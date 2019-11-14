@@ -92,12 +92,6 @@ describe('git/writer with remote', function() {
         factory.addResource('fields', 'published-date').withAttributes({ fieldType: '@cardstack/core-types::string' })
       ]).withRelated('data-source', dataSource);
 
-    factory.addResource('plugin-configs', '@cardstack/hub')
-      .withRelated(
-        'default-data-source',
-        dataSource
-      );
-
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
     writers = env.lookup('hub:writers');
   });
@@ -311,12 +305,6 @@ describe('git/writer with empty remote', function() {
         factory.addResource('fields', 'published-date').withAttributes({ fieldType: '@cardstack/core-types::string' })
       ]).withRelated('data-source', dataSource);
 
-    factory.addResource('plugin-configs', '@cardstack/hub')
-      .withRelated(
-        'default-data-source',
-        dataSource
-      );
-
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
     writers = env.lookup('hub:writers');
   });
@@ -392,12 +380,6 @@ describe('git/writer-remote/githereum', function() {
         factory.addResource('fields', 'title').withAttributes({ fieldType: '@cardstack/core-types::string' }),
         factory.addResource('fields', 'primary-image').withAttributes({ fieldType: '@cardstack/core-types::belongs-to' })
       ]).withRelated('data-source', dataSource);
-
-    factory.addResource('plugin-configs', '@cardstack/hub')
-      .withRelated(
-        'default-data-source',
-        dataSource
-      );
 
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
     writers = env.lookup('hub:writers');

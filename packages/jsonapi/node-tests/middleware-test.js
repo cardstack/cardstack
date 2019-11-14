@@ -12,7 +12,7 @@ const qs = require('qs');
 const { removeSync } = require('fs-extra');
 const { join } = require('path');
 const { tmpdir } = require('os');
-const { adaptCardToFormat, cardBrowserAssetFields } = require('@cardstack/test-support/card-utils');
+const { adaptCardToFormat, cardBrowserAssetFields } = require('@cardstack/plugin-utils/card-utils');
 
 const cardsDir = join(tmpdir(), 'card_modules');
 let cardFactory = new JSONAPIFactory();
@@ -936,6 +936,8 @@ describe('jsonapi/middleware', function() {
 
         app = new Koa();
         env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, factory.getModels());
+        let cardServices = env.lookup('hub:card-services');
+        await cardServices._setupPromise;
         app.use(async function (ctxt, next) {
           await next();
           log.info('%s %s %s', ctxt.request.method, ctxt.request.originalUrl, ctxt.response.status);

@@ -7,7 +7,7 @@ import {
   SingleResourceDoc,
   CollectionResourceDoc,
 } from 'jsonapi-typescript';
-import cardUtils from './indexing/card-utils';
+import cardUtils from '@cardstack/plugin-utils/card-utils';
 import baseCard from '@cardstack/base-card';
 
 const log = logger('cardstack/card-services');

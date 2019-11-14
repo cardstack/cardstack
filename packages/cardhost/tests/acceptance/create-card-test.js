@@ -96,7 +96,7 @@ module('Acceptance | card create', function(hooks) {
     assert.equal(card.data.attributes.title, undefined);
     assert.equal(card.data.attributes.body, undefined);
     assert.equal(card.data.relationships.author, undefined);
-    assert.deepEqual(card.data.relationships.reviewers.data, []);
+    assert.deepEqual(card.data.relationships.reviewers, undefined);
   });
 
   test(`selecting a field`, async function(assert) {

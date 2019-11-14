@@ -75,23 +75,32 @@ const Change = require("./change");
 const { safeEntryByName } = require('./mutable-tree');
 const log = require('@cardstack/logger')('cardstack/git');
 const service = require('./service');
+const { set, intersection } = require('lodash');
+const { isInternalCard, adoptionChain } = require('@cardstack/plugin-utils/card-utils');
+const { declareInjections } = require('@cardstack/di');
+const Session = require('@cardstack/plugin-utils/session');
 
 const defaultBranch = 'master';
 
-module.exports = class Indexer {
+module.exports = declareInjections({
+  searchers: 'hub:searchers',
+},
+
+class Indexer {
   static create(params) { return new this(params); }
 
-  constructor({ repo, basePath, branchPrefix, remote }) {
+  constructor({ dataSource, repo, basePath, branchPrefix, remote, searchers }) {
     if (repo && remote) {
       throw new Error('You cannot define the params \'remote\' and \'repo\' at the same time for this data source');
     }
     this.repoPath = repo;
+    this.searchers = searchers;
+    this.cardTypes = dataSource.cardTypes || [];
     this.branchPrefix = branchPrefix || "";
     this.basePath = basePath ? basePath.split('/') : [];
     this.repo = null;
     this.remote = remote;
   }
-
 
   async _ensureRepo() {
     if (!this.repo) {
@@ -132,15 +141,18 @@ module.exports = class Indexer {
     }
     log.debug(`ending beginUpdate()`);
 
-    return new GitUpdater(this.repo, targetBranch, this.repoPath, this.basePath);
+    return new GitUpdater(this.repo, targetBranch, this.repoPath, this.basePath, this.searchers, this.cardTypes, this.__owner__);
   }
-};
+});
 
 class GitUpdater {
-  constructor(repo, branch, repoPath, basePath) {
+  constructor(repo, branch, repoPath, basePath, searchers, cardTypes, owner) {
+    this.cardTypes = cardTypes;
     this.repo = repo;
     this.basePath = basePath;
     this.branch = branch;
+    this.searchers = searchers;
+    this.owner = owner;
     this.commit = null;
     this.commitId = null;
     this.rootTree = null;
@@ -154,6 +166,26 @@ class GitUpdater {
       only: this.basePath.concat(['schema'])
     });
     return models.map(m => m.data);
+  }
+
+  async _ensureBaseCard() {
+    if (this.cardTypes && this.cardTypes.length) {
+      // lazily performing the lookup of card services so that the base card creation doesn't
+      // interfere with the remote syncing as base card may actually be written to git,
+      // which may require a merge, as well as a promise to reconcile, which we do below.
+      let cardServices = this.owner.lookup('hub:card-services');
+      await cardServices._setupPromise;
+    }
+  }
+
+  async getInternalCard(cardId) {
+    let card;
+    try {
+      card = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', cardId, cardId);
+    } catch (err) {
+      if (err.status !== 404) { throw err; }
+    }
+    return card;
   }
 
   async updateContent(meta, hints, ops) {
@@ -172,7 +204,7 @@ class GitUpdater {
       await ops.beginReplaceAll();
     }
     await this._indexTree(ops, originalTree, this.rootTree, {
-      only: this.basePath.concat([['schema', 'contents']])
+      only: this.basePath.concat([['schema', 'contents', 'cards']])
     });
     if (!originalTree) {
       await ops.finishReplaceAll();
@@ -245,7 +277,18 @@ class GitUpdater {
       let { type, id } = identify(newEntry);
       let doc = await this._entryToDoc(type, id, newEntry);
       if (doc) {
-        await ops.save(type, id, { data: doc });
+        if (isInternalCard(type, id)) {
+          await this._ensureBaseCard();
+
+          let chain = (await adoptionChain(doc, this.getInternalCard.bind(this))).map(i => i.data.id);
+          if (!intersection(this.cardTypes, chain).length) {
+            return;
+          }
+
+          await ops.save(type, id, doc);
+        } else {
+          await ops.save(type, id, { data: doc });
+        }
       }
     }
   }
@@ -269,11 +312,6 @@ class GitUpdater {
       log.warn("Ignoring record with invalid json at %s", entry.path());
       return;
     }
-    doc.type = type;
-    doc.id = id;
-    if (!doc.meta) {
-      doc.meta = {};
-    }
 
     // A note on the cardstack meta versioning protocol:
     //
@@ -285,18 +323,31 @@ class GitUpdater {
     // meta.hash is a content hash. If you change and then undo, you
     // should end up back at the original meta.hash. In this git
     // data-source, this is ID of a blob.
-    doc.meta.version = this.commitId;
-    doc.meta.hash = entry.id().tostrS();
+    if (!isInternalCard(type, id)) {
+      doc.type = type;
+      doc.id = id;
+      set(doc, 'meta.version', this.commitId);
+      set(doc, 'meta.hash', entry.id().tostrS());
+    } else {
+      set(doc, 'data.meta.version', this.commitId);
+      set(doc, 'data.meta.hash', entry.id().tostrS());
+    }
+
     return doc;
   }
 }
 
-
 function identify(entry) {
+  let type, id;
   let parts = entry.path().split('/');
-  let type = parts[parts.length - 2] || 'tops';
-  let filename = parts[parts.length - 1];
-  let id = filename.replace(/\.json$/, '');
+  if (parts[0] === 'cards' && parts.length > 1) {
+    parts.shift();
+    id = type = parts.join('/').replace(/\.json$/, '');
+  } else {
+    type = parts[parts.length - 2] || 'tops';
+    let filename = parts[parts.length - 1];
+    id = filename.replace(/\.json$/, '');
+  }
   return { type, id };
 }
 
@@ -305,8 +356,10 @@ class Gather {
     this.models = models;
   }
   save(type, id, document) {
-    document.type = type;
-    document.id = id;
+    if (!isInternalCard(type, id)) {
+      document.type = type;
+      document.id = id;
+    }
     this.models.push(document);
   }
 }

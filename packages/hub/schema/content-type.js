@@ -5,6 +5,7 @@ const Realms = require('./realms');
 const authLog = require('@cardstack/logger')('cardstack/auth');
 const Session = require('@cardstack/plugin-utils/session');
 const log = require('@cardstack/logger')('cardstack/schema/content-type');
+const { resolveDocument } = require('@cardstack/plugin-utils/card-utils');
 
 module.exports = class ContentType {
   constructor(model, allFields, allComputedFields, allConstraints, dataSources, defaultDataSource, allGrants, allGroups) {
@@ -170,6 +171,8 @@ module.exports = class ContentType {
 
   _validateUnknownFields(pending, errors) {
     let { finalDocument, originalDocument } = pending;
+    finalDocument = resolveDocument(finalDocument);
+    originalDocument = resolveDocument(originalDocument);
 
     if (finalDocument.attributes) {
       let originalFields = originalDocument && originalDocument.attributes
@@ -291,7 +294,7 @@ module.exports = class ContentType {
       return;
     }
 
-    let resource = pendingChange.finalDocument;
+    let resource = resolveDocument(pendingChange.finalDocument);
     for (let section of ['attributes', 'relationships']) {
       if (resource[section]) {
         for (let fieldName of Object.keys(resource[section])) {

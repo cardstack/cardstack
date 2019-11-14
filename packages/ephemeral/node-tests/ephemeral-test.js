@@ -12,9 +12,10 @@ const {
   destroyDefaultEnvironment
 } = require('../../../tests/ephemeral-test-app/node_modules/@cardstack/test-support/env');
 const JSONAPIFactory = require('../../../tests/ephemeral-test-app/node_modules/@cardstack/test-support/jsonapi-factory');
+const { defaultDataSourceId } = require('@cardstack/test-support/env');
 
 describe('ephemeral-storage', function() {
-  let env, request;
+  let env, request, ephemeralService;
 
   async function setup() {
     let factory = new JSONAPIFactory();
@@ -45,10 +46,13 @@ describe('ephemeral-storage', function() {
     ]);
 
     env = await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', factory.getModels());
+    let cardServices = env.lookup('hub:card-services');
+    await cardServices._setupPromise;
 
     let app = new Koa();
     app.use(env.lookup('hub:middleware-stack').middleware());
     request = defaults(supertest(app.callback()));
+    ephemeralService = env.lookup(`plugin-services:${require.resolve('../service')}`);
     request.set('Accept', 'application/vnd.api+json');
   }
 
@@ -103,6 +107,43 @@ describe('ephemeral-storage', function() {
       expect(response.body).has.deep.property('data.attributes.title', 'hello');
     });
 
+    it("can store a card document as a single document", async function () {
+      let factory = new JSONAPIFactory();
+      let card = factory.getDocumentFor(
+        factory.addResource('cards', 'local-hub::test-card')
+          .withRelated('fields', [
+            factory.addResource('fields', 'title').withAttributes({
+              'is-metadata': true,
+              'field-type': '@cardstack/core-types::string',
+              'needed-when-embedded': true
+            })
+          ])
+          .withRelated('model', factory.addResource('local-hub::test-card', 'local-hub::test-card')
+            .withAttributes({
+              title: 'hello'
+            })
+          )
+      );
+
+      let response = await request.post('/api/cards').send(card);
+      expect(response).hasStatus(201);
+      expect(response.body).has.deep.property('data.meta.version');
+      expect(response.body).has.deep.property('data.id');
+      expect(response.body.data.id).to.equal('local-hub::test-card');
+
+      response = await request.get(`/api/cards/${response.body.data.id}`);
+      expect(response).hasStatus(200);
+      expect(response.body).has.deep.property('data.attributes.title', 'hello');
+
+      let storage = await ephemeralService.findOrCreateStorage(defaultDataSourceId);
+      let cardDocument = storage.lookup(card.data.id, card.data.id);
+      expect(cardDocument.data).to.be.ok;
+      expect(cardDocument.included.length).to.equal(1);
+
+      let internalCardResource = storage.lookup('fields', `${card.data.id}::title`);
+      expect(internalCardResource).to.be.undefined;
+    });
+
     it('can update a record', async function() {
       let response = await request.get('/api/posts/first-post');
       expect(response).hasStatus(200);
@@ -129,6 +170,60 @@ describe('ephemeral-storage', function() {
         body: 'Updated body',
         title: 'The First Post'
       });
+    });
+
+    it("can update a card document stored as a single document", async function () {
+      let factory = new JSONAPIFactory();
+      let card = factory.getDocumentFor(
+        factory.addResource('cards', 'local-hub::test-card')
+          .withRelated('fields', [
+            factory.addResource('fields', 'title').withAttributes({
+              'is-metadata': true,
+              'field-type': '@cardstack/core-types::string',
+              'needed-when-embedded': true
+            })
+          ])
+          .withRelated('model', factory.addResource('local-hub::test-card', 'local-hub::test-card')
+            .withAttributes({
+              title: 'hello'
+            })
+          )
+      );
+
+      ({ body: card } = await request.post('/api/cards').send(card));
+      let model = card.included.find(i => `${i.type}/${i.id}`);
+      model.attributes.body = 'Updated Body';
+      model.attributes.title = 'The First Post';
+      card.data.relationships.fields.data.push({ type: 'fields', id: 'body' });
+      card.included.push({
+        type: 'fields',
+        id: 'body',
+        attributes: {
+          'is-metadata': true,
+          'field-type': '@cardstack/core-types::string',
+          'needed-when-embedded': true
+        }
+      });
+
+      let response = await request.patch(`/api/cards/${card.data.id}`).send(card);
+      expect(response).hasStatus(200);
+      expect(response.body.data.attributes.body).equals('Updated Body');
+      expect(response.body.data.attributes.title).equals('The First Post');
+
+      response = await request.get(`/api/cards/${card.data.id}`);
+      expect(response).hasStatus(200);
+      expect(response.body.data.attributes.body).equals('Updated Body');
+      expect(response.body.data.attributes.title).equals('The First Post');
+
+      let storage = await ephemeralService.findOrCreateStorage(defaultDataSourceId);
+      let cardDocument = storage.lookup(card.data.id, card.data.id);
+      expect(cardDocument.data).to.be.ok;
+      expect(cardDocument.included.length).to.equal(2);
+
+      let internalCardResource = storage.lookup('fields', `${card.data.id}::title`);
+      expect(internalCardResource).to.be.undefined;
+      internalCardResource = storage.lookup('fields', `${card.data.id}::body`);
+      expect(internalCardResource).to.be.undefined;
     });
 
     it('enforces meta.version consistency during update', async function() {
@@ -160,6 +255,38 @@ describe('ephemeral-storage', function() {
       expect(response).hasStatus(404);
     });
 
+    it('can delete a card from storage', async function() {
+      let factory = new JSONAPIFactory();
+      let card = factory.getDocumentFor(
+        factory.addResource('cards', 'local-hub::test-card')
+          .withRelated('fields', [
+            factory.addResource('fields', 'title').withAttributes({
+              'is-metadata': true,
+              'field-type': '@cardstack/core-types::string',
+              'needed-when-embedded': true
+            })
+          ])
+          .withRelated('model', factory.addResource('local-hub::test-card', 'local-hub::test-card')
+            .withAttributes({
+              title: 'hello'
+            })
+          )
+      );
+
+      await request.post('/api/cards').send(card);
+      let response = await request.get(`/api/cards/${card.data.id}`);
+      expect(response).hasStatus(200);
+      expect(response.body).has.deep.property('data.meta.version');
+      response = await request.delete(`/api/cards/${card.data.id}`).set('If-Match', response.body.data.meta.version);
+      expect(response).hasStatus(204);
+
+      response = await request.get(`/api/cards/${card.data.id}`);
+      expect(response).hasStatus(404);
+
+      let storage = await ephemeralService.findOrCreateStorage(defaultDataSourceId);
+      let cardDocument = storage.lookup(card.data.id, card.data.id);
+      expect(cardDocument).to.be.not.ok;
+    });
 
     it('enforces meta.version consistency during delete', async function() {
       let response = await request.get('/api/posts/first-post');
