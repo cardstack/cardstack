@@ -18,6 +18,7 @@
     @field.name
     " field-type-"
     this.dasherizedType
+    (if (or @setPosition @removeField) " with-buttons")
   }}
   data-test-field={{@field.name}}
   data-test-field-type={{@field.type}}
@@ -46,196 +47,150 @@
         />
       </div>
     {{/let}}
-  {{else if (and (eq @mode "schema") @isRightEdgeField)}}
+  {{else if (eq @mode "schema")}}
     {{!-- TODO we should extract the schema editing stuff into a seaprate component --}}
-    <div class="schema-field-renderer">
-      {{#if (includes this.schemaAttrs "title")}}
-        <header
-          class="schema-field-renderer--header"
-          data-test-field-renderer-header
-        >
-          {{@field.name}}
-          {{#if @field.isAdopted}}
-            <span class="schema-field-renderer--header--detail">Adopted</span>
-          {{/if}}
-        </header>
+      {{#if (includes schemaAttrs "title")}}
+        <div class="schema-field-renderer" tabindex="0">
+          {{!-- TODO: Change displayed logo depending on field --}}
+          {{! template-lint-disable no-inline-styles }}
+          <header
+            class="schema-field-renderer--header"
+            style={{css-url "background-image" "/images/fields/text.svg"}}
+            data-test-field-renderer-type
+          >
+            {{@field.type}}
+            {{#if @field.isAdopted}}
+              <span class="schema-field-renderer--header--detail">Adopted</span>
+            {{/if}}
+          </header>
+          <div class="schema-field-renderer--content">
+            <div class="schema-field-renderer--name" data-test-field-renderer-label>
+              {{@field.name}}
+            </div>
+            <div class="schema-field-renderer--value" data-test-field-renderer-value>
+              {{@field.value}}
+            </div>
+          </div>
+        </div>
       {{/if}}
-      <div class="schema-field-renderer--attributes">
-        {{#each this.schemaAttrs as |schemaAttr|}}
-          {{#if (eq schemaAttr "type")}}
-            <div
-              class="schema-field-renderer--attribute"
-              data-test-schema-attr={{schemaAttr}}
+    {{#each this.schemaAttrs as |schemaAttr|}}
+      {{#if (eq schemaAttr "type")}}
+        <div class="field-renderer--display" data-test-schema-attr={{schemaAttr}}>
+          <span class="ch-label">Field Type</span>
+          <span data-test-field-renderer-field-type>
+            {{@field.type}}
+          </span>
+        </div>
+      {{else if (eq schemaAttr "label")}}
+        <div class="ch-input-group" data-test-schema-attr={{schemaAttr}}>
+          {{#if @setFieldLabel}}
+            <label
+              for={{concat "edit-field-label-" @field.nonce "-" this.renderNonce}}
+              class="ch-label"
+              data-test-field-renderer-field-label-label
             >
-              <span class="schema-field-renderer--attribute-name">Field Type</span>
-              <span
-                class="schema-field-renderer--attribute-value"
-                data-test-field-renderer-field-type
-              >
-                {{@field.type}}
+              Field Label
+            </label>
+            <Input
+              @id={{concat "edit-field-label-" @field.nonce "-" this.renderNonce}}
+              @class="ch-input"
+              @value={{this.newFieldLabel}}
+              @key-up={{action this.updateFieldLabel}}
+              @disabled={{@field.isAdopted}}
+            />
+          {{else}}
+            <div class="field-renderer--display">
+              <span class="ch-label">Field Label</span>
+              <span data-test-field-renderer-field-label>
+                {{@field.label}}
               </span>
             </div>
-          {{else if (eq schemaAttr "label")}}
-            <div
-              class="schema-field-renderer--attribute"
-              data-test-schema-attr={{schemaAttr}}
+          {{/if}}
+        </div>
+      {{else if (eq schemaAttr "instructions")}}
+        <div class="ch-input-group" data-test-schema-attr={{schemaAttr}}>
+          {{#if @setFieldInstructions}}
+            <label
+              for={{concat "edit-field-instructions-" @field.nonce "-" this.renderNonce}}
+              class="ch-label"
+              data-test-field-renderer-field-instructions-label
             >
-              {{#if @setFieldLabel}}
-                <label
-                  for={{concat "edit-field-label-" @field.nonce "-" this.renderNonce}}
-                  class="schema-field-renderer--attribute-name"
-                  data-test-field-renderer-field-label-label
-                >
-                  Field Label
-                </label>
-                <Input
-                  @id={{concat "edit-field-label-" @field.nonce "-" this.renderNonce}}
-                  @class="field-renderer-field-label-input schema-field-renderer--input"
-                  @value={{this.newFieldLabel}}
-                  @key-up={{action this.updateFieldLabel}}
-                  @disabled={{@field.isAdopted}}
-                />
-              {{else}}
-                <span class="schema-field-renderer--attribute-name">Field Label</span>
-                <span
-                  class="schema-field-renderer--attribute-value"
-                  data-test-field-renderer-field-label
-                >
-                  {{@field.label}}
-                </span>
-              {{/if}}
-            </div>
-          {{else if (eq schemaAttr "instructions")}}
-            <div
-              class="schema-field-renderer--attribute"
-              data-test-schema-attr={{schemaAttr}}
-            >
-              {{#if @setFieldInstructions}}
-                <label
-                  for={{concat "edit-field-instructions-" @field.nonce "-" this.renderNonce}}
-                  class="schema-field-renderer--attribute-name"
-                  data-test-field-renderer-field-instructions-label
-                >
-                  Helper Text
-                </label>
-                <Textarea
-                  @id={{concat "edit-field-instructions-" @field.nonce "-" this.renderNonce}}
-                  data-test-field-renderer-field-helper-text
-                  @class="field-renderer-field-instructions-input schema-field-renderer--input"
-                  @value={{this.newFieldInstructions}}
-                  @key-up={{action this.updateFieldInstructions}}
-                />
-              {{else}}
-                <span class="schema-field-renderer--attribute-name">Helper Text</span>
-                <span
-                  class="schema-field-renderer--attribute-value"
-                  data-test-field-renderer-field-instructions
-                >
-                  {{@field.instructions}}
-                </span>
-              {{/if}}
-            </div>
-          {{else if (eq schemaAttr "is-meta")}}
-            <div
-              class="schema-field-renderer--attribute"
-              data-test-schema-attr={{schemaAttr}}
-            >
-              <span class="schema-field-renderer--attribute-name">Is Metadata Field</span>
-              <span data-test-field-renderer-is-meta>
-                {{if @field.json.data.attributes.is-metadata "true" "false"}}
+              Helper Text
+            </label>
+            <Textarea
+              @id={{concat "edit-field-instructions-" @field.nonce "-" this.renderNonce}}
+              data-test-field-renderer-field-helper-text
+              @class="ch-input"
+              @value={{this.newFieldInstructions}}
+              @key-up={{action this.updateFieldInstructions}}
+            />
+          {{else}}
+            <div class="field-renderer--display">
+              <span class="ch-label">Helper Text</span>
+              <span data-test-field-renderer-field-instructions>
+                {{@field.instructions}}
               </span>
             </div>
-          {{else if (and (eq schemaAttr "name") @setFieldName)}}
-            <div
-              class="schema-field-renderer--attribute"
-              data-test-schema-attr={{schemaAttr}}
-            >
-              <label
-                for={{concat "edit-field-name-" @field.nonce "-" this.renderNonce}}
-                class="schema-field-renderer--attribute-name"
-                data-test-field-renderer-field-name-label
-              >
-                Field Name
-              </label>
+          {{/if}}
+        </div>
+      {{else if (and (eq schemaAttr "name") @setFieldName)}}
+        <div class="ch-input-group" data-test-schema-attr={{schemaAttr}}>
+          <label
+            for={{concat "edit-field-name-" @field.nonce "-" this.renderNonce}}
+            class="ch-label"
+            data-test-field-renderer-field-name-label
+          >
+            Field Name
+          </label>
+          <Input
+            @id={{concat "edit-field-name-" @field.nonce "-" this.renderNonce}}
+            @class="ch-input"
+            @value={{this.newFieldName}}
+            @key-up={{action this.updateFieldName}}
+            @disabled={{@field.isAdopted}}
+          />
+        </div>
+      {{else if (eq schemaAttr "is-meta")}}
+        <div class="field-renderer--display" data-test-schema-attr={{schemaAttr}}>
+          <span class="ch-label">Export as Metadata</span>
+          <span data-test-field-renderer-is-meta>
+            {{if @field.json.data.attributes.is-metadata "true" "false"}}
+          </span>
+        </div>
+      {{else if (eq schemaAttr "embedded")}}
+        <div class="ch-input-group" data-test-schema-attr={{schemaAttr}}>
+          {{#if @setNeededWhenEmbedded}}
+            <label class="ch-label ch-checkbox-group {{if @field.isAdopted "disabled"}}">
+              Available When Embedded
               <Input
-                @id={{concat "edit-field-name-" @field.nonce "-" this.renderNonce}}
-                @class="field-renderer-field-name-input schema-field-renderer--input"
-                @value={{this.newFieldName}}
-                @key-up={{action this.updateFieldName}}
+                @checked={{@field.neededWhenEmbedded}}
+                @type="checkbox"
+                @class="ch-checkbox"
+                @id={{concat "edit_" @field.name "_" this.renderNonce "_embedded"}}
+                @click={{fn @setNeededWhenEmbedded @field.name}}
                 @disabled={{@field.isAdopted}}
               />
-            </div>
-          {{else if (eq schemaAttr "embedded")}}
-            <div
-              class="schema-field-renderer--attribute"
-              data-test-schema-attr={{schemaAttr}}
-            >
-              {{#if @setNeededWhenEmbedded}}
-                <label
-                  for="new_field_embedded"
-                  class="checkbox-container {{if @field.isAdopted "disabled"}}"
-                >
-                  Available When Embedded
-                  <Input
-                    @checked={{@field.neededWhenEmbedded}}
-                    @class="field-renderer--needed-when-embedded-chbx"
-                    @type="checkbox"
-                    @id={{concat "edit_" @field.name "_" this.renderNonce "_embedded"}}
-                    @click={{fn @setNeededWhenEmbedded @field.name}}
-                    @disabled={{@field.isAdopted}}
-                  />
-                  <span class="checkmark"></span>
-                </label>
-              {{else}}
-                <span class="schema-field-renderer--attribute-name">Available When Embedded</span>
-                <span
-                  class="schema-field-renderer--attribute-value"
-                  data-test-field-renderer-embedded
-                >
-                  {{if @field.neededWhenEmbedded "true" "false"}}
-                </span>
-              {{/if}}
-            </div>
-          {{else if (eq schemaAttr "required")}}
-            <div
-              class="schema-field-renderer--attribute"
-              data-test-schema-attr={{schemaAttr}}
-            >
-              <label class="checkbox-container">
-                Required
-                <Input @type="checkbox" />
-                <span class="checkmark"></span>
-              </label>
+              <span class="ch-checkmark"></span>
+            </label>
+          {{else}}
+            <div class="field-renderer--display">
+              <span class="ch-label">Available When Embedded</span>
+              <span data-test-field-renderer-embedded>
+                {{if @field.neededWhenEmbedded "true" "false"}}
+              </span>
             </div>
           {{/if}}
-        {{/each}}
-      </div>
-    </div>
-  {{else if (eq @mode "schema")}}
-    <div class="schema-field-renderer" tabindex="0">
-      {{! template-lint-disable no-inline-styles}}
-      {{!-- TODO: need to display field icon and (formatted) type --}}
-      <header
-        class="schema-field-renderer--header-bar"
-        data-test-field-renderer-type
-      >
-        {{@field.type}}
-        {{#if @field.isAdopted}}
-          <span class="schema-field-renderer--header--detail">Adopted</span>
-        {{/if}}
-      </header>
-      <div class="schema-field-renderer--content">
-        <div
-          class="schema-field-renderer--name"
-          data-test-field-renderer-label
-        >
-          {{@field.name}}
         </div>
-        <div class="schema-field-renderer--value" data-test-field-renderer-value>
-          {{@field.value}}
+      {{else if (eq schemaAttr "required")}}
+        <div class="ch-input-group" data-test-schema-attr={{schemaAttr}}>
+          <label class="ch-label ch-checkbox-group">
+            Required
+            <Input @type="checkbox" @class="ch-checkbox" />
+            <span class="ch-checkmark"></span>
+          </label>
         </div>
-      </div>
-    </div>
+      {{/if}}
+    {{/each}}
   {{/if}}
 
   <div class="field-renderer--action">

@@ -233,7 +233,6 @@ module('Integration | Component | field-renderer', function(hooks) {
 
     await render(hbs`
     <FieldRenderer
-      @isRightEdgeField={{true}}
       @field={{field}}
       @mode="schema"
       @setFieldName={{action setFieldName}}
@@ -265,7 +264,6 @@ module('Integration | Component | field-renderer', function(hooks) {
 
     await render(hbs`
     <FieldRenderer
-      @isRightEdgeField={{true}}
       @field={{field}}
       @mode="schema"
       @setFieldName={{action setFieldName}}
@@ -296,7 +294,6 @@ module('Integration | Component | field-renderer', function(hooks) {
 
     await render(hbs`
     <FieldRenderer
-      @isRightEdgeField={{true}}
       @field={{field}}
       @mode="schema"
       @setFieldName={{action noop}}
@@ -328,7 +325,6 @@ module('Integration | Component | field-renderer', function(hooks) {
 
     await render(hbs`
     <FieldRenderer
-      @isRightEdgeField={{true}}
       @field={{field}}
       @mode="schema"
       @setFieldName={{action noop}}

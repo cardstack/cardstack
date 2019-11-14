@@ -4,9 +4,9 @@
   display: grid;
   grid-template-columns: 80px 1fr;
   align-items: center;
+  background-color: white;
   border: 1px solid var(--ch-light-gray-d6);
   border-radius: 10px;
-  background-color: white;
 }
 
 .ch-catalog-field:hover {

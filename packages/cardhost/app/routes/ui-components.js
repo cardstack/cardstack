@@ -8,11 +8,58 @@ export default class UIComponentsRoute extends Route {
       name: 'event',
       isolatedFields: [
         {
+          name: 'title',
           label: 'title',
-          type: 'text',
+          type: '@cardstack/core-types::string',
           value: 'Ember Meetup'
+        },
+        {
+          name: 'description',
+          label: 'description',
+          type: '@cardstack/core-types::string',
+          value: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero.'
+        },
+        {
+          name: 'image',
+          label: 'image',
+          type: '@cardstack/core-types::string',
+          value: '/assets/images/cards/nyc.png'
+        },
+        {
+          name: 'datetime',
+          label: 'datetime',
+          type: '@cardstack/core-types::date',
+          value: '2019-09-26'
         }
-      ]
+      ],
+
+      sampleNameField: {
+        name: 'sample-name',
+        label: 'name',
+        type: '@cardstack/core-types::string',
+        value: 'Ember Meetup'
+      },
+
+      sampleTitleField: {
+        name: 'sample-title',
+        label: 'title',
+        type: '@cardstack/core-types::string',
+        value: 'Ember Meetup'
+      },
+
+      sampleDescriptionField: {
+        name: 'sample-description',
+        label: 'description',
+        type: '@cardstack/core-types::string',
+        value: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero.'
+      },
+
+      sampleDateField: {
+        name: 'sample-datetime',
+        label: 'datetime',
+        type: '@cardstack/core-types::date',
+        value: '2019-09-26'
+      }
     }
   }
 }

@@ -108,8 +108,8 @@ module('Acceptance | card adoption', function(hooks) {
 
     await showCardId();
 
-    assert.dom(`a.right-edge--adopted-card-link[href="/cards/${card1Id}/schema"]`).hasText(card1Id);
-    await click(`a.right-edge--adopted-card-link[href="/cards/${card1Id}/schema"]`);
+    assert.dom(`[data-test-right-edge] a.adopted-card[href="/cards/${card1Id}/schema"]`).includesText(card1Id);
+    await click(`[data-test-right-edge] a.adopted-card[href="/cards/${card1Id}/schema"]`);
     await waitFor(`[data-test-card-schema="${card1Id}"]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card1Id}/schema`);

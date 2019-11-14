@@ -3,13 +3,13 @@
 }
 
 .edit-field-renderer {
-  width: 100%;
+  width: 453px;
   max-width: 100%;
-  margin: 0 auto;
-  padding: var(--spacing);
-  background-color: white;
-  border: 1px solid var(--field-renderer-border-color);
+  min-height: 76px;
+  padding: 10px var(--ch-spacing);
+  border: 1px solid var(--field-border-color);
   border-radius: 5px;
+  background-color: white;
   overflow: hidden;
 }
 

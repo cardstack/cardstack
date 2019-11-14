@@ -3,7 +3,7 @@
   --padding: 10px 15px;
   --width: 100px;
   --height: 40px;
-  --color: var(--ch-gray-black);
+  --color: var(--ch-dark-purple-28);
   --background: var(--ch-cyan);
   --font: 600 13px/18px "Open Sans";
   --letter-spacing: 0.46px;
@@ -15,7 +15,7 @@
   margin: var(--margin);
   padding: var(--padding);
   height: var(--height);
-  min-width: var(--width);
+  width: var(--width);
   color: var(--color);
   background: var(--background);
   font: var(--font);
@@ -49,13 +49,12 @@
   --icon-size: 17px 20px;
 }
 
-
 .ch-button--icon {
   --width: 40px;
   --height: 40px;
   --padding: 0;
   --border: none;
-  --border-radius: auto;
+  --border-radius: 50%;
   --icon-url: url('');
   --background: var(--icon-url) center/40px 40px no-repeat;
   --box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);

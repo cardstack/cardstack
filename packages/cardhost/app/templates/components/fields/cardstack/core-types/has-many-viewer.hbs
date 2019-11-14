@@ -1,7 +1,7 @@
-<div class="label" data-test-has-many-field-viewer-label>
+<div class="ch-label" data-test-has-many-field-viewer-label>
   {{@field.name}}:
 </div>
-<div class="value" data-test-has-many-field-viewer-value>
+<div class="ch-value" data-test-has-many-field-viewer-value>
   {{#each @field.value key="id" as | card |}}
     <CardRenderer @card={{card}} @format="embedded"/>
     <br>

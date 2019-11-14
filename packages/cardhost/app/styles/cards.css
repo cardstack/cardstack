@@ -1,5 +1,5 @@
 .cardhost-cards {
-  /* TODO: make this a grid */
+  /* TODO: make this a grid. do not use padding to determine card view zone */
 
   --padding-top: var(--ch-top-edge-height);
   --padding-left: var(--ch-left-edge-width);
@@ -16,5 +16,5 @@
 
 .cardhost-cards.add,
 .cardhost-cards.schema {
-  background: url("/assets/images/grid-square.png") center/20px repeat;
+  background: url("/assets/images/schema-grid-tile.png") center/60px repeat;
 }
