@@ -48,16 +48,16 @@ export default class FieldRenderer extends Component {
   }
 
   @action
-  updateFieldProperties(element, [field]) {
-    if (field && this.nonce !== this.currentNonce) {
-      this.currentNonce = this.nonce;
+  updateFieldProperties(element, [field], { nonce }) {
+    if (field && nonce !== this.currentNonce) {
+      this.currentNonce = nonce;
       this.newFieldName = field.name;
       this.newFieldLabel = field.label;
       this.newFieldInstructions = field.instructions;
     }
     return null;
   }
-  
+
   get nonce() {
     return onFieldChangedDependencies.map(i => this.args.field[i]).join('::');
   }
