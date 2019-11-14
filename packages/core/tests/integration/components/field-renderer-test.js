@@ -150,7 +150,6 @@ module('Integration | Component | field-renderer', function(hooks) {
       @setNeededWhenEmbedded={{action noop}}
       @setPosition={{action noop}}
       @removeField={{action noop}}
-      @isRightEdgeField={{true}} {{!-- Burcu please delete this line when you merge your stuff --}}
       @schemaAttrs={{array "title" "type" "label" "name" "instructions" "is-meta" "embedded" "required"}}
     />
     `);
@@ -200,7 +199,6 @@ module('Integration | Component | field-renderer', function(hooks) {
       @setNeededWhenEmbedded={{action noop}}
       @setPosition={{action noop}}
       @removeField={{action noop}}
-      @isRightEdgeField={{true}} {{!-- Burcu please delete this line when you merge your stuff --}}
       @schemaAttrs={{array "title" "type" "label" "name" "instructions" "is-meta" "embedded" "required"}}
     />
     `);
