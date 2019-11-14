@@ -11,7 +11,7 @@ import { printSprites } from 'ember-animated';
 export default class RightEdge extends Component {
   fade = fade;
   @tracked cardName;
-  @tracked displayCardMetadata;
+  // @tracked displayCardMetadata;
 
   constructor(...args) {
     super(...args);
@@ -19,19 +19,17 @@ export default class RightEdge extends Component {
     if (this.args.card) {
       this.cardName = this.args.card.name;
     }
-
-    this.displayCardMetadata = this.args.displayCardMetadata;
   }
 
   * outerTransition ({ keptSprites }) {
-    printSprites(arguments[0], 'trayTransition');
+    printSprites(arguments[0], 'outerTransition');
     keptSprites.forEach(sprite => {
       resize(sprite, { easing: easeInAndOut });
     });
   }
 
   * innerTransition ({ insertedSprites, removedSprites }) {
-    printSprites(arguments[0], 'trayTransition');
+    printSprites(arguments[0], 'innerTransition');
     insertedSprites.forEach(sprite => {
       fadeIn(sprite);
     });

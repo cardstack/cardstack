@@ -95,6 +95,17 @@ module.exports = function(defaults) {
             },
           },
         },
+        {
+          package: "ember-element-helper",
+          addonModules: {
+            "helpers/-element.js": {
+              dependsOnComponents: [
+                "{{-dynamic-element}}",
+                "{{-dynamic-element-alt}}"
+              ],
+            },
+          },
+        },
       ],
     });
   })();

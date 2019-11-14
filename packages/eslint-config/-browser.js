@@ -17,5 +17,6 @@ module.exports = {
   rules: {
     'no-restricted-globals': [2, 'find'],
     'keyword-spacing': [2],
+    'require-yield': 0,
   }
 };
