@@ -1,4 +1,9 @@
-<div class="right-edge" data-test-right-edge {{did-update this.updateCard @card @displayCardMetadata}}>
+{{! template-lint-disable attribute-indentation}}
+<div
+  class="right-edge"
+  data-test-right-edge
+  {{did-update this.updateCard @card}}
+>
   {{!-- TODO: make this a component --}}
   <div class="right-edge--section">
     <div class="pill-selector">
@@ -6,28 +11,7 @@
       <div class="pill-option">Structure</div>
     </div>
   </div>
-  {{#if @selectedField}}
-    <div class="right-edge--section">
-      <div class="right-edge--section-header" data-test-section-header>
-        {{this.selectedFieldTitle}} Field
-        {{#if @selectedField.isAdopted}}
-          <div class="right-edge--section-header--adopted">
-            Adopted from {{@selectedField.card.adoptedFrom.name}}
-          </div>
-        {{/if}}
-      </div>
-
-      <FieldRenderer
-        @field={{@selectedField}}
-        @mode="schema"
-        @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
-        @setFieldName={{@setFieldName}}
-        @setFieldLabel={{@setFieldLabel}}
-        @setFieldInstructions={{@setFieldInstructions}}
-        @schemaAttrs={{array "name" "label" "instructions" "required" "embedded"}}
-      />
-    </div>
-  {{else}}
+  {{#if @displayCardMetadata}}
     {{!--
     TODO each of these section is collapsable.
     Waiting until ember animated/liquid fire is available
@@ -99,6 +83,27 @@
           </div>
         {{/if}}
       </div>
+    </div>
+  {{else}}
+    <div class="right-edge--section">
+      <div class="right-edge--section-header" data-test-section-header>
+        {{this.selectedFieldTitle}} Field
+        {{#if @selectedField.isAdopted}}
+          <div class="right-edge--section-header--adopted">
+            Adopted from {{@selectedField.card.adoptedFrom.name}}
+          </div>
+        {{/if}}
+      </div>
+
+      <FieldRenderer
+        @field={{@selectedField}}
+        @mode="schema"
+        @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+        @setFieldName={{@setFieldName}}
+        @setFieldLabel={{@setFieldLabel}}
+        @setFieldInstructions={{@setFieldInstructions}}
+        @schemaAttrs={{array "name" "label" "instructions" "required" "embedded"}}
+      />
     </div>
   {{/if}}
 </div>
