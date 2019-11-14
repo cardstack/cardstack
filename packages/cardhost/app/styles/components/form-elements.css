@@ -1,3 +1,5 @@
+/* TODO: make focus states more accessible */
+
 .ch-label {
   display: block;
   color: var(--ch-white-op60);
@@ -18,18 +20,13 @@
   max-width: 100%;
   padding: 10px var(--ch-spacing);
   background-color: var(--ch-dark-blue-gray);
-  color: var(--ch-white-op60);
-  border: none;
+  color: white;
+  border: 1px solid transparent;
   border-radius: 5px;
   font: 400 13px/18px var(--ch-font-family);
   letter-spacing: 0.015em;
 
   transition: color var(--ch-transition-time);
-}
-
-.ch-input:focus,
-.ch-textarea:focus {
-  color: white;
 }
 
 .ch-input {
@@ -40,43 +37,39 @@
   min-height: 80px;
 }
 
-.ch-input-group:focus-within .ch-label,
-.ch-input-group:focus-within .ch-input,
-.ch-input-group:focus-within .ch-textarea {
+.ch-input:focus,
+.ch-textarea:focus {
   color: white;
-}
-
-.ch-input-group:hover .ch-label {
-  color: white;
-  cursor: pointer;
-}
-
-.ch-label.ch-input-group > .ch-input,
-.ch-label.ch-input-group > .ch-textarea {
-  margin-top: 10px;
-}
-
-.ch-label.ch-input-group:hover,
-.ch-label.ch-checkbox-group:hover {
-  color: white;
-  cursor: pointer;
+  border-color: var(--ch-medium-blue-gray);
+  outline: 0;
 }
 
 .ch-label + .ch-input,
-.ch-label + .ch-textarea {
+.ch-label + .ch-textarea,
+.ch-label > .ch-input,
+.ch-label > .ch-textarea {
   margin-top: 10px;
 }
 
 .ch-input::placeholder,
 .ch-input::-webkit-input-placeholder,
-.ch-input::-ms-input-placeholder {
+.ch-input::-ms-input-placeholder,
+.ch-textarea::placeholder,
+.ch-textarea::-webkit-input-placeholder,
+.ch-textarea::-ms-input-placeholder {
   font: inherit;
   letter-spacing: inherit;
+  color: inherit;
   opacity: 0.25;
 }
 
-.ch-input-group + .ch-input-group {
-  margin-top: var(--ch-spacing);
+.ch-input:disabled,
+.ch-textarea:disabled,
+.ch-input.disabled,
+.ch-textarea.disabled {
+  opacity: 0.6;
+  color: var(--ch-white-op25);
+  cursor: not-allowed;
 }
 
 .ch-checkbox-group {
@@ -108,7 +101,9 @@
   transition: background-color var(--ch-transition-time);
 }
 
-.ch-checkbox:hover + .ch-checkmark {
+/* .ch-checkbox-group:focus-within > .ch-checkbox + .ch-checkmark, */
+.ch-checkbox:focus + .ch-checkmark,
+.ch-checkbox:hover:not(:disabled) + .ch-checkmark {
   background-color: var(--ch-dark-blue-gray);
 }
 
@@ -117,8 +112,25 @@
   background-color: var(--ch-dark-blue-gray);
 }
 
+.ch-checkbox-group:hover {
+  cursor: pointer;
+}
+
+.ch-checkbox-group.checked {
+  color: white;
+}
+
+.ch-checkbox-group.disabled {
+  opacity: 0.6;
+  cursor: initial;
+}
+
 .ch-checkbox:disabled + .ch-checkmark,
 .ch-checkbox.disabled + .ch-checkmark {
-  opacity: 0.4;
+  opacity: 0.6;
   cursor: not-allowed;
+}
+
+.ch-input-group + .ch-input-group {
+  margin-top: var(--ch-spacing);
 }

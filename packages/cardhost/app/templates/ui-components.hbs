@@ -212,68 +212,175 @@
 
   <section class="ui-components--section ui-components--grid-2-col">
     <h2>Form Elements</h2>
-    <h3>Label</h3>
-    <label class="ch-label">Field name</label>
+    <h3>Field label</h3>
+    <label class="ch-label">Field label</label>
     <CodeBlock
-      @code='<label class="ch-label">Field name</label>'
+      @code='<label class="ch-label">Field label</label>'
       @language="html"
     />
 
     <h3>Text Input</h3>
-    <Input @class="ch-input" placeholder="Enter value" />
-    <CodeBlock
-      @code='<Input @class="ch-input" @placeholder="Enter value" />'
-      @language="html"
-    />
-
-    <h3>Textarea</h3>
-    <Textarea @class="ch-textarea" @placeholder="Enter value" />
-    <CodeBlock
-      @code='<Textarea @class="ch-textarea" @placeholder="Enter value" />'
-      @language="html"
-    />
-
-    <h3>Checkbox</h3>
-    <label class="ch-label ch-checkbox-group">
-      Required field
-      <Input @class="ch-checkbox" @type="checkbox" />
-      <span class="ch-checkmark"></span>
-    </label>
-     <CodeBlock
-      @code='
-        <label class="ch-label ch-checkbox-group">
-          Required field
-          <Input @class="ch-checkbox" @type="checkbox" />
-          <span class="ch-checkmark"></span>
-        </label>
-      '
-      @language="html"
-    />
-
-    <h3>Input Group</h3>
     <div class="ch-input-group">
-      <label for="ch-input-id" class="ch-label">Display label</label>
-      <Input @id="ch-input-id" @class="ch-input" @placeholder="Enter value" />
+      <label for="input-1" class="ch-label">Field label</label>
+      <Input @id="input-1" @class="ch-input" @placeholder="Placeholder text" />
     </div>
     <CodeBlock
       @code='
         <div class="ch-input-group">
-          <label for="[input-id-here]" class="ch-label">Display label</label>
-          <Input @id="[input-id-here]" @class="ch-input" @placeholder="Enter value" />
+          <label for="[id]" class="ch-label">Field label</label>
+          <Input @id="[id]" @class="ch-input" @placeholder="Placeholder text" />
         </div>
       '
       @language="html"
     />
 
     <label class="ch-label ch-input-group">
-      Display label
-      <Input @class="ch-input" @placeholder="Enter value" />
+      Field label
+      <Input @class="ch-input" @value="Entered text" />
     </label>
     <CodeBlock
       @code='
         <label class="ch-label ch-input-group">
-          Display label
-          <Input @class="ch-input" @placeholder="Enter value" />
+          Field label
+          <Input @class="ch-input" @value="Entered text" />
+        </label>
+      '
+      @language="html"
+    />
+
+    <div class="ch-input-group">
+      <label for="input-2" class="ch-label">Field label</label>
+      <Input @id="input-2" @class="ch-input disabled" @disabled={{true}} @placeholder="Disabled field with placeholder" />
+    </div>
+    <CodeBlock
+      @code='
+        <div class="ch-input-group">
+          <label for="[id]" class="ch-label">Field label</label>
+          <Input @id="[id]" @class="ch-input disabled" @disabled=true @placeholder="Disabled field with placeholder" />
+        </div>
+      '
+      @language="html"
+    />
+
+    <label class="ch-label ch-input-group">
+      Field label
+      <Input @class="ch-input disabled" @disabled={{true}} @value="Disabled field with entered value" />
+    </label>
+    <CodeBlock
+      @code='
+        <label class="ch-label ch-input-group">
+          Field label
+          <Input @class="ch-input disabled" @disabled=true @value="Disabled field with entered value" />
+        </label>
+      '
+      @language="html"
+    />
+
+    <h3>Textarea</h3>
+    <div class="ch-input-group">
+      <label for="textarea-1" class="ch-label">Textarea label</label>
+      <Textarea @id="textarea-1" @class="ch-textarea" @placeholder="Placeholder text" />
+    </div>
+    <CodeBlock
+      @code='
+        <div class="ch-input-group">
+          <label for="[id]" class="ch-label">Textarea label</label>
+          <Textarea @id="[id]" @class="ch-textarea" @placeholder="Placeholder text" />
+        </div>
+      '
+      @language="html"
+    />
+
+    <label class="ch-label ch-input-group">
+      Textarea label
+      <Textarea @class="ch-textarea" @value="Entered long text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero." />
+    </label>
+    <CodeBlock
+      @code='
+        <label class="ch-label ch-input-group">
+          Textarea label
+          <Textarea @class="ch-textarea" @value="Entered long text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero." />
+        </label>
+      '
+      @language="html"
+    />
+
+    <div class="ch-input-group">
+      <label for="textarea-2" class="ch-label">Textarea label</label>
+      <Textarea @id="textarea-2" @class="ch-textarea disabled" @disabled={{true}} @placeholder="Disabled textarea with placeholder text" />
+    </div>
+    <CodeBlock
+      @code='
+        <div class="ch-input-group">
+          <label for="[id]" class="ch-label">Textarea label</label>
+          <Textarea @id="[id]" @class="ch-textarea disabled" @disabled=true @placeholder="Disabled textarea with placeholder text" />
+        </div>
+      '
+      @language="html"
+    />
+
+    <label class="ch-label ch-input-group">
+      Textarea label
+      <Textarea @class="ch-textarea disabled" @disabled={{true}} @value="Disabled textarea with entered text" />
+    </label>
+    <CodeBlock
+      @code='
+        <label class="ch-label ch-input-group">
+          Textarea label
+          <Textarea @class="ch-textarea disabled" @disabled=true @value="Disabled textarea with entered text" />
+        </label>
+      '
+      @language="html"
+    />
+
+    <h3>Checkbox</h3>
+    <label class="ch-label ch-input-group ch-checkbox-group {{if this.selected "checked"}}">
+      {{if this.selected "selected" "not selected"}}
+      <Input @class="ch-checkbox" @type="checkbox" @checked={{mut this.selected (not this.selected)}} />
+      <span class="ch-checkmark"></span>
+    </label>
+     <CodeBlock
+      @code={{if this.selected '
+        <label class="ch-label ch-input-group ch-checkbox-group checked">
+          Selected
+          <Input @type="checkbox" @class="ch-checkbox" @checked=true />
+          <span class="ch-checkmark"></span>
+        </label>
+      ' '
+        <label class="ch-label ch-input-group ch-checkbox-group">
+          Not selected
+          <Input @type="checkbox" @class="ch-checkbox" @checked=false />
+          <span class="ch-checkmark"></span>
+        </label>
+      '}}
+      @language="html"
+    />
+    <label class="ch-label ch-input-group ch-checkbox-group disabled">
+      Not selected (disabled state)
+      <Input @class="ch-checkbox disabled" @disabled={{true}} @type="checkbox" />
+      <span class="ch-checkmark"></span>
+    </label>
+     <CodeBlock
+      @code='
+        <label class="ch-label ch-input-group ch-checkbox-group disabled">
+          Not selected (disabled state)
+          <Input @class="ch-checkbox disabled" @disabled=true @type="checkbox" />
+          <span class="ch-checkmark"></span>
+        </label>
+      '
+      @language="html"
+    />
+    <label class="ch-label ch-input-group ch-checkbox-group disabled">
+      Selected (disabled state)
+      <Input @class="ch-checkbox disabled" @checked={{true}} @disabled={{true}} @type="checkbox" />
+      <span class="ch-checkmark"></span>
+    </label>
+     <CodeBlock
+      @code='
+        <label class="ch-label ch-input-group ch-checkbox-group disabled">
+          Selected (disabled state)
+          <Input @class="ch-checkbox disabled" @checked=true @disabled=true @type="checkbox" />
+          <span class="ch-checkmark"></span>
         </label>
       '
       @language="html"
