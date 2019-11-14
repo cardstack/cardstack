@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
 import { dasherize } from '@ember/string';
 import { tracked } from '@glimmer/tracking';
+import { action } from '@ember/object';
 
 // TODO we'll need to use EC in order to be able to isolate cards
 // (due to the need to await the load of the isolated format of a card)
@@ -10,6 +11,7 @@ import { tracked } from '@glimmer/tracking';
 export default class CardRenderer extends Component {
   @tracked componentName;
   @tracked mode;
+  @tracked cardFocused = () => {};
 
   constructor(...args) {
     super(...args);
@@ -19,6 +21,15 @@ export default class CardRenderer extends Component {
     // component name
     this.componentName = '@cardstack/base-card';
     this.mode = this.args.mode || 'view';
+
+    if (this.args.cardFocused) {
+      this.cardFocused = this.args.cardFocused;
+    }
+  }
+
+  @action
+  focusCard(value) {
+    this.cardFocused(value);
   }
 
   get sanitizedName() {

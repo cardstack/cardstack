@@ -37,7 +37,12 @@
 
 <CardhostLeftEdge />
 
-<section class="card-editor" data-test-card-edit={{this.card.name}} {{did-update this.updateCard @card}}>
+{{! template-lint-disable attribute-indentation}}
+<section
+  class="card-editor"
+  data-test-card-edit={{this.card.name}}
+  {{did-update this.updateCard @card}}
+>
   <CardRenderer
     @card={{this.card}}
     @mode="edit"

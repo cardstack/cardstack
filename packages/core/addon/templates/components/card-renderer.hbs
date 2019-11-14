@@ -10,7 +10,7 @@ Ember Concurrency into the rendering of the card component here.
       class="card-renderer-{{@format}} {{this.mode}}"
       tabindex="0"
       data-test-card-renderer-isolated
-      {{on "focus" (action @cardFocused true)}}
+      {{on "focus" (action this.focusCard true)}}
     >
       <header class="card-renderer-{{@format}}--header">
         <div class="card-renderer-isolated--header-overlay"></div>
