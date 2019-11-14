@@ -1,5 +1,4 @@
 .field-renderer {
-  --field-spacing: var(--ch-spacing, 20px);
   --field-transition-time: var(--ch-transition-time, 250ms);
   --field-container-width: auto;
   --field-container-height: auto;
@@ -21,7 +20,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--field-spacing) 0;
+  padding: var(--ch-spacing) 0;
 }
 
 .field-renderer.schema-field {

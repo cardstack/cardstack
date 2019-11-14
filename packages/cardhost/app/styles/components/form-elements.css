@@ -17,7 +17,7 @@
   width: 268px;
   max-width: 100%;
   padding: 10px var(--ch-spacing);
-  background-color: var(--ch-dark-blue-gray); /* TODO: check if correct color */
+  background-color: var(--ch-dark-blue-gray);
   color: var(--ch-white-op60);
   border: none;
   border-radius: 5px;
@@ -109,7 +109,7 @@
 }
 
 .ch-checkbox:hover + .ch-checkmark {
-  background-color: var(--ch-dark-blue-gray); /* TODO: check if correct color */
+  background-color: var(--ch-dark-blue-gray);
 }
 
 .ch-checkbox:checked + .ch-checkmark {

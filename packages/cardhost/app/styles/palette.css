@@ -1,4 +1,5 @@
 :root {
+  /* Also add new colors to `color-palette.js` */
   --ch-light-gray: #f2f2f2;
   --ch-light-gray-f0: #f0f0f0;
   --ch-light-gray-d6: #d6d6d6;
@@ -13,13 +14,11 @@
   --ch-medium-darker-blue-gray: #383849;
   --ch-dark-blue-gray: #2e2d38;
   --ch-darker-dark-blue-gray: #2d2c37;
-  --ch-darker-purple: #22212b;
   --ch-dark-purple-28: #282738;
   --ch-darker-blue-gray: #201f27;
   --ch-darkest-blue-gray: #141428;
   --ch-cyan: #00ebe5;
   --ch-blue: #0076ff;
-
   --ch-white-op60: rgba(255, 255, 255, 0.6);
   --ch-black-op35: rgba(0, 0, 0, 0.35);
 }

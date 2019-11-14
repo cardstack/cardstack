@@ -1,0 +1,14 @@
+{{! template-lint-disable }}
+<div class="color-palette">
+  {{#each-in this.colors as |name value|}}
+    <div>
+      <div class="color-palette--block" style="background-color: var({{name}})">
+        {{value}}
+      </div>
+      <CodeBlock
+        @code={{name}}
+        @language="css"
+      />
+    </div>
+  {{/each-in}}
+</div>
