@@ -1,8 +1,6 @@
 {{! eslint is confused about indentation for else-if }}
 {{! template-lint-disable block-indentation}}
 
-{{this.onFieldUpdated}}
-
 {{#if (and (eq @mode "schema") @dropField)}}
   <DropZone @dropField={{@dropField}} @position={{@field.position}} />
 {{/if}}
@@ -23,6 +21,7 @@
   data-test-field={{@field.name}}
   data-test-field-type={{@field.type}}
   data-test-field-mode={{@mode}}
+  {{did-update this.updateFieldProperties @field}}
 >
   {{#if @setPosition}}
     <button {{on "mousedown" (action this.initDrag @field)}} {{on "mouseup" (action this.endDrag)}} {{on "dragend" (action (mut this.isDragging) false)}}

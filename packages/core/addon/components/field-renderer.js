@@ -47,16 +47,17 @@ export default class FieldRenderer extends Component {
     return this.args.field.type.replace(/::/g, '/').replace(/@/g, '');
   }
 
-  get onFieldUpdated() {
-    if (this.nonce !== this.currentNonce) {
+  @action
+  updateFieldProperties(element, [field]) {
+    if (field && this.nonce !== this.currentNonce) {
       this.currentNonce = this.nonce;
-      this.newFieldName = this.args.field.name;
-      this.newFieldLabel = this.args.field.label;
-      this.newFieldInstructions = this.args.field.instructions;
+      this.newFieldName = field.name;
+      this.newFieldLabel = field.label;
+      this.newFieldInstructions = field.instructions;
     }
     return null;
   }
-
+  
   get nonce() {
     return onFieldChangedDependencies.map(i => this.args.field[i]).join('::');
   }

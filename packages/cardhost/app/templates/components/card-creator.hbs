@@ -1,5 +1,3 @@
-{{this.didUpdate}}
-
 <CardhostTopEdge @mode="schema">
   {{!-- TODO: DRY buttons --}}
   {{#if this.cardstackSession.isAuthenticated}}
@@ -80,9 +78,10 @@
   @setFieldLabel={{this.setFieldLabel}}
   @setFieldInstructions={{this.setFieldInstructions}}
   @updateCardId={{this.updateCardId}}
+  @displayCardMetadata={{this.displayCardMetadata}}
 />
 
-<section class="card-creator" data-test-card-creator>
+<section class="card-creator" data-test-card-creator {{did-update this.updateCard @card}}>
   {{#if this.card}}
     <CardRenderer
       @card={{this.card}}
@@ -92,6 +91,7 @@
       @setPosition={{action this.setPosition}}
       @selectField={{action this.selectField}}
       @dropField={{action this.dropField}}
+      @cardFocused={{action (mut this.displayCardMetadata)}}
     />
   {{/if}}
 </section>

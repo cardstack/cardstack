@@ -5,6 +5,7 @@ import { action } from '@ember/object';
 
 export default class RightEdge extends Component {
   @tracked cardName;
+  @tracked displayCardMetadata;
 
   constructor(...args) {
     super(...args);
@@ -15,16 +16,18 @@ export default class RightEdge extends Component {
   }
 
   get selectedFieldTitle() {
-    let { title } = fieldComponents.findBy('coreType', this.args.selectedField.type);
-    return title;
-  }
-
-  get didUpdate() {
-    if (this.args.card && !this.args.card.isNew &&
-      this.args.card.name !== this.cardName) {
-      this.cardName = this.args.card.name;
+    if (this.args.selectedField) {
+      let { title } = fieldComponents.findBy('coreType', this.args.selectedField.type);
+      return title;
     }
-    return null;
+
+    return '';
+  }
+  
+  @action
+  updateCard(element, [card, displayCardMetadata]) {
+    this.cardName = card.name;
+    this.displayCardMetadata = displayCardMetadata;
   }
 
   @action

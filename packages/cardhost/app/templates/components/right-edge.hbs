@@ -1,6 +1,4 @@
-{{this.didUpdate}}
-
-<div class="right-edge" data-test-right-edge>
+<div class="right-edge" data-test-right-edge {{did-update this.updateCard @card @displayCardMetadata}}>
   {{!-- TODO: make this a component --}}
   <div class="right-edge--section">
     <div class="pill-selector">
