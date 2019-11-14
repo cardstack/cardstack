@@ -25,13 +25,13 @@ package-lock.json
 /packages/hub/code-generators.js
 /packages/hub/code-generators.js.map
 /packages/hub/code-generators.d.ts
-/packages/hub/indexing/card-utils.d.ts
-/packages/hub/indexing/card-utils.js
-/packages/hub/indexing/card-utils.js.map
 /packages/hub/indexing/operations.d.ts
 /packages/hub/indexing/operations.js
 /packages/hub/indexing/operations.js.map
 
+/packages/plugin-utils/card-utils.d.ts
+/packages/plugin-utils/card-utils.js
+/packages/plugin-utils/card-utils.js.map
 /packages/plugin-utils/error.d.ts
 /packages/plugin-utils/error.js
 /packages/plugin-utils/error.js.map
@@ -41,10 +41,6 @@ package-lock.json
 /packages/plugin-utils/todo-any.d.ts
 /packages/plugin-utils/todo-any.js
 /packages/plugin-utils/todo-any.js.map
-
-/packages/test-support/card-utils.d.ts
-/packages/test-support/card-utils.js
-/packages/test-support/card-utils.js.map
 
 /packages/cli/**/*.js
 !packages/cli/node-tests/sample-cards/**/*.js

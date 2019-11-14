@@ -8,7 +8,7 @@ const { readFileSync } = require('fs');
 const { join } = require('path');
 const { tmpdir } = require('os');
 const { cloneDeep, set } = require('lodash');
-const { adaptCardToFormat, cardBrowserAssetFields } = require('../indexing/card-utils');
+const { adaptCardToFormat, cardBrowserAssetFields } = require('@cardstack/plugin-utils/card-utils');
 
 const internalArticleCard = require('./internal-cards/article-card');
 const foreignSchema = require('./internal-cards/foreign-schema');
@@ -247,6 +247,7 @@ describe('hub/card-services', function () {
         });
       env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, factory.getModels());
       cardServices = env.lookup('hub:card-services');
+      await cardServices._setupPromise;
     });
 
     it("does not allow card with foreign field to be loaded", async function () {
@@ -305,6 +306,7 @@ describe('hub/card-services', function () {
       let factory = new JSONAPIFactory();
       env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, factory.getModels());
       cardServices = env.lookup('hub:card-services');
+      await cardServices._setupPromise;
       externalArticleCard = await convertToExternalFormat(internalArticleCard);
       externalUserCard = await convertToExternalFormat(userCard);
       await cardServices.create(env.session, externalUserCard);
@@ -707,6 +709,7 @@ describe('hub/card-services', function () {
       let factory = new JSONAPIFactory();
       env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, factory.getModels());
       cardServices = env.lookup('hub:card-services');
+      await cardServices._setupPromise;
       let externalArticleCard = await convertToExternalFormat(internalArticleCard);
       let externalUserCard = await convertToExternalFormat(userCard);
       await cardServices.create(env.session, externalUserCard);
@@ -760,6 +763,7 @@ describe('hub/card-services', function () {
       let factory = new JSONAPIFactory();
       env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, factory.getModels());
       cardServices = env.lookup('hub:card-services');
+      await cardServices._setupPromise;
     });
 
     it(`can fashion relationship to card that didn't originally exist at the time the card was created`, async function () {
@@ -865,6 +869,7 @@ describe('hub/card-services', function () {
 
       env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, factory.getModels());
       cardServices = env.lookup('hub:card-services');
+      await cardServices._setupPromise;
       restrictedUser = env.lookup('hub:sessions').create('test-users', 'restricted-user');
       allowedUser = env.lookup('hub:sessions').create('test-users', 'allowed-user');
       let externalArticleCard = await convertToExternalFormat(internalArticleCard);
@@ -1097,6 +1102,7 @@ describe('hub/card-services', function () {
 
       env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, factory.getModels());
       cardServices = env.lookup('hub:card-services');
+      await cardServices._setupPromise;
     });
 
     it.skip("can search for a card by an adopted field", async function () {
@@ -1140,6 +1146,7 @@ describe('hub/card-services', function () {
 
       env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, factory.getModels());
       cardServices = env.lookup('hub:card-services');
+      await cardServices._setupPromise;
       externalArticleCard = await convertToExternalFormat(internalArticleCard);
       externalUserCard = await convertToExternalFormat(userCard);
       await cardServices.create(env.session, externalArticleCard);
@@ -1154,6 +1161,10 @@ describe('hub/card-services', function () {
 
       // clean up empty relationship default values to make it easier to deep equals
       for (let resource of adopted.included) {
+        if (resource.type !== 'fields') { continue; }
+        delete resource.relationships;
+      }
+      for (let resource of adoptedCreateResponse.included) {
         if (resource.type !== 'fields') { continue; }
         delete resource.relationships;
       }
@@ -1314,6 +1325,10 @@ describe('hub/card-services', function () {
 
       // clean up empty relationship default values to make it easier to deep equals
       for (let resource of adopted.included) {
+        if (resource.type !== 'fields') { continue; }
+        delete resource.relationships;
+      }
+      for (let resource of adoptedCreateResponse.included) {
         if (resource.type !== 'fields') { continue; }
         delete resource.relationships;
       }
@@ -1532,8 +1547,18 @@ describe('hub/card-services', function () {
         'author',
         'tags',
         'tag-names',
+        'yarn',
         'title',
       ];
+      card = await cardServices.update(env.session, card.data.id, card);
+      expect(card.data.attributes['field-order']).to.eql([
+        'body',
+        'author',
+        'tags',
+        'tag-names',
+        'yarn',
+        'title',
+      ]);
 
       parentCard.data.relationships.fields.data.push({ type: 'fields', id: 'editor' });
       parentCard.included.push({
@@ -1548,14 +1573,51 @@ describe('hub/card-services', function () {
 
       parentCard = await cardServices.update(env.session, parentCard.data.id, parentCard);
       card = await cardServices.get(env.session, card.data.id, 'isolated');
-      card.data.attributes['field-order'] = [
+
+      expect(card.data.attributes['field-order']).to.eql([
         'body',
         'author',
         'tags',
         'tag-names',
+        'yarn',
         'title',
         'editor'
-      ];
+      ]);
+      expect(Object.keys(card.data.attributes['metadata-summary'])).to.have.members([
+        'body',
+        'author',
+        'tags',
+        'tag-names',
+        'yarn',
+        'title',
+        'editor'
+      ]);
+    });
+
+    it("can remove an adopted field via an upstream change", async function() {
+      let parentCard = await cardServices.get(env.session, externalArticleCard.data.id, 'isolated');
+      let card = await cardServices.create(env.session, genXKittens);
+
+      parentCard.data.relationships.fields.data = parentCard.data.relationships.fields.data.filter(i => `${i.type}/${i.id}` !== `fields/body`);
+      parentCard.included = parentCard.included.filter(i => `${i.type}/${i.id}` !== `fields/body`);
+
+      parentCard = await cardServices.update(env.session, parentCard.data.id, parentCard);
+      card = await cardServices.get(env.session, card.data.id, 'isolated');
+
+      expect(card.data.attributes['field-order']).to.eql([
+        'title',
+        'author',
+        'tag-names',
+        'tags',
+        'yarn',
+      ]);
+      expect(Object.keys(card.data.attributes['metadata-summary'])).to.have.members([
+        'title',
+        'author',
+        'tag-names',
+        'tags',
+        'yarn',
+      ]);
     });
 
     it("can change the adopted-from relationship to adopt from a different parent", async function () {

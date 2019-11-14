@@ -3,11 +3,27 @@ const Error = require('@cardstack/plugin-utils/error');
 const { declareInjections } = require('@cardstack/di');
 const { statSync } = require("fs");
 const streamToPromise = require('stream-to-promise');
+const { merge, cloneDeep } = require('lodash');
+
+function getType(model) {
+  return model.data ? model.data.type : model.type;
+}
+
+function getId(model) {
+  return model.data ? model.data.id : model.id;
+}
+
+function getMeta(model) {
+  return model.data ? model.data.meta : model.meta;
+}
 
 module.exports = declareInjections({
   indexers: 'hub:indexers',
   service: `plugin-services:${require.resolve('./service')}`
 }, class Writer {
+  get hasCardSupport() {
+    return true;
+  }
 
   get storage() {
     if (!this._storage) {
@@ -17,23 +33,28 @@ module.exports = declareInjections({
   }
 
   async prepareCreate(session, type, document, isSchema) {
-    let id = document.id;
+    let id = getId(document);
     if (id == null) {
       id = this._generateId();
     }
-
 
     if (this.storage.lookup(type, id)) {
       throw new Error(`id ${id} is already in use for type ${type}`, { status: 409, source: { pointer: '/data/id'}});
     }
 
+    let storedDocument = document.data ?
+      { data: { id, type: getType(document) } } :
+      { id, type: getType(document) };
 
-    let storedDocument = { id, type: document.type };
-    if (document.attributes) {
-      storedDocument.attributes = document.attributes;
-    }
-    if (document.relationships) {
-      storedDocument.relationships = document.relationships;
+    if (document.data) {
+      storedDocument = merge(storedDocument, cloneDeep(document));
+    } else {
+      if (document.attributes) {
+        storedDocument.attributes = document.attributes;
+      }
+      if (document.relationships) {
+        storedDocument.relationships = document.relationships;
+      }
     }
 
     return {
@@ -77,7 +98,8 @@ module.exports = declareInjections({
   }
 
   async prepareUpdate(session, type, id, document, isSchema) {
-    if (!document.meta || !document.meta.version) {
+    let meta = getMeta(document);
+    if (!meta || meta.version == null) {
       throw new Error('missing required field "meta.version"', {
         status: 400,
         source: { pointer: '/data/meta/version' }
@@ -100,7 +122,7 @@ module.exports = declareInjections({
       id,
       storage: this.storage,
       isSchema,
-      ifMatch: document.meta.version
+      ifMatch: meta.version
     };
   }
 
@@ -137,13 +159,32 @@ module.exports = declareInjections({
 });
 
 function patch(before, diffDocument) {
-  let after = Object.assign({}, before);
+  let after;
+  let afterResource;
+  let beforeResource;
+  let diffDocumentResource;
+
+  if (diffDocument.data) {
+    after = { data: Object.assign({}, before.data) };
+    if (Array.isArray(diffDocument.included)) {
+      after.included = [].concat(diffDocument.included);
+    }
+    afterResource = after.data;
+    beforeResource = before.data;
+    diffDocumentResource = diffDocument.data;
+  } else {
+    after = Object.assign({}, before);
+    afterResource = after;
+    beforeResource = before;
+    diffDocumentResource = diffDocument;
+  }
+
   for (let section of ['attributes', 'relationships']) {
-    if (diffDocument[section]) {
-      after[section] = Object.assign(
+    if (diffDocumentResource[section]) {
+      afterResource[section] = Object.assign(
         {},
-        before[section],
-        diffDocument[section]
+        beforeResource[section],
+        diffDocumentResource[section]
       );
     }
   }
@@ -156,7 +197,10 @@ async function finalizer(pendingChange) {
   if (type === 'checkpoints') {
     return { version: storage.makeCheckpoint(id) };
   } else if (type === 'restores') {
-    return { version: await storage.restoreCheckpoint(pendingChange.finalDocument.relationships.checkpoint.data.id) };
+    let checkpoint = pendingChange.finalDocument.data ?
+      pendingChange.finalDocument.data.relationships.checkpoint :
+      pendingChange.finalDocument.relationships.checkpoint;
+    return { version: await storage.restoreCheckpoint(checkpoint.data.id) };
   } else {
     return { version: storage.store(type, id, pendingChange.finalDocument, isSchema, ifMatch) };
   }

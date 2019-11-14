@@ -1,6 +1,6 @@
-import Error from '@cardstack/plugin-utils/error';
-import Session from '@cardstack/plugin-utils/session';
-import { todo } from '@cardstack/plugin-utils/todo-any';
+import Error from './error';
+import Session from './session';
+import { todo } from './todo-any';
 import {
   SingleResourceDoc,
   ResourceObject,
@@ -22,6 +22,7 @@ import {
   intersection,
   difference,
   unset,
+  union,
 } from 'lodash';
 import logger from '@cardstack/logger';
 import { join } from "path";
@@ -627,13 +628,13 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
 
   // Construct the main card attributes and
   // metadata attribute type fields that will be hoisted as metadata
-  for (let attr of Object.keys(get(priviledgedCard, 'data.attributes') || {})) {
-    if (result.data.attributes &&
-      cardBrowserAssetFields.concat([
-        metadataSummaryField,
-        adoptionChainField,
-        'field-order'
-      ]).includes(attr)) {
+  let fieldsOfInterest = cardBrowserAssetFields.concat([
+    metadataSummaryField,
+    adoptionChainField,
+    'field-order'
+  ]);
+  for (let attr of union(Object.keys(get(priviledgedCard, 'data.attributes') || {}), fieldsOfInterest)) {
+    if (result.data.attributes && fieldsOfInterest.includes(attr)) {
       let value = get(priviledgedCard, `data.attributes.${attr}`);
       // Crawl up the adoption chain looking for browser assets.
       // Note that since we are collapsing the inherited browser asset values into

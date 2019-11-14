@@ -8,7 +8,7 @@ const {
   getCardId,
   isInternalCard,
   loadCard,
-} = require('./card-utils');
+} = require('@cardstack/plugin-utils/card-utils');
 const qs = require('qs');
 
 module.exports = class DocumentContext {
@@ -405,7 +405,14 @@ module.exports = class DocumentContext {
     let docType = get(this, 'upstreamDoc.data.type');
     this._references.push(`${id}/${id}`);
 
-    if (isInternalCard(docId, docType) && docId === id && this.upstreamDoc.included) {
+    if (isInternalCard(docId, docType) &&
+      docId === id &&
+      (
+        get(this, 'upstreamDoc.included.length') ||
+        (!get(this, 'upstreamDoc.data.relationships.fields.data.length') &&
+          !get(this, 'upstreamDoc.data.relationships.adopted-from.data.length')
+        )
+      )) {
       return this.upstreamDoc;
     } else if (isInternalCard(docId, docType) && docId === id) {
       let card = {
