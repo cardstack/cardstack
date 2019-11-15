@@ -1599,13 +1599,13 @@
     ember-cli-babel "^6.16.0"
     ember-compatibility-helpers "^1.1.1"
 
-"@ember/render-modifiers@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@ember/render-modifiers/-/render-modifiers-1.0.0.tgz#dc1e4c615e38507da4b6a80f6e4b27fe4d37ec8f"
-  integrity sha512-TqUW7exzLUwnzqHqKbo5ui0rvrS/YkbRlFD+h07kDYVFJkS2uPwkQE/K4YDeTywqN6er7VamFwl7Og98sPjmiQ==
+"@ember/render-modifiers@1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@ember/render-modifiers/-/render-modifiers-1.0.2.tgz#2e87c48db49d922ce4850d707215caaac60d8444"
+  integrity sha512-6tEnHl5+62NTSAG2mwhGMFPhUrJQjoVqV+slsn+rlTknm2Zik+iwxBQEbwaiQOU1FUYxkS8RWcieovRNMR8inQ==
   dependencies:
-    ember-cli-babel "^7.1.2"
-    ember-modifier-manager-polyfill "^1.0.1"
+    ember-cli-babel "^7.10.0"
+    ember-modifier-manager-polyfill "^1.1.0"
 
 "@ember/test-helpers@^0.7.18":
   version "0.7.20"
@@ -10083,7 +10083,7 @@ ember-mobiledoc-editor@backspace/ember-mobiledoc-editor#closure-actions:
     mobiledoc-dom-renderer "^0.6.5"
     mobiledoc-kit "^0.11.1"
 
-ember-modifier-manager-polyfill@^1.0.1:
+ember-modifier-manager-polyfill@^1.1.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/ember-modifier-manager-polyfill/-/ember-modifier-manager-polyfill-1.2.0.tgz#cf4444e11a42ac84f5c8badd85e635df57565dda"
   integrity sha512-bnaKF1LLKMkBNeDoetvIJ4vhwRPKIIumWr6dbVuW6W6p4QV8ZiO+GdF8J7mxDNlog9CeL9Z/7wam4YS86G8BYA==
