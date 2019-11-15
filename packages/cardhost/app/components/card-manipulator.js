@@ -175,11 +175,12 @@ export default class CardManipulator extends Component {
     if (!fieldName || !this.card) { return; }
 
     let field = this.card.getField(fieldName)
-    field.remove();
 
     if (field === this.selectedField) {
-      this.selectedField = null;
+      this.displayCardMetadata = true;
     }
+
+    field.remove();
   }
 
   @action
@@ -302,7 +303,6 @@ export default class CardManipulator extends Component {
 
     // Toggling the selected field in tests is baffling me, using something more brute force
     if (environment === 'test' && this.selectedField === field) {
-      this.selectedField = null;
       return;
     }
 

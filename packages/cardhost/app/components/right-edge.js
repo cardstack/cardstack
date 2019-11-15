@@ -23,11 +23,10 @@ export default class RightEdge extends Component {
 
     return '';
   }
-  
+
   @action
-  updateCard(element, [card, displayCardMetadata]) {
+  updateCard(element, [card]) {
     this.cardName = card.name;
-    this.displayCardMetadata = displayCardMetadata;
   }
 
   @action
