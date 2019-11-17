@@ -13,6 +13,7 @@
     "test": "mocha ../test-support/bin/run.js"
   },
   "dependencies": {
+    "@cardstack/di": "0.14.46",
     "@cardstack/logger": "^0.2.0",
     "@cardstack/plugin-utils": "0.14.46",
     "delay": "^4.1.0",
@@ -28,7 +29,6 @@
     "truffle-contract": "^4.0.30"
   },
   "devDependencies": {
-    "@cardstack/di": "0.14.46",
     "@cardstack/eslint-config": "0.14.46",
     "@cardstack/test-support": "0.14.46",
     "sinon": "7.2.3"
