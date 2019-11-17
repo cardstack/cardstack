@@ -4,6 +4,7 @@ const { declareInjections } = require('@cardstack/di');
 const { statSync } = require("fs");
 const streamToPromise = require('stream-to-promise');
 const { merge, cloneDeep } = require('lodash');
+const { isInternalCard } = require('@cardstack/plugin-utils/card-utils');
 
 function getType(model) {
   return model.data ? model.data.type : model.type;
@@ -21,9 +22,7 @@ module.exports = declareInjections({
   indexers: 'hub:indexers',
   service: `plugin-services:${require.resolve('./service')}`
 }, class Writer {
-  get hasCardSupport() {
-    return true;
-  }
+  get hasCardSupport() { return true; }
 
   get storage() {
     if (!this._storage) {
@@ -42,11 +41,11 @@ module.exports = declareInjections({
       throw new Error(`id ${id} is already in use for type ${type}`, { status: 409, source: { pointer: '/data/id'}});
     }
 
-    let storedDocument = document.data ?
+    let storedDocument = document.data && isInternalCard(type, id) ?
       { data: { id, type: getType(document) } } :
       { id, type: getType(document) };
 
-    if (document.data) {
+    if (document.data && isInternalCard(type, id)) {
       storedDocument = merge(storedDocument, cloneDeep(document));
     } else {
       if (document.attributes) {
@@ -164,7 +163,8 @@ function patch(before, diffDocument) {
   let beforeResource;
   let diffDocumentResource;
 
-  if (diffDocument.data) {
+  if (diffDocument.data &&
+    isInternalCard(diffDocument.data.type, diffDocument.data.id)) {
     after = { data: Object.assign({}, before.data) };
     if (Array.isArray(diffDocument.included)) {
       after.included = [].concat(diffDocument.included);

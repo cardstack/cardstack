@@ -70,6 +70,13 @@ const cardComputedFields = [
   adoptionChainField
 ];
 
+function resolveDocument(document: todo) {
+  if (document && document.data && isInternalCard(document.data.type, document.data.type)) {
+    return document.data;
+  }
+  return document;
+}
+
 function cardContextFromId(id: string | number) {
   let noContext: CardContext = {};
   if (id == null) { return noContext; }
@@ -964,10 +971,12 @@ function formatHasField(field: todo, format: string) {
 }
 
 export = {
+  adoptionChain,
   isInternalCard,
   loadCard,
   getCardId,
   cardIdDelim,
+  resolveDocument,
   adaptCardToFormat,
   cardContextFromId,
   cardBrowserAssetFields,

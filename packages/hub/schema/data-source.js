@@ -9,6 +9,7 @@ module.exports = class DataSource {
   constructor(model, plugins, projectPath) {
     this.id = model.id;
     this.sourceType = model.attributes['source-type'];
+    this.cardTypes = model.attributes['card-types'] || [];
     this._params = Object.assign({ dataSource: this }, model.attributes.params);
     this._Writer = plugins.lookupFeatureFactory('writers', this.sourceType);
     this._writer = null;

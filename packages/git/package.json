@@ -19,6 +19,7 @@
     "filenamify-url": "^1.0.0",
     "githereum": "0.0.1",
     "json-stable-stringify-without-jsonify": "^1.0.1",
+    "lodash": "^4.17.11",
     "mkdirp": "^0.5.1",
     "moment-timezone": "^0.5.11",
     "nodegit": "^0.23.0",

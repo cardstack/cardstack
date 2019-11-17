@@ -2,6 +2,7 @@ const Error = require('@cardstack/plugin-utils/error');
 const find = require('../async-find');
 const authLog = require('@cardstack/logger')('cardstack/auth');
 const { isEqual } = require('lodash');
+const { resolveDocument } = require('@cardstack/plugin-utils/card-utils');
 
 const legalFieldName = /^[a-zA-Z0-9](?:[-_a-zA-Z0-9]*[a-zA-Z0-9])?$/;
 
@@ -78,7 +79,7 @@ module.exports = class Field {
   }
 
   valueFrom(pendingChange, side='finalDocument') {
-    let document = pendingChange[side];
+    let document = resolveDocument(pendingChange[side]);
     if (document) {
       let section = this._sectionName();
       if (section === 'top') {
@@ -100,7 +101,7 @@ module.exports = class Field {
 
   _checkInWrongSection(pendingChange, errors) {
     let sectionName = this.isRelationship ? 'attributes' : 'relationships';
-    let section = pendingChange.finalDocument[sectionName];
+    let section = resolveDocument(pendingChange.finalDocument)[sectionName];
     if (section && section[this.id]) {
       errors.push(new Error(`field "${this.id}" should be in ${this._sectionName()}, not ${sectionName}`, {
         status: 400,
@@ -147,7 +148,7 @@ module.exports = class Field {
       //   - Otherwise ask the field-type plugin it is has a default.
       //
       //   - Otherwise all fields default to null.
-      defaultInput = this.defaultAtCreate || this.defaultAtUpdate || { value: this.id === 'type' ? pendingChange.finalDocument.type : (this.plugin.default || null) };
+      defaultInput = this.defaultAtCreate || this.defaultAtUpdate || { value: this.id === 'type' ? resolveDocument(pendingChange.finalDocument).type : (this.plugin.default || null) };
     } else {
       defaultInput = this.defaultAtUpdate;
     }
@@ -183,13 +184,14 @@ module.exports = class Field {
       }
 
       let section = this._sectionName();
+      let finalDocument = resolveDocument(pendingChange.finalDocument);
       if (section === 'top') {
-        pendingChange.finalDocument[this.id] = defaultValue.value;
+        finalDocument[this.id] = defaultValue.value;
       } else {
-        if (!pendingChange.finalDocument[section]) {
-          pendingChange.finalDocument[section] = {};
+        if (!finalDocument[section]) {
+          finalDocument[section] = {};
         }
-        pendingChange.finalDocument[section][this.id] = defaultValue.value;
+        finalDocument[section][this.id] = defaultValue.value;
       }
     }
   }

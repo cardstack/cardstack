@@ -14,7 +14,7 @@ const realpathPromise = promisify(realpath);
 
 describe('git/writer', function() {
 
-  let env, writers, repoPath, head;
+  let env, writers, cardServices, repoPath, head;
 
   beforeEach(async function() {
     repoPath = await temp.mkdir('git-writer-test');
@@ -25,6 +25,7 @@ describe('git/writer', function() {
     let source = factory.addResource('data-sources')
       .withAttributes({
         'source-type': '@cardstack/git',
+        'card-types': ['local-hub::test-card'],
         params: { repo: repoPath }
       });
 
@@ -100,6 +101,8 @@ describe('git/writer', function() {
       });
 
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+    cardServices = env.lookup('hub:card-services');
+    await cardServices._setupPromise;
     head = (await inRepo(repoPath).getCommit('master')).id;
     writers = env.lookup('hub:writers');
   });
@@ -128,6 +131,60 @@ describe('git/writer', function() {
           'primary-image': { data: null }
         }
       });
+    });
+
+    it('saves card documents', async function() {
+      let factory = new JSONAPIFactory();
+      let card = factory.getDocumentFor(
+        factory.addResource('cards', 'local-hub::test-card')
+          .withRelated('adopted-from', { type: 'cards', id: 'local-hub::@cardstack/base-card' })
+          .withRelated('fields', [
+            factory.addResource('fields', 'title').withAttributes({
+              'is-metadata': true,
+              'field-type': '@cardstack/core-types::string',
+              'needed-when-embedded': true
+            })
+          ])
+          .withRelated('model', factory.addResource('local-hub::test-card', 'local-hub::test-card')
+            .withAttributes({
+              title: 'hello'
+            })
+          )
+      );
+
+      card = await cardServices.create(env.session, card);
+      expect(card).has.deep.property('data.meta.version');
+      expect(card).has.deep.property('data.id');
+      expect(card.data.id).to.equal('local-hub::test-card');
+      expect(card).has.deep.property('data.attributes.title', 'hello');
+
+      card = await cardServices.get(env.session, card.data.id, 'isolated');
+      expect(card).has.deep.property('data.meta.version');
+      expect(card).has.deep.property('data.id');
+      expect(card.data.id).to.equal('local-hub::test-card');
+      expect(card).has.deep.property('data.attributes.title', 'hello');
+
+      let saved = await inRepo(repoPath).getJSONContents('master', `cards/${card.data.id}.json`);
+      expect(saved).has.deep.property('data.id', card.data.id);
+      expect(saved).has.deep.property('data.type', card.data.id);
+      expect(saved).has.deep.property(`data.attributes.${card.data.id}::title`, 'hello');
+      expect(saved.attributes).to.be.undefined;
+      expect(saved.relationships).to.be.undefined;
+      expect(saved.id).to.be.undefined;
+      expect(saved.type).to.be.undefined;
+      expect(saved.included.length).to.equal(1);
+      expect(saved.included[0].id).to.equal(`${card.data.id}::title`);
+      expect(saved.included[0].type).to.equal('fields');
+
+      let error;
+      try {
+        await inRepo(repoPath).getJSONContents('master', `schema/fields/${card.data.id}::title.json`);
+      } catch (e) { error = e; }
+      expect(error.stderr).to.match(/Path .* does not exist/);
+    });
+
+    // TODO move this out of here and into the @cardstack/hub node tests
+    it.skip('honors card document adoption chain when choosing writer to use for saving cards', async function() {
     });
 
     it('sorts previously saved, unsorted records', async function () {
@@ -560,6 +617,82 @@ describe('git/writer', function() {
         .deep.property('attributes.karma', 0);
     });
 
+    it('stores updated card document', async function() {
+      let factory = new JSONAPIFactory();
+      let card = factory.getDocumentFor(
+        factory.addResource('cards', 'local-hub::test-card')
+          .withRelated('adopted-from', { type: 'cards', id: 'local-hub::@cardstack/base-card' })
+          .withRelated('fields', [
+            factory.addResource('fields', 'title').withAttributes({
+              'is-metadata': true,
+              'field-type': '@cardstack/core-types::string',
+              'needed-when-embedded': true
+            })
+          ])
+          .withRelated('model', factory.addResource('local-hub::test-card', 'local-hub::test-card')
+            .withAttributes({
+              title: 'hello'
+            })
+          )
+      );
+
+      card = await cardServices.create(env.session, card);
+      card.data.relationships.fields.data.push({ type: 'fields', id: 'body' });
+      card.included.push({
+        type: 'fields',
+        id: 'body',
+        attributes: {
+          'is-metadata': true,
+          'field-type': '@cardstack/core-types::string',
+          'needed-when-embedded': true
+        }
+      });
+      let model = card.included.find(i => `${i.type}/${i.id}` === `${card.data.id}/${card.data.id}`);
+      model.attributes.title = 'updated title';
+      model.attributes.body = 'new body';
+
+      card = await cardServices.update(env.session, card.data.id, card);
+      expect(card).has.deep.property('data.meta.version');
+      expect(card).has.deep.property('data.id');
+      expect(card.data.id).to.equal('local-hub::test-card');
+      expect(card).has.deep.property('data.attributes.title', 'updated title');
+      expect(card).has.deep.property('data.attributes.body', 'new body');
+
+      card = await cardServices.get(env.session, card.data.id, 'isolated');
+      expect(card).has.deep.property('data.meta.version');
+      expect(card).has.deep.property('data.id');
+      expect(card.data.id).to.equal('local-hub::test-card');
+      expect(card).has.deep.property('data.attributes.title', 'updated title');
+      expect(card).has.deep.property('data.attributes.body', 'new body');
+
+      let saved = await inRepo(repoPath).getJSONContents('master', `cards/${card.data.id}.json`);
+      expect(saved).has.deep.property('data.id', card.data.id);
+      expect(saved).has.deep.property('data.type', card.data.id);
+      expect(saved).has.deep.property(`data.attributes.${card.data.id}::title`, 'updated title');
+      expect(saved).has.deep.property(`data.attributes.${card.data.id}::body`, 'new body');
+      expect(saved.attributes).to.be.undefined;
+      expect(saved.relationships).to.be.undefined;
+      expect(saved.id).to.be.undefined;
+      expect(saved.type).to.be.undefined;
+      expect(saved.included.length).to.equal(2);
+      expect(saved.included[0].id).to.equal(`${card.data.id}::title`);
+      expect(saved.included[0].type).to.equal('fields');
+      expect(saved.included[1].id).to.equal(`${card.data.id}::body`);
+      expect(saved.included[1].type).to.equal('fields');
+
+      let error;
+      try {
+        await inRepo(repoPath).getJSONContents('master', `schema/fields/${card.data.id}::title.json`);
+      } catch (e) { error = e; }
+      expect(error.stderr).to.match(/Path .* does not exist/);
+
+      error = null;
+      try {
+        await inRepo(repoPath).getJSONContents('master', `schema/fields/${card.data.id}::body.json`);
+      } catch (e) { error = e; }
+      expect(error.stderr).to.match(/Path .* does not exist/);
+    });
+
     it('reports merge conflict', async function() {
       await writers.update(env.session, 'articles', '1', {
         data: {
@@ -708,6 +841,37 @@ describe('git/writer', function() {
       await writers.delete(env.session, head, 'people', '1');
       let articles = (await inRepo(repoPath).listTree('master', 'contents/people')).map(a => a.name);
       expect(articles).to.not.contain('1.json');
+    });
+
+    it('deletes card document', async function() {
+      let factory = new JSONAPIFactory();
+      let card = factory.getDocumentFor(
+        factory.addResource('cards', 'local-hub::test-card')
+          .withRelated('adopted-from', { type: 'cards', id: 'local-hub::@cardstack/base-card' })
+          .withRelated('fields', [
+            factory.addResource('fields', 'title').withAttributes({
+              'is-metadata': true,
+              'field-type': '@cardstack/core-types::string',
+              'needed-when-embedded': true
+            })
+          ])
+          .withRelated('model', factory.addResource('local-hub::test-card', 'local-hub::test-card')
+            .withAttributes({
+              title: 'hello'
+            })
+          )
+      );
+
+      card = await cardServices.create(env.session, card);
+      let saved = await inRepo(repoPath).getJSONContents('master', `cards/${card.data.id}.json`);
+      expect(saved).to.be.ok;
+
+      await cardServices.delete(env.session, card.data.id, card.data.meta.version);
+      let error;
+      try {
+        await inRepo(repoPath).getJSONContents('master', `cards/${card.data.id}.json`);
+      } catch (e) { error = e; }
+      expect(error.stderr).to.match(/Path .* does not exist/);
     });
 
     it('reports merge conflict', async function() {

@@ -2,7 +2,7 @@ const Error = require('@cardstack/plugin-utils/error');
 const Session = require('@cardstack/plugin-utils/session');
 const { declareInjections } = require('@cardstack/di');
 const { partition, uniqWith, isEqual, uniq } = require('lodash');
-const { isInternalCard } = require('@cardstack/plugin-utils/card-utils');
+const { resolveDocument } = require('@cardstack/plugin-utils/card-utils');
 
 module.exports = declareInjections({
   schemaLoader: 'hub:schema-loader',
@@ -164,22 +164,17 @@ class Schema {
     }
   }
 
+  // TODO push the card specific reasoning out of this layer
   async validate(pendingChange, context={}) {
     let type, id;
     if (pendingChange.finalDocument) {
-      let document = pendingChange.finalDocument.data &&
-        isInternalCard(pendingChange.finalDocument.data.type, pendingChange.finalDocument.data.id) ?
-        pendingChange.finalDocument.data :
-        pendingChange.finalDocument;
+      let document = resolveDocument(pendingChange.finalDocument);
       // Create or update: check basic request document structure.
       this._validateDocumentStructure(document, context);
       ({ type, id } = document);
     } else {
       // Deletion. There's no request document to check.
-      let document = pendingChange.originalDocument.data &&
-        isInternalCard(pendingChange.originalDocument.data.type, pendingChange.originalDocument.data.id) ?
-        pendingChange.originalDocument.data :
-        pendingChange.originalDocument;
+      let document = resolveDocument(pendingChange.originalDocument);
       ({ type, id } = document);
     }
 

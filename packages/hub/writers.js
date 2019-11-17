@@ -1,12 +1,14 @@
 const Error = require('@cardstack/plugin-utils/error');
 const Session = require('@cardstack/plugin-utils/session');
 const log = require('@cardstack/logger')('cardstack/writers');
+// const performanceLog = require('@cardstack/logger')('cardstack/performance/writers');
 const { set, get, differenceBy, intersectionBy, partition, merge } = require('lodash');
 const { declareInjections } = require('@cardstack/di');
 const {
   isInternalCard,
   loadCard,
   getCardId,
+  adoptionChain,
   adaptCardToFormat,
   generateInternalCardFormat
 } = require('@cardstack/plugin-utils/card-utils');
@@ -131,18 +133,19 @@ class Writers {
     return { internalCard, schema, beforeFinalize, afterFinalize, context };
   }
 
+  // TODO add timing logs
   async handleCreate(isBinary, session, type, documentOrStream, schema, indexOnly) {
     await this.pgSearchClient.ensureDatabaseSetup();
 
     schema = schema || await this.currentSchema.getSchema();
-    let context, beforeFinalize;
+    let context, beforeFinalize, id;
     if (type === 'cards') {
       ({ context, schema, internalCard: documentOrStream, beforeFinalize } = await this.handleCardOperations(session, documentOrStream));
-      type = documentOrStream.data.type;
+      ({ type, id } = documentOrStream.data);
     }
 
     let pending;
-    let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
+    let { writer, sourceId } = await this._getSchemaDetailsForType(schema, type, id, documentOrStream);
     if (isInternalCard(type, documentOrStream.data && documentOrStream.data.id) &&
       !writer.hasCardSupport) {
       let source = schema.getDataSource(sourceId);
@@ -208,6 +211,7 @@ class Writers {
     return authorizedDocument;
   }
 
+  // TODO add timing logs
   async update(session, type, id, document, schema, indexOnly) {
     log.info("updating type=%s id=%s", type, id);
     if (!document.data) {
@@ -224,7 +228,7 @@ class Writers {
       type = document.data.type;
     }
 
-    let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
+    let { writer, sourceId } = await this._getSchemaDetailsForType(schema, type, id, document);
     if (isInternalCard(type, id) && !writer.hasCardSupport) {
       let source = schema.getDataSource(sourceId);
       throw new Error(`The configured writer for cards documents, 'data-sources/${sourceId}' (source type '${source.sourceType}'), does not have card support`);
@@ -283,22 +287,22 @@ class Writers {
     return authorizedDocument;
   }
 
+  // TODO add timing logs
   async delete(session, version, type, id, schema, indexOnly) {
     log.info("deleting type=%s id=%s", type, id);
     await this.pgSearchClient.ensureDatabaseSetup();
 
     schema = schema || await this.currentSchema.getSchema();
 
-    let afterFinalize, context;
+    let afterFinalize, context, internalCard;
     if (type === 'cards') {
-      let internalCard;
       ({ schema, context, internalCard, afterFinalize } = await this.handleCardDeleteOperation(session, id));
       if (!internalCard) { return; }
       type = internalCard.data.type;
       version = get(internalCard, 'data.meta.version');
     }
 
-    let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
+    let { writer, sourceId } = await this._getSchemaDetailsForType(schema, type, id, internalCard);
     if (isInternalCard(type, id) && !writer.hasCardSupport) {
       let source = schema.getDataSource(sourceId);
       throw new Error(`The configured writer for cards documents, 'data-sources/${sourceId}' (source type '${source.sourceType}'), does not have card support`);
@@ -454,23 +458,43 @@ class Writers {
     return { internalCard, context, schema: await (await this.currentSchema.getSchema()).applyChanges(schema.map(document => ({ id: document.id, type: document.type, document }))) };
   }
 
-  _getSchemaDetailsForType(schema, type) {
-    let contentType = schema.getType(type);
-    if (!contentType || !contentType.dataSource || !contentType.dataSource.writer) {
-      log.debug('non-writeable type %s: exists=%s hasDataSource=%s hasWriter=%s',
-        type,
-        Boolean(contentType),
-        Boolean(contentType && contentType.dataSource),
-        Boolean(contentType && contentType.dataSource && contentType.dataSource.writer));
+  // TODO this service should be moved into the schema
+  async _getSchemaDetailsForType(schema, type, id, internalCard) {
+    let dataSource;
+    let getInternalCard = async function(cardId) {
+      let card;
+      try {
+        card = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', cardId, cardId);
+      } catch (err) {
+        if (err.status !== 404) { throw err; }
+      }
+      return card;
+    };
 
+    if (isInternalCard(type, id) && internalCard) {
+      let dataSources = [...schema.getDataSources().values()];
+      // chain is ordered with the closest ancestor first, and the most remote ancestor last
+      // crawl the chain looking for the data source of the most direct ancestor of the card
+      let chain = (await adoptionChain(internalCard, getInternalCard.bind(this))).map(i => i.data.id);
+      for (let cardType of chain) {
+        dataSource = dataSources.find(i => Array.isArray(i.cardTypes) && i.cardTypes.includes(cardType));
+        if (dataSource) { break; }
+      }
+    }
+
+    if (!dataSource) {
+      ({ dataSource } = schema.getType(type) || {});
+    }
+
+    if (!dataSource || !dataSource.writer) {
       throw new Error(`"${type}" is not a writable type`, {
         status: 403,
         title: "Not a writable type"
       });
     }
 
-    let writer = contentType.dataSource.writer;
-    let sourceId = contentType.dataSource.id;
+    let writer = dataSource.writer;
+    let sourceId = dataSource.id;
     return { writer, sourceId };
   }
 

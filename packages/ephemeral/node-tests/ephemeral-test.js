@@ -129,7 +129,7 @@ describe('ephemeral-storage', function() {
       expect(response).hasStatus(201);
       expect(response.body).has.deep.property('data.meta.version');
       expect(response.body).has.deep.property('data.id');
-      expect(response.body.data.id).equal('local-hub::test-card');
+      expect(response.body.data.id).to.equal('local-hub::test-card');
 
       response = await request.get(`/api/cards/${response.body.data.id}`);
       expect(response).hasStatus(200);
