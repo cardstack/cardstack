@@ -47,6 +47,7 @@ describe('git/config', function() {
       });
 
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+    await (env.lookup('hub:card-services'))._setupPromise;
     let contents = await inRepo(repoPath).getJSONContents('master', `my/base/contents/articles/1.json`);
     expect(contents).deep.equals({
       attributes: {
@@ -87,6 +88,7 @@ describe('git/config', function() {
 
 
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+    await (env.lookup('hub:card-services'))._setupPromise;
 
     let response = await env.lookup('hub:searchers').search(env.session, { filter: { type: 'articles' } });
     expect(response.data.map(m => m.id)).deep.equals(['2']);
@@ -113,6 +115,7 @@ describe('git/config', function() {
       });
 
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+    await (env.lookup('hub:card-services'))._setupPromise;
     let contents = await inRepo(repoPath).getJSONContents('cs-master', `contents/articles/1.json`);
     expect(contents).deep.equals({
       attributes: {
@@ -157,6 +160,7 @@ describe('git/config', function() {
 
 
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+    await (env.lookup('hub:card-services'))._setupPromise;
 
     let response = await env.lookup('hub:searchers').search(env.session, { filter: { type: 'articles' } });
     expect(response.data.map(m => m.id)).deep.equals(['2']);

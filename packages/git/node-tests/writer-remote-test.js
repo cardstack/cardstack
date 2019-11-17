@@ -99,6 +99,7 @@ describe('git/writer with remote', function() {
       );
 
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+    await (env.lookup('hub:card-services'))._setupPromise;
     writers = env.lookup('hub:writers');
   });
 
@@ -318,6 +319,7 @@ describe('git/writer with empty remote', function() {
       );
 
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+    await (env.lookup('hub:card-services'))._setupPromise;
     writers = env.lookup('hub:writers');
   });
 
@@ -400,6 +402,7 @@ describe('git/writer-remote/githereum', function() {
       );
 
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+    await (env.lookup('hub:card-services'))._setupPromise;
     writers = env.lookup('hub:writers');
 
     let schema = await writers.currentSchema.getSchema();

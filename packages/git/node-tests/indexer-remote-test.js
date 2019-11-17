@@ -107,6 +107,7 @@ describe('git/indexer remote config', function() {
       );
 
     let env = await createDefaultEnvironment(join(__dirname, '..'), factory.getModels());
+    await (env.lookup('hub:card-services'))._setupPromise;
     await destroyDefaultEnvironment(env);
   });
 
@@ -129,6 +130,7 @@ describe('git/indexer remote config', function() {
       );
 
     let env = await createDefaultEnvironment(join(__dirname, '..'), factory.getModels());
+    await env.lookup('hub:card-services')._setupPromise;
     await destroyDefaultEnvironment(env);
   });
 });
@@ -179,6 +181,7 @@ describe('git/indexer cloning', function() {
 
     start = async function() {
       env = await createDefaultEnvironment(join(__dirname, '..'), factory.getModels());
+      await env.lookup('hub:card-services')._setupPromise;
       indexer = env.lookup('hub:indexers');
       searcher = env.lookup('hub:searchers');
       client = env.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`);
