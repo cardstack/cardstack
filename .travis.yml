@@ -63,4 +63,4 @@ install:
   - yarn install
 
 before_script:
- - node packages/pgsearch/node-tests/pg-server/wait-for-db.js
+ - node packages/pgsearch/node-tests/wait-for-db.js
