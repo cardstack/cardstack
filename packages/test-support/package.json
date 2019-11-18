@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/test-support",
-  "version": "0.14.48",
+  "version": "0.14.49",
   "description": "Shared test support for cardstack packages.",
   "main": "index.js",
   "scripts": {
@@ -18,13 +18,13 @@
     "api-version": 1
   },
   "dependencies": {
-    "@cardstack/data": "0.14.48",
-    "@cardstack/di": "0.14.48",
-    "@cardstack/ephemeral": "0.14.48",
-    "@cardstack/hub": "0.14.48",
+    "@cardstack/data": "0.14.49",
+    "@cardstack/di": "0.14.49",
+    "@cardstack/ephemeral": "0.14.49",
+    "@cardstack/hub": "0.14.49",
     "@cardstack/logger": "^0.2.0",
-    "@cardstack/pgsearch": "0.14.48",
-    "@cardstack/plugin-utils": "0.14.48",
+    "@cardstack/pgsearch": "0.14.49",
+    "@cardstack/plugin-utils": "0.14.49",
     "@std/esm": "^0.25.1",
     "@types/lodash": "^4.14.136",
     "broccoli-funnel": "^2.0.1",
@@ -48,7 +48,7 @@
     "temp": "^0.8.3"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.14.48"
+    "@cardstack/eslint-config": "0.14.49"
   },
   "author": "Edward Faulkner <edward@eaf4.com>",
   "license": "MIT",
