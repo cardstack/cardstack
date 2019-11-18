@@ -31,7 +31,7 @@ jobs:
       script: npm run lint:deps && npm run lint:js
       name: 'Linting'
     - stage: test
-      script: npm run node-tests && npm run truffle-tests
+      script: npm run node-tests
       name: 'Node tests'
     - stage: test
       script: npm run ember-tests
@@ -63,6 +63,4 @@ install:
   - yarn install
 
 before_script:
- - yarn run blockchain &
- - sleep 10
  - node packages/postgresql/node-tests/pg-server/wait-for-db.js
