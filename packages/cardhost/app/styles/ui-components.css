@@ -1,6 +1,5 @@
 .ui-components {
   padding: var(--ch-spacing) var(--ch-spacing) 300px;
-  /* background-color: var(--ch-dark-blue-gray); */
   background-color: #666;
   color: black;
 }
@@ -17,6 +16,14 @@
   resize: both;
 }
 
+.ui-components--note,
+.code-block.ui-components--notes,
+.ui-components--grid-2-col .code-block.ui-components--notes {
+  grid-column: span 2;
+  width: min-content;
+  margin-bottom: var(--ch-spacing);
+}
+
 .ui-components--grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min-content, 1fr));
@@ -26,6 +33,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(40%, 60%));
   align-items: flex-start;
+  grid-gap: 0 30px;
 }
 .ui-components--grid-2-col > h2,
 .ui-components--grid-2-col > h3 {
@@ -47,7 +55,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  font-size: 21px;
   font-weight: 600;
 }
 

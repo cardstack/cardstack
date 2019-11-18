@@ -54,6 +54,9 @@ Until that work is done we are statically adding this css
   --ch-left-edge-width: calc(var(--ch-left-edge-panel-width) + var(--ch-left-edge-navbar-width));
   --ch-right-edge-width: calc(var(--ch-right-edge-panel-width) + var(--ch-spacing));
 
+  --ch-component-width: 260px;
+  --ch-component-height: 40px;
+
   --ch-spacing: 20px;
   --ch-edges-z-index: 10;
   --ch-actions-z-index: 11;
@@ -140,6 +143,10 @@ a:hover {
   position: absolute;
   right: var(--ch-spacing);
   bottom: var(--ch-spacing);
+}
+
+.card-schema-updator--search-bar > .ch-search-bar {
+  min-width: 230px;
 }
 
 .card-creator--new-card {

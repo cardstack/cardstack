@@ -5,8 +5,8 @@
   --height: 40px;
   --color: var(--ch-dark-purple-28);
   --background: var(--ch-cyan);
-  --font: 600 13px/18px "Open Sans";
-  --letter-spacing: 0.46px;
+  --font: 600 13px/18px var(--ch-font-family);
+  --letter-spacing: 0.035em;
   --border: 1px solid transparent;
   --border-radius: 100px;
   --box-shadow: none;

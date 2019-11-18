@@ -15,6 +15,7 @@
 }
 
 .cardhost-cards.add,
-.cardhost-cards.schema {
+.cardhost-cards.schema,
+.cardhost-cards.adopt {
   background: url("/assets/images/schema-grid-tile.png") center/60px repeat;
 }

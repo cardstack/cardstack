@@ -8,8 +8,10 @@
   position: relative;
   display: flex;
   align-items: center;
-  height: 40px;
-  width: var(--width);
+  max-width: 100%;
+  min-width: var(--width);
+  width: min-content;
+  height: var(--ch-component-height);
   padding: 0 60px;
   background-color: var(--ch-dark-blue-gray);
   background-image: var(--mode-icon), url('/assets/images/icons/carot-down-active.svg');
@@ -20,7 +22,7 @@
   border-radius: 20px;
   color: white;
   font: 400 13px/18px var(--ch-font-family);
-  letter-spacing: 0.46px;
+  letter-spacing: 0.035em;
   text-transform: capitalize;
   -moz-appearance: none;
   -webkit-appearance: none;
@@ -38,13 +40,11 @@
   --mode-icon: url('/assets/images/icons/layout-active.svg');
 }
 
-.mode-switcher + * {
-  margin-left: 15px;
-}
-
+.mode-switcher:focus,
 .mode-switcher:hover {
   color: var(--ch-cyan);
   cursor: pointer;
+  outline: 0;
 }
 
 .mode-switcher::-ms-expand {
