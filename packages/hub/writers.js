@@ -163,7 +163,7 @@ class Writers {
       );
       let { originalDocument, finalDocument, finalizer, aborter } = opts;
       pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, schema, context, opts});
-      performanceLog.debug(`create ${type}/${documentOrStream.data.id} time to complete writer.prepareCreate: ${Date.now() - prepareCreateStart}ms`);
+      performanceLog.debug(`create ${type}/${documentOrStream.data ? documentOrStream.data.id : 'not-defined'} time to complete writer.prepareCreate: ${Date.now() - prepareCreateStart}ms`);
     }
 
     try {
@@ -173,19 +173,19 @@ class Writers {
       if (typeof beforeFinalize === 'function') {
         let beforeFinalizeStart = Date.now();
         await beforeFinalize();
-        performanceLog.debug(`create ${type}/${documentOrStream.data.id} time to complete beforeFinalize work (create/update card schema resources): ${Date.now() - beforeFinalizeStart}ms`);
+        performanceLog.debug(`create ${type}/${documentOrStream.data ? documentOrStream.data.id : 'not-defined'} time to complete beforeFinalize work (create/update card schema resources): ${Date.now() - beforeFinalizeStart}ms`);
       }
       let finalizeStart = Date.now();
       context = await this._finalize(pending, type, schema, sourceId);
-      performanceLog.debug(`create ${type}/${documentOrStream.data.id} time to complete finalize: ${Date.now() - finalizeStart}ms`);
+      performanceLog.debug(`create ${type}/${documentOrStream.data ? documentOrStream.data.id : 'not-defined'} time to complete finalize: ${Date.now() - finalizeStart}ms`);
 
       let batch = this.pgSearchClient.beginBatch(schema, this.searchers);
       let indexSaveStart = Date.now();
       await batch.saveDocument(context);
-      performanceLog.debug(`create ${type}/${documentOrStream.data.id} time to complete index save: ${Date.now() - indexSaveStart}ms`);
+      performanceLog.debug(`create ${type}/${documentOrStream.data ? documentOrStream.data.id : 'not-defined'} time to complete index save: ${Date.now() - indexSaveStart}ms`);
       let invalidateStart = Date.now();
       await batch.done();
-      performanceLog.debug(`create ${type}/${documentOrStream.data.id} time to complete index invalidation: ${Date.now() - invalidateStart}ms`);
+      performanceLog.debug(`create ${type}/${documentOrStream.data ? documentOrStream.data.id : 'not-defined'} time to complete index invalidation: ${Date.now() - invalidateStart}ms`);
 
       if (newSchema) {
         this.currentSchema.invalidateCache();
@@ -196,7 +196,7 @@ class Writers {
 
     let readAuthStart = Date.now();
     let authorizedDocument = await context.applyReadAuthorization({ session });
-    performanceLog.debug(`create ${type}/${documentOrStream.data.id} time to complete read auth: ${Date.now() - readAuthStart}ms`);
+    performanceLog.debug(`create ${type}/${documentOrStream.data ? documentOrStream.data.id : 'not-defined'} time to complete read auth: ${Date.now() - readAuthStart}ms`);
 
     if (isInternalCard(authorizedDocument.data.type, authorizedDocument.data.id)) {
       let adaptStart = Date.now();
@@ -205,7 +205,7 @@ class Writers {
       performanceLog.debug(`create ${type}/${documentOrStream.data.id} total time to create document: ${Date.now() - handleCreateStart}ms`);
       return card;
     }
-    performanceLog.debug(`create ${type}/${documentOrStream.data.id} total time to create document: ${Date.now() - handleCreateStart}ms`);
+    performanceLog.debug(`create ${type}/${documentOrStream.data ? documentOrStream.data.id : 'not-defined'} total time to create document: ${Date.now() - handleCreateStart}ms`);
     return authorizedDocument;
   }
 
