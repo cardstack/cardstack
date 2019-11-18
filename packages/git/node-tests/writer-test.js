@@ -25,7 +25,7 @@ describe('git/writer', function() {
     let source = factory.addResource('data-sources')
       .withAttributes({
         'source-type': '@cardstack/git',
-        'card-types': ['local-hub::test-card'],
+        'card-types': ['local-hub::@cardstack/base-card'],
         params: { repo: repoPath }
       });
 
@@ -109,6 +109,7 @@ describe('git/writer', function() {
 
   afterEach(async function() {
     await temp.cleanup();
+    await cardServices._setupPromise;
     await destroyDefaultEnvironment(env);
   });
 

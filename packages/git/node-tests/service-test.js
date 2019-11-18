@@ -53,7 +53,6 @@ describe('local git cache service', function() {
       );
 
     let env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
-    await (env.lookup('hub:card-services'))._setupPromise;
 
     expect(readdirSync(tempRepoPath)).to.have.length(1);
 
@@ -102,7 +101,6 @@ describe('local git cache service', function() {
       );
 
     let env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
-    await (env.lookup('hub:card-services'))._setupPromise;
 
     expect(readdirSync(tempRepoPath)).to.have.length(2);
 
@@ -136,7 +134,6 @@ describe('local git cache service', function() {
       );
 
     let env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
-    await (env.lookup('hub:card-services'))._setupPromise;
 
     sinon.assert.calledTwice(service.getRepo);
     sinon.assert.calledOnce(service._makeRepo);
@@ -176,7 +173,6 @@ describe('local git cache service', function() {
       );
 
     let env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
-    await (env.lookup('hub:card-services'))._setupPromise;
 
     sinon.assert.calledTwice(service.getRepo);
     sinon.assert.calledOnce(service._makeRepo);
@@ -233,7 +229,6 @@ describe('local git cache service', function() {
       );
 
     let env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
-    await (env.lookup('hub:card-services'))._setupPromise;
 
     sinon.assert.calledTwice(service.getRepo);
     sinon.assert.calledOnce(service._makeRepo);

@@ -84,19 +84,17 @@ const defaultBranch = 'master';
 
 module.exports = declareInjections({
   searchers: 'hub:searchers',
-  cardServices: 'hub:card-services'
 },
 
 class Indexer {
   static create(params) { return new this(params); }
 
-  constructor({ dataSource, repo, basePath, branchPrefix, remote, searchers, cardServices }) {
+  constructor({ dataSource, repo, basePath, branchPrefix, remote, searchers }) {
     if (repo && remote) {
       throw new Error('You cannot define the params \'remote\' and \'repo\' at the same time for this data source');
     }
     this.repoPath = repo;
     this.searchers = searchers;
-    this.cardServices = cardServices;
     this.cardTypes = dataSource.cardTypes || [];
     this.branchPrefix = branchPrefix || "";
     this.basePath = basePath ? basePath.split('/') : [];
@@ -143,18 +141,18 @@ class Indexer {
     }
     log.debug(`ending beginUpdate()`);
 
-    return new GitUpdater(this.repo, targetBranch, this.repoPath, this.basePath, this.searchers, this.cardServices, this.cardTypes);
+    return new GitUpdater(this.repo, targetBranch, this.repoPath, this.basePath, this.searchers, this.cardTypes, this.__owner__);
   }
 });
 
 class GitUpdater {
-  constructor(repo, branch, repoPath, basePath, searchers, cardServices, cardTypes) {
+  constructor(repo, branch, repoPath, basePath, searchers, cardTypes, owner) {
     this.cardTypes = cardTypes;
     this.repo = repo;
     this.basePath = basePath;
     this.branch = branch;
     this.searchers = searchers;
-    this.cardServices = cardServices;
+    this.owner = owner;
     this.commit = null;
     this.commitId = null;
     this.rootTree = null;
@@ -172,7 +170,11 @@ class GitUpdater {
 
   async _ensureBaseCard() {
     if (this.cardTypes && this.cardTypes.length) {
-      await this.cardServices._setupPromise;
+      // lazily performing the lookup of card services so that the base card creation doesn't
+      // interfere with the remote syncing as base card may actually be written to git,
+      // which may require a merge, as well as a promise to reconcile, which we do below.
+      let cardServices = this.owner.lookup('hub:card-services');
+      await cardServices._setupPromise;
     }
   }
 

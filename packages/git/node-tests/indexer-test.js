@@ -102,6 +102,7 @@ describe('git/indexer', function() {
 
   afterEach(async function() {
     await temp.cleanup();
+    await cardServices._setupPromise;
     await destroyDefaultEnvironment(env);
   });
 
