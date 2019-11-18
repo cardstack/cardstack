@@ -1,5 +1,3 @@
-{{this.didUpdate}}
-
 {{#if this.cardstackSession.isAuthenticated}}
   <div class="card-renderer--top-edge-buttons">
     {{! eslint is confused by on helper }}
@@ -39,7 +37,12 @@
 
 <CardhostLeftEdge />
 
-<section class="card-editor" data-test-card-edit={{this.card.name}}>
+{{! template-lint-disable attribute-indentation}}
+<section
+  class="card-editor"
+  data-test-card-edit={{this.card.name}}
+  {{did-update this.updateCard @card}}
+>
   <CardRenderer
     @card={{this.card}}
     @mode="edit"

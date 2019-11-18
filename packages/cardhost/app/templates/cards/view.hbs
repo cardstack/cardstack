@@ -23,7 +23,10 @@
 <CardhostLeftEdge />
 
 <section class="card-view" data-test-card-view={{this.model.name}}>
-  <CardRenderer @card={{this.model}} @format="isolated"/>
+  <CardRenderer
+    @card={{this.model}}
+    @format="isolated"
+  />
 </section>
 
 {{!-- Hidden --}}

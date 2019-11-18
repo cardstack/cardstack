@@ -3,11 +3,7 @@ import { click, find, triggerEvent, fillIn, visit, waitFor } from '@ember/test-h
 const timeout = 5000;
 
 export async function showCardId() {
-  let selectedField = document.querySelector('.right-edge [data-test-field]');
-  if (selectedField) {
-    let field = selectedField.getAttribute('data-test-field');
-    await click(`.card-renderer-isolated [data-test-field="${field}"]`);
-  }
+  await click(`.card-renderer-isolated`);
 }
 
 export async function setCardId(id) {
