@@ -1,6 +1,7 @@
 const Error = require('@cardstack/plugin-utils/error');
 const Session = require('@cardstack/plugin-utils/session');
 const log = require('@cardstack/logger')('cardstack/writers');
+const performanceLog = require('@cardstack/logger')('cardstack/performance/writers');
 const { set, get, differenceBy, intersectionBy, partition, merge } = require('lodash');
 const { declareInjections } = require('@cardstack/di');
 const {
@@ -128,13 +129,16 @@ class Writers {
   }
 
   async handleCreate(isBinary, session, type, documentOrStream, schema) {
+    let handleCreateStart = Date.now();
     await this.pgSearchClient.ensureDatabaseSetup();
 
     schema = schema || await this.currentSchema.getSchema();
     let context, beforeFinalize;
     if (type === 'cards') {
+      let handleCardOperationsStart = Date.now();
       ({ context, schema, internalCard: documentOrStream, beforeFinalize } = await this.handleCardOperations(session, documentOrStream));
       type = documentOrStream.data.type;
+      performanceLog.debug(`create ${type}/${documentOrStream.data.id} time to complete handleCardOperations: ${Date.now() - handleCardOperationsStart}ms`);
     }
 
     let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
@@ -150,6 +154,7 @@ class Writers {
       pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, opts});
     } else {
       let isSchema = this.schemaTypes.includes(type);
+      let prepareCreateStart = Date.now();
       let opts = await writer.prepareCreate(
         session,
         type,
@@ -158,6 +163,7 @@ class Writers {
       );
       let { originalDocument, finalDocument, finalizer, aborter } = opts;
       pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, schema, context, opts});
+      performanceLog.debug(`create ${type}/${documentOrStream.data ? documentOrStream.data.id : 'not-defined'} time to complete writer.prepareCreate: ${Date.now() - prepareCreateStart}ms`);
     }
 
     try {
@@ -165,13 +171,21 @@ class Writers {
       schema = newSchema || schema;
 
       if (typeof beforeFinalize === 'function') {
+        let beforeFinalizeStart = Date.now();
         await beforeFinalize();
+        performanceLog.debug(`create ${type}/${documentOrStream.data ? documentOrStream.data.id : 'not-defined'} time to complete beforeFinalize work (create/update card schema resources): ${Date.now() - beforeFinalizeStart}ms`);
       }
+      let finalizeStart = Date.now();
       context = await this._finalize(pending, type, schema, sourceId);
+      performanceLog.debug(`create ${type}/${documentOrStream.data ? documentOrStream.data.id : 'not-defined'} time to complete finalize: ${Date.now() - finalizeStart}ms`);
 
       let batch = this.pgSearchClient.beginBatch(schema, this.searchers);
+      let indexSaveStart = Date.now();
       await batch.saveDocument(context);
+      performanceLog.debug(`create ${type}/${documentOrStream.data ? documentOrStream.data.id : 'not-defined'} time to complete index save: ${Date.now() - indexSaveStart}ms`);
+      let invalidateStart = Date.now();
       await batch.done();
+      performanceLog.debug(`create ${type}/${documentOrStream.data ? documentOrStream.data.id : 'not-defined'} time to complete index invalidation: ${Date.now() - invalidateStart}ms`);
 
       if (newSchema) {
         this.currentSchema.invalidateCache();
@@ -180,15 +194,23 @@ class Writers {
       if (pending) { await pending.abort();  }
     }
 
+    let readAuthStart = Date.now();
     let authorizedDocument = await context.applyReadAuthorization({ session });
+    performanceLog.debug(`create ${type}/${documentOrStream.data ? documentOrStream.data.id : 'not-defined'} time to complete read auth: ${Date.now() - readAuthStart}ms`);
+
     if (isInternalCard(authorizedDocument.data.type, authorizedDocument.data.id)) {
+      let adaptStart = Date.now();
       let card = await adaptCardToFormat(schema, session, authorizedDocument, 'isolated', this.searchers);
+      performanceLog.debug(`create ${type}/${documentOrStream.data.id} time to complete adapting card to format: ${Date.now() - adaptStart}ms`);
+      performanceLog.debug(`create ${type}/${documentOrStream.data.id} total time to create document: ${Date.now() - handleCreateStart}ms`);
       return card;
     }
+    performanceLog.debug(`create ${type}/${documentOrStream.data ? documentOrStream.data.id : 'not-defined'} total time to create document: ${Date.now() - handleCreateStart}ms`);
     return authorizedDocument;
   }
 
   async update(session, type, id, document, schema) {
+    let updateStart = Date.now();
     log.info("updating type=%s id=%s", type, id);
     if (!document.data) {
       throw new Error('The document must have a top-level "data" property', {
@@ -200,12 +222,15 @@ class Writers {
 
     let beforeFinalize, afterFinalize, context;
     if (type === 'cards') {
+      let handleCardOperationsStart = Date.now();
       ({ schema, context, internalCard:document, beforeFinalize, afterFinalize } = await this.handleCardOperations(session, document));
       type = document.data.type;
+      performanceLog.debug(`update ${type}/${document.data.id} time to complete handleCardOperations: ${Date.now() - handleCardOperationsStart}ms`);
     }
 
     let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
     let isSchema = this.schemaTypes.includes(type);
+    let prepareUpdateStart = Date.now();
     let opts = await writer.prepareUpdate(
       session,
       type,
@@ -215,22 +240,33 @@ class Writers {
     );
     let { originalDocument, finalDocument, finalizer, aborter } = opts;
     let pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, schema, context, opts });
+    performanceLog.debug(`update ${type}/${document.data.id} time to complete writer.prepareUpdate: ${Date.now() - prepareUpdateStart}ms`);
 
     try {
       let newSchema = await schema.validate(pending, { type, id, session });
       schema = newSchema || schema;
 
       if (typeof beforeFinalize === 'function') {
+        let beforeFinalizeStart = Date.now();
         await beforeFinalize();
+        performanceLog.debug(`update ${type}/${document.data.id} time to complete beforeFinalize work (create/update card schema resources): ${Date.now() - beforeFinalizeStart}ms`);
       }
+      let finalizeStart = Date.now();
       context = await this._finalize(pending, type, schema, sourceId);
+      performanceLog.debug(`update ${type}/${document.data.id} time to complete finalize: ${Date.now() - finalizeStart}ms`);
 
       let batch = this.pgSearchClient.beginBatch(schema, this.searchers);
+      let indexSaveStart = Date.now();
       await batch.saveDocument(context);
+      performanceLog.debug(`update ${type}/${document.data.id} time to complete index save: ${Date.now() - indexSaveStart}ms`);
+      let invalidateStart = Date.now();
       await batch.done();
+      performanceLog.debug(`update ${type}/${document.data.id} time to complete index invalidation: ${Date.now() - invalidateStart}ms`);
 
       if (typeof afterFinalize === 'function') {
+        let afterFinalizeStart = Date.now();
         schema = await afterFinalize(pending.originalDocumentContext.schema, schema);
+        performanceLog.debug(`update ${type}/${document.data.id} time to complete afterFinalize work (delete card schema resources): ${Date.now() - afterFinalizeStart}ms`);
       }
       if (newSchema) {
         this.currentSchema.invalidateCache();
@@ -239,14 +275,23 @@ class Writers {
       if (pending) { await pending.abort();  }
     }
 
+    let readAuthStart = Date.now();
     let authorizedDocument = await context.applyReadAuthorization({ session });
+    performanceLog.debug(`update ${type}/${document.data.id} time to complete read auth: ${Date.now() - readAuthStart}ms`);
+
     if (isInternalCard(authorizedDocument.data.type, authorizedDocument.data.id)) {
-      return await adaptCardToFormat(schema, session, authorizedDocument, 'isolated', this.searchers);
+      let adaptStart = Date.now();
+      let card = await adaptCardToFormat(schema, session, authorizedDocument, 'isolated', this.searchers);
+      performanceLog.debug(`update ${type}/${document.data.id} time to complete adapting card to format: ${Date.now() - adaptStart}ms`);
+      performanceLog.debug(`update ${type}/${document.data.id} total time to update document: ${Date.now() - updateStart}ms`);
+      return card;
     }
+    performanceLog.debug(`update ${type}/${document.data.id} total time to update document: ${Date.now() - updateStart}ms`);
     return authorizedDocument;
   }
 
   async delete(session, version, type, id, schema) {
+    let deleteStart = Date.now();
     log.info("deleting type=%s id=%s", type, id);
     await this.pgSearchClient.ensureDatabaseSetup();
 
@@ -255,32 +300,45 @@ class Writers {
     let afterFinalize, context;
     if (type === 'cards') {
       let internalCard;
+      let handleCardOperationsStart = Date.now();
       ({ schema, context, internalCard, afterFinalize } = await this.handleCardDeleteOperation(session, id));
       if (!internalCard) { return; }
       type = internalCard.data.type;
       version = get(internalCard, 'data.meta.version');
+      performanceLog.debug(`delete ${type}/${id} time to complete handleCardOperations: ${Date.now() - handleCardOperationsStart}ms`);
     }
 
     let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
     let isSchema = this.schemaTypes.includes(type);
+    let prepareDeleteStart = Date.now();
     let opts = await writer.prepareDelete(session, version, type, id, isSchema);
     let { originalDocument, finalDocument, finalizer, aborter } = opts;
     let pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, schema, context, opts });
+    performanceLog.debug(`delete ${type}/${id} time to complete writer.prepareDelete: ${Date.now() - prepareDeleteStart}ms`);
     try {
       let newSchema = await schema.validate(pending, { session });
       schema = newSchema || schema;
+      let finalizeStart = Date.now();
       let context = await this._finalize(pending, type, schema, sourceId, id);
+      performanceLog.debug(`delete ${type}/${id} time to complete finalize: ${Date.now() - finalizeStart}ms`);
 
       let batch = this.pgSearchClient.beginBatch(schema, this.searchers);
+      let indexDeleteStart = Date.now();
       await batch.deleteDocument(context);
+      performanceLog.debug(`delete ${type}/${id} time to complete index delete: ${Date.now() - indexDeleteStart}ms`);
+      let invalidateStart = Date.now();
       await batch.done();
+      performanceLog.debug(`delete ${type}/${id} time to complete index invalidation: ${Date.now() - invalidateStart}ms`);
 
       if (typeof afterFinalize === 'function') {
+        let afterFinalizeStart = Date.now();
         schema = await afterFinalize(schema);
+        performanceLog.debug(`delete ${type}/${id} time to complete afterFinalize work (delete card schema resources): ${Date.now() - afterFinalizeStart}ms`);
       }
       if (newSchema) {
         this.currentSchema.invalidateCache();
       }
+      performanceLog.debug(`delete ${type}/${id} total time to delete document: ${Date.now() - deleteStart}ms`);
     } finally {
       if (pending) { await pending.abort();  }
     }
