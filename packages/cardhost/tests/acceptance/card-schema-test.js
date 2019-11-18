@@ -38,6 +38,8 @@ module('Acceptance | card schema', function(hooks) {
     await addField('title', 'string', true);
 
     await click('[data-test-card-schema-save-btn]');
+    await waitFor('[data-test-card-schema-save-btn]', { timeout });
+    await click('[data-test-card-schema-preview-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
     await visit(`/cards/${card1Id}/schema`);
 
@@ -84,6 +86,8 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea').hasValue('fill this in with your subheader');
 
     await click('[data-test-card-schema-save-btn]');
+    await waitFor('[data-test-card-schema-save-btn]', { timeout });
+    await click('[data-test-card-schema-preview-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
     await visit(`/cards/${card1Id}/schema`);
 
@@ -131,6 +135,8 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('TITLE');
 
     await click('[data-test-card-schema-save-btn]');
+    await waitFor('[data-test-card-schema-save-btn]', { timeout });
+    await click('[data-test-card-schema-preview-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card1Id}`);
@@ -161,6 +167,8 @@ module('Acceptance | card schema', function(hooks) {
     await removeField('body');
 
     await click('[data-test-card-schema-save-btn]');
+    await waitFor('[data-test-card-schema-save-btn]', { timeout });
+    await click('[data-test-card-schema-preview-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`);
 
     assert.dom('[data-test-field="body"]').doesNotExist();
@@ -196,6 +204,8 @@ module('Acceptance | card schema', function(hooks) {
       ['body', 'author', 'title']);
 
     await click('[data-test-card-schema-save-btn]');
+    await waitFor('[data-test-card-schema-save-btn]', { timeout });
+    await click('[data-test-card-schema-preview-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
 
     assert.deepEqual([...document.querySelectorAll(`[data-test-isolated-card="${card1Id}"] [data-test-field]`)].map(i => i.getAttribute('data-test-field')),
@@ -263,6 +273,8 @@ module('Acceptance | card schema', function(hooks) {
     assert.equal(field.attributes['needed-when-embedded'], true);
 
     await click('[data-test-card-schema-save-btn]');
+    await waitFor('[data-test-card-schema-save-btn]', { timeout });
+    await click('[data-test-card-schema-preview-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
     await visit(`/cards/${card1Id}/schema`);
     await click('[data-test-field="title"]');
@@ -292,6 +304,8 @@ module('Acceptance | card schema', function(hooks) {
     assert.equal(field.attributes['needed-when-embedded'], false);
 
     await click('[data-test-card-schema-save-btn]');
+    await waitFor('[data-test-card-schema-save-btn]', { timeout });
+    await click('[data-test-card-schema-preview-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
     await visit(`/cards/${card1Id}/schema`);
     await click('[data-test-field="title"]');

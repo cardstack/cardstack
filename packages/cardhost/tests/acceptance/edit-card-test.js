@@ -46,6 +46,8 @@ module('Acceptance | card edit', function(hooks) {
     await setFieldValue('body', 'updated body');
 
     await click('[data-test-card-editor-save-btn]');
+    await waitFor('[data-test-card-editor-save-btn]', { timeout });
+    await click('[data-test-card-editor-preview-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card1Id}`);
@@ -68,6 +70,8 @@ module('Acceptance | card edit', function(hooks) {
     await setFieldValue('email', 'hassan@nowhere.dog');
 
     await click('[data-test-card-editor-save-btn]');
+    await waitFor('[data-test-card-editor-save-btn]', { timeout });
+    await click('[data-test-card-editor-preview-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card1Id}`);
@@ -90,6 +94,8 @@ module('Acceptance | card edit', function(hooks) {
     await setFieldValue('created', '2019-10-08');
 
     await click('[data-test-card-editor-save-btn]');
+    await waitFor('[data-test-card-editor-save-btn]', { timeout });
+    await click('[data-test-card-editor-preview-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card1Id}`);
@@ -112,6 +118,8 @@ module('Acceptance | card edit', function(hooks) {
     await setFieldValue('likes', 110);
 
     await click('[data-test-card-editor-save-btn]');
+    await waitFor('[data-test-card-editor-save-btn]', { timeout });
+    await click('[data-test-card-editor-preview-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card1Id}`);
@@ -134,6 +142,8 @@ module('Acceptance | card edit', function(hooks) {
     await setFieldValue('published', false);
 
     await click('[data-test-card-editor-save-btn]');
+    await waitFor('[data-test-card-editor-save-btn]', { timeout });
+    await click('[data-test-card-editor-preview-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card1Id}`);
@@ -163,6 +173,8 @@ module('Acceptance | card edit', function(hooks) {
     await setFieldValue('reviewers', `${card2Id},${card3Id}`);
 
     await click('[data-test-card-editor-save-btn]');
+    await waitFor('[data-test-card-editor-save-btn]', { timeout });
+    await click('[data-test-card-editor-preview-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card1Id}`);
@@ -198,6 +210,8 @@ module('Acceptance | card edit', function(hooks) {
     await setFieldValue('author', card2Id);
 
     await click('[data-test-card-editor-save-btn]');
+    await waitFor('[data-test-card-editor-save-btn]', { timeout });
+    await click('[data-test-card-editor-preview-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card1Id}`);

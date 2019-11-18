@@ -53,7 +53,7 @@ export async function createCards(args) {
       await addField(name, type, neededWhenEmbedded, index);
     }
     await click('[data-test-card-creator-save-btn]');
-    await waitFor(`[data-test-card-view="${id}"]`, { timeout });
+    await waitFor('[data-test-card-creator-save-btn]', { timeout });
 
     await visit(`/cards/${id}/edit`);
     for (let [name, , , value] of args[id]) {
@@ -61,6 +61,8 @@ export async function createCards(args) {
       await setFieldValue(name, value);
     }
     await click('[data-test-card-editor-save-btn]');
+    await waitFor('[data-test-card-editor-save-btn]', { timeout });
+    await click('[data-test-card-editor-preview-btn]');
     await waitFor(`[data-test-card-view="${id}"]`, { timeout });
   }
 }
