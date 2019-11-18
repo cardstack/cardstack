@@ -3,7 +3,6 @@
   "dependencies": {
   },
   "devDependencies": {
-    "@cardstack/mobiledoc": "*",
     "@cardstack/test-support": "*",
     "fake-indexer": "*"
   },
