@@ -41,7 +41,10 @@
         <button class="ch-catalog--header-btn sidebar active" aria-label="View as sidebar"></button>
         <button class="ch-catalog--header-btn grid" aria-label="View as grid"></button>
       </div>
-      <div class="ch-filter-bar">Filter Results</div>
+      <Input
+        @class="ch-filter-bar"
+        @placeholder="Filter Results"
+      />
     </header>
     <div class="ch-catalog--fields">
       {{#each this.fieldComponents as |field|}}
@@ -81,7 +84,13 @@
   @displayCardMetadata={{this.displayCardMetadata}}
 />
 
-<div class="ch-search-bar card-schema-updator--search-bar">Search Library</div>
+<div class="card-schema-updator--search-bar">
+  <Input
+    @type="search"
+    @class="ch-search-bar"
+    @placeholder="Search Library"
+  />
+</div>
 
 <section class="card-schema-updator" data-test-card-schema={{@card.name}} {{did-update this.updateCard @card}}>
   <CardRenderer

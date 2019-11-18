@@ -119,7 +119,7 @@
             <Textarea
               @id={{concat "edit-field-instructions-" @field.nonce "-" this.renderNonce}}
               data-test-field-renderer-field-helper-text
-              @class="ch-input"
+              @class="ch-textarea"
               @value={{this.newFieldInstructions}}
               @key-up={{action this.updateFieldInstructions}}
             />
@@ -159,7 +159,9 @@
       {{else if (eq schemaAttr "embedded")}}
         <div class="ch-input-group" data-test-schema-attr={{schemaAttr}}>
           {{#if @setNeededWhenEmbedded}}
-            <label class="ch-label ch-checkbox-group {{if @field.isAdopted "disabled"}}">
+            <label
+              class="ch-label ch-checkbox-group {{if @field.neededWhenEmbedded "checked"}} {{if @field.isAdopted "disabled"}}"
+            >
               Available When Embedded
               <Input
                 @checked={{@field.neededWhenEmbedded}}

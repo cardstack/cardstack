@@ -116,9 +116,10 @@
 /* TODO: Functionality and hover-focus styles */
 .pill-selector {
   display: flex;
-  max-width: 262px;
-  height: 38px;
-  margin: 0;
+  max-width: 100%;
+  min-width: var(--ch-component-width);
+  width: min-content;
+  height: var(--ch-component-height);
   background-color: var(--ch-dark-blue-gray);
   color: white;
   font: 400 13px/18px var(--ch-font-family);
@@ -129,7 +130,7 @@
 
 .pill-option {
   flex: 1;
-  padding: 10px 20px;
+  padding: 10px 15px;
   text-align: center;
 }
 

@@ -16,7 +16,6 @@ export default class ColorPalette extends Component {
     "--ch-medium-darker-blue-gray": "#383849",
     "--ch-dark-blue-gray": "#2e2d38",
     "--ch-darker-dark-blue-gray": "#2d2c37",
-    "--ch-darker-purple": "#22212b",
     "--ch-dark-purple-28": "#282738",
     "--ch-darker-blue-gray": "#201f27",
     "--ch-darkest-blue-gray": "#141428",
