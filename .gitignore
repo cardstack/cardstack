@@ -56,10 +56,6 @@ package-lock.json
 /tests/ephemeral-test-app/node_modules/@cardstack/hub/**/*
 /tests/elasticsearch-test-app/node_modules/@cardstack/hub/**/*
 
-/packages/test-support/lib/find-dependencies.d.ts
-/packages/test-support/lib/find-dependencies.js
-/packages/test-support/lib/find-dependencies.js.map
-
 # generated files you may end up with if you run the cli blueprint directly
 packages/cli/node-tests/sample-cards/*/node_modules/**/*
 
