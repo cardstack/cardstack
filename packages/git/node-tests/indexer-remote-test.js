@@ -171,12 +171,6 @@ describe('git/indexer cloning', function() {
           }
         });
 
-    factory.addResource('plugin-configs', '@cardstack/hub')
-      .withRelated(
-        'default-data-source',
-        dataSource
-      );
-
     start = async function() {
       env = await createDefaultEnvironment(join(__dirname, '..'), factory.getModels());
       indexer = env.lookup('hub:indexers');

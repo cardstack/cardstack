@@ -6,6 +6,7 @@ const { partition } = require('lodash');
 const { INTERNAL_PRIVILEGED } = require('@cardstack/plugin-utils/session');
 const streamToPromise = require('stream-to-promise');
 const { statSync } = require("fs");
+const { isInternalCard } = require('@cardstack/plugin-utils/card-utils');
 
 // When we first load, we establish an identity. This allows us to
 // distinguish any older content leftover in the search index from our
@@ -15,6 +16,17 @@ const identity = Math.random();
 // Within our own identity, we track generations to know what to update.
 let generationCounter = 0;
 
+function isCard(model) {
+  return model.data && isInternalCard(model.data.type, model.data.id);
+}
+
+function getType(model) {
+  return model.data ? model.data.type : model.type;
+}
+
+function getId(model) {
+  return model.data ? model.data.id : model.id;
+}
 
 module.exports = declareInjections({
   indexers: 'hub:indexers',
@@ -45,10 +57,10 @@ module.exports = declareInjections({
       if (initialModels) {
         let schemaTypes = this.schemaLoader.ownTypes();
         for (let model of initialModels) {
-          let isSchema = schemaTypes.includes(model.type);
+          let isSchema = schemaTypes.includes(getType(model));
           if (model.readable) {
             // store binary data
-            let id = model.id || crypto.randomBytes(20).toString('hex'); // if model has id, use it, otherwise generate one
+            let id = getId(model) || crypto.randomBytes(20).toString('hex'); // if model has id, use it, otherwise generate one
             let blob = await streamToPromise(model);
             let storedDocument = {
               type: 'cardstack-files',
@@ -65,7 +77,7 @@ module.exports = declareInjections({
 
             storage.storeBinary(model.type, id, storedDocument, blob);
           } else {
-            storage.store(model.type, model.id, model, isSchema);
+            storage.store(getType(model), getId(model), model, isSchema);
           }
         }
       }
@@ -87,6 +99,10 @@ module.exports = declareInjections({
     let [schemaModels, dataModels] = partition(models, model => schemaTypes.includes(model.type));
     let schema = await this.schemaLoader.loadFrom(schemaModels);
     for (let model of dataModels) {
+      if (isCard(model)) {
+        // TODO validate card document
+        continue;
+      }
       await schema.validate(await this.writers.createPendingChange({
         finalDocument: model,
         finalizer: () => { },
@@ -102,6 +118,8 @@ async function crawlModels(initialModels, read) {
   while (foundModels.length > 0) {
     let pendingRefs = [];
     for (let model of foundModels) {
+      // TODO crawl card documents
+      if (isCard(model)) { continue; }
       let key = `${model.type}/${model.id}`;
       models.set(key, model);
       for (let ref of references(model)) {
@@ -120,6 +138,7 @@ async function crawlModels(initialModels, read) {
   return [...models.values()].filter(Boolean);
 }
 
+// TODO this assumes model is a resource--need to change it?
 function references(model) {
 
   let refs = [

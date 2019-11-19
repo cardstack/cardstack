@@ -8,9 +8,10 @@ const {
   isInternalCard,
   loadCard,
   getCardId,
+  adoptionChain,
   adaptCardToFormat,
   generateInternalCardFormat
-} = require('./indexing/card-utils');
+} = require('@cardstack/plugin-utils/card-utils');
 
 module.exports = declareInjections({
   currentSchema: 'hub:current-schema',
@@ -93,22 +94,26 @@ class Writers {
     deletedModels = differenceBy(deletedModels, ignoredModels, i => `${i.type}/${i.id}`);
     changedModels = differenceBy(changedModels, ignoredModels, i => `${i.type}/${i.id}`);
 
-    let beforeFinalize = async () => {
-      // This assumes that the session used to update cards also posseses permissions to CRUD schema models and internal card models
+    let beforeFinalize = async (currentSchema) => {
+      // the new schema may be missing deleted resources which will be important to have in order
+      // for invalidated documents that have deleted schema to be reasoned about correctly
+      let localSchema = await currentSchema.applyChanges(deletedModels.map(document => ({ type: document.type, id: document.id, document })));
+      // TODO can we run all these concurrently?
       for (let resource of addedModels) {
         let { data: { meta } } = await this.handleCreate(false, session, resource.type, {
           data: resource,
           included: [internalCard.data].concat(internalCard.included || [])
-        }, schema);
+        }, localSchema, true);
         let includedResource = (internalCard.included || []).find(i => `${i.type}/${i.id}` === `${resource.type}/${resource.id}`);
         if (!includedResource) { continue; }
         includedResource.meta = merge({}, includedResource.meta, meta);
       }
+    // TODO can we run all these concurrently?
       for (let resource of changedModels) {
         let { data: { meta } } = await this.update(session, resource.type, resource.id, {
           data: resource,
           included: [internalCard.data].concat(internalCard.included || [])
-        }, schema);
+        }, localSchema, true);
         let includedResource = (internalCard.included || []).find(i => `${i.type}/${i.id}` === `${resource.type}/${resource.id}`);
         if (!includedResource) { continue; }
         includedResource.meta = merge({}, includedResource.meta, meta);
@@ -128,22 +133,27 @@ class Writers {
     return { internalCard, schema, beforeFinalize, afterFinalize, context };
   }
 
-  async handleCreate(isBinary, session, type, documentOrStream, schema) {
+  // TODO add timing logs
+  async handleCreate(isBinary, session, type, documentOrStream, schema, indexOnly) {
     let handleCreateStart = Date.now();
     await this.pgSearchClient.ensureDatabaseSetup();
 
     schema = schema || await this.currentSchema.getSchema();
-    let context, beforeFinalize;
+    let context, beforeFinalize, id;
     if (type === 'cards') {
       let handleCardOperationsStart = Date.now();
       ({ context, schema, internalCard: documentOrStream, beforeFinalize } = await this.handleCardOperations(session, documentOrStream));
-      type = documentOrStream.data.type;
+      ({ type, id } = documentOrStream.data);
       performanceLog.debug(`create ${type}/${documentOrStream.data.id} time to complete handleCardOperations: ${Date.now() - handleCardOperationsStart}ms`);
     }
 
-    let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
-
     let pending;
+    let { writer, sourceId } = await this._getSchemaDetailsForType(schema, type, id, documentOrStream);
+    if (isInternalCard(type, documentOrStream.data && documentOrStream.data.id) &&
+      !writer.hasCardSupport) {
+      let source = schema.getDataSource(sourceId);
+      throw new Error(`The configured writer for cards documents, 'data-sources/${sourceId}' (source type '${source.sourceType}'), does not have card support`);
+    }
     if (isBinary) {
       let opts = await writer.prepareBinaryCreate(
         session,
@@ -151,18 +161,25 @@ class Writers {
         documentOrStream
       );
       let { originalDocument, finalDocument, finalizer, aborter } = opts;
-      pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, opts});
+      pending = await this.createPendingChange({ type, originalDocument, finalDocument, finalizer, aborter, opts});
     } else {
       let isSchema = this.schemaTypes.includes(type);
       let prepareCreateStart = Date.now();
-      let opts = await writer.prepareCreate(
-        session,
-        type,
-        this._cleanupBodyData(schema, documentOrStream.data),
-        isSchema
-      );
-      let { originalDocument, finalDocument, finalizer, aborter } = opts;
-      pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, schema, context, opts});
+      let document = isInternalCard(type, documentOrStream.data && documentOrStream.data.id) && writer.hasCardSupport ?
+        this._cleanupCardData(schema, documentOrStream) :
+        this._cleanupBodyData(schema, documentOrStream.data);
+      if (!indexOnly) {
+        let opts = await writer.prepareCreate(
+          session,
+          type,
+          document,
+          isSchema
+        );
+        let { originalDocument, finalDocument, finalizer, aborter } = opts;
+        pending = await this.createPendingChange({ type, originalDocument, finalDocument, finalizer, aborter, schema, context, opts});
+      } else {
+        pending = await this.createPendingChange({ type, finalDocument: document, schema, context });
+      }
       performanceLog.debug(`create ${type}/${documentOrStream.data ? documentOrStream.data.id : 'not-defined'} time to complete writer.prepareCreate: ${Date.now() - prepareCreateStart}ms`);
     }
 
@@ -172,12 +189,17 @@ class Writers {
 
       if (typeof beforeFinalize === 'function') {
         let beforeFinalizeStart = Date.now();
-        await beforeFinalize();
+        await beforeFinalize(schema);
         performanceLog.debug(`create ${type}/${documentOrStream.data ? documentOrStream.data.id : 'not-defined'} time to complete beforeFinalize work (create/update card schema resources): ${Date.now() - beforeFinalizeStart}ms`);
       }
-      let finalizeStart = Date.now();
-      context = await this._finalize(pending, type, schema, sourceId);
-      performanceLog.debug(`create ${type}/${documentOrStream.data ? documentOrStream.data.id : 'not-defined'} time to complete finalize: ${Date.now() - finalizeStart}ms`);
+
+      if (!indexOnly) {
+        let finalizeStart = Date.now();
+        context = await this._finalize(pending, type, schema, sourceId);
+        performanceLog.debug(`create ${type}/${documentOrStream.data ? documentOrStream.data.id : 'not-defined'} time to complete finalize: ${Date.now() - finalizeStart}ms`);
+      } else {
+        context = pending.finalDocumentContext;
+      }
 
       let batch = this.pgSearchClient.beginBatch(schema, this.searchers);
       let indexSaveStart = Date.now();
@@ -209,7 +231,8 @@ class Writers {
     return authorizedDocument;
   }
 
-  async update(session, type, id, document, schema) {
+  // TODO add timing logs
+  async update(session, type, id, document, schema, indexOnly) {
     let updateStart = Date.now();
     log.info("updating type=%s id=%s", type, id);
     if (!document.data) {
@@ -228,18 +251,31 @@ class Writers {
       performanceLog.debug(`update ${type}/${document.data.id} time to complete handleCardOperations: ${Date.now() - handleCardOperationsStart}ms`);
     }
 
-    let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
+    let { writer, sourceId } = await this._getSchemaDetailsForType(schema, type, id, document);
+    if (isInternalCard(type, id) && !writer.hasCardSupport) {
+      let source = schema.getDataSource(sourceId);
+      throw new Error(`The configured writer for cards documents, 'data-sources/${sourceId}' (source type '${source.sourceType}'), does not have card support`);
+    }
+
+    let pending;
     let isSchema = this.schemaTypes.includes(type);
     let prepareUpdateStart = Date.now();
-    let opts = await writer.prepareUpdate(
-      session,
-      type,
-      id,
-      this._cleanupBodyData(schema, document.data),
-      isSchema
-    );
-    let { originalDocument, finalDocument, finalizer, aborter } = opts;
-    let pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, schema, context, opts });
+    let cleanDocument = isInternalCard(type, document.data && document.data.id) && writer.hasCardSupport ?
+      this._cleanupCardData(schema, document) :
+      this._cleanupBodyData(schema, document.data);
+    if (!indexOnly) {
+      let opts = await writer.prepareUpdate(
+        session,
+        type,
+        id,
+        cleanDocument,
+        isSchema,
+      );
+      let { originalDocument, finalDocument, finalizer, aborter } = opts;
+      pending = await this.createPendingChange({ type, originalDocument, finalDocument, finalizer, aborter, schema, context, opts });
+    } else {
+      pending = await this.createPendingChange({ type, finalDocument: cleanDocument, schema, context });
+    }
     performanceLog.debug(`update ${type}/${document.data.id} time to complete writer.prepareUpdate: ${Date.now() - prepareUpdateStart}ms`);
 
     try {
@@ -248,12 +284,16 @@ class Writers {
 
       if (typeof beforeFinalize === 'function') {
         let beforeFinalizeStart = Date.now();
-        await beforeFinalize();
+        await beforeFinalize(schema);
         performanceLog.debug(`update ${type}/${document.data.id} time to complete beforeFinalize work (create/update card schema resources): ${Date.now() - beforeFinalizeStart}ms`);
       }
-      let finalizeStart = Date.now();
-      context = await this._finalize(pending, type, schema, sourceId);
-      performanceLog.debug(`update ${type}/${document.data.id} time to complete finalize: ${Date.now() - finalizeStart}ms`);
+      if (!indexOnly) {
+        let finalizeStart = Date.now();
+        context = await this._finalize(pending, type, schema, sourceId);
+        performanceLog.debug(`update ${type}/${document.data.id} time to complete finalize: ${Date.now() - finalizeStart}ms`);
+      } else {
+        context = pending.finalDocumentContext;
+      }
 
       let batch = this.pgSearchClient.beginBatch(schema, this.searchers);
       let indexSaveStart = Date.now();
@@ -290,16 +330,16 @@ class Writers {
     return authorizedDocument;
   }
 
-  async delete(session, version, type, id, schema) {
+  // TODO add timing logs
+  async delete(session, version, type, id, schema, indexOnly) {
     let deleteStart = Date.now();
     log.info("deleting type=%s id=%s", type, id);
     await this.pgSearchClient.ensureDatabaseSetup();
 
     schema = schema || await this.currentSchema.getSchema();
 
-    let afterFinalize, context;
+    let afterFinalize, context, internalCard;
     if (type === 'cards') {
-      let internalCard;
       let handleCardOperationsStart = Date.now();
       ({ schema, context, internalCard, afterFinalize } = await this.handleCardDeleteOperation(session, id));
       if (!internalCard) { return; }
@@ -308,19 +348,41 @@ class Writers {
       performanceLog.debug(`delete ${type}/${id} time to complete handleCardOperations: ${Date.now() - handleCardOperationsStart}ms`);
     }
 
-    let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
+    let { writer, sourceId } = await this._getSchemaDetailsForType(schema, type, id, internalCard);
+    if (isInternalCard(type, id) && !writer.hasCardSupport) {
+      let source = schema.getDataSource(sourceId);
+      throw new Error(`The configured writer for cards documents, 'data-sources/${sourceId}' (source type '${source.sourceType}'), does not have card support`);
+    }
+
+    let pending;
     let isSchema = this.schemaTypes.includes(type);
     let prepareDeleteStart = Date.now();
-    let opts = await writer.prepareDelete(session, version, type, id, isSchema);
-    let { originalDocument, finalDocument, finalizer, aborter } = opts;
-    let pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, schema, context, opts });
+    if (!indexOnly) {  
+      let opts = await writer.prepareDelete(session, version, type, id, isSchema, indexOnly);
+      let { originalDocument, finalDocument, finalizer, aborter } = opts;
+      pending = await this.createPendingChange({ type, originalDocument, finalDocument, finalizer, aborter, schema, context, opts });
+    } else {
+      pending = await this.createPendingChange({ type, schema, context });
+    }
     performanceLog.debug(`delete ${type}/${id} time to complete writer.prepareDelete: ${Date.now() - prepareDeleteStart}ms`);
+
+    let newSchema;
     try {
-      let newSchema = await schema.validate(pending, { session });
-      schema = newSchema || schema;
-      let finalizeStart = Date.now();
-      let context = await this._finalize(pending, type, schema, sourceId, id);
-      performanceLog.debug(`delete ${type}/${id} time to complete finalize: ${Date.now() - finalizeStart}ms`);
+      if (!indexOnly) {
+        newSchema = await schema.validate(pending, { session });
+        schema = newSchema || schema;
+        let finalizeStart = Date.now();
+        context = await this._finalize(pending, type, schema, sourceId, id);
+        performanceLog.debug(`delete ${type}/${id} time to complete finalize: ${Date.now() - finalizeStart}ms`);
+      } else {
+        context = this.searchers.createDocumentContext({
+          id,
+          type,
+          schema,
+          sourceId,
+          upstreamDoc: null
+        });
+      }
 
       let batch = this.pgSearchClient.beginBatch(schema, this.searchers);
       let indexDeleteStart = Date.now();
@@ -331,9 +393,7 @@ class Writers {
       performanceLog.debug(`delete ${type}/${id} time to complete index invalidation: ${Date.now() - invalidateStart}ms`);
 
       if (typeof afterFinalize === 'function') {
-        let afterFinalizeStart = Date.now();
-        schema = await afterFinalize(schema);
-        performanceLog.debug(`delete ${type}/${id} time to complete afterFinalize work (delete card schema resources): ${Date.now() - afterFinalizeStart}ms`);
+        schema = await afterFinalize(get(pending, 'originalDocumentContext.schema'), schema);
       }
       if (newSchema) {
         this.currentSchema.invalidateCache();
@@ -344,9 +404,8 @@ class Writers {
     }
   }
 
-  async createPendingChange({ originalDocument, finalDocument, finalizer, aborter, schema, context, opts }) {
+  async createPendingChange({ type, originalDocument, finalDocument, finalizer, aborter, schema, context, opts }) {
     schema = schema || await this.currentSchema.getSchema();
-    let type = originalDocument ? originalDocument.type : finalDocument.type;
     let contentType = schema.getType(type);
     let sourceId;
     if (contentType) {
@@ -394,15 +453,17 @@ class Writers {
 
     let [ modelsToDelete, schemaToDelete] = partition(deletedResources, i => getCardId(i.type));
     let [ cardModels, internalModels ] = partition(modelsToDelete, i => isInternalCard(i.type, i.id));
+    // TODO can we run all these concurrently?
     for (let resource of internalModels) {
-      await this.delete(session, resource.meta.version, resource.type, resource.id, schema);
+      await this.delete(session, resource.meta.version, resource.type, resource.id, schema, true);
     }
     let fieldsWithRelatedTypes = schemaToDelete.filter(i => i.type === 'fields' && (get(i, 'relationships.related-types.data.length') || 0) > 0);
     // remove any related types so we wont be tripped up by deleting an internal card
     // content type that has a field with an internal card related type
+    // TODO can we run all these concurrently?
     for (let resource of fieldsWithRelatedTypes) {
       set(resource, 'relationships.related-types.data', []);
-      let { data: updatedResource } = await this.update(session, resource.type, resource.id, { data: resource }, schema);
+      let { data: updatedResource } = await this.update(session, resource.type, resource.id, { data: resource }, schema, true);
       let index = schemaToDelete.findIndex(i => `${i.type}/${i.id}` === `${resource.type}/${resource.id}`);
       schemaToDelete[index] = updatedResource;
     }
@@ -411,8 +472,9 @@ class Writers {
       schema = await schema.applyChanges(cardModels.map(i => ({ type: 'content-types', id: i.id, document: null })));
     }
     schemaToDelete.sort(sortSchemaForDelete);
+    // TODO can we run all these concurrently?
     for (let resource of schemaToDelete) {
-      await this.delete(session, resource.meta.version, resource.type, resource.id, schema);
+      await this.delete(session, resource.meta.version, resource.type, resource.id, schema, true);
     }
 
     return schema;
@@ -451,29 +513,59 @@ class Writers {
     return { internalCard, context, schema: await (await this.currentSchema.getSchema()).applyChanges(schema.map(document => ({ id: document.id, type: document.type, document }))) };
   }
 
-  _getSchemaDetailsForType(schema, type) {
-    let contentType = schema.getType(type);
-    if (!contentType || !contentType.dataSource || !contentType.dataSource.writer) {
-      log.debug('non-writeable type %s: exists=%s hasDataSource=%s hasWriter=%s',
-        type,
-        Boolean(contentType),
-        Boolean(contentType && contentType.dataSource),
-        Boolean(contentType && contentType.dataSource && contentType.dataSource.writer));
+  // TODO this service should be moved into the schema
+  async _getSchemaDetailsForType(schema, type, id, internalCard) {
+    let dataSource;
+    let getInternalCard = async function(cardId) {
+      let card;
+      try {
+        card = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', cardId, cardId);
+      } catch (err) {
+        if (err.status !== 404) { throw err; }
+      }
+      return card;
+    };
 
+    if (isInternalCard(type, id) && internalCard) {
+      let dataSources = [...schema.getDataSources().values()];
+      // chain is ordered with the closest ancestor first, and the most remote ancestor last
+      // crawl the chain looking for the data source of the most direct ancestor of the card
+      let chain = (await adoptionChain(internalCard, getInternalCard.bind(this))).map(i => i.data.id);
+      for (let cardType of chain) {
+        dataSource = dataSources.find(i => Array.isArray(i.cardTypes) && i.cardTypes.includes(cardType));
+        if (dataSource) { break; }
+      }
+    }
+
+    if (!dataSource) {
+      ({ dataSource } = schema.getType(type) || {});
+    }
+
+    if (!dataSource || !dataSource.writer) {
       throw new Error(`"${type}" is not a writable type`, {
         status: 403,
         title: "Not a writable type"
       });
     }
 
-    let writer = contentType.dataSource.writer;
-    let sourceId = contentType.dataSource.id;
+    let writer = dataSource.writer;
+    let sourceId = dataSource.id;
     return { writer, sourceId };
   }
 
   _cleanupBodyData(schema, data) {
     let doc = schema.withOnlyRealFields(data);  // remove computed fields
     return this._createQueryLinks(doc);         // convert `cardstack-queries` relationships to links.related
+  }
+
+  _cleanupCardData(schema, card) {
+    let meta = get(card, 'data.meta');
+    let cardResource = schema.withOnlyRealFields(card.data);  // remove computed fields
+    card.data = cardResource;
+    if (meta) {
+      card.data.meta = meta;
+    }
+    return card;
   }
 
   _createQueryLinks(doc) {

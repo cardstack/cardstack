@@ -14,12 +14,26 @@ const temp = require('temp').track();
 const Githereum = require('githereum/githereum');
 const GithereumContract = require("githereum/build/contracts/Githereum.json");
 const TruffleContract = require("truffle-contract");
+const { merge, cloneDeep } = require('lodash');
+const { isInternalCard } = require('@cardstack/plugin-utils/card-utils');
 
 const log = require('@cardstack/logger')('cardstack/git');
 const stringify = require('json-stable-stringify-without-jsonify');
 
 const mkdir = promisify(temp.mkdir);
 const defaultBranch = 'master';
+
+function getType(model) {
+  return model.data ? model.data.type : model.type;
+}
+
+function getId(model) {
+  return model.data ? model.data.id : model.id;
+}
+
+function getMeta(model) {
+  return model.data ? model.data.meta : model.meta;
+}
 
 module.exports = class Writer {
   static create(...args) {
@@ -43,8 +57,7 @@ module.exports = class Writer {
       this.githereumConfig = config;
     }
 
-
-    if(remote) {
+    if (remote) {
       this.fetchOpts = {
         callbacks: {
           credentials: (url, userName) => {
@@ -58,16 +71,19 @@ module.exports = class Writer {
     }
   }
 
+  get hasCardSupport() { return true; }
+
   async prepareCreate(session, type, document, isSchema) {
-    return withErrorHandling(document.id, type, async () => {
+    let id = getId(document);
+    return withErrorHandling(id, type, async () => {
       await this._ensureRepo();
+      let type = getType(document);
       let change = await Change.create(this.repo, null, this.branchPrefix + defaultBranch, this.fetchOpts);
 
-      let id = document.id;
       let file;
       while (id == null) {
         let candidateId = this._generateId();
-        let candidateFile = await change.get(this._filenameFor(document.type, candidateId, isSchema), { allowCreate: true });
+        let candidateFile = await change.get(this._filenameFor(type, candidateId, isSchema), { allowCreate: true });
         if (!candidateFile.exists()) {
           id = candidateId;
           file = candidateFile;
@@ -75,22 +91,29 @@ module.exports = class Writer {
       }
 
       if (!file) {
-        file = await change.get(this._filenameFor(document.type, id, isSchema), { allowCreate: true });
+        file = await change.get(this._filenameFor(type, id, isSchema), { allowCreate: true });
       }
 
-      let gitDocument = { id, type: document.type };
-      if (document.attributes) {
-        gitDocument.attributes = document.attributes;
-      }
-      if (document.relationships) {
-        gitDocument.relationships = document.relationships;
+      let gitDocument = document.data && isInternalCard(type, id) ?
+        { data: { id, type } } :
+        { id, type };
+
+      if (document.data && isInternalCard(type, id)) {
+        gitDocument = merge(gitDocument, cloneDeep(document));
+      } else {
+        if (document.attributes) {
+          gitDocument.attributes = document.attributes;
+        }
+        if (document.relationships) {
+          gitDocument.relationships = document.relationships;
+        }
       }
 
-      let signature = await this._commitOptions('create', document.type, id, session);
+      let signature = await this._commitOptions('create', type, id, session);
       return {
         finalDocument: gitDocument,
         finalizer: finalizer.bind(this),
-        type: document.type,
+        type,
         id,
         signature,
         change,
@@ -100,7 +123,8 @@ module.exports = class Writer {
   }
 
   async prepareUpdate(session, type, id, document, isSchema) {
-    if (!document.meta || !document.meta.version) {
+    let meta = getMeta(document);
+    if (!meta || !meta.version) {
       throw new Error('missing required field "meta.version"', {
         status: 400,
         source: { pointer: '/data/meta/version' }
@@ -109,7 +133,7 @@ module.exports = class Writer {
 
     await this._ensureRepo();
     return withErrorHandling(id, type, async () => {
-      let change = await Change.create(this.repo, document.meta.version, this.branchPrefix + defaultBranch, this.fetchOpts);
+      let change = await Change.create(this.repo, meta.version, this.branchPrefix + defaultBranch, this.fetchOpts);
 
       let file = await change.get(this._filenameFor(type, id, isSchema), { allowUpdate: true });
       let before = JSON.parse(await file.getBuffer());
@@ -117,10 +141,12 @@ module.exports = class Writer {
       // we don't write id & type into the actual file (they're part
       // of the filename). But we want them present on the
       // PendingChange as complete valid documents.
-      before.id = id;
-      before.type = type;
-      after.id = document.id;
-      after.type = document.type;
+      if (!isInternalCard(type, id)) {
+        before.id = id;
+        before.type = type;
+        after.id = document.id;
+        after.type = document.type;
+      }
       let signature = await this._commitOptions('update', type, id, session);
       return {
         originalDocument: before,
@@ -177,8 +203,11 @@ module.exports = class Writer {
   }
 
   _filenameFor(type, id, isSchema) {
-    let category = isSchema ? 'schema' : 'contents';
     let base = this.basePath ? this.basePath + '/' : '';
+    if (!isSchema && isInternalCard(type, id)) {
+      return `${base}cards/${id}.json`;
+    }
+    let category = isSchema ? 'schema' : 'contents';
     return `${base}${category}/${type}/${id}.json`;
   }
 
@@ -259,13 +288,33 @@ module.exports = class Writer {
 // "read" hook to call on writers. We should use that instead and move
 // this into the generic hub:writers code.
 function patch(before, diffDocument) {
-  let after = Object.assign({}, before);
+  let after;
+  let afterResource;
+  let beforeResource;
+  let diffDocumentResource;
+
+  if (diffDocument.data &&
+    isInternalCard(diffDocument.data.type, diffDocument.data.id)) {
+    after = { data: Object.assign({}, before.data) };
+    if (Array.isArray(diffDocument.included)) {
+      after.included = [].concat(diffDocument.included);
+    }
+    afterResource = after.data;
+    beforeResource = before.data;
+    diffDocumentResource = diffDocument.data;
+  } else {
+    after = Object.assign({}, before);
+    afterResource = after;
+    beforeResource = before;
+    diffDocumentResource = diffDocument;
+  }
+
   for (let section of ['attributes', 'relationships']) {
-    if (diffDocument[section]) {
-      after[section] = Object.assign(
+    if (diffDocumentResource[section]) {
+      afterResource[section] = Object.assign(
         {},
-        before[section],
-        diffDocument[section]
+        beforeResource[section],
+        diffDocumentResource[section]
       );
     }
   }
@@ -303,10 +352,14 @@ async function finalizer(pendingChange) {
       if (pendingChange.finalDocument) {
         // use stringify library instead of JSON.stringify, since JSON's method
         // is non-deterministic and could produce unnecessary diffs
-        file.setContent(stringify({
-          attributes: pendingChange.finalDocument.attributes,
-          relationships: pendingChange.finalDocument.relationships
-        }, null, 2));
+        if (pendingChange.finalDocument.data && isInternalCard(type, id)) {
+          file.setContent(stringify(pendingChange.finalDocument, null, 2));
+        } else {
+          file.setContent(stringify({
+            attributes: pendingChange.finalDocument.attributes,
+            relationships: pendingChange.finalDocument.relationships
+          }, null, 2));
+        }
       } else {
         file.delete();
       }

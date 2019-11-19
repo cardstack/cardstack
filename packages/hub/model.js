@@ -7,7 +7,7 @@ const {
   isInternalCard,
   loadCard,
   cardContextFromId
-} = require('./indexing/card-utils');
+} = require('@cardstack/plugin-utils/card-utils');
 
 exports.privateModels = priv;
 

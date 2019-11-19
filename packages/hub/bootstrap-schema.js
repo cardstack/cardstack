@@ -190,7 +190,8 @@ const models = [
           { type: 'fields', id: 'user-correlation-query' },
           { type: 'fields', id: 'may-create-user' },
           { type: 'fields', id: 'may-update-user' },
-          { type: 'fields', id: 'token-expiry-seconds' }
+          { type: 'fields', id: 'token-expiry-seconds' },
+          { type: 'fields', id: 'card-types' }
         ]
       }
     }
@@ -493,6 +494,13 @@ const models = [
     id: 'source-type',
     attributes: {
       'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'card-types',
+    attributes: {
+      'field-type': '@cardstack/core-types::string-array'
     }
   },
   {
