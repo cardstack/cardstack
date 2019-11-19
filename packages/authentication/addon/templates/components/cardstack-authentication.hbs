@@ -1,9 +1,0 @@
-{{#cardstack-session as |session|}}
-  {{#if session.isAuthenticated}}
-    {{in-left-toolbar
-      show=(component "cardstack-authentication-launcher"
-            session=session
-            network=network)
-    }}
-  {{/if}}
-{{/cardstack-session}}

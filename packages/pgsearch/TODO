@@ -1,8 +1,0 @@
-# Implementation notes for pgsearch refactor
-
-- verify cursor behavior in docsThatReference (either manually or write a test)
-- Improve DI system to remove hack where we do require.resolve during injections.
-- Switch filter default from non-exact to exact.
-- Drop implicit "any" array support inside operators like 'exact'
-- readOtherIndexers can become a full searcher, but that involves more sophisticated invalidation queries
-- uncachedRead should go away (this is easier to do if we replace readOtherIndexers with a full searcher)
