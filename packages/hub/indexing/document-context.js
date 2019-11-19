@@ -2,7 +2,7 @@ const authLog = require('@cardstack/logger')('cardstack/auth');
 const log = require('@cardstack/logger')('cardstack/indexing/document-context');
 const { Model, privateModels } = require('../model');
 const { getPath } = require('@cardstack/routing/cardstack/path');
-const { merge, get, uniqBy, uniq } = require('lodash');
+const { merge, get, uniqBy, uniq, difference } = require('lodash');
 const Session = require('@cardstack/plugin-utils/session');
 const {
   getCardId,
@@ -401,18 +401,16 @@ module.exports = class DocumentContext {
   // and read() only returns resources.
   async getCard(id) {
     let cardResource;
+    this._references.push(`${id}/${id}`);
+
     let docId = get(this, 'upstreamDoc.data.id');
     let docType = get(this, 'upstreamDoc.data.type');
-    this._references.push(`${id}/${id}`);
+    let fieldRefs = (get(this, 'upstreamDoc.data.relationships.fields.data') || []).map(i => `${i.type}/${i.id}`);
+    let includedRefs = (get(this, 'upstreamDoc.included') || []).map(i => `${i.type}/${i.id}`);
 
     if (isInternalCard(docId, docType) &&
       docId === id &&
-      (
-        get(this, 'upstreamDoc.included.length') ||
-        (!get(this, 'upstreamDoc.data.relationships.fields.data.length') &&
-          !get(this, 'upstreamDoc.data.relationships.adopted-from.data.length')
-        )
-      )) {
+      difference(fieldRefs, includedRefs).length === 0) {
       return this.upstreamDoc;
     } else if (isInternalCard(docId, docType) && docId === id) {
       let card = {
