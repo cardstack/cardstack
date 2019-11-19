@@ -289,6 +289,54 @@ module('Integration | Component | card-renderer', function(hooks) {
     assert.dom('.embedded-card-label').hasText(card1Id);
   });
 
+  test('isolated card in schema mode is focused on initial render', async function(assert) {
+    let service = this.owner.lookup('service:data');
+    let card = service.createCard(qualifiedCard1Id);
+    this.set('card', card);
+
+    await render(hbs`
+      <CardRenderer
+        @card={{card}}
+        @format="isolated"
+        @mode="schema"
+      />
+    `);
+
+    assert.dom('[data-test-card-renderer-isolated]').isFocused();
+  });
+
+  test('isolated card in view mode is not focused on initial render', async function(assert) {
+    let service = this.owner.lookup('service:data');
+    let card = service.createCard(qualifiedCard1Id);
+    this.set('card', card);
+
+    await render(hbs`
+      <CardRenderer
+        @card={{card}}
+        @format="isolated"
+        @mode="view"
+      />
+    `);
+
+    assert.dom('[data-test-card-renderer-isolated]').isNotFocused();
+  });
+
+  test('isolated card in edit mode is not focused on initial render', async function(assert) {
+    let service = this.owner.lookup('service:data');
+    let card = service.createCard(qualifiedCard1Id);
+    this.set('card', card);
+
+    await render(hbs`
+      <CardRenderer
+        @card={{card}}
+        @format="isolated"
+        @mode="edit"
+      />
+    `);
+
+    assert.dom('[data-test-card-renderer-isolated]').isNotFocused();
+  });
+
   skip('TODO it adds isolated css into the page when rendering an isolated card', async function(/*assert*/) {
   });
 

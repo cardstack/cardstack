@@ -28,8 +28,15 @@ export default class CardRenderer extends Component {
   }
 
   @action
-  focusCard(value) {
+  cardIsFocused(value) {
     this.cardFocused(value);
+  }
+
+  @action
+  focusElement(element) {
+    if (this.mode === 'schema') {
+      element.focus({ preventScroll: true });
+    }
   }
 
   get sanitizedName() {
