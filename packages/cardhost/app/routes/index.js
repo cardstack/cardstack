@@ -4,18 +4,12 @@ import { inject as service } from '@ember/service';
 import ENV from '@cardstack/cardhost/config/environment'
 import { hash } from 'rsvp';
 
-const { environment, cardstack: { cardTemplates=[] } } = ENV;
+const { cardstack: { cardTemplates=[] } } = ENV;
 
 export default class IndexRoute extends Route {
   @service data;
 
   async model() {
-    if (environment === 'development') {
-      // prime the store with seed models
-      await this.data.getCard('local-hub::why-doors', 'isolated');
-      await this.data.getCard('local-hub::event', 'isolated');
-    }
-
     return await hash({
       // TODO need to refactor this once we have search support for cards.
       // For now we're just hardcoding a list of templates to load, and pretending

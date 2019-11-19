@@ -32,7 +32,6 @@
     "@cardstack/core": "0.16.0",
     "@cardstack/eslint-config": "0.16.0",
     "@cardstack/hub": "0.16.0",
-    "@cardstack/logger": "0.2.0",
     "@ember/jquery": "^0.6.1",
     "@ember/optional-features": "^0.7.0",
     "@ember/render-modifiers": "1.0.2",
