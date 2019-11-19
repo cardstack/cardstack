@@ -34,7 +34,6 @@
     "@cardstack/di": "0.16.0",
     "@cardstack/ephemeral": "0.16.0",
     "@cardstack/eslint-config": "0.16.0",
-    "@cardstack/git": "0.16.0",
     "@cardstack/hub": "0.16.0",
     "@cardstack/jsonapi": "0.16.0",
     "@cardstack/logger": "0.2.0",
@@ -86,5 +85,8 @@
   },
   "engines": {
     "node": "8.* || >= 10.*"
+  },
+  "volta": {
+    "node": "12.13.1"
   }
 }

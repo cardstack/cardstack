@@ -19,15 +19,10 @@ package-lock.json
 /cards/base-card/index.js.map
 /cards/base-card/index.d.ts
 
-/packages/hub/card-services.d.ts
-/packages/hub/card-services.js
-/packages/hub/card-services.js.map
-/packages/hub/code-generators.js
-/packages/hub/code-generators.js.map
-/packages/hub/code-generators.d.ts
-/packages/hub/indexing/operations.d.ts
-/packages/hub/indexing/operations.js
-/packages/hub/indexing/operations.js.map
+/packages/hub/**/*.d.ts
+/packages/hub/**/*.js
+/packages/hub/**/*.js.map
+
 
 /packages/plugin-utils/card-utils.d.ts
 /packages/plugin-utils/card-utils.js
