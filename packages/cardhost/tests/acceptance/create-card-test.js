@@ -34,6 +34,8 @@ module('Acceptance | card create', function(hooks) {
     assert.equal(currentURL(), '/cards/new');
 
     await click('[data-test-card-creator-save-btn]');
+    await waitFor('[data-test-card-creator-save-btn]', { timeout });
+    await click('[data-test-card-creator-preview-btn]');
     await waitFor('[data-test-card-view^="new-card-"]', { timeout });
 
     assert.ok(currentURL().match(/\/cards\/new-card-[0-9]+/));
@@ -155,6 +157,8 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('subtitle');
 
     await click('[data-test-card-creator-save-btn]');
+    await waitFor('[data-test-card-creator-save-btn]', { timeout });
+    await click('[data-test-card-creator-preview-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card1Id}`);
@@ -200,6 +204,8 @@ module('Acceptance | card create', function(hooks) {
       ['title', 'author', 'body']);
 
     await click('[data-test-card-creator-save-btn]');
+    await waitFor('[data-test-card-creator-save-btn]', { timeout });
+    await click('[data-test-card-creator-preview-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`);
 
     assert.deepEqual([...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),

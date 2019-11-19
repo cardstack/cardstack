@@ -155,7 +155,6 @@ export default class CardManipulator extends Component {
       this.statusMsg = `card ${this.card.name} was NOT successfully created: ${e.message}`;
       return;
     }
-    this.router.transitionTo('cards.view', this.card.name);
   })) saveCard;
 
   @(task(function * () {
@@ -257,7 +256,7 @@ export default class CardManipulator extends Component {
   }
 
   @action
-  cancel() {
+  preview() {
     this.router.transitionTo('cards.view', this.card.name);
   }
 

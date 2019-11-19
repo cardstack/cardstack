@@ -8,10 +8,10 @@
     >
     </button>
     <button
-      {{on "click" this.cancel}}
+      {{on "click" this.preview}}
       class="ch-button ch-button--secondary"
       disabled={{not this.cardstackSession.isAuthenticated}}
-      data-test-card-schema-cancel-btn
+      data-test-card-schema-preview-btn
     >
       Preview
     </button>

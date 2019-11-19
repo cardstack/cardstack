@@ -52,7 +52,8 @@ module('Acceptance | card adoption', function(hooks) {
     assert.equal(currentURL(), `/cards/${card1Id}/adopt`);
 
     await click('[data-test-card-creator-save-btn]');
-    await waitFor('[data-test-card-view^="new-card-"]', { timeout });
+    await waitFor('[data-test-card-creator-save-btn]', { timeout });
+    await click('[data-test-card-creator-preview-btn]');
 
     assert.ok(currentURL().match(/\/cards\/new-card-[0-9]+/));
   });
@@ -83,6 +84,8 @@ module('Acceptance | card adoption', function(hooks) {
 
     await setCardId(card2Id);
     await click('[data-test-card-creator-save-btn]');
+    await waitFor('[data-test-card-creator-save-btn]', { timeout });
+    await click('[data-test-card-creator-preview-btn]');
     await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
 
     assert.deepEqual([...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')), [
@@ -102,6 +105,8 @@ module('Acceptance | card adoption', function(hooks) {
 
     await setCardId(card2Id);
     await click('[data-test-card-creator-save-btn]');
+    await waitFor('[data-test-card-creator-save-btn]', { timeout });
+    await click('[data-test-card-creator-preview-btn]');
     await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
 
     await visit(`/cards/${card2Id}/schema`);
@@ -137,6 +142,8 @@ module('Acceptance | card adoption', function(hooks) {
     ]);
 
     await click('[data-test-card-creator-save-btn]');
+    await waitFor('[data-test-card-creator-save-btn]', { timeout });
+    await click('[data-test-card-creator-preview-btn]');
     await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
 
     assert.deepEqual([...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')), [
@@ -161,6 +168,8 @@ module('Acceptance | card adoption', function(hooks) {
     await addField('treats-available', 'boolean', false);
 
     await click('[data-test-card-creator-save-btn]');
+    await waitFor('[data-test-card-creator-save-btn]', { timeout });
+    await click('[data-test-card-creator-preview-btn]');
     await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
 
     assert.dom('[data-test-field="treats-available"]').exists();
@@ -173,6 +182,8 @@ module('Acceptance | card adoption', function(hooks) {
     await visit(`/cards/${card2Id}/schema`);
     await removeField('treats-available');
     await click('[data-test-card-schema-save-btn]');
+    await waitFor('[data-test-card-schema-save-btn]', { timeout });
+    await click('[data-test-card-schema-preview-btn]');
     await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
 
     assert.deepEqual([...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')), [
@@ -193,6 +204,8 @@ module('Acceptance | card adoption', function(hooks) {
     assert.dom('[data-test-field-renderer-remove-btn]').doesNotExist();
     await setCardId(card2Id);
     await click('[data-test-card-creator-save-btn]');
+    await waitFor('[data-test-card-creator-save-btn]', { timeout });
+    await click('[data-test-card-creator-preview-btn]');
     await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
 
     await visit(`/cards/${card2Id}/schema`);
@@ -224,6 +237,8 @@ module('Acceptance | card adoption', function(hooks) {
     await addField('treats-available', 'boolean', false);
 
     await click('[data-test-card-creator-save-btn]');
+    await waitFor('[data-test-card-creator-save-btn]', { timeout });
+    await click('[data-test-card-creator-preview-btn]');
     await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
 
     await visit(`/cards/${card2Id}/edit`);
@@ -243,6 +258,8 @@ module('Acceptance | card adoption', function(hooks) {
     await setFieldValue('zip', '01234');
 
     await click('[data-test-card-editor-save-btn]');
+    await waitFor('[data-test-card-editor-save-btn]', { timeout });
+    await click('[data-test-card-editor-preview-btn]');
     await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
     assert.equal(currentURL(), `/cards/${card2Id}`);
     assert.dom('[data-test-field="treats-available"] [data-test-boolean-field-viewer-value]').hasText('true');
@@ -266,6 +283,8 @@ module('Acceptance | card adoption', function(hooks) {
     await setCardId(card2Id);
     await addField('treats-available', 'boolean', true);
     await click('[data-test-card-creator-save-btn]');
+    await waitFor('[data-test-card-creator-save-btn]', { timeout });
+    await click('[data-test-card-creator-preview-btn]');
     await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
 
     await visit(`/cards/${card2Id}/adopt`);
@@ -282,6 +301,8 @@ module('Acceptance | card adoption', function(hooks) {
     ]);
 
     await click('[data-test-card-creator-save-btn]');
+    await waitFor('[data-test-card-creator-save-btn]', { timeout });
+    await click('[data-test-card-creator-preview-btn]');
     await waitFor(`[data-test-card-view="${card3Id}"]`, { timeout });
 
     assert.deepEqual([...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')), [
@@ -306,11 +327,15 @@ module('Acceptance | card adoption', function(hooks) {
     await setCardId(card2Id);
     await addField('treats-available', 'boolean', true);
     await click('[data-test-card-creator-save-btn]');
+    await waitFor('[data-test-card-creator-save-btn]', { timeout });
+    await click('[data-test-card-creator-preview-btn]');
     await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
 
     await visit(`/cards/${card1Id}/schema`);
     await addField('number-of-bones', 'integer', true);
     await click('[data-test-card-schema-save-btn]');
+    await waitFor('[data-test-card-schema-save-btn]', { timeout });
+    await click('[data-test-card-schema-preview-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
 
     await visit(`/cards/${card2Id}/schema`);
