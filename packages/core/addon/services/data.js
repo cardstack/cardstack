@@ -9,10 +9,10 @@ import {
   difference,
   partition
 } from 'lodash';
-import { hubURL } from '@cardstack/plugin-utils/environment';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { isEmpty } from '@ember/utils';
+import { getOwner } from '@ember/application';
 
 const cardIdDelim = '::';
 const baseCard = 'local-hub::@cardstack/base-card'; // eventually base-cards will not come from local-hub, but rather an official cardstack catalog repository
@@ -24,9 +24,15 @@ let store = {
   embedded: new Map()
 }
 
+let hubURL;
 
 export default class DataService extends Service {
   @service cardstackSession;
+
+  constructor(...args) {
+    super(...args);
+    hubURL = getOwner(this).resolveRegistration('config:environment').cardstack.hubURL;
+  }
 
   async getCard(id, format) {
     if (!['isolated', 'embedded'].includes(format)) { throw new Error(`unknown format specified when getting card '${id}': '${format}'`); }

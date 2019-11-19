@@ -1,6 +1,7 @@
-import { hubURL } from '@cardstack/plugin-utils/environment';
-import { ciSessionId } from '@cardstack/test-support/environment'
 import { get } from 'lodash';
+
+let hubURL = 'http://localhost:3000';
+let ciSessionId = 'TODO';
 
 export function cleanupDefaulValueArtifacts(document) {
   if (!Object.keys(get(document, 'data.attributes') || {}).length) {

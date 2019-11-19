@@ -27,7 +27,10 @@ module.exports = function(environment) {
       // Here you can pass flags/options to your application instance
       // when it is created
     },
-    cardTemplates: JSON.parse(process.env.CARD_TEMPLATES || null) || []
+    cardstack: {
+      cardTemplates: JSON.parse(process.env.CARD_TEMPLATES || null) || [],
+      hubURL: 'http://localhost:3000',
+    },
   };
 
   if (environment === 'development') {
