@@ -13,8 +13,14 @@ Ember Concurrency into the rendering of the card component here.
       {{on "focus" (action this.focusCard true)}}
     >
       <header class="card-renderer-{{@format}}--header">
+        {{!--
+          TODO: this svg is hard-coded because background-image transitions are flaky
+          Also the icon will change depending on the content type, we should consider
+          using svg-jar or similar
+        --}}
+        <svg viewBox="0 0 20 22" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect height="18" rx="2" width="18" x="1" y="3"/><path d="m16 2v4" transform="translate(-2 -1)"/><path d="m8 2v4" transform="translate(-2 -1)"/><path d="m11.273 6-5 5-2.273-2.273" transform="translate(2 4)"/></g></svg>
         <div class="card-renderer-isolated--header-overlay"></div>
-        {{or @card.name "Blank Card"}}
+        <span class="card-renderer-{{@format}}--header-title">{{or @card.name "Blank Card"}}</span>
       </header>
       <div class="card-renderer-{{@format}}--main">
         <div class="card-renderer-{{@format}}--content">
