@@ -45,6 +45,7 @@ Until that work is done we are statically adding this css
 @import '/assets/fields/string-viewer.css';
 
 :root {
+  --icon-color: black;
   --ch-font-family: "Open Sans", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
 
   --ch-left-edge-navbar-width: 80px;
@@ -62,6 +63,7 @@ Until that work is done we are statically adding this css
   --ch-edges-z-index: 10;
   --ch-actions-z-index: 11;
   --ch-transition-time: 250ms;
+  --ch-card-transition-duration: 300ms;
 }
 
 /*
@@ -80,7 +82,7 @@ body {
   width: 100%;
   height: auto;
   margin: 0;
-  background-color: var(--ch-medium-medium-blue-gray);
+  background-color: var(--ch-dark-blue-gray);
   color: white;
   font-family: var(--ch-font-family);
   font-size: 13px;
