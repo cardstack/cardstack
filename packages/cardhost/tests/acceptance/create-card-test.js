@@ -189,6 +189,18 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('.cardhost-right-edge-panel [data-test-field]').doesNotExist();
   });
 
+  test(`removing a field from a card that has an empty name`, async function(assert) {
+    await login();
+    await visit('/cards/new');
+
+    await setCardId(card1Id);
+    await addField('', 'string', true);
+    assert.dom('[data-test-isolated-card] [data-test-field').exists({ count: 1 });
+
+    await click(`[data-test-isolated-card] [data-test-field-renderer-remove-btn]`);
+    assert.dom('[data-test-isolated-card] [data-test-field').doesNotExist();
+  });
+
   test('can add a field at a particular position', async function(assert) {
     await login();
     await visit('/cards/new');

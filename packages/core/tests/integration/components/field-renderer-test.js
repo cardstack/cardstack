@@ -346,7 +346,7 @@ module('Integration | Component | field-renderer', function(hooks) {
     let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
     this.set('field', field);
     this.set('noop', () => {});
-    this.set('removeField', fieldName => card.getField(fieldName).remove());
+    this.set('removeField', fieldNonce => card.getFieldByNonce(fieldNonce).remove());
 
     await render(hbs`
     <FieldRenderer
