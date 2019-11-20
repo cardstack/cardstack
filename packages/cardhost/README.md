@@ -9,17 +9,23 @@ You will need the following things properly installed on your computer.
 * [Git](https://git-scm.com/)
 * [Node.js](https://nodejs.org/) (with npm)
 * [Ember CLI](https://ember-cli.com/)
-* [Google Chrome](https://google.com/chrome/)
+* [Google Chrome](https://google.com/chrome/)'
+* [Docker](https://www.docker.com/products/docker-desktop)
+* [yarn](https://yarnpkg.com/lang/en/)
 
 ## Installation
 
 * `git clone <repository-url>` this repository
-* `cd cardhost`
-* `npm install`
+* `cd packages/cardhost`
+* `yarn install`
 
 ## Running / Development
 
-* `ember serve`
+* `yarn start-prereqs`
+* `yarn start-hub`
+* In a new tab, `yarn start-ember`
+
+
 * Visit your app at [http://localhost:4200](http://localhost:4200).
 * Visit your tests at [http://localhost:4200/tests](http://localhost:4200/tests).
 
@@ -29,14 +35,17 @@ Make use of the many generators for code, try `ember help generate` for more det
 
 ### Running Tests
 
+* `yarn start-prereqs`
 * `ember test`
 * `ember test --server`
 
 ### Linting
 
-* `npm run lint:hbs`
-* `npm run lint:js`
-* `npm run lint:js -- --fix`
+From the root of the repository:
+
+* `yarn lint:hbs`
+* `yarn lint:js`
+* `yarn lint:js -- --fix`
 
 ### Building
 
@@ -45,7 +54,7 @@ Make use of the many generators for code, try `ember help generate` for more det
 
 ### Deploying
 
-Specify what it takes to deploy your app.
+Deploying is done from `master` automatically via CI/CD.
 
 ## Further Reading / Useful Links
 
