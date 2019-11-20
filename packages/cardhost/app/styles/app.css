@@ -226,6 +226,17 @@ a:hover {
   height: 0;
 }
 
+.cardhost-card-theme-editor {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 40%;
+  height: 100%;
+  background: var(--ch-darkest-blue-gray);
+  z-index: 12;
+  padding: 20px;
+}
+
 
 
 /* TODO: Do not hardcode. Move some styles to core package and some to isolated card css */

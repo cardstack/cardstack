@@ -1,6 +1,6 @@
 {{#let this.target.currentRoute.localName as |mode|}}
-  <div class="cardhost-cards {{mode}}">
-    {{#if (not-eq mode "add")}}
+  <div class="cardhost-cards {{mode}} {{if this.css.editingCss 'editing-css'}}">
+    {{#if (and (not-eq mode "add") (not this.css.editingCss))}}
       <CardhostTopEdge @mode={{mode}}>
         <ModeSwitcher @name={{this.target.currentRoute.params.id}} @mode={{mode}} />
       </CardhostTopEdge>

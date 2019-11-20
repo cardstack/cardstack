@@ -104,6 +104,7 @@ export default class CardManipulator extends Component {
   @service data;
   @service router;
   @service cardstackSession;
+  @service css;
 
   @tracked statusMsg;
   @tracked card;

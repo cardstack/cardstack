@@ -14,6 +14,10 @@
   padding-right: var(--padding-right);
 }
 
+.cardhost-cards.editing-css {
+  padding-left: 0;
+}
+
 .cardhost-cards.add,
 .cardhost-cards.schema {
   background: url("/assets/images/grid-square.png") center/20px repeat;
