@@ -1,7 +1,7 @@
 {{#let this.target.currentRoute.localName as |mode|}}
-  <div class="cardhost-cards {{mode}}">
+  <div class="cardhost-cards {{mode}} {{if this.cssModeToggle.editingCss 'editing-css'}}">
     <CardhostTopEdge @mode={{mode}}>
-      {{#if (or (eq mode "schema") (eq mode "edit") (eq mode "view"))}}
+      {{#if (and (not this.cssModeToggle.editingCss) (or (eq mode "schema") (eq mode "edit") (eq mode "view")))}}
         <ModeSwitcher @name={{this.target.currentRoute.params.id}} @mode={{mode}} />
       {{/if}}
     </CardhostTopEdge>

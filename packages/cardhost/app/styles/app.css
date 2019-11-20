@@ -239,6 +239,17 @@ a:hover {
   overflow: hidden;
 }
 
+.cardhost-card-theme-editor {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 40%;
+  height: 100%;
+  background: var(--ch-darkest-blue-gray);
+  z-index: 12;
+  padding: 20px;
+}
+
 .cardhost-card-document--codeblock {
   height: 0;
 }
