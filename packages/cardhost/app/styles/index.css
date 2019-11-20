@@ -62,7 +62,6 @@
 
   color: white;
   fill: var(--ch-cyan);
-  stroke: var(--ch-cyan);
 }
 
 /* Main */
@@ -94,7 +93,6 @@
 
   margin-right: 20px;
   fill: var(--ch-cyan);
-  stroke: var(--ch-cyan);
 }
 
 

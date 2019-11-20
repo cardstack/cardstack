@@ -45,7 +45,6 @@ Until that work is done we are statically adding this css
 @import '/assets/fields/string-viewer.css';
 
 :root {
-  --icon-color: black;
   --ch-font-family: "Open Sans", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
 
   --ch-left-edge-navbar-width: 80px;

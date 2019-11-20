@@ -9,6 +9,13 @@
   border-bottom: 1px solid var(--ch-light-gray-b1);
 }
 
+.ui-components--icon {
+  --icon-color: #3b3390;
+}
+.ui-components--icon:hover {
+  --icon-color: #71248a;
+}
+
 .ui-components .code-block {
   width: 700px;
   max-width: 100%;

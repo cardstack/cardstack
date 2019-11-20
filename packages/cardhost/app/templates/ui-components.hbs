@@ -5,6 +5,30 @@
   {{!-- TODO: Add navbar --}}
 
   <section class="ui-components--section">
+    <h2>Icons</h2>
+    <a href="/ember-svg-jar/index.html">** See all SVG icons here. **</a>
+
+    <h4>Inline SVG embedding example with `fill` color change (Hover over the icons)</h4>
+    {{svg-jar "clock" class="ui-components--icon" width="30px" height="30px"}}
+
+    <h4>Inline SVG embedding example with `stroke` color change</h4>
+    {{svg-jar "cards" class="ui-components--icon" width="30px" height="30px"}}
+
+    <CodeEditor @language="handlebars" @code='\{{svg-jar "clock" class="ui-components--icon" width="30px" height="30px"}}
+\{{svg-jar "cards" class="ui-components--icon" width="30px" height="30px"}}' />
+    <CodeEditor @language="css" @code='/* Note:
+  - You may need to add `--icon-color` CSS variable to the SVG, if not already in there. (Or use the `fill` and/or `stroke` properties.)
+  - Do not hardcode colors in the existing SVGs. Make a copy of the SVG first.
+*/
+.ui-components--icon {
+  --icon-color: #3b3390;
+}
+.ui-components--icon:hover {
+  --icon-color: #71248a;
+}' />
+  </section>
+
+  <section class="ui-components--section">
     <h2>Font Family</h2>
     <CodeEditor
       @code='--ch-font-family: "Open Sans", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;'
@@ -289,7 +313,7 @@ Textarea label
   Selected
   <Input @type="checkbox" @class="ch-checkbox" @checked=true />
   <span class="ch-checkmark"></span>
-</label>' 
+</label>'
 '<label class="ch-label ch-input-group ch-checkbox-group">
   Not selected
   <Input @type="checkbox" @class="ch-checkbox" @checked=false />
