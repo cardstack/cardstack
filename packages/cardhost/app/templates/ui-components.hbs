@@ -472,20 +472,18 @@ Textarea label
       @mode="edit"
       @setFieldValue={{action this.noop}}
     />
-    <CodeBlock
-      @code='
-        <FieldRenderer
-          @field=@field
-          @format="isolated"
-          @mode="edit"
-          @setFieldValue=@setFieldValue
-        />
-      '
+    <CodeEditor
+      @code='<FieldRenderer
+  @field=@field
+  @format="isolated"
+  @mode="edit"
+  @setFieldValue=@setFieldValue
+/>'
       @language="html"
     />
 
     <h4>Textarea Editor</h4>
-    <CodeBlock
+    <CodeEditor
       @class="ui-components--notes"
       @code='Note: Textarea core-type currently does not exist.'
       @language="html"
@@ -497,21 +495,19 @@ Textarea label
         @value="Entered long text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero."
       />
     </div>
-    <CodeBlock
-      @code='
-        <div class="field-renderer edit-field">
-          <label for="textarea-editor">Textarea</label>
-          <Textarea
-            @id="textarea-editor"
-            @value="Entered long text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero."
-          />
-        </div>
-      '
+    <CodeEditor
+      @code='<div class="field-renderer edit-field">
+<label for="textarea-editor">Textarea</label>
+<Textarea
+  @id="textarea-editor"
+  @value="Entered long text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero."
+/>
+</div>'
       @language="html"
     />
 
     <h4>Address string editor</h4>
-    <CodeBlock
+    <CodeEditor
       @class="ui-components--notes"
       @code='Note: Address core-type does not exist.'
       @language="html"
@@ -523,21 +519,19 @@ Textarea label
         @value="One World Trade Center, 285 Fulton St, New York, NY"
       />
     </div>
-    <CodeBlock
-      @code='
-        <div class="field-renderer edit-field field-address">
-          <label for="address-string-editor">Address</label>
-          <Input
-            @id="address-string-editor"
-            @value="One World Trade Center, 285 Fulton St, New York, NY"
-          />
-        </div>
-      '
+    <CodeEditor
+      @code='<div class="field-renderer edit-field field-address">
+  <label for="address-string-editor">Address</label>
+  <Input
+    @id="address-string-editor"
+    @value="One World Trade Center, 285 Fulton St, New York, NY"
+  />
+</div>'
       @language="html"
     />
 
     <h4>Image editor</h4>
-    <CodeBlock
+    <CodeEditor
       @class="ui-components--notes"
       @code='Note: Image core-type currently does not exist.'
       @language="html"
@@ -556,22 +550,20 @@ Textarea label
         height="55px"
       >
     </div>
-    <CodeBlock
-      @code='
-        <div class="field-renderer edit-field">
-          <label for="image-string-editor">Image</label>
-          <Input
-            @id="image-string-editor"
-            @value="one_world.png"
-          />
-          <img
-            src="/assets/images/cards/one_world.png"
-            alt="One World Trade Center"
-            width="90px"
-            height="55px"
-          >
-        </div>
-      '
+    <CodeEditor
+      @code='<div class="field-renderer edit-field">
+  <label for="image-string-editor">Image</label>
+  <Input
+    @id="image-string-editor"
+    @value="one_world.png"
+  />
+  <img
+    src="/assets/images/cards/one_world.png"
+    alt="One World Trade Center"
+    width="90px"
+    height="55px"
+  >
+</div>'
       @language="html"
     />
 
