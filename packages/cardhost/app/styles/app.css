@@ -253,3 +253,8 @@ a:hover {
 .cardhost-card-document--codeblock {
   height: 0;
 }
+
+.cardhost-monaco-container {
+  min-height: 50px;
+  margin-bottom: 1em;
+}

@@ -6,7 +6,7 @@
 
   <section class="ui-components--section">
     <h2>Font Family</h2>
-    <CodeBlock
+    <CodeEditor
       @code='--ch-font-family: "Open Sans", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;'
       @language="css"
     />
@@ -14,22 +14,20 @@
 
   <section class="ui-components--section">
     <h2>Root CSS Variables</h2>
-    <CodeBlock
+    <CodeEditor
       @class="ui-components--notes"
-      @code='
-      --ch-left-edge-navbar-width: 80px;
-      --ch-left-edge-panel-width: 330px;
-      --ch-right-edge-panel-width: 300px;
+      @code='--ch-left-edge-navbar-width: 80px;
+--ch-left-edge-panel-width: 330px;
+--ch-right-edge-panel-width: 300px;
 
-      --ch-top-edge-height: 80px;
-      --ch-left-edge-width: calc(var(--ch-left-edge-panel-width) + var(--ch-left-edge-navbar-width));
-      --ch-right-edge-width: calc(var(--ch-right-edge-panel-width) + var(--ch-spacing));
+--ch-top-edge-height: 80px;
+--ch-left-edge-width: calc(var(--ch-left-edge-panel-width) + var(--ch-left-edge-navbar-width));
+--ch-right-edge-width: calc(var(--ch-right-edge-panel-width) + var(--ch-spacing));
 
-      --ch-spacing: 20px;
-      --ch-edges-z-index: 10;
-      --ch-actions-z-index: 11;
-      --ch-transition-time: 250ms;
-      '
+--ch-spacing: 20px;
+--ch-edges-z-index: 10;
+--ch-actions-z-index: 11;
+--ch-transition-time: 250ms;'
       @language="css"
     />
   </section>
@@ -43,14 +41,14 @@
     <h2>Buttons</h2>
     <h3>Primary button</h3>
     <button class="ch-button">Save</button>
-    <CodeBlock
+    <CodeEditor
       @code='<button class="ch-button">Save</button>'
       @language="html"
     />
 
     <h3>Secondary button</h3>
     <button class="ch-button ch-button--secondary">Preview</button>
-    <CodeBlock
+    <CodeEditor
       @code='<button class="ch-button ch-button--secondary">Preview</button>'
       @language="html"
     />
@@ -63,18 +61,16 @@
       <button class="ch-button ch-button--icon library" aria-label="Library"></button>
     </div>
     <div>
-      <CodeBlock @code='
-        <button class="ch-button ch-button--icon user" aria-label="User"></button>
-        <button class="ch-button ch-button--icon catalog" aria-label="Catalog"></button>
-        <button class="ch-button ch-button--icon share" aria-label="Share"></button>
-        <button class="ch-button ch-button--icon library" aria-label="Library"></button>
-      '
+      <CodeEditor @code='<button class="ch-button ch-button--icon user" aria-label="User"></button>
+<button class="ch-button ch-button--icon catalog" aria-label="Catalog"></button>
+<button class="ch-button ch-button--icon share" aria-label="Share"></button>
+<button class="ch-button ch-button--icon library" aria-label="Library"></button>'
         @language="html"/>
     </div>
 
     <h3>Secondary Icon button</h3>
     <button class="ch-button ch-button--icon-secondary delete" aria-label="Delete"></button>
-    <CodeBlock
+    <CodeEditor
       @code='<button class="ch-button ch-button--icon-secondary delete" aria-label="Delete"></button>'
       @language="html"
     />
@@ -92,12 +88,10 @@
       <ModeSwitcher @name="" @mode="edit" />
       <ModeSwitcher @name="" @mode="schema" />
     </div>
-    <CodeBlock
-      @code='
-        <ModeSwitcher @name="[card-id-here]" @mode="view" />
-        <ModeSwitcher @name="[card-id-here]" @mode="edit" />
-        <ModeSwitcher @name="[card-id-here]" @mode="schema" />
-      '
+    <CodeEditor
+      @code='<ModeSwitcher @name="[card-id-here]" @mode="view" />
+<ModeSwitcher @name="[card-id-here]" @mode="edit" />
+<ModeSwitcher @name="[card-id-here]" @mode="schema" />'
       @language="html"
     />
   </section>
@@ -108,13 +102,12 @@
       <div class="pill-option selected">Properties</div>
       <div class="pill-option">Structure</div>
     </div>
-    <CodeBlock
-      @code='
-        <div class="pill-selector">
-          <div class="pill-option selected">Properties</div>
-          <div class="pill-option">Structure</div>
-        </div>
-      '
+
+    <CodeEditor
+      @code='<div class="pill-selector">
+  <div class="pill-option selected">Properties</div>
+  <div class="pill-option">Structure</div>
+</div>'
       @language="html"
     />
   </section>
@@ -129,16 +122,14 @@
         @placeholder="Search Library"
       />
     </div>
-    <CodeBlock
-      @code='
-      <div class="ch-input-group">
-        <Input
-          @type="search"
-          @class="ch-search-bar"
-          @placeholder="Search Library"
-        />
-      </div>
-      '
+    <CodeEditor
+      @code='<div class="ch-input-group">
+  <Input
+    @type="search"
+    @class="ch-search-bar"
+    @placeholder="Search Library"
+  />
+</div>'
       @language="html"
     />
   </section>
@@ -152,22 +143,20 @@
         @placeholder="Filter Results"
       />
     </div>
-    <CodeBlock
-      @code='
-        <div class="ch-input-group">
-          <Input
-            @class="ch-filter-bar"
-            @placeholder="Filter Results"
-          />
-        </div>
-      '
+    <CodeEditor
+      @code='<div class="ch-input-group">
+  <Input
+    @class="ch-filter-bar"
+    @placeholder="Filter Results"
+  />
+</div>'
       @language="html"
     />
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col">
     <h2>Form Elements</h2>
-    <CodeBlock
+    <CodeEditor
       @class="ui-components--notes"
       @code='`ch-input-group` class is optional. It adds top margin when there are sibling elements with the same class.'
       @language="html"
@@ -175,13 +164,13 @@
 
     <h3>Text</h3>
       <label class="ch-label">Field label</label>
-      <CodeBlock
+      <CodeEditor
         @code='<label class="ch-label">Field label</label>'
         @language="html"
       />
 
       <div class="ch-helper-text">Example of helper text lorem ipsum dolor</div>
-      <CodeBlock
+      <CodeEditor
         @code='<div class="ch-helper-text">Example of helper text lorem ipsum dolor</div>'
         @language="html"
       />
@@ -191,13 +180,11 @@
       <label for="input-1" class="ch-label">Field label</label>
       <Input @id="input-1" @class="ch-input" @placeholder="Placeholder text" />
     </div>
-    <CodeBlock
-      @code='
-        <div class="ch-input-group">
-          <label for="[id]" class="ch-label">Field label</label>
-          <Input @id="[id]" @class="ch-input" @placeholder="Placeholder text" />
-        </div>
-      '
+    <CodeEditor
+      @code='<div class="ch-input-group">
+  <label for="[id]" class="ch-label">Field label</label>
+  <Input @id="[id]" @class="ch-input" @placeholder="Placeholder text" />
+</div>'
       @language="html"
     />
 
@@ -205,13 +192,11 @@
       Field label
       <Input @class="ch-input" @value="Entered text" />
     </label>
-    <CodeBlock
-      @code='
-        <label class="ch-label ch-input-group">
-          Field label
-          <Input @class="ch-input" @value="Entered text" />
-        </label>
-      '
+    <CodeEditor
+      @code='<label class="ch-label ch-input-group">
+  Field label
+  <Input @class="ch-input" @value="Entered text" />
+</label>'
       @language="html"
     />
 
@@ -219,13 +204,11 @@
       <label for="input-2" class="ch-label">Field label</label>
       <Input @id="input-2" @class="ch-input disabled" @disabled={{true}} @placeholder="Disabled field with placeholder" />
     </div>
-    <CodeBlock
-      @code='
-        <div class="ch-input-group">
-          <label for="[id]" class="ch-label">Field label</label>
-          <Input @id="[id]" @class="ch-input disabled" @disabled=true @placeholder="Disabled field with placeholder" />
-        </div>
-      '
+    <CodeEditor
+      @code='<div class="ch-input-group">
+  <label for="[id]" class="ch-label">Field label</label>
+  <Input @id="[id]" @class="ch-input disabled" @disabled=true @placeholder="Disabled field with placeholder" />
+</div>'
       @language="html"
     />
 
@@ -233,13 +216,11 @@
       Field label
       <Input @class="ch-input disabled" @disabled={{true}} @value="Disabled field with entered value" />
     </label>
-    <CodeBlock
-      @code='
-        <label class="ch-label ch-input-group">
-          Field label
-          <Input @class="ch-input disabled" @disabled=true @value="Disabled field with entered value" />
-        </label>
-      '
+    <CodeEditor
+      @code='<label class="ch-label ch-input-group">
+  Field label
+  <Input @class="ch-input disabled" @disabled=true @value="Disabled field with entered value" />
+</label>'
       @language="html"
     />
 
@@ -248,13 +229,11 @@
       <label for="textarea-1" class="ch-label">Textarea label</label>
       <Textarea @id="textarea-1" @class="ch-textarea" @placeholder="Placeholder text" />
     </div>
-    <CodeBlock
-      @code='
-        <div class="ch-input-group">
-          <label for="[id]" class="ch-label">Textarea label</label>
-          <Textarea @id="[id]" @class="ch-textarea" @placeholder="Placeholder text" />
-        </div>
-      '
+    <CodeEditor
+      @code='<div class="ch-input-group">
+  <label for="[id]" class="ch-label">Textarea label</label>
+  <Textarea @id="[id]" @class="ch-textarea" @placeholder="Placeholder text" />
+</div>'
       @language="html"
     />
 
@@ -262,13 +241,11 @@
       Textarea label
       <Textarea @class="ch-textarea" @value="Entered long text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero." />
     </label>
-    <CodeBlock
-      @code='
-        <label class="ch-label ch-input-group">
-          Textarea label
-          <Textarea @class="ch-textarea" @value="Entered long text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero." />
-        </label>
-      '
+    <CodeEditor
+      @code='<label class="ch-label ch-input-group">
+Textarea label
+<Textarea @class="ch-textarea" @value="Entered long text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero." />
+</label>'
       @language="html"
     />
 
@@ -276,13 +253,11 @@
       <label for="textarea-2" class="ch-label">Textarea label</label>
       <Textarea @id="textarea-2" @class="ch-textarea disabled" @disabled={{true}} @placeholder="Disabled textarea with placeholder text" />
     </div>
-    <CodeBlock
-      @code='
-        <div class="ch-input-group">
-          <label for="[id]" class="ch-label">Textarea label</label>
-          <Textarea @id="[id]" @class="ch-textarea disabled" @disabled=true @placeholder="Disabled textarea with placeholder text" />
-        </div>
-      '
+    <CodeEditor
+      @code='<div class="ch-input-group">
+  <label for="[id]" class="ch-label">Textarea label</label>
+  <Textarea @id="[id]" @class="ch-textarea disabled" @disabled=true @placeholder="Disabled textarea with placeholder text" />
+</div>'
       @language="html"
     />
 
@@ -290,18 +265,16 @@
       Textarea label
       <Textarea @class="ch-textarea disabled" @disabled={{true}} @value="Disabled textarea with entered text" />
     </label>
-    <CodeBlock
-      @code='
-        <label class="ch-label ch-input-group">
-          Textarea label
-          <Textarea @class="ch-textarea disabled" @disabled=true @value="Disabled textarea with entered text" />
-        </label>
-      '
+    <CodeEditor
+      @code='<label class="ch-label ch-input-group">
+  Textarea label
+  <Textarea @class="ch-textarea disabled" @disabled=true @value="Disabled textarea with entered text" />
+</label>'
       @language="html"
     />
 
     <h3>Checkbox</h3>
-    <CodeBlock
+    <CodeEditor
       @class="ui-components--notes"
       @code='`checked` and `disabled` classes should be added to the `ch-checkbox-group` along with using the attributes on the input field.'
       @language="html"
@@ -311,20 +284,17 @@
       <Input @class="ch-checkbox" @type="checkbox" @checked={{mut this.selected (not this.selected)}} />
       <span class="ch-checkmark"></span>
     </label>
-     <CodeBlock
-      @code={{if this.selected '
-        <label class="ch-label ch-input-group ch-checkbox-group checked">
-          Selected
-          <Input @type="checkbox" @class="ch-checkbox" @checked=true />
-          <span class="ch-checkmark"></span>
-        </label>
-      ' '
-        <label class="ch-label ch-input-group ch-checkbox-group">
-          Not selected
-          <Input @type="checkbox" @class="ch-checkbox" @checked=false />
-          <span class="ch-checkmark"></span>
-        </label>
-      '}}
+     <CodeEditor
+      @code={{if this.selected '<label class="ch-label ch-input-group ch-checkbox-group checked">
+  Selected
+  <Input @type="checkbox" @class="ch-checkbox" @checked=true />
+  <span class="ch-checkmark"></span>
+</label>' 
+'<label class="ch-label ch-input-group ch-checkbox-group">
+  Not selected
+  <Input @type="checkbox" @class="ch-checkbox" @checked=false />
+  <span class="ch-checkmark"></span>
+</label>'}}
       @language="html"
     />
     <label class="ch-label ch-input-group ch-checkbox-group disabled">
@@ -332,14 +302,12 @@
       <Input @class="ch-checkbox disabled" @disabled={{true}} @type="checkbox" />
       <span class="ch-checkmark"></span>
     </label>
-     <CodeBlock
-      @code='
-        <label class="ch-label ch-input-group ch-checkbox-group disabled">
-          Not selected (disabled state)
-          <Input @class="ch-checkbox disabled" @disabled=true @type="checkbox" />
-          <span class="ch-checkmark"></span>
-        </label>
-      '
+     <CodeEditor
+      @code='<label class="ch-label ch-input-group ch-checkbox-group disabled">
+  Not selected (disabled state)
+  <Input @class="ch-checkbox disabled" @disabled=true @type="checkbox" />
+  <span class="ch-checkmark"></span>
+</label>'
       @language="html"
     />
     <label class="ch-label ch-input-group ch-checkbox-group disabled">
@@ -347,14 +315,12 @@
       <Input @class="ch-checkbox disabled" @checked={{true}} @disabled={{true}} @type="checkbox" />
       <span class="ch-checkmark"></span>
     </label>
-    <CodeBlock
-      @code='
-        <label class="ch-label ch-input-group ch-checkbox-group disabled">
-          Selected (disabled state)
-          <Input @class="ch-checkbox disabled" @checked=true @disabled=true @type="checkbox" />
-          <span class="ch-checkmark"></span>
-        </label>
-      '
+    <CodeEditor
+      @code='<label class="ch-label ch-input-group ch-checkbox-group disabled">
+  Selected (disabled state)
+  <Input @class="ch-checkbox disabled" @checked=true @disabled=true @type="checkbox" />
+  <span class="ch-checkmark"></span>
+</label>'
       @language="html"
     />
 
@@ -365,15 +331,13 @@
         <option class="ch-dropdown--option">Dropdown</option>
       </select>
     </div>
-    <CodeBlock
-      @code='
-      <div class="cs-input-group">
-        <label for="[id]" class="ch-label">Label</label>
-        <select id="[id]" class="ch-dropdown">
-          <option class="ch-dropdown--option">Dropdown</option>
-        </select>
-      </div>
-      '
+    <CodeEditor
+      @code='<div class="cs-input-group">
+  <label for="[id]" class="ch-label">Label</label>
+  <select id="[id]" class="ch-dropdown">
+    <option class="ch-dropdown--option">Dropdown</option>
+  </select>
+</div>'
       @language="html"
     />
     <div class="cs-input-group">
@@ -382,15 +346,13 @@
         <option class="ch-dropdown--option">Dropdown</option>
       </select>
     </div>
-    <CodeBlock
-      @code='
-      <div class="cs-input-group">
-        <label for="[id]" class="ch-label">Label</label>
-        <select id="[id]" class="ch-dropdown disabled" disabled>
-          <option class="ch-dropdown--option">Dropdown</option>
-        </select>
-      </div>
-      '
+    <CodeEditor
+      @code='<div class="cs-input-group">
+  <label for="[id]" class="ch-label">Label</label>
+  <select id="[id]" class="ch-dropdown disabled" disabled>
+    <option class="ch-dropdown--option">Dropdown</option>
+  </select>
+</div>'
       @language="html"
     />
   </section>
@@ -404,16 +366,14 @@
         <p class="ch-catalog-field--description">All-purpose text field</p>
       </div>
     </div>
-    <CodeBlock
-      @code='
-        <div class="ch-catalog-field" role="button" draggable="true">
-          <div class="ch-catalog-field--icon" style=css-url "background-image" "[icon]"></div>
-          <div>
-            <h4 class="ch-catalog-field--title">Text</h4>
-            <p class="ch-catalog-field--description">All-purpose text field</p>
-          </div>
-        </div>
-      '
+    <CodeEditor
+      @code='<div class="ch-catalog-field" role="button" draggable="true">
+  <div class="ch-catalog-field--icon" style=css-url "background-image" "[icon]"></div>
+  <div>
+    <h4 class="ch-catalog-field--title">Text</h4>
+    <p class="ch-catalog-field--description">All-purpose text field</p>
+  </div>
+</div>'
       @language="html"
     />
   </section>
@@ -442,33 +402,31 @@
         </div>
       </div>
     </section>
-    <CodeBlock
-      @code='
-        <section class="ch-catalog">
-          <header class="ch-catalog--header">
-            <h3 class="ch-catalog--title">Card Catalog</h3>
-            <div class="ch-catalog--header-btns">
-              <button class="ch-catalog--header-btn sidebar active" aria-label="View as sidebar"></button>
-              <button class="ch-catalog--header-btn grid" aria-label="View as grid"></button>
-            </div>
-            <div class="ch-input-group">
-              <Input
-                @class="ch-filter-bar"
-                @placeholder="Filter Results"
-              />
-            </div>
-          </header>
-          <div class="ch-catalog--fields">
-            <div class="ch-catalog-field" role="button" draggable="true">
-              <div class="ch-catalog-field--icon" style={{css-url "background-image" "[icon]"}}></div>
-              <div>
-                <h4 class="ch-catalog-field--title">Text</h4>
-                <p class="ch-catalog-field--description">All-purpose text field</p>
-              </div>
-            </div>
-          </div>
-        </section>
-      '
+    <CodeEditor
+      @code='<section class="ch-catalog">
+  <header class="ch-catalog--header">
+    <h3 class="ch-catalog--title">Card Catalog</h3>
+    <div class="ch-catalog--header-btns">
+      <button class="ch-catalog--header-btn sidebar active" aria-label="View as sidebar"></button>
+      <button class="ch-catalog--header-btn grid" aria-label="View as grid"></button>
+    </div>
+    <div class="ch-input-group">
+      <Input
+        @class="ch-filter-bar"
+        @placeholder="Filter Results"
+      />
+    </div>
+  </header>
+  <div class="ch-catalog--fields">
+    <div class="ch-catalog-field" role="button" draggable="true">
+      <div class="ch-catalog-field--icon" style={{css-url "background-image" "[icon]"}}></div>
+      <div>
+        <h4 class="ch-catalog-field--title">Text</h4>
+        <p class="ch-catalog-field--description">All-purpose text field</p>
+      </div>
+    </div>
+  </div>
+</section>'
       @language="html"
     />
   </section>
@@ -481,14 +439,12 @@
         @format="isolated"
         @mode="schema"
       />
-    <CodeBlock
-      @code='
-        <FieldRenderer
-          @field=@field
-          @format="isolated"
-          @mode="schema"
-        />
-      '
+    <CodeEditor
+      @code='<FieldRenderer
+  @field=@field
+  @format="isolated"
+  @mode="schema"
+/>'
       @language="html"
     />
     <h3>Edit mode</h3>
@@ -499,15 +455,13 @@
       @mode="edit"
       @setFieldValue={{action this.noop}}
     />
-    <CodeBlock
-      @code='
-        <FieldRenderer
-          @field=@field
-          @format="isolated"
-          @mode="edit"
-          @setFieldValue=@setFieldValue
-        />
-      '
+    <CodeEditor
+      @code='<FieldRenderer
+  @field=@field
+  @format="isolated"
+  @mode="edit"
+  @setFieldValue=@setFieldValue
+/>'
       @language="html"
     />
 
@@ -518,20 +472,18 @@
       @mode="edit"
       @setFieldValue={{action this.noop}}
     />
-    <CodeBlock
-      @code='
-        <FieldRenderer
-          @field=@field
-          @format="isolated"
-          @mode="edit"
-          @setFieldValue=@setFieldValue
-        />
-      '
+    <CodeEditor
+      @code='<FieldRenderer
+  @field=@field
+  @format="isolated"
+  @mode="edit"
+  @setFieldValue=@setFieldValue
+/>'
       @language="html"
     />
 
     <h4>Textarea Editor</h4>
-    <CodeBlock
+    <CodeEditor
       @class="ui-components--notes"
       @code='Note: Textarea core-type currently does not exist.'
       @language="html"
@@ -543,21 +495,19 @@
         @value="Entered long text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero."
       />
     </div>
-    <CodeBlock
-      @code='
-        <div class="field-renderer edit-field">
-          <label for="textarea-editor">Textarea</label>
-          <Textarea
-            @id="textarea-editor"
-            @value="Entered long text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero."
-          />
-        </div>
-      '
+    <CodeEditor
+      @code='<div class="field-renderer edit-field">
+<label for="textarea-editor">Textarea</label>
+<Textarea
+  @id="textarea-editor"
+  @value="Entered long text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero."
+/>
+</div>'
       @language="html"
     />
 
     <h4>Address string editor</h4>
-    <CodeBlock
+    <CodeEditor
       @class="ui-components--notes"
       @code='Note: Address core-type does not exist.'
       @language="html"
@@ -569,21 +519,19 @@
         @value="One World Trade Center, 285 Fulton St, New York, NY"
       />
     </div>
-    <CodeBlock
-      @code='
-        <div class="field-renderer edit-field field-address">
-          <label for="address-string-editor">Address</label>
-          <Input
-            @id="address-string-editor"
-            @value="One World Trade Center, 285 Fulton St, New York, NY"
-          />
-        </div>
-      '
+    <CodeEditor
+      @code='<div class="field-renderer edit-field field-address">
+  <label for="address-string-editor">Address</label>
+  <Input
+    @id="address-string-editor"
+    @value="One World Trade Center, 285 Fulton St, New York, NY"
+  />
+</div>'
       @language="html"
     />
 
     <h4>Image editor</h4>
-    <CodeBlock
+    <CodeEditor
       @class="ui-components--notes"
       @code='Note: Image core-type currently does not exist.'
       @language="html"
@@ -602,22 +550,20 @@
         height="55px"
       >
     </div>
-    <CodeBlock
-      @code='
-        <div class="field-renderer edit-field">
-          <label for="image-string-editor">Image</label>
-          <Input
-            @id="image-string-editor"
-            @value="one_world.png"
-          />
-          <img
-            src="/assets/images/cards/one_world.png"
-            alt="One World Trade Center"
-            width="90px"
-            height="55px"
-          >
-        </div>
-      '
+    <CodeEditor
+      @code='<div class="field-renderer edit-field">
+  <label for="image-string-editor">Image</label>
+  <Input
+    @id="image-string-editor"
+    @value="one_world.png"
+  />
+  <img
+    src="/assets/images/cards/one_world.png"
+    alt="One World Trade Center"
+    width="90px"
+    height="55px"
+  >
+</div>'
       @language="html"
     />
 
@@ -627,14 +573,12 @@
       @format="isolated"
       @mode="view"
     />
-    <CodeBlock
-      @code='
-        <FieldRenderer
-          @field=@field
-          @format="isolated"
-          @mode="view"
-        />
-      '
+    <CodeEditor
+      @code='<FieldRenderer
+  @field=@field
+  @format="isolated"
+  @mode="view"
+/>'
       @language="html"
     />
   </section>
@@ -649,16 +593,14 @@
         @setPosition={{action this.noop}}
         @removeField={{action this.noop}}
       />
-      <CodeBlock
-        @code='
-          <CardRenderer
-            @card=@card
-            @format="isolated"
-            @mode="schema"
-            @setPosition=@setPosition
-            @removeField=@removeField
-          />
-        '
+      <CodeEditor
+        @code='<CardRenderer
+  @card=@card
+  @format="isolated"
+  @mode="schema"
+  @setPosition=@setPosition
+  @removeField=@removeField
+/>'
         @language="html"
       />
 
@@ -669,15 +611,13 @@
         @mode="edit"
         @setFieldValue={{action this.noop}}
       />
-      <CodeBlock
-        @code='
-          <CardRenderer
-            @card=@card
-            @format="isolated"
-            @mode="edit"
-            @setFieldValue=@setFieldValue
-          />
-        '
+      <CodeEditor
+        @code='<CardRenderer
+  @card=@card
+  @format="isolated"
+  @mode="edit"
+  @setFieldValue=@setFieldValue
+/>'
         @language="html"
       />
 
@@ -687,21 +627,19 @@
         @format="isolated"
         @mode="view"
       />
-      <CodeBlock
-        @code='
-          <CardRenderer
-            @card=@card
-            @format="isolated"
-            @mode="view"
-          />
-        '
+      <CodeEditor
+        @code='<CardRenderer
+  @card=@card
+  @format="isolated"
+  @mode="view"
+/>'
         @language="html"
       />
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col">
     <h2>Right Edge</h2>
-    <CodeBlock
+    <CodeEditor
       @class="ui-components--notes"
       @code='<RightEdge> component normally has fixed positioning. Using `position: static` here for display purposes.'
       @language="html"
@@ -709,7 +647,7 @@
 
     <h3>Right Edge (No field selected)</h3>
     <RightEdge />
-    <CodeBlock
+    <CodeEditor
       @code='<RightEdge />'
       @language="html"
     />
@@ -726,17 +664,15 @@
       @setFieldInstructions={{this.noop}}
       @setNeededWhenEmbedded={{this.noop}}
     />
-    <CodeBlock
-      @code='
-        <RightEdge
-          @selectedField=@selectedField
-          @selectField=@selectField
-          @setFieldName=@setFieldName
-          @setFieldLabel=@setFieldLabel
-          @setFieldInstructions=@setFieldInstructions
-          @setNeededWhenEmbedded=@setNeededWhenEmbedded
-        />
-      '
+    <CodeEditor
+      @code='<RightEdge
+  @selectedField=@selectedField
+  @selectField=@selectField
+  @setFieldName=@setFieldName
+  @setFieldLabel=@setFieldLabel
+  @setFieldInstructions=@setFieldInstructions
+  @setNeededWhenEmbedded=@setNeededWhenEmbedded
+/>'
       @language="html"
     />
   </section>

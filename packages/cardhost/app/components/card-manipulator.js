@@ -149,12 +149,17 @@ export default class CardManipulator extends Component {
 
   @(task(function * () {
     this.statusMsg = null;
+    let cardIsNew = this.card.isNew;
+
     try {
       yield this.card.save();
     } catch (e) {
       console.error(e); // eslint-disable-line no-console
       this.statusMsg = `card ${this.card.name} was NOT successfully created: ${e.message}`;
       return;
+    }
+    if (cardIsNew) {
+      this.router.transitionTo('cards.schema', this.card.name);
     }
   })) saveCard;
 

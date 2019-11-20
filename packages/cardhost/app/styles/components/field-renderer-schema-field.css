@@ -17,19 +17,19 @@
   --field-height: 112px;
   --field-header-bg: var(--ch-light-gray-f0);
   --field-header-color: black;
+  --field-header-height: 36px;
   --field-bg: white;
   --field-color: var(--ch-black-op35);
 
   width: var(--field-width);
   min-height: var(--field-height);
   max-width: 100%;
-  background-color: var(--field-bg);
   color: var(--field-color);
   font: 400 16px/22px var(--ch-font-family);
   letter-spacing: 0.015em;
   border-radius: 5px;
   overflow: hidden;
-
+  border: 3px solid transparent;
   transition: border var(--field-transition-time);
 }
 
@@ -37,8 +37,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 36px;
+  height: var(--field-header-height);
   padding: 9px 20px 10px 45px;
+  border-radius: 5px 5px 0 0;
   background-position: var(--ch-spacing) center;
   background-size: 10px;
   background-repeat: no-repeat;
@@ -48,8 +49,7 @@
   font-size: 13px;
   line-height: 18px;
   text-transform: capitalize;
-
-  transition: background-color var(--field-transition-time);
+  transition: background-color var(--field-transition-time), border-radius var(--field-transition-time);
 }
 
 .schema-field-renderer--header--detail {
@@ -57,7 +57,11 @@
 }
 
 .schema-field-renderer--content {
+  min-height: calc(var(--field-height) - var(--field-header-height));
   padding: 10px var(--ch-spacing);
+  background-color: var(--field-bg);
+  border-radius: 0 0 5px 5px;
+  transition: border-radius var(--field-transition-time);
 }
 
 .schema-field-renderer--name {
@@ -90,4 +94,9 @@
 
 .schema-field-renderer:focus .schema-field-renderer--header {
   background-color: var(--field-highlight);
+  border-radius: 2px 2px 0 0;
+}
+
+.schema-field-renderer:focus .schema-field-renderer--content {
+  border-radius: 0 0 2px 2px;
 }

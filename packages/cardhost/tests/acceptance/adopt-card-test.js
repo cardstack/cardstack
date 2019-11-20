@@ -2,7 +2,7 @@ import { module, test, skip } from 'qunit';
 import { click, find, visit, currentURL, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
-import { showCardId, addField, setCardId, createCards, setFieldValue, removeField } from '@cardstack/test-support/card-ui-helpers';
+import { showCardId, addField, setCardId, createCards, saveCard, setFieldValue, removeField } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 
 const timeout = 20000;
@@ -51,9 +51,7 @@ module('Acceptance | card adoption', function(hooks) {
 
     assert.equal(currentURL(), `/cards/${card1Id}/adopt`);
 
-    await click('[data-test-card-creator-save-btn]');
-    await waitFor('[data-test-card-creator-save-btn]', { timeout });
-    await click('[data-test-card-creator-preview-btn]');
+    await saveCard('creator');
 
     assert.ok(currentURL().match(/\/cards\/new-card-[0-9]+/));
   });
@@ -83,10 +81,7 @@ module('Acceptance | card adoption', function(hooks) {
     await visit(`/cards/${card1Id}/adopt`);
 
     await setCardId(card2Id);
-    await click('[data-test-card-creator-save-btn]');
-    await waitFor('[data-test-card-creator-save-btn]', { timeout });
-    await click('[data-test-card-creator-preview-btn]');
-    await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
+    await saveCard('creator', card2Id);
 
     assert.deepEqual([...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')), [
       'address',
@@ -94,7 +89,8 @@ module('Acceptance | card adoption', function(hooks) {
       'state',
       'zip'
     ]);
-    let card = JSON.parse(find('.code-block').textContent);
+    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block')
+    let card = JSON.parse(cardJson);
     assert.deepEqual(card.data.relationships['adopted-from'].data, { type: 'cards', id: qualifiedCard1Id });
     assert.deepEqual(card.data.relationships.fields.data, []);
   });
@@ -104,10 +100,7 @@ module('Acceptance | card adoption', function(hooks) {
     await visit(`/cards/${card1Id}/adopt`);
 
     await setCardId(card2Id);
-    await click('[data-test-card-creator-save-btn]');
-    await waitFor('[data-test-card-creator-save-btn]', { timeout });
-    await click('[data-test-card-creator-preview-btn]');
-    await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
+    await saveCard('creator', card2Id);
 
     await visit(`/cards/${card2Id}/schema`);
 
@@ -141,10 +134,7 @@ module('Acceptance | card adoption', function(hooks) {
       'zip'
     ]);
 
-    await click('[data-test-card-creator-save-btn]');
-    await waitFor('[data-test-card-creator-save-btn]', { timeout });
-    await click('[data-test-card-creator-preview-btn]');
-    await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
+    await saveCard('creator', card2Id);
 
     assert.deepEqual([...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')), [
       'address',
@@ -153,7 +143,8 @@ module('Acceptance | card adoption', function(hooks) {
       'state',
       'zip'
     ]);
-    let card = JSON.parse(find('.code-block').textContent);
+    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block')
+    let card = JSON.parse(cardJson);
     assert.deepEqual(card.data.relationships['adopted-from'].data, { type: 'cards', id: qualifiedCard1Id });
     assert.deepEqual(card.data.relationships.fields.data, [
       { type: 'fields', id: 'treats-available' },
@@ -167,13 +158,11 @@ module('Acceptance | card adoption', function(hooks) {
     await setCardId(card2Id);
     await addField('treats-available', 'boolean', false);
 
-    await click('[data-test-card-creator-save-btn]');
-    await waitFor('[data-test-card-creator-save-btn]', { timeout });
-    await click('[data-test-card-creator-preview-btn]');
-    await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
+    await saveCard('creator', card2Id);
 
     assert.dom('[data-test-field="treats-available"]').exists();
-    let card = JSON.parse(find('.code-block').textContent);
+    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block')
+    let card = JSON.parse(cardJson);
     assert.deepEqual(card.data.relationships['adopted-from'].data, { type: 'cards', id: qualifiedCard1Id });
     assert.deepEqual(card.data.relationships.fields.data, [
       { type: 'fields', id: 'treats-available' },
@@ -181,10 +170,7 @@ module('Acceptance | card adoption', function(hooks) {
 
     await visit(`/cards/${card2Id}/schema`);
     await removeField('treats-available');
-    await click('[data-test-card-schema-save-btn]');
-    await waitFor('[data-test-card-schema-save-btn]', { timeout });
-    await click('[data-test-card-schema-preview-btn]');
-    await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
+    await saveCard('schema', card2Id);
 
     assert.deepEqual([...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')), [
       'address',
@@ -192,7 +178,8 @@ module('Acceptance | card adoption', function(hooks) {
       'state',
       'zip'
     ]);
-    card = JSON.parse(find('.code-block').textContent);
+    cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block')
+    card = JSON.parse(cardJson);
     assert.deepEqual(card.data.relationships['adopted-from'].data, { type: 'cards', id: qualifiedCard1Id });
     assert.deepEqual(card.data.relationships.fields.data, []);
   });
@@ -203,12 +190,8 @@ module('Acceptance | card adoption', function(hooks) {
 
     assert.dom('[data-test-field-renderer-remove-btn]').doesNotExist();
     await setCardId(card2Id);
-    await click('[data-test-card-creator-save-btn]');
-    await waitFor('[data-test-card-creator-save-btn]', { timeout });
-    await click('[data-test-card-creator-preview-btn]');
-    await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
+    await saveCard('creator', card2Id);
 
-    await visit(`/cards/${card2Id}/schema`);
     assert.dom('[data-test-field-renderer-remove-btn]').doesNotExist();
   });
 
@@ -236,10 +219,7 @@ module('Acceptance | card adoption', function(hooks) {
     await setCardId(card2Id);
     await addField('treats-available', 'boolean', false);
 
-    await click('[data-test-card-creator-save-btn]');
-    await waitFor('[data-test-card-creator-save-btn]', { timeout });
-    await click('[data-test-card-creator-preview-btn]');
-    await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
+    await saveCard('creator', card2Id);
 
     await visit(`/cards/${card2Id}/edit`);
 
@@ -257,18 +237,19 @@ module('Acceptance | card adoption', function(hooks) {
     await setFieldValue('state', 'MA');
     await setFieldValue('zip', '01234');
 
-    await click('[data-test-card-editor-save-btn]');
-    await waitFor('[data-test-card-editor-save-btn]', { timeout });
+    await saveCard('editor', card2Id);
+    assert.equal(currentURL(), `/cards/${card2Id}/edit`);
+
     await click('[data-test-card-editor-preview-btn]');
     await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
-    assert.equal(currentURL(), `/cards/${card2Id}`);
     assert.dom('[data-test-field="treats-available"] [data-test-boolean-field-viewer-value]').hasText('true');
     assert.dom('[data-test-field="address"] [data-test-string-field-viewer-value]').hasText('105 Barkley Lane');
     assert.dom('[data-test-field="city"] [data-test-string-field-viewer-value]').hasText('Puppyville');
     assert.dom('[data-test-field="state"] [data-test-string-field-viewer-value]').hasText('MA');
     assert.dom('[data-test-field="zip"] [data-test-string-field-viewer-value]').hasText('01234');
-
-    let card = JSON.parse(find('.code-block').textContent);
+    
+    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block')
+    let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes['treats-available'], true);
     assert.equal(card.data.attributes.address, '105 Barkley Lane');
     assert.equal(card.data.attributes.city, 'Puppyville');
@@ -282,10 +263,7 @@ module('Acceptance | card adoption', function(hooks) {
     await visit(`/cards/${card1Id}/adopt`);
     await setCardId(card2Id);
     await addField('treats-available', 'boolean', true);
-    await click('[data-test-card-creator-save-btn]');
-    await waitFor('[data-test-card-creator-save-btn]', { timeout });
-    await click('[data-test-card-creator-preview-btn]');
-    await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
+    await saveCard('creator', card2Id);
 
     await visit(`/cards/${card2Id}/adopt`);
     await setCardId(card3Id);
@@ -300,10 +278,7 @@ module('Acceptance | card adoption', function(hooks) {
       'number-of-bones'
     ]);
 
-    await click('[data-test-card-creator-save-btn]');
-    await waitFor('[data-test-card-creator-save-btn]', { timeout });
-    await click('[data-test-card-creator-preview-btn]');
-    await waitFor(`[data-test-card-view="${card3Id}"]`, { timeout });
+    await saveCard('creator', card3Id);
 
     assert.deepEqual([...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')), [
       'treats-available',
@@ -313,7 +288,8 @@ module('Acceptance | card adoption', function(hooks) {
       'zip',
       'number-of-bones'
     ]);
-    let card = JSON.parse(find('.code-block').textContent);
+    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block')
+    let card = JSON.parse(cardJson);
     assert.deepEqual(card.data.relationships['adopted-from'].data, { type: 'cards', id: qualifiedCard2Id });
     assert.deepEqual(card.data.relationships.fields.data, [
       { type: 'fields', id: 'number-of-bones' },
@@ -326,17 +302,11 @@ module('Acceptance | card adoption', function(hooks) {
     await visit(`/cards/${card1Id}/adopt`);
     await setCardId(card2Id);
     await addField('treats-available', 'boolean', true);
-    await click('[data-test-card-creator-save-btn]');
-    await waitFor('[data-test-card-creator-save-btn]', { timeout });
-    await click('[data-test-card-creator-preview-btn]');
-    await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
+    await saveCard('creator', card2Id);
 
     await visit(`/cards/${card1Id}/schema`);
     await addField('number-of-bones', 'integer', true);
-    await click('[data-test-card-schema-save-btn]');
-    await waitFor('[data-test-card-schema-save-btn]', { timeout });
-    await click('[data-test-card-schema-preview-btn]');
-    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
+    await saveCard('schema', card1Id);
 
     await visit(`/cards/${card2Id}/schema`);
     assert.deepEqual([...document.querySelectorAll(`[data-test-isolated-card] [data-test-field]`)].map(i => i.getAttribute('data-test-field')), [
