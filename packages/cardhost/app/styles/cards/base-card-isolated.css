@@ -9,3 +9,101 @@ custom CSS for each card, all cards will inherit the
   background-color: white;
   color: black;
 }
+
+.card-view .isolated-card.cardstack_base-card {
+  padding: 50px 30px;
+  display: grid;
+  grid-template-columns: 656px;
+  grid-gap: 30px;
+  justify-content: center;
+}
+
+/* TODO: Move these to event card template css file */
+.card-view .isolated-card.cardstack_base-card[data-test-isolated-card="event-card"] {
+  /* TODO: Do not hard code the image */
+  background: url("/assets/images/cards/one_world.png") top center/100% 271px no-repeat;
+  grid-template-columns: 328px 328px;
+  grid-gap: 0;
+  grid-template-areas:
+    "image        image"
+    "title        title"
+    "city         cta"
+    "admission    cta"
+    "date         date"
+    "location     location"
+    "description  description"
+}
+
+.card-view .isolated-card.cardstack_base-card[data-test-isolated-card="event-card"] > .view-field.field-image {
+  grid-area: image;
+  height: 271px;
+}
+.card-view .isolated-card.cardstack_base-card[data-test-isolated-card="event-card"] > .view-field.field-title {
+  grid-area: title;
+  margin-bottom: 30px;
+}
+.card-view .isolated-card.cardstack_base-card[data-test-isolated-card="event-card"] > .view-field.field-cta {
+  grid-area: cta;
+}
+.card-view .isolated-card.cardstack_base-card[data-test-isolated-card="event-card"] > .view-field.field-city {
+  grid-area: city;
+}
+.card-view .isolated-card.cardstack_base-card[data-test-isolated-card="event-card"] > .view-field.field-admission {
+  grid-area: admission;
+}
+.card-view .isolated-card.cardstack_base-card[data-test-isolated-card="event-card"] > .view-field.field-date {
+  grid-area: date;
+  margin-top: 30px;
+  padding-top: 30px;
+  border-top: 1px solid var(--ch-light-gray-d6);
+}
+.card-view .isolated-card.cardstack_base-card[data-test-isolated-card="event-card"] > .view-field.field-location {
+  grid-area: location;
+  margin-top: 30px;
+}
+.card-view .isolated-card.cardstack_base-card[data-test-isolated-card="event-card"] > .view-field.field-description {
+  grid-area: description;
+  margin-top: 30px;
+}
+
+.card-view .isolated-card.cardstack_base-card[data-test-isolated-card="event-card"] > .view-field.field-title > .view-field--label,
+.card-view .isolated-card.cardstack_base-card[data-test-isolated-card="event-card"] > .view-field.field-image > .view-field--label,
+.card-view .isolated-card.cardstack_base-card[data-test-isolated-card="event-card"] > .view-field.field-image > .view-field--value,
+.card-view .isolated-card.cardstack_base-card[data-test-isolated-card="event-card"] > .view-field.field-admission > .view-field--label,
+.card-view .isolated-card.cardstack_base-card[data-test-isolated-card="event-card"] > .view-field.field-cta > .view-field--label,
+.card-view .isolated-card.cardstack_base-card[data-test-isolated-card="event-card"] > .view-field.field-city > .view-field--label {
+  visibility: hidden;
+  height: 0;
+  padding: 0;
+}
+
+.card-view .isolated-card.cardstack_base-card[data-test-isolated-card="event-card"] > .view-field.field-title > .view-field--value {
+  font-size: 28px;
+  line-height: 21px;
+}
+
+.card-view .isolated-card.cardstack_base-card[data-test-isolated-card="event-card"] > .view-field.field-city > .view-field--value {
+  opacity: 0.5;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.card-view .isolated-card.cardstack_base-card[data-test-isolated-card="event-card"] > .view-field.field-admission > .view-field--value {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+}
+
+.card-view .isolated-card.cardstack_base-card[data-test-isolated-card="event-card"] > .view-field.field-cta > .view-field--value {
+  width: 128px;
+  height: 35px;
+  margin-left: auto;
+  padding: 10px 15px;
+  border-radius: 5px;
+  background-color: var(--ch-blue);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+}

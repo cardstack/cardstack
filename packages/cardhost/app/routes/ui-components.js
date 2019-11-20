@@ -23,11 +23,11 @@ export default class UIComponentsRoute extends Route {
           name: 'image',
           label: 'image',
           type: '@cardstack/core-types::string',
-          value: '/assets/images/cards/nyc.png'
+          value: 'one_world.png'
         },
         {
           name: 'datetime',
-          label: 'datetime',
+          label: 'date',
           type: '@cardstack/core-types::date',
           value: '2019-09-26'
         }
@@ -56,10 +56,17 @@ export default class UIComponentsRoute extends Route {
 
       sampleDateField: {
         name: 'sample-datetime',
-        label: 'datetime',
+        label: 'date',
         type: '@cardstack/core-types::date',
         value: '2019-09-26'
-      }
+      },
+
+      sampleLocationField: {
+        name: 'sample-location',
+        label: 'location',
+        type: '@cardstack/core-types::string',
+        value: 'One World Trade Center'
+      },
     }
   }
 }

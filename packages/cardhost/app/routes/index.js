@@ -13,7 +13,6 @@ export default class IndexRoute extends Route {
     if (environment === 'development') {
       // prime the store with seed models
       await this.data.getCard('local-hub::why-doors', 'isolated');
-      await this.data.getCard('local-hub::event', 'isolated');
     }
 
     return await hash({

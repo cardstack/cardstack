@@ -39,12 +39,10 @@
     {{/let}}
   {{else if (eq @mode "edit")}}
     {{#let (component this.fieldEditor) as | FieldEditor |}}
-      <div class="edit-field-renderer">
-        <FieldEditor
-          @field={{@field}}
-          @setFieldValue={{@setFieldValue}}
-        />
-      </div>
+      <FieldEditor
+        @field={{@field}}
+        @setFieldValue={{@setFieldValue}}
+      />
     {{/let}}
   {{else if (eq @mode "schema")}}
     {{!-- TODO we should extract the schema editing stuff into a seaprate component --}}
