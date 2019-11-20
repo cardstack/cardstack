@@ -91,5 +91,8 @@
   },
   "engines": {
     "node": "8.* || >= 10.*"
+  },
+  "dependencies": {
+    "ember-svg-jar": "^2.2.3"
   }
 }
