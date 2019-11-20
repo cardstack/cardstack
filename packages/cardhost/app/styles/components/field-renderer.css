@@ -23,19 +23,6 @@
   padding: var(--ch-spacing) 0;
 }
 
-.field-renderer.schema-field {
-  padding: var(--ch-spacing) 0;
-  color: white;
-  font: 400 13px/18px var(--ch-font-family);
-  letter-spacing: 0.035em;
-}
-
-.field-renderer.schema-field .field-renderer--display {
-  visibility: hidden;
-  width: 0;
-  height: 0;
-}
-
 .field-renderer--move-btn {
   width: 14px;
   height: 18px;

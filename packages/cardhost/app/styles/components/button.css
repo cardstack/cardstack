@@ -73,6 +73,7 @@
 
 .ch-button--icon.catalog {
   --icon-url: url('/assets/images/buttons/catalog.svg');
+  --border-radius: 0;
 }
 
 .ch-button--icon.catalog.active,

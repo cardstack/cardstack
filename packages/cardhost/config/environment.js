@@ -38,7 +38,7 @@ module.exports = function(environment) {
     // ENV.APP.LOG_VIEW_LOOKUPS = true;
 
     ENV.cardTemplates = JSON.parse(process.env.CARD_TEMPLATES || null) ||
-      ['local-hub::location-card'];
+      ['local-hub::location-card', 'local-hub::event-card'];
   }
 
   if (environment === 'test') {

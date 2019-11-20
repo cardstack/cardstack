@@ -1,0 +1,18 @@
+.view-field--label {
+  display: block;
+  padding-bottom: 10px;
+  color: var(--ch-black-op50);
+  font: 400 13px/18px var(--ch-font-family);
+  letter-spacing: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: capitalize;
+}
+
+.view-field--value {
+  color: black;
+  font: 400 16px/22px var(--ch-font-family);
+  letter-spacing: 0;
+  text-align: left;
+}

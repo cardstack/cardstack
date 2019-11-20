@@ -23,5 +23,6 @@ export default class ColorPalette extends Component {
     "--ch-blue": "#0076ff",
     "--ch-white-op60": "rgba(255, 255, 255, 0.6)",
     "--ch-black-op35": "rgba(0, 0, 0, 0.35)",
+    "--ch-black-op50": "rgba(0, 0, 0, 0.5)",
   };
 }

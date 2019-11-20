@@ -38,6 +38,9 @@
 
 .ch-input {
   height: var(--ch-component-height);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ch-textarea {

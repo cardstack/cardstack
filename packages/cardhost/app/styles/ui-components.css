@@ -36,7 +36,8 @@
   grid-gap: 0 30px;
 }
 .ui-components--grid-2-col > h2,
-.ui-components--grid-2-col > h3 {
+.ui-components--grid-2-col > h3,
+.ui-components--grid-2-col > h4 {
   grid-column: span 2;
 }
 .ui-components--grid-2-col .code-block {
