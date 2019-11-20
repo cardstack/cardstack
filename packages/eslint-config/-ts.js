@@ -4,6 +4,10 @@ module.exports = {
     // "unsupported", even though we're transpiling them first.
     "node/no-unsupported-features":  "off",
 
+    // Type overloads cause false positives. typescript errors on duplicates, so
+    // this doesn't need to be replaced.
+    "no-dupe-class-members": "off",
+
     "@typescript-eslint/adjacent-overload-signatures": "error",
     "@typescript-eslint/array-type": "error",
     "@typescript-eslint/ban-types": "error",
