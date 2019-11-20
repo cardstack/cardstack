@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { click, fillIn, find, visit, currentURL, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
-import { setFieldValue, createCards } from '@cardstack/test-support/card-ui-helpers';
+import { setFieldValue, createCards, saveCard } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 
 const timeout = 20000;
@@ -45,12 +45,11 @@ module('Acceptance | card edit', function(hooks) {
 
     await setFieldValue('body', 'updated body');
 
-    await click('[data-test-card-editor-save-btn]');
-    await waitFor('[data-test-card-editor-save-btn]', { timeout });
-    await click('[data-test-card-editor-preview-btn]');
-    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
+    await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+
+    await visit(`/cards/${card1Id}`);
     assert.dom('[data-test-field="body"] [data-test-string-field-viewer-value]').hasText(`updated body`);
 
     let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block')
@@ -70,12 +69,11 @@ module('Acceptance | card edit', function(hooks) {
 
     await setFieldValue('email', 'hassan@nowhere.dog');
 
-    await click('[data-test-card-editor-save-btn]');
-    await waitFor('[data-test-card-editor-save-btn]', { timeout });
-    await click('[data-test-card-editor-preview-btn]');
-    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
+    await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+
+    await visit(`/cards/${card1Id}`);
     assert.dom('[data-test-field="email"] [data-test-case-insensitive-field-viewer-value]').hasText(`hassan@nowhere.dog`);
 
     let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block')
@@ -95,12 +93,11 @@ module('Acceptance | card edit', function(hooks) {
 
     await setFieldValue('created', '2019-10-08');
 
-    await click('[data-test-card-editor-save-btn]');
-    await waitFor('[data-test-card-editor-save-btn]', { timeout });
-    await click('[data-test-card-editor-preview-btn]');
-    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
+    await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+
+    await visit(`/cards/${card1Id}`);
     assert.dom('[data-test-field="created"] [data-test-date-field-viewer-value]').hasText(`2019-10-08`);
 
     let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block')
@@ -120,12 +117,11 @@ module('Acceptance | card edit', function(hooks) {
 
     await setFieldValue('likes', 110);
 
-    await click('[data-test-card-editor-save-btn]');
-    await waitFor('[data-test-card-editor-save-btn]', { timeout });
-    await click('[data-test-card-editor-preview-btn]');
-    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
+    await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+
+    await visit(`/cards/${card1Id}`);
     assert.dom('[data-test-field="likes"] [data-test-integer-field-viewer-value]').hasText(`110`);
 
     let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block')
@@ -145,12 +141,11 @@ module('Acceptance | card edit', function(hooks) {
 
     await setFieldValue('published', false);
 
-    await click('[data-test-card-editor-save-btn]');
-    await waitFor('[data-test-card-editor-save-btn]', { timeout });
-    await click('[data-test-card-editor-preview-btn]');
-    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
+    await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+
+    await visit(`/cards/${card1Id}`);
     assert.dom('[data-test-field="published"] [data-test-boolean-field-viewer-value]').hasText(`false`);
 
     let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block')
@@ -177,12 +172,11 @@ module('Acceptance | card edit', function(hooks) {
 
     await setFieldValue('reviewers', `${card2Id},${card3Id}`);
 
-    await click('[data-test-card-editor-save-btn]');
-    await waitFor('[data-test-card-editor-save-btn]', { timeout });
-    await click('[data-test-card-editor-preview-btn]');
-    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
+    await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+
+    await visit(`/cards/${card1Id}`);
     assert.dom(`[data-test-field="reviewers"] [data-test-embedded-card="${card2Id}"] [data-test-field="name"] [data-test-string-field-viewer-value]`).hasText('Van Gogh');
     assert.dom(`[data-test-field="reviewers"] [data-test-embedded-card="${card3Id}"] [data-test-field="name"] [data-test-string-field-viewer-value]`).hasText('Hassan Abdel-Rahman');
     assert.deepEqual([...document.querySelectorAll(`[data-test-field="reviewers"] [data-test-embedded-card]`)].map(i => i.getAttribute('data-test-embedded-card')), [card2Id, card3Id ]);
@@ -215,12 +209,11 @@ module('Acceptance | card edit', function(hooks) {
 
     await setFieldValue('author', card2Id);
 
-    await click('[data-test-card-editor-save-btn]');
-    await waitFor('[data-test-card-editor-save-btn]', { timeout });
-    await click('[data-test-card-editor-preview-btn]');
-    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
+    await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+
+    await visit(`/cards/${card1Id}`);
     assert.dom(`[data-test-field="author"] [data-test-embedded-card="${card2Id}"] [data-test-field="name"] [data-test-string-field-viewer-value]`).hasText('Van Gogh');
     assert.dom(`[data-test-field="author"] [data-test-embedded-card="${card2Id}"] [data-test-field="email"]`).doesNotExist();
 
