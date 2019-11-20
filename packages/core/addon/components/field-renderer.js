@@ -58,6 +58,13 @@ export default class FieldRenderer extends Component {
     return null;
   }
 
+  @action
+  focusElement(element) {
+    if (this.args.mode === 'schema') {
+      element.focus({ preventScroll: true });
+    }
+  }
+
   get nonce() {
     return onFieldChangedDependencies.map(i => this.args.field[i]).join('::');
   }
