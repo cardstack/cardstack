@@ -281,6 +281,12 @@ class Card {
     return (internal.fields || []).find(i => i.name === fieldName);
   }
 
+  getFieldByNonce(fieldNonce) {
+    if (this.isDestroyed) { throw new Error('Cannot call getFieldByNonce from destroyed card'); }
+    let internal = priv.get(this);
+    return (internal.fields || []).find(i => i.nonce === fieldNonce);
+  }
+
   addField({ name, label, type, instructions, neededWhenEmbedded=false, value, position }) {
     if (this.isDestroyed) { throw new Error('Cannot addField from destroyed card'); }
     if (this.loadedFormat === 'embedded') { throw new Error(`Cannot addField() on card id '${this.id}' because the card is in the embedded format. Use card.load() to get the isolated form of the card before adding fields.`) }

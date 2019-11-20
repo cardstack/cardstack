@@ -170,10 +170,11 @@ export default class CardManipulator extends Component {
   })) deleteCard;
 
   @action
-  removeField(fieldName) {
-    if (!fieldName || !this.card) { return; }
+  removeField(fieldNonce) {
+    if (fieldNonce == null || !this.card) { return; }
 
-    let field = this.card.getField(fieldName)
+    // using field nonce in order to be resiliant to the scenario where the user deletes the name of the field too
+    let field = this.card.getFieldByNonce(fieldNonce);
 
     if (field === this.selectedField) {
       this.displayCardMetadata = true;

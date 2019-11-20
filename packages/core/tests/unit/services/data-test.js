@@ -1062,6 +1062,13 @@ module("Unit | Service | data", function () {
       assert.equal(card.getField('title').value, 'test title');
     });
 
+    test("it can get a field by the field's nonce", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      let nonce = card.getField('title').nonce;
+      assert.equal(card.getFieldByNonce(nonce).value, 'test title');
+    });
+
     test("it can get the value of a belongs-to field", async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'isolated');
@@ -2311,6 +2318,14 @@ module("Unit | Service | data", function () {
       await card.delete();
 
       assert.throws(() => card.getField('title'), /destroyed card/);
+    });
+
+    test('throws when you call getFieldByNonce from deleted Card instance', async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      await card.delete();
+
+      assert.throws(() => card.getFieldByNonce(0), /destroyed card/);
     });
 
     test('throws when you call save from deleted Card instance', async function (assert) {
