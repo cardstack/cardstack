@@ -1,6 +1,7 @@
 'use strict';
 
 const EmberApp = require('ember-cli/lib/broccoli/ember-app');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = function(defaults) {
   let app = new EmberApp(defaults, {
@@ -24,6 +25,7 @@ module.exports = function(defaults) {
   // modules that you would like to import into your application
   // please specify an object with the list of modules as keys
   // along with the exports of each module as its value.
+  app.import('node_modules/monaco-editor/dev/vs/editor/editor.main.css');
 
   return (function(){
     const Webpack = require('@embroider/webpack').Webpack;
@@ -37,6 +39,11 @@ module.exports = function(defaults) {
       staticComponents: true,
       onOutputPath(outputPath) {
         writeFileSync(join(__dirname, '.embroider-app-path'), outputPath, 'utf8');
+      },
+      packagerOptions: {
+        webpackConfig: {
+          plugins: [new MonacoWebpackPlugin(/*{languages: ['javascript', 'typescript']}*/)],
+        }
       },
       packageRules: [
         {
