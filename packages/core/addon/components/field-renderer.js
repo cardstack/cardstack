@@ -59,10 +59,8 @@ export default class FieldRenderer extends Component {
   }
 
   @action
-  focusElement(element) {
-    if (this.args.mode === 'schema') {
-      element.focus({ preventScroll: true });
-    }
+  focusParentElement(element) {
+    element.parentElement.focus({ preventScroll: true });
   }
 
   get nonce() {

@@ -18,6 +18,7 @@
     this.dasherizedType
     (if (or @setPosition @removeField) " with-buttons")
   }}
+  tabindex={{@field.position}}
   data-test-field={{@field.name}}
   data-test-field-type={{@field.type}}
   data-test-field-mode={{@mode}}
@@ -48,10 +49,9 @@
     {{!-- TODO we should extract the schema editing stuff into a seaprate component --}}
       {{#if (includes this.schemaAttrs "title")}}
         <div
-          tabindex="0"
           class="schema-field-renderer"
           data-test-field-schema-renderer
-          {{did-insert this.focusElement}}
+          {{did-insert this.focusParentElement}}
         >
           {{!-- TODO: Change displayed logo depending on field --}}
           {{! template-lint-disable no-inline-styles }}
