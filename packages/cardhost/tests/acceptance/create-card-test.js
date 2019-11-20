@@ -1,11 +1,10 @@
 import { module, test } from 'qunit';
-import { click, fillIn, find, visit, currentURL, waitFor, triggerEvent, focus } from '@ember/test-helpers';
+import { click, fillIn, find, visit, currentURL, triggerEvent, focus } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
-import { addField, setCardId, createCards, dragAndDropNewField, removeField } from '@cardstack/test-support/card-ui-helpers';
+import { addField, setCardId, createCards, saveCard, dragAndDropNewField, removeField } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 
-const timeout = 20000;
 const card1Id = 'millenial-puppies';
 const qualifiedCard1Id = `local-hub::${card1Id}`;
 
@@ -33,12 +32,9 @@ module('Acceptance | card create', function(hooks) {
 
     assert.equal(currentURL(), '/cards/new');
 
-    await click('[data-test-card-creator-save-btn]');
-    await waitFor('[data-test-card-creator-save-btn]', { timeout });
-    await click('[data-test-card-creator-preview-btn]');
-    await waitFor('[data-test-card-view^="new-card-"]', { timeout });
+    await saveCard('creator');
 
-    assert.ok(currentURL().match(/\/cards\/new-card-[0-9]+/));
+    assert.ok(currentURL().match(/\/cards\/new-card-[0-9]+\/schema/));
   });
 
   test("changing a card's id does not clear the card fields", async function(assert) {
@@ -156,12 +152,11 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('subtitle');
 
-    await click('[data-test-card-creator-save-btn]');
-    await waitFor('[data-test-card-creator-save-btn]', { timeout });
-    await click('[data-test-card-creator-preview-btn]');
-    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
+    await saveCard('creator', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}`);
+    assert.equal(currentURL(), `/cards/${card1Id}/schema`);
+
+    await visit(`/cards/${card1Id}`);
     assert.dom('[data-test-field="subtitle"] [data-test-string-field-viewer-label]').hasText('subtitle');
     assert.dom('[data-test-field="title"]').doesNotExist();
 
@@ -201,13 +196,11 @@ module('Acceptance | card create', function(hooks) {
     await addField('author', 'string', false, 1);
 
     assert.deepEqual([...document.querySelectorAll(`[data-test-isolated-card="${card1Id}"] [data-test-field]`)].map(i => i.getAttribute('data-test-field')),
-      ['title', 'author', 'body']);
+    ['title', 'author', 'body']);
 
-    await click('[data-test-card-creator-save-btn]');
-    await waitFor('[data-test-card-creator-save-btn]', { timeout });
-    await click('[data-test-card-creator-preview-btn]');
-    await waitFor(`[data-test-card-view="${card1Id}"]`);
+    await saveCard('creator', card1Id);
 
+    await visit(`/cards/${card1Id}`);
     assert.deepEqual([...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
       ['title', 'author', 'body']);
     let card = JSON.parse(find('.code-block').textContent);

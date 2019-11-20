@@ -53,17 +53,29 @@ export async function createCards(args) {
       await addField(name, type, neededWhenEmbedded, index);
     }
     await click('[data-test-card-creator-save-btn]');
-    await waitFor('[data-test-card-creator-save-btn]', { timeout });
+    await waitFor(`[data-test-card-schema="${id}"]`, { timeout });
 
     await visit(`/cards/${id}/edit`);
     for (let [name, , , value] of args[id]) {
       if (value == null) { continue; }
       await setFieldValue(name, value);
     }
-    await click('[data-test-card-editor-save-btn]');
-    await waitFor('[data-test-card-editor-save-btn]', { timeout });
-    await click('[data-test-card-editor-preview-btn]');
-    await waitFor(`[data-test-card-view="${id}"]`, { timeout });
+    await saveCard('editor', id);
+    await visit(`/cards/${id}`);
+  }
+}
+
+export async function saveCard(mode, id) {
+  await click(`[data-test-card-${mode}-save-btn]`);
+
+  if (mode === 'creator') {
+    if (id) {
+      await waitFor(`[data-test-card-schema="${id}"]`, { timeout });
+    } else {
+      await waitFor('[data-test-card-schema^="new-card-"]', { timeout });
+    }
+  } else {
+    await waitFor(`[data-test-card-${mode}-save-btn]`, { timeout });
   }
 }
 
