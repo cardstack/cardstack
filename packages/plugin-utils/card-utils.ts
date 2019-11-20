@@ -666,7 +666,7 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
       .filter(i => !cardBrowserAssetFields.concat(cardComputedFields).includes(i))) {
     attributes[attr] = internalCard.data.attributes[attr];
   }
-  for (let field of cardComputedFields) {
+  for (let field of Object.keys(cardComputedFields).concat(['field-order'])) {
     unset(attributes, field);
   }
 

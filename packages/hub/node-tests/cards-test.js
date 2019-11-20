@@ -165,7 +165,9 @@ function assertCardModels(card) {
   expect(model.attributes.body).to.match(/discerning tastes of the millenial puppy/);
   expect(model.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
   expect(model.attributes['embedded-metadata-summary']).to.be.undefined; // this one shouldn't leak into the model
-  expect(model.attributes['metadata-summary']).to.be.undefined; // this one shouldn't leak into the external model
+  expect(model.attributes['metadata-summary']).to.be.undefined; // this one shouldn't leak into the model
+  expect(model.attributes['field-order']).to.be.undefined; // this one shouldn't leak into the model
+  expect(model.attributes['adoption-chain']).to.be.undefined; // this one shouldn't leak into the model
   expect(model.relationships.tags.data).to.eql([
     { type: 'tags', id: 'millenials' },
     { type: 'tags', id: 'puppies' },
