@@ -48,6 +48,7 @@ export default class CodeEditor extends Component {
 
   @action
   editorReady() {
+    console.log('READY')
     if (!this.editorIsReady) {
       this.editorIsReady = true;
       if (this.args.editorReady) {
@@ -58,6 +59,10 @@ export default class CodeEditor extends Component {
 
   @action
   renderEditor(el) {
+    // Every time a new editor is created, this fires for the new editor
+    // plus all existing editors on the page. If there are 4 editors on
+    // the page, it will fire 1 + 2 + 3 + 4 times
+    monaco.editor.onDidCreateEditor(this.editorReady)
     // This is called when the containing div has been rendered.
     // `create` constructs a code editor and inserts it into the DOM.
     // el is the element that {{did-insert}} was used on.
@@ -73,10 +78,6 @@ export default class CodeEditor extends Component {
       scrollBeyondLastLine: false,
       wrappingIndent: 'same'
     })
-    // Every time a new editor is created, this fires for the new editor
-    // plus all existing editors on the page. If there are 4 editors on
-    // the page, it will fire 1 + 2 + 3 + 4 times
-    monaco.editor.onDidCreateEditor(this.editorReady)
     // Whenever the code block's text changes, onUpdateCode will be called.
     editor.onDidChangeModelContent(this.onUpdateCode)
     // Save editor instance locally, so we can reference it in other methods
