@@ -1,10 +1,11 @@
 import { module, test } from 'qunit';
-import { click, fillIn, find, visit, currentURL, triggerEvent, focus } from '@ember/test-helpers';
+import { click, fillIn, find, visit, currentURL, triggerEvent, focus, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
 import { addField, setCardId, createCards, saveCard, dragAndDropNewField, removeField } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 
+const timeout = 20000;
 const card1Id = 'millenial-puppies';
 const qualifiedCard1Id = `local-hub::${card1Id}`;
 
@@ -100,6 +101,7 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     await focus('[data-test-card-renderer-isolated]');
+    await waitFor('.card-renderer.selected', { timeout });
     assert.dom('.field-renderer').doesNotHaveClass('selected');
     assert.dom('.card-renderer-isolated--header').hasText('millenial-puppies');
     assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
