@@ -1,30 +1,50 @@
-import { Registry, Container, inject } from '../dependency-injection';
+import { Registry, Container, inject, getOwner } from '../dependency-injection';
 
 describe("dependency injection", function() {
-  it("it can inject a service", async function() {
-    let registry = new Registry();
+  let registry: Registry;
+  let container: Container;
+
+  before(function() {
+    registry = new Registry();
     registry.register('testExample', ExampleService);
     registry.register('testConsumer', ConsumingService);
     registry.register('test-has-async', HasAsyncReady);
+    registry.register('testBadService', BadService);
+  });
 
-    let container = new Container(registry);
+  beforeEach(function() {
+    container = new Container(registry);
+  });
+
+  afterEach(async function() {
+    await container.teardown();
+  });
+
+  it("it can inject a service", async function() {
     let consumer = await container.lookup('testConsumer');
     expect(consumer.useIt()).equals('Quint');
     expect(consumer.theAnswer()).equals('Quint');
   });
 
   it("errors if you mis-assign an injection", async function() {
-    let registry = new Registry();
-    registry.register('testExample', ExampleService);
-    registry.register('testBadService', BadService);
-
-    let container = new Container(registry);
     try {
       await container.lookup('testBadService');
       throw new Error("should not get here");
     } catch(err) {
       expect(err.message).to.match(/you must pass the 'as' argument/);
     }
+  });
+
+  it("returns the same singleton", async function() {
+    let instance = await container.lookup('testConsumer');
+    let second = await container.lookup('testConsumer');
+    expect(instance).equals(second);
+  });
+
+  it("supports getOwner", async function() {
+    let instance = await container.lookup('testConsumer');
+    let owner = getOwner(instance);
+    expect(owner).equals(container);
   });
 });
 
