@@ -78,6 +78,7 @@
 }
 
 .card-renderer-isolated--content {
+  position: relative;
   margin: 0 auto;
   width: var(--card-width);
   max-width: 100%;

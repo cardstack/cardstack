@@ -1,11 +1,25 @@
 {{!-- TODO move this into the @cardstack/base-card package when we support runtime js compilation --}}
 
-{{!-- TODO use a sanitized version of the @card.id in the class name after we have css coming from card documents --}}
+{{!-- TODO use a sanitized version of the @card.id in the class name (instead of @card.name) after we have css coming from card documents --}}
+{{! template-lint-disable attribute-indentation}}
 <div
   data-test-isolated-card={{@card.name}}
-  class="isolated-card cardstack_base-card"
+  class="isolated-card cardstack_base-card {{@card.name}}
+    {{if
+      (and
+        @card.adoptedFrom
+        (not (eq @card.adoptedFrom.name "@cardstack/base-card"))
+      )
+      @card.adoptedFrom.name
+    }}
+  "
 >
   {{#each @card.isolatedFields key="nonce" as |field|}}
+    {{!-- TODO: This is here temporarily until we have a better solution for rendering images --}}
+    {{#if (eq field.name "image")}}
+      <img src={{field.value}} alt="" width="100%" class="isolated--hero-image">
+    {{/if}}
+
     {{#if @setFieldValue}}
       <FieldRenderer
         @field={{field}}

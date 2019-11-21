@@ -99,7 +99,7 @@ let eventCardTemplate = eventFactory.getDocumentFor(
     ])
     .withRelated('model', eventFactory.addResource('local-hub::event-card', 'local-hub::event-card')
       .withAttributes({
-        image: "one_world.png",
+        image: "https://images.unsplash.com/photo-1542296140-47fd7d838e76",
         title: "Ember Meetup NYC",
         date: "2019-09-26",
         location: "One World Trade Center",
