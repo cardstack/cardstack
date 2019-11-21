@@ -83,7 +83,7 @@
   @setFieldName={{this.setFieldName}}
   @setFieldLabel={{this.setFieldLabel}}
   @setFieldInstructions={{this.setFieldInstructions}}
-  @displayCardMetadata={{this.displayCardMetadata}}
+  @cardSelected={{this.cardSelected}}
 />
 
 <div class="card-schema-updator--search-bar">
@@ -104,8 +104,8 @@
     @setPosition={{action this.setPosition}}
     @selectedField={{this.selectedField}}
     @dropField={{action this.dropField}}
-    @displayCardMetadata={{this.displayCardMetadata}}
-    @cardFocused={{action (mut this.displayCardMetadata)}}
+    @cardSelected={{this.cardSelected}}
+    @cardFocused={{action (mut this.cardSelected)}}
   />
 </section>
 

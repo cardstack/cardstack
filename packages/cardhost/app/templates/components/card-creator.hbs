@@ -83,7 +83,7 @@
   @setFieldLabel={{this.setFieldLabel}}
   @setFieldInstructions={{this.setFieldInstructions}}
   @updateCardId={{this.updateCardId}}
-  @displayCardMetadata={{this.displayCardMetadata}}
+  @cardSelected={{this.cardSelected}}
 />
 
 <section class="card-creator" data-test-card-creator {{did-update this.updateCard @card}}>
@@ -97,8 +97,8 @@
       @selectField={{action this.selectField}}
       @selectedField={{this.selectedField}}
       @dropField={{action this.dropField}}
-      @displayCardMetadata={{this.displayCardMetadata}}
-      @cardFocused={{action (mut this.displayCardMetadata)}}
+      @cardSelected={{this.cardSelected}}
+      @cardFocused={{action (mut this.cardSelected)}}
     />
   {{/if}}
 </section>

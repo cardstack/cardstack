@@ -12,7 +12,6 @@ export default class CardRenderer extends Component {
   @tracked componentName;
   @tracked mode;
   @tracked cardFocused = () => {};
-  @tracked cardSelected = true;
 
   constructor(...args) {
     super(...args);
@@ -31,7 +30,6 @@ export default class CardRenderer extends Component {
   @action
   cardIsFocused(value) {
     this.cardFocused(value);
-    this.cardSelected = value;
   }
 
   @action
@@ -39,7 +37,6 @@ export default class CardRenderer extends Component {
     if (this.mode === 'schema') {
       element.focus({ preventScroll: true });
     }
-    this.cardSelected = true;
   }
 
   get sanitizedName() {
