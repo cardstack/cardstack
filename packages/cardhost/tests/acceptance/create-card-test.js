@@ -37,13 +37,13 @@ module('Acceptance | card create', function(hooks) {
     assert.ok(currentURL().match(/\/cards\/new-card-[0-9]+\/schema/));
   });
 
-  test('card element is focused on initial render', async function(assert) {
+  test('card element is selected on initial render', async function(assert) {
     await login();
     await visit('/cards/new');
 
     assert.equal(currentURL(), '/cards/new');
 
-    assert.dom('.card-renderer').isFocused('card renderer element is focused');
+    assert.dom('.card-renderer').hasClass('selected');
   });
 
   test("changing a card's id does not clear the card fields", async function(assert) {

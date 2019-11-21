@@ -33,10 +33,8 @@ export default class CardRenderer extends Component {
   }
 
   @action
-  focusElement(element) {
-    if (this.mode === 'schema') {
-      element.focus({ preventScroll: true });
-    }
+  focusCard(element, [value]) {
+    this.cardFocused(value);
   }
 
   get sanitizedName() {
