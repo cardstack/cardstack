@@ -102,20 +102,20 @@
   outline: 0; /* TODO: make this accessible */
 }
 
-.card-renderer-isolated:focus .card-renderer-isolated--header {
+.card-renderer-isolated.selected .card-renderer-isolated--header {
   color: black;
   background-color: var(--card-highlight);
   /* background-image: url('/images/icons/event.svg'); */
 }
 
-.card-renderer-isolated:focus .card-renderer-isolated--header svg g {
+.card-renderer-isolated.selected .card-renderer-isolated--header svg g {
   stroke: black;
 }
 
-.card-renderer-isolated:focus .card-renderer-isolated--header-overlay {
+.card-renderer-isolated.selected .card-renderer-isolated--header-overlay {
   visibility: hidden;
 }
 
-.card-renderer-isolated:focus .card-renderer-isolated--content {
+.card-renderer-isolated.selected .card-renderer-isolated--content {
   border-color: var(--card-highlight);
 }

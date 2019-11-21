@@ -17,6 +17,7 @@
     " field-type-"
     this.dasherizedType
     (if (or @setPosition @removeField) " with-buttons")
+    (if (eq @field @selectedField) " selected")
   }}
   tabindex={{@field.position}}
   data-test-field={{@field.name}}

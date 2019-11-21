@@ -7,10 +7,11 @@ Ember Concurrency into the rendering of the card component here.
 {{#if (eq @format "isolated")}}
   {{#let (component this.isolatedComponentName) as | Isolated |}}
     <section
-      class="card-renderer card-renderer-{{@format}} {{this.mode}}"
+      class="card-renderer card-renderer-{{@format}} {{this.mode}} {{if this.cardSelected "selected"}}"
       tabindex="0"
       data-test-card-renderer-isolated
       {{on "focus" (action this.cardIsFocused true)}}
+      {{on "blur" (action this.cardIsFocused false)}}
       {{did-insert this.focusElement}}
     >
       <header class="card-renderer-{{@format}}--header">
@@ -34,6 +35,7 @@ Ember Concurrency into the rendering of the card component here.
             @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
             @setPosition={{@setPosition}}
             @selectField={{@selectField}}
+            @selectedField={{@selectedField}}
             @dropField={{@dropField}}
           />
           {{#if (and @dropField (eq @mode "schema")) }}
