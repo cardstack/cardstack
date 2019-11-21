@@ -1,6 +1,6 @@
 import { Registry, Container, inject, getOwner } from '../dependency-injection';
 
-describe("dependency injection", function() {
+describe("hub/dependency-injection", function() {
   let registry: Registry;
   let container: Container;
 

@@ -11,10 +11,15 @@
   "dependencies": {
     "@cardstack/logger": "^0.2.0",
     "@types/koa": "^2.0.52",
-    "koa": "^2.11.0"
+    "@types/koa-route": "^3.2.4",
+    "koa": "^2.11.0",
+    "koa-better-route": "^0.3.0",
+    "koa-compose": "^4.1.0"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.16.0"
+    "@cardstack/eslint-config": "0.16.0",
+    "@types/supertest": "^2.0.8",
+    "supertest": "^4.0.2"
   },
   "engines": {
     "node": ">= 12"
