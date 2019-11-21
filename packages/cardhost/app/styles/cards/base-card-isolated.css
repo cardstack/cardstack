@@ -10,7 +10,7 @@ custom CSS for each card, all cards will inherit the
   color: black;
 }
 
-.card-view .isolated-card.cardstack_base-card {
+.isolated-card.cardstack_base-card.view {
   max-width: 656px;
   margin: 0 auto;
   padding: 50px 30px;
@@ -21,7 +21,7 @@ custom CSS for each card, all cards will inherit the
 }
 
 /* TODO: Move these to event card template css file */
-.card-view .isolated-card.event-card {
+.isolated-card.template_event-card.view {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-areas:
@@ -34,71 +34,71 @@ custom CSS for each card, all cards will inherit the
     "description  description"
 }
 
-.card-view .isolated-card.event-card > .view-field {
+.isolated-card.template_event-card.view > .view-field {
   margin-bottom: 0;
 }
 
-.card-view .isolated-card.event-card > .view-field.field-image {
+.isolated-card.template_event-card.view > .field-image {
   grid-area: image;
   height: 300px;
 }
-.card-view .isolated-card.event-card > .view-field.field-title {
+.isolated-card.template_event-card.view > .field-title {
   grid-area: title;
   margin-bottom: 30px;
 }
-.card-view .isolated-card.event-card > .view-field.field-cta {
+.isolated-card.template_event-card.view > .field-cta {
   grid-area: cta;
 }
-.card-view .isolated-card.event-card > .view-field.field-city {
+.isolated-card.template_event-card.view > .field-city {
   grid-area: city;
 }
-.card-view .isolated-card.event-card > .view-field.field-admission {
+.isolated-card.template_event-card.view > .field-admission {
   grid-area: admission;
 }
-.card-view .isolated-card.event-card > .view-field.field-date {
+.isolated-card.template_event-card.view > .field-date {
   grid-area: date;
   margin-top: 30px;
   padding-top: 30px;
   border-top: 1px solid var(--ch-light-gray-d6);
 }
-.card-view .isolated-card.event-card > .view-field.field-location {
+.isolated-card.template_event-card.view > .field-location {
   grid-area: location;
   margin-top: 30px;
 }
-.card-view .isolated-card.event-card > .view-field.field-description {
+.isolated-card.template_event-card.view > .field-description {
   grid-area: description;
   margin-top: 30px;
 }
 
-.card-view .isolated-card.event-card > .view-field.field-title > .view-field--label,
-.card-view .isolated-card.event-card > .view-field.field-image > .view-field--label,
-.card-view .isolated-card.event-card > .view-field.field-image > .view-field--value,
-.card-view .isolated-card.event-card > .view-field.field-admission > .view-field--label,
-.card-view .isolated-card.event-card > .view-field.field-cta > .view-field--label,
-.card-view .isolated-card.event-card > .view-field.field-city > .view-field--label {
+.isolated-card.template_event-card.view > .field-title > .view-field--label,
+.isolated-card.template_event-card.view > .field-image > .view-field--label,
+.isolated-card.template_event-card.view > .field-image > .view-field--value,
+.isolated-card.template_event-card.view > .field-admission > .view-field--label,
+.isolated-card.template_event-card.view > .field-cta > .view-field--label,
+.isolated-card.template_event-card.view > .field-city > .view-field--label {
   visibility: hidden;
   height: 0;
   padding: 0;
 }
 
-.card-view .isolated-card.event-card > .view-field.field-title > .view-field--value {
+.isolated-card.template_event-card.view > .field-title > .view-field--value {
   font-size: 28px;
   line-height: 36px;
 }
 
-.card-view .isolated-card.event-card > .view-field.field-city > .view-field--value {
+.isolated-card.template_event-card.view > .field-city > .view-field--value {
   opacity: 0.5;
   font-size: 13px;
   line-height: 18px;
 }
 
-.card-view .isolated-card.event-card > .view-field.field-admission > .view-field--value {
+.isolated-card.template_event-card.view > .field-admission > .view-field--value {
   font-size: 13px;
   font-weight: 700;
   line-height: 18px;
 }
 
-.card-view .isolated-card.event-card > .view-field.field-cta > .view-field--value {
+.isolated-card.template_event-card.view > .field-cta > .view-field--value {
   width: 128px;
   height: 35px;
   margin-left: auto;
@@ -112,7 +112,7 @@ custom CSS for each card, all cards will inherit the
   text-align: center;
 }
 
-.card-view .isolated-card.event-card .isolated--hero-image {
+.isolated-card.template_event-card.view .isolated--hero-image {
   display: block;
   max-height: 300px;
   object-fit: cover;

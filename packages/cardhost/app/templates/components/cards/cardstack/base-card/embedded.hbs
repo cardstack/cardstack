@@ -3,7 +3,7 @@
 {{!-- TODO use a sanitized version of the @card.id in the class name after we have css coming from card documents --}}
 <div
   data-test-embedded-card={{@card.name}}
-  class="embedded-card cardstack_base-card"
+  class="embedded-card cardstack_base-card {{@cardId}} {{@mode}}"
 >
   {{#each @card.embeddedFields key="nonce" as | field |}}
     <FieldRenderer @field={{field}} @mode={{@mode}}/>

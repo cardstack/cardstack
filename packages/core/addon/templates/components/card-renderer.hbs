@@ -28,6 +28,8 @@ Ember Concurrency into the rendering of the card component here.
           <Isolated
             @card={{@card}}
             @mode={{this.mode}}
+            @cardId={{this.sanitizedCardId}}
+            @templateId={{this.sanitizedTemplateId}}
             @setFieldValue={{@setFieldValue}}
             @setFieldName={{@setFieldName}}
             @removeField={{@removeField}}
@@ -55,13 +57,21 @@ Ember Concurrency into the rendering of the card component here.
         @route="cards.view"
         @model={{@card.name}}
       >
-        <Embedded @card={{@card}} @mode={{this.mode}}/>
+        <Embedded
+          @card={{@card}}
+          @mode={{this.mode}}
+          @cardId={{this.sanitizedCardId}}
+        />
         {{#if @showName}}
           <div class="embedded-card-label">{{@card.name}}</div>
         {{/if}}
       </LinkTo>
     {{else}}
-      <Embedded @card={{@card}} @mode={{this.mode}}/>
+      <Embedded
+        @card={{@card}}
+        @mode={{this.mode}}
+        @cardId={{this.sanitizedCardId}}
+      />
       {{#if @showName}}
         <div class="embedded-card-label">{{@card.name}}</div>
       {{/if}}
