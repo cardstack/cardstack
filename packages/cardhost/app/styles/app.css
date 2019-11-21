@@ -258,4 +258,7 @@ a:hover {
 .cardhost-monaco-container {
   min-height: 50px;
   margin-bottom: 1em;
+  overflow: hidden;
+  resize: vertical;
+  background-color: #1e1e1e;
 }
