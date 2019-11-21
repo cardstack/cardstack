@@ -80,27 +80,27 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
 
     await click('[data-test-field="title"] [data-test-field-schema-renderer]');
-    assert.dom('[data-test-field="title"] [data-test-field-schema-renderer]').isFocused();
+    assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="title"]').hasClass('selected');
     assert.dom('[data-test-field="title"] [data-test-field-renderer-type]').hasText('@cardstack/core-types::string');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     await click('[data-test-field="body"] [data-test-field-schema-renderer]');
-    assert.dom('[data-test-field="body"] [data-test-field-schema-renderer]').isFocused();
+    assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="body"]').hasClass('selected');
     assert.dom('[data-test-field="body"] [data-test-field-renderer-type]').hasText('@cardstack/core-types::string');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isNotChecked();
 
     await click('[data-test-field="author"] [data-test-field-schema-renderer]');
-    assert.dom('[data-test-field="author"] [data-test-field-schema-renderer]').isFocused();
+    assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="author"]').hasClass('selected');
     assert.dom('[data-test-field="author"] [data-test-field-renderer-type]').hasText('@cardstack/core-types::belongs-to');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     await click('[data-test-field="reviewers"] [data-test-field-schema-renderer]');
-    assert.dom('[data-test-field="reviewers"] [data-test-field-schema-renderer]').isFocused();
+    assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="reviewers"]').hasClass('selected');
     assert.dom('[data-test-field="reviewers"] [data-test-field-renderer-type]').hasText('@cardstack/core-types::has-many');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     await focus('[data-test-card-renderer-isolated]');
-    assert.dom('.field-renderer .schema-field-renderer').isNotFocused();
+    assert.dom('.field-renderer').doesNotHaveClass('selected');
     assert.dom('.card-renderer-isolated--header').hasText('millenial-puppies');
     assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
 
@@ -137,19 +137,19 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea').hasValue('This is the subtitle');
 
     await click('[data-test-field="body"] [data-test-field-schema-renderer]');
-    assert.dom('[data-test-field="body"] [data-test-field-schema-renderer]').isFocused();
+    assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="body"]').hasClass('selected');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('body');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('body');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea').hasValue('');
 
     await click('[data-test-field="subtitle"] [data-test-field-schema-renderer]');
-    assert.dom('[data-test-field="subtitle"] [data-test-field-schema-renderer]').isFocused();
+    assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="subtitle"]').hasClass('selected');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea').hasValue('This is the subtitle');
 
     await dragAndDropNewField('string');
-    assert.dom('[data-test-field="new-field-2"] [data-test-field-schema-renderer]').isFocused();
+    assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="new-field-2"]').hasClass('selected');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('new-field-2');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('new-field-2');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea').hasValue('');
