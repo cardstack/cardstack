@@ -48,7 +48,6 @@ export default class CodeEditor extends Component {
 
   @action
   editorReady() {
-    console.log('READY')
     if (!this.editorIsReady) {
       this.editorIsReady = true;
       if (this.args.editorReady) {
