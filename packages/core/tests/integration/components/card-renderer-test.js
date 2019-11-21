@@ -289,7 +289,7 @@ module('Integration | Component | card-renderer', function(hooks) {
     assert.dom('.embedded-card-label').hasText(card1Id);
   });
 
-  test('isolated card in schema mode is focused on initial render', async function(assert) {
+  test('isolated card in schema mode is selected on initial render', async function(assert) {
     let service = this.owner.lookup('service:data');
     let card = service.createCard(qualifiedCard1Id);
     this.set('card', card);
@@ -302,10 +302,10 @@ module('Integration | Component | card-renderer', function(hooks) {
       />
     `);
 
-    assert.dom('[data-test-card-renderer-isolated]').isFocused();
+    assert.dom('[data-test-card-renderer-isolated]').hasClass('selected');
   });
 
-  test('isolated card in view mode is not focused on initial render', async function(assert) {
+  test('isolated card in view mode is not selected on initial render', async function(assert) {
     let service = this.owner.lookup('service:data');
     let card = service.createCard(qualifiedCard1Id);
     this.set('card', card);
@@ -318,7 +318,7 @@ module('Integration | Component | card-renderer', function(hooks) {
       />
     `);
 
-    assert.dom('[data-test-card-renderer-isolated]').isNotFocused();
+    assert.dom('[data-test-card-renderer-isolated]').doesNotHaveClass('selected');
   });
 
   test('isolated card in edit mode is not focused on initial render', async function(assert) {
@@ -334,7 +334,7 @@ module('Integration | Component | card-renderer', function(hooks) {
       />
     `);
 
-    assert.dom('[data-test-card-renderer-isolated]').isNotFocused();
+    assert.dom('[data-test-card-renderer-isolated]').doesNotHaveClass('selected');
   });
 
   skip('TODO it adds isolated css into the page when rendering an isolated card', async function(/*assert*/) {
