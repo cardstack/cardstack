@@ -1,13 +1,17 @@
 import Koa from 'koa';
 import logger from '@cardstack/logger';
-import JSONAPIMiddleware from './jsonapi-middleware';
 import { Registry, Container } from './dependency-injection';
+
+import JSONAPIMiddleware from './jsonapi-middleware';
+import CardsService from './cards-service';
 
 const log = logger('cardstack/server');
 
 export async function wireItUp() {
   let registry = new Registry();
   registry.register('jsonapi-middleware', JSONAPIMiddleware);
+  registry.register('cards', CardsService);
+
   return new Container(registry);
 }
 

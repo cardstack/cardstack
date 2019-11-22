@@ -13,6 +13,25 @@ describe("hub/jsonapi", function() {
     request = supertest(app.callback());
   });
 
+  it("errors correctly for missing post body", async function() {
+    let response = await request
+      .post("/api/cards")
+      .set("Content-Type", "application/vnd.api+json");
+    expect(response.status).to.equal(400);
+    expect(response.body.errors).has.length(1);
+    expect(response.body.errors[0]).property('detail', 'A JSON:API formatted body is required');
+  });
+
+  it("errors correctly for invalid json", async function() {
+    let response = await request
+      .post("/api/cards")
+      .set("Content-Type", "application/vnd.api+json")
+      .send("{ data ");
+    expect(response.status).to.equal(400);
+    expect(response.body.errors).has.length(1);
+    expect(response.body.errors[0]).property('detail', 'error while parsing body: Unexpected token d in JSON at position 2');
+  });
+
   it("can create card", async function() {
     let response = await request
       .post("/api/cards")

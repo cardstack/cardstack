@@ -3,11 +3,16 @@ import route from "koa-better-route";
 import Koa from "koa";
 // @ts-ignore
 import mimeMatch from "mime-match";
+import KoaBody from 'koa-body';
 import { Memoize } from "typescript-memoize";
+import { inject } from "./dependency-injection";
+import CardstackError from './error';
 
 const apiPrefix = /^\/api\/(.*)/;
 
 export default class JSONAPIMiddleware {
+  cards = inject('cards');
+
   middleware() {
     return (ctxt: Koa.Context, next: Koa.Next) => {
       let m = apiPrefix.exec(ctxt.request.path);
@@ -19,14 +24,27 @@ export default class JSONAPIMiddleware {
       if (this.isJSONAPI(ctxt)) {
         return this.jsonHandlers(ctxt, next);
       } else {
-        throw new Error(`not implemented`);
+        throw new CardstackError(`not implemented`);
       }
     };
   }
 
   @Memoize()
   get jsonHandlers() {
+    let body = KoaBody({
+      jsonLimit: '16mb',
+      multipart: false,
+      urlencoded: false,
+      text: false,
+      jsonStrict: true,
+      onError(error: Error) {
+        throw new CardstackError(`error while parsing body: ${error.message}`, { status: 400 });
+      }
+    });
+
     return compose([
+      CardstackError.withJsonErrorHandling,
+      body,
       //route.get("/cards", getCards),
       route.post("/cards", this.createCard.bind(this))
       // route.get("/cards/:id", getCard),
@@ -49,8 +67,17 @@ export default class JSONAPIMiddleware {
     return isJsonApi || acceptsJsonApi;
   }
 
+  private assertBodyPresent(ctxt: Koa.Context) {
+    if (!ctxt.request.body || !ctxt.request.body.data) {
+      throw new CardstackError('A JSON:API formatted body is required', {
+        status: 400
+      });
+    }
+  }
+
   createCard(ctxt: Koa.Context) {
-    ctxt.body = "Hello world";
+    this.assertBodyPresent(ctxt);
+    ctxt.response.body = "Hello world";
     ctxt.status = 201;
   }
 }
