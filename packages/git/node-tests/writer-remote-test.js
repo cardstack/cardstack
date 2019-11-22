@@ -3,7 +3,7 @@ const {
   Clone,
   Remote,
   Repository,
-  Revwalk
+  logFromCommit
 } = require("../git");
 
 const {
@@ -417,17 +417,11 @@ describe('git/writer-remote/githereum', function() {
 
     let repo = await Repository.open(githereum.repoPath);
     let firstCommitOnMaster = await repo.getMasterCommit();
-    let commitCount = 0;
 
-    await new Promise((resolve, reject) => {
-      let history = firstCommitOnMaster.history(Revwalk.SORT.TIME);
-      history.on("commit", () => commitCount += 1);
-      history.on('end', resolve);
-      history.on('error', reject);
-      history.start();
-    });
+    let history = await logFromCommit(firstCommitOnMaster);
 
-    expect(commitCount).to.equal(2);
+
+    expect(history.length).to.equal(2);
 
     expect(githereum.contract).to.equal(fakeContract);
     expect(githereum.repoName).to.equal("githereum-repo");
