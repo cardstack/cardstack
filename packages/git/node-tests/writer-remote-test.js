@@ -4,7 +4,7 @@ const {
   Remote,
   Repository,
   Revwalk
-} = require('nodegit');
+} = require("../git");
 
 const {
   createDefaultEnvironment,

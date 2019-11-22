@@ -3,7 +3,7 @@ const {
   Branch,
   Reference,
   Commit
-} = require('nodegit');
+} = require('../../git');
 
 
 /* eslint-env node */

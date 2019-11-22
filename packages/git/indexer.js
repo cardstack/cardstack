@@ -69,7 +69,7 @@ const {
   Repository,
   Branch,
   Commit,
-} = require('nodegit');
+} = require('./git');
 
 const Change = require("./change");
 const { safeEntryByName } = require('./mutable-tree');

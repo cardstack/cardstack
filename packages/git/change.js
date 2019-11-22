@@ -7,7 +7,7 @@ const {
   Tree,
   setThreadSafetyStatus,
   TreeEntry: { FILEMODE }
-} = require('nodegit');
+} = require('./git');
 const {
   MutableTree,
   NotFound,

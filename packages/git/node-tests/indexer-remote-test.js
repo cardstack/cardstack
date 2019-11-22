@@ -10,7 +10,7 @@ const { readFileSync } = require('fs');
 const {
   Cred,
   Remote,
-} = require('nodegit');
+} = require("../git");
 
 const service = require('../service');
 

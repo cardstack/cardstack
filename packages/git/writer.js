@@ -2,7 +2,7 @@ const {
   Repository,
   Cred,
   Clone
-} = require('nodegit');
+} = require('./git');
 
 const crypto = require('crypto');
 const Change = require('./change');
