@@ -21,7 +21,7 @@ custom CSS for each card, all cards will inherit the
 }
 
 /* TODO: Move these to event card template css file */
-.isolated-card.template_event-card.view {
+.adopts-event-card {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-areas:
@@ -34,71 +34,71 @@ custom CSS for each card, all cards will inherit the
     "description  description"
 }
 
-.isolated-card.template_event-card.view > .view-field {
+.adopts-event-card > .view-field {
   margin-bottom: 0;
 }
 
-.isolated-card.template_event-card.view > .field-image {
+.adopts-event-card > .field-image {
   grid-area: image;
   height: 300px;
 }
-.isolated-card.template_event-card.view > .field-title {
+.adopts-event-card > .field-title {
   grid-area: title;
   margin-bottom: 30px;
 }
-.isolated-card.template_event-card.view > .field-cta {
+.adopts-event-card > .field-cta {
   grid-area: cta;
 }
-.isolated-card.template_event-card.view > .field-city {
+.adopts-event-card > .field-city {
   grid-area: city;
 }
-.isolated-card.template_event-card.view > .field-admission {
+.adopts-event-card > .field-admission {
   grid-area: admission;
 }
-.isolated-card.template_event-card.view > .field-date {
+.adopts-event-card > .field-date {
   grid-area: date;
   margin-top: 30px;
   padding-top: 30px;
   border-top: 1px solid var(--ch-light-gray-d6);
 }
-.isolated-card.template_event-card.view > .field-location {
+.adopts-event-card > .field-location {
   grid-area: location;
   margin-top: 30px;
 }
-.isolated-card.template_event-card.view > .field-description {
+.adopts-event-card > .field-description {
   grid-area: description;
   margin-top: 30px;
 }
 
-.isolated-card.template_event-card.view > .field-title > .view-field--label,
-.isolated-card.template_event-card.view > .field-image > .view-field--label,
-.isolated-card.template_event-card.view > .field-image > .view-field--value,
-.isolated-card.template_event-card.view > .field-admission > .view-field--label,
-.isolated-card.template_event-card.view > .field-cta > .view-field--label,
-.isolated-card.template_event-card.view > .field-city > .view-field--label {
+.adopts-event-card > .field-title > .view-field--label,
+.adopts-event-card > .field-image > .view-field--label,
+.adopts-event-card > .field-image > .view-field--value,
+.adopts-event-card > .field-admission > .view-field--label,
+.adopts-event-card > .field-cta > .view-field--label,
+.adopts-event-card > .field-city > .view-field--label {
   visibility: hidden;
   height: 0;
   padding: 0;
 }
 
-.isolated-card.template_event-card.view > .field-title > .view-field--value {
+.adopts-event-card > .field-title > .view-field--value {
   font-size: 28px;
   line-height: 36px;
 }
 
-.isolated-card.template_event-card.view > .field-city > .view-field--value {
+.adopts-event-card > .field-city > .view-field--value {
   opacity: 0.5;
   font-size: 13px;
   line-height: 18px;
 }
 
-.isolated-card.template_event-card.view > .field-admission > .view-field--value {
+.adopts-event-card > .field-admission > .view-field--value {
   font-size: 13px;
   font-weight: 700;
   line-height: 18px;
 }
 
-.isolated-card.template_event-card.view > .field-cta > .view-field--value {
+.adopts-event-card > .field-cta > .view-field--value {
   width: 128px;
   height: 35px;
   margin-left: auto;
@@ -112,7 +112,7 @@ custom CSS for each card, all cards will inherit the
   text-align: center;
 }
 
-.isolated-card.template_event-card.view .isolated--hero-image {
+.adopts-event-card .isolated--hero-image {
   display: block;
   max-height: 300px;
   object-fit: cover;

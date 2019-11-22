@@ -41,31 +41,11 @@ export default class CardRenderer extends Component {
     return this.componentName.replace(/@/g, '');
   }
 
-  get sanitizedCardId() {
-    return this.cardId.replace(/local-hub::/g, '');
-  }
-
-  get sanitizedTemplateId() {
-    return this.templateId.replace(/local-hub::/g, '');
-  }
-
   get embeddedComponentName() {
     return `cards/${dasherize(this.sanitizedName)}/embedded`;
   }
 
   get isolatedComponentName() {
     return `cards/${dasherize(this.sanitizedName)}/isolated`;
-  }
-
-  get cardId() {
-    return this.args.card.id;
-  }
-
-  get templateId() {
-    if (!this.args.card.adoptedFrom || this.args.card.adoptedFrom.name === '@cardstack/base-card') {
-      return this.cardId;
-    }
-
-    return this.args.card.adoptedFrom.id;
   }
 }

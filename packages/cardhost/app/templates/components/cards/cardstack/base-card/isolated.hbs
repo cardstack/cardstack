@@ -1,16 +1,8 @@
 {{!-- TODO move this into the @cardstack/base-card package when we support runtime js compilation --}}
 
 {{!-- TODO use a sanitized version of the @card.id in the class name after we have css coming from card documents --}}
-<div
-  data-test-isolated-card={{@card.name}}
-  class="isolated-card cardstack_base-card template_{{@templateId}} {{@cardId}} {{@mode}}"
->
+<div class="isolated-card {{@mode}}" data-test-isolated-card={{@card.name}}>
   {{#each @card.isolatedFields key="nonce" as |field|}}
-    {{!-- TODO: This is here temporarily until we have a better solution for rendering images --}}
-    {{#if (eq field.name "image")}}
-      <img src={{field.value}} alt="" width="100%" class="isolated--hero-image">
-    {{/if}}
-
     {{#if @setFieldValue}}
       <FieldRenderer
         @field={{field}}
