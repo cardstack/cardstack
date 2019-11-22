@@ -17,6 +17,9 @@ const {
   TreeEntry: { FILEMODE },
 } = require("nodegit");
 
+// This is supposed to enable thread-safe locking around all async
+// operations.
+setThreadSafetyStatus(1);
 
 module.exports = {
   Blob,
@@ -29,7 +32,6 @@ module.exports = {
   Repository,
   Reset,
   Revwalk,
-  setThreadSafetyStatus,
   Signature,
   Tree,
   Treebuilder,

@@ -5,7 +5,6 @@ const {
   Repository,
   Signature,
   Tree,
-  setThreadSafetyStatus,
   TreeEntry: { FILEMODE }
 } = require('./git');
 const {
@@ -17,10 +16,6 @@ const moment = require('moment-timezone');
 const crypto = require('crypto');
 const delay = require('delay');
 const log = require('@cardstack/logger')('cardstack/git');
-
-// This is supposed to enable thread-safe locking around all async
-// operations.
-setThreadSafetyStatus(1);
 
 
 class Change {
