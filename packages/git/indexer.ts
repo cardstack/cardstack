@@ -65,112 +65,134 @@
 
 */
 
-const { Repository, Branch, Commit } = require('nodegit');
+import {
+  Repository,
+  Branch,
+  Commit,
+  RemoteConfig,
+  TreeEntry
+} from "./git";
 
-const Change = require('./change');
-const { safeEntryByName } = require('./mutable-tree');
-const log = require('@cardstack/logger')('cardstack/git');
-const service = require('./service');
-const { set, intersection } = require('lodash');
+import Change from "./change";
+import { safeEntryByName } from './mutable-tree';
+import logger from "@cardstack/logger";
+const log = logger('cardstack/git');
+import service from "./service";
+import { set, intersection } from 'lodash';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 const { isInternalCard, adoptionChain } = require('@cardstack/plugin-utils/card-utils');
+// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 const { declareInjections } = require('@cardstack/di');
+// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 const Session = require('@cardstack/plugin-utils/session');
+
+import { todo } from '@cardstack/plugin-utils/todo-any';
 
 const defaultBranch = 'master';
 
-module.exports = declareInjections(
-  {
-    searchers: 'hub:searchers',
-  },
+interface IndexerSettings {
+  dataSource: todo;
+  repo: string;
+  basePath: string;
+  branchPrefix: string;
+  remote: RemoteConfig;
+  searchers: todo;
+}
 
-  class Indexer {
-    static create(params) {
-      return new this(params);
+module.exports = declareInjections({
+  searchers: 'hub:searchers',
+},
+
+class Indexer {
+  static create(params: IndexerSettings) { return new this(params); }
+
+  dataSource: todo;
+  repoPath?: string;
+  cardTypes: string[];
+  basePath:  todo[];;
+  branchPrefix?: string;
+  remote?: RemoteConfig;
+  searchers: todo;
+  repo?: Repository;
+  __owner__: todo;
+
+  constructor({ dataSource, repo, basePath, branchPrefix, remote, searchers }: IndexerSettings) {
+    if (repo && remote) {
+      throw new Error('You cannot define the params \'remote\' and \'repo\' at the same time for this data source');
     }
+    this.repoPath = repo;
+    this.searchers = searchers;
+    this.cardTypes = dataSource.cardTypes || [];
+    this.branchPrefix = branchPrefix || "";
+    this.basePath = basePath ? basePath.split('/') : [];
+    this.remote = remote;
+  }
 
-    constructor({ dataSource, repo, basePath, branchPrefix, remote, searchers }) {
-      if (repo && remote) {
-        throw new Error("You cannot define the params 'remote' and 'repo' at the same time for this data source");
-      }
-      this.repoPath = repo;
-      this.searchers = searchers;
-      this.cardTypes = dataSource.cardTypes || [];
-      this.branchPrefix = branchPrefix || '';
-      this.basePath = basePath ? basePath.split('/') : [];
-      this.repo = null;
-      this.remote = remote;
-    }
-
-    async _ensureRepo() {
-      if (!this.repo) {
-        if (this.remote) {
-          log.info('Getting remote repo for %s from service', this.remote.url);
-          this.repo = await service.getRepo(this.remote.url, this.remote);
-          return;
-        }
-
-        try {
-          this.repo = await Repository.open(this.repoPath);
-        } catch (e) {
-          if (/(could not find repository from|Failed to resolve path)/i.test(e.message)) {
-            let change = await Change.createInitial(this.repoPath, 'master');
-            this.repo = change.repo;
-
-            await change.finalize({
-              message: 'First commit',
-              authorName: 'Cardstack Hub',
-              authorEmail: 'hub@cardstack.com',
-            });
-          } else {
-            throw e;
-          }
-        }
-      }
-    }
-
-    async beginUpdate() {
-      log.debug(`starting beginUpdate()`);
-      await this._ensureRepo();
-
-      let targetBranch = this.branchPrefix + defaultBranch;
-
+  async _ensureRepo() {
+    if (!this.repo) {
       if (this.remote) {
-        await service.pullRepo(this.remote.url, targetBranch);
+        log.info('Getting remote repo for %s from service', this.remote.url);
+        this.repo = await service.getRepo(this.remote.url, this.remote);
+        return;
       }
-      log.debug(`ending beginUpdate()`);
 
-      return new GitUpdater(
-        this.repo,
-        targetBranch,
-        this.repoPath,
-        this.basePath,
-        this.searchers,
-        this.cardTypes,
-        this.__owner__
-      );
+      try {
+        this.repo = await Repository.open(this.repoPath!);
+      } catch (e) {
+        if (/(could not find repository from|Failed to resolve path)/i.test(e.message)) {
+
+          let change = await Change.createInitial(this.repoPath!, 'master');
+          this.repo = change.repo;
+
+          await change.finalize({
+            message: 'First commit',
+            authorName: 'Cardstack Hub',
+            authorEmail: 'hub@cardstack.com',
+          });
+        } else {
+          throw e;
+        }
+      }
     }
   }
-);
+
+  async beginUpdate() {
+    log.debug(`starting beginUpdate()`);
+    await this._ensureRepo();
+
+    let targetBranch = this.branchPrefix + defaultBranch;
+
+    if (this.remote) {
+      await service.pullRepo(this.remote.url, targetBranch);
+    }
+    log.debug(`ending beginUpdate()`);
+
+    return new GitUpdater(this.repo!, targetBranch, this.basePath, this.searchers, this.cardTypes, this.__owner__);
+  }
+});
 
 class GitUpdater {
-  constructor(repo, branch, repoPath, basePath, searchers, cardTypes, owner) {
-    this.cardTypes = cardTypes;
-    this.repo = repo;
-    this.basePath = basePath;
-    this.branch = branch;
-    this.searchers = searchers;
-    this.owner = owner;
-    this.commit = null;
-    this.commitId = null;
-    this.rootTree = null;
+  commit?: Commit;
+  commitId?: string;
+  rootTree: todo;
+
+  constructor(
+    readonly repo: Repository,
+    readonly branch: string,
+    readonly basePath: todo[],
+    readonly searchers: todo,
+    readonly cardTypes: string[],
+    readonly owner: todo) {
   }
 
   async schema() {
-    let models = [];
+    let models: todo[] = [];
+
     let ops = new Gather(models);
     await this._loadCommit();
     await this._indexTree(ops, null, this.rootTree, {
-      only: this.basePath.concat(['schema']),
+      only: this.basePath.concat(['schema'])
     });
     return models.map(m => m.data);
   }
@@ -185,19 +207,17 @@ class GitUpdater {
     }
   }
 
-  async getInternalCard(cardId) {
+  async getInternalCard(cardId: string) {
     let card;
     try {
       card = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', cardId, cardId);
     } catch (err) {
-      if (err.status !== 404) {
-        throw err;
-      }
+      if (err.status !== 404) { throw err; }
     }
     return card;
   }
 
-  async updateContent(meta, hints, ops) {
+  async updateContent(meta: todo, hints: todo[], ops: todo) {
     log.debug(`starting updateContent()`);
     await this._loadCommit();
     let originalTree;
@@ -206,23 +226,21 @@ class GitUpdater {
         let oldCommit = await Commit.lookup(this.repo, meta.commit);
         originalTree = await oldCommit.getTree();
       } catch (err) {
-        log.warn(
-          `Unable to load previously indexed commit ${meta.commit} due to ${err}. We will recover by reindexing all content.`
-        );
+        log.warn(`Unable to load previously indexed commit ${meta.commit} due to ${err}. We will recover by reindexing all content.`);
       }
     }
     if (!originalTree) {
       await ops.beginReplaceAll();
     }
     await this._indexTree(ops, originalTree, this.rootTree, {
-      only: this.basePath.concat([['schema', 'contents', 'cards']]),
+      only: this.basePath.concat([['schema', 'contents', 'cards']])
     });
     if (!originalTree) {
       await ops.finishReplaceAll();
     }
     log.debug(`completed updateContent()`);
     return {
-      commit: this.commitId,
+      commit: this.commitId
     };
   }
 
@@ -236,12 +254,12 @@ class GitUpdater {
     }
   }
 
-  async _commitAtBranch(branchName) {
+  async _commitAtBranch(branchName: string) {
     let branch = await Branch.lookup(this.repo, branchName, Branch.BRANCH.LOCAL);
     return Commit.lookup(this.repo, branch.target());
   }
 
-  async _indexTree(ops, oldTree, newTree, filter) {
+  async _indexTree(ops: todo, oldTree: todo, newTree: todo, filter?: todo) {
     let seen = new Map();
     if (newTree) {
       for (let newEntry of newTree.entries()) {
@@ -266,7 +284,7 @@ class GitUpdater {
     }
   }
 
-  async _indexEntry(ops, name, oldTree, newEntry, filter) {
+  async _indexEntry(ops: todo, name: string, oldTree: todo, newEntry: todo, filter: todo) {
     let oldEntry;
     if (oldTree) {
       oldEntry = safeEntryByName(oldTree, name);
@@ -280,7 +298,7 @@ class GitUpdater {
     if (newEntry.isTree()) {
       await this._indexTree(
         ops,
-        oldEntry && oldEntry.isTree() ? await oldEntry.getTree() : null,
+        oldEntry && oldEntry.isTree() ? (await oldEntry.getTree()) : null,
         await newEntry.getTree(),
         nextFilter(filter)
       );
@@ -291,7 +309,7 @@ class GitUpdater {
         if (isInternalCard(type, id)) {
           await this._ensureBaseCard();
 
-          let chain = (await adoptionChain(doc, this.getInternalCard.bind(this))).map(i => i.data.id);
+          let chain = (await adoptionChain(doc, this.getInternalCard.bind(this))).map( (i: todo) => i.data.id);
           if (!intersection(this.cardTypes, chain).length) {
             return;
           }
@@ -304,7 +322,7 @@ class GitUpdater {
     }
   }
 
-  async _deleteEntry(ops, oldEntry, filter) {
+  async _deleteEntry(ops: todo, oldEntry: todo, filter: todo) {
     if (oldEntry.isTree()) {
       await this._indexTree(ops, await oldEntry.getTree(), nextFilter(filter));
     } else {
@@ -313,14 +331,14 @@ class GitUpdater {
     }
   }
 
-  async _entryToDoc(type, id, entry) {
+  async _entryToDoc(type: string, id: string, entry: todo) {
     entry.isBlob();
     let contents = (await entry.getBlob()).content().toString('utf8');
     let doc;
     try {
       doc = JSON.parse(contents);
     } catch (err) {
-      log.warn('Ignoring record with invalid json at %s', entry.path());
+      log.warn("Ignoring record with invalid json at %s", entry.path());
       return;
     }
 
@@ -348,7 +366,7 @@ class GitUpdater {
   }
 }
 
-function identify(entry) {
+function identify(entry: TreeEntry) {
   let type, id;
   let parts = entry.path().split('/');
   if (parts[0] === 'cards' && parts.length > 1) {
@@ -363,10 +381,10 @@ function identify(entry) {
 }
 
 class Gather {
-  constructor(models) {
-    this.models = models;
+
+  constructor(readonly models: todo[]) {
   }
-  save(type, id, document) {
+  save(type: string, id: string, document: todo) {
     if (!isInternalCard(type, id)) {
       document.type = type;
       document.id = id;
@@ -375,17 +393,13 @@ class Gather {
   }
 }
 
-function filterAllows(filter, name) {
-  return (
-    !filter ||
-    !filter.only ||
-    filter.only.length === 0 ||
+function filterAllows(filter: todo, name: string) {
+  return !filter || !filter.only || filter.only.length === 0 ||
     (Array.isArray(filter.only[0]) && filter.only[0].includes(name)) ||
-    name === filter.only[0]
-  );
+    name === filter.only[0];
 }
 
-function nextFilter(filter) {
+function nextFilter(filter: todo) {
   if (!filter || !filter.only || filter.only.length < 2) {
     return null;
   }
