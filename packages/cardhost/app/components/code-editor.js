@@ -106,9 +106,10 @@ export default class CodeEditor extends Component {
 
   @restartableTask
   * startResizeWatcher (wrapper) {
+    wrapper.style['padding-bottom'] = '20px';
+
     let { offsetWidth, offsetHeight } = wrapper;
 
-    wrapper.style['padding-bottom'] = '20px';
     while (true) {
       yield timeout(this.resizeCheckIntervalMs);
 
