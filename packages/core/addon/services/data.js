@@ -196,8 +196,9 @@ class Card {
 
   get adoptedFromId() {
     let internal = priv.get(this);
-    if (internal.adoptedFrom) {
-      return internal.adoptedFrom.id;
+    let adoptedFromId;
+    if ((adoptedFromId = get(internal, "adoptedFrom.id"))) {
+      return adoptedFromId;
     }
 
     let cardJson =
@@ -207,8 +208,11 @@ class Card {
     return get(cardJson, `data.relationships.adopted-from.data.id`) || baseCard;
   }
 
-  getAdoptedFromName() {
-    return this.adoptedId.split(cardIdDelim)[1];
+  get adoptedFromName() {
+    if (!this.adoptedFromId) {
+      return null;
+    }
+    return this.adoptedFromId.split(cardIdDelim)[1];
   }
 
   get adoptedFrom() {

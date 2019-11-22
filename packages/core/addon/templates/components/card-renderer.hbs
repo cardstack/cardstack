@@ -9,10 +9,9 @@ Ember Concurrency into the rendering of the card component here.
     <section
       class="card-renderer-{{@format}}
         {{this.mode}}
-        {{safe-css-string @card.adoptedFrom.name}}
+        {{safe-css-string @card.adoptedFromName}}
         {{safe-css-string @card.name}}
-        {{if @cardSelected "selected"}}
-      "
+        {{if @cardSelected "selected"}}"
       tabindex="0"
       data-test-card-renderer-isolated
       {{on "focus" (action this.cardIsFocused true)}}
@@ -56,7 +55,7 @@ Ember Concurrency into the rendering of the card component here.
   {{#let (component this.embeddedComponentName) as | Embedded |}}
     <div
       class="card-renderer-embedded
-        {{concat "adopts-" (safe-css-string @card.adoptedFrom.name)}}
+        {{concat "adopts-" (safe-css-string @card.adoptedFromName)}}
         {{safe-css-string @card.name}}
       "
     >
