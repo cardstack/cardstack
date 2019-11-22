@@ -2,7 +2,7 @@
 // not-yet-written tree. But you can't recursively put a Treebuilder
 // inside a Treebuilder. That's where this class comes in.
 
-const { Treebuilder, Blob, FILEMODE } = require('./git');
+const { Treebuilder, FILEMODE } = require('./git');
 
 const tombstone = {};
 
@@ -105,7 +105,7 @@ class MutableBlob {
     return this.buffer;
   }
   async write() {
-    return Blob.createFromBuffer(this.repo, this.buffer, this.buffer.length);
+    return this.repo.createBlobFromBuffer(this.buffer);
   }
 }
 

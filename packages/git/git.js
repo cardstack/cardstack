@@ -1,5 +1,4 @@
 const {
-  Blob,
   Branch,
   Clone,
   Commit,
@@ -22,7 +21,6 @@ const {
 setThreadSafetyStatus(1);
 
 module.exports = {
-  Blob,
   Branch,
   Clone,
   Commit,
