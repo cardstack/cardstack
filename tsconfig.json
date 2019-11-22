@@ -9,7 +9,9 @@
     "sourceMap": true,
     "experimentalDecorators": true,
     "allowUnreachableCode": false,
-    "strict": true
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
   },
   "exclude": [
     "node_modules",
