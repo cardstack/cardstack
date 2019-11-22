@@ -1,5 +1,5 @@
 import compose from "koa-compose";
-import route from "koa-better-route";
+import route, { KoaRoute } from "koa-better-route";
 import Koa from "koa";
 // @ts-ignore
 import mimeMatch from "mime-match";
@@ -7,15 +7,17 @@ import KoaBody from 'koa-body';
 import { Memoize } from "typescript-memoize";
 import { inject } from "./dependency-injection";
 import CardstackError from './error';
+import Card from "./card";
 
-const apiPrefix = /^\/api\/(.*)/;
+const apiPrefix = '/api';
+const apiPrefixPattern = new RegExp(`^${apiPrefix}/(.*)`);
 
 export default class JSONAPIMiddleware {
   cards = inject('cards');
 
   middleware() {
     return (ctxt: Koa.Context, next: Koa.Next) => {
-      let m = apiPrefix.exec(ctxt.request.path);
+      let m = apiPrefixPattern.exec(ctxt.request.path);
       if (!m) {
         return next();
       }
@@ -46,7 +48,7 @@ export default class JSONAPIMiddleware {
       CardstackError.withJsonErrorHandling,
       body,
       //route.get("/cards", getCards),
-      route.post("/cards", this.createCard.bind(this))
+      route.post("/cards/:realm", this.createCard.bind(this))
       // route.get("/cards/:id", getCard),
       // route.patch("/cards/:id", updateCard),
       // route.delete("/cards/:id", deleteCard)
@@ -75,10 +77,24 @@ export default class JSONAPIMiddleware {
     }
   }
 
-  createCard(ctxt: Koa.Context) {
+  createCard(ctxt: KoaRoute.Context) {
     this.assertBodyPresent(ctxt);
-    ctxt.response.body = "Hello world";
+    let realm = ctxt.routeParams.realm;
+    let card: Card = {
+      id: 'bogus',
+      realm,
+      asJSONAPI() {
+        return {
+          data: {
+            type: 'cards',
+            id: 'realm::bogus',
+          }
+        }
+      }
+    };
+    ctxt.body = card.asJSONAPI();
     ctxt.status = 201;
+    ctxt.set('location', `${ctxt.request.origin}${apiPrefix}/cards/${card.realm}/${card.id}`);
   }
 }
 

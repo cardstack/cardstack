@@ -15,7 +15,7 @@ describe("hub/jsonapi", function() {
 
   it("errors correctly for missing post body", async function() {
     let response = await request
-      .post("/api/cards")
+      .post("/api/cards/some-realm")
       .set("Content-Type", "application/vnd.api+json");
     expect(response.status).to.equal(400);
     expect(response.body.errors).has.length(1);
@@ -34,11 +34,10 @@ describe("hub/jsonapi", function() {
 
   it("can create card", async function() {
     let response = await request
-      .post("/api/cards")
+      .post("/api/cards/my-realm")
       .set("Content-Type", "application/vnd.api+json")
       .send({
         data: {
-          id: "local-hub::new-card-476650",
           type: "cards",
           relationships: {
             "adopted-from": {
@@ -71,5 +70,6 @@ describe("hub/jsonapi", function() {
         }
       });
     expect(response.status).to.equal(201);
+    expect(response.header.location).to.match(/http:\/\/[^/]+\/api\/cards\/my-realm\/[^/]+/);
   });
 });
