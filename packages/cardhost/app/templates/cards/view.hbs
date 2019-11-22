@@ -20,7 +20,9 @@
   </button>
 </div>
 
-<CardhostLeftEdge />
+{{#unless this.cssModeToggle.editingCss}}
+  <CardhostLeftEdge />
+{{/unless}}
 
 <section class="card-view" data-test-card-view={{this.model.name}}>
   <CardRenderer
@@ -37,3 +39,15 @@
   />
 </section>
 
+
+{{#if this.cssModeToggle.editingCss}}
+  <section class="cardhost-card-theme-editor">
+    <h3>Card Theme Editor</h3>
+    <CodeEditor
+      @code=".a {}"
+      @language="css"
+      @readOnly={{false}}
+      @resizable={{true}}
+    />
+  </section>
+{{/if}}
