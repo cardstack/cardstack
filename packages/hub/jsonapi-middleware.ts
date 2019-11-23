@@ -7,7 +7,7 @@ import KoaBody from 'koa-body';
 import { Memoize } from "typescript-memoize";
 import { inject } from "./dependency-injection";
 import CardstackError from './error';
-import Card from "./card";
+import { SessionContext } from "./authentication-middleware";
 
 const apiPrefix = '/api';
 const apiPrefixPattern = new RegExp(`^${apiPrefix}/(.*)`);
@@ -16,7 +16,7 @@ export default class JSONAPIMiddleware {
   cards = inject('cards');
 
   middleware() {
-    return (ctxt: Koa.Context, next: Koa.Next) => {
+    return (ctxt: Koa.ParameterizedContext<SessionContext>, next: Koa.Next) => {
       let m = apiPrefixPattern.exec(ctxt.request.path);
       if (!m) {
         return next();
@@ -77,21 +77,9 @@ export default class JSONAPIMiddleware {
     }
   }
 
-  createCard(ctxt: KoaRoute.Context) {
+  async createCard(ctxt: KoaRoute.Context<SessionContext>) {
     this.assertBodyPresent(ctxt);
-    let realm = ctxt.routeParams.realm;
-    let card: Card = {
-      id: 'bogus',
-      realm,
-      asJSONAPI() {
-        return {
-          data: {
-            type: 'cards',
-            id: 'realm::bogus',
-          }
-        }
-      }
-    };
+    let card = await this.cards.create(ctxt.state.cardstackSession, ctxt.routeParams.realm, ctxt.body);
     ctxt.body = card.asJSONAPI();
     ctxt.status = 201;
     ctxt.set('location', `${ctxt.request.origin}${apiPrefix}/cards/${card.realm}/${card.id}`);

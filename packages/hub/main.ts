@@ -4,14 +4,15 @@ import { Registry, Container } from './dependency-injection';
 
 import JSONAPIMiddleware from './jsonapi-middleware';
 import CardsService from './cards-service';
+import AuthenticationMiddleware from './authentication-middleware';
 
 const log = logger('cardstack/server');
 
 export async function wireItUp() {
   let registry = new Registry();
+  registry.register('authentication-middleware', AuthenticationMiddleware);
   registry.register('jsonapi-middleware', JSONAPIMiddleware);
   registry.register('cards', CardsService);
-
   return new Container(registry);
 }
 
@@ -22,6 +23,7 @@ export async function makeServer(container?: Container) {
   let app = new Koa();
   app.use(cors);
   app.use(httpLogging);
+  app.use((await container.lookup('authentication-middleware')).middleware());
   app.use((await container.lookup('jsonapi-middleware')).middleware());
   return app;
 }

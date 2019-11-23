@@ -27,7 +27,7 @@ module.exports = {
     "@typescript-eslint/no-object-literal-type-assertion": "error",
     "@typescript-eslint/no-triple-slash-reference": "error",
     "no-unused-vars": "off",
-    "@typescript-eslint/no-unused-vars": "error",
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     "@typescript-eslint/no-var-requires": "error",
     "@typescript-eslint/prefer-interface": "error",
     "@typescript-eslint/prefer-namespace-keyword": "error",
