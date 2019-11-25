@@ -4,6 +4,7 @@ import * as monaco from 'monaco-editor';
 import { action } from '@ember/object';
 import { restartableTask } from "ember-concurrency-decorators";
 import { timeout } from "ember-concurrency";
+import ENV from '@cardstack/cardhost/config/environment'
 
 /**
  * <CodeEditor> takes the following arguments:
@@ -27,8 +28,8 @@ export default class CodeEditor extends Component {
 
   constructor(...args) {
     super(...args);
-
-    this.resizable = (this.args.resizable === true) ? true : false;
+    let notTesting = ENV.environment !== 'test'; // disable resize loops in testing
+    this.resizable = (this.args.resizable === true && notTesting) ? true : false;
   }
 
   // Set default debounce in milliseconds.

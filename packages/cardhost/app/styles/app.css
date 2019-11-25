@@ -102,6 +102,10 @@ a:hover {
   cursor: pointer;
 }
 
+.padding-vertical-small {
+  padding-top: var(--ch-spacing);
+  padding-bottom: var(--ch-spacing);
+}
 
 /* Index template */
 .cardhost--topnav {

@@ -41,7 +41,7 @@
 
 
 {{#if this.cssModeToggle.editingCss}}
-  <section class="cardhost-card-theme-editor">
+  <section class="cardhost-card-theme-editor" data-test-theme-editor>
     <h3>Card Theme Editor</h3>
     <CodeEditor
       @code=".a {}"
@@ -50,4 +50,27 @@
       @resizable={{true}}
     />
   </section>
+{{else}}
+  <RightEdge
+    @card={{this.card}}
+  >
+    <div class="right-edge--section">
+      <div class="right-edge--section-header" data-test-section-header>
+        Appearance
+        <div class="padding-vertical-small">
+          <Dropdown
+            @label="Choose a theme:"
+            @options={{this.themerOptions}}
+            @handleChange={{this.handleThemeChange}}
+          />
+        </div>
+        <button {{on "click" this.createTheme}}
+          class="ch-button"
+          data-test-card-custom-style-button
+        >
+          New Custom Style
+        </button>
+      </div>
+    </div>
+  </RightEdge>
 {{/if}}
