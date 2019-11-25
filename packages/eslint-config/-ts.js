@@ -8,6 +8,8 @@ module.exports = {
     // this doesn't need to be replaced.
     "no-dupe-class-members": "off",
 
+    "semi": "off",
+    "@typescript-eslint/semi": ["error"],
     "@typescript-eslint/adjacent-overload-signatures": "error",
     "@typescript-eslint/array-type": "error",
     "@typescript-eslint/ban-types": "error",
