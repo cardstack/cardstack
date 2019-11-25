@@ -1,11 +1,22 @@
-  <section class="cardhost-card-theme-editor {{if (eq this.dockLocation "bottom") "bottom-docked"}}">
+  <section  class="cardhost-card-theme-editor {{if (eq this.dockLocation "bottom") "bottom-docked"}}">
     <div {{on "click" this.dockRight}}>right</div>
     <div {{on "click" this.dockBottom}}>bottom</div>
     <h3>Card Theme Editor</h3>
     <CodeEditor
-      @code=".a {}"
+      @code={{@model.isolatedCss}}
       @language="css"
       @readOnly={{false}}
       @resizable={{true}}
+      @updateCode={{action "updateCode"}}
+    />
+
+    <h3>HTML Viewer</h3>
+    <CodeEditor
+      @code={{this.markup}}
+      @language="handlebars"
+      @readOnly={{true}}
+      @resizable={{true}}
     />
   </section>
+
+<style id="card-styles" {{did-insert this.preview}}></style>
