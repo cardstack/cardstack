@@ -1,124 +1,30 @@
 /*
-".cardstack_base-card" is the sanitized @card.id for the
-card for which this css applies. Until we begin to support
-custom CSS for each card, all cards will inherit the
-@cardstack/base-card css.
+Until we begin to support custom CSS for each card,
+all cards will inherit the @cardstack/base-card css.
 */
 .isolated-card.cardstack_base-card {
-  /* This is just placeholder CSS to test that everuthing works--please change as necessary */
+  --card-width: 656px;
+  --hero-image-height: 300px;
+
+  width: var(--card-width);
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 50px 30px;
   background-color: white;
   color: black;
 }
 
-.isolated-card.cardstack_base-card.view {
-  max-width: 656px;
-  margin: 0 auto;
-  padding: 50px 30px;
-}
-
-.isolated-card.cardstack_base-card .isolated--hero-image {
-  display: none;
-}
-
-/* TODO: Move these to event card template css file */
-.adopts-event-card {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-areas:
-    "image        image"
-    "title        title"
-    "city         cta"
-    "admission    cta"
-    "date         date"
-    "location     location"
-    "description  description"
-}
-
-.adopts-event-card > .view-field {
-  margin-bottom: 0;
-}
-
-.adopts-event-card > .field-image {
-  grid-area: image;
-  height: 300px;
-}
-.adopts-event-card > .field-title {
-  grid-area: title;
-  margin-bottom: 30px;
-}
-.adopts-event-card > .field-cta {
-  grid-area: cta;
-}
-.adopts-event-card > .field-city {
-  grid-area: city;
-}
-.adopts-event-card > .field-admission {
-  grid-area: admission;
-}
-.adopts-event-card > .field-date {
-  grid-area: date;
-  margin-top: 30px;
-  padding-top: 30px;
-  border-top: 1px solid var(--ch-light-gray-d6);
-}
-.adopts-event-card > .field-location {
-  grid-area: location;
-  margin-top: 30px;
-}
-.adopts-event-card > .field-description {
-  grid-area: description;
-  margin-top: 30px;
-}
-
-.adopts-event-card > .field-title > .view-field--label,
-.adopts-event-card > .field-image > .view-field--label,
-.adopts-event-card > .field-image > .view-field--value,
-.adopts-event-card > .field-admission > .view-field--label,
-.adopts-event-card > .field-cta > .view-field--label,
-.adopts-event-card > .field-city > .view-field--label {
+.isolated-card.view.cardstack_base-card .field-image {
   visibility: hidden;
+  width: 0;
   height: 0;
-  padding: 0;
 }
 
-.adopts-event-card > .field-title > .view-field--value {
-  font-size: 28px;
-  line-height: 36px;
-}
-
-.adopts-event-card > .field-city > .view-field--value {
-  opacity: 0.5;
-  font-size: 13px;
-  line-height: 18px;
-}
-
-.adopts-event-card > .field-admission > .view-field--value {
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 18px;
-}
-
-.adopts-event-card > .field-cta > .view-field--value {
-  width: 128px;
-  height: 35px;
-  margin-left: auto;
-  padding: 10px 15px;
-  border-radius: 5px;
-  background-color: var(--ch-blue);
-  color: white;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 18px;
-  text-align: center;
-}
-
-.adopts-event-card .isolated--hero-image {
+.isolated-card--hero-image {
   display: block;
-  max-height: 300px;
-  object-fit: cover;
-  object-position: center;
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
+  height: var(--hero-image-height);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }

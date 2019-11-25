@@ -62,39 +62,47 @@ let eventCardTemplate = eventFactory.getDocumentFor(
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
         'needed-when-embedded': true,
+        'required': true,
         caption: 'Event name'
       }),
       eventFactory.addResource('fields', 'date').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::date',
         'needed-when-embedded': true,
+        'required': true,
         caption: 'Date & Time'
       }),
       eventFactory.addResource('fields', 'image').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
+        'required': true,
         'needed-when-embedded': true
       }),
       eventFactory.addResource('fields', 'cta').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
+        'required': true,
         caption: 'CTA Text'
       }),
       eventFactory.addResource('fields', 'location').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
+        'required': true,
       }),
       eventFactory.addResource('fields', 'city').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
+        'required': true,
       }),
       eventFactory.addResource('fields', 'admission').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
+        'required': true,
       }),
       eventFactory.addResource('fields', 'description').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
+        'required': true,
       }),
     ])
     .withRelated('model', eventFactory.addResource('local-hub::event-card', 'local-hub::event-card')

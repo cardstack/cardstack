@@ -16,6 +16,11 @@
 
 .card-renderer-isolated.schema .isolated-card {
   background: none;
+  padding: 0;
+}
+
+.card-renderer-isolated.edit .isolated-card {
+  padding: 0;
 }
 
 .card-renderer-isolated.view {
@@ -119,4 +124,103 @@
 
 .card-renderer-isolated.selected .card-renderer-isolated--content {
   border-color: var(--card-highlight);
+}
+
+
+/* Event Card Template */
+.card-renderer-isolated.view.event-card .isolated-card {
+  --event-image-height: 300px;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "image        image"
+    "title        title"
+    "city         cta"
+    "admission    cta"
+    "date         date"
+    "location     location"
+    "description  description"
+}
+.card-renderer-isolated.view.event-card .isolated-card .field-renderer {
+  margin-bottom: 0;
+}
+.card-renderer-isolated.view.event-card .isolated-card .field-image {
+  grid-area: image;
+  height: var(--event-image-height);
+}
+.card-renderer-isolated.view.event-card .isolated-card .field-title {
+  grid-area: title;
+  margin-bottom: 30px;
+}
+.card-renderer-isolated.view.event-card .isolated-card .field-cta {
+  grid-area: cta;
+}
+.card-renderer-isolated.view.event-card .isolated-card .field-city {
+  grid-area: city;
+}
+.card-renderer-isolated.view.event-card .isolated-card .field-admission {
+  grid-area: admission;
+}
+.card-renderer-isolated.view.event-card .isolated-card .field-date {
+  grid-area: date;
+  margin-top: 30px;
+  padding-top: 30px;
+  border-top: 1px solid var(--ch-light-gray-d6);
+}
+.card-renderer-isolated.view.event-card .isolated-card .field-location {
+  grid-area: location;
+  margin-top: 30px;
+}
+.card-renderer-isolated.view.event-card .isolated-card .field-description {
+  grid-area: description;
+  margin-top: 30px;
+}
+
+.card-renderer-isolated.view.event-card .isolated-card .field-title > .view-field--label,
+.card-renderer-isolated.view.event-card .isolated-card .field-image > .view-field--label,
+.card-renderer-isolated.view.event-card .isolated-card .field-image > .view-field--value,
+.card-renderer-isolated.view.event-card .isolated-card .field-admission > .view-field--label,
+.card-renderer-isolated.view.event-card .isolated-card .field-cta > .view-field--label,
+.card-renderer-isolated.view.event-card .isolated-card .field-city > .view-field--label {
+  visibility: hidden;
+  height: 0;
+  padding: 0;
+}
+
+.card-renderer-isolated.view.event-card .isolated-card .field-title > .view-field--value {
+  font-size: 28px;
+  line-height: 36px;
+}
+
+.card-renderer-isolated.view.event-card .isolated-card .field-city > .view-field--value {
+  opacity: 0.5;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.card-renderer-isolated.view.event-card .isolated-card .field-admission > .view-field--value {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+}
+
+.card-renderer-isolated.view.event-card .isolated-card .field-cta > .view-field--value {
+  width: 128px;
+  height: 35px;
+  margin-left: auto;
+  padding: 10px 15px;
+  border-radius: 5px;
+  background-color: var(--ch-blue);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+}
+
+.card-renderer-isolated.view.event-card .isolated-card--hero-image {
+  position: absolute;
+  top: 0;
+  left: 0;
 }

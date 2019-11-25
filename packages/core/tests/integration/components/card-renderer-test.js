@@ -110,8 +110,8 @@ module('Integration | Component | card-renderer', function(hooks) {
       />
     `);
 
-    assert.dom(`.card-renderer-isolated.adopts-event-card`).exists();
-    assert.dom(`.card-renderer-isolated.burcu-birthday-card`).exists();
+    assert.dom(`[data-test-card-renderer-isolated]`).hasClass('event-card');
+    assert.dom(`[data-test-card-renderer-isolated]`).hasClass('burcu-birthday-card');
   });
 
   test('it renders an embedded card that adopts from another card', async function (assert) {
@@ -129,8 +129,8 @@ module('Integration | Component | card-renderer', function(hooks) {
       />
     `);
 
-    assert.dom(`.card-renderer-embedded.adopts-event-card`).exists();
-    assert.dom(`.card-renderer-embedded.burcu-birthday-card`).exists();
+    assert.dom(`[data-test-card-renderer-embedded]`).hasClass('event-card');
+    assert.dom(`[data-test-card-renderer-embedded]`).hasClass('burcu-birthday-card');
   });
 
   test('embedded card is wrapped with a link in view mode', async function(assert) {
