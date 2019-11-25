@@ -6,6 +6,7 @@ import { tracked } from '@glimmer/tracking';
 export default class ViewCardController extends Controller {
   @service cssModeToggle
   @service router
+  resizeable = true;
 
   get cardJson() {
     if (!this.model) { return null; }

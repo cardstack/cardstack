@@ -28,8 +28,7 @@ export default class CodeEditor extends Component {
 
   constructor(...args) {
     super(...args);
-    let notTesting = ENV.environment !== 'test'; // disable resize loops in testing
-    this.resizable = (this.args.resizable === true && notTesting) ? true : false;
+    this.resizable = (this.args.resizable === true) ? true : false;
   }
 
   // Set default debounce in milliseconds.
