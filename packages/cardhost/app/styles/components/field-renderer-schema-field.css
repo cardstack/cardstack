@@ -86,17 +86,23 @@
   cursor: pointer;
 }
 
-.schema-field-renderer:focus {
-  border: 3px solid var(--field-highlight);
+.field-renderer:focus {
   outline: 0;
   /* TODO: Make this accessible */
 }
 
-.schema-field-renderer:focus .schema-field-renderer--header {
+.field-renderer:focus .schema-field-renderer,
+.card-renderer:not(.selected) .field-renderer.selected .schema-field-renderer {
+  border: 3px solid var(--field-highlight);
+}
+
+.field-renderer:focus .schema-field-renderer .schema-field-renderer--header,
+.card-renderer:not(.selected) .field-renderer.selected .schema-field-renderer .schema-field-renderer--header {
   background-color: var(--field-highlight);
   border-radius: 2px 2px 0 0;
 }
 
-.schema-field-renderer:focus .schema-field-renderer--content {
+.field-renderer:focus .schema-field-renderer .schema-field-renderer--content,
+.card-renderer:not(.selected) .field-renderer.selected .schema-field-renderer .schema-field-renderer--content {
   border-radius: 0 0 2px 2px;
 }

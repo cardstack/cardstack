@@ -289,6 +289,17 @@ module('Integration | Component | card-renderer', function(hooks) {
     assert.dom('.embedded-card-label').hasText(card1Id);
   });
 
+  test('isolated card can be selected', async function(assert) {
+    await render(hbs`
+      <CardRenderer
+        @format="isolated"
+        @cardSelected={{true}}
+      />
+    `);
+
+    assert.dom('[data-test-card-renderer-isolated]').hasClass('selected');
+  });
+
   skip('TODO it adds isolated css into the page when rendering an isolated card', async function(/*assert*/) {
   });
 

@@ -111,7 +111,7 @@ export default class CardManipulator extends Component {
   @tracked selectedField;
   @tracked isDragging;
   @tracked cardId;
-  @tracked displayCardMetadata = true;
+  @tracked cardSelected = true;
 
   constructor(...args) {
     super(...args);
@@ -183,7 +183,7 @@ export default class CardManipulator extends Component {
     let field = this.card.getFieldByNonce(fieldNonce);
 
     if (field === this.selectedField) {
-      this.displayCardMetadata = true;
+      this.cardSelected = true;
     }
 
     field.remove();
@@ -313,7 +313,7 @@ export default class CardManipulator extends Component {
     }
 
     this.selectedField = field;
-    this.displayCardMetadata = false;
+    this.cardSelected = false;
   }
 
   @action startDragging(field, evt) {

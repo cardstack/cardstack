@@ -28,7 +28,12 @@ export default class CardRenderer extends Component {
   }
 
   @action
-  focusCard(value) {
+  cardIsFocused(value) {
+    this.cardFocused(value);
+  }
+
+  @action
+  focusCard(element, [value]) {
     this.cardFocused(value);
   }
 
