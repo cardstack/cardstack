@@ -4,7 +4,6 @@ import * as monaco from 'monaco-editor';
 import { action } from '@ember/object';
 import { restartableTask } from "ember-concurrency-decorators";
 import { timeout } from "ember-concurrency";
-import ENV from '@cardstack/cardhost/config/environment'
 
 /**
  * <CodeEditor> takes the following arguments:
