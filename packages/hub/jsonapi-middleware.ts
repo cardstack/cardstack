@@ -8,6 +8,7 @@ import { Memoize } from "typescript-memoize";
 import { inject } from "./dependency-injection";
 import CardstackError from './error';
 import { SessionContext } from "./authentication-middleware";
+import { myOrigin } from "./origin";
 
 const apiPrefix = '/api';
 const apiPrefixPattern = new RegExp(`^${apiPrefix}/(.*)`);
@@ -48,7 +49,8 @@ export default class JSONAPIMiddleware {
       CardstackError.withJsonErrorHandling,
       body,
       //route.get("/cards", getCards),
-      route.post("/cards/:realm", this.createCard.bind(this))
+      route.post("/cards/:realm_id", this.createCard.bind(this)),
+      route.post("/cards/:origin/:realm_id", this.createCard.bind(this)),
       // route.get("/cards/:id", getCard),
       // route.patch("/cards/:id", updateCard),
       // route.delete("/cards/:id", deleteCard)
@@ -79,7 +81,12 @@ export default class JSONAPIMiddleware {
 
   async createCard(ctxt: KoaRoute.Context<SessionContext>) {
     this.assertBodyPresent(ctxt);
-    let card = await this.cards.create(ctxt.state.cardstackSession, ctxt.routeParams.realm, ctxt.body);
+    let realm = {
+      id: ctxt.routeParams.realm_id,
+      // todo: test koa decoding behavior here
+      origin: ctxt.routeParams.origin ? decodeURI(ctxt.routeParams.origin) : myOrigin,
+    };
+    let card = await this.cards.create(ctxt.state.cardstackSession, realm, ctxt.body);
     ctxt.body = card.jsonapi;
     ctxt.status = 201;
     ctxt.set('location', `${ctxt.request.origin}${apiPrefix}/cards/${card.realm}/${card.id}`);

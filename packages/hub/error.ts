@@ -19,7 +19,7 @@ interface ErrorDetails {
   source?: { pointer?: string; parameter?: string };
 }
 
-class E extends Error {
+class CardstackError extends Error {
   detail: string;
   status: number;
   title?: string;
@@ -63,4 +63,4 @@ class E extends Error {
   }
 }
 
-export = E;
+export default CardstackError;
