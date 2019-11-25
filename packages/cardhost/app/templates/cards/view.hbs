@@ -1,23 +1,32 @@
 <div class="card-renderer--top-edge-buttons">
-  {{! eslint is confused by on helper }}
-  {{! template-lint-disable attribute-indentation}}
-  <button
-    class="ch-button ch-button--icon share"
-    aria-label="Share button"
-  >
-  </button>
-  <button
-    class="ch-button ch-button--secondary"
-    disabled={{not this.cardstackSession.isAuthenticated}}
-  >
-    Preview
-  </button>
-  <button
-    class="ch-button"
-    disabled={{not this.cardstackSession.isAuthenticated}}
-  >
-    Save
-  </button>
+  {{#if this.cssModeToggle.editingCss}}
+    <button
+      class="ch-button"
+    >
+      Close Editor
+    </button>
+
+  {{else}}
+    {{! eslint is confused by on helper }}
+    {{! template-lint-disable attribute-indentation}}
+    <button
+      class="ch-button ch-button--icon share"
+      aria-label="Share button"
+    >
+    </button>
+    <button
+      class="ch-button ch-button--secondary"
+      disabled={{not this.cardstackSession.isAuthenticated}}
+    >
+      Preview
+    </button>
+    <button
+      class="ch-button"
+      disabled={{not this.cardstackSession.isAuthenticated}}
+    >
+      Save
+    </button>
+  {{/if}}
 </div>
 
 {{#unless this.cssModeToggle.editingCss}}
@@ -41,13 +50,5 @@
 
 
 {{#if this.cssModeToggle.editingCss}}
-  <section class="cardhost-card-theme-editor">
-    <h3>Card Theme Editor</h3>
-    <CodeEditor
-      @code=".a {}"
-      @language="css"
-      @readOnly={{false}}
-      @resizable={{true}}
-    />
-  </section>
+  <EditorPane />
 {{/if}}
