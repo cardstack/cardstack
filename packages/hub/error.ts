@@ -25,7 +25,7 @@ class CardstackError extends Error {
   title?: string;
   source?: ErrorDetails["source"];
   isCardstackError: true = true;
-  additionalErrors: E[] | null = null;
+  additionalErrors: CardstackError[] | null = null;
 
   constructor(detail: string, { status, title, source}: ErrorDetails = {}) {
     super(detail);
