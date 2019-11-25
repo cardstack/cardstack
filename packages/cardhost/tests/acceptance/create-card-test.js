@@ -43,7 +43,7 @@ module('Acceptance | card create', function(hooks) {
 
     assert.equal(currentURL(), '/cards/new');
 
-    assert.dom('.card-renderer').hasClass('selected');
+    assert.dom('[data-test-card-renderer-isolated]').hasClass('selected');
   });
 
   test("changing a card's id does not clear the card fields", async function(assert) {
@@ -103,7 +103,7 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('.card-renderer-isolated--header').hasText('millenial-puppies');
     assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
     // TODO: figure out why having the following assertions before the line above ^^^ causes a test failure
-    assert.dom('.card-renderer').hasClass('selected');
+    assert.dom('[data-test-card-renderer-isolated]').hasClass('selected');
     assert.dom('.field-renderer').doesNotHaveClass('selected');
 
     let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block')

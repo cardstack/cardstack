@@ -57,16 +57,16 @@ module('Acceptance | catalog', function(hooks) {
   test(`viewing catalog`, async function(assert) {
     await visit(`/`);
 
-    assert.dom(`.card-catalog > .card-renderer--embedded-card-link[href="/cards/${card1Id}"]`).exists();
-    assert.dom(`.card-catalog > .card-renderer--embedded-card-link[href="/cards/${card2Id}"]`).exists();
-    assert.dom(`.card-catalog > .card-renderer--embedded-card-link[href="/cards/${card3Id}"]`).exists();
+    assert.dom(`[data-test-embedded-card=${card1Id}]`).exists();
+    assert.dom(`[data-test-embedded-card=${card2Id}]`).exists();
+    assert.dom(`[data-test-embedded-card=${card3Id}]`).exists();
   });
 
   test(`isolating a card`, async function(assert) {
     await visit(`/`);
 
-    await click(`.card-catalog > .card-renderer--embedded-card-link[href="/cards/${card3Id}"]`);
-    await waitFor(`[data-test-card-view="${card3Id}"]`, { timeout });
+    await click(`[data-test-embedded-card=${card3Id}]`);
+    await waitFor(`[data-test-card-view=${card3Id}]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card3Id}`);
   });

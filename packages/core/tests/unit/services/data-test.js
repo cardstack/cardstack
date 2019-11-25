@@ -694,6 +694,8 @@ module("Unit | Service | data", function () {
       assert.equal(parent.id, 'local-hub::@cardstack/base-card');
       let adoptedResource = card.json.included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::@cardstack/base-card');
       assert.ok(adoptedResource);
+      assert.equal(card.adoptedFromId, 'local-hub::@cardstack/base-card');
+      assert.equal(card.adoptedFromName, '@cardstack/base-card');
     });
 
     test("a card can specify a card that it adopts from", async function(assert) {
@@ -726,6 +728,8 @@ module("Unit | Service | data", function () {
 
       assert.equal(card.getField('name').isAdopted, false);
       assert.equal(card.adoptedFrom, parent);
+      assert.equal(card.adoptedFromId, parent.id);
+      assert.equal(card.adoptedFromName, parent.name);
       assert.deepEqual(card.fields.map(i => i.name), [
         'title',
         'body',
@@ -744,6 +748,8 @@ module("Unit | Service | data", function () {
       assert.equal(card.getField('title').isAdopted, true);
       assert.equal(card.getField('body').isAdopted, true);
       assert.equal(card.getField('name').isAdopted, false);
+      assert.equal(card.adoptedFromId, parent.id);
+      assert.equal(card.adoptedFromName, parent.name);
 
       let adoptedFrom = card.adoptedFrom;
       assert.equal(adoptedFrom.id, card1Id);
@@ -871,6 +877,13 @@ module("Unit | Service | data", function () {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'embedded');
       assert.throws(() => card.adoptedFrom, /must be loaded in the isolated format/);
+    });
+
+    test("it allows adoptedFromId and adoptedFromName to be called on a card that has only been loaded in the embedded format", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'embedded');
+      assert.equal(card.adoptedFromId, 'local-hub::@cardstack/base-card');
+      assert.equal(card.adoptedFromName, '@cardstack/base-card');
     });
 
     test("it can get all cards in the store", async function(assert) {
@@ -1741,12 +1754,16 @@ module("Unit | Service | data", function () {
 
       let field = card.getField('name');
       assert.equal(card.adoptedFrom.id, parent1.id);
+      assert.equal(card.adoptedFromId, parent1.id);
+      assert.equal(card.adoptedFromName, parent1.name);
       assert.equal(card.isDirty, false, 'the dirtiness is correct');
       assert.equal(field.isDestroyed, false);
 
       card.setAdoptedFrom(parent2);
 
       assert.equal(card.adoptedFrom.id, parent2.id);
+      assert.equal(card.adoptedFromId, parent2.id);
+      assert.equal(card.adoptedFromName, parent2.name);
       assert.equal(card.isDirty, true, 'the dirtiness is correct');
       assert.equal(parent2.isDirty, false, 'the dirtiness is correct');
       assert.equal(field.isDestroyed, true);
@@ -1766,6 +1783,8 @@ module("Unit | Service | data", function () {
       await card.save();
       assert.equal(card.isDirty, false, 'the dirtiness is correct');
       assert.equal(card.adoptedFrom.id, parent2.id);
+      assert.equal(card.adoptedFromId, parent2.id);
+      assert.equal(card.adoptedFromName, parent2.name);
       assert.deepEqual(card.fields.map(i => i.name), [
         'favorite-color',
         'name',

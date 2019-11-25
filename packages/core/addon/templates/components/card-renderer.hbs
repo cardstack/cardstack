@@ -7,7 +7,12 @@ Ember Concurrency into the rendering of the card component here.
 {{#if (eq @format "isolated")}}
   {{#let (component this.isolatedComponentName) as | Isolated |}}
     <section
-      class="card-renderer card-renderer-{{@format}} {{this.mode}} {{if @cardSelected "selected"}}"
+      class="card-renderer-isolated
+        {{this.mode}}
+        {{safe-css-string @card.adoptedFromName}}
+        {{safe-css-string @card.name}}
+        {{if @cardSelected "selected"}}
+      "
       tabindex="0"
       data-test-card-renderer-isolated
       {{on "focus" (action this.cardIsFocused true)}}
@@ -49,22 +54,30 @@ Ember Concurrency into the rendering of the card component here.
   {{/let}}
 {{else if (eq @format "embedded")}}
   {{#let (component this.embeddedComponentName) as | Embedded |}}
-    {{#if (and (eq this.mode "view") (not @preventIsolation))}}
-      <LinkTo
-        @class="card-renderer--embedded-card-link"
-        @route="cards.view"
-        @model={{@card.name}}
-      >
-        <Embedded @card={{@card}} @mode={{this.mode}}/>
+    <div
+      class="card-renderer-embedded
+        {{safe-css-string @card.adoptedFromName}}
+        {{safe-css-string @card.name}}
+      "
+      data-test-card-renderer-embedded
+    >
+      {{#if (and (eq this.mode "view") (not @preventIsolation))}}
+        <LinkTo
+          @class="card-renderer--embedded-card-link"
+          @route="cards.view"
+          @model={{@card.name}}
+        >
+          <Embedded @card={{@card}} @mode={{this.mode}} />
+          {{#if @showName}}
+            <div class="embedded-card-label">{{@card.name}}</div>
+          {{/if}}
+        </LinkTo>
+      {{else}}
+        <Embedded @card={{@card}} @mode={{this.mode}} />
         {{#if @showName}}
           <div class="embedded-card-label">{{@card.name}}</div>
         {{/if}}
-      </LinkTo>
-    {{else}}
-      <Embedded @card={{@card}} @mode={{this.mode}}/>
-      {{#if @showName}}
-        <div class="embedded-card-label">{{@card.name}}</div>
       {{/if}}
-    {{/if}}
+    </div>
   {{/let}}
 {{/if}}

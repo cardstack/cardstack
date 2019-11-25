@@ -5,7 +5,11 @@ import { render, triggerEvent } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
 const card1Id = 'millenial-puppies';
+const eventCardTemplate = 'event-card';
+const birthdayCard = '@burcu/birthday-card';
 const qualifiedCard1Id = `local-hub::${card1Id}`;
+const qualifiedEventCard = `local-hub::${eventCardTemplate}`;
+const qualifiedBirthday = `local-hub::${birthdayCard}`;
 
 const scenario = new Fixtures({
   create(factory) {
@@ -34,6 +38,8 @@ const scenario = new Fixtures({
 
   destroy() {
     return [
+      { type: 'cards', id: qualifiedBirthday },
+      { type: 'cards', id: qualifiedEventCard },
       { type: 'cards', id: qualifiedCard1Id },
     ];
   }
@@ -87,6 +93,44 @@ module('Integration | Component | card-renderer', function(hooks) {
     assert.dom(`[data-test-isolated-card="${card1Id}"]`).exists();
     assert.deepEqual([...this.element.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
       ['title', 'author', 'body']);
+  });
+
+  test('it renders an isolated card that adopts from another card', async function (assert) {
+    let service = this.owner.lookup('service:data');
+    let parent = service.createCard(qualifiedEventCard);
+    await parent.save();
+    let child = service.createCard(qualifiedBirthday, parent);
+    this.set('card', child);
+
+    await render(hbs`
+      <CardRenderer
+        @card={{card}}
+        @format="isolated"
+        @mode="view"
+      />
+    `);
+
+    assert.dom(`[data-test-card-renderer-isolated]`).hasClass('event-card');
+    assert.dom(`[data-test-card-renderer-isolated]`).hasClass('burcu-birthday-card');
+  });
+
+  test('it renders an embedded card that adopts from another card', async function (assert) {
+    let service = this.owner.lookup('service:data');
+    let parent = service.createCard(qualifiedEventCard);
+    await parent.save();
+    let child = service.createCard(qualifiedBirthday, parent);
+    this.set('card', child);
+
+    await render(hbs`
+      <CardRenderer
+        @card={{card}}
+        @format="embedded"
+        @mode="view"
+      />
+    `);
+
+    assert.dom(`[data-test-card-renderer-embedded]`).hasClass('event-card');
+    assert.dom(`[data-test-card-renderer-embedded]`).hasClass('burcu-birthday-card');
   });
 
   test('embedded card is wrapped with a link in view mode', async function(assert) {
