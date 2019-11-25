@@ -51,6 +51,8 @@ export default class CardsService {
     if (!query.filter) {
       throw new CardstackError('unimplemented');
     }
+
+    return [];
   }
 }
 
