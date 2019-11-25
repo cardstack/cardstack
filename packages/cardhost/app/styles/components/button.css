@@ -15,7 +15,7 @@
   margin: var(--margin);
   padding: var(--padding);
   height: var(--height);
-  width: var(--width);
+  min-width: var(--width);
   color: var(--color);
   background: var(--background);
   font: var(--font);
