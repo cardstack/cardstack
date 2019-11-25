@@ -7,9 +7,7 @@ export default class CardsService {
     return {
       realm,
       id: String(Math.floor(Math.random()*1000)),
-      asJSONAPI() {
-        return doc;
-      }
+      jsonapi: doc,
     };
   }
 }

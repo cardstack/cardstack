@@ -80,7 +80,7 @@ export default class JSONAPIMiddleware {
   async createCard(ctxt: KoaRoute.Context<SessionContext>) {
     this.assertBodyPresent(ctxt);
     let card = await this.cards.create(ctxt.state.cardstackSession, ctxt.routeParams.realm, ctxt.body);
-    ctxt.body = card.asJSONAPI();
+    ctxt.body = card.jsonapi;
     ctxt.status = 201;
     ctxt.set('location', `${ctxt.request.origin}${apiPrefix}/cards/${card.realm}/${card.id}`);
   }
