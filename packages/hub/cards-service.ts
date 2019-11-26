@@ -11,7 +11,6 @@ export default class CardsService {
     realm: Realm,
     doc: SingleResourceDoc
   ): Promise<Card> {
-
     let realms = await this.search(Session.INTERNAL_PRIVILEGED, {
       filter: {
         every: [
@@ -25,13 +24,13 @@ export default class CardsService {
             // meta-realm determines all the realms this hub (origin) knows
             // about. Some of the realms in here can live on other origins, and
             // that's fine.
-            value: { origin: myOrigin, id: 'meta-realm'},
+            value: { origin: myOrigin, id: "meta-realm" }
           },
           {
             cardId: { realm: CARDSTACK_PUBLIC_REALM, id: "realm" }, // <- "search for id fields on realm cards"
             fieldName: "id",
-            value: `${realm.origin}/${realm.id}`,
-          },
+            value: `${realm.origin}/${realm.id}`
+          }
         ]
       }
     });
@@ -47,24 +46,119 @@ export default class CardsService {
     };
   }
 
-  async search(_session: Session, query: SearchQuery): Promise<Card[]> {
-    if (!query.filter) {
-      throw new CardstackError('unimplemented');
+  async search(_session: Session, query: Query): Promise<Card[]> {
+    // this is currently special-cased to only handle searches for realms.
+    // Everything else throws unimplemented.
+
+    if (!query.filter?.every || query.filter.every.length !== 2) {
+      throw new CardstackError("unimplemented");
     }
 
-    return [];
+    let foundMetaRealm = false;
+    for (let f of query.filter.every) {
+      if (
+        f.fieldName === "realm" &&
+        f.value?.origin === myOrigin &&
+        f.value?.id === "meta-realm"
+      ) {
+        foundMetaRealm = true;
+        break;
+      }
+    }
+
+    if (!foundMetaRealm) {
+      throw new CardstackError("unimplemented");
+    }
+
+    let foundRealmId: FieldFilter | null = null;
+    for (let f of query.filter.every) {
+      if (
+        f.fieldName === "id" &&
+        f.cardId.realm.id === CARDSTACK_PUBLIC_REALM.id &&
+        f.cardId.realm.origin === CARDSTACK_PUBLIC_REALM.origin &&
+        f.cardId.id === "realm"
+      ) {
+        foundRealmId = f;
+      }
+    }
+
+    if (!foundRealmId || typeof foundRealmId.value !== "string") {
+      throw new CardstackError("unimplemented");
+    }
+
+    return [
+      {
+        realm: { origin: myOrigin, id: "meta-realm" },
+        id: foundRealmId.value,
+        jsonapi: {
+          data: {
+            type: "cards",
+            id: `${myOrigin}/meta-realm/${foundRealmId.value}`,
+            attributes: {
+              model: {
+                attributes: {
+
+                },
+                relationships: {
+                  'realm-type': {
+                    data: {
+                      type: 'cards',
+                      id: `${CARDSTACK_PUBLIC_REALM.origin}/${CARDSTACK_PUBLIC_REALM.id}/git`,
+                    }
+                  }
+                }
+              }
+            },
+            relationships: {
+              "adopts-from": {
+                data: {
+                  type: "cards",
+                  id: `${CARDSTACK_PUBLIC_REALM.origin}/${CARDSTACK_PUBLIC_REALM.id}/realm`
+                }
+              }
+            }
+          }
+        }
+      }
+    ];
   }
 }
 
-interface SearchQuery {
-  filter?: EveryCondition | SearchCondition;
+interface Query {
+  filter?: Filter;
 }
 
-interface EveryCondition {
-  every: SearchCondition[];
+type Filter = AnyFilter | EveryFilter | NotFilter | FieldFilter;
+
+// The explicitly undefined types below may look funny, but they make it legal
+// to check the presence of the special marker `any`, `every`, `fieldName`, and
+// `not` properties on every kind of Filter.
+
+interface AnyFilter {
+  any: Filter[];
+  every?: undefined;
+  fieldName?: undefined;
+  not?: undefined;
 }
 
-interface SearchCondition {
+interface EveryFilter {
+  any?: undefined;
+  every: Filter[];
+  fieldName?: undefined;
+  not?: undefined;
+}
+
+interface NotFilter {
+  any?: undefined;
+  every?: undefined;
+  fieldName?: undefined;
+  not: Filter;
+}
+
+interface FieldFilter {
+  any?: undefined;
+  every?: undefined;
+  not?: undefined;
   cardId: CardId;
   fieldName: string;
   value: any;
