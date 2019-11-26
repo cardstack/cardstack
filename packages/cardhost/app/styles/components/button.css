@@ -1,7 +1,7 @@
 .ch-button {
   --margin: 0;
   --padding: 10px 15px;
-  --width: 100px;
+  --width: inherit;
   --height: 40px;
   --color: var(--ch-dark-purple-28);
   --background: var(--ch-cyan);
@@ -15,7 +15,7 @@
   margin: var(--margin);
   padding: var(--padding);
   height: var(--height);
-  min-width: var(--width);
+  width: var(--width);
   color: var(--color);
   background: var(--background);
   font: var(--font);
@@ -101,4 +101,8 @@
 
 .ch-button-group {
   display: flex;
+}
+
+.ch-button--fixed-width {
+  --width: 100px;
 }

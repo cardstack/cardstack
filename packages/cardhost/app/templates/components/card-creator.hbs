@@ -6,7 +6,7 @@
       {{! template-lint-disable attribute-indentation}}
       <button
         {{on "click" this.preview}}
-        class="ch-button ch-button--secondary"
+        class="ch-button ch-button--secondary ch-button--fixed-width"
         data-test-card-creator-preview-btn
         disabled={{not this.cardstackSession.isAuthenticated}}
       >
@@ -19,7 +19,7 @@
       {{else}}
         <button
           {{on "click" this.save}}
-          class="ch-button"
+          class="ch-button ch-button--fixed-width"
           data-test-card-creator-save-btn
           disabled={{not this.cardstackSession.isAuthenticated}}
         >

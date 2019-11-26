@@ -25,6 +25,10 @@
   --padding-right: 0;
 }
 
+.cardhost-cards.view {
+  --padding-left: var(--ch-left-edge-navbar-width);
+}
+
 .cardhost-cards.add,
 .cardhost-cards.schema,
 .cardhost-cards.adopt {

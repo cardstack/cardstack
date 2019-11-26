@@ -12,7 +12,7 @@
     </button>
     <button
       {{on "click" this.preview}}
-      class="ch-button ch-button--secondary"
+      class="ch-button ch-button--secondary ch-button--fixed-width"
       data-test-card-editor-preview-btn
       disabled={{not this.cardstackSession.isAuthenticated}}
     >
@@ -25,7 +25,7 @@
     {{else}}
       <button
         {{on "click" this.save}}
-        class="ch-button"
+        class="ch-button ch-button--fixed-width"
         data-test-card-editor-save-btn
         disabled={{not this.cardstackSession.isAuthenticated}}
       >
