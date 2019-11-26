@@ -5,6 +5,7 @@ import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
 import { createCards } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
+import { percySnapshot } from 'ember-percy';
 
 const timeout = 20000;
 const card1Id = 'millenial-puppies';
@@ -60,6 +61,7 @@ module('Acceptance | catalog', function(hooks) {
     assert.dom(`[data-test-embedded-card=${card1Id}]`).exists();
     assert.dom(`[data-test-embedded-card=${card2Id}]`).exists();
     assert.dom(`[data-test-embedded-card=${card3Id}]`).exists();
+    await percySnapshot(assert);
   });
 
   test(`isolating a card`, async function(assert) {
@@ -69,5 +71,6 @@ module('Acceptance | catalog', function(hooks) {
     await waitFor(`[data-test-card-view=${card3Id}]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card3Id}`);
+    await percySnapshot(assert);
   });
 });

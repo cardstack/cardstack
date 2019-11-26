@@ -4,6 +4,7 @@ import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
 import { addField, setCardId, createCards, saveCard, dragAndDropNewField, removeField } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
+import { percySnapshot } from 'ember-percy';
 
 const card1Id = 'millenial-puppies';
 const qualifiedCard1Id = `local-hub::${card1Id}`;
@@ -61,6 +62,7 @@ module('Acceptance | card create', function(hooks) {
     await visit('/cards/new');
 
     assert.equal(currentURL(), '/cards/new');
+    await percySnapshot(assert + "-new");
 
     assert.dom('.card-renderer-isolated--header').hasTextContaining('new-card-');
     assert.dom('[data-test-internal-card-id]').hasTextContaining('local-hub::new-card-');
@@ -112,6 +114,7 @@ module('Acceptance | card create', function(hooks) {
     assert.equal(card.data.attributes.body, undefined);
     assert.equal(card.data.relationships.author, undefined);
     assert.deepEqual(card.data.relationships.reviewers, undefined);
+    await percySnapshot(assert + "-data-entered");
   });
 
   test(`selecting a field`, async function(assert) {
@@ -155,6 +158,7 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('new-field-2');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('new-field-2');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea').hasValue('');
+    await percySnapshot(assert);
   });
 
   test(`renaming a card's field`, async function(assert) {
@@ -201,6 +205,7 @@ module('Acceptance | card create', function(hooks) {
     await removeField('title');
 
     assert.dom('.cardhost-right-edge-panel [data-test-field]').doesNotExist();
+    await percySnapshot(assert);
   });
 
   test(`removing a field from a card that has an empty name`, async function(assert) {
