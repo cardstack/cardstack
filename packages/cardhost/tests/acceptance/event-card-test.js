@@ -1,4 +1,4 @@
-import { module, test } from 'qunit';
+import { module, skip } from 'qunit';
 import { visit, currentURL } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
@@ -45,8 +45,8 @@ module('Acceptance | event card', function(hooks) {
     })
     await visit(`/cards/${card1Id}`);
   })
-
-  test('visiting /event-card', async function(assert) {
+  
+  skip('visiting /event-card', async function(assert) {
     assert.equal(currentURL(), '/cards/event-card');
     await percySnapshot(assert)
   });
