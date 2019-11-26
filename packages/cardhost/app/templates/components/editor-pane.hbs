@@ -1,6 +1,7 @@
   <section  class="cardhost-card-theme-editor {{if (eq this.dockLocation "bottom") "bottom-docked"}}">
     <div {{on "click" this.dockRight}}>right</div>
     <div {{on "click" this.dockBottom}}>bottom</div>
+    <button {{on "click" (fn @saveCss this.css)}}>save</button>
     <h3>Card Theme Editor</h3>
     <CodeEditor
       @code={{@model.isolatedCss}}
