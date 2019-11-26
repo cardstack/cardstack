@@ -9,10 +9,10 @@ export default class ViewCardController extends Controller {
     if (!this.model) { return null; }
     return JSON.stringify(this.model.json, null, 2);
   }
-
+  
+  @action
   saveCss(css) {
-    this.model.isolatedCss = css;
-    console.log(this.model)
-    // this.model.save()
+    this.model.setIsolatedCss(css);
+    this.model.save()
   }
 }
