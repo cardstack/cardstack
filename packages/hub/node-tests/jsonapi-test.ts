@@ -15,7 +15,7 @@ describe("hub/jsonapi", function() {
 
   it("errors correctly for missing post body", async function() {
     let response = await request
-      .post("/api/cards/some-realm")
+      .post("/api/realms/some-realm")
       .set("Content-Type", "application/vnd.api+json");
     expect(response.status).to.equal(400);
     expect(response.body.errors).has.length(1);
@@ -34,7 +34,7 @@ describe("hub/jsonapi", function() {
 
   it("can create card", async function() {
     let response = await request
-      .post("/api/cards/my-realm")
+      .post("/api/realms/my-realm")
       .set("Content-Type", "application/vnd.api+json")
       .send({
         data: {

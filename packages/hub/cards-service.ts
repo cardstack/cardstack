@@ -1,21 +1,21 @@
 import { SingleResourceDoc } from "jsonapi-typescript";
 import Session from "./session";
 import Card, { CardId } from "./card";
-import { Realm, CARDSTACK_PUBLIC_REALM } from "./realm";
+import { CARDSTACK_PUBLIC_REALM } from "./realm";
 import CardstackError from "./error";
 import { myOrigin } from "./origin";
 
 export default class CardsService {
   async create(
     _session: Session,
-    realm: Realm,
-    doc: SingleResourceDoc
+    realm: URL,
+    _doc: SingleResourceDoc
   ): Promise<Card> {
     let realms = await this.search(Session.INTERNAL_PRIVILEGED, {
       filter: {
         every: [
           {
-            cardId: { realm: CARDSTACK_PUBLIC_REALM, id: "base" },
+            cardId: { realm: CARDSTACK_PUBLIC_REALM, localId: "base" },
             fieldName: "realm",
 
             // the special meta-realm on each origin has restrictive but not
@@ -24,12 +24,17 @@ export default class CardsService {
             // meta-realm determines all the realms this hub (origin) knows
             // about. Some of the realms in here can live on other origins, and
             // that's fine.
-            value: { origin: myOrigin, id: "meta-realm" }
+            value: `${myOrigin}/api/realms/meta`
           },
           {
-            cardId: { realm: CARDSTACK_PUBLIC_REALM, id: "realm" }, // <- "search for id fields on realm cards"
-            fieldName: "id",
-            value: `${realm.origin}/${realm.id}`
+            // within cards that adopt from our base realm card:
+            cardId: { realm: CARDSTACK_PUBLIC_REALM, localId: "realm" },
+
+            // search their local-id fields:
+            fieldName: "local-id",
+
+            // for this value
+            value: realm.href,
           }
         ]
       }
@@ -39,11 +44,7 @@ export default class CardsService {
       throw new CardstackError(`no such realm`, { status: 400 });
     }
 
-    return {
-      realm,
-      id: String(Math.floor(Math.random() * 1000)),
-      jsonapi: doc
-    };
+    return realms[0];
   }
 
   async search(_session: Session, query: Query): Promise<Card[]> {
@@ -51,75 +52,70 @@ export default class CardsService {
     // Everything else throws unimplemented.
 
     if (!query.filter?.every || query.filter.every.length !== 2) {
-      throw new CardstackError("unimplemented");
+      throw new CardstackError("unimplemented, not an every");
     }
 
-    let foundMetaRealm = false;
+    let searchingInMetaRealm = false;
     for (let f of query.filter.every) {
       if (
         f.fieldName === "realm" &&
-        f.value?.origin === myOrigin &&
-        f.value?.id === "meta-realm"
+        f.value === `${myOrigin}/api/realms/meta`
       ) {
-        foundMetaRealm = true;
+        searchingInMetaRealm = true;
         break;
       }
     }
 
-    if (!foundMetaRealm) {
-      throw new CardstackError("unimplemented");
+    if (!searchingInMetaRealm) {
+      throw new CardstackError("unimplemented, not searching in meta realm");
     }
 
     let foundRealmId: FieldFilter | null = null;
     for (let f of query.filter.every) {
       if (
-        f.fieldName === "id" &&
-        f.cardId.realm.id === CARDSTACK_PUBLIC_REALM.id &&
-        f.cardId.realm.origin === CARDSTACK_PUBLIC_REALM.origin &&
-        f.cardId.id === "realm"
+        f.fieldName === "local-id" &&
+        f.cardId.realm.href === CARDSTACK_PUBLIC_REALM.href &&
+        f.cardId.localId === "realm"
       ) {
         foundRealmId = f;
       }
     }
 
     if (!foundRealmId || typeof foundRealmId.value !== "string") {
-      throw new CardstackError("unimplemented");
+      throw new CardstackError("unimplemented, not searching for realm localId");
     }
 
     return [
-      {
-        realm: { origin: myOrigin, id: "meta-realm" },
-        id: foundRealmId.value,
-        jsonapi: {
-          data: {
-            type: "cards",
-            id: `${myOrigin}/meta-realm/${foundRealmId.value}`,
-            attributes: {
-              model: {
-                attributes: {
-
-                },
-                relationships: {
-                  'realm-type': {
-                    data: {
-                      type: 'cards',
-                      id: `${CARDSTACK_PUBLIC_REALM.origin}/${CARDSTACK_PUBLIC_REALM.id}/git`,
-                    }
+      new Card({
+        data: {
+          type: "cards",
+          id: `a-fake-realm`,
+          attributes: {
+            realm: `${myOrigin}/api/realms/meta`,
+            'original-realm': `${myOrigin}/api/realms/meta`,
+            'local-id': foundRealmId.value,
+            model: {
+              attributes: {},
+              relationships: {
+                "realm-type": {
+                  data: {
+                    type: "cards",
+                    id: 'stubbed-git-card',
                   }
                 }
               }
-            },
-            relationships: {
-              "adopts-from": {
-                data: {
-                  type: "cards",
-                  id: `${CARDSTACK_PUBLIC_REALM.origin}/${CARDSTACK_PUBLIC_REALM.id}/realm`
-                }
+            }
+          },
+          relationships: {
+            "adopts-from": {
+              data: {
+                type: "cards",
+                id: 'stubbed-base-realm-card',
               }
             }
           }
         }
-      }
+      })
     ];
   }
 }
