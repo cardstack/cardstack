@@ -102,3 +102,7 @@
 .ch-button-group {
   display: flex;
 }
+
+.ch-button--responsive {
+  --width: 100%;
+}

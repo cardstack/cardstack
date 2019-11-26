@@ -27,7 +27,6 @@ export default class CodeEditor extends Component {
 
   constructor(...args) {
     super(...args);
-
     this.resizable = (this.args.resizable === true) ? true : false;
   }
 
