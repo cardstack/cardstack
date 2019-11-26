@@ -5,7 +5,6 @@ import { action } from '@ember/object';
 
 export default class RightEdge extends Component {
   @tracked cardName;
-  @tracked displayCardMetadata;
 
   constructor(...args) {
     super(...args);

@@ -41,5 +41,8 @@
     "packages/*",
     "cards/*"
   ],
+  "volta": {
+    "node": "10.12.0"
+  },
   "private": true
 }

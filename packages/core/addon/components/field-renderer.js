@@ -58,6 +58,11 @@ export default class FieldRenderer extends Component {
     return null;
   }
 
+  @action
+  focusParentElement(element) {
+    element.parentElement.focus({ preventScroll: true });
+  }
+
   get nonce() {
     return onFieldChangedDependencies.map(i => this.args.field[i]).join('::');
   }

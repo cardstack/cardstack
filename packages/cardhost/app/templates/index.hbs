@@ -55,6 +55,7 @@
             @class="card-renderer--embedded-card-link"
             @route="cards.adopt"
             @model={{card.name}}
+            data-test-embedded-card={{card.name}}
           >
             <CardRenderer
               @card={{card}}
@@ -74,16 +75,22 @@
       </header>
       <div class="card-catalog">
         <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
-          <div class="embedded-card placeholder icon-common-form"></div>
-          <div class="embedded-card-label">Form</div>
+          <div>
+            <div class="card-catalog--embedded-card-placeholder icon-common-form"></div>
+            <div class="embedded-card-label">Form</div>
+          </div>
         </LinkTo>
         <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
-          <div class="embedded-card placeholder icon-common-layout"></div>
-          <div class="embedded-card-label">Layout</div>
+          <div>
+            <div class="card-catalog--embedded-card-placeholder icon-common-layout"></div>
+            <div class="embedded-card-label">Layout</div>
+          </div>
         </LinkTo>
         <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
-          <div class="embedded-card placeholder icon-common-collection"></div>
-          <div class="embedded-card-label">Collection</div>
+          <div>
+            <div class="card-catalog--embedded-card-placeholder icon-common-collection"></div>
+            <div class="embedded-card-label">Collection</div>
+          </div>
         </LinkTo>
       </div>
     </section>
@@ -98,8 +105,10 @@
           @route="cards.add"
           @class="card-renderer--embedded-card-link"
         >
-          <div class="embedded-card placeholder icon-add-card"></div>
-          <div class="embedded-card-label">Blank Card</div>
+          <div>
+            <div class="card-catalog--embedded-card-placeholder icon-add-card"></div>
+            <div class="embedded-card-label">Blank Card</div>
+          </div>
         </LinkTo>
       </div>
     </section>
