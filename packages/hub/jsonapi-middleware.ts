@@ -48,8 +48,8 @@ export default class JSONAPIMiddleware {
       CardstackError.withJsonErrorHandling,
       body,
       //route.get("/cards", getCards),
-      route.post("/realms/:local_realm_id", this.createCard.bind(this)),
-      route.post("/remote-realms/:remote_realm", this.createCard.bind(this)),
+      route.post("/realms/:local_realm_id/cards", this.createCard.bind(this)),
+      route.post("/remote-realms/:remote_realm/cards", this.createCard.bind(this)),
       // route.get("/cards/:id", getCard),
       // route.patch("/cards/:id", updateCard),
       // route.delete("/cards/:id", deleteCard)

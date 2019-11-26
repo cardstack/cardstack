@@ -4,6 +4,7 @@ import Card, { CardId } from "./card";
 import { CARDSTACK_PUBLIC_REALM } from "./realm";
 import CardstackError from "./error";
 import { myOrigin } from "./origin";
+import { search } from "./scaffolding";
 
 export default class CardsService {
   async create(
@@ -48,110 +49,42 @@ export default class CardsService {
   }
 
   async search(_session: Session, query: Query): Promise<Card[]> {
-    // this is currently special-cased to only handle searches for realms.
-    // Everything else throws unimplemented.
-
-    if (!query.filter?.every || query.filter.every.length !== 2) {
-      throw new CardstackError("unimplemented, not an every");
-    }
-
-    let searchingInMetaRealm = false;
-    for (let f of query.filter.every) {
-      if (
-        f.fieldName === "realm" &&
-        f.value === `${myOrigin}/api/realms/meta`
-      ) {
-        searchingInMetaRealm = true;
-        break;
-      }
-    }
-
-    if (!searchingInMetaRealm) {
-      throw new CardstackError("unimplemented, not searching in meta realm");
-    }
-
-    let foundRealmId: FieldFilter | null = null;
-    for (let f of query.filter.every) {
-      if (
-        f.fieldName === "local-id" &&
-        f.cardId.realm.href === CARDSTACK_PUBLIC_REALM.href &&
-        f.cardId.localId === "realm"
-      ) {
-        foundRealmId = f;
-      }
-    }
-
-    if (!foundRealmId || typeof foundRealmId.value !== "string") {
-      throw new CardstackError("unimplemented, not searching for realm localId");
-    }
-
-    return [
-      new Card({
-        data: {
-          type: "cards",
-          id: `a-fake-realm`,
-          attributes: {
-            realm: `${myOrigin}/api/realms/meta`,
-            'original-realm': `${myOrigin}/api/realms/meta`,
-            'local-id': foundRealmId.value,
-            model: {
-              attributes: {},
-              relationships: {
-                "realm-type": {
-                  data: {
-                    type: "cards",
-                    id: 'stubbed-git-card',
-                  }
-                }
-              }
-            }
-          },
-          relationships: {
-            "adopts-from": {
-              data: {
-                type: "cards",
-                id: 'stubbed-base-realm-card',
-              }
-            }
-          }
-        }
-      })
-    ];
+    return await search(query);
   }
 }
 
-interface Query {
+export interface Query {
   filter?: Filter;
 }
 
-type Filter = AnyFilter | EveryFilter | NotFilter | FieldFilter;
+export type Filter = AnyFilter | EveryFilter | NotFilter | FieldFilter;
 
 // The explicitly undefined types below may look funny, but they make it legal
 // to check the presence of the special marker `any`, `every`, `fieldName`, and
 // `not` properties on every kind of Filter.
 
-interface AnyFilter {
+export interface AnyFilter {
   any: Filter[];
   every?: undefined;
   fieldName?: undefined;
   not?: undefined;
 }
 
-interface EveryFilter {
+export interface EveryFilter {
   any?: undefined;
   every: Filter[];
   fieldName?: undefined;
   not?: undefined;
 }
 
-interface NotFilter {
+export interface NotFilter {
   any?: undefined;
   every?: undefined;
   fieldName?: undefined;
   not: Filter;
 }
 
-interface FieldFilter {
+export interface FieldFilter {
   any?: undefined;
   every?: undefined;
   not?: undefined;
