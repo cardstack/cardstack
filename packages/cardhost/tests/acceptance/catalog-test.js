@@ -5,6 +5,7 @@ import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
 import { createCards } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
+import { percySnapshot } from 'ember-percy';
 
 const timeout = 20000;
 const card1Id = 'millenial-puppies';
@@ -57,17 +58,19 @@ module('Acceptance | catalog', function(hooks) {
   test(`viewing catalog`, async function(assert) {
     await visit(`/`);
 
-    assert.dom(`.card-catalog > .card-renderer--embedded-card-link[href="/cards/${card1Id}"]`).exists();
-    assert.dom(`.card-catalog > .card-renderer--embedded-card-link[href="/cards/${card2Id}"]`).exists();
-    assert.dom(`.card-catalog > .card-renderer--embedded-card-link[href="/cards/${card3Id}"]`).exists();
+    assert.dom(`[data-test-embedded-card=${card1Id}]`).exists();
+    assert.dom(`[data-test-embedded-card=${card2Id}]`).exists();
+    assert.dom(`[data-test-embedded-card=${card3Id}]`).exists();
+    await percySnapshot(assert);
   });
 
   test(`isolating a card`, async function(assert) {
     await visit(`/`);
 
-    await click(`.card-catalog > .card-renderer--embedded-card-link[href="/cards/${card3Id}"]`);
-    await waitFor(`[data-test-card-view="${card3Id}"]`, { timeout });
+    await click(`[data-test-embedded-card=${card3Id}]`);
+    await waitFor(`[data-test-card-view=${card3Id}]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card3Id}`);
+    await percySnapshot(assert);
   });
 });

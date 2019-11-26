@@ -4,6 +4,7 @@ import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
 import { showCardId, addField, setCardId, createCards, saveCard, setFieldValue, removeField } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
+import { percySnapshot } from 'ember-percy';
 
 const timeout = 20000;
 const card1Id = 'address-card';
@@ -54,6 +55,7 @@ module('Acceptance | card adoption', function(hooks) {
     await saveCard('creator');
 
     assert.ok(currentURL().match(/\/cards\/new-card-[0-9]+/));
+    await percySnapshot(assert)
   });
 
   test('adopted fields are present', async function(assert) {

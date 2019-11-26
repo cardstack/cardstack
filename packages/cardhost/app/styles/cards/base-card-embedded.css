@@ -5,13 +5,13 @@ custom CSS for each card, all cards will inherit the
 @cardstack/base-card css.
 */
 
-.embedded-card {
-  overflow: hidden;
-}
-
 .embedded-card.cardstack_base-card {
   /* This is just placeholder CSS to test that everuthing works--please change as necessary */
+  margin: 0;
+  padding: 20px;
   background-color: white;
   color: black;
-  border-radius: 5px;
+  border-radius: 15px;
+  font-size: 18px;
+  overflow: hidden;
 }

@@ -1,9 +1,10 @@
 import { module, test } from 'qunit';
-import { fillIn, find, visit, currentURL, waitFor } from '@ember/test-helpers';
+import { fillIn, find, visit, currentURL, waitFor, settled } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
 import { createCards } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
+import { percySnapshot } from 'ember-percy';
 
 const timeout = 20000;
 const card1Id = 'millenial-puppies';
@@ -76,6 +77,8 @@ module('Acceptance | card view', function(hooks) {
     assert.equal(card.data.attributes.created, '2019-10-08');
     assert.deepEqual(card.data.relationships.author.data, { type: 'cards', id: qualifiedCard2Id });
     assert.deepEqual(card.data.relationships.reviewers.data, [{ type: 'cards', id: qualifiedCard2Id }, { type: 'cards', id: qualifiedCard3Id }]);
+
+    await percySnapshot(assert)
   });
 
   test('can navigate to edit card', async function(assert) {
@@ -94,6 +97,7 @@ module('Acceptance | card view', function(hooks) {
 
     assert.equal(currentURL(), `/cards/${card1Id}/edit`);
     assert.dom(`[data-test-card-edit="${card1Id}"]`).exists();
+    await percySnapshot(assert)
   });
 
   test('can navigate to card schema', async function(assert) {
@@ -112,6 +116,7 @@ module('Acceptance | card view', function(hooks) {
 
     assert.equal(currentURL(), `/cards/${card1Id}/schema`);
     assert.dom(`[data-test-card-schema="${card1Id}"]`).exists();
+    await percySnapshot(assert)
   });
 
   test('can navigate to the base-card', async function(assert) {
@@ -122,5 +127,17 @@ module('Acceptance | card view', function(hooks) {
     assert.equal(currentURL(), `/cards/@cardstack%2Fbase-card`);
 
     assert.dom('[data-test-field]').doesNotExist(); // base-card currenty has no fields
+    await percySnapshot(assert)
   });
+
+  test('can view code editor', async function(assert) {
+    await login();
+
+    await visit(`/cards/@cardstack%2Fbase-card?editingCss=true`);
+    assert.equal(currentURL(), `/cards/@cardstack%2Fbase-card?editingCss=true`);
+    await waitFor(`[data-test-card-view="@cardstack/base-card"]`, { timeout });
+    assert.dom('[data-test-code-block]').exists();
+    await settled();
+    await percySnapshot(assert);
+  })
 });

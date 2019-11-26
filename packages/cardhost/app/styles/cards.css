@@ -19,8 +19,11 @@
   width: 85%;
 }
 
+/* TODO: Remove this after right-edge is displayed on edit and layout views */
+.cardhost-cards.edit,
 .cardhost-cards.view {
   --padding-left: var(--ch-left-edge-navbar-width);
+  --padding-right: 0;
 }
 
 .cardhost-cards.add,
