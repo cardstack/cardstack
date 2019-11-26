@@ -8,7 +8,9 @@ import { Memoize } from "typescript-memoize";
 import { inject } from "./dependency-injection";
 import CardstackError from './error';
 import { SessionContext } from "./authentication-middleware";
-import { isSingleResourceDoc, PristineDocument } from "./document";
+import { assertSingleResourceDoc, PristineDocument } from "./document";
+import { myOrigin } from "./origin";
+import Card from "./card";
 
 const apiPrefix = '/api';
 const apiPrefixPattern = new RegExp(`^${apiPrefix}/(.*)`);
@@ -50,10 +52,14 @@ export default class JSONAPIMiddleware {
       body,
       //route.get("/cards", getCards),
       route.post("/realms/:local_realm_id/cards", this.createCard.bind(this)),
-      route.post("/remote-realms/:remote_realm/cards", this.createCard.bind(this)),
-      // route.get("/cards/:id", getCard),
-      // route.patch("/cards/:id", updateCard),
-      // route.delete("/cards/:id", deleteCard)
+      route.post("/remote-realms/:remote_realm_url/cards", this.createCard.bind(this)),
+
+      // route.get("/realms/:local_realm_id/cards/:local_id", ....)
+      // route.get("/realms/:local_realm_id/cards/:original_realm_url/:local_id", ....)
+      // route.get("/remote-realms/:remote_realm_url/cards/:local_id", ....)
+      // route.get("/remote-realms/:remote_realm_url/cards/:original_realm_url/:local_id", ....)
+      // repeat for patch
+      // repeat for delete
     ]);
   }
 
@@ -72,11 +78,7 @@ export default class JSONAPIMiddleware {
   }
 
   private documentFromBody(ctxt: Koa.Context): PristineDocument {
-    if (!isSingleResourceDoc(ctxt.request.body)) {
-      throw new CardstackError('A JSON:API formatted body is required', {
-        status: 400
-      });
-    }
+    assertSingleResourceDoc(ctxt.request.body);
     return new PristineDocument(ctxt.request.body);
   }
 
@@ -84,15 +86,39 @@ export default class JSONAPIMiddleware {
     let body = this.documentFromBody(ctxt);
     let realm: URL;
     if (ctxt.routeParams.local_realm_id) {
-      realm = new URL(`${ctxt.request.origin}${apiPrefix}/realms/${ctxt.routeParams.local_realm_id}`);
+      realm = new URL(`${myOrigin}${apiPrefix}/realms/${ctxt.routeParams.local_realm_id}`);
     } else {
       // todo: test koa decoding behavior here
-      realm = new URL(decodeURI(ctxt.routeParams.remote_realm));
+      realm = new URL(decodeURIComponent(ctxt.routeParams.remote_realm_url));
+      if (realm.origin === myOrigin) {
+        throw new CardstackError(`${realm.href} is a local realm. You tried to access it via /api/remote-realms`, { status: 400 });
+      }
     }
     let card = await this.cards.create(ctxt.state.cardstackSession, realm, body);
-    ctxt.body = card.jsonapi;
+    ctxt.body = (await card.asPristineDoc()).jsonapi;
     ctxt.status = 201;
-    ctxt.set('location', `${ctxt.request.origin}${apiPrefix}/cards/${card.id}`);
+    ctxt.set('location', this.canonicalURLFor(card));
+  }
+
+  private canonicalURLFor(card: Card): string {
+    let isHome = card.originalRealm.href === card.realm.href;
+    if (card.realm.origin === myOrigin) {
+      let base = `${myOrigin}${apiPrefix}/realms`;
+      let localRealmId = card.realm.href.slice(base.length + 1);
+      if (isHome) {
+        return [base, localRealmId, 'cards', card.localId].join('/');
+      } else {
+        return [base, localRealmId, 'cards', encodeURIComponent(card.originalRealm.href), card.localId].join('/');
+      }
+    } else {
+      let base = `${myOrigin}${apiPrefix}/remote-realms`;
+      if (isHome) {
+        return [base, encodeURIComponent(card.realm.href), 'cards', card.localId].join('/');
+      } else {
+        return [base, encodeURIComponent(card.realm.href), 'cards', encodeURIComponent(card.originalRealm.href), card.localId].join('/');
+      }
+    }
+
   }
 }
 

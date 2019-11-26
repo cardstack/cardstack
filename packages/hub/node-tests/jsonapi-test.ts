@@ -1,6 +1,7 @@
 import Koa from "koa";
 import { wireItUp } from "../main";
 import supertest from "supertest";
+import { myOrigin } from "../origin";
 
 describe("hub/jsonapi", function() {
   let request: supertest.SuperTest<supertest.Test>;
@@ -15,16 +16,18 @@ describe("hub/jsonapi", function() {
 
   it("errors correctly for missing post body", async function() {
     let response = await request
-      .post("/api/realms/some-realm/cards")
+      .post("/api/realms/first-ephemeral-realm/cards")
       .set("Content-Type", "application/vnd.api+json");
     expect(response.status).to.equal(400);
     expect(response.body.errors).has.length(1);
-    expect(response.body.errors[0]).property('detail', 'A JSON:API formatted body is required');
+    expect(response.body.errors[0]).property('detail', 'missing resource object');
+    expect(response.body.errors[0].source).property('pointer', '/data');
+
   });
 
   it("errors correctly for invalid json", async function() {
     let response = await request
-      .post("/api/cards")
+      .post("/api/realms/first-ephemeral-realm/cards")
       .set("Content-Type", "application/vnd.api+json")
       .send("{ data ");
     expect(response.status).to.equal(400);
@@ -32,9 +35,21 @@ describe("hub/jsonapi", function() {
     expect(response.body.errors[0]).property('detail', 'error while parsing body: Unexpected token d in JSON at position 2');
   });
 
+  it("errors correctly for local realm on remote-realms endpoint", async function() {
+    let response = await request
+      .post(`/api/remote-realms/${encodeURIComponent(myOrigin + '/api/realms/first-ephemeral-realm')}/cards`)
+      .set("Content-Type", "application/vnd.api+json")
+      .send({ data: {
+        type: 'cards'
+      } });
+    expect(response.status).to.equal(400);
+    expect(response.body.errors).has.length(1);
+    expect(response.body.errors[0].detail).matches(/is a local realm. You tried to access it/);
+  });
+
   it("can create card", async function() {
     let response = await request
-      .post("/api/realms/my-realm/cards")
+      .post("/api/realms/first-ephemeral-realm/cards")
       .set("Content-Type", "application/vnd.api+json")
       .send({
         data: {
@@ -70,6 +85,6 @@ describe("hub/jsonapi", function() {
         }
       });
     expect(response.status).to.equal(201);
-    expect(response.header.location).to.match(/http:\/\/[^/]+\/api\/cards\/my-realm\/[^/]+/);
+    expect(response.header.location).to.match(/http:\/\/[^/]+\/api\/realms\/first-ephemeral-realm\/cards\/[^/]+/);
   });
 });

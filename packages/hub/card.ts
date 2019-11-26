@@ -1,13 +1,14 @@
-import { SingleResourceDoc } from "jsonapi-typescript";
 import CardstackError from "./error";
 import { loadWriter } from "./scaffolding";
 import { WriterFactory } from "./writer";
+import { PristineDocument, UpstreamDocument } from "./document";
+import { SingleResourceDoc } from "jsonapi-typescript";
 
-export default class Card {
+export class NewCard {
   // The id is an entirely synthetic primary key that is only relevant on the
   // current hub. When establishing ard identity across hubs, we always work
   // with realm, originalRealm, and localId instead.
-  id: string;
+  id: string | undefined;
 
   // This is the realm the card is stored in.
   realm: URL;
@@ -19,7 +20,9 @@ export default class Card {
   // the localId distinguishes the card within its originalRealm. In some cases
   // it may be chosen by the person creating the card. In others it may be
   // chosen by the hub.
-  localId: string;
+  localId: string | undefined;
+
+  private jsonapi: SingleResourceDoc;
 
   // Identity invariants:
   //
@@ -36,29 +39,70 @@ export default class Card {
   //  - [realm, originalRealm, id] is globally unique, such that there are
   //    exactly zero or one cards that match it, across all hubs.
 
-  constructor(public jsonapi: SingleResourceDoc) {
-    if (typeof jsonapi.data.id !== 'string') {
-      throw new CardstackError(`card missing required field "id": ${JSON.stringify(jsonapi)}`);
-    }
+  constructor(public doc: PristineDocument, realm: URL) {
+    let jsonapi = doc.jsonapi;
+    this.jsonapi = jsonapi;
     this.id = jsonapi.data.id;
+    this.realm = realm;
+    this.originalRealm =
+      typeof jsonapi.data.attributes?.["original-realm"] === "string"
+        ? new URL(jsonapi.data.attributes["original-realm"])
+        : realm;
 
-    if (typeof jsonapi.data.attributes?.realm !== 'string') {
-      throw new CardstackError(`card missing required attribute "realm": ${JSON.stringify(jsonapi)}`);
-    }
-    this.realm = new URL(jsonapi.data.attributes.realm);
 
-    if (typeof jsonapi.data.attributes?.['original-realm'] !== 'string') {
-      throw new CardstackError(`card missing required attribute "originalRealm": ${JSON.stringify(jsonapi)}`);
+    if (typeof jsonapi.data.attributes?.['local-id'] === 'string') {
+      this.localId = jsonapi.data.attributes?.["local-id"];
     }
-    this.originalRealm = new URL(jsonapi.data.attributes['original-realm']);
-
-    if (typeof jsonapi.data.attributes?.['local-id'] !== 'string') {
-      throw new CardstackError(`card missing required attribute "localId": ${JSON.stringify(jsonapi)}`);
-    }
-    this.localId = jsonapi.data.attributes['local-id'];
   }
 
-  async loadFeature(featureName: 'writer'): Promise<WriterFactory>
+  async asPristineDoc(): Promise<PristineDocument> {
+    let copied = JSON.parse(JSON.stringify(this.jsonapi)) as SingleResourceDoc;
+    if (!copied.data.attributes) {
+      copied.data.attributes = {};
+    }
+    copied.data.attributes.realm = this.realm.href;
+    copied.data.attributes['original-realm'] = this.originalRealm.href;
+    if (!copied.data.id) {
+      copied.data.id = String(Math.floor(Math.random() * 1000));
+    }
+
+    if (!copied.data.attributes['local-id']) {
+      copied.data.attributes['local-id'] = copied.data.id;
+    }
+
+    return new PristineDocument(copied);
+  }
+
+  async asUpstreamDoc(): Promise<UpstreamDocument> {
+    return new UpstreamDocument(this.jsonapi);
+  }
+}
+
+export default class Card extends NewCard {
+  id!: string;
+  localId!: string;
+
+  constructor(doc: PristineDocument) {
+    if (typeof doc.jsonapi.data.attributes?.realm !== "string") {
+      throw new CardstackError(
+        `card missing required attribute "realm": ${JSON.stringify(
+          doc.jsonapi
+        )}`
+      );
+    }
+    let realm = new URL(doc.jsonapi.data.attributes.realm);
+    super(doc, realm);
+    if (typeof this.id !== 'string') {
+      throw new CardstackError(`card missing required attribute "id"`);
+    }
+    if (typeof this.localId !== "string") {
+      throw new CardstackError(
+        `card missing required attribute "localId"`
+      );
+    }
+  }
+
+  async loadFeature(featureName: "writer"): Promise<WriterFactory>;
   async loadFeature(_featureName: any): Promise<any> {
     return await loadWriter(this);
   }

@@ -46,6 +46,13 @@ describe("hub/dependency-injection", function() {
     let owner = getOwner(instance);
     expect(owner).equals(container);
   });
+
+  it("supports instantiating your own class", async function() {
+    let thing = await container.instantiate(class {
+      testExample = inject('testExample');
+    });
+    expect(thing.testExample.whoAreYou()).to.equal('Quint');
+  });
 });
 
 class ExampleService {

@@ -8,18 +8,22 @@ export class Container {
   async lookup(name: string): Promise<any> {
     let cached = this.cache.get(name);
     if (!cached) {
-      cached = await this.instantiate(name);
+      let factory = this.lookupFactory(name);
+      cached = await this.instantiate(factory);
       this.cache.set(name, cached);
     }
     return cached;
   }
 
-  private async instantiate(name: string): Promise<any> {
+  private lookupFactory(name: string): Factory<any> {
     let factory = mappings.get(this.registry)!.get(name);
     if (!factory) {
       throw new Error(`no such service "${name}"`);
     }
+    return factory;
+  }
 
+  async instantiate<T>(factory: Factory<T>): Promise<T> {
     let pending = [] as PendingInjection[];
     pendingInjections.unshift(pending);
     let instance: any;

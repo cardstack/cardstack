@@ -1,16 +1,17 @@
 import { Session } from "./session";
-import Card, { CardId } from "./card";
+import Card, { CardId, NewCard } from "./card";
 import { CARDSTACK_PUBLIC_REALM } from "./realm";
 import CardstackError from "./error";
 import { myOrigin } from "./origin";
 import { search } from "./scaffolding";
 import { PristineDocument } from "./document";
+import { getOwner } from './dependency-injection';
 
 export default class CardsService {
   async create(
-    _session: Session,
+    session: Session,
     realm: URL,
-    _doc: PristineDocument
+    doc: PristineDocument
   ): Promise<Card> {
     let realms = await this.search(Session.INTERNAL_PRIVILEGED, {
       filter: {
@@ -45,8 +46,12 @@ export default class CardsService {
       throw new CardstackError(`no such realm`, { status: 400 });
     }
 
-    let writer = await realms[0].loadFeature('writer');
-
+    let writerFactory = await realms[0].loadFeature('writer');
+    let writer = await getOwner(this).instantiate(writerFactory);
+    let card = new NewCard(doc, realm);
+    let pending = await writer.prepareCreate(session, await card.asUpstreamDoc());
+    await pending.finalize();
+    return new Card(await card.asPristineDoc());
   }
 
   async search(_session: Session, query: Query): Promise<Card[]> {
