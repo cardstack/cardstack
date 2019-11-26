@@ -41,13 +41,12 @@ module('Acceptance | event card', function(hooks) {
     // local store. So the first step is to warm up the store.
     await login();
     await createCards({
-      [card1Id]: eventData
+      ['event-card']: eventData
     })
     await visit(`/cards/${card1Id}`);
   })
 
   test('visiting /event-card', async function(assert) {
-    await visit('cards/event-card/');
     assert.equal(currentURL(), '/cards/event-card');
     await percySnapshot(assert)
   });
