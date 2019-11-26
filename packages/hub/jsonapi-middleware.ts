@@ -8,6 +8,7 @@ import { Memoize } from "typescript-memoize";
 import { inject } from "./dependency-injection";
 import CardstackError from './error';
 import { SessionContext } from "./authentication-middleware";
+import { isSingleResourceDoc, PristineDocument } from "./document";
 
 const apiPrefix = '/api';
 const apiPrefixPattern = new RegExp(`^${apiPrefix}/(.*)`);
@@ -70,16 +71,17 @@ export default class JSONAPIMiddleware {
     return isJsonApi || acceptsJsonApi;
   }
 
-  private assertBodyPresent(ctxt: Koa.Context) {
-    if (!ctxt.request.body || !ctxt.request.body.data) {
+  private documentFromBody(ctxt: Koa.Context): PristineDocument {
+    if (!isSingleResourceDoc(ctxt.request.body)) {
       throw new CardstackError('A JSON:API formatted body is required', {
         status: 400
       });
     }
+    return new PristineDocument(ctxt.request.body);
   }
 
   async createCard(ctxt: KoaRoute.Context<SessionContext, {}>) {
-    this.assertBodyPresent(ctxt);
+    let body = this.documentFromBody(ctxt);
     let realm: URL;
     if (ctxt.routeParams.local_realm_id) {
       realm = new URL(`${ctxt.request.origin}${apiPrefix}/realms/${ctxt.routeParams.local_realm_id}`);
@@ -87,7 +89,7 @@ export default class JSONAPIMiddleware {
       // todo: test koa decoding behavior here
       realm = new URL(decodeURI(ctxt.routeParams.remote_realm));
     }
-    let card = await this.cards.create(ctxt.state.cardstackSession, realm, ctxt.request.body);
+    let card = await this.cards.create(ctxt.state.cardstackSession, realm, body);
     ctxt.body = card.jsonapi;
     ctxt.status = 201;
     ctxt.set('location', `${ctxt.request.origin}${apiPrefix}/cards/${card.id}`);

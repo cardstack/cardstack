@@ -3,6 +3,26 @@ import { Query, FieldFilter } from './cards-service';
 import CardstackError from "./error";
 import { myOrigin } from "./origin";
 import { CARDSTACK_PUBLIC_REALM } from "./realm";
+import { WriterFactory } from "./writer";
+
+const ephemeralRealm = new Card({
+  data: {
+    type: "cards",
+    id: `fake-realm-1`,
+    attributes: {
+      realm: `${myOrigin}/api/realms/meta`,
+      'original-realm': `${myOrigin}/api/realms/meta`,
+      'local-id': 'first-ephemeral-realm',
+    },
+    relationships: {
+      "adopts-from": {
+        links: {
+          related: 'https://base.cardstack.com/api/realms/public/cards/ephemeral'
+        },
+      }
+    }
+  }
+});
 
 export async function search(query: Query): Promise<Card[]> {
   // this is currently special-cased to only handle searches for realms.
@@ -42,29 +62,18 @@ export async function search(query: Query): Promise<Card[]> {
     throw new CardstackError("unimplemented, not searching for realm localId");
   }
 
+  if (foundRealmId.value !== 'first-ephemeral-realm') {
+    return [];
+  }
+
   return [
-    new Card({
-      data: {
-        type: "cards",
-        id: `a-fake-realm`,
-        attributes: {
-          realm: `${myOrigin}/api/realms/meta`,
-          'original-realm': `${myOrigin}/api/realms/meta`,
-          'local-id': foundRealmId.value,
-          model: {
-            attributes: {
-              repo: 'git+https://github.com/ef4/ember-animated'
-            },
-          }
-        },
-        relationships: {
-          "adopts-from": {
-            links: {
-              related: 'https://base.cardstack.com/api/realms/public/cards/git'
-            },
-          }
-        }
-      }
-    })
+    ephemeralRealm
   ];
+}
+
+export async function loadWriter(card: Card): Promise<WriterFactory> {
+  if (card.id === 'fake-realm-1') {
+    return (await import('./ephemeral/writer')).default;
+  }
+  throw new Error(`unimplemented`);
 }

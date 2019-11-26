@@ -1,16 +1,16 @@
-import { SingleResourceDoc } from "jsonapi-typescript";
-import Session from "./session";
+import { Session } from "./session";
 import Card, { CardId } from "./card";
 import { CARDSTACK_PUBLIC_REALM } from "./realm";
 import CardstackError from "./error";
 import { myOrigin } from "./origin";
 import { search } from "./scaffolding";
+import { PristineDocument } from "./document";
 
 export default class CardsService {
   async create(
     _session: Session,
     realm: URL,
-    _doc: SingleResourceDoc
+    _doc: PristineDocument
   ): Promise<Card> {
     let realms = await this.search(Session.INTERNAL_PRIVILEGED, {
       filter: {
@@ -45,7 +45,8 @@ export default class CardsService {
       throw new CardstackError(`no such realm`, { status: 400 });
     }
 
-    return realms[0];
+    let writer = await realms[0].loadFeature('writer');
+
   }
 
   async search(_session: Session, query: Query): Promise<Card[]> {

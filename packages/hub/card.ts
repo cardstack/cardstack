@@ -1,5 +1,7 @@
 import { SingleResourceDoc } from "jsonapi-typescript";
 import CardstackError from "./error";
+import { loadWriter } from "./scaffolding";
+import { WriterFactory } from "./writer";
 
 export default class Card {
   // The id is an entirely synthetic primary key that is only relevant on the
@@ -54,6 +56,11 @@ export default class Card {
       throw new CardstackError(`card missing required attribute "localId": ${JSON.stringify(jsonapi)}`);
     }
     this.localId = jsonapi.data.attributes['local-id'];
+  }
+
+  async loadFeature(featureName: 'writer'): Promise<WriterFactory>
+  async loadFeature(_featureName: any): Promise<any> {
+    return await loadWriter(this);
   }
 }
 
