@@ -7,13 +7,13 @@
   >
   </button>
   <button
-    class="ch-button ch-button--secondary  ch-button--fixed-width"
+    class="ch-button ch-button--secondary"
     disabled={{not this.cardstackSession.isAuthenticated}}
   >
     Preview
   </button>
   <button
-    class="ch-button ch-button--fixed-width"
+    class="ch-button"
     disabled={{not this.cardstackSession.isAuthenticated}}
   >
     Save
@@ -65,7 +65,7 @@
           />
         </div>
         <button {{on "click" this.createTheme}}
-          class="ch-button ch-button--secondary"
+          class="ch-button ch-button--secondary ch-button--responsive"
           data-test-card-custom-style-button
         >
           New Custom Style
