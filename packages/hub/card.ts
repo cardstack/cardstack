@@ -1,5 +1,5 @@
 import CardstackError from "./error";
-import { loadWriter } from "./scaffolding";
+import { loadWriter, cardToPristine } from "./scaffolding";
 import { WriterFactory } from "./writer";
 import { PristineDocument, UpstreamDocument } from "./document";
 import { SingleResourceDoc } from "jsonapi-typescript";
@@ -56,21 +56,7 @@ export class NewCard {
   }
 
   async asPristineDoc(): Promise<PristineDocument> {
-    let copied = JSON.parse(JSON.stringify(this.jsonapi)) as SingleResourceDoc;
-    if (!copied.data.attributes) {
-      copied.data.attributes = {};
-    }
-    copied.data.attributes.realm = this.realm.href;
-    copied.data.attributes['original-realm'] = this.originalRealm.href;
-    if (!copied.data.id) {
-      copied.data.id = String(Math.floor(Math.random() * 1000));
-    }
-
-    if (!copied.data.attributes['local-id']) {
-      copied.data.attributes['local-id'] = copied.data.id;
-    }
-
-    return new PristineDocument(copied);
+    return cardToPristine(this.jsonapi, this.realm, this.originalRealm);
   }
 
   async asUpstreamDoc(): Promise<UpstreamDocument> {

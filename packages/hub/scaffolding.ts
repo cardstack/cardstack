@@ -5,6 +5,7 @@ import { myOrigin } from "./origin";
 import { CARDSTACK_PUBLIC_REALM } from "./realm";
 import { WriterFactory } from "./writer";
 import { PristineDocument } from "./document";
+import { SingleResourceDoc } from "jsonapi-typescript";
 
 function ephemeralRealm() {
   return new Card(
@@ -77,4 +78,22 @@ export async function loadWriter(card: Card): Promise<WriterFactory> {
     return (await import("./ephemeral/writer")).default;
   }
   throw new Error(`unimplemented`);
+}
+
+export async function cardToPristine(jsonapi: SingleResourceDoc, realm: URL, originalRealm: URL): Promise<PristineDocument> {
+  let copied = JSON.parse(JSON.stringify(jsonapi)) as SingleResourceDoc;
+  if (!copied.data.attributes) {
+    copied.data.attributes = {};
+  }
+  copied.data.attributes.realm = realm.href;
+  copied.data.attributes['original-realm'] = originalRealm.href;
+  if (!copied.data.id) {
+    copied.data.id = String(Math.floor(Math.random() * 1000));
+  }
+
+  if (!copied.data.attributes['local-id']) {
+    copied.data.attributes['local-id'] = copied.data.id;
+  }
+
+  return new PristineDocument(copied);
 }
