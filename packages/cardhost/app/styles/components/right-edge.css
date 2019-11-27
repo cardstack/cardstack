@@ -5,7 +5,7 @@
   width: var(--ch-right-edge-panel-width);
   max-height: calc(100vh - var(--ch-top-edge-height) - var(--ch-bottom-edge-height));
   border-radius: 10px;
-  background-color: var(--ch-medium-dark-blue-gray);
+  background-color: var(--ch-dark-background);
   color: white;
   font: 400 13px/18px var(--ch-font-family);
   letter-spacing: 0.035em;
@@ -24,11 +24,11 @@
   min-width: var(--ch-component-width);
   width: min-content;
   height: var(--ch-component-height);
-  background-color: var(--ch-dark-blue-gray);
+  background-color: var(--ch-default);
   color: white;
   font: 400 13px/18px var(--ch-font-family);
   letter-spacing: 0.035em;
-  border: 1px solid var(--ch-dark-blue-gray);
+  border: 1px solid var(--ch-default);
   border-radius: 20px;
 }
 
@@ -39,15 +39,15 @@
 }
 
 .pill-option.selected {
-  background-color: var(--ch-lighter-medium-blue-gray);
-  color: var(--ch-cyan);
+  background-color: var(--ch-foreground);
+  color: var(--ch-highlight);
   font-weight: 600;
   border-radius: inherit;
 }
 
 .right-edge--section {
   padding: 10px var(--ch-spacing) 11px;
-  border-top: 1px solid var(--ch-dark-blue-gray);
+  border-top: 1px solid var(--ch-default);
 }
 
 .right-edge--section:last-child {
@@ -65,7 +65,7 @@
 
 .right-edge--section-header--adopted {
   font-weight: 400;
-  color: var(--ch-white-op60);
+  color: var(--ch-light-op60);
   text-transform: none;
 }
 
@@ -114,9 +114,9 @@
   align-items: center;
   min-height: 75px;
   padding: 10px;
-  background-color: var(--ch-lighter-medium-blue-gray);
+  background-color: var(--ch-foreground);
   color: white;
-  border: 1px solid var(--ch-darker-dark-blue-gray);
+  border: 1px solid var(--ch-default);
   border-radius: 5px;
   font: 600 13px/18px var(--ch-font-family);
   letter-spacing: 0.035em;
@@ -143,6 +143,6 @@
   background-position: center;
   background-repeat: no-repeat;
   background-size: var(--adopted-image-size);
-  border: 1px solid var(--ch-darker-dark-blue-gray);
+  border: 1px solid var(--ch-default);
   border-radius: 5px;
 }

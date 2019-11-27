@@ -4,7 +4,7 @@
 
   {{!-- TODO: Add navbar --}}
 
-  <section class="ui-components--section">
+  <section class="ui-components--section icons">
     <h2>Icons</h2>
     <a href="/ember-svg-jar/index.html">** See all SVG icons here. **</a>
 
@@ -21,10 +21,10 @@
   - Do not hardcode colors in the existing SVGs. Make a copy of the SVG first.
 */
 .ui-components--icon {
-  --icon-color: #3b3390;
+  --icon-color: var(--ch-light-op50);
 }
 .ui-components--icon:hover {
-  --icon-color: #71248a;
+  --icon-color: var(--ch-light);
 }' />
   </section>
 
@@ -105,12 +105,7 @@
       @code='<button class="ch-button ch-button--icon-secondary delete" aria-label="Delete"></button>'
       @language="html"
     />
-
-    <h3>Blue CTA button on default card</h3>
-    TK
   </section>
-
-
 
   <section class="ui-components--section ui-components--grid-2-col">
     <h2>View Switcher</h2>

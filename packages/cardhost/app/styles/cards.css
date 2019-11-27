@@ -8,7 +8,7 @@
 
   width: 100vw;
   height: 100vh;
-  background-color: var(--ch-dark-blue-gray);
+  background-color: var(--ch-default);
   overflow: hidden;
   padding-top: var(--padding-top);
   padding-left: var(--padding-left);
