@@ -90,3 +90,10 @@
 .color-palette--code.cardhost-monaco-container {
   min-height: 1em;
 }
+
+
+/* Form Fields section */
+.ui-components--section.form-fields {
+  background-color: var(--ch-dark-background);
+  padding: 15px;
+}

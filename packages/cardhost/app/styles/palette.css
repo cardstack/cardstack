@@ -14,7 +14,9 @@
   --ch-foreground-hover: #434050;
   --ch-light: #fff;
   --ch-dark: #000;
-  --ch-light-op50: rgba(255, 255, 255, 0.5); /* example: inactive label on dark bg */
+  --ch-alert: #ff0000;
+  --ch-light-op40: rgba(255, 255, 255, 0.4); /* example: disabled field font color */
+  --ch-light-op50: rgba(255, 255, 255, 0.5); /* example: placeholder or inactive label on dark bg */
   --ch-light-op60: rgba(255, 255, 255, 0.6); /* example: regular label on dark bg */
   --ch-dark-op50: rgba(0, 0, 0, 0.5);        /* example: regular label on light bg */
 
