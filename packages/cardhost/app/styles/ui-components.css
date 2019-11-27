@@ -23,12 +23,8 @@
   resize: both;
 }
 
-.ui-components--note,
-.code-block.ui-components--notes,
-.ui-components--grid-2-col .code-block.ui-components--notes {
-  grid-column: span 2;
-  width: min-content;
-  margin-bottom: var(--ch-spacing);
+.ui-components--notes {
+  grid-column: 1 / -1;
 }
 
 .ui-components--grid {
@@ -45,7 +41,7 @@
 .ui-components--grid-2-col > h2,
 .ui-components--grid-2-col > h3,
 .ui-components--grid-2-col > h4 {
-  grid-column: span 2;
+  grid-column: 1 / -1;
 }
 .ui-components--grid-2-col .code-block {
   margin: 0;

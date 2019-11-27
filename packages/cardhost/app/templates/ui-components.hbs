@@ -39,7 +39,7 @@
   <section class="ui-components--section">
     <h2>Root CSS Variables</h2>
     <CodeEditor
-      @class="ui-components--notes"
+      class="ui-components--notes"
       @code='--ch-left-edge-navbar-width: 80px;
 --ch-left-edge-panel-width: 330px;
 --ch-right-edge-panel-width: 300px;
@@ -188,7 +188,7 @@
   <section class="ui-components--section ui-components--grid-2-col">
     <h2>Form Elements</h2>
     <CodeEditor
-      @class="ui-components--notes"
+      class="ui-components--notes"
       @code='`ch-input-group` class is optional. It adds top margin when there are sibling elements with the same class.'
       @language="html"
     />
@@ -306,9 +306,9 @@ Textarea label
 
     <h3>Checkbox</h3>
     <CodeEditor
-      @class="ui-components--notes"
-      @code='`checked` and `disabled` classes should be added to the `ch-checkbox-group` along with using the attributes on the input field.'
-      @language="html"
+      class="ui-components--notes"
+      @code='Notes: `checked` and `disabled` classes should be added to the `ch-checkbox-group` along with using the attributes on the input field.'
+      @language="markdown"
     />
     <label class="ch-label ch-input-group ch-checkbox-group {{if this.selected "checked"}}">
       {{if this.selected "selected" "not selected"}}
@@ -356,14 +356,14 @@ Textarea label
     />
 
     <h3>Dropdown</h3>
-    <div class="cs-input-group">
+    <div class="ch-input-group">
       <label for="ch-dropdown-1" class="ch-label">Label</label>
       <select id="ch-dropdown-1" class="ch-dropdown">
         <option class="ch-dropdown--option">Dropdown</option>
       </select>
     </div>
     <CodeEditor
-      @code='<div class="cs-input-group">
+      @code='<div class="ch-input-group">
   <label for="[id]" class="ch-label">Label</label>
   <select id="[id]" class="ch-dropdown">
     <option class="ch-dropdown--option">Dropdown</option>
@@ -371,14 +371,14 @@ Textarea label
 </div>'
       @language="html"
     />
-    <div class="cs-input-group">
+    <div class="ch-input-group">
       <label for="ch-dropdown-2" class="ch-label">Label</label>
       <select id="ch-dropdown-2" class="ch-dropdown disabled" disabled>
         <option class="ch-dropdown--option">Dropdown</option>
       </select>
     </div>
     <CodeEditor
-      @code='<div class="cs-input-group">
+      @code='<div class="ch-input-group">
   <label for="[id]" class="ch-label">Label</label>
   <select id="[id]" class="ch-dropdown disabled" disabled>
     <option class="ch-dropdown--option">Dropdown</option>
@@ -515,7 +515,7 @@ Textarea label
 
     <h4>Textarea Editor</h4>
     <CodeEditor
-      @class="ui-components--notes"
+      class="ui-components--notes"
       @code='Note: Textarea core-type currently does not exist.'
       @language="html"
     />
@@ -539,7 +539,7 @@ Textarea label
 
     <h4>Address string editor</h4>
     <CodeEditor
-      @class="ui-components--notes"
+      class="ui-components--notes"
       @code='Note: Address core-type does not exist.'
       @language="html"
     />
@@ -563,7 +563,7 @@ Textarea label
 
     <h4>Image editor</h4>
     <CodeEditor
-      @class="ui-components--notes"
+      class="ui-components--notes"
       @code='Note: Image core-type currently does not exist.'
       @language="html"
     />
@@ -671,7 +671,7 @@ Textarea label
   <section class="ui-components--section ui-components--grid-2-col">
     <h2>Right Edge</h2>
     <CodeEditor
-      @class="ui-components--notes"
+      class="ui-components--notes"
       @code='<RightEdge> component normally has fixed positioning. Using `position: static` here for display purposes.'
       @language="html"
     />

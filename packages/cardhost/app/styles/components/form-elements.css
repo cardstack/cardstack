@@ -59,7 +59,7 @@
 .ch-label + .ch-dropdown,
 .ch-label > .ch-input,
 .ch-label > .ch-textarea {
-  margin-top: 10px;
+  margin-top: 7px;
 }
 
 .ch-input::placeholder,
@@ -137,8 +137,8 @@
   pointer-events: none;
 }
 
-.ch-input-group + .ch-input-group {
-  margin-top: var(--ch-spacing);
+.ch-input-group {
+  padding-bottom: 15px;
 }
 
 .ch-dropdown {
