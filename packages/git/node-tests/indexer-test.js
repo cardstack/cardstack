@@ -388,6 +388,7 @@ describe('git/indexer', function() {
   });
 
   it('replaces unrelated card content it finds in the search index', async function() {
+    this.timeout(10000);
     let repos = await temp.mkdir('extra-repos');
 
     await makeRepo(repos + '/left', {

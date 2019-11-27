@@ -19,6 +19,10 @@ package-lock.json
 /cards/base-card/index.js.map
 /cards/base-card/index.d.ts
 
+/packages/git/git.d.ts
+/packages/git/git.js
+/packages/git/git.js.map
+
 /packages/hub/card-services.d.ts
 /packages/hub/card-services.js
 /packages/hub/card-services.js.map

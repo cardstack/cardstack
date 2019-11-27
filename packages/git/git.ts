@@ -21,12 +21,12 @@ const {
 setThreadSafetyStatus(1);
 
 
-async function logFromCommit(commit) {
-  let log = [];
+async function logFromCommit(commit: any) {
+  let log: any[] = [];
 
   await new Promise((resolve, reject) => {
     let history = commit.history(Revwalk.SORT.TIME);
-    history.on("commit", (c) => log.push(c) );
+    history.on("commit", (c: any) => log.push(c) );
     history.on('end', resolve);
     history.on('error', reject);
     history.start();
@@ -35,13 +35,19 @@ async function logFromCommit(commit) {
   return log;
 }
 
+async function cloneRepo(url:String, path:String, { fetchOpts }: {fetchOpts:any}) {
+  return await Clone(url, path, { fetchOpts });
+}
+
+async function createRemote(repo:any, name:String, url:String) {
+  return await Remote.create(repo, name, url);
+}
+
 module.exports = {
   Branch,
-  Clone,
   Commit,
   Cred,
   Merge,
-  Remote,
   Repository,
   Reset,
   Signature,
@@ -49,6 +55,9 @@ module.exports = {
   Treebuilder,
   TreeEntry,
   FILEMODE,
-  logFromCommit
+  // wrapped
+  logFromCommit,
+  cloneRepo,
+  createRemote
 };
 

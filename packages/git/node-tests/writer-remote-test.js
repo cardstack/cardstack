@@ -1,7 +1,7 @@
 const {
   Cred,
-  Clone,
-  Remote,
+  cloneRepo,
+  createRemote,
   Repository,
   logFromCommit
 } = require("../git");
@@ -51,7 +51,7 @@ async function resetRemote() {
     }, null, 2)
   });
 
-  let remote = await Remote.create(tempRepo.repo, 'origin', 'ssh://root@localhost:9022/root/data-test');
+  let remote = await createRemote(tempRepo.repo, 'origin', 'ssh://root@localhost:9022/root/data-test');
   await remote.push(["+refs/heads/master:refs/heads/master"], fetchOpts);
   return tempRepo;
 }
@@ -70,7 +70,7 @@ describe('git/writer with remote', function() {
     tempRepoPath = await mkdir('cardstack-temp-test-repo');
     tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
 
-    repo = await Clone('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
+    repo = await cloneRepo('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
       fetchOpts,
     });
 
@@ -275,7 +275,7 @@ describe('git/writer with empty remote', function() {
 
     let { repo: remoteRepo } = await makeRepo(root);
 
-    let remote = await Remote.create(remoteRepo, 'origin', 'ssh://root@localhost:9022/root/data-test');
+    let remote = await createRemote(remoteRepo, 'origin', 'ssh://root@localhost:9022/root/data-test');
     await remote.push(["+refs/heads/master:refs/heads/master"], fetchOpts);
 
     let factory = new JSONAPIFactory();
@@ -283,7 +283,7 @@ describe('git/writer with empty remote', function() {
     tempRepoPath = await mkdir('cardstack-temp-test-repo');
     tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
 
-    repo = await Clone('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
+    repo = await cloneRepo('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
       fetchOpts,
     });
 
@@ -353,7 +353,7 @@ describe('git/writer-remote/githereum', function() {
     tempRepoPath = await mkdir('cardstack-temp-test-repo');
     tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
 
-    await Clone('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
+    await cloneRepo('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
       fetchOpts,
     });
 

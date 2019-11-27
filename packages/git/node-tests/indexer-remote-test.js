@@ -9,7 +9,7 @@ const { join } = require('path');
 const { readFileSync } = require('fs');
 const {
   Cred,
-  Remote,
+  createRemote,
 } = require("../git");
 
 const service = require('../service');
@@ -46,7 +46,7 @@ async function resetRemote() {
     })
   });
 
-  let remote = await Remote.create(tempRepo.repo, 'origin', 'ssh://root@localhost:9022/root/data-test');
+  let remote = await createRemote(tempRepo.repo, 'origin', 'ssh://root@localhost:9022/root/data-test');
   await remote.push(["+refs/heads/master:refs/heads/master"], fetchOpts);
 
   return tempRepo;

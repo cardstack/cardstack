@@ -4,7 +4,7 @@ const filenamifyUrl = require('filenamify-url');
 const { existsSync } = require('fs');
 const rimraf = promisify(require('rimraf'));
 const { join } = require('path');
-const { Clone, Cred, Merge, Repository, Reset } = require('./git');
+const { cloneRepo, Cred, Merge, Repository, Reset } = require('./git');
 const { tmpdir } = require('os');
 const log = require('@cardstack/logger')('cardstack/git');
 
@@ -75,7 +75,7 @@ class GitLocalCache {
 
         await mkdirp(repoPath);
 
-        repo = await Clone(remote.url, repoPath, {
+        repo = await cloneRepo(remote.url, repoPath, {
           fetchOpts
         });
       }
@@ -83,7 +83,7 @@ class GitLocalCache {
       log.info("cloning %s into %s", remote.url, repoPath);
       await mkdirp(repoPath);
 
-      repo = await Clone(remote.url, repoPath, {
+      repo = await cloneRepo(remote.url, repoPath, {
         fetchOpts
       });
     }
