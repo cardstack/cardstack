@@ -47,7 +47,7 @@ export default class CardsService {
     }
 
     let writerFactory = await realms[0].loadFeature('writer');
-    let writer = await getOwner(this).instantiate(writerFactory);
+    let writer = await getOwner(this).instantiate(writerFactory, realms[0]);
     let card: Card = new Card(doc, realm);
     await validate(null, card, realms[0]);
     let { saved, id: upstreamId } = await writer.create(session, await card.asUpstreamDoc(), card.upstreamId);

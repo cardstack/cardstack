@@ -5,6 +5,7 @@ import { Registry, Container } from './dependency-injection';
 import JSONAPIMiddleware from './jsonapi-middleware';
 import CardsService from './cards-service';
 import AuthenticationMiddleware from './authentication-middleware';
+import { EphemeralStorage } from './ephemeral/storage';
 
 const log = logger('cardstack/server');
 
@@ -12,6 +13,7 @@ export async function wireItUp() {
   let registry = new Registry();
   registry.register('authentication-middleware', AuthenticationMiddleware);
   registry.register('jsonapi-middleware', JSONAPIMiddleware);
+  registry.register('ephemeralStorage', EphemeralStorage);
   registry.register('cards', CardsService);
   return new Container(registry);
 }

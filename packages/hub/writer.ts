@@ -1,10 +1,10 @@
 import { Session } from "./session";
 import { UpstreamDocument, UpstreamIdentity } from "./document";
+import { CardWithId } from "./card";
 
 export interface WriterFactory {
-  new (): Writer;
+  new(realmCard: CardWithId): Writer;
 }
-
 
 export interface Writer {
   create(

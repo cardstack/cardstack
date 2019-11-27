@@ -23,12 +23,18 @@ export class Container {
     return factory;
   }
 
-  async instantiate<T>(factory: Factory<T>): Promise<T> {
+  async instantiate<T, A>(factory: FactoryWithArg<T, A>, arg: A): Promise<T>;
+  async instantiate<T>(factory: Factory<T>): Promise<T>;
+  async instantiate<T, A>(factory: any, arg?: A): Promise<T> {
     let pending = [] as PendingInjection[];
     pendingInjections.unshift(pending);
     let instance: any;
     try {
-      instance = new factory();
+      if (arg === undefined) {
+        instance = new factory();
+      } else {
+        instance = new factory(arg);
+      }
     } finally {
       pendingInjections.shift();
     }
@@ -59,8 +65,12 @@ export class Container {
   }
 }
 
-interface Factory<T> {
+export interface Factory<T> {
   new(): T;
+}
+
+export interface FactoryWithArg<T, A> {
+  new(a: A): T;
 }
 
 let mappings = new WeakMap() as WeakMap<Registry, Map<string, Factory<any>>>;

@@ -53,6 +53,17 @@ describe("hub/dependency-injection", function() {
     });
     expect(thing.testExample.whoAreYou()).to.equal('Quint');
   });
+
+  it("supports instantiating your own class with an arg", async function() {
+    class X {
+      testExample = inject('testExample');
+      constructor(public options: { quiet: boolean }) {}
+    }
+    let thing = await container.instantiate(X, { quiet: true });
+    expect(thing.testExample.whoAreYou()).to.equal('Quint');
+    expect(thing.options).to.deep.equal({ quiet: true });
+  });
+
 });
 
 class ExampleService {
