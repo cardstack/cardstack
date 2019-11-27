@@ -54,6 +54,7 @@ Until that work is done we are statically adding this css
   --ch-top-edge-height: 80px;
   --ch-left-edge-width: calc(var(--ch-left-edge-panel-width) + var(--ch-left-edge-navbar-width));
   --ch-right-edge-width: calc(var(--ch-right-edge-panel-width) + var(--ch-spacing));
+  --ch-bottom-edge-height: 80px;
 
   --ch-component-width: 260px;
   --ch-component-height: 40px;

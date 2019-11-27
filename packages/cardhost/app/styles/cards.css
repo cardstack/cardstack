@@ -4,6 +4,7 @@
   --padding-top: var(--ch-top-edge-height);
   --padding-left: var(--ch-left-edge-width);
   --padding-right: var(--ch-right-edge-width);
+  --padding-bottom: var(--ch-bottom-edge-height);
 
   width: 100vw;
   height: 100vh;
@@ -12,6 +13,7 @@
   padding-top: var(--padding-top);
   padding-left: var(--padding-left);
   padding-right: var(--padding-right);
+  padding-bottom: var(--padding-bottom);
 }
 
 .cardhost-cards.editing-css {

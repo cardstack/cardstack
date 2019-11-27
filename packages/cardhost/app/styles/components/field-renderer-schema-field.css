@@ -79,7 +79,8 @@
   margin: 0;
   padding: 0;
   border: none;
-  overflow-y: scroll;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .schema-field-renderer:hover {

@@ -1,5 +1,18 @@
 :root {
-  /* Also add new colors to `color-palette.js` */
+  /* TODO Only use these colors now on */
+  --ch-default: #2e2d38;
+  --ch-hover: #272330;
+  --ch-disabled: #393642;
+  --ch-highlight: #00ebe5;
+  --ch-highlight-hover: #00b0ad;
+  --ch-success: #37eb77;
+  --ch-dark-background: #41404d;
+  --ch-light-background: #e9e9ed;
+  --ch-border: #5b596e;
+  --ch-foreground: #5a586a;
+  --ch-foreground-hover: #434050;
+  /* */
+
   --ch-light-gray: #f2f2f2;
   --ch-light-gray-f0: #f0f0f0;
   --ch-light-gray-d6: #d6d6d6;

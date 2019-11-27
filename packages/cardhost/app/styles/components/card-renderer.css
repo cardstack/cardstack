@@ -1,129 +1,118 @@
+.card-view,
+.card-editor,
+.card-creator,
+.card-schema-updator {
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  height: 100%;
+  padding: 0 20px;
+}
+
 .card-renderer-isolated {
-  --card-spacing: 20px;
-  --card-header-height: 50px;
-  --card-width: 496px;
-  --card-min-height: 496px;
-  --card-min-width: 400px;
-  --card-bg: var(--ch-medium-lighter-blue-gray, #4a4857);
-  --card-header-bg: var(--ch-medium-dark-darker-blue-gray, #3f3d4d);
-  --card-highlight: var(--ch-cyan, #00ebe5);
-  --card-transition-time: 250ms;
+  --card-renderer-width: 496px;
+  --card-renderer-height: 496px;
+  --card-renderer-header-height: 50px;
 
-  height: calc(100vh - 80px);
-  min-width: var(--card-min-width);
-  padding: 0 var(--card-spacing);
+  position: relative;
+  width: var(--card-renderer-width);
+  max-width: 100%;
+  min-height: var(--card-renderer-height);
+  border: 3px solid transparent;
+  border-radius: 10px;
+  font: 400 16px/22px var(--ch-font-family);
+  letter-spacing: 0.015em;
+  overflow: hidden;
+
+  transition: border-color var(--ch-transition-time);
 }
 
-.card-renderer-isolated.schema .isolated-card {
-  background: none;
-  padding: 0;
+.card-renderer-isolated.view {
+  --card-renderer-width: 100%;
 }
 
+.card-renderer-isolated.schema .isolated-card,
 .card-renderer-isolated.edit .isolated-card {
   padding: 0;
 }
 
-.card-renderer-isolated.view {
-  --card-width: 100%;
+.card-renderer-isolated.selected {
+  border-color: var(--ch-highlight);
 }
 
 .card-renderer-isolated--header {
-  position: relative;
   display: flex;
   align-items: center;
-  width: var(--card-width);
-  height: var(--card-header-height);
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 15px var(--card-spacing) 15px 15px;
-  border-radius: 10px 10px 0 0;
-  background-color: var(--card-header-bg);
-  color: white;
-  font-size: 16px;
+  height: var(--card-renderer-header-height);
+  padding: 14px 20px;
+  background-color: var(--ch-disabled);
+  border: none;
   font-weight: 600;
-  letter-spacing: 0.24px;
-  line-height: 22px;
-  text-transform: capitalize;
-  white-space: nowrap;
   overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
-  transition: background-color var(--card-transition-time),
-              color var(--card-transition-time);
+  text-transform: capitalize;
+
+  transition: background-color var(--ch-transition-time),
+              color var(--ch-transition-time);
+}
+
+.card-renderer-isolated.selected .card-renderer-isolated--header {
+  background-color: var(--ch-highlight);
+  color: black;
 }
 
 .card-renderer-isolated--header svg {
-  width: 20px;
-  height: 22px;
+  --icon-color: white;
+
+  margin-right: 13px;
+  width: 18px;
+  height: 20px;
+
+  transition: stroke var(--ch-transition-time);
 }
 
-.card-renderer-isolated--header svg g {
-  stroke: white;
-  transition: stroke var(--card-transition-time);
+.card-renderer-isolated.selected .card-renderer-isolated--header svg {
+  --icon-color: black;
 }
 
-.card-renderer-isolated--header-overlay {
+.card-renderer-isolated--content {
+  position: relative;
+  min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
+  max-height: calc(100vh - var(--ch-top-edge-height) - var(--ch-bottom-edge-height) - var(--card-renderer-header-height));
+  background-color: white;
+  color: black;
+  border: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.card-renderer-isolated.schema .card-renderer-isolated--content {
+  background-color: var(--ch-dark-background);
+  color: white;
+}
+
+.card-renderer-isolated.edit .card-renderer-isolated--content {
+  padding: 20px;
+}
+
+/* TODO: fade card if field-renderer is selected */
+/* .card-renderer-isolated.faded::before {
+  content: '';
+  display: block;
   position: absolute;
   top: 0;
   right: 0;
   left: 0;
   bottom: 0;
-  background-color: var(--card-bg);
+  background-color: var(--ch-default);
   opacity: 0.35;
-}
-
-.card-renderer-isolated--header-title {
-  padding-left: 10px;
-}
-
-.card-renderer-isolated--main {
-  width: 100%;
-  height: calc(100% - var(--card-header-height));
-  padding-bottom: 80px;
-  overflow: scroll;
-}
-
-.card-renderer-isolated--content {
-  position: relative;
-  margin: 0 auto;
-  width: var(--card-width);
-  max-width: 100%;
-  min-height: var(--card-min-height);
-  background-color: white;
-  border: 3px solid transparent;
-  border-radius: 0 0 10px 10px;
-  overflow: hidden;
-
-  transition: border-color var(--card-transition-time);
-}
-
-.card-renderer-isolated.schema .card-renderer-isolated--content {
-  background-color: var(--card-bg);
-}
-
-.card-renderer-isolated.edit .card-renderer-isolated--content {
-  padding: var(--card-spacing);
-}
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 5;
+} */
 
 .card-renderer-isolated:focus {
   outline: 0; /* TODO: make this accessible */
-}
-
-.card-renderer-isolated.selected .card-renderer-isolated--header {
-  color: black;
-  background-color: var(--card-highlight);
-  /* background-image: url('/images/icons/event.svg'); */
-}
-
-.card-renderer-isolated.selected .card-renderer-isolated--header svg g {
-  stroke: black;
-}
-
-.card-renderer-isolated.selected .card-renderer-isolated--header-overlay {
-  visibility: hidden;
-}
-
-.card-renderer-isolated.selected .card-renderer-isolated--content {
-  border-color: var(--card-highlight);
 }
 
 
