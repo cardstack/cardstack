@@ -18,12 +18,13 @@
     "api-version": 1
   },
   "dependencies": {
+    "@cardstack/logger": "^0.2.0",
     "chai": "^3.5.0",
     "glob": "^7.1.1",
     "require-uncached": "^1.0.3"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.14.49"
+    "@cardstack/eslint-config": "0.16.0"
   },
   "author": "Edward Faulkner <edward@eaf4.com>",
   "license": "MIT",

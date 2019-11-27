@@ -1,10 +1,15 @@
 import { Session } from "./session";
-import { UpstreamDocument } from "./document";
+import { UpstreamDocument, UpstreamIdentity } from "./document";
 
 export interface WriterFactory {
-  new(): Writer;
+  new (): Writer;
 }
 
+
 export interface Writer {
-  create(session: Session, doc: UpstreamDocument): Promise<UpstreamDocument>;
+  create(
+    session: Session,
+    doc: UpstreamDocument,
+    id: UpstreamIdentity | null,
+  ): Promise<{ saved: UpstreamDocument; id: UpstreamIdentity }>;
 }

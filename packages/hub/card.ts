@@ -1,14 +1,25 @@
 import CardstackError from "./error";
-import { loadWriter, cardToPristine, patch } from "./scaffolding";
+import { loadWriter, patch } from "./scaffolding";
 import { WriterFactory } from "./writer";
-import { PristineDocument, UpstreamDocument } from "./document";
+import {
+  PristineDocument,
+  UpstreamDocument,
+  UpstreamIdentity
+} from "./document";
 import { SingleResourceDoc } from "jsonapi-typescript";
+import cloneDeep from 'lodash/cloneDeep';
+
 
 export class Card {
-  // The id is an entirely synthetic primary key that is only relevant on the
-  // current hub. When establishing ard identity across hubs, we always work
-  // with realm, originalRealm, and localId instead.
-  id: string | undefined;
+  // Almost everyone should treat this as opaque and only valid on the current
+  // hub. (The only exception is some code within the hub itself that may
+  // optimize by pulling these apart.)
+  get id(): string | undefined {
+    if (typeof this.localId === 'string') {
+      return [this.realm.href, this.originalRealm.href, this.localId].map(encodeURIComponent).join('/');
+    }
+    return undefined;
+  }
 
   // This is the realm the card is stored in.
   realm: URL;
@@ -41,21 +52,28 @@ export class Card {
 
   constructor(jsonapi: SingleResourceDoc, realm: URL) {
     this.jsonapi = jsonapi;
-    this.id = jsonapi.data.id;
     this.realm = realm;
     this.originalRealm =
       typeof jsonapi.data.attributes?.["original-realm"] === "string"
         ? new URL(jsonapi.data.attributes["original-realm"])
         : realm;
 
-
-    if (typeof jsonapi.data.attributes?.['local-id'] === 'string') {
+    if (typeof jsonapi.data.attributes?.["local-id"] === "string") {
       this.localId = jsonapi.data.attributes?.["local-id"];
     }
   }
 
   async asPristineDoc(): Promise<PristineDocument> {
-    return cardToPristine(this.jsonapi, this.realm, this.originalRealm);
+    let copied = cloneDeep(this.jsonapi);
+    if (!copied.data.attributes) {
+      copied.data.attributes = {};
+    }
+    copied.data.attributes.realm = this.realm.href;
+    copied.data.attributes['original-realm'], this.originalRealm.href;
+    copied.data.attributes['local-id'], this.localId;
+    copied.data.id =this.id;
+
+    return new PristineDocument(copied);
   }
 
   async asUpstreamDoc(): Promise<UpstreamDocument> {
@@ -69,16 +87,32 @@ export class Card {
   patch(otherDoc: SingleResourceDoc): void {
     patch(this.jsonapi, otherDoc);
   }
+
+  // This is the way that data source plugins think about card IDs. The
+  // upstreamId is only unique *within* a realm.
+  get upstreamId(): UpstreamIdentity | null {
+    if (this.realm.href === this.originalRealm.href) {
+      if (typeof this.localId === "string") {
+        return this.localId;
+      } else {
+        return null;
+      }
+    } else {
+      if (typeof this.localId === "string") {
+        return { originalRealm: this.originalRealm, localId: this.localId };
+      } else {
+        throw new CardstackError(
+          `A card originally from a different realm must already have a local-id`,
+          { status: 400 }
+        );
+      }
+    }
+  }
 }
 
 function cardHasIds(card: Card): asserts card is CardWithId {
-  if (typeof card.id !== 'string') {
-    throw new CardstackError(`card missing required attribute "id"`);
-  }
   if (typeof card.localId !== "string") {
-    throw new CardstackError(
-      `card missing required attribute "localId"`
-    );
+    throw new CardstackError(`card missing required attribute "localId"`);
   }
 }
 
@@ -89,9 +123,7 @@ export class CardWithId extends Card {
   constructor(jsonapi: SingleResourceDoc) {
     if (typeof jsonapi.data.attributes?.realm !== "string") {
       throw new CardstackError(
-        `card missing required attribute "realm": ${JSON.stringify(
-          jsonapi
-        )}`
+        `card missing required attribute "realm": ${JSON.stringify(jsonapi)}`
       );
     }
     let realm = new URL(jsonapi.data.attributes.realm);

@@ -4,15 +4,13 @@ import CardstackError from "./error";
 import { myOrigin } from "./origin";
 import { CARDSTACK_PUBLIC_REALM } from "./realm";
 import { WriterFactory } from "./writer";
-import { PristineDocument } from "./document";
 import { SingleResourceDoc } from "jsonapi-typescript";
-import merge from "lodash-es/merge";
+import merge from "lodash/merge";
 
 function ephemeralRealm() {
   return new CardWithId({
     data: {
       type: "cards",
-      id: `fake-realm-1`,
       attributes: {
         realm: `${myOrigin}/api/realms/meta`,
         "original-realm": `${myOrigin}/api/realms/meta`,
@@ -73,32 +71,10 @@ export async function search(query: Query): Promise<CardWithId[]> {
 }
 
 export async function loadWriter(card: CardWithId): Promise<WriterFactory> {
-  if (card.id === "fake-realm-1") {
+  if (card.id === ephemeralRealm().id) {
     return (await import("./ephemeral/writer")).default;
   }
   throw new Error(`unimplemented`);
-}
-
-export async function cardToPristine(
-  jsonapi: SingleResourceDoc,
-  realm: URL,
-  originalRealm: URL
-): Promise<PristineDocument> {
-  let copied = JSON.parse(JSON.stringify(jsonapi)) as SingleResourceDoc;
-  if (!copied.data.attributes) {
-    copied.data.attributes = {};
-  }
-  copied.data.attributes.realm = realm.href;
-  copied.data.attributes["original-realm"] = originalRealm.href;
-  if (!copied.data.id) {
-    copied.data.id = String(Math.floor(Math.random() * 1000));
-  }
-
-  if (!copied.data.attributes["local-id"]) {
-    copied.data.attributes["local-id"] = copied.data.id;
-  }
-
-  return new PristineDocument(copied);
 }
 
 export async function validate(

@@ -24,6 +24,8 @@ export class UpstreamDocument {
   constructor(public jsonapi: SingleResourceDoc) {}
 }
 
+export type UpstreamIdentity = { originalRealm: URL; localId: string } | string;
+
 export class SearchDocument {
   kind = "search";
   constructor(public jsonapi: SingleResourceDoc) {}
