@@ -1,18 +1,18 @@
 import { Session } from "./session";
-import Card, { CardId, NewCard } from "./card";
+import { Card, CardWithId, CardId } from "./card";
 import { CARDSTACK_PUBLIC_REALM } from "./realm";
 import CardstackError from "./error";
 import { myOrigin } from "./origin";
-import { search } from "./scaffolding";
-import { PristineDocument } from "./document";
+import { search, validate } from "./scaffolding";
 import { getOwner } from './dependency-injection';
+import { SingleResourceDoc } from "jsonapi-typescript";
 
 export default class CardsService {
   async create(
     session: Session,
     realm: URL,
-    doc: PristineDocument
-  ): Promise<Card> {
+    doc: SingleResourceDoc
+  ): Promise<CardWithId> {
     let realms = await this.search(Session.INTERNAL_PRIVILEGED, {
       filter: {
         every: [
@@ -48,13 +48,16 @@ export default class CardsService {
 
     let writerFactory = await realms[0].loadFeature('writer');
     let writer = await getOwner(this).instantiate(writerFactory);
-    let card = new NewCard(doc, realm);
-    let pending = await writer.prepareCreate(session, await card.asUpstreamDoc());
-    await pending.finalize();
-    return new Card(await card.asPristineDoc());
+    let card: Card = new Card(doc, realm);
+    await validate(null, card, realms[0]);
+    let upstreamFromWriter = await writer.create(session, await card.asUpstreamDoc());
+    card.patch(upstreamFromWriter.jsonapi);
+    card.assertHasIds();
+    // TODO: insert into index card.asSearchDoc()
+    return card;
   }
 
-  async search(_session: Session, query: Query): Promise<Card[]> {
+  async search(_session: Session, query: Query): Promise<CardWithId[]> {
     return await search(query);
   }
 }

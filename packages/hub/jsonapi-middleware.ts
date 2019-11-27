@@ -8,9 +8,10 @@ import { Memoize } from "typescript-memoize";
 import { inject } from "./dependency-injection";
 import CardstackError from './error';
 import { SessionContext } from "./authentication-middleware";
-import { assertSingleResourceDoc, PristineDocument } from "./document";
+import { assertSingleResourceDoc } from "./document";
 import { myOrigin } from "./origin";
-import Card from "./card";
+import { Card } from "./card";
+import { SingleResourceDoc } from "jsonapi-typescript";
 
 const apiPrefix = '/api';
 const apiPrefixPattern = new RegExp(`^${apiPrefix}/(.*)`);
@@ -77,9 +78,9 @@ export default class JSONAPIMiddleware {
     return isJsonApi || acceptsJsonApi;
   }
 
-  private documentFromBody(ctxt: Koa.Context): PristineDocument {
+  private documentFromBody(ctxt: Koa.Context): SingleResourceDoc {
     assertSingleResourceDoc(ctxt.request.body);
-    return new PristineDocument(ctxt.request.body);
+    return ctxt.request.body;
   }
 
   async createCard(ctxt: KoaRoute.Context<SessionContext, {}>) {

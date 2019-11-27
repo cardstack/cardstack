@@ -1,10 +1,10 @@
 import CardstackError from "./error";
-import { loadWriter, cardToPristine } from "./scaffolding";
+import { loadWriter, cardToPristine, patch } from "./scaffolding";
 import { WriterFactory } from "./writer";
 import { PristineDocument, UpstreamDocument } from "./document";
 import { SingleResourceDoc } from "jsonapi-typescript";
 
-export class NewCard {
+export class Card {
   // The id is an entirely synthetic primary key that is only relevant on the
   // current hub. When establishing ard identity across hubs, we always work
   // with realm, originalRealm, and localId instead.
@@ -39,8 +39,7 @@ export class NewCard {
   //  - [realm, originalRealm, id] is globally unique, such that there are
   //    exactly zero or one cards that match it, across all hubs.
 
-  constructor(public doc: PristineDocument, realm: URL) {
-    let jsonapi = doc.jsonapi;
+  constructor(jsonapi: SingleResourceDoc, realm: URL) {
     this.jsonapi = jsonapi;
     this.id = jsonapi.data.id;
     this.realm = realm;
@@ -62,30 +61,42 @@ export class NewCard {
   async asUpstreamDoc(): Promise<UpstreamDocument> {
     return new UpstreamDocument(this.jsonapi);
   }
+
+  assertHasIds(): asserts this is CardWithId {
+    cardHasIds(this);
+  }
+
+  patch(otherDoc: SingleResourceDoc): void {
+    patch(this.jsonapi, otherDoc);
+  }
 }
 
-export default class Card extends NewCard {
+function cardHasIds(card: Card): asserts card is CardWithId {
+  if (typeof card.id !== 'string') {
+    throw new CardstackError(`card missing required attribute "id"`);
+  }
+  if (typeof card.localId !== "string") {
+    throw new CardstackError(
+      `card missing required attribute "localId"`
+    );
+  }
+}
+
+export class CardWithId extends Card {
   id!: string;
   localId!: string;
 
-  constructor(doc: PristineDocument) {
-    if (typeof doc.jsonapi.data.attributes?.realm !== "string") {
+  constructor(jsonapi: SingleResourceDoc) {
+    if (typeof jsonapi.data.attributes?.realm !== "string") {
       throw new CardstackError(
         `card missing required attribute "realm": ${JSON.stringify(
-          doc.jsonapi
+          jsonapi
         )}`
       );
     }
-    let realm = new URL(doc.jsonapi.data.attributes.realm);
-    super(doc, realm);
-    if (typeof this.id !== 'string') {
-      throw new CardstackError(`card missing required attribute "id"`);
-    }
-    if (typeof this.localId !== "string") {
-      throw new CardstackError(
-        `card missing required attribute "localId"`
-      );
-    }
+    let realm = new URL(jsonapi.data.attributes.realm);
+    super(jsonapi, realm);
+    cardHasIds(this);
   }
 
   async loadFeature(featureName: "writer"): Promise<WriterFactory>;
