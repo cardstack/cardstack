@@ -1,14 +1,3 @@
-.card-view,
-.card-editor,
-.card-creator,
-.card-schema-updator {
-  display: grid;
-  align-items: center;
-  justify-items: center;
-  height: 100%;
-  padding: 0 20px;
-}
-
 .card-renderer-isolated {
   --card-renderer-width: 496px;
   --card-renderer-height: 496px;
@@ -29,6 +18,11 @@
 
 .card-renderer-isolated.view {
   --card-renderer-width: 100%;
+  height: min-content;
+}
+
+.card-renderer-isolated.edit {
+  height: min-content;
 }
 
 .card-renderer-isolated.schema .isolated-card,
