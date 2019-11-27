@@ -3,8 +3,8 @@
   --padding: 10px 15px;
   --width: 100px;
   --height: 40px;
-  --color: var(--ch-dark-purple-28);
-  --background: var(--ch-cyan);
+  --color: var(--ch-default);
+  --background: var(--ch-highlight);
   --font: 600 13px/18px var(--ch-font-family);
   --letter-spacing: 0.035em;
   --border: 1px solid transparent;
@@ -27,21 +27,21 @@
 }
 
 .ch-button--secondary {
-  --color: var(--ch-cyan);
-  --background: var(--ch-dark-blue-gray);
-  --border: 1px solid var(--ch-medium-blue-gray);
+  --color: var(--ch-highlight);
+  --background: none;
+  --border: 1px solid var(--ch-border);
 }
 
 .ch-button--icon-secondary {
   --icon-url: url('');
   --width: 40px;
   --height: 40px;
-  --color: var(--ch-cyan);
+  --color: var(--ch-highlight);
   --background: var(--icon-url) center/var(--icon-size) no-repeat;
-  --border: 1px solid var(--ch-medium-blue-gray);
+  --border: 1px solid var(--ch-border);
   --border-radius: 50%;
 
-  background-color: var(--ch-dark-blue-gray);
+  background-color: transparent;
 }
 
 .ch-button--icon-secondary.delete {

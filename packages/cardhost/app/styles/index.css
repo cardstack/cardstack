@@ -1,5 +1,6 @@
 .cardhost-welcome-page {
   --welcome-navbar-width: 210px;
+  --welcome-placeholder-card: #acaac6;
 
   display: grid;
   grid-template-columns: var(--welcome-navbar-width) 1fr;
@@ -9,9 +10,9 @@
   min-width: 1100px;
   max-width: 1400px;
   margin: 60px auto;
-  background-color: var(--ch-darkest-blue-gray);
+  background-color: var(--ch-deep-background);
   border-radius: 10px;
-  box-shadow: 0px 5px 20px 0px var(--ch-black-op25);
+  box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.25);
 }
 
 .cardhost-welcome-page > nav {
@@ -42,13 +43,13 @@
 }
 
 .cardhost-welcome-left-edge--nav ul li .left-edge-icon {
-  --icon-color: var(--ch-lighter-blue-gray);
+  --icon-color: var(--ch-light-op50);
 
   display: flex;
   align-items: center;
-  color: var(--ch-lighter-blue-gray);
-  fill: var(--ch-lighter-blue-gray);
-  stroke: var(--ch-lighter-blue-gray);
+  color: var(--ch-light-op50);
+  fill: var(--ch-light-op50);
+  stroke: var(--ch-light-op50);
 
   transition: color var(--ch-card-transition-duration), fill var(--ch-card-transition-duration), stroke var(--ch-card-transition-duration);
 }
@@ -58,10 +59,10 @@
 }
 
 .cardhost-welcome-left-edge--nav ul li .left-edge-icon.active {
-  --icon-color: var(--ch-cyan);
+  --icon-color: var(--ch-highlight);
 
-  color: white;
-  fill: var(--ch-cyan);
+  color: var(--ch-light);
+  fill: var(--ch-highlight);
 }
 
 /* Main */
@@ -77,7 +78,7 @@
 }
 
 .cardhost-section + .cardhost-section {
-  border-top: solid 1px var(--ch-medium-darker-blue-gray);
+  border-top: solid 1px var(--ch-border);
 }
 
 .cardhost-section--header {
@@ -89,10 +90,10 @@
 }
 
 .cardhost-section--header > svg {
-  --icon-color: var(--ch-cyan);
+  --icon-color: var(--ch-highlight);
 
   margin-right: 20px;
-  fill: var(--ch-cyan);
+  fill: var(--ch-highlight);
 }
 
 
@@ -125,7 +126,7 @@
 }
 
 .card-catalog > *:hover > * {
-  background-color: var(--ch-medium-medium-blue-gray);
+  background-color: var(--ch-hover);
   transform: scale(1.2);
 }
 
@@ -134,7 +135,7 @@
 }
 
 .card-catalog--embedded-card-placeholder {
-  background-color: var(--ch-light-blue-gray);
+  background-color: var(--welcome-placeholder-card);
   background-position: center center;
   background-repeat: no-repeat;
   background-size: 50px 56px;

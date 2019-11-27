@@ -26,11 +26,11 @@
 .login-box > button {
   --background: none;
   --border-radius: 10px;
-  --border: 2px solid var(--ch-light-gray-d6);
+  --border: 2px solid var(--ch-border);
   --color: white;
   --width: 80px;
 }
 
 .login-box > button:hover {
-  --color: var(--ch-cyan);
+  --color: var(--ch-highlight);
 }

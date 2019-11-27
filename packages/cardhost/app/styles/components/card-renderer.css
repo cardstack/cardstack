@@ -113,6 +113,8 @@
 /* Event Card Template */
 .card-renderer-isolated.view.event-card .isolated-card {
   --event-image-height: 300px;
+  --event-button: #0076ff;
+  --event-border: rgba(0, 0, 0, 0.15);
 
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -149,7 +151,7 @@
   grid-area: date;
   margin-top: 30px;
   padding-top: 30px;
-  border-top: 1px solid var(--ch-light-gray-d6);
+  border-top: 1px solid var(--event-border);
 }
 .card-renderer-isolated.view.event-card .isolated-card .field-location {
   grid-area: location;
@@ -194,7 +196,7 @@
   margin-left: auto;
   padding: 10px 15px;
   border-radius: 5px;
-  background-color: var(--ch-blue);
+  background-color: var(--event-button);
   color: white;
   font-size: 13px;
   font-weight: 600;

@@ -1,7 +1,7 @@
 .ch-catalog {
   width: var(--ch-left-edge-panel-width);
   padding: var(--ch-spacing);
-  background-color: var(--ch-light-gray);
+  background-color: var(--ch-light-background);
   color: black;
   display: grid;
   grid-template-rows: 85px 1fr;

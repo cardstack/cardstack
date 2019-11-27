@@ -10,7 +10,12 @@
 
 .cardhost-left-edge--nav {
   width: var(--ch-left-edge-navbar-width);
-  background-color: var(--ch-darkest-blue-gray);
+}
+
+.cardhost-left-edge--nav.schema,
+.cardhost-left-edge--nav.new,
+.cardhost-left-edge--nav.adopt {
+  background-color: var(--ch-deep-background);
 }
 
 .cardhost-left-edge--nav > ul {

@@ -7,7 +7,7 @@
   color: black;
   font: 400 13px/18px var(--ch-font-family);
   letter-spacing: 0.035em;
-  border: 1px solid var(--ch-light-gray-d6);
+  border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 100px;
 }
 

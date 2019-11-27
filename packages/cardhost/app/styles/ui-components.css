@@ -1,19 +1,13 @@
 .ui-components {
   padding: var(--ch-spacing) var(--ch-spacing) 300px;
-  background-color: #666;
-  color: black;
 }
 
 .ui-components--section {
   padding: 30px 0;
-  border-bottom: 1px solid var(--ch-light-gray-b1);
+  border-bottom: 1px solid var(--ch-border);
 }
-
-.ui-components--icon {
-  --icon-color: #3b3390;
-}
-.ui-components--icon:hover {
-  --icon-color: #71248a;
+.ui-components--section:first-of-type {
+  border-top: 1px solid var(--ch-border);
 }
 
 .ui-components .code-block {
@@ -47,12 +41,38 @@
   margin: 0;
 }
 
+.ui-components .right-edge {
+  position: static;
+}
+
+/* Icons Section */
+.ui-components--section.icons > h4 {
+  margin: 0;
+}
+.ui-components--section.icons > a {
+  display: block;
+  font-weight: 600;
+  color: var(--ch-highlight);
+  margin-bottom: 15px;
+}
+.ui-components--section.icons > svg {
+  display: block;
+  margin: 15px;
+}
+.ui-components--icon {
+  --icon-color: var(--ch-light-op50);
+}
+.ui-components--icon:hover {
+  --icon-color: var(--ch-light);
+}
+
+
+/* Color Palette section */
 .color-palette {
   display: grid;
   grid-template-columns: repeat(auto-fill, 250px);
   grid-gap: var(--ch-spacing);
 }
-
 .color-palette--block {
   width: 250px;
   height: 150px;
@@ -61,8 +81,12 @@
   justify-content: center;
   font-size: 21px;
   font-weight: 600;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
 }
-
-.ui-components .right-edge {
-  position: static;
+.color-palette--block.--ch-light,
+.color-palette--block.--ch-light-background {
+  color: black;
+}
+.color-palette--code.cardhost-monaco-container {
+  min-height: 1em;
 }

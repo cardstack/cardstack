@@ -2,7 +2,7 @@
 
 .ch-label {
   display: block;
-  color: var(--ch-white-op60);
+  color: var(--ch-light-op60);
   font: 400 13px/18px var(--ch-font-family);
   letter-spacing: 0.035em;
   white-space: nowrap;
@@ -15,7 +15,7 @@
 
 .ch-helper-text {
   display: block;
-  color: var(--ch-white-op50);
+  color: rgba(255, 255, 255, 0.5);
   font: 400 11px/15px var(--ch-font-family);
   letter-spacing: 0.035em;
 }
@@ -26,7 +26,7 @@
   min-width: var(--ch-component-width);
   max-width: 100%;
   padding: 10px 15px;
-  background-color: var(--ch-dark-blue-gray);
+  background-color: var(--ch-default);
   color: white;
   border: 1px solid transparent;
   border-radius: 5px;
@@ -50,7 +50,7 @@
 .ch-input:focus,
 .ch-textarea:focus {
   color: white;
-  border-color: var(--ch-medium-blue-gray);
+  border-color: var(--ch-highlight);
   outline: 0;
 }
 
@@ -68,14 +68,14 @@
 .ch-textarea::placeholder,
 .ch-textarea::-webkit-input-placeholder,
 .ch-textarea::-ms-input-placeholder {
-  color: var(--ch-white-op60);
+  color: var(--ch-light-op60);
 }
 
 .ch-input:disabled,
 .ch-textarea:disabled,
 .ch-input.disabled,
 .ch-textarea.disabled {
-  color: var(--ch-white-op60);
+  color: var(--ch-light-op60);
   pointer-events: none;
   opacity: 0.6;
 }
@@ -101,8 +101,8 @@
   vertical-align: text-bottom;
   height: 18px;
   width: 18px;
-  background-color: var(--ch-lighter-medium-blue-gray);
-  border: 1px solid var(--ch-darker-dark-blue-gray);
+  background-color: var(--ch-foreground);
+  border: 1px solid var(--ch-border);
   border-radius: 3px;
   cursor: pointer;
 
@@ -111,12 +111,12 @@
 
 .ch-checkbox:focus + .ch-checkmark,
 .ch-checkbox:hover:not(:disabled) + .ch-checkmark {
-  background-color: var(--ch-dark-blue-gray);
+  background-color: var(--ch-default);
 }
 
 .ch-checkbox:checked + .ch-checkmark {
   background: url('/assets/images/icons/checkmark-active.svg') center/12px no-repeat;
-  background-color: var(--ch-dark-blue-gray);
+  background-color: var(--ch-default);
 }
 
 .ch-checkbox-group:hover {
@@ -148,9 +148,9 @@
   height: var(--ch-component-height);
   padding: 10px 15px;
   background: url('/assets/images/icons/dropdown-arrows-sm-active.svg') right 15px center/10px no-repeat;
-  background-color: var(--ch-lighter-medium-blue-gray);
+  background-color: var(--ch-foreground);
   color: white;
-  border: 1px solid var(--ch-darker-dark-blue-gray);
+  border: 1px solid var(--ch-border);
   border-radius: 5px;
   font: 400 13px/18px var(--ch-font-family);
   letter-spacing: 0.015em;
@@ -160,8 +160,8 @@
 
 .ch-dropdown:focus:not(:disabled),
 .ch-dropdown:hover:not(:disabled) {
-  background-color: var(--ch-darker-dark-blue-gray);
-  color: var(--ch-cyan);
+  background-color: var(--ch-foreground-hover);
+  color: var(--ch-highlight);
   cursor: pointer;
   outline: 0;
 }
