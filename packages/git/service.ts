@@ -1,23 +1,23 @@
+import { cloneRepo, Cred, Merge, Repository, Reset } from './git';
+import { todo } from '@cardstack/plugin-utils/todo-any';
+
 const { promisify } = require('util');
 const mkdirp = promisify(require('mkdirp'));
 const filenamifyUrl = require('filenamify-url');
 const { existsSync } = require('fs');
 const rimraf = promisify(require('rimraf'));
 const { join } = require('path');
-const { cloneRepo, Cred, Merge, Repository, Reset } = require('./git');
 const { tmpdir } = require('os');
 const log = require('@cardstack/logger')('cardstack/git');
 
 class GitLocalCache {
-  constructor() {
-    this.clearCache();
-  }
+  private _remotes = new Map();
 
   clearCache() {
     this._remotes = new Map();
   }
 
-  async getRepo(remoteUrl, remote) {
+  async getRepo(remoteUrl:String, remote:todo) {
     let existingRepo = this._remotes.get(remoteUrl);
 
     if (existingRepo) {
@@ -36,7 +36,7 @@ class GitLocalCache {
     return repo;
   }
 
-  async _makeRepo(remote) {
+  async _makeRepo(remote:todo) {
     let cacheDirectory = remote.cacheDir;
 
     if (!cacheDirectory) {
@@ -51,7 +51,7 @@ class GitLocalCache {
 
     let fetchOpts = {
       callbacks: {
-        credentials: (url, userName) => {
+        credentials: (url:string, userName:string) => {
           if (remote.privateKey) {
             return Cred.sshKeyMemoryNew(userName, remote.publicKey || '', remote.privateKey, remote.passphrase || '');
           }
@@ -95,12 +95,12 @@ class GitLocalCache {
     };
   }
 
-  async fetchAllFromRemote(remoteUrl) {
+  async fetchAllFromRemote(remoteUrl:string) {
     let { repo, fetchOpts } = this._remotes.get(remoteUrl);
     return await repo.fetchAll(fetchOpts);
   }
 
-  async pullRepo(remoteUrl, targetBranch) {
+  async pullRepo(remoteUrl:string, targetBranch:string) {
     log.info("pulling changes for branch %s on %s", targetBranch, remoteUrl);
     let { repo } = this._remotes.get(remoteUrl);
 

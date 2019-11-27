@@ -1,7 +1,7 @@
 const {
   Repository,
   Cred,
-  Clone
+  cloneRepo
 } = require('./git');
 
 const crypto = require('crypto');
@@ -215,7 +215,7 @@ module.exports = class Writer {
     if (!this.repo) {
       if (this.remote) {
         let tempRepoPath = await mkdir('cardstack-temp-repo');
-        this.repo = await Clone(this.remote.url, tempRepoPath, {
+        this.repo = await cloneRepo(this.remote.url, tempRepoPath, {
           fetchOpts: this.fetchOpts,
         });
         return;

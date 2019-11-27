@@ -43,7 +43,7 @@ async function createRemote(repo:any, name:String, url:String) {
   return await Remote.create(repo, name, url);
 }
 
-module.exports = {
+export {
   Branch,
   Commit,
   Cred,

@@ -22,6 +22,9 @@ package-lock.json
 /packages/git/git.d.ts
 /packages/git/git.js
 /packages/git/git.js.map
+/packages/git/service.d.ts
+/packages/git/service.js
+/packages/git/service.js.map
 
 /packages/hub/card-services.d.ts
 /packages/hub/card-services.js
