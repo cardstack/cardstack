@@ -1,10 +1,8 @@
 <div class="card-renderer--top-edge-buttons">
   {{#if this.cssModeToggle.editingCss}}
-    <button
-      class="ch-button"
-    >
-      Close Editor
-    </button>
+    <div class="dock-btn {{if (eq this.cssModeToggle.dockLocation "bottom") "selected"}}" {{on "click" this.cssModeToggle.dockBottom}}>{{svg-jar "dock-bottom"}}</div>
+    <div class="dock-btn {{if (eq this.cssModeToggle.dockLocation "right") "selected"}}" {{on "click" this.cssModeToggle.dockRight}}>{{svg-jar "dock-right"}}</div>
+    <button class="ch-button close-editor-btn">Close Editor</button>
 
   {{else}}
     {{! eslint is confused by on helper }}

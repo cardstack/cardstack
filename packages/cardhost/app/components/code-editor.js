@@ -101,7 +101,7 @@ export default class CodeEditor extends Component {
     this.editor = editor;
 
     if (this.resizable) {
-      this.startResizeWatcher.perform(el);
+      // this.startResizeWatcher.perform(el);
     }
   }
 
