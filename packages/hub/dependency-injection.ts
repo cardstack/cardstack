@@ -1,18 +1,21 @@
 export class Container {
-  private cache = new Map() as Map<string, any>;
+  private cache = new Map() as Map<string | Function, Promise<any>>;
+  private teardownPromise: Promise<void[]> | undefined;
 
   constructor(private registry: Registry) {}
 
-  async lookup<K extends keyof KnownServices>(name: K): Promise<KnownServices[K]>;
+  async lookup<K extends keyof KnownServices>(
+    name: K
+  ): Promise<KnownServices[K]>;
   async lookup(name: string): Promise<unknown>;
   async lookup(name: string): Promise<any> {
     let cached = this.cache.get(name);
     if (!cached) {
       let factory = this.lookupFactory(name);
-      cached = await this.instantiate(factory);
+      cached = this._instantiate(factory);
       this.cache.set(name, cached);
     }
-    return cached;
+    return await cached;
   }
 
   private lookupFactory(name: string): Factory<any> {
@@ -26,6 +29,20 @@ export class Container {
   async instantiate<T, A>(factory: FactoryWithArg<T, A>, arg: A): Promise<T>;
   async instantiate<T>(factory: Factory<T>): Promise<T>;
   async instantiate<T, A>(factory: any, arg?: A): Promise<T> {
+    let cached = this.cache.get(factory);
+    if (!cached) {
+      cached = this._instantiate(factory, arg);
+      this.cache.set(factory, cached);
+    }
+    return await cached;
+  }
+
+  private async _instantiate<T, A>(
+    factory: FactoryWithArg<T, A>,
+    arg: A
+  ): Promise<T>;
+  private async _instantiate<T>(factory: Factory<T>): Promise<T>;
+  private async _instantiate<T, A>(factory: any, arg?: A): Promise<T> {
     let pending = [] as PendingInjection[];
     pendingInjections.unshift(pending);
     let instance: any;
@@ -39,15 +56,22 @@ export class Container {
       pendingInjections.shift();
     }
 
-    await Promise.all(pending.map(async p => {
-      let injectedValue = await this.lookup(p.name);
-      if (!instance[p.opts.as] || instance[p.opts.as].injectionNotReadyYet !== p.name) {
-        throw new Error(`To assign 'inject("${p.name}")' to a property other than '${p.name}' you must pass the 'as' argument to inject().`);
-      }
-      instance[p.opts.as] = injectedValue;
-    }));
+    await Promise.all(
+      pending.map(async p => {
+        let injectedValue = await this.lookup(p.name);
+        if (
+          !instance[p.opts.as] ||
+          instance[p.opts.as].injectionNotReadyYet !== p.name
+        ) {
+          throw new Error(
+            `To assign 'inject("${p.name}")' to a property other than '${p.name}' you must pass the 'as' argument to inject().`
+          );
+        }
+        instance[p.opts.as] = injectedValue;
+      })
+    );
 
-    if (typeof instance.ready === 'function') {
+    if (typeof instance.ready === "function") {
       await instance.ready();
     }
     ownership.set(instance, this);
@@ -55,22 +79,32 @@ export class Container {
   }
 
   async teardown() {
-    let promises = [] as Promise<void>[];
-    for (let instance of this.cache.values()) {
-      if (typeof instance.teardown === 'function') {
-        promises.push(instance.teardown());
-      }
+    if (!this.teardownPromise) {
+      this.teardownPromise = Promise.all(
+        [...this.cache.values()].map(async promise => {
+          let instance;
+          try {
+            instance = await promise;
+          } catch (e) {
+            // whoever originally called instantiate or lookup received a rejected promise and its their responsibility to handle it
+          }
+          if (typeof instance?.teardown === "function") {
+            await instance.teardown();
+          }
+        })
+      );
     }
-    await Promise.all(promises);
+
+    await this.teardownPromise;
   }
 }
 
 export interface Factory<T> {
-  new(): T;
+  new (): T;
 }
 
 export interface FactoryWithArg<T, A> {
-  new(a: A): T;
+  new (a: A): T;
 }
 
 let mappings = new WeakMap() as WeakMap<Registry, Map<string, Factory<any>>>;
@@ -146,11 +180,16 @@ interface PendingInjection {
     }
   }
 */
-export function inject<K extends keyof KnownServices>(name: K, opts?: InjectOptions): KnownServices[K];
+export function inject<K extends keyof KnownServices>(
+  name: K,
+  opts?: InjectOptions
+): KnownServices[K];
 export function inject(name: string, opts?: InjectOptions): unknown {
   let pending = pendingInjections[0];
   if (!pending) {
-    throw new Error(`Tried to directly instantiate an object with injections. Look it up in the container instead.`);
+    throw new Error(
+      `Tried to directly instantiate an object with injections. Look it up in the container instead.`
+    );
   }
   if (!opts) {
     opts = { as: name };
@@ -162,7 +201,9 @@ export function inject(name: string, opts?: InjectOptions): unknown {
 export function getOwner(obj: any): Container {
   let container = ownership.get(obj);
   if (!container) {
-    throw new Error(`Tried to getOwner of an object that didn't come from the container`);
+    throw new Error(
+      `Tried to getOwner of an object that didn't come from the container`
+    );
   }
   return container;
 }
