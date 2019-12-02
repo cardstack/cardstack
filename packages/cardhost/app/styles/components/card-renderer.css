@@ -40,6 +40,7 @@
   height: var(--card-renderer-header-height);
   padding: 14px 20px;
   background-color: var(--ch-disabled);
+  color: var(--ch-light);
   border: none;
   font-weight: 600;
   overflow: hidden;
@@ -53,11 +54,11 @@
 
 .card-renderer-isolated.selected .card-renderer-isolated--header {
   background-color: var(--ch-highlight);
-  color: black;
+  color: var(--ch-dark);
 }
 
 .card-renderer-isolated--header svg {
-  --icon-color: white;
+  --icon-color: var(--ch-light);
 
   margin-right: 13px;
   width: 18px;
@@ -67,15 +68,15 @@
 }
 
 .card-renderer-isolated.selected .card-renderer-isolated--header svg {
-  --icon-color: black;
+  --icon-color: var(--ch-dark);
 }
 
 .card-renderer-isolated--content {
   position: relative;
   min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
   max-height: calc(100vh - var(--ch-top-edge-height) - var(--ch-bottom-edge-height) - var(--card-renderer-header-height));
-  background-color: white;
-  color: black;
+  background-color: var(--ch-light);
+  color: var(--ch-dark);
   border: none;
   overflow-x: hidden;
   overflow-y: auto;
@@ -83,7 +84,7 @@
 
 .card-renderer-isolated.schema .card-renderer-isolated--content {
   background-color: var(--ch-dark-background);
-  color: white;
+  color: var(--ch-light);
 }
 
 .card-renderer-isolated.edit .card-renderer-isolated--content {
@@ -197,7 +198,7 @@
   padding: 10px 15px;
   border-radius: 5px;
   background-color: var(--event-button);
-  color: white;
+  color: var(--ch-light);
   font-size: 13px;
   font-weight: 600;
   line-height: 18px;

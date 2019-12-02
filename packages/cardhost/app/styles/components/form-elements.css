@@ -1,4 +1,16 @@
-/* TODO: make focus states more accessible */
+.ch-input-group {
+  position: relative;
+  width: min-content;
+  max-width: 100%;
+  padding-bottom: 15px;
+}
+
+.ch-input-group.required > .ch-label::after {
+  content: "*";
+  display: inline-block;
+  vertical-align: text-top;
+  margin-left: 2px;
+}
 
 .ch-label {
   display: block;
@@ -13,11 +25,42 @@
   transition: color var(--ch-transition-time);
 }
 
+.ch-required {
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: block;
+  color: var(--ch-light-op60);
+  font: 400 13px/18px var(--ch-font-family);
+  letter-spacing: 0.035em;
+  text-transform: lowercase;
+}
+
 .ch-helper-text {
   display: block;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--ch-light-op60);
   font: 400 11px/15px var(--ch-font-family);
   letter-spacing: 0.035em;
+  text-transform: initial;
+
+  transition: display var(--ch-transition-time),
+              color var(--ch-transition-time);
+}
+
+.ch-helper-text.error {
+  color: var(--ch-alert);
+}
+
+input + .ch-helper-text,
+textarea + .ch-helper-text {
+  padding-left: 10px;
+  padding-top: 7px;
+}
+
+.ch-required {
+  text-transform: lowercase;
+  position: absolute;
+  right: 0;
 }
 
 .ch-input,
@@ -33,7 +76,9 @@
   font: 400 13px/18px var(--ch-font-family);
   letter-spacing: 0.015em;
 
-  transition: color var(--ch-transition-time);
+  transition: color var(--ch-transition-time),
+              border-color var(--ch-transition-time),
+              background-color var(--ch-transition-time);
 }
 
 .ch-input {
@@ -47,11 +92,42 @@
   min-height: 80px;
 }
 
+.ch-input.error,
+.ch-textarea.error {
+  border-color: var(--ch-alert);
+}
+
+.ch-input:hover,
+.ch-textarea:hover {
+  background-color: var(--ch-hover);
+}
+
 .ch-input:focus,
 .ch-textarea:focus {
   color: white;
   border-color: var(--ch-highlight);
   outline: 0;
+}
+
+.ch-input:focus + .ch-helper-text.error,
+.ch-textarea:focus + .ch-helper-text.error {
+  display: none;
+}
+
+input.ch-input[placeholder],
+textarea.ch-textarea[placeholder],
+input.ch-input::placeholder,
+textarea.ch-textarea::placeholder {
+  color: var(--ch-light-op50);
+}
+
+.ch-input:disabled,
+.ch-textarea:disabled,
+.ch-input.disabled,
+.ch-textarea.disabled {
+  background-color: var(--ch-disabled);
+  color: var(--ch-light-op40);
+  pointer-events: none;
 }
 
 .ch-label + .ch-input,
@@ -60,24 +136,6 @@
 .ch-label > .ch-input,
 .ch-label > .ch-textarea {
   margin-top: 7px;
-}
-
-.ch-input::placeholder,
-.ch-input::-webkit-input-placeholder,
-.ch-input::-ms-input-placeholder,
-.ch-textarea::placeholder,
-.ch-textarea::-webkit-input-placeholder,
-.ch-textarea::-ms-input-placeholder {
-  color: var(--ch-light-op60);
-}
-
-.ch-input:disabled,
-.ch-textarea:disabled,
-.ch-input.disabled,
-.ch-textarea.disabled {
-  color: var(--ch-light-op60);
-  pointer-events: none;
-  opacity: 0.6;
 }
 
 .ch-checkbox-group {
@@ -135,10 +193,6 @@
 .ch-checkbox:disabled + .ch-checkmark,
 .ch-checkbox.disabled + .ch-checkmark {
   pointer-events: none;
-}
-
-.ch-input-group {
-  padding-bottom: 15px;
 }
 
 .ch-dropdown {
