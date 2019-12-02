@@ -106,7 +106,7 @@ module('Acceptance | card schema', function(hooks) {
 
     await visit(`/cards/${card1Id}/edit`);
     assert.dom('[data-test-field="subtitle"] input').hasValue('test title');
-    assert.dom('[data-test-field="subtitle"] [data-test-string-field-editor-label]').hasText('subtitle');
+    assert.dom('[data-test-field="subtitle"] [data-test-cs-component-label="text-field"]').hasText('subtitle');
     assert.dom('[data-test-field="title"]').doesNotExist();
 
     await visit(`/cards/${card1Id}/schema`);
@@ -143,7 +143,7 @@ module('Acceptance | card schema', function(hooks) {
 
     await visit(`/cards/${card1Id}/edit`);
     assert.dom('[data-test-field="title"] input').hasValue('test title');
-    assert.dom('[data-test-field="title"] [data-test-string-field-editor-label]').hasText('TITLE');
+    assert.dom('[data-test-field="title"] [data-test-cs-component-label="text-field"]').hasText('TITLE');
 
     await visit(`/cards/${card1Id}/schema`);
     assert.dom('[data-test-field="title"] [data-test-field-renderer-label]').hasText('TITLE');
