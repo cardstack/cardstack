@@ -1,7 +1,17 @@
 <div class="card-renderer--top-edge-buttons">
   {{#if this.cssModeToggle.editingCss}}
-    <div class="dock-btn {{if (eq this.cssModeToggle.dockLocation "bottom") "selected"}}" {{on "click" this.cssModeToggle.dockBottom}}>{{svg-jar "dock-bottom"}}</div>
-    <div class="dock-btn {{if (eq this.cssModeToggle.dockLocation "right") "selected"}}" {{on "click" this.cssModeToggle.dockRight}}>{{svg-jar "dock-right"}}</div>
+    <div
+      class="dock-btn {{if (eq this.cssModeToggle.dockLocation "bottom") "selected"}}" {{on "click" this.cssModeToggle.dockBottom}}
+      data-test-dock-bottom
+    >
+      {{svg-jar "dock-bottom"}}
+    </div>
+    <div
+      class="dock-btn {{if (eq this.cssModeToggle.dockLocation "right") "selected"}}" {{on "click" this.cssModeToggle.dockRight}}
+      data-test-dock-right
+    >
+      {{svg-jar "dock-right"}}
+    </div>
     <button class="ch-button close-editor-btn">Close Editor</button>
 
   {{else}}
@@ -48,7 +58,7 @@
 
 
 {{#if this.cssModeToggle.editingCss}}
-  <EditorPane />
+  <EditorPane data-test-dock-location={{this.cssModeToggle.dockLocation}} />
 {{else}}
   <RightEdge
     @card={{this.card}}
