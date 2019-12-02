@@ -6,6 +6,7 @@ import JSONAPIMiddleware from './jsonapi-middleware';
 import CardsService from './cards-service';
 import AuthenticationMiddleware from './authentication-middleware';
 import { EphemeralStorage } from './ephemeral/storage';
+import PgClient from './pgsearch/pgclient';
 
 const log = logger('cardstack/server');
 
@@ -15,6 +16,7 @@ export async function wireItUp() {
   registry.register('jsonapi-middleware', JSONAPIMiddleware);
   registry.register('ephemeralStorage', EphemeralStorage);
   registry.register('cards', CardsService);
+  registry.register('pgclient', PgClient);
   return new Container(registry);
 }
 
