@@ -7,64 +7,71 @@ Ember Concurrency into the rendering of the card component here.
 {{#if (eq @format "isolated")}}
   {{#let (component this.isolatedComponentName) as | Isolated |}}
     <section
-      class="card-renderer card-renderer-{{@format}} {{this.mode}} {{if @cardSelected "selected"}}"
+      class="card-renderer-isolated
+        {{this.mode}}
+        {{safe-css-string @card.adoptedFromName}}
+        {{safe-css-string @card.name}}
+        {{if @cardSelected "selected"}}
+      "
       tabindex="0"
       data-test-card-renderer-isolated
       {{on "focus" (action this.cardIsFocused true)}}
       {{did-insert this.focusCard true}}
     >
       <header class="card-renderer-{{@format}}--header">
-        {{!--
-          TODO: this svg is hard-coded because background-image transitions are flaky
-          Also the icon will change depending on the content type, we should consider
-          using svg-jar or similar
-        --}}
-        <svg viewBox="0 0 20 22" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect height="18" rx="2" width="18" x="1" y="3"/><path d="m16 2v4" transform="translate(-2 -1)"/><path d="m8 2v4" transform="translate(-2 -1)"/><path d="m11.273 6-5 5-2.273-2.273" transform="translate(2 4)"/></g></svg>
-        <div class="card-renderer-isolated--header-overlay"></div>
+        {{#if (or (eq (safe-css-string @card.adoptedFromName) "event-card") (eq (safe-css-string @card.name) "event-card"))}}
+          {{svg-jar "event" width="18px" height="20px"}}
+        {{/if}}
         <span class="card-renderer-{{@format}}--header-title">{{or @card.name "Blank Card"}}</span>
       </header>
-      <div class="card-renderer-{{@format}}--main">
-        <div class="card-renderer-{{@format}}--content">
-          <Isolated
-            @card={{@card}}
-            @mode={{this.mode}}
-            @setFieldValue={{@setFieldValue}}
-            @setFieldName={{@setFieldName}}
-            @removeField={{@removeField}}
-            @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
-            @setPosition={{@setPosition}}
-            @selectField={{@selectField}}
-            @selectedField={{@selectedField}}
+      <div class="card-renderer-{{@format}}--content">
+        <Isolated
+          @card={{@card}}
+          @mode={{this.mode}}
+          @setFieldValue={{@setFieldValue}}
+          @setFieldName={{@setFieldName}}
+          @removeField={{@removeField}}
+          @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+          @setPosition={{@setPosition}}
+          @selectField={{@selectField}}
+          @selectedField={{@selectedField}}
+          @dropField={{@dropField}}
+        />
+        {{#if (and @dropField (eq @mode "schema")) }}
+          <DropZone
             @dropField={{@dropField}}
+            @position={{@card.isolatedFields.length}}
           />
-          {{#if (and @dropField (eq @mode "schema")) }}
-            <DropZone
-              @dropField={{@dropField}}
-              @position={{@card.isolatedFields.length}}
-            />
-          {{/if}}
-        </div>
+        {{/if}}
       </div>
     </section>
   {{/let}}
 {{else if (eq @format "embedded")}}
   {{#let (component this.embeddedComponentName) as | Embedded |}}
-    {{#if (and (eq this.mode "view") (not @preventIsolation))}}
-      <LinkTo
-        @class="card-renderer--embedded-card-link"
-        @route="cards.view"
-        @model={{@card.name}}
-      >
-        <Embedded @card={{@card}} @mode={{this.mode}}/>
+    <div
+      class="card-renderer-embedded
+        {{safe-css-string @card.adoptedFromName}}
+        {{safe-css-string @card.name}}
+      "
+      data-test-card-renderer-embedded
+    >
+      {{#if (and (eq this.mode "view") (not @preventIsolation))}}
+        <LinkTo
+          @class="card-renderer--embedded-card-link"
+          @route="cards.view"
+          @model={{@card.name}}
+        >
+          <Embedded @card={{@card}} @mode={{this.mode}} />
+          {{#if @showName}}
+            <div class="embedded-card-label">{{@card.name}}</div>
+          {{/if}}
+        </LinkTo>
+      {{else}}
+        <Embedded @card={{@card}} @mode={{this.mode}} />
         {{#if @showName}}
           <div class="embedded-card-label">{{@card.name}}</div>
         {{/if}}
-      </LinkTo>
-    {{else}}
-      <Embedded @card={{@card}} @mode={{this.mode}}/>
-      {{#if @showName}}
-        <div class="embedded-card-label">{{@card.name}}</div>
       {{/if}}
-    {{/if}}
+    </div>
   {{/let}}
 {{/if}}

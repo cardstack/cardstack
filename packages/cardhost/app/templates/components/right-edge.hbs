@@ -5,7 +5,7 @@
   {{did-update this.updateCard @card}}
 >
   {{!-- TODO: make this a component --}}
-  <div class="right-edge--section">
+  <div class="right-edge--pill-selector-container">
     <div class="pill-selector">
       <div class="pill-option selected">Properties</div>
       <div class="pill-option">Structure</div>
@@ -19,7 +19,7 @@
     --}}
     <div class="right-edge--section">
       <div class="right-edge--section-header" data-test-section-header>ID</div>
-      <div class="right-edge--item ch-input-group">
+      <div class="right-edge--item">
         <label for="card__id" class="ch-label">
           Card ID
         </label>
@@ -106,4 +106,5 @@
       />
     </div>
   {{/if}}
+  {{yield}}
 </div>

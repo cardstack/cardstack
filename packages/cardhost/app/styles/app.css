@@ -54,6 +54,7 @@ Until that work is done we are statically adding this css
   --ch-top-edge-height: 80px;
   --ch-left-edge-width: calc(var(--ch-left-edge-panel-width) + var(--ch-left-edge-navbar-width));
   --ch-right-edge-width: calc(var(--ch-right-edge-panel-width) + var(--ch-spacing));
+  --ch-bottom-edge-height: 80px;
 
   --ch-component-width: 260px;
   --ch-component-height: 40px;
@@ -81,7 +82,7 @@ body {
   width: 100%;
   height: auto;
   margin: 0;
-  background-color: var(--ch-dark-blue-gray);
+  background-color: var(--ch-default);
   color: white;
   font-family: var(--ch-font-family);
   font-size: 13px;
@@ -97,40 +98,15 @@ a {
 }
 
 a:hover {
-  --link: var(--ch-cyan);
+  --link: var(--ch-highlight);
 
   cursor: pointer;
 }
 
-
-/* Index template */
-.cardhost--topnav {
-  margin: 0 auto;
+.padding-vertical-small {
+  padding-top: var(--ch-spacing);
+  padding-bottom: var(--ch-spacing);
 }
-
-.cardhost--topnav ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 10px 0;
-  display: flex;
-  align-items: center;
-}
-
-.cardhost--topnav ul li a::after {
-  display: inline-block;
-  color: var(--ch-light-gray);
-  content: '|';
-  font-size: 80%;
-  font-weight: bold;
-  padding: 0 10px;
-}
-
-.cardhost-catalog--title {
-  margin: 0;
-  font-size: 32px;
-  font-weight: 200;
-}
-
 
 /* Other */
 .card-renderer--top-edge-buttons {
@@ -147,7 +123,7 @@ a:hover {
 }
 
 .card-renderer--top-edge-buttons .dock-btn.selected g {
-  stroke: var(--ch-cyan);
+  stroke: var(--ch-highlight);
 }
 
 .card-renderer--top-edge-buttons .close-editor-btn {
@@ -260,7 +236,7 @@ a:hover {
   top: 0;
   width: 40%;
   height: 100%;
-  background: var(--ch-darkest-blue-gray);
+  background: var(--ch-deep-background);
   z-index: 10;
   padding: 20px;
 }

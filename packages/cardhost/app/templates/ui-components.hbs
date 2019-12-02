@@ -4,7 +4,7 @@
 
   {{!-- TODO: Add navbar --}}
 
-  <section class="ui-components--section">
+  <section class="ui-components--section icons">
     <h2>Icons</h2>
     <a href="/ember-svg-jar/index.html">** See all SVG icons here. **</a>
 
@@ -21,10 +21,10 @@
   - Do not hardcode colors in the existing SVGs. Make a copy of the SVG first.
 */
 .ui-components--icon {
-  --icon-color: #3b3390;
+  --icon-color: var(--ch-light-op50);
 }
 .ui-components--icon:hover {
-  --icon-color: #71248a;
+  --icon-color: var(--ch-light);
 }' />
   </section>
 
@@ -39,7 +39,7 @@
   <section class="ui-components--section">
     <h2>Root CSS Variables</h2>
     <CodeEditor
-      @class="ui-components--notes"
+      class="ui-components--notes"
       @code='--ch-left-edge-navbar-width: 80px;
 --ch-left-edge-panel-width: 330px;
 --ch-right-edge-panel-width: 300px;
@@ -77,6 +77,13 @@
       @language="html"
     />
 
+    <h3>Responsive width (100%) button</h3>
+    <button class="ch-button ch-button--responsive">Create a new theme</button>
+    <CodeEditor
+      @code='<button class="ch-button ch-button--responsive">Create a new theme</button>'
+      @language="html"
+    />
+
     <h3>Icon buttons (SVG button)</h3>
     <div>
       <button class="ch-button ch-button--icon user" aria-label="User"></button>
@@ -98,12 +105,7 @@
       @code='<button class="ch-button ch-button--icon-secondary delete" aria-label="Delete"></button>'
       @language="html"
     />
-
-    <h3>Blue CTA button on default card</h3>
-    TK
   </section>
-
-
 
   <section class="ui-components--section ui-components--grid-2-col">
     <h2>View Switcher</h2>
@@ -160,7 +162,6 @@
 
   <section class="ui-components--section ui-components--grid-2-col">
     <h2>Filter Bar</h2>
-    {{!-- TODO: Check for accessibility --}}
     <div class="ch-input-group">
       <Input
         @class="ch-filter-bar"
@@ -178,130 +179,119 @@
     />
   </section>
 
-  <section class="ui-components--section ui-components--grid-2-col">
-    <h2>Form Elements</h2>
-    <CodeEditor
-      @class="ui-components--notes"
-      @code='`ch-input-group` class is optional. It adds top margin when there are sibling elements with the same class.'
-      @language="html"
-    />
-
-    <h3>Text</h3>
-      <label class="ch-label">Field label</label>
-      <CodeEditor
-        @code='<label class="ch-label">Field label</label>'
-        @language="html"
-      />
-
-      <div class="ch-helper-text">Example of helper text lorem ipsum dolor</div>
-      <CodeEditor
-        @code='<div class="ch-helper-text">Example of helper text lorem ipsum dolor</div>'
-        @language="html"
-      />
+  <section class="ui-components--section ui-components--grid-2-col form-fields">
+    <h2>Form fields</h2>
 
     <h3>Text Input</h3>
+    <CodeEditor
+      class="ui-components--notes"
+      @code='Notes: Below class names should work both with a `label` wrapping the `<Input>` component,
+or a `div` wrapping a `label` and an `<Input>`.'
+      @language="markdown"
+    />
     <div class="ch-input-group">
       <label for="input-1" class="ch-label">Field label</label>
       <Input @id="input-1" @class="ch-input" @placeholder="Placeholder text" />
     </div>
     <CodeEditor
       @code='<div class="ch-input-group">
-  <label for="[id]" class="ch-label">Field label</label>
-  <Input @id="[id]" @class="ch-input" @placeholder="Placeholder text" />
+  <span id=\{{id}} class="ch-label">\{{label}}</span>
+  <Input @id=\{{id}} @class="ch-input" @placeholder=\{{placeholderText}} />
 </div>'
-      @language="html"
+      @language="handlebars"
     />
 
-    <label class="ch-label ch-input-group">
-      Field label
+    <label class="ch-input-group">
+      <span class="ch-label">Field label</span>
       <Input @class="ch-input" @value="Entered text" />
     </label>
     <CodeEditor
-      @code='<label class="ch-label ch-input-group">
-  Field label
-  <Input @class="ch-input" @value="Entered text" />
+      @code='<label class="ch-input-group">
+  <span class="ch-label">\{{label}}</span>
+  <Input @class="ch-input" @value=\{{value}} />
 </label>'
-      @language="html"
+      @language="handlebars"
     />
 
-    <div class="ch-input-group">
-      <label for="input-2" class="ch-label">Field label</label>
-      <Input @id="input-2" @class="ch-input disabled" @disabled={{true}} @placeholder="Disabled field with placeholder" />
-    </div>
-    <CodeEditor
-      @code='<div class="ch-input-group">
-  <label for="[id]" class="ch-label">Field label</label>
-  <Input @id="[id]" @class="ch-input disabled" @disabled=true @placeholder="Disabled field with placeholder" />
-</div>'
-      @language="html"
-    />
-
-    <label class="ch-label ch-input-group">
-      Field label
-      <Input @class="ch-input disabled" @disabled={{true}} @value="Disabled field with entered value" />
+    <label class="ch-input-group">
+      <span class="ch-label">Field label</span>
+      <Input @class="ch-input disabled" @disabled={{true}} @value="Disabled field" />
     </label>
     <CodeEditor
-      @code='<label class="ch-label ch-input-group">
-  Field label
-  <Input @class="ch-input disabled" @disabled=true @value="Disabled field with entered value" />
+      @code='<label class="ch-input-group">
+  <span class="ch-label">\{{label}}</span>
+  <Input @class="ch-input \{{if disabled "disabled"}}" @disabled=\{{disabled}} />
 </label>'
-      @language="html"
+      @language="handlebars"
+    />
+
+    <label class="ch-input-group">
+      <span class="ch-label">Field label</span>
+      <Input @class="ch-input" @placeholder="Field with helper text" />
+      <div class="ch-helper-text">I am the helper text.</div>
+    </label>
+    <CodeEditor
+      @code='<label class="ch-input-group">
+  <span class="ch-label">\{{label}}</span>
+  <Input @class="ch-input" />
+  <div class="ch-helper-text">\{{helperText}}</div>
+</label>'
+      @language="handlebars"
+    />
+
+    <label class="ch-input-group required">
+      <span class="ch-required">required</span>
+      <span class="ch-label">Field label</span>
+      <Input @class="ch-input" @placeholder="Required field" />
+    </label>
+    <CodeEditor
+      @code='<label class="ch-input-group \{{if required "required"}}">
+  \{{#if required "required"}}
+    <span class="ch-required">required</span>
+  \{{/if}}
+  <span class="ch-label">\{{label}}</span>
+  <Input @class="ch-input" />
+</label>'
+      @language="handlebars"
+    />
+
+    <label class="ch-input-group">
+      <span class="ch-label">Field label</span>
+      <Input @class="ch-input error" @placeholder="Error state" />
+      <div class="ch-helper-text error">I am an error message.</div>
+    </label>
+    <CodeEditor
+      @code='<label class="ch-input-group">
+  <span class="ch-label">\{{label}}</span>
+  <Input @class="ch-input \{{if error "error"}}" />
+  <div class="ch-helper-text \{{if error "error"}}">\{{errorMessage}}</div>
+</label>'
+      @language="handlebars"
     />
 
     <h3>Textarea</h3>
+    <CodeEditor
+      class="ui-components--notes"
+      @code='Notes: Use input field features above with `<Textarea>` component and `ch-textarea` class.'
+      @language="markdown"
+    />
     <div class="ch-input-group">
       <label for="textarea-1" class="ch-label">Textarea label</label>
       <Textarea @id="textarea-1" @class="ch-textarea" @placeholder="Placeholder text" />
     </div>
     <CodeEditor
       @code='<div class="ch-input-group">
-  <label for="[id]" class="ch-label">Textarea label</label>
-  <Textarea @id="[id]" @class="ch-textarea" @placeholder="Placeholder text" />
+  <label for=\{{id}} class="ch-label">\{{label}}</label>
+  <Textarea @id=\{{id}} @class="ch-textarea" />
 </div>'
-      @language="html"
-    />
-
-    <label class="ch-label ch-input-group">
-      Textarea label
-      <Textarea @class="ch-textarea" @value="Entered long text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero." />
-    </label>
-    <CodeEditor
-      @code='<label class="ch-label ch-input-group">
-Textarea label
-<Textarea @class="ch-textarea" @value="Entered long text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero." />
-</label>'
-      @language="html"
-    />
-
-    <div class="ch-input-group">
-      <label for="textarea-2" class="ch-label">Textarea label</label>
-      <Textarea @id="textarea-2" @class="ch-textarea disabled" @disabled={{true}} @placeholder="Disabled textarea with placeholder text" />
-    </div>
-    <CodeEditor
-      @code='<div class="ch-input-group">
-  <label for="[id]" class="ch-label">Textarea label</label>
-  <Textarea @id="[id]" @class="ch-textarea disabled" @disabled=true @placeholder="Disabled textarea with placeholder text" />
-</div>'
-      @language="html"
-    />
-
-    <label class="ch-label ch-input-group">
-      Textarea label
-      <Textarea @class="ch-textarea disabled" @disabled={{true}} @value="Disabled textarea with entered text" />
-    </label>
-    <CodeEditor
-      @code='<label class="ch-label ch-input-group">
-  Textarea label
-  <Textarea @class="ch-textarea disabled" @disabled=true @value="Disabled textarea with entered text" />
-</label>'
-      @language="html"
+      @language="handlebars"
     />
 
     <h3>Checkbox</h3>
     <CodeEditor
-      @class="ui-components--notes"
-      @code='`checked` and `disabled` classes should be added to the `ch-checkbox-group` along with using the attributes on the input field.'
-      @language="html"
+      class="ui-components--notes"
+      @code='Notes: `checked` and `disabled` classes should be added to the `ch-checkbox-group` along with using the attributes on the input field.'
+      @language="markdown"
     />
     <label class="ch-label ch-input-group ch-checkbox-group {{if this.selected "checked"}}">
       {{if this.selected "selected" "not selected"}}
@@ -349,14 +339,14 @@ Textarea label
     />
 
     <h3>Dropdown</h3>
-    <div class="cs-input-group">
+    <div class="ch-input-group">
       <label for="ch-dropdown-1" class="ch-label">Label</label>
       <select id="ch-dropdown-1" class="ch-dropdown">
         <option class="ch-dropdown--option">Dropdown</option>
       </select>
     </div>
     <CodeEditor
-      @code='<div class="cs-input-group">
+      @code='<div class="ch-input-group">
   <label for="[id]" class="ch-label">Label</label>
   <select id="[id]" class="ch-dropdown">
     <option class="ch-dropdown--option">Dropdown</option>
@@ -364,14 +354,14 @@ Textarea label
 </div>'
       @language="html"
     />
-    <div class="cs-input-group">
+    <div class="ch-input-group">
       <label for="ch-dropdown-2" class="ch-label">Label</label>
       <select id="ch-dropdown-2" class="ch-dropdown disabled" disabled>
         <option class="ch-dropdown--option">Dropdown</option>
       </select>
     </div>
     <CodeEditor
-      @code='<div class="cs-input-group">
+      @code='<div class="ch-input-group">
   <label for="[id]" class="ch-label">Label</label>
   <select id="[id]" class="ch-dropdown disabled" disabled>
     <option class="ch-dropdown--option">Dropdown</option>
@@ -508,7 +498,7 @@ Textarea label
 
     <h4>Textarea Editor</h4>
     <CodeEditor
-      @class="ui-components--notes"
+      class="ui-components--notes"
       @code='Note: Textarea core-type currently does not exist.'
       @language="html"
     />
@@ -532,7 +522,7 @@ Textarea label
 
     <h4>Address string editor</h4>
     <CodeEditor
-      @class="ui-components--notes"
+      class="ui-components--notes"
       @code='Note: Address core-type does not exist.'
       @language="html"
     />
@@ -556,7 +546,7 @@ Textarea label
 
     <h4>Image editor</h4>
     <CodeEditor
-      @class="ui-components--notes"
+      class="ui-components--notes"
       @code='Note: Image core-type currently does not exist.'
       @language="html"
     />
@@ -664,7 +654,7 @@ Textarea label
   <section class="ui-components--section ui-components--grid-2-col">
     <h2>Right Edge</h2>
     <CodeEditor
-      @class="ui-components--notes"
+      class="ui-components--notes"
       @code='<RightEdge> component normally has fixed positioning. Using `position: static` here for display purposes.'
       @language="html"
     />
