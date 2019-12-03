@@ -6,6 +6,7 @@ import { myOrigin } from "./origin";
 import { search, validate } from "./scaffolding";
 import { getOwner, inject } from './dependency-injection';
 import { SingleResourceDoc } from "jsonapi-typescript";
+import * as JSON from "json-typescript";
 
 export default class CardsService {
   pgclient = inject('pgclient');
@@ -72,7 +73,7 @@ export default class CardsService {
             // meta-realm determines all the realms this hub (origin) knows
             // about. Some of the realms in here can live on other origins, and
             // that's fine.
-            value: `${myOrigin}/api/realms/meta`
+            eq: `${myOrigin}/api/realms/meta`
           },
           {
             // within cards that adopt from our base realm card:
@@ -82,7 +83,7 @@ export default class CardsService {
             fieldName: "local-id",
 
             // for this value
-            value: realm.href,
+            eq: realm.href,
           }
         ]
       }
@@ -97,42 +98,41 @@ export default class CardsService {
 
 export interface Query {
   filter?: Filter;
+  sort?: unknown;
+  page?: { size?: number; cursor?: string };
+  queryString?: string;
 }
 
-export type Filter = AnyFilter | EveryFilter | NotFilter | FieldFilter;
-
-// The explicitly undefined types below may look funny, but they make it legal
-// to check the presence of the special marker `any`, `every`, `fieldName`, and
-// `not` properties on every kind of Filter.
+export type Filter = AnyFilter | EveryFilter | NotFilter | EqFilter | RangeFilter;
 
 export interface AnyFilter {
   any: Filter[];
-  every?: undefined;
-  fieldName?: undefined;
-  not?: undefined;
 }
 
 export interface EveryFilter {
-  any?: undefined;
   every: Filter[];
-  fieldName?: undefined;
-  not?: undefined;
 }
 
 export interface NotFilter {
-  any?: undefined;
-  every?: undefined;
-  fieldName?: undefined;
   not: Filter;
 }
 
 export interface FieldFilter {
-  any?: undefined;
-  every?: undefined;
-  not?: undefined;
   cardId: CardId;
   fieldName: string;
-  value: any;
+}
+
+export interface EqFilter extends FieldFilter {
+  eq: JSON.Value;
+}
+
+export interface RangeFilter extends FieldFilter {
+  range: {
+    gt?: JSON.Primitive;
+    gte?: JSON.Primitive;
+    lt?: JSON.Primitive;
+    lte?: JSON.Primitive;
+  };
 }
 
 declare module "@cardstack/hub/dependency-injection" {
