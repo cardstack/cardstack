@@ -15,6 +15,48 @@ export default class CardsService {
     realm: URL,
     doc: SingleResourceDoc
   ): Promise<CardWithId> {
+    let realmCard = await this.getRealm(realm);
+    let writerFactory = await realmCard.loadFeature('writer');
+    if (!writerFactory) {
+      throw new CardstackError(`realm "${realm.href}" is not writable`, { status: 403 });
+    }
+    let writer = await getOwner(this).instantiate(writerFactory, realmCard);
+    let card: Card = new Card(doc, realm);
+    await validate(null, card, realmCard);
+    let { saved, id: upstreamId } = await writer.create(session, await card.asUpstreamDoc(), card.upstreamId);
+    if (card.upstreamId && upstreamId !== card.upstreamId) {
+      throw new CardstackError(`Writer plugin for realm ${realm.href} tried to change a localId it's not allowed to change`);
+    }
+    card.localId = typeof upstreamId === 'object' ? upstreamId.localId : upstreamId;
+    card.patch(saved.jsonapi);
+    card.assertHasIds();
+
+    let batch = this.pgclient.beginBatch();
+    await batch.save(card);
+    await batch.done();
+
+    return card;
+  }
+
+  async search(_session: Session, query: Query): Promise<CardWithId[]> {
+    return await search(query);
+  }
+
+  async get(_session: Session, id: CardId): Promise<CardWithId> {
+    // this exists to throw if there's no such realm. We're not using the return
+    // value yet but we will onc we implement custom searchers and realm grants.
+    await this.getRealm(id.realm);
+    return await this.pgclient.get(_session, id);
+  }
+
+  private async getRealm(realm: URL): Promise<CardWithId> {
+    // This searches by realm and localId. Even though it doesn't search by
+    // originalRealm, it's unique because of the special property that Realm
+    // cards have that their localId contains the complete URL to the realm. So
+    // localIds created on different hubs will never collide.
+    //
+    // We don't necessarily know the originalRealm we're looking for because we
+    // don't know whose meta realm this realm was originally created in.
     let realms = await this.search(Session.INTERNAL_PRIVILEGED, {
       filter: {
         every: [
@@ -47,28 +89,7 @@ export default class CardsService {
     if (realms.length === 0) {
       throw new CardstackError(`no such realm`, { status: 400 });
     }
-
-    let writerFactory = await realms[0].loadFeature('writer');
-    let writer = await getOwner(this).instantiate(writerFactory, realms[0]);
-    let card: Card = new Card(doc, realm);
-    await validate(null, card, realms[0]);
-    let { saved, id: upstreamId } = await writer.create(session, await card.asUpstreamDoc(), card.upstreamId);
-    if (card.upstreamId && upstreamId !== card.upstreamId) {
-      throw new CardstackError(`Writer plugin for realm ${realm.href} tried to change a localId it's not allowed to change`);
-    }
-    card.localId = typeof upstreamId === 'object' ? upstreamId.localId : upstreamId;
-    card.patch(saved.jsonapi);
-    card.assertHasIds();
-
-    let batch = this.pgclient.beginBatch();
-    await batch.save(card);
-    await batch.done();
-
-    return card;
-  }
-
-  async search(_session: Session, query: Query): Promise<CardWithId[]> {
-    return await search(query);
+    return realms[0];
   }
 }
 

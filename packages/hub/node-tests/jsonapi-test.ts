@@ -2,6 +2,7 @@ import Koa from "koa";
 import supertest from "supertest";
 import { myOrigin } from "../origin";
 import { TestEnv, createTestEnv } from "./helpers";
+import { testCard } from "./test-card";
 
 describe("hub/jsonapi", function() {
   let request: supertest.SuperTest<supertest.Test>;
@@ -56,39 +57,7 @@ describe("hub/jsonapi", function() {
     let response = await request
       .post("/api/realms/first-ephemeral-realm/cards")
       .set("Content-Type", "application/vnd.api+json")
-      .send({
-        data: {
-          type: "cards",
-          relationships: {
-            "adopted-from": {
-              data: { type: "cards", id: "core-catalog::@cardstack/base-card" }
-            }
-          },
-          attributes: {
-            model: {
-              attributes: {
-                "new-field-0": "hello",
-              }
-            },
-            "field-order": ["new-field-0"],
-            fields: {
-              "new-field-0": {
-                attributes: {
-                  caption: "Your New Field"
-                },
-                relationships: {
-                  definition: {
-                    data: {
-                      type: "cards",
-                      id: "core-catalog::@cardstack/string"
-                    }
-                  }
-                }
-              },
-            }
-          }
-        }
-      });
+      .send(testCard({ hello: 'world' }).jsonapi);
     expect(response.status).to.equal(201);
     expect(response.header.location).to.match(/http:\/\/[^/]+\/api\/realms\/first-ephemeral-realm\/cards\/[^/]+/);
   });

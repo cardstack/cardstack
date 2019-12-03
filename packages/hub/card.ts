@@ -69,10 +69,11 @@ export class Card {
       copied.data.attributes = {};
     }
     copied.data.attributes.realm = this.realm.href;
-    copied.data.attributes['original-realm'], this.originalRealm.href;
-    copied.data.attributes['local-id'], this.localId;
+    copied.data.attributes['original-realm'] = this.originalRealm.href;
+    if (this.localId) {
+      copied.data.attributes['local-id'] = this.localId;
+    }
     copied.data.id =this.id;
-
     return new PristineDocument(copied);
   }
 
@@ -131,7 +132,7 @@ export class CardWithId extends Card {
     cardHasIds(this);
   }
 
-  async loadFeature(featureName: "writer"): Promise<WriterFactory>;
+  async loadFeature(featureName: "writer"): Promise<WriterFactory | null>;
   async loadFeature(_featureName: any): Promise<any> {
     return await loadWriter(this);
   }

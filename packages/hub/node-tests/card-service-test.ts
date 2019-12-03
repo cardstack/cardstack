@@ -2,6 +2,7 @@ import { queryToSQL, param } from "../pgsearch/util";
 import { createTestEnv, TestEnv } from "./helpers";
 import { Session } from "../session";
 import { myOrigin } from "../origin";
+import { testCard } from "./test-card";
 
 describe("hub/card-service", function() {
   let env: TestEnv;
@@ -14,43 +15,20 @@ describe("hub/card-service", function() {
     await env.destroy();
   });
 
-  it("saves a card", async function() {
-    let doc = {
-      data: {
-        type: "cards",
-        relationships: {
-          "adopted-from": {
-            data: { type: "cards", id: "core-catalog::@cardstack/base-card" }
-          }
-        },
-        attributes: {
-          model: {
-            attributes: {
-              "new-field-0": "hello"
-            }
-          },
-          "field-order": ["new-field-0"],
-          fields: {
-            "new-field-0": {
-              attributes: {
-                caption: "your new field"
-              },
-              relationships: {
-                definition: {
-                  data: {
-                    type: "cards",
-                    id: "core-catalog::@cardstack/string"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    };
-
+  it("handles get from missing realm", async function() {
     let service = await env.container.lookup('cards');
-    let card = await service.create(Session.EVERYONE, new URL(`${myOrigin}/api/realms/first-ephemeral-realm`), doc);
+    try {
+      await service.get(Session.EVERYONE, { realm: new URL('http://not-a-known-realm'), localId: 'x' });
+      throw new Error(`should not get here`);
+    } catch (err) {
+      expect(err.message).to.match(/no such realm/);
+    }
+  });
+
+  it("saves a card", async function() {
+    let doc = testCard({ hello: 'world' });
+    let service = await env.container.lookup('cards');
+    let card = await service.create(Session.EVERYONE, new URL(`${myOrigin}/api/realms/first-ephemeral-realm`), doc.jsonapi);
     expect(card.realm.href).to.equal(`${myOrigin}/api/realms/first-ephemeral-realm`);
 
     let pgclient = await env.container.lookup('pgclient');
@@ -58,5 +36,13 @@ describe("hub/card-service", function() {
       queryToSQL([`select * from cards where realm = `, param(`${myOrigin}/api/realms/first-ephemeral-realm`)])
     );
     expect(result.rowCount).equals(1);
+  });
+
+  it("can get a card back out", async function() {
+    let doc = testCard({ hello: 'world' });
+    let service = await env.container.lookup('cards');
+    let card = await service.create(Session.EVERYONE, new URL(`${myOrigin}/api/realms/first-ephemeral-realm`), doc.jsonapi);
+    let foundCard = await service.get(Session.EVERYONE, card);
+    expect(foundCard.id).equals(card.id);
   });
 });

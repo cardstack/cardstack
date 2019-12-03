@@ -12,8 +12,10 @@ import logger from "@cardstack/logger";
 import postgresConfig from "./postgres-config";
 import { join } from "path";
 import * as JSON from "json-typescript";
-import { upsert, queryToSQL, param, safeName } from "./util";
-import { CardWithId } from "../card";
+import { upsert, queryToSQL, param, safeName, every } from "./util";
+import { CardWithId, CardId } from "../card";
+import { Session } from "../session";
+import CardstackError from "../error";
 
 const log = logger("cardstack/pgsearch");
 
@@ -117,6 +119,19 @@ export default class PgClient {
 
   beginBatch() {
     return new Batch(this);
+  }
+
+  async get(_session: Session, id: CardId): Promise<CardWithId> {
+    let condition = every([
+      [`realm = `, param(id.realm.href)],
+      [`original_realm = `, param(id.originalRealm?.href ?? id.realm.href)],
+      [`local_id = `, param(id.localId)]
+    ]);
+    let result = await this.query(queryToSQL([`select pristine_doc from cards where`, ...condition]));
+    if (result.rowCount !== 1) {
+      throw new CardstackError(`Card not found with realm="${id.realm.href}", original-realm="${id.originalRealm?.href ?? id.realm.href}", local-id="${id.localId}"`, { status: 404 });
+    }
+    return new CardWithId(result.rows[0].pristine_doc);
   }
 }
 

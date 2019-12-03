@@ -1,6 +1,7 @@
 import { CardWithId } from "../card";
 import { queryToSQL, param } from "../pgsearch/util";
 import { createTestEnv, TestEnv } from "./helpers";
+import { testCard } from "./test-card";
 
 describe("hub/pgclient", function() {
   let env: TestEnv;
@@ -20,41 +21,7 @@ describe("hub/pgclient", function() {
   });
 
   it("saves a card", async function() {
-    let card = new CardWithId({
-      data: {
-        type: "cards",
-        relationships: {
-          "adopted-from": {
-            data: { type: "cards", id: "core-catalog::@cardstack/base-card" }
-          }
-        },
-        attributes: {
-          "local-id": "card-1",
-          realm: "http://hassan.com/my-realm",
-          model: {
-            attributes: {
-              "new-field-0": "hello"
-            }
-          },
-          "field-order": ["new-field-0"],
-          fields: {
-            "new-field-0": {
-              attributes: {
-                caption: "your new field"
-              },
-              relationships: {
-                definition: {
-                  data: {
-                    type: "cards",
-                    id: "core-catalog::@cardstack/string"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    });
+    let card = new CardWithId(testCard({ localId: 'card-1', realm: `http://hassan.com/realm` }, { hello: 'world' }).jsonapi);
     let pgclient = await env.container.lookup("pgclient");
     let batch = pgclient.beginBatch();
     await batch.save(card);
