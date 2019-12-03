@@ -61,4 +61,69 @@ describe("hub/jsonapi", function() {
     expect(response.status).to.equal(201);
     expect(response.header.location).to.match(/http:\/\/[^/]+\/api\/realms\/first-ephemeral-realm\/cards\/[^/]+/);
   });
+
+  it("handles missing card in valid realm", async function() {
+    let response = await request
+      .get("/api/realms/first-ephemeral-realm/cards/not-a-real-card")
+      .set("Accept", "application/vnd.api+json");
+    expect(response.status).to.equal(404);
+  });
+
+  it("can get a card from local realm that was created in that realm", async function() {
+    let response = await request
+      .post("/api/realms/first-ephemeral-realm/cards")
+      .set("Content-Type", "application/vnd.api+json")
+      .send(testCard({ hello: 'world' }).jsonapi);
+    expect(response.status).to.equal(201);
+
+    response = await request.get((new URL(response.header.location)).pathname)
+      .set("Accept", "application/vnd.api+json");
+    expect(response.status).to.equal(200);
+    expect(response.body?.data?.attributes?.model?.attributes?.hello).to.equal("world");
+    expect(response.body?.data?.attributes?.['realm']).to.equal(`${myOrigin}/api/realms/first-ephemeral-realm`);
+  });
+
+  it("can get a card from local realm that was created in another realm", async function() {
+    let response = await request
+      .post("/api/realms/first-ephemeral-realm/cards")
+      .set("Content-Type", "application/vnd.api+json")
+      .send(testCard({ originalRealm: 'https://somewhere/else', localId: '432' }, { hello: 'world' }).jsonapi);
+    expect(response.status).to.equal(201);
+
+    response = await request.get((new URL(response.header.location)).pathname)
+      .set("Accept", "application/vnd.api+json");
+    expect(response.status).to.equal(200);
+    expect(response.body?.data?.attributes?.model?.attributes?.hello).to.equal("world");
+    expect(response.body?.data?.attributes?.['original-realm']).to.equal("https://somewhere/else");
+    expect(response.body?.data?.attributes?.['realm']).to.equal(`${myOrigin}/api/realms/first-ephemeral-realm`);
+  });
+
+  it("can get a card from remote realm that was created in that realm", async function() {
+    let response = await request
+      .post(`/api/remote-realms/${encodeURIComponent('http://example.com/api/realms/second-ephemeral-realm')}/cards`)
+      .set("Content-Type", "application/vnd.api+json")
+      .send(testCard({ hello: 'world' }).jsonapi);
+    expect(response.status).to.equal(201);
+
+    response = await request.get((new URL(response.header.location)).pathname)
+      .set("Accept", "application/vnd.api+json");
+    expect(response.status).to.equal(200);
+    expect(response.body?.data?.attributes?.model?.attributes?.hello).to.equal("world");
+    expect(response.body?.data?.attributes?.['realm']).to.equal('http://example.com/api/realms/second-ephemeral-realm');
+  });
+
+  it("can get a card from remote realm that was created in another realm", async function() {
+    let response = await request
+      .post(`/api/remote-realms/${encodeURIComponent('http://example.com/api/realms/second-ephemeral-realm')}/cards`)
+      .set("Content-Type", "application/vnd.api+json")
+      .send(testCard({ originalRealm: 'https://somewhere/else', localId: '432' }, { hello: 'world' }).jsonapi);
+    expect(response.status).to.equal(201);
+
+    response = await request.get((new URL(response.header.location)).pathname)
+      .set("Accept", "application/vnd.api+json");
+    expect(response.status).to.equal(200);
+    expect(response.body?.data?.attributes?.model?.attributes?.hello).to.equal("world");
+    expect(response.body?.data?.attributes?.['original-realm']).to.equal("https://somewhere/else");
+    expect(response.body?.data?.attributes?.['realm']).to.equal('http://example.com/api/realms/second-ephemeral-realm');
+  });
 });

@@ -6,26 +6,31 @@ import { CARDSTACK_PUBLIC_REALM } from "./realm";
 import { WriterFactory } from "./writer";
 import { SingleResourceDoc } from "jsonapi-typescript";
 import merge from "lodash/merge";
+import { testCard } from "./node-tests/test-card";
 
-function ephemeralRealm() {
-  return new CardWithId({
-    data: {
-      type: "cards",
-      attributes: {
-        realm: `${myOrigin}/api/realms/meta`,
-        "original-realm": `${myOrigin}/api/realms/meta`,
-        "local-id": "first-ephemeral-realm"
-      },
-      relationships: {
-        "adopts-from": {
-          links: {
-            related:
-              "https://base.cardstack.com/api/realms/public/cards/ephemeral"
-          }
-        }
-      }
-    }
-  });
+function ephemeralRealms() {
+  return [
+    new CardWithId(
+      testCard(
+        {
+          realm: `${myOrigin}/api/realms/meta`,
+          originalRealm: `${myOrigin}/api/realms/meta`,
+          localId: `${myOrigin}/api/realms/first-ephemeral-realm`
+        },
+        {}
+      ).jsonapi
+    ),
+    new CardWithId(
+      testCard(
+        {
+          realm: `${myOrigin}/api/realms/meta`,
+          originalRealm: `http://example.com/api/realms/meta`,
+          localId: `http://example.com/api/realms/second-ephemeral-realm`,
+        },
+        {}
+      ).jsonapi
+    )
+  ];
 }
 
 export async function search(query: Query): Promise<CardWithId[]> {
@@ -62,16 +67,12 @@ export async function search(query: Query): Promise<CardWithId[]> {
   if (!foundRealmId || typeof foundRealmId.value !== "string") {
     throw new CardstackError("unimplemented, not searching for realm localId");
   }
-
-  if (foundRealmId.value !== `${myOrigin}/api/realms/first-ephemeral-realm`) {
-    return [];
-  }
-
-  return [ephemeralRealm()];
+  let searchingFor = foundRealmId.value;
+  return ephemeralRealms().filter(card => card.localId === searchingFor);
 }
 
 export async function loadWriter(card: CardWithId): Promise<WriterFactory> {
-  if (card.id === ephemeralRealm().id) {
+  if (ephemeralRealms().find(realm => realm.id === card.id)) {
     return (await import("./ephemeral/writer")).default;
   }
   throw new Error(`unimplemented`);

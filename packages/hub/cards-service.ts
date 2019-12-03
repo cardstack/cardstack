@@ -23,11 +23,13 @@ export default class CardsService {
     let writer = await getOwner(this).instantiate(writerFactory, realmCard);
     let card: Card = new Card(doc, realm);
     await validate(null, card, realmCard);
-    let { saved, id: upstreamId } = await writer.create(session, await card.asUpstreamDoc(), card.upstreamId);
-    if (card.upstreamId && upstreamId !== card.upstreamId) {
+
+    let upstreamIdToWriter = card.upstreamId;
+    let { saved, id: upstreamIdFromWriter } = await writer.create(session, await card.asUpstreamDoc(), upstreamIdToWriter);
+    if (upstreamIdToWriter && upstreamIdFromWriter !== upstreamIdToWriter) {
       throw new CardstackError(`Writer plugin for realm ${realm.href} tried to change a localId it's not allowed to change`);
     }
-    card.localId = typeof upstreamId === 'object' ? upstreamId.localId : upstreamId;
+    card.localId = typeof upstreamIdFromWriter === 'object' ? upstreamIdFromWriter.localId : upstreamIdFromWriter;
     card.patch(saved.jsonapi);
     card.assertHasIds();
 

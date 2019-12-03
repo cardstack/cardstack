@@ -54,11 +54,10 @@ export default class JSONAPIMiddleware {
       //route.get("/cards", getCards),
       route.post("/realms/:local_realm_id/cards", this.createCard.bind(this)),
       route.post("/remote-realms/:remote_realm_url/cards", this.createCard.bind(this)),
-
-      // route.get("/realms/:local_realm_id/cards/:local_id", ....)
-      // route.get("/realms/:local_realm_id/cards/:original_realm_url/:local_id", ....)
-      // route.get("/remote-realms/:remote_realm_url/cards/:local_id", ....)
-      // route.get("/remote-realms/:remote_realm_url/cards/:original_realm_url/:local_id", ....)
+      route.get("/realms/:local_realm_id/cards/:local_id", this.getCard.bind(this)),
+      route.get("/realms/:local_realm_id/cards/:original_realm_url/:local_id", this.getCard.bind(this)),
+      route.get("/remote-realms/:remote_realm_url/cards/:local_id", this.getCard.bind(this)),
+      route.get("/remote-realms/:remote_realm_url/cards/:original_realm_url/:local_id", this.getCard.bind(this)),
       // repeat for patch
       // repeat for delete
     ]);
@@ -89,8 +88,7 @@ export default class JSONAPIMiddleware {
     if (ctxt.routeParams.local_realm_id) {
       realm = new URL(`${myOrigin}${apiPrefix}/realms/${ctxt.routeParams.local_realm_id}`);
     } else {
-      // todo: test koa decoding behavior here
-      realm = new URL(decodeURIComponent(ctxt.routeParams.remote_realm_url));
+      realm = new URL(ctxt.routeParams.remote_realm_url);
       if (realm.origin === myOrigin) {
         throw new CardstackError(`${realm.href} is a local realm. You tried to access it via /api/remote-realms`, { status: 400 });
       }
@@ -98,10 +96,39 @@ export default class JSONAPIMiddleware {
     let card = await this.cards.create(ctxt.state.cardstackSession, realm, body);
     ctxt.body = (await card.asPristineDoc()).jsonapi;
     ctxt.status = 201;
-    ctxt.set('location', this.canonicalURLFor(card));
+    ctxt.set('location', this.localURLFor(card));
   }
 
-  private canonicalURLFor(card: Card): string {
+  async getCard(ctxt: KoaRoute.Context<SessionContext, {}>) {
+    let realm: URL;
+    if (ctxt.routeParams.local_realm_id != null) {
+      realm = new URL(`${myOrigin}${apiPrefix}/realms/${ctxt.routeParams.local_realm_id}`);
+    } else if (ctxt.routeParams.remote_realm_url) {
+      realm = new URL(ctxt.routeParams.remote_realm_url);
+    } else {
+      throw new CardstackError(`bug in jsonapi-middleware: missing realm parameter in getCard`, { status: 500 });
+    }
+
+    let originalRealm: URL;
+    if (ctxt.routeParams.original_realm_url != null) {
+      originalRealm = new URL(ctxt.routeParams.original_realm_url);
+    } else {
+      originalRealm = realm;
+    }
+
+    let localId: string;
+    if (ctxt.routeParams.local_id != null) {
+      localId = ctxt.routeParams.local_id;
+    } else {
+      throw new CardstackError(`bug in jsonapi-middleware: missing localId parameter in getCard`, { status: 500 });
+    }
+
+    let card = await this.cards.get(ctxt.state.cardstackSession, { realm, originalRealm, localId });
+    ctxt.body = (await card.asPristineDoc()).jsonapi;
+    ctxt.status = 200;
+  }
+
+  private localURLFor(card: Card): string {
     let isHome = card.originalRealm.href === card.realm.href;
     if (card.realm.origin === myOrigin) {
       let base = `${myOrigin}${apiPrefix}/realms`;
