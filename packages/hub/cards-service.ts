@@ -4,12 +4,12 @@ import { CARDSTACK_PUBLIC_REALM } from "./realm";
 import CardstackError from "./error";
 import { myOrigin } from "./origin";
 import { search, validate } from "./scaffolding";
-import { getOwner, inject } from './dependency-injection';
+import { getOwner, inject } from "./dependency-injection";
 import { SingleResourceDoc } from "jsonapi-typescript";
 import * as JSON from "json-typescript";
 
 export default class CardsService {
-  pgclient = inject('pgclient');
+  pgclient = inject("pgclient");
 
   async create(
     session: Session,
@@ -17,20 +17,31 @@ export default class CardsService {
     doc: SingleResourceDoc
   ): Promise<CardWithId> {
     let realmCard = await this.getRealm(realm);
-    let writerFactory = await realmCard.loadFeature('writer');
+    let writerFactory = await realmCard.loadFeature("writer");
     if (!writerFactory) {
-      throw new CardstackError(`realm "${realm.href}" is not writable`, { status: 403 });
+      throw new CardstackError(`realm "${realm.href}" is not writable`, {
+        status: 403
+      });
     }
     let writer = await getOwner(this).instantiate(writerFactory, realmCard);
     let card: Card = new Card(doc, realm);
     await validate(null, card, realmCard);
 
     let upstreamIdToWriter = card.upstreamId;
-    let { saved, id: upstreamIdFromWriter } = await writer.create(session, await card.asUpstreamDoc(), upstreamIdToWriter);
+    let { saved, id: upstreamIdFromWriter } = await writer.create(
+      session,
+      await card.asUpstreamDoc(),
+      upstreamIdToWriter
+    );
     if (upstreamIdToWriter && upstreamIdFromWriter !== upstreamIdToWriter) {
-      throw new CardstackError(`Writer plugin for realm ${realm.href} tried to change a localId it's not allowed to change`);
+      throw new CardstackError(
+        `Writer plugin for realm ${realm.href} tried to change a localId it's not allowed to change`
+      );
     }
-    card.localId = typeof upstreamIdFromWriter === 'object' ? upstreamIdFromWriter.localId : upstreamIdFromWriter;
+    card.localId =
+      typeof upstreamIdFromWriter === "object"
+        ? upstreamIdFromWriter.localId
+        : upstreamIdFromWriter;
     card.patch(saved.jsonapi);
     card.assertHasIds();
 
@@ -62,30 +73,17 @@ export default class CardsService {
     // don't know whose meta realm this realm was originally created in.
     let realms = await this.search(Session.INTERNAL_PRIVILEGED, {
       filter: {
-        every: [
-          {
-            cardId: { realm: CARDSTACK_PUBLIC_REALM, localId: "base" },
-            fieldName: "realm",
-
-            // the special meta-realm on each origin has restrictive but not
-            // entirely closed off permissions that let users create / update /
-            // delete their own Realm cards. The set of relam cards in the
-            // meta-realm determines all the realms this hub (origin) knows
-            // about. Some of the realms in here can live on other origins, and
-            // that's fine.
-            eq: `${myOrigin}/api/realms/meta`
-          },
-          {
-            // within cards that adopt from our base realm card:
-            cardId: { realm: CARDSTACK_PUBLIC_REALM, localId: "realm" },
-
-            // search their local-id fields:
-            fieldName: "local-id",
-
-            // for this value
-            eq: realm.href,
-          }
-        ]
+        type: { realm: CARDSTACK_PUBLIC_REALM, localId: "realm" },
+        eq: {
+          // the special meta-realm on each origin has restrictive but not
+          // entirely closed off permissions that let users create / update /
+          // delete their own Realm cards. The set of relam cards in the
+          // meta-realm determines all the realms this hub (origin) knows
+          // about. Some of the realms in here can live on other origins, and
+          // that's fine.
+          realm: `${myOrigin}/api/realms/meta`,
+          "local-id": realm.href
+        }
       }
     });
 
@@ -103,35 +101,41 @@ export interface Query {
   queryString?: string;
 }
 
-export type Filter = AnyFilter | EveryFilter | NotFilter | EqFilter | RangeFilter;
+export type Filter =
+  | AnyFilter
+  | EveryFilter
+  | NotFilter
+  | EqFilter
+  | RangeFilter;
 
-export interface AnyFilter {
+export interface TypedFilter {
+  type?: CardId;
+}
+
+export interface AnyFilter extends TypedFilter {
   any: Filter[];
 }
 
-export interface EveryFilter {
+export interface EveryFilter extends TypedFilter {
   every: Filter[];
 }
 
-export interface NotFilter {
+export interface NotFilter extends TypedFilter {
   not: Filter;
 }
 
-export interface FieldFilter {
-  cardId: CardId;
-  fieldName: string;
+export interface EqFilter extends TypedFilter {
+  eq: { [fieldName: string]: JSON.Value };
 }
 
-export interface EqFilter extends FieldFilter {
-  eq: JSON.Value;
-}
-
-export interface RangeFilter extends FieldFilter {
+export interface RangeFilter extends TypedFilter {
   range: {
-    gt?: JSON.Primitive;
-    gte?: JSON.Primitive;
-    lt?: JSON.Primitive;
-    lte?: JSON.Primitive;
+    [fieldName: string]: {
+      gt?: JSON.Primitive;
+      gte?: JSON.Primitive;
+      lt?: JSON.Primitive;
+      lte?: JSON.Primitive;
+    };
   };
 }
 

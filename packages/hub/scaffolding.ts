@@ -1,8 +1,7 @@
 import { CardWithId, Card } from "./card";
-import { Query, EqFilter } from "./cards-service";
+import { Query } from "./cards-service";
 import CardstackError from "./error";
 import { myOrigin } from "./origin";
-import { CARDSTACK_PUBLIC_REALM } from "./realm";
 import { WriterFactory } from "./writer";
 import { SingleResourceDoc } from "jsonapi-typescript";
 import merge from "lodash/merge";
@@ -37,38 +36,15 @@ export async function search(query: Query): Promise<CardWithId[]> {
   // this is currently special-cased to only handle searches for realms.
   // Everything else throws unimplemented.
 
-  if (!query.filter || !('every' in query.filter) || query.filter.every.length !== 2) {
-    throw new CardstackError("unimplemented, not an every");
+  if (!query.filter || !('eq' in query.filter)) {
+    throw new CardstackError("unimplemented, not an eq");
   }
 
-  let searchingInMetaRealm = false;
-  for (let f of query.filter.every) {
-    if ('eq' in f && f.fieldName === "realm" && f.eq === `${myOrigin}/api/realms/meta`) {
-      searchingInMetaRealm = true;
-      break;
-    }
-  }
-
-  if (!searchingInMetaRealm) {
+  if (query.filter.eq.realm !== `${myOrigin}/api/realms/meta` || !('local-id' in query.filter.eq)) {
     throw new CardstackError("unimplemented, not searching in meta realm");
   }
 
-  let foundRealmId: EqFilter | null = null;
-  for (let f of query.filter.every) {
-    if (
-      'eq' in f &&
-      f.fieldName === "local-id" &&
-      f.cardId.realm.href === CARDSTACK_PUBLIC_REALM.href &&
-      f.cardId.localId === "realm"
-    ) {
-      foundRealmId = f;
-    }
-  }
-
-  if (!foundRealmId || typeof foundRealmId.eq !== "string") {
-    throw new CardstackError("unimplemented, not searching for realm localId");
-  }
-  let searchingFor = foundRealmId.eq;
+  let searchingFor = query.filter.eq['local-id'];
   return ephemeralRealms().filter(card => card.localId === searchingFor);
 }
 
