@@ -1,27 +1,20 @@
-import { wireItUp } from "../main";
-import { Container } from "../dependency-injection";
-import PgClient from "../pgsearch/pgclient";
 import { CardWithId } from "../card";
 import { queryToSQL, param } from "../pgsearch/util";
+import { createTestEnv, TestEnv } from "./helpers";
 
 describe("hub/pgclient", function() {
-  let container: Container;
-
-  before(function() {
-    process.env.PGDATABASE = `test_db_${Math.floor(100000 * Math.random())}`;
-  });
+  let env: TestEnv;
 
   beforeEach(async function() {
-    container = await wireItUp();
+    env = await createTestEnv();
   });
 
   afterEach(async function() {
-    await container.teardown();
-    await PgClient.deleteSearchIndexIHopeYouKnowWhatYouAreDoing();
+    await env.destroy();
   });
 
   it("it can access the database", async function() {
-    let pgclient = await container.lookup("pgclient");
+    let pgclient = await env.container.lookup("pgclient");
     let result = await pgclient.query("select 1");
     expect(result.rowCount).equals(1);
   });
@@ -62,7 +55,7 @@ describe("hub/pgclient", function() {
         }
       }
     });
-    let pgclient = await container.lookup("pgclient");
+    let pgclient = await env.container.lookup("pgclient");
     let batch = pgclient.beginBatch();
     await batch.save(card);
     await batch.done();
