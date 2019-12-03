@@ -2,18 +2,21 @@
 // not-yet-written tree. But you can't recursively put a Treebuilder
 // inside a Treebuilder. That's where this class comes in.
 
-const { Treebuilder, FILEMODE } = require('./git');
+import { Treebuilder, FILEMODE, Repository, Oid, Tree, TreeEntry as NodeGitTreeEntry, Blob } from './git';
+import { todo } from '@cardstack/plugin-utils/todo-any';
 
-const tombstone = {};
+const tombstone = undefined;
+
+type TreeEntry = NodeGitTreeEntry | NewEntry | MutableEntryWrapper | MutableTree | MutableBlob | undefined;
 
 class MutableTree {
-  constructor(repo, tree) {
-    this.repo = repo;
-    this.tree = tree;
+  overlay: Map<string,TreeEntry>;
+
+  constructor(readonly repo: Repository, readonly tree?: Tree|MutableTree) {
     this.overlay = new Map();
   }
 
-  entryByName(name) {
+  entryByName(name:string): TreeEntry {
     if (this.overlay.has(name)) {
       return this.overlay.get(name);
     }
@@ -29,20 +32,36 @@ class MutableTree {
     return result;
   }
 
-  insert(filename, object, filemode) {
+  _entryByName(name: string) {
+    return this.entryByName(name);
+  }
+
+  insert(filename:string, object: TreeEntry, filemode: FILEMODE) {
     let entry = new NewEntry(this.repo, object, filemode);
     this.overlay.set(filename, entry);
     return entry;
   }
 
-  delete(filename) {
+  delete(filename:string) {
     this.overlay.set(filename, tombstone);
   }
 
-  async fileAtPath(path, allowCreate) {
+  isBlob() {
+    return false;
+  }
+
+  isTree() {
+    return true;
+  }
+
+  getTree() {
+    return this.tree;
+  }
+
+  async fileAtPath(path: string, allowCreate: boolean) {
     let { tree, leaf, leafName } = await this.traverse(path, allowCreate);
     if (!leaf || leaf === tombstone || !leaf.isBlob()) {
-      leaf = null;
+      leaf = undefined;
     }
     if (!leaf && !allowCreate) {
       throw new NotFound(`No such file ${path}`);
@@ -50,20 +69,20 @@ class MutableTree {
     return { tree, leaf, leafName };
   }
 
-  async traverse(path, allowCreate=false) {
+  async traverse(path:string, allowCreate=false) {
     let parts = path.split('/');
-    let here = this;
+    let here:todo = this;
 
     while (parts.length > 1) {
       let dirName = parts.shift();
-      let entry = here.entryByName(dirName);
+      let entry:TreeEntry = here!.entryByName(dirName!);
       if (!entry || !entry.isTree()) {
         if (!allowCreate) {
           throw new NotFound(`${path} does not exist`);
         }
-        entry = here.insert(dirName, new MutableTree(here.repo, null), FILEMODE.TREE);
+        entry = here!.insert(dirName!, new MutableTree(here!.repo), FILEMODE.TREE);
       }
-      here = await entry.getTree();
+      here = await entry!.getTree();
     }
 
     return {
@@ -73,18 +92,22 @@ class MutableTree {
     };
   }
 
+  filemode() {
+    return FILEMODE.TREE;
+  }
+
   async write(allowEmpty=false) {
     if (this.overlay.size === 0 && this.tree) {
-      return this.tree.id();
+      return (<Tree>this.tree).id();
     }
-    let builder = await Treebuilder.create(this.repo, this.tree);
+    let builder = await Treebuilder.create(this.repo, <Tree>this.tree);
     for (let [filename, entry] of this.overlay.entries()) {
       if (entry === tombstone) {
         builder.remove(filename);
       } else {
-        let childId = await entry.write();
+        let childId = await (<MutableBlob>entry!).write();
         if (childId) {
-          await builder.insert(filename, childId, entry.filemode());
+          await builder.insert(filename, childId, (<MutableTree> entry!).filemode());
         } else {
           builder.remove(filename);
         }
@@ -97,12 +120,19 @@ class MutableTree {
 }
 
 class MutableBlob {
-  constructor(repo, buffer) {
-    this.repo = repo;
-    this.buffer = buffer;
+  constructor(readonly repo: Repository, readonly buffer: Buffer) {
   }
   content() {
     return this.buffer;
+  }
+  isBlob() {
+    return true;
+  }
+  isTree() {
+    return false;
+  }
+  getTree() {
+    return null;
   }
   async write() {
     return this.repo.createBlobFromBuffer(this.buffer);
@@ -110,22 +140,24 @@ class MutableBlob {
 }
 
 class MutableEntryWrapper {
-  constructor(repo, entry) {
-    this.repo = repo;
-    this.entry = entry;
-    this._mutableTree = null;
+  _mutableTree?: MutableTree;
+
+  constructor(readonly repo:Repository, readonly entry: NodeGitTreeEntry) {
   }
   filemode() {
-    return this.entry.filemode();
+    return this.entry!.filemode();
   }
   isBlob() {
-    return this.entry.isBlob();
+    return this.entry!.isBlob();
   }
   isTree() {
-    return this.entry.isTree();
+    return this.entry!.isTree();
+  }
+  id() {
+    return this.entry!.id();
   }
   async getBlob() {
-    return this.entry.getBlob();
+    return this.entry!.getBlob();
   }
   async getTree() {
     if (!this._mutableTree) {
@@ -143,17 +175,21 @@ class MutableEntryWrapper {
 }
 
 class NewEntry {
-  constructor(repo, object, filemode) {
-    this.repo = repo;
+  _filemode: FILEMODE;
+  _object: TreeEntry;
+  savedId?: Oid;
+
+  constructor(readonly repo: Repository, object: TreeEntry, filemode: FILEMODE) {
+
     this._filemode = filemode;
+
     if (this.isTree() && !(object instanceof MutableTree)) {
-      this._object = new MutableTree(repo, object);
+      this._object = new MutableTree(repo, <Tree>(object as unknown));
     } else if (this.isBlob() && object instanceof Buffer) {
       this._object = new MutableBlob(repo, object);
     } else {
       this._object = object;
     }
-    this.savedId = null;
   }
   filemode() {
     return this._filemode;
@@ -173,15 +209,20 @@ class NewEntry {
   async write() {
     return this.savedId = await this._write();
   }
+
+  id() {
+    return this.savedId;
+  }
+
   async _write() {
     if (this.isBlob()) {
       if (this._object instanceof MutableBlob) {
         return this._object.write();
       } else {
-        return this._object.id();
+        return (<Blob>(this._object as unknown)!).id();
       }
     } else {
-      return this._object.write();
+      return (<MutableTree>this._object!).write();
     }
   }
 }
@@ -189,13 +230,13 @@ class NewEntry {
 class NotFound extends Error {}
 class OverwriteRejected extends Error {}
 
-module.exports = { MutableTree, MutableBlob, safeEntryByName, NotFound, OverwriteRejected };
+export { MutableTree, MutableBlob, safeEntryByName, NotFound, OverwriteRejected };
 
-function safeEntryByName(tree, name) {
+function safeEntryByName(tree: todo, name:string) {
   // This is apparently private API. There's unfortunately no public
   // API for gracefully attempting to retriee and entry that may be
   // absent.
-  let entry = tree._entryByName(name);
+  let entry = tree!._entryByName(name);
   if (entry) {
     entry.parent = tree;
   }

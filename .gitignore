@@ -28,6 +28,15 @@ package-lock.json
 /packages/git/change.d.ts
 /packages/git/change.js
 /packages/git/change.js.map
+/packages/git/indexer.d.ts
+/packages/git/indexer.js
+/packages/git/indexer.js.map
+/packages/git/writer.d.ts
+/packages/git/writer.js
+/packages/git/writer.js.map
+/packages/git/mutable-tree.d.ts
+/packages/git/mutable-tree.js
+/packages/git/mutable-tree.js.map
 
 /packages/hub/card-services.d.ts
 /packages/hub/card-services.js

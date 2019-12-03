@@ -5,10 +5,12 @@ import {
   Repository,
   Signature,
   Tree,
-  FILEMODE
+  FILEMODE,
+  FetchOptions
 } from './git';
 
 import { todo } from '@cardstack/plugin-utils/todo-any';
+
 
 const {
   MutableTree,
@@ -41,7 +43,7 @@ class Change {
     return new this(repo, targetBranch, null, [], null, null);
   }
 
-  static async createBranch(repo:todo, parentId:string, targetBranch:string, fetchOpts:any) {
+  static async createBranch(repo:Repository, parentId:string, targetBranch:string, fetchOpts:FetchOptions) {
     let parentCommit;
     if (parentId) {
       parentCommit = await Commit.lookup(repo, parentId);
@@ -56,7 +58,7 @@ class Change {
     return new this(repo, targetBranch, parentTree, parents, parentCommit, fetchOpts);
   }
 
-  static async create(repo:todo, parentId:string, targetBranch:string, fetchOpts:todo) {
+  static async create(repo:Repository, parentId:string, targetBranch:string, fetchOpts:todo) {
     let parentCommit;
     if (parentId) {
       parentCommit = await Commit.lookup(repo, parentId);
@@ -146,15 +148,16 @@ class Change {
       return this.parentCommit;
     }
 
-    let tree = await Tree.lookup(this.repo, treeOid, null);
+    let tree = await Tree.lookup(this.repo, treeOid, undefined);
     let { author, committer } = signature(commitOpts);
+    // @ts-ignore types don't know null is valid for second argument
     let commitOid = await Commit.create(this.repo, null, author, committer, 'UTF-8', commitOpts.message, tree, this.parents.length, this.parents);
     return Commit.lookup(this.repo, commitOid);
   }
 
   async _pushCommit(mergeCommit:todo) {
     const remoteBranchName = `temp-remote-${crypto.randomBytes(20).toString('hex')}`;
-    await Branch.create(this.repo, remoteBranchName, mergeCommit, false);
+    await Branch.create(this.repo, remoteBranchName, mergeCommit, 0);
 
     let remote = await this.repo.getRemote('origin');
 
@@ -174,18 +177,19 @@ class Change {
       // new branch, so no merge needed
       return newCommit;
     }
-    let baseOid = await Merge.base(this.repo, newCommit, headCommit);
+    let baseOid = await Merge.base(this.repo, newCommit, headCommit.id());
     if (baseOid.equal(headCommit.id())) {
       // fast forward (we think), so no merge needed
       return newCommit;
     }
-    let index = await Merge.commits(this.repo, newCommit, headCommit, null);
+    let index = await Merge.commits(this.repo, newCommit, headCommit);
     if (index.hasConflicts()) {
       throw new GitConflict(index);
     }
     let treeOid = await index.writeTreeTo(this.repo);
-    let tree = await Tree.lookup(this.repo, treeOid, null);
+    let tree = await Tree.lookup(this.repo, treeOid);
     let { author, committer } = signature(commitOpts);
+    // @ts-ignore null isn't recognized as valid second param
     let mergeCommitOid = await Commit.create(this.repo, null, author, committer, 'UTF-8', `Clean merge into ${this.targetBranch}`, tree, 2, [newCommit, headCommit]);
     return await Commit.lookup(this.repo, mergeCommitOid);
   }
@@ -202,7 +206,7 @@ class Change {
   }
 
   async _newBranch(newCommit:todo) {
-    await Branch.create(this.repo, this.targetBranch, newCommit, false);
+    await Branch.create(this.repo, this.targetBranch, newCommit, 0);
   }
 }
 

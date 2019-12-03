@@ -1,4 +1,4 @@
-import { cloneRepo, Cred, Merge, Repository, Reset } from './git';
+import { cloneRepo, Cred, Merge, Repository, Reset, Remote, RemoteConfig } from './git';
 import { todo } from '@cardstack/plugin-utils/todo-any';
 
 const { promisify } = require('util');
@@ -17,7 +17,7 @@ class GitLocalCache {
     this._remotes = new Map();
   }
 
-  async getRepo(remoteUrl:String, remote:todo) {
+  async getRepo(remoteUrl:string, remote:RemoteConfig) {
     let existingRepo = this._remotes.get(remoteUrl);
 
     if (existingRepo) {
@@ -36,7 +36,7 @@ class GitLocalCache {
     return repo;
   }
 
-  async _makeRepo(remote:todo) {
+  async _makeRepo(remote:RemoteConfig) {
     let cacheDirectory = remote.cacheDir;
 
     if (!cacheDirectory) {

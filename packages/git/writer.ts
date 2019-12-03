@@ -1,8 +1,12 @@
-const {
+import {
   Repository,
   Cred,
-  cloneRepo
-} = require('./git');
+  cloneRepo,
+  RemoteConfig,
+  FetchOptions
+} from './git';
+
+import { todo } from '@cardstack/plugin-utils/todo-any';
 
 const crypto = require('crypto');
 const Change = require('./change');
@@ -17,34 +21,56 @@ const TruffleContract = require("truffle-contract");
 const { merge, cloneDeep } = require('lodash');
 const { isInternalCard } = require('@cardstack/plugin-utils/card-utils');
 
+
 const log = require('@cardstack/logger')('cardstack/git');
 const stringify = require('json-stable-stringify-without-jsonify');
 
 const mkdir = promisify(temp.mkdir);
 const defaultBranch = 'master';
 
-function getType(model) {
+function getType(model:todo) {
   return model.data ? model.data.type : model.type;
 }
 
-function getId(model) {
+function getId(model:todo) {
   return model.data ? model.data.id : model.id;
 }
 
-function getMeta(model) {
+function getMeta(model:todo) {
   return model.data ? model.data.meta : model.meta;
 }
 
-module.exports = class Writer {
-  static create(...args) {
-    return new this(...args);
+interface WriterConfig {
+  repo: string;
+  basePath: string;
+  branchPrefix: string;
+  remote: RemoteConfig;
+  idGenerator: Function;
+  githereum: todo;
+}
+
+class Writer {
+  static create(params: WriterConfig) {
+    return new this(params);
   }
 
-  constructor({ repo, idGenerator, basePath, branchPrefix, remote, githereum }) {
+  myEmail: string;
+  myName: string;
+  remote: RemoteConfig;
+  idGenerator: Function;
+  repoPath: string;
+  basePath: string;
+  repo?: Repository;
+  branchPrefix: string;
+  githereumConfig: todo;
+  githereum: todo;
+  fetchOpts?: FetchOptions;
+  _githereumPromise?: Promise<todo>;
+
+  constructor({ repo, idGenerator, basePath, branchPrefix, remote, githereum }: WriterConfig) {
     this.repoPath = repo;
     this.basePath = basePath;
     this.branchPrefix = branchPrefix || "";
-    this.repo = null;
     let hostname = os.hostname();
     this.myName = `PID${process.pid} on ${hostname}`;
     this.myEmail = `${os.userInfo().username}@${hostname}`;
@@ -60,7 +86,7 @@ module.exports = class Writer {
     if (remote) {
       this.fetchOpts = {
         callbacks: {
-          credentials: (url, userName) => {
+          credentials: (url:string, userName:string) => {
             if (remote && remote.privateKey) {
               return Cred.sshKeyMemoryNew(userName, remote.publicKey || '', remote.privateKey, remote.passphrase || '');
             }
@@ -71,9 +97,10 @@ module.exports = class Writer {
     }
   }
 
+
   get hasCardSupport() { return true; }
 
-  async prepareCreate(session, type, document, isSchema) {
+  async prepareCreate(session: todo, type: string, document: todo, isSchema: boolean) {
     let id = getId(document);
     return withErrorHandling(id, type, async () => {
       await this._ensureRepo();
@@ -94,7 +121,7 @@ module.exports = class Writer {
         file = await change.get(this._filenameFor(type, id, isSchema), { allowCreate: true });
       }
 
-      let gitDocument = document.data && isInternalCard(type, id) ?
+      let gitDocument:todo = document.data && isInternalCard(type, id) ?
         { data: { id, type } } :
         { id, type };
 
@@ -122,7 +149,7 @@ module.exports = class Writer {
     });
   }
 
-  async prepareUpdate(session, type, id, document, isSchema) {
+  async prepareUpdate(session: todo, type: string, id: string, document: todo, isSchema: boolean) {
     let meta = getMeta(document);
     if (!meta || !meta.version) {
       throw new Error('missing required field "meta.version"', {
@@ -161,7 +188,7 @@ module.exports = class Writer {
     });
   }
 
-  async prepareDelete(session, version, type, id, isSchema) {
+  async prepareDelete(session: todo, version: string, type: string, id: string, isSchema: boolean) {
     if (!version) {
       throw new Error('version is required', {
         status: 400,
@@ -189,7 +216,7 @@ module.exports = class Writer {
     });
   }
 
-  async _commitOptions(operation, type, id, session) {
+  async _commitOptions(operation: string, type: string, id: string, session: todo) {
     let user = session && await session.loadUser();
     let userAttributes = (user && user.data && user.data.attributes) || {};
 
@@ -202,7 +229,7 @@ module.exports = class Writer {
     };
   }
 
-  _filenameFor(type, id, isSchema) {
+  _filenameFor(type: string, id: string, isSchema: boolean) {
     let base = this.basePath ? this.basePath + '/' : '';
     if (!isSchema && isInternalCard(type, id)) {
       return `${base}cards/${id}.json`;
@@ -216,7 +243,7 @@ module.exports = class Writer {
       if (this.remote) {
         let tempRepoPath = await mkdir('cardstack-temp-repo');
         this.repo = await cloneRepo(this.remote.url, tempRepoPath, {
-          fetchOpts: this.fetchOpts,
+          fetchOpts: this.fetchOpts!,
         });
         return;
       }
@@ -232,7 +259,7 @@ module.exports = class Writer {
       let contract = await this._getGithereumContract();
 
       this.githereum = new Githereum(
-        this.repo.path(),
+        this.repo!.path(),
         this.githereumConfig.repoName,
         contract,
         this.githereumConfig.from,
@@ -273,7 +300,7 @@ module.exports = class Writer {
         log.info("Starting githereum push");
         return this.githereum.push(this.githereumConfig.tag).then(() =>
           log.info("Githereum push complete")
-        ).catch(e => {
+        ).catch( (e:todo) => {
           log.error("Error pushing to githereum:", e, e.stack);
         });
       });
@@ -287,7 +314,7 @@ module.exports = class Writer {
 // TODO: we only need to do this here because the Hub has no generic
 // "read" hook to call on writers. We should use that instead and move
 // this into the generic hub:writers code.
-function patch(before, diffDocument) {
+function patch(before: todo, diffDocument: todo) {
   let after;
   let afterResource;
   let beforeResource;
@@ -295,7 +322,7 @@ function patch(before, diffDocument) {
 
   if (diffDocument.data &&
     isInternalCard(diffDocument.data.type, diffDocument.data.id)) {
-    after = { data: Object.assign({}, before.data) };
+    after = { data: Object.assign({}, before.data), included: [] };
     if (Array.isArray(diffDocument.included)) {
       after.included = [].concat(diffDocument.included);
     }
@@ -321,7 +348,7 @@ function patch(before, diffDocument) {
   return after;
 }
 
-async function withErrorHandling(id, type, fn) {
+async function withErrorHandling(id:string, type:string, fn:Function) {
   try {
     return await fn();
   } catch (err) {
@@ -345,7 +372,7 @@ async function withErrorHandling(id, type, fn) {
 }
 
 
-async function finalizer(pendingChange) {
+async function finalizer(this: Writer, pendingChange:todo) {
   let { id, type, change, file, signature } = pendingChange;
   return withErrorHandling(id, type, async () => {
     if (file) {
@@ -369,3 +396,5 @@ async function finalizer(pendingChange) {
     return { version, hash: (file ? file.savedId() : null) };
   });
 }
+
+module.exports = Writer;

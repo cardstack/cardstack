@@ -65,11 +65,13 @@
 
 */
 
-const {
+import {
   Repository,
   Branch,
   Commit,
-} = require('./git');
+  RemoteConfig,
+  TreeEntry
+} from "./git";
 
 const Change = require("./change");
 const { safeEntryByName } = require('./mutable-tree');
@@ -79,17 +81,37 @@ const { set, intersection } = require('lodash');
 const { isInternalCard, adoptionChain } = require('@cardstack/plugin-utils/card-utils');
 const { declareInjections } = require('@cardstack/di');
 const Session = require('@cardstack/plugin-utils/session');
+import { todo } from '@cardstack/plugin-utils/todo-any';
 
 const defaultBranch = 'master';
+
+interface IndexerSettings {
+  dataSource: todo;
+  repo:string;
+  basePath:string;
+  branchPrefix:string;
+  remote:RemoteConfig;
+  searchers: todo;
+}
 
 module.exports = declareInjections({
   searchers: 'hub:searchers',
 },
 
 class Indexer {
-  static create(params) { return new this(params); }
+  static create(params:IndexerSettings) { return new this(params); }
 
-  constructor({ dataSource, repo, basePath, branchPrefix, remote, searchers }) {
+  dataSource: todo;
+  repoPath?: string;
+  cardTypes: Array<string>;
+  basePath:  Array<todo>;;
+  branchPrefix?: string;
+  remote?: RemoteConfig;
+  searchers: todo;
+  repo?: Repository;
+  __owner__: todo;
+
+  constructor({ dataSource, repo, basePath, branchPrefix, remote, searchers }: IndexerSettings) {
     if (repo && remote) {
       throw new Error('You cannot define the params \'remote\' and \'repo\' at the same time for this data source');
     }
@@ -98,7 +120,6 @@ class Indexer {
     this.cardTypes = dataSource.cardTypes || [];
     this.branchPrefix = branchPrefix || "";
     this.basePath = basePath ? basePath.split('/') : [];
-    this.repo = null;
     this.remote = remote;
   }
 
@@ -111,7 +132,7 @@ class Indexer {
       }
 
       try {
-        this.repo = await Repository.open(this.repoPath);
+        this.repo = await Repository.open(this.repoPath!);
       } catch (e) {
         if (/(could not find repository from|Failed to resolve path)/i.test(e.message)) {
 
@@ -141,25 +162,27 @@ class Indexer {
     }
     log.debug(`ending beginUpdate()`);
 
-    return new GitUpdater(this.repo, targetBranch, this.repoPath, this.basePath, this.searchers, this.cardTypes, this.__owner__);
+    return new GitUpdater(this.repo!, targetBranch, this.basePath, this.searchers, this.cardTypes, this.__owner__);
   }
 });
 
 class GitUpdater {
-  constructor(repo, branch, repoPath, basePath, searchers, cardTypes, owner) {
-    this.cardTypes = cardTypes;
-    this.repo = repo;
-    this.basePath = basePath;
-    this.branch = branch;
-    this.searchers = searchers;
-    this.owner = owner;
-    this.commit = null;
-    this.commitId = null;
-    this.rootTree = null;
+  commit?: Commit;
+  commitId?: string;
+  rootTree: todo;
+
+  constructor(
+    readonly repo:Repository,
+    readonly branch:string,
+    readonly basePath:Array<todo>,
+    readonly searchers:todo,
+    readonly cardTypes:Array<string>,
+    readonly owner:todo) {
   }
 
   async schema() {
-    let models = [];
+    let models:Array<todo> = [];
+
     let ops = new Gather(models);
     await this._loadCommit();
     await this._indexTree(ops, null, this.rootTree, {
@@ -178,7 +201,7 @@ class GitUpdater {
     }
   }
 
-  async getInternalCard(cardId) {
+  async getInternalCard(cardId:string) {
     let card;
     try {
       card = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', cardId, cardId);
@@ -188,7 +211,7 @@ class GitUpdater {
     return card;
   }
 
-  async updateContent(meta, hints, ops) {
+  async updateContent(meta:todo, hints:Array<todo>, ops:todo) {
     log.debug(`starting updateContent()`);
     await this._loadCommit();
     let originalTree;
@@ -225,12 +248,12 @@ class GitUpdater {
     }
   }
 
-  async _commitAtBranch(branchName) {
+  async _commitAtBranch(branchName:string) {
     let branch = await Branch.lookup(this.repo, branchName, Branch.BRANCH.LOCAL);
     return Commit.lookup(this.repo, branch.target());
   }
 
-  async _indexTree(ops, oldTree, newTree, filter) {
+  async _indexTree(ops:todo, oldTree:todo, newTree:todo, filter?:todo) {
     let seen = new Map();
     if (newTree) {
       for (let newEntry of newTree.entries()) {
@@ -255,7 +278,7 @@ class GitUpdater {
     }
   }
 
-  async _indexEntry(ops, name, oldTree, newEntry, filter) {
+  async _indexEntry(ops:todo, name:string, oldTree:todo, newEntry:todo, filter:todo) {
     let oldEntry;
     if (oldTree) {
       oldEntry = safeEntryByName(oldTree, name);
@@ -280,7 +303,7 @@ class GitUpdater {
         if (isInternalCard(type, id)) {
           await this._ensureBaseCard();
 
-          let chain = (await adoptionChain(doc, this.getInternalCard.bind(this))).map(i => i.data.id);
+          let chain = (await adoptionChain(doc, this.getInternalCard.bind(this))).map( (i:todo) => i.data.id);
           if (!intersection(this.cardTypes, chain).length) {
             return;
           }
@@ -293,7 +316,7 @@ class GitUpdater {
     }
   }
 
-  async _deleteEntry(ops, oldEntry, filter) {
+  async _deleteEntry(ops:todo, oldEntry:todo, filter:todo) {
     if (oldEntry.isTree()) {
       await this._indexTree(ops, await oldEntry.getTree(), nextFilter(filter));
     } else {
@@ -302,7 +325,7 @@ class GitUpdater {
     }
   }
 
-  async _entryToDoc(type, id, entry) {
+  async _entryToDoc(type:string, id:string, entry:todo) {
     entry.isBlob();
     let contents = (await entry.getBlob()).content().toString('utf8');
     let doc;
@@ -337,7 +360,7 @@ class GitUpdater {
   }
 }
 
-function identify(entry) {
+function identify(entry: TreeEntry) {
   let type, id;
   let parts = entry.path().split('/');
   if (parts[0] === 'cards' && parts.length > 1) {
@@ -352,10 +375,10 @@ function identify(entry) {
 }
 
 class Gather {
-  constructor(models) {
-    this.models = models;
+
+  constructor(readonly models:Array<todo>) {
   }
-  save(type, id, document) {
+  save(type:string, id:string, document:todo) {
     if (!isInternalCard(type, id)) {
       document.type = type;
       document.id = id;
@@ -364,13 +387,13 @@ class Gather {
   }
 }
 
-function filterAllows(filter, name) {
+function filterAllows(filter:todo, name:string) {
   return !filter || !filter.only || filter.only.length === 0 ||
     (Array.isArray(filter.only[0]) && filter.only[0].includes(name)) ||
     name === filter.only[0];
 }
 
-function nextFilter(filter) {
+function nextFilter(filter:todo) {
   if (!filter || !filter.only || filter.only.length < 2) {
     return null;
   }
