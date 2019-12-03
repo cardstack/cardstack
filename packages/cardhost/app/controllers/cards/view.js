@@ -6,6 +6,7 @@ import { tracked } from '@glimmer/tracking';
 export default class ViewCardController extends Controller {
   @service cssModeToggle
   @service router
+  @service cardstackSession;
   resizeable = true;
 
   get cardJson() {
@@ -28,5 +29,16 @@ export default class ViewCardController extends Controller {
     this.cssModeToggle.setEditingCss(true)
     this.themerOptions.push({name: 'Custom theme'})
     this.router.transitionTo('cards.view', this.model, { queryParams:{ editingCss: true } })
+  }
+
+  @action
+  save() {
+    this.model.save()
+  }
+
+  @action
+  closeEditor() {
+    this.cssModeToggle.setEditingCss(false);
+    this.router.transitionTo('cards.view', this.model, {queryParams:{editingCss: false}})
   }
 }
