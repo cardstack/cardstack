@@ -1,12 +1,13 @@
-  <section
-    ...attributes
-    class="cardhost-card-theme-editor {{if (eq this.cssModeToggle.dockLocation "bottom") "bottom-docked"}}"
-  >
-    <h3>Card Theme Editor</h3>
-    <CodeEditor
-      @code=".a {}"
-      @language="css"
-      @readOnly={{false}}
-      @resizable={{true}}
-    />
-  </section>
+<section
+  ...attributes
+  data-test-editor-pane
+  class="cardhost-card-theme-editor {{if (eq this.cssModeToggle.dockLocation "bottom") "bottom-docked"}}"
+>
+  <h3>Card Theme Editor</h3>
+  <CodeEditor
+    @code=".a {}"
+    @language="css"
+    @readOnly={{false}}
+    @resizable={{true}}
+  />
+</section>
