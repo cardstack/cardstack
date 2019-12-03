@@ -47,6 +47,6 @@ module('Acceptance | css editing', function(hooks) {
     assert.equal(currentURL(), `/cards/${card1Id}`);
     assert.dom(`[data-test-card-view="${card1Id}"]`).exists();
     await click('[data-test-card-custom-style-button]')
-    assert.dom('[data-test-theme-editor]').exists();
+    assert.dom('[data-test-editor-pane]').exists();
   });
 });

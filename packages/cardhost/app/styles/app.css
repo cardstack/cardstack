@@ -117,6 +117,20 @@ a:hover {
   z-index: var(--ch-actions-z-index);
 }
 
+.card-renderer--top-edge-buttons .dock-btn {
+  margin: 10px 15px;
+  cursor: pointer;
+}
+
+.card-renderer--top-edge-buttons .dock-btn.selected g {
+  stroke: var(--ch-highlight);
+}
+
+.card-renderer--top-edge-buttons .close-editor-btn {
+  --width: 125px;
+  margin-left: 20px;
+}
+
 .card-schema-updator--search-bar {
   position: absolute;
   right: var(--ch-spacing);
@@ -223,8 +237,20 @@ a:hover {
   width: 40%;
   height: 100%;
   background: var(--ch-deep-background);
-  z-index: 12;
+  z-index: 10;
   padding: 20px;
+}
+
+.cardhost-card-theme-editor.bottom-docked {
+  top: auto;
+  bottom: 0;
+  left: 0;
+  height: 40%;
+  width: 100%;
+}
+
+.dock-icon-unselected {
+  --icon-color: --ch-light-gray-b1;
 }
 
 .cardhost-card-document--codeblock {

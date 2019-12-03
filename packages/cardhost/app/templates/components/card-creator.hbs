@@ -112,15 +112,3 @@
     />
   </section>
 {{/if}}
-
-{{#if this.cssModeToggle.editingCss}}
-  <section class="cardhost-card-theme-editor" data-test-theme-editor>
-    <h3>Card Theme Editor</h3>
-    <CodeEditor
-      @code=".a {}"
-      @language="css"
-      @readOnly={{false}}
-      @resizable={{true}}
-    />
-  </section>
-{{/if}}
