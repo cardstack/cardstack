@@ -12,7 +12,10 @@
     >
       {{svg-jar "dock-right"}}
     </div>
-    <button class="ch-button close-editor-btn" {{on "click" this.closeEditor}}>
+    <button {{on "click" this.closeEditor}}
+      class="ch-button close-editor-btn"
+      data-test-close-editor
+    >
       Close Editor
     </button>
 

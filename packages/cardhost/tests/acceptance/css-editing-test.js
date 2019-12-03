@@ -8,6 +8,13 @@ import { setupMockUser, login } from '../helpers/login';
 const timeout = 20000;
 const card1Id = 'millenial-puppies';
 const qualifiedCard1Id = `local-hub::${card1Id}`;
+const cardData  = {
+  [card1Id]: [
+    ['title', 'string', true, 'The Millenial Puppy'],
+    ['author', 'string', true, 'Van Gogh'],
+    ['body', 'string', false, 'It can be difficult these days to deal with the discerning tastes of the millenial puppy.']
+  ]
+}
 
 const scenario = new Fixtures({
   create(factory) {
@@ -30,15 +37,9 @@ module('Acceptance | css editing', function(hooks) {
     this.owner.lookup('controller:cards.view').resizable = false;
   });
 
-  test(`navigating to custom styles`, async function(assert) {
+  test('navigating to custom styles', async function(assert) {
     await login();
-    await createCards({
-      [card1Id]: [
-        ['title', 'string', true, 'The Millenial Puppy'],
-        ['author', 'string', true, 'Van Gogh'],
-        ['body', 'string', false, 'It can be difficult these days to deal with the discerning tastes of the millenial puppy.']
-      ]
-    });
+    await createCards(cardData);
     await visit(`/cards/${card1Id}`);
 
     await fillIn('[data-test-mode-switcher]', 'view');
@@ -48,5 +49,16 @@ module('Acceptance | css editing', function(hooks) {
     assert.dom(`[data-test-card-view="${card1Id}"]`).exists();
     await click('[data-test-card-custom-style-button]')
     assert.dom('[data-test-editor-pane]').exists();
+  });
+
+  test('closing the editor', async function(assert) {
+    await login();
+    await createCards(cardData);
+    await click('[data-test-card-custom-style-button]')
+    assert.equal(currentURL(), `/cards/${card1Id}?editingCss=true`);
+    assert.dom('[data-test-close-editor]').exists();
+    await click('[data-test-close-editor]')
+    assert.equal(currentURL(), `/cards/${card1Id}?editingCss=false`);
+    assert.dom('[data-test-editor-pane]').doesNotExist();
   });
 });
