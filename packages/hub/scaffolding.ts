@@ -1,5 +1,5 @@
 import { CardWithId, Card } from "./card";
-import { Query } from "./cards-service";
+import { Query } from "./query";
 import CardstackError from "./error";
 import { myOrigin } from "./origin";
 import { WriterFactory } from "./writer";

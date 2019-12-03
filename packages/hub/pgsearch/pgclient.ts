@@ -12,10 +12,12 @@ import logger from "@cardstack/logger";
 import postgresConfig from "./postgres-config";
 import { join } from "path";
 import * as JSON from "json-typescript";
-import { upsert, queryToSQL, param, safeName, every } from "./util";
+import { upsert, queryToSQL, param, safeName, every, Expression } from "./util";
 import { CardWithId, CardId } from "../card";
 import { Session } from "../session";
 import CardstackError from "../error";
+import { Query } from "../query";
+import { Sorts } from "./sorts";
 
 const log = logger("cardstack/pgsearch");
 
@@ -132,6 +134,36 @@ export default class PgClient {
       throw new CardstackError(`Card not found with realm="${id.realm.href}", original-realm="${id.originalRealm?.href ?? id.realm.href}", local-id="${id.localId}"`, { status: 404 });
     }
     return new CardWithId(result.rows[0].pristine_doc);
+  }
+
+  async search(_session: Session, { filter, queryString, sort, page }: Query): Promise<{ cards: CardWithId[] }> {
+    let conditions = [] as Expression[];
+
+    if (filter) {
+      conditions.push(this.filterCondition(filter));
+    }
+
+    if (queryString) {
+      conditions.push(this.queryCondition(queryString));
+    }
+
+    let totalResponsePromise = this.query(queryToSQL([`select count(*) from cards where`, ...every(conditions)]));
+
+    let sorts = new Sorts(this, sort);
+    if (page && page.cursor) {
+      conditions.push(sorts.afterExpression(page.cursor));
+    }
+
+    let query = [`select`, ...sorts.cursorColumns() ,`, pristine_doc from documents where`, ...every(conditions), ...sorts.orderExpression()];
+
+    let size = page?.size ?? 10;
+    query = [...query, "limit", param(size + 1) ];
+
+    let sql = queryToSQL(query);
+    log.trace("search: %s trace: %j", sql.text, sql.values);
+    let response = await this.query(sql);
+    let totalResponse = await totalResponsePromise;
+
   }
 }
 

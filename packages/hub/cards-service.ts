@@ -3,10 +3,10 @@ import { Card, CardWithId, CardId } from "./card";
 import { CARDSTACK_PUBLIC_REALM } from "./realm";
 import CardstackError from "./error";
 import { myOrigin } from "./origin";
-import { search, validate } from "./scaffolding";
+import { search as scaffoldSearch, validate } from "./scaffolding";
 import { getOwner, inject } from "./dependency-injection";
 import { SingleResourceDoc } from "jsonapi-typescript";
-import * as JSON from "json-typescript";
+import { Query } from "./query";
 
 export default class CardsService {
   pgclient = inject("pgclient");
@@ -52,8 +52,12 @@ export default class CardsService {
     return card;
   }
 
-  async search(_session: Session, query: Query): Promise<CardWithId[]> {
-    return await search(query);
+  async search(_session: Session, query: Query): Promise<{ cards: CardWithId[] }> {
+    let { cards } = await this.pgclient.search(_session, query);
+    if (cards.length === 0) {
+      cards = await scaffoldSearch(query);
+    }
+    return { cards };
   }
 
   async get(_session: Session, id: CardId): Promise<CardWithId> {
@@ -71,7 +75,7 @@ export default class CardsService {
     //
     // We don't necessarily know the originalRealm we're looking for because we
     // don't know whose meta realm this realm was originally created in.
-    let realms = await this.search(Session.INTERNAL_PRIVILEGED, {
+    let { cards: realms } = await this.search(Session.INTERNAL_PRIVILEGED, {
       filter: {
         type: { realm: CARDSTACK_PUBLIC_REALM, localId: "realm" },
         eq: {
@@ -94,50 +98,7 @@ export default class CardsService {
   }
 }
 
-export interface Query {
-  filter?: Filter;
-  sort?: unknown;
-  page?: { size?: number; cursor?: string };
-  queryString?: string;
-}
 
-export type Filter =
-  | AnyFilter
-  | EveryFilter
-  | NotFilter
-  | EqFilter
-  | RangeFilter;
-
-export interface TypedFilter {
-  type?: CardId;
-}
-
-export interface AnyFilter extends TypedFilter {
-  any: Filter[];
-}
-
-export interface EveryFilter extends TypedFilter {
-  every: Filter[];
-}
-
-export interface NotFilter extends TypedFilter {
-  not: Filter;
-}
-
-export interface EqFilter extends TypedFilter {
-  eq: { [fieldName: string]: JSON.Value };
-}
-
-export interface RangeFilter extends TypedFilter {
-  range: {
-    [fieldName: string]: {
-      gt?: JSON.Primitive;
-      gte?: JSON.Primitive;
-      lt?: JSON.Primitive;
-      lte?: JSON.Primitive;
-    };
-  };
-}
 
 declare module "@cardstack/hub/dependency-injection" {
   interface KnownServices {

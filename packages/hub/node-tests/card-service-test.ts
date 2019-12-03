@@ -143,11 +143,12 @@ describe("hub/card-service", function() {
     });
 
     it("can filter by realm", async function() {
-      await service.search(Session.EVERYONE, {
+      let { cards } = await service.search(Session.EVERYONE, {
         filter: {
           eq: { realm: `${myOrigin}/api/realms/first-ephemeral-realm` },
         }
       });
+      expect(cards.length).equals(4);
     });
   });
 });
