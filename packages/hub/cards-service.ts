@@ -4,10 +4,12 @@ import { CARDSTACK_PUBLIC_REALM } from "./realm";
 import CardstackError from "./error";
 import { myOrigin } from "./origin";
 import { search, validate } from "./scaffolding";
-import { getOwner } from './dependency-injection';
+import { getOwner, inject } from './dependency-injection';
 import { SingleResourceDoc } from "jsonapi-typescript";
 
 export default class CardsService {
+  pgclient = inject('pgclient');
+
   async create(
     session: Session,
     realm: URL,
@@ -57,7 +59,11 @@ export default class CardsService {
     card.localId = typeof upstreamId === 'object' ? upstreamId.localId : upstreamId;
     card.patch(saved.jsonapi);
     card.assertHasIds();
-    // TODO: insert into index card.asSearchDoc()
+
+    let batch = this.pgclient.beginBatch();
+    await batch.save(card);
+    await batch.done();
+
     return card;
   }
 

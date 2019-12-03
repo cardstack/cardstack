@@ -1,17 +1,22 @@
 import Koa from "koa";
-import { wireItUp } from "../main";
 import supertest from "supertest";
 import { myOrigin } from "../origin";
+import { TestEnv, createTestEnv } from "./helpers";
 
 describe("hub/jsonapi", function() {
   let request: supertest.SuperTest<supertest.Test>;
+  let env: TestEnv;
 
   beforeEach(async function() {
+    env = await createTestEnv();
     let app = new Koa();
-    let container = await wireItUp();
-    let jsonapi = await container.lookup("jsonapi-middleware");
+    let jsonapi = await env.container.lookup("jsonapi-middleware");
     app.use(jsonapi.middleware());
     request = supertest(app.callback());
+  });
+
+  afterEach(async function() {
+    await env.destroy();
   });
 
   it("errors correctly for missing post body", async function() {
