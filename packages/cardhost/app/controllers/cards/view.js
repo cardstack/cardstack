@@ -39,6 +39,6 @@ export default class ViewCardController extends Controller {
   @action
   closeEditor() {
     this.cssModeToggle.setEditingCss(false);
-    this.router.transitionTo('cards.view', this.model, {queryParams:{editingCss: false}})
+    this.router.transitionTo('cards.view', this.model, {queryParams:{editingCss: undefined}})
   }
 }

@@ -58,7 +58,7 @@ module('Acceptance | css editing', function(hooks) {
     assert.equal(currentURL(), `/cards/${card1Id}?editingCss=true`);
     assert.dom('[data-test-close-editor]').exists();
     await click('[data-test-close-editor]')
-    assert.equal(currentURL(), `/cards/${card1Id}?editingCss=false`);
+    assert.equal(currentURL(), `/cards/${card1Id}`);
     assert.dom('[data-test-editor-pane]').doesNotExist();
   });
 });
