@@ -10,6 +10,8 @@ describe("hub/dependency-injection", function() {
     registry.register("testConsumer", ConsumingService);
     registry.register("test-has-async", HasAsyncReady);
     registry.register("testBadService", BadService);
+    registry.register("testCircleOne", CircleOneService);
+    registry.register("testCircleTwo", CircleTwoService);
   });
 
   beforeEach(function() {
@@ -85,6 +87,15 @@ describe("hub/dependency-injection", function() {
     await container.teardown();
     expect(exampleServiceTornDown).to.equal(true);
   });
+
+  it("throws when a circle would have deadlocked", async function() {
+    try {
+      await container.lookup("testCircleOne");
+      throw new Error(`shouldn't get here`);
+    } catch(err) {
+      expect(err.message).to.match(/circular dependency injection: testCircleOne -> testCircleTwo -> testCircleOne/);
+    }
+  });
 });
 
 let exampleServiceTornDown = false;
@@ -124,11 +135,21 @@ class BadService {
   weird = inject("testExample");
 }
 
+class CircleOneService {
+  testCircleTwo = inject("testCircleTwo");
+}
+
+class CircleTwoService {
+  testCircleOne = inject("testCircleOne");
+}
+
 declare module "@cardstack/hub/dependency-injection" {
   interface KnownServices {
     testExample: ExampleService;
     testConsumer: ConsumingService;
     "test-has-async": HasAsyncReady;
     testBadService: BadService;
+    testCircleOne: CircleOneService;
+    testCircleTwo: CircleTwoService;
   }
 }
