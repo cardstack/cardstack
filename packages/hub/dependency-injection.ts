@@ -1,5 +1,5 @@
 export class Container {
-  private cache = new Map() as Map<string | Function, Promise<any>>;
+  private cache = new Map() as Map<CacheKey, CacheEntry>;
   private teardownPromise: Promise<void[]> | undefined;
 
   constructor(private registry: Registry) {}
@@ -9,13 +9,15 @@ export class Container {
   ): Promise<KnownServices[K]>;
   async lookup(name: string): Promise<unknown>;
   async lookup(name: string): Promise<any> {
-    let cached = this.cache.get(name);
-    if (!cached) {
+    let { promise } = this._lookup(name);
+    return await promise;
+  }
+
+  _lookup(name: string): CacheEntry {
+    return this._instantiate(name, () => {
       let factory = this.lookupFactory(name);
-      cached = this._instantiate(name, factory);
-      this.cache.set(name, cached);
-    }
-    return await cached;
+      return new factory();
+    });
   }
 
   private lookupFactory(name: string): Factory<any> {
@@ -29,76 +31,44 @@ export class Container {
   async instantiate<T, A>(factory: FactoryWithArg<T, A>, arg: A): Promise<T>;
   async instantiate<T>(factory: Factory<T>): Promise<T>;
   async instantiate<T, A>(factory: any, arg?: A): Promise<T> {
-    let cached = this.cache.get(factory);
-    if (!cached) {
-      cached = this._instantiate(factory, factory, arg);
-      this.cache.set(factory, cached);
-    }
-    return await cached;
+    let { promise } = this._instantiate(factory, () => {
+      if (arguments.length === 1) {
+        return new factory();
+      } else {
+        return new factory(arg);
+      }
+    });
+    return await promise;
   }
 
-  private async _instantiate<T, A>(
-    identityKey: string | Function,
-    factory: FactoryWithArg<T, A>,
-    arg: A
-  ): Promise<T>;
-  private async _instantiate<T>(
-    identityKey: string | Function,
-    factory: Factory<T>
-  ): Promise<T>;
-  private async _instantiate<T, A>(
-    identityKey: string | Function,
-    factory: any,
-    arg?: A
-  ): Promise<T> {
-    pendingInstantiationStack.unshift(identityKey);
-    if (pendingInstantiations.has(identityKey)) {
-      throw new Error(
-        `circular dependency injection: ${pendingInstantiationStack.join(
-          " -> "
-        )}`
-      );
+  private _instantiate<T>(identityKey: CacheKey, create: () => T): CacheEntry {
+    let cached = this.cache.get(identityKey);
+    if (cached) {
+      return cached;
     }
+
     let pending = new Map() as PendingInjections;
-    pendingInstantiations.set(identityKey, pending);
+    pendingInstantiationStack.unshift(pending);
     let instance: any;
+    let result: CacheEntry;
     try {
-      if (arg === undefined) {
-        instance = new factory();
-      } else {
-        instance = new factory(arg);
-      }
-
-      await Promise.all(
-        [...pending.entries()].map(async ([name, opts]) => {
-          let injectedValue = await this.lookup(name);
-          if (
-            !instance[opts.as] ||
-            instance[opts.as].injectionNotReadyYet !== name
-          ) {
-            throw new Error(
-              `To assign 'inject("${name}")' to a property other than '${name}' you must pass the 'as' argument to inject().`
-            );
-          }
-          instance[opts.as] = injectedValue;
-        })
-      );
-
-      if (typeof instance.ready === "function") {
-        await instance.ready();
-      }
+      instance = create();
       ownership.set(instance, this);
-      return instance;
+      result = new CacheEntry(identityKey, instance, pending);
+      this.cache.set(identityKey, result);
+      for (let [name, entry] of pending.entries()) {
+        entry.cacheEntry = this._lookup(name);
+      }
     } finally {
-      pendingInstantiations.delete(identityKey);
       pendingInstantiationStack.shift();
     }
+    return result;
   }
 
   async teardown() {
     if (!this.teardownPromise) {
       this.teardownPromise = Promise.all(
-        [...this.cache.values()].map(async promise => {
+        [...this.cache.values()].map(async ({ promise }) => {
           let instance;
           try {
             instance = await promise;
@@ -124,9 +94,61 @@ export interface FactoryWithArg<T, A> {
   new (a: A): T;
 }
 
+class CacheEntry {
+  private _promise: Promise<any> | undefined;
+
+  constructor(
+    private identityKey: CacheKey,
+    readonly instance: any,
+    private injections: PendingInjections
+  ) {}
+
+  get promise() {
+    if (!this._promise) {
+      this._promise = this.prepare();
+    }
+    return this._promise;
+  }
+
+  private async prepare(): Promise<any> {
+    let circular = pendingPrepareStack.includes(this.identityKey);
+    try {
+      pendingPrepareStack.unshift(this.identityKey);
+      if (circular) {
+        throw new Error(`circular dependency injection: ${pendingPrepareStack.join(' -> ')}`);
+      }
+      await Promise.all(
+        [...this.injections.entries()].map(
+          async ([name, { opts, cacheEntry }]) => {
+            let injectedValue = await cacheEntry!.promise;
+            if (
+              !this.instance[opts.as] ||
+              this.instance[opts.as].injectionNotReadyYet !== name
+            ) {
+              throw new Error(
+                `To assign 'inject("${name}")' to a property other than '${name}' you must pass the 'as' argument to inject().`
+              );
+            }
+            this.instance[opts.as] = injectedValue;
+          }
+        )
+      );
+    } finally {
+      pendingPrepareStack.shift();
+    }
+
+    if (typeof this.instance.ready === "function") {
+      await this.instance.ready();
+    }
+    return this.instance;
+  }
+}
+
+type CacheKey = string | Function;
+
 let mappings = new WeakMap() as WeakMap<Registry, Map<string, Factory<any>>>;
-let pendingInstantiations = new Map() as Map<string | Function,PendingInjections>;
-let pendingInstantiationStack = [] as (string | Function)[];
+let pendingInstantiationStack = [] as PendingInjections[];
+let pendingPrepareStack = [] as CacheKey[];
 let ownership = new WeakMap() as WeakMap<any, Container>;
 
 export class Registry {
@@ -144,10 +166,22 @@ export class Registry {
 export interface KnownServices {}
 
 interface InjectOptions {
+  // if you are storing your injection in a property whose name doesn't match
+  // the key it was registered under, you need to pass the property name here.
   as: string;
+
+  // when true, this injection will not be available inside your `ready` hook.
+  // This can break cycles. It will still be available before we return your
+  // instance out of the container.
+  lazy: boolean;
 }
 
-type PendingInjections = Map<string, InjectOptions>;
+interface PendingInjection {
+  opts: InjectOptions;
+  cacheEntry: CacheEntry | null;
+}
+
+type PendingInjections = Map<string, PendingInjection>;
 
 /*
   Dependency Injection HOWTO
@@ -199,17 +233,21 @@ export function inject<K extends keyof KnownServices>(
   name: K,
   opts?: InjectOptions
 ): KnownServices[K];
-export function inject(name: string, opts?: InjectOptions): unknown {
-  let pendingKey = pendingInstantiationStack[0];
-  if (!pendingKey) {
+export function inject(name: string, opts?: Partial<InjectOptions>): unknown {
+  let pending = pendingInstantiationStack[0];
+  if (!pending) {
     throw new Error(
       `Tried to directly instantiate an object with injections. Look it up in the container instead.`
     );
   }
-  if (!opts) {
-    opts = { as: name };
-  }
-  pendingInstantiations.get(pendingKey)!.set(name, opts);
+  let completeOpts = Object.assign(
+    {
+      as: name,
+      lazy: false
+    },
+    opts
+  );
+  pending.set(name, { opts: completeOpts, cacheEntry: null });
   return { injectionNotReadyYet: name };
 }
 

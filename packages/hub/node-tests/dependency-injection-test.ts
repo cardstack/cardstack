@@ -137,10 +137,12 @@ class BadService {
 
 class CircleOneService {
   testCircleTwo = inject("testCircleTwo");
+  iAmOne = true;
 }
 
 class CircleTwoService {
   testCircleOne = inject("testCircleOne");
+  iAmTwo = true;
 }
 
 declare module "@cardstack/hub/dependency-injection" {
