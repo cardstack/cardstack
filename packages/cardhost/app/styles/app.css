@@ -118,6 +118,12 @@ a:hover {
   z-index: var(--ch-actions-z-index);
 }
 
+.card-renderer--top-edge-buttons .show-editor-btn, .card-renderer--top-edge-buttons .hide-editor-btn {
+  margin-top: 10px;
+  margin-right: 15px;
+  cursor: pointer;
+}
+
 .card-renderer--top-edge-buttons .dock-btn {
   margin: 10px 15px;
   cursor: pointer;
@@ -240,6 +246,7 @@ a:hover {
   background: var(--ch-deep-background);
   z-index: 10;
   padding: 20px;
+  transform: translateX(0%);
 }
 
 .cardhost-card-theme-editor.bottom-docked {
@@ -248,6 +255,49 @@ a:hover {
   left: 0;
   height: 40%;
   width: 100%;
+  transform: translateY(0%);
+}
+
+.cardhost-card-theme-editor.hidden {
+  transform: translateX(100%);
+}
+
+.cardhost-card-theme-editor.bottom-docked.hidden {
+  transform: translateY(100%);
+}
+
+
+.cardhost-card-theme-editor .resizable-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.cardhost-card-theme-editor .resizer.left {
+  left: 5px;
+  width: 25px;
+}
+
+.cardhost-card-theme-editor .resizer.top {
+  height: 25px;
+}
+
+.cardhost-card-theme-editor .drag-handle {
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: rotate(180deg);
+  z-index: -1;
+}
+
+.cardhost-card-theme-editor.bottom-docked .drag-handle {
+  left: 50%;
+  top: -30px;
+  transform: rotate(-90deg);
+}
+
+.cardhost-card-theme-editor .drag-handle path {
+  stroke: var(--ch-light-background);
 }
 
 .dock-icon-unselected {

@@ -1,15 +1,20 @@
 <ReSizable
   ...attributes
   data-test-editor-pane
-  class="cardhost-card-theme-editor {{if (eq this.cssModeToggle.dockLocation "bottom") "bottom-docked"}}"
-  @width="300"
-  @height="100%"
+  class="cardhost-card-theme-editor {{classNames}}"
+  @width={{this.width}}
+  @directions={{this.resizeDirections}}
+  @height={{this.height}}
 >
-  <h3>Card Theme Editor</h3>
-  <CodeEditor
-    @code=".a {}"
-    @language="css"
-    @readOnly={{false}}
-    @resizable={{true}}
-  />
+  <div class="resizable-content">
+    <h3>Card Theme Editor</h3>
+    <CodeEditor
+      @code=".a {}"
+      @language="css"
+      @readOnly={{false}}
+      @resizable={{true}}
+    />
+
+    {{svg-jar "icon-grabber" class="drag-handle"}}
+  </div>
 </ReSizable>
