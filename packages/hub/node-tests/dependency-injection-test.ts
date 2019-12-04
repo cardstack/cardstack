@@ -12,6 +12,9 @@ describe("hub/dependency-injection", function() {
     registry.register("testBadService", BadService);
     registry.register("testCircleOne", CircleOneService);
     registry.register("testCircleTwo", CircleTwoService);
+    registry.register("testCircleThree", CircleThreeService);
+    registry.register("testCircleFour", CircleFourService);
+
   });
 
   beforeEach(function() {
@@ -88,12 +91,18 @@ describe("hub/dependency-injection", function() {
     expect(exampleServiceTornDown).to.equal(true);
   });
 
+  it("allows circular injection when not accessing eachother within ready()", async function() {
+    let one = await container.lookup("testCircleOne");
+    expect(one.testCircleTwo?.iAmTwo).equals(true);
+    expect(one.testCircleTwo?.testCircleOne).equals(one);
+  });
+
   it("throws when a circle would have deadlocked", async function() {
     try {
-      await container.lookup("testCircleOne");
+      await container.lookup("testCircleThree");
       throw new Error(`shouldn't get here`);
     } catch(err) {
-      expect(err.message).to.match(/circular dependency injection: testCircleOne -> testCircleTwo -> testCircleOne/);
+      expect(err.message).to.match(/circular dependency injection: testCircleThree -> testCircleFour -> testCircleThree/);
     }
   });
 });
@@ -146,6 +155,19 @@ class CircleTwoService {
   iAmTwo = true;
 }
 
+class CircleThreeService {
+  testCircleFour = inject("testCircleFour");
+  iAmThree = true;
+  async ready() {
+    await injectionReady(this, 'testCircleFour');
+  }
+}
+
+class CircleFourService {
+  testCircleThree = inject("testCircleThree");
+  iAmFour = true;
+}
+
 declare module "@cardstack/hub/dependency-injection" {
   interface KnownServices {
     testExample: ExampleService;
@@ -154,5 +176,8 @@ declare module "@cardstack/hub/dependency-injection" {
     testBadService: BadService;
     testCircleOne: CircleOneService;
     testCircleTwo: CircleTwoService;
+    testCircleThree: CircleThreeService;
+    testCircleFour: CircleFourService;
+
   }
 }

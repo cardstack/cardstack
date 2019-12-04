@@ -112,7 +112,7 @@ class Deferred<T> {
 
 class CacheEntry {
   private deferredPartial: Deferred<void> | undefined;
-  private deferredPromise: Deferred<void[]> | undefined;
+  private deferredPromise: Deferred<void> | undefined;
   private deferredInjections: Map<string, Deferred<void>> = new Map();
 
   constructor(
@@ -122,27 +122,62 @@ class CacheEntry {
   ) {}
 
   // resolves when this CacheEntry is fully ready to be used
-  get promise(): Promise<void[]> {
-    if (pendingPrepareStack.includes(this.identityKey)) {
-      let path = [this.identityKey, ...pendingPrepareStack];
-      throw new Error(`circular dependency injection: ${path.join(" -> ")}`);
-    }
-
+  get promise(): Promise<void> {
     if (!this.deferredPromise) {
       this.deferredPromise = new Deferred();
-      pendingPrepareStack.unshift(this.identityKey);
-      try {
-        this.deferredPromise.fulfill(Promise.all([
-          this.partial,
-          ...[...this.injections.keys()].map(name => {
-            return this.prepareInjection(name);
-          })
-        ]));
-      } finally {
-        pendingPrepareStack.shift();
-      }
+      this.deferredPromise.fulfill(this.prepareSubgraph());
     }
     return this.deferredPromise.promise;
+  }
+
+  private async prepareSubgraph(): Promise<void> {
+    let subgraph = this.subgraph();
+    await Promise.all([...subgraph].map(entry => {
+      if (pendingReadyStack.includes(entry.identityKey)) {
+        throw new Error(`circular dependency injection: ${[...pendingReadyStack, this.identityKey, entry.identityKey].join(' -> ')}`);
+      }
+      return entry.partial;
+    }));
+    for (let entry of subgraph) {
+      for (let [name, pending] of entry.injections) {
+        entry.installInjection(name, pending);
+      }
+    }
+  }
+
+  private installInjection(name: string, pending: PendingInjection) {
+    if (pending.isReady) {
+      return;
+    }
+    let { opts, cacheEntry } = pending;
+    if (
+      !this.instance[opts.as] ||
+      this.instance[opts.as].injectionNotReadyYet !== name
+    ) {
+      throw new Error(
+        `To assign 'inject("${name}")' to a property other than '${name}' you must pass the 'as' argument to inject().`
+      );
+    }
+    this.instance[opts.as] = cacheEntry!.instance;
+    pending.isReady = true;
+  }
+
+  private subgraph(): Set<CacheEntry> {
+    let subgraph = new Set() as Set<CacheEntry>;
+    let queue: CacheEntry[] = [this];
+    while (true) {
+      let entry = queue.shift();
+      if (!entry) {
+        break;
+      }
+      subgraph.add(entry);
+      for (let { cacheEntry } of entry.injections.values()) {
+        if (!subgraph.has(cacheEntry!)) {
+          queue.push(cacheEntry!);
+        }
+      }
+    }
+    return subgraph;
   }
 
   // resolves when the instance's ready hook has run. This implies that any
@@ -164,25 +199,24 @@ class CacheEntry {
     }
     cached = new Deferred();
     this.deferredInjections.set(name, cached);
-    cached.fulfill((async () => {
-      let { opts, cacheEntry } = this.injections.get(name)!;
-      await cacheEntry!.promise;
-      if (
-        !this.instance[opts.as] ||
-        this.instance[opts.as].injectionNotReadyYet !== name
-      ) {
-        throw new Error(
-          `To assign 'inject("${name}")' to a property other than '${name}' you must pass the 'as' argument to inject().`
-        );
-      }
-      this.instance[opts.as] = cacheEntry!.instance;
-    })());
+    cached.fulfill(
+      (async () => {
+        let pending = this.injections.get(name)!;
+        await pending.cacheEntry!.promise;
+        this.installInjection(name, pending);
+      })()
+    );
     await cached.promise;
   }
 
   private async runReady(): Promise<void> {
-    if (typeof this.instance.ready === "function") {
-      await this.instance.ready();
+    pendingReadyStack.push(this.identityKey);
+    try {
+      if (typeof this.instance.ready === "function") {
+        await this.instance.ready();
+      }
+    } finally {
+      pendingReadyStack.pop();
     }
   }
 }
@@ -191,8 +225,8 @@ type CacheKey = string | Function;
 
 let mappings = new WeakMap() as WeakMap<Registry, Map<string, Factory<any>>>;
 let pendingInstantiationStack = [] as PendingInjections[];
-let pendingPrepareStack = [] as CacheKey[];
 let ownership = new WeakMap() as WeakMap<any, Container>;
+let pendingReadyStack = [] as CacheKey[];
 
 export class Registry {
   constructor() {
@@ -217,6 +251,7 @@ interface InjectOptions {
 interface PendingInjection {
   opts: InjectOptions;
   cacheEntry: CacheEntry | null;
+  isReady: boolean;
 }
 
 type PendingInjections = Map<string, PendingInjection>;
@@ -292,7 +327,7 @@ export function inject(name: string, opts?: Partial<InjectOptions>): unknown {
     },
     opts
   );
-  pending.set(name, { opts: completeOpts, cacheEntry: null });
+  pending.set(name, { opts: completeOpts, cacheEntry: null, isReady: false });
   return { injectionNotReadyYet: name };
 }
 
