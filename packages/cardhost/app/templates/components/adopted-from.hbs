@@ -1,0 +1,40 @@
+{{#if @card}}
+  <div class="ch-label right-edge--label">Adopted Card</div>
+  <LinkTo
+    @class="adopted-card"
+    @route="cards.schema"
+    @model={{@card.name}}
+  >
+    {{!-- TODO: This should change according to card --}}
+    {{! template-lint-disable no-inline-styles }}
+    <div
+      class="adopted-card--image"
+      style={{css-url
+        "background-image"
+        "/assets/images/cards/adopted-card-preview-sample.png"
+      }}
+    />
+    <div>
+      <span data-test-adopted-card-name>{{@card.name}}</span>
+      {{#if @card.adoptedFromName}}
+        <div class="adopted-card--view">
+          <span
+            class="adopted-card--view-text"
+            data-test-adopted-card-adopted-card-name
+          >
+            {{if
+              (eq @card.adoptedFromName "@cardstack/base-card")
+              "Base Card"
+              @card.adoptedFromName
+            }}
+          </span>
+        </div>
+      {{/if}}
+    </div>
+
+  </LinkTo>
+  <div class="right-edge--section-btn-container">
+    {{!-- TODO: Remove functionality --}}
+    <button class="right-edge--section-btn">Remove</button>
+  </div>
+{{/if}}

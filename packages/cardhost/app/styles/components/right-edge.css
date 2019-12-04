@@ -122,19 +122,31 @@
   letter-spacing: 0.035em;
 }
 
-.right-edge .adopted-card--view-text {
+.right-edge .adopted-card--view {
   margin-top: 5px;
+  padding-left: 15px;
+  background-image: url(/assets/images/icons/arrow-curved.svg);
+  background-position: left center;
+  background-repeat: no-repeat;
+  background-size: 10px 10px;
+}
+
+.right-edge .adopted-card--view-text {
   font-size: 11px;
   font-weight: 400;
   line-height: 15px;
   opacity: 0.5;
 }
 
+.right-edge .adopted-card:focus .adopted-card--view,
+.right-edge .adopted-card:hover .adopted-card--view {
+  cursor: pointer;
+  outline: 0;
+}
+
 .right-edge .adopted-card:focus .adopted-card--view-text,
 .right-edge .adopted-card:hover .adopted-card--view-text {
   opacity: 1;
-  cursor: pointer;
-  outline: 0;
 }
 
 .right-edge--section .adopted-card--image {
