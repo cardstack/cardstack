@@ -15,7 +15,13 @@
       }}
     />
     <div>
-      <span data-test-adopted-card-name>{{@card.name}}</span>
+      <span data-test-adopted-card-name>
+        {{if
+          (eq @card.name "@cardstack/base-card")
+          "Base Card"
+          @card.name
+        }}
+      </span>
       {{#if @card.adoptedFromName}}
         <div class="adopted-card--view">
           <span

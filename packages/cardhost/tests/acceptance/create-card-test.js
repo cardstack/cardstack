@@ -47,6 +47,16 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-card-renderer-isolated]').hasClass('selected');
   });
 
+  test('right edge shows base card as adopted from card', async function(assert) {
+    await login();
+    await visit('/cards/new');
+
+    assert.equal(currentURL(), '/cards/new');
+
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-name').hasText('Base Card');
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name').doesNotExist();
+  });
+
   test("changing a card's id does not clear the card fields", async function(assert) {
     await login();
     await visit('/cards/new');
