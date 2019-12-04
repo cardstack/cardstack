@@ -125,10 +125,7 @@ export interface FactoryWithArg<T, A> {
 }
 
 let mappings = new WeakMap() as WeakMap<Registry, Map<string, Factory<any>>>;
-let pendingInstantiations = new Map() as Map<
-  string | Function,
-  PendingInjections
->;
+let pendingInstantiations = new Map() as Map<string | Function,PendingInjections>;
 let pendingInstantiationStack = [] as (string | Function)[];
 let ownership = new WeakMap() as WeakMap<any, Container>;
 
