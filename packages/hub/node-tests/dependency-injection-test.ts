@@ -1,4 +1,4 @@
-import { Registry, Container, inject, getOwner } from "../dependency-injection";
+import { Registry, Container, inject, getOwner, injectionReady } from "../dependency-injection";
 
 describe("hub/dependency-injection", function() {
   let registry: Registry;
@@ -114,6 +114,7 @@ class HasAsyncReady {
   answer: string | undefined;
 
   async ready() {
+    await injectionReady(this, 'testExample');
     this.answer = this.testExample.whoAreYou();
   }
 }

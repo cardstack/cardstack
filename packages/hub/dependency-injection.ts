@@ -9,11 +9,12 @@ export class Container {
   ): Promise<KnownServices[K]>;
   async lookup(name: string): Promise<unknown>;
   async lookup(name: string): Promise<any> {
-    let { promise } = this._lookup(name);
-    return await promise;
+    let { promise, instance } = this._lookup(name);
+    await promise;
+    return instance;
   }
 
-  _lookup(name: string): CacheEntry {
+  private _lookup(name: string): CacheEntry {
     return this._instantiate(name, () => {
       let factory = this.lookupFactory(name);
       return new factory();
@@ -31,14 +32,15 @@ export class Container {
   async instantiate<T, A>(factory: FactoryWithArg<T, A>, arg: A): Promise<T>;
   async instantiate<T>(factory: Factory<T>): Promise<T>;
   async instantiate<T, A>(factory: any, arg?: A): Promise<T> {
-    let { promise } = this._instantiate(factory, () => {
+    let { promise, instance } = this._instantiate(factory, () => {
       if (arguments.length === 1) {
         return new factory();
       } else {
         return new factory(arg);
       }
     });
-    return await promise;
+    await promise;
+    return instance;
   }
 
   private _instantiate<T>(identityKey: CacheKey, create: () => T): CacheEntry {
@@ -68,10 +70,9 @@ export class Container {
   async teardown() {
     if (!this.teardownPromise) {
       this.teardownPromise = Promise.all(
-        [...this.cache.values()].map(async ({ promise }) => {
-          let instance;
+        [...this.cache.values()].map(async ({ promise, instance }) => {
           try {
-            instance = await promise;
+            await promise;
           } catch (e) {
             // whoever originally called instantiate or lookup received a rejected promise and its their responsibility to handle it
           }
@@ -110,7 +111,9 @@ class Deferred<T> {
 }
 
 class CacheEntry {
-  private deferred: Deferred<void> | undefined;
+  private deferredPartial: Deferred<void> | undefined;
+  private deferredPromise: Deferred<void[]> | undefined;
+  private deferredInjections: Map<string, Deferred<void>> = new Map();
 
   constructor(
     private identityKey: CacheKey,
@@ -118,48 +121,69 @@ class CacheEntry {
     private injections: PendingInjections
   ) {}
 
-  get promise() {
+  // resolves when this CacheEntry is fully ready to be used
+  get promise(): Promise<void[]> {
     if (pendingPrepareStack.includes(this.identityKey)) {
       let path = [this.identityKey, ...pendingPrepareStack];
-      throw new Error(
-        `circular dependency injection: ${path.join(" -> ")}`
-      );
+      throw new Error(`circular dependency injection: ${path.join(" -> ")}`);
     }
 
-    if (!this.deferred) {
-      this.deferred = new Deferred();
+    if (!this.deferredPromise) {
+      this.deferredPromise = new Deferred();
       pendingPrepareStack.unshift(this.identityKey);
       try {
-        this.deferred.fulfill(this.prepare());
+        this.deferredPromise.fulfill(Promise.all([
+          this.partial,
+          ...[...this.injections.keys()].map(name => {
+            return this.prepareInjection(name);
+          })
+        ]));
       } finally {
         pendingPrepareStack.shift();
       }
     }
-    return this.deferred.promise;
+    return this.deferredPromise.promise;
   }
 
-  private async prepare(): Promise<any> {
-    await Promise.all(
-      [...this.injections.entries()].map(
-        async ([name, { opts, cacheEntry }]) => {
-          let injectedValue = await cacheEntry!.promise;
-          if (
-            !this.instance[opts.as] ||
-            this.instance[opts.as].injectionNotReadyYet !== name
-          ) {
-            throw new Error(
-              `To assign 'inject("${name}")' to a property other than '${name}' you must pass the 'as' argument to inject().`
-            );
-          }
-          this.instance[opts.as] = injectedValue;
-        }
-      )
-    );
+  // resolves when the instance's ready hook has run. This implies that any
+  // forced-eager injections that ready() uses will be present, but does *not*
+  // imply that all other injections are present.
+  get partial(): Promise<void> {
+    if (!this.deferredPartial) {
+      this.deferredPartial = new Deferred();
+      this.deferredPartial.fulfill(this.runReady());
+    }
+    return this.deferredPartial.promise;
+  }
 
+  async prepareInjection(name: string): Promise<void> {
+    let cached = this.deferredInjections.get(name);
+    if (cached) {
+      await cached.promise;
+      return;
+    }
+    cached = new Deferred();
+    this.deferredInjections.set(name, cached);
+    cached.fulfill((async () => {
+      let { opts, cacheEntry } = this.injections.get(name)!;
+      await cacheEntry!.promise;
+      if (
+        !this.instance[opts.as] ||
+        this.instance[opts.as].injectionNotReadyYet !== name
+      ) {
+        throw new Error(
+          `To assign 'inject("${name}")' to a property other than '${name}' you must pass the 'as' argument to inject().`
+        );
+      }
+      this.instance[opts.as] = cacheEntry!.instance;
+    })());
+    await cached.promise;
+  }
+
+  private async runReady(): Promise<void> {
     if (typeof this.instance.ready === "function") {
       await this.instance.ready();
     }
-    return this.instance;
   }
 }
 
@@ -235,7 +259,7 @@ type PendingInjections = Map<string, PendingInjection>;
       //
       // Instead, if you want to use an injection during ready() you need to use
       // await injectionReady:
-      await injectionReady(this.thing);
+      await injectionReady(this, 'thing');
       this.thing.doStuff();
     }
   }
@@ -280,4 +304,21 @@ export function getOwner(obj: any): Container {
     );
   }
   return container;
+}
+
+export async function injectionReady(
+  instance: any,
+  name: string
+): Promise<void> {
+  let container = getOwner(instance);
+
+  // accessing a private member variable
+  let cache: Container["cache"] = (container as any).cache;
+
+  for (let entry of cache.values()) {
+    if (entry.instance === instance) {
+      await entry.prepareInjection(name);
+      return;
+    }
+  }
 }
