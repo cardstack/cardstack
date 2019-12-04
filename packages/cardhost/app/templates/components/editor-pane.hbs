@@ -1,7 +1,9 @@
-<section
+<ReSizable
   ...attributes
   data-test-editor-pane
   class="cardhost-card-theme-editor {{if (eq this.cssModeToggle.dockLocation "bottom") "bottom-docked"}}"
+  @width="300"
+  @height="100%"
 >
   <h3>Card Theme Editor</h3>
   <CodeEditor
@@ -10,4 +12,4 @@
     @readOnly={{false}}
     @resizable={{true}}
   />
-</section>
+</ReSizable>
