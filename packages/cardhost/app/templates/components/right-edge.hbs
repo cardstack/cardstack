@@ -43,42 +43,13 @@
 
     <div class="right-edge--section">
       <div class="right-edge--section-header" data-test-section-header>
-        Adopt
+        Template
       </div>
       <div class="right-edge--item">
-        <div class="ch-label right-edge--label">Adopted Card</div>
-        {{#if
-          (and
-            @card.adoptedFrom
-            (not (eq @card.adoptedFrom.name "@cardstack/base-card"))
-          )
-        }}
-          <LinkTo
-            @class="adopted-card"
-            @route="cards.schema"
-            @model={{@card.adoptedFrom.name}}
-          >
-            {{!-- TODO: This should change according to card --}}
-            {{! template-lint-disable no-inline-styles }}
-            <div
-              class="adopted-card--image"
-              style={{css-url
-                "background-image"
-                "/assets/images/cards/adopted-card-preview-sample.png"
-              }}
-            />
-            <div>
-              {{@card.adoptedFrom.name}}
-              <div class="adopted-card--view-text">View Schema</div>
-            </div>
-
-          </LinkTo>
-          <div class="right-edge--section-btn-container">
-            {{!-- TODO: Remove functionality --}}
-            <button class="right-edge--section-btn">Remove</button>
-          </div>
+        {{#if @card.adoptedFrom}}
+          <AdoptedFrom @card={{@card.adoptedFrom}} />
         {{else}}
-          <div>
+          <div data-test-no-adoption>
             No Adoption
           </div>
         {{/if}}

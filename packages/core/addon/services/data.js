@@ -196,6 +196,11 @@ class Card {
 
   get adoptedFromId() {
     let internal = priv.get(this);
+
+    if (internal.id === baseCard) {
+      return null;
+    }
+
     let adoptedFromId;
     if ((adoptedFromId = get(internal, "adoptedFrom.id"))) {
       return adoptedFromId;

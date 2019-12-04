@@ -315,3 +315,7 @@ a:hover {
   resize: vertical;
   background-color: #1e1e1e;
 }
+
+.cardhost-monaco-container.editor-pane-code {
+  min-height: 35vh;
+}

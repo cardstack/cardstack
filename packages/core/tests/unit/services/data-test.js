@@ -692,6 +692,7 @@ module("Unit | Service | data", function () {
       let parent = card.adoptedFrom;
       assert.equal(parent.constructor.name, 'Card');
       assert.equal(parent.id, 'local-hub::@cardstack/base-card');
+      assert.equal(parent.adoptedFromId, null);
       let adoptedResource = card.json.included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::@cardstack/base-card');
       assert.ok(adoptedResource);
       assert.equal(card.adoptedFromId, 'local-hub::@cardstack/base-card');

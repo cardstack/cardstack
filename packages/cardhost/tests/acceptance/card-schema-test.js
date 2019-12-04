@@ -333,4 +333,13 @@ module('Acceptance | card schema', function(hooks) {
     assert.equal(currentURL(), `/cards/${card1Id}`);
     assert.dom(`[data-test-card-view="${card1Id}"]`).exists();
   });
+
+  test(`can navigate to base card schema`, async function(assert) {
+    await login();
+    await visit(`/cards/@cardstack%2Fbase-card/schema`);
+
+    assert.equal(currentURL(), `/cards/@cardstack%2Fbase-card/schema`);
+
+    assert.dom(`[data-test-right-edge] [data-test-no-adoption]`).hasText('No Adoption');
+  });
 });

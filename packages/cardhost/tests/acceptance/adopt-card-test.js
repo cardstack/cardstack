@@ -108,7 +108,9 @@ module('Acceptance | card adoption', function(hooks) {
 
     await showCardId();
 
-    assert.dom(`[data-test-right-edge] a.adopted-card[href="/cards/${card1Id}/schema"]`).includesText(card1Id);
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-name').hasText(card1Id);
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name').hasText('Base Card');
+
     await click(`[data-test-right-edge] a.adopted-card[href="/cards/${card1Id}/schema"]`);
     await waitFor(`[data-test-card-schema="${card1Id}"]`, { timeout });
 
@@ -249,7 +251,7 @@ module('Acceptance | card adoption', function(hooks) {
     assert.dom('[data-test-field="city"] [data-test-string-field-viewer-value]').hasText('Puppyville');
     assert.dom('[data-test-field="state"] [data-test-string-field-viewer-value]').hasText('MA');
     assert.dom('[data-test-field="zip"] [data-test-string-field-viewer-value]').hasText('01234');
-    
+
     let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block')
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes['treats-available'], true);
@@ -267,6 +269,9 @@ module('Acceptance | card adoption', function(hooks) {
     await addField('treats-available', 'boolean', true);
     await saveCard('creator', card2Id);
 
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-name').hasText(card1Id);
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name').hasText('Base Card');
+
     await visit(`/cards/${card2Id}/adopt`);
     await setCardId(card3Id);
     await addField('number-of-bones', 'integer', true, 5);
@@ -282,6 +287,8 @@ module('Acceptance | card adoption', function(hooks) {
 
     await saveCard('creator', card3Id);
 
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-name').hasText(card2Id);
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name').hasText(card1Id);
     assert.deepEqual([...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')), [
       'treats-available',
       'address',
