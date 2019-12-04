@@ -293,26 +293,21 @@
 
     <h3>Dropdown</h3>
     <div>
-      <div class="ch-input-group">
-        <label for="ch-dropdown-1" class="ch-label">Label</label>
-        <select id="ch-dropdown-1" class="ch-dropdown">
-          <option class="ch-dropdown--option">Dropdown</option>
-        </select>
-      </div>
-      <div class="ch-input-group">
-        <label for="ch-dropdown-2" class="ch-label">Label</label>
-        <select id="ch-dropdown-2" class="ch-dropdown disabled" disabled>
-          <option class="ch-dropdown--option">Disabled Dropdown</option>
-        </select>
-      </div>
+      <Dropdown @theme="dark" @options={{this.model.countries}} @searchEnabled={{false}} />
+      <Dropdown @theme="dark" @options={{this.model.countries}} @searchEnabled={{false}} @label="Disabled dropdown" @disabled={{true}} />
+      <Dropdown @theme="dark" @options={{this.model.countries}} @searchEnabled={{false}} @outerLabel="Country" @required={{true}} />
     </div>
     <CodeEditor
-      @code='<div class="ch-input-group">
-  <label for="[id]" class="ch-label">Label</label>
-  <select id="[id]" class="ch-dropdown \{{if disabled "disabled"}}" disabled=\{{disabled}}>
-    <option class="ch-dropdown--option">Dropdown</option>
-  </select>
-</div>'
+      @code='<Dropdown @theme="dark" @options=\{{options}} @searchEnabled={{false}} />
+
+// Additional Attributes
+<Dropdown @theme="dark" @options=\{{options}}
+  @searchEnabled={{false}}
+  @label=\{{label}}
+  @outerLabel=\{{outerLabel}}
+  @required=\{{required}}
+  @disabled=\{{disabled}}
+/>'
       @language="handlebars"
     />
   </section>

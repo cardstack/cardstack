@@ -67,6 +67,16 @@ export default class UIComponentsRoute extends Route {
         type: '@cardstack/core-types::string',
         value: 'One World Trade Center'
       },
+
+      countries: [
+        { name: 'United States' },
+        { name: 'Spain' },
+        { name: 'Portugal' },
+        { name: 'Russia' },
+        { name: 'Latvia' },
+        { name: 'Brazil' },
+        { name: 'United Kingdom' }
+      ],
     }
   }
 }
