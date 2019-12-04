@@ -12,15 +12,16 @@ import logger from "@cardstack/logger";
 import postgresConfig from "./postgres-config";
 import { join } from "path";
 import * as JSON from "json-typescript";
-import { upsert, queryToSQL, param, safeName, every, Expression } from "./util";
+import { upsert, queryToSQL, param, safeName, every, Expression, any, addExplicitParens } from "./util";
 import { CardWithId, CardId } from "../card";
 import { Session } from "../session";
 import CardstackError from "../error";
-import { Query, baseType } from "../query";
+import { Query, baseType, Filter, EqFilter, RangeFilter } from "../query";
 import { Sorts } from "./sorts";
 import { inject } from "../dependency-injection";
 import snakeCase from "lodash/snakeCase";
 import { CARDSTACK_PUBLIC_REALM } from "../realm";
+import assertNever from 'assert-never';
 
 const log = logger("cardstack/pgsearch");
 
@@ -130,7 +131,7 @@ export default class PgClient {
 
   async buildQueryExpression(
     session: Session,
-    _cardId: CardId,
+    _typeContext: CardId,
     path: string,
     errorHint: string
   ): Promise<{
@@ -178,7 +179,7 @@ export default class PgClient {
     let conditions = [] as Expression[];
 
     if (filter) {
-      // conditions.push(this.filterCondition(filter));
+      conditions.push(this.filterCondition(filter));
     }
 
     if (queryString) {
@@ -233,6 +234,37 @@ export default class PgClient {
       cards: cards.map(row => new CardWithId(row.pristine_doc)),
       meta: { page }
     };
+  }
+
+  private filterCondition(filter: Filter): Expression {
+    if ('any' in filter) {
+      return any(filter.any.map(item => this.filterCondition(item)));
+    } else if ('every' in filter) {
+      return every(filter.every.map(item => this.filterCondition(item)));
+    } else if ('not' in filter) {
+      return ['NOT', ...addExplicitParens(this.filterCondition(filter.not))];
+    } else if ('eq' in filter) {
+      return this.eqCondition(filter);
+    } else if ('range' in filter) {
+      return this.rangeCondition(filter);
+    } else {
+      assertNever(filter);
+    }
+  }
+
+  private eqCondition(filter: EqFilter): Expression {
+    return every(Object.entries(filter.eq).map(([key, value]) => {
+      return this.fieldFilter(key, value);
+    }));
+  }
+
+  private async fieldFilter(session: Session, typeContext: CardId, key: string, value: JSON.Value): Expression {
+    let { isPlural, expression, leafField } = await this.buildQueryExpression(session, typeContext, key, 'filter');
+
+  }
+
+  private rangeCondition(_filter: RangeFilter): Expression {
+    throw new Error('unimplemented');
   }
 }
 
