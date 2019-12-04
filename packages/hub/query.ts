@@ -1,5 +1,6 @@
 import { CardId } from "./card";
 import * as JSON from "json-typescript";
+import { CARDSTACK_PUBLIC_REALM } from "./realm";
 
 export interface Query {
   filter?: Filter;
@@ -44,4 +45,8 @@ export interface RangeFilter extends TypedFilter {
       lte?: JSON.Primitive;
     };
   };
+}
+
+export function baseType(filter: Filter | undefined) {
+  return filter?.type || { realm: CARDSTACK_PUBLIC_REALM, localId: 'base' };
 }

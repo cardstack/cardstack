@@ -16,8 +16,11 @@ import { upsert, queryToSQL, param, safeName, every, Expression } from "./util";
 import { CardWithId, CardId } from "../card";
 import { Session } from "../session";
 import CardstackError from "../error";
-import { Query } from "../query";
+import { Query, baseType } from "../query";
 import { Sorts } from "./sorts";
+import { inject } from "../dependency-injection";
+import snakeCase from "lodash/snakeCase";
+import { CARDSTACK_PUBLIC_REALM } from "../realm";
 
 const log = logger("cardstack/pgsearch");
 
@@ -28,6 +31,8 @@ function config() {
 }
 
 export default class PgClient {
+  cards = inject("cards");
+
   private pool: Pool;
 
   constructor() {
@@ -123,47 +128,111 @@ export default class PgClient {
     return new Batch(this);
   }
 
+  async buildQueryExpression(
+    session: Session,
+    _cardId: CardId,
+    path: string,
+    errorHint: string
+  ): Promise<{
+    isPlural: boolean;
+    expression: Expression;
+    leafField: CardWithId;
+  }> {
+    if (path === "realm" || path === "original-realm" || path === "local-id") {
+      return {
+        isPlural: false,
+        expression: [snakeCase(path)],
+        leafField: await this.cards.get(session, {
+          realm: CARDSTACK_PUBLIC_REALM,
+          localId: "string-field"
+        })
+      };
+    }
+
+    throw new Error(`unimplemented in buildQueryExpression for ${errorHint}`);
+  }
+
   async get(_session: Session, id: CardId): Promise<CardWithId> {
     let condition = every([
       [`realm = `, param(id.realm.href)],
       [`original_realm = `, param(id.originalRealm?.href ?? id.realm.href)],
       [`local_id = `, param(id.localId)]
     ]);
-    let result = await this.query(queryToSQL([`select pristine_doc from cards where`, ...condition]));
+    let result = await this.query(
+      queryToSQL([`select pristine_doc from cards where`, ...condition])
+    );
     if (result.rowCount !== 1) {
-      throw new CardstackError(`Card not found with realm="${id.realm.href}", original-realm="${id.originalRealm?.href ?? id.realm.href}", local-id="${id.localId}"`, { status: 404 });
+      throw new CardstackError(
+        `Card not found with realm="${id.realm.href}", original-realm="${id
+          .originalRealm?.href ?? id.realm.href}", local-id="${id.localId}"`,
+        { status: 404 }
+      );
     }
     return new CardWithId(result.rows[0].pristine_doc);
   }
 
-  async search(_session: Session, { filter, queryString, sort, page }: Query): Promise<{ cards: CardWithId[] }> {
+  async search(
+    session: Session,
+    { filter, queryString, sort, page }: Query
+  ): Promise<{ cards: CardWithId[]; meta: ResponseMeta }> {
     let conditions = [] as Expression[];
 
     if (filter) {
-      conditions.push(this.filterCondition(filter));
+      // conditions.push(this.filterCondition(filter));
     }
 
     if (queryString) {
-      conditions.push(this.queryCondition(queryString));
+      //conditions.push(this.queryCondition(queryString));
     }
 
-    let totalResponsePromise = this.query(queryToSQL([`select count(*) from cards where`, ...every(conditions)]));
+    let totalResponsePromise = this.query(
+      queryToSQL([`select count(*) from cards where`, ...every(conditions)])
+    );
 
-    let sorts = new Sorts(this, sort);
+    let sorts = await Sorts.create(session, this, baseType(filter), sort);
     if (page && page.cursor) {
       conditions.push(sorts.afterExpression(page.cursor));
     }
 
-    let query = [`select`, ...sorts.cursorColumns() ,`, pristine_doc from documents where`, ...every(conditions), ...sorts.orderExpression()];
+    let query = [
+      `select`,
+      ...sorts.cursorColumns(),
+      `, pristine_doc from cards where`,
+      ...every(conditions),
+      ...sorts.orderExpression()
+    ];
 
     let size = page?.size ?? 10;
-    query = [...query, "limit", param(size + 1) ];
+    query = [...query, "limit", param(size + 1)];
 
     let sql = queryToSQL(query);
     log.trace("search: %s trace: %j", sql.text, sql.values);
     let response = await this.query(sql);
     let totalResponse = await totalResponsePromise;
+    return this.assembleResponse(response, totalResponse, size, sorts);
+  }
 
+  private assembleResponse(
+    response: QueryResult,
+    totalResponse: QueryResult,
+    requestedSize: number,
+    sorts: Sorts
+  ) {
+    let page: ResponseMeta["page"] = {
+      // nobody has more than 2^53-1 total docs right?
+      total: parseInt(totalResponse.rows[0].count, 10)
+    };
+    let cards = response.rows;
+    if (response.rowCount > requestedSize) {
+      cards = cards.slice(0, requestedSize);
+      let last = cards[cards.length - 1];
+      page.cursor = sorts.getCursor(last);
+    }
+
+    return {
+      cards: cards.map(row => new CardWithId(row.pristine_doc)),
+      meta: { page }
+    };
   }
 }
 
@@ -199,3 +268,5 @@ declare module "@cardstack/hub/dependency-injection" {
     pgclient: PgClient;
   }
 }
+
+export interface ResponseMeta { page: { total: number; cursor?: string } }

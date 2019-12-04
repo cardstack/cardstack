@@ -3,7 +3,7 @@ import { Card, CardWithId, CardId } from "./card";
 import { CARDSTACK_PUBLIC_REALM } from "./realm";
 import CardstackError from "./error";
 import { myOrigin } from "./origin";
-import { search as scaffoldSearch, validate } from "./scaffolding";
+import { search as scaffoldSearch, get as scaffoldGet, validate } from "./scaffolding";
 import { getOwner, inject } from "./dependency-injection";
 import { SingleResourceDoc } from "jsonapi-typescript";
 import { Query } from "./query";
@@ -53,18 +53,24 @@ export default class CardsService {
   }
 
   async search(_session: Session, query: Query): Promise<{ cards: CardWithId[] }> {
-    let { cards } = await this.pgclient.search(_session, query);
-    if (cards.length === 0) {
-      cards = await scaffoldSearch(query);
+    let cards = await scaffoldSearch(query);
+    if (cards) {
+      return { cards };
     }
-    return { cards };
+
+    let { cards: foundCards } = await this.pgclient.search(_session, query);
+    return { cards: foundCards };
   }
 
-  async get(_session: Session, id: CardId): Promise<CardWithId> {
+  async get(session: Session, id: CardId): Promise<CardWithId> {
     // this exists to throw if there's no such realm. We're not using the return
     // value yet but we will onc we implement custom searchers and realm grants.
     await this.getRealm(id.realm);
-    return await this.pgclient.get(_session, id);
+    let card = await scaffoldGet(id);
+    if (card) {
+      return card;
+    }
+    return await this.pgclient.get(session, id);
   }
 
   private async getRealm(realm: URL): Promise<CardWithId> {

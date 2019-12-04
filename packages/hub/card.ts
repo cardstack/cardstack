@@ -1,5 +1,5 @@
 import CardstackError from "./error";
-import { loadWriter, patch } from "./scaffolding";
+import { loadWriter, patch, buildValueExpression } from "./scaffolding";
 import { WriterFactory } from "./writer";
 import {
   PristineDocument,
@@ -8,6 +8,7 @@ import {
 } from "./document";
 import { SingleResourceDoc } from "jsonapi-typescript";
 import cloneDeep from 'lodash/cloneDeep';
+import { Expression } from "./pgsearch/util";
 
 
 export class Card {
@@ -133,8 +134,16 @@ export class CardWithId extends Card {
   }
 
   async loadFeature(featureName: "writer"): Promise<WriterFactory | null>;
-  async loadFeature(_featureName: any): Promise<any> {
-    return await loadWriter(this);
+  async loadFeature(featureName: "buildValueExpression"): Promise<(expression: Expression) => Expression>;
+  async loadFeature(featureName: any): Promise<any> {
+    switch (featureName) {
+      case 'writer':
+        return await loadWriter(this);
+      case 'buildValueExpression':
+        return buildValueExpression;
+      default:
+        throw new Error(`unimplemented loadFeature("${featureName}")`);
+    }
   }
 }
 
