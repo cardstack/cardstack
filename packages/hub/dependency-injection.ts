@@ -94,8 +94,23 @@ export interface FactoryWithArg<T, A> {
   new (a: A): T;
 }
 
+class Deferred<T> {
+  promise: Promise<T>;
+  private resolve!: (result: T) => void;
+  private reject!: (err: unknown) => void;
+  constructor() {
+    this.promise = new Promise((resolve, reject) => {
+      this.resolve = resolve;
+      this.reject = reject;
+    });
+  }
+  fulfill(result: Promise<T>): void {
+    result.then(this.resolve, this.reject);
+  }
+}
+
 class CacheEntry {
-  private _promise: Promise<any> | undefined;
+  private deferred: Deferred<void> | undefined;
 
   constructor(
     private identityKey: CacheKey,
@@ -104,38 +119,42 @@ class CacheEntry {
   ) {}
 
   get promise() {
-    if (!this._promise) {
-      this._promise = this.prepare();
+    if (pendingPrepareStack.includes(this.identityKey)) {
+      let path = [this.identityKey, ...pendingPrepareStack];
+      throw new Error(
+        `circular dependency injection: ${path.join(" -> ")}`
+      );
     }
-    return this._promise;
+
+    if (!this.deferred) {
+      this.deferred = new Deferred();
+      pendingPrepareStack.unshift(this.identityKey);
+      try {
+        this.deferred.fulfill(this.prepare());
+      } finally {
+        pendingPrepareStack.shift();
+      }
+    }
+    return this.deferred.promise;
   }
 
   private async prepare(): Promise<any> {
-    let circular = pendingPrepareStack.includes(this.identityKey);
-    try {
-      pendingPrepareStack.unshift(this.identityKey);
-      if (circular) {
-        throw new Error(`circular dependency injection: ${pendingPrepareStack.join(' -> ')}`);
-      }
-      await Promise.all(
-        [...this.injections.entries()].map(
-          async ([name, { opts, cacheEntry }]) => {
-            let injectedValue = await cacheEntry!.promise;
-            if (
-              !this.instance[opts.as] ||
-              this.instance[opts.as].injectionNotReadyYet !== name
-            ) {
-              throw new Error(
-                `To assign 'inject("${name}")' to a property other than '${name}' you must pass the 'as' argument to inject().`
-              );
-            }
-            this.instance[opts.as] = injectedValue;
+    await Promise.all(
+      [...this.injections.entries()].map(
+        async ([name, { opts, cacheEntry }]) => {
+          let injectedValue = await cacheEntry!.promise;
+          if (
+            !this.instance[opts.as] ||
+            this.instance[opts.as].injectionNotReadyYet !== name
+          ) {
+            throw new Error(
+              `To assign 'inject("${name}")' to a property other than '${name}' you must pass the 'as' argument to inject().`
+            );
           }
-        )
-      );
-    } finally {
-      pendingPrepareStack.shift();
-    }
+          this.instance[opts.as] = injectedValue;
+        }
+      )
+    );
 
     if (typeof this.instance.ready === "function") {
       await this.instance.ready();
@@ -169,11 +188,6 @@ interface InjectOptions {
   // if you are storing your injection in a property whose name doesn't match
   // the key it was registered under, you need to pass the property name here.
   as: string;
-
-  // when true, this injection will not be available inside your `ready` hook.
-  // This can break cycles. It will still be available before we return your
-  // instance out of the container.
-  lazy: boolean;
 }
 
 interface PendingInjection {
@@ -185,6 +199,8 @@ type PendingInjections = Map<string, PendingInjection>;
 
 /*
   Dependency Injection HOWTO
+
+  import { inject, injectionReady } from '@cardstack/hub/dependency-injection';
 
   class YourClass {
 
@@ -202,7 +218,7 @@ type PendingInjections = Map<string, PendingInjection>;
     }
 
     someMethod() {
-      // they are available everywhere else
+      // they are available everywhere else (except the ready hook, see below)
       return this.thing;
     }
 
@@ -213,8 +229,14 @@ type PendingInjections = Map<string, PendingInjection>;
       // The Container will call your ready() method before returning your
       // instance to anyone.
 
-      // ready is able to use injections, like every other method other than constructor.
-      await this.weirdName().doSomething();
+      // ready is *not* guaranteed to have access to the injections, because
+      // that would require us to make all of them eager, which makes dependency
+      // cycles into deadlock even when they're not actually needed during ready().
+      //
+      // Instead, if you want to use an injection during ready() you need to use
+      // await injectionReady:
+      await injectionReady(this.thing);
+      this.thing.doStuff();
     }
   }
 
@@ -242,8 +264,7 @@ export function inject(name: string, opts?: Partial<InjectOptions>): unknown {
   }
   let completeOpts = Object.assign(
     {
-      as: name,
-      lazy: false
+      as: name
     },
     opts
   );
