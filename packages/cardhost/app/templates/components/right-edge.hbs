@@ -49,7 +49,7 @@
         {{#if @card.adoptedFrom}}
           <AdoptedFrom @card={{@card.adoptedFrom}} />
         {{else}}
-          <div>
+          <div data-test-no-adoption>
             No Adoption
           </div>
         {{/if}}
