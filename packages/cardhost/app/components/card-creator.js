@@ -5,6 +5,10 @@ export default class CardCreator extends CardManipulator {
   constructor(...args) {
     super(...args);
 
+    /*
+      Remove `hide-in-percy` css selectors from places
+      where we display card IDs once we remove this
+    */
     let defaultCardId = `new-card-${Math.floor(Math.random() * 1E7)}`;
 
     this.updateCardId(defaultCardId);
