@@ -6,6 +6,7 @@ export default class CardsRoute extends Route {
   queryParams = { editingCss: {} }
 
   model({ editingCss }) {
-    this.cssModeToggle.setEditingCss(editingCss);
+    let editingBool = editingCss === "true" ? true : false;
+    this.cssModeToggle.setEditingCss(editingBool);
   }
 }

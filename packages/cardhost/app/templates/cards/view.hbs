@@ -12,7 +12,12 @@
     >
       {{svg-jar "dock-right"}}
     </div>
-    <button class="ch-button close-editor-btn">Close Editor</button>
+    <button {{on "click" this.closeEditor}}
+      class="ch-button close-editor-btn"
+      data-test-close-editor
+    >
+      Close Editor
+    </button>
 
   {{else}}
     {{! eslint is confused by on helper }}
@@ -31,6 +36,7 @@
     <button
       class="ch-button"
       disabled={{not this.cardstackSession.isAuthenticated}}
+      {{on "click" this.save}}
     >
       Save
     </button>
@@ -58,7 +64,10 @@
 
 
 {{#if this.cssModeToggle.editingCss}}
-  <EditorPane data-test-dock-location={{this.cssModeToggle.dockLocation}} />
+  <EditorPane data-test-dock-location={{this.cssModeToggle.dockLocation}}
+    @model={{this.model}}
+    @saveCss={{this.saveCss}}
+  />
 {{else}}
   <RightEdge
     @card={{this.card}}
@@ -85,3 +94,5 @@
     </div>
   </RightEdge>
 {{/if}}
+
+<style id="card-styles">{{this.model.isolatedCss}}</style>
