@@ -39,7 +39,17 @@
 
   </LinkTo>
   <div class="section-btn-container">
-    {{!-- TODO: Remove functionality --}}
-    <button class="section-btn">Remove</button>
+    {{! template-lint-disable attribute-indentation}}
+    <button
+      class={{concat
+        "section-btn "
+        (if this.adoptFromBaseCard.isRunning "is-running")
+      }}
+      disabled={{eq @card.name "@cardstack/base-card"}}
+      {{on "click" this.removeAdoptedCard}}
+      data-test-remove-adopted-from-btn
+    >
+      Remove
+    </button>
   </div>
 {{/if}}

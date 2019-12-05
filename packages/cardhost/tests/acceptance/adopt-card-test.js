@@ -329,6 +329,36 @@ module('Acceptance | card adoption', function(hooks) {
     assert.dom('[data-test-field="number-of-bones"] .schema-field-renderer--header--detail').hasText('Adopted');
   });
 
+  test('removing adoptedFrom card makes it adopted from base card', async function(assert) {
+    await setupParentCard();
+    await visit(`/cards/${card1Id}/adopt`);
+
+    await setCardId(card2Id);
+    await saveCard('creator', card2Id);
+
+    await visit(`/cards/${card2Id}/schema`);
+
+    await showCardId();
+
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-name').hasText(card1Id);
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name').hasText('Base Card');
+
+    await click(`[data-test-right-edge] [data-test-remove-adopted-from-btn]`);
+    await waitFor('[data-test-right-edge] [data-test-remove-adopted-from-btn]:not(.is-running)', { timeout });
+
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-name').hasText('Base Card');
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name').doesNotExist();
+  });
+
+  test('remove button is disabled if adopted from base card', async function(assert) {
+    await setupParentCard();
+    await visit(`/cards/${card1Id}/schema`);
+
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-name').hasText('Base Card');
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name').doesNotExist();
+    assert.dom('[data-test-right-edge] [data-test-remove-adopted-from-btn]').isDisabled()
+  });
+
   // Waiting on UI designs
   skip("TODO cannot add a field that has the same name as an adopted field", async function(/*assert*/) {
   });

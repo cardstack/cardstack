@@ -47,7 +47,7 @@
       </div>
       <div class="right-edge--item">
         {{#if @card.adoptedFrom}}
-          <AdoptedFrom @card={{@card.adoptedFrom}} />
+          <AdoptedFrom @card={{@card.adoptedFrom}} @adoptedCard={{@card}}/>
         {{else}}
           <div data-test-no-adoption>
             No Adoption
