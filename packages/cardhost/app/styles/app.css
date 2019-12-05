@@ -72,9 +72,18 @@ Until that work is done we are statically adding this css
   - better positioning for edges (esp on/off state)
   - link and button focus and disabled states styling
 */
-
 * {
   box-sizing: border-box;
+}
+
+/*
+  Use the `hide-in-percy` css selector when you want to visually
+  hide page elements that can change, i.e. random numbers, etc
+*/
+@media only percy {
+  .hide-in-percy {
+    visibility: hidden;
+  }
 }
 
 body {
