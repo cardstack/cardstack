@@ -10,10 +10,10 @@
       class="adopted-card--image"
       style={{css-url
         "background-image"
-        "/assets/images/cards/adopted-card-preview-sample.png"
+        "/assets/images/cards/image-placeholder.svg"
       }}
     />
-    <div>
+    <div class="adopted-card--text">
       <span data-test-adopted-card-name>
         {{if
           (eq @card.name "@cardstack/base-card")
@@ -38,8 +38,8 @@
     </div>
 
   </LinkTo>
-  <div class="right-edge--section-btn-container">
+  <div class="section-btn-container">
     {{!-- TODO: Remove functionality --}}
-    <button class="right-edge--section-btn">Remove</button>
+    <button class="section-btn">Remove</button>
   </div>
 {{/if}}
