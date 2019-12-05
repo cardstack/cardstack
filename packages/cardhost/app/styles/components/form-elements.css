@@ -1,5 +1,6 @@
 .ch-input-group {
   position: relative;
+  display: block;
   width: min-content;
   max-width: 100%;
   padding-bottom: 15px;
@@ -57,12 +58,6 @@ textarea + .ch-helper-text {
   padding-top: 7px;
 }
 
-.ch-required {
-  text-transform: lowercase;
-  position: absolute;
-  right: 0;
-}
-
 .ch-input,
 .ch-textarea {
   display: block;
@@ -114,8 +109,6 @@ textarea + .ch-helper-text {
   display: none;
 }
 
-input.ch-input[placeholder],
-textarea.ch-textarea[placeholder],
 input.ch-input::placeholder,
 textarea.ch-textarea::placeholder {
   color: var(--ch-light-op50);
@@ -132,7 +125,6 @@ textarea.ch-textarea::placeholder {
 
 .ch-label + .ch-input,
 .ch-label + .ch-textarea,
-.ch-label + .ch-dropdown,
 .ch-label > .ch-input,
 .ch-label > .ch-textarea {
   margin-top: 7px;
@@ -160,21 +152,33 @@ textarea.ch-textarea::placeholder {
   height: 18px;
   width: 18px;
   background-color: var(--ch-foreground);
-  border: 1px solid var(--ch-border);
+  border: 1px solid var(--ch-default);
   border-radius: 3px;
+  text-align: center;
   cursor: pointer;
 
   transition: background-color var(--ch-transition-time);
 }
 
-.ch-checkbox:focus + .ch-checkmark,
-.ch-checkbox:hover:not(:disabled) + .ch-checkmark {
-  background-color: var(--ch-default);
+.ch-checkbox:focus + .ch-checkmark {
+  border-color: var(--ch-highlight);
+}
+
+.ch-checkbox:checked:focus + .ch-checkmark {
+  border-color: var(--ch-highlight-hover);
+}
+
+.ch-checkbox:hover + .ch-checkmark {
+  background-color: var(--ch-foreground-hover);
+}
+
+.ch-checkbox:checked:hover + .ch-checkmark {
+  background-color: var(--ch-highlight-hover);
 }
 
 .ch-checkbox:checked + .ch-checkmark {
-  background: url('/assets/images/icons/checkmark-active.svg') center/12px no-repeat;
-  background-color: var(--ch-default);
+  background: url('/assets/images/icons/checkmark.svg') center/12px no-repeat;
+  background-color: var(--ch-highlight);
 }
 
 .ch-checkbox-group:hover {
@@ -186,46 +190,15 @@ textarea.ch-textarea::placeholder {
 }
 
 .ch-checkbox-group.disabled {
-  opacity: 0.6;
   cursor: initial;
 }
 
 .ch-checkbox:disabled + .ch-checkmark,
-.ch-checkbox.disabled + .ch-checkmark {
+.ch-checkbox.disabled + .ch-checkmark,
+.ch-checkbox:disabled:checked + .ch-checkmark,
+.ch-checkbox:disabled:checked:hover + .ch-checkmark {
+  --icon-color: var(--ch-light-op40);
+
+  background-color: var(--ch-disabled);
   pointer-events: none;
-}
-
-.ch-dropdown {
-  display: block;
-  min-width: var(--ch-component-width);
-  max-width: 100%;
-  height: var(--ch-component-height);
-  padding: 10px 15px;
-  background: url('/assets/images/icons/dropdown-arrows-sm-active.svg') right 15px center/10px no-repeat;
-  background-color: var(--ch-foreground);
-  color: white;
-  border: 1px solid var(--ch-border);
-  border-radius: 5px;
-  font: 400 13px/18px var(--ch-font-family);
-  letter-spacing: 0.015em;
-  -moz-appearance: none;
-  -webkit-appearance: none;
-}
-
-.ch-dropdown:focus:not(:disabled),
-.ch-dropdown:hover:not(:disabled) {
-  background-color: var(--ch-foreground-hover);
-  color: var(--ch-highlight);
-  cursor: pointer;
-  outline: 0;
-}
-
-.ch-dropdown:disabled,
-.ch-dropdown.disabled {
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-.ch-dropdown::-ms-expand {
-  display: none;
 }

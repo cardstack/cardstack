@@ -1,5 +1,5 @@
 .ui-components {
-  padding: var(--ch-spacing) var(--ch-spacing) 300px;
+  padding: var(--ch-spacing);
 }
 
 .ui-components--section {
@@ -8,13 +8,6 @@
 }
 .ui-components--section:first-of-type {
   border-top: 1px solid var(--ch-border);
-}
-
-.ui-components .code-block {
-  width: 700px;
-  max-width: 100%;
-  margin: var(--ch-spacing) 0;
-  resize: both;
 }
 
 .ui-components--notes {
@@ -37,13 +30,7 @@
 .ui-components--grid-2-col > h4 {
   grid-column: 1 / -1;
 }
-.ui-components--grid-2-col .code-block {
-  margin: 0;
-}
 
-.ui-components .right-edge {
-  position: static;
-}
 
 /* Icons Section */
 .ui-components--section.icons > h4 {
@@ -96,4 +83,10 @@
 .ui-components--section.form-fields {
   background-color: var(--ch-dark-background);
   padding: 15px;
+}
+
+
+/* Right Edge section */
+.ui-components .right-edge {
+  position: static;
 }
