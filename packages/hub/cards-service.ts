@@ -3,7 +3,11 @@ import { Card, CardWithId, CardId } from "./card";
 import { CARDSTACK_PUBLIC_REALM } from "./realm";
 import CardstackError from "./error";
 import { myOrigin } from "./origin";
-import { search as scaffoldSearch, get as scaffoldGet, validate } from "./scaffolding";
+import {
+  search as scaffoldSearch,
+  get as scaffoldGet,
+  validate
+} from "./scaffolding";
 import { getOwner, inject } from "./dependency-injection";
 import { SingleResourceDoc } from "jsonapi-typescript";
 import { Query } from "./query";
@@ -16,6 +20,7 @@ export default class CardsService {
     realm: URL,
     doc: SingleResourceDoc
   ): Promise<CardWithId> {
+    let scopedCardService = this.getScopedCardService(session);
     let realmCard = await this.getRealm(realm);
     let writerFactory = await realmCard.loadFeature("writer");
     if (!writerFactory) {
@@ -45,20 +50,27 @@ export default class CardsService {
     card.patch(saved.jsonapi);
     card.assertHasIds();
 
-    let batch = this.pgclient.beginBatch();
+    let batch = this.pgclient.beginBatch(scopedCardService);
     await batch.save(card);
     await batch.done();
 
     return card;
   }
 
-  async search(_session: Session, query: Query): Promise<{ cards: CardWithId[] }> {
+  async search(
+    _session: Session,
+    query: Query
+  ): Promise<{ cards: CardWithId[] }> {
     let cards = await scaffoldSearch(query);
     if (cards) {
       return { cards };
     }
 
-    let { cards: foundCards } = await this.pgclient.search(_session, query);
+    // TODO dont create a scoped card service here
+    let { cards: foundCards } = await this.pgclient.search(
+      this.getScopedCardService(_session),
+      query
+    );
     return { cards: foundCards };
   }
 
@@ -70,7 +82,12 @@ export default class CardsService {
     if (card) {
       return card;
     }
-    return await this.pgclient.get(session, id);
+    // TODO dont create a scoped card service here
+    return await this.pgclient.get(this.getScopedCardService(session), id);
+  }
+
+  getScopedCardService(session: Session) {
+    return new ScopedCardService(this, session);
   }
 
   private async getRealm(realm: URL): Promise<CardWithId> {
@@ -104,7 +121,17 @@ export default class CardsService {
   }
 }
 
+export class ScopedCardService {
+  constructor(private cards: CardsService, private session: Session) {}
 
+  async get(id: CardId): Promise<CardWithId> {
+    return await this.cards.get(this.session, id);
+  }
+
+  async search(query: Query): Promise<{ cards: CardWithId[] }> {
+    return await this.cards.search(this.session, query);
+  }
+}
 
 declare module "@cardstack/hub/dependency-injection" {
   interface KnownServices {

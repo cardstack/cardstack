@@ -1,27 +1,36 @@
-import { Expression, separatedByCommas, param } from "./util";
+import {
+  Expression,
+  separatedByCommas,
+  param,
+  fieldQuery,
+  FieldQuery,
+  fieldValue
+} from "./util";
 import { CardId } from "../card";
 import { Primitive } from "json-typescript";
 import CardstackError from "../error";
-import PgClient from "./pgclient";
-import { Session } from "../session";
 
 interface Sort {
   name: string;
-  order: 'asc' | 'desc';
-  expression: Expression;
-  buildValueExpression: (e: Expression) => Expression;
+  order: "asc" | "desc";
+  fieldQuery: FieldQuery;
 }
 
-const PRIMARY_KEY = Object.freeze(['realm', 'original-realm', 'local-id']);
+const PRIMARY_KEY = Object.freeze(["realm", "original-realm", "local-id"]);
 
 export class Sorts {
-  static async create(session: Session, pgclient: PgClient, baseType: CardId, rawSorts: string | string[] | undefined) {
+  private _sorts: Sort[];
+
+  constructor(
+    private baseType: CardId,
+    rawSorts: string | string[] | undefined
+  ) {
     let sorts: Sort[];
     if (rawSorts) {
-      if (Array.isArray(rawSorts)){
-        sorts = await Promise.all(rawSorts.map(name => this.parseSort(pgclient, session, baseType, name)));
+      if (Array.isArray(rawSorts)) {
+        sorts = rawSorts.map(name => this.parseSort(baseType, name));
       } else {
-        sorts = [await this.parseSort(pgclient, session, baseType, rawSorts)];
+        sorts = [this.parseSort(baseType, rawSorts)];
       }
     } else {
       sorts = [];
@@ -29,36 +38,35 @@ export class Sorts {
 
     for (let name of PRIMARY_KEY) {
       if (!sorts.find(entry => entry.name === name)) {
-        sorts.push(await this.parseSort(pgclient, session, baseType, name));
+        sorts.push(this.parseSort(baseType, name));
       }
     }
-    return new this(sorts);
+    this._sorts = sorts;
   }
 
-  private static async parseSort(pgclient: PgClient, session: Session, baseType: CardId, name: string): Promise<Sort> {
+  private parseSort(baseType: CardId, name: string): Sort {
     let realName;
     let order: "asc" | "desc";
-    if (name.indexOf('-') === 0) {
+    if (name.indexOf("-") === 0) {
       realName = name.slice(1);
-      order = 'desc';
+      order = "desc";
     } else {
       realName = name;
-      order = 'asc';
+      order = "asc";
     }
-    let { expression, leafField } = await pgclient.buildQueryExpression(session, baseType, realName, 'sort');
-    let buildValueExpression = await leafField.loadFeature('buildValueExpression');
     return {
       name: realName,
       order,
-      expression,
-      buildValueExpression,
+      fieldQuery: fieldQuery(baseType, realName, "sort")
     };
   }
 
-  constructor(private _sorts: Sort[]) {}
-
   orderExpression(): Expression {
-    return (['order by '] as Expression).concat(separatedByCommas(this._sorts.map(({ expression, order }) => [...expression, order])));
+    return (["order by "] as Expression).concat(
+      separatedByCommas(
+        this._sorts.map(({ fieldQuery, order }) => [fieldQuery, order])
+      )
+    );
   }
 
   afterExpression(cursor: string): Expression {
@@ -66,15 +74,35 @@ export class Sorts {
     return this._afterExpression(cursorValues, 0);
   }
 
-  private _afterExpression(cursorValues: Primitive[], index: number): Expression {
-    if(index === this._sorts.length) {
-      return ['false'];
+  private _afterExpression(
+    cursorValues: Primitive[],
+    index: number
+  ): Expression {
+    if (index === this._sorts.length) {
+      return ["false"];
     }
-    let { expression, order, buildValueExpression } = this._sorts[index];
-    let value = buildValueExpression([param(cursorValues[index])]);
-    let operator = order === 'asc' ? '>' : '<';
+    let { name, fieldQuery, order } = this._sorts[index];
+    let value = fieldValue(
+      this.baseType,
+      name,
+      [param(cursorValues[index])],
+      "sort"
+    );
+    let operator = order === "asc" ? ">" : "<";
 
-    return ['(', ...expression, operator, ...value, ') OR ((', ...expression, '=', ...value, ') AND (', ...this._afterExpression(cursorValues, index + 1), '))'];
+    return [
+      "(",
+      fieldQuery,
+      operator,
+      value,
+      ") OR ((",
+      fieldQuery,
+      "=",
+      value,
+      ") AND (",
+      ...this._afterExpression(cursorValues, index + 1),
+      "))"
+    ];
   }
 
   private _parseCursor(cursor: string): Primitive[] {
@@ -91,13 +119,18 @@ export class Sorts {
   }
 
   getCursor(lastRow: any) {
-    return encodeURIComponent(JSON.stringify(this._sorts.map((_unused, index)=> lastRow[`cursor${index}`])));
+    return encodeURIComponent(
+      JSON.stringify(
+        this._sorts.map((_unused, index) => lastRow[`cursor${index}`])
+      )
+    );
   }
 
-
   cursorColumns() {
-    return separatedByCommas(this._sorts.map(({ expression }, index)=> {
-      return [...expression, `AS cursor${index}`];
-    }));
+    return separatedByCommas(
+      this._sorts.map(({ fieldQuery }, index) => {
+        return [fieldQuery, `AS cursor${index}`];
+      })
+    );
   }
 }

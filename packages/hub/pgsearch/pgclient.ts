@@ -1,27 +1,35 @@
-import {
-  Pool,
-  Client,
-  QueryArrayConfig,
-  QueryArrayResult,
-  QueryResultRow,
-  QueryConfig,
-  QueryResult
-} from "pg";
+import { Pool, Client, QueryResult } from "pg";
 import migrate from "node-pg-migrate";
 import logger from "@cardstack/logger";
 import postgresConfig from "./postgres-config";
 import { join } from "path";
 import * as JSON from "json-typescript";
-import { upsert, queryToSQL, param, safeName, every, Expression, any, addExplicitParens } from "./util";
+import {
+  upsert,
+  param,
+  safeName,
+  every,
+  Expression,
+  SyncExpression,
+  any,
+  isParam,
+  addExplicitParens,
+  PgPrimitive,
+  fieldQuery,
+  fieldArity,
+  fieldValue,
+  FieldQuery,
+  FieldValue,
+  FieldArity
+} from "./util";
 import { CardWithId, CardId } from "../card";
-import { Session } from "../session";
 import CardstackError from "../error";
 import { Query, baseType, Filter, EqFilter, RangeFilter } from "../query";
 import { Sorts } from "./sorts";
-import { inject } from "../dependency-injection";
 import snakeCase from "lodash/snakeCase";
-import { CARDSTACK_PUBLIC_REALM } from "../realm";
-import assertNever from 'assert-never';
+import flatten from "lodash/flatten";
+import assertNever from "assert-never";
+import { ScopedCardService } from "../cards-service";
 
 const log = logger("cardstack/pgsearch");
 
@@ -32,8 +40,6 @@ function config() {
 }
 
 export default class PgClient {
-  cards = inject("cards");
-
   private pool: Pool;
 
   constructor() {
@@ -105,63 +111,117 @@ export default class PgClient {
     }
   }
 
-  query<R extends any[] = any[], I extends any[] = any[]>(
-    queryConfig: QueryArrayConfig<I>,
-    values?: I
-  ): Promise<QueryArrayResult<R>>;
-  query<R extends QueryResultRow = any, I extends any[] = any[]>(
-    queryConfig: QueryConfig<I>
-  ): Promise<QueryResult<R>>;
-  query<R extends QueryResultRow = any, I extends any[] = any[]>(
-    queryTextOrConfig: string | QueryConfig<I>,
-    values?: I
-  ): Promise<QueryResult<R>>;
-  async query(arg: any, ...rest: any[]) {
+  async query(
+    cards: ScopedCardService,
+    query: Expression
+  ): Promise<QueryResult> {
     let client = await this.pool.connect();
+    let sql = await this.queryToSQL(cards, query);
+    log.trace("search: %s trace: %j", sql.text, sql.values);
     try {
-      return await client.query(arg, ...rest);
+      return await client.query(sql);
     } finally {
       client.release();
     }
   }
 
-  beginBatch() {
-    return new Batch(this);
+  private async queryToSQL(cards: ScopedCardService, query: Expression) {
+    return this.syncExpressionToSql(await this.makeSynchronous(cards, query));
   }
 
-  async buildQueryExpression(
-    session: Session,
-    _typeContext: CardId,
-    path: string,
-    errorHint: string
-  ): Promise<{
-    isPlural: boolean;
-    expression: Expression;
-    leafField: CardWithId;
-  }> {
-    if (path === "realm" || path === "original-realm" || path === "local-id") {
-      return {
-        isPlural: false,
-        expression: [snakeCase(path)],
-        leafField: await this.cards.get(session, {
-          realm: CARDSTACK_PUBLIC_REALM,
-          localId: "string-field"
+  private async makeSynchronous(
+    cards: ScopedCardService,
+    query: Expression
+  ): Promise<SyncExpression> {
+    return flatten(
+      await Promise.all(
+        query.map(element => {
+          if (isParam(element) || typeof element === "string") {
+            return Promise.resolve([element]);
+          } else if (element.kind === "field-query") {
+            return this.handleFieldQuery(cards, element);
+          } else if (element.kind === "field-value") {
+            return this.handleFieldValue(cards, element);
+          } else if (element.kind === "field-arity") {
+            return this.handleFieldArity(cards, element);
+          } else {
+            throw assertNever(element);
+          }
         })
-      };
+      )
+    );
+  }
+
+  private syncExpressionToSql(query: SyncExpression) {
+    let values: PgPrimitive[] = [];
+    let text = query
+      .map(element => {
+        if (isParam(element)) {
+          values.push(element.param);
+          return `$${values.length}`;
+        } else if (typeof element === "string") {
+          return element;
+        } else {
+          assertNever(element);
+        }
+      })
+      .join(" ");
+    return {
+      text,
+      values
+    };
+  }
+
+  beginBatch(cards: ScopedCardService) {
+    return new Batch(this, cards);
+  }
+
+  private async handleFieldQuery(
+    _cards: ScopedCardService,
+    fieldQuery: FieldQuery
+  ): Promise<SyncExpression> {
+    let { path, errorHint } = fieldQuery;
+    if (path === "realm" || path === "original-realm" || path === "local-id") {
+      return [snakeCase(path)];
     }
 
     throw new Error(`unimplemented in buildQueryExpression for ${errorHint}`);
   }
 
-  async get(_session: Session, id: CardId): Promise<CardWithId> {
+  private async handleFieldValue(
+    cards: ScopedCardService,
+    fieldValue: FieldValue
+  ): Promise<SyncExpression> {
+    let { path, errorHint, value } = fieldValue;
+    if (path === "realm" || path === "original-realm" || path === "local-id") {
+      return await this.makeSynchronous(cards, value);
+    }
+
+    throw new Error(`unimplemented in buildQueryExpression for ${errorHint}`);
+  }
+
+  private async handleFieldArity(
+    cards: ScopedCardService,
+    fieldArity: FieldArity
+  ): Promise<SyncExpression> {
+    let { path, singular, errorHint } = fieldArity;
+    if (path === "realm" || path === "original-realm" || path === "local-id") {
+      return await this.makeSynchronous(cards, singular);
+    }
+
+    throw new Error(`unimplemented in buildQueryExpression for ${errorHint}`);
+  }
+
+  async get(cards: ScopedCardService, id: CardId): Promise<CardWithId> {
     let condition = every([
       [`realm = `, param(id.realm.href)],
       [`original_realm = `, param(id.originalRealm?.href ?? id.realm.href)],
       [`local_id = `, param(id.localId)]
     ]);
-    let result = await this.query(
-      queryToSQL([`select pristine_doc from cards where`, ...condition])
-    );
+    let result = await this.query(cards, [
+      `select pristine_doc from cards where`,
+      ...condition
+    ]);
     if (result.rowCount !== 1) {
       throw new CardstackError(
         `Card not found with realm="${id.realm.href}", original-realm="${id
@@ -173,24 +233,25 @@ export default class PgClient {
   }
 
   async search(
-    session: Session,
+    cards: ScopedCardService,
     { filter, queryString, sort, page }: Query
   ): Promise<{ cards: CardWithId[]; meta: ResponseMeta }> {
     let conditions = [] as Expression[];
 
     if (filter) {
-      conditions.push(this.filterCondition(filter));
+      conditions.push(this.filterCondition(baseType(filter), filter));
     }
 
     if (queryString) {
       //conditions.push(this.queryCondition(queryString));
     }
 
-    let totalResponsePromise = this.query(
-      queryToSQL([`select count(*) from cards where`, ...every(conditions)])
-    );
+    let totalResponsePromise = this.query(cards, [
+      `select count(*) from cards where`,
+      ...every(conditions)
+    ]);
 
-    let sorts = await Sorts.create(session, this, baseType(filter), sort);
+    let sorts = new Sorts(baseType(filter), sort);
     if (page && page.cursor) {
       conditions.push(sorts.afterExpression(page.cursor));
     }
@@ -206,9 +267,7 @@ export default class PgClient {
     let size = page?.size ?? 10;
     query = [...query, "limit", param(size + 1)];
 
-    let sql = queryToSQL(query);
-    log.trace("search: %s trace: %j", sql.text, sql.values);
-    let response = await this.query(sql);
+    let response = await this.query(cards, query);
     let totalResponse = await totalResponsePromise;
     return this.assembleResponse(response, totalResponse, size, sorts);
   }
@@ -236,40 +295,69 @@ export default class PgClient {
     };
   }
 
-  private filterCondition(filter: Filter): Expression {
-    if ('any' in filter) {
-      return any(filter.any.map(item => this.filterCondition(item)));
-    } else if ('every' in filter) {
-      return every(filter.every.map(item => this.filterCondition(item)));
-    } else if ('not' in filter) {
-      return ['NOT', ...addExplicitParens(this.filterCondition(filter.not))];
-    } else if ('eq' in filter) {
-      return this.eqCondition(filter);
-    } else if ('range' in filter) {
-      return this.rangeCondition(filter);
+  private filterCondition(typeContext: CardId, filter: Filter): Expression {
+    if (filter.type) {
+      typeContext = filter.type;
+    }
+
+    if ("any" in filter) {
+      return any(
+        filter.any.map(item => this.filterCondition(typeContext, item))
+      );
+    } else if ("every" in filter) {
+      return every(
+        filter.every.map(item => this.filterCondition(typeContext, item))
+      );
+    } else if ("not" in filter) {
+      return [
+        "NOT",
+        ...addExplicitParens(this.filterCondition(typeContext, filter.not))
+      ];
+    } else if ("eq" in filter) {
+      return this.eqCondition(typeContext, filter);
+    } else if ("range" in filter) {
+      return this.rangeCondition(typeContext, filter);
     } else {
       assertNever(filter);
     }
   }
 
-  private eqCondition(filter: EqFilter): Expression {
-    return every(Object.entries(filter.eq).map(([key, value]) => {
-      return this.fieldFilter(key, value);
-    }));
+  private eqCondition(typeContext: CardId, filter: EqFilter): Expression {
+    return every(
+      Object.entries(filter.eq).map(([key, value]) => {
+        return this.fieldFilter(typeContext, key, value);
+      })
+    );
   }
 
-  private async fieldFilter(session: Session, typeContext: CardId, key: string, value: JSON.Value): Expression {
-    let { isPlural, expression, leafField } = await this.buildQueryExpression(session, typeContext, key, 'filter');
-
+  private fieldFilter(
+    typeContext: CardId,
+    key: string,
+    value: JSON.Value
+  ): Expression {
+    let query = fieldQuery(typeContext, key, "filter");
+    let v = fieldValue(typeContext, key, [param(value)], "filter");
+    return [
+      fieldArity(
+        typeContext,
+        key,
+        [query, "=", v],
+        [query, "&&", "array[", v, "]"],
+        "filter"
+      )
+    ];
   }
 
-  private rangeCondition(_filter: RangeFilter): Expression {
-    throw new Error('unimplemented');
+  private rangeCondition(
+    _typeContext: CardId,
+    _filter: RangeFilter
+  ): Expression {
+    throw new Error("unimplemented");
   }
 }
 
 class Batch {
-  constructor(private client: PgClient) {}
+  constructor(private client: PgClient, private cards: ScopedCardService) {}
 
   async save(card: CardWithId) {
     /* eslint-disable @typescript-eslint/camelcase */
@@ -283,7 +371,7 @@ class Batch {
     };
     /* eslint-enable @typescript-eslint/camelcase */
 
-    await this.client.query(queryToSQL(upsert("cards", "cards_pkey", row)));
+    await this.client.query(this.cards, upsert("cards", "cards_pkey", row));
     log.debug(
       "save realm: %s original realm: %s local id: %s",
       card.realm,
@@ -301,4 +389,6 @@ declare module "@cardstack/hub/dependency-injection" {
   }
 }
 
-export interface ResponseMeta { page: { total: number; cursor?: string } }
+export interface ResponseMeta {
+  page: { total: number; cursor?: string };
+}

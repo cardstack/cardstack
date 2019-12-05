@@ -1,4 +1,4 @@
-import { queryToSQL, param } from "../pgsearch/util";
+import { param } from "../pgsearch/util";
 import { createTestEnv, TestEnv } from "./helpers";
 import { Session } from "../session";
 import { myOrigin } from "../origin";
@@ -44,10 +44,11 @@ describe("hub/card-service", function() {
 
       let pgclient = await env.container.lookup("pgclient");
       let result = await pgclient.query(
-        queryToSQL([
+        service.getScopedCardService(Session.EVERYONE),
+        [
           `select * from cards where realm = `,
           param(`${myOrigin}/api/realms/first-ephemeral-realm`)
-        ])
+        ]
       );
       expect(result.rowCount).equals(1);
     });

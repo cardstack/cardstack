@@ -1,11 +1,51 @@
-import * as JSON from 'json-typescript';
-export type PgPrimitive = number | string | boolean | JSON.Object | null;
+import * as JSON from "json-typescript";
+import { CardId } from "../card";
+export type PgPrimitive =
+  | number
+  | string
+  | boolean
+  | JSON.Object
+  | JSON.Arr
+  | null;
 
 export interface Param {
   param: PgPrimitive;
+  kind: "param";
 }
 
-export type Expression = ( string | Param )[];
+export interface FieldQuery {
+  typeContext: CardId;
+  path: string;
+  errorHint: string;
+  kind: "field-query";
+}
+
+export interface FieldValue {
+  typeContext: CardId;
+  path: string;
+  value: Expression;
+  errorHint: string;
+  kind: "field-value";
+}
+
+export interface FieldArity {
+  typeContext: CardId;
+  path: string;
+  singular: Expression;
+  plural: Expression;
+  errorHint: string;
+  kind: "field-arity";
+}
+
+export type Expression = (
+  | string
+  | Param
+  | FieldQuery
+  | FieldValue
+  | FieldArity
+)[];
+
+export type SyncExpression = (string | Param)[];
 
 export function addExplicitParens(expression: Expression): Expression {
   if (expression.length === 0) {
@@ -25,11 +65,11 @@ export function separatedByCommas(expressions: Expression[]): Expression {
 }
 
 export function param(value: PgPrimitive): Param {
-  return { param: value };
+  return { param: value, kind: "param" };
 }
 
-function isParam(expression: any): expression is Param {
-  return expression?.hasOwnProperty('param');
+export function isParam(expression: any): expression is Param {
+  return expression?.hasOwnProperty("param");
 }
 
 export function every(expressions: Expression[]): Expression {
@@ -41,6 +81,51 @@ export function every(expressions: Expression[]): Expression {
     .reduce((accum, expression) => [...accum, "AND", ...expression]);
 }
 
+export function fieldQuery(
+  typeContext: CardId,
+  path: string,
+  errorHint: string
+): FieldQuery {
+  return {
+    typeContext,
+    path,
+    errorHint,
+    kind: "field-query"
+  };
+}
+
+export function fieldValue(
+  typeContext: CardId,
+  path: string,
+  value: Expression,
+  errorHint: string
+): FieldValue {
+  return {
+    typeContext,
+    path,
+    value,
+    errorHint,
+    kind: "field-value"
+  };
+}
+
+export function fieldArity(
+  typeContext: CardId,
+  path: string,
+  singular: Expression,
+  plural: Expression,
+  errorHint: string
+): FieldArity {
+  return {
+    typeContext,
+    path,
+    singular,
+    plural,
+    errorHint,
+    kind: "field-arity"
+  };
+}
+
 export function any(expressions: Expression[]): Expression {
   if (expressions.length === 0) {
     return ["false"]; // this is "SQL false", not javascript false
@@ -48,24 +133,6 @@ export function any(expressions: Expression[]): Expression {
   return expressions
     .map(addExplicitParens)
     .reduce((accum, expression) => [...accum, "OR", ...expression]);
-}
-
-export function queryToSQL(query: Expression) {
-  let values: PgPrimitive[] = [];
-  let text = query
-    .map(element => {
-      if (isParam(element)) {
-        values.push(element.param);
-        return `$${values.length}`;
-      } else {
-        return element;
-      }
-    })
-    .join(" ");
-  return {
-    text,
-    values
-  };
 }
 
 export function safeName(name: string) {
@@ -76,7 +143,11 @@ export function safeName(name: string) {
 }
 
 // takes a pojo with column name keys and expression values
-export function upsert(table: string, constraint: string, values: { [column: string]: Expression | Param }) {
+export function upsert(
+  table: string,
+  constraint: string,
+  values: { [column: string]: Expression | Param }
+) {
   let names = Object.keys(values).map(safeName);
   let nameExpressions = names.map(name => [name]);
   let valueExpressions = Object.keys(values).map(k => {
@@ -87,7 +158,7 @@ export function upsert(table: string, constraint: string, values: { [column: str
       );
     }
     if (isParam(v)) {
-      return [ v ];
+      return [v];
     }
     return v;
   });
