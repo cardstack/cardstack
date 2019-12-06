@@ -1,2 +1,2 @@
-import CardManipulator from "./card-manipulator";
-export default class CardSchemaUpdator extends CardManipulator { }
+import CardManipulator from './card-manipulator';
+export default class CardSchemaUpdator extends CardManipulator {}

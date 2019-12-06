@@ -2,8 +2,8 @@ import Component from '@glimmer/component';
 import requirejsPolyfill from '@cardstack/requirejs-monaco-ember-polyfill';
 import * as monaco from 'monaco-editor';
 import { action } from '@ember/object';
-import { restartableTask } from "ember-concurrency-decorators";
-import { timeout } from "ember-concurrency";
+import { restartableTask } from 'ember-concurrency-decorators';
+import { timeout } from 'ember-concurrency';
 
 /**
  * <CodeEditor> takes the following arguments:
@@ -27,14 +27,14 @@ export default class CodeEditor extends Component {
 
   constructor(...args) {
     super(...args);
-    this.resizable = (this.args.resizable === true) ? true : false;
+    this.resizable = this.args.resizable === true ? true : false;
   }
 
   // Set default debounce in milliseconds.
   // This limits how often updateCode is called.
   get debounceMs() {
-    let ms = this.args.debounceMs
-    return (ms !== undefined) ? this.args.debounceMs : 500;
+    let ms = this.args.debounceMs;
+    return ms !== undefined ? this.args.debounceMs : 500;
   }
 
   // Sets default resize interval check in milliseconds.
@@ -45,12 +45,17 @@ export default class CodeEditor extends Component {
 
   // readOnly defaults to true
   get readOnly() {
-    return (this.args.readOnly === false) ? false : true;
+    return this.args.readOnly === false ? false : true;
   }
 
   // validate defaults to returning true
   get validate() {
-    return this.args.validate || function() { return true };
+    return (
+      this.args.validate ||
+      function() {
+        return true;
+      }
+    );
   }
 
   get updateCode() {
@@ -66,7 +71,7 @@ export default class CodeEditor extends Component {
     if (!this.editorIsReady) {
       this.editorIsReady = true;
       if (this.args.editorReady) {
-        this.args.editorReady()
+        this.args.editorReady();
       }
     }
   }
@@ -76,26 +81,26 @@ export default class CodeEditor extends Component {
     // Every time a new editor is created, this fires for the new editor
     // plus all existing editors on the page. If there are 4 editors on
     // the page, it will fire 1 + 2 + 3 + 4 times
-    monaco.editor.onDidCreateEditor(this.editorReady)
+    monaco.editor.onDidCreateEditor(this.editorReady);
     // This is called when the containing div has been rendered.
     // `create` constructs a code editor and inserts it into the DOM.
     // el is the element that {{did-insert}} was used on.
-    let codeModel = monaco.editor.createModel(this.args.code, this.args.language)
+    let codeModel = monaco.editor.createModel(this.args.code, this.args.language);
     if (!this.resizable) {
       let height = codeModel.getLineCount() * 20;
-      el.style.height = height.toString() + "px";
+      el.style.height = height.toString() + 'px';
     }
     let editor = monaco.editor.create(el, {
       model: codeModel,
       theme: 'vs-dark',
       readOnly: this.readOnly,
       minimap: { enabled: false },
-      wordWrap: "on",
+      wordWrap: 'on',
       scrollBeyondLastLine: false,
-      wrappingIndent: 'same'
-    })
+      wrappingIndent: 'same',
+    });
     // Whenever the code block's text changes, onUpdateCode will be called.
-    editor.onDidChangeModelContent(this.onUpdateCode)
+    editor.onDidChangeModelContent(this.onUpdateCode);
     // Save editor instance locally, so we can reference it in other methods
     this.editor = editor;
 
@@ -107,21 +112,21 @@ export default class CodeEditor extends Component {
   @action
   onUpdateCode() {
     // called whenever the code in the editor changes
-    this.debounceAndUpdate.perform()
+    this.debounceAndUpdate.perform();
   }
 
   @restartableTask
-  * debounceAndUpdate() {
+  *debounceAndUpdate() {
     // This is a rate limiter so that fast typing doesn't wreck things.
-    yield timeout(this.debounceMs)
-    let code = this.editor.getValue() // get the current text contents of the code editor
+    yield timeout(this.debounceMs);
+    let code = this.editor.getValue(); // get the current text contents of the code editor
     if (this.validate(code)) {
       this.updateCode(code);
-    }  
+    }
   }
 
   @restartableTask
-  * startResizeWatcher (wrapper) {
+  *startResizeWatcher(wrapper) {
     wrapper.style['padding-bottom'] = '20px';
 
     let { offsetWidth, offsetHeight } = wrapper;
@@ -134,7 +139,7 @@ export default class CodeEditor extends Component {
         offsetHeight = newOffsetHeight;
         offsetWidth = newOffsetWidth;
         let editorHeight = offsetHeight - 15; // So that the editor doesn't cover the resize corner
-        this.updateDimensions({height: editorHeight, width: offsetWidth});
+        this.updateDimensions({ height: editorHeight, width: offsetWidth });
       }
     }
   }

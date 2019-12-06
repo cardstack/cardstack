@@ -7,4 +7,3 @@ export default function stripNamespace(type) {
   let parts = type.split(/[/:]/g);
   return parts[parts.length - 1];
 }
-

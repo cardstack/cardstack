@@ -1,10 +1,6 @@
-
 const supertest = require('supertest');
 const Koa = require('koa');
-const {
-  createDefaultEnvironment,
-  destroyDefaultEnvironment
-} = require('@cardstack/test-support/env');
+const { createDefaultEnvironment, destroyDefaultEnvironment } = require('@cardstack/test-support/env');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 describe('authentication/schema-authorization', function() {
@@ -13,34 +9,35 @@ describe('authentication/schema-authorization', function() {
   async function setup() {
     let factory = new JSONAPIFactory();
 
-    factory.addResource('grants')
+    factory
+      .addResource('grants')
       .withRelated('who', [{ type: 'test-users', id: 'authorized-user' }])
       .withAttributes({
-        mayLogin: true
+        mayLogin: true,
       });
-    factory.addResource('grants')
+    factory
+      .addResource('grants')
       .withRelated('who', [{ type: 'test-users', id: 'unauthorized-user' }])
       .withAttributes({
-        mayLogin: false
+        mayLogin: false,
       });
-    factory.addResource('grants')
-      .withRelated('who', [{ type: 'test-users', id: 'user' }]);
+    factory.addResource('grants').withRelated('who', [{ type: 'test-users', id: 'user' }]);
 
     user = factory.addResource('test-users', 'user').withAttributes({
       email: 'vangogh@example.com',
-      fullName: "Van Gogh"
+      fullName: 'Van Gogh',
     });
     unauthorizedUser = factory.addResource('test-users', 'unauthorized-user').withAttributes({
       email: 'hassan@example.com',
-      fullName: "Hassan Abdel-Rahman"
+      fullName: 'Hassan Abdel-Rahman',
     });
     authorizedUser = factory.addResource('test-users', 'authorized-user').withAttributes({
       email: 'ringo@example.com',
-      fullName: "Ringo Abdel-Rahman"
+      fullName: 'Ringo Abdel-Rahman',
     });
 
     factory.addResource('data-sources', 'echo').withAttributes({
-      sourceType: 'stub-authenticators::echo'
+      sourceType: 'stub-authenticators::echo',
     });
 
     env = await createDefaultEnvironment(`${__dirname}/stub-authenticators`, factory.getModels());
@@ -67,13 +64,12 @@ describe('authentication/schema-authorization', function() {
   }
 
   describe('mayLogin authorization', function() {
-
     before(setup);
     after(teardown);
 
     it('authorizes a user with a grant that has a `mayLogin` attribute set to true to be allowed to login', async function() {
       let response = await request.post(`/auth/echo`).send({
-        data: { id: authorizedUser.id, type: 'test-users' }
+        data: { id: authorizedUser.id, type: 'test-users' },
       });
       expect(response).hasStatus(200);
       expect(response.body).has.deep.property('data.meta.token');
@@ -82,27 +78,31 @@ describe('authentication/schema-authorization', function() {
 
     it('does not authorize a user with a grant that has a `mayLogin` attribute set to false to be allowed to login', async function() {
       let response = await request.post(`/auth/echo`).send({
-        data: { id: unauthorizedUser.id, type: 'test-users' }
+        data: { id: unauthorizedUser.id, type: 'test-users' },
       });
       expect(response).hasStatus(401);
       expect(response.body).deep.equal({
-        errors: [{
-          title: 'Not authorized',
-          detail: 'You do not posses a grant that authorizes you to login'
-        }]
+        errors: [
+          {
+            title: 'Not authorized',
+            detail: 'You do not posses a grant that authorizes you to login',
+          },
+        ],
       });
     });
 
     it('defaults to not authorizing a user to be able to login when the `mayLogin` attribute is not specified', async function() {
       let response = await request.post(`/auth/echo`).send({
-        data: { id: user.id, type: 'test-users' }
+        data: { id: user.id, type: 'test-users' },
       });
       expect(response).hasStatus(401);
       expect(response.body).deep.equal({
-        errors: [{
-          title: 'Not authorized',
-          detail: 'You do not posses a grant that authorizes you to login'
-        }]
+        errors: [
+          {
+            title: 'Not authorized',
+            detail: 'You do not posses a grant that authorizes you to login',
+          },
+        ],
       });
     });
   });

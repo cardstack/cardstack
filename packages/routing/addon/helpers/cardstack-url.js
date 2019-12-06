@@ -4,7 +4,7 @@ import { get } from '@ember/object';
 import { hrefTo } from 'ember-href-to/helpers/href-to';
 import { pluralize } from 'ember-inflector';
 
-export function urlForModel(context, model, opts={})  {
+export function urlForModel(context, model, opts = {}) {
   if (model) {
     let path = get(model, 'selfLink');
 
@@ -20,8 +20,10 @@ export function urlForModel(context, model, opts={})  {
   }
 }
 
-export function urlForParams(context, path, /*opts={}*/) {
-  if (!path) { return; }
+export function urlForParams(context, path /*opts={}*/) {
+  if (!path) {
+    return;
+  }
 
   if (path !== '/' && path.charAt(0) === '/') {
     path = path.replace('/', ''); // looks like ember router prepends an extra '/' to the path
@@ -42,7 +44,9 @@ export default Helper.extend({
         return urlForModel(this, arg, hash);
       }
     } else {
-      throw new Error(`the cardstack-url helper expects one argument which can be either the model or the path of the model to route to.`);
+      throw new Error(
+        `the cardstack-url helper expects one argument which can be either the model or the path of the model to route to.`
+      );
     }
-  }
+  },
 });

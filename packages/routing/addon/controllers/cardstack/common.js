@@ -11,13 +11,15 @@ export default Controller.extend({
     setParam(paramName, paramValue) {
       let space = this.get('model');
       let allowedParams = space.get('allowedQueryParams');
-      if (!allowedParams.includes(paramName)) { return; }
+      if (!allowedParams.includes(paramName)) {
+        return;
+      }
 
       let type = pluralize(space.get('primaryCard.type'));
       let location = this.get('router.location');
       let currentUrl = location.getURL();
       let params = {};
-      let [ path, currentParams ] = currentUrl.split('?');
+      let [path, currentParams] = currentUrl.split('?');
 
       if (currentParams) {
         params = qs.parse(currentParams);
@@ -33,6 +35,6 @@ export default Controller.extend({
       let hasParams = some(params, type => typeof type === 'object' && Object.keys(type).length);
 
       location.setURL(`${path}${hasParams ? '?' : ''}${qs.stringify(params, { encodeValuesOnly: true })}`);
-    }
-  }
+    },
+  },
 });

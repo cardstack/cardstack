@@ -1,5 +1,5 @@
 /* eslint-env node */
-"use strict";
+'use strict';
 
 /*
   This is the beginning of an experimental code transform for cardstack templates.
@@ -33,8 +33,10 @@ class BindTransform {
   }
 
   transform(ast) {
-    if (!/\btemplates\/components\/cardstack\//.test(this.moduleName) &&
-      !/\btemplates\/(embedded|isolated).hbs/.test(this.moduleName)) {
+    if (
+      !/\btemplates\/components\/cardstack\//.test(this.moduleName) &&
+      !/\btemplates\/(embedded|isolated).hbs/.test(this.moduleName)
+    ) {
       return ast;
     }
 
@@ -80,9 +82,12 @@ class BindTransform {
         if (foundDynamicContent) {
           let newTag = b.element(tag, newAttributes, []);
           let blockWithParam = b.program([newTag], [unusedBlockParam]);
-          let block = b.block(b.path('cs-field'), [
-            b.path("content"), b.string(contentProperty)
-          ], b.hash(), blockWithParam);
+          let block = b.block(
+            b.path('cs-field'),
+            [b.path('content'), b.string(contentProperty)],
+            b.hash(),
+            blockWithParam
+          );
           return block;
         }
 
@@ -91,9 +96,9 @@ class BindTransform {
 
       MustacheStatement(node) {
         if (node.path.parts && node.path.parts.length === 2 && node.path.parts[0] === 'content') {
-          return b.mustache(b.path("cs-field"), [b.path("content"), b.string(node.path.parts[1])]);
+          return b.mustache(b.path('cs-field'), [b.path('content'), b.string(node.path.parts[1])]);
         }
-      }
+      },
     });
 
     return ast;
@@ -114,14 +119,14 @@ class BlockParamTracker {
 
   _collectBlockParams(ast) {
     this.syntax.traverse(ast, {
-      Program: (node) => {
+      Program: node => {
         this.blockParams.push(...node.blockParams);
-      }
+      },
     });
   }
 
   getUnusedBlockParam() {
-    for (;; this.i++) {
+    for (; ; this.i++) {
       let paramName = 'param' + this.i;
       if (!this.blockParams.includes(paramName)) {
         this.blockParams.push(paramName);

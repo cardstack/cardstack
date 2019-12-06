@@ -18,7 +18,7 @@ module('Acceptance | content', function(hooks) {
     assert.dom('.title').hasText('hello world');
   });
 
-  test('passes query params to primary card in route', async function(assert){
+  test('passes query params to primary card in route', async function(assert) {
     await visit('/posts/1?posts[foo]=bar&posts[bee]=bop');
     assert.equal(currentURL(this.owner), '/posts/1?posts[foo]=bar&posts[bee]=bop');
     assert.dom('.foo').hasText('foo is bar');
@@ -33,7 +33,7 @@ module('Acceptance | content', function(hooks) {
 
   test('reloads models on route transitions', async function(assert) {
     await visit('/categories/category-1');
-    await click('[data-test-post="1"]')
+    await click('[data-test-post="1"]');
 
     assert.equal(currentURL(this.owner), '/posts/1');
   });

@@ -22,8 +22,8 @@ export async function dragAndDropNewField(type, position = 0) {
   let options = {
     dataTransfer: {
       getData: () => type,
-      setData: () => {}
-    }
+      setData: () => {},
+    },
   };
   await dragAndDrop(`[data-test-card-add-field-draggable="${type}"]`, `[data-test-drop-zone="${position}"]`, options);
 }
@@ -34,15 +34,19 @@ export async function dragFieldToNewPosition(originalPosition, newPosition) {
   let fieldName;
   let options = {
     dataTransfer: {
-      getData: (type) => {
+      getData: type => {
         if (type === 'text/field-name') {
           return fieldName;
         }
       },
-      setData: (type, name) => fieldName = name
-    }
+      setData: (type, name) => (fieldName = name),
+    },
   };
-  await dragAndDrop(`[data-test-field-renderer-move-btn-position="${originalPosition}"]`, `[data-test-drop-zone="${newPosition}"]`, options);
+  await dragAndDrop(
+    `[data-test-field-renderer-move-btn-position="${originalPosition}"]`,
+    `[data-test-drop-zone="${newPosition}"]`,
+    options
+  );
 }
 
 export async function createCards(args) {
@@ -57,7 +61,9 @@ export async function createCards(args) {
 
     await visit(`/cards/${id}/edit`);
     for (let [name, , , value] of args[id]) {
-      if (value == null) { continue; }
+      if (value == null) {
+        continue;
+      }
       await setFieldValue(name, value);
     }
     await saveCard('editor', id);

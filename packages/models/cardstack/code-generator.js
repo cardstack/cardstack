@@ -70,45 +70,46 @@ const reexportTemplate = Handlebars.compile(`
 export { default } from "{{source}}";
 `);
 
-module.exports = declareInjections({
-  currentSchema: 'hub:current-schema'
-},
+module.exports = declareInjections(
+  {
+    currentSchema: 'hub:current-schema',
+  },
 
-class CodeGenerator {
+  class CodeGenerator {
+    async generateAppModules() {
+      let schema = await this.currentSchema.getSchema();
+      let modules = new Map();
 
-  async generateAppModules() {
-    let schema = await this.currentSchema.getSchema();
-    let modules = new Map();
+      for (let type of schema.getTypes().values()) {
+        let modelName = inflection.singularize(type.id);
+        modules.set(`models/${modelName}`, reexportTemplate({ source: `@cardstack/models/generated/${modelName}` }));
+        modules.set(`adapters/${modelName}`, reexportTemplate({ source: `@cardstack/models/adapter` }));
+        modules.set(`serializers/${modelName}`, reexportTemplate({ source: `@cardstack/models/serializer` }));
+      }
 
-    for (let type of schema.getTypes().values()) {
-      let modelName = inflection.singularize(type.id);
-      modules.set(`models/${modelName}`, reexportTemplate({ source: `@cardstack/models/generated/${modelName}` }));
-      modules.set(`adapters/${modelName}`,reexportTemplate({ source: `@cardstack/models/adapter`}));
-      modules.set(`serializers/${modelName}`, reexportTemplate({ source: `@cardstack/models/serializer` }));
+      // define an adapter for the cardstack-card base type as well to allow for polymorphic queries
+      modules.set(`adapters/cardstack-card`, reexportTemplate({ source: `@cardstack/models/adapter` }));
+
+      return modules;
     }
 
-    // define an adapter for the cardstack-card base type as well to allow for polymorphic queries
-    modules.set(`adapters/cardstack-card`, reexportTemplate({ source: `@cardstack/models/adapter` }));
+    async generateModules() {
+      let schema = await this.currentSchema.getSchema();
+      let modules = new Map();
 
-    return modules;
-  }
-
-  async generateModules() {
-    let schema = await this.currentSchema.getSchema();
-    let modules = new Map();
-
-    for (let type of schema.getTypes().values()) {
-      let modelName = inflection.singularize(type.id);
-      modules.set(`generated/${modelName}`, this._generatedModel(modelName, type));
+      for (let type of schema.getTypes().values()) {
+        let modelName = inflection.singularize(type.id);
+        modules.set(`generated/${modelName}`, this._generatedModel(modelName, type));
+      }
+      return modules;
     }
-    return modules;
-  }
 
-  _generatedModel(modelName, type) {
-    return modelTemplate({
-      modelName,
-      fields: [...type.realAndComputedFields.values()].filter(f => f.id !== 'id' && f.id !== 'type'),
-      routingField: type.routingField
-    });
+    _generatedModel(modelName, type) {
+      return modelTemplate({
+        modelName,
+        fields: [...type.realAndComputedFields.values()].filter(f => f.id !== 'id' && f.id !== 'type'),
+        routingField: type.routingField,
+      });
+    }
   }
-});
+);

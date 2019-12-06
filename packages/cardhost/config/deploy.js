@@ -1,7 +1,6 @@
 /* eslint-env node */
 
 module.exports = function(deployTarget) {
-
   // these get less aggressive caching because they exist at stable URLs
   let s3PagePattern = '**/*.{html,zip,pdf,css}'; // note that fingerprinting has not been implemented in embroider yet, using less agressive caching for css for now
 
@@ -15,21 +14,21 @@ module.exports = function(deployTarget) {
       disabled: {},
       alias: {
         s3: {
-          as: ['s3Pages', 's3Assets']
-        }
-      }
+          as: ['s3Pages', 's3Assets'],
+        },
+      },
     },
     'revision-data': {
-      scm: null
+      scm: null,
     },
     s3Assets: {
       filePattern: s3AssetPattern,
-      allowOverwrite: true
+      allowOverwrite: true,
     },
     s3Pages: {
       filePattern: s3PagePattern,
       allowOverwrite: true,
-      cacheControl: 'max-age=600, public'
+      cacheControl: 'max-age=600, public',
     },
     cloudfront: {
       objectPaths: [
@@ -40,9 +39,9 @@ module.exports = function(deployTarget) {
         '/vendor.css',
         '/assets/vendor.css',
         '/@cardstack/cardhost.css',
-        '/assets/@cardstack/cardhost.css'
-      ]
-    }
+        '/assets/@cardstack/cardhost.css',
+      ],
+    },
   };
 
   process.env.DEPLOY_TARGET = deployTarget;

@@ -18,5 +18,5 @@ export default Component.extend({
     }
     let type = modelType(this.get('content'));
     return `cardstack/${type}-${format}`;
-  })
+  }),
 });

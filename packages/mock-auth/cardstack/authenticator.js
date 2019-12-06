@@ -5,29 +5,29 @@ module.exports = class {
     return new this(...args);
   }
   constructor(params) {
-    this.users = params["users"];
+    this.users = params['users'];
   }
 
   defaultUserRewriter(user) {
     let output = {
       data: {
         id: user.id,
-        type: "mock-users",
+        type: 'mock-users',
         attributes: {
           name: user.name,
           email: user.email,
-          "avatar-url": user.picture,
-          "email-verified": Boolean(user.verified)
-        }
-      }
+          'avatar-url': user.picture,
+          'email-verified': Boolean(user.verified),
+        },
+      },
     };
     if (!user.verified) {
       output.data.attributes.message = {
-        state: "verify-email",
-        id: user.id
+        state: 'verify-email',
+        id: user.id,
       };
       output.data.meta = {
-        "partial-session": true
+        'partial-session': true,
       };
     }
     return output;
@@ -36,7 +36,7 @@ module.exports = class {
   async authenticate(payload /*, userSearcher */) {
     if (!payload.authorizationCode) {
       throw new Error("missing required field 'authorizationCode'", {
-        status: 400
+        status: 400,
       });
     }
 
@@ -49,12 +49,11 @@ module.exports = class {
 
     throw new Error("User doesn't exist", {
       status: 401,
-      description: `A mock user with the id of "${payload.authorizationCode}" does not exist`
+      description: `A mock user with the id of "${payload.authorizationCode}" does not exist`,
     });
   }
 
   exposeConfig() {
     return { mockEnabled: true };
   }
-
 };

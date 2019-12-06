@@ -5,17 +5,10 @@ const { join, resolve } = require('path');
 const { emptyDirSync, copySync } = require('fs-extra');
 const { execSync } = require('child_process');
 const root = resolve(join(__dirname, '..'));
-const specialBranches = [ 'master' ];
+const specialBranches = ['master'];
 const context = join(root, 'deploy/context');
-const depLayerFiles = [ 'package.json' ];
-const codeLayerFiles = [
-  'cardstack',
-  'config',
-  'app',
-  'public',
-  'ember-cli-build.js',
-  '.ember-cli.js'
-];
+const depLayerFiles = ['package.json'];
+const codeLayerFiles = ['cardstack', 'config', 'app', 'public', 'ember-cli-build.js', '.ember-cli.js'];
 
 emptyDirSync(context);
 copySync(join(root, 'deploy/Dockerfile'), join(context, 'Dockerfile'));
@@ -38,7 +31,9 @@ codeLayerFiles.forEach(serverFile => {
   });
 });
 
-let dockerImageLabel = specialBranches.includes(process.env.TRAVIS_BRANCH) ? process.env.TRAVIS_BRANCH : process.env.TRAVIS_BUILD_ID || 'latest';
+let dockerImageLabel = specialBranches.includes(process.env.TRAVIS_BRANCH)
+  ? process.env.TRAVIS_BRANCH
+  : process.env.TRAVIS_BUILD_ID || 'latest';
 
 try {
   process.stdout.write(`Retrieving docker build from ${process.env.ECR_ENDPOINT}:${dockerImageLabel} ...`);
@@ -49,4 +44,9 @@ try {
   }
   process.stdout.write(`No build cache found for cardhost:${dockerImageLabel}, building from scratch.`);
 }
-execSync(`docker build -f ${join(context, 'Dockerfile')} --cache-from ${process.env.ECR_ENDPOINT}:${dockerImageLabel} -t cardhost ${context}`, { stdio: 'inherit' });
+execSync(
+  `docker build -f ${join(context, 'Dockerfile')} --cache-from ${
+    process.env.ECR_ENDPOINT
+  }:${dockerImageLabel} -t cardhost ${context}`,
+  { stdio: 'inherit' }
+);
