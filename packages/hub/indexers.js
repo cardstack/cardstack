@@ -43,121 +43,138 @@ const { declareInjections, getOwner } = require('@cardstack/di');
 const bootstrapSchema = require('./bootstrap-schema');
 const RunningIndexers = require('./indexing/running-indexers');
 
-module.exports = declareInjections({
-  schemaLoader: 'hub:schema-loader',
-  dataSources: 'config:data-sources',
-  client: `plugin-client:${require.resolve('@cardstack/pgsearch/client')}`,
-  jobQueue: 'hub:queues'
-},
+module.exports = declareInjections(
+  {
+    schemaLoader: 'hub:schema-loader',
+    dataSources: 'config:data-sources',
+    client: `plugin-client:${require.resolve('@cardstack/pgsearch/client')}`,
+    jobQueue: 'hub:queues',
+  },
 
-class Indexers extends EventEmitter {
-  constructor() {
-    super();
+  class Indexers extends EventEmitter {
+    constructor() {
+      super();
 
-    this._queue = [];
-    this._forceRefreshQueue = [];
-    this._dataSourcesMemo = null;
-    this._schemaCache = null;
-  }
-
-  async schema() {
-    if (!this._schemaCache) {
-      this._schemaCache = (async () => {
-        let running = new RunningIndexers(await this._seedSchema(), this.client, this.emit.bind(this), this.schemaLoader.ownTypes(), getOwner(this));
-        try {
-          return await running.schemas();
-        } finally {
-          await running.destroy();
-        }
-      })();
+      this._queue = [];
+      this._forceRefreshQueue = [];
+      this._dataSourcesMemo = null;
+      this._schemaCache = null;
     }
-    return await this._schemaCache;
-  }
 
-  async invalidateSchemaCache() {
-    if (this._schemaCache) {
-      let schema = await this._schemaCache;
-      await schema.teardown();
+    async schema() {
+      if (!this._schemaCache) {
+        this._schemaCache = (async () => {
+          let running = new RunningIndexers(
+            await this._seedSchema(),
+            this.client,
+            this.emit.bind(this),
+            this.schemaLoader.ownTypes(),
+            getOwner(this)
+          );
+          try {
+            return await running.schemas();
+          } finally {
+            await running.destroy();
+          }
+        })();
+      }
+      return await this._schemaCache;
     }
-    this._schemaCache = null;
-  }
 
-  static async teardown(instance) {
-    await instance.invalidateSchemaCache();
-    if (instance._dataSourcesMemo) {
-      await instance._dataSourcesMemo.teardown();
+    async invalidateSchemaCache() {
+      if (this._schemaCache) {
+        let schema = await this._schemaCache;
+        await schema.teardown();
+      }
+      this._schemaCache = null;
     }
-  }
 
-  async update({ forceRefresh, hints, dontWaitForJob } = {}) {
-    await this._setupWorkers();
-    // Note that we dont want singletonKey, its inefficient due to the sophisticated invalidation we are using,
-    // also we dont want to use singletoneNextSlot, since all the indexing calls are important (as they can have different hints, and we dont want to collapse jobs)
+    static async teardown(instance) {
+      await instance.invalidateSchemaCache();
+      if (instance._dataSourcesMemo) {
+        await instance._dataSourcesMemo.teardown();
+      }
+    }
 
-    if (dontWaitForJob) {
-      await this.jobQueue.publish('hub/indexers/update',
-        { forceRefresh, hints },
-        { singletonKey: 'hub/indexers/update', singletonNextSlot: true, expireIn: '2 hours' }
+    async update({ forceRefresh, hints, dontWaitForJob } = {}) {
+      await this._setupWorkers();
+      // Note that we dont want singletonKey, its inefficient due to the sophisticated invalidation we are using,
+      // also we dont want to use singletoneNextSlot, since all the indexing calls are important (as they can have different hints, and we dont want to collapse jobs)
+
+      if (dontWaitForJob) {
+        await this.jobQueue.publish(
+          'hub/indexers/update',
+          { forceRefresh, hints },
+          { singletonKey: 'hub/indexers/update', singletonNextSlot: true, expireIn: '2 hours' }
+        );
+      } else {
+        await this.jobQueue.publishAndWait(
+          'hub/indexers/update',
+          { forceRefresh, hints },
+          { singletonKey: 'hub/indexers/update', singletonNextSlot: true, expireIn: '2 hours' }
+        );
+      }
+    }
+
+    async _setupWorkers() {
+      if (!this._workersSetup) {
+        await this.jobQueue.subscribe('hub/indexers/update', async ({ data: { forceRefresh, hints } }) => {
+          await this._doUpdate(forceRefresh, hints);
+        });
+        this._workersSetup = true;
+      }
+    }
+
+    async _seedSchema() {
+      if (!this._dataSourcesMemo) {
+        let types = this.schemaLoader.ownTypes();
+        log.debug(`Indexers._seedSchema starting seed schema load`);
+        this._dataSourcesMemo = await this.schemaLoader.loadFrom(
+          bootstrapSchema.concat(this.dataSources.filter(model => types.includes(model.type)))
+        );
+        log.debug(`Indexers._seedSchema completed loading seed schema`);
+      }
+      return this._dataSourcesMemo;
+    }
+
+    async _doUpdate(forceRefresh, hints) {
+      log.debug('begin update, forceRefresh=%s', forceRefresh);
+      let priorCache = this._schemaCache;
+      let running = new RunningIndexers(
+        await this._seedSchema(),
+        this.client,
+        this.emit.bind(this),
+        this.schemaLoader.ownTypes(),
+        getOwner(this)
       );
-    } else {
-      await this.jobQueue.publishAndWait('hub/indexers/update',
-        { forceRefresh, hints },
-        { singletonKey: 'hub/indexers/update', singletonNextSlot: true, expireIn: '2 hours' }
-      );
-    }
-  }
-
-  async _setupWorkers() {
-    if (!this._workersSetup) {
-      await this.jobQueue.subscribe("hub/indexers/update", async ({data: { forceRefresh, hints }}) => {
-        await this._doUpdate(forceRefresh, hints);
-      });
-      this._workersSetup = true;
-    }
-  }
-
-  async _seedSchema() {
-    if (!this._dataSourcesMemo) {
-      let types = this.schemaLoader.ownTypes();
-      log.debug(`Indexers._seedSchema starting seed schema load`);
-      this._dataSourcesMemo = await this.schemaLoader.loadFrom(bootstrapSchema.concat(this.dataSources.filter(model => types.includes(model.type))));
-      log.debug(`Indexers._seedSchema completed loading seed schema`);
-    }
-    return this._dataSourcesMemo;
-  }
-
-  async _doUpdate(forceRefresh, hints) {
-    log.debug('begin update, forceRefresh=%s', forceRefresh);
-    let priorCache = this._schemaCache;
-    let running = new RunningIndexers(await this._seedSchema(), this.client, this.emit.bind(this), this.schemaLoader.ownTypes(), getOwner(this));
-    try {
-      let newSchema = await running.update(forceRefresh, hints);
-      if (this._schemaCache === priorCache) {
-        // nobody else has done a more recent update of the schema
-        // cache than us, so we can try to update it.
-        if (priorCache) {
-          let oldSchema = await priorCache;
-          if (!newSchema.equalTo(oldSchema)) {
-            log.info('schema was changed');
-            this._schemaCache = newSchema;
-            if (oldSchema) {
-              await oldSchema.teardown();
+      try {
+        let newSchema = await running.update(forceRefresh, hints);
+        if (this._schemaCache === priorCache) {
+          // nobody else has done a more recent update of the schema
+          // cache than us, so we can try to update it.
+          if (priorCache) {
+            let oldSchema = await priorCache;
+            if (!newSchema.equalTo(oldSchema)) {
+              log.info('schema was changed');
+              this._schemaCache = newSchema;
+              if (oldSchema) {
+                await oldSchema.teardown();
+              }
             }
+          } else {
+            this._schemaCache = newSchema;
           }
         } else {
-          this._schemaCache = newSchema;
+          // somebody else has updated the cache in the time since we
+          // started running, so just drop the schemas we computed
+          // during indexing
+          await newSchema.teardown();
         }
-      } else {
-        // somebody else has updated the cache in the time since we
-        // started running, so just drop the schemas we computed
-        // during indexing
-        await newSchema.teardown();
+      } finally {
+        await running.destroy();
       }
-    } finally {
-      await running.destroy();
+      this.emit('update_complete', hints);
+      log.debug('end update, forceRefresh=%s', forceRefresh);
     }
-    this.emit('update_complete', hints);
-    log.debug('end update, forceRefresh=%s', forceRefresh);
   }
-
-});
+);

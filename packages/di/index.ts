@@ -5,7 +5,7 @@ import {
   FactoryDefinition,
   RegistrationOptions,
   Resolver as GlimmerResolver,
-  Factory
+  Factory,
 } from '@glimmer/di';
 import resolve from 'resolve';
 import path from 'path';
@@ -26,7 +26,7 @@ export function declareInjections<T>(injections: Injections, klass: T) {
   (klass as any)[injectionSymbol] = injections;
 
   if (!(klass as any).create) {
-    (klass as any).create = function (injectedArgs: { [key: string]: any }) {
+    (klass as any).create = function(injectedArgs: { [key: string]: any }) {
       return Object.assign(new this(), injectedArgs);
     };
   }
@@ -43,10 +43,7 @@ export class Registry extends GlimmerRegistry {
     // These are the feature types that are not supposed to be
     // instantiated. Possibly we should just make them all be
     // instantiated anyway for consistency.
-    for (let type of [
-      'constraint-types',
-      'field-types'
-    ]) {
+    for (let type of ['constraint-types', 'field-types']) {
       this.registerOption(`plugin-${type}`, 'instantiate', false);
     }
   }
@@ -80,14 +77,14 @@ export class Container extends GlimmerContainer {
     if (result) {
       return {
         class: result.class,
-        create: (options) => {
+        create: options => {
           let instance = result.create(options);
           setOwner(instance, this);
           return instance;
         },
-        teardown: (specifier) => {
+        teardown: specifier => {
           this._teardownPromises.push(result.teardown(specifier));
-        }
+        },
       };
     }
     return result;
@@ -97,7 +94,11 @@ export class Container extends GlimmerContainer {
   }
 }
 
-function registerDeclaredInjections(registry: GlimmerRegistry, identifier: string, factoryDefinition: FactoryDefinition<any>) {
+function registerDeclaredInjections(
+  registry: GlimmerRegistry,
+  identifier: string,
+  factoryDefinition: FactoryDefinition<any>
+) {
   let declaredInjections: Injections = (factoryDefinition as any)[injectionSymbol];
   if (declaredInjections) {
     for (let [property, dependency] of Object.entries(declaredInjections)) {
@@ -107,7 +108,7 @@ function registerDeclaredInjections(registry: GlimmerRegistry, identifier: strin
 }
 
 class Resolver implements GlimmerResolver {
-  private _hubPath: string | null
+  private _hubPath: string | null;
   constructor(public registry: GlimmerRegistry, public nextResolver: Resolver) {
     this._hubPath = null;
   }
@@ -119,7 +120,6 @@ class Resolver implements GlimmerResolver {
 
   get hubPath() {
     if (!this._hubPath) {
-
       /*
          There are two ways to find @cardstack/hub. Either the
          top-level project must directly depend on it (this is what
@@ -128,14 +128,14 @@ class Resolver implements GlimmerResolver {
          (this is what plugins can do).
       */
 
-      let project = this.registry.registration('config:project') as unknown as { path: string } | undefined;
+      let project = (this.registry.registration('config:project') as unknown) as { path: string } | undefined;
       if (!project) {
         throw new Error(`Failed to locate hub because config:project is not registered`);
       }
       if (!project.path) {
         throw new Error(`Failed to locate hub because config:project does not contain a "path"`);
       }
-      try  {
+      try {
         // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
         let p = require(project.path + '/package.json');
         let deps = Object.keys(p.dependencies || {}).concat(Object.keys(p.devDependencies || {}));

@@ -7,26 +7,29 @@ const { declareInjections } = require('@cardstack/di');
 const { URL } = require('url');
 const { withJsonErrorHandling } = Error;
 const asyncBusboy = require('async-busboy');
-const mimeMatch = require("mime-match");
+const mimeMatch = require('mime-match');
 
-module.exports = declareInjections({
-  searcher: 'hub:searchers',
-  writers: 'hub:writers',
-  indexers: 'hub:indexers',
-  cardServices: 'hub:card-services'
-}, {
-  create({ searcher, writers, indexers, cardServices }) {
-    return {
-      category: 'api',
-      after: 'authentication',
-      middleware() {
-        return jsonapiMiddleware(searcher, writers, indexers, cardServices);
-      }
-    };
+module.exports = declareInjections(
+  {
+    searcher: 'hub:searchers',
+    writers: 'hub:writers',
+    indexers: 'hub:indexers',
+    cardServices: 'hub:card-services',
+  },
+  {
+    create({ searcher, writers, indexers, cardServices }) {
+      return {
+        category: 'api',
+        after: 'authentication',
+        middleware() {
+          return jsonapiMiddleware(searcher, writers, indexers, cardServices);
+        },
+      };
+    },
   }
-});
+);
 
-function jsonapiMiddleware(searcher, writers, indexers, cardServices ) {
+function jsonapiMiddleware(searcher, writers, indexers, cardServices) {
   // TODO move into config
   let options = { servedPrefixes: 'api-validate|api' };
 
@@ -41,7 +44,7 @@ function jsonapiMiddleware(searcher, writers, indexers, cardServices ) {
       let m = prefixPattern.exec(ctxt.request.path);
       if (m) {
         options.prefix = m[1];
-        ctxt.request.path = '/'+m[2];
+        ctxt.request.path = '/' + m[2];
       } else {
         return next();
       }
@@ -60,14 +63,13 @@ function jsonapiMiddleware(searcher, writers, indexers, cardServices ) {
     let contentType = ctxt.request.headers['content-type'];
     let isJsonApi = contentType && contentType.includes('application/vnd.api+json');
 
-    let [ acceptedTypes ] = (ctxt.request.headers['accept'] || "").split(";");
-    let types = acceptedTypes.split(",");
-    let acceptsJsonApi = types.some(t => mimeMatch(t, "application/vnd.api+json"));
+    let [acceptedTypes] = (ctxt.request.headers['accept'] || '').split(';');
+    let types = acceptedTypes.split(',');
+    let acceptsJsonApi = types.some(t => mimeMatch(t, 'application/vnd.api+json'));
 
     if (!(isJsonApi || acceptsJsonApi)) {
       return handler.runBinary();
     }
-
 
     // This is here in case an earlier middleware needs to parse the
     // body before us. That's OK as long as they also set this flag to
@@ -116,7 +118,7 @@ class Handler {
       // provide in their query, which is reasonable (the endpoint
       // name itself is taking precedence).
       filter.type = {
-        exact: type
+        exact: type,
       };
     }
     return filter;
@@ -125,8 +127,8 @@ class Handler {
   async run() {
     this.ctxt.response.set('Content-Type', 'application/vnd.api+json');
     await withJsonErrorHandling(this.ctxt, async () => {
-     let [methodName, segments] = this.getBaseMethodNameAndSegments();
-      log.debug("attempting to match method %s", methodName);
+      let [methodName, segments] = this.getBaseMethodNameAndSegments();
+      log.debug('attempting to match method %s', methodName);
       let method = this[methodName];
       if (method) {
         await method.apply(this, segments.slice(1).filter(Boolean));
@@ -138,7 +140,7 @@ class Handler {
     let [baseMethodName, segments] = this.getBaseMethodNameAndSegments();
     let methodName = `${baseMethodName}Binary`;
 
-    log.debug("attempting to match method %s", methodName);
+    log.debug('attempting to match method %s', methodName);
     let method = this[methodName];
     if (method) {
       await method.apply(this, segments.slice(1));
@@ -169,7 +171,7 @@ class Handler {
 
   async handleCollectionValidate(type) {
     let session = this.session;
-    let { data:finalDocument } = this._mandatoryBodyData();
+    let { data: finalDocument } = this._mandatoryBodyData();
     let schema = await this.writers.currentSchema.getSchema();
     let pendingChange = await this.writers.createPendingChange({
       finalDocument,
@@ -180,7 +182,7 @@ class Handler {
 
   async handleIndividualValidate(type, id) {
     let session = this.session;
-    let { data:finalDocument } = this._mandatoryBodyData();
+    let { data: finalDocument } = this._mandatoryBodyData();
     finalDocument.id = id;
     let schema = await this.writers.currentSchema.getSchema();
     let pendingChange = await this.writers.createPendingChange({
@@ -251,17 +253,21 @@ class Handler {
 
   // TODO handle card collection formatting
   async handleCollectionGET(type) {
-    let { data: models, meta: { page }, included } = await this.searcher.search(this.session, {
+    let {
+      data: models,
+      meta: { page },
+      included,
+    } = await this.searcher.search(this.session, {
       filter: this.filterExpression(type),
       sort: this.query.sort,
       page: this.query.page,
       include: this.query.include,
-      queryString: this.query.q
+      queryString: this.query.q,
     });
     let body = { data: models, meta: { total: page.total } };
     if (page.cursor) {
       body.links = {
-        next: this._urlWithUpdatedParams({ page: { cursor: page.cursor } })
+        next: this._urlWithUpdatedParams({ page: { cursor: page.cursor } }),
       };
     }
     this.ctxt.body = body;
@@ -291,7 +297,10 @@ class Handler {
     let { files } = await asyncBusboy(this.ctxt.req);
 
     if (!files[0]) {
-      throw new Error("A file was not included in your post request. If you are not trying to upload a file, make sure to set your request content type to application/vnd.api+json", {status: 400});
+      throw new Error(
+        'A file was not included in your post request. If you are not trying to upload a file, make sure to set your request content type to application/vnd.api+json',
+        { status: 400 }
+      );
     }
 
     let record = await this.writers.createBinary(this.session, type, files[0]);
@@ -304,11 +313,10 @@ class Handler {
     this.ctxt.set('location', origin + this.ctxt.request.path + '/' + record.data.id);
   }
 
-
   _mandatoryBodyData() {
     if (!this.ctxt.request.body || !this.ctxt.request.body.data) {
       throw new Error('A body with a top-level "data" property is required', {
-        status: 400
+        status: 400,
       });
     }
     return this.ctxt.request.body;
@@ -321,7 +329,7 @@ class Handler {
       origin = origin + '/' + this.prefix;
     }
     let u = new URL(origin + (this.ctxt.req.originalUrl || this.ctxt.req.url));
-    u.search = "?" + qs.stringify(p, { encode: false });
+    u.search = '?' + qs.stringify(p, { encode: false });
     return u.href;
   }
 }

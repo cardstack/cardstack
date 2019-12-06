@@ -2,7 +2,9 @@ exports.type = '@cardstack/core-types::boolean';
 
 exports.compute = async function(model, { color }) {
   let otherFoods = await model.getRelated('goes-well-with');
-  if (!otherFoods) { return false; }
+  if (!otherFoods) {
+    return false;
+  }
   for (let otherModel of otherFoods) {
     let otherColor = await otherModel.getField('color');
     if (otherColor === color) {

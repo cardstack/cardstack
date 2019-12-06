@@ -4,45 +4,38 @@
 
 const { makeServer } = require('../main');
 const path = require('path');
-const { commandLineOptions,
-        loadModels,
-        seedsFolder,
-        dataSourcesFolder } = require('../util/bin-utils');
+const { commandLineOptions, loadModels, seedsFolder, dataSourcesFolder } = require('../util/bin-utils');
 const logger = require('@cardstack/logger');
 const log = logger('cardstack/server');
 
 if (process.env.EMBER_ENV === 'test') {
   logger.configure({
-    defaultLevel: 'warn'
+    defaultLevel: 'warn',
   });
 } else {
   logger.configure({
     defaultLevel: 'warn',
-    logLevels: [['cardstack/*', 'info']]
+    logLevels: [['cardstack/*', 'info']],
   });
 }
 
 async function runServer(options, dataSources) {
-  let {
-    sessionsKey,
-    port,
-  } = options;
+  let { sessionsKey, port } = options;
 
   let seedsDir = path.join(options.initialDataDirectory, seedsFolder);
   options.seeds = () => loadModels(seedsDir);
 
   let app = await makeServer(process.cwd(), sessionsKey, dataSources, options);
   app.listen(port);
-  log.info("server listening on %s", port);
+  log.info('server listening on %s', port);
   if (process.connected) {
     process.send('hub hello');
   }
 }
 
-process.on('warning', (warning) => {
+process.on('warning', warning => {
   process.stderr.write(warning.stack);
 });
-
 
 if (process.connected === false) {
   // This happens if we were started by another node process with IPC
@@ -58,10 +51,9 @@ process.on('disconnect', () => {
   process.exit(0);
 });
 
-
 let options = commandLineOptions();
 let dataSources = loadModels(path.join(options.initialDataDirectory, dataSourcesFolder));
 runServer(options, dataSources).catch(err => {
-  log.error("Server failed to start cleanly: %s", err.stack || err);
+  log.error('Server failed to start cleanly: %s', err.stack || err);
   process.exit(-1);
 });

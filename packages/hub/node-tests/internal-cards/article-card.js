@@ -5,7 +5,8 @@ let factory = new JSONAPIFactory();
 // encounter this form of a card. Look at the jsonapi tests and browser
 // tests for the structure of a card as it is known externally.
 let card = factory.getDocumentFor(
-  factory.addResource('local-hub::millenial-puppies', 'local-hub::millenial-puppies')
+  factory
+    .addResource('local-hub::millenial-puppies', 'local-hub::millenial-puppies')
     .withAttributes({
       'isolated-template': `
         <h1>{{this.title}}</h1>
@@ -42,38 +43,40 @@ let card = factory.getDocumentFor(
         discerning tastes of the millenial puppy. In this
         article we probe the needs and desires of millenial
         puppies and why they love belly rubs so much.
-      `
+      `,
     })
     .withRelated('fields', [
-      factory.addResource('fields', 'local-hub::millenial-puppies::title').withAttributes({
-        'is-metadata': true,
-        'needed-when-embedded': true,
-        'instructions': 'this is a required field',
-        'field-type': '@cardstack/core-types::string' //TODO rework for fields-as-cards
-      }).withRelated('constraints', [
-        factory.addResource('constraints', 'local-hub::millenial-puppies::title-not-null')
-          .withAttributes({
+      factory
+        .addResource('fields', 'local-hub::millenial-puppies::title')
+        .withAttributes({
+          'is-metadata': true,
+          'needed-when-embedded': true,
+          instructions: 'this is a required field',
+          'field-type': '@cardstack/core-types::string', //TODO rework for fields-as-cards
+        })
+        .withRelated('constraints', [
+          factory.addResource('constraints', 'local-hub::millenial-puppies::title-not-null').withAttributes({
             'constraint-type': '@cardstack/core-types::not-null',
-            'error-message': 'The title must not be empty.'
-          })
-      ]),
+            'error-message': 'The title must not be empty.',
+          }),
+        ]),
       // TODO add the idea of "related-cards" after we support adopts and implements
       factory.addResource('fields', 'local-hub::millenial-puppies::author').withAttributes({
         'is-metadata': true,
         'needed-when-embedded': true,
-        'field-type': '@cardstack/core-types::belongs-to'
+        'field-type': '@cardstack/core-types::belongs-to',
       }),
       factory.addResource('fields', 'local-hub::millenial-puppies::body').withAttributes({
         'is-metadata': true,
-        'field-type': '@cardstack/core-types::string'
+        'field-type': '@cardstack/core-types::string',
       }),
       factory.addResource('fields', 'local-hub::millenial-puppies::internal-field').withAttributes({
-        'field-type': '@cardstack/core-types::string'
+        'field-type': '@cardstack/core-types::string',
       }),
       factory.addResource('computed-fields', 'local-hub::millenial-puppies::tag-names').withAttributes({
         'is-metadata': true,
         'needed-when-embedded': true,
-        'computed-field-type': 'stub-card-project::tags'
+        'computed-field-type': 'stub-card-project::tags',
       }),
 
       // TODO is this a legit scenario where a card has a metadata relationship field
@@ -81,16 +84,19 @@ let card = factory.getDocumentFor(
       // Maybe a better test involving relationships to internal models would be to consume
       // this relationship in a computed that is a metadata field (and probably we
       // should have a test that involves a card that has a relationship to another card).
-      factory.addResource('fields', 'local-hub::millenial-puppies::tags').withAttributes({
-        'is-metadata': true,
-        'field-type': '@cardstack/core-types::has-many'
-      }).withRelated('related-types', [
-        // this is modeling an enumeration using a private model.
-        // this content type name will be prefixed with the card's
-        // package and card name, such that other cards can also
-        // have their own 'tags' internal content types.
-        factory.addResource('content-types', 'local-hub::millenial-puppies::tags')
-      ]),
+      factory
+        .addResource('fields', 'local-hub::millenial-puppies::tags')
+        .withAttributes({
+          'is-metadata': true,
+          'field-type': '@cardstack/core-types::has-many',
+        })
+        .withRelated('related-types', [
+          // this is modeling an enumeration using a private model.
+          // this content type name will be prefixed with the card's
+          // package and card name, such that other cards can also
+          // have their own 'tags' internal content types.
+          factory.addResource('content-types', 'local-hub::millenial-puppies::tags'),
+        ]),
     ])
     .withRelated('local-hub::millenial-puppies::tags', [
       // Note that the tags models will be prefixed with this card's ID
@@ -100,9 +106,7 @@ let card = factory.getDocumentFor(
       factory.addResource('local-hub::millenial-puppies::tags', 'local-hub::millenial-puppies::puppies'),
       factory.addResource('local-hub::millenial-puppies::tags', 'local-hub::millenial-puppies::belly-rubs'),
     ])
-    .withRelated('local-hub::millenial-puppies::author',
-      { type: 'local-hub::van-gogh', id: 'local-hub::van-gogh'}
-    )
+    .withRelated('local-hub::millenial-puppies::author', { type: 'local-hub::van-gogh', id: 'local-hub::van-gogh' })
 );
 
 module.exports = card;

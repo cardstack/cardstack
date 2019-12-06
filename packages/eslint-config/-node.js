@@ -6,9 +6,9 @@ module.exports = {
     sourceType: 'module',
   },
   env: {
-    'node': true,
-    'browser': false,
-    'es6': true
+    node: true,
+    browser: false,
+    es6: true,
   },
   // I'm doing this instead of `extends` so that this config module
   // can be used within override blocks of other config modules.
@@ -17,17 +17,26 @@ module.exports = {
     require('eslint-plugin-node').configs.recommended.rules,
     require('eslint/conf/eslint-recommended').rules,
     {
-      'no-constant-condition': ["error", { checkLoops: false }],
+      'no-constant-condition': ['error', { checkLoops: false }],
       'require-yield': 0,
-      semi: ["error", "always"],
-      'node/no-extraneous-require': ['error', {
-        'allowModules': []
-      }],
-      'node/no-extraneous-import': ['error', {
-        'allowModules': []
-      }],
+      semi: ['error', 'always'],
+      'node/no-extraneous-require': [
+        'error',
+        {
+          allowModules: [],
+        },
+      ],
+      'node/no-extraneous-import': [
+        'error',
+        {
+          allowModules: [],
+        },
+      ],
       'node/no-missing-require': ['error'],
       'no-undef': 'error',
-    }),
-  plugins: ['node', '@typescript-eslint']
+
+      'prettier/prettier': 'error',
+    }
+  ),
+  plugins: ['node', '@typescript-eslint', 'prettier'],
 };

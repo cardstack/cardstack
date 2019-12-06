@@ -7,21 +7,25 @@ const template = Handlebars.compile(`
 {{/each}}
 `);
 
-module.exports = declareInjections({
-  publicURL: 'config:public-url'
-},
+module.exports = declareInjections(
+  {
+    publicURL: 'config:public-url',
+  },
 
-class {
-  async generateModules() {
-    return new Map([[
-      'environment', 
-      template({ properties: Object.entries(this._content()).map(([name, value]) => ({ name, value })) }) 
-    ]]);
+  class {
+    async generateModules() {
+      return new Map([
+        [
+          'environment',
+          template({ properties: Object.entries(this._content()).map(([name, value]) => ({ name, value })) }),
+        ],
+      ]);
+    }
+    _content() {
+      return {
+        hubURL: this.publicURL.url,
+        compiledAt: new Date().toISOString(),
+      };
+    }
   }
-  _content() {
-    return {
-      hubURL: this.publicURL.url,
-      compiledAt: new Date().toISOString()
-    };
-  }
-});
+);

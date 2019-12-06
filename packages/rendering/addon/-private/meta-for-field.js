@@ -1,7 +1,9 @@
 import { camelize } from '@ember/string';
 
 export default function metaForField(content, fieldName) {
-  if (!content) { return; }
+  if (!content) {
+    return;
+  }
 
   fieldName = camelize(fieldName);
   try {
@@ -9,5 +11,4 @@ export default function metaForField(content, fieldName) {
   } catch (err) {
     return;
   }
-
 }

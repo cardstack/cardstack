@@ -16,17 +16,16 @@ export async function login() {
 }
 
 export function setupMockUser(factory) {
-  factory.addResource('data-sources', 'mock-auth')
-    .withAttributes({
-      sourceType: '@cardstack/mock-auth',
-      params: {
-        users: {
-          user1: {
-            name: 'Carl Stack',
-            email: 'carlstack@cardstack.com',
-            verified: true
-          }
-        }
-      }
-    });
+  factory.addResource('data-sources', 'mock-auth').withAttributes({
+    sourceType: '@cardstack/mock-auth',
+    params: {
+      users: {
+        user1: {
+          name: 'Carl Stack',
+          email: 'carlstack@cardstack.com',
+          verified: true,
+        },
+      },
+    },
+  });
 }

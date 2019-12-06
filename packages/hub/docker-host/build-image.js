@@ -1,5 +1,5 @@
 const child_process = require('child_process');
-const {spawn} = child_process;
+const { spawn } = child_process;
 const path = require('path');
 
 const tar = require('tar-stream');
@@ -10,12 +10,7 @@ const log = require('@cardstack/logger')('cardstack/hub/build-image');
 module.exports = function buildAppImage(packages, appName) {
   let context = buildContext(packages, appName);
 
-  let proc = spawn('docker', [
-      'build',
-      '--label', 'com.cardstack',
-      '-t', appName,
-      '-'
-  ]);
+  let proc = spawn('docker', ['build', '--label', 'com.cardstack', '-t', appName, '-']);
 
   context.pipe(proc.stdin);
 
@@ -39,7 +34,7 @@ module.exports = function buildAppImage(packages, appName) {
 
 function buildContext(packages, appName) {
   let archive = tar.pack();
-  archive.entry({name: 'Dockerfile'}, dockerfile(packages, appName));
+  archive.entry({ name: 'Dockerfile' }, dockerfile(packages, appName));
 
   async function archivePackages() {
     for (let package of packages) {
@@ -52,7 +47,6 @@ function buildContext(packages, appName) {
   return archive;
 }
 
-
 async function archivePackage(archive, package) {
   return new Promise(function(resolve, reject) {
     tarfs.pack(package.path, {
@@ -62,7 +56,7 @@ async function archivePackage(archive, package) {
       map(header) {
         header.name = path.normalize(path.join('packages', package.name, header.name));
       },
-      finish: resolve
+      finish: resolve,
     });
     archive.on('error', reject);
   });
@@ -71,10 +65,9 @@ async function archivePackage(archive, package) {
 function dirs() {
   let directories = [].slice.call(arguments);
   return function(x) {
-    return directories.some(dir=>x.endsWith('/'+dir));
+    return directories.some(dir => x.endsWith('/' + dir));
   };
 }
-
 
 function dockerfile(packages, appName) {
   let file = [];
@@ -89,8 +82,8 @@ function dockerfile(packages, appName) {
   // yarn install step in the docker build cache
   for (let pack of packages) {
     let dir = `packages/${pack.name}/`; // Don't use path.join, in case host is Windows
-    let json = dir+'package.json';
-    let yarn = dir+'yarn.loc[k]';        // COPY errors out if a directly specified file is missing, but is ok with a pattern matching 0 files
+    let json = dir + 'package.json';
+    let yarn = dir + 'yarn.loc[k]'; // COPY errors out if a directly specified file is missing, but is ok with a pattern matching 0 files
     let files = JSON.stringify([json, yarn, dir]);
     file.push(`COPY ${files}`);
   }
@@ -113,7 +106,6 @@ function dockerfile(packages, appName) {
     }
   }
 
-
   file.push('WORKDIR /hub');
 
   for (let pack of packages) {
@@ -131,12 +123,7 @@ function dockerfile(packages, appName) {
     flags.push('--leave-services-running');
   }
 
-  let entry = JSON.stringify([
-    'npx',
-    '--no-install',
-    'cardstack-hub',
-    '/hub/app/cardstack/seeds/development'
-  ]);
+  let entry = JSON.stringify(['npx', '--no-install', 'cardstack-hub', '/hub/app/cardstack/seeds/development']);
   let cmd = JSON.stringify(flags);
 
   file.push(`ENTRYPOINT ${entry}`);

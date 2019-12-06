@@ -10,11 +10,13 @@ export default class IndexController extends Controller {
 
   @action
   scrollToSection(sectionId) {
-    if (!sectionId) { return; }
+    if (!sectionId) {
+      return;
+    }
     this.scroller.scrollToSection({
       selector: `.cardhost-section--${sectionId}`,
       elementOffset: 160,
-      doneScrolling: () => this.selectedSection = sectionId
+      doneScrolling: () => (this.selectedSection = sectionId),
     });
   }
 }

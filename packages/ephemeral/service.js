@@ -5,7 +5,7 @@ const { declareInjections } = require('@cardstack/di');
 const { partition } = require('lodash');
 const { INTERNAL_PRIVILEGED } = require('@cardstack/plugin-utils/session');
 const streamToPromise = require('stream-to-promise');
-const { statSync } = require("fs");
+const { statSync } = require('fs');
 const { isInternalCard } = require('@cardstack/plugin-utils/card-utils');
 
 // When we first load, we establish an identity. This allows us to
@@ -28,89 +28,94 @@ function getId(model) {
   return model.data ? model.data.id : model.id;
 }
 
-module.exports = declareInjections({
-  indexers: 'hub:indexers',
-  writers: 'hub:writers',
-  schemaLoader: 'hub:schema-loader'
-}, class EphemeralStorageService {
-  constructor() {
-    this._dataSources = new Map();
-  }
-
-  findStorage(dataSourceId) {
-    let storage = this._dataSources.get(dataSourceId);
-    if (!storage) {
-      // we're not expecting this to happen because we know indexing
-      // must happen at least once before writers are available (you
-      // can't discovery the writers without indexing the data
-      // sources).
-      throw new Error("Bug in @cardstack/ephemeral: Tried to findStorage before findOrCreateStorage");
+module.exports = declareInjections(
+  {
+    indexers: 'hub:indexers',
+    writers: 'hub:writers',
+    schemaLoader: 'hub:schema-loader',
+  },
+  class EphemeralStorageService {
+    constructor() {
+      this._dataSources = new Map();
     }
-    return storage;
-  }
 
-  async findOrCreateStorage(dataSourceId, initialModels) {
-    let storage = this._dataSources.get(dataSourceId);
-    if (!storage) {
-      storage = new EphemeralStorage(this.indexers);
-      this._dataSources.set(dataSourceId, storage);
-      if (initialModels) {
-        let schemaTypes = this.schemaLoader.ownTypes();
-        for (let model of initialModels) {
-          let isSchema = schemaTypes.includes(getType(model));
-          if (model.readable) {
-            // store binary data
-            let id = getId(model) || crypto.randomBytes(20).toString('hex'); // if model has id, use it, otherwise generate one
-            let blob = await streamToPromise(model);
-            let storedDocument = {
-              type: 'cardstack-files',
-              id,
-              attributes: {
-                'created-at':   statSync(model.path).ctime,
-                'size':         statSync(model.path).size,
-                'content-type': model.mimeType,
-                'file-name':    model.filename || model.path
-              }
-            };
+    findStorage(dataSourceId) {
+      let storage = this._dataSources.get(dataSourceId);
+      if (!storage) {
+        // we're not expecting this to happen because we know indexing
+        // must happen at least once before writers are available (you
+        // can't discovery the writers without indexing the data
+        // sources).
+        throw new Error('Bug in @cardstack/ephemeral: Tried to findStorage before findOrCreateStorage');
+      }
+      return storage;
+    }
 
-            log.debug('storing document for binary data %j', storedDocument);
+    async findOrCreateStorage(dataSourceId, initialModels) {
+      let storage = this._dataSources.get(dataSourceId);
+      if (!storage) {
+        storage = new EphemeralStorage(this.indexers);
+        this._dataSources.set(dataSourceId, storage);
+        if (initialModels) {
+          let schemaTypes = this.schemaLoader.ownTypes();
+          for (let model of initialModels) {
+            let isSchema = schemaTypes.includes(getType(model));
+            if (model.readable) {
+              // store binary data
+              let id = getId(model) || crypto.randomBytes(20).toString('hex'); // if model has id, use it, otherwise generate one
+              let blob = await streamToPromise(model);
+              let storedDocument = {
+                type: 'cardstack-files',
+                id,
+                attributes: {
+                  'created-at': statSync(model.path).ctime,
+                  size: statSync(model.path).size,
+                  'content-type': model.mimeType,
+                  'file-name': model.filename || model.path,
+                },
+              };
 
-            storage.storeBinary(model.type, id, storedDocument, blob);
-          } else {
-            storage.store(getType(model), getId(model), model, isSchema);
+              log.debug('storing document for binary data %j', storedDocument);
+
+              storage.storeBinary(model.type, id, storedDocument, blob);
+            } else {
+              storage.store(getType(model), getId(model), model, isSchema);
+            }
           }
         }
       }
+      return storage;
     }
-    return storage;
-  }
 
-  // The ephemeral indexer is a bit special in the sense that we use
-  // it in development and want it to explode on startup if you try to
-  // initialize it with invalid models.
-  //
-  // We can't just look at our own initialModels to decide if there's
-  // a consistent schema, because we're allowed to depend on models
-  // coming out of other indexers (and we probably depend on
-  // the @cardstack/hub::seeds indexer in any case).
-  async validateModels(initialModels, read) {
-    let models = await crawlModels(initialModels, read);
-    let schemaTypes = this.schemaLoader.ownTypes();
-    let [schemaModels, dataModels] = partition(models, model => schemaTypes.includes(model.type));
-    let schema = await this.schemaLoader.loadFrom(schemaModels);
-    for (let model of dataModels) {
-      if (isCard(model)) {
-        // TODO validate card document
-        continue;
+    // The ephemeral indexer is a bit special in the sense that we use
+    // it in development and want it to explode on startup if you try to
+    // initialize it with invalid models.
+    //
+    // We can't just look at our own initialModels to decide if there's
+    // a consistent schema, because we're allowed to depend on models
+    // coming out of other indexers (and we probably depend on
+    // the @cardstack/hub::seeds indexer in any case).
+    async validateModels(initialModels, read) {
+      let models = await crawlModels(initialModels, read);
+      let schemaTypes = this.schemaLoader.ownTypes();
+      let [schemaModels, dataModels] = partition(models, model => schemaTypes.includes(model.type));
+      let schema = await this.schemaLoader.loadFrom(schemaModels);
+      for (let model of dataModels) {
+        if (isCard(model)) {
+          // TODO validate card document
+          continue;
+        }
+        await schema.validate(
+          await this.writers.createPendingChange({
+            finalDocument: model,
+            finalizer: () => {},
+          }),
+          { session: INTERNAL_PRIVILEGED }
+        );
       }
-      await schema.validate(await this.writers.createPendingChange({
-        finalDocument: model,
-        finalizer: () => { },
-      }), { session: INTERNAL_PRIVILEGED });
     }
   }
-});
-
+);
 
 async function crawlModels(initialModels, read) {
   let models = new Map();
@@ -119,40 +124,45 @@ async function crawlModels(initialModels, read) {
     let pendingRefs = [];
     for (let model of foundModels) {
       // TODO crawl card documents
-      if (isCard(model)) { continue; }
+      if (isCard(model)) {
+        continue;
+      }
       let key = `${model.type}/${model.id}`;
       models.set(key, model);
       for (let ref of references(model)) {
         pendingRefs.push(ref);
       }
     }
-    foundModels = (await Promise.all(pendingRefs.map(async ({ type, id }) => {
-      let key = `${type}/${id}`;
-      if (!models.has(key)) {
-        models.set(key, null);
-        let output = await read(type, id);
-        return output;
-      }
-    }))).filter(Boolean);
+    foundModels = (
+      await Promise.all(
+        pendingRefs.map(async ({ type, id }) => {
+          let key = `${type}/${id}`;
+          if (!models.has(key)) {
+            models.set(key, null);
+            let output = await read(type, id);
+            return output;
+          }
+        })
+      )
+    ).filter(Boolean);
   }
   return [...models.values()].filter(Boolean);
 }
 
 // TODO this assumes model is a resource--need to change it?
 function references(model) {
-
   let refs = [
     // every model depends on its content type
     { type: 'content-types', id: model.type },
 
     // and has type and id fields
     { type: 'fields', id: 'id' },
-    { type: 'fields', id: 'type', },
+    { type: 'fields', id: 'type' },
 
     // and I'm including the root privileged grant (from bootstrap
     // schema) so that we can validate using INTERNAL_PRIVILEGED
     // session and expect it to work
-    { type: 'grants', id: 'hub-internal-grant' }
+    { type: 'grants', id: 'hub-internal-grant' },
   ];
 
   if (model.relationships) {
@@ -187,7 +197,10 @@ class EphemeralStorage {
   }
 
   schemaModels() {
-    return [...this.models.values()].filter(entry => entry.isSchema).map(entry => entry.model).filter(Boolean);
+    return [...this.models.values()]
+      .filter(entry => entry.isSchema)
+      .map(entry => entry.model)
+      .filter(Boolean);
   }
 
   modelsNewerThan(generation) {
@@ -224,9 +237,9 @@ class EphemeralStorage {
     let entry = this.models.get(key);
 
     if (entry && ifMatch != null && String(entry.generation) !== String(ifMatch)) {
-      throw new Error("Merge conflict", {
+      throw new Error('Merge conflict', {
         status: 409,
-        source: model ? { pointer: '/data/meta/version'} : { header: 'If-Match' }
+        source: model ? { pointer: '/data/meta/version' } : { header: 'If-Match' },
       });
     }
 
@@ -236,7 +249,7 @@ class EphemeralStorage {
       isSchema,
       generation: generationCounter,
       type,
-      id
+      id,
     });
 
     return generationCounter;
@@ -253,7 +266,7 @@ class EphemeralStorage {
       id,
       model,
       generation: generationCounter,
-      blob
+      blob,
     });
 
     return generationCounter;
@@ -273,9 +286,9 @@ class EphemeralStorage {
     generationCounter++;
     let checkpoint = this.checkpoints.get(id);
     if (!checkpoint) {
-      throw new Error("No such checkpoint", {
+      throw new Error('No such checkpoint', {
         status: 400,
-        source: { pointer: '/data/relationships/checkpoint'}
+        source: { pointer: '/data/relationships/checkpoint' },
       });
     }
 
@@ -289,20 +302,20 @@ class EphemeralStorage {
     for (let key of this.models.keys()) {
       let entry = this.models.get(key);
       if (entry.generation < generationCounter) {
-        this.models.set(key, Object.assign({}, entry, {
-          model: null,
-          generation: generationCounter
-        }));
+        this.models.set(
+          key,
+          Object.assign({}, entry, {
+            model: null,
+            generation: generationCounter,
+          })
+        );
       }
     }
-
-
 
     await this.indexers.update({ forceRefresh: true });
     log.debug(`restored checkpoint ${id}`);
     return generationCounter;
   }
-
 }
 
 function copyMap(m) {

@@ -1,2 +1,2 @@
 import CardModelRoute from './card-model-route';
-export default class AdoptCardRoute extends CardModelRoute { }
+export default class AdoptCardRoute extends CardModelRoute {}

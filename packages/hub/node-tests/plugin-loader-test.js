@@ -6,18 +6,21 @@ describe('hub/plugin-loader', function() {
 
   before(async function() {
     let registry = new Registry();
-    registry.register('config:project', {
-      path: __dirname + '/../../../tests/plugin-loader-test-project'
-    }, { instantiate: false });
+    registry.register(
+      'config:project',
+      {
+        path: __dirname + '/../../../tests/plugin-loader-test-project',
+      },
+      { instantiate: false }
+    );
     pluginLoader = new Container(registry).lookup('hub:plugin-loader');
 
     let factory = new JSONAPIFactory();
-    factory.addResource('plugin-configs', 'sample-plugin-one')
-      .withAttributes({
-        params: { awesomeness: 11 }
-      });
+    factory.addResource('plugin-configs', 'sample-plugin-one').withAttributes({
+      params: { awesomeness: 11 },
+    });
     factory.addResource('plugin-configs', 'sample-plugin-four').withAttributes({
-      enabled: false
+      enabled: false,
     });
 
     configuredPlugins = await pluginLoader.configuredPlugins(factory.getModels());
@@ -26,7 +29,7 @@ describe('hub/plugin-loader', function() {
   it('throws if project config is missing', function() {
     expect(() => {
       new Container(new Registry()).lookup('hub:plugin-loader');
-    }).to.throw("Failed to locate hub because config:project is not registered");
+    }).to.throw('Failed to locate hub because config:project is not registered');
   });
 
   it('throws if project config has no path', function() {
@@ -34,7 +37,7 @@ describe('hub/plugin-loader', function() {
     registry.register('config:project', {}, { instantiate: false });
     expect(() => {
       new Container(registry).lookup('hub:plugin-loader');
-    }).to.throw("Failed to locate hub because config:project does not contain a \"path\"");
+    }).to.throw('Failed to locate hub because config:project does not contain a "path"');
   });
 
   it('locates top-level plugins', async function() {
@@ -48,7 +51,7 @@ describe('hub/plugin-loader', function() {
   it('skips non-plugin dependencies', async function() {
     let plugins = await pluginLoader.installedPlugins();
     expect(plugins).not.collectionContains({
-      id: 'sample-non-plugin'
+      id: 'sample-non-plugin',
     });
   });
 
@@ -64,7 +67,7 @@ describe('hub/plugin-loader', function() {
   it('locates second-level plugins', async function() {
     let plugins = await pluginLoader.installedPlugins();
     expect(plugins).collectionContains({
-      id: 'sample-plugin-two'
+      id: 'sample-plugin-two',
     });
   });
 
@@ -97,7 +100,6 @@ describe('hub/plugin-loader', function() {
     expect(feature).has.property('isPluginTwoWriter');
   });
 
-
   it('identifies named features', function() {
     let feature = configuredPlugins.lookupFeatureAndAssert('field-types', 'sample-plugin-one::x');
     expect(feature).is.ok;
@@ -117,7 +119,7 @@ describe('hub/plugin-loader', function() {
   it('complains about unknown feature type', function() {
     try {
       configuredPlugins.lookupFeatureAndAssert('coffee-makers', 'sample-plugin-one::x');
-      throw new Error("should not get here");
+      throw new Error('should not get here');
     } catch (err) {
       expect(err.message).to.equal(`No such feature type "coffee-makers"`);
     }
@@ -126,28 +128,33 @@ describe('hub/plugin-loader', function() {
   it('can assert for missing feature', function() {
     try {
       configuredPlugins.lookupFeatureAndAssert('field-types', 'sample-plugin-one::y');
-      throw new Error("should not get here");
+      throw new Error('should not get here');
     } catch (err) {
-      expect(err.message).to.equal(`You're trying to use field-types sample-plugin-one::y but no such feature exists in plugin sample-plugin-one`);
+      expect(err.message).to.equal(
+        `You're trying to use field-types sample-plugin-one::y but no such feature exists in plugin sample-plugin-one`
+      );
     }
   });
-
 
   it('can assert for missing module', function() {
     try {
       configuredPlugins.lookupFeatureAndAssert('field-types', 'sample-plugin-three::y');
-      throw new Error("should not get here");
+      throw new Error('should not get here');
     } catch (err) {
-      expect(err.message).to.equal(`You're trying to use field-types sample-plugin-three::y but the plugin sample-plugin-three is not installed. Make sure it appears in the dependencies section of package.json`);
+      expect(err.message).to.equal(
+        `You're trying to use field-types sample-plugin-three::y but the plugin sample-plugin-three is not installed. Make sure it appears in the dependencies section of package.json`
+      );
     }
   });
 
   it('can assert for unactivated module', function() {
     try {
       configuredPlugins.lookupFeatureAndAssert('searchers', 'sample-plugin-four');
-      throw new Error("should not get here");
+      throw new Error('should not get here');
     } catch (err) {
-      expect(err.message).to.equal(`You're trying to use searchers sample-plugin-four but the plugin sample-plugin-four is not activated`);
+      expect(err.message).to.equal(
+        `You're trying to use searchers sample-plugin-four but the plugin sample-plugin-four is not activated`
+      );
     }
   });
 
@@ -155,7 +162,6 @@ describe('hub/plugin-loader', function() {
     let feature = configuredPlugins.lookupFeatureAndAssert('searchers', 'sample-plugin-five');
     expect(feature).is.ok;
     expect(feature).has.property('isPluginFiveSearcher');
-
   });
 
   it('lists all features of a given type (non-top naming)', function() {
@@ -182,9 +188,11 @@ describe('hub/plugin-loader', function() {
   it('can assert for unactivated factory', function() {
     try {
       configuredPlugins.lookupFeatureFactoryAndAssert('searchers', 'sample-plugin-four');
-      throw new Error("should not get here");
+      throw new Error('should not get here');
     } catch (err) {
-      expect(err.message).to.equal(`You're trying to use searchers sample-plugin-four but the plugin sample-plugin-four is not activated`);
+      expect(err.message).to.equal(
+        `You're trying to use searchers sample-plugin-four but the plugin sample-plugin-four is not activated`
+      );
     }
   });
 
@@ -194,7 +202,7 @@ describe('hub/plugin-loader', function() {
     // contains this in-repo plugin
     let plugins = await pluginLoader.installedPlugins();
     expect(plugins).collectionContains({
-      id: 'inner-plugin'
+      id: 'inner-plugin',
     });
   });
 
@@ -204,7 +212,7 @@ describe('hub/plugin-loader', function() {
     expect(one).has.deep.property('relationships.features.data');
     expect(one.relationships.features.data).collectionContains({
       type: 'field-types',
-      id: 'sample-plugin-one::x'
+      id: 'sample-plugin-one::x',
     });
   });
 
@@ -214,7 +222,7 @@ describe('hub/plugin-loader', function() {
     expect(x).has.deep.property('relationships.plugin.data');
     expect(x.relationships.plugin.data).deep.equals({
       type: 'plugins',
-      id: 'sample-plugin-one'
+      id: 'sample-plugin-one',
     });
   });
 
@@ -229,5 +237,4 @@ describe('hub/plugin-loader', function() {
     expect(feature).is.ok;
     expect(feature).has.property('isDeepMiddleware');
   });
-
 });

@@ -27,6 +27,4 @@ module.exports = class MockSearcher {
       return await this.dataSource.rewriteExternalUser(mockUser);
     }
   }
-
-
 };

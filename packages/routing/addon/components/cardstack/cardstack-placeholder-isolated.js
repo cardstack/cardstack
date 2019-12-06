@@ -3,5 +3,5 @@ import layout from '../../templates/components/cardstack/cardstack-placeholder-i
 
 export default Component.extend({
   layout,
-  classNames: ['cs-error-card']
+  classNames: ['cs-error-card'],
 });

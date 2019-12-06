@@ -31,21 +31,22 @@ module.exports = class RunningIndexers {
   }
 
   async _loadSchemaModels() {
-    let newDataSources = [...this.seedSchema.getDataSources().values()]
-        .map(this._sawDataSource.bind(this));
+    let newDataSources = [...this.seedSchema.getDataSources().values()].map(this._sawDataSource.bind(this));
 
     log.debug(`RunningIndexers._loadSchemaModels() found ${newDataSources.length} newDataSources`);
     while (newDataSources.length > 0) {
       let newSchemaModels = await this._activateDataSources(newDataSources);
-      newDataSources = newSchemaModels.map(model => {
-        log.debug("new schema model %s %s", model.type, model.id);
-        if (model.type === 'data-sources' && !this.seenDataSources[model.id]) {
-          log.debug("Discovered data source %s", model.id);
-          let dataSource = new DataSource(model, this.seedSchema.plugins);
-          this.ownedDataSources[model.id] = dataSource;
-          return this._sawDataSource(dataSource);
-        }
-      }).filter(Boolean);
+      newDataSources = newSchemaModels
+        .map(model => {
+          log.debug('new schema model %s %s', model.type, model.id);
+          if (model.type === 'data-sources' && !this.seenDataSources[model.id]) {
+            log.debug('Discovered data source %s', model.id);
+            let dataSource = new DataSource(model, this.seedSchema.plugins);
+            this.ownedDataSources[model.id] = dataSource;
+            return this._sawDataSource(dataSource);
+          }
+        })
+        .filter(Boolean);
     }
 
     let staticModels = flatten(this.staticModels);
@@ -54,29 +55,37 @@ module.exports = class RunningIndexers {
   }
 
   async _activateDataSources(dataSources) {
-    log.debug("=Activating data sources=\n%t", () => dataSources.map(source => {
-      return [ source.sourceType, source.id ];
-    }));
+    log.debug('=Activating data sources=\n%t', () =>
+      dataSources.map(source => {
+        return [source.sourceType, source.id];
+      })
+    );
     let newSchemaModels = [];
     let staticModelsDataSources = dataSources.filter(ds => ds.sourceType === '@cardstack/hub::static-models');
 
-    await Promise.all(dataSources.filter(ds => ds.sourceType !== '@cardstack/hub::static-models').map(async source => {
-      let indexer = source.indexer;
-      if (indexer) {
-        await Promise.all(staticModelsDataSources.map(async staticSource => {
-          newSchemaModels.push(await this.sourcesUpdater.addDataSource(staticSource));
-        }));
-        newSchemaModels.push(await this.sourcesUpdater.addDataSource(source));
-      }
-      if (source.staticModels.length > 0) {
-        // this ensures that static models can contain more data
-        // sources and they will actually get crawled correctly.
-        newSchemaModels.push(source.staticModels);
-        // and this is where we gather all staticModels until the next
-        // step where we will actually let them get indexed
-        this.staticModels.push(source.staticModels);
-      }
-    }));
+    await Promise.all(
+      dataSources
+        .filter(ds => ds.sourceType !== '@cardstack/hub::static-models')
+        .map(async source => {
+          let indexer = source.indexer;
+          if (indexer) {
+            await Promise.all(
+              staticModelsDataSources.map(async staticSource => {
+                newSchemaModels.push(await this.sourcesUpdater.addDataSource(staticSource));
+              })
+            );
+            newSchemaModels.push(await this.sourcesUpdater.addDataSource(source));
+          }
+          if (source.staticModels.length > 0) {
+            // this ensures that static models can contain more data
+            // sources and they will actually get crawled correctly.
+            newSchemaModels.push(source.staticModels);
+            // and this is where we gather all staticModels until the next
+            // step where we will actually let them get indexed
+            this.staticModels.push(source.staticModels);
+          }
+        })
+    );
     return flatten(newSchemaModels).filter(Boolean);
   }
 

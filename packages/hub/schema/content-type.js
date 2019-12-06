@@ -8,8 +8,16 @@ const log = require('@cardstack/logger')('cardstack/schema/content-type');
 const { resolveDocument } = require('@cardstack/plugin-utils/card-utils');
 
 module.exports = class ContentType {
-  constructor(model, allFields, allComputedFields, allConstraints, dataSources, defaultDataSource, allGrants, allGroups) {
-
+  constructor(
+    model,
+    allFields,
+    allComputedFields,
+    allConstraints,
+    dataSources,
+    defaultDataSource,
+    allGrants,
+    allGroups
+  ) {
     let realFields = new Map();
     let computedFields = new Map();
     let realAndComputedFields = new Map();
@@ -27,7 +35,7 @@ module.exports = class ContentType {
           log.error(`Error broken field:`, console.trace()); //eslint-disable-line no-console
           throw new Error(`content type "${model.id}" refers to missing field "${fieldRef.id}"`, {
             status: 400,
-            title: 'Broken field reference'
+            title: 'Broken field reference',
           });
         }
       }
@@ -56,10 +64,13 @@ module.exports = class ContentType {
     if (model.relationships && model.relationships['data-source'] && model.relationships['data-source'].data) {
       this.dataSource = dataSources.get(model.relationships['data-source'].data.id);
       if (!this.dataSource) {
-        throw new Error(`content type "${model.id}" refers to missing data source id "${model.relationships['data-source'].data.id}"`, {
-          status: 400,
-          title: 'Broken field reference'
-        });
+        throw new Error(
+          `content type "${model.id}" refers to missing data source id "${model.relationships['data-source'].data.id}"`,
+          {
+            status: 400,
+            title: 'Broken field reference',
+          }
+        );
       }
     } else if (defaultDataSource) {
       this.dataSource = dataSources.get(defaultDataSource.data.id);
@@ -69,7 +80,12 @@ module.exports = class ContentType {
     this.grants = allGrants.filter(g => g.types == null || g.types.includes(model.id));
     this._groups = allGroups.filter(g => g.types.includes(model.id));
     this._realms = null;
-    authLog.trace(`while constructing content type %s, %s of %s grants apply`, this.id, this.grants.length, allGrants.length);
+    authLog.trace(
+      `while constructing content type %s, %s of %s grants apply`,
+      this.id,
+      this.grants.length,
+      allGrants.length
+    );
     this.constraints = allConstraints.filter(constraint => {
       return Object.values(constraint.fieldInputs).some(field => this.realFields.get(field.id));
     });
@@ -88,10 +104,15 @@ module.exports = class ContentType {
       let fieldsets = model.attributes['fieldsets'];
       for (let format of Object.keys(fieldsets)) {
         if (!Array.isArray(fieldsets[format])) {
-          throw new Error(`content type "${model.id}" contains fieldset for format "${format}" that is not an array: "${JSON.stringify(fieldsets[format])}"`, {
-            status: 400,
-            title: 'Invalid fieldset'
-          });
+          throw new Error(
+            `content type "${
+              model.id
+            }" contains fieldset for format "${format}" that is not an array: "${JSON.stringify(fieldsets[format])}"`,
+            {
+              status: 400,
+              title: 'Invalid fieldset',
+            }
+          );
         }
       }
       this.fieldsets = fieldsets;
@@ -157,15 +178,21 @@ module.exports = class ContentType {
   }
 
   async _checkConstraints(pendingChange, badFields) {
-    let activeConstraints = this.constraints.filter(constraint => Object.values(constraint.fieldInputs).every(field => !badFields[field.id]));
-    return flatten(await Promise.all(activeConstraints.map(constraint => constraint.validationErrors(pendingChange, this.realFields))));
+    let activeConstraints = this.constraints.filter(constraint =>
+      Object.values(constraint.fieldInputs).every(field => !badFields[field.id])
+    );
+    return flatten(
+      await Promise.all(
+        activeConstraints.map(constraint => constraint.validationErrors(pendingChange, this.realFields))
+      )
+    );
   }
 
   _unknownFieldError(fieldName, section) {
     return new Error(`type "${this.id}" has no field named "${fieldName}"`, {
       status: 400,
       title: 'Validation error',
-      source: { pointer: `/data/${section}/${fieldName}` }
+      source: { pointer: `/data/${section}/${fieldName}` },
     });
   }
 
@@ -175,8 +202,8 @@ module.exports = class ContentType {
     originalDocument = resolveDocument(originalDocument);
 
     if (finalDocument.attributes) {
-      let originalFields = originalDocument && originalDocument.attributes
-        ? Object.keys(originalDocument.attributes) : [];
+      let originalFields =
+        originalDocument && originalDocument.attributes ? Object.keys(originalDocument.attributes) : [];
 
       for (let fieldName of Object.keys(finalDocument.attributes)) {
         if (!this.realFields.has(fieldName) && !originalFields.includes(fieldName)) {
@@ -186,8 +213,8 @@ module.exports = class ContentType {
     }
 
     if (finalDocument.relationships) {
-      let originalFields = originalDocument && originalDocument.relationships
-        ? Object.keys(originalDocument.relationships) : [];
+      let originalFields =
+        originalDocument && originalDocument.relationships ? Object.keys(originalDocument.relationships) : [];
 
       for (let fieldName of Object.keys(finalDocument.relationships)) {
         if (!this.realFields.has(fieldName) && !originalFields.includes(fieldName)) {
@@ -202,18 +229,22 @@ module.exports = class ContentType {
       if (!g[permission]) {
         return false;
       }
-      let documentMatches = await Promise.all(documentContexts.map(documentContext => g.matches(documentContext, context)));
+      let documentMatches = await Promise.all(
+        documentContexts.map(documentContext => g.matches(documentContext, context))
+      );
       return documentMatches.every(Boolean);
     });
     if (grant) {
-      authLog.debug("approved %s of %s %s because of grant %s",
+      authLog.debug(
+        'approved %s of %s %s because of grant %s',
         description,
         documentContexts[0] ? documentContexts[0].type : '-undefined-',
         documentContexts[0] ? documentContexts[0].id : '-undefined-',
-        grant.id);
-      authLog.trace("grant %s = %j", grant.id, grant);
+        grant.id
+      );
+      authLog.trace('grant %s = %j', grant.id, grant);
     } else {
-      authLog.trace("no matching %s grant for %j in %j", description, context, this.grants);
+      authLog.trace('no matching %s grant for %j in %j', description, context, this.grants);
       if (permission === 'may-read-resource') {
         throw new Error(`Not found`, { status: 404 });
       } else {
@@ -230,7 +261,12 @@ module.exports = class ContentType {
       await this._assertGrant([finalDocumentContext], context, 'may-read-resource', 'read (during create)');
       await this._assertGrant([finalDocumentContext], context, 'may-create-resource', 'create');
     } else {
-      await this._assertGrant([finalDocumentContext, originalDocumentContext], context, 'may-read-resource', 'read (during update)');
+      await this._assertGrant(
+        [finalDocumentContext, originalDocumentContext],
+        context,
+        'may-read-resource',
+        'read (during update)'
+      );
       await this._assertGrant([originalDocumentContext], context, 'may-update-resource', 'update');
     }
   }
@@ -259,7 +295,7 @@ module.exports = class ContentType {
   }
 
   async applyReadAuthorization(documentContext, userRealms) {
-    if (!await this.realms.mayReadResource(documentContext, userRealms)) {
+    if (!(await this.realms.mayReadResource(documentContext, userRealms))) {
       return;
     }
     let resource = (await documentContext.pristineDoc()).data;
@@ -298,7 +334,7 @@ module.exports = class ContentType {
     for (let section of ['attributes', 'relationships']) {
       if (resource[section]) {
         for (let fieldName of Object.keys(resource[section])) {
-          if (!await this.realms.hasExplicitFieldGrant(pendingChange.finalDocumentContext, userRealms, fieldName)) {
+          if (!(await this.realms.hasExplicitFieldGrant(pendingChange.finalDocumentContext, userRealms, fieldName))) {
             errors.push(this._unknownFieldError(fieldName, section));
             badFields[fieldName] = true;
           }

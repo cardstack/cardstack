@@ -1,3 +1,3 @@
 module.exports = {
-  "name": "@cardstack/jsonapi"
+  name: '@cardstack/jsonapi',
 };

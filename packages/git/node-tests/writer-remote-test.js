@@ -1,15 +1,6 @@
-const {
-  Cred,
-  Clone,
-  Remote,
-  Repository,
-  Revwalk
-} = require('nodegit');
+const { Cred, Clone, Remote, Repository, Revwalk } = require('nodegit');
 
-const {
-  createDefaultEnvironment,
-  destroyDefaultEnvironment
-} = require('@cardstack/test-support/env');
+const { createDefaultEnvironment, destroyDefaultEnvironment } = require('@cardstack/test-support/env');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const { join } = require('path');
 const { readFileSync } = require('fs');
@@ -29,30 +20,38 @@ const fetchOpts = {
   callbacks: {
     credentials: (url, userName) => {
       return Cred.sshKeyMemoryNew(userName, '', privateKey, '');
-    }
-  }
+    },
+  },
 };
 
 async function resetRemote() {
   let root = await temp.mkdir('cardstack-server-test');
 
   let tempRepo = await makeRepo(root, {
-    'contents/events/event-1.json': JSON.stringify({
-      attributes: {
-        title: "This is a test event",
-        'published-date': "2018-09-25"
-      }
-    }, null, 2),
-    'contents/events/event-2.json': JSON.stringify({
-      attributes: {
-        title: "This is another test event",
-        "published-date": "2018-10-25"
-      }
-    }, null, 2)
+    'contents/events/event-1.json': JSON.stringify(
+      {
+        attributes: {
+          title: 'This is a test event',
+          'published-date': '2018-09-25',
+        },
+      },
+      null,
+      2
+    ),
+    'contents/events/event-2.json': JSON.stringify(
+      {
+        attributes: {
+          title: 'This is another test event',
+          'published-date': '2018-10-25',
+        },
+      },
+      null,
+      2
+    ),
   });
 
   let remote = await Remote.create(tempRepo.repo, 'origin', 'ssh://root@localhost:9022/root/data-test');
-  await remote.push(["+refs/heads/master:refs/heads/master"], fetchOpts);
+  await remote.push(['+refs/heads/master:refs/heads/master'], fetchOpts);
   return tempRepo;
 }
 
@@ -74,23 +73,24 @@ describe('git/writer with remote', function() {
       fetchOpts,
     });
 
-    let dataSource = factory.addResource('data-sources')
-        .withAttributes({
-          'source-type': '@cardstack/git',
-          params: {
-            remote: {
-              url: 'ssh://root@localhost:9022/root/data-test',
-              privateKey,
-              cacheDir: tempRepoPath,
-            }
-          }
-        });
+    let dataSource = factory.addResource('data-sources').withAttributes({
+      'source-type': '@cardstack/git',
+      params: {
+        remote: {
+          url: 'ssh://root@localhost:9022/root/data-test',
+          privateKey,
+          cacheDir: tempRepoPath,
+        },
+      },
+    });
 
-    factory.addResource('content-types', 'events')
+    factory
+      .addResource('content-types', 'events')
       .withRelated('fields', [
         factory.addResource('fields', 'title').withAttributes({ fieldType: '@cardstack/core-types::string' }),
-        factory.addResource('fields', 'published-date').withAttributes({ fieldType: '@cardstack/core-types::string' })
-      ]).withRelated('data-source', dataSource);
+        factory.addResource('fields', 'published-date').withAttributes({ fieldType: '@cardstack/core-types::string' }),
+      ])
+      .withRelated('data-source', dataSource);
 
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
     writers = env.lookup('hub:writers');
@@ -103,44 +103,48 @@ describe('git/writer with remote', function() {
   });
 
   describe('create', function() {
-    it('saves attributes', async function () {
-      let { data:record } = await writers.create(env.session, 'events', {
+    it('saves attributes', async function() {
+      let { data: record } = await writers.create(env.session, 'events', {
         data: {
           type: 'events',
           attributes: {
             title: 'Second Event',
             'published-date': '2018-09-01',
-          }
-        }
+          },
+        },
       });
       await repo.fetch('origin', fetchOpts);
-      let saved = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/${record.id}.json`);
+      let saved = await inRepo(tempRemoteRepoPath).getJSONContents(
+        'origin/master',
+        `contents/events/${record.id}.json`
+      );
       expect(saved).to.deep.equal({
         attributes: {
           title: 'Second Event',
           'published-date': '2018-09-01',
-        }
+        },
       });
     });
   });
 
   describe('update', function() {
     it('returns updated document', async function() {
-      let { data:record } = await writers.update(env.session, 'events', 'event-1', {
+      let { data: record } = await writers.update(env.session, 'events', 'event-1', {
         data: {
           id: 'event-1',
           type: 'events',
           attributes: {
-            title: 'Updated title'
+            title: 'Updated title',
           },
           meta: {
-            version: head
-          }
-        }
+            version: head,
+          },
+        },
       });
       expect(record).has.deep.property('attributes.title', 'Updated title');
-      expect(record).has.deep.property('meta.version').not.equal(head);
-
+      expect(record)
+        .has.deep.property('meta.version')
+        .not.equal(head);
 
       await repo.fetch('origin', fetchOpts);
       let updated = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/event-1.json`);
@@ -149,7 +153,7 @@ describe('git/writer with remote', function() {
         attributes: {
           title: 'Updated title',
           'published-date': '2018-09-25',
-        }
+        },
       });
     });
 
@@ -160,22 +164,24 @@ describe('git/writer with remote', function() {
 
       let file = await change.get('contents/events/event-2.json', { allowUpdate: true });
 
-      file.setContent(JSON.stringify({
-        attributes: {
-          title: "This is a test event",
-          'published-date': "2019-09-25"
-        }
-      }));
+      file.setContent(
+        JSON.stringify({
+          attributes: {
+            title: 'This is a test event',
+            'published-date': '2019-09-25',
+          },
+        })
+      );
 
       await change.finalize({
         authorName: 'John Milton',
         authorEmail: 'john@paradiselost.com',
-        message: 'I probably shouldnt update this out of sync'
+        message: 'I probably shouldnt update this out of sync',
       });
 
       await remoteRepo.getRemote('origin');
 
-      let { data:record } = await writers.update(env.session, 'events', 'event-1', {
+      let { data: record } = await writers.update(env.session, 'events', 'event-1', {
         data: {
           id: 'event-1',
           type: 'events',
@@ -183,13 +189,14 @@ describe('git/writer with remote', function() {
             title: 'Updated title',
           },
           meta: {
-            version: head
-          }
-        }
+            version: head,
+          },
+        },
       });
       expect(record).has.deep.property('attributes.title', 'Updated title');
-      expect(record).has.deep.property('meta.version').not.equal(head);
-
+      expect(record)
+        .has.deep.property('meta.version')
+        .not.equal(head);
 
       await repo.fetch('origin', fetchOpts);
       let updated = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/event-1.json`);
@@ -198,7 +205,7 @@ describe('git/writer with remote', function() {
         attributes: {
           title: 'Updated title',
           'published-date': '2018-09-25',
-        }
+        },
       });
     });
 
@@ -209,37 +216,44 @@ describe('git/writer with remote', function() {
 
       let file = await change.get('contents/events/event-1.json', { allowUpdate: true });
 
-      file.setContent(JSON.stringify({
-        attributes: {
-          title: "This is a test event",
-          'published-date': "2018-09-25"
-        }
-      }, null, 2));
+      file.setContent(
+        JSON.stringify(
+          {
+            attributes: {
+              title: 'This is a test event',
+              'published-date': '2018-09-25',
+            },
+          },
+          null,
+          2
+        )
+      );
 
       await change.finalize({
         authorName: 'John Milton',
         authorEmail: 'john@paradiselost.com',
-        message: 'I probably shouldnt update this out of sync'
+        message: 'I probably shouldnt update this out of sync',
       });
 
       let remote = await remoteRepo.getRemote('origin');
-      await remote.push(["refs/heads/master:refs/heads/master"], fetchOpts);
+      await remote.push(['refs/heads/master:refs/heads/master'], fetchOpts);
 
-      let { data:record } = await writers.update(env.session, 'events', 'event-1', {
+      let { data: record } = await writers.update(env.session, 'events', 'event-1', {
         data: {
           id: 'event-1',
           type: 'events',
           attributes: {
-            title: 'Updated title'
+            title: 'Updated title',
           },
           meta: {
-            version: head
-          }
-        }
+            version: head,
+          },
+        },
       });
       expect(record).has.deep.property('attributes.title', 'Updated title');
-      expect(record).has.deep.property('meta.version').not.equal(head);
-
+      expect(record)
+        .has.deep.property('meta.version')
+        .not.equal(head);
 
       await repo.fetch('origin', fetchOpts);
       let updated = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/event-1.json`);
@@ -248,7 +262,7 @@ describe('git/writer with remote', function() {
         attributes: {
           title: 'Updated title',
           'published-date': '2018-09-25',
-        }
+        },
       });
     });
   });
@@ -276,7 +290,7 @@ describe('git/writer with empty remote', function() {
     let { repo: remoteRepo } = await makeRepo(root);
 
     let remote = await Remote.create(remoteRepo, 'origin', 'ssh://root@localhost:9022/root/data-test');
-    await remote.push(["+refs/heads/master:refs/heads/master"], fetchOpts);
+    await remote.push(['+refs/heads/master:refs/heads/master'], fetchOpts);
 
     let factory = new JSONAPIFactory();
 
@@ -287,23 +301,24 @@ describe('git/writer with empty remote', function() {
       fetchOpts,
     });
 
-    let dataSource = factory.addResource('data-sources')
-        .withAttributes({
-          'source-type': '@cardstack/git',
-          params: {
-            remote: {
-              url: 'ssh://root@localhost:9022/root/data-test',
-              privateKey,
-              cacheDir: tempRepoPath,
-            }
-          }
-        });
+    let dataSource = factory.addResource('data-sources').withAttributes({
+      'source-type': '@cardstack/git',
+      params: {
+        remote: {
+          url: 'ssh://root@localhost:9022/root/data-test',
+          privateKey,
+          cacheDir: tempRepoPath,
+        },
+      },
+    });
 
-    factory.addResource('content-types', 'events')
+    factory
+      .addResource('content-types', 'events')
       .withRelated('fields', [
         factory.addResource('fields', 'title').withAttributes({ fieldType: '@cardstack/core-types::string' }),
-        factory.addResource('fields', 'published-date').withAttributes({ fieldType: '@cardstack/core-types::string' })
-      ]).withRelated('data-source', dataSource);
+        factory.addResource('fields', 'published-date').withAttributes({ fieldType: '@cardstack/core-types::string' }),
+      ])
+      .withRelated('data-source', dataSource);
 
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
     writers = env.lookup('hub:writers');
@@ -316,36 +331,36 @@ describe('git/writer with empty remote', function() {
   });
 
   describe('create', function() {
-    it('allows you to create a record in an empty git repo', async function () {
-      let { data:record } = await writers.create(env.session, 'events', {
+    it('allows you to create a record in an empty git repo', async function() {
+      let { data: record } = await writers.create(env.session, 'events', {
         data: {
           type: 'events',
           attributes: {
             title: 'Fresh Event',
             'published-date': '2018-09-01',
-          }
-        }
+          },
+        },
       });
       await repo.fetch('origin', fetchOpts);
-      let saved = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/${record.id}.json`);
+      let saved = await inRepo(tempRemoteRepoPath).getJSONContents(
+        'origin/master',
+        `contents/events/${record.id}.json`
+      );
       expect(saved).to.deep.equal({
         attributes: {
           title: 'Fresh Event',
           'published-date': '2018-09-01',
-        }
+        },
       });
     });
   });
 });
-
-
 
 describe('git/writer-remote/githereum', function() {
   let env, writers, tempRepoPath, tempRemoteRepoPath, githereum, fakeContract, writer;
   this.timeout(20000);
 
   beforeEach(async function() {
-
     await resetRemote();
 
     let factory = new JSONAPIFactory();
@@ -357,29 +372,31 @@ describe('git/writer-remote/githereum', function() {
       fetchOpts,
     });
 
-    let dataSource = factory.addResource('data-sources', 'git')
-        .withAttributes({
-          'source-type': '@cardstack/git',
-          params: {
-            remote: {
-              url: 'ssh://root@localhost:9022/root/data-test',
-              privateKey,
-              cacheDir: tempRepoPath,
-            },
-            githereum: {
-              contractAddress: '0xD8B92BE4420Fe70b62FF5e5F8eE5CF87871952e1',
-              tag: 'test-tag',
-              repoName: 'githereum-repo'
-            }
-          }
-        });
+    let dataSource = factory.addResource('data-sources', 'git').withAttributes({
+      'source-type': '@cardstack/git',
+      params: {
+        remote: {
+          url: 'ssh://root@localhost:9022/root/data-test',
+          privateKey,
+          cacheDir: tempRepoPath,
+        },
+        githereum: {
+          contractAddress: '0xD8B92BE4420Fe70b62FF5e5F8eE5CF87871952e1',
+          tag: 'test-tag',
+          repoName: 'githereum-repo',
+        },
+      },
+    });
 
-
-    factory.addResource('content-types', 'articles')
+    factory
+      .addResource('content-types', 'articles')
       .withRelated('fields', [
         factory.addResource('fields', 'title').withAttributes({ fieldType: '@cardstack/core-types::string' }),
-        factory.addResource('fields', 'primary-image').withAttributes({ fieldType: '@cardstack/core-types::belongs-to' })
-      ]).withRelated('data-source', dataSource);
+        factory
+          .addResource('fields', 'primary-image')
+          .withAttributes({ fieldType: '@cardstack/core-types::belongs-to' }),
+      ])
+      .withRelated('data-source', dataSource);
 
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
     writers = env.lookup('hub:writers');
@@ -391,7 +408,6 @@ describe('git/writer-remote/githereum', function() {
     replace(writer, '_getGithereumContract', fake.returns(fakeContract));
     await writer._ensureGithereum();
     githereum = writer.githereum;
-
   });
 
   afterEach(async function() {
@@ -400,8 +416,7 @@ describe('git/writer-remote/githereum', function() {
     service.clearCache();
   });
 
-
-  it('writes to githereum if configured when writing', async function () {
+  it('writes to githereum if configured when writing', async function() {
     let fakePush = fake.returns(new Promise(resolve => resolve()));
 
     replace(githereum, 'push', fakePush);
@@ -410,9 +425,9 @@ describe('git/writer-remote/githereum', function() {
       data: {
         type: 'articles',
         attributes: {
-          title: 'An article'
-        }
-      }
+          title: 'An article',
+        },
+      },
     });
 
     let repo = await Repository.open(githereum.repoPath);
@@ -421,7 +436,7 @@ describe('git/writer-remote/githereum', function() {
 
     await new Promise((resolve, reject) => {
       let history = firstCommitOnMaster.history(Revwalk.SORT.TIME);
-      history.on("commit", () => commitCount += 1);
+      history.on('commit', () => (commitCount += 1));
       history.on('end', resolve);
       history.on('error', reject);
       history.start();
@@ -430,12 +445,10 @@ describe('git/writer-remote/githereum', function() {
     expect(commitCount).to.equal(2);
 
     expect(githereum.contract).to.equal(fakeContract);
-    expect(githereum.repoName).to.equal("githereum-repo");
-
+    expect(githereum.repoName).to.equal('githereum-repo');
 
     // push is called with the correct tag
     expect(fakePush.callCount).to.equal(1);
     expect(fakePush.calledWith('test-tag')).to.be.ok;
   });
-
 });

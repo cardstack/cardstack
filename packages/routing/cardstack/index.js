@@ -3,14 +3,18 @@ const { get, uniq } = require('lodash');
 
 async function getRoute(searchers, router, path, applicationCard, session) {
   let query;
-  let { route: matchedRoute,
+  let {
+    route: matchedRoute,
     remainingPath,
     params,
     routingCard,
     routingCardsCache,
-    allowedQueryParams } = await routeThatMatchesPath(searchers, router, path, applicationCard);
+    allowedQueryParams,
+  } = await routeThatMatchesPath(searchers, router, path, applicationCard);
 
-  if (!matchedRoute) { return; }
+  if (!matchedRoute) {
+    return;
+  }
 
   routingCard = routingCard || applicationCard;
 
@@ -21,11 +25,15 @@ async function getRoute(searchers, router, path, applicationCard, session) {
     }
   }
 
-  let routeStack = [ `${routingCard.data.type}/${routingCard.data.id}` ].concat(matchedRoute.routeStack.map(({contentType}) => {
-    let card = get(routingCardsCache, `antecedantResolution.${contentType}`);
-    if (!card) { return; }
-    return `${card.data.type}/${card.data.id}`;
-  }));
+  let routeStack = [`${routingCard.data.type}/${routingCard.data.id}`].concat(
+    matchedRoute.routeStack.map(({ contentType }) => {
+      let card = get(routingCardsCache, `antecedantResolution.${contentType}`);
+      if (!card) {
+        return;
+      }
+      return `${card.data.type}/${card.data.id}`;
+    })
+  );
 
   if (routeStack.filter(r => !r).length) {
     // interior routing card cannot be found, consider the route unmatched
@@ -43,31 +51,41 @@ async function getRoute(searchers, router, path, applicationCard, session) {
     params,
     allowedQueryParams,
     routingCard,
-    routeStack
+    routeStack,
   };
 }
 
 function isCanonicalRoute(route) {
-  if (!route.query ||
-      route.path === '/' ||
-      typeof route.query.filter !== 'object' ||
-      Object.keys(route.query.filter).length !== 2) { return false; }
+  if (
+    !route.query ||
+    route.path === '/' ||
+    typeof route.query.filter !== 'object' ||
+    Object.keys(route.query.filter).length !== 2
+  ) {
+    return false;
+  }
 
   let filter = route.query.filter;
   let typePredicate = filter.type;
   let idPredicate = filter.id;
 
-  if (!typePredicate || !typePredicate.exact) { return false; }
+  if (!typePredicate || !typePredicate.exact) {
+    return false;
+  }
 
-  if (idPredicate && idPredicate.exact) { return true; }
+  if (idPredicate && idPredicate.exact) {
+    return true;
+  }
 
   let uniqueFieldName = Object.keys(filter).find(i => i !== 'type');
 
   return uniqueFieldName.exact === ':friendly_id';
 }
 
-async function buildRoutingCardsCache({ searchers, resolvedPath, context, applicationCard, routeStack=[] }) {
-  if (!searchers) { return {}; }
+async function buildRoutingCardsCache({ searchers, resolvedPath, context, applicationCard, routeStack = [] }) {
+  if (!searchers) {
+    return {};
+  }
 
   let routingCards = { antecedantResolution: {}, cardResolution: {} };
   let typeRegex = /:(?!card:)[\w-]+\[([^\]]+)\]/g;
@@ -88,11 +106,19 @@ async function buildRoutingCardsCache({ searchers, resolvedPath, context, applic
       }
 
       for (let route of [cardRoute, fieldRoute].filter(i => Boolean(i))) {
-        if (!route.query) { continue; }
+        if (!route.query) {
+          continue;
+        }
 
-        let query = resolvedPath ? resolveReplacementTagsFromPath(route, resolvedPath, JSON.stringify(route.query)) : JSON.stringify(route.query);
+        let query = resolvedPath
+          ? resolveReplacementTagsFromPath(route, resolvedPath, JSON.stringify(route.query))
+          : JSON.stringify(route.query);
         if (query.includes(':card:')) {
-          query = resolveRoutingCardReplacementTags(get(routingCards, `antecedantResolution.${route.contentType}`), query, routingCards);
+          query = resolveRoutingCardReplacementTags(
+            get(routingCards, `antecedantResolution.${route.contentType}`),
+            query,
+            routingCards
+          );
         }
         let { data: cards } = await searchers.search(Session.INTERNAL_PRIVILEGED, JSON.parse(query));
         if (cards.length) {
@@ -112,7 +138,9 @@ async function buildRoutingCardsCache({ searchers, resolvedPath, context, applic
 function replaceNamespacedField(routingCard, routingCards, resolutionType) {
   return (match, field, typeTag, type) => {
     let card = get(routingCards, `${resolutionType}.${type}`) || routingCard;
-    if (!card) { return match; }
+    if (!card) {
+      return match;
+    }
 
     if (field === 'id') {
       return card.data.id;
@@ -128,11 +156,16 @@ function replaceNamespacedField(routingCard, routingCards, resolutionType) {
   };
 }
 
-function resolveRoutingCardReplacementTags(routingCard, stringToResolve, routingCards={}) {
-  if (!stringToResolve) { return stringToResolve; }
+function resolveRoutingCardReplacementTags(routingCard, stringToResolve, routingCards = {}) {
+  if (!stringToResolve) {
+    return stringToResolve;
+  }
 
   return stringToResolve
-    .replace(/:card:([\w-]+)(\[([^\]]+)\])?/g, replaceNamespacedField(routingCard, routingCards, 'antecedantResolution'))
+    .replace(
+      /:card:([\w-]+)(\[([^\]]+)\])?/g,
+      replaceNamespacedField(routingCard, routingCards, 'antecedantResolution')
+    )
     .replace(/:([\w-]+)(\[([^\]]+)\])/g, replaceNamespacedField(routingCard, routingCards, 'cardResolution'));
 }
 
@@ -141,19 +174,28 @@ function resolveReplacementTagsFromPath(route, path, string, session) {
   let dictionary = buildSubstitutionDictionary(route, path, session);
 
   for (let dynamicSegmentName of Object.keys(dictionary)) {
-    result = result.replace(new RegExp(`:${dynamicSegmentName.replace(/([[\]])/g, '\\$1')}`, 'g'), dictionary[dynamicSegmentName]);
+    result = result.replace(
+      new RegExp(`:${dynamicSegmentName.replace(/([[\]])/g, '\\$1')}`, 'g'),
+      dictionary[dynamicSegmentName]
+    );
   }
   return result;
 }
 
-async function getRoutingCardForRoute(searchers, route, path, routingCardsCache={}) {
+async function getRoutingCardForRoute(searchers, route, path, routingCardsCache = {}) {
   for (let parentRoute of route.routeStack) {
-    if (!parentRoute.query) { continue; }
+    if (!parentRoute.query) {
+      continue;
+    }
 
     let query = resolveReplacementTagsFromPath(parentRoute, path, JSON.stringify(parentRoute.query));
     let routingCardType = route.routeStack.length ? route.routeStack[0].contentType : null;
-    query = resolveRoutingCardReplacementTags(get(routingCardsCache, `antecedantResolution.${routingCardType}`), query, routingCardsCache);
-    let { data:routingCards } = await searchers.search(Session.INTERNAL_PRIVILEGED, JSON.parse(query));
+    query = resolveRoutingCardReplacementTags(
+      get(routingCardsCache, `antecedantResolution.${routingCardType}`),
+      query,
+      routingCardsCache
+    );
+    let { data: routingCards } = await searchers.search(Session.INTERNAL_PRIVILEGED, JSON.parse(query));
     return routingCards.length ? { data: routingCards[0] } : null;
   }
 }
@@ -231,7 +273,9 @@ async function routeThatMatchesPath(searchers, router, path, applicationCard) {
         }
       }
 
-      if (!route.query && (!routingCard || routingCard.data.type !== route.contentType)) { continue; }
+      if (!route.query && (!routingCard || routingCard.data.type !== route.contentType)) {
+        continue;
+      }
 
       matchedRoute = route;
       remainingPath = decodeURI(remainingPath).replace(pathRegex, '');
@@ -246,8 +290,22 @@ async function routeThatMatchesPath(searchers, router, path, applicationCard) {
       }
 
       if (matchedRoute.additionalParams) {
-        let resolvedAdditionalParams = resolveReplacementTagsFromPath(matchedRoute, path, JSON.stringify(matchedRoute.additionalParams));
-        params = Object.assign({}, params, JSON.parse(resolveRoutingCardReplacementTags(routingCard || applicationCard, resolvedAdditionalParams, routingCardsCache)));
+        let resolvedAdditionalParams = resolveReplacementTagsFromPath(
+          matchedRoute,
+          path,
+          JSON.stringify(matchedRoute.additionalParams)
+        );
+        params = Object.assign(
+          {},
+          params,
+          JSON.parse(
+            resolveRoutingCardReplacementTags(
+              routingCard || applicationCard,
+              resolvedAdditionalParams,
+              routingCardsCache
+            )
+          )
+        );
       }
 
       if (matchedRoute.path.includes('?')) {
@@ -256,14 +314,18 @@ async function routeThatMatchesPath(searchers, router, path, applicationCard) {
       }
 
       let routePathSegment = resolveReplacementTagsFromPath(matchedRoute, path, matchedRoute.routePathSegment);
-      routePathSegment = resolveRoutingCardReplacementTags(routingCard, routePathSegment, routingCardsCache).split("?")[0];
+      routePathSegment = resolveRoutingCardReplacementTags(routingCard, routePathSegment, routingCardsCache).split(
+        '?'
+      )[0];
       let matchedQueryParams = [];
       for (let queryParam of allowedQueryParams) {
         if (params[queryParam]) {
           matchedQueryParams.push(`${queryParam}=${params[queryParam]}`);
         }
       }
-      params.path = matchedQueryParams.length ? `${routePathSegment}?${matchedQueryParams.join('&')}` : routePathSegment;
+      params.path = matchedQueryParams.length
+        ? `${routePathSegment}?${matchedQueryParams.join('&')}`
+        : routePathSegment;
 
       break;
     }
@@ -275,5 +337,5 @@ async function routeThatMatchesPath(searchers, router, path, applicationCard) {
 module.exports = {
   getRoute,
   isCanonicalRoute,
-  resolveRoutingCardReplacementTags
+  resolveRoutingCardReplacementTags,
 };

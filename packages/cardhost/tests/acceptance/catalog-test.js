@@ -1,8 +1,7 @@
-
 import { module, test } from 'qunit';
 import { click, visit, currentURL, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
-import Fixtures from '@cardstack/test-support/fixtures'
+import Fixtures from '@cardstack/test-support/fixtures';
 import { createCards } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -23,16 +22,16 @@ const scenario = new Fixtures({
     return [
       { type: 'cards', id: qualifiedCard1Id },
       { type: 'cards', id: qualifiedCard2Id },
-      { type: 'cards', id: qualifiedCard3Id }
+      { type: 'cards', id: qualifiedCard3Id },
     ];
-  }
+  },
 });
 
 module('Acceptance | catalog', function(hooks) {
   setupApplicationTest(hooks);
   scenario.setupTest(hooks);
 
-  hooks.beforeEach(async function () {
+  hooks.beforeEach(async function() {
     this.owner.lookup('service:data')._clearCache();
     // Until we have searching capabilities, we'll just render the contents of the
     // local store. So the first step is to warm up the store.
@@ -50,7 +49,7 @@ module('Acceptance | catalog', function(hooks) {
         ['title', 'string', true, 'The Millenial Puppy'],
         ['author', 'related card', true, card2Id],
         ['reviewers', 'related cards', true, `${card2Id},${card3Id}`],
-      ]
+      ],
     });
     await visit(`/cards/${card1Id}`);
   });

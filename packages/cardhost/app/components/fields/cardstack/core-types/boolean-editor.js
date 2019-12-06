@@ -22,7 +22,7 @@ export default class BooleanEditor extends BaseEditor {
   }
 
   @action
-  updateFieldValue({ target: { id }}) {
+  updateFieldValue({ target: { id } }) {
     let value = id.includes('true');
     this.fieldValue = value;
     this.args.setFieldValue(value);

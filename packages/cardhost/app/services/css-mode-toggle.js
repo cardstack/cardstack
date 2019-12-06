@@ -4,7 +4,7 @@ import { action } from '@ember/object';
 
 export default class CssModeToggleService extends Service {
   @tracked editingCss;
-  @tracked dockLocation = "right";
+  @tracked dockLocation = 'right';
 
   setEditingCss(value) {
     this.editingCss = value;
@@ -12,11 +12,11 @@ export default class CssModeToggleService extends Service {
 
   @action
   dockRight() {
-    this.dockLocation = "right";
+    this.dockLocation = 'right';
   }
 
   @action
   dockBottom() {
-    this.dockLocation = "bottom";
+    this.dockLocation = 'bottom';
   }
 }

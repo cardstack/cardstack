@@ -4,7 +4,7 @@
 const child_process = require('child_process');
 
 function runDocker(...args) {
-  let result = child_process.spawnSync("docker", args, { encoding: 'utf8' });
+  let result = child_process.spawnSync('docker', args, { encoding: 'utf8' });
   if (result.status !== 0) {
     throw new Error(`Docker died running ${args.join(' ')}: ${result.stderr}`);
   }
@@ -13,7 +13,7 @@ function runDocker(...args) {
 
 function getServiceId() {
   let result = runDocker('stack', 'services', 'hub', '--filter', 'name=hub', '--format', '{{.ID}}');
-  return result.split("\n")[0];
+  return result.split('\n')[0];
 }
 
 function safeGet(obj, ...paths) {
@@ -38,7 +38,7 @@ async function timeout(ms) {
 async function main() {
   let targetLabel = process.argv[2];
   if (!targetLabel) {
-    process.stderr.write("You must pass the desired label as an argument\n");
+    process.stderr.write('You must pass the desired label as an argument\n');
     process.exit(-1);
   }
   let serviceId = getServiceId();
@@ -51,7 +51,7 @@ async function main() {
     }
     process.stdout.write(`Still waiting to see ${targetLabel}\n`);
     if (Date.now() - startTime > 120000) {
-      process.stderr.write("More than 150 seconds elapsed and we never saw our new label\n");
+      process.stderr.write('More than 150 seconds elapsed and we never saw our new label\n');
       process.exit(-1);
     }
     await timeout(1000);
@@ -82,8 +82,6 @@ async function main() {
     process.stdout.write(`Waiting. status=${status}\n`);
     await timeout(5000);
   }
-
-
 }
 
 main().catch(err => {

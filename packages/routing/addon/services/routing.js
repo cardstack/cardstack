@@ -5,7 +5,7 @@ export default Service.extend({
   routeFor(path) {
     return {
       name: 'cardstack.content',
-      params: [ ['path', path] ],
+      params: [['path', path]],
     };
   },
 
@@ -13,12 +13,11 @@ export default Service.extend({
     type = pluralize(type);
     return {
       name: 'cardstack.new-content',
-      params: [ ['type', type] ],
-    }
+      params: [['type', type]],
+    };
   },
 
   modelType(type) {
     return singularize(type);
-  }
-
+  },
 });

@@ -13,20 +13,14 @@ module.exports = Object.assign({}, browser, {
         'cardstack/**/*.js',
         'config/**/*.js',
         'tests/dummy/config/**/*.js',
-        'tests/dummy/cardstack/**/*.js'
+        'tests/dummy/cardstack/**/*.js',
       ],
-      excludedFiles: [
-        'app/**',
-        'addon/**',
-        'tests/dummy/app/**'
-      ]
+      excludedFiles: ['app/**', 'addon/**', 'tests/dummy/app/**'],
     }),
 
     // And this loads our node tests rules
     Object.assign({}, require('./test'), {
-      files: [
-        'node-tests/**/*.js'
-      ]
-    })
-  ]
+      files: ['node-tests/**/*.js'],
+    }),
+  ],
 });

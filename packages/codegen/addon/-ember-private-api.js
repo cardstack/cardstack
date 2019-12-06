@@ -3,7 +3,7 @@ export function unload(moduleName, modulePrefix, owner) {
     window.requirejs.unsee(moduleName);
   }
   let parts = moduleName.split('/');
-  if (parts[0] === modulePrefix  && parts[1] === 'models') {
+  if (parts[0] === modulePrefix && parts[1] === 'models') {
     clearResolveCache(owner.__registry__, `model:${parts[2]}`);
   }
 }

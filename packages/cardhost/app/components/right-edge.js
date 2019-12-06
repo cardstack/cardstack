@@ -30,7 +30,9 @@ export default class RightEdge extends Component {
 
   @action
   updateCardId(id) {
-    if (!this.args.updateCardId) { return; }
+    if (!this.args.updateCardId) {
+      return;
+    }
 
     this.args.updateCardId(id);
   }

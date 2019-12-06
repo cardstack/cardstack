@@ -1,10 +1,6 @@
 const Change = require('../change');
 const temp = require('@cardstack/test-support/temp-helper');
-const {
-  inRepo,
-  commitOpts,
-  makeRepo
-}= require('./support');
+const { inRepo, commitOpts, makeRepo } = require('./support');
 const moment = require('moment-timezone');
 
 describe('git/change', function() {
@@ -20,10 +16,12 @@ describe('git/change', function() {
 
   it('can make new empty repo', async function() {
     let change = await Change.createInitial(path, 'master');
-    await change.finalize(commitOpts({
-      message: 'First commit',
-      authorDate: moment.tz('2017-01-16 12:21', 'Africa/Addis_Ababa')
-    }));
+    await change.finalize(
+      commitOpts({
+        message: 'First commit',
+        authorDate: moment.tz('2017-01-16 12:21', 'Africa/Addis_Ababa'),
+      })
+    );
 
     let commit = await inRepo(path).getCommit('master');
     expect(commit.authorName).to.equal('John Milton');
@@ -37,12 +35,14 @@ describe('git/change', function() {
 
     let change = await Change.create(repo, head, 'master');
     (await change.get('example.txt', { allowCreate: true })).setContent('something');
-    let id = await change.finalize(commitOpts({
-      message: 'Second commit',
-      authorDate: moment.tz('2017-01-16 12:21', 'Africa/Addis_Ababa'),
-      committerName: 'The Committer',
-      committerEmail: 'committer@git.com'
-    }));
+    let id = await change.finalize(
+      commitOpts({
+        message: 'Second commit',
+        authorDate: moment.tz('2017-01-16 12:21', 'Africa/Addis_Ababa'),
+        committerName: 'The Committer',
+        committerEmail: 'committer@git.com',
+      })
+    );
 
     let commit = await inRepo(path).getCommit(id);
     expect(commit.authorName).to.equal('John Milton');
@@ -93,7 +93,7 @@ describe('git/change', function() {
 
   it('can detect unintended filename collision', async function() {
     let { repo, head } = await makeRepo(path, {
-      'sample.txt': 'sample'
+      'sample.txt': 'sample',
     });
 
     let change = await Change.create(repo, head, 'master');
@@ -101,12 +101,11 @@ describe('git/change', function() {
 
     try {
       file.setContent('something else');
-      throw new Error("should not get here");
+      throw new Error('should not get here');
     } catch (err) {
       expect(err).instanceof(Change.OverwriteRejected);
     }
   });
-
 
   it('non-fast-forward merge some new content', async function() {
     let { repo, head } = await makeRepo(path);
@@ -145,8 +144,8 @@ describe('git/change', function() {
 
     try {
       await change.finalize(commitOpts({ message: 'Third commit' }));
-      throw new Error("merge was not supposed to succeed");
-    } catch(err) {
+      throw new Error('merge was not supposed to succeed');
+    } catch (err) {
       expect(err).instanceof(Change.GitConflict);
     }
 
@@ -176,7 +175,7 @@ describe('git/change', function() {
 
   it('can add new file within directory', async function() {
     let { repo, head } = await makeRepo(path, {
-      'outer/inner/hello-world.txt': 'This is a file'
+      'outer/inner/hello-world.txt': 'This is a file',
     });
 
     let change = await Change.create(repo, head, 'master');
@@ -191,7 +190,7 @@ describe('git/change', function() {
 
   it('can delete a file at the top level', async function() {
     let { repo, head } = await makeRepo(path, {
-      'sample.txt': 'sample'
+      'sample.txt': 'sample',
     });
 
     let listing = (await inRepo(path).listTree(head, '')).map(e => e.name);
@@ -204,13 +203,12 @@ describe('git/change', function() {
 
     listing = (await inRepo(path).listTree(head, '')).map(e => e.name);
     expect(listing).to.deep.equal([]);
-
   });
 
   it('can delete a file at an inner level', async function() {
     let { repo, head } = await makeRepo(path, {
-      'outer/sample.txt':'sample',
-      'outer/second.txt': 'second'
+      'outer/sample.txt': 'sample',
+      'outer/second.txt': 'second',
     });
 
     let listing = (await inRepo(path).listTree(head, 'outer')).map(e => e.name);
@@ -230,12 +228,11 @@ describe('git/change', function() {
 
     listing = (await inRepo(path).listTree(head, '')).map(e => e.name);
     expect(listing).to.contain('outer');
-
   });
 
   it('can delete a whole subtree', async function() {
     let { repo, head } = await makeRepo(path, {
-      'outer/sample.txt': 'sample'
+      'outer/sample.txt': 'sample',
     });
 
     let listing = (await inRepo(path).listTree(head, 'outer')).map(e => e.name);
@@ -259,12 +256,11 @@ describe('git/change', function() {
       let change = await Change.create(repo, head, 'master');
       let file = await change.get('outer/sample.txt');
       file.delete();
-      throw new Error("should not get here");
+      throw new Error('should not get here');
     } catch (err) {
       expect(err).instanceOf(Change.NotFound);
     }
   });
-
 
   it('rejects deletion of missing file', async function() {
     let { repo, head } = await makeRepo(path);
@@ -272,16 +268,15 @@ describe('git/change', function() {
       let change = await Change.create(repo, head, 'master');
       let file = await change.get('sample.txt');
       file.delete();
-      throw new Error("should not get here");
+      throw new Error('should not get here');
     } catch (err) {
       expect(err).instanceOf(Change.NotFound);
     }
   });
 
-
   it('rejects double deletion file', async function() {
     let { repo, head } = await makeRepo(path, {
-      'outer/sample.txt': 'sample'
+      'outer/sample.txt': 'sample',
     });
 
     let change = await Change.create(repo, head, 'master');
@@ -290,11 +285,10 @@ describe('git/change', function() {
 
     try {
       file.delete();
-      throw new Error("should not get here");
+      throw new Error('should not get here');
     } catch (err) {
       expect(err).instanceOf(Change.NotFound);
     }
-
   });
 
   it('rejects update within missing directory', async function() {
@@ -304,7 +298,7 @@ describe('git/change', function() {
 
     try {
       await change.get('outer/sample.txt', { allowUpdate: true });
-      throw new Error("should not get here");
+      throw new Error('should not get here');
     } catch (err) {
       expect(err).instanceOf(Change.NotFound);
     }
@@ -315,7 +309,7 @@ describe('git/change', function() {
     let change = await Change.create(repo, head, 'master');
     try {
       await change.get('sample.txt', { allowUpdate: true });
-      throw new Error("should not get here");
+      throw new Error('should not get here');
     } catch (err) {
       expect(err).instanceOf(Change.NotFound);
     }
@@ -323,7 +317,7 @@ describe('git/change', function() {
 
   it('can update a file', async function() {
     let { repo, head } = await makeRepo(path, {
-      'sample.txt': 'sample'
+      'sample.txt': 'sample',
     });
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('sample.txt', { allowUpdate: true });
@@ -341,7 +335,7 @@ describe('git/change', function() {
 
   it('can patch a file', async function() {
     let { repo, head } = await makeRepo(path, {
-      'sample.txt': 'sample'
+      'sample.txt': 'sample',
     });
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('sample.txt', { allowUpdate: true });
@@ -353,7 +347,7 @@ describe('git/change', function() {
 
   it('can abort a patch', async function() {
     let { repo, head } = await makeRepo(path, {
-      'sample.txt': 'sample'
+      'sample.txt': 'sample',
     });
 
     let change = await Change.create(repo, head, 'master');
@@ -370,5 +364,4 @@ describe('git/change', function() {
     let notMaster = await inRepo(path).getCommit('not-master');
     expect(notMaster.id).to.equal(head);
   });
-
 });

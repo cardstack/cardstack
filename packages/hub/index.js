@@ -1,24 +1,24 @@
 const CONTAINER_MODE = process.env.CONTAINERIZED_HUB != null;
-const BroccoliConnector = require("./docker-host/broccoli-connector");
-const path = require("path");
-const fs = require("fs");
+const BroccoliConnector = require('./docker-host/broccoli-connector');
+const path = require('path');
+const fs = require('fs');
 const Funnel = require('broccoli-funnel');
 
 let addon = {
-  name: "@cardstack/hub",
+  name: '@cardstack/hub',
 
   includedCommands() {
     if (CONTAINER_MODE) {
       return {
-        "hub:build": require("./commands/build"),
-        "hub:start": require("./commands/start"),
-        "hub:stop": require("./commands/stop"),
-        "hub:prune": require("./commands/prune"),
+        'hub:build': require('./commands/build'),
+        'hub:start': require('./commands/start'),
+        'hub:stop': require('./commands/stop'),
+        'hub:prune': require('./commands/prune'),
       };
     } else {
       return {
-        "hub:start": require("./commands/start-native"),
-        "hub:seed": require("./commands/seed"),
+        'hub:start': require('./commands/start-native'),
+        'hub:seed': require('./commands/seed'),
       };
     }
   },
@@ -45,17 +45,8 @@ let addon = {
 
   async url() {
     if (!this._hub) {
-      this._env = process.env.EMBER_ENV || "development";
-      if (
-        fs.existsSync(
-          path.join(
-            path.dirname(this.project.configPath()),
-            "..",
-            "cardstack",
-            "data-sources"
-          )
-        )
-      ) {
+      this._env = process.env.EMBER_ENV || 'development';
+      if (fs.existsSync(path.join(path.dirname(this.project.configPath()), '..', 'cardstack', 'data-sources'))) {
         this._hub = this._startHub();
       } else {
         this._hub = Promise.resolve(null);
@@ -80,13 +71,13 @@ let addon = {
     }
     if (CONTAINER_MODE) {
       throw new Error(
-        "TODO: automatically start containerized hub here. This code should block until the hub is actually listening, and it should return the URL at which the hub is listening."
+        'TODO: automatically start containerized hub here. This code should block until the hub is actually listening, and it should return the URL at which the hub is listening.'
       );
     } else {
       // we wait until here to require this because in the
       // containerized case, "main" and its recursive dependencies
       // never need to load on the host environment.
-      let StartNative = require("./commands/start-native");
+      let StartNative = require('./commands/start-native');
       return StartNative.spawnHub(
         this.project.pkg.name,
         this.project.configPath(),

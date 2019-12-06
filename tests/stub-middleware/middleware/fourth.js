@@ -11,7 +11,7 @@ module.exports = class FirstMiddleware {
     return route.get('/fourth', async function(ctxt) {
       ctxt.body = {
         message: 'fourth middleware plugin',
-        state: JSON.parse(JSON.stringify(ctxt.state))
+        state: JSON.parse(JSON.stringify(ctxt.state)),
       };
     });
   }

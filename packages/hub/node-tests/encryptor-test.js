@@ -24,12 +24,11 @@ describe('hub/encryptor', function() {
     let ciphertext = e.encryptAndSign(message);
     let buffer = Buffer.from(ciphertext, 'utf8');
     let sections = ciphertext.split('--');
-    for (let i = 0; i < buffer.length; i+= sections.shift().length + 2) {
+    for (let i = 0; i < buffer.length; i += sections.shift().length + 2) {
       let copied = Buffer.from(buffer);
       copied[i] += 1;
       expect(() => e.verifyAndDecrypt(copied.toString('utf8'))).throws(/unable to authenticate data/);
     }
     expect(e.verifyAndDecrypt(buffer.toString('utf8'))).to.deep.equal(message);
   });
-
 });

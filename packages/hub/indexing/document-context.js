@@ -4,19 +4,14 @@ const { Model, privateModels } = require('../model');
 const { getPath } = require('@cardstack/routing/cardstack/path');
 const { merge, get, uniqBy, uniq, difference } = require('lodash');
 const Session = require('@cardstack/plugin-utils/session');
-const {
-  getCardId,
-  isInternalCard,
-  loadCard,
-} = require('@cardstack/plugin-utils/card-utils');
+const { getCardId, isInternalCard, loadCard } = require('@cardstack/plugin-utils/card-utils');
 const qs = require('qs');
 
 module.exports = class DocumentContext {
-
   constructor({ read, search, routers, schema, type, id, sourceId, generation, upstreamDoc, format, includePaths }) {
     if (upstreamDoc && !upstreamDoc.data) {
       throw new Error('The upstreamDoc must have a top-level "data" property', {
-        status: 400
+        status: 400,
       });
     }
     this.schema = schema;
@@ -27,7 +22,9 @@ module.exports = class DocumentContext {
     this.sourceId = sourceId;
     this.generation = generation;
     this.upstreamDoc = upstreamDoc;
-    this.includePaths = includePaths ? includePaths.map(part => part ? part.split('.') : null).filter(i => Boolean(i)) : [];
+    this.includePaths = includePaths
+      ? includePaths.map(part => (part ? part.split('.') : null)).filter(i => Boolean(i))
+      : [];
     this._read = read;
     this._search = search;
     this._realms = [];
@@ -37,7 +34,7 @@ module.exports = class DocumentContext {
     this.cache = {};
     this._cardCache = {};
     this.isCollection = upstreamDoc && upstreamDoc.data && Array.isArray(upstreamDoc.data);
-    this.suppliedIncluded = upstreamDoc && upstreamDoc.included || [];
+    this.suppliedIncluded = (upstreamDoc && upstreamDoc.included) || [];
     this._model = null;
 
     // included resources that we actually found
@@ -57,20 +54,42 @@ module.exports = class DocumentContext {
   }
 
   get model() {
-    if (this._model) { return this._model; }
+    if (this._model) {
+      return this._model;
+    }
 
     if (this.isCollection) {
       this._model = this.upstreamDoc.data.map(doc => {
         let contentType = this.schema.getType(doc.type);
-        if (!contentType) { throw new Error(`Unknown content type=${doc.type} id=${doc.id}`); }
+        if (!contentType) {
+          throw new Error(`Unknown content type=${doc.type} id=${doc.id}`);
+        }
 
-        return new Model(contentType, doc, this.schema, this.read.bind(this), this.getCard.bind(this), this.search.bind(this), this.cardIdContext);
+        return new Model(
+          contentType,
+          doc,
+          this.schema,
+          this.read.bind(this),
+          this.getCard.bind(this),
+          this.search.bind(this),
+          this.cardIdContext
+        );
       });
     } else {
       let contentType = this.schema.getType(this.type);
-      if (!contentType) { throw new Error(`Unknown content type=${this.type} id=${this.id}`); }
+      if (!contentType) {
+        throw new Error(`Unknown content type=${this.type} id=${this.id}`);
+      }
 
-      this._model = new Model(contentType, this.upstreamDoc.data, this.schema, this.read.bind(this), this.getCard.bind(this), this.search.bind(this), this.cardIdContext);
+      this._model = new Model(
+        contentType,
+        this.upstreamDoc.data,
+        this.schema,
+        this.read.bind(this),
+        this.getCard.bind(this),
+        this.search.bind(this),
+        this.cardIdContext
+      );
     }
 
     return this._model;
@@ -81,10 +100,14 @@ module.exports = class DocumentContext {
   }
 
   async searchDoc() {
-    if (this.isCollection) { return; }
+    if (this.isCollection) {
+      return;
+    }
 
     let searchDoc = await this._buildCachedResponse();
-    if (!searchDoc) { return; }
+    if (!searchDoc) {
+      return;
+    }
 
     return searchDoc;
   }
@@ -95,14 +118,18 @@ module.exports = class DocumentContext {
   }
 
   async realms() {
-    if (this.isCollection) { return; }
+    if (this.isCollection) {
+      return;
+    }
 
     await this._buildCachedResponse();
     return this._realms;
   }
 
   async references() {
-    if (this.isCollection) { return; }
+    if (this.isCollection) {
+      return;
+    }
 
     await this._buildCachedResponse();
     return uniq(this._references);
@@ -111,7 +138,9 @@ module.exports = class DocumentContext {
   async updateDocumentMeta(meta) {
     this.upstreamDoc.data.meta = merge({}, this.upstreamDoc.data.meta, meta);
     await this.pristineDoc();
-    if (!this._pristine || !this._pristine.data) { return; }
+    if (!this._pristine || !this._pristine.data) {
+      return;
+    }
 
     this._pristine.data.meta = merge({}, this._pristine.data.meta, meta);
   }
@@ -139,7 +168,11 @@ module.exports = class DocumentContext {
     }
 
     if (this._pendingReads.includes(key)) {
-      throw new Error(`Cycle encountered in DocumentContext.read for ${this.type}/${this.id}. Pending resource reads are ${JSON.stringify(this._pendingReads)}`);
+      throw new Error(
+        `Cycle encountered in DocumentContext.read for ${this.type}/${
+          this.id
+        }. Pending resource reads are ${JSON.stringify(this._pendingReads)}`
+      );
     }
     this._pendingReads.push(key);
 
@@ -165,7 +198,11 @@ module.exports = class DocumentContext {
     }
 
     if (this._pendingReads.includes(key)) {
-      throw new Error(`Cycle encountered in DocumentContext.search for ${key}. Pending resource searches are ${JSON.stringify(this._pendingReads)}`);
+      throw new Error(
+        `Cycle encountered in DocumentContext.search for ${key}. Pending resource searches are ${JSON.stringify(
+          this._pendingReads
+        )}`
+      );
     }
     this._pendingReads.push(key);
 
@@ -185,27 +222,34 @@ module.exports = class DocumentContext {
   // ensure there are valid grants for them. We return a new sanitized
   // document that strips out any included resources or fields that
   // were lacking grants.
-  async applyReadAuthorization(context={}) {
+  async applyReadAuthorization(context = {}) {
     let session = context.session || Session.EVERYONE;
     let userRealms = await session.realms();
     let document = await this.pristineDoc();
-    if (!document) { return; }
+    if (!document) {
+      return;
+    }
 
     let authorizedResource;
     let types = this.schema.getTypes();
     if (Array.isArray(document.data)) {
-      authorizedResource = await Promise.all(document.data.map(async resource => {
-        if (resource.id == null || resource.type == null) {
-          return;
-        }
+      authorizedResource = await Promise.all(
+        document.data.map(async resource => {
+          if (resource.id == null || resource.type == null) {
+            return;
+          }
 
-        let type = types.get(resource.type);
-        if (!type) {
-          return;
-        }
-        let readAuthorizedResource = await type.applyReadAuthorization(this._deriveDocumentContextForResource(resource), userRealms);
-        return readAuthorizedResource;
-      }));
+          let type = types.get(resource.type);
+          if (!type) {
+            return;
+          }
+          let readAuthorizedResource = await type.applyReadAuthorization(
+            this._deriveDocumentContextForResource(resource),
+            userRealms
+          );
+          return readAuthorizedResource;
+        })
+      );
       authorizedResource = authorizedResource.filter(Boolean);
     } else {
       if (document.data.id == null || document.data.type == null) {
@@ -230,7 +274,7 @@ module.exports = class DocumentContext {
 
     if (document.data !== authorizedResource) {
       output = {
-        data: authorizedResource
+        data: authorizedResource,
       };
       if (document.meta) {
         output.meta = document.meta;
@@ -264,7 +308,6 @@ module.exports = class DocumentContext {
       // we altered something, so lets verify "full linkage" as
       // required by the spec
       // http://jsonapi.org/format/#document-compound-documents
-
 
       let allResources = new Map();
       if (Array.isArray(output.data)) {
@@ -325,16 +368,21 @@ module.exports = class DocumentContext {
 
   async _readAuthIncluded(included, userRealms) {
     let modified = false;
-    let safeIncluded = await Promise.all(included.map(async resource => {
-      let contentType = this.schema.getType(resource.type);
-      if (contentType) {
-        let authorized = await contentType.applyReadAuthorization(this._deriveDocumentContextForResource(resource), userRealms);
-        if (authorized !== resource) {
-          modified = true;
+    let safeIncluded = await Promise.all(
+      included.map(async resource => {
+        let contentType = this.schema.getType(resource.type);
+        if (contentType) {
+          let authorized = await contentType.applyReadAuthorization(
+            this._deriveDocumentContextForResource(resource),
+            userRealms
+          );
+          if (authorized !== resource) {
+            modified = true;
+          }
+          return authorized;
         }
-        return authorized;
-      }
-    }));
+      })
+    );
     if (modified) {
       return safeIncluded.filter(Boolean);
     } else {
@@ -353,7 +401,7 @@ module.exports = class DocumentContext {
       read: this._read,
       format: this.format,
       search: this._search,
-      routers: this.routers
+      routers: this.routers,
     });
     context.cache = this.cache;
     context._cardCache = this._cardCache;
@@ -366,10 +414,14 @@ module.exports = class DocumentContext {
   async _readAuthorizationForPermissions(session, context) {
     // Applying read authorization for permission resources is a special case
     // a permission resource can be read if the subject of the permission object can be read
-    if (this.type !== 'permissions') { return; }
+    if (this.type !== 'permissions') {
+      return;
+    }
 
     let document = await this.pristineDoc();
-    if (!document) { return; }
+    if (!document) {
+      return;
+    }
 
     let [queryType, queryId] = document.data.id.split('/');
     let permissionsSubjectType = this.schema.getType(queryType);
@@ -380,8 +432,8 @@ module.exports = class DocumentContext {
       // to assemble a document from what we know about the fields
       permissionsSubject = {
         data: {
-          type: queryType
-        }
+          type: queryType,
+        },
       };
     } else {
       permissionsSubject = { data: await this.read(queryType, queryId) };
@@ -408,25 +460,24 @@ module.exports = class DocumentContext {
     let fieldRefs = (get(this, 'upstreamDoc.data.relationships.fields.data') || []).map(i => `${i.type}/${i.id}`);
     let includedRefs = (get(this, 'upstreamDoc.included') || []).map(i => `${i.type}/${i.id}`);
 
-    if (isInternalCard(docId, docType) &&
-      docId === id &&
-      difference(fieldRefs, includedRefs).length === 0) {
+    if (isInternalCard(docId, docType) && docId === id && difference(fieldRefs, includedRefs).length === 0) {
       return this.upstreamDoc;
     } else if (isInternalCard(docId, docType) && docId === id) {
       let card = {
         data: this.upstreamDoc.data,
-        included: await this.crawlInternalModels(this.upstreamDoc.data)
+        included: await this.crawlInternalModels(this.upstreamDoc.data),
       };
       this._cardCache[id] = card;
       return card;
-    } else if (this.upstreamDoc &&
+    } else if (
+      this.upstreamDoc &&
       this.upstreamDoc.data &&
       Array.isArray(this.upstreamDoc.data) &&
       (cardResource = this.upstreamDoc.data.find(i => isInternalCard(i.type, i.id) && i.id === id))
     ) {
       let card = {
         data: cardResource,
-        included: (this.upstreamDoc.included || []).filter(i => i.type.includes(id) || i.id.includes(id))
+        included: (this.upstreamDoc.included || []).filter(i => i.type.includes(id) || i.id.includes(id)),
       };
       this._cardCache[id] = card;
       return card;
@@ -440,21 +491,29 @@ module.exports = class DocumentContext {
   }
 
   async crawlInternalModels(resource, models = []) {
-    if (isInternalCard(resource.type, resource.id) && this.id !== resource.id) { return models; }
+    if (isInternalCard(resource.type, resource.id) && this.id !== resource.id) {
+      return models;
+    }
 
     for (let relationship of Object.keys(resource.relationships || {})) {
       let linkage = get(resource, `relationships.${relationship}.data`);
-      if (!linkage) { continue; }
+      if (!linkage) {
+        continue;
+      }
       if (Array.isArray(linkage)) {
         for (let fieldRef of linkage) {
           let related = await this.read(fieldRef.type, fieldRef.id);
-          if (!related) { continue; }
+          if (!related) {
+            continue;
+          }
           models.push(related);
           await this.crawlInternalModels(related, models);
         }
       } else {
         let related = await this.read(linkage.type, linkage.id);
-        if (!related) { continue; }
+        if (!related) {
+          continue;
+        }
         models.push(related);
         await this.crawlInternalModels(related, models);
       }
@@ -469,7 +528,9 @@ module.exports = class DocumentContext {
   // result in a cycle as searchers.get() needs to use a schema itself in order to process results.
   async _loadCardSchemaForResource(resourceType, resourceId) {
     let id;
-    if (!resourceType || !(id = getCardId(resourceId))) { return; }
+    if (!resourceType || !(id = getCardId(resourceId))) {
+      return;
+    }
 
     if (this._cardCache[id]) {
       await this._cardCache[id];
@@ -482,21 +543,27 @@ module.exports = class DocumentContext {
 
   async _updateSchema(cardId) {
     let card = await this.getCard(cardId);
-    if (!card) { return; } // assume that the caller has provided the card schema already;
+    if (!card) {
+      return;
+    } // assume that the caller has provided the card schema already;
 
     let adoptedFromId = get(card, 'data.relationships.adopted-from.data.id');
     if (adoptedFromId) {
       await this._updateSchema(adoptedFromId);
     }
     let cardSchema = await loadCard(this.schema, card, this.getCard.bind(this));
-    this.schema = await this.schema.applyChanges(cardSchema.map(document => ({ id:document.id, type:document.type, document })));
+    this.schema = await this.schema.applyChanges(
+      cardSchema.map(document => ({ id: document.id, type: document.type, document }))
+    );
   }
 
   async _buildCachedResponse() {
     let searchTree;
     if (!this.isCollection && !isInternalCard(this.type, this.id)) {
       let contentType = this.schema.getType(this.type);
-      if (!contentType) { return; }
+      if (!contentType) {
+        return;
+      }
 
       searchTree = contentType.includesTree;
     }
@@ -517,12 +584,14 @@ module.exports = class DocumentContext {
       if (field.id === 'id' || field.id === 'type' || field.isRelationship) {
         continue;
       }
-      if (contentType.computedFields.has(field.id) ||
-          (jsonapiDoc.attributes && jsonapiDoc.attributes.hasOwnProperty(field.id))) {
+      if (
+        contentType.computedFields.has(field.id) ||
+        (jsonapiDoc.attributes && jsonapiDoc.attributes.hasOwnProperty(field.id))
+      ) {
         let value = await userModel.getField(field.id);
         await this._buildAttribute(field, value, pristineDocOut, searchDocOut);
       }
-     }
+    }
   }
 
   async _buildAttribute(field, value, pristineDocOut, searchDocOut) {
@@ -532,16 +601,34 @@ module.exports = class DocumentContext {
     ensure(pristineDocOut, 'attributes')[field.id] = value;
   }
 
-  async _buildRelationships(contentType, jsonapiDoc, userModel, pristineDocOut, searchDocOut, searchTree, depth, fieldsets) {
+  async _buildRelationships(
+    contentType,
+    jsonapiDoc,
+    userModel,
+    pristineDocOut,
+    searchDocOut,
+    searchTree,
+    depth,
+    fieldsets
+  ) {
     for (let field of contentType.realAndComputedFields.values()) {
       if (!field.isRelationship) {
         continue;
       }
-      if (contentType.computedFields.has(field.id) ||
-          (jsonapiDoc.relationships && jsonapiDoc.relationships.hasOwnProperty(field.id))) {
-
+      if (
+        contentType.computedFields.has(field.id) ||
+        (jsonapiDoc.relationships && jsonapiDoc.relationships.hasOwnProperty(field.id))
+      ) {
         let fieldset = fieldsets && fieldsets.find(f => f.field === field.id);
-        await this._buildRelationship(field, pristineDocOut, searchDocOut, searchTree, depth, get(fieldset, 'format'), userModel);
+        await this._buildRelationship(
+          field,
+          pristineDocOut,
+          searchDocOut,
+          searchTree,
+          depth,
+          get(fieldset, 'format'),
+          userModel
+        );
       }
     }
   }
@@ -553,14 +640,32 @@ module.exports = class DocumentContext {
       let models = await userModel.getRelated(field.id);
       this.schema = userModel.schema; // this will incorporate any discovered card schema as a result of traversing the relationship
       if (Array.isArray(models)) {
-        related = await Promise.all(models.map(async (model) => {
-          return this._build(model.type, model.id, privateModels.get(model).jsonapiDoc, searchTree[field.id], depth + 1, format);
-        }));
-        ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, relObj, { data: related.filter(Boolean).map(r => ({ type: r.type, id: r.id })) });
+        related = await Promise.all(
+          models.map(async model => {
+            return this._build(
+              model.type,
+              model.id,
+              privateModels.get(model).jsonapiDoc,
+              searchTree[field.id],
+              depth + 1,
+              format
+            );
+          })
+        );
+        ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, relObj, {
+          data: related.filter(Boolean).map(r => ({ type: r.type, id: r.id })),
+        });
       } else {
         let model = models;
         if (model) {
-          related = await this._build(model.type, model.id, privateModels.get(model).jsonapiDoc, searchTree[field.id], depth + 1, format);
+          related = await this._build(
+            model.type,
+            model.id,
+            privateModels.get(model).jsonapiDoc,
+            searchTree[field.id],
+            depth + 1,
+            format
+          );
         }
         let data = related ? { type: related.type, id: related.id } : null;
         ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, relObj, { data });
@@ -575,7 +680,9 @@ module.exports = class DocumentContext {
   }
 
   _buildSearchTree(searchTree, segments) {
-    if (!segments.length) { return {}; }
+    if (!segments.length) {
+      return {};
+    }
 
     let childNode = searchTree[segments[0]] || {};
     searchTree[segments[0]] = merge(childNode, this._buildSearchTree(Object.assign({}, childNode), segments.slice(1)));
@@ -586,7 +693,9 @@ module.exports = class DocumentContext {
   // If a routing card is not provided to the DocumentContext, then leverage the application card
   // to determine the context in which to resolve the canonical URL for the card.
   async _addSelfLink(jsonapiDoc) {
-    if (!this.routers) { return; }
+    if (!this.routers) {
+      return;
+    }
 
     let routeStackCards = [];
     if (this._routeStack && this._routeStack.length) {
@@ -597,11 +706,15 @@ module.exports = class DocumentContext {
     } else if (this.routers.applicationCard) {
       routeStackCards.push(this.routers.applicationCard);
     }
-    if (!routeStackCards.length) { return; }
+    if (!routeStackCards.length) {
+      return;
+    }
 
-    let path = await getPath(routeStackCards,
+    let path = await getPath(
+      routeStackCards,
       { data: jsonapiDoc },
-      (await this.routers.getRoutersInfo()).routerMapByDepth);
+      (await this.routers.getRoutersInfo()).routerMapByDepth
+    );
     if (path) {
       jsonapiDoc.links = jsonapiDoc.links || {};
       jsonapiDoc.links.self = path;
@@ -621,10 +734,11 @@ module.exports = class DocumentContext {
 
     if (isCollection) {
       for (let [index, resource] of jsonapiDoc.data.entries()) {
-
         await this._loadCardSchemaForResource(resource.type, resource.id);
         let contentType = this.schema.getType(resource.type);
-        if (!contentType) { continue; }
+        if (!contentType) {
+          continue;
+        }
 
         let includesTree;
         let includePaths = this.includePaths;
@@ -652,12 +766,14 @@ module.exports = class DocumentContext {
     } else {
       // I think processing relationships that use `link` are not working right--as
       // we are not resolving the link queries to type/id before _build() is called.
-      if (!type) { return; }
+      if (!type) {
+        return;
+      }
 
       await this._loadCardSchemaForResource(type, id);
       let contentType = this.schema.getType(type);
       if (!contentType) {
-        log.warn("ignoring unknown document type=%s id=%s", type, id);
+        log.warn('ignoring unknown document type=%s id=%s', type, id);
         return;
       }
 
@@ -674,7 +790,7 @@ module.exports = class DocumentContext {
 
       let fieldsets = get(contentType, `fieldsets.${fieldsetFormat || contentType.fieldsetExpansionFormat}`);
       if (fieldsets && fieldsets.length) {
-        for (let { field:fieldPath } of fieldsets) {
+        for (let { field: fieldPath } of fieldsets) {
           this._buildSearchTree(searchTree, fieldPath.split('.'));
         }
       }
@@ -686,12 +802,29 @@ module.exports = class DocumentContext {
       } else {
         jsonapiDoc = jsonapiDoc.data;
       }
-      let userModel = new Model(contentType, jsonapiDoc, this.schema, this.read.bind(this), this.getCard.bind(this), this.search.bind(this), this.cardIdContext);
+      let userModel = new Model(
+        contentType,
+        jsonapiDoc,
+        this.schema,
+        this.read.bind(this),
+        this.getCard.bind(this),
+        this.search.bind(this),
+        this.cardIdContext
+      );
       await this._buildAttributes(contentType, jsonapiDoc, userModel, pristine, searchDoc);
 
       if (!this._followedRelationships[`${type}/${id}`]) {
         this._followedRelationships[`${type}/${id}`] = true;
-        await this._buildRelationships(contentType, jsonapiDoc, userModel, pristine, searchDoc, searchTree, depth, fieldsets);
+        await this._buildRelationships(
+          contentType,
+          jsonapiDoc,
+          userModel,
+          pristine,
+          searchDoc,
+          searchTree,
+          depth,
+          fieldsets
+        );
       }
 
       assignMeta(pristine.data, jsonapiDoc);
@@ -719,7 +852,7 @@ module.exports = class DocumentContext {
           this._pristine.data.meta.source = this.sourceId;
         }
         this._realms = await this.schema.authorizedReadRealms(type, this);
-        authLog.trace("setting resource_realms for %s %s: %j", type, id, this._realms);
+        authLog.trace('setting resource_realms for %s %s: %j', type, id, this._realms);
       }
     }
     if (this.isCollection && depth === 1) {
@@ -727,7 +860,6 @@ module.exports = class DocumentContext {
     }
     return searchDoc;
   }
-
 };
 
 function assignMeta(pristine, resource) {

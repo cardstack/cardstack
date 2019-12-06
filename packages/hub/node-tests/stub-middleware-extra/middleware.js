@@ -7,7 +7,7 @@ module.exports = class FirstMiddleware {
   middleware() {
     return route.get('/extra', async function(ctxt) {
       ctxt.body = {
-        message: 'Extra middleware plugin'
+        message: 'Extra middleware plugin',
       };
     });
   }

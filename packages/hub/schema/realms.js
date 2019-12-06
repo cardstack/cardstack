@@ -2,12 +2,11 @@ const Grant = require('./grant');
 const { flatten, uniq } = require('lodash');
 const log = require('@cardstack/logger')('cardstack/auth');
 
-
 module.exports = class Realms {
   constructor(grants) {
     // set of realms that have read access to the resource
-    let resource =  new Set();
-    let dynamicResource =  [];
+    let resource = new Set();
+    let dynamicResource = [];
 
     // set of realms that have access to all fields
     let allFields = new Set();
@@ -21,7 +20,6 @@ module.exports = class Realms {
     let dynamicFields = new Map();
 
     for (let grant of grants) {
-
       let intersectionRealm;
 
       if (grant.who.find(entry => entry.realmField)) {
@@ -31,14 +29,19 @@ module.exports = class Realms {
       } else {
         // this grant is not field dependent, so we can reify it into
         // a concrete realm in advance.
-        intersectionRealm = grant.who.map(entry => entry.staticRealm).sort().join('/');
+        intersectionRealm = grant.who
+          .map(entry => entry.staticRealm)
+          .sort()
+          .join('/');
       }
 
       if (grant['may-login']) {
         if (intersectionRealm) {
           canLogin.add(intersectionRealm);
         } else {
-          throw new Error(`may-login grants may not be field-dependent. This was supposed to be asserted already in the Grant constructor.`);
+          throw new Error(
+            `may-login grants may not be field-dependent. This was supposed to be asserted already in the Grant constructor.`
+          );
         }
       }
 
@@ -63,11 +66,11 @@ module.exports = class Realms {
         if (intersectionRealm) {
           target = fields;
           empty = () => new Set();
-          addTo  = (realmSet) => realmSet.add(intersectionRealm);
+          addTo = realmSet => realmSet.add(intersectionRealm);
         } else {
           target = dynamicFields;
           empty = () => [];
-          addTo  = (realmSet) => realmSet.push(grant.who);
+          addTo = realmSet => realmSet.push(grant.who);
         }
 
         for (let field of grant.fields) {
@@ -97,16 +100,33 @@ module.exports = class Realms {
   async mayReadResource(documentContext, userRealms) {
     let matchingRealm = userRealms.find(realm => this._resourceReaders.has(realm));
     if (matchingRealm) {
-      log.debug('approved resource read for type=%s id=%s with static realm=%s', documentContext.type, documentContext.id, matchingRealm);
+      log.debug(
+        'approved resource read for type=%s id=%s with static realm=%s',
+        documentContext.type,
+        documentContext.id,
+        matchingRealm
+      );
       return true;
     }
     let dynamicRealms = await this._dynamicRealms(this._dynamicResourceReaders, documentContext);
     matchingRealm = userRealms.find(realm => dynamicRealms.includes(realm));
     if (matchingRealm) {
-      log.debug('approved resource read for type=%s id=%s wtih dynamic realm=%s', documentContext.type, documentContext.id, matchingRealm);
+      log.debug(
+        'approved resource read for type=%s id=%s wtih dynamic realm=%s',
+        documentContext.type,
+        documentContext.id,
+        matchingRealm
+      );
       return true;
     }
-    log.debug('rejected resource read for type=%s id=%s userRealms=%j dynamicRealms=%j staticRealms=%j', documentContext.type, documentContext.id, userRealms, dynamicRealms, [...this._resourceReaders.keys()]);
+    log.debug(
+      'rejected resource read for type=%s id=%s userRealms=%j dynamicRealms=%j staticRealms=%j',
+      documentContext.type,
+      documentContext.id,
+      userRealms,
+      dynamicRealms,
+      [...this._resourceReaders.keys()]
+    );
     return false;
   }
 
@@ -119,7 +139,10 @@ module.exports = class Realms {
   }
 
   async mayReadField(documentContext, userRealms, fieldName) {
-    return await this.mayReadAllFields(documentContext, userRealms) || await this.hasExplicitFieldGrant(documentContext, userRealms, fieldName);
+    return (
+      (await this.mayReadAllFields(documentContext, userRealms)) ||
+      (await this.hasExplicitFieldGrant(documentContext, userRealms, fieldName))
+    );
   }
 
   async hasExplicitFieldGrant(documentContext, userRealms, fieldName) {
@@ -161,14 +184,17 @@ module.exports = class Realms {
       }
     }
 
-    return realmIntersections(choiceRealms, singleRealms).map(list => uniq(list).sort().join('/'));
+    return realmIntersections(choiceRealms, singleRealms).map(list =>
+      uniq(list)
+        .sort()
+        .join('/')
+    );
   }
 
   async authorizedReadRealms(documentContext) {
     let dynamicRealms = await this._dynamicRealms(this._dynamicResourceReaders, documentContext);
     return [...this._resourceReaders].concat(dynamicRealms);
   }
-
 };
 
 function mayReadAllFields(grant) {

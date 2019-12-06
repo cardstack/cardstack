@@ -27,8 +27,8 @@ export function setupCardTest(hooks) {
 // in a rendering test, you need use this.
 export function setupURLs(hooks) {
   hooks.beforeEach(function() {
-    this.owner.lookup('router:main').setupRouter()
-  })
+    this.owner.lookup('router:main').setupRouter();
+  });
 }
 
 /**
@@ -71,12 +71,16 @@ export async function closeTools() {
   await settled();
 }
 
-export function findCard(type, id, format='isolated') {
-  return getContext().owner.lookup('service:cardstackData').load(type, id, format);
+export function findCard(type, id, format = 'isolated') {
+  return getContext()
+    .owner.lookup('service:cardstackData')
+    .load(type, id, format);
 }
 
 export function getSpaceForCard(type, id) {
-  return getContext().owner.lookup('service:store').findRecord('space', `/${pluralize(type)}/${id}`);
+  return getContext()
+    .owner.lookup('service:store')
+    .findRecord('space', `/${pluralize(type)}/${id}`);
 }
 
 export function renderCard(type, id, format, options = {}) {
@@ -139,13 +143,15 @@ export function setupCardTestComponent(hooks) {
       // derived data
       card: readOnly('space.primaryCard'),
       _params: computed('space', 'params', function() {
-        Object.assign({}, this.get('space.params'), this.params)
+        Object.assign({}, this.get('space.params'), this.params);
       }),
 
       getSpaceForCardTask: task(function*() {
         let space = yield getSpaceForCard(this.type, this.id);
         this.set('space', space);
-      }).on('didInsertElement').cancelOn('willDestroyElement'),
+      })
+        .on('didInsertElement')
+        .cancelOn('willDestroyElement'),
     });
 
     CardTestComponent.reopenClass({
@@ -154,8 +160,10 @@ export function setupCardTestComponent(hooks) {
 
     this.owner.register('component:cardstack-card-test', CardTestComponent);
 
-    this.owner.register('template:components/cardstack-card-test',
-      hbs`{{#if card}}{{cardstack-content content=card format=format params=params}}{{/if}}`);
+    this.owner.register(
+      'template:components/cardstack-card-test',
+      hbs`{{#if card}}{{cardstack-content content=card format=format params=params}}{{/if}}`
+    );
   });
 }
 
@@ -200,7 +208,6 @@ export async function fillInFieldEditor(name, value) {
     if ((isEnabled && value === false) || (!isEnabled && value === true)) {
       await click(slider);
     }
-
   } else {
     let input = editorSection.querySelector(`.cs-field-editor-section input`);
     if (!input) {

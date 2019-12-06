@@ -1,24 +1,28 @@
 const { get } = require('lodash');
 const { declareInjections } = require('@cardstack/di');
 
-module.exports = declareInjections({
-  service: `plugin-services:${require.resolve('./service')}`,
-  loadInitialModels: 'config:initial-models'
-}, class Indexer {
-
-  async beginUpdate() {
-    if (this.initialModels) {
-      throw new Error("The ephemeral data source no longer accepts params.initialModels. Use the new general-purpose seed model support instead.");
+module.exports = declareInjections(
+  {
+    service: `plugin-services:${require.resolve('./service')}`,
+    loadInitialModels: 'config:initial-models',
+  },
+  class Indexer {
+    async beginUpdate() {
+      if (this.initialModels) {
+        throw new Error(
+          'The ephemeral data source no longer accepts params.initialModels. Use the new general-purpose seed model support instead.'
+        );
+      }
+      let initialModels = this.initialModels || [];
+      if (typeof this.loadInitialModels === 'function') {
+        initialModels = initialModels.concat(await this.loadInitialModels());
+      }
+      initialModels = initialModels.filter(Boolean).filter(i => get(i, 'data.type') !== 'cards');
+      let storage = await this.service.findOrCreateStorage(this.dataSource.id, initialModels);
+      return new Updater(storage, this.dataSource.id);
     }
-    let initialModels = this.initialModels || [];
-    if (typeof this.loadInitialModels === 'function') {
-      initialModels = initialModels.concat(await this.loadInitialModels());
-    }
-    initialModels = initialModels.filter(Boolean).filter(i => get(i, 'data.type') !== 'cards');
-    let storage = await this.service.findOrCreateStorage(this.dataSource.id, initialModels);
-    return new Updater(storage, this.dataSource.id);
   }
-});
+);
 
 class Updater {
   constructor(storage, dataSourceId) {
@@ -46,7 +50,9 @@ class Updater {
 
     for (let entry of this.storage.modelsNewerThan(generation)) {
       if (entry.model) {
-        await ops.save(entry.type, entry.id, { data: Object.assign({}, entry.model, { meta: { version: String(entry.generation) } }) });
+        await ops.save(entry.type, entry.id, {
+          data: Object.assign({}, entry.model, { meta: { version: String(entry.generation) } }),
+        });
       } else {
         await ops.delete(entry.type, entry.id);
       }
@@ -54,7 +60,9 @@ class Updater {
 
     for (let entry of this.storage.blobsNewerThan(generation)) {
       if (entry.model) {
-        await ops.save(entry.type, entry.id, { data: Object.assign({}, entry.model, { meta: { version: String(entry.generation) } }) });
+        await ops.save(entry.type, entry.id, {
+          data: Object.assign({}, entry.model, { meta: { version: String(entry.generation) } }),
+        });
       } else {
         await ops.delete(entry.type, entry.id);
       }
@@ -66,7 +74,7 @@ class Updater {
 
     return {
       generation: newGeneration,
-      identity: this.storage.identity
+      identity: this.storage.identity,
     };
   }
 }

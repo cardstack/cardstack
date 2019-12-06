@@ -1,7 +1,7 @@
 exports.type = '@cardstack/core-types::integer';
 
 const errorCardMapping = {
-  'not-found': 404
+  'not-found': 404,
 };
 
 exports.compute = async function(model) {

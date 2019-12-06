@@ -1,4 +1,4 @@
-const {connect} = require('../docker-host/hub-connection');
+const { connect } = require('../docker-host/hub-connection');
 
 module.exports = {
   name: 'hub:stop',
@@ -16,7 +16,7 @@ module.exports = {
       throw new Error("There doesn't seem to be a hub running");
     }
 
-    this.ui.writeLine("Sending shutdown message to hub...");
+    this.ui.writeLine('Sending shutdown message to hub...');
     hub.shutdown();
-  }
+  },
 };

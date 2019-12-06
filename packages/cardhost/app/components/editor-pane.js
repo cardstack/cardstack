@@ -9,11 +9,11 @@ export default class EditorPane extends Component {
   @tracked css = this.args.model.isolatedCss;
 
   constructor() {
-    super(...arguments)
+    super(...arguments);
     // getting markup must be done in the constuctor to guarantee that it
     // resolves before the code editor is rendered.
-    let cardMarkup = document.querySelector('.card-renderer-isolated--content')
-    this.markup = cardMarkup ? cardMarkup.innerHTML.toString().trim() : "";
+    let cardMarkup = document.querySelector('.card-renderer-isolated--content');
+    this.markup = cardMarkup ? cardMarkup.innerHTML.toString().trim() : '';
   }
 
   @action

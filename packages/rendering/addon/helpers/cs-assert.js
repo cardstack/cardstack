@@ -18,5 +18,5 @@ export default Helper.extend({
     }
 
     throw new Error(message);
-  }
+  },
 });

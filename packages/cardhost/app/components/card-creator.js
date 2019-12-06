@@ -1,5 +1,5 @@
 import { action } from '@ember/object';
-import CardManipulator from "./card-manipulator";
+import CardManipulator from './card-manipulator';
 
 export default class CardCreator extends CardManipulator {
   constructor(...args) {
@@ -9,7 +9,7 @@ export default class CardCreator extends CardManipulator {
       Remove `hide-in-percy` css selectors from places
       where we display card IDs once we remove this
     */
-    let defaultCardId = `new-card-${Math.floor(Math.random() * 1E7)}`;
+    let defaultCardId = `new-card-${Math.floor(Math.random() * 1e7)}`;
 
     this.updateCardId(defaultCardId);
     this.cardId = defaultCardId;

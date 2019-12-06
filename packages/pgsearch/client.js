@@ -1,4 +1,3 @@
-
 const { Pool, Client } = require('pg');
 const Cursor = require('pg-cursor');
 const migrate = require('node-pg-migrate').default;
@@ -16,7 +15,7 @@ module.exports = class PgClient extends EventEmitter {
     return new this(...args);
   }
 
-  constructor(){
+  constructor() {
     super();
 
     this.pool = new Pool({
@@ -24,7 +23,7 @@ module.exports = class PgClient extends EventEmitter {
       host: config.host,
       database: config.database,
       password: config.password,
-      port: config.port
+      port: config.port,
     });
 
     this._migrateDbPromise = null;
@@ -38,7 +37,9 @@ module.exports = class PgClient extends EventEmitter {
   }
 
   async ensureDatabaseSetup() {
-    if (this._didEnsureDatabaseSetup) { return; }
+    if (this._didEnsureDatabaseSetup) {
+      return;
+    }
 
     if (!this._migrateDbPromise) {
       this._migrateDbPromise = this._migrateDb();
@@ -52,7 +53,9 @@ module.exports = class PgClient extends EventEmitter {
     let client = new Client(Object.assign({}, config, { database: 'postgres' }));
     try {
       await client.connect();
-      let response = await client.query(`select count(*)=1 as has_database from pg_database where datname=$1`, [config.database]);
+      let response = await client.query(`select count(*)=1 as has_database from pg_database where datname=$1`, [
+        config.database,
+      ]);
       if (!response.rows[0].has_database) {
         await client.query(`create database ${safeDatabaseName(config.database)}`);
       }
@@ -70,10 +73,10 @@ module.exports = class PgClient extends EventEmitter {
         host: config.host,
         database: config.database,
         password: config.password,
-        port: config.port
+        port: config.port,
       },
       dir: join(__dirname, 'migrations'),
-      log: (...args) => log.debug(...args)
+      log: (...args) => log.debug(...args),
     });
   }
 
@@ -87,7 +90,7 @@ module.exports = class PgClient extends EventEmitter {
     }
   }
 
-  async accomodateSchema(/* schema */){
+  async accomodateSchema(/* schema */) {
     await this.ensureDatabaseSetup();
     // TODO: add specialized indices to postgres?
   }
@@ -96,15 +99,14 @@ module.exports = class PgClient extends EventEmitter {
     let client = await this.pool.connect();
     try {
       return await client.query(...args);
-    }
-    finally {
+    } finally {
       client.release();
     }
   }
 
   async loadMeta({ id }) {
     let response = await this.query('SELECT params from meta where id=$1', [id]);
-    if (response.rowCount > 0){
+    if (response.rowCount > 0) {
       return response.rows[0].params;
     }
   }
@@ -123,20 +125,21 @@ module.exports = class PgClient extends EventEmitter {
 
   async deleteOlderGenerations(sourceId, nonce) {
     let sql = 'delete from documents where (generation != $1 or generation is null) and source=$2';
-    await this.query(sql, [nonce, sourceId ]);
+    await this.query(sql, [nonce, sourceId]);
   }
 
-  async saveMeta({id, params}) {
-    let sql = 'insert into meta (id, params) values ($1, $2) on conflict on constraint meta_pkey do UPDATE SET params = EXCLUDED.params';
+  async saveMeta({ id, params }) {
+    let sql =
+      'insert into meta (id, params) values ($1, $2) on conflict on constraint meta_pkey do UPDATE SET params = EXCLUDED.params';
     await this.query(sql, [id, params]);
   }
 
   async emitEvent(operation, context) {
-    let { type, id, upstreamDoc:doc } = context;
+    let { type, id, upstreamDoc: doc } = context;
     this.emit(operation, { type, id, doc });
   }
 
-  async docsThatReference(references, fn){
+  async docsThatReference(references, fn) {
     let refs = [];
     references.forEach(key => {
       let [type, id] = key.split('/');
@@ -149,7 +152,7 @@ module.exports = class PgClient extends EventEmitter {
       await this._iterateThroughRows(
         'select upstream_doc, refs from documents where refs && $1',
         [queryRefs],
-        async (row) => await fn(row.upstream_doc, row.refs)
+        async row => await fn(row.upstream_doc, row.refs)
       );
     }
   }
@@ -162,12 +165,11 @@ module.exports = class PgClient extends EventEmitter {
       let rows;
       do {
         rows = await readCursor(cursor, rowBatchSize);
-        for (let row of rows){
+        for (let row of rows) {
           await fn(row);
         }
       } while (rows.length > 0);
-    }
-    finally {
+    } finally {
       client.release();
     }
   }
@@ -199,7 +201,9 @@ class Batch {
 
     this._touched[`${type}/${id}`] = this._touchCounter++; //TODO we'll eventually need to use a touched key that is sensitive to source/pkg/card_id
 
-    if (!searchDoc) { return; }
+    if (!searchDoc) {
+      return;
+    }
 
     let document = {
       type: param(type),
@@ -211,7 +215,7 @@ class Batch {
       source: param(sourceId),
       refs: param(refs),
       realms: param(realms),
-      expires: expirationExpression(opts.maxAge)
+      expires: expirationExpression(opts.maxAge),
     };
 
     if (generation != null) {
@@ -220,15 +224,20 @@ class Batch {
 
     await this.client.query(queryToSQL(upsert('documents', 'documents_pkey', document)));
     await this.client.emitEvent('add', context);
-    log.debug("save %s %s", type, id);
+    log.debug('save %s %s', type, id);
 
     await this._handleGrantOrGroupsTouched(context);
   }
 
   async deleteDocument(context) {
     let { type, id } = context;
-    let { rows } = await this.client.query('select type, id, source, generation, upstream_doc as "upstreamDoc" from documents where type=$1 and id=$2', [type, id]);
-    let [ row={} ] = rows;
+    let {
+      rows,
+    } = await this.client.query(
+      'select type, id, source, generation, upstream_doc as "upstreamDoc" from documents where type=$1 and id=$2',
+      [type, id]
+    );
+    let [row = {}] = rows;
     let { upstreamDoc } = row;
 
     this._touched[`${type}/${id}`] = this._touchCounter++;
@@ -236,7 +245,7 @@ class Batch {
 
     await this.client.query(sql, [type, id]);
     await this.client.emitEvent('delete', { id, type, upstreamDoc });
-    log.debug("delete %s %s", type, id);
+    log.debug('delete %s %s', type, id);
 
     await this._handleGrantOrGroupsTouched(context);
   }
@@ -265,37 +274,41 @@ class Batch {
 
   async _recalcuateRealms() {
     await this.client._iterateThroughRows(
-      'select id, type, source, upstream_doc from documents', [],
-      async ({ id, upstream_doc:upstreamDoc, type, source:sourceId }) => {
+      'select id, type, source, upstream_doc from documents',
+      [],
+      async ({ id, upstream_doc: upstreamDoc, type, source: sourceId }) => {
         let schema = this._schema;
         let context = this._searchers.createDocumentContext({
           schema,
           type,
           id,
           sourceId,
-          upstreamDoc
+          upstreamDoc,
         });
         let realms = await schema.authorizedReadRealms(type, context);
         const sql = 'update documents set realms=$1 where id=$2 and type=$3';
         await this.client.query(sql, [realms, id, type]);
-      });
-    }
+      }
+    );
+  }
 
   async _recalculateUserRealms() {
     let schema = this._schema;
     await this.client._iterateThroughRows(
-      `select id, type, source, upstream_doc, generation from documents where type != 'user-realms'`, [],
-      async ({ id, type, source:sourceId, upstream_doc:upstreamDoc, generation }) => {
-          let context = this._searchers.createDocumentContext({
-            type,
-            id,
-            sourceId,
-            generation,
-            upstreamDoc,
-            schema
-          });
-          await this._maybeUpdateRealms(context);
-      });
+      `select id, type, source, upstream_doc, generation from documents where type != 'user-realms'`,
+      [],
+      async ({ id, type, source: sourceId, upstream_doc: upstreamDoc, generation }) => {
+        let context = this._searchers.createDocumentContext({
+          type,
+          id,
+          sourceId,
+          generation,
+          upstreamDoc,
+          schema,
+        });
+        await this._maybeUpdateRealms(context);
+      }
+    );
   }
 
   // This method does not need to recursively invalidate, because each
@@ -303,9 +316,12 @@ class Batch {
   // documents it references.
   async _invalidations() {
     await this.client._iterateThroughRows(
-      'select id, type from documents where expires < now()', [], async({ id, type }) => {
+      'select id, type from documents where expires < now()',
+      [],
+      async ({ id, type }) => {
         this._touched[`${type}/${id}`] = this._touchCounter++;
-      });
+      }
+    );
     await this.client.query('delete from documents where expires < now()');
     await this.client.docsThatReference(Object.keys(this._touched), async (doc, refs) => {
       let { type, id } = doc.data;
@@ -326,7 +342,7 @@ class Batch {
           type,
           id,
           sourceId,
-          upstreamDoc: doc
+          upstreamDoc: doc,
         });
 
         if (type === 'user-realms') {
@@ -367,8 +383,10 @@ class Batch {
   }
 
   async _maybeUpdateRealms(context) {
-    let { id, type, sourceId, generation, schema, upstreamDoc:doc } = context;
-    if (!doc) { return; }
+    let { id, type, sourceId, generation, schema, upstreamDoc: doc } = context;
+    if (!doc) {
+      return;
+    }
 
     let realms = await schema.userRealms(context);
     if (realms) {
@@ -384,24 +402,23 @@ class Batch {
             type: 'user-realms',
             id: userRealmsId,
             attributes: {
-              realms
+              realms,
             },
             relationships: {
               user: {
-                data: { type, id }
-              }
-            }
-          }
-        }
+                data: { type, id },
+              },
+            },
+          },
+        },
       });
 
       await this.saveDocument(userRealmContext);
     }
   }
-
 }
 
-function readCursor(cursor, rowCount){
+function readCursor(cursor, rowCount) {
   return new Promise((resolve, reject) => {
     cursor.read(rowCount, (err, rows) => {
       if (err) {
@@ -413,8 +430,8 @@ function readCursor(cursor, rowCount){
   });
 }
 
-function safeDatabaseName(name){
-  if (!/^[a-zA-Z_0-9]+$/.test(name)){
+function safeDatabaseName(name) {
+  if (!/^[a-zA-Z_0-9]+$/.test(name)) {
     throw new Error(`unsure if db name ${name} is safe`);
   }
   return name;

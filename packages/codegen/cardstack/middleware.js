@@ -1,7 +1,7 @@
-const { declareInjections } = require("@cardstack/di");
-const route = require("koa-better-route");
-const compose = require("koa-compose");
-const { transform } = require("@babel/core");
+const { declareInjections } = require('@cardstack/di');
+const route = require('koa-better-route');
+const compose = require('koa-compose');
+const { transform } = require('@babel/core');
 
 module.exports = declareInjections(
   {
@@ -14,7 +14,7 @@ module.exports = declareInjections(
 
   class CodeGenMiddleware {
     constructor() {
-      this.before = "authentication";
+      this.before = 'authentication';
     }
 
     middleware() {
@@ -22,26 +22,25 @@ module.exports = declareInjections(
     }
 
     _scriptRoute() {
-      return route.get("/codegen/:module_prefix", async ctxt => {
+      return route.get('/codegen/:module_prefix', async ctxt => {
         let { appModules, modules } = await this.service.generateCode();
         let modulePrefix = ctxt.routeParams.module_prefix;
-        ctxt.body =
-          compileModules(appModules, modulePrefix) + compileModules(modules);
-        ctxt.response.set("Access-Control-Allow-Origin", "*");
-        ctxt.response.set("Content-Type", "application/javascript");
+        ctxt.body = compileModules(appModules, modulePrefix) + compileModules(modules);
+        ctxt.response.set('Access-Control-Allow-Origin', '*');
+        ctxt.response.set('Content-Type', 'application/javascript');
         ctxt.status = 200;
       });
     }
 
     _modulesRoute() {
-      return route.get("/codegen-modules", async ctxt => {
+      return route.get('/codegen-modules', async ctxt => {
         let { appModules, modules } = await this.service.generateCode();
         ctxt.body = JSON.stringify({
           modules: [...modules],
           appModules: [...appModules],
         });
-        ctxt.response.set("Access-Control-Allow-Origin", "*");
-        ctxt.response.set("Content-Type", "application/json");
+        ctxt.response.set('Access-Control-Allow-Origin', '*');
+        ctxt.response.set('Content-Type', 'application/json');
         ctxt.status = 200;
       });
     }
@@ -53,10 +52,10 @@ function compileModules(modules, packagePrefix = null) {
   for (let [name, code] of modules) {
     results.push(
       transform(code, {
-        plugins: ["@babel/plugin-transform-modules-amd"],
+        plugins: ['@babel/plugin-transform-modules-amd'],
         moduleId: packagePrefix ? `${packagePrefix}/${name}` : name,
       }).code
     );
   }
-  return results.join("\n");
+  return results.join('\n');
 }

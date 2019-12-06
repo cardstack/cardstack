@@ -19,13 +19,15 @@ module.exports = class SourcesUpdate {
 
   async addDataSource(dataSource) {
     if (this._schema) {
-      throw new Error("Bug in hub indexing. Something tried to add an indexer after we had already established the schema");
+      throw new Error(
+        'Bug in hub indexing. Something tried to add an indexer after we had already established the schema'
+      );
     }
     let indexer = dataSource.indexer;
     if (!indexer) {
       return [];
     }
-    let updater = this.updaters[dataSource.id] = await indexer.beginUpdate();
+    let updater = (this.updaters[dataSource.id] = await indexer.beginUpdate());
     owningDataSource.set(updater, dataSource);
     let newModels = await updater.schema();
     this.schemaModels.push(newModels);
@@ -39,10 +41,12 @@ module.exports = class SourcesUpdate {
 
   async schema() {
     if (this._schema === FINALIZED) {
-      throw new Error("Bug: the schema has already been taken away from this sources update");
+      throw new Error('Bug: the schema has already been taken away from this sources update');
     }
     if (!this._schema) {
-      this._schema = await this.seedSchema.applyChanges(flatten(this.schemaModels).map(model => ({ type: model.type, id: model.id, document: model })));
+      this._schema = await this.seedSchema.applyChanges(
+        flatten(this.schemaModels).map(model => ({ type: model.type, id: model.id, document: model }))
+      );
     }
     return this._schema;
   }
@@ -77,16 +81,22 @@ module.exports = class SourcesUpdate {
     let types = hints && Array.isArray(hints) ? hints.map(hint => hint.type).filter(type => Boolean(type)) : [];
     let updaters = Object.entries(this.updaters);
 
-    let dataSourceIds = types.map(type => {
-      let contentType = schema.getType(type);
-      if (!contentType) { return; }
-      let dataSource = contentType.dataSource;
-      if (!dataSource) { return; }
-      return dataSource.id;
-    }).filter(item => Boolean(item));
+    let dataSourceIds = types
+      .map(type => {
+        let contentType = schema.getType(type);
+        if (!contentType) {
+          return;
+        }
+        let dataSource = contentType.dataSource;
+        if (!dataSource) {
+          return;
+        }
+        return dataSource.id;
+      })
+      .filter(item => Boolean(item));
 
     if (dataSourceIds.length) {
-      updaters = updaters.filter(([ sourceId ]) => dataSourceIds.includes(sourceId));
+      updaters = updaters.filter(([sourceId]) => dataSourceIds.includes(sourceId));
     }
 
     for (let [sourceId, updater] of updaters) {
@@ -111,8 +121,8 @@ module.exports = class SourcesUpdate {
     // it. We don't want inconsistent types across plugins to cause
     // mapping errors.
     return this.client.saveMeta({
-        id: owningDataSource.get(updater).id,
-        params: newMeta
+      id: owningDataSource.get(updater).id,
+      params: newMeta,
     });
   }
 
@@ -137,7 +147,7 @@ module.exports = class SourcesUpdate {
     await this._batch.saveDocument(context);
 
     this.emitEvent('add', { type, id, doc });
-    log.debug("save %s %s", type, id);
+    log.debug('save %s %s', type, id);
   }
 
   async delete(type, id) {
@@ -151,13 +161,12 @@ module.exports = class SourcesUpdate {
     await this._batch.deleteDocument(context);
 
     this.emitEvent('delete', { type, id });
-    log.debug("delete %s %s", type, id);
+    log.debug('delete %s %s', type, id);
   }
 
   async deleteAllWithoutNonce(sourceId, nonce) {
     await this.client.deleteOlderGenerations(sourceId, nonce);
     this.emitEvent('delete_all_without_nonce', { sourceId, nonce });
-    log.debug("bulk delete older content for data source %s", sourceId);
+    log.debug('bulk delete older content for data source %s', sourceId);
   }
 };
-

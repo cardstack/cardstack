@@ -21,7 +21,7 @@ class GitLocalCache {
     let existingRepo = this._remotes.get(remoteUrl);
 
     if (existingRepo) {
-      log.info("existing repo found for %s, reusing it from the cache", remoteUrl);
+      log.info('existing repo found for %s, reusing it from the cache', remoteUrl);
       return existingRepo.repo;
     }
 
@@ -42,7 +42,7 @@ class GitLocalCache {
     if (!cacheDirectory) {
       cacheDirectory = join(tmpdir(), 'cardstack-git-local-cache');
 
-      if(!existsSync(cacheDirectory)) {
+      if (!existsSync(cacheDirectory)) {
         await mkdirp(cacheDirectory);
       }
     }
@@ -56,42 +56,42 @@ class GitLocalCache {
             return Cred.sshKeyMemoryNew(userName, remote.publicKey || '', remote.privateKey, remote.passphrase || '');
           }
           return Cred.sshKeyFromAgent(userName);
-        }
-      }
+        },
+      },
     };
 
-    log.info("creating local repo cache for %s in %s", remote.url, repoPath);
+    log.info('creating local repo cache for %s in %s', remote.url, repoPath);
 
     let repo;
 
-    if(existsSync(repoPath)) {
+    if (existsSync(repoPath)) {
       try {
-        log.info("repo already exists - reusing local clone");
+        log.info('repo already exists - reusing local clone');
         repo = await Repository.open(repoPath);
       } catch (e) {
-        log.info("creating repo from %s failed, deleting and recloning", repoPath);
+        log.info('creating repo from %s failed, deleting and recloning', repoPath);
         // if opening existing repo fails for any reason we should just delete it and clone it
         await rimraf(repoPath);
 
         await mkdirp(repoPath);
 
         repo = await Clone(remote.url, repoPath, {
-          fetchOpts
+          fetchOpts,
         });
       }
     } else {
-      log.info("cloning %s into %s", remote.url, repoPath);
+      log.info('cloning %s into %s', remote.url, repoPath);
       await mkdirp(repoPath);
 
       repo = await Clone(remote.url, repoPath, {
-        fetchOpts
+        fetchOpts,
       });
     }
 
     return {
       repo,
       fetchOpts,
-      repoPath
+      repoPath,
     };
   }
 
@@ -101,17 +101,17 @@ class GitLocalCache {
   }
 
   async pullRepo(remoteUrl, targetBranch) {
-    log.info("pulling changes for branch %s on %s", targetBranch, remoteUrl);
+    log.info('pulling changes for branch %s on %s', targetBranch, remoteUrl);
     let { repo } = this._remotes.get(remoteUrl);
 
     // if branch does not exist locally then create it and reset to head of remote
     // this is required because nodegit doesn't support direct pull https://github.com/nodegit/nodegit/issues/1123
     try {
       await repo.getReference(`${targetBranch}`);
-      log.info("reference for %s on %s already exists, continuing", targetBranch, remoteUrl);
+      log.info('reference for %s on %s already exists, continuing', targetBranch, remoteUrl);
     } catch (e) {
-      if(e.message.startsWith('no reference found for shorthand')) {
-        log.info("no local branch for %s on %s. Creating it now...", targetBranch, remoteUrl);
+      if (e.message.startsWith('no reference found for shorthand')) {
+        log.info('no local branch for %s on %s. Creating it now...', targetBranch, remoteUrl);
         let headCommit = await repo.getHeadCommit();
         let ref = await repo.createBranch(targetBranch, headCommit, false);
         await repo.checkoutBranch(ref, {});

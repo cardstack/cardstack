@@ -22,8 +22,8 @@ module.exports = [
         // who are actively managing their own local git
         // repository. In production or in friendly-desktop mode, this
         // feature should not be needed.
-        branchPrefix: 'cs-'
-      }
-    }
-  }
+        branchPrefix: 'cs-',
+      },
+    },
+  },
 ];

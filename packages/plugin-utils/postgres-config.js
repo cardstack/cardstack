@@ -1,6 +1,6 @@
 const parse = require('pg-connection-string');
 
-module.exports = function postgresConfig(defaultConfig={}) {
+module.exports = function postgresConfig(defaultConfig = {}) {
   let config;
   let { database } = defaultConfig;
 
@@ -13,12 +13,15 @@ module.exports = function postgresConfig(defaultConfig={}) {
   if (process.env.DB_URL) {
     config = parse(process.env.DB_URL);
   } else {
-    config = Object.assign({
-      host: process.env.PGHOST || 'localhost',
-      port: process.env.PGPORT || '5432',
-      user: process.env.PGUSER || 'postgres',
-      password: process.env.PGPASSWORD || undefined
-    }, defaultConfig);
+    config = Object.assign(
+      {
+        host: process.env.PGHOST || 'localhost',
+        port: process.env.PGPORT || '5432',
+        user: process.env.PGUSER || 'postgres',
+        password: process.env.PGPASSWORD || undefined,
+      },
+      defaultConfig
+    );
   }
 
   config.database = database || process.env.PGDATABASE || 'postgres';

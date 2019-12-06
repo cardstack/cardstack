@@ -3,5 +3,5 @@ import layout from '../../templates/components/cardstack/application-card-isolat
 
 export default Component.extend({
   layout,
-  classNames: ['cs-application-card']
+  classNames: ['cs-application-card'],
 });

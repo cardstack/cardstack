@@ -9,7 +9,7 @@ const defaults = require('superagent-defaults');
 const Koa = require('koa');
 const {
   createDefaultEnvironment,
-  destroyDefaultEnvironment
+  destroyDefaultEnvironment,
 } = require('../../../tests/ephemeral-test-app/node_modules/@cardstack/test-support/env');
 const JSONAPIFactory = require('../../../tests/ephemeral-test-app/node_modules/@cardstack/test-support/jsonapi-factory');
 const { defaultDataSourceId } = require('@cardstack/test-support/env');
@@ -22,27 +22,27 @@ describe('ephemeral-storage', function() {
     factory.addResource('posts', 'initial').withAttributes({ title: 'initial post' });
     factory.addResource('content-types', 'extra-things').withRelated('fields', [
       factory.addResource('fields', 'extra-field').withAttributes({
-        fieldType: '@cardstack/core-types::string'
-      })
+        fieldType: '@cardstack/core-types::string',
+      }),
     ]);
 
     factory.addResource('posts', 'first-post').withAttributes({
       title: 'The First Post',
-      body: 'First post body'
+      body: 'First post body',
     });
 
     factory.addResource('posts', 'second-post').withAttributes({
       title: 'The Second Post',
-      body: 'Second post body'
+      body: 'Second post body',
     });
 
     factory.addResource('content-types', 'posts').withRelated('fields', [
       factory.addResource('fields', 'title').withAttributes({
-        fieldType: '@cardstack/core-types::string'
+        fieldType: '@cardstack/core-types::string',
       }),
       factory.addResource('fields', 'body').withAttributes({
-        fieldType: '@cardstack/core-types::string'
-      })
+        fieldType: '@cardstack/core-types::string',
+      }),
     ]);
 
     env = await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', factory.getModels());
@@ -75,15 +75,14 @@ describe('ephemeral-storage', function() {
     beforeEach(setup);
     afterEach(teardown);
 
-
     it('respect schema in initial models', async function() {
       let response = await request.post(`/api/extra-things`).send({
         data: {
           type: 'extra-things',
           attributes: {
-            'extra-field': 'x'
-          }
-        }
+            'extra-field': 'x',
+          },
+        },
       });
       expect(response).hasStatus(201);
     });
@@ -91,11 +90,11 @@ describe('ephemeral-storage', function() {
     it('can create a new record', async function() {
       let response = await request.post('/api/posts').send({
         data: {
-          type: "posts",
+          type: 'posts',
           attributes: {
-            title: "hello"
-          }
-        }
+            title: 'hello',
+          },
+        },
       });
       expect(response).hasStatus(201);
       expect(response.body).has.deep.property('data.meta.version');
@@ -107,20 +106,22 @@ describe('ephemeral-storage', function() {
       expect(response.body).has.deep.property('data.attributes.title', 'hello');
     });
 
-    it("can store a card document as a single document", async function () {
+    it('can store a card document as a single document', async function() {
       let factory = new JSONAPIFactory();
       let card = factory.getDocumentFor(
-        factory.addResource('cards', 'local-hub::test-card')
+        factory
+          .addResource('cards', 'local-hub::test-card')
           .withRelated('fields', [
             factory.addResource('fields', 'title').withAttributes({
               'is-metadata': true,
               'field-type': '@cardstack/core-types::string',
-              'needed-when-embedded': true
-            })
+              'needed-when-embedded': true,
+            }),
           ])
-          .withRelated('model', factory.addResource('local-hub::test-card', 'local-hub::test-card')
-            .withAttributes({
-              title: 'hello'
+          .withRelated(
+            'model',
+            factory.addResource('local-hub::test-card', 'local-hub::test-card').withAttributes({
+              title: 'hello',
             })
           )
       );
@@ -151,41 +152,43 @@ describe('ephemeral-storage', function() {
       response = await request.patch('/api/posts/first-post').send({
         data: {
           attributes: {
-            body: 'Updated body'
+            body: 'Updated body',
           },
           meta: {
-            version: response.body.data.meta.version
-          }
-        }
+            version: response.body.data.meta.version,
+          },
+        },
       });
       expect(response).hasStatus(200);
       expect(response.body.data.attributes).deep.equals({
         body: 'Updated body',
-        title: 'The First Post'
+        title: 'The First Post',
       });
 
       response = await request.get('/api/posts/first-post');
       expect(response).hasStatus(200);
       expect(response.body.data.attributes).deep.equals({
         body: 'Updated body',
-        title: 'The First Post'
+        title: 'The First Post',
       });
     });
 
-    it("can update a card document stored as a single document", async function () {
+    it('can update a card document stored as a single document', async function() {
       let factory = new JSONAPIFactory();
       let card = factory.getDocumentFor(
-        factory.addResource('cards', 'local-hub::test-card')
+        factory
+          .addResource('cards', 'local-hub::test-card')
           .withRelated('fields', [
             factory.addResource('fields', 'title').withAttributes({
               'is-metadata': true,
               'field-type': '@cardstack/core-types::string',
-              'needed-when-embedded': true
-            })
+              'needed-when-embedded': true,
+            }),
           ])
-          .withRelated('model', factory.addResource('local-hub::test-card', 'local-hub::test-card')
-            .withAttributes({
-              title: 'hello'
+          .withRelated(
+            'model',
+            factory.addResource('local-hub::test-card', 'local-hub::test-card').withAttributes({
+              title: 'hello',
             })
           )
       );
@@ -201,8 +204,8 @@ describe('ephemeral-storage', function() {
         attributes: {
           'is-metadata': true,
           'field-type': '@cardstack/core-types::string',
-          'needed-when-embedded': true
-        }
+          'needed-when-embedded': true,
+        },
       });
 
       let response = await request.patch(`/api/cards/${card.data.id}`).send(card);
@@ -233,16 +236,15 @@ describe('ephemeral-storage', function() {
       response = await request.patch('/api/posts/first-post').send({
         data: {
           attributes: {
-            body: 'Updated body'
+            body: 'Updated body',
           },
           meta: {
-            version: 'not valid'
-          }
-        }
+            version: 'not valid',
+          },
+        },
       });
       expect(response).hasStatus(409);
     });
-
 
     it('can delete a record', async function() {
       let response = await request.get('/api/posts/first-post');
@@ -258,17 +260,19 @@ describe('ephemeral-storage', function() {
     it('can delete a card from storage', async function() {
       let factory = new JSONAPIFactory();
       let card = factory.getDocumentFor(
-        factory.addResource('cards', 'local-hub::test-card')
+        factory
+          .addResource('cards', 'local-hub::test-card')
           .withRelated('fields', [
             factory.addResource('fields', 'title').withAttributes({
               'is-metadata': true,
               'field-type': '@cardstack/core-types::string',
-              'needed-when-embedded': true
-            })
+              'needed-when-embedded': true,
+            }),
           ])
-          .withRelated('model', factory.addResource('local-hub::test-card', 'local-hub::test-card')
-            .withAttributes({
-              title: 'hello'
+          .withRelated(
+            'model',
+            factory.addResource('local-hub::test-card', 'local-hub::test-card').withAttributes({
+              title: 'hello',
             })
           )
       );
@@ -308,33 +312,35 @@ describe('ephemeral-storage', function() {
       expect(first).hasStatus(200);
       expect(second).hasStatus(200);
 
-      let checkpointId = "0";
+      let checkpointId = '0';
       storage.makeCheckpoint(checkpointId);
 
       // Now do a post-checkpoint delete, patch, and post
 
-      let response = await request.delete(`/api/posts/${first.body.data.id}`).set('If-Match', first.body.data.meta.version);
+      let response = await request
+        .delete(`/api/posts/${first.body.data.id}`)
+        .set('If-Match', first.body.data.meta.version);
       expect(response).hasStatus(204);
 
       response = await request.patch(`/api/posts/${second.body.data.id}`).send({
         data: {
           attributes: {
-            body: 'updated second body'
+            body: 'updated second body',
           },
           meta: {
-            version: second.body.data.meta.version
-          }
-        }
+            version: second.body.data.meta.version,
+          },
+        },
       });
       expect(response).hasStatus(200);
 
       let third = await request.post(`/api/posts`).send({
         data: {
-          type: "posts",
+          type: 'posts',
           attributes: {
-            title: "third title"
-          }
-        }
+            title: 'third title',
+          },
+        },
       });
       expect(third).hasStatus(201);
 
@@ -350,38 +356,32 @@ describe('ephemeral-storage', function() {
 
       response = await request.get(`/api/posts/${third.body.data.id}`);
       expect(response).hasStatus(404);
-
     });
   });
 
-
   describe('invalid', function() {
-
     it('rejects an initial data model that violates schema', async function() {
       let factory = new JSONAPIFactory();
       factory.addResource('no-such-types').withAttributes({ title: 'initial post' });
       try {
         await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', factory.getModels());
-        throw new Error("should not get here");
-      } catch(err) {
+        throw new Error('should not get here');
+      } catch (err) {
         expect(err.message).to.equal('"no-such-types" is not a valid type');
       }
     });
 
     it('rejects an initial schema model that violates bootstrap schema', async function() {
       let factory = new JSONAPIFactory();
-      factory.addResource('content-types', 'animals').withRelated('fields', [
-        { type: 'fields', id: 'not-a-real-field' }
-      ]);
+      factory
+        .addResource('content-types', 'animals')
+        .withRelated('fields', [{ type: 'fields', id: 'not-a-real-field' }]);
       try {
         await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', factory.getModels());
-        throw new Error("should not get here");
-      } catch(err) {
+        throw new Error('should not get here');
+      } catch (err) {
         expect(err.message).to.equal('content type "animals" refers to missing field "not-a-real-field"');
       }
     });
-
   });
-
-
 });

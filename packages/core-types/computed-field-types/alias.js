@@ -1,7 +1,11 @@
 async function resolvePath(model, pathSegments) {
-  if (!model) { return; }
+  if (!model) {
+    return;
+  }
 
-  if (!pathSegments.length) { return model; }
+  if (!pathSegments.length) {
+    return model;
+  }
 
   if (pathSegments.length === 1) {
     let field = pathSegments[0];

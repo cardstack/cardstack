@@ -10,7 +10,7 @@ module.exports = class StubSearcher {
   async get(session, type, id, next) {
     if (type === 'sample-searcher-models' && id === '1') {
       return {
-        data: makeModel(type, id)
+        data: makeModel(type, id),
       };
     }
     return next();
@@ -19,10 +19,10 @@ module.exports = class StubSearcher {
   async search(session, query, next) {
     if (query.filter && query.filter.type && query.filter.type === 'sample-searcher-models') {
       return {
-        data: [ makeModel('sample-searcher-models', '1') ],
+        data: [makeModel('sample-searcher-models', '1')],
         meta: {
-          page: {}
-        }
+          page: {},
+        },
       };
     }
     return next();
@@ -34,7 +34,7 @@ function makeModel(type, id) {
     type,
     id,
     attributes: {
-      'height': 1
-    }
+      height: 1,
+    },
   };
 }

@@ -5,16 +5,16 @@ import { inject as service } from '@ember/service';
 const modes = [
   {
     id: 'schema',
-    displayTitle: 'Schema View'
+    displayTitle: 'Schema View',
   },
   {
     id: 'view',
-    displayTitle: 'Layout View'
+    displayTitle: 'Layout View',
   },
   {
     id: 'edit',
-    displayTitle: 'Edit View'
-  }
+    displayTitle: 'Edit View',
+  },
 ];
 
 export default class ModeSwitcher extends Component {
@@ -24,7 +24,9 @@ export default class ModeSwitcher extends Component {
 
   @action
   selectMode(mode) {
-    if (!mode || !this.args.name) { return; }
+    if (!mode || !this.args.name) {
+      return;
+    }
 
     this.router.transitionTo(`cards.${mode}`, this.args.name);
   }

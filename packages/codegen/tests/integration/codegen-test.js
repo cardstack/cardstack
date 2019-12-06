@@ -16,5 +16,4 @@ module('Integration | CodeGen', function(hooks) {
     let env2 = window.require('@cardstack/plugin-utils/environment');
     assert.ok(!env2.seenInCodeGenTest, 'should have a refresh version of the module');
   });
-
 });

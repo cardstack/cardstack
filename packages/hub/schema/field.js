@@ -38,13 +38,17 @@ module.exports = class Field {
     this.plugin = plugins.lookupFeatureAndAssert('field-types', this.fieldType);
     this.isRelationship = this.plugin.isRelationship;
 
-    if (model.relationships && model.relationships['related-types'] && model.relationships['related-types'].data.length > 0) {
+    if (
+      model.relationships &&
+      model.relationships['related-types'] &&
+      model.relationships['related-types'].data.length > 0
+    ) {
       this.relatedTypes = Object.create(null);
       for (let typeRef of model.relationships['related-types'].data) {
         if (typeRef.type !== 'content-types') {
           throw new Error(`field "${this.id}" has a related type that is not of type "content-types"`, {
             status: 400,
-            title: "Non-type in related-types"
+            title: 'Non-type in related-types',
           });
         }
         this.relatedTypes[typeRef.id] = true;
@@ -57,10 +61,12 @@ module.exports = class Field {
   }
 
   _lookupDefaultValue(model, relationship, defaultValues) {
-    if (defaultValues &&
-        model.relationships &&
-        model.relationships[relationship] &&
-        model.relationships[relationship].data) {
+    if (
+      defaultValues &&
+      model.relationships &&
+      model.relationships[relationship] &&
+      model.relationships[relationship].data
+    ) {
       let valueModelId = model.relationships[relationship].data.id;
       let valueModel = defaultValues.get(valueModelId);
       if (!valueModel) {
@@ -78,7 +84,7 @@ module.exports = class Field {
     return this.isRelationship ? 'relationships' : 'attributes';
   }
 
-  valueFrom(pendingChange, side='finalDocument') {
+  valueFrom(pendingChange, side = 'finalDocument') {
     let document = resolveDocument(pendingChange[side]);
     if (document) {
       let section = this._sectionName();
@@ -103,10 +109,12 @@ module.exports = class Field {
     let sectionName = this.isRelationship ? 'attributes' : 'relationships';
     let section = resolveDocument(pendingChange.finalDocument)[sectionName];
     if (section && section[this.id]) {
-      errors.push(new Error(`field "${this.id}" should be in ${this._sectionName()}, not ${sectionName}`, {
-        status: 400,
-        source: { pointer: `/data/${sectionName}/${this.id}` }
-      }));
+      errors.push(
+        new Error(`field "${this.id}" should be in ${this._sectionName()}, not ${sectionName}`, {
+          status: 400,
+          source: { pointer: `/data/${sectionName}/${this.id}` },
+        })
+      );
     }
   }
 
@@ -114,7 +122,9 @@ module.exports = class Field {
     // every field is allowed to be null -- validator plugins only run
     // when a non-null value is present. If you don't want to allow
     // null, you can do that via a constraint instead.
-    if (value == null) { return; }
+    if (value == null) {
+      return;
+    }
 
     let result = this.plugin.valid(value, { relatedTypes: this.relatedTypes });
     if (!result) {
@@ -123,10 +133,12 @@ module.exports = class Field {
       result = `field "${this.id}" ${result}`;
     }
     if (typeof result === 'string') {
-      errors.push(new Error(result, {
-        status: 422,
-        title: "Validation error"
-      }));
+      errors.push(
+        new Error(result, {
+          status: 422,
+          title: 'Validation error',
+        })
+      );
     }
   }
 
@@ -148,7 +160,10 @@ module.exports = class Field {
       //   - Otherwise ask the field-type plugin it is has a default.
       //
       //   - Otherwise all fields default to null.
-      defaultInput = this.defaultAtCreate || this.defaultAtUpdate || { value: this.id === 'type' ? resolveDocument(pendingChange.finalDocument).type : (this.plugin.default || null) };
+      defaultInput = this.defaultAtCreate ||
+        this.defaultAtUpdate || {
+          value: this.id === 'type' ? resolveDocument(pendingChange.finalDocument).type : this.plugin.default || null,
+        };
     } else {
       defaultInput = this.defaultAtUpdate;
     }
@@ -164,10 +179,10 @@ module.exports = class Field {
     }
   }
 
-  async applyDefault(pendingChange,  context) {
+  async applyDefault(pendingChange, context) {
     let defaultValue = await this._defaultValueFor(pendingChange, context);
     if (defaultValue) {
-      pendingChange.serverProvidedValues.set(this.id,defaultValue.value);
+      pendingChange.serverProvidedValues.set(this.id, defaultValue.value);
       if (!pendingChange.originalDocument) {
         if (this.valueFrom(pendingChange, 'finalDocument') !== undefined) {
           // The user provided a value at creation, so defaults do not
@@ -200,20 +215,37 @@ module.exports = class Field {
     let value = this.valueFrom(pendingChange, 'finalDocument');
     let grant;
 
-    if (pendingChange.serverProvidedValues.has(this.id) && isEqual(pendingChange.serverProvidedValues.get(this.id), value)) {
-      authLog.debug("approved field write for %s because it matches server provided default", this.id);
+    if (
+      pendingChange.serverProvidedValues.has(this.id) &&
+      isEqual(pendingChange.serverProvidedValues.get(this.id), value)
+    ) {
+      authLog.debug('approved field write for %s because it matches server provided default', this.id);
     } else if (pendingChange.originalDocument && isEqual(value, this.valueFrom(pendingChange, 'originalDocument'))) {
-      authLog.debug("approved field write for %s because it was unchanged", this.id);
-    } else if (pendingChange.originalDocumentContext && (grant = await find(this.grants, async g => g['may-write-fields'] && await g.matches(pendingChange.originalDocumentContext, context)))) {
-      authLog.debug("approved field write for %s because grant %s applies to original document", this.id, grant.id);
-    } else if (!pendingChange.originalDocumentContext && (grant = await find(this.grants, async g => g['may-write-fields'] && await g.matches(pendingChange.finalDocumentContext, context)))) {
-      authLog.debug("approved field write for %s because grant %s applies to final document", this.id, grant.id);
+      authLog.debug('approved field write for %s because it was unchanged', this.id);
+    } else if (
+      pendingChange.originalDocumentContext &&
+      (grant = await find(
+        this.grants,
+        async g => g['may-write-fields'] && (await g.matches(pendingChange.originalDocumentContext, context))
+      ))
+    ) {
+      authLog.debug('approved field write for %s because grant %s applies to original document', this.id, grant.id);
+    } else if (
+      !pendingChange.originalDocumentContext &&
+      (grant = await find(
+        this.grants,
+        async g => g['may-write-fields'] && (await g.matches(pendingChange.finalDocumentContext, context))
+      ))
+    ) {
+      authLog.debug('approved field write for %s because grant %s applies to final document', this.id, grant.id);
     } else {
       // Denied
-      authLog.debug("denied field write for %s", this.id);
-      return [new Error(`You may not write field "${this.id}"`, {
-        status: 401
-      })];
+      authLog.debug('denied field write for %s', this.id);
+      return [
+        new Error(`You may not write field "${this.id}"`, {
+          status: 401,
+        }),
+      ];
     }
 
     let errors = [];
@@ -222,12 +254,11 @@ module.exports = class Field {
     return errors;
   }
 
-
   buildQueryExpression(sourceExpression) {
     if (this.plugin.buildQueryExpression) {
       return this.plugin.buildQueryExpression(sourceExpression, this.id);
     }
-    if (this.id === 'type' || this.id === 'id'){
+    if (this.id === 'type' || this.id === 'id') {
       if (isEqual(sourceExpression, ['search_doc'])) {
         // Optimization for pulling top-level fields that have their own columns
         return [this.id];
@@ -245,25 +276,25 @@ module.exports = class Field {
   }
 
   searchIndexFormat(value) {
-   if(this.plugin.searchIndexFormat) {
-     return this.plugin.searchIndexFormat(value);
-   }
-   return value;
+    if (this.plugin.searchIndexFormat) {
+      return this.plugin.searchIndexFormat(value);
+    }
+    return value;
   }
-
-
 };
-
 
 function humanize(string) {
   // First regex taken from @ember/string#capitalize
   // Would be great to "merge" this with the cs-humanize helper
   // in the rendering package
-  return string.replace(/(^|\/)([a-z])/g, function(match) {
-    return match.toUpperCase();
-  }).replace(/([a-z])([A-Z])/g, function(all, low, upper) {
-    return `${low} ${upper}`;
-  }).replace(/-([a-zA-Z])/g, function(all, follower){
-    return ` ${follower.toUpperCase()}`;
-  });
+  return string
+    .replace(/(^|\/)([a-z])/g, function(match) {
+      return match.toUpperCase();
+    })
+    .replace(/([a-z])([A-Z])/g, function(all, low, upper) {
+      return `${low} ${upper}`;
+    })
+    .replace(/-([a-zA-Z])/g, function(all, follower) {
+      return ` ${follower.toUpperCase()}`;
+    });
 }

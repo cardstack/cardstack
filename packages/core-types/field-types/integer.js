@@ -1,8 +1,8 @@
 module.exports = {
   valid(value) {
-    return typeof value==='number' && (value%1)===0;
+    return typeof value === 'number' && value % 1 === 0;
   },
-  buildQueryExpression(sourceExpression, name){
+  buildQueryExpression(sourceExpression, name) {
     return ['(', ...sourceExpression, '->>', { param: name }, ')::bigint'];
-  }
+  },
 };

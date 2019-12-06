@@ -1,6 +1,6 @@
 module.exports = {
   inputs: {
-    ignoreBlank: ['@cardstack/core-types::boolean']
+    ignoreBlank: ['@cardstack/core-types::boolean'],
   },
   description: `{{target.name}} must not be empty`,
   valid({ target, ignoreBlank }) {
@@ -12,5 +12,5 @@ module.exports = {
       value = value.trim();
     }
     return value.length > 0;
-  }
+  },
 };
