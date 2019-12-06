@@ -18,7 +18,7 @@ describe('hub/pgclient', function() {
   it('it can access the database', async function() {
     let pgclient = await env.container.lookup('pgclient');
     let cardsService = await env.container.lookup('cards');
-    let cards = cardsService.getScopedCardService(Session.INTERNAL_PRIVILEGED);
+    let cards = cardsService.as(Session.INTERNAL_PRIVILEGED);
     let result = await pgclient.query(cards, ['select 1']);
     expect(result.rowCount).equals(1);
   });
@@ -29,7 +29,7 @@ describe('hub/pgclient', function() {
     );
     let pgclient = await env.container.lookup('pgclient');
     let cardsService = await env.container.lookup('cards');
-    let cards = cardsService.getScopedCardService(Session.INTERNAL_PRIVILEGED);
+    let cards = cardsService.as(Session.INTERNAL_PRIVILEGED);
 
     let batch = pgclient.beginBatch(cards);
     await batch.save(card);

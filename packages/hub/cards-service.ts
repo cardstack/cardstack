@@ -11,8 +11,15 @@ import { Query } from './query';
 export default class CardsService {
   pgclient = inject('pgclient');
 
-  async create(session: Session, realm: URL, doc: SingleResourceDoc): Promise<CardWithId> {
-    let scopedCardService = this.getScopedCardService(session);
+  as(session: Session) {
+    return new ScopedCardService(this, session);
+  }
+}
+
+export class ScopedCardService {
+  constructor(private cards: CardsService, private session: Session) {}
+
+  async create(realm: URL, doc: SingleResourceDoc): Promise<CardWithId> {
     let realmCard = await this.getRealm(realm);
     let writerFactory = await realmCard.loadFeature('writer');
     if (!writerFactory) {
@@ -20,13 +27,13 @@ export default class CardsService {
         status: 403,
       });
     }
-    let writer = await getOwner(this).instantiate(writerFactory, realmCard);
+    let writer = await getOwner(this.cards).instantiate(writerFactory, realmCard);
     let card: Card = new Card(doc, realm);
     await validate(null, card, realmCard);
 
     let upstreamIdToWriter = card.upstreamId;
     let { saved, id: upstreamIdFromWriter } = await writer.create(
-      session,
+      this.session,
       await card.asUpstreamDoc(),
       upstreamIdToWriter
     );
@@ -39,25 +46,25 @@ export default class CardsService {
     card.patch(saved.jsonapi);
     card.assertHasIds();
 
-    let batch = this.pgclient.beginBatch(scopedCardService);
+    let batch = this.cards.pgclient.beginBatch(this);
     await batch.save(card);
     await batch.done();
 
     return card;
   }
 
-  async search(_session: Session, query: Query): Promise<{ cards: CardWithId[] }> {
+  async search(query: Query): Promise<{ cards: CardWithId[] }> {
     let cards = await scaffoldSearch(query);
     if (cards) {
       return { cards };
     }
 
     // TODO dont create a scoped card service here
-    let { cards: foundCards } = await this.pgclient.search(this.getScopedCardService(_session), query);
+    let { cards: foundCards } = await this.cards.pgclient.search(this, query);
     return { cards: foundCards };
   }
 
-  async get(session: Session, id: CardId): Promise<CardWithId> {
+  async get(id: CardId): Promise<CardWithId> {
     // this exists to throw if there's no such realm. We're not using the return
     // value yet but we will onc we implement custom searchers and realm grants.
     await this.getRealm(id.realm);
@@ -66,11 +73,7 @@ export default class CardsService {
       return card;
     }
     // TODO dont create a scoped card service here
-    return await this.pgclient.get(this.getScopedCardService(session), id);
-  }
-
-  getScopedCardService(session: Session) {
-    return new ScopedCardService(this, session);
+    return await this.cards.pgclient.get(this, id);
   }
 
   private async getRealm(realm: URL): Promise<CardWithId> {
@@ -81,7 +84,7 @@ export default class CardsService {
     //
     // We don't necessarily know the originalRealm we're looking for because we
     // don't know whose meta realm this realm was originally created in.
-    let { cards: realms } = await this.search(Session.INTERNAL_PRIVILEGED, {
+    let { cards: realms } = await this.cards.as(Session.INTERNAL_PRIVILEGED).search({
       filter: {
         type: { realm: CARDSTACK_PUBLIC_REALM, localId: 'realm' },
         eq: {
@@ -101,18 +104,6 @@ export default class CardsService {
       throw new CardstackError(`no such realm`, { status: 400 });
     }
     return realms[0];
-  }
-}
-
-export class ScopedCardService {
-  constructor(private cards: CardsService, private session: Session) {}
-
-  async get(id: CardId): Promise<CardWithId> {
-    return await this.cards.get(this.session, id);
-  }
-
-  async search(query: Query): Promise<{ cards: CardWithId[] }> {
-    return await this.cards.search(this.session, query);
   }
 }
 

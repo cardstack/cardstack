@@ -20,7 +20,7 @@ describe('hub/card-service', function() {
     it('handles get from missing realm', async function() {
       let service = await env.container.lookup('cards');
       try {
-        await service.get(Session.EVERYONE, {
+        await service.as(Session.EVERYONE).get({
           realm: new URL('http://not-a-known-realm'),
           localId: 'x',
         });
@@ -32,16 +32,12 @@ describe('hub/card-service', function() {
 
     it('saves a card', async function() {
       let doc = testCard({ hello: 'world' });
-      let service = await env.container.lookup('cards');
-      let card = await service.create(
-        Session.EVERYONE,
-        new URL(`${myOrigin}/api/realms/first-ephemeral-realm`),
-        doc.jsonapi
-      );
+      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
+      let card = await service.create(new URL(`${myOrigin}/api/realms/first-ephemeral-realm`), doc.jsonapi);
       expect(card.realm.href).to.equal(`${myOrigin}/api/realms/first-ephemeral-realm`);
 
       let pgclient = await env.container.lookup('pgclient');
-      let result = await pgclient.query(service.getScopedCardService(Session.EVERYONE), [
+      let result = await pgclient.query(service, [
         `select * from cards where realm = `,
         param(`${myOrigin}/api/realms/first-ephemeral-realm`),
       ]);
@@ -50,13 +46,9 @@ describe('hub/card-service', function() {
 
     it('can get a card back out', async function() {
       let doc = testCard({ hello: 'world' });
-      let service = await env.container.lookup('cards');
-      let card = await service.create(
-        Session.EVERYONE,
-        new URL(`${myOrigin}/api/realms/first-ephemeral-realm`),
-        doc.jsonapi
-      );
-      let foundCard = await service.get(Session.EVERYONE, card);
+      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
+      let card = await service.create(new URL(`${myOrigin}/api/realms/first-ephemeral-realm`), doc.jsonapi);
+      let foundCard = await service.get(card);
       expect(foundCard.id).equals(card.id);
     });
   });
@@ -68,18 +60,16 @@ describe('hub/card-service', function() {
     before(async function() {
       env = await createTestEnv();
       service = await env.container.lookup('cards');
-      await service.create(
-        Session.INTERNAL_PRIVILEGED,
+      let scopedService = service.as(Session.INTERNAL_PRIVILEGED);
+      await scopedService.create(
         new URL(`${myOrigin}/api/realms/first-ephemeral-realm`),
         testCard({ localId: '1' }, {}).jsonapi
       );
-      await service.create(
-        Session.INTERNAL_PRIVILEGED,
+      await scopedService.create(
         new URL(`${myOrigin}/api/realms/first-ephemeral-realm`),
         testCard({ localId: '2' }, {}).jsonapi
       );
-      await service.create(
-        Session.INTERNAL_PRIVILEGED,
+      await scopedService.create(
         new URL(`${myOrigin}/api/realms/first-ephemeral-realm`),
         testCard(
           {
@@ -89,8 +79,7 @@ describe('hub/card-service', function() {
           {}
         ).jsonapi
       );
-      await service.create(
-        Session.INTERNAL_PRIVILEGED,
+      await scopedService.create(
         new URL(`${myOrigin}/api/realms/first-ephemeral-realm`),
         testCard(
           {
@@ -100,18 +89,15 @@ describe('hub/card-service', function() {
           {}
         ).jsonapi
       );
-      await service.create(
-        Session.INTERNAL_PRIVILEGED,
+      await scopedService.create(
         new URL(`http://example.com/api/realms/second-ephemeral-realm`),
         testCard({ localId: '1' }, {}).jsonapi
       );
-      await service.create(
-        Session.INTERNAL_PRIVILEGED,
+      await scopedService.create(
         new URL(`http://example.com/api/realms/second-ephemeral-realm`),
         testCard({ localId: '2' }, {}).jsonapi
       );
-      await service.create(
-        Session.INTERNAL_PRIVILEGED,
+      await scopedService.create(
         new URL(`http://example.com/api/realms/second-ephemeral-realm`),
         testCard(
           {
@@ -121,8 +107,7 @@ describe('hub/card-service', function() {
           {}
         ).jsonapi
       );
-      await service.create(
-        Session.INTERNAL_PRIVILEGED,
+      await scopedService.create(
         new URL(`http://example.com/api/realms/second-ephemeral-realm`),
         testCard(
           {
@@ -139,7 +124,7 @@ describe('hub/card-service', function() {
     });
 
     it('can filter by realm', async function() {
-      let { cards } = await service.search(Session.EVERYONE, {
+      let { cards } = await service.as(Session.INTERNAL_PRIVILEGED).search({
         filter: {
           eq: { realm: `${myOrigin}/api/realms/first-ephemeral-realm` },
         },

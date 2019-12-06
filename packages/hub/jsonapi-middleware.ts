@@ -90,7 +90,7 @@ export default class JSONAPIMiddleware {
         });
       }
     }
-    let card = await this.cards.create(ctxt.state.cardstackSession, realm, body);
+    let card = await this.cards.as(ctxt.state.cardstackSession).create(realm, body);
     ctxt.body = (await card.asPristineDoc()).jsonapi;
     ctxt.status = 201;
     ctxt.set('location', this.localURLFor(card));
@@ -120,7 +120,7 @@ export default class JSONAPIMiddleware {
       throw new CardstackError(`bug in jsonapi-middleware: missing localId parameter in getCard`, { status: 500 });
     }
 
-    let card = await this.cards.get(ctxt.state.cardstackSession, { realm, originalRealm, localId });
+    let card = await this.cards.as(ctxt.state.cardstackSession).get({ realm, originalRealm, localId });
     ctxt.body = (await card.asPristineDoc()).jsonapi;
     ctxt.status = 200;
   }
