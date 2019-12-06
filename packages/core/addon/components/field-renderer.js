@@ -2,6 +2,7 @@ import Component from '@glimmer/component';
 import { dasherize } from '@ember/string';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import { fieldComponents } from '../utils/mappings';
 
 const defaultSchemaAttrs = ['title', 'type', 'is-meta', 'name', 'instructions', 'embedded'];
 
@@ -33,6 +34,12 @@ export default class FieldRenderer extends Component {
 
   get sanitizedType() {
     return this.args.field.type.replace(/::/g, '/').replace(/@/g, '');
+  }
+
+  get fieldTypeTitle() {
+    let { title } = fieldComponents.find(el => el.coreType === this.args.field.type);
+
+    return title;
   }
 
   @action

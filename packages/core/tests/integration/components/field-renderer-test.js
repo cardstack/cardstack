@@ -169,6 +169,7 @@ module('Integration | Component | field-renderer', function(hooks) {
     });
     let field = card.addField({
       name: 'title',
+      label: 'Article Title',
       type: '@cardstack/core-types::string',
       neededWhenEmbedded: true,
       value: 'test title',
@@ -197,6 +198,9 @@ module('Integration | Component | field-renderer', function(hooks) {
     />
     `);
 
+    assert.dom('[data-test-field-schema-renderer] [data-test-field-renderer-type]').hasText('title (Text)');
+    assert.dom('[data-test-field-schema-renderer] [data-test-field-renderer-label]').hasText('Article Title');
+    assert.dom('[data-test-field-schema-renderer] [data-test-field-renderer-value]').hasText('test title');
     assert.dom('.schema-field-renderer--header--detail').doesNotExist();
     assert.dom('[data-test-field-renderer-field-type]').hasText('@cardstack/core-types::string');
     assert.dom('[data-test-field-renderer-move-btn]').exists();
@@ -207,7 +211,7 @@ module('Integration | Component | field-renderer', function(hooks) {
 
     assert.dom('[data-test-schema-attr="name"] input').hasValue('title');
     assert.dom('[data-test-schema-attr="name"] input').isNotDisabled();
-    assert.dom('[data-test-schema-attr="label"] input').hasValue('title');
+    assert.dom('[data-test-schema-attr="label"] input').hasValue('Article Title');
     assert.dom('[data-test-schema-attr="label"] input').isNotDisabled();
     assert.dom('[data-test-schema-attr="instructions"] textarea').isNotDisabled();
     assert.dom('[data-test-schema-attr="embedded"] input').isChecked();
