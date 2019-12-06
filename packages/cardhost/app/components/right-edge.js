@@ -5,7 +5,6 @@ import { action } from '@ember/object';
 
 export default class RightEdge extends Component {
   @tracked cardName;
-  @tracked displayCardMetadata;
 
   constructor(...args) {
     super(...args);
@@ -31,7 +30,9 @@ export default class RightEdge extends Component {
 
   @action
   updateCardId(id) {
-    if (!this.args.updateCardId) { return; }
+    if (!this.args.updateCardId) {
+      return;
+    }
 
     this.args.updateCardId(id);
   }

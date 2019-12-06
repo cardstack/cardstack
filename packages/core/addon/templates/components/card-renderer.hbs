@@ -7,56 +7,71 @@ Ember Concurrency into the rendering of the card component here.
 {{#if (eq @format "isolated")}}
   {{#let (component this.isolatedComponentName) as | Isolated |}}
     <section
-      class="card-renderer-{{@format}} {{this.mode}}"
+      class="card-renderer-isolated
+        {{this.mode}}
+        {{safe-css-string @card.adoptedFromName}}
+        {{safe-css-string @card.name}}
+        {{if @cardSelected "selected"}}
+      "
       tabindex="0"
       data-test-card-renderer-isolated
-      {{on "focus" (action this.focusCard true)}}
+      {{on "focus" (action this.cardIsFocused true)}}
+      {{did-insert this.focusCard true}}
     >
       <header class="card-renderer-{{@format}}--header">
-        <div class="card-renderer-isolated--header-overlay"></div>
-        {{or @card.name "Blank Card"}}
+        {{#if (or (eq (safe-css-string @card.adoptedFromName) "event-card") (eq (safe-css-string @card.name) "event-card"))}}
+          {{svg-jar "event" width="18px" height="20px"}}
+        {{/if}}
+        <span class="card-renderer-{{@format}}--header-title hide-in-percy">{{or @card.name "Blank Card"}}</span>
       </header>
-      <div class="card-renderer-{{@format}}--main">
-        <div class="card-renderer-{{@format}}--content">
-          <Isolated
-            @card={{@card}}
-            @mode={{this.mode}}
-            @setFieldValue={{@setFieldValue}}
-            @setFieldName={{@setFieldName}}
-            @removeField={{@removeField}}
-            @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
-            @setPosition={{@setPosition}}
-            @selectField={{@selectField}}
+      <div class="card-renderer-{{@format}}--content">
+        <Isolated
+          @card={{@card}}
+          @mode={{this.mode}}
+          @setFieldValue={{@setFieldValue}}
+          @setFieldName={{@setFieldName}}
+          @removeField={{@removeField}}
+          @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+          @setPosition={{@setPosition}}
+          @selectField={{@selectField}}
+          @selectedField={{@selectedField}}
+          @dropField={{@dropField}}
+        />
+        {{#if (and @dropField (eq @mode "schema")) }}
+          <DropZone
             @dropField={{@dropField}}
+            @position={{@card.isolatedFields.length}}
           />
-          {{#if (and @dropField (eq @mode "schema")) }}
-            <DropZone
-              @dropField={{@dropField}}
-              @position={{@card.isolatedFields.length}}
-            />
-          {{/if}}
-        </div>
+        {{/if}}
       </div>
     </section>
   {{/let}}
 {{else if (eq @format "embedded")}}
   {{#let (component this.embeddedComponentName) as | Embedded |}}
-    {{#if (and (eq this.mode "view") (not @preventIsolation))}}
-      <LinkTo
-        @class="card-renderer--embedded-card-link"
-        @route="cards.view"
-        @model={{@card.name}}
-      >
-        <Embedded @card={{@card}} @mode={{this.mode}}/>
+    <div
+      class="card-renderer-embedded
+        {{safe-css-string @card.adoptedFromName}}
+        {{safe-css-string @card.name}}
+      "
+      data-test-card-renderer-embedded
+    >
+      {{#if (and (eq this.mode "view") (not @preventIsolation))}}
+        <LinkTo
+          @class="card-renderer--embedded-card-link"
+          @route="cards.view"
+          @model={{@card.name}}
+        >
+          <Embedded @card={{@card}} @mode={{this.mode}} />
+          {{#if @showName}}
+            <div class="embedded-card-label">{{@card.name}}</div>
+          {{/if}}
+        </LinkTo>
+      {{else}}
+        <Embedded @card={{@card}} @mode={{this.mode}} />
         {{#if @showName}}
           <div class="embedded-card-label">{{@card.name}}</div>
         {{/if}}
-      </LinkTo>
-    {{else}}
-      <Embedded @card={{@card}} @mode={{this.mode}}/>
-      {{#if @showName}}
-        <div class="embedded-card-label">{{@card.name}}</div>
       {{/if}}
-    {{/if}}
+    </div>
   {{/let}}
 {{/if}}

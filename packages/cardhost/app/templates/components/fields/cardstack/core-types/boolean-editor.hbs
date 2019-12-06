@@ -1,9 +1,9 @@
 <div {{did-insert (action this.setChecked)}}>
   <label
-    data-test-date-field-editor-label
     for={{concat "edit-" @field.name "-field-value"}}
+    data-test-date-field-editor-label
   >
-    {{@field.name}}
+    {{@field.label}}
   </label>
   <Input
     @id={{concat this.idPrefix "-true"}}

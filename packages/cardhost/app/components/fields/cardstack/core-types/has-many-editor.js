@@ -2,7 +2,6 @@ import BaseEditor from './base-editor';
 import { action } from '@ember/object';
 
 export default class HasManyEditor extends BaseEditor {
-
   constructor(...args) {
     super(...args);
 

@@ -1,7 +1,7 @@
 .ch-catalog {
   width: var(--ch-left-edge-panel-width);
   padding: var(--ch-spacing);
-  background-color: var(--ch-light-gray);
+  background-color: var(--ch-light-background);
   color: black;
   display: grid;
   grid-template-rows: 85px 1fr;
@@ -20,7 +20,8 @@
 .ch-catalog--fields {
   height: 100%;
   padding: var(--ch-spacing) 0;
-  overflow-y: scroll;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .ch-catalog--header {

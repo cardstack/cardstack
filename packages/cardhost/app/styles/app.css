@@ -14,12 +14,14 @@
 @import '/assets/components/filter-bar.css';
 @import '/assets/components/catalog.css';
 @import '/assets/components/catalog-field.css';
+@import '/assets/components/adopted-from.css';
 
 /* Cardhost styling for core package templates */
 @import '/assets/components/card-renderer.css';
 @import '/assets/components/field-renderer.css';
-@import '/assets/components/schema-field-renderer.css';
-@import '/assets/components/edit-field-renderer.css';
+@import '/assets/components/field-renderer-schema-field.css';
+@import '/assets/components/field-renderer-edit-field.css';
+@import '/assets/components/field-renderer-view-field.css';
 @import '/assets/components/drop-zone.css';
 
 
@@ -53,6 +55,7 @@ Until that work is done we are statically adding this css
   --ch-top-edge-height: 80px;
   --ch-left-edge-width: calc(var(--ch-left-edge-panel-width) + var(--ch-left-edge-navbar-width));
   --ch-right-edge-width: calc(var(--ch-right-edge-panel-width) + var(--ch-spacing));
+  --ch-bottom-edge-height: 80px;
 
   --ch-component-width: 260px;
   --ch-component-height: 40px;
@@ -61,6 +64,7 @@ Until that work is done we are statically adding this css
   --ch-edges-z-index: 10;
   --ch-actions-z-index: 11;
   --ch-transition-time: 250ms;
+  --ch-card-transition-duration: 300ms;
 }
 
 /*
@@ -68,9 +72,18 @@ Until that work is done we are statically adding this css
   - better positioning for edges (esp on/off state)
   - link and button focus and disabled states styling
 */
-
 * {
   box-sizing: border-box;
+}
+
+/*
+  Use the `hide-in-percy` css selector when you want to visually
+  hide page elements that can change, i.e. random numbers, etc
+*/
+@media only percy {
+  .hide-in-percy {
+    visibility: hidden;
+  }
 }
 
 body {
@@ -79,7 +92,7 @@ body {
   width: 100%;
   height: auto;
   margin: 0;
-  background-color: var(--ch-medium-medium-blue-gray);
+  background-color: var(--ch-default);
   color: white;
   font-family: var(--ch-font-family);
   font-size: 13px;
@@ -95,40 +108,15 @@ a {
 }
 
 a:hover {
-  --link: var(--ch-cyan);
+  --link: var(--ch-highlight);
 
   cursor: pointer;
 }
 
-
-/* Index template */
-.cardhost--topnav {
-  margin: 0 auto;
+.padding-vertical-small {
+  padding-top: var(--ch-spacing);
+  padding-bottom: var(--ch-spacing);
 }
-
-.cardhost--topnav ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 10px 0;
-  display: flex;
-  align-items: center;
-}
-
-.cardhost--topnav ul li a::after {
-  display: inline-block;
-  color: var(--ch-light-gray);
-  content: '|';
-  font-size: 80%;
-  font-weight: bold;
-  padding: 0 10px;
-}
-
-.cardhost-catalog--title {
-  margin: 0;
-  font-size: 32px;
-  font-weight: 200;
-}
-
 
 /* Other */
 .card-renderer--top-edge-buttons {
@@ -137,6 +125,20 @@ a:hover {
   right: var(--ch-spacing);
   display: flex;
   z-index: var(--ch-actions-z-index);
+}
+
+.card-renderer--top-edge-buttons .dock-btn {
+  margin: 10px 15px;
+  cursor: pointer;
+}
+
+.card-renderer--top-edge-buttons .dock-btn.selected g {
+  stroke: var(--ch-highlight);
+}
+
+.card-renderer--top-edge-buttons .close-editor-btn {
+  --width: 125px;
+  margin-left: 20px;
 }
 
 .card-schema-updator--search-bar {
@@ -238,60 +240,41 @@ a:hover {
   overflow: hidden;
 }
 
+.cardhost-card-theme-editor {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 40%;
+  height: 100%;
+  background: var(--ch-deep-background);
+  z-index: 10;
+  padding: 20px;
+}
+
+.cardhost-card-theme-editor.bottom-docked {
+  top: auto;
+  bottom: 0;
+  left: 0;
+  height: 40%;
+  width: 100%;
+}
+
+.dock-icon-unselected {
+  --icon-color: --ch-light-gray-b1;
+}
+
 .cardhost-card-document--codeblock {
   height: 0;
 }
 
-
-
-/* TODO: Do not hardcode. Move some styles to core package and some to isolated card css */
-.card-renderer-isolated.view .field-renderer.view-field {
-  margin: 0 auto;
-  padding-right: 70px;
-  padding-left: 70px;
-  width: 997px;
-  max-width: 100%;
+.cardhost-monaco-container {
+  min-height: 50px;
+  margin-bottom: 1em;
+  overflow: hidden;
+  resize: vertical;
+  background-color: #1e1e1e;
 }
 
-.field-renderer.view-field .ch-label {
-  letter-spacing: 0;
-  color: rgba(0, 0, 0, 0.5);
-}
-
-.card-renderer-isolated.view .field-renderer.view-field.field-title {
-  color: black;
-  font: 400 28px/21px 'Open Sans';
-  letter-spacing: 0;
-  text-align: left;
-}
-
-.card-renderer-isolated.view .field-renderer.view-field.field-title .ch-label {
-  visibility: hidden;
-  height: 0;
-  padding: 0;
-}
-
-.card-renderer-isolated.view .field-renderer.view-field.field-body,
-.card-renderer-isolated.view .field-renderer.view-field.field-description {
-  color: black;
-  font: 400 16px/22px 'Open Sans';
-  letter-spacing: 0;
-  text-align: left;
-}
-
-.card-renderer-isolated.view .field-renderer.view-field:first-child {
-  padding-top: 50px;
-  padding-bottom: 20px;
-}
-
-.card-renderer-isolated.view .field-renderer.view-field:last-child {
-  padding-bottom: 50px;
-}
-
-.field-renderer.view-field  + .field-renderer.view-field {
-  margin-top: 30px;
-}
-
-.field-renderer.edit-field  + .field-renderer.edit-field {
-  margin-top: 20px;
+.cardhost-monaco-container.editor-pane-code {
+  min-height: 35vh;
 }

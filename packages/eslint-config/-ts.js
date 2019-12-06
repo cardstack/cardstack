@@ -2,7 +2,7 @@ module.exports = {
   rules: {
     // this needs to be off because things like import and export statements are
     // "unsupported", even though we're transpiling them first.
-    "node/no-unsupported-features":  "off",
+    'node/no-unsupported-features': 'off',
 
     // Type overloads cause false positives. typescript errors on duplicates, so
     // this doesn't need to be replaced.
@@ -17,7 +17,7 @@ module.exports = {
     "@typescript-eslint/camelcase": "error",
     "@typescript-eslint/class-name-casing": "error",
     "indent": "off",
-    "@typescript-eslint/indent": ["error", 2],
+    "@typescript-eslint/indent": 'off',
     "@typescript-eslint/member-delimiter-style": "error",
     "@typescript-eslint/consistent-type-assertions": "error",
     "no-array-constructor": "off",

@@ -3,23 +3,11 @@ import { dasherize } from '@ember/string';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 
-const defaultSchemaAttrs = [
-  'title',
-  'type',
-  'is-meta',
-  'name',
-  'instructions',
-  'embedded'
-];
+const defaultSchemaAttrs = ['title', 'type', 'is-meta', 'name', 'instructions', 'embedded'];
 
 // These are the field attributes that will trigger onFieldChanged()
 // to be called when the values of this attributes change
-const onFieldChangedDependencies = [
-  'nonce',
-  'name',
-  'label',
-  'instructions'
-]
+const onFieldChangedDependencies = ['nonce', 'name', 'label', 'instructions'];
 
 let renderNonce = 0;
 export default class FieldRenderer extends Component {
@@ -56,6 +44,11 @@ export default class FieldRenderer extends Component {
       this.newFieldInstructions = this.args.field.instructions;
     }
     return null;
+  }
+
+  @action
+  focusParentElement(element) {
+    element.parentElement.focus({ preventScroll: true });
   }
 
   get nonce() {
@@ -110,11 +103,11 @@ export default class FieldRenderer extends Component {
   }
 
   @action startDragging(field, evt) {
-    evt.dataTransfer.setData("text", evt.target.id);
-    evt.dataTransfer.setData("text/field-name", field.name);
+    evt.dataTransfer.setData('text', evt.target.id);
+    evt.dataTransfer.setData('text/field-name', field.name);
   }
 
   @action finishDragging(evt) {
-    evt.target.setAttribute('draggable', 'false')
+    evt.target.setAttribute('draggable', 'false');
   }
 }

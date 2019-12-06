@@ -5,9 +5,9 @@
       {{! eslint is confused by on helper }}
       {{! template-lint-disable attribute-indentation}}
       <button
-        {{on "click" this.cancel}}
+        {{on "click" this.preview}}
         class="ch-button ch-button--secondary"
-        data-test-card-creator-cancel-btn
+        data-test-card-creator-preview-btn
         disabled={{not this.cardstackSession.isAuthenticated}}
       >
         Preview
@@ -30,47 +30,49 @@
   {{/if}}
 </CardhostTopEdge>
 
-<CardhostLeftEdge @mode="schema">
-  {{!-- TODO: DRY catalog section --}}
-  <section class="ch-catalog">
-    <header class="ch-catalog--header">
-      <h3 class="ch-catalog--title">Card Catalog</h3>
-      <div class="ch-catalog--header-btns">
-        {{! template-lint-disable attribute-indentation}}
-        <button class="ch-catalog--header-btn sidebar active" aria-label="View as sidebar"></button>
-        <button class="ch-catalog--header-btn grid" aria-label="View as grid"></button>
-      </div>
-      <Input
-        @class="ch-filter-bar"
-        @placeholder="Filter Results"
-      />
-    </header>
-    <div class="ch-catalog--fields">
-      {{#each this.fieldComponents as |field|}}
-        {{! eslint is confused by on helper }}
-        {{! template-lint-disable attribute-indentation}}
-        <div
-          class="ch-catalog-field"
-          role="button"
-          draggable="true"
-          {{on "mousedown" (action this.initDrag field)}}
-          {{on "dragend" (action (mut this.isDragging) false)}}
-          {{on "dragstart" (action this.startDragging field)}}
-          data-test-card-add-field-draggable={{field.type}}
-        >
-          {{! template-lint-disable no-inline-styles}}
-          <div class="ch-catalog-field--icon" style={{css-url "background-image" field.icon}}></div>
-          <div>
-            <h4 class="ch-catalog-field--title">{{field.title}}</h4>
-            {{#if field.description}}
-              <p class="ch-catalog-field--description">{{field.description}}</p>
-            {{/if}}
-          </div>
+{{#unless this.cssModeToggle.editingCss}}
+  <CardhostLeftEdge @mode="schema">
+    {{!-- TODO: DRY catalog section --}}
+    <section class="ch-catalog">
+      <header class="ch-catalog--header">
+        <h3 class="ch-catalog--title">Card Catalog</h3>
+        <div class="ch-catalog--header-btns">
+          {{! template-lint-disable attribute-indentation}}
+          <button class="ch-catalog--header-btn sidebar active" aria-label="View as sidebar"></button>
+          <button class="ch-catalog--header-btn grid" aria-label="View as grid"></button>
         </div>
-      {{/each}}
-    </div>
-  </section>
-</CardhostLeftEdge>
+        <Input
+          @class="ch-filter-bar"
+          @placeholder="Filter Results"
+        />
+      </header>
+      <div class="ch-catalog--fields">
+        {{#each this.fieldComponents as |field|}}
+          {{! eslint is confused by on helper }}
+          {{! template-lint-disable attribute-indentation}}
+          <div
+            class="ch-catalog-field"
+            role="button"
+            draggable="true"
+            {{on "mousedown" (action this.initDrag field)}}
+            {{on "dragend" (action (mut this.isDragging) false)}}
+            {{on "dragstart" (action this.startDragging field)}}
+            data-test-card-add-field-draggable={{field.type}}
+          >
+            {{! template-lint-disable no-inline-styles}}
+            <div class="ch-catalog-field--icon" style={{css-url "background-image" field.icon}}></div>
+            <div>
+              <h4 class="ch-catalog-field--title">{{field.title}}</h4>
+              {{#if field.description}}
+                <p class="ch-catalog-field--description">{{field.description}}</p>
+              {{/if}}
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    </section>
+  </CardhostLeftEdge>
+{{/unless}}
 
 <RightEdge
   @card={{this.card}}
@@ -81,7 +83,7 @@
   @setFieldLabel={{this.setFieldLabel}}
   @setFieldInstructions={{this.setFieldInstructions}}
   @updateCardId={{this.updateCardId}}
-  @displayCardMetadata={{this.displayCardMetadata}}
+  @cardSelected={{this.cardSelected}}
 />
 
 <section class="card-creator" data-test-card-creator {{did-update this.updateCard @card}}>
@@ -93,8 +95,10 @@
       @removeField={{action this.removeField}}
       @setPosition={{action this.setPosition}}
       @selectField={{action this.selectField}}
+      @selectedField={{this.selectedField}}
       @dropField={{action this.dropField}}
-      @cardFocused={{action (mut this.displayCardMetadata)}}
+      @cardSelected={{this.cardSelected}}
+      @cardFocused={{action (mut this.cardSelected)}}
     />
   {{/if}}
 </section>
@@ -102,9 +106,9 @@
 {{#if this.card}}
   <section class="cardhost-card-document">
     <h3>Card Document</h3>
-    <CodeBlock
+    <CodeEditor
       @code={{this.cardJson}}
-      @language="javascript"
+      @language="json"
     />
   </section>
 {{/if}}

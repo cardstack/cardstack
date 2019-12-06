@@ -1,107 +1,212 @@
 .card-renderer-isolated {
-  --card-spacing: 20px;
-  --card-header-height: 50px;
-  --card-width: 496px;
-  --card-min-height: 496px;
-  --card-min-width: 400px;
-  --card-bg: var(--ch-medium-lighter-blue-gray, #4a4857);
-  --card-header-bg: var(--ch-medium-dark-darker-blue-gray, #3f3d4d);
-  --card-highlight: var(--ch-cyan, #00ebe5);
-  --card-transition-time: 250ms;
+  --card-renderer-width: 496px;
+  --card-renderer-height: 496px;
+  --card-renderer-header-height: 50px;
 
-  height: calc(100vh - 80px);
-  min-width: var(--card-min-width);
-  padding: 0 var(--card-spacing);
-}
+  position: relative;
+  width: var(--card-renderer-width);
+  max-width: 100%;
+  min-height: var(--card-renderer-height);
+  border: 3px solid transparent;
+  border-radius: 10px;
+  font: 400 16px/22px var(--ch-font-family);
+  letter-spacing: 0.015em;
+  overflow: hidden;
 
-.card-renderer-isolated.schema .isolated-card {
-  background: none;
+  transition: border-color var(--ch-transition-time);
 }
 
 .card-renderer-isolated.view {
-  --card-width: 100%;
+  --card-renderer-width: 100%;
+  height: min-content;
+}
+
+.card-renderer-isolated.edit {
+  height: min-content;
+}
+
+.card-renderer-isolated.schema .isolated-card,
+.card-renderer-isolated.edit .isolated-card {
+  padding: 0;
+}
+
+.card-renderer-isolated.selected {
+  border-color: var(--ch-highlight);
 }
 
 .card-renderer-isolated--header {
-  position: relative;
-  width: var(--card-width);
-  height: var(--card-header-height);
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 15px var(--card-spacing) 15px 50px;
-  border-radius: 10px 10px 0 0;
-  /* TODO: icon will change depending on card content type */
-  background-image: url('/images/icons/event-white.svg');
-  background-color: var(--card-header-bg);
-  background-position: var(--card-spacing) center;
-  background-size: 18px 20px;
-  background-repeat: no-repeat;
-  color: white;
-  font-size: 16px;
+  display: flex;
+  align-items: center;
+  height: var(--card-renderer-header-height);
+  padding: 14px 20px;
+  background-color: var(--ch-disabled);
+  color: var(--ch-light);
+  border: none;
   font-weight: 600;
-  letter-spacing: 0.24px;
-  line-height: 22px;
-  text-transform: capitalize;
-  white-space: nowrap;
   overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+  text-transform: capitalize;
 
-  transition: background-color var(--card-transition-time), color var(--card-transition-time), background-image var(--card-transition-time);
+  transition: background-color var(--ch-transition-time),
+              color var(--ch-transition-time);
 }
 
-.card-renderer-isolated--header-overlay {
+.card-renderer-isolated.selected .card-renderer-isolated--header {
+  background-color: var(--ch-highlight);
+  color: var(--ch-dark);
+}
+
+.card-renderer-isolated--header svg {
+  --icon-color: var(--ch-light);
+
+  margin-right: 13px;
+  width: 18px;
+  height: 20px;
+
+  transition: stroke var(--ch-transition-time);
+}
+
+.card-renderer-isolated.selected .card-renderer-isolated--header svg {
+  --icon-color: var(--ch-dark);
+}
+
+.card-renderer-isolated--content {
+  position: relative;
+  min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
+  max-height: calc(100vh - var(--ch-top-edge-height) - var(--ch-bottom-edge-height) - var(--card-renderer-header-height));
+  background-color: var(--ch-light);
+  color: var(--ch-dark);
+  border: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.card-renderer-isolated.schema .card-renderer-isolated--content {
+  background-color: var(--ch-dark-background);
+  color: var(--ch-light);
+}
+
+.card-renderer-isolated.edit .card-renderer-isolated--content {
+  padding: 20px;
+}
+
+/* TODO: fade card if field-renderer is selected */
+/* .card-renderer-isolated.faded::before {
+  content: '';
+  display: block;
   position: absolute;
   top: 0;
   right: 0;
   left: 0;
   bottom: 0;
-  background-color: var(--card-bg);
+  background-color: var(--ch-default);
   opacity: 0.35;
-}
-
-.card-renderer-isolated--main {
-  width: 100%;
-  height: calc(100% - var(--card-header-height));
-  padding-bottom: 80px;
-  overflow: scroll;
-}
-
-.card-renderer-isolated--content {
-  margin: 0 auto;
-  width: var(--card-width);
-  max-width: 100%;
-  min-height: var(--card-min-height);
-  background-color: white;
-  border: 3px solid transparent;
-  border-radius: 0 0 10px 10px;
-  overflow: hidden;
-
-  transition: border-color var(--card-transition-time);
-}
-
-.card-renderer-isolated.schema .card-renderer-isolated--content {
-  background-color: var(--card-bg);
-}
-
-.card-renderer-isolated.edit .card-renderer-isolated--content {
-  padding: var(--card-spacing);
-}
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 5;
+} */
 
 .card-renderer-isolated:focus {
   outline: 0; /* TODO: make this accessible */
 }
 
-.card-renderer-isolated:focus .card-renderer-isolated--header {
-  color: black;
-  background-color: var(--card-highlight);
-  background-image: url('/images/icons/event.svg');
+
+/* Event Card Template */
+.card-renderer-isolated.view.event-card .isolated-card {
+  --event-image-height: 300px;
+  --event-button: #0076ff;
+  --event-border: rgba(0, 0, 0, 0.15);
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "image        image"
+    "title        title"
+    "city         cta"
+    "admission    cta"
+    "date         date"
+    "location     location"
+    "description  description"
+}
+.card-renderer-isolated.view.event-card .isolated-card .field-renderer {
+  margin-bottom: 0;
+}
+.card-renderer-isolated.view.event-card .isolated-card .field-image {
+  grid-area: image;
+  height: var(--event-image-height);
+}
+.card-renderer-isolated.view.event-card .isolated-card .field-title {
+  grid-area: title;
+  margin-bottom: 30px;
+}
+.card-renderer-isolated.view.event-card .isolated-card .field-cta {
+  grid-area: cta;
+}
+.card-renderer-isolated.view.event-card .isolated-card .field-city {
+  grid-area: city;
+}
+.card-renderer-isolated.view.event-card .isolated-card .field-admission {
+  grid-area: admission;
+}
+.card-renderer-isolated.view.event-card .isolated-card .field-date {
+  grid-area: date;
+  margin-top: 30px;
+  padding-top: 30px;
+  border-top: 1px solid var(--event-border);
+}
+.card-renderer-isolated.view.event-card .isolated-card .field-location {
+  grid-area: location;
+  margin-top: 30px;
+}
+.card-renderer-isolated.view.event-card .isolated-card .field-description {
+  grid-area: description;
+  margin-top: 30px;
 }
 
-.card-renderer-isolated:focus .card-renderer-isolated--header-overlay {
+.card-renderer-isolated.view.event-card .isolated-card .field-title > .view-field--label,
+.card-renderer-isolated.view.event-card .isolated-card .field-image > .view-field--label,
+.card-renderer-isolated.view.event-card .isolated-card .field-image > .view-field--value,
+.card-renderer-isolated.view.event-card .isolated-card .field-admission > .view-field--label,
+.card-renderer-isolated.view.event-card .isolated-card .field-cta > .view-field--label,
+.card-renderer-isolated.view.event-card .isolated-card .field-city > .view-field--label {
   visibility: hidden;
+  height: 0;
+  padding: 0;
 }
 
-.card-renderer-isolated:focus .card-renderer-isolated--content {
-  border-color: var(--card-highlight);
+.card-renderer-isolated.view.event-card .isolated-card .field-title > .view-field--value {
+  font-size: 28px;
+  line-height: 36px;
+}
+
+.card-renderer-isolated.view.event-card .isolated-card .field-city > .view-field--value {
+  opacity: 0.5;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.card-renderer-isolated.view.event-card .isolated-card .field-admission > .view-field--value {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+}
+
+.card-renderer-isolated.view.event-card .isolated-card .field-cta > .view-field--value {
+  width: 128px;
+  height: 35px;
+  margin-left: auto;
+  padding: 10px 15px;
+  border-radius: 5px;
+  background-color: var(--event-button);
+  color: var(--ch-light);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+}
+
+.card-renderer-isolated.view.event-card .isolated-card--hero-image {
+  position: absolute;
+  top: 0;
+  left: 0;
 }

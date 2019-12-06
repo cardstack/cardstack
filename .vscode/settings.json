@@ -3,5 +3,6 @@
   "eslint.validate": [
     "javascript",
     "typescript"
-  ]
+  ],
+  "editor.formatOnSave": true
 }

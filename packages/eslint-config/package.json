@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/eslint-config",
-  "version": "0.16.0",
+  "version": "0.16.6",
   "description": "Shared eslint config for cardstack packages.",
   "main": "index.js",
   "scripts": {
@@ -24,9 +24,13 @@
     "@typescript-eslint/eslint-plugin": "^2.5.0",
     "@typescript-eslint/parser": "^2.5.0",
     "eslint": "^5.8.0",
+    "eslint-config-prettier": "^6.7.0",
     "eslint-plugin-ember": "^5.0.0",
+    "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-mocha": "^5.2.0",
-    "eslint-plugin-node": "^5.2.1"
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-prettier": "^3.1.1",
+    "prettier": "^1.19.1"
   },
   "engines": {
     "node": ">= 8"

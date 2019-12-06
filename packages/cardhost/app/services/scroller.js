@@ -2,7 +2,7 @@ import Service from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
 function easeInOutCubic(t) {
-  return t < 0.5 ? 4 * t * t * t : ( t - 1 ) * ( 2 * t - 2 ) * ( 2 * t - 2 ) + 1;
+  return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
 }
 
 export default class ScrollerService extends Service {
@@ -14,31 +14,38 @@ export default class ScrollerService extends Service {
     this.scrollingElementSelector = element;
   }
 
-  scrollToSection({selector, duration = 1000, elementOffset = 60, doneScrolling}) {
-    if (this.currentlyScrolledTo === selector) { return; }
+  scrollToSection({ selector, duration = 1000, elementOffset = 60, doneScrolling }) {
+    if (this.currentlyScrolledTo === selector) {
+      return;
+    }
 
     let element = document.querySelector(selector);
     let scrollingElement = document.querySelector(this.scrollingElementSelector);
 
-    if (!element) { return; }
+    if (!element) {
+      return;
+    }
 
     this.isScrolling = true;
 
     let start = scrollingElement.scrollTop;
     let startTime = Date.now();
-    let destinationOffset = Math.min(Math.max(element.offsetTop - elementOffset, 0), scrollingElement.scrollHeight - scrollingElement.offsetHeight);
+    let destinationOffset = Math.min(
+      Math.max(element.offsetTop - elementOffset, 0),
+      scrollingElement.scrollHeight - scrollingElement.offsetHeight
+    );
 
     let animatedScroll = () => {
       if (this.isDestroyed) {
         return;
       }
       let now = Date.now();
-      let time = Math.min(1, ((now - startTime) / duration));
+      let time = Math.min(1, (now - startTime) / duration);
       let timeFunction = easeInOutCubic(time);
-      scrollingElement.scroll(0, Math.ceil((timeFunction * (destinationOffset - start)) + start));
+      scrollingElement.scroll(0, Math.ceil(timeFunction * (destinationOffset - start) + start));
 
       // if it's "close enough", stop :)
-      if (Math.abs(Math.ceil(scrollingElement.scrollTop) - destinationOffset) < 2)  {
+      if (Math.abs(Math.ceil(scrollingElement.scrollTop) - destinationOffset) < 2) {
         this.isScrolling = false;
         if (typeof doneScrolling === 'function') {
           doneScrolling();
@@ -53,5 +60,4 @@ export default class ScrollerService extends Service {
 
     this.currentlyScrolledTo = selector;
   }
-
 }

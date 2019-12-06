@@ -5,13 +5,13 @@
   {{did-update this.updateCard @card}}
 >
   {{!-- TODO: make this a component --}}
-  <div class="right-edge--section">
+  <div class="right-edge--pill-selector-container">
     <div class="pill-selector">
       <div class="pill-option selected">Properties</div>
       <div class="pill-option">Structure</div>
     </div>
   </div>
-  {{#if @displayCardMetadata}}
+  {{#if @cardSelected}}
     {{!--
     TODO each of these section is collapsable.
     Waiting until ember animated/liquid fire is available
@@ -19,13 +19,13 @@
     --}}
     <div class="right-edge--section">
       <div class="right-edge--section-header" data-test-section-header>ID</div>
-      <div class="right-edge--item ch-input-group">
+      <div class="right-edge--item">
         <label for="card__id" class="ch-label">
           Card ID
         </label>
         <Input
           @id="card__id"
-          @class="ch-input"
+          @class="ch-input hide-in-percy"
           @size="60"
           @placeholder="e.g. millenial-puppies"
           @value={{this.cardName}}
@@ -35,7 +35,7 @@
       </div>
       <div class="right-edge--item">
         <div class="ch-label right-edge--label">Internal ID</div>
-        <div data-test-internal-card-id>
+        <div class="hide-in-percy" data-test-internal-card-id>
           {{@card.id}}
         </div>
       </div>
@@ -43,42 +43,13 @@
 
     <div class="right-edge--section">
       <div class="right-edge--section-header" data-test-section-header>
-        Adopt
+        Template
       </div>
       <div class="right-edge--item">
-        <div class="ch-label right-edge--label">Adopted Card</div>
-        {{#if
-          (and
-            @card.adoptedFrom
-            (not (eq @card.adoptedFrom.name "@cardstack/base-card"))
-          )
-        }}
-          <LinkTo
-            @class="adopted-card"
-            @route="cards.schema"
-            @model={{@card.adoptedFrom.name}}
-          >
-            {{!-- TODO: This should change according to card --}}
-            {{! template-lint-disable no-inline-styles }}
-            <div
-              class="adopted-card--image"
-              style={{css-url
-                "background-image"
-                "/assets/images/cards/adopted-card-preview-sample.png"
-              }}
-            />
-            <div>
-              {{@card.adoptedFrom.name}}
-              <div class="adopted-card--view-text">View Schema</div>
-            </div>
-
-          </LinkTo>
-          <div class="right-edge--section-btn-container">
-            {{!-- TODO: Remove functionality --}}
-            <button class="right-edge--section-btn">Remove</button>
-          </div>
+        {{#if @card.adoptedFrom}}
+          <AdoptedFrom @card={{@card.adoptedFrom}} @adoptedCard={{@card}}/>
         {{else}}
-          <div>
+          <div data-test-no-adoption>
             No Adoption
           </div>
         {{/if}}
@@ -102,8 +73,9 @@
         @setFieldName={{@setFieldName}}
         @setFieldLabel={{@setFieldLabel}}
         @setFieldInstructions={{@setFieldInstructions}}
-        @schemaAttrs={{array "name" "label" "instructions" "required" "embedded"}}
+        @schemaAttrs={{array "name" "label" "instructions" "embedded"}}
       />
     </div>
   {{/if}}
+  {{yield}}
 </div>

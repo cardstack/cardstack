@@ -1,7 +1,6 @@
+import { hubURL } from '@cardstack/plugin-utils/environment';
+import { ciSessionId } from '@cardstack/test-support/environment';
 import { get } from 'lodash';
-
-let hubURL = 'http://localhost:3000';
-let ciSessionId = 'TODO';
 
 export function cleanupDefaulValueArtifacts(document) {
   if (!Object.keys(get(document, 'data.attributes') || {}).length) {
@@ -43,10 +42,10 @@ export async function getCard(id) {
   let response = await fetch(url, {
     headers: {
       authorization: `Bearer ${ciSessionId}`,
-      "content-type": 'application/vnd.api+json'
-    }
+      'content-type': 'application/vnd.api+json',
+    },
   });
-  return (await response.json());
+  return await response.json();
 }
 
 export async function updateCard(id, card) {
@@ -55,10 +54,9 @@ export async function updateCard(id, card) {
     method: 'PATCH',
     headers: {
       authorization: `Bearer ${ciSessionId}`,
-      "content-type": 'application/vnd.api+json'
+      'content-type': 'application/vnd.api+json',
     },
-    body: JSON.stringify(card)
+    body: JSON.stringify(card),
   });
-  return (await response.json());
-
+  return await response.json();
 }

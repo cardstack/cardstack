@@ -1,39 +1,22 @@
 .field-renderer {
-  --field-transition-time: var(--ch-transition-time, 250ms);
   --field-container-width: auto;
   --field-container-height: auto;
-  --field-container-bg: none;
-  --field-border-color: var(--ch-light-gray-b1, #b1b1b1);
-  --field-highlight: var(--ch-cyan, #00ebe5);
 
   width: var(--field-container-width);
   max-width: 100%;
   min-height: var(--field-container-height);
-  background: var(--field-container-bg);
+  background: none;
 }
 
 .field-renderer.with-buttons {
   --field-container-width: 496px;
   --field-container-height: 154px;
-  --field-container-bg: var(--ch-medium-lighter-blue-gray, #4a4857);
 
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: var(--ch-spacing) 0;
-}
-
-.field-renderer.schema-field {
-  padding: var(--ch-spacing) 0;
-  color: white;
-  font: 400 13px/18px var(--ch-font-family);
-  letter-spacing: 0.035em;
-}
-
-.field-renderer.schema-field .field-renderer--display {
-  visibility: hidden;
-  width: 0;
-  height: 0;
+  background-color: var(--ch-dark-background);
 }
 
 .field-renderer--move-btn {

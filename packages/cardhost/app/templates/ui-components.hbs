@@ -4,9 +4,33 @@
 
   {{!-- TODO: Add navbar --}}
 
+  <section class="ui-components--section icons">
+    <h2>Icons</h2>
+    <a href="/ember-svg-jar/index.html">** See all SVG icons here. **</a>
+
+    <h4>Inline SVG embedding example with `fill` color change (Hover over the icons)</h4>
+    {{svg-jar "clock" class="ui-components--icon" width="30px" height="30px"}}
+
+    <h4>Inline SVG embedding example with `stroke` color change</h4>
+    {{svg-jar "cards" class="ui-components--icon" width="30px" height="30px"}}
+
+    <CodeEditor @language="handlebars" @code='\{{svg-jar "clock" class="ui-components--icon" width="30px" height="30px"}}
+\{{svg-jar "cards" class="ui-components--icon" width="30px" height="30px"}}' />
+    <CodeEditor @language="css" @code='/* Note:
+  - You may need to add `--icon-color` CSS variable to the SVG, if not already in there. (Or use the `fill` and/or `stroke` properties.)
+  - Do not hardcode colors in the existing SVGs. Make a copy of the SVG first.
+*/
+.ui-components--icon {
+  --icon-color: var(--ch-light-op50);
+}
+.ui-components--icon:hover {
+  --icon-color: var(--ch-light);
+}' />
+  </section>
+
   <section class="ui-components--section">
     <h2>Font Family</h2>
-    <CodeBlock
+    <CodeEditor
       @code='--ch-font-family: "Open Sans", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;'
       @language="css"
     />
@@ -14,22 +38,20 @@
 
   <section class="ui-components--section">
     <h2>Root CSS Variables</h2>
-    <CodeBlock
-      @class="ui-components--notes"
-      @code='
-      --ch-left-edge-navbar-width: 80px;
-      --ch-left-edge-panel-width: 330px;
-      --ch-right-edge-panel-width: 300px;
+    <CodeEditor
+      class="ui-components--notes"
+      @code='--ch-left-edge-navbar-width: 80px;
+--ch-left-edge-panel-width: 330px;
+--ch-right-edge-panel-width: 300px;
 
-      --ch-top-edge-height: 80px;
-      --ch-left-edge-width: calc(var(--ch-left-edge-panel-width) + var(--ch-left-edge-navbar-width));
-      --ch-right-edge-width: calc(var(--ch-right-edge-panel-width) + var(--ch-spacing));
+--ch-top-edge-height: 80px;
+--ch-left-edge-width: calc(var(--ch-left-edge-panel-width) + var(--ch-left-edge-navbar-width));
+--ch-right-edge-width: calc(var(--ch-right-edge-panel-width) + var(--ch-spacing));
 
-      --ch-spacing: 20px;
-      --ch-edges-z-index: 10;
-      --ch-actions-z-index: 11;
-      --ch-transition-time: 250ms;
-      '
+--ch-spacing: 20px;
+--ch-edges-z-index: 10;
+--ch-actions-z-index: 11;
+--ch-transition-time: 250ms;'
       @language="css"
     />
   </section>
@@ -43,15 +65,22 @@
     <h2>Buttons</h2>
     <h3>Primary button</h3>
     <button class="ch-button">Save</button>
-    <CodeBlock
+    <CodeEditor
       @code='<button class="ch-button">Save</button>'
       @language="html"
     />
 
     <h3>Secondary button</h3>
     <button class="ch-button ch-button--secondary">Preview</button>
-    <CodeBlock
+    <CodeEditor
       @code='<button class="ch-button ch-button--secondary">Preview</button>'
+      @language="html"
+    />
+
+    <h3>Responsive width (100%) button</h3>
+    <button class="ch-button ch-button--responsive">Create a new theme</button>
+    <CodeEditor
+      @code='<button class="ch-button ch-button--responsive">Create a new theme</button>'
       @language="html"
     />
 
@@ -63,27 +92,20 @@
       <button class="ch-button ch-button--icon library" aria-label="Library"></button>
     </div>
     <div>
-      <CodeBlock @code='
-        <button class="ch-button ch-button--icon user" aria-label="User"></button>
-        <button class="ch-button ch-button--icon catalog" aria-label="Catalog"></button>
-        <button class="ch-button ch-button--icon share" aria-label="Share"></button>
-        <button class="ch-button ch-button--icon library" aria-label="Library"></button>
-      '
+      <CodeEditor @code='<button class="ch-button ch-button--icon user" aria-label="User"></button>
+<button class="ch-button ch-button--icon catalog" aria-label="Catalog"></button>
+<button class="ch-button ch-button--icon share" aria-label="Share"></button>
+<button class="ch-button ch-button--icon library" aria-label="Library"></button>'
         @language="html"/>
     </div>
 
     <h3>Secondary Icon button</h3>
     <button class="ch-button ch-button--icon-secondary delete" aria-label="Delete"></button>
-    <CodeBlock
+    <CodeEditor
       @code='<button class="ch-button ch-button--icon-secondary delete" aria-label="Delete"></button>'
       @language="html"
     />
-
-    <h3>Blue CTA button on default card</h3>
-    TK
   </section>
-
-
 
   <section class="ui-components--section ui-components--grid-2-col">
     <h2>View Switcher</h2>
@@ -92,36 +114,16 @@
       <ModeSwitcher @name="" @mode="edit" />
       <ModeSwitcher @name="" @mode="schema" />
     </div>
-    <CodeBlock
-      @code='
-        <ModeSwitcher @name="[card-id-here]" @mode="view" />
-        <ModeSwitcher @name="[card-id-here]" @mode="edit" />
-        <ModeSwitcher @name="[card-id-here]" @mode="schema" />
-      '
-      @language="html"
-    />
-  </section>
-
-  <section class="ui-components--section ui-components--grid-2-col">
-    <h2>Pill Selector</h2>
-    <div class="pill-selector">
-      <div class="pill-option selected">Properties</div>
-      <div class="pill-option">Structure</div>
-    </div>
-    <CodeBlock
-      @code='
-        <div class="pill-selector">
-          <div class="pill-option selected">Properties</div>
-          <div class="pill-option">Structure</div>
-        </div>
-      '
+    <CodeEditor
+      @code='<ModeSwitcher @name="[card-id-here]" @mode="view" />
+<ModeSwitcher @name="[card-id-here]" @mode="edit" />
+<ModeSwitcher @name="[card-id-here]" @mode="schema" />'
       @language="html"
     />
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col">
     <h2>Search Bar</h2>
-    {{!-- TODO: Check for accessibility --}}
     <div class="ch-input-group">
       <Input
         @type="search"
@@ -129,293 +131,414 @@
         @placeholder="Search Library"
       />
     </div>
-    <CodeBlock
-      @code='
-      <div class="ch-input-group">
-        <Input
-          @type="search"
-          @class="ch-search-bar"
-          @placeholder="Search Library"
-        />
-      </div>
-      '
+    <CodeEditor
+      @code='<div class="ch-input-group">
+  <Input
+    @type="search"
+    @class="ch-search-bar"
+    @placeholder="Search Library"
+  />
+</div>'
       @language="html"
     />
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col">
     <h2>Filter Bar</h2>
-    {{!-- TODO: Check for accessibility --}}
     <div class="ch-input-group">
       <Input
         @class="ch-filter-bar"
         @placeholder="Filter Results"
       />
     </div>
-    <CodeBlock
-      @code='
-        <div class="ch-input-group">
-          <Input
-            @class="ch-filter-bar"
-            @placeholder="Filter Results"
-          />
-        </div>
-      '
+    <CodeEditor
+      @code='<div class="ch-input-group">
+  <Input
+    @class="ch-filter-bar"
+    @placeholder="Filter Results"
+  />
+</div>'
       @language="html"
     />
   </section>
 
-  <section class="ui-components--section ui-components--grid-2-col">
-    <h2>Form Elements</h2>
-    <CodeBlock
-      @class="ui-components--notes"
-      @code='`ch-input-group` class is optional. It adds top margin when there are sibling elements with the same class.'
-      @language="html"
-    />
-
-    <h3>Text</h3>
-      <label class="ch-label">Field label</label>
-      <CodeBlock
-        @code='<label class="ch-label">Field label</label>'
-        @language="html"
-      />
-
-      <div class="ch-helper-text">Example of helper text lorem ipsum dolor</div>
-      <CodeBlock
-        @code='<div class="ch-helper-text">Example of helper text lorem ipsum dolor</div>'
-        @language="html"
-      />
+  <section class="ui-components--section ui-components--grid-2-col form-fields">
+    <h2>Form Fields</h2>
 
     <h3>Text Input</h3>
-    <div class="ch-input-group">
-      <label for="input-1" class="ch-label">Field label</label>
-      <Input @id="input-1" @class="ch-input" @placeholder="Placeholder text" />
+    <div>
+      <div class="ch-input-group">
+        <label for="input-1" class="ch-label">Field label</label>
+        <Input @id="input-1" @class="ch-input" @placeholder="Default field" />
+      </div>
+      <label class="ch-input-group">
+        <span class="ch-label">Field label</span>
+        <Input @class="ch-input disabled" @disabled={{true}} @value="Disabled field" />
+      </label>
+      <label class="ch-input-group required">
+        <span class="ch-required">required</span>
+        <span class="ch-label">Field label</span>
+        <Input @class="ch-input" @placeholder="Required field" />
+        <div class="ch-helper-text">Helper text goes here (optional).</div>
+      </label>
+      <label class="ch-input-group">
+        <span class="ch-label">Field label</span>
+        <Input @class="ch-input error" @placeholder="Error state" />
+        <div class="ch-helper-text error">Error message goes here, replacing any helper text.</div>
+      </label>
     </div>
-    <CodeBlock
-      @code='
-        <div class="ch-input-group">
-          <label for="[id]" class="ch-label">Field label</label>
-          <Input @id="[id]" @class="ch-input" @placeholder="Placeholder text" />
-        </div>
-      '
-      @language="html"
-    />
-
-    <label class="ch-label ch-input-group">
-      Field label
-      <Input @class="ch-input" @value="Entered text" />
-    </label>
-    <CodeBlock
-      @code='
-        <label class="ch-label ch-input-group">
-          Field label
-          <Input @class="ch-input" @value="Entered text" />
-        </label>
-      '
-      @language="html"
-    />
-
-    <div class="ch-input-group">
-      <label for="input-2" class="ch-label">Field label</label>
-      <Input @id="input-2" @class="ch-input disabled" @disabled={{true}} @placeholder="Disabled field with placeholder" />
-    </div>
-    <CodeBlock
-      @code='
-        <div class="ch-input-group">
-          <label for="[id]" class="ch-label">Field label</label>
-          <Input @id="[id]" @class="ch-input disabled" @disabled=true @placeholder="Disabled field with placeholder" />
-        </div>
-      '
-      @language="html"
-    />
-
-    <label class="ch-label ch-input-group">
-      Field label
-      <Input @class="ch-input disabled" @disabled={{true}} @value="Disabled field with entered value" />
-    </label>
-    <CodeBlock
-      @code='
-        <label class="ch-label ch-input-group">
-          Field label
-          <Input @class="ch-input disabled" @disabled=true @value="Disabled field with entered value" />
-        </label>
-      '
-      @language="html"
+    <CodeEditor
+      @code='<div class="ch-input-group \{{if required "required"}}">
+  \{{#if required}}
+    <span class="ch-required">required</span>
+  \{{/if}}
+  <label class="ch-label">\{{label}}</label>
+  <Input
+    @class="ch-input \{{if required "required"}} \{{if disabled "disabled"}} \{{if error "error"}}"
+    @value=\{{value}}
+    @placeholder=\{{placeholderText}}
+    @disabled=\{{disabled}}
+  />
+  <div class="ch-helper-text \{{if error "error"}}">
+    \{{#if error}}
+      \{{errorMessage}}
+    \{{else}}
+      \{{helperText}}
+    \{{/if}}
+  </div>
+</div>'
+      @language="handlebars"
     />
 
     <h3>Textarea</h3>
-    <div class="ch-input-group">
-      <label for="textarea-1" class="ch-label">Textarea label</label>
-      <Textarea @id="textarea-1" @class="ch-textarea" @placeholder="Placeholder text" />
+    <div>
+      <div class="ch-input-group">
+        <label for="textarea-1" class="ch-label">Textarea label</label>
+        <Textarea @id="textarea-1" @class="ch-textarea" @placeholder="Default textarea" />
+      </div>
+      <label class="ch-input-group">
+        <span class="ch-label">Textarea label</span>
+        <Textarea @class="ch-textarea" @disabled={{true}} @placeholder="Disabled textarea" />
+      </label>
+      <label class="ch-input-group required">
+        <span class="ch-required">required</span>
+        <span class="ch-label">Textarea label</span>
+        <Textarea @class="ch-textarea" @placeholder="Required textarea" />
+        <div class="ch-helper-text">Helper text goes here (optional).</div>
+      </label>
+      <label class="ch-input-group">
+        <span class="ch-label">Textarea label</span>
+        <Textarea @class="ch-textarea error" @placeholder="Error state" />
+        <div class="ch-helper-text error">Error message goes here, replacing any helper text.</div>
+      </label>
     </div>
-    <CodeBlock
-      @code='
-        <div class="ch-input-group">
-          <label for="[id]" class="ch-label">Textarea label</label>
-          <Textarea @id="[id]" @class="ch-textarea" @placeholder="Placeholder text" />
-        </div>
-      '
-      @language="html"
-    />
-
-    <label class="ch-label ch-input-group">
-      Textarea label
-      <Textarea @class="ch-textarea" @value="Entered long text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero." />
-    </label>
-    <CodeBlock
-      @code='
-        <label class="ch-label ch-input-group">
-          Textarea label
-          <Textarea @class="ch-textarea" @value="Entered long text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero." />
-        </label>
-      '
-      @language="html"
-    />
-
-    <div class="ch-input-group">
-      <label for="textarea-2" class="ch-label">Textarea label</label>
-      <Textarea @id="textarea-2" @class="ch-textarea disabled" @disabled={{true}} @placeholder="Disabled textarea with placeholder text" />
-    </div>
-    <CodeBlock
-      @code='
-        <div class="ch-input-group">
-          <label for="[id]" class="ch-label">Textarea label</label>
-          <Textarea @id="[id]" @class="ch-textarea disabled" @disabled=true @placeholder="Disabled textarea with placeholder text" />
-        </div>
-      '
-      @language="html"
-    />
-
-    <label class="ch-label ch-input-group">
-      Textarea label
-      <Textarea @class="ch-textarea disabled" @disabled={{true}} @value="Disabled textarea with entered text" />
-    </label>
-    <CodeBlock
-      @code='
-        <label class="ch-label ch-input-group">
-          Textarea label
-          <Textarea @class="ch-textarea disabled" @disabled=true @value="Disabled textarea with entered text" />
-        </label>
-      '
-      @language="html"
+    <CodeEditor
+      @code='<label class="ch-input-group \{{if required "required"}}">
+  \{{#if required}}
+    <span class="ch-required">required</span>
+  \{{/if}}
+  <span id=\{{id}} class="ch-label">\{{label}}</span>
+  <Input
+    @id=\{{id}}
+    @class="ch-textarea \{{if required "required"}} \{{if disabled "disabled"}} \{{if error "error"}}"
+    @value=\{{value}}
+    @placeholder=\{{placeholderText}}
+    @disabled=\{{disabled}}
+  />
+  <div class="ch-helper-text \{{if error "error"}}">
+    \{{#if error}}
+      \{{errorMessage}}
+    \{{else}}
+      \{{helperText}}
+    \{{/if}}
+  </div>
+</div>'
+      @language="handlebars"
     />
 
     <h3>Checkbox</h3>
-    <CodeBlock
-      @class="ui-components--notes"
-      @code='`checked` and `disabled` classes should be added to the `ch-checkbox-group` along with using the attributes on the input field.'
-      @language="html"
-    />
-    <label class="ch-label ch-input-group ch-checkbox-group {{if this.selected "checked"}}">
-      {{if this.selected "selected" "not selected"}}
-      <Input @class="ch-checkbox" @type="checkbox" @checked={{mut this.selected (not this.selected)}} />
-      <span class="ch-checkmark"></span>
-    </label>
-     <CodeBlock
-      @code={{if this.selected '
-        <label class="ch-label ch-input-group ch-checkbox-group checked">
-          Selected
-          <Input @type="checkbox" @class="ch-checkbox" @checked=true />
-          <span class="ch-checkmark"></span>
-        </label>
-      ' '
-        <label class="ch-label ch-input-group ch-checkbox-group">
-          Not selected
-          <Input @type="checkbox" @class="ch-checkbox" @checked=false />
-          <span class="ch-checkmark"></span>
-        </label>
-      '}}
-      @language="html"
-    />
-    <label class="ch-label ch-input-group ch-checkbox-group disabled">
-      Not selected (disabled state)
-      <Input @class="ch-checkbox disabled" @disabled={{true}} @type="checkbox" />
-      <span class="ch-checkmark"></span>
-    </label>
-     <CodeBlock
-      @code='
-        <label class="ch-label ch-input-group ch-checkbox-group disabled">
-          Not selected (disabled state)
-          <Input @class="ch-checkbox disabled" @disabled=true @type="checkbox" />
-          <span class="ch-checkmark"></span>
-        </label>
-      '
-      @language="html"
-    />
-    <label class="ch-label ch-input-group ch-checkbox-group disabled">
-      Selected (disabled state)
-      <Input @class="ch-checkbox disabled" @checked={{true}} @disabled={{true}} @type="checkbox" />
-      <span class="ch-checkmark"></span>
-    </label>
-    <CodeBlock
-      @code='
-        <label class="ch-label ch-input-group ch-checkbox-group disabled">
-          Selected (disabled state)
-          <Input @class="ch-checkbox disabled" @checked=true @disabled=true @type="checkbox" />
-          <span class="ch-checkmark"></span>
-        </label>
-      '
-      @language="html"
+    <div>
+      <label class="ch-label ch-input-group ch-checkbox-group {{if this.selected "checked"}}">
+        {{if this.selected "selected" "not selected"}}
+        <Input @class="ch-checkbox" @type="checkbox" @checked={{mut this.selected (not this.selected)}} />
+        <span class="ch-checkmark">
+          {{#if this.selected}}
+            {{svg-jar "checkmark" width="12px" height="12px"}}
+          {{/if}}
+        </span>
+      </label>
+      <label class="ch-label ch-input-group ch-checkbox-group disabled">
+        Not selected (disabled state)
+        <Input @class="ch-checkbox disabled" @disabled={{true}} @type="checkbox" />
+        <span class="ch-checkmark"></span>
+      </label>
+      <label class="ch-label ch-input-group ch-checkbox-group disabled">
+        Selected (disabled state)
+        <Input @class="ch-checkbox disabled" @checked={{true}} @disabled={{true}} @type="checkbox" />
+        <span class="ch-checkmark">{{svg-jar "checkmark" width="12px" height="12px"}}</span>
+      </label>
+    </div>
+    <CodeEditor
+      @code='<label class="ch-label ch-input-group ch-checkbox-group \{{if checked "checked"}} \{{if disabled "disabled"}}">
+  \{{label}}
+  <Input @class="ch-checkbox" @type="checkbox" @checked=\{{checked}} @disabled=\{{disabled}} />
+  <span class="ch-checkmark">
+    \{{#if checked}}
+      \{{svg-jar "checkmark" width="12px" height="12px"}}
+    \{{/if}}
+  </span>
+</label>'
+      @language="handlebars"
     />
 
     <h3>Dropdown</h3>
-    <div class="cs-input-group">
-      <label for="ch-dropdown-1" class="ch-label">Label</label>
-      <select id="ch-dropdown-1" class="ch-dropdown">
-        <option class="ch-dropdown--option">Dropdown</option>
-      </select>
+    <div>
+      <Dropdown @theme="dark" @options={{this.model.countries}} @searchEnabled={{false}} />
+      <Dropdown @theme="dark" @options={{this.model.countries}} @searchEnabled={{false}} @label="Disabled dropdown" @disabled={{true}} />
+      <Dropdown @theme="dark" @options={{this.model.countries}} @searchEnabled={{false}} @outerLabel="Country" @required={{true}} />
     </div>
-    <CodeBlock
-      @code='
-      <div class="cs-input-group">
-        <label for="[id]" class="ch-label">Label</label>
-        <select id="[id]" class="ch-dropdown">
-          <option class="ch-dropdown--option">Dropdown</option>
-        </select>
-      </div>
-      '
-      @language="html"
+    <CodeEditor
+      @code='<Dropdown @theme="dark" @options=\{{options}} @searchEnabled={{false}} />
+
+// Additional Attributes
+<Dropdown @theme="dark" @options=\{{options}}
+  @searchEnabled={{false}}
+  @label=\{{label}}
+  @outerLabel=\{{outerLabel}}
+  @required=\{{required}}
+  @disabled=\{{disabled}}
+/>'
+      @language="handlebars"
     />
-    <div class="cs-input-group">
-      <label for="ch-dropdown-2" class="ch-label">Label</label>
-      <select id="ch-dropdown-2" class="ch-dropdown disabled" disabled>
-        <option class="ch-dropdown--option">Dropdown</option>
-      </select>
-    </div>
-    <CodeBlock
-      @code='
-      <div class="cs-input-group">
-        <label for="[id]" class="ch-label">Label</label>
-        <select id="[id]" class="ch-dropdown disabled" disabled>
-          <option class="ch-dropdown--option">Dropdown</option>
-        </select>
-      </div>
-      '
+  </section>
+
+  <section class="ui-components--section ui-components--grid-2-col">
+    <h2>Right Edge</h2>
+    <RightEdge
+      @selectedField={{this.model.isolatedFields.firstObject}}
+      @selectField={{action this.noop}}
+      @setFieldName={{this.noop}}
+      @setFieldLabel={{this.noop}}
+      @setFieldInstructions={{this.noop}}
+      @setNeededWhenEmbedded={{this.noop}}
+    />
+    <CodeEditor
+      @code='<RightEdge
+  @selectedField=@selectedField
+  @selectField=@selectField
+  @setFieldName=@setFieldName
+  @setFieldLabel=@setFieldLabel
+  @setFieldInstructions=@setFieldInstructions
+  @setNeededWhenEmbedded=@setNeededWhenEmbedded
+/>'
       @language="html"
     />
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col">
-    <h2>Catalog Field</h2>
-    <div class="ch-catalog-field" role="button" draggable="true">
-      <div class="ch-catalog-field--icon" style={{css-url "background-image" "/assets/images/field-types/text.svg"}}></div>
-      <div>
-        <h4 class="ch-catalog-field--title">Text</h4>
-        <p class="ch-catalog-field--description">All-purpose text field</p>
-      </div>
-    </div>
-    <CodeBlock
-      @code='
-        <div class="ch-catalog-field" role="button" draggable="true">
-          <div class="ch-catalog-field--icon" style=css-url "background-image" "[icon]"></div>
-          <div>
-            <h4 class="ch-catalog-field--title">Text</h4>
-            <p class="ch-catalog-field--description">All-purpose text field</p>
-          </div>
-        </div>
-      '
+    <h2>Field Renderer</h2>
+    <h3>View mode</h3>
+    <FieldRenderer
+      @field={{this.model.sampleLocationField}}
+      @format="isolated"
+      @mode="view"
+    />
+    <CodeEditor
+      @code='<FieldRenderer
+  @field=@field
+  @format="isolated"
+  @mode="view"
+/>'
       @language="html"
     />
+
+    <h3>Schema mode</h3>
+    <FieldRenderer
+        @field={{this.model.sampleNameField}}
+        @format="isolated"
+        @mode="schema"
+      />
+    <CodeEditor
+      @code='<FieldRenderer
+  @field=@field
+  @format="isolated"
+  @mode="schema"
+/>'
+      @language="html"
+    />
+    <h3>Edit mode</h3>
+    <h4>String Editor</h4>
+    <FieldRenderer
+      @field={{this.model.sampleTitleField}}
+      @format="isolated"
+      @mode="edit"
+      @setFieldValue={{action this.noop}}
+    />
+    <CodeEditor
+      @code='<FieldRenderer
+  @field=@field
+  @format="isolated"
+  @mode="edit"
+  @setFieldValue=@setFieldValue
+/>'
+      @language="html"
+    />
+
+    <h4>Date Editor</h4>
+    <FieldRenderer
+      @field={{this.model.sampleDateField}}
+      @format="isolated"
+      @mode="edit"
+      @setFieldValue={{action this.noop}}
+    />
+    <CodeEditor
+      @code='<FieldRenderer
+  @field=@field
+  @format="isolated"
+  @mode="edit"
+  @setFieldValue=@setFieldValue
+/>'
+      @language="html"
+    />
+
+    <h4>Textarea</h4>
+    <CodeEditor
+      class="ui-components--notes"
+      @code='Note: This editor does not currently exist.'
+      @language="html"
+    />
+    <div class="field-renderer edit-field">
+      <label for="textarea-editor">Textarea</label>
+      <Textarea
+        @id="textarea-editor"
+        @value="Entered long text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero."
+      />
+    </div>
+    <CodeEditor
+      @code='<div class="field-renderer edit-field">
+<label for="textarea-editor">Textarea</label>
+<Textarea
+  @id="textarea-editor"
+  @value="Entered long text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero."
+/>
+</div>'
+      @language="html"
+    />
+
+    <h4>Address string</h4>
+    <CodeEditor
+      class="ui-components--notes"
+      @code='Note: This editor does not currently exist.'
+      @language="html"
+    />
+    <div class="field-renderer edit-field field-address">
+      <label for="address-string-editor">Address</label>
+      <Input
+        @id="address-string-editor"
+        @value="One World Trade Center, 285 Fulton St, New York, NY"
+      />
+    </div>
+    <CodeEditor
+      @code='<div class="field-renderer edit-field field-address">
+  <label for="address-string-editor">Address</label>
+  <Input
+    @id="address-string-editor"
+    @value="One World Trade Center, 285 Fulton St, New York, NY"
+  />
+</div>'
+      @language="html"
+    />
+
+    <h4>Image</h4>
+    <CodeEditor
+      class="ui-components--notes"
+      @code='Note: This editor does not currently exist.'
+      @language="html"
+    />
+    <div class="field-renderer edit-field">
+      <label for="image-string-editor">Image</label>
+      <Input
+        @id="image-string-editor"
+        @value="one_world.png"
+      />
+      <img
+        class="edit-field--image"
+        src="/assets/images/cards/one_world.png"
+        alt="One World Trade Center"
+        width="90px"
+        height="55px"
+      >
+    </div>
+    <CodeEditor
+      @code='<div class="field-renderer edit-field">
+  <label for="image-string-editor">Image</label>
+  <Input
+    @id="image-string-editor"
+    @value="one_world.png"
+  />
+  <img
+    src="/assets/images/cards/one_world.png"
+    alt="One World Trade Center"
+    width="90px"
+    height="55px"
+  >
+</div>'
+      @language="html"
+    />
+  </section>
+
+  <section class="ui-components--section ui-components--grid-2-col">
+    <h2>Card Renderer</h2>
+      <h3>Schema mode</h3>
+      <CardRenderer
+        @card={{this.model}}
+        @format="isolated"
+        @mode="schema"
+        @setPosition={{action this.noop}}
+        @removeField={{action this.noop}}
+      />
+      <CodeEditor
+        @code='<CardRenderer
+  @card=@card
+  @format="isolated"
+  @mode="schema"
+  @setPosition=@setPosition
+  @removeField=@removeField
+/>'
+        @language="html"
+      />
+
+      <h3>Edit mode</h3>
+      <CardRenderer
+        @card={{this.model}}
+        @format="isolated"
+        @mode="edit"
+        @setFieldValue={{action this.noop}}
+      />
+      <CodeEditor
+        @code='<CardRenderer
+  @card=@card
+  @format="isolated"
+  @mode="edit"
+  @setFieldValue=@setFieldValue
+/>'
+        @language="html"
+      />
+
+      <h3>View mode</h3>
+      <CardRenderer
+        @card={{this.model}}
+        @format="isolated"
+        @mode="view"
+      />
+      <CodeEditor
+        @code='<CardRenderer
+  @card=@card
+  @format="isolated"
+  @mode="view"
+/>'
+        @language="html"
+      />
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col">
@@ -442,189 +565,31 @@
         </div>
       </div>
     </section>
-    <CodeBlock
-      @code='
-        <section class="ch-catalog">
-          <header class="ch-catalog--header">
-            <h3 class="ch-catalog--title">Card Catalog</h3>
-            <div class="ch-catalog--header-btns">
-              <button class="ch-catalog--header-btn sidebar active" aria-label="View as sidebar"></button>
-              <button class="ch-catalog--header-btn grid" aria-label="View as grid"></button>
-            </div>
-            <div class="ch-input-group">
-              <Input
-                @class="ch-filter-bar"
-                @placeholder="Filter Results"
-              />
-            </div>
-          </header>
-          <div class="ch-catalog--fields">
-            <div class="ch-catalog-field" role="button" draggable="true">
-              <div class="ch-catalog-field--icon" style={{css-url "background-image" "[icon]"}}></div>
-              <div>
-                <h4 class="ch-catalog-field--title">Text</h4>
-                <p class="ch-catalog-field--description">All-purpose text field</p>
-              </div>
-            </div>
-          </div>
-        </section>
-      '
-      @language="html"
-    />
-  </section>
-
-  <section class="ui-components--section ui-components--grid-2-col">
-    <h2>Field Renderer</h2>
-    <h3>Schema mode</h3>
-    <FieldRenderer
-        @field={{this.model.sampleNameField}}
-        @format="isolated"
-        @mode="schema"
+    <CodeEditor
+      @code='<section class="ch-catalog">
+  <header class="ch-catalog--header">
+    <h3 class="ch-catalog--title">Card Catalog</h3>
+    <div class="ch-catalog--header-btns">
+      <button class="ch-catalog--header-btn sidebar active" aria-label="View as sidebar"></button>
+      <button class="ch-catalog--header-btn grid" aria-label="View as grid"></button>
+    </div>
+    <div class="ch-input-group">
+      <Input
+        @class="ch-filter-bar"
+        @placeholder="Filter Results"
       />
-    <CodeBlock
-      @code='
-        <FieldRenderer
-          @field=@field
-          @format="isolated"
-          @mode="schema"
-        />
-      '
-      @language="html"
-    />
-    <h3>Edit mode</h3>
-    <FieldRenderer
-      @field={{this.model.sampleNameField}}
-      @format="isolated"
-      @mode="edit"
-      @setFieldValue={{action this.noop}}
-    />
-    <CodeBlock
-      @code='
-        <FieldRenderer
-          @field=@field
-          @format="isolated"
-          @mode="edit"
-          @setFieldValue=@setFieldValue
-        />
-      '
-      @language="html"
-    />
-    <h3>View mode</h3>
-    <FieldRenderer
-      @field={{this.model.sampleNameField}}
-      @format="isolated"
-      @mode="view"
-    />
-    <CodeBlock
-      @code='
-        <FieldRenderer
-          @field=@field
-          @format="isolated"
-          @mode="view"
-        />
-      '
-      @language="html"
-    />
-  </section>
-
-  <section class="ui-components--section ui-components--grid-2-col">
-    <h2>Card Renderer</h2>
-      <h3>Schema mode</h3>
-      <CardRenderer
-        @card={{this.model}}
-        @format="isolated"
-        @mode="schema"
-        @setPosition={{action this.noop}}
-        @removeField={{action this.noop}}
-      />
-      <CodeBlock
-        @code='
-          <CardRenderer
-            @card=@card
-            @format="isolated"
-            @mode="schema"
-            @setPosition=@setPosition
-            @removeField=@removeField
-          />
-        '
-        @language="html"
-      />
-
-      <h3>Edit mode</h3>
-      <CardRenderer
-        @card={{this.model}}
-        @format="isolated"
-        @mode="edit"
-        @setFieldValue={{action this.noop}}
-      />
-      <CodeBlock
-        @code='
-          <CardRenderer
-            @card=@card
-            @format="isolated"
-            @mode="edit"
-            @setFieldValue=@setFieldValue
-          />
-        '
-        @language="html"
-      />
-
-      <h3>View mode</h3>
-      <CardRenderer
-        @card={{this.model}}
-        @format="isolated"
-        @mode="view"
-      />
-      <CodeBlock
-        @code='
-          <CardRenderer
-            @card=@card
-            @format="isolated"
-            @mode="view"
-          />
-        '
-        @language="html"
-      />
-  </section>
-
-  <section class="ui-components--section ui-components--grid-2-col">
-    <h2>Right Edge</h2>
-    <CodeBlock
-      @class="ui-components--notes"
-      @code='<RightEdge> component normally has fixed positioning. Using `position: static` here for display purposes.'
-      @language="html"
-    />
-
-    <h3>Right Edge (No field selected)</h3>
-    <RightEdge />
-    <CodeBlock
-      @code='<RightEdge />'
-      @language="html"
-    />
-
-    <h3>Right Edge (With adopted card preview)</h3>
-    TODO: Add example
-
-    <h3>Right Edge (With selected field)</h3>
-    <RightEdge
-      @selectedField={{this.model.isolatedFields.firstObject}}
-      @selectField={{action this.noop}}
-      @setFieldName={{this.noop}}
-      @setFieldLabel={{this.noop}}
-      @setFieldInstructions={{this.noop}}
-      @setNeededWhenEmbedded={{this.noop}}
-    />
-    <CodeBlock
-      @code='
-        <RightEdge
-          @selectedField=@selectedField
-          @selectField=@selectField
-          @setFieldName=@setFieldName
-          @setFieldLabel=@setFieldLabel
-          @setFieldInstructions=@setFieldInstructions
-          @setNeededWhenEmbedded=@setNeededWhenEmbedded
-        />
-      '
+    </div>
+  </header>
+  <div class="ch-catalog--fields">
+    <div class="ch-catalog-field" role="button" draggable="true">
+      <div class="ch-catalog-field--icon" style={{css-url "background-image" "[icon]"}}></div>
+      <div>
+        <h4 class="ch-catalog-field--title">Text</h4>
+        <p class="ch-catalog-field--description">All-purpose text field</p>
+      </div>
+    </div>
+  </div>
+</section>'
       @language="html"
     />
   </section>

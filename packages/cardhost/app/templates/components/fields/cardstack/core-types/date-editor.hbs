@@ -1,12 +1,12 @@
 <label
-  data-test-date-field-editor-label
   for={{concat "edit-" @field.name "-field-value"}}
+  data-test-date-field-editor-label
 >
-  {{@field.name}}
+  {{@field.label}}
 </label>
 <Input
-  @id={{concat "edit-" @field.name "-field-value"}}
   @type="date"
+  @id={{concat "edit-" @field.name "-field-value"}}
   @value={{this.fieldValue}}
   @change={{action this.updateFieldValue}}
 />

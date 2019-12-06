@@ -15,22 +15,18 @@ module.exports = function(environment) {
         EMBER_GLIMMER_ANGLE_BRACKET_NESTED_LOOKUP: true,
         EMBER_GLIMMER_ANGLE_BRACKET_BUILT_INS: true,
         EMBER_GLIMMER_FN_HELPER: true,
-        EMBER_GLIMMER_ON_MODIFIER: true
+        EMBER_GLIMMER_ON_MODIFIER: true,
       },
       EXTEND_PROTOTYPES: {
         // Prevent Ember Data from overriding Date.parse.
-        Date: false
+        Date: false,
       },
-
     },
     APP: {
       // Here you can pass flags/options to your application instance
       // when it is created
     },
-    cardstack: {
-      cardTemplates: JSON.parse(process.env.CARD_TEMPLATES || null) || [],
-      hubURL: 'http://localhost:3000',
-    },
+    cardTemplates: JSON.parse(process.env.CARD_TEMPLATES || null) || [],
   };
 
   if (environment === 'development') {
@@ -40,8 +36,10 @@ module.exports = function(environment) {
     // ENV.APP.LOG_TRANSITIONS_INTERNAL = true;
     // ENV.APP.LOG_VIEW_LOOKUPS = true;
 
-    ENV.cardTemplates = JSON.parse(process.env.CARD_TEMPLATES || null) ||
-      ['local-hub::location-card'];
+    ENV.cardTemplates = JSON.parse(process.env.CARD_TEMPLATES || null) || [
+      'local-hub::location-card',
+      'local-hub::event-card',
+    ];
   }
 
   if (environment === 'test') {
@@ -55,8 +53,7 @@ module.exports = function(environment) {
     ENV.APP.rootElement = '#ember-testing';
     ENV.APP.autoboot = false;
 
-    ENV.cardTemplates = JSON.parse(process.env.CARD_TEMPLATES || null) ||
-      ['local-hub::location-card'];
+    ENV.cardTemplates = JSON.parse(process.env.CARD_TEMPLATES || null) || ['local-hub::location-card'];
   }
 
   // if (environment === 'production') {

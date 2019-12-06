@@ -3,21 +3,55 @@
   right: var(--ch-spacing);
   top: var(--ch-top-edge-height);
   width: var(--ch-right-edge-panel-width);
+  max-height: calc(100vh - var(--ch-top-edge-height) - var(--ch-bottom-edge-height));
   border-radius: 10px;
-  background-color: var(--ch-medium-dark-blue-gray);
+  background-color: var(--ch-dark-background);
   color: white;
   font: 400 13px/18px var(--ch-font-family);
   letter-spacing: 0.035em;
   z-index: var(--ch-edges-z-index);
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+  overflow-y: auto;
+}
+
+.right-edge--pill-selector-container {
+  padding: 23px 18px 21px 20px;
+}
+
+.pill-selector {
+  display: flex;
+  max-width: 100%;
+  min-width: var(--ch-component-width);
+  width: min-content;
+  height: var(--ch-component-height);
+  background-color: var(--ch-default);
+  color: white;
+  font: 400 13px/18px var(--ch-font-family);
+  letter-spacing: 0.035em;
+  border: 1px solid var(--ch-default);
+  border-radius: 20px;
+}
+
+.pill-option {
+  flex: 1;
+  padding: 10px 15px;
+  text-align: center;
+}
+
+.pill-option.selected {
+  background-color: var(--ch-foreground);
+  color: var(--ch-highlight);
+  font-weight: 600;
+  border-radius: inherit;
 }
 
 .right-edge--section {
-  padding: var(--ch-spacing);
+  padding: 10px var(--ch-spacing) 11px;
+  border-top: 1px solid var(--ch-default);
 }
 
-.right-edge--section + .right-edge--section {
-  border-top: 1px solid var(--ch-dark-blue-gray);
+.right-edge--section:last-child {
+  padding-bottom: 14px;
 }
 
 .right-edge--section-header {
@@ -31,24 +65,27 @@
 
 .right-edge--section-header--adopted {
   font-weight: 400;
-  color: var(--ch-white-op60);
+  color: var(--ch-light-op60);
   text-transform: none;
 }
 
-.right-edge--section-header + .right-edge--item,
-.right-edge--item + .right-edge--item {
-  margin-top: var(--ch-spacing);
+.right-edge--section-header + .right-edge--item {
+  margin-top: 26px;
+}
+
+.right-edge--item {
+  padding-bottom: 16px;
 }
 
 .right-edge--label {
-  padding-bottom: 10px;
+  padding-bottom: 4px;
 }
 
-.right-edge--section-btn-container {
+.section-btn-container {
   text-align: right;
 }
 
-.right-edge--section-btn {
+.section-btn {
   display: inline-block;
   margin: 0;
   padding: 10px 0 10px 10px;
@@ -60,83 +97,8 @@
   opacity: 0.3;
 }
 
-.right-edge--section-btn:focus,
-.right-edge--section-btn:hover {
+.section-btn:focus,
+.section-btn:hover {
   opacity: 1;
   cursor: pointer;
-}
-
-
-/* Adopted card */
-.right-edge .adopted-card {
-  --adopted-image-size: 54px;
-
-  display: grid;
-  grid-template-columns: var(--adopted-image-size) 1fr;
-  grid-gap: var(--ch-spacing);
-  align-items: center;
-  min-height: 75px;
-  padding: 10px;
-  background-color: var(--ch-lighter-medium-blue-gray);
-  color: white;
-  border: 1px solid var(--ch-darker-dark-blue-gray);
-  border-radius: 5px;
-  font: 600 13px/18px var(--ch-font-family);
-  letter-spacing: 0.035em;
-}
-
-.right-edge .adopted-card--view-text {
-  margin-top: 5px;
-  font-size: 11px;
-  font-weight: 400;
-  line-height: 15px;
-  opacity: 0.5;
-}
-
-.right-edge .adopted-card:focus .adopted-card--view-text,
-.right-edge .adopted-card:hover .adopted-card--view-text {
-  opacity: 1;
-  cursor: pointer;
-  outline: 0;
-  /* TODO: Make this accessible */
-}
-
-.right-edge--section .adopted-card--image {
-  width: 100%;
-  height: 100%;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: var(--adopted-image-size);
-  border: 1px solid var(--ch-darker-dark-blue-gray);
-  border-radius: 5px;
-}
-
-
-/* Pill selector */
-/* TODO: Functionality and hover-focus styles */
-.pill-selector {
-  display: flex;
-  max-width: 100%;
-  min-width: var(--ch-component-width);
-  width: min-content;
-  height: var(--ch-component-height);
-  background-color: var(--ch-dark-blue-gray);
-  color: white;
-  font: 400 13px/18px var(--ch-font-family);
-  letter-spacing: 0.035em;
-  border: 1px solid var(--ch-dark-blue-gray);
-  border-radius: 20px;
-}
-
-.pill-option {
-  flex: 1;
-  padding: 10px 15px;
-  text-align: center;
-}
-
-.pill-option.selected {
-  background-color: var(--ch-lighter-medium-blue-gray);
-  color: var(--ch-cyan);
-  font-weight: 600;
-  border-radius: inherit;
 }
