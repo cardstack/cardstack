@@ -47,7 +47,7 @@ module('Acceptance | card schema', function(hooks) {
     await visit(`/cards/${card1Id}/schema`);
 
     await click('[data-test-field="title"]');
-    assert.dom('[data-test-field="title"] [data-test-field-renderer-type]').hasText('@cardstack/core-types::string');
+    assert.dom('[data-test-field="title"] [data-test-field-renderer-type]').hasText('title (Text)');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
@@ -146,7 +146,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-field="title"] [data-test-string-field-editor-label]').hasText('TITLE');
 
     await visit(`/cards/${card1Id}/schema`);
-    assert.dom('[data-test-field="title"] [data-test-field-renderer-label]').hasText('title');
+    assert.dom('[data-test-field="title"] [data-test-field-renderer-label]').hasText('TITLE');
     await click('[data-test-field="title"]');
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('title');

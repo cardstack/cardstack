@@ -102,26 +102,22 @@ module('Acceptance | card create', function(hooks) {
 
     await click('[data-test-field="title"] [data-test-field-schema-renderer]');
     assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="title"]').hasClass('selected');
-    assert.dom('[data-test-field="title"] [data-test-field-renderer-type]').hasText('@cardstack/core-types::string');
+    assert.dom('[data-test-field="title"] [data-test-field-renderer-type]').hasText('title (Text)');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     await click('[data-test-field="body"] [data-test-field-schema-renderer]');
     assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="body"]').hasClass('selected');
-    assert.dom('[data-test-field="body"] [data-test-field-renderer-type]').hasText('@cardstack/core-types::string');
+    assert.dom('[data-test-field="body"] [data-test-field-renderer-type]').hasText('body (Text)');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isNotChecked();
 
     await click('[data-test-field="author"] [data-test-field-schema-renderer]');
     assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="author"]').hasClass('selected');
-    assert
-      .dom('[data-test-field="author"] [data-test-field-renderer-type]')
-      .hasText('@cardstack/core-types::belongs-to');
+    assert.dom('[data-test-field="author"] [data-test-field-renderer-type]').hasText('author (Single-select)');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     await click('[data-test-field="reviewers"] [data-test-field-schema-renderer]');
     assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="reviewers"]').hasClass('selected');
-    assert
-      .dom('[data-test-field="reviewers"] [data-test-field-renderer-type]')
-      .hasText('@cardstack/core-types::has-many');
+    assert.dom('[data-test-field="reviewers"] [data-test-field-renderer-type]').hasText('reviewers (Multi-select)');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     await focus('[data-test-card-renderer-isolated]');
