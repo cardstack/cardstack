@@ -23,11 +23,11 @@ class CardstackError extends Error {
   detail: string;
   status: number;
   title?: string;
-  source?: ErrorDetails["source"];
+  source?: ErrorDetails['source'];
   isCardstackError: true = true;
   additionalErrors: CardstackError[] | null = null;
 
-  constructor(detail: string, { status, title, source}: ErrorDetails = {}) {
+  constructor(detail: string, { status, title, source }: ErrorDetails = {}) {
     super(detail);
     this.detail = detail;
     this.status = status || 500;
@@ -39,7 +39,7 @@ class CardstackError extends Error {
       title: this.title,
       detail: this.detail,
       code: this.status,
-      source: this.source
+      source: this.source,
     };
   }
 

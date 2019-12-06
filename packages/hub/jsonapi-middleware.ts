@@ -1,17 +1,17 @@
-import compose from "koa-compose";
-import route, { KoaRoute } from "koa-better-route";
-import Koa from "koa";
+import compose from 'koa-compose';
+import route, { KoaRoute } from 'koa-better-route';
+import Koa from 'koa';
 // @ts-ignore
-import mimeMatch from "mime-match";
+import mimeMatch from 'mime-match';
 import KoaBody from 'koa-body';
-import { Memoize } from "typescript-memoize";
-import { inject } from "./dependency-injection";
+import { Memoize } from 'typescript-memoize';
+import { inject } from './dependency-injection';
 import CardstackError from './error';
-import { SessionContext } from "./authentication-middleware";
-import { assertSingleResourceDoc } from "./document";
-import { myOrigin } from "./origin";
-import { Card } from "./card";
-import { SingleResourceDoc } from "jsonapi-typescript";
+import { SessionContext } from './authentication-middleware';
+import { assertSingleResourceDoc } from './document';
+import { myOrigin } from './origin';
+import { Card } from './card';
+import { SingleResourceDoc } from 'jsonapi-typescript';
 
 const apiPrefix = '/api';
 const apiPrefixPattern = new RegExp(`^${apiPrefix}/(.*)`);
@@ -45,35 +45,30 @@ export default class JSONAPIMiddleware {
       jsonStrict: true,
       onError(error: Error) {
         throw new CardstackError(`error while parsing body: ${error.message}`, { status: 400 });
-      }
+      },
     });
 
     return compose([
       CardstackError.withJsonErrorHandling,
       body,
       //route.get("/cards", getCards),
-      route.post("/realms/:local_realm_id/cards", this.createCard.bind(this)),
-      route.post("/remote-realms/:remote_realm_url/cards", this.createCard.bind(this)),
-      route.get("/realms/:local_realm_id/cards/:local_id", this.getCard.bind(this)),
-      route.get("/realms/:local_realm_id/cards/:original_realm_url/:local_id", this.getCard.bind(this)),
-      route.get("/remote-realms/:remote_realm_url/cards/:local_id", this.getCard.bind(this)),
-      route.get("/remote-realms/:remote_realm_url/cards/:original_realm_url/:local_id", this.getCard.bind(this)),
+      route.post('/realms/:local_realm_id/cards', this.createCard.bind(this)),
+      route.post('/remote-realms/:remote_realm_url/cards', this.createCard.bind(this)),
+      route.get('/realms/:local_realm_id/cards/:local_id', this.getCard.bind(this)),
+      route.get('/realms/:local_realm_id/cards/:original_realm_url/:local_id', this.getCard.bind(this)),
+      route.get('/remote-realms/:remote_realm_url/cards/:local_id', this.getCard.bind(this)),
+      route.get('/remote-realms/:remote_realm_url/cards/:original_realm_url/:local_id', this.getCard.bind(this)),
       // repeat for patch
       // repeat for delete
     ]);
   }
 
   isJSONAPI(ctxt: Koa.ParameterizedContext<{}, {}>) {
-    let contentType = ctxt.request.headers["content-type"];
-    let isJsonApi =
-      contentType && contentType.includes("application/vnd.api+json");
-    let [acceptedTypes]: string[] = (
-      ctxt.request.headers["accept"] || ""
-    ).split(";");
-    let types = acceptedTypes.split(",");
-    let acceptsJsonApi = types.some(t =>
-      mimeMatch(t, "application/vnd.api+json")
-    );
+    let contentType = ctxt.request.headers['content-type'];
+    let isJsonApi = contentType && contentType.includes('application/vnd.api+json');
+    let [acceptedTypes]: string[] = (ctxt.request.headers['accept'] || '').split(';');
+    let types = acceptedTypes.split(',');
+    let acceptsJsonApi = types.some(t => mimeMatch(t, 'application/vnd.api+json'));
     return isJsonApi || acceptsJsonApi;
   }
 
@@ -90,7 +85,9 @@ export default class JSONAPIMiddleware {
     } else {
       realm = new URL(ctxt.routeParams.remote_realm_url);
       if (realm.origin === myOrigin) {
-        throw new CardstackError(`${realm.href} is a local realm. You tried to access it via /api/remote-realms`, { status: 400 });
+        throw new CardstackError(`${realm.href} is a local realm. You tried to access it via /api/remote-realms`, {
+          status: 400,
+        });
       }
     }
     let card = await this.cards.create(ctxt.state.cardstackSession, realm, body);
@@ -143,15 +140,20 @@ export default class JSONAPIMiddleware {
       if (isHome) {
         return [base, encodeURIComponent(card.realm.href), 'cards', card.localId].join('/');
       } else {
-        return [base, encodeURIComponent(card.realm.href), 'cards', encodeURIComponent(card.originalRealm.href), card.localId].join('/');
+        return [
+          base,
+          encodeURIComponent(card.realm.href),
+          'cards',
+          encodeURIComponent(card.originalRealm.href),
+          card.localId,
+        ].join('/');
       }
     }
-
   }
 }
 
-declare module "@cardstack/hub/dependency-injection" {
+declare module '@cardstack/hub/dependency-injection' {
   interface KnownServices {
-    "jsonapi-middleware": JSONAPIMiddleware;
+    'jsonapi-middleware': JSONAPIMiddleware;
   }
 }

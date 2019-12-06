@@ -1,6 +1,6 @@
-import { wireItUp } from "../main";
-import { Container } from "../dependency-injection";
-import PgClient from "../pgsearch/pgclient";
+import { wireItUp } from '../main';
+import { Container } from '../dependency-injection';
+import PgClient from '../pgsearch/pgclient';
 
 export interface TestEnv {
   container: Container;

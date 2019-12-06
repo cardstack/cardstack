@@ -14,8 +14,8 @@ export default class AuthenticationMiddleware {
   }
 }
 
-declare module "@cardstack/hub/dependency-injection" {
+declare module '@cardstack/hub/dependency-injection' {
   interface KnownServices {
-    "authentication-middleware": AuthenticationMiddleware;
+    'authentication-middleware': AuthenticationMiddleware;
   }
 }

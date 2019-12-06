@@ -1,4 +1,4 @@
-import { UpstreamDocument, UpstreamIdentity } from "../document";
+import { UpstreamDocument, UpstreamIdentity } from '../document';
 
 export class EphemeralStorage {
   store = new Map() as Map<string, UpstreamDocument>;
@@ -8,13 +8,15 @@ export class EphemeralStorage {
       realmURL,
       typeof id === 'string' ? realmURL : id.originalRealm.href,
       typeof id === 'string' ? id : id.localId,
-    ].map(encodeURIComponent).join('/');
+    ]
+      .map(encodeURIComponent)
+      .join('/');
     this.store.set(key, doc);
   }
 }
 
-declare module "@cardstack/hub/dependency-injection" {
+declare module '@cardstack/hub/dependency-injection' {
   interface KnownServices {
-    "ephemeralStorage": EphemeralStorage;
+    ephemeralStorage: EphemeralStorage;
   }
 }

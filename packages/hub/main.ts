@@ -48,4 +48,3 @@ function cors(ctxt: Koa.Context, next: Koa.Next) {
   }
   next();
 }
-

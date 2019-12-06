@@ -1,4 +1,4 @@
-import { SingleResourceDoc } from "jsonapi-typescript";
+import { SingleResourceDoc } from 'jsonapi-typescript';
 
 export class TestCard {
   constructor(private cardAttrs: CardAttrs, private modelAttrs: ModelAttrs) {}
@@ -9,13 +9,13 @@ export class TestCard {
         type: 'cards',
         attributes: {
           model: {
-            attributes: this.modelAttrs
-          }
-        } as NonNullable<SingleResourceDoc["data"]["attributes"]>
-      }
+            attributes: this.modelAttrs,
+          },
+        } as NonNullable<SingleResourceDoc['data']['attributes']>,
+      },
     };
     if (this.cardAttrs.localId) {
-      doc.data.attributes["local-id"] = this.cardAttrs.localId;
+      doc.data.attributes['local-id'] = this.cardAttrs.localId;
     }
 
     if (this.cardAttrs.realm) {
@@ -30,8 +30,14 @@ export class TestCard {
   }
 }
 
-interface ModelAttrs { [fieldName: string]: any }
-interface CardAttrs { realm?: string; originalRealm?: string; localId?: string}
+interface ModelAttrs {
+  [fieldName: string]: any;
+}
+interface CardAttrs {
+  realm?: string;
+  originalRealm?: string;
+  localId?: string;
+}
 
 export function testCard(modelAttrs: ModelAttrs): TestCard;
 export function testCard(cardAttrs: CardAttrs, modelAttrs: ModelAttrs): TestCard;

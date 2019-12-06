@@ -1,15 +1,10 @@
-import CardstackError from "./error";
-import { loadWriter, patch, buildValueExpression } from "./scaffolding";
-import { WriterFactory } from "./writer";
-import {
-  PristineDocument,
-  UpstreamDocument,
-  UpstreamIdentity
-} from "./document";
-import { SingleResourceDoc } from "jsonapi-typescript";
+import CardstackError from './error';
+import { loadWriter, patch, buildValueExpression } from './scaffolding';
+import { WriterFactory } from './writer';
+import { PristineDocument, UpstreamDocument, UpstreamIdentity } from './document';
+import { SingleResourceDoc } from 'jsonapi-typescript';
 import cloneDeep from 'lodash/cloneDeep';
-import { Expression } from "./pgsearch/util";
-
+import { Expression } from './pgsearch/util';
 
 export class Card {
   // Almost everyone should treat this as opaque and only valid on the current
@@ -55,12 +50,12 @@ export class Card {
     this.jsonapi = jsonapi;
     this.realm = realm;
     this.originalRealm =
-      typeof jsonapi.data.attributes?.["original-realm"] === "string"
-        ? new URL(jsonapi.data.attributes["original-realm"])
+      typeof jsonapi.data.attributes?.['original-realm'] === 'string'
+        ? new URL(jsonapi.data.attributes['original-realm'])
         : realm;
 
-    if (typeof jsonapi.data.attributes?.["local-id"] === "string") {
-      this.localId = jsonapi.data.attributes?.["local-id"];
+    if (typeof jsonapi.data.attributes?.['local-id'] === 'string') {
+      this.localId = jsonapi.data.attributes?.['local-id'];
     }
   }
 
@@ -74,7 +69,7 @@ export class Card {
     if (this.localId) {
       copied.data.attributes['local-id'] = this.localId;
     }
-    copied.data.id =this.id;
+    copied.data.id = this.id;
     return new PristineDocument(copied);
   }
 
@@ -94,26 +89,25 @@ export class Card {
   // upstreamId is only unique *within* a realm.
   get upstreamId(): UpstreamIdentity | null {
     if (this.realm.href === this.originalRealm.href) {
-      if (typeof this.localId === "string") {
+      if (typeof this.localId === 'string') {
         return this.localId;
       } else {
         return null;
       }
     } else {
-      if (typeof this.localId === "string") {
+      if (typeof this.localId === 'string') {
         return { originalRealm: this.originalRealm, localId: this.localId };
       } else {
-        throw new CardstackError(
-          `A card originally from a different realm must already have a local-id`,
-          { status: 400 }
-        );
+        throw new CardstackError(`A card originally from a different realm must already have a local-id`, {
+          status: 400,
+        });
       }
     }
   }
 }
 
 function cardHasIds(card: Card): asserts card is CardWithId {
-  if (typeof card.localId !== "string") {
+  if (typeof card.localId !== 'string') {
     throw new CardstackError(`card missing required attribute "localId"`);
   }
 }
@@ -123,18 +117,16 @@ export class CardWithId extends Card {
   localId!: string;
 
   constructor(jsonapi: SingleResourceDoc) {
-    if (typeof jsonapi.data.attributes?.realm !== "string") {
-      throw new CardstackError(
-        `card missing required attribute "realm": ${JSON.stringify(jsonapi)}`
-      );
+    if (typeof jsonapi.data.attributes?.realm !== 'string') {
+      throw new CardstackError(`card missing required attribute "realm": ${JSON.stringify(jsonapi)}`);
     }
     let realm = new URL(jsonapi.data.attributes.realm);
     super(jsonapi, realm);
     cardHasIds(this);
   }
 
-  async loadFeature(featureName: "writer"): Promise<WriterFactory | null>;
-  async loadFeature(featureName: "buildValueExpression"): Promise<(expression: Expression) => Expression>;
+  async loadFeature(featureName: 'writer'): Promise<WriterFactory | null>;
+  async loadFeature(featureName: 'buildValueExpression'): Promise<(expression: Expression) => Expression>;
   async loadFeature(featureName: any): Promise<any> {
     switch (featureName) {
       case 'writer':

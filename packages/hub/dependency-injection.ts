@@ -4,9 +4,7 @@ export class Container {
 
   constructor(private registry: Registry) {}
 
-  async lookup<K extends keyof KnownServices>(
-    name: K
-  ): Promise<KnownServices[K]>;
+  async lookup<K extends keyof KnownServices>(name: K): Promise<KnownServices[K]>;
   async lookup(name: string): Promise<unknown>;
   async lookup(name: string): Promise<any> {
     let { promise, instance } = this._lookup(name);
@@ -76,7 +74,7 @@ export class Container {
           } catch (e) {
             // whoever originally called instantiate or lookup received a rejected promise and its their responsibility to handle it
           }
-          if (typeof instance?.teardown === "function") {
+          if (typeof instance?.teardown === 'function') {
             await instance.teardown();
           }
         })
@@ -115,11 +113,7 @@ class CacheEntry {
   private deferredPromise: Deferred<void> | undefined;
   private deferredInjections: Map<string, Deferred<void>> = new Map();
 
-  constructor(
-    private identityKey: CacheKey,
-    readonly instance: any,
-    private injections: PendingInjections
-  ) {}
+  constructor(private identityKey: CacheKey, readonly instance: any, private injections: PendingInjections) {}
 
   // resolves when this CacheEntry is fully ready to be used
   get promise(): Promise<void> {
@@ -132,12 +126,16 @@ class CacheEntry {
 
   private async prepareSubgraph(): Promise<void> {
     let subgraph = this.subgraph();
-    await Promise.all([...subgraph].map(entry => {
-      if (pendingReadyStack.includes(entry.identityKey)) {
-        throw new Error(`circular dependency injection: ${[...pendingReadyStack, this.identityKey, entry.identityKey].join(' -> ')}`);
-      }
-      return entry.partial;
-    }));
+    await Promise.all(
+      [...subgraph].map(entry => {
+        if (pendingReadyStack.includes(entry.identityKey)) {
+          throw new Error(
+            `circular dependency injection: ${[...pendingReadyStack, this.identityKey, entry.identityKey].join(' -> ')}`
+          );
+        }
+        return entry.partial;
+      })
+    );
     for (let entry of subgraph) {
       for (let [name, pending] of entry.injections) {
         entry.installInjection(name, pending);
@@ -150,10 +148,7 @@ class CacheEntry {
       return;
     }
     let { opts, cacheEntry } = pending;
-    if (
-      !this.instance[opts.as] ||
-      this.instance[opts.as].injectionNotReadyYet !== name
-    ) {
+    if (!this.instance[opts.as] || this.instance[opts.as].injectionNotReadyYet !== name) {
       throw new Error(
         `To assign 'inject("${name}")' to a property other than '${name}' you must pass the 'as' argument to inject().`
       );
@@ -212,7 +207,7 @@ class CacheEntry {
   private async runReady(): Promise<void> {
     pendingReadyStack.push(this.identityKey);
     try {
-      if (typeof this.instance.ready === "function") {
+      if (typeof this.instance.ready === 'function') {
         await this.instance.ready();
       }
     } finally {
@@ -310,20 +305,15 @@ type PendingInjections = Map<string, PendingInjection>;
     }
   }
 */
-export function inject<K extends keyof KnownServices>(
-  name: K,
-  opts?: InjectOptions
-): KnownServices[K];
+export function inject<K extends keyof KnownServices>(name: K, opts?: InjectOptions): KnownServices[K];
 export function inject(name: string, opts?: Partial<InjectOptions>): unknown {
   let pending = pendingInstantiationStack[0];
   if (!pending) {
-    throw new Error(
-      `Tried to directly instantiate an object with injections. Look it up in the container instead.`
-    );
+    throw new Error(`Tried to directly instantiate an object with injections. Look it up in the container instead.`);
   }
   let completeOpts = Object.assign(
     {
-      as: name
+      as: name,
     },
     opts
   );
@@ -334,21 +324,16 @@ export function inject(name: string, opts?: Partial<InjectOptions>): unknown {
 export function getOwner(obj: any): Container {
   let container = ownership.get(obj);
   if (!container) {
-    throw new Error(
-      `Tried to getOwner of an object that didn't come from the container`
-    );
+    throw new Error(`Tried to getOwner of an object that didn't come from the container`);
   }
   return container;
 }
 
-export async function injectionReady(
-  instance: any,
-  name: string
-): Promise<void> {
+export async function injectionReady(instance: any, name: string): Promise<void> {
   let container = getOwner(instance);
 
   // accessing a private member variable
-  let cache: Container["cache"] = (container as any).cache;
+  let cache: Container['cache'] = (container as any).cache;
 
   for (let entry of cache.values()) {
     if (entry.instance === instance) {

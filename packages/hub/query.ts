@@ -1,6 +1,6 @@
-import { CardId } from "./card";
-import * as JSON from "json-typescript";
-import { CARDSTACK_PUBLIC_REALM } from "./realm";
+import { CardId } from './card';
+import * as JSON from 'json-typescript';
+import { CARDSTACK_PUBLIC_REALM } from './realm';
 
 export interface Query {
   filter?: Filter;
@@ -9,12 +9,7 @@ export interface Query {
   queryString?: string;
 }
 
-export type Filter =
-  | AnyFilter
-  | EveryFilter
-  | NotFilter
-  | EqFilter
-  | RangeFilter;
+export type Filter = AnyFilter | EveryFilter | NotFilter | EqFilter | RangeFilter;
 
 export interface TypedFilter {
   type?: CardId;

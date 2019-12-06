@@ -1,31 +1,23 @@
-import { Session } from "./session";
-import { Card, CardWithId, CardId } from "./card";
-import { CARDSTACK_PUBLIC_REALM } from "./realm";
-import CardstackError from "./error";
-import { myOrigin } from "./origin";
-import {
-  search as scaffoldSearch,
-  get as scaffoldGet,
-  validate
-} from "./scaffolding";
-import { getOwner, inject } from "./dependency-injection";
-import { SingleResourceDoc } from "jsonapi-typescript";
-import { Query } from "./query";
+import { Session } from './session';
+import { Card, CardWithId, CardId } from './card';
+import { CARDSTACK_PUBLIC_REALM } from './realm';
+import CardstackError from './error';
+import { myOrigin } from './origin';
+import { search as scaffoldSearch, get as scaffoldGet, validate } from './scaffolding';
+import { getOwner, inject } from './dependency-injection';
+import { SingleResourceDoc } from 'jsonapi-typescript';
+import { Query } from './query';
 
 export default class CardsService {
-  pgclient = inject("pgclient");
+  pgclient = inject('pgclient');
 
-  async create(
-    session: Session,
-    realm: URL,
-    doc: SingleResourceDoc
-  ): Promise<CardWithId> {
+  async create(session: Session, realm: URL, doc: SingleResourceDoc): Promise<CardWithId> {
     let scopedCardService = this.getScopedCardService(session);
     let realmCard = await this.getRealm(realm);
-    let writerFactory = await realmCard.loadFeature("writer");
+    let writerFactory = await realmCard.loadFeature('writer');
     if (!writerFactory) {
       throw new CardstackError(`realm "${realm.href}" is not writable`, {
-        status: 403
+        status: 403,
       });
     }
     let writer = await getOwner(this).instantiate(writerFactory, realmCard);
@@ -43,10 +35,7 @@ export default class CardsService {
         `Writer plugin for realm ${realm.href} tried to change a localId it's not allowed to change`
       );
     }
-    card.localId =
-      typeof upstreamIdFromWriter === "object"
-        ? upstreamIdFromWriter.localId
-        : upstreamIdFromWriter;
+    card.localId = typeof upstreamIdFromWriter === 'object' ? upstreamIdFromWriter.localId : upstreamIdFromWriter;
     card.patch(saved.jsonapi);
     card.assertHasIds();
 
@@ -57,20 +46,14 @@ export default class CardsService {
     return card;
   }
 
-  async search(
-    _session: Session,
-    query: Query
-  ): Promise<{ cards: CardWithId[] }> {
+  async search(_session: Session, query: Query): Promise<{ cards: CardWithId[] }> {
     let cards = await scaffoldSearch(query);
     if (cards) {
       return { cards };
     }
 
     // TODO dont create a scoped card service here
-    let { cards: foundCards } = await this.pgclient.search(
-      this.getScopedCardService(_session),
-      query
-    );
+    let { cards: foundCards } = await this.pgclient.search(this.getScopedCardService(_session), query);
     return { cards: foundCards };
   }
 
@@ -100,7 +83,7 @@ export default class CardsService {
     // don't know whose meta realm this realm was originally created in.
     let { cards: realms } = await this.search(Session.INTERNAL_PRIVILEGED, {
       filter: {
-        type: { realm: CARDSTACK_PUBLIC_REALM, localId: "realm" },
+        type: { realm: CARDSTACK_PUBLIC_REALM, localId: 'realm' },
         eq: {
           // the special meta-realm on each origin has restrictive but not
           // entirely closed off permissions that let users create / update /
@@ -109,9 +92,9 @@ export default class CardsService {
           // about. Some of the realms in here can live on other origins, and
           // that's fine.
           realm: `${myOrigin}/api/realms/meta`,
-          "local-id": realm.href
-        }
-      }
+          'local-id': realm.href,
+        },
+      },
     });
 
     if (realms.length === 0) {
@@ -133,7 +116,7 @@ export class ScopedCardService {
   }
 }
 
-declare module "@cardstack/hub/dependency-injection" {
+declare module '@cardstack/hub/dependency-injection' {
   interface KnownServices {
     cards: CardsService;
   }
