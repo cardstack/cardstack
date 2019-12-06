@@ -1,8 +1,4 @@
-const {
-  Repository,
-  Cred,
-  Clone
-} = require('nodegit');
+const { Repository, Cred, Clone } = require('nodegit');
 
 const crypto = require('crypto');
 const Change = require('./change');
@@ -12,8 +8,8 @@ const Error = require('@cardstack/plugin-utils/error');
 const { promisify } = require('util');
 const temp = require('temp').track();
 const Githereum = require('githereum/githereum');
-const GithereumContract = require("githereum/build/contracts/Githereum.json");
-const TruffleContract = require("truffle-contract");
+const GithereumContract = require('githereum/build/contracts/Githereum.json');
+const TruffleContract = require('truffle-contract');
 const { merge, cloneDeep } = require('lodash');
 const { isInternalCard } = require('@cardstack/plugin-utils/card-utils');
 
@@ -43,7 +39,7 @@ module.exports = class Writer {
   constructor({ repo, idGenerator, basePath, branchPrefix, remote, githereum }) {
     this.repoPath = repo;
     this.basePath = basePath;
-    this.branchPrefix = branchPrefix || "";
+    this.branchPrefix = branchPrefix || '';
     this.repo = null;
     let hostname = os.hostname();
     this.myName = `PID${process.pid} on ${hostname}`;
@@ -65,13 +61,15 @@ module.exports = class Writer {
               return Cred.sshKeyMemoryNew(userName, remote.publicKey || '', remote.privateKey, remote.passphrase || '');
             }
             return Cred.sshKeyFromAgent(userName);
-          }
-        }
+          },
+        },
       };
     }
   }
 
-  get hasCardSupport() { return true; }
+  get hasCardSupport() {
+    return true;
+  }
 
   async prepareCreate(session, type, document, isSchema) {
     let id = getId(document);
@@ -94,9 +92,7 @@ module.exports = class Writer {
         file = await change.get(this._filenameFor(type, id, isSchema), { allowCreate: true });
       }
 
-      let gitDocument = document.data && isInternalCard(type, id) ?
-        { data: { id, type } } :
-        { id, type };
+      let gitDocument = document.data && isInternalCard(type, id) ? { data: { id, type } } : { id, type };
 
       if (document.data && isInternalCard(type, id)) {
         gitDocument = merge(gitDocument, cloneDeep(document));
@@ -117,7 +113,7 @@ module.exports = class Writer {
         id,
         signature,
         change,
-        file
+        file,
       };
     });
   }
@@ -127,7 +123,7 @@ module.exports = class Writer {
     if (!meta || !meta.version) {
       throw new Error('missing required field "meta.version"', {
         status: 400,
-        source: { pointer: '/data/meta/version' }
+        source: { pointer: '/data/meta/version' },
       });
     }
 
@@ -156,7 +152,7 @@ module.exports = class Writer {
         id,
         signature,
         change,
-        file
+        file,
       };
     });
   }
@@ -165,7 +161,7 @@ module.exports = class Writer {
     if (!version) {
       throw new Error('version is required', {
         status: 400,
-        source: { pointer: '/data/meta/version' }
+        source: { pointer: '/data/meta/version' },
       });
     }
     await this._ensureRepo();
@@ -184,13 +180,13 @@ module.exports = class Writer {
         type,
         id,
         signature,
-        change
+        change,
       };
     });
   }
 
   async _commitOptions(operation, type, id, session) {
-    let user = session && await session.loadUser();
+    let user = session && (await session.loadUser());
     let userAttributes = (user && user.data && user.data.attributes) || {};
 
     return {
@@ -198,7 +194,7 @@ module.exports = class Writer {
       authorEmail: userAttributes.email || 'anon@example.com',
       committerName: this.myName,
       committerEmail: this.myEmail,
-      message: `${operation} ${type} ${String(id).slice(12)}`
+      message: `${operation} ${type} ${String(id).slice(12)}`,
     };
   }
 
@@ -236,13 +232,13 @@ module.exports = class Writer {
         this.githereumConfig.repoName,
         contract,
         this.githereumConfig.from,
-        {log: log.info.bind(log)}
+        { log: log.info.bind(log) }
       );
     }
   }
 
   async _getGithereumContract() {
-    let providerUrl = this.githereumConfig.providerUrl || "http://localhost:9545";
+    let providerUrl = this.githereumConfig.providerUrl || 'http://localhost:9545';
 
     let GithereumTruffleContract = TruffleContract(GithereumContract);
     GithereumTruffleContract.setProvider(providerUrl);
@@ -265,24 +261,24 @@ module.exports = class Writer {
   async _pushToGithereum() {
     await this._ensureGithereum();
 
-    if(this.githereum) {
-      log.info("Githereum is enabled, triggering push");
+    if (this.githereum) {
+      log.info('Githereum is enabled, triggering push');
       // make sure only one push is ongoing at a time, by creating a chain of
       // promises here
       this._githereumPromise = Promise.resolve(this._githereumPromise).then(() => {
-        log.info("Starting githereum push");
-        return this.githereum.push(this.githereumConfig.tag).then(() =>
-          log.info("Githereum push complete")
-        ).catch(e => {
-          log.error("Error pushing to githereum:", e, e.stack);
-        });
+        log.info('Starting githereum push');
+        return this.githereum
+          .push(this.githereumConfig.tag)
+          .then(() => log.info('Githereum push complete'))
+          .catch(e => {
+            log.error('Error pushing to githereum:', e, e.stack);
+          });
       });
     } else {
-      log.info("Githereum is disabled");
+      log.info('Githereum is disabled');
     }
   }
 };
-
 
 // TODO: we only need to do this here because the Hub has no generic
 // "read" hook to call on writers. We should use that instead and move
@@ -293,8 +289,7 @@ function patch(before, diffDocument) {
   let beforeResource;
   let diffDocumentResource;
 
-  if (diffDocument.data &&
-    isInternalCard(diffDocument.data.type, diffDocument.data.id)) {
+  if (diffDocument.data && isInternalCard(diffDocument.data.type, diffDocument.data.id)) {
     after = { data: Object.assign({}, before.data) };
     if (Array.isArray(diffDocument.included)) {
       after.included = [].concat(diffDocument.included);
@@ -311,11 +306,7 @@ function patch(before, diffDocument) {
 
   for (let section of ['attributes', 'relationships']) {
     if (diffDocumentResource[section]) {
-      afterResource[section] = Object.assign(
-        {},
-        beforeResource[section],
-        diffDocumentResource[section]
-      );
+      afterResource[section] = Object.assign({}, beforeResource[section], diffDocumentResource[section]);
     }
   }
   return after;
@@ -326,24 +317,23 @@ async function withErrorHandling(id, type, fn) {
     return await fn();
   } catch (err) {
     if (/Unable to parse OID/i.test(err.message) || /Object not found/i.test(err.message)) {
-      throw new Error(err.message, { status: 400, source: { pointer: '/data/meta/version' }});
+      throw new Error(err.message, { status: 400, source: { pointer: '/data/meta/version' } });
     }
     if (err instanceof Change.GitConflict) {
-      throw new Error("Merge conflict", { status: 409 });
+      throw new Error('Merge conflict', { status: 409 });
     }
     if (err instanceof Change.OverwriteRejected) {
-      throw new Error(`id ${id} is already in use for type ${type}`, { status: 409, source: { pointer: '/data/id'}});
+      throw new Error(`id ${id} is already in use for type ${type}`, { status: 409, source: { pointer: '/data/id' } });
     }
     if (err instanceof Change.NotFound) {
       throw new Error(`${type} with id ${id} does not exist`, {
         status: 404,
-        source: { pointer: '/data/id' }
+        source: { pointer: '/data/id' },
       });
     }
     throw err;
   }
 }
-
 
 async function finalizer(pendingChange) {
   let { id, type, change, file, signature } = pendingChange;
@@ -355,10 +345,16 @@ async function finalizer(pendingChange) {
         if (pendingChange.finalDocument.data && isInternalCard(type, id)) {
           file.setContent(stringify(pendingChange.finalDocument, null, 2));
         } else {
-          file.setContent(stringify({
-            attributes: pendingChange.finalDocument.attributes,
-            relationships: pendingChange.finalDocument.relationships
-          }, null, 2));
+          file.setContent(
+            stringify(
+              {
+                attributes: pendingChange.finalDocument.attributes,
+                relationships: pendingChange.finalDocument.relationships,
+              },
+              null,
+              2
+            )
+          );
         }
       } else {
         file.delete();
@@ -366,6 +362,6 @@ async function finalizer(pendingChange) {
     }
     let version = await change.finalize(signature, this.remote, this.fetchOpts);
     await this._pushToGithereum();
-    return { version, hash: (file ? file.savedId() : null) };
+    return { version, hash: file ? file.savedId() : null };
   });
 }

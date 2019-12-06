@@ -21,7 +21,12 @@ class RepoExplorer {
   }
   async getCommit(which) {
     let props = Object.keys(formats);
-    let result = await this.runGit('show', which, '-s', `--format=format:${props.map(p => '%' + formats[p]).join('|')}`);
+    let result = await this.runGit(
+      'show',
+      which,
+      '-s',
+      `--format=format:${props.map(p => '%' + formats[p]).join('|')}`
+    );
     let values = result.stdout.split('|');
     let output = {};
     for (let i = 0; i < props.length; i++) {
@@ -37,10 +42,13 @@ class RepoExplorer {
   }
   async listTree(refSpec, path) {
     let contents = (await this.runGit('ls-tree', `${refSpec}:${path}`)).stdout;
-    return contents.split("\n").filter(line => line.length > 0).map(line => {
-      let [filemode, type, oid, name] = line.split(/\s+/);
-      return { filemode, type, oid, name };
-    });
+    return contents
+      .split('\n')
+      .filter(line => line.length > 0)
+      .map(line => {
+        let [filemode, type, oid, name] = line.split(/\s+/);
+        return { filemode, type, oid, name };
+      });
   }
 }
 
@@ -51,7 +59,7 @@ const formats = {
   authorDate: 'ai',
   committerName: 'cn',
   committerEmail: 'ce',
-  message: 'B'
+  message: 'B',
 };
 
 function run(command, args, opts) {
@@ -65,9 +73,9 @@ function run(command, args, opts) {
     p.stderr.on('data', function(output) {
       stderr += output;
     });
-    p.on('close', function(code){
+    p.on('close', function(code) {
       if (code !== 0) {
-        let err = new Error(command + " " + args.join(" ") + " exited with nonzero status");
+        let err = new Error(command + ' ' + args.join(' ') + ' exited with nonzero status');
         err.stderr = stderr;
         err.stdout = stdout;
         reject(err);
@@ -79,11 +87,15 @@ function run(command, args, opts) {
 }
 
 function commitOpts(opts) {
-  return Object.assign({}, {
-    authorName: 'John Milton',
-    authorEmail: 'john@paradiselost.com',
-    message: 'Default test message'
-  }, opts);
+  return Object.assign(
+    {},
+    {
+      authorName: 'John Milton',
+      authorEmail: 'john@paradiselost.com',
+      message: 'Default test message',
+    },
+    opts
+  );
 }
 
 exports.commitOpts = commitOpts;
@@ -99,9 +111,11 @@ exports.makeRepo = async function makeRepo(path, files) {
     }
   }
 
-  let head = await change.finalize(commitOpts({
-    message: 'First commit'
-  }));
+  let head = await change.finalize(
+    commitOpts({
+      message: 'First commit',
+    })
+  );
 
   return { head, repo };
 };

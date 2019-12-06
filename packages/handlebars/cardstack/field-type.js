@@ -4,7 +4,7 @@ module.exports = {
     try {
       Handlebars.precompile(value);
       return true;
-    } catch(err) {
+    } catch (err) {
       return false;
     }
   },

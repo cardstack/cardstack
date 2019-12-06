@@ -1,4 +1,4 @@
-module.exports = function format(v){
+module.exports = function format(v) {
   if (!v) {
     return 'none';
   }
@@ -21,7 +21,7 @@ module.exports = function format(v){
       }
       output += ' ';
     }
-    output += "\n";
+    output += '\n';
   }
   return output;
 };

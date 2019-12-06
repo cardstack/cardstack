@@ -7,54 +7,75 @@ const DataSource = require('./schema/data-source');
 const Grant = require('./schema/grant');
 const Group = require('./schema/group');
 const log = require('@cardstack/logger')('cardstack/schema');
-const {
-  declareInjections,
-  getOwner
-} = require('@cardstack/di');
+const { declareInjections, getOwner } = require('@cardstack/di');
 
-const ownTypes = Object.freeze(['content-types', 'fields', 'computed-fields', 'constraints', 'input-assignments', 'data-sources', 'grants', 'groups', 'plugin-configs', 'default-values']);
+const ownTypes = Object.freeze([
+  'content-types',
+  'fields',
+  'computed-fields',
+  'constraints',
+  'input-assignments',
+  'data-sources',
+  'grants',
+  'groups',
+  'plugin-configs',
+  'default-values',
+]);
 
-module.exports = declareInjections({
-  pluginLoader: 'hub:plugin-loader',
-  project: 'config:project'
-},
+module.exports = declareInjections(
+  {
+    pluginLoader: 'hub:plugin-loader',
+    project: 'config:project',
+  },
 
-class SchemaLoader {
-  static create(opts) {
-    return new this(opts);
+  class SchemaLoader {
+    static create(opts) {
+      return new this(opts);
+    }
+
+    constructor({ pluginLoader, project }) {
+      this.pluginLoader = pluginLoader;
+      this.projectPath = project.path;
+    }
+
+    ownTypes() {
+      return ownTypes;
+    }
+
+    async loadFrom(inputModels) {
+      log.debug(`SchemaLoader.loadFrom inputModules=${JSON.stringify(inputModels)}`);
+      let models = inputModels;
+      let plugins = await this.pluginLoader.configuredPlugins(models.filter(model => model.type === 'plugin-configs'));
+      log.debug(`SchemaLoader.loadFrom() discovered ${plugins.length} plugins`);
+      let defaultValues = findDefaultValues(models);
+      let grants = findGrants(models);
+      let fields = findFields(models, plugins, grants, defaultValues);
+      let computedFields = findComputedFields(models, plugins, grants, fields);
+      discoverComputedFieldTypes(fields, computedFields);
+      let constraints = await findConstraints(models, plugins, fields);
+      let dataSources = findDataSources(models, plugins, this.projectPath);
+      let defaultDataSource = findDefaultDataSource(plugins);
+      log.trace('default data source %j', defaultDataSource);
+      let groups = findGroups(models, fields, computedFields);
+      let types = findTypes(
+        models,
+        fields,
+        computedFields,
+        constraints,
+        dataSources,
+        defaultDataSource,
+        grants,
+        groups
+      );
+      validateRelatedTypes(types, fields);
+      log.debug(`SchemaLoader.loadFrom completed loading schema`);
+
+      return getOwner(this)
+        .factoryFor('hub:schema')
+        .create({ types, fields, computedFields, dataSources, inputModels, plugins, grants });
+    }
   }
-
-  constructor({ pluginLoader, project }) {
-    this.pluginLoader = pluginLoader;
-    this.projectPath = project.path;
-  }
-
-  ownTypes() {
-    return ownTypes;
-  }
-
-  async loadFrom(inputModels) {
-    log.debug(`SchemaLoader.loadFrom inputModules=${JSON.stringify(inputModels)}`);
-    let models = inputModels;
-    let plugins = await this.pluginLoader.configuredPlugins(models.filter(model => model.type === 'plugin-configs'));
-    log.debug(`SchemaLoader.loadFrom() discovered ${plugins.length} plugins`);
-    let defaultValues = findDefaultValues(models);
-    let grants = findGrants(models);
-    let fields = findFields(models, plugins, grants, defaultValues);
-    let computedFields = findComputedFields(models, plugins, grants, fields);
-    discoverComputedFieldTypes(fields, computedFields);
-    let constraints = await findConstraints(models, plugins, fields);
-    let dataSources = findDataSources(models, plugins, this.projectPath);
-    let defaultDataSource = findDefaultDataSource(plugins);
-    log.trace('default data source %j', defaultDataSource);
-    let groups = findGroups(models, fields, computedFields);
-    let types = findTypes(models, fields, computedFields, constraints, dataSources, defaultDataSource, grants, groups);
-    validateRelatedTypes(types, fields);
-    log.debug(`SchemaLoader.loadFrom completed loading schema`);
-
-    return getOwner(this).factoryFor('hub:schema').create({ types, fields, computedFields, dataSources, inputModels, plugins, grants });
-  }
-});
+);
 
 function findInputAssignments(models) {
   let inputAssignments = new Map();
@@ -91,9 +112,7 @@ function findDefaultValues(models) {
 }
 
 function findGrants(models) {
-  return models
-    .filter(model => model.type === 'grants')
-    .map(model => new Grant(model));
+  return models.filter(model => model.type === 'grants').map(model => new Grant(model));
 }
 
 function findFields(models, plugins, grants, defaultValues) {
@@ -146,7 +165,10 @@ function findTypes(models, fields, computedFields, constraints, dataSources, def
   let types = new Map();
   for (let model of models) {
     if (model.type === 'content-types') {
-      types.set(model.id, new ContentType(model, fields, computedFields, constraints, dataSources, defaultDataSource, grants, groups));
+      types.set(
+        model.id,
+        new ContentType(model, fields, computedFields, constraints, dataSources, defaultDataSource, grants, groups)
+      );
     }
   }
   return types;

@@ -9,7 +9,7 @@ module.exports = class WrapMiddleware {
     return async function(ctxt, next) {
       ctxt.state.thirdRan = true;
       await next();
-      ctxt.state.thirdRan= false;
+      ctxt.state.thirdRan = false;
     };
   }
 };

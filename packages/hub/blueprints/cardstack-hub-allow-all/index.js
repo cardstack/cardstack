@@ -6,5 +6,5 @@ module.exports = {
     // to us
   },
 
-  description: 'Grant full admin powers by default in development.'
+  description: 'Grant full admin powers by default in development.',
 };

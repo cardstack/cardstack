@@ -6,13 +6,9 @@ const {
   Signature,
   Tree,
   setThreadSafetyStatus,
-  TreeEntry: { FILEMODE }
+  TreeEntry: { FILEMODE },
 } = require('nodegit');
-const {
-  MutableTree,
-  NotFound,
-  OverwriteRejected
-} = require('./mutable-tree');
+const { MutableTree, NotFound, OverwriteRejected } = require('./mutable-tree');
 const moment = require('moment-timezone');
 const crypto = require('crypto');
 const delay = require('delay');
@@ -21,7 +17,6 @@ const log = require('@cardstack/logger')('cardstack/git');
 // This is supposed to enable thread-safe locking around all async
 // operations.
 setThreadSafetyStatus(1);
-
 
 class Change {
   static async createInitial(repoPath, targetBranch) {
@@ -93,7 +88,7 @@ class Change {
       try {
         if (this.fetchOpts) {
           // needsFetchAll only gets set to true if the retry block has failed once
-          if(needsFetchAll) {
+          if (needsFetchAll) {
             // pull remote before allowing process to continue, allowing us to
             // (hopefully) recover from upstream getting out of sync
             await this.repo.fetchAll(this.fetchOpts);
@@ -114,7 +109,12 @@ class Change {
 
       if (this.fetchOpts && !this.repo.isBare()) {
         await this.repo.fetchAll(this.fetchOpts);
-        await this.repo.mergeBranches(this.targetBranch, `origin/${this.targetBranch}`, null, Merge.PREFERENCE.FASTFORWARD_ONLY);
+        await this.repo.mergeBranches(
+          this.targetBranch,
+          `origin/${this.targetBranch}`,
+          null,
+          Merge.PREFERENCE.FASTFORWARD_ONLY
+        );
       }
 
       return mergeCommit.id().tostrS();
@@ -132,7 +132,17 @@ class Change {
 
     let tree = await Tree.lookup(this.repo, treeOid, null);
     let { author, committer } = signature(commitOpts);
-    let commitOid = await Commit.create(this.repo, null, author, committer, 'UTF-8', commitOpts.message, tree, this.parents.length, this.parents);
+    let commitOid = await Commit.create(
+      this.repo,
+      null,
+      author,
+      committer,
+      'UTF-8',
+      commitOpts.message,
+      tree,
+      this.parents.length,
+      this.parents
+    );
     return Commit.lookup(this.repo, commitOid);
   }
 
@@ -170,7 +180,17 @@ class Change {
     let treeOid = await index.writeTreeTo(this.repo);
     let tree = await Tree.lookup(this.repo, treeOid, null);
     let { author, committer } = signature(commitOpts);
-    let mergeCommitOid = await Commit.create(this.repo, null, author, committer, 'UTF-8', `Clean merge into ${this.targetBranch}`, tree, 2, [newCommit, headCommit]);
+    let mergeCommitOid = await Commit.create(
+      this.repo,
+      null,
+      author,
+      committer,
+      'UTF-8',
+      `Clean merge into ${this.targetBranch}`,
+      tree,
+      2,
+      [newCommit, headCommit]
+    );
     return await Commit.lookup(this.repo, mergeCommitOid);
   }
 
@@ -193,10 +213,12 @@ class Change {
 function signature(commitOpts) {
   let date = commitOpts.authorDate || moment();
   let author = Signature.create(commitOpts.authorName, commitOpts.authorEmail, date.unix(), date.utcOffset());
-  let committer = commitOpts.committerName ? Signature.create(commitOpts.committerName, commitOpts.committerEmail, date.unix(), date.utcOffset()) : author;
+  let committer = commitOpts.committerName
+    ? Signature.create(commitOpts.committerName, commitOpts.committerEmail, date.unix(), date.utcOffset())
+    : author;
   return {
     author,
-    committer
+    committer,
   };
 }
 
@@ -233,7 +255,7 @@ class FileHandle {
       buffer = Buffer.from(buffer, 'utf8');
     }
     if (!(buffer instanceof Buffer)) {
-      throw new Error("setContent got something that was not a Buffer or String");
+      throw new Error('setContent got something that was not a Buffer or String');
     }
     if (!this.allowUpdate && this.leaf) {
       throw new OverwriteRejected(`Refusing to overwrite ${this.path}`);
@@ -269,7 +291,7 @@ async function headCommit(repo, targetBranch, fetchOpts) {
     } else {
       headRef = await Branch.lookup(repo, targetBranch, Branch.BRANCH.LOCAL);
     }
-  } catch(err) {
+  } catch (err) {
     if (err.errorFunction !== 'Branch.lookup') {
       throw err;
     }

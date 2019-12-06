@@ -17,30 +17,31 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
 
     factory.addResource('content-types', 'test-users').withRelated('fields', [
       factory.addResource('fields', 'full-name').withAttributes({
-        fieldType: '@cardstack/core-types::string'
+        fieldType: '@cardstack/core-types::string',
       }),
       factory.addResource('fields', 'email').withAttributes({
-        fieldType: '@cardstack/core-types::string'
-      })
-
+        fieldType: '@cardstack/core-types::string',
+      }),
     ]);
 
-    let user = factory.addResource('test-users', 'the-default-test-user').withAttributes({
-      fullName: 'Default Test Environment',
-      email: 'test@example.com'
-    }).asDocument();
+    let user = factory
+      .addResource('test-users', 'the-default-test-user')
+      .withAttributes({
+        fullName: 'Default Test Environment',
+        email: 'test@example.com',
+      })
+      .asDocument();
 
     let defaultDataSource = new JSONAPIFactory();
-    defaultDataSource.addResource('plugin-configs', '@cardstack/hub')
-      .withRelated(
-        'default-data-source',
-        defaultDataSource.addResource('data-sources', defaultDataSourceId)
-          .withAttributes({
-            'source-type': '@cardstack/ephemeral'
-          })
-      );
+    defaultDataSource.addResource('plugin-configs', '@cardstack/hub').withRelated(
+      'default-data-source',
+      defaultDataSource.addResource('data-sources', defaultDataSourceId).withAttributes({
+        'source-type': '@cardstack/ephemeral',
+      })
+    );
 
-    factory.addResource('grants')
+    factory
+      .addResource('grants')
       .withAttributes({
         mayReadResource: true,
         mayCreateResource: true,
@@ -48,23 +49,20 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
         mayDeleteResource: true,
         mayReadFields: true,
         mayWriteFields: true,
-        mayLogin: true
-      }).withRelated('who', [{ type: user.data.type, id: user.data.id }]);
+        mayLogin: true,
+      })
+      .withRelated('who', [{ type: user.data.type, id: user.data.id }]);
 
     let models = factory.getModels();
-    let [
-      foreignInitialModels,
-      ephemeralInitialModels
-    ] = partitionInitialModels(models);
+    let [foreignInitialModels, ephemeralInitialModels] = partitionInitialModels(models);
 
     opts.disableAutomaticIndexing = true;
     opts.environment = 'test';
     opts.seeds = () => ephemeralInitialModels;
 
     opts.pgBossConfig = opts.pgBossConfig || {
-      newJobCheckInterval:  100 // set to minimum to speed up tests
+      newJobCheckInterval: 100, // set to minimum to speed up tests
     };
-
 
     container = await wireItUp(projectDir, crypto.randomBytes(32), defaultDataSource.getModels(), opts);
     if (foreignInitialModels.length) {
@@ -75,12 +73,14 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
 
     let ephemeralStorage = await container.lookup(`plugin-services:${require.resolve('@cardstack/ephemeral/service')}`);
     let searchers = await container.lookup(`hub:searchers`);
-    await ephemeralStorage.validateModels(models, async(type, id) => {
+    await ephemeralStorage.validateModels(models, async (type, id) => {
       let result;
       try {
         result = await searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', type, id);
       } catch (err) {
-        if (err.status !== 404) { throw err; }
+        if (err.status !== 404) {
+          throw err;
+        }
       }
 
       if (result && result.data) {
@@ -104,7 +104,7 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
         let m = plugins.lookupFeatureAndAssert('middleware', '@cardstack/test-support-authenticator');
         m.userId = id;
         m.type = type;
-      }
+      },
     });
     return container;
   } catch (err) {
@@ -132,17 +132,17 @@ async function destroySearchIndex() {
   await PgClient.deleteSearchIndexIHopeYouKnowWhatYouAreDoing();
 }
 
-
 function partitionInitialModels(initialModels) {
   let hasNonDefaultSource = Object.create(null);
   for (let model of initialModels) {
     if (model.type === 'content-types') {
       let sourceId;
-      if (model.relationships &&
-          model.relationships['data-source'] &&
-          (sourceId = model.relationships['data-source'].data) &&
-          sourceId !== defaultDataSourceId
-         ) {
+      if (
+        model.relationships &&
+        model.relationships['data-source'] &&
+        (sourceId = model.relationships['data-source'].data) &&
+        sourceId !== defaultDataSourceId
+      ) {
         hasNonDefaultSource[model.id] = true;
       }
     }

@@ -8,5 +8,5 @@ module.exports = {
     if (input === 'now') {
       return moment().toISOString();
     }
-  }
+  },
 };

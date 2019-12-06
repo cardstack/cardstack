@@ -3,11 +3,7 @@
 const priv = new WeakMap();
 const qs = require('qs');
 const { difference, unset, get } = require('lodash');
-const {
-  isInternalCard,
-  loadCard,
-  cardContextFromId
-} = require('@cardstack/plugin-utils/card-utils');
+const { isInternalCard, loadCard, cardContextFromId } = require('@cardstack/plugin-utils/card-utils');
 
 exports.privateModels = priv;
 
@@ -15,10 +11,7 @@ function isRelationshipObject(obj) {
   // json:api spec says you're also a valid relationship object if you have
   // only a "meta" property, but we don't really use that case, so we're not
   // including it here.
-  return obj && (
-    obj.hasOwnProperty('links') ||
-    obj.hasOwnProperty('data')
-  );
+  return obj && (obj.hasOwnProperty('links') || obj.hasOwnProperty('data'));
 }
 
 exports.Model = class Model {
@@ -106,7 +99,6 @@ exports.Model = class Model {
     } else {
       return null;
     }
-
   }
 
   async getModel(type, id) {
@@ -115,10 +107,14 @@ exports.Model = class Model {
     let { schema, read, search, jsonapiDoc, getCard, cardIdContext } = priv.get(this);
     if (isInternalCard(type, id)) {
       let card = await getCard(id);
-      if (!card) { return; }
+      if (!card) {
+        return;
+      }
 
       let cardSchema = await loadCard(schema, card, getCard);
-      schema = await schema.applyChanges(cardSchema.map(document => ({ id: document.id, type: document.type, document })));
+      schema = await schema.applyChanges(
+        cardSchema.map(document => ({ id: document.id, type: document.type, document }))
+      );
       priv.get(this).schema = schema;
 
       contentType = schema.getType(type);
@@ -139,7 +135,9 @@ exports.Model = class Model {
           if (!fieldToDelete) {
             fieldToDelete = Object.keys(model.relationships || {}).find(i => cardContextFromId(i).modelId === field);
           }
-          if (!fieldToDelete) { continue; }
+          if (!fieldToDelete) {
+            continue;
+          }
           unset(model, `attributes.${fieldToDelete}`);
           unset(model, `relationships.${fieldToDelete}`);
         }
@@ -151,7 +149,9 @@ exports.Model = class Model {
       }
       model = await read(type, id);
     }
-    if (!model) { return; }
+    if (!model) {
+      return;
+    }
 
     return new Model(contentType, model, schema, read, getCard, search);
   }
@@ -160,7 +160,9 @@ exports.Model = class Model {
     let { schema, search, read, getCard } = priv.get(this);
 
     let models = await search(query);
-    if (!models) { return; }
+    if (!models) {
+      return;
+    }
 
     return models.data.map(model => new Model(schema.getType(model.type), model, schema, read, getCard, search));
   }

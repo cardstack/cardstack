@@ -5,7 +5,7 @@ const fixturify = require('fixturify');
 const { Builder } = require('broccoli-builder');
 const walkSync = require('walk-sync');
 
-describe("broccoli conditional include", function() {
+describe('broccoli conditional include', function() {
   let builder;
   let input = path.resolve(__dirname, '../tmp/INPUT');
 
@@ -15,8 +15,8 @@ describe("broccoli conditional include", function() {
       dir1: {
         'foo.txt': 'hello world',
         'bar.txt': 'goodbye',
-        'baz.txt': 'stable'
-      }
+        'baz.txt': 'stable',
+      },
     });
   });
 
@@ -28,21 +28,36 @@ describe("broccoli conditional include", function() {
   });
 
   it('builds when enabled', async function() {
-    let node = new ConditionalInclude(input, { name: 'test', predicate: function(){ return true; }});
+    let node = new ConditionalInclude(input, {
+      name: 'test',
+      predicate: function() {
+        return true;
+      },
+    });
     builder = new Builder(node);
     let { directory: output } = await builder.build();
     expect(walkSync(output, ['**/*'])).to.eql(walkSync(input, ['**/*']));
   });
 
   it('builds when disabled', async function() {
-    let node = new ConditionalInclude(input, { name: 'test', predicate: function(){ return false; }});
+    let node = new ConditionalInclude(input, {
+      name: 'test',
+      predicate: function() {
+        return false;
+      },
+    });
     builder = new Builder(node);
     let { directory: output } = await builder.build();
     expect(walkSync(output, ['**/*'])).to.eql([]);
   });
 
   it('rebuilds when still enabled', async function() {
-    let node = new ConditionalInclude(input, { name: 'test', predicate: function(){ return true; }});
+    let node = new ConditionalInclude(input, {
+      name: 'test',
+      predicate: function() {
+        return true;
+      },
+    });
     builder = new Builder(node);
     await builder.build();
     fs.writeFileSync(`${input}/created-top-level.txt`, 'created', 'utf8');
@@ -58,7 +73,12 @@ describe("broccoli conditional include", function() {
   });
 
   it('rebuilds when still disabled', async function() {
-    let node = new ConditionalInclude(input, { name: 'test', predicate: function(){ return false; }});
+    let node = new ConditionalInclude(input, {
+      name: 'test',
+      predicate: function() {
+        return false;
+      },
+    });
     builder = new Builder(node);
     await builder.build();
     fs.writeFileSync(`${input}/created-top-level.txt`, 'created', 'utf8');
@@ -68,7 +88,12 @@ describe("broccoli conditional include", function() {
 
   it('rebuilds when going from enabled to disabled', async function() {
     let enabled = true;
-    let node = new ConditionalInclude(input, { name: 'test', predicate: function(){ return enabled; }});
+    let node = new ConditionalInclude(input, {
+      name: 'test',
+      predicate: function() {
+        return enabled;
+      },
+    });
     builder = new Builder(node);
     await builder.build();
     fs.writeFileSync(`${input}/created-top-level.txt`, 'created', 'utf8');
@@ -79,7 +104,12 @@ describe("broccoli conditional include", function() {
 
   it('rebuilds when going from disabled to enabled', async function() {
     let enabled = false;
-    let node = new ConditionalInclude(input, { name: 'test', predicate: function(){ return enabled; }});
+    let node = new ConditionalInclude(input, {
+      name: 'test',
+      predicate: function() {
+        return enabled;
+      },
+    });
     builder = new Builder(node);
     await builder.build();
     fs.writeFileSync(`${input}/created-top-level.txt`, 'created', 'utf8');
@@ -95,6 +125,4 @@ describe("broccoli conditional include", function() {
     expect(have).not.contains('dir1/bar.txt');
     expect(fs.readFileSync(`${input}/dir1/foo.txt`, 'utf8')).to.eql('edited');
   });
-
-
 });

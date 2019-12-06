@@ -1,10 +1,10 @@
 const isEmpty = require('lodash.isempty');
 
-const isNil = (obj) => {
+const isNil = obj => {
   return obj === null || obj === undefined;
 };
 
-const isBlank = (obj) => {
+const isBlank = obj => {
   let none = isNil(obj);
   if (none) {
     return none;
@@ -34,10 +34,10 @@ const isBlank = (obj) => {
 module.exports = {
   inputs: {
     target: ['@cardstack/core-types::string'],
-    alternative: ['@cardstack/core-types::integer']
+    alternative: ['@cardstack/core-types::integer'],
   },
   description: `Only either {{target.name}} or {{alternative.name}} can have a value, not both.`,
   valid({ target, alternative }) {
     return isBlank(target.value) || isBlank(alternative.value);
-  }
+  },
 };

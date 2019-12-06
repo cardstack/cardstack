@@ -22,7 +22,7 @@ module.exports = {
       // needed to make embroider happy (since things pull on this module
       // from embroider's perspective regardless of the env).
       let filter = new Funnel(tree, {
-        exclude: [' @cardstack/test-support/environment.js']
+        exclude: [' @cardstack/test-support/environment.js'],
       });
       return filter;
     }
@@ -39,5 +39,5 @@ module.exports = {
     return this.preprocessJs(namespacedTree, '/', this.name, {
       registry: this.registry,
     });
-  }
+  },
 };

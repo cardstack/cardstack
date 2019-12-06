@@ -32,10 +32,10 @@ module.exports = class StubSearcher {
   async search(session, query, next) {
     if (this.params.injectFirst) {
       return {
-        data: [ this.makeModel('examples', '2', this.params.injectFirst) ],
+        data: [this.makeModel('examples', '2', this.params.injectFirst)],
         meta: {
-          page: {}
-        }
+          page: {},
+        },
       };
     }
     return next();
@@ -47,8 +47,8 @@ module.exports = class StubSearcher {
       id,
       attributes: {
         'example-flavor': flavor,
-        'example-counter': this.counter++
-      }
+        'example-counter': this.counter++,
+      },
     };
   }
 
@@ -58,7 +58,4 @@ module.exports = class StubSearcher {
     }
     return {};
   }
-
 };
-
-

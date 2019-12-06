@@ -197,7 +197,7 @@ const actions = [
   'may-delete-resource',
   'may-read-fields',
   'may-write-fields',
-  'may-login'
+  'may-login',
 ];
 const log = require('@cardstack/logger')('cardstack/auth');
 const Session = require('@cardstack/plugin-utils/session');
@@ -230,22 +230,30 @@ module.exports = class Grant {
 
     if (rels.who && rels.who.data) {
       if (!Array.isArray(rels.who.data)) {
-        log.warn(`The "who" fields on content-types "grants" has switched from belongsTo to hasMany, so you must provide an array`);
+        log.warn(
+          `The "who" fields on content-types "grants" has switched from belongsTo to hasMany, so you must provide an array`
+        );
         rels.who.data = [rels.who.data];
       }
       this.who = rels.who.data.map(({ type, id }) => {
         if (type === 'fields') {
           if (this['may-login']) {
-            throw new Error(`may-login grants may not be field-dependent (because they don't apply to a resource that would have fields to compare with): ${JSON.stringify(document, null, 2)}`);
+            throw new Error(
+              `may-login grants may not be field-dependent (because they don't apply to a resource that would have fields to compare with): ${JSON.stringify(
+                document,
+                null,
+                2
+              )}`
+            );
           }
           return {
             realmField: id,
-            staticRealm: null
+            staticRealm: null,
           };
         } else {
           return {
             realmField: null,
-            staticRealm: Session.encodeBaseRealm(type, id)
+            staticRealm: Session.encodeBaseRealm(type, id),
           };
         }
       });
@@ -257,16 +265,29 @@ module.exports = class Grant {
   async matches(documentContext, context) {
     let userRealms = await (context.session || Session.EVERYONE).realms();
 
-    let approvedRealm = uniq(await Promise.all(this.who.map(async ({ staticRealm, realmField }) => {
-      if (documentContext && realmField) {
-        return await Grant.readRealmsFromField(documentContext, realmField);
-      } else {
-        return [staticRealm];
-      }
-    }))).sort().join('/');
+    let approvedRealm = uniq(
+      await Promise.all(
+        this.who.map(async ({ staticRealm, realmField }) => {
+          if (documentContext && realmField) {
+            return await Grant.readRealmsFromField(documentContext, realmField);
+          } else {
+            return [staticRealm];
+          }
+        })
+      )
+    )
+      .sort()
+      .join('/');
 
     let matches = userRealms.includes(approvedRealm);
-    log.trace('testing grant id=%s approvedRealm=%s resource=%j userRealms=%j matches=%s', this.id, approvedRealm, documentContext ? get(documentContext, 'upstreamDoc.data') : '[no resource]', userRealms, !!matches);
+    log.trace(
+      'testing grant id=%s approvedRealm=%s resource=%j userRealms=%j matches=%s',
+      this.id,
+      approvedRealm,
+      documentContext ? get(documentContext, 'upstreamDoc.data') : '[no resource]',
+      userRealms,
+      !!matches
+    );
     return matches;
   }
 
@@ -276,10 +297,14 @@ module.exports = class Grant {
     }
 
     let model = documentContext.model;
-    if (!model || Array.isArray(model)) { return []; } // currently only handles single resource documents
+    if (!model || Array.isArray(model)) {
+      return [];
+    } // currently only handles single resource documents
 
     let contentType = model.getContentType();
-    if (!contentType.realAndComputedFields.get(fieldName)) { return []; }
+    if (!contentType.realAndComputedFields.get(fieldName)) {
+      return [];
+    }
 
     let related = await documentContext.model.getRelated(fieldName);
     if (related) {

@@ -4,13 +4,17 @@ const commander = require('commander');
 const path = require('path');
 const fs = require('fs');
 
-const testingToken = require('crypto').randomBytes(32).toString('base64').replace(/\W+/g, '');
+const testingToken = require('crypto')
+  .randomBytes(32)
+  .toString('base64')
+  .replace(/\W+/g, '');
 const seedsFolder = 'seeds';
 const dataSourcesFolder = 'data-sources';
 
 function commandLineOptions() {
   commander
-    .usage(`
+    .usage(
+      `
 
 Cardstack Hub takes all its basic settings via environment variables:
 
@@ -21,11 +25,12 @@ PORT                              Port to bind to. Defaults to 3000.
 PUBLIC_HUB_URL                    The public URL at which the Hub can be accessed. Defaults to http://localhost:$PORT.
 ENABLE_TEST_SESSION               When set to a non-falsy value, this indicates if a priviledged session should be shared with the client for the purpose of test setup/tear down. Note that this is automatically enabled in the test environment.
 HUB_ENVIRONMENT                   The environment the hub is running in. Possible values are "development", "production", and "test". Defaults to "development".
-`)
+`
+    )
     .parse(process.argv);
 
   if (!process.env.INITIAL_DATA_DIR) {
-    process.stderr.write("You must set the INITIAL_DATA_DIR environment variable.\n");
+    process.stderr.write('You must set the INITIAL_DATA_DIR environment variable.\n');
     commander.outputHelp();
     process.exit(-1);
   }
@@ -45,7 +50,7 @@ HUB_ENVIRONMENT                   The environment the hub is running in. Possibl
     }
     commander.sessionsKey = Buffer.from(base64Key, 'base64');
   } else {
-    process.stderr.write("You must set the CARDSTACK_SESSIONS_KEY environment variable.\n");
+    process.stderr.write('You must set the CARDSTACK_SESSIONS_KEY environment variable.\n');
     commander.outputHelp();
     process.exit(-1);
   }
@@ -70,19 +75,22 @@ HUB_ENVIRONMENT                   The environment the hub is running in. Possibl
     commander.ciSessionId = testingToken;
   }
 
-  commander.environment = process.env.HUB_ENVIRONMENT || "development";
+  commander.environment = process.env.HUB_ENVIRONMENT || 'development';
 
   return commander;
 }
 
 function readDir(dir) {
-  return fs.readdirSync(dir).map(filename => {
-    if (/\.js$/.test(filename)) {
-      return require(path.join(dir, filename));
-    } else {
-      return [];
-    }
-  }).reduce((a,b) => a.concat(b), []);
+  return fs
+    .readdirSync(dir)
+    .map(filename => {
+      if (/\.js$/.test(filename)) {
+        return require(path.join(dir, filename));
+      } else {
+        return [];
+      }
+    })
+    .reduce((a, b) => a.concat(b), []);
 }
 
 function loadModels(modelsDir) {
@@ -104,5 +112,5 @@ module.exports = {
   commandLineOptions,
   seedsFolder,
   loadModels,
-  dataSourcesFolder
+  dataSourcesFolder,
 };

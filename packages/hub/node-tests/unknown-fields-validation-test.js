@@ -2,7 +2,7 @@ const JSONAPIFactory = require('../../../tests/stub-project/node_modules/@cardst
 const bootstrapSchema = require('../bootstrap-schema');
 const {
   createDefaultEnvironment,
-  destroyDefaultEnvironment
+  destroyDefaultEnvironment,
 } = require('../../../tests/stub-project/node_modules/@cardstack/test-support/env');
 
 /**
@@ -16,14 +16,13 @@ describe('unknown fields validation', function() {
 
     factory.importModels(bootstrapSchema);
 
-    factory.addResource('content-types', 'articles')
+    factory
+      .addResource('content-types', 'articles')
       .withRelated('fields', [
-        factory.addResource('fields', 'title')
-          .withAttributes({ fieldType: '@cardstack/core-types::string' }),
+        factory.addResource('fields', 'title').withAttributes({ fieldType: '@cardstack/core-types::string' }),
       ]);
 
-    factory.addResource('fields', 'header')
-      .withAttributes({ fieldType: '@cardstack/core-types::string' });
+    factory.addResource('fields', 'header').withAttributes({ fieldType: '@cardstack/core-types::string' });
 
     env = await createDefaultEnvironment(`${__dirname}/../../../tests/sample-computed-fields`, factory.getModels());
   });
@@ -32,7 +31,7 @@ describe('unknown fields validation', function() {
     await destroyDefaultEnvironment(env);
   });
 
-  it('backend has new field, request has new field', async function () {
+  it('backend has new field, request has new field', async function() {
     await changeArticleField();
     let model = await createArticle({ header: 'foo' });
 
@@ -42,15 +41,16 @@ describe('unknown fields validation', function() {
     expect(article.data.attributes).to.have.property('header', 'bar');
   });
 
-  it('backend has new field, request has old field', async function () {
+  it('backend has new field, request has old field', async function() {
     await changeArticleField();
     let model = await createArticle({ header: 'foo' });
 
-    await expect(updateArticle(model.data.id, { title: 'bar' }))
-      .to.be.rejectedWith('type "articles" has no field named "title"');
+    await expect(updateArticle(model.data.id, { title: 'bar' })).to.be.rejectedWith(
+      'type "articles" has no field named "title"'
+    );
   });
 
-  it('backend has old field, request has new field', async function () {
+  it('backend has old field, request has new field', async function() {
     let model = await createArticle({ title: 'foo' });
     await changeArticleField();
 
@@ -62,30 +62,33 @@ describe('unknown fields validation', function() {
 
   // This is an artificial test case that should never actually happen in the app
   // as the JSONAPI will only return fields that are included in the schema
-  it.skip('backend has old field, request has old field', async function () {
+  it.skip('backend has old field, request has old field', async function() {
     let model = await createArticle({ title: 'foo' });
     await changeArticleField();
 
-    await expect(updateArticle(model.data.id, { title: 'bar' }))
-      .to.be.rejectedWith('type "articles" has no field named "title"');
+    await expect(updateArticle(model.data.id, { title: 'bar' })).to.be.rejectedWith(
+      'type "articles" has no field named "title"'
+    );
   });
 
   /**
    * Changes the `articles` content type from having a `title` field to having a `header` field.
    */
   async function changeArticleField() {
-    let articleContentType = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'articles');
+    let articleContentType = await env
+      .lookup('hub:searchers')
+      .get(env.session, 'local-hub', 'content-types', 'articles');
 
     await env.lookup('hub:writers').update(env.session, 'content-types', 'articles', {
       data: {
         type: 'content-types',
         meta: {
-          version: articleContentType.data.meta.version
+          version: articleContentType.data.meta.version,
         },
         relationships: {
-          fields: {data: [{type: 'fields', id: 'header'}]},
+          fields: { data: [{ type: 'fields', id: 'header' }] },
         },
-      }
+      },
     });
   }
 
@@ -93,8 +96,8 @@ describe('unknown fields validation', function() {
     return await env.lookup('hub:writers').create(env.session, 'articles', {
       data: {
         type: 'articles',
-        attributes
-      }
+        attributes,
+      },
     });
   }
 

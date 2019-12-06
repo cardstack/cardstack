@@ -15,7 +15,7 @@ module.exports = class ComputedField {
 
     this._finishSetup = () => {
       if (typeof type === 'function') {
-        type = type(function typeOf(otherFieldId)  {
+        type = type(function typeOf(otherFieldId) {
           let otherField = allFields.get(otherFieldId);
           if (otherField) {
             return otherField.fieldType;
@@ -40,10 +40,10 @@ module.exports = class ComputedField {
           caption: model.attributes.caption,
           searchable: model.attributes.searchable,
           'editor-options': model.attributes['editor-options'],
-          'instructions': model.attributes['instructions'],
+          instructions: model.attributes['instructions'],
           'is-metadata': model.attributes['is-metadata'],
-          'needed-when-embedded': model.attributes['needed-when-embedded']
-        }
+          'needed-when-embedded': model.attributes['needed-when-embedded'],
+        },
       };
       this._virtualField = new Field(virtualModel, plugins, allGrants);
     };

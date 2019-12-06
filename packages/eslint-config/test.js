@@ -1,7 +1,5 @@
 module.exports = Object.assign({}, require('./-node'), {
-  plugins: [
-    'mocha',
-  ],
+  plugins: ['mocha'],
   globals: {
     describe: false,
     it: false,
@@ -9,7 +7,7 @@ module.exports = Object.assign({}, require('./-node'), {
     afterEach: false,
     before: false,
     after: false,
-    expect: false
+    expect: false,
   },
   rules: {
     'mocha/handle-done-callback': 'error',

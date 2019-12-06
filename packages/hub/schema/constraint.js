@@ -17,12 +17,16 @@ module.exports = class Constraint {
     this.constantInputs = constantInputs;
 
     let fieldInputs = Object.create(null);
-    if (model.relationships &&
-        model.relationships['input-assignments'] &&
-        model.relationships['input-assignments'].data) {
-      model.relationships['input-assignments'].data.forEach(({type, id}) => {
+    if (
+      model.relationships &&
+      model.relationships['input-assignments'] &&
+      model.relationships['input-assignments'].data
+    ) {
+      model.relationships['input-assignments'].data.forEach(({ type, id }) => {
         if (type !== 'input-assignments') {
-          throw new Error(`constraint "${model.id}"'s input-assignments relationship can only refer to type input-assignments (found "${type}")`);
+          throw new Error(
+            `constraint "${model.id}"'s input-assignments relationship can only refer to type input-assignments (found "${type}")`
+          );
         }
         let assignment = inputAssignments.get(id);
         if (!assignment) {
@@ -32,10 +36,12 @@ module.exports = class Constraint {
         if (!assignment.attributes || !(inputName = assignment.attributes['input-name'])) {
           throw new Error(`input-assignment "${assignment.id}" has no input-name attribute`);
         }
-        if (!assignment.relationships ||
-            !assignment.relationships.field ||
-            !assignment.relationships.field.data ||
-            !(fieldId = assignment.relationships.field.data.id)) {
+        if (
+          !assignment.relationships ||
+          !assignment.relationships.field ||
+          !assignment.relationships.field.data ||
+          !(fieldId = assignment.relationships.field.data.id)
+        ) {
           throw new Error(`input-assignment "${assignment.id}" has no field`);
         }
 
@@ -63,17 +69,18 @@ module.exports = class Constraint {
       inputs[inputName] = {
         name: field.caption || field.id,
         value: field.valueFrom(pendingChange, 'finalDocument'),
-        oldValue: field.valueFrom(pendingChange, 'originalDocument')
+        oldValue: field.valueFrom(pendingChange, 'originalDocument'),
       };
     }
-    if (!await this.plugin.valid(inputs)) {
+    if (!(await this.plugin.valid(inputs))) {
       let detail = this.template(inputs);
       return Object.values(this.fieldInputs).map(
-        field => new Error(detail, {
-          title: 'Validation error',
-          status: 422,
-          source: { pointer: field.pointer() }
-        })
+        field =>
+          new Error(detail, {
+            title: 'Validation error',
+            status: 422,
+            source: { pointer: field.pointer() },
+          })
       );
     } else {
       return [];

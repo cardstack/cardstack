@@ -22,14 +22,16 @@ module.exports = class DataSource {
     this._StaticModels = plugins.lookupFeatureFactory('static-models', this.sourceType);
     this._staticModels = null;
 
-    this._schemaContentTypes = bootstrapSchema.filter(i => i.type === 'content-types' && get(i, 'attributes.is-built-in')).map(i => i.id);
+    this._schemaContentTypes = bootstrapSchema
+      .filter(i => i.type === 'content-types' && get(i, 'attributes.is-built-in'))
+      .map(i => i.id);
     if (!this._Writer && !this._Indexer && !this._Searcher && !this._Authenticator && !this._StaticModels) {
       throw new Error(`${this.sourceType} is either missing or does not appear to be a valid data source plugin`);
     }
     this.mayCreateUser = !!model.attributes['may-create-user'];
     this.mayUpdateUser = !!model.attributes['may-update-user'];
     if (model.attributes['user-template']) {
-      throw new Error("user-template is deprecated in favor of user-rewriter");
+      throw new Error('user-template is deprecated in favor of user-rewriter');
     }
     this._userRewriter = model.attributes['user-rewriter'];
     this._userRewriterFunc = null;
@@ -71,9 +73,11 @@ module.exports = class DataSource {
         this._staticModels = [];
       }
     }
-    let schemaModels = this._staticModels.filter(i => this._schemaContentTypes.includes(i.type)).map(i => `${i.type}/${i.id}`);
+    let schemaModels = this._staticModels
+      .filter(i => this._schemaContentTypes.includes(i.type))
+      .map(i => `${i.type}/${i.id}`);
     if (schemaModels.length) {
-    /*
+      /*
       TODO: We need to grandfather in the current static-model ability to specify schema if we want to limit this PR to
       reasoning about being able to specify the new card schema only--otherwise we'll need to also implement the new
       card indexing at the same time as well. The next step here is to remove this grandfathering so that everything uses
@@ -107,19 +111,21 @@ module.exports = class DataSource {
       } else if (this.authenticator.defaultUserRewriter) {
         this._userRewriterFunc = this.authenticator.defaultUserRewriter.bind(this.authenticator);
       } else {
-        this._userRewriterFunc = (externalUser) => Object.assign({}, externalUser);
+        this._userRewriterFunc = externalUser => Object.assign({}, externalUser);
       }
     }
-    authLog.debug("external user %j", externalUser);
+    authLog.debug('external user %j', externalUser);
     let rewritten = this._userRewriterFunc(externalUser);
-    authLog.debug("rewritten user %j", rewritten);
+    authLog.debug('rewritten user %j', rewritten);
     return rewritten;
   }
 
   async externalUserCorrelationQuery(externalUser) {
     if (!this._userCorrelationQueryFunc) {
       if (this._userCorrelationQuery) {
-        this._userCorrelationQueryFunc = require(await resolve(this._userCorrelationQuery, { basedir: this._projectPath }));
+        this._userCorrelationQueryFunc = require(await resolve(this._userCorrelationQuery, {
+          basedir: this._projectPath,
+        }));
       } else {
         this._userCorrelationQueryFunc = () => null;
       }

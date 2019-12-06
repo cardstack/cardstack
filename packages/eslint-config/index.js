@@ -5,15 +5,10 @@ let ts = require('./-ts');
 module.exports = Object.assign({}, node, {
   overrides: [
     Object.assign({}, test, {
-      files: [
-        'node-tests/**/*.js',
-        'node-tests/**/*.ts'
-      ]
+      files: ['node-tests/**/*.js', 'node-tests/**/*.ts'],
     }),
     Object.assign({}, ts, {
-      files: [
-        '**/*.ts'
-      ]
-    })
-  ]
+      files: ['**/*.ts'],
+    }),
+  ],
 });

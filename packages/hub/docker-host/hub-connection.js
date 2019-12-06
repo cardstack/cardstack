@@ -1,4 +1,4 @@
-const {promisify} = require('util');
+const { promisify } = require('util');
 const timeout = promisify(setTimeout);
 
 const nssocket = require('nssocket');
@@ -13,7 +13,7 @@ class HubConnection {
     this.ready = this.awaitReady();
   }
 
-  startHeartbeat(){
+  startHeartbeat() {
     let beat = () => {
       log.trace('Sending heartbeat to hub');
       this.connection.send('heartbeat');
@@ -43,7 +43,7 @@ async function connect() {
     let connection = await _connect();
     return new HubConnection(connection);
   } catch (e) {
-    if (e.code === "ECONNREFUSED") {
+    if (e.code === 'ECONNREFUSED') {
       throw new Error('The hub is not accepting connections on port 6785');
     } else {
       throw e;
@@ -71,7 +71,7 @@ async function _connect() {
 
     socket.on('close', onClose);
     socket.data('shake', function() {
-      log.trace("Hub heartbeat connection established");
+      log.trace('Hub heartbeat connection established');
       socket.removeListener('close', onClose);
       resolve(socket);
     });
@@ -82,5 +82,5 @@ async function _connect() {
 
 module.exports = {
   HubConnection,
-  connect
+  connect,
 };
