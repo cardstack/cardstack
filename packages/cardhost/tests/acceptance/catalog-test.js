@@ -86,7 +86,7 @@ module('Acceptance | catalog', function(hooks) {
 
   test('can navigate to catalog via left edge', async function(assert) {
     await visit(`/cards/${card1Id}`);
-    await click('[data-test-catalog-link]');
+    await click('[data-test-library-link]');
     assert.equal(currentURL(), '/');
   });
 });
