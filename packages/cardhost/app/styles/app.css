@@ -304,6 +304,7 @@ a:hover {
   border: 1px solid var(--ch-default);
   border-radius: 10px;
   overflow: hidden;
+  height: 100%;
 }
 
 .cardhost-card-theme-editor .editor-container__title {
