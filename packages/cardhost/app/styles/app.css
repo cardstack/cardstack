@@ -271,7 +271,36 @@ a:hover {
   position: relative;
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
+
+.cardhost-card-theme-editor.bottom-docked .resizable-content {
+  flex-direction: row;
+}
+
+.cardhost-card-theme-editor .editor-section {
+  height: 50%;
+  width: 100%;
+  padding: 12px;
+}
+
+.cardhost-card-theme-editor.bottom-docked .editor-section {
+  height: 100%;
+  width: 50%;
+}
+
+.cardhost-card-theme-editor .editor-container {
+  border: 1px solid var(--ch-default);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.cardhost-card-theme-editor .editor-container__title {
+  background-color: var(--ch-default);
+  padding: 12px;
+}
+
 
 .cardhost-card-theme-editor .resizer.left {
   left: 5px;
@@ -317,5 +346,6 @@ a:hover {
 }
 
 .cardhost-monaco-container.editor-pane-code {
-  min-height: 35vh;
+  min-height: 32vh;
+  height 100%;
 }

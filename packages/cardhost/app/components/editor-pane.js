@@ -24,6 +24,10 @@ export default class EditorPane extends Component {
     }
   }
 
+  get cssEditorResizeDirections() {
+    return ["bottom"];
+  }
+
   get width() {
     if (this.cssModeToggle.dockLocation === "right") {
       return "40%";

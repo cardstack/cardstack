@@ -7,23 +7,30 @@
   @height={{this.height}}
 >
   <div class="resizable-content">
-    <h3>Card Theme Editor</h3>
-    <CodeEditor
-      @code={{@model.isolatedCss}}
-      @language="css"
-      @readOnly={{false}}
-      @updateCode={{action "updateCode"}}
-      class="editor-pane-code"
-    />
+    <ReSizable
+      @directions={{this.cssEditorResizeDirections}}
+      class="editor-section"
+      @height="50%"
+    >
+      <CodeEditor
+        @title="CSS"
+        @code={{@model.isolatedCss}}
+        @language="css"
+        @readOnly={{false}}
+        @updateCode={{action "updateCode"}}
+        class="editor-pane-code"
+      />
+    </ReSizable>
 
-    <h3>HTML Viewer</h3>
-    <CodeEditor
-      @code={{this.markup}}
-      @language="handlebars"
-      @readOnly={{true}}
-      class="editor-pane-code"
-    />
-
+    <div class="editor-section">
+      <CodeEditor
+        @title="HTML"
+        @code={{this.markup}}
+        @language="handlebars"
+        @readOnly={{true}}
+        class="editor-pane-code"
+      />
+    </div>
     {{svg-jar "icon-grabber" class="drag-handle"}}
   </div>
 </ReSizable>
