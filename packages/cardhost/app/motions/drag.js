@@ -27,7 +27,6 @@ class Drag extends Motion {
     this.prior = motions.find(m => m instanceof this.constructor);
   }
 
-
   *animate() {
     let sprite = this.sprite;
 
@@ -62,7 +61,7 @@ class Drag extends Motion {
 
     sprite.applyStyles({
       zIndex: 1,
-      outline
+      outline,
     });
 
     // when we first start a new "keyboard" drag, adjust the active
@@ -95,17 +94,13 @@ class Drag extends Motion {
         if (chosenTarget !== ownTarget) {
           this.opts.onCollision(chosenTarget.payload);
         }
-
       } else {
         // these track relative motion since the drag started
         let dx = dragState.latestPointerX - dragState.initialPointerX;
         let dy = dragState.latestPointerY - dragState.initialPointerY;
 
         // adjust our transform to match the latest relative mouse motion
-        sprite.translate(
-          dx + initialTx - sprite.transform.tx,
-          dy + initialTy - sprite.transform.ty
-        );
+        sprite.translate(dx + initialTx - sprite.transform.tx, dy + initialTy - sprite.transform.ty);
 
         // now this is our own absolute center position
         let x = dx + this.dragStartX + sprite.absoluteFinalBounds.width / 2;
@@ -125,16 +120,14 @@ class Drag extends Motion {
       }
       yield rAF();
     }
-
   }
-
 }
 
 export function makeTarget(bounds, payload) {
   return {
     x: bounds.left + bounds.width / 2,
     y: bounds.top + bounds.height / 2,
-    payload
+    payload,
   };
 }
 
@@ -144,8 +137,7 @@ export function chooseNextToLeft(chosenTarget, targets) {
       return false;
     }
     let limit = (chosenTarget.x - target.x) / 2;
-    return target.y <= chosenTarget.y + limit &&
-      target.y >= chosenTarget.y - limit;
+    return target.y <= chosenTarget.y + limit && target.y >= chosenTarget.y - limit;
   });
   return closest(chosenTarget, candidates) || chosenTarget;
 }
@@ -156,8 +148,7 @@ export function chooseNextToRight(chosenTarget, targets) {
       return false;
     }
     let limit = (chosenTarget.x - target.x) / -2;
-    return target.y <= chosenTarget.y + limit &&
-      target.y >= chosenTarget.y - limit;
+    return target.y <= chosenTarget.y + limit && target.y >= chosenTarget.y - limit;
   });
   return closest(chosenTarget, candidates) || chosenTarget;
 }
@@ -168,8 +159,7 @@ export function chooseNextToUp(chosenTarget, targets) {
       return false;
     }
     let limit = (chosenTarget.y - target.y) / 2;
-    return target.x <= chosenTarget.x + limit &&
-      target.x >= chosenTarget.x - limit;
+    return target.x <= chosenTarget.x + limit && target.x >= chosenTarget.x - limit;
   });
   return closest(chosenTarget, candidates) || chosenTarget;
 }
@@ -180,23 +170,22 @@ export function chooseNextToDown(chosenTarget, targets) {
       return false;
     }
     let limit = (chosenTarget.y - target.y) / -2;
-    return target.x <= chosenTarget.x + limit &&
-      target.x >= chosenTarget.x - limit;
+    return target.x <= chosenTarget.x + limit && target.x >= chosenTarget.x - limit;
   });
   return closest(chosenTarget, candidates) || chosenTarget;
 }
-
 
 function closest(chosenTarget, candidates) {
   let closest;
   let closestDistance;
   for (let candidate of candidates) {
-    let distance = (candidate.x - chosenTarget.x) * (candidate.x - chosenTarget.x) + (candidate.y - chosenTarget.y) * (candidate.y - chosenTarget.y);
-    if (closestDistance == null || distance < closestDistance ) {
+    let distance =
+      (candidate.x - chosenTarget.x) * (candidate.x - chosenTarget.x) +
+      (candidate.y - chosenTarget.y) * (candidate.y - chosenTarget.y);
+    if (closestDistance == null || distance < closestDistance) {
       closestDistance = distance;
       closest = candidate;
     }
   }
   return closest;
-
 }

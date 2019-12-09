@@ -13,20 +13,20 @@ let card: SingleResourceDoc = {
     // make sure to move the default card component js and template into the base card.
     attributes: {
       'isolated-css': isolatedCss,
-      'embedded-css': embeddedCss
+      'embedded-css': embeddedCss,
     },
     relationships: {
       'adopted-from': { data: null },
       fields: { data: [] },
-      model: { data: { type: 'local-hub::@cardstack/base-card', id: 'local-hub::@cardstack/base-card' } }
-    }
+      model: { data: { type: 'local-hub::@cardstack/base-card', id: 'local-hub::@cardstack/base-card' } },
+    },
   },
   included: [
     {
       id: 'local-hub::@cardstack/base-card',
-      type: 'local-hub::@cardstack/base-card'
-    }
-  ]
+      type: 'local-hub::@cardstack/base-card',
+    },
+  ],
 };
 
 export = card;

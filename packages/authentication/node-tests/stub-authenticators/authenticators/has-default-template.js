@@ -6,8 +6,8 @@ module.exports = class HasDefaultTemplate {
     return {
       data: {
         id: user.upstreamId,
-        type: "test-users"
-      }
+        type: 'test-users',
+      },
     };
   }
   async authenticate(payload /*, userSearcher */) {

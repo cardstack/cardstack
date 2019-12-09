@@ -1,10 +1,6 @@
-const {
-  createDefaultEnvironment,
-  destroyDefaultEnvironment
-} = require('@cardstack/test-support/env');
+const { createDefaultEnvironment, destroyDefaultEnvironment } = require('@cardstack/test-support/env');
 
 const delay = require('delay');
-
 
 describe('@cardstack/queue', function() {
   let env, queue;
@@ -38,7 +34,8 @@ describe('@cardstack/queue', function() {
   });
 
   it('can return a promise that resolves after a job is complete', async function() {
-    let isDoneWithoutWait = false, isDoneWithWait = false;
+    let isDoneWithoutWait = false,
+      isDoneWithWait = false;
 
     let noWaitWorker = () => {
       isDoneWithoutWait = true;
@@ -60,10 +57,8 @@ describe('@cardstack/queue', function() {
 
     let result = await queue.publishAndWait('long-job-with-wait');
     expect(isDoneWithWait).to.be.ok;
-    expect(result.name).to.equal("long-job-with-wait__state__complete");
-
+    expect(result.name).to.equal('long-job-with-wait__state__complete');
   }).timeout(4000);
-
 
   it('completes immediately if workers do not return a promise', function(done) {
     (async () => {
@@ -118,58 +113,57 @@ describe('@cardstack/queue', function() {
   }).timeout(4000);
 
   it('the result of the job is returned to the waiter', async function() {
-
     let worker = async () => {
       await delay(10);
-      return {outcome: "it worked!"};
+      return { outcome: 'it worked!' };
     };
 
     await queue.subscribe('async-job', worker);
 
     let result = await queue.publishAndWait('async-job');
-    expect(result.data.response.outcome).to.equal("it worked!");
+    expect(result.data.response.outcome).to.equal('it worked!');
   }).timeout(4000);
 
   it('handles sync errors', async function() {
     let worker = () => {
-      throw new Error("sync error");
+      throw new Error('sync error');
     };
 
     await queue.subscribe('sync-error-job', worker);
     try {
       await queue.publishAndWait('sync-error-job');
-      expect(false).to.be.ok("should not get here");
+      expect(false).to.be.ok('should not get here');
     } catch (e) {
-      expect(e.message).to.equal("sync error");
+      expect(e.message).to.equal('sync error');
     }
   }).timeout(4000);
 
   it('handles async errors', async function() {
     let worker = async () => {
       await delay(100);
-      throw new Error("async error");
+      throw new Error('async error');
     };
 
     await queue.subscribe('async-error-job', worker);
     try {
       await queue.publishAndWait('async-error-job');
-      expect(false).to.be.ok("should not get here");
+      expect(false).to.be.ok('should not get here');
     } catch (e) {
-      expect(e.message).to.equal("async error");
+      expect(e.message).to.equal('async error');
     }
   }).timeout(4000);
 
   it('cleans up state', async function() {
     let worker = () => {
-      throw new Error("sync error");
+      throw new Error('sync error');
     };
 
     await queue.subscribe('cleanup-job', worker);
     try {
       await queue.publishAndWait('cleanup-job');
-      expect(false).to.be.ok("should not get here");
+      expect(false).to.be.ok('should not get here');
     } catch (e) {
-      expect(e.message).to.equal("sync error");
+      expect(e.message).to.equal('sync error');
     }
 
     expect(Object.keys(queue.jobErrors).length).to.equal(0);
@@ -192,12 +186,10 @@ describe('@cardstack/queue', function() {
   }).timeout(8000);
 
   it('sends data to the job', async function() {
-    let worker = ({data}) => {
+    let worker = ({ data }) => {
       expect(data.foo).to.equal(123);
     };
     await queue.subscribe('test-job', worker);
-    await queue.publishAndWait('test-job', {foo: 123});
+    await queue.publishAndWait('test-job', { foo: 123 });
   }).timeout(4000);
-
-
 });

@@ -1,7 +1,4 @@
-const {
-  createDefaultEnvironment,
-  destroyDefaultEnvironment
-} = require('@cardstack/test-support/env');
+const { createDefaultEnvironment, destroyDefaultEnvironment } = require('@cardstack/test-support/env');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const { join } = require('path');
 const { readFileSync, writeFileSync, readdirSync, mkdirSync } = require('fs');
@@ -34,23 +31,18 @@ describe('local git cache service', function() {
 
     let factory = new JSONAPIFactory();
 
-    let dataSource1 = factory.addResource('data-sources')
-        .withAttributes({
-          'source-type': '@cardstack/git',
-          params: {
-            remote: {
-              url: 'ssh://root@localhost:9022/root/data-test',
-              privateKey,
-              cacheDir: tempRepoPath,
-            }
-          }
-        });
+    let dataSource1 = factory.addResource('data-sources').withAttributes({
+      'source-type': '@cardstack/git',
+      params: {
+        remote: {
+          url: 'ssh://root@localhost:9022/root/data-test',
+          privateKey,
+          cacheDir: tempRepoPath,
+        },
+      },
+    });
 
-    factory.addResource('plugin-configs', '@cardstack/hub')
-      .withRelated(
-        'default-data-source-test-1',
-        dataSource1
-      );
+    factory.addResource('plugin-configs', '@cardstack/hub').withRelated('default-data-source-test-1', dataSource1);
 
     let env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
 
@@ -64,41 +56,31 @@ describe('local git cache service', function() {
 
     let factory = new JSONAPIFactory();
 
-    let dataSource1 = factory.addResource('data-sources')
-        .withAttributes({
-          'source-type': '@cardstack/git',
-          params: {
-            remote: {
-              url: 'ssh://root@localhost:9022/root/data-test',
-              privateKey,
-              cacheDir: tempRepoPath,
-            }
-          }
-        });
+    let dataSource1 = factory.addResource('data-sources').withAttributes({
+      'source-type': '@cardstack/git',
+      params: {
+        remote: {
+          url: 'ssh://root@localhost:9022/root/data-test',
+          privateKey,
+          cacheDir: tempRepoPath,
+        },
+      },
+    });
 
-    let dataSource2 = factory.addResource('data-sources')
-        .withAttributes({
-          'source-type': '@cardstack/git',
-          params: {
-            remote: {
-              url: 'ssh://root@127.0.0.1:9022/root/data-test',
-              privateKey,
-              cacheDir: tempRepoPath,
-            }
-          }
-        });
+    let dataSource2 = factory.addResource('data-sources').withAttributes({
+      'source-type': '@cardstack/git',
+      params: {
+        remote: {
+          url: 'ssh://root@127.0.0.1:9022/root/data-test',
+          privateKey,
+          cacheDir: tempRepoPath,
+        },
+      },
+    });
 
-    factory.addResource('plugin-configs', '@cardstack/hub')
-      .withRelated(
-        'default-data-source',
-        dataSource1
-      );
+    factory.addResource('plugin-configs', '@cardstack/hub').withRelated('default-data-source', dataSource1);
 
-    factory.addResource('plugin-configs', '@cardstack/hub')
-      .withRelated(
-        'second-data-source',
-        dataSource2
-      );
+    factory.addResource('plugin-configs', '@cardstack/hub').withRelated('second-data-source', dataSource2);
 
     let env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
 
@@ -115,23 +97,18 @@ describe('local git cache service', function() {
 
     let factory = new JSONAPIFactory();
 
-    let dataSource1 = factory.addResource('data-sources')
-        .withAttributes({
-          'source-type': '@cardstack/git',
-          params: {
-            remote: {
-              url: 'ssh://root@localhost:9022/root/data-test',
-              privateKey,
-              cacheDir: tempRepoPath,
-            }
-          }
-        });
+    let dataSource1 = factory.addResource('data-sources').withAttributes({
+      'source-type': '@cardstack/git',
+      params: {
+        remote: {
+          url: 'ssh://root@localhost:9022/root/data-test',
+          privateKey,
+          cacheDir: tempRepoPath,
+        },
+      },
+    });
 
-    factory.addResource('plugin-configs', '@cardstack/hub')
-      .withRelated(
-        'default-data-source-test-1',
-        dataSource1
-      );
+    factory.addResource('plugin-configs', '@cardstack/hub').withRelated('default-data-source-test-1', dataSource1);
 
     let env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
 
@@ -154,23 +131,18 @@ describe('local git cache service', function() {
 
     let factory = new JSONAPIFactory();
 
-    let dataSource1 = factory.addResource('data-sources')
-        .withAttributes({
-          'source-type': '@cardstack/git',
-          params: {
-            remote: {
-              url: 'ssh://root@localhost:9022/root/data-test',
-              privateKey,
-              cacheDir: tempRepoPath,
-            }
-          }
-        });
+    let dataSource1 = factory.addResource('data-sources').withAttributes({
+      'source-type': '@cardstack/git',
+      params: {
+        remote: {
+          url: 'ssh://root@localhost:9022/root/data-test',
+          privateKey,
+          cacheDir: tempRepoPath,
+        },
+      },
+    });
 
-    factory.addResource('plugin-configs', '@cardstack/hub')
-      .withRelated(
-        'default-data-source-test-1',
-        dataSource1
-      );
+    factory.addResource('plugin-configs', '@cardstack/hub').withRelated('default-data-source-test-1', dataSource1);
 
     let env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
 
@@ -185,7 +157,6 @@ describe('local git cache service', function() {
 
     sinon.assert.callCount(service.getRepo, 4);
     sinon.assert.calledTwice(service._makeRepo);
-
 
     await rimraf(tempRepoPath);
     service.getRepo.restore();
@@ -210,23 +181,18 @@ describe('local git cache service', function() {
 
     let factory = new JSONAPIFactory();
 
-    let dataSource1 = factory.addResource('data-sources')
-        .withAttributes({
-          'source-type': '@cardstack/git',
-          params: {
-            remote: {
-              url,
-              privateKey,
-              cacheDir: tempRepoPath,
-            }
-          }
-        });
+    let dataSource1 = factory.addResource('data-sources').withAttributes({
+      'source-type': '@cardstack/git',
+      params: {
+        remote: {
+          url,
+          privateKey,
+          cacheDir: tempRepoPath,
+        },
+      },
+    });
 
-    factory.addResource('plugin-configs', '@cardstack/hub')
-      .withRelated(
-        'default-data-source-test-1',
-        dataSource1
-      );
+    factory.addResource('plugin-configs', '@cardstack/hub').withRelated('default-data-source-test-1', dataSource1);
 
     let env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
 

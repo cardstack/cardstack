@@ -1,10 +1,9 @@
-const {promisify} = require('util');
+const { promisify } = require('util');
 const realpath = promisify(require('fs').realpath);
 const path = require('path');
 const resolve = promisify(require('resolve'));
 const path_is_inside = require('path-is-inside');
 const _ = require('lodash');
-
 
 module.exports = getPackageList;
 
@@ -15,7 +14,6 @@ module.exports = getPackageList;
 //     links: [ "@cardstack/hub", "@cardstack/models" ]
 // }]
 async function getPackageList(rootPackagePath) {
-
   // Map {
   //   "/Users/aaron/dev/basic-cardstack" => [
   //     {
@@ -26,7 +24,6 @@ async function getPackageList(rootPackagePath) {
   //   ]
   // }
   let moduleLinkings = await recursivelyFindLinkedModules(rootPackagePath);
-
 
   // Map {
   //   "/Users/aaron/dev/cardstack/packages/hub" => "@cardstack/hub"
@@ -62,15 +59,15 @@ function stitchPackages(modules, pathResolver) {
     result.push({
       name,
       path,
-      volumeName: name.replace('@', '').replace('/', '-') + "-node_modules",
-      links: links.map(x=>x.name)
+      volumeName: name.replace('@', '').replace('/', '-') + '-node_modules',
+      links: links.map(x => x.name),
     });
   }
   return result;
 }
 
 function allPathMappings(moduleLinkings) {
-  let allLinks = Array.from(moduleLinkings.values()).reduce((a,b)=>a.concat(b), []);
+  let allLinks = Array.from(moduleLinkings.values()).reduce((a, b) => a.concat(b), []);
 
   let result = new Map();
 
@@ -78,13 +75,14 @@ function allPathMappings(moduleLinkings) {
 
   for (let moduleName in linksByModule) {
     let links = linksByModule[moduleName];
-    let paths = links.map(x=>x.path);
+    let paths = links.map(x => x.path);
     if (_.uniq(paths).length > 1) {
-      let linksMsg = links.map(l => {
-        return `"${l.from}" links to "${l.path}"`;
-      }).join('\n');
-      let msg =
-`Multiple different linked versions of "${moduleName}" were found:
+      let linksMsg = links
+        .map(l => {
+          return `"${l.from}" links to "${l.path}"`;
+        })
+        .join('\n');
+      let msg = `Multiple different linked versions of "${moduleName}" were found:
 ${linksMsg}
 Cardstack hub only supports linking to a single version of a given module`;
       throw new Error(msg);
@@ -104,18 +102,20 @@ async function recursivelyFindLinkedModules(packageDir, packageLinks = new Map()
   }
   let deps = allDeps(packageDir);
 
-  let depResolutions = await Promise.all(deps.map(async function(depName) {
-    // resolving the package.json instead of the module name lets us find the root
-    // directory. Otherwise, we get different results depending on package.json's "main" key
-    let depPackagePath = await resolve(depName + '/package.json', {basedir: packageDir});
-    depPackagePath = await realpath(depPackagePath);
-    let depDir = depPackagePath.replace(/\/package\.json$/, '');
-    return {
-      name: depName,
-      path: depDir,
-      from: packageDir
-    };
-  }));
+  let depResolutions = await Promise.all(
+    deps.map(async function(depName) {
+      // resolving the package.json instead of the module name lets us find the root
+      // directory. Otherwise, we get different results depending on package.json's "main" key
+      let depPackagePath = await resolve(depName + '/package.json', { basedir: packageDir });
+      depPackagePath = await realpath(depPackagePath);
+      let depDir = depPackagePath.replace(/\/package\.json$/, '');
+      return {
+        name: depName,
+        path: depDir,
+        from: packageDir,
+      };
+    })
+  );
 
   let links = depResolutions.filter(function(dep) {
     return !path_is_inside(dep.path, packageDir);
@@ -137,4 +137,3 @@ function allDeps(packageDir) {
   let devDeps = packageJSON.devDependencies || {};
   return Object.keys(deps).concat(Object.keys(devDeps));
 }
-

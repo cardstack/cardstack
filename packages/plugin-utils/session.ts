@@ -44,7 +44,7 @@ class Session {
   // access)
   async realms() {
     if (!this._realms) {
-      if (!this.userSearcher || !this.userSearcher.get ) {
+      if (!this.userSearcher || !this.userSearcher.get) {
         throw new Error(`no valid user searcher in session for ${this.type} ${this.id}`);
       }
 
@@ -53,7 +53,7 @@ class Session {
       let realmsDoc;
       try {
         realmsDoc = await this.userSearcher.get('user-realms', ownBaseRealm);
-      } catch(err) {
+      } catch (err) {
         if (err.status !== 404) {
           throw err;
         }
@@ -70,11 +70,9 @@ class Session {
   static encodeBaseRealm(type: string, id: string) {
     return `${encodeURIComponent(type)}/${encodeURIComponent(id)}`;
   }
-
 }
 
 const everyoneRealm = Session.encodeBaseRealm('groups', 'everyone');
-
 
 export = Session;
 
@@ -93,14 +91,14 @@ Object.defineProperty(Session, 'INTERNAL_PRIVILEGED', {
           type: 'groups',
           attributes: {
             'full-name': '@cardstack/hub/authentication',
-            email: 'noreply@nowhere.com'
-          }
+            email: 'noreply@nowhere.com',
+          },
         },
         [Session.encodeBaseRealm('groups', '@cardstack/hub'), everyoneRealm]
       );
     }
     return privilegedSession;
-  }
+  },
 });
 
 // This is the default lowest-privileged session
@@ -116,12 +114,12 @@ Object.defineProperty(Session, 'EVERYONE', {
           type: 'users',
           attributes: {
             'full-name': 'Anonymous',
-            email: 'noreply@nowhere.com'
-          }
+            email: 'noreply@nowhere.com',
+          },
         },
         [everyoneRealm]
       );
     }
     return everyoneSession;
-  }
+  },
 });

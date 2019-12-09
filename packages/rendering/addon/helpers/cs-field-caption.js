@@ -11,7 +11,7 @@ export function fieldCaption(content, fieldName) {
   if (!meta) {
     return;
   }
-  
+
   let caption = meta.options && meta.options.caption;
   if (caption) {
     caption = stripNamespace(caption);

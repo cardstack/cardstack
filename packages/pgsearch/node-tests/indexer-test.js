@@ -7,70 +7,77 @@
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment,
-  defaultDataSourceId
+  defaultDataSourceId,
 } = require('../../../tests/pgsearch-test-app/node_modules/@cardstack/test-support/env');
 const Factory = require('../../../tests/pgsearch-test-app/node_modules/@cardstack/test-support/jsonapi-factory');
 const DocumentContext = require('@cardstack/hub/indexing/document-context');
 
 describe('pgsearch/indexer', function() {
-
   let env, factory, writer, indexer, searcher, currentSchema, changedModels;
 
   before(async function() {
     this.timeout(5000);
     factory = new Factory();
 
-    factory.addResource('content-types', 'puppies')
+    factory
+      .addResource('content-types', 'puppies')
       .withAttributes({
         fieldsetExpansionFormat: 'isolated',
         fieldsets: {
-          isolated: [{ field: 'puppy-friends', format: 'isolated' }]
-        }
+          isolated: [{ field: 'puppy-friends', format: 'isolated' }],
+        },
       })
       .withRelated('fields', [
         factory.addResource('fields', 'name').withAttributes({
-          fieldType: '@cardstack/core-types::string'
+          fieldType: '@cardstack/core-types::string',
         }),
         factory.addResource('fields', 'puppy-friends').withAttributes({
-          fieldType: '@cardstack/core-types::has-many'
-        })
+          fieldType: '@cardstack/core-types::has-many',
+        }),
       ]);
 
-    factory.addResource('content-types', 'articles').withAttributes({
-      defaultIncludes: ['author', 'reviewers']
-    }).withRelated('fields', [
-      factory.addResource('fields', 'title').withAttributes({
-        fieldType: '@cardstack/core-types::string'
-      }),
-      factory.addResource('fields', 'author').withAttributes({
-        fieldType: '@cardstack/core-types::belongs-to'
-      }).withRelated('related-types', [
-        factory.addResource('content-types', 'people')
+    factory
+      .addResource('content-types', 'articles')
+      .withAttributes({
+        defaultIncludes: ['author', 'reviewers'],
+      })
+      .withRelated('fields', [
+        factory.addResource('fields', 'title').withAttributes({
+          fieldType: '@cardstack/core-types::string',
+        }),
+        factory
+          .addResource('fields', 'author')
           .withAttributes({
-            defaultIncludes: ['friends'],
+            fieldType: '@cardstack/core-types::belongs-to',
           })
-        .withRelated('fields', [
-          factory.addResource('fields', 'name').withAttributes({
-            fieldType: '@cardstack/core-types::string'
-          }),
-          factory.addResource('fields', 'friends').withAttributes({
-            fieldType: '@cardstack/core-types::has-many'
+          .withRelated('related-types', [
+            factory
+              .addResource('content-types', 'people')
+              .withAttributes({
+                defaultIncludes: ['friends'],
+              })
+              .withRelated('fields', [
+                factory.addResource('fields', 'name').withAttributes({
+                  fieldType: '@cardstack/core-types::string',
+                }),
+                factory.addResource('fields', 'friends').withAttributes({
+                  fieldType: '@cardstack/core-types::has-many',
+                }),
+              ]),
+          ]),
+        factory
+          .addResource('fields', 'reviewers')
+          .withAttributes({
+            fieldType: '@cardstack/core-types::has-many',
           })
-        ])
-      ]),
-      factory.addResource('fields', 'reviewers').withAttributes({
-        fieldType: '@cardstack/core-types::has-many'
-      }).withRelated('related-types', [
-        factory.getResource('content-types', 'people')
-      ])
-    ]);
+          .withRelated('related-types', [factory.getResource('content-types', 'people')]),
+      ]);
 
     changedModels = [];
-    factory.addResource('data-sources')
-      .withAttributes({
-        'source-type': 'fake-indexer',
-        params: { changedModels }
-      });
+    factory.addResource('data-sources').withAttributes({
+      'source-type': 'fake-indexer',
+      params: { changedModels },
+    });
 
     env = await createDefaultEnvironment(`${__dirname}/../../../tests/pgsearch-test-app`, factory.getModels());
     writer = env.lookup('hub:writers');
@@ -85,7 +92,11 @@ describe('pgsearch/indexer', function() {
 
   async function alterExpiration(type, id, interval) {
     let client = env.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`);
-    let result = await client.query(`update documents set expires = now() + $1 where type=$2 and id=$3`, [interval, type, id]);
+    let result = await client.query(`update documents set expires = now() + $1 where type=$2 and id=$3`, [
+      interval,
+      type,
+      id,
+    ]);
     if (result.rowCount !== 1) {
       throw new Error(`test was unable to alter expiration`);
     }
@@ -93,16 +104,16 @@ describe('pgsearch/indexer', function() {
 
   // this scenario technically violates jsonapi spec, but our indexer needs to be tolerant of it
   it('tolerates missing relationship', async function() {
-    let { data:article } = await writer.create(env.session, 'articles', {
+    let { data: article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
-          title: 'Hello World'
+          title: 'Hello World',
         },
         relationships: {
-          author: null
-        }
-      }
+          author: null,
+        },
+      },
     });
     expect(article).has.deep.property('id');
     await indexer.update({ forceRefresh: true });
@@ -112,25 +123,25 @@ describe('pgsearch/indexer', function() {
   });
 
   it('indexes a belongs-to', async function() {
-    let { data:person } = await writer.create(env.session, 'people', {
+    let { data: person } = await writer.create(env.session, 'people', {
       data: {
         type: 'people',
         attributes: {
-          name: 'Quint'
-        }
-      }
+          name: 'Quint',
+        },
+      },
     });
     expect(person).has.deep.property('id');
-    let { data:article } = await writer.create(env.session, 'articles', {
+    let { data: article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
-          title: 'Hello World'
+          title: 'Hello World',
         },
         relationships: {
-          author: { data: { type: 'people', id: person.id } }
-        }
-      }
+          author: { data: { type: 'people', id: person.id } },
+        },
+      },
     });
     expect(article).has.deep.property('id');
     await indexer.update({ forceRefresh: true });
@@ -144,193 +155,201 @@ describe('pgsearch/indexer', function() {
   });
 
   it('indexes a resource that is related to itself', async function() {
-    let { data:person } = await writer.create(env.session, 'people', {
+    let { data: person } = await writer.create(env.session, 'people', {
       data: {
         id: 'vanGogh',
         type: 'people',
         attributes: {
-          name: 'Van Gogh'
+          name: 'Van Gogh',
         },
         relationships: {
-          friends: { data: [{ type: 'people', id: 'vanGogh' }] }
-        }
-      }
+          friends: { data: [{ type: 'people', id: 'vanGogh' }] },
+        },
+      },
     });
 
     let found = await searcher.get(env.session, 'local-hub', 'people', person.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.name');
-    expect(found.data.relationships).deep.equals({ friends: { data: [{ type: 'people', id: person.id }]}});
+    expect(found.data.relationships).deep.equals({ friends: { data: [{ type: 'people', id: person.id }] } });
     expect(found).has.property('included');
     expect(found.included).length(0);
   });
 
   it('indexes a resource that includes a resource which has a relation to itself', async function() {
-    let { data:circularPerson } = await writer.create(env.session, 'people', {
+    let { data: circularPerson } = await writer.create(env.session, 'people', {
       data: {
         id: 'vanGogh2',
         type: 'people',
         attributes: {
-          name: 'Van Gogh'
+          name: 'Van Gogh',
         },
         relationships: {
-          friends: { data: [{ type: 'people', id: 'vanGogh2' }] }
-        }
-      }
+          friends: { data: [{ type: 'people', id: 'vanGogh2' }] },
+        },
+      },
     });
-    let { data:person } = await writer.create(env.session, 'people', {
+    let { data: person } = await writer.create(env.session, 'people', {
       data: {
         id: 'ringo',
         type: 'people',
         attributes: {
-          name: 'Ringo'
+          name: 'Ringo',
         },
         relationships: {
-          friends: { data: [{ type: 'people', id: 'vanGogh2' }] }
-        }
-      }
+          friends: { data: [{ type: 'people', id: 'vanGogh2' }] },
+        },
+      },
     });
 
     let found = await searcher.get(env.session, 'local-hub', 'people', person.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.name');
-    expect(found.data.relationships).deep.equals({ friends: { data: [{ type: 'people', id: circularPerson.id }]}});
+    expect(found.data.relationships).deep.equals({ friends: { data: [{ type: 'people', id: circularPerson.id }] } });
     expect(found).has.property('included');
     expect(found.included).length(1);
     expect(found.included[0].attributes.name).to.equal('Van Gogh');
-    expect(found.included[0].relationships).deep.equals({ friends: { data: [{ type: 'people', id: circularPerson.id }]}});
+    expect(found.included[0].relationships).deep.equals({
+      friends: { data: [{ type: 'people', id: circularPerson.id }] },
+    });
   });
 
   it('indexes a circular relationship', async function() {
-    let { data:person1 } = await writer.create(env.session, 'people', {
+    let { data: person1 } = await writer.create(env.session, 'people', {
       data: {
         id: 'hassan',
         type: 'people',
         attributes: {
-          name: 'Hassan'
+          name: 'Hassan',
         },
         relationships: {
-          friends: { data: [{ type: 'people', id: 'vanGogh3' }] }
-        }
-      }
+          friends: { data: [{ type: 'people', id: 'vanGogh3' }] },
+        },
+      },
     });
-    let { data:person2 } = await writer.create(env.session, 'people', {
+    let { data: person2 } = await writer.create(env.session, 'people', {
       data: {
         id: 'vanGogh3',
         type: 'people',
         attributes: {
-          name: 'Van Gogh'
+          name: 'Van Gogh',
         },
         relationships: {
-          friends: { data: [{ type: 'people', id: 'hassan' }] }
-        }
-      }
+          friends: { data: [{ type: 'people', id: 'hassan' }] },
+        },
+      },
     });
 
     let found = await searcher.get(env.session, 'local-hub', 'people', person1.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.name');
-    expect(found.data.relationships).deep.equals({ friends: { data: [{ type: 'people', id: person2.id }]}});
+    expect(found.data.relationships).deep.equals({ friends: { data: [{ type: 'people', id: person2.id }] } });
     expect(found).has.property('included');
     expect(found.included).length(1);
 
     expect(found.included[0].attributes.name).to.equal('Van Gogh');
-    expect(found.included[0].relationships).deep.equals({ friends: { data: [{ type: 'people', id: person1.id }]}});
+    expect(found.included[0].relationships).deep.equals({ friends: { data: [{ type: 'people', id: person1.id }] } });
   });
 
   it('indexes a circular relationship by following fieldset paths', async function() {
-    let { data:puppy1 } = await writer.create(env.session, 'puppies', {
+    let { data: puppy1 } = await writer.create(env.session, 'puppies', {
       data: {
         id: 'ringo',
         type: 'puppies',
         attributes: {
-          name: 'Ringo'
+          name: 'Ringo',
         },
         relationships: {
-          'puppy-friends': { data: [{ type: 'puppies', id: 'vanGogh' }] }
-        }
-      }
+          'puppy-friends': { data: [{ type: 'puppies', id: 'vanGogh' }] },
+        },
+      },
     });
-    let { data:puppy2 } = await writer.create(env.session, 'puppies', {
+    let { data: puppy2 } = await writer.create(env.session, 'puppies', {
       data: {
         id: 'vanGogh',
         type: 'puppies',
         attributes: {
-          name: 'Van Gogh'
+          name: 'Van Gogh',
         },
         relationships: {
-          'puppy-friends': { data: [{ type: 'puppies', id: 'ringo' }] }
-        }
-      }
+          'puppy-friends': { data: [{ type: 'puppies', id: 'ringo' }] },
+        },
+      },
     });
 
     let found = await searcher.get(env.session, 'local-hub', 'puppies', puppy1.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.name');
-    expect(found.data.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: puppy2.id }]}});
+    expect(found.data.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: puppy2.id }] } });
     expect(found).has.property('included');
     expect(found.included).length(1);
 
     expect(found.included[0].attributes.name).to.equal('Van Gogh');
-    expect(found.included[0].relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: puppy1.id }]}});
+    expect(found.included[0].relationships).deep.equals({
+      'puppy-friends': { data: [{ type: 'puppies', id: puppy1.id }] },
+    });
   });
 
   it('indexes a resource that is related to itself by following fieldset paths', async function() {
-    let { data:puppy } = await writer.create(env.session, 'puppies', {
+    let { data: puppy } = await writer.create(env.session, 'puppies', {
       data: {
         id: 'vanGogh2',
         type: 'puppies',
         attributes: {
-          name: 'Van Gogh'
+          name: 'Van Gogh',
         },
         relationships: {
-          'puppy-friends': { data: [{ type: 'puppies', id: 'vanGogh2' }] }
-        }
-      }
+          'puppy-friends': { data: [{ type: 'puppies', id: 'vanGogh2' }] },
+        },
+      },
     });
 
     let found = await searcher.get(env.session, 'local-hub', 'puppies', puppy.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.name');
-    expect(found.data.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: puppy.id }]}});
+    expect(found.data.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: puppy.id }] } });
     expect(found).has.property('included');
     expect(found.included).length(0);
   });
 
   it('indexes a resource that includes a resource which has a relation to itself by following fieldset paths', async function() {
-    let { data:circularPuppy } = await writer.create(env.session, 'puppies', {
+    let { data: circularPuppy } = await writer.create(env.session, 'puppies', {
       data: {
         id: 'vanGogh3',
         type: 'puppies',
         attributes: {
-          name: 'Van Gogh'
+          name: 'Van Gogh',
         },
         relationships: {
-          'puppy-friends': { data: [{ type: 'puppies', id: 'vanGogh3' }] }
-        }
-      }
+          'puppy-friends': { data: [{ type: 'puppies', id: 'vanGogh3' }] },
+        },
+      },
     });
-    let { data:puppy } = await writer.create(env.session, 'puppies', {
+    let { data: puppy } = await writer.create(env.session, 'puppies', {
       data: {
         id: 'ringo2',
         type: 'puppies',
         attributes: {
-          name: 'Ringo'
+          name: 'Ringo',
         },
         relationships: {
-          'puppy-friends': { data: [{ type: 'puppies', id: 'vanGogh3' }] }
-        }
-      }
+          'puppy-friends': { data: [{ type: 'puppies', id: 'vanGogh3' }] },
+        },
+      },
     });
 
     let found = await searcher.get(env.session, 'local-hub', 'puppies', puppy.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.name');
-    expect(found.data.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: circularPuppy.id }]}});
+    expect(found.data.relationships).deep.equals({
+      'puppy-friends': { data: [{ type: 'puppies', id: circularPuppy.id }] },
+    });
     expect(found).has.property('included');
     expect(found.included).length(1);
     expect(found.included[0].attributes.name).to.equal('Van Gogh');
-    expect(found.included[0].relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: circularPuppy.id }]}});
+    expect(found.included[0].relationships).deep.equals({
+      'puppy-friends': { data: [{ type: 'puppies', id: circularPuppy.id }] },
+    });
   });
 
   /*
@@ -345,55 +364,55 @@ describe('pgsearch/indexer', function() {
     case where the invalidation should actually trigger another invalidation.
   */
   it.skip('indexes a resource that includes resources that have a circular relationship by following fieldset paths', async function() {
-    let { data:puppy } = await writer.create(env.session, 'puppies', {
+    let { data: puppy } = await writer.create(env.session, 'puppies', {
       data: {
         type: 'puppies',
         attributes: {
-          name: 'Bagel'
+          name: 'Bagel',
         },
         relationships: {
-          'puppy-friends': { data: [{ type: 'puppies', id: 'ringo3' }] }
-        }
-      }
+          'puppy-friends': { data: [{ type: 'puppies', id: 'ringo3' }] },
+        },
+      },
     });
-    let { data:puppy1 } = await writer.create(env.session, 'puppies', {
+    let { data: puppy1 } = await writer.create(env.session, 'puppies', {
       data: {
         id: 'ringo3',
         type: 'puppies',
         attributes: {
-          name: 'Ringo'
+          name: 'Ringo',
         },
         relationships: {
-          'puppy-friends': { data: [{ type: 'puppies', id: 'vanGogh4' }] }
-        }
-      }
+          'puppy-friends': { data: [{ type: 'puppies', id: 'vanGogh4' }] },
+        },
+      },
     });
-    let { data:puppy2 } = await writer.create(env.session, 'puppies', {
+    let { data: puppy2 } = await writer.create(env.session, 'puppies', {
       data: {
         id: 'vanGogh4',
         type: 'puppies',
         attributes: {
-          name: 'Van Gogh'
+          name: 'Van Gogh',
         },
         relationships: {
-          'puppy-friends': { data: [{ type: 'puppies', id: 'ringo3' }] }
-        }
-      }
+          'puppy-friends': { data: [{ type: 'puppies', id: 'ringo3' }] },
+        },
+      },
     });
 
     let found = await searcher.get(env.session, 'local-hub', 'puppies', puppy.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.name');
-    expect(found.data.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: puppy1.id }]}});
+    expect(found.data.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: puppy1.id }] } });
     expect(found).has.property('included');
     expect(found.included).length(2);
     let included1 = found.included.find(i => i.type === puppy1.type && i.id === puppy1.id);
     let included2 = found.included.find(i => i.type === puppy2.type && i.id === puppy2.id);
 
     expect(included1.attributes.name).to.equal('Ringo');
-    expect(included1.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: puppy2.id }]}});
+    expect(included1.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: puppy2.id }] } });
     expect(included2.attributes.name).to.equal('Van Gogh');
-    expect(included2.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: puppy1.id }]}});
+    expect(included2.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: puppy1.id }] } });
   });
 
   it('reuses included resources when building pristine document when upstreamDoc has includes', async function() {
@@ -406,7 +425,9 @@ describe('pgsearch/indexer', function() {
       try {
         result = await searcher.get(env.session, 'local-hub', type, id);
       } catch (err) {
-        if (err.status !== 404) { throw err; }
+        if (err.status !== 404) {
+          throw err;
+        }
       }
 
       if (result) {
@@ -414,66 +435,74 @@ describe('pgsearch/indexer', function() {
       }
     };
 
-    let { data:person } = await writer.create(env.session, 'people', {
+    let { data: person } = await writer.create(env.session, 'people', {
       data: {
         type: 'people',
         attributes: {
-          name: 'Quint'
-        }
-      }
+          name: 'Quint',
+        },
+      },
     });
-    let { data:article } = await writer.create(env.session, 'articles', {
+    let { data: article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
-          title: 'Hello World'
+          title: 'Hello World',
         },
         relationships: {
-          author: { data: { type: 'people', id: person.id } }
-        }
-      }
+          author: { data: { type: 'people', id: person.id } },
+        },
+      },
     });
 
     let { id, type } = article;
-    let { data:resource, included } = await searcher.get(env.session, 'local-hub', type, id);
+    let { data: resource, included } = await searcher.get(env.session, 'local-hub', type, id);
 
-    let pristineDoc = await (new DocumentContext({ id, type, schema, read,
+    let pristineDoc = await new DocumentContext({
+      id,
+      type,
+      schema,
+      read,
       upstreamDoc: { data: resource },
-    })).pristineDoc();
+    }).pristineDoc();
 
     expect(documentFetchCount).to.equal(1);
     expect(pristineDoc).to.deep.equal({ data: resource, included });
 
     documentFetchCount = 0;
 
-    pristineDoc = await (new DocumentContext({ id, type, schema, read,
+    pristineDoc = await new DocumentContext({
+      id,
+      type,
+      schema,
+      read,
       upstreamDoc: { data: resource, included },
-    })).pristineDoc();
+    }).pristineDoc();
 
     expect(documentFetchCount).to.equal(0);
     expect(pristineDoc).to.deep.equal({ data: resource, included });
   });
 
   it('reindexes included resources', async function() {
-    let { data:person } = await writer.create(env.session, 'people', {
+    let { data: person } = await writer.create(env.session, 'people', {
       data: {
         type: 'people',
         attributes: {
-          name: 'Quint'
-        }
-      }
+          name: 'Quint',
+        },
+      },
     });
     expect(person).has.deep.property('id');
-    let { data:article } = await writer.create(env.session, 'articles', {
+    let { data: article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
-          title: 'Hello World'
+          title: 'Hello World',
         },
         relationships: {
-          author: { data: { type: 'people', id: person.id } }
-        }
-      }
+          author: { data: { type: 'people', id: person.id } },
+        },
+      },
     });
     expect(article).has.deep.property('id');
     await indexer.update({ forceRefresh: true });
@@ -492,13 +521,13 @@ describe('pgsearch/indexer', function() {
   });
 
   it("doesn't reuse included upstream resource if it has been invalidated", async function() {
-    let { data:person } = await writer.create(env.session, 'people', {
+    let { data: person } = await writer.create(env.session, 'people', {
       data: {
         type: 'people',
         attributes: {
-          name: 'Quint'
-        }
-      }
+          name: 'Quint',
+        },
+      },
     });
     expect(person).has.deep.property('id');
 
@@ -508,25 +537,27 @@ describe('pgsearch/indexer', function() {
     let client = env.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`);
     let schema = await currentSchema.getSchema();
     let batch = client.beginBatch(schema, searcher);
-    await batch.saveDocument(searcher.createDocumentContext({
-      schema,
-      type: 'articles',
-      id: articleId,
-      sourceId: defaultDataSourceId,
-      upstreamDoc: {
-        data: {
-          id: articleId,
-          type: 'articles',
-          attributes: {
-            title: 'Hello World'
+    await batch.saveDocument(
+      searcher.createDocumentContext({
+        schema,
+        type: 'articles',
+        id: articleId,
+        sourceId: defaultDataSourceId,
+        upstreamDoc: {
+          data: {
+            id: articleId,
+            type: 'articles',
+            attributes: {
+              title: 'Hello World',
+            },
+            relationships: {
+              author: { data: { type: 'people', id: person.id } },
+            },
           },
-          relationships: {
-            author: { data: { type: 'people', id: person.id } }
-          }
+          included: [person],
         },
-        included: [person]
-      }
-    }));
+      })
+    );
     await batch.done();
     await indexer.update({ forceRefresh: true });
 
@@ -544,25 +575,25 @@ describe('pgsearch/indexer', function() {
   });
 
   it('reindexes included resources when both docs are already changing', async function() {
-    let { data:person } = await writer.create(env.session, 'people', {
+    let { data: person } = await writer.create(env.session, 'people', {
       data: {
         type: 'people',
         attributes: {
-          name: 'Quint'
-        }
-      }
+          name: 'Quint',
+        },
+      },
     });
     expect(person).has.deep.property('id');
-    let { data:article } = await writer.create(env.session, 'articles', {
+    let { data: article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
-          title: 'Hello World'
+          title: 'Hello World',
         },
         relationships: {
-          author: { data: { type: 'people', id: person.id } }
-        }
-      }
+          author: { data: { type: 'people', id: person.id } },
+        },
+      },
     });
     expect(article).has.deep.property('id');
     await indexer.update({ forceRefresh: true });
@@ -583,25 +614,25 @@ describe('pgsearch/indexer', function() {
   });
 
   it('reindexes correctly when related resource is saved before own resource', async function() {
-    let { data:person } = await writer.create(env.session, 'people', {
+    let { data: person } = await writer.create(env.session, 'people', {
       data: {
         type: 'people',
         attributes: {
-          name: 'Quint'
-        }
-      }
+          name: 'Quint',
+        },
+      },
     });
     expect(person).has.deep.property('id');
-    let { data:article } = await writer.create(env.session, 'articles', {
+    let { data: article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
-          title: 'Hello World'
+          title: 'Hello World',
         },
         relationships: {
-          author: { data: { type: 'people', id: person.id } }
-        }
-      }
+          author: { data: { type: 'people', id: person.id } },
+        },
+      },
     });
     expect(article).has.deep.property('id');
     await indexer.update({ forceRefresh: true });
@@ -623,25 +654,25 @@ describe('pgsearch/indexer', function() {
   });
 
   it('reindexes correctly when related resource is saved after own resource', async function() {
-    let { data:person } = await writer.create(env.session, 'people', {
+    let { data: person } = await writer.create(env.session, 'people', {
       data: {
         type: 'people',
         attributes: {
-          name: 'Quint'
-        }
-      }
+          name: 'Quint',
+        },
+      },
     });
     expect(person).has.deep.property('id');
-    let { data:article } = await writer.create(env.session, 'articles', {
+    let { data: article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
-          title: 'Hello World'
+          title: 'Hello World',
         },
         relationships: {
-          author: { data: { type: 'people', id: person.id } }
-        }
-      }
+          author: { data: { type: 'people', id: person.id } },
+        },
+      },
     });
     expect(article).has.deep.property('id');
     await indexer.update({ forceRefresh: true });
@@ -663,25 +694,25 @@ describe('pgsearch/indexer', function() {
   });
 
   it('invalidates resource that contains included resource that was updated', async function() {
-    let { data:person } = await writer.create(env.session, 'people', {
+    let { data: person } = await writer.create(env.session, 'people', {
       data: {
         type: 'people',
         attributes: {
-          name: 'Quint'
-        }
-      }
+          name: 'Quint',
+        },
+      },
     });
     expect(person).has.deep.property('id');
-    let { data:article } = await writer.create(env.session, 'articles', {
+    let { data: article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
-          title: 'Hello World'
+          title: 'Hello World',
         },
         relationships: {
-          author: { data: { type: 'people', id: person.id } }
-        }
-      }
+          author: { data: { type: 'people', id: person.id } },
+        },
+      },
     });
     expect(article).has.deep.property('id');
 
@@ -700,26 +731,26 @@ describe('pgsearch/indexer', function() {
   });
 
   it('invalidates expired resources', async function() {
-    let { data:person } = await writer.create(env.session, 'people', {
+    let { data: person } = await writer.create(env.session, 'people', {
       data: {
         type: 'people',
         attributes: {
-          name: 'Quint'
-        }
-      }
+          name: 'Quint',
+        },
+      },
     });
     await alterExpiration('people', person.id, '300 seconds');
 
-    let { data:article } = await writer.create(env.session, 'articles', {
+    let { data: article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
-          title: 'Hello World'
+          title: 'Hello World',
         },
         relationships: {
-          author: { data: { type: 'people', id: person.id } }
-        }
-      }
+          author: { data: { type: 'people', id: person.id } },
+        },
+      },
     });
 
     let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
@@ -736,16 +767,16 @@ describe('pgsearch/indexer', function() {
   });
 
   it('ignores a broken belongs-to', async function() {
-    let { data:article } = await writer.create(env.session, 'articles', {
+    let { data: article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
-          title: 'Hello World'
+          title: 'Hello World',
         },
         relationships: {
           author: { data: { type: 'people', id: 'x' } },
-        }
-      }
+        },
+      },
     });
     expect(article).has.deep.property('id');
     await indexer.update({ forceRefresh: true });
@@ -755,26 +786,31 @@ describe('pgsearch/indexer', function() {
   });
 
   it('ignores a broken has-many', async function() {
-    let { data:person } = await writer.create(env.session, 'people', {
+    let { data: person } = await writer.create(env.session, 'people', {
       data: {
         type: 'people',
         attributes: {
-          name: 'Quint'
-        }
-      }
+          name: 'Quint',
+        },
+      },
     });
     expect(person).has.deep.property('id');
 
-    let { data:article } = await writer.create(env.session, 'articles', {
+    let { data: article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
-          title: 'Hello World'
+          title: 'Hello World',
         },
         relationships: {
-          reviewers: { data: [{ type: 'people', id: person.id }, { type: "people", id: 'x'} ]}
-        }
-      }
+          reviewers: {
+            data: [
+              { type: 'people', id: person.id },
+              { type: 'people', id: 'x' },
+            ],
+          },
+        },
+      },
     });
     expect(article).has.deep.property('id');
     await indexer.update({ forceRefresh: true });
@@ -785,18 +821,17 @@ describe('pgsearch/indexer', function() {
     expect(found.data.relationships.reviewers.data[0]).has.property('id', person.id);
   });
 
-
   it('can fix broken relationship when it is later fixed', async function() {
-    let { data:article } = await writer.create(env.session, 'articles', {
+    let { data: article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
-          title: 'Hello World'
+          title: 'Hello World',
         },
         relationships: {
-          author: { data: { type: 'people', id: 'x' } }
-        }
-      }
+          author: { data: { type: 'people', id: 'x' } },
+        },
+      },
     });
     expect(article).has.deep.property('id');
     await indexer.update({ forceRefresh: true });
@@ -811,9 +846,9 @@ describe('pgsearch/indexer', function() {
         id: 'x',
         type: 'people',
         attributes: {
-          name: 'Quint'
-        }
-      }
+          name: 'Quint',
+        },
+      },
     });
 
     await indexer.update({ forceRefresh: true });
@@ -825,5 +860,4 @@ describe('pgsearch/indexer', function() {
     expect(found.included).length(1);
     expect(found.included[0].attributes.name).to.equal('Quint');
   });
-
 });

@@ -6,9 +6,7 @@ module.exports = Object.assign({}, browser, {
     Object.assign({}, require('./-node'), {
       // And applies them to all the paths that are node paths in a
       // standard card
-      files: [
-        '.eslintrc.js',
-      ]
-    })
-  ]
+      files: ['.eslintrc.js'],
+    }),
+  ],
 });

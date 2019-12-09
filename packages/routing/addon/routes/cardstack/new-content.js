@@ -7,8 +7,8 @@ export default Route.extend({
   queryParams: {
     // optionally prefill the routingId for the new record
     routingId: {
-      refreshModel: true
-    }
+      refreshModel: true,
+    },
   },
 
   model({ type }, transition) {
@@ -36,5 +36,5 @@ export default Route.extend({
     this._super(controller, model);
 
     controller.set('isNewContent', true);
-  }
+  },
 });

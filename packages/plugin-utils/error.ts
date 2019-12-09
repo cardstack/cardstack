@@ -27,7 +27,7 @@ class E extends Error {
   isCardstackError: boolean;
   additionalErrors: todo;
 
-  constructor(detail: todo, { status, title, source}: ErrorDetails = {}) {
+  constructor(detail: todo, { status, title, source }: ErrorDetails = {}) {
     super(detail);
     this.detail = detail;
     this.status = status || 500;
@@ -41,7 +41,7 @@ class E extends Error {
       title: this.title,
       detail: this.detail,
       code: this.status,
-      source: this.source
+      source: this.source,
     };
   }
 

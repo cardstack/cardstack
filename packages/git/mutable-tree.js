@@ -50,7 +50,7 @@ class MutableTree {
     return { tree, leaf, leafName };
   }
 
-  async traverse(path, allowCreate=false) {
+  async traverse(path, allowCreate = false) {
     let parts = path.split('/');
     let here = this;
 
@@ -69,11 +69,11 @@ class MutableTree {
     return {
       tree: here,
       leaf: here.entryByName(parts[0]),
-      leafName: parts[0]
+      leafName: parts[0],
     };
   }
 
-  async write(allowEmpty=false) {
+  async write(allowEmpty = false) {
     if (this.overlay.size === 0 && this.tree) {
       return this.tree.id();
     }
@@ -171,7 +171,7 @@ class NewEntry {
     return this._object;
   }
   async write() {
-    return this.savedId = await this._write();
+    return (this.savedId = await this._write());
   }
   async _write() {
     if (this.isBlob()) {

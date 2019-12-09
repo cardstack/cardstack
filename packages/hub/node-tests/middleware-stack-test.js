@@ -3,20 +3,18 @@ const supertest = require('supertest');
 const Koa = require('koa');
 const {
   createDefaultEnvironment,
-  destroyDefaultEnvironment
+  destroyDefaultEnvironment,
 } = require('../../../tests/stub-middleware/node_modules/@cardstack/test-support/env');
-
 
 let SecondMiddleware = require('../../../tests/stub-middleware/middleware/second.js');
 
 describe('middleware-stack', function() {
-
   let env, request;
 
   async function setup() {
     let factory = new JSONAPIFactory();
     factory.addResource('plugin-configs', 'stub-middleware-extra').withAttributes({
-      enabled: false
+      enabled: false,
     });
     env = await createDefaultEnvironment(__dirname + '/../../../tests/stub-middleware', factory.getModels());
     let app = new Koa();
@@ -71,7 +69,6 @@ describe('middleware-stack', function() {
       // tagged with 'unused-tag'.
       expect(response.body.state).has.property('thirdRan');
     });
-
   });
 
   describe('(dynamic)', function() {
@@ -79,7 +76,9 @@ describe('middleware-stack', function() {
     afterEach(teardown);
 
     it('can dynamically mount more middleware', async function() {
-      let config = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'plugin-configs', 'stub-middleware-extra');
+      let config = await env
+        .lookup('hub:searchers')
+        .get(env.session, 'local-hub', 'plugin-configs', 'stub-middleware-extra');
       config.data.attributes.enabled = true;
       await env.lookup('hub:writers').update(env.session, config.data.type, config.data.id, config);
       await env.lookup('hub:indexers').update({ forceRefresh: true });
@@ -94,9 +93,9 @@ describe('middleware-stack', function() {
           id: 'stub-middleware',
           type: 'plugin-configs',
           attributes: {
-            enabled: false
-          }
-        }
+            enabled: false,
+          },
+        },
       });
       await env.lookup('hub:indexers').update({ forceRefresh: true });
       let response = await request.get('/first');
@@ -125,17 +124,14 @@ describe('middleware-stack', function() {
           id: 'stub-middleware',
           type: 'plugin-configs',
           attributes: {
-            enabled: false
-          }
-        }
+            enabled: false,
+          },
+        },
       });
       await env.lookup('hub:indexers').update({ forceRefresh: true });
       response = await request.get('/first');
       expect(response).hasStatus(404);
       expect(SecondMiddleware._teardowns).to.equal(1);
-
     });
-
-
   });
 });

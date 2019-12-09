@@ -28,5 +28,5 @@ export default DS.JSONAPISerializer.extend(SerializerMixin, {
       delete json.data.attributes['self-link'];
     }
     return json;
-  }
+  },
 });

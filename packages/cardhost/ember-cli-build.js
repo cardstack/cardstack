@@ -9,7 +9,7 @@ module.exports = function(defaults) {
       // we're not pre-rendering any URLs yet, but we still need prember because
       // our deployment infrastructure already expects `_empty.html` to exist
       // for handling unknown URLs.
-      urls: []
+      urls: [],
     },
   });
 
@@ -27,12 +27,12 @@ module.exports = function(defaults) {
   // along with the exports of each module as its value.
   app.import('node_modules/monaco-editor/dev/vs/editor/editor.main.css');
 
-  return (function(){
+  return (function() {
     const Webpack = require('@embroider/webpack').Webpack;
     const { join } = require('path');
     const { writeFileSync } = require('fs');
 
-    return require("@embroider/compat").compatBuild(app, Webpack, {
+    return require('@embroider/compat').compatBuild(app, Webpack, {
       staticAddonTestSupportTrees: true,
       staticAddonTrees: true,
       staticHelpers: true,
@@ -43,19 +43,19 @@ module.exports = function(defaults) {
       packagerOptions: {
         webpackConfig: {
           plugins: [new MonacoWebpackPlugin(/*{languages: ['javascript', 'typescript']}*/)],
-        }
+        },
       },
       packageRules: [
         {
-          package: "@cardstack/core",
+          package: '@cardstack/core',
           appModules: {
-            "components/card-renderer.js": {
+            'components/card-renderer.js': {
               dependsOnComponents: [
                 '<Cards::Cardstack::BaseCard::Isolated/>',
                 '<Cards::Cardstack::BaseCard::Embedded/>',
-              ]
+              ],
             },
-            "components/field-renderer.js": {
+            'components/field-renderer.js': {
               dependsOnComponents: [
                 '<Fields::Cardstack::CoreTypes::StringViewer/>',
                 '<Fields::Cardstack::CoreTypes::StringEditor/>',
@@ -71,34 +71,34 @@ module.exports = function(defaults) {
                 '<Fields::Cardstack::CoreTypes::BelongsToEditor/>',
                 '<Fields::Cardstack::CoreTypes::HasManyViewer/>',
                 '<Fields::Cardstack::CoreTypes::HasManyEditor/>',
-              ]
-            },
-          }
-        },
-        {
-          package: "@cardstack/routing",
-          addonModules: {
-            "routes/cardstack/common.js": {
-              dependsOnComponents: ["<HeadLayout/>"],
+              ],
             },
           },
         },
         {
-          package: "ember-elsewhere",
-          components: {
-            "<ToElsewhere/>": {
-              acceptsComponentArguments: ["send"],
+          package: '@cardstack/routing',
+          addonModules: {
+            'routes/cardstack/common.js': {
+              dependsOnComponents: ['<HeadLayout/>'],
             },
-            "<FromElsewhere/>": {
+          },
+        },
+        {
+          package: 'ember-elsewhere',
+          components: {
+            '<ToElsewhere/>': {
+              acceptsComponentArguments: ['send'],
+            },
+            '<FromElsewhere/>': {
               yieldsSafeComponents: [true],
             },
           },
         },
         {
-          package: "liquid-fire",
+          package: 'liquid-fire',
           components: {
-            "{{liquid-bind}}": {
-              yieldsArguments: ["value"],
+            '{{liquid-bind}}': {
+              yieldsArguments: ['value'],
             },
           },
         },

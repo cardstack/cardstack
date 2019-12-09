@@ -25,7 +25,7 @@ export default Service.extend({
     this._contentTypeCache = {};
   },
 
-  async load(type, id, format, opts={}) {
+  async load(type, id, format, opts = {}) {
     let store = this.get('store');
     let contentType = await this._getContentType(type);
     let fieldset = contentType.get(`fieldsets.${format}`);
@@ -44,7 +44,7 @@ export default Service.extend({
     return record;
   },
 
-  async query(format, opts={}) {
+  async query(format, opts = {}) {
     let store = this.get('store');
     let type = opts.type || 'cardstack-card';
     let _opts = Object.assign({ modelName: type }, opts);
@@ -61,7 +61,7 @@ export default Service.extend({
     return result;
   },
 
-  async queryCard(format, opts={}) {
+  async queryCard(format, opts = {}) {
     let card;
     let result = await this.query(format, opts);
     if (result && (card = result.toArray()) && card) {
@@ -71,12 +71,12 @@ export default Service.extend({
 
   async validate(model) {
     let toValidate = [model, ...model.relatedOwnedRecords()];
-    let responses = toValidate.map(async (record) => {
+    let responses = toValidate.map(async record => {
       let { url, verb } = this._validationRequestParams(record);
       let response = await fetch(url, {
         method: verb,
         headers: this._headers(),
-        body: JSON.stringify(record.serialize())
+        body: JSON.stringify(record.serialize()),
       });
       let { status } = response;
       if (status === 422) {
@@ -103,29 +103,27 @@ export default Service.extend({
     }
     let url = `${hubURL}/api/permissions/${permissionsPath}`;
     let response = await fetch(url, {
-      headers: this._headers()
+      headers: this._headers(),
     });
     if (response.status !== 200) {
       let permissionsSubject = model.id ? `${modelName}/${model.id}` : modelName;
-      throw new Error(`Couldn't fetch permissions for ${permissionsSubject}`)
+      throw new Error(`Couldn't fetch permissions for ${permissionsSubject}`);
     }
     let { data } = await response.json();
     let { attributes, relationships } = data;
     return {
       mayUpdateResource: attributes['may-update-resource'],
-      writableFields: relationships['writable-fields'].data
-        .map((field) => camelize(field.id))
-    }
+      writableFields: relationships['writable-fields'].data.map(field => camelize(field.id)),
+    };
   },
 
   getCardMeta(card, attribute) {
     if (attribute === 'human-id') {
       let humanType = getType(card)
         .split('-')
-        .map((s) => capitalize(s))
+        .map(s => capitalize(s))
         .join(' ');
-      return [`${humanType} `, card.id]
-        .join('#');
+      return [`${humanType} `, card.id].join('#');
     }
     if (attribute === 'uid') {
       return `${getType(card)}/${card.id}`;
@@ -140,7 +138,7 @@ export default Service.extend({
   _headers() {
     let headers = {
       'Content-Type': 'application/vnd.api+json',
-      'Accept': 'application/vnd.api+json',
+      Accept: 'application/vnd.api+json',
     };
     let token = this.get('cardstackSession.token');
     if (token) {
@@ -186,17 +184,23 @@ export default Service.extend({
   },
 
   async _loadRelatedRecords(record, format) {
-    if (!record || !getType(record)) { return; }
+    if (!record || !getType(record)) {
+      return;
+    }
 
     let contentType = await this._getContentType(getType(record));
     let fieldset = contentType.get(`fieldsets.${format}`);
 
-    if (!fieldset || !fieldset.length) { return; } // record is already loaded, you are all done
+    if (!fieldset || !fieldset.length) {
+      return;
+    } // record is already loaded, you are all done
 
     let recordLoadPromises = [];
     for (let fieldItem of fieldset) {
       let fieldRecord = await record.get(camelize(fieldItem.field));
-      if (!fieldRecord) { continue; }
+      if (!fieldRecord) {
+        continue;
+      }
 
       if (fieldRecord instanceof DS.ManyArray) {
         for (let fieldRecordItem of fieldRecord.toArray()) {
@@ -212,7 +216,9 @@ export default Service.extend({
 
   async _recurseRecord(record, format) {
     let loadedRecord = await this._loadRecord(getType(record), record.id, format);
-    if (!loadedRecord) { return; }
+    if (!loadedRecord) {
+      return;
+    }
     await this._loadRelatedRecords(loadedRecord, format);
   },
 
@@ -221,7 +227,9 @@ export default Service.extend({
     let fieldRecordType = await this._getContentType(type);
     let fieldset = fieldRecordType.get(`fieldsets.${format}`);
 
-    if (!fieldset) { return; }
+    if (!fieldset) {
+      return;
+    }
 
     let include = fieldset.map(i => i.field).join(',') || noFields; // note that ember data ignores an empty string includes, so setting to nonsense field
     let cacheKey = `${type}/${id}:${include}`;
@@ -237,5 +245,5 @@ export default Service.extend({
     this._loadedRecordsCache[cacheKey] = store.findRecord(type, id, { include, reload: true });
 
     return await this._loadedRecordsCache[cacheKey];
-  }
+  },
 });

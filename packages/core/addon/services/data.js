@@ -1,14 +1,5 @@
 import Service from '@ember/service';
-import {
-  get,
-  set,
-  uniqBy,
-  merge,
-  cloneDeep,
-  unionBy,
-  difference,
-  partition
-} from 'lodash';
+import { get, set, uniqBy, merge, cloneDeep, unionBy, difference, partition } from 'lodash';
 import { hubURL } from '@cardstack/plugin-utils/environment';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
@@ -21,22 +12,23 @@ let fieldNonce = 0;
 let priv = new WeakMap();
 let store = {
   isolated: new Map(),
-  embedded: new Map()
-}
-
+  embedded: new Map(),
+};
 
 export default class DataService extends Service {
   @service cardstackSession;
 
   async getCard(id, format) {
-    if (!['isolated', 'embedded'].includes(format)) { throw new Error(`unknown format specified when getting card '${id}': '${format}'`); }
+    if (!['isolated', 'embedded'].includes(format)) {
+      throw new Error(`unknown format specified when getting card '${id}': '${format}'`);
+    }
 
     if (store[format].has(id)) {
       return new Card({
         id,
         loadedFormat: format,
         session: this.cardstackSession,
-        data: await store[format].get(id)
+        data: await store[format].get(id),
       });
     } else {
       let card = new Card({
@@ -54,23 +46,33 @@ export default class DataService extends Service {
       adoptedFrom,
       isNew: true,
       loadedFormat: 'isolated',
-      session: this.cardstackSession
+      session: this.cardstackSession,
     });
   }
 
   async allCardsInStore() {
-    let isolatedCards = await Promise.all([...store.isolated.keys()].map(async id => new Card({
-        id,
-        loadedFormat: 'isolated',
-        session: this.cardstackSession,
-        data: await store.isolated.get(id)
-      })));
-    let embeddedCards = await Promise.all(difference([...store.embedded.keys()], [...store.isolated.keys()]).map(async id => new Card({
-        id,
-        loadedFormat: 'embedded',
-        session: this.cardstackSession,
-        data: await store.embedded.get(id)
-      })));
+    let isolatedCards = await Promise.all(
+      [...store.isolated.keys()].map(
+        async id =>
+          new Card({
+            id,
+            loadedFormat: 'isolated',
+            session: this.cardstackSession,
+            data: await store.isolated.get(id),
+          })
+      )
+    );
+    let embeddedCards = await Promise.all(
+      difference([...store.embedded.keys()], [...store.isolated.keys()]).map(
+        async id =>
+          new Card({
+            id,
+            loadedFormat: 'embedded',
+            session: this.cardstackSession,
+            data: await store.embedded.get(id),
+          })
+      )
+    );
 
     return isolatedCards.concat(embeddedCards);
   }
@@ -83,14 +85,7 @@ export default class DataService extends Service {
 }
 
 class Card {
-  constructor({
-    id,
-    adoptedFrom,
-    loadedFormat = "embedded",
-    isNew = false,
-    session,
-    data
-  }) {
+  constructor({ id, adoptedFrom, loadedFormat = 'embedded', isNew = false, session, data }) {
     if (id.split(cardIdDelim).length !== 2) {
       throw new Error(
         `The card ID '${id}' format is incorrect. The card ID must be formatted as 'repository::card-name'`
@@ -103,7 +98,7 @@ class Card {
     }
 
     // this keeps our internal state private
-    let adoptedFromId = get(data, "data.relationships.adopted-from.data.id");
+    let adoptedFromId = get(data, 'data.relationships.adopted-from.data.id');
     if (adoptedFrom) {
       adoptedFromId = adoptedFrom.id;
     }
@@ -118,29 +113,29 @@ class Card {
         isNew,
         loadedFormat,
         isDirty: isNew || false,
-        isolatedCss: data ? get(data, "data.attributes.isolated-css") : null,
-        embeddedCss: data ? get(data, "data.attributes.embedded-css") : null,
-        serverEmbeddedData: (loadedFormat === "embedded" ? data : null) || {
-          data: { id, type: "cards" }
+        isolatedCss: data ? get(data, 'data.attributes.isolated-css') : null,
+        embeddedCss: data ? get(data, 'data.attributes.embedded-css') : null,
+        serverEmbeddedData: (loadedFormat === 'embedded' ? data : null) || {
+          data: { id, type: 'cards' },
         },
-        serverIsolatedData: (loadedFormat === "isolated" ? data : null) || {
+        serverIsolatedData: (loadedFormat === 'isolated' ? data : null) || {
           data: {
             id,
-            type: "cards",
+            type: 'cards',
             relationships: {
               fields: {
-                data: []
+                data: [],
               },
-              "adopted-from": {
-                data: { type: "cards", id: adoptedFromId }
+              'adopted-from': {
+                data: { type: 'cards', id: adoptedFromId },
               },
               model: {
-                data: { type: id, id }
-              }
-            }
+                data: { type: id, id },
+              },
+            },
           },
-          included: [{ id, type: id }]
-        }
+          included: [{ id, type: id }],
+        },
       })
     );
 
@@ -202,14 +197,12 @@ class Card {
     }
 
     let adoptedFromId;
-    if ((adoptedFromId = get(internal, "adoptedFrom.id"))) {
+    if ((adoptedFromId = get(internal, 'adoptedFrom.id'))) {
       return adoptedFromId;
     }
 
     let cardJson =
-      this.loadedFormat === "isolated"
-        ? get(internal, "serverIsolatedData")
-        : get(internal, "serverEmbeddedData");
+      this.loadedFormat === 'isolated' ? get(internal, 'serverIsolatedData') : get(internal, 'serverEmbeddedData');
     return get(cardJson, `data.relationships.adopted-from.data.id`) || baseCard;
   }
 
@@ -221,7 +214,7 @@ class Card {
   }
 
   get adoptedFrom() {
-    if (this.loadedFormat === "embedded") {
+    if (this.loadedFormat === 'embedded') {
       throw new Error(
         `The card '${this.id}' must be loaded in the isolated format first before you can get the adoptedFrom. Invoke card.load() first, before getting adoptedFrom`
       );
@@ -230,7 +223,7 @@ class Card {
   }
 
   get isolatedFields() {
-    if (this.loadedFormat === "embedded") {
+    if (this.loadedFormat === 'embedded') {
       throw new Error(
         `Cannot get isolatedFields for card '${this.id}' because card has not loaded isolated format. Invoke card.load() first, before getting isolatedFields`
       );
@@ -257,24 +250,20 @@ class Card {
 
   setAdoptedFrom(card) {
     if (!card) {
-      throw new Error(
-        "Cannot setAdoptedFrom, no card was specified to adopt from"
-      );
+      throw new Error('Cannot setAdoptedFrom, no card was specified to adopt from');
     }
     if (this.isDestroyed) {
-      throw new Error("Cannot setAdoptedFrom from destroyed card");
+      throw new Error('Cannot setAdoptedFrom from destroyed card');
     }
     if (card.isDestroyed) {
-      throw new Error(
-        `Cannot setAdoptedFrom, the specifed card to adopt '${card.id}' has been destroyed`
-      );
+      throw new Error(`Cannot setAdoptedFrom, the specifed card to adopt '${card.id}' has been destroyed`);
     }
-    if (card.loadedFormat !== "isolated") {
+    if (card.loadedFormat !== 'isolated') {
       throw new Error(
         `Cannot setAdoptedFrom to use the provided card '${card.id}' because it is not fully loaded. Call card.load() on the card you wish to adopt from first.`
       );
     }
-    if (this.loadedFormat !== "isolated") {
+    if (this.loadedFormat !== 'isolated') {
       throw new Error(
         `Cannot setAdoptedFrom on the card '${this.id}' because it is not fully loaded. Call card.load() on your card before calling setAdoptedFrom().`
       );
@@ -290,56 +279,44 @@ class Card {
     } // you are already adopting this card, do nothing
 
     let ownFields = this.fields.filter(i => !i.isAdopted);
-    let conflictingFields = ownFields.filter(i =>
-      card.fields.find(j => j.name === i.name)
-    );
+    let conflictingFields = ownFields.filter(i => card.fields.find(j => j.name === i.name));
     if (conflictingFields.length) {
       throw new Error(
-        `Cannot setAdoptedFrom to use the provided card '${
-          card.id
-        }' because the field(s) ${conflictingFields
+        `Cannot setAdoptedFrom to use the provided card '${card.id}' because the field(s) ${conflictingFields
           .map(i => "'" + i.name + "'")
-          .join(", ")} conflict with the specified card to adopt from.`
+          .join(', ')} conflict with the specified card to adopt from.`
       );
     }
 
     let internal = priv.get(this);
     let oldAdoptedFrom = this.adoptedFrom;
     if (oldAdoptedFrom) {
-      internal.serverIsolatedData.included = (
-        internal.serverIsolatedData.included || []
-      ).filter(i => `${i.type}/${i.id}` !== `cards/${oldAdoptedFrom.id}`);
+      internal.serverIsolatedData.included = (internal.serverIsolatedData.included || []).filter(
+        i => `${i.type}/${i.id}` !== `cards/${oldAdoptedFrom.id}`
+      );
     }
 
     // remove adopted fields (and their included data) that do not have the same source as the fields set in card
-    let namespacedAdoptedFields = card.fields.map(
-      i => `${i.source}::${i.name}`
-    );
+    let namespacedAdoptedFields = card.fields.map(i => `${i.source}::${i.name}`);
     let fieldToRemove = this.fields.filter(
-      i =>
-        i.isAdopted &&
-        !namespacedAdoptedFields.includes(`${i.source}::${i.name}`)
+      i => i.isAdopted && !namespacedAdoptedFields.includes(`${i.source}::${i.name}`)
     );
     for (let field of fieldToRemove) {
       internal.fields = internal.fields.filter(i => i.name !== field.name);
-      if (
-        field.value &&
-        field.type === "@cardstack/core-types::belongs-to" &&
-        field.value.id
-      ) {
-        internal.serverIsolatedData.included = (
-          internal.serverIsolatedData.included || []
-        ).filter(i => `${i.type}/${i.id}` !== `cards/${field.value.id}`);
+      if (field.value && field.type === '@cardstack/core-types::belongs-to' && field.value.id) {
+        internal.serverIsolatedData.included = (internal.serverIsolatedData.included || []).filter(
+          i => `${i.type}/${i.id}` !== `cards/${field.value.id}`
+        );
       } else if (
         field.value &&
-        field.type === "@cardstack/core-types::has-many" &&
+        field.type === '@cardstack/core-types::has-many' &&
         Array.isArray(field.value) &&
-        field.value.every(i => get(i, "constructor.name") === "Card")
+        field.value.every(i => get(i, 'constructor.name') === 'Card')
       ) {
         let removedIncludeds = field.value.map(i => `cards/${i.id}`);
-        internal.serverIsolatedData.included = (
-          internal.serverIsolatedData.included || []
-        ).filter(i => !removedIncludeds.includes(`${i.type}/${i.id}`));
+        internal.serverIsolatedData.included = (internal.serverIsolatedData.included || []).filter(
+          i => !removedIncludeds.includes(`${i.type}/${i.id}`)
+        );
       }
 
       let fieldInternals = priv.get(field);
@@ -364,7 +341,7 @@ class Card {
 
   getField(fieldName) {
     if (this.isDestroyed) {
-      throw new Error("Cannot call getField from destroyed card");
+      throw new Error('Cannot call getField from destroyed card');
     }
     let internal = priv.get(this);
     return (internal.fields || []).find(i => i.name === fieldName);
@@ -372,38 +349,26 @@ class Card {
 
   getFieldByNonce(fieldNonce) {
     if (this.isDestroyed) {
-      throw new Error("Cannot call getFieldByNonce from destroyed card");
+      throw new Error('Cannot call getFieldByNonce from destroyed card');
     }
     let internal = priv.get(this);
     return (internal.fields || []).find(i => i.nonce === fieldNonce);
   }
 
-  addField({
-    name,
-    label,
-    type,
-    instructions,
-    neededWhenEmbedded = false,
-    value,
-    position
-  }) {
+  addField({ name, label, type, instructions, neededWhenEmbedded = false, value, position }) {
     if (this.isDestroyed) {
-      throw new Error("Cannot addField from destroyed card");
+      throw new Error('Cannot addField from destroyed card');
     }
-    if (this.loadedFormat === "embedded") {
+    if (this.loadedFormat === 'embedded') {
       throw new Error(
         `Cannot addField() on card id '${this.id}' because the card is in the embedded format. Use card.load() to get the isolated form of the card before adding fields.`
       );
     }
     if (!name) {
-      throw new Error(
-        `'addField()' called for card id '${this.id}' is missing 'name'`
-      );
+      throw new Error(`'addField()' called for card id '${this.id}' is missing 'name'`);
     }
     if (!type) {
-      throw new Error(
-        `'addField()' called for card id '${this.id}' is missing 'type'`
-      );
+      throw new Error(`'addField()' called for card id '${this.id}' is missing 'type'`);
     }
     if (this.fields.find(i => i.name === name)) {
       throw new Error(
@@ -420,7 +385,7 @@ class Card {
       neededWhenEmbedded,
       instructions,
       value,
-      source: this.id
+      source: this.id,
     });
     let internal = priv.get(this);
     internal.fields.push(field);
@@ -435,17 +400,15 @@ class Card {
 
   moveField(field, position) {
     if (this.isDestroyed) {
-      throw new Error("Cannot moveField from destroyed card");
+      throw new Error('Cannot moveField from destroyed card');
     }
-    if (this.loadedFormat === "embedded") {
+    if (this.loadedFormat === 'embedded') {
       throw new Error(
         `Cannot moveField() on card id '${this.id}' because the card is in the embedded format. Use card.load() to get the isolated form of the card before moving the field.`
       );
     }
     if (!(field instanceof Field)) {
-      throw new Error(
-        `Cannot moveField(), the field specified is not an instance of the Field class`
-      );
+      throw new Error(`Cannot moveField(), the field specified is not an instance of the Field class`);
     }
     if (position > this.fields.length - 1) {
       throw new Error(
@@ -459,17 +422,11 @@ class Card {
     } // the position is not actually changing
 
     if (currentIndex === -1) {
-      throw new Error(
-        `Cannot moveField(). The field specified is not a field of the card '${this.id}'`
-      );
+      throw new Error(`Cannot moveField(). The field specified is not a field of the card '${this.id}'`);
     }
 
     let internal = priv.get(this);
-    internal.fields.splice(
-      position,
-      0,
-      internal.fields.splice(currentIndex, 1)[0]
-    );
+    internal.fields.splice(position, 0, internal.fields.splice(currentIndex, 1)[0]);
     // eslint-disable-next-line no-self-assign
     internal.fields = internal.fields; // oh glimmer, you so silly...
     internal.isDirty = true;
@@ -478,16 +435,16 @@ class Card {
   }
 
   setIsolatedCss(css) {
-    return setCss(this, "isolated", css);
+    return setCss(this, 'isolated', css);
   }
 
   setEmbeddedCss(css) {
-    return setCss(this, "embedded", css);
+    return setCss(this, 'embedded', css);
   }
 
   async save() {
     if (this.isDestroyed) {
-      throw new Error("Cannot save from destroyed card");
+      throw new Error('Cannot save from destroyed card');
     }
     if (!this.isDirty) {
       return this;
@@ -497,9 +454,9 @@ class Card {
     // we don't want to indavertantly clear fields of the card just because the embedded format does not
     // use a field. The use case for this is the ability of a user to edit owned relationships that are cards
     let internal = priv.get(this);
-    if (this.loadedFormat === "embedded") {
+    if (this.loadedFormat === 'embedded') {
       let updatedFields = this.fields;
-      await this.load("isolated");
+      await this.load('isolated');
       internal.fields = unionBy(updatedFields, internal.fields, i => i.name);
     }
 
@@ -508,9 +465,7 @@ class Card {
     if (!this.isNew) {
       await invalidate(this.id);
     }
-    for (let card of (internal.serverIsolatedData.included || []).filter(
-      i => i.type === "cards"
-    )) {
+    for (let card of (internal.serverIsolatedData.included || []).filter(i => i.type === 'cards')) {
       store.embedded.set(card.id, new Promise(res => res({ data: card })));
     }
 
@@ -522,47 +477,35 @@ class Card {
     return this;
   }
 
-  async load(format = "isolated") {
+  async load(format = 'isolated') {
     if (this.isDestroyed) {
-      throw new Error("Cannot load from destroyed card");
+      throw new Error('Cannot load from destroyed card');
     }
-    if (!["isolated", "embedded"].includes(format)) {
-      throw new Error(
-        `unknown format specified in 'load()' for card '${this.id}': '${format}'`
-      );
+    if (!['isolated', 'embedded'].includes(format)) {
+      throw new Error(`unknown format specified in 'load()' for card '${this.id}': '${format}'`);
     }
 
     // It's really kind of odd to explicitly load the embedded format for a Card, as the embedded format should have been loaded
     // via another card's relationships to this card. I wonder if we should just only ever load the isolated format in this method...
-    if (format === "embedded" && this.loadedFormat === "isolated") {
+    if (format === 'embedded' && this.loadedFormat === 'isolated') {
       return this;
     } // the embedded format has already been loaded
 
     let internal = priv.get(this);
     internal.loadedFormat = format;
     store[format].set(this.id, load(internal.session, this.id, format));
-    if (format === "isolated") {
+    if (format === 'isolated') {
       internal.serverIsolatedData = await store[format].get(this.id);
-      await invalidate(
-        this.id,
-        get(internal.serverIsolatedData, "data.meta.version")
-      );
-      for (let card of (internal.serverIsolatedData.included || []).filter(
-        i => i.type === "cards"
-      )) {
-        await invalidate(card.id, get(card, "meta.version"));
+      await invalidate(this.id, get(internal.serverIsolatedData, 'data.meta.version'));
+      for (let card of (internal.serverIsolatedData.included || []).filter(i => i.type === 'cards')) {
+        await invalidate(card.id, get(card, 'meta.version'));
         store.embedded.set(card.id, new Promise(res => res({ data: card })));
       }
     } else {
       internal.serverEmbeddedData = await store[format].get(this.id);
-      await invalidate(
-        this.id,
-        get(internal.serverEmbeddedData, "data.meta.version")
-      );
-      for (let card of (internal.serverEmbeddedData.included || []).filter(
-        i => i.type === "cards"
-      )) {
-        await invalidate(card.id, get(card, "meta.version"));
+      await invalidate(this.id, get(internal.serverEmbeddedData, 'data.meta.version'));
+      for (let card of (internal.serverEmbeddedData.included || []).filter(i => i.type === 'cards')) {
+        await invalidate(card.id, get(card, 'meta.version'));
         store.embedded.set(card.id, new Promise(res => res({ data: card })));
       }
     }
@@ -575,35 +518,29 @@ class Card {
 
   async delete() {
     if (this.isDestroyed) {
-      throw new Error("Cannot delete from destroyed card");
+      throw new Error('Cannot delete from destroyed card');
     }
-    let version = get(this.json, "data.meta.version");
+    let version = get(this.json, 'data.meta.version');
     if (version == null) {
-      await this.load("embedded");
-      version = get(this.json, "data.meta.version");
+      await this.load('embedded');
+      version = get(this.json, 'data.meta.version');
       if (version == null) {
         throw new Error(`cannot determine version of card '${this.id}'`);
       }
     }
 
     let internal = priv.get(this);
-    let response = await fetch(
-      `${hubURL}/api/cards/${encodeURIComponent(this.id)}`,
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/vnd.api+json",
-          Authorization: `Bearer ${internal.session.token}`,
-          "If-Match": version
-        }
-      }
-    );
+    let response = await fetch(`${hubURL}/api/cards/${encodeURIComponent(this.id)}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+        Authorization: `Bearer ${internal.session.token}`,
+        'If-Match': version,
+      },
+    });
     if (!response.ok) {
       let error = await response.json();
-      throw new Error(
-        `Cannot delete card ${response.status}: ${response.statusText}`,
-        error
-      );
+      throw new Error(`Cannot delete card ${response.status}: ${response.statusText}`, error);
     }
     for (let field of this.fields) {
       priv.get(field).isDestroyed = true;
@@ -619,29 +556,22 @@ class Card {
 // Internal card fields (fields not exposed as metadata) are intentionally
 // not exposed by this API--maybe we decide to change that in the future...
 class Field {
-  constructor({
-    card,
-    name,
-    type,
-    label,
-    instructions,
-    source,
-    neededWhenEmbedded,
-    isAdopted,
-    value
-  }) {
+  constructor({ card, name, type, label, instructions, source, neededWhenEmbedded, isAdopted, value }) {
     // this keeps our internal state private
-    priv.set(this, new FieldInternals({
-      card,
-      name,
-      type,
-      label,
-      source,
-      instructions,
-      neededWhenEmbedded,
-      isAdopted,
-      value
-    }));
+    priv.set(
+      this,
+      new FieldInternals({
+        card,
+        name,
+        type,
+        label,
+        source,
+        instructions,
+        neededWhenEmbedded,
+        isAdopted,
+        value,
+      })
+    );
   }
 
   toString() {
@@ -698,7 +628,7 @@ class Field {
   }
 
   get json() {
-    let { name:id, type, neededWhenEmbedded, serverData, label = null, instructions = null } = priv.get(this);
+    let { name: id, type, neededWhenEmbedded, serverData, label = null, instructions = null } = priv.get(this);
     // We're returning a JSON:API document here (as opposed to a resource) since eventually
     // a field may encapsulate constraints as included resources within its document
     return {
@@ -709,25 +639,39 @@ class Field {
           'is-metadata': true,
           'needed-when-embedded': neededWhenEmbedded,
           'field-type': type,
-          'caption': label,
-          'instructions': instructions
-        }
-      })
+          caption: label,
+          instructions: instructions,
+        },
+      }),
     };
   }
 
   setName(name) {
-    if (this.isDestroyed) { throw new Error('Cannot setName from destroyed field'); }
-    if (this.isAdopted) { throw new Error(`Cannot setName() on card id '${this.card.id}', field: '${this.name}' because this field is an adopted field and adopted fields cannot have their name changed.`); }
+    if (this.isDestroyed) {
+      throw new Error('Cannot setName from destroyed field');
+    }
+    if (this.isAdopted) {
+      throw new Error(
+        `Cannot setName() on card id '${this.card.id}', field: '${this.name}' because this field is an adopted field and adopted fields cannot have their name changed.`
+      );
+    }
 
     let internal = priv.get(this);
     let internalCard = priv.get(this.card);
     let oldName = internal.name;
-    if (name === oldName) { return this; } // nothing is changing, so do nothing
-    if (this.card.getField(name)) { throw new Error(`Cannot change the field name from '${this.name}' to '${name}'. A field with the name '${name}' already exists in this card '${this.card.id}'.`); }
+    if (name === oldName) {
+      return this;
+    } // nothing is changing, so do nothing
+    if (this.card.getField(name)) {
+      throw new Error(
+        `Cannot change the field name from '${this.name}' to '${name}'. A field with the name '${name}' already exists in this card '${this.card.id}'.`
+      );
+    }
 
     internal.name = name;
-    internalCard.serverIsolatedData.included = (internalCard.serverIsolatedData.included || []).filter(i => `${i.type}/${i.id}` !== `fields/${oldName}`);
+    internalCard.serverIsolatedData.included = (internalCard.serverIsolatedData.included || []).filter(
+      i => `${i.type}/${i.id}` !== `fields/${oldName}`
+    );
 
     // eslint-disable-next-line no-self-assign
     internalCard.fields = internalCard.fields; // oh glimmer, you so silly...
@@ -739,8 +683,14 @@ class Field {
   }
 
   setLabel(label) {
-    if (this.isDestroyed) { throw new Error('Cannot setLabel from destroyed field'); }
-    if (this.isAdopted) { throw new Error(`Cannot setLabel() on card id '${this.card.id}', field: '${this.name}' because this field is an adopted field and adopted fields cannot have their label changed.`); }
+    if (this.isDestroyed) {
+      throw new Error('Cannot setLabel from destroyed field');
+    }
+    if (this.isAdopted) {
+      throw new Error(
+        `Cannot setLabel() on card id '${this.card.id}', field: '${this.name}' because this field is an adopted field and adopted fields cannot have their label changed.`
+      );
+    }
 
     let internal = priv.get(this);
     let internalCard = priv.get(this.card);
@@ -759,8 +709,14 @@ class Field {
   }
 
   setInstructions(label) {
-    if (this.isDestroyed) { throw new Error('Cannot setInstructions from destroyed field'); }
-    if (this.isAdopted) { throw new Error(`Cannot setInstructions() on card id '${this.card.id}', field: '${this.name}' because this field is an adopted field and adopted fields cannot have their instructions changed.`); }
+    if (this.isDestroyed) {
+      throw new Error('Cannot setInstructions from destroyed field');
+    }
+    if (this.isAdopted) {
+      throw new Error(
+        `Cannot setInstructions() on card id '${this.card.id}', field: '${this.name}' because this field is an adopted field and adopted fields cannot have their instructions changed.`
+      );
+    }
 
     let internal = priv.get(this);
     let internalCard = priv.get(this.card);
@@ -775,7 +731,9 @@ class Field {
   }
 
   setValue(value) {
-    if (this.isDestroyed) { throw new Error('Cannot setValue from destroyed field'); }
+    if (this.isDestroyed) {
+      throw new Error('Cannot setValue from destroyed field');
+    }
 
     let internal = priv.get(this);
     let internalCard = priv.get(this.card);
@@ -787,9 +745,17 @@ class Field {
       }
       internal.value = value;
     } else if (this.type === '@cardstack/core-types::has-many') {
-      if (!Array.isArray(value)) { throw new Error(`Cannot set cards relationships on card id '${this.card.id}', field '${this.name}' from value '${JSON.stringify(value)}'. The value must be an array of Cards.`); }
+      if (!Array.isArray(value)) {
+        throw new Error(
+          `Cannot set cards relationships on card id '${this.card.id}', field '${
+            this.name
+          }' from value '${JSON.stringify(value)}'. The value must be an array of Cards.`
+        );
+      }
 
-      value = [].concat(value.map(i => !(i instanceof Card) ? new Card({ id: i, session: internalCard.session }) : i));
+      value = [].concat(
+        value.map(i => (!(i instanceof Card) ? new Card({ id: i, session: internalCard.session }) : i))
+      );
       internal.value = value;
     } else {
       internal.value = value;
@@ -802,15 +768,27 @@ class Field {
   }
 
   remove() {
-    if (this.isDestroyed) { throw new Error('Cannot removeField from destroyed field'); }
-    if (this.card.loadedFormat === 'embedded') { throw new Error(`Cannot removeField() on card id '${this.card.id}', field '${this.name}' because the card is in the embedded format. Use card.load('isolated') to get the isolated form of the card before removing the field.`) }
-    if (this.isAdopted) { throw new Error(`Cannot removeField() on card id '${this.card.id}', field: '${this.name}' because this field is an adopted field and adopted fields cannot be removed.`); }
+    if (this.isDestroyed) {
+      throw new Error('Cannot removeField from destroyed field');
+    }
+    if (this.card.loadedFormat === 'embedded') {
+      throw new Error(
+        `Cannot removeField() on card id '${this.card.id}', field '${this.name}' because the card is in the embedded format. Use card.load('isolated') to get the isolated form of the card before removing the field.`
+      );
+    }
+    if (this.isAdopted) {
+      throw new Error(
+        `Cannot removeField() on card id '${this.card.id}', field: '${this.name}' because this field is an adopted field and adopted fields cannot be removed.`
+      );
+    }
 
     let internal = priv.get(this);
     let internalCard = priv.get(this.card);
 
     internalCard.fields = internalCard.fields.filter(i => i.name !== this.name);
-    internalCard.serverIsolatedData.included = (internalCard.serverIsolatedData.included || []).filter(i => `${i.type}/${i.id}` !== `fields/${this.name}`);
+    internalCard.serverIsolatedData.included = (internalCard.serverIsolatedData.included || []).filter(
+      i => `${i.type}/${i.id}` !== `fields/${this.name}`
+    );
     // eslint-disable-next-line no-self-assign
     internal.serverIsolatedData = internal.serverIsolatedData; // oh glimmer, you so silly...
     internalCard.isDirty = true;
@@ -818,12 +796,24 @@ class Field {
   }
 
   setNeededWhenEmbedded(neededWhenEmbedded) {
-    if (this.isDestroyed) { throw new Error('Cannot setNeededWhenEmbedded() from destroyed field'); }
-    if (this.card.loadedFormat === 'embedded') { throw new Error(`Cannot setNeededWhenEmbedded() on card id '${this.card.id}', field '${this.name}' because the card is in the embedded format. Use card.load('isolated') to get the isolated form of the card.`) }
-    if (this.isAdopted) { throw new Error(`Cannot setNeededWhenEmbedded() on card id '${this.card.id}', field: '${this.name}' because this field is an adopted field and adopted fields cannot have their neededWhenEmbedded value changed.`); }
+    if (this.isDestroyed) {
+      throw new Error('Cannot setNeededWhenEmbedded() from destroyed field');
+    }
+    if (this.card.loadedFormat === 'embedded') {
+      throw new Error(
+        `Cannot setNeededWhenEmbedded() on card id '${this.card.id}', field '${this.name}' because the card is in the embedded format. Use card.load('isolated') to get the isolated form of the card.`
+      );
+    }
+    if (this.isAdopted) {
+      throw new Error(
+        `Cannot setNeededWhenEmbedded() on card id '${this.card.id}', field: '${this.name}' because this field is an adopted field and adopted fields cannot have their neededWhenEmbedded value changed.`
+      );
+    }
 
     let internal = priv.get(this);
-    if (internal.neededWhenEmbedded === neededWhenEmbedded) { return this; }
+    if (internal.neededWhenEmbedded === neededWhenEmbedded) {
+      return this;
+    }
 
     let internalCard = priv.get(this.card);
     internal.neededWhenEmbedded = neededWhenEmbedded;
@@ -860,12 +850,12 @@ class CardInternals {
     loadedFormat,
     isDirty,
     isLoaded,
-    fields=[],
+    fields = [],
     isolatedCss,
     embeddedCss,
     serverEmbeddedData,
     serverIsolatedData,
-    adoptedFrom
+    adoptedFrom,
   }) {
     this.id = id;
     this.session = session;
@@ -898,18 +888,7 @@ class FieldInternals {
   @tracked isDestroyed;
   // TODO add contraints and "related cards" capabilities
 
-  constructor({
-    card,
-    name,
-    label,
-    instructions,
-    type,
-    neededWhenEmbedded,
-    isAdopted,
-    value,
-    source,
-    serverData
-  }) {
+  constructor({ card, name, label, instructions, type, neededWhenEmbedded, isAdopted, value, source, serverData }) {
     this.card = card;
     this.name = name;
     this.label = label;
@@ -926,8 +905,14 @@ class FieldInternals {
 }
 
 function setCss(card, format, css) {
-  if (card.isDestroyed) { throw new Error('Cannot set css from destroyed card'); }
-  if (card.loadedFormat === 'embedded') { throw new Error(`Cannot set css on card id '${card.id}' because the card is not fully loaded. Call card.load() first before setting css.`) }
+  if (card.isDestroyed) {
+    throw new Error('Cannot set css from destroyed card');
+  }
+  if (card.loadedFormat === 'embedded') {
+    throw new Error(
+      `Cannot set css on card id '${card.id}' because the card is not fully loaded. Call card.load() first before setting css.`
+    );
+  }
 
   let internal = priv.get(card);
   internal[`${format}Css`] = css;
@@ -965,7 +950,7 @@ function cloneField(field, cardForField) {
 function getCardDocument(card) {
   let format = card.loadedFormat;
   let internal = priv.get(card);
-  let document = cloneDeep((format === 'isolated' ? internal.serverIsolatedData : internal.serverEmbeddedData));
+  let document = cloneDeep(format === 'isolated' ? internal.serverIsolatedData : internal.serverEmbeddedData);
 
   let modelAttributes = {};
   let modelRelationships = {};
@@ -973,24 +958,32 @@ function getCardDocument(card) {
   // TODO this is going to strip out internal fields from the card. update this so that
   // we are respectful of the internal fields (which should exist in the internal.serverIsolatedData)
   for (let field of card.fields) {
-    if (field.value === undefined) { continue; }
+    if (field.value === undefined) {
+      continue;
+    }
     if (['@cardstack/core-types::belongs-to', '@cardstack/core-types::has-many'].includes(field.type)) {
       modelRelationships[field.name] = {
-        data: field.type.includes('has-many') ?
-        (field.value || []).map(i => ({ type: 'cards', id: i.id })) :
-        (field.value ? { type: 'cards', id: field.value.id } : null)
-      }
+        data: field.type.includes('has-many')
+          ? (field.value || []).map(i => ({ type: 'cards', id: i.id }))
+          : field.value
+          ? { type: 'cards', id: field.value.id }
+          : null,
+      };
     } else {
       modelAttributes[field.name] = field.value;
     }
   }
 
   // TODO make sure that we filter out internal fields from field-order
-  set(document, `data.attributes.field-order`, card.fields.map(i => i.name));
-  set(document,
+  set(
+    document,
+    `data.attributes.field-order`,
+    card.fields.map(i => i.name)
+  );
+  set(
+    document,
     `data.relationships.fields.data`,
-    card.fields.filter(i => !i.isAdopted)
-      .map(i => ({ type: 'fields', id: i.name }))
+    card.fields.filter(i => !i.isAdopted).map(i => ({ type: 'fields', id: i.name }))
   );
   set(document, `data.attributes.isolated-css`, card.isolatedCss || null);
   set(document, `data.attributes.embedded-css`, card.embeddedCss || null);
@@ -1006,20 +999,22 @@ function getCardDocument(card) {
 
     let fieldLookup = {};
     for (let field of card.fields) {
-      if (field.isAdopted) { continue; }
+      if (field.isAdopted) {
+        continue;
+      }
       fieldLookup[`fields/${field.name}`] = field;
     }
     // updates existing field schema
     document.included = document.included.map(i =>
-      Object.keys(fieldLookup).includes(`${i.type}/${i.id}`) ?
-        merge({}, i, fieldLookup[`${i.type}/${i.id}`].json.data)
+      Object.keys(fieldLookup).includes(`${i.type}/${i.id}`)
+        ? merge({}, i, fieldLookup[`${i.type}/${i.id}`].json.data)
         : i
     );
     // adds new field schema
-    document.included = uniqBy(document.included.concat(
-      card.fields.filter(i => !i.isAdopted)
-        .map(i => i.json.data)
-    ), i => `${i.type}/${i.id}`);
+    document.included = uniqBy(
+      document.included.concat(card.fields.filter(i => !i.isAdopted).map(i => i.json.data)),
+      i => `${i.type}/${i.id}`
+    );
   }
 
   let adoptedFromId = get(internal, 'serverIsolatedData.data.relationships.adopted-from.data.id') || baseCard;
@@ -1037,17 +1032,19 @@ function getCardMetadata(card, type, fieldName) {
       return new Card({
         id,
         session: session,
-        data: embeddedCard ? { data: embeddedCard } : null
+        data: embeddedCard ? { data: embeddedCard } : null,
       });
     });
   } else if (type === '@cardstack/core-types::belongs-to') {
     let { id } = get(card.json, `data.relationships.${fieldName}.data`) || {};
     let embeddedCard = (card.json.included || []).find(i => `${i.type}/${i.id}` === `cards/${id}`);
-    return id ? new Card({
-      id,
-      session: session,
-      data: embeddedCard ? { data: embeddedCard } : null
-    }) : undefined;
+    return id
+      ? new Card({
+          id,
+          session: session,
+          data: embeddedCard ? { data: embeddedCard } : null,
+        })
+      : undefined;
   } else {
     return get(card.json, `data.attributes.${fieldName}`);
   }
@@ -1055,10 +1052,14 @@ function getCardMetadata(card, type, fieldName) {
 
 function constructAdoptedFields(child, parent) {
   if (parent.loadedFormat !== 'isolated') {
-    throw new Error(`The card you wish to adopt '${parent.id}' must be loaded in the 'isolated' format first before you can create a card that adopts from it.`);
+    throw new Error(
+      `The card you wish to adopt '${parent.id}' must be loaded in the 'isolated' format first before you can create a card that adopts from it.`
+    );
   }
   if (child.loadedFormat !== 'isolated') {
-    throw new Error(`The card whose adoption you are setting '${child.id}' must be loaded in the 'isolated' format first before you can set it's adopted-from card.`);
+    throw new Error(
+      `The card whose adoption you are setting '${child.id}' must be loaded in the 'isolated' format first before you can set it's adopted-from card.`
+    );
   }
 
   let internal = priv.get(child);
@@ -1072,26 +1073,20 @@ function constructAdoptedFields(child, parent) {
 function reifyCard(card) {
   let unorderedFields = {};
   let internal = priv.get(card);
-  let cardJson = card.loadedFormat === 'isolated' ?
-    get(internal, 'serverIsolatedData') :
-    get(internal, 'serverEmbeddedData');
-  if (!cardJson) { throw new Error(`Card document from server for '${card.id}' does not exist`); }
+  let cardJson =
+    card.loadedFormat === 'isolated' ? get(internal, 'serverIsolatedData') : get(internal, 'serverEmbeddedData');
+  if (!cardJson) {
+    throw new Error(`Card document from server for '${card.id}' does not exist`);
+  }
 
   internal.isolatedCss = get(cardJson, 'data.attributes.isolated-css') || null;
   internal.embeddedCss = get(cardJson, 'data.attributes.embedded-css') || null;
 
   let fieldSummary = get(cardJson, 'data.attributes.metadata-summary') || {};
-  let [ adoptedFieldNames, nonAdoptedFieldNames ] = partition(Object.keys(fieldSummary), i => fieldSummary[i].isAdopted);
+  let [adoptedFieldNames, nonAdoptedFieldNames] = partition(Object.keys(fieldSummary), i => fieldSummary[i].isAdopted);
   let orderedFieldNames = adoptedFieldNames.concat(nonAdoptedFieldNames);
   for (let name of orderedFieldNames) {
-    let {
-      type,
-      label,
-      source,
-      isAdopted,
-      instructions,
-      neededWhenEmbedded
-    } = fieldSummary[name];
+    let { type, label, source, isAdopted, instructions, neededWhenEmbedded } = fieldSummary[name];
     let value = getCardMetadata(card, type, name);
 
     unorderedFields[name] = new Field({
@@ -1103,7 +1098,7 @@ function reifyCard(card) {
       neededWhenEmbedded,
       source,
       isAdopted,
-      value
+      value,
     });
   }
   let fieldOrder = get(cardJson, 'data.attributes.field-order') || [];
@@ -1124,7 +1119,9 @@ function reifyCard(card) {
 }
 
 async function invalidate(cardId, latestVersion) {
-  if (cardId === baseCard) { return; } // don't invalidate the base card--it never changes, and everything descends from it
+  if (cardId === baseCard) {
+    return;
+  } // don't invalidate the base card--it never changes, and everything descends from it
 
   for (let format of ['isolated', 'embedded']) {
     for (let [id, entry] of store[format].entries()) {
@@ -1138,10 +1135,14 @@ async function invalidate(cardId, latestVersion) {
       }
       for (let relationship of Object.keys(get(card, 'data.relationships') || {})) {
         let linkage = get(card, `data.relationships.${relationship}.data`);
-        if (!linkage) { continue; }
-        if (latestVersion == null &&
+        if (!linkage) {
+          continue;
+        }
+        if (
+          latestVersion == null &&
           Array.isArray(linkage) &&
-          linkage.map(i => `${i.type}/${i.id}`).includes(`cards/${cardId}`)) {
+          linkage.map(i => `${i.type}/${i.id}`).includes(`cards/${cardId}`)
+        ) {
           store[format].delete(id);
           break;
         } else if (latestVersion == null && `${linkage.type}/${linkage.id}` === `cards/${cardId}`) {
@@ -1152,10 +1153,12 @@ async function invalidate(cardId, latestVersion) {
       if (Array.isArray(card.included) && store[format].has(id)) {
         if (latestVersion == null && card.included.map(i => `${i.type}/${i.id}`).includes(`cards/${cardId}`)) {
           store[format].delete(id);
-        } else if (latestVersion != null &&
+        } else if (
+          latestVersion != null &&
           card.included
             .filter(i => `${i.type}/${i.id}` === `cards/${cardId}`)
-            .some(i => get(i, 'meta.version') !== latestVersion)) {
+            .some(i => get(i, 'meta.version') !== latestVersion)
+        ) {
           store[format].delete(id);
         }
       }
@@ -1170,9 +1173,9 @@ async function save(session, cardDocument, isNew) {
     method: isNew ? 'POST' : 'PATCH',
     headers: {
       'Content-Type': 'application/vnd.api+json',
-      'Authorization': `Bearer ${session.token}`
+      Authorization: `Bearer ${session.token}`,
     },
-    body: JSON.stringify(cardDocument)
+    body: JSON.stringify(cardDocument),
   });
 
   let json = await response.json();
@@ -1188,7 +1191,7 @@ async function load(session, id, format) {
   let response = await fetch(`${hubURL}/api/cards/${encodeURIComponent(id)}?format=${format}`, {
     headers: {
       'Content-Type': 'application/vnd.api+json',
-      'Authorization': `Bearer ${session.token}`
+      Authorization: `Bearer ${session.token}`,
     },
   });
 

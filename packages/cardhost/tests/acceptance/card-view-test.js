@@ -1,7 +1,7 @@
 import { module, test } from 'qunit';
 import { fillIn, find, visit, currentURL, waitFor, settled, click } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
-import Fixtures from '@cardstack/test-support/fixtures'
+import Fixtures from '@cardstack/test-support/fixtures';
 import { createCards } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -22,15 +22,15 @@ const scenario = new Fixtures({
     return [
       { type: 'cards', id: qualifiedCard1Id },
       { type: 'cards', id: qualifiedCard2Id },
-      { type: 'cards', id: qualifiedCard3Id }
+      { type: 'cards', id: qualifiedCard3Id },
     ];
-  }
+  },
 });
 
 module('Acceptance | card view', function(hooks) {
   setupApplicationTest(hooks);
   scenario.setupTest(hooks);
-  hooks.beforeEach(function () {
+  hooks.beforeEach(function() {
     this.owner.lookup('service:data')._clearCache();
   });
 
@@ -48,37 +48,73 @@ module('Acceptance | card view', function(hooks) {
       [card1Id]: [
         ['title', 'string', true, 'The Millenial Puppy'],
         ['author', 'related card', true, card2Id],
-        ['body', 'string', false, 'It can be difficult these days to deal with the discerning tastes of the millenial puppy.'],
+        [
+          'body',
+          'string',
+          false,
+          'It can be difficult these days to deal with the discerning tastes of the millenial puppy.',
+        ],
         ['reviewers', 'related cards', true, `${card2Id},${card3Id}`],
         ['likes', 'integer', true, 100],
         ['published', 'boolean', false, true],
         ['created', 'date', true, '2019-10-08'],
-      ]
+      ],
     });
     await visit(`/cards/${card1Id}`);
 
     assert.equal(currentURL(), `/cards/${card1Id}`);
     assert.dom('[data-test-field="title"] [data-test-string-field-viewer-value]').hasText('The Millenial Puppy');
-    assert.dom('[data-test-field="body"] [data-test-string-field-viewer-value]').hasText(`It can be difficult these days to deal with the discerning tastes of the millenial puppy.`);
-    assert.dom(`[data-test-field="author"] [data-test-embedded-card="${card2Id}"] [data-test-field="name"] [data-test-string-field-viewer-value]`).hasText('Van Gogh');
-    assert.dom(`[data-test-field="author"] [data-test-embedded-card="${card2Id}"] [data-test-field="email"]`).doesNotExist();
-    assert.dom(`[data-test-field="reviewers"] [data-test-embedded-card="${card2Id}"] [data-test-field="name"] [data-test-string-field-viewer-value]`).hasText('Van Gogh');
-    assert.dom(`[data-test-field="reviewers"] [data-test-embedded-card="${card3Id}"] [data-test-field="name"] [data-test-string-field-viewer-value]`).hasText('Hassan Abdel-Rahman');
-    assert.dom(`[data-test-field="reviewers"] [data-test-embedded-card="${card2Id}"] [data-test-field="email"]`).doesNotExist();
-    assert.dom(`[data-test-field="reviewers"] [data-test-embedded-card="${card3Id}"] [data-test-field="email"]`).doesNotExist();
-    assert.deepEqual([...document.querySelectorAll(`[data-test-field="reviewers"] [data-test-embedded-card]`)].map(i => i.getAttribute('data-test-embedded-card')), [card2Id, card3Id ]);
+    assert
+      .dom('[data-test-field="body"] [data-test-string-field-viewer-value]')
+      .hasText(`It can be difficult these days to deal with the discerning tastes of the millenial puppy.`);
+    assert
+      .dom(
+        `[data-test-field="author"] [data-test-embedded-card="${card2Id}"] [data-test-field="name"] [data-test-string-field-viewer-value]`
+      )
+      .hasText('Van Gogh');
+    assert
+      .dom(`[data-test-field="author"] [data-test-embedded-card="${card2Id}"] [data-test-field="email"]`)
+      .doesNotExist();
+    assert
+      .dom(
+        `[data-test-field="reviewers"] [data-test-embedded-card="${card2Id}"] [data-test-field="name"] [data-test-string-field-viewer-value]`
+      )
+      .hasText('Van Gogh');
+    assert
+      .dom(
+        `[data-test-field="reviewers"] [data-test-embedded-card="${card3Id}"] [data-test-field="name"] [data-test-string-field-viewer-value]`
+      )
+      .hasText('Hassan Abdel-Rahman');
+    assert
+      .dom(`[data-test-field="reviewers"] [data-test-embedded-card="${card2Id}"] [data-test-field="email"]`)
+      .doesNotExist();
+    assert
+      .dom(`[data-test-field="reviewers"] [data-test-embedded-card="${card3Id}"] [data-test-field="email"]`)
+      .doesNotExist();
+    assert.deepEqual(
+      [...document.querySelectorAll(`[data-test-field="reviewers"] [data-test-embedded-card]`)].map(i =>
+        i.getAttribute('data-test-embedded-card')
+      ),
+      [card2Id, card3Id]
+    );
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block')
+    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.title, 'The Millenial Puppy');
-    assert.equal(card.data.attributes.body, `It can be difficult these days to deal with the discerning tastes of the millenial puppy.`);
+    assert.equal(
+      card.data.attributes.body,
+      `It can be difficult these days to deal with the discerning tastes of the millenial puppy.`
+    );
     assert.equal(card.data.attributes.likes, 100);
     assert.equal(card.data.attributes.published, true);
     assert.equal(card.data.attributes.created, '2019-10-08');
     assert.deepEqual(card.data.relationships.author.data, { type: 'cards', id: qualifiedCard2Id });
-    assert.deepEqual(card.data.relationships.reviewers.data, [{ type: 'cards', id: qualifiedCard2Id }, { type: 'cards', id: qualifiedCard3Id }]);
+    assert.deepEqual(card.data.relationships.reviewers.data, [
+      { type: 'cards', id: qualifiedCard2Id },
+      { type: 'cards', id: qualifiedCard3Id },
+    ]);
 
-    await percySnapshot(assert)
+    await percySnapshot(assert);
   });
 
   test('can navigate to edit card', async function(assert) {
@@ -87,8 +123,13 @@ module('Acceptance | card view', function(hooks) {
       [card1Id]: [
         ['title', 'string', true, 'The Millenial Puppy'],
         ['author', 'string', true, 'Van Gogh'],
-        ['body', 'string', false, 'It can be difficult these days to deal with the discerning tastes of the millenial puppy.']
-      ]
+        [
+          'body',
+          'string',
+          false,
+          'It can be difficult these days to deal with the discerning tastes of the millenial puppy.',
+        ],
+      ],
     });
     await visit(`/cards/${card1Id}`);
 
@@ -97,7 +138,7 @@ module('Acceptance | card view', function(hooks) {
 
     assert.equal(currentURL(), `/cards/${card1Id}/edit`);
     assert.dom(`[data-test-card-edit="${card1Id}"]`).exists();
-    await percySnapshot(assert)
+    await percySnapshot(assert);
   });
 
   test('can navigate to card schema', async function(assert) {
@@ -106,8 +147,13 @@ module('Acceptance | card view', function(hooks) {
       [card1Id]: [
         ['title', 'string', true, 'The Millenial Puppy'],
         ['author', 'string', true, 'Van Gogh'],
-        ['body', 'string', false, 'It can be difficult these days to deal with the discerning tastes of the millenial puppy.']
-      ]
+        [
+          'body',
+          'string',
+          false,
+          'It can be difficult these days to deal with the discerning tastes of the millenial puppy.',
+        ],
+      ],
     });
     await visit(`/cards/${card1Id}`);
 
@@ -116,7 +162,7 @@ module('Acceptance | card view', function(hooks) {
 
     assert.equal(currentURL(), `/cards/${card1Id}/schema`);
     assert.dom(`[data-test-card-schema="${card1Id}"]`).exists();
-    await percySnapshot(assert)
+    await percySnapshot(assert);
   });
 
   test('can navigate to the base-card', async function(assert) {
@@ -127,7 +173,7 @@ module('Acceptance | card view', function(hooks) {
     assert.equal(currentURL(), `/cards/@cardstack%2Fbase-card`);
 
     assert.dom('[data-test-field]').doesNotExist(); // base-card currenty has no fields
-    await percySnapshot(assert)
+    await percySnapshot(assert);
   });
 
   test('can view code editor', async function(assert) {
@@ -139,7 +185,7 @@ module('Acceptance | card view', function(hooks) {
     assert.dom('[data-test-code-block]').exists();
     await settled();
     await percySnapshot(assert);
-  })
+  });
 
   test('can dock code editor to bottom', async function(assert) {
     await login();
@@ -154,5 +200,5 @@ module('Acceptance | card view', function(hooks) {
     await click('[data-test-dock-bottom]');
     assert.dom('.cardhost-card-theme-editor').hasAttribute('data-test-dock-location', 'bottom');
     await percySnapshot(assert);
-  })
+  });
 });

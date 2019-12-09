@@ -7,7 +7,7 @@ module.exports = [
     type: 'data-sources',
     id: 'cardhost-static-models',
     attributes: {
-      'source-type': '@cardstack/cardhost'
-    }
-  }
+      'source-type': '@cardstack/cardhost',
+    },
+  },
 ];

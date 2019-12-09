@@ -14,7 +14,7 @@ export default Service.extend({
     return fetch(`${hubURL}/codegen/${modulePrefix}`)
       .then(response => response.text())
       .then(source => load(source, modulePrefix, getOwner(this)));
-  }
+  },
 });
 
 function load(source, modulePrefix, owner) {

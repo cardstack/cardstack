@@ -12,5 +12,5 @@ module.exports = {
     return true;
   },
   default: { data: null },
-  isRelationship: true
+  isRelationship: true,
 };

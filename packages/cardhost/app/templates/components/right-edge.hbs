@@ -25,7 +25,7 @@
         </label>
         <Input
           @id="card__id"
-          @class="ch-input"
+          @class="ch-input hide-in-percy"
           @size="60"
           @placeholder="e.g. millenial-puppies"
           @value={{this.cardName}}
@@ -35,7 +35,7 @@
       </div>
       <div class="right-edge--item">
         <div class="ch-label right-edge--label">Internal ID</div>
-        <div data-test-internal-card-id>
+        <div class="hide-in-percy" data-test-internal-card-id>
           {{@card.id}}
         </div>
       </div>
@@ -47,7 +47,7 @@
       </div>
       <div class="right-edge--item">
         {{#if @card.adoptedFrom}}
-          <AdoptedFrom @card={{@card.adoptedFrom}} />
+          <AdoptedFrom @card={{@card.adoptedFrom}} @adoptedCard={{@card}}/>
         {{else}}
           <div data-test-no-adoption>
             No Adoption

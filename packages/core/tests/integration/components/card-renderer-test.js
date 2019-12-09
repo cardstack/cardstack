@@ -1,5 +1,5 @@
 import { module, test, skip } from 'qunit';
-import Fixtures from '@cardstack/test-support/fixtures'
+import Fixtures from '@cardstack/test-support/fixtures';
 import { setupRenderingTest } from 'ember-qunit';
 import { render, triggerEvent } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
@@ -13,17 +13,17 @@ const qualifiedBirthday = `local-hub::${birthdayCard}`;
 
 const scenario = new Fixtures({
   create(factory) {
-    factory.addResource('data-sources', 'mock-auth').
-      withAttributes({
-        sourceType: '@cardstack/mock-auth',
-        mayCreateUser: true,
-        params: {
-          users: {
-            'sample-user': { verified: true }
-          }
-        }
-      });
-    factory.addResource('grants')
+    factory.addResource('data-sources', 'mock-auth').withAttributes({
+      sourceType: '@cardstack/mock-auth',
+      mayCreateUser: true,
+      params: {
+        users: {
+          'sample-user': { verified: true },
+        },
+      },
+    });
+    factory
+      .addResource('grants')
       .withAttributes({
         mayWriteFields: true,
         mayReadFields: true,
@@ -31,7 +31,7 @@ const scenario = new Fixtures({
         mayReadResource: true,
         mayUpdateResource: true,
         mayDeleteResource: true,
-        mayLogin: true
+        mayLogin: true,
       })
       .withRelated('who', [{ type: 'mock-users', id: 'sample-user' }]);
   },
@@ -42,23 +42,41 @@ const scenario = new Fixtures({
       { type: 'cards', id: qualifiedEventCard },
       { type: 'cards', id: qualifiedCard1Id },
     ];
-  }
+  },
 });
 
 module('Integration | Component | card-renderer', function(hooks) {
   setupRenderingTest(hooks);
   scenario.setupTest(hooks);
 
-  hooks.beforeEach(async function () {
-    await this.owner.lookup('service:mock-login').get('login').perform('sample-user');
+  hooks.beforeEach(async function() {
+    await this.owner
+      .lookup('service:mock-login')
+      .get('login')
+      .perform('sample-user');
   });
 
   test('it renders embedded card', async function(assert) {
     let service = this.owner.lookup('service:data');
     let card = service.createCard(qualifiedCard1Id);
-    card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
-    card.addField({ name: 'author', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test author' });
-    card.addField({ name: 'body', type: '@cardstack/core-types::string', neededWhenEmbedded: false, value: 'test body' });
+    card.addField({
+      name: 'title',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test title',
+    });
+    card.addField({
+      name: 'author',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test author',
+    });
+    card.addField({
+      name: 'body',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: false,
+      value: 'test body',
+    });
     this.set('card', card);
 
     await render(hbs`
@@ -70,16 +88,33 @@ module('Integration | Component | card-renderer', function(hooks) {
     `);
 
     assert.dom(`[data-test-embedded-card="${card1Id}"]`).exists();
-    assert.deepEqual([...this.element.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
-      ['title', 'author']);
+    assert.deepEqual(
+      [...this.element.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
+      ['title', 'author']
+    );
   });
 
   test('it renders isolated card', async function(assert) {
     let service = this.owner.lookup('service:data');
     let card = service.createCard(qualifiedCard1Id);
-    card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
-    card.addField({ name: 'author', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test author' });
-    card.addField({ name: 'body', type: '@cardstack/core-types::string', neededWhenEmbedded: false, value: 'test body' });
+    card.addField({
+      name: 'title',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test title',
+    });
+    card.addField({
+      name: 'author',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test author',
+    });
+    card.addField({
+      name: 'body',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: false,
+      value: 'test body',
+    });
     this.set('card', card);
 
     await render(hbs`
@@ -91,11 +126,13 @@ module('Integration | Component | card-renderer', function(hooks) {
     `);
 
     assert.dom(`[data-test-isolated-card="${card1Id}"]`).exists();
-    assert.deepEqual([...this.element.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
-      ['title', 'author', 'body']);
+    assert.deepEqual(
+      [...this.element.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
+      ['title', 'author', 'body']
+    );
   });
 
-  test('it renders an isolated card that adopts from another card', async function (assert) {
+  test('it renders an isolated card that adopts from another card', async function(assert) {
     let service = this.owner.lookup('service:data');
     let parent = service.createCard(qualifiedEventCard);
     await parent.save();
@@ -114,7 +151,7 @@ module('Integration | Component | card-renderer', function(hooks) {
     assert.dom(`[data-test-card-renderer-isolated]`).hasClass('burcu-birthday-card');
   });
 
-  test('it renders an embedded card that adopts from another card', async function (assert) {
+  test('it renders an embedded card that adopts from another card', async function(assert) {
     let service = this.owner.lookup('service:data');
     let parent = service.createCard(qualifiedEventCard);
     await parent.save();
@@ -149,7 +186,7 @@ module('Integration | Component | card-renderer', function(hooks) {
     assert.dom('.embedded-card.cardstack_base-card').exists();
   });
 
-  test('it can render an embedded card without the ability to isolate it', async function (assert) {
+  test('it can render an embedded card without the ability to isolate it', async function(assert) {
     let service = this.owner.lookup('service:data');
     let card = service.createCard(qualifiedCard1Id);
     this.set('card', card);
@@ -201,9 +238,24 @@ module('Integration | Component | card-renderer', function(hooks) {
   test('renders an isolated card in edit mode', async function(assert) {
     let service = this.owner.lookup('service:data');
     let card = service.createCard(qualifiedCard1Id);
-    card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
-    card.addField({ name: 'author', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test author' });
-    card.addField({ name: 'body', type: '@cardstack/core-types::string', neededWhenEmbedded: false, value: 'test body' });
+    card.addField({
+      name: 'title',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test title',
+    });
+    card.addField({
+      name: 'author',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test author',
+    });
+    card.addField({
+      name: 'body',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: false,
+      value: 'test body',
+    });
     this.set('card', card);
 
     await render(hbs`
@@ -216,16 +268,33 @@ module('Integration | Component | card-renderer', function(hooks) {
 
     assert.dom(`[data-test-isolated-card-mode="edit"]`).exists();
     assert.dom(`input`).exists({ count: 3 });
-    assert.deepEqual([...this.element.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
-      ['title', 'author', 'body']);
+    assert.deepEqual(
+      [...this.element.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
+      ['title', 'author', 'body']
+    );
   });
 
   test('renders an embedded card in edit mode', async function(assert) {
     let service = this.owner.lookup('service:data');
     let card = service.createCard(qualifiedCard1Id);
-    card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
-    card.addField({ name: 'author', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test author' });
-    card.addField({ name: 'body', type: '@cardstack/core-types::string', neededWhenEmbedded: false, value: 'test body' });
+    card.addField({
+      name: 'title',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test title',
+    });
+    card.addField({
+      name: 'author',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test author',
+    });
+    card.addField({
+      name: 'body',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: false,
+      value: 'test body',
+    });
     this.set('card', card);
 
     await render(hbs`
@@ -238,16 +307,33 @@ module('Integration | Component | card-renderer', function(hooks) {
 
     assert.dom(`[data-test-embedded-card-mode="edit"]`).exists();
     assert.dom(`input`).exists({ count: 2 });
-    assert.deepEqual([...this.element.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
-      ['title', 'author' ]);
+    assert.deepEqual(
+      [...this.element.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
+      ['title', 'author']
+    );
   });
 
   test('renders an isolated card in schema mode', async function(assert) {
     let service = this.owner.lookup('service:data');
     let card = service.createCard(qualifiedCard1Id);
-    card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
-    card.addField({ name: 'author', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test author' });
-    card.addField({ name: 'body', type: '@cardstack/core-types::string', neededWhenEmbedded: false, value: 'test body' });
+    card.addField({
+      name: 'title',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test title',
+    });
+    card.addField({
+      name: 'author',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test author',
+    });
+    card.addField({
+      name: 'body',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: false,
+      value: 'test body',
+    });
     this.set('card', card);
     this.set('noop', () => {});
 
@@ -263,8 +349,10 @@ module('Integration | Component | card-renderer', function(hooks) {
 
     assert.dom(`[data-test-isolated-card-mode="schema"]`).exists();
     assert.dom('[data-test-field-renderer-type]').exists({ count: 3 });
-    assert.deepEqual([...this.element.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
-      ['title', 'author', 'body']);
+    assert.deepEqual(
+      [...this.element.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
+      ['title', 'author', 'body']
+    );
     assert.dom('[data-test-drop-zone="3"]').exists();
   });
 
@@ -296,9 +384,24 @@ module('Integration | Component | card-renderer', function(hooks) {
   test('renders an embedded card in schema mode', async function(assert) {
     let service = this.owner.lookup('service:data');
     let card = service.createCard(qualifiedCard1Id);
-    card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
-    card.addField({ name: 'author', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test author' });
-    card.addField({ name: 'body', type: '@cardstack/core-types::string', neededWhenEmbedded: false, value: 'test body' });
+    card.addField({
+      name: 'title',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test title',
+    });
+    card.addField({
+      name: 'author',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test author',
+    });
+    card.addField({
+      name: 'body',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: false,
+      value: 'test body',
+    });
     this.set('card', card);
     this.set('noop', () => {});
 
@@ -313,8 +416,10 @@ module('Integration | Component | card-renderer', function(hooks) {
 
     assert.dom(`[data-test-embedded-card-mode="schema"]`).exists();
     assert.dom(`input`).doesNotExist();
-    assert.deepEqual([...this.element.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
-      ['title', 'author' ]);
+    assert.deepEqual(
+      [...this.element.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
+      ['title', 'author']
+    );
   });
 
   test("it can render an embedded card with the card's name", async function(assert) {
@@ -344,18 +449,13 @@ module('Integration | Component | card-renderer', function(hooks) {
     assert.dom('[data-test-card-renderer-isolated]').hasClass('selected');
   });
 
-  skip('TODO it adds isolated css into the page when rendering an isolated card', async function(/*assert*/) {
-  });
+  skip('TODO it adds isolated css into the page when rendering an isolated card', async function(/*assert*/) {});
 
-  skip('TODO it adds embedded css into the page when rendering an embedded card', async function(/*assert*/) {
-  });
+  skip('TODO it adds embedded css into the page when rendering an embedded card', async function(/*assert*/) {});
 
-  skip("TODO it removes a card's isolated css when the isolated card is removed from the page", async function(/*assert*/) {
-  });
+  skip("TODO it removes a card's isolated css when the isolated card is removed from the page", async function(/*assert*/) {});
 
-  skip("TODO it does not remove a card's embedded css when an embedded card is removed from the page, but another instance of the embedded card still remains on teh page", async function(/*assert*/) {
-  });
+  skip("TODO it does not remove a card's embedded css when an embedded card is removed from the page, but another instance of the embedded card still remains on teh page", async function(/*assert*/) {});
 
-  skip("TODO it removes an embedded card's css when all instances of the embedded card are removed from the page", async function(/*assert*/) {
-  });
+  skip("TODO it removes an embedded card's css when all instances of the embedded card are removed from the page", async function(/*assert*/) {});
 });

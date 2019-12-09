@@ -8,9 +8,8 @@ const log = require('@cardstack/logger')('cardstack/orchestrator');
 const timeout = require('util').promisify(setTimeout);
 const execFile = util.promisify(child_process.execFile);
 
-const NETWORK_NAME = "cardstack-network";
+const NETWORK_NAME = 'cardstack-network';
 const ELASTICSEARCH_STARTUP_TIMEOUT = 60 * 1000; // 60 seconds
-
 
 module.exports = class Orchestrator {
   constructor(leaveRunning) {
@@ -42,8 +41,6 @@ module.exports = class Orchestrator {
   }
 };
 
-
-
 async function ensureNetwork() {
   try {
     await execFile('docker', ['network', 'create', NETWORK_NAME]);
@@ -68,7 +65,6 @@ async function destroyNetwork() {
   await execFile('docker', ['network', 'rm', NETWORK_NAME]);
 }
 
-
 async function ensureElasticsearch() {
   if (await isElasticsearchReady()) {
     log.info('Found existing elasticsearch container, will try to re-use it');
@@ -76,14 +72,19 @@ async function ensureElasticsearch() {
   }
 
   await execFile('docker', [
-      'run',
-      '-d',
-      '--network', NETWORK_NAME,
-      '--network-alias', 'elasticsearch',
-      '--label', 'com.cardstack',
-      '--label', 'com.cardstack.service=elasticsearch',
-      '--publish', '9200:9200',
-      'cardstack/elasticsearch:dev'
+    'run',
+    '-d',
+    '--network',
+    NETWORK_NAME,
+    '--network-alias',
+    'elasticsearch',
+    '--label',
+    'com.cardstack',
+    '--label',
+    'com.cardstack.service=elasticsearch',
+    '--publish',
+    '9200:9200',
+    'cardstack/elasticsearch:dev',
   ]);
 
   log.info('Waiting for elasticsearch container to start up...');
@@ -105,16 +106,14 @@ async function ensureElasticsearch() {
 }
 
 function isElasticsearchReady() {
-  return new Promise(function (resolve) {
-    request
-      .get('http://elasticsearch:9200')
-      .end(function(err) {
-        if(err) {
-          resolve(false);
-        } else {
-          resolve(true);
-        }
-      });
+  return new Promise(function(resolve) {
+    request.get('http://elasticsearch:9200').end(function(err) {
+      if (err) {
+        resolve(false);
+      } else {
+        resolve(true);
+      }
+    });
   });
 }
 
@@ -125,6 +124,6 @@ async function destroyElasticsearch() {
 }
 
 async function getServiceContainerId(serviceName) {
-  let {stdout} = await execFile('docker', ['ps', '-q', '-f', `label=com.cardstack.service=${serviceName}`]);
+  let { stdout } = await execFile('docker', ['ps', '-q', '-f', `label=com.cardstack.service=${serviceName}`]);
   return stdout.trim();
 }

@@ -43,5 +43,4 @@ export default Service.extend({
   token: computed('_rawSession', function() {
     return this.get('_rawSession.data.meta.token');
   }),
-
 });

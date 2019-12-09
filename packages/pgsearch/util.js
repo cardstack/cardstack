@@ -1,4 +1,4 @@
-function addExplicitParens(expression){
+function addExplicitParens(expression) {
   if (expression.length === 0) {
     return expression;
   } else {
@@ -8,7 +8,7 @@ function addExplicitParens(expression){
 
 function separatedByCommas(expressions) {
   return expressions.reduce((accum, expression) => {
-    if (accum.length > 0){
+    if (accum.length > 0) {
       accum.push(',');
     }
     return accum.concat(expression);
@@ -19,33 +19,35 @@ function param(value) {
   return { param: value };
 }
 
-function every(expressions){
-  if (expressions.length === 0){
+function every(expressions) {
+  if (expressions.length === 0) {
     return ['true'];
   }
   return expressions.map(addExplicitParens).reduce((accum, expression) => [...accum, 'AND', ...expression]);
 }
 
-function any(expressions){
-  if (expressions.length === 0){
+function any(expressions) {
+  if (expressions.length === 0) {
     return ['false'];
   }
   return expressions.map(addExplicitParens).reduce((accum, expression) => [...accum, 'OR', ...expression]);
 }
 
-function queryToSQL(query){
+function queryToSQL(query) {
   let values = [];
-  let text = query.map(element =>{
-    if (element.hasOwnProperty('param')) {
-      values.push(element.param);
-      return `$${values.length}`;
-    } else {
-      return element;
-    }
-  }).join(' ');
+  let text = query
+    .map(element => {
+      if (element.hasOwnProperty('param')) {
+        values.push(element.param);
+        return `$${values.length}`;
+      } else {
+        return element;
+      }
+    })
+    .join(' ');
   return {
     text,
-    values
+    values,
   };
 }
 
@@ -67,18 +69,21 @@ function upsert(table, constraint, values) {
     }
     return v;
   });
-  return ['insert into', safeName(table),
+  return [
+    'insert into',
+    safeName(table),
     ...addExplicitParens(separatedByCommas(nameExpressions)),
     'values',
     ...addExplicitParens(separatedByCommas(valueExpressions)),
-    'on conflict on constraint', safeName(constraint),
+    'on conflict on constraint',
+    safeName(constraint),
     'do UPDATE SET',
-                                           // this interpolation is safe because
-                                           // of safeName() above. In general
-                                           // don't add any more interpolations
-                                           // unless you've really thought hard
-                                           // about the security implications.
-    ...separatedByCommas(names.map(name => `${name}=EXCLUDED.${name}`))
+    // this interpolation is safe because
+    // of safeName() above. In general
+    // don't add any more interpolations
+    // unless you've really thought hard
+    // about the security implications.
+    ...separatedByCommas(names.map(name => `${name}=EXCLUDED.${name}`)),
   ];
 }
 
@@ -89,5 +94,5 @@ module.exports = {
   every,
   any,
   queryToSQL,
-  upsert
+  upsert,
 };

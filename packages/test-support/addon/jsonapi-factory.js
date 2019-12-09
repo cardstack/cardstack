@@ -7,7 +7,7 @@ export default class JSONAPIFactory {
     this.data = [];
   }
 
-  addResource(type, id=null) {
+  addResource(type, id = null) {
     if (id == null) {
       id = idGenerator++;
     }
@@ -26,13 +26,14 @@ export default class JSONAPIFactory {
     return new ResourceFactory(resource);
   }
 
-
-  getDocumentFor({type, id}) {
+  getDocumentFor({ type, id }) {
     let model;
     if (type != null && id != null) {
       model = this.data.find(i => i.id === id && i.type === type);
     }
-    if (!model) { return; }
+    if (!model) {
+      return;
+    }
 
     let dag = new DAGMap();
     this._getModelsRelatedTo(model, dag);
@@ -50,17 +51,17 @@ export default class JSONAPIFactory {
     return output;
   }
 
-  _getModelsRelatedTo(model, dag, relatedModels=[]) {
+  _getModelsRelatedTo(model, dag, relatedModels = []) {
     let modelRefs = getModelDependencies(model, dag);
     for (let relatedModelRef of modelRefs) {
-      if ([
-        'content-types/content-types',
-        'content-types/fields',
-        'fields/fields'
-      ].includes(relatedModelRef)) { continue; }
+      if (['content-types/content-types', 'content-types/fields', 'fields/fields'].includes(relatedModelRef)) {
+        continue;
+      }
 
       let relatedModel = this.data.find(i => `${i.type}/${i.id}` === relatedModelRef);
-      if (!relatedModel) { continue; }
+      if (!relatedModel) {
+        continue;
+      }
 
       relatedModels.push(relatedModel);
       this._getModelsRelatedTo(relatedModel, dag, relatedModels);
@@ -89,7 +90,7 @@ function getModelDependencies(model, dag) {
   let dependsOn = [];
   if (model.relationships) {
     Object.keys(model.relationships).forEach(rel => {
-      let { data/*, links*/ } = model.relationships[rel];
+      let { data /*, links*/ } = model.relationships[rel];
 
       if (data) {
         if (Array.isArray(data)) {
@@ -106,11 +107,7 @@ function getModelDependencies(model, dag) {
   // These are all bootstrap schema and we need to not include them
   // here to avoid circularity.
   dependsOn = dependsOn.filter(dep => {
-    return ![
-      'content-types/content-types',
-      'content-types/fields',
-      'fields/fields'
-    ].includes(dep);
+    return !['content-types/content-types', 'content-types/fields', 'fields/fields'].includes(dep);
   });
 
   dag.add(`${model.type}/${model.id}`, model, [], dependsOn);
@@ -167,5 +164,5 @@ class ResourceFactory {
 }
 
 function dasherize(camelCase) {
-  return camelCase.replace(/([a-z])([A-Z])/g, (a,b,c) => `${b}-${c.toLowerCase()}`);
+  return camelCase.replace(/([a-z])([A-Z])/g, (a, b, c) => `${b}-${c.toLowerCase()}`);
 }

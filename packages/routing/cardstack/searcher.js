@@ -1,25 +1,27 @@
 const { declareInjections } = require('@cardstack/di');
 
-module.exports = declareInjections({
-  routers: 'hub:routers'
-},
+module.exports = declareInjections(
+  {
+    routers: 'hub:routers',
+  },
 
-class RoutingSearcher {
-  static create(...args) {
-    return new this(...args);
-  }
-  constructor({ routers }) {
-    this.routers = routers;
-  }
-
-  async get(session, type, id, next) {
-    if (type === 'spaces') {
-      return await this.routers.getSpace(id, session);
+  class RoutingSearcher {
+    static create(...args) {
+      return new this(...args);
     }
-    return next();
-  }
+    constructor({ routers }) {
+      this.routers = routers;
+    }
 
-  async search(session, query, next) {
-    return next();
+    async get(session, type, id, next) {
+      if (type === 'spaces') {
+        return await this.routers.getSpace(id, session);
+      }
+      return next();
+    }
+
+    async search(session, query, next) {
+      return next();
+    }
   }
-});
+);

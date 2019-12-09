@@ -13,13 +13,19 @@ async function main() {
       return;
     } catch (err) {
       if (started + 30000 < Date.now()) {
-        console.log("Giving up on postgresql");
+        console.log('Giving up on postgresql');
         process.exit(-1);
       }
-      console.log("Waiting for postgresql to start");
+      console.log('Waiting for postgresql to start');
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
   }
 }
 
-main().then(() => process.exit(0), err => { console.log(err); process.exit(-1); });
+main().then(
+  () => process.exit(0),
+  err => {
+    console.log(err);
+    process.exit(-1);
+  }
+);

@@ -92,13 +92,15 @@
     <div class="right-edge--section">
       <div class="right-edge--section-header" data-test-section-header>
         Appearance
-        <div class="padding-vertical-small">
-          <Dropdown
-            @label="Choose a theme:"
-            @options={{this.themerOptions}}
-            @handleChange={{this.handleThemeChange}}
-          />
-        </div>
+      </div>
+      <div class="right-edge--item">
+        <Dropdown
+          @theme="dark"
+          @searchEnabled={{false}}
+          @label="Choose a theme:"
+          @options={{this.themerOptions}}
+          {{!-- @handleChange={{this.handleThemeChange}} --}}
+        />
         <button {{on "click" this.createTheme}}
           class="ch-button ch-button--secondary ch-button--responsive"
           data-test-card-custom-style-button

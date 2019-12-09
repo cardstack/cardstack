@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { fieldComponents } from './card-manipulator';
+import { fieldComponents } from '@cardstack/core/utils/mappings';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 
@@ -30,7 +30,9 @@ export default class RightEdge extends Component {
 
   @action
   updateCardId(id) {
-    if (!this.args.updateCardId) { return; }
+    if (!this.args.updateCardId) {
+      return;
+    }
 
     this.args.updateCardId(id);
   }

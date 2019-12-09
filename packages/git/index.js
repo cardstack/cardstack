@@ -1,3 +1,3 @@
 module.exports = {
-  "name": "@cardstack/git"
+  name: '@cardstack/git',
 };

@@ -1,15 +1,17 @@
 const { declareInjections } = require('@cardstack/di');
 const { isEqual } = require('lodash');
 
-module.exports = declareInjections({
-  pluginLoader: 'hub:plugin-loader'
-},
+module.exports = declareInjections(
+  {
+    pluginLoader: 'hub:plugin-loader',
+  },
 
-class PluginIndexer {
-  async beginUpdate() {
-    return new Updater(this.pluginLoader);
+  class PluginIndexer {
+    async beginUpdate() {
+      return new Updater(this.pluginLoader);
+    }
   }
-});
+);
 
 class Updater {
   constructor(pluginLoader) {

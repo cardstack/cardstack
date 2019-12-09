@@ -61,14 +61,14 @@
             style={{css-url "background-image" "/images/fields/text.svg"}}
             data-test-field-renderer-type
           >
-            {{@field.type}}
+            {{@field.name}} ({{this.fieldTypeTitle}})
             {{#if @field.isAdopted}}
               <span class="schema-field-renderer--header--detail">Adopted</span>
             {{/if}}
           </header>
           <div class="schema-field-renderer--content">
             <div class="schema-field-renderer--name" data-test-field-renderer-label>
-              {{@field.name}}
+              {{@field.label}}
             </div>
             <div class="schema-field-renderer--value" data-test-field-renderer-value>
               {{@field.value}}

@@ -26,19 +26,21 @@ export default DS.JSONAPIAdapter.extend(AdapterMixin, {
     upstreamQuery.page = { size: 1 };
     let response = await this._super(store, type, upstreamQuery);
     if (!response.data || !Array.isArray(response.data) || response.data.length < 1) {
-      throw new DS.AdapterError([ { code: 404, title: 'Not Found', detail: 'queryRecord got less than one record back' } ]);
+      throw new DS.AdapterError([
+        { code: 404, title: 'Not Found', detail: 'queryRecord got less than one record back' },
+      ]);
     }
     let returnValue = {
       data: response.data[0],
     };
-    if (response.meta){
+    if (response.meta) {
       returnValue.meta = response.meta;
     }
     return returnValue;
   },
 
   buildURL(modelName, id, snapshot, requestType, query) {
-    let actualModelName = snapshot && snapshot.modelName || query && query.modelName;
+    let actualModelName = (snapshot && snapshot.modelName) || (query && query.modelName);
     return this._super(actualModelName || modelName, id, snapshot, requestType, query);
   },
 
@@ -51,11 +53,11 @@ export default DS.JSONAPIAdapter.extend(AdapterMixin, {
     let version = get(meta, 'version');
 
     if (version) {
-      options.headers = { "If-Match": version };
+      options.headers = { 'If-Match': version };
     }
 
     // Note: this bypasses the `ds-improved-ajax` feature
-    return this.ajax(this.buildURL(type.modelName, id, snapshot, 'deleteRecord'), "DELETE", options);
+    return this.ajax(this.buildURL(type.modelName, id, snapshot, 'deleteRecord'), 'DELETE', options);
   },
 
   urlForCreateRecord(modelName, snapshot) {
@@ -71,7 +73,7 @@ export default DS.JSONAPIAdapter.extend(AdapterMixin, {
   _addQueryParams(url, snapshot) {
     let { adapterOptions } = snapshot;
     if (adapterOptions && adapterOptions.onlyValidate) {
-      return `${url}?onlyValidate=true`
+      return `${url}?onlyValidate=true`;
     }
     return url;
   },
@@ -81,7 +83,7 @@ export default DS.JSONAPIAdapter.extend(AdapterMixin, {
     let token = this.get('cardstackSession.token');
     if (token) {
       let { beforeSend } = hash;
-      hash.beforeSend = (xhr) => {
+      hash.beforeSend = xhr => {
         xhr.setRequestHeader('Authorization', `Bearer ${token}`);
         if (beforeSend) {
           beforeSend(xhr);
@@ -90,5 +92,4 @@ export default DS.JSONAPIAdapter.extend(AdapterMixin, {
     }
     return hash;
   },
-
 });

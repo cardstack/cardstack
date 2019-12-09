@@ -6,8 +6,8 @@ module.exports = [
     id: '@cardstack/hub',
     relationships: {
       'default-data-source': {
-        data: { type: 'data-sources', id: 'cardstack-git-default' }
-      }
-    }
-  }
+        data: { type: 'data-sources', id: 'cardstack-git-default' },
+      },
+    },
+  },
 ];

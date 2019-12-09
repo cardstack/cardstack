@@ -14,6 +14,5 @@ module.exports = {
       return !(await hub.url());
     }
     return new ConditionalInclude(tree, { name: 'default cardstack env', predicate: hubNotRunning });
-  }
-
+  },
 };

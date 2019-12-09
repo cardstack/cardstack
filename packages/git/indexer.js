@@ -65,13 +65,9 @@
 
 */
 
-const {
-  Repository,
-  Branch,
-  Commit,
-} = require('nodegit');
+const { Repository, Branch, Commit } = require('nodegit');
 
-const Change = require("./change");
+const Change = require('./change');
 const { safeEntryByName } = require('./mutable-tree');
 const log = require('@cardstack/logger')('cardstack/git');
 const service = require('./service');
@@ -82,68 +78,79 @@ const Session = require('@cardstack/plugin-utils/session');
 
 const defaultBranch = 'master';
 
-module.exports = declareInjections({
-  searchers: 'hub:searchers',
-},
+module.exports = declareInjections(
+  {
+    searchers: 'hub:searchers',
+  },
 
-class Indexer {
-  static create(params) { return new this(params); }
-
-  constructor({ dataSource, repo, basePath, branchPrefix, remote, searchers }) {
-    if (repo && remote) {
-      throw new Error('You cannot define the params \'remote\' and \'repo\' at the same time for this data source');
+  class Indexer {
+    static create(params) {
+      return new this(params);
     }
-    this.repoPath = repo;
-    this.searchers = searchers;
-    this.cardTypes = dataSource.cardTypes || [];
-    this.branchPrefix = branchPrefix || "";
-    this.basePath = basePath ? basePath.split('/') : [];
-    this.repo = null;
-    this.remote = remote;
-  }
 
-  async _ensureRepo() {
-    if (!this.repo) {
-      if (this.remote) {
-        log.info('Getting remote repo for %s from service', this.remote.url);
-        this.repo = await service.getRepo(this.remote.url, this.remote);
-        return;
+    constructor({ dataSource, repo, basePath, branchPrefix, remote, searchers }) {
+      if (repo && remote) {
+        throw new Error("You cannot define the params 'remote' and 'repo' at the same time for this data source");
       }
+      this.repoPath = repo;
+      this.searchers = searchers;
+      this.cardTypes = dataSource.cardTypes || [];
+      this.branchPrefix = branchPrefix || '';
+      this.basePath = basePath ? basePath.split('/') : [];
+      this.repo = null;
+      this.remote = remote;
+    }
 
-      try {
-        this.repo = await Repository.open(this.repoPath);
-      } catch (e) {
-        if (/(could not find repository from|Failed to resolve path)/i.test(e.message)) {
+    async _ensureRepo() {
+      if (!this.repo) {
+        if (this.remote) {
+          log.info('Getting remote repo for %s from service', this.remote.url);
+          this.repo = await service.getRepo(this.remote.url, this.remote);
+          return;
+        }
 
-          let change = await Change.createInitial(this.repoPath, 'master');
-          this.repo = change.repo;
+        try {
+          this.repo = await Repository.open(this.repoPath);
+        } catch (e) {
+          if (/(could not find repository from|Failed to resolve path)/i.test(e.message)) {
+            let change = await Change.createInitial(this.repoPath, 'master');
+            this.repo = change.repo;
 
-          await change.finalize({
-            message: 'First commit',
-            authorName: 'Cardstack Hub',
-            authorEmail: 'hub@cardstack.com',
-          });
-        } else {
-          throw e;
+            await change.finalize({
+              message: 'First commit',
+              authorName: 'Cardstack Hub',
+              authorEmail: 'hub@cardstack.com',
+            });
+          } else {
+            throw e;
+          }
         }
       }
     }
-  }
 
-  async beginUpdate() {
-    log.debug(`starting beginUpdate()`);
-    await this._ensureRepo();
+    async beginUpdate() {
+      log.debug(`starting beginUpdate()`);
+      await this._ensureRepo();
 
-    let targetBranch = this.branchPrefix + defaultBranch;
+      let targetBranch = this.branchPrefix + defaultBranch;
 
-    if (this.remote) {
-      await service.pullRepo(this.remote.url, targetBranch);
+      if (this.remote) {
+        await service.pullRepo(this.remote.url, targetBranch);
+      }
+      log.debug(`ending beginUpdate()`);
+
+      return new GitUpdater(
+        this.repo,
+        targetBranch,
+        this.repoPath,
+        this.basePath,
+        this.searchers,
+        this.cardTypes,
+        this.__owner__
+      );
     }
-    log.debug(`ending beginUpdate()`);
-
-    return new GitUpdater(this.repo, targetBranch, this.repoPath, this.basePath, this.searchers, this.cardTypes, this.__owner__);
   }
-});
+);
 
 class GitUpdater {
   constructor(repo, branch, repoPath, basePath, searchers, cardTypes, owner) {
@@ -163,7 +170,7 @@ class GitUpdater {
     let ops = new Gather(models);
     await this._loadCommit();
     await this._indexTree(ops, null, this.rootTree, {
-      only: this.basePath.concat(['schema'])
+      only: this.basePath.concat(['schema']),
     });
     return models.map(m => m.data);
   }
@@ -183,7 +190,9 @@ class GitUpdater {
     try {
       card = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', cardId, cardId);
     } catch (err) {
-      if (err.status !== 404) { throw err; }
+      if (err.status !== 404) {
+        throw err;
+      }
     }
     return card;
   }
@@ -197,21 +206,23 @@ class GitUpdater {
         let oldCommit = await Commit.lookup(this.repo, meta.commit);
         originalTree = await oldCommit.getTree();
       } catch (err) {
-        log.warn(`Unable to load previously indexed commit ${meta.commit} due to ${err}. We will recover by reindexing all content.`);
+        log.warn(
+          `Unable to load previously indexed commit ${meta.commit} due to ${err}. We will recover by reindexing all content.`
+        );
       }
     }
     if (!originalTree) {
       await ops.beginReplaceAll();
     }
     await this._indexTree(ops, originalTree, this.rootTree, {
-      only: this.basePath.concat([['schema', 'contents', 'cards']])
+      only: this.basePath.concat([['schema', 'contents', 'cards']]),
     });
     if (!originalTree) {
       await ops.finishReplaceAll();
     }
     log.debug(`completed updateContent()`);
     return {
-      commit: this.commitId
+      commit: this.commitId,
     };
   }
 
@@ -269,7 +280,7 @@ class GitUpdater {
     if (newEntry.isTree()) {
       await this._indexTree(
         ops,
-        oldEntry && oldEntry.isTree() ? (await oldEntry.getTree()) : null,
+        oldEntry && oldEntry.isTree() ? await oldEntry.getTree() : null,
         await newEntry.getTree(),
         nextFilter(filter)
       );
@@ -309,7 +320,7 @@ class GitUpdater {
     try {
       doc = JSON.parse(contents);
     } catch (err) {
-      log.warn("Ignoring record with invalid json at %s", entry.path());
+      log.warn('Ignoring record with invalid json at %s', entry.path());
       return;
     }
 
@@ -365,9 +376,13 @@ class Gather {
 }
 
 function filterAllows(filter, name) {
-  return !filter || !filter.only || filter.only.length === 0 ||
+  return (
+    !filter ||
+    !filter.only ||
+    filter.only.length === 0 ||
     (Array.isArray(filter.only[0]) && filter.only[0].includes(name)) ||
-    name === filter.only[0];
+    name === filter.only[0]
+  );
 }
 
 function nextFilter(filter) {

@@ -15,7 +15,6 @@ function getPriv(instance: Operations): PrivateOperations {
 }
 
 class Operations {
-
   static create(sourcesUpdate: todo, sourceId: string): Operations {
     return new this(sourcesUpdate, sourceId);
   }
@@ -24,7 +23,7 @@ class Operations {
     opsPrivate.set(this, {
       sourceId,
       sourcesUpdate,
-      nonce: null
+      nonce: null,
     });
   }
   async save(type: string, id: string, doc: Document) {
@@ -41,7 +40,7 @@ class Operations {
   async finishReplaceAll() {
     let { sourcesUpdate, sourceId, nonce } = getPriv(this);
     if (!nonce) {
-      throw new Error("tried to finishReplaceAll when there was no beginReplaceAll");
+      throw new Error('tried to finishReplaceAll when there was no beginReplaceAll');
     }
     await sourcesUpdate.deleteAllWithoutNonce(sourceId, nonce);
   }

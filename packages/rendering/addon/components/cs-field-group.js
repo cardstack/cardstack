@@ -2,7 +2,7 @@ import layout from '../templates/components/cs-field-group';
 import { humanize } from '../helpers/cs-humanize';
 import Component from '@ember/component';
 import { computed } from '@ember/object';
-import { guidFor } from "@ember/object/internals"
+import { guidFor } from '@ember/object/internals';
 
 const limit = 7;
 
@@ -34,10 +34,9 @@ export default Component.extend({
       name: this.get('name'),
       content: this.get('content'),
       grouped: this.get('fieldNames'),
-      caption: this.get('groupCaption')
+      caption: this.get('groupCaption'),
     };
-  })
-
+  }),
 }).reopenClass({
-  positionalParams: ['content']
+  positionalParams: ['content'],
 });

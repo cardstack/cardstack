@@ -1,5 +1,5 @@
 import DS from 'ember-data';
-import RelationshipTracker from "ember-data-relationship-tracker";
+import RelationshipTracker from 'ember-data-relationship-tracker';
 import { inject as service } from '@ember/service';
 import { computed, defineProperty, get } from '@ember/object';
 import { readOnly, or } from '@ember/object/computed';
@@ -12,7 +12,7 @@ export default DS.Model.extend(RelationshipTracker, {
   init() {
     this._super();
     let ownedRelationships = {};
-    this._relationshipsByName().forEach((relation) => {
+    this._relationshipsByName().forEach(relation => {
       let { kind, meta } = relation;
       if (meta) {
         let { owned } = meta.options;
@@ -46,7 +46,7 @@ export default DS.Model.extend(RelationshipTracker, {
   },
 
   async saveRelated() {
-    let relatedSaves = Object.keys(this.ownedRelationships).map(async (relationName) => {
+    let relatedSaves = Object.keys(this.ownedRelationships).map(async relationName => {
       let isRelationDirty = this.dirtyTrackingRelationNames[relationName];
       if (isRelationDirty) {
         let relatedRecords = relatedRecordsFor(this, relationName);
@@ -58,7 +58,7 @@ export default DS.Model.extend(RelationshipTracker, {
   },
 
   relatedOwnedRecords() {
-    return uniq(relatedOwnedRecords([ this ]));
+    return uniq(relatedOwnedRecords([this]));
   },
 
   cardstackRollback() {
@@ -91,15 +91,15 @@ export default DS.Model.extend(RelationshipTracker, {
 
   _relationshipsByName() {
     return get(this.constructor, 'relationshipsByName');
-  }
+  },
 });
 
-function relatedOwnedRecords(models, records=[]) {
+function relatedOwnedRecords(models, records = []) {
   if (models.length === 0) {
     return records;
   }
-  let [ model, ...remainingModels ] = models;
-  Object.keys(model.ownedRelationships).map((relationName) => {
+  let [model, ...remainingModels] = models;
+  Object.keys(model.ownedRelationships).map(relationName => {
     let relatedRecords = relatedRecordsFor(model, relationName);
     records = records.concat(relatedRecords);
     remainingModels = remainingModels.concat(relatedRecords);
@@ -110,15 +110,22 @@ function relatedOwnedRecords(models, records=[]) {
 function relatedRecordsFor(model, relationName) {
   let kind = model.ownedRelationships[relationName];
   let related = model.get(relationName);
-  return (kind === 'hasMany' ? related.toArray() : [ related ]).filter(Boolean);
+  return (kind === 'hasMany' ? related.toArray() : [related]).filter(Boolean);
 }
 
 function createHasDirtyForRelationship(model, name, kind) {
   let propertyName = `hasDirty${capitalize(name)}`;
   if (kind === 'hasMany') {
-    defineProperty(model, propertyName, computed(`${name}.@each.hasDirtyFields`, function() {
-      return model.get(name).toArray().some((related) => related.hasDirtyFields);
-    }));
+    defineProperty(
+      model,
+      propertyName,
+      computed(`${name}.@each.hasDirtyFields`, function() {
+        return model
+          .get(name)
+          .toArray()
+          .some(related => related.hasDirtyFields);
+      })
+    );
   } else {
     defineProperty(model, propertyName, readOnly(`${name}.hasDirtyFields`));
   }
@@ -138,15 +145,19 @@ function createHasDirtyOwned(model, ownedRelationships, properties) {
     return dependentKeys;
   }, []);
 
-  defineProperty(model, 'hasDirtyOwned', computed('hasDirtyOwnedRelationships', ...dependentKeys, function() {
-    if (model.hasDirtyOwnedRelationships) {
-      return true;
-    }
-    return Object.keys(ownedRelationships).some((relationName) => {
-      let relatedRecords = relatedRecordsFor(model, relationName);
-      return relatedRecords.some((records) => records.hasDirtyOwned);
-    });
-  }));
+  defineProperty(
+    model,
+    'hasDirtyOwned',
+    computed('hasDirtyOwnedRelationships', ...dependentKeys, function() {
+      if (model.hasDirtyOwnedRelationships) {
+        return true;
+      }
+      return Object.keys(ownedRelationships).some(relationName => {
+        let relatedRecords = relatedRecordsFor(model, relationName);
+        return relatedRecords.some(records => records.hasDirtyOwned);
+      });
+    })
+  );
 }
 
 function flatten(arrays) {

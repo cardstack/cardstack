@@ -4,14 +4,13 @@ import layout from '../templates/components/cardstack-session';
 
 export default Component.extend({
   layout,
-  tagName: "",
+  tagName: '',
   session: service(),
   cardstackSession: service(),
 
   actions: {
     logout() {
       this.get('session').invalidate();
-    }
-  }
-
+    },
+  },
 });

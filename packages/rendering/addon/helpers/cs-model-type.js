@@ -7,6 +7,6 @@ export function modelType(model) {
   }
 }
 
-export default buildHelper(function([model]){
+export default buildHelper(function([model]) {
   return modelType(model);
 });

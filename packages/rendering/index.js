@@ -11,10 +11,12 @@ module.exports = {
       return;
     }
 
-    registry.add("htmlbars-ast-plugin", {
-      name: "cardstack-transform",
-      plugin: require("./lib/transform"),
-      baseDir() { return __dirname; }
+    registry.add('htmlbars-ast-plugin', {
+      name: 'cardstack-transform',
+      plugin: require('./lib/transform'),
+      baseDir() {
+        return __dirname;
+      },
     });
-  }
+  },
 };

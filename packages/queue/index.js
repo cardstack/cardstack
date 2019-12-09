@@ -16,7 +16,9 @@ module.exports = class Queue {
     let client = new Client(Object.assign({}, this.config, { database: 'postgres' }));
     try {
       await client.connect();
-      let response = await client.query(`select count(*)=1 as has_database from pg_database where datname=$1`, [this.config.database]);
+      let response = await client.query(`select count(*)=1 as has_database from pg_database where datname=$1`, [
+        this.config.database,
+      ]);
       if (!response.rows[0].has_database) {
         await client.query(`create database ${safeDatabaseName(this.config.database)}`);
       }
@@ -30,14 +32,14 @@ module.exports = class Queue {
       await this._ensureDatabaseSetup();
       this.boss = new PgBoss(this.config);
       await this.boss.start();
-      log.debug("Boss started");
+      log.debug('Boss started');
     }
   }
 
   async stop() {
     if (this.boss) {
       await this.boss.stop();
-      log.debug("Boss stopped");
+      log.debug('Boss stopped');
       this.boss = null;
     }
   }
@@ -57,7 +59,9 @@ module.exports = class Queue {
     // finishes. In the meantime you have no job ID and no way to actually resolve the promise
     // that the caller is awaiting when the job completes, because you have no way to correlate
     // the onComplete event with the original promise.
-    if (!jobId) { return { jobCancelled: true }; }
+    if (!jobId) {
+      return { jobCancelled: true };
+    }
 
     this._setupCallbacks(jobName);
 
@@ -67,7 +71,7 @@ module.exports = class Queue {
     });
   }
 
-  async subscribe(jobName, handler, options={}) {
+  async subscribe(jobName, handler, options = {}) {
     log.debug(`Subscribing to queue ${jobName}`);
 
     await this._ensureBoss();
@@ -97,7 +101,6 @@ module.exports = class Queue {
     return await this.boss.subscribe(jobName, options, wrappedHander);
   }
 
-
   _setupCallbacks(jobName) {
     if (this.callbackedQueues.includes(jobName)) {
       return;
@@ -125,8 +128,8 @@ module.exports = class Queue {
   }
 };
 
-function safeDatabaseName(name){
-  if (!/^[a-zA-Z_0-9]+$/.test(name)){
+function safeDatabaseName(name) {
+  if (!/^[a-zA-Z_0-9]+$/.test(name)) {
     throw new Error(`unsure if db name ${name} is safe`);
   }
   return name;

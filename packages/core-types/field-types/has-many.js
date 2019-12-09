@@ -15,5 +15,5 @@ module.exports = {
     return true;
   },
   default: { data: [] },
-  isRelationship: true
+  isRelationship: true,
 };

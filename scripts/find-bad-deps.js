@@ -17,7 +17,7 @@ let hasMismatches = false;
 for (let pkg of packages) {
   for (let field of ['dependencies', 'devDependencies', 'peerDependencies']) {
     if (pkg[field]) {
-      for (let [k,v] of Object.entries(pkg[field])) {
+      for (let [k, v] of Object.entries(pkg[field])) {
         if (ownPackages.has(k) && ownPackages.get(k) !== v && v !== '*') {
           console.log(`mismatch in ${pkg.name} ${field}: ${k} is ${v}, should be ${ownPackages.get(k)}`);
           hasMismatches = true;
@@ -27,7 +27,6 @@ for (let pkg of packages) {
   }
 }
 
-
-if(hasMismatches) {
+if (hasMismatches) {
   process.exit(1);
 }

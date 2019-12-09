@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import Fixtures from '@cardstack/test-support/fixtures'
+import Fixtures from '@cardstack/test-support/fixtures';
 import { setupRenderingTest } from 'ember-qunit';
 import { render, fillIn, triggerEvent, click } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
@@ -11,17 +11,17 @@ const qualifiedCard2Id = `local-hub::${card2Id}`;
 
 const scenario = new Fixtures({
   create(factory) {
-    factory.addResource('data-sources', 'mock-auth').
-      withAttributes({
-        sourceType: '@cardstack/mock-auth',
-        mayCreateUser: true,
-        params: {
-          users: {
-            'sample-user': { verified: true }
-          }
-        }
-      });
-    factory.addResource('grants')
+    factory.addResource('data-sources', 'mock-auth').withAttributes({
+      sourceType: '@cardstack/mock-auth',
+      mayCreateUser: true,
+      params: {
+        users: {
+          'sample-user': { verified: true },
+        },
+      },
+    });
+    factory
+      .addResource('grants')
       .withAttributes({
         mayWriteFields: true,
         mayReadFields: true,
@@ -29,7 +29,7 @@ const scenario = new Fixtures({
         mayReadResource: true,
         mayUpdateResource: true,
         mayDeleteResource: true,
-        mayLogin: true
+        mayLogin: true,
       })
       .withRelated('who', [{ type: 'mock-users', id: 'sample-user' }]);
   },
@@ -39,15 +39,18 @@ const scenario = new Fixtures({
       { type: 'cards', id: qualifiedCard2Id },
       { type: 'cards', id: qualifiedCard1Id },
     ];
-  }
+  },
 });
 
 module('Integration | Component | field-renderer', function(hooks) {
   setupRenderingTest(hooks);
   scenario.setupTest(hooks);
 
-  hooks.beforeEach(async function () {
-    await this.owner.lookup('service:mock-login').get('login').perform('sample-user');
+  hooks.beforeEach(async function() {
+    await this.owner
+      .lookup('service:mock-login')
+      .get('login')
+      .perform('sample-user');
   });
 
   test('it can select a field', async function(assert) {
@@ -55,8 +58,18 @@ module('Integration | Component | field-renderer', function(hooks) {
 
     let service = this.owner.lookup('service:data');
     let card = service.createCard(qualifiedCard1Id);
-    card.addField({ name: 'body', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test body' });
-    let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
+    card.addField({
+      name: 'body',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test body',
+    });
+    let field = card.addField({
+      name: 'title',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test title',
+    });
     this.set('field', field);
     this.set('selectField', field => {
       assert.equal(field.name, 'title');
@@ -76,7 +89,12 @@ module('Integration | Component | field-renderer', function(hooks) {
   test('it renders field in view mode', async function(assert) {
     let service = this.owner.lookup('service:data');
     let card = service.createCard(qualifiedCard1Id);
-    let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
+    let field = card.addField({
+      name: 'title',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test title',
+    });
     this.set('field', field);
 
     await render(hbs`<FieldRenderer @field={{field}} @mode="view"/>`);
@@ -89,7 +107,12 @@ module('Integration | Component | field-renderer', function(hooks) {
   test('it renders field in edit mode', async function(assert) {
     let service = this.owner.lookup('service:data');
     let card = service.createCard(qualifiedCard1Id);
-    let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
+    let field = card.addField({
+      name: 'title',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test title',
+    });
     this.set('field', field);
     this.set('noop', () => {});
 
@@ -103,7 +126,7 @@ module('Integration | Component | field-renderer', function(hooks) {
 
     assert.dom('[data-test-string-field-editor-label]').hasText('title:');
     assert.dom('input').hasValue('test title');
-    assert.dom('button').doesNotExist
+    assert.dom('button').doesNotExist;
     assert.dom('.field-renderer-field-name-input').doesNotExist();
     assert.dom('.field-renderer--needed-when-embedded-chbx').doesNotExist();
   });
@@ -111,7 +134,12 @@ module('Integration | Component | field-renderer', function(hooks) {
   test('it can update field value in edit mode', async function(assert) {
     let service = this.owner.lookup('service:data');
     let card = service.createCard(qualifiedCard1Id);
-    let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
+    let field = card.addField({
+      name: 'title',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test title',
+    });
     this.set('field', field);
     this.set('setFieldValue', value => field.setValue(value));
 
@@ -133,9 +161,25 @@ module('Integration | Component | field-renderer', function(hooks) {
   test('it renders field in schema mode', async function(assert) {
     let service = this.owner.lookup('service:data');
     let card = service.createCard(qualifiedCard1Id);
-    card.addField({ name: 'body', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test body' });
-    let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
-    card.addField({ name: 'author', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test author' });
+    card.addField({
+      name: 'body',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test body',
+    });
+    let field = card.addField({
+      name: 'title',
+      label: 'Article Title',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test title',
+    });
+    card.addField({
+      name: 'author',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test author',
+    });
     this.set('field', field);
     this.set('noop', () => {});
 
@@ -154,6 +198,9 @@ module('Integration | Component | field-renderer', function(hooks) {
     />
     `);
 
+    assert.dom('[data-test-field-schema-renderer] [data-test-field-renderer-type]').hasText('title (Text)');
+    assert.dom('[data-test-field-schema-renderer] [data-test-field-renderer-label]').hasText('Article Title');
+    assert.dom('[data-test-field-schema-renderer] [data-test-field-renderer-value]').hasText('test title');
     assert.dom('.schema-field-renderer--header--detail').doesNotExist();
     assert.dom('[data-test-field-renderer-field-type]').hasText('@cardstack/core-types::string');
     assert.dom('[data-test-field-renderer-move-btn]').exists();
@@ -164,14 +211,14 @@ module('Integration | Component | field-renderer', function(hooks) {
 
     assert.dom('[data-test-schema-attr="name"] input').hasValue('title');
     assert.dom('[data-test-schema-attr="name"] input').isNotDisabled();
-    assert.dom('[data-test-schema-attr="label"] input').hasValue('title');
+    assert.dom('[data-test-schema-attr="label"] input').hasValue('Article Title');
     assert.dom('[data-test-schema-attr="label"] input').isNotDisabled();
     assert.dom('[data-test-schema-attr="instructions"] textarea').isNotDisabled();
     assert.dom('[data-test-schema-attr="embedded"] input').isChecked();
     assert.dom('[data-test-schema-attr="embedded"] input').isNotDisabled();
   });
 
-  test("it can render an adopted field in schema mode", async function (assert) {
+  test('it can render an adopted field in schema mode', async function(assert) {
     // name, label, and needed-when-embedded should be disabled
     // instructions and required should be enabled
 
@@ -184,7 +231,7 @@ module('Integration | Component | field-renderer', function(hooks) {
 
     let card = service.createCard(qualifiedCard2Id, parent);
     let field = card.getField('title');
-    field.setValue('test title')
+    field.setValue('test title');
     this.set('field', field);
     this.set('noop', () => {});
 
@@ -223,7 +270,12 @@ module('Integration | Component | field-renderer', function(hooks) {
   test('it can change field name in schema mode', async function(assert) {
     let service = this.owner.lookup('service:data');
     let card = service.createCard(qualifiedCard1Id);
-    let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
+    let field = card.addField({
+      name: 'title',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test title',
+    });
     this.set('field', field);
     this.set('noop', () => {});
     this.set('setFieldName', (oldName, newName) => card.getField(oldName).setName(newName));
@@ -254,7 +306,12 @@ module('Integration | Component | field-renderer', function(hooks) {
   test('it can change field label in schema mode', async function(assert) {
     let service = this.owner.lookup('service:data');
     let card = service.createCard(qualifiedCard1Id);
-    let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
+    let field = card.addField({
+      name: 'title',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test title',
+    });
     this.set('field', field);
     this.set('noop', () => {});
     this.set('setFieldName', (oldName, newName) => card.getField(oldName).setName(newName));
@@ -285,10 +342,16 @@ module('Integration | Component | field-renderer', function(hooks) {
   test('it can change field instructions in schema mode', async function(assert) {
     let service = this.owner.lookup('service:data');
     let card = service.createCard(qualifiedCard1Id);
-    let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', instructions: 'test instructions'  });
+    let field = card.addField({
+      name: 'title',
+      type: '@cardstack/core-types::string',
+      instructions: 'test instructions',
+    });
     this.set('field', field);
     this.set('noop', () => {});
-    this.set('setFieldInstructions', (fieldName, instructions) => card.getField(fieldName).setInstructions(instructions));
+    this.set('setFieldInstructions', (fieldName, instructions) =>
+      card.getField(fieldName).setInstructions(instructions)
+    );
 
     await render(hbs`
     <FieldRenderer
@@ -312,12 +375,19 @@ module('Integration | Component | field-renderer', function(hooks) {
   test('it can change field needed-when-embedded in schema mode', async function(assert) {
     let service = this.owner.lookup('service:data');
     let card = service.createCard(qualifiedCard1Id);
-    let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
+    let field = card.addField({
+      name: 'title',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test title',
+    });
     this.set('field', field);
     this.set('noop', () => {});
     this.set('setNeededWhenEmbedded', (fieldName, evt) => {
       evt.preventDefault();
-      let { target: { checked } } = evt;
+      let {
+        target: { checked },
+      } = evt;
       card.getField(fieldName).setNeededWhenEmbedded(checked);
     });
 
@@ -343,7 +413,12 @@ module('Integration | Component | field-renderer', function(hooks) {
   test('it can remove a field in schema mode', async function(assert) {
     let service = this.owner.lookup('service:data');
     let card = service.createCard(qualifiedCard1Id);
-    let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
+    let field = card.addField({
+      name: 'title',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test title',
+    });
     this.set('field', field);
     this.set('noop', () => {});
     this.set('removeField', fieldNonce => card.getFieldByNonce(fieldNonce).remove());
@@ -372,7 +447,12 @@ module('Integration | Component | field-renderer', function(hooks) {
 
     let service = this.owner.lookup('service:data');
     let card = service.createCard(qualifiedCard1Id);
-    let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
+    let field = card.addField({
+      name: 'title',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test title',
+    });
     this.set('field', field);
     this.set('noop', () => {});
     this.set('dropField', (position, callback) => {

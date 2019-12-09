@@ -1,7 +1,7 @@
 module.exports = function(chai, utils) {
   const { Assertion } = chai;
 
-  Assertion.addMethod('collectionContains', function (expected) {
+  Assertion.addMethod('collectionContains', function(expected) {
     let obj = this._obj;
 
     utils.expectTypes(this, ['array']);
@@ -10,7 +10,7 @@ module.exports = function(chai, utils) {
     let keys = Object.keys(expected);
 
     for (let candidate of obj) {
-      let hits = keys.map(key => utils.eql(candidate[key], expected[key]) ? 1 : 0).reduce((a,b) => a + b);
+      let hits = keys.map(key => (utils.eql(candidate[key], expected[key]) ? 1 : 0)).reduce((a, b) => a + b);
       if (hits > best.hits) {
         best = { hits, candidate };
       }
@@ -21,13 +21,12 @@ module.exports = function(chai, utils) {
 
     // always diff POJOs
     let actual = {};
-    Object.entries(best.candidate).forEach(([k,v]) => actual[k] = v);
-
+    Object.entries(best.candidate).forEach(([k, v]) => (actual[k] = v));
 
     this.assert(
       best.hits === keys.length,
-      "expected #{this} to contain",
-      "expected #{this} to not contain",
+      'expected #{this} to contain',
+      'expected #{this} to not contain',
       expected,
       actual,
       true

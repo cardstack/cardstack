@@ -3,42 +3,49 @@ const { spawn } = require('child_process');
 
 module.exports = {
   name: 'hub:start',
-  description: "Start the Cardstack hub for local development and testing",
+  description: 'Start the Cardstack hub for local development and testing',
   works: 'insideProject',
 
   availableOptions: [
     {
       name: 'environment',
-      aliases: ['e', { 'dev': 'development' }, { 'prod': 'production' }],
+      aliases: ['e', { dev: 'development' }, { prod: 'production' }],
       description: 'Possible values are "development", "production", and "test".',
       type: String,
-      default: 'development'
+      default: 'development',
     },
     {
       name: 'port',
       aliases: ['p'],
       description: 'Port to listen on',
       type: Number,
-      default: 3000
+      default: 3000,
     },
     {
       name: 'url',
       aliases: ['d'],
-      description: 'Public URL at which clients will be able to talk to the Hub. For production use you will almost always need to set this. For local development, you can leave it unset and it will default to localhost on the configured listen port.',
-      type: String
+      description:
+        'Public URL at which clients will be able to talk to the Hub. For production use you will almost always need to set this. For local development, you can leave it unset and it will default to localhost on the configured listen port.',
+      type: String,
     },
     {
       name: 'print',
       description: 'Instead of starting the hub, print the startup command(s) we would run.',
       aliases: ['r'],
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   ],
 
   async run(args) {
     if (args.print) {
-      let { setEnvVars, bin, args: shellArgs } = await this.prepareSpawnHub(this.project.pkg.name, this.project.configPath(), args.environment, args.port, args.url);
+      let { setEnvVars, bin, args: shellArgs } = await this.prepareSpawnHub(
+        this.project.pkg.name,
+        this.project.configPath(),
+        args.environment,
+        args.port,
+        args.url
+      );
       for (let [key, value] of Object.entries(setEnvVars)) {
         process.stdout.write(`export ${key}=${value}\n`);
       }
@@ -58,13 +65,12 @@ module.exports = {
     }
 
     if (!process.env.PGSEARCH_NAMESPACE) {
-      setEnvVars.PGSEARCH_NAMESPACE = packageName.replace(/^[^a-zA-Z]*/, '').replace(/[^a-zA-Z0-9]/g, '_') + '_' + environment;
+      setEnvVars.PGSEARCH_NAMESPACE =
+        packageName.replace(/^[^a-zA-Z]*/, '').replace(/[^a-zA-Z0-9]/g, '_') + '_' + environment;
     }
 
     if (!process.env.INITIAL_DATA_DIR) {
-      setEnvVars.INITIAL_DATA_DIR = path.join(path.dirname(configPath),
-                                              '..', 'cardstack');
-
+      setEnvVars.INITIAL_DATA_DIR = path.join(path.dirname(configPath), '..', 'cardstack');
     }
 
     if (explicitURL) {
@@ -89,7 +95,7 @@ module.exports = {
       process.env[key] = value;
     }
 
-    let proc = spawn(process.execPath, [bin, ...args], { stdio: [0, 1, 2, 'ipc']  });
+    let proc = spawn(process.execPath, [bin, ...args], { stdio: [0, 1, 2, 'ipc'] });
     await new Promise((resolve, reject) => {
       // by convention the hub will send a hello message if it sees we
       // are supervising it over IPC. If we get an error or exit before
@@ -103,5 +109,5 @@ module.exports = {
       proc.on('exit', reject);
     });
     return `http://localhost:${port}`;
-  }
+  },
 };

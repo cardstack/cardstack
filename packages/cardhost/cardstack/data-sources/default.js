@@ -4,9 +4,9 @@ let sources = [
     id: '@cardstack/hub',
     relationships: {
       'default-data-source': {
-        data: { type: 'data-sources', id: 'default' }
-      }
-    }
+        data: { type: 'data-sources', id: 'default' },
+      },
+    },
   },
 
   // TODO this is for testing only--eventually we should
@@ -21,12 +21,12 @@ let sources = [
           user1: {
             name: 'Carl Stack',
             email: 'carlstack@cardstack.com',
-            verified: true
-          }
-        }
-      }
-    }
-  }
+            verified: true,
+          },
+        },
+      },
+    },
+  },
 ];
 
 if (process.env.HUB_ENVIRONMENT === 'production') {
@@ -40,17 +40,17 @@ if (process.env.HUB_ENVIRONMENT === 'production') {
         remote: {
           url: 'git@github.com:cardstack/builder-data.git',
           privateKey: process.env.GIT_PRIVATE_KEY,
-        }
-      }
-    }
+        },
+      },
+    },
   });
 } else {
   sources.push({
     type: 'data-sources',
     id: 'default',
     attributes: {
-      'source-type': '@cardstack/ephemeral'
-    }
+      'source-type': '@cardstack/ephemeral',
+    },
   });
 }
 
