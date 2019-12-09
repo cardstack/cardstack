@@ -20,9 +20,18 @@ const scenario = new Fixtures({
   },
   destroy() {
     return [
-      { type: 'cards', id: qualifiedCard1Id },
-      { type: 'cards', id: qualifiedCard2Id },
-      { type: 'cards', id: qualifiedCard3Id },
+      {
+        type: 'cards',
+        id: qualifiedCard1Id,
+      },
+      {
+        type: 'cards',
+        id: qualifiedCard2Id,
+      },
+      {
+        type: 'cards',
+        id: qualifiedCard3Id,
+      },
     ];
   },
 });
@@ -67,9 +76,17 @@ module('Acceptance | catalog', function(hooks) {
     await visit(`/`);
 
     await click(`[data-test-embedded-card=${card3Id}]`);
-    await waitFor(`[data-test-card-view=${card3Id}]`, { timeout });
+    await waitFor(`[data-test-card-view=${card3Id}]`, {
+      timeout,
+    });
 
     assert.equal(currentURL(), `/cards/${card3Id}`);
     await percySnapshot(assert);
+  });
+
+  test('can navigate to catalog via left edge', async function(assert) {
+    await visit(`/cards/${card1Id}`);
+    await click('[data-test-catalog-link]');
+    assert.equal(currentURL(), '/');
   });
 });

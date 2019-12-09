@@ -71,6 +71,12 @@
   --icon-url: url('/assets/images/buttons/user-active.svg');
 }
 
+.ch-button--icon.user:hover:disabled,
+.ch-button--icon.user:disabled {
+  --icon-url: url('/assets/images/buttons/user-disabled.svg');
+  cursor: not-allowed;
+}
+
 .ch-button--icon.catalog {
   --icon-url: url('/assets/images/buttons/catalog.svg');
   --border-radius: 0;
@@ -80,6 +86,12 @@
 .ch-button--icon.catalog:hover,
 .ch-button--icon.catalog:active {
   --icon-url: url('/assets/images/buttons/catalog-active.svg');
+}
+
+.ch-button--icon.catalog:hover:disabled,
+.ch-button--icon.catalog:disabled {
+  --icon-url: url('/assets/images/buttons/catalog-disabled.svg');
+  cursor: not-allowed;
 }
 
 .ch-button--icon.library {
