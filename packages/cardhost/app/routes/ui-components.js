@@ -74,7 +74,7 @@ export default class UIComponentsRoute extends Route {
         name: 'image',
         label: 'image',
         type: '@cardstack/core-types::string',
-        value: 'https://images.unsplash.com/photo-1542296140-47fd7d838e76'
+        value: 'https://images.unsplash.com/photo-1542296140-47fd7d838e76',
       },
 
       countries: [
