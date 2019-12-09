@@ -95,4 +95,6 @@
   </RightEdge>
 {{/if}}
 
-<style id="card-styles">{{this.model.isolatedCss}}</style>
+<style id="card-styles">
+  {{scope-css this.model.isolatedCss this.model.id}}
+</style>
