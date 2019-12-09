@@ -17,6 +17,7 @@
         @code={{@model.isolatedCss}}
         @language="css"
         @readOnly={{false}}
+        @resizable={{true}}
         @updateCode={{action "updateCode"}}
         class="editor-pane-code"
       />
@@ -28,6 +29,7 @@
         @code={{this.markup}}
         @language="handlebars"
         @readOnly={{true}}
+        @resizable={{true}}
         class="editor-pane-code"
       />
     </div>
