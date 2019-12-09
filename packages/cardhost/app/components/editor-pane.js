@@ -17,45 +17,45 @@ export default class EditorPane extends Component {
   }
 
   get resizeDirections() {
-    if (this.cssModeToggle.dockLocation === "right") {
-      return ["left"];
+    if (this.cssModeToggle.dockLocation === 'right') {
+      return ['left'];
     } else {
-      return ["top"];
+      return ['top'];
     }
   }
 
   get cssEditorResizeDirections() {
-    return ["bottom"];
+    return ['bottom'];
   }
 
   get width() {
-    if (this.cssModeToggle.dockLocation === "right") {
-      return "40%";
+    if (this.cssModeToggle.dockLocation === 'right') {
+      return '40%';
     } else {
-      return "100%";
+      return '100%';
     }
   }
 
   get height() {
-    if (this.cssModeToggle.dockLocation === "right") {
-      return "100%";
+    if (this.cssModeToggle.dockLocation === 'right') {
+      return '100%';
     } else {
-      return "40%";
+      return '40%';
     }
   }
 
   get classNames() {
     let classes = [];
 
-    if (this.cssModeToggle.dockLocation === "bottom") {
-      classes.push("bottom-docked");
+    if (this.cssModeToggle.dockLocation === 'bottom') {
+      classes.push('bottom-docked');
     }
 
     if (this.cssModeToggle.visible === false) {
-      classes.push("hidden");
+      classes.push('hidden');
     }
 
-    return classes.join(" ");
+    return classes.join(' ');
   }
 
   @action
