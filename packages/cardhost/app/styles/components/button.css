@@ -10,6 +10,7 @@
   --border: 1px solid transparent;
   --border-radius: 100px;
   --box-shadow: none;
+  --transition-duration: 800ms;
 
   display: inline-block;
   margin: var(--margin);
@@ -89,10 +90,43 @@
   --icon-url: url('/assets/images/buttons/library-active.svg');
 }
 
+.ch-button--save {
+  --width: 140px;
+  position: relative;
+  transition: (background-color var(--transition-duration));
+}
+
+.ch-button--save.saved {
+  --background: var(--ch-highlight-light);
+  transition: (background-color var(--transition-duration));
+}
+
+.ch-button--save.just-saved {
+  --background: var(--ch-success);
+}
+
+.ch-button--save.saved .ch-button--inner {
+  opacity: 0.5;
+}
+
+.ch-button--save.saved .ch-button--inner svg {
+  position: absolute;
+  top: 14px;
+  right: 20px;
+}
+
+.ch-button--save.just-saved .ch-button--inner {
+  opacity: 1;
+}
+
 .ch-button:hover {
   --color: white;
 
   cursor: pointer;
+}
+
+.ch-button:hover:disabled {
+  --color: var(--ch-default);
 }
 
 .ch-button + .ch-button {
