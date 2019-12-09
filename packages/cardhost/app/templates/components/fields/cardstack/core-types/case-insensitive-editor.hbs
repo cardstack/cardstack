@@ -1,11 +1,2 @@
-<label
-  for={{concat "edit-" @field.name "-field-value"}}
-  data-test-case-insensitive-field-editor-label
->
-  {{@field.label}}
-</label>
-<Input
-  @id={{concat "edit-" @field.name "-field-value"}}
-  @value={{this.fieldValue}}
-  @key-up={{action this.updateFieldValue}}
-/>
+<TextField @id={{concat "edit-" @field.name "-field-value"}} @label={{@field.label}} @value={{this.fieldValue}}
+  @changeAction={{action this.updateFieldValue}} />

@@ -207,7 +207,7 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-field="title"]').doesNotExist();
 
     await visit(`/cards/${card1Id}/edit`);
-    assert.dom('[data-test-field="subtitle"] [data-test-string-field-editor-label]').hasText('subtitle');
+    assert.dom('[data-test-field="subtitle"] [data-test-cs-component-label="text-field"]').hasText('subtitle');
     assert.dom('[data-test-field="title"]').doesNotExist();
 
     await visit(`/cards/${card1Id}/schema`);
