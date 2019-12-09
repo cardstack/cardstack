@@ -1,4 +1,4 @@
-.field-type-cardstack-core-types-date.edit-field > input {
+.field-type-cardstack-core-types-date.edit-field .cs-input {
   background: url('/assets/images/icons/calendar.svg') left center/15px no-repeat;
   padding-left: 25px;
 }
