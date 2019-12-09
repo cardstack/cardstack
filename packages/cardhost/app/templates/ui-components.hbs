@@ -30,17 +30,13 @@
 
   <section class="ui-components--section">
     <h2>Font Family</h2>
-    <CodeEditor
-      @code='--ch-font-family: "Open Sans", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;'
-      @language="css"
-    />
+    <CodeEditor @code='--ch-font-family: "Open Sans", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;'
+      @language="css" />
   </section>
 
   <section class="ui-components--section">
     <h2>Root CSS Variables</h2>
-    <CodeEditor
-      class="ui-components--notes"
-      @code='--ch-left-edge-navbar-width: 80px;
+    <CodeEditor class="ui-components--notes" @code='--ch-left-edge-navbar-width: 80px;
 --ch-left-edge-panel-width: 330px;
 --ch-right-edge-panel-width: 300px;
 
@@ -51,9 +47,7 @@
 --ch-spacing: 20px;
 --ch-edges-z-index: 10;
 --ch-actions-z-index: 11;
---ch-transition-time: 250ms;'
-      @language="css"
-    />
+--ch-transition-time: 250ms;' @language="css" />
   </section>
 
   <section class="ui-components--section">
@@ -65,24 +59,15 @@
     <h2>Buttons</h2>
     <h3>Primary button</h3>
     <button class="ch-button">Save</button>
-    <CodeEditor
-      @code='<button class="ch-button">Save</button>'
-      @language="html"
-    />
+    <CodeEditor @code='<button class="ch-button">Save</button>' @language="html" />
 
     <h3>Secondary button</h3>
     <button class="ch-button ch-button--secondary">Preview</button>
-    <CodeEditor
-      @code='<button class="ch-button ch-button--secondary">Preview</button>'
-      @language="html"
-    />
+    <CodeEditor @code='<button class="ch-button ch-button--secondary">Preview</button>' @language="html" />
 
     <h3>Responsive width (100%) button</h3>
     <button class="ch-button ch-button--responsive">Create a new theme</button>
-    <CodeEditor
-      @code='<button class="ch-button ch-button--responsive">Create a new theme</button>'
-      @language="html"
-    />
+    <CodeEditor @code='<button class="ch-button ch-button--responsive">Create a new theme</button>' @language="html" />
 
     <h3>Icon buttons (SVG button)</h3>
     <div>
@@ -95,16 +80,23 @@
       <CodeEditor @code='<button class="ch-button ch-button--icon user" aria-label="User"></button>
 <button class="ch-button ch-button--icon catalog" aria-label="Catalog"></button>
 <button class="ch-button ch-button--icon share" aria-label="Share"></button>
-<button class="ch-button ch-button--icon library" aria-label="Library"></button>'
-        @language="html"/>
+<button class="ch-button ch-button--icon library" aria-label="Library"></button>' @language="html" />
     </div>
 
     <h3>Secondary Icon button</h3>
     <button class="ch-button ch-button--icon-secondary delete" aria-label="Delete"></button>
-    <CodeEditor
-      @code='<button class="ch-button ch-button--icon-secondary delete" aria-label="Delete"></button>'
-      @language="html"
-    />
+    <CodeEditor @code='<button class="ch-button ch-button--icon-secondary delete" aria-label="Delete"></button>'
+      @language="html" />
+
+    <h3>Disabled Icon button</h3>
+    <div>
+      <button disabled class="ch-button ch-button--icon user" aria-label="User"></button>
+      <button disabled class="ch-button ch-button--icon catalog" aria-label="Catalog"></button>
+    </div>
+    <div>
+      <CodeEditor @code='<button disabled class="ch-button ch-button--icon user" aria-label="User"></button>
+<button disabled class="ch-button ch-button--icon catalog" aria-label="Catalog"></button>' @language="html" />
+    </div>
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col">
@@ -114,52 +106,36 @@
       <ModeSwitcher @name="" @mode="edit" />
       <ModeSwitcher @name="" @mode="schema" />
     </div>
-    <CodeEditor
-      @code='<ModeSwitcher @name="[card-id-here]" @mode="view" />
+    <CodeEditor @code='<ModeSwitcher @name="[card-id-here]" @mode="view" />
 <ModeSwitcher @name="[card-id-here]" @mode="edit" />
-<ModeSwitcher @name="[card-id-here]" @mode="schema" />'
-      @language="html"
-    />
+<ModeSwitcher @name="[card-id-here]" @mode="schema" />' @language="html" />
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col">
     <h2>Search Bar</h2>
     <div class="ch-input-group">
-      <Input
-        @type="search"
-        @class="ch-search-bar"
-        @placeholder="Search Library"
-      />
+      <Input @type="search" @class="ch-search-bar" @placeholder="Search Library" />
     </div>
-    <CodeEditor
-      @code='<div class="ch-input-group">
+    <CodeEditor @code='<div class="ch-input-group">
   <Input
     @type="search"
     @class="ch-search-bar"
     @placeholder="Search Library"
   />
-</div>'
-      @language="html"
-    />
+</div>' @language="html" />
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col">
     <h2>Filter Bar</h2>
     <div class="ch-input-group">
-      <Input
-        @class="ch-filter-bar"
-        @placeholder="Filter Results"
-      />
+      <Input @class="ch-filter-bar" @placeholder="Filter Results" />
     </div>
-    <CodeEditor
-      @code='<div class="ch-input-group">
+    <CodeEditor @code='<div class="ch-input-group">
   <Input
     @class="ch-filter-bar"
     @placeholder="Filter Results"
   />
-</div>'
-      @language="html"
-    />
+</div>' @language="html" />
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col form-fields">
@@ -187,8 +163,7 @@
         <div class="ch-helper-text error">Error message goes here, replacing any helper text.</div>
       </label>
     </div>
-    <CodeEditor
-      @code='<div class="ch-input-group \{{if required "required"}}">
+    <CodeEditor @code='<div class="ch-input-group \{{if required "required"}}">
   \{{#if required}}
     <span class="ch-required">required</span>
   \{{/if}}
@@ -206,16 +181,14 @@
       \{{helperText}}
     \{{/if}}
   </div>
-</div>'
-      @language="handlebars"
-    />
+</div>' @language="handlebars" />
 
     <h3>Textarea</h3>
     <div>
       <div class="ch-input-group">
         <label for="textarea-1" class="ch-label">Textarea label</label>
         <Textarea @id="textarea-1" @class="ch-textarea" @placeholder="Default textarea" />
-      </div>
+        </div>
       <label class="ch-input-group">
         <span class="ch-label">Textarea label</span>
         <Textarea @class="ch-textarea" @disabled={{true}} @placeholder="Disabled textarea" />
