@@ -7,6 +7,7 @@ import CardsService from './cards-service';
 import AuthenticationMiddleware from './authentication-middleware';
 import { EphemeralStorage } from './ephemeral/storage';
 import PgClient from './pgsearch/pgclient';
+import IndexingService from './indexing';
 
 const log = logger('cardstack/server');
 
@@ -17,6 +18,7 @@ export async function wireItUp() {
   registry.register('ephemeralStorage', EphemeralStorage);
   registry.register('cards', CardsService);
   registry.register('pgclient', PgClient);
+  registry.register('indexing', IndexingService);
   return new Container(registry);
 }
 

@@ -151,7 +151,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "search query is malformed"]
+      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can paginate the search results"]
     },
     {
       "type": "node",
