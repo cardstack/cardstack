@@ -130,6 +130,58 @@ describe('hub/card-service', function() {
         },
       });
       expect(cards.length).equals(4);
+      expect(cards.map(c => `${c.realm.href}/${c.originalRealm.href}/${c.localId}`)).to.eql([
+        `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
+        `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/2`,
+        `${myOrigin}/api/realms/first-ephemeral-realm/${myOrigin}/api/realms/first-ephemeral-realm/1`,
+        `${myOrigin}/api/realms/first-ephemeral-realm/${myOrigin}/api/realms/first-ephemeral-realm/2`,
+      ]);
+    });
+
+    it('can filter by original-realm', async function() {
+      let { cards } = await service.as(Session.INTERNAL_PRIVILEGED).search({
+        filter: {
+          eq: { 'original-realm': `http://example.com/api/realms/second-ephemeral-realm` },
+        },
+      });
+      expect(cards.length).equals(4);
+      expect(cards.map(c => `${c.realm.href}/${c.originalRealm.href}/${c.localId}`)).to.eql([
+        `http://example.com/api/realms/second-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
+        `http://example.com/api/realms/second-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/2`,
+        `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
+        `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/2`,
+      ]);
+    });
+
+    it('can filter by local-id', async function() {
+      let { cards } = await service.as(Session.INTERNAL_PRIVILEGED).search({
+        filter: {
+          eq: { 'local-id': '1' },
+        },
+      });
+      expect(cards.length).equals(4);
+      expect(cards.map(c => `${c.realm.href}/${c.originalRealm.href}/${c.localId}`)).to.eql([
+        `http://example.com/api/realms/second-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
+        `http://example.com/api/realms/second-ephemeral-realm/${myOrigin}/api/realms/first-ephemeral-realm/1`,
+        `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
+        `${myOrigin}/api/realms/first-ephemeral-realm/${myOrigin}/api/realms/first-ephemeral-realm/1`,
+      ]);
+    });
+
+    it('can filter by realm and local-id and original-realm', async function() {
+      let { cards } = await service.as(Session.INTERNAL_PRIVILEGED).search({
+        filter: {
+          eq: {
+            realm: `${myOrigin}/api/realms/first-ephemeral-realm`,
+            'original-realm': 'http://example.com/api/realms/second-ephemeral-realm',
+            'local-id': '1',
+          },
+        },
+      });
+      expect(cards.length).equals(1);
+      expect(cards.map(c => `${c.realm.href}/${c.originalRealm.href}/${c.localId}`)).to.eql([
+        `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
+      ]);
     });
   });
 });
