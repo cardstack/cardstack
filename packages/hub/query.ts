@@ -114,6 +114,10 @@ export function assertFilter(filter: any, pointer: string[]): asserts filter is 
     });
   }
 
+  if ('type' in filter) {
+    assertCardId(filter.type, pointer.concat('type'));
+  }
+
   if ('any' in filter) {
     assertAnyFilter(filter, pointer);
   } else if ('every' in filter) {
@@ -170,10 +174,6 @@ export function assertAnyFilter(filter: any, pointer: string[]): asserts filter 
       status: 400,
     });
   }
-  if ('type' in filter) {
-    assertCardId(filter.type, pointer.concat('type'));
-  }
-
   pointer.concat('any');
   if (!('any' in filter)) {
     throw new CardstackError('AnyFilter must have any property', {
@@ -199,10 +199,6 @@ export function assertEveryFilter(filter: any, pointer: string[]): asserts filte
       status: 400,
     });
   }
-  if ('type' in filter) {
-    assertCardId(filter.type, pointer.concat('type'));
-  }
-
   pointer.concat('every');
   if (!('every' in filter)) {
     throw new CardstackError('EveryFilter must have every property', {
@@ -228,10 +224,6 @@ export function assertNotFilter(filter: any, pointer: string[]): asserts filter 
       status: 400,
     });
   }
-  if ('type' in filter) {
-    assertCardId(filter.type, pointer.concat('type'));
-  }
-
   pointer.concat('not');
   if (!('not' in filter)) {
     throw new CardstackError('NotFilter must have not property', {
@@ -250,11 +242,6 @@ export function assertEqFilter(filter: any, pointer: string[]): asserts filter i
       status: 400,
     });
   }
-
-  if ('type' in filter) {
-    assertCardId(filter.type, pointer.concat('type'));
-  }
-
   pointer.concat('eq');
   if (!('eq' in filter)) {
     throw new CardstackError('EqFilter must have eq property', {
@@ -278,11 +265,6 @@ export function assertRangeFilter(filter: any, pointer: string[]): asserts filte
       status: 400,
     });
   }
-
-  if ('type' in filter) {
-    assertCardId(filter.type, pointer.concat('type'));
-  }
-
   pointer.concat('range');
   if (!('range' in filter)) {
     throw new CardstackError('RangeFilter must have range property', {
