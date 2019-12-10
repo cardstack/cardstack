@@ -14,7 +14,6 @@ import { Card } from './card';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { parse } from 'qs';
 import { assertQuery } from './query';
-import CardCollection from './card-collection';
 
 const apiPrefix = '/api';
 const apiPrefixPattern = new RegExp(`^${apiPrefix}/(.*)`);
@@ -132,13 +131,10 @@ export default class JSONAPIMiddleware {
     let query = parse(ctxt.request.querystring, { plainObjects: true });
     assertQuery(query);
 
-    // The CardCollection essentially serves the same purpose as the old
-    // DocumentContext. This is a stub for now until I have a chance to discuss
-    // with Ed, as something needs to be responsible for generating the JSONAPI
-    // for a collection of cards. Likely it will be refactored into something
-    // else.
-    let collection = new CardCollection((await this.cards.as(ctxt.state.cardstackSession).search(query)).cards);
-    ctxt.body = (await collection.asPristineDoc()).jsonapi;
+    let collection = await Card.makePristineCollection(
+      (await this.cards.as(ctxt.state.cardstackSession).search(query)).cards
+    );
+    ctxt.body = collection.jsonapi;
     ctxt.status = 200;
   }
 

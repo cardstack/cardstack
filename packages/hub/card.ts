@@ -1,12 +1,20 @@
 import CardstackError from './error';
 import { loadWriter, patch, buildValueExpression } from './scaffolding';
 import { WriterFactory } from './writer';
-import { PristineDocument, UpstreamDocument, UpstreamIdentity } from './document';
+import { PristineDocument, UpstreamDocument, UpstreamIdentity, PristineCollection } from './document';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import cloneDeep from 'lodash/cloneDeep';
 import { Expression } from './pgsearch/util';
 
 export class Card {
+  static async makePristineCollection(cards: CardWithId[]): Promise<PristineCollection> {
+    let pristineDocs = await Promise.all(cards.map(card => card.asPristineDoc()));
+    // TODO includeds
+    return new PristineCollection({
+      data: pristineDocs.map(doc => doc.jsonapi.data),
+    });
+  }
+
   // Almost everyone should treat this as opaque and only valid on the current
   // hub. (The only exception is some code within the hub itself that may
   // optimize by pulling these apart.)
