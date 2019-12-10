@@ -40,7 +40,10 @@ class RepoExplorer {
     }
     async listTree(refSpec, path) {
         let contents = (await this.runGit('ls-tree', `${refSpec}:${path}`)).stdout;
-        return contents.split("\n").filter(line => line.length > 0).map(line => {
+        return contents
+            .split('\n')
+            .filter(line => line.length > 0)
+            .map(line => {
             let [filemode, type, oid, name] = line.split(/\s+/);
             return { filemode, type, oid, name };
         });
@@ -53,7 +56,7 @@ const formats = {
     authorDate: 'ai',
     committerName: 'cn',
     committerEmail: 'ce',
-    message: 'B'
+    message: 'B',
 };
 async function run(command, args, opts) {
     return await new Promise(function (resolve, reject) {
@@ -68,7 +71,7 @@ async function run(command, args, opts) {
         });
         p.on('close', function (code) {
             if (code !== 0) {
-                let err = new Error(command + " " + args.join(" ") + " exited with nonzero status");
+                let err = new Error(command + ' ' + args.join(' ') + ' exited with nonzero status');
                 err.stderr = stderr;
                 err.stdout = stdout;
                 reject(err);
@@ -84,7 +87,7 @@ function commitOpts(opts) {
     return Object.assign({}, {
         authorName: 'John Milton',
         authorEmail: 'john@paradiselost.com',
-        message: 'Default test message'
+        message: 'Default test message',
     }, opts);
 }
 exports.commitOpts = commitOpts;
@@ -98,7 +101,7 @@ async function makeRepo(path, files) {
         }
     }
     let opts = commitOpts({
-        message: 'First commit'
+        message: 'First commit',
     });
     let head = await change.finalize(opts);
     return { head, repo };

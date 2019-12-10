@@ -6,25 +6,28 @@
 */
 
 import { spawn } from 'child_process';
-import Change from "../change";
+import Change from '../change';
 import { todo } from '@cardstack/plugin-utils/todo-any';
 import { CommitOpts } from '../git';
-
 
 export function inRepo(path: string) {
   return new RepoExplorer(path);
 }
 
 class RepoExplorer {
-  constructor(readonly path: string) {
-  }
+  constructor(readonly path: string) {}
 
   async runGit(...args: string[]) {
     return await run('git', args, { cwd: this.path });
   }
   async getCommit(which: string) {
     let props = Object.keys(formats);
-    let result = await this.runGit('show', which, '-s', `--format=format:${props.map(p => '%' + formats[p]).join('|')}`);
+    let result = await this.runGit(
+      'show',
+      which,
+      '-s',
+      `--format=format:${props.map(p => '%' + formats[p]).join('|')}`
+    );
     let values = result.stdout.split('|');
     let output: Record<string, string> = {};
     for (let i = 0; i < props.length; i++) {
@@ -40,10 +43,13 @@ class RepoExplorer {
   }
   async listTree(refSpec: string, path: string) {
     let contents = (await this.runGit('ls-tree', `${refSpec}:${path}`)).stdout;
-    return contents.split("\n").filter(line => line.length > 0).map(line => {
-      let [filemode, type, oid, name] = line.split(/\s+/);
-      return { filemode, type, oid, name };
-    });
+    return contents
+      .split('\n')
+      .filter(line => line.length > 0)
+      .map(line => {
+        let [filemode, type, oid, name] = line.split(/\s+/);
+        return { filemode, type, oid, name };
+      });
   }
 }
 
@@ -54,7 +60,7 @@ const formats: Record<string, string> = {
   authorDate: 'ai',
   committerName: 'cn',
   committerEmail: 'ce',
-  message: 'B'
+  message: 'B',
 };
 
 async function run(command: string, args: string[], opts: Record<string, string>): Promise<Record<string, string>> {
@@ -68,9 +74,9 @@ async function run(command: string, args: string[], opts: Record<string, string>
     p.stderr.on('data', function(output) {
       stderr += output;
     });
-    p.on('close', function(code){
+    p.on('close', function(code) {
       if (code !== 0) {
-        let err: todo = new Error(command + " " + args.join(" ") + " exited with nonzero status");
+        let err: todo = new Error(command + ' ' + args.join(' ') + ' exited with nonzero status');
         err.stderr = stderr;
         err.stdout = stdout;
         reject(err);
@@ -85,13 +91,16 @@ async function run(command: string, args: string[], opts: Record<string, string>
 type CommitOptsPartial = Partial<CommitOpts>;
 
 export function commitOpts(opts?: CommitOptsPartial) {
-  return Object.assign({}, {
-    authorName: 'John Milton',
-    authorEmail: 'john@paradiselost.com',
-    message: 'Default test message'
-  }, opts) as CommitOpts;
+  return Object.assign(
+    {},
+    {
+      authorName: 'John Milton',
+      authorEmail: 'john@paradiselost.com',
+      message: 'Default test message',
+    },
+    opts
+  ) as CommitOpts;
 }
-
 
 export async function makeRepo(path: string, files?: Record<string, string>) {
   let change = await Change.createInitial(path, 'master');
@@ -105,7 +114,7 @@ export async function makeRepo(path: string, files?: Record<string, string>) {
   }
 
   let opts = commitOpts({
-    message: 'First commit'
+    message: 'First commit',
   });
 
   let head = await change.finalize(opts);

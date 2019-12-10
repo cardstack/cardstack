@@ -5,22 +5,15 @@ const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 import { todo } from '@cardstack/plugin-utils/todo-any';
 
-const {
-  createDefaultEnvironment,
-  destroyDefaultEnvironment
-} = require('@cardstack/test-support/env'); // eslint-disable-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
+const { createDefaultEnvironment, destroyDefaultEnvironment } = require('@cardstack/test-support/env'); // eslint-disable-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 
 import { makeRepo } from './support';
 
 import { join } from 'path';
 import { readFileSync } from 'fs';
-import {
-  Cred,
-  createRemote,
-  FetchOptions
-} from "../git";
+import { Cred, createRemote, FetchOptions } from '../git';
 
-import service from "../service";
+import service from '../service';
 
 const privateKey = readFileSync(join(__dirname, 'git-ssh-server', 'cardstack-test-key'), 'utf8');
 
@@ -32,8 +25,8 @@ const fetchOpts: FetchOptions = {
   callbacks: {
     credentials: (url: string, userName: string) => {
       return Cred.sshKeyMemoryNew(userName, '', privateKey, '');
-    }
-  }
+    },
+  },
 };
 
 async function resetRemote() {
@@ -42,20 +35,20 @@ async function resetRemote() {
   let tempRepo = await makeRepo(root, {
     'contents/events/event-1.json': JSON.stringify({
       attributes: {
-        title: "This is a test event",
-        'published-date': "2018-09-25"
-      }
+        title: 'This is a test event',
+        'published-date': '2018-09-25',
+      },
     }),
     'contents/events/event-2.json': JSON.stringify({
       attributes: {
-        title: "This is another test event",
-        "published-date": "2018-10-25"
-      }
-    })
+        title: 'This is another test event',
+        'published-date': '2018-10-25',
+      },
+    }),
   });
 
   let remote = await createRemote(tempRepo.repo, 'origin', 'ssh://root@localhost:9022/root/data-test');
-  await remote.push(["+refs/heads/master:refs/heads/master"], fetchOpts);
+  await remote.push(['+refs/heads/master:refs/heads/master'], fetchOpts);
 
   return tempRepo;
 }
@@ -74,45 +67,36 @@ describe('git/indexer remote config', function() {
 
   it('throws an error when remote and repo are defined', function() {
     let factory = new JSONAPIFactory();
-    let dataSource = factory.addResource('data-sources')
-      .withAttributes({
-        'source-type': '@cardstack/git',
-        params: {
-          repo: '/user/repo',
-          remote: {
-            url: 'ssh://root@localhost:9022/root/data-test',
-            privateKey
-          }
-        }
-      });
-    factory.addResource('plugin-configs', '@cardstack/hub')
-      .withRelated(
-        'default-data-source',
-        dataSource
-      );
+    let dataSource = factory.addResource('data-sources').withAttributes({
+      'source-type': '@cardstack/git',
+      params: {
+        repo: '/user/repo',
+        remote: {
+          url: 'ssh://root@localhost:9022/root/data-test',
+          privateKey,
+        },
+      },
+    });
+    factory.addResource('plugin-configs', '@cardstack/hub').withRelated('default-data-source', dataSource);
 
-    return expect(createDefaultEnvironment(join(__dirname, '..'), factory.getModels()))
-      .to.be.rejectedWith(/You cannot define the params 'remote' and 'repo' at the same time for this data source/);
+    return expect(createDefaultEnvironment(join(__dirname, '..'), factory.getModels())).to.be.rejectedWith(
+      /You cannot define the params 'remote' and 'repo' at the same time for this data source/
+    );
   });
 
   it('does not throw an error when remote is configured on its own', async function() {
     let factory = new JSONAPIFactory();
 
-    let dataSource = factory.addResource('data-sources')
-      .withAttributes({
-        'source-type': '@cardstack/git',
-        params: {
-          remote: {
-            url: 'ssh://root@localhost:9022/root/data-test',
-            privateKey
-          }
-        }
-      });
-    factory.addResource('plugin-configs', '@cardstack/hub')
-      .withRelated(
-        'default-data-source',
-        dataSource
-      );
+    let dataSource = factory.addResource('data-sources').withAttributes({
+      'source-type': '@cardstack/git',
+      params: {
+        remote: {
+          url: 'ssh://root@localhost:9022/root/data-test',
+          privateKey,
+        },
+      },
+    });
+    factory.addResource('plugin-configs', '@cardstack/hub').withRelated('default-data-source', dataSource);
 
     let env = await createDefaultEnvironment(join(__dirname, '..'), factory.getModels());
     await destroyDefaultEnvironment(env);
@@ -122,19 +106,14 @@ describe('git/indexer remote config', function() {
     let factory = new JSONAPIFactory();
     let repo = await temp.mkdir('cardstack-server-test-remote');
 
-    let dataSource = factory.addResource('data-sources')
-      .withAttributes({
-        'source-type': '@cardstack/git',
-        params: {
-          repo
-        }
-      });
+    let dataSource = factory.addResource('data-sources').withAttributes({
+      'source-type': '@cardstack/git',
+      params: {
+        repo,
+      },
+    });
 
-    factory.addResource('plugin-configs', '@cardstack/hub')
-      .withRelated(
-        'default-data-source',
-        dataSource
-      );
+    factory.addResource('plugin-configs', '@cardstack/hub').withRelated('default-data-source', dataSource);
 
     let env = await createDefaultEnvironment(join(__dirname, '..'), factory.getModels());
     await destroyDefaultEnvironment(env);
@@ -153,31 +132,27 @@ describe('git/indexer cloning', function() {
 
     let factory = new JSONAPIFactory();
 
-    factory.addResource('content-types', 'events')
-      .withRelated('fields', [
-        factory.addResource('fields', 'title')
-          .withAttributes({
-            fieldType: '@cardstack/core-types::string'
-          }),
-        factory.addResource('fields', 'published-date')
-          .withAttributes({
-            fieldType: '@cardstack/core-types::string'
-          })
-      ]);
+    factory.addResource('content-types', 'events').withRelated('fields', [
+      factory.addResource('fields', 'title').withAttributes({
+        fieldType: '@cardstack/core-types::string',
+      }),
+      factory.addResource('fields', 'published-date').withAttributes({
+        fieldType: '@cardstack/core-types::string',
+      }),
+    ]);
 
     let cacheDir = await temp.mkdir('indexer-cloning-test');
 
-    dataSource = factory.addResource('data-sources')
-      .withAttributes({
-        'source-type': '@cardstack/git',
-        params: {
-          remote: {
-            url: 'ssh://root@localhost:9022/root/data-test',
-            privateKey,
-            cacheDir,
-          }
-        }
-      });
+    dataSource = factory.addResource('data-sources').withAttributes({
+      'source-type': '@cardstack/git',
+      params: {
+        remote: {
+          url: 'ssh://root@localhost:9022/root/data-test',
+          privateKey,
+          cacheDir,
+        },
+      },
+    });
 
     start = async function() {
       env = await createDefaultEnvironment(join(__dirname, '..'), factory.getModels());

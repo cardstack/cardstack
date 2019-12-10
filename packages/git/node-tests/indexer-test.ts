@@ -1,82 +1,89 @@
-import Change from "../change";
+import Change from '../change';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 const temp = require('@cardstack/test-support/temp-helper');
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
-const {
-  createDefaultEnvironment,
-  destroyDefaultEnvironment
-} = require('@cardstack/test-support/env'); // eslint-disable-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
+const { createDefaultEnvironment, destroyDefaultEnvironment } = require('@cardstack/test-support/env'); // eslint-disable-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 
 import { commitOpts, makeRepo } from './support';
 
-import logger from "@cardstack/logger";
+import logger from '@cardstack/logger';
 
-import fs from "fs";
-import { join } from "path";
+import fs from 'fs';
+import { join } from 'path';
 import { todo } from '@cardstack/plugin-utils/todo-any';
 
 function toResource(doc: todo) {
   return doc.data;
 }
 
-function internalCardDocument(titleValue: string, id='local-hub::test-card') {
+function internalCardDocument(titleValue: string, id = 'local-hub::test-card') {
   let factory = new JSONAPIFactory();
   return factory.getDocumentFor(
-    factory.addResource(id, id)
+    factory
+      .addResource(id, id)
       .withRelated('adopted-from', { type: 'local-hub::@cardstack/base-card', id: 'local-hub::@cardstack/base-card' })
       .withRelated('fields', [
         factory.addResource('fields', `${id}::title`).withAttributes({
           'is-metadata': true,
           'field-type': '@cardstack/core-types::string',
-          'needed-when-embedded': true
-        })
+          'needed-when-embedded': true,
+        }),
       ])
       .withAttributes({
-        [`${id}::title`]: titleValue
+        [`${id}::title`]: titleValue,
       })
   );
 }
 
 describe('git/indexer', function() {
-  let root: string, env: todo, indexer: todo, searcher: todo, cardServices: todo, dataSource: todo, assertNoDocument: Function, assertNoCard: Function, start: Function, client: todo;
+  let root: string,
+    env: todo,
+    indexer: todo,
+    searcher: todo,
+    cardServices: todo,
+    dataSource: todo,
+    assertNoDocument: Function,
+    assertNoCard: Function,
+    start: Function,
+    client: todo;
 
   beforeEach(async function() {
     root = await temp.mkdir('cardstack-server-test');
 
     let factory = new JSONAPIFactory();
 
-    dataSource = factory.addResource('data-sources')
-      .withAttributes({
-        'source-type': '@cardstack/git',
-        'card-types': ['local-hub::@cardstack/base-card'],
-        params: { repo: root }
-      });
+    dataSource = factory.addResource('data-sources').withAttributes({
+      'source-type': '@cardstack/git',
+      'card-types': ['local-hub::@cardstack/base-card'],
+      params: { repo: root },
+    });
 
-    factory.addResource('content-types', 'articles')
+    factory
+      .addResource('content-types', 'articles')
       .withAttributes({
-        defaultIncludes: ['author']
+        defaultIncludes: ['author'],
       })
       .withRelated('fields', [
-        factory.addResource('fields', 'title')
-          .withAttributes({
-            fieldType: '@cardstack/core-types::string'
-          }),
-        factory.addResource('fields', 'author')
-          .withAttributes({
-            fieldType: '@cardstack/core-types::belongs-to'
-          })
-      ]).withRelated('data-source', dataSource);
+        factory.addResource('fields', 'title').withAttributes({
+          fieldType: '@cardstack/core-types::string',
+        }),
+        factory.addResource('fields', 'author').withAttributes({
+          fieldType: '@cardstack/core-types::belongs-to',
+        }),
+      ])
+      .withRelated('data-source', dataSource);
 
-    factory.addResource('content-types', 'people')
+    factory
+      .addResource('content-types', 'people')
       .withRelated('fields', [
-        factory.addResource('fields', 'name')
-          .withAttributes({
-            fieldType: '@cardstack/core-types::string'
-          })
-      ]).withRelated('data-source', dataSource);
+        factory.addResource('fields', 'name').withAttributes({
+          fieldType: '@cardstack/core-types::string',
+        }),
+      ])
+      .withRelated('data-source', dataSource);
 
     start = async function() {
       env = await createDefaultEnvironment(join(__dirname, '..'), factory.getModels());
@@ -90,7 +97,7 @@ describe('git/indexer', function() {
     assertNoDocument = async function(type: string, id: string) {
       try {
         await searcher.get(env.session, 'local-hub', type, id);
-      } catch(err) {
+      } catch (err) {
         expect(err.status).to.equal(404);
         return;
       }
@@ -100,7 +107,7 @@ describe('git/indexer', function() {
     assertNoCard = async function(id: string) {
       try {
         await cardServices.get(env.session, id, 'isolated');
-      } catch(err) {
+      } catch (err) {
         expect(err.status).to.equal(404);
         return;
       }
@@ -128,9 +135,11 @@ describe('git/indexer', function() {
 
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('contents/articles/hello-world.json', { allowCreate: true });
-    file.setContent(JSON.stringify({
-      attributes: { title: 'world' }
-    }));
+    file.setContent(
+      JSON.stringify({
+        attributes: { title: 'world' },
+      })
+    );
     head = await change.finalize(commitOpts());
 
     await indexer.update();
@@ -164,8 +173,7 @@ describe('git/indexer', function() {
     expect(jsonapi).has.deep.property('attributes.title', 'world');
   });
 
-  it.skip("does not index card document from data source whose adoption chain does not match data source's card types", async function() {
-  });
+  it.skip("does not index card document from data source whose adoption chain does not match data source's card types", async function() {});
 
   it('ignores newly added document that lacks json extension', async function() {
     let { repo, head } = await makeRepo(root);
@@ -174,9 +182,11 @@ describe('git/indexer', function() {
 
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('contents/articles/hello-world', { allowCreate: true });
-    file.setContent(JSON.stringify({
-      attributes: { title: 'world' }
-    }));
+    file.setContent(
+      JSON.stringify({
+        attributes: { title: 'world' },
+      })
+    );
     head = await change.finalize(commitOpts());
 
     await indexer.update();
@@ -208,8 +218,8 @@ describe('git/indexer', function() {
   it('does not reindex unchanged content', async function() {
     let { repo, head } = await makeRepo(root, {
       'contents/articles/hello-world.json': JSON.stringify({
-        attributes: { title: 'world' }
-      })
+        attributes: { title: 'world' },
+      }),
     });
 
     await start();
@@ -217,16 +227,25 @@ describe('git/indexer', function() {
     // Here we manually reach into postgres to dirty a cached
     // document in order to see whether the indexer will leave it
     // alone
-    let row = await client.query(`select pristine_doc from documents where type=$1 and id=$2`, ['articles', 'hello-world']);
+    let row = await client.query(`select pristine_doc from documents where type=$1 and id=$2`, [
+      'articles',
+      'hello-world',
+    ]);
     let editedDoc = Object.assign({}, row.rows[0].pristine_doc);
     editedDoc.data.attributes.title = 'somebody else';
-    await client.query(`update documents set pristine_doc=$1 where type=$2 and id=$3`, [editedDoc, 'articles', 'hello-world']);
+    await client.query(`update documents set pristine_doc=$1 where type=$2 and id=$3`, [
+      editedDoc,
+      'articles',
+      'hello-world',
+    ]);
 
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('contents/articles/second.json', { allowCreate: true });
-    file.setContent(JSON.stringify({
-      attributes: { title: 'world' }
-    }));
+    file.setContent(
+      JSON.stringify({
+        attributes: { title: 'world' },
+      })
+    );
     head = await change.finalize(commitOpts());
 
     await indexer.update();
@@ -241,7 +260,7 @@ describe('git/indexer', function() {
   it('does not reindex unchanged card document', async function() {
     let internalCard = internalCardDocument('world');
     let { repo, head } = await makeRepo(root, {
-      [`cards/${internalCard.data.id}.json`]: JSON.stringify(internalCard)
+      [`cards/${internalCard.data.id}.json`]: JSON.stringify(internalCard),
     });
 
     await start();
@@ -249,17 +268,26 @@ describe('git/indexer', function() {
     // Here we manually reach into postgres to dirty a cached
     // document in order to see whether the indexer will leave it
     // alone
-    let row = await client.query(`select pristine_doc from documents where type=$1 and id=$2`, [internalCard.data.id, internalCard.data.id]);
+    let row = await client.query(`select pristine_doc from documents where type=$1 and id=$2`, [
+      internalCard.data.id,
+      internalCard.data.id,
+    ]);
     let editedDoc = Object.assign({}, row.rows[0].pristine_doc);
     editedDoc.data.attributes[`${internalCard.data.id}::title`] = 'somebody else';
 
-    await client.query(`update documents set pristine_doc=$1 where type=$2 and id=$3`, [editedDoc, internalCard.data.id, internalCard.data.id]);
+    await client.query(`update documents set pristine_doc=$1 where type=$2 and id=$3`, [
+      editedDoc,
+      internalCard.data.id,
+      internalCard.data.id,
+    ]);
 
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('contents/articles/second.json', { allowCreate: true });
-    file.setContent(JSON.stringify({
-      attributes: { title: 'world' }
-    }));
+    file.setContent(
+      JSON.stringify({
+        attributes: { title: 'world' },
+      })
+    );
     head = await change.finalize(commitOpts());
 
     await indexer.update();
@@ -274,8 +302,8 @@ describe('git/indexer', function() {
   it('deletes removed content', async function() {
     let { repo, head } = await makeRepo(root, {
       'contents/articles/hello-world.json': JSON.stringify({
-        title: 'world'
-      })
+        title: 'world',
+      }),
     });
 
     await start();
@@ -291,7 +319,7 @@ describe('git/indexer', function() {
   it('deletes removed card document', async function() {
     let internalCard = internalCardDocument('world');
     let { repo, head } = await makeRepo(root, {
-      [`cards/${internalCard.data.id}.json`]: JSON.stringify(internalCard)
+      [`cards/${internalCard.data.id}.json`]: JSON.stringify(internalCard),
     });
 
     await start();
@@ -310,41 +338,41 @@ describe('git/indexer', function() {
     await makeRepo(repos + '/left', {
       'contents/articles/left.json': JSON.stringify({
         attributes: {
-          title: 'article from left repo'
-        }
+          title: 'article from left repo',
+        },
       }),
       'contents/articles/both.json': JSON.stringify({
         attributes: {
-          title: 'article from both repos, left version'
-        }
-      })
+          title: 'article from both repos, left version',
+        },
+      }),
     });
 
     await makeRepo(repos + '/right', {
       'contents/articles/right.json': JSON.stringify({
         attributes: {
-          title: 'article from right repo'
-        }
+          title: 'article from right repo',
+        },
       }),
       'contents/articles/both.json': JSON.stringify({
         attributes: {
-          title: 'article from both repos, right version'
-        }
-      })
+          title: 'article from both repos, right version',
+        },
+      }),
     });
 
     let { repo, head } = await makeRepo(root, {
       'contents/articles/upstream.json': JSON.stringify({
         attributes: {
-          title: 'article from upstream'
-        }
+          title: 'article from upstream',
+        },
       }),
       'schema/data-sources/under-test.json': JSON.stringify({
         attributes: {
           'source-type': '@cardstack/git',
-          params: { repo: repos + '/left' }
-        }
-      })
+          params: { repo: repos + '/left' },
+        },
+      }),
     });
 
     await start();
@@ -364,18 +392,19 @@ describe('git/indexer', function() {
 
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('schema/data-sources/under-test.json', { allowUpdate: true });
-    file.setContent(JSON.stringify({
-      attributes: {
-        'source-type': '@cardstack/git',
-        params: { repo: repos + '/right' }
-      }
-    }));
+    file.setContent(
+      JSON.stringify({
+        attributes: {
+          'source-type': '@cardstack/git',
+          params: { repo: repos + '/right' },
+        },
+      })
+    );
     await change.finalize(commitOpts());
 
     await logger.expectWarn(/Unable to load previously indexed commit/, async () => {
       await indexer.update({ forceRefresh: true });
     });
-
 
     {
       // Update
@@ -401,23 +430,31 @@ describe('git/indexer', function() {
 
     await makeRepo(repos + '/left', {
       'cards/local-hub::left.json': JSON.stringify(internalCardDocument('article from left repo', 'local-hub::left')),
-      'cards/local-hub::both.json': JSON.stringify(internalCardDocument('article from both repos, left version', 'local-hub::both'))
+      'cards/local-hub::both.json': JSON.stringify(
+        internalCardDocument('article from both repos, left version', 'local-hub::both')
+      ),
     });
 
     await makeRepo(repos + '/right', {
-      'cards/local-hub::right.json': JSON.stringify(internalCardDocument('article from right repo', 'local-hub::right')),
-      'cards/local-hub::both.json': JSON.stringify(internalCardDocument('article from both repos, right version', 'local-hub::both'))
+      'cards/local-hub::right.json': JSON.stringify(
+        internalCardDocument('article from right repo', 'local-hub::right')
+      ),
+      'cards/local-hub::both.json': JSON.stringify(
+        internalCardDocument('article from both repos, right version', 'local-hub::both')
+      ),
     });
 
     let { repo, head } = await makeRepo(root, {
-      'cards/local-hub::upstream.json': JSON.stringify(internalCardDocument('article from upstream', 'local-hub::upstream')),
+      'cards/local-hub::upstream.json': JSON.stringify(
+        internalCardDocument('article from upstream', 'local-hub::upstream')
+      ),
       'schema/data-sources/under-test.json': JSON.stringify({
         attributes: {
           'source-type': '@cardstack/git',
           'card-types': ['local-hub::@cardstack/base-card'],
-          params: { repo: repos + '/left' }
-        }
-      })
+          params: { repo: repos + '/left' },
+        },
+      }),
     });
 
     await start();
@@ -437,19 +474,20 @@ describe('git/indexer', function() {
 
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('schema/data-sources/under-test.json', { allowUpdate: true });
-    file.setContent(JSON.stringify({
-      attributes: {
-        'source-type': '@cardstack/git',
-        'card-types': ['local-hub::@cardstack/base-card'],
-        params: { repo: repos + '/right' }
-      }
-    }));
+    file.setContent(
+      JSON.stringify({
+        attributes: {
+          'source-type': '@cardstack/git',
+          'card-types': ['local-hub::@cardstack/base-card'],
+          params: { repo: repos + '/right' },
+        },
+      })
+    );
     await change.finalize(commitOpts());
 
     await logger.expectWarn(/Unable to load previously indexed commit/, async () => {
       await indexer.update({ forceRefresh: true });
     });
-
 
     {
       // Update
@@ -473,19 +511,19 @@ describe('git/indexer', function() {
     await makeRepo(root, {
       'contents/articles/hello-world.json': JSON.stringify({
         attributes: {
-          title: 'Hello world'
+          title: 'Hello world',
         },
         relationships: {
           author: {
-            data: { type: 'people', id: 'person1' }
-          }
-        }
+            data: { type: 'people', id: 'person1' },
+          },
+        },
       }),
       'contents/people/person1.json': JSON.stringify({
         attributes: {
-          name: 'Q'
-        }
-      })
+          name: 'Q',
+        },
+      }),
     });
 
     await start();
@@ -495,8 +533,6 @@ describe('git/indexer', function() {
     expect(contents.included).has.length(1);
     expect(contents.included[0]).has.deep.property('attributes.name', 'Q');
   });
-
-
 });
 
 describe('git/indexer failures', function() {
@@ -507,17 +543,12 @@ describe('git/indexer failures', function() {
 
     let factory = new JSONAPIFactory();
 
-    let dataSource = factory.addResource('data-sources')
-      .withAttributes({
-        'source-type': '@cardstack/git',
-        params: { repo: root + '/repo-to-be-created' }
-      });
+    let dataSource = factory.addResource('data-sources').withAttributes({
+      'source-type': '@cardstack/git',
+      params: { repo: root + '/repo-to-be-created' },
+    });
 
-    factory.addResource('plugin-configs', '@cardstack/hub')
-      .withRelated(
-        'default-data-source',
-        dataSource
-      );
+    factory.addResource('plugin-configs', '@cardstack/hub').withRelated('default-data-source', dataSource);
     env = await createDefaultEnvironment(join(__dirname, '..'), factory.getModels());
   });
 

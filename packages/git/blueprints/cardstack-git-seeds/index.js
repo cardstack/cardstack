@@ -1,10 +1,4 @@
-const {
-  Repository,
-  Branch,
-  Reference,
-  Commit
-} = require('../../git');
-
+const { Repository, Branch, Reference, Commit } = require('../../git');
 
 /* eslint-env node */
 module.exports = {
@@ -20,7 +14,7 @@ module.exports = {
     let repo = await Repository.open(target);
     try {
       await Branch.lookup(repo, 'cs-master', Branch.BRANCH.LOCAL);
-      ui.writeInfoLine("Not creating branch cs-master because it exists");
+      ui.writeInfoLine('Not creating branch cs-master because it exists');
       return;
     } catch (err) {
       if (!/Cannot locate local branch/i.test(err.message)) {
@@ -30,8 +24,7 @@ module.exports = {
       let headCommit = await Commit.lookup(repo, oid);
       // zero here means "don't force"
       await Branch.create(repo, 'cs-master', headCommit, 0);
-      ui.writeInfoLine("Created branch cs-master");
+      ui.writeInfoLine('Created branch cs-master');
     }
-
-  }
+  },
 };

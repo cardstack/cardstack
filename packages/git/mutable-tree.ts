@@ -10,9 +10,9 @@ const tombstone = undefined;
 type TreeEntry = NodeGitTreeEntry | NewEntry | MutableEntryWrapper | MutableTree | MutableBlob | undefined;
 
 class MutableTree {
-  overlay: Map<string,TreeEntry>;
+  overlay: Map<string, TreeEntry>;
 
-  constructor(readonly repo: Repository, readonly tree?: Tree|MutableTree) {
+  constructor(readonly repo: Repository, readonly tree?: Tree | MutableTree) {
     this.overlay = new Map();
   }
 
@@ -69,7 +69,7 @@ class MutableTree {
     return { tree, leaf, leafName };
   }
 
-  async traverse(path: string, allowCreate=false) {
+  async traverse(path: string, allowCreate = false) {
     let parts = path.split('/');
     let here: todo = this;
 
@@ -88,7 +88,7 @@ class MutableTree {
     return {
       tree: here,
       leaf: here.entryByName(parts[0]),
-      leafName: parts[0]
+      leafName: parts[0],
     };
   }
 
@@ -96,7 +96,7 @@ class MutableTree {
     return FILEMODE.TREE;
   }
 
-  async write(allowEmpty=false) {
+  async write(allowEmpty = false) {
     if (this.overlay.size === 0 && this.tree) {
       return (this.tree as Tree).id();
     }
@@ -120,8 +120,7 @@ class MutableTree {
 }
 
 class MutableBlob {
-  constructor(readonly repo: Repository, readonly buffer: Buffer) {
-  }
+  constructor(readonly repo: Repository, readonly buffer: Buffer) {}
   content() {
     return this.buffer;
   }
@@ -142,8 +141,7 @@ class MutableBlob {
 class MutableEntryWrapper {
   _mutableTree?: MutableTree;
 
-  constructor(readonly repo: Repository, readonly entry: NodeGitTreeEntry) {
-  }
+  constructor(readonly repo: Repository, readonly entry: NodeGitTreeEntry) {}
   filemode() {
     return this.entry!.filemode();
   }
@@ -180,7 +178,6 @@ class NewEntry {
   savedId?: Oid;
 
   constructor(readonly repo: Repository, object: TreeEntry, filemode: FILEMODE) {
-
     this._filemode = filemode;
 
     if (this.isTree() && !(object instanceof MutableTree)) {
@@ -207,7 +204,7 @@ class NewEntry {
     return this._object;
   }
   async write() {
-    return this.savedId = await this._write();
+    return (this.savedId = await this._write());
   }
 
   id() {

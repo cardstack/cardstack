@@ -12,13 +12,12 @@ import {
   Treebuilder,
   TreeEntry,
   Oid,
-  Blob
-} from "nodegit";
+  Blob,
+} from 'nodegit';
 
 // import fs from "fs";
 // import IsomorphicGit from "isomorphic-git";
 // IsomorphicGit.plugins.set('fs', fs);
-
 
 import { FetchOptions } from 'nodegit/fetch-options';
 
@@ -28,10 +27,8 @@ const enum FILEMODE {
   BLOB = 33188,
   EXECUTABLE = 33261,
   LINK = 40960,
-  COMMIT = 57344
+  COMMIT = 57344,
 }
-
-
 
 // there is no type for this
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
@@ -40,13 +37,12 @@ const { setThreadSafetyStatus } = require('nodegit');
 // operations.
 setThreadSafetyStatus(1);
 
-
 async function logFromCommit(commit: Commit) {
   let log: any[] = [];
 
   await new Promise((resolve, reject) => {
     let history = commit.history();
-    history.on("commit", (c: any) => log.push(c) );
+    history.on('commit', (c: any) => log.push(c));
     history.on('end', resolve);
     history.on('error', reject);
     history.start();
@@ -55,14 +51,13 @@ async function logFromCommit(commit: Commit) {
   return log;
 }
 
-async function cloneRepo(url: string, path: string, { fetchOpts }: {fetchOpts: FetchOptions}) {
+async function cloneRepo(url: string, path: string, { fetchOpts }: { fetchOpts: FetchOptions }) {
   return await Clone.clone(url, path, { fetchOpts });
 }
 
 async function createRemote(repo: Repository, name: string, url: string) {
   return await Remote.create(repo, name, url);
 }
-
 
 export interface RemoteConfig {
   url: string;
@@ -102,6 +97,5 @@ export {
   // wrapped
   logFromCommit,
   cloneRepo,
-  createRemote
+  createRemote,
 };
-
