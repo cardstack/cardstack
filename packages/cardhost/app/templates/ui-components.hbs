@@ -97,6 +97,10 @@
       <CodeEditor @code='<button disabled class="ch-button ch-button--icon user" aria-label="User"></button>
 <button disabled class="ch-button ch-button--icon catalog" aria-label="Catalog"></button>' @language="html" />
     </div>
+
+    <h3>Save button</h3>
+    <SaveButton @card={{this.model}} />
+    <CodeEditor @code='<SaveButton @card=\{{card}} />' @language="html" />
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col">
