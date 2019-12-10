@@ -153,6 +153,45 @@ describe('hub/jsonapi', function() {
     expect(response.body?.data.length).to.equal(2);
   });
 
+  it('can paginate the search results', async function() {
+    for (let i = 0; i < 20; i++) {
+      await request
+        .post('/api/realms/first-ephemeral-realm/cards')
+        .set('Content-Type', 'application/vnd.api+json')
+        .send(testCard({ foo: 'bar' }).jsonapi);
+    }
+
+    let filter = {
+      filter: {
+        eq: { 'original-realm': `${myOrigin}/api/realms/first-ephemeral-realm` },
+      },
+      page: {
+        size: 7,
+        cursor: undefined,
+      },
+    };
+
+    let response = await request.get(`/api/cards?${stringify(filter)}`).set('Accept', 'application/vnd.api+json');
+    expect(response.status).to.equal(200);
+    expect(response.body?.data.length).to.equal(7);
+    expect(response.body?.meta.page.total).to.equal(20);
+    expect(response.body?.meta.page.cursor).to.be.ok;
+
+    filter.page.cursor = response.body.meta.page.cursor;
+    response = await request.get(`/api/cards?${stringify(filter)}`).set('Accept', 'application/vnd.api+json');
+    expect(response.status).to.equal(200);
+    expect(response.body?.data.length).to.equal(7);
+    expect(response.body?.meta.page.total).to.equal(20);
+    expect(response.body?.meta.page.cursor).to.be.ok;
+
+    filter.page.cursor = response.body.meta.page.cursor;
+    response = await request.get(`/api/cards?${stringify(filter)}`).set('Accept', 'application/vnd.api+json');
+    expect(response.status).to.equal(200);
+    expect(response.body?.data.length).to.equal(6);
+    expect(response.body?.meta.page.total).to.equal(20);
+    expect(response.body?.meta.page.cursor).to.be.not.ok;
+  });
+
   it('returns 400 when search query is malformed', async function() {
     let filter = {
       filter: { foo: 'bar' },

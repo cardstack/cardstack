@@ -7,6 +7,7 @@ import { search as scaffoldSearch, get as scaffoldGet, validate } from './scaffo
 import { getOwner, inject } from './dependency-injection';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { Query } from './query';
+import { ResponseMeta } from './pgsearch/pgclient';
 
 export default class CardsService {
   pgclient = inject('pgclient');
@@ -51,15 +52,14 @@ export class ScopedCardService {
     return card;
   }
 
-  async search(query: Query): Promise<{ cards: CardWithId[] }> {
+  async search(query: Query): Promise<{ cards: CardWithId[]; meta: ResponseMeta }> {
     let cards = await scaffoldSearch(query);
     if (cards) {
-      return { cards };
+      return { cards, meta: { page: { total: cards.length } } };
     }
 
-    // TODO dont create a scoped card service here
-    let { cards: foundCards } = await this.cards.pgclient.search(this, query);
-    return { cards: foundCards };
+    let { cards: foundCards, meta } = await this.cards.pgclient.search(this, query);
+    return { cards: foundCards, meta };
   }
 
   async get(id: CardId): Promise<CardWithId> {

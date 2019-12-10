@@ -7,7 +7,7 @@ import { assertJSONValue, assertJSONPrimitive } from './json-validation';
 export interface Query {
   filter?: Filter;
   sort?: string | string[];
-  page?: { size?: number; cursor?: string };
+  page?: { size?: number | string; cursor?: string };
   queryString?: string;
 }
 
@@ -79,7 +79,7 @@ export function assertQuery(query: any, pointer: string[] = ['']): asserts query
   }
 
   if ('page' in query) {
-    assertPage(query.filter.page, pointer.concat('page'));
+    assertPage(query.page, pointer.concat('page'));
   }
 }
 
@@ -91,11 +91,16 @@ export function assertPage(page: any, pointer: string[]): asserts page is Query[
     });
   }
 
-  if ('size' in page && typeof page.size !== 'number') {
-    throw new CardstackError('size must be a number', {
-      source: { pointer: pointer.concat('size').join('/') },
-      status: 400,
-    });
+  if ('size' in page) {
+    if (
+      (typeof page.size !== 'number' && typeof page.size !== 'string') ||
+      (typeof page.size === 'string' && isNaN(page.size))
+    ) {
+      throw new CardstackError('size must be a number', {
+        source: { pointer: pointer.concat('size').join('/') },
+        status: 400,
+      });
+    }
   }
 
   if ('cursor' in page && typeof page.cursor !== 'string') {

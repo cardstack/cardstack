@@ -241,7 +241,7 @@ export default class PgClient {
       ...sorts.orderExpression(),
     ];
 
-    let size = page?.size ?? 10;
+    let size = Number(page?.size ?? 10);
     query = [...query, 'limit', param(size + 1)];
 
     let response = await this.query(cards, query);

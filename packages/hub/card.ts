@@ -5,13 +5,16 @@ import { PristineDocument, UpstreamDocument, UpstreamIdentity, PristineCollectio
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import cloneDeep from 'lodash/cloneDeep';
 import { Expression } from './pgsearch/util';
+import { ResponseMeta } from './pgsearch/pgclient';
+import * as J from 'json-typescript';
 
 export class Card {
-  static async makePristineCollection(cards: CardWithId[]): Promise<PristineCollection> {
+  static async makePristineCollection(cards: CardWithId[], meta: ResponseMeta): Promise<PristineCollection> {
     let pristineDocs = await Promise.all(cards.map(card => card.asPristineDoc()));
     // TODO includeds
     return new PristineCollection({
       data: pristineDocs.map(doc => doc.jsonapi.data),
+      meta: (meta as unknown) as J.Object,
     });
   }
 

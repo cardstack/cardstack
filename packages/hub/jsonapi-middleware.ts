@@ -131,9 +131,8 @@ export default class JSONAPIMiddleware {
     let query = parse(ctxt.request.querystring, { plainObjects: true });
     assertQuery(query);
 
-    let collection = await Card.makePristineCollection(
-      (await this.cards.as(ctxt.state.cardstackSession).search(query)).cards
-    );
+    let { cards, meta } = await this.cards.as(ctxt.state.cardstackSession).search(query);
+    let collection = await Card.makePristineCollection(cards, meta);
     ctxt.body = collection.jsonapi;
     ctxt.status = 200;
   }
