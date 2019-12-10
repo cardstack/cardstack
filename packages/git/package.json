@@ -19,6 +19,7 @@
     "delay": "^4.1.0",
     "filenamify-url": "^1.0.0",
     "githereum": "0.0.1",
+    "isomorphic-git": "^0.72.0",
     "json-stable-stringify-without-jsonify": "^1.0.1",
     "lodash": "^4.17.11",
     "mkdirp": "^0.5.1",
@@ -31,6 +32,7 @@
   "devDependencies": {
     "@cardstack/eslint-config": "0.16.7",
     "@cardstack/test-support": "0.16.7",
+    "@types/nodegit": "^0.24.13",
     "sinon": "7.2.3"
   },
   "engines": {

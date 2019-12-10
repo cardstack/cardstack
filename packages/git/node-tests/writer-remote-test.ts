@@ -1,24 +1,31 @@
-const { Cred, Clone, Remote, Repository, Revwalk } = require('nodegit');
+import { Cred, cloneRepo, createRemote, Repository, logFromCommit } from '../git';
 
-const { createDefaultEnvironment, destroyDefaultEnvironment } = require('@cardstack/test-support/env');
+const { createDefaultEnvironment, destroyDefaultEnvironment } = require('@cardstack/test-support/env'); // eslint-disable-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
-const { join } = require('path');
-const { readFileSync } = require('fs');
-const { promisify } = require('util');
+
+import { todo } from '@cardstack/plugin-utils/todo-any';
+
+import { join } from 'path';
+import { readFileSync } from 'fs';
+import { promisify } from 'util';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 const temp = require('@cardstack/test-support/temp-helper');
 
-const { inRepo, makeRepo } = require('./support');
-const Change = require('../change');
-const service = require('../service');
+import { inRepo, makeRepo } from './support';
+import Change from '../change';
+import service from '../service';
 
 const mkdir = promisify(temp.mkdir);
 
 const privateKey = readFileSync(join(__dirname, 'git-ssh-server', 'cardstack-test-key'), 'utf8');
-const { fake, replace } = require('sinon');
+import { fake, replace } from 'sinon';
 
 const fetchOpts = {
   callbacks: {
-    credentials: (url, userName) => {
+    credentials: (url: string, userName: string) => {
       return Cred.sshKeyMemoryNew(userName, '', privateKey, '');
     },
   },
@@ -50,13 +57,19 @@ async function resetRemote() {
     ),
   });
 
-  let remote = await Remote.create(tempRepo.repo, 'origin', 'ssh://root@localhost:9022/root/data-test');
+  let remote = await createRemote(tempRepo.repo, 'origin', 'ssh://root@localhost:9022/root/data-test');
   await remote.push(['+refs/heads/master:refs/heads/master'], fetchOpts);
   return tempRepo;
 }
 
 describe('git/writer with remote', function() {
-  let env, writers, repo, tempRepoPath, tempRemoteRepoPath, head, remoteRepo;
+  let env: todo,
+    writers: todo,
+    repo: Repository,
+    tempRepoPath,
+    tempRemoteRepoPath: string,
+    head: string,
+    remoteRepo: Repository;
 
   beforeEach(async function() {
     let tempRepo = await resetRemote();
@@ -69,7 +82,7 @@ describe('git/writer with remote', function() {
     tempRepoPath = await mkdir('cardstack-temp-test-repo');
     tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
 
-    repo = await Clone('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
+    repo = await cloneRepo('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
       fetchOpts,
     });
 
@@ -282,14 +295,14 @@ describe('git/writer with remote', function() {
 });
 
 describe('git/writer with empty remote', function() {
-  let env, writers, repo, tempRepoPath, tempRemoteRepoPath;
+  let env: todo, writers: todo, repo: Repository, tempRepoPath, tempRemoteRepoPath: string;
 
   beforeEach(async function() {
     let root = await temp.mkdir('cardstack-server-test');
 
     let { repo: remoteRepo } = await makeRepo(root);
 
-    let remote = await Remote.create(remoteRepo, 'origin', 'ssh://root@localhost:9022/root/data-test');
+    let remote = await createRemote(remoteRepo, 'origin', 'ssh://root@localhost:9022/root/data-test');
     await remote.push(['+refs/heads/master:refs/heads/master'], fetchOpts);
 
     let factory = new JSONAPIFactory();
@@ -297,7 +310,7 @@ describe('git/writer with empty remote', function() {
     tempRepoPath = await mkdir('cardstack-temp-test-repo');
     tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
 
-    repo = await Clone('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
+    repo = await cloneRepo('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
       fetchOpts,
     });
 
@@ -357,7 +370,7 @@ describe('git/writer with empty remote', function() {
 });
 
 describe('git/writer-remote/githereum', function() {
-  let env, writers, tempRepoPath, tempRemoteRepoPath, githereum, fakeContract, writer;
+  let env: todo, writers: todo, tempRepoPath, tempRemoteRepoPath, githereum: todo, fakeContract: todo, writer;
   this.timeout(20000);
 
   beforeEach(async function() {
@@ -368,7 +381,7 @@ describe('git/writer-remote/githereum', function() {
     tempRepoPath = await mkdir('cardstack-temp-test-repo');
     tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
 
-    await Clone('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
+    await cloneRepo('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
       fetchOpts,
     });
 
@@ -432,17 +445,10 @@ describe('git/writer-remote/githereum', function() {
 
     let repo = await Repository.open(githereum.repoPath);
     let firstCommitOnMaster = await repo.getMasterCommit();
-    let commitCount = 0;
 
-    await new Promise((resolve, reject) => {
-      let history = firstCommitOnMaster.history(Revwalk.SORT.TIME);
-      history.on('commit', () => (commitCount += 1));
-      history.on('end', resolve);
-      history.on('error', reject);
-      history.start();
-    });
+    let history = await logFromCommit(firstCommitOnMaster);
 
-    expect(commitCount).to.equal(2);
+    expect(history.length).to.equal(2);
 
     expect(githereum.contract).to.equal(fakeContract);
     expect(githereum.repoName).to.equal('githereum-repo');
