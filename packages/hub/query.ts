@@ -56,12 +56,12 @@ export function assertQuery(query: any, pointer: string[] = ['']): asserts query
     });
   }
 
-  if (query.hasOwnProperty('filter')) {
+  if ('filter' in query) {
     assertFilter(query.filter, pointer.concat('filter'));
   }
 
   if (
-    query.hasOwnProperty('sort') &&
+    'sort' in query &&
     typeof query.sort !== 'string' &&
     (!Array.isArray(query.sort) || query.sort.some((i: any) => typeof i !== 'string'))
   ) {
@@ -71,14 +71,14 @@ export function assertQuery(query: any, pointer: string[] = ['']): asserts query
     });
   }
 
-  if (query.hasOwnProperty('queryString') && typeof query.queryString !== 'string') {
+  if ('queryString' in query && typeof query.queryString !== 'string') {
     throw new CardstackError('queryString must be a string', {
       source: { pointer: pointer.concat('queryString').join('/') },
       status: 400,
     });
   }
 
-  if (query.hasOwnProperty('page')) {
+  if ('page' in query) {
     assertPage(query.filter.page, pointer.concat('page'));
   }
 }
@@ -91,14 +91,14 @@ export function assertPage(page: any, pointer: string[]): asserts page is Query[
     });
   }
 
-  if (page.hasOwnProperty('size') && typeof page.size !== 'number') {
+  if ('size' in page && typeof page.size !== 'number') {
     throw new CardstackError('size must be a number', {
       source: { pointer: pointer.concat('size').join('/') },
       status: 400,
     });
   }
 
-  if (page.hasOwnProperty('cursor') && typeof page.cursor !== 'string') {
+  if ('cursor' in page && typeof page.cursor !== 'string') {
     throw new CardstackError('cursor must be a string', {
       source: { pointer: pointer.concat('cursor').join('/') },
       status: 400,
@@ -114,24 +114,21 @@ export function assertFilter(filter: any, pointer: string[]): asserts filter is 
     });
   }
 
-  if (filter.hasOwnProperty('any')) {
+  if ('any' in filter) {
     assertAnyFilter(filter, pointer);
-  }
-
-  if (filter.hasOwnProperty('every')) {
-    assertEveryFilter(filter.any, pointer);
-  }
-
-  if (filter.hasOwnProperty('not')) {
-    assertNotFilter(filter.not, pointer);
-  }
-
-  if (filter.hasOwnProperty('eq')) {
-    assertEqFilter(filter.eq, pointer);
-  }
-
-  if (filter.hasOwnProperty('range')) {
-    assertRangeFilter(filter.eq, pointer);
+  } else if ('every' in filter) {
+    assertEveryFilter(filter, pointer);
+  } else if ('not' in filter) {
+    assertNotFilter(filter, pointer);
+  } else if ('eq' in filter) {
+    assertEqFilter(filter, pointer);
+  } else if ('range' in filter) {
+    assertRangeFilter(filter, pointer);
+  } else {
+    throw new CardstackError('cannot determine the type of filter', {
+      source: { pointer: pointer.join('/') || '/' },
+      status: 400,
+    });
   }
 }
 
@@ -143,7 +140,7 @@ export function assertCardId(id: any, pointer: string[]): asserts id is CardId {
     });
   }
 
-  if (!id.hasOwnProperty('localId') || typeof id.localId !== 'string') {
+  if (!('localId' in id) || typeof id.localId !== 'string') {
     throw new CardstackError('localId must be a string', {
       source: { pointer: pointer.concat('localId').join('/') || '/' },
       status: 400,
@@ -151,14 +148,14 @@ export function assertCardId(id: any, pointer: string[]): asserts id is CardId {
   }
 
   // TODO do we really want to assert the realm and originalRealm props are URL's, or do we really mean the URL href string here?
-  if (!id.hasOwnProperty('realm') || !(id.realm instanceof URL)) {
+  if (!('realm' in id) || !(id.realm instanceof URL)) {
     throw new CardstackError('realm must be a URL', {
       source: { pointer: pointer.concat('realm').join('/') || '/' },
       status: 400,
     });
   }
 
-  if (id.hasOwnProperty('originalRealm') && !(id.originalRealm instanceof URL)) {
+  if ('originalRealm' in id && !(id.originalRealm instanceof URL)) {
     throw new CardstackError('originalRealm must be a URL', {
       source: { pointer: pointer.concat('originalRealm').join('/') || '/' },
       status: 400,
@@ -173,12 +170,12 @@ export function assertAnyFilter(filter: any, pointer: string[]): asserts filter 
       status: 400,
     });
   }
-  if (filter.hasOwnProperty('type')) {
+  if ('type' in filter) {
     assertCardId(filter.type, pointer.concat('type'));
   }
 
   pointer.concat('any');
-  if (!filter.hasOwnProperty('any')) {
+  if (!('any' in filter)) {
     throw new CardstackError('AnyFilter must have any property', {
       source: { pointer: pointer.join('/') || '/' },
       status: 400,
@@ -202,12 +199,12 @@ export function assertEveryFilter(filter: any, pointer: string[]): asserts filte
       status: 400,
     });
   }
-  if (filter.hasOwnProperty('type')) {
+  if ('type' in filter) {
     assertCardId(filter.type, pointer.concat('type'));
   }
 
   pointer.concat('every');
-  if (!filter.hasOwnProperty('every')) {
+  if (!('every' in filter)) {
     throw new CardstackError('EveryFilter must have every property', {
       source: { pointer: pointer.join('/') || '/' },
       status: 400,
@@ -231,12 +228,12 @@ export function assertNotFilter(filter: any, pointer: string[]): asserts filter 
       status: 400,
     });
   }
-  if (filter.hasOwnProperty('type')) {
+  if ('type' in filter) {
     assertCardId(filter.type, pointer.concat('type'));
   }
 
   pointer.concat('not');
-  if (!filter.hasOwnProperty('not')) {
+  if (!('not' in filter)) {
     throw new CardstackError('NotFilter must have not property', {
       source: { pointer: pointer.join('/') || '/' },
       status: 400,
@@ -254,12 +251,12 @@ export function assertEqFilter(filter: any, pointer: string[]): asserts filter i
     });
   }
 
-  if (filter.hasOwnProperty('type')) {
+  if ('type' in filter) {
     assertCardId(filter.type, pointer.concat('type'));
   }
 
   pointer.concat('eq');
-  if (!filter.hasOwnProperty('eq')) {
+  if (!('eq' in filter)) {
     throw new CardstackError('EqFilter must have eq property', {
       source: { pointer: pointer.concat('eq').join('/') || '/' },
       status: 400,
@@ -282,12 +279,12 @@ export function assertRangeFilter(filter: any, pointer: string[]): asserts filte
     });
   }
 
-  if (filter.hasOwnProperty('type')) {
+  if ('type' in filter) {
     assertCardId(filter.type, pointer.concat('type'));
   }
 
   pointer.concat('range');
-  if (!filter.hasOwnProperty('range')) {
+  if (!('range' in filter)) {
     throw new CardstackError('RangeFilter must have range property', {
       source: { pointer: pointer.concat('range').join('/') || '/' },
       status: 400,

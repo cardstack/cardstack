@@ -12,6 +12,9 @@ import { assertSingleResourceDoc } from './document';
 import { myOrigin } from './origin';
 import { Card } from './card';
 import { SingleResourceDoc } from 'jsonapi-typescript';
+import { parse } from 'qs';
+import { assertQuery } from './query';
+import CardCollection from './card-collection';
 
 const apiPrefix = '/api';
 const apiPrefixPattern = new RegExp(`^${apiPrefix}/(.*)`);
@@ -51,7 +54,7 @@ export default class JSONAPIMiddleware {
     return compose([
       CardstackError.withJsonErrorHandling,
       body,
-      //route.get("/cards", getCards),
+      route.get('/cards', this.getCards.bind(this)),
       route.post('/realms/:local_realm_id/cards', this.createCard.bind(this)),
       route.post('/remote-realms/:remote_realm_url/cards', this.createCard.bind(this)),
       route.get('/realms/:local_realm_id/cards/:local_id', this.getCard.bind(this)),
@@ -122,6 +125,20 @@ export default class JSONAPIMiddleware {
 
     let card = await this.cards.as(ctxt.state.cardstackSession).get({ realm, originalRealm, localId });
     ctxt.body = (await card.asPristineDoc()).jsonapi;
+    ctxt.status = 200;
+  }
+
+  async getCards(ctxt: KoaRoute.Context<SessionContext, {}>) {
+    let query = parse(ctxt.request.querystring, { plainObjects: true });
+    assertQuery(query);
+
+    // The CardCollection essentially serves the same purpose as the old
+    // DocumentContext. This is a stub for now until I have a chance to discuss
+    // with Ed, as something needs to be responsible for generating the JSONAPI
+    // for a collection of cards. Likely it will be refactored into something
+    // else.
+    let collection = new CardCollection((await this.cards.as(ctxt.state.cardstackSession).search(query)).cards);
+    ctxt.body = (await collection.asPristineDoc()).jsonapi;
     ctxt.status = 200;
   }
 

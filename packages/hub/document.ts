@@ -11,6 +11,7 @@ import {
   RelationshipsObject,
   ResourceLinkage,
   ResourceIdentifierObject,
+  CollectionResourceDoc,
 } from 'jsonapi-typescript';
 import CardstackError from './error';
 import { assertJSONValue } from './json-validation';
@@ -18,6 +19,11 @@ import { assertJSONValue } from './json-validation';
 export class PristineDocument {
   kind = 'pristine';
   constructor(public jsonapi: SingleResourceDoc) {}
+}
+
+export class PristineCollection {
+  kind = 'pristine-collection';
+  constructor(public jsonapi: CollectionResourceDoc) {}
 }
 
 export class UpstreamDocument {

@@ -3,6 +3,7 @@ import supertest from 'supertest';
 import { myOrigin } from '../origin';
 import { TestEnv, createTestEnv } from './helpers';
 import { testCard } from './test-card';
+import { stringify } from 'qs';
 
 describe('hub/jsonapi', function() {
   let request: supertest.SuperTest<supertest.Test>;
@@ -125,5 +126,39 @@ describe('hub/jsonapi', function() {
     expect(response.body?.data?.attributes?.model?.attributes?.hello).to.equal('world');
     expect(response.body?.data?.attributes?.['original-realm']).to.equal('https://somewhere/else');
     expect(response.body?.data?.attributes?.['realm']).to.equal('http://example.com/api/realms/second-ephemeral-realm');
+  });
+
+  it('can search for cards', async function() {
+    await request
+      .post('/api/realms/first-ephemeral-realm/cards')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(testCard({ hello: 'world' }).jsonapi);
+    await request
+      .post('/api/realms/first-ephemeral-realm/cards')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(testCard({ foo: 'bar' }).jsonapi);
+    await request
+      .post('/api/realms/second-ephemeral-realm/cards')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(testCard({ foo: 'bar' }).jsonapi);
+
+    let filter = {
+      filter: {
+        eq: { 'original-realm': `${myOrigin}/api/realms/first-ephemeral-realm` },
+      },
+    };
+    let response = await request.get(`/api/cards?${stringify(filter)}`).set('Accept', 'application/vnd.api+json');
+
+    expect(response.status).to.equal(200);
+    expect(response.body?.data.length).to.equal(2);
+  });
+
+  it('returns 400 when search query is malformed', async function() {
+    let filter = {
+      filter: { foo: 'bar' },
+    };
+    let response = await request.get(`/api/cards?${stringify(filter)}`).set('Accept', 'application/vnd.api+json');
+
+    expect(response.status).to.equal(400);
   });
 });
