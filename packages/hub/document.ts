@@ -13,6 +13,7 @@ import {
   ResourceIdentifierObject,
 } from 'jsonapi-typescript';
 import CardstackError from './error';
+import { assertJSONValue } from './json-validation';
 
 export class PristineDocument {
   kind = 'pristine';
@@ -123,29 +124,6 @@ function assertResourceObject(obj: any, pointer: string[]): asserts obj is Resou
 
 function assertAttributesObject(obj: any, pointer: string[]): asserts obj is AttributesObject {
   Object.entries(obj).every(([key, value]) => assertJSONValue(value, pointer.concat(key)));
-}
-
-function assertJSONValue(v: any, pointer: string[]) {
-  if (v === null) {
-    return;
-  }
-  switch (typeof v) {
-    case 'string':
-    case 'number':
-    case 'boolean':
-      return;
-    case 'object':
-      if (Array.isArray(v)) {
-        v.every((value, index) => assertJSONValue(value, pointer.concat(`[${index}]`)));
-      } else {
-        Object.entries(v).every(([key, value]) => assertJSONValue(value, pointer.concat(key)));
-      }
-      return;
-  }
-  throw new CardstackError('value not allowed in json', {
-    source: { pointer: pointer.join('/') },
-    status: 400,
-  });
 }
 
 function assertMetaObject(obj: any, pointer: string[]): asserts obj is MetaObject {
