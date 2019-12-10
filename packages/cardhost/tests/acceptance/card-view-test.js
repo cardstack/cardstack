@@ -201,4 +201,22 @@ module('Acceptance | card view', function(hooks) {
     assert.dom('.cardhost-card-theme-editor').hasAttribute('data-test-dock-location', 'bottom');
     await percySnapshot(assert);
   });
+
+  test('check that card name is stable so we can use it for themer styling', async function(assert) {
+    await login();
+    await createCards({
+      [card1Id]: [
+        ['title', 'string', true, 'The Millenial Puppy'],
+        ['author', 'string', true, 'Van Gogh'],
+        [
+          'body',
+          'string',
+          false,
+          'It can be difficult these days to deal with the discerning tastes of the millenial puppy.',
+        ],
+      ],
+    });
+    await visit(`/cards/${card1Id}`);
+    assert.dom('.millenial-puppies').exists();
+  });
 });

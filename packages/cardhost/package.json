@@ -86,7 +86,8 @@
     "monaco-editor": "^0.18.1",
     "monaco-editor-webpack-plugin": "^1.7.0",
     "prember": "^1.0.0",
-    "qunit-dom": "^0.8.0"
+    "qunit-dom": "^0.8.0",
+    "scope-css": "^1.2.1"
   },
   "engines": {
     "node": "8.* || >= 10.*"
