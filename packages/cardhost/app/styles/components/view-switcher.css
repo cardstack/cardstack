@@ -30,6 +30,9 @@
 .view-switcher-dropdown:not(.disabled) .ember-power-select-trigger--active {
   outline: 0;
 }
+.view-switcher-dropdown:not(.disabled) .ember-power-select-trigger:hover {
+  background-color: var(--ch-hover);
+}
 .view-switcher-dropdown .ember-power-select-status-icon {
   right: 20px;
   width: 10px;

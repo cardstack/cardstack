@@ -24,15 +24,14 @@ export default class ViewSwitcher extends Component {
 
   @service router;
 
-  @tracked selected = this.views[0];
-
-  optionComponent = 'view-option-component';
+  @tracked selected = this.views.filterBy('id', this.args.mode).firstObject || this.views[0];
 
   @action
   selectView(view) {
-    if (!view || !this.args.name) {
-      return;
+    this.selected = view;
+
+    if (this.args.cardId) {
+      this.router.transitionTo(`cards.${view.id}`, this.args.cardId);
     }
-    this.router.transitionTo(`cards.${view.id}`, this.args.name);
   }
 }

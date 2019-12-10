@@ -3,7 +3,7 @@
   {{#if (not this.cssModeToggle.editingCss)}}
   <CardhostTopEdge @mode={{mode}}>
     {{#if (or (eq mode "schema") (eq mode "edit") (eq mode "view"))}}
-    <ViewSwitcher @name={{this.target.currentRoute.params.id}} @selected={{mode}} />
+    <ViewSwitcher @mode={{mode}} @cardId={{this.target.currentRoute.params.id}} />
     {{/if}}
   </CardhostTopEdge>
   {{/if}}

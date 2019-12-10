@@ -1,2 +1,7 @@
 <Dropdown @options={{this.views}} @selected={{this.selected}} @label="Please select a view" @searchEnabled={{false}}
-  @changeAction={{action this.selectView}} @theme="view-switcher" data-test-mode-switcher />
+  @changeAction={{action this.selectView}} @theme="view-switcher" data-test-mode-switcher as |option|>
+  <span class="view-switcher--option">
+    {{svg-jar option.icon width="18px" height="17px"}}
+    {{option.name}}
+  </span>
+</Dropdown>
