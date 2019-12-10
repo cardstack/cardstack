@@ -1,0 +1,46 @@
+name: Node CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Volta
+      uses: rwjblue/setup-volta@v1
+    - name: Set up build cache (yarn)
+      uses: actions/cache@preview
+      with:
+        path: ~/.cache/yarn
+        key: ${{ runner.os }}-yarn
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Start prereqs
+      uses: |
+        docker network create cardstack
+        docker run -d --rm --network cardstack -p 5444:5432 --name postgres cardstack/pg-test
+        docker run -d --rm --network cardstack -p 9022:22 --name git-ssh cardstack/git-test
+        ssh-keyscan -p 9022 -t rsa,ecdsa-sha2-nistp256 localhost >> $HOME/.ssh/known_hosts
+        chmod 600 packages/git/node-tests/git-ssh-server/cardstack-test-key
+    - name: yarn install
+      run: yarn install
+    - name: Linting
+      run: |
+        yarn lint:deps
+        yarn lint:js
+    - name: wait for db
+      run: node packages/pgsearch/node-tests/wait-for-db.js
+    - name: Node tests
+      run: yarn node-tests
+      env:
+        CI: true
+        PGHOST: localhost
+        PGPORT: 5444
+        PGUSER: postgres
+    - name: Ember tests
+      run: yarn ember-tests
+      env:
+        CI: true
+        PGHOST: localhost
+        PGPORT: 5444
+        PGUSER: postgres
