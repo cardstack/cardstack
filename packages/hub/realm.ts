@@ -1,1 +1,1 @@
-export const CARDSTACK_PUBLIC_REALM = new URL('https://base.cardstack.com/public');
+export const CARDSTACK_PUBLIC_REALM = 'https://base.cardstack.com/public';

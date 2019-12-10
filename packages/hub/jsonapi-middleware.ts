@@ -92,25 +92,25 @@ export default class JSONAPIMiddleware {
         });
       }
     }
-    let card = await this.cards.as(ctxt.state.cardstackSession).create(realm, body);
+    let card = await this.cards.as(ctxt.state.cardstackSession).create(realm.href, body);
     ctxt.body = (await card.asPristineDoc()).jsonapi;
     ctxt.status = 201;
     ctxt.set('location', this.localURLFor(card));
   }
 
   async getCard(ctxt: KoaRoute.Context<SessionContext, {}>) {
-    let realm: URL;
+    let realm: string;
     if (ctxt.routeParams.local_realm_id != null) {
-      realm = new URL(`${myOrigin}${apiPrefix}/realms/${ctxt.routeParams.local_realm_id}`);
+      realm = `${myOrigin}${apiPrefix}/realms/${ctxt.routeParams.local_realm_id}`;
     } else if (ctxt.routeParams.remote_realm_url) {
-      realm = new URL(ctxt.routeParams.remote_realm_url);
+      realm = ctxt.routeParams.remote_realm_url;
     } else {
       throw new CardstackError(`bug in jsonapi-middleware: missing realm parameter in getCard`, { status: 500 });
     }
 
-    let originalRealm: URL;
+    let originalRealm: string;
     if (ctxt.routeParams.original_realm_url != null) {
-      originalRealm = new URL(ctxt.routeParams.original_realm_url);
+      originalRealm = ctxt.routeParams.original_realm_url;
     } else {
       originalRealm = realm;
     }
@@ -139,25 +139,25 @@ export default class JSONAPIMiddleware {
   }
 
   private localURLFor(card: Card): string {
-    let isHome = card.originalRealm.href === card.realm.href;
-    if (card.realm.origin === myOrigin) {
+    let isHome = card.originalRealm === card.realm;
+    if (new URL(card.realm).origin === myOrigin) {
       let base = `${myOrigin}${apiPrefix}/realms`;
-      let localRealmId = card.realm.href.slice(base.length + 1);
+      let localRealmId = card.realm.slice(base.length + 1);
       if (isHome) {
         return [base, localRealmId, 'cards', card.localId].join('/');
       } else {
-        return [base, localRealmId, 'cards', encodeURIComponent(card.originalRealm.href), card.localId].join('/');
+        return [base, localRealmId, 'cards', encodeURIComponent(card.originalRealm), card.localId].join('/');
       }
     } else {
       let base = `${myOrigin}${apiPrefix}/remote-realms`;
       if (isHome) {
-        return [base, encodeURIComponent(card.realm.href), 'cards', card.localId].join('/');
+        return [base, encodeURIComponent(card.realm), 'cards', card.localId].join('/');
       } else {
         return [
           base,
-          encodeURIComponent(card.realm.href),
+          encodeURIComponent(card.realm),
           'cards',
-          encodeURIComponent(card.originalRealm.href),
+          encodeURIComponent(card.originalRealm),
           card.localId,
         ].join('/');
       }

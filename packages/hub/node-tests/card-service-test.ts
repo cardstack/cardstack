@@ -21,7 +21,7 @@ describe('hub/card-service', function() {
       let service = await env.container.lookup('cards');
       try {
         await service.as(Session.EVERYONE).get({
-          realm: new URL('http://not-a-known-realm'),
+          realm: 'http://not-a-known-realm',
           localId: 'x',
         });
         throw new Error(`should not get here`);
@@ -33,8 +33,8 @@ describe('hub/card-service', function() {
     it('saves a card', async function() {
       let doc = testCard({ hello: 'world' });
       let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
-      let card = await service.create(new URL(`${myOrigin}/api/realms/first-ephemeral-realm`), doc.jsonapi);
-      expect(card.realm.href).to.equal(`${myOrigin}/api/realms/first-ephemeral-realm`);
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+      expect(card.realm).to.equal(`${myOrigin}/api/realms/first-ephemeral-realm`);
 
       let pgclient = await env.container.lookup('pgclient');
       let result = await pgclient.query(service, [
@@ -47,7 +47,7 @@ describe('hub/card-service', function() {
     it('can get a card back out', async function() {
       let doc = testCard({ hello: 'world' });
       let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
-      let card = await service.create(new URL(`${myOrigin}/api/realms/first-ephemeral-realm`), doc.jsonapi);
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       let foundCard = await service.get(card);
       expect(foundCard.id).equals(card.id);
     });
@@ -62,15 +62,15 @@ describe('hub/card-service', function() {
       service = await env.container.lookup('cards');
       let scopedService = service.as(Session.INTERNAL_PRIVILEGED);
       await scopedService.create(
-        new URL(`${myOrigin}/api/realms/first-ephemeral-realm`),
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
         testCard({ localId: '1' }, {}).jsonapi
       );
       await scopedService.create(
-        new URL(`${myOrigin}/api/realms/first-ephemeral-realm`),
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
         testCard({ localId: '2' }, {}).jsonapi
       );
       await scopedService.create(
-        new URL(`${myOrigin}/api/realms/first-ephemeral-realm`),
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
         testCard(
           {
             localId: '1',
@@ -80,7 +80,7 @@ describe('hub/card-service', function() {
         ).jsonapi
       );
       await scopedService.create(
-        new URL(`${myOrigin}/api/realms/first-ephemeral-realm`),
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
         testCard(
           {
             localId: '2',
@@ -90,15 +90,15 @@ describe('hub/card-service', function() {
         ).jsonapi
       );
       await scopedService.create(
-        new URL(`http://example.com/api/realms/second-ephemeral-realm`),
+        `http://example.com/api/realms/second-ephemeral-realm`,
         testCard({ localId: '1' }, {}).jsonapi
       );
       await scopedService.create(
-        new URL(`http://example.com/api/realms/second-ephemeral-realm`),
+        `http://example.com/api/realms/second-ephemeral-realm`,
         testCard({ localId: '2' }, {}).jsonapi
       );
       await scopedService.create(
-        new URL(`http://example.com/api/realms/second-ephemeral-realm`),
+        `http://example.com/api/realms/second-ephemeral-realm`,
         testCard(
           {
             localId: '1',
@@ -108,7 +108,7 @@ describe('hub/card-service', function() {
         ).jsonapi
       );
       await scopedService.create(
-        new URL(`http://example.com/api/realms/second-ephemeral-realm`),
+        `http://example.com/api/realms/second-ephemeral-realm`,
         testCard(
           {
             localId: '2',
@@ -130,7 +130,7 @@ describe('hub/card-service', function() {
         },
       });
       expect(cards.length).equals(4);
-      expect(cards.map(c => `${c.realm.href}/${c.originalRealm.href}/${c.localId}`)).to.eql([
+      expect(cards.map(c => `${c.realm}/${c.originalRealm}/${c.localId}`)).to.eql([
         `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
         `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/2`,
         `${myOrigin}/api/realms/first-ephemeral-realm/${myOrigin}/api/realms/first-ephemeral-realm/1`,
@@ -145,7 +145,7 @@ describe('hub/card-service', function() {
         },
       });
       expect(cards.length).equals(4);
-      expect(cards.map(c => `${c.realm.href}/${c.originalRealm.href}/${c.localId}`)).to.eql([
+      expect(cards.map(c => `${c.realm}/${c.originalRealm}/${c.localId}`)).to.eql([
         `http://example.com/api/realms/second-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
         `http://example.com/api/realms/second-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/2`,
         `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
@@ -160,7 +160,7 @@ describe('hub/card-service', function() {
         },
       });
       expect(cards.length).equals(4);
-      expect(cards.map(c => `${c.realm.href}/${c.originalRealm.href}/${c.localId}`)).to.eql([
+      expect(cards.map(c => `${c.realm}/${c.originalRealm}/${c.localId}`)).to.eql([
         `http://example.com/api/realms/second-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
         `http://example.com/api/realms/second-ephemeral-realm/${myOrigin}/api/realms/first-ephemeral-realm/1`,
         `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
@@ -179,7 +179,7 @@ describe('hub/card-service', function() {
         },
       });
       expect(cards.length).equals(1);
-      expect(cards.map(c => `${c.realm.href}/${c.originalRealm.href}/${c.localId}`)).to.eql([
+      expect(cards.map(c => `${c.realm}/${c.originalRealm}/${c.localId}`)).to.eql([
         `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
       ]);
     });

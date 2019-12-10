@@ -19,11 +19,11 @@ export default class CardsService {
 export class ScopedCardService {
   constructor(private cards: CardsService, private session: Session) {}
 
-  async create(realm: URL, doc: SingleResourceDoc): Promise<CardWithId> {
+  async create(realm: string, doc: SingleResourceDoc): Promise<CardWithId> {
     let realmCard = await this.getRealm(realm);
     let writerFactory = await realmCard.loadFeature('writer');
     if (!writerFactory) {
-      throw new CardstackError(`realm "${realm.href}" is not writable`, {
+      throw new CardstackError(`realm "${realm}" is not writable`, {
         status: 403,
       });
     }
@@ -38,9 +38,7 @@ export class ScopedCardService {
       upstreamIdToWriter
     );
     if (upstreamIdToWriter && upstreamIdFromWriter !== upstreamIdToWriter) {
-      throw new CardstackError(
-        `Writer plugin for realm ${realm.href} tried to change a localId it's not allowed to change`
-      );
+      throw new CardstackError(`Writer plugin for realm ${realm} tried to change a localId it's not allowed to change`);
     }
     card.localId = typeof upstreamIdFromWriter === 'object' ? upstreamIdFromWriter.localId : upstreamIdFromWriter;
     card.patch(saved.jsonapi);
@@ -76,7 +74,7 @@ export class ScopedCardService {
     return await this.cards.pgclient.get(this, id);
   }
 
-  private async getRealm(realm: URL): Promise<CardWithId> {
+  private async getRealm(realm: string): Promise<CardWithId> {
     // This searches by realm and localId. Even though it doesn't search by
     // originalRealm, it's unique because of the special property that Realm
     // cards have that their localId contains the complete URL to the realm. So
@@ -95,7 +93,7 @@ export class ScopedCardService {
           // about. Some of the realms in here can live on other origins, and
           // that's fine.
           realm: `${myOrigin}/api/realms/meta`,
-          'local-id': realm.href,
+          'local-id': realm,
         },
       },
     });

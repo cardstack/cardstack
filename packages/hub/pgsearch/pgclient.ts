@@ -196,15 +196,16 @@ export default class PgClient {
 
   async get(cards: ScopedCardService, id: CardId): Promise<CardWithId> {
     let condition = every([
-      [`realm = `, param(id.realm.href)],
-      [`original_realm = `, param(id.originalRealm?.href ?? id.realm.href)],
+      [`realm = `, param(id.realm)],
+      [`original_realm = `, param(id.originalRealm ?? id.realm)],
       [`local_id = `, param(id.localId)],
     ]);
     let result = await this.query(cards, [`select pristine_doc from cards where`, ...condition]);
     if (result.rowCount !== 1) {
       throw new CardstackError(
-        `Card not found with realm="${id.realm.href}", original-realm="${id.originalRealm?.href ??
-          id.realm.href}", local-id="${id.localId}"`,
+        `Card not found with realm="${id.realm}", original-realm="${id.originalRealm ?? id.realm}", local-id="${
+          id.localId
+        }"`,
         { status: 404 }
       );
     }
@@ -311,8 +312,8 @@ class Batch {
   async save(card: CardWithId) {
     /* eslint-disable @typescript-eslint/camelcase */
     let row = {
-      realm: param(card.realm.href),
-      original_realm: param(card.originalRealm.href),
+      realm: param(card.realm),
+      original_realm: param(card.originalRealm),
       local_id: param(card.localId),
       pristine_doc: param(((await card.asPristineDoc()).jsonapi as unknown) as JSON.Object),
     };

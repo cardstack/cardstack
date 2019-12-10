@@ -34,8 +34,8 @@ function ephemeralRealms() {
       testCard(
         {
           realm: `${myOrigin}/api/realms/meta`,
-          originalRealm: CARDSTACK_PUBLIC_REALM.href,
-          localId: CARDSTACK_PUBLIC_REALM.href,
+          originalRealm: CARDSTACK_PUBLIC_REALM,
+          localId: CARDSTACK_PUBLIC_REALM,
         },
         {}
       ).jsonapi
@@ -61,15 +61,15 @@ export async function search(query: Query): Promise<CardWithId[] | null> {
 
 export async function get(id: CardId): Promise<CardWithId | null> {
   if (
-    id.realm.href === 'https://base.cardstack.com/public' &&
-    (id.originalRealm ?? id.realm).href === 'https://base.cardstack.com/public' &&
+    id.realm === 'https://base.cardstack.com/public' &&
+    (id.originalRealm ?? id.realm) === 'https://base.cardstack.com/public' &&
     id.localId === 'string-field'
   ) {
     return new CardWithId(
       testCard(
         {
-          realm: id.realm.href,
-          originalRealm: id.originalRealm?.href,
+          realm: id.realm,
+          originalRealm: id.originalRealm,
           localId: id.localId,
         },
         {}

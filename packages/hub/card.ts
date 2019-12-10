@@ -20,17 +20,17 @@ export class Card {
   // optimize by pulling these apart.)
   get id(): string | undefined {
     if (typeof this.localId === 'string') {
-      return [this.realm.href, this.originalRealm.href, this.localId].map(encodeURIComponent).join('/');
+      return [this.realm, this.originalRealm, this.localId].map(encodeURIComponent).join('/');
     }
     return undefined;
   }
 
   // This is the realm the card is stored in.
-  realm: URL;
+  realm: string;
 
   // this is the realm the card was first created in. As a card is copied to
   // other realms, `card.realm` changes but `card.originalRealm` does not.
-  originalRealm: URL;
+  originalRealm: string;
 
   // the localId distinguishes the card within its originalRealm. In some cases
   // it may be chosen by the person creating the card. In others it may be
@@ -54,12 +54,12 @@ export class Card {
   //  - [realm, originalRealm, id] is globally unique, such that there are
   //    exactly zero or one cards that match it, across all hubs.
 
-  constructor(jsonapi: SingleResourceDoc, realm: URL) {
+  constructor(jsonapi: SingleResourceDoc, realm: string) {
     this.jsonapi = jsonapi;
     this.realm = realm;
     this.originalRealm =
       typeof jsonapi.data.attributes?.['original-realm'] === 'string'
-        ? new URL(jsonapi.data.attributes['original-realm'])
+        ? jsonapi.data.attributes['original-realm']
         : realm;
 
     if (typeof jsonapi.data.attributes?.['local-id'] === 'string') {
@@ -72,8 +72,8 @@ export class Card {
     if (!copied.data.attributes) {
       copied.data.attributes = {};
     }
-    copied.data.attributes.realm = this.realm.href;
-    copied.data.attributes['original-realm'] = this.originalRealm.href;
+    copied.data.attributes.realm = this.realm;
+    copied.data.attributes['original-realm'] = this.originalRealm;
     if (this.localId) {
       copied.data.attributes['local-id'] = this.localId;
     }
@@ -96,7 +96,7 @@ export class Card {
   // This is the way that data source plugins think about card IDs. The
   // upstreamId is only unique *within* a realm.
   get upstreamId(): UpstreamIdentity | null {
-    if (this.realm.href === this.originalRealm.href) {
+    if (this.realm === this.originalRealm) {
       if (typeof this.localId === 'string') {
         return this.localId;
       } else {
@@ -128,7 +128,7 @@ export class CardWithId extends Card {
     if (typeof jsonapi.data.attributes?.realm !== 'string') {
       throw new CardstackError(`card missing required attribute "realm": ${JSON.stringify(jsonapi)}`);
     }
-    let realm = new URL(jsonapi.data.attributes.realm);
+    let realm = jsonapi.data.attributes.realm;
     super(jsonapi, realm);
     cardHasIds(this);
   }
@@ -148,7 +148,7 @@ export class CardWithId extends Card {
 }
 
 export interface CardId {
-  realm: URL;
-  originalRealm?: URL; // if not set, its implied that its equal to `realm`.
+  realm: string;
+  originalRealm?: string; // if not set, its implied that its equal to `realm`.
   localId: string;
 }
