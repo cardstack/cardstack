@@ -1,15 +1,13 @@
 {{#let this.target.currentRoute.localName as |mode|}}
-  <div
-    class="cardhost-cards {{mode}} {{if this.cssModeToggle.editingCss "editing-css"}}"
-  >
-    {{#if (not this.cssModeToggle.editingCss)}}
-      <CardhostTopEdge @mode={{mode}}>
-        {{#if (or (eq mode "schema") (eq mode "edit") (eq mode "view"))}}
-          <ModeSwitcher @name={{this.target.currentRoute.params.id}} @mode={{mode}} />
-        {{/if}}
-      </CardhostTopEdge>
+<div class="cardhost-cards {{mode}} {{if this.cssModeToggle.editingCss "editing-css"}}">
+  {{#if (not this.cssModeToggle.editingCss)}}
+  <CardhostTopEdge @mode={{mode}}>
+    {{#if (or (eq mode "schema") (eq mode "edit") (eq mode "view"))}}
+    <ViewSwitcher @name={{this.target.currentRoute.params.id}} @selected={{mode}} />
     {{/if}}
+  </CardhostTopEdge>
+  {{/if}}
 
-    {{outlet}}
-  </div>
+  {{outlet}}
+</div>
 {{/let}}
