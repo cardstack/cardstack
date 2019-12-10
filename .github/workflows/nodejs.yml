@@ -6,8 +6,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Set up Volta
-      uses: rwjblue/setup-volta@v1
+    - name: Install Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10.x
     - name: Set up build cache (yarn)
       uses: actions/cache@preview
       with:
