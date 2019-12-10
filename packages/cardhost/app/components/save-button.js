@@ -43,6 +43,10 @@ export default class SaveButton extends Component {
 
   @action
   save() {
-    this.saveCardWithState.perform();
+    if (this.args.clickAction) {
+      this.args.clickAction();
+    } else {
+      this.saveCardWithState.perform();
+    }
   }
 }
