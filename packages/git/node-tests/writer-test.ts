@@ -1,16 +1,22 @@
-const Writer = require('../writer');
-const { inRepo } = require('./support');
-const { createDefaultEnvironment, destroyDefaultEnvironment } = require('@cardstack/test-support/env');
+import Writer from '../writer';
+import { inRepo, makeRepo } from './support';
+const { createDefaultEnvironment, destroyDefaultEnvironment } = require('@cardstack/test-support/env'); // eslint-disable-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 const temp = require('@cardstack/test-support/temp-helper');
-const { makeRepo } = require('./support');
-const { fake, replace } = require('sinon');
-const { realpath } = require('fs');
-const { promisify } = require('util');
+
+import { fake, replace } from 'sinon';
+import { realpath } from 'fs';
+import { promisify } from 'util';
 const realpathPromise = promisify(realpath);
 
+import { todo } from '@cardstack/plugin-utils/todo-any';
+
 describe('git/writer', function() {
-  let env, writers, cardServices, repoPath, head;
+  let env: todo, writers: todo, cardServices: todo, repoPath: string, head: string;
 
   beforeEach(async function() {
     repoPath = await temp.mkdir('git-writer-test');
@@ -392,7 +398,7 @@ describe('git/writer', function() {
         }
         expect(err.detail).to.match(/missing required field/);
         expect(err.source).to.deep.equal({ pointer: '/data/id' });
-        expect(err).hasStatus(400);
+        (expect(err) as todo).hasStatus(400);
       }
     });
 
@@ -475,6 +481,8 @@ describe('git/writer', function() {
     for (let meta of badMetas) {
       it(`refuses to update without meta version (${JSON.stringify(meta)})`, async function() {
         try {
+          let meta: todo = undefined;
+
           let doc = {
             data: {
               id: '1',
@@ -482,6 +490,7 @@ describe('git/writer', function() {
               attributes: {
                 title: 'Updated title',
               },
+              meta,
             },
           };
           if (meta !== undefined) {
@@ -671,7 +680,7 @@ describe('git/writer', function() {
           'needed-when-embedded': true,
         },
       });
-      let model = card.included.find(i => `${i.type}/${i.id}` === `${card.data.id}/${card.data.id}`);
+      let model = card.included.find((i: todo) => `${i.type}/${i.id}` === `${card.data.id}/${card.data.id}`);
       model.attributes.title = 'updated title';
       model.attributes.body = 'new body';
 
@@ -1039,7 +1048,7 @@ describe('git/writer', function() {
 });
 
 describe('git/writer/githereum', function() {
-  let env, writers, repoPath, writer, githereum, fakeContract;
+  let env: todo, writers: todo, repoPath: string, writer, githereum: todo, fakeContract: todo;
 
   beforeEach(async function() {
     repoPath = await temp.mkdir('git-writer-test');

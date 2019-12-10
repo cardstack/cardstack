@@ -20,8 +20,6 @@
     </button>
 
   {{else}}
-    {{! eslint is confused by on helper }}
-    {{! template-lint-disable attribute-indentation}}
     <button
       class="ch-button ch-button--icon share"
       aria-label="Share button"
@@ -33,13 +31,7 @@
     >
       Preview
     </button>
-    <button
-      class="ch-button"
-      disabled={{not this.cardstackSession.isAuthenticated}}
-      {{on "click" this.save}}
-    >
-      Save
-    </button>
+    <SaveButton @card={{this.card}}/>
   {{/if}}
 </div>
 

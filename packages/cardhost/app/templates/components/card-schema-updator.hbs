@@ -1,7 +1,5 @@
 {{#if this.cardstackSession.isAuthenticated}}
   <div class="card-renderer--top-edge-buttons">
-    {{! eslint is confused by on helper }}
-    {{! template-lint-disable attribute-indentation}}
     <button
       class="ch-button ch-button--icon share"
       aria-label="Share button"
@@ -15,20 +13,7 @@
     >
       Preview
     </button>
-    {{#if this.saveCard.isRunning}}
-      <div class="loader-container">
-        <div class="loader">Loading...</div>
-      </div>
-    {{else}}
-      <button
-        {{on "click" this.save}}
-        class="ch-button"
-        data-test-card-schema-save-btn
-        disabled={{not this.cardstackSession.isAuthenticated}}
-      >
-        Save
-      </button>
-    {{/if}}
+    <SaveButton @card={{this.card}}/>
   </div>
 {{/if}}
 
@@ -38,7 +23,6 @@
       <header class="ch-catalog--header">
         <h3 class="ch-catalog--title">Card Catalog</h3>
         <div class="ch-catalog--header-btns">
-          {{! template-lint-disable attribute-indentation}}
           <button class="ch-catalog--header-btn sidebar active" aria-label="View as sidebar"></button>
           <button class="ch-catalog--header-btn grid" aria-label="View as grid"></button>
         </div>
@@ -49,8 +33,6 @@
       </header>
       <div class="ch-catalog--fields">
         {{#each this.fieldComponents as |field|}}
-          {{! eslint is confused by on helper }}
-          {{! template-lint-disable attribute-indentation}}
           <div
             class="ch-catalog-field"
             role="button"
