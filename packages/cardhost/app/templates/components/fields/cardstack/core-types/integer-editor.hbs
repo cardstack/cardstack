@@ -1,12 +1,2 @@
-<label
-  data-test-integer-field-editor-label
-  for={{concat "edit-" @field.name "-field-value"}}
->
-  {{@field.name}}
-</label>
-<Input
-  @id={{concat "edit-" @field.name "-field-value"}}
-  @type="number"
-  @value={{this.fieldValue}}
-  @key-up={{action this.updateFieldValue}}
-/>
+<TextField @type="number" @id={{concat "edit-" @field.name "-field-value"}} @label={{@field.name}}
+  @value={{this.fieldValue}} @changeAction={{action this.updateFieldValue}} />

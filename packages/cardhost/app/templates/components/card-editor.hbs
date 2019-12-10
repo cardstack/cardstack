@@ -1,7 +1,5 @@
 {{#if this.cardstackSession.isAuthenticated}}
   <div class="card-renderer--top-edge-buttons">
-    {{! eslint is confused by on helper }}
-    {{! template-lint-disable attribute-indentation}}
     <button
       {{on "click" this.delete}}
       class="ch-button ch-button--icon-secondary delete"
@@ -18,26 +16,12 @@
     >
       Preview
     </button>
-    {{#if this.saveCard.isRunning}}
-      <div class="loader-container">
-        <div class="loader">Loading...</div>
-      </div>
-    {{else}}
-      <button
-        {{on "click" this.save}}
-        class="ch-button"
-        data-test-card-editor-save-btn
-        disabled={{not this.cardstackSession.isAuthenticated}}
-      >
-        Save
-      </button>
-    {{/if}}
+    <SaveButton @card={{this.card}}/>
   </div>
 {{/if}}
 
 <CardhostLeftEdge />
 
-{{! template-lint-disable attribute-indentation}}
 <section
   class="card-editor"
   data-test-card-edit={{this.card.name}}

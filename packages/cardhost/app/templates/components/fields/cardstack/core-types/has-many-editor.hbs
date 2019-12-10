@@ -1,13 +1,3 @@
-<label
-  data-test-belongs-to-field-editor-label
-  for={{concat "edit-" @field.name "-field-value"}}
->
-  {{@field.label}}
-</label>
-<Input
-  @id={{concat "edit-" @field.name "-field-value"}}
-  @placeholder="Comma separated Card ID's"
-  @size="60"
-  @value={{this.fieldValue}}
-  @key-up={{action this.updateFieldValue}}
-/>
+<TextField @id={{concat "edit-" @field.name "-field-value"}} @label={{@field.label}}
+  @placeholder="Comma separated Card ID's" @size="60" @value={{this.fieldValue}}
+  @changeAction={{action this.updateFieldValue}} />

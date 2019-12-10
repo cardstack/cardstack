@@ -1,20 +1,29 @@
-const { createDefaultEnvironment, destroyDefaultEnvironment } = require('@cardstack/test-support/env');
+const { createDefaultEnvironment, destroyDefaultEnvironment } = require('@cardstack/test-support/env'); // eslint-disable-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
-const { join } = require('path');
-const { readFileSync, writeFileSync, readdirSync, mkdirSync } = require('fs');
-const { promisify } = require('util');
-const sinon = require('sinon');
-const temp = require('temp').track();
-const filenamifyUrl = require('filenamify-url');
-const rimraf = promisify(require('rimraf'));
 
-const service = require('../service');
+// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
+const temp = require('@cardstack/test-support/temp-helper');
+const { mkdir } = temp;
 
-const mkdir = promisify(temp.mkdir);
+import { join } from 'path';
+import { readFileSync, writeFileSync, readdirSync, mkdirSync } from 'fs';
+
+import { promisify } from 'util';
+import sinon from 'sinon';
+
+import filenamifyUrl from 'filenamify-url';
+import rimrafcb from 'rimraf';
+const rimraf = promisify(rimrafcb);
+
+import service from '../service';
 
 const privateKey = readFileSync(join(__dirname, 'git-ssh-server', 'cardstack-test-key'), 'utf8');
 
 describe('local git cache service', function() {
+  let tempRepoPath: string;
+
   this.timeout(10000);
 
   beforeEach(function() {
@@ -27,7 +36,7 @@ describe('local git cache service', function() {
   });
 
   it('creates a local clone of the repo with a naming convention', async function() {
-    let tempRepoPath = await mkdir('test-1');
+    tempRepoPath = (await mkdir('test-1')) as string;
 
     let factory = new JSONAPIFactory();
 
@@ -52,7 +61,7 @@ describe('local git cache service', function() {
   });
 
   it('consideres localhost and 127.0.0.1 different for the purposes of a local cache', async function() {
-    let tempRepoPath = await mkdir('test-2');
+    tempRepoPath = (await mkdir('test-2')) as string;
 
     let factory = new JSONAPIFactory();
 
@@ -90,10 +99,10 @@ describe('local git cache service', function() {
   });
 
   it('only creates one local repo if the remote is the same for the writer and indexer', async function() {
-    sinon.spy(service, 'getRepo');
-    sinon.spy(service, '_makeRepo');
+    let getRepoSpy = sinon.spy(service, 'getRepo');
+    let _makeRepoSpy = sinon.spy(service, '_makeRepo');
 
-    let tempRepoPath = await mkdir('test-3');
+    tempRepoPath = (await mkdir('test-3')) as string;
 
     let factory = new JSONAPIFactory();
 
@@ -112,22 +121,21 @@ describe('local git cache service', function() {
 
     let env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
 
-    sinon.assert.calledTwice(service.getRepo);
-    sinon.assert.calledOnce(service._makeRepo);
+    sinon.assert.calledTwice(getRepoSpy);
+    sinon.assert.calledOnce(_makeRepoSpy);
 
     await destroyDefaultEnvironment(env);
-    service.getRepo.restore();
-    service._makeRepo.restore();
+    getRepoSpy.restore();
+    _makeRepoSpy.restore();
   });
 
   it('allows you to restart the hub and it will re-use the exising cached folder', async function() {
     this.timeout(20000);
 
-    sinon.spy(service, 'getRepo');
-    sinon.spy(service, '_makeRepo');
+    let getRepoSpy = sinon.spy(service, 'getRepo');
+    let _makeRepoSpy = sinon.spy(service, '_makeRepo');
 
-    let tempRepoPath = await temp.path('test-4');
-    mkdirSync(tempRepoPath);
+    tempRepoPath = await mkdir('test-4');
 
     let factory = new JSONAPIFactory();
 
@@ -146,8 +154,8 @@ describe('local git cache service', function() {
 
     let env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
 
-    sinon.assert.calledTwice(service.getRepo);
-    sinon.assert.calledOnce(service._makeRepo);
+    sinon.assert.calledTwice(getRepoSpy);
+    sinon.assert.calledOnce(_makeRepoSpy);
 
     await destroyDefaultEnvironment(env);
     service.clearCache();
@@ -155,20 +163,20 @@ describe('local git cache service', function() {
     // create the environment a second time
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
 
-    sinon.assert.callCount(service.getRepo, 4);
-    sinon.assert.calledTwice(service._makeRepo);
+    sinon.assert.callCount(getRepoSpy, 4);
+    sinon.assert.calledTwice(_makeRepoSpy);
 
     await rimraf(tempRepoPath);
-    service.getRepo.restore();
-    service._makeRepo.restore();
+    getRepoSpy.restore();
+    _makeRepoSpy.restore();
     await destroyDefaultEnvironment(env);
   });
 
   it('will re-clone the remote repo if the local folder exists but is not a valid git repo', async function() {
     this.timeout(20000);
 
-    sinon.spy(service, 'getRepo');
-    sinon.spy(service, '_makeRepo');
+    let getRepoSpy = sinon.spy(service, 'getRepo');
+    let _makeRepoSpy = sinon.spy(service, '_makeRepo');
 
     let url = 'ssh://root@localhost:9022/root/data-test';
 
@@ -196,11 +204,11 @@ describe('local git cache service', function() {
 
     let env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
 
-    sinon.assert.calledTwice(service.getRepo);
-    sinon.assert.calledOnce(service._makeRepo);
+    sinon.assert.calledTwice(getRepoSpy);
+    sinon.assert.calledOnce(_makeRepoSpy);
 
-    service.getRepo.restore();
-    service._makeRepo.restore();
+    getRepoSpy.restore();
+    _makeRepoSpy.restore();
     await destroyDefaultEnvironment(env);
   });
 });

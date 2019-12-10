@@ -1,4 +1,4 @@
-const { Repository, Branch, Reference, Commit } = require('nodegit');
+const { Repository, Branch, Reference, Commit } = require('../../git');
 
 /* eslint-env node */
 module.exports = {
