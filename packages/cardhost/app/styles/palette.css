@@ -4,6 +4,7 @@
   --ch-hover: #272330;
   --ch-disabled: #393642;
   --ch-highlight: var(--cs-cyan);               /* form components focus state, links hover state */
+  --ch-highlight-light: var(--cs-cyan-lighter); /* saved state */
   --ch-highlight-hover: var(--cs-darker-cyan);
   --ch-success: var(--cs-green);
   --ch-dark-background: #41404d;              /* right edge background */
@@ -28,6 +29,7 @@
     --cs-fuschia: #ac00ff;
     --cs-lilac: #a66dfa;
     --cs-cyan: #00ebe5;
+    --cs-cyan-lighter: #9AF6F3;
     --cs-darker-cyan: #00b0ad;
     --cs-green: #37eb77;
     --cs-yellow: #c3fc33;

@@ -16,20 +16,7 @@
     >
       Preview
     </button>
-    {{#if this.saveCard.isRunning}}
-      <div class="loader-container">
-        <div class="loader">Loading...</div>
-      </div>
-    {{else}}
-      <button
-        {{on "click" this.save}}
-        class="ch-button"
-        data-test-card-editor-save-btn
-        disabled={{not this.cardstackSession.isAuthenticated}}
-      >
-        Save
-      </button>
-    {{/if}}
+    <SaveButton @card={{this.card}}/>
   </div>
 {{/if}}
 
