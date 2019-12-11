@@ -17,7 +17,7 @@ export interface FieldQuery {
 export interface FieldValue {
   typeContext: CardId;
   path: string;
-  value: Expression;
+  value: CardExpression;
   errorHint: string;
   kind: 'field-value';
 }
@@ -25,17 +25,17 @@ export interface FieldValue {
 export interface FieldArity {
   typeContext: CardId;
   path: string;
-  singular: Expression;
-  plural: Expression;
+  singular: CardExpression;
+  plural: CardExpression;
   errorHint: string;
   kind: 'field-arity';
 }
 
-export type Expression = (string | Param | FieldQuery | FieldValue | FieldArity)[];
+export type CardExpression = (string | Param | FieldQuery | FieldValue | FieldArity)[];
 
-export type SyncExpression = (string | Param)[];
+export type Expression = (string | Param)[];
 
-export function addExplicitParens(expression: Expression): Expression {
+export function addExplicitParens(expression: CardExpression): CardExpression {
   if (expression.length === 0) {
     return expression;
   } else {
@@ -43,7 +43,7 @@ export function addExplicitParens(expression: Expression): Expression {
   }
 }
 
-export function separatedByCommas(expressions: Expression[]): Expression {
+export function separatedByCommas(expressions: CardExpression[]): CardExpression {
   return expressions.reduce((accum, expression) => {
     if (accum.length > 0) {
       accum.push(',');
@@ -60,7 +60,7 @@ export function isParam(expression: any): expression is Param {
   return expression?.hasOwnProperty('param');
 }
 
-export function every(expressions: Expression[]): Expression {
+export function every(expressions: CardExpression[]): CardExpression {
   if (expressions.length === 0) {
     return ['true']; // this is "SQL true", not javascript true
   }
@@ -76,7 +76,7 @@ export function fieldQuery(typeContext: CardId, path: string, errorHint: string)
   };
 }
 
-export function fieldValue(typeContext: CardId, path: string, value: Expression, errorHint: string): FieldValue {
+export function fieldValue(typeContext: CardId, path: string, value: CardExpression, errorHint: string): FieldValue {
   return {
     typeContext,
     path,
@@ -89,8 +89,8 @@ export function fieldValue(typeContext: CardId, path: string, value: Expression,
 export function fieldArity(
   typeContext: CardId,
   path: string,
-  singular: Expression,
-  plural: Expression,
+  singular: CardExpression,
+  plural: CardExpression,
   errorHint: string
 ): FieldArity {
   return {
@@ -103,7 +103,7 @@ export function fieldArity(
   };
 }
 
-export function any(expressions: Expression[]): Expression {
+export function any(expressions: CardExpression[]): CardExpression {
   if (expressions.length === 0) {
     return ['false']; // this is "SQL false", not javascript false
   }
@@ -118,7 +118,7 @@ export function safeName(name: string) {
 }
 
 // takes a pojo with column name keys and expression values
-export function upsert(table: string, constraint: string, values: { [column: string]: Expression | Param }) {
+export function upsert(table: string, constraint: string, values: { [column: string]: CardExpression | Param }) {
   let names = Object.keys(values).map(safeName);
   let nameExpressions = names.map(name => [name]);
   let valueExpressions = Object.keys(values).map(k => {

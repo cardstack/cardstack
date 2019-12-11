@@ -37,7 +37,7 @@ describe('hub/card-service', function() {
       expect(card.realm).to.equal(`${myOrigin}/api/realms/first-ephemeral-realm`);
 
       let pgclient = await env.container.lookup('pgclient');
-      let result = await pgclient.query(service, [
+      let result = await pgclient.queryCards(service, [
         `select * from cards where realm = `,
         param(`${myOrigin}/api/realms/first-ephemeral-realm`),
       ]);

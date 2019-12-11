@@ -9,8 +9,8 @@ import {
   param,
   safeName,
   every,
+  CardExpression,
   Expression,
-  SyncExpression,
   any,
   isParam,
   addExplicitParens,
@@ -37,6 +37,14 @@ function config() {
   return postgresConfig({
     database: `pgsearch_${process.env.PGSEARCH_NAMESPACE || 'dev'}`,
   });
+}
+
+export interface JobData<A> {
+  name: string;
+  id?: number;
+  status?: 'waiting' | 'running' | 'completed' | 'failed' | 'fulfilled' | 'rejected';
+  createdAt: string;
+  finishedAt: string;
 }
 
 export default class PgClient {
@@ -108,9 +116,9 @@ export default class PgClient {
     }
   }
 
-  async query(cards: ScopedCardService, query: Expression): Promise<QueryResult> {
+  async queryCards(cards: ScopedCardService, query: CardExpression): Promise<QueryResult> {
     let client = await this.pool.connect();
-    let sql = await this.queryToSQL(cards, query);
+    let sql = await this.cardQueryToSQL(cards, query);
     log.trace('search: %s trace: %j', sql.text, sql.values);
     try {
       return await client.query(sql);
@@ -119,32 +127,35 @@ export default class PgClient {
     }
   }
 
-  public async getAdvisoryLock(lockName: string): Promise<boolean> {
-    let key = hashString(lockName);
+  async query(query: Expression): Promise<QueryResult> {
     let client = await this.pool.connect();
+    let sql = await this.expressionToSql(query);
+    log.trace('search: %s trace: %j', sql.text, sql.values);
     try {
-      let result = await client.query(`select pg_try_advisory_lock(${key})`);
-      return Boolean(result.rows.length && result.rows[0].pg_try_advisory_lock);
+      return await client.query(sql);
     } finally {
       client.release();
     }
   }
 
-  public async releaseAdvisoryLock(lockName: string): Promise<void> {
-    let key = hashString(lockName);
+  async begin<T>(fn: (connection: { query: (e: Expression) => Promise<QueryResult> }) => Promise<T>): Promise<T> {
     let client = await this.pool.connect();
+    let query = async (expression: Expression) => {
+      return await client.query(this.expressionToSql(expression));
+    };
     try {
-      await client.query(`select pg_advisory_unlock(${key})`);
+      await query(['begin']);
+      return await fn({ query });
     } finally {
       client.release();
     }
   }
 
-  private async queryToSQL(cards: ScopedCardService, query: Expression) {
-    return this.syncExpressionToSql(await this.makeSynchronous(cards, query));
+  private async cardQueryToSQL(cards: ScopedCardService, query: CardExpression) {
+    return this.expressionToSql(await this.makeExpression(cards, query));
   }
 
-  private async makeSynchronous(cards: ScopedCardService, query: Expression): Promise<SyncExpression> {
+  private async makeExpression(cards: ScopedCardService, query: CardExpression): Promise<Expression> {
     return flatten(
       await Promise.all(
         query.map(element => {
@@ -164,7 +175,7 @@ export default class PgClient {
     );
   }
 
-  private syncExpressionToSql(query: SyncExpression) {
+  private expressionToSql(query: Expression) {
     let values: PgPrimitive[] = [];
     let text = query
       .map(element => {
@@ -184,11 +195,10 @@ export default class PgClient {
     };
   }
 
-  beginBatch(cards: ScopedCardService) {
+  beginCardBatch(cards: ScopedCardService) {
     return new Batch(this, cards);
   }
-
-  private async handleFieldQuery(_cards: ScopedCardService, fieldQuery: FieldQuery): Promise<SyncExpression> {
+  private async handleFieldQuery(_cards: ScopedCardService, fieldQuery: FieldQuery): Promise<Expression> {
     let { path, errorHint } = fieldQuery;
     if (path === 'realm' || path === 'original-realm' || path === 'local-id') {
       return [snakeCase(path)];
@@ -197,19 +207,19 @@ export default class PgClient {
     throw new Error(`unimplemented in buildQueryExpression for ${errorHint}`);
   }
 
-  private async handleFieldValue(cards: ScopedCardService, fieldValue: FieldValue): Promise<SyncExpression> {
+  private async handleFieldValue(cards: ScopedCardService, fieldValue: FieldValue): Promise<Expression> {
     let { path, errorHint, value } = fieldValue;
     if (path === 'realm' || path === 'original-realm' || path === 'local-id') {
-      return await this.makeSynchronous(cards, value);
+      return await this.makeExpression(cards, value);
     }
 
     throw new Error(`unimplemented in buildQueryExpression for ${errorHint}`);
   }
 
-  private async handleFieldArity(cards: ScopedCardService, fieldArity: FieldArity): Promise<SyncExpression> {
+  private async handleFieldArity(cards: ScopedCardService, fieldArity: FieldArity): Promise<Expression> {
     let { path, singular, errorHint } = fieldArity;
     if (path === 'realm' || path === 'original-realm' || path === 'local-id') {
-      return await this.makeSynchronous(cards, singular);
+      return await this.makeExpression(cards, singular);
     }
 
     throw new Error(`unimplemented in buildQueryExpression for ${errorHint}`);
@@ -221,7 +231,7 @@ export default class PgClient {
       [`original_realm = `, param(id.originalRealm ?? id.realm)],
       [`local_id = `, param(id.localId)],
     ]);
-    let result = await this.query(cards, [`select pristine_doc from cards where`, ...condition]);
+    let result = await this.queryCards(cards, [`select pristine_doc from cards where`, ...condition]);
     if (result.rowCount !== 1) {
       throw new CardstackError(
         `Card not found with realm="${id.realm}", original-realm="${id.originalRealm ?? id.realm}", local-id="${
@@ -237,7 +247,7 @@ export default class PgClient {
     cards: ScopedCardService,
     { filter, queryString, sort, page }: Query
   ): Promise<{ cards: CardWithId[]; meta: ResponseMeta }> {
-    let conditions = [] as Expression[];
+    let conditions = [] as CardExpression[];
 
     if (filter) {
       conditions.push(this.filterCondition(baseType(filter), filter));
@@ -247,7 +257,7 @@ export default class PgClient {
       //conditions.push(this.queryCondition(queryString));
     }
 
-    let totalResponsePromise = this.query(cards, [`select count(*) from cards where`, ...every(conditions)]);
+    let totalResponsePromise = this.queryCards(cards, [`select count(*) from cards where`, ...every(conditions)]);
 
     let sorts = new Sorts(baseType(filter), sort);
     if (page && page.cursor) {
@@ -265,7 +275,7 @@ export default class PgClient {
     let size = Number(page?.size ?? 10);
     query = [...query, 'limit', param(size + 1)];
 
-    let response = await this.query(cards, query);
+    let response = await this.queryCards(cards, query);
     let totalResponse = await totalResponsePromise;
     return this.assembleResponse(response, totalResponse, size, sorts);
   }
@@ -288,7 +298,7 @@ export default class PgClient {
     };
   }
 
-  private filterCondition(typeContext: CardId, filter: Filter): Expression {
+  private filterCondition(typeContext: CardId, filter: Filter): CardExpression {
     if (filter.type) {
       typeContext = filter.type;
     }
@@ -308,7 +318,7 @@ export default class PgClient {
     }
   }
 
-  private eqCondition(typeContext: CardId, filter: EqFilter): Expression {
+  private eqCondition(typeContext: CardId, filter: EqFilter): CardExpression {
     return every(
       Object.entries(filter.eq).map(([key, value]) => {
         return this.fieldFilter(typeContext, key, value);
@@ -316,13 +326,13 @@ export default class PgClient {
     );
   }
 
-  private fieldFilter(typeContext: CardId, key: string, value: JSON.Value): Expression {
+  private fieldFilter(typeContext: CardId, key: string, value: JSON.Value): CardExpression {
     let query = fieldQuery(typeContext, key, 'filter');
     let v = fieldValue(typeContext, key, [param(value)], 'filter');
     return [fieldArity(typeContext, key, [query, '=', v], [query, '&&', 'array[', v, ']'], 'filter')];
   }
 
-  private rangeCondition(_typeContext: CardId, _filter: RangeFilter): Expression {
+  private rangeCondition(_typeContext: CardId, _filter: RangeFilter): CardExpression {
     throw new Error('unimplemented');
   }
 }
@@ -340,7 +350,7 @@ class Batch {
     };
     /* eslint-enable @typescript-eslint/camelcase */
 
-    await this.client.query(this.cards, upsert('cards', 'cards_pkey', row));
+    await this.client.queryCards(this.cards, upsert('cards', 'cards_pkey', row));
     log.debug('save realm: %s original realm: %s local id: %s', card.realm, card.originalRealm, card.localId);
   }
 
@@ -355,14 +365,4 @@ declare module '@cardstack/hub/dependency-injection' {
 
 export interface ResponseMeta {
   page: { total: number; cursor?: string };
-}
-
-// doesn't need to be secure--just needs to be unique
-function hashString(str: string): number {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash += Math.pow(str.charCodeAt(i) * 31, str.length - i);
-    hash = hash & hash; // Convert to 32bit integer
-  }
-  return hash;
 }

@@ -45,7 +45,7 @@ export class ScopedCardService {
     card.patch(saved.jsonapi);
     card.assertHasIds();
 
-    let batch = this.cards.pgclient.beginBatch(this);
+    let batch = this.cards.pgclient.beginCardBatch(this);
     await batch.save(card);
     await batch.done();
 

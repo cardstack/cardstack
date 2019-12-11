@@ -4,7 +4,7 @@ import { WriterFactory } from './writer';
 import { PristineDocument, UpstreamDocument, UpstreamIdentity, PristineCollection } from './document';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import cloneDeep from 'lodash/cloneDeep';
-import { Expression } from './pgsearch/util';
+import { CardExpression } from './pgsearch/util';
 import { ResponseMeta } from './pgsearch/pgclient';
 import * as J from 'json-typescript';
 
@@ -137,7 +137,7 @@ export class CardWithId extends Card {
   }
 
   async loadFeature(featureName: 'writer'): Promise<WriterFactory | null>;
-  async loadFeature(featureName: 'buildValueExpression'): Promise<(expression: Expression) => Expression>;
+  async loadFeature(featureName: 'buildValueExpression'): Promise<(expression: CardExpression) => CardExpression>;
   async loadFeature(featureName: any): Promise<any> {
     switch (featureName) {
       case 'writer':

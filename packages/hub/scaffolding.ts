@@ -5,7 +5,7 @@ import { WriterFactory } from './writer';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import merge from 'lodash/merge';
 import { testCard } from './node-tests/test-card';
-import { Expression } from './pgsearch/util';
+import { CardExpression } from './pgsearch/util';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
 
 function ephemeralRealms() {
@@ -92,6 +92,6 @@ export function patch(target: SingleResourceDoc, source: SingleResourceDoc) {
   return merge(target, source);
 }
 
-export function buildValueExpression(expression: Expression): Expression {
+export function buildValueExpression(expression: CardExpression): CardExpression {
   return expression;
 }

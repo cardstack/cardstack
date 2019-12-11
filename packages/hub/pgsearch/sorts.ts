@@ -1,4 +1,4 @@
-import { Expression, separatedByCommas, param, fieldQuery, FieldQuery, fieldValue } from './util';
+import { CardExpression, separatedByCommas, param, fieldQuery, FieldQuery, fieldValue } from './util';
 import { CardId } from '../card';
 import { Primitive } from 'json-typescript';
 import CardstackError from '../error';
@@ -51,18 +51,18 @@ export class Sorts {
     };
   }
 
-  orderExpression(): Expression {
-    return (['order by '] as Expression).concat(
+  orderExpression(): CardExpression {
+    return (['order by '] as CardExpression).concat(
       separatedByCommas(this._sorts.map(({ fieldQuery, order }) => [fieldQuery, order]))
     );
   }
 
-  afterExpression(cursor: string): Expression {
+  afterExpression(cursor: string): CardExpression {
     let cursorValues = this._parseCursor(cursor);
     return this._afterExpression(cursorValues, 0);
   }
 
-  private _afterExpression(cursorValues: Primitive[], index: number): Expression {
+  private _afterExpression(cursorValues: Primitive[], index: number): CardExpression {
     if (index === this._sorts.length) {
       return ['false'];
     }

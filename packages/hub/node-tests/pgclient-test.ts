@@ -19,7 +19,7 @@ describe('hub/pgclient', function() {
     let pgclient = await env.container.lookup('pgclient');
     let cardsService = await env.container.lookup('cards');
     let cards = cardsService.as(Session.INTERNAL_PRIVILEGED);
-    let result = await pgclient.query(cards, ['select 1']);
+    let result = await pgclient.queryCards(cards, ['select 1']);
     expect(result.rowCount).equals(1);
   });
 
@@ -31,11 +31,11 @@ describe('hub/pgclient', function() {
     let cardsService = await env.container.lookup('cards');
     let cards = cardsService.as(Session.INTERNAL_PRIVILEGED);
 
-    let batch = pgclient.beginBatch(cards);
+    let batch = pgclient.beginCardBatch(cards);
     await batch.save(card);
     await batch.done();
 
-    let result = await pgclient.query(cards, [`select * from cards where local_id = `, param('card-1')]);
+    let result = await pgclient.queryCards(cards, [`select * from cards where local_id = `, param('card-1')]);
     expect(result.rowCount).equals(1);
   });
 });
