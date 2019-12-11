@@ -15,12 +15,17 @@ export default class Queue {
     // pg migrate the jobs DB schema with columns: id (seq number), name, args,
     // status, publish-time
     //
-    // statuses: waiting - job is waiting to be started running - job is running
-    //   completed - job has completed successsfully but submitter has not yet
-    //   been informed failed - job has completed unsuccessfully but submitter
-    //   has not yet been informed fulfilled - job submitter has been informed
-    //   about the success of the job rejected - job submitter has been informed
-    //   about teh failure of the jov
+    // statuses:
+    //   - waiting: job is waiting to be started
+    //   - running: job is running
+    //   - completed: job has completed successsfully but submitter has not yet
+    //     been informed
+    //   - failed: job has completed unsuccessfully but submitter has not yet
+    //     been informed
+    //   - fulfilled: job submitter has been informed about the success of the
+    //     job
+    //   - rejected: job submitter has been informed about teh failure of the
+    //     job
     //
     // Execute this.lookForWorkToDo() to start polling for jobs that were
     // submitted by other hubs. Note that we shouldn't run this polling during
