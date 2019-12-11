@@ -1,13 +1,18 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { capitalize, htmlSafe } from '@ember/string';
+import { dasherize, capitalize, htmlSafe } from '@ember/string';
 import { isNone } from '@ember/utils';
 import { action } from '@ember/object';
 import { guidFor } from '@ember/object/internals';
 
-/*global window*/
+/*global window, document*/
 
 const getSize = n => (!isNaN(parseFloat(n)) && isFinite(n) ? `${n}px` : n);
+
+/**
+ * Actions accepted: onResizeStart, onResizeStop, onResize
+ * Arguments accepted: directions array (i.e. ['left'], classNames string (i.e. "my-class another-class")
+ */
 
 export default class ReSizable extends Component {
   @tracked elementId = guidFor(this);
@@ -16,19 +21,18 @@ export default class ReSizable extends Component {
   maxWidth = null;
   maxHeight = null;
   grid = [1, 1];
-  lockAspectRatio = false;
   get directions() {
-    return this.args.directions || ['top', 'right', 'bottom', 'left'];
+    return (
+      this.args.directions || ['top', 'right', 'bottom', 'left', 'topRight', 'bottomRight', 'bottomLeft', 'topLeft']
+    );
   }
 
   @action
   setElement() {
+    // done this way so that we only query once. If this was a getter instead,
+    //it would be called 100s of times a second, because it us used by the mousemove event.
     this.el = document.querySelector(`#${this.elementId}`);
   }
-
-  onResizeStart = null;
-  onResizeStop = null;
-  onResize = null;
 
   @tracked isActive = false;
   @tracked width;
@@ -37,6 +41,14 @@ export default class ReSizable extends Component {
   @tracked elementWidth = this.args.width;
   @tracked elementHeight = this.args.height;
   @tracked _original;
+
+  get lockAspectRatio() {
+    if (typeof this.args.lockAspectRatio === 'boolean') {
+      return this.args.lockAspectRatio;
+    } else {
+      return false;
+    }
+  }
 
   get style() {
     let s = '';
@@ -47,7 +59,6 @@ export default class ReSizable extends Component {
       s = `${s}height: ${getSize(this.elementHeight || this.args.height)};`;
     }
 
-    // can we be sure this actually is safe?
     return s.length ? htmlSafe(s) : null;
   }
 
@@ -76,9 +87,9 @@ export default class ReSizable extends Component {
       }
     }
 
-    if (this.onResizeStart) {
+    if (this.args.onResizeStart) {
       let el = this.el;
-      this.onResizeStart(direction, event, el);
+      this.args.onResizeStart(direction, event, el);
     }
 
     const size = this.getBoxSize();
@@ -95,11 +106,11 @@ export default class ReSizable extends Component {
       return;
     }
 
-    el.addEventListener('mouseup', this._onMouseUp, true);
+    el.addEventListener('mouseup', this._onMouseUp);
     // have to use the document, otherwise you can move the mouse too fast and lose tracking
-    document.addEventListener('mousemove', this._onMouseMove, true);
-    el.addEventListener('touchmove', this._onTouchMove, true);
-    el.addEventListener('touchend', this._onMouseUp, true);
+    document.addEventListener('mousemove', this._onMouseMove);
+    el.addEventListener('touchmove', this._onTouchMove);
+    el.addEventListener('touchend', this._onMouseUp);
   }
 
   @action
@@ -122,7 +133,7 @@ export default class ReSizable extends Component {
     if (!this.isActive) {
       return;
     }
-    const direction = this._direction;
+    const direction = dasherize(this._direction);
     const original = this._original;
     const ratio = original.height / original.width;
     let newWidth = original.width;
@@ -152,8 +163,8 @@ export default class ReSizable extends Component {
     this.elementHeight = newHeight;
     let el = this.el;
 
-    if (this.onResize) {
-      this.onResize(
+    if (this.args.onResize) {
+      this.args.onResize(
         this._direction,
         { width: newWidth, height: newHeight },
         { width: newWidth - original.width, height: newHeight - original.height },
@@ -164,11 +175,32 @@ export default class ReSizable extends Component {
 
   @action
   _onMouseUp() {
+    if (!this.isActive) {
+      return;
+    }
+
+    if (this.args.onResizeStop) {
+      const styleSize = this.getBoxSize();
+      this.args.onResizeStop(
+        this._direction,
+        { width: styleSize.width - this._original.width, height: styleSize.height - this._original.height },
+        this.el
+      );
+    }
+
     this.isActive = false;
 
-    document.removeEventListener('mouseup', this._onMouseUp, true);
-    document.removeEventListener('mousemove', this._onMouseMove, true);
-    document.removeEventListener('touchmove', this._onTouchMove, true);
-    document.removeEventListener('touchend', this._onMouseUp, true);
+    this.el.removeEventListener('mouseup', this._onMouseUp);
+    document.removeEventListener('mousemove', this._onMouseMove);
+    this.el.removeEventListener('touchmove', this._onTouchMove);
+    this.el.removeEventListener('touchend', this._onMouseUp);
+  }
+
+  willDestroy() {
+    // ensure teardown in case of hiccups with onMouseUp state
+    this.el.removeEventListener('mouseup', this._onMouseUp);
+    document.removeEventListener('mousemove', this._onMouseMove);
+    this.el.removeEventListener('touchmove', this._onTouchMove);
+    this.el.removeEventListener('touchend', this._onMouseUp);
   }
 }
