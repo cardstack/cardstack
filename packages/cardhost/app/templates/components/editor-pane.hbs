@@ -1,10 +1,11 @@
-<ReSizable ...attributes data-test-editor-pane class="cardhost-card-theme-editor {{this.classNames}}"
-  @width={{this.width}} @directions={{this.resizeDirections}} @height={{this.height}}>
+<ReSizable ...attributes data-test-editor-pane class="cardhost-card-theme-editor"
+  @width={{this.width}} @directions={{this.resizeDirections}} @height={{this.height}}
+  @classNames={{this.classNames}}>
   <div class="resizable-content">
-    <ReSizable @directions={{this.cssEditorResizeDirections}} class="editor-section" @height="50%">
+    <div>
       <CodeEditor @title="CSS" @code={{@model.isolatedCss}} @language="css" @readOnly={{false}} @resizable={{true}}
         @updateCode={{action "updateCode"}} class="editor-pane-code" />
-    </ReSizable>
+    </div>
 
     <div class="editor-section">
       <CodeEditor @title="HTML" @code={{this.markup}} @language="handlebars" @readOnly={{true}} @resizable={{true}}
@@ -15,9 +16,5 @@
 </ReSizable>
 
 <style id="card-styles">
-  {
-      {
-      scope-css this.model.isolatedCss this.model.name
-    }
-  }
+  {{scope-css this.model.isolatedCss this.model.name}}
 </style>
