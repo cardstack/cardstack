@@ -16,6 +16,48 @@ export default class EditorPane extends Component {
     this.markup = cardMarkup ? cardMarkup.innerHTML.toString().trim() : '';
   }
 
+  get resizeDirections() {
+    if (this.cssModeToggle.dockLocation === 'right') {
+      return ['left'];
+    } else {
+      return ['top'];
+    }
+  }
+
+  get cssEditorResizeDirections() {
+    return ['bottom'];
+  }
+
+  get width() {
+    if (this.cssModeToggle.dockLocation === 'right') {
+      return '40%';
+    } else {
+      return '100%';
+    }
+  }
+
+  get height() {
+    if (this.cssModeToggle.dockLocation === 'right') {
+      return '100%';
+    } else {
+      return '40%';
+    }
+  }
+
+  get classNames() {
+    let classes = [];
+
+    if (this.cssModeToggle.dockLocation === 'bottom') {
+      classes.push('bottom-docked');
+    }
+
+    if (this.cssModeToggle.visible === false) {
+      classes.push('hidden');
+    }
+
+    return classes.join(' ');
+  }
+
   @action
   updateCode(code) {
     this.args.model.setIsolatedCss(code);
