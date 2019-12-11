@@ -80,21 +80,25 @@ export default class Queue {
   // This will pick up any jobs that were not submitted by this hub. We could
   // hold off implementing this for the first pass at queuing...
   private lookForWorkToDo() {
-    setInterval(() => {
+    while (true) {
       // for all the keys in this.handlers, call this.runNextJob(name)
-    });
+      //
+      // sleep
+    }
   }
 
   // This will pick up any jobs that were submitted by this hub but not
   // completed by this hub. We could hold off implementing this for the first
   // pass at queuing...
   private lookForCompletedWork() {
-    setInterval(() => {
+    while (true) {
       // for all the keys in this.jobs, look for any completed or failed jobs.
       // For each job resolve or reject the job promise and update the job row
       // in the DB to reflect that we have informed the job submitter the state
       // of the job
-    });
+      //
+      // sleep
+    }
   }
 }
 
