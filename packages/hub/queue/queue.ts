@@ -9,39 +9,39 @@ export interface QueueOptions {
 
 export default class Queue {
   private handlers: Map<string, Function> = new Map();
-  private runningJobs: Map<string, Promise<void>> = new Map();
-  private waitingJobs: Map<string, Promise<void>> = new Map();
+  private jobs: Map<string, Promise<void>> = new Map();
 
-  // 0. make sure handler exists for job name, throw otherwise
-  // 1. create a deferred promise for the handler function that corresponds to
-  //    the job name and curry the job args for the handler function
-  // 2. hash job name (i think advisory lock operate on ints) and try to get
-  //    advisory lock for the job name.
-  // 3. if we are able to get lock then add the job promise to the running jobs
-  //    and return the promise. Presumably there should be no existing running
-  //    job already for that job name. 4a. if we are unable to get lock then add
-  //    job promise to the this.watitingJobs.
-  // 4. If there is already an entry in waitingJobs for this job name, and we
-  //    are coalescing jobs, then return the current this.waitingJobs.get(name)
-  //    promise instead of the one that was constructed at the beginning in step
-  //    #1. Otherwise chain the promise to the end of the promise that exists in
-  //    this.waitingJobs and return the chained promise
-  // 5. if in step #4 where we were unable to get a lock, look for the job name
-  //    in running jobs. If If we cannot find the running job, then that means
-  //    the running job is in another node runtime (a 2nd hub instance has spun
-  //    up) and start polling for an advisory lock for the job name. Once a lock
-  //    is obtained, follow logic in step #6.
-  // 6. When a running handler job has completed (or failed) as part of a
-  //    finally block, look for this.waitingJobs(name) deferred promises. If you
-  //    find any, then remove that promise from the this.waitingJobs and add it
-  //    to the this.runningJobs and start executing that job's handler function.
-  //    If there are no waiting jobs, then release the advisory lock. Note that
-  //    the lock is held until all the jobs in this hub instances for the job
-  //    name have been flushed. This allows hub hub instance to complete it's
-  //    processing of jobs before another hub instance can start processing the
-  //    same job name's.
+  async ready() {
+    // pg migrate the jobs DB schema with columns: id (seq number), name, args,
+    // status, publish-time
+    //
+    // statuses: waiting - job is waiting to be started running - job is running
+    //   completed - job has completed successsfully but submitter has not yet
+    //   been informed failed - job has completed unsuccessfully but submitter
+    //   has not yet been informed fulfilled - job submitter has been informed
+    //   about the success of the job rejected - job submitter has been informed
+    //   about teh failure of the jov
+    //
+    // Execute this.lookForWorkToDo() to start polling for jobs that were
+    // submitted by other hubs. Note that we shouldn't run this polling during
+    // tests...
+    //
+    // execute this.lookForCompletedWork() to start polling for jobs that your
+    // hub has submitted that were completed by other hubs. Note that we
+    // shouldn't run this polling during tests
+  }
 
-  async publish(name: string, args: JobArgs, opts: QueueOptions): Promise<void> {}
+  async publish(name: string, args: JobArgs, opts: QueueOptions): Promise<void> {
+    // 1. assert that handler exists for job name, otherwise throw
+    // 2. if opts.coaleseWaitingJobs is true and there is alread an entry for
+    //    this job name in the jobs table that is in a waiting status, then do
+    //    not create a new row
+    // 2. add new row to jobs table with state of "waiting" include name args,
+    //    opts, publish-time in jobs row.
+    // 3. create a promise that will be fulfilled when the job is completed and
+    //    add to the this.jobs map with the created (or coalesced) row's job id
+    // 4. invoke this.runNextJob(name)
+  }
 
   // Services can register async function handlers that are invoked when a job is kicked off
   // for the job "name"
@@ -51,6 +51,41 @@ export default class Queue {
 
   unsubscribe(name: string) {
     this.handlers.delete(name);
+  }
+
+  private async runNextJob(name) {
+    // 1. try to get advisory lock for the job name (may need to hash job name
+    //    to an int)
+    // 2. if no advisory lock can be obtained then exit this function
+    // 3. if an advisory lock can be obtained, then select the next waiting job
+    //    for the job name and update the job's status to "running"
+    // 4. invoke the handler for the job name with the args that were in the
+    //    selected job in step #3
+    // 5. when the handler function completes (or fails--use "finally"). update
+    //    the status of the job in the DB to "completed" or "failed" and release
+    //    the advisory lock.
+    // 6. if this.jobs(jobId) has a promise then resolve (or reject it as the
+    //    case may be) it (otherwise the promise lives in another hub). Update
+    //    the status to the job to indicate that the job submitter has been
+    //    informed (set job status to fulfilled or rejected state)
+    // 7. execute this.runNextJob(name) recursivey to pick up any more waiting
+    //    jobs for this job name.
+  }
+
+  // This will pick up any jobs that were not submitted by this hub
+  private lookForWorkToDo() {
+    setInterval(() => {
+      // for all the keys in this.handlers, call this.runNextJob()
+    });
+  }
+
+  private lookForCompletedWork() {
+    setInterval(() => {
+      // for all the keys in this.jobs, look for any completed or failed jobs.
+      // For each job resolve or reject the job promise and update the job row
+      // in the DB to reflect that we have informed the job submitter the state
+      // of the job
+    });
   }
 }
 
