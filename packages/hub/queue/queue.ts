@@ -30,10 +30,12 @@ export default class Queue {
     // Execute this.lookForWorkToDo() to start polling for jobs that were
     // submitted by other hubs. Note that we shouldn't run this polling during
     // tests...
+    // don't await this promise
     //
     // execute this.lookForCompletedWork() to start polling for jobs that your
     // hub has submitted that were completed by other hubs. Note that we
     // shouldn't run this polling during tests
+    // don't await this promise
   }
 
   async publish(name: string, args: JobArgs, opts: QueueOptions): Promise<void> {
