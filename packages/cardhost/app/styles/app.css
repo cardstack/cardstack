@@ -1,4 +1,5 @@
 @import '/assets/fonts.css';
+@import '/assets/resizable.css';
 @import '/assets/palette.css';
 @import '/assets/ui-components.css';
 
@@ -127,6 +128,12 @@ a:hover {
   z-index: var(--ch-actions-z-index);
 }
 
+.card-renderer--top-edge-buttons .show-editor-btn, .card-renderer--top-edge-buttons .hide-editor-btn {
+  margin-top: 10px;
+  margin-right: 15px;
+  cursor: pointer;
+}
+
 .card-renderer--top-edge-buttons .dock-btn {
   margin: 10px 15px;
   cursor: pointer;
@@ -215,6 +222,7 @@ a:hover {
   background: var(--ch-deep-background);
   z-index: 10;
   padding: 20px;
+  transform: translateX(0%);
 }
 
 .cardhost-card-theme-editor.bottom-docked {
@@ -223,6 +231,79 @@ a:hover {
   left: 0;
   height: 40%;
   width: 100%;
+  transform: translateY(0%);
+}
+
+.cardhost-card-theme-editor.hidden {
+  transform: translateX(100%);
+}
+
+.cardhost-card-theme-editor.bottom-docked.hidden {
+  transform: translateY(100%);
+}
+
+
+.cardhost-card-theme-editor .resizable-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.cardhost-card-theme-editor.bottom-docked .resizable-content {
+  flex-direction: row;
+}
+
+.cardhost-card-theme-editor .editor-section {
+  height: 50%;
+  width: 100%;
+  padding: 12px;
+}
+
+.cardhost-card-theme-editor.bottom-docked .editor-section {
+  height: 100%;
+  width: 50%;
+}
+
+.cardhost-card-theme-editor .editor-container {
+  border: 1px solid var(--ch-default);
+  border-radius: 10px;
+  overflow: hidden;
+  height: 100%;
+}
+
+.cardhost-card-theme-editor .editor-container__title {
+  background-color: var(--ch-default);
+  padding: 12px;
+}
+
+
+.cardhost-card-theme-editor .resizer.left {
+  left: 5px;
+  width: 25px;
+}
+
+.cardhost-card-theme-editor .resizer.top {
+  height: 25px;
+}
+
+.cardhost-card-theme-editor .drag-handle {
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: rotate(180deg);
+  z-index: -1;
+}
+
+.cardhost-card-theme-editor.bottom-docked .drag-handle {
+  left: 50%;
+  top: -30px;
+  transform: rotate(-90deg);
+}
+
+.cardhost-card-theme-editor .drag-handle path {
+  stroke: var(--ch-light-background);
 }
 
 .dock-icon-unselected {
@@ -242,5 +323,5 @@ a:hover {
 }
 
 .cardhost-monaco-container.editor-pane-code {
-  min-height: 35vh;
+  min-height: 32vh;
 }

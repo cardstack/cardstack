@@ -73,6 +73,7 @@
     "ember-concurrency-decorators": "^1.0.0",
     "ember-data": "github:emberjs/data#1df833396855d956b817540923dd89338463fec2",
     "ember-export-application-global": "^2.0.0",
+    "ember-lifeline": "^4.1.5",
     "ember-load-initializers": "^2.0.0",
     "ember-maybe-import-regenerator": "^0.1.6",
     "ember-percy": "^1.6.0",
