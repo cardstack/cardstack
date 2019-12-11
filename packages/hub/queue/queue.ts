@@ -53,7 +53,7 @@ export default class Queue {
     this.handlers.delete(name);
   }
 
-  private async runNextJob(name) {
+  private async runNextJob(name: string) {
     // 1. try to get advisory lock for the job name (may need to hash job name
     //    to an int)
     // 2. if no advisory lock can be obtained then exit this function
@@ -75,7 +75,7 @@ export default class Queue {
   // This will pick up any jobs that were not submitted by this hub
   private lookForWorkToDo() {
     setInterval(() => {
-      // for all the keys in this.handlers, call this.runNextJob()
+      // for all the keys in this.handlers, call this.runNextJob(name)
     });
   }
 
