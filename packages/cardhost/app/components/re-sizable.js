@@ -18,7 +18,7 @@ export default class ReSizable extends Component {
   grid = [1, 1];
   lockAspectRatio = false;
   get directions() {
-    return this.args.directions || ['top', 'right', 'bottom', 'left']
+    return this.args.directions || ['top', 'right', 'bottom', 'left'];
   }
 
   @action
@@ -38,11 +38,6 @@ export default class ReSizable extends Component {
   @tracked elementHeight = this.args.height;
   @tracked _original;
 
-  // get el() {
-  //   console.log("EL")
-  //   return document.querySelector(`#${this.elementId}`);
-  // }
-
   get style() {
     let s = '';
     if (!isNone(this.args.width)) {
@@ -55,10 +50,6 @@ export default class ReSizable extends Component {
     // can we be sure this actually is safe?
     return s.length ? htmlSafe(s) : null;
   }
-
-  // willDestroy() {
-  //   runDisposables(this);
-  // }
 
   getBoxSize() {
     let el = this.el;
@@ -103,8 +94,10 @@ export default class ReSizable extends Component {
     if (!el) {
       return;
     }
+
     el.addEventListener('mouseup', this._onMouseUp, true);
-    el.addEventListener('mousemove', this._onMouseMove, true);
+    // have to use the document, otherwise you can move the mouse too fast and lose tracking
+    document.addEventListener('mousemove', this._onMouseMove, true);
     el.addEventListener('touchmove', this._onTouchMove, true);
     el.addEventListener('touchend', this._onMouseUp, true);
   }
