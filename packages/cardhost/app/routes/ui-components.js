@@ -6,6 +6,14 @@ export default class UIComponentsRoute extends Route {
     return {
       id: 'local-hub::event',
       name: 'event',
+      isDirty: true,
+      save: async () => {
+        return new Promise(resolve => {
+          setTimeout(() => {
+            resolve();
+          }, 2000);
+        });
+      },
       isolatedFields: [
         {
           name: 'title',
