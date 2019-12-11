@@ -165,6 +165,6 @@
 }
 
 .card-catalog > *:hover .embedded-card-label {
-  padding-top: 20px;
-  transform: scale(.8);
+  padding-top: 6px;
+  transform: scale(.85);
 }
