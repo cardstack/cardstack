@@ -24,7 +24,7 @@ export default class ViewSwitcher extends Component {
   @service router;
 
   get mode() {
-    if (this.args.mode && this.args.mode.length) {
+    if (this.args.mode) {
       return this.views.filterBy('id', this.args.mode).firstObject;
     }
 

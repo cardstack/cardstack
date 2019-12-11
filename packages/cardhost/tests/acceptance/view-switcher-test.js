@@ -32,14 +32,20 @@ module('Acceptance | view switcher', function(hooks) {
     });
 
     await visit(`/cards/${card1Id}/edit`);
+    await waitFor(`[data-test-card-edit="${card1Id}"]`, { timeout });
+
     assert.equal(currentURL(), `/cards/${card1Id}/edit`);
     assert.dom(`[data-test-mode-switcher] .ember-power-select-selected-item`).hasText('Edit View');
 
     await visit(`/cards/${card1Id}/schema`);
+    await waitFor(`[data-test-card-schema="${card1Id}"]`, { timeout });
+
     assert.equal(currentURL(), `/cards/${card1Id}/schema`);
     assert.dom(`[data-test-mode-switcher] .ember-power-select-selected-item`).hasText('Schema View');
 
     await visit(`/cards/${card1Id}`);
+    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
+
     assert.equal(currentURL(), `/cards/${card1Id}`);
     assert.dom(`[data-test-mode-switcher] .ember-power-select-selected-item`).hasText('Layout View');
   });
@@ -53,6 +59,7 @@ module('Acceptance | view switcher', function(hooks) {
     await click('[data-test-mode-switcher] .ember-power-select-trigger');
     await click('[data-test-mode-switcher-mode="edit"]');
     await waitFor(`[data-test-card-edit="${card1Id}"]`, { timeout });
+
     assert.equal(currentURL(), `/cards/${card1Id}/edit`);
     assert.dom(`[data-test-mode-switcher] .ember-power-select-selected-item`).hasText('Edit View');
     assert.dom(`[data-test-card-edit="${card1Id}"]`).exists();
@@ -67,6 +74,7 @@ module('Acceptance | view switcher', function(hooks) {
     await click('[data-test-mode-switcher] .ember-power-select-trigger');
     await click('[data-test-mode-switcher-mode="view"]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
+
     assert.equal(currentURL(), `/cards/${card1Id}`);
     assert.dom(`[data-test-mode-switcher] .ember-power-select-selected-item`).hasText('Layout View');
     assert.dom(`[data-test-card-view="${card1Id}"]`).exists();
