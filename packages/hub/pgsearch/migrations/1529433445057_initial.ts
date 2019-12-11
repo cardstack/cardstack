@@ -14,7 +14,7 @@ export function up(pgm: MigrationBuilder) {
     primaryKey: ['realm', 'original_realm', 'local_id'],
   });
 
-  pgm.createType('job_statuses', ['waiting', 'running', 'completed', 'failed', 'fulfilled', 'rejected']);
+  pgm.createType('job_statuses', ['not done', 'completed', 'failed', 'fulfilled', 'rejected']);
   /* eslint-disable @typescript-eslint/camelcase */
   pgm.createTable('jobs', {
     id: 'id', // shorthand for primary key that is an auto incremented id
@@ -25,10 +25,10 @@ export function up(pgm: MigrationBuilder) {
     args: 'jsonb',
     status: {
       type: 'job_statuses',
-      default: 'waiting',
+      default: 'not done',
       notNull: true,
     },
-    published_at: {
+    created_at: {
       type: 'timestamp',
       notNull: true,
       default: pgm.func('current_timestamp'),

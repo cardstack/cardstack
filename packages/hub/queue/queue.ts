@@ -1,48 +1,34 @@
-export interface Job<T> {
-  done: Promise<T>;
-}
+import { inject } from '../dependency-injection';
+import { param, PgPrimitive, Expression } from '../pgsearch/util';
+import { Memoize } from 'typescript-memoize';
 
 export default class Queue {
+  private pgclient = inject('pgclient');
   private handlers: Map<string, Function> = new Map();
   private jobs: Map<string, Promise<void>> = new Map();
 
-  async ready() {
-    // pg migrate the jobs DB schema with columns: id (seq number), name, args,
-    // status, publish-time
-    //
-    // statuses:
-    //   - waiting: job is waiting to be started
-    //   - running: job is running
-    //   - completed: job has completed successsfully but submitter has not yet
-    //     been informed
-    //   - failed: job has completed unsuccessfully but submitter has not yet
-    //     been informed
-    //   - fulfilled: job submitter has been informed about the success of the
-    //     job
-    //   - rejected: job submitter has been informed about teh failure of the
-    //     job
-    //
-    // Execute this.lookForWorkToDo() to start polling for jobs that were
-    // submitted by other hubs. Note that we shouldn't run this polling during
-    // tests...
-    // don't await this promise
-    //
-    // execute this.lookForCompletedWork() to start polling for jobs that your
-    // hub has submitted that were completed by other hubs. Note that we
-    // shouldn't run this polling during tests
-    // don't await this promise
-  }
+  async publish<T>(name: string, arg: PgPrimitive): Promise<Job<T>> {
+    // we're using "skip locked" because we are searching for jobs that are not running
+    // the idea is that we will coalesce with waiting jobs that have the same name and args.
+    let existingJob: Expression = [
+      'select id from jobs where name =',
+      param(name),
+      'and args =',
+      param(arg),
+      'for share skip locked',
+    ];
+    let result = await this.pgclient.query(existingJob);
+    if (result.rowCount > 0) {
+      let jobId = result.rows[0].id;
+      return new Job(jobId, this);
+    }
 
-  async publish<A, T>(name: string, arg: A): Promise<Job<T>> {
-    // 1. assert that handler exists for job name, otherwise throw
-    // 2. if opts.coaleseWaitingJobs is true and there is alread an entry for
-    //    this job name in the jobs table that is in a waiting status, then do
-    //    not create a new row
-    // 2. add new row to jobs table with state of "waiting" include name args,
-    //    opts, publish-time in jobs row.
-    // 3. create a promise that will be fulfilled when the job is completed and
-    //    add to the this.jobs map with the created (or coalesced) row's job id
-    // 4. invoke this.runNextJob(name)
+    let newJob: Expression = ['insert into jobs (name, args) values (', param(name), ',', param(arg), ') returning id'];
+    let {
+      rows: [{ id: jobId }],
+    } = await this.pgclient.query(newJob);
+
+    return new Job(jobId, this);
   }
 
   // Services can register async function handlers that are invoked when a job is kicked off
@@ -54,48 +40,27 @@ export default class Queue {
   unsubscribe(name: string) {
     this.handlers.delete(name);
   }
+}
 
-  private async runNextJob(name: string) {
-    // 1. try to get advisory lock for the job name (may need to hash job name
-    //    to an int)
-    // 2. if no advisory lock can be obtained then exit this function
-    // 3. if an advisory lock can be obtained, then select the next waiting job
-    //    for the job name and update the job's status to "running"
-    // 4. invoke the handler for the job name with the args that were in the
-    //    selected job in step #3
-    // 5. when the handler function completes (or fails--use "finally"). update
-    //    the status of the job in the DB to "completed" or "failed" and release
-    //    the advisory lock.
-    // 6. if this.jobs(jobId) has a promise then resolve it (or reject it as the
-    //    case may be). otherwise the promise for this job lives in another hub.
-    //    Update the status to the job to indicate that the job submitter has
-    //    been informed (set job status to fulfilled or rejected state)
-    // 7. execute this.runNextJob(name) recursivey to pick up any more waiting
-    //    jobs for this job name.
+export class Job<T> {
+  constructor(private jobId: string, private queue: Queue) {}
+
+  @Memoize()
+  private buildPromise() {
+    let resolve, reject;
+    let promise = new Promise((r, e) => {
+      resolve = r;
+      reject = e;
+    });
+    return {
+      resolve,
+      reject,
+      promise: promise as Promise<T>,
+    };
   }
 
-  // This will pick up any jobs that were not submitted by this hub. We could
-  // hold off implementing this for the first pass at queuing...
-  private lookForWorkToDo() {
-    while (true) {
-      // for all the keys in this.handlers, call this.runNextJob(name)
-      //
-      // sleep
-    }
-  }
-
-  // This will pick up any jobs that were submitted by this hub but not
-  // completed by this hub. We could hold off implementing this for the first
-  // pass at queuing...
-  private lookForCompletedWork() {
-    while (true) {
-      // for all the keys in this.jobs, look for any completed or failed jobs.
-      // For each job resolve or reject the job promise and update the job row
-      // in the DB to reflect that we have informed the job submitter the state
-      // of the job
-      //
-      // sleep
-    }
+  get done(): Promise<T> {
+    return this.buildPromise().promise;
   }
 }
 
