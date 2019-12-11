@@ -1,4 +1,4 @@
-<div class="{{if this.isActive "active" "inactive"}} {{@classNames}} re-sizable" ...attributes id={{this.elementId}} style={{this.style}}>
+<div class="{{if this.isActive "active" "inactive"}} {{@classNames}} re-sizable" ...attributes id={{this.elementId}} style={{this.style}} {{did-insert this.setElement}}>
   {{#each @directions as |dir|}}
     <div
       class={{concat "resizer " dir}}

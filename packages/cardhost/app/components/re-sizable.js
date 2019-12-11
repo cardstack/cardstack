@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { dasherize, capitalize, htmlSafe } from '@ember/string';
+import { capitalize, htmlSafe } from '@ember/string';
 import { isNone } from '@ember/utils';
 import { action } from '@ember/object';
 import { guidFor } from '@ember/object/internals';
@@ -18,7 +18,12 @@ export default class ReSizable extends Component {
   grid = [1, 1];
   lockAspectRatio = false;
   get directions() {
-    return this.args.directions || ['top', 'right', 'bottom', 'left', 'topRight', 'bottomRight', 'bottomLeft', 'topLeft']
+    return this.args.directions || ['top', 'right', 'bottom', 'left']
+  }
+
+  @action
+  setElement() {
+    this.el = document.querySelector(`#${this.elementId}`);
   }
 
   onResizeStart = null;
@@ -33,9 +38,10 @@ export default class ReSizable extends Component {
   @tracked elementHeight = this.args.height;
   @tracked _original;
 
-  get el() {
-    return document.querySelector(`#${this.elementId}`);
-  }
+  // get el() {
+  //   console.log("EL")
+  //   return document.querySelector(`#${this.elementId}`);
+  // }
 
   get style() {
     let s = '';
@@ -55,7 +61,7 @@ export default class ReSizable extends Component {
   // }
 
   getBoxSize() {
-    let el = document.querySelector(`#${this.elementId}`);
+    let el = this.el;
     if (!el) {
       return;
     }
@@ -80,7 +86,7 @@ export default class ReSizable extends Component {
     }
 
     if (this.onResizeStart) {
-      let el = document.querySelector(`#${this.elementId}`);
+      let el = this.el;
       this.onResizeStart(direction, event, el);
     }
 
@@ -93,7 +99,7 @@ export default class ReSizable extends Component {
       height: size.height,
     };
     this._direction = direction;
-    let el = document.querySelector(`#${this.elementId}`);
+    let el = this.el;
     if (!el) {
       return;
     }
@@ -151,7 +157,7 @@ export default class ReSizable extends Component {
 
     this.elementWidth = newWidth;
     this.elementHeight = newHeight;
-    let el = document.querySelector(`#${this.elementId}`);
+    let el = this.el;
 
     if (this.onResize) {
       this.onResize(
