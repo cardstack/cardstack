@@ -34,6 +34,18 @@
   border-color: var(--ch-highlight);
 }
 
+.card-renderer-isolated.no-fields .drop-zone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
+}
+
+.card-renderer-isolated.no-fields .drop-zone .drop-zone-text {
+  border: none;
+  font-size: 24px;
+}
+
 .card-renderer-isolated--header {
   display: flex;
   align-items: center;
