@@ -10,7 +10,9 @@ import { guidFor } from '@ember/object/internals';
 const getSize = n => (!isNaN(parseFloat(n)) && isFinite(n) ? `${n}px` : n);
 
 /**
- * Actions accepted: onResizeStart, onResizeStop, onResize
+ * `<ReSizable @width={{this.width}} @directions={{this.resizeDirections}} @height={{this.height}}
+  @classNames={{this.classNames}} > my content </ReSizable>
+ * Optional Actions accepted: onResizeStart, onResizeStop, onResize
  * Arguments accepted: directions array (i.e. ['left'], classNames string (i.e. "my-class another-class")
  */
 
@@ -21,6 +23,11 @@ export default class ReSizable extends Component {
   maxWidth = null;
   maxHeight = null;
   grid = [1, 1];
+  @tracked isActive = false;
+  @tracked elementWidth = this.args.width;
+  @tracked elementHeight = this.args.height;
+  @tracked _original;
+
   get directions() {
     return (
       this.args.directions || ['top', 'right', 'bottom', 'left', 'topRight', 'bottomRight', 'bottomLeft', 'topLeft']
@@ -34,14 +41,6 @@ export default class ReSizable extends Component {
     this.el = document.querySelector(`#${this.elementId}`);
   }
 
-  @tracked isActive = false;
-  @tracked width;
-  @tracked height;
-
-  @tracked elementWidth = this.args.width;
-  @tracked elementHeight = this.args.height;
-  @tracked _original;
-
   get lockAspectRatio() {
     if (typeof this.args.lockAspectRatio === 'boolean') {
       return this.args.lockAspectRatio;
@@ -53,12 +52,11 @@ export default class ReSizable extends Component {
   get style() {
     let s = '';
     if (!isNone(this.args.width)) {
-      s = `width: ${getSize(this.elementWidth || this.args.width)};`;
+      s = `width: ${getSize(this.elementWidth) || this.args.width}; `;
     }
     if (!isNone(this.args.height)) {
       s = `${s}height: ${getSize(this.elementHeight || this.args.height)};`;
     }
-
     return s.length ? htmlSafe(s) : null;
   }
 
@@ -194,6 +192,20 @@ export default class ReSizable extends Component {
     document.removeEventListener('mousemove', this._onMouseMove);
     this.el.removeEventListener('touchmove', this._onTouchMove);
     this.el.removeEventListener('touchend', this._onMouseUp);
+  }
+
+  @action
+  resetWidth(el, [width]) {
+    if (width >= 0) {
+      this.elementWidth = width;
+    }
+  }
+
+  @action
+  resetHeight(el, [height]) {
+    if (height >= 0) {
+      this.elementHeight = height;
+    }
   }
 
   willDestroy() {
