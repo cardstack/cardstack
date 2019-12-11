@@ -6,7 +6,7 @@
   --padding-right: var(--ch-right-edge-width);
   --padding-bottom: var(--ch-bottom-edge-height);
 
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   background-color: var(--ch-default);
   overflow: hidden;
@@ -33,7 +33,7 @@
 
 .cardhost-cards.add,
 .cardhost-cards.adopt {
-  background: url("/assets/images/schema-grid-tile.png") center/60px repeat;
+  background: url('/assets/images/schema-grid-tile.png') center/60px repeat;
 }
 
 .cardhost-cards.schema {
@@ -41,17 +41,11 @@
 }
 
 .card-creator,
-.card-schema-updator {
-  display: grid;
-  align-items: center;
-  justify-items: center;
-  height: 100%;
-  padding: 0 20px;
-}
-
+.card-schema-updator,
 .card-view,
 .card-editor {
   display: grid;
+  align-items: flex-start;
   justify-items: center;
   height: 100%;
   padding: 0 20px;

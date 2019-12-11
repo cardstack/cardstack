@@ -117,54 +117,6 @@ module('Acceptance | card view', function(hooks) {
     await percySnapshot(assert);
   });
 
-  test('can navigate to edit card', async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [
-        ['title', 'string', true, 'The Millenial Puppy'],
-        ['author', 'string', true, 'Van Gogh'],
-        [
-          'body',
-          'string',
-          false,
-          'It can be difficult these days to deal with the discerning tastes of the millenial puppy.',
-        ],
-      ],
-    });
-    await visit(`/cards/${card1Id}`);
-
-    await fillIn('[data-test-mode-switcher]', 'edit');
-    await waitFor(`[data-test-card-edit="${card1Id}"]`, { timeout });
-
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
-    assert.dom(`[data-test-card-edit="${card1Id}"]`).exists();
-    await percySnapshot(assert);
-  });
-
-  test('can navigate to card schema', async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [
-        ['title', 'string', true, 'The Millenial Puppy'],
-        ['author', 'string', true, 'Van Gogh'],
-        [
-          'body',
-          'string',
-          false,
-          'It can be difficult these days to deal with the discerning tastes of the millenial puppy.',
-        ],
-      ],
-    });
-    await visit(`/cards/${card1Id}`);
-
-    await fillIn('[data-test-mode-switcher]', 'schema');
-    await waitFor(`[data-test-card-schema="${card1Id}"]`, { timeout });
-
-    assert.equal(currentURL(), `/cards/${card1Id}/schema`);
-    assert.dom(`[data-test-card-schema="${card1Id}"]`).exists();
-    await percySnapshot(assert);
-  });
-
   test('can navigate to the base-card', async function(assert) {
     await login();
 

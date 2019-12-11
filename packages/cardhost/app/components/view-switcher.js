@@ -1,6 +1,5 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
-import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 
 export default class ViewSwitcher extends Component {
@@ -24,7 +23,13 @@ export default class ViewSwitcher extends Component {
 
   @service router;
 
-  @tracked selected = this.views.filterBy('id', this.args.mode).firstObject || this.views[0];
+  get mode() {
+    if (this.args.mode && this.args.mode.length) {
+      return this.views.filterBy('id', this.args.mode).firstObject;
+    }
+
+    return this.views[0];
+  }
 
   @action
   selectView(view) {

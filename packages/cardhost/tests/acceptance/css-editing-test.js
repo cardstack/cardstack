@@ -45,7 +45,8 @@ module('Acceptance | css editing', function(hooks) {
     await createCards(cardData);
     await visit(`/cards/${card1Id}`);
 
-    await fillIn('[data-test-mode-switcher]', 'view');
+    await click('[data-test-mode-switcher] .ember-power-select-trigger');
+    await click('[data-test-mode-switcher-mode="view"]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card1Id}`);

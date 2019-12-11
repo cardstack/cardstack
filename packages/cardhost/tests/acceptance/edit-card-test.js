@@ -239,44 +239,6 @@ module('Acceptance | card edit', function(hooks) {
     assert.equal(userCard.attributes.email, undefined);
   });
 
-  test(`can navigate to card schema`, async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [['body', 'string', false, 'test body']],
-    });
-    await visit(`/cards/${card1Id}/edit`);
-
-    assert.dom('[data-test-mode-switcher-mode]').exists();
-    assert.dom('[data-test-mode-switcher-mode="edit"]').hasClass('selected');
-
-    await fillIn('[data-test-mode-switcher]', 'schema');
-    await waitFor(`[data-test-card-schema="${card1Id}"]`, { timeout });
-
-    assert.equal(currentURL(), `/cards/${card1Id}/schema`);
-    assert.dom(`[data-test-card-schema="${card1Id}"]`).exists();
-    assert.dom('[data-test-mode-switcher-mode="schema"]').hasClass('selected');
-    assert.dom('[data-test-mode-switcher-mode].selected').exists({ count: 1 });
-  });
-
-  test(`can navigate to card view`, async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [['body', 'string', false, 'test body']],
-    });
-    await visit(`/cards/${card1Id}/edit`);
-
-    assert.dom('[data-test-mode-switcher-mode]').exists();
-    assert.dom('[data-test-mode-switcher-mode="edit"]').hasClass('selected');
-
-    await fillIn('[data-test-mode-switcher]', 'view');
-    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
-
-    assert.equal(currentURL(), `/cards/${card1Id}`);
-    assert.dom(`[data-test-card-view="${card1Id}"]`).exists();
-    assert.dom('[data-test-mode-switcher-mode="view"]').hasClass('selected');
-    assert.dom('[data-test-mode-switcher-mode].selected').exists({ count: 1 });
-  });
-
   test(`deleting a card`, async function(assert) {
     await login();
     await createCards({

@@ -2,8 +2,8 @@
   --ch-dropdown-width: 325px;
   --ch-dropdown-height: 40px;
 
+  width: 100%;
   max-width: var(--ch-dropdown-width);
-  min-width: var(--ch-dropdown-width);
   height: var(--ch-dropdown-height);
   color: var(--ch-light);
   font: 400 13px/18px var(--ch-font-family);
