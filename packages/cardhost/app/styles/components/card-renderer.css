@@ -4,8 +4,8 @@
   --card-renderer-header-height: 50px;
 
   position: relative;
-  width: var(--card-renderer-width);
-  max-width: 100%;
+  width: 100%;
+  max-width: var(--card-renderer-width);
   min-height: var(--card-renderer-height);
   border: 3px solid transparent;
   border-radius: 10px;
@@ -18,11 +18,6 @@
 
 .card-renderer-isolated.view {
   --card-renderer-width: 100%;
-  height: min-content;
-}
-
-.card-renderer-isolated.edit {
-  height: min-content;
 }
 
 .card-renderer-isolated.schema .isolated-card,
@@ -65,8 +60,7 @@
   text-overflow: ellipsis;
   text-transform: capitalize;
 
-  transition: background-color var(--ch-transition-time),
-              color var(--ch-transition-time);
+  transition: background-color var(--ch-transition-time), color var(--ch-transition-time);
 }
 
 .card-renderer-isolated.selected .card-renderer-isolated--header {
@@ -91,7 +85,9 @@
 .card-renderer-isolated--content {
   position: relative;
   min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
-  max-height: calc(100vh - var(--ch-top-edge-height) - var(--ch-bottom-edge-height) - var(--card-renderer-header-height));
+  max-height: calc(
+    100vh - var(--ch-top-edge-height) - var(--ch-bottom-edge-height) - var(--card-renderer-header-height)
+  );
   background-color: var(--ch-light);
   color: var(--ch-dark);
   border: none;
@@ -127,7 +123,6 @@
   outline: 0; /* TODO: make this accessible */
 }
 
-
 /* Event Card Template */
 .card-renderer-isolated.view.event-card .isolated-card {
   --event-image-height: 300px;
@@ -137,13 +132,13 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-areas:
-    "image        image"
-    "title        title"
-    "city         cta"
-    "admission    cta"
-    "date         date"
-    "location     location"
-    "description  description"
+    'image        image'
+    'title        title'
+    'city         cta'
+    'admission    cta'
+    'date         date'
+    'location     location'
+    'description  description';
 }
 .card-renderer-isolated.view.event-card .isolated-card .field-renderer {
   margin-bottom: 0;

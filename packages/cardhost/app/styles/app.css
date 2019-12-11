@@ -4,7 +4,7 @@
 
 @import '/assets/index.css';
 @import '/assets/cards.css';
-@import '/assets/components/mode-switcher.css';
+@import '/assets/components/view-switcher.css';
 @import '/assets/components/right-edge.css';
 @import '/assets/components/cardhost-left-edge.css';
 @import '/assets/components/cardhost-top-edge.css';
@@ -23,7 +23,6 @@
 @import '/assets/components/field-renderer-edit-field.css';
 @import '/assets/components/field-renderer-view-field.css';
 @import '/assets/components/drop-zone.css';
-
 
 /* TODO eventually these will be dynamically added to the DOM.
 Until that work is done we are statically adding this css
@@ -46,7 +45,7 @@ Until that work is done we are statically adding this css
 @import '/assets/fields/string-viewer.css';
 
 :root {
-  --ch-font-family: "Open Sans", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --ch-font-family: 'Open Sans', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
   --ch-left-edge-navbar-width: 80px;
   --ch-left-edge-panel-width: 330px;

@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { click, visit, currentURL, waitFor, fillIn } from '@ember/test-helpers';
+import { click, visit, currentURL, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures';
 import { createCards } from '@cardstack/test-support/card-ui-helpers';
@@ -45,7 +45,8 @@ module('Acceptance | css editing', function(hooks) {
     await createCards(cardData);
     await visit(`/cards/${card1Id}`);
 
-    await fillIn('[data-test-mode-switcher]', 'view');
+    await click('[data-test-mode-switcher] .ember-power-select-trigger');
+    await click('[data-test-mode-switcher-mode="view"]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card1Id}`);

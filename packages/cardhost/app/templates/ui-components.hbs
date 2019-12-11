@@ -105,14 +105,11 @@
 
   <section class="ui-components--section ui-components--grid-2-col">
     <h2>View Switcher</h2>
-    <div>
-      <ModeSwitcher @name="" @mode="view" />
-      <ModeSwitcher @name="" @mode="edit" />
-      <ModeSwitcher @name="" @mode="schema" />
-    </div>
-    <CodeEditor @code='<ModeSwitcher @name="[card-id-here]" @mode="view" />
-<ModeSwitcher @name="[card-id-here]" @mode="edit" />
-<ModeSwitcher @name="[card-id-here]" @mode="schema" />' @language="html" />
+    <ViewSwitcher />
+    <CodeEditor @code='<ViewSwitcher
+  @mode=\{{@mode}}
+  @cardId=\{{@cardId}}
+/>' @language="html" />
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col">
