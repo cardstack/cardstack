@@ -19,17 +19,17 @@
     <div class="right-edge--section">
       <div class="right-edge--section-header" data-test-section-header>ID</div>
       <div class="right-edge--item">
-        <label for="card__id" class="ch-label">
-          Card ID
-        </label>
-        <Input
+        <TextField
           @id="card__id"
+          @label="Card ID"
           @class="ch-input hide-in-percy"
           @size="60"
           @placeholder="e.g. millenial-puppies"
           @value={{this.cardName}}
-          @key-up={{action this.updateCardId}}
+          @setValue={{action this.updateCardId}}
+          @pattern="[a-zA-Z0-9_-]+"
           @disabled={{or (not @updateCardId) (not @card.isNew)}}
+          @title="Can only contain letters, numbers, dashes, and underscores."
         />
       </div>
       <div class="right-edge--item">
