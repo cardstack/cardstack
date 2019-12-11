@@ -119,6 +119,27 @@ export default class PgClient {
     }
   }
 
+  public async getAdvisoryLock(lockName: string): Promise<boolean> {
+    let key = hashString(lockName);
+    let client = await this.pool.connect();
+    try {
+      let result = await client.query(`select pg_try_advisory_lock(${key})`);
+      return Boolean(result.rows.length && result.rows[0].pg_try_advisory_lock);
+    } finally {
+      client.release();
+    }
+  }
+
+  public async releaseAdvisoryLock(lockName: string): Promise<void> {
+    let key = hashString(lockName);
+    let client = await this.pool.connect();
+    try {
+      await client.query(`select pg_advisory_unlock(${key})`);
+    } finally {
+      client.release();
+    }
+  }
+
   private async queryToSQL(cards: ScopedCardService, query: Expression) {
     return this.syncExpressionToSql(await this.makeSynchronous(cards, query));
   }
@@ -334,4 +355,14 @@ declare module '@cardstack/hub/dependency-injection' {
 
 export interface ResponseMeta {
   page: { total: number; cursor?: string };
+}
+
+// doesn't need to be secure--just needs to be unique
+function hashString(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash += Math.pow(str.charCodeAt(i) * 31, str.length - i);
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return hash;
 }
