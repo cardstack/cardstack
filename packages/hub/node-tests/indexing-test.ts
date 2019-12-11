@@ -21,7 +21,7 @@ describe('hub/indexing', function() {
     await env.destroy();
   });
 
-  it('it can index a realm', async function() {
+  it.skip('it can index a realm', async function() {
     let card = new CardWithId(
       testCard({ realm: `${myOrigin}/api/realms/first-ephemeral-realm`, localId: '1' }, { foo: 'bar' }).jsonapi
     );

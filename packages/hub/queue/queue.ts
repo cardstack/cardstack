@@ -1,10 +1,5 @@
-import * as JSON from 'json-typescript';
-
-export interface JobArgs {
-  [key: string]: JSON.Value;
-}
-export interface QueueOptions {
-  coalesceWaitingJobs?: boolean;
+export interface Job<T> {
+  done: Promise<T>;
 }
 
 export default class Queue {
@@ -38,7 +33,7 @@ export default class Queue {
     // don't await this promise
   }
 
-  async publish(name: string, args: JobArgs, opts: QueueOptions): Promise<void> {
+  async publish<A, T>(name: string, arg: A): Promise<Job<T>> {
     // 1. assert that handler exists for job name, otherwise throw
     // 2. if opts.coaleseWaitingJobs is true and there is alread an entry for
     //    this job name in the jobs table that is in a waiting status, then do
@@ -52,7 +47,7 @@ export default class Queue {
 
   // Services can register async function handlers that are invoked when a job is kicked off
   // for the job "name"
-  subscribe(name: string, handler: Function) {
+  subscribe<A, T>(name: string, handler: (arg: A) => Promise<T>) {
     this.handlers.set(name, handler);
   }
 
