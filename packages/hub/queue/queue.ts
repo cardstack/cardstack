@@ -69,10 +69,10 @@ export default class Queue {
     // 5. when the handler function completes (or fails--use "finally"). update
     //    the status of the job in the DB to "completed" or "failed" and release
     //    the advisory lock.
-    // 6. if this.jobs(jobId) has a promise then resolve (or reject it as the
-    //    case may be) it (otherwise the promise lives in another hub). Update
-    //    the status to the job to indicate that the job submitter has been
-    //    informed (set job status to fulfilled or rejected state)
+    // 6. if this.jobs(jobId) has a promise then resolve it (or reject it as the
+    //    case may be). otherwise the promise for this job lives in another hub.
+    //    Update the status to the job to indicate that the job submitter has
+    //    been informed (set job status to fulfilled or rejected state)
     // 7. execute this.runNextJob(name) recursivey to pick up any more waiting
     //    jobs for this job name.
   }
