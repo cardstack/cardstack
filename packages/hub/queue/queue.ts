@@ -77,13 +77,17 @@ export default class Queue {
     //    jobs for this job name.
   }
 
-  // This will pick up any jobs that were not submitted by this hub
+  // This will pick up any jobs that were not submitted by this hub. We could
+  // hold off implementing this for the first pass at queuing...
   private lookForWorkToDo() {
     setInterval(() => {
       // for all the keys in this.handlers, call this.runNextJob(name)
     });
   }
 
+  // This will pick up any jobs that were submitted by this hub but not
+  // completed by this hub. We could hold off implementing this for the first
+  // pass at queuing...
   private lookForCompletedWork() {
     setInterval(() => {
       // for all the keys in this.jobs, look for any completed or failed jobs.
