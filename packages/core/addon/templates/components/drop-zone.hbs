@@ -9,5 +9,8 @@
   {{on "dragleave" (action (mut this.isOverDropZone) false)}}
   data-test-drop-zone={{@position}}
 >
-  <div class="drop-zone-text {{if this.isOverDropZone "active"}}">Drop fields here to edit/add</div>
+  <div class="drop-zone-text {{if this.isOverDropZone "active"}}">
+    Drag &amp; drop from the catalog
+    <div class="drop-zone--drag-drop-icon">{{svg-jar "drag-drop"}}</div>
+  </div>
 </div>

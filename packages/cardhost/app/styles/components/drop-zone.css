@@ -18,3 +18,7 @@
 .drop-zone .drop-zone-text.active {
   opacity: 1;
 }
+
+.drop-zone .drop-zone--drag-drop-icon {
+  display: none;
+}
