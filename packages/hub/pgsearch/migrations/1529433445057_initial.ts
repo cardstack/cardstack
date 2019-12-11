@@ -25,6 +25,7 @@ export function up(pgm: MigrationBuilder) {
     args: 'jsonb',
     status: {
       type: 'job_statuses',
+      default: 'waiting',
       notNull: true,
     },
     published_at: {
