@@ -27,6 +27,7 @@ export default class ReSizable extends Component {
   @tracked elementWidth = this.args.width;
   @tracked elementHeight = this.args.height;
   @tracked _original;
+  @tracked style;
 
   get directions() {
     return (
@@ -49,15 +50,19 @@ export default class ReSizable extends Component {
     }
   }
 
-  get style() {
+  @action
+  setStyle(el, [width, height]) {
+    this.elementWidth = width;
+    this.elementHeight = height;
     let s = '';
-    if (!isNone(this.args.width)) {
-      s = `width: ${getSize(this.elementWidth) || this.args.width}; `;
+    if (!isNone(width)) {
+      s = `width: ${getSize(this.elementWidth)}; `;
     }
-    if (!isNone(this.args.height)) {
-      s = `${s}height: ${getSize(this.elementHeight || this.args.height)};`;
+    if (!isNone(height)) {
+      s = `${s}height: ${getSize(this.elementHeight)};`;
     }
-    return s.length ? htmlSafe(s) : null;
+    let style = s.length ? htmlSafe(s) : null;
+    this.style = style;
   }
 
   getBoxSize() {
@@ -159,6 +164,7 @@ export default class ReSizable extends Component {
 
     this.elementWidth = newWidth;
     this.elementHeight = newHeight;
+    this.setStyle(null, [newWidth, newHeight]);
     let el = this.el;
 
     if (this.args.onResize) {

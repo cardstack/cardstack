@@ -1,5 +1,13 @@
 {{! template-lint-disable no-inline-styles}}
-<div class="{{if this.isActive "active" "inactive"}} {{@classNames}} re-sizable" ...attributes id={{this.elementId}} style={{this.style}} {{did-insert this.setElement}} {{did-update this.resetWidth @width}}  {{did-update this.resetHeight @height}}>
+<div class="{{if this.isActive "active" "inactive"}} {{@classNames}} re-sizable" 
+  ...attributes
+  id={{this.elementId}}
+  style={{this.style}}
+  {{did-insert this.setElement}}
+  {{did-insert this.setStyle @width @height}}
+  {{did-update this.setStyle @width @height}}
+  >
+
   {{#each this.directions as |dir|}}
     <div
       class={{concat "resizer " dir}}

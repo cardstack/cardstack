@@ -16,7 +16,7 @@ export default class EditorPane extends Component {
     this.markup = cardMarkup ? cardMarkup.innerHTML.toString().trim() : '';
   }
 
-  get resizeDirections() {
+  get directions() {
     if (this.cssModeToggle.dockLocation === 'right') {
       return ['left'];
     } else {

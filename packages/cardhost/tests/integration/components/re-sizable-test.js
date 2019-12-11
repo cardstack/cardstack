@@ -61,26 +61,33 @@ module('Integration | Component | re-sizable', function(hooks) {
     assert.equal(this.element.querySelector('.re-sizable').style.height, '40px');
   });
 
-  DIRECTIONS.forEach(dir => {
-    test('should resize to input', async function(assert) {
-      assert.expect(2);
-      this.set('width', 200);
-      this.set('height', 150);
-      this.set('directions', [dir]);
-      await render(
-        hbs`<ReSizable @width={{this.width}} @height={{this.height}} @onResize={{this.onResize}} @directions={{this.directions}}>Hello</ReSizable>`
-      );
-      this.set('width', 200);
-      this.set('height', 150);
+  test('should resize to input', async function(assert) {
+    assert.expect(16);
+    this.set('width', 200);
+    this.set('height', 150);
+    this.set('directions', DIRECTIONS);
+    await render(
+      hbs`<ReSizable @width={{this.width}} @height={{this.height}} @onResize={{this.onResize}} @directions={{this.directions}}>Hello</ReSizable>`
+    );
+    await settled();
 
+    for (let i = 0; i < DIRECTIONS.length; ++i) {
+      let direction = DIRECTIONS[i];
+
+      this.set('width', 200);
+      this.set('height', 150);
+      // as the component resizes, capture the resulting dimensions as this.width and this.height
+      this.set('onResize', (direction, dimensions) => this.setProperties(dimensions));
+
+      await settled();
       let width = this.width;
       let height = this.height;
 
-      await triggerEvent(`.resizer.${dir}`, 'mousedown', { clientX: 110, clientY: 40 });
-      await triggerEvent(`.resizer.${dir}`, 'mousemove', { clientX: 160, clientY: 80 });
-      await triggerEvent(`.resizer.${dir}`, 'mouseup', {});
-
-      const dashDir = dasherize(dir);
+      await triggerEvent(`.resizer.${direction}`, 'mousedown', { clientX: 110, clientY: 40 });
+      await triggerEvent(`.resizer.${direction}`, 'mousemove', { clientX: 160, clientY: 80 });
+      await triggerEvent(`.resizer.${direction}`, 'mouseup', {});
+      await settled();
+      const dashDir = dasherize(direction);
       if (dashDir.includes('top')) {
         height -= 40;
       } else if (dashDir.includes('bottom')) {
@@ -94,6 +101,6 @@ module('Integration | Component | re-sizable', function(hooks) {
       }
       assert.dom('.re-sizable').hasStyle({ width: `${width}px` });
       assert.dom('.re-sizable').hasStyle({ height: `${height}px` });
-    });
+    }
   });
 });

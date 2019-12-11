@@ -1,8 +1,8 @@
 <ReSizable ...attributes data-test-editor-pane class="cardhost-card-theme-editor"
-  @width={{this.width}} @directions={{this.resizeDirections}} @height={{this.height}}
+  @width={{this.width}} @directions={{this.directions}} @height={{this.height}}
   @classNames={{this.classNames}}>
   <div class="resizable-content">
-    <div>
+    <div class="editor-section">
       <CodeEditor @title="CSS" @code={{@model.isolatedCss}} @language="css" @readOnly={{false}} @resizable={{true}}
         @updateCode={{action "updateCode"}} class="editor-pane-code" />
     </div>
