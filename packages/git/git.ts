@@ -34,10 +34,10 @@ export const enum FILEMODE {
 
 // there is no type for this
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
-// const { setThreadSafetyStatus } = require('nodegit');
+const { setThreadSafetyStatus } = require('nodegit');
 // This is supposed to enable thread-safe locking around all async
 // operations.
-// setThreadSafetyStatus(1);
+setThreadSafetyStatus(1);
 
 export interface RemoteConfig {
   url: string;
