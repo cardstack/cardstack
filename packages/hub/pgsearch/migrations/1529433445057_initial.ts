@@ -36,5 +36,6 @@ export function up(pgm: MigrationBuilder) {
     finished_at: {
       type: 'timestamp',
     },
+    result: 'jsonb',
   });
 }
