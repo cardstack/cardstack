@@ -165,7 +165,7 @@ export default class Writer {
       let change = await Change.create(this.repo!, meta.version, this.branchPrefix + defaultBranch, this.fetchOpts);
 
       let file = await change.get(this._filenameFor(type, id, isSchema), { allowUpdate: true });
-      let before = JSON.parse(await file.getBuffer());
+      let before = JSON.parse((await file.getBuffer())!.toString());
       let after = patch(before, document);
       // we don't write id & type into the actual file (they're part
       // of the filename). But we want them present on the
@@ -202,7 +202,7 @@ export default class Writer {
       let change = await Change.create(this.repo!, version, this.branchPrefix + defaultBranch, this.fetchOpts);
 
       let file = await change.get(this._filenameFor(type, id, isSchema));
-      let before = JSON.parse(await file.getBuffer());
+      let before = JSON.parse((await file.getBuffer())!.toString());
       file.delete();
       before.id = id;
       before.type = type;

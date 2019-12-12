@@ -344,7 +344,7 @@ describe('git/change', function() {
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('sample.txt', { allowUpdate: true });
     let originalBuffer = await file.getBuffer();
-    file.setContent('The original was: ' + originalBuffer.toString('utf8'));
+    file.setContent('The original was: ' + originalBuffer!.toString('utf8'));
     head = await change.finalize(commitOpts());
     expect(await inRepo(path).getContents(head, 'sample.txt')).to.equal('The original was: sample');
   });

@@ -1,4 +1,4 @@
-import { Cred, cloneRepo, createRemote, Repository, logFromCommit } from '../git';
+import { Cred, cloneRepo, createRemote, Repository } from '../git';
 
 const { createDefaultEnvironment, destroyDefaultEnvironment } = require('@cardstack/test-support/env'); // eslint-disable-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 
@@ -446,7 +446,7 @@ describe('git/writer-remote/githereum', function() {
     let repo = await Repository.open(githereum.repoPath);
     let firstCommitOnMaster = await repo.getMasterCommit();
 
-    let history = await logFromCommit(firstCommitOnMaster);
+    let history = await firstCommitOnMaster.getLog();
 
     expect(history.length).to.equal(2);
 
