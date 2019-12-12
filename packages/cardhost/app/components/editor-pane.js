@@ -49,6 +49,8 @@ export default class EditorPane extends Component {
 
     if (this.cssModeToggle.dockLocation === 'bottom') {
       classes.push('bottom-docked');
+    } else {
+      classes.push('right-docked');
     }
 
     if (this.cssModeToggle.visible === false) {

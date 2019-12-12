@@ -138,10 +138,6 @@ a:hover {
   cursor: pointer;
 }
 
-.card-renderer--top-edge-buttons .dock-btn.selected g {
-  stroke: var(--ch-highlight);
-}
-
 .card-renderer--top-edge-buttons .close-editor-btn {
   --width: 125px;
   margin-left: 20px;
@@ -233,6 +229,10 @@ a:hover {
   transform: translateY(0%);
 }
 
+.cardhost-card-theme-editor.right-docked .resizable-content {
+  padding-top: 50px;
+}
+
 .cardhost-card-theme-editor.hidden {
   transform: translateX(100%);
 }
@@ -257,6 +257,10 @@ a:hover {
 .cardhost-card-theme-editor .editor-section {
   height: 50%;
   width: 100%;
+  padding: 12px 0 12px 12px;
+}
+
+.cardhost-card-theme-editor.bottom-docked .editor-section {
   padding: 12px;
 }
 
@@ -296,17 +300,13 @@ a:hover {
 }
 
 .cardhost-card-theme-editor.bottom-docked .drag-handle {
-  left: 50%;
-  top: -30px;
+  left: 49.5%;
+  top: -18px;
   transform: rotate(-90deg);
 }
 
 .cardhost-card-theme-editor .drag-handle path {
   stroke: var(--ch-light-background);
-}
-
-.dock-icon-unselected {
-  --icon-color: --ch-light-gray-b1;
 }
 
 .cardhost-card-document--codeblock {
