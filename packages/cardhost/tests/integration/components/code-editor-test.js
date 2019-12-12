@@ -24,6 +24,6 @@ module('Integration | Component | code-editor', function(hooks) {
     await waitUntil(function() {
       return find('.cardhost-monaco-container').textContent.includes(lineNumber + 'card');
     });
-    assert.dom('.cardhost-monaco-container').hasText(lineNumber + 'card'); // should be 1card
+    assert.dom('.cardhost-monaco-container').includesText(lineNumber + 'card'); // should be 1card
   });
 });
