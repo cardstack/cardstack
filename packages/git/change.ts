@@ -22,7 +22,7 @@ export default class Change {
   static OverwriteRejected = OverwriteRejected;
 
   static async createInitial(repoPath: string, targetBranch: string) {
-    let repo = await Repository.init(repoPath, true);
+    let repo = await Repository.initBare(repoPath);
     return new this(repo, targetBranch, undefined, []);
   }
 
