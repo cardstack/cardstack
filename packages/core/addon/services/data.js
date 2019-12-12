@@ -18,6 +18,8 @@ let store = {
 export default class DataService extends Service {
   @service cardstackSession;
 
+  static FIELD_NAME_REGEX = /[^a-zA-Z0-9_-]/;
+
   async getCard(id, format) {
     if (!['isolated', 'embedded'].includes(format)) {
       throw new Error(`unknown format specified when getting card '${id}': '${format}'`);
@@ -654,6 +656,9 @@ class Field {
       throw new Error(
         `Cannot setName() on card id '${this.card.id}', field: '${this.name}' because this field is an adopted field and adopted fields cannot have their name changed.`
       );
+    }
+    if (DataService.FIELD_NAME_REGEX.test(name)) {
+      throw new Error('Field name must only contain letters, numbers, dashes and underscores');
     }
 
     let internal = priv.get(this);
