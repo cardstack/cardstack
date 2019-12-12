@@ -1,4 +1,4 @@
-import { Cred, Merge, Repository, Reset, RemoteConfig, FetchOptions } from './git';
+import { Merge, Repository, Reset, RemoteConfig, FetchOptions } from './git';
 
 import { promisify } from 'util';
 import mkdirpcb from 'mkdirp';
@@ -58,11 +58,9 @@ class GitLocalCache {
 
     let repoPath = join(cacheDirectory, filenamifyUrl(remote.url));
 
-    let fetchOpts = new FetchOptions((url, userName) =>
-      remote.privateKey
-        ? Cred.sshKeyMemoryNew(userName, remote.publicKey || '', remote.privateKey, remote.passphrase || '')
-        : Cred.sshKeyFromAgent(userName)
-    );
+    let fetchOpts = remote.privateKey
+      ? FetchOptions.privateKey(remote.privateKey, remote.publicKey, remote.passphrase)
+      : FetchOptions.agentKey();
 
     log.info('creating local repo cache for %s in %s', remote.url, repoPath);
 

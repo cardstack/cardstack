@@ -11,7 +11,7 @@ import { makeRepo } from './support';
 
 import { join } from 'path';
 import { readFileSync } from 'fs';
-import { Cred, Remote, FetchOptions } from '../git';
+import { Remote, FetchOptions } from '../git';
 
 import service from '../service';
 
@@ -21,7 +21,7 @@ function toResource(doc: todo) {
   return doc.data;
 }
 
-const fetchOpts = new FetchOptions((url, userName) => Cred.sshKeyMemoryNew(userName, '', privateKey, ''));
+const fetchOpts = FetchOptions.privateKey(privateKey);
 
 async function resetRemote() {
   let root = await temp.mkdir('cardstack-server-test');
