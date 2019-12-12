@@ -1,4 +1,4 @@
-import { Cred, cloneRepo, createRemote, Repository, FetchOptions } from '../git';
+import { Cred, Repository, FetchOptions, Remote } from '../git';
 
 const { createDefaultEnvironment, destroyDefaultEnvironment } = require('@cardstack/test-support/env'); // eslint-disable-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 
@@ -51,7 +51,7 @@ async function resetRemote() {
     ),
   });
 
-  let remote = await createRemote(tempRepo.repo, 'origin', 'ssh://root@localhost:9022/root/data-test');
+  let remote = await Remote.create(tempRepo.repo, 'origin', 'ssh://root@localhost:9022/root/data-test');
   await remote.push(['+refs/heads/master:refs/heads/master'], fetchOpts);
   return tempRepo;
 }
@@ -76,7 +76,7 @@ describe('git/writer with remote', function() {
     tempRepoPath = await mkdir('cardstack-temp-test-repo');
     tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
 
-    repo = await cloneRepo('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
+    repo = await Repository.clone('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
       fetchOpts,
     });
 
@@ -296,7 +296,7 @@ describe('git/writer with empty remote', function() {
 
     let { repo: remoteRepo } = await makeRepo(root);
 
-    let remote = await createRemote(remoteRepo, 'origin', 'ssh://root@localhost:9022/root/data-test');
+    let remote = await Remote.create(remoteRepo, 'origin', 'ssh://root@localhost:9022/root/data-test');
     await remote.push(['+refs/heads/master:refs/heads/master'], fetchOpts);
 
     let factory = new JSONAPIFactory();
@@ -304,7 +304,7 @@ describe('git/writer with empty remote', function() {
     tempRepoPath = await mkdir('cardstack-temp-test-repo');
     tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
 
-    repo = await cloneRepo('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
+    repo = await Repository.clone('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
       fetchOpts,
     });
 
@@ -375,7 +375,7 @@ describe('git/writer-remote/githereum', function() {
     tempRepoPath = await mkdir('cardstack-temp-test-repo');
     tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
 
-    await cloneRepo('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
+    await Repository.clone('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
       fetchOpts,
     });
 
