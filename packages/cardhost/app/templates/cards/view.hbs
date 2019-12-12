@@ -1,5 +1,20 @@
 <div class="card-renderer--top-edge-buttons">
   {{#if this.cssModeToggle.editingCss}}
+    {{#if this.cssModeToggle.visible}}
+      <div {{on "click" this.cssModeToggle.hideEditor}}
+        class="hide-editor-btn"
+        data-test-hide-editor-btn
+      >
+        Hide Editor
+      </div>
+    {{else}}
+      <div {{on "click" this.cssModeToggle.showEditor}}
+        class="show-editor-btn"
+        data-test-show-editor-btn
+      >
+        Show Editor
+      </div>
+    {{/if}}
     <div
       class="dock-btn {{if (eq this.cssModeToggle.dockLocation "bottom") "selected"}}" {{on "click" this.cssModeToggle.dockBottom}}
       data-test-dock-bottom

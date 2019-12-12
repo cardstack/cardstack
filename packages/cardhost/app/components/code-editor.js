@@ -89,7 +89,10 @@ export default class CodeEditor extends Component {
     if (!this.resizable) {
       let height = codeModel.getLineCount() * 20;
       el.style.height = height.toString() + 'px';
+    } else {
+      el.style.height = '100%';
     }
+
     let editor = monaco.editor.create(el, {
       model: codeModel,
       theme: 'vs-dark',
