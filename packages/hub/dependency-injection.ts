@@ -30,20 +30,24 @@ export class Container {
   async instantiate<T, A>(factory: FactoryWithArg<T, A>, arg: A): Promise<T>;
   async instantiate<T>(factory: Factory<T>): Promise<T>;
   async instantiate<T, A>(factory: any, arg?: A): Promise<T> {
-    let { promise, instance } = this._instantiate(factory, () => {
-      if (arguments.length === 1) {
-        return new factory();
-      } else {
-        return new factory(arg);
-      }
-    });
+    let { promise, instance } = this._instantiate(
+      factory,
+      () => {
+        if (arguments.length === 1) {
+          return new factory();
+        } else {
+          return new factory(arg);
+        }
+      },
+      arguments.length > 1
+    );
     await promise;
     return instance;
   }
 
-  private _instantiate<T>(identityKey: CacheKey, create: () => T): CacheEntry {
+  private _instantiate<T>(identityKey: CacheKey, create: () => T, noCache?: boolean): CacheEntry {
     let cached = this.cache.get(identityKey);
-    if (cached) {
+    if (!noCache && cached) {
       return cached;
     }
 
