@@ -21,7 +21,22 @@ describe('hub/indexing', function() {
     await env.destroy();
   });
 
-  it.skip('it can index a realm', async function() {
+  async function createRealm(localId: string) {
+    await cards.as(Session.INTERNAL_PRIVILEGED).create(
+      `${myOrigin}/api/realms/meta`,
+      testCard(
+        {
+          realm: `${myOrigin}/api/realms/meta`,
+          originalRealm: `${myOrigin}/api/realms/meta`,
+          localId,
+        },
+        {}
+      ).jsonapi
+    );
+  }
+
+  it('it can index a realm', async function() {
+    await createRealm(`${myOrigin}/api/realms/first-ephemeral-realm`);
     let card = new CardWithId(
       testCard({ realm: `${myOrigin}/api/realms/first-ephemeral-realm`, localId: '1' }, { foo: 'bar' }).jsonapi
     );
@@ -32,4 +47,8 @@ describe('hub/indexing', function() {
     let indexedCard = await cards.as(Session.INTERNAL_PRIVILEGED).get(card);
     expect(indexedCard).to.be.ok;
   });
+
+  it.skip('it can index multiple realms', async function() {});
+  it.skip('ephemeral cards do not persist in the index between container teardowns', async function() {});
+  it.skip('it does not index unchanged cards since the last time the ephemeral realm was indexed', async function() {});
 });

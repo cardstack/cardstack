@@ -7,9 +7,21 @@ import merge from 'lodash/merge';
 import { testCard } from './node-tests/test-card';
 import { CardExpression } from './pgsearch/util';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
+import { IndexerFactory } from './indexer';
 
 function ephemeralRealms() {
   return [
+    // The realm card for the meta realm
+    new CardWithId(
+      testCard(
+        {
+          realm: `${myOrigin}/api/realms/meta`,
+          originalRealm: `${myOrigin}/api/realms/meta`,
+          localId: `${myOrigin}/api/realms/meta`,
+        },
+        {}
+      ).jsonapi
+    ),
     new CardWithId(
       testCard(
         {
@@ -82,6 +94,13 @@ export async function get(id: CardId): Promise<CardWithId | null> {
 export async function loadWriter(card: CardWithId): Promise<WriterFactory> {
   if (ephemeralRealms().find(realm => realm.id === card.id)) {
     return (await import('./ephemeral/writer')).default;
+  }
+  throw new Error(`unimplemented`);
+}
+
+export async function loadIndexer(card: CardWithId): Promise<IndexerFactory> {
+  if (ephemeralRealms().find(realm => realm.id === card.id)) {
+    return (await import('./ephemeral/indexer')).default;
   }
   throw new Error(`unimplemented`);
 }

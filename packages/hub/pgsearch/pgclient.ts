@@ -39,14 +39,6 @@ function config() {
   });
 }
 
-export interface JobData<A> {
-  name: string;
-  id?: number;
-  status?: 'waiting' | 'running' | 'completed' | 'failed' | 'fulfilled' | 'rejected';
-  createdAt: string;
-  finishedAt: string;
-}
-
 export default class PgClient {
   private pool: Pool;
 
@@ -337,7 +329,7 @@ export default class PgClient {
   }
 }
 
-class Batch {
+export class Batch {
   constructor(private client: PgClient, private cards: ScopedCardService) {}
 
   async save(card: CardWithId) {

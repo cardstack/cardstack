@@ -9,6 +9,11 @@ export class EphemeralStorage {
       .join('/');
     this.store.set(key, doc);
   }
+
+  // TODO ultimately you will probably want something that only gets the latest generation of cards
+  allCards(): UpstreamDocument[] {
+    return [...this.store.values()];
+  }
 }
 
 declare module '@cardstack/hub/dependency-injection' {

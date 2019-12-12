@@ -1,5 +1,5 @@
 import CardstackError from './error';
-import { loadWriter, patch, buildValueExpression } from './scaffolding';
+import { loadIndexer, loadWriter, patch, buildValueExpression } from './scaffolding';
 import { WriterFactory } from './writer';
 import { PristineDocument, UpstreamDocument, UpstreamIdentity, PristineCollection } from './document';
 import { SingleResourceDoc } from 'jsonapi-typescript';
@@ -7,6 +7,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { CardExpression } from './pgsearch/util';
 import { ResponseMeta } from './pgsearch/pgclient';
 import * as J from 'json-typescript';
+import { IndexerFactory } from './indexer';
 
 export class Card {
   static async makePristineCollection(cards: CardWithId[], meta: ResponseMeta): Promise<PristineCollection> {
@@ -137,11 +138,14 @@ export class CardWithId extends Card {
   }
 
   async loadFeature(featureName: 'writer'): Promise<WriterFactory | null>;
+  async loadFeature(featureName: 'indexer'): Promise<IndexerFactory | null>;
   async loadFeature(featureName: 'buildValueExpression'): Promise<(expression: CardExpression) => CardExpression>;
   async loadFeature(featureName: any): Promise<any> {
     switch (featureName) {
       case 'writer':
         return await loadWriter(this);
+      case 'indexer':
+        return await loadIndexer(this);
       case 'buildValueExpression':
         return buildValueExpression;
       default:

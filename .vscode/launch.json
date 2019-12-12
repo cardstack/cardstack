@@ -151,7 +151,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "it can run a job"]
+      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "it can index a realm"]
     },
     {
       "type": "node",
