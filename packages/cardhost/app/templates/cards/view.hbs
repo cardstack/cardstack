@@ -31,7 +31,7 @@
     >
       Preview
     </button>
-    <SaveButton @card={{this.card}}/>
+    <SaveButton @card={{this.model}}/>
   {{/if}}
 </div>
 
@@ -74,14 +74,25 @@
           @searchEnabled={{false}}
           @label="Choose a theme:"
           @options={{this.themerOptions}}
+          @selected={{this.selectedTheme}}
           {{!-- @handleChange={{this.handleThemeChange}} --}}
         />
-        <button {{on "click" this.createTheme}}
-          class="ch-button ch-button--secondary ch-button--responsive"
-          data-test-card-custom-style-button
-        >
-          New Custom Style
-        </button>
+
+        {{#if this.model.isolatedCss}}
+          <div {{on "click" this.createTheme}}
+            class="right-edge--code-sample ch-input"
+          >
+            <div class="right-edge--code-edit-text">Edit <span>{ }</span></div>
+            {{this.model.isolatedCss}}
+          </div>
+        {{else}}
+          <button {{on "click" this.createTheme}}
+            class="ch-button ch-button--secondary ch-button--responsive"
+            data-test-card-custom-style-button
+          >
+            New Custom Style
+          </button>
+        {{/if}}
       </div>
     </div>
   </RightEdge>

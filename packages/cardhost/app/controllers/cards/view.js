@@ -1,7 +1,6 @@
 import Controller from '@ember/controller';
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
-import { tracked } from '@glimmer/tracking';
 
 export default class ViewCardController extends Controller {
   @service cssModeToggle;
@@ -16,8 +15,25 @@ export default class ViewCardController extends Controller {
     return JSON.stringify(this.model.json, null, 2);
   }
 
-  @tracked
-  themerOptions = [{ name: 'Cardstack default' }];
+  get themerOptions() {
+    let options = [{ name: 'Cardstack default' }];
+
+    if (this.model.adoptedFrom) {
+      options.push({ name: this.model.adoptedFromName });
+    }
+
+    if (this.model.isolatedCss) {
+      options.push({ name: 'Custom Style' });
+    }
+
+    return options;
+  }
+
+  get selectedTheme() {
+    if (this.model.isolatedCss) {
+      return { name: 'Custom Style' };
+    }
+  }
 
   @action
   handleThemeChange(/*val*/) {
