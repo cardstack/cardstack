@@ -21,13 +21,7 @@ function toResource(doc: todo) {
   return doc.data;
 }
 
-const fetchOpts: FetchOptions = {
-  callbacks: {
-    credentials: (url: string, userName: string) => {
-      return Cred.sshKeyMemoryNew(userName, '', privateKey, '');
-    },
-  },
-};
+const fetchOpts = new FetchOptions((url, userName) => Cred.sshKeyMemoryNew(userName, '', privateKey, ''));
 
 async function resetRemote() {
   let root = await temp.mkdir('cardstack-server-test');

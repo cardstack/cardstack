@@ -1,4 +1,4 @@
-import { Cred, cloneRepo, createRemote, Repository } from '../git';
+import { Cred, cloneRepo, createRemote, Repository, FetchOptions } from '../git';
 
 const { createDefaultEnvironment, destroyDefaultEnvironment } = require('@cardstack/test-support/env'); // eslint-disable-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 
@@ -23,13 +23,7 @@ const mkdir = promisify(temp.mkdir);
 const privateKey = readFileSync(join(__dirname, 'git-ssh-server', 'cardstack-test-key'), 'utf8');
 import { fake, replace } from 'sinon';
 
-const fetchOpts = {
-  callbacks: {
-    credentials: (url: string, userName: string) => {
-      return Cred.sshKeyMemoryNew(userName, '', privateKey, '');
-    },
-  },
-};
+const fetchOpts = new FetchOptions((url, userName) => Cred.sshKeyMemoryNew(userName, '', privateKey, ''));
 
 async function resetRemote() {
   let root = await temp.mkdir('cardstack-server-test');
