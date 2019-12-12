@@ -12,7 +12,11 @@ import Queue from './queue/queue';
 
 const log = logger('cardstack/server');
 
-export async function wireItUp() {
+export interface ContainerOptions {
+  suppressInitialIndex: boolean;
+}
+
+export async function wireItUp(opts?: ContainerOptions) {
   let registry = new Registry();
   registry.register('authentication-middleware', AuthenticationMiddleware);
   registry.register('jsonapi-middleware', JSONAPIMiddleware);
@@ -21,7 +25,20 @@ export async function wireItUp() {
   registry.register('pgclient', PgClient);
   registry.register('indexing', IndexingService);
   registry.register('queue', Queue);
-  return new Container(registry);
+  let container = new Container(registry);
+
+  if (!opts?.suppressInitialIndex) {
+    let indexing = await container.lookup('indexing');
+
+    // TODO careful awaiting here. it might be a good idea to ignore this promise
+    // when not running tests so that we don't interfere with getting the server
+    // to start listening immediately in the event that first time index takes a
+    // really long time and the server requires health checks in order to stay
+    // running.
+    await indexing.update();
+  }
+
+  return container;
 }
 
 export async function makeServer(container?: Container) {

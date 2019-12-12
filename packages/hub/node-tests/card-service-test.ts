@@ -51,6 +51,9 @@ describe('hub/card-service', function() {
       let foundCard = await service.get(card);
       expect(foundCard.id).equals(card.id);
     });
+
+    // TODO we can do this now--the ephemeral data source is now keeping track of generation
+    it.skip("adds upstream data source's version to the card's meta", async function() {});
   });
 
   describe('readonly', function() {

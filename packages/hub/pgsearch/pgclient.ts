@@ -339,11 +339,22 @@ export class Batch {
       original_realm: param(card.originalRealm),
       local_id: param(card.localId),
       pristine_doc: param(((await card.asPristineDoc()).jsonapi as unknown) as JSON.Object),
+      generation: param(card.generation || null),
     };
     /* eslint-enable @typescript-eslint/camelcase */
 
     await this.client.queryCards(this.cards, upsert('cards', 'cards_pkey', row));
     log.debug('save realm: %s original realm: %s local id: %s', card.realm, card.originalRealm, card.localId);
+  }
+
+  async deleteOtherGenerations(realm: string, currentGeneration: number) {
+    await this.client.query([
+      'delete from cards where (generation !=',
+      param(currentGeneration),
+      'or generation is null) and realm =',
+      param(realm),
+    ]);
+    log.debug(`deleted generations other than ${currentGeneration} for cards in realm '${realm}'`);
   }
 
   async done() {}

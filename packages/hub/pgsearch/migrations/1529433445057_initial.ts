@@ -7,11 +7,21 @@ export function up(pgm: MigrationBuilder) {
     original_realm: 'varchar',
     local_id: 'varchar',
     pristine_doc: 'jsonb',
+    generation: 'bigint',
   });
   /* eslint-enable @typescript-eslint/camelcase */
   pgm.sql('ALTER TABLE cards SET UNLOGGED');
   pgm.addConstraint('cards', 'cards_pkey', {
     primaryKey: ['realm', 'original_realm', 'local_id'],
+  });
+
+  pgm.createTable('meta', {
+    realm: 'varchar',
+    params: 'jsonb',
+  });
+  pgm.sql('ALTER TABLE meta SET UNLOGGED');
+  pgm.addConstraint('meta', 'meta_pkey', {
+    primaryKey: ['realm'],
   });
 
   pgm.createType('job_statuses', ['not done', 'completed', 'failed', 'fulfilled', 'rejected']);
@@ -38,4 +48,5 @@ export function up(pgm: MigrationBuilder) {
     },
     result: 'jsonb',
   });
+  pgm.sql('ALTER TABLE jobs SET UNLOGGED');
 }
