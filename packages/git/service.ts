@@ -58,16 +58,11 @@ class GitLocalCache {
 
     let repoPath = join(cacheDirectory, filenamifyUrl(remote.url));
 
-    let fetchOpts = {
-      callbacks: {
-        credentials: (url: string, userName: string) => {
-          if (remote.privateKey) {
-            return Cred.sshKeyMemoryNew(userName, remote.publicKey || '', remote.privateKey, remote.passphrase || '');
-          }
-          return Cred.sshKeyFromAgent(userName);
-        },
-      },
-    };
+    let fetchOpts = new FetchOptions((url, userName) =>
+      remote.privateKey
+        ? Cred.sshKeyMemoryNew(userName, remote.publicKey || '', remote.privateKey, remote.passphrase || '')
+        : Cred.sshKeyFromAgent(userName)
+    );
 
     log.info('creating local repo cache for %s in %s', remote.url, repoPath);
 

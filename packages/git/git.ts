@@ -1,8 +1,8 @@
 import {
   Branch as NGBranch,
-  Clone,
+  Clone as NGClone,
   Commit as NGCommit,
-  Cred,
+  Cred as NGCred,
   Merge as NGMerge,
   Oid as NGOid,
   Remote as NGRemote,
@@ -10,18 +10,18 @@ import {
   Reference as NGReference,
   Index as NGIndex,
   Reset as NGReset,
-  Signature,
+  Signature as NGSignature,
   Tree as NGTree,
   Treebuilder as NGTreebuilder,
   TreeEntry as NGTreeEntry,
   Blob as NGBlob,
 } from 'nodegit';
 
+import { FetchOptions as NGFetchOptions } from 'nodegit/fetch-options';
+
 // import fs from 'fs';
 // import IsomorphicGit from 'isomorphic-git';
 // IsomorphicGit.plugins.set('fs', fs);
-
-import { FetchOptions } from 'nodegit/fetch-options';
 
 const enum FILEMODE {
   UNREADABLE = 0,
@@ -40,7 +40,7 @@ const enum FILEMODE {
 // setThreadSafetyStatus(1);
 
 async function cloneRepo(url: string, path: string, { fetchOpts }: { fetchOpts: FetchOptions }) {
-  let ngrepo = await Clone.clone(url, path, { fetchOpts });
+  let ngrepo = await NGClone.clone(url, path, { fetchOpts: fetchOpts.toNgFetchOptions() });
   return new Repository(ngrepo);
 }
 
@@ -89,7 +89,7 @@ class Repository {
   }
 
   async fetch(remote: string, fetchOpts: FetchOptions): Promise<void> {
-    await this.ngrepo.fetch(remote, fetchOpts);
+    await this.ngrepo.fetch(remote, fetchOpts.toNgFetchOptions());
   }
 
   async getRemote(remote: string): Promise<Remote> {
@@ -101,7 +101,7 @@ class Repository {
   }
 
   async fetchAll(fetchOpts?: FetchOptions) {
-    await this.ngrepo.fetchAll(fetchOpts);
+    await this.ngrepo.fetchAll(fetchOpts && fetchOpts.toNgFetchOptions());
   }
 
   async mergeBranches(to: string, from: string, ignored: null, preference: number) {
@@ -155,8 +155,8 @@ class Commit {
     let ngoid = await NGCommit.create(
       repo.getNgRepo(),
       (updateRef as unknown) as string,
-      author,
-      committer,
+      author.getNgSignature(),
+      committer.getNgSignature(),
       messageEncoding,
       message,
       tree.getNgTree(),
@@ -269,7 +269,7 @@ class Remote {
   constructor(private readonly ngremote: NGRemote) {}
 
   async push(refSpecs: string[], fetchOpts?: FetchOptions): Promise<void> {
-    await this.ngremote.push(refSpecs, fetchOpts);
+    await this.ngremote.push(refSpecs, fetchOpts && fetchOpts.toNgFetchOptions());
   }
 }
 
@@ -418,16 +418,57 @@ export class Reset {
   }
 }
 
+export class Signature {
+  static create(name: string, email: string, unixDate: number, utcOffset: number) {
+    let ngsignature = NGSignature.create(name, email, unixDate, utcOffset);
+    return new Signature(ngsignature);
+  }
+
+  constructor(private readonly ngsignature: NGSignature) {}
+
+  getNgSignature() {
+    return this.ngsignature;
+  }
+}
+
+export class Cred {
+  static async sshKeyMemoryNew(username: string, publicKey: string, privateKey: string, passphrase: string) {
+    let ngcred = await NGCred.sshKeyMemoryNew(username, publicKey, privateKey, passphrase);
+    return new Cred(ngcred);
+  }
+
+  static sshKeyFromAgent(username: string) {
+    let ngcred = NGCred.sshKeyFromAgent(username);
+    return new Cred(ngcred);
+  }
+
+  constructor(private readonly ngcred: NGCred) {}
+
+  getNgCred() {
+    return this.ngcred;
+  }
+}
+
+export class FetchOptions {
+  constructor(private readonly credentialsCallback: (url: string, userName: string) => Promise<Cred> | Cred) {}
+
+  toNgFetchOptions(): NGFetchOptions {
+    return {
+      callbacks: {
+        credentials: async (url: string, userName: string) =>
+          (await this.credentialsCallback(url, userName)).getNgCred(),
+      },
+    };
+  }
+}
+
 export {
   Commit,
-  Cred,
   Merge,
   Repository,
-  Signature,
   Tree,
   Treebuilder,
   TreeEntry,
-  FetchOptions,
   Oid,
   Remote,
   Blob,

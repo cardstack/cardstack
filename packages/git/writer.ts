@@ -87,16 +87,12 @@ export default class Writer {
     }
 
     if (remote) {
-      this.fetchOpts = {
-        callbacks: {
-          credentials: (url: string, userName: string) => {
-            if (remote && remote.privateKey) {
-              return Cred.sshKeyMemoryNew(userName, remote.publicKey || '', remote.privateKey, remote.passphrase || '');
-            }
-            return Cred.sshKeyFromAgent(userName);
-          },
-        },
-      };
+      this.fetchOpts = new FetchOptions((url, userName) => {
+        if (remote && remote.privateKey) {
+          return Cred.sshKeyMemoryNew(userName, remote.publicKey || '', remote.privateKey, remote.passphrase || '');
+        }
+        return Cred.sshKeyFromAgent(userName);
+      });
     }
   }
 
