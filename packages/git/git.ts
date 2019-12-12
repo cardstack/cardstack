@@ -23,7 +23,7 @@ import { FetchOptions as NGFetchOptions } from 'nodegit/fetch-options';
 // import IsomorphicGit from 'isomorphic-git';
 // IsomorphicGit.plugins.set('fs', fs);
 
-const enum FILEMODE {
+export const enum FILEMODE {
   UNREADABLE = 0,
   TREE = 16384,
   BLOB = 33188,
@@ -38,15 +38,6 @@ const enum FILEMODE {
 // This is supposed to enable thread-safe locking around all async
 // operations.
 // setThreadSafetyStatus(1);
-
-async function cloneRepo(url: string, path: string, { fetchOpts }: { fetchOpts: FetchOptions }) {
-  let ngrepo = await NGClone.clone(url, path, { fetchOpts: fetchOpts.toNgFetchOptions() });
-  return new Repository(ngrepo);
-}
-
-async function createRemote(repo: Repository, name: string, url: string) {
-  return await Remote.create(repo, name, url);
-}
 
 export interface RemoteConfig {
   url: string;
@@ -67,7 +58,7 @@ export interface CommitOpts {
   committerEmail?: string;
 }
 
-class Repository {
+export class Repository {
   static async open(path: string) {
     let ngrepo = await NGRepository.open(path);
     return new Repository(ngrepo);
@@ -75,6 +66,11 @@ class Repository {
 
   static async init(path: string, isBare: boolean) {
     let ngrepo = await NGRepository.init(path, isBare ? 1 : 0);
+    return new Repository(ngrepo);
+  }
+
+  static async clone(url: string, path: string, { fetchOpts }: { fetchOpts: FetchOptions }) {
+    let ngrepo = await NGClone.clone(url, path, { fetchOpts: fetchOpts.toNgFetchOptions() });
     return new Repository(ngrepo);
   }
 
@@ -140,7 +136,7 @@ class Repository {
   }
 }
 
-class Commit {
+export class Commit {
   static async create(
     repo: Repository,
     updateRef: string | null,
@@ -202,7 +198,7 @@ class Commit {
   }
 }
 
-class Oid {
+export class Oid {
   constructor(private readonly sha: string) {}
 
   static fromNGOid(oid: NGOid) {
@@ -260,7 +256,7 @@ class Reference {
   }
 }
 
-class Remote {
+export class Remote {
   static async create(repo: Repository, name: string, url: string): Promise<Remote> {
     let ngremote = await NGRemote.create(repo.getNgRepo(), name, url);
     return new Remote(ngremote);
@@ -273,7 +269,7 @@ class Remote {
   }
 }
 
-class Tree {
+export class Tree {
   static async lookup(repo: Repository, oid: Oid) {
     let ngtree = await NGTree.lookup(repo.getNgRepo(), oid.toNGOid());
     return new Tree(ngtree);
@@ -307,7 +303,7 @@ class Tree {
   }
 }
 
-class Merge {
+export class Merge {
   static FASTFORWARD_ONLY = 2;
 
   static async base(repo: Repository, one: Oid, two: Oid): Promise<Oid> {
@@ -334,7 +330,7 @@ export class Index {
   }
 }
 
-class Treebuilder {
+export class Treebuilder {
   static async create(repo: Repository, tree: Tree | undefined) {
     let ngtreebuilder = await NGTreebuilder.create(repo.getNgRepo(), tree && tree.getNgTree());
     return new Treebuilder(ngtreebuilder);
@@ -360,7 +356,7 @@ class Treebuilder {
   }
 }
 
-class Blob {
+export class Blob {
   constructor(private readonly ngblob: NGBlob) {}
 
   id() {
@@ -372,7 +368,7 @@ class Blob {
   }
 }
 
-class TreeEntry {
+export class TreeEntry {
   constructor(private readonly ngtreeentry: NGTreeEntry) {}
 
   isTree() {
@@ -461,19 +457,3 @@ export class FetchOptions {
     };
   }
 }
-
-export {
-  Commit,
-  Merge,
-  Repository,
-  Tree,
-  Treebuilder,
-  TreeEntry,
-  Oid,
-  Remote,
-  Blob,
-  FILEMODE,
-  // wrapped
-  cloneRepo,
-  createRemote,
-};

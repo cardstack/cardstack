@@ -1,4 +1,4 @@
-import { cloneRepo, Cred, Merge, Repository, Reset, RemoteConfig, FetchOptions } from './git';
+import { Cred, Merge, Repository, Reset, RemoteConfig, FetchOptions } from './git';
 
 import { promisify } from 'util';
 import mkdirpcb from 'mkdirp';
@@ -79,7 +79,7 @@ class GitLocalCache {
 
         await mkdirp(repoPath);
 
-        repo = await cloneRepo(remote.url, repoPath, {
+        repo = await Repository.clone(remote.url, repoPath, {
           fetchOpts,
         });
       }
@@ -87,7 +87,7 @@ class GitLocalCache {
       log.info('cloning %s into %s', remote.url, repoPath);
       await mkdirp(repoPath);
 
-      repo = await cloneRepo(remote.url, repoPath, {
+      repo = await Repository.clone(remote.url, repoPath, {
         fetchOpts,
       });
     }
