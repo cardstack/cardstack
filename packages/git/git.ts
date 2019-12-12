@@ -446,13 +446,23 @@ export class Cred {
 }
 
 export class FetchOptions {
-  constructor(private readonly credentialsCallback: (url: string, userName: string) => Promise<Cred> | Cred) {}
+  constructor(private readonly credentialsCallback: (userName: string) => Promise<Cred> | Cred) {}
+
+  static privateKey(privateKey: string, publicKey = '', passphrase = '') {
+    return new FetchOptions(userName => Cred.sshKeyMemoryNew(userName, publicKey, privateKey, passphrase));
+  }
+
+  static agentKey() {
+    return new FetchOptions(userName => Cred.sshKeyFromAgent(userName));
+  }
 
   toNgFetchOptions(): NGFetchOptions {
     return {
       callbacks: {
-        credentials: async (url: string, userName: string) =>
-          (await this.credentialsCallback(url, userName)).getNgCred(),
+        credentials: async (url: string, userName: string) => {
+          let cred = await this.credentialsCallback(userName);
+          return cred.getNgCred();
+        },
       },
     };
   }
