@@ -76,10 +76,12 @@
 
 
 {{#if this.cssModeToggle.editingCss}}
-  <EditorPane data-test-dock-location={{this.cssModeToggle.dockLocation}}
-    @model={{this.model}}
-    @saveCss={{this.saveCss}}
-  />
+  <div data-test-editor-pane>
+    <EditorPane data-test-dock-location={{this.cssModeToggle.dockLocation}}
+      @model={{this.model}}
+      @saveCss={{this.saveCss}}
+    />
+  </div>
 {{else}}
   <RightEdge
     @card={{this.card}}
