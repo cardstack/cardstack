@@ -16,6 +16,7 @@ const realpathPromise = promisify(realpath);
 import { todo } from '@cardstack/plugin-utils/todo-any';
 describe('git/writer', function() {
   let env: todo, writers: todo, cardServices: todo, repoPath: string, head: string;
+  this.timeout(10000);
 
   beforeEach(async function() {
     repoPath = await temp.mkdir('git-writer-test');
@@ -1048,6 +1049,8 @@ describe('git/writer', function() {
 
 describe('git/writer/githereum', function() {
   let env: todo, writers: todo, repoPath: string, writer, githereum: todo, fakeContract: todo;
+
+  this.timeout(10000);
 
   beforeEach(async function() {
     repoPath = await temp.mkdir('git-writer-test');

@@ -39,6 +39,8 @@ function internalCardDocument(titleValue: string, id = 'local-hub::test-card') {
 }
 
 describe('git/indexer', function() {
+  this.timeout(10000);
+
   let root: string,
     env: todo,
     indexer: todo,

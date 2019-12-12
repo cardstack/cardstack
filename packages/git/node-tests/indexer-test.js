@@ -33,6 +33,7 @@ function internalCardDocument(titleValue, id = 'local-hub::test-card') {
     }));
 }
 describe('git/indexer', function () {
+    this.timeout(10000);
     let root, env, indexer, searcher, cardServices, dataSource, assertNoDocument, assertNoCard, start, client;
     beforeEach(async function () {
         root = await temp.mkdir('cardstack-server-test');

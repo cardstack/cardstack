@@ -65,6 +65,8 @@ describe('git/writer with remote', function() {
     head: string,
     remoteRepo: Repository;
 
+  this.timeout(10000);
+
   beforeEach(async function() {
     let tempRepo = await resetRemote();
 
@@ -290,6 +292,8 @@ describe('git/writer with remote', function() {
 
 describe('git/writer with empty remote', function() {
   let env: todo, writers: todo, repo: Repository, tempRepoPath, tempRemoteRepoPath: string;
+
+  this.timeout(10000);
 
   beforeEach(async function() {
     let root = await temp.mkdir('cardstack-server-test');

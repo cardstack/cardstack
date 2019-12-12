@@ -19,9 +19,9 @@ import {
 
 import { FetchOptions as NGFetchOptions } from 'nodegit/fetch-options';
 
-// import fs from 'fs';
-// import IsomorphicGit from 'isomorphic-git';
-// IsomorphicGit.plugins.set('fs', fs);
+import fs from 'fs';
+import { plugins as IGplugins, init as IGinit } from 'isomorphic-git';
+IGplugins.set('fs', fs);
 
 export const enum FILEMODE {
   UNREADABLE = 0,
@@ -59,14 +59,14 @@ export interface CommitOpts {
 }
 
 export class Repository {
-  static async open(path: string) {
-    let ngrepo = await NGRepository.open(path);
+  static async open(path: string, bare = false) {
+    let ngrepo = bare ? await NGRepository.openBare(path) : await NGRepository.open(path);
     return new Repository(ngrepo);
   }
 
-  static async init(path: string, isBare: boolean) {
-    let ngrepo = await NGRepository.init(path, isBare ? 1 : 0);
-    return new Repository(ngrepo);
+  static async initBare(path: string): Promise<Repository> {
+    await IGinit({ gitdir: path, bare: true });
+    return await Repository.open(path, true);
   }
 
   static async clone(url: string, path: string, { fetchOpts }: { fetchOpts: FetchOptions }) {

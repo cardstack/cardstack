@@ -12,6 +12,7 @@ const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const support_2 = require("./support");
 const change_1 = __importDefault(require("../change"));
 describe('git/config', function () {
+    this.timeout(10000);
     let factory, env, repoPath;
     beforeEach(async function () {
         factory = new JSONAPIFactory();
