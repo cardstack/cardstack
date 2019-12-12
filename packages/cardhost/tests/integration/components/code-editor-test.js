@@ -21,9 +21,12 @@ module('Integration | Component | code-editor', function(hooks) {
       { timeout: 10000 }
     );
     let lineNumber = '1';
-    await waitUntil(function() {
-      return find('.cardhost-monaco-container').textContent.includes(lineNumber + 'card');
-    });
-    assert.dom('.cardhost-monaco-container').hasText(lineNumber + 'card'); // should be 1card
+    await waitUntil(
+      function() {
+        return find('.cardhost-monaco-container').textContent.includes(lineNumber + 'card');
+      },
+      { timeout: 3000 }
+    );
+    assert.dom('.cardhost-monaco-container').includesText(lineNumber + 'card'); // should be 1card
   });
 });
