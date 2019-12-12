@@ -119,7 +119,8 @@
             @class="ch-input"
             @setValue={{action this.updateFieldName}}
             @disabled={{@field.isAdopted}}
-            @pattern={{this.data.FIELD_NAME_REGEX}}
+            @pattern={{@field.fieldNameRegex.source}}
+            @title="Can only contain letters, numbers, dashes, and underscores."
           />
         </div>
       {{else if (eq schemaAttr "is-meta")}}
