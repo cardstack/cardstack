@@ -1,19 +1,16 @@
 {{#if this.cardstackSession.isAuthenticated}}
   <div class="card-renderer--top-edge-buttons">
-    <button
-      class="ch-button ch-button--icon share"
-      aria-label="Share button"
-    >
+    <button class="ch-button ch-button--icon share" aria-label="Share button">
     </button>
     <button
-      {{on "click" this.preview}}
       class="ch-button ch-button--secondary"
+      {{on "click" this.preview}}
       disabled={{not this.cardstackSession.isAuthenticated}}
       data-test-card-schema-preview-btn
     >
       Preview
     </button>
-    <SaveButton @card={{this.card}}/>
+    <SaveButton @card={{this.card}} />
   </div>
 {{/if}}
 
@@ -26,10 +23,7 @@
           <button class="ch-catalog--header-btn sidebar active" aria-label="View as sidebar"></button>
           <button class="ch-catalog--header-btn grid" aria-label="View as grid"></button>
         </div>
-        <Input
-          @class="ch-filter-bar"
-          @placeholder="Filter Results"
-        />
+        <Input @class="ch-filter-bar" @placeholder="Filter Results" />
       </header>
       <div class="ch-catalog--fields">
         {{#each this.fieldComponents as |field|}}
@@ -57,23 +51,13 @@
   </CardhostLeftEdge>
 {{/unless}}
 
-<RightEdge
-  @card={{this.card}}
-  @selectedField={{this.selectedField}}
-  @selectField={{action this.selectField}}
-  @setNeededWhenEmbedded={{this.setNeededWhenEmbedded}}
-  @setFieldName={{this.setFieldName}}
-  @setFieldLabel={{this.setFieldLabel}}
-  @setFieldInstructions={{this.setFieldInstructions}}
-  @cardSelected={{this.cardSelected}}
-/>
+<RightEdge @card={{this.card}} @selectedField={{this.selectedField}} @selectField={{action this.selectField}}
+  @setNeededWhenEmbedded={{this.setNeededWhenEmbedded}} @setFieldName={{this.setFieldName}}
+  @setFieldLabel={{this.setFieldLabel}} @setFieldInstructions={{this.setFieldInstructions}}
+  @cardSelected={{this.cardSelected}} />
 
 <div class="card-schema-updator--search-bar">
-  <Input
-    @type="search"
-    @class="ch-search-bar"
-    @placeholder="Search Library"
-  />
+  <Input @type="search" @class="ch-search-bar" @placeholder="Search Library" />
 </div>
 
 <section class="card-schema-updator" data-test-card-schema={{@card.name}} {{did-update this.updateCard @card}}>
@@ -87,26 +71,17 @@
     @selectedField={{this.selectedField}}
     @dropField={{action this.dropField}}
     @cardSelected={{this.cardSelected}}
-    @cardFocused={{action (mut this.cardSelected)}}
-  />
+    @cardFocused={{action (mut this.cardSelected)}} />
 </section>
 
 <section class="cardhost-card-document">
   <h3>Card Document</h3>
-  <CodeEditor
-    @code={{this.cardJson}}
-    @language="json"
-  />
+  <CodeEditor @code={{this.cardJson}} @language="json" />
 </section>
 
 {{#if this.cssModeToggle.editingCss}}
   <section class="cardhost-card-theme-editor">
     <h3>Card Theme Editor</h3>
-    <CodeEditor
-      @code=".a {}"
-      @language="css"
-      @readOnly={{false}}
-      @resizable={{true}}
-    />
+    <CodeEditor @code=".a {}" @language="css" @readOnly={{false}} @resizable={{true}} />
   </section>
 {{/if}}

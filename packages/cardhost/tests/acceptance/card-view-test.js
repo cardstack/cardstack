@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { fillIn, find, visit, currentURL, waitFor, settled, click } from '@ember/test-helpers';
+import { find, visit, currentURL, waitFor, settled, click } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures';
 import { createCards } from '@cardstack/test-support/card-ui-helpers';
@@ -114,54 +114,6 @@ module('Acceptance | card view', function(hooks) {
       { type: 'cards', id: qualifiedCard3Id },
     ]);
 
-    await percySnapshot(assert);
-  });
-
-  test('can navigate to edit card', async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [
-        ['title', 'string', true, 'The Millenial Puppy'],
-        ['author', 'string', true, 'Van Gogh'],
-        [
-          'body',
-          'string',
-          false,
-          'It can be difficult these days to deal with the discerning tastes of the millenial puppy.',
-        ],
-      ],
-    });
-    await visit(`/cards/${card1Id}`);
-
-    await fillIn('[data-test-mode-switcher]', 'edit');
-    await waitFor(`[data-test-card-edit="${card1Id}"]`, { timeout });
-
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
-    assert.dom(`[data-test-card-edit="${card1Id}"]`).exists();
-    await percySnapshot(assert);
-  });
-
-  test('can navigate to card schema', async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [
-        ['title', 'string', true, 'The Millenial Puppy'],
-        ['author', 'string', true, 'Van Gogh'],
-        [
-          'body',
-          'string',
-          false,
-          'It can be difficult these days to deal with the discerning tastes of the millenial puppy.',
-        ],
-      ],
-    });
-    await visit(`/cards/${card1Id}`);
-
-    await fillIn('[data-test-mode-switcher]', 'schema');
-    await waitFor(`[data-test-card-schema="${card1Id}"]`, { timeout });
-
-    assert.equal(currentURL(), `/cards/${card1Id}/schema`);
-    assert.dom(`[data-test-card-schema="${card1Id}"]`).exists();
     await percySnapshot(assert);
   });
 

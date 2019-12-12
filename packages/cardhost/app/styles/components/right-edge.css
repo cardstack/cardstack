@@ -20,9 +20,8 @@
 
 .pill-selector {
   display: flex;
-  max-width: 100%;
   min-width: var(--ch-component-width);
-  width: min-content;
+  width: 100%;
   height: var(--ch-component-height);
   background-color: var(--ch-default);
   color: white;
@@ -55,7 +54,7 @@
 }
 
 .right-edge--section-header {
-  background: url("/assets/images/icons/arrow-show-hide-active.svg") right center/10px no-repeat;
+  background: url('/assets/images/icons/arrow-show-hide-active.svg') right center/10px no-repeat;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
