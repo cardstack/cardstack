@@ -1,44 +1,6 @@
 <div class="card-renderer--top-edge-buttons">
   {{#if this.cssModeToggle.editingCss}}
-    {{#if this.cssModeToggle.visible}}
-      <button 
-        class="ch-button ch-button--icon eye-on"
-        aria-label="Hide the CSS editor"
-        {{on "click" this.cssModeToggle.hideEditor}}
-        data-test-hide-editor-btn
-      >
-      </button>
-    {{else}}
-      <button 
-        class="ch-button ch-button--icon eye-off"
-        aria-label="Show the CSS editor"
-        {{on "click" this.cssModeToggle.showEditor}}
-        data-test-show-editor-btn
-      >
-      </button>
-    {{/if}}
-    <button 
-      class="ch-button ch-button--icon dock-bottom {{if (eq this.cssModeToggle.dockLocation "bottom") "selected"}}"
-      {{on "click" this.cssModeToggle.dockBottom}}
-      aria-label="Dock the CSS editor to the bottom"
-      data-test-dock-bottom
-    >
-    </button>
-
-    <button 
-      class="ch-button ch-button--icon dock-right {{if (eq this.cssModeToggle.dockLocation "right") "selected"}}"
-      {{on "click" this.cssModeToggle.dockRight}}
-      aria-label="Dock the CSS editor to the right"
-      data-test-dock-right
-    >
-    </button>
-    <button {{on "click" this.closeEditor}}
-      class="ch-button close-editor-btn"
-      data-test-close-editor
-    >
-      Close Editor
-    </button>
-
+    <ThemerToolbar @closeEditor={{this.closeEditor}} />
   {{else}}
     <button
       class="ch-button ch-button--icon share"
