@@ -30,7 +30,7 @@ export class Container {
   // When this is called we'll always instantiate a new instance for each
   // invocation of instantiate(), as opposed to when .lookup() is used, where
   // there will only ever be 1 instance in the container. Consider the example
-  // of using instantiate() to create an indexer for each realm--the desired
+  // of using instantiate() to create an indexer for each realm. The desired
   // behavior is that there is a separate indexer instance for each realm--not
   // that they are all using the same indexer instance.
   async instantiate<T, A>(factory: FactoryWithArg<T, A>, arg: A): Promise<T>;
