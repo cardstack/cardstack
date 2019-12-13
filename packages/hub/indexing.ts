@@ -60,7 +60,7 @@ export default class IndexingService {
           }) as Expression
         );
 
-        return batch.saved;
+        return batch.touched;
       })
     );
 
