@@ -105,7 +105,7 @@
 .ch-button--icon.eye-on {
   --icon-url: url('/assets/images/buttons/eye-on.svg');
   background-size: 30px;
-  margin-right: 15px;
+  margin-right: 20px;
 }
 .ch-button--icon.eye-on:hover {
   --icon-url: url('/assets/images/buttons/eye-on.svg');
@@ -116,7 +116,7 @@
 .ch-button--icon.eye-off {
   --icon-url: url('/assets/images/buttons/eye-off.svg');
   background-size: 30px;
-  margin-right: 15px;
+  margin-right: 20px;
 }
 
 .ch-button--icon.eye-off:hover {
@@ -150,16 +150,22 @@
 
 .ch-button--icon.responsive {
   --icon-url: url('/assets/images/buttons/responsive-inactive.svg');
-  background-size: 25px 25px;
+  background-size: 30px 30px;
 }
 
 .ch-button--icon.responsive.selected {
   --icon-url: url('/assets/images/buttons/responsive-active.svg');
 }
 
+.ch-button--icon.responsive:hover, .ch-button--icon.full-width:hover {
+  opacity: 0.5;
+  filter: alpha(opacity=50);
+}
+
 .ch-button--icon.full-width {
   --icon-url: url('/assets/images/buttons/full-width-inactive.svg');
   background-size: 25px 25px;
+  margin-right: 20px;
 }
 
 .ch-button--icon.full-width.selected {

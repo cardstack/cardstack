@@ -1,3 +1,19 @@
+<button 
+  class="ch-button ch-button--icon responsive {{if this.cssModeToggle.isResponsive "selected"}}"
+  {{on "click" this.cssModeToggle.useResponsiveWidth}}
+  aria-label="Show the card in responsive size"
+  data-test-responsive-btn
+>
+</button>
+
+<button 
+  class="ch-button ch-button--icon full-width {{if this.cssModeToggle.isResponsive "" "selected"}}"
+  {{on "click" this.cssModeToggle.useFullWidth}}
+  aria-label="Show the card in full width size"
+  data-test-full-width-btn
+>
+</button>
+
 {{#if this.cssModeToggle.visible}}
   <button 
     class="ch-button ch-button--icon eye-on"

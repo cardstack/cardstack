@@ -95,4 +95,30 @@ module('Acceptance | css editing', function(hooks) {
     await click('[data-test-dock-right]');
     assert.dom('[data-test-dock-location="right"]');
   });
+
+  test('toggling card width', async function(assert) {
+    await login();
+    await createCards(cardData);
+    await click('[data-test-card-custom-style-button]');
+    assert.equal(currentURL(), `/cards/${card1Id}?editingCss=true`);
+    // make sure initial state is correct
+    assert.dom('[data-test-responsive-btn]').exists();
+    assert.dom('[data-test-responsive-btn]').hasClass('selected');
+    assert.dom('[data-test-full-width-btn]').exists();
+    assert.dom('[data-test-full-width-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-cardhost-cards]').hasClass('responsive');
+    // toggle to full width
+    await click('[data-test-full-width-btn]');
+    assert.dom('[data-test-full-width-btn]').hasClass('selected');
+    assert.dom('[data-test-cardhost-cards]').hasClass('full-width');
+
+    // let animation finish before taking screenshot
+    const waitForAnimation = new Promise(resolve => {
+      setTimeout(() => {
+        percySnapshot(assert);
+        resolve('done');
+      }, 1000);
+    });
+    await waitForAnimation;
+  });
 });
