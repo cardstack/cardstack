@@ -335,6 +335,8 @@ export class Batch {
   constructor(private client: PgClient, private cards: ScopedCardService) {}
 
   async save(card: CardWithId) {
+    this._touched.push({ realm: card.realm, originalRealm: card.originalRealm, localId: card.localId });
+
     /* eslint-disable @typescript-eslint/camelcase */
     let row = {
       realm: param(card.realm),
@@ -346,8 +348,20 @@ export class Batch {
     /* eslint-enable @typescript-eslint/camelcase */
 
     await this.client.queryCards(this.cards, upsert('cards', 'cards_pkey', row));
-    this._touched.push({ realm: card.realm, originalRealm: card.originalRealm, localId: card.localId });
     log.debug('save realm: %s original realm: %s local id: %s', card.realm, card.originalRealm, card.localId);
+  }
+
+  async delete(id: CardId) {
+    this._touched.push(id);
+    await this.client.query([
+      'delete from cards where realm =',
+      param(id.realm),
+      'and original_realm = ',
+      param(id.originalRealm ?? id.realm),
+      'and local_id = ',
+      param(id.localId),
+    ]);
+    log.debug('delete realm: %s original realm: %s local id: %s', id.realm, id.originalRealm ?? id.realm, id.localId);
   }
 
   async deleteOtherGenerations(realm: string, currentGeneration: number) {

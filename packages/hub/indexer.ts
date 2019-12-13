@@ -1,4 +1,4 @@
-import { CardWithId } from './card';
+import { CardWithId, CardId } from './card';
 import { Batch } from './pgsearch/pgclient';
 import CardstackError from './error';
 
@@ -18,6 +18,10 @@ export class IndexingOperations {
   async save(card: CardWithId) {
     card.generation = this.generation;
     return await this.batch.save(card);
+  }
+
+  async delete(id: CardId) {
+    return await this.batch.delete(id);
   }
 
   async beginReplaceAll() {
