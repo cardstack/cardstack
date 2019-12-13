@@ -1,9 +1,10 @@
 import { module, test } from 'qunit';
-import { click, visit, currentURL, waitFor, fillIn } from '@ember/test-helpers';
+import { click, visit, currentURL, waitFor, settled } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures';
 import { createCards } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
+import { percySnapshot } from 'ember-percy';
 
 const timeout = 20000;
 const card1Id = 'millenial-puppies';
@@ -45,7 +46,8 @@ module('Acceptance | css editing', function(hooks) {
     await createCards(cardData);
     await visit(`/cards/${card1Id}`);
 
-    await fillIn('[data-test-mode-switcher]', 'view');
+    await click('[data-test-mode-switcher] .ember-power-select-trigger');
+    await click('[data-test-mode-switcher-mode="view"]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card1Id}`);
@@ -63,5 +65,34 @@ module('Acceptance | css editing', function(hooks) {
     await click('[data-test-close-editor]');
     assert.equal(currentURL(), `/cards/${card1Id}`);
     assert.dom('[data-test-editor-pane]').doesNotExist();
+    assert.dom('[data-test-card-custom-style-button]').exists();
+  });
+
+  test('hiding the editor', async function(assert) {
+    await login();
+    await createCards(cardData);
+    await click('[data-test-card-custom-style-button]');
+    await settled();
+    assert.equal(currentURL(), `/cards/${card1Id}?editingCss=true`);
+    assert.dom('[data-test-hide-editor-btn]').exists();
+    assert.dom('[data-test-editor-pane]').exists();
+    await click('[data-test-hide-editor-btn]');
+    assert.dom('.cardhost-card-theme-editor.hidden').exists();
+    percySnapshot(assert);
+  });
+
+  test('toggling editor docking', async function(assert) {
+    await login();
+    await createCards(cardData);
+    await click('[data-test-card-custom-style-button]');
+    assert.equal(currentURL(), `/cards/${card1Id}?editingCss=true`);
+    assert.dom('[data-test-dock-bottom]').exists();
+    assert.dom('[data-test-dock-location="right"]');
+    percySnapshot('css editor docked right');
+    await click('[data-test-dock-bottom]');
+    assert.dom('[data-test-dock-location="bottom"]');
+    percySnapshot('css editor docked bottom');
+    await click('[data-test-dock-right]');
+    assert.dom('[data-test-dock-location="right"]');
   });
 });

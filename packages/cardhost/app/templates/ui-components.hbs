@@ -75,12 +75,21 @@
       <button class="ch-button ch-button--icon catalog" aria-label="Catalog"></button>
       <button class="ch-button ch-button--icon share" aria-label="Share"></button>
       <button class="ch-button ch-button--icon library" aria-label="Library"></button>
+      <button class="ch-button ch-button--icon dock-right" aria-label="Dock right"></button>
+      <button class="ch-button ch-button--icon dock-bottom" aria-label="Dock bottom"></button>
+      <button class="ch-button ch-button--icon eye-on" aria-label="Visible"></button>
+      <button class="ch-button ch-button--icon eye-off" aria-label="Hidden"></button>
     </div>
     <div>
       <CodeEditor @code='<button class="ch-button ch-button--icon user" aria-label="User"></button>
 <button class="ch-button ch-button--icon catalog" aria-label="Catalog"></button>
 <button class="ch-button ch-button--icon share" aria-label="Share"></button>
-<button class="ch-button ch-button--icon library" aria-label="Library"></button>' @language="html" />
+<button class="ch-button ch-button--icon library" aria-label="Library"></button>
+<button class="ch-button ch-button--icon dock-right" aria-label="Dock right">
+<button class="ch-button ch-button--icon dock-bottom" aria-label="Dock bottom">
+<button class="ch-button ch-button--icon eye-on" aria-label="Visible"></button>
+<button class="ch-button ch-button--icon eye-off" aria-label="Hidden"></button>'
+      @language="html" />
     </div>
 
     <h3>Secondary Icon button</h3>
@@ -97,18 +106,19 @@
       <CodeEditor @code='<button disabled class="ch-button ch-button--icon user" aria-label="User"></button>
 <button disabled class="ch-button ch-button--icon catalog" aria-label="Catalog"></button>' @language="html" />
     </div>
+
+    <h3>Save button</h3>
+    <SaveButton @card={{this.model}} />
+    <CodeEditor @code='<SaveButton @card=\{{card}} />' @language="html" />
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col">
     <h2>View Switcher</h2>
-    <div>
-      <ModeSwitcher @name="" @mode="view" />
-      <ModeSwitcher @name="" @mode="edit" />
-      <ModeSwitcher @name="" @mode="schema" />
-    </div>
-    <CodeEditor @code='<ModeSwitcher @name="[card-id-here]" @mode="view" />
-<ModeSwitcher @name="[card-id-here]" @mode="edit" />
-<ModeSwitcher @name="[card-id-here]" @mode="schema" />' @language="html" />
+    <ViewSwitcher />
+    <CodeEditor @code='<ViewSwitcher
+  @mode=\{{@mode}}
+  @cardId=\{{@cardId}}
+/>' @language="html" />
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col">
