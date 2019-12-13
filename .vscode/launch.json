@@ -151,7 +151,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "ephemeral cards do not persist"]
+      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "queue"]
     },
     {
       "type": "node",

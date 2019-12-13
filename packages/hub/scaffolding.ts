@@ -98,9 +98,9 @@ export async function loadWriter(card: CardWithId): Promise<WriterFactory> {
   throw new Error(`unimplemented`);
 }
 
-export async function loadIndexer(card: CardWithId): Promise<IndexerFactory> {
+export async function loadIndexer(card: CardWithId): Promise<IndexerFactory<unknown>> {
   if (ephemeralRealms().find(realm => realm.id === card.id)) {
-    return (await import('./ephemeral/indexer')).default;
+    return (await import('./ephemeral/indexer')).default as IndexerFactory<unknown>;
   }
   throw new Error(`unimplemented`);
 }

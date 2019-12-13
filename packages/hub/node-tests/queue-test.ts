@@ -14,7 +14,7 @@ describe('hub/queue', function() {
     await env.destroy();
   });
 
-  it.skip('it can run a job', async function() {
+  it('it can run a job', async function() {
     let job = await queue.publish('plus1', 17);
     queue.subscribe('plus1', async (a: number) => a + 1);
     let result = await job.done;

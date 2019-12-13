@@ -8,22 +8,18 @@ export default class Queue {
   private jobs: Map<string, Promise<void>> = new Map();
 
   async publish<T>(name: string, arg: PgPrimitive): Promise<Job<T>> {
-    // we're using "skip locked" because we are searching for jobs that are not running
-    // the idea is that we will coalesce with waiting jobs that have the same name and args.
-    let existingJob: Expression = [
-      'select id from jobs where name =',
-      param(name),
-      'and args =',
-      param(arg),
-      'for share skip locked',
-    ];
-    let result = await this.pgclient.query(existingJob);
-    if (result.rowCount > 0) {
-      let jobId = result.rows[0].id;
-      return new Job(jobId, this);
-    }
+    let queueName = `${name}_${JSON.stringify(arg)}`;
 
-    let newJob: Expression = ['insert into jobs (name, args) values (', param(name), ',', param(arg), ') returning id'];
+    let ensureQueue: Expression = [`insert into queues (name) values (`, param(queueName), `) on conflict do nothing`];
+    await this.pgclient.query(ensureQueue);
+
+    let newJob: Expression = [
+      'insert into jobs (name, args, queue) values (',
+      param(name),
+      ',',
+      param(arg),
+      ') returning id',
+    ];
     let {
       rows: [{ id: jobId }],
     } = await this.pgclient.query(newJob);

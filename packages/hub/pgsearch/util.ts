@@ -35,7 +35,9 @@ export type CardExpression = (string | Param | FieldQuery | FieldValue | FieldAr
 
 export type Expression = (string | Param)[];
 
-export function addExplicitParens(expression: CardExpression): CardExpression {
+export function addExplicitParens(expression: CardExpression): CardExpression;
+export function addExplicitParens(expression: Expression): Expression;
+export function addExplicitParens(expression: unknown[]): unknown[] {
   if (expression.length === 0) {
     return expression;
   } else {

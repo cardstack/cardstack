@@ -139,7 +139,7 @@ export class CardWithId extends Card {
   }
 
   async loadFeature(featureName: 'writer'): Promise<WriterFactory | null>;
-  async loadFeature(featureName: 'indexer'): Promise<IndexerFactory | null>;
+  async loadFeature(featureName: 'indexer'): Promise<IndexerFactory<J.Value> | null>;
   async loadFeature(featureName: 'buildValueExpression'): Promise<(expression: CardExpression) => CardExpression>;
   async loadFeature(featureName: any): Promise<any> {
     switch (featureName) {

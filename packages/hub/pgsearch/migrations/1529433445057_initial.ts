@@ -24,6 +24,13 @@ export function up(pgm: MigrationBuilder) {
     primaryKey: ['realm'],
   });
 
+  pgm.createTable('queues', {
+    name: {
+      type: 'varchar',
+      primaryKey: true,
+    },
+  });
+
   pgm.createType('job_statuses', ['not done', 'completed', 'failed', 'fulfilled', 'rejected']);
   /* eslint-disable @typescript-eslint/camelcase */
   pgm.createTable('jobs', {
@@ -45,6 +52,11 @@ export function up(pgm: MigrationBuilder) {
     },
     finished_at: {
       type: 'timestamp',
+    },
+    queue: {
+      type: 'varchar',
+      references: 'queues.name',
+      notNull: true,
     },
     result: 'jsonb',
   });
