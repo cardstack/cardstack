@@ -11,6 +11,12 @@
   position: absolute;
 }
 
+.resizer {
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+
 .resizer.top,
 .resizer.bottom {
   width: 100%;

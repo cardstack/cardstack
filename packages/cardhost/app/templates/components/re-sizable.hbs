@@ -9,12 +9,12 @@
   >
 
   {{#each this.directions as |dir|}}
-    <div
+    <button
       class={{concat "resizer " dir}}
       {{on "mousedown" (fn this._onResizeStart dir)}}
       {{on "touchstart" (fn this._onResizeStart dir)}}
     >
-    </div>
+    </button>
   {{/each}}
 
   {{yield}}
