@@ -13,7 +13,7 @@ export default class EphemeralWriter implements Writer {
 
   async create(_session: Session, doc: UpstreamDocument, upstreamId: UpstreamIdentity | null) {
     let id = upstreamId ?? String(counter++);
-    this.ephemeralStorage.save(doc, id, this.realmCard.localId);
+    this.ephemeralStorage.store(doc, id, this.realmCard.localId);
     return { saved: doc, id };
   }
 }

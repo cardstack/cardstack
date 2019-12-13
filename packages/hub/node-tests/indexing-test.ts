@@ -40,12 +40,27 @@ describe('hub/indexing', function() {
     let realm = `${myOrigin}/api/realms/first-ephemeral-realm`;
     await createRealm(`${myOrigin}/api/realms/meta`, realm);
     let card = new CardWithId(testCard({ realm, localId: '1' }, { foo: 'bar' }).jsonapi);
-    storage.save(await card.asUpstreamDoc(), card.localId, card.realm);
+    storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
 
     await indexing.update();
 
     let indexedCard = await cards.as(Session.INTERNAL_PRIVILEGED).get(card);
     expect(indexedCard).to.be.ok;
+  });
+
+  it('it can remove a document from the index if the document was removed from the data source', async function() {
+    let realm = `${myOrigin}/api/realms/first-ephemeral-realm`;
+    await createRealm(`${myOrigin}/api/realms/meta`, realm);
+    let card = await cards
+      .as(Session.INTERNAL_PRIVILEGED)
+      .create(realm, testCard({ realm, localId: '1' }, { foo: 'bar' }).jsonapi);
+    storage.store(null, card.localId, card.realm);
+    await indexing.update();
+
+    let { cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
+      filter: { eq: { 'local-id': '1' } },
+    });
+    expect(results.length).to.equal(0);
   });
 
   it('it can index multiple realms', async function() {
@@ -55,9 +70,9 @@ describe('hub/indexing', function() {
     await createRealm(`http://example.com/api/realms/meta`, realm2);
 
     let card = new CardWithId(testCard({ realm: realm1, localId: '1' }, { foo: 'bar' }).jsonapi);
-    storage.save(await card.asUpstreamDoc(), card.localId, card.realm);
+    storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
     card = new CardWithId(testCard({ realm: realm2, localId: '1' }, { foo: 'bar' }).jsonapi);
-    storage.save(await card.asUpstreamDoc(), card.localId, card.realm);
+    storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
 
     await indexing.update();
 
@@ -74,13 +89,13 @@ describe('hub/indexing', function() {
     // card is indexed in torn down ephemeral storage
     // This card will _not_ live through the container teardown
     let card = new CardWithId(testCard({ realm, localId: '1' }, { foo: 'bar' }).jsonapi);
-    storage.save(await card.asUpstreamDoc(), card.localId, card.realm);
+    storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
     await indexing.update();
 
     // card is not yet indexed in torn down ephemeral storage
     // This card will _not_ live through the container teardown
     card = new CardWithId(testCard({ realm, localId: '2' }, { foo: 'bar' }).jsonapi);
-    storage.save(await card.asUpstreamDoc(), card.localId, card.realm);
+    storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
     await env.container.teardown();
     env.container = await wireItUp();
 
@@ -91,7 +106,7 @@ describe('hub/indexing', function() {
     // card is not yet indexed in new ephemeral storage
     // This card _will_ live through the container teardown
     card = new CardWithId(testCard({ realm, localId: '3' }, { foo: 'bar' }).jsonapi);
-    storage.save(await card.asUpstreamDoc(), card.localId, card.realm);
+    storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
     await indexing.update();
 
     let { cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
@@ -115,17 +130,21 @@ describe('hub/indexing', function() {
     await createRealm(`${myOrigin}/api/realms/meta`, realm);
 
     let card = new CardWithId(testCard({ realm, localId: '1' }, { foo: 'bar' }).jsonapi);
-    storage.save(await card.asUpstreamDoc(), card.localId, card.realm);
+    storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
     let report = await indexing.update();
     expect(report[realm].length).to.equal(1);
 
     card = new CardWithId(testCard({ realm, localId: '2' }, { foo: 'bar' }).jsonapi);
-    storage.save(await card.asUpstreamDoc(), card.localId, card.realm);
+    storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
     report = await indexing.update();
     expect(report[realm].length).to.equal(1);
 
     card = new CardWithId(testCard({ realm, localId: '1' }, { foo: 'bar' }).jsonapi);
-    storage.save(await card.asUpstreamDoc(), card.localId, card.realm);
+    storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
+    report = await indexing.update();
+    expect(report[realm].length).to.equal(1);
+
+    storage.store(null, card.localId, card.realm);
     report = await indexing.update();
     expect(report[realm].length).to.equal(1);
 

@@ -1,13 +1,15 @@
 import { UpstreamDocument, UpstreamIdentity } from '../document';
+import { CardId } from '../card';
 interface StoreEntry {
-  doc: UpstreamDocument;
+  id: CardId;
+  doc: UpstreamDocument | null;
   generation: number;
 }
 
 export class EphemeralStorage {
-  private _identity = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
   private generationCounter = 0;
-  private store = new Map() as Map<string, StoreEntry>;
+  private _identity = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+  private _store = new Map() as Map<string, StoreEntry>;
 
   get identity() {
     return this._identity;
@@ -17,24 +19,27 @@ export class EphemeralStorage {
     return this.generationCounter;
   }
 
-  save(doc: UpstreamDocument, id: UpstreamIdentity, realmURL: string) {
+  store(doc: UpstreamDocument | null, id: UpstreamIdentity, realm: string) {
     this.generationCounter++;
-    let key = [realmURL, typeof id === 'string' ? realmURL : id.originalRealm, typeof id === 'string' ? id : id.localId]
-      .map(encodeURIComponent)
-      .join('/');
-    this.store.set(key, {
+    let originalRealm = typeof id === 'string' ? realm : id.originalRealm;
+    let localId = typeof id === 'string' ? id : id.localId;
+    let key = [realm, originalRealm, localId].map(encodeURIComponent).join('/');
+    this._store.set(key, {
+      id: {
+        realm,
+        originalRealm,
+        localId,
+      },
       doc,
       generation: this.generationCounter,
     });
   }
 
-  // TODO for the delete() null out the document for the entry (tombstone) and use that to be able to determine to delete form the index
-
-  cardsNewerThan(realmURL: string, generation = -Infinity): UpstreamDocument[] {
-    return [...this.store.entries()]
+  entriesNewerThan(realmURL: string, generation = -Infinity): StoreEntry[] {
+    return [...this._store.entries()]
       .filter(([key]) => key.indexOf(encodeURIComponent(realmURL)) === 0)
       .filter(([, entry]) => entry.generation > generation)
-      .map(([, entry]) => entry.doc);
+      .map(([, entry]) => entry);
   }
 }
 

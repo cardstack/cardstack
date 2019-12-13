@@ -21,11 +21,14 @@ export default class EphemeralIndexer implements Indexer<EphemeralMeta> {
       await ops.beginReplaceAll();
     }
 
-    let upstreamDocs = this.ephemeralStorage.cardsNewerThan(this.realmCard.localId, generation);
-    let cards = upstreamDocs.map(doc => new CardWithId(doc.jsonapi));
-    await Promise.all(cards.map(card => ops.save(card)));
-    // TODO there is a bug here for when we need to delete an index entry if it no longer lives in the store.
-    // test is to go directly into the index and delete a card
+    let entries = this.ephemeralStorage.entriesNewerThan(this.realmCard.localId, generation);
+    for (let entry of entries) {
+      if (entry.doc) {
+        await ops.save(new CardWithId(entry.doc.jsonapi));
+      } else {
+        await ops.delete(entry.id);
+      }
+    }
 
     if (identity !== this.ephemeralStorage.identity) {
       await ops.finishReplaceAll();
