@@ -2,7 +2,7 @@ import { Session } from './session';
 import { inject, getOwner } from './dependency-injection';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
 import { myOrigin } from './origin';
-import { IndexingOperations } from './indexer';
+import { IndexingOperations, IndexerFactory } from './indexer';
 import * as JSON from 'json-typescript';
 import { upsert, param, Expression } from './pgsearch/util';
 import { CardId } from './card';
@@ -28,9 +28,9 @@ export default class IndexingService {
       },
     });
 
-    let saved = await Promise.all(
+    let touched = await Promise.all(
       realms.map(async realmCard => {
-        let indexerFactory = await realmCard.loadFeature('indexer');
+        let indexerFactory: IndexerFactory<JSON.Value> = await realmCard.loadFeature('indexer');
 
         // TODO need to make sure that if this hub does not have a handler for
         // the realm it does not pick up this job from the queue so that some
@@ -67,7 +67,7 @@ export default class IndexingService {
     let indexedReport: IndexedReport = {};
     let i = 0;
     for (let realmCard of realms) {
-      indexedReport[realmCard.localId] = saved[i++] || [];
+      indexedReport[realmCard.localId] = touched[i++] || [];
     }
 
     return indexedReport;

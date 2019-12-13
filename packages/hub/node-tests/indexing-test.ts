@@ -82,7 +82,7 @@ describe('hub/indexing', function() {
     card = new CardWithId(testCard({ realm, localId: '2' }, { foo: 'bar' }).jsonapi);
     storage.save(await card.asUpstreamDoc(), card.localId, card.realm);
     await env.container.teardown();
-    env.container = await wireItUp({ suppressInitialIndex: true });
+    env.container = await wireItUp();
 
     cards = await env.container.lookup('cards');
     indexing = await env.container.lookup('indexing');

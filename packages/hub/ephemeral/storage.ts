@@ -28,6 +28,8 @@ export class EphemeralStorage {
     });
   }
 
+  // TODO for the delete() null out the document for the entry (tombstone) and use that to be able to determine to delete form the index
+
   cardsNewerThan(realmURL: string, generation = -Infinity): UpstreamDocument[] {
     return [...this.store.entries()]
       .filter(([key]) => key.indexOf(encodeURIComponent(realmURL)) === 0)

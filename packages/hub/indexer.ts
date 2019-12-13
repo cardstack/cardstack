@@ -2,13 +2,12 @@ import { CardWithId, CardId } from './card';
 import { Batch } from './pgsearch/pgclient';
 import CardstackError from './error';
 
-export interface IndexerFactory {
-  new (realmCard: CardWithId): Indexer;
+export interface IndexerFactory<Meta> {
+  new (realmCard: CardWithId): Indexer<Meta>;
 }
-export type Meta<T> = T; // I really wanted to do something like: Meta<T extends JSON.Value> = T, but i need some help
 
-export interface Indexer {
-  update(meta: Meta<any>, ops: IndexingOperations): Promise<Meta<any> | void>;
+export interface Indexer<Meta> {
+  update(meta: Meta, ops: IndexingOperations): Promise<Meta | void>;
 }
 
 export class IndexingOperations {
@@ -25,6 +24,7 @@ export class IndexingOperations {
   }
 
   async beginReplaceAll() {
+    // TODO move generation to the batch, and remove the generation from the Card
     this.generation = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
   }
 
