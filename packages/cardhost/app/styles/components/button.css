@@ -102,6 +102,52 @@
   --icon-url: url('/assets/images/buttons/library-active.svg');
 }
 
+.ch-button--icon.eye-on {
+  --icon-url: url('/assets/images/buttons/eye-on.svg');
+  background-size: 30px;
+  margin-right: 15px;
+}
+.ch-button--icon.eye-on:hover {
+  --icon-url: url('/assets/images/buttons/eye-on.svg');
+  opacity: 0.5;
+  filter: alpha(opacity=50);
+}
+
+.ch-button--icon.eye-off {
+  --icon-url: url('/assets/images/buttons/eye-off.svg');
+  background-size: 30px;
+  margin-right: 15px;
+}
+
+.ch-button--icon.eye-off:hover {
+  --icon-url: url('/assets/images/buttons/eye-off.svg');
+  opacity: 0.5;
+  filter: alpha(opacity=50);
+}
+
+.ch-button--icon.dock-right {
+  --icon-url: url('/assets/images/buttons/dock-right-secondary.svg');
+  background-size: 25px 25px;
+}
+
+.ch-button--icon.dock-right.selected {
+  --icon-url: url('/assets/images/buttons/dock-right.svg');
+}
+
+.ch-button--icon.dock-bottom {
+  --icon-url: url('/assets/images/buttons/dock-bottom-secondary.svg');
+  background-size: 25px 25px;
+}
+
+.ch-button--icon.dock-bottom.selected {
+  --icon-url: url('/assets/images/buttons/dock-bottom.svg');
+}
+
+.ch-button--icon.dock-bottom:hover, .ch-button--icon.dock-right:hover {
+  opacity: 0.5;
+  filter: alpha(opacity=50);
+}
+
 .ch-button--save {
   --width: 140px;
   position: relative;
