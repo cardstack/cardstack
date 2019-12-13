@@ -12,6 +12,10 @@ export default class Queue {
   private handlers: Map<string, Function> = new Map();
   notifiers: Map<string, JobNotifier> = new Map();
 
+  // TODO I wonder if ther eis some sort of queue configuration such that you
+  // can inform the system that it is serviced by a particular category of
+  // handlers. since multiple queues belong to a single category of handlers. It
+  // seems redundant to have to pass in the category for the job...
   async publish<T>(queue: string, category: string, args: PgPrimitive): Promise<Job<T>> {
     let ensureQueue: Expression = [`insert into queues (name) values (`, param(queue), `) on conflict do nothing`];
     await this.pgclient.query(ensureQueue);
