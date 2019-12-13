@@ -1,3 +1,5 @@
+let nonce = 0;
+
 export class Container {
   private cache = new Map() as Map<CacheKey, CacheEntry>;
   private teardownPromise: Promise<void[]> | undefined;
@@ -13,10 +15,13 @@ export class Container {
   }
 
   private _lookup(name: string): CacheEntry {
-    return this._instantiate(name, () => {
-      let factory = this.lookupFactory(name);
-      return new factory();
-    });
+    let cached = this.cache.get(name);
+    if (cached) {
+      return cached;
+    }
+
+    let factory = this.lookupFactory(name);
+    return this.provideInjections(() => new factory(), name);
   }
 
   private lookupFactory(name: string): Factory<any> {
@@ -36,36 +41,29 @@ export class Container {
   async instantiate<T, A>(factory: FactoryWithArg<T, A>, arg: A): Promise<T>;
   async instantiate<T>(factory: Factory<T>): Promise<T>;
   async instantiate<T, A>(factory: any, arg?: A): Promise<T> {
-    let { promise, instance } = this._instantiate(
-      factory,
-      () => {
-        if (arguments.length === 1) {
-          return new factory();
-        } else {
-          return new factory(arg);
-        }
-      },
-      true
-    );
+    let { instance, promise } = this.provideInjections(() => {
+      if (arguments.length === 1) {
+        return new factory();
+      } else {
+        return new factory(arg);
+      }
+    });
+
     await promise;
     return instance;
   }
 
-  private _instantiate<T>(identityKey: CacheKey, create: () => T, noCache?: boolean): CacheEntry {
-    let cached = this.cache.get(identityKey);
-    if (!noCache && cached) {
-      return cached;
-    }
-
+  private provideInjections<T>(create: () => T, cacheKey?: CacheKey): CacheEntry {
     let pending = new Map() as PendingInjections;
     pendingInstantiationStack.unshift(pending);
-    let instance: any;
     let result: CacheEntry;
     try {
-      instance = create();
+      let instance = create();
       ownership.set(instance, this);
-      result = new CacheEntry(identityKey, instance, pending);
-      this.cache.set(identityKey, result);
+      result = new CacheEntry(cacheKey ?? `anonymous_${nonce++}`, instance, pending);
+      if (cacheKey) {
+        this.cache.set(cacheKey, result);
+      }
       for (let [name, entry] of pending.entries()) {
         entry.cacheEntry = this._lookup(name);
       }
@@ -226,7 +224,7 @@ class CacheEntry {
   }
 }
 
-type CacheKey = string | Function;
+type CacheKey = string;
 
 let mappings = new WeakMap() as WeakMap<Registry, Map<string, Factory<any>>>;
 let pendingInstantiationStack = [] as PendingInjections[];

@@ -70,18 +70,6 @@ describe('hub/dependency-injection', function() {
     expect(thing.options).to.deep.equal({ quiet: true });
   });
 
-  it('container teardown call teardown on container.instantiated instance', async function() {
-    let isTornDown = false;
-    class X {
-      async teardown() {
-        isTornDown = true;
-      }
-    }
-    await container.instantiate(X);
-    await container.teardown();
-    expect(isTornDown).to.equal(true);
-  });
-
   it('container teardown call teardown on container.lookup instance', async function() {
     exampleServiceTornDown = false;
 
