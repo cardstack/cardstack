@@ -1,15 +1,14 @@
 import { CardWithId } from './card';
 import { Batch } from './pgsearch/pgclient';
-import * as JSON from 'json-typescript';
 import CardstackError from './error';
 
 export interface IndexerFactory {
   new (realmCard: CardWithId): Indexer;
 }
-export type IndexingMeta = JSON.Object | null;
+export type Meta<T> = T; // I really wanted to do something like: Meta<T extends JSON.Value> = T, but i need some help
 
 export interface Indexer {
-  update(meta: IndexingMeta, ops: IndexingOperations): Promise<IndexingMeta | void>;
+  update(meta: Meta<any>, ops: IndexingOperations): Promise<Meta<any> | void>;
 }
 
 export class IndexingOperations {

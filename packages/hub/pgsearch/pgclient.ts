@@ -330,6 +330,10 @@ export default class PgClient {
 }
 
 export class Batch {
+  // TODO this will eventually be the thing we used to call "touched" in order
+  // to calculate the invalidations.
+  private _saved: CardId[] = [];
+
   constructor(private client: PgClient, private cards: ScopedCardService) {}
 
   async save(card: CardWithId) {
@@ -344,6 +348,7 @@ export class Batch {
     /* eslint-enable @typescript-eslint/camelcase */
 
     await this.client.queryCards(this.cards, upsert('cards', 'cards_pkey', row));
+    this._saved.push({ realm: card.realm, originalRealm: card.originalRealm, localId: card.localId });
     log.debug('save realm: %s original realm: %s local id: %s', card.realm, card.originalRealm, card.localId);
   }
 
@@ -358,6 +363,10 @@ export class Batch {
   }
 
   async done() {}
+
+  get saved() {
+    return this._saved;
+  }
 }
 
 declare module '@cardstack/hub/dependency-injection' {
