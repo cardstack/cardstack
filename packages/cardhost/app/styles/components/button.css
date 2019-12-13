@@ -148,6 +148,24 @@
   filter: alpha(opacity=50);
 }
 
+.ch-button--icon.responsive {
+  --icon-url: url('/assets/images/buttons/responsive-inactive.svg');
+  background-size: 25px 25px;
+}
+
+.ch-button--icon.responsive.selected {
+  --icon-url: url('/assets/images/buttons/responsive-active.svg');
+}
+
+.ch-button--icon.full-width {
+  --icon-url: url('/assets/images/buttons/full-width-inactive.svg');
+  background-size: 25px 25px;
+}
+
+.ch-button--icon.full-width.selected {
+  --icon-url: url('/assets/images/buttons/full-width-active.svg');
+}
+
 .ch-button--save {
   --width: 140px;
   position: relative;
