@@ -38,7 +38,7 @@
     "node": ">= 12"
   },
   "scripts": {
-    "test": "mocha ../test-support/bin/run.js --timeout 10000"
+    "test": "mocha ../test-support/bin/run.js --timeout 5000"
   },
   "volta": {
     "node": "12.13.1"

@@ -15,8 +15,8 @@ describe('hub/queue', function() {
   });
 
   it('it can run a job', async function() {
-    let job = await queue.publish('plus1', 17);
-    queue.subscribe('plus1', async (a: number) => a + 1);
+    let job = await queue.publish('first-ephemeral-realm-incrementing', 'increment', 17);
+    queue.subscribe('increment', async (a: number) => a + 1);
     let result = await job.done;
     expect(result).equals(18);
   });

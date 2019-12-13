@@ -35,7 +35,7 @@ export function up(pgm: MigrationBuilder) {
   /* eslint-disable @typescript-eslint/camelcase */
   pgm.createTable('jobs', {
     id: 'id', // shorthand for primary key that is an auto incremented id
-    name: {
+    category: {
       type: 'varchar',
       notNull: true,
     },

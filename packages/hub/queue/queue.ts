@@ -1,24 +1,30 @@
 import { inject } from '../dependency-injection';
-import { param, PgPrimitive, Expression } from '../pgsearch/util';
+import { param, PgPrimitive, Expression, separatedByCommas, addExplicitParens } from '../pgsearch/util';
 import { Memoize } from 'typescript-memoize';
+
+interface JobNotifier {
+  resolve: Function | undefined;
+  reject: Function | undefined;
+}
 
 export default class Queue {
   private pgclient = inject('pgclient');
   private handlers: Map<string, Function> = new Map();
-  private jobs: Map<string, Promise<void>> = new Map();
+  notifiers: Map<string, JobNotifier> = new Map();
 
-  async publish<T>(name: string, arg: PgPrimitive): Promise<Job<T>> {
-    let queueName = `${name}_${JSON.stringify(arg)}`;
-
-    let ensureQueue: Expression = [`insert into queues (name) values (`, param(queueName), `) on conflict do nothing`];
+  async publish<T>(queue: string, category: string, args: PgPrimitive): Promise<Job<T>> {
+    let ensureQueue: Expression = [`insert into queues (name) values (`, param(queue), `) on conflict do nothing`];
     await this.pgclient.query(ensureQueue);
 
+    let jobRow: { [name: string]: PgPrimitive } = { args, queue, category };
+    let nameExpressions = Object.keys(jobRow).map(name => [name]);
+    let valueExpressions = Object.keys(jobRow).map(name => [param(jobRow[name])]);
     let newJob: Expression = [
-      'insert into jobs (name, args, queue) values (',
-      param(name),
-      ',',
-      param(arg),
-      ') returning id',
+      'insert into jobs',
+      ...addExplicitParens(separatedByCommas(nameExpressions)),
+      'values',
+      ...addExplicitParens(separatedByCommas(valueExpressions)),
+      'returning id',
     ];
     let {
       rows: [{ id: jobId }],
@@ -28,13 +34,12 @@ export default class Queue {
   }
 
   // Services can register async function handlers that are invoked when a job is kicked off
-  // for the job "name"
-  subscribe<A, T>(name: string, handler: (arg: A) => Promise<T>) {
-    this.handlers.set(name, handler);
+  subscribe<A, T>(category: string, handler: (arg: A) => Promise<T>) {
+    this.handlers.set(category, handler);
   }
 
-  unsubscribe(name: string) {
-    this.handlers.delete(name);
+  unsubscribe(category: string) {
+    this.handlers.delete(category);
   }
 }
 
@@ -48,6 +53,8 @@ export class Job<T> {
       resolve = r;
       reject = e;
     });
+    this.queue.notifiers.set(this.jobId, { resolve, reject });
+
     return {
       resolve,
       reject,
