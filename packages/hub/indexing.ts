@@ -32,10 +32,6 @@ export default class IndexingService {
       realms.map(async realmCard => {
         let indexerFactory = await realmCard.loadFeature('indexer');
 
-        // TODO need to make sure that if this hub does not have a handler for
-        // the realm it does not pick up this job from the queue so that some
-        // other hub that knows how to index realm this can process this item
-        // from the queue.
         if (!indexerFactory) {
           return;
         }

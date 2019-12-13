@@ -331,6 +331,9 @@ export default class PgClient {
 
 export class Batch {
   private _touched: CardId[] = [];
+  private generations: {
+    [realm: string]: number | undefined;
+  } = {};
 
   constructor(private client: PgClient, private cards: ScopedCardService) {}
 
@@ -343,7 +346,7 @@ export class Batch {
       original_realm: param(card.originalRealm),
       local_id: param(card.localId),
       pristine_doc: param(((await card.asPristineDoc()).jsonapi as unknown) as JSON.Object),
-      generation: param(card.generation || null),
+      generation: param(this.generations[card.realm] || null),
     };
     /* eslint-enable @typescript-eslint/camelcase */
 
@@ -354,24 +357,33 @@ export class Batch {
   async delete(id: CardId) {
     this._touched.push(id);
     await this.client.query([
-      'delete from cards where realm =',
-      param(id.realm),
-      'and original_realm = ',
-      param(id.originalRealm ?? id.realm),
-      'and local_id = ',
-      param(id.localId),
+      'delete from cards where ',
+      ...every([
+        ['realm =', param(id.realm)],
+        ['original_realm = ', param(id.originalRealm ?? id.realm)],
+        ['local_id = ', param(id.localId)],
+      ]),
     ]);
     log.debug('delete realm: %s original realm: %s local id: %s', id.realm, id.originalRealm ?? id.realm, id.localId);
   }
 
-  async deleteOtherGenerations(realm: string, currentGeneration: number) {
+  createGeneration(realm: string) {
+    this.generations[realm] = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+  }
+
+  async deleteOlderGenerations(realm: string) {
+    if (this.generations[realm] == null) {
+      throw new CardstackError(
+        `tried to remove older generation of cards before new generation was created for realm '${realm}'`
+      );
+    }
     await this.client.query([
-      'delete from cards where (generation !=',
-      param(currentGeneration),
-      'or generation is null) and realm =',
+      'delete from cards where ',
+      ...addExplicitParens(['generation !=', param(this.generations[realm]!), 'or generation is null']),
+      ' and realm =',
       param(realm),
     ]);
-    log.debug(`deleted generations other than ${currentGeneration} for cards in realm '${realm}'`);
+    log.debug(`deleted generations other than ${this.generations[realm]} for cards in realm '${realm}'`);
   }
 
   async done() {}

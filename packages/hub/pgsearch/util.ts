@@ -35,8 +35,8 @@ export type CardExpression = (string | Param | FieldQuery | FieldValue | FieldAr
 
 export type Expression = (string | Param)[];
 
-export function addExplicitParens(expression: CardExpression): CardExpression;
 export function addExplicitParens(expression: Expression): Expression;
+export function addExplicitParens(expression: CardExpression): CardExpression;
 export function addExplicitParens(expression: unknown[]): unknown[] {
   if (expression.length === 0) {
     return expression;
@@ -45,7 +45,9 @@ export function addExplicitParens(expression: unknown[]): unknown[] {
   }
 }
 
-export function separatedByCommas(expressions: CardExpression[]): CardExpression {
+export function separatedByCommas(expressions: Expression[]): Expression;
+export function separatedByCommas(expressions: CardExpression[]): CardExpression;
+export function separatedByCommas(expressions: unknown[][]): unknown {
   return expressions.reduce((accum, expression) => {
     if (accum.length > 0) {
       accum.push(',');
@@ -62,11 +64,15 @@ export function isParam(expression: any): expression is Param {
   return expression?.hasOwnProperty('param');
 }
 
-export function every(expressions: CardExpression[]): CardExpression {
+export function every(expressions: Expression[]): Expression;
+export function every(expressions: CardExpression[]): CardExpression;
+export function every(expressions: unknown[][]): unknown {
   if (expressions.length === 0) {
     return ['true']; // this is "SQL true", not javascript true
   }
-  return expressions.map(addExplicitParens).reduce((accum, expression) => [...accum, 'AND', ...expression]);
+  return expressions
+    .map(expression => addExplicitParens(expression as Expression | CardExpression))
+    .reduce((accum, expression: CardExpression | Expression) => [...accum, 'AND', ...expression]);
 }
 
 export function fieldQuery(typeContext: CardId, path: string, errorHint: string): FieldQuery {
@@ -105,11 +111,15 @@ export function fieldArity(
   };
 }
 
-export function any(expressions: CardExpression[]): CardExpression {
+export function any(expressions: Expression[]): Expression;
+export function any(expressions: CardExpression[]): CardExpression;
+export function any(expressions: unknown[][]): unknown {
   if (expressions.length === 0) {
     return ['false']; // this is "SQL false", not javascript false
   }
-  return expressions.map(addExplicitParens).reduce((accum, expression) => [...accum, 'OR', ...expression]);
+  return expressions
+    .map(expression => addExplicitParens(expression as CardExpression | Expression))
+    .reduce((accum, expression: CardExpression | Expression) => [...accum, 'OR', ...expression]);
 }
 
 export function safeName(name: string) {

@@ -55,7 +55,7 @@ export function up(pgm: MigrationBuilder) {
     },
     queue: {
       type: 'varchar',
-      references: 'queues.name',
+      references: 'queues',
       notNull: true,
     },
     result: 'jsonb',

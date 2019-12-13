@@ -127,7 +127,6 @@ function cardHasIds(card: Card): asserts card is CardWithId {
 export class CardWithId extends Card {
   id!: string;
   localId!: string;
-  generation?: number;
 
   constructor(jsonapi: SingleResourceDoc) {
     if (typeof jsonapi.data.attributes?.realm !== 'string') {
