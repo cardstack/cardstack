@@ -30,6 +30,14 @@
   background: url(/assets/images/cardstack-logo.svg) 30px 30px/24px 25px no-repeat;
 }
 
+.cardhost-welcome-left-edge--nav button {
+  background: none;
+  box-shadow: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
 .cardhost-welcome-left-edge--nav ul {
   list-style-type: none;
   margin: 0;
@@ -89,11 +97,14 @@
   letter-spacing: 0.015em;
 }
 
-.cardhost-section--header > svg {
+.cardhost-section--header svg {
   --icon-color: var(--ch-highlight);
-
   margin-right: 20px;
   fill: var(--ch-highlight);
+}
+
+.cardhost-section--header .permalink {
+  font-size: 36px;
 }
 
 
