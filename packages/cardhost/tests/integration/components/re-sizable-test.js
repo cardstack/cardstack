@@ -34,13 +34,13 @@ module('Integration | Component | re-sizable', function(hooks) {
     await render(hbs`<ReSizable @directions={{this.directions}}>Hello</ReSizable>`);
     await settled();
 
-    assert.equal(this.element.querySelectorAll('div.resizer').length, 8);
+    assert.equal(this.element.querySelectorAll('button.resizer').length, 8);
 
     this.set('directions', ['top', 'right']);
 
-    assert.equal(this.element.querySelectorAll('div.resizer').length, 2);
-    assert.ok(this.element.querySelector('div.resizer.top'));
-    assert.notOk(this.element.querySelector('div.resizer.bottom'));
+    assert.equal(this.element.querySelectorAll('button.resizer').length, 2);
+    assert.ok(this.element.querySelector('button.resizer.top'));
+    assert.notOk(this.element.querySelector('button.resizer.bottom'));
   });
 
   test('should react to width/height changes', async function(assert) {
