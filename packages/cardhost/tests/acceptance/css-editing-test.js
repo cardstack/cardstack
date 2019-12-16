@@ -22,6 +22,17 @@ const cardData = {
   ],
 };
 
+// let animation finish before taking screenshot
+
+const waitForAnimation = function(cb) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      cb();
+      resolve('done');
+    }, 1000);
+  });
+};
+
 const scenario = new Fixtures({
   create(factory) {
     setupMockUser(factory);
@@ -78,7 +89,7 @@ module('Acceptance | css editing', function(hooks) {
     assert.dom('[data-test-editor-pane]').exists();
     await click('[data-test-hide-editor-btn]');
     assert.dom('.cardhost-card-theme-editor.hidden').exists();
-    percySnapshot(assert);
+    await waitForAnimation(() => percySnapshot(assert));
   });
 
   test('toggling editor docking', async function(assert) {
@@ -88,11 +99,29 @@ module('Acceptance | css editing', function(hooks) {
     assert.equal(currentURL(), `/cards/${card1Id}?editingCss=true`);
     assert.dom('[data-test-dock-bottom]').exists();
     assert.dom('[data-test-dock-location="right"]');
-    percySnapshot('css editor docked right');
+    await waitForAnimation(() => percySnapshot('css editor docked right'));
     await click('[data-test-dock-bottom]');
     assert.dom('[data-test-dock-location="bottom"]');
-    percySnapshot('css editor docked bottom');
+    await waitForAnimation(() => percySnapshot('css editor docked bottom'));
     await click('[data-test-dock-right]');
     assert.dom('[data-test-dock-location="right"]');
+  });
+
+  test('toggling card width', async function(assert) {
+    await login();
+    await createCards(cardData);
+    await click('[data-test-card-custom-style-button]');
+    assert.equal(currentURL(), `/cards/${card1Id}?editingCss=true`);
+    // make sure initial state is correct
+    assert.dom('[data-test-responsive-btn]').exists();
+    assert.dom('[data-test-responsive-btn]').hasClass('selected');
+    assert.dom('[data-test-full-width-btn]').exists();
+    assert.dom('[data-test-full-width-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-cardhost-cards]').hasClass('responsive');
+    // toggle to full width
+    await click('[data-test-full-width-btn]');
+    assert.dom('[data-test-full-width-btn]').hasClass('selected');
+    assert.dom('[data-test-cardhost-cards]').hasClass('full-width');
+    await waitForAnimation(() => percySnapshot(assert));
   });
 });
