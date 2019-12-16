@@ -161,9 +161,10 @@
   font-size: 13px;
   text-align: center;
   transform: none;
-  transition: padding var(--ch-card-transition-duration) ease-in-out calc(var(--ch-card-transition-duration) / 3);
+  transition: padding var(--ch-card-transition-duration) ease-in-out calc(var(--ch-card-transition-duration) / 3), transform var(--ch-card-transition-duration) ease-in-out calc(var(--ch-card-transition-duration) / 3);
 }
 
 .card-catalog > *:hover .embedded-card-label {
-  padding-top: 20px;
+  padding-top: 6px;
+  transform: scale(.85);
 }
