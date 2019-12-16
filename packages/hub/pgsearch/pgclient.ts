@@ -1,4 +1,4 @@
-import { Pool, Client, QueryResult, PoolClient } from 'pg';
+import { Pool, Client, QueryResult, PoolClient, Notification } from 'pg';
 import migrate from 'node-pg-migrate';
 import logger from '@cardstack/logger';
 import postgresConfig from './postgres-config';
@@ -142,6 +142,14 @@ export default class PgClient {
     } finally {
       client.release();
     }
+  }
+
+  async listen(channel: string, handler: (notification: Notification) => void, fn: () => Promise<void>) {
+    await this.withConnection(async ({ client, query }) => {
+      client.on('notification', handler);
+      await query(['LISTEN', safeName(channel)]);
+      await fn();
+    });
   }
 
   private async cardQueryToSQL(cards: ScopedCardService, query: CardExpression) {
