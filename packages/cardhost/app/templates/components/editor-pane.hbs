@@ -1,15 +1,32 @@
-<ReSizable ...attributes class="cardhost-card-theme-editor"
-  @width={{this.width}} @directions={{this.directions}} @height={{this.height}}
-  @classNames={{this.classNames}}>
+<ReSizable
+  ...attributes
+  class="cardhost-card-theme-editor"
+  @width={{this.width}}
+  @directions={{this.directions}}
+  @height={{this.height}}
+  @classNames={{this.classNames}}
+>
   <div class="resizable-content">
-    <div class="editor-section">
-      <CodeEditor @title="CSS" @code={{@model.isolatedCss}} @language="css" @readOnly={{false}} @resizable={{true}}
-        @updateCode={{action "updateCode"}} class="editor-pane-code" />
+    <div class="editor-section" aria-label={{this.monacoKeyboardInstructions}}>
+      <CodeEditor
+        @title="CSS"
+        @code={{@model.isolatedCss}}
+        @language="css"
+        @readOnly={{false}}
+        @resizable={{true}}
+        @updateCode={{action "updateCode"}}
+        class="editor-pane--container-highlighted"
+      />
     </div>
 
     <div class="editor-section">
-      <CodeEditor @title="HTML" @code={{this.markup}} @language="handlebars" @readOnly={{true}} @resizable={{true}}
-        class="editor-pane-code" />
+      <CodeEditor
+        @title="HTML"
+        @code={{this.markup}}
+        @language="handlebars"
+        @readOnly={{true}}
+        @resizable={{true}} 
+      />
     </div>
     {{svg-jar "icon-grabber" class="drag-handle"}}
   </div>

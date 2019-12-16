@@ -8,23 +8,13 @@
 
   width: 100%;
   height: 100vh;
+  transition: var(--ch-card-background-color-animate);
   background-color: var(--ch-default);
   overflow: hidden;
   padding-top: var(--padding-top);
   padding-left: var(--padding-left);
   padding-right: var(--padding-right);
   padding-bottom: var(--padding-bottom);
-}
-
-.cardhost-cards.editing-css {
-  padding-left: 0;
-  width: 40%;
-  transition: width 0.3s ease-in-out;
-  padding-right: 0;
-}
-
-.cardhost-cards.editing-css.full-width {
-  width: 100%;
 }
 
 /* TODO: Remove this after right-edge is displayed on edit view */
