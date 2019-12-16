@@ -5,18 +5,14 @@ import { myOrigin } from './origin';
 import { IndexingOperations } from './indexer';
 import * as JSON from 'json-typescript';
 import { upsert, param, Expression } from './pgsearch/util';
-import { CardId } from './card';
 
-export interface IndexedReport {
-  [realm: string]: CardId[];
-}
 export default class IndexingService {
   cards = inject('cards');
   pgclient = inject('pgclient');
 
   // For all the realms ensure that each realm has run indexing at least once
   // and then resolve this promise.
-  async update(): Promise<IndexedReport> {
+  async update(): Promise<void> {
     // Note that the default page size for search is 10. we may want to
     // explicitely set the page size here to something very high...
     let { cards: realms } = await this.cards.as(Session.INTERNAL_PRIVILEGED).search({
@@ -28,7 +24,7 @@ export default class IndexingService {
       },
     });
 
-    let touched = await Promise.all(
+    await Promise.all(
       realms.map(async realmCard => {
         let indexerFactory = await realmCard.loadFeature('indexer');
 
@@ -55,18 +51,8 @@ export default class IndexingService {
             params: param(newMeta || null),
           }) as Expression
         );
-
-        return batch.touched;
       })
     );
-
-    let indexedReport: IndexedReport = {};
-    let i = 0;
-    for (let realmCard of realms) {
-      indexedReport[realmCard.localId] = touched[i++] || [];
-    }
-
-    return indexedReport;
   }
 }
 

@@ -339,7 +339,6 @@ export default class PgClient {
 }
 
 export class Batch {
-  private _touched: CardId[] = [];
   private generations: {
     [realm: string]: number | undefined;
   } = {};
@@ -347,8 +346,6 @@ export class Batch {
   constructor(private client: PgClient, private cards: ScopedCardService) {}
 
   async save(card: CardWithId) {
-    this._touched.push({ realm: card.realm, originalRealm: card.originalRealm, localId: card.localId });
-
     /* eslint-disable @typescript-eslint/camelcase */
     let row = {
       realm: param(card.realm),
@@ -364,7 +361,6 @@ export class Batch {
   }
 
   async delete(id: CardId) {
-    this._touched.push(id);
     await this.client.query([
       'delete from cards where ',
       ...every([
@@ -396,10 +392,6 @@ export class Batch {
   }
 
   async done() {}
-
-  get touched() {
-    return this._touched;
-  }
 }
 
 declare module '@cardstack/hub/dependency-injection' {
