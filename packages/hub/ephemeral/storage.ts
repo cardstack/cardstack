@@ -1,5 +1,6 @@
 import { UpstreamDocument, UpstreamIdentity } from '../document';
 import { CardId } from '../card';
+
 interface StoreEntry {
   id: CardId;
   doc: UpstreamDocument | null;
@@ -40,6 +41,18 @@ export class EphemeralStorage {
       .filter(([key]) => key.indexOf(encodeURIComponent(realmURL)) === 0)
       .filter(([, entry]) => entry.generation > generation)
       .map(([, entry]) => entry);
+  }
+
+  // Supports some internal testing. Allows us to distinguish which cards are
+  // being indexed incrementally vs full
+  async inThePast(fn: () => Promise<void>) {
+    let gen = this.generationCounter;
+    try {
+      this.generationCounter = -Infinity;
+      await fn();
+    } finally {
+      this.generationCounter = gen;
+    }
   }
 }
 

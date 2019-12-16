@@ -126,29 +126,62 @@ describe('hub/indexing', function() {
   });
 
   it('it does not index unchanged cards since the last time the ephemeral realm was indexed', async function() {
+    async function cardsWithStep(n: number): Promise<number> {
+      let found = await cards.as(Session.INTERNAL_PRIVILEGED).search({});
+      let steps = await Promise.all(found.cards.map(c => c.field('step')));
+      return steps.filter(step => step === n).length;
+    }
+
     let realm = `${myOrigin}/api/realms/first-ephemeral-realm`;
     await createRealm(`${myOrigin}/api/realms/meta`, realm);
 
-    let card = new CardWithId(testCard({ realm, localId: '1' }, { foo: 'bar' }).jsonapi);
+    // Add a new card
+    let card = new CardWithId(testCard({ realm, localId: '1' }, { foo: 'bar', step: 1 }).jsonapi);
     storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
-    let report = await indexing.update();
-    expect(report[realm].length).to.equal(1);
+    await indexing.update();
+    expect(await cardsWithStep(1)).to.equal(1);
 
-    card = new CardWithId(testCard({ realm, localId: '2' }, { foo: 'bar' }).jsonapi);
+    // Add another new card
+    card = new CardWithId(testCard({ realm, localId: '2' }, { foo: 'bar', step: 2 }).jsonapi);
     storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
-    report = await indexing.update();
-    expect(report[realm].length).to.equal(1);
 
-    card = new CardWithId(testCard({ realm, localId: '1' }, { foo: 'bar' }).jsonapi);
+    // Maniuplate existing card so we would notice if it gets indexed when it shouldn't.
+    await storage.inThePast(async () => {
+      card = new CardWithId(testCard({ realm, localId: '1' }, { foo: 'bar', step: 2 }).jsonapi);
+      storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
+    });
+
+    await indexing.update();
+    let n = await cardsWithStep(2);
+    expect(n).to.equal(1);
+
+    // Update first card
+    card = new CardWithId(testCard({ realm, localId: '1' }, { foo: 'bar', step: 3 }).jsonapi);
     storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
-    report = await indexing.update();
-    expect(report[realm].length).to.equal(1);
 
+    // Maniuplate other existing card so we would notice if it gets indexed when it shouldn't.
+    await storage.inThePast(async () => {
+      card = new CardWithId(testCard({ realm, localId: '2' }, { foo: 'bar', step: 3 }).jsonapi);
+      storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
+    });
+
+    await indexing.update();
+    expect(await cardsWithStep(3)).to.equal(1);
+
+    // Delete card 2
     storage.store(null, card.localId, card.realm);
-    report = await indexing.update();
-    expect(report[realm].length).to.equal(1);
 
-    report = await indexing.update();
-    expect(report[realm].length).to.equal(0);
+    // Maniuplate other existing card so we would notice if it gets indexed when it shouldn't.
+    await storage.inThePast(async () => {
+      card = new CardWithId(testCard({ realm, localId: '1' }, { foo: 'bar', step: 4 }).jsonapi);
+      storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
+    });
+
+    await indexing.update();
+    expect(await cardsWithStep(4)).to.equal(0);
+
+    // stable case
+    await indexing.update();
+    expect(await cardsWithStep(4)).to.equal(0);
   });
 });

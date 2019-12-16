@@ -71,6 +71,11 @@ export class Card {
     }
   }
 
+  async field(name: string): Promise<any> {
+    let model = this.jsonapi.data.attributes?.model as { attributes: { [name: string]: any } };
+    return model?.attributes[name];
+  }
+
   async asPristineDoc(): Promise<PristineDocument> {
     let copied = cloneDeep(this.jsonapi);
     if (!copied.data.attributes) {
