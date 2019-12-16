@@ -4,6 +4,7 @@ import * as monaco from 'monaco-editor';
 import { action } from '@ember/object';
 import { restartableTask } from 'ember-concurrency-decorators';
 import { timeout } from 'ember-concurrency';
+import ENV from '@cardstack/cardhost/config/environment';
 
 /**
  * <CodeEditor> takes the following arguments:
@@ -102,7 +103,9 @@ export default class CodeEditor extends Component {
     // Save editor instance locally, so we can reference it in other methods
     this.editor = editor;
 
-    if (this.resizable) {
+    // turn off resize in testing, otherwise it breaks any acceptance test
+    // that visits a page with a resizable code editor
+    if (this.resizable && ENV.environment !== 'test') {
       this.startResizeWatcher.perform(el);
     }
   }
