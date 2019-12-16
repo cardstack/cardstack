@@ -87,7 +87,14 @@ export default class CodeEditor extends Component {
     // `create` constructs a code editor and inserts it into the DOM.
     // el is the element that {{did-insert}} was used on.
     let codeModel = monaco.editor.createModel(this.args.code, this.args.language);
-    el.style.height = '100%';
+
+    // use calculated height for the ui-components page
+    if (!this.resizable) {
+      let height = codeModel.getLineCount() * 23;
+      el.style.height = height.toString() + 'px';
+    } else {
+      el.style.height = '100%';
+    }
 
     let editor = monaco.editor.create(el, {
       model: codeModel,
