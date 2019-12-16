@@ -24,14 +24,7 @@ export function up(pgm: MigrationBuilder) {
     primaryKey: ['realm'],
   });
 
-  pgm.createTable('queues', {
-    name: {
-      type: 'varchar',
-      primaryKey: true,
-    },
-  });
-
-  pgm.createType('job_statuses', ['not done', 'completed', 'failed', 'fulfilled', 'rejected']);
+  pgm.createType('job_statuses', ['unfulfilled', 'resolved', 'rejected']);
   /* eslint-disable @typescript-eslint/camelcase */
   pgm.createTable('jobs', {
     id: 'id', // shorthand for primary key that is an auto incremented id
@@ -42,7 +35,7 @@ export function up(pgm: MigrationBuilder) {
     args: 'jsonb',
     status: {
       type: 'job_statuses',
-      default: 'not done',
+      default: 'unfulfilled',
       notNull: true,
     },
     created_at: {
@@ -55,7 +48,6 @@ export function up(pgm: MigrationBuilder) {
     },
     queue: {
       type: 'varchar',
-      references: 'queues',
       notNull: true,
     },
     result: 'jsonb',

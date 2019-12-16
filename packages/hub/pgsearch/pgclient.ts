@@ -1,4 +1,4 @@
-import { Pool, Client, QueryResult } from 'pg';
+import { Pool, Client, QueryResult, PoolClient } from 'pg';
 import migrate from 'node-pg-migrate';
 import logger from '@cardstack/logger';
 import postgresConfig from './postgres-config';
@@ -130,14 +130,15 @@ export default class PgClient {
     }
   }
 
-  async begin<T>(fn: (connection: { query: (e: Expression) => Promise<QueryResult> }) => Promise<T>): Promise<T> {
+  async withConnection<T>(
+    fn: (connection: { client: PoolClient; query: (e: Expression) => Promise<QueryResult> }) => Promise<T>
+  ): Promise<T> {
     let client = await this.pool.connect();
     let query = async (expression: Expression) => {
       return await client.query(this.expressionToSql(expression));
     };
     try {
-      await query(['begin']);
-      return await fn({ query });
+      return await fn({ query, client });
     } finally {
       client.release();
     }
