@@ -35,7 +35,8 @@
   box-shadow: none;
   border: none;
   cursor: pointer;
-  font-size: 1rem;
+  font: 400 13px/18px var(--ch-font-family);
+  letter-spacing: 0.015em;
 }
 
 .cardhost-welcome-left-edge--nav ul {
