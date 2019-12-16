@@ -86,12 +86,7 @@ export default class CodeEditor extends Component {
     // `create` constructs a code editor and inserts it into the DOM.
     // el is the element that {{did-insert}} was used on.
     let codeModel = monaco.editor.createModel(this.args.code, this.args.language);
-    if (!this.resizable) {
-      let height = codeModel.getLineCount() * 20;
-      el.style.height = height.toString() + 'px';
-    } else {
-      el.style.height = '100%';
-    }
+    el.style.height = '100%';
 
     let editor = monaco.editor.create(el, {
       model: codeModel,
@@ -108,7 +103,7 @@ export default class CodeEditor extends Component {
     this.editor = editor;
 
     if (this.resizable) {
-      // this.startResizeWatcher.perform(el);
+      this.startResizeWatcher.perform(el);
     }
   }
 
@@ -130,7 +125,7 @@ export default class CodeEditor extends Component {
 
   @restartableTask
   *startResizeWatcher(wrapper) {
-    wrapper.style['padding-bottom'] = '20px';
+    wrapper.style['padding-bottom'] = '2px';
 
     let { offsetWidth, offsetHeight } = wrapper;
 
