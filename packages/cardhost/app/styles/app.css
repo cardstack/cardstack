@@ -67,6 +67,7 @@ Until that work is done we are statically adding this css
   --ch-transition-time: 250ms;
   --ch-card-transition-duration: 300ms;
   --ch-card-background-color-animate: background-color 0.5s ease;
+  --ch-card-padding-animate: padding-right 0.3s ease;
 }
 
 /*

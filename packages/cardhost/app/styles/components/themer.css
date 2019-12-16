@@ -140,13 +140,12 @@
 
 .cardhost-cards.editing-css {
   padding-left: 0;
-  width: 40%;
-  transition: width 0.3s ease-in-out;
-  padding-right: 0;
-  transition: var(--ch-card-background-color-animate);
+  width: 100%;
+  padding-right: 60%;
+  transition: var(--ch-card-padding-animate), var(--ch-card-background-color-animate);
   background-color: var(--ch-dark-background);
 }
 
 .cardhost-cards.editing-css.full-width {
-  width: 100%;
+  padding-right: 0;
 }

@@ -8,7 +8,7 @@
 
   width: 100%;
   height: 100vh;
-  transition: var(--ch-card-background-color-animate);
+  transition: var(--ch-card-background-color-animate), var(--ch-card-padding-animate);
   background-color: var(--ch-default);
   overflow: hidden;
   padding-top: var(--padding-top);
