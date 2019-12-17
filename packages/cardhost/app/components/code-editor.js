@@ -32,7 +32,7 @@ export default class CodeEditor extends Component {
   // Sets default resize interval check in milliseconds.
   // This limits how often updatedDimensions is called.
   get resizeCheckIntervalMs() {
-    return this.args.resizeCheckIntervalMs || 2000;
+    return this.args.resizeCheckIntervalMs || 1000;
   }
 
   // readOnly defaults to true. Affects whether the editor lets you type in it
