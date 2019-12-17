@@ -24,7 +24,7 @@ export default class EphemeralIndexer implements Indexer<EphemeralMeta> {
     let entries = this.ephemeralStorage.entriesNewerThan(this.realmCard.localId, generation);
     for (let entry of entries) {
       if (entry.doc) {
-        await ops.save(new CardWithId(entry.doc.jsonapi));
+        await ops.save(entry.doc);
       } else {
         await ops.delete(entry.id);
       }

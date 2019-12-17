@@ -1,5 +1,6 @@
 import { CardWithId, CardId } from './card';
 import { Batch } from './pgsearch/pgclient';
+import { UpstreamDocument } from './document';
 
 export interface IndexerFactory<Meta> {
   new (realmCard: CardWithId): Indexer<Meta>;
@@ -12,8 +13,8 @@ export interface Indexer<Meta> {
 export class IndexingOperations {
   constructor(private realmCard: CardWithId, private batch: Batch) {}
 
-  async save(card: CardWithId) {
-    return await this.batch.save(card);
+  async save(doc: UpstreamDocument) {
+    return await this.batch.save(new CardWithId(doc.jsonapi));
   }
 
   async delete(id: CardId) {
