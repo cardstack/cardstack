@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { render, triggerEvent, settled } from '@ember/test-helpers';
+import { render, triggerEvent, settled, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { dasherize } from '@ember/string';
 
@@ -102,5 +102,43 @@ module('Integration | Component | re-sizable', function(hooks) {
       assert.dom('.re-sizable').hasStyle({ width: `${width}px` });
       assert.dom('.re-sizable').hasStyle({ height: `${height}px` });
     }
+  });
+
+  test('width should not exceed window dimensions', async function(assert) {
+    this.set('width', 200);
+    this.set('height', 150);
+    let direction = 'left';
+    this.set('directions', [direction]);
+    this.set('maxWidth', 800);
+    // as the component resizes, capture the resulting dimensions as this.width and this.height
+    this.set('onResize', (direction, dimensions) => this.setProperties(dimensions));
+    await render(
+      hbs`<ReSizable @width={{this.width}} @height={{this.height}} @onResize={{this.onResize}} @directions={{this.directions}}>Hello</ReSizable>`
+    );
+    await settled();
+    await triggerEvent(`.resizer.${direction}`, 'mousedown', { clientX: 110, clientY: 40 });
+    await triggerEvent(`.resizer.${direction}`, 'mousemove', { clientX: 2000 });
+    await triggerEvent(`.resizer.${direction}`, 'mouseup', {});
+    let actualWidth = Number(find('.re-sizable').style.width.replace('px', ''));
+    assert.ok(actualWidth < 800);
+  });
+
+  test('height should not exceed window dimensions', async function(assert) {
+    this.set('width', 200);
+    this.set('height', 150);
+    let direction = 'top';
+    this.set('directions', [direction]);
+    this.set('maxWidth', 800);
+    // as the component resizes, capture the resulting dimensions as this.width and this.height
+    this.set('onResize', (direction, dimensions) => this.setProperties(dimensions));
+    await render(
+      hbs`<ReSizable @width={{this.width}} @height={{this.height}} @onResize={{this.onResize}} @directions={{this.directions}}>Hello</ReSizable>`
+    );
+    await settled();
+    await triggerEvent(`.resizer.${direction}`, 'mousedown', { clientX: 110, clientY: 40 });
+    await triggerEvent(`.resizer.${direction}`, 'mousemove', { clientY: 2000 });
+    await triggerEvent(`.resizer.${direction}`, 'mouseup', {});
+    let actualHeight = Number(find('.re-sizable').style.height.replace('px', ''));
+    assert.ok(actualHeight < 800);
   });
 });

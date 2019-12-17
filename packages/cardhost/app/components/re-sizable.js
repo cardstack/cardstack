@@ -31,6 +31,14 @@ export default class ReSizable extends Component {
     );
   }
 
+  get maxWidth() {
+    return typeof this.args.maxWidth === 'number' ? this.args.maxWidth : document.body.clientWidth;
+  }
+
+  get maxHeight() {
+    return typeof this.args.maxHeight === 'number' ? this.args.maxWidth : document.body.clientHeight;
+  }
+
   @action
   setElement() {
     // done this way so that we only query once. If this was a getter instead,
@@ -158,12 +166,9 @@ export default class ReSizable extends Component {
       }
     }
 
-    // prevent resize from exceeding browser window dimensions
-    let maxHeight = document.body.clientHeight;
-    let maxWidth = document.body.clientWidth;
-
-    newHeight = newHeight > maxHeight ? maxHeight : newHeight;
-    newWidth = newWidth > maxWidth ? maxWidth : newWidth;
+    // prevent resize from exceeding browser window dimensions or maximums
+    newHeight = newHeight > this.maxHeight ? this.maxHeight : newHeight;
+    newWidth = newWidth > this.maxWidth ? this.maxWidth : newWidth;
 
     this.elementWidth = newWidth;
     this.elementHeight = newHeight;
