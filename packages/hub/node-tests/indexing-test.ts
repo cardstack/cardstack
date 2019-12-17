@@ -82,7 +82,7 @@ describe('hub/indexing', function() {
     expect(results.length).to.equal(2);
   });
 
-  it.skip('ephemeral cards do not persist in the index between container teardowns', async function() {
+  it('ephemeral cards do not persist in the index between container teardowns', async function() {
     let realm = `${myOrigin}/api/realms/first-ephemeral-realm`;
     await createRealm(`${myOrigin}/api/realms/meta`, realm);
 
@@ -102,6 +102,7 @@ describe('hub/indexing', function() {
     cards = await env.container.lookup('cards');
     indexing = await env.container.lookup('indexing');
     storage = await env.container.lookup('ephemeralStorage');
+    (await env.container.lookup('queue')).launchJobRunner();
 
     // card is not yet indexed in new ephemeral storage
     // This card _will_ live through the container teardown
