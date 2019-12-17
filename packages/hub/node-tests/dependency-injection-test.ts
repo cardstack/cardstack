@@ -90,7 +90,7 @@ describe('hub/dependency-injection', function() {
       throw new Error(`shouldn't get here`);
     } catch (err) {
       expect(err.message).to.match(
-        /circular dependency injection: testCircleThree -> testCircleFour -> testCircleThree/
+        /circular dependency: testCircleThree tries to eagerly inject testCircleFour, which depends on testCircleThree/
       );
     }
   });

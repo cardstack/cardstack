@@ -1,3 +1,5 @@
+import { Memoize } from 'typescript-memoize';
+
 let nonce = 0;
 
 export class Container {
@@ -134,16 +136,7 @@ class CacheEntry {
 
   private async prepareSubgraph(): Promise<void> {
     let subgraph = this.subgraph();
-    await Promise.all(
-      [...subgraph].map(entry => {
-        if (pendingReadyStack.includes(entry.identityKey)) {
-          throw new Error(
-            `circular dependency injection: ${[...pendingReadyStack, this.identityKey, entry.identityKey].join(' -> ')}`
-          );
-        }
-        return entry.partial;
-      })
-    );
+    await Promise.all([...subgraph].map(entry => entry.partial));
     for (let entry of subgraph) {
       for (let [name, pending] of entry.injections) {
         entry.installInjection(name, pending);
@@ -165,6 +158,7 @@ class CacheEntry {
     pending.isReady = true;
   }
 
+  @Memoize()
   private subgraph(): Set<CacheEntry> {
     let subgraph = new Set() as Set<CacheEntry>;
     let queue: CacheEntry[] = [this];
@@ -194,7 +188,7 @@ class CacheEntry {
     return this.deferredPartial.promise;
   }
 
-  async prepareInjection(name: string): Promise<void> {
+  async prepareInjectionEagerly(name: string): Promise<void> {
     let cached = this.deferredInjections.get(name);
     if (cached) {
       await cached.promise;
@@ -205,6 +199,11 @@ class CacheEntry {
     cached.fulfill(
       (async () => {
         let pending = this.injections.get(name)!;
+        if (pending.cacheEntry?.subgraph().has(this)) {
+          throw new Error(
+            `circular dependency: ${this.identityKey} tries to eagerly inject ${name}, which depends on ${this.identityKey}`
+          );
+        }
         await pending.cacheEntry!.promise;
         this.installInjection(name, pending);
       })()
@@ -213,13 +212,8 @@ class CacheEntry {
   }
 
   private async runReady(): Promise<void> {
-    pendingReadyStack.push(this.identityKey);
-    try {
-      if (typeof this.instance.ready === 'function') {
-        await this.instance.ready();
-      }
-    } finally {
-      pendingReadyStack.pop();
+    if (typeof this.instance.ready === 'function') {
+      await this.instance.ready();
     }
   }
 }
@@ -229,7 +223,6 @@ type CacheKey = string;
 let mappings = new WeakMap() as WeakMap<Registry, Map<string, Factory<any>>>;
 let pendingInstantiationStack = [] as PendingInjections[];
 let ownership = new WeakMap() as WeakMap<any, Container>;
-let pendingReadyStack = [] as CacheKey[];
 
 export class Registry {
   constructor() {
@@ -345,7 +338,7 @@ export async function injectionReady(instance: any, name: string): Promise<void>
 
   for (let entry of cache.values()) {
     if (entry.instance === instance) {
-      await entry.prepareInjection(name);
+      await entry.prepareInjectionEagerly(name);
       return;
     }
   }
