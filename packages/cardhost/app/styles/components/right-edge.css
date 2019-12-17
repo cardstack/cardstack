@@ -49,10 +49,6 @@
   border-top: 1px solid var(--ch-default);
 }
 
-.right-edge--section:last-child {
-  padding-bottom: 14px;
-}
-
 .right-edge--section-header {
   background: url('/assets/images/icons/arrow-show-hide-active.svg') right center/10px no-repeat;
   font-weight: 600;
