@@ -25,7 +25,7 @@ describe('hub/pgclient', function() {
 
   it('saves a card', async function() {
     let card = new CardWithId(
-      testCard({ localId: 'card-1', realm: `http://hassan.com/realm` }, { hello: 'world' }).jsonapi
+      testCard({ csLocalId: 'card-1', csRealm: `http://hassan.com/realm`, hello: 'world' }).jsonapi
     );
     let pgclient = await env.container.lookup('pgclient');
     let cardsService = await env.container.lookup('cards');

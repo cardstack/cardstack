@@ -54,6 +54,17 @@ describe('hub/card-service', function() {
 
     // TODO we can do this now--the ephemeral data source is now keeping track of generation
     it.skip("adds upstream data source's version to the card's meta", async function() {});
+
+    it.skip('can create a card that adopts from another', async function() {
+      let base = testCard({ hello: 'world' });
+      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
+      let baseCard = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, base.jsonapi);
+
+      let doc = testCard({ goodbye: 'world' }).adoptingFrom(baseCard);
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+      let parent = await card.adoptsFrom();
+      expect(parent.id).to.equal(baseCard.id);
+    });
   });
 
   describe('readonly', function() {
@@ -64,61 +75,43 @@ describe('hub/card-service', function() {
       env = await createTestEnv();
       service = await env.container.lookup('cards');
       let scopedService = service.as(Session.INTERNAL_PRIVILEGED);
+      await scopedService.create(`${myOrigin}/api/realms/first-ephemeral-realm`, testCard({ csLocalId: '1' }).jsonapi);
+      await scopedService.create(`${myOrigin}/api/realms/first-ephemeral-realm`, testCard({ csLocalId: '2' }).jsonapi);
       await scopedService.create(
         `${myOrigin}/api/realms/first-ephemeral-realm`,
-        testCard({ localId: '1' }, {}).jsonapi
-      );
-      await scopedService.create(
-        `${myOrigin}/api/realms/first-ephemeral-realm`,
-        testCard({ localId: '2' }, {}).jsonapi
-      );
-      await scopedService.create(
-        `${myOrigin}/api/realms/first-ephemeral-realm`,
-        testCard(
-          {
-            localId: '1',
-            originalRealm: `http://example.com/api/realms/second-ephemeral-realm`,
-          },
-          {}
-        ).jsonapi
+        testCard({
+          csLocalId: '1',
+          csOriginalRealm: `http://example.com/api/realms/second-ephemeral-realm`,
+        }).jsonapi
       );
       await scopedService.create(
         `${myOrigin}/api/realms/first-ephemeral-realm`,
-        testCard(
-          {
-            localId: '2',
-            originalRealm: `http://example.com/api/realms/second-ephemeral-realm`,
-          },
-          {}
-        ).jsonapi
+        testCard({
+          csLocalId: '2',
+          csOriginalRealm: `http://example.com/api/realms/second-ephemeral-realm`,
+        }).jsonapi
       );
       await scopedService.create(
         `http://example.com/api/realms/second-ephemeral-realm`,
-        testCard({ localId: '1' }, {}).jsonapi
+        testCard({ csLocalId: '1' }).jsonapi
       );
       await scopedService.create(
         `http://example.com/api/realms/second-ephemeral-realm`,
-        testCard({ localId: '2' }, {}).jsonapi
+        testCard({ csLocalId: '2' }).jsonapi
       );
       await scopedService.create(
         `http://example.com/api/realms/second-ephemeral-realm`,
-        testCard(
-          {
-            localId: '1',
-            originalRealm: `${myOrigin}/api/realms/first-ephemeral-realm`,
-          },
-          {}
-        ).jsonapi
+        testCard({
+          csLocalId: '1',
+          csOriginalRealm: `${myOrigin}/api/realms/first-ephemeral-realm`,
+        }).jsonapi
       );
       await scopedService.create(
         `http://example.com/api/realms/second-ephemeral-realm`,
-        testCard(
-          {
-            localId: '2',
-            originalRealm: `${myOrigin}/api/realms/first-ephemeral-realm`,
-          },
-          {}
-        ).jsonapi
+        testCard({
+          csLocalId: '2',
+          csOriginalRealm: `${myOrigin}/api/realms/first-ephemeral-realm`,
+        }).jsonapi
       );
     });
 

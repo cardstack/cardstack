@@ -13,44 +13,32 @@ function ephemeralRealms() {
   return [
     // The realm card for the meta realm
     new CardWithId(
-      testCard(
-        {
-          realm: `${myOrigin}/api/realms/meta`,
-          originalRealm: `${myOrigin}/api/realms/meta`,
-          localId: `${myOrigin}/api/realms/meta`,
-        },
-        {}
-      ).jsonapi
+      testCard({
+        csRealm: `${myOrigin}/api/realms/meta`,
+        csOriginalRealm: `${myOrigin}/api/realms/meta`,
+        csLocalId: `${myOrigin}/api/realms/meta`,
+      }).jsonapi
     ),
     new CardWithId(
-      testCard(
-        {
-          realm: `${myOrigin}/api/realms/meta`,
-          originalRealm: `${myOrigin}/api/realms/meta`,
-          localId: `${myOrigin}/api/realms/first-ephemeral-realm`,
-        },
-        {}
-      ).jsonapi
+      testCard({
+        csRealm: `${myOrigin}/api/realms/meta`,
+        csOriginalRealm: `${myOrigin}/api/realms/meta`,
+        csLocalId: `${myOrigin}/api/realms/first-ephemeral-realm`,
+      }).jsonapi
     ),
     new CardWithId(
-      testCard(
-        {
-          realm: `${myOrigin}/api/realms/meta`,
-          originalRealm: `http://example.com/api/realms/meta`,
-          localId: `http://example.com/api/realms/second-ephemeral-realm`,
-        },
-        {}
-      ).jsonapi
+      testCard({
+        csRealm: `${myOrigin}/api/realms/meta`,
+        csOriginalRealm: `http://example.com/api/realms/meta`,
+        csLocalId: `http://example.com/api/realms/second-ephemeral-realm`,
+      }).jsonapi
     ),
     new CardWithId(
-      testCard(
-        {
-          realm: `${myOrigin}/api/realms/meta`,
-          originalRealm: CARDSTACK_PUBLIC_REALM,
-          localId: CARDSTACK_PUBLIC_REALM,
-        },
-        {}
-      ).jsonapi
+      testCard({
+        csRealm: `${myOrigin}/api/realms/meta`,
+        csOriginalRealm: CARDSTACK_PUBLIC_REALM,
+        csLocalId: CARDSTACK_PUBLIC_REALM,
+      }).jsonapi
     ),
   ];
 }
@@ -78,14 +66,11 @@ export async function get(id: CardId): Promise<CardWithId | null> {
     id.localId === 'string-field'
   ) {
     return new CardWithId(
-      testCard(
-        {
-          realm: id.realm,
-          originalRealm: id.originalRealm,
-          localId: id.localId,
-        },
-        {}
-      ).jsonapi
+      testCard({
+        csRealm: id.realm,
+        csOriginalRealm: id.originalRealm,
+        csLocalId: id.localId,
+      }).jsonapi
     );
   }
   return null;

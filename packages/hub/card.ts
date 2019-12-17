@@ -8,6 +8,9 @@ import { CardExpression } from './pgsearch/util';
 import { ResponseMeta } from './pgsearch/pgclient';
 import * as J from 'json-typescript';
 import { IndexerFactory } from './indexer';
+import { myOrigin } from './origin';
+
+export const apiPrefix = '/api';
 
 export class Card {
   static async makePristineCollection(cards: CardWithId[], meta: ResponseMeta): Promise<PristineCollection> {
@@ -19,12 +22,16 @@ export class Card {
     });
   }
 
+  static compositeId(id: CardId) {
+    return [id.realm, id.originalRealm ?? id.realm, id.localId].map(encodeURIComponent).join('/');
+  }
+
   // Almost everyone should treat this as opaque and only valid on the current
   // hub. (The only exception is some code within the hub itself that may
   // optimize by pulling these apart.)
   get id(): string | undefined {
     if (typeof this.localId === 'string') {
-      return [this.realm, this.originalRealm, this.localId].map(encodeURIComponent).join('/');
+      return Card.compositeId({ realm: this.realm, originalRealm: this.originalRealm, localId: this.localId });
     }
     return undefined;
   }
@@ -102,6 +109,17 @@ export class Card {
     patch(this.jsonapi, otherDoc);
   }
 
+  get canonicalURL(): string {
+    let isHome = this.originalRealm === this.realm;
+    let base = `${myOrigin}${apiPrefix}/realms`;
+    let localRealmId = this.realm.slice(base.length + 1);
+    if (isHome) {
+      return [base, localRealmId, 'cards', this.localId].join('/');
+    } else {
+      return [base, localRealmId, 'cards', encodeURIComponent(this.originalRealm), this.localId].join('/');
+    }
+  }
+
   // This is the way that data source plugins think about card IDs. The
   // upstreamId is only unique *within* a realm.
   get upstreamId(): UpstreamIdentity | null {
@@ -121,6 +139,8 @@ export class Card {
       }
     }
   }
+
+  async adoptsFrom(): CardWithId {}
 }
 
 function cardHasIds(card: Card): asserts card is CardWithId {

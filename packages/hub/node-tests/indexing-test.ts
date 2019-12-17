@@ -25,21 +25,18 @@ describe('hub/indexing', function() {
   async function createRealm(originalRealm: string, localId: string) {
     await cards.as(Session.INTERNAL_PRIVILEGED).create(
       `${myOrigin}/api/realms/meta`,
-      testCard(
-        {
-          realm: `${myOrigin}/api/realms/meta`,
-          originalRealm,
-          localId,
-        },
-        {}
-      ).jsonapi
+      testCard({
+        csRealm: `${myOrigin}/api/realms/meta`,
+        csOriginalRealm: originalRealm,
+        csLocalId: localId,
+      }).jsonapi
     );
   }
 
   it('it can index a realm', async function() {
-    let realm = `${myOrigin}/api/realms/first-ephemeral-realm`;
-    await createRealm(`${myOrigin}/api/realms/meta`, realm);
-    let card = new CardWithId(testCard({ realm, localId: '1' }, { foo: 'bar' }).jsonapi);
+    let csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
+    await createRealm(`${myOrigin}/api/realms/meta`, csRealm);
+    let card = new CardWithId(testCard({ csRealm, csLocalId: '1', foo: 'bar' }).jsonapi);
     storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
 
     await indexing.update();
@@ -49,11 +46,11 @@ describe('hub/indexing', function() {
   });
 
   it('it can remove a document from the index if the document was removed from the data source', async function() {
-    let realm = `${myOrigin}/api/realms/first-ephemeral-realm`;
-    await createRealm(`${myOrigin}/api/realms/meta`, realm);
+    let csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
+    await createRealm(`${myOrigin}/api/realms/meta`, csRealm);
     let card = await cards
       .as(Session.INTERNAL_PRIVILEGED)
-      .create(realm, testCard({ realm, localId: '1' }, { foo: 'bar' }).jsonapi);
+      .create(csRealm, testCard({ csRealm, csLocalId: '1', foo: 'bar' }).jsonapi);
     storage.store(null, card.localId, card.realm);
     await indexing.update();
 
@@ -69,9 +66,9 @@ describe('hub/indexing', function() {
     await createRealm(`${myOrigin}/api/realms/meta`, realm1);
     await createRealm(`http://example.com/api/realms/meta`, realm2);
 
-    let card = new CardWithId(testCard({ realm: realm1, localId: '1' }, { foo: 'bar' }).jsonapi);
+    let card = new CardWithId(testCard({ csRealm: realm1, csLocalId: '1', foo: 'bar' }).jsonapi);
     storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
-    card = new CardWithId(testCard({ realm: realm2, localId: '1' }, { foo: 'bar' }).jsonapi);
+    card = new CardWithId(testCard({ csRealm: realm2, csLocalId: '1', foo: 'bar' }).jsonapi);
     storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
 
     await indexing.update();
@@ -88,13 +85,13 @@ describe('hub/indexing', function() {
 
     // card is indexed in torn down ephemeral storage
     // This card will _not_ live through the container teardown
-    let card = new CardWithId(testCard({ realm, localId: '1' }, { foo: 'bar' }).jsonapi);
+    let card = new CardWithId(testCard({ csRealm: realm, csLocalId: '1', foo: 'bar' }).jsonapi);
     storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
     await indexing.update();
 
     // card is not yet indexed in torn down ephemeral storage
     // This card will _not_ live through the container teardown
-    card = new CardWithId(testCard({ realm, localId: '2' }, { foo: 'bar' }).jsonapi);
+    card = new CardWithId(testCard({ csRealm: realm, csLocalId: '2', foo: 'bar' }).jsonapi);
     storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
     await env.container.teardown();
     env.container = await wireItUp();
@@ -106,7 +103,7 @@ describe('hub/indexing', function() {
 
     // card is not yet indexed in new ephemeral storage
     // This card _will_ live through the container teardown
-    card = new CardWithId(testCard({ realm, localId: '3' }, { foo: 'bar' }).jsonapi);
+    card = new CardWithId(testCard({ csRealm: realm, csLocalId: '3', foo: 'bar' }).jsonapi);
     storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
     await indexing.update();
 
@@ -137,18 +134,18 @@ describe('hub/indexing', function() {
     await createRealm(`${myOrigin}/api/realms/meta`, realm);
 
     // Add a new card
-    let card = new CardWithId(testCard({ realm, localId: '1' }, { foo: 'bar', step: 1 }).jsonapi);
+    let card = new CardWithId(testCard({ csRealm: realm, csLocalId: '1', foo: 'bar', step: 1 }).jsonapi);
     storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
     await indexing.update();
     expect(await cardsWithStep(1)).to.equal(1);
 
     // Add another new card
-    card = new CardWithId(testCard({ realm, localId: '2' }, { foo: 'bar', step: 2 }).jsonapi);
+    card = new CardWithId(testCard({ csRealm: realm, csLocalId: '2', foo: 'bar', step: 2 }).jsonapi);
     storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
 
     // Maniuplate existing card so we would notice if it gets indexed when it shouldn't.
     await storage.inThePast(async () => {
-      card = new CardWithId(testCard({ realm, localId: '1' }, { foo: 'bar', step: 2 }).jsonapi);
+      card = new CardWithId(testCard({ csRealm: realm, csLocalId: '1', foo: 'bar', step: 2 }).jsonapi);
       storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
     });
 
@@ -157,12 +154,12 @@ describe('hub/indexing', function() {
     expect(n).to.equal(1);
 
     // Update first card
-    card = new CardWithId(testCard({ realm, localId: '1' }, { foo: 'bar', step: 3 }).jsonapi);
+    card = new CardWithId(testCard({ csRealm: realm, csLocalId: '1', foo: 'bar', step: 3 }).jsonapi);
     storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
 
     // Maniuplate other existing card so we would notice if it gets indexed when it shouldn't.
     await storage.inThePast(async () => {
-      card = new CardWithId(testCard({ realm, localId: '2' }, { foo: 'bar', step: 3 }).jsonapi);
+      card = new CardWithId(testCard({ csRealm: realm, csLocalId: '2', foo: 'bar', step: 3 }).jsonapi);
       storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
     });
 
@@ -174,7 +171,7 @@ describe('hub/indexing', function() {
 
     // Maniuplate other existing card so we would notice if it gets indexed when it shouldn't.
     await storage.inThePast(async () => {
-      card = new CardWithId(testCard({ realm, localId: '1' }, { foo: 'bar', step: 4 }).jsonapi);
+      card = new CardWithId(testCard({ csRealm: realm, csLocalId: '1', foo: 'bar', step: 4 }).jsonapi);
       storage.store(await card.asUpstreamDoc(), card.localId, card.realm);
     });
 

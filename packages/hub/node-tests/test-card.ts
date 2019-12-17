@@ -1,7 +1,26 @@
 import { SingleResourceDoc } from 'jsonapi-typescript';
+import { CardId } from '../card';
 
 export class TestCard {
-  constructor(private cardAttrs: CardAttrs, private modelAttrs: ModelAttrs) {}
+  private parent: CardId | undefined;
+  private model = {} as { [field: string]: any };
+
+  localId?: string;
+  originalRealm?: string;
+  realm?: string;
+
+  constructor(values: Fields) {
+    this.localId = values.csLocalId;
+    this.originalRealm = values.csOriginalRealm ?? values.csRealm;
+    this.realm = values.csRealm;
+
+    for (let [field, value] of Object.entries(values)) {
+      if (!/^cs[A-Z]/.test(field)) {
+        // a user field
+        this.model[field] = value;
+      }
+    }
+  }
 
   get jsonapi(): SingleResourceDoc {
     let doc = {
@@ -9,47 +28,46 @@ export class TestCard {
         type: 'cards',
         attributes: {
           model: {
-            attributes: this.modelAttrs,
+            attributes: this.model,
           },
         } as NonNullable<SingleResourceDoc['data']['attributes']>,
+        relationships: {} as NonNullable<SingleResourceDoc['data']['relationships']>,
       },
     };
-    if (this.cardAttrs.localId) {
-      doc.data.attributes['local-id'] = this.cardAttrs.localId;
+    if (this.localId) {
+      doc.data.attributes['local-id'] = this.localId;
     }
 
-    if (this.cardAttrs.realm) {
-      doc.data.attributes.realm = this.cardAttrs.realm;
+    if (this.realm) {
+      doc.data.attributes.realm = this.realm;
     }
 
-    if (this.cardAttrs.originalRealm) {
-      doc.data.attributes['original-realm'] = this.cardAttrs.originalRealm;
+    if (this.originalRealm) {
+      doc.data.attributes['original-realm'] = this.originalRealm;
+    }
+
+    if (this.parent) {
+      doc.data.relationships['adopts-from'] = {
+        links: { related: '' },
+      };
     }
 
     return doc;
   }
+
+  adoptingFrom(parent: CardId) {
+    this.parent = parent;
+    return this;
+  }
 }
 
-interface ModelAttrs {
+interface Fields {
+  csRealm?: string;
+  csOriginalRealm?: string;
+  csLocalId?: string;
   [fieldName: string]: any;
 }
-interface CardAttrs {
-  realm?: string;
-  originalRealm?: string;
-  localId?: string;
-}
 
-export function testCard(modelAttrs: ModelAttrs): TestCard;
-export function testCard(cardAttrs: CardAttrs, modelAttrs: ModelAttrs): TestCard;
-export function testCard(first: CardAttrs | ModelAttrs, second?: ModelAttrs): TestCard {
-  let card: CardAttrs | undefined;
-  let model: ModelAttrs;
-  if (second) {
-    card = first as CardAttrs;
-    model = second;
-  } else {
-    card = {};
-    model = first;
-  }
-  return new TestCard(card, model);
+export function testCard(values: Fields): TestCard {
+  return new TestCard(values);
 }

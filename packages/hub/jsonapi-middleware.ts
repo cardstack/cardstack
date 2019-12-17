@@ -10,12 +10,11 @@ import CardstackError from './error';
 import { SessionContext } from './authentication-middleware';
 import { assertSingleResourceDoc } from './document';
 import { myOrigin } from './origin';
-import { Card } from './card';
+import { Card, apiPrefix, CardWithId } from './card';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { parse } from 'qs';
 import { assertQuery } from './query';
 
-const apiPrefix = '/api';
 const apiPrefixPattern = new RegExp(`^${apiPrefix}/(.*)`);
 
 export default class JSONAPIMiddleware {
@@ -137,17 +136,12 @@ export default class JSONAPIMiddleware {
     ctxt.status = 200;
   }
 
-  private localURLFor(card: Card): string {
-    let isHome = card.originalRealm === card.realm;
+  private localURLFor(card: CardWithId): string {
     if (new URL(card.realm).origin === myOrigin) {
-      let base = `${myOrigin}${apiPrefix}/realms`;
-      let localRealmId = card.realm.slice(base.length + 1);
-      if (isHome) {
-        return [base, localRealmId, 'cards', card.localId].join('/');
-      } else {
-        return [base, localRealmId, 'cards', encodeURIComponent(card.originalRealm), card.localId].join('/');
-      }
+      return card.canonicalURL;
     } else {
+      let isHome = card.originalRealm === card.realm;
+
       let base = `${myOrigin}${apiPrefix}/remote-realms`;
       if (isHome) {
         return [base, encodeURIComponent(card.realm), 'cards', card.localId].join('/');
