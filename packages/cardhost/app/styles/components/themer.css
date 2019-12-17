@@ -113,18 +113,18 @@
   background-color: #1e1e1e;
 }
 
-.card-renderer--top-edge-buttons .show-editor-btn, .card-renderer--top-edge-buttons .hide-editor-btn {
+.themer--top-edge-container .show-editor-btn, .themer--top-edge-container .hide-editor-btn {
   margin-top: 10px;
   margin-right: 15px;
   cursor: pointer;
 }
 
-.card-renderer--top-edge-buttons .dock-btn {
+.themer--top-edge-container .dock-btn {
   margin: 10px 15px;
   cursor: pointer;
 }
 
-.card-renderer--top-edge-buttons .close-editor-btn {
+.themer--top-edge-container .close-editor-btn {
   --width: 125px;
   margin-left: 20px;
 }
@@ -148,4 +148,31 @@
 
 .cardhost-cards.editing-css.full-width {
   padding-right: 0;
+}
+
+.themer--top-edge-container {
+  display: grid;
+  position: fixed;
+  top: var(--ch-spacing);
+  right: var(--ch-spacing);
+  left: 40px;
+  z-index: var(--ch-actions-z-index);
+  grid-template-columns: auto auto;
+}
+
+.themer--top-edge-container .ch-button {
+  --color: var(--ch-light);
+}
+
+.themer--top-edge-container .ch-button.selected {
+  --color: var(--ch-highlight);
+}
+
+.themer--top-edge-width-controls {
+  justify-self: start;
+  
+}
+
+.themer--top-edge-pane-controls {
+  justify-self: end;
 }
