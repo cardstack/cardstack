@@ -18,10 +18,6 @@ const getSize = n => (!isNaN(parseFloat(n)) && isFinite(n) ? `${n}px` : n);
 
 export default class ReSizable extends Component {
   @tracked elementId = guidFor(this);
-  minWidth = 10;
-  minHeight = 10;
-  maxWidth = null;
-  maxHeight = null;
   grid = [1, 1];
   @tracked isActive = false;
   @tracked elementWidth = this.args.width;
@@ -161,6 +157,13 @@ export default class ReSizable extends Component {
         newHeight = newWidth * ratio;
       }
     }
+
+    // prevent resize from exceeding browser window dimensions
+    let maxHeight = document.body.clientHeight;
+    let maxWidth = document.body.clientWidth;
+
+    newHeight = newHeight > maxHeight ? maxHeight : newHeight;
+    newWidth = newWidth > maxWidth ? maxWidth : newWidth;
 
     this.elementWidth = newWidth;
     this.elementHeight = newHeight;
