@@ -1,16 +1,23 @@
-{{! eslint is confused by on helper }}
-{{! template-lint-disable attribute-indentation}}
-<div
-  class="drop-zone"
-  role="button"
-  {{on "drop" (action @dropField @position (fn (mut this.isOverDropZone) false))}}
-  {{on "dragover" (action this.dragOver)}}
-  {{on "dragenter" (action (mut this.isOverDropZone) true)}}
-  {{on "dragleave" (action (mut this.isOverDropZone) false)}}
-  data-test-drop-zone={{@position}}
->
-  <div class="drop-zone-text {{if this.isOverDropZone "active"}}">
-    Drag &amp; drop from the catalog
-    <div class="drop-zone--drag-drop-icon">{{svg-jar "drag-drop"}}</div>
+<div class="drop-zone--container">
+  <div
+    class="drop-zone"
+    role="button"
+    {{on "drop" (action @dropField @position (fn (mut this.isOverDropZone) false))}}
+    {{on "dragover" (action this.dragOver)}}
+    {{on "dragenter" (action (mut this.isOverDropZone) true)}}
+    {{on "dragleave" (action (mut this.isOverDropZone) false)}}
+    data-test-drop-zone={{@position}}
+  >
+    <div class="drop-zone-text {{if this.isOverDropZone "active"}}">
+        Drag &amp; drop from the catalog
+        <div class="drop-zone--drag-drop-icon">{{svg-jar "drag-drop"}}</div>
+    </div>
+    <AnimatedContainer>
+      {{#animated-if this.isOverDropZone use=this.expandPreview as |overDropZone|}}
+        <div class="drop-zone--preview {{if overDropZone "active"}}">
+          <FieldRenderer @field={{this.stubField}} @mode="schema"/>
+        </div>
+      {{/animated-if}}
+    </AnimatedContainer>
   </div>
 </div>

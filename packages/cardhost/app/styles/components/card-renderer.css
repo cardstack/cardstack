@@ -30,6 +30,8 @@
 }
 
 .card-renderer-isolated.no-fields .drop-zone {
+  position: static;
+  height: initial;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -37,6 +39,7 @@
 }
 
 .card-renderer-isolated.no-fields .drop-zone .drop-zone-text {
+  display: block;
   border: none;
   font-size: 16px;
 }
