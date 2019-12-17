@@ -560,4 +560,22 @@
       @language="html"
     />
   </section>
+
+  <section class="ui-components--section">
+    <h2>Code Editor</h2>
+    <CodeEditor @language="handlebars" @code='<CodeEditor @language="javascript" @code="let a;" @resizable={{true}} />
+
+/** <CodeEditor> takes the following arguments:
+ * @code - the code to display, in string form, like `let a = 2;`
+ * @language - string like javascript, json, etc.
+ * @readOnly - optional boolean. Defaults to true.
+ * @updateCode - optional action that is called when content of the editor changes. It receives the full code as an argument.
+ * @editorReady - optional action used for testing and animations. Fires every time an editor has finished rendering.
+ * @validate - optional action that should return a bool. Blocks calling updateCode if it returns false. Defaults to returning true.
+ * @debounceMsForValidate - optional number in ms, rate limits how often @validate is called. Default 500.
+ * @resizable - optional boolean that determines whether the code editor should respond to size changes of the parent container. Defaults to false.
+ * @resizeCheckInterval - optional number in ms to rate limit how quickly the container resizes
+ */'
+ />
+  </section>
 </section>

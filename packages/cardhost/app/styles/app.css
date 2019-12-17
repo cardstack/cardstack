@@ -16,6 +16,7 @@
 @import '/assets/components/catalog.css';
 @import '/assets/components/catalog-field.css';
 @import '/assets/components/adopted-from.css';
+@import '/assets/components/themer.css';
 
 /* Cardhost styling for core package templates */
 @import '/assets/components/card-renderer.css';
@@ -65,6 +66,8 @@ Until that work is done we are statically adding this css
   --ch-actions-z-index: 11;
   --ch-transition-time: 250ms;
   --ch-card-transition-duration: 300ms;
+  --ch-card-background-color-animate: background-color 0.5s ease;
+  --ch-card-padding-animate: padding-right 0.3s ease;
 }
 
 /*
@@ -125,22 +128,6 @@ a:hover {
   right: var(--ch-spacing);
   display: flex;
   z-index: var(--ch-actions-z-index);
-}
-
-.card-renderer--top-edge-buttons .show-editor-btn, .card-renderer--top-edge-buttons .hide-editor-btn {
-  margin-top: 10px;
-  margin-right: 15px;
-  cursor: pointer;
-}
-
-.card-renderer--top-edge-buttons .dock-btn {
-  margin: 10px 15px;
-  cursor: pointer;
-}
-
-.card-renderer--top-edge-buttons .close-editor-btn {
-  --width: 125px;
-  margin-left: 20px;
 }
 
 .card-schema-updator--search-bar {
@@ -206,122 +193,4 @@ a:hover {
   visibility: hidden;
   height: 0;
   overflow: hidden;
-}
-
-.cardhost-card-theme-editor {
-  position: fixed;
-  right: 0;
-  top: 0;
-  width: 40%;
-  height: 100%;
-  background: var(--ch-deep-background);
-  z-index: 10;
-  padding: 20px;
-  transform: translateX(0%);
-  opacity: 0.95;
-}
-
-.cardhost-card-theme-editor.bottom-docked {
-  top: auto;
-  bottom: 0;
-  left: 0;
-  height: 40%;
-  width: 100%;
-  transform: translateY(0%);
-}
-
-.cardhost-card-theme-editor.right-docked .resizable-content {
-  padding-top: 50px;
-}
-
-.cardhost-card-theme-editor.hidden {
-  transform: translateX(100%);
-}
-
-.cardhost-card-theme-editor.bottom-docked.hidden {
-  transform: translateY(100%);
-}
-
-
-.cardhost-card-theme-editor .resizable-content {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.cardhost-card-theme-editor.bottom-docked .resizable-content {
-  flex-direction: row;
-}
-
-.cardhost-card-theme-editor .editor-section {
-  height: 50%;
-  width: 100%;
-  padding: 12px 0 12px 12px;
-}
-
-.cardhost-card-theme-editor.bottom-docked .editor-section {
-  padding: 12px;
-}
-
-.cardhost-card-theme-editor.bottom-docked .editor-section {
-  height: 100%;
-  width: 50%;
-}
-
-.cardhost-card-theme-editor .editor-container {
-  border: 1px solid var(--ch-default);
-  border-radius: 10px;
-  overflow: hidden;
-  height: 100%;
-}
-
-.cardhost-card-theme-editor .editor-container__title {
-  background-color: var(--ch-default);
-  padding: 12px;
-}
-
-
-.cardhost-card-theme-editor .resizer.left {
-  left: 5px;
-  width: 25px;
-}
-
-.cardhost-card-theme-editor .resizer.top {
-  height: 25px;
-}
-
-.cardhost-card-theme-editor .drag-handle {
-  position: absolute;
-  left: -12px;
-  top: 50%;
-  transform: rotate(180deg);
-  z-index: -1;
-}
-
-.cardhost-card-theme-editor.bottom-docked .drag-handle {
-  left: 49.5%;
-  top: -18px;
-  transform: rotate(-90deg);
-}
-
-.cardhost-card-theme-editor .drag-handle path {
-  stroke: var(--ch-light-background);
-}
-
-.cardhost-card-document--codeblock {
-  height: 0;
-}
-
-.cardhost-monaco-container {
-  min-height: 50px;
-  margin-bottom: 1em;
-  overflow: hidden;
-  resize: vertical;
-  background-color: #1e1e1e;
-}
-
-.cardhost-monaco-container.editor-pane-code {
-  min-height: 32vh;
 }
