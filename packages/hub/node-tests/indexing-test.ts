@@ -82,7 +82,7 @@ describe('hub/indexing', function() {
     expect(results.length).to.equal(2);
   });
 
-  it('ephemeral cards do not persist in the index between container teardowns', async function() {
+  it.skip('ephemeral cards do not persist in the index between container teardowns', async function() {
     let realm = `${myOrigin}/api/realms/first-ephemeral-realm`;
     await createRealm(`${myOrigin}/api/realms/meta`, realm);
 

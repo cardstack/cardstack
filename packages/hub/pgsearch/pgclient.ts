@@ -135,7 +135,9 @@ export default class PgClient {
   ): Promise<T> {
     let client = await this.pool.connect();
     let query = async (expression: Expression) => {
-      return await client.query(this.expressionToSql(expression));
+      let sql = this.expressionToSql(expression);
+      log.trace('search: %s trace: %j', sql.text, sql.values);
+      return await client.query(sql);
     };
     try {
       return await fn({ query, client });
@@ -145,11 +147,29 @@ export default class PgClient {
   }
 
   async listen(channel: string, handler: (notification: Notification) => void, fn: () => Promise<void>) {
-    await this.withConnection(async ({ client, query }) => {
-      client.on('notification', handler);
-      await query(['LISTEN', safeName(channel)]);
-      await fn();
+    // I found that LISTEN/NOTIFY doesn't work reliably on connections from the
+    // Pool, and this is substantiated by commentary on GitHub:
+    //   https://github.com/brianc/node-postgres/issues/1543#issuecomment-353622236
+    // So for listen purposes, we establish a completely separate connection.
+    let c = config();
+    let client = new Client({
+      user: c.user,
+      host: c.host,
+      database: c.database,
+      password: c.password,
+      port: c.port,
     });
+    await client.connect();
+    try {
+      client.on('notification', n => {
+        log.trace(`heard pg notification for channel %s`, n.channel);
+        handler(n);
+      });
+      await client.query(`LISTEN ${safeName(channel)}`);
+      await fn();
+    } finally {
+      await client.end();
+    }
   }
 
   private async cardQueryToSQL(cards: ScopedCardService, query: CardExpression) {

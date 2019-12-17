@@ -10,6 +10,7 @@ export interface TestEnv {
 export async function createTestEnv(): Promise<TestEnv> {
   process.env.PGDATABASE = `test_db_${Math.floor(100000 * Math.random())}`;
   let container = await wireItUp();
+  (await container.lookup('queue')).launchJobRunner();
   return { container, destroy };
 }
 

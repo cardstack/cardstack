@@ -8,7 +8,6 @@ describe('hub/queue', function() {
   beforeEach(async function() {
     env = await createTestEnv();
     queue = await env.container.lookup('queue');
-    queue.launchJobRunner();
   });
 
   afterEach(async function() {
