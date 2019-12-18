@@ -51,11 +51,11 @@ export async function search(query: Query): Promise<Card[] | null> {
     return null;
   }
 
-  if (query.filter.eq.realm !== `${myOrigin}/api/realms/meta` || !('local-id' in query.filter.eq)) {
+  if (query.filter.eq.realm !== `${myOrigin}/api/realms/meta` || !('localId' in query.filter.eq)) {
     return null;
   }
 
-  let searchingFor = query.filter.eq['local-id'];
+  let searchingFor = query.filter.eq.localId;
   return ephemeralRealms().filter(card => card.localId === searchingFor);
 }
 

@@ -98,12 +98,10 @@ class BaseCard {
     this.jsonapi = jsonapi;
     this.realm = realm;
     this.originalRealm =
-      typeof jsonapi.data.attributes?.['original-realm'] === 'string'
-        ? jsonapi.data.attributes['original-realm']
-        : realm;
+      typeof jsonapi.data.attributes?.originalRealm === 'string' ? jsonapi.data.attributes.originalRealm : realm;
 
-    if (typeof jsonapi.data.attributes?.['local-id'] === 'string') {
-      this.localId = jsonapi.data.attributes?.['local-id'];
+    if (typeof jsonapi.data.attributes?.localId === 'string') {
+      this.localId = jsonapi.data.attributes?.localId;
     }
   }
 
@@ -118,9 +116,9 @@ class BaseCard {
       copied.data.attributes = {};
     }
     copied.data.attributes.realm = this.realm;
-    copied.data.attributes['original-realm'] = this.originalRealm;
+    copied.data.attributes.originalRealm = this.originalRealm;
     if (this.localId) {
-      copied.data.attributes['local-id'] = this.localId;
+      copied.data.attributes.localId = this.localId;
     }
     copied.data.id = this.id;
     return copied;

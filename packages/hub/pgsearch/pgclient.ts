@@ -221,7 +221,7 @@ export default class PgClient {
   }
   private async handleFieldQuery(_cards: ScopedCardService, fieldQuery: FieldQuery): Promise<Expression> {
     let { path, errorHint } = fieldQuery;
-    if (path === 'realm' || path === 'original-realm' || path === 'local-id') {
+    if (path === 'realm' || path === 'originalRealm' || path === 'localId') {
       return [snakeCase(path)];
     }
 
@@ -230,7 +230,7 @@ export default class PgClient {
 
   private async handleFieldValue(cards: ScopedCardService, fieldValue: FieldValue): Promise<Expression> {
     let { path, errorHint, value } = fieldValue;
-    if (path === 'realm' || path === 'original-realm' || path === 'local-id') {
+    if (path === 'realm' || path === 'originalRealm' || path === 'localId') {
       return await this.makeExpression(cards, value);
     }
 
@@ -239,7 +239,7 @@ export default class PgClient {
 
   private async handleFieldArity(cards: ScopedCardService, fieldArity: FieldArity): Promise<Expression> {
     let { path, singular, errorHint } = fieldArity;
-    if (path === 'realm' || path === 'original-realm' || path === 'local-id') {
+    if (path === 'realm' || path === 'originalRealm' || path === 'localId') {
       return await this.makeExpression(cards, singular);
     }
 

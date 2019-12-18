@@ -36,7 +36,7 @@ export class TestCard {
       },
     };
     if (this.localId) {
-      doc.data.attributes['local-id'] = this.localId;
+      doc.data.attributes.localId = this.localId;
     }
 
     if (this.realm) {
@@ -44,11 +44,11 @@ export class TestCard {
     }
 
     if (this.originalRealm) {
-      doc.data.attributes['original-realm'] = this.originalRealm;
+      doc.data.attributes.originalRealm = this.originalRealm;
     }
 
     if (this.parent) {
-      doc.data.relationships['adopts-from'] = {
+      doc.data.relationships.adoptsFrom = {
         links: { related: canonicalURL(this.parent) },
       };
     }

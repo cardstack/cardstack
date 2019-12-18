@@ -12,11 +12,11 @@ let card: SingleResourceDoc = {
     // TODO after we have the ability to perform ember-cli builds on browser assets emitted from cards
     // make sure to move the default card component js and template into the base card.
     attributes: {
-      'isolated-css': isolatedCss,
-      'embedded-css': embeddedCss,
+      isolatedCSS: isolatedCss,
+      embeddedCSS: embeddedCss,
     },
     relationships: {
-      'adopted-from': { data: null },
+      adoptedFrom: { data: null },
       fields: { data: [] },
       model: { data: { type: 'local-hub::@cardstack/base-card', id: 'local-hub::@cardstack/base-card' } },
     },

@@ -63,7 +63,7 @@ describe('hub/card-service', function() {
     // TODO we can do this now--the ephemeral data source is now keeping track of generation
     it.skip("adds upstream data source's version to the card's meta", async function() {});
 
-    it.skip('can create a card that adopts from another', async function() {
+    it('can create a card that adopts from another', async function() {
       let base = testCard({ hello: 'world' });
       let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       let baseCard = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, base.jsonapi);
@@ -145,7 +145,7 @@ describe('hub/card-service', function() {
     it('can filter by original-realm', async function() {
       let { cards } = await service.as(Session.INTERNAL_PRIVILEGED).search({
         filter: {
-          eq: { 'original-realm': `http://example.com/api/realms/second-ephemeral-realm` },
+          eq: { originalRealm: `http://example.com/api/realms/second-ephemeral-realm` },
         },
       });
       expect(cards.length).equals(4);
@@ -160,7 +160,7 @@ describe('hub/card-service', function() {
     it('can filter by local-id', async function() {
       let { cards } = await service.as(Session.INTERNAL_PRIVILEGED).search({
         filter: {
-          eq: { 'local-id': '1' },
+          eq: { localId: '1' },
         },
       });
       expect(cards.length).equals(4);
@@ -177,8 +177,8 @@ describe('hub/card-service', function() {
         filter: {
           eq: {
             realm: `${myOrigin}/api/realms/first-ephemeral-realm`,
-            'original-realm': 'http://example.com/api/realms/second-ephemeral-realm',
-            'local-id': '1',
+            originalRealm: 'http://example.com/api/realms/second-ephemeral-realm',
+            localId: '1',
           },
         },
       });

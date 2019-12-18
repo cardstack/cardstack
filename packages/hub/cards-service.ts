@@ -105,7 +105,7 @@ export class ScopedCardService {
           // about. Some of the realms in here can live on other origins, and
           // that's fine.
           realm: `${myOrigin}/api/realms/meta`,
-          'local-id': realm,
+          localId: realm,
         },
       },
     });

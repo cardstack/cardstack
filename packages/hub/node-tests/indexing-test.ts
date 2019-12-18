@@ -54,7 +54,7 @@ describe('hub/indexing', function() {
     await indexing.update();
 
     let { cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
-      filter: { eq: { 'local-id': '1' } },
+      filter: { eq: { localId: '1' } },
     });
     expect(results.length).to.equal(0);
   });
@@ -73,7 +73,7 @@ describe('hub/indexing', function() {
     await indexing.update();
 
     let { cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
-      filter: { eq: { 'local-id': '1' } },
+      filter: { eq: { localId: '1' } },
     });
     expect(results.length).to.equal(2);
   });
@@ -107,17 +107,17 @@ describe('hub/indexing', function() {
     await indexing.update();
 
     let { cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
-      filter: { eq: { 'local-id': '1' } },
+      filter: { eq: { localId: '1' } },
     });
     expect(results.length).to.equal(0);
 
     ({ cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
-      filter: { eq: { 'local-id': '2' } },
+      filter: { eq: { localId: '2' } },
     }));
     expect(results.length).to.equal(0);
 
     ({ cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
-      filter: { eq: { 'local-id': '3' } },
+      filter: { eq: { localId: '3' } },
     }));
     expect(results.length).to.equal(1);
   });

@@ -151,7 +151,13 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can create card"]
+      "args": [
+        "packages/test-support/bin/run.js",
+        "--timeout",
+        "200000",
+        "--grep",
+        "can create a card that adopts from another"
+      ]
     },
     {
       "type": "node",

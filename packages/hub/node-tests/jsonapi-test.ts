@@ -97,7 +97,7 @@ describe('hub/jsonapi', function() {
     response = await request.get(new URL(response.header.location).pathname).set('Accept', 'application/vnd.api+json');
     expect(response.status).to.equal(200);
     expect(response.body?.data?.attributes?.model?.attributes?.hello).to.equal('world');
-    expect(response.body?.data?.attributes?.['original-realm']).to.equal('https://somewhere/else');
+    expect(response.body?.data?.attributes?.['originalRealm']).to.equal('https://somewhere/else');
     expect(response.body?.data?.attributes?.['realm']).to.equal(`${myOrigin}/api/realms/first-ephemeral-realm`);
   });
 
@@ -124,7 +124,7 @@ describe('hub/jsonapi', function() {
     response = await request.get(new URL(response.header.location).pathname).set('Accept', 'application/vnd.api+json');
     expect(response.status).to.equal(200);
     expect(response.body?.data?.attributes?.model?.attributes?.hello).to.equal('world');
-    expect(response.body?.data?.attributes?.['original-realm']).to.equal('https://somewhere/else');
+    expect(response.body?.data?.attributes?.['originalRealm']).to.equal('https://somewhere/else');
     expect(response.body?.data?.attributes?.['realm']).to.equal('http://example.com/api/realms/second-ephemeral-realm');
   });
 
@@ -144,7 +144,7 @@ describe('hub/jsonapi', function() {
 
     let filter = {
       filter: {
-        eq: { 'original-realm': `${myOrigin}/api/realms/first-ephemeral-realm` },
+        eq: { originalRealm: `${myOrigin}/api/realms/first-ephemeral-realm` },
       },
     };
     let response = await request.get(`/api/cards?${stringify(filter)}`).set('Accept', 'application/vnd.api+json');
@@ -163,7 +163,7 @@ describe('hub/jsonapi', function() {
 
     let filter = {
       filter: {
-        eq: { 'original-realm': `${myOrigin}/api/realms/first-ephemeral-realm` },
+        eq: { originalRealm: `${myOrigin}/api/realms/first-ephemeral-realm` },
       },
       page: {
         size: 7,
