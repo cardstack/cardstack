@@ -4,7 +4,7 @@ let nonce = 0;
 
 export class Container {
   private cache = new Map() as Map<CacheKey, CacheEntry>;
-  private teardownPromise: Promise<void[]> | undefined;
+  private tearingDown: Deferred<void> | undefined;
 
   constructor(private registry: Registry) {}
 
@@ -76,22 +76,42 @@ export class Container {
   }
 
   async teardown() {
-    if (!this.teardownPromise) {
-      this.teardownPromise = Promise.all(
-        [...this.cache.values()].map(async ({ promise, instance }) => {
-          try {
-            await promise;
-          } catch (e) {
-            // whoever originally called instantiate or lookup received a rejected promise and its their responsibility to handle it
-          }
-          if (typeof instance?.teardown === 'function') {
-            await instance.teardown();
-          }
-        })
+    if (!this.tearingDown) {
+      this.tearingDown = new Deferred();
+      this.tearingDown.fulfill(
+        (async () => {
+          // first phase: everybody's willTeardown resolves. Each instance
+          // promises that it will not *initiate* new calls to its injections
+          // after resolving willTeardown. You may still call your injections in
+          // response to being called by someone who injected you.
+          await Promise.all(
+            [...this.cache.values()].map(async ({ promise, instance }) => {
+              try {
+                await promise;
+              } catch (e) {
+                // whoever originally called instantiate or lookup received a rejected promise and its their responsibility to handle it
+              }
+              if (typeof instance?.willTeardown === 'function') {
+                await instance.willTeardown();
+              }
+            })
+          );
+
+          // Once everybody has resolved willTeardown, we know there are no more
+          // inter-instance functions that will run, so we can destroy
+          // everything.
+          await Promise.all(
+            [...this.cache.values()].map(async ({ instance }) => {
+              if (typeof instance?.teardown === 'function') {
+                await instance.teardown();
+              }
+            })
+          );
+        })()
       );
     }
 
-    await this.teardownPromise;
+    await this.tearingDown.promise;
   }
 }
 

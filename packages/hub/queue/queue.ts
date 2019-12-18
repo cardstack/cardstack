@@ -111,33 +111,31 @@ export default class Queue {
   }
 
   private async drainNotifications(loop: WorkLoop) {
-    await this.pgclient.withConnection(async ({ query }) => {
-      while (!loop.shuttingDown) {
-        let waitingIds = [...this.notifiers.keys()];
-        log.trace('jobs waiting for notification: %s', waitingIds);
-        let result = await query([
-          `select id, status, result from jobs where status != 'unfulfilled' and (`,
-          ...any(waitingIds.map(id => [`id=`, param(id)])),
-          `)`,
-        ]);
-        if (result.rowCount === 0) {
-          log.trace(`no jobs to notify`);
-          return;
-        }
-        for (let row of result.rows) {
-          log.trace(`notifying caller that job %s finished with %s`, row.id, row.status);
-          // "!" because we only searched for rows matching our notifiers Map, and
-          // we are the only code that deletes from that Map.
-          let { resolve, reject } = this.notifiers.get(row.id)!;
-          this.notifiers.delete(row.id);
-          if (row.status === 'resolved') {
-            resolve(row.result);
-          } else {
-            reject(row.result);
-          }
+    while (!loop.shuttingDown) {
+      let waitingIds = [...this.notifiers.keys()];
+      log.trace('jobs waiting for notification: %s', waitingIds);
+      let result = await this.pgclient.query([
+        `select id, status, result from jobs where status != 'unfulfilled' and (`,
+        ...any(waitingIds.map(id => [`id=`, param(id)])),
+        `)`,
+      ]);
+      if (result.rowCount === 0) {
+        log.trace(`no jobs to notify`);
+        return;
+      }
+      for (let row of result.rows) {
+        log.trace(`notifying caller that job %s finished with %s`, row.id, row.status);
+        // "!" because we only searched for rows matching our notifiers Map, and
+        // we are the only code that deletes from that Map.
+        let { resolve, reject } = this.notifiers.get(row.id)!;
+        this.notifiers.delete(row.id);
+        if (row.status === 'resolved') {
+          resolve(row.result);
+        } else {
+          reject(row.result);
         }
       }
-    });
+    }
   }
 
   async publish<T>(category: string, args: PgPrimitive, opts: QueueOpts = {}): Promise<Job<T>> {
@@ -188,11 +186,6 @@ export default class Queue {
   }
 
   private async drainQueues(workLoop: WorkLoop) {
-    // it's important that our persistent tasks like this one hold open a
-    // connection, rather than grabbing a new connection from the pool each time
-    // they want to run a query. The open connection blocks teardown of pgclient
-    // until this method can make an orderly exit, avoiding a possible exception
-    // where we try to run a last query and the pool is already torn down.
     await this.pgclient.withConnection(async ({ query }) => {
       while (!workLoop.shuttingDown) {
         log.trace(`draining queues`);
@@ -241,7 +234,7 @@ export default class Queue {
     });
   }
 
-  async teardown() {
+  async willTeardown() {
     this.shuttingDown = true;
     if (this.jobRunner) {
       await this.jobRunner.shutDown();
