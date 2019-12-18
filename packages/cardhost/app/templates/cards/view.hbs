@@ -1,7 +1,7 @@
-<div class="card-renderer--top-edge-buttons">
-  {{#if this.cssModeToggle.editingCss}}
-    <ThemerToolbar @closeEditor={{this.closeEditor}} />
-  {{else}}
+{{#if this.cssModeToggle.editingCss}}
+  <ThemerToolbar @closeEditor={{this.closeEditor}} />
+{{else}}
+  <div class="card-renderer--top-edge-buttons">
     <button
       class="ch-button ch-button--icon share"
       aria-label="Share button"
@@ -14,8 +14,8 @@
       Preview
     </button>
     <SaveButton @card={{this.card}}/>
-  {{/if}}
-</div>
+  </div>
+{{/if}}
 
 {{#unless this.cssModeToggle.editingCss}}
   <CardhostLeftEdge />

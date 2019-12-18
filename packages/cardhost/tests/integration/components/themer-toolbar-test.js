@@ -9,6 +9,6 @@ module('Integration | Component | themer-toolbar', function(hooks) {
   test('it renders', async function(assert) {
     this.set('closeEditor', () => {});
     await render(hbs`<ThemerToolbar @closeEditor={{this.closeEditor}} />`);
-    assert.equal(this.element.textContent.trim(), 'Close Editor');
+    assert.ok(this.element.textContent.includes('Close Editor'));
   });
 });
