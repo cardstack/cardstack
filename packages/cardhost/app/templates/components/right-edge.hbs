@@ -50,7 +50,7 @@
                 </div>
               </div>
             </div>
-          {{else}}
+          {{else if @selectedField}}
             <div class="right-edge--sections">
               <AnimatedContainer>
                 {{#animated-value @selectedField use=this.fade as |field|}}
