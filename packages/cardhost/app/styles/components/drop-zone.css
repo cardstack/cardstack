@@ -1,31 +1,33 @@
 :root {
-  --ch-drop-zone-transition-duration: 300ms;
+  --ch-drop-zone-transition-duration: 200ms;
 }
 .drop-zone--container {
-  position: relative;
+  height: 20px;
+  background-color: var(--ch-dark-background);
+}
+
+.drop-zone--container.outside {
+  transition: height var(--ch-drop-zone-transition-duration) cubic-bezier(0.445, 0.05, 0.55, 0.95);
+}
+
+.drop-zone--container.dragging {
+  height: 158px;
+  transition: height var(--ch-drop-zone-transition-duration) cubic-bezier(0.445, 0.05, 0.55, 0.95);
 }
 
 .drop-zone {
   background-color: transparent;
-  position: absolute;
-  top: -60px;
-  height: 120px;
   width: 100%;
-  border: solid 1px red;
 }
 
-.drop-zone--container .drop-zone--preview {
-  height: 2px;
+.drop-zone--container .drop-zone--description .drop-zone--preview--container {
   pointer-events: none;
+  padding: 20px 53px;
 }
 
-.drop-zone--container .drop-zone--preview.active {
+.drop-zone .drop-zone--description {
+  pointer-events: none;
   height: 120px;
-}
-
-.drop-zone .drop-zone-text {
-  display: none;
-  height: 2px;
   opacity: 0.5;
   padding: 0;
   background-color: var(--ch-medium-purple);
@@ -33,18 +35,14 @@
   font-size: 16px;
   line-height: 22px;
   text-align: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-  transition:
-    opacity var(--ch-drop-zone-transition-duration),
-    height var(--ch-drop-zone-transition-duration),
-    padding var(--ch-drop-zone-transition-duration);
 }
 
-.drop-zone .drop-zone-text.active {
+.drop-zone--description--text {
+  display: none;
+}
+
+.drop-zone .drop-zone--description.dragging {
   opacity: 1;
-  padding: var(--ch-spacing);
-  height: 120px;
 }
 
 .drop-zone .drop-zone--drag-drop-icon {
