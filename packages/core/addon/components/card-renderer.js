@@ -12,6 +12,7 @@ export default class CardRenderer extends Component {
   @tracked componentName;
   @tracked mode;
   @tracked cardFocused = () => {};
+  @tracked scrolled = '';
 
   constructor(...args) {
     super(...args);
@@ -47,5 +48,24 @@ export default class CardRenderer extends Component {
 
   get isolatedComponentName() {
     return `cards/${dasherize(this.sanitizedName)}/isolated`;
+  }
+
+  @action
+  registerScrollListener(el) {
+    // needed for styling the scrolled card
+    this.scrolled = el.scrollTop > 0 ? 'scrolled' : '';
+
+    el.addEventListener('scroll', scrollEvent => {
+      let position = scrollEvent.currentTarget.scrollTop;
+      if (position > 3) {
+        this.scrolled = 'scrolled';
+      } else {
+        this.scrolled = '';
+      }
+    });
+  }
+
+  removeScrollListener(el) {
+    el.removeEventListener('scroll');
   }
 }
