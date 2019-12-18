@@ -10,7 +10,7 @@
     {{#animated-value this.options watch="selectedContent" use=this.outerTransition}}
       <div class="right-edge--section--container">
         <AnimatedContainer>
-          {{#animated-if @cardSelected use=fade}}
+          {{#animated-if @cardSelected use=this.fade}}
             {{!--
             TODO each of these section is collapsable.
             Waiting until ember animated/liquid fire is available
@@ -41,11 +41,11 @@
                 </div>
                 <div class="right-edge--item">
                   {{#if @card.adoptedFrom}}
-                  <AdoptedFrom @card={{@card.adoptedFrom}} @adoptedCard={{@card}} />
+                    <AdoptedFrom @card={{@card.adoptedFrom}} @adoptedCard={{@card}} />
                   {{else}}
-                  <div data-test-no-adoption>
-                    No Adoption
-                  </div>
+                    <div data-test-no-adoption>
+                      No Adoption
+                    </div>
                   {{/if}}
                 </div>
               </div>
@@ -53,18 +53,18 @@
           {{else}}
             <div class="right-edge--sections">
               <AnimatedContainer>
-                {{#animated-value @selectedField use=fade as |field|}}
+                {{#animated-value @selectedField use=this.fade as |field|}}
                   <div class="right-edge--section">
                     <div class="right-edge--section-header" data-test-section-header>
                       <AnimatedContainer>
-                        {{#animated-value this.selectedFieldTitle use=fade as |fieldTitle|}}
+                        {{#animated-value this.selectedFieldTitle use=this.fade as |fieldTitle|}}
                           <div class="right-edge--selected-field-title">{{fieldTitle}} Field</div>
                         {{/animated-value}}
                       </AnimatedContainer>
                       {{#if field.isAdopted}}
-                      <div class="right-edge--section-header--adopted">
-                        Adopted from {{field.card.adoptedFrom.name}}
-                      </div>
+                        <div class="right-edge--section-header--adopted">
+                          Adopted from {{field.card.adoptedFrom.name}}
+                        </div>
                       {{/if}}
                     </div>
 
