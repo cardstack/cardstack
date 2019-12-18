@@ -90,3 +90,8 @@
 .ui-components .right-edge {
   position: static;
 }
+
+.ui-components .ch-button--icon.responsive,
+.ui-components .ch-button--icon.full-width {
+  color: var(--ch-light);
+}
