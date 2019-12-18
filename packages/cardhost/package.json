@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/cardhost",
-  "version": "0.16.8",
+  "version": "0.16.9",
   "description": "The stock Ember app blueprint that hosts Cardstack Cards.",
   "repository": "",
   "license": "MIT",
