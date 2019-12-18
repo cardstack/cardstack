@@ -125,8 +125,12 @@
 }
 
 .themer--top-edge-container .close-editor-btn {
-  --width: 125px;
+  width: 125px;
   margin-left: 20px;
+  align-self: start;
+  display: inline-block;
+  vertical-align: top;
+  color: var(--ch-dark);
 }
 
 .cardhost-card-theme-editor .editor-container.editor-pane--container-highlighted {
@@ -175,4 +179,8 @@
 
 .themer--top-edge-pane-controls {
   justify-self: end;
+}
+
+.themer--top-edge-width-controls .ch-button + .ch-button {
+  margin-left: 45px;
 }
