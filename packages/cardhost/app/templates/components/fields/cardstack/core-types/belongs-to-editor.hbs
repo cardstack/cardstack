@@ -1,2 +1,6 @@
-<TextField @id={{concat "edit-" @field.name "-field-value"}} @label={{@field.label}} @placeholder="Card ID"
-  @value={{this.fieldValue}} @changeAction={{action this.updateFieldValue}} />
+<TextField
+  @id={{concat "edit-" @field.name "-field-value"}}
+  @label={{@field.label}}
+  @placeholder="Card ID"
+  @value={{this.fieldValue}}
+  @changeAction={{action this.updateFieldValue}} />

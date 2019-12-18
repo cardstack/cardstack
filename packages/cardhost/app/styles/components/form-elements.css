@@ -1,3 +1,5 @@
+/* Remove these when all text input and textarea are
+replaced with ui-components TextField and TextArea */
 .ch-input-group {
   position: relative;
   display: block;
@@ -129,6 +131,8 @@ textarea.ch-textarea::placeholder {
 .ch-label > .ch-textarea {
   margin-top: 7px;
 }
+
+
 
 .ch-checkbox-group {
   display: flex;

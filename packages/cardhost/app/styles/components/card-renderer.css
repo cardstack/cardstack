@@ -52,7 +52,7 @@
   height: var(--card-renderer-header-height);
   padding: 14px 20px;
   background-color: var(--ch-disabled);
-  color: var(--ch-light);
+  color: var(--ch-light-op50);
   border: none;
   font-weight: 600;
   overflow: hidden;
@@ -69,7 +69,7 @@
 }
 
 .card-renderer-isolated--header svg {
-  --icon-color: var(--ch-light);
+  --icon-color: var(--ch-light-op50);
 
   margin-right: 13px;
   width: 18px;

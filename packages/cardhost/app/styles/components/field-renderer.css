@@ -1,9 +1,6 @@
 .field-renderer {
-  --field-container-width: auto;
-  --field-container-height: auto;
-
-  width: var(--field-container-width);
-  max-width: 100%;
+  width: 100%;
+  max-width: var(--field-container-width);
   min-height: var(--field-container-height);
   background: none;
 }
