@@ -5,11 +5,9 @@
       <div class="color-palette--block {{name}}" style="background-color: var({{name}})">
         {{value}}
       </div>
-      <CodeEditor
-        class="color-palette--code"
-        @code={{name}}
-        @language="css"
-      />
+      <div class="ui-components--notes color-palette--code">
+        <code>{{name}}</code>
+      </div>
     </div>
   {{/each-in}}
 </div>

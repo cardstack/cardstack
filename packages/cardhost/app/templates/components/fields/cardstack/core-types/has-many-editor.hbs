@@ -1,3 +1,7 @@
-<TextField @id={{concat "edit-" @field.name "-field-value"}} @label={{@field.label}}
-  @placeholder="Comma separated Card ID's" @size="60" @value={{this.fieldValue}}
+<TextField
+  @id={{concat "edit-" @field.name "-field-value"}}
+  @label={{@field.label}}
+  @placeholder="Comma separated Card ID's"
+  @size="60"
+  @value={{this.fieldValue}}
   @changeAction={{action this.updateFieldValue}} />

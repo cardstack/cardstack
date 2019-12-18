@@ -21,14 +21,6 @@
     <section class="ch-catalog">
       <header class="ch-catalog--header">
         <h3 class="ch-catalog--title">Card Catalog</h3>
-        <div class="ch-catalog--header-btns">
-          <button class="ch-catalog--header-btn sidebar active" aria-label="View as sidebar"></button>
-          <button class="ch-catalog--header-btn grid" aria-label="View as grid"></button>
-        </div>
-        <Input
-          @class="ch-filter-bar"
-          @placeholder="Filter Results"
-        />
       </header>
       <div class="ch-catalog--fields">
         {{#each this.fieldComponents as |field|}}

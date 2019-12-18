@@ -2,6 +2,10 @@
   margin-top: var(--ch-spacing);
 }
 
+.field-renderer.edit-field label {
+  text-transform: capitalize;
+}
+
 /* .field-renderer.edit-field > img {
   position: absolute;
   top: 10px;
@@ -13,6 +17,9 @@
 
 .field-renderer.edit-field.field-address .cs-input,
 .field-renderer.edit-field.field-location .cs-input {
-  background: url('/assets/images/icons/location-pin.svg') left center/15px no-repeat;
-  padding-left: 25px;
+  padding-left: 40px;
+  background-image: url('/assets/images/icons/location-pin.svg');
+  background-position: center left 15px;
+  background-repeat: no-repeat;
+  background-size: 15px 17px;
 }
