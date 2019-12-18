@@ -12,6 +12,7 @@ import {
 } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
+import { animationsSettled } from 'ember-animated/test-support';
 
 const card1Id = 'millenial-puppies';
 const qualifiedCard1Id = `local-hub::${card1Id}`;
@@ -143,13 +144,15 @@ module('Acceptance | card create', function(hooks) {
     await setCardId(card1Id);
     await addField('title', 'string', true);
     await addField('body', 'string', false);
+    await animationsSettled();
 
     await click('[data-test-field="title"]');
-
+    await animationsSettled();
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('title');
 
     await fillIn('[data-test-right-edge] [data-test-schema-attr="name"] input', 'subtitle');
     await triggerEvent(`[data-test-right-edge] [data-test-schema-attr="name"] input`, 'keyup');
+    await animationsSettled();
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
 
     await fillIn('[data-test-right-edge] [data-test-schema-attr="label"] input', 'Subtitle');
