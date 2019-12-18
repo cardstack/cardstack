@@ -6,7 +6,6 @@ import fade from 'ember-animated/transitions/fade';
 import resize from 'ember-animated/motions/resize';
 import { fadeIn, fadeOut } from 'ember-animated/motions/opacity';
 import { easeInAndOut } from 'ember-animated/easings/cosine';
-import { printSprites } from 'ember-animated';
 
 export default class RightEdge extends Component {
   @tracked cardName = this.args.card.name;
@@ -44,14 +43,12 @@ export default class RightEdge extends Component {
   }
 
   *outerTransition({ keptSprites }) {
-    printSprites(arguments[0], 'outerTransition');
     keptSprites.forEach(sprite => {
       resize(sprite, { easing: easeInAndOut });
     });
   }
 
   *innerTransition({ insertedSprites, removedSprites }) {
-    printSprites(arguments[0], 'innerTransition');
     insertedSprites.forEach(sprite => {
       fadeIn(sprite);
     });
