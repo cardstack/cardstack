@@ -12,6 +12,7 @@ import {
   dragFieldToNewPosition,
 } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
+import { animationsSettled } from 'ember-animated/test-support';
 
 const card1Id = 'millenial-puppies';
 const qualifiedCard1Id = `local-hub::${card1Id}`;
@@ -253,15 +254,17 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
 
     await click('[data-test-field="body"]');
+    await animationsSettled();
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('body');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('body');
 
     await click('[data-test-field="subtitle"]');
+    await animationsSettled();
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
 
     await dragAndDropNewField('string');
-    await click('[data-test-field="new-field-3"]');
+    await animationsSettled();
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('new-field-3');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('new-field-3');
   });

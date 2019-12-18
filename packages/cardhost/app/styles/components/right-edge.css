@@ -44,13 +44,14 @@
   border-radius: inherit;
 }
 
+.right-edge--sections {
+  width: var(--ch-right-edge-panel-width);
+}
+
 .right-edge--section {
   padding: 10px var(--ch-spacing) 11px;
   border-top: 1px solid var(--ch-default);
-}
-
-.right-edge--section:last-child {
-  padding-bottom: 14px;
+  width: var(--ch-right-edge-panel-width);
 }
 
 .right-edge--section-header {
@@ -60,6 +61,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
   text-transform: capitalize;
+  height: 18px;
+}
+
+.right-edge--section-header .right-edge--selected-field-title {
+  height: 18px;
 }
 
 .right-edge--section-header--adopted {
