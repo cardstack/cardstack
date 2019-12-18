@@ -20,6 +20,10 @@ export default class CardsService {
 export class ScopedCardService {
   constructor(private cards: CardsService, private session: Session) {}
 
+  instantiate(jsonapi: SingleResourceDoc): CardWithId {
+    return new CardWithId(jsonapi);
+  }
+
   async create(realm: string, doc: SingleResourceDoc): Promise<CardWithId> {
     let realmCard = await this.getRealm(realm);
     let writerFactory = await realmCard.loadFeature('writer');

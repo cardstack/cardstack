@@ -12,6 +12,39 @@ import { myOrigin } from './origin';
 
 export const apiPrefix = '/api';
 
+export function canonicalURLToCardId(url: string) {
+  let parts = url.split('/');
+  let localId = parts.pop()!;
+  let nextPart = parts.pop()!;
+  let originalRealm;
+  if (nextPart !== 'cards') {
+    originalRealm = nextPart;
+    parts.pop();
+  }
+  return {
+    realm: parts.join('/'),
+    originalRealm: originalRealm == null ? undefined : decodeURIComponent(originalRealm),
+    localId: decodeURIComponent(localId),
+  };
+}
+
+export function canonicalURL(id: CardId) {
+  let isHome = id.originalRealm === id.realm;
+  let base = `${myOrigin}${apiPrefix}/realms`;
+  let localRealmId = id.realm.slice(base.length + 1);
+  if (isHome) {
+    return [base, localRealmId, 'cards', encodeURIComponent(id.localId)].join('/');
+  } else {
+    return [
+      base,
+      localRealmId,
+      'cards',
+      encodeURIComponent(id.originalRealm ?? id.realm),
+      encodeURIComponent(id.localId),
+    ].join('/');
+  }
+}
+
 export class Card {
   static async makePristineCollection(cards: CardWithId[], meta: ResponseMeta): Promise<PristineCollection> {
     let pristineDocs = await Promise.all(cards.map(card => card.asPristineDoc()));
@@ -109,17 +142,6 @@ export class Card {
     patch(this.jsonapi, otherDoc);
   }
 
-  get canonicalURL(): string {
-    let isHome = this.originalRealm === this.realm;
-    let base = `${myOrigin}${apiPrefix}/realms`;
-    let localRealmId = this.realm.slice(base.length + 1);
-    if (isHome) {
-      return [base, localRealmId, 'cards', this.localId].join('/');
-    } else {
-      return [base, localRealmId, 'cards', encodeURIComponent(this.originalRealm), this.localId].join('/');
-    }
-  }
-
   // This is the way that data source plugins think about card IDs. The
   // upstreamId is only unique *within* a realm.
   get upstreamId(): UpstreamIdentity | null {
@@ -140,7 +162,13 @@ export class Card {
     }
   }
 
-  async adoptsFrom(): CardWithId {}
+  get canonicalURL(): string {
+    return canonicalURL(this);
+  }
+
+  async adoptsFrom(): CardWithId {
+    debugger;
+  }
 }
 
 function cardHasIds(card: Card): asserts card is CardWithId {

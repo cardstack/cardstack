@@ -261,7 +261,7 @@ export default class PgClient {
         { status: 404 }
       );
     }
-    return new CardWithId(result.rows[0].pristine_doc);
+    return cards.instantiate(result.rows[0].pristine_doc);
   }
 
   async search(
@@ -298,10 +298,16 @@ export default class PgClient {
 
     let response = await this.queryCards(cards, query);
     let totalResponse = await totalResponsePromise;
-    return this.assembleResponse(response, totalResponse, size, sorts);
+    return this.assembleResponse(response, totalResponse, size, sorts, cards);
   }
 
-  private assembleResponse(response: QueryResult, totalResponse: QueryResult, requestedSize: number, sorts: Sorts) {
+  private assembleResponse(
+    response: QueryResult,
+    totalResponse: QueryResult,
+    requestedSize: number,
+    sorts: Sorts,
+    cardService: ScopedCardService
+  ) {
     let page: ResponseMeta['page'] = {
       // nobody has more than 2^53-1 total docs right?
       total: parseInt(totalResponse.rows[0].count, 10),
@@ -314,7 +320,7 @@ export default class PgClient {
     }
 
     return {
-      cards: cards.map(row => new CardWithId(row.pristine_doc)),
+      cards: cards.map(row => cardService.instantiate(row.pristine_doc)),
       meta: { page },
     };
   }

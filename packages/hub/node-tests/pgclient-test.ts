@@ -1,4 +1,3 @@
-import { CardWithId } from '../card';
 import { param } from '../pgsearch/util';
 import { createTestEnv, TestEnv } from './helpers';
 import { testCard } from './test-card';
@@ -24,12 +23,12 @@ describe('hub/pgclient', function() {
   });
 
   it('saves a card', async function() {
-    let card = new CardWithId(
-      testCard({ csLocalId: 'card-1', csRealm: `http://hassan.com/realm`, hello: 'world' }).jsonapi
-    );
     let pgclient = await env.container.lookup('pgclient');
     let cardsService = await env.container.lookup('cards');
     let cards = cardsService.as(Session.INTERNAL_PRIVILEGED);
+    let card = cards.instantiate(
+      testCard({ csLocalId: 'card-1', csRealm: `http://hassan.com/realm`, hello: 'world' }).jsonapi
+    );
 
     let batch = pgclient.beginCardBatch(cards);
     await batch.save(card);

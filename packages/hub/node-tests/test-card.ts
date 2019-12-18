@@ -1,5 +1,6 @@
 import { SingleResourceDoc } from 'jsonapi-typescript';
-import { CardId } from '../card';
+import { CardId, canonicalURL } from '../card';
+import { UpstreamDocument } from '../document';
 
 export class TestCard {
   private parent: CardId | undefined;
@@ -48,11 +49,15 @@ export class TestCard {
 
     if (this.parent) {
       doc.data.relationships['adopts-from'] = {
-        links: { related: '' },
+        links: { related: canonicalURL(this.parent) },
       };
     }
 
     return doc;
+  }
+
+  get upstreamDoc(): UpstreamDocument {
+    return new UpstreamDocument(this.jsonapi);
   }
 
   adoptingFrom(parent: CardId) {
@@ -68,6 +73,14 @@ interface Fields {
   [fieldName: string]: any;
 }
 
-export function testCard(values: Fields): TestCard {
+interface TestCardWithId extends TestCard {
+  localId: string;
+  realm: string;
+  originalRealm: string;
+}
+
+export function testCard(values: { csRealm: string; csLocalId: string; [userField: string]: any }): TestCardWithId;
+export function testCard(values: Fields): TestCard;
+export function testCard(values: Fields): TestCard | TestCardWithId {
   return new TestCard(values);
 }
