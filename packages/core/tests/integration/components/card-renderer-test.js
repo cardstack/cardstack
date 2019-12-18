@@ -1,7 +1,7 @@
 import { module, test, skip } from 'qunit';
 import Fixtures from '@cardstack/test-support/fixtures';
 import { setupRenderingTest } from 'ember-qunit';
-import { render, triggerEvent } from '@ember/test-helpers';
+import { render, triggerEvent, find, waitFor, waitUntil } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
 const card1Id = 'millenial-puppies';
@@ -130,6 +130,56 @@ module('Integration | Component | card-renderer', function(hooks) {
       [...this.element.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
       ['title', 'author', 'body']
     );
+  });
+
+  test('isolated card has scrolling class toggled', async function(assert) {
+    let service = this.owner.lookup('service:data');
+    let card = service.createCard(qualifiedCard1Id);
+    card.addField({
+      name: 'title',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test title',
+    });
+    card.addField({
+      name: 'author',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: true,
+      value: 'test author',
+    });
+    card.addField({
+      name: 'body',
+      type: '@cardstack/core-types::string',
+      neededWhenEmbedded: false,
+      value: 'test body',
+    });
+    this.set('card', card);
+
+    await render(hbs`
+      <CardRenderer
+        @card={{card}}
+        @format="isolated"
+        @mode="view"
+      />
+    `);
+
+    assert.dom(`[data-test-isolated-card="${card1Id}"]`).exists();
+    assert.dom('[data-test-card-renderer-header]').exists();
+    assert.dom('[data-test-scroll-target]').exists();
+    let target = find('[data-test-scroll-target]');
+    target.style['overflow-y'] = 'scroll';
+    target.style.height = '15px';
+    assert.dom('[data-test-card-renderer-header]').doesNotHaveClass('scrolled');
+    // simulate scrolling down
+    target.scrollTop = 50;
+    await waitFor('.scrolled');
+    assert.dom('[data-test-card-renderer-header]').hasClass('scrolled');
+    // simulate scrolling back up to the top
+    target.scrollTop = 0;
+    await waitUntil(function() {
+      return !find('[data-test-card-renderer-header]').classList.contains('scrolled');
+    });
+    assert.dom('[data-test-card-renderer-header]').doesNotHaveClass('scrolled');
   });
 
   test('it renders an isolated card that adopts from another card', async function(assert) {

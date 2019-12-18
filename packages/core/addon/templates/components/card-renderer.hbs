@@ -19,13 +19,13 @@ Ember Concurrency into the rendering of the card component here.
       {{on "focus" (action this.cardIsFocused true)}}
       {{did-insert this.focusCard true}}
     >
-      <header class="card-renderer-{{@format}}--header {{this.scrolled}}">
+      <header class="card-renderer-{{@format}}--header {{this.scrolled}}" data-test-card-renderer-header>
         {{#if (or (eq (safe-css-string @card.adoptedFromName) "event-card") (eq (safe-css-string @card.name) "event-card"))}}
           {{svg-jar "event" width="18px" height="20px"}}
         {{/if}}
         <span class="card-renderer-{{@format}}--header-title hide-in-percy">{{or @card.name "Blank Card"}}</span>
       </header>
-      <div class="card-renderer-{{@format}}--content" {{did-insert this.registerScrollListener}}>
+      <div class="card-renderer-{{@format}}--content" {{did-insert this.registerScrollListener}} data-test-scroll-target>
         <Isolated
           @card={{@card}}
           @mode={{this.mode}}

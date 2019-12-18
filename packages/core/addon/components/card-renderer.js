@@ -2,6 +2,8 @@ import Component from '@glimmer/component';
 import { dasherize } from '@ember/string';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
+import { restartableTask } from 'ember-concurrency-decorators';
+import { timeout } from 'ember-concurrency';
 
 // TODO we'll need to use EC in order to be able to isolate cards
 // (due to the need to await the load of the isolated format of a card)
@@ -56,13 +58,22 @@ export default class CardRenderer extends Component {
     this.scrolled = el.scrollTop > 0 ? 'scrolled' : '';
 
     el.addEventListener('scroll', scrollEvent => {
-      let position = scrollEvent.currentTarget.scrollTop;
-      if (position > 3) {
-        this.scrolled = 'scrolled';
-      } else {
-        this.scrolled = '';
-      }
+      this.debouncedScroll.perform(scrollEvent);
     });
+  }
+
+  @restartableTask
+  *debouncedScroll(scrollEvent) {
+    yield timeout(15);
+    if (!scrollEvent.target) {
+      return;
+    }
+    let position = scrollEvent.target.scrollTop;
+    if (position > 3) {
+      this.scrolled = 'scrolled';
+    } else {
+      this.scrolled = '';
+    }
   }
 
   removeScrollListener(el) {
