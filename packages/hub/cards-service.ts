@@ -21,7 +21,7 @@ export class ScopedCardService {
   constructor(private cards: CardsService, private session: Session) {}
 
   instantiate(jsonapi: SingleResourceDoc): Card {
-    return new Card(jsonapi);
+    return new Card(jsonapi, this);
   }
 
   async create(realm: string, doc: SingleResourceDoc): Promise<Card> {
@@ -33,7 +33,7 @@ export class ScopedCardService {
       });
     }
     let writer = await getOwner(this.cards).instantiate(writerFactory, realmCard);
-    let card: UnsavedCard = new UnsavedCard(doc, realm);
+    let card: UnsavedCard = new UnsavedCard(doc, realm, this);
     await validate(null, card, realmCard);
 
     let upstreamIdToWriter = card.upstreamId;
@@ -57,7 +57,7 @@ export class ScopedCardService {
   }
 
   async search(query: Query): Promise<{ cards: Card[]; meta: ResponseMeta }> {
-    let cards = await scaffoldSearch(query);
+    let cards = await scaffoldSearch(query, this);
     if (cards) {
       return { cards, meta: { page: { total: cards.length } } };
     }
@@ -78,7 +78,7 @@ export class ScopedCardService {
       id = idOrURL;
     }
     await this.getRealm(id.realm);
-    let card = await scaffoldGet(id);
+    let card = await scaffoldGet(id, this);
     if (card) {
       return card;
     }

@@ -8,32 +8,33 @@ import { testCard } from './node-tests/test-card';
 import { CardExpression } from './pgsearch/util';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
 import { IndexerFactory } from './indexer';
+import { ScopedCardService } from './cards-service';
 
-function ephemeralRealms() {
+function ephemeralRealms(cards: ScopedCardService) {
   return [
     // The realm card for the meta realm
-    new Card(
+    cards.instantiate(
       testCard({
         csRealm: `${myOrigin}/api/realms/meta`,
         csOriginalRealm: `${myOrigin}/api/realms/meta`,
         csLocalId: `${myOrigin}/api/realms/meta`,
       }).jsonapi
     ),
-    new Card(
+    cards.instantiate(
       testCard({
         csRealm: `${myOrigin}/api/realms/meta`,
         csOriginalRealm: `${myOrigin}/api/realms/meta`,
         csLocalId: `${myOrigin}/api/realms/first-ephemeral-realm`,
       }).jsonapi
     ),
-    new Card(
+    cards.instantiate(
       testCard({
         csRealm: `${myOrigin}/api/realms/meta`,
         csOriginalRealm: `http://example.com/api/realms/meta`,
         csLocalId: `http://example.com/api/realms/second-ephemeral-realm`,
       }).jsonapi
     ),
-    new Card(
+    cards.instantiate(
       testCard({
         csRealm: `${myOrigin}/api/realms/meta`,
         csOriginalRealm: CARDSTACK_PUBLIC_REALM,
@@ -43,7 +44,7 @@ function ephemeralRealms() {
   ];
 }
 
-export async function search(query: Query): Promise<Card[] | null> {
+export async function search(query: Query, cards: ScopedCardService): Promise<Card[] | null> {
   // this is currently special-cased to only handle searches for realms.
   // Everything else throws unimplemented.
 
@@ -56,16 +57,16 @@ export async function search(query: Query): Promise<Card[] | null> {
   }
 
   let searchingFor = query.filter.eq.localId;
-  return ephemeralRealms().filter(card => card.localId === searchingFor);
+  return ephemeralRealms(cards).filter(card => card.localId === searchingFor);
 }
 
-export async function get(id: CardId): Promise<Card | null> {
+export async function get(id: CardId, cards: ScopedCardService): Promise<Card | null> {
   if (
     id.realm === 'https://base.cardstack.com/public' &&
     (id.originalRealm ?? id.realm) === 'https://base.cardstack.com/public' &&
     id.localId === 'string-field'
   ) {
-    return new Card(
+    return cards.instantiate(
       testCard({
         csRealm: id.realm,
         csOriginalRealm: id.originalRealm,
@@ -76,15 +77,15 @@ export async function get(id: CardId): Promise<Card | null> {
   return null;
 }
 
-export async function loadWriter(card: Card): Promise<WriterFactory> {
-  if (ephemeralRealms().find(realm => realm.id === card.id)) {
+export async function loadWriter(card: Card, cards: ScopedCardService): Promise<WriterFactory> {
+  if (ephemeralRealms(cards).find(realm => realm.id === card.id)) {
     return (await import('./ephemeral/writer')).default;
   }
   throw new Error(`unimplemented`);
 }
 
-export async function loadIndexer(card: Card): Promise<IndexerFactory<unknown>> {
-  if (ephemeralRealms().find(realm => realm.id === card.id)) {
+export async function loadIndexer(card: Card, cards: ScopedCardService): Promise<IndexerFactory<unknown>> {
+  if (ephemeralRealms(cards).find(realm => realm.id === card.id)) {
     return (await import('./ephemeral/indexer')).default as IndexerFactory<unknown>;
   }
   throw new Error(`unimplemented`);

@@ -9,6 +9,7 @@ import { ResponseMeta } from './pgsearch/pgclient';
 import * as J from 'json-typescript';
 import { IndexerFactory } from './indexer';
 import { myOrigin } from './origin';
+import { ScopedCardService } from './cards-service';
 
 export const apiPrefix = '/api';
 
@@ -94,7 +95,7 @@ class BaseCard {
   //  - [realm, originalRealm, id] is globally unique, such that there are
   //    exactly zero or one cards that match it, across all hubs.
 
-  constructor(jsonapi: SingleResourceDoc, realm: string) {
+  constructor(jsonapi: SingleResourceDoc, realm: string, protected service: ScopedCardService) {
     this.jsonapi = jsonapi;
     this.realm = realm;
     this.originalRealm =
@@ -156,8 +157,17 @@ class BaseCard {
     }
   }
 
-  async adoptsFrom(): Card {
-    debugger;
+  async adoptsFrom(): Promise<Card | undefined> {
+    let adoptsFromRelationship = this.jsonapi.data.relationships?.adoptsFrom;
+    if (adoptsFromRelationship && `links` in adoptsFromRelationship) {
+      let url = adoptsFromRelationship.links.related;
+      if (url) {
+        if (typeof url !== 'string') {
+          url = url.href;
+        }
+        return await this.service.get(url);
+      }
+    }
   }
 }
 
@@ -166,7 +176,7 @@ export class UnsavedCard extends BaseCard {
     if (typeof this.localId !== 'string') {
       throw new CardstackError(`card missing required attribute "localId"`);
     }
-    return new Card(this.regenerateJSONAPI());
+    return new Card(this.regenerateJSONAPI(), this.service);
   }
 }
 
@@ -176,12 +186,12 @@ export class Card extends UnsavedCard {
   id!: string;
   localId!: string;
 
-  constructor(jsonapi: SingleResourceDoc) {
+  constructor(jsonapi: SingleResourceDoc, service: ScopedCardService) {
     if (typeof jsonapi.data.attributes?.realm !== 'string') {
       throw new CardstackError(`card missing required attribute "realm": ${JSON.stringify(jsonapi)}`);
     }
     let realm = jsonapi.data.attributes.realm;
-    super(jsonapi, realm);
+    super(jsonapi, realm, service);
 
     // this is initialized in super() by typescript can't see it.
     if ((this as any).localId == null) {
@@ -195,9 +205,9 @@ export class Card extends UnsavedCard {
   async loadFeature(featureName: any): Promise<any> {
     switch (featureName) {
       case 'writer':
-        return await loadWriter(this);
+        return await loadWriter(this, this.service);
       case 'indexer':
-        return await loadIndexer(this);
+        return await loadIndexer(this, this.service);
       case 'buildValueExpression':
         return buildValueExpression;
       default:

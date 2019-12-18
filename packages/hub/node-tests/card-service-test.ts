@@ -71,7 +71,7 @@ describe('hub/card-service', function() {
       let doc = testCard({ goodbye: 'world' }).adoptingFrom(baseCard);
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       let parent = await card.adoptsFrom();
-      expect(parent.id).to.equal(baseCard.id);
+      expect(parent?.id).to.equal(baseCard.id);
     });
   });
 
