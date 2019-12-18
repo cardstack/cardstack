@@ -52,6 +52,14 @@ describe('hub/card-service', function() {
       expect(foundCard.id).equals(card.id);
     });
 
+    it('can get a card out by canonical URL', async function() {
+      let doc = testCard({ hello: 'world' });
+      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+      let foundCard = await service.get(card.canonicalURL);
+      expect(foundCard.id).equals(card.id);
+    });
+
     // TODO we can do this now--the ephemeral data source is now keeping track of generation
     it.skip("adds upstream data source's version to the card's meta", async function() {});
 

@@ -1,5 +1,5 @@
 import { Session } from './session';
-import { UnsavedCard, Card, CardId } from './card';
+import { UnsavedCard, Card, CardId, canonicalURLToCardId } from './card';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
 import CardstackError from './error';
 import { myOrigin } from './origin';
@@ -66,9 +66,17 @@ export class ScopedCardService {
     return { cards: foundCards, meta };
   }
 
-  async get(id: CardId): Promise<Card> {
+  async get(id: CardId): Promise<Card>;
+  async get(canonicalURL: string): Promise<Card>;
+  async get(idOrURL: CardId | string): Promise<Card> {
     // this exists to throw if there's no such realm. We're not using the return
     // value yet but we will onc we implement custom searchers and realm grants.
+    let id;
+    if (typeof idOrURL === 'string') {
+      id = canonicalURLToCardId(idOrURL);
+    } else {
+      id = idOrURL;
+    }
     await this.getRealm(id.realm);
     let card = await scaffoldGet(id);
     if (card) {
