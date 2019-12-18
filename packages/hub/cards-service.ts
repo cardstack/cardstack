@@ -1,5 +1,5 @@
 import { Session } from './session';
-import { Card, CardWithId, CardId } from './card';
+import { UnsavedCard, Card, CardId } from './card';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
 import CardstackError from './error';
 import { myOrigin } from './origin';
@@ -20,11 +20,11 @@ export default class CardsService {
 export class ScopedCardService {
   constructor(private cards: CardsService, private session: Session) {}
 
-  instantiate(jsonapi: SingleResourceDoc): CardWithId {
-    return new CardWithId(jsonapi);
+  instantiate(jsonapi: SingleResourceDoc): Card {
+    return new Card(jsonapi);
   }
 
-  async create(realm: string, doc: SingleResourceDoc): Promise<CardWithId> {
+  async create(realm: string, doc: SingleResourceDoc): Promise<Card> {
     let realmCard = await this.getRealm(realm);
     let writerFactory = await realmCard.loadFeature('writer');
     if (!writerFactory) {
@@ -33,7 +33,7 @@ export class ScopedCardService {
       });
     }
     let writer = await getOwner(this.cards).instantiate(writerFactory, realmCard);
-    let card: Card = new Card(doc, realm);
+    let card: UnsavedCard = new UnsavedCard(doc, realm);
     await validate(null, card, realmCard);
 
     let upstreamIdToWriter = card.upstreamId;
@@ -46,17 +46,17 @@ export class ScopedCardService {
       throw new CardstackError(`Writer plugin for realm ${realm} tried to change a localId it's not allowed to change`);
     }
     card.localId = typeof upstreamIdFromWriter === 'object' ? upstreamIdFromWriter.localId : upstreamIdFromWriter;
-    card.patch(saved.jsonapi);
-    card.assertHasIds();
+    let savedCard = card.asSavedCard();
+    savedCard.patch(saved.jsonapi);
 
     let batch = this.cards.pgclient.beginCardBatch(this);
-    await batch.save(card);
+    await batch.save(savedCard);
     await batch.done();
 
-    return card;
+    return savedCard;
   }
 
-  async search(query: Query): Promise<{ cards: CardWithId[]; meta: ResponseMeta }> {
+  async search(query: Query): Promise<{ cards: Card[]; meta: ResponseMeta }> {
     let cards = await scaffoldSearch(query);
     if (cards) {
       return { cards, meta: { page: { total: cards.length } } };
@@ -66,7 +66,7 @@ export class ScopedCardService {
     return { cards: foundCards, meta };
   }
 
-  async get(id: CardId): Promise<CardWithId> {
+  async get(id: CardId): Promise<Card> {
     // this exists to throw if there's no such realm. We're not using the return
     // value yet but we will onc we implement custom searchers and realm grants.
     await this.getRealm(id.realm);
@@ -78,7 +78,7 @@ export class ScopedCardService {
     return await this.cards.pgclient.get(this, id);
   }
 
-  private async getRealm(realm: string): Promise<CardWithId> {
+  private async getRealm(realm: string): Promise<Card> {
     // This searches by realm and localId. Even though it doesn't search by
     // originalRealm, it's unique because of the special property that Realm
     // cards have that their localId contains the complete URL to the realm. So

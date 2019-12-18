@@ -22,7 +22,7 @@ import {
   FieldValue,
   FieldArity,
 } from './util';
-import { CardWithId, CardId } from '../card';
+import { Card, CardId } from '../card';
 import CardstackError from '../error';
 import { Query, baseType, Filter, EqFilter, RangeFilter } from '../query';
 import { Sorts } from './sorts';
@@ -246,7 +246,7 @@ export default class PgClient {
     throw new Error(`unimplemented in buildQueryExpression for ${errorHint}`);
   }
 
-  async get(cards: ScopedCardService, id: CardId): Promise<CardWithId> {
+  async get(cards: ScopedCardService, id: CardId): Promise<Card> {
     let condition = every([
       [`realm = `, param(id.realm)],
       [`original_realm = `, param(id.originalRealm ?? id.realm)],
@@ -267,7 +267,7 @@ export default class PgClient {
   async search(
     cards: ScopedCardService,
     { filter, queryString, sort, page }: Query
-  ): Promise<{ cards: CardWithId[]; meta: ResponseMeta }> {
+  ): Promise<{ cards: Card[]; meta: ResponseMeta }> {
     let conditions = [] as CardExpression[];
 
     if (filter) {
@@ -371,7 +371,7 @@ export class Batch {
 
   constructor(private client: PgClient, private cards: ScopedCardService) {}
 
-  async save(card: CardWithId) {
+  async save(card: Card) {
     /* eslint-disable @typescript-eslint/camelcase */
     let row = {
       realm: param(card.realm),

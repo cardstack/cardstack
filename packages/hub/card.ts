@@ -45,26 +45,22 @@ export function canonicalURL(id: CardId) {
   }
 }
 
-export class Card {
-  static async makePristineCollection(cards: CardWithId[], meta: ResponseMeta): Promise<PristineCollection> {
-    let pristineDocs = await Promise.all(cards.map(card => card.asPristineDoc()));
-    // TODO includeds
-    return new PristineCollection({
-      data: pristineDocs.map(doc => doc.jsonapi.data),
-      meta: (meta as unknown) as J.Object,
-    });
-  }
+export async function makePristineCollection(cards: Card[], meta: ResponseMeta): Promise<PristineCollection> {
+  let pristineDocs = await Promise.all(cards.map(card => card.asPristineDoc()));
+  // TODO includeds
+  return new PristineCollection({
+    data: pristineDocs.map(doc => doc.jsonapi.data),
+    meta: (meta as unknown) as J.Object,
+  });
+}
 
-  static compositeId(id: CardId) {
-    return [id.realm, id.originalRealm ?? id.realm, id.localId].map(encodeURIComponent).join('/');
-  }
-
+class BaseCard {
   // Almost everyone should treat this as opaque and only valid on the current
   // hub. (The only exception is some code within the hub itself that may
   // optimize by pulling these apart.)
   get id(): string | undefined {
     if (typeof this.localId === 'string') {
-      return Card.compositeId({ realm: this.realm, originalRealm: this.originalRealm, localId: this.localId });
+      return [this.realm, this.originalRealm, this.localId].map(encodeURIComponent).join('/');
     }
     return undefined;
   }
@@ -116,7 +112,7 @@ export class Card {
     return model?.attributes[name];
   }
 
-  async asPristineDoc(): Promise<PristineDocument> {
+  protected regenerateJSONAPI(): SingleResourceDoc {
     let copied = cloneDeep(this.jsonapi);
     if (!copied.data.attributes) {
       copied.data.attributes = {};
@@ -127,15 +123,15 @@ export class Card {
       copied.data.attributes['local-id'] = this.localId;
     }
     copied.data.id = this.id;
-    return new PristineDocument(copied);
+    return copied;
+  }
+
+  async asPristineDoc(): Promise<PristineDocument> {
+    return new PristineDocument(this.regenerateJSONAPI());
   }
 
   async asUpstreamDoc(): Promise<UpstreamDocument> {
     return new UpstreamDocument(this.jsonapi);
-  }
-
-  assertHasIds(): asserts this is CardWithId {
-    cardHasIds(this);
   }
 
   patch(otherDoc: SingleResourceDoc): void {
@@ -162,22 +158,23 @@ export class Card {
     }
   }
 
-  get canonicalURL(): string {
-    return canonicalURL(this);
-  }
-
-  async adoptsFrom(): CardWithId {
+  async adoptsFrom(): Card {
     debugger;
   }
 }
 
-function cardHasIds(card: Card): asserts card is CardWithId {
-  if (typeof card.localId !== 'string') {
-    throw new CardstackError(`card missing required attribute "localId"`);
+export class UnsavedCard extends BaseCard {
+  asSavedCard(): Card {
+    if (typeof this.localId !== 'string') {
+      throw new CardstackError(`card missing required attribute "localId"`);
+    }
+    return new Card(this.regenerateJSONAPI());
   }
 }
 
-export class CardWithId extends Card {
+export class Card extends UnsavedCard {
+  // these are non-null because of the assertion in our construction that
+  // ensures localId is present.
   id!: string;
   localId!: string;
 
@@ -187,7 +184,11 @@ export class CardWithId extends Card {
     }
     let realm = jsonapi.data.attributes.realm;
     super(jsonapi, realm);
-    cardHasIds(this);
+
+    // this is initialized in super() by typescript can't see it.
+    if ((this as any).localId == null) {
+      throw new Error(`Bug: tried to use an UnsavedCard as a Card`);
+    }
   }
 
   async loadFeature(featureName: 'writer'): Promise<WriterFactory | null>;
@@ -204,6 +205,10 @@ export class CardWithId extends Card {
       default:
         throw new Error(`unimplemented loadFeature("${featureName}")`);
     }
+  }
+
+  get canonicalURL(): string {
+    return canonicalURL(this);
   }
 }
 

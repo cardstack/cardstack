@@ -10,7 +10,7 @@ import CardstackError from './error';
 import { SessionContext } from './authentication-middleware';
 import { assertSingleResourceDoc } from './document';
 import { myOrigin } from './origin';
-import { Card, apiPrefix, CardWithId } from './card';
+import { makePristineCollection, apiPrefix, Card } from './card';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { parse } from 'qs';
 import { assertQuery } from './query';
@@ -131,12 +131,12 @@ export default class JSONAPIMiddleware {
     assertQuery(query);
 
     let { cards, meta } = await this.cards.as(ctxt.state.cardstackSession).search(query);
-    let collection = await Card.makePristineCollection(cards, meta);
+    let collection = await makePristineCollection(cards, meta);
     ctxt.body = collection.jsonapi;
     ctxt.status = 200;
   }
 
-  private localURLFor(card: CardWithId): string {
+  private localURLFor(card: Card): string {
     if (new URL(card.realm).origin === myOrigin) {
       return card.canonicalURL;
     } else {
