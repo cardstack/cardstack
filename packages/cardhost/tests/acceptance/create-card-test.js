@@ -82,7 +82,7 @@ module('Acceptance | card create', function(hooks) {
     await visit('/cards/new');
 
     assert.equal(currentURL(), '/cards/new');
-    await percySnapshot(assert + '-new');
+    await percySnapshot([assert.test.module.name, assert.test.testName, 'new'].join(' | '));
 
     assert.dom('.card-renderer-isolated--header').hasTextContaining('new-card-');
     assert.dom('[data-test-internal-card-id]').hasTextContaining('local-hub::new-card-');
@@ -122,6 +122,7 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     await focus('[data-test-card-renderer-isolated]');
+    await animationsSettled();
     assert.dom('.card-renderer-isolated--header').hasText('millenial-puppies');
     assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
     // TODO: figure out why having the following assertions before the line above ^^^ causes a test failure
@@ -134,7 +135,7 @@ module('Acceptance | card create', function(hooks) {
     assert.equal(card.data.attributes.body, undefined);
     assert.equal(card.data.relationships.author, undefined);
     assert.deepEqual(card.data.relationships.reviewers, undefined);
-    await percySnapshot(assert + '-data-entered');
+    await percySnapshot([assert.test.module.name, assert.test.testName, 'data-entered'].join(' | '));
   });
 
   test(`selecting a field`, async function(assert) {

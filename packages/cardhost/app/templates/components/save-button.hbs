@@ -1,5 +1,3 @@
-{{! eslint is confused by on helper }}
-{{! template-lint-disable attribute-indentation}}
 <button
   {{on "click" this.save}}
   class={{concat
@@ -15,9 +13,7 @@
       Saving
       <span class="loading-spinner"><div></div><div></div><div></div><div></div></span>
     {{else}}
-      {{#if @card.isNew}}
-        Create
-      {{else if @card.isDirty}}
+      {{#if @card.isDirty}}
         Save
       {{else}}
         Saved {{svg-jar "checkmark" width="12px" height="9px"}}

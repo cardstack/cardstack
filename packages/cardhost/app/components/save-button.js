@@ -4,6 +4,8 @@ import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 import { task } from 'ember-concurrency';
 
+const SAVED_HIGHLIGHT_DELAY = 2500;
+
 export default class SaveButton extends Component {
   @service router;
   @service cardstackSession;
@@ -36,7 +38,7 @@ export default class SaveButton extends Component {
       this.justSaved = true;
       yield setTimeout(() => {
         this.justSaved = false;
-      }, 5000);
+      }, SAVED_HIGHLIGHT_DELAY);
     }
   })
   saveCardWithState;
