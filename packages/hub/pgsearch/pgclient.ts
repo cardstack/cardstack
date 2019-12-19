@@ -221,29 +221,29 @@ export default class PgClient {
   }
   private async handleFieldQuery(_cards: ScopedCardService, fieldQuery: FieldQuery): Promise<Expression> {
     let { path, errorHint } = fieldQuery;
-    if (path === 'realm' || path === 'originalRealm' || path === 'localId') {
-      return [snakeCase(path)];
+    if (path === 'csRealm' || path === 'csOriginalRealm' || path === 'csLocalId') {
+      return [snakeCase(path.slice(2))];
     }
 
-    throw new Error(`unimplemented in buildQueryExpression for ${errorHint}`);
+    throw new Error(`${path} unimplemented in handleFieldQuery for ${errorHint}`);
   }
 
   private async handleFieldValue(cards: ScopedCardService, fieldValue: FieldValue): Promise<Expression> {
     let { path, errorHint, value } = fieldValue;
-    if (path === 'realm' || path === 'originalRealm' || path === 'localId') {
+    if (path === 'csRealm' || path === 'csOriginalRealm' || path === 'csLocalId') {
       return await this.makeExpression(cards, value);
     }
 
-    throw new Error(`unimplemented in buildQueryExpression for ${errorHint}`);
+    throw new Error(`${path} unimplemented in handleFieldValue for ${errorHint}`);
   }
 
   private async handleFieldArity(cards: ScopedCardService, fieldArity: FieldArity): Promise<Expression> {
     let { path, singular, errorHint } = fieldArity;
-    if (path === 'realm' || path === 'originalRealm' || path === 'localId') {
+    if (path === 'csRealm' || path === 'csOriginalRealm' || path === 'csLocalId') {
       return await this.makeExpression(cards, singular);
     }
 
-    throw new Error(`unimplemented in buildQueryExpression for ${errorHint}`);
+    throw new Error(`${path} unimplemented in handleFieldArity for ${errorHint}`);
   }
 
   async get(cards: ScopedCardService, id: CardId): Promise<Card> {

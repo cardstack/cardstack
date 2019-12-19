@@ -9,7 +9,7 @@ interface Sort {
   fieldQuery: FieldQuery;
 }
 
-const PRIMARY_KEY = Object.freeze(['realm', 'originalRealm', 'localId']);
+const PRIMARY_KEY = Object.freeze(['csRealm', 'csOriginalRealm', 'csLocalId']);
 
 export class Sorts {
   private _sorts: Sort[];

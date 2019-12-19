@@ -50,7 +50,7 @@ export default class IndexingService {
       filter: {
         type: { realm: CARDSTACK_PUBLIC_REALM, localId: 'realm' },
         eq: {
-          realm: `${myOrigin}/api/realms/meta`,
+          csRealm: `${myOrigin}/api/realms/meta`,
         },
       },
     });

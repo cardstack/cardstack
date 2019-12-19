@@ -3,12 +3,13 @@ import { UnsavedCard, Card, CardId, canonicalURLToCardId } from './card';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
 import CardstackError from './error';
 import { myOrigin } from './origin';
-import { search as scaffoldSearch, get as scaffoldGet, validate } from './scaffolding';
+import { search as scaffoldSearch, get as scaffoldGet } from './scaffolding';
 import { getOwner, inject } from './dependency-injection';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { Query } from './query';
 import { ResponseMeta } from './pgsearch/pgclient';
 import { Writer } from './writer';
+import { validate } from './validation';
 
 export default class CardsService {
   pgclient = inject('pgclient');
@@ -118,8 +119,8 @@ export class ScopedCardService {
           // meta-realm determines all the realms this hub (origin) knows
           // about. Some of the realms in here can live on other origins, and
           // that's fine.
-          realm: `${myOrigin}/api/realms/meta`,
-          localId: realm,
+          csRealm: `${myOrigin}/api/realms/meta`,
+          csLocalId: realm,
         },
       },
     });

@@ -107,8 +107,7 @@ class BaseCard {
   }
 
   async field(name: string): Promise<any> {
-    let model = this.jsonapi.data.attributes?.model as { attributes: { [name: string]: any } };
-    return model?.attributes[name];
+    return this.jsonapi.data.attributes?.[name];
   }
 
   protected regenerateJSONAPI(): SingleResourceDoc {
@@ -162,7 +161,7 @@ class BaseCard {
   }
 
   async adoptsFrom(): Promise<Card | undefined> {
-    let adoptsFromRelationship = this.jsonapi.data.relationships?.adoptsFrom;
+    let adoptsFromRelationship = this.jsonapi.data.relationships?.csAdoptsFrom;
     if (adoptsFromRelationship && `links` in adoptsFromRelationship) {
       let url = adoptsFromRelationship.links.related;
       if (url) {

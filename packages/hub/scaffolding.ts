@@ -1,4 +1,4 @@
-import { Card, UnsavedCard, CardId } from './card';
+import { Card, CardId } from './card';
 import { Query } from './query';
 import { myOrigin } from './origin';
 import { WriterFactory } from './writer';
@@ -14,28 +14,28 @@ function ephemeralRealms(cards: ScopedCardService) {
   return [
     // The realm card for the meta realm
     cards.instantiate(
-      testCard({
+      testCard().withAttributes({
         csRealm: `${myOrigin}/api/realms/meta`,
         csOriginalRealm: `${myOrigin}/api/realms/meta`,
         csLocalId: `${myOrigin}/api/realms/meta`,
       }).jsonapi
     ),
     cards.instantiate(
-      testCard({
+      testCard().withAttributes({
         csRealm: `${myOrigin}/api/realms/meta`,
         csOriginalRealm: `${myOrigin}/api/realms/meta`,
         csLocalId: `${myOrigin}/api/realms/first-ephemeral-realm`,
       }).jsonapi
     ),
     cards.instantiate(
-      testCard({
+      testCard().withAttributes({
         csRealm: `${myOrigin}/api/realms/meta`,
         csOriginalRealm: `http://example.com/api/realms/meta`,
         csLocalId: `http://example.com/api/realms/second-ephemeral-realm`,
       }).jsonapi
     ),
     cards.instantiate(
-      testCard({
+      testCard().withAttributes({
         csRealm: `${myOrigin}/api/realms/meta`,
         csOriginalRealm: CARDSTACK_PUBLIC_REALM,
         csLocalId: CARDSTACK_PUBLIC_REALM,
@@ -52,11 +52,11 @@ export async function search(query: Query, cards: ScopedCardService): Promise<Ca
     return null;
   }
 
-  if (query.filter.eq.realm !== `${myOrigin}/api/realms/meta` || !('localId' in query.filter.eq)) {
+  if (query.filter.eq.csRealm !== `${myOrigin}/api/realms/meta` || !('csLocalId' in query.filter.eq)) {
     return null;
   }
 
-  let searchingFor = query.filter.eq.localId;
+  let searchingFor = query.filter.eq.csLocalId;
   return ephemeralRealms(cards).filter(card => card.localId === searchingFor);
 }
 
@@ -67,7 +67,7 @@ export async function get(id: CardId, cards: ScopedCardService): Promise<Card | 
     id.localId === 'string-field'
   ) {
     return cards.instantiate(
-      testCard({
+      testCard().withAttributes({
         csRealm: id.realm,
         csOriginalRealm: id.originalRealm,
         csLocalId: id.localId,
@@ -90,8 +90,6 @@ export async function loadIndexer(card: Card, cards: ScopedCardService): Promise
   }
   throw new Error(`unimplemented`);
 }
-
-export async function validate(_oldCard: Card | null, _newCard: UnsavedCard | null, _realm: Card): Promise<void> {}
 
 export function patch(target: SingleResourceDoc, source: SingleResourceDoc) {
   return merge(target, source);

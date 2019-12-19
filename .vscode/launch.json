@@ -36,7 +36,13 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "rejects unknown field"]
+      "args": [
+        "packages/test-support/bin/run.js",
+        "--timeout",
+        "200000",
+        "--grep",
+        "can get a card from local realm that was created in that realm"
+      ]
     },
     {
       "type": "node",

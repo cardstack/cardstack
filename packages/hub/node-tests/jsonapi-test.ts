@@ -78,54 +78,60 @@ describe('hub/jsonapi', function() {
     let response = await request
       .post('/api/realms/first-ephemeral-realm/cards')
       .set('Content-Type', 'application/vnd.api+json')
-      .send(testCard({ hello: 'world' }).jsonapi);
+      .send(testCard().withAttributes({ hello: 'world' }).jsonapi);
     expect(response.status).to.equal(201);
 
     response = await request.get(new URL(response.header.location).pathname).set('Accept', 'application/vnd.api+json');
     expect(response.status).to.equal(200);
-    expect(response.body?.data?.attributes?.model?.attributes?.hello).to.equal('world');
-    expect(response.body?.data?.attributes?.['realm']).to.equal(`${myOrigin}/api/realms/first-ephemeral-realm`);
+    expect(response.body?.data?.attributes?.hello).to.equal('world');
+    expect(response.body?.data?.attributes?.csRealm).to.equal(`${myOrigin}/api/realms/first-ephemeral-realm`);
   });
 
   it('can get a card from local realm that was created in another realm', async function() {
     let response = await request
       .post('/api/realms/first-ephemeral-realm/cards')
       .set('Content-Type', 'application/vnd.api+json')
-      .send(testCard({ csOriginalRealm: 'https://somewhere/else', csLocalId: '432', hello: 'world' }).jsonapi);
+      .send(
+        testCard().withAttributes({ csOriginalRealm: 'https://somewhere/else', csLocalId: '432', hello: 'world' })
+          .jsonapi
+      );
     expect(response.status).to.equal(201);
 
     response = await request.get(new URL(response.header.location).pathname).set('Accept', 'application/vnd.api+json');
     expect(response.status).to.equal(200);
-    expect(response.body?.data?.attributes?.model?.attributes?.hello).to.equal('world');
-    expect(response.body?.data?.attributes?.['originalRealm']).to.equal('https://somewhere/else');
-    expect(response.body?.data?.attributes?.['realm']).to.equal(`${myOrigin}/api/realms/first-ephemeral-realm`);
+    expect(response.body?.data?.attributes?.hello).to.equal('world');
+    expect(response.body?.data?.attributes?.csOriginalRealm).to.equal('https://somewhere/else');
+    expect(response.body?.data?.attributes?.csRealm).to.equal(`${myOrigin}/api/realms/first-ephemeral-realm`);
   });
 
   it('can get a card from remote realm that was created in that realm', async function() {
     let response = await request
       .post(`/api/remote-realms/${encodeURIComponent('http://example.com/api/realms/second-ephemeral-realm')}/cards`)
       .set('Content-Type', 'application/vnd.api+json')
-      .send(testCard({ hello: 'world' }).jsonapi);
+      .send(testCard().withAttributes({ hello: 'world' }).jsonapi);
     expect(response.status).to.equal(201);
 
     response = await request.get(new URL(response.header.location).pathname).set('Accept', 'application/vnd.api+json');
     expect(response.status).to.equal(200);
-    expect(response.body?.data?.attributes?.model?.attributes?.hello).to.equal('world');
-    expect(response.body?.data?.attributes?.['realm']).to.equal('http://example.com/api/realms/second-ephemeral-realm');
+    expect(response.body?.data?.attributes?.hello).to.equal('world');
+    expect(response.body?.data?.attributes?.csRealm).to.equal('http://example.com/api/realms/second-ephemeral-realm');
   });
 
   it('can get a card from remote realm that was created in another realm', async function() {
     let response = await request
       .post(`/api/remote-realms/${encodeURIComponent('http://example.com/api/realms/second-ephemeral-realm')}/cards`)
       .set('Content-Type', 'application/vnd.api+json')
-      .send(testCard({ csOriginalRealm: 'https://somewhere/else', csLocalId: '432', hello: 'world' }).jsonapi);
+      .send(
+        testCard().withAttributes({ csOriginalRealm: 'https://somewhere/else', csLocalId: '432', hello: 'world' })
+          .jsonapi
+      );
     expect(response.status).to.equal(201);
 
     response = await request.get(new URL(response.header.location).pathname).set('Accept', 'application/vnd.api+json');
     expect(response.status).to.equal(200);
-    expect(response.body?.data?.attributes?.model?.attributes?.hello).to.equal('world');
-    expect(response.body?.data?.attributes?.['originalRealm']).to.equal('https://somewhere/else');
-    expect(response.body?.data?.attributes?.['realm']).to.equal('http://example.com/api/realms/second-ephemeral-realm');
+    expect(response.body?.data?.attributes?.hello).to.equal('world');
+    expect(response.body?.data?.attributes?.csOriginalRealm).to.equal('https://somewhere/else');
+    expect(response.body?.data?.attributes?.csRealm).to.equal('http://example.com/api/realms/second-ephemeral-realm');
   });
 
   it('can search for cards', async function() {
@@ -136,15 +142,15 @@ describe('hub/jsonapi', function() {
     await request
       .post('/api/realms/first-ephemeral-realm/cards')
       .set('Content-Type', 'application/vnd.api+json')
-      .send(testCard({ foo: 'bar' }).jsonapi);
+      .send(testCard().withAttributes({ foo: 'bar' }).jsonapi);
     await request
       .post('/api/realms/second-ephemeral-realm/cards')
       .set('Content-Type', 'application/vnd.api+json')
-      .send(testCard({ foo: 'bar' }).jsonapi);
+      .send(testCard().withAttributes({ foo: 'bar' }).jsonapi);
 
     let filter = {
       filter: {
-        eq: { originalRealm: `${myOrigin}/api/realms/first-ephemeral-realm` },
+        eq: { csOriginalRealm: `${myOrigin}/api/realms/first-ephemeral-realm` },
       },
     };
     let response = await request.get(`/api/cards?${stringify(filter)}`).set('Accept', 'application/vnd.api+json');
@@ -158,12 +164,12 @@ describe('hub/jsonapi', function() {
       await request
         .post('/api/realms/first-ephemeral-realm/cards')
         .set('Content-Type', 'application/vnd.api+json')
-        .send(testCard({ foo: 'bar' }).jsonapi);
+        .send(testCard().withAttributes({ foo: 'bar' }).jsonapi);
     }
 
     let filter = {
       filter: {
-        eq: { originalRealm: `${myOrigin}/api/realms/first-ephemeral-realm` },
+        eq: { csOriginalRealm: `${myOrigin}/api/realms/first-ephemeral-realm` },
       },
       page: {
         size: 7,

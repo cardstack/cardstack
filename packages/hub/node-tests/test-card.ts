@@ -6,32 +6,74 @@ import { CARDSTACK_PUBLIC_REALM } from '../realm';
 export class TestCard {
   private parent: CardId | undefined;
   private userFieldValues: Map<string, any> = new Map();
-  private fields: Map<string, TestCard> = new Map();
+  private userFieldRefs: Map<string, CardId | undefined> = new Map();
+  private fields: Map<string, TestCard | null> = new Map();
 
   localId?: string;
   originalRealm?: string;
   realm?: string;
 
-  constructor(values: FieldValues = {}) {
-    this.localId = values.csLocalId;
-    this.originalRealm = values.csOriginalRealm ?? values.csRealm;
-    this.realm = values.csRealm;
-
+  withAttributes(values: FieldValues & { csLocalId: string; csRealm: string }): TestCardWithId;
+  withAttributes<T extends TestCard>(this: T, values: FieldValues): T;
+  withAttributes(values: FieldValues): TestCard | TestCardWithId {
     for (let [field, value] of Object.entries(values)) {
-      if (!/^cs[A-Z]/.test(field)) {
+      if (/^cs[A-Z]/.test(field)) {
+        // cardstack fields
+        switch (field) {
+          case 'csLocalId':
+            this.localId = value;
+            break;
+          case 'csOriginalRealm':
+            this.originalRealm = value;
+            break;
+          case 'csRealm':
+            this.realm = value;
+            if (this.originalRealm == null) {
+              this.originalRealm = value;
+            }
+            break;
+          default:
+            throw new Error(`unknown cardstack field ${field}`);
+        }
+      } else {
         // a user field
         this.userFieldValues.set(field, value);
-        this.fields.set(field, new TestCard().adoptingFrom(guessType(value)));
+        if (!this.fields.has(field)) {
+          this.fields.set(field, new TestCard().adoptingFrom(this.guessValueType(value)));
+        }
       }
     }
+    return this;
   }
 
-  withField(name: string, fieldShorthand: string, values?: FieldValues): this;
-  withField(name: string, fieldCard: CardId, values?: FieldValues): this;
-  withField(name: string, fieldCard: null): this;
+  withRelationships<T extends TestCard>(this: T, values: FieldRefs): T {
+    for (let [field, value] of Object.entries(values)) {
+      if (/^cs[A-Z]/.test(field)) {
+        // cardstack fields
+        switch (field) {
+          case 'csAdoptsFrom':
+            this.parent = value;
+            break;
+          default:
+            throw new Error(`unknown cardstack field ${field}`);
+        }
+      } else {
+        // a user field
+        this.userFieldRefs.set(field, value);
+        if (!this.fields.has(field)) {
+          this.fields.set(field, new TestCard().adoptingFrom(this.guessReferenceType(value)));
+        }
+      }
+    }
+    return this;
+  }
+
+  withField<T extends TestCard>(this: T, name: string, fieldShorthand: string, values?: FieldValues): T;
+  withField<T extends TestCard>(this: T, name: string, fieldCard: CardId, values?: FieldValues): T;
+  withField<T extends TestCard>(this: T, name: string, fieldCard: null): T;
   withField(name: string, fieldCard: string | CardId | null, values: FieldValues = {}): this {
     if (fieldCard == null) {
-      this.fields.delete(name);
+      this.fields.set(name, null);
       return this;
     }
 
@@ -39,22 +81,33 @@ export class TestCard {
       fieldCard = { realm: CARDSTACK_PUBLIC_REALM, localId: fieldCard };
     }
 
-    this.fields.set(name, new TestCard(values).adoptingFrom(fieldCard));
+    this.fields.set(name, new TestCard().withAttributes(values).adoptingFrom(fieldCard));
     return this;
   }
 
   get jsonapi(): SingleResourceDoc {
     let attributes = Object.create(null);
-
     for (let [key, value] of this.userFieldValues.entries()) {
       attributes[key] = value;
+    }
+
+    let relationships = Object.create(null);
+    for (let [key, value] of this.userFieldRefs.entries()) {
+      relationships[key] =
+        value == null
+          ? null
+          : {
+              links: {
+                related: canonicalURL(value),
+              },
+            };
     }
 
     let doc = {
       data: {
         type: 'cards',
         attributes,
-        relationships: {} as NonNullable<SingleResourceDoc['data']['relationships']>,
+        relationships,
       },
     };
     if (this.localId) {
@@ -77,7 +130,9 @@ export class TestCard {
 
     let csFields = Object.create(null);
     for (let [fieldName, testCard] of this.fields) {
-      csFields[fieldName] = testCard.jsonapi;
+      if (testCard) {
+        csFields[fieldName] = testCard.jsonapi;
+      }
     }
 
     return doc;
@@ -87,9 +142,20 @@ export class TestCard {
     return new UpstreamDocument(this.jsonapi);
   }
 
-  adoptingFrom(parent: CardId) {
+  adoptingFrom<T extends TestCard>(this: T, parent: CardId): T {
     this.parent = parent;
     return this;
+  }
+
+  private guessValueType(_value: any) {
+    return { realm: CARDSTACK_PUBLIC_REALM, localId: 'string-field' };
+  }
+
+  private guessReferenceType(value: CardId | TestCardWithId | undefined) {
+    if (value instanceof TestCard && value.parent) {
+      return value.parent;
+    }
+    return { realm: CARDSTACK_PUBLIC_REALM, localId: 'base-card' };
   }
 }
 
@@ -100,18 +166,17 @@ interface FieldValues {
   [fieldName: string]: any;
 }
 
+interface FieldRefs {
+  csAdoptsFrom?: CardId;
+  [fieldName: string]: CardId | TestCardWithId | undefined;
+}
+
 interface TestCardWithId extends TestCard {
   localId: string;
   realm: string;
   originalRealm: string;
 }
 
-function guessType(_value: any) {
-  return { realm: CARDSTACK_PUBLIC_REALM, localId: 'string-field' };
-}
-
-export function testCard(values: FieldValues & { csLocalId: string; csRealm: string }): TestCardWithId;
-export function testCard(values?: FieldValues): TestCard;
-export function testCard(values: FieldValues = {}): TestCard | TestCardWithId {
-  return new TestCard(values);
+export function testCard(): TestCard {
+  return new TestCard();
 }
