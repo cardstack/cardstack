@@ -39,12 +39,13 @@
 }
 
 .card-renderer-isolated.no-fields .drop-zone .drop-zone--description {
+  width: 100%;
   border: none;
   font-size: 16px;
 }
 
 .card-renderer-isolated.no-fields .drop-zone .drop-zone--description .drop-zone--description--text {
-  text-indent: 0;
+  display: block;
 }
 
 .card-renderer-isolated.no-fields .drop-zone .drop-zone--drag-drop-icon {
