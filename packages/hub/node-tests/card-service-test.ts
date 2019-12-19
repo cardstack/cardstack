@@ -1,4 +1,3 @@
-import { param } from '../pgsearch/util';
 import { createTestEnv, TestEnv } from './helpers';
 import { Session } from '../session';
 import { myOrigin } from '../origin';
@@ -21,8 +20,8 @@ describe('hub/card-service', function() {
       let service = await env.container.lookup('cards');
       try {
         await service.as(Session.EVERYONE).get({
-          realm: 'http://not-a-known-realm',
-          localId: 'x',
+          csRealm: 'http://not-a-known-realm',
+          csId: 'x',
         });
         throw new Error(`should not get here`);
       } catch (err) {
@@ -30,24 +29,12 @@ describe('hub/card-service', function() {
       }
     });
 
-    it('saves a card', async function() {
-      let doc = testCard();
-      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
-      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
-      expect(card.realm).to.equal(`${myOrigin}/api/realms/first-ephemeral-realm`);
-
-      let pgclient = await env.container.lookup('pgclient');
-      let result = await pgclient.queryCards(service, [
-        `select * from cards where realm = `,
-        param(`${myOrigin}/api/realms/first-ephemeral-realm`),
-      ]);
-      expect(result.rowCount).equals(1);
-    });
-
     it('can get a card back out', async function() {
       let doc = testCard();
       let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+      expect(card.csRealm).to.equal(`${myOrigin}/api/realms/first-ephemeral-realm`);
+
       let foundCard = await service.get(card);
       expect(foundCard.canonicalURL).equals(card.canonicalURL);
     });
@@ -86,11 +73,11 @@ describe('hub/card-service', function() {
       let storage = await env.container.lookup('ephemeralStorage');
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       let version = (await card.asPristineDoc()).jsonapi.data.meta?.version as number;
-      expect(storage.entriesNewerThan(card.realm).filter(entry => Boolean(entry.doc)).length).to.equal(1);
+      expect(storage.entriesNewerThan(card.csRealm).filter(entry => Boolean(entry.doc)).length).to.equal(1);
 
       await service.delete(card, version);
 
-      expect(storage.entriesNewerThan(card.realm).filter(entry => Boolean(entry.doc)).length).to.equal(0);
+      expect(storage.entriesNewerThan(card.csRealm).filter(entry => Boolean(entry.doc)).length).to.equal(0);
       try {
         await service.get(card);
         throw new Error(`Should not be able to find card`);
@@ -105,11 +92,11 @@ describe('hub/card-service', function() {
       let storage = await env.container.lookup('ephemeralStorage');
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       let version = (await card.asPristineDoc()).jsonapi.data.meta?.version as number;
-      expect(storage.entriesNewerThan(card.realm).filter(entry => Boolean(entry.doc)).length).to.equal(1);
+      expect(storage.entriesNewerThan(card.csRealm).filter(entry => Boolean(entry.doc)).length).to.equal(1);
 
       await service.delete(card.canonicalURL, version);
 
-      expect(storage.entriesNewerThan(card.realm).filter(entry => Boolean(entry.doc)).length).to.equal(0);
+      expect(storage.entriesNewerThan(card.csRealm).filter(entry => Boolean(entry.doc)).length).to.equal(0);
       try {
         await service.get(card);
         throw new Error(`Should not be able to find card`);
@@ -134,7 +121,7 @@ describe('hub/card-service', function() {
       }
       let foundCard = await service.get(card);
       expect(foundCard).to.be.ok;
-      expect(storage.entriesNewerThan(card.realm).filter(entry => Boolean(entry.doc)).length).to.equal(1);
+      expect(storage.entriesNewerThan(card.csRealm).filter(entry => Boolean(entry.doc)).length).to.equal(1);
     });
 
     it.skip('rejects unknown attribute at create', async function() {
@@ -155,7 +142,7 @@ describe('hub/card-service', function() {
     it.skip('rejects unknown relationship at create', async function() {
       let doc = testCard()
         .withRelationships({
-          badField: testCard().withAttributes({ csRealm: 'x', csLocalId: 'y' }),
+          badField: testCard().withAttributes({ csRealm: 'x', csId: 'y' }),
         })
         .withField('badField', null);
 
@@ -180,45 +167,45 @@ describe('hub/card-service', function() {
       let scopedService = service.as(Session.INTERNAL_PRIVILEGED);
       await scopedService.create(
         `${myOrigin}/api/realms/first-ephemeral-realm`,
-        testCard().withAttributes({ csLocalId: '1' }).jsonapi
+        testCard().withAttributes({ csId: '1' }).jsonapi
       );
       await scopedService.create(
         `${myOrigin}/api/realms/first-ephemeral-realm`,
-        testCard().withAttributes({ csLocalId: '2' }).jsonapi
+        testCard().withAttributes({ csId: '2' }).jsonapi
       );
       await scopedService.create(
         `${myOrigin}/api/realms/first-ephemeral-realm`,
         testCard().withAttributes({
-          csLocalId: '1',
+          csId: '1',
           csOriginalRealm: `http://example.com/api/realms/second-ephemeral-realm`,
         }).jsonapi
       );
       await scopedService.create(
         `${myOrigin}/api/realms/first-ephemeral-realm`,
         testCard().withAttributes({
-          csLocalId: '2',
+          csId: '2',
           csOriginalRealm: `http://example.com/api/realms/second-ephemeral-realm`,
         }).jsonapi
       );
       await scopedService.create(
         `http://example.com/api/realms/second-ephemeral-realm`,
-        testCard().withAttributes({ csLocalId: '1' }).jsonapi
+        testCard().withAttributes({ csId: '1' }).jsonapi
       );
       await scopedService.create(
         `http://example.com/api/realms/second-ephemeral-realm`,
-        testCard().withAttributes({ csLocalId: '2' }).jsonapi
+        testCard().withAttributes({ csId: '2' }).jsonapi
       );
       await scopedService.create(
         `http://example.com/api/realms/second-ephemeral-realm`,
         testCard().withAttributes({
-          csLocalId: '1',
+          csId: '1',
           csOriginalRealm: `${myOrigin}/api/realms/first-ephemeral-realm`,
         }).jsonapi
       );
       await scopedService.create(
         `http://example.com/api/realms/second-ephemeral-realm`,
         testCard().withAttributes({
-          csLocalId: '2',
+          csId: '2',
           csOriginalRealm: `${myOrigin}/api/realms/first-ephemeral-realm`,
         }).jsonapi
       );
@@ -235,7 +222,7 @@ describe('hub/card-service', function() {
         },
       });
       expect(cards.length).equals(4);
-      expect(cards.map(c => `${c.realm}/${c.originalRealm}/${c.localId}`)).to.eql([
+      expect(cards.map(c => `${c.csRealm}/${c.csOriginalRealm}/${c.csId}`)).to.eql([
         `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
         `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/2`,
         `${myOrigin}/api/realms/first-ephemeral-realm/${myOrigin}/api/realms/first-ephemeral-realm/1`,
@@ -243,14 +230,14 @@ describe('hub/card-service', function() {
       ]);
     });
 
-    it('can filter by original-realm', async function() {
+    it('can filter by csOriginalRealm', async function() {
       let { cards } = await service.as(Session.INTERNAL_PRIVILEGED).search({
         filter: {
           eq: { csOriginalRealm: `http://example.com/api/realms/second-ephemeral-realm` },
         },
       });
       expect(cards.length).equals(4);
-      expect(cards.map(c => `${c.realm}/${c.originalRealm}/${c.localId}`)).to.eql([
+      expect(cards.map(c => `${c.csRealm}/${c.csOriginalRealm}/${c.csId}`)).to.eql([
         `http://example.com/api/realms/second-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
         `http://example.com/api/realms/second-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/2`,
         `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
@@ -258,14 +245,14 @@ describe('hub/card-service', function() {
       ]);
     });
 
-    it('can filter by local-id', async function() {
+    it('can filter by csId', async function() {
       let { cards } = await service.as(Session.INTERNAL_PRIVILEGED).search({
         filter: {
-          eq: { csLocalId: '1' },
+          eq: { csId: '1' },
         },
       });
       expect(cards.length).equals(4);
-      expect(cards.map(c => `${c.realm}/${c.originalRealm}/${c.localId}`)).to.eql([
+      expect(cards.map(c => `${c.csRealm}/${c.csOriginalRealm}/${c.csId}`)).to.eql([
         `http://example.com/api/realms/second-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
         `http://example.com/api/realms/second-ephemeral-realm/${myOrigin}/api/realms/first-ephemeral-realm/1`,
         `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
@@ -273,18 +260,18 @@ describe('hub/card-service', function() {
       ]);
     });
 
-    it('can filter by realm and local-id and original-realm', async function() {
+    it('can filter by csRealm and csId and csOriginalRealm', async function() {
       let { cards } = await service.as(Session.INTERNAL_PRIVILEGED).search({
         filter: {
           eq: {
             csRealm: `${myOrigin}/api/realms/first-ephemeral-realm`,
             csOriginalRealm: 'http://example.com/api/realms/second-ephemeral-realm',
-            csLocalId: '1',
+            csId: '1',
           },
         },
       });
       expect(cards.length).equals(1);
-      expect(cards.map(c => `${c.realm}/${c.originalRealm}/${c.localId}`)).to.eql([
+      expect(cards.map(c => `${c.csRealm}/${c.csOriginalRealm}/${c.csId}`)).to.eql([
         `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
       ]);
     });

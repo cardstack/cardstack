@@ -3,25 +3,28 @@ import { MigrationBuilder } from 'node-pg-migrate';
 export function up(pgm: MigrationBuilder) {
   /* eslint-disable @typescript-eslint/camelcase */
   pgm.createTable('cards', {
-    realm: 'varchar',
-    original_realm: 'varchar',
-    local_id: 'varchar',
+    cs_realm: 'varchar',
+    cs_original_realm: 'varchar',
+    cs_id: 'varchar',
     pristine_doc: 'jsonb',
     generation: 'bigint',
   });
   /* eslint-enable @typescript-eslint/camelcase */
   pgm.sql('ALTER TABLE cards SET UNLOGGED');
   pgm.addConstraint('cards', 'cards_pkey', {
-    primaryKey: ['realm', 'original_realm', 'local_id'],
+    primaryKey: ['cs_realm', 'cs_original_realm', 'cs_id'],
   });
 
+  /* eslint-disable @typescript-eslint/camelcase */
   pgm.createTable('meta', {
-    realm: 'varchar',
+    cs_realm: 'varchar',
     params: 'jsonb',
   });
+  /* eslint-enable @typescript-eslint/camelcase */
+
   pgm.sql('ALTER TABLE meta SET UNLOGGED');
   pgm.addConstraint('meta', 'meta_pkey', {
-    primaryKey: ['realm'],
+    primaryKey: ['cs_realm'],
   });
 
   pgm.createType('job_statuses', ['unfulfilled', 'resolved', 'rejected']);

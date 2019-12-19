@@ -9,27 +9,27 @@ export class TestCard {
   private userFieldRefs: Map<string, CardId | undefined> = new Map();
   private fields: Map<string, TestCard | null> = new Map();
 
-  localId?: string;
-  originalRealm?: string;
-  realm?: string;
+  csId?: string;
+  csOriginalRealm?: string;
+  csRealm?: string;
 
-  withAttributes(values: FieldValues & { csLocalId: string; csRealm: string }): TestCardWithId;
+  withAttributes(values: FieldValues & { csId: string; csRealm: string }): TestCardWithId;
   withAttributes<T extends TestCard>(this: T, values: FieldValues): T;
   withAttributes(values: FieldValues): TestCard | TestCardWithId {
     for (let [field, value] of Object.entries(values)) {
       if (/^cs[A-Z]/.test(field)) {
         // cardstack fields
         switch (field) {
-          case 'csLocalId':
-            this.localId = value;
+          case 'csId':
+            this.csId = value;
             break;
           case 'csOriginalRealm':
-            this.originalRealm = value;
+            this.csOriginalRealm = value;
             break;
           case 'csRealm':
-            this.realm = value;
-            if (this.originalRealm == null) {
-              this.originalRealm = value;
+            this.csRealm = value;
+            if (this.csOriginalRealm == null) {
+              this.csOriginalRealm = value;
             }
             break;
           default:
@@ -78,7 +78,7 @@ export class TestCard {
     }
 
     if (typeof fieldCard === 'string') {
-      fieldCard = { realm: CARDSTACK_PUBLIC_REALM, localId: fieldCard };
+      fieldCard = { csRealm: CARDSTACK_PUBLIC_REALM, csId: fieldCard };
     }
 
     this.fields.set(name, new TestCard().withAttributes(values).adoptingFrom(fieldCard));
@@ -110,16 +110,16 @@ export class TestCard {
         relationships,
       },
     };
-    if (this.localId) {
-      doc.data.attributes.csLocalId = this.localId;
+    if (this.csId) {
+      doc.data.attributes.csId = this.csId;
     }
 
-    if (this.realm) {
-      doc.data.attributes.csRealm = this.realm;
+    if (this.csRealm) {
+      doc.data.attributes.csRealm = this.csRealm;
     }
 
-    if (this.originalRealm) {
-      doc.data.attributes.csOriginalRealm = this.originalRealm;
+    if (this.csOriginalRealm) {
+      doc.data.attributes.csOriginalRealm = this.csOriginalRealm;
     }
 
     if (this.parent) {
@@ -147,22 +147,22 @@ export class TestCard {
     return this;
   }
 
-  private guessValueType(_value: any) {
-    return { realm: CARDSTACK_PUBLIC_REALM, localId: 'string-field' };
+  private guessValueType(_value: any): CardId {
+    return { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'string-field' };
   }
 
-  private guessReferenceType(value: CardId | TestCardWithId | undefined) {
+  private guessReferenceType(value: CardId | TestCardWithId | undefined): CardId {
     if (value instanceof TestCard && value.parent) {
       return value.parent;
     }
-    return { realm: CARDSTACK_PUBLIC_REALM, localId: 'base-card' };
+    return { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base-card' };
   }
 }
 
 interface FieldValues {
   csRealm?: string;
   csOriginalRealm?: string;
-  csLocalId?: string;
+  csId?: string;
   [fieldName: string]: any;
 }
 
@@ -172,9 +172,9 @@ interface FieldRefs {
 }
 
 interface TestCardWithId extends TestCard {
-  localId: string;
-  realm: string;
-  originalRealm: string;
+  csId: string;
+  csRealm: string;
+  csOriginalRealm: string;
 }
 
 export function testCard(): TestCard {

@@ -92,7 +92,7 @@ describe('hub/jsonapi', function() {
       .post('/api/realms/first-ephemeral-realm/cards')
       .set('Content-Type', 'application/vnd.api+json')
       .send(
-        testCard().withAttributes({ csOriginalRealm: 'https://somewhere/else', csLocalId: '432', hello: 'world' })
+        testCard().withAttributes({ csOriginalRealm: 'https://somewhere/else', csId: '432', hello: 'world' })
           .jsonapi
       );
     expect(response.status).to.equal(201);
@@ -122,7 +122,7 @@ describe('hub/jsonapi', function() {
       .post(`/api/remote-realms/${encodeURIComponent('http://example.com/api/realms/second-ephemeral-realm')}/cards`)
       .set('Content-Type', 'application/vnd.api+json')
       .send(
-        testCard().withAttributes({ csOriginalRealm: 'https://somewhere/else', csLocalId: '432', hello: 'world' })
+        testCard().withAttributes({ csOriginalRealm: 'https://somewhere/else', csId: '432', hello: 'world' })
           .jsonapi
       );
     expect(response.status).to.equal(201);

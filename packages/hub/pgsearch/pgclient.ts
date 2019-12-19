@@ -221,8 +221,8 @@ export default class PgClient {
   }
   private async handleFieldQuery(_cards: ScopedCardService, fieldQuery: FieldQuery): Promise<Expression> {
     let { path, errorHint } = fieldQuery;
-    if (path === 'csRealm' || path === 'csOriginalRealm' || path === 'csLocalId') {
-      return [snakeCase(path.slice(2))];
+    if (path === 'csRealm' || path === 'csOriginalRealm' || path === 'csId') {
+      return [snakeCase(path)];
     }
 
     throw new Error(`${path} unimplemented in handleFieldQuery for ${errorHint}`);
@@ -230,7 +230,7 @@ export default class PgClient {
 
   private async handleFieldValue(cards: ScopedCardService, fieldValue: FieldValue): Promise<Expression> {
     let { path, errorHint, value } = fieldValue;
-    if (path === 'csRealm' || path === 'csOriginalRealm' || path === 'csLocalId') {
+    if (path === 'csRealm' || path === 'csOriginalRealm' || path === 'csId') {
       return await this.makeExpression(cards, value);
     }
 
@@ -239,7 +239,7 @@ export default class PgClient {
 
   private async handleFieldArity(cards: ScopedCardService, fieldArity: FieldArity): Promise<Expression> {
     let { path, singular, errorHint } = fieldArity;
-    if (path === 'csRealm' || path === 'csOriginalRealm' || path === 'csLocalId') {
+    if (path === 'csRealm' || path === 'csOriginalRealm' || path === 'csId') {
       return await this.makeExpression(cards, singular);
     }
 
@@ -248,15 +248,15 @@ export default class PgClient {
 
   async get(cards: ScopedCardService, id: CardId): Promise<Card> {
     let condition = every([
-      [`realm = `, param(id.realm)],
-      [`original_realm = `, param(id.originalRealm ?? id.realm)],
-      [`local_id = `, param(id.localId)],
+      [`cs_realm = `, param(id.csRealm)],
+      [`cs_original_realm = `, param(id.csOriginalRealm ?? id.csRealm)],
+      [`cs_id = `, param(id.csId)],
     ]);
     let result = await this.queryCards(cards, [`select pristine_doc from cards where`, ...condition]);
     if (result.rowCount !== 1) {
       throw new CardstackError(
-        `Card not found with realm="${id.realm}", original-realm="${id.originalRealm ?? id.realm}", local-id="${
-          id.localId
+        `Card not found with csRealm="${id.csRealm}", csOriginalRealm="${id.csOriginalRealm ?? id.csRealm}", csId="${
+          id.csId
         }"`,
         { status: 404 }
       );
@@ -374,28 +374,33 @@ export class Batch {
   async save(card: Card) {
     /* eslint-disable @typescript-eslint/camelcase */
     let row = {
-      realm: param(card.realm),
-      original_realm: param(card.originalRealm),
-      local_id: param(card.localId),
+      cs_realm: param(card.csRealm),
+      cs_original_realm: param(card.csOriginalRealm),
+      cs_id: param(card.csId),
       pristine_doc: param(((await card.asPristineDoc()).jsonapi as unknown) as JSON.Object),
-      generation: param(this.generations[card.realm] || null),
+      generation: param(this.generations[card.csRealm] || null),
     };
     /* eslint-enable @typescript-eslint/camelcase */
 
     await this.client.queryCards(this.cards, upsert('cards', 'cards_pkey', row));
-    log.debug('save realm: %s original realm: %s local id: %s', card.realm, card.originalRealm, card.localId);
+    log.debug('save realm: %s original realm: %s local id: %s', card.csRealm, card.csOriginalRealm, card.csId);
   }
 
   async delete(id: CardId) {
     await this.client.query([
       'delete from cards where ',
       ...every([
-        ['realm =', param(id.realm)],
-        ['original_realm = ', param(id.originalRealm ?? id.realm)],
-        ['local_id = ', param(id.localId)],
+        ['cs_realm =', param(id.csRealm)],
+        ['cs_original_realm = ', param(id.csOriginalRealm ?? id.csRealm)],
+        ['cs_id = ', param(id.csId)],
       ]),
     ]);
-    log.debug('delete realm: %s original realm: %s local id: %s', id.realm, id.originalRealm ?? id.realm, id.localId);
+    log.debug(
+      'delete realm: %s original realm: %s local id: %s',
+      id.csRealm,
+      id.csOriginalRealm ?? id.csRealm,
+      id.csId
+    );
   }
 
   createGeneration(realm: string) {
@@ -411,7 +416,7 @@ export class Batch {
     await this.client.query([
       'delete from cards where ',
       ...addExplicitParens(['generation !=', param(this.generations[realm]!), 'or generation is null']),
-      ' and realm =',
+      ' and cs_realm =',
       param(realm),
     ]);
     log.debug(`deleted generations other than ${this.generations[realm]} for cards in realm '${realm}'`);

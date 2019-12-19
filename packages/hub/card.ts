@@ -13,9 +13,9 @@ import { ScopedCardService } from './cards-service';
 
 export const apiPrefix = '/api';
 
-export function canonicalURLToCardId(url: string) {
+export function canonicalURLToCardId(url: string): CardId {
   let parts = url.split('/');
-  let localId = parts.pop()!;
+  let csId = parts.pop()!;
   let nextPart = parts.pop()!;
   let originalRealm;
   if (nextPart !== 'cards') {
@@ -23,25 +23,25 @@ export function canonicalURLToCardId(url: string) {
     parts.pop();
   }
   return {
-    realm: parts.join('/'),
-    originalRealm: originalRealm == null ? undefined : decodeURIComponent(originalRealm),
-    localId: decodeURIComponent(localId),
+    csRealm: parts.join('/'),
+    csOriginalRealm: originalRealm == null ? undefined : decodeURIComponent(originalRealm),
+    csId: decodeURIComponent(csId),
   };
 }
 
-export function canonicalURL(id: CardId) {
-  let isHome = id.originalRealm === id.realm;
+export function canonicalURL(id: CardId): string {
+  let isHome = id.csOriginalRealm === id.csRealm;
   let base = `${myOrigin}${apiPrefix}/realms`;
-  let localRealmId = id.realm.slice(base.length + 1);
+  let localRealmId = id.csRealm.slice(base.length + 1);
   if (isHome) {
-    return [base, localRealmId, 'cards', encodeURIComponent(id.localId)].join('/');
+    return [base, localRealmId, 'cards', encodeURIComponent(id.csId)].join('/');
   } else {
     return [
       base,
       localRealmId,
       'cards',
-      encodeURIComponent(id.originalRealm ?? id.realm),
-      encodeURIComponent(id.localId),
+      encodeURIComponent(id.csOriginalRealm ?? id.csRealm),
+      encodeURIComponent(id.csId),
     ].join('/');
   }
 }
@@ -57,42 +57,42 @@ export async function makePristineCollection(cards: Card[], meta: ResponseMeta):
 
 class BaseCard {
   // This is the realm the card is stored in.
-  realm: string;
+  csRealm: string;
 
   // this is the realm the card was first created in. As a card is copied to
-  // other realms, `card.realm` changes but `card.originalRealm` does not.
-  originalRealm: string;
+  // other realms, `card.csRealm` changes but `card.csOriginalRealm` does not.
+  csOriginalRealm: string;
 
-  // the localId distinguishes the card within its originalRealm. In some cases
+  // the csId distinguishes the card within its originalRealm. In some cases
   // it may be chosen by the person creating the card. In others it may be
   // chosen by the hub.
-  localId: string | undefined;
+  csId: string | undefined;
 
   private jsonapi: SingleResourceDoc;
 
   // Identity invariants:
   //
-  //  - within a given originalRealm, localId is unique.
+  //  - within a given csOriginalRealm, csId is unique.
   //
-  //  - [originalRealm, localId] is the globally unique *semantic* identity of a
-  //    card. In other words, two Cards with the same [originalRealm, localId]
+  //  - [csOriginalRealm, csId] is the globally unique *semantic* identity of a
+  //    card. In other words, two Cards with the same [csOriginalRealm, csId]
   //    are "the same card" from the user's perspective, but might be different
   //    "versions" of it, stored in different realms.
   //
-  //  - within a given realm, [originalRealm, localId] is unique. That is, we
+  //  - within a given realm, [csOriginalRealm, csId] is unique. That is, we
   //    only allow one version of the same card per realm.
   //
-  //  - [realm, originalRealm, id] is globally unique, such that there are
+  //  - [csRealm, csOriginalRealm, csId] is globally unique, such that there are
   //    exactly zero or one cards that match it, across all hubs.
 
   constructor(jsonapi: SingleResourceDoc, realm: string, protected service: ScopedCardService) {
     this.jsonapi = jsonapi;
-    this.realm = realm;
-    this.originalRealm =
+    this.csRealm = realm;
+    this.csOriginalRealm =
       typeof jsonapi.data.attributes?.csOriginalRealm === 'string' ? jsonapi.data.attributes.csOriginalRealm : realm;
 
-    if (typeof jsonapi.data.attributes?.csLocalId === 'string') {
-      this.localId = jsonapi.data.attributes?.csLocalId;
+    if (typeof jsonapi.data.attributes?.csId === 'string') {
+      this.csId = jsonapi.data.attributes?.csId;
     }
   }
 
@@ -105,14 +105,14 @@ class BaseCard {
     if (!copied.data.attributes) {
       copied.data.attributes = {};
     }
-    copied.data.attributes.csRealm = this.realm;
-    if (this.realm === this.originalRealm) {
+    copied.data.attributes.csRealm = this.csRealm;
+    if (this.csRealm === this.csOriginalRealm) {
       delete copied.data.attributes.csOriginalRealm;
     } else {
-      copied.data.attributes.csOriginalRealm = this.originalRealm;
+      copied.data.attributes.csOriginalRealm = this.csOriginalRealm;
     }
-    if (this.localId) {
-      copied.data.attributes.csLocalId = this.localId;
+    if (this.csId) {
+      copied.data.attributes.csId = this.csId;
     }
 
     if (this instanceof Card) {
@@ -137,17 +137,17 @@ class BaseCard {
   // This is the way that data source plugins think about card IDs. The
   // upstreamId is only unique *within* a realm.
   get upstreamId(): UpstreamIdentity | null {
-    if (this.realm === this.originalRealm) {
-      if (typeof this.localId === 'string') {
-        return this.localId;
+    if (this.csRealm === this.csOriginalRealm) {
+      if (typeof this.csId === 'string') {
+        return this.csId;
       } else {
         return null;
       }
     } else {
-      if (typeof this.localId === 'string') {
-        return { originalRealm: this.originalRealm, localId: this.localId };
+      if (typeof this.csId === 'string') {
+        return { csOriginalRealm: this.csOriginalRealm, csId: this.csId };
       } else {
-        throw new CardstackError(`A card originally from a different realm must already have a local-id`, {
+        throw new CardstackError(`A card originally from a different realm must already have a csId`, {
           status: 400,
         });
       }
@@ -170,17 +170,18 @@ class BaseCard {
 
 export class UnsavedCard extends BaseCard {
   asSavedCard(): Card {
-    if (typeof this.localId !== 'string') {
-      throw new CardstackError(`card missing required attribute "localId"`);
+    if (typeof this.csId !== 'string') {
+      throw new CardstackError(`card missing required attribute "csId"`);
     }
     return new Card(this.regenerateJSONAPI(), this.service);
   }
 }
 
-export class Card extends UnsavedCard {
+export class Card extends UnsavedCard implements CardId {
   // these are non-null because of the assertion in our construction that
-  // ensures localId is present.
-  localId!: string;
+  // ensures csId is present.
+  csId!: string;
+  upstreamId!: NonNullable<BaseCard['upstreamId']>;
 
   constructor(jsonapi: SingleResourceDoc, service: ScopedCardService) {
     if (typeof jsonapi.data.attributes?.csRealm !== 'string') {
@@ -190,7 +191,7 @@ export class Card extends UnsavedCard {
     super(jsonapi, realm, service);
 
     // this is initialized in super() by typescript can't see it.
-    if ((this as any).localId == null) {
+    if ((this as any).csId == null) {
       throw new Error(`Bug: tried to use an UnsavedCard as a Card`);
     }
   }
@@ -217,7 +218,7 @@ export class Card extends UnsavedCard {
 }
 
 export interface CardId {
-  realm: string;
-  originalRealm?: string; // if not set, its implied that its equal to `realm`.
-  localId: string;
+  csRealm: string;
+  csOriginalRealm?: string; // if not set, its implied that its equal to `realm`.
+  csId: string;
 }

@@ -24,9 +24,9 @@ export class EphemeralStorage {
 
   store(doc: UpstreamDocument | null, id: UpstreamIdentity, realm: string, ifMatch?: string | number) {
     this.generationCounter++;
-    let originalRealm = typeof id === 'string' ? realm : id.originalRealm;
-    let localId = typeof id === 'string' ? id : id.localId;
-    let key = [realm, originalRealm, localId].map(encodeURIComponent).join('/');
+    let originalRealm = typeof id === 'string' ? realm : id.csOriginalRealm;
+    let csId = typeof id === 'string' ? id : id.csId;
+    let key = [realm, originalRealm, csId].map(encodeURIComponent).join('/');
     let entry = this._store.get(key);
 
     if (entry && String(entry.generation) !== String(ifMatch)) {
@@ -44,9 +44,9 @@ export class EphemeralStorage {
     }
     this._store.set(key, {
       id: {
-        realm,
-        originalRealm,
-        localId,
+        csRealm: realm,
+        csOriginalRealm: originalRealm,
+        csId: csId,
       },
       doc,
       generation: this.generationCounter,
@@ -56,9 +56,9 @@ export class EphemeralStorage {
   }
 
   getEntry(id: CardId) {
-    let { realm, originalRealm, localId } = id;
+    let { csRealm: realm, csOriginalRealm: originalRealm, csId: csId } = id;
     originalRealm = originalRealm ?? realm;
-    let key = [realm, originalRealm, localId].map(encodeURIComponent).join('/');
+    let key = [realm, originalRealm, csId].map(encodeURIComponent).join('/');
     return this._store.get(key);
   }
 

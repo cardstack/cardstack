@@ -39,9 +39,9 @@ export class ScopedCardService {
       upstreamIdToWriter
     );
     if (upstreamIdToWriter && upstreamIdFromWriter !== upstreamIdToWriter) {
-      throw new CardstackError(`Writer plugin for realm ${realm} tried to change a localId it's not allowed to change`);
+      throw new CardstackError(`Writer plugin for realm ${realm} tried to change a csId it's not allowed to change`);
     }
-    card.localId = typeof upstreamIdFromWriter === 'object' ? upstreamIdFromWriter.localId : upstreamIdFromWriter;
+    card.csId = typeof upstreamIdFromWriter === 'object' ? upstreamIdFromWriter.csId : upstreamIdFromWriter;
     let savedCard = card.asSavedCard();
     savedCard.patch(saved.jsonapi);
 
@@ -56,11 +56,12 @@ export class ScopedCardService {
   async delete(canonicalURL: string, version: string | number): Promise<void>;
   async delete(idOrURL: CardId | string, version: string | number): Promise<void> {
     let id = asCardId(idOrURL);
-    let realmCard = await this.getRealm(id.realm);
+    let realmCard = await this.getRealm(id.csRealm);
     let writer = await this.loadWriter(realmCard);
-    await validate(await this.get(id), null, realmCard);
+    let card = await this.get(id);
+    await validate(card, null, realmCard);
 
-    await writer.delete(this.session, id, version);
+    await writer.delete(this.session, card.upstreamId, version);
     let batch = this.cards.pgclient.beginCardBatch(this);
     await batch.delete(id);
     await batch.done();
@@ -82,7 +83,7 @@ export class ScopedCardService {
     // this exists to throw if there's no such realm. We're not using the return
     // value yet but we will onc we implement custom searchers and realm grants.
     let id = asCardId(idOrURL);
-    await this.getRealm(id.realm);
+    await this.getRealm(id.csRealm);
     let card = await scaffoldGet(id, this);
     if (card) {
       return card;
@@ -102,16 +103,16 @@ export class ScopedCardService {
   }
 
   private async getRealm(realm: string): Promise<Card> {
-    // This searches by realm and localId. Even though it doesn't search by
+    // This searches by realm and csId. Even though it doesn't search by
     // originalRealm, it's unique because of the special property that Realm
-    // cards have that their localId contains the complete URL to the realm. So
-    // localIds created on different hubs will never collide.
+    // cards have that their csId contains the complete URL to the realm. So
+    // csIds created on different hubs will never collide.
     //
     // We don't necessarily know the originalRealm we're looking for because we
     // don't know whose meta realm this realm was originally created in.
     let { cards: realms } = await this.cards.as(Session.INTERNAL_PRIVILEGED).search({
       filter: {
-        type: { realm: CARDSTACK_PUBLIC_REALM, localId: 'realm' },
+        type: { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'realm' },
         eq: {
           // the special meta-realm on each origin has restrictive but not
           // entirely closed off permissions that let users create / update /
@@ -120,7 +121,7 @@ export class ScopedCardService {
           // about. Some of the realms in here can live on other origins, and
           // that's fine.
           csRealm: `${myOrigin}/api/realms/meta`,
-          csLocalId: realm,
+          csId: realm,
         },
       },
     });

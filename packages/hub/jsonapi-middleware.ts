@@ -114,14 +114,16 @@ export default class JSONAPIMiddleware {
       originalRealm = realm;
     }
 
-    let localId: string;
+    let csId: string;
     if (ctxt.routeParams.local_id != null) {
-      localId = ctxt.routeParams.local_id;
+      csId = ctxt.routeParams.local_id;
     } else {
-      throw new CardstackError(`bug in jsonapi-middleware: missing localId parameter in getCard`, { status: 500 });
+      throw new CardstackError(`bug in jsonapi-middleware: missing csId parameter in getCard`, { status: 500 });
     }
 
-    let card = await this.cards.as(ctxt.state.cardstackSession).get({ realm, originalRealm, localId });
+    let card = await this.cards
+      .as(ctxt.state.cardstackSession)
+      .get({ csRealm: realm, csOriginalRealm: originalRealm, csId: csId });
     ctxt.body = (await card.asPristineDoc()).jsonapi;
     ctxt.status = 200;
   }
@@ -137,21 +139,21 @@ export default class JSONAPIMiddleware {
   }
 
   private localURLFor(card: Card): string {
-    if (new URL(card.realm).origin === myOrigin) {
+    if (new URL(card.csRealm).origin === myOrigin) {
       return card.canonicalURL;
     } else {
-      let isHome = card.originalRealm === card.realm;
+      let isHome = card.csOriginalRealm === card.csRealm;
 
       let base = `${myOrigin}${apiPrefix}/remote-realms`;
       if (isHome) {
-        return [base, encodeURIComponent(card.realm), 'cards', card.localId].join('/');
+        return [base, encodeURIComponent(card.csRealm), 'cards', card.csId].join('/');
       } else {
         return [
           base,
-          encodeURIComponent(card.realm),
+          encodeURIComponent(card.csRealm),
           'cards',
-          encodeURIComponent(card.originalRealm),
-          card.localId,
+          encodeURIComponent(card.csOriginalRealm),
+          card.csId,
         ].join('/');
       }
     }

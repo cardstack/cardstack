@@ -17,28 +17,28 @@ function ephemeralRealms(cards: ScopedCardService) {
       testCard().withAttributes({
         csRealm: `${myOrigin}/api/realms/meta`,
         csOriginalRealm: `${myOrigin}/api/realms/meta`,
-        csLocalId: `${myOrigin}/api/realms/meta`,
+        csId: `${myOrigin}/api/realms/meta`,
       }).jsonapi
     ),
     cards.instantiate(
       testCard().withAttributes({
         csRealm: `${myOrigin}/api/realms/meta`,
         csOriginalRealm: `${myOrigin}/api/realms/meta`,
-        csLocalId: `${myOrigin}/api/realms/first-ephemeral-realm`,
+        csId: `${myOrigin}/api/realms/first-ephemeral-realm`,
       }).jsonapi
     ),
     cards.instantiate(
       testCard().withAttributes({
         csRealm: `${myOrigin}/api/realms/meta`,
         csOriginalRealm: `http://example.com/api/realms/meta`,
-        csLocalId: `http://example.com/api/realms/second-ephemeral-realm`,
+        csId: `http://example.com/api/realms/second-ephemeral-realm`,
       }).jsonapi
     ),
     cards.instantiate(
       testCard().withAttributes({
         csRealm: `${myOrigin}/api/realms/meta`,
         csOriginalRealm: CARDSTACK_PUBLIC_REALM,
-        csLocalId: CARDSTACK_PUBLIC_REALM,
+        csId: CARDSTACK_PUBLIC_REALM,
       }).jsonapi
     ),
   ];
@@ -52,25 +52,25 @@ export async function search(query: Query, cards: ScopedCardService): Promise<Ca
     return null;
   }
 
-  if (query.filter.eq.csRealm !== `${myOrigin}/api/realms/meta` || !('csLocalId' in query.filter.eq)) {
+  if (query.filter.eq.csRealm !== `${myOrigin}/api/realms/meta` || !('csId' in query.filter.eq)) {
     return null;
   }
 
-  let searchingFor = query.filter.eq.csLocalId;
-  return ephemeralRealms(cards).filter(card => card.localId === searchingFor);
+  let searchingFor = query.filter.eq.csId;
+  return ephemeralRealms(cards).filter(card => card.csId === searchingFor);
 }
 
 export async function get(id: CardId, cards: ScopedCardService): Promise<Card | null> {
   if (
-    id.realm === 'https://base.cardstack.com/public' &&
-    (id.originalRealm ?? id.realm) === 'https://base.cardstack.com/public' &&
-    id.localId === 'string-field'
+    id.csRealm === 'https://base.cardstack.com/public' &&
+    (id.csOriginalRealm ?? id.csRealm) === 'https://base.cardstack.com/public' &&
+    id.csId === 'string-field'
   ) {
     return cards.instantiate(
       testCard().withAttributes({
-        csRealm: id.realm,
-        csOriginalRealm: id.originalRealm,
-        csLocalId: id.localId,
+        csRealm: id.csRealm,
+        csOriginalRealm: id.csOriginalRealm,
+        csId: id.csId,
       }).jsonapi
     );
   }

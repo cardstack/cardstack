@@ -21,13 +21,13 @@ describe('hub/indexing', function() {
     await env.destroy();
   });
 
-  async function createRealm(originalRealm: string, localId: string) {
+  async function createRealm(originalRealm: string, csId: string) {
     await cards.as(Session.INTERNAL_PRIVILEGED).create(
       `${myOrigin}/api/realms/meta`,
       testCard().withAttributes({
         csRealm: `${myOrigin}/api/realms/meta`,
         csOriginalRealm: originalRealm,
-        csLocalId: localId,
+        csId: csId,
       }).jsonapi
     );
   }
@@ -35,8 +35,8 @@ describe('hub/indexing', function() {
   it('it can index a realm', async function() {
     let csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
     await createRealm(`${myOrigin}/api/realms/meta`, csRealm);
-    let card = testCard().withAttributes({ csRealm, csLocalId: '1', foo: 'bar' });
-    storage.store(card.upstreamDoc, card.localId, card.realm);
+    let card = testCard().withAttributes({ csRealm, csId: '1', foo: 'bar' });
+    storage.store(card.upstreamDoc, card.csId, card.csRealm);
 
     await indexing.update();
 
@@ -49,12 +49,12 @@ describe('hub/indexing', function() {
     await createRealm(`${myOrigin}/api/realms/meta`, csRealm);
     let card = await cards
       .as(Session.INTERNAL_PRIVILEGED)
-      .create(csRealm, testCard().withAttributes({ csRealm, csLocalId: '1', foo: 'bar' }).jsonapi);
-    storage.store(null, card.localId, card.realm, storage.getEntry(card)?.generation);
+      .create(csRealm, testCard().withAttributes({ csRealm, csId: '1', foo: 'bar' }).jsonapi);
+    storage.store(null, card.csId, card.csRealm, storage.getEntry(card)?.generation);
     await indexing.update();
 
     let { cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
-      filter: { eq: { csLocalId: '1' } },
+      filter: { eq: { csId: '1' } },
     });
     expect(results.length).to.equal(0);
   });
@@ -65,15 +65,15 @@ describe('hub/indexing', function() {
     await createRealm(`${myOrigin}/api/realms/meta`, realm1);
     await createRealm(`http://example.com/api/realms/meta`, realm2);
 
-    let card = testCard().withAttributes({ csRealm: realm1, csLocalId: '1', foo: 'bar' });
-    storage.store(card.upstreamDoc, card.localId, card.realm);
-    card = testCard().withAttributes({ csRealm: realm2, csLocalId: '1', foo: 'bar' });
-    storage.store(card.upstreamDoc, card.localId, card.realm);
+    let card = testCard().withAttributes({ csRealm: realm1, csId: '1', foo: 'bar' });
+    storage.store(card.upstreamDoc, card.csId, card.csRealm);
+    card = testCard().withAttributes({ csRealm: realm2, csId: '1', foo: 'bar' });
+    storage.store(card.upstreamDoc, card.csId, card.csRealm);
 
     await indexing.update();
 
     let { cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
-      filter: { eq: { csLocalId: '1' } },
+      filter: { eq: { csId: '1' } },
     });
     expect(results.length).to.equal(2);
   });
@@ -84,14 +84,14 @@ describe('hub/indexing', function() {
 
     // card is indexed in torn down ephemeral storage
     // This card will _not_ live through the container teardown
-    let card = testCard().withAttributes({ csRealm: realm, csLocalId: '1', foo: 'bar' });
-    storage.store(card.upstreamDoc, card.localId, card.realm);
+    let card = testCard().withAttributes({ csRealm: realm, csId: '1', foo: 'bar' });
+    storage.store(card.upstreamDoc, card.csId, card.csRealm);
     await indexing.update();
 
     // card is not yet indexed in torn down ephemeral storage
     // This card will _not_ live through the container teardown
-    card = testCard().withAttributes({ csRealm: realm, csLocalId: '2', foo: 'bar' });
-    storage.store(await card.upstreamDoc, card.localId, card.realm);
+    card = testCard().withAttributes({ csRealm: realm, csId: '2', foo: 'bar' });
+    storage.store(await card.upstreamDoc, card.csId, card.csRealm);
     await env.container.teardown();
     env.container = await wireItUp();
 
@@ -102,22 +102,22 @@ describe('hub/indexing', function() {
 
     // card is not yet indexed in new ephemeral storage
     // This card _will_ live through the container teardown
-    card = testCard().withAttributes({ csRealm: realm, csLocalId: '3', foo: 'bar' });
-    storage.store(await card.upstreamDoc, card.localId, card.realm);
+    card = testCard().withAttributes({ csRealm: realm, csId: '3', foo: 'bar' });
+    storage.store(await card.upstreamDoc, card.csId, card.csRealm);
     await indexing.update();
 
     let { cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
-      filter: { eq: { csLocalId: '1' } },
+      filter: { eq: { csId: '1' } },
     });
     expect(results.length).to.equal(0);
 
     ({ cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
-      filter: { eq: { csLocalId: '2' } },
+      filter: { eq: { csId: '2' } },
     }));
     expect(results.length).to.equal(0);
 
     ({ cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
-      filter: { eq: { csLocalId: '3' } },
+      filter: { eq: { csId: '3' } },
     }));
     expect(results.length).to.equal(1);
   });
@@ -133,19 +133,24 @@ describe('hub/indexing', function() {
     await createRealm(`${myOrigin}/api/realms/meta`, realm);
 
     // Add a new card
-    let card = testCard().withAttributes({ csRealm: realm, csLocalId: '1', foo: 'bar', step: 1 });
-    storage.store(card.upstreamDoc, card.localId, card.realm);
+    let card = testCard().withAttributes({ csRealm: realm, csId: '1', foo: 'bar', step: 1 });
+    storage.store(card.upstreamDoc, card.csId, card.csRealm);
     await indexing.update();
     expect(await cardsWithStep(1)).to.equal(1);
 
     // Add another new card
-    card = testCard().withAttributes({ csRealm: realm, csLocalId: '2', foo: 'bar', step: 2 });
-    storage.store(card.upstreamDoc, card.localId, card.realm);
+    card = testCard().withAttributes({ csRealm: realm, csId: '2', foo: 'bar', step: 2 });
+    storage.store(card.upstreamDoc, card.csId, card.csRealm);
 
     // Maniuplate existing card so we would notice if it gets indexed when it shouldn't.
     await storage.inThePast(async () => {
-      card = testCard().withAttributes({ csRealm: realm, csLocalId: '1', foo: 'bar', step: 2 });
-      storage.store(card.upstreamDoc, card.localId, card.realm, storage.getEntry({ realm, localId: '1' })?.generation);
+      card = testCard().withAttributes({ csRealm: realm, csId: '1', foo: 'bar', step: 2 });
+      storage.store(
+        card.upstreamDoc,
+        card.csId,
+        card.csRealm,
+        storage.getEntry({ csRealm: realm, csId: '1' })?.generation
+      );
     });
 
     await indexing.update();
@@ -153,25 +158,40 @@ describe('hub/indexing', function() {
     expect(n).to.equal(1);
 
     // Update first card
-    card = testCard().withAttributes({ csRealm: realm, csLocalId: '1', foo: 'bar', step: 3 });
-    storage.store(card.upstreamDoc, card.localId, card.realm, storage.getEntry({ realm, localId: '1' })?.generation);
+    card = testCard().withAttributes({ csRealm: realm, csId: '1', foo: 'bar', step: 3 });
+    storage.store(
+      card.upstreamDoc,
+      card.csId,
+      card.csRealm,
+      storage.getEntry({ csRealm: realm, csId: '1' })?.generation
+    );
 
     // Maniuplate other existing card so we would notice if it gets indexed when it shouldn't.
     await storage.inThePast(async () => {
-      card = testCard().withAttributes({ csRealm: realm, csLocalId: '2', foo: 'bar', step: 3 });
-      storage.store(card.upstreamDoc, card.localId, card.realm, storage.getEntry({ realm, localId: '2' })?.generation);
+      card = testCard().withAttributes({ csRealm: realm, csId: '2', foo: 'bar', step: 3 });
+      storage.store(
+        card.upstreamDoc,
+        card.csId,
+        card.csRealm,
+        storage.getEntry({ csRealm: realm, csId: '2' })?.generation
+      );
     });
 
     await indexing.update();
     expect(await cardsWithStep(3)).to.equal(1);
 
     // Delete card 2
-    storage.store(null, card.localId, card.realm, storage.getEntry({ realm, localId: '2' })?.generation);
+    storage.store(null, card.csId, card.csRealm, storage.getEntry({ csRealm: realm, csId: '2' })?.generation);
 
     // Maniuplate other existing card so we would notice if it gets indexed when it shouldn't.
     await storage.inThePast(async () => {
-      card = testCard().withAttributes({ csRealm: realm, csLocalId: '1', foo: 'bar', step: 4 });
-      storage.store(card.upstreamDoc, card.localId, card.realm, storage.getEntry({ realm, localId: '1' })?.generation);
+      card = testCard().withAttributes({ csRealm: realm, csId: '1', foo: 'bar', step: 4 });
+      storage.store(
+        card.upstreamDoc,
+        card.csId,
+        card.csRealm,
+        storage.getEntry({ csRealm: realm, csId: '1' })?.generation
+      );
     });
 
     await indexing.update();

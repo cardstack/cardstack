@@ -45,7 +45,7 @@ export interface RangeFilter extends TypedFilter {
 }
 
 export function baseType(filter: Filter | undefined) {
-  return filter?.type || { realm: CARDSTACK_PUBLIC_REALM, localId: 'base' };
+  return filter?.type || { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' };
 }
 
 export function assertQuery(query: any, pointer: string[] = ['']): asserts query is Query {
@@ -149,9 +149,9 @@ export function assertCardId(id: any, pointer: string[]): asserts id is CardId {
     });
   }
 
-  if (!('localId' in id) || typeof id.localId !== 'string') {
-    throw new CardstackError('localId must be a string', {
-      source: { pointer: pointer.concat('localId').join('/') || '/' },
+  if (!('csId' in id) || typeof id.csId !== 'string') {
+    throw new CardstackError('csId must be a string', {
+      source: { pointer: pointer.concat('csId').join('/') || '/' },
       status: 400,
     });
   }

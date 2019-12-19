@@ -27,14 +27,14 @@ describe('hub/pgclient', function() {
     let cardsService = await env.container.lookup('cards');
     let cards = cardsService.as(Session.INTERNAL_PRIVILEGED);
     let card = cards.instantiate(
-      testCard().withAttributes({ csLocalId: 'card-1', csRealm: `http://hassan.com/realm`, hello: 'world' }).jsonapi
+      testCard().withAttributes({ csId: 'card-1', csRealm: `http://hassan.com/realm`, hello: 'world' }).jsonapi
     );
 
     let batch = pgclient.beginCardBatch(cards);
     await batch.save(card);
     await batch.done();
 
-    let result = await pgclient.queryCards(cards, [`select * from cards where local_id = `, param('card-1')]);
+    let result = await pgclient.queryCards(cards, [`select * from cards where cs_id = `, param('card-1')]);
     expect(result.rowCount).equals(1);
   });
 });

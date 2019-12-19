@@ -23,10 +23,10 @@ export class IndexingOperations {
   }
 
   async beginReplaceAll() {
-    this.batch.createGeneration(this.realmCard.localId);
+    this.batch.createGeneration(this.realmCard.csId);
   }
 
   async finishReplaceAll() {
-    await this.batch.deleteOlderGenerations(this.realmCard.localId);
+    await this.batch.deleteOlderGenerations(this.realmCard.csId);
   }
 }

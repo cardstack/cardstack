@@ -28,14 +28,14 @@ export default class IndexingService {
     let batch = this.pgclient.beginCardBatch(scopedService);
     let indexer = await getOwner(this).instantiate(indexerFactory, realmCard);
 
-    let metaResult = await this.pgclient.query(['select params from meta where realm = ', param(realmCard.localId)]);
+    let metaResult = await this.pgclient.query(['select params from meta where cs_realm = ', param(realmCard.csId)]);
     let meta = metaResult.rowCount ? (metaResult.rows[0].params as JSON.Object) : null;
 
     let newMeta = await indexer.update(meta, new IndexingOperations(realmCard, batch, scopedService));
     await batch.done();
     await this.pgclient.query(
       upsert('meta', 'meta_pkey', {
-        realm: param(realmCard.localId),
+        ['cs_realm']: param(realmCard.csId),
         params: param(newMeta || null),
       }) as Expression
     );
@@ -48,7 +48,7 @@ export default class IndexingService {
     // explicitely set the page size here to something very high...
     let { cards: realms } = await this.cards.as(Session.INTERNAL_PRIVILEGED).search({
       filter: {
-        type: { realm: CARDSTACK_PUBLIC_REALM, localId: 'realm' },
+        type: { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'realm' },
         eq: {
           csRealm: `${myOrigin}/api/realms/meta`,
         },
@@ -58,7 +58,7 @@ export default class IndexingService {
       realms.map(async realmCard => {
         let job = await this.queue.publish(
           'index_realm',
-          { realm: realmCard.realm, originalRealm: realmCard.originalRealm, localId: realmCard.localId },
+          { csRealm: realmCard.csRealm, csOriginalRealm: realmCard.csOriginalRealm, csId: realmCard.csId },
           { queueName: realmCard.canonicalURL }
         );
         return job.done;
