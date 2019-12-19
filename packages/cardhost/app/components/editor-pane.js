@@ -1,7 +1,6 @@
 import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
 
 export default class EditorPane extends Component {
   @service cssModeToggle;
@@ -60,10 +59,5 @@ export default class EditorPane extends Component {
     }
 
     return classes.join(' ');
-  }
-
-  @action
-  updateCode(code) {
-    this.args.model.setIsolatedCss(code);
   }
 }
