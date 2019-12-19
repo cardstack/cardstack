@@ -122,6 +122,7 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     await focus('[data-test-card-renderer-isolated]');
+    await animationsSettled();
     assert.dom('.card-renderer-isolated--header').hasText('millenial-puppies');
     assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
     // TODO: figure out why having the following assertions before the line above ^^^ causes a test failure
