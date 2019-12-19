@@ -8,6 +8,7 @@ import { getOwner, inject } from './dependency-injection';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { Query } from './query';
 import { ResponseMeta } from './pgsearch/pgclient';
+import { Writer } from './writer';
 
 export default class CardsService {
   pgclient = inject('pgclient');
@@ -26,13 +27,7 @@ export class ScopedCardService {
 
   async create(realm: string, doc: SingleResourceDoc): Promise<Card> {
     let realmCard = await this.getRealm(realm);
-    let writerFactory = await realmCard.loadFeature('writer');
-    if (!writerFactory) {
-      throw new CardstackError(`realm "${realm}" is not writable`, {
-        status: 403,
-      });
-    }
-    let writer = await getOwner(this.cards).instantiate(writerFactory, realmCard);
+    let writer = await this.loadWriter(realmCard);
     let card: UnsavedCard = new UnsavedCard(doc, realm, this);
     await validate(null, card, realmCard);
 
@@ -56,6 +51,20 @@ export class ScopedCardService {
     return savedCard;
   }
 
+  async delete(id: CardId, version: string | number): Promise<void>;
+  async delete(canonicalURL: string, version: string | number): Promise<void>;
+  async delete(idOrURL: CardId | string, version: string | number): Promise<void> {
+    let id = asCardId(idOrURL);
+    let realmCard = await this.getRealm(id.realm);
+    let writer = await this.loadWriter(realmCard);
+    await validate(await this.get(id), null, realmCard);
+
+    await writer.delete(this.session, id, version);
+    let batch = this.cards.pgclient.beginCardBatch(this);
+    await batch.delete(id);
+    await batch.done();
+  }
+
   async search(query: Query): Promise<{ cards: Card[]; meta: ResponseMeta }> {
     let cards = await scaffoldSearch(query, this);
     if (cards) {
@@ -71,12 +80,7 @@ export class ScopedCardService {
   async get(idOrURL: CardId | string): Promise<Card> {
     // this exists to throw if there's no such realm. We're not using the return
     // value yet but we will onc we implement custom searchers and realm grants.
-    let id;
-    if (typeof idOrURL === 'string') {
-      id = canonicalURLToCardId(idOrURL);
-    } else {
-      id = idOrURL;
-    }
+    let id = asCardId(idOrURL);
     await this.getRealm(id.realm);
     let card = await scaffoldGet(id, this);
     if (card) {
@@ -84,6 +88,16 @@ export class ScopedCardService {
     }
     // TODO dont create a scoped card service here
     return await this.cards.pgclient.get(this, id);
+  }
+
+  private async loadWriter(realmCard: Card): Promise<Writer> {
+    let writerFactory = await realmCard.loadFeature('writer');
+    if (!writerFactory) {
+      throw new CardstackError(`realm "${realmCard.canonicalURL}" is not writable`, {
+        status: 403,
+      });
+    }
+    return await getOwner(this.cards).instantiate(writerFactory, realmCard);
   }
 
   private async getRealm(realm: string): Promise<Card> {
@@ -114,6 +128,14 @@ export class ScopedCardService {
       throw new CardstackError(`no such realm`, { status: 400 });
     }
     return realms[0];
+  }
+}
+
+function asCardId(idOrURL: CardId | string): CardId {
+  if (typeof idOrURL === 'string') {
+    return canonicalURLToCardId(idOrURL);
+  } else {
+    return idOrURL;
   }
 }
 

@@ -1,5 +1,7 @@
 import { UpstreamDocument, UpstreamIdentity } from '../document';
 import { CardId } from '../card';
+import { MetaObject } from 'jsonapi-typescript';
+import CardstackError from '../error';
 
 interface StoreEntry {
   id: CardId;
@@ -20,11 +22,26 @@ export class EphemeralStorage {
     return this.generationCounter;
   }
 
-  store(doc: UpstreamDocument | null, id: UpstreamIdentity, realm: string) {
+  store(doc: UpstreamDocument | null, id: UpstreamIdentity, realm: string, ifMatch?: string | number) {
     this.generationCounter++;
     let originalRealm = typeof id === 'string' ? realm : id.originalRealm;
     let localId = typeof id === 'string' ? id : id.localId;
     let key = [realm, originalRealm, localId].map(encodeURIComponent).join('/');
+    let entry = this._store.get(key);
+
+    if (entry && ifMatch != null && String(entry.generation) !== String(ifMatch)) {
+      throw new CardstackError('Merge conflict', {
+        status: 409,
+        source: doc ? { pointer: '/data/meta/version' } : { header: 'If-Match' },
+      });
+    }
+
+    let meta: MetaObject | undefined;
+    if (doc) {
+      meta = Object.assign({}, doc.jsonapi.data.meta);
+      meta.version = this.generationCounter;
+      doc.jsonapi.data.meta = meta;
+    }
     this._store.set(key, {
       id: {
         realm,
@@ -34,6 +51,8 @@ export class EphemeralStorage {
       doc,
       generation: this.generationCounter,
     });
+
+    return doc;
   }
 
   entriesNewerThan(realmURL: string, generation = -Infinity): StoreEntry[] {

@@ -16,7 +16,11 @@ const log = Logger('cardstack/error');
 interface ErrorDetails {
   status?: number;
   title?: string;
-  source?: { pointer?: string; parameter?: string };
+  source?: {
+    pointer?: string;
+    header?: string;
+    parameter?: string;
+  };
 }
 
 class CardstackError extends Error {

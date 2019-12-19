@@ -60,8 +60,12 @@ describe('hub/card-service', function() {
       expect(foundCard.id).equals(card.id);
     });
 
-    // TODO we can do this now--the ephemeral data source is now keeping track of generation
-    it.skip("adds upstream data source's version to the card's meta", async function() {});
+    it("adds upstream data source's version to the card's meta", async function() {
+      let doc = testCard({ hello: 'world' });
+      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+      expect((await card.asPristineDoc()).jsonapi.data.meta?.version).to.be.ok;
+    });
 
     it('can create a card that adopts from another', async function() {
       let base = testCard({ hello: 'world' });
@@ -72,6 +76,63 @@ describe('hub/card-service', function() {
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       let parent = await card.adoptsFrom();
       expect(parent?.id).to.equal(baseCard.id);
+    });
+
+    it('can delete a card', async function() {
+      let doc = testCard({ hello: 'world' });
+      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
+      let storage = await env.container.lookup('ephemeralStorage');
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+      let version = (await card.asPristineDoc()).jsonapi.data.meta?.version as number;
+      expect(storage.entriesNewerThan(card.realm).filter(entry => Boolean(entry.doc)).length).to.equal(1);
+
+      await service.delete(card, version);
+
+      expect(storage.entriesNewerThan(card.realm).filter(entry => Boolean(entry.doc)).length).to.equal(0);
+      try {
+        await service.get(card);
+        throw new Error(`Should not be able to find card`);
+      } catch (e) {
+        expect(e.status).to.equal(404);
+      }
+    });
+
+    it('can delete a card by canonical URL', async function() {
+      let doc = testCard({ hello: 'world' });
+      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
+      let storage = await env.container.lookup('ephemeralStorage');
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+      let version = (await card.asPristineDoc()).jsonapi.data.meta?.version as number;
+      expect(storage.entriesNewerThan(card.realm).filter(entry => Boolean(entry.doc)).length).to.equal(1);
+
+      await service.delete(card.canonicalURL, version);
+
+      expect(storage.entriesNewerThan(card.realm).filter(entry => Boolean(entry.doc)).length).to.equal(0);
+      try {
+        await service.get(card);
+        throw new Error(`Should not be able to find card`);
+      } catch (e) {
+        expect(e.status).to.equal(404);
+      }
+    });
+
+    it('does not delete a card that uses ephemeral storage when the specified version is not the latest', async function() {
+      let doc = testCard({ hello: 'world' });
+      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
+      let storage = await env.container.lookup('ephemeralStorage');
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+      let version = (await card.asPristineDoc()).jsonapi.data.meta?.version as number;
+      let badVersion = version - 1;
+
+      try {
+        await service.delete(card, badVersion);
+        throw new Error(`Should not be able to delete a card`);
+      } catch (e) {
+        expect(e.status).to.equal(409);
+      }
+      let foundCard = await service.get(card);
+      expect(foundCard).to.be.ok;
+      expect(storage.entriesNewerThan(card.realm).filter(entry => Boolean(entry.doc)).length).to.equal(1);
     });
   });
 
