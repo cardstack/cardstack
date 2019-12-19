@@ -227,6 +227,10 @@
   --color: var(--ch-default);
 }
 
+.ch-button--save:hover:disabled {
+  cursor: default;
+}
+
 .ch-button + .ch-button {
   margin-left: 10px;
 }
