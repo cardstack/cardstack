@@ -79,31 +79,23 @@
     {{#each this.schemaAttrs as |schemaAttr|}}
       {{#if (eq schemaAttr "type")}}
         <div class="field-renderer--display" data-test-schema-attr={{schemaAttr}}>
-          <span class="ch-label">Field Type</span>
+          <span class="field-renderer--display-label">Field Type</span>
           <span data-test-field-renderer-field-type>
             {{@field.type}}
           </span>
         </div>
       {{else if (eq schemaAttr "label")}}
-        <div class="ch-input-group" data-test-schema-attr={{schemaAttr}}>
+        <div data-test-schema-attr={{schemaAttr}}>
           {{#if @setFieldLabel}}
-            <label
-              for={{concat "edit-field-label-" @field.nonce "-" this.renderNonce}}
-              class="ch-label"
-              data-test-field-renderer-field-label-label
-            >
-              Field Label
-            </label>
-            <Input
-              @id={{concat "edit-field-label-" @field.nonce "-" this.renderNonce}}
-              @class="ch-input"
+            <TextField
+              @theme="cs-dark"
+              @label="Field Label"
               @value={{this.newFieldLabel}}
-              @key-up={{action this.updateFieldLabel}}
-              @disabled={{@field.isAdopted}}
-            />
+              @setValue={{action this.updateFieldLabel}}
+              @disabled={{@field.isAdopted}} />
           {{else}}
             <div class="field-renderer--display">
-              <span class="ch-label">Field Label</span>
+              <span class="field-renderer--display-label">Field Label</span>
               <span data-test-field-renderer-field-label>
                 {{@field.label}}
               </span>
@@ -111,25 +103,16 @@
           {{/if}}
         </div>
       {{else if (eq schemaAttr "instructions")}}
-        <div class="ch-input-group" data-test-schema-attr={{schemaAttr}}>
+        <div data-test-schema-attr={{schemaAttr}}>
           {{#if @setFieldInstructions}}
-            <label
-              for={{concat "edit-field-instructions-" @field.nonce "-" this.renderNonce}}
-              class="ch-label"
-              data-test-field-renderer-field-instructions-label
-            >
-              Helper Text
-            </label>
-            <Textarea
-              @id={{concat "edit-field-instructions-" @field.nonce "-" this.renderNonce}}
-              data-test-field-renderer-field-helper-text
-              @class="ch-textarea"
+            <TextArea
+              @theme="cs-dark"
+              @label="Helper Text"
               @value={{this.newFieldInstructions}}
-              @key-up={{action this.updateFieldInstructions}}
-            />
+              @setValue={{action this.updateFieldInstructions}} />
           {{else}}
             <div class="field-renderer--display">
-              <span class="ch-label">Helper Text</span>
+              <span class="field-renderer--display-label">Helper Text</span>
               <span data-test-field-renderer-field-instructions>
                 {{@field.instructions}}
               </span>
@@ -137,49 +120,32 @@
           {{/if}}
         </div>
       {{else if (and (eq schemaAttr "name") @setFieldName)}}
-        <div class="ch-input-group" data-test-schema-attr={{schemaAttr}}>
-          <label
-            for={{concat "edit-field-name-" @field.nonce "-" this.renderNonce}}
-            class="ch-label"
-            data-test-field-renderer-field-name-label
-          >
-            Field Name
-          </label>
-          <Input
-            @id={{concat "edit-field-name-" @field.nonce "-" this.renderNonce}}
-            @class="ch-input"
-            @value={{this.newFieldName}}
-            @key-up={{action this.updateFieldName}}
-            @disabled={{@field.isAdopted}}
-          />
-        </div>
+        <TextField
+          @theme="cs-dark"
+          @label="Field Name"
+          @value={{this.newFieldName}}
+          @setValue={{action this.updateFieldName}}
+          @disabled={{@field.isAdopted}}
+          data-test-schema-attr={{schemaAttr}} />
       {{else if (eq schemaAttr "is-meta")}}
         <div class="field-renderer--display" data-test-schema-attr={{schemaAttr}}>
-          <span class="ch-label">Export as Metadata</span>
+          <span class="field-renderer--display-label">Export as Metadata</span>
           <span data-test-field-renderer-is-meta>
             {{if @field.json.data.attributes.is-metadata "true" "false"}}
           </span>
         </div>
       {{else if (eq schemaAttr "embedded")}}
-        <div class="ch-input-group" data-test-schema-attr={{schemaAttr}}>
+        <div data-test-schema-attr={{schemaAttr}}>
           {{#if @setNeededWhenEmbedded}}
-            <label
-              class="ch-label ch-checkbox-group {{if @field.neededWhenEmbedded "checked"}} {{if @field.isAdopted "disabled"}}"
-            >
-              Available When Embedded
-              <Input
-                @checked={{@field.neededWhenEmbedded}}
-                @type="checkbox"
-                @class="ch-checkbox"
-                @id={{concat "edit_" @field.name "_" this.renderNonce "_embedded"}}
-                @click={{fn @setNeededWhenEmbedded @field.name}}
-                @disabled={{@field.isAdopted}}
-              />
-              <span class="ch-checkmark"></span>
-            </label>
+            <Checkbox
+              @theme="cs-dark"
+              @label="Available When Embedded"
+              @checked={{@field.neededWhenEmbedded}}
+              @setChecked={{fn @setNeededWhenEmbedded @field.name}}
+              @disabled={{@field.isAdopted}} />
           {{else}}
             <div class="field-renderer--display">
-              <span class="ch-label">Available When Embedded</span>
+              <span class="field-renderer--display-label">Available When Embedded</span>
               <span data-test-field-renderer-embedded>
                 {{if @field.neededWhenEmbedded "true" "false"}}
               </span>
@@ -187,13 +153,11 @@
           {{/if}}
         </div>
       {{else if (eq schemaAttr "required")}}
-        <div class="ch-input-group" data-test-schema-attr={{schemaAttr}}>
-          <label class="ch-label ch-checkbox-group">
-            Required
-            <Input @type="checkbox" @class="ch-checkbox" />
-            <span class="ch-checkmark"></span>
-          </label>
-        </div>
+        <Checkbox
+          @theme="cs-dark"
+          @label="Required"
+          @checked={{@field.required}}
+          data-test-schema-attr={{schemaAttr}} />
       {{/if}}
     {{/each}}
   {{/if}}

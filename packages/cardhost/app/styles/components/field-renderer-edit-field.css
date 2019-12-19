@@ -1,7 +1,3 @@
-.field-renderer.edit-field + .field-renderer.edit-field {
-  margin-top: var(--ch-spacing);
-}
-
 .field-renderer.edit-field label {
   text-transform: capitalize;
 }

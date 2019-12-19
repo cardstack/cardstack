@@ -20,15 +20,18 @@
               <div class="right-edge--section">
                 <div class="right-edge--section-header" data-test-section-header>ID</div>
                 <div class="right-edge--item">
-                  <label for="card__id" class="ch-label">
-                    Card ID
-                  </label>
-                  <Input @id="card__id" @class="ch-input hide-in-percy" @size="60" @placeholder="e.g. millenial-puppies"
-                    @value={{this.cardName}} @key-up={{action this.updateCardId}}
+                  <TextField
+                    @theme="cs-dark"
+                    @class="hide-in-percy"
+                    @id="card__id"
+                    @label="Card ID"
+                    @placeholder="e.g. millenial-puppies"
+                    @value={{this.cardName}}
+                    @key-up={{action this.updateCardId}}
                     @disabled={{or (not @updateCardId) (not @card.isNew)}} />
                 </div>
                 <div class="right-edge--item">
-                  <div class="ch-label right-edge--label">Internal ID</div>
+                  <div class="right-edge--label">Internal ID</div>
                   <div class="hide-in-percy" data-test-internal-card-id>
                     {{@card.id}}
                   </div>

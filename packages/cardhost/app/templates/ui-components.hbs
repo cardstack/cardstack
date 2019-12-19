@@ -290,36 +290,33 @@
 
     <h3 id="checkbox">Checkbox</h3>
     <div>
-      <label class="ch-label ch-input-group ch-checkbox-group {{if this.selected "checked"}}">
-        {{if this.selected "selected" "not selected"}}
-        <Input @class="ch-checkbox" @type="checkbox" @checked={{mut this.selected (not this.selected)}} />
-        <span class="ch-checkmark">
-          {{#if this.selected}}
-            {{svg-jar "checkmark" width="12px" height="12px"}}
-          {{/if}}
-        </span>
-      </label>
-      <label class="ch-label ch-input-group ch-checkbox-group disabled">
-        Not selected (disabled state)
-        <Input @class="ch-checkbox disabled" @disabled={{true}} @type="checkbox" />
-        <span class="ch-checkmark"></span>
-      </label>
-      <label class="ch-label ch-input-group ch-checkbox-group disabled">
-        Selected (disabled state)
-        <Input @class="ch-checkbox disabled" @checked={{true}} @disabled={{true}} @type="checkbox" />
-        <span class="ch-checkmark">{{svg-jar "checkmark" width="12px" height="12px"}}</span>
-      </label>
+      <Checkbox
+        @theme="cs-dark"
+        @label={{if this.isChecked "Selected" "Not Selected"}}
+        @checked={{this.isChecked}}
+        @setChecked={{fn this.setChecked "isChecked"}} />
+
+      <Checkbox
+        @theme="cs-dark"
+        @label="Not Selected (Disabled State)"
+        @disabled={{true}}
+        @setChecked={{fn this.setChecked "isChecked"}} />
+
+      <Checkbox
+        @theme="cs-dark"
+        @label="Selected (Disabled State)"
+        @disabled={{true}}
+        @checked={{true}}
+        @setChecked={{fn this.setChecked "isChecked"}} />
     </div>
     <CodeEditor
-      @code='<label class="ch-label ch-input-group ch-checkbox-group \{{if checked "checked"}} \{{if disabled "disabled"}}">
-  \{{label}}
-  <Input @class="ch-checkbox" @type="checkbox" @checked=\{{checked}} @disabled=\{{disabled}} />
-  <span class="ch-checkmark">
-    \{{#if checked}}
-      \{{svg-jar "checkmark" width="12px" height="12px"}}
-    \{{/if}}
-  </span>
-</label>' @language="handlebars" />
+      @code='<Checkbox
+  @theme="cs-dark"
+  @label=\{{label}}
+  @checked=\{{checked}}
+  @disabled=\{{disabled}}
+  @required=\{{required}}
+  @setChecked=\{{fn setCheckedAction}} />' @language="html" />
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col" id="right-edge">

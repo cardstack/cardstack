@@ -786,10 +786,10 @@
   resolved "https://registry.yarnpkg.com/@cardstack/requirejs-monaco-ember-polyfill/-/requirejs-monaco-ember-polyfill-0.0.1.tgz#e623ac30a2e228e30e726b85cee81c5680f19753"
   integrity sha512-B5bmLSLkweDtlzoDeem7IezF1zAHZDZU7vH5AQ3bklJjN/Vo80kLOyOomRcgAQfvyhbEN4663ZhUDk9PyAkgKA==
 
-"@cardstack/ui-components@^0.2.12":
-  version "0.2.12"
-  resolved "https://registry.yarnpkg.com/@cardstack/ui-components/-/ui-components-0.2.12.tgz#7254b65d41b346f0481d64c6f2e018787ce880d2"
-  integrity sha512-0/JgRSdqR2qiGDpoVFbb+D1pf/uyMI9oi2lsPsRto9uEZjtKeb7FShwRNmS/EJXMGQrtHf/Hwp5ryIquRP/w6g==
+"@cardstack/ui-components@^0.2.14":
+  version "0.2.14"
+  resolved "https://registry.yarnpkg.com/@cardstack/ui-components/-/ui-components-0.2.14.tgz#63faf3fcc14bb3f4a3103c26279eb8f08beaf410"
+  integrity sha512-VUgDUIPN3NDXLgi1g+x4oMkATX4qF+41R96i28bGKlyIdfozD/SD9Pq09NFETHKbp+OIw7FbpgJwWQB27MjhfA==
   dependencies:
     broccoli-funnel "^2.0.2"
     broccoli-merge-trees "^3.0.2"
@@ -8393,9 +8393,9 @@ ember-power-calendar@^0.13.2:
     ember-cli-htmlbars "^3.0.1"
     ember-concurrency "^0.8.27 || ^0.9.0 || ^0.10.0 || ^1.0.0"
 
-"ember-power-datepicker@git+https://github.com/bagby/ember-power-datepicker.git#9eaf27d921056b47b7d620b42e303b45c7a40e67":
+"ember-power-datepicker@git+https://github.com/bagby/ember-power-datepicker#9eaf27d921056b47b7d620b42e303b45c7a40e67":
   version "0.6.0"
-  resolved "git+https://github.com/bagby/ember-power-datepicker.git#9eaf27d921056b47b7d620b42e303b45c7a40e67"
+  resolved "git+https://github.com/bagby/ember-power-datepicker#9eaf27d921056b47b7d620b42e303b45c7a40e67"
   dependencies:
     ember-basic-dropdown "^1.1.2"
     ember-cli-babel "^7.1.2"
