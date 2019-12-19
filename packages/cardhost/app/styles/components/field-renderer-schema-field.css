@@ -26,7 +26,7 @@
 
 /* Schema Display View on Card */
 .schema-field-renderer {
-  --field-width: 384px;
+  --field-width: var(--ch-field-width);
   --field-height: 112px;
   --field-header-height: 36px;
 

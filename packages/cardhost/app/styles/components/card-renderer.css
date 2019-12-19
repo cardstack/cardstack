@@ -109,7 +109,7 @@
 }
 
 .card-renderer-isolated.edit .card-renderer-isolated--content {
-  padding: 22px 21px 22px 22px;
+  padding: 30px;
 }
 
 /* TODO: fade card if field-renderer is selected */

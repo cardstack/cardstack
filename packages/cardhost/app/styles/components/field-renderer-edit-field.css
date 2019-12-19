@@ -1,3 +1,9 @@
+.field-renderer.edit-field {
+  --field-container-width: var(--ch-field-width);
+  margin: 0 auto;
+  padding-bottom: 12px;
+}
+
 .field-renderer.edit-field label {
   text-transform: capitalize;
 }
