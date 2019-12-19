@@ -59,7 +59,7 @@ export default class IndexingService {
         let job = await this.queue.publish(
           'index_realm',
           { realm: realmCard.realm, originalRealm: realmCard.originalRealm, localId: realmCard.localId },
-          { queueName: realmCard.id }
+          { queueName: realmCard.canonicalURL }
         );
         return job.done;
       })

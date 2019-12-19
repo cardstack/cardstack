@@ -78,14 +78,14 @@ export async function get(id: CardId, cards: ScopedCardService): Promise<Card | 
 }
 
 export async function loadWriter(card: Card, cards: ScopedCardService): Promise<WriterFactory> {
-  if (ephemeralRealms(cards).find(realm => realm.id === card.id)) {
+  if (ephemeralRealms(cards).find(realm => realm.canonicalURL === card.canonicalURL)) {
     return (await import('./ephemeral/writer')).default;
   }
   throw new Error(`unimplemented`);
 }
 
 export async function loadIndexer(card: Card, cards: ScopedCardService): Promise<IndexerFactory<unknown>> {
-  if (ephemeralRealms(cards).find(realm => realm.id === card.id)) {
+  if (ephemeralRealms(cards).find(realm => realm.canonicalURL === card.canonicalURL)) {
     return (await import('./ephemeral/indexer')).default as IndexerFactory<unknown>;
   }
   throw new Error(`unimplemented`);

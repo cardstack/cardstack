@@ -56,16 +56,6 @@ export async function makePristineCollection(cards: Card[], meta: ResponseMeta):
 }
 
 class BaseCard {
-  // Almost everyone should treat this as opaque and only valid on the current
-  // hub. (The only exception is some code within the hub itself that may
-  // optimize by pulling these apart.)
-  get id(): string | undefined {
-    if (typeof this.localId === 'string') {
-      return [this.realm, this.originalRealm, this.localId].map(encodeURIComponent).join('/');
-    }
-    return undefined;
-  }
-
   // This is the realm the card is stored in.
   realm: string;
 
@@ -124,7 +114,11 @@ class BaseCard {
     if (this.localId) {
       copied.data.attributes.csLocalId = this.localId;
     }
-    copied.data.id = this.id;
+
+    if (this instanceof Card) {
+      copied.data.id = this.canonicalURL;
+    }
+
     return copied;
   }
 
@@ -186,7 +180,6 @@ export class UnsavedCard extends BaseCard {
 export class Card extends UnsavedCard {
   // these are non-null because of the assertion in our construction that
   // ensures localId is present.
-  id!: string;
   localId!: string;
 
   constructor(jsonapi: SingleResourceDoc, service: ScopedCardService) {

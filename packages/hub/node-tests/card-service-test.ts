@@ -49,7 +49,7 @@ describe('hub/card-service', function() {
       let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       let foundCard = await service.get(card);
-      expect(foundCard.id).equals(card.id);
+      expect(foundCard.canonicalURL).equals(card.canonicalURL);
     });
 
     it('can get a card out by canonical URL', async function() {
@@ -57,7 +57,7 @@ describe('hub/card-service', function() {
       let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       let foundCard = await service.get(card.canonicalURL);
-      expect(foundCard.id).equals(card.id);
+      expect(foundCard.canonicalURL).equals(card.canonicalURL);
     });
 
     it("adds upstream data source's version to the card's meta", async function() {
@@ -77,7 +77,7 @@ describe('hub/card-service', function() {
         .adoptingFrom(baseCard);
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       let parent = await card.adoptsFrom();
-      expect(parent?.id).to.equal(baseCard.id);
+      expect(parent?.canonicalURL).to.equal(baseCard.canonicalURL);
     });
 
     it('can delete a card', async function() {
