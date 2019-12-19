@@ -99,10 +99,10 @@ class BaseCard {
     this.jsonapi = jsonapi;
     this.realm = realm;
     this.originalRealm =
-      typeof jsonapi.data.attributes?.originalRealm === 'string' ? jsonapi.data.attributes.originalRealm : realm;
+      typeof jsonapi.data.attributes?.csOriginalRealm === 'string' ? jsonapi.data.attributes.csOriginalRealm : realm;
 
-    if (typeof jsonapi.data.attributes?.localId === 'string') {
-      this.localId = jsonapi.data.attributes?.localId;
+    if (typeof jsonapi.data.attributes?.csLocalId === 'string') {
+      this.localId = jsonapi.data.attributes?.csLocalId;
     }
   }
 
@@ -116,10 +116,14 @@ class BaseCard {
     if (!copied.data.attributes) {
       copied.data.attributes = {};
     }
-    copied.data.attributes.realm = this.realm;
-    copied.data.attributes.originalRealm = this.originalRealm;
+    copied.data.attributes.csRealm = this.realm;
+    if (this.realm === this.originalRealm) {
+      delete copied.data.attributes.csOriginalRealm;
+    } else {
+      copied.data.attributes.csOriginalRealm = this.originalRealm;
+    }
     if (this.localId) {
-      copied.data.attributes.localId = this.localId;
+      copied.data.attributes.csLocalId = this.localId;
     }
     copied.data.id = this.id;
     return copied;
@@ -187,10 +191,10 @@ export class Card extends UnsavedCard {
   localId!: string;
 
   constructor(jsonapi: SingleResourceDoc, service: ScopedCardService) {
-    if (typeof jsonapi.data.attributes?.realm !== 'string') {
+    if (typeof jsonapi.data.attributes?.csRealm !== 'string') {
       throw new CardstackError(`card missing required attribute "realm": ${JSON.stringify(jsonapi)}`);
     }
-    let realm = jsonapi.data.attributes.realm;
+    let realm = jsonapi.data.attributes.csRealm;
     super(jsonapi, realm, service);
 
     // this is initialized in super() by typescript can't see it.

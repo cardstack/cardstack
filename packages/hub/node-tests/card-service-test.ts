@@ -31,7 +31,7 @@ describe('hub/card-service', function() {
     });
 
     it('saves a card', async function() {
-      let doc = testCard({ hello: 'world' });
+      let doc = testCard();
       let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       expect(card.realm).to.equal(`${myOrigin}/api/realms/first-ephemeral-realm`);
@@ -45,7 +45,7 @@ describe('hub/card-service', function() {
     });
 
     it('can get a card back out', async function() {
-      let doc = testCard({ hello: 'world' });
+      let doc = testCard();
       let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       let foundCard = await service.get(card);
@@ -53,7 +53,7 @@ describe('hub/card-service', function() {
     });
 
     it('can get a card out by canonical URL', async function() {
-      let doc = testCard({ hello: 'world' });
+      let doc = testCard();
       let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       let foundCard = await service.get(card.canonicalURL);
@@ -61,14 +61,14 @@ describe('hub/card-service', function() {
     });
 
     it("adds upstream data source's version to the card's meta", async function() {
-      let doc = testCard({ hello: 'world' });
+      let doc = testCard();
       let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       expect((await card.asPristineDoc()).jsonapi.data.meta?.version).to.be.ok;
     });
 
     it('can create a card that adopts from another', async function() {
-      let base = testCard({ hello: 'world' });
+      let base = testCard();
       let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       let baseCard = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, base.jsonapi);
 
@@ -79,7 +79,7 @@ describe('hub/card-service', function() {
     });
 
     it('can delete a card', async function() {
-      let doc = testCard({ hello: 'world' });
+      let doc = testCard();
       let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       let storage = await env.container.lookup('ephemeralStorage');
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
@@ -98,7 +98,7 @@ describe('hub/card-service', function() {
     });
 
     it('can delete a card by canonical URL', async function() {
-      let doc = testCard({ hello: 'world' });
+      let doc = testCard();
       let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       let storage = await env.container.lookup('ephemeralStorage');
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
@@ -117,7 +117,7 @@ describe('hub/card-service', function() {
     });
 
     it('does not delete a card that uses ephemeral storage when the specified version is not the latest', async function() {
-      let doc = testCard({ hello: 'world' });
+      let doc = testCard();
       let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       let storage = await env.container.lookup('ephemeralStorage');
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
@@ -133,6 +133,19 @@ describe('hub/card-service', function() {
       let foundCard = await service.get(card);
       expect(foundCard).to.be.ok;
       expect(storage.entriesNewerThan(card.realm).filter(entry => Boolean(entry.doc)).length).to.equal(1);
+    });
+
+    it('rejects unknown field value at create', async function() {
+      let doc = testCard({ badField: 'hello' }).withField('badField', null);
+
+      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(/some good error/);
+      }
     });
   });
 

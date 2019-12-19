@@ -1,16 +1,18 @@
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { CardId, canonicalURL } from '../card';
 import { UpstreamDocument } from '../document';
+import { CARDSTACK_PUBLIC_REALM } from '../realm';
 
 export class TestCard {
   private parent: CardId | undefined;
-  private model = {} as { [field: string]: any };
+  private userFieldValues: Map<string, any> = new Map();
+  private fields: Map<string, TestCard> = new Map();
 
   localId?: string;
   originalRealm?: string;
   realm?: string;
 
-  constructor(values: Fields) {
+  constructor(values: FieldValues = {}) {
     this.localId = values.csLocalId;
     this.originalRealm = values.csOriginalRealm ?? values.csRealm;
     this.realm = values.csRealm;
@@ -18,39 +20,64 @@ export class TestCard {
     for (let [field, value] of Object.entries(values)) {
       if (!/^cs[A-Z]/.test(field)) {
         // a user field
-        this.model[field] = value;
+        this.userFieldValues.set(field, value);
+        this.fields.set(field, new TestCard().adoptingFrom(guessType(value)));
       }
     }
   }
 
+  withField(name: string, fieldShorthand: string, values?: FieldValues): this;
+  withField(name: string, fieldCard: CardId, values?: FieldValues): this;
+  withField(name: string, fieldCard: null): this;
+  withField(name: string, fieldCard: string | CardId | null, values: FieldValues = {}): this {
+    if (fieldCard == null) {
+      this.fields.delete(name);
+      return this;
+    }
+
+    if (typeof fieldCard === 'string') {
+      fieldCard = { realm: CARDSTACK_PUBLIC_REALM, localId: fieldCard };
+    }
+
+    this.fields.set(name, new TestCard(values).adoptingFrom(fieldCard));
+    return this;
+  }
+
   get jsonapi(): SingleResourceDoc {
+    let attributes = Object.create(null);
+
+    for (let [key, value] of this.userFieldValues.entries()) {
+      attributes[key] = value;
+    }
+
     let doc = {
       data: {
         type: 'cards',
-        attributes: {
-          model: {
-            attributes: this.model,
-          },
-        } as NonNullable<SingleResourceDoc['data']['attributes']>,
+        attributes,
         relationships: {} as NonNullable<SingleResourceDoc['data']['relationships']>,
       },
     };
     if (this.localId) {
-      doc.data.attributes.localId = this.localId;
+      doc.data.attributes.csLocalId = this.localId;
     }
 
     if (this.realm) {
-      doc.data.attributes.realm = this.realm;
+      doc.data.attributes.csRealm = this.realm;
     }
 
     if (this.originalRealm) {
-      doc.data.attributes.originalRealm = this.originalRealm;
+      doc.data.attributes.csOriginalRealm = this.originalRealm;
     }
 
     if (this.parent) {
-      doc.data.relationships.adoptsFrom = {
+      doc.data.relationships.csAdoptsFrom = {
         links: { related: canonicalURL(this.parent) },
       };
+    }
+
+    let csFields = Object.create(null);
+    for (let [fieldName, testCard] of this.fields) {
+      csFields[fieldName] = testCard.jsonapi;
     }
 
     return doc;
@@ -66,7 +93,7 @@ export class TestCard {
   }
 }
 
-interface Fields {
+interface FieldValues {
   csRealm?: string;
   csOriginalRealm?: string;
   csLocalId?: string;
@@ -79,8 +106,12 @@ interface TestCardWithId extends TestCard {
   originalRealm: string;
 }
 
-export function testCard(values: { csRealm: string; csLocalId: string; [userField: string]: any }): TestCardWithId;
-export function testCard(values: Fields): TestCard;
-export function testCard(values: Fields): TestCard | TestCardWithId {
+function guessType(_value: any) {
+  return { realm: CARDSTACK_PUBLIC_REALM, localId: 'string-field' };
+}
+
+export function testCard(values: FieldValues & { csLocalId: string; csRealm: string }): TestCardWithId;
+export function testCard(values?: FieldValues): TestCard;
+export function testCard(values: FieldValues = {}): TestCard | TestCardWithId {
   return new TestCard(values);
 }

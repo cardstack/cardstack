@@ -1,4 +1,7 @@
 import chai from 'chai';
+import hasStatus from './has-status';
+
+chai.use(hasStatus);
 
 if (!(process as any).__didSetCardstackWarning) {
   (process as any).__didSetCardstackWarning = true;

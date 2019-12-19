@@ -62,7 +62,7 @@ describe('hub/jsonapi', function() {
     let response = await request
       .post('/api/realms/first-ephemeral-realm/cards')
       .set('Content-Type', 'application/vnd.api+json')
-      .send(testCard({ hello: 'world' }).jsonapi);
+      .send(testCard().jsonapi);
     expect(response.status).to.equal(201);
     expect(response.header.location).to.match(/http:\/\/[^/]+\/api\/realms\/first-ephemeral-realm\/cards\/[^/]+/);
   });
@@ -132,7 +132,7 @@ describe('hub/jsonapi', function() {
     await request
       .post('/api/realms/first-ephemeral-realm/cards')
       .set('Content-Type', 'application/vnd.api+json')
-      .send(testCard({ hello: 'world' }).jsonapi);
+      .send(testCard().jsonapi);
     await request
       .post('/api/realms/first-ephemeral-realm/cards')
       .set('Content-Type', 'application/vnd.api+json')
