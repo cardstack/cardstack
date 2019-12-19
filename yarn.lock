@@ -7205,7 +7205,7 @@ ember-animated-tools@^0.4.1:
     ember-cli-htmlbars "^3.0.0"
     resolve "^1.5.0"
 
-ember-animated@0.10.0:
+ember-animated@0.10.0, ember-animated@^0.10.0:
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/ember-animated/-/ember-animated-0.10.0.tgz#71d6ebc004a44608638c31876006a5dbd11dbd3e"
   integrity sha512-USx3qzv7vX09wWV79UgKzSQMDaE9fxg6iYWWWepRpTBueWrT2QPfm0Adt2wA29UV8z011AtiVIhy/sDheK7Sbg==
