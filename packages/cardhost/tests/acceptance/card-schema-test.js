@@ -265,8 +265,8 @@ module('Acceptance | card schema', function(hooks) {
 
     await dragAndDropNewField('string');
     await animationsSettled();
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('new-field-3');
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('new-field-3');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('field-3');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('field-3');
   });
 
   test(`change a field's needed-when-embedded value to true`, async function(assert) {
