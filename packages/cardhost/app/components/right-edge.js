@@ -4,8 +4,9 @@ import { tracked } from '@glimmer/tracking';
 import { action, set } from '@ember/object';
 import fade from 'ember-animated/transitions/fade';
 import resize from 'ember-animated/motions/resize';
-import { fadeIn, fadeOut } from 'ember-animated/motions/opacity';
 import { easeInAndOut } from 'ember-animated/easings/cosine';
+
+const duration = 250;
 
 export default class RightEdge extends Component {
   @tracked cardName = this.args.card.name;
@@ -13,6 +14,7 @@ export default class RightEdge extends Component {
   @tracked options = {};
 
   fade = fade;
+  duration = duration;
 
   get selectedFieldTitle() {
     if (this.args.selectedField) {
@@ -44,16 +46,7 @@ export default class RightEdge extends Component {
 
   *outerTransition({ keptSprites }) {
     keptSprites.forEach(sprite => {
-      resize(sprite, { easing: easeInAndOut });
-    });
-  }
-
-  *innerTransition({ insertedSprites, removedSprites }) {
-    insertedSprites.forEach(sprite => {
-      fadeIn(sprite);
-    });
-    removedSprites.forEach(sprite => {
-      fadeOut(sprite);
+      resize(sprite, { easing: easeInAndOut, duration });
     });
   }
 }
