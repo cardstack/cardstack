@@ -29,7 +29,7 @@ export class EphemeralStorage {
     let key = [realm, originalRealm, localId].map(encodeURIComponent).join('/');
     let entry = this._store.get(key);
 
-    if (entry && ifMatch != null && String(entry.generation) !== String(ifMatch)) {
+    if (entry && String(entry.generation) !== String(ifMatch)) {
       throw new CardstackError('Merge conflict', {
         status: 409,
         source: doc ? { pointer: '/data/meta/version' } : { header: 'If-Match' },
@@ -53,6 +53,13 @@ export class EphemeralStorage {
     });
 
     return doc;
+  }
+
+  getEntry(id: CardId) {
+    let { realm, originalRealm, localId } = id;
+    originalRealm = originalRealm ?? realm;
+    let key = [realm, originalRealm, localId].map(encodeURIComponent).join('/');
+    return this._store.get(key);
   }
 
   entriesNewerThan(realmURL: string, generation = -Infinity): StoreEntry[] {

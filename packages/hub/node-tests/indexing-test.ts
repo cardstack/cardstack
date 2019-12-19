@@ -50,7 +50,7 @@ describe('hub/indexing', function() {
     let card = await cards
       .as(Session.INTERNAL_PRIVILEGED)
       .create(csRealm, testCard({ csRealm, csLocalId: '1', foo: 'bar' }).jsonapi);
-    storage.store(null, card.localId, card.realm);
+    storage.store(null, card.localId, card.realm, storage.getEntry(card)?.generation);
     await indexing.update();
 
     let { cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
@@ -145,7 +145,7 @@ describe('hub/indexing', function() {
     // Maniuplate existing card so we would notice if it gets indexed when it shouldn't.
     await storage.inThePast(async () => {
       card = testCard({ csRealm: realm, csLocalId: '1', foo: 'bar', step: 2 });
-      storage.store(card.upstreamDoc, card.localId, card.realm);
+      storage.store(card.upstreamDoc, card.localId, card.realm, storage.getEntry({ realm, localId: '1' })?.generation);
     });
 
     await indexing.update();
@@ -154,24 +154,24 @@ describe('hub/indexing', function() {
 
     // Update first card
     card = testCard({ csRealm: realm, csLocalId: '1', foo: 'bar', step: 3 });
-    storage.store(card.upstreamDoc, card.localId, card.realm);
+    storage.store(card.upstreamDoc, card.localId, card.realm, storage.getEntry({ realm, localId: '1' })?.generation);
 
     // Maniuplate other existing card so we would notice if it gets indexed when it shouldn't.
     await storage.inThePast(async () => {
       card = testCard({ csRealm: realm, csLocalId: '2', foo: 'bar', step: 3 });
-      storage.store(card.upstreamDoc, card.localId, card.realm);
+      storage.store(card.upstreamDoc, card.localId, card.realm, storage.getEntry({ realm, localId: '2' })?.generation);
     });
 
     await indexing.update();
     expect(await cardsWithStep(3)).to.equal(1);
 
     // Delete card 2
-    storage.store(null, card.localId, card.realm);
+    storage.store(null, card.localId, card.realm, storage.getEntry({ realm, localId: '2' })?.generation);
 
     // Maniuplate other existing card so we would notice if it gets indexed when it shouldn't.
     await storage.inThePast(async () => {
       card = testCard({ csRealm: realm, csLocalId: '1', foo: 'bar', step: 4 });
-      storage.store(card.upstreamDoc, card.localId, card.realm);
+      storage.store(card.upstreamDoc, card.localId, card.realm, storage.getEntry({ realm, localId: '1' })?.generation);
     });
 
     await indexing.update();

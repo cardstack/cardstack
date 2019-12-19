@@ -41,7 +41,7 @@
         "--timeout",
         "200000",
         "--grep",
-        "does not delete a card that uses ephemeral storage when the specified version is not the latest"
+        "it does not index unchanged cards since the last time the ephemeral realm was indexed"
       ]
     },
     {
