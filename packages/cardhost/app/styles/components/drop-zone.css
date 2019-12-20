@@ -4,6 +4,7 @@
 .drop-zone--container {
   height: 20px;
   background-color: var(--ch-dark-background);
+  border-top: 2px solid var(--ch-default);
 }
 
 .drop-zone--container.outside {
@@ -22,7 +23,7 @@
 
 .drop-zone--container .drop-zone--description .drop-zone--preview--container {
   pointer-events: none;
-  padding: 20px 53px;
+  padding: 0 53px;
 }
 
 .drop-zone .drop-zone--description {
@@ -30,7 +31,6 @@
   height: 120px;
   opacity: 0.5;
   padding: 0;
-  background-color: var(--ch-medium-purple);
   color: white;
   font-size: 16px;
   line-height: 22px;

@@ -59,8 +59,8 @@ module('Acceptance | card create', function(hooks) {
 
     assert.equal(currentURL(), '/cards/new');
 
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-name').hasText('Base Card');
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name').doesNotExist();
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('Base Card');
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').doesNotExist();
   });
 
   test("changing a card's id does not clear the card fields", async function(assert) {

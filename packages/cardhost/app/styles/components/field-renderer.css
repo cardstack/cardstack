@@ -7,7 +7,7 @@
 
 .field-renderer.with-buttons {
   --field-container-width: 496px;
-  --field-container-height: 118px;
+  --field-container-height: 154px;
 
   display: flex;
   align-items: center;

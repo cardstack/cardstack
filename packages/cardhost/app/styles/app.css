@@ -10,7 +10,6 @@
 @import '/assets/components/cardhost-left-edge.css';
 @import '/assets/components/cardhost-top-edge.css';
 @import '/assets/components/button.css';
-@import '/assets/components/form-elements.css';
 @import '/assets/components/search-bar.css';
 @import '/assets/components/filter-bar.css';
 @import '/assets/components/catalog.css';
@@ -48,7 +47,6 @@ Until that work is done we are statically adding this css
 
 :root {
   --ch-font-family: 'Open Sans', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-
   --ch-left-edge-navbar-width: 80px;
   --ch-left-edge-panel-width: 330px;
   --ch-right-edge-panel-width: 330px;
@@ -60,7 +58,8 @@ Until that work is done we are statically adding this css
 
   --ch-component-width: 260px;
   --ch-component-height: 40px;
-
+  --ch-card-size: 496px;
+  --ch-field-width: 384px;
   --ch-spacing: 20px;
   --ch-edges-z-index: 10;
   --ch-actions-z-index: 11;

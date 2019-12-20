@@ -1,6 +1,6 @@
 .card-renderer-isolated {
-  --card-renderer-width: 496px;
-  --card-renderer-height: 496px;
+  --card-renderer-width: var(--ch-card-size);
+  --card-renderer-height: var(--ch-card-size);
   --card-renderer-header-height: 50px;
 
   position: relative;
@@ -58,7 +58,7 @@
   align-items: center;
   height: var(--card-renderer-header-height);
   padding: 14px 20px;
-  background-color: var(--ch-disabled);
+  background-color: var(--ch-dark-background);
   color: var(--ch-light-op50);
   border: none;
   font-weight: 600;
@@ -108,7 +108,7 @@
 }
 
 .card-renderer-isolated.edit .card-renderer-isolated--content {
-  padding: 20px;
+  padding: 30px;
 }
 
 /* TODO: fade card if field-renderer is selected */

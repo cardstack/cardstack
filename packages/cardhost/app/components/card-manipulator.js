@@ -119,7 +119,7 @@ export default class CardManipulator extends Component {
   }
 
   @action
-  setNeededWhenEmbedded(fieldName, evt) {
+  setNeededWhenEmbedded(fieldName, neededWhenEmbedded, evt) {
     // this prevents 2-way data binding from trying to alter the Field
     // instance's neededWhenEmbedded value, which is bound to the input
     // that fired this action. Our data service API is very unforgiving when
@@ -135,9 +135,6 @@ export default class CardManipulator extends Component {
       evt.preventDefault();
     }
 
-    let {
-      target: { checked: neededWhenEmbedded },
-    } = evt;
     this.card.getField(fieldName).setNeededWhenEmbedded(neededWhenEmbedded);
   }
 
