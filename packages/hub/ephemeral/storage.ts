@@ -55,9 +55,9 @@ export class EphemeralStorage {
     return doc;
   }
 
-  getEntry(id: CardId) {
-    let { csRealm: realm, csOriginalRealm: originalRealm, csId: csId } = id;
-    originalRealm = originalRealm ?? realm;
+  getEntry(id: UpstreamIdentity, realm: string) {
+    let originalRealm = typeof id === 'string' ? realm : id.csOriginalRealm;
+    let csId = typeof id === 'string' ? id : id.csId;
     let key = [realm, originalRealm, csId].map(encodeURIComponent).join('/');
     return this._store.get(key);
   }

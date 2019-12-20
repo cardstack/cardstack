@@ -50,7 +50,7 @@ describe('hub/indexing', function() {
     let card = await cards
       .as(Session.INTERNAL_PRIVILEGED)
       .create(csRealm, testCard().withAttributes({ csRealm, csId: '1', foo: 'bar' }).jsonapi);
-    storage.store(null, card.csId, card.csRealm, storage.getEntry(card)?.generation);
+    storage.store(null, card.csId, card.csRealm, storage.getEntry(card, csRealm)?.generation);
     await indexing.update();
 
     let { cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
@@ -145,12 +145,7 @@ describe('hub/indexing', function() {
     // Maniuplate existing card so we would notice if it gets indexed when it shouldn't.
     await storage.inThePast(async () => {
       card = testCard().withAttributes({ csRealm: realm, csId: '1', foo: 'bar', step: 2 });
-      storage.store(
-        card.upstreamDoc,
-        card.csId,
-        card.csRealm,
-        storage.getEntry({ csRealm: realm, csId: '1' })?.generation
-      );
+      storage.store(card.upstreamDoc, card.csId, card.csRealm, storage.getEntry('1', realm)?.generation);
     });
 
     await indexing.update();
@@ -159,39 +154,24 @@ describe('hub/indexing', function() {
 
     // Update first card
     card = testCard().withAttributes({ csRealm: realm, csId: '1', foo: 'bar', step: 3 });
-    storage.store(
-      card.upstreamDoc,
-      card.csId,
-      card.csRealm,
-      storage.getEntry({ csRealm: realm, csId: '1' })?.generation
-    );
+    storage.store(card.upstreamDoc, card.csId, card.csRealm, storage.getEntry('1', realm)?.generation);
 
     // Maniuplate other existing card so we would notice if it gets indexed when it shouldn't.
     await storage.inThePast(async () => {
       card = testCard().withAttributes({ csRealm: realm, csId: '2', foo: 'bar', step: 3 });
-      storage.store(
-        card.upstreamDoc,
-        card.csId,
-        card.csRealm,
-        storage.getEntry({ csRealm: realm, csId: '2' })?.generation
-      );
+      storage.store(card.upstreamDoc, card.csId, card.csRealm, storage.getEntry('2', realm)?.generation);
     });
 
     await indexing.update();
     expect(await cardsWithStep(3)).to.equal(1);
 
     // Delete card 2
-    storage.store(null, card.csId, card.csRealm, storage.getEntry({ csRealm: realm, csId: '2' })?.generation);
+    storage.store(null, card.csId, card.csRealm, storage.getEntry('2', realm)?.generation);
 
     // Maniuplate other existing card so we would notice if it gets indexed when it shouldn't.
     await storage.inThePast(async () => {
       card = testCard().withAttributes({ csRealm: realm, csId: '1', foo: 'bar', step: 4 });
-      storage.store(
-        card.upstreamDoc,
-        card.csId,
-        card.csRealm,
-        storage.getEntry({ csRealm: realm, csId: '1' })?.generation
-      );
+      storage.store(card.upstreamDoc, card.csId, card.csRealm, storage.getEntry('1', realm)?.generation);
     });
 
     await indexing.update();
