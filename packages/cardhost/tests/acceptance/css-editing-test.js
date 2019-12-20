@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { click, visit, currentURL, waitFor, settled } from '@ember/test-helpers';
+import { click, visit, currentURL, waitFor, find, settled, fillIn } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures';
 import { createCards } from '@cardstack/test-support/card-ui-helpers';
@@ -123,5 +123,28 @@ module('Acceptance | css editing', function(hooks) {
     assert.dom('[data-test-full-width-btn]').hasClass('selected');
     assert.dom('[data-test-cardhost-cards]').hasClass('full-width');
     await waitForAnimation(() => percySnapshot(assert));
+  });
+
+  test('save button is available after editing CSS', async function(assert) {
+    await login();
+    await createCards(cardData);
+    await click('[data-test-card-custom-style-button]');
+    await waitFor('[data-test-editor-pane] textarea');
+    await fillIn('[data-test-editor-pane] textarea', 'test');
+    await click('[data-test-close-editor]');
+    assert.dom('[data-test-card-save-btn]').hasText('Save');
+  });
+
+  test('can see instant preview of styles', async function(assert) {
+    await login();
+    await createCards(cardData);
+    await click('[data-test-card-custom-style-button]');
+    await waitFor('[data-test-editor-pane] textarea');
+    await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
+    let themerHasStyle = find('[data-test-preview-css]').innerText.includes('gorgeous styles');
+    assert.ok(themerHasStyle);
+    await click('[data-test-close-editor]');
+    let viewHasStyle = find('[data-test-view-css]').innerText.includes('gorgeous styles');
+    assert.ok(viewHasStyle);
   });
 });

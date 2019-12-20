@@ -14,7 +14,7 @@
         @language="css"
         @readOnly={{false}}
         @resizable={{true}}
-        @updateCode={{action "updateCode"}}
+        @updateCode={{@updateCode}}
         class="editor-pane--container-highlighted"
       />
     </div>
@@ -32,6 +32,6 @@
   </div>
 </ReSizable>
 
-<style id="card-styles">
-  {{scope-css this.model.isolatedCss this.model.name}}
+<style id="card-styles" data-test-preview-css>
+  {{scope-css @model.isolatedCss @model.name}}
 </style>

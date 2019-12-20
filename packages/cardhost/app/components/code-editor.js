@@ -124,7 +124,7 @@ export default class CodeEditor extends Component {
     yield timeout(this.debounceMsForValidate);
     let code = this.editor.getValue(); // get the current text contents of the code editor
     if (this.validate(code)) {
-      this.updateCode(code);
+      this.args.updateCode(code);
     }
   }
 

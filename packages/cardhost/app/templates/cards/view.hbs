@@ -13,7 +13,7 @@
     >
       Preview
     </button>
-    <SaveButton @card={{this.card}}/>
+    <SaveButton @card={{this.model}} />
   </div>
 {{/if}}
 
@@ -42,6 +42,7 @@
     <EditorPane data-test-dock-location={{this.cssModeToggle.dockLocation}}
       @model={{this.model}}
       @saveCss={{this.saveCss}}
+      @updateCode={{this.updateCode}}
     />
   </div>
 {{else}}
@@ -71,6 +72,6 @@
   </RightEdge>
 {{/if}}
 
-<style id="card-styles">
+<style id="card-styles" data-test-view-css>
   {{scope-css this.model.isolatedCss this.model.name}}
 </style>
