@@ -82,7 +82,7 @@ describe('hub/card-service', function() {
         await service.get(card);
         throw new Error(`Should not be able to find card`);
       } catch (e) {
-        expect(e.status).to.equal(404);
+        expect(e).hasStatus(404);
       }
     });
 
@@ -101,7 +101,7 @@ describe('hub/card-service', function() {
         await service.get(card);
         throw new Error(`Should not be able to find card`);
       } catch (e) {
-        expect(e.status).to.equal(404);
+        expect(e).hasStatus(404);
       }
     });
 
@@ -117,7 +117,7 @@ describe('hub/card-service', function() {
         await service.delete(card, badVersion);
         throw new Error(`Should not be able to delete a card`);
       } catch (e) {
-        expect(e.status).to.equal(409);
+        expect(e).hasStatus(409);
       }
       let foundCard = await service.get(card);
       expect(foundCard).to.be.ok;
