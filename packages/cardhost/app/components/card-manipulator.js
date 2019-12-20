@@ -43,7 +43,7 @@ export default class CardManipulator extends Component {
   }
 
   get newFieldName() {
-    return `new-field-${this.card.isolatedFields.length}`;
+    return `field-${this.card.isolatedFields.length}`;
   }
 
   get didUpdate() {
