@@ -52,7 +52,7 @@ jobs:
         - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd ../..; fi'
     - stage: deploy
       name: 'deploy cardhost production'
-      if: branch = production
+      if: branch = production-placeholder-change-me
       install: skip
       script:
         - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then echo "$SSH_PRIVATE_KEY" > $HOME/.ssh/id_rsa && chmod 400 $HOME/.ssh/id_rsa; fi'
