@@ -156,17 +156,16 @@ export function assertCardId(id: any, pointer: string[]): asserts id is CardId {
     });
   }
 
-  // TODO do we really want to assert the realm and originalRealm props are URL's, or do we really mean the URL href string here?
-  if (!('realm' in id) || !(id.realm instanceof URL)) {
-    throw new CardstackError('realm must be a URL', {
-      source: { pointer: pointer.concat('realm').join('/') || '/' },
+  if (!('csRealm' in id) || typeof id.csRealm !== 'string') {
+    throw new CardstackError('csRealm must be a string', {
+      source: { pointer: pointer.concat('csRealm').join('/') || '/' },
       status: 400,
     });
   }
 
-  if ('originalRealm' in id && !(id.originalRealm instanceof URL)) {
-    throw new CardstackError('originalRealm must be a URL', {
-      source: { pointer: pointer.concat('originalRealm').join('/') || '/' },
+  if ('csOriginalRealm' in id && typeof id.csOrginalRealm !== 'string') {
+    throw new CardstackError('csOriginalRealm must be a string', {
+      source: { pointer: pointer.concat('csOriginalRealm').join('/') || '/' },
       status: 400,
     });
   }
