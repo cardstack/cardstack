@@ -27,7 +27,7 @@
                     @label="Card ID"
                     @placeholder="e.g. millenial-puppies"
                     @value={{this.cardName}}
-                    @key-up={{action this.updateCardId}}
+                    @setValue={{action this.updateCardId}}
                     @disabled={{or (not @updateCardId) (not @card.isNew)}} />
                 </div>
                 <div class="right-edge--item">
@@ -71,8 +71,12 @@
                       {{/if}}
                     </div>
 
-                    <FieldRenderer @field={{field}} @mode="schema" @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
-                      @setFieldName={{@setFieldName}} @setFieldLabel={{@setFieldLabel}}
+                    <FieldRenderer
+                      @field={{field}}
+                      @mode="schema"
+                      @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+                      @setFieldName={{@setFieldName}}
+                      @setFieldLabel={{@setFieldLabel}}
                       @setFieldInstructions={{@setFieldInstructions}}
                       @schemaAttrs={{array "name" "label" "instructions" "embedded"}} />
                   </div>

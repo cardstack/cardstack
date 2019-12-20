@@ -383,11 +383,8 @@ module('Integration | Component | field-renderer', function(hooks) {
     });
     this.set('field', field);
     this.set('noop', () => {});
-    this.set('setNeededWhenEmbedded', (fieldName, evt) => {
+    this.set('setNeededWhenEmbedded', (fieldName, checked, evt) => {
       evt.preventDefault();
-      let {
-        target: { checked },
-      } = evt;
       card.getField(fieldName).setNeededWhenEmbedded(checked);
     });
 

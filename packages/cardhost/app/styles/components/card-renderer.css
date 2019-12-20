@@ -105,7 +105,6 @@
 .card-renderer-isolated.schema .card-renderer-isolated--content {
   background-color: var(--ch-dark-background);
   color: var(--ch-light);
-  border-top: 2px solid var(--ch-default);
 }
 
 .card-renderer-isolated.edit .card-renderer-isolated--content {

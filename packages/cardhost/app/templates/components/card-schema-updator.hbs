@@ -46,9 +46,14 @@
   </CardhostLeftEdge>
 {{/unless}}
 
-<RightEdge @card={{this.card}} @selectedField={{this.selectedField}} @selectField={{action this.selectField}}
-  @setNeededWhenEmbedded={{this.setNeededWhenEmbedded}} @setFieldName={{this.setFieldName}}
-  @setFieldLabel={{this.setFieldLabel}} @setFieldInstructions={{this.setFieldInstructions}}
+<RightEdge
+  @card={{this.card}}
+  @selectedField={{this.selectedField}}
+  @selectField={{action this.selectField}}
+  @setNeededWhenEmbedded={{this.setNeededWhenEmbedded}}
+  @setFieldName={{this.setFieldName}}
+  @setFieldLabel={{this.setFieldLabel}}
+  @setFieldInstructions={{this.setFieldInstructions}}
   @cardSelected={{this.cardSelected}} />
 
 <section class="card-schema-updator" data-test-card-schema={{@card.name}} {{did-update this.updateCard @card}}>

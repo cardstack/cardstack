@@ -1,8 +1,12 @@
 .field-renderer.schema-field {
-  padding: 0;
+  padding: var(--ch-spacing) 0;
   color: white;
   font: 400 13px/18px var(--ch-font-family);
   letter-spacing: 0.035em;
+}
+
+.field-renderer.schema-field.with-buttons {
+  padding-top: 0;
 }
 
 .field-renderer.schema-field .field-renderer--display {
@@ -48,6 +52,7 @@
   align-items: center;
   height: var(--field-header-height);
   padding: 9px 20px 10px 45px;
+  border: 1px solid var(--ch-light-background);
   border-radius: 5px 5px 0 0;
   background-position: var(--ch-spacing) center;
   background-size: 10px;
@@ -58,7 +63,9 @@
   font-size: 13px;
   line-height: 18px;
   text-transform: capitalize;
-  transition: background-color var(--ch-transition-time), border-radius var(--ch-transition-time);
+  transition: background-color var(--ch-transition-time),
+              border-color var(--ch-transition-time),
+              border-radius var(--ch-transition-time);
 }
 
 .schema-field-renderer--header--detail {
@@ -109,6 +116,7 @@
 .field-renderer:focus .schema-field-renderer .schema-field-renderer--header,
 .card-renderer:not(.selected) .field-renderer.selected .schema-field-renderer .schema-field-renderer--header {
   background-color: var(--ch-highlight);
+  border-color: var(--ch-highlight);
   border-radius: 2px 2px 0 0;
 }
 

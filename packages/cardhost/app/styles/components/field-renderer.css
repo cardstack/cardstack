@@ -7,15 +7,13 @@
 
 .field-renderer.with-buttons {
   --field-container-width: 496px;
-  --field-container-height: 118px;
+  --field-container-height: 154px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: var(--ch-spacing) 0;
   background-color: var(--ch-dark-background);
-  border-top: 2px solid var(--ch-default);
-  border-bottom: 2px solid var(--ch-default);
 }
 
 .field-renderer--move-btn {
