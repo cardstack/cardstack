@@ -95,7 +95,8 @@
     "node": "8.* || >= 10.*"
   },
   "dependencies": {
-    "ember-svg-jar": "^2.2.3"
+    "ember-svg-jar": "^2.2.3",
+    "lodash": "^4.17.15"
   },
   "volta": {
     "node": "10.12.0"

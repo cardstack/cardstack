@@ -1,5 +1,5 @@
 import Service from '@ember/service';
-import { get, set, uniqBy, merge, cloneDeep, unionBy, difference, partition } from 'lodash';
+import { get, set, uniqBy, merge, cloneDeep, unionBy, difference, partition, startCase } from 'lodash';
 import { hubURL } from '@cardstack/plugin-utils/environment';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
@@ -677,7 +677,7 @@ class Field {
     internalCard.fields = internalCard.fields; // oh glimmer, you so silly...
     internalCard.isDirty = true;
 
-    this.setLabel(name);
+    this.setLabel(startCase(name));
 
     return this;
   }

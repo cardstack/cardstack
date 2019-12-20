@@ -155,10 +155,11 @@ module('Acceptance | card create', function(hooks) {
     await triggerEvent(`[data-test-right-edge] [data-test-schema-attr="name"] input`, 'keyup');
     await animationsSettled();
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
-
-    await fillIn('[data-test-right-edge] [data-test-schema-attr="label"] input', 'Subtitle');
-    await triggerEvent(`[data-test-right-edge] [data-test-schema-attr="label"] input`, 'keyup');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
+
+    await fillIn('[data-test-right-edge] [data-test-schema-attr="label"] input', 'subtitle');
+    await triggerEvent(`[data-test-right-edge] [data-test-schema-attr="label"] input`, 'keyup');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('subtitle');
 
     await fillIn('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea', 'This is the subtitle');
     await triggerEvent(`[data-test-right-edge] [data-test-schema-attr="instructions"] textarea`, 'keyup');

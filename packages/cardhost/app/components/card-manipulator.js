@@ -3,6 +3,7 @@ import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import { dasherize } from '@ember/string';
+import { startCase } from 'lodash';
 import { task } from 'ember-concurrency';
 import ENV from '@cardstack/cardhost/config/environment';
 import { fieldTypeMappings, fieldComponents } from '@cardstack/core/utils/mappings';
@@ -149,7 +150,7 @@ export default class CardManipulator extends Component {
   @action
   setFieldName(oldFieldName, newFieldName) {
     this.card.getField(oldFieldName).setName(newFieldName);
-    this.card.getField(newFieldName).setLabel(newFieldName);
+    this.card.getField(newFieldName).setLabel(startCase(newFieldName));
   }
 
   @action
