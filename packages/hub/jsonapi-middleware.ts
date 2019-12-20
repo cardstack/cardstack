@@ -10,7 +10,7 @@ import CardstackError from './error';
 import { SessionContext } from './authentication-middleware';
 import { assertSingleResourceDoc } from './jsonapi';
 import { myOrigin } from './origin';
-import { makePristineCollection, apiPrefix, Card } from './card';
+import { makePristineCollection, apiPrefix, Card, CardId } from './card';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { parse } from 'qs';
 import { assertQuery } from './query';
@@ -55,12 +55,18 @@ export default class JSONAPIMiddleware {
       route.get('/cards', this.getCards.bind(this)),
       route.post('/realms/:local_realm_id/cards', this.createCard.bind(this)),
       route.post('/remote-realms/:remote_realm_url/cards', this.createCard.bind(this)),
+
       route.get('/realms/:local_realm_id/cards/:local_id', this.getCard.bind(this)),
       route.get('/realms/:local_realm_id/cards/:original_realm_url/:local_id', this.getCard.bind(this)),
       route.get('/remote-realms/:remote_realm_url/cards/:local_id', this.getCard.bind(this)),
       route.get('/remote-realms/:remote_realm_url/cards/:original_realm_url/:local_id', this.getCard.bind(this)),
+
+      route.delete('/realms/:local_realm_id/cards/:local_id', this.deleteCard.bind(this)),
+      route.delete('/realms/:local_realm_id/cards/:original_realm_url/:local_id', this.deleteCard.bind(this)),
+      route.delete('/remote-realms/:remote_realm_url/cards/:local_id', this.deleteCard.bind(this)),
+      route.delete('/remote-realms/:remote_realm_url/cards/:original_realm_url/:local_id', this.deleteCard.bind(this)),
+
       // repeat for patch
-      // repeat for delete
     ]);
   }
 
@@ -98,34 +104,15 @@ export default class JSONAPIMiddleware {
   }
 
   async getCard(ctxt: KoaRoute.Context<SessionContext, {}>) {
-    let realm: string;
-    if (ctxt.routeParams.local_realm_id != null) {
-      realm = `${myOrigin}${apiPrefix}/realms/${ctxt.routeParams.local_realm_id}`;
-    } else if (ctxt.routeParams.remote_realm_url) {
-      realm = ctxt.routeParams.remote_realm_url;
-    } else {
-      throw new CardstackError(`bug in jsonapi-middleware: missing realm parameter in getCard`, { status: 500 });
-    }
-
-    let originalRealm: string;
-    if (ctxt.routeParams.original_realm_url != null) {
-      originalRealm = ctxt.routeParams.original_realm_url;
-    } else {
-      originalRealm = realm;
-    }
-
-    let csId: string;
-    if (ctxt.routeParams.local_id != null) {
-      csId = ctxt.routeParams.local_id;
-    } else {
-      throw new CardstackError(`bug in jsonapi-middleware: missing csId parameter in getCard`, { status: 500 });
-    }
-
-    let card = await this.cards
-      .as(ctxt.state.cardstackSession)
-      .get({ csRealm: realm, csOriginalRealm: originalRealm, csId: csId });
+    let card = await this.cards.as(ctxt.state.cardstackSession).get(cardIdFromRoute(ctxt));
     ctxt.body = (await card.asPristineDoc()).jsonapi;
     ctxt.status = 200;
+  }
+
+  async deleteCard(ctxt: KoaRoute.Context<SessionContext, {}>) {
+    let version = ctxt.header['if-match'];
+    await this.cards.as(ctxt.state.cardstackSession).delete(cardIdFromRoute(ctxt), version);
+    ctxt.status = 204;
   }
 
   async getCards(ctxt: KoaRoute.Context<SessionContext, {}>) {
@@ -158,6 +145,33 @@ export default class JSONAPIMiddleware {
       }
     }
   }
+}
+
+function cardIdFromRoute(ctxt: KoaRoute.Context<SessionContext, {}>): CardId {
+  let csRealm: string;
+  if (ctxt.routeParams.local_realm_id != null) {
+    csRealm = `${myOrigin}${apiPrefix}/realms/${ctxt.routeParams.local_realm_id}`;
+  } else if (ctxt.routeParams.remote_realm_url) {
+    csRealm = ctxt.routeParams.remote_realm_url;
+  } else {
+    throw new CardstackError(`bug in jsonapi-middleware: missing realm parameter in route`, { status: 500 });
+  }
+
+  let csOriginalRealm: string;
+  if (ctxt.routeParams.original_realm_url != null) {
+    csOriginalRealm = ctxt.routeParams.original_realm_url;
+  } else {
+    csOriginalRealm = csRealm;
+  }
+
+  let csId: string;
+  if (ctxt.routeParams.local_id != null) {
+    csId = ctxt.routeParams.local_id;
+  } else {
+    throw new CardstackError(`bug in jsonapi-middleware: missing csId parameter in route`, { status: 500 });
+  }
+
+  return { csId, csOriginalRealm, csRealm };
 }
 
 declare module '@cardstack/hub/dependency-injection' {

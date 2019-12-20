@@ -67,6 +67,27 @@ describe('hub/jsonapi', function() {
     expect(response.header.location).to.match(/http:\/\/[^/]+\/api\/realms\/first-ephemeral-realm\/cards\/[^/]+/);
   });
 
+  it('can delete a card', async function() {
+    let response = await request
+      .post('/api/realms/first-ephemeral-realm/cards')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(testCard().jsonapi);
+    let csId = response.body.data.attributes.csId;
+    let version = response.body.data.meta.version;
+
+    response = await request
+      .delete(`/api/realms/first-ephemeral-realm/cards/${csId}`)
+      .set('Content-Type', 'application/vnd.api+json')
+      .set('If-Match', version);
+
+    expect(response.status).to.equal(204);
+
+    response = await request
+      .get(`/api/realms/first-ephemeral-realm/cards/${csId}`)
+      .set('Accept', 'application/vnd.api+json');
+    expect(response.status).to.equal(404);
+  });
+
   it('handles missing card in valid realm', async function() {
     let response = await request
       .get('/api/realms/first-ephemeral-realm/cards/not-a-real-card')
