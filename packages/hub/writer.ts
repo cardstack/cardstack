@@ -13,5 +13,7 @@ export interface Writer {
     id: UpstreamIdentity | null
   ): Promise<{ saved: UpstreamDocument; id: UpstreamIdentity }>;
 
+  update(session: Session, id: UpstreamIdentity, doc: UpstreamDocument): Promise<UpstreamDocument>;
+
   delete(session: Session, id: UpstreamIdentity, version: string | number): Promise<void>;
 }

@@ -92,7 +92,7 @@ export async function loadIndexer(card: Card, cards: ScopedCardService): Promise
 }
 
 export function patch(target: SingleResourceDoc, source: SingleResourceDoc) {
-  return merge(target, source);
+  return merge({}, target, source);
 }
 
 export function buildValueExpression(expression: CardExpression): CardExpression {

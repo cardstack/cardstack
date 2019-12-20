@@ -3,7 +3,7 @@ import { UnsavedCard, Card, CardId, canonicalURLToCardId } from './card';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
 import CardstackError from './error';
 import { myOrigin } from './origin';
-import { search as scaffoldSearch, get as scaffoldGet } from './scaffolding';
+import { search as scaffoldSearch, get as scaffoldGet, patch } from './scaffolding';
 import { getOwner, inject } from './dependency-injection';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { Query } from './query';
@@ -50,6 +50,31 @@ export class ScopedCardService {
     await batch.done();
 
     return savedCard;
+  }
+
+  async update(id: CardId, doc: SingleResourceDoc): Promise<Card>;
+  async update(canonicalURL: string, doc: SingleResourceDoc): Promise<Card>;
+  async update(idOrURL: CardId | string, doc: SingleResourceDoc): Promise<Card> {
+    let id = asCardId(idOrURL);
+    let realmCard = await this.getRealm(id.csRealm);
+    let writer = await this.loadWriter(realmCard);
+    let previousCard = await this.get(id);
+    let previousDoc = (await previousCard.asUpstreamDoc()).jsonapi;
+    if (previousDoc.data.meta) {
+      delete previousDoc.data.meta.version; // don't what the previous version's version to bleed thru
+    }
+    let patchedDoc = patch(previousDoc, doc);
+    let updatedCard: Card = this.instantiate(patchedDoc);
+    await validate(await this.get(id), updatedCard, realmCard);
+
+    let saved = await writer.update(this.session, updatedCard.upstreamId, await updatedCard.asUpstreamDoc());
+    updatedCard.patch(saved.jsonapi);
+
+    let batch = this.cards.pgclient.beginCardBatch(this);
+    await batch.save(updatedCard);
+    await batch.done();
+
+    return updatedCard;
   }
 
   async delete(id: CardId, version: string | number): Promise<void>;

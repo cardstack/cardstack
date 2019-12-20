@@ -67,6 +67,69 @@ describe('hub/card-service', function() {
       expect(parent?.canonicalURL).to.equal(baseCard.canonicalURL);
     });
 
+    it('can update a card', async function() {
+      let doc = testCard().withAttributes({ foo: 'bar' });
+      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
+      let storage = await env.container.lookup('ephemeralStorage');
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+      let version = (await card.asPristineDoc()).jsonapi.data.meta?.version as number;
+
+      let jsonapi = (await card.asPristineDoc()).jsonapi;
+      jsonapi.data.attributes!.foo = 'poo';
+      card = await service.update(card, jsonapi);
+      let newVersion = (await card.asPristineDoc()).jsonapi.data.meta?.version as number;
+
+      expect(await card.field('foo')).to.equal('poo');
+      expect(newVersion).to.be.ok;
+      expect(newVersion).to.not.equal(version);
+      expect(storage.getEntry(card, card.csRealm)?.doc?.jsonapi.data.attributes?.foo).to.equal('poo');
+    });
+
+    it('can update a card by canonical URL', async function() {
+      let doc = testCard().withAttributes({ foo: 'bar' });
+      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+
+      let jsonapi = (await card.asPristineDoc()).jsonapi;
+      jsonapi.data.attributes!.foo = 'poo';
+      card = await service.update(card.canonicalURL, jsonapi);
+
+      expect(await card.field('foo')).to.equal('poo');
+    });
+
+    it('can update a card with a patch', async function() {
+      let doc = testCard().withAttributes({ foo: 'bar', hello: 'world' });
+      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+
+      let jsonapi = (await card.asPristineDoc()).jsonapi;
+      jsonapi.data.attributes!.foo = 'poo';
+      delete jsonapi.data.attributes!.hello;
+
+      card = await service.update(card, jsonapi);
+
+      expect(await card.field('foo')).to.equal('poo');
+      expect(await card.field('hello')).to.equal('world');
+    });
+
+    it('it does not update a card that uses ephemeral storage when the meta.version is missing', async function() {
+      let doc = testCard().withAttributes({ foo: 'bar' });
+      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+
+      let jsonapi = (await card.asPristineDoc()).jsonapi;
+      jsonapi.data.attributes!.foo = 'poo';
+      delete jsonapi.data.meta!.version;
+
+      try {
+        await service.update(card.canonicalURL, jsonapi);
+        throw new Error(`should not be able to update card`);
+      } catch (e) {
+        expect(e).hasStatus(400);
+        expect(e.message).to.match(/missing required field "meta.version"/);
+      }
+    });
+
     it('can delete a card', async function() {
       let doc = testCard();
       let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
@@ -89,14 +152,11 @@ describe('hub/card-service', function() {
     it('can delete a card by canonical URL', async function() {
       let doc = testCard();
       let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
-      let storage = await env.container.lookup('ephemeralStorage');
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       let version = (await card.asPristineDoc()).jsonapi.data.meta?.version as number;
-      expect(storage.entriesNewerThan(card.csRealm).filter(entry => Boolean(entry.doc)).length).to.equal(1);
 
       await service.delete(card.canonicalURL, version);
 
-      expect(storage.entriesNewerThan(card.csRealm).filter(entry => Boolean(entry.doc)).length).to.equal(0);
       try {
         await service.get(card);
         throw new Error(`Should not be able to find card`);
