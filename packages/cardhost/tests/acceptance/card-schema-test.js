@@ -107,6 +107,9 @@ module('Acceptance | card schema', function(hooks) {
     await visit(`/cards/${card1Id}/edit`);
     assert.dom('[data-test-field="subtitle"] input').hasValue('test title');
     assert.dom('[data-test-field="subtitle"] [data-test-cs-component-label="text-field"]').hasText('subtitle');
+    assert
+      .dom('[data-test-field="subtitle"] [data-test-cs-component-validation]')
+      .hasText('fill this in with your subheader');
     assert.dom('[data-test-field="title"]').doesNotExist();
 
     await visit(`/cards/${card1Id}/schema`);
