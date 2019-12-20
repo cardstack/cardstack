@@ -47,7 +47,6 @@
     "@ember/optional-features": "^0.6.3",
     "@ember/render-modifiers": "1.0.2",
     "@glimmer/component": "^0.14.0-alpha.13",
-    "babel-eslint": "^10.0.2",
     "broccoli-asset-rev": "^2.7.0",
     "ember-animated": "^0.10.0",
     "ember-cli": "~3.8.2",
@@ -69,8 +68,6 @@
     "ember-source-channel-url": "^1.1.0",
     "ember-try": "^1.0.0",
     "eslint-plugin-ember": "^7.1.0",
-    "eslint-plugin-mocha": "^5.2.0",
-    "eslint-plugin-node": "^10.0.0",
     "loader.js": "^4.7.0",
     "qunit-dom": "^0.8.0"
   },
