@@ -161,7 +161,6 @@ module('Integration | Component | field-renderer', function(hooks) {
     `);
 
     await fillIn('input', 'updated title');
-    await triggerEvent('input', 'keyup');
 
     assert.dom('input').hasValue('updated title');
     assert.equal(field.value, 'updated title');
@@ -304,12 +303,11 @@ module('Integration | Component | field-renderer', function(hooks) {
     let nameInput = '[data-test-schema-attr="name"] input';
     let labelInput = '[data-test-schema-attr="label"] input';
     await fillIn(nameInput, 'subtitle');
-    await triggerEvent(nameInput, 'keyup');
 
     assert.dom(nameInput).hasValue('subtitle');
-    assert.dom(labelInput).hasValue('subtitle');
+    assert.dom(labelInput).hasValue('Subtitle');
     assert.equal(field.name, 'subtitle');
-    assert.equal(field.label, 'subtitle');
+    assert.equal(field.label, 'Subtitle');
   });
 
   test('it can change field label in schema mode', async function(assert) {
@@ -340,7 +338,6 @@ module('Integration | Component | field-renderer', function(hooks) {
     let nameInput = '[data-test-schema-attr="name"] input';
     let labelInput = '[data-test-schema-attr="label"] input';
     await fillIn(labelInput, 'TITLE');
-    await triggerEvent(labelInput, 'keyup');
 
     assert.dom(nameInput).hasValue('title');
     assert.dom(labelInput).hasValue('TITLE');
@@ -375,7 +372,6 @@ module('Integration | Component | field-renderer', function(hooks) {
     `);
     let input = '[data-test-schema-attr="instructions"] textarea';
     await fillIn(input, 'updated instructions');
-    await triggerEvent(input, 'keyup');
 
     assert.dom(input).hasValue('updated instructions');
     assert.equal(field.instructions, 'updated instructions');

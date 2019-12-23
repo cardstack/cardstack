@@ -155,10 +155,11 @@ module('Acceptance | card create', function(hooks) {
     await triggerEvent(`[data-test-right-edge] [data-test-schema-attr="name"] input`, 'keyup');
     await animationsSettled();
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
-
-    await fillIn('[data-test-right-edge] [data-test-schema-attr="label"] input', 'Subtitle');
-    await triggerEvent(`[data-test-right-edge] [data-test-schema-attr="label"] input`, 'keyup');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
+
+    await fillIn('[data-test-right-edge] [data-test-schema-attr="label"] input', 'subtitle');
+    await triggerEvent(`[data-test-right-edge] [data-test-schema-attr="label"] input`, 'keyup');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('subtitle');
 
     await fillIn('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea', 'This is the subtitle');
     await triggerEvent(`[data-test-right-edge] [data-test-schema-attr="instructions"] textarea`, 'keyup');
@@ -169,13 +170,13 @@ module('Acceptance | card create', function(hooks) {
     await click('[data-test-field="body"] [data-test-field-schema-renderer]');
     assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="body"]').hasClass('selected');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('body');
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('body');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Body');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea').hasValue('');
 
     await click('[data-test-field="subtitle"] [data-test-field-schema-renderer]');
     assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="subtitle"]').hasClass('selected');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('subtitle');
     assert
       .dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea')
       .hasValue('This is the subtitle');
@@ -200,26 +201,26 @@ module('Acceptance | card create', function(hooks) {
     await triggerEvent('[data-test-schema-attr="name"] input', 'keyup');
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('subtitle');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
 
     await saveCard('creator', card1Id);
 
     assert.equal(currentURL(), `/cards/${card1Id}/schema`);
 
     await visit(`/cards/${card1Id}`);
-    assert.dom('[data-test-field="subtitle"] [data-test-string-field-viewer-label]').hasText('subtitle');
+    assert.dom('[data-test-field="subtitle"] [data-test-string-field-viewer-label]').hasText('Subtitle');
     assert.dom('[data-test-field="title"]').doesNotExist();
 
     await visit(`/cards/${card1Id}/edit`);
-    assert.dom('[data-test-field="subtitle"] [data-test-cs-component-label="text-field"]').hasText('subtitle');
+    assert.dom('[data-test-field="subtitle"] [data-test-cs-component-label="text-field"]').hasText('Subtitle');
     assert.dom('[data-test-field="title"]').doesNotExist();
 
     await visit(`/cards/${card1Id}/schema`);
-    assert.dom('[data-test-field="subtitle"] [data-test-field-renderer-label]').hasText('subtitle');
+    assert.dom('[data-test-field="subtitle"] [data-test-field-renderer-label]').hasText('Subtitle');
     await click('[data-test-field="subtitle"]');
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('subtitle');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
   });
 
   test(`removing a field from a card`, async function(assert) {
