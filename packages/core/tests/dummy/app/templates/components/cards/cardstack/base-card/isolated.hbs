@@ -17,21 +17,17 @@
       <FieldRenderer
         @field={{field}}
         @mode={{@mode}}
+        @dropField={{@dropField}}
         @removeField={{@removeField}}
         @setPosition={{@setPosition}}
         @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
         @setFieldName={{@setFieldName}}
         @selectField={{@selectField}}
+        @selectedField={{@selectedField}}
       />
     {{else}}
       <FieldRenderer @field={{field}} @mode={{@mode}}/>
     {{/if}}
     <br>
   {{/each}}
-  {{#if @dropField}}
-    <DropZone
-      @dropField={{@dropField}}
-      @position={{@card.isolatedFields.length}}
-    />
-  {{/if}}
 </div>
