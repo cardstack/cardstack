@@ -1543,7 +1543,7 @@ module('Unit | Service | data', function() {
 
       assert.equal(card.isDirty, true, 'the dirtiness is correct for card');
       assert.equal(field.name, 'subtitle');
-      assert.equal(field.label, 'subtitle');
+      assert.equal(field.label, 'Subtitle');
       assert.equal(field.value, 'test title');
       assert.equal(card.getField('title'), undefined);
       assert.equal(card.getField('subtitle').name, 'subtitle');
@@ -1577,11 +1577,11 @@ module('Unit | Service | data', function() {
       field = card.getField('subtitle');
 
       assert.equal(field.name, 'subtitle');
-      assert.equal(field.label, 'subtitle');
+      assert.equal(field.label, 'Subtitle');
       assert.equal(field.value, 'test title');
       assert.equal(card.getField('title'), undefined);
       assert.equal(card.getField('subtitle').name, 'subtitle');
-      assert.equal(card.getField('subtitle').label, 'subtitle');
+      assert.equal(card.getField('subtitle').label, 'Subtitle');
       assert.equal(card.getField('subtitle').value, 'test title');
       assert.equal(
         Boolean(card.json.data.relationships.fields.data.find(i => `${i.type}/${i.id}` === 'fields/subtitle')),
