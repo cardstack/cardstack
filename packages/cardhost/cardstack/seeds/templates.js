@@ -112,8 +112,8 @@ let eventCardTemplate = eventFactory.getDocumentFor(
       'model',
       eventFactory.addResource('local-hub::event-card', 'local-hub::event-card').withAttributes({
         image: 'https://images.unsplash.com/photo-1542296140-47fd7d838e76',
-        title: 'Ember Meetup NYC',
-        date: '2019-09-26',
+        title: 'Quarterly Planning Meeting',
+        date: '2020-05-26',
         location: 'One World Trade Center',
         city: 'New York, NY',
         admission: 'Free',
