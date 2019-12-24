@@ -81,6 +81,7 @@
     "ember-qunit": "^4.1.2",
     "ember-resolver": "^5.1.3",
     "ember-source": "3.13.1",
+    "ember-test-selectors": "^3.0.0",
     "eslint-plugin-ember": "^7.1.0",
     "eslint-plugin-mocha": "^5.2.0",
     "eslint-plugin-node": "^10.0.0",
