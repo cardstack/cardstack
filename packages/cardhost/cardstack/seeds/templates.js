@@ -161,8 +161,10 @@ let jobCardTemplate = eventFactory.getDocumentFor(
       eventFactory.addResource('local-hub::job-description', 'local-hub::job-description').withAttributes({
         company: 'StackBox Creative LLC',
         jobTitle: 'Videographer',
-        jobDescription: 'Join our marketing team, as we open a new flagship store in New York City, and create compelling videos.',
-        responsibilities: 'Follow the marketing team to events, create camera footage for a B-roll film, produce a sales pitch for a client, conduct interviews.'
+        jobDescription:
+          'Join our marketing team, as we open a new flagship store in New York City, and create compelling videos.',
+        responsibilities:
+          'Follow the marketing team to events, create camera footage for a B-roll film, produce a sales pitch for a client, conduct interviews.',
       })
     )
 );
@@ -213,11 +215,11 @@ let jobApplicantProfileTemplate = eventFactory.getDocumentFor(
       'model',
       eventFactory.addResource('local-hub::job-applicant-profile', 'local-hub::job-applicant-profile').withAttributes({
         name: 'Marcel Bridges',
-        portfolio: "marcel-bridges.example.com/portfolio",
+        portfolio: 'marcel-bridges.example.com/portfolio',
         address: 'Chicago, IL',
         phoneNumber: '555-555-5555',
         email: 'marcel_bridges@example.com',
-        dateStart: '2020-02-01'
+        dateStart: '2020-02-01',
       })
     )
 );
