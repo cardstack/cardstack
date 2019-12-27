@@ -63,7 +63,7 @@ export default class FieldRenderer extends Component {
   }
 
   get dasherizedType() {
-    return dasherize(this.sanitizedType.replace(/\//g, '-'));
+    return dasherize(this.args.field.type.replace(/@cardstack\/core-types::/g, ''));
   }
 
   get fieldViewer() {
