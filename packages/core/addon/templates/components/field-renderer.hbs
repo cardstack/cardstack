@@ -163,8 +163,8 @@
     {{/each}}
   {{/if}}
 
-  <div class="field-renderer--action">
-    {{#if (and @removeField (not @field.isAdopted))}}
+  {{#if (and @removeField (not @field.isAdopted))}}
+    <div class="field-renderer--action">
       {{!-- using field.nonce in case the user deletes the name of the field --}}
       <button {{on "click" (fn @removeField @field.nonce)}}
         class="field-renderer--remove-btn"
@@ -172,6 +172,6 @@
         data-test-field-renderer-remove-btn
       >
       </button>
-    {{/if}}
-  </div>
+    </div>
+  {{/if}}
 </div>
