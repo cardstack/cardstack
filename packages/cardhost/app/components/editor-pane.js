@@ -13,8 +13,13 @@ export default class EditorPane extends Component {
     super(...arguments);
     // getting markup must be done in the constuctor to guarantee that it
     // resolves before the code editor is rendered.
-    let cardMarkup = document.querySelector('.card-renderer-isolated--content');
-    this.markup = cardMarkup ? cardMarkup.innerHTML.toString().trim() : '';
+    let cardMarkup = document.querySelector('.card-renderer-isolated--card-container');
+    this.markup = cardMarkup
+      ? cardMarkup.innerHTML
+          .toString()
+          .replace(/<!---->/gi, '')
+          .trim()
+      : '';
   }
 
   get directions() {
