@@ -28,7 +28,8 @@ if [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
                   CARD_TEMPLATES \
                   GIT_PRIVATE_KEY \
                   GIT_BRANCH_PREFIX \
-                  CARDSTACK_SESSIONS_KEY; do
+                  CARDSTACK_SESSIONS_KEY \
+                  INDEX_INTERVAL; do
       command="export ${variable}=\$${target_env}_${variable}"
       eval $command
   done
