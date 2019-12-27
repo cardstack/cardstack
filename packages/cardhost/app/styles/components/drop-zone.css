@@ -1,10 +1,15 @@
 :root {
   --ch-drop-zone-transition-duration: 200ms;
 }
+
 .drop-zone--container {
   height: 20px;
   background-color: var(--ch-dark-background);
   border-top: 2px solid var(--ch-default);
+}
+
+.drop-zone--container:first-of-type {
+  border-top: none;
 }
 
 .drop-zone--container.outside {
@@ -17,7 +22,6 @@
 }
 
 .drop-zone {
-  background-color: transparent;
   width: 100%;
 }
 
@@ -47,4 +51,35 @@
 
 .drop-zone .drop-zone--drag-drop-icon {
   display: none;
+}
+
+
+/* In relation to Card Renderer */
+.card-renderer-isolated--card-container > .drop-zone--container {
+  border-top: none;
+}
+
+.card-renderer-isolated.no-fields .drop-zone {
+  position: static;
+  min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-renderer-isolated.no-fields .drop-zone .drop-zone--description {
+  width: 100%;
+  border: none;
+  font-size: 16px;
+}
+
+.card-renderer-isolated.no-fields .drop-zone .drop-zone--description .drop-zone--description--text {
+  display: block;
+}
+
+.card-renderer-isolated.no-fields .drop-zone .drop-zone--drag-drop-icon {
+  display: block;
+  margin-top: 10px;
 }

@@ -14,7 +14,6 @@
   padding-top: var(--padding-top);
   padding-left: var(--padding-left);
   padding-right: var(--padding-right);
-  padding-bottom: var(--padding-bottom);
 }
 
 /* TODO: Remove this after right-edge is displayed on edit view */
@@ -25,11 +24,6 @@
 
 .cardhost-cards.view {
   --padding-left: var(--ch-left-edge-navbar-width);
-}
-
-.cardhost-cards.add,
-.cardhost-cards.adopt {
-  background: url('/assets/images/schema-grid-tile.png') center/60px repeat;
 }
 
 .cardhost-cards.schema {
