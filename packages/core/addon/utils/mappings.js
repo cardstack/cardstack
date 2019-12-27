@@ -75,7 +75,7 @@ export const fieldComponents = [
     id: 'decorative-image',
     coreType: '@cardstack/core-types::decorative-image',
     title: 'Decorative image',
-    description: 'Use this for images that are decorative, not informative',
+    description: 'Use this for hero images',
     type: 'decorative image',
     icon: `/assets/images/field-types/image.svg`,
   },

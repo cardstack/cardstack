@@ -31,7 +31,7 @@ export default class UIComponentsRoute extends Route {
         {
           name: 'main-image',
           label: 'image',
-          type: '@cardstack/core-types::string',
+          type: '@cardstack/core-types::decorative-image',
           value: 'https://images.unsplash.com/photo-1542296140-47fd7d838e76',
         },
         {
@@ -81,7 +81,7 @@ export default class UIComponentsRoute extends Route {
       sampleImageField: {
         name: 'image',
         label: 'image',
-        type: '@cardstack/core-types::string',
+        type: '@cardstack/core-types::decorative-image',
         value: 'https://images.unsplash.com/photo-1542296140-47fd7d838e76',
       },
 

@@ -4,29 +4,13 @@ all cards will inherit the @cardstack/base-card css.
 */
 .isolated-card.cardstack_base-card {
   --card-width: 656px;
-  --hero-image-height: 300px;
-
+  
   width: var(--card-width);
   max-width: 100%;
   margin: 0 auto;
   padding: 50px 30px;
   background-color: white;
   color: black;
-}
-
-.isolated-card.view.cardstack_base-card .field-image {
-  visibility: hidden;
-  width: 0;
-  height: 0;
-}
-
-.isolated-card--hero-image {
-  display: block;
-  width: 100%;
-  height: var(--hero-image-height);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
 }
 
 .type-image {

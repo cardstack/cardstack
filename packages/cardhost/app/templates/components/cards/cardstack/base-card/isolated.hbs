@@ -7,14 +7,6 @@
   class="isolated-card cardstack_base-card {{@mode}}"
 >
   {{#each @card.isolatedFields key="nonce" as |field|}}
-    {{!-- TODO: Better way to display images --}}
-    {{#if (and (eq field.name "image") (eq @mode "view"))}}
-      {{! template-lint-disable no-inline-styles }}
-      <div
-        class="isolated-card--hero-image"
-        style={{css-url "background-image" field.value}}
-      />
-    {{/if}}
     {{#if @setFieldValue}}
       <FieldRenderer
         @field={{field}}
