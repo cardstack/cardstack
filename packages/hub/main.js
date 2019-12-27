@@ -114,7 +114,7 @@ async function startIndexing(environment, container) {
     );
   }
 
-  setInterval(() => container.lookup('hub:indexers').update({ dontWaitForJob: true }), 6000000);
+  setInterval(() => container.lookup('hub:indexers').update({ dontWaitForJob: true }), 600000);
 }
 
 async function loadSeeds(container, seedModels) {
