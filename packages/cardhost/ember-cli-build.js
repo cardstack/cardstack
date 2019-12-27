@@ -71,6 +71,8 @@ module.exports = function(defaults) {
                 '<Fields::Cardstack::CoreTypes::BelongsToEditor/>',
                 '<Fields::Cardstack::CoreTypes::HasManyViewer/>',
                 '<Fields::Cardstack::CoreTypes::HasManyEditor/>',
+                '<Fields::Cardstack::CoreTypes::DecorativeImageViewer/>',
+                '<Fields::Cardstack::CoreTypes::DecorativeImageEditor/>',
               ],
             },
           },

@@ -6,7 +6,7 @@ export const fieldTypeMappings = {
   integer: '@cardstack/core-types::integer',
   'related card': '@cardstack/core-types::belongs-to',
   'related cards': '@cardstack/core-types::has-many',
-  decorativeImage: '@cardstack/core-types::decorative-image',
+  'decorative image': '@cardstack/core-types::decorative-image',
 
   // Probably want to omit these types as they could probably be better
   // handled as related cards:

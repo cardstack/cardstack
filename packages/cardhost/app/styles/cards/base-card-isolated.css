@@ -28,3 +28,8 @@ all cards will inherit the @cardstack/base-card css.
   background-position: center;
   background-repeat: no-repeat;
 }
+
+.type-image {
+  display: block;
+  max-width: 100%;
+}
