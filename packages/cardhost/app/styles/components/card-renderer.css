@@ -59,16 +59,14 @@
 }
 
 .card-renderer-isolated.selected .card-renderer-isolated--header,
-.card-renderer-isolated.edit:focus .card-renderer-isolated--header,
-.card-renderer-isolated.view:focus .card-renderer-isolated--header {
+.card-renderer-isolated.edit:focus .card-renderer-isolated--header {
   background-color: var(--ch-highlight);
   border-color: var(--ch-highlight);
   color: var(--ch-dark);
 }
 
 .card-renderer-isolated.selected .card-renderer-isolated--header svg,
-.card-renderer-isolated.edit:focus .card-renderer-isolated--header svg,
-.card-renderer-isolated.view:focus .card-renderer-isolated--header svg {
+.card-renderer-isolated.edit:focus .card-renderer-isolated--header svg {
   --icon-color: var(--ch-dark);
 }
 
@@ -87,6 +85,8 @@
   border: none;
   overflow-x: hidden;
   overflow-y: auto;
+
+  transition: var(--ch-card-background-color-animate);
 }
 
 .card-renderer-isolated.schema .card-renderer-isolated--content {

@@ -1,6 +1,6 @@
 <div class="editor-container" ...attributes>
   {{#if @title}}
-    <div class="editor-container__title">{{@title}} ({{if this.readOnly "read-only" "editable"}})</div>
+    <div class="editor-container__title">{{@title}} <span>({{if this.readOnly "read-only" "editable"}})</span></div>
   {{/if}}
   <div {{did-insert this.renderEditor}}
     data-test-code-block={{@code}}
