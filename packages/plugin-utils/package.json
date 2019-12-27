@@ -1,13 +1,13 @@
 {
   "name": "@cardstack/plugin-utils",
-  "version": "0.16.11",
+  "version": "0.16.12",
   "description": "Support library for authors of cardstack plugins.",
   "main": "index.js",
   "repository": "https://github.com/cardstack/cardstack",
   "author": "Edward Faulkner <edward@eaf4.com>",
   "license": "MIT",
   "devDependencies": {
-    "@cardstack/eslint-config": "0.16.11",
+    "@cardstack/eslint-config": "0.16.12",
     "broccoli-builder": "^0.18.10",
     "denodeify": "^1.2.1",
     "fixturify": "^0.3.4",
@@ -15,7 +15,7 @@
     "walk-sync": "^0.3.2"
   },
   "dependencies": {
-    "@cardstack/di": "0.16.11",
+    "@cardstack/di": "0.16.12",
     "@cardstack/logger": "^0.2.0",
     "broccoli-plugin": "^1.3.0",
     "ember-cli-babel": "^6.8.2",
