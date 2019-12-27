@@ -8,17 +8,9 @@
 {{!-- TODO: let's think of a more accessible solution here, consider making this a button--}}
 {{!-- TODO: also we should also turn on a11y linting --}}
 <div {{on "click" (fn this.selectField @field)}} {{on "dragstart" (action this.startDragging @field)}} {{on "dragend" (action this.finishDragging)}}
-  class={{concat
-    "field-renderer "
-    @mode
-    "-field "
-    "field-"
-    @field.name
-    " field-type-"
-    this.dasherizedType
-    (if (or @setPosition @removeField) " with-buttons")
-    (if (eq @field @selectedField) " selected")
-  }}
+  class="field {{@field.name}}-field field-type-{{this.dasherizedType}}
+    {{if (or @setPosition @removeField) " with-buttons"}}
+    {{if (eq @field @selectedField) " selected"}}"
   tabindex={{@field.position}}
   data-test-field={{@field.name}}
   data-test-field-type={{@field.type}}
