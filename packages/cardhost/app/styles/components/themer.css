@@ -4,11 +4,11 @@
   top: 0;
   width: 40%;
   height: 100%;
-  background: var(--ch-dark);
+  background: var(--ch-deep-background);
   z-index: 10;
   padding: 20px;
   transform: translateX(0%);
-  opacity: 0.92;
+  opacity: 0.95;
 }
 
 .cardhost-card-theme-editor.bottom-docked {
@@ -69,9 +69,14 @@
 
 .cardhost-card-theme-editor .editor-container__title {
   background-color: var(--ch-default);
+  font: 600 13px/18px var(--ch-font-family);
+  letter-spacing: 0.035em;
   padding: 12px;
 }
 
+.cardhost-card-theme-editor .editor-container__title > span {
+  font-weight: 400;
+}
 
 .cardhost-card-theme-editor .resizer.left {
   left: 5px;
@@ -154,6 +159,15 @@
   padding-right: 0;
 }
 
+.cardhost-cards.editing-css .card-renderer-isolated--header {
+  background-color: var(--ch-default);
+  border-color: var(--ch-default);
+}
+
+.cardhost-cards.editing-css .card-renderer-isolated.view .card-renderer-isolated--content {
+  background-color: var(--ch-dark-background);
+}
+
 .themer--top-edge-container {
   display: grid;
   position: fixed;
@@ -174,7 +188,6 @@
 
 .themer--top-edge-width-controls {
   justify-self: start;
-  
 }
 
 .themer--top-edge-pane-controls {
