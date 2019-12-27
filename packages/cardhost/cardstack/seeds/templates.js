@@ -79,7 +79,7 @@ let eventCardTemplate = eventFactory.getDocumentFor(
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
         required: true,
-        'needed-when-embedded': true,
+        'needed-when-embedded': false,
       }),
       eventFactory.addResource('fields', 'cta').withAttributes({
         'is-metadata': true,
@@ -112,8 +112,8 @@ let eventCardTemplate = eventFactory.getDocumentFor(
       'model',
       eventFactory.addResource('local-hub::event-card', 'local-hub::event-card').withAttributes({
         image: 'https://images.unsplash.com/photo-1542296140-47fd7d838e76',
-        title: 'Ember Meetup NYC',
-        date: '2019-09-26',
+        title: 'Quarterly Planning Meeting',
+        date: '2020-05-26',
         location: 'One World Trade Center',
         city: 'New York, NY',
         admission: 'Free',
@@ -124,4 +124,104 @@ let eventCardTemplate = eventFactory.getDocumentFor(
     )
 );
 
-module.exports = [locationCardTemplate, eventCardTemplate];
+let jobCardTemplate = eventFactory.getDocumentFor(
+  eventFactory
+    .addResource('cards', 'local-hub::job-description')
+    .withRelated('adopted-from', { type: 'cards', id: 'local-hub::@cardstack/base-card' })
+    .withRelated('fields', [
+      eventFactory.addResource('fields', 'company').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::string',
+        'needed-when-embedded': true,
+        required: true,
+        caption: 'Company',
+      }),
+      eventFactory.addResource('fields', 'job-title').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::string',
+        'needed-when-embedded': true,
+        required: true,
+        caption: 'Job Title',
+      }),
+      eventFactory.addResource('fields', 'job-description').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::string',
+        required: true,
+        caption: 'Job Description',
+      }),
+      eventFactory.addResource('fields', 'responsibilities').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::string',
+        required: true,
+        caption: 'Responsibilities',
+      }),
+    ])
+    .withRelated(
+      'model',
+      eventFactory.addResource('local-hub::job-description', 'local-hub::job-description').withAttributes({
+        company: 'StackBox Creative LLC',
+        jobTitle: 'Videographer',
+        jobDescription:
+          'Join our marketing team, as we open a new flagship store in New York City, and create compelling videos.',
+        responsibilities:
+          'Follow the marketing team to events, create camera footage for a B-roll film, produce a sales pitch for a client, conduct interviews.',
+      })
+    )
+);
+
+let jobApplicantProfileTemplate = eventFactory.getDocumentFor(
+  eventFactory
+    .addResource('cards', 'local-hub::job-applicant-profile')
+    .withRelated('adopted-from', { type: 'cards', id: 'local-hub::@cardstack/base-card' })
+    .withRelated('fields', [
+      eventFactory.addResource('fields', 'name').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::string',
+        'needed-when-embedded': true,
+        required: true,
+        caption: 'Name',
+      }),
+      eventFactory.addResource('fields', 'portfolio').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::string',
+        required: true,
+        caption: 'Link to your portfolio',
+      }),
+      eventFactory.addResource('fields', 'address').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::string',
+        caption: 'Address',
+      }),
+      eventFactory.addResource('fields', 'phone-number').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::string',
+        required: false,
+        caption: 'Phone Number',
+      }),
+      eventFactory.addResource('fields', 'email').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::string',
+        required: false,
+        caption: 'Email',
+      }),
+      eventFactory.addResource('fields', 'date-start').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::date',
+        required: false,
+        caption: 'What is the earliest date you would be available to start?',
+      }),
+    ])
+    .withRelated(
+      'model',
+      eventFactory.addResource('local-hub::job-applicant-profile', 'local-hub::job-applicant-profile').withAttributes({
+        name: 'Marcel Bridges',
+        portfolio: 'marcel-bridges.example.com/portfolio',
+        address: 'Chicago, IL',
+        phoneNumber: '555-555-5555',
+        email: 'marcel_bridges@example.com',
+        dateStart: '2020-02-01',
+      })
+    )
+);
+
+module.exports = [locationCardTemplate, eventCardTemplate, jobCardTemplate, jobApplicantProfileTemplate];
