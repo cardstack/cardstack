@@ -20,9 +20,7 @@
 /* Cardhost styling for core package templates */
 @import '/assets/components/card-renderer.css';
 @import '/assets/components/field-renderer.css';
-@import '/assets/components/field-renderer-schema-field.css';
-@import '/assets/components/field-renderer-edit-field.css';
-@import '/assets/components/field-renderer-view-field.css';
+@import '/assets/components/schema-field-renderer.css';
 @import '/assets/components/drop-zone.css';
 
 /* TODO eventually these will be dynamically added to the DOM.
@@ -30,6 +28,7 @@ Until that work is done we are statically adding this css
 */
 @import '/assets/cards/base-card-isolated.css';
 @import '/assets/cards/base-card-embedded.css';
+@import '/assets/cards/event-card-isolated.css';
 @import '/assets/fields/belongs-to-editor.css';
 @import '/assets/fields/belongs-to-viewer.css';
 @import '/assets/fields/boolean-editor.css';

@@ -1,25 +1,44 @@
-.field-renderer {
+/* Edit Mode */
+.card-renderer-isolated.edit .field {
   width: 100%;
-  max-width: var(--field-container-width);
-  min-height: var(--field-container-height);
-  background: none;
+  max-width: var(--ch-field-width);
+  margin: 0 auto;
+  padding-bottom: 12px;
 }
 
-.field-renderer.with-buttons {
-  --field-container-width: 496px;
-  --field-container-height: 154px;
 
+/* Schema Mode */
+.card-renderer-isolated.schema .field {
+  width: 100%;
+  max-width: var(--ch-field-width);
+  margin: 0 auto;
+  padding: 20px 0;
+  border: none;
+  color: white;
+  font: 400 13px/18px var(--ch-font-family);
+  letter-spacing: 0.035em;
+}
+
+.card-renderer-isolated.schema .background-image-field {
+  visibility: visible;
+  height: auto;
+}
+
+.card-renderer-isolated.schema .field.with-buttons {
+  width: 100%;
+  max-width: 496px;
+  min-height: 154px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--ch-spacing) 0;
+  padding-top: 0;
   background-color: var(--ch-dark-background);
 }
 
-.field-renderer--move-btn {
+.card-renderer-isolated.schema .field--move-btn {
   width: 14px;
   height: 18px;
-  padding: var(--ch-spacing);
+  padding: 20px;
   margin: auto;
   background: none;
   background-image: url('/images/icons/grabber-handle-white.svg');
@@ -32,8 +51,8 @@
   transition: opacity 250ms;
 }
 
-.field-renderer--move-btn:hover,
-.field-renderer--move-btn:focus {
+.card-renderer-isolated.schema .field--move-btn:hover,
+.card-renderer-isolated.schema .field--move-btn:focus {
   opacity: 1;
   cursor: move; /* fallback */
   cursor: grab;
@@ -41,22 +60,22 @@
   cursor: -webkit-grab;
 }
 
-.field-renderer--move-btn:active {
+.card-renderer-isolated.schema .field--move-btn:active {
   opacity: 1;
   cursor: grabbing;
   cursor: -moz-grabbing;
   cursor: -webkit-grabbing;
 }
 
-.field-renderer--action {
+.card-renderer-isolated.schema .field--action {
   min-width: 40px;
   margin: auto;
 }
 
-.field-renderer--remove-btn {
+.card-renderer-isolated.schema .field--remove-btn {
   width: 16px;
   height: 18px;
-  padding: var(--ch-spacing);
+  padding: 20px;
   margin: auto;
   background: none;
   background-image: url('/images/icons/trash-white.svg');
@@ -69,8 +88,26 @@
   transition: opacity 250ms;
 }
 
-.field-renderer--remove-btn:hover,
-.field-renderer--remove-btn:focus {
+.card-renderer-isolated.schema .field--remove-btn:hover,
+.card-renderer-isolated.schema .field--remove-btn:focus {
   opacity: 1;
   cursor: pointer;
+}
+
+.card-renderer-isolated.schema .field-renderer--display {
+  visibility: hidden;
+  width: 0;
+  height: 0;
+  padding-bottom: 15px;
+}
+
+.card-renderer-isolated.schema .field-renderer--display-label {
+  display: block;
+  padding-bottom: 7px;
+  color: var(--ch-light-op60);
+  font: 400 13px/18px var(--ch-font-family);
+  letter-spacing: 0.035em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

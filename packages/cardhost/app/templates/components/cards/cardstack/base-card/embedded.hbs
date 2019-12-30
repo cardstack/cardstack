@@ -1,9 +1,12 @@
 {{!-- TODO move this into the @cardstack/base-card package when we support runtime js compilation --}}
-
-{{!-- TODO use a sanitized version of the @card.id in the class name after we have css coming from card documents --}}
 <div
   data-test-embedded-card={{@card.name}}
-  class="embedded-card cardstack_base-card {{@mode}}"
+  class="embedded-card
+    embedded-card--{{@mode}}
+    cardstack_base-card-embedded
+    {{safe-css-string @card.name}}-embedded
+    {{safe-css-string @card.adoptedFromName}}-embedded
+  "
 >
   {{#each @card.embeddedFields key="nonce" as | field |}}
     <FieldRenderer @field={{field}} @mode={{@mode}}/>

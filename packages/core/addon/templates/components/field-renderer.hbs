@@ -17,7 +17,7 @@
 >
   {{#if @setPosition}}
     <button {{on "mousedown" (action this.initDrag @field)}} {{on "mouseup" (action this.endDrag)}} {{on "dragend" (action (mut this.isDragging) false)}}
-      class="field-renderer--move-btn"
+      class="field--move-btn"
       aria-label="Drag field"
       data-test-field-renderer-move-btn
       data-test-field-renderer-move-btn-position={{@field.position}}
@@ -154,10 +154,10 @@
   {{/if}}
 
   {{#if (and @removeField (not @field.isAdopted))}}
-    <div class="field-renderer--action">
+    <div class="field--action">
       {{!-- using field.nonce in case the user deletes the name of the field --}}
       <button {{on "click" (fn @removeField @field.nonce)}}
-        class="field-renderer--remove-btn"
+        class="field--remove-btn"
         aria-label="Remove"
         data-test-field-renderer-remove-btn
       >

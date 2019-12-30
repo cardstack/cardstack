@@ -1,19 +1,16 @@
 {{!-- TODO move this into the @cardstack/base-card package when we support runtime js compilation --}}
-
-{{!-- TODO use a sanitized version of the @card.id in the class name after we have css coming from card documents --}}
-{{!-- TODO we need to ensure the user's card styles only change the view mode, and not the edit and schema mode styles --}}
 <div
   data-test-isolated-card={{@card.name}}
-  class="isolated-card isolated-card--{{@mode}} cardstack_base-card"
->
+  class="
+    isolated-card
+    isolated-card--{{@mode}}
+    cardstack_base-card-isolated
+    {{safe-css-string @card.name}}-isolated
+    {{safe-css-string @card.adoptedFromName}}-isolated">
   {{#each @card.isolatedFields key="nonce" as |field|}}
     {{!-- TODO: Better way to display images --}}
-    {{#if (and (eq field.name "image") (eq @mode "view"))}}
-      {{! template-lint-disable no-inline-styles }}
-      <div
-        class="isolated-card--hero-image"
-        style={{css-url "background-image" field.value}}
-      />
+    {{#if (and (eq field.name "background-image") (eq @mode "view"))}}
+      <div class="background-image" style={{css-url "background-image" field.value}} />
     {{/if}}
     {{#if @setFieldValue}}
       <FieldRenderer

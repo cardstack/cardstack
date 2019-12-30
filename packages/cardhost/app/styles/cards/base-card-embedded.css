@@ -5,13 +5,30 @@ custom CSS for each card, all cards will inherit the
 @cardstack/base-card css.
 */
 
-.embedded-card.cardstack_base-card {
+.cardstack_base-card-embedded {
   /* This is just placeholder CSS to test that everuthing works--please change as necessary */
   margin: 0;
   padding: 20px;
   background-color: white;
   color: black;
   border-radius: 15px;
-  font-size: 18px;
+  font: 400 13px/18px var(--ch-font-family);
+  letter-spacing: 0;
   overflow: hidden;
+}
+
+.cardstack_base-card-embedded .embedded-card.cardstack_base-card {
+  padding: 5px 10px;
+}
+
+.cardstack_base-card-embedded .label {
+  display: block;
+  padding-bottom: 4px;
+  color: var(--ch-dark-op50);
+  text-transform: capitalize;
+}
+
+.cardstack_base-card-embedded .value {
+  margin-bottom: 15px;
+  word-break: break-word;
 }
