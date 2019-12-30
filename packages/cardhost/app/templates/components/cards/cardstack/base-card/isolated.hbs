@@ -10,6 +10,7 @@
   {{#each @card.isolatedFields key="nonce" as |field|}}
     {{!-- TODO: Better way to display images --}}
     {{#if (and (eq field.name "background-image") (eq @mode "view"))}}
+      {{! template-lint-disable no-inline-styles }}
       <div class="background-image" style={{css-url "background-image" field.value}} />
     {{/if}}
     {{#if @setFieldValue}}
