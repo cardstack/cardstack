@@ -153,15 +153,17 @@
     {{/each}}
   {{/if}}
 
-  {{#if (and @removeField (not @field.isAdopted))}}
+  {{#unless (eq @mode "view")}}
     <div class="field--action">
-      {{!-- using field.nonce in case the user deletes the name of the field --}}
-      <button {{on "click" (fn @removeField @field.nonce)}}
-        class="field--remove-btn"
-        aria-label="Remove"
-        data-test-field-renderer-remove-btn
-      >
-      </button>
+      {{#if (and @removeField (not @field.isAdopted))}}
+        {{!-- using field.nonce in case the user deletes the name of the field --}}
+        <button {{on "click" (fn @removeField @field.nonce)}}
+          class="field--remove-btn"
+          aria-label="Remove"
+          data-test-field-renderer-remove-btn
+        >
+        </button>
+      {{/if}}
     </div>
-  {{/if}}
+  {{/unless}}
 </div>
