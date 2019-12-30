@@ -254,12 +254,13 @@ module('Acceptance | card edit', function(hooks) {
     assert.equal(currentURL(), `/cards/${card1Id}/edit`);
 
     await visit(`/cards/${card1Id}`);
-    assert.dom('[data-test-field="image"] [data-test-decorative-image-field-viewer-value]').exists();
-    // .hasText(`http://example.com/testimage.jpg`);
+    assert
+      .dom('[data-test-field="image"] [data-test-decorative-image-field-viewer-value]')
+      .hasAttribute('src', 'http://example.com/testimage.jpg');
 
     let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
     let card = JSON.parse(cardJson);
-    assert.equal(card.data.attributes.image, `http://example.com/testimage.jpg`);
+    assert.equal(card.data.attributes.image, 'http://example.com/testimage.jpg');
   });
 
   test(`deleting a card`, async function(assert) {
