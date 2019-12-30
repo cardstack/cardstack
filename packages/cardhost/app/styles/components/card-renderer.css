@@ -18,7 +18,8 @@
 
 /* Resetting styles so that view mode styling does not affect other modes */
 .card-renderer-isolated.schema .isolated-card,
-.card-renderer-isolated.edit .isolated-card {
+.card-renderer-isolated.edit .isolated-card,
+.card-renderer-isolated.edit .field {
   all: unset;
 }
 
