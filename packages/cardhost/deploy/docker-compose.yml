@@ -37,6 +37,7 @@ services:
       - GITHUB_CLIENT_SECRET
       - GITHUB_TOKEN
       - WEBHOOK_URL
+      - INDEX_INTERVAL
 
 networks:
   default:
