@@ -140,7 +140,7 @@
 }
 
 .card-catalog .embedded-card {
-  box-shadow: 0px 0px 0px 0px var(--ch-hover);
+  box-shadow: 0px 0px 0px 0px none;
   transition: all 0.3s ease;
 }
 
@@ -177,10 +177,6 @@
   text-align: center;
   position: absolute;
   top: 225px;
-}
-
-.card-catalog .embedded-card-label {
-  
 }
 
 .card-catalog > *:hover .embedded-card-label {
