@@ -239,6 +239,29 @@ module('Acceptance | card edit', function(hooks) {
     assert.equal(userCard.attributes.email, undefined);
   });
 
+  test(`setting an image`, async function(assert) {
+    await login();
+    await createCards({
+      [card1Id]: [['image', 'decorative image', false, 'test image']],
+    });
+    await visit(`/cards/${card1Id}/edit`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+
+    await setFieldValue('image', 'http://example.com/testimage.jpg');
+
+    await saveCard('editor', card1Id);
+
+    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+
+    await visit(`/cards/${card1Id}`);
+    assert.dom('[data-test-field="image"] [data-test-decorative-image-field-viewer-value]').exists();
+    // .hasText(`http://example.com/testimage.jpg`);
+
+    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let card = JSON.parse(cardJson);
+    assert.equal(card.data.attributes.image, `http://example.com/testimage.jpg`);
+  });
+
   test(`deleting a card`, async function(assert) {
     await login();
     await createCards({
