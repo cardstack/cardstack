@@ -77,7 +77,7 @@ let eventCardTemplate = eventFactory.getDocumentFor(
       }),
       eventFactory.addResource('fields', 'image').withAttributes({
         'is-metadata': true,
-        'field-type': '@cardstack/core-types::string',
+        'field-type': '@cardstack/core-types::decorative-image',
         required: true,
         'needed-when-embedded': false,
       }),

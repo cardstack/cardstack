@@ -4,29 +4,13 @@ all cards will inherit the @cardstack/base-card css.
 */
 .isolated-card--view {
   --card-width: 656px;
-  --hero-image-height: 300px;
-
+  
   width: var(--card-width);
   max-width: 100%;
   margin: 0 auto;
   padding: 50px 30px;
   background-color: white;
   color: black;
-}
-
-.isolated-card--view .field-image {
-  visibility: hidden;
-  width: 0;
-  height: 0;
-}
-
-.isolated-card--hero-image {
-  display: block;
-  width: 100%;
-  height: var(--hero-image-height);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
 }
 
 
@@ -55,6 +39,7 @@ all cards will inherit the @cardstack/base-card css.
 .event-card .isolated-card--view .field-image {
   grid-area: image;
   height: var(--event-image-height);
+  margin-bottom: 30px;
 }
 
 .event-card .isolated-card--view .field-title {
