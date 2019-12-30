@@ -5,9 +5,7 @@
     embedded-card--{{@mode}}
     cardstack_base-card-embedded
     {{safe-css-string @card.name}}-embedded
-    {{safe-css-string @card.adoptedFromName}}-embedded
-  "
->
+    {{safe-css-string @card.adoptedFromName}}-embedded">
   {{#each @card.embeddedFields key="nonce" as | field |}}
     {{#if (eq @mode "schema")}}
       <FieldRenderer @field={{field}} @mode="view"/>
