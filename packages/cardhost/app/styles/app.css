@@ -102,15 +102,11 @@ body {
 }
 
 a {
-  --link: white;
-
-  color: var(--link);
+  color: inherit;
   text-decoration: none;
 }
 
 a:hover {
-  --link: var(--ch-highlight);
-
   cursor: pointer;
 }
 

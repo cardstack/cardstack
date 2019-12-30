@@ -32,3 +32,15 @@ custom CSS for each card, all cards will inherit the
   margin-bottom: 15px;
   word-break: break-word;
 }
+
+/* Embedded card in isolated card */
+.cardstack_base-card-isolated .cardstack_base-card-embedded {
+  margin: inherit;
+  padding: inherit;
+  background-color: inherit;
+  border: none;
+  border-radius: 0;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+}
