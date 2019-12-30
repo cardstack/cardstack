@@ -92,6 +92,9 @@ module('Integration | Component | card-renderer', function(hooks) {
       [...this.element.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
       ['title', 'author']
     );
+    assert.dom(`[data-test-card-renderer-embedded]`).hasClass('card-renderer-embedded');
+    assert.dom(`[data-test-embedded-card="${card1Id}"].embedded-card.cardstack_base-card-embedded`).exists();
+    assert.dom(`[data-test-embedded-card="${card1Id}"]`).hasClass(`${card1Id}-embedded`);
   });
 
   test('it renders isolated card', async function(assert) {
@@ -130,6 +133,9 @@ module('Integration | Component | card-renderer', function(hooks) {
       [...this.element.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
       ['title', 'author', 'body']
     );
+    assert.dom(`[data-test-card-renderer-isolated]`).hasClass('card-renderer-isolated');
+    assert.dom(`[data-test-isolated-card="${card1Id}"].isolated-card.cardstack_base-card-isolated`).exists();
+    assert.dom(`[data-test-isolated-card="${card1Id}"]`).hasClass(`${card1Id}-isolated`);
   });
 
   test('it renders an isolated card that adopts from another card', async function(assert) {
@@ -149,6 +155,8 @@ module('Integration | Component | card-renderer', function(hooks) {
 
     assert.dom(`[data-test-card-renderer-isolated]`).hasClass('event-card');
     assert.dom(`[data-test-card-renderer-isolated]`).hasClass('burcu-birthday-card');
+    assert.dom(`[data-test-isolated-card]`).hasClass(`event-card-isolated`);
+    assert.dom(`[data-test-isolated-card]`).hasClass(`burcu-birthday-card-isolated`);
   });
 
   test('it renders an embedded card that adopts from another card', async function(assert) {
@@ -168,6 +176,8 @@ module('Integration | Component | card-renderer', function(hooks) {
 
     assert.dom(`[data-test-card-renderer-embedded]`).hasClass('event-card');
     assert.dom(`[data-test-card-renderer-embedded]`).hasClass('burcu-birthday-card');
+    assert.dom(`[data-test-embedded-card]`).hasClass(`event-card-embedded`);
+    assert.dom(`[data-test-embedded-card]`).hasClass(`burcu-birthday-card-embedded`);
   });
 
   test('embedded card is wrapped with a link in view mode', async function(assert) {

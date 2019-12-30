@@ -104,8 +104,11 @@ module('Integration | Component | field-renderer', function(hooks) {
     assert.dom('[data-test-string-field-viewer-value]').hasText('test title');
     assert.dom('[data-test-string-field-viewer-label]').hasText('Field Title');
     assert.dom('[data-test-field="title"]').doesNotContainText('field instructions');
+    assert.dom('[data-test-field="title"]').hasClass('field title-field');
     assert.dom('input').doesNotExist();
     assert.dom('button').doesNotExist();
+    assert.dom('[data-test-string-field-viewer-label]').hasClass('label title-label');
+    assert.dom('[data-test-string-field-viewer-value]').hasClass('value title-value');
   });
 
   test('it renders field in edit mode', async function(assert) {
