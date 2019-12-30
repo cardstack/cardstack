@@ -1,6 +1,6 @@
 .cardstack_base-card-isolated {
   width: 100%;
-  max-width: 656px;
+  min-height: inherit;
   margin: 0 auto;
   padding: 50px 30px;
   background-color: white;
@@ -14,7 +14,10 @@
 }
 
 .cardstack_base-card-isolated .field {
-  margin-bottom: 30px;
+  width: 100%;
+  max-width: 656px;
+  margin: 0 auto;
+  padding-bottom: 30px;
 }
 
 .cardstack_base-card-isolated .label {

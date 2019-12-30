@@ -12,7 +12,7 @@
 }
 
 .event-card-isolated .field {
-  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .event-card-isolated .background-image-field {
@@ -21,7 +21,7 @@
 
 .event-card-isolated .title-field {
   grid-area: title;
-  margin-bottom: 30px;
+  padding-bottom: 30px;
 }
 .event-card-isolated .cta-field {
   grid-area: cta;
@@ -45,6 +45,21 @@
 .event-card-isolated .description-field {
   grid-area: description;
   margin-top: 30px;
+}
+
+.event-card-isolated .city-field,
+.event-card-isolated .admission-field,
+.event-card-isolated .cta-field {
+  max-width: calc(656px / 2);
+}
+
+.event-card-isolated .city-field,
+.event-card-isolated .admission-field {
+  margin-right: 0;
+}
+
+.event-card-isolated .cta-field {
+  margin-left: 0;
 }
 
 .event-card-isolated .title-label,
