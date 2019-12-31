@@ -6,7 +6,7 @@ This document is for project maintainers who are doing versioning, releases, and
 
 The versions of all packages in the mono-repo are updated at the same time, to the same version number.
 
-1. Get the latest code on master and create a branch. `git checkout master`, `git pull origin master`, `git checkout -b vX.Y.Z`
+1. Get the latest code on master and create a branch. `git checkout master`, `git pull origin master`, `git checkout -b release-vX.Y.Z`
 2. Look at the `git log` since the last release, and list anything significant in the `CHANGELOG.md`.
 Determine whether the release should be a major (breaking), minor, or patch.
 For breaking releases, include upgrade instructions in the changelog.
@@ -16,8 +16,8 @@ For breaking releases, include upgrade instructions in the changelog.
 `--force-publish` will update interdependencies as well as the version numbers of the packages themselves.
 Before the version updating happens, `lerna` will ask what you want the version to be.
 5. Open a pull request with your version updates
-6. Merge the pull request after version-checking tests finish
-7. Create a tag on GitHub for the version
+6. Merge the pull request after version-checking tests finish (in Linting Tests)
+7. Check to see that the new version is on GitHub
 8. Check out master and pull again. `git checkout master`, `git pull origin master`
 9. `lerna publish from-git` will update all packages that don't yet have the new version published. You can safely re-run this command if publishing is interrupted.
 10. Make sure all the packages made it up to npm
