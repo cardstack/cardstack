@@ -3,6 +3,7 @@ import { inject as service } from '@ember/service';
 
 export default class CardsController extends Controller {
   @service cssModeToggle;
+  @service cardstackSession;
 
   get themerClasses() {
     let editing = this.cssModeToggle.editingCss;
@@ -10,6 +11,8 @@ export default class CardsController extends Controller {
       return 'responsive editing-css';
     } else if (editing && !this.cssModeToggle.isResponsive) {
       return 'full-width editing-css';
+    } else if (!this.cardstackSession.isAuthenticated) {
+      return 'full-width'
     } else {
       return '';
     }

@@ -1,6 +1,6 @@
 {{#if this.cssModeToggle.editingCss}}
   <ThemerToolbar @closeEditor={{this.closeEditor}} />
-{{else}}
+{{else if this.cardstackSession.isAuthenticated}}
   <div class="card-renderer--top-edge-buttons">
     <button
       class="ch-button ch-button--icon share"
@@ -9,7 +9,6 @@
     </button>
     <button
       class="ch-button ch-button--secondary"
-      disabled={{not this.cardstackSession.isAuthenticated}}
     >
       Preview
     </button>
@@ -45,7 +44,7 @@
       @updateCode={{this.updateCode}}
     />
   </div>
-{{else}}
+{{else if this.cardstackSession.isAuthenticated}}
   <RightEdge
     @card={{this.card}}
   >
