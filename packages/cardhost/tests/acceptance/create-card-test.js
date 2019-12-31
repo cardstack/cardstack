@@ -127,7 +127,7 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
     // TODO: figure out why having the following assertions before the line above ^^^ causes a test failure
     assert.dom('[data-test-card-renderer-isolated]').hasClass('selected');
-    assert.dom('.field-renderer').doesNotHaveClass('selected');
+    assert.dom('[data-test-field]').doesNotHaveClass('selected');
 
     let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
     let card = JSON.parse(cardJson);

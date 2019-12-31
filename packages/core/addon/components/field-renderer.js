@@ -63,7 +63,15 @@ export default class FieldRenderer extends Component {
   }
 
   get dasherizedType() {
-    return dasherize(this.sanitizedType.replace(/\//g, '-'));
+    return dasherize(this.args.field.type.replace(/@cardstack\/core-types::/g, ''));
+  }
+
+  get friendlyType() {
+    if (this.dasherizedType === 'case-insensitive' || this.dasherizedType === 'string') {
+      return 'text';
+    }
+
+    return '';
   }
 
   get fieldViewer() {

@@ -8,17 +8,7 @@
 {{!-- TODO: let's think of a more accessible solution here, consider making this a button--}}
 {{!-- TODO: also we should also turn on a11y linting --}}
 <div {{on "click" (fn this.selectField @field)}} {{on "dragstart" (action this.startDragging @field)}} {{on "dragend" (action this.finishDragging)}}
-  class={{concat
-    "field-renderer "
-    @mode
-    "-field "
-    "field-"
-    @field.name
-    " field-type-"
-    this.dasherizedType
-    (if (or @setPosition @removeField) " with-buttons")
-    (if (eq @field @selectedField) " selected")
-  }}
+  class="field {{@field.name}}-field {{if this.friendlyType (concat "field-type-" this.friendlyType "-" @mode "-field ")}}field-type-{{this.dasherizedType}}-{{@mode}}-field{{if (or @setPosition @removeField) " with-buttons"}}{{if (eq @field @selectedField) " selected"}}"
   tabindex={{@field.position}}
   data-test-field={{@field.name}}
   data-test-field-type={{@field.type}}
@@ -27,7 +17,7 @@
 >
   {{#if @setPosition}}
     <button {{on "mousedown" (action this.initDrag @field)}} {{on "mouseup" (action this.endDrag)}} {{on "dragend" (action (mut this.isDragging) false)}}
-      class="field-renderer--move-btn"
+      class="field--move-btn"
       aria-label="Drag field"
       data-test-field-renderer-move-btn
       data-test-field-renderer-move-btn-position={{@field.position}}
@@ -163,15 +153,17 @@
     {{/each}}
   {{/if}}
 
-  <div class="field-renderer--action">
-    {{#if (and @removeField (not @field.isAdopted))}}
-      {{!-- using field.nonce in case the user deletes the name of the field --}}
-      <button {{on "click" (fn @removeField @field.nonce)}}
-        class="field-renderer--remove-btn"
-        aria-label="Remove"
-        data-test-field-renderer-remove-btn
-      >
-      </button>
-    {{/if}}
-  </div>
+  {{#if (not (eq @mode "view"))}}
+    <div class="field--action">
+      {{#if (and @removeField (not @field.isAdopted))}}
+        {{!-- using field.nonce in case the user deletes the name of the field --}}
+        <button {{on "click" (fn @removeField @field.nonce)}}
+          class="field--remove-btn"
+          aria-label="Remove"
+          data-test-field-renderer-remove-btn
+        >
+        </button>
+      {{/if}}
+    </div>
+  {{/if}}
 </div>

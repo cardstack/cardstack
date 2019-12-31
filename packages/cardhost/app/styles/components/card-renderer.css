@@ -5,25 +5,22 @@
 
   position: relative;
   width: 100%;
-  max-width: var(--card-renderer-width);
-  min-height: var(--card-renderer-height);
   font: 400 16px/22px var(--ch-font-family);
   letter-spacing: 0.015em;
   overflow: hidden;
 }
 
+.card-renderer-isolated.schema,
+.card-renderer-isolated.edit {
+  max-width: var(--card-renderer-width);
+  min-height: var(--card-renderer-height);
+}
+
 /* Resetting styles so that view mode styling does not affect other modes */
 .card-renderer-isolated.schema .isolated-card,
-.card-renderer-isolated.edit .isolated-card {
+.card-renderer-isolated.edit .isolated-card,
+.card-renderer-isolated.edit .field {
   all: unset;
-}
-
-.card-renderer-isolated.view {
-  --card-renderer-width: 100%;
-}
-
-.card-renderer-isolated:focus {
-  outline: 0;
 }
 
 
@@ -58,6 +55,10 @@
   transition: stroke var(--ch-transition-time);
 }
 
+.card-renderer-isolated:focus {
+  outline: 0;
+}
+
 .card-renderer-isolated.selected .card-renderer-isolated--header,
 .card-renderer-isolated.edit:focus .card-renderer-isolated--header {
   background-color: var(--ch-highlight);
@@ -80,7 +81,7 @@
     100vh - var(--ch-top-edge-height) - var(--card-renderer-header-height)
   );
   padding-bottom: 80px;
-  background-color: var(--ch-light);
+  background-color: transparent;
   color: var(--ch-dark);
   border: none;
   overflow-x: hidden;
@@ -90,14 +91,7 @@
 }
 
 .card-renderer-isolated.schema .card-renderer-isolated--content {
-  background-color: var(--ch-deep-background);
   color: var(--ch-light);
-}
-
-.card-renderer-isolated.edit .card-renderer-isolated--content,
-.card-renderer-isolated.view .card-renderer-isolated--content {
-  background-color: var(--ch-default);
-  color: var(--ch-dark);
 }
 
 
@@ -123,7 +117,8 @@
 }
 
 .card-renderer-isolated.view .card-renderer-isolated--card-container {
-  background-color: var(--ch-light);
+  background: var(--ch-light);
+  border: none;
 }
 
 .card-renderer-isolated.schema.selected .card-renderer-isolated--card-container,

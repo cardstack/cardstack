@@ -1,0 +1,110 @@
+.event-card-isolated {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    'image        image'
+    'title        title'
+    'city         cta'
+    'admission    cta'
+    'date         date'
+    'location     location'
+    'description  description';
+}
+
+.event-card-isolated .label {
+  text-transform: capitalize;
+}
+
+.event-card-isolated .field {
+  padding-bottom: 0;
+}
+
+.event-card-isolated .title-label,
+.event-card-isolated .admission-label,
+.event-card-isolated .cta-label,
+.event-card-isolated .city-label{
+  visibility: hidden;
+  height: 0;
+  padding: 0;
+}
+
+.event-card-isolated .background-image-field {
+  grid-area: image;
+  padding-bottom: 30px;
+  max-width: 100%;
+  height: 300px;
+}
+.event-card-isolated .image-background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.event-card-isolated .title-field {
+  grid-area: title;
+  padding-bottom: 30px;
+  font-size: 28px;
+  line-height: 1.285;
+}
+.event-card-isolated .cta-field {
+  grid-area: cta;
+  font-size: 13px;
+  line-height: 1.285;
+  font-weight: 600;
+}
+.event-card-isolated .city-field {
+  grid-area: city;
+  opacity: 0.5;
+  font-size: 13px;
+  line-height: 1.285;
+}
+.event-card-isolated .admission-field {
+  grid-area: admission;
+  font-size: 13px;
+  line-height: 1.285;
+  font-weight: 700;
+}
+.event-card-isolated .date-field {
+  grid-area: date;
+  margin-top: 30px;
+  padding-top: 30px;
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+}
+.event-card-isolated .location-field {
+  grid-area: location;
+  margin-top: 30px;
+}
+.event-card-isolated .description-field {
+  grid-area: description;
+  margin-top: 30px;
+}
+
+.event-card-isolated .city-field,
+.event-card-isolated .admission-field,
+.event-card-isolated .cta-field {
+  max-width: calc(656px / 2);
+}
+
+.event-card-isolated .city-field,
+.event-card-isolated .admission-field {
+  margin-right: 0;
+}
+
+.event-card-isolated .cta-field {
+  margin-left: 0;
+}
+
+.event-card-isolated .cta-value {
+  width: 128px;
+  min-height: 35px;
+  margin-left: auto;
+  padding: 10px 15px;
+  border-radius: 5px;
+  background-color: #0076ff;
+  color: white;
+  text-align: center;
+}

@@ -70,15 +70,16 @@
                         </div>
                       {{/if}}
                     </div>
-
-                    <FieldRenderer
-                      @field={{field}}
-                      @mode="schema"
-                      @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
-                      @setFieldName={{@setFieldName}}
-                      @setFieldLabel={{@setFieldLabel}}
-                      @setFieldInstructions={{@setFieldInstructions}}
-                      @schemaAttrs={{array "name" "label" "instructions" "embedded"}} />
+                    <div class="right-edge--item">
+                      <FieldRenderer
+                        @field={{field}}
+                        @mode="schema"
+                        @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+                        @setFieldName={{@setFieldName}}
+                        @setFieldLabel={{@setFieldLabel}}
+                        @setFieldInstructions={{@setFieldInstructions}}
+                        @schemaAttrs={{array "name" "label" "instructions" "embedded"}} />
+                    </div>
                   </div>
                 {{/animated-value}}
               </AnimatedContainer>
