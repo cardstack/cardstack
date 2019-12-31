@@ -24,23 +24,5 @@
   padding-bottom: 4px;
   color: var(--ch-dark-op50);
   font-size: 13px;
-  line-height: 1.285;
-}
-
-.cardstack_base-card-isolated .background-image-field {
-  visibility: hidden;
-  width: 0;
-  height: 300px;
-}
-
-.cardstack_base-card-isolated .background-image {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: block;
-  width: 100%;
-  height: 300px;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  line-height: 1.385;
 }

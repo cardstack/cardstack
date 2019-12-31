@@ -14,15 +14,13 @@
   padding: 0;
 }
 
-.cardstack_base-card-embedded .label {
-  display: block;
-  padding-bottom: 4px;
-  color: var(--ch-dark-op50);
+.cardstack_base-card-embedded .field {
+  padding-bottom: 15px;
 }
 
-.cardstack_base-card-embedded .value {
-  margin-bottom: 15px;
-  word-break: break-word;
+.cardstack_base-card-embedded .label {
+  padding-bottom: 4px;
+  color: var(--ch-dark-op50);
 }
 
 /* Embedded card in isolated card */
@@ -33,4 +31,8 @@
   color: inherit;
   font: inherit;
   letter-spacing: inherit;
+}
+
+.cardstack_base-card-isolated .cardstack_base-card-embedded .field {
+  padding-bottom: 0;
 }

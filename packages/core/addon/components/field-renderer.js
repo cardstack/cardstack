@@ -71,7 +71,7 @@ export default class FieldRenderer extends Component {
       return 'text';
     }
 
-    return this.dasherizedType;
+    return '';
   }
 
   get fieldViewer() {
