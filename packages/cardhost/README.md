@@ -22,12 +22,15 @@ You will need the following things properly installed on your computer.
 ## Running / Development
 
 * `yarn start-prereqs`
-* `yarn start-hub`
+* `INDEX_INTERVAL=120 yarn start-hub`
 * In a new tab, `yarn start-ember`
 
 
 * Visit your app at [http://localhost:4200](http://localhost:4200).
 * Visit your tests at [http://localhost:4200/tests](http://localhost:4200/tests).
+
+`INDEX_INTERVAL` determines how often the hub should reindex data, in minutes.
+It is recommended to set this number high for local development.
 
 ### Code Generators
 

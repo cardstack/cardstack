@@ -114,7 +114,9 @@ async function startIndexing(environment, container) {
     );
   }
 
-  setInterval(() => container.lookup('hub:indexers').update({ dontWaitForJob: true }), 600000);
+  let millisecondsPerMinute = 60000;
+  let interval = process.env.INDEX_INTERVAL * millisecondsPerMinute || 600000;
+  setInterval(() => container.lookup('hub:indexers').update({ dontWaitForJob: true }), interval);
 }
 
 async function loadSeeds(container, seedModels) {

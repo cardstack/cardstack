@@ -37,6 +37,7 @@ Until that work is done we are statically adding this css
 @import '/assets/fields/case-insensitive-viewer.css';
 @import '/assets/fields/date-editor.css';
 @import '/assets/fields/date-viewer.css';
+@import '/assets/fields/decorative-image-viewer.css';
 @import '/assets/fields/has-many-editor.css';
 @import '/assets/fields/has-many-viewer.css';
 @import '/assets/fields/integer-editor.css';

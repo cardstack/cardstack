@@ -6,6 +6,7 @@ export const fieldTypeMappings = {
   integer: '@cardstack/core-types::integer',
   'related card': '@cardstack/core-types::belongs-to',
   'related cards': '@cardstack/core-types::has-many',
+  'decorative image': '@cardstack/core-types::decorative-image',
 
   // Probably want to omit these types as they could probably be better
   // handled as related cards:
@@ -69,6 +70,14 @@ export const fieldComponents = [
     description: 'Multiple select dropdown',
     type: 'related cards',
     icon: `/assets/images/field-types/dropdown.svg`,
+  },
+  {
+    id: 'decorative-image',
+    coreType: '@cardstack/core-types::decorative-image',
+    title: 'Decorative image',
+    description: 'Use this for hero images',
+    type: 'decorative image',
+    icon: `/assets/images/field-types/image.svg`,
   },
   // We'll need to figure out how to deal with the other types of ui-components, ex:
   // {

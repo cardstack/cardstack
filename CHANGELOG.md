@@ -7,6 +7,12 @@ and features, and is not intended to be an exhaustive list.
 
 ## [Unreleased]
 
+## [v0.16.13]
+
+### Added
+
+- Feature: image core type
+
 ## [v0.14.22] - 2019-08-15
 
 When upgrading, `@cardstack/eslint-config/browser` should become `@cardstack/eslint-config/ember-addon`
