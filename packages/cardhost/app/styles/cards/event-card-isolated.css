@@ -16,7 +16,7 @@
 }
 
 .event-card-isolated .field {
-  padding-bottom: 0;
+  grid-column: 1 / -1;
 }
 
 .event-card-isolated .title-label,
@@ -46,24 +46,26 @@
 
 .event-card-isolated .title-field {
   grid-area: title;
-  padding-bottom: 30px;
   font-size: 28px;
   line-height: 1.285;
 }
 .event-card-isolated .cta-field {
   grid-area: cta;
+  padding-bottom: 0;
   font-size: 13px;
   line-height: 1.285;
   font-weight: 600;
 }
 .event-card-isolated .city-field {
   grid-area: city;
+  padding-bottom: 0;
   opacity: 0.5;
   font-size: 13px;
   line-height: 1.285;
 }
 .event-card-isolated .admission-field {
   grid-area: admission;
+  padding-bottom: 0;
   font-size: 13px;
   line-height: 1.285;
   font-weight: 700;
@@ -76,11 +78,9 @@
 }
 .event-card-isolated .location-field {
   grid-area: location;
-  margin-top: 30px;
 }
 .event-card-isolated .description-field {
   grid-area: description;
-  margin-top: 30px;
 }
 
 .event-card-isolated .city-field,
