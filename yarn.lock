@@ -807,6 +807,27 @@
     ember-radio-button "^2.0.1"
     ember-truth-helpers "^2.1.0"
 
+"@cardstack/ui-components@^0.2.16":
+  version "0.2.16"
+  resolved "https://registry.yarnpkg.com/@cardstack/ui-components/-/ui-components-0.2.16.tgz#12f31ff71e71201d9b14783f62ff6cd9c1528b93"
+  integrity sha512-XlLcuLdAKgPRc0BFUnUGtxeH18OpJz0eqXq+XZnKXNElXBmJUcgGLlFTnZm9FwOY+lX2SYdv0pzDL8lUHWNnDQ==
+  dependencies:
+    broccoli-funnel "^2.0.2"
+    broccoli-merge-trees "^3.0.2"
+    ember-cli-babel "^7.11.1"
+    ember-cli-htmlbars "^4.0.0"
+    ember-inputmask "^0.9.1"
+    ember-moment "^7.8.1"
+    ember-multiselect-checkboxes "^0.11.1"
+    ember-phone-input "^2.0.7"
+    ember-place-autocomplete "^2.0.0"
+    ember-power-calendar "^0.13.2"
+    ember-power-calendar-moment "^0.1.7"
+    ember-power-datepicker "git+https://github.com/bagby/ember-power-datepicker#9eaf27d921056b47b7d620b42e303b45c7a40e67"
+    ember-power-select "^2.3.1"
+    ember-radio-button "^2.0.1"
+    ember-truth-helpers "^2.1.0"
+
 "@cnakazawa/watch@^1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@cnakazawa/watch/-/watch-1.0.3.tgz#099139eaec7ebf07a27c1786a3ff64f39464d2ef"
@@ -8342,6 +8363,18 @@ ember-power-calendar@^0.13.2:
     ember-power-calendar "^0.12.0"
     ember-power-calendar-moment "^0.1.6"
 
+"ember-power-datepicker@git+https://github.com/bagby/ember-power-datepicker.git#9eaf27d921056b47b7d620b42e303b45c7a40e67":
+  version "0.6.0"
+  uid "9eaf27d921056b47b7d620b42e303b45c7a40e67"
+  resolved "git+https://github.com/bagby/ember-power-datepicker.git#9eaf27d921056b47b7d620b42e303b45c7a40e67"
+  dependencies:
+    ember-basic-dropdown "^1.1.2"
+    ember-cli-babel "^7.1.2"
+    ember-cli-htmlbars "^3.0.0"
+    ember-native-dom-helpers "^0.5.10"
+    ember-power-calendar "^0.12.0"
+    ember-power-calendar-moment "^0.1.6"
+
 ember-power-select@^2.3.1:
   version "2.3.5"
   resolved "https://registry.yarnpkg.com/ember-power-select/-/ember-power-select-2.3.5.tgz#c702d5cf5b2c6c2fd422f0a8253e982cecbdd048"
@@ -8554,6 +8587,15 @@ ember-template-lint@^1.1.0:
     minimatch "^3.0.4"
     resolve "^1.1.3"
     strip-bom "^3.0.0"
+
+ember-test-selectors@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/ember-test-selectors/-/ember-test-selectors-3.0.0.tgz#5be818cd4c10a3154e72ac5abc982e712c3514bf"
+  integrity sha512-yKCURzLx+mQfqL4ts4oIYobXZVhOAXDwsObdVVTY9+UuzH0xdZEpIx37nCXV7UugP/vCoaUN3YruYZKgqxWQpg==
+  dependencies:
+    calculate-cache-key-for-tree "^2.0.0"
+    ember-cli-babel "^7.12.0"
+    ember-cli-version-checker "^3.1.3"
 
 ember-test-waiters@^1.1.1:
   version "1.1.1"

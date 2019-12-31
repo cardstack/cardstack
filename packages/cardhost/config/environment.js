@@ -39,6 +39,8 @@ module.exports = function(environment) {
     ENV.cardTemplates = JSON.parse(process.env.CARD_TEMPLATES || null) || [
       'local-hub::location-card',
       'local-hub::event-card',
+      'local-hub::job-description',
+      'local-hub::job-applicant-profile',
     ];
   }
 

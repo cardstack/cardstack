@@ -7,72 +7,45 @@
   width: 100%;
   max-width: var(--card-renderer-width);
   min-height: var(--card-renderer-height);
-  border: 3px solid transparent;
-  border-radius: 10px;
   font: 400 16px/22px var(--ch-font-family);
   letter-spacing: 0.015em;
   overflow: hidden;
+}
 
-  transition: border-color var(--ch-transition-time);
+/* Resetting styles so that view mode styling does not affect other modes */
+.card-renderer-isolated.schema .isolated-card,
+.card-renderer-isolated.edit .isolated-card {
+  all: unset;
 }
 
 .card-renderer-isolated.view {
   --card-renderer-width: 100%;
 }
 
-.card-renderer-isolated.schema .isolated-card,
-.card-renderer-isolated.edit .isolated-card {
-  padding: 0;
+.card-renderer-isolated:focus {
+  outline: 0;
 }
 
-.card-renderer-isolated.selected {
-  border-color: var(--ch-highlight);
-}
 
-.card-renderer-isolated.no-fields .drop-zone {
-  position: static;
-  height: initial;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
-}
-
-.card-renderer-isolated.no-fields .drop-zone .drop-zone--description {
-  width: 100%;
-  border: none;
-  font-size: 16px;
-}
-
-.card-renderer-isolated.no-fields .drop-zone .drop-zone--description .drop-zone--description--text {
-  display: block;
-}
-
-.card-renderer-isolated.no-fields .drop-zone .drop-zone--drag-drop-icon {
-  display: block;
-  margin-top: 10px;
-}
-
+/* Card Renderer Header */
 .card-renderer-isolated--header {
   display: flex;
   align-items: center;
   height: var(--card-renderer-header-height);
   padding: 14px 20px;
-  background-color: var(--ch-dark-background);
   color: var(--ch-light-op50);
-  border: none;
+  background-color: var(--ch-dark-background);
+  border: 3px solid var(--ch-dark-background);
+  border-radius: 10px 10px 0 0;
   font-weight: 600;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   text-transform: capitalize;
 
-  transition: background-color var(--ch-transition-time), color var(--ch-transition-time);
-}
-
-.card-renderer-isolated.selected .card-renderer-isolated--header {
-  background-color: var(--ch-highlight);
-  color: var(--ch-dark);
+  transition: background-color var(--ch-transition-time),
+              color var(--ch-transition-time),
+              border-color var(--ch-transition-time);
 }
 
 .card-renderer-isolated--header svg {
@@ -85,30 +58,77 @@
   transition: stroke var(--ch-transition-time);
 }
 
-.card-renderer-isolated.selected .card-renderer-isolated--header svg {
+.card-renderer-isolated.selected .card-renderer-isolated--header,
+.card-renderer-isolated.edit:focus .card-renderer-isolated--header {
+  background-color: var(--ch-highlight);
+  border-color: var(--ch-highlight);
+  color: var(--ch-dark);
+}
+
+.card-renderer-isolated.selected .card-renderer-isolated--header svg,
+.card-renderer-isolated.edit:focus .card-renderer-isolated--header svg {
   --icon-color: var(--ch-dark);
 }
 
+
+/* Card Renderer - Outer Wrapper */
+/* Needed for scroll behavior */
 .card-renderer-isolated--content {
   position: relative;
   min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
   max-height: calc(
-    100vh - var(--ch-top-edge-height) - var(--ch-bottom-edge-height) - var(--card-renderer-header-height)
+    100vh - var(--ch-top-edge-height) - var(--card-renderer-header-height)
   );
+  padding-bottom: 80px;
   background-color: var(--ch-light);
   color: var(--ch-dark);
   border: none;
   overflow-x: hidden;
   overflow-y: auto;
+
+  transition: var(--ch-card-background-color-animate);
 }
 
 .card-renderer-isolated.schema .card-renderer-isolated--content {
-  background-color: var(--ch-dark-background);
+  background-color: var(--ch-deep-background);
   color: var(--ch-light);
 }
 
-.card-renderer-isolated.edit .card-renderer-isolated--content {
+.card-renderer-isolated.edit .card-renderer-isolated--content,
+.card-renderer-isolated.view .card-renderer-isolated--content {
+  background-color: var(--ch-default);
+  color: var(--ch-dark);
+}
+
+
+/* Card Renderer - Inner Wrapper */
+.card-renderer-isolated .card-renderer-isolated--card-container {
+  border: 3px solid transparent;
+  border-radius: 0 0 10px 10px;
+  overflow: hidden;
+  min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
+
+  transition: background-color var(--ch-transition-time),
+              border-color var(--ch-transition-time);
+}
+
+.card-renderer-isolated.schema .card-renderer-isolated--card-container {
+  background-color: var(--ch-dark-background);
+  border-top: 3px solid var(--ch-default);
+}
+
+.card-renderer-isolated.edit .card-renderer-isolated--card-container {
+  background-color: var(--ch-light);
   padding: 30px;
+}
+
+.card-renderer-isolated.view .card-renderer-isolated--card-container {
+  background-color: var(--ch-light);
+}
+
+.card-renderer-isolated.schema.selected .card-renderer-isolated--card-container,
+.card-renderer-isolated.edit:focus .card-renderer-isolated--card-container {
+  border-color: var(--ch-highlight);
 }
 
 /* TODO: fade card if field-renderer is selected */
@@ -125,107 +145,3 @@
   background: rgba(0, 0, 0, 0.4);
   z-index: 5;
 } */
-
-.card-renderer-isolated:focus {
-  outline: 0; /* TODO: make this accessible */
-}
-
-/* Event Card Template */
-.card-renderer-isolated.view.event-card .isolated-card {
-  --event-image-height: 300px;
-  --event-button: #0076ff;
-  --event-border: rgba(0, 0, 0, 0.15);
-
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-areas:
-    'image        image'
-    'title        title'
-    'city         cta'
-    'admission    cta'
-    'date         date'
-    'location     location'
-    'description  description';
-}
-.card-renderer-isolated.view.event-card .isolated-card .field-renderer {
-  margin-bottom: 0;
-}
-.card-renderer-isolated.view.event-card .isolated-card .field-image {
-  grid-area: image;
-  height: var(--event-image-height);
-}
-.card-renderer-isolated.view.event-card .isolated-card .field-title {
-  grid-area: title;
-  margin-bottom: 30px;
-}
-.card-renderer-isolated.view.event-card .isolated-card .field-cta {
-  grid-area: cta;
-}
-.card-renderer-isolated.view.event-card .isolated-card .field-city {
-  grid-area: city;
-}
-.card-renderer-isolated.view.event-card .isolated-card .field-admission {
-  grid-area: admission;
-}
-.card-renderer-isolated.view.event-card .isolated-card .field-date {
-  grid-area: date;
-  margin-top: 30px;
-  padding-top: 30px;
-  border-top: 1px solid var(--event-border);
-}
-.card-renderer-isolated.view.event-card .isolated-card .field-location {
-  grid-area: location;
-  margin-top: 30px;
-}
-.card-renderer-isolated.view.event-card .isolated-card .field-description {
-  grid-area: description;
-  margin-top: 30px;
-}
-
-.card-renderer-isolated.view.event-card .isolated-card .field-title > .view-field--label,
-.card-renderer-isolated.view.event-card .isolated-card .field-image > .view-field--label,
-.card-renderer-isolated.view.event-card .isolated-card .field-image > .view-field--value,
-.card-renderer-isolated.view.event-card .isolated-card .field-admission > .view-field--label,
-.card-renderer-isolated.view.event-card .isolated-card .field-cta > .view-field--label,
-.card-renderer-isolated.view.event-card .isolated-card .field-city > .view-field--label {
-  visibility: hidden;
-  height: 0;
-  padding: 0;
-}
-
-.card-renderer-isolated.view.event-card .isolated-card .field-title > .view-field--value {
-  font-size: 28px;
-  line-height: 36px;
-}
-
-.card-renderer-isolated.view.event-card .isolated-card .field-city > .view-field--value {
-  opacity: 0.5;
-  font-size: 13px;
-  line-height: 18px;
-}
-
-.card-renderer-isolated.view.event-card .isolated-card .field-admission > .view-field--value {
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 18px;
-}
-
-.card-renderer-isolated.view.event-card .isolated-card .field-cta > .view-field--value {
-  width: 128px;
-  height: 35px;
-  margin-left: auto;
-  padding: 10px 15px;
-  border-radius: 5px;
-  background-color: var(--event-button);
-  color: var(--ch-light);
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 18px;
-  text-align: center;
-}
-
-.card-renderer-isolated.view.event-card .isolated-card--hero-image {
-  position: absolute;
-  top: 0;
-  left: 0;
-}

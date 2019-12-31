@@ -1,5 +1,10 @@
 {{#let this.target.currentRoute.localName as |mode|}}
-  <div class="cardhost-cards {{mode}} {{this.themerClasses}}" data-test-cardhost-cards>
+  <div class="
+    cardhost-cards
+    {{mode}}
+    {{if (or (eq mode "add") (eq mode "adopt")) "schema"}}
+    {{this.themerClasses}}"
+    data-test-cardhost-cards>
     {{#if (not this.cssModeToggle.editingCss)}}
       <CardhostTopEdge @mode={{mode}}>
         {{#if (or (eq mode "schema") (eq mode "edit") (eq mode "view"))}}

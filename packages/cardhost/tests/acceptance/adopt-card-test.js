@@ -201,7 +201,7 @@ module('Acceptance | card adoption', function(hooks) {
     await click('[data-test-field="address"]');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('address');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').isDisabled();
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('address');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Address');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').isDisabled();
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isDisabled();

@@ -4,17 +4,9 @@
 {{!-- TODO we need to ensure the user's card styles only change the view mode, and not the edit and schema mode styles --}}
 <div
   data-test-isolated-card={{@card.name}}
-  class="isolated-card cardstack_base-card {{@mode}}"
+  class="isolated-card isolated-card--{{@mode}} cardstack_base-card"
 >
   {{#each @card.isolatedFields key="nonce" as |field|}}
-    {{!-- TODO: Better way to display images --}}
-    {{#if (and (eq field.name "image") (eq @mode "view"))}}
-      {{! template-lint-disable no-inline-styles }}
-      <div
-        class="isolated-card--hero-image"
-        style={{css-url "background-image" field.value}}
-      />
-    {{/if}}
     {{#if @setFieldValue}}
       <FieldRenderer
         @field={{field}}

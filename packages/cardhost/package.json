@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/cardhost",
-  "version": "0.16.9",
+  "version": "0.16.13",
   "description": "The stock Ember app blueprint that hosts Cardstack Cards.",
   "repository": "",
   "license": "MIT",
@@ -28,20 +28,20 @@
     "test": "ember test"
   },
   "devDependencies": {
-    "@cardstack/authentication": "0.16.9",
-    "@cardstack/base-card": "0.16.9",
-    "@cardstack/core": "0.16.9",
-    "@cardstack/di": "0.16.9",
-    "@cardstack/ephemeral": "0.16.9",
-    "@cardstack/eslint-config": "0.16.9",
-    "@cardstack/git": "0.16.9",
-    "@cardstack/hub": "0.16.9",
-    "@cardstack/jsonapi": "0.16.9",
+    "@cardstack/authentication": "0.16.13",
+    "@cardstack/base-card": "0.16.13",
+    "@cardstack/core": "0.16.13",
+    "@cardstack/di": "0.16.13",
+    "@cardstack/ephemeral": "0.16.13",
+    "@cardstack/eslint-config": "0.16.13",
+    "@cardstack/git": "0.16.13",
+    "@cardstack/hub": "0.16.13",
+    "@cardstack/jsonapi": "0.16.13",
     "@cardstack/logger": "0.2.0",
-    "@cardstack/mock-auth": "0.16.9",
+    "@cardstack/mock-auth": "0.16.13",
     "@cardstack/requirejs-monaco-ember-polyfill": "^0.0.1",
-    "@cardstack/test-support": "0.16.9",
-    "@cardstack/ui-components": "^0.2.14",
+    "@cardstack/test-support": "0.16.13",
+    "@cardstack/ui-components": "^0.2.16",
     "@ember/optional-features": "^0.7.0",
     "@ember/render-modifiers": "^1.0.2",
     "@embroider/compat": "^0.10.0",
@@ -81,6 +81,7 @@
     "ember-qunit": "^4.1.2",
     "ember-resolver": "^5.1.3",
     "ember-source": "3.13.1",
+    "ember-test-selectors": "^3.0.0",
     "eslint-plugin-ember": "^7.1.0",
     "eslint-plugin-mocha": "^5.2.0",
     "eslint-plugin-node": "^10.0.0",
@@ -95,7 +96,8 @@
     "node": "8.* || >= 10.*"
   },
   "dependencies": {
-    "ember-svg-jar": "^2.2.3"
+    "ember-svg-jar": "^2.2.3",
+    "lodash": "^4.17.11"
   },
   "volta": {
     "node": "10.12.0"

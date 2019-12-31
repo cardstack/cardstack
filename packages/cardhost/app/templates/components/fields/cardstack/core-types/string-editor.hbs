@@ -1,5 +1,7 @@
 <TextField
   @id={{concat "edit-" @field.name "-field-value"}}
+  @className={{if @field.instructions "with-instructions"}}
   @label={{@field.label}}
+  @helperText={{@field.instructions}}
   @value={{this.fieldValue}}
-  @changeAction={{action this.updateFieldValue}} />
+  @setValue={{action this.updateFieldValue}} />

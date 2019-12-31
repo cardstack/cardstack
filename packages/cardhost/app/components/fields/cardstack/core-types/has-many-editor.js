@@ -8,6 +8,12 @@ export default class HasManyEditor extends BaseEditor {
     if (this.args.field && this.args.field.value) {
       this.fieldValue = this.args.field.value.map(i => i.name).join(', ');
     }
+
+    if (this.args.field.instructions) {
+      this.fieldInstructions = this.args.field.instructions;
+    } else {
+      this.fieldInstructions = 'Please enter card IDs separated by commas';
+    }
   }
 
   @action
