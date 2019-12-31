@@ -10,7 +10,7 @@ export default class CardModelRoute extends Route {
   }
 
   async afterModel(model, transition) {
-    let viewOrEdit = transition.targetName.match(/cards.edit|cards.schema/)
+    let viewOrEdit = transition.targetName.match(/cards.edit|cards.schema/);
 
     // If the user is not logged in, redirect to layout view.
     if (!this.cardstackSession.isAuthenticated && viewOrEdit) {

@@ -12,7 +12,7 @@ export default class CardsController extends Controller {
     } else if (editing && !this.cssModeToggle.isResponsive) {
       return 'full-width editing-css';
     } else if (!this.cardstackSession.isAuthenticated) {
-      return 'full-width'
+      return 'full-width';
     } else {
       return '';
     }
