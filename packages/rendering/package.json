@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/rendering",
-  "version": "0.16.13",
+  "version": "0.16.14",
   "description": "Basic front-end rendering support for Cardstack",
   "keywords": [
     "ember-addon",
@@ -23,7 +23,7 @@
     "node-tests": "mocha ../test-support/bin/run.js"
   },
   "dependencies": {
-    "@cardstack/data": "0.16.13",
+    "@cardstack/data": "0.16.14",
     "ember-cli-babel": "^7.1.2",
     "ember-cli-htmlbars": "^3.0.0",
     "ember-cli-is-component": "^0.5.0",
@@ -32,7 +32,7 @@
     "ember-truth-helpers": "^2.0.0"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.16.13",
+    "@cardstack/eslint-config": "0.16.14",
     "@ember/jquery": "^0.6.0",
     "@ember/optional-features": "^0.6.3",
     "@glimmer/syntax": "^0.25.6",
