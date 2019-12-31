@@ -1,12 +1,7 @@
 <div
+  class="isolated-card cardstack_base-card-isolated {{safe-css-string @card.name}}-isolated {{safe-css-string @card.adoptedFromName}}-isolated"
   data-test-isolated-card={{@card.name}}
-  data-test-isolated-card-mode={{@mode}}
-  class="
-    isolated-card
-    isolated-card--{{@mode}}
-    cardstack_base-card-isolated
-    {{safe-css-string @card.name}}-isolated
-    {{safe-css-string @card.adoptedFromName}}-isolated">
+  data-test-isolated-card-mode={{@mode}}>
   {{#each @card.isolatedFields key="nonce" as |field|}}
     {{#if @setFieldValue}}
       <FieldRenderer

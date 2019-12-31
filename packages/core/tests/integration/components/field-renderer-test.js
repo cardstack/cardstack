@@ -101,14 +101,17 @@ module('Integration | Component | field-renderer', function(hooks) {
 
     await render(hbs`<FieldRenderer @field={{field}} @mode="view"/>`);
 
+    assert.dom('[data-test-field-mode="view"][data-test-field="title"]').exists();
+    assert
+      .dom('[data-test-field="title"].field.title-field.field-type-text-view-field.field-type-string-view-field')
+      .exists();
     assert.dom('[data-test-string-field-viewer-value]').hasText('test title');
     assert.dom('[data-test-string-field-viewer-label]').hasText('Field Title');
     assert.dom('[data-test-field="title"]').doesNotContainText('field instructions');
-    assert.dom('[data-test-field="title"]').hasClass('field title-field');
     assert.dom('input').doesNotExist();
     assert.dom('button').doesNotExist();
-    assert.dom('[data-test-string-field-viewer-label]').hasClass('label title-label');
-    assert.dom('[data-test-string-field-viewer-value]').hasClass('value title-value');
+    assert.dom('[data-test-string-field-viewer-label].label.title-label').exists();
+    assert.dom('[data-test-string-field-viewer-value].value.title-value').exists();
   });
 
   test('it renders field in edit mode', async function(assert) {
@@ -133,6 +136,9 @@ module('Integration | Component | field-renderer', function(hooks) {
     `);
 
     assert.dom('[data-test-field-mode="edit"][data-test-field="title"]').exists();
+    assert
+      .dom('[data-test-field="title"].field.title-field.field-type-text-edit-field.field-type-string-edit-field')
+      .exists();
     assert.dom('[data-test-field-mode="edit"][data-test-field="title"] label').hasText('title');
     assert.dom('[data-test-field-mode="edit"][data-test-field="title"] input').hasValue('test title');
     assert
@@ -209,6 +215,10 @@ module('Integration | Component | field-renderer', function(hooks) {
     />
     `);
 
+    assert.dom('[data-test-field-mode="schema"][data-test-field="title"]').exists();
+    assert
+      .dom('[data-test-field="title"].field.title-field.field-type-text-schema-field.field-type-string-schema-field')
+      .exists();
     assert.dom('[data-test-field-schema-renderer] [data-test-field-renderer-type]').hasText('title (Text)');
     assert.dom('[data-test-field-schema-renderer] [data-test-field-renderer-label]').hasText('Article Title');
     assert.dom('[data-test-field-schema-renderer] [data-test-field-renderer-value]').hasText('test title');
@@ -261,6 +271,10 @@ module('Integration | Component | field-renderer', function(hooks) {
     />
     `);
 
+    assert.dom('[data-test-field-mode="schema"][data-test-field="title"]').exists();
+    assert
+      .dom('[data-test-field="title"].field.title-field.field-type-text-schema-field.field-type-string-schema-field')
+      .exists();
     assert.dom('.schema-field-renderer--header--detail').hasText('Adopted');
     assert.dom('[data-test-field-renderer-field-type]').hasText('@cardstack/core-types::string');
     assert.dom('[data-test-field-renderer-move-btn]').exists();

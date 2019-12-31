@@ -93,7 +93,7 @@ module('Integration | Component | card-renderer', function(hooks) {
       ['title', 'author']
     );
     assert.dom(`[data-test-card-renderer-embedded]`).hasClass('card-renderer-embedded');
-    assert.dom(`[data-test-embedded-card="${card1Id}"].embedded-card.cardstack_base-card-embedded`).exists();
+    assert.dom(`[data-test-embedded-card="${card1Id}"]`).hasClass('cardstack_base-card-embedded');
     assert.dom(`[data-test-embedded-card="${card1Id}"]`).hasClass(`${card1Id}-embedded`);
   });
 
@@ -192,8 +192,9 @@ module('Integration | Component | card-renderer', function(hooks) {
         @mode="view"
       />
     `);
+    assert.dom('[data-test-card-renderer-embedded]').exists();
     assert.dom(`.card-renderer--embedded-card-link`).exists();
-    assert.dom('.embedded-card.cardstack_base-card').exists();
+    assert.dom(`[data-test-embedded-card=${card1Id}]`).exists();
   });
 
   test('it can render an embedded card without the ability to isolate it', async function(assert) {
@@ -209,8 +210,9 @@ module('Integration | Component | card-renderer', function(hooks) {
         @mode="view"
       />
     `);
+    assert.dom('[data-test-card-renderer-embedded]').exists();
     assert.dom(`.card-renderer--embedded-card-link`).doesNotExist();
-    assert.dom('.embedded-card.cardstack_base-card').exists();
+    assert.dom(`[data-test-embedded-card=${card1Id}]`).exists();
   });
 
   test('embedded card does not have a link to isolated card route in edit mode', async function(assert) {
@@ -225,8 +227,9 @@ module('Integration | Component | card-renderer', function(hooks) {
         @mode="edit"
       />
     `);
+    assert.dom(`[data-test-card-renderer-embedded]`).exists();
     assert.dom(`.card-renderer--embedded-card-link`).doesNotExist();
-    assert.dom('.embedded-card.cardstack_base-card').exists();
+    assert.dom(`[data-test-embedded-card=${card1Id}]`).exists();
   });
 
   test('embedded card does not have a link to isolated card route in schema mode', async function(assert) {
@@ -242,7 +245,7 @@ module('Integration | Component | card-renderer', function(hooks) {
       />
     `);
     assert.dom(`.card-renderer--embedded-card-link`).doesNotExist();
-    assert.dom('.embedded-card.cardstack_base-card').exists();
+    assert.dom(`[data-test-embedded-card=${card1Id}]`).exists();
   });
 
   test('renders an isolated card in edit mode', async function(assert) {

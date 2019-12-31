@@ -1,11 +1,7 @@
 <div
+  class="embedded-card cardstack_base-card-embedded {{safe-css-string @card.name}}-embedded {{safe-css-string @card.adoptedFromName}}-embedded"
   data-test-embedded-card={{@card.name}}
-  data-test-embedded-card-mode={{@mode}}
-  class="embedded-card
-    embedded-card--{{@mode}}
-    cardstack_base-card-embedded
-    {{safe-css-string @card.name}}-embedded
-    {{safe-css-string @card.adoptedFromName}}-embedded">
+  data-test-embedded-card-mode={{@mode}}>
   {{#each @card.embeddedFields key="nonce" as | field |}}
     {{#if (eq @mode "schema")}}
       <FieldRenderer @field={{field}} @mode="view"/>
