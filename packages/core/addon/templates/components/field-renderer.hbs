@@ -16,7 +16,7 @@
     {{if (eq @field @selectedField) " selected"}}"
   tabindex={{@field.position}}
   data-test-field={{@field.name}}
-  data-test-field-type={{this.dasherizedType}}
+  data-test-field-type={{@field.type}}
   data-test-field-mode={{@mode}}
   {{did-update this.updateFieldProperties this.nonce}}
 >
