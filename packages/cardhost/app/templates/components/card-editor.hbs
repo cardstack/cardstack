@@ -24,7 +24,9 @@
 
 <RightEdge
   @card={{this.card}}
-  @mode="edit" />
+  @mode="edit"
+  @cardSelected={{true}} {{!-- Change this when we want to display different right-edge options --}}
+/>
 
 <section
   class="card-editor"
@@ -36,6 +38,8 @@
     @mode="edit"
     @setFieldValue={{action this.setFieldValue}}
     @format="isolated"
+    @selectField={{action this.selectField}}
+    @selectedField={{this.selectedField}}
     @cardSelected={{this.cardSelected}}
     @cardFocused={{action (mut this.cardSelected)}} />
 </section>

@@ -25,6 +25,7 @@
   <CardRenderer
     @card={{this.model}}
     @format="isolated"
+    @cardSelected={{true}} {{!-- Card is always selected --}}
   />
 </section>
 
@@ -48,7 +49,7 @@
 {{else}}
   <RightEdge
     @card={{this.model}}
-    @cardSelected={{true}}
+    @cardSelected={{true}} {{!-- Change this when we want to display different right-edge options --}}
   >
     <div class="right-edge--section">
       <div class="right-edge--section-header" data-test-section-header>

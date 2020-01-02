@@ -8,17 +8,19 @@
 
   width: 100%;
   height: 100vh;
-  transition: var(--ch-card-background-color-animate), var(--ch-card-padding-animate);
   background-color: var(--ch-default);
   overflow: hidden;
   padding-top: var(--padding-top);
   padding-left: var(--padding-left);
   padding-right: var(--padding-right);
+
+  transition: padding-left var(--ch-transition-time) ease-in-out,
+              var(--ch-card-padding-animate),
+              var(--ch-card-background-color-animate);
 }
 
-.cardhost-cards.edit,
 .cardhost-cards.view {
-  --padding-left: var(--ch-left-edge-navbar-width);
+  padding-left: var(--ch-left-edge-navbar-width);
 }
 
 .cardhost-cards.schema {
@@ -34,4 +36,11 @@
   justify-items: center;
   height: 100%;
   padding: 0 20px;
+}
+
+
+@media (max-width: 1440px) {
+  .cardhost-cards.edit {
+    padding-left: var(--ch-left-edge-navbar-width);
+  }
 }

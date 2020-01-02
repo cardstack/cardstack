@@ -17,26 +17,28 @@
             before implemnenting that, as that will make this easy
             --}}
             <div class="right-edge--sections">
-              <div class="right-edge--section">
-                <div class="right-edge--section-header" data-test-section-header>ID</div>
-                <div class="right-edge--item">
-                  <TextField
-                    @theme="cs-dark"
-                    @class="hide-in-percy"
-                    @id="card__id"
-                    @label="Card ID"
-                    @placeholder="e.g. millenial-puppies"
-                    @value={{this.cardName}}
-                    @setValue={{action this.updateCardId}}
-                    @disabled={{or (not @updateCardId) (not @card.isNew)}} />
-                </div>
-                <div class="right-edge--item">
-                  <div class="right-edge--label">Internal ID</div>
-                  <div class="hide-in-percy" data-test-internal-card-id>
-                    {{@card.id}}
+              {{#if (eq @mode "schema")}}
+                <div class="right-edge--section">
+                  <div class="right-edge--section-header" data-test-section-header>ID</div>
+                  <div class="right-edge--item">
+                    <TextField
+                      @theme="cs-dark"
+                      @class="hide-in-percy"
+                      @id="card__id"
+                      @label="Card ID"
+                      @placeholder="e.g. millenial-puppies"
+                      @value={{this.cardName}}
+                      @setValue={{action this.updateCardId}}
+                      @disabled={{or (not @updateCardId) (not @card.isNew)}} />
+                  </div>
+                  <div class="right-edge--item">
+                    <div class="right-edge--label">Internal ID</div>
+                    <div class="hide-in-percy" data-test-internal-card-id>
+                      {{@card.id}}
+                    </div>
                   </div>
                 </div>
-              </div>
+              {{/if}}
 
               <div class="right-edge--section">
                 <div class="right-edge--section-header" data-test-section-header>
