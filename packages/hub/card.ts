@@ -4,6 +4,7 @@ import { WriterFactory } from './writer';
 import { PristineDocument, UpstreamDocument, UpstreamIdentity, PristineCollection } from './document';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import cloneDeep from 'lodash/cloneDeep';
+import isPlainObject from 'lodash/isPlainObject';
 import { CardExpression } from './pgsearch/util';
 import { ResponseMeta } from './pgsearch/pgclient';
 import * as J from 'json-typescript';
@@ -46,7 +47,10 @@ export function canonicalURL(id: CardId): string {
   }
 }
 
-export async function makePristineCollection(cards: Card[], meta: ResponseMeta): Promise<PristineCollection> {
+export async function makePristineCollection(
+  cards: AddressableCard[],
+  meta: ResponseMeta
+): Promise<PristineCollection> {
   let pristineDocs = await Promise.all(cards.map(card => card.asPristineDoc()));
   // TODO includeds
   return new PristineCollection({
@@ -55,7 +59,7 @@ export async function makePristineCollection(cards: Card[], meta: ResponseMeta):
   });
 }
 
-class BaseCard {
+export class Card {
   // This is the realm the card is stored in.
   csRealm: string;
 
@@ -69,6 +73,7 @@ class BaseCard {
   csId: string | undefined;
 
   private jsonapi: SingleResourceDoc;
+  private ownFields: Map<string, Card> = new Map();
 
   // Identity invariants:
   //
@@ -94,10 +99,30 @@ class BaseCard {
     if (typeof jsonapi.data.attributes?.csId === 'string') {
       this.csId = jsonapi.data.attributes?.csId;
     }
+
+    let fields = this.jsonapi.data.attributes?.csFields;
+    if (fields) {
+      if (!isPlainObject(fields)) {
+        throw new CardstackError(`csFields must be an object`);
+      }
+      for (let [name, value] of Object.entries(fields)) {
+        this.ownFields.set(name, service.instantiate(value, this));
+      }
+    }
   }
 
-  async field(name: string): Promise<any> {
+  async validate(_priorCard: AddressableCard | null, _realm: AddressableCard, _forDeletion?: true) {}
+
+  async value(name: string): Promise<any> {
     return this.jsonapi.data.attributes?.[name];
+  }
+
+  async field(name: string): Promise<Card> {
+    let field = this.ownFields.get(name);
+    if (field) {
+      return field;
+    }
+    throw new Error(`no such field ${name} on card`);
   }
 
   protected regenerateJSONAPI(): SingleResourceDoc {
@@ -115,7 +140,7 @@ class BaseCard {
       copied.data.attributes.csId = this.csId;
     }
 
-    if (this instanceof Card) {
+    if (this instanceof AddressableCard) {
       copied.data.id = this.canonicalURL;
     }
 
@@ -154,7 +179,7 @@ class BaseCard {
     }
   }
 
-  async adoptsFrom(): Promise<Card | undefined> {
+  async adoptsFrom(): Promise<AddressableCard | undefined> {
     let adoptsFromRelationship = this.jsonapi.data.relationships?.csAdoptsFrom;
     if (adoptsFromRelationship && `links` in adoptsFromRelationship) {
       let url = adoptsFromRelationship.links.related;
@@ -168,20 +193,20 @@ class BaseCard {
   }
 }
 
-export class UnsavedCard extends BaseCard {
-  asSavedCard(): Card {
+export class UnsavedCard extends Card {
+  asAddressableCard(): AddressableCard {
     if (typeof this.csId !== 'string') {
       throw new CardstackError(`card missing required attribute "csId"`);
     }
-    return new Card(this.regenerateJSONAPI(), this.service);
+    return new AddressableCard(this.regenerateJSONAPI(), this.service);
   }
 }
 
-export class Card extends UnsavedCard implements CardId {
+export class AddressableCard extends UnsavedCard implements CardId {
   // these are non-null because of the assertion in our construction that
   // ensures csId is present.
   csId!: string;
-  upstreamId!: NonNullable<BaseCard['upstreamId']>;
+  upstreamId!: NonNullable<Card['upstreamId']>;
 
   constructor(jsonapi: SingleResourceDoc, service: ScopedCardService) {
     if (typeof jsonapi.data.attributes?.csRealm !== 'string') {

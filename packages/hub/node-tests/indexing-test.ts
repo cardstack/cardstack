@@ -125,7 +125,7 @@ describe('hub/indexing', function() {
   it('it does not index unchanged cards since the last time the ephemeral realm was indexed', async function() {
     async function cardsWithStep(n: number): Promise<number> {
       let found = await cards.as(Session.INTERNAL_PRIVILEGED).search({});
-      let steps = await Promise.all(found.cards.map(c => c.field('step')));
+      let steps = await Promise.all(found.cards.map(c => c.value('step')));
       return steps.filter(step => step === n).length;
     }
 

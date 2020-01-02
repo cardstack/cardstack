@@ -79,7 +79,7 @@ describe('hub/card-service', function() {
       card = await service.update(card, jsonapi);
       let newVersion = (await card.asPristineDoc()).jsonapi.data.meta?.version as number;
 
-      expect(await card.field('foo')).to.equal('poo');
+      expect(await card.value('foo')).to.equal('poo');
       expect(newVersion).to.be.ok;
       expect(newVersion).to.not.equal(version);
       expect(storage.getEntry(card, card.csRealm)?.doc?.jsonapi.data.attributes?.foo).to.equal('poo');
@@ -94,7 +94,7 @@ describe('hub/card-service', function() {
       jsonapi.data.attributes!.foo = 'poo';
       card = await service.update(card.canonicalURL, jsonapi);
 
-      expect(await card.field('foo')).to.equal('poo');
+      expect(await card.value('foo')).to.equal('poo');
     });
 
     it('can update a card with a patch', async function() {
@@ -108,8 +108,8 @@ describe('hub/card-service', function() {
 
       card = await service.update(card, jsonapi);
 
-      expect(await card.field('foo')).to.equal('poo');
-      expect(await card.field('hello')).to.equal('world');
+      expect(await card.value('foo')).to.equal('poo');
+      expect(await card.value('hello')).to.equal('world');
     });
 
     it('it does not update a card that uses ephemeral storage when the meta.version is missing', async function() {
@@ -184,7 +184,7 @@ describe('hub/card-service', function() {
       expect(storage.entriesNewerThan(card.csRealm).filter(entry => Boolean(entry.doc)).length).to.equal(1);
     });
 
-    it.skip('rejects unknown attribute at create', async function() {
+    it('rejects unknown attribute at create', async function() {
       let doc = testCard()
         .withAttributes({ badField: 'hello' })
         .withField('badField', null);

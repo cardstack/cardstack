@@ -1,5 +1,5 @@
 import { Session } from './session';
-import { UnsavedCard, Card, CardId, canonicalURLToCardId } from './card';
+import { UnsavedCard, AddressableCard, Card, CardId, canonicalURLToCardId } from './card';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
 import CardstackError from './error';
 import { myOrigin } from './origin';
@@ -9,7 +9,6 @@ import { SingleResourceDoc } from 'jsonapi-typescript';
 import { Query } from './query';
 import { ResponseMeta } from './pgsearch/pgclient';
 import { Writer } from './writer';
-import { validate } from './validation';
 
 export default class CardsService {
   pgclient = inject('pgclient');
@@ -22,15 +21,21 @@ export default class CardsService {
 export class ScopedCardService {
   constructor(private cards: CardsService, private session: Session) {}
 
-  instantiate(jsonapi: SingleResourceDoc): Card {
-    return new Card(jsonapi, this);
+  instantiate(jsonapi: SingleResourceDoc): AddressableCard;
+  instantiate(jsonapi: SingleResourceDoc, enclosingCard: Card): Card;
+  instantiate(jsonapi: SingleResourceDoc, enclosingCard?: Card): AddressableCard | Card {
+    if (enclosingCard) {
+      return new Card(jsonapi, enclosingCard.csRealm, this);
+    } else {
+      return new AddressableCard(jsonapi, this);
+    }
   }
 
-  async create(realm: string, doc: SingleResourceDoc): Promise<Card> {
+  async create(realm: string, doc: SingleResourceDoc): Promise<AddressableCard> {
     let realmCard = await this.getRealm(realm);
     let writer = await this.loadWriter(realmCard);
     let card: UnsavedCard = new UnsavedCard(doc, realm, this);
-    await validate(null, card, realmCard);
+    await card.validate(null, realmCard);
 
     let upstreamIdToWriter = card.upstreamId;
     let { saved, id: upstreamIdFromWriter } = await writer.create(
@@ -42,7 +47,7 @@ export class ScopedCardService {
       throw new CardstackError(`Writer plugin for realm ${realm} tried to change a csId it's not allowed to change`);
     }
     card.csId = typeof upstreamIdFromWriter === 'object' ? upstreamIdFromWriter.csId : upstreamIdFromWriter;
-    let savedCard = card.asSavedCard();
+    let savedCard = card.asAddressableCard();
     savedCard.patch(saved.jsonapi);
 
     let batch = this.cards.pgclient.beginCardBatch(this);
@@ -52,9 +57,9 @@ export class ScopedCardService {
     return savedCard;
   }
 
-  async update(id: CardId, doc: SingleResourceDoc): Promise<Card>;
-  async update(canonicalURL: string, doc: SingleResourceDoc): Promise<Card>;
-  async update(idOrURL: CardId | string, doc: SingleResourceDoc): Promise<Card> {
+  async update(id: CardId, doc: SingleResourceDoc): Promise<AddressableCard>;
+  async update(canonicalURL: string, doc: SingleResourceDoc): Promise<AddressableCard>;
+  async update(idOrURL: CardId | string, doc: SingleResourceDoc): Promise<AddressableCard> {
     let id = asCardId(idOrURL);
     let realmCard = await this.getRealm(id.csRealm);
     let writer = await this.loadWriter(realmCard);
@@ -64,8 +69,8 @@ export class ScopedCardService {
       delete previousDoc.data.meta.version; // don't what the previous version's version to bleed thru
     }
     let patchedDoc = patch(previousDoc, doc);
-    let updatedCard: Card = this.instantiate(patchedDoc);
-    await validate(await this.get(id), updatedCard, realmCard);
+    let updatedCard: AddressableCard = this.instantiate(patchedDoc);
+    await updatedCard.validate(await this.get(id), realmCard);
 
     let saved = await writer.update(this.session, updatedCard.upstreamId, await updatedCard.asUpstreamDoc());
     updatedCard.patch(saved.jsonapi);
@@ -84,7 +89,7 @@ export class ScopedCardService {
     let realmCard = await this.getRealm(id.csRealm);
     let writer = await this.loadWriter(realmCard);
     let card = await this.get(id);
-    await validate(card, null, realmCard);
+    await card.validate(null, realmCard, true);
 
     await writer.delete(this.session, card.upstreamId, version);
     let batch = this.cards.pgclient.beginCardBatch(this);
@@ -92,7 +97,7 @@ export class ScopedCardService {
     await batch.done();
   }
 
-  async search(query: Query): Promise<{ cards: Card[]; meta: ResponseMeta }> {
+  async search(query: Query): Promise<{ cards: AddressableCard[]; meta: ResponseMeta }> {
     let cards = await scaffoldSearch(query, this);
     if (cards) {
       return { cards, meta: { page: { total: cards.length } } };
@@ -102,9 +107,9 @@ export class ScopedCardService {
     return { cards: foundCards, meta };
   }
 
-  async get(id: CardId): Promise<Card>;
-  async get(canonicalURL: string): Promise<Card>;
-  async get(idOrURL: CardId | string): Promise<Card> {
+  async get(id: CardId): Promise<AddressableCard>;
+  async get(canonicalURL: string): Promise<AddressableCard>;
+  async get(idOrURL: CardId | string): Promise<AddressableCard> {
     // this exists to throw if there's no such realm. We're not using the return
     // value yet but we will onc we implement custom searchers and realm grants.
     let id = asCardId(idOrURL);
@@ -117,7 +122,7 @@ export class ScopedCardService {
     return await this.cards.pgclient.get(this, id);
   }
 
-  private async loadWriter(realmCard: Card): Promise<Writer> {
+  private async loadWriter(realmCard: AddressableCard): Promise<Writer> {
     let writerFactory = await realmCard.loadFeature('writer');
     if (!writerFactory) {
       throw new CardstackError(`realm "${realmCard.canonicalURL}" is not writable`, {
@@ -127,7 +132,7 @@ export class ScopedCardService {
     return await getOwner(this.cards).instantiate(writerFactory, realmCard);
   }
 
-  private async getRealm(realm: string): Promise<Card> {
+  private async getRealm(realm: string): Promise<AddressableCard> {
     // This searches by realm and csId. Even though it doesn't search by
     // originalRealm, it's unique because of the special property that Realm
     // cards have that their csId contains the complete URL to the realm. So

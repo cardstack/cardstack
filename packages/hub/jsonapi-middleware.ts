@@ -10,7 +10,7 @@ import CardstackError from './error';
 import { SessionContext } from './authentication-middleware';
 import { assertSingleResourceDoc } from './jsonapi';
 import { myOrigin } from './origin';
-import { makePristineCollection, apiPrefix, Card, CardId } from './card';
+import { makePristineCollection, apiPrefix, AddressableCard, CardId } from './card';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { parse } from 'qs';
 import { assertQuery } from './query';
@@ -125,7 +125,7 @@ export default class JSONAPIMiddleware {
     ctxt.status = 200;
   }
 
-  private localURLFor(card: Card): string {
+  private localURLFor(card: AddressableCard): string {
     if (new URL(card.csRealm).origin === myOrigin) {
       return card.canonicalURL;
     } else {

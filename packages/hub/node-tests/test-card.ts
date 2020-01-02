@@ -134,6 +134,7 @@ export class TestCard {
         csFields[fieldName] = testCard.jsonapi;
       }
     }
+    doc.data.attributes.csFields = csFields;
 
     return doc;
   }

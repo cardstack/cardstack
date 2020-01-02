@@ -22,7 +22,7 @@ import {
   FieldValue,
   FieldArity,
 } from './util';
-import { Card, CardId } from '../card';
+import { AddressableCard, CardId } from '../card';
 import CardstackError from '../error';
 import { Query, baseType, Filter, EqFilter, RangeFilter } from '../query';
 import { Sorts } from './sorts';
@@ -246,7 +246,7 @@ export default class PgClient {
     throw new Error(`${path} unimplemented in handleFieldArity for ${errorHint}`);
   }
 
-  async get(cards: ScopedCardService, id: CardId): Promise<Card> {
+  async get(cards: ScopedCardService, id: CardId): Promise<AddressableCard> {
     let condition = every([
       [`cs_realm = `, param(id.csRealm)],
       [`cs_original_realm = `, param(id.csOriginalRealm ?? id.csRealm)],
@@ -267,7 +267,7 @@ export default class PgClient {
   async search(
     cards: ScopedCardService,
     { filter, queryString, sort, page }: Query
-  ): Promise<{ cards: Card[]; meta: ResponseMeta }> {
+  ): Promise<{ cards: AddressableCard[]; meta: ResponseMeta }> {
     let conditions = [] as CardExpression[];
 
     if (filter) {
@@ -371,7 +371,7 @@ export class Batch {
 
   constructor(private client: PgClient, private cards: ScopedCardService) {}
 
-  async save(card: Card) {
+  async save(card: AddressableCard) {
     /* eslint-disable @typescript-eslint/camelcase */
     let row = {
       cs_realm: param(card.csRealm),

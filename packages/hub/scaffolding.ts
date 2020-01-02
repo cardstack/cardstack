@@ -1,4 +1,4 @@
-import { Card, CardId } from './card';
+import { AddressableCard, CardId } from './card';
 import { Query } from './query';
 import { myOrigin } from './origin';
 import { WriterFactory } from './writer';
@@ -44,7 +44,7 @@ function ephemeralRealms(cards: ScopedCardService) {
   ];
 }
 
-export async function search(query: Query, cards: ScopedCardService): Promise<Card[] | null> {
+export async function search(query: Query, cards: ScopedCardService): Promise<AddressableCard[] | null> {
   // this is currently special-cased to only handle searches for realms.
   // Everything else throws unimplemented.
 
@@ -60,7 +60,7 @@ export async function search(query: Query, cards: ScopedCardService): Promise<Ca
   return ephemeralRealms(cards).filter(card => card.csId === searchingFor);
 }
 
-export async function get(id: CardId, cards: ScopedCardService): Promise<Card | null> {
+export async function get(id: CardId, cards: ScopedCardService): Promise<AddressableCard | null> {
   if (
     id.csRealm === 'https://base.cardstack.com/public' &&
     (id.csOriginalRealm ?? id.csRealm) === 'https://base.cardstack.com/public' &&
@@ -77,14 +77,14 @@ export async function get(id: CardId, cards: ScopedCardService): Promise<Card | 
   return null;
 }
 
-export async function loadWriter(card: Card, cards: ScopedCardService): Promise<WriterFactory> {
+export async function loadWriter(card: AddressableCard, cards: ScopedCardService): Promise<WriterFactory> {
   if (ephemeralRealms(cards).find(realm => realm.canonicalURL === card.canonicalURL)) {
     return (await import('./ephemeral/writer')).default;
   }
   throw new Error(`unimplemented`);
 }
 
-export async function loadIndexer(card: Card, cards: ScopedCardService): Promise<IndexerFactory<unknown>> {
+export async function loadIndexer(card: AddressableCard, cards: ScopedCardService): Promise<IndexerFactory<unknown>> {
   if (ephemeralRealms(cards).find(realm => realm.canonicalURL === card.canonicalURL)) {
     return (await import('./ephemeral/indexer')).default as IndexerFactory<unknown>;
   }

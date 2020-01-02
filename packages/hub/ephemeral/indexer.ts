@@ -1,6 +1,6 @@
 import { Indexer, IndexingOperations } from '../indexer';
 import { inject } from '../dependency-injection';
-import { Card } from '../card';
+import { AddressableCard } from '../card';
 
 interface EphemeralMeta {
   identity: number;
@@ -10,7 +10,7 @@ interface EphemeralMeta {
 export default class EphemeralIndexer implements Indexer<EphemeralMeta> {
   ephemeralStorage = inject('ephemeralStorage');
 
-  constructor(private realmCard: Card) {}
+  constructor(private realmCard: AddressableCard) {}
 
   async update(meta: EphemeralMeta, ops: IndexingOperations) {
     let { identity, generation } = meta || {};

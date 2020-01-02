@@ -1,10 +1,10 @@
-import { Card, CardId } from './card';
+import { AddressableCard, CardId } from './card';
 import { Batch } from './pgsearch/pgclient';
 import { UpstreamDocument } from './document';
 import { ScopedCardService } from './cards-service';
 
 export interface IndexerFactory<Meta> {
-  new (realmCard: Card): Indexer<Meta>;
+  new (realmCard: AddressableCard): Indexer<Meta>;
 }
 
 export interface Indexer<Meta> {
@@ -12,7 +12,7 @@ export interface Indexer<Meta> {
 }
 
 export class IndexingOperations {
-  constructor(private realmCard: Card, private batch: Batch, private cards: ScopedCardService) {}
+  constructor(private realmCard: AddressableCard, private batch: Batch, private cards: ScopedCardService) {}
 
   async save(doc: UpstreamDocument) {
     return await this.batch.save(this.cards.instantiate(doc.jsonapi));
