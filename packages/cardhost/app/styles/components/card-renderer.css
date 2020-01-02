@@ -102,7 +102,6 @@
 
 .card-renderer-isolated.view .card-renderer-isolated--card-container {
   background: var(--ch-light);
-  border: none;
 }
 
 
