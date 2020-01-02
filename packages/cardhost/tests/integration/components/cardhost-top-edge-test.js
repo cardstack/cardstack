@@ -12,7 +12,7 @@ module('Integration | Component | cardhost-top-edge', function(hooks) {
 
     await render(hbs`<CardhostTopEdge />`);
 
-    assert.equal(this.element.textContent.trim(), '');
+    assert.equal(this.element.textContent.trim(), 'Login');
 
     // Template block usage:
     await render(hbs`
@@ -21,6 +21,6 @@ module('Integration | Component | cardhost-top-edge', function(hooks) {
       </CardhostTopEdge>
     `);
 
-    assert.equal(this.element.textContent.trim(), 'template block text');
+    assert.ok(this.element.textContent.trim().includes('template block text'));
   });
 });

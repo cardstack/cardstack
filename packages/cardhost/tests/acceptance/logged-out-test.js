@@ -1,12 +1,11 @@
 import { module, test } from 'qunit';
-import { find, visit, currentURL, waitFor, settled, click } from '@ember/test-helpers';
+import { visit, currentURL, waitFor, click } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures';
 import { createCards } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 
-const timeout = 20000;
 const card1Id = 'millenial-puppies';
 const qualifiedCard1Id = `local-hub::${card1Id}`;
 
@@ -19,7 +18,7 @@ const scenario = new Fixtures({
   },
 });
 
-module('Acceptance | auth', function(hooks) {
+module('Acceptance | logged-out', function(hooks) {
   setupApplicationTest(hooks);
   scenario.setupTest(hooks);
   hooks.beforeEach(function() {
@@ -40,7 +39,8 @@ module('Acceptance | auth', function(hooks) {
     assert.dom('[data-test-card-save-btn]').doesNotExist();
     assert.dom('[data-test-right-edge]').doesNotExist();
     await percySnapshot(assert);
-    await login();
+    await click('#login-button');
+    await waitFor('[data-test-mode-switcher]');
     assert.dom('[data-test-mode-switcher]').exists();
     assert.dom('[data-test-card-save-btn]').exists();
     assert.dom('[data-test-right-edge]').exists();
