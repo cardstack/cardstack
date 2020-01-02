@@ -66,6 +66,20 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('#card__id').isDisabled();
   });
 
+  test(`can expand a right edge section`, async function(assert) {
+    await login();
+    await createCards({
+      [card1Id]: [['body', 'string', false, 'test body']],
+    });
+    await visit(`/cards/${card1Id}/schema`);
+
+    assert.dom('.right-edge--item [data-test-adopted-card-name]').doesNotExist();
+
+    await click('[data-test-right-edge-section-toggle]');
+
+    assert.dom('.right-edge--item [data-test-adopted-card-name]').hasText('card-id');
+  });
+
   test(`renaming a card's field`, async function(assert) {
     await login();
     await createCards({

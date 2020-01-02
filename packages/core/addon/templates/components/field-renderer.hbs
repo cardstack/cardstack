@@ -113,6 +113,8 @@
         <div class="ch-input-group" data-test-schema-attr={{schemaAttr}}>
           <TextField
             @id={{concat "edit-field-name-" @field.nonce "-" this.renderNonce}}
+            @theme="cs-dark"
+            @label="Field ID"
             @value={{this.newFieldName}}
             @label="Field Name"
             @theme="cs-dark"
