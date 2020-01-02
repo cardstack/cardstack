@@ -2,8 +2,6 @@ import { AddressableCard, CardId } from './card';
 import { Query } from './query';
 import { myOrigin } from './origin';
 import { WriterFactory } from './writer';
-import { SingleResourceDoc } from 'jsonapi-typescript';
-import merge from 'lodash/merge';
 import { testCard } from './node-tests/test-card';
 import { CardExpression } from './pgsearch/util';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
@@ -89,10 +87,6 @@ export async function loadIndexer(card: AddressableCard, cards: ScopedCardServic
     return (await import('./ephemeral/indexer')).default as IndexerFactory<unknown>;
   }
   throw new Error(`unimplemented`);
-}
-
-export function patch(target: SingleResourceDoc, source: SingleResourceDoc) {
-  return merge({}, target, source);
 }
 
 export function buildValueExpression(expression: CardExpression): CardExpression {

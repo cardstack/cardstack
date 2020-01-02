@@ -41,7 +41,7 @@
         "--timeout",
         "200000",
         "--grep",
-        "can create a card that adopts from another"
+        "it does not update a card that uses ephemeral storage when the meta.version is missing"
       ]
     },
     {

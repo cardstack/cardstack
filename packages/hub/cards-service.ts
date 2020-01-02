@@ -3,7 +3,7 @@ import { UnsavedCard, AddressableCard, Card, CardId, canonicalURLToCardId } from
 import { CARDSTACK_PUBLIC_REALM } from './realm';
 import CardstackError from './error';
 import { myOrigin } from './origin';
-import { search as scaffoldSearch, get as scaffoldGet, patch } from './scaffolding';
+import { search as scaffoldSearch, get as scaffoldGet } from './scaffolding';
 import { getOwner, inject } from './dependency-injection';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { Query } from './query';
@@ -64,13 +64,9 @@ export class ScopedCardService {
     let realmCard = await this.getRealm(id.csRealm);
     let writer = await this.loadWriter(realmCard);
     let previousCard = await this.get(id);
-    let previousDoc = (await previousCard.asUpstreamDoc()).jsonapi;
-    if (previousDoc.data.meta) {
-      delete previousDoc.data.meta.version; // don't what the previous version's version to bleed thru
-    }
-    let patchedDoc = patch(previousDoc, doc);
-    let updatedCard: AddressableCard = this.instantiate(patchedDoc);
-    await updatedCard.validate(await this.get(id), realmCard);
+    let updatedCard = previousCard.clone();
+    updatedCard.patch(doc);
+    await updatedCard.validate(previousCard, realmCard);
 
     let saved = await writer.update(this.session, updatedCard.upstreamId, await updatedCard.asUpstreamDoc());
     updatedCard.patch(saved.jsonapi);

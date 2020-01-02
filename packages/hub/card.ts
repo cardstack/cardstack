@@ -1,10 +1,11 @@
 import CardstackError from './error';
-import { loadIndexer, loadWriter, patch, buildValueExpression } from './scaffolding';
+import { loadIndexer, loadWriter, buildValueExpression } from './scaffolding';
 import { WriterFactory } from './writer';
 import { PristineDocument, UpstreamDocument, UpstreamIdentity, PristineCollection } from './document';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import cloneDeep from 'lodash/cloneDeep';
 import isPlainObject from 'lodash/isPlainObject';
+import mergeWith from 'lodash/mergeWith';
 import { CardExpression } from './pgsearch/util';
 import { ResponseMeta } from './pgsearch/pgclient';
 import * as J from 'json-typescript';
@@ -72,7 +73,7 @@ export class Card {
   // chosen by the hub.
   csId: string | undefined;
 
-  private jsonapi: SingleResourceDoc;
+  protected jsonapi: SingleResourceDoc;
   private ownFields: Map<string, Card> = new Map();
 
   // Identity invariants:
@@ -100,7 +101,7 @@ export class Card {
       this.csId = jsonapi.data.attributes?.csId;
     }
 
-    let fields = this.jsonapi.data.attributes?.csFields;
+    let fields = jsonapi.data.attributes?.csFields;
     if (fields) {
       if (!isPlainObject(fields)) {
         throw new CardstackError(`csFields must be an object`);
@@ -109,6 +110,10 @@ export class Card {
         this.ownFields.set(name, service.instantiate(value, this));
       }
     }
+  }
+
+  clone(): Card {
+    return new Card(this.jsonapi, this.csRealm, this.service);
   }
 
   async validate(_priorCard: AddressableCard | null, _realm: AddressableCard, _forDeletion?: true) {}
@@ -156,7 +161,7 @@ export class Card {
   }
 
   patch(otherDoc: SingleResourceDoc): void {
-    patch(this.jsonapi, otherDoc);
+    this.jsonapi = mergeWith({}, this.jsonapi, otherDoc, everythingButMeta);
   }
 
   // This is the way that data source plugins think about card IDs. The
@@ -221,6 +226,10 @@ export class AddressableCard extends UnsavedCard implements CardId {
     }
   }
 
+  clone(): AddressableCard {
+    return new AddressableCard(this.jsonapi, this.service);
+  }
+
   async loadFeature(featureName: 'writer'): Promise<WriterFactory | null>;
   async loadFeature(featureName: 'indexer'): Promise<IndexerFactory<J.Value> | null>;
   async loadFeature(featureName: 'buildValueExpression'): Promise<(expression: CardExpression) => CardExpression>;
@@ -246,4 +255,11 @@ export interface CardId {
   csRealm: string;
   csOriginalRealm?: string; // if not set, its implied that its equal to `realm`.
   csId: string;
+}
+
+function everythingButMeta(_objValue: any, srcValue: any, key: string) {
+  if (key === 'meta') {
+    // meta fields don't merge, the new entire "meta" object overwrites
+    return srcValue;
+  }
 }
