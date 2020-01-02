@@ -287,7 +287,7 @@ module('Acceptance | card edit', function(hooks) {
 
     assert.dom('[data-test-right-edge]').exists();
     assert.dom('[data-test-internal-card-id]').doesNotExist();
-    assert.dom('[data-test-no-adoption]').exists();
-    assert.dom('[data-test-right-edge-section="appearance"]').doesNotExist();
+    assert.dom('[data-test-appearance-section]').doesNotExist();
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('Base Card');
   });
 });
