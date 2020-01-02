@@ -17,9 +17,23 @@
             before implemnenting that, as that will make this easy
             --}}
             <div class="right-edge--sections">
+              <div class="right-edge--section">
+                <div class="right-edge--section-header" data-test-section-header>
+                  Template
+                </div>
+                <div class="right-edge--item">
+                  {{#if @card.adoptedFrom}}
+                    <AdoptedFrom @card={{@card.adoptedFrom}} @adoptedCard={{@card}} />
+                  {{else}}
+                    <div data-test-no-adoption>
+                      No Adoption
+                    </div>
+                  {{/if}}
+                </div>
+              </div>
               {{#if (eq @mode "schema")}}
                 <div class="right-edge--section">
-                  <div class="right-edge--section-header" data-test-section-header>ID</div>
+                  <div class="right-edge--section-header" data-test-section-header>Details</div>
                   <div class="right-edge--item">
                     <TextField
                       @theme="cs-dark"
@@ -39,21 +53,6 @@
                   </div>
                 </div>
               {{/if}}
-
-              <div class="right-edge--section">
-                <div class="right-edge--section-header" data-test-section-header>
-                  Template
-                </div>
-                <div class="right-edge--item">
-                  {{#if @card.adoptedFrom}}
-                    <AdoptedFrom @card={{@card.adoptedFrom}} @adoptedCard={{@card}} />
-                  {{else}}
-                    <div data-test-no-adoption>
-                      No Adoption
-                    </div>
-                  {{/if}}
-                </div>
-              </div>
             </div>
           {{else if @selectedField}}
             <div class="right-edge--sections">
@@ -80,7 +79,7 @@
                         @setFieldName={{@setFieldName}}
                         @setFieldLabel={{@setFieldLabel}}
                         @setFieldInstructions={{@setFieldInstructions}}
-                        @schemaAttrs={{array "name" "label" "instructions" "embedded"}} />
+                        @schemaAttrs={{array "label" "name" "instructions" "embedded"}} />
                     </div>
                   </div>
                 {{/animated-value}}

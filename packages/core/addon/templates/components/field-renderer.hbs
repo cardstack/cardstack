@@ -112,8 +112,9 @@
       {{else if (and (eq schemaAttr "name") @setFieldName)}}
         <div data-test-schema-attr={{schemaAttr}}>
           <TextField
+            @id={{concat "edit-field-name-" @field.nonce "-" this.renderNonce}}
             @theme="cs-dark"
-            @label="Field Name"
+            @label="Field ID"
             @value={{this.newFieldName}}
             @setValue={{action this.updateFieldName}}
             @disabled={{@field.isAdopted}} />
