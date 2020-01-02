@@ -22,6 +22,10 @@
 
 <CardhostLeftEdge />
 
+<RightEdge
+  @card={{this.card}}
+  @mode="edit" />
+
 <section
   class="card-editor"
   data-test-card-edit={{this.card.name}}
@@ -32,7 +36,8 @@
     @mode="edit"
     @setFieldValue={{action this.setFieldValue}}
     @format="isolated"
-  />
+    @cardSelected={{this.cardSelected}}
+    @cardFocused={{action (mut this.cardSelected)}} />
 </section>
 
 <section class="cardhost-card-document">

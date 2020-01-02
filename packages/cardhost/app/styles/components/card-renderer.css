@@ -55,22 +55,6 @@
   transition: stroke var(--ch-transition-time);
 }
 
-.card-renderer-isolated:focus {
-  outline: 0;
-}
-
-.card-renderer-isolated.selected .card-renderer-isolated--header,
-.card-renderer-isolated.edit:focus .card-renderer-isolated--header {
-  background-color: var(--ch-highlight);
-  border-color: var(--ch-highlight);
-  color: var(--ch-dark);
-}
-
-.card-renderer-isolated.selected .card-renderer-isolated--header svg,
-.card-renderer-isolated.edit:focus .card-renderer-isolated--header svg {
-  --icon-color: var(--ch-dark);
-}
-
 
 /* Card Renderer - Outer Wrapper */
 /* Needed for scroll behavior */
@@ -121,10 +105,27 @@
   border: none;
 }
 
-.card-renderer-isolated.schema.selected .card-renderer-isolated--card-container,
-.card-renderer-isolated.edit:focus .card-renderer-isolated--card-container {
+
+/* Focus state */
+.card-renderer-isolated:focus {
+  outline: 0;
+}
+
+.card-renderer-isolated.selected .card-renderer-isolated--header {
+  background-color: var(--ch-highlight);
+  border-color: var(--ch-highlight);
+  color: var(--ch-dark);
+}
+
+.card-renderer-isolated.selected .card-renderer-isolated--header svg {
+  --icon-color: var(--ch-dark);
+}
+
+.card-renderer-isolated.selected .card-renderer-isolated--card-container {
   border-color: var(--ch-highlight);
 }
+
+
 
 /* TODO: fade card if field-renderer is selected */
 /* .card-renderer-isolated.faded::before {
