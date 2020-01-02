@@ -61,6 +61,7 @@
           @searchEnabled={{false}}
           @label="Choose a theme:"
           @options={{this.themerOptions}}
+          @selected={{this.selectedTheme}}
           @setValue={{this.handleThemeChange}}
         />
         <button {{on "click" this.createTheme}}
