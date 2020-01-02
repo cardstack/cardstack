@@ -59,7 +59,7 @@
           @searchEnabled={{false}}
           @label="Choose a theme:"
           @options={{this.themerOptions}}
-          {{!-- @handleChange={{this.handleThemeChange}} --}}
+          @setValue={{this.handleThemeChange}}
         />
         <button {{on "click" this.createTheme}}
           class="ch-button ch-button--secondary ch-button--responsive"
