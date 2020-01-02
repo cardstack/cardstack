@@ -85,7 +85,7 @@ export default class FieldRenderer extends Component {
   @action
   updateFieldName(newName) {
     try {
-      this.args.setFieldName(this.args.field.name, this.newFieldName);
+      this.args.setFieldName(this.args.field.name, newName);
       this.newFieldName = newName;
     } catch (e) {
       console.error(e); // eslint-disable-line no-console

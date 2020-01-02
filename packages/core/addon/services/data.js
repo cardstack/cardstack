@@ -18,7 +18,7 @@ let store = {
 export default class DataService extends Service {
   @service cardstackSession;
 
-  static FIELD_NAME_REGEX = /[a-zA-Z][a-zA-Z0-9_-]*/;
+  static FIELD_NAME_REGEX = /^[a-zA-Z][a-zA-Z0-9_-]*$/;
 
   async getCard(id, format) {
     if (!['isolated', 'embedded'].includes(format)) {
