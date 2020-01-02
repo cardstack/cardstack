@@ -12,9 +12,18 @@ export default class RightEdge extends Component {
   @tracked cardName = this.args.card.name;
   @tracked cardSelected = this.args.cardSelected;
   @tracked options = {};
+  @tracked expandedSections = ['template'];
 
   fade = fade;
   duration = duration;
+
+  constructor(...args) {
+    super(...args);
+
+    if (this.args.updateCardId) {
+      this.toggleSection('details');
+    }
+  }
 
   get selectedFieldTitle() {
     if (this.args.selectedField) {
@@ -42,6 +51,11 @@ export default class RightEdge extends Component {
     }
 
     this.args.updateCardId(id);
+  }
+
+  @action
+  toggleSection(section) {
+    this.expandedSection = section;
   }
 
   *outerTransition({ keptSprites }) {
