@@ -1,6 +1,6 @@
 import { Index, Branch, Commit, Merge, Repository, Signature, Tree, FILEMODE, FetchOptions, CommitOpts } from './git';
 
-import { TreeEntry, NewEntry, MutableTree, NotFound, OverwriteRejected } from './mutable-tree';
+import { NewEntry, MutableTree, NotFound, OverwriteRejected } from './mutable-tree';
 
 import moment from 'moment-timezone';
 
