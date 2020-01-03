@@ -31,7 +31,7 @@ describe('hub/jsonapi', function() {
     expect(response.body.errors[0].source).property('pointer', '/data');
   });
 
-  it('errors correctly for invalid json', async function() {
+  it('errors correctly for invalid json in post body', async function() {
     let response = await request
       .post('/api/realms/first-ephemeral-realm/cards')
       .set('Content-Type', 'application/vnd.api+json')
@@ -65,6 +65,60 @@ describe('hub/jsonapi', function() {
       .send(testCard().jsonapi);
     expect(response.status).to.equal(201);
     expect(response.header.location).to.match(/http:\/\/[^/]+\/api\/realms\/first-ephemeral-realm\/cards\/[^/]+/);
+  });
+
+  it('can patch a card', async function() {
+    let response = await request
+      .post('/api/realms/first-ephemeral-realm/cards')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(testCard().withAttributes({ foo: 'bar', hello: 'world' }).jsonapi);
+    let cardDoc = response.body;
+    let csId = cardDoc.data.attributes.csId;
+    cardDoc.data.attributes.foo = 'poo';
+    delete cardDoc.data.attributes.hello;
+
+    response = await request
+      .patch(`/api/realms/first-ephemeral-realm/cards/${csId}`)
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(cardDoc);
+    expect(response.status).to.equal(200);
+    expect(response.body.data.attributes.foo).to.equal('poo');
+    expect(response.body.data.attributes.hello).to.equal('world');
+  });
+
+  it('errors correctly for missing patch body', async function() {
+    let response = await request
+      .post('/api/realms/first-ephemeral-realm/cards')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(testCard().withAttributes({ foo: 'bar', hello: 'world' }).jsonapi);
+    let csId = response.body.data.attributes.csId;
+
+    response = await request
+      .patch(`/api/realms/first-ephemeral-realm/cards/${csId}`)
+      .set('Content-Type', 'application/vnd.api+json');
+    expect(response.status).to.equal(400);
+    expect(response.body.errors).has.length(1);
+    expect(response.body.errors[0]).property('detail', 'missing resource object');
+    expect(response.body.errors[0].source).property('pointer', '/data');
+  });
+
+  it('errors correctly for invalid json in patch body', async function() {
+    let response = await request
+      .post('/api/realms/first-ephemeral-realm/cards')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(testCard().withAttributes({ foo: 'bar', hello: 'world' }).jsonapi);
+    let csId = response.body.data.attributes.csId;
+
+    response = await request
+      .patch(`/api/realms/first-ephemeral-realm/cards/${csId}`)
+      .set('Content-Type', 'application/vnd.api+json')
+      .send('{ data ');
+    expect(response.status).to.equal(400);
+    expect(response.body.errors).has.length(1);
+    expect(response.body.errors[0]).property(
+      'detail',
+      'error while parsing body: Unexpected token d in JSON at position 2'
+    );
   });
 
   it('can delete a card', async function() {

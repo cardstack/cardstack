@@ -66,7 +66,10 @@ export default class JSONAPIMiddleware {
       route.delete('/remote-realms/:remote_realm_url/cards/:local_id', this.deleteCard.bind(this)),
       route.delete('/remote-realms/:remote_realm_url/cards/:original_realm_url/:local_id', this.deleteCard.bind(this)),
 
-      // repeat for patch
+      route.patch('/realms/:local_realm_id/cards/:local_id', this.patchCard.bind(this)),
+      route.patch('/realms/:local_realm_id/cards/:original_realm_url/:local_id', this.patchCard.bind(this)),
+      route.patch('/remote-realms/:remote_realm_url/cards/:local_id', this.patchCard.bind(this)),
+      route.patch('/remote-realms/:remote_realm_url/cards/:original_realm_url/:local_id', this.patchCard.bind(this)),
     ]);
   }
 
@@ -113,6 +116,13 @@ export default class JSONAPIMiddleware {
     let version = ctxt.header['if-match'];
     await this.cards.as(ctxt.state.cardstackSession).delete(cardIdFromRoute(ctxt), version);
     ctxt.status = 204;
+  }
+
+  async patchCard(ctxt: KoaRoute.Context<SessionContext, {}>) {
+    let body = this.documentFromBody(ctxt);
+    let card = await this.cards.as(ctxt.state.cardstackSession).update(cardIdFromRoute(ctxt), body);
+    ctxt.body = (await card.asPristineDoc()).jsonapi;
+    ctxt.status = 200;
   }
 
   async getCards(ctxt: KoaRoute.Context<SessionContext, {}>) {

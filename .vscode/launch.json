@@ -36,13 +36,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": [
-        "packages/test-support/bin/run.js",
-        "--timeout",
-        "200000",
-        "--grep",
-        "it does not update a card that uses ephemeral storage when the meta.version is missing"
-      ]
+      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "patch body"]
     },
     {
       "type": "node",
