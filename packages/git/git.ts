@@ -20,7 +20,7 @@ import {
 import { FetchOptions as NGFetchOptions } from 'nodegit/fetch-options';
 
 import fs from 'fs';
-import { plugins as IGplugins, init as IGinit } from 'isomorphic-git';
+import { plugins as IGplugins, init as IGinit, clone as IGClone } from 'isomorphic-git';
 IGplugins.set('fs', fs);
 
 export const enum FILEMODE {
@@ -64,14 +64,18 @@ export class Repository {
     return new Repository(ngrepo);
   }
 
-  static async initBare(path: string): Promise<Repository> {
-    await IGinit({ gitdir: path, bare: true });
-    return await Repository.open(path, true);
+  static async initBare(gitdir: string): Promise<Repository> {
+    await IGinit({ gitdir, bare: true });
+    return await Repository.open(gitdir, true);
   }
 
-  static async clone(url: string, path: string, { fetchOpts }: { fetchOpts: FetchOptions }) {
-    let ngrepo = await NGClone.clone(url, path, { fetchOpts: fetchOpts.toNgFetchOptions() });
-    return new Repository(ngrepo);
+  static async clone(url: string, dir: string, { fetchOpts }: { fetchOpts: FetchOptions }) {
+    await IGClone({
+      url,
+      dir,
+    });
+    // let ngrepo = await NGClone.clone(url, path, { fetchOpts: fetchOpts.toNgFetchOptions() });
+    return await Repository.open(dir);
   }
 
   constructor(private readonly ngrepo: NGRepository) {}
