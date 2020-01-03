@@ -18,14 +18,14 @@
             --}}
             <div class="right-edge--sections">
               <div class="right-edge--section">
-                <button {{on "click" (fn this.toggleSection "template")}} class="section-toggle-btn {{if (eq this.expandedSection "template") "expanded"}}" data-test-right-edge-section-toggle>
+                <button {{on "click" (fn this.toggleSection "template")}} class="section-toggle-btn {{if (includes this.expandedSections "template") "expanded"}}" data-test-right-edge-section-toggle>
                   Toggle
                 </button>
                 <div class="right-edge--section-header" data-test-section-header>
                   Template
                 </div>
                 <AnimatedContainer class="right-edge--animation-container">
-                  {{#animated-if (eq this.expandedSection "template") use=this.fade duration=500}}
+                  {{#animated-if (includes this.expandedSections "template") use=this.fade duration=this.duration}}
                     <div class="right-edge--item">
                       {{#if @card.adoptedFrom}}
                         <AdoptedFrom @card={{@card.adoptedFrom}} @adoptedCard={{@card}} />
@@ -40,12 +40,12 @@
               </div>
               {{#if (eq @mode "schema")}}
                 <div class="right-edge--section">
-                  <button {{on "click" (fn this.toggleSection "details")}} class="section-toggle-btn {{if (eq this.expandedSection "details") "expanded"}}" data-test-right-edge-section-toggle>
+                  <button {{on "click" (fn this.toggleSection "details")}} class="section-toggle-btn {{if (includes this.expandedSections "details") "expanded"}}" data-test-right-edge-section-toggle>
                     Toggle
                   </button>
                   <div class="right-edge--section-header" data-test-section-header>Details</div>
                   <AnimatedContainer class="right-edge--animation-container">
-                    {{#animated-if (eq this.expandedSection "details") use=this.fade duration=500}}
+                    {{#animated-if (includes this.expandedSections "details") use=this.fade duration=this.duration}}
                       <div class="right-edge--items">
                         <div class="right-edge--item">
                           <TextField

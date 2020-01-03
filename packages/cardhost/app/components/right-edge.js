@@ -5,6 +5,7 @@ import { action, set } from '@ember/object';
 import fade from 'ember-animated/transitions/fade';
 import resize from 'ember-animated/motions/resize';
 import { easeInAndOut } from 'ember-animated/easings/cosine';
+import { remove } from 'lodash';
 
 const duration = 250;
 
@@ -55,7 +56,13 @@ export default class RightEdge extends Component {
 
   @action
   toggleSection(section) {
-    this.expandedSection = section;
+    if (this.expandedSections.includes(section)) {
+      remove(this.expandedSections, i => section === i);
+    } else {
+      this.expandedSections.push(section);
+    }
+    // eslint-disable-next-line no-self-assign
+    this.expandedSections = this.expandedSections; // oh glimmer, you so silly...
   }
 
   *outerTransition({ keptSprites }) {
