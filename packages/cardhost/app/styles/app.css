@@ -188,3 +188,10 @@ a:hover {
 .animated-tools {
   z-index: 20;
 }
+
+/* TODO: Move to ui-components repo */
+.cs-dark-input.cs-input:disabled,
+.cs-dark-input.cs-input.disabled {
+  -webkit-text-fill-color: var(--cs-dark-field-disabled-text); /* For strangeness in safari */
+  -webkit-text-stroke-color: var(--cs-dark-field-disabled-text);
+}
