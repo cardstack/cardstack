@@ -4,7 +4,6 @@
   top: var(--ch-top-edge-height);
   width: var(--ch-right-edge-panel-width);
   max-height: calc(100vh - var(--ch-top-edge-height) - var(--ch-bottom-edge-height));
-  /* min-height: var(--ch-card-size); */
   border-radius: 10px;
   background-color: var(--ch-dark-background);
   color: white;
@@ -134,14 +133,4 @@
 .section-btn:hover {
   opacity: 1;
   cursor: pointer;
-}
-
-.right-edge--item .cs-input-group--helper-text {
-  height: auto;
-  transform: scaleY(0);
-  transition: transform 0.3s ease-out;
-}
-
-.right-edge--item .cs-input-group--helper-text.invalid {
-  transform: scaleY(1);
 }
