@@ -38,7 +38,6 @@
   color: white;
   font-size: 16px;
   line-height: 22px;
-  text-align: center;
 }
 
 .drop-zone--description--text {
@@ -77,9 +76,11 @@
 
 .card-renderer-isolated.no-fields .drop-zone .drop-zone--description .drop-zone--description--text {
   display: block;
+  text-align: center;
 }
 
 .card-renderer-isolated.no-fields .drop-zone .drop-zone--drag-drop-icon {
   display: block;
   margin-top: 10px;
+  text-align: center;
 }

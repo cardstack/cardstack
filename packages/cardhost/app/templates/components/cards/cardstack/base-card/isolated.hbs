@@ -9,6 +9,8 @@
         @field={{field}}
         @mode={{@mode}}
         @setFieldValue={{fn @setFieldValue field.name}}
+        @selectField={{@selectField}}
+        @selectedField={{@selectedField}}
       />
     {{else if (or @setNeededWhenEmbedded @setPosition @removeField @setFieldName)}}
       <FieldRenderer

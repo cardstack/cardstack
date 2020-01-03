@@ -150,7 +150,7 @@
 .cardhost-cards.editing-css {
   padding-left: 0;
   width: 100%;
-  padding-right: 60%;
+  padding-right: 40%;
   transition: var(--ch-card-padding-animate), var(--ch-card-background-color-animate);
   background-color: var(--ch-dark-background);
 }

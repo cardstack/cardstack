@@ -127,6 +127,8 @@
 
 .card-catalog a {
   display: block;
+  /* relative so that the labels can be absolutely positioned */
+  position: relative;
 }
 
 .card-catalog > * > *,
@@ -137,13 +139,15 @@
   transition: transform var(--ch-card-transition-duration) ease-in-out calc(var(--ch-card-transition-duration) / 3);
 }
 
-.card-catalog > *:hover > * {
-  background-color: var(--ch-hover);
-  transform: scale(1.2);
+.card-catalog .embedded-card, .card-catalog--embedded-card-placeholder {
+  box-shadow: 0px 0px 0px 0px none;
+  transition: all 0.3s ease;
 }
 
-.card-catalog > *:hover > * > * {
-  transform: scale(0.75);
+.card-catalog > *:hover > * > .embedded-card,
+.card-catalog > *:hover > * > .card-catalog--embedded-card-placeholder {
+  transform: scale(0.9);
+  box-shadow: 0px 0px 0px 35px var(--ch-hover);
 }
 
 .card-catalog--embedded-card-placeholder {
@@ -172,11 +176,10 @@
   padding-top: 30px;
   font-size: 13px;
   text-align: center;
-  transform: none;
-  transition: padding var(--ch-card-transition-duration) ease-in-out calc(var(--ch-card-transition-duration) / 3), transform var(--ch-card-transition-duration) ease-in-out calc(var(--ch-card-transition-duration) / 3);
+  position: absolute;
+  top: 225px;
 }
 
 .card-catalog > *:hover .embedded-card-label {
-  padding-top: 6px;
-  transform: scale(.85);
+  color: var(--ch-link)
 }
