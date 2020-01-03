@@ -27,8 +27,7 @@
 /* Card Renderer Header */
 .card-renderer-isolated--header {
   display: flex;
-  align-items: center;
-  height: var(--card-renderer-header-height);
+  height: calc(var(--card-renderer-header-height) + 150px); /* to counteract the safari scroll bounce */
   padding: 14px 20px;
   color: var(--ch-light-op50);
   background-color: var(--ch-dark-background);
@@ -70,6 +69,7 @@
   border: none;
   overflow-x: hidden;
   overflow-y: auto;
+  margin-top: -150px; /* to counteract the safari scroll bounce */
 
   transition: var(--ch-card-background-color-animate);
 }
