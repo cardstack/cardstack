@@ -1,4 +1,4 @@
-import { cloneRepo, Cred, Merge, Repository, Reset, RemoteConfig } from './git';
+import { Cred, Merge, Repository, Reset, RemoteConfig, FetchOptions } from './git';
 
 import { promisify } from 'util';
 import mkdirpcb from 'mkdirp';
@@ -13,8 +13,14 @@ import { tmpdir } from 'os';
 import logger from '@cardstack/logger';
 const log = logger('cardstack/git');
 
+interface RemoteCache {
+  repo: Repository;
+  fetchOpts: FetchOptions;
+  repoPath: string;
+}
+
 class GitLocalCache {
-  private _remotes = new Map();
+  private _remotes: Map<string, RemoteCache> = new Map();
 
   clearCache() {
     this._remotes = new Map();
@@ -52,16 +58,11 @@ class GitLocalCache {
 
     let repoPath = join(cacheDirectory, filenamifyUrl(remote.url));
 
-    let fetchOpts = {
-      callbacks: {
-        credentials: (url: string, userName: string) => {
-          if (remote.privateKey) {
-            return Cred.sshKeyMemoryNew(userName, remote.publicKey || '', remote.privateKey, remote.passphrase || '');
-          }
-          return Cred.sshKeyFromAgent(userName);
-        },
-      },
-    };
+    let fetchOpts = new FetchOptions((url, userName) =>
+      remote.privateKey
+        ? Cred.sshKeyMemoryNew(userName, remote.publicKey || '', remote.privateKey, remote.passphrase || '')
+        : Cred.sshKeyFromAgent(userName)
+    );
 
     log.info('creating local repo cache for %s in %s', remote.url, repoPath);
 
@@ -78,7 +79,7 @@ class GitLocalCache {
 
         await mkdirp(repoPath);
 
-        repo = await cloneRepo(remote.url, repoPath, {
+        repo = await Repository.clone(remote.url, repoPath, {
           fetchOpts,
         });
       }
@@ -86,7 +87,7 @@ class GitLocalCache {
       log.info('cloning %s into %s', remote.url, repoPath);
       await mkdirp(repoPath);
 
-      repo = await cloneRepo(remote.url, repoPath, {
+      repo = await Repository.clone(remote.url, repoPath, {
         fetchOpts,
       });
     }
@@ -99,13 +100,13 @@ class GitLocalCache {
   }
 
   async fetchAllFromRemote(remoteUrl: string) {
-    let { repo, fetchOpts } = this._remotes.get(remoteUrl);
+    let { repo, fetchOpts } = this._remotes.get(remoteUrl)!;
     return await repo.fetchAll(fetchOpts);
   }
 
   async pullRepo(remoteUrl: string, targetBranch: string) {
     log.info('pulling changes for branch %s on %s', targetBranch, remoteUrl);
-    let { repo } = this._remotes.get(remoteUrl);
+    let { repo } = this._remotes.get(remoteUrl)!;
 
     // if branch does not exist locally then create it and reset to head of remote
     // this is required because node git doesn't support direct pull https://github.com/nodegit/nodegit/issues/1123
@@ -117,15 +118,15 @@ class GitLocalCache {
         log.info('no local branch for %s on %s. Creating it now...', targetBranch, remoteUrl);
         let headCommit = await repo.getHeadCommit();
         let ref = await repo.createBranch(targetBranch, headCommit, false);
-        await repo.checkoutBranch(ref, {});
+        await repo.checkoutBranch(ref);
         let remoteCommit = await repo.getReferenceCommit(`refs/remotes/origin/${targetBranch}`);
-        Reset.reset(repo, remoteCommit, 3, {});
+        Reset.hardReset(repo, remoteCommit);
       } else {
         throw e;
       }
     }
 
-    await repo.mergeBranches(targetBranch, `origin/${targetBranch}`, null, Merge.PREFERENCE.FASTFORWARD_ONLY);
+    await repo.mergeBranches(targetBranch, `origin/${targetBranch}`, null, Merge.FASTFORWARD_ONLY);
   }
 }
 
