@@ -30,6 +30,15 @@
   background: url(/assets/images/cardstack-logo.svg) 30px 30px/24px 25px no-repeat;
 }
 
+.cardhost-welcome-left-edge--nav button {
+  background: none;
+  box-shadow: none;
+  border: none;
+  cursor: pointer;
+  font: 400 13px/18px var(--ch-font-family);
+  letter-spacing: 0.015em;
+}
+
 .cardhost-welcome-left-edge--nav ul {
   list-style-type: none;
   margin: 0;
@@ -89,11 +98,14 @@
   letter-spacing: 0.015em;
 }
 
-.cardhost-section--header > svg {
+.cardhost-section--header svg {
   --icon-color: var(--ch-highlight);
-
   margin-right: 20px;
   fill: var(--ch-highlight);
+}
+
+.cardhost-section--header .permalink {
+  font-size: 36px;
 }
 
 
@@ -161,9 +173,10 @@
   font-size: 13px;
   text-align: center;
   transform: none;
-  transition: padding var(--ch-card-transition-duration) ease-in-out calc(var(--ch-card-transition-duration) / 3);
+  transition: padding var(--ch-card-transition-duration) ease-in-out calc(var(--ch-card-transition-duration) / 3), transform var(--ch-card-transition-duration) ease-in-out calc(var(--ch-card-transition-duration) / 3);
 }
 
 .card-catalog > *:hover .embedded-card-label {
-  padding-top: 20px;
+  padding-top: 6px;
+  transform: scale(.85);
 }

@@ -1,6 +1,10 @@
-<div {{did-insert this.renderEditor}}
-  ...attributes 
-  data-test-code-block={{@code}}
-  class="cardhost-monaco-container"
->
+<div class="editor-container" ...attributes>
+  {{#if @title}}
+    <div class="editor-container__title">{{@title}} <span>({{if this.readOnly "read-only" "editable"}})</span></div>
+  {{/if}}
+  <div {{did-insert this.renderEditor}}
+    data-test-code-block={{@code}}
+    class="cardhost-monaco-container"
+  >
+  </div>
 </div>

@@ -91,17 +91,27 @@ module('Integration | Component | field-renderer', function(hooks) {
     let card = service.createCard(qualifiedCard1Id);
     let field = card.addField({
       name: 'title',
+      label: 'Field Title',
       type: '@cardstack/core-types::string',
       neededWhenEmbedded: true,
       value: 'test title',
+      instructions: 'field instructions',
     });
     this.set('field', field);
 
     await render(hbs`<FieldRenderer @field={{field}} @mode="view"/>`);
 
+    assert.dom('[data-test-field-mode="view"][data-test-field="title"]').exists();
+    assert
+      .dom('[data-test-field="title"].field.title-field.field-type-text-view-field.field-type-string-view-field')
+      .exists();
     assert.dom('[data-test-string-field-viewer-value]').hasText('test title');
+    assert.dom('[data-test-string-field-viewer-label]').hasText('Field Title');
+    assert.dom('[data-test-field="title"]').doesNotContainText('field instructions');
     assert.dom('input').doesNotExist();
     assert.dom('button').doesNotExist();
+    assert.dom('[data-test-string-field-viewer-label].label.title-label').exists();
+    assert.dom('[data-test-string-field-viewer-value].value.title-value').exists();
   });
 
   test('it renders field in edit mode', async function(assert) {
@@ -112,6 +122,7 @@ module('Integration | Component | field-renderer', function(hooks) {
       type: '@cardstack/core-types::string',
       neededWhenEmbedded: true,
       value: 'test title',
+      instructions: 'test instructions',
     });
     this.set('field', field);
     this.set('noop', () => {});
@@ -124,11 +135,18 @@ module('Integration | Component | field-renderer', function(hooks) {
     />
     `);
 
-    assert.dom('[data-test-string-field-editor-label]').hasText('title:');
-    assert.dom('input').hasValue('test title');
+    assert.dom('[data-test-field-mode="edit"][data-test-field="title"]').exists();
+    assert
+      .dom('[data-test-field="title"].field.title-field.field-type-text-edit-field.field-type-string-edit-field')
+      .exists();
+    assert.dom('[data-test-field-mode="edit"][data-test-field="title"] label').hasText('title');
+    assert.dom('[data-test-field-mode="edit"][data-test-field="title"] input').hasValue('test title');
+    assert
+      .dom('[data-test-field-mode="edit"][data-test-field="title"] [data-test-cs-component-validation]')
+      .hasText('test instructions');
     assert.dom('button').doesNotExist;
-    assert.dom('.field-renderer-field-name-input').doesNotExist();
-    assert.dom('.field-renderer--needed-when-embedded-chbx').doesNotExist();
+    assert.dom('[data-test-field-mode="schema"]').doesNotExist();
+    assert.dom('[data-test-field-mode="view"]').doesNotExist();
   });
 
   test('it can update field value in edit mode', async function(assert) {
@@ -152,7 +170,6 @@ module('Integration | Component | field-renderer', function(hooks) {
     `);
 
     await fillIn('input', 'updated title');
-    await triggerEvent('input', 'keyup');
 
     assert.dom('input').hasValue('updated title');
     assert.equal(field.value, 'updated title');
@@ -169,6 +186,7 @@ module('Integration | Component | field-renderer', function(hooks) {
     });
     let field = card.addField({
       name: 'title',
+      label: 'Article Title',
       type: '@cardstack/core-types::string',
       neededWhenEmbedded: true,
       value: 'test title',
@@ -197,6 +215,13 @@ module('Integration | Component | field-renderer', function(hooks) {
     />
     `);
 
+    assert.dom('[data-test-field-mode="schema"][data-test-field="title"]').exists();
+    assert
+      .dom('[data-test-field="title"].field.title-field.field-type-text-schema-field.field-type-string-schema-field')
+      .exists();
+    assert.dom('[data-test-field-schema-renderer] [data-test-field-renderer-type]').hasText('title (Text)');
+    assert.dom('[data-test-field-schema-renderer] [data-test-field-renderer-label]').hasText('Article Title');
+    assert.dom('[data-test-field-schema-renderer] [data-test-field-renderer-value]').hasText('test title');
     assert.dom('.schema-field-renderer--header--detail').doesNotExist();
     assert.dom('[data-test-field-renderer-field-type]').hasText('@cardstack/core-types::string');
     assert.dom('[data-test-field-renderer-move-btn]').exists();
@@ -207,7 +232,7 @@ module('Integration | Component | field-renderer', function(hooks) {
 
     assert.dom('[data-test-schema-attr="name"] input').hasValue('title');
     assert.dom('[data-test-schema-attr="name"] input').isNotDisabled();
-    assert.dom('[data-test-schema-attr="label"] input').hasValue('title');
+    assert.dom('[data-test-schema-attr="label"] input').hasValue('Article Title');
     assert.dom('[data-test-schema-attr="label"] input').isNotDisabled();
     assert.dom('[data-test-schema-attr="instructions"] textarea').isNotDisabled();
     assert.dom('[data-test-schema-attr="embedded"] input').isChecked();
@@ -246,6 +271,10 @@ module('Integration | Component | field-renderer', function(hooks) {
     />
     `);
 
+    assert.dom('[data-test-field-mode="schema"][data-test-field="title"]').exists();
+    assert
+      .dom('[data-test-field="title"].field.title-field.field-type-text-schema-field.field-type-string-schema-field')
+      .exists();
     assert.dom('.schema-field-renderer--header--detail').hasText('Adopted');
     assert.dom('[data-test-field-renderer-field-type]').hasText('@cardstack/core-types::string');
     assert.dom('[data-test-field-renderer-move-btn]').exists();
@@ -291,12 +320,11 @@ module('Integration | Component | field-renderer', function(hooks) {
     let nameInput = '[data-test-schema-attr="name"] input';
     let labelInput = '[data-test-schema-attr="label"] input';
     await fillIn(nameInput, 'subtitle');
-    await triggerEvent(nameInput, 'keyup');
 
     assert.dom(nameInput).hasValue('subtitle');
-    assert.dom(labelInput).hasValue('subtitle');
+    assert.dom(labelInput).hasValue('Subtitle');
     assert.equal(field.name, 'subtitle');
-    assert.equal(field.label, 'subtitle');
+    assert.equal(field.label, 'Subtitle');
   });
 
   test('it can change field label in schema mode', async function(assert) {
@@ -327,7 +355,6 @@ module('Integration | Component | field-renderer', function(hooks) {
     let nameInput = '[data-test-schema-attr="name"] input';
     let labelInput = '[data-test-schema-attr="label"] input';
     await fillIn(labelInput, 'TITLE');
-    await triggerEvent(labelInput, 'keyup');
 
     assert.dom(nameInput).hasValue('title');
     assert.dom(labelInput).hasValue('TITLE');
@@ -362,7 +389,6 @@ module('Integration | Component | field-renderer', function(hooks) {
     `);
     let input = '[data-test-schema-attr="instructions"] textarea';
     await fillIn(input, 'updated instructions');
-    await triggerEvent(input, 'keyup');
 
     assert.dom(input).hasValue('updated instructions');
     assert.equal(field.instructions, 'updated instructions');
@@ -379,11 +405,8 @@ module('Integration | Component | field-renderer', function(hooks) {
     });
     this.set('field', field);
     this.set('noop', () => {});
-    this.set('setNeededWhenEmbedded', (fieldName, evt) => {
+    this.set('setNeededWhenEmbedded', (fieldName, checked, evt) => {
       evt.preventDefault();
-      let {
-        target: { checked },
-      } = evt;
       card.getField(fieldName).setNeededWhenEmbedded(checked);
     });
 

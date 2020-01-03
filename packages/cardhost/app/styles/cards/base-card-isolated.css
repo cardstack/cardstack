@@ -1,30 +1,28 @@
-/*
-Until we begin to support custom CSS for each card,
-all cards will inherit the @cardstack/base-card css.
-*/
-.isolated-card.cardstack_base-card {
-  --card-width: 656px;
-  --hero-image-height: 300px;
-
-  width: var(--card-width);
-  max-width: 100%;
+.cardstack_base-card-isolated {
+  width: 100%;
+  min-height: inherit;
   margin: 0 auto;
   padding: 50px 30px;
   background-color: white;
   color: black;
+  font: 400 16px/1.385 var(--ch-font-family);
+  letter-spacing: 0;
+  text-align: left;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
-.isolated-card.view.cardstack_base-card .field-image {
-  visibility: hidden;
-  width: 0;
-  height: 0;
-}
-
-.isolated-card--hero-image {
-  display: block;
+.cardstack_base-card-isolated .field {
   width: 100%;
-  height: var(--hero-image-height);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  max-width: 656px;
+  margin: 0 auto;
+  padding-bottom: 30px;
+}
+
+.cardstack_base-card-isolated .label {
+  padding-bottom: 4px;
+  color: var(--ch-dark-op50);
+  font-size: 13px;
+  line-height: 1.385;
 }

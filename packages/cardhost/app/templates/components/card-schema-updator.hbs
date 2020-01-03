@@ -1,34 +1,16 @@
 {{#if this.cardstackSession.isAuthenticated}}
   <div class="card-renderer--top-edge-buttons">
-    {{! eslint is confused by on helper }}
-    {{! template-lint-disable attribute-indentation}}
-    <button
-      class="ch-button ch-button--icon share"
-      aria-label="Share button"
-    >
+    <button class="ch-button ch-button--icon share" aria-label="Share button">
     </button>
     <button
-      {{on "click" this.preview}}
       class="ch-button ch-button--secondary"
+      {{on "click" this.preview}}
       disabled={{not this.cardstackSession.isAuthenticated}}
       data-test-card-schema-preview-btn
     >
       Preview
     </button>
-    {{#if this.saveCard.isRunning}}
-      <div class="loader-container">
-        <div class="loader">Loading...</div>
-      </div>
-    {{else}}
-      <button
-        {{on "click" this.save}}
-        class="ch-button"
-        data-test-card-schema-save-btn
-        disabled={{not this.cardstackSession.isAuthenticated}}
-      >
-        Save
-      </button>
-    {{/if}}
+    <SaveButton @card={{this.card}} />
   </div>
 {{/if}}
 
@@ -37,39 +19,30 @@
     <section class="ch-catalog">
       <header class="ch-catalog--header">
         <h3 class="ch-catalog--title">Card Catalog</h3>
-        <div class="ch-catalog--header-btns">
-          {{! template-lint-disable attribute-indentation}}
-          <button class="ch-catalog--header-btn sidebar active" aria-label="View as sidebar"></button>
-          <button class="ch-catalog--header-btn grid" aria-label="View as grid"></button>
-        </div>
-        <Input
-          @class="ch-filter-bar"
-          @placeholder="Filter Results"
-        />
       </header>
-      <div class="ch-catalog--fields">
-        {{#each this.fieldComponents as |field|}}
-          {{! eslint is confused by on helper }}
-          {{! template-lint-disable attribute-indentation}}
-          <div
-            class="ch-catalog-field"
-            role="button"
-            draggable="true"
-            {{on "mousedown" (action this.initDrag field)}}
-            {{on "dragend" (action (mut this.isDragging) false)}}
-            {{on "dragstart" (action this.startDragging field)}}
-            data-test-card-add-field-draggable={{field.type}}
-          >
-            {{! template-lint-disable no-inline-styles}}
-            <div class="ch-catalog-field--icon" style={{css-url "background-image" field.icon}}></div>
-            <div>
-              <h4 class="ch-catalog-field--title">{{field.title}}</h4>
-              {{#if field.description}}
-                <p class="ch-catalog-field--description">{{field.description}}</p>
-              {{/if}}
+      <div class="ch-catalog--content">
+        <div class="ch-catalog--fields">
+          {{#each this.fieldComponents as |field|}}
+            <div
+              class="ch-catalog-field"
+              role="button"
+              draggable="true"
+              {{on "mousedown" (action this.initDrag field)}}
+              {{on "dragend" (action (mut this.isDragging) false)}}
+              {{on "dragstart" (action this.startDragging field)}}
+              data-test-card-add-field-draggable={{field.type}}
+            >
+              {{! template-lint-disable no-inline-styles}}
+              <div class="ch-catalog-field--icon" style={{css-url "background-image" field.icon}}></div>
+              <div>
+                <h4 class="ch-catalog-field--title">{{field.title}}</h4>
+                {{#if field.description}}
+                  <p class="ch-catalog-field--description">{{field.description}}</p>
+                {{/if}}
+              </div>
             </div>
-          </div>
-        {{/each}}
+          {{/each}}
+        </div>
       </div>
     </section>
   </CardhostLeftEdge>
@@ -83,16 +56,7 @@
   @setFieldName={{this.setFieldName}}
   @setFieldLabel={{this.setFieldLabel}}
   @setFieldInstructions={{this.setFieldInstructions}}
-  @cardSelected={{this.cardSelected}}
-/>
-
-<div class="card-schema-updator--search-bar">
-  <Input
-    @type="search"
-    @class="ch-search-bar"
-    @placeholder="Search Library"
-  />
-</div>
+  @cardSelected={{this.cardSelected}} />
 
 <section class="card-schema-updator" data-test-card-schema={{@card.name}} {{did-update this.updateCard @card}}>
   <CardRenderer
@@ -105,26 +69,17 @@
     @selectedField={{this.selectedField}}
     @dropField={{action this.dropField}}
     @cardSelected={{this.cardSelected}}
-    @cardFocused={{action (mut this.cardSelected)}}
-  />
+    @cardFocused={{action (mut this.cardSelected)}} />
 </section>
 
 <section class="cardhost-card-document">
   <h3>Card Document</h3>
-  <CodeEditor
-    @code={{this.cardJson}}
-    @language="json"
-  />
+  <CodeEditor @code={{this.cardJson}} @language="json" />
 </section>
 
 {{#if this.cssModeToggle.editingCss}}
   <section class="cardhost-card-theme-editor">
     <h3>Card Theme Editor</h3>
-    <CodeEditor
-      @code=".a {}"
-      @language="css"
-      @readOnly={{false}}
-      @resizable={{true}}
-    />
+    <CodeEditor @code=".a {}" @language="css" @readOnly={{false}} />
   </section>
 {{/if}}

@@ -1,5 +1,6 @@
 import { action } from '@ember/object';
 import CardManipulator from './card-manipulator';
+import { schedule } from '@ember/runloop';
 
 export default class CardCreator extends CardManipulator {
   constructor(...args) {
@@ -24,5 +25,14 @@ export default class CardCreator extends CardManipulator {
       }
     }
     this.card = newCard;
+
+    /*
+      FIXME: THIS IS A COMPLETE HACK. This problem should go away
+      once we clarify how card ids and names work. See:
+      https://github.com/cardstack/cardstack/issues/1150
+    */
+    schedule('afterRender', this, function() {
+      document.querySelector('#card__id').focus();
+    });
   }
 }

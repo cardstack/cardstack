@@ -1,18 +1,20 @@
 import Component from '@glimmer/component';
-import { fieldComponents } from './card-manipulator';
+import { fieldComponents } from '@cardstack/core/utils/mappings';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
+import { action, set } from '@ember/object';
+import fade from 'ember-animated/transitions/fade';
+import resize from 'ember-animated/motions/resize';
+import { easeInAndOut } from 'ember-animated/easings/cosine';
+
+const duration = 250;
 
 export default class RightEdge extends Component {
-  @tracked cardName;
+  @tracked cardName = this.args.card.name;
+  @tracked cardSelected = this.args.cardSelected;
+  @tracked options = {};
 
-  constructor(...args) {
-    super(...args);
-
-    if (this.args.card) {
-      this.cardName = this.args.card.name;
-    }
-  }
+  fade = fade;
+  duration = duration;
 
   get selectedFieldTitle() {
     if (this.args.selectedField) {
@@ -23,9 +25,14 @@ export default class RightEdge extends Component {
     return '';
   }
 
+  get selectedContent() {
+    return this.args.cardSelected ? 'card' : 'field';
+  }
+
   @action
-  updateCard(element, [card]) {
+  updateCard(element, [card, cardSelected]) {
     this.cardName = card.name;
+    set(this.options, 'selectedContent', cardSelected ? 'card' : 'field');
   }
 
   @action
@@ -35,5 +42,11 @@ export default class RightEdge extends Component {
     }
 
     this.args.updateCardId(id);
+  }
+
+  *outerTransition({ keptSprites }) {
+    keptSprites.forEach(sprite => {
+      resize(sprite, { easing: easeInAndOut, duration });
+    });
   }
 }

@@ -1,22 +1,11 @@
-.ch-filter-bar {
-  min-width: 290px;
-  max-width: 100%;
+.filter-bar-input.cs-input {
   height: 30px;
   padding: 10px 15px;
-  background-color: white;
-  color: black;
-  font: 400 13px/18px var(--ch-font-family);
-  letter-spacing: 0.035em;
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-color: rgba(0, 0, 0, 0.15);
   border-radius: 100px;
 }
 
-.ch-filter-bar::placeholder {
-  color: rgba(0, 0, 0, 0.5);
-}
-
-.ch-filter-bar:focus,
-.ch-filter-bar:hover {
-  /* TODO: accessibility styles */
-  outline: 0;
+.filter-bar-input-group .cs-input-group--helper-text,
+.filter-bar-input-group .cs-input-group--label {
+  display: none;
 }

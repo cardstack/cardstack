@@ -1,9 +1,4 @@
-{{! template-lint-disable attribute-indentation}}
-<div
-  class="right-edge"
-  data-test-right-edge
-  {{did-update this.updateCard @card}}
->
+<div class="right-edge" data-test-right-edge {{did-update this.updateCard @card @cardSelected}}>
   {{!-- TODO: make this a component --}}
   <div class="right-edge--pill-selector-container">
     <div class="pill-selector">
@@ -11,71 +6,88 @@
       <div class="pill-option">Structure</div>
     </div>
   </div>
-  {{#if @cardSelected}}
-    {{!--
-    TODO each of these section is collapsable.
-    Waiting until ember animated/liquid fire is available
-    before implemnenting that, as that will make this easy
-    --}}
-    <div class="right-edge--section">
-      <div class="right-edge--section-header" data-test-section-header>ID</div>
-      <div class="right-edge--item">
-        <label for="card__id" class="ch-label">
-          Card ID
-        </label>
-        <Input
-          @id="card__id"
-          @class="ch-input hide-in-percy"
-          @size="60"
-          @placeholder="e.g. millenial-puppies"
-          @value={{this.cardName}}
-          @key-up={{action this.updateCardId}}
-          @disabled={{or (not @updateCardId) (not @card.isNew)}}
-        />
-      </div>
-      <div class="right-edge--item">
-        <div class="ch-label right-edge--label">Internal ID</div>
-        <div class="hide-in-percy" data-test-internal-card-id>
-          {{@card.id}}
-        </div>
-      </div>
-    </div>
+  <AnimatedContainer>
+    {{#animated-value this.options watch="selectedContent" use=this.outerTransition}}
+      <div class="right-edge--section--container">
+        <AnimatedContainer>
+          {{#animated-if @cardSelected use=this.fade duration=this.duration}}
+            {{!--
+            TODO each of these section is collapsable.
+            Waiting until ember animated/liquid fire is available
+            before implemnenting that, as that will make this easy
+            --}}
+            <div class="right-edge--sections">
+              <div class="right-edge--section">
+                <div class="right-edge--section-header" data-test-section-header>ID</div>
+                <div class="right-edge--item">
+                  <TextField
+                    @theme="cs-dark"
+                    @class="hide-in-percy"
+                    @id="card__id"
+                    @label="Card ID"
+                    @placeholder="e.g. millenial-puppies"
+                    @value={{this.cardName}}
+                    @setValue={{action this.updateCardId}}
+                    @disabled={{or (not @updateCardId) (not @card.isNew)}} />
+                </div>
+                <div class="right-edge--item">
+                  <div class="right-edge--label">Internal ID</div>
+                  <div class="hide-in-percy" data-test-internal-card-id>
+                    {{@card.id}}
+                  </div>
+                </div>
+              </div>
 
-    <div class="right-edge--section">
-      <div class="right-edge--section-header" data-test-section-header>
-        Template
+              <div class="right-edge--section">
+                <div class="right-edge--section-header" data-test-section-header>
+                  Template
+                </div>
+                <div class="right-edge--item">
+                  {{#if @card.adoptedFrom}}
+                    <AdoptedFrom @card={{@card.adoptedFrom}} @adoptedCard={{@card}} />
+                  {{else}}
+                    <div data-test-no-adoption>
+                      No Adoption
+                    </div>
+                  {{/if}}
+                </div>
+              </div>
+            </div>
+          {{else if @selectedField}}
+            <div class="right-edge--sections">
+              <AnimatedContainer>
+                {{#animated-value @selectedField use=this.fade duration=this.duration as |field|}}
+                  <div class="right-edge--section">
+                    <div class="right-edge--section-header" data-test-section-header>
+                      <AnimatedContainer>
+                        {{#animated-value this.selectedFieldTitle use=this.fade duration=this.duration as |fieldTitle|}}
+                          <div class="right-edge--selected-field-title">{{fieldTitle}} Field</div>
+                        {{/animated-value}}
+                      </AnimatedContainer>
+                      {{#if field.isAdopted}}
+                        <div class="right-edge--section-header--adopted">
+                          Adopted from {{field.card.adoptedFrom.name}}
+                        </div>
+                      {{/if}}
+                    </div>
+                    <div class="right-edge--item">
+                      <FieldRenderer
+                        @field={{field}}
+                        @mode="schema"
+                        @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+                        @setFieldName={{@setFieldName}}
+                        @setFieldLabel={{@setFieldLabel}}
+                        @setFieldInstructions={{@setFieldInstructions}}
+                        @schemaAttrs={{array "name" "label" "instructions" "embedded"}} />
+                    </div>
+                  </div>
+                {{/animated-value}}
+              </AnimatedContainer>
+            </div>
+          {{/animated-if}}
+        </AnimatedContainer>
       </div>
-      <div class="right-edge--item">
-        {{#if @card.adoptedFrom}}
-          <AdoptedFrom @card={{@card.adoptedFrom}} @adoptedCard={{@card}}/>
-        {{else}}
-          <div data-test-no-adoption>
-            No Adoption
-          </div>
-        {{/if}}
-      </div>
-    </div>
-  {{else if @selectedField}}
-    <div class="right-edge--section">
-      <div class="right-edge--section-header" data-test-section-header>
-        {{this.selectedFieldTitle}} Field
-        {{#if @selectedField.isAdopted}}
-          <div class="right-edge--section-header--adopted">
-            Adopted from {{@selectedField.card.adoptedFrom.name}}
-          </div>
-        {{/if}}
-      </div>
-
-      <FieldRenderer
-        @field={{@selectedField}}
-        @mode="schema"
-        @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
-        @setFieldName={{@setFieldName}}
-        @setFieldLabel={{@setFieldLabel}}
-        @setFieldInstructions={{@setFieldInstructions}}
-        @schemaAttrs={{array "name" "label" "instructions" "embedded"}}
-      />
-    </div>
-  {{/if}}
+    {{/animated-value}}
+  </AnimatedContainer>
   {{yield}}
 </div>

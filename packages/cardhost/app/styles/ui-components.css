@@ -1,17 +1,101 @@
 .ui-components {
-  padding: var(--ch-spacing);
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  grid-template-areas:
+    "header header"
+    "navbar main";
+  width: calc(100vw - 100px);
+  height: calc(100vh - 120px);
+  min-width: 1100px;
+  max-width: 1400px;
+  margin: 60px auto;
+  background-color: var(--ch-deep-background);
+  border-radius: 10px;
+  box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.ui-components > h1 {
+  grid-area: header;
+  grid-column: 1 / -1;
+  margin: 0 30px;
+  padding: 30px 0;
+  font: 400 26px/36px var(--ch-font-family);
+  letter-spacing: 0.015em;
+  border-bottom: 1px solid var(--ch-border);
+}
+
+.ui-components > nav {
+  grid-area: navbar;
+  width: 260px;
+  overflow-y: auto;
+}
+
+.ui-components > main {
+  grid-area: main;
+  padding: 0 50px 150px;
+  overflow: auto;
+}
+
+.ui-components--nav > ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 50px 30px;
+  font: 400 13px/18px var(--ch-font-family);
+}
+
+.ui-components--nav li > ul,
+.ui-components--nav ul li + li {
+  margin-top: 18px;
 }
 
 .ui-components--section {
+  position: relative;
   padding: 30px 0;
   border-bottom: 1px solid var(--ch-border);
 }
-.ui-components--section:first-of-type {
-  border-top: 1px solid var(--ch-border);
+.ui-components--section:last-of-type {
+  border-bottom: none;
+}
+
+.ui-components--back-button {
+  color: var(--cs-highlight);
+  position: absolute;
+  top: 30px;
+  right: 0;
+  display: block;
+}
+
+.ui-components--section > h2 {
+  margin-top: 0;
+  margin-bottom: 30px;
+  font: 400 26px/36px var(--ch-font-family);
+  letter-spacing: 0.015em;
 }
 
 .ui-components--notes {
   grid-column: 1 / -1;
+  font: 400 13px/18px var(--cs-font-family);
+  letter-spacing: 0.035em;
+  padding-bottom: 2em;
+}
+
+.ui-components--notes a {
+  color: var(--cs-highlight);
+}
+
+.ui-components--notes p {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.ui-components--notes code,
+.ui-components--notes pre {
+  font-family: Menlo, Monaco, "Courier New", monospace;
+  padding: 3px 10px;
+  background: rgba(0,0,0,0.4);
+  color: lightcoral;
+  text-align: left;
 }
 
 .ui-components--grid {
@@ -30,21 +114,21 @@
 .ui-components--grid-2-col > h4 {
   grid-column: 1 / -1;
 }
+.ui-components--grid-2-col > h2 > a {
+  color: var(--ch-highlight);
+}
+
+.ui-components--light-background {
+  background-color: white;
+  padding: 30px;
+}
 
 
 /* Icons Section */
-.ui-components--section.icons > h4 {
-  margin: 0;
-}
-.ui-components--section.icons > a {
-  display: block;
-  font-weight: 600;
-  color: var(--ch-highlight);
-  margin-bottom: 15px;
-}
-.ui-components--section.icons > svg {
-  display: block;
-  margin: 15px;
+.ui-components--section.icons svg {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 5px;
 }
 .ui-components--icon {
   --icon-color: var(--ch-light-op50);
@@ -79,14 +163,12 @@
 }
 
 
-/* Form Fields section */
-.ui-components--section.form-fields {
-  background-color: var(--ch-dark-background);
-  padding: 15px;
-}
-
-
 /* Right Edge section */
 .ui-components .right-edge {
   position: static;
+}
+
+.ui-components .ch-button--icon.responsive,
+.ui-components .ch-button--icon.full-width {
+  color: var(--ch-light);
 }

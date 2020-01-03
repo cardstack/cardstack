@@ -23,6 +23,10 @@ package-lock.json
 /packages/hub/**/*.js
 /packages/hub/**/*.js.map
 
+/packages/git/**/*.d.ts
+/packages/git/**/*.js
+/packages/git/**/*.js.map
+
 /packages/test-support/**/*.d.ts
 /packages/test-support/**/*.js
 /packages/test-support/**/*.js.map

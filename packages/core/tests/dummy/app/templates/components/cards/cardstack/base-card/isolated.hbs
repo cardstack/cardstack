@@ -1,8 +1,7 @@
 <div
+  class="isolated-card cardstack_base-card-isolated {{safe-css-string @card.name}}-isolated {{safe-css-string @card.adoptedFromName}}-isolated"
   data-test-isolated-card={{@card.name}}
-  data-test-isolated-card-mode={{@mode}}
-  class="isolated-card cardstack_base-card"
->
+  data-test-isolated-card-mode={{@mode}}>
   {{#each @card.isolatedFields key="nonce" as |field|}}
     {{#if @setFieldValue}}
       <FieldRenderer
@@ -17,21 +16,17 @@
       <FieldRenderer
         @field={{field}}
         @mode={{@mode}}
+        @dropField={{@dropField}}
         @removeField={{@removeField}}
         @setPosition={{@setPosition}}
         @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
         @setFieldName={{@setFieldName}}
         @selectField={{@selectField}}
+        @selectedField={{@selectedField}}
       />
     {{else}}
       <FieldRenderer @field={{field}} @mode={{@mode}}/>
     {{/if}}
     <br>
   {{/each}}
-  {{#if @dropField}}
-    <DropZone
-      @dropField={{@dropField}}
-      @position={{@card.isolatedFields.length}}
-    />
-  {{/if}}
 </div>

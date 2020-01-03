@@ -10,6 +10,7 @@
   --border: 1px solid transparent;
   --border-radius: 100px;
   --box-shadow: none;
+  --transition-duration: 800ms;
 
   display: inline-block;
   margin: var(--margin);
@@ -71,6 +72,12 @@
   --icon-url: url('/assets/images/buttons/user-active.svg');
 }
 
+.ch-button--icon.user:hover:disabled,
+.ch-button--icon.user:disabled {
+  --icon-url: url('/assets/images/buttons/user-disabled.svg');
+  cursor: not-allowed;
+}
+
 .ch-button--icon.catalog {
   --icon-url: url('/assets/images/buttons/catalog.svg');
   --border-radius: 0;
@@ -82,6 +89,12 @@
   --icon-url: url('/assets/images/buttons/catalog-active.svg');
 }
 
+.ch-button--icon.catalog:hover:disabled,
+.ch-button--icon.catalog:disabled {
+  --icon-url: url('/assets/images/buttons/catalog-disabled.svg');
+  cursor: not-allowed;
+}
+
 .ch-button--icon.library {
   --icon-url: url('/assets/images/buttons/library.svg');
 }
@@ -89,10 +102,133 @@
   --icon-url: url('/assets/images/buttons/library-active.svg');
 }
 
+.ch-button--icon.eye-on {
+  --icon-url: url('/assets/images/buttons/eye-on.svg');
+  background-size: 30px;
+  margin-right: 20px;
+}
+.ch-button--icon.eye-on:hover {
+  --icon-url: url('/assets/images/buttons/eye-on.svg');
+  opacity: 0.5;
+  filter: alpha(opacity=50);
+}
+
+.ch-button--icon.eye-off {
+  --icon-url: url('/assets/images/buttons/eye-off.svg');
+  background-size: 30px;
+  margin-right: 20px;
+}
+
+.ch-button--icon.eye-off:hover {
+  --icon-url: url('/assets/images/buttons/eye-off.svg');
+  opacity: 0.5;
+  filter: alpha(opacity=50);
+}
+
+.ch-button--icon.dock-right {
+  --icon-url: url('/assets/images/buttons/dock-right-secondary.svg');
+  background-size: 25px 25px;
+}
+
+.ch-button--icon.dock-right.selected {
+  --icon-url: url('/assets/images/buttons/dock-right.svg');
+}
+
+.ch-button--icon.dock-bottom {
+  --icon-url: url('/assets/images/buttons/dock-bottom-secondary.svg');
+  background-size: 25px 25px;
+}
+
+.ch-button--icon.dock-bottom.selected {
+  --icon-url: url('/assets/images/buttons/dock-bottom.svg');
+}
+
+.ch-button--icon.dock-bottom:hover, .ch-button--icon.dock-right:hover {
+  opacity: 0.5;
+  filter: alpha(opacity=50);
+}
+
+.ch-button--icon.responsive {
+  --icon-url: url('/assets/images/buttons/responsive-inactive.svg');
+  --width: auto;
+  --height: auto;
+  padding-top: 25px;
+  background-size: 25px 25px;
+  background-position: top;
+  justify-content: center;
+  align-items: flex-end;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.ch-button--icon.responsive.selected {
+  --icon-url: url('/assets/images/buttons/responsive-active.svg');
+}
+
+.ch-button--icon.responsive:hover, .ch-button--icon.full-width:hover {
+  opacity: 0.5;
+  filter: alpha(opacity=50);
+}
+
+.ch-button--icon.full-width {
+  --icon-url: url('/assets/images/buttons/full-width-inactive.svg');
+  --width: auto;
+  --height: auto;
+  padding-top: 25px;
+  background-size: 20px 20px;
+  background-position: top;
+  display: inline-flex;
+  justify-content: center;
+  align-items: flex-end;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.ch-button--icon.full-width.selected {
+  --icon-url: url('/assets/images/buttons/full-width-active.svg');
+}
+
+.ch-button--save {
+  --width: 140px;
+  position: relative;
+  transition: (background-color var(--transition-duration));
+}
+
+.ch-button--save.saved {
+  --background: var(--ch-highlight-light);
+  transition: (background-color var(--transition-duration));
+}
+
+.ch-button--save.just-saved {
+  --background: var(--ch-success);
+}
+
+.ch-button--save.saved .ch-button--inner {
+  opacity: 0.5;
+}
+
+.ch-button--save.saved .ch-button--inner svg {
+  position: absolute;
+  top: 14px;
+  right: 20px;
+}
+
+.ch-button--save.just-saved .ch-button--inner {
+  opacity: 1;
+}
+
 .ch-button:hover {
   --color: white;
 
   cursor: pointer;
+}
+
+.ch-button:hover:disabled {
+  --color: var(--ch-default);
+}
+
+.ch-button--save:hover:disabled {
+  cursor: default;
 }
 
 .ch-button + .ch-button {

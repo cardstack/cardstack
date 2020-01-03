@@ -1,0 +1,5 @@
+.field-type-decorative-image-view-field img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+}

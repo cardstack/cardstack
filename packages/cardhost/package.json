@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/cardhost",
-  "version": "0.16.6",
+  "version": "0.16.14",
   "description": "The stock Ember app blueprint that hosts Cardstack Cards.",
   "repository": "",
   "license": "MIT",
@@ -28,18 +28,22 @@
     "test": "ember test"
   },
   "devDependencies": {
-    "@cardstack/base-card": "0.16.6",
-    "@cardstack/core": "0.16.6",
-    "@cardstack/eslint-config": "0.16.6",
-    "@cardstack/hub": "0.16.6",
+    "@cardstack/base-card": "0.16.14",
+    "@cardstack/core": "0.16.14",
+    "@cardstack/eslint-config": "0.16.14",
+    "@cardstack/hub": "0.16.14",
+    "@cardstack/requirejs-monaco-ember-polyfill": "^0.0.1",
+    "@cardstack/ui-components": "^0.2.16",
     "@ember/optional-features": "^0.7.0",
-    "@ember/render-modifiers": "1.0.2",
-    "@embroider/compat": "^0.7.0",
-    "@embroider/core": "^0.7.0",
-    "@embroider/webpack": "^0.7.0",
+    "@ember/render-modifiers": "^1.0.2",
+    "@embroider/compat": "^0.10.0",
+    "@embroider/core": "^0.10.0",
+    "@embroider/webpack": "^0.10.0",
     "@glimmer/component": "^0.14.0-alpha.13",
-    "babel-eslint": "^8.0.2",
+    "babel-eslint": "^10.0.2",
     "broccoli-asset-rev": "^3.0.0",
+    "ember-animated": "0.10.0",
+    "ember-animated-tools": "^0.4.1",
     "ember-auto-import": "^1.4.0",
     "ember-cli": "3.13.0",
     "ember-cli-app-version": "^3.2.0",
@@ -66,22 +70,26 @@
     "ember-load-initializers": "^2.0.0",
     "ember-maybe-import-regenerator": "^0.1.6",
     "ember-percy": "^1.6.0",
-    "ember-prism": "^0.5.0",
     "ember-qunit": "^4.1.2",
     "ember-resolver": "^5.1.3",
     "ember-source": "3.13.1",
-    "ember-truth-helpers": "^2.1.0",
-    "eslint-plugin-ember": "^5.0.0",
+    "ember-test-selectors": "^3.0.0",
+    "eslint-plugin-ember": "^7.1.0",
     "eslint-plugin-mocha": "^5.2.0",
-    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-node": "^10.0.0",
     "loader.js": "^4.7.0",
     "monaco-editor": "^0.18.1",
     "monaco-editor-webpack-plugin": "^1.7.0",
     "prember": "^1.0.0",
-    "qunit-dom": "^0.8.0"
+    "qunit-dom": "^0.8.1",
+    "scope-css": "^1.2.1"
   },
   "engines": {
     "node": "8.* || >= 10.*"
+  },
+  "dependencies": {
+    "ember-svg-jar": "^2.2.3",
+    "lodash": "^4.17.11"
   },
   "volta": {
     "node": "12.13.1"

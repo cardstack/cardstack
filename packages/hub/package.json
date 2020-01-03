@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/hub",
-  "version": "0.16.6",
+  "version": "0.16.14",
   "bin": {
     "cardstack-hub": "./bin/cardstack-hub.js"
   },
@@ -30,7 +30,7 @@
     "typescript-memoize": "^1.0.0-alpha.3"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.16.6",
+    "@cardstack/eslint-config": "0.16.14",
     "@types/supertest": "^2.0.8",
     "supertest": "^4.0.2"
   },

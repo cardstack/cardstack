@@ -1,24 +1,37 @@
-<section
+<ReSizable
   ...attributes
-  data-test-editor-pane
-  class="cardhost-card-theme-editor {{if (eq this.cssModeToggle.dockLocation "bottom") "bottom-docked"}}"
+  class="cardhost-card-theme-editor"
+  @width={{this.width}}
+  @directions={{this.directions}}
+  @height={{this.height}}
+  @classNames={{this.classNames}}
 >
-  <h3>Card Theme Editor</h3>
-  <CodeEditor
-    @code={{@model.isolatedCss}}
-    @language="css"
-    @readOnly={{false}}
-    @updateCode={{action "updateCode"}}
-    class="editor-pane-code"
-  />
+  <div class="resizable-content">
+    <div class="editor-section" aria-label={{this.monacoKeyboardInstructions}}>
+      <CodeEditor
+        @title="CSS"
+        @code={{@model.isolatedCss}}
+        @language="css"
+        @readOnly={{false}}
+        @resizable={{true}}
+        @updateCode={{@updateCode}}
+        class="editor-pane--container-highlighted"
+      />
+    </div>
 
-  <h3>HTML Viewer</h3>
-  <CodeEditor
-    @code={{this.markup}}
-    @language="handlebars"
-    @readOnly={{true}}
-    class="editor-pane-code"
-  />
-</section>
+    <div class="editor-section">
+      <CodeEditor
+        @title="HTML"
+        @code={{this.markup}}
+        @language="handlebars"
+        @readOnly={{true}}
+        @resizable={{true}} 
+      />
+    </div>
+    {{svg-jar "icon-grabber" class="drag-handle"}}
+  </div>
+</ReSizable>
 
-<style id="card-styles">{{@model.isolatedCss}}</style>
+<style id="card-styles" data-test-preview-css>
+  {{scope-css @model.isolatedCss @model.name}}
+</style>

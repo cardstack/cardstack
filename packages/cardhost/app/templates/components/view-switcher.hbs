@@ -1,0 +1,14 @@
+<Dropdown
+  @theme="view-switcher"
+  @options={{this.views}}
+  @selected={{this.mode}}
+  @label="Please select a view"
+  @searchEnabled={{false}}
+  @changeAction={{action this.selectView}}
+  data-test-mode-switcher
+as |option|>
+  <span class="view-switcher--option" data-test-mode-switcher-mode={{option.id}}>
+    {{svg-jar option.icon width="18px" height="17px"}}
+    {{option.name}}
+  </span>
+</Dropdown>

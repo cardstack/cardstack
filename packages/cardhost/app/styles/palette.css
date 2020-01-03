@@ -1,34 +1,22 @@
 :root {
-  /* Cardhost color palette */
-  --ch-default: #2e2d38;                      /* body background, cards background, form components default background  */
+  --ch-default: #2e2d38;
   --ch-hover: #272330;
   --ch-disabled: #393642;
-  --ch-highlight: var(--cs-cyan);               /* form components focus state, links hover state */
-  --ch-highlight-hover: var(--cs-darker-cyan);
-  --ch-success: var(--cs-green);
-  --ch-dark-background: #41404d;              /* right edge background */
-  --ch-light-background: #e9e9ed;
-  --ch-deep-background: #141428;              /* use sparsely (currently used on homepage, schema view left-edge bg) */
-  --ch-border: #5b596e;                       /* mostly used as form-components border */
-  --ch-foreground: #5a586a;                   /* serves as medium background on dark background. example: used in right-edge dropdown and pill selector */
+  --ch-dark-background: #41404d;     /* right-edge panel background */
+  --ch-light-background: #e9e9ed;    /* left-edge catalog bg, field-renderer header bg */
+  --ch-deep-background: #141428;     /* use sparsely (homepage, themer, and schema view backgrounds) */
+  --ch-foreground: #5a586a;          /* right-edge dropdown, pill selector, checkbox background */
   --ch-foreground-hover: #434050;
+  --ch-highlight: #00ebe5;           /* form components focus border state, links hover state */
+  --ch-highlight-light: #9af6f3;     /* disabled saved button */
+  --ch-highlight-hover: #00b0ad;
+  --ch-success: #37eb77;
+  --ch-border: #5b596e;              /* button, search-bar, and view-switcher borders */
   --ch-light: #fff;
   --ch-dark: #000;
   --ch-alert: #ff0000;
-  --ch-light-op40: rgba(255, 255, 255, 0.4); /* example: disabled field font color */
-  --ch-light-op50: rgba(255, 255, 255, 0.5); /* example: placeholder or inactive label on dark bg */
-  --ch-light-op60: rgba(255, 255, 255, 0.6); /* example: regular label on dark bg */
-  --ch-dark-op50: rgba(0, 0, 0, 0.5);        /* example: regular label on light bg */
-
-  /* Cardstack color palette */
-  /* (most are not currently in use in cardhost) */
-    --cs-navy: #281e78;
-    --cs-blue: #0069f9;
-    --cs-purple: #6638ff;
-    --cs-fuschia: #ac00ff;
-    --cs-lilac: #a66dfa;
-    --cs-cyan: #00ebe5;
-    --cs-darker-cyan: #00b0ad;
-    --cs-green: #37eb77;
-    --cs-yellow: #c3fc33;
+  --ch-light-op40: #6b6971;         /* disabled border/stroke color on dark bg */
+  --ch-light-op50: rgba(255, 255, 255, 0.5);  /* inactive titles with icons */
+  --ch-light-op60: #cfcfd2;         /* regular label on dark bg */
+  --ch-dark-op50: #404040;          /* regular label on light bg */
 }

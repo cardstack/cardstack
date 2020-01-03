@@ -2,6 +2,7 @@ import Component from '@glimmer/component';
 import { dasherize } from '@ember/string';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import { fieldComponents } from '../utils/mappings';
 
 const defaultSchemaAttrs = ['title', 'type', 'is-meta', 'name', 'instructions', 'embedded'];
 
@@ -35,6 +36,12 @@ export default class FieldRenderer extends Component {
     return this.args.field.type.replace(/::/g, '/').replace(/@/g, '');
   }
 
+  get fieldTypeTitle() {
+    let { title } = fieldComponents.find(el => el.coreType === this.args.field.type);
+
+    return title;
+  }
+
   @action
   updateFieldProperties(element, [nonce]) {
     if (nonce !== this.currentNonce) {
@@ -56,7 +63,15 @@ export default class FieldRenderer extends Component {
   }
 
   get dasherizedType() {
-    return dasherize(this.sanitizedType.replace(/\//g, '-'));
+    return dasherize(this.args.field.type.replace(/@cardstack\/core-types::/g, ''));
+  }
+
+  get friendlyType() {
+    if (this.dasherizedType === 'case-insensitive' || this.dasherizedType === 'string') {
+      return 'text';
+    }
+
+    return '';
   }
 
   get fieldViewer() {

@@ -1,6 +1,6 @@
-<div class="view-field--label" data-test-boolean-field-viewer-label>
+<div class="label {{@field.name}}-label" data-test-boolean-field-viewer-label>
   {{@field.label}}
 </div>
-<div class="view-field--value" data-test-boolean-field-viewer-value>
+<div class="value {{@field.name}}-value" data-test-boolean-field-viewer-value>
   {{#if @field.value}}true{{else}}false{{/if}}
 </div>

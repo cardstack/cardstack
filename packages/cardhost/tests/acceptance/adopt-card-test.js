@@ -113,8 +113,8 @@ module('Acceptance | card adoption', function(hooks) {
 
     await showCardId();
 
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-name').hasText(card1Id);
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name').hasText('Base Card');
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText(card1Id);
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').hasText('Base Card');
 
     await click(`[data-test-right-edge] a.adopted-card[href="/cards/${card1Id}/schema"]`);
     await waitFor(`[data-test-card-schema="${card1Id}"]`, { timeout });
@@ -201,7 +201,7 @@ module('Acceptance | card adoption', function(hooks) {
     await click('[data-test-field="address"]');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('address');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').isDisabled();
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('address');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Address');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').isDisabled();
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isDisabled();
@@ -262,8 +262,8 @@ module('Acceptance | card adoption', function(hooks) {
     await addField('treats-available', 'boolean', true);
     await saveCard('creator', card2Id);
 
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-name').hasText(card1Id);
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name').hasText('Base Card');
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText(card1Id);
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').hasText('Base Card');
 
     await visit(`/cards/${card2Id}/adopt`);
     await setCardId(card3Id);
@@ -278,8 +278,8 @@ module('Acceptance | card adoption', function(hooks) {
 
     await saveCard('creator', card3Id);
 
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-name').hasText(card2Id);
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name').hasText(card1Id);
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText(card2Id);
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').hasText(card1Id);
     assert.deepEqual(
       [...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
       ['treats-available', 'address', 'city', 'state', 'zip', 'number-of-bones']
@@ -323,22 +323,22 @@ module('Acceptance | card adoption', function(hooks) {
 
     await showCardId();
 
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-name').hasText(card1Id);
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name').hasText('Base Card');
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText(card1Id);
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').hasText('Base Card');
 
     await click(`[data-test-right-edge] [data-test-remove-adopted-from-btn]`);
     await waitFor('[data-test-right-edge] [data-test-remove-adopted-from-btn]:not(.is-running)', { timeout });
 
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-name').hasText('Base Card');
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name').doesNotExist();
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('Base Card');
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').doesNotExist();
   });
 
   test('remove button is disabled if adopted from base card', async function(assert) {
     await setupParentCard();
     await visit(`/cards/${card1Id}/schema`);
 
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-name').hasText('Base Card');
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name').doesNotExist();
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('Base Card');
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').doesNotExist();
     assert.dom('[data-test-right-edge] [data-test-remove-adopted-from-btn]').isDisabled();
   });
 

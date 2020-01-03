@@ -6,19 +6,14 @@
   --padding-right: var(--ch-right-edge-width);
   --padding-bottom: var(--ch-bottom-edge-height);
 
-  width: 100vw;
+  width: 100%;
   height: 100vh;
+  transition: var(--ch-card-background-color-animate), var(--ch-card-padding-animate);
   background-color: var(--ch-default);
   overflow: hidden;
   padding-top: var(--padding-top);
   padding-left: var(--padding-left);
   padding-right: var(--padding-right);
-  padding-bottom: var(--padding-bottom);
-}
-
-.cardhost-cards.editing-css {
-  padding-left: 0;
-  width: 85%;
 }
 
 /* TODO: Remove this after right-edge is displayed on edit view */
@@ -31,24 +26,16 @@
   --padding-left: var(--ch-left-edge-navbar-width);
 }
 
-.cardhost-cards.add,
-.cardhost-cards.schema,
-.cardhost-cards.adopt {
-  background: url("/assets/images/schema-grid-tile.png") center/60px repeat;
+.cardhost-cards.schema {
+  background-color: var(--ch-deep-background);
 }
 
 .card-creator,
-.card-schema-updator {
-  display: grid;
-  align-items: center;
-  justify-items: center;
-  height: 100%;
-  padding: 0 20px;
-}
-
+.card-schema-updator,
 .card-view,
 .card-editor {
   display: grid;
+  align-items: flex-start;
   justify-items: center;
   height: 100%;
   padding: 0 20px;

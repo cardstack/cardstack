@@ -12,8 +12,8 @@ import {
   dragFieldToNewPosition,
 } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
+import { animationsSettled } from 'ember-animated/test-support';
 
-const timeout = 20000;
 const card1Id = 'millenial-puppies';
 const qualifiedCard1Id = `local-hub::${card1Id}`;
 
@@ -47,7 +47,7 @@ module('Acceptance | card schema', function(hooks) {
     await visit(`/cards/${card1Id}/schema`);
 
     await click('[data-test-field="title"]');
-    assert.dom('[data-test-field="title"] [data-test-field-renderer-type]').hasText('@cardstack/core-types::string');
+    assert.dom('[data-test-field="title"] [data-test-field-renderer-type]').hasText('title (Text)');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
@@ -74,7 +74,7 @@ module('Acceptance | card schema', function(hooks) {
     await visit(`/cards/${card1Id}/schema`);
     assert.equal(currentURL(), `/cards/${card1Id}/schema`);
 
-    assert.dom('[data-test-field="title"] [data-test-field-renderer-label]').hasText('title');
+    assert.dom('[data-test-field="title"] [data-test-field-renderer-label]').hasText('Title');
     await click('[data-test-field="title"]');
     await fillIn('[data-test-right-edge] [data-test-schema-attr="name"] input', 'subtitle');
     await triggerEvent('[data-test-right-edge] [data-test-schema-attr="name"] input', 'keyup');
@@ -85,7 +85,7 @@ module('Acceptance | card schema', function(hooks) {
     await triggerEvent('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea', 'keyup');
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('subtitle');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
     assert
       .dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea')
       .hasValue('fill this in with your subheader');
@@ -101,20 +101,23 @@ module('Acceptance | card schema', function(hooks) {
 
     await visit(`/cards/${card1Id}`);
     assert.dom('[data-test-field="subtitle"] [data-test-string-field-viewer-value]').hasText('test title');
-    assert.dom('[data-test-field="subtitle"] [data-test-string-field-viewer-label]').hasText('subtitle');
+    assert.dom('[data-test-field="subtitle"] [data-test-string-field-viewer-label]').hasText('Subtitle');
     assert.dom('[data-test-field="title"]').doesNotExist();
 
     await visit(`/cards/${card1Id}/edit`);
     assert.dom('[data-test-field="subtitle"] input').hasValue('test title');
-    assert.dom('[data-test-field="subtitle"] [data-test-string-field-editor-label]').hasText('subtitle');
+    assert.dom('[data-test-field="subtitle"] [data-test-cs-component-label="text-field"]').hasText('Subtitle');
+    assert
+      .dom('[data-test-field="subtitle"] [data-test-cs-component-validation]')
+      .hasText('fill this in with your subheader');
     assert.dom('[data-test-field="title"]').doesNotExist();
 
     await visit(`/cards/${card1Id}/schema`);
-    assert.dom('[data-test-field="subtitle"] [data-test-field-renderer-label]').hasText('subtitle');
+    assert.dom('[data-test-field="subtitle"] [data-test-field-renderer-label]').hasText('Subtitle');
     await click('[data-test-field="subtitle"]');
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('subtitle');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
   });
 
   test(`changing the label for a field`, async function(assert) {
@@ -125,7 +128,7 @@ module('Acceptance | card schema', function(hooks) {
     await visit(`/cards/${card1Id}/schema`);
     assert.equal(currentURL(), `/cards/${card1Id}/schema`);
 
-    assert.dom('[data-test-field="title"] [data-test-field-renderer-label]').hasText('title');
+    assert.dom('[data-test-field="title"] [data-test-field-renderer-label]').hasText('Title');
     await click('[data-test-field="title"]');
     await fillIn('[data-test-right-edge] [data-test-schema-attr="label"] input', 'TITLE');
     await triggerEvent('[data-test-right-edge] [data-test-schema-attr="label"] input', 'keyup');
@@ -143,10 +146,10 @@ module('Acceptance | card schema', function(hooks) {
 
     await visit(`/cards/${card1Id}/edit`);
     assert.dom('[data-test-field="title"] input').hasValue('test title');
-    assert.dom('[data-test-field="title"] [data-test-string-field-editor-label]').hasText('TITLE');
+    assert.dom('[data-test-field="title"] [data-test-cs-component-label="text-field"]').hasText('TITLE');
 
     await visit(`/cards/${card1Id}/schema`);
-    assert.dom('[data-test-field="title"] [data-test-field-renderer-label]').hasText('title');
+    assert.dom('[data-test-field="title"] [data-test-field-renderer-label]').hasText('TITLE');
     await click('[data-test-field="title"]');
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('title');
@@ -254,17 +257,19 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
 
     await click('[data-test-field="body"]');
+    await animationsSettled();
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('body');
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('body');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Body');
 
     await click('[data-test-field="subtitle"]');
+    await animationsSettled();
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
 
     await dragAndDropNewField('string');
-    await click('[data-test-field="new-field-3"]');
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('new-field-3');
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('new-field-3');
+    await animationsSettled();
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('field-3');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('field-3');
   });
 
   test(`change a field's needed-when-embedded value to true`, async function(assert) {
@@ -321,32 +326,6 @@ module('Acceptance | card schema', function(hooks) {
     card = JSON.parse(cardJson);
     field = card.included.find(i => `${i.type}/${i.id}` === 'fields/title');
     assert.equal(field.attributes['needed-when-embedded'], false);
-  });
-
-  test(`can navigate to card editor`, async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [['body', 'string', false, 'test body']],
-    });
-    await visit(`/cards/${card1Id}/schema`);
-    await fillIn('[data-test-mode-switcher]', 'edit');
-    await waitFor(`[data-test-card-edit="${card1Id}"]`, { timeout });
-
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
-    assert.dom(`[data-test-card-edit="${card1Id}"]`).exists();
-  });
-
-  test(`can navigate to card view`, async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [['body', 'string', false, 'test body']],
-    });
-    await visit(`/cards/${card1Id}/schema`);
-    await fillIn('[data-test-mode-switcher]', 'view');
-    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
-
-    assert.equal(currentURL(), `/cards/${card1Id}`);
-    assert.dom(`[data-test-card-view="${card1Id}"]`).exists();
   });
 
   test(`can navigate to base card schema`, async function(assert) {

@@ -1,0 +1,21 @@
+{{! template-lint-disable no-inline-styles}}
+<div class="{{if this.isActive "active" "inactive"}} {{@classNames}} re-sizable" 
+  ...attributes
+  id={{this.elementId}}
+  style={{this.style}}
+  {{did-insert this.setElement}}
+  {{did-insert this.setStyle @width @height}}
+  {{did-update this.setStyle @width @height}}
+  >
+
+  {{#each this.directions as |dir|}}
+    <button
+      class={{concat "resizer " dir}}
+      {{on "mousedown" (fn this._onResizeStart dir)}}
+      {{on "touchstart" (fn this._onResizeStart dir)}}
+    >
+    </button>
+  {{/each}}
+
+  {{yield}}
+</div>

@@ -41,4 +41,9 @@ export default class ViewCardController extends Controller {
     this.cssModeToggle.setEditingCss(false);
     this.router.transitionTo('cards.view', this.model, { queryParams: { editingCss: undefined } });
   }
+
+  @action
+  updateCode(code) {
+    this.model.setIsolatedCss(code);
+  }
 }

@@ -1,27 +1,7 @@
-<div class="card-renderer--top-edge-buttons">
-  {{#if this.cssModeToggle.editingCss}}
-    <div
-      class="dock-btn {{if (eq this.cssModeToggle.dockLocation "bottom") "selected"}}" {{on "click" this.cssModeToggle.dockBottom}}
-      data-test-dock-bottom
-    >
-      {{svg-jar "dock-bottom"}}
-    </div>
-    <div
-      class="dock-btn {{if (eq this.cssModeToggle.dockLocation "right") "selected"}}" {{on "click" this.cssModeToggle.dockRight}}
-      data-test-dock-right
-    >
-      {{svg-jar "dock-right"}}
-    </div>
-    <button {{on "click" this.closeEditor}}
-      class="ch-button close-editor-btn"
-      data-test-close-editor
-    >
-      Close Editor
-    </button>
-
-  {{else}}
-    {{! eslint is confused by on helper }}
-    {{! template-lint-disable attribute-indentation}}
+{{#if this.cssModeToggle.editingCss}}
+  <ThemerToolbar @closeEditor={{this.closeEditor}} />
+{{else}}
+  <div class="card-renderer--top-edge-buttons">
     <button
       class="ch-button ch-button--icon share"
       aria-label="Share button"
@@ -33,15 +13,9 @@
     >
       Preview
     </button>
-    <button
-      class="ch-button"
-      disabled={{not this.cardstackSession.isAuthenticated}}
-      {{on "click" this.save}}
-    >
-      Save
-    </button>
-  {{/if}}
-</div>
+    <SaveButton @card={{this.model}} />
+  </div>
+{{/if}}
 
 {{#unless this.cssModeToggle.editingCss}}
   <CardhostLeftEdge />
@@ -64,10 +38,13 @@
 
 
 {{#if this.cssModeToggle.editingCss}}
-  <EditorPane data-test-dock-location={{this.cssModeToggle.dockLocation}}
-    @model={{this.model}}
-    @saveCss={{this.saveCss}}
-  />
+  <div data-test-editor-pane>
+    <EditorPane data-test-dock-location={{this.cssModeToggle.dockLocation}}
+      @model={{this.model}}
+      @saveCss={{this.saveCss}}
+      @updateCode={{this.updateCode}}
+    />
+  </div>
 {{else}}
   <RightEdge
     @card={{this.card}}
@@ -78,7 +55,7 @@
       </div>
       <div class="right-edge--item">
         <Dropdown
-          @theme="dark"
+          @theme="cs-dark"
           @searchEnabled={{false}}
           @label="Choose a theme:"
           @options={{this.themerOptions}}
@@ -95,4 +72,6 @@
   </RightEdge>
 {{/if}}
 
-<style id="card-styles">{{this.model.isolatedCss}}</style>
+<style id="card-styles" data-test-view-css>
+  {{scope-css this.model.isolatedCss this.model.name}}
+</style>

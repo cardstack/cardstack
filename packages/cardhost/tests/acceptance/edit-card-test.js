@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { click, fillIn, find, visit, currentURL, waitFor } from '@ember/test-helpers';
+import { click, find, visit, currentURL, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures';
 import { setFieldValue, createCards, saveCard } from '@cardstack/test-support/card-ui-helpers';
@@ -239,42 +239,28 @@ module('Acceptance | card edit', function(hooks) {
     assert.equal(userCard.attributes.email, undefined);
   });
 
-  test(`can navigate to card schema`, async function(assert) {
+  test(`setting an image`, async function(assert) {
     await login();
     await createCards({
-      [card1Id]: [['body', 'string', false, 'test body']],
+      [card1Id]: [['image', 'decorative image', false, 'test image']],
     });
     await visit(`/cards/${card1Id}/edit`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
 
-    assert.dom('[data-test-mode-switcher-mode]').exists();
-    assert.dom('[data-test-mode-switcher-mode="edit"]').hasClass('selected');
+    await setFieldValue('image', 'http://example.com/testimage.jpg');
 
-    await fillIn('[data-test-mode-switcher]', 'schema');
-    await waitFor(`[data-test-card-schema="${card1Id}"]`, { timeout });
+    await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/schema`);
-    assert.dom(`[data-test-card-schema="${card1Id}"]`).exists();
-    assert.dom('[data-test-mode-switcher-mode="schema"]').hasClass('selected');
-    assert.dom('[data-test-mode-switcher-mode].selected').exists({ count: 1 });
-  });
+    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
 
-  test(`can navigate to card view`, async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [['body', 'string', false, 'test body']],
-    });
-    await visit(`/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}`);
+    assert
+      .dom('[data-test-field="image"] [data-test-decorative-image-field-viewer-value]')
+      .hasAttribute('src', 'http://example.com/testimage.jpg');
 
-    assert.dom('[data-test-mode-switcher-mode]').exists();
-    assert.dom('[data-test-mode-switcher-mode="edit"]').hasClass('selected');
-
-    await fillIn('[data-test-mode-switcher]', 'view');
-    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
-
-    assert.equal(currentURL(), `/cards/${card1Id}`);
-    assert.dom(`[data-test-card-view="${card1Id}"]`).exists();
-    assert.dom('[data-test-mode-switcher-mode="view"]').hasClass('selected');
-    assert.dom('[data-test-mode-switcher-mode].selected').exists({ count: 1 });
+    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let card = JSON.parse(cardJson);
+    assert.equal(card.data.attributes.image, 'http://example.com/testimage.jpg');
   });
 
   test(`deleting a card`, async function(assert) {

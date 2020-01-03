@@ -1,35 +1,34 @@
 @import '/assets/fonts.css';
+@import '/assets/resizable.css';
 @import '/assets/palette.css';
 @import '/assets/ui-components.css';
 
 @import '/assets/index.css';
 @import '/assets/cards.css';
-@import '/assets/components/mode-switcher.css';
+@import '/assets/components/view-switcher.css';
 @import '/assets/components/right-edge.css';
 @import '/assets/components/cardhost-left-edge.css';
 @import '/assets/components/cardhost-top-edge.css';
 @import '/assets/components/button.css';
-@import '/assets/components/form-elements.css';
 @import '/assets/components/search-bar.css';
 @import '/assets/components/filter-bar.css';
 @import '/assets/components/catalog.css';
 @import '/assets/components/catalog-field.css';
 @import '/assets/components/adopted-from.css';
+@import '/assets/components/themer.css';
 
 /* Cardhost styling for core package templates */
 @import '/assets/components/card-renderer.css';
 @import '/assets/components/field-renderer.css';
-@import '/assets/components/field-renderer-schema-field.css';
-@import '/assets/components/field-renderer-edit-field.css';
-@import '/assets/components/field-renderer-view-field.css';
+@import '/assets/components/schema-field-renderer.css';
 @import '/assets/components/drop-zone.css';
-
 
 /* TODO eventually these will be dynamically added to the DOM.
 Until that work is done we are statically adding this css
 */
 @import '/assets/cards/base-card-isolated.css';
 @import '/assets/cards/base-card-embedded.css';
+@import '/assets/cards/event-card-isolated.css';
 @import '/assets/fields/belongs-to-editor.css';
 @import '/assets/fields/belongs-to-viewer.css';
 @import '/assets/fields/boolean-editor.css';
@@ -38,6 +37,7 @@ Until that work is done we are statically adding this css
 @import '/assets/fields/case-insensitive-viewer.css';
 @import '/assets/fields/date-editor.css';
 @import '/assets/fields/date-viewer.css';
+@import '/assets/fields/decorative-image-viewer.css';
 @import '/assets/fields/has-many-editor.css';
 @import '/assets/fields/has-many-viewer.css';
 @import '/assets/fields/integer-editor.css';
@@ -46,11 +46,10 @@ Until that work is done we are statically adding this css
 @import '/assets/fields/string-viewer.css';
 
 :root {
-  --ch-font-family: "Open Sans", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
-
+  --ch-font-family: 'Open Sans', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --ch-left-edge-navbar-width: 80px;
   --ch-left-edge-panel-width: 330px;
-  --ch-right-edge-panel-width: 300px;
+  --ch-right-edge-panel-width: 330px;
 
   --ch-top-edge-height: 80px;
   --ch-left-edge-width: calc(var(--ch-left-edge-panel-width) + var(--ch-left-edge-navbar-width));
@@ -59,12 +58,15 @@ Until that work is done we are statically adding this css
 
   --ch-component-width: 260px;
   --ch-component-height: 40px;
-
+  --ch-card-size: 496px;
+  --ch-field-width: 384px;
   --ch-spacing: 20px;
   --ch-edges-z-index: 10;
   --ch-actions-z-index: 11;
   --ch-transition-time: 250ms;
   --ch-card-transition-duration: 300ms;
+  --ch-card-background-color-animate: background-color 0.5s ease;
+  --ch-card-padding-animate: padding-right 0.3s ease;
 }
 
 /*
@@ -101,21 +103,12 @@ body {
 }
 
 a {
-  --link: white;
-
-  color: var(--link);
+  color: inherit;
   text-decoration: none;
 }
 
 a:hover {
-  --link: var(--ch-highlight);
-
   cursor: pointer;
-}
-
-.padding-vertical-small {
-  padding-top: var(--ch-spacing);
-  padding-bottom: var(--ch-spacing);
 }
 
 /* Other */
@@ -125,20 +118,6 @@ a:hover {
   right: var(--ch-spacing);
   display: flex;
   z-index: var(--ch-actions-z-index);
-}
-
-.card-renderer--top-edge-buttons .dock-btn {
-  margin: 10px 15px;
-  cursor: pointer;
-}
-
-.card-renderer--top-edge-buttons .dock-btn.selected g {
-  stroke: var(--ch-highlight);
-}
-
-.card-renderer--top-edge-buttons .close-editor-btn {
-  --width: 125px;
-  margin-left: 20px;
 }
 
 .card-schema-updator--search-bar {
@@ -160,76 +139,42 @@ a:hover {
   text-align: right;
 }
 
-.loader-container {
-  width: 60px;
+.loading-spinner {
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  right: 20px;
+  width: 20px;
+  height: 20px;
 }
 
-.loader {
-  margin: 20px auto;
-  font-size: 6px;
-  width: 1em;
-  height: 1em;
+.loading-spinner div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  margin: 8px;
+  border: 2px solid black;
   border-radius: 50%;
-  position: relative;
-  text-indent: -9999em;
-  -webkit-animation: load5 1.1s infinite ease;
-  animation: load5 1.1s infinite ease;
-  -webkit-transform: translateZ(0);
-  -ms-transform: translateZ(0);
-  transform: translateZ(0);
+  animation: loading-spinner 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: black transparent transparent transparent;
 }
-@-webkit-keyframes load5 {
-  0%,
-  100% {
-    box-shadow: 0em -2.6em 0em 0em #ffffff, 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.5), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.7);
-  }
-  12.5% {
-    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.7), 1.8em -1.8em 0 0em #ffffff, 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.5);
-  }
-  25% {
-    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.5), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.7), 2.5em 0em 0 0em #ffffff, 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
-  }
-  37.5% {
-    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.5), 2.5em 0em 0 0em rgba(255, 255, 255, 0.7), 1.75em 1.75em 0 0em #ffffff, 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
-  }
-  50% {
-    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.5), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.7), 0em 2.5em 0 0em #ffffff, -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
-  }
-  62.5% {
-    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.5), 0em 2.5em 0 0em rgba(255, 255, 255, 0.7), -1.8em 1.8em 0 0em #ffffff, -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
-  }
-  75% {
-    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.5), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.7), -2.6em 0em 0 0em #ffffff, -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
-  }
-  87.5% {
-    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.5), -2.6em 0em 0 0em rgba(255, 255, 255, 0.7), -1.8em -1.8em 0 0em #ffffff;
-  }
+.loading-spinner div:nth-child(1) {
+  animation-delay: -0.45s;
 }
-@keyframes load5 {
-  0%,
+.loading-spinner div:nth-child(2) {
+  animation-delay: -0.3s;
+}
+.loading-spinner div:nth-child(3) {
+  animation-delay: -0.15s;
+}
+@keyframes loading-spinner {
+  0% {
+    transform: rotate(0deg);
+  }
   100% {
-    box-shadow: 0em -2.6em 0em 0em #ffffff, 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.5), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.7);
-  }
-  12.5% {
-    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.7), 1.8em -1.8em 0 0em #ffffff, 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.5);
-  }
-  25% {
-    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.5), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.7), 2.5em 0em 0 0em #ffffff, 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
-  }
-  37.5% {
-    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.5), 2.5em 0em 0 0em rgba(255, 255, 255, 0.7), 1.75em 1.75em 0 0em #ffffff, 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
-  }
-  50% {
-    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.5), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.7), 0em 2.5em 0 0em #ffffff, -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
-  }
-  62.5% {
-    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.5), 0em 2.5em 0 0em rgba(255, 255, 255, 0.7), -1.8em 1.8em 0 0em #ffffff, -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
-  }
-  75% {
-    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.5), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.7), -2.6em 0em 0 0em #ffffff, -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
-  }
-  87.5% {
-    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.5), -2.6em 0em 0 0em rgba(255, 255, 255, 0.7), -1.8em -1.8em 0 0em #ffffff;
+    transform: rotate(360deg);
   }
 }
 
@@ -240,41 +185,6 @@ a:hover {
   overflow: hidden;
 }
 
-.cardhost-card-theme-editor {
-  position: fixed;
-  right: 0;
-  top: 0;
-  width: 40%;
-  height: 100%;
-  background: var(--ch-deep-background);
-  z-index: 10;
-  padding: 20px;
-}
-
-.cardhost-card-theme-editor.bottom-docked {
-  top: auto;
-  bottom: 0;
-  left: 0;
-  height: 40%;
-  width: 100%;
-}
-
-.dock-icon-unselected {
-  --icon-color: --ch-light-gray-b1;
-}
-
-.cardhost-card-document--codeblock {
-  height: 0;
-}
-
-.cardhost-monaco-container {
-  min-height: 50px;
-  margin-bottom: 1em;
-  overflow: hidden;
-  resize: vertical;
-  background-color: #1e1e1e;
-}
-
-.cardhost-monaco-container.editor-pane-code {
-  min-height: 35vh;
+.animated-tools {
+  z-index: 20;
 }

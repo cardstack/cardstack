@@ -58,6 +58,7 @@ before_install:
   - ssh-keyscan -p 9022 -t rsa,ecdsa-sha2-nistp256 localhost >> $HOME/.ssh/known_hosts
   - chmod 600 packages/git/node-tests/git-ssh-server/cardstack-test-key
   - export PATH=$HOME/.yarn/bin:$PATH
+  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then PERCY_TOKEN="skip percy"; fi'
 
 install:
   - yarn install

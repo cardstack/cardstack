@@ -3,99 +3,12 @@ import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import { dasherize } from '@ember/string';
+import { startCase } from 'lodash';
 import { task } from 'ember-concurrency';
 import ENV from '@cardstack/cardhost/config/environment';
+import { fieldTypeMappings, fieldComponents } from '@cardstack/core/utils/mappings';
 
 const { environment } = ENV;
-
-const fieldTypeMappings = {
-  string: '@cardstack/core-types::string',
-  'case-insensitive string': '@cardstack/core-types::case-insensitive',
-  boolean: '@cardstack/core-types::boolean',
-  date: '@cardstack/core-types::date',
-  integer: '@cardstack/core-types::integer',
-  'related card': '@cardstack/core-types::belongs-to',
-  'related cards': '@cardstack/core-types::has-many',
-
-  // Probably want to omit these types as they could probably be better
-  // handled as related cards:
-  // '@cardstack/core-types::string-array',
-  // '@cardstack/core-types::object',
-};
-
-export const fieldComponents = [
-  {
-    id: 'text-field',
-    coreType: '@cardstack/core-types::string',
-    title: 'Text',
-    description: 'All-purpose text field',
-    type: 'string',
-    icon: `/assets/images/field-types/text.svg`,
-  },
-  {
-    id: 'text-field-case-insensitive',
-    coreType: '@cardstack/core-types::case-insensitive',
-    title: 'Text (case-insensitive)',
-    description: 'Case-insensitive text field',
-    type: 'case-insensitive string',
-    icon: `/assets/images/field-types/text.svg`,
-  },
-  {
-    id: 'checkbox',
-    coreType: '@cardstack/core-types::boolean',
-    title: 'Checkbox',
-    description: 'True/false (boolean) values',
-    type: 'boolean',
-    icon: `/assets/images/field-types/checkbox.svg`,
-  },
-  {
-    id: 'date-field',
-    coreType: '@cardstack/core-types::date',
-    title: 'Date',
-    description: 'Date field',
-    type: 'date',
-    icon: `/assets/images/field-types/calendar.svg`,
-  },
-  {
-    id: 'number',
-    coreType: '@cardstack/core-types::integer',
-    title: 'Number',
-    description: 'Integer number field',
-    type: 'integer',
-    icon: `/assets/images/field-types/number.png`,
-  },
-  {
-    id: 'dropdown',
-    coreType: '@cardstack/core-types::belongs-to',
-    title: 'Single-select',
-    description: 'Single select dropdown',
-    type: 'related card',
-    icon: `/assets/images/field-types/dropdown.svg`,
-  },
-  {
-    id: 'dropdown-multi',
-    coreType: '@cardstack/core-types::has-many',
-    title: 'Multi-select',
-    description: 'Multiple select dropdown',
-    type: 'related cards',
-    icon: `/assets/images/field-types/dropdown.svg`,
-  },
-  // We'll need to figure out how to deal with the other types of ui-components, ex:
-  // {
-  //   id: 'text-area',
-  //   title: 'Text Area',
-  //   description: 'Multi-line text field',
-  //   type: 'string',
-  //   icon: `/assets/images/field-types/textarea.png`
-  // },
-  // {
-  //   id: 'phone-number-field',
-  //   title: 'Phone Number',
-  //   description: 'Description',
-  //   type: 'string',
-  //   icon: `/assets/images/field-types/phone-number.png`
-  // },
-];
 
 export default class CardManipulator extends Component {
   fieldTypeMappings = fieldTypeMappings;
@@ -131,7 +44,7 @@ export default class CardManipulator extends Component {
   }
 
   get newFieldName() {
-    return `new-field-${this.card.isolatedFields.length}`;
+    return `field-${this.card.isolatedFields.length}`;
   }
 
   get didUpdate() {
@@ -147,23 +60,6 @@ export default class CardManipulator extends Component {
       this.card = card;
     }
   }
-
-  @task(function*() {
-    this.statusMsg = null;
-    let cardIsNew = this.card.isNew;
-
-    try {
-      yield this.card.save();
-    } catch (e) {
-      console.error(e); // eslint-disable-line no-console
-      this.statusMsg = `card ${this.card.name} was NOT successfully created: ${e.message}`;
-      return;
-    }
-    if (cardIsNew) {
-      this.router.transitionTo('cards.schema', this.card.name);
-    }
-  })
-  saveCard;
 
   @task(function*() {
     this.statusMsg = null;
@@ -224,7 +120,7 @@ export default class CardManipulator extends Component {
   }
 
   @action
-  setNeededWhenEmbedded(fieldName, evt) {
+  setNeededWhenEmbedded(fieldName, neededWhenEmbedded, evt) {
     // this prevents 2-way data binding from trying to alter the Field
     // instance's neededWhenEmbedded value, which is bound to the input
     // that fired this action. Our data service API is very unforgiving when
@@ -240,9 +136,6 @@ export default class CardManipulator extends Component {
       evt.preventDefault();
     }
 
-    let {
-      target: { checked: neededWhenEmbedded },
-    } = evt;
     this.card.getField(fieldName).setNeededWhenEmbedded(neededWhenEmbedded);
   }
 
@@ -257,7 +150,7 @@ export default class CardManipulator extends Component {
   @action
   setFieldName(oldFieldName, newFieldName) {
     this.card.getField(oldFieldName).setName(newFieldName);
-    this.card.getField(newFieldName).setLabel(newFieldName);
+    this.card.getField(newFieldName).setLabel(startCase(newFieldName));
   }
 
   @action
@@ -268,11 +161,6 @@ export default class CardManipulator extends Component {
   @action
   setFieldInstructions(fieldName, instructions) {
     this.card.getField(fieldName).setInstructions(instructions);
-  }
-
-  @action
-  save() {
-    this.saveCard.perform();
   }
 
   @action

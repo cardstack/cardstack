@@ -71,6 +71,8 @@ module.exports = function(defaults) {
                 '<Fields::Cardstack::CoreTypes::BelongsToEditor/>',
                 '<Fields::Cardstack::CoreTypes::HasManyViewer/>',
                 '<Fields::Cardstack::CoreTypes::HasManyEditor/>',
+                '<Fields::Cardstack::CoreTypes::DecorativeImageViewer/>',
+                '<Fields::Cardstack::CoreTypes::DecorativeImageEditor/>',
               ],
             },
           },
@@ -99,6 +101,14 @@ module.exports = function(defaults) {
           components: {
             '{{liquid-bind}}': {
               yieldsArguments: ['value'],
+            },
+          },
+        },
+        {
+          package: 'ember-element-helper',
+          addonModules: {
+            'helpers/-element.js': {
+              dependsOnComponents: ['{{-dynamic-element}}', '{{-dynamic-element-alt}}'],
             },
           },
         },
