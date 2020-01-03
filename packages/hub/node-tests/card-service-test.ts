@@ -195,11 +195,11 @@ describe('hub/card-service', function() {
         throw new Error(`should not have been able to create`);
       } catch (err) {
         expect(err).hasStatus(400);
-        expect(err.detail).to.match(/some good error/);
+        expect(err.detail).to.match(/no such field "badField"/);
       }
     });
 
-    it.skip('rejects unknown relationship at create', async function() {
+    it('rejects unknown relationship at create', async function() {
       let doc = testCard()
         .withRelationships({
           badField: testCard().withAttributes({ csRealm: 'x', csId: 'y' }),
@@ -212,7 +212,7 @@ describe('hub/card-service', function() {
         throw new Error(`should not have been able to create`);
       } catch (err) {
         expect(err).hasStatus(400);
-        expect(err.detail).to.match(/some good error/);
+        expect(err.detail).to.match(/no such field "badField"/);
       }
     });
   });

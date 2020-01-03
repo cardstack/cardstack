@@ -1,12 +1,14 @@
-import { AddressableCard, CardId } from './card';
+import { AddressableCard, CardId, Card, canonicalURL } from './card';
 import { Query } from './query';
 import { myOrigin } from './origin';
 import { WriterFactory } from './writer';
 import { testCard } from './node-tests/test-card';
-import { CardExpression } from './pgsearch/util';
+import { Expression } from './pgsearch/util';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
 import { IndexerFactory } from './indexer';
 import { ScopedCardService } from './cards-service';
+import * as FieldHooks from './field-hooks';
+import * as J from 'json-typescript';
 
 function ephemeralRealms(cards: ScopedCardService) {
   return [
@@ -75,20 +77,81 @@ export async function get(id: CardId, cards: ScopedCardService): Promise<Address
   return null;
 }
 
-export async function loadWriter(card: AddressableCard, cards: ScopedCardService): Promise<WriterFactory> {
+export async function loadFeature(
+  card: Card,
+  cards: ScopedCardService,
+  featureName: 'writer'
+): Promise<WriterFactory | null>;
+export async function loadFeature(
+  card: Card,
+  cards: ScopedCardService,
+  featureName: 'indexer'
+): Promise<IndexerFactory<J.Value> | null>;
+export async function loadFeature(
+  card: Card,
+  cards: ScopedCardService,
+  featureName: 'field-validate'
+): Promise<FieldHooks.validate<unknown>>;
+export async function loadFeature(
+  card: Card,
+  cards: ScopedCardService,
+  featureName: 'field-deserialize'
+): Promise<FieldHooks.deserialize<unknown, unknown>>;
+export async function loadFeature(
+  card: Card,
+  cards: ScopedCardService,
+  featureName: 'field-buildValueExpression'
+): Promise<FieldHooks.buildValueExpression>;
+export async function loadFeature(card: Card, cards: ScopedCardService, featureName: any): Promise<any> {
+  switch (featureName) {
+    case 'writer':
+      return await loadWriter(card, cards);
+    case 'indexer':
+      return await loadIndexer(card, cards);
+    case 'field-validate':
+      return (await loadFieldHooks(card))?.validate;
+    case 'field-deserialize':
+      return (await loadFieldHooks(card))?.deserialize;
+    case 'field-buildValueExpression':
+      return (await loadFieldHooks(card))?.buildValueExpression;
+    default:
+      throw new Error(`unimplemented loadFeature("${featureName}")`);
+  }
+}
+
+async function loadWriter(card: Card, cards: ScopedCardService): Promise<WriterFactory> {
   if (ephemeralRealms(cards).find(realm => realm.canonicalURL === card.canonicalURL)) {
     return (await import('./ephemeral/writer')).default;
   }
   throw new Error(`unimplemented`);
 }
 
-export async function loadIndexer(card: AddressableCard, cards: ScopedCardService): Promise<IndexerFactory<unknown>> {
+async function loadIndexer(card: Card, cards: ScopedCardService): Promise<IndexerFactory<unknown>> {
   if (ephemeralRealms(cards).find(realm => realm.canonicalURL === card.canonicalURL)) {
     return (await import('./ephemeral/indexer')).default as IndexerFactory<unknown>;
   }
   throw new Error(`unimplemented`);
 }
 
-export function buildValueExpression(expression: CardExpression): CardExpression {
-  return expression;
+async function loadFieldHooks(
+  card: Card
+): Promise<{
+  validate: FieldHooks.validate<string>;
+  deserialize: FieldHooks.deserialize<string, string>;
+  buildValueExpression: FieldHooks.buildValueExpression;
+} | null> {
+  if (card.canonicalURL === canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'string-field' })) {
+    return {
+      validate: async (value: string, _fieldCard: Card) => {
+        return typeof value === 'string';
+      },
+      deserialize: async (value: string, _fieldCard: Card) => {
+        return value;
+      },
+      buildValueExpression(e: Expression): Expression {
+        return e;
+      },
+    };
+  }
+  return null;
 }

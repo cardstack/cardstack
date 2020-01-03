@@ -1,5 +1,5 @@
 import { SingleResourceDoc } from 'jsonapi-typescript';
-import { CardId, canonicalURL } from '../card';
+import { CardId, canonicalURL, cardstackFieldPattern } from '../card';
 import { UpstreamDocument } from '../document';
 import { CARDSTACK_PUBLIC_REALM } from '../realm';
 
@@ -17,7 +17,7 @@ export class TestCard {
   withAttributes<T extends TestCard>(this: T, values: FieldValues): T;
   withAttributes(values: FieldValues): TestCard | TestCardWithId {
     for (let [field, value] of Object.entries(values)) {
-      if (/^cs[A-Z]/.test(field)) {
+      if (cardstackFieldPattern.test(field)) {
         // cardstack fields
         switch (field) {
           case 'csId':

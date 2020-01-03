@@ -1,17 +1,16 @@
 import CardstackError from './error';
-import { loadIndexer, loadWriter, buildValueExpression } from './scaffolding';
+import { loadFeature } from './scaffolding';
 import { WriterFactory } from './writer';
 import { PristineDocument, UpstreamDocument, UpstreamIdentity, PristineCollection } from './document';
-import { SingleResourceDoc } from 'jsonapi-typescript';
+import { SingleResourceDoc, RelationshipObject } from 'jsonapi-typescript';
 import cloneDeep from 'lodash/cloneDeep';
 import isPlainObject from 'lodash/isPlainObject';
 import mergeWith from 'lodash/mergeWith';
-import { CardExpression } from './pgsearch/util';
 import { ResponseMeta } from './pgsearch/pgclient';
 import * as J from 'json-typescript';
 import { IndexerFactory } from './indexer';
-import { myOrigin } from './origin';
 import { ScopedCardService } from './cards-service';
+import * as FieldHooks from './field-hooks';
 
 export const apiPrefix = '/api';
 
@@ -32,21 +31,20 @@ export function canonicalURLToCardId(url: string): CardId {
 }
 
 export function canonicalURL(id: CardId): string {
-  let isHome = id.csOriginalRealm === id.csRealm;
-  let base = `${myOrigin}${apiPrefix}/realms`;
-  let localRealmId = id.csRealm.slice(base.length + 1);
+  let isHome = !id.csOriginalRealm || id.csOriginalRealm === id.csRealm;
   if (isHome) {
-    return [base, localRealmId, 'cards', encodeURIComponent(id.csId)].join('/');
+    return [id.csRealm, 'cards', encodeURIComponent(id.csId)].join('/');
   } else {
     return [
-      base,
-      localRealmId,
+      id.csRealm,
       'cards',
       encodeURIComponent(id.csOriginalRealm ?? id.csRealm),
       encodeURIComponent(id.csId),
     ].join('/');
   }
 }
+
+export const cardstackFieldPattern = /^cs[A-Z]/;
 
 export async function makePristineCollection(
   cards: AddressableCard[],
@@ -116,10 +114,83 @@ export class Card {
     return new Card(this.jsonapi, this.csRealm, this.service);
   }
 
-  async validate(_priorCard: AddressableCard | null, _realm: AddressableCard, _forDeletion?: true) {}
+  async validate(priorCard: AddressableCard | null, realm: AddressableCard, _forDeletion?: true) {
+    // validate all present user attributes (fields-by-value)
+    if (this.jsonapi.data.attributes) {
+      for (let [name, value] of Object.entries(this.jsonapi.data.attributes)) {
+        if (cardstackFieldPattern.test(name)) {
+          continue;
+        }
+        let field = await this.field(name);
+        field.validateFieldValue(await priorCard?.value(name), value, realm);
+      }
+    }
 
-  async value(name: string): Promise<any> {
-    return this.jsonapi.data.attributes?.[name];
+    // validate all present user relationships (fields-by-reference)
+    if (this.jsonapi.data.relationships) {
+      for (let [name, ref] of Object.entries(this.jsonapi.data.relationships)) {
+        if (cardstackFieldPattern.test(name)) {
+          continue;
+        }
+        let field = await this.field(name);
+        field.validateFieldReference(await priorCard?.reference(name), relationshipToCardId(ref), realm);
+      }
+    }
+  }
+
+  private async validateFieldValue(priorFieldValue: any, value: any, realm: AddressableCard) {
+    let validate = await this.loadFeature('field-validate');
+    if (validate) {
+      if (!(await validate(value, this))) {
+        throw new CardstackError(`field validation error: <add better error message here>`);
+      }
+      return;
+    }
+    let copy = this.clone();
+    copy.patch({ data: value });
+    await copy.validate(priorFieldValue, realm);
+  }
+
+  private async validateFieldReference(
+    _priorReference: CardId | undefined,
+    _newReference: CardId | undefined,
+    _realm: AddressableCard
+  ) {
+    // TODO
+  }
+
+  private async deserializeFieldValue(value: any): Promise<any> {
+    let deserialize = await this.loadFeature('field-deserialize');
+    if (deserialize) {
+      return await deserialize(value, this);
+    }
+    let copy = this.clone();
+    copy.patch({ data: value });
+    return copy;
+  }
+
+  // gets the value of a field. Its type is governed by the schema of this card.
+  async value(fieldName: string): Promise<any> {
+    let rawValue = this.jsonapi.data.attributes?.[fieldName];
+    if (rawValue != null) {
+      let field = await this.field(fieldName);
+      return await field.deserializeFieldValue(rawValue);
+    }
+    let ref = await this.reference(fieldName);
+    if (ref != null) {
+      return await this.service.get(ref);
+    }
+    return null;
+  }
+
+  // if the given field is stored as a reference, this gives you the reference
+  // without converting it to a value like `value()` would.
+  async reference(fieldName: string): Promise<CardId | undefined> {
+    let ref = this.jsonapi.data.relationships?.[fieldName];
+    if (ref != null) {
+      return relationshipToCardId(ref);
+    }
+    return undefined;
   }
 
   async field(name: string): Promise<Card> {
@@ -127,7 +198,7 @@ export class Card {
     if (field) {
       return field;
     }
-    throw new Error(`no such field ${name} on card`);
+    throw new CardstackError(`no such field "${name}"`, { status: 400 });
   }
 
   protected regenerateJSONAPI(): SingleResourceDoc {
@@ -196,6 +267,30 @@ export class Card {
       }
     }
   }
+
+  async loadFeature(featureName: 'writer'): Promise<WriterFactory | null>;
+  async loadFeature(featureName: 'indexer'): Promise<IndexerFactory<J.Value> | null>;
+  async loadFeature(featureName: 'field-validate'): Promise<null | FieldHooks.validate<unknown>>;
+  async loadFeature(featureName: 'field-deserialize'): Promise<null | FieldHooks.deserialize<unknown, unknown>>;
+  async loadFeature(featureName: 'field-buildValueExpression'): Promise<null | FieldHooks.buildValueExpression>;
+  async loadFeature(featureName: any): Promise<any> {
+    let card: Card | undefined = this;
+    while (card) {
+      let result = await loadFeature(card, this.service, featureName);
+      if (result) {
+        return result;
+      }
+      card = await this.adoptsFrom();
+    }
+    return null;
+  }
+
+  get canonicalURL(): string | undefined {
+    if (this.csId) {
+      return canonicalURL({ csId: this.csId, csRealm: this.csRealm, csOriginalRealm: this.csOriginalRealm });
+    }
+    return undefined;
+  }
 }
 
 export class UnsavedCard extends Card {
@@ -230,22 +325,6 @@ export class AddressableCard extends UnsavedCard implements CardId {
     return new AddressableCard(this.jsonapi, this.service);
   }
 
-  async loadFeature(featureName: 'writer'): Promise<WriterFactory | null>;
-  async loadFeature(featureName: 'indexer'): Promise<IndexerFactory<J.Value> | null>;
-  async loadFeature(featureName: 'buildValueExpression'): Promise<(expression: CardExpression) => CardExpression>;
-  async loadFeature(featureName: any): Promise<any> {
-    switch (featureName) {
-      case 'writer':
-        return await loadWriter(this, this.service);
-      case 'indexer':
-        return await loadIndexer(this, this.service);
-      case 'buildValueExpression':
-        return buildValueExpression;
-      default:
-        throw new Error(`unimplemented loadFeature("${featureName}")`);
-    }
-  }
-
   get canonicalURL(): string {
     return canonicalURL(this);
   }
@@ -262,4 +341,12 @@ function everythingButMeta(_objValue: any, srcValue: any, key: string) {
     // meta fields don't merge, the new entire "meta" object overwrites
     return srcValue;
   }
+}
+
+function relationshipToCardId(ref: RelationshipObject): CardId {
+  if (!('links' in ref) || !ref.links.related) {
+    throw new Error(`only links.related references are implemented`);
+  }
+  let url = typeof ref.links.related === 'string' ? ref.links.related : ref.links.related.href;
+  return canonicalURLToCardId(url);
 }

@@ -153,7 +153,7 @@ export class ScopedCardService {
     });
 
     if (realms.length === 0) {
-      throw new CardstackError(`no such realm`, { status: 400 });
+      throw new CardstackError(`no such realm "${realm}"`, { status: 400 });
     }
     return realms[0];
   }
