@@ -25,7 +25,7 @@
   <CardRenderer
     @card={{this.model}}
     @format="isolated"
-    @cardSelected={{true}} {{!-- Card is always selected --}}
+    @cardSelected={{not this.cssModeToggle.editingCss}} {{!-- Card is highlighted (unless the themer is open) --}}
   />
 </section>
 
