@@ -114,7 +114,7 @@ describe('git/indexer remote config', function() {
   });
 });
 
-describe('git/indexer cloning', function() {
+describe.only('git/indexer cloning', function() {
   let env: todo, indexer: todo, searcher: todo, dataSource: todo, start: Function, client: todo, head: string;
 
   this.timeout(10000);
