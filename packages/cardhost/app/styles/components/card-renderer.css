@@ -27,8 +27,7 @@
 /* Card Renderer Header */
 .card-renderer-isolated--header {
   display: flex;
-  align-items: center;
-  height: var(--card-renderer-header-height);
+  height: calc(var(--card-renderer-header-height) + 150px); /* to counteract the safari scroll bounce */
   padding: 14px 20px;
   color: var(--ch-light-op50);
   background-color: var(--ch-dark-background);
@@ -55,22 +54,6 @@
   transition: stroke var(--ch-transition-time);
 }
 
-.card-renderer-isolated:focus {
-  outline: 0;
-}
-
-.card-renderer-isolated.selected .card-renderer-isolated--header,
-.card-renderer-isolated.edit:focus .card-renderer-isolated--header {
-  background-color: var(--ch-highlight);
-  border-color: var(--ch-highlight);
-  color: var(--ch-dark);
-}
-
-.card-renderer-isolated.selected .card-renderer-isolated--header svg,
-.card-renderer-isolated.edit:focus .card-renderer-isolated--header svg {
-  --icon-color: var(--ch-dark);
-}
-
 
 /* Card Renderer - Outer Wrapper */
 /* Needed for scroll behavior */
@@ -86,6 +69,7 @@
   border: none;
   overflow-x: hidden;
   overflow-y: auto;
+  margin-top: -150px; /* to counteract the safari scroll bounce */
 
   transition: var(--ch-card-background-color-animate);
 }
@@ -118,13 +102,29 @@
 
 .card-renderer-isolated.view .card-renderer-isolated--card-container {
   background: var(--ch-light);
-  border: none;
 }
 
-.card-renderer-isolated.schema.selected .card-renderer-isolated--card-container,
-.card-renderer-isolated.edit:focus .card-renderer-isolated--card-container {
+
+/* Focus state */
+.card-renderer-isolated:focus {
+  outline: 0;
+}
+
+.card-renderer-isolated.selected .card-renderer-isolated--header {
+  background-color: var(--ch-highlight);
+  border-color: var(--ch-highlight);
+  color: var(--ch-dark);
+}
+
+.card-renderer-isolated.selected .card-renderer-isolated--header svg {
+  --icon-color: var(--ch-dark);
+}
+
+.card-renderer-isolated.selected .card-renderer-isolated--card-container {
   border-color: var(--ch-highlight);
 }
+
+
 
 /* TODO: fade card if field-renderer is selected */
 /* .card-renderer-isolated.faded::before {

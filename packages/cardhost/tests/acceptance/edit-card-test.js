@@ -276,4 +276,18 @@ module('Acceptance | card edit', function(hooks) {
     await visit(`/cards/${card1Id}`);
     assert.dom('h2').includesText('Not Found');
   });
+
+  test(`displays the right edge`, async function(assert) {
+    await login();
+    await createCards({
+      [card1Id]: [['body', 'string', false, 'test body']],
+    });
+    await visit(`/cards/${card1Id}/edit`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+
+    assert.dom('[data-test-right-edge]').exists();
+    assert.dom('[data-test-internal-card-id]').doesNotExist();
+    assert.dom('[data-test-appearance-section]').doesNotExist();
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('Base Card');
+  });
 });
