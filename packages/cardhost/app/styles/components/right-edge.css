@@ -119,10 +119,8 @@
 
 .right-edge--item .cs-input-group--helper-text {
   height: auto;
-  transform: scaleY(0);
-  transition: transform 0.3s ease-out;
 }
 
 .right-edge--item .cs-input-group--helper-text.invalid {
-  transform: scaleY(1);
+  margin-bottom: 10px;
 }
