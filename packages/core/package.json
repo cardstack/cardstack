@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/core",
-  "version": "0.16.14",
+  "version": "0.16.15",
   "description": "Core API for cardstack cards",
   "keywords": [
     "ember-addon",
@@ -27,11 +27,11 @@
     "node-tests": "mocha ../test-support/bin/run.js"
   },
   "dependencies": {
-    "@cardstack/authentication": "0.16.14",
-    "@cardstack/di": "0.16.14",
-    "@cardstack/jsonapi": "0.16.14",
+    "@cardstack/authentication": "0.16.15",
+    "@cardstack/di": "0.16.15",
+    "@cardstack/jsonapi": "0.16.15",
     "@cardstack/logger": "^0.2.0",
-    "@cardstack/plugin-utils": "0.16.14",
+    "@cardstack/plugin-utils": "0.16.15",
     "ember-auto-import": "^1.4.0",
     "ember-cli-babel": "^7.1.2",
     "ember-cli-htmlbars": "^3.0.0",
@@ -40,9 +40,9 @@
     "lodash": "^4.17.11"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.16.14",
-    "@cardstack/mock-auth": "0.16.14",
-    "@cardstack/test-support": "0.16.14",
+    "@cardstack/eslint-config": "0.16.15",
+    "@cardstack/mock-auth": "0.16.15",
+    "@cardstack/test-support": "0.16.15",
     "@cardstack/ui-components": "^0.2.17",
     "@ember/optional-features": "^0.6.3",
     "@ember/render-modifiers": "1.0.2",
