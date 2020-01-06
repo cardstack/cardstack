@@ -560,7 +560,7 @@
     <h2>System and Error Messages (Dialog)</h2>
     <h3>Error</h3>
     <div class="ui-components--dialog-container">
-      <Dialog open={{true}} @type="error" @title="System Error">
+      <Dialog open={{true}} @icon="error" @title="System Error">
         <p class="dialog--message">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem.
         </p>
@@ -572,7 +572,7 @@
 
     <h3>Success</h3>
     <div class="ui-components--dialog-container">
-      <Dialog open={{true}} @type="success" @title="Successful Operation">
+      <Dialog open={{true}} @icon="success" @title="Successful Operation">
         <p class="dialog--message">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem.
         </p>
@@ -584,7 +584,7 @@
 
     <h3>Warning</h3>
     <div class="ui-components--dialog-container">
-      <Dialog open={{true}} @type="warning" @title="Unsaved Changes">
+      <Dialog open={{true}} @icon="warning" @title="Unsaved Changes">
         <p class="dialog--message">
           You have some unsaved changes in this card. If you proceed to change the view or
           navigate away, they will be lost. If you want to save changes, please stay in this
@@ -597,7 +597,7 @@
       </Dialog>
     </div>
 
-    <CodeEditor @code='<Dialog open={{true}} @type="warning" @title="Unsaved Changes">
+    <CodeEditor @code='<Dialog open={{true}} @icon="warning" @title="Unsaved Changes">
   <p class="dialog--message">
     You have some unsaved changes in this card. If you proceed to change the view or
     navigate away, they will be lost. If you want to save changes, please stay in this
