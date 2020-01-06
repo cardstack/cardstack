@@ -1,10 +1,9 @@
 import { UpstreamDocument, UpstreamIdentity } from '../document';
-import { CardId } from '../card';
 import { MetaObject } from 'jsonapi-typescript';
 import CardstackError from '../error';
 
 interface StoreEntry {
-  id: CardId;
+  id: UpstreamIdentity;
   doc: UpstreamDocument | null;
   generation: number;
 }
@@ -44,7 +43,6 @@ export class EphemeralStorage {
     }
     this._store.set(key, {
       id: {
-        csRealm: realm,
         csOriginalRealm: originalRealm,
         csId: csId,
       },

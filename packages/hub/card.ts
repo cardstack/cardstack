@@ -362,14 +362,18 @@ export class AddressableCard extends Card implements CardId {
   csId!: string;
   upstreamId!: NonNullable<Card['upstreamId']>;
 
-  constructor(jsonapi: SingleResourceDoc, service: ScopedCardService) {
-    if (typeof jsonapi.data.attributes?.csRealm !== 'string') {
+  constructor(jsonapi: SingleResourceDoc, service: ScopedCardService, identity?: CardId) {
+    let actualRealm = identity?.csRealm ?? jsonapi.data.attributes?.csRealm;
+    if (typeof actualRealm !== 'string') {
       throw new CardstackError(`card missing required attribute "realm": ${JSON.stringify(jsonapi)}`);
     }
-    let realm = jsonapi.data.attributes.csRealm;
-    super(jsonapi, realm, undefined, service);
+    super(jsonapi, actualRealm, undefined, service);
 
-    // this is initialized in super() by typescript can't see it.
+    if (identity != null) {
+      this.csOriginalRealm = identity.csOriginalRealm ?? identity?.csRealm;
+      this.csId = identity.csId;
+    }
+
     if ((this as any).csId == null) {
       throw new Error(`Bug: tried to use an UnsavedCard as a Card`);
     }

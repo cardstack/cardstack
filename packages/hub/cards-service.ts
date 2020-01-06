@@ -1,5 +1,5 @@
 import { Session } from './session';
-import { UnsavedCard, AddressableCard, Card, CardId, canonicalURLToCardId } from './card';
+import { UnsavedCard, AddressableCard, CardId, canonicalURLToCardId } from './card';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
 import CardstackError from './error';
 import { myOrigin } from './origin';
@@ -21,14 +21,8 @@ export default class CardsService {
 export class ScopedCardService {
   constructor(private cards: CardsService, private session: Session) {}
 
-  instantiate(jsonapi: SingleResourceDoc): AddressableCard;
-  instantiate(jsonapi: SingleResourceDoc, enclosingCard: Card): Card;
-  instantiate(jsonapi: SingleResourceDoc, enclosingCard?: Card): AddressableCard | Card {
-    if (enclosingCard) {
-      return new Card(jsonapi, enclosingCard.csRealm, enclosingCard, this);
-    } else {
-      return new AddressableCard(jsonapi, this);
-    }
+  instantiate(jsonapi: SingleResourceDoc): AddressableCard {
+    return new AddressableCard(jsonapi, this);
   }
 
   async create(realm: string, doc: SingleResourceDoc): Promise<AddressableCard> {

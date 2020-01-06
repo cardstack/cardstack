@@ -19,14 +19,6 @@ export default class EphemeralWriter implements Writer {
   }
 
   async update(_session: Session, id: UpstreamIdentity, doc: UpstreamDocument) {
-    let csOriginalRealm, csId;
-    if (typeof id === 'string') {
-      csId = id;
-      csOriginalRealm = this.realmCard.csId;
-    } else {
-      ({ csId, csOriginalRealm } = id);
-    }
-
     let version = doc.jsonapi.data.meta?.version;
     if (version == null) {
       throw new CardstackError('missing required field "meta.version"', {
@@ -35,17 +27,10 @@ export default class EphemeralWriter implements Writer {
       });
     }
 
-    return this.ephemeralStorage.store(doc, { csOriginalRealm, csId }, this.realmCard.csId, String(version))!;
+    return this.ephemeralStorage.store(doc, id, this.realmCard.csId, String(version))!;
   }
 
   async delete(_session: Session, id: UpstreamIdentity, version: string | number) {
-    let csOriginalRealm, csId;
-    if (typeof id === 'string') {
-      csId = id;
-      csOriginalRealm = this.realmCard.csId;
-    } else {
-      ({ csId, csOriginalRealm } = id);
-    }
-    this.ephemeralStorage.store(null, { csOriginalRealm, csId }, this.realmCard.csId, version);
+    this.ephemeralStorage.store(null, id, this.realmCard.csId, version);
   }
 }

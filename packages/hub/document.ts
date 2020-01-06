@@ -1,4 +1,5 @@
 import { SingleResourceDoc, CollectionResourceDoc } from 'jsonapi-typescript';
+import { CardId } from './card';
 
 export class PristineDocument {
   kind = 'pristine';
@@ -16,3 +17,14 @@ export class UpstreamDocument {
 }
 
 export type UpstreamIdentity = { csOriginalRealm: string; csId: string } | string;
+
+export function upstreamIdToCardId(upstreamId: UpstreamIdentity, csRealm: string): CardId {
+  let csOriginalRealm, csId;
+  if (typeof upstreamId === 'string') {
+    csId = upstreamId;
+    csOriginalRealm = csRealm;
+  } else {
+    ({ csId, csOriginalRealm } = upstreamId);
+  }
+  return { csRealm, csOriginalRealm, csId };
+}
