@@ -172,3 +172,59 @@
 .ui-components .ch-button--icon.full-width {
   color: var(--ch-light);
 }
+
+
+/* System Dialog */
+.ui-components--dialog-container {
+  width: 100%;
+  height: 260px;
+}
+
+
+
+/* System Dialog */
+.dialog {
+  width: 100%;
+  max-width: 400px;
+  min-height: 200px;
+  padding: 20px;
+  background-color: var(--ch-light);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.35);
+  border: none;
+  border-radius: 10px;
+  color: var(--ch-dark);
+  font: 400 14px/1.43 var(--ch-font-family);
+  letter-spacing: 0.035em;
+}
+
+.dialog--heading {
+  margin: 0;
+  padding: 1px 10px 18px 9px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.375;
+  letter-spacing: 0.015em;
+}
+
+.dialog--heading svg {
+  display: inline-block;
+  margin-right: 9px;
+}
+
+.dialog--content {
+  padding: 1px 10px 19px 11px;
+}
+
+.dialog--content p {
+  margin: 0;
+}
+
+.dialog--button-group {
+  padding: 1px 1px 1px 9px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.dialog--button-group > button + button {
+  margin-left: 9px;
+}

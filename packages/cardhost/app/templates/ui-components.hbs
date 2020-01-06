@@ -25,6 +25,7 @@
       <li><a href="#filter-bar">Filter Bar</a></li>
       <li><a href="#catalog">Catalog</a></li>
       <li><a href="#code-editor">Code Editor</a></li>
+      <li><a href="#system-dialog">System and Error Messages (Dialog)</a></li>
     </ul>
   </nav>
 
@@ -554,6 +555,28 @@
  * @resizeCheckInterval - optional number in ms to rate limit how quickly the container resizes
  */'
  />
+  </section>
+  <section class="ui-components--section" id="system-dialog">
+    <h2>System and Error Messages (Dialog)</h2>
+    <div class="ui-components--dialog-container">
+      <dialog class="dialog" open>
+        <h1 class="dialog--heading">
+          {{svg-jar "system-warning" width="24px" height="21px"}}Unsaved Changes
+        </h1>
+        <div class="dialog--content">
+          <p>
+            You have some unsaved changes in this card. If you proceed to change the view or
+            navigate away, they will be lost. If you want to save changes, please stay in this
+            view and save them. Do you want to proceed, or stay?
+          </p>
+        </div>
+        <div class="dialog--button-group">
+          <button>Proceed</button>
+          <button>Stay</button>
+        </div>
+      </dialog>
+    </div>
+    <CodeEditor @code='' @language="html" />
   </section>
   </main>
 </section>
