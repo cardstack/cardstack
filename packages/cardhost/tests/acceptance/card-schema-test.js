@@ -75,7 +75,7 @@ module('Acceptance | card schema', function(hooks) {
 
     assert.dom('.right-edge--item [data-test-adopted-card-name]').doesNotExist();
 
-    await click('[data-test-right-edge-section-toggle]');
+    await click('[data-test-right-edge-section-toggle="details"]');
 
     assert.dom('.right-edge--item [data-test-adopted-card-name]').hasText('card-id');
   });

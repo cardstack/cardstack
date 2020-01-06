@@ -18,7 +18,7 @@
             --}}
             <div class="right-edge--sections">
               <div class="right-edge--section">
-                <button {{on "click" (fn this.toggleSection "template")}} class="section-toggle-btn {{if (includes this.expandedSections "template") "expanded"}}" data-test-right-edge-section-toggle>
+                <button {{on "click" (fn this.toggleSection "template")}} class="section-toggle-btn {{if (includes this.expandedSections "template") "expanded"}}" data-test-right-edge-section-toggle="template">
                   Toggle
                 </button>
                 <div class="right-edge--section-header" data-test-section-header>
@@ -40,7 +40,7 @@
               </div>
               {{#if (eq @mode "schema")}}
                 <div class="right-edge--section">
-                  <button {{on "click" (fn this.toggleSection "details")}} class="section-toggle-btn {{if (includes this.expandedSections "details") "expanded"}}" data-test-right-edge-section-toggle>
+                  <button {{on "click" (fn this.toggleSection "details")}} class="section-toggle-btn {{if (includes this.expandedSections "details") "expanded"}}" data-test-right-edge-section-toggle="details">
                     Toggle
                   </button>
                   <div class="right-edge--section-header" data-test-section-header>Details</div>
