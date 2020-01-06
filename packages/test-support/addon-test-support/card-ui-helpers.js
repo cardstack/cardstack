@@ -2,8 +2,12 @@ import { click, find, triggerEvent, fillIn, visit, waitFor } from '@ember/test-h
 
 const timeout = 5000;
 
-export async function showCardId() {
+export async function showCardId(toggleDetailsSection = false) {
   await click(`.card-renderer-isolated`);
+
+  if (toggleDetailsSection) {
+    await click('[data-test-right-edge-section-toggle="details"]');
+  }
 }
 
 export async function setCardId(id) {

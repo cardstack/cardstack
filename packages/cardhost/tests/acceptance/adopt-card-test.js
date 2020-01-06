@@ -111,7 +111,7 @@ module('Acceptance | card adoption', function(hooks) {
 
     await visit(`/cards/${card2Id}/schema`);
 
-    await showCardId();
+    await showCardId(true);
 
     assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText(card1Id);
     assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').hasText('Base Card');
@@ -120,7 +120,7 @@ module('Acceptance | card adoption', function(hooks) {
     await waitFor(`[data-test-card-schema="${card1Id}"]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card1Id}/schema`);
-    await showCardId();
+    await showCardId(true);
     assert.dom('#card__id').hasValue(card1Id);
   });
 
