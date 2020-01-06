@@ -71,7 +71,7 @@ describe('hub/jsonapi', function() {
     let response = await request
       .post('/api/realms/first-ephemeral-realm/cards')
       .set('Content-Type', 'application/vnd.api+json')
-      .send(testCard().withAttributes({ foo: 'bar', hello: 'world' }).jsonapi);
+      .send(testCard().withAutoAttributes({ foo: 'bar', hello: 'world' }).jsonapi);
     let cardDoc = response.body;
     let csId = cardDoc.data.attributes.csId;
     cardDoc.data.attributes.foo = 'poo';
@@ -90,7 +90,7 @@ describe('hub/jsonapi', function() {
     let response = await request
       .post('/api/realms/first-ephemeral-realm/cards')
       .set('Content-Type', 'application/vnd.api+json')
-      .send(testCard().withAttributes({ foo: 'bar', hello: 'world' }).jsonapi);
+      .send(testCard().withAutoAttributes({ foo: 'bar', hello: 'world' }).jsonapi);
     let csId = response.body.data.attributes.csId;
 
     response = await request
@@ -106,7 +106,7 @@ describe('hub/jsonapi', function() {
     let response = await request
       .post('/api/realms/first-ephemeral-realm/cards')
       .set('Content-Type', 'application/vnd.api+json')
-      .send(testCard().withAttributes({ foo: 'bar', hello: 'world' }).jsonapi);
+      .send(testCard().withAutoAttributes({ foo: 'bar', hello: 'world' }).jsonapi);
     let csId = response.body.data.attributes.csId;
 
     response = await request
@@ -153,7 +153,7 @@ describe('hub/jsonapi', function() {
     let response = await request
       .post('/api/realms/first-ephemeral-realm/cards')
       .set('Content-Type', 'application/vnd.api+json')
-      .send(testCard().withAttributes({ hello: 'world' }).jsonapi);
+      .send(testCard().withAutoAttributes({ hello: 'world' }).jsonapi);
     expect(response.status).to.equal(201);
 
     response = await request.get(new URL(response.header.location).pathname).set('Accept', 'application/vnd.api+json');
@@ -167,7 +167,8 @@ describe('hub/jsonapi', function() {
       .post('/api/realms/first-ephemeral-realm/cards')
       .set('Content-Type', 'application/vnd.api+json')
       .send(
-        testCard().withAttributes({ csOriginalRealm: 'https://somewhere/else', csId: '432', hello: 'world' }).jsonapi
+        testCard().withAutoAttributes({ csOriginalRealm: 'https://somewhere/else', csId: '432', hello: 'world' })
+          .jsonapi
       );
     expect(response.status).to.equal(201);
 
@@ -182,7 +183,7 @@ describe('hub/jsonapi', function() {
     let response = await request
       .post(`/api/remote-realms/${encodeURIComponent('http://example.com/api/realms/second-ephemeral-realm')}/cards`)
       .set('Content-Type', 'application/vnd.api+json')
-      .send(testCard().withAttributes({ hello: 'world' }).jsonapi);
+      .send(testCard().withAutoAttributes({ hello: 'world' }).jsonapi);
     expect(response.status).to.equal(201);
 
     response = await request.get(new URL(response.header.location).pathname).set('Accept', 'application/vnd.api+json');
@@ -196,7 +197,8 @@ describe('hub/jsonapi', function() {
       .post(`/api/remote-realms/${encodeURIComponent('http://example.com/api/realms/second-ephemeral-realm')}/cards`)
       .set('Content-Type', 'application/vnd.api+json')
       .send(
-        testCard().withAttributes({ csOriginalRealm: 'https://somewhere/else', csId: '432', hello: 'world' }).jsonapi
+        testCard().withAutoAttributes({ csOriginalRealm: 'https://somewhere/else', csId: '432', hello: 'world' })
+          .jsonapi
       );
     expect(response.status).to.equal(201);
 
@@ -215,11 +217,11 @@ describe('hub/jsonapi', function() {
     await request
       .post('/api/realms/first-ephemeral-realm/cards')
       .set('Content-Type', 'application/vnd.api+json')
-      .send(testCard().withAttributes({ foo: 'bar' }).jsonapi);
+      .send(testCard().withAutoAttributes({ foo: 'bar' }).jsonapi);
     await request
       .post('/api/realms/second-ephemeral-realm/cards')
       .set('Content-Type', 'application/vnd.api+json')
-      .send(testCard().withAttributes({ foo: 'bar' }).jsonapi);
+      .send(testCard().withAutoAttributes({ foo: 'bar' }).jsonapi);
 
     let filter = {
       filter: {
@@ -237,7 +239,7 @@ describe('hub/jsonapi', function() {
       await request
         .post('/api/realms/first-ephemeral-realm/cards')
         .set('Content-Type', 'application/vnd.api+json')
-        .send(testCard().withAttributes({ foo: 'bar' }).jsonapi);
+        .send(testCard().withAutoAttributes({ foo: 'bar' }).jsonapi);
     }
 
     let filter = {

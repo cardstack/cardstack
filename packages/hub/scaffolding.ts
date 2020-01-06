@@ -12,28 +12,28 @@ function ephemeralRealms(cards: ScopedCardService) {
   return [
     // The realm card for the meta realm
     cards.instantiate(
-      testCard().withAttributes({
+      testCard().withAutoAttributes({
         csRealm: `${myOrigin}/api/realms/meta`,
         csOriginalRealm: `${myOrigin}/api/realms/meta`,
         csId: `${myOrigin}/api/realms/meta`,
       }).jsonapi
     ),
     cards.instantiate(
-      testCard().withAttributes({
+      testCard().withAutoAttributes({
         csRealm: `${myOrigin}/api/realms/meta`,
         csOriginalRealm: `${myOrigin}/api/realms/meta`,
         csId: `${myOrigin}/api/realms/first-ephemeral-realm`,
       }).jsonapi
     ),
     cards.instantiate(
-      testCard().withAttributes({
+      testCard().withAutoAttributes({
         csRealm: `${myOrigin}/api/realms/meta`,
         csOriginalRealm: `http://example.com/api/realms/meta`,
         csId: `http://example.com/api/realms/second-ephemeral-realm`,
       }).jsonapi
     ),
     cards.instantiate(
-      testCard().withAttributes({
+      testCard().withAutoAttributes({
         csRealm: `${myOrigin}/api/realms/meta`,
         csOriginalRealm: CARDSTACK_PUBLIC_REALM,
         csId: CARDSTACK_PUBLIC_REALM,
@@ -66,7 +66,7 @@ export async function get(id: CardId, cards: ScopedCardService): Promise<Address
     coreFieldTypes.includes(id.csId)
   ) {
     return cards.instantiate(
-      testCard().withAttributes({
+      testCard().withAutoAttributes({
         csRealm: id.csRealm,
         csOriginalRealm: id.csOriginalRealm,
         csId: id.csId,

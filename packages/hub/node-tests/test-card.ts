@@ -13,9 +13,7 @@ export class TestCard {
   csOriginalRealm?: string;
   csRealm?: string;
 
-  withAttributes(values: FieldValues & { csId: string; csRealm: string }): TestCardWithId;
-  withAttributes<T extends TestCard>(this: T, values: FieldValues): T;
-  withAttributes(values: FieldValues): TestCard | TestCardWithId {
+  private setAttributes(values: FieldValues, autoCreateField: boolean) {
     for (let [field, value] of Object.entries(values)) {
       if (cardstackFieldPattern.test(field)) {
         // cardstack fields
@@ -38,15 +36,28 @@ export class TestCard {
       } else {
         // a user field
         this.userFieldValues.set(field, value);
-        if (!this.fields.has(field)) {
+        if (!this.fields.has(field) && autoCreateField) {
           this.fields.set(field, new TestCard().adoptingFrom(this.guessValueType(value)));
         }
       }
     }
+  }
+
+  withAttributes(values: FieldValues & { csId: string; csRealm: string }): TestCardWithId;
+  withAttributes<T extends TestCard>(this: T, values: FieldValues): T;
+  withAttributes(values: FieldValues): TestCard | TestCardWithId {
+    this.setAttributes(values, false);
     return this;
   }
 
-  withRelationships<T extends TestCard>(this: T, values: FieldRefs): T {
+  withAutoAttributes(values: FieldValues & { csId: string; csRealm: string }): TestCardWithId;
+  withAutoAttributes<T extends TestCard>(this: T, values: FieldValues): T;
+  withAutoAttributes(values: FieldValues): TestCard | TestCardWithId {
+    this.setAttributes(values, true);
+    return this;
+  }
+
+  private setRelationships(values: FieldRefs, autoCreateField: boolean) {
     for (let [field, value] of Object.entries(values)) {
       if (/^cs[A-Z]/.test(field)) {
         // cardstack fields
@@ -60,11 +71,20 @@ export class TestCard {
       } else {
         // a user field
         this.userFieldRefs.set(field, value);
-        if (!this.fields.has(field)) {
+        if (!this.fields.has(field) && autoCreateField) {
           this.fields.set(field, new TestCard().adoptingFrom(this.guessReferenceType(value)));
         }
       }
     }
+  }
+
+  withRelationships<T extends TestCard>(this: T, values: FieldRefs): T {
+    this.setRelationships(values, false);
+    return this;
+  }
+
+  withAutoRelationships<T extends TestCard>(this: T, values: FieldRefs): T {
+    this.setRelationships(values, true);
     return this;
   }
 
@@ -81,7 +101,7 @@ export class TestCard {
       fieldCard = { csRealm: CARDSTACK_PUBLIC_REALM, csId: fieldCard };
     }
 
-    this.fields.set(name, new TestCard().withAttributes(values).adoptingFrom(fieldCard));
+    this.fields.set(name, new TestCard().withAutoAttributes(values).adoptingFrom(fieldCard));
     return this;
   }
 

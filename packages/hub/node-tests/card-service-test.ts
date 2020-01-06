@@ -57,7 +57,7 @@ describe('hub/card-service', function() {
       let baseCard = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, base.jsonapi);
 
       let doc = testCard()
-        .withAttributes({ goodbye: 'world' })
+        .withAutoAttributes({ goodbye: 'world' })
         .adoptingFrom(baseCard);
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       let parent = await card.adoptsFrom();
@@ -65,7 +65,7 @@ describe('hub/card-service', function() {
     });
 
     it('can update a card', async function() {
-      let doc = testCard().withAttributes({ foo: 'bar' });
+      let doc = testCard().withAutoAttributes({ foo: 'bar' });
       let storage = await env.container.lookup('ephemeralStorage');
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       let version = (await card.asPristineDoc()).jsonapi.data.meta?.version as number;
@@ -82,7 +82,7 @@ describe('hub/card-service', function() {
     });
 
     it('can update a card by canonical URL', async function() {
-      let doc = testCard().withAttributes({ foo: 'bar' });
+      let doc = testCard().withAutoAttributes({ foo: 'bar' });
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
 
       let jsonapi = (await card.asPristineDoc()).jsonapi;
@@ -93,7 +93,7 @@ describe('hub/card-service', function() {
     });
 
     it('can update a card with a patch', async function() {
-      let doc = testCard().withAttributes({ foo: 'bar', hello: 'world' });
+      let doc = testCard().withAutoAttributes({ foo: 'bar', hello: 'world' });
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
 
       let jsonapi = (await card.asPristineDoc()).jsonapi;
@@ -107,7 +107,7 @@ describe('hub/card-service', function() {
     });
 
     it('it does not update a card that uses ephemeral storage when the meta.version is missing', async function() {
-      let doc = testCard().withAttributes({ foo: 'bar' });
+      let doc = testCard().withAutoAttributes({ foo: 'bar' });
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
 
       let jsonapi = (await card.asPristineDoc()).jsonapi;
@@ -183,20 +183,18 @@ describe('hub/card-service', function() {
         `${myOrigin}/api/realms/first-ephemeral-realm`,
         testCard()
           .withAttributes({ title: 'hello' })
-          .withField('title', null) // TODO: null out automatic field creation because it doesn't understand adoptsFrom
           .adoptingFrom(post).jsonapi
       );
       await service.create(
         `${myOrigin}/api/realms/first-ephemeral-realm`,
         testCard()
           .withAttributes({ title: 'goodbye' })
-          .withField('title', null) // TODO: null out automatic field creation because it doesn't understand adoptsFrom
           .adoptingFrom(post).jsonapi
       );
       // deliberately unrelated card which happens to use the same field name
       await service.create(
         `${myOrigin}/api/realms/first-ephemeral-realm`,
-        testCard().withAttributes({ title: 'hello', iAmUnrelated: true }).jsonapi
+        testCard().withAutoAttributes({ title: 'hello', iAmUnrelated: true }).jsonapi
       );
       let foundCards = await service.search({
         filter: {
@@ -211,9 +209,7 @@ describe('hub/card-service', function() {
     });
 
     it('rejects unknown attribute at create', async function() {
-      let doc = testCard()
-        .withAttributes({ badField: 'hello' })
-        .withField('badField', null);
+      let doc = testCard().withAttributes({ badField: 'hello' });
 
       try {
         await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
@@ -225,11 +221,9 @@ describe('hub/card-service', function() {
     });
 
     it('rejects unknown relationship at create', async function() {
-      let doc = testCard()
-        .withRelationships({
-          badField: testCard().withAttributes({ csRealm: 'x', csId: 'y' }),
-        })
-        .withField('badField', null);
+      let doc = testCard().withRelationships({
+        badField: testCard().withAutoAttributes({ csRealm: 'x', csId: 'y' }),
+      });
 
       try {
         await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
@@ -251,44 +245,44 @@ describe('hub/card-service', function() {
       let scopedService = service.as(Session.INTERNAL_PRIVILEGED);
       await scopedService.create(
         `${myOrigin}/api/realms/first-ephemeral-realm`,
-        testCard().withAttributes({ csId: '1' }).jsonapi
+        testCard().withAutoAttributes({ csId: '1' }).jsonapi
       );
       await scopedService.create(
         `${myOrigin}/api/realms/first-ephemeral-realm`,
-        testCard().withAttributes({ csId: '2' }).jsonapi
+        testCard().withAutoAttributes({ csId: '2' }).jsonapi
       );
       await scopedService.create(
         `${myOrigin}/api/realms/first-ephemeral-realm`,
-        testCard().withAttributes({
+        testCard().withAutoAttributes({
           csId: '1',
           csOriginalRealm: `http://example.com/api/realms/second-ephemeral-realm`,
         }).jsonapi
       );
       await scopedService.create(
         `${myOrigin}/api/realms/first-ephemeral-realm`,
-        testCard().withAttributes({
+        testCard().withAutoAttributes({
           csId: '2',
           csOriginalRealm: `http://example.com/api/realms/second-ephemeral-realm`,
         }).jsonapi
       );
       await scopedService.create(
         `http://example.com/api/realms/second-ephemeral-realm`,
-        testCard().withAttributes({ csId: '1' }).jsonapi
+        testCard().withAutoAttributes({ csId: '1' }).jsonapi
       );
       await scopedService.create(
         `http://example.com/api/realms/second-ephemeral-realm`,
-        testCard().withAttributes({ csId: '2' }).jsonapi
+        testCard().withAutoAttributes({ csId: '2' }).jsonapi
       );
       await scopedService.create(
         `http://example.com/api/realms/second-ephemeral-realm`,
-        testCard().withAttributes({
+        testCard().withAutoAttributes({
           csId: '1',
           csOriginalRealm: `${myOrigin}/api/realms/first-ephemeral-realm`,
         }).jsonapi
       );
       await scopedService.create(
         `http://example.com/api/realms/second-ephemeral-realm`,
-        testCard().withAttributes({
+        testCard().withAutoAttributes({
           csId: '2',
           csOriginalRealm: `${myOrigin}/api/realms/first-ephemeral-realm`,
         }).jsonapi

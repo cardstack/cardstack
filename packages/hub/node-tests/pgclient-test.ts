@@ -27,7 +27,7 @@ describe('hub/pgclient', function() {
     let cardsService = await env.container.lookup('cards');
     let cards = cardsService.as(Session.INTERNAL_PRIVILEGED);
     let card = cards.instantiate(
-      testCard().withAttributes({ csId: 'card-1', csRealm: `http://hassan.com/realm`, hello: 'world' }).jsonapi
+      testCard().withAutoAttributes({ csId: 'card-1', csRealm: `http://hassan.com/realm`, hello: 'world' }).jsonapi
     );
 
     let batch = pgclient.beginCardBatch(cards);
