@@ -28,7 +28,7 @@
 .card-renderer-isolated.schema .field.with-buttons {
   width: 100%;
   max-width: 496px;
-  min-height: 154px;
+  min-height: 144px;
   display: flex;
   align-items: center;
   justify-content: space-between;
