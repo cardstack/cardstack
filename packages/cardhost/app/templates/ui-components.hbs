@@ -558,10 +558,67 @@
   </section>
   <section class="ui-components--section" id="system-dialog">
     <h2>System and Error Messages (Dialog)</h2>
+    <h3>Error</h3>
     <div class="ui-components--dialog-container">
-      <Dialog open={{true}} />
+      <Dialog open={{true}} @type="error" @title="System Error">
+        <p class="dialog--message">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem.
+        </p>
+        <div class="dialog--button-group">
+          <button>Dismiss</button>
+        </div>
+      </Dialog>
     </div>
-    <CodeEditor @code='' @language="html" />
+
+    <h3>Success</h3>
+    <div class="ui-components--dialog-container">
+      <Dialog open={{true}} @type="success" @title="Successful Operation">
+        <p class="dialog--message">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem.
+        </p>
+        <div class="dialog--button-group">
+          <button>Dismiss</button>
+        </div>
+      </Dialog>
+    </div>
+
+    <h3>Warning</h3>
+    <div class="ui-components--dialog-container">
+      <Dialog open={{true}} @type="warning" @title="Unsaved Changes">
+        <p class="dialog--message">
+          You have some unsaved changes in this card. If you proceed to change the view or
+          navigate away, they will be lost. If you want to save changes, please stay in this
+          view and save them. Do you want to proceed, or stay?
+        </p>
+        <div class="dialog--button-group">
+          <button>Proceed</button>
+          <button>Stay</button>
+        </div>
+      </Dialog>
+    </div>
+
+    <CodeEditor @code='<Dialog open={{true}} @type="warning" @title="Unsaved Changes">
+  <p class="dialog--message">
+    You have some unsaved changes in this card. If you proceed to change the view or
+    navigate away, they will be lost. If you want to save changes, please stay in this
+    view and save them. Do you want to proceed, or stay?
+  </p>
+  <div class="dialog--button-group">
+    <button>Proceed</button>
+    <button>Stay</button>
+  </div>
+</Dialog>' @language="html" />
+
+    <CodeEditor @code='<Dialog open=\{{openCondition}} @icon=\{{@icon}} @title=\{{@title}}>
+  // your message and any CTA here...
+</Dialog>' @language="html" />
+
+    <div class="ui-components--notes">
+      <h4>Attributes:</h4>
+        - <code>open</code>: opening condition for dialog box<br>
+        - <code>@icon</code>: pass in <code>warning</code>, <code>error</code>, <code>success</code>, or your own icon's svg name to display an icon with header<br>
+        - <code>@title</code>: pass in a title for the header
+    </div>
   </section>
   </main>
 </section>

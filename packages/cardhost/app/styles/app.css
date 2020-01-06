@@ -16,6 +16,7 @@
 @import '/assets/components/catalog-field.css';
 @import '/assets/components/adopted-from.css';
 @import '/assets/components/themer.css';
+@import '/assets/components/dialog.css';
 
 /* Cardhost styling for core package templates */
 @import '/assets/components/card-renderer.css';
