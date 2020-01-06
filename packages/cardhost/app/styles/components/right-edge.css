@@ -116,3 +116,11 @@
   opacity: 1;
   cursor: pointer;
 }
+
+.right-edge--item .cs-input-group--helper-text {
+  height: auto;
+}
+
+.right-edge--item .cs-input-group--helper-text.invalid {
+  margin-bottom: 10px;
+}

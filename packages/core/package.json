@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/core",
-  "version": "0.16.14",
+  "version": "0.16.16",
   "description": "Core API for cardstack cards",
   "keywords": [
     "ember-addon",
@@ -36,7 +36,7 @@
     "lodash": "^4.17.11"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.16.14",
+    "@cardstack/eslint-config": "0.16.16",
     "@ember/optional-features": "^0.6.3",
     "@ember/render-modifiers": "1.0.2",
     "@glimmer/component": "^0.14.0-alpha.13",
