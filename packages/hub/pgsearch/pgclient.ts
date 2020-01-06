@@ -219,31 +219,66 @@ export default class PgClient {
   beginCardBatch(cards: ScopedCardService) {
     return new Batch(this, cards);
   }
-  private async handleFieldQuery(_cards: ScopedCardService, fieldQuery: FieldQuery): Promise<Expression> {
+  private async handleFieldQuery(cards: ScopedCardService, fieldQuery: FieldQuery): Promise<Expression> {
     let { path, errorHint } = fieldQuery;
     if (path === 'csRealm' || path === 'csOriginalRealm' || path === 'csId') {
       return [snakeCase(path)];
     }
 
-    throw new Error(`${path} unimplemented in handleFieldQuery for ${errorHint}`);
+    if (path.indexOf('.') !== -1) {
+      throw new Error(`unimplemented: deeper paths handleFieldQuery for ${errorHint}`);
+    }
+
+    let source = ['search_doc'];
+    let fieldCard = await (await cards.get(fieldQuery.typeContext)).field(path);
+    let fullFieldName = `${fieldCard.enclosingCard.canonicalURL}/${path}`;
+    let buildQueryExpression = await fieldCard.loadFeature('field-buildQueryExpression');
+    if (buildQueryExpression) {
+      return buildQueryExpression(source, fullFieldName);
+    } else {
+      return [...source, '->>', param(fullFieldName)];
+    }
   }
 
   private async handleFieldValue(cards: ScopedCardService, fieldValue: FieldValue): Promise<Expression> {
     let { path, errorHint, value } = fieldValue;
+    let expression = await this.makeExpression(cards, value);
     if (path === 'csRealm' || path === 'csOriginalRealm' || path === 'csId') {
-      return await this.makeExpression(cards, value);
+      return expression;
     }
 
-    throw new Error(`${path} unimplemented in handleFieldValue for ${errorHint}`);
+    if (path.indexOf('.') !== -1) {
+      throw new Error(`unimplemented: deeper paths field value for ${errorHint}`);
+    }
+
+    let fieldCard = await (await cards.get(fieldValue.typeContext)).field(path);
+    let buildValueExpression = await fieldCard.loadFeature('field-buildValueExpression');
+    if (buildValueExpression) {
+      expression = buildValueExpression(expression);
+    }
+    return expression;
   }
 
   private async handleFieldArity(cards: ScopedCardService, fieldArity: FieldArity): Promise<Expression> {
-    let { path, singular, errorHint } = fieldArity;
-    if (path === 'csRealm' || path === 'csOriginalRealm' || path === 'csId') {
-      return await this.makeExpression(cards, singular);
+    let { path, singular, plural, errorHint } = fieldArity;
+
+    if (path.indexOf('.') !== -1) {
+      throw new Error(`unimplemented: deeper paths field arity for ${errorHint}`);
     }
 
-    throw new Error(`${path} unimplemented in handleFieldArity for ${errorHint}`);
+    let chosenExpression: CardExpression;
+    if (path === 'csRealm' || path === 'csOriginalRealm' || path === 'csId') {
+      chosenExpression = singular;
+    } else {
+      let fieldCard = await (await cards.get(fieldArity.typeContext)).field(path);
+      if (fieldCard.csFieldArity === 'plural') {
+        chosenExpression = plural;
+      } else {
+        chosenExpression = singular;
+      }
+    }
+
+    return await this.makeExpression(cards, chosenExpression);
   }
 
   async get(cards: ScopedCardService, id: CardId): Promise<AddressableCard> {
@@ -378,6 +413,7 @@ export class Batch {
       cs_original_realm: param(card.csOriginalRealm),
       cs_id: param(card.csId),
       pristine_doc: param(((await card.asPristineDoc()).jsonapi as unknown) as JSON.Object),
+      search_doc: param(((await card.asSearchDoc()) as unknown) as JSON.Object),
       generation: param(this.generations[card.csRealm] || null),
     };
     /* eslint-enable @typescript-eslint/camelcase */

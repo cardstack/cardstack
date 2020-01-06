@@ -16,4 +16,5 @@ import { Card } from './card';
 
 export type validate<Serial> = (value: Serial, fieldCard: Card) => Promise<boolean>;
 export type deserialize<Serial, Value> = (value: Serial, fieldCard: Card) => Promise<Value>;
+export type buildQueryExpression = (source: Expression, name: string) => Expression;
 export type buildValueExpression = (value: Expression) => Expression;

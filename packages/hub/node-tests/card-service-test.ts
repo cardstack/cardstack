@@ -2,14 +2,16 @@ import { createTestEnv, TestEnv } from './helpers';
 import { Session } from '../session';
 import { myOrigin } from '../origin';
 import { testCard } from './test-card';
-import CardsService from '../cards-service';
+import CardsService, { ScopedCardService } from '../cards-service';
 
 describe('hub/card-service', function() {
   describe('read-write', function() {
     let env: TestEnv;
+    let service: ScopedCardService;
 
     beforeEach(async function() {
       env = await createTestEnv();
+      service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
     });
 
     afterEach(async function() {
@@ -17,9 +19,8 @@ describe('hub/card-service', function() {
     });
 
     it('handles get from missing realm', async function() {
-      let service = await env.container.lookup('cards');
       try {
-        await service.as(Session.EVERYONE).get({
+        await service.get({
           csRealm: 'http://not-a-known-realm',
           csId: 'x',
         });
@@ -31,7 +32,6 @@ describe('hub/card-service', function() {
 
     it('can get a card back out', async function() {
       let doc = testCard();
-      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       expect(card.csRealm).to.equal(`${myOrigin}/api/realms/first-ephemeral-realm`);
 
@@ -41,7 +41,6 @@ describe('hub/card-service', function() {
 
     it('can get a card out by canonical URL', async function() {
       let doc = testCard();
-      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       let foundCard = await service.get(card.canonicalURL);
       expect(foundCard.canonicalURL).equals(card.canonicalURL);
@@ -49,14 +48,12 @@ describe('hub/card-service', function() {
 
     it("adds upstream data source's version to the card's meta", async function() {
       let doc = testCard();
-      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       expect((await card.asPristineDoc()).jsonapi.data.meta?.version).to.be.ok;
     });
 
     it('can create a card that adopts from another', async function() {
       let base = testCard();
-      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       let baseCard = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, base.jsonapi);
 
       let doc = testCard()
@@ -69,7 +66,6 @@ describe('hub/card-service', function() {
 
     it('can update a card', async function() {
       let doc = testCard().withAttributes({ foo: 'bar' });
-      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       let storage = await env.container.lookup('ephemeralStorage');
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       let version = (await card.asPristineDoc()).jsonapi.data.meta?.version as number;
@@ -87,7 +83,6 @@ describe('hub/card-service', function() {
 
     it('can update a card by canonical URL', async function() {
       let doc = testCard().withAttributes({ foo: 'bar' });
-      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
 
       let jsonapi = (await card.asPristineDoc()).jsonapi;
@@ -99,7 +94,6 @@ describe('hub/card-service', function() {
 
     it('can update a card with a patch', async function() {
       let doc = testCard().withAttributes({ foo: 'bar', hello: 'world' });
-      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
 
       let jsonapi = (await card.asPristineDoc()).jsonapi;
@@ -114,7 +108,6 @@ describe('hub/card-service', function() {
 
     it('it does not update a card that uses ephemeral storage when the meta.version is missing', async function() {
       let doc = testCard().withAttributes({ foo: 'bar' });
-      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
 
       let jsonapi = (await card.asPristineDoc()).jsonapi;
@@ -132,7 +125,6 @@ describe('hub/card-service', function() {
 
     it('can delete a card', async function() {
       let doc = testCard();
-      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       let storage = await env.container.lookup('ephemeralStorage');
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       let version = (await card.asPristineDoc()).jsonapi.data.meta?.version as number;
@@ -151,7 +143,6 @@ describe('hub/card-service', function() {
 
     it('can delete a card by canonical URL', async function() {
       let doc = testCard();
-      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       let version = (await card.asPristineDoc()).jsonapi.data.meta?.version as number;
 
@@ -167,7 +158,6 @@ describe('hub/card-service', function() {
 
     it('does not delete a card that uses ephemeral storage when the specified version is not the latest', async function() {
       let doc = testCard();
-      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       let storage = await env.container.lookup('ephemeralStorage');
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       let version = (await card.asPristineDoc()).jsonapi.data.meta?.version as number;
@@ -184,12 +174,47 @@ describe('hub/card-service', function() {
       expect(storage.entriesNewerThan(card.csRealm).filter(entry => Boolean(entry.doc)).length).to.equal(1);
     });
 
+    it('can search by user-defined field', async function() {
+      let post = await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        testCard().withField('title', 'string-field').jsonapi
+      );
+      let matchingPost = await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        testCard()
+          .withAttributes({ title: 'hello' })
+          .withField('title', null) // TODO: null out automatic field creation because it doesn't understand adoptsFrom
+          .adoptingFrom(post).jsonapi
+      );
+      await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        testCard()
+          .withAttributes({ title: 'goodbye' })
+          .withField('title', null) // TODO: null out automatic field creation because it doesn't understand adoptsFrom
+          .adoptingFrom(post).jsonapi
+      );
+      // deliberately unrelated card which happens to use the same field name
+      await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        testCard().withAttributes({ title: 'hello', iAmUnrelated: true }).jsonapi
+      );
+      let foundCards = await service.search({
+        filter: {
+          type: post,
+          eq: {
+            title: 'hello',
+          },
+        },
+      });
+      expect(foundCards.cards.length).to.equal(1);
+      expect(foundCards.cards[0].canonicalURL).to.equal(matchingPost.canonicalURL);
+    });
+
     it('rejects unknown attribute at create', async function() {
       let doc = testCard()
         .withAttributes({ badField: 'hello' })
         .withField('badField', null);
 
-      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       try {
         await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
         throw new Error(`should not have been able to create`);
@@ -206,7 +231,6 @@ describe('hub/card-service', function() {
         })
         .withField('badField', null);
 
-      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
       try {
         await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
         throw new Error(`should not have been able to create`);

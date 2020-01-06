@@ -8,6 +8,7 @@ export function up(pgm: MigrationBuilder) {
     cs_id: 'varchar',
     pristine_doc: 'jsonb',
     generation: 'bigint',
+    search_doc: 'jsonb',
   });
   /* eslint-enable @typescript-eslint/camelcase */
   pgm.sql('ALTER TABLE cards SET UNLOGGED');

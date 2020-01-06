@@ -71,8 +71,11 @@ export class Card {
   // chosen by the hub.
   csId: string | undefined;
 
+  // if this card is stored inside another, this is the other
+  readonly enclosingCard: Card | undefined;
+
   protected jsonapi: SingleResourceDoc;
-  private ownFields: Map<string, Card> = new Map();
+  private ownFields: Map<string, FieldCard> = new Map();
 
   // Identity invariants:
   //
@@ -89,9 +92,15 @@ export class Card {
   //  - [csRealm, csOriginalRealm, csId] is globally unique, such that there are
   //    exactly zero or one cards that match it, across all hubs.
 
-  constructor(jsonapi: SingleResourceDoc, realm: string, protected service: ScopedCardService) {
+  constructor(
+    jsonapi: SingleResourceDoc,
+    realm: string,
+    enclosingCard: Card | undefined,
+    protected service: ScopedCardService
+  ) {
     this.jsonapi = jsonapi;
     this.csRealm = realm;
+    this.enclosingCard = enclosingCard;
     this.csOriginalRealm =
       typeof jsonapi.data.attributes?.csOriginalRealm === 'string' ? jsonapi.data.attributes.csOriginalRealm : realm;
 
@@ -105,13 +114,13 @@ export class Card {
         throw new CardstackError(`csFields must be an object`);
       }
       for (let [name, value] of Object.entries(fields)) {
-        this.ownFields.set(name, service.instantiate(value, this));
+        this.ownFields.set(name, new FieldCard(value, name, this, this.service));
       }
     }
   }
 
   clone(): Card {
-    return new Card(this.jsonapi, this.csRealm, this.service);
+    return new Card(this.jsonapi, this.csRealm, this.enclosingCard, this.service);
   }
 
   async validate(priorCard: AddressableCard | null, realm: AddressableCard, _forDeletion?: true) {
@@ -122,7 +131,7 @@ export class Card {
           continue;
         }
         let field = await this.field(name);
-        field.validateFieldValue(await priorCard?.value(name), value, realm);
+        field.validateValue(await priorCard?.value(name), value, realm);
       }
     }
 
@@ -133,40 +142,9 @@ export class Card {
           continue;
         }
         let field = await this.field(name);
-        field.validateFieldReference(await priorCard?.reference(name), relationshipToCardId(ref), realm);
+        field.validateReference(await priorCard?.reference(name), relationshipToCardId(ref), realm);
       }
     }
-  }
-
-  private async validateFieldValue(priorFieldValue: any, value: any, realm: AddressableCard) {
-    let validate = await this.loadFeature('field-validate');
-    if (validate) {
-      if (!(await validate(value, this))) {
-        throw new CardstackError(`field validation error: <add better error message here>`);
-      }
-      return;
-    }
-    let copy = this.clone();
-    copy.patch({ data: value });
-    await copy.validate(priorFieldValue, realm);
-  }
-
-  private async validateFieldReference(
-    _priorReference: CardId | undefined,
-    _newReference: CardId | undefined,
-    _realm: AddressableCard
-  ) {
-    // TODO
-  }
-
-  private async deserializeFieldValue(value: any): Promise<any> {
-    let deserialize = await this.loadFeature('field-deserialize');
-    if (deserialize) {
-      return await deserialize(value, this);
-    }
-    let copy = this.clone();
-    copy.patch({ data: value });
-    return copy;
   }
 
   // gets the value of a field. Its type is governed by the schema of this card.
@@ -174,7 +152,7 @@ export class Card {
     let rawValue = this.jsonapi.data.attributes?.[fieldName];
     if (rawValue != null) {
       let field = await this.field(fieldName);
-      return await field.deserializeFieldValue(rawValue);
+      return await field.deserializeValue(rawValue);
     }
     let ref = await this.reference(fieldName);
     if (ref != null) {
@@ -193,10 +171,14 @@ export class Card {
     return undefined;
   }
 
-  async field(name: string): Promise<Card> {
-    let field = this.ownFields.get(name);
-    if (field) {
-      return field;
+  async field(name: string): Promise<FieldCard> {
+    let card: Card | undefined = this;
+    while (card) {
+      let field = card.ownFields.get(name);
+      if (field) {
+        return field;
+      }
+      card = await card.adoptsFrom();
     }
     throw new CardstackError(`no such field "${name}"`, { status: 400 });
   }
@@ -225,6 +207,28 @@ export class Card {
 
   async asPristineDoc(): Promise<PristineDocument> {
     return new PristineDocument(this.regenerateJSONAPI());
+  }
+
+  async asSearchDoc(): Promise<J.Object> {
+    let doc: J.Object = Object.create(null);
+    doc.csRealm = this.csRealm;
+    doc.csOriginalRealm = this.csOriginalRealm;
+    if (this.csId != null) {
+      doc.csId = this.csId;
+    }
+
+    if (this.jsonapi.data.attributes) {
+      for (let fieldName of Object.keys(this.jsonapi.data.attributes)) {
+        if (cardstackFieldPattern.test(fieldName)) {
+          continue;
+        }
+        let value = await this.value(fieldName);
+        let field = await this.field(fieldName);
+        doc[`${field.enclosingCard.canonicalURL}/${fieldName}`] = value;
+      }
+    }
+
+    return doc;
   }
 
   async asUpstreamDoc(): Promise<UpstreamDocument> {
@@ -273,6 +277,7 @@ export class Card {
   async loadFeature(featureName: 'field-validate'): Promise<null | FieldHooks.validate<unknown>>;
   async loadFeature(featureName: 'field-deserialize'): Promise<null | FieldHooks.deserialize<unknown, unknown>>;
   async loadFeature(featureName: 'field-buildValueExpression'): Promise<null | FieldHooks.buildValueExpression>;
+  async loadFeature(featureName: 'field-buildQueryExpression'): Promise<null | FieldHooks.buildQueryExpression>;
   async loadFeature(featureName: any): Promise<any> {
     let card: Card | undefined = this;
     while (card) {
@@ -280,7 +285,7 @@ export class Card {
       if (result) {
         return result;
       }
-      card = await this.adoptsFrom();
+      card = await card.adoptsFrom();
     }
     return null;
   }
@@ -294,15 +299,64 @@ export class Card {
 }
 
 export class UnsavedCard extends Card {
+  constructor(jsonapi: SingleResourceDoc, realm: string, protected service: ScopedCardService) {
+    super(jsonapi, realm, undefined, service);
+  }
+
   asAddressableCard(): AddressableCard {
     if (typeof this.csId !== 'string') {
       throw new CardstackError(`card missing required attribute "csId"`);
     }
-    return new AddressableCard(this.regenerateJSONAPI(), this.service);
+    return this.service.instantiate(this.regenerateJSONAPI());
   }
 }
 
-export class AddressableCard extends UnsavedCard implements CardId {
+export class FieldCard extends Card {
+  readonly enclosingCard: Card;
+  readonly csFieldArity: 'singular' | 'plural' = 'singular';
+
+  constructor(jsonapi: SingleResourceDoc, readonly name: string, enclosingCard: Card, service: ScopedCardService) {
+    super(jsonapi, enclosingCard.csRealm, enclosingCard, service);
+    this.enclosingCard = enclosingCard;
+  }
+
+  async validateValue(priorFieldValue: any, value: any, realm: AddressableCard) {
+    let validate = await this.loadFeature('field-validate');
+    if (validate) {
+      if (!(await validate(value, this))) {
+        throw new CardstackError(
+          `field ${this.name} on card ${
+            this.enclosingCard.canonicalURL
+          } failed type validation for value: ${JSON.stringify(value)}`
+        );
+      }
+      return;
+    }
+    let copy = this.clone();
+    copy.patch({ data: value });
+    await copy.validate(priorFieldValue, realm);
+  }
+
+  async validateReference(
+    _priorReference: CardId | undefined,
+    _newReference: CardId | undefined,
+    _realm: AddressableCard
+  ) {
+    // TODO
+  }
+
+  async deserializeValue(value: any): Promise<any> {
+    let deserialize = await this.loadFeature('field-deserialize');
+    if (deserialize) {
+      return await deserialize(value, this);
+    }
+    let copy = this.clone();
+    copy.patch({ data: value });
+    return copy;
+  }
+}
+
+export class AddressableCard extends Card implements CardId {
   // these are non-null because of the assertion in our construction that
   // ensures csId is present.
   csId!: string;
@@ -313,7 +367,7 @@ export class AddressableCard extends UnsavedCard implements CardId {
       throw new CardstackError(`card missing required attribute "realm": ${JSON.stringify(jsonapi)}`);
     }
     let realm = jsonapi.data.attributes.csRealm;
-    super(jsonapi, realm, service);
+    super(jsonapi, realm, undefined, service);
 
     // this is initialized in super() by typescript can't see it.
     if ((this as any).csId == null) {

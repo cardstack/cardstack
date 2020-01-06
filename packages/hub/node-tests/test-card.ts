@@ -148,8 +148,14 @@ export class TestCard {
     return this;
   }
 
-  private guessValueType(_value: any): CardId {
-    return { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'string-field' };
+  private guessValueType(value: any): CardId {
+    switch (typeof value) {
+      case 'boolean':
+        return { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'boolean-field' };
+      case 'string':
+      default:
+        return { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'string-field' };
+    }
   }
 
   private guessReferenceType(value: CardId | TestCardWithId | undefined): CardId {

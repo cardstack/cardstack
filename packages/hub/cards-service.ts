@@ -25,7 +25,7 @@ export class ScopedCardService {
   instantiate(jsonapi: SingleResourceDoc, enclosingCard: Card): Card;
   instantiate(jsonapi: SingleResourceDoc, enclosingCard?: Card): AddressableCard | Card {
     if (enclosingCard) {
-      return new Card(jsonapi, enclosingCard.csRealm, this);
+      return new Card(jsonapi, enclosingCard.csRealm, enclosingCard, this);
     } else {
       return new AddressableCard(jsonapi, this);
     }

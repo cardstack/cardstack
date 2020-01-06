@@ -3,12 +3,10 @@ import { Query } from './query';
 import { myOrigin } from './origin';
 import { WriterFactory } from './writer';
 import { testCard } from './node-tests/test-card';
-import { Expression } from './pgsearch/util';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
 import { IndexerFactory } from './indexer';
 import { ScopedCardService } from './cards-service';
 import * as FieldHooks from './field-hooks';
-import * as J from 'json-typescript';
 
 function ephemeralRealms(cards: ScopedCardService) {
   return [
@@ -61,10 +59,11 @@ export async function search(query: Query, cards: ScopedCardService): Promise<Ad
 }
 
 export async function get(id: CardId, cards: ScopedCardService): Promise<AddressableCard | null> {
+  let coreFieldTypes = ['string-field', 'boolean-field'];
   if (
     id.csRealm === 'https://base.cardstack.com/public' &&
     (id.csOriginalRealm ?? id.csRealm) === 'https://base.cardstack.com/public' &&
-    id.csId === 'string-field'
+    coreFieldTypes.includes(id.csId)
   ) {
     return cards.instantiate(
       testCard().withAttributes({
@@ -77,31 +76,6 @@ export async function get(id: CardId, cards: ScopedCardService): Promise<Address
   return null;
 }
 
-export async function loadFeature(
-  card: Card,
-  cards: ScopedCardService,
-  featureName: 'writer'
-): Promise<WriterFactory | null>;
-export async function loadFeature(
-  card: Card,
-  cards: ScopedCardService,
-  featureName: 'indexer'
-): Promise<IndexerFactory<J.Value> | null>;
-export async function loadFeature(
-  card: Card,
-  cards: ScopedCardService,
-  featureName: 'field-validate'
-): Promise<FieldHooks.validate<unknown>>;
-export async function loadFeature(
-  card: Card,
-  cards: ScopedCardService,
-  featureName: 'field-deserialize'
-): Promise<FieldHooks.deserialize<unknown, unknown>>;
-export async function loadFeature(
-  card: Card,
-  cards: ScopedCardService,
-  featureName: 'field-buildValueExpression'
-): Promise<FieldHooks.buildValueExpression>;
 export async function loadFeature(card: Card, cards: ScopedCardService, featureName: any): Promise<any> {
   switch (featureName) {
     case 'writer':
@@ -112,6 +86,8 @@ export async function loadFeature(card: Card, cards: ScopedCardService, featureN
       return (await loadFieldHooks(card))?.validate;
     case 'field-deserialize':
       return (await loadFieldHooks(card))?.deserialize;
+    case 'field-buildQueryExpression':
+      return (await loadFieldHooks(card))?.buildQueryExpression;
     case 'field-buildValueExpression':
       return (await loadFieldHooks(card))?.buildValueExpression;
     default:
@@ -136,9 +112,10 @@ async function loadIndexer(card: Card, cards: ScopedCardService): Promise<Indexe
 async function loadFieldHooks(
   card: Card
 ): Promise<{
-  validate: FieldHooks.validate<string>;
-  deserialize: FieldHooks.deserialize<string, string>;
-  buildValueExpression: FieldHooks.buildValueExpression;
+  validate?: FieldHooks.validate<string>;
+  deserialize?: FieldHooks.deserialize<string, string>;
+  buildQueryExpression?: FieldHooks.buildQueryExpression;
+  buildValueExpression?: FieldHooks.buildValueExpression;
 } | null> {
   if (card.canonicalURL === canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'string-field' })) {
     return {
@@ -148,8 +125,15 @@ async function loadFieldHooks(
       deserialize: async (value: string, _fieldCard: Card) => {
         return value;
       },
-      buildValueExpression(e: Expression): Expression {
-        return e;
+    };
+  }
+  if (card.canonicalURL === canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'boolean-field' })) {
+    return {
+      validate: async (value: string, _fieldCard: Card) => {
+        return typeof value === 'boolean';
+      },
+      deserialize: async (value: string, _fieldCard: Card) => {
+        return value;
       },
     };
   }
