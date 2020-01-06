@@ -123,41 +123,47 @@ describe('hub/indexing', function() {
   });
 
   it('it does not index unchanged cards since the last time the ephemeral realm was indexed', async function() {
-    async function cardsWithStep(n: number): Promise<number> {
-      // this is a wonky search because we don't have better searching
-      // implemented yet. This can become a much more straightforward search
-      // once we do.
-      let found = await cards.as(Session.INTERNAL_PRIVILEGED).search({});
-      let steps = await Promise.all(
-        found.cards.map(async c => {
-          try {
-            return await c.value('step');
-          } catch (err) {
-            // this is needed because our search returns all cards, even ones
-            // that don't have a "step" field.
-            return undefined;
-          }
-        })
-      );
-      return steps.filter(step => step === n).length;
-    }
-
     let realm = `${myOrigin}/api/realms/first-ephemeral-realm`;
     await createRealm(`${myOrigin}/api/realms/meta`, realm);
 
+    let steps = await cards.as(Session.INTERNAL_PRIVILEGED).create(
+      realm,
+      testCard()
+        .withField('foo', 'string-field')
+        .withField('step', 'integer-field').jsonapi
+    );
+
+    async function cardsWithStep(n: number): Promise<number> {
+      let found = await cards.as(Session.INTERNAL_PRIVILEGED).search({
+        filter: {
+          type: steps,
+          eq: {
+            step: n,
+          },
+        },
+      });
+      return found.cards.length;
+    }
+
     // Add a new card
-    let card = testCard().withAutoAttributes({ csRealm: realm, csId: '1', foo: 'bar', step: 1 });
+    let card = testCard()
+      .withAttributes({ csRealm: realm, csId: '1', foo: 'bar', step: 1 })
+      .adoptingFrom(steps);
     storage.store(card.upstreamDoc, card.csId, card.csRealm);
     await indexing.update();
     expect(await cardsWithStep(1)).to.equal(1);
 
     // Add another new card
-    card = testCard().withAutoAttributes({ csRealm: realm, csId: '2', foo: 'bar', step: 2 });
+    card = testCard()
+      .withAttributes({ csRealm: realm, csId: '2', foo: 'bar', step: 2 })
+      .adoptingFrom(steps);
     storage.store(card.upstreamDoc, card.csId, card.csRealm);
 
     // Maniuplate existing card so we would notice if it gets indexed when it shouldn't.
     await storage.inThePast(async () => {
-      card = testCard().withAutoAttributes({ csRealm: realm, csId: '1', foo: 'bar', step: 2 });
+      card = testCard()
+        .withAttributes({ csRealm: realm, csId: '1', foo: 'bar', step: 2 })
+        .adoptingFrom(steps);
       storage.store(card.upstreamDoc, card.csId, card.csRealm, storage.getEntry('1', realm)?.generation);
     });
 
@@ -166,12 +172,16 @@ describe('hub/indexing', function() {
     expect(n).to.equal(1);
 
     // Update first card
-    card = testCard().withAutoAttributes({ csRealm: realm, csId: '1', foo: 'bar', step: 3 });
+    card = testCard()
+      .withAttributes({ csRealm: realm, csId: '1', foo: 'bar', step: 3 })
+      .adoptingFrom(steps);
     storage.store(card.upstreamDoc, card.csId, card.csRealm, storage.getEntry('1', realm)?.generation);
 
     // Maniuplate other existing card so we would notice if it gets indexed when it shouldn't.
     await storage.inThePast(async () => {
-      card = testCard().withAutoAttributes({ csRealm: realm, csId: '2', foo: 'bar', step: 3 });
+      card = testCard()
+        .withAttributes({ csRealm: realm, csId: '2', foo: 'bar', step: 3 })
+        .adoptingFrom(steps);
       storage.store(card.upstreamDoc, card.csId, card.csRealm, storage.getEntry('2', realm)?.generation);
     });
 
@@ -183,7 +193,9 @@ describe('hub/indexing', function() {
 
     // Maniuplate other existing card so we would notice if it gets indexed when it shouldn't.
     await storage.inThePast(async () => {
-      card = testCard().withAutoAttributes({ csRealm: realm, csId: '1', foo: 'bar', step: 4 });
+      card = testCard()
+        .withAttributes({ csRealm: realm, csId: '1', foo: 'bar', step: 4 })
+        .adoptingFrom(steps);
       storage.store(card.upstreamDoc, card.csId, card.csRealm, storage.getEntry('1', realm)?.generation);
     });
 

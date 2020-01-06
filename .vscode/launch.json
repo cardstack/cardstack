@@ -36,7 +36,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can search by user-defined field"]
+      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "it does not index unchanged cards since the last time the ephemeral realm was indexed"]
     },
     {
       "type": "node",

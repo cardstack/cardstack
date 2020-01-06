@@ -59,7 +59,7 @@ export async function search(query: Query, cards: ScopedCardService): Promise<Ad
 }
 
 export async function get(id: CardId, cards: ScopedCardService): Promise<AddressableCard | null> {
-  let coreFieldTypes = ['string-field', 'boolean-field'];
+  let coreFieldTypes = ['string-field', 'boolean-field', 'integer-field'];
   if (
     id.csRealm === 'https://base.cardstack.com/public' &&
     (id.csOriginalRealm ?? id.csRealm) === 'https://base.cardstack.com/public' &&
@@ -131,6 +131,16 @@ async function loadFieldHooks(
     return {
       validate: async (value: string, _fieldCard: Card) => {
         return typeof value === 'boolean';
+      },
+      deserialize: async (value: string, _fieldCard: Card) => {
+        return value;
+      },
+    };
+  }
+  if (card.canonicalURL === canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'integer-field' })) {
+    return {
+      validate: async (value: string, _fieldCard: Card) => {
+        return typeof value === 'number' && value === Math.floor(value) && value < Number.MAX_SAFE_INTEGER;
       },
       deserialize: async (value: string, _fieldCard: Card) => {
         return value;
