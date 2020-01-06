@@ -213,7 +213,7 @@ export default class Queue {
           result = await this.runJob(firstJob.category, firstJob.args);
           newStatus = 'resolved';
         } catch (err) {
-          result = err;
+          result = serializableError(err);
           newStatus = 'rejected';
         }
         log.trace(`finished %s as %s`, coalescedIds, newStatus);
@@ -242,6 +242,27 @@ export default class Queue {
     if (this.notificationRunner) {
       await this.notificationRunner.shutDown();
     }
+  }
+}
+
+function serializableError(err: any): Record<string, any> {
+  try {
+    let result = Object.create(null);
+    for (let field of Object.getOwnPropertyNames(err)) {
+      result[field] = err[field];
+    }
+    return result;
+  } catch (megaError) {
+    let stringish: string | undefined;
+    try {
+      stringish = String(err);
+    } catch (_ignored) {
+      // ignoring
+    }
+    return {
+      failedToSerializeError: true,
+      string: stringish,
+    };
   }
 }
 
