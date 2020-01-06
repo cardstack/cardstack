@@ -1608,6 +1608,28 @@ module('Unit | Service | data', function() {
       assert.equal(model.attributes.title, undefined);
     });
 
+    test('it throws when the field name is invalid', async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      let field = card.getField('title');
+
+      assert.equal(field.label, 'title');
+
+      assert.throws(
+        () => field.setName('sub title'),
+        /only contain letters, numbers, dashes and underscores/,
+        'field name cannot contain spaces'
+      );
+      assert.throws(
+        () => field.setName('title!'),
+        /only contain letters, numbers, dashes and underscores/,
+        'field name can only include alphanumeric, _, and -'
+      );
+
+      assert.equal(card.isDirty, false, 'card is not dirty');
+      assert.equal(field.name, 'title', 'field name is not changed');
+    });
+
     test('it can change the label of a field', async function(assert) {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'isolated');
