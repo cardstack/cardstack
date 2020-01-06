@@ -2,14 +2,11 @@
   <div class="card-renderer--top-edge-buttons">
     <button class="ch-button ch-button--icon share" aria-label="Share button">
     </button>
-    <button
-      class="ch-button ch-button--secondary"
-      {{on "click" this.preview}}
-      disabled={{not this.cardstackSession.isAuthenticated}}
-      data-test-card-schema-preview-btn
-    >
-      Preview
-    </button>
+    <Cta {{on "click" this.preview}}
+      @label="Open"
+      @variant="secondary primary"
+      @theme="cs-dark"
+      @disabled={{not this.cardstackSession.isAuthenticated}} />
     <SaveButton @card={{this.card}} />
   </div>
 {{/if}}

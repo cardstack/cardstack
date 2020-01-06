@@ -1,12 +1,12 @@
-<button
-  {{on "click" this.save}}
+<Cta {{on "click" this.save}}
+  @variant="primary"
   class={{concat
-    "ch-button ch-button--save "
+    "ch-button--save "
     (if this.justSaved "just-saved ")
     (if (not @card.isDirty) "saved ")
   }}
   data-test-card-save-btn
-  disabled={{not (and this.cardstackSession.isAuthenticated @card.isDirty)}}
+  @disabled={{not (and this.cardstackSession.isAuthenticated @card.isDirty)}}
 >
   <span class="ch-button--inner">
     {{#if this.saveCard.isRunning}}
@@ -20,4 +20,4 @@
       {{/if}}
     {{/if}}
   </span>
-</button>
+</Cta>

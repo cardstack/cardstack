@@ -2,23 +2,21 @@
   {{#cardstack-session as |session|}}
     <div class="login-box {{if session.isAuthenticated "" "full-width"}}">
       {{#if session.isAuthenticated }}
-        <button
-          class="ch-button ch-button--secondary"
+        <Cta
           id="logout-button"
           onclick={{action this.logout session.logout}}
-        >
-          Logout
-        </button>
+          @label="Logout"
+          @variant="secondary primary"
+          @theme="cs-dark" />
       {{else}}
         {{#mock-login as |login|}}
-          <button
+          <Cta
             id="login-button"
-            class="ch-button"
             onclick={{action login "user1"}}
-            data-test-cardstack="login-button"
-          >
-            Login
-          </button>
+            @label="Login"
+            @variant="secondary primary"
+            @theme="cs-dark"
+            data-test-cardstack="login-button" />
         {{/mock-login}}
       {{/if}}
     </div>

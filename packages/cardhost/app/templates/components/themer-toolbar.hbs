@@ -1,6 +1,6 @@
 <header class="themer--top-edge-container">
   <div class="themer--top-edge-width-controls">
-    <button 
+    <button
       class="ch-button ch-button--icon responsive {{if this.cssModeToggle.isResponsive "selected"}}"
       {{on "click" this.cssModeToggle.useResponsiveWidth}}
       aria-label="Show the card in responsive size"
@@ -9,7 +9,7 @@
       Responsive
     </button>
 
-    <button 
+    <button
       class="ch-button ch-button--icon full-width {{if this.cssModeToggle.isResponsive "" "selected"}}"
       {{on "click" this.cssModeToggle.useFullWidth}}
       aria-label="Show the card in full width size"
@@ -21,7 +21,7 @@
 
   <div class="themer--top-edge-pane-controls">
     {{#if this.cssModeToggle.visible}}
-      <button 
+      <button
         class="ch-button ch-button--icon eye-on"
         aria-label="Hide the CSS editor"
         {{on "click" this.cssModeToggle.hideEditor}}
@@ -29,7 +29,7 @@
       >
       </button>
     {{else}}
-      <button 
+      <button
         class="ch-button ch-button--icon eye-off"
         aria-label="Show the CSS editor"
         {{on "click" this.cssModeToggle.showEditor}}
@@ -38,7 +38,7 @@
       </button>
     {{/if}}
 
-    <button 
+    <button
       class="ch-button ch-button--icon dock-bottom {{if (eq this.cssModeToggle.dockLocation "bottom") "selected"}}"
       {{on "click" this.cssModeToggle.dockBottom}}
       aria-label="Dock the CSS editor to the bottom"
@@ -46,18 +46,19 @@
     >
     </button>
 
-    <button 
+    <button
       class="ch-button ch-button--icon dock-right {{if (eq this.cssModeToggle.dockLocation "right") "selected"}}"
       {{on "click" this.cssModeToggle.dockRight}}
       aria-label="Dock the CSS editor to the right"
       data-test-dock-right
     >
     </button>
-    <button {{on "click" @closeEditor}}
-      class="ch-button close-editor-btn"
+    <Cta {{on "click" @closeEditor}}
+      @variant="primary"
+      class="close-editor-btn"
       data-test-close-editor
     >
       Close Editor
-    </button>
+    </Cta>
   </div>
 </header>
