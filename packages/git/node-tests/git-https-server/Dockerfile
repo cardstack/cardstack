@@ -21,9 +21,10 @@ RUN mkdir /root/data-test && \
   mkdir /run/nginx/
 
 COPY nginx.conf /etc/nginx/nginx.conf
+COPY git-auth /etc/nginx/auth/git
 
-# RUN git init --bare /root/data-test
-# RUN chown root:root -R /root/data-test
+RUN git init --bare /root/data-test/repo
+RUN chown root:root -R /root/data-test
 
 EXPOSE 443
 EXPOSE 80
