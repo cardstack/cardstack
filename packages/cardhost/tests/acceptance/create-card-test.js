@@ -240,7 +240,7 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-schema-attr="name"] input').hasClass('invalid');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Title');
     assert
-      .dom('[data-test-right-edge] [data-test-cs-component-validation="text-field"]')
+      .dom('[data-test-right-edge] [data-test-schema-attr="name"] [data-test-cs-component-validation="text-field"]')
       .hasText('Can only contain letters, numbers, dashes, and underscores.');
 
     await percySnapshot(assert);
