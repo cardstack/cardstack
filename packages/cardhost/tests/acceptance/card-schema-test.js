@@ -62,7 +62,7 @@ module('Acceptance | card schema', function(hooks) {
     });
     await visit(`/cards/${card1Id}/schema`);
 
-    await showCardId();
+    await showCardId(true);
     assert.dom('#card__id').isDisabled();
   });
 
@@ -73,11 +73,11 @@ module('Acceptance | card schema', function(hooks) {
     });
     await visit(`/cards/${card1Id}/schema`);
 
-    assert.dom('.right-edge--item [data-test-adopted-card-name]').doesNotExist();
+    assert.dom('.right-edge--item #card__id').doesNotExist();
 
     await click('[data-test-right-edge-section-toggle="details"]');
 
-    assert.dom('.right-edge--item [data-test-adopted-card-name]').hasText('card-id');
+    assert.dom('.right-edge--item #card__id').hasValue('millenial-puppies');
   });
 
   test(`renaming a card's field`, async function(assert) {
