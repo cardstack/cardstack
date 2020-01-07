@@ -1,0 +1,14 @@
+{
+  "data": {
+    "type": "cards",
+    "attributes": {
+      "csFeatures": {
+        "writer": "writer.js",
+        "indexer": "indexer.js"
+      }
+    },
+    "relationships": {
+
+    }
+  }
+}

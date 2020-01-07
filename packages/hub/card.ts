@@ -368,7 +368,7 @@ export class AddressableCard extends Card implements CardId {
   constructor(jsonapi: SingleResourceDoc, service: ScopedCardService, identity?: CardId) {
     let actualRealm = identity?.csRealm ?? jsonapi.data.attributes?.csRealm;
     if (typeof actualRealm !== 'string') {
-      throw new CardstackError(`card missing required attribute "realm": ${JSON.stringify(jsonapi)}`);
+      throw new CardstackError(`card missing required attribute "csRealm": ${JSON.stringify(jsonapi)}`);
     }
     super(jsonapi, actualRealm, undefined, service);
 

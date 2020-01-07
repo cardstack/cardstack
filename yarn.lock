@@ -2109,6 +2109,13 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
+"@cardstack/base-card@0.16.14":
+  version "0.16.14"
+  resolved "https://registry.yarnpkg.com/@cardstack/base-card/-/base-card-0.16.14.tgz#0ad0458fb29696219f0cbf5bd78ec211eb95d37d"
+  integrity sha512-yw67aAvFQZ7TuPVK41elY5pn8BNHtyqnkFKgzGvu3c90m7iA/EV5bMWzQdr9D3wNfKbFDFrNios4kfIjUCs7EA==
+  dependencies:
+    jsonapi-typescript "^0.1.3"
+
 "@cardstack/logger@^0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@cardstack/logger/-/logger-0.2.0.tgz#aa964da93eb8e2a374607bba14546c7146689f37"

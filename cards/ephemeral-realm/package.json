@@ -1,0 +1,15 @@
+{
+  "name": "ephemeral-realm",
+  "version": "0.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "peerDependencies": {
+    "@cardstack/hub": "0.16.14"
+  },
+  "devDependencies": {
+    "@cardstack/hub": "0.16.14"
+  },
+  "dependencies": {
+    "jsonapi-typescript": "^0.1.3"
+  }
+}

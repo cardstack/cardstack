@@ -1,0 +1,13 @@
+{
+  "data": {
+    "type": "cards",
+    "attributes": {
+      "csFeatures": {
+        "field-validate": ["field-hooks.js", "validate"]
+      }
+    },
+    "relationships": {
+
+    }
+  }
+}

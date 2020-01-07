@@ -38,15 +38,6 @@ async function ephemeralRealms(cards: ScopedCardService) {
         })
         .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi
     ),
-    await cards.instantiate(
-      testCard()
-        .withAutoAttributes({
-          csRealm: `${myOrigin}/api/realms/meta`,
-          csOriginalRealm: CARDSTACK_PUBLIC_REALM,
-          csId: CARDSTACK_PUBLIC_REALM,
-        })
-        .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi
-    ),
   ];
 }
 
@@ -72,21 +63,6 @@ export async function search(query: Query, cards: ScopedCardService): Promise<Ad
 }
 
 export async function get(id: CardId, cards: ScopedCardService): Promise<AddressableCard | null> {
-  let coreNames = ['string-field', 'boolean-field', 'integer-field', 'ephemeral-realm'];
-  if (
-    id.csRealm === 'https://base.cardstack.com/public' &&
-    (id.csOriginalRealm ?? id.csRealm) === 'https://base.cardstack.com/public' &&
-    coreNames.includes(id.csId)
-  ) {
-    return cards.instantiate(
-      testCard().withAutoAttributes({
-        csRealm: id.csRealm,
-        csOriginalRealm: id.csOriginalRealm,
-        csId: id.csId,
-      }).jsonapi
-    );
-  }
-
   let allRealms = await ephemeralRealms(cards);
   let found = allRealms.find(r => r.canonicalURL === canonicalURL(id));
   if (found) {

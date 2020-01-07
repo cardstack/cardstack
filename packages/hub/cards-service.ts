@@ -9,6 +9,9 @@ import { SingleResourceDoc } from 'jsonapi-typescript';
 import { Query } from './query';
 import { ResponseMeta } from './pgsearch/pgclient';
 import { Writer } from './writer';
+import { join } from 'path';
+import { existsSync } from 'fs';
+import { assertSingleResourceDoc } from './jsonapi';
 
 export default class CardsService {
   pgclient = inject('pgclient');
@@ -21,8 +24,8 @@ export default class CardsService {
 export class ScopedCardService {
   constructor(private cards: CardsService, private session: Session) {}
 
-  async instantiate(jsonapi: SingleResourceDoc): Promise<AddressableCard> {
-    return await getOwner(this.cards).instantiate(AddressableCard, jsonapi, this);
+  async instantiate(jsonapi: SingleResourceDoc, imposeIdentity?: CardId): Promise<AddressableCard> {
+    return await getOwner(this.cards).instantiate(AddressableCard, jsonapi, this, imposeIdentity);
   }
 
   async create(realm: string, doc: SingleResourceDoc): Promise<AddressableCard> {
@@ -100,10 +103,19 @@ export class ScopedCardService {
   async get(id: CardId): Promise<AddressableCard>;
   async get(canonicalURL: string): Promise<AddressableCard>;
   async get(idOrURL: CardId | string): Promise<AddressableCard> {
+    let id = asCardId(idOrURL);
+
+    if (
+      id.csRealm === CARDSTACK_PUBLIC_REALM &&
+      (!id.csOriginalRealm || id.csOriginalRealm === CARDSTACK_PUBLIC_REALM)
+    ) {
+      return await this.getBuiltIn(id);
+    }
+
     // this exists to throw if there's no such realm. We're not using the return
     // value yet but we will onc we implement custom searchers and realm grants.
-    let id = asCardId(idOrURL);
     await this.getRealm(id.csRealm);
+
     let card = await scaffoldGet(id, this);
     if (card) {
       return card;
@@ -150,6 +162,16 @@ export class ScopedCardService {
       throw new CardstackError(`no such realm "${realm}"`, { status: 400 });
     }
     return realms[0];
+  }
+
+  private async getBuiltIn(id: CardId): Promise<AddressableCard> {
+    let cardDir = join(__dirname, '..', '..', 'cards', id.csId);
+    if (!existsSync(cardDir)) {
+      throw new CardstackError(`Card ${id.csId} not found in public realm`, { status: 404 });
+    }
+    let json = await import(join(cardDir, 'card.json'));
+    assertSingleResourceDoc(json);
+    return await this.instantiate(json, id);
   }
 }
 

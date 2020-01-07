@@ -1,5 +1,6 @@
 /node_modules
 /packages/*/node_modules
+/cards/*/node_modules
 /packages/*/dist
 /packages/*/tmp
 /packages/*/vendor
@@ -22,6 +23,10 @@ package-lock.json
 /packages/hub/**/*.d.ts
 /packages/hub/**/*.js
 /packages/hub/**/*.js.map
+
+/cards/**/*.d.ts
+/cards/**/*.js
+/cards/**/*.js.map
 
 /packages/git/**/*.d.ts
 /packages/git/**/*.js
