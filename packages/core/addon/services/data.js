@@ -17,6 +17,7 @@ let store = {
 
 export default class DataService extends Service {
   @service cardstackSession;
+  @service cardLocalStorage;
 
   static FIELD_NAME_REGEX = /^[a-zA-Z][a-zA-Z0-9_-]*$/;
 
@@ -43,6 +44,8 @@ export default class DataService extends Service {
   }
 
   createCard(id, adoptedFrom) {
+    // remove the next line once we have progressive data handling
+    this.cardLocalStorage.addRecentCardId(id);
     return new Card({
       id,
       adoptedFrom,
