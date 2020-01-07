@@ -116,8 +116,6 @@
     <h3>Icon Buttons</h3>
     <h4>- Default icon button</h4>
     <div>
-      <button class="ch-button ch-button--icon user" aria-label="User"></button>
-      <button class="ch-button ch-button--icon catalog" aria-label="Catalog"></button>
       <button class="ch-button ch-button--icon share" aria-label="Share"></button>
       <button class="ch-button ch-button--icon library" aria-label="Library"></button>
       <button class="ch-button ch-button--icon dock-right" aria-label="Dock right"></button>
@@ -138,7 +136,21 @@
     </div>
 
     <h4>- Secondary icon button</h4>
-    <button class="ch-button ch-button--icon-secondary delete" aria-label="Delete"></button>
+    <div>
+      <button class="ch-button ch-button--icon-secondary" aria-label="User">
+        {{svg-jar "user" width="18px" height="20px"}}
+      </button>
+      <button class="ch-button ch-button--icon-secondary" aria-label="Catalog">
+        {{svg-jar "catalog" width="20px" height="20px"}}
+      </button>
+      <button class="ch-button ch-button--icon-secondary" aria-label="Library">
+        {{svg-jar "library" width="20px" height="20px"}}
+      </button>
+      <button class="ch-button ch-button--icon-secondary" aria-label="Delete">
+        {{svg-jar "trash" width="17px" height="20px"}}
+      </button>
+    </div>
+
     <CodeEditor @code='<button class="ch-button ch-button--icon-secondary delete" aria-label="Delete"></button>' @language="html" />
 
     <h4>- Icon with text</h4>
