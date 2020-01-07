@@ -131,7 +131,7 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-card-renderer-isolated]').hasClass('selected');
     assert.dom('[data-test-field]').doesNotHaveClass('selected');
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.title, undefined);
     assert.equal(card.data.attributes.body, undefined);
@@ -296,7 +296,7 @@ module('Acceptance | card create', function(hooks) {
       [...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
       ['title', 'author', 'body']
     );
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.deepEqual(card.data.relationships.fields.data, [
       { type: 'fields', id: 'title' },

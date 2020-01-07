@@ -104,7 +104,7 @@ module('Acceptance | card view', function(hooks) {
     assert.dom('[data-test-appearance-section] .ember-power-select-selected-item').hasText('Cardstack default');
     assert.dom('[data-test-card-custom-style-button]').exists();
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.title, 'The Millenial Puppy');
     assert.equal(

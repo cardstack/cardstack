@@ -50,7 +50,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-field="title"] [data-test-field-renderer-type]').hasText('title (Text)');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.title, undefined);
   });
@@ -107,7 +107,7 @@ module('Acceptance | card schema', function(hooks) {
     await saveCard('schema', card1Id);
     assert.dom('[data-test-field="title"]').doesNotExist();
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.subtitle, 'test title');
     assert.equal(card.data.attributes['metadata-summary'].subtitle.instructions, 'fill this in with your subheader');
@@ -183,7 +183,7 @@ module('Acceptance | card schema', function(hooks) {
     await waitFor(`[data-test-card-schema="${card1Id}"]`);
 
     assert.dom('[data-test-field="body"]').doesNotExist();
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.body, undefined);
 
@@ -239,7 +239,7 @@ module('Acceptance | card schema', function(hooks) {
       ),
       ['body', 'author', 'title']
     );
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.deepEqual(card.data.relationships.fields.data, [
       { type: 'fields', id: 'body' },
@@ -298,7 +298,7 @@ module('Acceptance | card schema', function(hooks) {
 
     await click('[data-test-right-edge] [data-test-schema-attr="embedded"] input');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     let field = card.included.find(i => `${i.type}/${i.id}` === 'fields/title');
     assert.equal(field.attributes['needed-when-embedded'], true);
@@ -308,7 +308,7 @@ module('Acceptance | card schema', function(hooks) {
     await click('[data-test-field="title"]');
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
-    cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    cardJson = find('[data-test-card-json]').innerHTML;
     card = JSON.parse(cardJson);
     field = card.included.find(i => `${i.type}/${i.id}` === 'fields/title');
     assert.equal(field.attributes['needed-when-embedded'], true);
@@ -326,7 +326,7 @@ module('Acceptance | card schema', function(hooks) {
 
     await click('[data-test-right-edge] [data-test-schema-attr="embedded"] input');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isNotChecked();
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     let field = card.included.find(i => `${i.type}/${i.id}` === 'fields/title');
     assert.equal(field.attributes['needed-when-embedded'], false);
@@ -336,7 +336,7 @@ module('Acceptance | card schema', function(hooks) {
     await click('[data-test-field="title"]');
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isNotChecked();
-    cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    cardJson = find('[data-test-card-json]').innerHTML;
     card = JSON.parse(cardJson);
     field = card.included.find(i => `${i.type}/${i.id}` === 'fields/title');
     assert.equal(field.attributes['needed-when-embedded'], false);

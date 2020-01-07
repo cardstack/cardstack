@@ -15,7 +15,7 @@ export default class ViewCardController extends Controller {
   createTheme() {
     this.themerOptions.push({ name: 'Custom theme' });
     this.selectedTheme = this.themerOptions[this.themerOptions.length - 1];
-    this.router.transitionTo('cards.themer', this.model);
+    this.router.transitionTo('cards.themer', this.model.name);
   }
 
   get cardJson() {

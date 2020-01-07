@@ -21,7 +21,7 @@ export default class ThemerCardController extends Controller {
 
   @action
   closeEditor() {
-    this.router.transitionTo('cards.view', this.model);
+    this.router.transitionTo('cards.view', this.model.name);
   }
 
   @action

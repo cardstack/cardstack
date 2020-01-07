@@ -50,7 +50,7 @@ module('Acceptance | card edit', function(hooks) {
     await visit(`/cards/${card1Id}`);
     assert.dom('[data-test-field="body"] [data-test-string-field-viewer-value]').hasText(`updated body`);
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.body, `updated body`);
   });
@@ -74,7 +74,7 @@ module('Acceptance | card edit', function(hooks) {
       .dom('[data-test-field="email"] [data-test-case-insensitive-field-viewer-value]')
       .hasText(`hassan@nowhere.dog`);
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.email, `hassan@nowhere.dog`);
   });
@@ -96,7 +96,7 @@ module('Acceptance | card edit', function(hooks) {
     await visit(`/cards/${card1Id}`);
     assert.dom('[data-test-field="created"] [data-test-date-field-viewer-value]').hasText(`2019-10-08`);
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.created, `2019-10-08`);
   });
@@ -118,7 +118,7 @@ module('Acceptance | card edit', function(hooks) {
     await visit(`/cards/${card1Id}`);
     assert.dom('[data-test-field="likes"] [data-test-integer-field-viewer-value]').hasText(`110`);
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.likes, 110);
   });
@@ -140,7 +140,7 @@ module('Acceptance | card edit', function(hooks) {
     await visit(`/cards/${card1Id}`);
     assert.dom('[data-test-field="published"] [data-test-boolean-field-viewer-value]').hasText(`false`);
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.published, false);
   });
@@ -190,7 +190,7 @@ module('Acceptance | card edit', function(hooks) {
       .dom(`[data-test-field="reviewers"] [data-test-embedded-card="${card3Id}"] [data-test-field="email"]`)
       .doesNotExist();
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.deepEqual(card.data.relationships.reviewers.data, [
       { type: 'cards', id: qualifiedCard2Id },
@@ -231,7 +231,7 @@ module('Acceptance | card edit', function(hooks) {
       .dom(`[data-test-field="author"] [data-test-embedded-card="${card2Id}"] [data-test-field="email"]`)
       .doesNotExist();
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.deepEqual(card.data.relationships.author.data, { type: 'cards', id: qualifiedCard2Id });
     let userCard = card.included.find(i => `${i.type}/${i.id}` === `cards/${qualifiedCard2Id}`);
@@ -258,7 +258,7 @@ module('Acceptance | card edit', function(hooks) {
       .dom('[data-test-field="image"] [data-test-decorative-image-field-viewer-value]')
       .hasAttribute('src', 'http://example.com/testimage.jpg');
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.image, 'http://example.com/testimage.jpg');
   });
