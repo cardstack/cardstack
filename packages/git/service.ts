@@ -77,17 +77,13 @@ class GitLocalCache {
 
         await mkdirp(repoPath);
 
-        repo = await Repository.clone(remote.url, repoPath, {
-          fetchOpts,
-        });
+        repo = await Repository.clone(remote.url, repoPath);
       }
     } else {
       log.info('cloning %s into %s', remote.url, repoPath);
       await mkdirp(repoPath);
 
-      repo = await Repository.clone(remote.url, repoPath, {
-        fetchOpts,
-      });
+      repo = await Repository.clone(remote.url, repoPath);
     }
 
     return {

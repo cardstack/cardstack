@@ -78,9 +78,7 @@ describe('git/writer with remote', function() {
     tempRepoPath = await mkdir('cardstack-temp-test-repo');
     tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
 
-    repo = await Repository.clone('http://root:password@localhost:8838/git/repo', tempRemoteRepoPath, {
-      fetchOpts,
-    });
+    repo = await Repository.clone('http://root:password@localhost:8838/git/repo', tempRemoteRepoPath);
 
     let dataSource = factory.addResource('data-sources').withAttributes({
       'source-type': '@cardstack/git',
@@ -308,9 +306,7 @@ describe('git/writer with empty remote', function() {
     tempRepoPath = await mkdir('cardstack-temp-test-repo');
     tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
 
-    repo = await Repository.clone('http://root:password@localhost:8838/git/repo', tempRemoteRepoPath, {
-      fetchOpts,
-    });
+    repo = await Repository.clone('http://root:password@localhost:8838/git/repo', tempRemoteRepoPath);
 
     let dataSource = factory.addResource('data-sources').withAttributes({
       'source-type': '@cardstack/git',
@@ -379,9 +375,7 @@ describe('git/writer-remote/githereum', function() {
     tempRepoPath = await mkdir('cardstack-temp-test-repo');
     tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
 
-    await Repository.clone('http://root:password@localhost:8838/git/repo', tempRemoteRepoPath, {
-      fetchOpts,
-    });
+    await Repository.clone('http://root:password@localhost:8838/git/repo', tempRemoteRepoPath);
 
     let dataSource = factory.addResource('data-sources', 'git').withAttributes({
       'source-type': '@cardstack/git',
