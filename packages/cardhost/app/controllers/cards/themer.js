@@ -1,7 +1,6 @@
 import Controller from '@ember/controller';
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
-import { tracked } from '@glimmer/tracking';
 
 export default class ThemerCardController extends Controller {
   @service cssModeToggle;
@@ -16,24 +15,10 @@ export default class ThemerCardController extends Controller {
     return JSON.stringify(this.model.json, null, 2);
   }
 
-  @tracked
-  themerOptions = [{ name: 'Cardstack default' }];
-
-  @tracked
-  selectedTheme = this.themerOptions[0];
-
   @action
   handleThemeChange(val) {
     this.selectedTheme = val;
     //  TODO
-  }
-
-  @action
-  createTheme() {
-    this.cssModeToggle.setEditingCss(true);
-    this.themerOptions.push({ name: 'Custom theme' });
-    this.selectedTheme = this.themerOptions[this.themerOptions.length - 1];
-    this.router.transitionTo('cards.view', this.model, { queryParams: { editingCss: true } });
   }
 
   @action
@@ -43,8 +28,7 @@ export default class ThemerCardController extends Controller {
 
   @action
   closeEditor() {
-    this.cssModeToggle.setEditingCss(false);
-    this.router.transitionTo('cards.view', this.model, { queryParams: { editingCss: undefined } });
+    this.router.transitionTo('cards.view', this.model);
   }
 
   @action

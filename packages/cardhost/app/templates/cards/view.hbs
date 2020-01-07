@@ -1,6 +1,4 @@
-{{#if this.cssModeToggle.editingCss}}
-  <ThemerToolbar @closeEditor={{this.closeEditor}} />
-{{else if this.cardstackSession.isAuthenticated}}
+{{#if this.cardstackSession.isAuthenticated}}
   <div class="card-renderer--top-edge-buttons">
     <button
       class="ch-button ch-button--icon share"
@@ -16,15 +14,13 @@
   </div>
 {{/if}}
 
-{{#unless this.cssModeToggle.editingCss}}
-  <CardhostLeftEdge />
-{{/unless}}
+<CardhostLeftEdge />
 
 <section class="card-view" data-test-card-view={{this.model.name}}>
   <CardRenderer
     @card={{this.model}}
     @format="isolated"
-    @cardSelected={{not this.cssModeToggle.editingCss}} {{!-- Card is highlighted (unless the themer is open) --}}
+    @cardSelected={{true}}
   />
 </section>
 
@@ -36,16 +32,7 @@
   />
 </section>
 
-
-{{#if this.cssModeToggle.editingCss}}
-  <div data-test-editor-pane>
-    <EditorPane data-test-dock-location={{this.cssModeToggle.dockLocation}}
-      @model={{this.model}}
-      @saveCss={{this.saveCss}}
-      @updateCode={{this.updateCode}}
-    />
-  </div>
-{{else if this.cardstackSession.isAuthenticated}}
+{{#if this.cardstackSession.isAuthenticated}}
   <RightEdge
     @card={{this.model}}
     @cardSelected={{true}} {{!-- Change this when we want to display different right-edge options --}}

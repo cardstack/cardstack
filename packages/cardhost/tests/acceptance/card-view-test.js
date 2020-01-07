@@ -137,8 +137,8 @@ module('Acceptance | card view', function(hooks) {
   test('can view code editor', async function(assert) {
     await login();
 
-    await visit(`/cards/@cardstack%2Fbase-card?editingCss=true`);
-    assert.equal(currentURL(), `/cards/@cardstack%2Fbase-card?editingCss=true`);
+    await visit(`/cards/@cardstack%2Fbase-card/themer`);
+    assert.equal(currentURL(), `/cards/@cardstack%2Fbase-card/themer`);
     await waitFor(`[data-test-card-view="@cardstack/base-card"]`, { timeout });
     assert.dom('[data-test-code-block]').exists();
     await settled();
@@ -148,10 +148,9 @@ module('Acceptance | card view', function(hooks) {
   test('can dock code editor to bottom', async function(assert) {
     await login();
 
-    await visit(`/cards/@cardstack%2Fbase-card?editingCss=true`);
-    assert.equal(currentURL(), `/cards/@cardstack%2Fbase-card?editingCss=true`);
+    await visit(`/cards/@cardstack%2Fbase-card/themer`);
+    assert.equal(currentURL(), `/cards/@cardstack%2Fbase-card/themer`);
     await waitFor(`[data-test-card-view="@cardstack/base-card"]`, { timeout });
-    this.owner.lookup('service:css-mode-toggle').setEditingCss(true); // For some reason passing the query param isn't going through and setting the prop on the service
     assert.dom('[data-test-code-block]').exists();
     await settled();
     assert.dom('.cardhost-card-theme-editor').hasAttribute('data-test-dock-location', 'right');

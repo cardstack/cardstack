@@ -35,4 +35,8 @@ export default class CardCreator extends CardManipulator {
       document.querySelector('#card__id').focus();
     });
   }
+
+  get onThemerRoute() {
+    return this.router.currentRouteName.includes('themer');
+  }
 }

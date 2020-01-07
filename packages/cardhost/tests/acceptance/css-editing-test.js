@@ -73,7 +73,7 @@ module('Acceptance | css editing', function(hooks) {
     await login();
     await createCards(cardData);
     await click('[data-test-card-custom-style-button]');
-    assert.equal(currentURL(), `/cards/${card1Id}?editingCss=true`);
+    assert.equal(currentURL(), `/cards/${card1Id}/themer`);
     assert.dom('[data-test-close-editor]').exists();
     assert.dom('[data-test-card-renderer-isolated]').doesNotHaveClass('selected');
     await click('[data-test-close-editor]');
@@ -88,7 +88,7 @@ module('Acceptance | css editing', function(hooks) {
     await createCards(cardData);
     await click('[data-test-card-custom-style-button]');
     await settled();
-    assert.equal(currentURL(), `/cards/${card1Id}?editingCss=true`);
+    assert.equal(currentURL(), `/cards/${card1Id}/themer`);
     assert.dom('[data-test-hide-editor-btn]').exists();
     assert.dom('[data-test-editor-pane]').exists();
     await click('[data-test-hide-editor-btn]');
@@ -100,7 +100,7 @@ module('Acceptance | css editing', function(hooks) {
     await login();
     await createCards(cardData);
     await click('[data-test-card-custom-style-button]');
-    assert.equal(currentURL(), `/cards/${card1Id}?editingCss=true`);
+    assert.equal(currentURL(), `/cards/${card1Id}/themer`);
     assert.dom('[data-test-dock-bottom]').exists();
     assert.dom('[data-test-dock-location="right"]');
     await waitForAnimation(() => percySnapshot('css editor docked right'));
@@ -115,7 +115,7 @@ module('Acceptance | css editing', function(hooks) {
     await login();
     await createCards(cardData);
     await click('[data-test-card-custom-style-button]');
-    assert.equal(currentURL(), `/cards/${card1Id}?editingCss=true`);
+    assert.equal(currentURL(), `/cards/${card1Id}/themer`);
     // make sure initial state is correct
     assert.dom('[data-test-responsive-btn]').exists();
     assert.dom('[data-test-responsive-btn]').hasClass('selected');

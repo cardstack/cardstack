@@ -6,13 +6,13 @@
     {{if this.cardstackSession.isAuthenticated "logged-in" "logged-out"}}
     {{this.themerClasses}}"
     data-test-cardhost-cards>
-    {{#if (not this.cssModeToggle.editingCss)}}
+    {{#unless this.onThemerRoute}}
       <CardhostTopEdge @mode={{mode}}>
         {{#if (or (eq mode "schema") (eq mode "edit") (eq mode "view"))}}
           <ViewSwitcher @mode={{mode}} @cardId={{this.target.currentRoute.params.id}} />
         {{/if}}
       </CardhostTopEdge>
-    {{/if}}
+    {{/unless}}
 
     {{outlet}}
   </div>
