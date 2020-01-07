@@ -1,6 +1,6 @@
 import Service from '@ember/service';
 /**
- * The LocalStorage service is responsible for storing client-side data,
+ * The CardLocalStorage service is responsible for storing client-side data,
  * such as the ids of recently created Cards.
  * It uses the native localStorage browser API:
  * https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Local_storage
@@ -108,12 +108,16 @@ if (!window.localStorage) {
 
 export default Service.extend({
   getRecentCardIds() {
-    localStorage.getItem('recentCardIds');
+    return localStorage.getItem('recentCardIds');
   },
 
+  // this method should only be called by the data service
   addRecentCardId(id) {
     let cardIds = this.getRecentCardIds();
-    cardIds.push(id);
-    localStorage.setItem('recentCardIds', cardIds);
+    if (cardIds.indexOf(id) === -1) {
+      // deduplicate
+      cardIds.push(id);
+      localStorage.setItem('recentCardIds', cardIds);
+    }
   },
 });
