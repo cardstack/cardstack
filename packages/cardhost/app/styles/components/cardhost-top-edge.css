@@ -23,6 +23,10 @@
   z-index: var(--ch-edges-z-index);
 }
 
+.login-box.full-width {
+  right: var(--ch-spacing)
+}
+
 .login-box > button {
   --background: none;
   --border-radius: 10px;
