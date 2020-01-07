@@ -17,43 +17,58 @@
             before implemnenting that, as that will make this easy
             --}}
             <div class="right-edge--sections">
-              {{#if (eq @mode "schema")}}
-                <div class="right-edge--section">
-                  <div class="right-edge--section-header" data-test-section-header>ID</div>
-                  <div class="right-edge--item">
-                    <TextField
-                      @theme="cs-dark"
-                      @class="hide-in-percy"
-                      @id="card__id"
-                      @label="Card ID"
-                      @placeholder="e.g. millenial-puppies"
-                      @value={{this.cardName}}
-                      @setValue={{action this.updateCardId}}
-                      @disabled={{or (not @updateCardId) (not @card.isNew)}} />
-                  </div>
-                  <div class="right-edge--item">
-                    <div class="right-edge--label">Internal ID</div>
-                    <div class="hide-in-percy" data-test-internal-card-id>
-                      {{@card.id}}
-                    </div>
-                  </div>
-                </div>
-              {{/if}}
-
               <div class="right-edge--section">
+                <button {{on "click" (fn this.toggleSection "template")}} class="section-toggle-btn {{if (includes this.expandedSections "template") "expanded"}}" data-test-right-edge-section-toggle="template">
+                  Toggle
+                </button>
                 <div class="right-edge--section-header" data-test-section-header>
                   Template
                 </div>
-                <div class="right-edge--item">
-                  {{#if @card.adoptedFrom}}
-                    <AdoptedFrom @card={{@card.adoptedFrom}} @adoptedCard={{@card}} />
-                  {{else}}
-                    <div data-test-no-adoption>
-                      No Adoption
+                <AnimatedContainer class="right-edge--animation-container">
+                  {{#animated-if (includes this.expandedSections "template") use=this.fade duration=this.duration}}
+                    <div class="right-edge--item">
+                      {{#if @card.adoptedFrom}}
+                        <AdoptedFrom @card={{@card.adoptedFrom}} @adoptedCard={{@card}} />
+                      {{else}}
+                        <div data-test-no-adoption>
+                          No Adoption
+                        </div>
+                      {{/if}}
                     </div>
-                  {{/if}}
-                </div>
+                  {{/animated-if}}
+                </AnimatedContainer>
               </div>
+              {{#if (eq @mode "schema")}}
+                <div class="right-edge--section">
+                  <button {{on "click" (fn this.toggleSection "details")}} class="section-toggle-btn {{if (includes this.expandedSections "details") "expanded"}}" data-test-right-edge-section-toggle="details">
+                    Toggle
+                  </button>
+                  <div class="right-edge--section-header" data-test-section-header>Details</div>
+                  <AnimatedContainer class="right-edge--animation-container">
+                    {{#animated-if (includes this.expandedSections "details") use=this.fade duration=this.duration}}
+                      <div class="right-edge--items">
+                        <div class="right-edge--item">
+                          <TextField
+                            @theme="cs-dark"
+                            @class="hide-in-percy"
+                            @id="card__id"
+                            @label="Card ID"
+                            @placeholder="e.g. millenial-puppies"
+                            @value={{this.cardName}}
+                            @setValue={{action this.updateCardId}}
+                            @disabled={{or (not @updateCardId) (not @card.isNew)}} />
+                        </div>
+                        <div class="right-edge--item">
+                          <div class="right-edge--label">Internal ID</div>
+                          <div class="hide-in-percy" data-test-internal-card-id>
+                            {{@card.id}}
+                          </div>
+                        </div>
+                      </div>
+                    {{/animated-if}}
+                  </AnimatedContainer>
+                </div>
+              {{/if}}
             </div>
           {{else if @selectedField}}
             <div class="right-edge--sections">
@@ -80,7 +95,7 @@
                         @setFieldName={{@setFieldName}}
                         @setFieldLabel={{@setFieldLabel}}
                         @setFieldInstructions={{@setFieldInstructions}}
-                        @schemaAttrs={{array "name" "label" "instructions" "embedded"}} />
+                        @schemaAttrs={{array "label" "name" "instructions" "embedded"}} />
                     </div>
                   </div>
                 {{/animated-value}}

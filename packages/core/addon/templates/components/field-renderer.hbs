@@ -109,13 +109,18 @@
           {{/if}}
         </div>
       {{else if (and (eq schemaAttr "name") @setFieldName)}}
-        <div data-test-schema-attr={{schemaAttr}}>
+        <div class="ch-input-group" data-test-schema-attr={{schemaAttr}}>
           <TextField
-            @theme="cs-dark"
-            @label="Field Name"
+            @id={{concat "edit-field-name-" @field.nonce "-" this.renderNonce}}
             @value={{this.newFieldName}}
+            @theme="cs-dark"
+            @label="Field ID"
+            @class="ch-input"
             @setValue={{action this.updateFieldName}}
-            @disabled={{@field.isAdopted}} />
+            @disabled={{@field.isAdopted}}
+            @pattern={{@field.fieldNameRegex.source}}
+            @title="Can only contain letters, numbers, dashes, and underscores."
+          />
         </div>
       {{else if (eq schemaAttr "is-meta")}}
         <div class="field-renderer--display" data-test-schema-attr={{schemaAttr}}>
