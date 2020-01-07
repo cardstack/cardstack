@@ -14,6 +14,7 @@ Router.map(function() {
     this.route('view', { path: '/:id' });
     this.route('edit', { path: '/:id/edit' });
     this.route('schema', { path: '/:id/schema' });
+    this.route('themer', { path: '/:id/themer' });
   });
   this.route('ui-components');
 });
