@@ -142,3 +142,17 @@
 .right-edge--item .cs-input-group--helper-text.invalid {
   margin-bottom: 10px;
 }
+
+.right-edge--item .field .cs-input-group {
+  padding-bottom: 16px;
+}
+
+.right-edge--item .field .cs-checkbox-group--helper-text {
+  display: none;
+}
+
+.right-edge--item .field .cs-checkbox-group {
+  padding-top: 7px;
+}
+
+
