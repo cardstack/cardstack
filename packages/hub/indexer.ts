@@ -2,6 +2,7 @@ import { AddressableCard } from './card';
 import { Batch } from './pgsearch/pgclient';
 import { UpstreamDocument, UpstreamIdentity, upstreamIdToCardId } from './document';
 import { ScopedCardService } from './cards-service';
+import { getOwner } from './dependency-injection';
 
 export interface IndexerFactory<Meta> {
   new (realmCard: AddressableCard): Indexer<Meta>;
@@ -16,7 +17,8 @@ export class IndexingOperations {
 
   async save(upstreamId: UpstreamIdentity, doc: UpstreamDocument) {
     let id = upstreamIdToCardId(upstreamId, this.realmCard.csId);
-    return await this.batch.save(new AddressableCard(doc.jsonapi, this.cards, id));
+    let card = await getOwner(this).instantiate(AddressableCard, doc.jsonapi, this.cards, id);
+    return await this.batch.save(card);
   }
 
   async delete(upstreamId: UpstreamIdentity) {

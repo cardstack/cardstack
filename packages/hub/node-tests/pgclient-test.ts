@@ -26,7 +26,7 @@ describe('hub/pgclient', function() {
     let pgclient = await env.container.lookup('pgclient');
     let cardsService = await env.container.lookup('cards');
     let cards = cardsService.as(Session.INTERNAL_PRIVILEGED);
-    let card = cards.instantiate(
+    let card = await cards.instantiate(
       testCard().withAutoAttributes({ csId: 'card-1', csRealm: `http://hassan.com/realm`, hello: 'world' }).jsonapi
     );
 

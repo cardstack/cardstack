@@ -11,6 +11,7 @@ import * as J from 'json-typescript';
 import { IndexerFactory } from './indexer';
 import { ScopedCardService } from './cards-service';
 import * as FieldHooks from './field-hooks';
+import { inject, getOwner } from './dependency-injection';
 
 export const apiPrefix = '/api';
 
@@ -59,6 +60,8 @@ export async function makePristineCollection(
 }
 
 export class Card {
+  modules = inject('modules');
+
   // This is the realm the card is stored in.
   csRealm: string;
 
@@ -119,8 +122,8 @@ export class Card {
     }
   }
 
-  clone(): Card {
-    return new Card(this.jsonapi, this.csRealm, this.enclosingCard, this.service);
+  async clone(): Promise<Card> {
+    return await getOwner(this).instantiate(Card, this.jsonapi, this.csRealm, this.enclosingCard, this.service);
   }
 
   async validate(priorCard: AddressableCard | null, realm: AddressableCard, _forDeletion?: true) {
@@ -303,11 +306,11 @@ export class UnsavedCard extends Card {
     super(jsonapi, realm, undefined, service);
   }
 
-  asAddressableCard(): AddressableCard {
+  async asAddressableCard(): Promise<AddressableCard> {
     if (typeof this.csId !== 'string') {
       throw new CardstackError(`card missing required attribute "csId"`);
     }
-    return this.service.instantiate(this.regenerateJSONAPI());
+    return await this.service.instantiate(this.regenerateJSONAPI());
   }
 }
 
@@ -332,7 +335,7 @@ export class FieldCard extends Card {
       }
       return;
     }
-    let copy = this.clone();
+    let copy = await this.clone();
     copy.patch({ data: value });
     await copy.validate(priorFieldValue, realm);
   }
@@ -350,7 +353,7 @@ export class FieldCard extends Card {
     if (deserialize) {
       return await deserialize(value, this);
     }
-    let copy = this.clone();
+    let copy = await this.clone();
     copy.patch({ data: value });
     return copy;
   }
@@ -379,8 +382,8 @@ export class AddressableCard extends Card implements CardId {
     }
   }
 
-  clone(): AddressableCard {
-    return new AddressableCard(this.jsonapi, this.service);
+  async clone(): Promise<AddressableCard> {
+    return getOwner(this).instantiate(AddressableCard, this.jsonapi, this.service);
   }
 
   get canonicalURL(): string {

@@ -40,15 +40,9 @@ export class Container {
   // of using instantiate() to create an indexer for each realm. The desired
   // behavior is that there is a separate indexer instance for each realm--not
   // that they are all using the same indexer instance.
-  async instantiate<T, A>(factory: FactoryWithArg<T, A>, arg: A): Promise<T>;
-  async instantiate<T>(factory: Factory<T>): Promise<T>;
-  async instantiate<T, A>(factory: any, arg?: A): Promise<T> {
+  async instantiate<T, A extends unknown[]>(factory: Factory<T, A>, ...args: A): Promise<T> {
     let { instance, promise } = this.provideInjections(() => {
-      if (arguments.length === 1) {
-        return new factory();
-      } else {
-        return new factory(arg);
-      }
+      return new factory(...args);
     });
 
     await promise;
@@ -115,12 +109,8 @@ export class Container {
   }
 }
 
-export interface Factory<T> {
-  new (): T;
-}
-
-export interface FactoryWithArg<T, A> {
-  new (a: A): T;
+export interface Factory<T, A extends unknown[] = []> {
+  new (...a: A): T;
 }
 
 class Deferred<T> {

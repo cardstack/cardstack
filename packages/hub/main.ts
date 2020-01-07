@@ -4,6 +4,7 @@ import { Registry, Container } from './dependency-injection';
 
 import JSONAPIMiddleware from './jsonapi-middleware';
 import CardsService from './cards-service';
+import { ModuleService } from './module-service';
 import AuthenticationMiddleware from './authentication-middleware';
 import { EphemeralStorage } from './ephemeral/storage';
 import PgClient from './pgsearch/pgclient';
@@ -18,6 +19,7 @@ export async function wireItUp() {
   registry.register('jsonapi-middleware', JSONAPIMiddleware);
   registry.register('ephemeralStorage', EphemeralStorage);
   registry.register('cards', CardsService);
+  registry.register('modules', ModuleService);
   registry.register('pgclient', PgClient);
   registry.register('indexing', IndexingService);
   registry.register('queue', Queue);

@@ -21,14 +21,14 @@ export default class CardsService {
 export class ScopedCardService {
   constructor(private cards: CardsService, private session: Session) {}
 
-  instantiate(jsonapi: SingleResourceDoc): AddressableCard {
-    return new AddressableCard(jsonapi, this);
+  async instantiate(jsonapi: SingleResourceDoc): Promise<AddressableCard> {
+    return await getOwner(this.cards).instantiate(AddressableCard, jsonapi, this);
   }
 
   async create(realm: string, doc: SingleResourceDoc): Promise<AddressableCard> {
     let realmCard = await this.getRealm(realm);
     let writer = await this.loadWriter(realmCard);
-    let card: UnsavedCard = new UnsavedCard(doc, realm, this);
+    let card: UnsavedCard = await getOwner(this.cards).instantiate(UnsavedCard, doc, realm, this);
     await card.validate(null, realmCard);
 
     let upstreamIdToWriter = card.upstreamId;
@@ -41,7 +41,7 @@ export class ScopedCardService {
       throw new CardstackError(`Writer plugin for realm ${realm} tried to change a csId it's not allowed to change`);
     }
     card.csId = typeof upstreamIdFromWriter === 'object' ? upstreamIdFromWriter.csId : upstreamIdFromWriter;
-    let savedCard = card.asAddressableCard();
+    let savedCard = await card.asAddressableCard();
     savedCard.patch(saved.jsonapi);
 
     let batch = this.cards.pgclient.beginCardBatch(this);
@@ -58,7 +58,7 @@ export class ScopedCardService {
     let realmCard = await this.getRealm(id.csRealm);
     let writer = await this.loadWriter(realmCard);
     let previousCard = await this.get(id);
-    let updatedCard = previousCard.clone();
+    let updatedCard = await previousCard.clone();
     updatedCard.patch(doc);
     await updatedCard.validate(previousCard, realmCard);
 

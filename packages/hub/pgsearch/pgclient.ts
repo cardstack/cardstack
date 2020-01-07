@@ -333,10 +333,10 @@ export default class PgClient {
 
     let response = await this.queryCards(cards, query);
     let totalResponse = await totalResponsePromise;
-    return this.assembleResponse(response, totalResponse, size, sorts, cards);
+    return await this.assembleResponse(response, totalResponse, size, sorts, cards);
   }
 
-  private assembleResponse(
+  private async assembleResponse(
     response: QueryResult,
     totalResponse: QueryResult,
     requestedSize: number,
@@ -355,7 +355,7 @@ export default class PgClient {
     }
 
     return {
-      cards: cards.map(row => cardService.instantiate(row.pristine_doc)),
+      cards: await Promise.all(cards.map(row => cardService.instantiate(row.pristine_doc))),
       meta: { page },
     };
   }

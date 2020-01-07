@@ -31,7 +31,8 @@ export default class IndexingService {
     let metaResult = await this.pgclient.query(['select params from meta where cs_realm = ', param(realmCard.csId)]);
     let meta = metaResult.rowCount ? (metaResult.rows[0].params as JSON.Object) : null;
 
-    let newMeta = await indexer.update(meta, new IndexingOperations(realmCard, batch, scopedService));
+    let io = await getOwner(this).instantiate(IndexingOperations, realmCard, batch, scopedService);
+    let newMeta = await indexer.update(meta, io);
     await batch.done();
     await this.pgclient.query(
       upsert('meta', 'meta_pkey', {

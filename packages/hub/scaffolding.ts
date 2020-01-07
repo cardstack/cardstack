@@ -8,31 +8,31 @@ import { IndexerFactory } from './indexer';
 import { ScopedCardService } from './cards-service';
 import * as FieldHooks from './field-hooks';
 
-function ephemeralRealms(cards: ScopedCardService) {
+async function ephemeralRealms(cards: ScopedCardService) {
   return [
     // The realm card for the meta realm
-    cards.instantiate(
+    await cards.instantiate(
       testCard().withAutoAttributes({
         csRealm: `${myOrigin}/api/realms/meta`,
         csOriginalRealm: `${myOrigin}/api/realms/meta`,
         csId: `${myOrigin}/api/realms/meta`,
       }).jsonapi
     ),
-    cards.instantiate(
+    await cards.instantiate(
       testCard().withAutoAttributes({
         csRealm: `${myOrigin}/api/realms/meta`,
         csOriginalRealm: `${myOrigin}/api/realms/meta`,
         csId: `${myOrigin}/api/realms/first-ephemeral-realm`,
       }).jsonapi
     ),
-    cards.instantiate(
+    await cards.instantiate(
       testCard().withAutoAttributes({
         csRealm: `${myOrigin}/api/realms/meta`,
         csOriginalRealm: `http://example.com/api/realms/meta`,
         csId: `http://example.com/api/realms/second-ephemeral-realm`,
       }).jsonapi
     ),
-    cards.instantiate(
+    await cards.instantiate(
       testCard().withAutoAttributes({
         csRealm: `${myOrigin}/api/realms/meta`,
         csOriginalRealm: CARDSTACK_PUBLIC_REALM,
@@ -55,7 +55,7 @@ export async function search(query: Query, cards: ScopedCardService): Promise<Ad
   }
 
   let searchingFor = query.filter.eq.csId;
-  return ephemeralRealms(cards).filter(card => card.csId === searchingFor);
+  return (await ephemeralRealms(cards)).filter(card => card.csId === searchingFor);
 }
 
 export async function get(id: CardId, cards: ScopedCardService): Promise<AddressableCard | null> {
@@ -96,14 +96,14 @@ export async function loadFeature(card: Card, cards: ScopedCardService, featureN
 }
 
 async function loadWriter(card: Card, cards: ScopedCardService): Promise<WriterFactory> {
-  if (ephemeralRealms(cards).find(realm => realm.canonicalURL === card.canonicalURL)) {
+  if ((await ephemeralRealms(cards)).find(realm => realm.canonicalURL === card.canonicalURL)) {
     return (await import('./ephemeral/writer')).default;
   }
   throw new Error(`unimplemented`);
 }
 
 async function loadIndexer(card: Card, cards: ScopedCardService): Promise<IndexerFactory<unknown>> {
-  if (ephemeralRealms(cards).find(realm => realm.canonicalURL === card.canonicalURL)) {
+  if ((await ephemeralRealms(cards)).find(realm => realm.canonicalURL === card.canonicalURL)) {
     return (await import('./ephemeral/indexer')).default as IndexerFactory<unknown>;
   }
   throw new Error(`unimplemented`);
