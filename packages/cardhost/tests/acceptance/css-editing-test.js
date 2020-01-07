@@ -52,6 +52,38 @@ module('Acceptance | css editing', function(hooks) {
     this.owner.lookup('controller:cards.view').resizable = false;
   });
 
+  test('can view code editor', async function(assert) {
+    await login();
+
+    await visit(`/cards/@cardstack%2Fbase-card/themer`);
+    assert.equal(currentURL(), `/cards/@cardstack%2Fbase-card/themer`);
+    await waitFor(`[data-test-card-view="@cardstack/base-card"]`, { timeout });
+    assert.dom('[data-test-code-block]').exists();
+    await settled();
+    await percySnapshot(assert);
+  });
+
+  test('can dock code editor to bottom', async function(assert) {
+    await login();
+
+    await visit(`/cards/@cardstack%2Fbase-card/themer`);
+    assert.equal(currentURL(), `/cards/@cardstack%2Fbase-card/themer`);
+    await waitFor(`[data-test-card-view="@cardstack/base-card"]`, { timeout });
+    assert.dom('[data-test-code-block]').exists();
+    await settled();
+    assert.dom('.cardhost-card-theme-editor').hasAttribute('data-test-dock-location', 'right');
+    await click('[data-test-dock-bottom]');
+    assert.dom('.cardhost-card-theme-editor').hasAttribute('data-test-dock-location', 'bottom');
+    await percySnapshot(assert);
+  });
+
+  test('check that card name is stable so we can use it for themer styling', async function(assert) {
+    await login();
+    await createCards(cardData);
+    await visit(`/cards/${card1Id}`);
+    assert.dom('.millenial-puppies').exists();
+  });
+
   test('navigating to custom styles', async function(assert) {
     await login();
     await createCards(cardData);

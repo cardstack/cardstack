@@ -133,47 +133,4 @@ module('Acceptance | card view', function(hooks) {
     assert.dom('[data-test-field]').doesNotExist(); // base-card currenty has no fields
     await percySnapshot(assert);
   });
-
-  test('can view code editor', async function(assert) {
-    await login();
-
-    await visit(`/cards/@cardstack%2Fbase-card/themer`);
-    assert.equal(currentURL(), `/cards/@cardstack%2Fbase-card/themer`);
-    await waitFor(`[data-test-card-view="@cardstack/base-card"]`, { timeout });
-    assert.dom('[data-test-code-block]').exists();
-    await settled();
-    await percySnapshot(assert);
-  });
-
-  test('can dock code editor to bottom', async function(assert) {
-    await login();
-
-    await visit(`/cards/@cardstack%2Fbase-card/themer`);
-    assert.equal(currentURL(), `/cards/@cardstack%2Fbase-card/themer`);
-    await waitFor(`[data-test-card-view="@cardstack/base-card"]`, { timeout });
-    assert.dom('[data-test-code-block]').exists();
-    await settled();
-    assert.dom('.cardhost-card-theme-editor').hasAttribute('data-test-dock-location', 'right');
-    await click('[data-test-dock-bottom]');
-    assert.dom('.cardhost-card-theme-editor').hasAttribute('data-test-dock-location', 'bottom');
-    await percySnapshot(assert);
-  });
-
-  test('check that card name is stable so we can use it for themer styling', async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [
-        ['title', 'string', true, 'The Millenial Puppy'],
-        ['author', 'string', true, 'Van Gogh'],
-        [
-          'body',
-          'string',
-          false,
-          'It can be difficult these days to deal with the discerning tastes of the millenial puppy.',
-        ],
-      ],
-    });
-    await visit(`/cards/${card1Id}`);
-    assert.dom('.millenial-puppies').exists();
-  });
 });
