@@ -1,4 +1,4 @@
-import { Repository, Cred, RemoteConfig, FetchOptions } from './git';
+import { Repository, RemoteConfig, FetchOptions } from './git';
 
 import { todo } from '@cardstack/plugin-utils/todo-any';
 
@@ -239,9 +239,7 @@ export default class Writer {
       if (this.remote) {
         // @ts-ignore promisify not typed well apparently?
         let tempRepoPath = await mkdir('cardstack-temp-repo');
-        this.repo = await Repository.clone(this.remote.url, tempRepoPath, {
-          fetchOpts: this.fetchOpts!,
-        });
+        this.repo = await Repository.clone(this.remote.url, tempRepoPath);
         return;
       }
 

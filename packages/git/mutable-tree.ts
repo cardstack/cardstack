@@ -82,7 +82,6 @@ class MutableTree {
       leaf = undefined;
     }
     if (!leaf && !allowCreate) {
-      debugger;
       throw new NotFound(`No such file ${path}`);
     }
     return { tree, leaf, leafName };

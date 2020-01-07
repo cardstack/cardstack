@@ -4,7 +4,6 @@ import {
   Cred as NGCred,
   Merge as NGMerge,
   Oid as NGOid,
-  Remote as NGRemote,
   Repository as NGRepository,
   Reference as NGReference,
   Index as NGIndex,
@@ -79,12 +78,11 @@ export class Repository {
     return await Repository.open(gitdir, true);
   }
 
-  static async clone(url: string, dir: string, fetchOpts: any) {
+  static async clone(url: string, dir: string) {
     await igClone({
       url,
       dir,
     });
-    // let ngrepo = await NGClone.clone(url, path, { fetchOpts: fetchOpts.toNgFetchOptions() });
     return await Repository.open(dir);
   }
 
