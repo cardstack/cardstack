@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { find, visit, currentURL, waitFor, settled, click } from '@ember/test-helpers';
+import { find, visit, currentURL, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures';
 import { createCards } from '@cardstack/test-support/card-ui-helpers';
