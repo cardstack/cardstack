@@ -161,17 +161,7 @@ module('Acceptance | css editing', function(hooks) {
     await waitForAnimation(() => percySnapshot(assert));
   });
 
-  test('save button is available after editing CSS', async function(assert) {
-    await login();
-    await createCards(cardData);
-    await click('[data-test-card-custom-style-button]');
-    await waitFor('[data-test-editor-pane] textarea');
-    await fillIn('[data-test-editor-pane] textarea', 'test');
-    await click('[data-test-close-editor]');
-    assert.dom('[data-test-card-save-btn]').hasText('Save');
-  });
-
-  test('can see instant preview of styles', async function(assert) {
+  test('can save CSS edits', async function(assert) {
     await login();
     await createCards(cardData);
     await click('[data-test-card-custom-style-button]');
