@@ -3,6 +3,7 @@
     cardhost-cards
     {{mode}}
     {{if (or (eq mode "add") (eq mode "adopt")) "schema"}}
+    {{if this.cardstackSession.isAuthenticated "logged-in" "logged-out"}}
     {{this.themerClasses}}"
     data-test-cardhost-cards>
     {{#if (not this.cssModeToggle.editingCss)}}
