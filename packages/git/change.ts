@@ -159,7 +159,7 @@ export default class Change {
     let remote = await this.repo.getRemote('origin');
 
     try {
-      await remote.push([`refs/heads/${remoteBranchName}:refs/heads/${this.targetBranch}`], this.fetchOpts);
+      await remote.push(`refs/heads/${remoteBranchName}`, `refs/heads/${this.targetBranch}`, { force: true });
     } catch (err) {
       // pull remote before allowing process to continue
       await this.repo.fetchAll(this.fetchOpts);

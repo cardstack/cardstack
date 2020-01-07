@@ -1,6 +1,5 @@
 import {
   Branch as NGBranch,
-  Clone as NGClone,
   Commit as NGCommit,
   Cred as NGCred,
   Merge as NGMerge,
@@ -20,8 +19,15 @@ import {
 import { FetchOptions as NGFetchOptions } from 'nodegit/fetch-options';
 
 import fs from 'fs';
-import { plugins as IGplugins, init as IGinit, clone as IGClone } from 'isomorphic-git';
-IGplugins.set('fs', fs);
+import {
+  addRemote as igAddRemote,
+  clone as igClone,
+  init as igInit,
+  plugins as igPlugins,
+  push as igPush,
+} from 'isomorphic-git';
+
+igPlugins.set('fs', fs);
 
 export const enum FILEMODE {
   UNREADABLE = 0,
@@ -58,6 +64,10 @@ export interface CommitOpts {
   committerEmail?: string;
 }
 
+interface PushOptions {
+  force?: boolean;
+}
+
 export class Repository {
   static async open(path: string, bare = false) {
     let ngrepo = bare ? await NGRepository.openBare(path) : await NGRepository.open(path);
@@ -65,12 +75,12 @@ export class Repository {
   }
 
   static async initBare(gitdir: string): Promise<Repository> {
-    await IGinit({ gitdir, bare: true });
+    await igInit({ gitdir, bare: true });
     return await Repository.open(gitdir, true);
   }
 
-  static async clone(url: string, dir: string, { fetchOpts }: { fetchOpts: FetchOptions }) {
-    await IGClone({
+  static async clone(url: string, dir: string, fetchOpts: any) {
+    await igClone({
       url,
       dir,
     });
@@ -93,7 +103,7 @@ export class Repository {
   }
 
   async getRemote(remote: string): Promise<Remote> {
-    return new Remote(await this.ngrepo.getRemote(remote));
+    return new Remote(this, remote);
   }
 
   async createBlobFromBuffer(buffer: Buffer): Promise<Oid> {
@@ -261,15 +271,30 @@ class Reference {
 }
 
 export class Remote {
-  static async create(repo: Repository, name: string, url: string): Promise<Remote> {
-    let ngremote = await NGRemote.create(repo.getNgRepo(), name, url);
-    return new Remote(ngremote);
+  static async create(repo: Repository, remote: string, url: string): Promise<Remote> {
+    await igAddRemote({
+      gitdir: repo.path(),
+      remote,
+      url,
+    });
+
+    return new Remote(repo, remote);
   }
 
-  constructor(private readonly ngremote: NGRemote) {}
+  constructor(private readonly repo: Repository, private readonly remote: string) {}
 
-  async push(refSpecs: string[], fetchOpts?: FetchOptions): Promise<void> {
-    await this.ngremote.push(refSpecs, fetchOpts && fetchOpts.toNgFetchOptions());
+  async push(ref: string, remoteRef: string, options: PushOptions = {}): Promise<void> {
+    await igPush(
+      Object.assign(
+        {
+          gitdir: this.repo.path(),
+          remote: this.remote,
+          ref,
+          remoteRef,
+        },
+        options
+      )
+    );
   }
 }
 
