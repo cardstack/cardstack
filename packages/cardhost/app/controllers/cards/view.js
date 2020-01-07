@@ -19,15 +19,20 @@ export default class ViewCardController extends Controller {
   @tracked
   themerOptions = [{ name: 'Cardstack default' }];
 
+  @tracked
+  selectedTheme = this.themerOptions[0];
+
   @action
-  handleThemeChange(/*val*/) {
-    // TODO
+  handleThemeChange(val) {
+    this.selectedTheme = val;
+    //  TODO
   }
 
   @action
   createTheme() {
     this.cssModeToggle.setEditingCss(true);
     this.themerOptions.push({ name: 'Custom theme' });
+    this.selectedTheme = this.themerOptions[this.themerOptions.length - 1];
     this.router.transitionTo('cards.view', this.model, { queryParams: { editingCss: true } });
   }
 

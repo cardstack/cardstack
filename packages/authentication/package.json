@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/authentication",
-  "version": "0.16.13",
+  "version": "0.16.15",
   "description": "Authentication infrastructure for Cardstack.",
   "keywords": [
     "ember-addon",
@@ -27,9 +27,9 @@
     "node-tests": "mocha ../test-support/bin/run.js"
   },
   "dependencies": {
-    "@cardstack/di": "0.16.13",
+    "@cardstack/di": "0.16.15",
     "@cardstack/logger": "^0.2.0",
-    "@cardstack/plugin-utils": "0.16.13",
+    "@cardstack/plugin-utils": "0.16.15",
     "ember-cli-babel": "^7.1.2",
     "ember-cli-htmlbars": "^3.0.0",
     "ember-css-url": "0.2.0",
@@ -41,8 +41,8 @@
     "koa-json-body": "^5.3.0"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.16.13",
-    "@cardstack/test-support": "0.16.13",
+    "@cardstack/eslint-config": "0.16.15",
+    "@cardstack/test-support": "0.16.15",
     "@ember/jquery": "^0.6.0",
     "@ember/optional-features": "^0.6.3",
     "broccoli-asset-rev": "^2.7.0",

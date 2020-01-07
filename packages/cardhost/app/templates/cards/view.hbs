@@ -24,6 +24,7 @@
   <CardRenderer
     @card={{this.model}}
     @format="isolated"
+    @cardSelected={{not this.cssModeToggle.editingCss}} {{!-- Card is highlighted (unless the themer is open) --}}
   />
 </section>
 
@@ -46,9 +47,10 @@
   </div>
 {{else if this.cardstackSession.isAuthenticated}}
   <RightEdge
-    @card={{this.card}}
+    @card={{this.model}}
+    @cardSelected={{true}} {{!-- Change this when we want to display different right-edge options --}}
   >
-    <div class="right-edge--section">
+    <div class="right-edge--section" data-test-appearance-section>
       <div class="right-edge--section-header" data-test-section-header>
         Appearance
       </div>
@@ -58,7 +60,8 @@
           @searchEnabled={{false}}
           @label="Choose a theme:"
           @options={{this.themerOptions}}
-          {{!-- @handleChange={{this.handleThemeChange}} --}}
+          @selected={{this.selectedTheme}}
+          @setValue={{this.handleThemeChange}}
         />
         <button {{on "click" this.createTheme}}
           class="ch-button ch-button--secondary ch-button--responsive"

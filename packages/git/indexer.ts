@@ -65,10 +65,9 @@
 
 */
 
-import { Repository, Branch, Commit, RemoteConfig, TreeEntry } from './git';
+import { Repository, Branch, Commit, RemoteConfig, Tree, TreeEntry } from './git';
 
 import Change from './change';
-import { safeEntryByName } from './mutable-tree';
 import logger from '@cardstack/logger';
 const log = logger('cardstack/git');
 import service from './service';
@@ -188,7 +187,7 @@ class GitUpdater {
 
     let ops = new Gather(models);
     await this._loadCommit();
-    await this._indexTree(ops, null, this.rootTree, {
+    await this._indexTree(ops, undefined, this.rootTree, {
       only: this.basePath.concat(['schema']),
     });
     return models.map(m => m.data);
@@ -256,11 +255,11 @@ class GitUpdater {
   }
 
   async _commitAtBranch(branchName: string) {
-    let branch = await Branch.lookup(this.repo, branchName, Branch.BRANCH.LOCAL);
+    let branch = await Branch.lookup(this.repo, branchName, Branch.LOCAL);
     return Commit.lookup(this.repo, branch.target());
   }
 
-  async _indexTree(ops: todo, oldTree: todo, newTree: todo, filter?: todo) {
+  async _indexTree(ops: todo, oldTree: Tree | undefined, newTree: Tree | undefined, filter?: todo) {
     let seen = new Map();
     if (newTree) {
       for (let newEntry of newTree.entries()) {
@@ -285,10 +284,10 @@ class GitUpdater {
     }
   }
 
-  async _indexEntry(ops: todo, name: string, oldTree: todo, newEntry: todo, filter: todo) {
+  async _indexEntry(ops: todo, name: string, oldTree: Tree | undefined, newEntry: TreeEntry, filter: todo) {
     let oldEntry;
     if (oldTree) {
-      oldEntry = safeEntryByName(oldTree, name);
+      oldEntry = oldTree.entryByName(name);
       if (oldEntry && oldEntry.id().equal(newEntry.id())) {
         // We can prune whole subtrees when we find an identical
         // entry. Which is kinda the point of Git's data
@@ -299,7 +298,7 @@ class GitUpdater {
     if (newEntry.isTree()) {
       await this._indexTree(
         ops,
-        oldEntry && oldEntry.isTree() ? await oldEntry.getTree() : null,
+        oldEntry && oldEntry.isTree() ? await oldEntry.getTree() : undefined,
         await newEntry.getTree(),
         nextFilter(filter)
       );
@@ -323,16 +322,16 @@ class GitUpdater {
     }
   }
 
-  async _deleteEntry(ops: todo, oldEntry: todo, filter: todo) {
+  async _deleteEntry(ops: todo, oldEntry: TreeEntry, filter: todo) {
     if (oldEntry.isTree()) {
-      await this._indexTree(ops, await oldEntry.getTree(), nextFilter(filter));
+      await this._indexTree(ops, await oldEntry.getTree(), undefined, nextFilter(filter));
     } else {
       let { type, id } = identify(oldEntry);
       await ops.delete(type, id);
     }
   }
 
-  async _entryToDoc(type: string, id: string, entry: todo) {
+  async _entryToDoc(type: string, id: string, entry: TreeEntry) {
     entry.isBlob();
     let contents = (await entry.getBlob()).content().toString('utf8');
     let doc;

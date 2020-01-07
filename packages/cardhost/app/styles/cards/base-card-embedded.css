@@ -1,17 +1,38 @@
-/*
-".cardstack_base-card" is the sanitized @card.id for the
-card for which this css applies. Until we begin to support
-custom CSS for each card, all cards will inherit the
-@cardstack/base-card css.
-*/
-
-.embedded-card.cardstack_base-card {
-  /* This is just placeholder CSS to test that everuthing works--please change as necessary */
+.cardstack_base-card-embedded {
   margin: 0;
   padding: 20px;
   background-color: white;
   color: black;
-  border-radius: 15px;
-  font-size: 18px;
+  font: 400 13px/1.385 var(--ch-font-family);
+  letter-spacing: 0;
   overflow: hidden;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.cardstack_base-card-embedded .cardstack_base-card-embedded {
+  padding: 0;
+}
+
+.cardstack_base-card-embedded .field {
+  padding-bottom: 15px;
+}
+
+.cardstack_base-card-embedded .label {
+  padding-bottom: 4px;
+  color: var(--ch-dark-op50);
+}
+
+/* Embedded card in isolated card */
+.cardstack_base-card-isolated .cardstack_base-card-embedded {
+  margin: inherit;
+  padding: inherit;
+  background-color: inherit;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+.cardstack_base-card-isolated .cardstack_base-card-embedded .field {
+  padding-bottom: 0;
 }

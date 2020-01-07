@@ -22,6 +22,12 @@
 
 <CardhostLeftEdge />
 
+<RightEdge
+  @card={{this.card}}
+  @mode="edit"
+  @cardSelected={{true}} {{!-- Change this when we want to display different right-edge options --}}
+/>
+
 <section
   class="card-editor"
   data-test-card-edit={{this.card.name}}
@@ -32,7 +38,10 @@
     @mode="edit"
     @setFieldValue={{action this.setFieldValue}}
     @format="isolated"
-  />
+    @selectField={{action this.selectField}}
+    @selectedField={{this.selectedField}}
+    @cardSelected={{this.cardSelected}}
+    @cardFocused={{action (mut this.cardSelected)}} />
 </section>
 
 <section class="cardhost-card-document">

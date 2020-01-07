@@ -3,6 +3,7 @@ import { click, fillIn, find, visit, currentURL, triggerEvent, focus } from '@em
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures';
 import {
+  showCardId,
   addField,
   setCardId,
   createCards,
@@ -98,6 +99,7 @@ module('Acceptance | card create', function(hooks) {
 
     assert.equal(currentURL(), `/cards/${card1Id}`);
     await visit(`/cards/${card1Id}/schema`);
+    await showCardId(true);
     assert.dom('.card-renderer-isolated--header').hasText('millenial-puppies');
     assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
 
@@ -127,7 +129,7 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
     // TODO: figure out why having the following assertions before the line above ^^^ causes a test failure
     assert.dom('[data-test-card-renderer-isolated]').hasClass('selected');
-    assert.dom('.field-renderer').doesNotHaveClass('selected');
+    assert.dom('[data-test-field]').doesNotHaveClass('selected');
 
     let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
     let card = JSON.parse(cardJson);
@@ -221,6 +223,27 @@ module('Acceptance | card create', function(hooks) {
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
+  });
+
+  test(`entering invalid field name shows error`, async function(assert) {
+    await login();
+    await visit('/cards/new');
+
+    await setCardId(card1Id);
+    await addField('title', 'string', true);
+
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('title');
+    await fillIn('[data-test-schema-attr="name"] input', 'Title!');
+    await triggerEvent('[data-test-schema-attr="name"] input', 'keyup');
+
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('Title!');
+    assert.dom('[data-test-schema-attr="name"] input').hasClass('invalid');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Title');
+    assert
+      .dom('[data-test-right-edge] [data-test-schema-attr="name"] [data-test-cs-component-validation="text-field"]')
+      .hasText('Can only contain letters, numbers, dashes, and underscores.');
+
+    await percySnapshot(assert);
   });
 
   test(`removing a field from a card`, async function(assert) {

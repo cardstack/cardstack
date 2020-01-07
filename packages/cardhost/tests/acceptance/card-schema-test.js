@@ -62,8 +62,22 @@ module('Acceptance | card schema', function(hooks) {
     });
     await visit(`/cards/${card1Id}/schema`);
 
-    await showCardId();
+    await showCardId(true);
     assert.dom('#card__id').isDisabled();
+  });
+
+  test(`can expand a right edge section`, async function(assert) {
+    await login();
+    await createCards({
+      [card1Id]: [['body', 'string', false, 'test body']],
+    });
+    await visit(`/cards/${card1Id}/schema`);
+
+    assert.dom('.right-edge--item #card__id').doesNotExist();
+
+    await click('[data-test-right-edge-section-toggle="details"]');
+
+    assert.dom('.right-edge--item #card__id').hasValue('millenial-puppies');
   });
 
   test(`renaming a card's field`, async function(assert) {

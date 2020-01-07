@@ -75,7 +75,7 @@ let eventCardTemplate = eventFactory.getDocumentFor(
         required: true,
         caption: 'Date & Time',
       }),
-      eventFactory.addResource('fields', 'image').withAttributes({
+      eventFactory.addResource('fields', 'background-image').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::decorative-image',
         required: true,
@@ -111,7 +111,7 @@ let eventCardTemplate = eventFactory.getDocumentFor(
     .withRelated(
       'model',
       eventFactory.addResource('local-hub::event-card', 'local-hub::event-card').withAttributes({
-        image: 'https://images.unsplash.com/photo-1542296140-47fd7d838e76',
+        backgroundImage: 'https://images.unsplash.com/photo-1542296140-47fd7d838e76',
         title: 'Quarterly Planning Meeting',
         date: '2020-05-26',
         location: 'One World Trade Center',

@@ -38,3 +38,10 @@
 .login-box > button:hover {
   --color: var(--ch-highlight);
 }
+
+@media (max-width: 1440px) {
+  .cardhost-top-edge.view,
+  .cardhost-top-edge.edit {
+    --padding-left: var(--ch-left-edge-navbar-width);
+  }
+}

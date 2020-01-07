@@ -98,6 +98,12 @@ module('Acceptance | card view', function(hooks) {
       [card2Id, card3Id]
     );
 
+    assert.dom('[data-test-right-edge]').exists();
+    assert.dom('[data-test-internal-card-id]').doesNotExist();
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('Base Card');
+    assert.dom('[data-test-appearance-section] .ember-power-select-selected-item').hasText('Cardstack default');
+    assert.dom('[data-test-card-custom-style-button]').exists();
+
     let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.title, 'The Millenial Puppy');

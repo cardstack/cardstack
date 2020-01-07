@@ -4,6 +4,7 @@
 
 .drop-zone--container {
   height: 20px;
+  position: relative;
   background-color: var(--ch-dark-background);
   border-top: 2px solid var(--ch-default);
 }
@@ -17,28 +18,35 @@
 }
 
 .drop-zone--container.dragging {
-  height: 158px;
+  height: 184px;
   transition: height var(--ch-drop-zone-transition-duration) cubic-bezier(0.445, 0.05, 0.55, 0.95);
 }
 
 .drop-zone {
   width: 100%;
+  height: 50px;
+  position: absolute;
+  top: -25px;
+  transition: height var(--ch-drop-zone-transition-duration) cubic-bezier(0.445, 0.05, 0.55, 0.95);
+}
+
+.drop-zone--container.dragging .drop-zone {
+  height: 170px;
+  transition: height var(--ch-drop-zone-transition-duration) cubic-bezier(0.445, 0.05, 0.55, 0.95);
 }
 
 .drop-zone--container .drop-zone--description .drop-zone--preview--container {
   pointer-events: none;
-  padding: 0 53px;
 }
 
 .drop-zone .drop-zone--description {
   pointer-events: none;
-  height: 120px;
+  height: 170px;
   opacity: 0.5;
-  padding: 0;
+  padding: 30px 0;
   color: white;
   font-size: 16px;
   line-height: 22px;
-  text-align: center;
 }
 
 .drop-zone--description--text {
@@ -47,6 +55,10 @@
 
 .drop-zone .drop-zone--description.dragging {
   opacity: 1;
+}
+
+.drop-zone .drop-zone--description.dragging .field {
+  opacity: .35;
 }
 
 .drop-zone .drop-zone--drag-drop-icon {
@@ -77,9 +89,11 @@
 
 .card-renderer-isolated.no-fields .drop-zone .drop-zone--description .drop-zone--description--text {
   display: block;
+  text-align: center;
 }
 
 .card-renderer-isolated.no-fields .drop-zone .drop-zone--drag-drop-icon {
   display: block;
   margin-top: 10px;
+  text-align: center;
 }
