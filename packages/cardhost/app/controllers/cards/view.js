@@ -18,6 +18,13 @@ export default class ViewCardController extends Controller {
     this.router.transitionTo('cards.themer', this.model);
   }
 
+  get cardJson() {
+    if (!this.model) {
+      return null;
+    }
+    return JSON.stringify(this.model.json, null, 2);
+  }
+
   @tracked
   selectedTheme = this.themerOptions[0];
 

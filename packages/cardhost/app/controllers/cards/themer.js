@@ -8,13 +8,6 @@ export default class ThemerCardController extends Controller {
   @service cardstackSession;
   resizeable = true;
 
-  get cardJson() {
-    if (!this.model) {
-      return null;
-    }
-    return JSON.stringify(this.model.json, null, 2);
-  }
-
   @action
   handleThemeChange(val) {
     this.selectedTheme = val;

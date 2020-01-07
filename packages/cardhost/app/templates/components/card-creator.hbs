@@ -80,11 +80,9 @@
 </section>
 
 {{#if this.card}}
+  {{!-- This is hidden, used in tests --}}
   <section class="cardhost-card-document">
     <h3>Card Document</h3>
-    <CodeEditor
-      @code={{this.cardJson}}
-      @language="json"
-    />
+    <code data-test-card-json>{{this.cardJson}}</code>
   </section>
 {{/if}}
