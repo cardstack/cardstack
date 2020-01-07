@@ -3,13 +3,15 @@ import { testCard } from './test-card';
 import { myOrigin } from '../origin';
 import { ScopedCardService } from '../cards-service';
 import { Session } from '../session';
+import { ModuleService } from '../module-service';
 
 describe('module-service', function() {
-  let env: TestEnv, cards: ScopedCardService;
+  let env: TestEnv, cards: ScopedCardService, modules: ModuleService;
 
   beforeEach(async function() {
     env = await createTestEnv();
     cards = (await env.container.lookup('cards')).as(Session.INTERNAL_PRIVILEGED);
+    modules = await env.container.lookup('modules');
   });
 
   afterEach(async function() {
@@ -21,16 +23,13 @@ describe('module-service', function() {
     let card = await cards.create(
       `${myOrigin}/api/realms/first-ephemeral-realm`,
       testCard().withAttributes({
-        csFeatures: { 'field-validate': 'validate.js' },
         csFiles: { 'validate.js': sampleValidator },
       }).jsonapi
     );
-    let validate = await card.loadFeature('field-validate');
+    let validate = await modules.load(card, 'validate.js', 'default');
     expect(validate).is.ok;
-    if (validate) {
-      expect(await validate(42, undefined as any)).to.equal(true);
-      expect(await validate(41, undefined as any)).to.equal(false);
-    }
+    expect(validate(42)).to.equal(true);
+    expect(validate(41)).to.equal(false);
   });
 
   it('can access a feature that is a named export within the card', async function() {
@@ -38,16 +37,13 @@ describe('module-service', function() {
     let card = await cards.create(
       `${myOrigin}/api/realms/first-ephemeral-realm`,
       testCard().withAttributes({
-        csFeatures: { 'field-validate': ['validate.js', 'v'] },
         csFiles: { 'validate.js': sampleValidator },
       }).jsonapi
     );
-    let validate = await card.loadFeature('field-validate');
+    let validate = await modules.load(card, 'validate.js', 'v');
     expect(validate).is.ok;
-    if (validate) {
-      expect(await validate(42, undefined as any)).to.equal(true);
-      expect(await validate(41, undefined as any)).to.equal(false);
-    }
+    expect(validate(42)).to.equal(true);
+    expect(validate(41)).to.equal(false);
   });
 
   it('can access a feature that is within a subdirectory within the card', async function() {
@@ -55,18 +51,15 @@ describe('module-service', function() {
     let card = await cards.create(
       `${myOrigin}/api/realms/first-ephemeral-realm`,
       testCard().withAttributes({
-        csFeatures: { 'field-validate': ['lib/validate.js', 'v'] },
         csFiles: {
           lib: { 'validate.js': sampleValidator },
         },
       }).jsonapi
     );
-    let validate = await card.loadFeature('field-validate');
+    let validate = await modules.load(card, 'lib/validate.js', 'v');
     expect(validate).is.ok;
-    if (validate) {
-      expect(await validate(42, undefined as any)).to.equal(true);
-      expect(await validate(41, undefined as any)).to.equal(false);
-    }
+    expect(validate(42)).to.equal(true);
+    expect(validate(41)).to.equal(false);
   });
 
   it('allows feature code to import other files within card', async function() {
@@ -77,19 +70,16 @@ describe('module-service', function() {
     let card = await cards.create(
       `${myOrigin}/api/realms/first-ephemeral-realm`,
       testCard().withAttributes({
-        csFeatures: { 'field-validate': 'validate.js' },
         csFiles: {
           'validate.js': sampleValidator,
           'other.js': other,
         },
       }).jsonapi
     );
-    let validate = await card.loadFeature('field-validate');
+    let validate = await modules.load(card, 'validate.js', 'default');
     expect(validate).is.ok;
-    if (validate) {
-      expect(await validate('the-value', undefined as any)).to.equal(true);
-      expect(await validate(41, undefined as any)).to.equal(false);
-    }
+    expect(await validate('the-value', undefined as any)).to.equal(true);
+    expect(await validate(41, undefined as any)).to.equal(false);
   });
 
   it('allows feature code to import from hub peerDependency', async function() {
@@ -99,7 +89,6 @@ describe('module-service', function() {
     let card = await cards.create(
       `${myOrigin}/api/realms/first-ephemeral-realm`,
       testCard().withAttributes({
-        csFeatures: { 'field-validate': 'validate.js' },
         csPeerDependencies: {
           '@cardstack/hub': '*',
         },
@@ -108,15 +97,13 @@ describe('module-service', function() {
         },
       }).jsonapi
     );
-    let validate = await card.loadFeature('field-validate');
+    let validate = await modules.load(card, 'validate.js', 'default');
     expect(validate).is.ok;
-    if (validate) {
-      try {
-        await validate('anything', undefined as any);
-        throw new Error(`should never get here`);
-      } catch (err) {
-        expect(err.status).to.equal(654);
-      }
+    try {
+      await validate('anything', undefined as any);
+      throw new Error(`should never get here`);
+    } catch (err) {
+      expect(err.status).to.equal(654);
     }
   });
 });
