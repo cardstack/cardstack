@@ -1,5 +1,5 @@
 import { Expression } from './pgsearch/util';
-import { Card } from './card';
+import { FieldCard } from './card';
 
 /*
   These hooks allow a card to customize how it behaves when used as a field
@@ -14,7 +14,7 @@ import { Card } from './card';
   but cards that want to represent scalars can have a simpler value.
 */
 
-export type validate<Serial> = (value: Serial, fieldCard: Card) => Promise<boolean>;
-export type deserialize<Serial, Value> = (value: Serial, fieldCard: Card) => Promise<Value>;
+export type validate<Serial> = (value: Serial, fieldCard: FieldCard) => Promise<boolean>;
+export type deserialize<Serial, Value> = (value: Serial, fieldCard: FieldCard) => Promise<Value>;
 export type buildQueryExpression = (source: Expression, name: string) => Expression;
 export type buildValueExpression = (value: Expression) => Expression;

@@ -5,6 +5,7 @@ import { CARDSTACK_PUBLIC_REALM } from '../realm';
 
 export class TestCard {
   private parent: CardId | undefined;
+  private csFieldValues: Map<string, any> = new Map();
   private userFieldValues: Map<string, any> = new Map();
   private userFieldRefs: Map<string, CardId | undefined> = new Map();
   private fields: Map<string, TestCard | null> = new Map();
@@ -29,6 +30,11 @@ export class TestCard {
             if (this.csOriginalRealm == null) {
               this.csOriginalRealm = value;
             }
+            break;
+          case 'csFeatures':
+          case 'csFiles':
+          case 'csPeerDependencies':
+            this.csFieldValues.set(field, value);
             break;
           default:
             throw new Error(`unknown cardstack field ${field}`);
@@ -108,6 +114,9 @@ export class TestCard {
   get jsonapi(): SingleResourceDoc {
     let attributes = Object.create(null);
     for (let [key, value] of this.userFieldValues.entries()) {
+      attributes[key] = value;
+    }
+    for (let [key, value] of this.csFieldValues.entries()) {
       attributes[key] = value;
     }
 
