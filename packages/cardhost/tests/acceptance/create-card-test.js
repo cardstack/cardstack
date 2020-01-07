@@ -225,6 +225,27 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
   });
 
+  test(`entering invalid field name shows error`, async function(assert) {
+    await login();
+    await visit('/cards/new');
+
+    await setCardId(card1Id);
+    await addField('title', 'string', true);
+
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('title');
+    await fillIn('[data-test-schema-attr="name"] input', 'Title!');
+    await triggerEvent('[data-test-schema-attr="name"] input', 'keyup');
+
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('Title!');
+    assert.dom('[data-test-schema-attr="name"] input').hasClass('invalid');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Title');
+    assert
+      .dom('[data-test-right-edge] [data-test-schema-attr="name"] [data-test-cs-component-validation="text-field"]')
+      .hasText('Can only contain letters, numbers, dashes, and underscores.');
+
+    await percySnapshot(assert);
+  });
+
   test(`removing a field from a card`, async function(assert) {
     await login();
     await visit('/cards/new');

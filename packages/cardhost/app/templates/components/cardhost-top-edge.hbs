@@ -1,11 +1,11 @@
 <div class="cardhost-top-edge {{@mode}}" data-test-cardhost-top-edge>
   {{#cardstack-session as |session|}}
-    <div class="login-box">
+    <div class="login-box {{if session.isAuthenticated "" "full-width"}}">
       {{#if session.isAuthenticated }}
         <button
           class="ch-button ch-button--secondary"
           id="logout-button"
-          onclick={{action session.logout}}
+          onclick={{action this.logout session.logout}}
         >
           Logout
         </button>
