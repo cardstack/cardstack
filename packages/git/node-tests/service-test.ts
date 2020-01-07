@@ -44,7 +44,7 @@ describe('local git cache service', function() {
       'source-type': '@cardstack/git',
       params: {
         remote: {
-          url: 'ssh://root@localhost:9022/root/data-test',
+          url: 'http://root:password@localhost:8838/git/repo',
           privateKey,
           cacheDir: tempRepoPath,
         },
@@ -69,7 +69,7 @@ describe('local git cache service', function() {
       'source-type': '@cardstack/git',
       params: {
         remote: {
-          url: 'ssh://root@localhost:9022/root/data-test',
+          url: 'http://root:password@localhost:8838/git/repo',
           privateKey,
           cacheDir: tempRepoPath,
         },
@@ -80,7 +80,7 @@ describe('local git cache service', function() {
       'source-type': '@cardstack/git',
       params: {
         remote: {
-          url: 'ssh://root@127.0.0.1:9022/root/data-test',
+          url: 'http://root:password@127.0.0.1:8838/git/repo',
           privateKey,
           cacheDir: tempRepoPath,
         },
@@ -110,7 +110,7 @@ describe('local git cache service', function() {
       'source-type': '@cardstack/git',
       params: {
         remote: {
-          url: 'ssh://root@localhost:9022/root/data-test',
+          url: 'http://root:password@localhost:8838/git/repo',
           privateKey,
           cacheDir: tempRepoPath,
         },
@@ -143,7 +143,7 @@ describe('local git cache service', function() {
       'source-type': '@cardstack/git',
       params: {
         remote: {
-          url: 'ssh://root@localhost:9022/root/data-test',
+          url: 'http://root:password@localhost:8838/git/repo',
           privateKey,
           cacheDir: tempRepoPath,
         },
@@ -178,7 +178,7 @@ describe('local git cache service', function() {
     let getRepoSpy = sinon.spy(service, 'getRepo');
     let _makeRepoSpy = sinon.spy(service, '_makeRepo');
 
-    let url = 'ssh://root@localhost:9022/root/data-test';
+    let url = 'http://root:password@localhost:8838/git/repo';
 
     let tempRepoPath = await mkdir('test-5');
 

@@ -51,8 +51,8 @@ async function resetRemote() {
     ),
   });
 
-  let remote = await Remote.create(tempRepo.repo, 'origin', 'ssh://root@localhost:9022/root/data-test');
-  await remote.push(['+refs/heads/master:refs/heads/master'], fetchOpts);
+  let remote = await Remote.create(tempRepo.repo, 'origin', 'http://root:password@localhost:8838/git/repo');
+  await remote.push('refs/heads/master', 'refs/heads/master', { force: true });
   return tempRepo;
 }
 
@@ -78,7 +78,7 @@ describe('git/writer with remote', function() {
     tempRepoPath = await mkdir('cardstack-temp-test-repo');
     tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
 
-    repo = await Repository.clone('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
+    repo = await Repository.clone('http://root:password@localhost:8838/git/repo', tempRemoteRepoPath, {
       fetchOpts,
     });
 
@@ -86,7 +86,7 @@ describe('git/writer with remote', function() {
       'source-type': '@cardstack/git',
       params: {
         remote: {
-          url: 'ssh://root@localhost:9022/root/data-test',
+          url: 'http://root:password@localhost:8838/git/repo',
           privateKey,
           cacheDir: tempRepoPath,
         },
@@ -245,7 +245,7 @@ describe('git/writer with remote', function() {
       });
 
       let remote = await remoteRepo.getRemote('origin');
-      await remote.push(['refs/heads/master:refs/heads/master'], fetchOpts);
+      await remote.push('refs/heads/master', 'refs/heads/master', { force: true });
 
       let { data: record } = await writers.update(env.session, 'events', 'event-1', {
         data: {
@@ -300,15 +300,15 @@ describe('git/writer with empty remote', function() {
 
     let { repo: remoteRepo } = await makeRepo(root);
 
-    let remote = await Remote.create(remoteRepo, 'origin', 'ssh://root@localhost:9022/root/data-test');
-    await remote.push(['+refs/heads/master:refs/heads/master'], fetchOpts);
+    let remote = await Remote.create(remoteRepo, 'origin', 'http://root:password@localhost:8838/git/repo');
+    await remote.push('refs/heads/master', 'refs/heads/master', { force: true });
 
     let factory = new JSONAPIFactory();
 
     tempRepoPath = await mkdir('cardstack-temp-test-repo');
     tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
 
-    repo = await Repository.clone('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
+    repo = await Repository.clone('http://root:password@localhost:8838/git/repo', tempRemoteRepoPath, {
       fetchOpts,
     });
 
@@ -316,7 +316,7 @@ describe('git/writer with empty remote', function() {
       'source-type': '@cardstack/git',
       params: {
         remote: {
-          url: 'ssh://root@localhost:9022/root/data-test',
+          url: 'http://root:password@localhost:8838/git/repo',
           privateKey,
           cacheDir: tempRepoPath,
         },
@@ -379,7 +379,7 @@ describe('git/writer-remote/githereum', function() {
     tempRepoPath = await mkdir('cardstack-temp-test-repo');
     tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
 
-    await Repository.clone('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
+    await Repository.clone('http://root:password@localhost:8838/git/repo', tempRemoteRepoPath, {
       fetchOpts,
     });
 
@@ -387,7 +387,7 @@ describe('git/writer-remote/githereum', function() {
       'source-type': '@cardstack/git',
       params: {
         remote: {
-          url: 'ssh://root@localhost:9022/root/data-test',
+          url: 'http://root:password@localhost:8838/git/repo',
           privateKey,
           cacheDir: tempRepoPath,
         },
