@@ -3,6 +3,7 @@ import { click, fillIn, find, visit, currentURL, triggerEvent, focus } from '@em
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures';
 import {
+  showCardId,
   addField,
   setCardId,
   createCards,
@@ -98,6 +99,7 @@ module('Acceptance | card create', function(hooks) {
 
     assert.equal(currentURL(), `/cards/${card1Id}`);
     await visit(`/cards/${card1Id}/schema`);
+    await showCardId(true);
     assert.dom('.card-renderer-isolated--header').hasText('millenial-puppies');
     assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
 
@@ -238,7 +240,7 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-schema-attr="name"] input').hasClass('invalid');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Title');
     assert
-      .dom('[data-test-right-edge] [data-test-cs-component-validation="text-field"]')
+      .dom('[data-test-right-edge] [data-test-schema-attr="name"] [data-test-cs-component-validation="text-field"]')
       .hasText('Can only contain letters, numbers, dashes, and underscores.');
 
     await percySnapshot(assert);

@@ -114,8 +114,8 @@
           <TextField
             @id={{concat "edit-field-name-" @field.nonce "-" this.renderNonce}}
             @value={{this.newFieldName}}
-            @label="Field Name"
             @theme="cs-dark"
+            @label="Field ID"
             @class="ch-input"
             @setValue={{action this.updateFieldName}}
             @disabled={{@field.isAdopted}}
