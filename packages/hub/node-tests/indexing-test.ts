@@ -21,20 +21,8 @@ describe('hub/indexing', function() {
     await env.destroy();
   });
 
-  async function createRealm(originalRealm: string, csId: string) {
-    await cards.as(Session.INTERNAL_PRIVILEGED).create(
-      `${myOrigin}/api/realms/meta`,
-      testCard().withAutoAttributes({
-        csRealm: `${myOrigin}/api/realms/meta`,
-        csOriginalRealm: originalRealm,
-        csId: csId,
-      }).jsonapi
-    );
-  }
-
   it('it can index a realm', async function() {
     let csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
-    await createRealm(`${myOrigin}/api/realms/meta`, csRealm);
     let card = testCard().withAutoAttributes({ csRealm, csId: '1', foo: 'bar' });
     storage.store(card.upstreamDoc, card.csId, card.csRealm);
 
@@ -46,7 +34,6 @@ describe('hub/indexing', function() {
 
   it('it can remove a document from the index if the document was removed from the data source', async function() {
     let csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
-    await createRealm(`${myOrigin}/api/realms/meta`, csRealm);
     let card = await cards
       .as(Session.INTERNAL_PRIVILEGED)
       .create(csRealm, testCard().withAutoAttributes({ csRealm, csId: '1', foo: 'bar' }).jsonapi);
@@ -62,9 +49,6 @@ describe('hub/indexing', function() {
   it('it can index multiple realms', async function() {
     let realm1 = `${myOrigin}/api/realms/first-ephemeral-realm`;
     let realm2 = `http://example.com/api/realms/second-ephemeral-realm`;
-    await createRealm(`${myOrigin}/api/realms/meta`, realm1);
-    await createRealm(`http://example.com/api/realms/meta`, realm2);
-
     let card = testCard().withAutoAttributes({ csRealm: realm1, csId: '1', foo: 'bar' });
     storage.store(card.upstreamDoc, card.csId, card.csRealm);
     card = testCard().withAutoAttributes({ csRealm: realm2, csId: '1', foo: 'bar' });
@@ -80,7 +64,6 @@ describe('hub/indexing', function() {
 
   it('ephemeral cards do not persist in the index between container teardowns', async function() {
     let realm = `${myOrigin}/api/realms/first-ephemeral-realm`;
-    await createRealm(`${myOrigin}/api/realms/meta`, realm);
 
     // card is indexed in torn down ephemeral storage
     // This card will _not_ live through the container teardown
@@ -124,7 +107,6 @@ describe('hub/indexing', function() {
 
   it('it does not index unchanged cards since the last time the ephemeral realm was indexed', async function() {
     let realm = `${myOrigin}/api/realms/first-ephemeral-realm`;
-    await createRealm(`${myOrigin}/api/realms/meta`, realm);
 
     let steps = await cards.as(Session.INTERNAL_PRIVILEGED).create(
       realm,

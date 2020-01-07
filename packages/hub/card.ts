@@ -284,7 +284,7 @@ export class Card {
   async loadFeature(featureName: any): Promise<any> {
     let card: Card | undefined = this;
     while (card) {
-      let result = await loadFeature(card, this.service, featureName);
+      let result = await loadFeature(card, featureName);
       if (result) {
         return result;
       }

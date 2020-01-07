@@ -12,32 +12,40 @@ async function ephemeralRealms(cards: ScopedCardService) {
   return [
     // The realm card for the meta realm
     await cards.instantiate(
-      testCard().withAutoAttributes({
-        csRealm: `${myOrigin}/api/realms/meta`,
-        csOriginalRealm: `${myOrigin}/api/realms/meta`,
-        csId: `${myOrigin}/api/realms/meta`,
-      }).jsonapi
+      testCard()
+        .withAutoAttributes({
+          csRealm: `${myOrigin}/api/realms/meta`,
+          csOriginalRealm: `${myOrigin}/api/realms/meta`,
+          csId: `${myOrigin}/api/realms/meta`,
+        })
+        .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi
     ),
     await cards.instantiate(
-      testCard().withAutoAttributes({
-        csRealm: `${myOrigin}/api/realms/meta`,
-        csOriginalRealm: `${myOrigin}/api/realms/meta`,
-        csId: `${myOrigin}/api/realms/first-ephemeral-realm`,
-      }).jsonapi
+      testCard()
+        .withAutoAttributes({
+          csRealm: `${myOrigin}/api/realms/meta`,
+          csOriginalRealm: `${myOrigin}/api/realms/meta`,
+          csId: `${myOrigin}/api/realms/first-ephemeral-realm`,
+        })
+        .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi
     ),
     await cards.instantiate(
-      testCard().withAutoAttributes({
-        csRealm: `${myOrigin}/api/realms/meta`,
-        csOriginalRealm: `http://example.com/api/realms/meta`,
-        csId: `http://example.com/api/realms/second-ephemeral-realm`,
-      }).jsonapi
+      testCard()
+        .withAutoAttributes({
+          csRealm: `${myOrigin}/api/realms/meta`,
+          csOriginalRealm: `http://example.com/api/realms/meta`,
+          csId: `http://example.com/api/realms/second-ephemeral-realm`,
+        })
+        .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi
     ),
     await cards.instantiate(
-      testCard().withAutoAttributes({
-        csRealm: `${myOrigin}/api/realms/meta`,
-        csOriginalRealm: CARDSTACK_PUBLIC_REALM,
-        csId: CARDSTACK_PUBLIC_REALM,
-      }).jsonapi
+      testCard()
+        .withAutoAttributes({
+          csRealm: `${myOrigin}/api/realms/meta`,
+          csOriginalRealm: CARDSTACK_PUBLIC_REALM,
+          csId: CARDSTACK_PUBLIC_REALM,
+        })
+        .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi
     ),
   ];
 }
@@ -50,20 +58,25 @@ export async function search(query: Query, cards: ScopedCardService): Promise<Ad
     return null;
   }
 
-  if (query.filter.eq.csRealm !== `${myOrigin}/api/realms/meta` || !('csId' in query.filter.eq)) {
+  if (query.filter.eq.csRealm !== `${myOrigin}/api/realms/meta`) {
     return null;
   }
 
-  let searchingFor = query.filter.eq.csId;
-  return (await ephemeralRealms(cards)).filter(card => card.csId === searchingFor);
+  let allRealms = await ephemeralRealms(cards);
+  if ('csId' in query.filter.eq) {
+    let searchingFor = query.filter.eq.csId;
+    return allRealms.filter(card => card.csId === searchingFor);
+  } else {
+    return allRealms;
+  }
 }
 
 export async function get(id: CardId, cards: ScopedCardService): Promise<AddressableCard | null> {
-  let coreFieldTypes = ['string-field', 'boolean-field', 'integer-field'];
+  let coreNames = ['string-field', 'boolean-field', 'integer-field', 'ephemeral-realm'];
   if (
     id.csRealm === 'https://base.cardstack.com/public' &&
     (id.csOriginalRealm ?? id.csRealm) === 'https://base.cardstack.com/public' &&
-    coreFieldTypes.includes(id.csId)
+    coreNames.includes(id.csId)
   ) {
     return cards.instantiate(
       testCard().withAutoAttributes({
@@ -73,15 +86,22 @@ export async function get(id: CardId, cards: ScopedCardService): Promise<Address
       }).jsonapi
     );
   }
+
+  let allRealms = await ephemeralRealms(cards);
+  let found = allRealms.find(r => r.canonicalURL === canonicalURL(id));
+  if (found) {
+    return found;
+  }
+
   return null;
 }
 
-export async function loadFeature(card: Card, cards: ScopedCardService, featureName: any): Promise<any> {
+export async function loadFeature(card: Card, featureName: any): Promise<any> {
   switch (featureName) {
     case 'writer':
-      return await loadWriter(card, cards);
+      return await loadWriter(card);
     case 'indexer':
-      return await loadIndexer(card, cards);
+      return await loadIndexer(card);
     case 'field-validate':
       return (await loadFieldHooks(card))?.validate;
     case 'field-deserialize':
@@ -95,18 +115,18 @@ export async function loadFeature(card: Card, cards: ScopedCardService, featureN
   }
 }
 
-async function loadWriter(card: Card, cards: ScopedCardService): Promise<WriterFactory> {
-  if ((await ephemeralRealms(cards)).find(realm => realm.canonicalURL === card.canonicalURL)) {
+async function loadWriter(card: Card): Promise<WriterFactory | undefined> {
+  if (card.canonicalURL === canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' })) {
     return (await import('./ephemeral/writer')).default;
   }
-  throw new Error(`unimplemented`);
+  return undefined;
 }
 
-async function loadIndexer(card: Card, cards: ScopedCardService): Promise<IndexerFactory<unknown>> {
-  if ((await ephemeralRealms(cards)).find(realm => realm.canonicalURL === card.canonicalURL)) {
+async function loadIndexer(card: Card): Promise<IndexerFactory<unknown> | undefined> {
+  if (card.canonicalURL === canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' })) {
     return (await import('./ephemeral/indexer')).default as IndexerFactory<unknown>;
   }
-  throw new Error(`unimplemented`);
+  return undefined;
 }
 
 async function loadFieldHooks(

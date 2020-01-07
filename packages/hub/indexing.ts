@@ -1,6 +1,5 @@
 import { Session } from './session';
 import { inject, getOwner, injectionReady } from './dependency-injection';
-import { CARDSTACK_PUBLIC_REALM } from './realm';
 import { myOrigin } from './origin';
 import { IndexingOperations } from './indexer';
 import * as JSON from 'json-typescript';
@@ -49,7 +48,6 @@ export default class IndexingService {
     // explicitely set the page size here to something very high...
     let { cards: realms } = await this.cards.as(Session.INTERNAL_PRIVILEGED).search({
       filter: {
-        type: { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'realm' },
         eq: {
           csRealm: `${myOrigin}/api/realms/meta`,
         },
