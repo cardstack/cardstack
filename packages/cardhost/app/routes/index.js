@@ -20,7 +20,7 @@ export default class IndexRoute extends Route {
       // For now we're just hardcoding a list of templates to load, and pretending
       // that the local store is the catalog.
       catalog: this.data.allCardsInStore(),
-      templates: Promise.all(cardTemplates.map(i => this.data.getCard(i, 'embedded'))),
+      templates: Promise.allSettled(cardTemplates.map(i => this.data.getCard(i, 'embedded'))),
     });
   }
 
