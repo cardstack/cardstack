@@ -7,6 +7,7 @@
     {{on "dragenter" (action (mut this.dropZoneStatus) "dragging")}}
     {{on "dragleave" (action (mut this.dropZoneStatus) "outside")}}
     data-test-drop-zone={{@position}}
+    aria-label="drop zone {{@position}}"
   >
     <div class="drop-zone--description {{this.dropZoneStatus}}">
       <span class="drop-zone--description--text">Drag &amp; drop from the catalog</span>

@@ -126,7 +126,7 @@
   color: white;
   font: 600 13px/18px var(--ch-font-family);
   letter-spacing: 0.035em;
-  opacity: 0.3;
+  opacity: 0.6;
 }
 
 .section-btn:focus,

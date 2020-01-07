@@ -30,6 +30,11 @@ module.exports = function(environment) {
   };
 
   if (environment === 'development') {
+    ENV['ember-a11y-testing'] = {
+      componentOptions: {
+        turnAuditOff: true, // set to "false" to see accessibility errors hightlighted in the browser. Even if there are no errors, this impacts performance and can lead to unexpected behavior, so it is recommended to only run the audit on-demand.
+      },
+    };
     // ENV.APP.LOG_RESOLVER = true;
     // ENV.APP.LOG_ACTIVE_GENERATION = true;
     // ENV.APP.LOG_TRANSITIONS = true;
