@@ -1,23 +1,21 @@
 <Cta {{on "click" this.save}}
   @variant="primary"
   class={{concat
-    "ch-button--save "
+    "save-button "
     (if this.justSaved "just-saved ")
     (if (not @card.isDirty) "saved ")
   }}
   data-test-card-save-btn
   @disabled={{not (and this.cardstackSession.isAuthenticated @card.isDirty)}}
 >
-  <span class="ch-button--inner">
-    {{#if this.saveCard.isRunning}}
-      Saving
-      <span class="loading-spinner"><div></div><div></div><div></div><div></div></span>
+  {{#if this.saveCard.isRunning}}
+    Saving
+    <span class="loading-spinner"><div></div><div></div><div></div><div></div></span>
+  {{else}}
+    {{#if @card.isDirty}}
+      Save
     {{else}}
-      {{#if @card.isDirty}}
-        Save
-      {{else}}
-        Saved {{svg-jar "checkmark" width="12px" height="9px"}}
-      {{/if}}
+      Saved {{svg-jar "checkmark" width="12px" height="9px"}}
     {{/if}}
-  </span>
+  {{/if}}
 </Cta>

@@ -16,27 +16,15 @@
   z-index: var(--ch-edges-z-index);
 }
 
-.login-box {
-  position: fixed;
-  top: var(--ch-spacing);
-  right: var(--ch-right-edge-panel-width);
+.login-btn.cs-component-cta.primary {
+  position: absolute;
+  right: 370px;
+  min-width: 100px;
   z-index: var(--ch-edges-z-index);
 }
 
-.login-box.full-width {
+.login-btn.full-width.cs-component-cta.primary {
   right: var(--ch-spacing)
-}
-
-.login-box > button {
-  --background: none;
-  --border-radius: 10px;
-  --border: 2px solid var(--ch-border);
-  --color: white;
-  --width: 80px;
-}
-
-.login-box > button:hover {
-  --color: var(--ch-highlight);
 }
 
 @media (max-width: 1440px) {
