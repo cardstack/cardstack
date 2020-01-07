@@ -33,11 +33,15 @@
 /* Icon button with background and border */
 .ch-button--icon-secondary {
   background-color: var(--ch-default);
-  border: 1px solid var(--ch-light-op40);
+  border: 1px solid var(--ch-border);
   border-radius: 50%;
   color: var(--ch-highlight);
   fill: var(--ch-highlight);
   --icon-color: var(--ch-highlight);
+}
+.ch-button--icon-secondary svg {
+  display: inline-block;
+  vertical-align: middle;
 }
 .ch-button--icon-secondary:not(:disabled):focus,
 .ch-button--icon-secondary:not(:disabled):hover {
@@ -56,18 +60,13 @@
 }
 .ch-button--icon-secondary:disabled,
 .ch-button--icon-secondary.disabled {
-  --icon-color: var(--ch-disabled);
+  --icon-color: var(--ch-light-op40);
   background-color: var(--ch-default);
-  color: var(--ch-disabled);
-  fill: var(--ch-disabled);
+  color: var(--ch-light-op40);
+  fill: var(--ch-light-op40);
 }
 
 
-
-
-.ch-button--icon.share {
-  --icon-url: url('/assets/images/buttons/share.svg');
-}
 .ch-button--icon.eye-on {
   --icon-url: url('/assets/images/buttons/eye-on.svg');
   background-size: 30px;
@@ -116,8 +115,8 @@
 
 .ch-button--icon.responsive {
   --icon-url: url('/assets/images/buttons/responsive-inactive.svg');
-  --width: auto;
-  --height: auto;
+  width: auto;
+  height: auto;
   padding-top: 25px;
   background-size: 25px 25px;
   background-position: top;
@@ -138,8 +137,8 @@
 
 .ch-button--icon.full-width {
   --icon-url: url('/assets/images/buttons/full-width-inactive.svg');
-  --width: auto;
-  --height: auto;
+  width: auto;
+  height: auto;
   padding-top: 25px;
   background-size: 20px 20px;
   background-position: top;

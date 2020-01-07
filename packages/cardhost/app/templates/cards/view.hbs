@@ -2,11 +2,6 @@
   <ThemerToolbar @closeEditor={{this.closeEditor}} />
 {{else if this.cardstackSession.isAuthenticated}}
   <div class="card-renderer--top-edge-buttons">
-    <button
-      class="ch-button ch-button--icon share"
-      aria-label="Share button"
-    >
-    </button>
     <Cta @label="Open"
       @variant="secondary primary"
       @theme="cs-dark"

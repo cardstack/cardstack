@@ -7,9 +7,9 @@
         id="logout-button"
         onclick={{action this.logout session.logout}}
         @label="Logout"
-        @variant="secondary primary"
+        @variant="secondary"
         @theme="cs-dark"
-        class="login-btn" />
+        class="logout-btn" />
     {{else}}
       {{#mock-login as |login|}}
         <Cta
@@ -18,7 +18,7 @@
           @label="Login"
           @variant="secondary primary"
           @theme="cs-dark"
-          class="login-btn full-width"
+          class="login-btn"
           data-test-cardstack="login-button" />
       {{/mock-login}}
     {{/if}}

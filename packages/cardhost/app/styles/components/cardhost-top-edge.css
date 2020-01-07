@@ -16,14 +16,20 @@
   z-index: var(--ch-edges-z-index);
 }
 
-.login-btn.cs-component-cta.primary {
+.login-btn,
+.logout-btn {
   position: absolute;
-  right: 370px;
-  min-width: 100px;
   z-index: var(--ch-edges-z-index);
 }
 
-.login-btn.full-width.cs-component-cta.primary {
+.logout-btn {
+  position: absolute;
+  right: 320px;
+  min-width: 85px;
+  height: 40px;
+}
+
+.login-btn {
   right: var(--ch-spacing)
 }
 
