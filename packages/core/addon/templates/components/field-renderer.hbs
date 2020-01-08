@@ -1,14 +1,10 @@
 {{! eslint is confused about indentation for else-if }}
 {{! template-lint-disable block-indentation}}
 
-{{#if (and (eq @mode "schema") @dropField)}}
-  <DropZone @dropField={{@dropField}} @position={{@field.position}} />
-{{/if}}
-
 {{!-- TODO: let's think of a more accessible solution here, consider making this a button--}}
 {{!-- TODO: also we should also turn on a11y linting --}}
-<div {{on "click" (fn this.selectField @field)}} {{on "dragstart" (action this.startDragging @field)}} {{on "dragend" (action this.finishDragging)}}
-  class="field {{@field.name}}-field {{if this.friendlyType (concat "field-type-" this.friendlyType "-" @mode "-field ")}}field-type-{{this.dasherizedType}}-{{@mode}}-field{{if (or @setPosition @removeField) " with-buttons"}}{{if (eq @field @selectedField) " selected"}}"
+<section {{on "click" (fn this.selectField @field)}} {{on "dragstart" (action this.startDragging @field)}} {{on "dragend" (action this.finishDragging)}}
+  class="field {{@field.name}}-field {{if @field.preview "preview"}} {{if this.friendlyType (concat "field-type-" this.friendlyType "-" @mode "-field ")}}field-type-{{this.dasherizedType}}-{{@mode}}-field{{if (or @setPosition @removeField) " with-buttons"}}{{if (eq @field @selectedField) " selected"}}"
   data-test-field={{@field.name}}
   data-test-field-type={{@field.type}}
   data-test-field-mode={{@mode}}
@@ -170,4 +166,7 @@
       {{/if}}
     </div>
   {{/if}}
-</div>
+</section>
+{{#if (and (eq @mode "schema") @dropField (not @field.preview))}}
+  <DropZone @dropField={{@dropField}} @position={{inc @field.position}} @toggleStubField={{@toggleStubField}} />
+{{/if}}

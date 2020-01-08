@@ -1,5 +1,6 @@
 import Component from '@glimmer/component';
 import { dasherize } from '@ember/string';
+import { A } from '@ember/array';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 
@@ -12,6 +13,7 @@ export default class CardRenderer extends Component {
   @tracked componentName;
   @tracked mode;
   @tracked cardFocused = () => {};
+  @tracked fields = A([]);
 
   constructor(...args) {
     super(...args);
@@ -24,6 +26,28 @@ export default class CardRenderer extends Component {
 
     if (this.args.cardFocused) {
       this.cardFocused = this.args.cardFocused;
+    }
+
+    if (this.args.format === 'isolated') {
+      this.fields = A(Object.assign([], this.args.card.isolatedFields));
+    }
+  }
+
+  @action
+  updateFields(element, [fields]) {
+    if (this.args.mode === 'schema') {
+      this.fields = A(Object.assign([], fields));
+    }
+  }
+
+  @action
+  toggleStubField(field, position, addField) {
+    if (position || position === 0) {
+      if (addField) {
+        this.fields.insertAt(position, field);
+      } else {
+        this.fields.removeAt(position);
+      }
     }
   }
 

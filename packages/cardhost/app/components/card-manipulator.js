@@ -179,6 +179,7 @@ export default class CardManipulator extends Component {
   }
 
   @action dropField(position, onFinishDrop, evt) {
+    onFinishDrop();
     let field;
     let type = evt.dataTransfer.getData('text/type');
     if (type) {
@@ -201,8 +202,6 @@ export default class CardManipulator extends Component {
     if (field) {
       this.selectField(field);
     }
-
-    onFinishDrop();
   }
 
   @action selectField(field) {

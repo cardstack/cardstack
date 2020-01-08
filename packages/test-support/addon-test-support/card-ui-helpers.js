@@ -1,4 +1,5 @@
 import { click, find, triggerEvent, fillIn, visit, waitFor } from '@ember/test-helpers';
+import { animationsSettled } from 'ember-animated/test-support';
 
 const timeout = 5000;
 
@@ -7,6 +8,7 @@ export async function showCardId(toggleDetailsSection = false) {
 
   if (toggleDetailsSection) {
     await click('[data-test-right-edge-section-toggle="details"]');
+    await animationsSettled();
   }
 }
 
@@ -19,7 +21,10 @@ export async function setCardId(id) {
 export async function dragAndDrop(fieldSelector, dropZoneSelector, options) {
   await triggerEvent(fieldSelector, 'mousedown');
   await triggerEvent(fieldSelector, 'dragstart', options);
+  await triggerEvent(dropZoneSelector, 'dragenter', options);
+  await animationsSettled();
   await triggerEvent(dropZoneSelector, 'drop', options);
+  await animationsSettled();
 }
 
 export async function dragAndDropNewField(type, position = 0) {
@@ -87,6 +92,7 @@ export async function saveCard(mode, id) {
   } else {
     await waitFor(`[data-test-card-save-btn].saved`, { timeout });
   }
+  await animationsSettled();
 }
 
 export async function addField(name, type, isEmbedded, position) {

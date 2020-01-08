@@ -13,38 +13,44 @@ Ember Concurrency into the rendering of the card component here.
         {{safe-css-string @card.adoptedFromName}}
         {{safe-css-string @card.name}}
         {{if @cardSelected "selected"}}
-        {{if @card.isolatedFields.length "has-fields" "no-fields"}}
+        {{if this.fields.length "has-fields" "no-fields"}}
       "
       tabindex="0"
       data-test-card-renderer-isolated
       {{on "focus" (action this.cardIsFocused true)}}
       {{did-insert this.focusCard true}}
+      {{did-update this.updateFields @card.isolatedFields}}
     >
-      <header class="card-renderer-isolated--header">
-        {{#if (or (eq (safe-css-string @card.adoptedFromName) "event-card") (eq (safe-css-string @card.name) "event-card"))}}
-          {{svg-jar "event" width="18px" height="20px"}}
-        {{/if}}
-        <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.name "Blank Card"}}</span>
-      </header>
+      <div class="card-renderer-isolated--header--wrapper">
+        <header class="card-renderer-isolated--header">
+          {{#if (or (eq (safe-css-string @card.adoptedFromName) "event-card") (eq (safe-css-string @card.name) "event-card"))}}
+            {{svg-jar "event" width="18px" height="20px"}}
+          {{/if}}
+          <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.name "Blank Card"}}</span>
+        </header>
+      </div>
       <div class="card-renderer-isolated--content">
         <div class="card-renderer-isolated--card-container">
+          {{#if (and @dropField (eq @mode "schema")) }}
+            <DropZone
+              @dropField={{@dropField}}
+              @position=0
+              @toggleStubField={{this.toggleStubField}}
+            />
+          {{/if}}
           <Isolated
             @card={{@card}}
+            @fields={{this.fields}}
             @mode={{this.mode}}
             @setFieldValue={{@setFieldValue}}
             @setFieldName={{@setFieldName}}
             @removeField={{@removeField}}
+            @toggleStubField={{this.toggleStubField}}
             @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
             @setPosition={{@setPosition}}
             @selectField={{@selectField}}
             @selectedField={{@selectedField}}
             @dropField={{@dropField}} />
-          {{#if (and @dropField (eq @mode "schema")) }}
-            <DropZone
-              @dropField={{@dropField}}
-              @position={{@card.isolatedFields.length}}
-            />
-          {{/if}}
         </div>
       </div>
     </section>
