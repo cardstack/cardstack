@@ -24,11 +24,13 @@ export default class IndexRoute extends Route {
     // come back to handle this better for async
     // ids.forEach(id => {
     let recent;
-    try {
-      recent = await this.data.getCard(ids[0], 'embedded');
-      if (recent) cards.push(recent);
-    } catch (err) {
-      console.log('fail', err);
+    for await (let id of ids) {
+      try {
+        recent = await this.data.getCard(id, 'embedded');
+        if (recent.json.errors.length > 0) cards.push(recent);
+      } catch (err) {
+        console.log('fail', err);
+      }
     }
     // });
 
