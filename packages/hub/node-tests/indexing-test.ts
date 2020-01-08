@@ -1,5 +1,5 @@
 import { TestEnv, createTestEnv } from './helpers';
-import { EphemeralStorage } from '../ephemeral/storage';
+import { EphemeralStorage } from '../../../cards/ephemeral-realm/storage';
 import IndexingService from '../indexing';
 import { testCard } from './test-card';
 import { myOrigin } from '../origin';

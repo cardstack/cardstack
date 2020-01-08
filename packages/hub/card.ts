@@ -1,5 +1,4 @@
 import CardstackError from './error';
-import { loadFeature } from './scaffolding';
 import { WriterFactory } from './writer';
 import { PristineDocument, UpstreamDocument, UpstreamIdentity, PristineCollection } from './document';
 import { SingleResourceDoc, RelationshipObject } from 'jsonapi-typescript';
@@ -12,6 +11,7 @@ import { IndexerFactory } from './indexer';
 import { ScopedCardService } from './cards-service';
 import * as FieldHooks from './field-hooks';
 import { inject, getOwner } from './dependency-injection';
+import { Memoize } from 'typescript-memoize';
 
 export const apiPrefix = '/api';
 
@@ -77,11 +77,13 @@ export class Card {
   csFiles: CardFiles | undefined;
   csPeerDependencies: PeerDependencies | undefined;
 
+  private rawFields: { [name: string]: any } | undefined;
+  private features: { [name: string]: string | [string, string] } | undefined;
+
   // if this card is stored inside another, this is the other
   readonly enclosingCard: Card | undefined;
 
   protected jsonapi: SingleResourceDoc;
-  private ownFields: Map<string, FieldCard> = new Map();
 
   // Identity invariants:
   //
@@ -119,9 +121,7 @@ export class Card {
       if (!isPlainObject(fields)) {
         throw new CardstackError(`csFields must be an object`);
       }
-      for (let [name, value] of Object.entries(fields)) {
-        this.ownFields.set(name, new FieldCard(value, name, this, this.service));
-      }
+      this.rawFields = fields as J.Object;
     }
 
     let csFiles = jsonapi.data.attributes?.csFiles;
@@ -134,6 +134,12 @@ export class Card {
     if (csPeerDependencies) {
       assertPeerDependencies(csPeerDependencies);
       this.csPeerDependencies = csPeerDependencies;
+    }
+
+    let features = jsonapi.data.attributes?.csFeatures;
+    if (features) {
+      assertFeatures(features);
+      this.features = features;
     }
   }
 
@@ -149,7 +155,7 @@ export class Card {
           continue;
         }
         let field = await this.field(name);
-        field.validateValue(await priorCard?.value(name), value, realm);
+        await field.validateValue(await priorCard?.value(name), value, realm);
       }
     }
 
@@ -160,7 +166,7 @@ export class Card {
           continue;
         }
         let field = await this.field(name);
-        field.validateReference(await priorCard?.reference(name), relationshipToCardId(ref), realm);
+        await field.validateReference(await priorCard?.reference(name), relationshipToCardId(ref), realm);
       }
     }
   }
@@ -189,16 +195,19 @@ export class Card {
     return undefined;
   }
 
+  @Memoize()
   async field(name: string): Promise<FieldCard> {
-    let card: Card | undefined = this;
-    while (card) {
-      let field = card.ownFields.get(name);
-      if (field) {
-        return field;
+    if (this.rawFields) {
+      if (name in this.rawFields) {
+        return await getOwner(this).instantiate(FieldCard, this.rawFields[name], name, this, this.service);
       }
-      card = await card.adoptsFrom();
     }
-    throw new CardstackError(`no such field "${name}"`, { status: 400 });
+    let parent = await this.adoptsFrom();
+    if (parent) {
+      return await parent.field(name);
+    } else {
+      throw new CardstackError(`no such field "${name}"`, { status: 400 });
+    }
   }
 
   protected regenerateJSONAPI(): SingleResourceDoc {
@@ -254,6 +263,11 @@ export class Card {
         }
         let value = await this.value(fieldName);
         let field = await this.field(fieldName);
+        if (value instanceof Card) {
+          // this is here to avoid an uglier and harder-to-understand error when
+          // pg fails to serialize a Card instance
+          throw new Error(`unimplemented: nested card within searchdoc`);
+        }
         doc[`${field.enclosingCard.canonicalURL}/${fieldName}`] = value;
       }
     }
@@ -311,9 +325,13 @@ export class Card {
   async loadFeature(featureName: any): Promise<any> {
     let card: Card | undefined = this;
     while (card) {
-      let result = await loadFeature(card, featureName);
-      if (result) {
-        return result;
+      if (card.features && featureName in card.features) {
+        let location = card.features[featureName];
+        if (typeof location === 'string') {
+          return await this.modules.load(card, location);
+        } else {
+          return await this.modules.load(card, ...location);
+        }
       }
       card = await card.adoptsFrom();
     }
@@ -357,7 +375,8 @@ export class FieldCard extends Card {
         throw new CardstackError(
           `field ${this.name} on card ${
             this.enclosingCard.canonicalURL
-          } failed type validation for value: ${JSON.stringify(value)}`
+          } failed type validation for value: ${JSON.stringify(value)}`,
+          { status: 400 }
         );
       }
       return;
@@ -458,6 +477,23 @@ function assertPeerDependencies(deps: any): asserts deps is PeerDependencies {
     if (typeof value !== 'string') {
       throw new Error(`csPeerDependencies.${name} must be a string`);
     }
+  }
+}
+
+function assertFeatures(features: any): asserts features is Card['features'] {
+  if (!isPlainObject(features)) {
+    throw new Error(`csFeatures must be an object`);
+  }
+  for (let [name, value] of Object.entries(features)) {
+    if (typeof value === 'string') {
+      continue;
+    }
+    if (Array.isArray(value) && value.length === 2 && typeof value[0] === 'string' && typeof value[1] === 'string') {
+      continue;
+    }
+    throw new Error(
+      `csFeatures.${name} must be "moduleName: string" or "[moduleName, exportedName]: [string, string]"`
+    );
   }
 }
 

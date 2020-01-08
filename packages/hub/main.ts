@@ -6,7 +6,11 @@ import JSONAPIMiddleware from './jsonapi-middleware';
 import CardsService from './cards-service';
 import { ModuleService } from './module-service';
 import AuthenticationMiddleware from './authentication-middleware';
-import { EphemeralStorage } from './ephemeral/storage';
+
+// TODO: we need to let cards register services in a safely namespaced way,
+// instead of this hack
+import { EphemeralStorage } from '../../cards/ephemeral-realm/storage';
+
 import PgClient from './pgsearch/pgclient';
 import IndexingService from './indexing';
 import Queue from './queue/queue';

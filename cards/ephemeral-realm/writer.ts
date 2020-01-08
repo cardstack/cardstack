@@ -1,9 +1,9 @@
-import { Writer } from '../writer';
-import { Session } from '../session';
-import { UpstreamDocument, UpstreamIdentity } from '../document';
-import { inject } from '../dependency-injection';
-import { AddressableCard } from '../card';
-import CardstackError from '../error';
+import { Writer } from '@cardstack/hub/writer';
+import { Session } from '@cardstack/hub/session';
+import { UpstreamDocument, UpstreamIdentity } from '@cardstack/hub/document';
+import { inject } from '@cardstack/hub/dependency-injection';
+import { AddressableCard } from '@cardstack/hub/card';
+import CardstackError from '@cardstack/hub/error';
 
 let counter = 0;
 

@@ -6,9 +6,6 @@
         "writer": "writer.js",
         "indexer": "indexer.js"
       }
-    },
-    "relationships": {
-
     }
   }
 }

@@ -52,8 +52,9 @@ describe('module-service', function() {
       }).jsonapi
     );
     await modules.load(card, 'validate.js', 'default');
+    let initialCount = modules.writeCounter;
     await modules.load(card, 'other.js');
-    expect(modules.writeCounter).to.equal(1);
+    expect(modules.writeCounter).to.equal(initialCount);
   });
 
   it('can access a feature that is a named export within the card', async function() {
@@ -193,9 +194,8 @@ describe('module-service', function() {
     } catch (err) {
       expect(err instanceof SyntaxError).equals(true, `exception should have been a syntax error (${err})`);
     }
-    expect(modules.writeCounter).to.equal(1);
-
+    let initialCounter = modules.writeCounter;
     expect(await modules.load(card, 'good.js', 'good')).to.equal(42);
-    expect(modules.writeCounter).to.equal(1);
+    expect(modules.writeCounter).to.equal(initialCounter);
   });
 });

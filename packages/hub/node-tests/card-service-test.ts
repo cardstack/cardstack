@@ -233,6 +233,22 @@ describe('hub/card-service', function() {
         expect(err.detail).to.match(/no such field "badField"/);
       }
     });
+
+    it('applies field type validation at create', async function() {
+      let doc = testCard()
+        .withAttributes({
+          title: 42,
+        })
+        .withField('title', 'string-field');
+
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(/field title on card .* failed type validation for value: 42/);
+      }
+    });
   });
 
   describe('readonly', function() {

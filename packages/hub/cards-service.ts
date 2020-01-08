@@ -1,5 +1,5 @@
 import { Session } from './session';
-import { UnsavedCard, AddressableCard, CardId, canonicalURLToCardId } from './card';
+import { UnsavedCard, AddressableCard, CardId, canonicalURLToCardId, Card } from './card';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
 import CardstackError from './error';
 import { myOrigin } from './origin';
@@ -10,8 +10,9 @@ import { Query } from './query';
 import { ResponseMeta } from './pgsearch/pgclient';
 import { Writer } from './writer';
 import { join } from 'path';
-import { existsSync } from 'fs';
 import { assertSingleResourceDoc } from './jsonapi';
+import merge from 'lodash/merge';
+import { readdirSync, existsSync, statSync, readFileSync } from 'fs-extra';
 
 export default class CardsService {
   pgclient = inject('pgclient');
@@ -171,6 +172,20 @@ export class ScopedCardService {
     }
     let json = await import(join(cardDir, 'card.json'));
     assertSingleResourceDoc(json);
+
+    // ensure we have an attributes object
+    merge(json, {
+      data: {
+        attributes: {},
+      },
+    });
+
+    // then ensure that csFiles reflects our true on disk files only
+    json.data.attributes!.csFiles = walkFiles(cardDir);
+
+    // and our peerDeps match the ones from package.json
+    json.data.attributes!.csPeerDependencies = (await import(join(cardDir, 'package.json'))).peerDependencies;
+
     return await this.instantiate(json, id);
   }
 }
@@ -181,6 +196,21 @@ function asCardId(idOrURL: CardId | string): CardId {
   } else {
     return idOrURL;
   }
+}
+
+function walkFiles(dir: string): NonNullable<Card['csFiles']> {
+  let output = Object.create(null) as ReturnType<typeof walkFiles>;
+  let names = readdirSync(dir);
+  for (let name of names) {
+    let fullName = join(dir, name);
+    let stat = statSync(fullName);
+    if (stat.isDirectory()) {
+      output[name] = walkFiles(fullName);
+    } else {
+      output[name] = readFileSync(fullName, 'utf8');
+    }
+  }
+  return output;
 }
 
 declare module '@cardstack/hub/dependency-injection' {
