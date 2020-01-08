@@ -44,8 +44,6 @@ export default class DataService extends Service {
   }
 
   createCard(id, adoptedFrom) {
-    // remove the next line once we have progressive data handling
-    this.cardLocalStorage.addRecentCardId(id);
     return new Card({
       id,
       adoptedFrom,
@@ -478,6 +476,9 @@ class Card {
     internal.isDirty = false;
 
     reifyCard(this);
+
+    // remove the next line once we have progressive data handling
+    this.cardLocalStorage.addRecentCardId(this.id);
 
     return this;
   }

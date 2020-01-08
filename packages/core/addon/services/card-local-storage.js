@@ -107,15 +107,26 @@ if (!window.localStorage) {
 }
 
 export default Service.extend({
+  /**
+   * Returns an array of card ids from the local browser storage
+   */
   getRecentCardIds() {
-    return localStorage.getItem('recentCardIds');
+    let cardIds = localStorage.getItem('recentCardIds');
+    if (cardIds === null) {
+      return [];
+    } else {
+      return cardIds;
+    }
   },
 
-  // this method should only be called by the data service
+  /**
+   * Accepts the card id as a string, i.e. "local-hub::my-card-id"
+   * This method should only be called by the data service.
+   */
   addRecentCardId(id) {
     let cardIds = this.getRecentCardIds();
     if (cardIds.indexOf(id) === -1) {
-      // deduplicate
+      // prevent duplicates
       cardIds.push(id);
       localStorage.setItem('recentCardIds', cardIds);
     }
