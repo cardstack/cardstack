@@ -115,20 +115,22 @@ export default Service.extend({
     if (cardIds === null) {
       return [];
     } else {
-      return cardIds;
+      return JSON.parse(cardIds);
     }
   },
 
   /**
    * Accepts the card id as a string, i.e. "local-hub::my-card-id"
    * This method should only be called by the data service.
+   * localStorage only supports strings, so we have to use stringify
+   * before saving, and parse before using it in JavaScript code.
    */
   addRecentCardId(id) {
     let cardIds = this.getRecentCardIds();
     if (cardIds.indexOf(id) === -1) {
       // prevent duplicates
       cardIds.push(id);
-      localStorage.setItem('recentCardIds', cardIds);
+      localStorage.setItem('recentCardIds', JSON.stringify(cardIds));
     }
   },
 });
