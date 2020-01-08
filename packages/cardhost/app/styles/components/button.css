@@ -1,244 +1,129 @@
+/* Icon Button */
 .ch-button {
-  --margin: 0;
-  --padding: 10px 15px;
-  --width: 100px;
-  --height: 40px;
-  --color: var(--ch-default);
-  --background: var(--ch-highlight);
-  --font: 600 13px/18px var(--ch-font-family);
-  --letter-spacing: 0.035em;
-  --border: 1px solid transparent;
-  --border-radius: 100px;
-  --box-shadow: none;
-  --transition-duration: 800ms;
+  --icon-url: url('');
+  --icon-size: 40px 40px;
 
   display: inline-block;
-  margin: var(--margin);
-  padding: var(--padding);
-  height: var(--height);
-  width: var(--width);
-  color: var(--color);
-  background: var(--background);
-  font: var(--font);
-  letter-spacing: var(--letter-spacing);
-  border: var(--border);
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
+  min-width: 40px;
+  min-height: 40px;
+  max-width: 100%;
+  padding: 0;
+  background: var(--icon-url) center/var(--icon-size) no-repeat;
+  font: 600 13px/18px var(--ch-font-family);
+  letter-spacing: 0.035em;
   text-align: center;
 }
-
-.ch-button--secondary {
-  --color: var(--ch-highlight);
-  --background: none;
-  --border: 1px solid var(--ch-border);
+.ch-button:not(:disabled):hover,
+.ch-button:not(:disabled):focus {
+  cursor: pointer;
+  outline: 0;
+}
+.ch-button:disabled,
+.ch-button.disabled {
+  cursor: not-allowed;
 }
 
-.ch-button--icon-secondary {
-  --icon-url: url('');
-  --width: 40px;
-  --height: 40px;
-  --color: var(--ch-highlight);
-  --background: var(--icon-url) center/var(--icon-size) no-repeat;
-  --border: 1px solid var(--ch-border);
-  --border-radius: 50%;
-
-  background-color: transparent;
-}
-
-.ch-button--icon-secondary.delete {
-  --icon-url: url('/assets/images/icons/trash-active.svg');
-  --icon-size: 17px 20px;
-}
-
+/* Default icon button */
 .ch-button--icon {
-  --width: 40px;
-  --height: 40px;
-  --padding: 0;
-  --border: none;
-  --border-radius: 50%;
-  --icon-url: url('');
-  --background: var(--icon-url) center/40px 40px no-repeat;
-  --box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+  border: none;
+  background-color: transparent;
+  color: var(--ch-light);
 }
 
-.ch-button--icon.share {
-  --icon-url: url('/assets/images/buttons/share.svg');
+/* Icon button with background and border */
+.ch-button--icon-secondary {
+  background-color: var(--ch-default);
+  border: 1px solid var(--ch-border);
+  border-radius: 50%;
+  color: var(--ch-highlight);
+  fill: var(--ch-highlight);
+  --icon-color: var(--ch-highlight);
+}
+.ch-button--icon-secondary svg {
+  display: inline-block;
+  vertical-align: middle;
+}
+.ch-button--icon-secondary:not(:disabled):focus,
+.ch-button--icon-secondary:not(:disabled):hover {
+  --icon-color: var(--ch-highlight);
+  background-color: var(--ch-hover);
+  color: var(--ch-highlight);
+  fill: var(--ch-highlight);
+}
+.ch-button--icon-secondary:not(:disabled):active,
+.ch-button--icon-secondary:not(:disabled).active {
+  --icon-color: var(--ch-dark);
+  background-color: var(--ch-highlight);
+  border-color: var(--ch-highlight);
+  color: var(--ch-dark);
+  fill: var(--ch-dark);
+}
+.ch-button--icon-secondary:disabled,
+.ch-button--icon-secondary.disabled {
+  --icon-color: var(--ch-light-op40);
+  background-color: var(--ch-default);
+  color: var(--ch-light-op40);
+  fill: var(--ch-light-op40);
 }
 
-.ch-button--icon.user {
-  --icon-url: url('/assets/images/buttons/user.svg');
-}
-.ch-button--icon.user:hover {
-  --icon-url: url('/assets/images/buttons/user-active.svg');
-}
 
-.ch-button--icon.user:hover:disabled,
-.ch-button--icon.user:disabled {
-  --icon-url: url('/assets/images/buttons/user-disabled.svg');
-  cursor: not-allowed;
-}
-
-.ch-button--icon.catalog {
-  --icon-url: url('/assets/images/buttons/catalog.svg');
-  --border-radius: 0;
-}
-
-.ch-button--icon.catalog.active,
-.ch-button--icon.catalog:hover,
-.ch-button--icon.catalog:active {
-  --icon-url: url('/assets/images/buttons/catalog-active.svg');
-}
-
-.ch-button--icon.catalog:hover:disabled,
-.ch-button--icon.catalog:disabled {
-  --icon-url: url('/assets/images/buttons/catalog-disabled.svg');
-  cursor: not-allowed;
-}
-
-.ch-button--icon.library {
-  --icon-url: url('/assets/images/buttons/library.svg');
-}
-.ch-button--icon.library:hover {
-  --icon-url: url('/assets/images/buttons/library-active.svg');
-}
-
-.ch-button--icon.eye-on {
-  --icon-url: url('/assets/images/buttons/eye-on.svg');
-  background-size: 30px;
-  margin-right: 20px;
-}
-.ch-button--icon.eye-on:hover {
-  --icon-url: url('/assets/images/buttons/eye-on.svg');
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-
-.ch-button--icon.eye-off {
-  --icon-url: url('/assets/images/buttons/eye-off.svg');
-  background-size: 30px;
-  margin-right: 20px;
-}
-
-.ch-button--icon.eye-off:hover {
-  --icon-url: url('/assets/images/buttons/eye-off.svg');
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-
-.ch-button--icon.dock-right {
-  --icon-url: url('/assets/images/buttons/dock-right-secondary.svg');
-  background-size: 25px 25px;
-}
-
-.ch-button--icon.dock-right.selected {
-  --icon-url: url('/assets/images/buttons/dock-right.svg');
-}
-
-.ch-button--icon.dock-bottom {
-  --icon-url: url('/assets/images/buttons/dock-bottom-secondary.svg');
-  background-size: 25px 25px;
-}
-
-.ch-button--icon.dock-bottom.selected {
-  --icon-url: url('/assets/images/buttons/dock-bottom.svg');
-}
-
-.ch-button--icon.dock-bottom:hover, .ch-button--icon.dock-right:hover {
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-
-.ch-button--icon.responsive {
-  --icon-url: url('/assets/images/buttons/responsive-inactive.svg');
-  --width: auto;
-  --height: auto;
-  padding-top: 25px;
-  background-size: 25px 25px;
-  background-position: top;
-  justify-content: center;
-  align-items: flex-end;
-  box-shadow: none;
-  border-radius: 0;
-}
-
-.ch-button--icon.responsive.selected {
-  --icon-url: url('/assets/images/buttons/responsive-active.svg');
-}
-
-.ch-button--icon.responsive:hover, .ch-button--icon.full-width:hover {
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-
-.ch-button--icon.full-width {
-  --icon-url: url('/assets/images/buttons/full-width-inactive.svg');
-  --width: auto;
-  --height: auto;
-  padding-top: 25px;
-  background-size: 20px 20px;
-  background-position: top;
-  display: inline-flex;
-  justify-content: center;
-  align-items: flex-end;
-  box-shadow: none;
-  border-radius: 0;
-}
-
-.ch-button--icon.full-width.selected {
-  --icon-url: url('/assets/images/buttons/full-width-active.svg');
-}
-
-.ch-button--save {
-  --width: 140px;
+/* Save Button */
+.save-button.cs-component-cta.primary {
   position: relative;
-  transition: (background-color var(--transition-duration));
+  transition: background-color var(--transition-duration);
 }
 
-.ch-button--save.saved {
-  --background: var(--ch-highlight-light);
-  transition: (background-color var(--transition-duration));
-}
-
-.ch-button--save.just-saved {
-  --background: var(--ch-success);
-}
-
-.ch-button--save.saved .ch-button--inner {
-  opacity: 0.5;
-}
-
-.ch-button--save.saved .ch-button--inner svg {
+.save-button.cs-component-cta.primary.saved svg {
   position: absolute;
   top: 14px;
   right: 20px;
+  opacity: 0.5;
 }
 
-.ch-button--save.just-saved .ch-button--inner {
+.save-button.cs-component-cta.primary.just-saved {
+  background-color: var(--ch-success);
+  color: var(--ch-dark);
+}
+
+.save-button.cs-component-cta.primary.just-saved svg {
   opacity: 1;
 }
 
-.ch-button:hover {
-  --color: white;
-
-  cursor: pointer;
+.loading-spinner {
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  right: 20px;
+  width: 20px;
+  height: 20px;
 }
 
-.ch-button:hover:disabled {
-  --color: var(--ch-default);
+.loading-spinner div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  margin: 8px;
+  border: 2px solid black;
+  border-radius: 50%;
+  animation: loading-spinner 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: black transparent transparent transparent;
 }
-
-.ch-button--save:hover:disabled {
-  cursor: default;
+.loading-spinner div:nth-child(1) {
+  animation-delay: -0.45s;
 }
-
-.ch-button + .ch-button {
-  margin-left: 10px;
+.loading-spinner div:nth-child(2) {
+  animation-delay: -0.3s;
 }
-
-.ch-button-group {
-  display: flex;
+.loading-spinner div:nth-child(3) {
+  animation-delay: -0.15s;
 }
-
-.ch-button--responsive {
-  --width: 100%;
+@keyframes loading-spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
