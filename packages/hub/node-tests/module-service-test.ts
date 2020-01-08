@@ -4,11 +4,15 @@ import { myOrigin } from '../origin';
 import { ScopedCardService } from '../cards-service';
 import { Session } from '../session';
 import { ModuleService } from '../module-service';
+import { tmpdir } from 'os';
+import { join } from 'path';
+import { remove } from 'fs-extra';
 
 describe('module-service', function() {
   let env: TestEnv, cards: ScopedCardService, modules: ModuleService;
 
   beforeEach(async function() {
+    process.env.CARD_FILES_CACHE = join(tmpdir(), `cardstack-module-service-tests-${Math.floor(Math.random() * 1000)}`);
     env = await createTestEnv();
     cards = (await env.container.lookup('cards')).as(Session.INTERNAL_PRIVILEGED);
     modules = await env.container.lookup('modules');
@@ -16,6 +20,7 @@ describe('module-service', function() {
 
   afterEach(async function() {
     await env.destroy();
+    await remove(process.env.CARD_FILES_CACHE as string);
   });
 
   it('can access a feature that is a default export within the card', async function() {
@@ -106,4 +111,8 @@ describe('module-service', function() {
       expect(err.status).to.equal(654);
     }
   });
+
+  it.skip('handles invalid JS inside the card', async function() {});
+  it.skip('handles a slash in filename in csFiles', async function() {});
+  it.skip('handles non-object directory within csFiles', async function() {});
 });

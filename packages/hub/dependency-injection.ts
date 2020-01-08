@@ -1,4 +1,5 @@
 import { Memoize } from 'typescript-memoize';
+import { Deferred } from './deferred';
 
 let nonce = 0;
 
@@ -111,21 +112,6 @@ export class Container {
 
 export interface Factory<T, A extends unknown[] = []> {
   new (...a: A): T;
-}
-
-class Deferred<T> {
-  promise: Promise<T>;
-  private resolve!: (result: T) => void;
-  private reject!: (err: unknown) => void;
-  constructor() {
-    this.promise = new Promise((resolve, reject) => {
-      this.resolve = resolve;
-      this.reject = reject;
-    });
-  }
-  fulfill(result: Promise<T>): void {
-    result.then(this.resolve, this.reject);
-  }
 }
 
 class CacheEntry {

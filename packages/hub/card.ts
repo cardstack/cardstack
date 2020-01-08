@@ -74,6 +74,8 @@ export class Card {
   // chosen by the hub.
   csId: string | undefined;
 
+  csFiles: CardFiles | undefined;
+
   // if this card is stored inside another, this is the other
   readonly enclosingCard: Card | undefined;
 
@@ -119,6 +121,12 @@ export class Card {
       for (let [name, value] of Object.entries(fields)) {
         this.ownFields.set(name, new FieldCard(value, name, this, this.service));
       }
+    }
+
+    let csFiles = jsonapi.data.attributes?.csFiles;
+    if (csFiles) {
+      assertCSFiles(csFiles);
+      this.csFiles = csFiles;
     }
   }
 
@@ -203,6 +211,12 @@ export class Card {
 
     if (this instanceof AddressableCard) {
       copied.data.id = this.canonicalURL;
+    }
+
+    if (this.csFiles) {
+      copied.data.attributes.csFiles = this.csFiles;
+    } else {
+      delete copied.data.attributes.csFiles;
     }
 
     return copied;
@@ -395,6 +409,25 @@ export interface CardId {
   csRealm: string;
   csOriginalRealm?: string; // if not set, its implied that its equal to `realm`.
   csId: string;
+}
+
+export interface CardFiles {
+  [filename: string]: string | CardFiles;
+}
+
+function assertCSFiles(files: any): asserts files is CardFiles {
+  if (!isPlainObject(files)) {
+    throw new Error(`csFiles must be an object`);
+  }
+  for (let [name, value] of Object.entries(files)) {
+    if (name.includes('/')) {
+      throw new Error(`filename ${name} in csFiles cannot contain a slash. You can make subdirectories by nesting.`);
+    }
+    if (typeof value === 'string') {
+      continue;
+    }
+    assertCSFiles(value);
+  }
 }
 
 function everythingButMeta(_objValue: any, srcValue: any, key: string) {
