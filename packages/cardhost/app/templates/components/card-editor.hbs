@@ -12,7 +12,8 @@
       @label="Open"
       @variant="secondary primary"
       @theme="cs-dark"
-      @disabled={{not this.cardstackSession.isAuthenticated}} />
+      @disabled={{not this.cardstackSession.isAuthenticated}}
+      data-test-card-editor-preview-btn />
     <SaveButton @card={{this.card}}/>
   </div>
 {{/if}}
