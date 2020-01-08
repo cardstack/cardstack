@@ -106,7 +106,7 @@ describe('module-service', function() {
     expect(await validate(41, undefined as any)).to.equal(false);
   });
 
-  it.skip('allows feature code to import from hub peerDependency', async function() {
+  it('allows feature code to import from hub peerDependency', async function() {
     let sampleValidator = `const CardstackError = require('@cardstack/hub/error').default;
        module.exports = function shouldThrow(value){ throw new CardstackError('it worked', { title: 'it worked', status: 654 }) }
      `;
@@ -128,6 +128,46 @@ describe('module-service', function() {
       throw new Error(`should never get here`);
     } catch (err) {
       expect(err.status).to.equal(654);
+    }
+  });
+
+  it('asserts when peerDependency is out of range', async function() {
+    let card = await cards.create(
+      `${myOrigin}/api/realms/first-ephemeral-realm`,
+      testCard().withAttributes({
+        csPeerDependencies: {
+          '@cardstack/hub': '>1000',
+        },
+        csFiles: {
+          'validate.js': '',
+        },
+      }).jsonapi
+    );
+    try {
+      await modules.load(card, 'validate.js');
+      throw new Error(`should never get here`);
+    } catch (err) {
+      expect(err.message).to.match(/version >1000 of @cardstack\/hub is not available to cards on this hub/);
+    }
+  });
+
+  it('asserts when peerDependency is not available', async function() {
+    let card = await cards.create(
+      `${myOrigin}/api/realms/first-ephemeral-realm`,
+      testCard().withAttributes({
+        csPeerDependencies: {
+          lodash: '*',
+        },
+        csFiles: {
+          'validate.js': '',
+        },
+      }).jsonapi
+    );
+    try {
+      await modules.load(card, 'validate.js');
+      throw new Error(`should never get here`);
+    } catch (err) {
+      expect(err.message).to.match(/peerDependency lodash is not available to cards/);
     }
   });
 

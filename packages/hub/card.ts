@@ -75,6 +75,7 @@ export class Card {
   csId: string | undefined;
 
   csFiles: CardFiles | undefined;
+  csPeerDependencies: PeerDependencies | undefined;
 
   // if this card is stored inside another, this is the other
   readonly enclosingCard: Card | undefined;
@@ -127,6 +128,12 @@ export class Card {
     if (csFiles) {
       assertCSFiles(csFiles);
       this.csFiles = csFiles;
+    }
+
+    let csPeerDependencies = jsonapi.data.attributes?.csPeerDependencies;
+    if (csPeerDependencies) {
+      assertPeerDependencies(csPeerDependencies);
+      this.csPeerDependencies = csPeerDependencies;
     }
   }
 
@@ -217,6 +224,12 @@ export class Card {
       copied.data.attributes.csFiles = this.csFiles;
     } else {
       delete copied.data.attributes.csFiles;
+    }
+
+    if (this.csPeerDependencies) {
+      copied.data.attributes.csPeerDependencies = this.csPeerDependencies;
+    } else {
+      delete copied.data.attributes.csPeerDependencies;
     }
 
     return copied;
@@ -411,7 +424,7 @@ export interface CardId {
   csId: string;
 }
 
-export interface CardFiles {
+interface CardFiles {
   [filename: string]: string | CardFiles;
 }
 
@@ -431,6 +444,20 @@ function assertCSFiles(files: any, pathContext = [] as string[]): asserts files 
       continue;
     }
     assertCSFiles(value, [...pathContext, name]);
+  }
+}
+
+interface PeerDependencies {
+  [packageName: string]: string;
+}
+function assertPeerDependencies(deps: any): asserts deps is PeerDependencies {
+  if (!isPlainObject(deps)) {
+    throw new Error(`csPeerDependencies must be an object`);
+  }
+  for (let [name, value] of Object.entries(deps)) {
+    if (typeof value !== 'string') {
+      throw new Error(`csPeerDependencies.${name} must be a string`);
+    }
   }
 }
 

@@ -16,6 +16,7 @@
     "@types/lodash": "^4.14.149",
     "@types/pg": "^7.11.2",
     "@types/qs": "^6.9.0",
+    "@types/semver": "^6.2.0",
     "assert-never": "^1.2.0",
     "fast-json-stable-stringify": "^2.1.0",
     "fs-extra": "^8.1.0",
@@ -30,6 +31,7 @@
     "node-pg-migrate": "^3.23.3",
     "pg": "^7.14.0",
     "qs": "^6.9.1",
+    "semver": "^7.1.1",
     "typescript-memoize": "^1.0.0-alpha.3"
   },
   "devDependencies": {

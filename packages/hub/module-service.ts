@@ -1,11 +1,12 @@
-import { Card, CardFiles } from './card';
+import { Card } from './card';
 import stringify from 'fast-json-stable-stringify';
 import { createHash } from 'crypto';
 import { homedir } from 'os';
 import { join } from 'path';
 import { existsSync } from 'fs';
 import { Deferred } from './deferred';
-import { outputFile, mkdirp } from 'fs-extra';
+import { outputFile, mkdirp, ensureSymlink } from 'fs-extra';
+import { satisfies, coerce } from 'semver';
 
 export class ModuleService {
   cardFilesCache = process.env.CARD_FILES_CACHE ?? join(homedir(), '.cardstack', 'card-files-cache');
@@ -58,10 +59,13 @@ export class ModuleService {
       // we didn't, we still want to cache our empty card.
       await mkdirp(outDir);
     }
+    if (wroteAnyFiles && card.csPeerDependencies) {
+      await this.linkPeerDependencies(card.csPeerDependencies, outDir);
+    }
     this.writeCounter++;
   }
 
-  private async writeCardFiles(files: CardFiles, outDir: string): Promise<boolean> {
+  private async writeCardFiles(files: NonNullable<Card['csFiles']>, outDir: string): Promise<boolean> {
     let wroteAnyFiles = false;
     for (let [filename, entry] of Object.entries(files)) {
       if (typeof entry === 'string') {
@@ -72,6 +76,26 @@ export class ModuleService {
       }
     }
     return wroteAnyFiles;
+  }
+
+  private async linkPeerDependencies(deps: NonNullable<Card['csPeerDependencies']>, outDir: string) {
+    for (let [packageName, range] of Object.entries(deps)) {
+      let peerDepDir = await this.locatePeerDep(packageName);
+      let version = (await import(join(peerDepDir, 'package.json'))).version as string;
+      if (!satisfies(coerce(version)!, range)) {
+        throw new Error(`version ${range} of ${packageName} is not available to cards on this hub`);
+      }
+      await ensureSymlink(peerDepDir, join(outDir, 'node_modules', packageName), 'dir');
+    }
+  }
+
+  private async locatePeerDep(packageName: string): Promise<string> {
+    // right now this is the only one that is supported. We can choose to allow
+    // any of hub's dependencies here too though.
+    if (packageName === '@cardstack/hub') {
+      return __dirname;
+    }
+    throw new Error(`peerDependency ${packageName} is not available to cards`);
   }
 }
 
