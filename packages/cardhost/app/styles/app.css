@@ -120,6 +120,10 @@ a:hover {
   z-index: var(--ch-actions-z-index);
 }
 
+.card-renderer--top-edge-buttons button + button {
+  margin-left: 10px;
+}
+
 .card-schema-updator--search-bar {
   position: absolute;
   right: var(--ch-spacing);
@@ -139,44 +143,6 @@ a:hover {
   text-align: right;
 }
 
-.loading-spinner {
-  display: inline-block;
-  position: absolute;
-  top: 0;
-  right: 20px;
-  width: 20px;
-  height: 20px;
-}
-
-.loading-spinner div {
-  box-sizing: border-box;
-  display: block;
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  margin: 8px;
-  border: 2px solid black;
-  border-radius: 50%;
-  animation: loading-spinner 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-  border-color: black transparent transparent transparent;
-}
-.loading-spinner div:nth-child(1) {
-  animation-delay: -0.45s;
-}
-.loading-spinner div:nth-child(2) {
-  animation-delay: -0.3s;
-}
-.loading-spinner div:nth-child(3) {
-  animation-delay: -0.15s;
-}
-@keyframes loading-spinner {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
 
 /* JSON card document */
 .cardhost-card-document {

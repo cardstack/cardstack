@@ -1,28 +1,26 @@
 <div class="cardhost-top-edge {{@mode}}" data-test-cardhost-top-edge>
-  {{#cardstack-session as |session|}}
-    <div class="login-box {{if session.isAuthenticated "" "full-width"}}">
-      {{#if session.isAuthenticated }}
-        <button
-          class="ch-button ch-button--secondary"
-          id="logout-button"
-          onclick={{action this.logout session.logout}}
-        >
-          Logout
-        </button>
-      {{else}}
-        {{#mock-login as |login|}}
-          <button
-            id="login-button"
-            class="ch-button"
-            onclick={{action login "user1"}}
-            data-test-cardstack="login-button"
-          >
-            Login
-          </button>
-        {{/mock-login}}
-      {{/if}}
-    </div>
-  {{/cardstack-session}}
-
   {{yield}}
+
+  {{#cardstack-session as |session|}}
+    {{#if session.isAuthenticated }}
+      <Cta
+        id="logout-button"
+        onclick={{action this.logout session.logout}}
+        @label="Logout"
+        @variant="secondary"
+        @theme="cs-dark"
+        class="logout-btn" />
+    {{else}}
+      {{#mock-login as |login|}}
+        <Cta
+          id="login-button"
+          onclick={{action login "user1"}}
+          @label="Login"
+          @variant="secondary primary"
+          @theme="cs-dark"
+          class="login-btn"
+          data-test-cardstack="login-button" />
+      {{/mock-login}}
+    {{/if}}
+  {{/cardstack-session}}
 </div>
