@@ -12,6 +12,8 @@ export class ModuleService {
 
   activeCards = new Map() as Map<string, Promise<void>>;
 
+  writeCounter = 0;
+
   async load(card: Card, localModulePath: string, exportedName = 'default'): Promise<any> {
     // using md5 because this is just for cache validation, not cryptographic
     // collision resistance
@@ -56,6 +58,7 @@ export class ModuleService {
       // we didn't, we still want to cache our empty card.
       await mkdirp(outDir);
     }
+    this.writeCounter++;
   }
 
   private async writeCardFiles(files: CardFiles, outDir: string): Promise<boolean> {

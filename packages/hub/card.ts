@@ -415,9 +415,13 @@ export interface CardFiles {
   [filename: string]: string | CardFiles;
 }
 
-function assertCSFiles(files: any): asserts files is CardFiles {
+function assertCSFiles(files: any, pathContext = [] as string[]): asserts files is CardFiles {
   if (!isPlainObject(files)) {
-    throw new Error(`csFiles must be an object`);
+    if (pathContext.length === 0) {
+      throw new Error(`csFiles must be an object`);
+    } else {
+      throw new Error(`invalid csFiles contents for file ${pathContext.join('/')}`);
+    }
   }
   for (let [name, value] of Object.entries(files)) {
     if (name.includes('/')) {
@@ -426,7 +430,7 @@ function assertCSFiles(files: any): asserts files is CardFiles {
     if (typeof value === 'string') {
       continue;
     }
-    assertCSFiles(value);
+    assertCSFiles(value, [...pathContext, name]);
   }
 }
 

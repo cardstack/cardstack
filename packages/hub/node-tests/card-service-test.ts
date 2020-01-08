@@ -353,5 +353,44 @@ describe('hub/card-service', function() {
         `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
       ]);
     });
+
+    it('rejects csFiles with slashes in filenames', async function() {
+      let doc = testCard().jsonapi;
+      doc.data.attributes!.csFiles = { 'bad/slash': '123' };
+      try {
+        await service
+          .as(Session.INTERNAL_PRIVILEGED)
+          .instantiate(doc, { csRealm: `${myOrigin}/api/realms/first-ephemeral-realm`, csId: '1' });
+        throw new Error(`should not get here`);
+      } catch (err) {
+        expect(err.message).to.match(/filename bad\/slash in csFiles cannot contain a slash/);
+      }
+    });
+
+    it('rejects csFiles with non-string file contents', async function() {
+      let doc = testCard().jsonapi;
+      doc.data.attributes!.csFiles = 42;
+      try {
+        await service
+          .as(Session.INTERNAL_PRIVILEGED)
+          .instantiate(doc, { csRealm: `${myOrigin}/api/realms/first-ephemeral-realm`, csId: '1' });
+        throw new Error(`should not get here`);
+      } catch (err) {
+        expect(err.message).to.match(/csFiles must be an object/);
+      }
+    });
+
+    it('rejects csFiles with a non-string file inside', async function() {
+      let doc = testCard().jsonapi;
+      doc.data.attributes!.csFiles = { outer: { bad: 123 } };
+      try {
+        await service
+          .as(Session.INTERNAL_PRIVILEGED)
+          .instantiate(doc, { csRealm: `${myOrigin}/api/realms/first-ephemeral-realm`, csId: '1' });
+        throw new Error(`should not get here`);
+      } catch (err) {
+        expect(err.message).to.match(/invalid csFiles contents for file outer\/bad/);
+      }
+    });
   });
 });

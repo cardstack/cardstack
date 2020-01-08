@@ -37,6 +37,25 @@ describe('module-service', function() {
     expect(validate(41)).to.equal(false);
   });
 
+  it('modules loads are cached at the card level', async function() {
+    let sampleValidator = `let other = require('./other');
+    module.exports = function isValid(value){ return value === other(); }
+  `;
+    let other = `module.exports = function(){ return 'the-value'; }`;
+    let card = await cards.create(
+      `${myOrigin}/api/realms/first-ephemeral-realm`,
+      testCard().withAttributes({
+        csFiles: {
+          'validate.js': sampleValidator,
+          'other.js': other,
+        },
+      }).jsonapi
+    );
+    await modules.load(card, 'validate.js', 'default');
+    await modules.load(card, 'other.js');
+    expect(modules.writeCounter).to.equal(1);
+  });
+
   it('can access a feature that is a named export within the card', async function() {
     let sampleValidator = `exports.v = function isValid(value){ return value === 42; }`;
     let card = await cards.create(
@@ -87,7 +106,7 @@ describe('module-service', function() {
     expect(await validate(41, undefined as any)).to.equal(false);
   });
 
-  it('allows feature code to import from hub peerDependency', async function() {
+  it.skip('allows feature code to import from hub peerDependency', async function() {
     let sampleValidator = `const CardstackError = require('@cardstack/hub/error').default;
        module.exports = function shouldThrow(value){ throw new CardstackError('it worked', { title: 'it worked', status: 654 }) }
      `;
@@ -112,7 +131,31 @@ describe('module-service', function() {
     }
   });
 
-  it.skip('handles invalid JS inside the card', async function() {});
-  it.skip('handles a slash in filename in csFiles', async function() {});
-  it.skip('handles non-object directory within csFiles', async function() {});
+  it('handles invalid JS inside the card', async function() {
+    let invalidJS = `function(){`;
+    let goodJS = `exports.good = 42;`;
+    let card = await cards.create(
+      `${myOrigin}/api/realms/first-ephemeral-realm`,
+      testCard().withAttributes({
+        csPeerDependencies: {
+          '@cardstack/hub': '*',
+        },
+        csFiles: {
+          'bad.js': invalidJS,
+          'good.js': goodJS,
+        },
+      }).jsonapi
+    );
+
+    try {
+      await modules.load(card, 'bad.js');
+      throw new Error(`should not get here`);
+    } catch (err) {
+      expect(err instanceof SyntaxError).equals(true, `exception should have been a syntax error (${err})`);
+    }
+    expect(modules.writeCounter).to.equal(1);
+
+    expect(await modules.load(card, 'good.js', 'good')).to.equal(42);
+    expect(modules.writeCounter).to.equal(1);
+  });
 });
