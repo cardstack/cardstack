@@ -54,7 +54,7 @@ export default class DataService extends Service {
   }
 
   async allCardsInStore() {
-    let isolatedCards = await Promise.all(
+    let isolatedCards = await Promise.allSettled(
       [...store.isolated.keys()].map(
         async id =>
           new Card({
@@ -65,7 +65,7 @@ export default class DataService extends Service {
           })
       )
     );
-    let embeddedCards = await Promise.all(
+    let embeddedCards = await Promise.allSettled(
       difference([...store.embedded.keys()], [...store.isolated.keys()]).map(
         async id =>
           new Card({
@@ -1207,7 +1207,8 @@ async function load(session, id, format) {
 
   let json = await response.json();
   if (!response.ok) {
-    throw new Error(`Cannot load card ${response.status}: ${response.statusText}`, json);
+    // throw new Error(`Cannot load card ${response.status}: ${response.statusText}`, json);
+    console.error(`Cannot load card ${response.status}: ${response.statusText}`, json);
   }
   return json;
 }

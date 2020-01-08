@@ -14,18 +14,32 @@ export default class IndexRoute extends Route {
   async model() {
     let ids = this.cardLocalStorage.getRecentCardIds();
 
-    ids.forEach(id => {
-      this.data.getCard(id, 'isolated');
-    });
+    let cards = [];
+    if (environment === 'development') {
+      // prime the store with seed models
+      let defaults = await this.data.getCard('local-hub::why-doors', 'embedded');
+      cards.push(defaults);
+    }
 
-    let resolvedAndRejectedCards = await this.data.allCardsInStore();
-    let catalog = resolvedAndRejectedCards.filter(card => card !== undefined);
+    // come back to handle this better for async
+    // ids.forEach(id => {
+    let recent;
+    try {
+      recent = await this.data.getCard(ids[0], 'embedded');
+      if (recent) cards.push(recent);
+    } catch (err) {
+      console.log('fail', err);
+    }
+    // });
+
+    // let resolvedAndRejectedCards = await this.data.allCardsInStore();
+    // let catalog = resolvedAndRejectedCards.filter(card => card !== undefined);
 
     return await hash({
       // TODO need to refactor this once we have search support for cards.
       // For now we're just hardcoding a list of templates to load, and pretending
       // that the local store is the catalog.
-      catalog: catalog,
+      catalog: cards,
       templates: Promise.all(cardTemplates.map(i => this.data.getCard(i, 'embedded'))),
     });
   }
