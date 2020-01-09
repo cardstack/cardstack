@@ -264,11 +264,10 @@ export class Card {
         let value = await this.value(fieldName);
         let field = await this.field(fieldName);
         if (value instanceof Card) {
-          // this is here to avoid an uglier and harder-to-understand error when
-          // pg fails to serialize a Card instance
-          throw new Error(`unimplemented: nested card within searchdoc`);
+          doc[`${field.enclosingCard.canonicalURL}/${fieldName}`] = await value.asSearchDoc();
+        } else {
+          doc[`${field.enclosingCard.canonicalURL}/${fieldName}`] = value;
         }
-        doc[`${field.enclosingCard.canonicalURL}/${fieldName}`] = value;
       }
     }
 

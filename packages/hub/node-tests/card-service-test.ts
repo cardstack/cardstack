@@ -3,6 +3,7 @@ import { Session } from '../session';
 import { myOrigin } from '../origin';
 import { testCard } from './test-card';
 import CardsService, { ScopedCardService } from '../cards-service';
+import { AddressableCard } from '../card';
 
 describe('hub/card-service', function() {
   describe('read-write', function() {
@@ -248,6 +249,57 @@ describe('hub/card-service', function() {
         expect(err).hasStatus(400);
         expect(err.detail).to.match(/field title on card .* failed type validation for value: 42/);
       }
+    });
+
+    describe('composite field', function() {
+      let addressCard: AddressableCard, userCard: AddressableCard;
+
+      beforeEach(async function() {
+        addressCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('streetAddress', 'string-field')
+            .withField('city', 'string-field')
+            .withField('state', 'string-field')
+            .withField('zip', 'string-field').jsonapi
+        );
+        userCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('name', 'string-field')
+            .withField('address', addressCard).jsonapi
+        );
+      });
+
+      it('can set a composite field in a card as card value', async function() {
+        let validUser = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Mango',
+              address: {
+                attributes: {
+                  streetAddress: '123 Bone St.',
+                  city: 'Barkyville',
+                  state: 'MA',
+                  zip: '01234',
+                },
+              },
+            })
+            .adoptingFrom(userCard).jsonapi
+        );
+
+        expect(validUser).to.be.ok;
+        expect(await validUser.value('name')).to.equal('Mango');
+        let validAddress = await validUser.value('address');
+        expect(await validAddress.value('streetAddress')).to.equal('123 Bone St.');
+      });
+
+      it.skip('can patch an interior field within a composite field of a card', async function() {});
+      it.skip('rejects invalid composite field value', async function() {});
+      it.skip('rejects composite field value with unknown field', async function() {});
+      it.skip('can set a composite field in a card as card reference', async function() {});
+      it.skip('rejects a card reference that is not the correct card type', async function() {});
     });
   });
 
