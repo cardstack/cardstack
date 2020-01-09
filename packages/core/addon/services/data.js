@@ -54,7 +54,7 @@ export default class DataService extends Service {
   }
 
   async allCardsInStore() {
-    let isolatedCards = await Promise.allSettled(
+    let isolatedCards = await Promise.all(
       [...store.isolated.keys()].map(
         async id =>
           new Card({
@@ -65,7 +65,7 @@ export default class DataService extends Service {
           })
       )
     );
-    let embeddedCards = await Promise.allSettled(
+    let embeddedCards = await Promise.all(
       difference([...store.embedded.keys()], [...store.isolated.keys()]).map(
         async id =>
           new Card({
