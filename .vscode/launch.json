@@ -36,7 +36,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can set a composite field"]
+      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "rejects a card reference that is not the correct card type"]
     },
     {
       "type": "node",

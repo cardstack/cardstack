@@ -387,10 +387,47 @@ export class FieldCard extends Card {
 
   async validateReference(
     _priorReference: CardId | undefined,
-    _newReference: CardId | undefined,
+    newReference: CardId | undefined,
     _realm: AddressableCard
   ) {
-    // TODO
+    if (!newReference) {
+      return;
+    }
+    // just validating that newReference adopts from the same parent as the field card for now...
+    let fieldType = await this.adoptsFrom();
+    if (!fieldType) {
+      return;
+    }
+
+    // I don't think we should allow references to cards that don't exist yet.
+    // We can get into really awkward situations where a relationship to a
+    // not-yet-created card would imply the not-yet-created-card to have a
+    // particular card type and you would get a validation error when you create
+    // your not-yet-created card because some other card has assumptions about
+    // what kind of card you should be. This could even be extended to multiple
+    // cards having a relationship to a not-yet-created-card with conflicting
+    // card-types that has an impossible adoption chain--thereby preventing any
+    // card with the referenced card ID from ever being created (potential
+    // attack vector?). The only situation where this would not be a problem
+    // would be if the field card adopts directly from the base card (meaning
+    // any card can be present in this field).
+    let referencedCard = await this.service.get(newReference); // let a 404 error be thrown when not found
+    let card = referencedCard;
+    while (card) {
+      let parent = await card.adoptsFrom();
+      if (!parent) {
+        break;
+      }
+      if (parent.canonicalURL === fieldType.canonicalURL) {
+        return;
+      }
+      card = parent;
+    }
+
+    throw new CardstackError(
+      `field ${this.name} on card ${this.enclosingCard.canonicalURL} failed card-type validation for reference: ${referencedCard.canonicalURL}. The referenced card must adopt from: ${fieldType.canonicalURL}`,
+      { status: 400 }
+    );
   }
 
   async deserializeValue(value: any): Promise<any> {

@@ -251,7 +251,7 @@ describe('hub/card-service', function() {
       }
     });
 
-    describe('composite field', function() {
+    describe('fields filled with cards', function() {
       let addressCard: AddressableCard, userCard: AddressableCard;
 
       beforeEach(async function() {
@@ -277,14 +277,12 @@ describe('hub/card-service', function() {
           testCard()
             .withAttributes({
               name: 'Mango',
-              address: {
-                attributes: {
-                  streetAddress: '123 Bone St.',
-                  city: 'Barkyville',
-                  state: 'MA',
-                  zip: '01234',
-                },
-              },
+              address: testCard().withAttributes({
+                streetAddress: '123 Bone St.',
+                city: 'Barkyville',
+                state: 'MA',
+                zip: '01234',
+              }).jsonapi.data, // not specifying adoptingFrom(), since that is inferred from the field definition
             })
             .adoptingFrom(userCard).jsonapi
         );
@@ -295,11 +293,143 @@ describe('hub/card-service', function() {
         expect(await validAddress.value('streetAddress')).to.equal('123 Bone St.');
       });
 
-      it.skip('can patch an interior field within a composite field of a card', async function() {});
-      it.skip('rejects invalid composite field value', async function() {});
-      it.skip('rejects composite field value with unknown field', async function() {});
-      it.skip('can set a composite field in a card as card reference', async function() {});
-      it.skip('rejects a card reference that is not the correct card type', async function() {});
+      it('can patch an interior field within a composite field of a card', async function() {
+        let validUser = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Mango',
+              address: testCard().withAttributes({
+                streetAddress: '123 Bone St.',
+                city: 'Barkyville',
+                state: 'MA',
+                zip: '01234',
+              }).jsonapi.data,
+            })
+            .adoptingFrom(userCard).jsonapi
+        );
+
+        let updatedUser = await service.update(validUser, {
+          data: {
+            type: 'cards',
+            attributes: {
+              address: {
+                attributes: {
+                  state: 'NY',
+                },
+              },
+            },
+          },
+        });
+
+        let address = await updatedUser.value('address');
+        expect(await address.value('streetAddress')).to.equal('123 Bone St.');
+        expect(await address.value('state')).to.equal('NY');
+      });
+
+      it('applies field type validation to interior field of composite field', async function() {
+        let doc = testCard()
+          .withAttributes({
+            name: 'Mango',
+            address: {
+              attributes: {
+                streetAddress: true,
+              },
+            },
+          })
+          .adoptingFrom(userCard);
+
+        try {
+          await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+          throw new Error(`should not have been able to create`);
+        } catch (err) {
+          expect(err).hasStatus(400);
+          expect(err.detail).to.match(/field streetAddress on card .* failed type validation for value: true/);
+        }
+      });
+
+      it('rejects composite field value with unknown interior field', async function() {
+        let doc = testCard()
+          .withAttributes({
+            name: 'Mango',
+            address: {
+              attributes: {
+                badField: 'this is not a valid field',
+              },
+            },
+          })
+          .adoptingFrom(userCard);
+
+        try {
+          await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+          throw new Error(`should not have been able to create`);
+        } catch (err) {
+          expect(err).hasStatus(400);
+          expect(err.detail).to.match(/no such field "badField"/);
+        }
+      });
+
+      it('can set a field with a card reference', async function() {
+        let homeAddress = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              streetAddress: '123 Bone St.',
+              city: 'Barkyville',
+              state: 'MA',
+              zip: '01234',
+            })
+            .adoptingFrom(addressCard).jsonapi
+        );
+
+        let user = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({ name: 'Mango' })
+            .withRelationships({ address: homeAddress })
+            .adoptingFrom(userCard).jsonapi
+        );
+
+        expect(user).to.be.ok;
+        expect(await user.value('name')).to.equal('Mango');
+        let validAddress = await user.value('address');
+        expect(await validAddress.value('streetAddress')).to.equal('123 Bone St.');
+      });
+
+      it('rejects a card reference that is not the correct card type', async function() {
+        let nonAddressCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('streetAddress', 'string-field')
+            .withField('city', 'string-field')
+            .withField('state', 'string-field')
+            .withField('zip', 'string-field').jsonapi
+        );
+        let notActuallyAnAddress = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              streetAddress: '123 Bone St.',
+              city: 'Barkyville',
+              state: 'MA',
+              zip: '01234',
+            })
+            .adoptingFrom(nonAddressCard).jsonapi
+        );
+
+        let doc = testCard()
+          .withAttributes({ name: 'Mango' })
+          .withRelationships({ address: notActuallyAnAddress })
+          .adoptingFrom(userCard);
+
+        try {
+          await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+          throw new Error(`should not have been able to create`);
+        } catch (err) {
+          expect(err).hasStatus(400);
+          expect(err.detail).to.match(/field address on card .* failed card-type validation/);
+        }
+      });
     });
   });
 
