@@ -235,7 +235,7 @@ describe('hub/card-service', function() {
       }
     });
 
-    it('applies field type validation at create', async function() {
+    it('applies string field type validation at create', async function() {
       let doc = testCard()
         .withAttributes({
           title: 42,
@@ -249,6 +249,162 @@ describe('hub/card-service', function() {
         expect(err).hasStatus(400);
         expect(err.detail).to.match(/field title on card .* failed type validation for value: 42/);
       }
+
+      doc = testCard()
+        .withAttributes({
+          title: 'test',
+        })
+        .withField('title', 'string-field');
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+      expect(card).is.ok;
+      expect(await card.value('title')).to.equal('test');
+    });
+
+    it('applies boolean field type validation at create', async function() {
+      let doc = testCard()
+        .withAttributes({
+          isCool: 42,
+        })
+        .withField('isCool', 'boolean-field');
+
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(/field isCool on card .* failed type validation for value: 42/);
+      }
+      doc = testCard()
+        .withAttributes({
+          isCool: true,
+        })
+        .withField('isCool', 'boolean-field');
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+      expect(card).is.ok;
+      expect(await card.value('isCool')).to.equal(true);
+    });
+
+    it('applies integer field type validation at create', async function() {
+      let doc = testCard()
+        .withAttributes({
+          puppyCount: 'what',
+        })
+        .withField('puppyCount', 'integer-field');
+
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(/field puppyCount on card .* failed type validation for value: "what"/);
+      }
+      doc = testCard()
+        .withAttributes({
+          puppyCount: 42,
+        })
+        .withField('puppyCount', 'integer-field');
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+      expect(card).is.ok;
+      expect(await card.value('puppyCount')).to.equal(42);
+    });
+
+    it('applies string field type validation during update', async function() {
+      let card = await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        testCard().withField('title', 'string-field').jsonapi
+      );
+
+      try {
+        await service.update(card, {
+          data: {
+            type: 'cards',
+            attributes: {
+              title: 42,
+            },
+          },
+        });
+        throw new Error(`should not have been able to update`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(/field title on card .* failed type validation for value: 42/);
+      }
+
+      let updatedCard = await service.update(card, {
+        data: {
+          type: 'cards',
+          attributes: {
+            title: 'test',
+          },
+        },
+      });
+      expect(updatedCard).is.ok;
+      expect(await updatedCard.value('title')).to.equal('test');
+    });
+
+    it('applies boolean field type validation during update', async function() {
+      let card = await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        testCard().withField('isCool', 'boolean-field').jsonapi
+      );
+
+      try {
+        await service.update(card, {
+          data: {
+            type: 'cards',
+            attributes: {
+              isCool: 42,
+            },
+          },
+        });
+        throw new Error(`should not have been able to update`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(/field isCool on card .* failed type validation for value: 42/);
+      }
+
+      let updatedCard = await service.update(card, {
+        data: {
+          type: 'cards',
+          attributes: {
+            isCool: true,
+          },
+        },
+      });
+      expect(updatedCard).is.ok;
+      expect(await updatedCard.value('isCool')).to.equal(true);
+    });
+
+    it('applies integer field type validation during update', async function() {
+      let card = await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        testCard().withField('puppyCount', 'integer-field').jsonapi
+      );
+
+      try {
+        await service.update(card, {
+          data: {
+            type: 'cards',
+            attributes: {
+              puppyCount: 'what',
+            },
+          },
+        });
+        throw new Error(`should not have been able to update`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(/field puppyCount on card .* failed type validation for value: "what"/);
+      }
+
+      let updatedCard = await service.update(card, {
+        data: {
+          type: 'cards',
+          attributes: {
+            puppyCount: 42,
+          },
+        },
+      });
+      expect(updatedCard).is.ok;
+      expect(await updatedCard.value('puppyCount')).to.equal(42);
     });
 
     describe('fields filled with cards', function() {
