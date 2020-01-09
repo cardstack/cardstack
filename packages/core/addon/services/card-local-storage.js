@@ -130,7 +130,13 @@ export default Service.extend({
     if (cardIds.indexOf(id) === -1) {
       // prevent duplicates
       cardIds.push(id);
-      localStorage.setItem('recentCardIds', JSON.stringify(cardIds));
+      // Per documentation, you should catch errors because private
+      // browsers disallow setting items and will throw exceptions
+      try {
+        localStorage.setItem('recentCardIds', JSON.stringify(cardIds));
+      } catch (err) {
+        throw err;
+      }
     }
   },
 

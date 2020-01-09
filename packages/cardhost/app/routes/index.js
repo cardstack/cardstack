@@ -2,8 +2,6 @@ import Route from '@ember/routing/route';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import ENV from '@cardstack/cardhost/config/environment';
-import { hash } from 'rsvp';
-import { restartableTask } from 'ember-concurrency-decorators';
 import { Promise } from 'rsvp';
 
 const { environment, cardTemplates = [] } = ENV;
@@ -12,38 +10,36 @@ export default class IndexRoute extends Route {
   @service data;
   @service cardLocalStorage;
 
+  /** Get card ids from local storage, plus templates
+   * and seed data, and return them from the model hook.
+   * If a card is not found, remove it from local storage
+   * and try again to render the page.
+   */
   async model() {
     let ids = this.cardLocalStorage.getRecentCardIds();
-
-    let cards = [];
-    if (environment === 'development') {
-      // prime the store with seed models
-      let defaults = await this.data.getCard('local-hub::why-doors', 'embedded');
-      cards.push(defaults);
-    }
 
     let recent = [];
     for (let id of ids) {
       recent.push(
-        this.data.getCard(id, 'embedded').catch(err => {
-          // if err is 404, return null
-          // then filter on null
-          console.log(err);
-          // TODO handle removing specific ID
-          localStorage.setItem('recentCardIds', JSON.stringify([]));
-          // can probably remove this if we remove Boolean
-          return null;
+        await this.data.getCard(id, 'embedded').catch(err => {
+          // if there is a 404'd card in local storage, remove it
+          if (err.message.includes('404')) {
+            this.cardLocalStorage.removeRecentCardId(id);
+            return null;
+          } else {
+            throw err;
+          }
         })
       );
     }
 
-    debugger;
+    if (environment === 'development') {
+      // prime the store with seed models
+      recent.push(await this.data.getCard('local-hub::why-doors', 'embedded'));
+    }
+
     return {
-      // TODO need to refactor this once we have search support for cards.
-      // For now we're just hardcoding a list of templates to load, and pretending
-      // that the local store is the catalog.
-      // see if we can get rid of this filter, since we check for things on error
-      catalog: (await Promise.all(recent)).filter(Boolean),
+      catalog: recent.filter(Boolean),
       templates: await Promise.all(cardTemplates.map(i => this.data.getCard(i, 'embedded'))),
     };
   }
@@ -55,8 +51,10 @@ export default class IndexRoute extends Route {
 
   @action
   error(err, transition) {
-    // check for error type before we retry
-    console.log(err);
-    transition.retry();
+    // Check for error type before we retry, else fall back on automatic Ember behavior.
+    // Without this, the page falls apart if a card is missing.
+    if (err.message.includes('404')) {
+      return transition.retry();
+    }
   }
 }
