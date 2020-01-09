@@ -133,4 +133,14 @@ export default Service.extend({
       localStorage.setItem('recentCardIds', JSON.stringify(cardIds));
     }
   },
+
+  /**
+   * Accepts the card id as a string, i.e. "local-hub::my-card-id".
+   * Removes an id from the local storage array.
+   */
+  removeRecentCardId(id) {
+    let cardIds = this.getRecentCardIds();
+    cardIds = cardIds.filter(item => item !== id);
+    localStorage.setItem('recentCardIds', JSON.stringify(cardIds));
+  },
 });
