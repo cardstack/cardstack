@@ -1207,8 +1207,7 @@ async function load(session, id, format) {
 
   let json = await response.json();
   if (!response.ok) {
-    // throw new Error(`Cannot load card ${response.status}: ${response.statusText}`, json);
-    console.error(`Cannot load card ${response.status}: ${response.statusText}`, json);
+    throw new Error(`Cannot load card ${response.status}: ${response.statusText}`, json);
   }
   return json;
 }

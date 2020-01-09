@@ -4,6 +4,7 @@ import { inject as service } from '@ember/service';
 import ENV from '@cardstack/cardhost/config/environment';
 import { hash } from 'rsvp';
 import { restartableTask } from 'ember-concurrency-decorators';
+import { Promise } from 'rsvp';
 
 const { environment, cardTemplates = [] } = ENV;
 
@@ -21,33 +22,41 @@ export default class IndexRoute extends Route {
       cards.push(defaults);
     }
 
-    // come back to handle this better for async
-    // ids.forEach(id => {
-    let recent;
-    for await (let id of ids) {
-      try {
-        recent = await this.data.getCard(id, 'embedded');
-        if (recent.json.errors.length > 0) cards.push(recent);
-      } catch (err) {
-        console.log('fail', err);
-      }
+    let recent = [];
+    for (let id of ids) {
+      recent.push(
+        this.data.getCard(id, 'embedded').catch(err => {
+          // if err is 404, return null
+          // then filter on null
+          console.log(err);
+          // TODO handle removing specific ID
+          localStorage.setItem('recentCardIds', JSON.stringify([]));
+          // can probably remove this if we remove Boolean
+          return null;
+        })
+      );
     }
-    // });
 
-    // let resolvedAndRejectedCards = await this.data.allCardsInStore();
-    // let catalog = resolvedAndRejectedCards.filter(card => card !== undefined);
-
-    return await hash({
+    debugger;
+    return {
       // TODO need to refactor this once we have search support for cards.
       // For now we're just hardcoding a list of templates to load, and pretending
       // that the local store is the catalog.
-      catalog: cards,
-      templates: Promise.all(cardTemplates.map(i => this.data.getCard(i, 'embedded'))),
-    });
+      // see if we can get rid of this filter, since we check for things on error
+      catalog: (await Promise.all(recent)).filter(Boolean),
+      templates: await Promise.all(cardTemplates.map(i => this.data.getCard(i, 'embedded'))),
+    };
   }
 
   @action
   refreshModel() {
     this.refresh();
+  }
+
+  @action
+  error(err, transition) {
+    // check for error type before we retry
+    console.log(err);
+    transition.retry();
   }
 }
