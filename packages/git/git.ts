@@ -1,11 +1,9 @@
 import {
-  Branch as NGBranch,
   Commit as NGCommit,
   Cred as NGCred,
   Merge as NGMerge,
   Oid as NGOid,
   Repository as NGRepository,
-  Reference as NGReference,
   Index as NGIndex,
   Reset as NGReset,
   Signature as NGSignature,
@@ -22,8 +20,12 @@ import {
   addRemote as igAddRemote,
   clone as igClone,
   init as igInit,
+  listBranches as igListBranches,
   plugins as igPlugins,
   push as igPush,
+  findMergeBase as igFindMergeBase,
+  resolveRef as igResolveRef,
+  writeRef as igWriteRef,
 } from 'isomorphic-git';
 
 igPlugins.set('fs', fs);
@@ -92,6 +94,10 @@ export class Repository {
     return this.ngrepo.path();
   }
 
+  gitdir() {
+    return this.ngrepo.path();
+  }
+
   async getMasterCommit(): Promise<Commit> {
     return new Commit(await this.ngrepo.getMasterCommit());
   }
@@ -120,13 +126,13 @@ export class Repository {
     await this.ngrepo.getReference(branchName);
   }
 
-  async createBranch(targetBranch: string, headCommit: Commit, force: boolean): Promise<Reference> {
-    let ngreference = await this.ngrepo.createBranch(targetBranch, headCommit.getNgCommit(), force);
-    return new Reference(ngreference);
+  async createBranch(targetBranch: string, headCommit: Commit): Promise<Reference> {
+    let ngreference = await this.ngrepo.createBranch(targetBranch, headCommit.getNgCommit());
+    return await Reference.lookup(this, ngreference.toString());
   }
 
   async checkoutBranch(reference: Reference) {
-    await this.ngrepo.checkoutBranch(reference.getNgReference());
+    await this.ngrepo.checkoutBranch(reference.toString());
   }
 
   async getHeadCommit() {
@@ -137,6 +143,30 @@ export class Repository {
   async getReferenceCommit(name: string): Promise<Commit> {
     let ngcommit = await this.ngrepo.getReferenceCommit(name);
     return new Commit(ngcommit);
+  }
+
+  async lookupLocalBranch(branchName: string) {
+    let branches = await igListBranches({ gitdir: this.gitdir() });
+
+    if (branches.includes(branchName)) {
+      return await this.lookupReference(`refs/heads/${branchName}`);
+    } else {
+      throw new BranchNotFound();
+    }
+  }
+
+  async lookupRemoteBranch(remote: string, branchName: string) {
+    let branches = await igListBranches({ gitdir: this.gitdir(), remote });
+
+    if (branches.includes(branchName)) {
+      return await this.lookupReference(`refs/remotes/${remote}/${branchName}`);
+    } else {
+      throw new BranchNotFound();
+    }
+  }
+
+  async lookupReference(reference: string) {
+    return await Reference.lookup(this, reference);
   }
 
   isBare() {
@@ -233,45 +263,42 @@ export class Oid {
     return other.toString() === this.toString();
   }
 }
-
-export class Branch {
-  static LOCAL = 1;
-  static REMOTE = 2;
-  static ALL = 3;
-
-  static async lookup(repo: Repository, branchName: string, branchType: number): Promise<Reference> {
-    let ngreference = await NGBranch.lookup(repo.getNgRepo(), branchName, branchType);
-    return new Reference(ngreference);
-  }
-
-  static async create(repo: Repository, branchName: string, target: Commit, force: boolean): Promise<Reference> {
-    let ngreference = await NGBranch.create(repo.getNgRepo(), branchName, target.getNgCommit(), force ? 1 : 0);
-    return new Reference(ngreference);
-  }
-
-  constructor(private readonly ngbranch: NGBranch) {}
-}
+export class BranchNotFound extends Error {}
 
 class Reference {
-  constructor(private readonly ngreference: NGReference) {}
+  constructor(private readonly repo: Repository, private readonly reference: string, private readonly sha: string) {}
+
+  static async lookup(repo: Repository, reference: string) {
+    let sha = await igResolveRef({
+      gitdir: repo.gitdir(),
+      ref: reference,
+    });
+
+    return new Reference(repo, reference, sha);
+  }
 
   target() {
-    return Oid.fromNGOid(this.ngreference.target());
+    return new Oid(this.sha);
   }
 
-  async setTarget(id: Oid, logMessage: string): Promise<void> {
-    await this.ngreference.setTarget(id.toNGOid(), logMessage);
+  async setTarget(id: Oid): Promise<void> {
+    await igWriteRef({
+      gitdir: this.repo.gitdir(),
+      ref: this.reference,
+      value: id.toString(),
+      force: true,
+    });
   }
 
-  getNgReference() {
-    return this.ngreference;
+  toString() {
+    return this.reference;
   }
 }
 
 export class Remote {
   static async create(repo: Repository, remote: string, url: string): Promise<Remote> {
     await igAddRemote({
-      gitdir: repo.path(),
+      gitdir: await repo.gitdir(),
       remote,
       url,
     });
@@ -285,7 +312,7 @@ export class Remote {
     await igPush(
       Object.assign(
         {
-          gitdir: this.repo.path(),
+          gitdir: await this.repo.gitdir(),
           remote: this.remote,
           ref,
           remoteRef,
@@ -334,8 +361,11 @@ export class Merge {
   static FASTFORWARD_ONLY = 2;
 
   static async base(repo: Repository, one: Oid, two: Oid): Promise<Oid> {
-    let ngoid = await NGMerge.base(repo.getNgRepo(), one.toNGOid(), two.toNGOid());
-    return Oid.fromNGOid(ngoid);
+    let oids = await igFindMergeBase({
+      gitdir: repo.gitdir(),
+      oids: [one.toString(), two.toString()],
+    });
+    return new Oid(oids[0]);
   }
 
   static async commits(repo: Repository, ourCommit: Commit, theirCommit: Commit): Promise<Index> {

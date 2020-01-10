@@ -1,4 +1,15 @@
-import { Index, Branch, Commit, Merge, Repository, Signature, Tree, FILEMODE, FetchOptions, CommitOpts } from './git';
+import {
+  Index,
+  Commit,
+  Merge,
+  Repository,
+  Signature,
+  Tree,
+  FILEMODE,
+  FetchOptions,
+  CommitOpts,
+  BranchNotFound,
+} from './git';
 
 import { NewEntry, MutableTree, NotFound, OverwriteRejected } from './mutable-tree';
 
@@ -154,7 +165,7 @@ export default class Change {
 
   async _pushCommit(mergeCommit: Commit) {
     const remoteBranchName = `temp-remote-${crypto.randomBytes(20).toString('hex')}`;
-    await Branch.create(this.repo, remoteBranchName, mergeCommit, false);
+    await this.repo.createBranch(remoteBranchName, mergeCommit);
 
     let remote = await this.repo.getRemote('origin');
 
@@ -208,12 +219,12 @@ export default class Change {
       return await this._newBranch(commit);
     }
 
-    let headRef = await Branch.lookup(this.repo, this.targetBranch, Branch.LOCAL);
-    await headRef.setTarget(commit.id(), 'fast forward');
+    let headRef = await this.repo.lookupLocalBranch(this.targetBranch);
+    await headRef.setTarget(commit.id());
   }
 
   async _newBranch(newCommit: Commit) {
-    await Branch.create(this.repo, this.targetBranch, newCommit, false);
+    await this.repo.createBranch(this.targetBranch, newCommit);
   }
 }
 
@@ -291,12 +302,12 @@ async function headCommit(repo: Repository, targetBranch: string, fetchOpts?: Fe
   let headRef;
   try {
     if (fetchOpts) {
-      headRef = await Branch.lookup(repo, `origin/${targetBranch}`, Branch.REMOTE);
+      headRef = await repo.lookupRemoteBranch('origin', targetBranch);
     } else {
-      headRef = await Branch.lookup(repo, targetBranch, Branch.LOCAL);
+      headRef = await repo.lookupLocalBranch(targetBranch);
     }
   } catch (err) {
-    if (err.errorFunction !== 'Branch.lookup') {
+    if (err.constructor !== BranchNotFound) {
       throw err;
     }
   }
