@@ -65,7 +65,7 @@
 
 */
 
-import { Repository, Branch, Commit, RemoteConfig, Tree, TreeEntry } from './git';
+import { Repository, Commit, RemoteConfig, Tree, TreeEntry } from './git';
 
 import Change from './change';
 import logger from '@cardstack/logger';
@@ -255,7 +255,7 @@ class GitUpdater {
   }
 
   async _commitAtBranch(branchName: string) {
-    let branch = await Branch.lookup(this.repo, branchName, Branch.LOCAL);
+    let branch = await this.repo.lookupLocalBranch(branchName);
     return Commit.lookup(this.repo, branch.target());
   }
 

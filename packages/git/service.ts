@@ -111,7 +111,7 @@ class GitLocalCache {
       if (e.message.startsWith('no reference found for shorthand')) {
         log.info('no local branch for %s on %s. Creating it now...', targetBranch, remoteUrl);
         let headCommit = await repo.getHeadCommit();
-        let ref = await repo.createBranch(targetBranch, headCommit, false);
+        let ref = await repo.createBranch(targetBranch, headCommit);
         await repo.checkoutBranch(ref);
         let remoteCommit = await repo.getReferenceCommit(`refs/remotes/origin/${targetBranch}`);
         Reset.hardReset(repo, remoteCommit);
