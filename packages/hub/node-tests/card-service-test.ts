@@ -2,7 +2,7 @@ import { createTestEnv, TestEnv } from './helpers';
 import { Session } from '../session';
 import { myOrigin } from '../origin';
 import { testCard } from './test-card';
-import CardsService, { ScopedCardService } from '../cards-service';
+import { ScopedCardService } from '../cards-service';
 import { AddressableCard } from '../card';
 
 describe('hub/card-service', function() {
@@ -591,160 +591,247 @@ describe('hub/card-service', function() {
 
   describe('readonly', function() {
     let env: TestEnv;
-    let service: CardsService;
+    let service: ScopedCardService;
 
     before(async function() {
       env = await createTestEnv();
-      service = await env.container.lookup('cards');
-      let scopedService = service.as(Session.INTERNAL_PRIVILEGED);
-      await scopedService.create(
-        `${myOrigin}/api/realms/first-ephemeral-realm`,
-        testCard().withAutoAttributes({ csId: '1' }).jsonapi
-      );
-      await scopedService.create(
-        `${myOrigin}/api/realms/first-ephemeral-realm`,
-        testCard().withAutoAttributes({ csId: '2' }).jsonapi
-      );
-      await scopedService.create(
-        `${myOrigin}/api/realms/first-ephemeral-realm`,
-        testCard().withAutoAttributes({
-          csId: '1',
-          csOriginalRealm: `http://example.com/api/realms/second-ephemeral-realm`,
-        }).jsonapi
-      );
-      await scopedService.create(
-        `${myOrigin}/api/realms/first-ephemeral-realm`,
-        testCard().withAutoAttributes({
-          csId: '2',
-          csOriginalRealm: `http://example.com/api/realms/second-ephemeral-realm`,
-        }).jsonapi
-      );
-      await scopedService.create(
-        `http://example.com/api/realms/second-ephemeral-realm`,
-        testCard().withAutoAttributes({ csId: '1' }).jsonapi
-      );
-      await scopedService.create(
-        `http://example.com/api/realms/second-ephemeral-realm`,
-        testCard().withAutoAttributes({ csId: '2' }).jsonapi
-      );
-      await scopedService.create(
-        `http://example.com/api/realms/second-ephemeral-realm`,
-        testCard().withAutoAttributes({
-          csId: '1',
-          csOriginalRealm: `${myOrigin}/api/realms/first-ephemeral-realm`,
-        }).jsonapi
-      );
-      await scopedService.create(
-        `http://example.com/api/realms/second-ephemeral-realm`,
-        testCard().withAutoAttributes({
-          csId: '2',
-          csOriginalRealm: `${myOrigin}/api/realms/first-ephemeral-realm`,
-        }).jsonapi
-      );
+      service = (await env.container.lookup('cards')).as(Session.EVERYONE);
     });
 
     after(async function() {
       await env.destroy();
     });
 
-    it('can filter by realm', async function() {
-      let { cards } = await service.as(Session.INTERNAL_PRIVILEGED).search({
-        filter: {
-          eq: { csRealm: `${myOrigin}/api/realms/first-ephemeral-realm` },
-        },
-      });
-      expect(cards.length).equals(4);
-      expect(cards.map(c => `${c.csRealm}/${c.csOriginalRealm}/${c.csId}`)).to.eql([
-        `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
-        `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/2`,
-        `${myOrigin}/api/realms/first-ephemeral-realm/${myOrigin}/api/realms/first-ephemeral-realm/1`,
-        `${myOrigin}/api/realms/first-ephemeral-realm/${myOrigin}/api/realms/first-ephemeral-realm/2`,
-      ]);
-    });
-
-    it('can filter by csOriginalRealm', async function() {
-      let { cards } = await service.as(Session.INTERNAL_PRIVILEGED).search({
-        filter: {
-          eq: { csOriginalRealm: `http://example.com/api/realms/second-ephemeral-realm` },
-        },
-      });
-      expect(cards.length).equals(4);
-      expect(cards.map(c => `${c.csRealm}/${c.csOriginalRealm}/${c.csId}`)).to.eql([
-        `http://example.com/api/realms/second-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
-        `http://example.com/api/realms/second-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/2`,
-        `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
-        `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/2`,
-      ]);
-    });
-
-    it('can filter by csId', async function() {
-      let { cards } = await service.as(Session.INTERNAL_PRIVILEGED).search({
-        filter: {
-          eq: { csId: '1' },
-        },
-      });
-      expect(cards.length).equals(4);
-      expect(cards.map(c => `${c.csRealm}/${c.csOriginalRealm}/${c.csId}`)).to.eql([
-        `http://example.com/api/realms/second-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
-        `http://example.com/api/realms/second-ephemeral-realm/${myOrigin}/api/realms/first-ephemeral-realm/1`,
-        `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
-        `${myOrigin}/api/realms/first-ephemeral-realm/${myOrigin}/api/realms/first-ephemeral-realm/1`,
-      ]);
-    });
-
-    it('can filter by csRealm and csId and csOriginalRealm', async function() {
-      let { cards } = await service.as(Session.INTERNAL_PRIVILEGED).search({
-        filter: {
-          eq: {
-            csRealm: `${myOrigin}/api/realms/first-ephemeral-realm`,
-            csOriginalRealm: 'http://example.com/api/realms/second-ephemeral-realm',
+    describe('system fields', function() {
+      before(async function() {
+        await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard().withAutoAttributes({ csId: '1' }).jsonapi
+        );
+        await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard().withAutoAttributes({ csId: '2' }).jsonapi
+        );
+        await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard().withAutoAttributes({
             csId: '1',
-          },
-        },
+            csOriginalRealm: `http://example.com/api/realms/second-ephemeral-realm`,
+          }).jsonapi
+        );
+        await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard().withAutoAttributes({
+            csId: '2',
+            csOriginalRealm: `http://example.com/api/realms/second-ephemeral-realm`,
+          }).jsonapi
+        );
+        await service.create(
+          `http://example.com/api/realms/second-ephemeral-realm`,
+          testCard().withAutoAttributes({ csId: '1' }).jsonapi
+        );
+        await service.create(
+          `http://example.com/api/realms/second-ephemeral-realm`,
+          testCard().withAutoAttributes({ csId: '2' }).jsonapi
+        );
+        await service.create(
+          `http://example.com/api/realms/second-ephemeral-realm`,
+          testCard().withAutoAttributes({
+            csId: '1',
+            csOriginalRealm: `${myOrigin}/api/realms/first-ephemeral-realm`,
+          }).jsonapi
+        );
+        await service.create(
+          `http://example.com/api/realms/second-ephemeral-realm`,
+          testCard().withAutoAttributes({
+            csId: '2',
+            csOriginalRealm: `${myOrigin}/api/realms/first-ephemeral-realm`,
+          }).jsonapi
+        );
       });
-      expect(cards.length).equals(1);
-      expect(cards.map(c => `${c.csRealm}/${c.csOriginalRealm}/${c.csId}`)).to.eql([
-        `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
-      ]);
+
+      it('can filter by csRealm', async function() {
+        let { cards } = await service.search({
+          filter: {
+            eq: { csRealm: `${myOrigin}/api/realms/first-ephemeral-realm` },
+          },
+        });
+        expect(cards.length).equals(4);
+        expect(cards.map(c => `${c.csRealm}/${c.csOriginalRealm}/${c.csId}`)).to.eql([
+          `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
+          `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/2`,
+          `${myOrigin}/api/realms/first-ephemeral-realm/${myOrigin}/api/realms/first-ephemeral-realm/1`,
+          `${myOrigin}/api/realms/first-ephemeral-realm/${myOrigin}/api/realms/first-ephemeral-realm/2`,
+        ]);
+      });
+
+      it('can filter by csOriginalRealm', async function() {
+        let { cards } = await service.search({
+          filter: {
+            eq: { csOriginalRealm: `http://example.com/api/realms/second-ephemeral-realm` },
+          },
+        });
+        expect(cards.length).equals(4);
+        expect(cards.map(c => `${c.csRealm}/${c.csOriginalRealm}/${c.csId}`)).to.eql([
+          `http://example.com/api/realms/second-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
+          `http://example.com/api/realms/second-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/2`,
+          `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
+          `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/2`,
+        ]);
+      });
+
+      it('can filter by csId', async function() {
+        let { cards } = await service.search({
+          filter: {
+            eq: { csId: '1' },
+          },
+        });
+        expect(cards.length).equals(4);
+        expect(cards.map(c => `${c.csRealm}/${c.csOriginalRealm}/${c.csId}`)).to.eql([
+          `http://example.com/api/realms/second-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
+          `http://example.com/api/realms/second-ephemeral-realm/${myOrigin}/api/realms/first-ephemeral-realm/1`,
+          `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
+          `${myOrigin}/api/realms/first-ephemeral-realm/${myOrigin}/api/realms/first-ephemeral-realm/1`,
+        ]);
+      });
+
+      it('can filter by csRealm and csId and csOriginalRealm', async function() {
+        let { cards } = await service.search({
+          filter: {
+            eq: {
+              csRealm: `${myOrigin}/api/realms/first-ephemeral-realm`,
+              csOriginalRealm: 'http://example.com/api/realms/second-ephemeral-realm',
+              csId: '1',
+            },
+          },
+        });
+        expect(cards.length).equals(1);
+        expect(cards.map(c => `${c.csRealm}/${c.csOriginalRealm}/${c.csId}`)).to.eql([
+          `${myOrigin}/api/realms/first-ephemeral-realm/http://example.com/api/realms/second-ephemeral-realm/1`,
+        ]);
+      });
+
+      it('rejects csFiles with slashes in filenames', async function() {
+        let doc = testCard().jsonapi;
+        doc.data.attributes!.csFiles = { 'bad/slash': '123' };
+        try {
+          await service.instantiate(doc, { csRealm: `${myOrigin}/api/realms/first-ephemeral-realm`, csId: '1' });
+          throw new Error(`should not get here`);
+        } catch (err) {
+          expect(err.message).to.match(/filename bad\/slash in csFiles cannot contain a slash/);
+        }
+      });
+
+      it('rejects csFiles with non-string file contents', async function() {
+        let doc = testCard().jsonapi;
+        doc.data.attributes!.csFiles = 42;
+        try {
+          await service.instantiate(doc, { csRealm: `${myOrigin}/api/realms/first-ephemeral-realm`, csId: '1' });
+          throw new Error(`should not get here`);
+        } catch (err) {
+          expect(err.message).to.match(/csFiles must be an object/);
+        }
+      });
+
+      it('rejects csFiles with a non-string file inside', async function() {
+        let doc = testCard().jsonapi;
+        doc.data.attributes!.csFiles = { outer: { bad: 123 } };
+        try {
+          await service.instantiate(doc, { csRealm: `${myOrigin}/api/realms/first-ephemeral-realm`, csId: '1' });
+          throw new Error(`should not get here`);
+        } catch (err) {
+          expect(err.message).to.match(/invalid csFiles contents for file outer\/bad/);
+        }
+      });
     });
 
-    it('rejects csFiles with slashes in filenames', async function() {
-      let doc = testCard().jsonapi;
-      doc.data.attributes!.csFiles = { 'bad/slash': '123' };
-      try {
-        await service
-          .as(Session.INTERNAL_PRIVILEGED)
-          .instantiate(doc, { csRealm: `${myOrigin}/api/realms/first-ephemeral-realm`, csId: '1' });
-        throw new Error(`should not get here`);
-      } catch (err) {
-        expect(err.message).to.match(/filename bad\/slash in csFiles cannot contain a slash/);
-      }
-    });
+    describe('user fields', function() {
+      let puppyCard: AddressableCard, mango: AddressableCard, vanGogh: AddressableCard;
+      before(async function() {
+        puppyCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('name', 'string-field')
+            .withField('weightInPounds', 'integer-field')
+            .withField('pottyTrained', 'boolean-field').jsonapi
+        );
+        vanGogh = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Van Gogh',
+              weightInPounds: 55,
+              pottyTrained: true,
+            })
+            .adoptingFrom(puppyCard).jsonapi
+        );
+        mango = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Mango',
+              weightInPounds: 7,
+              pottyTrained: false,
+            })
+            .adoptingFrom(puppyCard).jsonapi
+        );
+      });
 
-    it('rejects csFiles with non-string file contents', async function() {
-      let doc = testCard().jsonapi;
-      doc.data.attributes!.csFiles = 42;
-      try {
-        await service
-          .as(Session.INTERNAL_PRIVILEGED)
-          .instantiate(doc, { csRealm: `${myOrigin}/api/realms/first-ephemeral-realm`, csId: '1' });
-        throw new Error(`should not get here`);
-      } catch (err) {
-        expect(err.message).to.match(/csFiles must be an object/);
-      }
-    });
+      it('can equality filter by string user field', async function() {
+        let results = await service.search({
+          filter: {
+            type: puppyCard,
+            eq: {
+              name: 'Mango',
+            },
+          },
+        });
+        expect(results.cards.length).to.equal(1);
+        expect(results.cards[0].canonicalURL).to.equal(mango.canonicalURL);
+      });
 
-    it('rejects csFiles with a non-string file inside', async function() {
-      let doc = testCard().jsonapi;
-      doc.data.attributes!.csFiles = { outer: { bad: 123 } };
-      try {
-        await service
-          .as(Session.INTERNAL_PRIVILEGED)
-          .instantiate(doc, { csRealm: `${myOrigin}/api/realms/first-ephemeral-realm`, csId: '1' });
-        throw new Error(`should not get here`);
-      } catch (err) {
-        expect(err.message).to.match(/invalid csFiles contents for file outer\/bad/);
-      }
+      it('can equality filter by integer user field', async function() {
+        let results = await service.search({
+          filter: {
+            type: puppyCard,
+            eq: {
+              weightInPounds: 55,
+            },
+          },
+        });
+        expect(results.cards.length).to.equal(1);
+        expect(results.cards[0].canonicalURL).to.equal(vanGogh.canonicalURL);
+      });
+
+      it('can equality filter by boolean user field', async function() {
+        let results = await service.search({
+          filter: {
+            type: puppyCard,
+            eq: {
+              pottyTrained: true,
+            },
+          },
+        });
+        expect(results.cards.length).to.equal(1);
+        expect(results.cards[0].canonicalURL).to.equal(vanGogh.canonicalURL);
+
+        results = await service.search({
+          filter: {
+            type: puppyCard,
+            eq: {
+              pottyTrained: false,
+            },
+          },
+        });
+        expect(results.cards.length).to.equal(1);
+        expect(results.cards[0].canonicalURL).to.equal(mango.canonicalURL);
+      });
+
+      it.skip('any filter', async function() {});
+      it.skip('every filter', async function() {});
+      it.skip('range filter', async function() {});
+      it.skip('filtering fields with arity > 1', async function() {});
+      it.skip('can filter by interior field', async function() {});
     });
   });
 });
