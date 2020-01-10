@@ -890,6 +890,18 @@ describe('hub/card-service', function() {
         expect(ids).to.include.members([vanGogh.canonicalURL, ringo.canonicalURL]);
       });
 
+      it('can use a "not" condition in a filter', async function() {
+        let results = await service.search({
+          filter: {
+            type: puppyCard,
+            not: { eq: { name: 'Ringo' } },
+          },
+        });
+        expect(results.cards.length).to.equal(2);
+        let ids = results.cards.map(i => i.canonicalURL);
+        expect(ids).to.include.members([mango.canonicalURL, vanGogh.canonicalURL]);
+      });
+
       it.skip('filtering fields with arity > 1', async function() {});
       it.skip('can filter by interior field', async function() {});
     });
