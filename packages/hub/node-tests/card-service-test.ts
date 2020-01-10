@@ -746,7 +746,7 @@ describe('hub/card-service', function() {
     });
 
     describe('user fields', function() {
-      let puppyCard: AddressableCard, mango: AddressableCard, vanGogh: AddressableCard;
+      let puppyCard: AddressableCard, mango: AddressableCard, vanGogh: AddressableCard, ringo: AddressableCard;
       before(async function() {
         puppyCard = await service.create(
           `${myOrigin}/api/realms/first-ephemeral-realm`,
@@ -772,6 +772,16 @@ describe('hub/card-service', function() {
               name: 'Mango',
               weightInPounds: 7,
               pottyTrained: false,
+            })
+            .adoptingFrom(puppyCard).jsonapi
+        );
+        ringo = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Ringo',
+              weightInPounds: 60,
+              pottyTrained: true,
             })
             .adoptingFrom(puppyCard).jsonapi
         );
@@ -812,8 +822,9 @@ describe('hub/card-service', function() {
             },
           },
         });
-        expect(results.cards.length).to.equal(1);
-        expect(results.cards[0].canonicalURL).to.equal(vanGogh.canonicalURL);
+        expect(results.cards.length).to.equal(2);
+        let ids = results.cards.map(i => i.canonicalURL);
+        expect(ids).to.include.members([vanGogh.canonicalURL, ringo.canonicalURL]);
 
         results = await service.search({
           filter: {
@@ -827,9 +838,58 @@ describe('hub/card-service', function() {
         expect(results.cards[0].canonicalURL).to.equal(mango.canonicalURL);
       });
 
-      it.skip('any filter', async function() {});
-      it.skip('every filter', async function() {});
-      it.skip('range filter', async function() {});
+      it('can use a range filter against an integer field', async function() {
+        let results = await service.search({
+          filter: {
+            type: puppyCard,
+            range: {
+              weightInPounds: { gt: 50, lt: 70 },
+            },
+          },
+        });
+        expect(results.cards.length).to.equal(2);
+        let ids = results.cards.map(i => i.canonicalURL);
+        expect(ids).to.include.members([vanGogh.canonicalURL, ringo.canonicalURL]);
+      });
+
+      it('can use a range filter against a string field', async function() {
+        let results = await service.search({
+          filter: {
+            type: puppyCard,
+            range: {
+              name: { lte: 'Ringo' },
+            },
+          },
+        });
+        expect(results.cards.length).to.equal(2);
+        let ids = results.cards.map(i => i.canonicalURL);
+        expect(ids).to.include.members([mango.canonicalURL, ringo.canonicalURL]);
+      });
+
+      it('can use an "any" condition in a filter', async function() {
+        let results = await service.search({
+          filter: {
+            type: puppyCard,
+            any: [{ eq: { name: 'Van Gogh' } }, { eq: { name: 'Mango' } }],
+          },
+        });
+        expect(results.cards.length).to.equal(2);
+        let ids = results.cards.map(i => i.canonicalURL);
+        expect(ids).to.include.members([vanGogh.canonicalURL, mango.canonicalURL]);
+      });
+
+      it('can use an "every" condition in a filter', async function() {
+        let results = await service.search({
+          filter: {
+            type: puppyCard,
+            every: [{ eq: { pottyTrained: true } }, { range: { weightInPounds: { gt: 40 } } }],
+          },
+        });
+        expect(results.cards.length).to.equal(2);
+        let ids = results.cards.map(i => i.canonicalURL);
+        expect(ids).to.include.members([vanGogh.canonicalURL, ringo.canonicalURL]);
+      });
+
       it.skip('filtering fields with arity > 1', async function() {});
       it.skip('can filter by interior field', async function() {});
     });

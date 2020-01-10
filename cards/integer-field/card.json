@@ -4,7 +4,8 @@
     "attributes": {
       "csFeatures": {
         "field-validate": ["field-hooks.js", "validate"],
-        "field-deserialize": ["field-hooks.js", "deserialize"]
+        "field-deserialize": ["field-hooks.js", "deserialize"],
+        "field-buildQueryExpression": ["field-hooks.js", "buildQueryExpression"]
       }
     },
     "relationships": {

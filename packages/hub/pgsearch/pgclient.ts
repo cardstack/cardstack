@@ -394,8 +394,21 @@ export default class PgClient {
     return [fieldArity(typeContext, key, [query, '=', v], [query, '&&', 'array[', v, ']'], 'filter')];
   }
 
-  private rangeCondition(_typeContext: CardId, _filter: RangeFilter): CardExpression {
-    throw new Error('unimplemented');
+  private rangeCondition(typeContext: CardId, filter: RangeFilter): CardExpression {
+    return every(
+      flatten(
+        Object.entries(filter.range).map(([path, range]) => {
+          let query = fieldQuery(typeContext, path, 'filter');
+          return Object.entries(range).map(([limit, value]) => {
+            if (value == null) {
+              return [];
+            }
+            let v = fieldValue(typeContext, path, [param(value)], 'filter');
+            return [query, RANGE_OPERATORS[limit], v];
+          });
+        })
+      )
+    );
   }
 }
 
@@ -470,3 +483,10 @@ declare module '@cardstack/hub/dependency-injection' {
 export interface ResponseMeta {
   page: { total: number; cursor?: string };
 }
+
+const RANGE_OPERATORS: { [limit: string]: string } = Object.freeze({
+  lte: '<=',
+  gte: '>=',
+  lt: '<',
+  gt: '>',
+});

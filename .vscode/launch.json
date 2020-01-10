@@ -36,7 +36,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "treats undefined boolean-fields as false"]
+      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can use a range filter against an integer field"]
     },
     {
       "type": "node",
