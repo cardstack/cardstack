@@ -809,6 +809,29 @@
     ember-radio-button "^2.0.1"
     ember-truth-helpers "^2.1.0"
 
+"@cardstack/ui-components@^0.2.19":
+  version "0.2.19"
+  resolved "https://registry.yarnpkg.com/@cardstack/ui-components/-/ui-components-0.2.19.tgz#b318d37f79937656a6e7b03ae911532f1135ea8a"
+  integrity sha512-tISKRtkzlQG+B8GaIZr+H2BXe2Sqrr2Mv6OipSpmVP6e3lPHPt+eHIZRV55BdZPmmcZCZTGyIsn5TcUNo99akQ==
+  dependencies:
+    broccoli-funnel "^2.0.2"
+    broccoli-merge-trees "^3.0.2"
+    ember-cli-babel "^7.11.1"
+    ember-cli-htmlbars "^4.0.0"
+    ember-concurrency "^1.1.3"
+    ember-concurrency-decorators "^1.0.0"
+    ember-inputmask "^0.9.1"
+    ember-moment "^7.8.1"
+    ember-multiselect-checkboxes "^0.11.1"
+    ember-phone-input "^2.0.7"
+    ember-place-autocomplete "^2.0.0"
+    ember-power-calendar "^0.13.2"
+    ember-power-calendar-moment "^0.1.7"
+    ember-power-datepicker "git+https://github.com/bagby/ember-power-datepicker#9eaf27d921056b47b7d620b42e303b45c7a40e67"
+    ember-power-select "^2.3.1"
+    ember-radio-button "^2.0.1"
+    ember-truth-helpers "^2.1.0"
+
 "@cnakazawa/watch@^1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@cnakazawa/watch/-/watch-1.0.3.tgz#099139eaec7ebf07a27c1786a3ff64f39464d2ef"

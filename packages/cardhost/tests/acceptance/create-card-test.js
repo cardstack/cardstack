@@ -147,7 +147,6 @@ module('Acceptance | card create', function(hooks) {
     await setCardId(card1Id);
     await addField('title', 'string', true);
     await addField('body', 'string', false);
-    await animationsSettled();
 
     await click('[data-test-field="title"]');
     await animationsSettled();

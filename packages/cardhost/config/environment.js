@@ -63,6 +63,7 @@ module.exports = function(environment) {
     ENV.cardTemplates = JSON.parse(process.env.CARD_TEMPLATES || null) || ['local-hub::location-card'];
 
     ENV.animationSpeed = 20;
+    ENV.debounceSpeed = 10; // for ui-components
   }
 
   // if (environment === 'production') {

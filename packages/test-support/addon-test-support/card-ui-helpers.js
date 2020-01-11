@@ -104,6 +104,8 @@ export async function addField(name, type, isEmbedded, position) {
   if (isEmbedded) {
     await click('[data-test-schema-attr="embedded"] input[type="checkbox"]');
   }
+
+  await animationsSettled();
 }
 
 export async function setFieldValue(name, value) {
