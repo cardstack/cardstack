@@ -28,7 +28,7 @@
 /* We need the wrapper to mask the border of the content when scrolling */
 .card-renderer-isolated--header--wrapper {
   background-color: var(--ch-deep-background);
-  position: fixed;
+  position: sticky;
   z-index: 5;
 }
 

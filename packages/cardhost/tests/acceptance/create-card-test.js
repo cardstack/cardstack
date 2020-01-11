@@ -70,6 +70,7 @@ module('Acceptance | card create', function(hooks) {
 
     await addField('title', 'string', true);
     await setCardId(card1Id);
+    await animationsSettled();
     assert.deepEqual(
       [...document.querySelectorAll(`[data-test-isolated-card="${card1Id}"] [data-test-field]`)].map(i =>
         i.getAttribute('data-test-field')
@@ -267,6 +268,7 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-isolated-card] [data-test-field').exists({ count: 1 });
 
     await click(`[data-test-isolated-card] [data-test-field-renderer-remove-btn]`);
+    await animationsSettled();
     assert.dom('[data-test-isolated-card] [data-test-field').doesNotExist();
   });
 
