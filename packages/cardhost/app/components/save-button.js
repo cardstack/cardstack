@@ -33,7 +33,7 @@ export default class SaveButton extends Component {
     yield this.saveCard.perform();
 
     if (cardIsNew) {
-      return this.router.transitionTo('cards.schema', card.name);
+      return this.router.transitionTo('cards.card.schema', card.name);
     } else {
       this.justSaved = true;
       yield setTimeout(() => {

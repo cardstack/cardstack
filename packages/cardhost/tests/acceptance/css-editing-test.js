@@ -49,7 +49,7 @@ module('Acceptance | css editing', function(hooks) {
     this.owner.lookup('service:data')._clearCache();
     // any time you visit the editor page, you need to set resizable to
     // false, or tests will time out.
-    this.owner.lookup('controller:cards.view').resizable = false;
+    this.owner.lookup('controller:cards.card.view').resizable = false;
   });
 
   test('navigating to custom styles', async function(assert) {
