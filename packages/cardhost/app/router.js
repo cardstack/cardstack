@@ -12,7 +12,7 @@ Router.map(function() {
     this.route('add', { path: '/new' });
     this.route('card', { path: '/:id' }, function() {
       this.route('adopt', { path: '/adopt' });
-      this.route('view', { path: '/' });
+      this.route('view', { path: '' });
       this.route('edit', { path: '/edit' });
       this.route('schema', { path: '/schema' });
     });
