@@ -6,7 +6,9 @@ import fade from 'ember-animated/transitions/fade';
 import resize from 'ember-animated/motions/resize';
 import { easeInAndOut } from 'ember-animated/easings/cosine';
 import { remove } from 'lodash';
+import ENV from '@cardstack/cardhost/config/environment';
 
+const { animationSpeed } = ENV;
 const duration = 250;
 
 export default class RightEdge extends Component {
@@ -16,7 +18,7 @@ export default class RightEdge extends Component {
   @tracked expandedSections = ['template'];
 
   fade = fade;
-  duration = duration;
+  duration = animationSpeed || duration;
 
   constructor(...args) {
     super(...args);

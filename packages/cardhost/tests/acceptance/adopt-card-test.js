@@ -13,6 +13,7 @@ import {
 } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
+import { animationsSettled } from 'ember-animated/test-support';
 
 const timeout = 20000;
 const card1Id = 'address-card';
@@ -296,6 +297,8 @@ module('Acceptance | card adoption', function(hooks) {
     await saveCard('schema', card1Id);
 
     await visit(`/cards/${card2Id}/schema`);
+    await animationsSettled();
+
     assert.deepEqual(
       [...document.querySelectorAll(`[data-test-isolated-card] [data-test-field]`)].map(i =>
         i.getAttribute('data-test-field')

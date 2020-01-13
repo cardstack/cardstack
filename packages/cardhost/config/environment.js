@@ -61,6 +61,11 @@ module.exports = function(environment) {
     ENV.APP.autoboot = false;
 
     ENV.cardTemplates = JSON.parse(process.env.CARD_TEMPLATES || null) || ['local-hub::location-card'];
+
+    ENV.animationSpeed = 20;
+    ENV['@cardstack/ui-components'] = {
+      debounceSpeed: 10,
+    };
   }
 
   // if (environment === 'production') {

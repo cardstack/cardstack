@@ -14,6 +14,7 @@
   align-items: center;
   text-align: right;
   z-index: var(--ch-edges-z-index);
+  background-color: var(--ch-deep-background);
 }
 
 .login-btn,

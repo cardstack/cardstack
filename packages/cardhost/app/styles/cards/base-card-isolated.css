@@ -26,3 +26,8 @@
   font-size: 13px;
   line-height: 1.385;
 }
+
+
+.cardstack_base-card-isolated .isolated-card--fields {
+  /* border: solid 2px red; */
+}
