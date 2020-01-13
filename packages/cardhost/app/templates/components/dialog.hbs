@@ -1,7 +1,9 @@
 <dialog class="dialog" data-test-dialog-box ...attributes>
-  <h1 class="dialog--heading">
-    {{svg-jar @icon width="20px" height="20px"}} {{@title}}
-  </h1>
+  {{#if @title}}
+    <h1 class="dialog--title">
+      {{svg-jar @icon width="20px" height="20px"}} {{@title}}
+    </h1>
+  {{/if}}
   <div class="dialog--content">
     {{yield}}
   </div>

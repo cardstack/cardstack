@@ -179,3 +179,9 @@
   width: 100%;
   height: 260px;
 }
+.ui-components--dialog-container.dialog-small {
+  height: 100px;
+}
+.ui-components--dialog-container.dialog-medium {
+  height: 160px;
+}
