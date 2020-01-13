@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/handlebars",
-  "version": "0.16.16",
+  "version": "0.16.17",
   "description": "Mobiledoc field plugin for plain handlebars templates",
   "keywords": [
     "cardstack-plugin"
@@ -17,7 +17,7 @@
     "handlebars": "^4.0.6"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.16.16"
+    "@cardstack/eslint-config": "0.16.17"
   },
   "engines": {
     "node": ">= 8"

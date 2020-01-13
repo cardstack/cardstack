@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/pgsearch",
-  "version": "0.16.16",
+  "version": "0.16.17",
   "author": "Edward Faulkner <edward@eaf4.com>",
   "repository": "https://github.com/cardstack/cardstack",
   "keywords": [
@@ -10,16 +10,16 @@
     "api-version": 1
   },
   "dependencies": {
-    "@cardstack/di": "0.16.16",
-    "@cardstack/hub": "0.16.16",
+    "@cardstack/di": "0.16.17",
+    "@cardstack/hub": "0.16.17",
     "@cardstack/logger": "^0.2.0",
-    "@cardstack/plugin-utils": "0.16.16",
+    "@cardstack/plugin-utils": "0.16.17",
     "node-pg-migrate": "3.5.0",
     "pg": "^7.0.3",
     "pg-cursor": "^1.3.0"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.16.16",
+    "@cardstack/eslint-config": "0.16.17",
     "lodash": "^4.17.11"
   },
   "scripts": {
