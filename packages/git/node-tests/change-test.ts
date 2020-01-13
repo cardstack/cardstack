@@ -1,5 +1,5 @@
 import Change from '../change';
-
+import { GitConflict } from '../git';
 import { inRepo, commitOpts, makeRepo } from './support';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
@@ -150,7 +150,7 @@ describe('git/change', function() {
       await change.finalize(commitOpts({ message: 'Third commit' }));
       throw new Error('merge was not supposed to succeed');
     } catch (err) {
-      expect(err).instanceof(Change.GitConflict);
+      expect(err).instanceof(GitConflict);
     }
 
     expect((await inRepo(path).getCommit('master')).message).to.equal('Second commit');
