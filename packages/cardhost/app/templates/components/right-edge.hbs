@@ -26,7 +26,7 @@
                 </div>
                 <AnimatedContainer class="right-edge--animation-container">
                   {{#animated-if (includes this.expandedSections "template") use=this.fade duration=this.duration}}
-                    <div class="right-edge--item">
+                    <div class="right-edge--items-container">
                       {{#if @card.adoptedFrom}}
                         <AdoptedFrom @card={{@card.adoptedFrom}} @adoptedCard={{@card}} />
                       {{else}}
@@ -46,7 +46,7 @@
                   <div class="right-edge--section-header" data-test-section-header>Details</div>
                   <AnimatedContainer class="right-edge--animation-container">
                     {{#animated-if (includes this.expandedSections "details") use=this.fade duration=this.duration}}
-                      <div class="right-edge--items">
+                      <div class="right-edge--items-container">
                         <div class="right-edge--item">
                           <TextField
                             @theme="cs-dark"
@@ -87,15 +87,17 @@
                         </div>
                       {{/if}}
                     </div>
-                    <div class="right-edge--item">
-                      <FieldRenderer
-                        @field={{field}}
-                        @mode="schema"
-                        @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
-                        @setFieldName={{@setFieldName}}
-                        @setFieldLabel={{@setFieldLabel}}
-                        @setFieldInstructions={{@setFieldInstructions}}
-                        @schemaAttrs={{array "label" "name" "instructions" "embedded"}} />
+                    <div class="right-edge--items-container">
+                      <div class="right-edge--item">
+                        <FieldRenderer
+                          @field={{field}}
+                          @mode="schema"
+                          @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+                          @setFieldName={{@setFieldName}}
+                          @setFieldLabel={{@setFieldLabel}}
+                          @setFieldInstructions={{@setFieldInstructions}}
+                          @schemaAttrs={{array "label" "name" "instructions" "embedded"}} />
+                      </div>
                     </div>
                   </div>
                 {{/animated-value}}

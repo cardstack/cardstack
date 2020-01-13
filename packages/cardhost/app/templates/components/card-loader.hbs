@@ -12,7 +12,7 @@
   <Input @value={{this.format}} />
 </div>
 <div>
-  <button {{on "click" this.load}} class="ch-button">Load</button>
+  <Cta {{on "click" this.load}} @variant="secondary primary">Load</Cta>
 </div>
 
 {{#if this.errorMsg}}

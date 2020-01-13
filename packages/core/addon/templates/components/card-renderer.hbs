@@ -4,78 +4,88 @@ The process of rendering a card is fundamentally async as we'll need to load the
 as well as waiting for the card component to be compiled by embroider. Make sure to build in
 Ember Concurrency into the rendering of the card component here.
 --}}
-{{#if (eq @format "isolated")}}
-  {{#let (component this.isolatedComponentName) as | Isolated |}}
-    <section
-      class="card-renderer-isolated
-        {{this.mode}}
-        {{if (or (eq this.mode "add") (eq this.mode "adopt")) "schema"}}
-        {{safe-css-string @card.adoptedFromName}}
-        {{safe-css-string @card.name}}
-        {{if @cardSelected "selected"}}
-        {{if @card.isolatedFields.length "has-fields" "no-fields"}}
-      "
-      tabindex="0"
-      data-test-card-renderer-isolated
-      {{on "focus" (action this.cardIsFocused true)}}
-      {{did-insert this.focusCard true}}
-    >
-      <header class="card-renderer-isolated--header">
-        {{#if (or (eq (safe-css-string @card.adoptedFromName) "event-card") (eq (safe-css-string @card.name) "event-card"))}}
-          {{svg-jar "event" width="18px" height="20px"}}
-        {{/if}}
-        <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.name "Blank Card"}}</span>
-      </header>
-      <div class="card-renderer-isolated--content">
-        <div class="card-renderer-isolated--card-container">
-          <Isolated
-            @card={{@card}}
-            @mode={{this.mode}}
-            @setFieldValue={{@setFieldValue}}
-            @setFieldName={{@setFieldName}}
-            @removeField={{@removeField}}
-            @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
-            @setPosition={{@setPosition}}
-            @selectField={{@selectField}}
-            @selectedField={{@selectedField}}
-            @dropField={{@dropField}} />
-          {{#if (and @dropField (eq @mode "schema")) }}
-            <DropZone
-              @dropField={{@dropField}}
-              @position={{@card.isolatedFields.length}}
-            />
-          {{/if}}
+{{#if @card}}
+  {{#if (eq @format "isolated")}}
+    {{#let (component this.isolatedComponentName) as | Isolated |}}
+      <section
+        class="card-renderer-isolated
+          {{this.mode}}
+          {{if (or (eq this.mode "add") (eq this.mode "adopt")) "schema"}}
+          {{safe-css-string @card.adoptedFromName}}
+          {{safe-css-string @card.name}}
+          {{if @cardSelected "selected"}}
+          {{if this.fields.length "has-fields" "no-fields"}}
+        "
+        tabindex="0"
+        data-test-card-renderer-isolated
+        {{on "focus" (action this.cardIsFocused true)}}
+        {{did-insert this.focusCard true}}
+        {{did-update this.updateFields @card.isolatedFields}}
+      >
+        <div class="card-renderer-isolated--header--wrapper">
+          <header class="card-renderer-isolated--header">
+            {{#if (or (eq (safe-css-string @card.adoptedFromName) "event-card") (eq (safe-css-string @card.name) "event-card"))}}
+              {{svg-jar "event" width="18px" height="20px"}}
+            {{/if}}
+            <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.name "Blank Card"}}</span>
+          </header>
         </div>
-      </div>
-    </section>
-  {{/let}}
-{{else if (eq @format "embedded")}}
-  {{#let (component this.embeddedComponentName) as | Embedded |}}
-    <div
-      class="card-renderer-embedded
-        {{safe-css-string @card.adoptedFromName}}
-        {{safe-css-string @card.name}}
-      "
-      data-test-card-renderer-embedded
-    >
-      {{#if (and (eq this.mode "view") (not @preventIsolation))}}
-        <LinkTo
-          @class="card-renderer--embedded-card-link"
-          @route="cards.view"
-          @model={{@card.name}}
-          aria-label={{@card.name}}
-        >
+        <div class="card-renderer-isolated--content">
+          <div class="card-renderer-isolated--card-container">
+            {{#if (and @dropField (eq @mode "schema")) }}
+              <DropZone
+                @dropField={{@dropField}}
+                @position=0
+                @toggleStubField={{this.toggleStubField}}
+              />
+            {{/if}}
+            <Isolated
+              @card={{@card}}
+              @fields={{this.fields}}
+              @mode={{this.mode}}
+              @setFieldValue={{@setFieldValue}}
+              @setFieldName={{@setFieldName}}
+              @removeField={{@removeField}}
+              @toggleStubField={{this.toggleStubField}}
+              @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+              @setPosition={{@setPosition}}
+              @selectField={{@selectField}}
+              @selectedField={{@selectedField}}
+              @dropField={{@dropField}} />
+          </div>
+        </div>
+      </section>
+    {{/let}}
+  {{else if (eq @format "embedded")}}
+    {{#let (component this.embeddedComponentName) as | Embedded |}}
+      <div
+        class="card-renderer-embedded
+          {{safe-css-string @card.adoptedFromName}}
+          {{safe-css-string @card.name}}
+        "
+        data-test-card-renderer-embedded
+      >
+        {{#if (and (eq this.mode "view") (not @preventIsolation))}}
+          <LinkTo
+            @class="card-renderer--embedded-card-link"
+            @route="cards.view"
+            @model={{@card.name}}
+            aria-label={{@card.name}}
+          >
+            <Embedded @card={{@card}} @mode={{this.mode}} />
+            {{#if @showName}}
+              <div class="embedded-card-label">{{@card.name}}</div>
+            {{/if}}
+          </LinkTo>
+        {{else}}
           <Embedded @card={{@card}} @mode={{this.mode}} />
           {{#if @showName}}
             <div class="embedded-card-label">{{@card.name}}</div>
           {{/if}}
-        </LinkTo>
-      {{else}}
-        <Embedded @card={{@card}} @mode={{this.mode}} />
-        {{#if @showName}}
-          <div class="embedded-card-label">{{@card.name}}</div>
         {{/if}}
-      {{/if}}
-    </div>
-  {{/let}}
+      </div>
+    {{/let}}
+  {{/if}}
+{{else}}
+  <div class="card-renderer-missing-card" data-test-missing-card>You must specify a @card attribute</div>
 {{/if}}

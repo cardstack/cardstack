@@ -76,48 +76,61 @@
     <ColorPalette />
   </section>
 
-  <section class="ui-components--section ui-components--grid-2-col" id="buttons">
+  <section class="ui-components--section" id="buttons">
     <h2>Buttons</h2>
-    <h3>Primary button</h3>
-    <button class="ch-button">Save</button>
-    <CodeEditor @code='<button class="ch-button">Save</button>' @language="html" />
 
-    <h3>Secondary button</h3>
-    <button class="ch-button ch-button--secondary">Preview</button>
-    <CodeEditor @code='<button class="ch-button ch-button--secondary">Preview</button>' @language="html" />
+    <h3>Default Buttons</h3>
+    <Cta>Default</Cta>
+    <Cta @variant="secondary" @theme="cs-dark">Secondary default</Cta>
+    <CodeEditor @code='<Cta>Default</Cta>' @language="html" />
+    <CodeEditor @code='<Cta @variant="secondary" @theme="cs-dark">Secondary</Cta>' @language="html" />
 
-    <h3>Responsive width (100%) button</h3>
-    <button class="ch-button ch-button--responsive">Create a new theme</button>
-    <CodeEditor @code='<button class="ch-button ch-button--responsive">Create a new theme</button>' @language="html" />
+    <h3>Primary Buttons</h3>
+    <Cta @variant="primary">Primary</Cta>
+    <Cta @variant="secondary primary">Secondary primary</Cta>
+    <CodeEditor @code='<Cta @variant="primary">Primary</Cta>' @language="html" />
+    <CodeEditor @code='<Cta @variant="secondary primary">Secondary primary</Cta>' @language="html" />
 
-    <h3>Icon buttons (SVG button)</h3>
+    <h3>Responsive Width (100%) CTA</h3>
+    <Cta @variant="responsive">Create a new theme</Cta>
+    <CodeEditor @code='<Cta @variant="responsive">Create a new theme</Cta>' @language="html" />
+    <Cta @variant="responsive primary">Create a new theme</Cta>
+    <CodeEditor @code='<Cta @variant="responsive primary">Create a new theme</Cta>' @language="html" />
+
+    <h3>Disabled Button</h3>
+    <Cta @disabled={{true}}>Default</Cta>
+    <Cta @variant="secondary" @theme="cs-dark" @disabled={{true}}>Secondary</Cta>
+    <Cta @variant="primary" @disabled={{true}}>Primary</Cta>
+    <Cta @variant="primary secondary" @disabled={{true}}>Secondary Primary</Cta><br><br>
+    <Cta @variant="responsive primary secondary" @disabled={{true}}>Responsive Secondary Primary</Cta>
+
+    <CodeEditor @code='<Cta @disabled=\{{true}}>Default</Cta>
+<Cta @variant="secondary" @theme="cs-dark" @disabled=\{{true}}>Secondary</Cta>
+<Cta @variant="primary" @disabled=\{{true}}>Primary</Cta>
+<Cta @variant="primary secondary" @disabled=\{{true}}>Secondary Primary</Cta>
+<Cta @variant="responsive primary secondary" @disabled=\{{true}}>Responsive Secondary Primary</Cta>' @language="html" />
+
+    <h3>Save Button</h3>
+    <SaveButton @card={{this.model}} />
+    <CodeEditor @code='<SaveButton @card=\{{card}} />' @language="html" />
+
+    <h3>Icon Buttons</h3>
+    <h4>- Default icon button</h4>
     <div>
-      <button class="ch-button ch-button--icon user" aria-label="User"></button>
-      <button class="ch-button ch-button--icon catalog" aria-label="Catalog"></button>
-      <button class="ch-button ch-button--icon share" aria-label="Share"></button>
-      <button class="ch-button ch-button--icon library" aria-label="Library"></button>
       <button class="ch-button ch-button--icon dock-right" aria-label="Dock right"></button>
       <button class="ch-button ch-button--icon dock-bottom" aria-label="Dock bottom"></button>
       <button class="ch-button ch-button--icon eye-on" aria-label="Visible"></button>
       <button class="ch-button ch-button--icon eye-off" aria-label="Hidden"></button>
     </div>
     <div>
-      <CodeEditor @code='<button class="ch-button ch-button--icon user" aria-label="User"></button>
-<button class="ch-button ch-button--icon catalog" aria-label="Catalog"></button>
-<button class="ch-button ch-button--icon share" aria-label="Share"></button>
-<button class="ch-button ch-button--icon library" aria-label="Library"></button>
-<button class="ch-button ch-button--icon dock-right" aria-label="Dock right">
+      <CodeEditor @code='<button class="ch-button ch-button--icon dock-right" aria-label="Dock right">
 <button class="ch-button ch-button--icon dock-bottom" aria-label="Dock bottom">
 <button class="ch-button ch-button--icon eye-on" aria-label="Visible"></button>
 <button class="ch-button ch-button--icon eye-off" aria-label="Hidden"></button>'
       @language="html" />
     </div>
 
-    <h3>Secondary Icon button</h3>
-    <button class="ch-button ch-button--icon-secondary delete" aria-label="Delete"></button>
-    <CodeEditor @code='<button class="ch-button ch-button--icon-secondary delete" aria-label="Delete"></button>' @language="html" />
-
-    <h3>Icon with text</h3>
+    <h4>- Icon with text</h4>
     <div>
       <button class="ch-button ch-button--icon responsive" aria-label="Responsive">Responsive</button>
       <button class="ch-button ch-button--icon full-width" aria-label="Full Width">Full Width</button>
@@ -126,19 +139,24 @@
 <button class="ch-button ch-button--icon full-width" aria-label="Full Width"></button>'
       @language="html" />
 
-    <h3>Disabled Icon button</h3>
+    <h4>- Secondary icon button</h4>
     <div>
-      <button disabled class="ch-button ch-button--icon user" aria-label="User"></button>
-      <button disabled class="ch-button ch-button--icon catalog" aria-label="Catalog"></button>
-    </div>
-    <div>
-      <CodeEditor @code='<button disabled class="ch-button ch-button--icon user" aria-label="User"></button>
-<button disabled class="ch-button ch-button--icon catalog" aria-label="Catalog"></button>' @language="html" />
+      <button class="ch-button ch-button--icon-secondary" aria-label="user">
+        {{svg-jar "user" width="18px" height="20px"}}
+      </button>
     </div>
 
-    <h3>Save button</h3>
-    <SaveButton @card={{this.model}} />
-    <CodeEditor @code='<SaveButton @card=\{{card}} />' @language="html" />
+    <CodeEditor @code='<button class="ch-button ch-button--icon-secondary" aria-label="user">
+  \{{svg-jar "user" width="18px" height="20px"}}
+</button>' @language="html" />
+
+    <h4>- Secondary icon button (Disabled)</h4>
+    <button disabled class="ch-button ch-button--icon-secondary" aria-label="User">
+      {{svg-jar "user" width="18px" height="20px"}}
+    </button>
+    <CodeEditor @code='<button disabled class="ch-button ch-button--icon-secondary" aria-label="user">
+  \{{svg-jar "user" width="18px" height="20px"}}
+</button>' @language="html" />
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col" id="view-switcher">

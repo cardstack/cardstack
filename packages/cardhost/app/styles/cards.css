@@ -7,9 +7,8 @@
   --padding-bottom: var(--ch-bottom-edge-height);
 
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   background-color: var(--ch-default);
-  overflow: hidden;
   padding-top: var(--padding-top);
   padding-left: var(--padding-left);
   padding-right: var(--padding-right);
