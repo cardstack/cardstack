@@ -165,7 +165,7 @@ export default class CardManipulator extends Component {
 
   @action
   preview() {
-    this.router.transitionTo('cards.card.view', this.card.name);
+    this.router.transitionTo('cards.card.view', this.card);
   }
 
   @action
