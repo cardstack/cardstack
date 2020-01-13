@@ -278,7 +278,7 @@ export default class PgClient {
         fieldArity.typeContext,
         path,
         [],
-        async (fieldCard, _expression, _fieldName) => {
+        async (fieldCard, _expression: CardExpression, _fieldName) => {
           if (fieldCard.csFieldArity === 'plural') {
             return plural;
           }
@@ -302,16 +302,20 @@ export default class PgClient {
     filterTypeContext: CardId,
     path: string,
     expression: Expression,
-    handleLeafField: (fieldCard: FieldCard, expression: Expression, fieldName: string) => Promise<CardExpression>,
-    handleInteriorField?: (fieldCard: FieldCard, expression: Expression, fieldName: string) => Promise<CardExpression>
+    handleLeafField: (fieldCard: FieldCard, expression: CardExpression, fieldName: string) => Promise<CardExpression>,
+    handleInteriorField?: (
+      fieldCard: FieldCard,
+      expression: CardExpression,
+      fieldName: string
+    ) => Promise<CardExpression>
   ): Promise<CardExpression>;
   private async walkFilterFieldPath(
     cards: ScopedCardService,
     filterTypeContext: CardId,
     path: string,
     expression: Expression,
-    handleLeafField: (fieldCard: FieldCard, expression: any[], fieldName: string) => Promise<any>,
-    handleInteriorField?: (fieldCard: FieldCard, expression: any[], fieldName: string) => Promise<any>
+    handleLeafField: (fieldCard: FieldCard, expression: any[], fieldName: string) => Promise<any[]>,
+    handleInteriorField?: (fieldCard: FieldCard, expression: any[], fieldName: string) => Promise<any[]>
   ): Promise<any> {
     let pathSegments = path.split('.');
     let enclosingCard: Card = await cards.get(filterTypeContext);
