@@ -43,7 +43,7 @@
     "@cardstack/eslint-config": "0.16.16",
     "@cardstack/mock-auth": "0.16.16",
     "@cardstack/test-support": "0.16.16",
-    "@cardstack/ui-components": "^0.2.18",
+    "@cardstack/ui-components": "^0.2.20",
     "@ember/optional-features": "^0.6.3",
     "@ember/render-modifiers": "1.0.2",
     "@glimmer/component": "^0.14.0-alpha.13",
