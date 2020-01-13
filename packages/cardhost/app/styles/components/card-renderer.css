@@ -7,7 +7,6 @@
   width: 100%;
   font: 400 16px/22px var(--ch-font-family);
   letter-spacing: 0.015em;
-  overflow: hidden;
 }
 
 .card-renderer-isolated.schema,
@@ -29,6 +28,7 @@
 .card-renderer-isolated--header--wrapper {
   background-color: var(--ch-deep-background);
   position: sticky;
+  top: 80px;
   z-index: 5;
 }
 
@@ -44,7 +44,6 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   text-transform: capitalize;
-  width: var(--card-renderer-width);
 
   transition: background-color var(--ch-transition-time),
               color var(--ch-transition-time),
@@ -73,7 +72,6 @@
   border: none;
   overflow-x: hidden;
   overflow-y: auto;
-  margin-top: 56px;
 
   transition: var(--ch-card-background-color-animate);
 }
