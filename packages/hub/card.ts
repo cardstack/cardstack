@@ -256,17 +256,34 @@ export class Card {
       doc.csId = this.csId;
     }
 
-    if (this.jsonapi.data.attributes) {
-      for (let fieldName of Object.keys(this.jsonapi.data.attributes)) {
-        if (cardstackFieldPattern.test(fieldName)) {
-          continue;
-        }
-        let value = await this.value(fieldName);
-        let field = await this.field(fieldName);
-        if (value instanceof Card) {
-          doc[`${field.enclosingCard.canonicalURL}/${fieldName}`] = await value.asSearchDoc();
-        } else {
-          doc[`${field.enclosingCard.canonicalURL}/${fieldName}`] = value;
+    // What about card fields that a user had decided to fill in with a
+    // relationship to a card? Do we include that card in the search doc? It
+    // seems kind of inconsistent that depending on how a user decided to fill
+    // in a card (value vs. reference) that search doc may or may not contain a
+    // card. Rather I think it would be more consistent if the policy used to
+    // determine the depth of a search doc was consistent regardless of how a
+    // user decided to fill in the card field.
+
+    // I'm gonna take a stab at making this consistent for both fields filled by
+    // card values and card references. We can back this out later if we decide
+    // that we don't want this. The policy will be that we'll include any cards
+    // that we encounter in the search doc regardless if the card is filled in
+    // via value or reference. At a future time, when we add occlusion to guide
+    // how to construct "embedded" cards we'll revisit this logic to make sure
+    // the search doc follows the occlusion boundary.
+    for (let section of [this.jsonapi.data.attributes, this.jsonapi.data.relationships]) {
+      if (section) {
+        for (let fieldName of Object.keys(section)) {
+          if (cardstackFieldPattern.test(fieldName)) {
+            continue;
+          }
+          let value = await this.value(fieldName);
+          let field = await this.field(fieldName);
+          if (value instanceof Card) {
+            doc[`${field.enclosingCard.canonicalURL}/${fieldName}`] = await value.asSearchDoc();
+          } else {
+            doc[`${field.enclosingCard.canonicalURL}/${fieldName}`] = value;
+          }
         }
       }
     }

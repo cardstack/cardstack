@@ -22,7 +22,7 @@ import {
   FieldValue,
   FieldArity,
 } from './util';
-import { AddressableCard, CardId } from '../card';
+import { AddressableCard, CardId, Card, FieldCard, cardstackFieldPattern } from '../card';
 import CardstackError from '../error';
 import { Query, baseType, Filter, EqFilter, RangeFilter } from '../query';
 import { Sorts } from './sorts';
@@ -220,65 +220,114 @@ export default class PgClient {
     return new Batch(this, cards);
   }
   private async handleFieldQuery(cards: ScopedCardService, fieldQuery: FieldQuery): Promise<Expression> {
-    let { path, errorHint } = fieldQuery;
+    let { path } = fieldQuery;
     if (path === 'csRealm' || path === 'csOriginalRealm' || path === 'csId') {
       return [snakeCase(path)];
     }
 
-    if (path.indexOf('.') !== -1) {
-      throw new Error(`unimplemented: deeper paths handleFieldQuery for ${errorHint}`);
-    }
-
-    let source = ['search_doc'];
-    let fieldCard = await (await cards.get(fieldQuery.typeContext)).field(path);
-    let fullFieldName = `${fieldCard.enclosingCard.canonicalURL}/${path}`;
-    let buildQueryExpression = await fieldCard.loadFeature('field-buildQueryExpression');
-    if (buildQueryExpression) {
-      return buildQueryExpression(source, fullFieldName);
-    } else {
-      return [...source, '->>', param(fullFieldName)];
-    }
+    return await this.walkFilterFieldPath(
+      cards,
+      fieldQuery.typeContext,
+      path,
+      ['search_doc'],
+      async (fieldCard, expression, fieldName) => {
+        let buildQueryExpression = await fieldCard.loadFeature('field-buildQueryExpression');
+        if (buildQueryExpression) {
+          return buildQueryExpression(expression, fieldName);
+        } else {
+          return [...expression, '->>', param(fieldName)];
+        }
+      },
+      async (_fieldCard, expression, fieldName) => {
+        return [...expression, '->', param(fieldName)];
+      }
+    );
   }
 
   private async handleFieldValue(cards: ScopedCardService, fieldValue: FieldValue): Promise<Expression> {
-    let { path, errorHint, value } = fieldValue;
+    let { path, value } = fieldValue;
     let expression = await this.makeExpression(cards, value);
     if (path === 'csRealm' || path === 'csOriginalRealm' || path === 'csId') {
       return expression;
     }
 
-    if (path.indexOf('.') !== -1) {
-      throw new Error(`unimplemented: deeper paths field value for ${errorHint}`);
-    }
-
-    let fieldCard = await (await cards.get(fieldValue.typeContext)).field(path);
-    let buildValueExpression = await fieldCard.loadFeature('field-buildValueExpression');
-    if (buildValueExpression) {
-      expression = buildValueExpression(expression);
-    }
-    return expression;
+    return await this.walkFilterFieldPath(
+      cards,
+      fieldValue.typeContext,
+      path,
+      expression,
+      async (fieldCard, expression) => {
+        let buildValueExpression = await fieldCard.loadFeature('field-buildValueExpression');
+        if (buildValueExpression) {
+          return buildValueExpression(expression);
+        }
+        return expression;
+      }
+    );
   }
 
   private async handleFieldArity(cards: ScopedCardService, fieldArity: FieldArity): Promise<Expression> {
-    let { path, singular, plural, errorHint } = fieldArity;
-
-    if (path.indexOf('.') !== -1) {
-      throw new Error(`unimplemented: deeper paths field arity for ${errorHint}`);
-    }
+    let { path, singular, plural } = fieldArity;
 
     let chosenExpression: CardExpression;
     if (path === 'csRealm' || path === 'csOriginalRealm' || path === 'csId') {
       chosenExpression = singular;
     } else {
-      let fieldCard = await (await cards.get(fieldArity.typeContext)).field(path);
-      if (fieldCard.csFieldArity === 'plural') {
-        chosenExpression = plural;
-      } else {
-        chosenExpression = singular;
-      }
+      chosenExpression = await this.walkFilterFieldPath(
+        cards,
+        fieldArity.typeContext,
+        path,
+        [],
+        async (fieldCard, _expression, _fieldName) => {
+          if (fieldCard.csFieldArity === 'plural') {
+            return plural;
+          }
+          return singular;
+        }
+      );
     }
-
     return await this.makeExpression(cards, chosenExpression);
+  }
+
+  private async walkFilterFieldPath(
+    cards: ScopedCardService,
+    filterTypeContext: CardId,
+    path: string,
+    expression: Expression,
+    handleLeafField: (fieldCard: FieldCard, expression: Expression, fieldName: string) => Promise<Expression>,
+    handleInteriorField?: (fieldCard: FieldCard, expression: Expression, fieldName: string) => Promise<Expression>
+  ): Promise<Expression>;
+  private async walkFilterFieldPath(
+    cards: ScopedCardService,
+    filterTypeContext: CardId,
+    path: string,
+    expression: Expression,
+    handleLeafField: (fieldCard: FieldCard, expression: Expression, fieldName: string) => Promise<CardExpression>,
+    handleInteriorField?: (fieldCard: FieldCard, expression: Expression, fieldName: string) => Promise<CardExpression>
+  ): Promise<CardExpression>;
+  private async walkFilterFieldPath(
+    cards: ScopedCardService,
+    filterTypeContext: CardId,
+    path: string,
+    expression: Expression,
+    handleLeafField: (fieldCard: FieldCard, expression: Expression, fieldName: string) => Promise<Expression>,
+    handleInteriorField?: (fieldCard: FieldCard, expression: Expression, fieldName: string) => Promise<Expression>
+  ): Promise<Expression> {
+    let pathSegments = path.split('.');
+    let enclosingCard: Card = await cards.get(filterTypeContext);
+    for (let [index, pathSegment] of pathSegments.entries()) {
+      let fieldCard = await enclosingCard.field(pathSegment);
+      let fullFieldName = cardstackFieldPattern.test(pathSegment)
+        ? pathSegment
+        : `${fieldCard.enclosingCard.canonicalURL}/${pathSegment}`;
+      if (index === pathSegments.length - 1) {
+        expression = await handleLeafField(fieldCard, expression, fullFieldName);
+      } else if (handleInteriorField) {
+        expression = await handleInteriorField(fieldCard, expression, fullFieldName);
+      }
+      enclosingCard = fieldCard;
+    }
+    return expression;
   }
 
   async get(cards: ScopedCardService, id: CardId): Promise<AddressableCard> {

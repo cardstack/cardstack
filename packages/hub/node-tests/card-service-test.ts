@@ -902,8 +902,82 @@ describe('hub/card-service', function() {
         expect(ids).to.include.members([mango.canonicalURL, vanGogh.canonicalURL]);
       });
 
+      it('can filter by the interior field of a field filled by a card as value', async function() {
+        let ownerCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('name', 'string-field')
+            .withField('puppy', puppyCard).jsonapi
+        );
+        await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Hassan',
+              puppy: (await vanGogh.asPristineDoc()).jsonapi.data,
+            })
+            .adoptingFrom(ownerCard).jsonapi
+        );
+        let mangosMommy = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Mariko',
+              puppy: (await mango.asPristineDoc()).jsonapi.data,
+            })
+            .adoptingFrom(ownerCard).jsonapi
+        );
+
+        let results = await service.search({
+          filter: {
+            type: ownerCard,
+            eq: {
+              'puppy.name': 'Mango',
+            },
+          },
+        });
+        expect(results.cards.length).to.equal(1);
+        expect(results.cards[0].canonicalURL).to.equal(mangosMommy.canonicalURL);
+      });
+
+      it('can filter by the interior field of a field filled by a referenced card', async function() {
+        let ownerCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('name', 'string-field')
+            .withField('puppy', puppyCard).jsonapi
+        );
+        await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({ name: 'Hassan' })
+            .withRelationships({ puppy: vanGogh })
+            .adoptingFrom(ownerCard).jsonapi
+        );
+        let mangosMommy = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({ name: 'Mariko' })
+            .withRelationships({ puppy: mango })
+            .adoptingFrom(ownerCard).jsonapi
+        );
+
+        let results = await service.search({
+          filter: {
+            type: ownerCard,
+            eq: {
+              'puppy.name': 'Mango',
+            },
+          },
+        });
+        expect(results.cards.length).to.equal(1);
+        expect(results.cards[0].canonicalURL).to.equal(mangosMommy.canonicalURL);
+      });
+
+      // Also test the arity of this scenario
+      it.skip('can filter by an interior csField of a field filled by a card', async function() {});
+
       it.skip('filtering fields with arity > 1', async function() {});
-      it.skip('can filter by interior field', async function() {});
     });
   });
 });

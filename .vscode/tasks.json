@@ -12,7 +12,6 @@
         "applyTo": "allDocuments"
       },
       "presentation": {
-        "reveal": "never",
         "panel": "new"
       },
       "group": "build",

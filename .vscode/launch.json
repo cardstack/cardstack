@@ -36,7 +36,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can use a range filter against an integer field"]
+      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can filter by the interior field of a field filled by a referenced card"]
     },
     {
       "type": "node",
