@@ -168,7 +168,7 @@ export class ScopedCardService {
   private async getBuiltIn(id: CardId): Promise<AddressableCard> {
     let cardDir = join(__dirname, '..', '..', 'cards', id.csId);
     if (!existsSync(cardDir)) {
-      throw new CardstackError(`Card ${id.csId} not found in public realm`, { status: 404 });
+      throw new CardstackError(`Card '${id.csId}' not found in public realm`, { status: 404 });
     }
     let json = await import(join(cardDir, 'card.json'));
     assertSingleResourceDoc(json);

@@ -238,6 +238,9 @@ export default class PgClient {
           return [...expression, '->>', param(fieldName)];
         }
       },
+      async (expression, csField) => {
+        return [...expression, '->>', param(csField)]; // this assumes arity of 1 for all the csFields which is probably not what we want long term...
+      },
       async (_fieldCard, expression, fieldName) => {
         return [...expression, '->', param(fieldName)];
       }
@@ -247,9 +250,6 @@ export default class PgClient {
   private async handleFieldValue(cards: ScopedCardService, fieldValue: FieldValue): Promise<Expression> {
     let { path, value } = fieldValue;
     let expression = await this.makeExpression(cards, value);
-    if (path === 'csRealm' || path === 'csOriginalRealm' || path === 'csId') {
-      return expression;
-    }
 
     return await this.walkFilterFieldPath(
       cards,
@@ -262,6 +262,9 @@ export default class PgClient {
           return buildValueExpression(expression);
         }
         return expression;
+      },
+      async expression => {
+        return expression;
       }
     );
   }
@@ -269,23 +272,21 @@ export default class PgClient {
   private async handleFieldArity(cards: ScopedCardService, fieldArity: FieldArity): Promise<Expression> {
     let { path, singular, plural } = fieldArity;
 
-    let chosenExpression: CardExpression;
-    if (path === 'csRealm' || path === 'csOriginalRealm' || path === 'csId') {
-      chosenExpression = singular;
-    } else {
-      chosenExpression = await this.walkFilterFieldPath(
-        cards,
-        fieldArity.typeContext,
-        path,
-        [],
-        async (fieldCard, _expression: CardExpression, _fieldName) => {
-          if (fieldCard.csFieldArity === 'plural') {
-            return plural;
-          }
-          return singular;
+    let chosenExpression: CardExpression = await this.walkFilterFieldPath(
+      cards,
+      fieldArity.typeContext,
+      path,
+      [],
+      async (fieldCard, _expression: CardExpression, _fieldName) => {
+        if (fieldCard.csFieldArity === 'plural') {
+          return plural;
         }
-      );
-    }
+        return singular;
+      },
+      async () => {
+        return singular;
+      }
+    );
     return await this.makeExpression(cards, chosenExpression);
   }
 
@@ -295,6 +296,7 @@ export default class PgClient {
     path: string,
     expression: Expression,
     handleLeafField: (fieldCard: FieldCard, expression: Expression, fieldName: string) => Promise<Expression>,
+    handleCsField?: (expression: Expression, csField: string) => Promise<Expression>,
     handleInteriorField?: (fieldCard: FieldCard, expression: Expression, fieldName: string) => Promise<Expression>
   ): Promise<Expression>;
   private async walkFilterFieldPath(
@@ -303,6 +305,7 @@ export default class PgClient {
     path: string,
     expression: Expression,
     handleLeafField: (fieldCard: FieldCard, expression: CardExpression, fieldName: string) => Promise<CardExpression>,
+    handleCsField?: (expression: CardExpression, csField: string) => Promise<CardExpression>,
     handleInteriorField?: (
       fieldCard: FieldCard,
       expression: CardExpression,
@@ -315,21 +318,25 @@ export default class PgClient {
     path: string,
     expression: Expression,
     handleLeafField: (fieldCard: FieldCard, expression: any[], fieldName: string) => Promise<any[]>,
+    handleCsField?: (expression: any[], csField: string) => Promise<any[]>,
     handleInteriorField?: (fieldCard: FieldCard, expression: any[], fieldName: string) => Promise<any[]>
   ): Promise<any> {
     let pathSegments = path.split('.');
     let enclosingCard: Card = await cards.get(filterTypeContext);
     for (let [index, pathSegment] of pathSegments.entries()) {
-      let fieldCard = await enclosingCard.field(pathSegment);
-      let fullFieldName = cardstackFieldPattern.test(pathSegment)
-        ? pathSegment
-        : `${fieldCard.enclosingCard.canonicalURL}/${pathSegment}`;
-      if (index === pathSegments.length - 1) {
-        expression = await handleLeafField(fieldCard, expression, fullFieldName);
-      } else if (handleInteriorField) {
-        expression = await handleInteriorField(fieldCard, expression, fullFieldName);
+      let isCsField = cardstackFieldPattern.test(pathSegment);
+      if (isCsField && handleCsField) {
+        expression = await handleCsField(expression, pathSegment);
+      } else if (!isCsField) {
+        let fieldCard = await enclosingCard.field(pathSegment);
+        let fullFieldName = `${fieldCard.enclosingCard.canonicalURL}/${pathSegment}`;
+        if (index === pathSegments.length - 1) {
+          expression = await handleLeafField(fieldCard, expression, fullFieldName);
+        } else if (handleInteriorField) {
+          expression = await handleInteriorField(fieldCard, expression, fullFieldName);
+        }
+        enclosingCard = fieldCard;
       }
-      enclosingCard = fieldCard;
     }
     return expression;
   }

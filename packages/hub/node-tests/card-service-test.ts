@@ -975,7 +975,39 @@ describe('hub/card-service', function() {
       });
 
       // Also test the arity of this scenario
-      it.skip('can filter by an interior csField of a field filled by a card', async function() {});
+      it('can filter by an interior csField of a field filled by a card', async function() {
+        let ownerCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('name', 'string-field')
+            .withField('puppy', puppyCard).jsonapi
+        );
+        await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({ name: 'Hassan' })
+            .withRelationships({ puppy: vanGogh })
+            .adoptingFrom(ownerCard).jsonapi
+        );
+        let mangosMommy = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({ name: 'Mariko' })
+            .withRelationships({ puppy: mango })
+            .adoptingFrom(ownerCard).jsonapi
+        );
+
+        let results = await service.search({
+          filter: {
+            type: ownerCard,
+            eq: {
+              'puppy.csId': mango.csId,
+            },
+          },
+        });
+        expect(results.cards.length).to.equal(1);
+        expect(results.cards[0].canonicalURL).to.equal(mangosMommy.canonicalURL);
+      });
 
       it.skip('filtering fields with arity > 1', async function() {});
     });
