@@ -1,0 +1,11 @@
+{
+  "name": "base",
+  "version": "0.0.0",
+  "license": "MIT",
+  "peerDependencies": {
+    "@cardstack/hub": "*"
+  },
+  "devDependencies": {
+    "@cardstack/hub": "0.16.16"
+  }
+}
