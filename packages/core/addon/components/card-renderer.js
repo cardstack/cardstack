@@ -28,7 +28,7 @@ export default class CardRenderer extends Component {
       this.cardFocused = this.args.cardFocused;
     }
 
-    if (this.args.format === 'isolated') {
+    if (this.args.card && this.args.format === 'isolated') {
       this.fields = A(Object.assign([], this.args.card.isolatedFields));
     }
   }

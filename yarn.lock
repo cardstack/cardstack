@@ -809,10 +809,10 @@
     ember-radio-button "^2.0.1"
     ember-truth-helpers "^2.1.0"
 
-"@cardstack/ui-components@^0.2.19":
-  version "0.2.19"
-  resolved "https://registry.yarnpkg.com/@cardstack/ui-components/-/ui-components-0.2.19.tgz#b318d37f79937656a6e7b03ae911532f1135ea8a"
-  integrity sha512-tISKRtkzlQG+B8GaIZr+H2BXe2Sqrr2Mv6OipSpmVP6e3lPHPt+eHIZRV55BdZPmmcZCZTGyIsn5TcUNo99akQ==
+"@cardstack/ui-components@^0.2.20":
+  version "0.2.20"
+  resolved "https://registry.yarnpkg.com/@cardstack/ui-components/-/ui-components-0.2.20.tgz#66d7976ba6a045c26b13bad7e6d8e6ed6439f772"
+  integrity sha512-XswQpS5tnqTG3aMdu64InwssTOqYmLSyI5A4cdBaz4RSodqhMa3l9WsImaWkh5Y8dW6l4yuwhFrKVVSRSjsIPw==
   dependencies:
     broccoli-funnel "^2.0.2"
     broccoli-merge-trees "^3.0.2"
