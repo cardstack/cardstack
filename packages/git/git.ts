@@ -1,7 +1,6 @@
 import {
   Commit as NGCommit,
   Cred as NGCred,
-  Merge as NGMerge,
   Oid as NGOid,
   Repository as NGRepository,
   Index as NGIndex,
@@ -26,6 +25,7 @@ import {
   findMergeBase as igFindMergeBase,
   resolveRef as igResolveRef,
   writeRef as igWriteRef,
+  merge as igMerge,
 } from 'isomorphic-git';
 
 igPlugins.set('fs', fs);
@@ -216,6 +216,10 @@ export class Commit {
     return Oid.fromNGOid(this.ngcommit.id());
   }
 
+  sha() {
+    return this.ngcommit.id().toString();
+  }
+
   async getLog() {
     let log: Commit[] = [];
 
@@ -264,6 +268,7 @@ export class Oid {
   }
 }
 export class BranchNotFound extends Error {}
+export class GitConflict extends Error {}
 
 class Reference {
   constructor(private readonly repo: Repository, private readonly reference: string, private readonly sha: string) {}
@@ -357,6 +362,29 @@ export class Tree {
   }
 }
 
+function formatCommitOpts(commitOpts: CommitOpts) {
+  let author = {
+    name: commitOpts.authorName,
+    email: commitOpts.authorEmail,
+    date: commitOpts.authorDate,
+  };
+
+  let committer;
+
+  if (commitOpts.committerName && commitOpts.committerEmail) {
+    committer = {
+      name: commitOpts.committerName,
+      email: commitOpts.committerEmail,
+    };
+  }
+
+  return {
+    author,
+    committer,
+    message: commitOpts.message,
+  };
+}
+
 export class Merge {
   static FASTFORWARD_ONLY = 2;
 
@@ -368,9 +396,24 @@ export class Merge {
     return new Oid(oids[0]);
   }
 
-  static async commits(repo: Repository, ourCommit: Commit, theirCommit: Commit): Promise<Index> {
-    let ngindex = await NGMerge.commits(repo.getNgRepo(), ourCommit.getNgCommit(), theirCommit.getNgCommit());
-    return new Index(ngindex);
+  static async perform(repo: Repository, ourCommit: Commit, theirCommit: Commit, commitOpts: CommitOpts) {
+    try {
+      let res = await igMerge(
+        Object.assign(formatCommitOpts(commitOpts), {
+          gitdir: repo.gitdir(),
+          ours: ourCommit.sha(),
+          theirs: theirCommit.sha(),
+        })
+      );
+
+      return res;
+    } catch (e) {
+      if (e.code === 'MergeNotSupportedFail') {
+        throw new GitConflict();
+      } else {
+        throw e;
+      }
+    }
   }
 }
 

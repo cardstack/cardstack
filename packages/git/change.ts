@@ -1,15 +1,4 @@
-import {
-  Index,
-  Commit,
-  Merge,
-  Repository,
-  Signature,
-  Tree,
-  FILEMODE,
-  FetchOptions,
-  CommitOpts,
-  BranchNotFound,
-} from './git';
+import { Commit, Merge, Repository, Signature, Tree, FILEMODE, FetchOptions, CommitOpts, BranchNotFound } from './git';
 
 import { NewEntry, MutableTree, NotFound, OverwriteRejected } from './mutable-tree';
 
@@ -20,15 +9,7 @@ import delay from 'delay';
 import logger from '@cardstack/logger';
 const log = logger('cardstack/git');
 
-class GitConflict extends Error {
-  constructor(public index: Index) {
-    super();
-    this.index = index;
-  }
-}
-
 export default class Change {
-  static GitConflict = GitConflict;
   static NotFound = NotFound;
   static OverwriteRejected = OverwriteRejected;
 
@@ -190,26 +171,12 @@ export default class Change {
       // fast forward (we think), so no merge needed
       return newCommit;
     }
-    let index = await Merge.commits(this.repo, newCommit, headCommit);
-    if (index.hasConflicts()) {
-      throw new GitConflict(index);
-    }
-    let treeOid = await index.writeTreeTo(this.repo);
-    let tree = await Tree.lookup(this.repo, treeOid);
-    let { author, committer } = signature(commitOpts);
-    let mergeCommitOid = await Commit.create(
-      this.repo,
-      // @ts-ignore null isn't recognized as valid second param
-      null,
-      author,
-      committer,
-      'UTF-8',
-      `Clean merge into ${this.targetBranch}`,
-      tree,
-      2,
-      [newCommit, headCommit]
-    );
-    return await Commit.lookup(this.repo, mergeCommitOid);
+
+    commitOpts.message = `Clean merge into ${this.targetBranch}`;
+
+    let mergeResult = await Merge.perform(this.repo, newCommit, headCommit, commitOpts);
+
+    return await Commit.lookup(this.repo, mergeResult.oid!);
   }
 
   async _applyCommit(commit: Commit) {

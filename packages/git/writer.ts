@@ -1,4 +1,4 @@
-import { Repository, RemoteConfig, FetchOptions } from './git';
+import { Repository, RemoteConfig, FetchOptions, GitConflict } from './git';
 
 import { todo } from '@cardstack/plugin-utils/todo-any';
 
@@ -345,7 +345,7 @@ async function withErrorHandling(id: string, type: string, fn: Function) {
     if (/Unable to parse OID/i.test(err.message) || /Object not found/i.test(err.message)) {
       throw new Error(err.message, { status: 400, source: { pointer: '/data/meta/version' } });
     }
-    if (err instanceof Change.GitConflict) {
+    if (err instanceof GitConflict) {
       throw new Error('Merge conflict', { status: 409 });
     }
     if (err instanceof Change.OverwriteRejected) {
