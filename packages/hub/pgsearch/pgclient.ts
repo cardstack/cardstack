@@ -310,9 +310,9 @@ export default class PgClient {
     filterTypeContext: CardId,
     path: string,
     expression: Expression,
-    handleLeafField: (fieldCard: FieldCard, expression: Expression, fieldName: string) => Promise<Expression>,
-    handleInteriorField?: (fieldCard: FieldCard, expression: Expression, fieldName: string) => Promise<Expression>
-  ): Promise<Expression> {
+    handleLeafField: (fieldCard: FieldCard, expression: any[], fieldName: string) => Promise<any>,
+    handleInteriorField?: (fieldCard: FieldCard, expression: any[], fieldName: string) => Promise<any>
+  ): Promise<any> {
     let pathSegments = path.split('.');
     let enclosingCard: Card = await cards.get(filterTypeContext);
     for (let [index, pathSegment] of pathSegments.entries()) {
