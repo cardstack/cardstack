@@ -1,7 +1,7 @@
 import { createTestEnv, TestEnv } from './helpers';
 import { Session } from '../session';
 import { myOrigin } from '../origin';
-import { testCard } from './test-card';
+import { testCard, cardToId } from './test-card';
 import { ScopedCardService } from '../cards-service';
 import { AddressableCard } from '../card';
 
@@ -974,7 +974,6 @@ describe('hub/card-service', function() {
         expect(results.cards[0].canonicalURL).to.equal(mangosMommy.canonicalURL);
       });
 
-      // Also test the arity of this scenario
       it('can filter by an interior csField of a field filled by a card', async function() {
         let ownerCard = await service.create(
           `${myOrigin}/api/realms/first-ephemeral-realm`,
@@ -1009,7 +1008,52 @@ describe('hub/card-service', function() {
         expect(results.cards[0].canonicalURL).to.equal(mangosMommy.canonicalURL);
       });
 
-      it.skip('filtering fields with arity > 1', async function() {});
+      it('filtering field filled by card references with arity > 1', async function() {
+        let ownerCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('name', 'string-field')
+            .withField('puppies', puppyCard, 'plural').jsonapi
+        );
+
+        let mommy = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({ name: 'Mariko' })
+            .withRelationships({ puppies: [vanGogh, mango].map(cardToId) })
+            .adoptingFrom(ownerCard).jsonapi
+        );
+        let daddy = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({ name: 'Hassan' })
+            .withRelationships({ puppies: [vanGogh, mango].map(cardToId) })
+            .adoptingFrom(ownerCard).jsonapi
+        );
+        await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({ name: 'Dog Heaven' })
+            .withRelationships({ puppies: [ringo].map(cardToId) })
+            .adoptingFrom(ownerCard).jsonapi
+        );
+
+        let results = await service.search({
+          filter: {
+            type: ownerCard,
+            eq: {
+              'puppies.name': 'Mango',
+            },
+          },
+        });
+        expect(results.cards.length).to.equal(2);
+        let ids = results.cards.map(i => i.canonicalURL);
+        expect(ids).to.include.members([mommy.canonicalURL, daddy.canonicalURL]);
+      });
+
+      it.skip('filtering field filled by card values with arity > 1', async function() {});
+
+      it.skip('filtering field by interior csField for a field with arity > 1', async function() {});
     });
   });
 });

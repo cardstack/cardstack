@@ -67,6 +67,10 @@ describe('hub/jsonapi', function() {
     expect(response.header.location).to.match(/http:\/\/[^/]+\/api\/realms\/first-ephemeral-realm\/cards\/[^/]+/);
   });
 
+  it.skip('can create a card with a field that has > 1 arity filled with cards as references', async function() {});
+
+  it.skip('can create a card with a field that has > 1 arity filled with cards as values', async function() {});
+
   it('can patch a card', async function() {
     let response = await request
       .post('/api/realms/first-ephemeral-realm/cards')
@@ -208,6 +212,10 @@ describe('hub/jsonapi', function() {
     expect(response.body?.data?.attributes?.csOriginalRealm).to.equal('https://somewhere/else');
     expect(response.body?.data?.attributes?.csRealm).to.equal('http://example.com/api/realms/second-ephemeral-realm');
   });
+
+  it.skip('get a card with a field that has > 1 arity filled with cards as references', async function() {});
+
+  it.skip('get a card with a field that has > 1 arity filled with cards as values', async function() {});
 
   it('can search for cards', async function() {
     await request

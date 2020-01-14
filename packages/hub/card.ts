@@ -166,7 +166,13 @@ export class Card {
           continue;
         }
         let field = await this.field(name);
-        await field.validateReference(await priorCard?.reference(name), relationshipToCardId(ref), realm);
+        let cardIds = relationshipToCardId(ref);
+        let priorCardReferences = await priorCard?.reference(name);
+        if (cardIds && Array.isArray(cardIds)) {
+          await Promise.all(cardIds.map(cardId => field.validateReferences(priorCardReferences, cardId, realm)));
+        } else if (cardIds) {
+          await field.validateReferences(priorCardReferences, cardIds, realm);
+        }
       }
     }
   }
@@ -178,16 +184,18 @@ export class Card {
       let field = await this.field(fieldName);
       return await field.deserializeValue(rawValue);
     }
-    let ref = await this.reference(fieldName);
-    if (ref != null) {
-      return await this.service.get(ref);
+    let refs = await this.reference(fieldName);
+    if (refs != null && Array.isArray(refs)) {
+      return await Promise.all(refs.map(ref => this.service.get(ref)));
+    } else if (refs != null) {
+      return await this.service.get(refs);
     }
     return null;
   }
 
   // if the given field is stored as a reference, this gives you the reference
   // without converting it to a value like `value()` would.
-  async reference(fieldName: string): Promise<CardId | undefined> {
+  async reference(fieldName: string): Promise<CardId | CardId[] | undefined> {
     let ref = this.jsonapi.data.relationships?.[fieldName];
     if (ref != null) {
       return relationshipToCardId(ref);
@@ -281,6 +289,10 @@ export class Card {
           let field = await this.field(fieldName);
           if (value instanceof Card) {
             doc[`${field.enclosingCard.canonicalURL}/${fieldName}`] = await value.asSearchDoc();
+          } else if (Array.isArray(value) && value.every(i => i instanceof Card)) {
+            doc[`${field.enclosingCard.canonicalURL}/${fieldName}`] = await Promise.all(
+              value.map(i => i.asSearchDoc())
+            );
           } else {
             doc[`${field.enclosingCard.canonicalURL}/${fieldName}`] = value;
           }
@@ -382,6 +394,9 @@ export class FieldCard extends Card {
   constructor(jsonapi: SingleResourceDoc, readonly name: string, enclosingCard: Card, service: ScopedCardService) {
     super(jsonapi, enclosingCard.csRealm, enclosingCard, service);
     this.enclosingCard = enclosingCard;
+    if (typeof jsonapi.data.attributes?.csFieldArity === 'string') {
+      this.csFieldArity = jsonapi.data.attributes?.csFieldArity === 'plural' ? 'plural' : 'singular';
+    }
   }
 
   async validateValue(priorFieldValue: any, value: any, realm: AddressableCard) {
@@ -402,9 +417,9 @@ export class FieldCard extends Card {
     await copy.validate(priorFieldValue, realm);
   }
 
-  async validateReference(
-    _priorReference: CardId | undefined,
-    newReference: CardId | undefined,
+  async validateReferences(
+    _priorReference: CardId | CardId[] | undefined,
+    newReference: CardId | CardId[] | undefined,
     _realm: AddressableCard
   ) {
     if (!newReference) {
@@ -428,22 +443,28 @@ export class FieldCard extends Card {
     // attack vector?). The only situation where this would not be a problem
     // would be if the field card adopts directly from the base card (meaning
     // any card can be present in this field).
-    let referencedCard = await this.service.get(newReference); // let a 404 error be thrown when not found
-    let card = referencedCard;
-    while (card) {
-      let parent = await card.adoptsFrom();
-      if (!parent) {
-        break;
-      }
-      if (parent.canonicalURL === fieldType.canonicalURL) {
-        return;
-      }
-      card = parent;
-    }
-
-    throw new CardstackError(
-      `field ${this.name} on card ${this.enclosingCard.canonicalURL} failed card-type validation for reference: ${referencedCard.canonicalURL}. The referenced card must adopt from: ${fieldType.canonicalURL}`,
-      { status: 400 }
+    let newReferences = Array.isArray(newReference) ? newReference : [newReference];
+    await Promise.all(
+      newReferences.map(async newRef => {
+        let referencedCard = await this.service.get(newRef); // let a 404 error be thrown when not found
+        let card = referencedCard;
+        while (card) {
+          let parent = await card.adoptsFrom();
+          if (!parent) {
+            break;
+          }
+          if (parent.canonicalURL === fieldType!.canonicalURL) {
+            return;
+          }
+          card = parent;
+        }
+        throw new CardstackError(
+          `field ${this.name} on card ${this.enclosingCard.canonicalURL} failed card-type validation for reference: ${
+            referencedCard.canonicalURL
+          }. The referenced card must adopt from: ${fieldType!.canonicalURL}`,
+          { status: 400 }
+        );
+      })
     );
   }
 
@@ -557,10 +578,21 @@ function everythingButMeta(_objValue: any, srcValue: any, key: string) {
   }
 }
 
-function relationshipToCardId(ref: RelationshipObject): CardId {
-  if (!('links' in ref) || !ref.links.related) {
-    throw new Error(`only links.related references are implemented`);
+function relationshipToCardId(ref: RelationshipObject): CardId | CardId[] | undefined {
+  if ('links' in ref && ref.links.related) {
+    let url = typeof ref.links.related === 'string' ? ref.links.related : ref.links.related.href;
+    return canonicalURLToCardId(url);
   }
-  let url = typeof ref.links.related === 'string' ? ref.links.related : ref.links.related.href;
-  return canonicalURLToCardId(url);
+
+  if ('data' in ref) {
+    if (!Array.isArray(ref.data) && ref.data?.type === 'cards' && ref.data?.id) {
+      return canonicalURLToCardId(ref.data.id);
+    } else if (
+      Array.isArray(ref.data) &&
+      ref.data.every(i => i.type === 'cards') &&
+      ref.data.every(i => i.id != null)
+    ) {
+      return ref.data.map(i => canonicalURLToCardId(i.id));
+    }
+  }
 }

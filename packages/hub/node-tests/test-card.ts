@@ -1,5 +1,5 @@
 import { SingleResourceDoc } from 'jsonapi-typescript';
-import { CardId, canonicalURL, cardstackFieldPattern } from '../card';
+import { CardId, canonicalURL, cardstackFieldPattern, FieldCard, AddressableCard } from '../card';
 import { UpstreamDocument } from '../document';
 import { CARDSTACK_PUBLIC_REALM } from '../realm';
 
@@ -7,7 +7,7 @@ export class TestCard {
   private parent: CardId | undefined;
   private csFieldValues: Map<string, any> = new Map();
   private userFieldValues: Map<string, any> = new Map();
-  private userFieldRefs: Map<string, CardId | undefined> = new Map();
+  private userFieldRefs: Map<string, CardId | CardId[] | undefined> = new Map();
   private fields: Map<string, TestCard | null> = new Map();
 
   csId?: string;
@@ -33,6 +33,7 @@ export class TestCard {
             break;
           case 'csFeatures':
           case 'csFiles':
+          case 'csFieldArity':
           case 'csPeerDependencies':
             this.csFieldValues.set(field, value);
             break;
@@ -69,7 +70,9 @@ export class TestCard {
         // cardstack fields
         switch (field) {
           case 'csAdoptsFrom':
-            this.parent = value;
+            if (!Array.isArray(value)) {
+              this.parent = value;
+            }
             break;
           default:
             throw new Error(`unknown cardstack field ${field}`);
@@ -78,7 +81,12 @@ export class TestCard {
         // a user field
         this.userFieldRefs.set(field, value);
         if (!this.fields.has(field) && autoCreateField) {
-          this.fields.set(field, new TestCard().adoptingFrom(this.guessReferenceType(value)));
+          this.fields.set(
+            field,
+            new TestCard().adoptingFrom(
+              this.guessReferenceType(!Array.isArray(value) ? value : value.length ? value[0] : undefined)
+            )
+          );
         }
       }
     }
@@ -94,10 +102,27 @@ export class TestCard {
     return this;
   }
 
-  withField<T extends TestCard>(this: T, name: string, fieldShorthand: string, values?: FieldValues): T;
-  withField<T extends TestCard>(this: T, name: string, fieldCard: CardId, values?: FieldValues): T;
+  withField<T extends TestCard>(
+    this: T,
+    name: string,
+    fieldShorthand: string,
+    arity?: FieldCard['csFieldArity'],
+    values?: FieldValues
+  ): T;
+  withField<T extends TestCard>(
+    this: T,
+    name: string,
+    fieldCard: CardId,
+    arity?: FieldCard['csFieldArity'],
+    values?: FieldValues
+  ): T;
   withField<T extends TestCard>(this: T, name: string, fieldCard: null): T;
-  withField(name: string, fieldCard: string | CardId | null, values: FieldValues = {}): this {
+  withField(
+    name: string,
+    fieldCard: string | CardId | null,
+    arity: FieldCard['csFieldArity'] = 'singular',
+    values: FieldValues = {}
+  ): this {
     if (fieldCard == null) {
       this.fields.set(name, null);
       return this;
@@ -107,7 +132,13 @@ export class TestCard {
       fieldCard = { csRealm: CARDSTACK_PUBLIC_REALM, csId: fieldCard };
     }
 
-    this.fields.set(name, new TestCard().withAutoAttributes(values).adoptingFrom(fieldCard));
+    this.fields.set(
+      name,
+      new TestCard()
+        .withAutoAttributes(values)
+        .withAttributes({ csFieldArity: arity })
+        .adoptingFrom(fieldCard)
+    );
     return this;
   }
 
@@ -122,14 +153,20 @@ export class TestCard {
 
     let relationships = Object.create(null);
     for (let [key, value] of this.userFieldRefs.entries()) {
-      relationships[key] =
-        value == null
-          ? null
-          : {
-              links: {
-                related: canonicalURL(value),
-              },
-            };
+      if (Array.isArray(value)) {
+        relationships[key] = {
+          data: value.map(i => ({ type: 'cards', id: canonicalURL(i) })),
+        };
+      } else {
+        relationships[key] =
+          value == null
+            ? null
+            : {
+                links: {
+                  related: canonicalURL(value),
+                },
+              };
+      }
     }
 
     let doc = {
@@ -204,7 +241,7 @@ interface FieldValues {
 
 interface FieldRefs {
   csAdoptsFrom?: CardId;
-  [fieldName: string]: CardId | TestCardWithId | undefined;
+  [fieldName: string]: CardId | TestCardWithId | CardId[] | TestCardWithId[] | undefined;
 }
 
 interface TestCardWithId extends TestCard {
@@ -215,4 +252,9 @@ interface TestCardWithId extends TestCard {
 
 export function testCard(): TestCard {
   return new TestCard();
+}
+
+export function cardToId(card: TestCardWithId | AddressableCard): CardId {
+  let { csId, csOriginalRealm, csRealm } = card;
+  return { csId, csOriginalRealm, csRealm };
 }

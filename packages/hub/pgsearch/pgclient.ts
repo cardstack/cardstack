@@ -226,8 +226,7 @@ export default class PgClient {
     }
 
     return await this.walkFilterFieldPath(
-      cards,
-      fieldQuery.typeContext,
+      await cards.get(fieldQuery.typeContext),
       path,
       ['search_doc'],
       async (fieldCard, expression, fieldName) => {
@@ -241,8 +240,14 @@ export default class PgClient {
       async (expression, csField) => {
         return [...expression, '->>', param(csField)]; // this assumes arity of 1 for all the csFields which is probably not what we want long term...
       },
-      async (_fieldCard, expression, fieldName) => {
-        return [...expression, '->', param(fieldName)];
+      {
+        enter: async (fieldCard, expression, fieldName) => {
+          if (fieldCard.csFieldArity === 'plural') {
+            return ['jsonb_array_elements (', ...expression, '->', param(fieldName), ')'];
+          } else {
+            return [...expression, '->', param(fieldName)];
+          }
+        },
       }
     );
   }
@@ -252,8 +257,7 @@ export default class PgClient {
     let expression = await this.makeExpression(cards, value);
 
     return await this.walkFilterFieldPath(
-      cards,
-      fieldValue.typeContext,
+      await cards.get(fieldValue.typeContext),
       path,
       expression,
       async (fieldCard, expression) => {
@@ -273,8 +277,7 @@ export default class PgClient {
     let { path, singular, plural } = fieldArity;
 
     let chosenExpression: CardExpression = await this.walkFilterFieldPath(
-      cards,
-      fieldArity.typeContext,
+      await cards.get(fieldArity.typeContext),
       path,
       [],
       async (fieldCard, _expression: CardExpression, _fieldName) => {
@@ -284,58 +287,76 @@ export default class PgClient {
         return singular;
       },
       async () => {
-        return singular;
+        return singular; // this assumes arity of 1 for all the csFields which is probably not what we want long term...
+      },
+      {
+        exit: async (fieldCard, expression, _fieldName) => {
+          if (fieldCard.csFieldArity === 'plural') {
+            return ['array(select', ...expression, ') && array[true]'];
+          } else {
+            return expression;
+          }
+        },
       }
     );
     return await this.makeExpression(cards, chosenExpression);
   }
 
   private async walkFilterFieldPath(
-    cards: ScopedCardService,
-    filterTypeContext: CardId,
+    enclosingCard: Card,
     path: string,
     expression: Expression,
-    handleLeafField: (fieldCard: FieldCard, expression: Expression, fieldName: string) => Promise<Expression>,
-    handleCsField?: (expression: Expression, csField: string) => Promise<Expression>,
-    handleInteriorField?: (fieldCard: FieldCard, expression: Expression, fieldName: string) => Promise<Expression>
+    handleLeafField: FilterFieldHandler<Expression>,
+    handleCsField?: FilterCsFieldHandler<Expression>,
+    handleInteriorField?: FilterFieldHandlerWithEntryAndExit<Expression>
   ): Promise<Expression>;
   private async walkFilterFieldPath(
-    cards: ScopedCardService,
-    filterTypeContext: CardId,
+    enclosingCard: Card,
     path: string,
     expression: Expression,
-    handleLeafField: (fieldCard: FieldCard, expression: CardExpression, fieldName: string) => Promise<CardExpression>,
-    handleCsField?: (expression: CardExpression, csField: string) => Promise<CardExpression>,
-    handleInteriorField?: (
-      fieldCard: FieldCard,
-      expression: CardExpression,
-      fieldName: string
-    ) => Promise<CardExpression>
+    handleLeafField: FilterFieldHandler<CardExpression>,
+    handleCsField?: FilterCsFieldHandler<CardExpression>,
+    handleInteriorField?: FilterFieldHandlerWithEntryAndExit<CardExpression>
   ): Promise<CardExpression>;
   private async walkFilterFieldPath(
-    cards: ScopedCardService,
-    filterTypeContext: CardId,
+    enclosingCard: Card,
     path: string,
     expression: Expression,
-    handleLeafField: (fieldCard: FieldCard, expression: any[], fieldName: string) => Promise<any[]>,
-    handleCsField?: (expression: any[], csField: string) => Promise<any[]>,
-    handleInteriorField?: (fieldCard: FieldCard, expression: any[], fieldName: string) => Promise<any[]>
+    handleLeafField: FilterFieldHandler<any[]>,
+    handleCsField?: FilterCsFieldHandler<any[]>,
+    handleInteriorField?: FilterFieldHandlerWithEntryAndExit<any[]>
   ): Promise<any> {
     let pathSegments = path.split('.');
-    let enclosingCard: Card = await cards.get(filterTypeContext);
-    for (let [index, pathSegment] of pathSegments.entries()) {
-      let isCsField = cardstackFieldPattern.test(pathSegment);
-      if (isCsField && handleCsField) {
-        expression = await handleCsField(expression, pathSegment);
-      } else if (!isCsField) {
-        let fieldCard = await enclosingCard.field(pathSegment);
-        let fullFieldName = `${fieldCard.enclosingCard.canonicalURL}/${pathSegment}`;
-        if (index === pathSegments.length - 1) {
-          expression = await handleLeafField(fieldCard, expression, fullFieldName);
-        } else if (handleInteriorField) {
-          expression = await handleInteriorField(fieldCard, expression, fullFieldName);
-        }
-        enclosingCard = fieldCard;
+    let isLeaf = pathSegments.length === 1;
+    let currentSegment = pathSegments.shift() as string; // string.split() always has at least one item
+    let isCsField = cardstackFieldPattern.test(currentSegment);
+    if (isCsField && handleCsField) {
+      expression = await handleCsField(expression, currentSegment);
+    } else if (!isCsField) {
+      let fieldCard = await enclosingCard.field(currentSegment);
+      let fullFieldName = `${fieldCard.enclosingCard.canonicalURL}/${currentSegment}`;
+      if (isLeaf) {
+        expression = await handleLeafField(fieldCard, expression, fullFieldName);
+      } else {
+        let passThru: FilterFieldHandler<any[]> = async (_fc, e: Expression, _f) => e;
+        // when dealing with an interior field that is not a leaf path segment,
+        // the entrance and exit hooks allow you to decorate the expression for
+        // the interior field before the interior's antecedant segment's
+        // expression is processed and after the interior field's antecedant
+        // segment's expression has been processed (i.e. recursing into the
+        // antecedant field and recursing out of the antecedant field).
+        let entranceHandler = handleInteriorField ? handleInteriorField.enter || passThru : passThru;
+        let exitHandler = handleInteriorField ? handleInteriorField.exit || passThru : passThru;
+
+        let interiorExpression = await this.walkFilterFieldPath(
+          fieldCard,
+          pathSegments.join('.'),
+          await entranceHandler(fieldCard, expression, fullFieldName),
+          handleLeafField,
+          handleCsField,
+          handleInteriorField
+        );
+        expression = await exitHandler(fieldCard, interiorExpression, fullFieldName);
       }
     }
     return expression;
@@ -543,6 +564,15 @@ declare module '@cardstack/hub/dependency-injection' {
 export interface ResponseMeta {
   page: { total: number; cursor?: string };
 }
+
+type FilterFieldHandler<T> = (fieldCard: FieldCard, expression: T, fieldName: string) => Promise<T>;
+
+interface FilterFieldHandlerWithEntryAndExit<T> {
+  enter?: FilterFieldHandler<T>;
+  exit?: FilterFieldHandler<T>;
+}
+
+type FilterCsFieldHandler<T> = (expression: T, csFieldName: string) => Promise<T>;
 
 const RANGE_OPERATORS: { [limit: string]: string } = Object.freeze({
   lte: '<=',
