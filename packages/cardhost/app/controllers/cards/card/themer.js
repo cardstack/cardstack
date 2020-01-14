@@ -15,12 +15,6 @@ export default class ThemerCardController extends Controller {
   }
 
   @action
-  async saveAndClose() {
-    await this.model.save();
-    this.router.transitionTo('cards.card.view', this.model.name);
-  }
-
-  @action
   updateCode(code) {
     this.model.setIsolatedCss(code);
   }

@@ -5,6 +5,7 @@ import Fixtures from '@cardstack/test-support/fixtures';
 import { createCards } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
+import { animationsSettled } from 'ember-animated/test-support';
 
 const timeout = 20000;
 const card1Id = 'millenial-puppies';
@@ -169,9 +170,10 @@ module('Acceptance | css editing', function(hooks) {
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
     let themerHasStyle = find('[data-test-preview-css]').innerText.includes('gorgeous styles');
     assert.ok(themerHasStyle);
-    debugger;
-    await click('[data-test-close-editor]');
-    // let viewHasStyle = find('[data-test-view-css]').innerText.includes('gorgeous styles');
-    // assert.ok(viewHasStyle);
+    await click('[data-test-card-save-btn]');
+    await waitFor(`[data-test-card-save-btn].saved`, { timeout });
+    await animationsSettled();
+    let viewHasStyle = find('[data-test-view-css]').innerText.includes('gorgeous styles');
+    assert.ok(viewHasStyle);
   });
 });

@@ -7,8 +7,8 @@ module('Integration | Component | themer-toolbar', function(hooks) {
   setupRenderingTest(hooks);
 
   test('it renders', async function(assert) {
-    this.set('saveAndClose', () => {});
-    await render(hbs`<ThemerToolbar @saveAndClose={{this.saveAndClose}} />`);
-    assert.ok(this.element.textContent.includes('Save and Close'));
+    this.set('model', {});
+    await render(hbs`<ThemerToolbar @model={{this.model}}/>`);
+    assert.dom(this.element).hasTextContaining('Close');
   });
 });
