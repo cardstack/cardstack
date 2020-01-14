@@ -42,11 +42,11 @@
           {{!-- TODO: Change displayed logo depending on field --}}
           {{! template-lint-disable no-inline-styles }}
           <header
-            class="schema-field-renderer--header"
-            style={{css-url "background-image" "/images/fields/text.svg"}}
+            class="schema-field-renderer--header {{this.field.id}}"
+            style={{css-url "background-image" this.field.icon}}
             data-test-field-renderer-type
           >
-            {{@field.name}} ({{this.fieldTypeTitle}})
+            {{@field.name}} ({{this.field.title}})
             {{#if @field.isAdopted}}
               <span class="schema-field-renderer--header--detail">Adopted</span>
             {{/if}}

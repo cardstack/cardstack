@@ -23,7 +23,7 @@
   border: 3px solid var(--ch-light-background);
   border-radius: 5px 5px 0 0;
   background-position: var(--ch-spacing) center;
-  background-size: 10px;
+  background-size: 15px 15px;
   background-repeat: no-repeat;
   background-color: var(--ch-light-background);
   color: black;
@@ -34,6 +34,11 @@
   transition: background-color var(--ch-transition-time),
               border-color var(--ch-transition-time),
               border-radius var(--ch-transition-time);
+}
+
+header.schema-field-renderer--header.text-field,
+header.schema-field-renderer--header.text-field-case-insensitive {
+  background-size: 12px 15px;
 }
 
 .schema-field-renderer--header--detail {
