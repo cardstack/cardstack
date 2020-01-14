@@ -586,6 +586,58 @@ describe('hub/card-service', function() {
           expect(err.detail).to.match(/field address on card .* failed card-type validation/);
         }
       });
+
+      it('can break a cycle in the search doc', async function() {
+        let friendCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('friend', userCard)
+            .adoptingFrom(userCard).jsonapi
+        );
+        let user1 = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Deandra',
+            })
+            .adoptingFrom(friendCard).jsonapi
+        );
+        let user2 = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Alice',
+            })
+            .withRelationships({ friend: user1 })
+            .adoptingFrom(friendCard).jsonapi
+        );
+        let user3 = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Monique',
+            })
+            .withRelationships({ friend: user2 })
+            .adoptingFrom(friendCard).jsonapi
+        );
+        user1 = await service.update(user1, {
+          data: {
+            type: 'cards',
+            relationships: {
+              friend: {
+                data: { type: 'cards', id: user3.canonicalURL },
+              },
+            },
+          },
+        });
+
+        let searchDoc = await user1.asSearchDoc();
+        let friendField = `${friendCard.canonicalURL}/friend`;
+        expect(searchDoc).to.have.deep.property(`csId`, user1.csId);
+        expect(searchDoc).to.have.deep.property(`${friendField}.csId`, user3.csId);
+        expect(searchDoc).to.have.deep.property(`${friendField}.${friendField}.csId`, user2.csId);
+        expect(searchDoc).to.not.have.deep.property(`${friendField}.${friendField}.${friendField}`);
+      });
     });
   });
 

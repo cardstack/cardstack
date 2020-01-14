@@ -256,12 +256,13 @@ export class Card {
     return new PristineDocument(this.regenerateJSONAPI());
   }
 
-  async asSearchDoc(): Promise<J.Object> {
+  async asSearchDoc(visitedCards: string[] = []): Promise<J.Object> {
     let doc: J.Object = Object.create(null);
     doc.csRealm = this.csRealm;
     doc.csOriginalRealm = this.csOriginalRealm;
     if (this.csId != null) {
       doc.csId = this.csId;
+      visitedCards.push(this.canonicalURL as string); // if csId exists, then a canonicalURL will exist as well
     }
 
     // What about card fields that a user had decided to fill in with a
@@ -287,14 +288,25 @@ export class Card {
           }
           let value = await this.value(fieldName);
           let field = await this.field(fieldName);
+          let fullFieldName = `${field.enclosingCard.canonicalURL}/${fieldName}`;
           if (value instanceof Card) {
-            doc[`${field.enclosingCard.canonicalURL}/${fieldName}`] = await value.asSearchDoc();
+            if (value.canonicalURL == null || !visitedCards.includes(value.canonicalURL)) {
+              doc[fullFieldName] = await value.asSearchDoc(
+                [...visitedCards, value.canonicalURL].filter(Boolean) as string[]
+              );
+            }
           } else if (Array.isArray(value) && value.every(i => i instanceof Card)) {
-            doc[`${field.enclosingCard.canonicalURL}/${fieldName}`] = await Promise.all(
-              value.map(i => i.asSearchDoc())
-            );
+            doc[fullFieldName] = (
+              await Promise.all(
+                value.map(i => {
+                  if (i.canonicalURL == null || !visitedCards.includes(i.canonicalURL)) {
+                    return i.asSearchDoc([...visitedCards, i.canonicalURL].filter(Boolean) as string[]);
+                  }
+                })
+              )
+            ).filter(Boolean);
           } else {
-            doc[`${field.enclosingCard.canonicalURL}/${fieldName}`] = value;
+            doc[fullFieldName] = value;
           }
         }
       }
