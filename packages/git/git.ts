@@ -3,7 +3,6 @@ import {
   Oid as NGOid,
   Repository as NGRepository,
   Index as NGIndex,
-  Signature as NGSignature,
   Tree as NGTree,
   Treebuilder as NGTreebuilder,
   TreeEntry as NGTreeEntry,
@@ -517,19 +516,6 @@ export class TreeEntry {
     if (tree) {
       return new Tree(tree);
     }
-  }
-}
-
-export class Signature {
-  static create(name: string, email: string, unixDate: number, utcOffset: number) {
-    let ngsignature = NGSignature.create(name, email, unixDate, utcOffset);
-    return new Signature(ngsignature);
-  }
-
-  constructor(private readonly ngsignature: NGSignature) {}
-
-  getNgSignature() {
-    return this.ngsignature;
   }
 }
 

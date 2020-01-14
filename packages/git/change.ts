@@ -1,4 +1,4 @@
-import { Commit, Merge, Repository, Signature, Tree, FILEMODE, FetchOptions, CommitOpts, BranchNotFound } from './git';
+import { Commit, Merge, Repository, Tree, FILEMODE, FetchOptions, CommitOpts, BranchNotFound } from './git';
 
 import { NewEntry, MutableTree, NotFound, OverwriteRejected } from './mutable-tree';
 
@@ -182,18 +182,6 @@ export default class Change {
   async _newBranch(newCommit: Commit) {
     await this.repo.createBranch(this.targetBranch, newCommit);
   }
-}
-
-function signature(commitOpts: CommitOpts) {
-  let date = commitOpts.authorDate || moment();
-  let author = Signature.create(commitOpts.authorName, commitOpts.authorEmail, date.unix(), date.utcOffset());
-  let committer = commitOpts.committerName
-    ? Signature.create(commitOpts.committerName, commitOpts.committerEmail!, date.unix(), date.utcOffset())
-    : author;
-  return {
-    author,
-    committer,
-  };
 }
 
 class FileHandle {
