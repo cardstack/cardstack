@@ -1200,7 +1200,7 @@ describe('hub/card-service', function() {
       });
 
       // includes cards that directly adopt and cards whose card-type is an ancestor in the adoption chain
-      it.skip('filter returns all cards that adopt from a card-type', async function() {});
+      it.skip('filtering on solely card type', async function() {});
     });
   });
 });
