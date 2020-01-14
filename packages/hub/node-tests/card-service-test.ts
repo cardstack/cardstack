@@ -1,7 +1,7 @@
 import { createTestEnv, TestEnv } from './helpers';
 import { Session } from '../session';
 import { myOrigin } from '../origin';
-import { testCard, cardToId } from './test-card';
+import { testCard } from './test-card';
 import { ScopedCardService } from '../cards-service';
 import { AddressableCard } from '../card';
 
@@ -1020,21 +1020,21 @@ describe('hub/card-service', function() {
           `${myOrigin}/api/realms/first-ephemeral-realm`,
           testCard()
             .withAttributes({ name: 'Mariko' })
-            .withRelationships({ puppies: [vanGogh, mango].map(cardToId) })
+            .withRelationships({ puppies: [vanGogh, mango] })
             .adoptingFrom(ownerCard).jsonapi
         );
         let daddy = await service.create(
           `${myOrigin}/api/realms/first-ephemeral-realm`,
           testCard()
             .withAttributes({ name: 'Hassan' })
-            .withRelationships({ puppies: [vanGogh, mango].map(cardToId) })
+            .withRelationships({ puppies: [vanGogh, mango] })
             .adoptingFrom(ownerCard).jsonapi
         );
         await service.create(
           `${myOrigin}/api/realms/first-ephemeral-realm`,
           testCard()
             .withAttributes({ name: 'Dog Heaven' })
-            .withRelationships({ puppies: [ringo].map(cardToId) })
+            .withRelationships({ puppies: [ringo] })
             .adoptingFrom(ownerCard).jsonapi
         );
 

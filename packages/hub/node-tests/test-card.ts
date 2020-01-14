@@ -1,5 +1,5 @@
 import { SingleResourceDoc } from 'jsonapi-typescript';
-import { CardId, canonicalURL, cardstackFieldPattern, FieldCard, AddressableCard } from '../card';
+import { CardId, canonicalURL, cardstackFieldPattern, FieldCard } from '../card';
 import { UpstreamDocument } from '../document';
 import { CARDSTACK_PUBLIC_REALM } from '../realm';
 
@@ -252,9 +252,4 @@ interface TestCardWithId extends TestCard {
 
 export function testCard(): TestCard {
   return new TestCard();
-}
-
-export function cardToId(card: TestCardWithId | AddressableCard): CardId {
-  let { csId, csOriginalRealm, csRealm } = card;
-  return { csId, csOriginalRealm, csRealm };
 }
