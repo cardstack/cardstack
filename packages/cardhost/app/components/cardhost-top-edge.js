@@ -4,6 +4,7 @@ import { action } from '@ember/object';
 
 export default class CardhostTopEdgeComponent extends Component {
   @service router;
+  @service edges;
 
   @action
   logout(sessionLogout) {

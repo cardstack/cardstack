@@ -7,11 +7,23 @@
     {{this.themerClasses}}"
     data-test-cardhost-cards>
     {{#if (not this.cssModeToggle.editingCss)}}
-      <CardhostTopEdge @mode={{mode}}>
+      {{!-- <CardhostTopEdge @mode={{mode}}>
         {{#if (or (eq mode "schema") (eq mode "edit") (eq mode "view"))}}
           <ViewSwitcher @mode={{mode}} @card={{this.target.currentRoute.parent.attributes}} />
         {{/if}}
-      </CardhostTopEdge>
+      </CardhostTopEdge> --}}
+
+
+      {{!-- {{cardstack-edge "left" (component "cardhost-left-edge")}} --}}
+
+      <CardstackEdge @edge="top" @componentToShow={{component "cardhost-top-edge" mode=mode}}>
+        <InTopToolbar>{{!-- TODO: This shouldn't be necessary --}}
+          {{!-- TODO: Display view switcher --}}
+          {{#if (or (eq mode "schema") (eq mode "edit") (eq mode "view"))}}
+            <ViewSwitcher @mode={{mode}} @card={{this.target.currentRoute.parent.attributes}} />
+          {{/if}}
+        </InTopToolbar>
+      </CardstackEdge>
     {{/if}}
 
     {{outlet}}
