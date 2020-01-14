@@ -158,14 +158,9 @@ export class TestCard {
           data: value.map(i => ({ type: 'cards', id: canonicalURL(i) })),
         };
       } else {
-        relationships[key] =
-          value == null
-            ? null
-            : {
-                links: {
-                  related: canonicalURL(value),
-                },
-              };
+        relationships[key] = {
+          data: value == null ? null : { type: 'cards', id: canonicalURL(value) },
+        };
       }
     }
 
