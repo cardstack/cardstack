@@ -53,17 +53,12 @@
 .logout-btn {
   position: absolute;
   z-index: var(--ch-edges-z-index);
+  left: calc(var(--ch-left-edge-navbar-width) + var(--ch-spacing));
 }
 
 .logout-btn {
-  position: absolute;
-  right: 320px;
   min-width: 85px;
   height: 40px;
-}
-
-.login-btn {
-  right: var(--ch-spacing)
 }
 
 @media (max-width: 1440px) {
