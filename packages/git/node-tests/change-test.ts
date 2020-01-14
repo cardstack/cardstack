@@ -30,7 +30,7 @@ describe('git/change', function() {
     let commit = await inRepo(path).getCommit('master');
     expect(commit.authorName).to.equal('John Milton');
     expect(commit.authorEmail).to.equal('john@paradiselost.com');
-    expect(commit.message).to.equal('First commit');
+    expect(commit.message).to.equal('First commit\n');
     expect(commit.authorDate).to.equal('2017-01-16 12:21:00 +0300');
   });
 
@@ -64,13 +64,13 @@ describe('git/change', function() {
     let id = await change.finalize(commitOpts({ message: 'Second commit' }));
 
     let commit = await inRepo(path).getCommit(id);
-    expect(commit.message).to.equal('Second commit');
+    expect(commit.message).to.equal('Second commit\n');
 
     let masterCommit = await inRepo(path).getCommit('master');
     expect(masterCommit.id).to.equal(id);
 
     let parentCommit = await inRepo(path).getCommit(id + '^');
-    expect(parentCommit.message).to.equal('First commit');
+    expect(parentCommit.message).to.equal('First commit\n');
 
     expect(await inRepo(path).getContents(id, 'hello-world.txt')).to.equal('This is a file');
   });
@@ -84,13 +84,13 @@ describe('git/change', function() {
     let id = await change.finalize(commitOpts({ message: 'Second commit' }));
 
     let commit = await inRepo(path).getCommit(id);
-    expect(commit.message).to.equal('Second commit');
+    expect(commit.message).to.equal('Second commit\n');
 
     let head = await inRepo(path).getCommit('master');
     expect(head.id).to.equal(id);
 
     let parentCommit = await inRepo(path).getCommit(id + '^');
-    expect(parentCommit.message).to.equal('First commit');
+    expect(parentCommit.message).to.equal('First commit\n');
 
     expect(await inRepo(path).getContents(id, 'hello-world.txt')).to.equal('This is a file');
   });
@@ -128,8 +128,8 @@ describe('git/change', function() {
     expect(commitId).is.a('string');
 
     expect((await inRepo(path).getCommit('master')).message).to.match(/Clean merge into master/);
-    expect((await inRepo(path).getCommit('master^1')).message).to.equal('Third commit');
-    expect((await inRepo(path).getCommit('master^2')).message).to.equal('Second commit');
+    expect((await inRepo(path).getCommit('master^1')).message).to.equal('Third commit\n');
+    expect((await inRepo(path).getCommit('master^2')).message).to.equal('Second commit\n');
     expect(await inRepo(path).getContents('master', 'hello-world.txt')).to.equal('This is a file');
     expect(await inRepo(path).getContents('master', 'other.txt')).to.equal('Non-conflicting content');
   });
@@ -153,7 +153,7 @@ describe('git/change', function() {
       expect(err).instanceof(GitConflict);
     }
 
-    expect((await inRepo(path).getCommit('master')).message).to.equal('Second commit');
+    expect((await inRepo(path).getCommit('master')).message).to.equal('Second commit\n');
     expect(await inRepo(path).getContents('master', 'hello-world.txt')).to.equal('This is a file');
     let listing = await inRepo(path).listTree('master', '');
     expect(listing.length).to.equal(1);
@@ -169,10 +169,10 @@ describe('git/change', function() {
     let id = await change.finalize(commitOpts({ message: 'Second commit' }));
 
     let commit = await inRepo(path).getCommit(id);
-    expect(commit.message).to.equal('Second commit');
+    expect(commit.message).to.equal('Second commit\n');
 
     let masterCommit = await inRepo(path).getCommit('master');
-    expect(masterCommit.message).to.equal('Second commit');
+    expect(masterCommit.message).to.equal('Second commit\n');
 
     expect(await inRepo(path).getContents(id, 'outer/inner/hello-world.txt')).to.equal('This is a file');
   });

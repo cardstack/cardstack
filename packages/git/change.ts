@@ -128,18 +128,7 @@ export default class Change {
     }
 
     let tree = await Tree.lookup(this.repo, treeOid!);
-    let { author, committer } = signature(commitOpts);
-    let commitOid = await Commit.create(
-      this.repo,
-      null,
-      author,
-      committer,
-      'UTF-8',
-      commitOpts.message,
-      tree,
-      this.parents.length,
-      this.parents
-    );
+    let commitOid = await Commit.create(this.repo, commitOpts, tree, this.parents);
 
     return Commit.lookup(this.repo, commitOid);
   }
