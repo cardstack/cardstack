@@ -1,5 +1,4 @@
 import {
-  Commit as NGCommit,
   Cred as NGCred,
   Oid as NGOid,
   Repository as NGRepository,
@@ -10,6 +9,7 @@ import {
   Treebuilder as NGTreebuilder,
   TreeEntry as NGTreeEntry,
   Blob as NGBlob,
+  Commit as NGCommit,
 } from 'nodegit';
 
 import { FetchOptions as NGFetchOptions } from 'nodegit/fetch-options';
@@ -18,14 +18,15 @@ import fs from 'fs';
 import {
   addRemote as igAddRemote,
   clone as igClone,
+  commit as igCommit,
+  findMergeBase as igFindMergeBase,
   init as igInit,
   listBranches as igListBranches,
+  merge as igMerge,
   plugins as igPlugins,
   push as igPush,
-  findMergeBase as igFindMergeBase,
   resolveRef as igResolveRef,
   writeRef as igWriteRef,
-  merge as igMerge,
 } from 'isomorphic-git';
 
 igPlugins.set('fs', fs);
@@ -54,7 +55,7 @@ export interface RemoteConfig {
   passphrase: string;
 }
 
-import { Moment } from 'moment-timezone';
+import moment, { Moment } from 'moment-timezone';
 
 export interface CommitOpts {
   authorDate?: Moment;
@@ -179,30 +180,16 @@ export class Repository {
 }
 
 export class Commit {
-  static async create(
-    repo: Repository,
-    updateRef: string | null,
-    author: Signature,
-    committer: Signature,
-    messageEncoding: string,
-    message: string,
-    tree: Tree,
-    parentCount: number,
-    parents: Commit[]
-  ): Promise<Oid> {
-    let ngoid = await NGCommit.create(
-      repo.getNgRepo(),
-      (updateRef as unknown) as string,
-      author.getNgSignature(),
-      committer.getNgSignature(),
-      messageEncoding,
-      message,
-      tree.getNgTree(),
-      parentCount,
-      parents.map(p => p.getNgCommit())
+  static async create(repo: Repository, commitOpts: CommitOpts, tree: Tree, parents: Commit[]): Promise<Oid> {
+    let sha = await igCommit(
+      Object.assign(formatCommitOpts(commitOpts), {
+        gitdir: repo.gitdir(),
+        tree: tree.id().toString(),
+        parent: parents.map(p => p.sha()),
+        noUpdateBranch: true,
+      })
     );
-
-    return Oid.fromNGOid(ngoid);
+    return new Oid(sha);
   }
 
   static async lookup(repo: Repository, id: Oid | string): Promise<Commit> {
@@ -363,10 +350,13 @@ export class Tree {
 }
 
 function formatCommitOpts(commitOpts: CommitOpts) {
+  let commitDate = moment(commitOpts.authorDate || new Date());
+
   let author = {
     name: commitOpts.authorName,
     email: commitOpts.authorEmail,
-    date: commitOpts.authorDate,
+    date: commitDate.toDate(),
+    timezoneOffset: -commitDate.utcOffset(),
   };
 
   let committer;
