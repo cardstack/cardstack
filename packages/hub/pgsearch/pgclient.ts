@@ -313,7 +313,7 @@ export default class PgClient {
   private async walkFilterFieldPath(
     enclosingCard: Card,
     path: string,
-    expression: Expression,
+    expression: CardExpression,
     handleLeafField: FilterFieldHandler<CardExpression>,
     handleCsField?: FilterCsFieldHandler<CardExpression>,
     handleInteriorField?: FilterFieldHandlerWithEntryAndExit<CardExpression>
