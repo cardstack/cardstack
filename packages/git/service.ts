@@ -1,4 +1,4 @@
-import { Merge, Repository, Reset, RemoteConfig, FetchOptions } from './git';
+import { Merge, Repository, RemoteConfig, FetchOptions } from './git';
 
 import { promisify } from 'util';
 import mkdirpcb from 'mkdirp';
@@ -114,7 +114,7 @@ class GitLocalCache {
         let ref = await repo.createBranch(targetBranch, headCommit);
         await repo.checkoutBranch(ref);
         let remoteCommit = await repo.getReferenceCommit(`refs/remotes/origin/${targetBranch}`);
-        Reset.hardReset(repo, remoteCommit);
+        await repo.reset(remoteCommit, true);
       } else {
         throw e;
       }

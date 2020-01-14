@@ -3,7 +3,6 @@ import {
   Oid as NGOid,
   Repository as NGRepository,
   Index as NGIndex,
-  Reset as NGReset,
   Signature as NGSignature,
   Tree as NGTree,
   Treebuilder as NGTreebuilder,
@@ -15,10 +14,16 @@ import {
 import { FetchOptions as NGFetchOptions } from 'nodegit/fetch-options';
 
 import fs from 'fs';
+import { join } from 'path';
+
+const { unlink } = fs.promises;
+
 import {
   addRemote as igAddRemote,
+  checkout as igCheckout,
   clone as igClone,
   commit as igCommit,
+  currentBranch as igCurrentBranch,
   findMergeBase as igFindMergeBase,
   init as igInit,
   listBranches as igListBranches,
@@ -168,6 +173,24 @@ export class Repository {
 
   async lookupReference(reference: string) {
     return await Reference.lookup(this, reference);
+  }
+
+  async reset(commit: Commit, hard: boolean) {
+    let ref = await igCurrentBranch({
+      gitdir: this.gitdir(),
+      fullname: true,
+    });
+
+    await igWriteRef({
+      dir: '/',
+      ref: ref!,
+      value: commit.sha(),
+    });
+
+    if (hard) {
+      await unlink(join(this.gitdir(), 'index'));
+      await igCheckout({ dir: this.path(), ref: ref! });
+    }
   }
 
   isBare() {
@@ -494,13 +517,6 @@ export class TreeEntry {
     if (tree) {
       return new Tree(tree);
     }
-  }
-}
-
-export class Reset {
-  static HARD = 3;
-  static async hardReset(repo: Repository, target: Commit) {
-    await NGReset.reset(repo.getNgRepo(), target.getNgCommit(), Reset.HARD, {});
   }
 }
 
