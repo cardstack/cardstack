@@ -129,13 +129,12 @@
   cursor: pointer;
 }
 
-.themer--top-edge-container .close-editor-btn {
+.themer--top-edge-container .cs-component-cta, .themer--top-edge-container .save-button {
   width: 150px;
   margin-left: 20px;
   align-self: start;
   display: inline-block;
   vertical-align: top;
-  color: var(--ch-dark);
 }
 
 .cardhost-card-theme-editor .editor-container.editor-pane--container-highlighted {

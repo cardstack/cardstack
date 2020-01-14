@@ -53,13 +53,14 @@
       data-test-dock-right
     >
     </button>
-    <SaveButton @card={{@model}} />
+
     <Cta {{on "click" this.close}}
-      @variant="primary"
-      class="close-editor-btn"
       data-test-close-editor
+      @variant="secondary primary"
     >
       Close
     </Cta>
+
+    <SaveButton @card={{@model}} />
   </div>
 </header>
