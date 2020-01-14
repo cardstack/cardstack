@@ -1,10 +1,19 @@
 {{#if this.cardstackSession.isAuthenticated}}
   <div class="card-renderer--top-edge-buttons">
-    <Cta {{on "click" this.preview}}
-      @label="Open"
+    <Cta
       @variant="secondary primary"
       @theme="cs-dark"
-      @disabled={{not this.cardstackSession.isAuthenticated}} />
+    >
+      Schema Mode
+      <LinkTo
+        @route="cards.card.layout"
+        @class="top-edge--edit-mode-link"
+        @model={{this.card}}
+        data-test-top-edge-link="edit"
+      >
+        {{svg-jar "close-circle" width="18px" height="18px"}}
+      </LinkTo>
+    </Cta>
     <SaveButton @card={{this.card}} />
   </div>
 {{/if}}
