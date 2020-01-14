@@ -33,7 +33,7 @@ export default class ViewCardController extends Controller {
     this.cssModeToggle.setEditingCss(true);
     this.themerOptions.push({ name: 'Custom theme' });
     this.selectedTheme = this.themerOptions[this.themerOptions.length - 1];
-    this.router.transitionTo('cards.view', this.model, { queryParams: { editingCss: true } });
+    this.router.transitionTo('cards.card.view', this.model, { queryParams: { editingCss: true } });
   }
 
   @action
@@ -44,7 +44,7 @@ export default class ViewCardController extends Controller {
   @action
   closeEditor() {
     this.cssModeToggle.setEditingCss(false);
-    this.router.transitionTo('cards.view', this.model, { queryParams: { editingCss: undefined } });
+    this.router.transitionTo('cards.card.view', this.model, { queryParams: { editingCss: undefined } });
   }
 
   @action

@@ -786,7 +786,7 @@
   resolved "https://registry.yarnpkg.com/@cardstack/requirejs-monaco-ember-polyfill/-/requirejs-monaco-ember-polyfill-0.0.1.tgz#e623ac30a2e228e30e726b85cee81c5680f19753"
   integrity sha512-B5bmLSLkweDtlzoDeem7IezF1zAHZDZU7vH5AQ3bklJjN/Vo80kLOyOomRcgAQfvyhbEN4663ZhUDk9PyAkgKA==
 
-"@cardstack/ui-components@^0.2.20":
+"@cardstack/ui-components@^0.2.20", "@cardstack/ui-components@^0.2.21":
   version "0.2.21"
   resolved "https://registry.yarnpkg.com/@cardstack/ui-components/-/ui-components-0.2.21.tgz#3ec8d632fcba2140d84fef7169f5ddd65184394b"
   integrity sha512-fcE0mhVfEQalZLCUHc7l4vqgh3PR0sJBnvHC+uMP6miDd8GtYqL8XEIdLeD8xnL+Jv2fETCSSjlyCDUWbr1CGQ==

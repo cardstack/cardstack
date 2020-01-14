@@ -41,7 +41,7 @@
     "@cardstack/mock-auth": "0.16.17",
     "@cardstack/requirejs-monaco-ember-polyfill": "^0.0.1",
     "@cardstack/test-support": "0.16.17",
-    "@cardstack/ui-components": "^0.2.20",
+    "@cardstack/ui-components": "^0.2.21",
     "@ember/optional-features": "^0.7.0",
     "@ember/render-modifiers": "^1.0.2",
     "@embroider/compat": "^0.10.0",
