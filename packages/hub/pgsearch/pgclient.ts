@@ -280,7 +280,7 @@ export default class PgClient {
       await cards.get(fieldArity.typeContext),
       path,
       [],
-      async (fieldCard, _expression: CardExpression, _fieldName) => {
+      async (fieldCard, _e: CardExpression, _fieldName) => {
         if (fieldCard.csFieldArity === 'plural') {
           return plural;
         }
