@@ -8,11 +8,11 @@
     data-test-cardhost-cards>
     {{#unless this.onThemerRoute}}
       <CardhostTopEdge @mode={{mode}}>
-        {{#if (or (eq mode "edit") (eq mode "view"))}}
+        {{#if (or (eq mode "edit") (eq mode "layout"))}}
           {{#let this.target.currentRoute.parent.attributes as |card|}}
             <div class="view-selector">
               <LinkTo
-                @route="cards.card.view"
+                @route="cards.card.layout"
                 @class="view-selector--mode-link {{mode}}"
                 @model={{card.name}}
                 data-test-view-selector="layout"

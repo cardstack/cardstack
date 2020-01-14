@@ -13,6 +13,7 @@ Router.map(function() {
     this.route('card', { path: '/:name' }, function() {
       this.route('adopt', { path: '/adopt' });
       this.route('view', { path: '' });
+      this.route('layout', { path: '/layout' });
       this.route('edit', { path: '/edit' });
       this.route('schema', { path: '/schema' });
       this.route('themer', { path: '/themer' });
