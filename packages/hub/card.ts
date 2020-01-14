@@ -155,6 +155,7 @@ export class Card {
           continue;
         }
         let field = await this.field(name);
+        this.assertArity(field, name, value);
         await field.validateValue(await priorCard?.value(name), value, realm);
       }
     }
@@ -167,12 +168,35 @@ export class Card {
         }
         let field = await this.field(name);
         let cardIds = relationshipToCardId(ref);
+        this.assertArity(field, name, cardIds, ref);
         let priorCardReference = await priorCard?.reference(name);
-        if (cardIds && Array.isArray(cardIds)) {
+        if (Array.isArray(cardIds)) {
           await Promise.all(cardIds.map(cardId => field.validateReference(priorCardReference, cardId, realm)));
         } else if (cardIds) {
           await field.validateReference(priorCardReference, cardIds, realm);
         }
+      }
+    }
+  }
+
+  private assertArity(field: FieldCard, fieldName: string, value: any, displayValue?: any) {
+    if (field.csFieldArity === 'plural') {
+      if (!Array.isArray(value) && value != null) {
+        throw new CardstackError(
+          `field ${fieldName} on card ${this.canonicalURL} failed arity validation for value: ${JSON.stringify(
+            displayValue || value
+          )}. This field has a plural arity.`,
+          { status: 400 }
+        );
+      }
+    } else {
+      if (Array.isArray(value)) {
+        throw new CardstackError(
+          `field ${fieldName} on card ${this.canonicalURL} failed arity validation for value: ${JSON.stringify(
+            displayValue || value
+          )}. This field has a singular arity.`,
+          { status: 400 }
+        );
       }
     }
   }
@@ -182,6 +206,9 @@ export class Card {
     let rawValue = this.jsonapi.data.attributes?.[fieldName];
     if (rawValue != null) {
       let field = await this.field(fieldName);
+      if (field.csFieldArity === 'plural' && Array.isArray(rawValue)) {
+        return await Promise.all(rawValue.map(v => field.deserializeValue(v)));
+      }
       return await field.deserializeValue(rawValue);
     }
     let refs = await this.reference(fieldName);
@@ -414,19 +441,46 @@ export class FieldCard extends Card {
   async validateValue(priorFieldValue: any, value: any, realm: AddressableCard) {
     let validate = await this.loadFeature('field-validate');
     if (validate) {
-      if (!(await validate(value, this))) {
-        throw new CardstackError(
-          `field ${this.name} on card ${
-            this.enclosingCard.canonicalURL
-          } failed type validation for value: ${JSON.stringify(value)}`,
-          { status: 400 }
-        );
+      if (this.csFieldArity === 'plural' && Array.isArray(value)) {
+        let validations = await Promise.all(value.map(v => validate!(v, this)));
+        if (!validations.every(Boolean)) {
+          let invalidItems = validations
+            .map((isValid, index) => (!isValid ? { index, value: value[index] } : null))
+            .filter(Boolean);
+          throw new CardstackError(
+            `field ${this.name} on card ${
+              this.enclosingCard.canonicalURL
+            } failed type validation for values: ${JSON.stringify(invalidItems)}`,
+            { status: 400 }
+          );
+        }
+        return;
+      } else {
+        if (!(await validate(value, this))) {
+          throw new CardstackError(
+            `field ${this.name} on card ${
+              this.enclosingCard.canonicalURL
+            } failed type validation for value: ${JSON.stringify(value)}`,
+            { status: 400 }
+          );
+        }
+        return;
       }
-      return;
     }
-    let copy = await this.clone();
-    copy.patch({ data: value });
-    await copy.validate(priorFieldValue, realm);
+
+    if (this.csFieldArity === 'plural' && Array.isArray(value)) {
+      await Promise.all(
+        value.map(async v => {
+          let copy = await this.clone();
+          copy.patch({ data: v });
+          await copy.validate(priorFieldValue, realm);
+        })
+      );
+    } else {
+      let copy = await this.clone();
+      copy.patch({ data: value });
+      await copy.validate(priorFieldValue, realm);
+    }
   }
 
   async validateReference(

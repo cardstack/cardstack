@@ -587,6 +587,10 @@ describe('hub/card-service', function() {
         }
       });
 
+      it.skip('rejects a card reference that is not the correct arity', async function() {});
+      it.skip('rejects a card value that is not the correct arity', async function() {});
+      it.skip('rejects a specific card value when validating a field that has arity > 1', async function() {});
+
       it('can break a cycle in the search doc', async function() {
         let friendCard = await service.create(
           `${myOrigin}/api/realms/first-ephemeral-realm`,
@@ -1103,12 +1107,59 @@ describe('hub/card-service', function() {
         expect(ids).to.include.members([mommy.canonicalURL, daddy.canonicalURL]);
       });
 
-      // includes cards that directly adopt and cards whose card-type is an ancestor in the adoption chain
-      it.skip('filter returns all cards that adopt from a card-type', async function() {});
+      it('filtering field filled by card values with arity > 1', async function() {
+        let ownerCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('name', 'string-field')
+            .withField('puppies', puppyCard, 'plural').jsonapi
+        );
 
-      it.skip('filtering field filled by card values with arity > 1', async function() {});
+        let mommy = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Mariko',
+              puppies: [(await vanGogh.asPristineDoc()).jsonapi.data, (await mango.asPristineDoc()).jsonapi.data],
+            })
+            .adoptingFrom(ownerCard).jsonapi
+        );
+        let daddy = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Hassan',
+              puppies: [(await vanGogh.asPristineDoc()).jsonapi.data, (await mango.asPristineDoc()).jsonapi.data],
+            })
+            .adoptingFrom(ownerCard).jsonapi
+        );
+        await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Dog Heaven',
+              puppies: [(await ringo.asPristineDoc()).jsonapi.data],
+            })
+            .adoptingFrom(ownerCard).jsonapi
+        );
+
+        let results = await service.search({
+          filter: {
+            type: ownerCard,
+            eq: {
+              'puppies.name': 'Mango',
+            },
+          },
+        });
+        expect(results.cards.length).to.equal(2);
+        let ids = results.cards.map(i => i.canonicalURL);
+        expect(ids).to.include.members([mommy.canonicalURL, daddy.canonicalURL]);
+      });
 
       it.skip('filtering field by interior csField for a field with arity > 1', async function() {});
+
+      // includes cards that directly adopt and cards whose card-type is an ancestor in the adoption chain
+      it.skip('filter returns all cards that adopt from a card-type', async function() {});
     });
   });
 });
