@@ -167,11 +167,11 @@ export class Card {
         }
         let field = await this.field(name);
         let cardIds = relationshipToCardId(ref);
-        let priorCardReferences = await priorCard?.reference(name);
+        let priorCardReference = await priorCard?.reference(name);
         if (cardIds && Array.isArray(cardIds)) {
-          await Promise.all(cardIds.map(cardId => field.validateReferences(priorCardReferences, cardId, realm)));
+          await Promise.all(cardIds.map(cardId => field.validateReference(priorCardReference, cardId, realm)));
         } else if (cardIds) {
-          await field.validateReferences(priorCardReferences, cardIds, realm);
+          await field.validateReference(priorCardReference, cardIds, realm);
         }
       }
     }
@@ -417,12 +417,12 @@ export class FieldCard extends Card {
     await copy.validate(priorFieldValue, realm);
   }
 
-  async validateReferences(
-    _priorReference: CardId | CardId[] | undefined,
-    newReference: CardId | CardId[] | undefined,
+  async validateReference(
+    _priorReferenceOrReferences: CardId | CardId[] | undefined,
+    newReferenceOrReferences: CardId | CardId[] | undefined,
     _realm: AddressableCard
   ) {
-    if (!newReference) {
+    if (!newReferenceOrReferences) {
       return;
     }
     // just validating that newReference adopts from the same parent as the field card for now...
@@ -443,7 +443,7 @@ export class FieldCard extends Card {
     // attack vector?). The only situation where this would not be a problem
     // would be if the field card adopts directly from the base card (meaning
     // any card can be present in this field).
-    let newReferences = Array.isArray(newReference) ? newReference : [newReference];
+    let newReferences = Array.isArray(newReferenceOrReferences) ? newReferenceOrReferences : [newReferenceOrReferences];
     await Promise.all(
       newReferences.map(async newRef => {
         let referencedCard = await this.service.get(newRef); // let a 404 error be thrown when not found
