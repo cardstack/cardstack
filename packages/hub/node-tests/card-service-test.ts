@@ -1156,7 +1156,48 @@ describe('hub/card-service', function() {
         expect(ids).to.include.members([mommy.canonicalURL, daddy.canonicalURL]);
       });
 
-      it.skip('filtering field by interior csField for a field with arity > 1', async function() {});
+      it('filtering field by interior csField for a field with arity > 1', async function() {
+        let ownerCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('name', 'string-field')
+            .withField('puppies', puppyCard, 'plural').jsonapi
+        );
+
+        let mommy = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({ name: 'Mariko' })
+            .withRelationships({ puppies: [vanGogh, mango] })
+            .adoptingFrom(ownerCard).jsonapi
+        );
+        let daddy = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({ name: 'Hassan' })
+            .withRelationships({ puppies: [vanGogh, mango] })
+            .adoptingFrom(ownerCard).jsonapi
+        );
+        await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({ name: 'Dog Heaven' })
+            .withRelationships({ puppies: [ringo] })
+            .adoptingFrom(ownerCard).jsonapi
+        );
+
+        let results = await service.search({
+          filter: {
+            type: ownerCard,
+            eq: {
+              'puppies.csId': mango.csId,
+            },
+          },
+        });
+        expect(results.cards.length).to.equal(2);
+        let ids = results.cards.map(i => i.canonicalURL);
+        expect(ids).to.include.members([mommy.canonicalURL, daddy.canonicalURL]);
+      });
 
       // includes cards that directly adopt and cards whose card-type is an ancestor in the adoption chain
       it.skip('filter returns all cards that adopt from a card-type', async function() {});
