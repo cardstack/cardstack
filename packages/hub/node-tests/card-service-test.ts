@@ -1051,6 +1051,9 @@ describe('hub/card-service', function() {
         expect(ids).to.include.members([mommy.canonicalURL, daddy.canonicalURL]);
       });
 
+      // includes cards that directly adopt and cards whose card-type is an ancestor in the adoption chain
+      it.skip('filter returns all cards that adopt from a card-type', async function() {});
+
       it.skip('filtering field filled by card values with arity > 1', async function() {});
 
       it.skip('filtering field by interior csField for a field with arity > 1', async function() {});
