@@ -1,21 +1,11 @@
 {{#if this.cardstackSession.isAuthenticated}}
   <div class="card-renderer--top-edge-buttons">
-    <button
-      {{on "click" this.delete}}
-      class="ch-button ch-button--icon-secondary delete"
-      data-test-card-editor-delete-btn
-      disabled={{not this.cardstackSession.isAuthenticated}}
-      aria-label="Delete"
-    >
-    </button>
-    <button
-      {{on "click" this.preview}}
-      class="ch-button ch-button--secondary"
-      data-test-card-editor-preview-btn
-      disabled={{not this.cardstackSession.isAuthenticated}}
-    >
-      Preview
-    </button>
+    <Cta {{on "click" this.preview}}
+      @label="Open"
+      @variant="secondary primary"
+      @theme="cs-dark"
+      @disabled={{not this.cardstackSession.isAuthenticated}}
+      data-test-card-editor-preview-btn />
     <SaveButton @card={{this.card}}/>
   </div>
 {{/if}}

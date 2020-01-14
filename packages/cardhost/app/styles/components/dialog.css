@@ -1,0 +1,57 @@
+.dialog {
+  min-width: 226px;
+  max-width: 400px;
+  height: auto;
+  padding: 9px 21px 6px 31px;
+  background-color: var(--ch-light);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.35);
+  border: none;
+  border-radius: 10px;
+  color: var(--ch-dark);
+  font: 400 14px/1.43 var(--ch-font-family);
+  letter-spacing: 0.035em;
+}
+
+.dialog--title {
+  display: flex;
+  margin: 0;
+  padding-top: 15px;
+  padding-bottom: 3px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.375;
+  letter-spacing: 0.015em;
+}
+
+.dialog--title svg {
+  display: inline-block;
+  margin-right: 11px;
+}
+
+.dialog--content {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  margin-right: 9px;
+}
+
+.dialog--content > * + * {
+  margin: 0;
+  padding-top: 20px;
+}
+
+
+/* For utility */
+.dialog--message {
+  margin: 0;
+}
+
+.dialog--button-group {
+  display: flex;
+  justify-content: flex-end;
+  margin-right: -9px;
+  padding-top: 20px;
+}
+
+.dialog--button-group button + button {
+  margin-left: 9px;
+}

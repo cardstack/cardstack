@@ -45,8 +45,9 @@ module('Acceptance | card schema', function(hooks) {
 
     await saveCard('schema', card1Id);
     await visit(`/cards/${card1Id}/schema`);
-
+    await animationsSettled();
     await click('[data-test-field="title"]');
+    await animationsSettled();
     assert.dom('[data-test-field="title"] [data-test-field-renderer-type]').hasText('title (Text)');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
@@ -165,6 +166,7 @@ module('Acceptance | card schema', function(hooks) {
     await visit(`/cards/${card1Id}/schema`);
     assert.dom('[data-test-field="title"] [data-test-field-renderer-label]').hasText('TITLE');
     await click('[data-test-field="title"]');
+    await animationsSettled();
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('title');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('TITLE');

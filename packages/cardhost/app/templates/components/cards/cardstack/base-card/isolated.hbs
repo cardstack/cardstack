@@ -2,30 +2,34 @@
 <div
   class="isolated-card cardstack_base-card-isolated {{safe-css-string @card.name}}-isolated {{safe-css-string @card.adoptedFromName}}-isolated"
   data-test-isolated-card={{@card.name}}
-  data-test-isolated-card-mode={{@mode}}>
-  {{#each @card.isolatedFields key="nonce" as |field|}}
-    {{#if @setFieldValue}}
-      <FieldRenderer
-        @field={{field}}
-        @mode={{@mode}}
-        @setFieldValue={{fn @setFieldValue field.name}}
-        @selectField={{@selectField}}
-        @selectedField={{@selectedField}}
-      />
-    {{else if (or @setNeededWhenEmbedded @setPosition @removeField @setFieldName)}}
-      <FieldRenderer
-        @field={{field}}
-        @mode={{@mode}}
-        @dropField={{@dropField}}
-        @removeField={{@removeField}}
-        @setPosition={{@setPosition}}
-        @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
-        @setFieldName={{@setFieldName}}
-        @selectField={{@selectField}}
-        @selectedField={{@selectedField}}
-      />
-    {{else}}
-      <FieldRenderer @field={{field}} @mode={{@mode}}/>
-    {{/if}}
-  {{/each}}
+  data-test-isolated-card-mode={{@mode}}
+>
+  <AnimatedContainer class="isolated-card--fields">
+    {{#animated-each @fields key="nonce" use=this.transition duration=this.duration as |field|}}
+      {{#if @setFieldValue}}
+        <FieldRenderer
+          @field={{field}}
+          @mode={{@mode}}
+          @setFieldValue={{fn @setFieldValue field.name}}
+          @selectField={{@selectField}}
+          @selectedField={{@selectedField}}
+        />
+      {{else if (or @setNeededWhenEmbedded @setPosition @removeField @setFieldName)}}
+        <FieldRenderer
+          @field={{field}}
+          @mode={{@mode}}
+          @dropField={{@dropField}}
+          @removeField={{@removeField}}
+          @toggleStubField={{@toggleStubField}}
+          @setPosition={{@setPosition}}
+          @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+          @setFieldName={{@setFieldName}}
+          @selectField={{@selectField}}
+          @selectedField={{@selectedField}}
+        />
+      {{else}}
+        <FieldRenderer @field={{field}} @mode={{@mode}}/>
+      {{/if}}
+    {{/animated-each}}
+  </AnimatedContainer>
 </div>

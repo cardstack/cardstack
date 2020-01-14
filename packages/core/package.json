@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/core",
-  "version": "0.16.16",
+  "version": "0.16.18",
   "description": "Core API for cardstack cards",
   "keywords": [
     "ember-addon",
@@ -27,11 +27,11 @@
     "node-tests": "mocha ../test-support/bin/run.js"
   },
   "dependencies": {
-    "@cardstack/authentication": "0.16.16",
-    "@cardstack/di": "0.16.16",
-    "@cardstack/jsonapi": "0.16.16",
+    "@cardstack/authentication": "0.16.18",
+    "@cardstack/di": "0.16.18",
+    "@cardstack/jsonapi": "0.16.18",
     "@cardstack/logger": "^0.2.0",
-    "@cardstack/plugin-utils": "0.16.16",
+    "@cardstack/plugin-utils": "0.16.18",
     "ember-auto-import": "^1.4.0",
     "ember-cli-babel": "^7.1.2",
     "ember-cli-htmlbars": "^3.0.0",
@@ -40,10 +40,10 @@
     "lodash": "^4.17.11"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.16.16",
-    "@cardstack/mock-auth": "0.16.16",
-    "@cardstack/test-support": "0.16.16",
-    "@cardstack/ui-components": "^0.2.17",
+    "@cardstack/eslint-config": "0.16.18",
+    "@cardstack/mock-auth": "0.16.18",
+    "@cardstack/test-support": "0.16.18",
+    "@cardstack/ui-components": "^0.2.20",
     "@ember/optional-features": "^0.6.3",
     "@ember/render-modifiers": "1.0.2",
     "@glimmer/component": "^0.14.0-alpha.13",
@@ -57,6 +57,7 @@
     "ember-cli-sri": "^2.1.1",
     "ember-cli-template-lint": "^1.0.0-beta.1",
     "ember-cli-uglify": "^2.1.0",
+    "ember-composable-helpers": "^3.0.3",
     "ember-data": "github:emberjs/data#1df833396855d956b817540923dd89338463fec2",
     "ember-disable-prototype-extensions": "^1.1.3",
     "ember-export-application-global": "^2.0.0",

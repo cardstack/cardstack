@@ -1,11 +1,10 @@
 import { module, test } from 'qunit';
-import { click, find, visit, currentURL, waitFor } from '@ember/test-helpers';
+import { find, visit, currentURL } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures';
 import { setFieldValue, createCards, saveCard } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 
-const timeout = 20000;
 const card1Id = 'millenial-puppies';
 const qualifiedCard1Id = `local-hub::${card1Id}`;
 const card2Id = 'van-gogh';
@@ -261,20 +260,6 @@ module('Acceptance | card edit', function(hooks) {
     let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.image, 'http://example.com/testimage.jpg');
-  });
-
-  test(`deleting a card`, async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [['body', 'string', false, 'test body']],
-    });
-    await visit(`/cards/${card1Id}/edit`);
-
-    await click('[data-test-card-editor-delete-btn]');
-    await waitFor('a[href="/cards/new"]', { timeout });
-
-    await visit(`/cards/${card1Id}`);
-    assert.dom('h2').includesText('Not Found');
   });
 
   test(`displays the right edge`, async function(assert) {

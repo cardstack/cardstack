@@ -1,15 +1,9 @@
 {{#if this.cardstackSession.isAuthenticated}}
   <div class="card-renderer--top-edge-buttons">
-    <button
-      class="ch-button ch-button--icon share"
-      aria-label="Share button"
-    >
-    </button>
-    <button
-      class="ch-button ch-button--secondary"
-    >
-      Preview
-    </button>
+    <Cta @label="Open"
+      @variant="secondary primary"
+      @theme="cs-dark"
+      @disabled={{true}} />
     <SaveButton @card={{this.model}} />
   </div>
 {{/if}}
@@ -33,21 +27,24 @@
       <div class="right-edge--section-header" data-test-section-header>
         Appearance
       </div>
-      <div class="right-edge--item">
-        <Dropdown
-          @theme="cs-dark"
-          @searchEnabled={{false}}
-          @label="Choose a theme:"
-          @options={{this.themerOptions}}
-          @selected={{this.selectedTheme}}
-          @setValue={{this.handleThemeChange}}
-        />
-        <button {{on "click" this.createTheme}}
-          class="ch-button ch-button--secondary ch-button--responsive"
-          data-test-card-custom-style-button
-        >
-          New Custom Style
-        </button>
+      <div class="right-edge--items-container">
+        <div class="right-edge--item">
+          <div class="right-edge--theme-dropdown-container">
+            <Dropdown
+              @theme="cs-dark"
+              @searchEnabled={{false}}
+              @label="Choose a theme:"
+              @options={{this.themerOptions}}
+              @selected={{this.selectedTheme}}
+              @setValue={{this.handleThemeChange}}
+            />
+          </div>
+          <Cta {{on "click" this.createTheme}}
+            @label="New Custom Style"
+            @variant="secondary responsive"
+            @theme="cs-dark"
+            data-test-card-custom-style-button />
+        </div>
       </div>
     </div>
   </RightEdge>

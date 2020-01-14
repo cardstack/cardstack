@@ -2,13 +2,11 @@
   {{!-- TODO: DRY buttons --}}
   {{#if this.cardstackSession.isAuthenticated}}
     <div class="card-renderer--top-edge-buttons">
-      <button
-        {{on "click" this.preview}}
-        class="ch-button ch-button--secondary"
-        data-test-card-creator-preview-btn
-      >
-        Preview
-      </button>
+      <Cta {{on "click" this.preview}}
+        @label="Open"
+        @variant="secondary primary"
+        @theme="cs-dark"
+        @disabled={{true}} />
       <SaveButton @card={{this.card}}/>
     </div>
   {{/if}}

@@ -8,7 +8,6 @@
   --ch-foreground: #5a586a;          /* right-edge dropdown, pill selector, checkbox background */
   --ch-foreground-hover: #434050;
   --ch-highlight: #00ebe5;           /* form components focus border state, links hover state */
-  --ch-highlight-light: #9af6f3;     /* disabled saved button */
   --ch-highlight-hover: #00b0ad;
   --ch-success: #37eb77;
   --ch-border: #5b596e;              /* button, search-bar, and view-switcher borders */

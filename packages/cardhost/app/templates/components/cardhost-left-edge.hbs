@@ -2,20 +2,24 @@
   <nav class="cardhost-left-edge--nav {{@mode}}">
     <ul>
       <li>
-        <button disabled class="ch-button ch-button--icon user" aria-label="User">
+        <button disabled class="ch-button ch-button--icon-secondary" aria-label="user">
+          {{svg-jar "user" width="18px" height="20px"}}
         </button>
       </li>
       <li>
-        <button disabled class="ch-button ch-button--icon catalog" aria-label="Catalog">
+        <button disabled class="catalog ch-button ch-button--icon-secondary" aria-label="catalog">
+          {{svg-jar "catalog" width="18px" height="20px"}}
         </button>
       </li>
       <li>
         <LinkTo
           @route="index"
           data-test-library-link
-          class="ch-button ch-button--icon library"
+          class="ch-button ch-button--icon-secondary"
           title="Library"
-        />
+        >
+          {{svg-jar "library" width="20px" height="38px"}}
+        </LinkTo>
       </li>
     </ul>
   </nav>

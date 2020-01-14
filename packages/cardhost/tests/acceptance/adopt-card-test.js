@@ -13,6 +13,7 @@ import {
 } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
+import { animationsSettled } from 'ember-animated/test-support';
 
 const timeout = 20000;
 const card1Id = 'address-card';
@@ -115,13 +116,6 @@ module('Acceptance | card adoption', function(hooks) {
 
     assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText(card1Id);
     assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').hasText('Base Card');
-
-    await click(`[data-test-right-edge] a.adopted-card[href="/cards/${card1Id}/schema"]`);
-    await waitFor(`[data-test-card-schema="${card1Id}"]`, { timeout });
-
-    assert.equal(currentURL(), `/cards/${card1Id}/schema`);
-    await showCardId(true);
-    assert.dom('#card__id').hasValue(card1Id);
   });
 
   test('can add a field at a particular position', async function(assert) {
@@ -303,6 +297,8 @@ module('Acceptance | card adoption', function(hooks) {
     await saveCard('schema', card1Id);
 
     await visit(`/cards/${card2Id}/schema`);
+    await animationsSettled();
+
     assert.deepEqual(
       [...document.querySelectorAll(`[data-test-isolated-card] [data-test-field]`)].map(i =>
         i.getAttribute('data-test-field')
