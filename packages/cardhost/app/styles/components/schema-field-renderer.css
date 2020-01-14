@@ -87,13 +87,11 @@ header.schema-field-renderer--header.text-field-case-insensitive {
   outline: 0;
 }
 
-.field:focus .schema-field-renderer .schema-field-renderer--header,
 .card-renderer-isolated:not(.selected) .field.selected .schema-field-renderer .schema-field-renderer--header {
   background-color: var(--ch-highlight);
   border-color: var(--ch-highlight);
 }
 
-.field:focus .schema-field-renderer .schema-field-renderer--content,
 .card-renderer-isolated:not(.selected) .field.selected .schema-field-renderer .schema-field-renderer--content {
   border-color: var(--ch-highlight);
 }
