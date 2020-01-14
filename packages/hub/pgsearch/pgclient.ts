@@ -254,12 +254,12 @@ export default class PgClient {
 
   private async handleFieldValue(cards: ScopedCardService, fieldValue: FieldValue): Promise<Expression> {
     let { path, value } = fieldValue;
-    let expression = await this.makeExpression(cards, value);
+    let _expression = await this.makeExpression(cards, value);
 
     return await this.walkFilterFieldPath(
       await cards.get(fieldValue.typeContext),
       path,
-      expression,
+      _expression,
       async (fieldCard, expression) => {
         let buildValueExpression = await fieldCard.loadFeature('field-buildValueExpression');
         if (buildValueExpression) {
@@ -276,7 +276,7 @@ export default class PgClient {
   private async handleFieldArity(cards: ScopedCardService, fieldArity: FieldArity): Promise<Expression> {
     let { path, singular, plural } = fieldArity;
 
-    let chosenExpression: CardExpression = await this.walkFilterFieldPath(
+    let _expression: CardExpression = await this.walkFilterFieldPath(
       await cards.get(fieldArity.typeContext),
       path,
       [],
@@ -299,7 +299,7 @@ export default class PgClient {
         },
       }
     );
-    return await this.makeExpression(cards, chosenExpression);
+    return await this.makeExpression(cards, _expression);
   }
 
   private async walkFilterFieldPath(
