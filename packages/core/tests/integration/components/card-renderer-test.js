@@ -446,20 +446,35 @@ module('Integration | Component | card-renderer', function(hooks) {
         @format="embedded"
         @mode="view"
         @showName={{true}}
-      />
-    `);
+        />
+      `);
     assert.dom('.embedded-card-label').hasText(card1Id);
   });
 
   test('isolated card can be selected', async function(assert) {
+    let service = this.owner.lookup('service:data');
+    let card = service.createCard(qualifiedCard1Id);
+    this.set('card', card);
+
     await render(hbs`
       <CardRenderer
+        @card={{card}}
         @format="isolated"
         @cardSelected={{true}}
       />
     `);
 
     assert.dom('[data-test-card-renderer-isolated]').hasClass('selected');
+  });
+
+  test('display message if no @card attribute', async function(assert) {
+    await render(hbs`
+      <CardRenderer
+        @format="isolated"
+        @cardSelected={{true}}
+      />
+    `);
+    assert.dom('[data-test-missing-card]').hasTextContaining('must specify a @card attribute');
   });
 
   skip('TODO it adds isolated css into the page when rendering an isolated card', async function(/*assert*/) {});

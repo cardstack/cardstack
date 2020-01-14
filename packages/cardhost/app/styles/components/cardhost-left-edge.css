@@ -36,3 +36,11 @@
 .cardhost-left-edge--nav li:first-child {
   margin-bottom: auto;
 }
+
+.cardhost-left-edge--nav li .ch-button--icon-secondary {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.cardhost-left-edge--nav li .ch-button--icon-secondary.catalog {
+  border-radius: 10px;
+}

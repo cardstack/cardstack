@@ -1,7 +1,7 @@
 import { module, test } from 'qunit';
 import Fixtures from '@cardstack/test-support/fixtures';
 import { setupRenderingTest } from 'ember-qunit';
-import { render, fillIn, triggerEvent, click } from '@ember/test-helpers';
+import { render, fillIn, click } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
 const card1Id = 'millenial-puppies';
@@ -225,7 +225,6 @@ module('Integration | Component | field-renderer', function(hooks) {
     assert.dom('.schema-field-renderer--header--detail').doesNotExist();
     assert.dom('[data-test-field-renderer-field-type]').hasText('@cardstack/core-types::string');
     assert.dom('[data-test-field-renderer-move-btn]').exists();
-    assert.dom('[data-test-drop-zone="1"]').exists();
 
     assert.dom('.edit-title-field-value').doesNotExist();
     assert.dom('[data-test-string-field-viewer-value]').doesNotExist();
@@ -278,7 +277,6 @@ module('Integration | Component | field-renderer', function(hooks) {
     assert.dom('.schema-field-renderer--header--detail').hasText('Adopted');
     assert.dom('[data-test-field-renderer-field-type]').hasText('@cardstack/core-types::string');
     assert.dom('[data-test-field-renderer-move-btn]').exists();
-    assert.dom('[data-test-drop-zone="1"]').exists();
 
     assert.dom('.edit-title-field-value').doesNotExist();
     assert.dom('[data-test-string-field-viewer-value]').doesNotExist();
@@ -459,40 +457,5 @@ module('Integration | Component | field-renderer', function(hooks) {
     await click('[data-test-field-renderer-remove-btn]');
 
     assert.notOk(card.getField('title'), 'field does not exist on card');
-  });
-
-  test('it can perform an action when an item is dropped into the drop zone', async function(assert) {
-    assert.expect(2);
-
-    let service = this.owner.lookup('service:data');
-    let card = service.createCard(qualifiedCard1Id);
-    let field = card.addField({
-      name: 'title',
-      type: '@cardstack/core-types::string',
-      neededWhenEmbedded: true,
-      value: 'test title',
-    });
-    this.set('field', field);
-    this.set('noop', () => {});
-    this.set('dropField', (position, callback) => {
-      assert.equal(position, 0);
-      assert.equal(typeof callback, 'function');
-    });
-
-    await render(hbs`
-    <FieldRenderer
-      @field={{field}}
-      @mode="schema"
-      @dropField={{action dropField}}
-      @setFieldName={{action noop}}
-      @setFieldLabel={{action noop}}
-      @setFieldInstructions={{action noop}}
-      @setNeededWhenEmbedded={{action noop}}
-      @setPosition={{action noop}}
-      @removeField={{action noop}}
-    />
-    `);
-
-    await triggerEvent(`[data-test-drop-zone="0"]`, 'drop');
   });
 });

@@ -8,9 +8,9 @@ export default class CardhostTopEdgeComponent extends Component {
   @action
   logout(sessionLogout) {
     sessionLogout();
-    let cardId = this.router.currentRoute.params.id;
+    let cardId = this.router.currentRoute.parent.params.name;
     if (cardId) {
-      this.router.transitionTo('cards.view', cardId);
+      this.router.transitionTo('cards.card.view', cardId);
     } else {
       this.router.transitionTo('index');
     }

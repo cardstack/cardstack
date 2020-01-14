@@ -11,7 +11,6 @@ export default class ColorPalette extends Component {
     '--ch-foreground': '#5a586a',
     '--ch-foreground-hover': '#434050',
     '--ch-highlight': '#00ebe5',
-    '--ch-highlight-light': '#9af6f3',
     '--ch-highlight-hover': '#00b0ad',
     '--ch-success': '#37eb77',
     '--ch-border': '#5b596e',

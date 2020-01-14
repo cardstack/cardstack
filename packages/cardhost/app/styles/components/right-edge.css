@@ -49,7 +49,7 @@
 }
 
 .right-edge--section {
-  padding: 10px var(--ch-spacing) 11px;
+  padding: 10px var(--ch-spacing) 12px;
   border-top: 2px solid var(--ch-default);
   width: var(--ch-right-edge-panel-width);
   position: relative;
@@ -57,13 +57,13 @@
 
 .right-edge--section .section-toggle-btn {
   position: absolute;
-  width: 10px;
-  height: 10px;
+  width: 20px;
+  height: 20px;
   top: 10px;
   right: 10px;
   background-image: url('/assets/images/icons/arrow-show-hide-collapsed.svg');
   background-repeat: no-repeat;
-  background-position: top right;
+  background-position: center;
   background-size: 10px 10px;
   border: none;
   background-color: transparent;
@@ -73,6 +73,7 @@
 .right-edge--section .section-toggle-btn.expanded {
   background-image: url('/assets/images/icons/arrow-show-hide-expanded.svg');
 }
+
 .right-edge--section-header {
   font-weight: 600;
   white-space: nowrap;
@@ -90,15 +91,6 @@
   font-weight: 400;
   color: var(--ch-light-op60);
   text-transform: none;
-}
-
-.right-edge--section-header + .right-edge--item,
-.right-edge--section-header + .right-edge--animation-container {
-  margin-top: 26px;
-}
-
-.right-edge--item {
-  padding-bottom: 16px;
 }
 
 .right-edge--label {
@@ -135,10 +127,38 @@
   cursor: pointer;
 }
 
+.right-edge--items-container {
+  padding-top: 26px;
+}
+
 .right-edge--item .cs-input-group--helper-text {
   height: auto;
 }
 
 .right-edge--item .cs-input-group--helper-text.invalid {
   margin-bottom: 10px;
+}
+
+.right-edge--item .cs-checkbox-group--helper-text {
+  display: none;
+}
+
+.right-edge--item {
+  padding-bottom: 16px;
+}
+
+.right-edge--item .field .cs-input-group {
+  padding-bottom: 11px;
+}
+
+.right-edge--item .cs-checkbox-group {
+  padding-top: 7px;
+}
+
+.right-edge--theme-dropdown-container {
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.15);
+  border: none;
+  border-radius: 10px;
+  margin-bottom: 26px;
 }

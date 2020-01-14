@@ -1,9 +1,6 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
-import { fadeIn, fadeOut } from 'ember-animated/motions/opacity';
-
-const duration = 250;
 
 export default class DropZone extends Component {
   @tracked dropZoneStatus = 'outside';
@@ -13,6 +10,7 @@ export default class DropZone extends Component {
       name: 'new field',
       label: 'New Field',
       type: '@cardstack/core-types::string',
+      preview: true,
     };
   }
 
@@ -20,16 +18,16 @@ export default class DropZone extends Component {
     return this.dropZoneStatus === 'dragging';
   }
 
-  @action dragOver(event) {
-    event.preventDefault();
+  @action
+  updateStatus(status) {
+    this.dropZoneStatus = status;
+
+    if (this.args.toggleStubField) {
+      this.args.toggleStubField(this.stubField, this.args.position, this.isOverDropZone);
+    }
   }
 
-  *expandPreview({ insertedSprites, removedSprites }) {
-    insertedSprites.forEach(sprite => {
-      fadeIn(sprite, { duration });
-    });
-    removedSprites.forEach(sprite => {
-      fadeOut(sprite, { duration });
-    });
+  @action dragOver(event) {
+    event.preventDefault();
   }
 }

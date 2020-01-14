@@ -7,7 +7,6 @@
   width: 100%;
   font: 400 16px/22px var(--ch-font-family);
   letter-spacing: 0.015em;
-  overflow: hidden;
 }
 
 .card-renderer-isolated.schema,
@@ -25,9 +24,20 @@
 
 
 /* Card Renderer Header */
+/* We need the wrapper to mask the border of the content when scrolling */
+.card-renderer-isolated--header--wrapper {
+  background-color: var(--ch-deep-background);
+  position: sticky;
+  top: 80px;
+  z-index: 5;
+}
+
+.card-renderer-isolated.view .card-renderer-isolated--header--wrapper {
+  background: var(--ch-dark-background);
+}
+
 .card-renderer-isolated--header {
   display: flex;
-  height: calc(var(--card-renderer-header-height) + 150px); /* to counteract the safari scroll bounce */
   padding: 14px 20px;
   color: var(--ch-light-op50);
   background-color: var(--ch-dark-background);
@@ -60,16 +70,12 @@
 .card-renderer-isolated--content {
   position: relative;
   min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
-  max-height: calc(
-    100vh - var(--ch-top-edge-height) - var(--card-renderer-header-height)
-  );
   padding-bottom: 80px;
   background-color: transparent;
   color: var(--ch-dark);
   border: none;
   overflow-x: hidden;
   overflow-y: auto;
-  margin-top: -150px; /* to counteract the safari scroll bounce */
 
   transition: var(--ch-card-background-color-animate);
 }
@@ -83,6 +89,7 @@
 .card-renderer-isolated .card-renderer-isolated--card-container {
   border: 3px solid transparent;
   border-radius: 0 0 10px 10px;
+  padding-top: 10px;
   overflow: hidden;
   min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
 

@@ -2,23 +2,16 @@
   <div
     class="drop-zone"
     role="button"
-    {{on "drop" (action @dropField @position (fn (mut this.dropZoneStatus) "dropped"))}}
+    {{on "drop" (action @dropField @position (fn this.updateStatus "dropped"))}}
     {{on "dragover" (action this.dragOver)}}
-    {{on "dragenter" (action (mut this.dropZoneStatus) "dragging")}}
-    {{on "dragleave" (action (mut this.dropZoneStatus) "outside")}}
+    {{on "dragenter" (action this.updateStatus "dragging")}}
+    {{on "dragleave" (action this.updateStatus "outside")}}
     data-test-drop-zone={{@position}}
     aria-label="drop zone {{@position}}"
   >
     <div class="drop-zone--description {{this.dropZoneStatus}}">
       <span class="drop-zone--description--text">Drag &amp; drop from the catalog</span>
       <div class="drop-zone--drag-drop-icon">{{svg-jar "drag-drop"}}</div>
-      <AnimatedContainer class="drop-zone--preview--container">
-        {{#animated-if this.isOverDropZone use=this.expandPreview as |overDropZone|}}
-          <div class="drop-zone--preview {{if overDropZone "active"}}">
-            <FieldRenderer @field={{this.stubField}} @mode="schema"/>
-          </div>
-        {{/animated-if}}
-      </AnimatedContainer>
     </div>
   </div>
 </div>
