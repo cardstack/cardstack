@@ -1,12 +1,13 @@
-import { module, test, only } from 'qunit';
+import { module, test } from 'qunit';
 import { click, visit, currentURL, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures';
 import { createCards } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
+import { animationsSettled } from 'ember-animated/test-support';
 
-const timeout = 20000;
+const timeout = 2000;
 const card1Id = 'millenial-puppies';
 const qualifiedCard1Id = `local-hub::${card1Id}`;
 const card2Id = 'van-gogh';
@@ -55,13 +56,8 @@ module('Acceptance | catalog', function(hooks) {
         ['name', 'string', true, 'Van Gogh'],
         ['email', 'string', false, 'vangogh@nowhere.dog'],
       ],
-      [card1Id]: [
-        ['title', 'string', true, 'The Millenial Puppy'],
-        ['author', 'related card', true, card2Id],
-        ['reviewers', 'related cards', true, `${card2Id},${card3Id}`],
-      ],
+      [card1Id]: [['title', 'string', true, 'The Millenial Puppy']],
     });
-    await visit(`/cards/${card1Id}`);
   });
 
   hooks.afterEach(function() {
@@ -78,26 +74,30 @@ module('Acceptance | catalog', function(hooks) {
 
   test(`created card ids are in local storage`, async function(assert) {
     await visit(`/`);
+    assert.equal(currentURL(), '/');
     let ids = this.owner.lookup('service:card-local-storage').getRecentCardIds();
     assert.ok(ids.includes(qualifiedCard1Id));
     assert.ok(ids.includes(qualifiedCard2Id));
     assert.ok(ids.includes(qualifiedCard3Id));
-    await percySnapshot(assert);
   });
 
-  only(`isolating a card`, async function(assert) {
-    await click('[data-test-library-link]');
-    await click(`[data-test-embedded-card=${card3Id}]`);
-    await waitFor(`[data-test-card-view=${card3Id}]`, {
+  test(`isolating a card`, async function(assert) {
+    await visit('/');
+    assert.equal(currentURL(), '/');
+    await animationsSettled();
+    assert.dom(`[data-test-embedded-card=${card2Id}]`).exists();
+    await click(`[data-test-embedded-card=${card2Id}]`);
+    assert.equal(currentURL(), `/cards/${card2Id}`);
+    await waitFor(`[data-test-card-view=${card2Id}]`, {
       timeout,
     });
 
-    assert.equal(currentURL(), `/cards/${card3Id}`);
     await percySnapshot(assert);
   });
 
   test('can navigate to catalog via left edge', async function(assert) {
     await visit(`/cards/${card1Id}`);
+    assert.equal(currentURL(), `/cards/${card1Id}`);
     await waitFor(`[data-test-card-view=${card1Id}]`, {
       timeout,
     });
