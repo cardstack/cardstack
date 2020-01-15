@@ -1,1 +1,52 @@
-<CardEditor @card={{this.model}}/>
+<CardhostTopEdge @mode="edit">
+  {{#let this.target.currentRoute.parent.localName as |mode|}}
+    {{#if (and (eq this.target.currentRoute.localName "index") (or (eq mode "layout") (eq mode "fields")))}}
+      {{#let this.target.currentRoute.parent.attributes as |card|}}
+        <div class="view-selector">
+          <LinkTo
+            @route="cards.card.edit.layout"
+            @class="view-selector--mode-link"
+            @model={{card.name}}
+            data-test-view-selector="layout"
+          >
+            {{svg-jar "layout" width="18px" height="17px"}}
+            Layout
+          </LinkTo>
+          <LinkTo
+            @route="cards.card.edit.fields"
+            @class="view-selector--mode-link"
+            @model={{card.name}}
+            data-test-view-selector="field"
+          >
+            {{svg-jar "form" width="18px" height="17px"}}
+            Field
+          </LinkTo>
+        </div>
+      {{/let}}
+    {{/if}}
+  {{/let}}
+</CardhostTopEdge>
+
+{{#if this.cardstackSession.isAuthenticated}}
+  <div class="card-renderer--top-edge-buttons">
+    <Cta
+      @variant="secondary primary"
+      @theme="cs-dark"
+    >
+      Edit Mode
+      <LinkTo
+        @route="cards.card.view"
+        @class="top-edge--view-mode-link"
+        @model={{this.card}}
+        data-test-top-edge-link="view"
+      >
+        {{svg-jar "close-circle" width="22px" height="22px"}}
+      </LinkTo>
+    </Cta>
+    <SaveButton @card={{this.card}}/>
+  </div>
+{{/if}}
+
+<CardhostLeftEdge />
+
+{{outlet}}

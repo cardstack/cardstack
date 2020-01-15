@@ -1,31 +1,3 @@
-{{#if this.cardstackSession.isAuthenticated}}
-  <div class="card-renderer--top-edge-buttons">
-    <Cta
-      @variant="secondary primary"
-      @theme="cs-dark"
-    >
-      Edit Mode
-      <LinkTo
-        @route="cards.card.view"
-        @class="top-edge--view-mode-link"
-        @model={{this.card}}
-        data-test-top-edge-link="view"
-      >
-        {{svg-jar "close-circle" width="22px" height="22px"}}
-      </LinkTo>
-    </Cta>
-    <SaveButton @card={{this.card}}/>
-  </div>
-{{/if}}
-
-<CardhostLeftEdge />
-
-<RightEdge
-  @card={{this.card}}
-  @mode="edit"
-  @cardSelected={{true}} {{!-- Change this when we want to display different right-edge options --}}
-/>
-
 <section
   class="card-editor"
   data-test-card-edit={{this.card.name}}
