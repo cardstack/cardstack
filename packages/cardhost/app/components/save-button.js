@@ -9,6 +9,7 @@ const SAVED_HIGHLIGHT_DELAY = 2500;
 export default class SaveButton extends Component {
   @service router;
   @service cardstackSession;
+  @service cardLocalStorage;
 
   @tracked justSaved;
 
@@ -18,6 +19,8 @@ export default class SaveButton extends Component {
 
     try {
       yield card.save();
+      // remove the next line once we have progressive data handling
+      this.cardLocalStorage.addRecentCardId(card.id);
     } catch (e) {
       console.error(e); // eslint-disable-line no-console
       this.statusMsg = `card ${card.name} was NOT successfully created: ${e.message}`;

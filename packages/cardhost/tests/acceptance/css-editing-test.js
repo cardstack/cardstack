@@ -48,6 +48,7 @@ module('Acceptance | css editing', function(hooks) {
   scenario.setupTest(hooks);
   hooks.beforeEach(function() {
     this.owner.lookup('service:data')._clearCache();
+    this.owner.lookup('service:card-local-storage').clearIds();
     // any time you visit the editor page, you need to set resizable to
     // false, or tests will time out.
     this.owner.lookup('controller:cards.card.view').resizable = false;
