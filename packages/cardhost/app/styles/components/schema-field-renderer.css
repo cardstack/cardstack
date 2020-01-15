@@ -18,18 +18,18 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: var(--field-header-height);
-  padding: 9px 20px 10px 45px;
+  min-height: var(--field-header-height);
+  padding: 6px 15px 6px 40px;
   border: 3px solid var(--ch-light-background);
   border-radius: 5px 5px 0 0;
-  background-position: var(--ch-spacing) center;
+  background-position: 15px center;
   background-size: 15px 15px;
   background-repeat: no-repeat;
   background-color: var(--ch-light-background);
   color: black;
   font-weight: 600;
   font-size: 13px;
-  line-height: 18px;
+  line-height: 1.385;
   text-transform: capitalize;
   transition: background-color var(--ch-transition-time),
               border-color var(--ch-transition-time),
@@ -64,7 +64,7 @@ header.schema-field-renderer--header.text-field-case-insensitive {
   display: block;
   padding-bottom: 10px;
   font-size: 11px;
-  line-height: 15px;
+  line-height: 1.364;
   letter-spacing: 0.035em;
   text-transform: capitalize;
 }
@@ -88,12 +88,12 @@ header.schema-field-renderer--header.text-field-case-insensitive {
 }
 
 .field:focus .schema-field-renderer .schema-field-renderer--header,
-.card-renderer:not(.selected) .field.selected .schema-field-renderer .schema-field-renderer--header {
+.card-renderer-isolated:not(.selected) .field.selected .schema-field-renderer .schema-field-renderer--header {
   background-color: var(--ch-highlight);
   border-color: var(--ch-highlight);
 }
 
 .field:focus .schema-field-renderer .schema-field-renderer--content,
-.card-renderer:not(.selected) .field.selected .schema-field-renderer .schema-field-renderer--content {
+.card-renderer-isolated:not(.selected) .field.selected .schema-field-renderer .schema-field-renderer--content {
   border-color: var(--ch-highlight);
 }
