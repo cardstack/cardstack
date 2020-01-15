@@ -125,6 +125,17 @@ a:hover {
   margin-left: 10px;
 }
 
+.card-renderer--top-edge-buttons .top-edge--mode-label {
+  padding: 10px;
+  background-color: white;
+  text-transform: uppercase;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 10px;
+  color: var(--ch-dark-op50);
+  margin-right: 20px;
+}
+
 .card-schema-updator--search-bar {
   position: absolute;
   right: var(--ch-spacing);

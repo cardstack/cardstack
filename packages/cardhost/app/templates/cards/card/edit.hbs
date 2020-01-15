@@ -27,25 +27,19 @@
   {{/let}}
 </CardhostTopEdge>
 
-{{#if this.cardstackSession.isAuthenticated}}
-  <div class="card-renderer--top-edge-buttons">
-    <Cta
-      @variant="secondary primary"
-      @theme="cs-dark"
+<div class="card-renderer--top-edge-buttons">
+  <div class="top-edge--mode-label">
+    Edit Mode
+    <LinkTo
+      @route="cards.card.view"
+      @class="top-edge--view-mode-link"
+      @model={{this.card}}
+      data-test-top-edge-link="view"
     >
-      Edit Mode
-      <LinkTo
-        @route="cards.card.view"
-        @class="top-edge--view-mode-link"
-        @model={{this.card}}
-        data-test-top-edge-link="view"
-      >
-        {{svg-jar "close-circle" width="22px" height="22px"}}
-      </LinkTo>
-    </Cta>
-    <SaveButton @card={{this.card}}/>
+      {{svg-jar "close-circle" width="18px" height="18px"}}
+    </LinkTo>
   </div>
-{{/if}}
+</div>
 
 <CardhostLeftEdge />
 

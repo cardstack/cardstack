@@ -1,9 +1,6 @@
 {{#if this.cardstackSession.isAuthenticated}}
   <div class="card-renderer--top-edge-buttons">
-    <Cta
-      @variant="secondary primary"
-      @theme="cs-dark"
-    >
+    <div class="top-edge--mode-label">
       Schema Mode
       <LinkTo
         @route="cards.card.edit.layout"
@@ -13,7 +10,7 @@
       >
         {{svg-jar "close-circle" width="18px" height="18px"}}
       </LinkTo>
-    </Cta>
+    </div>
     <SaveButton @card={{this.card}} />
   </div>
 {{/if}}
