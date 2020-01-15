@@ -56,8 +56,8 @@ export default class IndexRoute extends Route {
   error(err) {
     // Check for error type before we retry, else fall back on automatic Ember behavior.
     // Without this, the page falls apart if a card is missing.
-    if (err.message.includes('404')) {
-      // we have to reload or else the error state breaks the app further
+    if (err.message.includes('404') && environment !== 'test') {
+      // we have to reload or else the model error state breaks the app further
       window.location.reload();
     }
   }
