@@ -3,7 +3,7 @@ import { Session } from '../session';
 import { myOrigin } from '../origin';
 import { testCard } from './test-card';
 import { ScopedCardService } from '../cards-service';
-import { AddressableCard, canonicalURLToCardId, canonicalURL } from '../card';
+import { AddressableCard, canonicalURL } from '../card';
 import { CARDSTACK_PUBLIC_REALM } from '../realm';
 
 describe('hub/card-service', function() {
