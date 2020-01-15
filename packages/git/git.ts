@@ -1,5 +1,4 @@
 import {
-  Oid as NGOid,
   Repository as NGRepository,
   Tree as NGTree,
   Treebuilder as NGTreebuilder,
@@ -117,7 +116,7 @@ export class Repository {
   }
 
   async createBlobFromBuffer(buffer: Buffer): Promise<Oid> {
-    return Oid.fromNGOid(await this.ngrepo.createBlobFromBuffer(buffer));
+    return new Oid((await this.ngrepo.createBlobFromBuffer(buffer)).tostrS());
   }
 
   async fetchAll() {
@@ -248,20 +247,8 @@ export class Commit {
 export class Oid {
   constructor(private readonly sha: string) {}
 
-  static fromNGOid(oid: NGOid) {
-    return new Oid(oid.tostrS());
-  }
-
   toString() {
     return this.sha;
-  }
-
-  tostrS() {
-    return this.sha;
-  }
-
-  toNGOid() {
-    return NGOid.fromString(this.toString());
   }
 
   equal(other: Oid | string) {
@@ -331,13 +318,13 @@ export class Remote {
 
 export class Tree {
   static async lookup(repo: Repository, oid: Oid) {
-    let ngtree = await NGTree.lookup(repo.getNgRepo(), oid.toNGOid());
+    let ngtree = await NGTree.lookup(repo.getNgRepo(), oid.toString());
     return new Tree(ngtree);
   }
   constructor(private readonly ngtree: NGTree) {}
 
   id() {
-    return Oid.fromNGOid(this.ngtree.id());
+    return new Oid(this.ngtree.id().tostrS());
   }
 
   getNgTree() {
@@ -434,7 +421,8 @@ export class Treebuilder {
   }
 
   async insert(filename: string, childId: Oid, filemode: FILEMODE) {
-    await this.ngtreebuilder.insert(filename, childId.toNGOid(), filemode);
+    // @ts-ignore expects oid but it will have to live with a string for now
+    await this.ngtreebuilder.insert(filename, childId.toString(), filemode);
   }
 
   entrycount() {
@@ -443,7 +431,7 @@ export class Treebuilder {
 
   async write(): Promise<Oid> {
     let ngoid = await this.ngtreebuilder.write();
-    return Oid.fromNGOid(ngoid);
+    return new Oid(ngoid.tostrS());
   }
 }
 
@@ -451,7 +439,7 @@ export class Blob {
   constructor(private readonly ngblob: NGBlob) {}
 
   id() {
-    return Oid.fromNGOid(this.ngblob.id());
+    return new Oid(this.ngblob.id().tostrS());
   }
 
   content(): Buffer {
@@ -475,7 +463,7 @@ export class TreeEntry {
   }
 
   id() {
-    return Oid.fromNGOid(this.ngtreeentry.id());
+    return new Oid(this.ngtreeentry.id().tostrS());
   }
 
   async getBlob(): Promise<Blob> {

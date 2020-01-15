@@ -114,7 +114,7 @@ export default class Change {
         await this.repo.mergeBranches(this.targetBranch, `origin/${this.targetBranch}`, null, Merge.FASTFORWARD_ONLY);
       }
 
-      return mergeCommit.id().tostrS();
+      return mergeCommit.id().toString();
     }
 
     throw new Error('Failed to finalise commit and could not recover. ');
@@ -234,7 +234,7 @@ class FileHandle {
   savedId() {
     // this is available only after our change has been finalized
     if (this.leaf && this.leaf.savedId) {
-      return this.leaf.savedId.tostrS();
+      return this.leaf.savedId.toString();
     }
   }
 }

@@ -247,7 +247,7 @@ class GitUpdater {
   async _loadCommit() {
     if (!this.commit) {
       this.commit = await this._commitAtBranch(this.branch);
-      this.commitId = this.commit.id().tostrS();
+      this.commitId = this.commit.sha();
     }
     if (!this.rootTree) {
       this.rootTree = await this.commit.getTree();
@@ -356,10 +356,10 @@ class GitUpdater {
       doc.type = type;
       doc.id = id;
       set(doc, 'meta.version', this.commitId);
-      set(doc, 'meta.hash', entry.id().tostrS());
+      set(doc, 'meta.hash', entry.id().toString());
     } else {
       set(doc, 'data.meta.version', this.commitId);
-      set(doc, 'data.meta.hash', entry.id().tostrS());
+      set(doc, 'data.meta.hash', entry.id().toString());
     }
 
     return doc;
