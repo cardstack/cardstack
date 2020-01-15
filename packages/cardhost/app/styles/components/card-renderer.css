@@ -90,17 +90,17 @@
 .card-renderer-isolated .card-renderer-isolated--card-container {
   border: 3px solid transparent;
   border-radius: 0 0 10px 10px;
-  padding-top: 10px;
   overflow: hidden;
   min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
 
   transition: background-color var(--ch-transition-time),
-              border-color var(--ch-transition-time);
+  border-color var(--ch-transition-time);
 }
 
 .card-renderer-isolated.schema .card-renderer-isolated--card-container {
   background-color: var(--ch-dark-background);
   border-top: 3px solid var(--ch-default);
+  padding-top: 10px;
 }
 
 .card-renderer-isolated.edit .card-renderer-isolated--card-container {

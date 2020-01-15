@@ -6,7 +6,7 @@
           <LinkTo
             @route="cards.card.edit.layout"
             @class="view-selector--mode-link"
-            @model={{card.name}}
+            @model={{card}}
             data-test-view-selector="layout"
           >
             {{svg-jar "layout" width="18px" height="17px"}}
@@ -15,8 +15,8 @@
           <LinkTo
             @route="cards.card.edit.fields"
             @class="view-selector--mode-link"
-            @model={{card.name}}
-            data-test-view-selector="field"
+            @model={{card}}
+            data-test-view-selector="fields"
           >
             {{svg-jar "form" width="18px" height="17px"}}
             Field
