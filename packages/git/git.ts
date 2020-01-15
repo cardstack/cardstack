@@ -1,5 +1,4 @@
 import {
-  Cred as NGCred,
   Oid as NGOid,
   Repository as NGRepository,
   Index as NGIndex,
@@ -9,8 +8,6 @@ import {
   Blob as NGBlob,
   Commit as NGCommit,
 } from 'nodegit';
-
-import { FetchOptions as NGFetchOptions } from 'nodegit/fetch-options';
 
 import fs from 'fs';
 import { join } from 'path';
@@ -107,8 +104,8 @@ export class Repository {
     return new Commit(await this.ngrepo.getMasterCommit());
   }
 
-  async fetch(remote: string, fetchOpts: FetchOptions): Promise<void> {
-    await this.ngrepo.fetch(remote, fetchOpts.toNgFetchOptions());
+  async fetch(remote: string): Promise<void> {
+    await this.ngrepo.fetch(remote);
   }
 
   async getRemote(remote: string): Promise<Remote> {
@@ -119,8 +116,8 @@ export class Repository {
     return Oid.fromNGOid(await this.ngrepo.createBlobFromBuffer(buffer));
   }
 
-  async fetchAll(fetchOpts?: FetchOptions) {
-    await this.ngrepo.fetchAll(fetchOpts && fetchOpts.toNgFetchOptions());
+  async fetchAll() {
+    await this.ngrepo.fetchAll();
   }
 
   async mergeBranches(to: string, from: string, ignored: null, preference: number) {
@@ -516,46 +513,5 @@ export class TreeEntry {
     if (tree) {
       return new Tree(tree);
     }
-  }
-}
-
-export class Cred {
-  static async sshKeyMemoryNew(username: string, publicKey: string, privateKey: string, passphrase: string) {
-    let ngcred = await NGCred.sshKeyMemoryNew(username, publicKey, privateKey, passphrase);
-    return new Cred(ngcred);
-  }
-
-  static sshKeyFromAgent(username: string) {
-    let ngcred = NGCred.sshKeyFromAgent(username);
-    return new Cred(ngcred);
-  }
-
-  constructor(private readonly ngcred: NGCred) {}
-
-  getNgCred() {
-    return this.ngcred;
-  }
-}
-
-export class FetchOptions {
-  constructor(private readonly credentialsCallback: (userName: string) => Promise<Cred> | Cred) {}
-
-  static privateKey(privateKey: string, publicKey = '', passphrase = '') {
-    return new FetchOptions(userName => Cred.sshKeyMemoryNew(userName, publicKey, privateKey, passphrase));
-  }
-
-  static agentKey() {
-    return new FetchOptions(userName => Cred.sshKeyFromAgent(userName));
-  }
-
-  toNgFetchOptions(): NGFetchOptions {
-    return {
-      callbacks: {
-        credentials: async (url: string, userName: string) => {
-          let cred = await this.credentialsCallback(userName);
-          return cred.getNgCred();
-        },
-      },
-    };
   }
 }

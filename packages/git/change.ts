@@ -1,8 +1,6 @@
-import { Commit, Merge, Repository, Tree, FILEMODE, FetchOptions, CommitOpts, BranchNotFound } from './git';
+import { Commit, Merge, Repository, Tree, FILEMODE, CommitOpts, BranchNotFound } from './git';
 
 import { NewEntry, MutableTree, NotFound, OverwriteRejected } from './mutable-tree';
-
-import moment from 'moment-timezone';
 
 import crypto from 'crypto';
 import delay from 'delay';
@@ -18,7 +16,7 @@ export default class Change {
     return new this(repo, targetBranch, undefined, []);
   }
 
-  static async createBranch(repo: Repository, parentId: string, targetBranch: string, fetchOpts?: FetchOptions) {
+  static async createBranch(repo: Repository, parentId: string, targetBranch: string) {
     let parentCommit;
     if (parentId) {
       parentCommit = await Commit.lookup(repo, parentId);
@@ -30,15 +28,15 @@ export default class Change {
       parentTree = await parentCommit.getTree();
       parents.push(parentCommit);
     }
-    return new this(repo, targetBranch, parentTree, parents, parentCommit, fetchOpts);
+    return new this(repo, targetBranch, parentTree, parents, parentCommit);
   }
 
-  static async create(repo: Repository, parentId: string | null, targetBranch: string, fetchOpts?: FetchOptions) {
+  static async create(repo: Repository, parentId: string | null, targetBranch: string, isRemote?: boolean) {
     let parentCommit;
     if (parentId) {
       parentCommit = await Commit.lookup(repo, parentId);
     } else {
-      parentCommit = await headCommit(repo, targetBranch, fetchOpts);
+      parentCommit = await headCommit(repo, targetBranch, !!isRemote);
     }
 
     let parentTree;
@@ -47,10 +45,11 @@ export default class Change {
       parentTree = await parentCommit.getTree();
       parents.push(parentCommit);
     }
-    return new this(repo, targetBranch, parentTree, parents, parentCommit, fetchOpts);
+    return new this(repo, targetBranch, parentTree, parents, parentCommit, isRemote);
   }
 
   root: MutableTree;
+  isRemote: boolean;
 
   constructor(
     public repo: Repository,
@@ -58,7 +57,7 @@ export default class Change {
     public parentTree: Tree | undefined,
     public parents: Commit[],
     public parentCommit?: Commit,
-    public fetchOpts?: FetchOptions
+    isRemote?: boolean
   ) {
     this.repo = repo;
     this.parentTree = parentTree;
@@ -66,11 +65,11 @@ export default class Change {
     this.parents = parents;
     this.parentCommit = parentCommit;
     this.targetBranch = targetBranch;
-    this.fetchOpts = fetchOpts;
+    this.isRemote = !!isRemote;
   }
 
   async _headCommit() {
-    return headCommit(this.repo, this.targetBranch, this.fetchOpts);
+    return headCommit(this.repo, this.targetBranch, this.isRemote);
   }
 
   async get(path: string, { allowCreate, allowUpdate }: { allowCreate?: boolean; allowUpdate?: boolean } = {}) {
@@ -89,12 +88,12 @@ export default class Change {
       mergeCommit = await this._makeMergeCommit(newCommit!, commitOpts);
 
       try {
-        if (this.fetchOpts) {
+        if (this.isRemote) {
           // needsFetchAll only gets set to true if the retry block has failed once
           if (needsFetchAll) {
             // pull remote before allowing process to continue, allowing us to
             // (hopefully) recover from upstream getting out of sync
-            await this.repo.fetchAll(this.fetchOpts);
+            await this.repo.fetchAll();
           }
           await this._pushCommit(mergeCommit);
         } else {
@@ -110,8 +109,8 @@ export default class Change {
         continue;
       }
 
-      if (this.fetchOpts && !this.repo.isBare()) {
-        await this.repo.fetchAll(this.fetchOpts);
+      if (this.isRemote && !this.repo.isBare()) {
+        await this.repo.fetchAll();
         await this.repo.mergeBranches(this.targetBranch, `origin/${this.targetBranch}`, null, Merge.FASTFORWARD_ONLY);
       }
 
@@ -143,7 +142,7 @@ export default class Change {
       await remote.push(`refs/heads/${remoteBranchName}`, `refs/heads/${this.targetBranch}`, { force: true });
     } catch (err) {
       // pull remote before allowing process to continue
-      await this.repo.fetchAll(this.fetchOpts);
+      await this.repo.fetchAll();
       throw err;
     }
   }
@@ -242,10 +241,10 @@ class FileHandle {
 
 module.exports = Change;
 
-async function headCommit(repo: Repository, targetBranch: string, fetchOpts?: FetchOptions) {
+async function headCommit(repo: Repository, targetBranch: string, isRemote: boolean) {
   let headRef;
   try {
-    if (fetchOpts) {
+    if (isRemote) {
       headRef = await repo.lookupRemoteBranch('origin', targetBranch);
     } else {
       headRef = await repo.lookupLocalBranch(targetBranch);

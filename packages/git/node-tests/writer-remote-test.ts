@@ -1,4 +1,4 @@
-import { Repository, FetchOptions, Remote } from '../git';
+import { Repository, Remote } from '../git';
 
 const { createDefaultEnvironment, destroyDefaultEnvironment } = require('@cardstack/test-support/env'); // eslint-disable-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 
@@ -22,8 +22,6 @@ const mkdir = promisify(temp.mkdir);
 
 const privateKey = readFileSync(join(__dirname, 'git-ssh-server', 'cardstack-test-key'), 'utf8');
 import { fake, replace } from 'sinon';
-
-const fetchOpts = FetchOptions.privateKey(privateKey);
 
 async function resetRemote() {
   let root = await temp.mkdir('cardstack-server-test');
@@ -120,7 +118,7 @@ describe('git/writer with remote', function() {
           },
         },
       });
-      await repo.fetch('origin', fetchOpts);
+      await repo.fetch('origin');
       let saved = await inRepo(tempRemoteRepoPath).getJSONContents(
         'origin/master',
         `contents/events/${record.id}.json`
@@ -153,7 +151,7 @@ describe('git/writer with remote', function() {
         .has.deep.property('meta.version')
         .not.equal(head);
 
-      await repo.fetch('origin', fetchOpts);
+      await repo.fetch('origin');
       let updated = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/event-1.json`);
 
       expect(updated).to.deep.equal({
@@ -167,7 +165,7 @@ describe('git/writer with remote', function() {
     it('successfully merges updates when repo is out of sync', async function() {
       this.timeout(20000);
 
-      let change = await Change.create(remoteRepo, head, 'master', fetchOpts);
+      let change = await Change.create(remoteRepo, head, 'master');
 
       let file = await change.get('contents/events/event-2.json', { allowUpdate: true });
 
@@ -205,7 +203,7 @@ describe('git/writer with remote', function() {
         .has.deep.property('meta.version')
         .not.equal(head);
 
-      await repo.fetch('origin', fetchOpts);
+      await repo.fetch('origin');
       let updated = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/event-1.json`);
 
       expect(updated).to.deep.equal({
@@ -219,7 +217,7 @@ describe('git/writer with remote', function() {
     it('successfully merges updates when same file is out of sync', async function() {
       this.timeout(20000);
 
-      let change = await Change.create(remoteRepo, head, 'master', fetchOpts);
+      let change = await Change.create(remoteRepo, head, 'master');
 
       let file = await change.get('contents/events/event-1.json', { allowUpdate: true });
 
@@ -262,7 +260,7 @@ describe('git/writer with remote', function() {
         .has.deep.property('meta.version')
         .not.equal(head);
 
-      await repo.fetch('origin', fetchOpts);
+      await repo.fetch('origin');
       let updated = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/event-1.json`);
 
       expect(updated).to.deep.equal({
@@ -278,7 +276,7 @@ describe('git/writer with remote', function() {
     it('deletes document', async function() {
       await writers.delete(env.session, head, 'events', 'event-1');
 
-      await repo.fetch('origin', fetchOpts);
+      await repo.fetch('origin');
 
       let articles = (await inRepo(tempRemoteRepoPath).listTree('origin/master', 'contents/events')).map(a => a.name);
       expect(articles).to.not.contain('event-1.json');
@@ -348,7 +346,7 @@ describe('git/writer with empty remote', function() {
           },
         },
       });
-      await repo.fetch('origin', fetchOpts);
+      await repo.fetch('origin');
       let saved = await inRepo(tempRemoteRepoPath).getJSONContents(
         'origin/master',
         `contents/events/${record.id}.json`

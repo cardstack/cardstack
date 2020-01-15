@@ -1,4 +1,4 @@
-import { Merge, Repository, RemoteConfig, FetchOptions } from './git';
+import { Merge, Repository, RemoteConfig } from './git';
 
 import { promisify } from 'util';
 import mkdirpcb from 'mkdirp';
@@ -15,7 +15,6 @@ const log = logger('cardstack/git');
 
 interface RemoteCache {
   repo: Repository;
-  fetchOpts: FetchOptions;
   repoPath: string;
 }
 
@@ -34,11 +33,10 @@ class GitLocalCache {
       return existingRepo.repo;
     }
 
-    let { repo, fetchOpts, repoPath } = await this._makeRepo(remote);
+    let { repo, repoPath } = await this._makeRepo(remote);
 
     this._remotes.set(remote.url, {
       repo,
-      fetchOpts,
       repoPath,
     });
 
@@ -57,10 +55,6 @@ class GitLocalCache {
     }
 
     let repoPath = join(cacheDirectory, filenamifyUrl(remote.url));
-
-    let fetchOpts = remote.privateKey
-      ? FetchOptions.privateKey(remote.privateKey, remote.publicKey, remote.passphrase)
-      : FetchOptions.agentKey();
 
     log.info('creating local repo cache for %s in %s', remote.url, repoPath);
 
@@ -88,14 +82,13 @@ class GitLocalCache {
 
     return {
       repo,
-      fetchOpts,
       repoPath,
     };
   }
 
   async fetchAllFromRemote(remoteUrl: string) {
-    let { repo, fetchOpts } = this._remotes.get(remoteUrl)!;
-    return await repo.fetchAll(fetchOpts);
+    let { repo } = this._remotes.get(remoteUrl)!;
+    return await repo.fetchAll();
   }
 
   async pullRepo(remoteUrl: string, targetBranch: string) {
