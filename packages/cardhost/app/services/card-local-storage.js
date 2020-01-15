@@ -106,7 +106,7 @@ if (!window.localStorage) {
   );
 }
 
-export default Service.extend({
+export default class cardLocalStorageService extends Service {
   /**
    * Returns an array of card ids from the local browser storage
    */
@@ -117,7 +117,7 @@ export default Service.extend({
     } else {
       return JSON.parse(cardIds);
     }
-  },
+  }
 
   /**
    * Accepts the card id as a string, i.e. "local-hub::my-card-id"
@@ -138,7 +138,7 @@ export default Service.extend({
         throw err;
       }
     }
-  },
+  }
 
   /**
    * Accepts the card id as a string, i.e. "local-hub::my-card-id".
@@ -148,9 +148,9 @@ export default Service.extend({
     let cardIds = this.getRecentCardIds();
     cardIds = cardIds.filter(item => item !== id);
     localStorage.setItem('recentCardIds', JSON.stringify(cardIds));
-  },
+  }
 
   clearIds() {
     localStorage.removeItem('recentCardIds');
-  },
-});
+  }
+}
