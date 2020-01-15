@@ -1,0 +1,41 @@
+/* remove this media query when we implement responsive designs */
+@media (max-width: 900px) {
+  .right-edge {
+    right: unset;
+    left: 560px;
+  }
+
+  .card-renderer--top-edge-buttons {
+    right: unset;
+    left: 590px;
+  }
+  
+  .cardhost-top-edge {
+    min-width: 900px;
+  }
+
+  .themer--top-edge-container {
+    min-width: 700px;
+  }
+}
+
+/* remove this media query when we implement responsive designs */
+@media (max-width: 1330px) {
+  .schema .right-edge {
+    right: unset;
+    left: 900px;
+  }
+
+  .schema .card-renderer--top-edge-buttons {
+    right: unset;
+    left: 940px;
+  }
+  
+  .schema.cardhost-top-edge {
+    min-width: 1250px;
+  }
+
+  .card-creator, .card-schema-updator, .card-view, .card-editor {
+    min-width: 490px;
+  }
+}

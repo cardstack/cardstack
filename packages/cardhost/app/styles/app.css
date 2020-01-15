@@ -18,6 +18,9 @@
 @import '/assets/components/themer.css';
 @import '/assets/components/dialog.css';
 
+/* Handling minimum screen sizes for desktop */
+@import '/assets/responsive.css';
+
 /* Cardhost styling for core package templates */
 @import '/assets/components/card-renderer.css';
 @import '/assets/components/field-renderer.css';
@@ -90,7 +93,7 @@ Until that work is done we are statically adding this css
 }
 
 body {
-  min-width: 100%;
+  min-width: 900px;
   min-height: 100%;
   width: 100%;
   height: auto;
