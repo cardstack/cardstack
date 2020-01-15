@@ -588,9 +588,127 @@ describe('hub/card-service', function() {
         }
       });
 
-      it.skip('rejects a card reference that is not the correct arity', async function() {});
-      it.skip('rejects a card value that is not the correct arity', async function() {});
-      it.skip('rejects a specific card value when validating a field that has arity > 1', async function() {});
+      it('rejects a card reference that is not the correct arity', async function() {
+        let puppyCard = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, testCard().jsonapi);
+        let addressCard = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, testCard().jsonapi);
+        let mango = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard().adoptingFrom(puppyCard).jsonapi
+        );
+        let home = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard().adoptingFrom(addressCard).jsonapi
+        );
+        let ownerCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('address', addressCard, 'singular')
+            .withField('puppies', puppyCard, 'plural').jsonapi
+        );
+
+        try {
+          await service.create(
+            `${myOrigin}/api/realms/first-ephemeral-realm`,
+            testCard()
+              .withRelationships({
+                puppies: mango,
+              })
+              .adoptingFrom(ownerCard).jsonapi
+          );
+          throw new Error(`should not have been able to create`);
+        } catch (err) {
+          expect(err).hasStatus(400);
+          expect(err.detail).to.match(/field puppies on card .* failed arity validation .* field has a plural arity/);
+        }
+
+        try {
+          await service.create(
+            `${myOrigin}/api/realms/first-ephemeral-realm`,
+            testCard()
+              .withRelationships({
+                address: [home],
+              })
+              .adoptingFrom(ownerCard).jsonapi
+          );
+          throw new Error(`should not have been able to create`);
+        } catch (err) {
+          expect(err).hasStatus(400);
+          expect(err.detail).to.match(/field address on card .* failed arity validation .* field has a singular arity/);
+        }
+      });
+
+      it('rejects a card value that is not the correct arity', async function() {
+        let puppyCard = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, testCard().jsonapi);
+        let addressCard = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, testCard().jsonapi);
+        let ownerCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('address', addressCard, 'singular')
+            .withField('puppies', puppyCard, 'plural').jsonapi
+        );
+
+        try {
+          await service.create(
+            `${myOrigin}/api/realms/first-ephemeral-realm`,
+            testCard()
+              .withAttributes({
+                puppies: testCard().adoptingFrom(puppyCard).jsonapi.data,
+              })
+              .adoptingFrom(ownerCard).jsonapi
+          );
+          throw new Error(`should not have been able to create`);
+        } catch (err) {
+          expect(err).hasStatus(400);
+          expect(err.detail).to.match(/field puppies on card .* failed arity validation .* field has a plural arity/);
+        }
+
+        try {
+          await service.create(
+            `${myOrigin}/api/realms/first-ephemeral-realm`,
+            testCard()
+              .withAttributes({
+                address: [testCard().adoptingFrom(addressCard).jsonapi.data],
+              })
+              .adoptingFrom(ownerCard).jsonapi
+          );
+          throw new Error(`should not have been able to create`);
+        } catch (err) {
+          expect(err).hasStatus(400);
+          expect(err.detail).to.match(/field address on card .* failed arity validation .* field has a singular arity/);
+        }
+      });
+
+      it('rejects a specific card value when validating a field that has arity > 1', async function() {
+        let puppyCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard().withField('name', 'string-field').jsonapi
+        );
+        let ownerCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard().withField('puppies', puppyCard, 'plural').jsonapi
+        );
+        try {
+          await service.create(
+            `${myOrigin}/api/realms/first-ephemeral-realm`,
+            testCard()
+              .withAttributes({
+                puppies: [
+                  testCard()
+                    .withAttributes({ name: 'mango' })
+                    .adoptingFrom(puppyCard).jsonapi.data,
+                  testCard()
+                    .withAttributes({ name: 42 })
+                    .adoptingFrom(puppyCard).jsonapi.data,
+                ],
+              })
+              .adoptingFrom(ownerCard).jsonapi
+          );
+          throw new Error(`should not have been able to create`);
+        } catch (err) {
+          expect(err).hasStatus(400);
+          expect(err.detail).to.match(/field name on card .* failed type validation/);
+        }
+      });
 
       it('can break a cycle in the search doc', async function() {
         let friendCard = await service.create(
@@ -647,20 +765,12 @@ describe('hub/card-service', function() {
   });
 
   describe('readonly', function() {
-    let env: TestEnv;
-    let service: ScopedCardService;
-
-    before(async function() {
-      env = await createTestEnv();
-      service = (await env.container.lookup('cards')).as(Session.EVERYONE);
-    });
-
-    after(async function() {
-      await env.destroy();
-    });
-
     describe('system fields', function() {
+      let env: TestEnv;
+      let service: ScopedCardService;
       before(async function() {
+        env = await createTestEnv();
+        service = (await env.container.lookup('cards')).as(Session.EVERYONE);
         await service.create(
           `${myOrigin}/api/realms/first-ephemeral-realm`,
           testCard().withAutoAttributes({ csId: '1' }).jsonapi
@@ -705,6 +815,10 @@ describe('hub/card-service', function() {
             csOriginalRealm: `${myOrigin}/api/realms/first-ephemeral-realm`,
           }).jsonapi
         );
+      });
+
+      after(async function() {
+        await env.destroy();
       });
 
       it('can filter by csRealm', async function() {
@@ -803,6 +917,8 @@ describe('hub/card-service', function() {
     });
 
     describe('user fields', function() {
+      let env: TestEnv;
+      let service: ScopedCardService;
       let puppyCard: AddressableCard,
         puppyMemeCard: AddressableCard,
         puppyDankMemeCard: AddressableCard,
@@ -826,6 +942,8 @@ describe('hub/card-service', function() {
         puppyDankMemeOwner: AddressableCard,
         allTypesOwner: AddressableCard;
       before(async function() {
+        env = await createTestEnv();
+        service = (await env.container.lookup('cards')).as(Session.EVERYONE);
         puppyCard = await service.create(
           `${myOrigin}/api/realms/first-ephemeral-realm`,
           testCard()
@@ -1027,6 +1145,10 @@ describe('hub/card-service', function() {
             .withRelationships({ puppies: [noIdea, ringo, disappointed] })
             .adoptingFrom(ownerCardByRef).jsonapi
         );
+      });
+
+      after(async function() {
+        await env.destroy();
       });
 
       it('can equality filter by string user field', async function() {
