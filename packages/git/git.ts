@@ -5,7 +5,6 @@ import {
   Treebuilder as NGTreebuilder,
   TreeEntry as NGTreeEntry,
   Blob as NGBlob,
-  Commit as NGCommit,
 } from 'nodegit';
 
 import fs from 'fs';
@@ -22,11 +21,16 @@ import {
   findMergeBase as igFindMergeBase,
   init as igInit,
   listBranches as igListBranches,
+  log as igLog,
   merge as igMerge,
   plugins as igPlugins,
   push as igPush,
+  readCommit as igReadCommit,
   resolveRef as igResolveRef,
   writeRef as igWriteRef,
+
+  // types
+  ReadCommitResult,
 } from 'isomorphic-git';
 
 igPlugins.set('fs', fs);
@@ -100,7 +104,8 @@ export class Repository {
   }
 
   async getMasterCommit(): Promise<Commit> {
-    return new Commit(await this.ngrepo.getMasterCommit());
+    let masterCommit = await this.ngrepo.getMasterCommit();
+    return await Commit.lookup(this, masterCommit.id().tostrS());
   }
 
   async fetch(remote: string): Promise<void> {
@@ -128,7 +133,7 @@ export class Repository {
   }
 
   async createBranch(targetBranch: string, headCommit: Commit): Promise<Reference> {
-    let ngreference = await this.ngrepo.createBranch(targetBranch, headCommit.getNgCommit());
+    let ngreference = await this.ngrepo.createBranch(targetBranch, headCommit.sha());
     return await Reference.lookup(this, ngreference.toString());
   }
 
@@ -138,12 +143,12 @@ export class Repository {
 
   async getHeadCommit() {
     let ngcommit = await this.ngrepo.getHeadCommit();
-    return new Commit(ngcommit);
+    return await Commit.lookup(this, ngcommit.id().tostrS());
   }
 
   async getReferenceCommit(name: string): Promise<Commit> {
     let ngcommit = await this.ngrepo.getReferenceCommit(name);
-    return new Commit(ngcommit);
+    return await Commit.lookup(this, ngcommit.id().tostrS());
   }
 
   async lookupLocalBranch(branchName: string) {
@@ -211,41 +216,32 @@ export class Commit {
   }
 
   static async lookup(repo: Repository, id: Oid | string): Promise<Commit> {
-    let ngcommit = await NGCommit.lookup(repo.getNgRepo(), id.toString());
-    return new Commit(ngcommit);
+    let commitInfo = await igReadCommit({
+      gitdir: repo.gitdir(),
+      oid: id.toString(),
+    });
+    return new Commit(repo, commitInfo);
   }
 
-  constructor(private readonly ngcommit: NGCommit) {}
+  constructor(private readonly repo: Repository, private readonly commitInfo: ReadCommitResult) {}
 
   id() {
-    return Oid.fromNGOid(this.ngcommit.id());
+    return new Oid(this.commitInfo.oid);
   }
 
   sha() {
-    return this.ngcommit.id().toString();
+    return this.commitInfo.oid;
   }
 
   async getLog() {
-    let log: Commit[] = [];
-
-    await new Promise((resolve, reject) => {
-      let history = this.ngcommit.history();
-      history.on('commit', (c: any) => log.push(new Commit(c)));
-      history.on('end', resolve);
-      history.on('error', reject);
-      history.start();
+    return await igLog({
+      gitdir: this.repo.gitdir(),
+      ref: this.sha(),
     });
-
-    return log;
-  }
-
-  getNgCommit() {
-    return this.ngcommit;
   }
 
   async getTree() {
-    let ngtree = await this.ngcommit.getTree();
-    return new Tree(ngtree);
+    return await Tree.lookup(this.repo, new Oid(this.commitInfo.commit.tree));
   }
 }
 

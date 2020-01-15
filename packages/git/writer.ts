@@ -334,7 +334,7 @@ async function withErrorHandling(id: string, type: string, fn: Function) {
   try {
     return await fn();
   } catch (err) {
-    if (/Unable to parse OID/i.test(err.message) || /Object not found/i.test(err.message)) {
+    if (err.code === 'ReadObjectFail') {
       throw new Error(err.message, { status: 400, source: { pointer: '/data/meta/version' } });
     }
     if (err instanceof GitConflict) {
