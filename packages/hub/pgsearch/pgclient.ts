@@ -22,7 +22,7 @@ import {
   FieldValue,
   FieldArity,
 } from './util';
-import { AddressableCard, CardId, Card, FieldCard, cardstackFieldPattern } from '../card';
+import { AddressableCard, CardId, Card, FieldCard, cardstackFieldPattern, canonicalURL } from '../card';
 import CardstackError from '../error';
 import { Query, baseType, Filter, EqFilter, RangeFilter } from '../query';
 import { Sorts } from './sorts';
@@ -456,9 +456,17 @@ export default class PgClient {
       return this.eqCondition(typeContext, filter);
     } else if ('range' in filter) {
       return this.rangeCondition(typeContext, filter);
+    } else if ('type' in filter) {
+      return this.typeCondition(typeContext);
     } else {
       assertNever(filter);
     }
+  }
+
+  private typeCondition(typeContext: CardId): CardExpression {
+    let key = 'csAdoptionChain';
+    let value = fieldValue(typeContext, key, [param(canonicalURL(typeContext))], 'filter');
+    return ['search_doc ->', param(key), '?| array[', value, ']'];
   }
 
   private eqCondition(typeContext: CardId, filter: EqFilter): CardExpression {

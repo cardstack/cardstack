@@ -11,22 +11,30 @@ export interface Query {
   queryString?: string;
 }
 
-export type Filter = AnyFilter | EveryFilter | NotFilter | EqFilter | RangeFilter;
+export type Filter = AnyFilter | EveryFilter | NotFilter | EqFilter | RangeFilter | CardTypeFilter;
+export type InteriorFilter = Exclude<Filter, CardTypeFilter>;
 
 export interface TypedFilter {
   type?: CardId;
 }
 
+// The CardTypeFilter is used when you solely want to filter for all cards that
+// adopt from some particular card type--no other predicates are included in
+// this filter.
+export interface CardTypeFilter {
+  type: CardId;
+}
+
 export interface AnyFilter extends TypedFilter {
-  any: Filter[];
+  any: InteriorFilter[];
 }
 
 export interface EveryFilter extends TypedFilter {
-  every: Filter[];
+  every: InteriorFilter[];
 }
 
 export interface NotFilter extends TypedFilter {
-  not: Filter;
+  not: InteriorFilter;
 }
 
 export interface EqFilter extends TypedFilter {

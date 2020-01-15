@@ -36,7 +36,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "filtering field by interior csField for a field with arity > 1"]
+      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "filtering solely by card type"]
     },
     {
       "type": "node",

@@ -12,6 +12,7 @@ import { ScopedCardService } from './cards-service';
 import * as FieldHooks from './field-hooks';
 import { inject, getOwner } from './dependency-injection';
 import { Memoize } from 'typescript-memoize';
+import { CARDSTACK_PUBLIC_REALM } from './realm';
 
 export const apiPrefix = '/api';
 
@@ -245,6 +246,23 @@ export class Card {
     }
   }
 
+  @Memoize()
+  async adoptionChain(): Promise<AddressableCard[]> {
+    let adoptionChain: AddressableCard[] = [];
+    let card: Card | undefined = this;
+    while (card) {
+      card = await card.adoptsFrom();
+      if (card) {
+        adoptionChain.push(card as AddressableCard); // parent cards are always addressable
+      }
+    }
+    let baseCardId = { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' };
+    if (adoptionChain.map(i => i.canonicalURL).includes(canonicalURL(baseCardId))) {
+      adoptionChain.push(await this.service.get(baseCardId));
+    }
+    return adoptionChain;
+  }
+
   protected regenerateJSONAPI(): SingleResourceDoc {
     let copied = cloneDeep(this.jsonapi);
     if (!copied.data.attributes) {
@@ -291,6 +309,8 @@ export class Card {
       doc.csId = this.csId;
       visitedCards.push(this.canonicalURL as string); // if csId exists, then a canonicalURL will exist as well
     }
+
+    doc.csAdoptionChain = (await this.adoptionChain()).map(i => i.canonicalURL);
 
     // What about card fields that a user had decided to fill in with a
     // relationship to a card? Do we include that card in the search doc? It
@@ -370,6 +390,7 @@ export class Card {
     }
   }
 
+  @Memoize()
   async adoptsFrom(): Promise<AddressableCard | undefined> {
     let adoptsFromRelationship = this.jsonapi.data.relationships?.csAdoptsFrom;
     if (adoptsFromRelationship && `links` in adoptsFromRelationship) {

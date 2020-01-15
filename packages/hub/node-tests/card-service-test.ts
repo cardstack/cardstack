@@ -1199,8 +1199,69 @@ describe('hub/card-service', function() {
         expect(ids).to.include.members([mommy.canonicalURL, daddy.canonicalURL]);
       });
 
-      // includes cards that directly adopt and cards whose card-type is an ancestor in the adoption chain
-      it.skip('filtering on solely card type', async function() {});
+      it('filtering solely by card type', async function() {
+        let puppyMemeCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('meme', 'string-field')
+            .adoptingFrom(puppyCard).jsonapi
+        );
+        let noIdea = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Larry',
+              meme: `I have not idea what I'm doing`,
+            })
+            .adoptingFrom(puppyMemeCard).jsonapi
+        );
+        let cupcake = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Cupcake',
+              meme: 'Cupcake dog with 1000 yard stare',
+            })
+            .adoptingFrom(puppyMemeCard).jsonapi
+        );
+
+        let results = await service.search({
+          filter: {
+            type: puppyCard,
+          },
+        });
+        expect(results.cards.length).to.equal(6);
+        let ids = results.cards.map(i => i.canonicalURL);
+        expect(ids).to.include.members([
+          puppyMemeCard.canonicalURL,
+          mango.canonicalURL,
+          vanGogh.canonicalURL,
+          ringo.canonicalURL,
+          noIdea.canonicalURL,
+          cupcake.canonicalURL,
+        ]);
+      });
+
+      it.skip('can get all cards in the index by filtering for the base card', async function() {});
+
+      it.skip('nested filter with a leaf filter that filters against card type', async function() {
+        // testing with adoption heirarchy: puppyCard -> puppyMemeCard -> puppyDankMemeCard
+        // let results = await service.search({
+        //   filter: {
+        //     type: ownerCard,
+        //     eq: {
+        //       'puppies.csAdoptsFrom': puppyMemeCard.canonicalURL, // where this includes cards that have puppyMemeCard as an ancestor in their adoption chain (which includes puppyDankMemeCard's too, but not puppyCard's)
+        //     },
+        //   },
+        // });
+      });
+
+      describe('sorting', function() {
+        it.skip('sort by integer field', async function() {});
+        it.skip('sort by string field', async function() {});
+        it.skip('sort by nested card field', async function() {});
+        it.skip('sort direction', async function() {});
+      });
     });
   });
 });
