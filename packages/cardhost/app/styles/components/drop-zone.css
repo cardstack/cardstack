@@ -64,6 +64,8 @@
 }
 
 .card-renderer-isolated.no-fields .drop-zone .drop-zone--drag-drop-icon {
+  --icon-color: #fff;
+  --icon-opacity: 0.5;
   display: block;
   margin-top: 10px;
   text-align: center;

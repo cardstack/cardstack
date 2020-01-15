@@ -91,7 +91,7 @@
     "eslint-plugin-node": "^10.0.0",
     "loader.js": "^4.7.0",
     "monaco-editor": "^0.18.1",
-    "monaco-editor-webpack-plugin": "^1.7.0",
+    "monaco-editor-webpack-plugin": "~1.7.0",
     "prember": "^1.0.0",
     "qunit-dom": "^0.8.1",
     "scope-css": "^1.2.1",

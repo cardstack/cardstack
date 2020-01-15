@@ -5,6 +5,7 @@ import Fixtures from '@cardstack/test-support/fixtures';
 import { createCards } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
+import { animationsSettled } from 'ember-animated/test-support';
 
 const timeout = 20000;
 const card1Id = 'millenial-puppies';
@@ -52,6 +53,38 @@ module('Acceptance | css editing', function(hooks) {
     this.owner.lookup('controller:cards.card.view').resizable = false;
   });
 
+  test('can view code editor', async function(assert) {
+    await login();
+
+    await visit(`/cards/@cardstack%2Fbase-card/themer`);
+    assert.equal(currentURL(), `/cards/@cardstack%2Fbase-card/themer`);
+    await waitFor(`[data-test-card-view="@cardstack/base-card"]`, { timeout });
+    assert.dom('[data-test-code-block]').exists();
+    await settled();
+    await percySnapshot(assert);
+  });
+
+  test('can dock code editor to bottom', async function(assert) {
+    await login();
+
+    await visit(`/cards/@cardstack%2Fbase-card/themer`);
+    assert.equal(currentURL(), `/cards/@cardstack%2Fbase-card/themer`);
+    await waitFor(`[data-test-card-view="@cardstack/base-card"]`, { timeout });
+    assert.dom('[data-test-code-block]').exists();
+    await settled();
+    assert.dom('.cardhost-card-theme-editor').hasAttribute('data-test-dock-location', 'right');
+    await click('[data-test-dock-bottom]');
+    assert.dom('.cardhost-card-theme-editor').hasAttribute('data-test-dock-location', 'bottom');
+    await percySnapshot(assert);
+  });
+
+  test('check that card name is stable so we can use it for themer styling', async function(assert) {
+    await login();
+    await createCards(cardData);
+    await visit(`/cards/${card1Id}`);
+    assert.dom('.millenial-puppies').exists();
+  });
+
   test('navigating to custom styles', async function(assert) {
     await login();
     await createCards(cardData);
@@ -73,7 +106,7 @@ module('Acceptance | css editing', function(hooks) {
     await login();
     await createCards(cardData);
     await click('[data-test-card-custom-style-button]');
-    assert.equal(currentURL(), `/cards/${card1Id}?editingCss=true`);
+    assert.equal(currentURL(), `/cards/${card1Id}/themer`);
     assert.dom('[data-test-close-editor]').exists();
     assert.dom('[data-test-card-renderer-isolated]').doesNotHaveClass('selected');
     await click('[data-test-close-editor]');
@@ -88,7 +121,7 @@ module('Acceptance | css editing', function(hooks) {
     await createCards(cardData);
     await click('[data-test-card-custom-style-button]');
     await settled();
-    assert.equal(currentURL(), `/cards/${card1Id}?editingCss=true`);
+    assert.equal(currentURL(), `/cards/${card1Id}/themer`);
     assert.dom('[data-test-hide-editor-btn]').exists();
     assert.dom('[data-test-editor-pane]').exists();
     await click('[data-test-hide-editor-btn]');
@@ -100,7 +133,7 @@ module('Acceptance | css editing', function(hooks) {
     await login();
     await createCards(cardData);
     await click('[data-test-card-custom-style-button]');
-    assert.equal(currentURL(), `/cards/${card1Id}?editingCss=true`);
+    assert.equal(currentURL(), `/cards/${card1Id}/themer`);
     assert.dom('[data-test-dock-bottom]').exists();
     assert.dom('[data-test-dock-location="right"]');
     await waitForAnimation(() => percySnapshot('css editor docked right'));
@@ -115,7 +148,7 @@ module('Acceptance | css editing', function(hooks) {
     await login();
     await createCards(cardData);
     await click('[data-test-card-custom-style-button]');
-    assert.equal(currentURL(), `/cards/${card1Id}?editingCss=true`);
+    assert.equal(currentURL(), `/cards/${card1Id}/themer`);
     // make sure initial state is correct
     assert.dom('[data-test-responsive-btn]').exists();
     assert.dom('[data-test-responsive-btn]').hasClass('selected');
@@ -129,17 +162,7 @@ module('Acceptance | css editing', function(hooks) {
     await waitForAnimation(() => percySnapshot(assert));
   });
 
-  test('save button is available after editing CSS', async function(assert) {
-    await login();
-    await createCards(cardData);
-    await click('[data-test-card-custom-style-button]');
-    await waitFor('[data-test-editor-pane] textarea');
-    await fillIn('[data-test-editor-pane] textarea', 'test');
-    await click('[data-test-close-editor]');
-    assert.dom('[data-test-card-save-btn]').hasText('Save');
-  });
-
-  test('can see instant preview of styles', async function(assert) {
+  test('can save CSS edits', async function(assert) {
     await login();
     await createCards(cardData);
     await click('[data-test-card-custom-style-button]');
@@ -147,7 +170,9 @@ module('Acceptance | css editing', function(hooks) {
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
     let themerHasStyle = find('[data-test-preview-css]').innerText.includes('gorgeous styles');
     assert.ok(themerHasStyle);
-    await click('[data-test-close-editor]');
+    await click('[data-test-card-save-btn]');
+    await waitFor(`[data-test-card-save-btn].saved`, { timeout });
+    await animationsSettled();
     let viewHasStyle = find('[data-test-view-css]').innerText.includes('gorgeous styles');
     assert.ok(viewHasStyle);
   });

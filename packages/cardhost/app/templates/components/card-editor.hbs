@@ -34,10 +34,8 @@
     @cardFocused={{action (mut this.cardSelected)}} />
 </section>
 
+{{!-- This is hidden, used in tests --}}
 <section class="cardhost-card-document">
-  <h3>Card Document:</h3>
-  <CodeEditor
-    @code={{this.cardJson}}
-    @language="json"
-  />
+  <h3>Card Document</h3>
+  <code data-test-card-json>{{this.cardJson}}</code>
 </section>

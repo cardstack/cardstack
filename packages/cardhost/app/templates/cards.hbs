@@ -6,25 +6,23 @@
     {{if this.cardstackSession.isAuthenticated "logged-in" "logged-out"}}
     {{this.themerClasses}}"
     data-test-cardhost-cards>
-    {{#if (not this.cssModeToggle.editingCss)}}
+    {{#unless this.onThemerRoute}}
       {{!-- <CardhostTopEdge @mode={{mode}}>
         {{#if (or (eq mode "schema") (eq mode "edit") (eq mode "view"))}}
           <ViewSwitcher @mode={{mode}} @card={{this.target.currentRoute.parent.attributes}} />
         {{/if}}
       </CardhostTopEdge> --}}
 
-
-      {{!-- {{cardstack-edge "left" (component "cardhost-left-edge")}} --}}
+      {{!-- {{cardstack-edge "top" (component "cardhost-top-edge")}} --}}
 
       <CardstackEdge @edge="top" @componentToShow={{component "cardhost-top-edge" mode=mode}}>
-        <InTopToolbar>{{!-- TODO: This shouldn't be necessary --}}
-          {{!-- TODO: Display view switcher --}}
+        <InTopToolbar>
           {{#if (or (eq mode "schema") (eq mode "edit") (eq mode "view"))}}
             <ViewSwitcher @mode={{mode}} @card={{this.target.currentRoute.parent.attributes}} />
           {{/if}}
         </InTopToolbar>
       </CardstackEdge>
-    {{/if}}
+    {{/unless}}
 
     {{outlet}}
   </div>

@@ -13,6 +13,7 @@
       class={{concat "resizer " dir}}
       {{on "mousedown" (fn this._onResizeStart dir)}}
       {{on "touchstart" (fn this._onResizeStart dir)}}
+      aria-label="draggable resize handle"
     >
     </button>
   {{/each}}

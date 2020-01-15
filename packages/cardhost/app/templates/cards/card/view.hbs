@@ -1,6 +1,4 @@
-{{#if this.cssModeToggle.editingCss}}
-  <ThemerToolbar @closeEditor={{this.closeEditor}} />
-{{else if this.cardstackSession.isAuthenticated}}
+{{#if this.cardstackSession.isAuthenticated}}
   <div class="card-renderer--top-edge-buttons">
     <Cta @label="Open"
       @variant="secondary primary"
@@ -10,36 +8,17 @@
   </div>
 {{/if}}
 
-{{#unless this.cssModeToggle.editingCss}}
-  <CardhostLeftEdge />
-{{/unless}}
+<CardhostLeftEdge />
 
 <section class="card-view" data-test-card-view={{this.model.name}}>
   <CardRenderer
     @card={{this.model}}
     @format="isolated"
-    @cardSelected={{not this.cssModeToggle.editingCss}} {{!-- Card is highlighted (unless the themer is open) --}}
+    @cardSelected={{true}}
   />
 </section>
 
-<section class="cardhost-card-document">
-  <h3>Card Document</h3>
-  <CodeEditor
-    @code={{this.cardJson}}
-    @language="json"
-  />
-</section>
-
-
-{{#if this.cssModeToggle.editingCss}}
-  <div data-test-editor-pane>
-    <EditorPane data-test-dock-location={{this.cssModeToggle.dockLocation}}
-      @model={{this.model}}
-      @saveCss={{this.saveCss}}
-      @updateCode={{this.updateCode}}
-    />
-  </div>
-{{else if this.cardstackSession.isAuthenticated}}
+{{#if this.cardstackSession.isAuthenticated}}
   <RightEdge
     @card={{this.model}}
     @cardSelected={{true}} {{!-- Change this when we want to display different right-edge options --}}
@@ -71,6 +50,12 @@
   </RightEdge>
 {{/if}}
 
-<style id="card-styles" data-test-view-css>
+<style data-test-view-css>
   {{scope-css this.model.isolatedCss this.model.name}}
 </style>
+
+{{!-- This is hidden, used in tests --}}
+<section class="cardhost-card-document">
+  <h3>Card Document</h3>
+  <code data-test-card-json>{{this.cardJson}}</code>
+</section>

@@ -21,7 +21,7 @@ export const fieldComponents = [
     title: 'Text',
     description: 'All-purpose text field',
     type: 'string',
-    icon: `/assets/images/field-types/text.svg`,
+    icon: `/images/field-types/text-field-icon.svg`,
   },
   {
     id: 'text-field-case-insensitive',
@@ -29,7 +29,7 @@ export const fieldComponents = [
     title: 'Text (case-insensitive)',
     description: 'Case-insensitive text field',
     type: 'case-insensitive string',
-    icon: `/assets/images/field-types/text.svg`,
+    icon: `/images/field-types/text-field-icon.svg`,
   },
   {
     id: 'checkbox',
@@ -37,7 +37,7 @@ export const fieldComponents = [
     title: 'Checkbox',
     description: 'True/false (boolean) values',
     type: 'boolean',
-    icon: `/assets/images/field-types/checkbox.svg`,
+    icon: `/images/field-types/checkbox-field-icon.svg`,
   },
   {
     id: 'date-field',
@@ -45,7 +45,7 @@ export const fieldComponents = [
     title: 'Date',
     description: 'Date field',
     type: 'date',
-    icon: `/assets/images/field-types/calendar.svg`,
+    icon: `/images/field-types/date-field-icon.svg`,
   },
   {
     id: 'number',
@@ -53,7 +53,7 @@ export const fieldComponents = [
     title: 'Number',
     description: 'Integer number field',
     type: 'integer',
-    icon: `/assets/images/field-types/number.png`,
+    icon: `/images/field-types/number.png`,
   },
   {
     id: 'dropdown',
@@ -61,7 +61,7 @@ export const fieldComponents = [
     title: 'Single-select',
     description: 'Single select dropdown',
     type: 'related card',
-    icon: `/assets/images/field-types/dropdown.svg`,
+    icon: `/images/field-types/dropdown-field-icon.svg`,
   },
   {
     id: 'dropdown-multi',
@@ -69,7 +69,7 @@ export const fieldComponents = [
     title: 'Multi-select',
     description: 'Multiple select dropdown',
     type: 'related cards',
-    icon: `/assets/images/field-types/dropdown.svg`,
+    icon: `/images/field-types/has-many-field-icon.svg`,
   },
   {
     id: 'decorative-image',
@@ -77,7 +77,7 @@ export const fieldComponents = [
     title: 'Decorative image',
     description: 'Use this for hero images',
     type: 'decorative image',
-    icon: `/assets/images/field-types/image.svg`,
+    icon: `/images/field-types/image-field-icon.svg`,
   },
   // We'll need to figure out how to deal with the other types of ui-components, ex:
   // {
@@ -85,13 +85,13 @@ export const fieldComponents = [
   //   title: 'Text Area',
   //   description: 'Multi-line text field',
   //   type: 'string',
-  //   icon: `/assets/images/field-types/textarea.png`
+  //   icon: `/images/field-types/textarea.png`
   // },
   // {
   //   id: 'phone-number-field',
   //   title: 'Phone Number',
   //   description: 'Description',
   //   type: 'string',
-  //   icon: `/assets/images/field-types/phone-number.png`
+  //   icon: `/images/field-types/phone-field-icon.svg`
   // },
 ];
