@@ -49,6 +49,9 @@ module('Acceptance | card schema', function(hooks) {
     await click('[data-test-field="title"]');
     await animationsSettled();
     assert.dom('[data-test-field="title"] [data-test-field-renderer-type]').hasText('title (Text)');
+    assert
+      .dom('[data-test-field="title"] [data-test-field-renderer-type]')
+      .hasAttribute('style', 'background-image: url("/images/field-types/text-field-icon.svg")');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     let cardJson = find('[data-test-card-json]').innerHTML;

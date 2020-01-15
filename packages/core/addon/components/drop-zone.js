@@ -9,7 +9,7 @@ export default class DropZone extends Component {
     return {
       name: 'new field',
       label: 'New Field',
-      type: '@cardstack/core-types::string',
+      type: 'new-field',
       preview: true,
     };
   }
