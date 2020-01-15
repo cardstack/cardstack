@@ -33,12 +33,13 @@
     <LinkTo
       @route="cards.card.view"
       @class="top-edge--view-mode-link"
-      @model={{this.card}}
+      @model={{this.model}}
       data-test-top-edge-link="view"
     >
       {{svg-jar "close-circle" width="18px" height="18px"}}
     </LinkTo>
   </div>
+  <SaveButton @card={{this.model}} />
 </div>
 
 <CardhostLeftEdge />

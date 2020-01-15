@@ -38,6 +38,7 @@
 
 .card-renderer-isolated--header {
   display: flex;
+  justify-content: space-between;
   padding: 14px 20px;
   color: var(--ch-light-op50);
   background-color: var(--ch-dark-background);
