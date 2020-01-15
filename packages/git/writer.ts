@@ -1,4 +1,4 @@
-import { Repository, RemoteConfig, FetchOptions, GitConflict } from './git';
+import { Repository, RemoteConfig, GitConflict } from './git';
 
 import { todo } from '@cardstack/plugin-utils/todo-any';
 
@@ -67,7 +67,6 @@ export default class Writer {
   branchPrefix: string;
   githereumConfig: todo;
   githereum: todo;
-  fetchOpts?: FetchOptions;
   _githereumPromise?: Promise<todo>;
 
   constructor({ repo, idGenerator, basePath, branchPrefix, remote, githereum }: WriterConfig) {
@@ -85,13 +84,6 @@ export default class Writer {
       config.log = log.info.bind(log);
       this.githereumConfig = config;
     }
-
-    if (remote) {
-      this.fetchOpts =
-        remote && remote.privateKey
-          ? FetchOptions.privateKey(remote.privateKey, remote.publicKey, remote.passphrase)
-          : FetchOptions.agentKey();
-    }
   }
 
   get hasCardSupport() {
@@ -103,7 +95,7 @@ export default class Writer {
     return withErrorHandling(id, type, async () => {
       await this._ensureRepo();
       let type = getType(document);
-      let change = await Change.create(this.repo!, null, this.branchPrefix + defaultBranch, this.fetchOpts);
+      let change = await Change.create(this.repo!, null, this.branchPrefix + defaultBranch, !!this.remote);
 
       let file;
       while (id == null) {
@@ -156,7 +148,7 @@ export default class Writer {
 
     await this._ensureRepo();
     return withErrorHandling(id, type, async () => {
-      let change = await Change.create(this.repo!, meta.version, this.branchPrefix + defaultBranch, this.fetchOpts);
+      let change = await Change.create(this.repo!, meta.version, this.branchPrefix + defaultBranch, !!this.remote);
 
       let file = await change.get(this._filenameFor(type, id, isSchema), { allowUpdate: true });
       let before = JSON.parse((await file.getBuffer())!.toString());
@@ -193,7 +185,7 @@ export default class Writer {
     }
     await this._ensureRepo();
     return withErrorHandling(id, type, async () => {
-      let change = await Change.create(this.repo!, version, this.branchPrefix + defaultBranch, this.fetchOpts);
+      let change = await Change.create(this.repo!, version, this.branchPrefix + defaultBranch, !!this.remote);
 
       let file = await change.get(this._filenameFor(type, id, isSchema));
       let before = JSON.parse((await file.getBuffer())!.toString());
@@ -386,7 +378,7 @@ async function finalizer(this: Writer, pendingChange: todo) {
         file.delete();
       }
     }
-    let version = await change.finalize(signature, this.remote, this.fetchOpts);
+    let version = await change.finalize(signature, this.remote);
     await this._pushToGithereum();
     return { version, hash: file ? file.savedId() : null };
   });
