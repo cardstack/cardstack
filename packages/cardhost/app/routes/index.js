@@ -15,12 +15,15 @@ export default class IndexRoute extends Route {
    * If a card is not found, remove it from local storage
    * and try again to render the page.
    */
+
   async model() {
     let ids = this.cardLocalStorage.getRecentCardIds();
 
     let recent = [];
     for (let id of ids) {
-      recent.push(
+      // unshift so that latest cards go to the front
+      // Replace with datetime check in the future
+      recent.unshift(
         await this.data.getCard(id, 'embedded').catch(err => {
           // if there is a 404'd card in local storage, remove it
           if (err.message.includes('404')) {
@@ -39,7 +42,7 @@ export default class IndexRoute extends Route {
     }
 
     return {
-      catalog: recent.filter(Boolean),
+      catalog: recent.filter(Boolean).sortBy(),
       templates: await Promise.all(cardTemplates.map(i => this.data.getCard(i, 'embedded'))),
     };
   }
