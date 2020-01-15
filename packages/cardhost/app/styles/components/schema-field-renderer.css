@@ -36,6 +36,11 @@
               border-radius var(--ch-transition-time);
 }
 
+header.schema-field-renderer--header.new-field {
+  padding-left: 20px;
+  transition: padding-left var(--ch-transition-time);
+}
+
 header.schema-field-renderer--header.text-field,
 header.schema-field-renderer--header.text-field-case-insensitive {
   background-size: 12px 15px;

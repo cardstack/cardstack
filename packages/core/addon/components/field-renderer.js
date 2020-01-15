@@ -36,10 +36,8 @@ export default class FieldRenderer extends Component {
     return this.args.field.type.replace(/::/g, '/').replace(/@/g, '');
   }
 
-  get field() {
-    let field = fieldComponents.find(el => el.coreType === this.args.field.type);
-
-    return field;
+  get fieldType() {
+    return fieldComponents.find(el => el.coreType === this.args.field.type);
   }
 
   @action

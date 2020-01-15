@@ -9,7 +9,7 @@ export default class DropZone extends Component {
     return {
       name: 'new field',
       label: 'New Field',
-      type: '',
+      type: 'new-field',
       preview: true,
     };
   }
