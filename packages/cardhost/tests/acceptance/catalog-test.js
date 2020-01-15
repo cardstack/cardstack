@@ -107,23 +107,4 @@ module('Acceptance | catalog', function(hooks) {
     });
     assert.equal(currentURL(), '/');
   });
-
-  test('broken id in local storage doesn not break the app', async function(assert) {
-    let cardLocalStorage = this.owner.lookup('service:card-local-storage');
-    cardLocalStorage.addRecentCardId('local-hub::non-existant-card');
-    assert.ok(cardLocalStorage.getRecentCardIds().includes('local-hub::non-existant-card'));
-    await visit(`/cards/${card1Id}`);
-    await waitFor(`[data-test-card-view=${card1Id}]`, {
-      timeout,
-    });
-    await click('[data-test-library-link]');
-    await waitFor(`[data-test-embedded-card=${card1Id}]`, {
-      timeout,
-    });
-    assert.equal(currentURL(), '/');
-    assert.dom(`[data-test-embedded-card=${card1Id}]`).exists();
-    assert.dom(`[data-test-embedded-card="non-existant-card"]`).doesNotExist();
-    // make sure faulty card id was removed from local storage
-    assert.equal(cardLocalStorage.getRecentCardIds().indexOf('local-hub::non-existant-card'), -1);
-  });
 });
