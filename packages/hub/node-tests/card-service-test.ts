@@ -65,7 +65,7 @@ describe('hub/card-service', function() {
       expect(parent?.canonicalURL).to.equal(parentCard.canonicalURL);
     });
 
-    it('defaults to adopting from the base card if no adoptsFrom is specified', async function() {
+    it('defaults to adopting from the base card if no csAdoptsFrom is specified', async function() {
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, testCard().jsonapi);
       let parent = await card.adoptsFrom();
       expect(parent?.canonicalURL).to.equal(canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }));
@@ -1408,7 +1408,7 @@ describe('hub/card-service', function() {
         expect(results.cards.length).to.equal(26);
       });
 
-      it('nested filter with a leaf filter that filters against card type', async function() {
+      it("filtering by interior card's csAdoptsFrom field", async function() {
         // testing with adoption heirarchy: puppyCard -> puppyMemeCard -> puppyDankMemeCard
         let results = await service.search({
           filter: {
