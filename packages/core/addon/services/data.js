@@ -17,7 +17,6 @@ let store = {
 
 export default class DataService extends Service {
   @service cardstackSession;
-  @service cardLocalStorage;
 
   static FIELD_NAME_REGEX = /^[a-zA-Z][a-zA-Z0-9_-]*$/;
 
