@@ -25,10 +25,13 @@ export default class IndexRoute extends Route {
       // Replace with datetime check in the future
       recent.unshift(
         await this.data.getCard(id, 'embedded').catch(err => {
-          // if there is a 404'd card in local storage, remove it
+          // if there is a 404'd card in local storage, clear them
           if (err.message.includes('404')) {
-            this.cardLocalStorage.removeRecentCardId(id);
-            return null;
+            this.cardLocalStorage.clearIds();
+            if (environment !== 'test') {
+              // needed because otherwise the app remains in a broken state
+              window.location.reload();
+            }
           } else {
             throw err;
           }
@@ -50,15 +53,5 @@ export default class IndexRoute extends Route {
   @action
   refreshModel() {
     this.refresh();
-  }
-
-  @action
-  error(err) {
-    // Check for error type before we retry, else fall back on automatic Ember behavior.
-    // Without this, the page falls apart if a card is missing.
-    if (err.message.includes('404') && environment !== 'test') {
-      // we have to reload or else the model error state breaks the app further
-      window.location.reload();
-    }
   }
 }
