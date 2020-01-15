@@ -149,4 +149,8 @@ export default Service.extend({
     cardIds = cardIds.filter(item => item !== id);
     localStorage.setItem('recentCardIds', JSON.stringify(cardIds));
   },
+
+  clearIds() {
+    localStorage.removeItem('recentCardIds');
+  },
 });

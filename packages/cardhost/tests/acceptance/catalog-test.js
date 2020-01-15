@@ -42,6 +42,7 @@ module('Acceptance | catalog', function(hooks) {
 
   hooks.beforeEach(async function() {
     this.owner.lookup('service:data')._clearCache();
+    this.owner.lookup('service:card-local-storage').clearIds();
     // Until we have searching capabilities, we'll just render the contents of the
     // local store. So the first step is to warm up the store.
     await login();
@@ -63,12 +64,24 @@ module('Acceptance | catalog', function(hooks) {
     await visit(`/cards/${card1Id}`);
   });
 
+  hooks.afterEach(function() {
+    this.owner.lookup('service:card-local-storage').clearIds();
+  });
+
   test(`viewing catalog`, async function(assert) {
     await visit(`/`);
-
     assert.dom(`[data-test-embedded-card=${card1Id}]`).exists();
     assert.dom(`[data-test-embedded-card=${card2Id}]`).exists();
     assert.dom(`[data-test-embedded-card=${card3Id}]`).exists();
+    await percySnapshot(assert);
+  });
+
+  test(`created card ids are in local storage`, async function(assert) {
+    await visit(`/`);
+    let ids = this.owner.lookup('service:card-local-storage').getRecentCardIds();
+    assert.ok(ids.includes(qualifiedCard1Id));
+    assert.ok(ids.includes(qualifiedCard2Id));
+    assert.ok(ids.includes(qualifiedCard3Id));
     await percySnapshot(assert);
   });
 
@@ -94,5 +107,24 @@ module('Acceptance | catalog', function(hooks) {
       timeout,
     });
     assert.equal(currentURL(), '/');
+  });
+
+  test('broken id in local storage doesn not break the app', async function(assert) {
+    let cardLocalStorage = this.owner.lookup('service:card-local-storage');
+    cardLocalStorage.addRecentCardId('local-hub::non-existant-card');
+    assert.ok(cardLocalStorage.getRecentCardIds().includes('local-hub::non-existant-card'));
+    await visit(`/cards/${card1Id}`);
+    await waitFor(`[data-test-card-view=${card1Id}]`, {
+      timeout,
+    });
+    await click('[data-test-library-link]');
+    await waitFor(`[data-test-embedded-card=${card1Id}]`, {
+      timeout,
+    });
+    assert.equal(currentURL(), '/');
+    assert.dom(`[data-test-embedded-card=${card1Id}]`).exists();
+    assert.dom(`[data-test-embedded-card="non-existant-card"]`).doesNotExist();
+    // make sure faulty card id was removed from local storage
+    assert.equal(cardLocalStorage.getRecentCardIds().indexOf('local-hub::non-existant-card'), -1);
   });
 });
