@@ -4,6 +4,7 @@ import { myOrigin } from '../origin';
 import { TestEnv, createTestEnv } from './helpers';
 import { testCard } from './test-card';
 import { stringify } from 'qs';
+import { Session } from '../session';
 
 describe('hub/jsonapi', function() {
   let request: supertest.SuperTest<supertest.Test>;
@@ -67,9 +68,82 @@ describe('hub/jsonapi', function() {
     expect(response.header.location).to.match(/http:\/\/[^/]+\/api\/realms\/first-ephemeral-realm\/cards\/[^/]+/);
   });
 
-  it.skip('can create a card with a field that has > 1 arity filled with cards as references', async function() {});
+  it('can create a card with a field that has > 1 arity filled with cards as references', async function() {
+    let service = (await env.container.lookup('cards')).as(Session.INTERNAL_PRIVILEGED);
+    let puppyCard = await service.create(
+      `${myOrigin}/api/realms/first-ephemeral-realm`,
+      testCard().withField('name', 'string-field').jsonapi
+    );
+    let ownerCard = await service.create(
+      `${myOrigin}/api/realms/first-ephemeral-realm`,
+      testCard().withField('puppies', puppyCard, 'plural').jsonapi
+    );
+    let mango = await service.create(
+      `${myOrigin}/api/realms/first-ephemeral-realm`,
+      testCard()
+        .withAttributes({ name: 'Mango ' })
+        .adoptingFrom(puppyCard).jsonapi
+    );
+    let vanGogh = await service.create(
+      `${myOrigin}/api/realms/first-ephemeral-realm`,
+      testCard()
+        .withAttributes({ name: 'Mango ' })
+        .adoptingFrom(puppyCard).jsonapi
+    );
+    let response = await request
+      .post('/api/realms/first-ephemeral-realm/cards')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(
+        testCard()
+          .withRelationships({ puppies: [mango, vanGogh] })
+          .adoptingFrom(ownerCard).jsonapi
+      );
+    expect(response.status).to.equal(201);
+    expect(response.header.location).to.match(/http:\/\/[^/]+\/api\/realms\/first-ephemeral-realm\/cards\/[^/]+/);
+    expect(response.body.data.relationships.puppies.data).to.eql([
+      { type: 'cards', id: mango.canonicalURL },
+      { type: 'cards', id: vanGogh.canonicalURL },
+    ]);
+  });
 
-  it.skip('can create a card with a field that has > 1 arity filled with cards as values', async function() {});
+  it('can create a card with a field that has > 1 arity filled with cards as values', async function() {
+    let service = (await env.container.lookup('cards')).as(Session.INTERNAL_PRIVILEGED);
+    let puppyCard = await service.create(
+      `${myOrigin}/api/realms/first-ephemeral-realm`,
+      testCard().withField('name', 'string-field').jsonapi
+    );
+    let ownerCard = await service.create(
+      `${myOrigin}/api/realms/first-ephemeral-realm`,
+      testCard().withField('puppies', puppyCard, 'plural').jsonapi
+    );
+    let response = await request
+      .post('/api/realms/first-ephemeral-realm/cards')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(
+        testCard()
+          .withAttributes({
+            puppies: [
+              testCard()
+                .withAttributes({ name: 'Mango' })
+                .adoptingFrom(puppyCard).jsonapi,
+              testCard()
+                .withAttributes({ name: 'Van Gogh' })
+                .adoptingFrom(puppyCard).jsonapi,
+            ],
+          })
+          .adoptingFrom(ownerCard).jsonapi
+      );
+    expect(response.status).to.equal(201);
+    expect(response.header.location).to.match(/http:\/\/[^/]+\/api\/realms\/first-ephemeral-realm\/cards\/[^/]+/);
+    expect(response.body.data.attributes.puppies).to.eql([
+      testCard()
+        .withAttributes({ name: 'Mango' })
+        .adoptingFrom(puppyCard).jsonapi,
+      testCard()
+        .withAttributes({ name: 'Van Gogh' })
+        .adoptingFrom(puppyCard).jsonapi,
+    ]);
+  });
 
   it('can patch a card', async function() {
     let response = await request
@@ -212,10 +286,6 @@ describe('hub/jsonapi', function() {
     expect(response.body?.data?.attributes?.csOriginalRealm).to.equal('https://somewhere/else');
     expect(response.body?.data?.attributes?.csRealm).to.equal('http://example.com/api/realms/second-ephemeral-realm');
   });
-
-  it.skip('get a card with a field that has > 1 arity filled with cards as references', async function() {});
-
-  it.skip('get a card with a field that has > 1 arity filled with cards as values', async function() {});
 
   it('can search for cards', async function() {
     await request
