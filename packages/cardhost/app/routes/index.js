@@ -42,7 +42,7 @@ export default class IndexRoute extends Route {
     }
 
     return {
-      catalog: recent.filter(Boolean).sortBy(),
+      catalog: recent.filter(Boolean),
       templates: await Promise.all(cardTemplates.map(i => this.data.getCard(i, 'embedded'))),
     };
   }
@@ -53,11 +53,12 @@ export default class IndexRoute extends Route {
   }
 
   @action
-  error(err, transition) {
+  error(err) {
     // Check for error type before we retry, else fall back on automatic Ember behavior.
     // Without this, the page falls apart if a card is missing.
     if (err.message.includes('404')) {
-      return transition.retry();
+      // we have to reload or else the error state breaks the app further
+      window.location.reload();
     }
   }
 }
