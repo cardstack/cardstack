@@ -1,7 +1,6 @@
 import {
   Oid as NGOid,
   Repository as NGRepository,
-  Index as NGIndex,
   Tree as NGTree,
   Treebuilder as NGTreebuilder,
   TreeEntry as NGTreeEntry,
@@ -423,19 +422,6 @@ export class Merge {
         throw e;
       }
     }
-  }
-}
-
-export class Index {
-  constructor(private readonly ngindex: NGIndex) {}
-
-  hasConflicts(): boolean {
-    return this.ngindex.hasConflicts();
-  }
-
-  async writeTreeTo(repo: Repository) {
-    let ngoid = await this.ngindex.writeTreeTo(repo.getNgRepo());
-    return Oid.fromNGOid(ngoid);
   }
 }
 
