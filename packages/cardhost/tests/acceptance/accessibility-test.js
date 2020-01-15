@@ -50,8 +50,8 @@ module('Acceptance | accessibility', function(hooks) {
     await a11yAudit();
     assert.ok(true, 'no a11y errors found for layout');
 
-    await visit(`/cards/${card1Id}?editingCss=true`);
-    assert.equal(currentURL(), `/cards/${card1Id}?editingCss=true`);
+    await visit(`/cards/${card1Id}/themer`);
+    assert.equal(currentURL(), `/cards/${card1Id}/themer`);
     await a11yAudit();
     assert.ok(true, 'no a11y errors found for themer');
 

@@ -3,14 +3,9 @@ import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 
 export default class CssModeToggleService extends Service {
-  @tracked editingCss;
   @tracked visible = true;
   @tracked dockLocation = 'right';
   @tracked isResponsive = true;
-
-  setEditingCss(value) {
-    this.editingCss = value;
-  }
 
   @action
   dockRight() {

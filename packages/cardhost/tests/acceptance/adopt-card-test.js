@@ -97,7 +97,7 @@ module('Acceptance | card adoption', function(hooks) {
       [...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
       ['address', 'city', 'state', 'zip']
     );
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.deepEqual(card.data.relationships['adopted-from'].data, { type: 'cards', id: qualifiedCard1Id });
     assert.deepEqual(card.data.relationships.fields.data, []);
@@ -142,7 +142,7 @@ module('Acceptance | card adoption', function(hooks) {
       [...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
       ['address', 'treats-available', 'city', 'state', 'zip']
     );
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.deepEqual(card.data.relationships['adopted-from'].data, { type: 'cards', id: qualifiedCard1Id });
     assert.deepEqual(card.data.relationships.fields.data, [{ type: 'fields', id: 'treats-available' }]);
@@ -158,7 +158,7 @@ module('Acceptance | card adoption', function(hooks) {
     await saveCard('creator', card2Id);
 
     assert.dom('[data-test-field="treats-available"]').exists();
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.deepEqual(card.data.relationships['adopted-from'].data, { type: 'cards', id: qualifiedCard1Id });
     assert.deepEqual(card.data.relationships.fields.data, [{ type: 'fields', id: 'treats-available' }]);
@@ -171,7 +171,7 @@ module('Acceptance | card adoption', function(hooks) {
       [...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
       ['address', 'city', 'state', 'zip']
     );
-    cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    cardJson = find('[data-test-card-json]').innerHTML;
     card = JSON.parse(cardJson);
     assert.deepEqual(card.data.relationships['adopted-from'].data, { type: 'cards', id: qualifiedCard1Id });
     assert.deepEqual(card.data.relationships.fields.data, []);
@@ -239,7 +239,7 @@ module('Acceptance | card adoption', function(hooks) {
     assert.dom('[data-test-field="state"] [data-test-string-field-viewer-value]').hasText('MA');
     assert.dom('[data-test-field="zip"] [data-test-string-field-viewer-value]').hasText('01234');
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes['treats-available'], true);
     assert.equal(card.data.attributes.address, '105 Barkley Lane');
@@ -278,7 +278,7 @@ module('Acceptance | card adoption', function(hooks) {
       [...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
       ['treats-available', 'address', 'city', 'state', 'zip', 'number-of-bones']
     );
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.deepEqual(card.data.relationships['adopted-from'].data, { type: 'cards', id: qualifiedCard2Id });
     assert.deepEqual(card.data.relationships.fields.data, [{ type: 'fields', id: 'number-of-bones' }]);
