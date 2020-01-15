@@ -8,7 +8,6 @@ module('Unit | Service | card-local-storage', function(hooks) {
     this.owner.lookup('service:card-local-storage').clearIds();
   });
 
-  // Replace this with your real tests.
   test('it exists', function(assert) {
     let service = this.owner.lookup('service:card-local-storage');
     assert.ok(service);
