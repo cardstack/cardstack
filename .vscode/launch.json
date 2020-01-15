@@ -36,7 +36,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "rejects a specific card value when validating a field that has arity > 1"]
+      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can get a card back out"]
     },
     {
       "type": "node",

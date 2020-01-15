@@ -256,10 +256,6 @@ export class Card {
         adoptionChain.push(card as AddressableCard); // parent cards are always addressable
       }
     }
-    let baseCardId = { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' };
-    if (!adoptionChain.map(i => i.canonicalURL).includes(canonicalURL(baseCardId))) {
-      adoptionChain.push(await this.service.get(baseCardId));
-    }
     return adoptionChain;
   }
 
@@ -392,16 +388,29 @@ export class Card {
 
   @Memoize()
   async adoptsFrom(): Promise<AddressableCard | undefined> {
+    let baseCardURL = canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' });
+    if (this.canonicalURL === baseCardURL) {
+      return;
+    }
+
+    let cardId: CardId | CardId[] | undefined;
     let adoptsFromRelationship = this.jsonapi.data.relationships?.csAdoptsFrom;
-    if (adoptsFromRelationship && `links` in adoptsFromRelationship) {
-      let url = adoptsFromRelationship.links.related;
-      if (url) {
-        if (typeof url !== 'string') {
-          url = url.href;
-        }
-        return await this.service.get(url);
+    if (adoptsFromRelationship) {
+      cardId = relationshipToCardId(adoptsFromRelationship);
+      if (Array.isArray(cardId)) {
+        throw new CardstackError(
+          `The card ${this.canonicalURL} adopts from multiple parents: ${JSON.stringify(
+            cardId
+          )}. Multiple adoption is not allowed.`,
+          {
+            status: 400,
+          }
+        );
       }
     }
+    return await this.service.get(
+      canonicalURL((cardId as CardId | undefined) ?? { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' })
+    );
   }
 
   async loadFeature(featureName: 'writer'): Promise<WriterFactory | null>;

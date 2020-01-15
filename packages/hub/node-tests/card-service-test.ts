@@ -3,7 +3,7 @@ import { Session } from '../session';
 import { myOrigin } from '../origin';
 import { testCard } from './test-card';
 import { ScopedCardService } from '../cards-service';
-import { AddressableCard } from '../card';
+import { AddressableCard, canonicalURLToCardId, canonicalURL } from '../card';
 import { CARDSTACK_PUBLIC_REALM } from '../realm';
 
 describe('hub/card-service', function() {
@@ -55,15 +55,44 @@ describe('hub/card-service', function() {
     });
 
     it('can create a card that adopts from another', async function() {
-      let base = testCard();
-      let baseCard = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, base.jsonapi);
+      let parentCard = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, testCard().jsonapi);
 
       let doc = testCard()
         .withAutoAttributes({ goodbye: 'world' })
-        .adoptingFrom(baseCard);
+        .adoptingFrom(parentCard);
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       let parent = await card.adoptsFrom();
-      expect(parent?.canonicalURL).to.equal(baseCard.canonicalURL);
+      expect(parent?.canonicalURL).to.equal(parentCard.canonicalURL);
+    });
+
+    it('defaults to adopting from the base card if no adoptsFrom is specified', async function() {
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, testCard().jsonapi);
+      let parent = await card.adoptsFrom();
+      expect(parent?.canonicalURL).to.equal(canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }));
+    });
+
+    it('does not support multiple adoption', async function() {
+      let card1 = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, testCard().jsonapi);
+      let card2 = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, testCard().jsonapi);
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, {
+          data: {
+            type: 'cards',
+            relationships: {
+              csAdoptsFrom: {
+                data: [
+                  { type: 'cards', id: card1.canonicalURL },
+                  { type: 'cards', id: card2.canonicalURL },
+                ],
+              },
+            },
+          },
+        });
+        throw new Error(`should not be able to create card`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.message).to.match(/The card .* adopts from multiple parents.* Multiple adoption is not allowed/);
+      }
     });
 
     it('can update a card', async function() {
