@@ -1,4 +1,4 @@
-import { module, test } from 'qunit';
+import { module, test, only } from 'qunit';
 import { click, visit, currentURL, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures';
@@ -85,9 +85,8 @@ module('Acceptance | catalog', function(hooks) {
     await percySnapshot(assert);
   });
 
-  test(`isolating a card`, async function(assert) {
-    await visit(`/`);
-
+  only(`isolating a card`, async function(assert) {
+    await click('[data-test-library-link]');
     await click(`[data-test-embedded-card=${card3Id}]`);
     await waitFor(`[data-test-card-view=${card3Id}]`, {
       timeout,
