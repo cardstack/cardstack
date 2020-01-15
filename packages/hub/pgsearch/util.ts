@@ -27,6 +27,7 @@ export interface FieldArity {
   path: string;
   singular: CardExpression;
   plural: CardExpression;
+  csFieldExpressions: { [csFieldName: string]: CardExpression };
   errorHint: string;
   kind: 'field-arity';
 }
@@ -99,6 +100,7 @@ export function fieldArity(
   path: string,
   singular: CardExpression,
   plural: CardExpression,
+  csFieldExpressions: FieldArity['csFieldExpressions'],
   errorHint: string
 ): FieldArity {
   return {
@@ -106,6 +108,7 @@ export function fieldArity(
     path,
     singular,
     plural,
+    csFieldExpressions,
     errorHint,
     kind: 'field-arity',
   };

@@ -238,6 +238,9 @@ export default class PgClient {
         }
       },
       async (expression, csField) => {
+        if (csField === 'csAdoptsFrom') {
+          return [...expression, '->', param('csAdoptionChain')];
+        }
         return [...expression, '->>', param(csField)]; // this assumes arity of 1 for all the csFields which is probably not what we want long term...
       },
       {
@@ -274,7 +277,7 @@ export default class PgClient {
   }
 
   private async handleFieldArity(cards: ScopedCardService, fieldArity: FieldArity): Promise<Expression> {
-    let { path, singular, plural } = fieldArity;
+    let { path, singular, plural, csFieldExpressions } = fieldArity;
 
     let exp: CardExpression = await this.walkFilterFieldPath(
       await cards.get(fieldArity.typeContext),
@@ -286,8 +289,8 @@ export default class PgClient {
         }
         return singular;
       },
-      async () => {
-        return singular; // this assumes arity of 1 for all the csFields which is probably not what we want long term...
+      async (_expression, csField) => {
+        return csFieldExpressions[csField] || singular;
       },
       {
         exit: async (fieldCard, expression, _fieldName) => {
@@ -480,7 +483,21 @@ export default class PgClient {
   private fieldFilter(typeContext: CardId, key: string, value: JSON.Value): CardExpression {
     let query = fieldQuery(typeContext, key, 'filter');
     let v = fieldValue(typeContext, key, [param(value)], 'filter');
-    return [fieldArity(typeContext, key, [query, '=', v], [query, '&&', 'array[', v, ']'], 'filter')];
+    return [
+      fieldArity(
+        typeContext,
+        key,
+        [query, '=', v],
+        [query, '&&', 'array[', v, ']'],
+        {
+          // This is our hook into providing custom csField expressions since
+          // these don't have a FieldCard that we can leverage for this kind of
+          // stuff.
+          csAdoptsFrom: ['jsonb_array_elements_text(', query, ') =', v],
+        },
+        'filter'
+      ),
+    ];
   }
 
   private rangeCondition(typeContext: CardId, filter: RangeFilter): CardExpression {

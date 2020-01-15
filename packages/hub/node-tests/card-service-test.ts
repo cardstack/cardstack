@@ -4,6 +4,7 @@ import { myOrigin } from '../origin';
 import { testCard } from './test-card';
 import { ScopedCardService } from '../cards-service';
 import { AddressableCard } from '../card';
+import { CARDSTACK_PUBLIC_REALM } from '../realm';
 
 describe('hub/card-service', function() {
   describe('read-write', function() {
@@ -880,7 +881,7 @@ describe('hub/card-service', function() {
         });
         expect(results.cards.length).to.equal(2);
         let ids = results.cards.map(i => i.canonicalURL);
-        expect(ids).to.include.members([vanGogh.canonicalURL, ringo.canonicalURL]);
+        expect(ids).to.have.members([vanGogh.canonicalURL, ringo.canonicalURL]);
 
         results = await service.search({
           filter: {
@@ -905,7 +906,7 @@ describe('hub/card-service', function() {
         });
         expect(results.cards.length).to.equal(2);
         let ids = results.cards.map(i => i.canonicalURL);
-        expect(ids).to.include.members([vanGogh.canonicalURL, ringo.canonicalURL]);
+        expect(ids).to.have.members([vanGogh.canonicalURL, ringo.canonicalURL]);
       });
 
       it('can use a range filter against a string field', async function() {
@@ -919,7 +920,7 @@ describe('hub/card-service', function() {
         });
         expect(results.cards.length).to.equal(2);
         let ids = results.cards.map(i => i.canonicalURL);
-        expect(ids).to.include.members([mango.canonicalURL, ringo.canonicalURL]);
+        expect(ids).to.have.members([mango.canonicalURL, ringo.canonicalURL]);
       });
 
       it('can use an "any" condition in a filter', async function() {
@@ -931,7 +932,7 @@ describe('hub/card-service', function() {
         });
         expect(results.cards.length).to.equal(2);
         let ids = results.cards.map(i => i.canonicalURL);
-        expect(ids).to.include.members([vanGogh.canonicalURL, mango.canonicalURL]);
+        expect(ids).to.have.members([vanGogh.canonicalURL, mango.canonicalURL]);
       });
 
       it('can use an "every" condition in a filter', async function() {
@@ -943,7 +944,7 @@ describe('hub/card-service', function() {
         });
         expect(results.cards.length).to.equal(2);
         let ids = results.cards.map(i => i.canonicalURL);
-        expect(ids).to.include.members([vanGogh.canonicalURL, ringo.canonicalURL]);
+        expect(ids).to.have.members([vanGogh.canonicalURL, ringo.canonicalURL]);
       });
 
       it('can use a "not" condition in a filter', async function() {
@@ -955,7 +956,7 @@ describe('hub/card-service', function() {
         });
         expect(results.cards.length).to.equal(2);
         let ids = results.cards.map(i => i.canonicalURL);
-        expect(ids).to.include.members([mango.canonicalURL, vanGogh.canonicalURL]);
+        expect(ids).to.have.members([mango.canonicalURL, vanGogh.canonicalURL]);
       });
 
       it('can filter by the interior field of a field filled by a card as value', async function() {
@@ -1104,7 +1105,7 @@ describe('hub/card-service', function() {
         });
         expect(results.cards.length).to.equal(2);
         let ids = results.cards.map(i => i.canonicalURL);
-        expect(ids).to.include.members([mommy.canonicalURL, daddy.canonicalURL]);
+        expect(ids).to.have.members([mommy.canonicalURL, daddy.canonicalURL]);
       });
 
       it('filtering field filled by card values with arity > 1', async function() {
@@ -1153,7 +1154,7 @@ describe('hub/card-service', function() {
         });
         expect(results.cards.length).to.equal(2);
         let ids = results.cards.map(i => i.canonicalURL);
-        expect(ids).to.include.members([mommy.canonicalURL, daddy.canonicalURL]);
+        expect(ids).to.have.members([mommy.canonicalURL, daddy.canonicalURL]);
       });
 
       it('filtering field by interior csField for a field with arity > 1', async function() {
@@ -1196,7 +1197,7 @@ describe('hub/card-service', function() {
         });
         expect(results.cards.length).to.equal(2);
         let ids = results.cards.map(i => i.canonicalURL);
-        expect(ids).to.include.members([mommy.canonicalURL, daddy.canonicalURL]);
+        expect(ids).to.have.members([mommy.canonicalURL, daddy.canonicalURL]);
       });
 
       it('filtering solely by card type', async function() {
@@ -1211,7 +1212,7 @@ describe('hub/card-service', function() {
           testCard()
             .withAttributes({
               name: 'Larry',
-              meme: `I have not idea what I'm doing`,
+              meme: `I have no idea what I'm doing`,
             })
             .adoptingFrom(puppyMemeCard).jsonapi
         );
@@ -1232,7 +1233,7 @@ describe('hub/card-service', function() {
         });
         expect(results.cards.length).to.equal(6);
         let ids = results.cards.map(i => i.canonicalURL);
-        expect(ids).to.include.members([
+        expect(ids).to.have.members([
           puppyMemeCard.canonicalURL,
           mango.canonicalURL,
           vanGogh.canonicalURL,
@@ -1242,18 +1243,86 @@ describe('hub/card-service', function() {
         ]);
       });
 
-      it.skip('can get all cards in the index by filtering for the base card', async function() {});
-
-      it.skip('nested filter with a leaf filter that filters against card type', async function() {
+      it('nested filter with a leaf filter that filters against card type', async function() {
         // testing with adoption heirarchy: puppyCard -> puppyMemeCard -> puppyDankMemeCard
-        // let results = await service.search({
-        //   filter: {
-        //     type: ownerCard,
-        //     eq: {
-        //       'puppies.csAdoptsFrom': puppyMemeCard.canonicalURL, // where this includes cards that have puppyMemeCard as an ancestor in their adoption chain (which includes puppyDankMemeCard's too, but not puppyCard's)
-        //     },
-        //   },
-        // });
+        let puppyMemeCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('meme', 'string-field')
+            .adoptingFrom(puppyCard).jsonapi
+        );
+        let puppyDankMemeCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard().adoptingFrom(puppyMemeCard).jsonapi
+        );
+        let noIdea = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Larry',
+              meme: `I have no idea what I'm doing`,
+            })
+            .adoptingFrom(puppyMemeCard).jsonapi
+        );
+        let cupcake = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Cupcake',
+              meme: 'Cupcake dog with 1000 yard stare',
+            })
+            .adoptingFrom(puppyDankMemeCard).jsonapi
+        );
+
+        let ownerCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('name', 'string-field')
+            .withField('puppies', puppyCard, 'plural').jsonapi
+        );
+
+        await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({ name: 'Hassan' })
+            .withRelationships({ puppies: [vanGogh, mango] })
+            .adoptingFrom(ownerCard).jsonapi
+        );
+        let puppyMemeOwner = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withRelationships({ puppies: [noIdea] })
+            .adoptingFrom(ownerCard).jsonapi
+        );
+        let puppyDankMemeOwner = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withRelationships({ puppies: [cupcake] })
+            .adoptingFrom(ownerCard).jsonapi
+        );
+        let allTypesOwner = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withRelationships({ puppies: [noIdea, mango, cupcake] })
+            .adoptingFrom(ownerCard).jsonapi
+        );
+
+        let results = await service.search({
+          filter: {
+            type: ownerCard,
+            eq: {
+              'puppies.csAdoptsFrom': puppyMemeCard.canonicalURL,
+            },
+          },
+        });
+
+        expect(results.cards.length).to.equal(3);
+        let ids = results.cards.map(i => i.canonicalURL);
+        expect(ids).to.have.members([
+          puppyMemeOwner.canonicalURL,
+          puppyDankMemeOwner.canonicalURL,
+          allTypesOwner.canonicalURL,
+        ]);
       });
 
       describe('sorting', function() {
@@ -1262,6 +1331,75 @@ describe('hub/card-service', function() {
         it.skip('sort by nested card field', async function() {});
         it.skip('sort direction', async function() {});
       });
+    });
+  });
+
+  // separating this out of the read-only so that we have a clean container for the test
+  describe('filter by base card', function() {
+    let env: TestEnv, service: ScopedCardService;
+    let puppyCard: AddressableCard, mango: AddressableCard, vanGogh: AddressableCard, ringo: AddressableCard;
+
+    beforeEach(async function() {
+      env = await createTestEnv();
+      service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
+      puppyCard = await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        testCard()
+          .withField('name', 'string-field')
+          .withField('weightInPounds', 'integer-field')
+          .withField('pottyTrained', 'boolean-field').jsonapi
+      );
+      vanGogh = await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        testCard()
+          .withAttributes({
+            name: 'Van Gogh',
+            weightInPounds: 55,
+            pottyTrained: true,
+          })
+          .adoptingFrom(puppyCard).jsonapi
+      );
+      mango = await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        testCard()
+          .withAttributes({
+            name: 'Mango',
+            weightInPounds: 7,
+            pottyTrained: false,
+          })
+          .adoptingFrom(puppyCard).jsonapi
+      );
+      ringo = await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        testCard()
+          .withAttributes({
+            name: 'Ringo',
+            weightInPounds: 60,
+            pottyTrained: true,
+          })
+          .adoptingFrom(puppyCard).jsonapi
+      );
+    });
+
+    afterEach(async function() {
+      await env.destroy();
+    });
+
+    it('can get all cards in the index by filtering for the base card', async function() {
+      let results = await service.search({
+        filter: {
+          type: { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' },
+        },
+      });
+
+      expect(results.cards.length).to.equal(4);
+      let ids = results.cards.map(i => i.canonicalURL);
+      expect(ids).to.have.members([
+        puppyCard.canonicalURL,
+        mango.canonicalURL,
+        vanGogh.canonicalURL,
+        ringo.canonicalURL,
+      ]);
     });
   });
 });

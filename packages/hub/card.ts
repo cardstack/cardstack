@@ -257,7 +257,7 @@ export class Card {
       }
     }
     let baseCardId = { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' };
-    if (adoptionChain.map(i => i.canonicalURL).includes(canonicalURL(baseCardId))) {
+    if (!adoptionChain.map(i => i.canonicalURL).includes(canonicalURL(baseCardId))) {
       adoptionChain.push(await this.service.get(baseCardId));
     }
     return adoptionChain;
