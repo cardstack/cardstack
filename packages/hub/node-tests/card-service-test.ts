@@ -831,6 +831,7 @@ describe('hub/card-service', function() {
           testCard()
             .withField('name', 'string-field')
             .withField('weightInPounds', 'integer-field')
+            .withField('rating', 'integer-field')
             .withField('pottyTrained', 'boolean-field').jsonapi
         );
         vanGogh = await service.create(
@@ -839,6 +840,7 @@ describe('hub/card-service', function() {
             .withAttributes({
               name: 'Van Gogh',
               weightInPounds: 55,
+              rating: 11,
               pottyTrained: true,
             })
             .adoptingFrom(puppyCard).jsonapi
@@ -849,6 +851,7 @@ describe('hub/card-service', function() {
             .withAttributes({
               name: 'Mango',
               weightInPounds: 7,
+              rating: 11,
               pottyTrained: false,
             })
             .adoptingFrom(puppyCard).jsonapi
@@ -859,6 +862,7 @@ describe('hub/card-service', function() {
             .withAttributes({
               name: 'Ringo',
               weightInPounds: 60,
+              rating: 11,
               pottyTrained: true,
             })
             .adoptingFrom(puppyCard).jsonapi
@@ -873,7 +877,6 @@ describe('hub/card-service', function() {
           `${myOrigin}/api/realms/first-ephemeral-realm`,
           testCard()
             .withAttributes({
-              name: 'Zeus',
               meme: `I have no idea what I'm doing`,
             })
             .adoptingFrom(puppyMemeCard).jsonapi
@@ -882,7 +885,6 @@ describe('hub/card-service', function() {
           `${myOrigin}/api/realms/first-ephemeral-realm`,
           testCard()
             .withAttributes({
-              name: 'Trixie',
               meme: 'Cupcake dog with 1000 yard stare',
             })
             .adoptingFrom(puppyMemeCard).jsonapi
@@ -895,7 +897,6 @@ describe('hub/card-service', function() {
           `${myOrigin}/api/realms/first-ephemeral-realm`,
           testCard()
             .withAttributes({
-              name: 'Sam',
               meme: 'Disappointed puppy face',
             })
             .adoptingFrom(puppyDankMemeCard).jsonapi
@@ -1138,15 +1139,9 @@ describe('hub/card-service', function() {
             not: { eq: { name: 'Ringo' } },
           },
         });
-        expect(results.cards.length).to.equal(5);
+        expect(results.cards.length).to.equal(2);
         let ids = results.cards.map(i => i.canonicalURL);
-        expect(ids).to.have.members([
-          mango.canonicalURL,
-          vanGogh.canonicalURL,
-          noIdea.canonicalURL,
-          cupcake.canonicalURL,
-          disappointed.canonicalURL,
-        ]);
+        expect(ids).to.have.members([mango.canonicalURL, vanGogh.canonicalURL]);
       });
 
       it('can filter by the interior field of a field filled by a card as value', async function() {
@@ -1270,11 +1265,68 @@ describe('hub/card-service', function() {
         ]);
       });
 
-      describe('sorting', function() {
-        it.skip('sort by integer field', async function() {});
-        it.skip('sort by string field', async function() {});
-        it.skip('sort by nested card field', async function() {});
-        it.skip('sort direction', async function() {});
+      it('can sort by integer field', async function() {
+        let results = await service.search({
+          filter: {
+            type: puppyCard,
+            range: {
+              weightInPounds: { gt: 0 },
+            },
+          },
+          sort: 'weightInPounds',
+        });
+
+        expect(results.cards.length).to.equal(3);
+        let ids = results.cards.map(i => i.canonicalURL);
+        expect(ids).to.eql([mango.canonicalURL, vanGogh.canonicalURL, ringo.canonicalURL]);
+      });
+
+      it('can sort by string field', async function() {
+        let results = await service.search({
+          filter: {
+            type: puppyCard,
+            range: {
+              name: { gte: 'A' },
+            },
+          },
+          sort: 'name',
+        });
+
+        expect(results.cards.length).to.equal(3);
+        let ids = results.cards.map(i => i.canonicalURL);
+        expect(ids).to.eql([mango.canonicalURL, ringo.canonicalURL, vanGogh.canonicalURL]);
+      });
+
+      it('can compound sort', async function() {
+        let results = await service.search({
+          filter: {
+            type: puppyCard,
+            range: {
+              name: { gte: 'A' },
+            },
+          },
+          sort: ['rating', 'name'],
+        });
+
+        expect(results.cards.length).to.equal(3);
+        let ids = results.cards.map(i => i.canonicalURL);
+        expect(ids).to.eql([mango.canonicalURL, ringo.canonicalURL, vanGogh.canonicalURL]);
+      });
+
+      it('can sort descending', async function() {
+        let results = await service.search({
+          filter: {
+            type: puppyCard,
+            range: {
+              name: { gte: 'A' },
+            },
+          },
+          sort: '-name',
+        });
+
+        expect(results.cards.length).to.equal(3);
+        let ids = results.cards.map(i => i.canonicalURL);
+        expect(ids).to.eql([vanGogh.canonicalURL, ringo.canonicalURL, mango.canonicalURL]);
       });
     });
   });
