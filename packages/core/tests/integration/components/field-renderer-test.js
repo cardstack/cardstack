@@ -220,6 +220,7 @@ module('Integration | Component | field-renderer', function(hooks) {
       .dom('[data-test-field="title"].field.title-field.field-type-text-schema-field.field-type-string-schema-field')
       .exists();
     assert.dom('[data-test-field-schema-renderer] [data-test-field-renderer-type]').hasText('title (Text)');
+    assert.dom('[data-test-field-schema-renderer] [data-test-field-renderer-type]').hasAttribute('style', 'background-image: url("/images/field-types/text-field-icon.svg")');
     assert.dom('[data-test-field-schema-renderer] [data-test-field-renderer-label]').hasText('Article Title');
     assert.dom('[data-test-field-schema-renderer] [data-test-field-renderer-value]').hasText('test title');
     assert.dom('.schema-field-renderer--header--detail').doesNotExist();
