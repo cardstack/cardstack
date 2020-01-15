@@ -803,7 +803,28 @@ describe('hub/card-service', function() {
     });
 
     describe('user fields', function() {
-      let puppyCard: AddressableCard, mango: AddressableCard, vanGogh: AddressableCard, ringo: AddressableCard;
+      let puppyCard: AddressableCard,
+        puppyMemeCard: AddressableCard,
+        puppyDankMemeCard: AddressableCard,
+        mango: AddressableCard,
+        vanGogh: AddressableCard,
+        ringo: AddressableCard,
+        noIdea: AddressableCard,
+        cupcake: AddressableCard,
+        disappointed: AddressableCard,
+        ownerCardByRef: AddressableCard,
+        ownerCardByVal: AddressableCard,
+        onlyPuppyOwnerCardByRef: AddressableCard,
+        onlyPuppyOwnerCardByVal: AddressableCard,
+        mangosMommyByRef: AddressableCard,
+        mangosMommyByVal: AddressableCard,
+        mommyByRef: AddressableCard,
+        daddyByRef: AddressableCard,
+        mommyByVal: AddressableCard,
+        daddyByVal: AddressableCard,
+        puppyMemeOwner: AddressableCard,
+        puppyDankMemeOwner: AddressableCard,
+        allTypesOwner: AddressableCard;
       before(async function() {
         puppyCard = await service.create(
           `${myOrigin}/api/realms/first-ephemeral-realm`,
@@ -841,6 +862,169 @@ describe('hub/card-service', function() {
               pottyTrained: true,
             })
             .adoptingFrom(puppyCard).jsonapi
+        );
+        puppyMemeCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('meme', 'string-field')
+            .adoptingFrom(puppyCard).jsonapi
+        );
+        noIdea = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Zeus',
+              meme: `I have no idea what I'm doing`,
+            })
+            .adoptingFrom(puppyMemeCard).jsonapi
+        );
+        cupcake = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Trixie',
+              meme: 'Cupcake dog with 1000 yard stare',
+            })
+            .adoptingFrom(puppyMemeCard).jsonapi
+        );
+        puppyDankMemeCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard().adoptingFrom(puppyMemeCard).jsonapi
+        );
+        disappointed = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Sam',
+              meme: 'Disappointed puppy face',
+            })
+            .adoptingFrom(puppyDankMemeCard).jsonapi
+        );
+        onlyPuppyOwnerCardByRef = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('name', 'string-field')
+            .withField('puppy', puppyCard).jsonapi
+        );
+        onlyPuppyOwnerCardByVal = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('name', 'string-field')
+            .withField('puppy', puppyCard).jsonapi
+        );
+        ownerCardByRef = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('name', 'string-field')
+            .withField('puppies', puppyCard, 'plural').jsonapi
+        );
+        ownerCardByVal = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('name', 'string-field')
+            .withField('puppies', puppyCard, 'plural').jsonapi
+        );
+        // foil for the onlyPuppyOwnerCardByVal tests
+        await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Hassan',
+              puppy: (await vanGogh.asPristineDoc()).jsonapi.data,
+            })
+            .adoptingFrom(onlyPuppyOwnerCardByVal).jsonapi
+        );
+        mangosMommyByVal = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Mariko',
+              puppy: (await mango.asPristineDoc()).jsonapi.data,
+            })
+            .adoptingFrom(onlyPuppyOwnerCardByVal).jsonapi
+        );
+        // foil for the onlyPuppyOwnerCardByRef tests
+        await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({ name: 'Hassan' })
+            .withRelationships({ puppy: vanGogh })
+            .adoptingFrom(onlyPuppyOwnerCardByRef).jsonapi
+        );
+        mangosMommyByRef = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({ name: 'Mariko' })
+            .withRelationships({ puppy: mango })
+            .adoptingFrom(onlyPuppyOwnerCardByRef).jsonapi
+        );
+        mommyByRef = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({ name: 'Mariko' })
+            .withRelationships({ puppies: [vanGogh, mango] })
+            .adoptingFrom(ownerCardByRef).jsonapi
+        );
+        daddyByRef = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({ name: 'Hassan' })
+            .withRelationships({ puppies: [vanGogh, mango] })
+            .adoptingFrom(ownerCardByRef).jsonapi
+        );
+        // foil for the ownerCardByRef tests
+        await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({ name: 'Dog Heaven' })
+            .withRelationships({ puppies: [ringo] })
+            .adoptingFrom(ownerCardByRef).jsonapi
+        );
+        mommyByVal = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Mariko',
+              puppies: [(await vanGogh.asPristineDoc()).jsonapi.data, (await mango.asPristineDoc()).jsonapi.data],
+            })
+            .adoptingFrom(ownerCardByVal).jsonapi
+        );
+        daddyByVal = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Hassan',
+              puppies: [(await vanGogh.asPristineDoc()).jsonapi.data, (await mango.asPristineDoc()).jsonapi.data],
+            })
+            .adoptingFrom(ownerCardByVal).jsonapi
+        );
+        // foil for the ownerCardByVal tests
+        await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Dog Heaven',
+              puppies: [(await ringo.asPristineDoc()).jsonapi.data],
+            })
+            .adoptingFrom(ownerCardByVal).jsonapi
+        );
+        puppyMemeOwner = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withRelationships({ puppies: [noIdea] })
+            .adoptingFrom(ownerCardByRef).jsonapi
+        );
+        puppyDankMemeOwner = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withRelationships({ puppies: [disappointed] })
+            .adoptingFrom(ownerCardByRef).jsonapi
+        );
+        allTypesOwner = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withRelationships({ puppies: [noIdea, ringo, disappointed] })
+            .adoptingFrom(ownerCardByRef).jsonapi
         );
       });
 
@@ -954,150 +1138,60 @@ describe('hub/card-service', function() {
             not: { eq: { name: 'Ringo' } },
           },
         });
-        expect(results.cards.length).to.equal(2);
+        expect(results.cards.length).to.equal(5);
         let ids = results.cards.map(i => i.canonicalURL);
-        expect(ids).to.have.members([mango.canonicalURL, vanGogh.canonicalURL]);
+        expect(ids).to.have.members([
+          mango.canonicalURL,
+          vanGogh.canonicalURL,
+          noIdea.canonicalURL,
+          cupcake.canonicalURL,
+          disappointed.canonicalURL,
+        ]);
       });
 
       it('can filter by the interior field of a field filled by a card as value', async function() {
-        let ownerCard = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withField('name', 'string-field')
-            .withField('puppy', puppyCard).jsonapi
-        );
-        await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withAttributes({
-              name: 'Hassan',
-              puppy: (await vanGogh.asPristineDoc()).jsonapi.data,
-            })
-            .adoptingFrom(ownerCard).jsonapi
-        );
-        let mangosMommy = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withAttributes({
-              name: 'Mariko',
-              puppy: (await mango.asPristineDoc()).jsonapi.data,
-            })
-            .adoptingFrom(ownerCard).jsonapi
-        );
-
         let results = await service.search({
           filter: {
-            type: ownerCard,
+            type: onlyPuppyOwnerCardByVal,
             eq: {
               'puppy.name': 'Mango',
             },
           },
         });
         expect(results.cards.length).to.equal(1);
-        expect(results.cards[0].canonicalURL).to.equal(mangosMommy.canonicalURL);
+        expect(results.cards[0].canonicalURL).to.equal(mangosMommyByVal.canonicalURL);
       });
 
       it('can filter by the interior field of a field filled by a referenced card', async function() {
-        let ownerCard = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withField('name', 'string-field')
-            .withField('puppy', puppyCard).jsonapi
-        );
-        await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withAttributes({ name: 'Hassan' })
-            .withRelationships({ puppy: vanGogh })
-            .adoptingFrom(ownerCard).jsonapi
-        );
-        let mangosMommy = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withAttributes({ name: 'Mariko' })
-            .withRelationships({ puppy: mango })
-            .adoptingFrom(ownerCard).jsonapi
-        );
-
         let results = await service.search({
           filter: {
-            type: ownerCard,
+            type: onlyPuppyOwnerCardByRef,
             eq: {
               'puppy.name': 'Mango',
             },
           },
         });
         expect(results.cards.length).to.equal(1);
-        expect(results.cards[0].canonicalURL).to.equal(mangosMommy.canonicalURL);
+        expect(results.cards[0].canonicalURL).to.equal(mangosMommyByRef.canonicalURL);
       });
 
       it('can filter by an interior csField of a field filled by a card', async function() {
-        let ownerCard = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withField('name', 'string-field')
-            .withField('puppy', puppyCard).jsonapi
-        );
-        await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withAttributes({ name: 'Hassan' })
-            .withRelationships({ puppy: vanGogh })
-            .adoptingFrom(ownerCard).jsonapi
-        );
-        let mangosMommy = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withAttributes({ name: 'Mariko' })
-            .withRelationships({ puppy: mango })
-            .adoptingFrom(ownerCard).jsonapi
-        );
-
         let results = await service.search({
           filter: {
-            type: ownerCard,
+            type: onlyPuppyOwnerCardByRef,
             eq: {
               'puppy.csId': mango.csId,
             },
           },
         });
         expect(results.cards.length).to.equal(1);
-        expect(results.cards[0].canonicalURL).to.equal(mangosMommy.canonicalURL);
+        expect(results.cards[0].canonicalURL).to.equal(mangosMommyByRef.canonicalURL);
       });
 
       it('filtering field filled by card references with arity > 1', async function() {
-        let ownerCard = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withField('name', 'string-field')
-            .withField('puppies', puppyCard, 'plural').jsonapi
-        );
-
-        let mommy = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withAttributes({ name: 'Mariko' })
-            .withRelationships({ puppies: [vanGogh, mango] })
-            .adoptingFrom(ownerCard).jsonapi
-        );
-        let daddy = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withAttributes({ name: 'Hassan' })
-            .withRelationships({ puppies: [vanGogh, mango] })
-            .adoptingFrom(ownerCard).jsonapi
-        );
-        await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withAttributes({ name: 'Dog Heaven' })
-            .withRelationships({ puppies: [ringo] })
-            .adoptingFrom(ownerCard).jsonapi
-        );
-
         let results = await service.search({
           filter: {
-            type: ownerCard,
+            type: ownerCardByRef,
             eq: {
               'puppies.name': 'Mango',
             },
@@ -1105,48 +1199,13 @@ describe('hub/card-service', function() {
         });
         expect(results.cards.length).to.equal(2);
         let ids = results.cards.map(i => i.canonicalURL);
-        expect(ids).to.have.members([mommy.canonicalURL, daddy.canonicalURL]);
+        expect(ids).to.have.members([mommyByRef.canonicalURL, daddyByRef.canonicalURL]);
       });
 
       it('filtering field filled by card values with arity > 1', async function() {
-        let ownerCard = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withField('name', 'string-field')
-            .withField('puppies', puppyCard, 'plural').jsonapi
-        );
-
-        let mommy = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withAttributes({
-              name: 'Mariko',
-              puppies: [(await vanGogh.asPristineDoc()).jsonapi.data, (await mango.asPristineDoc()).jsonapi.data],
-            })
-            .adoptingFrom(ownerCard).jsonapi
-        );
-        let daddy = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withAttributes({
-              name: 'Hassan',
-              puppies: [(await vanGogh.asPristineDoc()).jsonapi.data, (await mango.asPristineDoc()).jsonapi.data],
-            })
-            .adoptingFrom(ownerCard).jsonapi
-        );
-        await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withAttributes({
-              name: 'Dog Heaven',
-              puppies: [(await ringo.asPristineDoc()).jsonapi.data],
-            })
-            .adoptingFrom(ownerCard).jsonapi
-        );
-
         let results = await service.search({
           filter: {
-            type: ownerCard,
+            type: ownerCardByVal,
             eq: {
               'puppies.name': 'Mango',
             },
@@ -1154,42 +1213,13 @@ describe('hub/card-service', function() {
         });
         expect(results.cards.length).to.equal(2);
         let ids = results.cards.map(i => i.canonicalURL);
-        expect(ids).to.have.members([mommy.canonicalURL, daddy.canonicalURL]);
+        expect(ids).to.have.members([mommyByVal.canonicalURL, daddyByVal.canonicalURL]);
       });
 
       it('filtering field by interior csField for a field with arity > 1', async function() {
-        let ownerCard = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withField('name', 'string-field')
-            .withField('puppies', puppyCard, 'plural').jsonapi
-        );
-
-        let mommy = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withAttributes({ name: 'Mariko' })
-            .withRelationships({ puppies: [vanGogh, mango] })
-            .adoptingFrom(ownerCard).jsonapi
-        );
-        let daddy = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withAttributes({ name: 'Hassan' })
-            .withRelationships({ puppies: [vanGogh, mango] })
-            .adoptingFrom(ownerCard).jsonapi
-        );
-        await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withAttributes({ name: 'Dog Heaven' })
-            .withRelationships({ puppies: [ringo] })
-            .adoptingFrom(ownerCard).jsonapi
-        );
-
         let results = await service.search({
           filter: {
-            type: ownerCard,
+            type: ownerCardByRef,
             eq: {
               'puppies.csId': mango.csId,
             },
@@ -1197,119 +1227,34 @@ describe('hub/card-service', function() {
         });
         expect(results.cards.length).to.equal(2);
         let ids = results.cards.map(i => i.canonicalURL);
-        expect(ids).to.have.members([mommy.canonicalURL, daddy.canonicalURL]);
+        expect(ids).to.have.members([mommyByRef.canonicalURL, daddyByRef.canonicalURL]);
       });
 
       it('filtering solely by card type', async function() {
-        let puppyMemeCard = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withField('meme', 'string-field')
-            .adoptingFrom(puppyCard).jsonapi
-        );
-        let noIdea = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withAttributes({
-              name: 'Larry',
-              meme: `I have no idea what I'm doing`,
-            })
-            .adoptingFrom(puppyMemeCard).jsonapi
-        );
-        let cupcake = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withAttributes({
-              name: 'Cupcake',
-              meme: 'Cupcake dog with 1000 yard stare',
-            })
-            .adoptingFrom(puppyMemeCard).jsonapi
-        );
-
         let results = await service.search({
           filter: {
             type: puppyCard,
           },
         });
-        expect(results.cards.length).to.equal(6);
+        expect(results.cards.length).to.equal(8);
         let ids = results.cards.map(i => i.canonicalURL);
         expect(ids).to.have.members([
           puppyMemeCard.canonicalURL,
+          puppyDankMemeCard.canonicalURL,
           mango.canonicalURL,
           vanGogh.canonicalURL,
           ringo.canonicalURL,
           noIdea.canonicalURL,
           cupcake.canonicalURL,
+          disappointed.canonicalURL,
         ]);
       });
 
       it('nested filter with a leaf filter that filters against card type', async function() {
         // testing with adoption heirarchy: puppyCard -> puppyMemeCard -> puppyDankMemeCard
-        let puppyMemeCard = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withField('meme', 'string-field')
-            .adoptingFrom(puppyCard).jsonapi
-        );
-        let puppyDankMemeCard = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard().adoptingFrom(puppyMemeCard).jsonapi
-        );
-        let noIdea = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withAttributes({
-              name: 'Larry',
-              meme: `I have no idea what I'm doing`,
-            })
-            .adoptingFrom(puppyMemeCard).jsonapi
-        );
-        let cupcake = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withAttributes({
-              name: 'Cupcake',
-              meme: 'Cupcake dog with 1000 yard stare',
-            })
-            .adoptingFrom(puppyDankMemeCard).jsonapi
-        );
-
-        let ownerCard = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withField('name', 'string-field')
-            .withField('puppies', puppyCard, 'plural').jsonapi
-        );
-
-        await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withAttributes({ name: 'Hassan' })
-            .withRelationships({ puppies: [vanGogh, mango] })
-            .adoptingFrom(ownerCard).jsonapi
-        );
-        let puppyMemeOwner = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withRelationships({ puppies: [noIdea] })
-            .adoptingFrom(ownerCard).jsonapi
-        );
-        let puppyDankMemeOwner = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withRelationships({ puppies: [cupcake] })
-            .adoptingFrom(ownerCard).jsonapi
-        );
-        let allTypesOwner = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard()
-            .withRelationships({ puppies: [noIdea, mango, cupcake] })
-            .adoptingFrom(ownerCard).jsonapi
-        );
-
         let results = await service.search({
           filter: {
-            type: ownerCard,
+            type: ownerCardByRef,
             eq: {
               'puppies.csAdoptsFrom': puppyMemeCard.canonicalURL,
             },
