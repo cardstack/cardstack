@@ -31,6 +31,7 @@ module('Acceptance | card schema', function(hooks) {
   scenario.setupTest(hooks);
   hooks.beforeEach(function() {
     this.owner.lookup('service:data')._clearCache();
+    this.owner.lookup('service:card-local-storage').clearIds();
   });
 
   test(`adding a new field to a card`, async function(assert) {

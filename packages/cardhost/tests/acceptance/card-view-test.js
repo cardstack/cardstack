@@ -32,6 +32,7 @@ module('Acceptance | card view', function(hooks) {
   scenario.setupTest(hooks);
   hooks.beforeEach(function() {
     this.owner.lookup('service:data')._clearCache();
+    this.owner.lookup('service:card-local-storage').clearIds();
   });
 
   test(`viewing a card`, async function(assert) {
