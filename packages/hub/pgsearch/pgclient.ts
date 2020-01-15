@@ -229,6 +229,7 @@ export default class PgClient {
       await cards.get(fieldQuery.typeContext),
       path,
       ['search_doc'],
+      // Leaf field handler
       async (fieldCard, expression, fieldName) => {
         let buildQueryExpression = await fieldCard.loadFeature('field-buildQueryExpression');
         if (buildQueryExpression) {
@@ -237,12 +238,14 @@ export default class PgClient {
           return [...expression, '->>', param(fieldName)];
         }
       },
+      // csField handler
       async (expression, csField) => {
         if (csField === 'csAdoptsFrom') {
           return [...expression, '->', param('csAdoptionChain')];
         }
-        return [...expression, '->>', param(csField)]; // this assumes arity of 1 for all the csFields which is probably not what we want long term...
+        return [...expression, '->>', param(csField)];
       },
+      // interior field handler
       {
         enter: async (fieldCard, expression, fieldName) => {
           if (fieldCard.csFieldArity === 'plural') {
@@ -263,6 +266,7 @@ export default class PgClient {
       await cards.get(fieldValue.typeContext),
       path,
       exp,
+      // Leaf field handler
       async (fieldCard, expression) => {
         let buildValueExpression = await fieldCard.loadFeature('field-buildValueExpression');
         if (buildValueExpression) {
@@ -270,6 +274,7 @@ export default class PgClient {
         }
         return expression;
       },
+      // csField handler
       async expression => {
         return expression;
       }
@@ -283,15 +288,18 @@ export default class PgClient {
       await cards.get(fieldArity.typeContext),
       path,
       [],
+      // Leaf field handler
       async (fieldCard, _expression: CardExpression, _fieldName) => {
         if (fieldCard.csFieldArity === 'plural') {
           return plural;
         }
         return singular;
       },
+      // csField handler
       async (_expression, csField) => {
         return csFieldExpressions[csField] || singular;
       },
+      // interior field handler
       {
         exit: async (fieldCard, expression, _fieldName) => {
           if (fieldCard.csFieldArity === 'plural') {
@@ -460,6 +468,8 @@ export default class PgClient {
     } else if ('range' in filter) {
       return this.rangeCondition(typeContext, filter);
     } else if ('type' in filter) {
+      // this is the scenario where you are solely filtering by the card's type
+      // and no other predicates are specified in the filter.
       return this.typeCondition(typeContext);
     } else {
       assertNever(filter);
@@ -490,9 +500,11 @@ export default class PgClient {
         [query, '=', v],
         [query, '&&', 'array[', v, ']'],
         {
-          // This is our hook into providing custom csField expressions since
-          // these don't have a FieldCard that we can leverage for this kind of
-          // stuff.
+          // This is our hook into providing custom csField arity expressions
+          // that need more fined grained control over how to wrap around the
+          // query and value sub-expressions. For example, for the csAdoptsFrom
+          // field we actually need to filter against values that appear in the
+          // adoption chain array.
           csAdoptsFrom: ['jsonb_array_elements_text(', query, ') =', v],
         },
         'filter'
