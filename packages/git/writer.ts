@@ -246,7 +246,7 @@ export default class Writer {
       let contract = await this._getGithereumContract();
 
       this.githereum = new Githereum(
-        this.repo!.path(),
+        this.repo!.path,
         this.githereumConfig.repoName,
         contract,
         this.githereumConfig.from,
