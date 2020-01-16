@@ -1,7 +1,7 @@
 import CardstackError from './error';
 import { WriterFactory } from './writer';
 import { PristineDocument, UpstreamDocument, UpstreamIdentity, PristineCollection } from './document';
-import { SingleResourceDoc, RelationshipObject } from 'jsonapi-typescript';
+import { SingleResourceDoc, RelationshipObject, ResourceObject } from 'jsonapi-typescript';
 import cloneDeep from 'lodash/cloneDeep';
 import isPlainObject from 'lodash/isPlainObject';
 import mergeWith from 'lodash/mergeWith';
@@ -13,7 +13,13 @@ import * as FieldHooks from './field-hooks';
 import { inject, getOwner } from './dependency-injection';
 import { Memoize } from 'typescript-memoize';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
-import { OcclusionRules, OcclusionFieldSets, InnerOcclusionRules } from './occlusion-rules';
+import {
+  OcclusionRules,
+  OcclusionFieldSets,
+  InnerOcclusionRules,
+  assertOcclusionFieldSets,
+  OcclusionRulesOrDefaults,
+} from './occlusion-rules';
 
 export const apiPrefix = '/api';
 
@@ -52,7 +58,7 @@ export const cardstackFieldPattern = /^cs[A-Z]/;
 export async function makePristineCollection(
   cards: AddressableCard[],
   meta: ResponseMeta,
-  rules: OcclusionRules
+  rules: OcclusionRules | undefined
 ): Promise<PristineCollection> {
   let pristineDocs = await Promise.all(cards.map(card => card.asPristineDoc(rules)));
   // TODO includeds
@@ -80,7 +86,7 @@ export class Card {
   csFiles: CardFiles | undefined;
   csPeerDependencies: PeerDependencies | undefined;
 
-  csOcclusionRules: OcclusionFieldSets | undefined;
+  readonly csFieldSets: OcclusionFieldSets | undefined;
 
   private rawFields: { [name: string]: any } | undefined;
   private features: { [name: string]: string | [string, string] } | undefined;
@@ -170,6 +176,12 @@ export class Card {
           }
         );
       }
+    }
+
+    let rules = jsonapi.data.attributes?.csFieldSets;
+    if (rules) {
+      assertOcclusionFieldSets(rules, `csFieldSets`);
+      this.csFieldSets = rules;
     }
   }
 
@@ -305,61 +317,11 @@ export class Card {
     return adoptionChain;
   }
 
-  async asUpstreamDoc(): Promise<UpstreamDocument> {
-    let copied = Object.create(null);
-    copied.data = Object.create(null);
-    copied.data.type = 'cards';
-
-    if (!this.attributes) {
-      copied.data.attributes = Object.create(null);
-    } else {
-      copied.data.attributes = cloneDeep(this.attributes);
-    }
-    copied.data.attributes.csRealm = this.csRealm;
-    if (this.csRealm === this.csOriginalRealm) {
-      delete copied.data.attributes.csOriginalRealm;
-    } else {
-      copied.data.attributes.csOriginalRealm = this.csOriginalRealm;
-    }
-    if (this.csId) {
-      copied.data.attributes.csId = this.csId;
-    }
-
-    if (this instanceof AddressableCard) {
-      copied.data.id = this.canonicalURL;
-    }
-
-    if (this.csFiles) {
-      copied.data.attributes.csFiles = this.csFiles;
-    } else {
-      delete copied.data.attributes.csFiles;
-    }
-
-    if (this.csPeerDependencies) {
-      copied.data.attributes.csPeerDependencies = this.csPeerDependencies;
-    } else {
-      delete copied.data.attributes.csPeerDependencies;
-    }
-
-    if (!this.relationships) {
-      // not needed... yet
-      // copied.data.relationships = Object.create(null);
-    } else {
-      copied.data.relationships = cloneDeep(this.relationships);
-    }
-
-    if (this.meta) {
-      copied.data.meta = this.meta;
-    }
-
-    return new UpstreamDocument(copied);
-  }
-
   @Memoize()
   private fieldSet(format: string): Map<string, InnerOcclusionRules | true> {
     let fieldSet: Map<string, InnerOcclusionRules | true> = new Map();
-    if (this.csOcclusionRules?.[format]) {
-      for (let fieldRule of this.csOcclusionRules[format]) {
+    if (this.csFieldSets?.[format]) {
+      for (let fieldRule of this.csFieldSets[format]) {
         if (typeof fieldRule === 'string') {
           fieldSet.set(fieldRule, true);
         } else {
@@ -370,9 +332,86 @@ export class Card {
     return fieldSet;
   }
 
-  // if you want this card isolated, rules = { includeFieldSet: 'isolated' }
-  async asPristineDoc(rules: OcclusionRules): Promise<PristineDocument> {
-    return new PristineDocument((await this.asUpstreamDoc()).jsonapi);
+  private async serialize(
+    rules: OcclusionRulesOrDefaults,
+    included: Map<string, OcclusionRules[]>
+  ): Promise<ResourceObject> {
+    let data = Object.create(null);
+    data.type = 'cards';
+
+    if (!this.attributes) {
+      data.attributes = Object.create(null);
+    } else {
+      data.attributes = cloneDeep(this.attributes);
+    }
+    data.attributes.csRealm = this.csRealm;
+    if (this.csRealm === this.csOriginalRealm) {
+      delete data.attributes.csOriginalRealm;
+    } else {
+      data.attributes.csOriginalRealm = this.csOriginalRealm;
+    }
+    if (this.csId) {
+      data.attributes.csId = this.csId;
+    }
+
+    if (this instanceof AddressableCard) {
+      data.id = this.canonicalURL;
+    }
+
+    if (this.csFiles) {
+      data.attributes.csFiles = this.csFiles;
+    } else {
+      delete data.attributes.csFiles;
+    }
+
+    if (this.csPeerDependencies) {
+      data.attributes.csPeerDependencies = this.csPeerDependencies;
+    } else {
+      delete data.attributes.csPeerDependencies;
+    }
+
+    if (!this.relationships) {
+      // not needed... yet
+      // data.relationships = Object.create(null);
+    } else {
+      data.relationships = cloneDeep(this.relationships);
+    }
+
+    if (this.meta) {
+      data.meta = this.meta;
+    }
+
+    return data;
+  }
+
+  private async serializeIncluded(included: Map<string, OcclusionRules[]>): Promise<ResourceObject[]> {
+    let resources: ResourceObject[] = [];
+    while (true) {
+      let foundMoreIncluded = new Map();
+      await Promise.all(
+        [...included].map(async ([canonicalURL, rulesArray]) => {
+          let card = await this.service.get(canonicalURL);
+          let rules = mergeRules(rulesArray);
+          resources.push(await card.serialize(rules, foundMoreIncluded));
+        })
+      );
+      if (foundMoreIncluded.size === 0) {
+        return resources;
+      }
+      included = foundMoreIncluded;
+    }
+  }
+
+  async asUpstreamDoc(): Promise<UpstreamDocument> {
+    let included = new Map();
+    let data = await this.serialize('upstream', included);
+    return new UpstreamDocument({ data, included: await this.serializeIncluded(included) });
+  }
+
+  async asPristineDoc(rules: OcclusionRulesOrDefaults = 'everything'): Promise<PristineDocument> {
+    let included = new Map();
+    let data = await this.serialize(rules, included);
+    return new PristineDocument({ data, included: await this.serializeIncluded(included) });
   }
 
   async asSearchDoc(visitedCards: string[] = []): Promise<J.Object> {
@@ -752,4 +791,14 @@ function relationshipToCardId(ref: RelationshipObject): CardId | CardId[] | unde
       return ref.data.map(i => canonicalURLToCardId(i.id));
     }
   }
+}
+
+function mergeRules(rulesArray: OcclusionRules[]): OcclusionRules {
+  if (rulesArray.length === 0) {
+    throw new Error(`bug: this should never happen`);
+  }
+  if (rulesArray.length === 1) {
+    return rulesArray[0];
+  }
+  throw new Error(`unimplemented: mergeRules`);
 }

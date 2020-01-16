@@ -14,7 +14,7 @@ import { makePristineCollection, apiPrefix, AddressableCard, CardId } from './ca
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { parse } from 'qs';
 import { assertQuery } from './query';
-import { OcclusionRules } from './occlusion-rules';
+import { OcclusionRules, assertOcclusionRules } from './occlusion-rules';
 
 const apiPrefixPattern = new RegExp(`^${apiPrefix}/(.*)`);
 
@@ -159,7 +159,13 @@ export default class JSONAPIMiddleware {
     }
   }
 
-  private occlusionRulesFromRequest(ctxt: KoaRoute.Context<SessionContext, {}>): OcclusionRules {}
+  private occlusionRulesFromRequest(_ctxt: KoaRoute.Context<SessionContext, {}>): OcclusionRules | undefined {
+    let rules = undefined;
+    if (rules) {
+      assertOcclusionRules(rules, 'Occlusion query parameter');
+    }
+    return rules;
+  }
 }
 
 function cardIdFromRoute(ctxt: KoaRoute.Context<SessionContext, {}>): CardId {
