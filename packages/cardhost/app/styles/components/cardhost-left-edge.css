@@ -12,6 +12,7 @@
 .cardhost-left-edge--nav {
   width: var(--ch-left-edge-navbar-width);
   transition: all 0.3s ease;
+  overflow: hidden;
 }
 
 .cardhost-left-edge--nav.expanded {

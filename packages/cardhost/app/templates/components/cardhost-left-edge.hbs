@@ -5,10 +5,14 @@
         <button 
           class="ch-button ch-button--icon-secondary"
           aria-label="expandable menu with login controls"
+          aria-expanded={{this.isExpanded}}
           {{on "click" this.toggleMenuExpand}}
         >
           {{svg-jar "cardstack-logo" width="18px" height="20px"}}
         </button>
+      </li>
+      <li>
+
       </li>
       <li>
         <button disabled class="catalog ch-button ch-button--icon-secondary" aria-label="catalog">
