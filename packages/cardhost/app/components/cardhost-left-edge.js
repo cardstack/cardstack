@@ -11,4 +11,17 @@ export default class CardhostTopEdgeComponent extends Component {
   toggleMenuExpand() {
     this.isExpanded = !this.isExpanded;
   }
+
+  @service router;
+
+  @action
+  logout(sessionLogout) {
+    sessionLogout();
+    let cardId = this.router.currentRoute.parent.params.name;
+    if (cardId) {
+      this.router.transitionTo('cards.card.view', cardId);
+    } else {
+      this.router.transitionTo('index');
+    }
+  }
 }
