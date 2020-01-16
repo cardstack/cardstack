@@ -5,6 +5,7 @@ import Fixtures from '@cardstack/test-support/fixtures';
 import {
   showCardId,
   addField,
+  setFieldValue,
   createCards,
   saveCard,
   removeField,
@@ -194,6 +195,32 @@ module('Acceptance | card schema', function(hooks) {
     assert.equal(card.data.attributes.body, undefined);
 
     assert.dom('[data-test-right-edge] [data-test-field]').doesNotExist();
+  });
+
+  test(`adding a field after removing a field from a card with auto-named fields`, async function(assert) {
+    await login();
+    await createCards({
+      [card1Id]: [
+        [null, 'string', false, 'test title'],
+        [null, 'string', false, 'test author'],
+        [null, 'string', false, 'test body'],
+      ],
+    });
+    await visit(`/cards/${card1Id}/schema`);
+
+    await removeField('field-1');
+    await addField(null, 'string', true, 2);
+    await setFieldValue('field-3', 23);
+
+    await saveCard('schema');
+    await waitFor(`[data-test-card-schema="${card1Id}"]`);
+
+    assert.dom('[data-test-field="field-1"]').doesNotExist();
+    assert.dom('[data-test-field="field-3"]').exists();
+    let cardJson = find('[data-test-card-json]').innerHTML;
+    let card = JSON.parse(cardJson);
+    assert.equal(card.data.attributes['field-1'], undefined);
+    assert.equal(card.data.attributes['field-3'], 23);
   });
 
   test(`move a field's position via drag & drop`, async function(assert) {

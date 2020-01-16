@@ -25,6 +25,7 @@ export default class CardManipulator extends Component {
   @tracked isDragging;
   @tracked cardId;
   @tracked cardSelected = true;
+  @tracked fieldIndex = this.card.isolatedFields.length;
 
   constructor(...args) {
     super(...args);
@@ -44,7 +45,9 @@ export default class CardManipulator extends Component {
   }
 
   get newFieldName() {
-    return `field-${this.card.isolatedFields.length}`;
+    let index = this.card.isolatedFields.length ? Math.max(...this.card.isolatedFields.mapBy('nonce')) + 1 : 0;
+
+    return `field-${index}`;
   }
 
   get didUpdate() {

@@ -558,7 +558,18 @@ class Card {
 // Internal card fields (fields not exposed as metadata) are intentionally
 // not exposed by this API--maybe we decide to change that in the future...
 class Field {
-  constructor({ card, name, type, label, instructions, source, neededWhenEmbedded, isAdopted, value }) {
+  constructor({
+    card,
+    name,
+    type,
+    label,
+    instructions,
+    source,
+    neededWhenEmbedded,
+    isAdopted,
+    value,
+    updateNonce = true,
+  }) {
     // this keeps our internal state private
     priv.set(
       this,
@@ -572,6 +583,7 @@ class Field {
         neededWhenEmbedded,
         isAdopted,
         value,
+        updateNonce,
       })
     );
   }
@@ -897,7 +909,19 @@ class FieldInternals {
   @tracked isDestroyed;
   // TODO add contraints and "related cards" capabilities
 
-  constructor({ card, name, label, instructions, type, neededWhenEmbedded, isAdopted, value, source, serverData }) {
+  constructor({
+    card,
+    name,
+    label,
+    instructions,
+    type,
+    neededWhenEmbedded,
+    isAdopted,
+    value,
+    source,
+    serverData,
+    updateNonce = true,
+  }) {
     this.card = card;
     this.name = name;
     this.label = label;
@@ -909,7 +933,9 @@ class FieldInternals {
     this.source = source;
     this.serverData = serverData;
     this.isDestroyed = false;
-    this.nonce = fieldNonce++;
+    if (updateNonce) {
+      this.nonce = fieldNonce++;
+    }
   }
 }
 
@@ -1108,6 +1134,7 @@ function reifyCard(card) {
       source,
       isAdopted,
       value,
+      updateNonce: false,
     });
   }
   let fieldOrder = get(cardJson, 'data.attributes.field-order') || [];

@@ -69,11 +69,11 @@ export async function createCards(args) {
     await waitFor(`[data-test-card-schema="${id}"]`, { timeout });
 
     await visit(`/cards/${id}/edit`);
-    for (let [name, , , value] of args[id]) {
+    for (let [index, [name, , , value]] of args[id].entries()) {
       if (value == null) {
         continue;
       }
-      await setFieldValue(name, value);
+      await setFieldValue(name ? name : `field-${index}`, value);
     }
     await saveCard('editor', id);
     await visit(`/cards/${id}`);
@@ -98,8 +98,10 @@ export async function saveCard(mode, id) {
 export async function addField(name, type, isEmbedded, position) {
   await dragAndDropNewField(type, position);
 
-  await fillIn('[data-test-schema-attr="name"] input', name);
-  await triggerEvent('[data-test-schema-attr="name"] input', 'keyup');
+  if (name) {
+    await fillIn('[data-test-schema-attr="name"] input', name);
+    await triggerEvent('[data-test-schema-attr="name"] input', 'keyup');
+  }
 
   if (isEmbedded) {
     await click('[data-test-schema-attr="embedded"] input[type="checkbox"]');
