@@ -118,7 +118,7 @@ describe('git/writer with remote', function() {
           },
         },
       });
-      await repo.fetch('origin');
+      await repo.fetchAll();
       let saved = await inRepo(tempRemoteRepoPath).getJSONContents(
         'origin/master',
         `contents/events/${record.id}.json`
@@ -151,7 +151,7 @@ describe('git/writer with remote', function() {
         .has.deep.property('meta.version')
         .not.equal(head);
 
-      await repo.fetch('origin');
+      await repo.fetchAll();
       let updated = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/event-1.json`);
 
       expect(updated).to.deep.equal({
@@ -203,7 +203,7 @@ describe('git/writer with remote', function() {
         .has.deep.property('meta.version')
         .not.equal(head);
 
-      await repo.fetch('origin');
+      await repo.fetchAll();
       let updated = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/event-1.json`);
 
       expect(updated).to.deep.equal({
@@ -260,7 +260,7 @@ describe('git/writer with remote', function() {
         .has.deep.property('meta.version')
         .not.equal(head);
 
-      await repo.fetch('origin');
+      await repo.fetchAll();
       let updated = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/event-1.json`);
 
       expect(updated).to.deep.equal({
@@ -276,7 +276,7 @@ describe('git/writer with remote', function() {
     it('deletes document', async function() {
       await writers.delete(env.session, head, 'events', 'event-1');
 
-      await repo.fetch('origin');
+      await repo.fetchAll();
 
       let articles = (await inRepo(tempRemoteRepoPath).listTree('origin/master', 'contents/events')).map(a => a.name);
       expect(articles).to.not.contain('event-1.json');
@@ -346,7 +346,7 @@ describe('git/writer with empty remote', function() {
           },
         },
       });
-      await repo.fetch('origin');
+      await repo.fetchAll();
       let saved = await inRepo(tempRemoteRepoPath).getJSONContents(
         'origin/master',
         `contents/events/${record.id}.json`

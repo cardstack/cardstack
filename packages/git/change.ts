@@ -111,7 +111,7 @@ export default class Change {
 
       if (this.isRemote && !this.repo.isBare()) {
         await this.repo.fetchAll();
-        await this.repo.mergeBranches(this.targetBranch, `origin/${this.targetBranch}`, null, Merge.FASTFORWARD_ONLY);
+        await this.repo.mergeBranches(this.targetBranch, `origin/${this.targetBranch}`);
       }
 
       return mergeCommit.id().toString();

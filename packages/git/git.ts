@@ -17,6 +17,7 @@ import {
   clone as igClone,
   commit as igCommit,
   currentBranch as igCurrentBranch,
+  fetch as igFetch,
   findMergeBase as igFindMergeBase,
   init as igInit,
   listBranches as igListBranches,
@@ -26,6 +27,7 @@ import {
   push as igPush,
   readCommit as igReadCommit,
   resolveRef as igResolveRef,
+  writeBlob as igWriteBlob,
   writeRef as igWriteRef,
 
   // types
@@ -103,12 +105,11 @@ export class Repository {
   }
 
   async getMasterCommit(): Promise<Commit> {
-    let masterCommit = await this.ngrepo.getMasterCommit();
-    return await Commit.lookup(this, masterCommit.id().tostrS());
-  }
-
-  async fetch(remote: string): Promise<void> {
-    await this.ngrepo.fetch(remote);
+    let sha = await igResolveRef({
+      gitdir: this.gitdir(),
+      ref: 'master',
+    });
+    return await Commit.lookup(this, sha);
   }
 
   async getRemote(remote: string): Promise<Remote> {
@@ -116,38 +117,58 @@ export class Repository {
   }
 
   async createBlobFromBuffer(buffer: Buffer): Promise<Oid> {
-    return new Oid((await this.ngrepo.createBlobFromBuffer(buffer)).tostrS());
+    let sha = await igWriteBlob({
+      gitdir: this.gitdir(),
+      blob: buffer,
+    });
+
+    return new Oid(sha);
   }
 
   async fetchAll() {
-    await this.ngrepo.fetchAll();
+    await igFetch({
+      gitdir: this.gitdir(),
+    });
   }
 
-  async mergeBranches(to: string, from: string, ignored: null, preference: number) {
-    await this.ngrepo.mergeBranches(to, from, undefined, preference);
+  async mergeBranches(to: string, from: string) {
+    await igMerge({
+      gitdir: this.gitdir(),
+      ours: to,
+      theirs: from,
+      fastForwardOnly: true,
+    });
   }
 
   async getReference(branchName: string) {
-    await this.ngrepo.getReference(branchName);
+    return await Reference.lookup(this, branchName);
   }
 
   async createBranch(targetBranch: string, headCommit: Commit): Promise<Reference> {
-    let ngreference = await this.ngrepo.createBranch(targetBranch, headCommit.sha());
-    return await Reference.lookup(this, ngreference.toString());
+    await igWriteRef({
+      gitdir: this.gitdir(),
+      ref: `refs/heads/${targetBranch}`,
+      value: headCommit.sha(),
+      force: true,
+    });
+
+    return await Reference.lookup(this, targetBranch);
   }
 
   async checkoutBranch(reference: Reference) {
-    await this.ngrepo.checkoutBranch(reference.toString());
+    await igCheckout({
+      dir: this.path(),
+      gitdir: this.gitdir(),
+      ref: reference.toString(),
+    });
   }
 
   async getHeadCommit() {
-    let ngcommit = await this.ngrepo.getHeadCommit();
-    return await Commit.lookup(this, ngcommit.id().tostrS());
+    return await Commit.lookup(this, 'HEAD');
   }
 
   async getReferenceCommit(name: string): Promise<Commit> {
-    let ngcommit = await this.ngrepo.getReferenceCommit(name);
-    return await Commit.lookup(this, ngcommit.id().tostrS());
+    return await Commit.lookup(this, name);
   }
 
   async lookupLocalBranch(branchName: string) {
@@ -181,7 +202,7 @@ export class Repository {
     });
 
     await igWriteRef({
-      dir: '/',
+      gitdir: this.gitdir(),
       ref: ref!,
       value: commit.sha(),
     });
