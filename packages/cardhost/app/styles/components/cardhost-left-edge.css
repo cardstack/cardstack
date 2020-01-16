@@ -81,5 +81,6 @@
 
 .cardhost-left-edge--nav h1 {
   font-size: 20px;
-  margin-top: 8px;
+  margin-top: 4px;
+  font-weight: 600px;
 }
