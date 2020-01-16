@@ -3,27 +3,37 @@
   .right-edge {
     right: unset;
     left: 560px;
+    position: absolute;
   }
 
-  .card-renderer--top-edge-buttons {
+  .view .card-renderer--top-edge-buttons,
+  .edit .card-renderer--top-edge-buttons {
     right: unset;
     left: 590px;
+    position: absolute;
   }
   
   .cardhost-top-edge {
     min-width: 900px;
+    position: absolute;
   }
 
   .themer--top-edge-container {
     min-width: 700px;
   }
+
+  html {
+    background-color: var(--ch-deep-background);
+  }
 }
 
 /* remove this media query when we implement responsive designs */
-@media (max-width: 1330px) {
+@media (max-width: 1230px) {
+
   .schema .right-edge {
     right: unset;
     left: 900px;
+    position: absolute;
   }
 
   .schema .card-renderer--top-edge-buttons {
