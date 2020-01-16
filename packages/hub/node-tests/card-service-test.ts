@@ -1428,6 +1428,9 @@ describe('hub/card-service', function() {
         ]);
       });
 
+      it.skip('TODO: prefix filtering', async function() {});
+      it.skip('TODO: exists filtering', async function() {});
+
       it('can sort by integer field', async function() {
         let results = await service.search({
           filter: {
