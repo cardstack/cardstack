@@ -5,7 +5,7 @@
   height: 100%;
   display: flex;
   flex-flow: row nowrap;
-  z-index: var(--ch-edges-z-index);
+  z-index: calc(var(--ch-edges-z-index) + 1 );
   background-color: var(--ch-deep-background);
 }
 
