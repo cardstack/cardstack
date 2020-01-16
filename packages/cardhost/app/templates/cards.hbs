@@ -6,7 +6,7 @@
   {{if this.cardstackSession.isAuthenticated "logged-in" "logged-out"}}
   {{this.themerClasses}}"
   data-test-cardhost-cards>
-  {{#if (not-eq this.routeInfo.mode "themer")}}
+  {{#if (and (not-eq this.routeInfo.mode "view") (not-eq this.routeInfo.mode "themer"))}}
     <CardhostTopEdge @mode="edit">
       {{#if (or (eq this.routeInfo.mode "layout") (eq this.routeInfo.mode "fields"))}}
         {{#let this.target.currentRoute.parent.attributes as |card|}}

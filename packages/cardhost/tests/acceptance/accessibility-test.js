@@ -6,7 +6,7 @@ import { createCards } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 import a11yAudit from 'ember-a11y-testing/test-support/audit';
 
-const timeout = 20000;
+const timeout = 2000;
 const card1Id = 'millenial-puppies';
 const qualifiedCard1Id = `local-hub::${card1Id}`;
 
@@ -33,23 +33,29 @@ module('Acceptance | accessibility', function(hooks) {
       [card1Id]: [['body', 'string', false, 'test body']],
     });
 
+    await visit(`/cards/${card1Id}`);
+    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
+    assert.equal(currentURL(), `/cards/${card1Id}`);
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found for view');
+
     await visit(`/cards/${card1Id}/edit/fields`);
     await waitFor(`[data-test-card-edit="${card1Id}"]`, { timeout });
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
     await a11yAudit();
-    assert.ok(true, 'no a11y errors found for edit');
+    assert.ok(true, 'no a11y errors found for edit fields');
+
+    await visit(`/cards/${card1Id}/edit/layout`);
+    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/layout`);
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found for edit layout');
 
     await visit(`/cards/${card1Id}/edit/fields/schema`);
     await waitFor(`[data-test-card-schema="${card1Id}"]`, { timeout });
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields/schema`);
     await a11yAudit();
     assert.ok(true, 'no a11y errors found for schema');
-
-    await visit(`/cards/${card1Id}`);
-    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
-    assert.equal(currentURL(), `/cards/${card1Id}`);
-    await a11yAudit();
-    assert.ok(true, 'no a11y errors found for layout');
 
     await visit(`/cards/${card1Id}/edit/layout/themer`);
     assert.equal(currentURL(), `/cards/${card1Id}/edit/layout/themer`);

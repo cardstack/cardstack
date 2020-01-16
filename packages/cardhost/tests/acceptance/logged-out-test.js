@@ -36,13 +36,13 @@ module('Acceptance | logged-out', function(hooks) {
     await click('#logout-button');
     assert.equal(currentURL(), `/cards/${card1Id}`);
 
-    assert.dom('[data-test-mode-switcher]').doesNotExist();
+    assert.dom('[data-test-card-edit-link]').doesNotExist();
     assert.dom('[data-test-card-save-btn]').doesNotExist();
     assert.dom('[data-test-right-edge]').doesNotExist();
     await percySnapshot(assert);
     await click('#login-button');
-    await waitFor('[data-test-mode-switcher]');
-    assert.dom('[data-test-mode-switcher]').exists();
+    await waitFor('[data-test-card-edit-link]');
+    assert.dom('[data-test-card-edit-link]').exists();
     assert.dom('[data-test-card-save-btn]').exists();
     assert.dom('[data-test-right-edge]').exists();
   });
