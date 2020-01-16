@@ -65,7 +65,7 @@
 
 */
 
-import { Repository, Commit, RemoteConfig, Tree, TreeEntry } from './git';
+import { Repository, Commit, RemoteConfig, Tree, TreeEntry, RepoNotFound } from './git';
 
 import Change from './change';
 import logger from '@cardstack/logger';
@@ -136,7 +136,7 @@ module.exports = declareInjections(
         try {
           this.repo = await Repository.open(this.repoPath!);
         } catch (e) {
-          if (/(could not find repository from|Failed to resolve path)/i.test(e.message)) {
+          if (e instanceof RepoNotFound) {
             let change = await Change.createInitial(this.repoPath!, 'master');
             this.repo = change.repo;
 
