@@ -245,11 +245,19 @@ export class Commit {
   }
 
   static async lookup(repo: Repository, id: Oid | string): Promise<Commit> {
-    let commitInfo = await igReadCommit({
-      gitdir: repo.gitdir,
-      oid: id.toString(),
-    });
-    return new Commit(repo, commitInfo);
+    try {
+      let commitInfo = await igReadCommit({
+        gitdir: repo.gitdir,
+        oid: id.toString(),
+      });
+      return new Commit(repo, commitInfo);
+    } catch (e) {
+      if (e.code == 'ReadObjectFail') {
+        throw new UnknownObjectId();
+      } else {
+        throw e;
+      }
+    }
   }
 
   constructor(private readonly repo: Repository, private readonly commitInfo: ReadCommitResult) {}
@@ -288,6 +296,7 @@ export class Oid {
 export class RepoNotFound extends Error {}
 export class BranchNotFound extends Error {}
 export class GitConflict extends Error {}
+export class UnknownObjectId extends Error {}
 
 class Reference {
   constructor(private readonly repo: Repository, private readonly reference: string, private readonly sha: string) {}

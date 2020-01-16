@@ -1,4 +1,4 @@
-import { Repository, RemoteConfig, GitConflict } from './git';
+import { Repository, RemoteConfig, GitConflict, UnknownObjectId } from './git';
 
 import { todo } from '@cardstack/plugin-utils/todo-any';
 
@@ -334,7 +334,7 @@ async function withErrorHandling(id: string, type: string, fn: Function) {
   try {
     return await fn();
   } catch (err) {
-    if (err.code === 'ReadObjectFail') {
+    if (err instanceof UnknownObjectId) {
       throw new Error(err.message, { status: 400, source: { pointer: '/data/meta/version' } });
     }
     if (err instanceof GitConflict) {
