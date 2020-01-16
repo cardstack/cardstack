@@ -88,9 +88,9 @@ export class Card {
   // if this card is stored inside another, this is the other
   readonly enclosingCard: Card | undefined;
 
-  protected jsonapi: SingleResourceDoc;
   private attributes: SingleResourceDoc['data']['attributes'];
   private relationships: SingleResourceDoc['data']['relationships'];
+  private meta: SingleResourceDoc['data']['meta'];
 
   // Identity invariants:
   //
@@ -113,9 +113,10 @@ export class Card {
     enclosingCard: Card | undefined,
     protected service: ScopedCardService
   ) {
-    this.jsonapi = jsonapi;
-    this.attributes = this.jsonapi.data.attributes;
-    this.relationships = this.jsonapi.data.relationships;
+    this.attributes = jsonapi.data.attributes;
+    this.relationships = jsonapi.data.relationships;
+    this.meta = jsonapi.data.meta;
+
     this.csRealm = realm;
     this.enclosingCard = enclosingCard;
     this.csOriginalRealm =
@@ -170,10 +171,6 @@ export class Card {
         );
       }
     }
-  }
-
-  async clone(): Promise<Card> {
-    return await getOwner(this).instantiate(Card, this.jsonapi, this.csRealm, this.enclosingCard, this.service);
   }
 
   async validate(priorCard: Card | null, realm: AddressableCard, _forDeletion?: true) {
@@ -308,10 +305,15 @@ export class Card {
     return adoptionChain;
   }
 
-  protected regenerateJSONAPI(): SingleResourceDoc {
-    let copied = cloneDeep(this.jsonapi);
-    if (!copied.data.attributes) {
-      copied.data.attributes = {};
+  async asUpstreamDoc(): Promise<UpstreamDocument> {
+    let copied = Object.create(null);
+    copied.data = Object.create(null);
+    copied.data.type = 'cards';
+
+    if (!this.attributes) {
+      copied.data.attributes = Object.create(null);
+    } else {
+      copied.data.attributes = cloneDeep(this.attributes);
     }
     copied.data.attributes.csRealm = this.csRealm;
     if (this.csRealm === this.csOriginalRealm) {
@@ -339,7 +341,18 @@ export class Card {
       delete copied.data.attributes.csPeerDependencies;
     }
 
-    return copied;
+    if (!this.relationships) {
+      // not needed... yet
+      // copied.data.relationships = Object.create(null);
+    } else {
+      copied.data.relationships = cloneDeep(this.relationships);
+    }
+
+    if (this.meta) {
+      copied.data.meta = this.meta;
+    }
+
+    return new UpstreamDocument(copied);
   }
 
   @Memoize()
@@ -359,7 +372,7 @@ export class Card {
 
   // if you want this card isolated, rules = { includeFieldSet: 'isolated' }
   async asPristineDoc(rules: OcclusionRules): Promise<PristineDocument> {
-    return new PristineDocument(this.regenerateJSONAPI());
+    return new PristineDocument((await this.asUpstreamDoc()).jsonapi);
   }
 
   async asSearchDoc(visitedCards: string[] = []): Promise<J.Object> {
@@ -416,12 +429,9 @@ export class Card {
     return doc;
   }
 
-  async asUpstreamDoc(): Promise<UpstreamDocument> {
-    return new UpstreamDocument(this.jsonapi);
-  }
-
-  patch(otherDoc: SingleResourceDoc): void {
-    this.jsonapi = mergeWith({}, this.jsonapi, otherDoc, everythingButMeta);
+  async patch(otherDoc: SingleResourceDoc): Promise<Card> {
+    let newDoc = mergeWith({}, (await this.asUpstreamDoc()).jsonapi, otherDoc, everythingButMeta);
+    return await getOwner(this).instantiate(Card, newDoc, this.csRealm, this.enclosingCard, this.service);
   }
 
   // This is the way that data source plugins think about card IDs. The
@@ -500,11 +510,9 @@ export class UnsavedCard extends Card {
     super(jsonapi, realm, undefined, service);
   }
 
-  async asAddressableCard(): Promise<AddressableCard> {
-    if (typeof this.csId !== 'string') {
-      throw new CardstackError(`card missing required attribute "csId"`);
-    }
-    return await this.service.instantiate(this.regenerateJSONAPI());
+  async asAddressableCard(patch: SingleResourceDoc): Promise<AddressableCard> {
+    let newDoc = mergeWith({}, (await this.asUpstreamDoc()).jsonapi, patch, everythingButMeta);
+    return await this.service.instantiate(newDoc);
   }
 }
 
@@ -553,8 +561,7 @@ export class FieldCard extends Card {
     if (this.csFieldArity === 'plural' && Array.isArray(value)) {
       await Promise.all(
         value.map(async v => {
-          let copy = await this.clone();
-          copy.patch({ data: v });
+          let copy = await this.patch({ data: v });
           // TODO: this priorFieldValue is an array of raw (still serialized)
           // card values. It needs to get deserialized and then matched by
           // identity with each `v`.
@@ -562,10 +569,8 @@ export class FieldCard extends Card {
         })
       );
     } else {
-      let newValueCard = await this.clone();
-      newValueCard.patch({ data: value });
-      let oldValueCard = await this.clone();
-      oldValueCard.patch({ data: priorFieldValue });
+      let newValueCard = await this.patch({ data: value });
+      let oldValueCard = await this.patch({ data: priorFieldValue });
       await newValueCard.validate(oldValueCard, realm);
     }
   }
@@ -626,9 +631,7 @@ export class FieldCard extends Card {
     if (deserialize) {
       return await deserialize(value, this);
     }
-    let copy = await this.clone();
-    copy.patch({ data: value });
-    return copy;
+    return await this.patch({ data: value });
   }
 }
 
@@ -655,8 +658,9 @@ export class AddressableCard extends Card implements CardId {
     }
   }
 
-  async clone(): Promise<AddressableCard> {
-    return getOwner(this).instantiate(AddressableCard, this.jsonapi, this.service);
+  async patch(otherDoc: SingleResourceDoc): Promise<AddressableCard> {
+    let newDoc = mergeWith({}, (await this.asUpstreamDoc()).jsonapi, otherDoc, everythingButMeta);
+    return await getOwner(this).instantiate(AddressableCard, newDoc, this.service);
   }
 
   get canonicalURL(): string {

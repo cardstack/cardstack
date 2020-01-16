@@ -5,6 +5,7 @@ import { TestEnv, createTestEnv } from './helpers';
 import { testCard } from './test-card';
 import { stringify } from 'qs';
 import { Session } from '../session';
+import { assertSingleResourceDoc } from '../jsonapi';
 
 describe('hub/jsonapi', function() {
   let request: supertest.SuperTest<supertest.Test>;
@@ -64,6 +65,7 @@ describe('hub/jsonapi', function() {
       .post('/api/realms/first-ephemeral-realm/cards')
       .set('Content-Type', 'application/vnd.api+json')
       .send(testCard().jsonapi);
+    assertSingleResourceDoc(response.body);
     expect(response.status).to.equal(201);
     expect(response.header.location).to.match(/http:\/\/[^/]+\/api\/realms\/first-ephemeral-realm\/cards\/[^/]+/);
   });
@@ -98,12 +100,13 @@ describe('hub/jsonapi', function() {
           .withRelationships({ puppies: [mango, vanGogh] })
           .adoptingFrom(ownerCard).jsonapi
       );
-    expect(response.status).to.equal(201);
+    expect(response).hasStatus(201);
     expect(response.header.location).to.match(/http:\/\/[^/]+\/api\/realms\/first-ephemeral-realm\/cards\/[^/]+/);
     expect(response.body.data.relationships.puppies.data).to.eql([
       { type: 'cards', id: mango.canonicalURL },
       { type: 'cards', id: vanGogh.canonicalURL },
     ]);
+    assertSingleResourceDoc(response.body);
   });
 
   it('can create a card with a field that has > 1 arity filled with cards as values', async function() {
@@ -143,6 +146,7 @@ describe('hub/jsonapi', function() {
         .withAttributes({ name: 'Van Gogh' })
         .adoptingFrom(puppyCard).jsonapi,
     ]);
+    assertSingleResourceDoc(response.body);
   });
 
   it('can patch a card', async function() {
@@ -159,9 +163,10 @@ describe('hub/jsonapi', function() {
       .patch(`/api/realms/first-ephemeral-realm/cards/${csId}`)
       .set('Content-Type', 'application/vnd.api+json')
       .send(cardDoc);
-    expect(response.status).to.equal(200);
+    expect(response).hasStatus(200);
     expect(response.body.data.attributes.foo).to.equal('poo');
     expect(response.body.data.attributes.hello).to.equal('world');
+    assertSingleResourceDoc(response.body);
   });
 
   it('errors correctly for missing patch body', async function() {
@@ -238,6 +243,7 @@ describe('hub/jsonapi', function() {
     expect(response.status).to.equal(200);
     expect(response.body?.data?.attributes?.hello).to.equal('world');
     expect(response.body?.data?.attributes?.csRealm).to.equal(`${myOrigin}/api/realms/first-ephemeral-realm`);
+    assertSingleResourceDoc(response.body);
   });
 
   it('can get a card from local realm that was created in another realm', async function() {
@@ -255,6 +261,7 @@ describe('hub/jsonapi', function() {
     expect(response.body?.data?.attributes?.hello).to.equal('world');
     expect(response.body?.data?.attributes?.csOriginalRealm).to.equal('https://somewhere/else');
     expect(response.body?.data?.attributes?.csRealm).to.equal(`${myOrigin}/api/realms/first-ephemeral-realm`);
+    assertSingleResourceDoc(response.body);
   });
 
   it('can get a card from remote realm that was created in that realm', async function() {
@@ -268,6 +275,7 @@ describe('hub/jsonapi', function() {
     expect(response.status).to.equal(200);
     expect(response.body?.data?.attributes?.hello).to.equal('world');
     expect(response.body?.data?.attributes?.csRealm).to.equal('http://example.com/api/realms/second-ephemeral-realm');
+    assertSingleResourceDoc(response.body);
   });
 
   it('can get a card from remote realm that was created in another realm', async function() {
@@ -285,6 +293,7 @@ describe('hub/jsonapi', function() {
     expect(response.body?.data?.attributes?.hello).to.equal('world');
     expect(response.body?.data?.attributes?.csOriginalRealm).to.equal('https://somewhere/else');
     expect(response.body?.data?.attributes?.csRealm).to.equal('http://example.com/api/realms/second-ephemeral-realm');
+    assertSingleResourceDoc(response.body);
   });
 
   it('can search for cards', async function() {
