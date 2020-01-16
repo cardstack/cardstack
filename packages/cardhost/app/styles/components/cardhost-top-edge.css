@@ -49,14 +49,6 @@
   margin-right: 15px;
 }
 
-.cardhost-top-edge .top-edge--mode-link {
-  background-image: url(/assets/images/icons/close-circle.svg);
-  background-size: 18px 18px;
-  background-repeat: no-repeat;
-  text-indent: -9999px;
-}
-
-
 .login-btn,
 .logout-btn {
   position: absolute;

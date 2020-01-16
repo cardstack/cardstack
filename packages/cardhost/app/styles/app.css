@@ -136,6 +136,20 @@ a:hover {
   margin-right: 20px;
 }
 
+.card-renderer--top-edge-buttons .top-edge--mode-link {
+  display: inline-block;
+}
+
+.card-renderer--top-edge-buttons .top-edge--mode-link span {
+  width: 18px;
+  height: 18px;
+  display: block;
+  text-indent: -9999px;
+  background-image: url(/assets/images/icons/close-circle.svg);
+  background-size: 18px 18px;
+  background-repeat: no-repeat;
+}
+
 .card-schema-updator--search-bar {
   position: absolute;
   right: var(--ch-spacing);
