@@ -26,6 +26,11 @@
   background-color: var(--ch-deep-background);
 }
 
+.cardhost-cards.view.logged-out, 
+.cardhost-cards.edit.logged-out {
+  padding-right: 0;
+}
+
 .card-creator,
 .card-schema-updator,
 .card-view,
