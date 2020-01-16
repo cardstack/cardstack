@@ -4,7 +4,7 @@
   data-test-cardhost-left-edge
 >
   <nav 
-    class="cardhost-left-edge--nav {{@mode}} {{if this.isExpanded "expanded" }}"
+    class="cardhost-left-edge--nav {{@mode}} {{if this.isExpanded "expanded"}}"
   >
     <ul>
       <li class="login-grid">
@@ -16,36 +16,34 @@
         >
           {{svg-jar "cardstack-logo" width="18px" height="20px"}}
         </button>
-        {{#if this.isExpanded}}
-          <div
-            class="login-grid-right-column"
-            {{did-insert this.registerCloseListener}}
-            {{will-destroy this.destroyCloseListener}}
-          >
-            <h1>Cardstack Builder</h1>
-            <CardstackSession as |session|>
-              {{#if session.isAuthenticated }}
-                <button 
-                  {{on "click" (fn this.logout session.logout)}}
+        <div
+          class="login-grid-right-column"
+          {{did-insert this.registerCloseListener}}
+          {{will-destroy this.destroyCloseListener}}
+        >
+          <h1>Cardstack Builder</h1>
+          <CardstackSession as |session|>
+            {{#if session.isAuthenticated }}
+              <button 
+                {{on "click" (fn this.logout session.logout)}}
+                class="cardhost-left-edge-login-buttons"
+                data-test-logout-button
+              >
+                Log out
+              </button>
+            {{else}}
+              <MockLogin as |login|>
+                <button
+                  {{on "click" (fn login "user1")}}
                   class="cardhost-left-edge-login-buttons"
-                  data-test-logout-button
+                  data-test-login-button
                 >
-                  Log out
+                  Log in
                 </button>
-              {{else}}
-                <MockLogin as |login|>
-                  <button
-                    {{on "click" (fn login "user1")}}
-                    class="cardhost-left-edge-login-buttons"
-                    data-test-login-button
-                  >
-                    Log in
-                  </button>
-                </MockLogin>
-              {{/if}}
-            </CardstackSession>
-          </div>
-        {{/if}}
+              </MockLogin>
+            {{/if}}
+          </CardstackSession>
+        </div>
       </li>
       <li>
         <button disabled class="catalog ch-button ch-button--icon-secondary" aria-label="catalog">

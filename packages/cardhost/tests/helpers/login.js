@@ -9,10 +9,13 @@ function setMockUser(userId) {
 }
 
 export async function login() {
-  await visit('/cards');
+  await visit('/cards/why-doors');
   setMockUser('user1');
-  await click('#login-button');
-  await waitFor('#logout-button');
+  await waitFor('[data-test-cardhost-left-edge]');
+  await click('[data-test-cardhost-left-edge]');
+  await waitFor('[data-test-login-button]');
+  await click('[data-test-login-button]');
+  await waitFor('[data-test-logout-button]');
 }
 
 export function setupMockUser(factory) {
