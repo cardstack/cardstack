@@ -1,4 +1,4 @@
-import { Merge, Repository, RemoteConfig } from './git';
+import { Repository, RemoteConfig } from './git';
 
 import { promisify } from 'util';
 import mkdirpcb from 'mkdirp';
@@ -113,7 +113,7 @@ class GitLocalCache {
       }
     }
 
-    await repo.mergeBranches(targetBranch, `origin/${targetBranch}`, null, Merge.FASTFORWARD_ONLY);
+    await repo.mergeBranches(targetBranch, `origin/${targetBranch}`);
   }
 }
 
