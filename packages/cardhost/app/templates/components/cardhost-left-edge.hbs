@@ -1,9 +1,13 @@
 <aside class="cardhost-left-edge" data-test-cardhost-left-edge>
-  <nav class="cardhost-left-edge--nav {{@mode}}">
+  <nav class="cardhost-left-edge--nav {{@mode}} {{if this.isExpanded "expanded"}}">
     <ul>
       <li>
-        <button disabled class="ch-button ch-button--icon-secondary" aria-label="user">
-          {{svg-jar "user" width="18px" height="20px"}}
+        <button 
+          class="ch-button ch-button--icon-secondary"
+          aria-label="expandable menu with login controls"
+          {{on "click" this.toggleMenuExpand}}
+        >
+          {{svg-jar "cardstack-logo" width="18px" height="20px"}}
         </button>
       </li>
       <li>

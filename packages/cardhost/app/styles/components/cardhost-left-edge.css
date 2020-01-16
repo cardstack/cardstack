@@ -6,26 +6,32 @@
   display: flex;
   flex-flow: row nowrap;
   z-index: var(--ch-edges-z-index);
+  background-color: var(--ch-dark);
 }
 
 .cardhost-left-edge--nav {
   width: var(--ch-left-edge-navbar-width);
+  transition: all 0.3s ease;
+}
+
+.cardhost-left-edge--nav.expanded {
+  width: 400px;
 }
 
 .cardhost-left-edge--nav.schema,
 .cardhost-left-edge--nav.new,
 .cardhost-left-edge--nav.adopt {
-  background-color: var(--ch-deep-background);
+  background-color: var(--ch-dark);
 }
 
 .cardhost-left-edge--nav > ul {
   display: flex;
   flex-flow: column nowrap;
   justify-content: flex-end;
-  align-items: center;
+  align-items: left;
   height: 100%;
   margin: 0;
-  padding: 20px 0;
+  padding: 20px 0 20px 10px;
   list-style-type: none;
 }
 
