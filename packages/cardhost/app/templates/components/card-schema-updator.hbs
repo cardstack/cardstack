@@ -4,11 +4,11 @@
       Schema Mode
       <LinkTo
         @route="cards.card.edit.fields"
-        @class="top-edge--edit-mode-link"
+        @class="top-edge--mode-link edit"
         @model={{this.card}}
         data-test-top-edge-link="edit"
       >
-        {{svg-jar "close-circle" width="18px" height="18px"}}
+        Edit
       </LinkTo>
     </div>
     <SaveButton @card={{this.card}} />

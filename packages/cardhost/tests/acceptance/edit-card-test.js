@@ -38,14 +38,14 @@ module('Acceptance | card edit', function(hooks) {
     await createCards({
       [card1Id]: [['body', 'string', false, 'test body']],
     });
-    await visit(`/cards/${card1Id}/edit`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await setFieldValue('body', 'updated body');
 
     await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await visit(`/cards/${card1Id}`);
     assert.dom('[data-test-field="body"] [data-test-string-field-viewer-value]').hasText(`updated body`);
@@ -60,14 +60,14 @@ module('Acceptance | card edit', function(hooks) {
     await createCards({
       [card1Id]: [['email', 'case-insensitive string', false, 'vangogh@nowhere.dog']],
     });
-    await visit(`/cards/${card1Id}/edit`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await setFieldValue('email', 'hassan@nowhere.dog');
 
     await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await visit(`/cards/${card1Id}`);
     assert
@@ -84,14 +84,14 @@ module('Acceptance | card edit', function(hooks) {
     await createCards({
       [card1Id]: [['created', 'date', false, '2019-10-07']],
     });
-    await visit(`/cards/${card1Id}/edit`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await setFieldValue('created', '2019-10-08');
 
     await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await visit(`/cards/${card1Id}`);
     assert.dom('[data-test-field="created"] [data-test-date-field-viewer-value]').hasText(`2019-10-08`);
@@ -106,14 +106,14 @@ module('Acceptance | card edit', function(hooks) {
     await createCards({
       [card1Id]: [['likes', 'integer', false, 100]],
     });
-    await visit(`/cards/${card1Id}/edit`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await setFieldValue('likes', 110);
 
     await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await visit(`/cards/${card1Id}`);
     assert.dom('[data-test-field="likes"] [data-test-integer-field-viewer-value]').hasText(`110`);
@@ -128,14 +128,14 @@ module('Acceptance | card edit', function(hooks) {
     await createCards({
       [card1Id]: [['published', 'boolean', false, true]],
     });
-    await visit(`/cards/${card1Id}/edit`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await setFieldValue('published', false);
 
     await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await visit(`/cards/${card1Id}`);
     assert.dom('[data-test-field="published"] [data-test-boolean-field-viewer-value]').hasText(`false`);
@@ -158,13 +158,13 @@ module('Acceptance | card edit', function(hooks) {
         ['email', 'case-insensitive string', false, 'hassan@nowhere.dog'],
       ],
     });
-    await visit(`/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
 
     await setFieldValue('reviewers', `${card2Id},${card3Id}`);
 
     await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await visit(`/cards/${card1Id}`);
     assert
@@ -213,13 +213,13 @@ module('Acceptance | card edit', function(hooks) {
         ['email', 'case-insensitive string', false, 'vangogh@nowhere.dog'],
       ],
     });
-    await visit(`/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
 
     await setFieldValue('author', card2Id);
 
     await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await visit(`/cards/${card1Id}`);
     assert
@@ -244,14 +244,14 @@ module('Acceptance | card edit', function(hooks) {
     await createCards({
       [card1Id]: [['image', 'decorative image', false, 'test image']],
     });
-    await visit(`/cards/${card1Id}/edit`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await setFieldValue('image', 'http://example.com/testimage.jpg');
 
     await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await visit(`/cards/${card1Id}`);
     assert
@@ -268,8 +268,8 @@ module('Acceptance | card edit', function(hooks) {
     await createCards({
       [card1Id]: [['body', 'string', false, 'test body']],
     });
-    await visit(`/cards/${card1Id}/edit`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     assert.dom('[data-test-right-edge]').exists();
     assert.dom('[data-test-internal-card-id]').doesNotExist();

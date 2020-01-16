@@ -52,10 +52,10 @@ module('Acceptance | logged-out', function(hooks) {
     await createCards({
       [card1Id]: [['title', 'string', true, 'The Millenial Puppy']],
     });
-    await visit(`/cards/${card1Id}/edit`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
     await click('#logout-button');
-    await visit(`/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
     assert.equal(currentURL(), `/cards/${card1Id}`);
   });
 
@@ -64,10 +64,10 @@ module('Acceptance | logged-out', function(hooks) {
     await createCards({
       [card1Id]: [['title', 'string', true, 'The Millenial Puppy']],
     });
-    await visit(`/cards/${card1Id}/schema`);
-    assert.equal(currentURL(), `/cards/${card1Id}/schema`);
+    await visit(`/cards/${card1Id}/edit/fields/schema`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields/schema`);
     await click('#logout-button');
-    await visit(`/cards/${card1Id}/schema`);
+    await visit(`/cards/${card1Id}/edit/fields/schema`);
     assert.equal(currentURL(), `/cards/${card1Id}`);
   });
 });

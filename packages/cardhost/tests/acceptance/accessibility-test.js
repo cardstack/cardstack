@@ -33,15 +33,15 @@ module('Acceptance | accessibility', function(hooks) {
       [card1Id]: [['body', 'string', false, 'test body']],
     });
 
-    await visit(`/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
     await waitFor(`[data-test-card-edit="${card1Id}"]`, { timeout });
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
     await a11yAudit();
     assert.ok(true, 'no a11y errors found for edit');
 
-    await visit(`/cards/${card1Id}/schema`);
+    await visit(`/cards/${card1Id}/edit/fields/schema`);
     await waitFor(`[data-test-card-schema="${card1Id}"]`, { timeout });
-    assert.equal(currentURL(), `/cards/${card1Id}/schema`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields/schema`);
     await a11yAudit();
     assert.ok(true, 'no a11y errors found for schema');
 
@@ -51,8 +51,8 @@ module('Acceptance | accessibility', function(hooks) {
     await a11yAudit();
     assert.ok(true, 'no a11y errors found for layout');
 
-    await visit(`/cards/${card1Id}/themer`);
-    assert.equal(currentURL(), `/cards/${card1Id}/themer`);
+    await visit(`/cards/${card1Id}/edit/layout/themer`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/layout/themer`);
     await a11yAudit();
     assert.ok(true, 'no a11y errors found for themer');
 
