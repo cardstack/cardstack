@@ -14,6 +14,7 @@ import { makePristineCollection, apiPrefix, AddressableCard, CardId } from './ca
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { parse } from 'qs';
 import { assertQuery } from './query';
+import { OcclusionRules } from './occlusion-rules';
 
 const apiPrefixPattern = new RegExp(`^${apiPrefix}/(.*)`);
 
@@ -108,7 +109,8 @@ export default class JSONAPIMiddleware {
 
   async getCard(ctxt: KoaRoute.Context<SessionContext, {}>) {
     let card = await this.cards.as(ctxt.state.cardstackSession).get(cardIdFromRoute(ctxt));
-    ctxt.body = (await card.asPristineDoc()).jsonapi;
+    let rules = this.occlusionRulesFromRequest(ctxt);
+    ctxt.body = (await card.asPristineDoc(rules)).jsonapi;
     ctxt.status = 200;
   }
 
@@ -130,7 +132,8 @@ export default class JSONAPIMiddleware {
     assertQuery(query);
 
     let { cards, meta } = await this.cards.as(ctxt.state.cardstackSession).search(query);
-    let collection = await makePristineCollection(cards, meta);
+    let rules = this.occlusionRulesFromRequest(ctxt);
+    let collection = await makePristineCollection(cards, meta, rules);
     ctxt.body = collection.jsonapi;
     ctxt.status = 200;
   }
@@ -155,6 +158,8 @@ export default class JSONAPIMiddleware {
       }
     }
   }
+
+  private occlusionRulesFromRequest(ctxt: KoaRoute.Context<SessionContext, {}>): OcclusionRules {}
 }
 
 function cardIdFromRoute(ctxt: KoaRoute.Context<SessionContext, {}>): CardId {

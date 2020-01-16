@@ -13,6 +13,7 @@ import * as FieldHooks from './field-hooks';
 import { inject, getOwner } from './dependency-injection';
 import { Memoize } from 'typescript-memoize';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
+import { OcclusionRules, OcclusionFieldSets, InnerOcclusionRules } from './occlusion-rules';
 
 export const apiPrefix = '/api';
 
@@ -50,9 +51,10 @@ export const cardstackFieldPattern = /^cs[A-Z]/;
 
 export async function makePristineCollection(
   cards: AddressableCard[],
-  meta: ResponseMeta
+  meta: ResponseMeta,
+  rules: OcclusionRules
 ): Promise<PristineCollection> {
-  let pristineDocs = await Promise.all(cards.map(card => card.asPristineDoc()));
+  let pristineDocs = await Promise.all(cards.map(card => card.asPristineDoc(rules)));
   // TODO includeds
   return new PristineCollection({
     data: pristineDocs.map(doc => doc.jsonapi.data),
@@ -78,6 +80,8 @@ export class Card {
   csFiles: CardFiles | undefined;
   csPeerDependencies: PeerDependencies | undefined;
 
+  csOcclusionRules: OcclusionFieldSets | undefined;
+
   private rawFields: { [name: string]: any } | undefined;
   private features: { [name: string]: string | [string, string] } | undefined;
 
@@ -85,6 +89,8 @@ export class Card {
   readonly enclosingCard: Card | undefined;
 
   protected jsonapi: SingleResourceDoc;
+  private attributes: SingleResourceDoc['data']['attributes'];
+  private relationships: SingleResourceDoc['data']['relationships'];
 
   // Identity invariants:
   //
@@ -108,6 +114,8 @@ export class Card {
     protected service: ScopedCardService
   ) {
     this.jsonapi = jsonapi;
+    this.attributes = this.jsonapi.data.attributes;
+    this.relationships = this.jsonapi.data.relationships;
     this.csRealm = realm;
     this.enclosingCard = enclosingCard;
     this.csOriginalRealm =
@@ -142,50 +150,69 @@ export class Card {
       assertFeatures(features);
       this.features = features;
     }
+
+    if (jsonapi.data.attributes?.csAdoptsFrom) {
+      throw new CardstackError(
+        `csAdoptsFrom must be a reference, not a value (it must appear in data.relationships, not data.attributes)`,
+        {
+          status: 400,
+        }
+      );
+    }
+
+    if (jsonapi.data.relationships?.csAdoptsFrom) {
+      if (Array.isArray(relationshipToCardId(jsonapi.data.relationships.csAdoptsFrom))) {
+        throw new CardstackError(
+          `The card ${this.canonicalURL} adopts from multiple parents. Multiple adoption is not allowed.`,
+          {
+            status: 400,
+          }
+        );
+      }
+    }
   }
 
   async clone(): Promise<Card> {
     return await getOwner(this).instantiate(Card, this.jsonapi, this.csRealm, this.enclosingCard, this.service);
   }
 
-  async validate(priorCard: AddressableCard | null, realm: AddressableCard, _forDeletion?: true) {
-    // validate all present user attributes (fields-by-value)
-    if (this.jsonapi.data.attributes) {
-      for (let [name, value] of Object.entries(this.jsonapi.data.attributes)) {
-        if (cardstackFieldPattern.test(name)) {
-          continue;
-        }
-        let field = await this.field(name);
+  async validate(priorCard: Card | null, realm: AddressableCard, _forDeletion?: true) {
+    for (let name of this.fieldsWithData()) {
+      // cast is safe because all fieldsWithData have non-null rawData
+      let rawData = this.rawData(name)!;
+      let priorRawData = priorCard?.rawData(name);
+      let field = await this.field(name);
+      if ('value' in rawData) {
+        let { value } = rawData;
         this.assertArity(field, name, value);
-        await field.validateValue(await priorCard?.value(name), value, realm);
-      }
-    }
-
-    // validate all present user relationships (fields-by-reference)
-    if (this.jsonapi.data.relationships) {
-      for (let [name, ref] of Object.entries(this.jsonapi.data.relationships)) {
-        if (cardstackFieldPattern.test(name)) {
-          continue;
+        let priorRawValue: any = undefined;
+        if (priorRawData && 'value' in priorRawData) {
+          priorRawValue = priorRawData.value;
         }
-        let field = await this.field(name);
-        let cardIds = relationshipToCardId(ref);
-        this.assertArity(field, name, cardIds, ref);
-        let priorCardReference = await priorCard?.reference(name);
+        await field.validateValue(priorRawValue, value, realm);
+      } else {
+        let cardIds = rawData.ref;
+        this.assertArity(field, name, cardIds);
+        let priorRawData = priorCard?.rawData(name);
+        let priorRef: CardId | CardId[] | undefined = undefined;
+        if (priorRawData && 'ref' in priorRawData) {
+          priorRef = priorRawData.ref;
+        }
         if (Array.isArray(cardIds)) {
-          await Promise.all(cardIds.map(cardId => field.validateReference(priorCardReference, cardId, realm)));
+          await Promise.all(cardIds.map(cardId => field.validateReference(priorRef, cardId, realm)));
         } else if (cardIds) {
-          await field.validateReference(priorCardReference, cardIds, realm);
+          await field.validateReference(priorRef, cardIds, realm);
         }
       }
     }
   }
 
-  private assertArity(field: FieldCard, fieldName: string, value: any, displayValue?: any) {
+  private assertArity(field: FieldCard, fieldName: string, value: any) {
     if (field.csFieldArity === 'plural') {
       if (!Array.isArray(value) && value != null) {
         throw new CardstackError(
           `field ${fieldName} on card ${this.canonicalURL} failed arity validation for value: ${JSON.stringify(
-            displayValue || value
+            value
           )}. This field has a plural arity.`,
           { status: 400 }
         );
@@ -194,7 +221,7 @@ export class Card {
       if (Array.isArray(value)) {
         throw new CardstackError(
           `field ${fieldName} on card ${this.canonicalURL} failed arity validation for value: ${JSON.stringify(
-            displayValue || value
+            value
           )}. This field has a singular arity.`,
           { status: 400 }
         );
@@ -202,33 +229,55 @@ export class Card {
     }
   }
 
-  // gets the value of a field. Its type is governed by the schema of this card.
-  async value(fieldName: string): Promise<any> {
-    let rawValue = this.jsonapi.data.attributes?.[fieldName];
-    if (rawValue != null) {
-      let field = await this.field(fieldName);
-      if (field.csFieldArity === 'plural' && Array.isArray(rawValue)) {
-        return await Promise.all(rawValue.map(v => field.deserializeValue(v)));
-      }
-      return await field.deserializeValue(rawValue);
+  private fieldsWithData(): string[] {
+    let names: string[];
+    if (this.attributes && this.relationships) {
+      names = Object.keys(this.attributes).concat(Object.keys(this.relationships));
+    } else if (this.attributes) {
+      names = Object.keys(this.attributes);
+    } else if (this.relationships) {
+      names = Object.keys(this.relationships);
+    } else {
+      return [];
     }
-    let refs = await this.reference(fieldName);
-    if (refs != null && Array.isArray(refs)) {
-      return await Promise.all(refs.map(ref => this.service.get(ref)));
-    } else if (refs != null) {
-      return await this.service.get(refs);
+    return names.filter(name => !cardstackFieldPattern.test(name));
+  }
+
+  private rawData(fieldName: string): { ref: CardId | CardId[] | undefined } | { value: any } | null {
+    if (this.attributes) {
+      if (fieldName in this.attributes) {
+        return { value: this.attributes[fieldName] };
+      }
+    }
+    if (this.relationships) {
+      if (fieldName in this.relationships) {
+        return { ref: relationshipToCardId(this.relationships[fieldName]) };
+      }
     }
     return null;
   }
 
-  // if the given field is stored as a reference, this gives you the reference
-  // without converting it to a value like `value()` would.
-  async reference(fieldName: string): Promise<CardId | CardId[] | undefined> {
-    let ref = this.jsonapi.data.relationships?.[fieldName];
-    if (ref != null) {
-      return relationshipToCardId(ref);
+  // gets the value of a field. Its type is governed by the schema of this card.
+  async value(fieldName: string): Promise<any> {
+    let rawData = this.rawData(fieldName);
+    if (rawData == null) {
+      return rawData;
     }
-    return undefined;
+    if ('value' in rawData) {
+      let field = await this.field(fieldName);
+      let value = rawData.value;
+      if (field.csFieldArity === 'plural' && Array.isArray(value)) {
+        return await Promise.all(value.map(v => field.deserializeValue(v)));
+      }
+      return await field.deserializeValue(value);
+    } else {
+      let refs = rawData.ref;
+      if (refs != null && Array.isArray(refs)) {
+        return await Promise.all(refs.map(ref => this.service.get(ref)));
+      } else if (refs != null) {
+        return await this.service.get(refs);
+      }
+    }
   }
 
   @Memoize()
@@ -293,7 +342,23 @@ export class Card {
     return copied;
   }
 
-  async asPristineDoc(): Promise<PristineDocument> {
+  @Memoize()
+  private fieldSet(format: string): Map<string, InnerOcclusionRules | true> {
+    let fieldSet: Map<string, InnerOcclusionRules | true> = new Map();
+    if (this.csOcclusionRules?.[format]) {
+      for (let fieldRule of this.csOcclusionRules[format]) {
+        if (typeof fieldRule === 'string') {
+          fieldSet.set(fieldRule, true);
+        } else {
+          fieldSet.set(fieldRule.name, fieldRule);
+        }
+      }
+    }
+    return fieldSet;
+  }
+
+  // if you want this card isolated, rules = { includeFieldSet: 'isolated' }
+  async asPristineDoc(rules: OcclusionRules): Promise<PristineDocument> {
     return new PristineDocument(this.regenerateJSONAPI());
   }
 
@@ -323,35 +388,28 @@ export class Card {
     // via value or reference. At a future time, when we add occlusion to guide
     // how to construct "embedded" cards we'll revisit this logic to make sure
     // the search doc follows the occlusion boundary.
-    for (let section of [this.jsonapi.data.attributes, this.jsonapi.data.relationships]) {
-      if (section) {
-        for (let fieldName of Object.keys(section)) {
-          if (cardstackFieldPattern.test(fieldName)) {
-            continue;
-          }
-          let value = await this.value(fieldName);
-          let field = await this.field(fieldName);
-          let fullFieldName = `${field.enclosingCard.canonicalURL}/${fieldName}`;
-          if (value instanceof Card) {
-            if (value.canonicalURL == null || !visitedCards.includes(value.canonicalURL)) {
-              doc[fullFieldName] = await value.asSearchDoc(
-                [...visitedCards, value.canonicalURL].filter(Boolean) as string[]
-              );
-            }
-          } else if (Array.isArray(value) && value.every(i => i instanceof Card)) {
-            doc[fullFieldName] = (
-              await Promise.all(
-                value.map(i => {
-                  if (i.canonicalURL == null || !visitedCards.includes(i.canonicalURL)) {
-                    return i.asSearchDoc([...visitedCards, i.canonicalURL].filter(Boolean) as string[]);
-                  }
-                })
-              )
-            ).filter(Boolean);
-          } else {
-            doc[fullFieldName] = value;
-          }
+    for (let fieldName of this.fieldsWithData()) {
+      let value = await this.value(fieldName);
+      let field = await this.field(fieldName);
+      let fullFieldName = `${field.enclosingCard.canonicalURL}/${fieldName}`;
+      if (value instanceof Card) {
+        if (value.canonicalURL == null || !visitedCards.includes(value.canonicalURL)) {
+          doc[fullFieldName] = await value.asSearchDoc(
+            [...visitedCards, value.canonicalURL].filter(Boolean) as string[]
+          );
         }
+      } else if (Array.isArray(value) && value.every(i => i instanceof Card)) {
+        doc[fullFieldName] = (
+          await Promise.all(
+            value.map(i => {
+              if (i.canonicalURL == null || !visitedCards.includes(i.canonicalURL)) {
+                return i.asSearchDoc([...visitedCards, i.canonicalURL].filter(Boolean) as string[]);
+              }
+            })
+          )
+        ).filter(Boolean);
+      } else {
+        doc[fullFieldName] = value;
       }
     }
 
@@ -390,27 +448,21 @@ export class Card {
   async adoptsFrom(): Promise<AddressableCard | undefined> {
     let baseCardURL = canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' });
     if (this.canonicalURL === baseCardURL) {
+      // base card has no parent
       return;
     }
 
-    let cardId: CardId | CardId[] | undefined;
-    let adoptsFromRelationship = this.jsonapi.data.relationships?.csAdoptsFrom;
-    if (adoptsFromRelationship) {
-      cardId = relationshipToCardId(adoptsFromRelationship);
-      if (Array.isArray(cardId)) {
-        throw new CardstackError(
-          `The card ${this.canonicalURL} adopts from multiple parents: ${JSON.stringify(
-            cardId
-          )}. Multiple adoption is not allowed.`,
-          {
-            status: 400,
-          }
-        );
-      }
+    // this cast is safe because:
+    //   1. Our constructor asserted that relationships.csAdoptsFrom was
+    //      singular, not plural.
+    //   2. There's no way to customize the FieldCard for csAdoptsFrom to
+    //      provide an alternative deserialize() hook.
+    let card = (await this.value('csAdoptsFrom')) as AddressableCard | null;
+    if (card) {
+      return card;
     }
-    return await this.service.get(
-      canonicalURL((cardId as CardId | undefined) ?? { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' })
-    );
+
+    return await this.service.get({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' });
   }
 
   async loadFeature(featureName: 'writer'): Promise<WriterFactory | null>;
@@ -503,13 +555,18 @@ export class FieldCard extends Card {
         value.map(async v => {
           let copy = await this.clone();
           copy.patch({ data: v });
+          // TODO: this priorFieldValue is an array of raw (still serialized)
+          // card values. It needs to get deserialized and then matched by
+          // identity with each `v`.
           await copy.validate(priorFieldValue, realm);
         })
       );
     } else {
-      let copy = await this.clone();
-      copy.patch({ data: value });
-      await copy.validate(priorFieldValue, realm);
+      let newValueCard = await this.clone();
+      newValueCard.patch({ data: value });
+      let oldValueCard = await this.clone();
+      oldValueCard.patch({ data: priorFieldValue });
+      await newValueCard.validate(oldValueCard, realm);
     }
   }
 
