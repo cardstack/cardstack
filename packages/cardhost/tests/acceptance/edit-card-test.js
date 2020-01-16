@@ -30,6 +30,7 @@ module('Acceptance | card edit', function(hooks) {
   scenario.setupTest(hooks);
   hooks.beforeEach(function() {
     this.owner.lookup('service:data')._clearCache();
+    this.owner.lookup('service:card-local-storage').clearIds();
   });
 
   test(`setting a string field`, async function(assert) {
