@@ -17,23 +17,6 @@
   background-color: var(--ch-deep-background);
 }
 
-.login-btn,
-.logout-btn {
-  position: absolute;
-  z-index: var(--ch-edges-z-index);
-}
-
-.logout-btn {
-  position: absolute;
-  right: 320px;
-  min-width: 85px;
-  height: 40px;
-}
-
-.login-btn {
-  right: var(--ch-spacing)
-}
-
 @media (max-width: 1440px) {
   .cardhost-top-edge.view,
   .cardhost-top-edge.edit {
