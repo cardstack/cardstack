@@ -48,10 +48,12 @@ export default class CardhostTopEdgeComponent extends Component {
   @action
   registerCloseListener() {
     document.querySelector('body').addEventListener('click', this.closeListener);
+    document.querySelector('body').addEventListener('focusin', this.closeListener);
   }
 
   @action
   destroyCloseListener() {
     document.querySelector('body').removeEventListener('click', this.closeListener);
+    document.querySelector('body').addEventListener('focusin', this.closeListener);
   }
 }
