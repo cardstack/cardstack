@@ -24,4 +24,34 @@ export default class CardhostTopEdgeComponent extends Component {
       this.router.transitionTo('index');
     }
   }
+
+  @action
+  closeLeftEdge() {
+    this.isExpanded = false;
+  }
+
+  /*
+    closeListener, registerCloseListener, and destroyCloseListener are the
+    actions responsible for closing the left edge when you click somewhere
+    outside of it. They are only registered when the left edge is open,
+    and torn down when it is closed via the did-insert and will-destroy
+    render modifiers.
+  */
+  @action
+  closeListener(event) {
+    let thisElement = document.querySelector('#cardhost-left-edge');
+    if (!thisElement.contains(event.target)) {
+      this.closeLeftEdge();
+    }
+  }
+
+  @action
+  registerCloseListener() {
+    document.querySelector('body').addEventListener('click', this.closeListener);
+  }
+
+  @action
+  destroyCloseListener() {
+    document.querySelector('body').removeEventListener('click', this.closeListener);
+  }
 }
