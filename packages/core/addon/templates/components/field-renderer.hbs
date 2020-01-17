@@ -42,7 +42,7 @@
           {{!-- TODO: Change displayed logo depending on field --}}
           {{! template-lint-disable no-inline-styles }}
           <header
-            class="schema-field-renderer--header {{if this.fieldType this.fieldType.id @field.type}}"
+            class="schema-field-renderer--header {{if this.fieldType this.fieldType.type @field.type}}"
             style={{css-url "background-image" this.fieldType.icon}}
             data-test-field-renderer-type
           >

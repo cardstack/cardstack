@@ -6,26 +6,19 @@
   display: flex;
   flex-flow: row nowrap;
   z-index: calc(var(--ch-edges-z-index) + 1 );
-  background-color: var(--ch-deep-background);
 }
 
 .cardhost-left-edge--nav {
+  background-color: var(--ch-deep-background);
   width: var(--ch-left-edge-navbar-width);
   transition: width 0.2s ease;
   overflow: hidden;
-}
-
-.cardhost-left-edge--nav.schema,
-.cardhost-left-edge--nav.new,
-.cardhost-left-edge--nav.adopt {
-  background-color: var(--ch-deep-background);
 }
 
 .cardhost-left-edge--nav > ul {
   display: flex;
   flex-flow: column nowrap;
   justify-content: flex-end;
-  align-items: left;
   height: 100%;
   margin: 0;
   padding: 20px 0 20px 10px;
@@ -54,6 +47,7 @@
 }
 
 .cardhost-left-edge--nav.expanded {
+  background-color: var(--ch-deep-background);
   width: 320px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
 }
