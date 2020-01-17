@@ -1,18 +1,22 @@
-<section
-  class="card-editor"
-  data-test-card-edit={{this.card.name}}
-  {{did-update this.updateCard @card}}
->
-  <CardRenderer
-    @card={{this.card}}
-    @mode="edit"
-    @setFieldValue={{action this.setFieldValue}}
-    @format="isolated"
-    @selectField={{action this.selectField}}
-    @selectedField={{this.selectedField}}
-    @cardSelected={{this.cardSelected}}
-    @cardFocused={{action (mut this.cardSelected)}} />
-</section>
+<AnimatedContainer>
+  {{#animated-value this.card group=this.card.name key=this.card.name use=this.cardTransition as |card|}}
+    <section
+      class="card-editor"
+      data-test-card-edit={{card.name}}
+      {{did-update this.updateCard @card}}
+    >
+      <CardRenderer
+        @card={{card}}
+        @mode="edit"
+        @setFieldValue={{action this.setFieldValue}}
+        @format="isolated"
+        @selectField={{action this.selectField}}
+        @selectedField={{this.selectedField}}
+        @cardSelected={{this.cardSelected}}
+        @cardFocused={{action (mut this.cardSelected)}} />
+    </section>
+  {{/animated-value}}
+</AnimatedContainer>
 
 {{!-- This is hidden, used in tests --}}
 <section class="cardhost-card-document">
