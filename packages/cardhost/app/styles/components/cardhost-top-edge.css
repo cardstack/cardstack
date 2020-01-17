@@ -14,7 +14,16 @@
   align-items: center;
   text-align: right;
   z-index: var(--ch-edges-z-index);
+  background-color: var(--ch-default);
+  transition: var(--ch-card-background-color-animate);
+}
+
+.cardhost-top-edge.schema {
   background-color: var(--ch-deep-background);
+}
+
+.cardhost-top-edge.themer {
+  background-color: var(--ch-dark-background);
 }
 
 .view-selector {

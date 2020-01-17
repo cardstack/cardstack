@@ -10,12 +10,11 @@ Ember Concurrency into the rendering of the card component here.
       <section
         class="card-renderer-isolated
           {{this.mode}}
-          {{if (or (eq this.mode "add") (eq this.mode "adopt")) "schema"}}
           {{safe-css-string @card.adoptedFromName}}
           {{safe-css-string @card.name}}
           {{if @cardSelected "selected"}}
           {{if this.fields.length "has-fields" "no-fields"}}
-
+          {{@class}}
         "
         tabindex="0"
         data-test-card-renderer-isolated

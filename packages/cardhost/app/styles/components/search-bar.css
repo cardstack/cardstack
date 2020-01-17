@@ -1,6 +1,6 @@
 .search-bar-input.cs-input {
-  min-width: var(--ch-component-width);
-  min-height: var(--ch-component-height);
+  min-width: 260px;
+  min-height: 40px;
   padding: 10px 15px 10px 45px;
   background: url('/assets/images/icons/search-active.svg') 15px center/15px no-repeat;
   background-color: var(--ch-default);
