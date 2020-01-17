@@ -40,6 +40,18 @@ export default class UIComponentsRoute extends Route {
           type: '@cardstack/core-types::date',
           value: '2019-09-26',
         },
+        {
+          name: 'social-link',
+          label: 'Follow us on Twitter:',
+          type: '@cardstack/core-types::url',
+          value: 'https://example.com',
+        },
+        {
+          name: 'rsvp',
+          label: 'RSVP',
+          type: '@cardstack/core-types::cta',
+          value: 'https://example.com',
+        },
       ],
 
       sampleNameField: {
