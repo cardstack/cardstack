@@ -1,7 +1,7 @@
 <div class="cardhost-top-edge {{@mode}}" data-test-cardhost-top-edge>
   {{yield}}
 
-  {{#unless (eq @mode "themer")}}
+  {{#if (not (eq @mode "themer"))}}
     {{#cardstack-session as |session|}}
       {{#if session.isAuthenticated }}
         <Cta
@@ -24,5 +24,5 @@
         {{/mock-login}}
       {{/if}}
     {{/cardstack-session}}
-  {{/unless}}
+  {{/if}}
 </div>
