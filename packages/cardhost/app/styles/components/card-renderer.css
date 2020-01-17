@@ -69,6 +69,10 @@
   transition: stroke var(--ch-transition-time);
 }
 
+.card-renderer-isolated.themer .card-renderer-isolated--header {
+  background-color: var(--ch-default);
+  border-color: var(--ch-default);
+}
 
 /* Card Renderer - Outer Wrapper */
 /* Needed for scroll behavior */
@@ -87,6 +91,10 @@
 
 .card-renderer-isolated.schema .card-renderer-isolated--content {
   color: var(--ch-light);
+}
+
+.card-renderer-isolated.themer .card-renderer-isolated--content {
+  background-color: var(--ch-dark-background);
 }
 
 
