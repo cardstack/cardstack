@@ -40,7 +40,7 @@ export default class CardhostTopEdgeComponent extends Component {
   @action
   closeListener(event) {
     let thisElement = document.querySelector('#cardhost-left-edge');
-    if (!thisElement.contains(event.target)) {
+    if (thisElement && !thisElement.contains(event.target)) {
       this.closeLeftEdge();
     }
   }
@@ -54,6 +54,6 @@ export default class CardhostTopEdgeComponent extends Component {
   @action
   destroyCloseListener() {
     document.querySelector('body').removeEventListener('click', this.closeListener);
-    document.querySelector('body').addEventListener('focusin', this.closeListener);
+    document.querySelector('body').removeEventListener('focusin', this.closeListener);
   }
 }
