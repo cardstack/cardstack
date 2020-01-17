@@ -40,13 +40,15 @@
 
 /* Label hidden by default */
 .cardstack_base-card-isolated .title-label,
-.cardstack_base-card-isolated .title-2-label {
+.cardstack_base-card-isolated .title-2-label,
+.cardstack_base-card-isolated .body-label {
   display: none;
 }
 
 /* Full-width field values by default */
 .cardstack_base-card-isolated .title-value,
-.cardstack_base-card-isolated .title-2-value {
+.cardstack_base-card-isolated .title-2-value,
+.cardstack_base-card-isolated .body-value {
   grid-column: 1 / -1;
 }
 
@@ -68,11 +70,12 @@
   text-transform: capitalize;
 }
 
-/* TODO: figure out how to deal with styling element fields */
+/* TODO: figure out how to deal with styling components */
 .divider-field {
   border-top: 1px solid var(--light-gray);
 }
-.divider-label {
+.divider-label,
+.divider-value {
   display: none;
 }
 
