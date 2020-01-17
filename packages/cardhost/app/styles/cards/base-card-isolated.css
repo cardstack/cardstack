@@ -3,10 +3,10 @@
   min-height: inherit;
   margin: 0 auto;
   padding: 50px 30px;
-  background-color: white;
+  background-color: var(--white);
   color: black;
-  font: 400 16px/1.385 var(--ch-font-family);
-  letter-spacing: 0;
+  font: 400 15px/1.467 var(--ch-font-family);
+  letter-spacing: 0.03em;
   text-align: left;
   overflow: hidden;
   overflow-wrap: break-word;
@@ -14,20 +14,75 @@
 }
 
 .cardstack_base-card-isolated .field {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  grid-gap: 35px 50px;
   width: 100%;
   max-width: 656px;
   margin: 0 auto;
-  padding-bottom: 30px;
+  padding-bottom: 35px;
 }
 
 .cardstack_base-card-isolated .label {
   padding-bottom: 4px;
-  color: var(--ch-dark-op50);
-  font-size: 13px;
-  line-height: 1.385;
+  color: var(--black);
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  line-height: 1.364;
+  text-transform: uppercase;
 }
+
+/* Label hidden by default */
+.cardstack_base-card-isolated .title-label,
+.cardstack_base-card-isolated .title-2-label {
+  display: none;
+}
+
+/* Full-width field values by default */
+.cardstack_base-card-isolated .title-value,
+.cardstack_base-card-isolated .title-2-value {
+  grid-column: 1 / -1;
+}
+
+/* Title value */
+.cardstack_base-card-isolated .title-value {
+  color: var(--dark-gray);
+  font-size: 25px;
+  font-weight: bold;
+  letter-spacing: 0.015em;
+  line-height: 1.2;
+}
+
+/* Title 2 value */
+.cardstack_base-card-isolated .title-2-value {
+  color: var(--red);
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 0.035em;
+  text-transform: capitalize;
+}
+
+/* TODO: figure out how to deal with styling element fields */
+.divider-field {
+  border-top: 1px solid var(--light-gray);
+}
+.divider-label {
+  display: none;
+}
+
 
 
 .cardstack_base-card-isolated .isolated-card--fields {
   /* border: solid 2px red; */
+}
+
+
+/* Photo card styling from themer */
+.photo-card-isolated {
+  padding: 21px 36px;
+}
+
+.image-photo-url {
+  grid-column: 1 / -1;
 }
