@@ -26,13 +26,17 @@
 /* Card Renderer Header */
 /* We need the wrapper to mask the border of the content when scrolling */
 .card-renderer-isolated--header--wrapper {
-  background-color: var(--ch-deep-background);
+  background-color: var(--ch-default);
   position: sticky;
   top: 80px;
   z-index: 5;
 }
 
-.card-renderer-isolated.view .card-renderer-isolated--header--wrapper {
+.card-renderer-isolated.schema .card-renderer-isolated--header--wrapper {
+  background: var(--ch-deep-background);
+}
+
+.card-renderer-isolated.view.themer .card-renderer-isolated--header--wrapper {
   background: var(--ch-dark-background);
 }
 
@@ -92,6 +96,7 @@
   border-radius: 0 0 10px 10px;
   overflow: hidden;
   min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
+  background: var(--ch-light);
 
   transition: background-color var(--ch-transition-time),
   border-color var(--ch-transition-time);
@@ -106,10 +111,6 @@
 .card-renderer-isolated.edit .card-renderer-isolated--card-container {
   background-color: var(--ch-light);
   padding: 30px;
-}
-
-.card-renderer-isolated.view .card-renderer-isolated--card-container {
-  background: var(--ch-light);
 }
 
 

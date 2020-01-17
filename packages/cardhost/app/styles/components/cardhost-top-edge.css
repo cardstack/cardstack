@@ -21,6 +21,10 @@
   background-color: var(--ch-deep-background);
 }
 
+.cardhost-top-edge.themer {
+  background-color: var(--ch-dark-background);
+}
+
 .view-selector {
   width: 300px;
   display: flex;
