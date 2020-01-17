@@ -68,7 +68,7 @@ export async function createCards(args) {
     await click('[data-test-card-save-btn]');
     await waitFor(`[data-test-card-schema="${id}"]`, { timeout });
 
-    await visit(`/cards/${id}/edit`);
+    await visit(`/cards/${id}/edit/fields`);
     for (let [name, , , value] of args[id]) {
       if (value == null) {
         continue;

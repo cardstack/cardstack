@@ -43,7 +43,7 @@ module('Acceptance | card create', function(hooks) {
 
     await saveCard('creator');
 
-    assert.ok(currentURL().match(/\/cards\/new-card-[0-9]+\/schema/));
+    assert.ok(currentURL().match(/\/cards\/new-card-[0-9]+\/edit\/fields\/schema/));
   });
 
   test('card element is selected on initial render', async function(assert) {
@@ -100,7 +100,7 @@ module('Acceptance | card create', function(hooks) {
     });
 
     assert.equal(currentURL(), `/cards/${card1Id}`);
-    await visit(`/cards/${card1Id}/schema`);
+    await visit(`/cards/${card1Id}/edit/fields/schema`);
     await showCardId(true);
     assert.dom('.card-renderer-isolated--header').hasText('millenial-puppies');
     assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
@@ -217,17 +217,17 @@ module('Acceptance | card create', function(hooks) {
 
     await saveCard('creator', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/schema`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields/schema`);
 
     await visit(`/cards/${card1Id}`);
     assert.dom('[data-test-field="subtitle"] [data-test-string-field-viewer-label]').hasText('Subtitle');
     assert.dom('[data-test-field="title"]').doesNotExist();
 
-    await visit(`/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
     assert.dom('[data-test-field="subtitle"] [data-test-cs-component-label="text-field"]').hasText('Subtitle');
     assert.dom('[data-test-field="title"]').doesNotExist();
 
-    await visit(`/cards/${card1Id}/schema`);
+    await visit(`/cards/${card1Id}/edit/fields/schema`);
     assert.dom('[data-test-field="subtitle"] [data-test-field-renderer-label]').hasText('Subtitle');
     await click('[data-test-field="subtitle"]');
 
