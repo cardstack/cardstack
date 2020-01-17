@@ -68,11 +68,6 @@ Until that work is done we are statically adding this css
   --ch-card-padding-animate: padding-right 0.3s ease;
 }
 
-/*
-  TODO:
-  - better positioning for edges (esp on/off state)
-  - link and button focus and disabled states styling
-*/
 * {
   box-sizing: border-box;
 }
@@ -110,7 +105,21 @@ a:hover {
   cursor: pointer;
 }
 
-/* Other */
+/* Ember Animated */
+.animated-tools {
+  z-index: 20;
+}
+
+/* JSON card document -- hidden from view */
+.cardhost-card-document {
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+}
+
+
+/* Other: */
+/* TODO: Refactor these to where they belong  */
 .card-renderer--top-edge-buttons {
   position: fixed;
   top: var(--ch-spacing);
@@ -167,17 +176,6 @@ a:hover {
   text-align: right;
 }
 
-
-/* JSON card document */
-.cardhost-card-document {
-  visibility: hidden;
-  height: 0;
-  overflow: hidden;
-}
-
-.animated-tools {
-  z-index: 20;
-}
 
 /* TODO: Move to ui-components repo */
 .cs-dark-input.cs-input:disabled,
