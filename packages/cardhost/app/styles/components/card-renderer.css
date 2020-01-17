@@ -36,7 +36,7 @@
   background: var(--ch-deep-background);
 }
 
-.card-renderer-isolated.view.themer .card-renderer-isolated--header--wrapper {
+.card-renderer-isolated.themer .card-renderer-isolated--header--wrapper {
   background: var(--ch-dark-background);
 }
 
