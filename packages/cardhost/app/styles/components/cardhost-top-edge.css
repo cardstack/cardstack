@@ -58,18 +58,6 @@
   margin-right: 15px;
 }
 
-.login-btn,
-.logout-btn {
-  position: absolute;
-  z-index: var(--ch-edges-z-index);
-  left: calc(var(--ch-left-edge-navbar-width) + var(--ch-spacing));
-}
-
-.logout-btn {
-  min-width: 85px;
-  height: 40px;
-}
-
 @media (max-width: 1440px) {
   .cardhost-top-edge.view,
   .cardhost-top-edge.edit {

@@ -33,14 +33,17 @@ module('Acceptance | logged-out', function(hooks) {
     });
     await visit(`/cards/${card1Id}`);
     assert.equal(currentURL(), `/cards/${card1Id}`);
-    await click('#logout-button');
+    await click('[data-test-toggle-left-edge]');
+    await click('[data-test-logout-button]');
+    await click('[data-test-toggle-left-edge]');
     assert.equal(currentURL(), `/cards/${card1Id}`);
 
     assert.dom('[data-test-card-edit-link]').doesNotExist();
     assert.dom('[data-test-card-save-btn]').doesNotExist();
     assert.dom('[data-test-right-edge]').doesNotExist();
     await percySnapshot(assert);
-    await click('#login-button');
+    await click('[data-test-toggle-left-edge]');
+    await click('[data-test-login-button]');
     await waitFor('[data-test-card-edit-link]');
     assert.dom('[data-test-card-edit-link]').exists();
     assert.dom('[data-test-card-save-btn]').exists();
@@ -54,7 +57,8 @@ module('Acceptance | logged-out', function(hooks) {
     });
     await visit(`/cards/${card1Id}/edit/fields`);
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
-    await click('#logout-button');
+    await click('[data-test-toggle-left-edge]');
+    await click('[data-test-logout-button]');
     await visit(`/cards/${card1Id}/edit/fields`);
     assert.equal(currentURL(), `/cards/${card1Id}`);
   });
@@ -66,7 +70,8 @@ module('Acceptance | logged-out', function(hooks) {
     });
     await visit(`/cards/${card1Id}/edit/fields/schema`);
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields/schema`);
-    await click('#logout-button');
+    await click('[data-test-toggle-left-edge]');
+    await click('[data-test-logout-button]');
     await visit(`/cards/${card1Id}/edit/fields/schema`);
     assert.equal(currentURL(), `/cards/${card1Id}`);
   });
