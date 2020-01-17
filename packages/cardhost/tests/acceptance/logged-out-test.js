@@ -35,6 +35,7 @@ module('Acceptance | logged-out', function(hooks) {
     assert.equal(currentURL(), `/cards/${card1Id}`);
     await click('[data-test-toggle-left-edge]');
     await click('[data-test-logout-button]');
+    await click('[data-test-toggle-left-edge]');
     assert.equal(currentURL(), `/cards/${card1Id}`);
 
     assert.dom('[data-test-card-edit-link]').doesNotExist();
