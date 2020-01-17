@@ -5,6 +5,7 @@ export default class CardsController extends Controller {
   @service cssModeToggle;
   @service cardstackSession;
   @service router;
+  @service routeInfo;
 
   get themerClasses() {
     if (this.onThemerRoute && this.cssModeToggle.isResponsive) {

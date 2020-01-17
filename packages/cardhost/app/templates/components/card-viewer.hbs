@@ -1,0 +1,50 @@
+<section class="card-view" data-test-card-view={{@card.name}}>
+  <CardRenderer
+    @card={{@card}}
+    @mode={{@mode}}
+    @format="isolated"
+    @cardSelected={{true}}
+  />
+</section>
+
+{{#if this.cardstackSession.isAuthenticated}}
+  <RightEdge
+    @card={{@card}}
+    @cardSelected={{true}} {{!-- Change this when we want to display different right-edge options --}}
+  >
+    <div class="right-edge--section" data-test-appearance-section>
+      <div class="right-edge--section-header" data-test-section-header>
+        Appearance
+      </div>
+      <div class="right-edge--items-container">
+        <div class="right-edge--item">
+          <div class="right-edge--theme-dropdown-container">
+            <Dropdown
+              @theme="cs-dark"
+              @searchEnabled={{false}}
+              @label="Choose a theme:"
+              @options={{this.themerOptions}}
+              @selected={{this.selectedTheme}}
+              @setValue={{this.handleThemeChange}}
+            />
+          </div>
+          <Cta {{on "click" this.createTheme}}
+            @label="New Custom Style"
+            @variant="secondary responsive"
+            @theme="cs-dark"
+            data-test-card-custom-style-button />
+        </div>
+      </div>
+    </div>
+  </RightEdge>
+{{/if}}
+
+<style data-test-view-css>
+  {{scope-css @card.isolatedCss @card.name}}
+</style>
+
+{{!-- This is hidden, used in tests --}}
+<section class="cardhost-card-document">
+  <h3>Card Document</h3>
+  <code data-test-card-json>{{this.cardJson}}</code>
+</section>
