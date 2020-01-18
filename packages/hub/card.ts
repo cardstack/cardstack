@@ -75,24 +75,24 @@ export class Card {
   modules = inject('modules');
 
   // This is the realm the card is stored in.
-  csRealm: string;
+  readonly csRealm: string;
 
   // this is the realm the card was first created in. As a card is copied to
   // other realms, `card.csRealm` changes but `card.csOriginalRealm` does not.
-  csOriginalRealm: string;
+  readonly csOriginalRealm: string;
 
   // the csId distinguishes the card within its originalRealm. In some cases
   // it may be chosen by the person creating the card. In others it may be
   // chosen by the hub.
-  csId: string | undefined;
+  csId: string | undefined; // TODO make readonly
 
-  csFiles: CardFiles | undefined;
-  csPeerDependencies: PeerDependencies | undefined;
+  readonly csFiles: CardFiles | undefined;
+  readonly csPeerDependencies: PeerDependencies | undefined;
 
   readonly csFieldSets: OcclusionFieldSets | undefined;
 
-  private rawFields: { [name: string]: any } | undefined;
-  private features: { [name: string]: string | [string, string] } | undefined;
+  private readonly csFields: { [name: string]: any } | undefined;
+  private readonly csFeatures: { [name: string]: string | [string, string] } | undefined;
 
   // if this card is stored inside another, this is the other
   readonly enclosingCard: Card | undefined;
@@ -126,8 +126,8 @@ export class Card {
     this.relationships = jsonapi.data.relationships;
     this.meta = jsonapi.data.meta;
 
-    this.csRealm = realm;
     this.enclosingCard = enclosingCard;
+    this.csRealm = realm;
     this.csOriginalRealm =
       typeof jsonapi.data.attributes?.csOriginalRealm === 'string' ? jsonapi.data.attributes.csOriginalRealm : realm;
 
@@ -135,12 +135,12 @@ export class Card {
       this.csId = jsonapi.data.attributes?.csId;
     }
 
-    let fields = jsonapi.data.attributes?.csFields;
-    if (fields) {
-      if (!isPlainObject(fields)) {
+    let csFields = jsonapi.data.attributes?.csFields;
+    if (csFields) {
+      if (!isPlainObject(csFields)) {
         throw new CardstackError(`csFields must be an object`);
       }
-      this.rawFields = fields as J.Object;
+      this.csFields = csFields as J.Object;
     }
 
     let csFiles = jsonapi.data.attributes?.csFiles;
@@ -155,10 +155,10 @@ export class Card {
       this.csPeerDependencies = csPeerDependencies;
     }
 
-    let features = jsonapi.data.attributes?.csFeatures;
-    if (features) {
-      assertFeatures(features);
-      this.features = features;
+    let csFeatures = jsonapi.data.attributes?.csFeatures;
+    if (csFeatures) {
+      assertFeatures(csFeatures);
+      this.csFeatures = csFeatures;
     }
 
     if (jsonapi.data.attributes?.csAdoptsFrom) {
@@ -181,10 +181,10 @@ export class Card {
       }
     }
 
-    let rules = jsonapi.data.attributes?.csFieldSets;
-    if (rules) {
-      assertOcclusionFieldSets(rules, `csFieldSets`);
-      this.csFieldSets = rules;
+    let csFieldSets = jsonapi.data.attributes?.csFieldSets;
+    if (csFieldSets) {
+      assertOcclusionFieldSets(csFieldSets, `csFieldSets`);
+      this.csFieldSets = csFieldSets;
     }
   }
 
@@ -294,9 +294,9 @@ export class Card {
 
   @Memoize()
   async field(name: string): Promise<FieldCard> {
-    if (this.rawFields) {
-      if (name in this.rawFields) {
-        return await getOwner(this).instantiate(FieldCard, this.rawFields[name], name, this, this.service);
+    if (this.csFields) {
+      if (name in this.csFields) {
+        return await getOwner(this).instantiate(FieldCard, this.csFields[name], name, this, this.service);
       }
     }
     let parent = await this.adoptsFrom();
@@ -357,8 +357,12 @@ export class Card {
       data.attributes.csId = this.csId;
     }
 
-    if (this.rawFields) {
-      data.attributes.csFields = this.rawFields;
+    if (this.csFields) {
+      data.attributes.csFields = this.csFields;
+    }
+
+    if (this.csFeatures) {
+      data.attributes.csFeatures = this.csFeatures;
     }
 
     if (this.csFiles) {
@@ -600,8 +604,8 @@ export class Card {
   async loadFeature(featureName: any): Promise<any> {
     let card: Card | undefined = this;
     while (card) {
-      if (card.features && featureName in card.features) {
-        let location = card.features[featureName];
+      if (card.csFeatures && featureName in card.csFeatures) {
+        let location = card.csFeatures[featureName];
         if (typeof location === 'string') {
           return await this.modules.load(card, location);
         } else {
@@ -762,12 +766,15 @@ export class AddressableCard extends Card implements CardId {
     if (typeof actualRealm !== 'string') {
       throw new CardstackError(`card missing required attribute "csRealm": ${JSON.stringify(jsonapi)}`);
     }
-    super(jsonapi, actualRealm, undefined, service);
-
     if (identity != null) {
-      this.csOriginalRealm = identity.csOriginalRealm ?? identity?.csRealm;
-      this.csId = identity.csId;
+      if (jsonapi.data.attributes == null) {
+        jsonapi.data.attributes = Object.create(null);
+      }
+      jsonapi.data.attributes!.csOriginalRealm = identity.csOriginalRealm ?? identity?.csRealm;
+      jsonapi.data.attributes!.csId = identity.csId;
     }
+
+    super(jsonapi, actualRealm, undefined, service);
 
     if ((this as any).csId == null) {
       throw new Error(`Bug: tried to use an UnsavedCard as a Card`);
@@ -827,7 +834,7 @@ function assertPeerDependencies(deps: any): asserts deps is PeerDependencies {
   }
 }
 
-function assertFeatures(features: any): asserts features is Card['features'] {
+function assertFeatures(features: any): asserts features is Card['csFeatures'] {
   if (!isPlainObject(features)) {
     throw new Error(`csFeatures must be an object`);
   }
