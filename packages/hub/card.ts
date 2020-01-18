@@ -88,18 +88,16 @@ export class Card {
 
   readonly csFiles: CardFiles | undefined;
   readonly csPeerDependencies: PeerDependencies | undefined;
-
   readonly csFieldSets: OcclusionFieldSets | undefined;
-
   private readonly csFields: { [name: string]: any } | undefined;
   private readonly csFeatures: { [name: string]: string | [string, string] } | undefined;
 
   // if this card is stored inside another, this is the other
   readonly enclosingCard: Card | undefined;
 
-  private attributes: SingleResourceDoc['data']['attributes'];
-  private relationships: SingleResourceDoc['data']['relationships'];
-  private meta: SingleResourceDoc['data']['meta'];
+  private readonly attributes: SingleResourceDoc['data']['attributes'];
+  private readonly relationships: SingleResourceDoc['data']['relationships'];
+  private readonly meta: SingleResourceDoc['data']['meta'];
 
   // Identity invariants:
   //
