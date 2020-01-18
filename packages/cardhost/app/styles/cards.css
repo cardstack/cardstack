@@ -19,7 +19,7 @@
 }
 
 .cardhost-cards.view {
-  padding-left: var(--ch-left-edge-navbar-width);
+  background-color: var(--ch-light-gray);
 }
 
 .cardhost-cards.schema {
@@ -44,9 +44,12 @@
 .card-editor {
   display: grid;
   align-items: flex-start;
-  justify-items: center;
   height: 100%;
   padding: 0 20px;
+}
+
+.card-view {
+  padding-top: 100px;
 }
 
 

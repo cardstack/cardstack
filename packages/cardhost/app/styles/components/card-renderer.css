@@ -9,10 +9,15 @@
   letter-spacing: 0.015em;
 }
 
+.card-renderer-isolated.view,
 .card-renderer-isolated.schema,
 .card-renderer-isolated.edit {
   max-width: var(--card-renderer-width);
   min-height: var(--card-renderer-height);
+}
+.card-renderer-isolated.view {
+  box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.4);
+  padding-top: 50px;
 }
 
 /* Resetting styles so that view mode styling does not affect other modes */
@@ -38,6 +43,10 @@
 
 .card-renderer-isolated.themer .card-renderer-isolated--header--wrapper {
   background: var(--ch-dark-background);
+}
+
+.card-renderer-isolated.view .card-renderer-isolated--header--wrapper {
+  background-color: var(--ch-light-gray);
 }
 
 .card-renderer-isolated--header {
@@ -87,6 +96,7 @@
   overflow-y: auto;
 
   transition: var(--ch-card-background-color-animate);
+  z-index: 10;
 }
 
 .card-renderer-isolated.schema .card-renderer-isolated--content {
@@ -127,7 +137,8 @@
   outline: 0;
 }
 
-.card-renderer-isolated.selected .card-renderer-isolated--header {
+.card-renderer-isolated.selected .card-renderer-isolated--header,
+.card-renderer-isolated.view .card-renderer-isolated--header {
   background-color: var(--ch-highlight);
   border-color: var(--ch-highlight);
   color: var(--ch-dark);
@@ -141,6 +152,17 @@
   border-color: var(--ch-highlight);
 }
 
+.card-renderer-isolated.view .card-renderer-isolated--header--wrapper {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  right: 0;
+  bottom: 100px;
+}
+
+.card-renderer-isolated.view .card-renderer-isolated--header--wrapper.selected {
+  top: 0;
+}
 
 
 /* TODO: fade card if field-renderer is selected */

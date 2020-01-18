@@ -4,11 +4,14 @@ import { A } from '@ember/array';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
+import { printSprites } from 'ember-animated';
+import move from 'ember-animated/motions/move';
 
 // TODO we'll need to use EC in order to be able to isolate cards
 // (due to the need to await the load of the isolated format of a card)
 // import { task } from "ember-concurrency";
 
+const duration = 250;
 // TODO This will be part of the official API. Move this into core as it solidifies
 export default class CardRenderer extends Component {
   @service cardstackSession;
@@ -17,6 +20,8 @@ export default class CardRenderer extends Component {
   @tracked mode;
   @tracked cardFocused = () => {};
   @tracked fields = A([]);
+
+  duration = duration;
 
   constructor(...args) {
     super(...args);
@@ -74,5 +79,12 @@ export default class CardRenderer extends Component {
 
   get isolatedComponentName() {
     return `cards/${dasherize(this.sanitizedName)}/isolated`;
+  }
+
+  *headerAnimation({ keptSprites }) {
+    printSprites(arguments[0], 'header animation');
+    keptSprites.forEach(sprite => {
+      move(sprite, { duration });
+    });
   }
 }
