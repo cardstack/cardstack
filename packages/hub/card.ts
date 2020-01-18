@@ -1,7 +1,7 @@
 import CardstackError from './error';
 import { WriterFactory } from './writer';
 import { PristineDocument, UpstreamDocument, UpstreamIdentity, PristineCollection } from './document';
-import { SingleResourceDoc, RelationshipObject, ResourceObject } from 'jsonapi-typescript';
+import { SingleResourceDoc, RelationshipObject, ResourceObject, ResourceIdentifierObject } from 'jsonapi-typescript';
 import cloneDeep from 'lodash/cloneDeep';
 import isPlainObject from 'lodash/isPlainObject';
 import mergeWith from 'lodash/mergeWith';
@@ -19,6 +19,8 @@ import {
   InnerOcclusionRules,
   assertOcclusionFieldSets,
   OcclusionRulesOrDefaults,
+  Format,
+  IncludedResourceOcclusionRules,
 } from './occlusion-rules';
 
 export const apiPrefix = '/api';
@@ -318,7 +320,7 @@ export class Card {
   }
 
   @Memoize()
-  private fieldSet(format: string): Map<string, InnerOcclusionRules | true> {
+  private fieldSet(format: Format): Map<string, InnerOcclusionRules | true> {
     let fieldSet: Map<string, InnerOcclusionRules | true> = new Map();
     if (this.csFieldSets?.[format]) {
       for (let fieldRule of this.csFieldSets[format]) {
@@ -334,7 +336,7 @@ export class Card {
 
   private async serialize(
     rules: OcclusionRulesOrDefaults,
-    included: Map<string, OcclusionRules[]>
+    included: Map<string, IncludedResourceOcclusionRules>
   ): Promise<ResourceObject> {
     let data = Object.create(null);
     data.type = 'cards';
@@ -377,6 +379,51 @@ export class Card {
       data.relationships = cloneDeep(this.relationships);
     }
 
+    // how to handle situation where the upstream doc provided to the Card
+    // constuctor had included? is it our responsibility to mirror any supplied
+    // included resources to the Card constuctor in the asUpstream() response?
+    if (rules !== 'upstream') {
+      for (let field of Object.keys(data.relationships)) {
+        let relationship: ResourceIdentifierObject | ResourceIdentifierObject[] = data.relationships[field].data;
+        if (!relationship) {
+          continue;
+        }
+        let relationshipRules: IncludedResourceOcclusionRules | undefined;
+        if (rules === 'everything') {
+          relationshipRules = 'everything';
+        }
+        if (rules !== 'everything') {
+          if (rules.includeFields) {
+            let interiorRules = rules.includeFields.filter(
+              i => typeof i !== 'string' && i.name === field
+            ) as InnerOcclusionRules[];
+            relationshipRules = interiorRules.length
+              ? interiorRules
+              : rules.includeFields.includes(field)
+              ? /* in this scenario you have specified you want this field via the
+              string field name, but you have not asked for any interior card
+              fields to be included */
+                []
+              : undefined;
+          }
+          if (rules.includeFieldSet) {
+            // use the embedded fieldset's fields for included resources when we
+            // are using a fieldset based rule--look at this.fieldSet()
+          }
+        }
+
+        if (relationshipRules) {
+          if (Array.isArray(relationship)) {
+            for (let ref of relationship) {
+              included.set(ref.id, relationshipRules);
+            }
+          } else if (relationship) {
+            included.set(relationship.id, relationshipRules);
+          }
+        }
+      }
+    }
+
     if (this.meta) {
       data.meta = this.meta;
     }
@@ -384,10 +431,10 @@ export class Card {
     return data;
   }
 
-  private async serializeIncluded(included: Map<string, OcclusionRules[]>): Promise<ResourceObject[]> {
+  private async serializeIncluded(included: Map<string, IncludedResourceOcclusionRules>): Promise<ResourceObject[]> {
     let resources: ResourceObject[] = [];
     while (true) {
-      let foundMoreIncluded = new Map();
+      let foundMoreIncluded = new Map<string, IncludedResourceOcclusionRules>();
       await Promise.all(
         [...included].map(async ([canonicalURL, rulesArray]) => {
           let card = await this.service.get(canonicalURL);
@@ -402,16 +449,24 @@ export class Card {
     }
   }
 
+  // we might wanna think about getting rid of the PristineDocument Type and just use this instead...
+  async serializeAsJsonAPIDoc(rules: OcclusionRulesOrDefaults): Promise<SingleResourceDoc> {
+    let includedMap = new Map<string, IncludedResourceOcclusionRules>();
+    let data = await this.serialize(rules, includedMap);
+    let jsonapi: SingleResourceDoc = { data };
+    let included = await this.serializeIncluded(includedMap);
+    if (included.length) {
+      jsonapi.included = included;
+    }
+    return jsonapi;
+  }
+
   async asUpstreamDoc(): Promise<UpstreamDocument> {
-    let included = new Map();
-    let data = await this.serialize('upstream', included);
-    return new UpstreamDocument({ data, included: await this.serializeIncluded(included) });
+    return new UpstreamDocument(await this.serializeAsJsonAPIDoc('upstream'));
   }
 
   async asPristineDoc(rules: OcclusionRulesOrDefaults = 'everything'): Promise<PristineDocument> {
-    let included = new Map();
-    let data = await this.serialize(rules, included);
-    return new PristineDocument({ data, included: await this.serializeIncluded(included) });
+    return new PristineDocument(await this.serializeAsJsonAPIDoc(rules));
   }
 
   async asSearchDoc(visitedCards: string[] = []): Promise<J.Object> {
@@ -793,12 +848,16 @@ function relationshipToCardId(ref: RelationshipObject): CardId | CardId[] | unde
   }
 }
 
-function mergeRules(rulesArray: OcclusionRules[]): OcclusionRules {
-  if (rulesArray.length === 0) {
+function mergeRules(rules: IncludedResourceOcclusionRules): OcclusionRulesOrDefaults {
+  if (rules === 'everything') {
+    return 'everything';
+  }
+
+  if (rules.length === 0) {
     throw new Error(`bug: this should never happen`);
   }
-  if (rulesArray.length === 1) {
-    return rulesArray[0];
+  if (rules.length === 1) {
+    return rules[0];
   }
   throw new Error(`unimplemented: mergeRules`);
 }

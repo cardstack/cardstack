@@ -36,7 +36,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can patch a card"]
+      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can include a primitive field when getting the pristine doc"]
     },
     {
       "type": "node",

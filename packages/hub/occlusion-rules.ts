@@ -1,15 +1,17 @@
-import isPlainObject = require('lodash/isPlainObject');
+import isPlainObject from 'lodash/isPlainObject';
 import CardstackError from './error';
 
 export interface OcclusionRules {
   includeFields?: (string | InnerOcclusionRules)[];
-  includeFieldSet?: string;
+  includeFieldSet?: Format;
 }
-
+export type Format = keyof OcclusionFieldSets;
 export type OcclusionRulesOrDefaults = OcclusionRules | 'everything' | 'upstream';
+export type IncludedResourceOcclusionRules = InnerOcclusionRules[] | 'everything';
 
 export interface OcclusionFieldSets {
-  [format: string]: (string | InnerOcclusionRules)[];
+  isolated: (string | InnerOcclusionRules)[];
+  embedded: (string | InnerOcclusionRules)[];
 }
 
 export interface InnerOcclusionRules extends OcclusionRules {

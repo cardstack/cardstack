@@ -1,4 +1,4 @@
-import { SingleResourceDoc } from 'jsonapi-typescript';
+import { SingleResourceDoc, AttributesObject, RelationshipObject } from 'jsonapi-typescript';
 import { CardId, canonicalURL, cardstackFieldPattern, FieldCard } from '../card';
 import { UpstreamDocument } from '../document';
 import { CARDSTACK_PUBLIC_REALM } from '../realm';
@@ -35,6 +35,7 @@ export class TestCard {
           case 'csFiles':
           case 'csFieldArity':
           case 'csPeerDependencies':
+          case 'csFieldSets':
             this.csFieldValues.set(field, value);
             break;
           default:
@@ -185,7 +186,7 @@ export class TestCard {
 
     if (this.parent) {
       doc.data.relationships.csAdoptsFrom = {
-        links: { related: canonicalURL(this.parent) },
+        data: { type: 'cards', id: canonicalURL(this.parent) },
       };
     }
 
@@ -198,6 +199,18 @@ export class TestCard {
     doc.data.attributes.csFields = csFields;
 
     return doc;
+  }
+
+  get asCardValue(): { attributes?: AttributesObject; relationships?: { [field: string]: RelationshipObject } } {
+    let cardValue: this['asCardValue'] = {};
+    let { attributes, relationships } = this.jsonapi.data;
+    if (attributes) {
+      cardValue.attributes = attributes;
+    }
+    if (relationships) {
+      cardValue.relationships = relationships;
+    }
+    return cardValue;
   }
 
   get upstreamDoc(): UpstreamDocument {

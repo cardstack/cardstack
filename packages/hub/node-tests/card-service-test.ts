@@ -1,10 +1,10 @@
-import { createTestEnv, TestEnv } from './helpers';
-import { Session } from '../session';
-import { myOrigin } from '../origin';
-import { testCard } from './test-card';
-import { ScopedCardService } from '../cards-service';
 import { AddressableCard, canonicalURL } from '../card';
+import { ScopedCardService } from '../cards-service';
+import { myOrigin } from '../origin';
 import { CARDSTACK_PUBLIC_REALM } from '../realm';
+import { Session } from '../session';
+import { createTestEnv, TestEnv } from './helpers';
+import { testCard } from './test-card';
 
 describe('hub/card-service', function() {
   describe('read-write', function() {
@@ -468,7 +468,7 @@ describe('hub/card-service', function() {
                 city: 'Barkyville',
                 state: 'MA',
                 zip: '01234',
-              }).jsonapi.data, // not specifying adoptingFrom(), since that is inferred from the field definition
+              }).asCardValue, // not specifying adoptingFrom(), since that is inferred from the field definition
             })
             .adoptingFrom(userCard).jsonapi
         );
@@ -785,10 +785,10 @@ describe('hub/card-service', function() {
 
         let searchDoc = await user1.asSearchDoc();
         let friendField = `${friendCard.canonicalURL}/friend`;
-        expect(searchDoc).to.have.deep.property(`csId`, user1.csId);
-        expect(searchDoc).to.have.deep.property(`${friendField}.csId`, user3.csId);
-        expect(searchDoc).to.have.deep.property(`${friendField}.${friendField}.csId`, user2.csId);
-        expect(searchDoc).to.not.have.deep.property(`${friendField}.${friendField}.${friendField}`);
+        expect(searchDoc).to.have.nested.property(`csId`, user1.csId);
+        expect(searchDoc).to.have.nested.property(`${friendField}.csId`, user3.csId);
+        expect(searchDoc).to.have.nested.property(`${friendField}.${friendField}.csId`, user2.csId);
+        expect(searchDoc).to.not.have.nested.property(`${friendField}.${friendField}.${friendField}`);
       });
     });
   });
@@ -1494,6 +1494,218 @@ describe('hub/card-service', function() {
         let ids = results.cards.map(i => i.canonicalURL);
         expect(ids).to.eql([vanGogh.canonicalURL, ringo.canonicalURL, mango.canonicalURL]);
       });
+    });
+
+    describe('occlusion tests', function() {
+      let env: TestEnv;
+      let service: ScopedCardService;
+      let toyCard: AddressableCard,
+        puppyCard: AddressableCard,
+        dalmatianCard: AddressableCard,
+        ownerCard: AddressableCard,
+        daddy: AddressableCard,
+        mango: AddressableCard,
+        vanGogh: AddressableCard,
+        squeakySnake: AddressableCard;
+
+      before(async function() {
+        env = await createTestEnv();
+        service = (await env.container.lookup('cards')).as(Session.EVERYONE);
+
+        toyCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard().withField('description', 'string-field').jsonapi
+        );
+
+        puppyCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('name', 'string-field')
+            .withField('favoriteToy', toyCard).jsonapi
+        );
+
+        dalmatianCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard().adoptingFrom(puppyCard).jsonapi
+        );
+
+        ownerCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('name', 'string-field')
+            .withField('puppies', puppyCard, 'plural').jsonapi
+        );
+
+        squeakySnake = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              description: 'a plush snake with squeaky segments',
+            })
+            .adoptingFrom(toyCard).jsonapi
+        );
+
+        vanGogh = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Van Gogh',
+              favoriteToy: testCard()
+                .withAttributes({
+                  description: 'a beef bone',
+                })
+                .adoptingFrom(toyCard).asCardValue,
+            })
+            .adoptingFrom(dalmatianCard).jsonapi
+        );
+
+        mango = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Mango',
+            })
+            .withRelationships({ favoriteToy: squeakySnake })
+            .adoptingFrom(dalmatianCard).jsonapi
+        );
+
+        daddy = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Hassan',
+            })
+            .withRelationships({ puppies: [vanGogh, mango] })
+            .adoptingFrom(ownerCard).jsonapi
+        );
+      });
+
+      after(async function() {
+        await env.destroy();
+      });
+
+      it('omits included cards when getting the upstream doc', async function() {
+        let { jsonapi: doc } = await daddy.asUpstreamDoc();
+        expect(doc).to.have.nested.property('data.type', 'cards');
+        expect(doc).to.have.nested.property('data.id', daddy.canonicalURL);
+        expect(doc).to.have.nested.property('data.attributes.name', 'Hassan');
+        expect(doc).to.have.deep.nested.property('data.relationships.puppies.data', [
+          { type: 'cards', id: vanGogh.canonicalURL },
+          { type: 'cards', id: mango.canonicalURL },
+        ]);
+        expect(doc).to.not.have.property('included');
+      });
+
+      it('recursively includes all resources and fields when getting the pristine doc if no rules are provided', async function() {
+        let { jsonapi: doc } = await daddy.asPristineDoc();
+
+        expect(doc).to.have.nested.property('data.type', 'cards');
+        expect(doc).to.have.nested.property('data.id', daddy.canonicalURL);
+        expect(doc).to.have.nested.property('data.attributes.name', 'Hassan');
+        expect(doc).to.have.deep.nested.property('data.relationships.puppies.data', [
+          { type: 'cards', id: vanGogh.canonicalURL },
+          { type: 'cards', id: mango.canonicalURL },
+        ]);
+        let { included } = doc;
+
+        expect(included?.length).to.equal(7);
+        let includedIds = included?.map(i => i.id);
+        expect(includedIds).to.have.members([
+          // Note that all relationships are traversed including csField
+          // relationships like csAdoptsFrom. These are the system field
+          // relationships:
+          toyCard.canonicalURL,
+          puppyCard.canonicalURL,
+          dalmatianCard.canonicalURL,
+          ownerCard.canonicalURL,
+
+          // user field relationships:
+          squeakySnake.canonicalURL,
+          vanGogh.canonicalURL,
+          mango.canonicalURL,
+        ]);
+
+        let includedSqueakySnake = included?.find(i => i.id === squeakySnake.canonicalURL);
+        expect(includedSqueakySnake).to.have.nested.property(
+          'attributes.description',
+          'a plush snake with squeaky segments'
+        );
+
+        let includedVanGogh = included?.find(i => i.id === vanGogh.canonicalURL);
+        expect(includedVanGogh).to.have.nested.property('attributes.name', 'Van Gogh');
+        expect(includedVanGogh).to.have.nested.property('attributes.favoriteToy.attributes.description', 'a beef bone');
+        expect(includedVanGogh).to.have.deep.nested.property('attributes.favoriteToy.relationships.csAdoptsFrom.data', {
+          type: 'cards',
+          id: toyCard.canonicalURL,
+        });
+
+        let includedMango = included?.find(i => i.id === mango.canonicalURL);
+        expect(includedMango).to.have.nested.property('attributes.name', 'Mango');
+        expect(includedMango).to.have.deep.nested.property('relationships.favoriteToy.data', {
+          type: 'cards',
+          id: squeakySnake.canonicalURL,
+        });
+      });
+
+      it.skip('can include a primitive field when getting the pristine doc', async function() {
+        let { jsonapi: doc } = await vanGogh.asPristineDoc({ includeFields: ['name'] });
+        expect(doc).to.have.nested.property('data.attributes.name', 'Van Gogh');
+        expect(doc).to.not.have.nested.property('data.attributes.favoriteToy');
+        expect(doc).to.not.have.property('included');
+      });
+
+      it.skip('can occlude all user fields when an empty rule "{}" is specified', async function() {
+        let { jsonapi: doc } = await daddy.asPristineDoc({ includeFields: [] });
+        expect(doc).to.have.nested.property('data.type', 'cards');
+        expect(doc).to.have.nested.property('data.id', daddy.canonicalURL);
+        expect(doc).to.not.have.nested.property('data.attributes.name');
+        expect(doc).to.not.have.nested.property('data.relationships.puppies');
+        expect(doc).to.not.have.property('included');
+      });
+
+      it.skip('does not occlude system fields as part of evaluating the occusion rules', async function() {});
+
+      // we will never omit the csAdoptsFrom in a card's relationships property
+      // (see test above), but we can include a rule to include the adoptsFrom
+      // resource in the resulting document.
+      it.skip('can include a csAdoptsFrom reference', async function() {
+        let { jsonapi: doc } = await vanGogh.asPristineDoc({ includeFields: ['csAdoptsFrom'] });
+        expect(doc).to.have.nested.property('data.attributes.name', 'Van Gogh');
+        expect(doc).to.not.have.nested.property('data.attributes.favoriteToy');
+        expect(doc.included?.length).to.equal(1);
+        expect(doc.included?.[0].id).to.equal(dalmatianCard.canonicalURL);
+      });
+
+      it.skip('can include a field filled by card-as-value when getting the pristine doc', async function() {});
+
+      it.skip('can include a field filled by card-as-reference when getting the pristine doc', async function() {});
+
+      it.skip('can include an interior card-as-value field when getting the pristine doc', async function() {});
+
+      it.skip('can include a card-as-reference with no user fields (no InnerOcclusionRules specified for relationship) when getting the pristine doc', async function() {});
+
+      it.skip('can include an interior card-as-reference field when getting the pristine doc', async function() {});
+
+      it.skip('can include a deeply nested field filled by card-as-reference when getting the pristine doc', async function() {});
+
+      it.skip('can include a deeply nested field filled by card-as-value when getting the pristine doc', async function() {});
+
+      // test occlusion through a arity > 1 field?
+
+      it.skip('can handle a cycle within in the included cards', async function() {});
+
+      // (also make sure the primary card doesn't appear as an item in the included cards)
+      it.skip('can handle a cycle between the primary resource and an included card', async function() {});
+
+      it.skip('can handle a primary card that is related to itself', async function() {});
+
+      it.skip('can include fields based on csFieldSets in a card', async function() {});
+
+      it.skip('can include fields based on csFieldSets in a card and specified include fields', async function() {});
+
+      it.skip('can include fields based on inheritied csFieldSets from a parent card', async function() {});
+
+      it.skip('can include fields based on csFieldSets that overrides inherited csFieldSets from a parent card', async function() {});
     });
   });
 });
