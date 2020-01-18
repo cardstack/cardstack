@@ -1,10 +1,11 @@
 import CardstackError from './error';
 import { WriterFactory } from './writer';
 import { PristineDocument, UpstreamDocument, UpstreamIdentity, PristineCollection } from './document';
-import { SingleResourceDoc, RelationshipObject, ResourceObject, ResourceIdentifierObject } from 'jsonapi-typescript';
+import { SingleResourceDoc, RelationshipObject, ResourceObject } from 'jsonapi-typescript';
 import cloneDeep from 'lodash/cloneDeep';
 import isPlainObject from 'lodash/isPlainObject';
 import mergeWith from 'lodash/mergeWith';
+import uniqBy from 'lodash/uniqBy';
 import { ResponseMeta } from './pgsearch/pgclient';
 import * as J from 'json-typescript';
 import { IndexerFactory } from './indexer';
@@ -341,51 +342,73 @@ export class Card {
     let data = Object.create(null);
     data.type = 'cards';
 
-    if (!this.attributes) {
-      data.attributes = Object.create(null);
-    } else {
-      data.attributes = cloneDeep(this.attributes);
-    }
-    data.attributes.csRealm = this.csRealm;
-    if (this.csRealm === this.csOriginalRealm) {
-      delete data.attributes.csOriginalRealm;
-    } else {
-      data.attributes.csOriginalRealm = this.csOriginalRealm;
-    }
-    if (this.csId) {
-      data.attributes.csId = this.csId;
-    }
-
     if (this instanceof AddressableCard) {
       data.id = this.canonicalURL;
     }
 
+    data.attributes = Object.create(null);
+    data.attributes.csRealm = this.csRealm;
+
+    if (this.csRealm !== this.csOriginalRealm) {
+      data.attributes.csOriginalRealm = this.csOriginalRealm;
+    }
+
+    if (this.csId) {
+      data.attributes.csId = this.csId;
+    }
+
+    if (this.rawFields) {
+      data.attributes.csFields = this.rawFields;
+    }
+
     if (this.csFiles) {
       data.attributes.csFiles = this.csFiles;
-    } else {
-      delete data.attributes.csFiles;
     }
 
     if (this.csPeerDependencies) {
       data.attributes.csPeerDependencies = this.csPeerDependencies;
-    } else {
-      delete data.attributes.csPeerDependencies;
     }
 
-    if (!this.relationships) {
-      // not needed... yet
-      // data.relationships = Object.create(null);
-    } else {
-      data.relationships = cloneDeep(this.relationships);
+    // TODO add this.csFieldSets
+
+    data.relationships = Object.create(null);
+    let adoptsFrom = await this.adoptsFrom();
+    if (adoptsFrom) {
+      data.relationships.csAdoptsFrom = {
+        data: {
+          type: 'cards',
+          id: adoptsFrom.canonicalURL,
+        },
+      };
     }
 
-    // how to handle situation where the upstream doc provided to the Card
-    // constuctor had included? is it our responsibility to mirror any supplied
-    // included resources to the Card constuctor in the asUpstream() response?
-    if (rules !== 'upstream') {
-      for (let field of Object.keys(data.relationships)) {
-        let relationship: ResourceIdentifierObject | ResourceIdentifierObject[] = data.relationships[field].data;
-        if (!relationship) {
+    for (let field of ['csAdoptsFrom', ...this.fieldsWithData()]) {
+      let rawData = this.rawData(field);
+      if (!rawData) {
+        continue;
+      }
+      if ('value' in rawData) {
+        data.attributes[field] = cloneDeep(rawData.value);
+      } else {
+        let cardId = rawData.ref;
+        if (Array.isArray(cardId)) {
+          data.relationships[field] = {
+            data: cardId.map(id => ({ type: 'cards', id: canonicalURL(id) })),
+          };
+        } else if (cardId) {
+          data.relationships[field] = {
+            data: { type: 'cards', id: canonicalURL(cardId) },
+          };
+        } else {
+          data.relationships[field] = { data: null };
+          continue;
+        }
+
+        if (rules === 'upstream') {
+          // how to handle situation where the upstream doc provided to the Card
+          // constuctor had included? is it our responsibility to mirror any
+          // supplied included resources to the Card constuctor in the
+          // asUpstream() response?
           continue;
         }
         let relationshipRules: IncludedResourceOcclusionRules | undefined;
@@ -411,14 +434,13 @@ export class Card {
             // are using a fieldset based rule--look at this.fieldSet()
           }
         }
-
         if (relationshipRules) {
-          if (Array.isArray(relationship)) {
-            for (let ref of relationship) {
-              included.set(ref.id, relationshipRules);
+          if (Array.isArray(cardId)) {
+            for (let id of cardId) {
+              included.set(canonicalURL(id), relationshipRules);
             }
-          } else if (relationship) {
-            included.set(relationship.id, relationshipRules);
+          } else {
+            included.set(canonicalURL(cardId), relationshipRules);
           }
         }
       }
@@ -443,7 +465,7 @@ export class Card {
         })
       );
       if (foundMoreIncluded.size === 0) {
-        return resources;
+        return uniqBy(resources, 'id');
       }
       included = foundMoreIncluded;
     }
@@ -454,7 +476,7 @@ export class Card {
     let includedMap = new Map<string, IncludedResourceOcclusionRules>();
     let data = await this.serialize(rules, includedMap);
     let jsonapi: SingleResourceDoc = { data };
-    let included = await this.serializeIncluded(includedMap);
+    let included = (await this.serializeIncluded(includedMap)).filter(i => i.id !== this.canonicalURL);
     if (included.length) {
       jsonapi.included = included;
     }

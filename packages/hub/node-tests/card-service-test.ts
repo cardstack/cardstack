@@ -1608,12 +1608,13 @@ describe('hub/card-service', function() {
         ]);
         let { included } = doc;
 
-        expect(included?.length).to.equal(7);
+        expect(included?.length).to.equal(8);
         let includedIds = included?.map(i => i.id);
         expect(includedIds).to.have.members([
           // Note that all relationships are traversed including csField
           // relationships like csAdoptsFrom. These are the system field
           // relationships:
+          canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }),
           toyCard.canonicalURL,
           puppyCard.canonicalURL,
           dalmatianCard.canonicalURL,
