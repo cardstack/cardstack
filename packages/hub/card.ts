@@ -834,8 +834,8 @@ function relationshipToCardId(ref: RelationshipObject): CardId | CardId[] | unde
 }
 
 function mergeRules(rules: IncludedResourceOcclusionRules): OcclusionRulesOrDefaults {
-  if (rules === 'everything') {
-    return 'everything';
+  if (!Array.isArray(rules)) {
+    return rules;
   }
 
   if (rules.length === 0) {
@@ -869,31 +869,8 @@ function applyRulesForRelationship(
   reference: CardId | CardId[] | undefined,
   included: Map<string, IncludedResourceOcclusionRules>
 ): void {
-  if (Array.isArray(reference)) {
-    relationships[field] = {
-      data: reference.map(id => ({ type: 'cards', id: canonicalURL(id) })),
-    };
-  } else if (reference) {
-    relationships[field] = {
-      data: { type: 'cards', id: canonicalURL(reference) },
-    };
-  } else {
-    relationships[field] = { data: null };
-    return;
-  }
-
-  if (rules === 'upstream') {
-    // how to handle situation where the upstream doc provided to the Card
-    // constuctor had included? is it our responsibility to mirror any
-    // supplied included resources to the Card constuctor in the
-    // asUpstream() response?
-    return;
-  }
   let relationshipRules: IncludedResourceOcclusionRules | undefined;
-  if (rules === 'everything') {
-    relationshipRules = 'everything';
-  }
-  if (rules !== 'everything') {
+  if (rules !== 'everything' && rules !== 'upstream') {
     if (rules.includeFields) {
       let interiorRules = rules.includeFields.filter(
         i => typeof i !== 'string' && i.name === field
@@ -904,14 +881,43 @@ function applyRulesForRelationship(
         ? /* in this scenario you have specified you want this field via the
               string field name, but you have not asked for any interior card
               fields to be included */
-          []
+          [{ name: field }]
         : undefined;
     }
     if (rules.includeFieldSet) {
       // use the embedded fieldset's fields for included resources when we
       // are using a fieldset based rule--look at this.fieldSet()
     }
+  } else {
+    relationshipRules = rules === 'upstream' ? 'upstream' : 'everything';
   }
+
+  if (relationshipRules) {
+    if (Array.isArray(reference)) {
+      relationships[field] = {
+        data: reference.map(id => ({ type: 'cards', id: canonicalURL(id) })),
+      };
+    } else if (reference) {
+      relationships[field] = {
+        data: { type: 'cards', id: canonicalURL(reference) },
+      };
+    } else {
+      relationships[field] = { data: null };
+    }
+  }
+
+  if (!reference) {
+    return;
+  }
+
+  if (rules === 'upstream') {
+    // how to handle situation where the upstream doc provided to the Card
+    // constuctor had included? is it our responsibility to mirror any
+    // supplied included resources to the Card constuctor in the
+    // asUpstream() response?
+    return;
+  }
+
   if (relationshipRules) {
     if (Array.isArray(reference)) {
       for (let id of reference) {

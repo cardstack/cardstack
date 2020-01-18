@@ -1655,7 +1655,7 @@ describe('hub/card-service', function() {
         expect(doc).to.not.have.property('included');
       });
 
-      it.skip('can occlude all user fields when an empty rule "{}" is specified', async function() {
+      it('can occlude all user fields when an empty rule "{}" is specified', async function() {
         let { jsonapi: doc } = await daddy.asPristineDoc({ includeFields: [] });
         expect(doc).to.have.nested.property('data.type', 'cards');
         expect(doc).to.have.nested.property('data.id', daddy.canonicalURL);
@@ -1664,14 +1664,20 @@ describe('hub/card-service', function() {
         expect(doc).to.not.have.property('included');
       });
 
-      it.skip('does not occlude system fields as part of evaluating the occusion rules', async function() {});
+      it('does not occlude system fields as part of evaluating the occusion rules', async function() {
+        let { jsonapi: doc } = await daddy.asPristineDoc({ includeFields: [] });
+        expect(doc.data.attributes?.csId).to.be.ok;
+        expect(doc.data.attributes?.csRealm).to.ok;
+        expect(doc.data.attributes?.csFields).to.be.ok;
+        expect(doc.data.relationships?.csAdoptsFrom).to.be.ok;
+      });
 
       // we will never omit the csAdoptsFrom in a card's relationships property
       // (see test above), but we can include a rule to include the adoptsFrom
       // resource in the resulting document.
-      it.skip('can include a csAdoptsFrom reference', async function() {
+      it('can include a csAdoptsFrom reference', async function() {
         let { jsonapi: doc } = await vanGogh.asPristineDoc({ includeFields: ['csAdoptsFrom'] });
-        expect(doc).to.have.nested.property('data.attributes.name', 'Van Gogh');
+        expect(doc).to.not.have.nested.property('data.attributes.name', 'Van Gogh');
         expect(doc).to.not.have.nested.property('data.attributes.favoriteToy');
         expect(doc.included?.length).to.equal(1);
         expect(doc.included?.[0].id).to.equal(dalmatianCard.canonicalURL);

@@ -7,7 +7,7 @@ export interface OcclusionRules {
 }
 export type Format = keyof OcclusionFieldSets;
 export type OcclusionRulesOrDefaults = OcclusionRules | 'everything' | 'upstream';
-export type IncludedResourceOcclusionRules = InnerOcclusionRules[] | 'everything';
+export type IncludedResourceOcclusionRules = InnerOcclusionRules[] | 'everything' | 'upstream';
 
 export interface OcclusionFieldSets {
   isolated: (string | InnerOcclusionRules)[];
