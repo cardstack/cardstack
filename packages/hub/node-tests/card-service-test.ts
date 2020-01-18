@@ -1648,7 +1648,7 @@ describe('hub/card-service', function() {
         });
       });
 
-      it.skip('can include a primitive field when getting the pristine doc', async function() {
+      it('can include a primitive field when getting the pristine doc', async function() {
         let { jsonapi: doc } = await vanGogh.asPristineDoc({ includeFields: ['name'] });
         expect(doc).to.have.nested.property('data.attributes.name', 'Van Gogh');
         expect(doc).to.not.have.nested.property('data.attributes.favoriteToy');
@@ -1691,7 +1691,9 @@ describe('hub/card-service', function() {
 
       it.skip('can include a deeply nested field filled by card-as-value when getting the pristine doc', async function() {});
 
-      // test occlusion through a arity > 1 field?
+      it.skip('can include an interior card-as-reference field from a field with arity > 1 when getting the pristine doc', async function() {});
+
+      it.skip('can include an interior card-as-value field from a field with arity > 1 when getting the pristine doc', async function() {});
 
       it.skip('can handle a cycle within in the included cards', async function() {});
 

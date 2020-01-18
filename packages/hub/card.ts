@@ -1,11 +1,18 @@
 import CardstackError from './error';
 import { WriterFactory } from './writer';
 import { PristineDocument, UpstreamDocument, UpstreamIdentity, PristineCollection } from './document';
-import { SingleResourceDoc, RelationshipObject, ResourceObject } from 'jsonapi-typescript';
+import {
+  SingleResourceDoc,
+  RelationshipObject,
+  ResourceObject,
+  AttributesObject,
+  RelationshipsObject,
+} from 'jsonapi-typescript';
 import cloneDeep from 'lodash/cloneDeep';
 import isPlainObject from 'lodash/isPlainObject';
 import mergeWith from 'lodash/mergeWith';
 import uniqBy from 'lodash/uniqBy';
+import isObjectLike from 'lodash/isObjectLike';
 import { ResponseMeta } from './pgsearch/pgclient';
 import * as J from 'json-typescript';
 import { IndexerFactory } from './indexer';
@@ -253,7 +260,7 @@ export class Card {
     return names.filter(name => !cardstackFieldPattern.test(name));
   }
 
-  private rawData(fieldName: string): { ref: CardId | CardId[] | undefined } | { value: any } | null {
+  private rawData(fieldName: string): RawData {
     if (this.attributes) {
       if (fieldName in this.attributes) {
         return { value: this.attributes[fieldName] };
@@ -371,7 +378,9 @@ export class Card {
       data.attributes.csPeerDependencies = this.csPeerDependencies;
     }
 
-    // TODO add this.csFieldSets
+    if (this.csFieldSets) {
+      data.attributes.csFieldSets = this.csFieldSets;
+    }
 
     data.relationships = Object.create(null);
     let adoptsFrom = await this.adoptsFrom();
@@ -390,61 +399,9 @@ export class Card {
         continue;
       }
       if ('value' in rawData) {
-        data.attributes[field] = cloneDeep(rawData.value);
+        applyRulesForAttribute(data.attributes, field, rules, rawData.value);
       } else {
-        let cardId = rawData.ref;
-        if (Array.isArray(cardId)) {
-          data.relationships[field] = {
-            data: cardId.map(id => ({ type: 'cards', id: canonicalURL(id) })),
-          };
-        } else if (cardId) {
-          data.relationships[field] = {
-            data: { type: 'cards', id: canonicalURL(cardId) },
-          };
-        } else {
-          data.relationships[field] = { data: null };
-          continue;
-        }
-
-        if (rules === 'upstream') {
-          // how to handle situation where the upstream doc provided to the Card
-          // constuctor had included? is it our responsibility to mirror any
-          // supplied included resources to the Card constuctor in the
-          // asUpstream() response?
-          continue;
-        }
-        let relationshipRules: IncludedResourceOcclusionRules | undefined;
-        if (rules === 'everything') {
-          relationshipRules = 'everything';
-        }
-        if (rules !== 'everything') {
-          if (rules.includeFields) {
-            let interiorRules = rules.includeFields.filter(
-              i => typeof i !== 'string' && i.name === field
-            ) as InnerOcclusionRules[];
-            relationshipRules = interiorRules.length
-              ? interiorRules
-              : rules.includeFields.includes(field)
-              ? /* in this scenario you have specified you want this field via the
-              string field name, but you have not asked for any interior card
-              fields to be included */
-                []
-              : undefined;
-          }
-          if (rules.includeFieldSet) {
-            // use the embedded fieldset's fields for included resources when we
-            // are using a fieldset based rule--look at this.fieldSet()
-          }
-        }
-        if (relationshipRules) {
-          if (Array.isArray(cardId)) {
-            for (let id of cardId) {
-              included.set(canonicalURL(id), relationshipRules);
-            }
-          } else {
-            included.set(canonicalURL(cardId), relationshipRules);
-          }
-        }
+        applyRulesForRelationship(data.relationships, field, rules, rawData.ref, included);
       }
     }
 
@@ -798,6 +755,10 @@ export interface CardId {
 interface CardFiles {
   [filename: string]: string | CardFiles;
 }
+interface PeerDependencies {
+  [packageName: string]: string;
+}
+type RawData = { ref: CardId | CardId[] | undefined } | { value: any } | null;
 
 function assertCSFiles(files: any, pathContext = [] as string[]): asserts files is CardFiles {
   if (!isPlainObject(files)) {
@@ -818,9 +779,6 @@ function assertCSFiles(files: any, pathContext = [] as string[]): asserts files 
   }
 }
 
-interface PeerDependencies {
-  [packageName: string]: string;
-}
 function assertPeerDependencies(deps: any): asserts deps is PeerDependencies {
   if (!isPlainObject(deps)) {
     throw new Error(`csPeerDependencies must be an object`);
@@ -887,4 +845,80 @@ function mergeRules(rules: IncludedResourceOcclusionRules): OcclusionRulesOrDefa
     return rules[0];
   }
   throw new Error(`unimplemented: mergeRules`);
+}
+
+function applyRulesForAttribute(
+  attributes: AttributesObject,
+  field: string,
+  rules: OcclusionRulesOrDefaults,
+  data: any
+): void {
+  if (rules === 'everything' || rules === 'upstream') {
+    attributes[field] = cloneDeep(data);
+  } else {
+    if (rules.includeFields?.includes(field) && typeof !isObjectLike(data)) {
+      attributes[field] = data;
+    }
+  }
+}
+
+function applyRulesForRelationship(
+  relationships: RelationshipsObject,
+  field: string,
+  rules: OcclusionRulesOrDefaults,
+  reference: CardId | CardId[] | undefined,
+  included: Map<string, IncludedResourceOcclusionRules>
+): void {
+  if (Array.isArray(reference)) {
+    relationships[field] = {
+      data: reference.map(id => ({ type: 'cards', id: canonicalURL(id) })),
+    };
+  } else if (reference) {
+    relationships[field] = {
+      data: { type: 'cards', id: canonicalURL(reference) },
+    };
+  } else {
+    relationships[field] = { data: null };
+    return;
+  }
+
+  if (rules === 'upstream') {
+    // how to handle situation where the upstream doc provided to the Card
+    // constuctor had included? is it our responsibility to mirror any
+    // supplied included resources to the Card constuctor in the
+    // asUpstream() response?
+    return;
+  }
+  let relationshipRules: IncludedResourceOcclusionRules | undefined;
+  if (rules === 'everything') {
+    relationshipRules = 'everything';
+  }
+  if (rules !== 'everything') {
+    if (rules.includeFields) {
+      let interiorRules = rules.includeFields.filter(
+        i => typeof i !== 'string' && i.name === field
+      ) as InnerOcclusionRules[];
+      relationshipRules = interiorRules.length
+        ? interiorRules
+        : rules.includeFields.includes(field)
+        ? /* in this scenario you have specified you want this field via the
+              string field name, but you have not asked for any interior card
+              fields to be included */
+          []
+        : undefined;
+    }
+    if (rules.includeFieldSet) {
+      // use the embedded fieldset's fields for included resources when we
+      // are using a fieldset based rule--look at this.fieldSet()
+    }
+  }
+  if (relationshipRules) {
+    if (Array.isArray(reference)) {
+      for (let id of reference) {
+        included.set(canonicalURL(id), relationshipRules);
+      }
+    } else {
+      included.set(canonicalURL(reference), relationshipRules);
+    }
+  }
 }
