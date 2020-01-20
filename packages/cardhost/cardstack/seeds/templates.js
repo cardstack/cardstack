@@ -89,7 +89,7 @@ let eventCardTemplate = eventFactory.getDocumentFor(
       }),
       eventFactory.addResource('fields', 'social-link').withAttributes({
         'is-metadata': true,
-        'field-type': '@cardstack/core-types::url',
+        'field-type': '@cardstack/core-types::link',
         required: true,
         caption: 'Follow us on Twitter:',
       }),
@@ -190,7 +190,7 @@ let jobApplicantProfileTemplate = eventFactory.getDocumentFor(
       }),
       eventFactory.addResource('fields', 'portfolio').withAttributes({
         'is-metadata': true,
-        'field-type': '@cardstack/core-types::string',
+        'field-type': '@cardstack/core-types::link',
         required: true,
         caption: 'Link to your portfolio',
       }),

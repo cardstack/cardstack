@@ -8,7 +8,7 @@ export const fieldTypeMappings = {
   'related cards': '@cardstack/core-types::has-many',
   'decorative image': '@cardstack/core-types::decorative-image',
   cta: '@cardstack/core-types::cta',
-  url: '@cardstack/core-types::url',
+  link: '@cardstack/core-types::link',
 
   // Probably want to omit these types as they could probably be better
   // handled as related cards:
@@ -90,12 +90,12 @@ export const fieldComponents = [
     icon: `/images/field-types/cta-field-icon.svg`,
   },
   {
-    id: 'url',
-    coreType: '@cardstack/core-types::url',
-    title: 'URL',
+    id: 'link',
+    coreType: '@cardstack/core-types::link',
+    title: 'Link',
     description: 'Link to another website',
-    type: 'url',
-    icon: `/images/field-types/url-field-icon.svg`,
+    type: 'link',
+    icon: `/images/field-types/link-field-icon.svg`,
   },
   // We'll need to figure out how to deal with the other types of ui-components, ex:
   // {
