@@ -65,7 +65,7 @@
       @selectedField={{this.selectedField}}
       @dropField={{action this.dropField}}
       @cardSelected={{this.cardSelected}}
-      @cardFocused={{action (mut this.cardSelected)}}
+      @cardFocused={{action (mut this.card.isSelected)}}
     />
   {{/if}}
 </section>
