@@ -5,6 +5,7 @@ import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import move from 'ember-animated/motions/move';
+import adjustCSS from 'ember-animated/motions/adjust-css';
 
 // TODO we'll need to use EC in order to be able to isolate cards
 // (due to the need to await the load of the isolated format of a card)
@@ -83,6 +84,13 @@ export default class CardRenderer extends Component {
   *headerAnimation({ keptSprites }) {
     keptSprites.forEach(sprite => {
       move(sprite, { duration });
+    });
+  }
+
+  *contentAnimation({ keptSprites }) {
+    keptSprites.forEach(sprite => {
+      adjustCSS('border-top-right-radius', sprite, { duration });
+      adjustCSS('border-top-left-radius', sprite, { duration });
     });
   }
 }

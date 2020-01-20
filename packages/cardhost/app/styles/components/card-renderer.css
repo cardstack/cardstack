@@ -128,6 +128,14 @@
   border-color var(--ch-transition-time);
 }
 
+.card-renderer-isolated.view .card-renderer-isolated--card-container {
+  border-radius: 10px;
+}
+
+.card-renderer-isolated.view .card-renderer-isolated--card-container.selected {
+  border-radius: 0 0 10px 10px;
+}
+
 .card-renderer-isolated.schema .card-renderer-isolated--card-container {
   background-color: var(--ch-dark-background);
   border-top: 3px solid var(--ch-default);
