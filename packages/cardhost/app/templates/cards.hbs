@@ -7,7 +7,7 @@
   {{this.themerClasses}}"
   data-test-cardhost-cards>
   {{#if (and (not-eq this.routeInfo.mode "view") (not-eq this.routeInfo.mode "themer"))}}
-    <CardhostTopEdge @mode="edit">
+    <CardhostTopEdge @mode={{this.routeInfo.mode}}>
       {{#if (or (eq this.routeInfo.mode "layout") (eq this.routeInfo.mode "fields"))}}
         {{#let this.target.currentRoute.parent.attributes as |card|}}
           <div class="view-selector">

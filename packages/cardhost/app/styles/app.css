@@ -49,7 +49,7 @@ Until that work is done we are statically adding this css
 
 :root {
   --ch-font-family: 'Open Sans', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --ch-left-edge-navbar-width: 80px;
+  --ch-left-edge-navbar-width: 65px;
   --ch-left-edge-panel-width: 330px;
   --ch-right-edge-panel-width: 330px;
 
@@ -58,10 +58,8 @@ Until that work is done we are statically adding this css
   --ch-right-edge-width: calc(var(--ch-right-edge-panel-width) + var(--ch-spacing));
   --ch-bottom-edge-height: 80px;
 
-  --ch-component-width: 260px;
-  --ch-component-height: 40px;
-  --ch-card-size: 496px;
-  --ch-field-width: 384px;
+  --ch-card-size: 496px;    /* min-width and min-height for cards */
+  --ch-field-width: 384px;  /* edit and schema view field-renderer max-width */
   --ch-spacing: 20px;
   --ch-edges-z-index: 10;
   --ch-actions-z-index: 11;
@@ -71,11 +69,6 @@ Until that work is done we are statically adding this css
   --ch-card-padding-animate: padding-right 0.3s ease;
 }
 
-/*
-  TODO:
-  - better positioning for edges (esp on/off state)
-  - link and button focus and disabled states styling
-*/
 * {
   box-sizing: border-box;
 }
@@ -113,7 +106,21 @@ a:hover {
   cursor: pointer;
 }
 
-/* Other */
+/* Ember Animated */
+.animated-tools {
+  z-index: 20;
+}
+
+/* JSON card document -- hidden from view */
+.cardhost-card-document {
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+}
+
+
+/* Other: */
+/* TODO: Refactor these to where they belong  */
 .card-renderer--top-edge-buttons {
   position: fixed;
   top: var(--ch-spacing);
@@ -170,17 +177,6 @@ a:hover {
   text-align: right;
 }
 
-
-/* JSON card document */
-.cardhost-card-document {
-  visibility: hidden;
-  height: 0;
-  overflow: hidden;
-}
-
-.animated-tools {
-  z-index: 20;
-}
 
 /* TODO: Move to ui-components repo */
 .cs-dark-input.cs-input:disabled,

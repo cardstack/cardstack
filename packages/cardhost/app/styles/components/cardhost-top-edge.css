@@ -14,7 +14,16 @@
   align-items: center;
   text-align: right;
   z-index: var(--ch-edges-z-index);
+  background-color: var(--ch-default);
+  transition: var(--ch-card-background-color-animate);
+}
+
+.cardhost-top-edge.schema {
   background-color: var(--ch-deep-background);
+}
+
+.cardhost-top-edge.themer {
+  background-color: var(--ch-dark-background);
 }
 
 .view-selector {
@@ -47,18 +56,6 @@
 
 .view-selector .view-selector--mode-link svg {
   margin-right: 15px;
-}
-
-.login-btn,
-.logout-btn {
-  position: absolute;
-  z-index: var(--ch-edges-z-index);
-  left: calc(var(--ch-left-edge-navbar-width) + var(--ch-spacing));
-}
-
-.logout-btn {
-  min-width: 85px;
-  height: 40px;
 }
 
 @media (max-width: 1440px) {

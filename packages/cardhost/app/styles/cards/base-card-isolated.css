@@ -13,6 +13,11 @@
   word-break: break-word;
 }
 
+/* TODO: Change this when we need to animate card contents in view/edit modes */
+.cardstack_base-card-isolated .isolated-card--view-fields {
+  display: contents;
+}
+
 .cardstack_base-card-isolated .field {
   width: 100%;
   max-width: 656px;
@@ -25,9 +30,4 @@
   color: var(--ch-dark-op50);
   font-size: 13px;
   line-height: 1.385;
-}
-
-
-.cardstack_base-card-isolated .isolated-card--fields {
-  /* border: solid 2px red; */
 }

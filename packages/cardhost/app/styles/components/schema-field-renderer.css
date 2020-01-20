@@ -41,8 +41,8 @@ header.schema-field-renderer--header.new-field {
   transition: padding-left var(--ch-transition-time);
 }
 
-header.schema-field-renderer--header.text-field,
-header.schema-field-renderer--header.text-field-case-insensitive {
+/* For text-field and case-insensitive text-field icon */
+header.schema-field-renderer--header.string {
   background-size: 12px 15px;
 }
 
