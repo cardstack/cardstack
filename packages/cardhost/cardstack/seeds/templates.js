@@ -83,15 +83,9 @@ let eventCardTemplate = eventFactory.getDocumentFor(
       }),
       eventFactory.addResource('fields', 'cta').withAttributes({
         'is-metadata': true,
-        'field-type': '@cardstack/core-types::cta',
+        'field-type': '@cardstack/core-types::string',
         required: true,
-        caption: 'RSVP',
-      }),
-      eventFactory.addResource('fields', 'social-link').withAttributes({
-        'is-metadata': true,
-        'field-type': '@cardstack/core-types::link',
-        required: true,
-        caption: 'Follow us on Twitter:',
+        caption: 'CTA Text',
       }),
       eventFactory.addResource('fields', 'location').withAttributes({
         'is-metadata': true,
@@ -125,8 +119,7 @@ let eventCardTemplate = eventFactory.getDocumentFor(
         admission: 'Free',
         description:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero.',
-        socialLink: 'https://example.com',
-        cta: 'https://example.com',
+        cta: 'RSVP',
       })
     )
 );
@@ -190,7 +183,7 @@ let jobApplicantProfileTemplate = eventFactory.getDocumentFor(
       }),
       eventFactory.addResource('fields', 'portfolio').withAttributes({
         'is-metadata': true,
-        'field-type': '@cardstack/core-types::link',
+        'field-type': '@cardstack/core-types::string',
         required: true,
         caption: 'Link to your portfolio',
       }),
