@@ -230,7 +230,7 @@ let vipTicketTemplate = eventFactory.getDocumentFor(
       }),
       eventFactory.addResource('fields', 'vip-package').withAttributes({
         'is-metadata': true,
-        'field-type': '@cardstack/core-types::boolean',
+        'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
         'needed-when-embedded': true,
         caption: 'VIP package',

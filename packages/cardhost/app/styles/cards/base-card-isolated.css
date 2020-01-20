@@ -45,6 +45,10 @@
   display: none;
 }
 
+.cardstack_base-card-isolated .title-field + .cardstack_base-card-isolated .title-2-field {
+  padding-top: 7px;
+}
+
 /* Full-width field values by default */
 .cardstack_base-card-isolated .title-value,
 .cardstack_base-card-isolated .title-2-value,
