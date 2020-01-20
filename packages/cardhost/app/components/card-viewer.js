@@ -10,12 +10,10 @@ export default class CardViewer extends Component {
   resizeable = true;
 
   @tracked
-  themerOptions = [{ name: 'Cardstack default' }];
+  themerOptions = [{ name: 'Cardstack default' }, { name: 'Custom theme' }];
 
   @action
   createTheme() {
-    this.themerOptions.push({ name: 'Custom theme' });
-    this.selectedTheme = this.themerOptions[this.themerOptions.length - 1];
     this.router.transitionTo('cards.card.edit.layout.themer', this.args.card);
   }
 
@@ -26,12 +24,16 @@ export default class CardViewer extends Component {
     return JSON.stringify(this.args.card.json, null, 2);
   }
 
-  @tracked
-  selectedTheme = this.themerOptions[0];
+  get selectedTheme() {
+    let css = this.args.card.isolatedCss;
+    let isDefault = css === '' || css === '.cardstack_base-card-isolated {}';
+    return isDefault ? { name: 'Cardstack default' } : { name: 'Custom theme' };
+  }
 
   @action
   handleThemeChange(val) {
-    this.selectedTheme = val;
-    //  TODO
+    if (val.name === 'Cardstack default') {
+      this.args.card.setIsolatedCss('');
+    }
   }
 }
