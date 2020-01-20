@@ -4,7 +4,6 @@ import { A } from '@ember/array';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
-import { printSprites } from 'ember-animated';
 import move from 'ember-animated/motions/move';
 
 // TODO we'll need to use EC in order to be able to isolate cards
@@ -82,7 +81,6 @@ export default class CardRenderer extends Component {
   }
 
   *headerAnimation({ keptSprites }) {
-    printSprites(arguments[0], 'header animation');
     keptSprites.forEach(sprite => {
       move(sprite, { duration });
     });
