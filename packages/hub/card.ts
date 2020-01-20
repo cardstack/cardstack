@@ -393,7 +393,7 @@ export class Card {
         continue;
       }
       if ('value' in rawData) {
-        await this.applyRulesForAttribute(data.attributes, field, rules, rawData.value);
+        await this.applyRulesForAttribute(data.attributes, field, rules, rawData.value, included);
       } else {
         await this.applyRulesForRelationship(data.relationships, field, rules, rawData.ref, included);
       }
@@ -424,23 +424,12 @@ export class Card {
     }
   }
 
-  // we might wanna think about getting rid of the PristineDocument Type and just use this instead...
-  async serializeAsJsonAPIDoc(rules: OcclusionRulesOrDefaults): Promise<SingleResourceDoc> {
-    let includedMap = new Map<string, IncludedResourceOcclusionRules>();
-    let data = await this.serialize(rules, includedMap);
-    let jsonapi: SingleResourceDoc = { data };
-    let included = (await this.serializeIncluded(includedMap)).filter(i => i.id !== this.canonicalURL);
-    if (included.length) {
-      jsonapi.included = included;
-    }
-    return jsonapi;
-  }
-
   private async applyRulesForAttribute(
     attributes: AttributesObject,
     field: string,
     rules: OcclusionRulesOrDefaults,
-    data: any
+    data: any,
+    included: Map<string, IncludedResourceOcclusionRules>
   ): Promise<void> {
     if (rules === 'everything' || rules === 'upstream') {
       attributes[field] = cloneDeep(data);
@@ -463,18 +452,23 @@ export class Card {
         return;
       }
 
-      let interiorCard = await getOwner(this).instantiate(Card, { data }, this.csRealm, this, this.service);
-      let {
-        data: { attributes: interiorAttrs, relationships: interiorRel },
-      } = await interiorCard.serializeAsJsonAPIDoc(interiorRule!);
-      let interiorJson: { attributes?: AttributesObject; relationships?: RelationshipsObject } = {};
-      if (interiorAttrs) {
-        interiorJson.attributes = interiorAttrs;
+      if (Array.isArray(data)) {
+        attributes[field] = await Promise.all(
+          data.map(async cardValue => {
+            let interiorCard = await getOwner(this).instantiate(
+              Card,
+              { data: cardValue },
+              this.csRealm,
+              this,
+              this.service
+            );
+            return (await interiorCard.asInteriorCard(interiorRule!, included)) as J.Value;
+          })
+        );
+      } else {
+        let interiorCard = await getOwner(this).instantiate(Card, { data }, this.csRealm, this, this.service);
+        attributes[field] = (await interiorCard.asInteriorCard(interiorRule!, included)) as J.Value;
       }
-      if (interiorRel) {
-        interiorJson.relationships = interiorRel;
-      }
-      attributes[field] = interiorJson as J.Value;
     }
   }
 
@@ -543,6 +537,36 @@ export class Card {
         included.set(canonicalURL(reference), relationshipRules);
       }
     }
+  }
+
+  private async asInteriorCard(
+    rules: OcclusionRulesOrDefaults = 'everything',
+    includedMap: Map<string, IncludedResourceOcclusionRules>
+  ): Promise<CardValue> {
+    let { id, attributes, relationships } = await this.serialize(rules, includedMap);
+    let interiorJson: CardValue = {};
+    if (id != null) {
+      interiorJson.id = id;
+    }
+    if (attributes) {
+      interiorJson.attributes = attributes;
+    }
+    if (relationships) {
+      interiorJson.relationships = relationships;
+    }
+    return interiorJson;
+  }
+
+  // we might wanna think about getting rid of the PristineDocument Type and just use this instead...
+  async serializeAsJsonAPIDoc(rules: OcclusionRulesOrDefaults): Promise<SingleResourceDoc> {
+    let includedMap = new Map<string, IncludedResourceOcclusionRules>();
+    let data = await this.serialize(rules, includedMap);
+    let jsonapi: SingleResourceDoc = { data };
+    let included = (await this.serializeIncluded(includedMap)).filter(i => i.id !== this.canonicalURL);
+    if (included.length) {
+      jsonapi.included = included;
+    }
+    return jsonapi;
   }
 
   async asUpstreamDoc(): Promise<UpstreamDocument> {
@@ -853,6 +877,11 @@ export interface CardId {
   csRealm: string;
   csOriginalRealm?: string; // if not set, its implied that its equal to `realm`.
   csId: string;
+}
+interface CardValue {
+  id?: string;
+  attributes?: AttributesObject;
+  relationships?: RelationshipsObject;
 }
 
 interface CardFiles {

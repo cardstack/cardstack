@@ -203,9 +203,16 @@ export class TestCard {
     return doc;
   }
 
-  get asCardValue(): { attributes?: AttributesObject; relationships?: { [field: string]: RelationshipObject } } {
+  get asCardValue(): {
+    id?: string;
+    attributes?: AttributesObject;
+    relationships?: { [field: string]: RelationshipObject };
+  } {
     let cardValue: this['asCardValue'] = {};
-    let { attributes, relationships } = this.jsonapi.data;
+    let { attributes, relationships, id } = this.jsonapi.data;
+    if (id != null) {
+      cardValue.id = id;
+    }
     if (attributes) {
       cardValue.attributes = attributes;
     }

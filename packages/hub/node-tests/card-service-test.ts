@@ -1504,6 +1504,7 @@ describe('hub/card-service', function() {
         dalmatianCard: AddressableCard,
         ownerCard: AddressableCard,
         daddy: AddressableCard,
+        mommy: AddressableCard,
         mango: AddressableCard,
         vanGogh: AddressableCard,
         squeakySnake: AddressableCard;
@@ -1576,6 +1577,32 @@ describe('hub/card-service', function() {
               name: 'Hassan',
             })
             .withRelationships({ puppies: [vanGogh, mango] })
+            .adoptingFrom(ownerCard).jsonapi
+        );
+        mommy = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              name: 'Mariko',
+              puppies: [
+                testCard()
+                  .withAttributes({
+                    name: 'Van Gogh',
+                    favoriteToy: testCard()
+                      .withAttributes({
+                        description: 'a beef bone',
+                      })
+                      .adoptingFrom(toyCard).asCardValue,
+                  })
+                  .adoptingFrom(dalmatianCard).asCardValue,
+                testCard()
+                  .withAttributes({
+                    name: 'Mango',
+                  })
+                  .withRelationships({ favoriteToy: squeakySnake })
+                  .adoptingFrom(dalmatianCard).asCardValue,
+              ],
+            })
             .adoptingFrom(ownerCard).jsonapi
         );
       });
@@ -1738,16 +1765,84 @@ describe('hub/card-service', function() {
         );
       });
 
-      it.skip('can include an interior card-as-reference field from a field with arity > 1 when getting the pristine doc', async function() {});
+      it('can include an interior card-as-reference field from a field with arity > 1 when getting the pristine doc', async function() {
+        let { jsonapi: doc } = await daddy.asPristineDoc({
+          includeFields: [
+            {
+              name: 'puppies',
+              includeFields: [{ name: 'favoriteToy', includeFields: ['description'] }],
+            },
+          ],
+        });
+        expect(doc).to.not.have.nested.property('data.attributes.name');
+        expect(doc).to.have.deep.nested.property('data.relationships.puppies.data', [
+          { type: 'cards', id: vanGogh.canonicalURL },
+          { type: 'cards', id: mango.canonicalURL },
+        ]);
 
-      it.skip('can include an interior card-as-value field from a field with arity > 1 when getting the pristine doc', async function() {});
+        expect(doc.included?.length).to.equal(3);
+        let ids = doc?.included?.map(i => i.id);
+        expect(ids).to.have.members([vanGogh.canonicalURL, mango.canonicalURL, squeakySnake.canonicalURL]);
+        let includedVanGogh = doc?.included?.find(i => i.id === vanGogh.canonicalURL);
+        let includedMango = doc?.included?.find(i => i.id === mango.canonicalURL);
+        let includedSqueakySnake = doc?.included?.find(i => i.id === squeakySnake.canonicalURL);
 
-      it.skip('can handle a cycle within in the included cards', async function() {});
+        expect(includedVanGogh).to.not.have.nested.property('attributes.name');
+        expect(includedVanGogh).to.have.nested.property('attributes.favoriteToy');
+        expect(includedVanGogh).to.have.deep.nested.property('attributes.favoriteToy.relationships.csAdoptsFrom.data', {
+          type: 'cards',
+          id: toyCard.canonicalURL,
+        });
+        expect(includedVanGogh).to.have.nested.property('attributes.favoriteToy.attributes.description', 'a beef bone');
 
-      // (also make sure the primary card doesn't appear as an item in the included cards)
-      it.skip('can handle a cycle between the primary resource and an included card', async function() {});
+        expect(includedMango).to.not.have.nested.property('attributes.name');
+        expect(includedMango).to.have.deep.nested.property('relationships.favoriteToy.data', {
+          type: 'cards',
+          id: squeakySnake.canonicalURL,
+        });
 
-      it.skip('can handle a primary card that is related to itself', async function() {});
+        expect(includedSqueakySnake).to.have.nested.property(
+          'attributes.description',
+          'a plush snake with squeaky segments'
+        );
+      });
+
+      it('can include an interior card-as-value field from a field with arity > 1 when getting the pristine doc', async function() {
+        let { jsonapi: doc } = await mommy.asPristineDoc({
+          includeFields: [
+            {
+              name: 'puppies',
+              includeFields: [{ name: 'favoriteToy', includeFields: ['description'] }],
+            },
+          ],
+        });
+        expect(doc).to.not.have.nested.property('data.attributes.name');
+        expect(doc).to.have.deep.nested.property('data.attributes.puppies');
+        let puppies = doc.data?.attributes?.puppies as any[];
+        expect(puppies.length).to.equal(2);
+        let interiorVanGogh = puppies[0];
+        let interiorMango = puppies[1];
+
+        expect(interiorVanGogh).to.not.have.nested.property('attributes.name');
+        expect(interiorVanGogh).to.have.nested.property('attributes.favoriteToy');
+        expect(interiorVanGogh).to.have.deep.nested.property('attributes.favoriteToy.relationships.csAdoptsFrom.data', {
+          type: 'cards',
+          id: toyCard.canonicalURL,
+        });
+        expect(interiorVanGogh).to.have.nested.property('attributes.favoriteToy.attributes.description', 'a beef bone');
+
+        expect(interiorMango).to.not.have.nested.property('attributes.name');
+        expect(interiorMango).to.have.deep.nested.property('relationships.favoriteToy.data', {
+          type: 'cards',
+          id: squeakySnake.canonicalURL,
+        });
+
+        expect(doc.included?.length).to.equal(1);
+        expect(doc.included?.[0]).to.have.nested.property(
+          'attributes.description',
+          'a plush snake with squeaky segments'
+        );
+      });
 
       it.skip('can include fields based on csFieldSets in a card', async function() {});
 
@@ -1756,6 +1851,13 @@ describe('hub/card-service', function() {
       it.skip('can include fields based on inheritied csFieldSets from a parent card', async function() {});
 
       it.skip('can include fields based on csFieldSets that overrides inherited csFieldSets from a parent card', async function() {});
+
+      it.skip('can handle a cycle within in the included cards', async function() {});
+
+      // (also make sure the primary card doesn't appear as an item in the included cards)
+      it.skip('can handle a cycle between the primary resource and an included card', async function() {});
+
+      it.skip('can handle a primary card that is related to itself', async function() {});
     });
   });
 });
