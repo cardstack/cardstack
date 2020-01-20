@@ -61,65 +61,66 @@ let eventCardTemplate = eventFactory.getDocumentFor(
     .addResource('cards', 'local-hub::event-card')
     .withRelated('adopted-from', { type: 'cards', id: 'local-hub::@cardstack/base-card' })
     .withRelated('fields', [
-      eventFactory.addResource('fields', 'title').withAttributes({
+      eventFactory.addResource('fields', 'event-title').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
         'needed-when-embedded': true,
         required: true,
-        caption: 'Event name',
       }),
-      eventFactory.addResource('fields', 'date').withAttributes({
+      eventFactory.addResource('fields', 'event-datetime').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::date',
         'needed-when-embedded': true,
-        required: true,
+        required: false,
         caption: 'Date & Time',
       }),
-      eventFactory.addResource('fields', 'background-image').withAttributes({
+      eventFactory.addResource('fields', 'event-image').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::decorative-image',
-        required: true,
         'needed-when-embedded': false,
+        required: false,
       }),
-      eventFactory.addResource('fields', 'cta').withAttributes({
+      eventFactory.addResource('fields', 'event-location').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
-        required: true,
-        caption: 'CTA Text',
+        'needed-when-embedded': false,
+        required: false,
+        caption: 'Location',
       }),
-      eventFactory.addResource('fields', 'location').withAttributes({
+      eventFactory.addResource('fields', 'event-city').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
-        required: true,
+        required: false,
       }),
-      eventFactory.addResource('fields', 'city').withAttributes({
+      eventFactory.addResource('fields', 'event-admission').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
-        required: true,
+        required: false,
       }),
-      eventFactory.addResource('fields', 'admission').withAttributes({
+      eventFactory.addResource('fields', 'event-cta').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
-        required: true,
+        required: false,
       }),
-      eventFactory.addResource('fields', 'description').withAttributes({
+      eventFactory.addResource('fields', 'event-description').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
-        required: true,
+        required: false,
+        caption: 'Description'
       }),
     ])
     .withRelated(
       'model',
       eventFactory.addResource('local-hub::event-card', 'local-hub::event-card').withAttributes({
-        backgroundImage: 'https://images.unsplash.com/photo-1542296140-47fd7d838e76',
-        title: 'Quarterly Planning Meeting',
-        date: '2020-05-26',
-        location: 'One World Trade Center',
-        city: 'New York, NY',
-        admission: 'Free',
-        description:
+        eventTitle: 'Quarterly Planning Meeting',
+        eventDatetime: '2020-05-26',
+        eventLocation: 'One World Trade Center',
+        eventImage: 'https://images.unsplash.com/photo-1542296140-47fd7d838e76',
+        eventCity: 'New York, NY',
+        eventAdmission: 'Free',
+        eventCta: 'RSVP',
+        eventDescription:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero.',
-        cta: 'RSVP',
       })
     )
 );

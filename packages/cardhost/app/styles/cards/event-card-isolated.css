@@ -1,4 +1,8 @@
 .event-card-isolated {
+  
+}
+
+.event-card-isolated .isolated-card--fields {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-areas:
@@ -11,24 +15,20 @@
     'description  description';
 }
 
-.event-card-isolated .label {
-  text-transform: capitalize;
-}
-
 .event-card-isolated .field {
   grid-column: 1 / -1;
 }
 
-.event-card-isolated .title-label,
-.event-card-isolated .admission-label,
-.event-card-isolated .cta-label,
-.event-card-isolated .city-label{
+.event-card-isolated .event-title-label,
+.event-card-isolated .event-admission-label,
+.event-card-isolated .event-cta-label,
+.event-card-isolated .event-city-label{
   visibility: hidden;
   height: 0;
   padding: 0;
 }
 
-.event-card-isolated .background-image-field {
+.event-card-isolated .event-image-field {
   grid-area: image;
   padding-bottom: 30px;
   max-width: 100%;
@@ -44,61 +44,61 @@
   object-position: center;
 }
 
-.event-card-isolated .title-field {
+.event-card-isolated .event-title-field {
   grid-area: title;
   font-size: 28px;
   line-height: 1.285;
 }
-.event-card-isolated .cta-field {
+.event-card-isolated .event-cta-field {
   grid-area: cta;
   padding-bottom: 0;
   font-size: 13px;
   line-height: 1.285;
   font-weight: 600;
 }
-.event-card-isolated .city-field {
+.event-card-isolated .event-city-field {
   grid-area: city;
   padding-bottom: 0;
   opacity: 0.5;
   font-size: 13px;
   line-height: 1.285;
 }
-.event-card-isolated .admission-field {
+.event-card-isolated .event-admission-field {
   grid-area: admission;
   padding-bottom: 0;
   font-size: 13px;
   line-height: 1.285;
   font-weight: 700;
 }
-.event-card-isolated .date-field {
+.event-card-isolated .event-datetime-field {
   grid-area: date;
   margin-top: 30px;
   padding-top: 30px;
   border-top: 1px solid rgba(0, 0, 0, 0.15);
 }
-.event-card-isolated .location-field {
+.event-card-isolated .event-location-field {
   grid-area: location;
 }
-.event-card-isolated .description-field {
+.event-card-isolated .event-description-field {
   grid-area: description;
 }
 
-.event-card-isolated .city-field,
-.event-card-isolated .admission-field,
-.event-card-isolated .cta-field {
+.event-card-isolated .event-city-field,
+.event-card-isolated .event-admission-field,
+.event-card-isolated .event-cta-field {
   max-width: calc(656px / 2);
 }
 
-.event-card-isolated .city-field,
-.event-card-isolated .admission-field {
+.event-card-isolated .event-city-field,
+.event-card-isolated .event-admission-field {
   margin-right: 0;
 }
 
-.event-card-isolated .cta-field {
+.event-card-isolated .event-cta-field {
   margin-left: 0;
 }
 
-.event-card-isolated .cta-value {
+.event-card-isolated .event-cta-value {
   width: 128px;
   min-height: 35px;
   margin-left: auto;
