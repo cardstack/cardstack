@@ -7,7 +7,7 @@ export interface OcclusionRules {
 }
 export type Format = keyof OcclusionFieldSets;
 export type OcclusionRulesOrDefaults = OcclusionRules | 'everything' | 'upstream';
-export type IncludedResourceOcclusionRules = InnerOcclusionRules[] | 'everything' | 'upstream';
+export type InnerOcclusionRulesOrDefaults = InnerOcclusionRules[] | 'everything' | 'upstream';
 
 export interface OcclusionFieldSets {
   isolated: (string | InnerOcclusionRules)[];
@@ -23,17 +23,24 @@ export function assertOcclusionRules(rules: any, errorSource: string): asserts r
     throw new CardstackError(`${errorSource} must be an object`);
   }
   if ('includeFields' in rules) {
-    for (let entry of rules.includeFields) {
-      if (typeof entry === 'string') {
-        continue;
-      }
-      assertInnerOcclusionRules(entry, errorSource);
-    }
+    assertIncludeFields(rules.includeFields, `${errorSource}.includeFields`);
   }
   if ('includeFieldSet' in rules) {
     if (typeof rules.includeFieldSet !== 'string') {
       throw new CardstackError(`includeFieldSet in ${errorSource} must be a string`);
     }
+  }
+}
+
+function assertIncludeFields(fields: any, errorSource: string): asserts fields is (string | InnerOcclusionRules)[] {
+  if (!Array.isArray(fields)) {
+    throw new CardstackError(`${errorSource} must be an array`);
+  }
+  for (let entry of fields) {
+    if (typeof entry === 'string') {
+      continue;
+    }
+    assertInnerOcclusionRules(entry, errorSource);
   }
 }
 
@@ -49,9 +56,6 @@ export function assertOcclusionFieldSets(rules: any, errorSource: string): asser
     throw new CardstackError(`${errorSource} must be an object`);
   }
   for (let [field, entry] of Object.entries(rules)) {
-    if (typeof entry === 'string') {
-      continue;
-    }
-    assertInnerOcclusionRules(entry, `${errorSource}.${field}`);
+    assertIncludeFields(entry, `${errorSource}.${field}`);
   }
 }

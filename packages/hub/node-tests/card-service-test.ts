@@ -1521,6 +1521,11 @@ describe('hub/card-service', function() {
         puppyCard = await service.create(
           `${myOrigin}/api/realms/first-ephemeral-realm`,
           testCard()
+            .withAttributes({
+              csFieldSets: {
+                embedded: ['name'],
+              },
+            })
             .withField('name', 'string-field')
             .withField('favoriteToy', toyCard).jsonapi
         );
@@ -1533,6 +1538,11 @@ describe('hub/card-service', function() {
         ownerCard = await service.create(
           `${myOrigin}/api/realms/first-ephemeral-realm`,
           testCard()
+            .withAttributes({
+              csFieldSets: {
+                isolated: ['name', 'puppies'],
+              },
+            })
             .withField('name', 'string-field')
             .withField('puppies', puppyCard, 'plural').jsonapi
         );
@@ -1844,7 +1854,28 @@ describe('hub/card-service', function() {
         );
       });
 
-      it.skip('can include fields based on csFieldSets in a card', async function() {});
+      it('can include fields based on csFieldSets in a card', async function() {
+        let { jsonapi: doc } = await daddy.asPristineDoc({
+          includeFieldSet: 'isolated',
+        });
+        expect(doc).to.have.nested.property('data.attributes.name');
+        expect(doc).to.have.deep.nested.property('data.relationships.puppies.data', [
+          { type: 'cards', id: vanGogh.canonicalURL },
+          { type: 'cards', id: mango.canonicalURL },
+        ]);
+
+        expect(doc.included?.length).to.equal(2);
+        let ids = doc?.included?.map(i => i.id);
+        expect(ids).to.have.members([vanGogh.canonicalURL, mango.canonicalURL]);
+        let includedVanGogh = doc?.included?.find(i => i.id === vanGogh.canonicalURL);
+        let includedMango = doc?.included?.find(i => i.id === mango.canonicalURL);
+
+        expect(includedVanGogh).to.have.nested.property('attributes.name');
+        expect(includedVanGogh).to.not.have.nested.property('attributes.favoriteToy');
+
+        expect(includedMango).to.have.nested.property('attributes.name');
+        expect(includedVanGogh).to.not.have.nested.property('attributes.favoriteToy');
+      });
 
       it.skip('can include fields based on csFieldSets in a card and specified include fields', async function() {});
 
