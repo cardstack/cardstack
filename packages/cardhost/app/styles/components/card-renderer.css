@@ -1,10 +1,15 @@
+.card-renderer--container {
+  grid-column-end: end;
+}
+
 .card-renderer-isolated {
   --card-renderer-width: var(--ch-card-size);
   --card-renderer-height: var(--ch-card-size);
   --card-renderer-header-height: 50px;
 
   position: relative;
-  width: var(--ch-card-size);
+  min-width: var(--ch-min-card-width);
+  max-width: var(--ch-card-size);
   font: 400 16px/22px var(--ch-font-family);
   letter-spacing: 0.015em;
 }
@@ -15,8 +20,13 @@
   max-width: var(--card-renderer-width);
   min-height: var(--card-renderer-height);
 }
+
 .card-renderer-isolated.view {
   padding-top: 50px;
+}
+
+.card-renderer-isolated.schema {
+  max-width: initial;
 }
 
 /* Resetting styles so that view mode styling does not affect other modes */

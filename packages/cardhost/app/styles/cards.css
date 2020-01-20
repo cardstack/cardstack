@@ -45,6 +45,7 @@
   align-items: flex-start;
   height: 100%;
   padding: 0 20px;
+  grid-template-columns: 1fr;
 }
 
 .card-view {
