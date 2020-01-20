@@ -43,11 +43,6 @@
   grid-template-columns: 1fr;
 }
 
-.card-view {
-  padding-top: 100px;
-}
-
-
 @media (max-width: 1440px) {
   .cardhost-cards.edit {
     padding-left: var(--ch-left-edge-navbar-width);
