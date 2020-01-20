@@ -36,7 +36,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can include a csAdoptsFrom reference"]
+      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can include fields based on csFieldSets in a card and specified include fields"]
     },
     {
       "type": "node",

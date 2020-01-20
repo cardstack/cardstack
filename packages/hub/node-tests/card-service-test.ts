@@ -1593,6 +1593,9 @@ describe('hub/card-service', function() {
           `${myOrigin}/api/realms/first-ephemeral-realm`,
           testCard()
             .withAttributes({
+              csFieldSets: {
+                embedded: ['name'],
+              },
               name: 'Mariko',
               puppies: [
                 testCard()
@@ -1877,11 +1880,77 @@ describe('hub/card-service', function() {
         expect(includedVanGogh).to.not.have.nested.property('attributes.favoriteToy');
       });
 
-      it.skip('can include fields based on csFieldSets in a card and specified include fields', async function() {});
+      it('can include fields based on csFieldSets in a card and specified include fields', async function() {
+        let { jsonapi: doc } = await daddy.asPristineDoc({
+          includeFieldSet: 'isolated',
+          includeFields: [
+            {
+              name: 'puppies',
+              includeFields: [
+                {
+                  name: 'favoriteToy',
+                  includeFields: ['description'],
+                },
+              ],
+            },
+          ],
+        });
+        expect(doc).to.have.nested.property('data.attributes.name');
+        expect(doc).to.have.deep.nested.property('data.relationships.puppies.data', [
+          { type: 'cards', id: vanGogh.canonicalURL },
+          { type: 'cards', id: mango.canonicalURL },
+        ]);
 
-      it.skip('can include fields based on inheritied csFieldSets from a parent card', async function() {});
+        expect(doc.included?.length).to.equal(3);
+        let ids = doc?.included?.map(i => i.id);
+        expect(ids).to.have.members([vanGogh.canonicalURL, mango.canonicalURL, squeakySnake.canonicalURL]);
+        let includedVanGogh = doc?.included?.find(i => i.id === vanGogh.canonicalURL);
+        let includedMango = doc?.included?.find(i => i.id === mango.canonicalURL);
+        let includedSqueakySnake = doc?.included?.find(i => i.id === squeakySnake.canonicalURL);
 
-      it.skip('can include fields based on csFieldSets that overrides inherited csFieldSets from a parent card', async function() {});
+        expect(includedVanGogh).to.have.nested.property('attributes.name', 'Van Gogh');
+        expect(includedVanGogh).to.have.nested.property('attributes.favoriteToy');
+        expect(includedVanGogh).to.have.deep.nested.property('attributes.favoriteToy.relationships.csAdoptsFrom.data', {
+          type: 'cards',
+          id: toyCard.canonicalURL,
+        });
+        expect(includedVanGogh).to.have.nested.property('attributes.favoriteToy.attributes.description', 'a beef bone');
+
+        expect(includedMango).to.have.nested.property('attributes.name', 'Mango');
+        expect(includedMango).to.have.deep.nested.property('relationships.favoriteToy.data', {
+          type: 'cards',
+          id: squeakySnake.canonicalURL,
+        });
+
+        expect(includedSqueakySnake).to.have.nested.property(
+          'attributes.description',
+          'a plush snake with squeaky segments'
+        );
+      });
+
+      it('can include fields based on csFieldSets that overrides inherited csFieldSets', async function() {
+        let { jsonapi: doc } = await mommy.asPristineDoc({
+          includeFieldSet: 'embedded',
+        });
+        expect(doc).to.have.nested.property('data.attributes.name', 'Mariko');
+        expect(doc).to.not.have.nested.property('data.attributes.puppies');
+        expect(doc).to.not.have.property('included');
+      });
+
+      it('does not return user fields if the card does not have field set rules for the requested field set', async function() {
+        let { jsonapi: doc } = await daddy.asPristineDoc({
+          includeFieldSet: 'embedded',
+        });
+        expect(doc).to.have.nested.property('data.type', 'cards');
+        expect(doc).to.have.nested.property('data.id', daddy.canonicalURL);
+        expect(doc).to.have.deep.nested.property('data.relationships.csAdoptsFrom.data', {
+          type: 'cards',
+          id: ownerCard.canonicalURL,
+        });
+        expect(doc).to.not.have.nested.property('data.attributes.name');
+        expect(doc).to.not.have.nested.property('data.relationships.puppies');
+        expect(doc).to.not.have.property('included');
+      });
 
       it.skip('can handle a cycle within in the included cards', async function() {});
 
