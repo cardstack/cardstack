@@ -234,7 +234,7 @@ module('Acceptance | card adoption', function(hooks) {
 
     await click('[data-test-top-edge-link="view"]');
     await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
-    assert.dom('[data-test-field="treats-available"] [data-test-boolean-field-viewer-value]').hasText('true');
+    assert.dom('[data-test-field="treats-available"] [data-test-boolean-field-viewer-value]').hasText('Yes');
     assert.dom('[data-test-field="address"] [data-test-string-field-viewer-value]').hasText('105 Barkley Lane');
     assert.dom('[data-test-field="city"] [data-test-string-field-viewer-value]').hasText('Puppyville');
     assert.dom('[data-test-field="state"] [data-test-string-field-viewer-value]').hasText('MA');
