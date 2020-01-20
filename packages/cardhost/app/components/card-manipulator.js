@@ -216,13 +216,17 @@ export default class CardManipulator extends Component {
 
     // we have to focus the clicked element to take focus away from the card.
     // to do that we have to give the element tabindex = 0 temporarily.
-    // but if the element is an input, we need to make sure not to clobber
-    // it's original tabindex
+    // but if the element already has a tabindex (i.e. an input), we need
+    // to make sure not to clobber it's original tabindex
     let tabIndex = evt.target.tabIndex;
-    evt.target.tabIndex = 0;
-    evt.target.focus();
-    evt.target.blur();
-    evt.target.tabIndex = tabIndex;
+    if (tabIndex === -1) {
+      evt.target.tabIndex = 0;
+      evt.target.focus();
+      evt.target.blur();
+      evt.target.tabIndex = tabIndex;
+    } else {
+      evt.target.focus();
+    }
 
     this.selectedField = field;
     this.cardSelected = false;
