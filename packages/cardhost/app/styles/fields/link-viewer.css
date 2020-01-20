@@ -1,4 +1,5 @@
-.field-type-url {
-  color: #00807D;
+.field-type-link {
+  color: var(--ch-cobalt-blue);
   text-decoration: underline;
+  font-weight: 600;
 }
