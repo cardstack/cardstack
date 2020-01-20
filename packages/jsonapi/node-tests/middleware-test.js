@@ -66,7 +66,7 @@ describe('jsonapi/middleware', function() {
           factory
             .addResource('content-types', 'article-links')
             .withRelated('fields', [
-              factory.addResource('fields', 'link').withAttributes({ fieldType: '@cardstack/core-types::string' }),
+              factory.addResource('fields', 'url').withAttributes({ fieldType: '@cardstack/core-types::link' }),
             ]),
         ]),
     ]);
