@@ -13,9 +13,7 @@
   padding-left: var(--padding-left);
   padding-right: var(--padding-right);
 
-  transition: padding-left var(--ch-transition-time) ease-in-out,
-              var(--ch-card-padding-animate),
-              var(--ch-card-background-color-animate);
+  transition: var(--ch-card-background-color-animate);
 }
 
 .cardhost-cards.view {
@@ -43,6 +41,7 @@
 .card-view,
 .card-editor {
   display: grid;
+  justify-content: center;
   align-items: flex-start;
   height: 100%;
   padding: 0 20px;

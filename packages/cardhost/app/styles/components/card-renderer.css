@@ -4,7 +4,7 @@
   --card-renderer-header-height: 50px;
 
   position: relative;
-  width: 100%;
+  width: var(--ch-card-size);
   font: 400 16px/22px var(--ch-font-family);
   letter-spacing: 0.015em;
 }
@@ -16,7 +16,6 @@
   min-height: var(--card-renderer-height);
 }
 .card-renderer-isolated.view {
-  box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.4);
   padding-top: 50px;
 }
 
@@ -88,7 +87,6 @@
 .card-renderer-isolated--content {
   position: relative;
   min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
-  padding-bottom: 80px;
   background-color: transparent;
   color: var(--ch-dark);
   border: none;
