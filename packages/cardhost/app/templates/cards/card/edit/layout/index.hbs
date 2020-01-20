@@ -18,12 +18,14 @@
           @selected={{this.selectedTheme}}
           @setValue={{this.handleThemeChange}}
         />
-        <button {{on "click" this.createTheme}}
-          class="ch-button ch-button--secondary ch-button--responsive"
+        <Cta
+          {{on "click" this.createTheme}}
+          @variant="secondary responsive"
+          @theme="cs-dark"
           data-test-card-custom-style-button
         >
           New Custom Style
-        </button>
+        </Cta>
       </div>
     </div>
   </RightEdge>
