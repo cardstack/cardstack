@@ -169,6 +169,98 @@ let jobCardTemplate = eventFactory.getDocumentFor(
     )
 );
 
+let vipTicketTemplate = eventFactory.getDocumentFor(
+  eventFactory
+    .addResource('cards', 'local-hub::vip-ticket')
+    .withRelated('adopted-from', { type: 'cards', id: 'local-hub::@cardstack/base-card' })
+    .withRelated('fields', [
+      eventFactory.addResource('fields', 'title').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        'needed-when-embedded': true,
+        required: true,
+        caption: 'Title',
+      }),
+      eventFactory.addResource('fields', 'title-2').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: true,
+        caption: 'Title 2',
+      }),
+      eventFactory.addResource('fields', 'divider').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::boolean',
+        'needed-when-embedded': true,
+        caption: 'Divider',
+      }),
+      eventFactory.addResource('fields', 'guest-name').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'Guest Name',
+      }),
+      eventFactory.addResource('fields', 'number-of-tickets').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::integer',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'Number of tickets',
+      }),
+      eventFactory.addResource('fields', 'date').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::date',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'Date',
+      }),
+      eventFactory.addResource('fields', 'wheelchair-access').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::boolean',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'Wheelchair access',
+      }),
+      eventFactory.addResource('fields', 'section').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'Section',
+      }),
+      eventFactory.addResource('fields', 'vip-package').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::boolean',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'VIP package',
+      }),
+      eventFactory.addResource('fields', 'qr-code').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::decorative-image',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'QR code',
+      }),
+    ])
+    .withRelated(
+      'model',
+      eventFactory.addResource('local-hub::vip-ticket', 'local-hub::vip-ticket').withAttributes({
+        title: 'Never Empty Cup Launch Party',
+        title2: 'VIP Guest Ticket',
+        divider: true,
+        guestName: 'Charlie Peel',
+        numberOfTickets: 4,
+        date: '2020-02-27',
+        wheelchairAccess: false,
+        section: 'Main floor',
+        vipPackage: 'Backstage pass, Open bar, VIP parking',
+        qrCode:
+          'https://www.qr-code-generator.com/wp-content/themes/qr/new_structure/markets/core_market_full/generator/dist/generator/assets/images/websiteQRCode_noFrame.png',
+      })
+    )
+);
+
 let jobApplicantProfileTemplate = eventFactory.getDocumentFor(
   eventFactory
     .addResource('cards', 'local-hub::job-applicant-profile')
@@ -224,4 +316,10 @@ let jobApplicantProfileTemplate = eventFactory.getDocumentFor(
     )
 );
 
-module.exports = [locationCardTemplate, eventCardTemplate, jobCardTemplate, jobApplicantProfileTemplate];
+module.exports = [
+  locationCardTemplate,
+  eventCardTemplate,
+  jobCardTemplate,
+  jobApplicantProfileTemplate,
+  vipTicketTemplate,
+];
