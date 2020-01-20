@@ -345,39 +345,33 @@ export class Card {
     included: Map<string, IncludedResourceOcclusionRules>
   ): Promise<ResourceObject> {
     let data = Object.create(null);
-    data.type = 'cards';
 
     if (this instanceof AddressableCard) {
       data.id = this.canonicalURL;
     }
 
+    data.type = 'cards';
     data.attributes = Object.create(null);
     data.attributes.csRealm = this.csRealm;
 
     if (this.csRealm !== this.csOriginalRealm) {
       data.attributes.csOriginalRealm = this.csOriginalRealm;
     }
-
     if (this.csId) {
       data.attributes.csId = this.csId;
     }
-
     if (this.csFields) {
       data.attributes.csFields = this.csFields;
     }
-
     if (this.csFeatures) {
       data.attributes.csFeatures = this.csFeatures;
     }
-
     if (this.csFiles) {
       data.attributes.csFiles = this.csFiles;
     }
-
     if (this.csPeerDependencies) {
       data.attributes.csPeerDependencies = this.csPeerDependencies;
     }
-
     if (this.csFieldSets) {
       data.attributes.csFieldSets = this.csFieldSets;
     }
@@ -399,9 +393,9 @@ export class Card {
         continue;
       }
       if ('value' in rawData) {
-        applyRulesForAttribute(data.attributes, field, rules, rawData.value);
+        await this.applyRulesForAttribute(data.attributes, field, rules, rawData.value);
       } else {
-        applyRulesForRelationship(data.relationships, field, rules, rawData.ref, included);
+        await this.applyRulesForRelationship(data.relationships, field, rules, rawData.ref, included);
       }
     }
 
@@ -440,6 +434,115 @@ export class Card {
       jsonapi.included = included;
     }
     return jsonapi;
+  }
+
+  private async applyRulesForAttribute(
+    attributes: AttributesObject,
+    field: string,
+    rules: OcclusionRulesOrDefaults,
+    data: any
+  ): Promise<void> {
+    if (rules === 'everything' || rules === 'upstream') {
+      attributes[field] = cloneDeep(data);
+    } else if (rules.includeFields) {
+      if (rules.includeFields?.includes(field) && !isObjectLike(data)) {
+        attributes[field] = data;
+        return;
+      }
+
+      let interiorRules = rules.includeFields.filter(
+        i => typeof i !== 'string' && i.name === field
+      ) as InnerOcclusionRules[];
+      let interiorRule: OcclusionRulesOrDefaults;
+      if (interiorRules.length) {
+        interiorRule = mergeRules(interiorRules);
+      } else if (rules.includeFields?.includes(field)) {
+        interiorRule = {};
+      }
+      if (!interiorRules.length && !rules.includeFields?.includes(field)) {
+        return;
+      }
+
+      let interiorCard = await getOwner(this).instantiate(Card, { data }, this.csRealm, this, this.service);
+      let {
+        data: { attributes: interiorAttrs, relationships: interiorRel },
+      } = await interiorCard.serializeAsJsonAPIDoc(interiorRule!);
+      let interiorJson: { attributes?: AttributesObject; relationships?: RelationshipsObject } = {};
+      if (interiorAttrs) {
+        interiorJson.attributes = interiorAttrs;
+      }
+      if (interiorRel) {
+        interiorJson.relationships = interiorRel;
+      }
+      attributes[field] = interiorJson as J.Value;
+    }
+  }
+
+  private async applyRulesForRelationship(
+    relationships: RelationshipsObject,
+    field: string,
+    rules: OcclusionRulesOrDefaults,
+    reference: CardId | CardId[] | undefined,
+    included: Map<string, IncludedResourceOcclusionRules>
+  ): Promise<void> {
+    let relationshipRules: IncludedResourceOcclusionRules | undefined;
+    if (rules !== 'everything' && rules !== 'upstream') {
+      if (rules.includeFields) {
+        let interiorRules = rules.includeFields.filter(
+          i => typeof i !== 'string' && i.name === field
+        ) as InnerOcclusionRules[];
+        relationshipRules = interiorRules.length
+          ? interiorRules
+          : rules.includeFields.includes(field)
+          ? /* in this scenario you have specified you want this field via the
+              string field name, but you have not asked for any interior card
+              fields to be included */
+            [{ name: field }]
+          : undefined;
+      }
+      if (rules.includeFieldSet) {
+        // use the embedded fieldset's fields for included resources when we
+        // are using a fieldset based rule--look at this.fieldSet()
+      }
+    } else {
+      relationshipRules = rules === 'upstream' ? 'upstream' : 'everything';
+    }
+
+    if (relationshipRules) {
+      if (Array.isArray(reference)) {
+        relationships[field] = {
+          data: reference.map(id => ({ type: 'cards', id: canonicalURL(id) })),
+        };
+      } else if (reference) {
+        relationships[field] = {
+          data: { type: 'cards', id: canonicalURL(reference) },
+        };
+      } else {
+        relationships[field] = { data: null };
+      }
+    }
+
+    if (!reference) {
+      return;
+    }
+
+    if (rules === 'upstream') {
+      // how to handle situation where the upstream doc provided to the Card
+      // constuctor had included? is it our responsibility to mirror any
+      // supplied included resources to the Card constuctor in the
+      // asUpstream() response?
+      return;
+    }
+
+    if (relationshipRules) {
+      if (Array.isArray(reference)) {
+        for (let id of reference) {
+          included.set(canonicalURL(id), relationshipRules);
+        }
+      } else {
+        included.set(canonicalURL(reference), relationshipRules);
+      }
+    }
   }
 
   async asUpstreamDoc(): Promise<UpstreamDocument> {
@@ -845,86 +948,4 @@ function mergeRules(rules: IncludedResourceOcclusionRules): OcclusionRulesOrDefa
     return rules[0];
   }
   throw new Error(`unimplemented: mergeRules`);
-}
-
-function applyRulesForAttribute(
-  attributes: AttributesObject,
-  field: string,
-  rules: OcclusionRulesOrDefaults,
-  data: any
-): void {
-  if (rules === 'everything' || rules === 'upstream') {
-    attributes[field] = cloneDeep(data);
-  } else {
-    if (rules.includeFields?.includes(field) && typeof !isObjectLike(data)) {
-      attributes[field] = data;
-    }
-  }
-}
-
-function applyRulesForRelationship(
-  relationships: RelationshipsObject,
-  field: string,
-  rules: OcclusionRulesOrDefaults,
-  reference: CardId | CardId[] | undefined,
-  included: Map<string, IncludedResourceOcclusionRules>
-): void {
-  let relationshipRules: IncludedResourceOcclusionRules | undefined;
-  if (rules !== 'everything' && rules !== 'upstream') {
-    if (rules.includeFields) {
-      let interiorRules = rules.includeFields.filter(
-        i => typeof i !== 'string' && i.name === field
-      ) as InnerOcclusionRules[];
-      relationshipRules = interiorRules.length
-        ? interiorRules
-        : rules.includeFields.includes(field)
-        ? /* in this scenario you have specified you want this field via the
-              string field name, but you have not asked for any interior card
-              fields to be included */
-          [{ name: field }]
-        : undefined;
-    }
-    if (rules.includeFieldSet) {
-      // use the embedded fieldset's fields for included resources when we
-      // are using a fieldset based rule--look at this.fieldSet()
-    }
-  } else {
-    relationshipRules = rules === 'upstream' ? 'upstream' : 'everything';
-  }
-
-  if (relationshipRules) {
-    if (Array.isArray(reference)) {
-      relationships[field] = {
-        data: reference.map(id => ({ type: 'cards', id: canonicalURL(id) })),
-      };
-    } else if (reference) {
-      relationships[field] = {
-        data: { type: 'cards', id: canonicalURL(reference) },
-      };
-    } else {
-      relationships[field] = { data: null };
-    }
-  }
-
-  if (!reference) {
-    return;
-  }
-
-  if (rules === 'upstream') {
-    // how to handle situation where the upstream doc provided to the Card
-    // constuctor had included? is it our responsibility to mirror any
-    // supplied included resources to the Card constuctor in the
-    // asUpstream() response?
-    return;
-  }
-
-  if (relationshipRules) {
-    if (Array.isArray(reference)) {
-      for (let id of reference) {
-        included.set(canonicalURL(id), relationshipRules);
-      }
-    } else {
-      included.set(canonicalURL(reference), relationshipRules);
-    }
-  }
 }

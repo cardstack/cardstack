@@ -1656,7 +1656,7 @@ describe('hub/card-service', function() {
       });
 
       it('can occlude all user fields when an empty rule "{}" is specified', async function() {
-        let { jsonapi: doc } = await daddy.asPristineDoc({ includeFields: [] });
+        let { jsonapi: doc } = await daddy.asPristineDoc({});
         expect(doc).to.have.nested.property('data.type', 'cards');
         expect(doc).to.have.nested.property('data.id', daddy.canonicalURL);
         expect(doc).to.not.have.nested.property('data.attributes.name');
@@ -1665,7 +1665,7 @@ describe('hub/card-service', function() {
       });
 
       it('does not occlude system fields as part of evaluating the occusion rules', async function() {
-        let { jsonapi: doc } = await daddy.asPristineDoc({ includeFields: [] });
+        let { jsonapi: doc } = await ownerCard.asPristineDoc({});
         expect(doc.data.attributes?.csId).to.be.ok;
         expect(doc.data.attributes?.csRealm).to.ok;
         expect(doc.data.attributes?.csFields).to.be.ok;
@@ -1683,19 +1683,60 @@ describe('hub/card-service', function() {
         expect(doc.included?.[0].id).to.equal(dalmatianCard.canonicalURL);
       });
 
-      it.skip('can include a field filled by card-as-value when getting the pristine doc', async function() {});
+      it('can include a field filled by card-as-value when getting the pristine doc', async function() {
+        let { jsonapi: doc } = await vanGogh.asPristineDoc({ includeFields: ['favoriteToy'] });
+        expect(doc).to.not.have.nested.property('data.attributes.name');
+        expect(doc).to.have.nested.property('data.attributes.favoriteToy');
+        expect(doc).to.have.deep.nested.property('data.attributes.favoriteToy.relationships.csAdoptsFrom.data', {
+          type: 'cards',
+          id: toyCard.canonicalURL,
+        });
+        expect(doc).to.not.have.nested.property('data.attributes.favoriteToy.attributes.description');
+        expect(doc).to.not.have.property('included');
+      });
 
-      it.skip('can include a field filled by card-as-reference when getting the pristine doc', async function() {});
+      it('can include a field filled by card-as-reference when getting the pristine doc', async function() {
+        let { jsonapi: doc } = await mango.asPristineDoc({ includeFields: ['favoriteToy'] });
+        expect(doc).to.not.have.nested.property('data.attributes.name');
+        expect(doc).to.have.deep.nested.property('data.relationships.favoriteToy.data', {
+          type: 'cards',
+          id: squeakySnake.canonicalURL,
+        });
+        expect(doc.included?.length).to.equal(1);
+        expect(doc.included?.[0].id).to.equal(squeakySnake.canonicalURL);
+        expect(doc.included?.[0]).to.not.have.nested.property('attributes.description');
+      });
 
-      it.skip('can include an interior card-as-value field when getting the pristine doc', async function() {});
+      it('can include an interior card-as-value field when getting the pristine doc', async function() {
+        let { jsonapi: doc } = await vanGogh.asPristineDoc({
+          includeFields: [{ name: 'favoriteToy', includeFields: ['description'] }],
+        });
+        expect(doc).to.not.have.nested.property('data.attributes.name');
+        expect(doc).to.have.nested.property('data.attributes.favoriteToy');
+        expect(doc).to.have.deep.nested.property('data.attributes.favoriteToy.relationships.csAdoptsFrom.data', {
+          type: 'cards',
+          id: toyCard.canonicalURL,
+        });
+        expect(doc).to.have.nested.property('data.attributes.favoriteToy.attributes.description', 'a beef bone');
+        expect(doc).to.not.have.property('included');
+      });
 
-      it.skip('can include a card-as-reference with no user fields (no InnerOcclusionRules specified for relationship) when getting the pristine doc', async function() {});
-
-      it.skip('can include an interior card-as-reference field when getting the pristine doc', async function() {});
-
-      it.skip('can include a deeply nested field filled by card-as-reference when getting the pristine doc', async function() {});
-
-      it.skip('can include a deeply nested field filled by card-as-value when getting the pristine doc', async function() {});
+      it('can include an interior card-as-reference field when getting the pristine doc', async function() {
+        let { jsonapi: doc } = await mango.asPristineDoc({
+          includeFields: [{ name: 'favoriteToy', includeFields: ['description'] }],
+        });
+        expect(doc).to.not.have.nested.property('data.attributes.name');
+        expect(doc).to.have.deep.nested.property('data.relationships.favoriteToy.data', {
+          type: 'cards',
+          id: squeakySnake.canonicalURL,
+        });
+        expect(doc.included?.length).to.equal(1);
+        expect(doc.included?.[0].id).to.equal(squeakySnake.canonicalURL);
+        expect(doc.included?.[0]).to.have.nested.property(
+          'attributes.description',
+          'a plush snake with squeaky segments'
+        );
+      });
 
       it.skip('can include an interior card-as-reference field from a field with arity > 1 when getting the pristine doc', async function() {});
 

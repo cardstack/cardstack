@@ -36,7 +36,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "does not occlude system fields as part of evaluating the occusion rules"]
+      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can include an interior card-as-reference field when getting the pristine doc"]
     },
     {
       "type": "node",

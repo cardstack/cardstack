@@ -190,13 +190,15 @@ export class TestCard {
       };
     }
 
-    let csFields = Object.create(null);
-    for (let [fieldName, testCard] of this.fields) {
-      if (testCard) {
-        csFields[fieldName] = testCard.jsonapi;
+    if (this.fields.size) {
+      let csFields = Object.create(null);
+      for (let [fieldName, testCard] of this.fields) {
+        if (testCard) {
+          csFields[fieldName] = testCard.jsonapi;
+        }
       }
+      doc.data.attributes.csFields = csFields;
     }
-    doc.data.attributes.csFields = csFields;
 
     return doc;
   }
