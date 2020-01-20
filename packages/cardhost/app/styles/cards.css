@@ -40,6 +40,10 @@
   align-items: flex-start;
   height: 100%;
   padding: 0 20px;
+}
+
+.card-view,
+.card-editor {
   grid-template-columns: 1fr;
 }
 

@@ -25,10 +25,6 @@
   padding-top: 50px;
 }
 
-.card-renderer-isolated.schema {
-  max-width: initial;
-}
-
 /* Resetting styles so that view mode styling does not affect other modes */
 .card-renderer-isolated.schema .isolated-card,
 .card-renderer-isolated.edit .isolated-card,
