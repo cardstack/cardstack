@@ -33,7 +33,7 @@ export default class CardViewer extends Component {
   @action
   handleThemeChange(val) {
     if (val.name === 'Cardstack default') {
-      this.args.card.setIsolatedCss('');
+      this.args.card.setIsolatedCss('.cardstack_base-card-isolated {}');
     }
   }
 }
