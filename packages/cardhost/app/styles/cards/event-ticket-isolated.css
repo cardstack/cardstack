@@ -1,67 +1,61 @@
-.vip-ticket-isolated {
-  background-color: #FFEE6E;
-  background-image: url('/assets/images/cards/vip-ticket/ticket-confetti.svg');
-  background-size: 931px 1365px;
-  background-position: top center;
-  background-repeat: no-repeat;
-  font-family: 'DM Sans', sans-serif;
+.event-ticket-isolated {
+    background-color: #FFEE6E;
+    background-image: url('/assets/images/cards/event-ticket/ticket-confetti.svg');
+    background-size: 931px 1365px;
+    background-position: top center;
+    background-repeat: no-repeat;
+    font-family: 'DM Sans', sans-serif;
 }
 
-.vip-ticket-isolated .title-value {
-  background-image: url('/assets/images/cards/vip-ticket/ticket-logo.svg');
-  background-size: 79px 61px;
-  background-position: top center;
-  background-repeat: no-repeat;
-  padding-top: 77px;
+.event-ticket-isolated .label {
+    color: #FF0049;
+    font-size: 12px;
+    letter-spacing: 0.1em;
 }
 
-.vip-ticket-isolated .title-value {
-  font-size: 35px;
-  font-weight: bold;
-  line-height: calc(40 / 35);
-  letter-spacing: 0.015em;
-  color: black;
-  text-align: center;
-}
-
-.vip-ticket-isolated .label {
-  color: #FF0049;
-  font-size: 12px;
-  letter-spacing: 0.1em;
-}
-
-.vip-ticket-isolated .field {
+.event-ticket-isolated .field {
     display: block;
     padding: 0 31px 25px;
-    color: white;
-}
-
-.vip-ticket-isolated .field {
     background: #373343;
+    color: white;
     font-size: 15px;
     font-weight: 500;
     line-height: calc(22 / 15);
 }
 
-.vip-ticket-isolated .title-field {
+.event-ticket-isolated .title-field {
     background: none;
 }
 
-.vip-ticket-isolated .title-2-field {
+.event-ticket-isolated .title-value {
+    padding-top: 77px;
+    background-image: url('/assets/images/cards/event-ticket/ticket-logo.svg');
+    background-size: 79px 61px;
+    background-position: top center;
+    background-repeat: no-repeat;
+    font-size: 35px;
+    font-weight: bold;
+    line-height: calc(40 / 35);
+    letter-spacing: 0.015em;
+    color: black;
+    text-align: center;
+}
+
+.event-ticket-isolated .highlight-title-field {
     background: #FF0049;
     padding: 16px 103px 11px;
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
 }
 
-.vip-ticket-isolated .title-2-value {
+.event-ticket-isolated .highlight-title-value {
     color: white;
     font-size: 12px;
     font-weight: bold;
     text-transform: uppercase;
 }
 
-.vip-ticket-isolated .isolated-card--view-fields {
+.event-ticket-isolated .isolated-card--fields {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
@@ -76,20 +70,20 @@
     overflow: hidden;
 }
 
-.vip-ticket-isolated .field {
+.event-ticket-isolated .field {
     grid-column: 1 / -1;
 }
 
-.vip-ticket-isolated .title-field {
+.event-ticket-isolated .title-field {
     grid-area: title;
 }
-.vip-ticket-isolated .title-2-field {
+.event-ticket-isolated .highlight-title-field {
     grid-area: title-2;
 }
-.vip-ticket-isolated .qr-code-field {
+.event-ticket-isolated .qr-code-field {
     grid-area: qr-code;
 }
-.vip-ticket-isolated .qr-code-value {
+.event-ticket-isolated .qr-code-value {
     display: block;
     background: white;
     width: 135px;
@@ -98,40 +92,40 @@
     margin: 33px auto 0;
     padding: 28px;
 }
-.vip-ticket-isolated .qr-code-field img {
+.event-ticket-isolated .qr-code-field img {
     width: 79px;
     min-height: 79px;
 }
-.vip-ticket-isolated .guest-name-field {
+.event-ticket-isolated .guest-name-field {
     grid-area: guest-name;
 }
-.vip-ticket-isolated .date-field {
+.event-ticket-isolated .date-field {
     grid-area: date;
     text-align: center;
-    background-image: url('/assets/images/cards/vip-ticket/ticket-date.svg');
+    background-image: url('/assets/images/cards/event-ticket/ticket-date.svg');
     background-size: 18px 20px;
     background-repeat: no-repeat;
     background-position: top center;
     padding-top: 31px;
 }
-.vip-ticket-isolated .number-of-tickets-field {
+.event-ticket-isolated .number-of-tickets-field {
     grid-area: quantity;
     text-align: center;
-    background-image: url('/assets/images/cards/vip-ticket/ticket-guest.svg');
+    background-image: url('/assets/images/cards/event-ticket/ticket-guest.svg');
     background-size: 18px 20px;
     background-repeat: no-repeat;
     background-position: top center;
     padding-top: 31px;
 }
 
-.vip-ticket-isolated .guest-name-label,
-.vip-ticket-isolated .date-label,
-.vip-ticket-isolated .number-of-tickets-label,
-.vip-ticket-isolated .qr-code-label {
+.event-ticket-isolated .guest-name-label,
+.event-ticket-isolated .date-label,
+.event-ticket-isolated .number-of-tickets-label,
+.event-ticket-isolated .qr-code-label {
     display: none;
 }
 
-.vip-ticket-isolated .guest-name-value::before {
+.event-ticket-isolated .guest-name-value::before {
     display: block;
     content: 'My name is';
     text-transform: uppercase;
@@ -140,21 +134,21 @@
     letter-spacing: 0.1em;
 }
 
-.vip-ticket-isolated .guest-name-field {
+.event-ticket-isolated .guest-name-field {
     font-size: 26px;
     font-weight: 500;
     text-align: center;
 }
 
-.vip-ticket-isolated .number-of-tickets-value::after {
+.event-ticket-isolated .number-of-tickets-value::after {
     content: 'Tickets';
     display: inline-block;
 }
 
-.vip-ticket-isolated .divider-field {
+.event-ticket-isolated .divider-field {
     border-top: none;
     height: 40px;
-    background-image: url('/assets/images/cards/vip-ticket/ticket-divider.svg');
+    background-image: url('/assets/images/cards/event-ticket/ticket-divider.svg');
     background-repeat: no-repeat;
     background-size: 346px 12px;
     background-position: top center;

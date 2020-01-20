@@ -13,11 +13,6 @@
   word-break: break-word;
 }
 
-/* TODO: Change this when we need to animate card contents in view/edit modes */
-.cardstack_base-card-isolated .isolated-card--view-fields {
-  display: contents;
-}
-
 .cardstack_base-card-isolated .field {
   display: grid;
   grid-template-columns: 1fr 1.5fr;
@@ -40,18 +35,14 @@
 
 /* Label hidden by default */
 .cardstack_base-card-isolated .title-label,
-.cardstack_base-card-isolated .title-2-label,
+.cardstack_base-card-isolated .highlight-title-label,
 .cardstack_base-card-isolated .body-label {
   display: none;
 }
 
-.cardstack_base-card-isolated .title-field + .cardstack_base-card-isolated .title-2-field {
-  padding-top: 7px;
-}
-
 /* Full-width field values by default */
 .cardstack_base-card-isolated .title-value,
-.cardstack_base-card-isolated .title-2-value,
+.cardstack_base-card-isolated .highlight-title-value,
 .cardstack_base-card-isolated .body-value {
   grid-column: 1 / -1;
 }
@@ -65,8 +56,8 @@
   line-height: 1.2;
 }
 
-/* Title 2 value */
-.cardstack_base-card-isolated .title-2-value {
+/* Highlight Title value */
+.cardstack_base-card-isolated .highlight-title-value {
   color: var(--red);
   font-size: 18px;
   font-weight: bold;
@@ -75,21 +66,10 @@
 }
 
 /* TODO: figure out how to deal with styling components */
-.divider-field {
+.cardstack_base-card-isolated .divider-field {
   border-top: 1px solid var(--light-gray);
 }
-.divider-label,
-.divider-value {
+.cardstack_base-card-isolated .divider-label,
+.cardstack_base-card-isolated .divider-value {
   display: none;
-}
-
-
-
-/* Photo card styling from themer */
-.photo-card-isolated {
-  padding: 21px 36px;
-}
-
-.image-photo-url {
-  grid-column: 1 / -1;
 }

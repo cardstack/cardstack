@@ -46,7 +46,7 @@ module.exports = function(environment) {
       'local-hub::event-card',
       'local-hub::job-description',
       'local-hub::job-applicant-profile',
-      'local-hub::vip-ticket',
+      'local-hub::event-ticket',
     ];
   }
 
