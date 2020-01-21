@@ -328,10 +328,111 @@ let eventTicketTemplate = eventFactory.getDocumentFor(
     )
 );
 
+let weddingInvitationTemplate = eventFactory.getDocumentFor(
+  eventFactory
+    .addResource('cards', 'local-hub::wedding-invitation')
+    .withRelated('adopted-from', { type: 'cards', id: 'local-hub::@cardstack/base-card' })
+    .withRelated('fields', [
+      eventFactory.addResource('fields', 'title').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        'needed-when-embedded': true,
+        required: true,
+        caption: 'Title',
+      }),
+      eventFactory.addResource('fields', 'divider').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::boolean',
+        'needed-when-embedded': false,
+        caption: 'Divider',
+      }),
+      eventFactory.addResource('fields', 'wedding-bride').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'Bride',
+      }),
+      eventFactory.addResource('fields', 'wedding-groom').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'Groom',
+      }),
+      eventFactory.addResource('fields', 'wedding-date').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::date',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'Wedding date',
+      }),
+      eventFactory.addResource('fields', 'wedding-time').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: true,
+        'needed-when-embedded': false,
+        caption: 'Wedding time',
+      }),
+      eventFactory.addResource('fields', 'wedding-reception-address').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: true,
+        'needed-when-embedded': false,
+        caption: 'Reception address',
+      }),
+      eventFactory.addResource('fields', 'wedding-rsvp-date').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::date',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'RSVP by',
+      }),
+      eventFactory.addResource('fields', 'wedding-website').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: false,
+        'needed-when-embedded': false,
+        caption: 'Website',
+      }),
+      eventFactory.addResource('fields', 'wedding-rsvp-cta').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::cta',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'RSVP',
+      }),
+      eventFactory.addResource('fields', 'wedding-intro-text').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: false,
+        'needed-when-embedded': false,
+        caption: 'Intro text',
+      }),
+    ])
+    .withRelated(
+      'model',
+      eventFactory.addResource('local-hub::wedding-invitation', 'local-hub::wedding-invitation').withAttributes({
+        title: 'Wedding Invitation',
+        divider: true,
+        weddingBride: 'Willa Karciana',
+        weddingGroom: 'Rufus Jackson',
+        weddingDate: '2021-06-05',
+        weddingTime: '3:00 PM',
+        weddingReceptionAddress: 'The Gorgeous Hotel, 96 Hilton Avenue, San Francisco, CA',
+        weddingRsvpDate: '2021-05-01',
+        weddingWebsite: 'www.rufusandwillainwonderland.com',
+        weddingRsvpCta: '',
+        weddingIntroText: 'Please join us for the wedding of',
+      })
+    )
+);
+
 module.exports = [
   locationCardTemplate,
   eventCardTemplate,
   jobCardTemplate,
   jobApplicantProfileTemplate,
   eventTicketTemplate,
+  weddingInvitationTemplate,
 ];
