@@ -27,7 +27,7 @@ describe('hub/jsonapi', function() {
     let response = await request
       .post('/api/realms/first-ephemeral-realm/cards')
       .set('Content-Type', 'application/vnd.api+json');
-    expect(response.status).to.equal(400);
+    expect(response).hasStatus(400);
     expect(response.body.errors).has.length(1);
     expect(response.body.errors[0]).property('detail', 'missing resource object');
     expect(response.body.errors[0].source).property('pointer', '/data');
@@ -38,7 +38,7 @@ describe('hub/jsonapi', function() {
       .post('/api/realms/first-ephemeral-realm/cards')
       .set('Content-Type', 'application/vnd.api+json')
       .send('{ data ');
-    expect(response.status).to.equal(400);
+    expect(response).hasStatus(400);
     expect(response.body.errors).has.length(1);
     expect(response.body.errors[0]).property(
       'detail',
@@ -65,7 +65,7 @@ describe('hub/jsonapi', function() {
           },
         })
       );
-    expect(response.status).to.equal(400);
+    expect(response).hasStatus(400);
     expect(response.body.errors).has.length(1);
     expect(response.body.errors[0]).property(
       'detail',
@@ -82,7 +82,7 @@ describe('hub/jsonapi', function() {
           type: 'cards',
         },
       });
-    expect(response.status).to.equal(400);
+    expect(response).hasStatus(400);
     expect(response.body.errors).has.length(1);
     expect(response.body.errors[0].detail).matches(/is a local realm. You tried to access it/);
   });
@@ -93,7 +93,7 @@ describe('hub/jsonapi', function() {
       .set('Content-Type', 'application/vnd.api+json')
       .send(testCard().jsonapi);
     assertSingleResourceDoc(response.body);
-    expect(response.status).to.equal(201);
+    expect(response).hasStatus(201);
     expect(response.header.location).to.match(/http:\/\/[^/]+\/api\/realms\/first-ephemeral-realm\/cards\/[^/]+/);
   });
 
@@ -166,7 +166,7 @@ describe('hub/jsonapi', function() {
           })
           .adoptingFrom(ownerCard).jsonapi
       );
-    expect(response.status).to.equal(201);
+    expect(response).hasStatus(201);
     expect(response.header.location).to.match(/http:\/\/[^/]+\/api\/realms\/first-ephemeral-realm\/cards\/[^/]+/);
     expect(response.body.data.attributes.puppies).to.eql([
       testCard()
@@ -217,7 +217,7 @@ describe('hub/jsonapi', function() {
     response = await request
       .patch(`/api/realms/first-ephemeral-realm/cards/${csId}`)
       .set('Content-Type', 'application/vnd.api+json');
-    expect(response.status).to.equal(400);
+    expect(response).hasStatus(400);
     expect(response.body.errors).has.length(1);
     expect(response.body.errors[0]).property('detail', 'missing resource object');
     expect(response.body.errors[0].source).property('pointer', '/data');
@@ -234,7 +234,7 @@ describe('hub/jsonapi', function() {
       .patch(`/api/realms/first-ephemeral-realm/cards/${csId}`)
       .set('Content-Type', 'application/vnd.api+json')
       .send('{ data ');
-    expect(response.status).to.equal(400);
+    expect(response).hasStatus(400);
     expect(response.body.errors).has.length(1);
     expect(response.body.errors[0]).property(
       'detail',
@@ -255,19 +255,19 @@ describe('hub/jsonapi', function() {
       .set('Content-Type', 'application/vnd.api+json')
       .set('If-Match', version);
 
-    expect(response.status).to.equal(204);
+    expect(response).hasStatus(204);
 
     response = await request
       .get(`/api/realms/first-ephemeral-realm/cards/${csId}`)
       .set('Accept', 'application/vnd.api+json');
-    expect(response.status).to.equal(404);
+    expect(response).hasStatus(404);
   });
 
   it('handles missing card in valid realm', async function() {
     let response = await request
       .get('/api/realms/first-ephemeral-realm/cards/not-a-real-card')
       .set('Accept', 'application/vnd.api+json');
-    expect(response.status).to.equal(404);
+    expect(response).hasStatus(404);
   });
 
   it('can get a card from local realm that was created in that realm', async function() {
@@ -275,10 +275,10 @@ describe('hub/jsonapi', function() {
       .post('/api/realms/first-ephemeral-realm/cards')
       .set('Content-Type', 'application/vnd.api+json')
       .send(testCard().withAutoAttributes({ hello: 'world' }).jsonapi);
-    expect(response.status).to.equal(201);
+    expect(response).hasStatus(201);
 
     response = await request.get(new URL(response.header.location).pathname).set('Accept', 'application/vnd.api+json');
-    expect(response.status).to.equal(200);
+    expect(response).hasStatus(200);
     expect(response.body?.data?.attributes?.hello).to.equal('world');
     expect(response.body?.data?.attributes?.csRealm).to.equal(`${myOrigin}/api/realms/first-ephemeral-realm`);
     assertSingleResourceDoc(response.body);
@@ -292,10 +292,10 @@ describe('hub/jsonapi', function() {
         testCard().withAutoAttributes({ csOriginalRealm: 'https://somewhere/else', csId: '432', hello: 'world' })
           .jsonapi
       );
-    expect(response.status).to.equal(201);
+    expect(response).hasStatus(201);
 
     response = await request.get(new URL(response.header.location).pathname).set('Accept', 'application/vnd.api+json');
-    expect(response.status).to.equal(200);
+    expect(response).hasStatus(200);
     expect(response.body?.data?.attributes?.hello).to.equal('world');
     expect(response.body?.data?.attributes?.csOriginalRealm).to.equal('https://somewhere/else');
     expect(response.body?.data?.attributes?.csRealm).to.equal(`${myOrigin}/api/realms/first-ephemeral-realm`);
@@ -307,10 +307,10 @@ describe('hub/jsonapi', function() {
       .post(`/api/remote-realms/${encodeURIComponent('http://example.com/api/realms/second-ephemeral-realm')}/cards`)
       .set('Content-Type', 'application/vnd.api+json')
       .send(testCard().withAutoAttributes({ hello: 'world' }).jsonapi);
-    expect(response.status).to.equal(201);
+    expect(response).hasStatus(201);
 
     response = await request.get(new URL(response.header.location).pathname).set('Accept', 'application/vnd.api+json');
-    expect(response.status).to.equal(200);
+    expect(response).hasStatus(200);
     expect(response.body?.data?.attributes?.hello).to.equal('world');
     expect(response.body?.data?.attributes?.csRealm).to.equal('http://example.com/api/realms/second-ephemeral-realm');
     assertSingleResourceDoc(response.body);
@@ -324,10 +324,10 @@ describe('hub/jsonapi', function() {
         testCard().withAutoAttributes({ csOriginalRealm: 'https://somewhere/else', csId: '432', hello: 'world' })
           .jsonapi
       );
-    expect(response.status).to.equal(201);
+    expect(response).hasStatus(201);
 
     response = await request.get(new URL(response.header.location).pathname).set('Accept', 'application/vnd.api+json');
-    expect(response.status).to.equal(200);
+    expect(response).hasStatus(200);
     expect(response.body?.data?.attributes?.hello).to.equal('world');
     expect(response.body?.data?.attributes?.csOriginalRealm).to.equal('https://somewhere/else');
     expect(response.body?.data?.attributes?.csRealm).to.equal('http://example.com/api/realms/second-ephemeral-realm');
@@ -355,7 +355,7 @@ describe('hub/jsonapi', function() {
     };
     let response = await request.get(`/api/cards?${stringify(filter)}`).set('Accept', 'application/vnd.api+json');
 
-    expect(response.status).to.equal(200);
+    expect(response).hasStatus(200);
     expect(response.body?.data.length).to.equal(2);
   });
 
@@ -378,21 +378,21 @@ describe('hub/jsonapi', function() {
     };
 
     let response = await request.get(`/api/cards?${stringify(filter)}`).set('Accept', 'application/vnd.api+json');
-    expect(response.status).to.equal(200);
+    expect(response).hasStatus(200);
     expect(response.body?.data.length).to.equal(7);
     expect(response.body?.meta.page.total).to.equal(20);
     expect(response.body?.meta.page.cursor).to.be.ok;
 
     filter.page.cursor = response.body.meta.page.cursor;
     response = await request.get(`/api/cards?${stringify(filter)}`).set('Accept', 'application/vnd.api+json');
-    expect(response.status).to.equal(200);
+    expect(response).hasStatus(200);
     expect(response.body?.data.length).to.equal(7);
     expect(response.body?.meta.page.total).to.equal(20);
     expect(response.body?.meta.page.cursor).to.be.ok;
 
     filter.page.cursor = response.body.meta.page.cursor;
     response = await request.get(`/api/cards?${stringify(filter)}`).set('Accept', 'application/vnd.api+json');
-    expect(response.status).to.equal(200);
+    expect(response).hasStatus(200);
     expect(response.body?.data.length).to.equal(6);
     expect(response.body?.meta.page.total).to.equal(20);
     expect(response.body?.meta.page.cursor).to.be.not.ok;
@@ -404,6 +404,6 @@ describe('hub/jsonapi', function() {
     };
     let response = await request.get(`/api/cards?${stringify(filter)}`).set('Accept', 'application/vnd.api+json');
 
-    expect(response.status).to.equal(400);
+    expect(response).hasStatus(400);
   });
 });
