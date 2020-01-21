@@ -92,7 +92,7 @@ export class Card {
   // the csId distinguishes the card within its originalRealm. In some cases
   // it may be chosen by the person creating the card. In others it may be
   // chosen by the hub.
-  csId: string | undefined; // TODO make readonly
+  readonly csId: string | undefined;
 
   readonly csFiles: CardFiles | undefined;
   readonly csPeerDependencies: PeerDependencies | undefined;
@@ -473,7 +473,7 @@ export class Card {
         );
       } else {
         let interiorCard = await getOwner(this).instantiate(Card, { data }, this.csRealm, this, this.service);
-        attributes[field] = (await interiorCard.asInteriorCard(interiorRule!, included)) as J.Value;
+        attributes[field] = (await interiorCard.asInteriorCard(interiorRule, included)) as J.Value;
       }
     }
   }

@@ -45,8 +45,8 @@ export class ScopedCardService {
       throw new CardstackError(`Writer plugin for realm ${realm} tried to change a csId it's not allowed to change`);
     }
 
-    card.csId = typeof upstreamIdFromWriter === 'object' ? upstreamIdFromWriter.csId : upstreamIdFromWriter;
-    let savedCard = await card.asAddressableCard(saved.jsonapi);
+    let csId = typeof upstreamIdFromWriter === 'object' ? upstreamIdFromWriter.csId : upstreamIdFromWriter;
+    let savedCard = await card.asAddressableCard(merge(saved.jsonapi, { data: { attributes: { csId } } }));
     let batch = this.cards.pgclient.beginCardBatch(this);
     await batch.save(savedCard);
     await batch.done();
