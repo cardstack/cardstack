@@ -19,4 +19,5 @@
   --ch-light-op60: #cfcfd2;         /* regular label on dark bg */
   --ch-dark-op50: #404040;          /* regular label on light bg */
   --ch-cobalt-blue: #0069F9;           /* used for links */
+  --ch-light-gray: #ededed;
 }

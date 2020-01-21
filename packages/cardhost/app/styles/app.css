@@ -59,6 +59,7 @@ Until that work is done we are statically adding this css
   --ch-bottom-edge-height: 80px;
 
   --ch-card-size: 496px;    /* min-width and min-height for cards */
+  --ch-min-card-width: 400px;
   --ch-field-width: 384px;  /* edit and schema view field-renderer max-width */
   --ch-spacing: 20px;
   --ch-edges-z-index: 10;
