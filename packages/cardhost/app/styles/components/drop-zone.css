@@ -1,25 +1,6 @@
-:root {
-  --ch-drop-zone-transition-duration: 200ms;
-}
-
 .drop-zone--container {
-  height: 20px;
+  height: 0;
   position: relative;
-  background-color: var(--ch-dark-background);
-  border-top: 2px solid var(--ch-default);
-}
-
-.drop-zone--container:first-of-type {
-  border-top: none;
-}
-
-.drop-zone--container.outside {
-  transition: height var(--ch-drop-zone-transition-duration) cubic-bezier(0.445, 0.05, 0.55, 0.95);
-}
-
-.drop-zone--container.dragging {
-  height: 184px;
-  transition: height var(--ch-drop-zone-transition-duration) cubic-bezier(0.445, 0.05, 0.55, 0.95);
 }
 
 .drop-zone {
@@ -27,12 +8,11 @@
   height: 50px;
   position: absolute;
   top: -25px;
-  transition: height var(--ch-drop-zone-transition-duration) cubic-bezier(0.445, 0.05, 0.55, 0.95);
+  z-index: 100;
 }
 
 .drop-zone--container.dragging .drop-zone {
   height: 170px;
-  transition: height var(--ch-drop-zone-transition-duration) cubic-bezier(0.445, 0.05, 0.55, 0.95);
 }
 
 .drop-zone--container .drop-zone--description .drop-zone--preview--container {
@@ -53,18 +33,9 @@
   display: none;
 }
 
-.drop-zone .drop-zone--description.dragging {
-  opacity: 1;
-}
-
-.drop-zone .drop-zone--description.dragging .field {
-  opacity: .35;
-}
-
 .drop-zone .drop-zone--drag-drop-icon {
   display: none;
 }
-
 
 /* In relation to Card Renderer */
 .card-renderer-isolated--card-container > .drop-zone--container {
@@ -93,6 +64,8 @@
 }
 
 .card-renderer-isolated.no-fields .drop-zone .drop-zone--drag-drop-icon {
+  --icon-color: #fff;
+  --icon-opacity: 0.5;
   display: block;
   margin-top: 10px;
   text-align: center;

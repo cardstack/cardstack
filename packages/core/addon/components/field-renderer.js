@@ -36,10 +36,8 @@ export default class FieldRenderer extends Component {
     return this.args.field.type.replace(/::/g, '/').replace(/@/g, '');
   }
 
-  get fieldTypeTitle() {
-    let { title } = fieldComponents.find(el => el.coreType === this.args.field.type);
-
-    return title;
+  get fieldType() {
+    return fieldComponents.find(el => el.coreType === this.args.field.type);
   }
 
   @action
@@ -107,9 +105,9 @@ export default class FieldRenderer extends Component {
   }
 
   @action
-  selectField(field) {
+  selectField(field, evt) {
     if (this.args.selectField) {
-      this.args.selectField(field);
+      this.args.selectField(field, evt);
     }
   }
 

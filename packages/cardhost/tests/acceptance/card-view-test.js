@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { find, visit, currentURL, waitFor, settled, click } from '@ember/test-helpers';
+import { find, visit, currentURL, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures';
 import { createCards } from '@cardstack/test-support/card-ui-helpers';
@@ -32,6 +32,7 @@ module('Acceptance | card view', function(hooks) {
   scenario.setupTest(hooks);
   hooks.beforeEach(function() {
     this.owner.lookup('service:data')._clearCache();
+    this.owner.lookup('service:card-local-storage').clearIds();
   });
 
   test(`viewing a card`, async function(assert) {
@@ -98,13 +99,10 @@ module('Acceptance | card view', function(hooks) {
       [card2Id, card3Id]
     );
 
-    assert.dom('[data-test-right-edge]').exists();
+    assert.dom('[data-test-right-edge]').doesNotExist();
     assert.dom('[data-test-internal-card-id]').doesNotExist();
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('Base Card');
-    assert.dom('[data-test-appearance-section] .ember-power-select-selected-item').hasText('Cardstack default');
-    assert.dom('[data-test-card-custom-style-button]').exists();
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.title, 'The Millenial Puppy');
     assert.equal(
@@ -132,49 +130,5 @@ module('Acceptance | card view', function(hooks) {
 
     assert.dom('[data-test-field]').doesNotExist(); // base-card currenty has no fields
     await percySnapshot(assert);
-  });
-
-  test('can view code editor', async function(assert) {
-    await login();
-
-    await visit(`/cards/@cardstack%2Fbase-card?editingCss=true`);
-    assert.equal(currentURL(), `/cards/@cardstack%2Fbase-card?editingCss=true`);
-    await waitFor(`[data-test-card-view="@cardstack/base-card"]`, { timeout });
-    assert.dom('[data-test-code-block]').exists();
-    await settled();
-    await percySnapshot(assert);
-  });
-
-  test('can dock code editor to bottom', async function(assert) {
-    await login();
-
-    await visit(`/cards/@cardstack%2Fbase-card?editingCss=true`);
-    assert.equal(currentURL(), `/cards/@cardstack%2Fbase-card?editingCss=true`);
-    await waitFor(`[data-test-card-view="@cardstack/base-card"]`, { timeout });
-    this.owner.lookup('service:css-mode-toggle').setEditingCss(true); // For some reason passing the query param isn't going through and setting the prop on the service
-    assert.dom('[data-test-code-block]').exists();
-    await settled();
-    assert.dom('.cardhost-card-theme-editor').hasAttribute('data-test-dock-location', 'right');
-    await click('[data-test-dock-bottom]');
-    assert.dom('.cardhost-card-theme-editor').hasAttribute('data-test-dock-location', 'bottom');
-    await percySnapshot(assert);
-  });
-
-  test('check that card name is stable so we can use it for themer styling', async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [
-        ['title', 'string', true, 'The Millenial Puppy'],
-        ['author', 'string', true, 'Van Gogh'],
-        [
-          'body',
-          'string',
-          false,
-          'It can be difficult these days to deal with the discerning tastes of the millenial puppy.',
-        ],
-      ],
-    });
-    await visit(`/cards/${card1Id}`);
-    assert.dom('.millenial-puppies').exists();
   });
 });

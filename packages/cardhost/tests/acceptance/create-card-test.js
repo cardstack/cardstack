@@ -32,6 +32,7 @@ module('Acceptance | card create', function(hooks) {
   scenario.setupTest(hooks);
   hooks.beforeEach(function() {
     this.owner.lookup('service:data')._clearCache();
+    this.owner.lookup('service:card-local-storage').clearIds();
   });
 
   test('new cards get a default id', async function(assert) {
@@ -42,7 +43,7 @@ module('Acceptance | card create', function(hooks) {
 
     await saveCard('creator');
 
-    assert.ok(currentURL().match(/\/cards\/new-card-[0-9]+\/schema/));
+    assert.ok(currentURL().match(/\/cards\/new-card-[0-9]+\/edit\/fields\/schema/));
   });
 
   test('card element is selected on initial render', async function(assert) {
@@ -70,6 +71,7 @@ module('Acceptance | card create', function(hooks) {
 
     await addField('title', 'string', true);
     await setCardId(card1Id);
+    await animationsSettled();
     assert.deepEqual(
       [...document.querySelectorAll(`[data-test-isolated-card="${card1Id}"] [data-test-field]`)].map(i =>
         i.getAttribute('data-test-field')
@@ -98,7 +100,7 @@ module('Acceptance | card create', function(hooks) {
     });
 
     assert.equal(currentURL(), `/cards/${card1Id}`);
-    await visit(`/cards/${card1Id}/schema`);
+    await visit(`/cards/${card1Id}/edit/fields/schema`);
     await showCardId(true);
     assert.dom('.card-renderer-isolated--header').hasText('millenial-puppies');
     assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
@@ -111,16 +113,25 @@ module('Acceptance | card create', function(hooks) {
     await click('[data-test-field="body"] [data-test-field-schema-renderer]');
     assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="body"]').hasClass('selected');
     assert.dom('[data-test-field="body"] [data-test-field-renderer-type]').hasText('body (Text)');
+    assert
+      .dom('[data-test-field="body"] [data-test-field-renderer-type]')
+      .hasAttribute('style', 'background-image: url("/images/field-types/text-field-icon.svg")');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isNotChecked();
 
     await click('[data-test-field="author"] [data-test-field-schema-renderer]');
     assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="author"]').hasClass('selected');
     assert.dom('[data-test-field="author"] [data-test-field-renderer-type]').hasText('author (Single-select)');
+    assert
+      .dom('[data-test-field="author"] [data-test-field-renderer-type]')
+      .hasAttribute('style', 'background-image: url("/images/field-types/dropdown-field-icon.svg")');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     await click('[data-test-field="reviewers"] [data-test-field-schema-renderer]');
     assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="reviewers"]').hasClass('selected');
     assert.dom('[data-test-field="reviewers"] [data-test-field-renderer-type]').hasText('reviewers (Multi-select)');
+    assert
+      .dom('[data-test-field="reviewers"] [data-test-field-renderer-type]')
+      .hasAttribute('style', 'background-image: url("/images/field-types/has-many-field-icon.svg")');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     await focus('[data-test-card-renderer-isolated]');
@@ -131,7 +142,7 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-card-renderer-isolated]').hasClass('selected');
     assert.dom('[data-test-field]').doesNotHaveClass('selected');
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.title, undefined);
     assert.equal(card.data.attributes.body, undefined);
@@ -147,7 +158,6 @@ module('Acceptance | card create', function(hooks) {
     await setCardId(card1Id);
     await addField('title', 'string', true);
     await addField('body', 'string', false);
-    await animationsSettled();
 
     await click('[data-test-field="title"]');
     await animationsSettled();
@@ -207,17 +217,17 @@ module('Acceptance | card create', function(hooks) {
 
     await saveCard('creator', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/schema`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields/schema`);
 
     await visit(`/cards/${card1Id}`);
     assert.dom('[data-test-field="subtitle"] [data-test-string-field-viewer-label]').hasText('Subtitle');
     assert.dom('[data-test-field="title"]').doesNotExist();
 
-    await visit(`/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
     assert.dom('[data-test-field="subtitle"] [data-test-cs-component-label="text-field"]').hasText('Subtitle');
     assert.dom('[data-test-field="title"]').doesNotExist();
 
-    await visit(`/cards/${card1Id}/schema`);
+    await visit(`/cards/${card1Id}/edit/fields/schema`);
     assert.dom('[data-test-field="subtitle"] [data-test-field-renderer-label]').hasText('Subtitle');
     await click('[data-test-field="subtitle"]');
 
@@ -268,6 +278,7 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-isolated-card] [data-test-field').exists({ count: 1 });
 
     await click(`[data-test-isolated-card] [data-test-field-renderer-remove-btn]`);
+    await animationsSettled();
     assert.dom('[data-test-isolated-card] [data-test-field').doesNotExist();
   });
 
@@ -296,7 +307,7 @@ module('Acceptance | card create', function(hooks) {
       [...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
       ['title', 'author', 'body']
     );
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.deepEqual(card.data.relationships.fields.data, [
       { type: 'fields', id: 'title' },

@@ -2,50 +2,43 @@
   {{!-- TODO: DRY buttons --}}
   {{#if this.cardstackSession.isAuthenticated}}
     <div class="card-renderer--top-edge-buttons">
-      <Cta {{on "click" this.preview}}
-        @label="Open"
-        @variant="secondary primary"
-        @theme="cs-dark"
-        @disabled={{true}} />
       <SaveButton @card={{this.card}}/>
     </div>
   {{/if}}
 </CardhostTopEdge>
 
-{{#unless this.cssModeToggle.editingCss}}
-  <CardhostLeftEdge @mode="schema">
-    {{!-- TODO: DRY catalog section --}}
-    <section class="ch-catalog">
-      <header class="ch-catalog--header">
-        <h3 class="ch-catalog--title">Card Catalog</h3>
-      </header>
-      <div class="ch-catalog--content" tabindex="0" >
-        <div class="ch-catalog--fields">
-          {{#each this.fieldComponents as |field|}}
-            <div
-              class="ch-catalog-field"
-              role="button"
-              draggable="true"
-              {{on "mousedown" (action this.initDrag field)}}
-              {{on "dragend" (action (mut this.isDragging) false)}}
-              {{on "dragstart" (action this.startDragging field)}}
-              data-test-card-add-field-draggable={{field.type}}
-            >
-              {{! template-lint-disable no-inline-styles}}
-              <div class="ch-catalog-field--icon" style={{css-url "background-image" field.icon}}></div>
-              <div>
-                <h4 class="ch-catalog-field--title">{{field.title}}</h4>
-                {{#if field.description}}
-                  <p class="ch-catalog-field--description">{{field.description}}</p>
-                {{/if}}
-              </div>
+<CardhostLeftEdge @mode="schema">
+  {{!-- TODO: DRY catalog section --}}
+  <section class="ch-catalog">
+    <header class="ch-catalog--header">
+      <h3 class="ch-catalog--title">Card Catalog</h3>
+    </header>
+    <div class="ch-catalog--content" tabindex="0" >
+      <div class="ch-catalog--fields">
+        {{#each this.fieldComponents as |field|}}
+          <div
+            class="ch-catalog-field"
+            role="button"
+            draggable="true"
+            {{on "mousedown" (action this.initDrag field)}}
+            {{on "dragend" (action (mut this.isDragging) false)}}
+            {{on "dragstart" (action this.startDragging field)}}
+            data-test-card-add-field-draggable={{field.type}}
+          >
+            {{! template-lint-disable no-inline-styles}}
+            <div class="ch-catalog-field--icon" style={{css-url "background-image" field.icon}}></div>
+            <div>
+              <h4 class="ch-catalog-field--title">{{field.title}}</h4>
+              {{#if field.description}}
+                <p class="ch-catalog-field--description">{{field.description}}</p>
+              {{/if}}
             </div>
-          {{/each}}
-        </div>
+          </div>
+        {{/each}}
       </div>
-    </section>
-  </CardhostLeftEdge>
-{{/unless}}
+    </div>
+  </section>
+</CardhostLeftEdge>
 
 <RightEdge
   @card={{this.card}}
@@ -78,11 +71,9 @@
 </section>
 
 {{#if this.card}}
+  {{!-- This is hidden, used in tests --}}
   <section class="cardhost-card-document">
     <h3>Card Document</h3>
-    <CodeEditor
-      @code={{this.cardJson}}
-      @language="json"
-    />
+    <code data-test-card-json>{{this.cardJson}}</code>
   </section>
 {{/if}}

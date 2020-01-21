@@ -29,11 +29,17 @@
   width: 100%;
   max-width: 496px;
   min-height: 144px;
+  margin-top: 25px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding-top: 0;
   background-color: var(--ch-dark-background);
+  border-bottom: 2px solid var(--ch-default);
+}
+
+.card-renderer-isolated.schema .field.with-buttons:last-of-type {
+  border-bottom-color: transparent;
 }
 
 .card-renderer-isolated.schema .field--move-btn {

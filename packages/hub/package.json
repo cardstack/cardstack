@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/hub",
-  "version": "0.16.16",
+  "version": "0.16.22",
   "bin": {
     "cardstack-hub": "./bin/cardstack-hub.js"
   },

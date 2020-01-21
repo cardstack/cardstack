@@ -14,23 +14,52 @@
   align-items: center;
   text-align: right;
   z-index: var(--ch-edges-z-index);
+  background-color: var(--ch-default);
+  transition: var(--ch-card-background-color-animate);
 }
 
-.login-btn,
-.logout-btn {
-  position: absolute;
-  z-index: var(--ch-edges-z-index);
+.cardhost-top-edge.schema {
+  background-color: var(--ch-deep-background);
 }
 
-.logout-btn {
-  position: absolute;
-  right: 320px;
-  min-width: 85px;
+.cardhost-top-edge.themer {
+  background-color: var(--ch-dark-background);
+}
+
+.cardhost-top-edge.view {
+  background-color: var(--ch-light-gray);
+}
+
+.view-selector {
+  width: 300px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: var(--ch-deep-background);
+  border: solid 1px var(--ch-border);
   height: 40px;
+  border-radius: 20px;
 }
 
-.login-btn {
-  right: var(--ch-spacing)
+.view-selector .view-selector--mode-link {
+  --icon-color: var(--ch-light-op50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 100%;
+}
+
+.view-selector .view-selector--mode-link.active {
+  --icon-color: var(--ch-highlight);
+}
+
+.view-selector .view-selector--mode-link:first-child {
+  border-right: solid 1px var(--ch-border);
+}
+
+.view-selector .view-selector--mode-link svg {
+  margin-right: 15px;
 }
 
 @media (max-width: 1440px) {

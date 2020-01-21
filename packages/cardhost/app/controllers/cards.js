@@ -4,15 +4,20 @@ import { inject as service } from '@ember/service';
 export default class CardsController extends Controller {
   @service cssModeToggle;
   @service cardstackSession;
+  @service router;
+  @service routeInfo;
 
   get themerClasses() {
-    let editing = this.cssModeToggle.editingCss;
-    if (editing && this.cssModeToggle.isResponsive) {
+    if (this.onThemerRoute && this.cssModeToggle.isResponsive) {
       return 'responsive editing-css';
-    } else if (editing && !this.cssModeToggle.isResponsive) {
+    } else if (this.onThemerRoute && !this.cssModeToggle.isResponsive) {
       return 'full-width editing-css';
     } else {
       return '';
     }
+  }
+
+  get onThemerRoute() {
+    return this.router.currentRoute.localName === 'themer';
   }
 }

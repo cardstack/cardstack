@@ -30,6 +30,7 @@ module('Acceptance | card edit', function(hooks) {
   scenario.setupTest(hooks);
   hooks.beforeEach(function() {
     this.owner.lookup('service:data')._clearCache();
+    this.owner.lookup('service:card-local-storage').clearIds();
   });
 
   test(`setting a string field`, async function(assert) {
@@ -37,19 +38,19 @@ module('Acceptance | card edit', function(hooks) {
     await createCards({
       [card1Id]: [['body', 'string', false, 'test body']],
     });
-    await visit(`/cards/${card1Id}/edit`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await setFieldValue('body', 'updated body');
 
     await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await visit(`/cards/${card1Id}`);
     assert.dom('[data-test-field="body"] [data-test-string-field-viewer-value]').hasText(`updated body`);
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.body, `updated body`);
   });
@@ -59,21 +60,21 @@ module('Acceptance | card edit', function(hooks) {
     await createCards({
       [card1Id]: [['email', 'case-insensitive string', false, 'vangogh@nowhere.dog']],
     });
-    await visit(`/cards/${card1Id}/edit`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await setFieldValue('email', 'hassan@nowhere.dog');
 
     await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await visit(`/cards/${card1Id}`);
     assert
       .dom('[data-test-field="email"] [data-test-case-insensitive-field-viewer-value]')
       .hasText(`hassan@nowhere.dog`);
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.email, `hassan@nowhere.dog`);
   });
@@ -83,19 +84,19 @@ module('Acceptance | card edit', function(hooks) {
     await createCards({
       [card1Id]: [['created', 'date', false, '2019-10-07']],
     });
-    await visit(`/cards/${card1Id}/edit`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await setFieldValue('created', '2019-10-08');
 
     await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await visit(`/cards/${card1Id}`);
     assert.dom('[data-test-field="created"] [data-test-date-field-viewer-value]').hasText(`2019-10-08`);
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.created, `2019-10-08`);
   });
@@ -105,19 +106,19 @@ module('Acceptance | card edit', function(hooks) {
     await createCards({
       [card1Id]: [['likes', 'integer', false, 100]],
     });
-    await visit(`/cards/${card1Id}/edit`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await setFieldValue('likes', 110);
 
     await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await visit(`/cards/${card1Id}`);
     assert.dom('[data-test-field="likes"] [data-test-integer-field-viewer-value]').hasText(`110`);
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.likes, 110);
   });
@@ -127,19 +128,19 @@ module('Acceptance | card edit', function(hooks) {
     await createCards({
       [card1Id]: [['published', 'boolean', false, true]],
     });
-    await visit(`/cards/${card1Id}/edit`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await setFieldValue('published', false);
 
     await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await visit(`/cards/${card1Id}`);
     assert.dom('[data-test-field="published"] [data-test-boolean-field-viewer-value]').hasText(`false`);
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.published, false);
   });
@@ -157,13 +158,13 @@ module('Acceptance | card edit', function(hooks) {
         ['email', 'case-insensitive string', false, 'hassan@nowhere.dog'],
       ],
     });
-    await visit(`/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
 
     await setFieldValue('reviewers', `${card2Id},${card3Id}`);
 
     await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await visit(`/cards/${card1Id}`);
     assert
@@ -189,7 +190,7 @@ module('Acceptance | card edit', function(hooks) {
       .dom(`[data-test-field="reviewers"] [data-test-embedded-card="${card3Id}"] [data-test-field="email"]`)
       .doesNotExist();
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.deepEqual(card.data.relationships.reviewers.data, [
       { type: 'cards', id: qualifiedCard2Id },
@@ -212,13 +213,13 @@ module('Acceptance | card edit', function(hooks) {
         ['email', 'case-insensitive string', false, 'vangogh@nowhere.dog'],
       ],
     });
-    await visit(`/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
 
     await setFieldValue('author', card2Id);
 
     await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await visit(`/cards/${card1Id}`);
     assert
@@ -230,7 +231,7 @@ module('Acceptance | card edit', function(hooks) {
       .dom(`[data-test-field="author"] [data-test-embedded-card="${card2Id}"] [data-test-field="email"]`)
       .doesNotExist();
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.deepEqual(card.data.relationships.author.data, { type: 'cards', id: qualifiedCard2Id });
     let userCard = card.included.find(i => `${i.type}/${i.id}` === `cards/${qualifiedCard2Id}`);
@@ -243,23 +244,67 @@ module('Acceptance | card edit', function(hooks) {
     await createCards({
       [card1Id]: [['image', 'decorative image', false, 'test image']],
     });
-    await visit(`/cards/${card1Id}/edit`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await setFieldValue('image', 'http://example.com/testimage.jpg');
 
     await saveCard('editor', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await visit(`/cards/${card1Id}`);
     assert
       .dom('[data-test-field="image"] [data-test-decorative-image-field-viewer-value]')
       .hasAttribute('src', 'http://example.com/testimage.jpg');
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.image, 'http://example.com/testimage.jpg');
+  });
+
+  test(`setting an link field`, async function(assert) {
+    await login();
+    await createCards({
+      [card1Id]: [['portfolioLink', 'link', false, 'https://example.com/old-portfolio']],
+    });
+    await visit(`/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+
+    await setFieldValue('portfolioLink', 'https://example.com/new-portfolio');
+
+    await saveCard('editor', card1Id);
+
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+
+    await visit(`/cards/${card1Id}`);
+    assert.dom('[data-test-link-field-viewer-value]').hasAttribute('href', 'https://example.com/new-portfolio');
+
+    let cardJson = find('[data-test-card-json]').innerHTML;
+    let card = JSON.parse(cardJson);
+    assert.equal(card.data.attributes.portfolioLink, 'https://example.com/new-portfolio');
+  });
+
+  test(`setting a cta field`, async function(assert) {
+    await login();
+    await createCards({
+      [card1Id]: [['rsvp', 'cta', false, 'https://example.com/old-rsvp']],
+    });
+    await visit(`/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+
+    await setFieldValue('rsvp', 'https://example.com/new-rsvp');
+
+    await saveCard('editor', card1Id);
+
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+
+    await visit(`/cards/${card1Id}`);
+    assert.dom('[data-test-cta-field-viewer-value]').hasAttribute('href', 'https://example.com/new-rsvp');
+
+    let cardJson = find('[data-test-card-json]').innerHTML;
+    let card = JSON.parse(cardJson);
+    assert.equal(card.data.attributes.rsvp, 'https://example.com/new-rsvp');
   });
 
   test(`displays the right edge`, async function(assert) {
@@ -267,8 +312,8 @@ module('Acceptance | card edit', function(hooks) {
     await createCards({
       [card1Id]: [['body', 'string', false, 'test body']],
     });
-    await visit(`/cards/${card1Id}/edit`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     assert.dom('[data-test-right-edge]').exists();
     assert.dom('[data-test-internal-card-id]').doesNotExist();

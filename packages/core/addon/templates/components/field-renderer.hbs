@@ -1,14 +1,10 @@
 {{! eslint is confused about indentation for else-if }}
 {{! template-lint-disable block-indentation}}
 
-{{#if (and (eq @mode "schema") @dropField)}}
-  <DropZone @dropField={{@dropField}} @position={{@field.position}} />
-{{/if}}
-
 {{!-- TODO: let's think of a more accessible solution here, consider making this a button--}}
 {{!-- TODO: also we should also turn on a11y linting --}}
-<div {{on "click" (fn this.selectField @field)}} {{on "dragstart" (action this.startDragging @field)}} {{on "dragend" (action this.finishDragging)}}
-  class="field {{@field.name}}-field {{if this.friendlyType (concat "field-type-" this.friendlyType "-" @mode "-field ")}}field-type-{{this.dasherizedType}}-{{@mode}}-field{{if (or @setPosition @removeField) " with-buttons"}}{{if (eq @field @selectedField) " selected"}}"
+<section {{on "click" (fn this.selectField @field)}} {{on "dragstart" (action this.startDragging @field)}} {{on "dragend" (action this.finishDragging)}}
+  class="field {{@field.name}}-field {{if @field.preview "preview"}} {{if this.friendlyType (concat "field-type-" this.friendlyType "-" @mode "-field ")}}field-type-{{this.dasherizedType}}-{{@mode}}-field{{if (or @setPosition @removeField) " with-buttons"}}{{if (eq @field @selectedField) " selected"}}"
   data-test-field={{@field.name}}
   data-test-field-type={{@field.type}}
   data-test-field-mode={{@mode}}
@@ -24,7 +20,7 @@
     </button>
   {{/if}}
 
-  {{#if (eq @mode "view")}}
+  {{#if (or (eq @mode "view") (eq @mode "layout"))}}
     {{#let (component this.fieldViewer) as | FieldViewer |}}
       <FieldViewer @field={{@field}}/>
     {{/let}}
@@ -46,11 +42,11 @@
           {{!-- TODO: Change displayed logo depending on field --}}
           {{! template-lint-disable no-inline-styles }}
           <header
-            class="schema-field-renderer--header"
-            style={{css-url "background-image" "/images/fields/text.svg"}}
+            class="schema-field-renderer--header {{if this.fieldType this.fieldType.type @field.type}}"
+            style={{css-url "background-image" this.fieldType.icon}}
             data-test-field-renderer-type
           >
-            {{@field.name}} ({{this.fieldTypeTitle}})
+            {{@field.name}} ({{if this.fieldType this.fieldType.title @field.name}})
             {{#if @field.isAdopted}}
               <span class="schema-field-renderer--header--detail">Adopted</span>
             {{/if}}
@@ -157,7 +153,7 @@
     {{/each}}
   {{/if}}
 
-  {{#if (not (eq @mode "view"))}}
+  {{#if (and (not-eq @mode "view") (not-eq @mode "layout"))}}
     <div class="field--action">
       {{#if (and @removeField (not @field.isAdopted))}}
         {{!-- using field.nonce in case the user deletes the name of the field --}}
@@ -170,4 +166,7 @@
       {{/if}}
     </div>
   {{/if}}
-</div>
+</section>
+{{#if (and (eq @mode "schema") @dropField (not @field.preview))}}
+  <DropZone @dropField={{@dropField}} @position={{inc @field.position}} @toggleStubField={{@toggleStubField}} />
+{{/if}}

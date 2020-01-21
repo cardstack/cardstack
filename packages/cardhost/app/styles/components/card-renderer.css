@@ -1,19 +1,28 @@
+.card-renderer--container {
+  grid-column-end: end;
+}
+
 .card-renderer-isolated {
   --card-renderer-width: var(--ch-card-size);
   --card-renderer-height: var(--ch-card-size);
   --card-renderer-header-height: 50px;
 
   position: relative;
-  width: 100%;
+  min-width: var(--ch-min-card-width);
+  max-width: var(--ch-card-size);
   font: 400 16px/22px var(--ch-font-family);
   letter-spacing: 0.015em;
-  overflow: hidden;
 }
 
+.card-renderer-isolated.view,
 .card-renderer-isolated.schema,
 .card-renderer-isolated.edit {
   max-width: var(--card-renderer-width);
   min-height: var(--card-renderer-height);
+}
+
+.card-renderer-isolated.view {
+  padding-top: 50px;
 }
 
 /* Resetting styles so that view mode styling does not affect other modes */
@@ -25,9 +34,29 @@
 
 
 /* Card Renderer Header */
+/* We need the wrapper to mask the border of the content when scrolling */
+.card-renderer-isolated--header--wrapper {
+  background-color: var(--ch-default);
+  position: sticky;
+  top: 80px;
+  z-index: 5;
+}
+
+.card-renderer-isolated.schema .card-renderer-isolated--header--wrapper {
+  background: var(--ch-deep-background);
+}
+
+.card-renderer-isolated.themer .card-renderer-isolated--header--wrapper {
+  background: var(--ch-dark-background);
+}
+
+.card-renderer-isolated.view .card-renderer-isolated--header--wrapper {
+  background-color: var(--ch-light-gray);
+}
+
 .card-renderer-isolated--header {
   display: flex;
-  height: calc(var(--card-renderer-header-height) + 150px); /* to counteract the safari scroll bounce */
+  justify-content: space-between;
   padding: 14px 20px;
   color: var(--ch-light-op50);
   background-color: var(--ch-dark-background);
@@ -54,28 +83,32 @@
   transition: stroke var(--ch-transition-time);
 }
 
+.card-renderer-isolated.themer .card-renderer-isolated--header {
+  background-color: var(--ch-default);
+  border-color: var(--ch-default);
+}
 
 /* Card Renderer - Outer Wrapper */
 /* Needed for scroll behavior */
 .card-renderer-isolated--content {
   position: relative;
   min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
-  max-height: calc(
-    100vh - var(--ch-top-edge-height) - var(--card-renderer-header-height)
-  );
-  padding-bottom: 80px;
   background-color: transparent;
   color: var(--ch-dark);
   border: none;
   overflow-x: hidden;
   overflow-y: auto;
-  margin-top: -150px; /* to counteract the safari scroll bounce */
 
   transition: var(--ch-card-background-color-animate);
+  z-index: 10;
 }
 
 .card-renderer-isolated.schema .card-renderer-isolated--content {
   color: var(--ch-light);
+}
+
+.card-renderer-isolated.themer .card-renderer-isolated--content {
+  background-color: var(--ch-dark-background);
 }
 
 
@@ -85,23 +118,29 @@
   border-radius: 0 0 10px 10px;
   overflow: hidden;
   min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
+  background: var(--ch-light);
 
   transition: background-color var(--ch-transition-time),
-              border-color var(--ch-transition-time);
+  border-color var(--ch-transition-time);
+}
+
+.card-renderer-isolated.view .card-renderer-isolated--card-container {
+  border-radius: 10px;
+}
+
+.card-renderer-isolated.view .card-renderer-isolated--card-container.selected {
+  border-radius: 0 0 10px 10px;
 }
 
 .card-renderer-isolated.schema .card-renderer-isolated--card-container {
   background-color: var(--ch-dark-background);
   border-top: 3px solid var(--ch-default);
+  padding-top: 10px;
 }
 
 .card-renderer-isolated.edit .card-renderer-isolated--card-container {
   background-color: var(--ch-light);
   padding: 30px;
-}
-
-.card-renderer-isolated.view .card-renderer-isolated--card-container {
-  background: var(--ch-light);
 }
 
 
@@ -110,7 +149,8 @@
   outline: 0;
 }
 
-.card-renderer-isolated.selected .card-renderer-isolated--header {
+.card-renderer-isolated.selected .card-renderer-isolated--header,
+.card-renderer-isolated.view .card-renderer-isolated--header {
   background-color: var(--ch-highlight);
   border-color: var(--ch-highlight);
   color: var(--ch-dark);
@@ -124,6 +164,17 @@
   border-color: var(--ch-highlight);
 }
 
+.card-renderer-isolated.view .card-renderer-isolated--header--wrapper {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  right: 0;
+  bottom: 100px;
+}
+
+.card-renderer-isolated.view .card-renderer-isolated--header--wrapper.selected {
+  top: 0;
+}
 
 
 /* TODO: fade card if field-renderer is selected */

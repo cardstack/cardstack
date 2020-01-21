@@ -35,6 +35,22 @@
                         </div>
                       {{/if}}
                     </div>
+                    {{#if (eq @mode "fields")}}
+                      <div class="right-edge--items-container">
+                        <div class="right-edge--item">
+                          <Cta @variant="secondary responsive" @theme="cs-dark">
+                            <LinkTo
+                              @route="cards.card.edit.fields.schema"
+                              @class="right-edge--configure-schema-link"
+                              @model={{@card}}
+                              data-test-configure-schema-btn
+                            >
+                              Configure Schema
+                            </LinkTo>
+                          </Cta>
+                        </div>
+                      </div>
+                    {{/if}}
                   {{/animated-if}}
                 </AnimatedContainer>
               </div>

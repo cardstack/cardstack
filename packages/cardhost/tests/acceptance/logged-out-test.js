@@ -23,6 +23,7 @@ module('Acceptance | logged-out', function(hooks) {
   scenario.setupTest(hooks);
   hooks.beforeEach(function() {
     this.owner.lookup('service:data')._clearCache();
+    this.owner.lookup('service:card-local-storage').clearIds();
   });
 
   test('viewing a card while logged out', async function(assert) {
@@ -32,18 +33,17 @@ module('Acceptance | logged-out', function(hooks) {
     });
     await visit(`/cards/${card1Id}`);
     assert.equal(currentURL(), `/cards/${card1Id}`);
-    await click('#logout-button');
+    await click('[data-test-toggle-left-edge]');
+    await click('[data-test-logout-button]');
+    await click('[data-test-toggle-left-edge]');
     assert.equal(currentURL(), `/cards/${card1Id}`);
 
-    assert.dom('[data-test-mode-switcher]').doesNotExist();
-    assert.dom('[data-test-card-save-btn]').doesNotExist();
-    assert.dom('[data-test-right-edge]').doesNotExist();
+    assert.dom('[data-test-card-edit-link]').doesNotExist();
     await percySnapshot(assert);
-    await click('#login-button');
-    await waitFor('[data-test-mode-switcher]');
-    assert.dom('[data-test-mode-switcher]').exists();
-    assert.dom('[data-test-card-save-btn]').exists();
-    assert.dom('[data-test-right-edge]').exists();
+    await click('[data-test-toggle-left-edge]');
+    await click('[data-test-login-button]');
+    await waitFor('[data-test-card-edit-link]');
+    assert.dom('[data-test-card-edit-link]').exists();
   });
 
   test('edit route redirects to view for unauthenticated users', async function(assert) {
@@ -51,10 +51,11 @@ module('Acceptance | logged-out', function(hooks) {
     await createCards({
       [card1Id]: [['title', 'string', true, 'The Millenial Puppy']],
     });
-    await visit(`/cards/${card1Id}/edit`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
-    await click('#logout-button');
-    await visit(`/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+    await click('[data-test-toggle-left-edge]');
+    await click('[data-test-logout-button]');
+    await visit(`/cards/${card1Id}/edit/fields`);
     assert.equal(currentURL(), `/cards/${card1Id}`);
   });
 
@@ -63,10 +64,11 @@ module('Acceptance | logged-out', function(hooks) {
     await createCards({
       [card1Id]: [['title', 'string', true, 'The Millenial Puppy']],
     });
-    await visit(`/cards/${card1Id}/schema`);
-    assert.equal(currentURL(), `/cards/${card1Id}/schema`);
-    await click('#logout-button');
-    await visit(`/cards/${card1Id}/schema`);
+    await visit(`/cards/${card1Id}/edit/fields/schema`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields/schema`);
+    await click('[data-test-toggle-left-edge]');
+    await click('[data-test-logout-button]');
+    await visit(`/cards/${card1Id}/edit/fields/schema`);
     assert.equal(currentURL(), `/cards/${card1Id}`);
   });
 });

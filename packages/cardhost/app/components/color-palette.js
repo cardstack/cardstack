@@ -20,5 +20,6 @@ export default class ColorPalette extends Component {
     '--ch-light-op50': 'rgba(255, 255, 255, 0.5)',
     '--ch-light-op60': '#cfcfd2',
     '--ch-dark-op50': '#404040',
+    '--ch-cobalt-blue': '#0069F9',
   };
 }

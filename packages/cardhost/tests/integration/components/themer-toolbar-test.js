@@ -7,8 +7,8 @@ module('Integration | Component | themer-toolbar', function(hooks) {
   setupRenderingTest(hooks);
 
   test('it renders', async function(assert) {
-    this.set('closeEditor', () => {});
-    await render(hbs`<ThemerToolbar @closeEditor={{this.closeEditor}} />`);
-    assert.ok(this.element.textContent.includes('Close Editor'));
+    this.set('model', {});
+    await render(hbs`<ThemerToolbar @model={{this.model}}/>`);
+    assert.dom(this.element).hasTextContaining('Close');
   });
 });

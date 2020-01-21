@@ -1,43 +1,23 @@
-{{#if this.cardstackSession.isAuthenticated}}
-  <div class="card-renderer--top-edge-buttons">
-    <Cta {{on "click" this.preview}}
-      @label="Open"
-      @variant="secondary primary"
-      @theme="cs-dark"
-      @disabled={{not this.cardstackSession.isAuthenticated}}
-      data-test-card-editor-preview-btn />
-    <SaveButton @card={{this.card}}/>
-  </div>
-{{/if}}
-
-<CardhostLeftEdge />
-
-<RightEdge
-  @card={{this.card}}
-  @mode="edit"
-  @cardSelected={{true}} {{!-- Change this when we want to display different right-edge options --}}
-/>
-
 <section
   class="card-editor"
   data-test-card-edit={{this.card.name}}
   {{did-update this.updateCard @card}}
 >
-  <CardRenderer
-    @card={{this.card}}
-    @mode="edit"
-    @setFieldValue={{action this.setFieldValue}}
-    @format="isolated"
-    @selectField={{action this.selectField}}
-    @selectedField={{this.selectedField}}
-    @cardSelected={{this.cardSelected}}
-    @cardFocused={{action (mut this.cardSelected)}} />
+  <AnimatedContainer class="card-renderer--container" {{on "click" (action (mut @card.isSelected) (not @card.isSelected))}}>
+    <CardRenderer
+      @card={{this.card}}
+      @mode="edit"
+      @setFieldValue={{action this.setFieldValue}}
+      @format="isolated"
+      @selectField={{action this.selectField}}
+      @selectedField={{this.selectedField}}
+      @cardSelected={{this.card.isSelected}}
+      @cardFocused={{action (mut this.card.isSelected)}} />
+  </AnimatedContainer>
 </section>
 
+{{!-- This is hidden, used in tests --}}
 <section class="cardhost-card-document">
-  <h3>Card Document:</h3>
-  <CodeEditor
-    @code={{this.cardJson}}
-    @language="json"
-  />
+  <h3>Card Document</h3>
+  <code data-test-card-json>{{this.cardJson}}</code>
 </section>

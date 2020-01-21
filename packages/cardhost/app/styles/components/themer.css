@@ -129,13 +129,12 @@
   cursor: pointer;
 }
 
-.themer--top-edge-container .close-editor-btn {
-  width: 125px;
+.themer--top-edge-container .cs-component-cta, .themer--top-edge-container .save-button {
+  width: 150px;
   margin-left: 20px;
   align-self: start;
   display: inline-block;
   vertical-align: top;
-  color: var(--ch-dark);
 }
 
 .cardhost-card-theme-editor .editor-container.editor-pane--container-highlighted {
@@ -147,7 +146,7 @@
   color :var(--ch-default);
 }
 
-.cardhost-cards.editing-css {
+.editing-css {
   padding-left: 0;
   width: 100%;
   padding-right: 40%;
@@ -155,21 +154,8 @@
   background-color: var(--ch-dark-background);
 }
 
-.editing-css.full-width, .cardhost-cards.view.logged-out, .cardhost-cards.edit.logged-out, .cardhost-cards.schema.logged-out {
+.editing-css.full-width {
   padding-right: 0;
-}
-
-.cardhost-cards.add.schema.logged-out {
-  padding-right: var(--ch-right-edge-width);
-}
-
-.cardhost-cards.editing-css .card-renderer-isolated--header {
-  background-color: var(--ch-default);
-  border-color: var(--ch-default);
-}
-
-.cardhost-cards.editing-css .card-renderer-isolated.view .card-renderer-isolated--content {
-  background-color: var(--ch-dark-background);
 }
 
 .themer--top-edge-container {
