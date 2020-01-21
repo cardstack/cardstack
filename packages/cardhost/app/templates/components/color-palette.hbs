@@ -10,4 +10,16 @@
       </div>
     </div>
   {{/each-in}}
+
+
+  {{#each-in this.unthemedCardColors as |name value|}}
+    <div>
+      <div class="color-palette--block {{name}}" style="background-color: var({{name}})">
+        {{value}}
+      </div>
+      <div class="ui-components--notes color-palette--code">
+        <code>{{name}}</code>
+      </div>
+    </div>
+  {{/each-in}}
 </div>

@@ -263,6 +263,50 @@ module('Acceptance | card edit', function(hooks) {
     assert.equal(card.data.attributes.image, 'http://example.com/testimage.jpg');
   });
 
+  test(`setting an link field`, async function(assert) {
+    await login();
+    await createCards({
+      [card1Id]: [['portfolioLink', 'link', false, 'https://example.com/old-portfolio']],
+    });
+    await visit(`/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+
+    await setFieldValue('portfolioLink', 'https://example.com/new-portfolio');
+
+    await saveCard('editor', card1Id);
+
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+
+    await visit(`/cards/${card1Id}`);
+    assert.dom('[data-test-link-field-viewer-value]').hasAttribute('href', 'https://example.com/new-portfolio');
+
+    let cardJson = find('[data-test-card-json]').innerHTML;
+    let card = JSON.parse(cardJson);
+    assert.equal(card.data.attributes.portfolioLink, 'https://example.com/new-portfolio');
+  });
+
+  test(`setting a cta field`, async function(assert) {
+    await login();
+    await createCards({
+      [card1Id]: [['rsvp', 'cta', false, 'https://example.com/old-rsvp']],
+    });
+    await visit(`/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+
+    await setFieldValue('rsvp', 'https://example.com/new-rsvp');
+
+    await saveCard('editor', card1Id);
+
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+
+    await visit(`/cards/${card1Id}`);
+    assert.dom('[data-test-cta-field-viewer-value]').hasAttribute('href', 'https://example.com/new-rsvp');
+
+    let cardJson = find('[data-test-card-json]').innerHTML;
+    let card = JSON.parse(cardJson);
+    assert.equal(card.data.attributes.rsvp, 'https://example.com/new-rsvp');
+  });
+
   test(`displays the right edge`, async function(assert) {
     await login();
     await createCards({
