@@ -902,8 +902,8 @@ export class FieldCard extends Card {
 export class AddressableCard extends Card implements CardId {
   // these are non-null because of the assertion in our construction that
   // ensures csId is present.
-  csId!: string;
-  upstreamId!: NonNullable<Card['upstreamId']>;
+  readonly csId!: string;
+  readonly upstreamId!: NonNullable<Card['upstreamId']>;
 
   constructor(jsonapi: SingleResourceDoc, service: ScopedCardService, identity?: CardId) {
     let actualRealm = identity?.csRealm ?? jsonapi.data.attributes?.csRealm;
