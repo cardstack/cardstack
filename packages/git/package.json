@@ -19,7 +19,7 @@
     "delay": "^4.1.0",
     "filenamify-url": "^1.0.0",
     "githereum": "0.0.1",
-    "isomorphic-git": "github:cardstack/isomorphic-git.git",
+    "isomorphic-git": "github:cardstack/isomorphic-git.git#add-type-for-find-merge-base",
     "json-stable-stringify-without-jsonify": "^1.0.1",
     "lodash": "^4.17.11",
     "mkdirp": "^0.5.1",
