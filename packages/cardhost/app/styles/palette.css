@@ -3,6 +3,7 @@
   --ch-hover: #272330;
   --ch-disabled: #393642;
   --ch-dark-background: #41404d;     /* right-edge panel background */
+  --ch-medium-background: #b7b1ba;   /* edit mode background */
   --ch-light-background: #e9e9ed;    /* left-edge catalog bg, field-renderer header bg */
   --ch-deep-background: #141428;     /* use sparsely (homepage, themer, and schema view backgrounds) */
   --ch-foreground: #5a586a;          /* right-edge dropdown, pill selector, checkbox background */

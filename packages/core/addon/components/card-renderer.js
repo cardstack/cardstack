@@ -5,7 +5,10 @@ import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import move from 'ember-animated/motions/move';
+import resize from 'ember-animated/motions/resize';
 import adjustCSS from 'ember-animated/motions/adjust-css';
+import { fadeIn, fadeOut } from 'ember-animated/motions/opacity';
+import { printSprites } from 'ember-animated';
 
 // TODO we'll need to use EC in order to be able to isolate cards
 // (due to the need to await the load of the isolated format of a card)
@@ -81,16 +84,35 @@ export default class CardRenderer extends Component {
     return `cards/${dasherize(this.sanitizedName)}/isolated`;
   }
 
+  *cardAnimation({ sentSprites, receivedSprites }) {
+    printSprites(arguments[0], 'card animation');
+
+    receivedSprites.forEach(sprite => {
+      move(sprite, { duration });
+      resize(sprite, { duration });
+    });
+  }
+
   *headerAnimation({ keptSprites }) {
     keptSprites.forEach(sprite => {
       move(sprite, { duration });
     });
   }
 
-  *contentAnimation({ keptSprites }) {
+  *borderAnimation({ keptSprites }) {
     keptSprites.forEach(sprite => {
       adjustCSS('border-top-right-radius', sprite, { duration });
       adjustCSS('border-top-left-radius', sprite, { duration });
+    });
+  }
+
+  *contentAnimation({ sentSprites, receivedSprites }) {
+    printSprites(arguments[0], 'content animation');
+    sentSprites.forEach(sprite => {
+      fadeOut(sprite, { duration });
+    });
+    receivedSprites.forEach(sprite => {
+      fadeIn(sprite, { duration });
     });
   }
 }

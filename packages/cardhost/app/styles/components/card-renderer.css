@@ -42,16 +42,21 @@
   z-index: 5;
 }
 
+.card-renderer-isolated.view .card-renderer-isolated--header--wrapper {
+  background-color: var(--ch-light-gray);
+}
+
+.card-renderer-isolated.edit .card-renderer-isolated--header--wrapper,
+.card-renderer-isolated.layout .card-renderer-isolated--header--wrapper {
+  background-color: var(--ch-medium-background);
+}
+
 .card-renderer-isolated.schema .card-renderer-isolated--header--wrapper {
   background: var(--ch-deep-background);
 }
 
 .card-renderer-isolated.themer .card-renderer-isolated--header--wrapper {
   background: var(--ch-dark-background);
-}
-
-.card-renderer-isolated.view .card-renderer-isolated--header--wrapper {
-  background-color: var(--ch-light-gray);
 }
 
 .card-renderer-isolated--header {

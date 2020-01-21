@@ -14,8 +14,15 @@
   align-items: center;
   text-align: right;
   z-index: var(--ch-edges-z-index);
-  background-color: var(--ch-default);
   transition: var(--ch-card-background-color-animate);
+}
+
+.cardhost-top-edge.view {
+  background-color: var(--ch-light-gray);
+}
+
+.cardhost-top-edge.edge {
+  background-color: var(--ch-medium-background);
 }
 
 .cardhost-top-edge.schema {
@@ -24,10 +31,6 @@
 
 .cardhost-top-edge.themer {
   background-color: var(--ch-dark-background);
-}
-
-.cardhost-top-edge.view {
-  background-color: var(--ch-light-gray);
 }
 
 .view-selector {
