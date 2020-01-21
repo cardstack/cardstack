@@ -11,10 +11,39 @@ import {
   RelationshipsObject,
   ResourceLinkage,
   ResourceIdentifierObject,
+  CollectionResourceDoc,
+  Included,
 } from 'jsonapi-typescript';
 import intersection from 'lodash/intersection';
 import CardstackError from './error';
 import { assertJSONValue } from './json-validation';
+
+export function assertCollectionResourceDoc(
+  body: any,
+  pointer: string[] = ['']
+): asserts body is CollectionResourceDoc {
+  if (typeof body !== 'object' || body == null) {
+    throw new CardstackError('missing json document', {
+      source: { pointer: pointer.join('/') || '/' },
+      status: 400,
+    });
+  }
+
+  let data = body.data;
+  if (!Array.isArray(data)) {
+    throw new CardstackError('body data must be an array', {
+      source: { pointer: pointer.concat('data').join('/') },
+      status: 400,
+    });
+  }
+  data.every((r, index) => assertResourceObject(r, pointer.concat(['data', `[${index}]`])));
+
+  if (body.hasOwnProperty('included')) {
+    assertIncluded(body.included, pointer.concat('included'));
+  }
+
+  assertDocBase(body, pointer);
+}
 
 export function assertSingleResourceDoc(body: any, pointer: string[] = ['']): asserts body is SingleResourceDoc {
   if (typeof body !== 'object' || body == null) {
@@ -23,20 +52,25 @@ export function assertSingleResourceDoc(body: any, pointer: string[] = ['']): as
       status: 400,
     });
   }
-
   assertResourceObject(body.data, pointer.concat('data'));
 
   if (body.hasOwnProperty('included')) {
-    let included = body.included;
-    if (!Array.isArray(included)) {
-      throw new CardstackError('included must be an array', {
-        source: { pointer: pointer.concat('included').join('/') },
-        status: 400,
-      });
-    }
-    included.every((r, index) => assertResourceObject(r, pointer.concat(`[${index}]`)));
+    assertIncluded(body.included, pointer.concat('included'));
   }
+  assertDocBase(body, pointer);
+}
 
+function assertIncluded(included: any, pointer: string[]): asserts included is Included {
+  if (!Array.isArray(included)) {
+    throw new CardstackError('included must be an array', {
+      source: { pointer: pointer.join('/') },
+      status: 400,
+    });
+  }
+  included.every((r, index) => assertResourceObject(r, pointer.concat(`[${index}]`)));
+}
+
+function assertDocBase(body: any, pointer: string[]) {
   if (body.hasOwnProperty('jsonapi')) {
     assertImplementationInfo(body.jsonapi, pointer.concat('jsonapi'));
   }

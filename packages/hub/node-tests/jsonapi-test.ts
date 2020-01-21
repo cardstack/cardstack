@@ -5,7 +5,7 @@ import { TestEnv, createTestEnv } from './helpers';
 import { testCard } from './test-card';
 import { stringify } from 'qs';
 import { Session } from '../session';
-import { assertSingleResourceDoc } from '../jsonapi';
+import { assertSingleResourceDoc, assertCollectionResourceDoc } from '../jsonapi';
 
 describe('hub/jsonapi', function() {
   let request: supertest.SuperTest<supertest.Test>;
@@ -357,6 +357,7 @@ describe('hub/jsonapi', function() {
 
     expect(response).hasStatus(200);
     expect(response.body?.data.length).to.equal(2);
+    assertCollectionResourceDoc(response.body);
   });
 
   it('can paginate the search results', async function() {
@@ -396,6 +397,7 @@ describe('hub/jsonapi', function() {
     expect(response.body?.data.length).to.equal(6);
     expect(response.body?.meta.page.total).to.equal(20);
     expect(response.body?.meta.page.cursor).to.be.not.ok;
+    assertCollectionResourceDoc(response.body);
   });
 
   it('returns 400 when search query is malformed', async function() {
