@@ -10,6 +10,7 @@ import {
 } from 'jsonapi-typescript';
 import cloneDeep from 'lodash/cloneDeep';
 import isPlainObject from 'lodash/isPlainObject';
+import merge from 'lodash/merge';
 import mergeWith from 'lodash/mergeWith';
 import flatten from 'lodash/flatten';
 import uniqBy from 'lodash/uniqBy';
@@ -303,7 +304,13 @@ export class Card {
   async field(name: string): Promise<FieldCard> {
     if (this.csFields) {
       if (name in this.csFields) {
-        return await getOwner(this).instantiate(FieldCard, this.csFields[name], name, this, this.service);
+        return await getOwner(this).instantiate(
+          FieldCard,
+          merge({ data: { type: 'cards' } }, { data: this.csFields[name] }),
+          name,
+          this,
+          this.service
+        );
       }
     }
     let parent = await this.adoptsFrom();
