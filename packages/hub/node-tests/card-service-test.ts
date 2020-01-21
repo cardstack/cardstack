@@ -2096,10 +2096,7 @@ describe('hub/card-service', function() {
         let included = doc.included as any[];
         expect(included.length).to.equal(1);
         expect(included[0].id).to.equal(squeakySnake.canonicalURL);
-        expect(included[0]).to.have.nested.property(
-          'attributes.description',
-          'a plush snake with squeaky segments'
-        );
+        expect(included[0]).to.have.nested.property('attributes.description', 'a plush snake with squeaky segments');
       });
 
       it('can include an interior card-as-reference field from a field with arity > 1 when getting the pristine doc', async function() {
@@ -2177,10 +2174,7 @@ describe('hub/card-service', function() {
 
         let included = doc.included as any[];
         expect(included.length).to.equal(1);
-        expect(included[0]).to.have.nested.property(
-          'attributes.description',
-          'a plush snake with squeaky segments'
-        );
+        expect(included[0]).to.have.nested.property('attributes.description', 'a plush snake with squeaky segments');
       });
 
       it('can include fields based on csFieldSets in a card', async function() {
