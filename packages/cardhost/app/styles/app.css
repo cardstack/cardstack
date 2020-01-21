@@ -29,7 +29,10 @@ Until that work is done we are statically adding this css
 */
 @import '/assets/cards/base-card-isolated.css';
 @import '/assets/cards/base-card-embedded.css';
-@import '/assets/cards/event-card-isolated.css';
+/* Themed cards */
+/* @import '/assets/cards/event-card-isolated.css'; */
+/* @import '/assets/cards/event-ticket-isolated.css'; */
+
 @import '/assets/fields/belongs-to-editor.css';
 @import '/assets/fields/belongs-to-viewer.css';
 @import '/assets/fields/boolean-editor.css';
@@ -59,7 +62,6 @@ Until that work is done we are statically adding this css
   --ch-bottom-edge-height: 80px;
 
   --ch-card-size: 496px;    /* min-width and min-height for cards */
-  --ch-min-card-width: 400px;
   --ch-field-width: 384px;  /* edit and schema view field-renderer max-width */
   --ch-spacing: 20px;
   --ch-edges-z-index: 10;

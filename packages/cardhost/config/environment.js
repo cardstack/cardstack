@@ -46,6 +46,7 @@ module.exports = function(environment) {
       'local-hub::event-card',
       'local-hub::job-description',
       'local-hub::job-applicant-profile',
+      'local-hub::event-ticket',
     ];
   }
 
@@ -65,6 +66,13 @@ module.exports = function(environment) {
     ENV.animationSpeed = 20;
     ENV['@cardstack/ui-components'] = {
       debounceSpeed: 10,
+    };
+
+    ENV.percy = {
+      breakpointsConfig: {
+        desktop: 1280,
+      },
+      defaultBreakpoints: ['desktop'],
     };
   }
 

@@ -1,5 +1,5 @@
 .card-renderer--container {
-  grid-column-end: end;
+  margin: 0 auto;
 }
 
 .card-renderer-isolated {
@@ -8,21 +8,20 @@
   --card-renderer-header-height: 50px;
 
   position: relative;
-  min-width: var(--ch-min-card-width);
-  max-width: var(--ch-card-size);
+  min-width: var(--card-renderer-width);
+  max-width: var(--card-renderer-width);
   font: 400 16px/22px var(--ch-font-family);
   letter-spacing: 0.015em;
 }
 
-.card-renderer-isolated.view,
 .card-renderer-isolated.schema,
 .card-renderer-isolated.edit {
-  max-width: var(--card-renderer-width);
   min-height: var(--card-renderer-height);
 }
 
 .card-renderer-isolated.view {
-  padding-top: 50px;
+  max-width: 100%;
+  padding-top: 0;
 }
 
 /* Resetting styles so that view mode styling does not affect other modes */
@@ -36,14 +35,23 @@
 /* Card Renderer Header */
 /* We need the wrapper to mask the border of the content when scrolling */
 .card-renderer-isolated--header--wrapper {
+  visibility: hidden;
   background-color: var(--ch-default);
   position: sticky;
   top: 80px;
-  z-index: 5;
+  z-index: 11;
+
+  transition: visibility var(--ch-transition-time);
+}
+
+.card-renderer-isolated.layout .card-renderer-isolated--header--wrapper,
+.card-renderer-isolated.edit .card-renderer-isolated--header--wrapper,
+.card-renderer-isolated--header--wrapper.selected {
+  visibility: visible;
 }
 
 .card-renderer-isolated.view .card-renderer-isolated--header--wrapper {
-  background-color: var(--ch-light-gray);
+  background-color: var(--ch-light-background);
 }
 
 .card-renderer-isolated.edit .card-renderer-isolated--header--wrapper,
@@ -52,11 +60,12 @@
 }
 
 .card-renderer-isolated.schema .card-renderer-isolated--header--wrapper {
-  background: var(--ch-deep-background);
+  visibility: visible;
+  background-color: var(--ch-deep-background);
 }
 
 .card-renderer-isolated.themer .card-renderer-isolated--header--wrapper {
-  background: var(--ch-dark-background);
+  background-color: var(--ch-dark-background);
 }
 
 .card-renderer-isolated--header {
@@ -98,6 +107,7 @@
 .card-renderer-isolated--content {
   position: relative;
   min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
+  padding-bottom: 80px;
   background-color: transparent;
   color: var(--ch-dark);
   border: none;
@@ -116,6 +126,10 @@
   background-color: var(--ch-dark-background);
 }
 
+.card-renderer-isolated.view.selected .card-renderer-isolated--content {
+  z-index: 9;
+}
+
 
 /* Card Renderer - Inner Wrapper */
 .card-renderer-isolated .card-renderer-isolated--card-container {
@@ -126,7 +140,7 @@
   background: var(--ch-light);
 
   transition: background-color var(--ch-transition-time),
-  border-color var(--ch-transition-time);
+              border-color var(--ch-transition-time);
 }
 
 .card-renderer-isolated.view .card-renderer-isolated--card-container {
@@ -167,18 +181,6 @@
 
 .card-renderer-isolated.selected .card-renderer-isolated--card-container {
   border-color: var(--ch-highlight);
-}
-
-.card-renderer-isolated.view .card-renderer-isolated--header--wrapper {
-  position: absolute;
-  top: 50px;
-  left: 0;
-  right: 0;
-  bottom: 100px;
-}
-
-.card-renderer-isolated.view .card-renderer-isolated--header--wrapper.selected {
-  top: 0;
 }
 
 

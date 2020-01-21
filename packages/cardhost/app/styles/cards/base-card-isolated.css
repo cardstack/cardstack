@@ -2,32 +2,116 @@
   width: 100%;
   min-height: inherit;
   margin: 0 auto;
-  padding: 50px 30px;
-  background-color: white;
+  background-color: var(--white);
   color: black;
-  font: 400 16px/1.385 var(--ch-font-family);
-  letter-spacing: 0;
+  font: 400 15px/1.467 var(--ch-font-family);
+  letter-spacing: 0.03em;
   text-align: left;
   overflow: hidden;
   overflow-wrap: break-word;
   word-break: break-word;
 }
 
-/* TODO: Change this when we need to animate card contents in view/edit modes */
 .cardstack_base-card-isolated .isolated-card--view-fields {
-  display: contents;
+  display: grid; /* Helpful for ordering fields */
+}
+.cardstack_base-card-isolated .isolated-card--view-fields::before,
+.cardstack_base-card-isolated .isolated-card--view-fields::after {
+  height: 0;
 }
 
 .cardstack_base-card-isolated .field {
-  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  grid-gap: 35px 50px;
   max-width: 656px;
+  width: 100%;
   margin: 0 auto;
-  padding-bottom: 30px;
+  padding: 0 30px 35px;
+}
+.cardstack_base-card-isolated .field:first-of-type {
+  padding-top: 35px;
 }
 
 .cardstack_base-card-isolated .label {
   padding-bottom: 4px;
-  color: var(--ch-dark-op50);
-  font-size: 13px;
-  line-height: 1.385;
+  color: var(--black);
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  line-height: 1.364;
+  text-transform: uppercase;
+}
+
+/* Label hidden by default */
+.cardstack_base-card-isolated .title-label,
+.cardstack_base-card-isolated .highlight-title-label,
+.cardstack_base-card-isolated .background-image-label,
+.cardstack_base-card-isolated .body-label {
+  display: none;
+}
+
+/* Full-width field values by default */
+.cardstack_base-card-isolated .title-value,
+.cardstack_base-card-isolated .highlight-title-value,
+.cardstack_base-card-isolated .background-image-value,
+.cardstack_base-card-isolated .body-value {
+  grid-column: 1 / -1;
+}
+
+/* Background-image field */
+.cardstack_base-card-isolated .background-image-field {
+  max-width: 100%;
+  padding: 0;
+  order: -1;
+}
+.cardstack_base-card-isolated .background-image-field .background-image {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Title value */
+.cardstack_base-card-isolated .title-value {
+  color: var(--dark-gray);
+  font-size: 25px;
+  font-weight: bold;
+  letter-spacing: 0.015em;
+  line-height: 1.2;
+}
+
+/* Highlight Title value */
+.cardstack_base-card-isolated .highlight-title-value {
+  color: var(--red);
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 0.035em;
+  text-transform: capitalize;
+}
+
+/* CTA type */
+.cardstack_base-card-isolated .cta {
+  min-height: 45px;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: calc(22 / 15);
+  letter-spacing: 0.03em;
+  padding-top: 11px;
+  padding-bottom: 11px;
+}
+
+
+/* TODO: figure out how to deal with styling components */
+.cardstack_base-card-isolated .divider-field {
+  width: calc(100% - 60px);
+  max-width: 596px; /* max-field-width - padding * 2 */
+  border-top: 1px solid var(--light-gray);
+}
+.cardstack_base-card-isolated .divider-label {
+  display: none;
+}
+.cardstack_base-card-isolated .divider-value {
+  display: none;
 }

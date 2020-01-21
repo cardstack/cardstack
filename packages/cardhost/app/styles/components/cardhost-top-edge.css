@@ -13,12 +13,14 @@
   justify-content: space-around;
   align-items: center;
   text-align: right;
-  z-index: var(--ch-edges-z-index);
-  transition: var(--ch-card-background-color-animate);
+  z-index: 11;
+  background-color: var(--ch-default);
+  transition: background-color var(--ch-transition-time);
 }
 
 .cardhost-top-edge.view {
-  background-color: var(--ch-light-gray);
+  background-color: var(--ch-light-background);
+  z-index: 10;
 }
 
 .cardhost-top-edge.fields,

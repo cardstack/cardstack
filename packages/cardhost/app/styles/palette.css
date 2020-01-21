@@ -19,6 +19,14 @@
   --ch-light-op50: rgba(255, 255, 255, 0.5);  /* inactive titles with icons */
   --ch-light-op60: #cfcfd2;         /* regular label on dark bg */
   --ch-dark-op50: #404040;          /* regular label on light bg */
-  --ch-cobalt-blue: #0069F9;           /* used for links */
-  --ch-light-gray: #ededed;
+
+
+  /* Only for UNTHEMED CARD CONTENT (Unthemed default card styling) */
+  --dark-gray: #404040;
+  --medium-gray: #707070;
+  --light-gray: rgba(112, 112, 112, 0.25);
+  --red: #ff0000;
+  --black: #000;
+  --white: #fff;
+  --cobalt-blue: #0069F9;         /* used for links */
 }
