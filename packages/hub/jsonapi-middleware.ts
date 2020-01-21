@@ -159,12 +159,13 @@ export default class JSONAPIMiddleware {
     }
   }
 
-  private occlusionRulesFromRequest(_ctxt: KoaRoute.Context<SessionContext, {}>): OcclusionRules | undefined {
-    let rules = undefined;
-    if (rules) {
+  private occlusionRulesFromRequest(ctxt: KoaRoute.Context<SessionContext, {}>): OcclusionRules | undefined {
+    let queryString = parse(ctxt.request.querystring, { plainObjects: true });
+    if (queryString.inclusion) {
+      let rules = parse(queryString.inclusion, { plainObjects: true, arrayLimit: 100 });
       assertOcclusionRules(rules, 'Occlusion query parameter');
+      return rules;
     }
-    return rules;
   }
 }
 
