@@ -10,6 +10,17 @@
     <CardhostTopEdge @mode={{this.routeInfo.mode}}>
       {{#if (or (eq this.routeInfo.mode "layout") (eq this.routeInfo.mode "fields"))}}
         {{#let this.target.currentRoute.parent.attributes as |card|}}
+          <div class="top-edge--mode-label">
+            Edit Mode
+            <LinkTo
+              @route="cards.card.view"
+              @class="top-edge--mode-link view"
+              @model={{card}}
+              data-test-top-edge-link="view"
+            >
+              <span>Preview</span>
+            </LinkTo>
+          </div>
           <div class="view-selector">
             <LinkTo
               @route="cards.card.edit.layout"

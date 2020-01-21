@@ -10,7 +10,7 @@
   right: 0;
   left: 0;
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
   text-align: right;
   z-index: var(--ch-edges-z-index);
@@ -21,7 +21,9 @@
   background-color: var(--ch-light-gray);
 }
 
-.cardhost-top-edge.edge {
+.cardhost-top-edge.fields,
+.cardhost-top-edge.layout {
+  --padding-left: var(--ch-left-edge-navbar-width);
   background-color: var(--ch-medium-background);
 }
 
