@@ -18,7 +18,6 @@
   --ch-light-op50: rgba(255, 255, 255, 0.5);  /* inactive titles with icons */
   --ch-light-op60: #cfcfd2;         /* regular label on dark bg */
   --ch-dark-op50: #404040;          /* regular label on light bg */
-  --ch-light-gray: #ededed;
 
   /* Card content colors (View field colors) */
   --dark-gray: #404040;

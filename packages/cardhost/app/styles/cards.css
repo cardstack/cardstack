@@ -17,7 +17,7 @@
 }
 
 .cardhost-cards.view {
-  background-color: var(--ch-light-gray);
+  background-color: var(--ch-light-background);
 }
 
 .cardhost-cards.schema {
@@ -45,10 +45,4 @@
 .card-view,
 .card-editor {
   grid-template-columns: 1fr;
-}
-
-@media (max-width: 1440px) {
-  .cardhost-cards.edit {
-    padding-left: var(--ch-left-edge-navbar-width);
-  }
 }

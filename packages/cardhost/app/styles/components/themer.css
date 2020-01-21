@@ -5,7 +5,7 @@
   width: 40%;
   height: 100%;
   background: var(--ch-deep-background);
-  z-index: 10;
+  z-index: 11;
   padding: 20px;
   transform: translateX(0%);
   opacity: 0.95;
@@ -164,7 +164,7 @@
   top: var(--ch-spacing);
   right: var(--ch-spacing);
   left: 40px;
-  z-index: var(--ch-actions-z-index);
+  z-index: 12;
   grid-template-columns: auto auto;
 }
 

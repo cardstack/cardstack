@@ -92,6 +92,7 @@
 
 /* TODO: figure out how to deal with styling components */
 .cardstack_base-card-isolated .divider-field {
+  width: calc(100% - 60px);
   max-width: 596px; /* max-field-width - padding * 2 */
   border-top: 1px solid var(--light-gray);
 }
