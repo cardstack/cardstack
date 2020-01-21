@@ -7,89 +7,85 @@ Ember Concurrency into the rendering of the card component here.
 {{#if @card}}
   {{#if (eq @format "isolated")}}
     {{#let (component this.isolatedComponentName) as | Isolated |}}
-      <AnimatedContainer class="card-renderer--container">
-        {{#animated-value @card key="id" group="card-renderer--isolated" use=this.cardAnimation}}
-          <section
-            class="card-renderer-isolated
-              {{this.mode}}
-              {{safe-css-string @card.adoptedFromName}}
-              {{safe-css-string @card.name}}
-              {{if @cardSelected "selected"}}
-              {{if this.fields.length "has-fields" "no-fields"}}
-              {{@class}}
-            "
-            tabindex="0"
-            data-test-card-renderer-isolated
-            {{on "focus" (action this.cardIsFocused true)}}
-            {{did-insert this.focusCard true}}
-            {{did-update this.updateFields @card.isolatedFields}}
-          >
-            {{#if (eq @mode "view")}}
-              {{#animated-value @card watch="isSelected" use=this.headerAnimation}}
-                <div class="card-renderer-isolated--header--wrapper {{if @cardSelected "selected"}}">
-                  <header class="card-renderer-isolated--header">
-                    {{#if (or (eq (safe-css-string @card.adoptedFromName) "event-card") (eq (safe-css-string @card.name) "event-card"))}}
-                      {{svg-jar "event" width="18px" height="20px"}}
-                    {{/if}}
-                    <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.name "Blank Card"}}</span>
-                    {{#if this.cardstackSession.isAuthenticated}}
-                      <LinkTo
-                        @route="cards.card.edit.fields"
-                        @model={{@card}}
-                        @class="card-renderer--edit-link"
-                        data-test-card-edit-link
-                      >
-                        Edit
-                      </LinkTo>
-                    {{/if}}
-                  </header>
-                </div>
-              {{/animated-value}}
-            {{else}}
-              <div class="card-renderer-isolated--header--wrapper">
-                <header class="card-renderer-isolated--header">
-                  {{#if (or (eq (safe-css-string @card.adoptedFromName) "event-card") (eq (safe-css-string @card.name) "event-card"))}}
-                    {{svg-jar "event" width="18px" height="20px"}}
-                  {{/if}}
-                  <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.name "Blank Card"}}</span>
-                </header>
+      <section
+        class="card-renderer-isolated
+          {{this.mode}}
+          {{safe-css-string @card.adoptedFromName}}
+          {{safe-css-string @card.name}}
+          {{if @cardSelected "selected"}}
+          {{if this.fields.length "has-fields" "no-fields"}}
+          {{@class}}
+        "
+        tabindex="0"
+        data-test-card-renderer-isolated
+        {{on "focus" (action this.cardIsFocused true)}}
+        {{did-insert this.focusCard true}}
+        {{did-update this.updateFields @card.isolatedFields}}
+      >
+        {{#if (eq @mode "view")}}
+          {{#animated-value @card watch="isSelected" use=this.headerAnimation}}
+            <div class="card-renderer-isolated--header--wrapper {{if @cardSelected "selected"}}">
+              <header class="card-renderer-isolated--header">
+                {{#if (or (eq (safe-css-string @card.adoptedFromName) "event-card") (eq (safe-css-string @card.name) "event-card"))}}
+                  {{svg-jar "event" width="18px" height="20px"}}
+                {{/if}}
+                <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.name "Blank Card"}}</span>
+                {{#if this.cardstackSession.isAuthenticated}}
+                  <LinkTo
+                    @route="cards.card.edit.fields"
+                    @model={{@card}}
+                    @class="card-renderer--edit-link"
+                    data-test-card-edit-link
+                  >
+                    Edit
+                  </LinkTo>
+                {{/if}}
+              </header>
+            </div>
+          {{/animated-value}}
+        {{else}}
+          <div class="card-renderer-isolated--header--wrapper">
+            <header class="card-renderer-isolated--header">
+              {{#if (or (eq (safe-css-string @card.adoptedFromName) "event-card") (eq (safe-css-string @card.name) "event-card"))}}
+                {{svg-jar "event" width="18px" height="20px"}}
+              {{/if}}
+              <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.name "Blank Card"}}</span>
+            </header>
+          </div>
+        {{/if}}
+          <AnimatedContainer>
+            {{#animated-value @card key="id" group="card-renderer--content" use=this.contentAnimation}}
+              <div class="card-renderer-isolated--content">
+                <AnimatedContainer>
+                  {{#animated-value @card watch="isSelected" use=this.borderAnimation}}
+                    <div class="card-renderer-isolated--card-container {{if @cardSelected "selected"}}">
+                      {{#if (and @dropField ) }}
+                        <DropZone
+                          @dropField={{@dropField}}
+                          @position={{0}}
+                          @toggleStubField={{this.toggleStubField}}
+                        />
+                      {{/if}}
+                      <Isolated
+                        @card={{@card}}
+                        @fields={{this.fields}}
+                        @mode={{this.mode}}
+                        @setFieldValue={{@setFieldValue}}
+                        @setFieldName={{@setFieldName}}
+                        @removeField={{@removeField}}
+                        @toggleStubField={{this.toggleStubField}}
+                        @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+                        @setPosition={{@setPosition}}
+                        @selectField={{@selectField}}
+                        @selectedField={{@selectedField}}
+                        @dropField={{@dropField}} />
+                    </div>
+                  {{/animated-value}}
+                </AnimatedContainer>
               </div>
-            {{/if}}
-              <AnimatedContainer>
-                {{#animated-value @card key="id" group="card-renderer--content" use=this.contentAnimation}}
-                  <div class="card-renderer-isolated--content">
-                    <AnimatedContainer>
-                      {{#animated-value @card watch="isSelected" use=this.borderAnimation}}
-                        <div class="card-renderer-isolated--card-container {{if @cardSelected "selected"}}">
-                          {{#if (and @dropField ) }}
-                            <DropZone
-                              @dropField={{@dropField}}
-                              @position={{0}}
-                              @toggleStubField={{this.toggleStubField}}
-                            />
-                          {{/if}}
-                          <Isolated
-                            @card={{@card}}
-                            @fields={{this.fields}}
-                            @mode={{this.mode}}
-                            @setFieldValue={{@setFieldValue}}
-                            @setFieldName={{@setFieldName}}
-                            @removeField={{@removeField}}
-                            @toggleStubField={{this.toggleStubField}}
-                            @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
-                            @setPosition={{@setPosition}}
-                            @selectField={{@selectField}}
-                            @selectedField={{@selectedField}}
-                            @dropField={{@dropField}} />
-                        </div>
-                      {{/animated-value}}
-                    </AnimatedContainer>
-                  </div>
-                {{/animated-value}}
-              </AnimatedContainer>
-          </section>
-        {{/animated-value}}
-      </AnimatedContainer>
+            {{/animated-value}}
+          </AnimatedContainer>
+      </section>
     {{/let}}
   {{else if (eq @format "embedded")}}
     {{#let (component this.embeddedComponentName) as | Embedded |}}

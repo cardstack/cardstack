@@ -1,10 +1,14 @@
 <section class="card-view" data-test-card-view={{@card.name}} {{on "click" (action (mut @card.isSelected) (not @card.isSelected))}}>
-  <CardRenderer
-    @card={{@card}}
-    @mode={{@mode}}
-    @format="isolated"
-    @cardSelected={{@card.isSelected}}
-  />
+  <AnimatedContainer class="card-renderer--container">
+    {{#animated-value @card key="id" group="card-renderer--isolated" use=this.cardAnimation}}
+      <CardRenderer
+        @card={{@card}}
+        @mode={{@mode}}
+        @format="isolated"
+        @cardSelected={{@card.isSelected}}
+      />
+    {{/animated-value}}
+  </AnimatedContainer>
 </section>
 
 <style data-test-view-css>

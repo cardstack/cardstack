@@ -3,15 +3,19 @@
   data-test-card-edit={{this.card.name}}
   {{did-update this.updateCard @card}}
 >
-  <CardRenderer
-    @card={{this.card}}
-    @mode="edit"
-    @setFieldValue={{action this.setFieldValue}}
-    @format="isolated"
-    @selectField={{action this.selectField}}
-    @selectedField={{this.selectedField}}
-    @cardSelected={{this.card.isSelected}}
-    @cardFocused={{action (mut this.card.isSelected)}} />
+  <AnimatedContainer class="card-renderer--container">
+    {{#animated-value this.card key="id" group="card-renderer--isolated" use=this.cardAnimation}}
+      <CardRenderer
+        @card={{this.card}}
+        @mode="edit"
+        @setFieldValue={{action this.setFieldValue}}
+        @format="isolated"
+        @selectField={{action this.selectField}}
+        @selectedField={{this.selectedField}}
+        @cardSelected={{this.card.isSelected}}
+        @cardFocused={{action (mut this.card.isSelected)}} />
+    {{/animated-value}}
+  </AnimatedContainer>
 </section>
 
 {{!-- This is hidden, used in tests --}}
