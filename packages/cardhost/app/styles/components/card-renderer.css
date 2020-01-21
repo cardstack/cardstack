@@ -1,18 +1,28 @@
+.card-renderer--container {
+  grid-column-end: end;
+}
+
 .card-renderer-isolated {
   --card-renderer-width: var(--ch-card-size);
   --card-renderer-height: var(--ch-card-size);
   --card-renderer-header-height: 50px;
 
   position: relative;
-  width: 100%;
+  min-width: var(--ch-min-card-width);
+  max-width: var(--ch-card-size);
   font: 400 16px/22px var(--ch-font-family);
   letter-spacing: 0.015em;
 }
 
+.card-renderer-isolated.view,
 .card-renderer-isolated.schema,
 .card-renderer-isolated.edit {
   max-width: var(--card-renderer-width);
   min-height: var(--card-renderer-height);
+}
+
+.card-renderer-isolated.view {
+  padding-top: 50px;
 }
 
 /* Resetting styles so that view mode styling does not affect other modes */
@@ -38,6 +48,10 @@
 
 .card-renderer-isolated.themer .card-renderer-isolated--header--wrapper {
   background: var(--ch-dark-background);
+}
+
+.card-renderer-isolated.view .card-renderer-isolated--header--wrapper {
+  background-color: var(--ch-light-gray);
 }
 
 .card-renderer-isolated--header {
@@ -79,7 +93,6 @@
 .card-renderer-isolated--content {
   position: relative;
   min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
-  padding-bottom: 80px;
   background-color: transparent;
   color: var(--ch-dark);
   border: none;
@@ -87,6 +100,7 @@
   overflow-y: auto;
 
   transition: var(--ch-card-background-color-animate);
+  z-index: 10;
 }
 
 .card-renderer-isolated.schema .card-renderer-isolated--content {
@@ -110,6 +124,14 @@
   border-color var(--ch-transition-time);
 }
 
+.card-renderer-isolated.view .card-renderer-isolated--card-container {
+  border-radius: 10px;
+}
+
+.card-renderer-isolated.view .card-renderer-isolated--card-container.selected {
+  border-radius: 0 0 10px 10px;
+}
+
 .card-renderer-isolated.schema .card-renderer-isolated--card-container {
   background-color: var(--ch-dark-background);
   border-top: 3px solid var(--ch-default);
@@ -127,7 +149,8 @@
   outline: 0;
 }
 
-.card-renderer-isolated.selected .card-renderer-isolated--header {
+.card-renderer-isolated.selected .card-renderer-isolated--header,
+.card-renderer-isolated.view .card-renderer-isolated--header {
   background-color: var(--ch-highlight);
   border-color: var(--ch-highlight);
   color: var(--ch-dark);
@@ -141,6 +164,17 @@
   border-color: var(--ch-highlight);
 }
 
+.card-renderer-isolated.view .card-renderer-isolated--header--wrapper {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  right: 0;
+  bottom: 100px;
+}
+
+.card-renderer-isolated.view .card-renderer-isolated--header--wrapper.selected {
+  top: 0;
+}
 
 
 /* TODO: fade card if field-renderer is selected */

@@ -112,6 +112,7 @@ module('Acceptance | css editing', function(hooks) {
   test('closing the editor', async function(assert) {
     await login();
     await createCards(cardData);
+    await visit(`/cards/${card1Id}/edit/layout`);
     await click('[data-test-card-custom-style-button]');
     assert.equal(currentURL(), `/cards/${card1Id}/edit/layout/themer`);
     assert.dom('[data-test-close-editor]').exists();
@@ -126,6 +127,7 @@ module('Acceptance | css editing', function(hooks) {
   test('hiding the editor', async function(assert) {
     await login();
     await createCards(cardData);
+    await visit(`/cards/${card1Id}/edit/layout`);
     await click('[data-test-card-custom-style-button]');
     await settled();
     assert.equal(currentURL(), `/cards/${card1Id}/edit/layout/themer`);
@@ -139,6 +141,7 @@ module('Acceptance | css editing', function(hooks) {
   test('toggling editor docking', async function(assert) {
     await login();
     await createCards(cardData);
+    await visit(`/cards/${card1Id}/edit/layout`);
     await click('[data-test-card-custom-style-button]');
     assert.equal(currentURL(), `/cards/${card1Id}/edit/layout/themer`);
     assert.dom('[data-test-dock-bottom]').exists();
@@ -154,6 +157,7 @@ module('Acceptance | css editing', function(hooks) {
   test('toggling card width', async function(assert) {
     await login();
     await createCards(cardData);
+    await visit(`/cards/${card1Id}/edit/layout`);
     await click('[data-test-card-custom-style-button]');
     assert.equal(currentURL(), `/cards/${card1Id}/edit/layout/themer`);
     // make sure initial state is correct
@@ -172,6 +176,7 @@ module('Acceptance | css editing', function(hooks) {
   test('can save CSS edits', async function(assert) {
     await login();
     await createCards(cardData);
+    await visit(`/cards/${card1Id}/edit/layout`);
     await click('[data-test-card-custom-style-button]');
     await waitFor('[data-test-editor-pane] textarea');
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');

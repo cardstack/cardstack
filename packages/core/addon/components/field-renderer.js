@@ -105,9 +105,9 @@ export default class FieldRenderer extends Component {
   }
 
   @action
-  selectField(field) {
+  selectField(field, evt) {
     if (this.args.selectField) {
-      this.args.selectField(field);
+      this.args.selectField(field, evt);
     }
   }
 
