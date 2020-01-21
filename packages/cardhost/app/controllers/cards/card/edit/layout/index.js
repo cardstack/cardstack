@@ -10,25 +10,30 @@ export default class CardLayoutIndexController extends Controller {
   resizeable = true;
 
   @tracked
-  themerOptions = [{ name: 'Cardstack default' }];
-  @tracked
-  selectedTheme = this.themerOptions[0];
+  themerOptions = [{ name: 'Cardstack default' }, { name: 'Custom theme' }];
 
   @action
   createTheme() {
-    this.themerOptions.push({ name: 'Custom theme' });
-    this.selectedTheme = this.themerOptions[this.themerOptions.length - 1];
     this.router.transitionTo('cards.card.edit.layout.themer', this.model);
   }
 
-  @action
-  updateCode(code) {
-    this.model.setIsolatedCss(code);
+  get selectedTheme() {
+    let css = this.model.isolatedCss;
+    let isDefault = true;
+
+    if (css) {
+      // Some cards have a null value for isolatedCss, so we have to typecheck
+      // For the comparison, first strip out whitespace and newlines so that extra whitespace doesn't register as a custom theme
+      css = css.replace(/\s*|[\r\n]/g, '');
+      isDefault = css === '' || css === '.cardstack_base-card-isolated{}';
+    }
+    return isDefault ? { name: 'Cardstack default' } : { name: 'Custom theme' };
   }
 
   @action
   handleThemeChange(val) {
-    this.selectedTheme = val;
-    //  TODO
+    if (val.name === 'Cardstack default') {
+      this.model.setIsolatedCss('.cardstack_base-card-isolated {}');
+    }
   }
 }

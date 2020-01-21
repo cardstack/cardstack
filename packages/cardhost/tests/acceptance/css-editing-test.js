@@ -6,6 +6,7 @@ import { createCards } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { animationsSettled } from 'ember-animated/test-support';
+import { selectChoose } from 'ember-power-select/test-support';
 
 const timeout = 2000;
 const card1Id = 'millenial-puppies';
@@ -185,5 +186,48 @@ module('Acceptance | css editing', function(hooks) {
     await animationsSettled();
     let viewHasStyle = find('[data-test-view-css]').innerText.includes('gorgeous styles');
     assert.ok(viewHasStyle);
+  });
+
+  test('dropdown displays default theme for new cards', async function(assert) {
+    await login();
+    await createCards(cardData);
+    await visit(`/cards/${card1Id}/edit/layout`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/layout`);
+    await waitFor('[data-test-cs-component="dropdown"]');
+    assert.dom('[data-test-cs-component="dropdown"]').exists();
+    assert.dom('[data-test-cs-component="dropdown"]').containsText('default');
+    assert.dom('[data-test-cs-component="dropdown"]').doesNotContainText('Custom');
+  });
+
+  test('dropdown displays custom theme for cards with custom CSS', async function(assert) {
+    await login();
+    await createCards(cardData);
+    await visit(`/cards/${card1Id}/edit/layout`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/layout`);
+    await click('[data-test-card-custom-style-button]');
+    await waitFor('[data-test-editor-pane] textarea');
+    await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
+    await click('[data-test-close-editor]');
+    await waitFor('[data-test-cs-component="dropdown"]');
+    assert.dom('[data-test-cs-component="dropdown"]').exists();
+    assert.dom('[data-test-cs-component="dropdown"]').containsText('Custom');
+    assert.dom('[data-test-cs-component="dropdown"]').doesNotContainText('default');
+  });
+
+  test('selecting default theme resets css', async function(assert) {
+    await login();
+    await createCards(cardData);
+    await visit(`/cards/${card1Id}/edit/layout`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/layout`);
+    await click('[data-test-card-custom-style-button]');
+    await waitFor('[data-test-editor-pane] textarea');
+    await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
+    await click('[data-test-close-editor]');
+    await click('[data-test-card-save-btn]');
+    await waitFor(`[data-test-card-save-btn].saved`, { timeout });
+    await waitFor('[data-test-cs-component="dropdown"]');
+    await selectChoose('[data-test-cs-component="dropdown"]', 'Cardstack default');
+    assert.dom('[data-test-cs-component="dropdown"]').doesNotContainText('Custom');
+    assert.dom('[data-test-view-css]').doesNotContainText('gorgeous styles');
   });
 });
