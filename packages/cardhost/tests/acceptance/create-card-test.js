@@ -259,13 +259,11 @@ module('Acceptance | card create', function(hooks) {
   test(`removing a field from a card`, async function(assert) {
     await login();
     await visit('/cards/new');
-
     await setCardId(card1Id);
     await addField('title', 'string', true);
-
     await removeField('title');
-
     assert.dom('.cardhost-right-edge-panel [data-test-field]').doesNotExist();
+    await animationsSettled();
     await percySnapshot(assert);
   });
 
