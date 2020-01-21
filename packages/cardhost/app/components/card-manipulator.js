@@ -44,7 +44,13 @@ export default class CardManipulator extends Component {
   }
 
   get newFieldName() {
-    return `field-${this.card.isolatedFields.length}`;
+    let existingFields = this.card.isolatedFields.map(field => field.name);
+    let newFieldNumber = this.card.isolatedFields.length;
+    // keep adding to the field number until we are sure that it is not already taken
+    while (existingFields.indexOf(`field-${newFieldNumber}`) !== -1) {
+      newFieldNumber++;
+    }
+    return `field-${newFieldNumber}`;
   }
 
   get didUpdate() {
