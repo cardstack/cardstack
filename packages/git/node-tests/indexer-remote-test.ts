@@ -10,12 +10,9 @@ const { createDefaultEnvironment, destroyDefaultEnvironment } = require('@cardst
 import { makeRepo } from './support';
 
 import { join } from 'path';
-import { readFileSync } from 'fs';
 import { Remote } from '../git';
 
 import service from '../service';
-
-const privateKey = readFileSync(join(__dirname, 'git-ssh-server', 'cardstack-test-key'), 'utf8');
 
 function toResource(doc: todo) {
   return doc.data;
@@ -65,7 +62,6 @@ describe('git/indexer remote config', function() {
         repo: '/user/repo',
         remote: {
           url: 'http://root:password@localhost:8838/git/repo',
-          privateKey,
         },
       },
     });
@@ -84,7 +80,6 @@ describe('git/indexer remote config', function() {
       params: {
         remote: {
           url: 'http://root:password@localhost:8838/git/repo',
-          privateKey,
         },
       },
     });

@@ -7,8 +7,6 @@ const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 import { todo } from '@cardstack/plugin-utils/todo-any';
 
-import { join } from 'path';
-import { readFileSync } from 'fs';
 import { promisify } from 'util';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
@@ -20,7 +18,6 @@ import service from '../service';
 
 const mkdir = promisify(temp.mkdir);
 
-const privateKey = readFileSync(join(__dirname, 'git-ssh-server', 'cardstack-test-key'), 'utf8');
 import { fake, replace } from 'sinon';
 
 async function resetRemote() {
@@ -83,7 +80,6 @@ describe('git/writer with remote', function() {
       params: {
         remote: {
           url: 'http://root:password@localhost:8838/git/repo',
-          privateKey,
           cacheDir: tempRepoPath,
         },
       },
@@ -311,7 +307,6 @@ describe('git/writer with empty remote', function() {
       params: {
         remote: {
           url: 'http://root:password@localhost:8838/git/repo',
-          privateKey,
           cacheDir: tempRepoPath,
         },
       },
@@ -380,7 +375,6 @@ describe('git/writer-remote/githereum', function() {
       params: {
         remote: {
           url: 'http://root:password@localhost:8838/git/repo',
-          privateKey,
           cacheDir: tempRepoPath,
         },
         githereum: {

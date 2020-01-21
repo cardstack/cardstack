@@ -8,7 +8,7 @@ const temp = require('@cardstack/test-support/temp-helper');
 const { mkdir } = temp;
 
 import { join } from 'path';
-import { readFileSync, writeFileSync, readdirSync, mkdirSync } from 'fs';
+import { writeFileSync, readdirSync, mkdirSync } from 'fs';
 
 import { promisify } from 'util';
 import sinon from 'sinon';
@@ -18,8 +18,6 @@ import rimrafcb from 'rimraf';
 const rimraf = promisify(rimrafcb);
 
 import service from '../service';
-
-const privateKey = readFileSync(join(__dirname, 'git-ssh-server', 'cardstack-test-key'), 'utf8');
 
 describe('local git cache service', function() {
   let tempRepoPath: string;
@@ -45,7 +43,6 @@ describe('local git cache service', function() {
       params: {
         remote: {
           url: 'http://root:password@localhost:8838/git/repo',
-          privateKey,
           cacheDir: tempRepoPath,
         },
       },
@@ -70,7 +67,6 @@ describe('local git cache service', function() {
       params: {
         remote: {
           url: 'http://root:password@localhost:8838/git/repo',
-          privateKey,
           cacheDir: tempRepoPath,
         },
       },
@@ -81,7 +77,6 @@ describe('local git cache service', function() {
       params: {
         remote: {
           url: 'http://root:password@127.0.0.1:8838/git/repo',
-          privateKey,
           cacheDir: tempRepoPath,
         },
       },
@@ -111,7 +106,6 @@ describe('local git cache service', function() {
       params: {
         remote: {
           url: 'http://root:password@localhost:8838/git/repo',
-          privateKey,
           cacheDir: tempRepoPath,
         },
       },
@@ -144,7 +138,6 @@ describe('local git cache service', function() {
       params: {
         remote: {
           url: 'http://root:password@localhost:8838/git/repo',
-          privateKey,
           cacheDir: tempRepoPath,
         },
       },
@@ -194,7 +187,6 @@ describe('local git cache service', function() {
       params: {
         remote: {
           url,
-          privateKey,
           cacheDir: tempRepoPath,
         },
       },
