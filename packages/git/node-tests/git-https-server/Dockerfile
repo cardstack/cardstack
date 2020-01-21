@@ -15,8 +15,6 @@ RUN apk add --no-cache \
     fcgiwrap \
     git-daemon
 
-# COPY cardstack-test-key.pub /root/.ssh/authorized_keys
-# RUN chmod 600 /root/.ssh/authorized_keys && chown root:root /root/.ssh/authorized_keys
 RUN mkdir /root/data-test && \
   mkdir /run/nginx/
 
