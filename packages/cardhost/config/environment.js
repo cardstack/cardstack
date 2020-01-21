@@ -69,10 +69,10 @@ module.exports = function(environment) {
 
     ENV.percy = {
       breakpointsConfig: {
-        desktop: 1280
+        desktop: 1280,
       },
-      defaultBreakpoints: ['desktop']
-    }
+      defaultBreakpoints: ['desktop'],
+    };
   }
 
   // if (environment === 'production') {
