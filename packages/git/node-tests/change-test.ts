@@ -1,6 +1,7 @@
 import Change from '../change';
 import { GitConflict } from '../git';
 import { inRepo, commitOpts, makeRepo } from './support';
+import { FileNotFound, OverwriteRejected } from '../git/tree';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 const temp = require('@cardstack/test-support/temp-helper');
@@ -107,7 +108,7 @@ describe('git/change', function() {
       file.setContent('something else');
       throw new Error('should not get here');
     } catch (err) {
-      expect(err).instanceof(Change.OverwriteRejected);
+      expect(err).instanceof(OverwriteRejected);
     }
   });
 
@@ -262,7 +263,7 @@ describe('git/change', function() {
       file.delete();
       throw new Error('should not get here');
     } catch (err) {
-      expect(err).instanceOf(Change.NotFound);
+      expect(err).instanceOf(FileNotFound);
     }
   });
 
@@ -274,7 +275,7 @@ describe('git/change', function() {
       file.delete();
       throw new Error('should not get here');
     } catch (err) {
-      expect(err).instanceOf(Change.NotFound);
+      expect(err).instanceOf(FileNotFound);
     }
   });
 
@@ -291,7 +292,7 @@ describe('git/change', function() {
       file.delete();
       throw new Error('should not get here');
     } catch (err) {
-      expect(err).instanceOf(Change.NotFound);
+      expect(err).instanceOf(FileNotFound);
     }
   });
 
@@ -304,7 +305,7 @@ describe('git/change', function() {
       await change.get('outer/sample.txt', { allowUpdate: true });
       throw new Error('should not get here');
     } catch (err) {
-      expect(err).instanceOf(Change.NotFound);
+      expect(err).instanceOf(FileNotFound);
     }
   });
 
@@ -315,7 +316,7 @@ describe('git/change', function() {
       await change.get('sample.txt', { allowUpdate: true });
       throw new Error('should not get here');
     } catch (err) {
-      expect(err).instanceOf(Change.NotFound);
+      expect(err).instanceOf(FileNotFound);
     }
   });
 

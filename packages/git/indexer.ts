@@ -65,7 +65,8 @@
 
 */
 
-import { Repository, Commit, RemoteConfig, Tree, TreeEntry, RepoNotFound } from './git';
+import { Repository, Commit, RemoteConfig, RepoNotFound } from './git';
+import Tree, { TreeEntry } from './git/tree';
 
 import Change from './change';
 import logger from '@cardstack/logger';
@@ -171,12 +172,12 @@ module.exports = declareInjections(
 class GitUpdater {
   commit?: Commit;
   commitId?: string;
-  rootTree: todo;
+  rootTree?: Tree;
 
   constructor(
     readonly repo: Repository,
     readonly branch: string,
-    readonly basePath: todo[],
+    readonly basePath: string[][],
     readonly searchers: todo,
     readonly cardTypes: string[],
     readonly owner: todo
@@ -259,7 +260,7 @@ class GitUpdater {
     return Commit.lookup(this.repo, branch.target());
   }
 
-  async _indexTree(ops: todo, oldTree: Tree | undefined, newTree: Tree | undefined, filter?: todo) {
+  async _indexTree(ops: todo, oldTree?: Tree, newTree?: Tree, filter?: todo) {
     let seen = new Map();
     if (newTree) {
       for (let newEntry of newTree.entries()) {
@@ -288,7 +289,7 @@ class GitUpdater {
     let oldEntry;
     if (oldTree) {
       oldEntry = oldTree.entryByName(name);
-      if (oldEntry && oldEntry.id().equal(newEntry.id())) {
+      if (oldEntry && oldEntry.id() && oldEntry.id()!.equal(newEntry.id()!)) {
         // We can prune whole subtrees when we find an identical
         // entry. Which is kinda the point of Git's data
         // structure in the first place.
@@ -356,10 +357,10 @@ class GitUpdater {
       doc.type = type;
       doc.id = id;
       set(doc, 'meta.version', this.commitId);
-      set(doc, 'meta.hash', entry.id().toString());
+      set(doc, 'meta.hash', entry.id()!.sha);
     } else {
       set(doc, 'data.meta.version', this.commitId);
-      set(doc, 'data.meta.hash', entry.id().toString());
+      set(doc, 'data.meta.hash', entry.id()!.sha);
     }
 
     return doc;

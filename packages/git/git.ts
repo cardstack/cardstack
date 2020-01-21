@@ -1,13 +1,7 @@
-import {
-  Repository as NGRepository,
-  Tree as NGTree,
-  Treebuilder as NGTreebuilder,
-  TreeEntry as NGTreeEntry,
-  Blob as NGBlob,
-} from 'nodegit';
-
 import fs, { existsSync } from 'fs';
 import { join } from 'path';
+
+import Tree from './git/tree';
 
 const { unlink } = fs.promises;
 
@@ -35,22 +29,6 @@ import {
 } from 'isomorphic-git';
 
 igPlugins.set('fs', fs);
-
-export const enum FILEMODE {
-  UNREADABLE = 0,
-  TREE = 16384,
-  BLOB = 33188,
-  EXECUTABLE = 33261,
-  LINK = 40960,
-  COMMIT = 57344,
-}
-
-// there is no type for this
-// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
-const { setThreadSafetyStatus } = require('nodegit');
-// This is supposed to enable thread-safe locking around all async
-// operations.
-setThreadSafetyStatus(1);
 
 export interface RemoteConfig {
   url: string;
@@ -224,11 +202,6 @@ export class Repository {
   isBare() {
     return this.bare;
   }
-
-  async getNgRepo() {
-    let ngrepo = this.bare ? await NGRepository.openBare(this.path) : await NGRepository.open(this.path);
-    return ngrepo;
-  }
 }
 
 export class Commit {
@@ -236,7 +209,7 @@ export class Commit {
     let sha = await igCommit(
       Object.assign(formatCommitOpts(commitOpts), {
         gitdir: repo.gitdir,
-        tree: tree.id().toString(),
+        tree: tree.id()!.toString(),
         parent: parents.map(p => p.sha()),
         noUpdateBranch: true,
       })
@@ -283,14 +256,14 @@ export class Commit {
 }
 
 export class Oid {
-  constructor(private readonly sha: string) {}
+  constructor(public readonly sha: string) {}
 
   toString() {
     return this.sha;
   }
 
-  equal(other: Oid | string) {
-    return other.toString() === this.toString();
+  equal(other: Oid | string | undefined) {
+    return other && other.toString() === this.toString();
   }
 }
 export class RepoNotFound extends Error {}
@@ -356,40 +329,6 @@ export class Remote {
   }
 }
 
-export class Tree {
-  static async lookup(repo: Repository, oid: Oid) {
-    let ngtree = await NGTree.lookup(await repo.getNgRepo(), oid.toString());
-    return new Tree(ngtree);
-  }
-  constructor(private readonly ngtree: NGTree) {}
-
-  id() {
-    return new Oid(this.ngtree.id().tostrS());
-  }
-
-  getNgTree() {
-    return this.ngtree;
-  }
-
-  entries() {
-    return this.ngtree.entries().map(e => new TreeEntry(e));
-  }
-
-  entryByName(name: string) {
-    // This is apparently private API. There's unfortunately no public
-    // API for gracefully attempting to retriee and entry that may be
-    // absent.
-    let entry,
-      ngentry = this.ngtree._entryByName(name);
-    if (ngentry) {
-      // @ts-ignore this is a hack
-      ngentry.parent = this.ngtree;
-      entry = new TreeEntry(ngentry);
-    }
-    return entry;
-  }
-}
-
 function formatCommitOpts(commitOpts: CommitOpts) {
   let commitDate = moment(commitOpts.authorDate || new Date());
 
@@ -444,84 +383,6 @@ export class Merge {
       } else {
         throw e;
       }
-    }
-  }
-}
-
-export class Treebuilder {
-  static async create(repo: Repository, tree: Tree | undefined) {
-    let ngtreebuilder = await NGTreebuilder.create(await repo.getNgRepo(), tree && tree.getNgTree());
-    return new Treebuilder(ngtreebuilder);
-  }
-
-  constructor(private readonly ngtreebuilder: NGTreebuilder) {}
-
-  remove(filename: string) {
-    this.ngtreebuilder.remove(filename);
-  }
-
-  async insert(filename: string, childId: Oid, filemode: FILEMODE) {
-    // @ts-ignore expects oid but it will have to live with a string for now
-    await this.ngtreebuilder.insert(filename, childId.toString(), filemode);
-  }
-
-  entrycount() {
-    return this.ngtreebuilder.entrycount();
-  }
-
-  async write(): Promise<Oid> {
-    let ngoid = await this.ngtreebuilder.write();
-    return new Oid(ngoid.tostrS());
-  }
-}
-
-export class Blob {
-  constructor(private readonly ngblob: NGBlob) {}
-
-  id() {
-    return new Oid(this.ngblob.id().tostrS());
-  }
-
-  content(): Buffer {
-    return this.ngblob.content();
-  }
-}
-
-export class TreeEntry {
-  constructor(private readonly ngtreeentry: NGTreeEntry) {}
-
-  isTree() {
-    return this.ngtreeentry.isTree();
-  }
-
-  filemode() {
-    return (this.ngtreeentry.filemode() as unknown) as FILEMODE;
-  }
-
-  path() {
-    return this.ngtreeentry.path();
-  }
-
-  id() {
-    return new Oid(this.ngtreeentry.id().tostrS());
-  }
-
-  async getBlob(): Promise<Blob> {
-    return new Blob(await this.ngtreeentry.getBlob());
-  }
-
-  isBlob(): boolean {
-    return this.ngtreeentry.isBlob();
-  }
-
-  name(): string {
-    return this.ngtreeentry.name();
-  }
-
-  async getTree() {
-    let tree = await this.ngtreeentry.getTree();
-    if (tree) {
-      return new Tree(tree);
     }
   }
 }

@@ -1,6 +1,5 @@
-import { Commit, Merge, Repository, Tree, FILEMODE, CommitOpts, BranchNotFound } from './git';
-
-import { NewEntry, MutableTree, NotFound, OverwriteRejected } from './mutable-tree';
+import { Commit, Merge, Repository, CommitOpts, BranchNotFound, Oid } from './git';
+import Tree, { TreeEntry, FileNotFound, OverwriteRejected, FILEMODE } from './git/tree';
 
 import crypto from 'crypto';
 import delay from 'delay';
@@ -8,9 +7,6 @@ import logger from '@cardstack/logger';
 const log = logger('cardstack/git');
 
 export default class Change {
-  static NotFound = NotFound;
-  static OverwriteRejected = OverwriteRejected;
-
   static async createInitial(repoPath: string, targetBranch: string) {
     let repo = await Repository.initBare(repoPath);
     return new this(repo, targetBranch, undefined, []);
@@ -48,7 +44,7 @@ export default class Change {
     return new this(repo, targetBranch, parentTree, parents, parentCommit, isRemote);
   }
 
-  root: MutableTree;
+  root: Tree;
   isRemote: boolean;
 
   constructor(
@@ -60,11 +56,7 @@ export default class Change {
     isRemote?: boolean
   ) {
     this.repo = repo;
-    this.parentTree = parentTree;
-    this.root = new MutableTree(repo, parentTree);
-    this.parents = parents;
-    this.parentCommit = parentCommit;
-    this.targetBranch = targetBranch;
+    this.root = parentTree || Tree.create(repo, parentTree);
     this.isRemote = !!isRemote;
   }
 
@@ -121,10 +113,10 @@ export default class Change {
   }
 
   async _makeCommit(commitOpts: CommitOpts) {
-    let treeOid = await this.root.write(true);
-    if (treeOid && this.parentTree && treeOid.equal(this.parentTree.id())) {
+    if (!this.root.dirty) {
       return this.parentCommit;
     }
+    let treeOid = await this.root.write(true);
 
     let tree = await Tree.lookup(this.repo, treeOid!);
     let commitOid = await Commit.create(this.repo, commitOpts, tree, this.parents);
@@ -184,11 +176,11 @@ export default class Change {
 }
 
 class FileHandle {
-  public mode: number;
+  public mode: FILEMODE;
 
   constructor(
-    public tree: MutableTree,
-    public leaf: NewEntry | null,
+    public tree: Tree,
+    public leaf: TreeEntry | undefined,
     public name: string,
     public allowUpdate: boolean,
     public path: string
@@ -226,16 +218,14 @@ class FileHandle {
   }
   delete() {
     if (!this.leaf) {
-      throw new NotFound(`No such file ${this.path}`);
+      throw new FileNotFound(`No such file ${this.path}`);
     }
     this.tree.delete(this.name);
-    this.leaf = null;
+    this.leaf = undefined;
   }
-  savedId() {
+  savedId(): Oid | undefined {
     // this is available only after our change has been finalized
-    if (this.leaf && this.leaf.savedId) {
-      return this.leaf.savedId.toString();
-    }
+    return this.leaf && this.leaf.id()!;
   }
 }
 
