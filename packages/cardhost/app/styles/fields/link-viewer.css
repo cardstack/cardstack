@@ -1,0 +1,5 @@
+.field-type-link {
+  color: var(--ch-cobalt-blue);
+  text-decoration: underline;
+  font-weight: 600;
+}
