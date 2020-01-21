@@ -1967,10 +1967,10 @@ describe('hub/card-service', function() {
           { type: 'cards', id: vanGogh.canonicalURL },
           { type: 'cards', id: mango.canonicalURL },
         ]);
-        let { included } = doc;
+        let included = doc.included as any[];
 
-        expect(included?.length).to.equal(8);
-        let includedIds = included?.map(i => i.id);
+        expect(included.length).to.equal(8);
+        let includedIds = included.map(i => i.id);
         expect(includedIds).to.have.members([
           // Note that all relationships are traversed including csField
           // relationships like csAdoptsFrom. These are the system field
@@ -1987,13 +1987,13 @@ describe('hub/card-service', function() {
           mango.canonicalURL,
         ]);
 
-        let includedSqueakySnake = included?.find(i => i.id === squeakySnake.canonicalURL);
+        let includedSqueakySnake = included.find(i => i.id === squeakySnake.canonicalURL);
         expect(includedSqueakySnake).to.have.nested.property(
           'attributes.description',
           'a plush snake with squeaky segments'
         );
 
-        let includedVanGogh = included?.find(i => i.id === vanGogh.canonicalURL);
+        let includedVanGogh = included.find(i => i.id === vanGogh.canonicalURL);
         expect(includedVanGogh).to.have.nested.property('attributes.name', 'Van Gogh');
         expect(includedVanGogh).to.have.nested.property('attributes.favoriteToy.attributes.description', 'a beef bone');
         expect(includedVanGogh).to.have.deep.nested.property('attributes.favoriteToy.relationships.csAdoptsFrom.data', {
@@ -2001,7 +2001,7 @@ describe('hub/card-service', function() {
           id: toyCard.canonicalURL,
         });
 
-        let includedMango = included?.find(i => i.id === mango.canonicalURL);
+        let includedMango = included.find(i => i.id === mango.canonicalURL);
         expect(includedMango).to.have.nested.property('attributes.name', 'Mango');
         expect(includedMango).to.have.deep.nested.property('relationships.favoriteToy.data', {
           type: 'cards',
@@ -2040,8 +2040,9 @@ describe('hub/card-service', function() {
         let { jsonapi: doc } = await vanGogh.asPristineDoc({ includeFields: ['csAdoptsFrom'] });
         expect(doc).to.not.have.nested.property('data.attributes.name', 'Van Gogh');
         expect(doc).to.not.have.nested.property('data.attributes.favoriteToy');
-        expect(doc.included?.length).to.equal(1);
-        expect(doc.included?.[0].id).to.equal(dalmatianCard.canonicalURL);
+        let included = doc.included as any[];
+        expect(included.length).to.equal(1);
+        expect(included[0].id).to.equal(dalmatianCard.canonicalURL);
       });
 
       it('can include a field filled by card-as-value when getting the pristine doc', async function() {
@@ -2063,9 +2064,10 @@ describe('hub/card-service', function() {
           type: 'cards',
           id: squeakySnake.canonicalURL,
         });
-        expect(doc.included?.length).to.equal(1);
-        expect(doc.included?.[0].id).to.equal(squeakySnake.canonicalURL);
-        expect(doc.included?.[0]).to.not.have.nested.property('attributes.description');
+        let included = doc.included as any[];
+        expect(included.length).to.equal(1);
+        expect(included[0].id).to.equal(squeakySnake.canonicalURL);
+        expect(included[0]).to.not.have.nested.property('attributes.description');
       });
 
       it('can include an interior card-as-value field when getting the pristine doc', async function() {
@@ -2091,9 +2093,10 @@ describe('hub/card-service', function() {
           type: 'cards',
           id: squeakySnake.canonicalURL,
         });
-        expect(doc.included?.length).to.equal(1);
-        expect(doc.included?.[0].id).to.equal(squeakySnake.canonicalURL);
-        expect(doc.included?.[0]).to.have.nested.property(
+        let included = doc.included as any[];
+        expect(included.length).to.equal(1);
+        expect(included[0].id).to.equal(squeakySnake.canonicalURL);
+        expect(included[0]).to.have.nested.property(
           'attributes.description',
           'a plush snake with squeaky segments'
         );
@@ -2114,12 +2117,13 @@ describe('hub/card-service', function() {
           { type: 'cards', id: mango.canonicalURL },
         ]);
 
-        expect(doc.included?.length).to.equal(3);
-        let ids = doc?.included?.map(i => i.id);
+        let included = doc.included as any[];
+        expect(included.length).to.equal(3);
+        let ids = included.map(i => i.id);
         expect(ids).to.have.members([vanGogh.canonicalURL, mango.canonicalURL, squeakySnake.canonicalURL]);
-        let includedVanGogh = doc?.included?.find(i => i.id === vanGogh.canonicalURL);
-        let includedMango = doc?.included?.find(i => i.id === mango.canonicalURL);
-        let includedSqueakySnake = doc?.included?.find(i => i.id === squeakySnake.canonicalURL);
+        let includedVanGogh = included.find(i => i.id === vanGogh.canonicalURL);
+        let includedMango = included.find(i => i.id === mango.canonicalURL);
+        let includedSqueakySnake = included.find(i => i.id === squeakySnake.canonicalURL);
 
         expect(includedVanGogh).to.not.have.nested.property('attributes.name');
         expect(includedVanGogh).to.have.nested.property('attributes.favoriteToy');
@@ -2171,8 +2175,9 @@ describe('hub/card-service', function() {
           id: squeakySnake.canonicalURL,
         });
 
-        expect(doc.included?.length).to.equal(1);
-        expect(doc.included?.[0]).to.have.nested.property(
+        let included = doc.included as any[];
+        expect(included.length).to.equal(1);
+        expect(included[0]).to.have.nested.property(
           'attributes.description',
           'a plush snake with squeaky segments'
         );
@@ -2188,11 +2193,12 @@ describe('hub/card-service', function() {
           { type: 'cards', id: mango.canonicalURL },
         ]);
 
-        expect(doc.included?.length).to.equal(2);
-        let ids = doc?.included?.map(i => i.id);
+        let included = doc.included as any[];
+        expect(included.length).to.equal(2);
+        let ids = included.map(i => i.id);
         expect(ids).to.have.members([vanGogh.canonicalURL, mango.canonicalURL]);
-        let includedVanGogh = doc?.included?.find(i => i.id === vanGogh.canonicalURL);
-        let includedMango = doc?.included?.find(i => i.id === mango.canonicalURL);
+        let includedVanGogh = included.find(i => i.id === vanGogh.canonicalURL);
+        let includedMango = included.find(i => i.id === mango.canonicalURL);
 
         expect(includedVanGogh).to.have.nested.property('attributes.name');
         expect(includedVanGogh).to.not.have.nested.property('attributes.favoriteToy');
@@ -2222,12 +2228,13 @@ describe('hub/card-service', function() {
           { type: 'cards', id: mango.canonicalURL },
         ]);
 
-        expect(doc.included?.length).to.equal(3);
-        let ids = doc?.included?.map(i => i.id);
+        let included = doc.included as any[];
+        expect(included.length).to.equal(3);
+        let ids = included.map(i => i.id);
         expect(ids).to.have.members([vanGogh.canonicalURL, mango.canonicalURL, squeakySnake.canonicalURL]);
-        let includedVanGogh = doc?.included?.find(i => i.id === vanGogh.canonicalURL);
-        let includedMango = doc?.included?.find(i => i.id === mango.canonicalURL);
-        let includedSqueakySnake = doc?.included?.find(i => i.id === squeakySnake.canonicalURL);
+        let includedVanGogh = included.find(i => i.id === vanGogh.canonicalURL);
+        let includedMango = included.find(i => i.id === mango.canonicalURL);
+        let includedSqueakySnake = included.find(i => i.id === squeakySnake.canonicalURL);
 
         expect(includedVanGogh).to.have.nested.property('attributes.name', 'Van Gogh');
         expect(includedVanGogh).to.have.nested.property('attributes.favoriteToy');
@@ -2275,15 +2282,16 @@ describe('hub/card-service', function() {
 
       it('can handle an included card that has a relationship to the primary card', async function() {
         let { jsonapi: doc } = await personA.asPristineDoc();
-        expect(doc.included?.length).to.equal(4);
-        let ids = doc?.included?.map(i => i.id);
+        let included = doc.included as any[];
+        expect(included.length).to.equal(4);
+        let ids = included.map(i => i.id);
         expect(ids).to.have.members([
           canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }),
           personCard.canonicalURL,
           friendCard.canonicalURL,
           personB.canonicalURL,
         ]);
-        let includedPersonB = doc?.included?.find(i => i.id === personB.canonicalURL);
+        let includedPersonB = included.find(i => i.id === personB.canonicalURL);
         expect(includedPersonB).to.have.deep.nested.property('relationships.bestFriend.data', {
           type: 'cards',
           id: personA.canonicalURL,
@@ -2292,8 +2300,9 @@ describe('hub/card-service', function() {
 
       it('can handle an included card that has a relationship to the primary card in arity > 1 field', async function() {
         let { jsonapi: doc } = await personC.asPristineDoc();
-        expect(doc.included?.length).to.equal(6);
-        let ids = doc?.included?.map(i => i.id);
+        let included = doc.included as any[];
+        expect(included.length).to.equal(6);
+        let ids = included.map(i => i.id);
         expect(ids).to.have.members([
           canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }),
           personCard.canonicalURL,
@@ -2302,7 +2311,7 @@ describe('hub/card-service', function() {
           personB.canonicalURL,
           personD.canonicalURL,
         ]);
-        let includedPersonD = doc?.included?.find(i => i.id === personD.canonicalURL);
+        let includedPersonD = included.find(i => i.id === personD.canonicalURL);
         expect(includedPersonD).to.have.deep.nested.property('relationships.friends.data', [
           { type: 'cards', id: personA.canonicalURL },
           { type: 'cards', id: personB.canonicalURL },
@@ -2312,8 +2321,9 @@ describe('hub/card-service', function() {
 
       it('can handle a cycle within the included cards', async function() {
         let { jsonapi: doc } = await personE.asPristineDoc();
-        expect(doc.included?.length).to.equal(5);
-        let ids = doc?.included?.map(i => i.id);
+        let included = doc.included as any[];
+        expect(included.length).to.equal(5);
+        let ids = included.map(i => i.id);
         expect(ids).to.have.members([
           canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }),
           personCard.canonicalURL,
@@ -2321,12 +2331,12 @@ describe('hub/card-service', function() {
           personF.canonicalURL,
           personG.canonicalURL,
         ]);
-        let includedPersonF = doc?.included?.find(i => i.id === personF.canonicalURL);
+        let includedPersonF = included.find(i => i.id === personF.canonicalURL);
         expect(includedPersonF).to.have.deep.nested.property('relationships.bestFriend.data', {
           type: 'cards',
           id: personG.canonicalURL,
         });
-        let includedPersonG = doc?.included?.find(i => i.id === personG.canonicalURL);
+        let includedPersonG = included.find(i => i.id === personG.canonicalURL);
         expect(includedPersonG).to.have.deep.nested.property('relationships.bestFriend.data', {
           type: 'cards',
           id: personF.canonicalURL,
@@ -2335,8 +2345,9 @@ describe('hub/card-service', function() {
 
       it('can handle a primary card that is related to itself', async function() {
         let { jsonapi: doc } = await personH.asPristineDoc();
-        expect(doc.included?.length).to.equal(3);
-        let ids = doc?.included?.map(i => i.id);
+        let included = doc.included as any[];
+        expect(included.length).to.equal(3);
+        let ids = included.map(i => i.id);
         expect(ids).to.have.members([
           canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }),
           personCard.canonicalURL,
