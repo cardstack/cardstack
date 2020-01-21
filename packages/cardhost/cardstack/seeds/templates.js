@@ -61,11 +61,24 @@ let eventCardTemplate = eventFactory.getDocumentFor(
     .addResource('cards', 'local-hub::event-card')
     .withRelated('adopted-from', { type: 'cards', id: 'local-hub::@cardstack/base-card' })
     .withRelated('fields', [
-      eventFactory.addResource('fields', 'event-title').withAttributes({
+      eventFactory.addResource('fields', 'title').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
         'needed-when-embedded': true,
         required: true,
+        caption: 'Event name',
+      }),
+      eventFactory.addResource('fields', 'divider').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::boolean',
+        'needed-when-embedded': false,
+      }),
+      eventFactory.addResource('fields', 'background-image').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::decorative-image',
+        'needed-when-embedded': false,
+        required: false,
+        caption: 'Background image',
       }),
       eventFactory.addResource('fields', 'event-datetime').withAttributes({
         'is-metadata': true,
@@ -73,12 +86,6 @@ let eventCardTemplate = eventFactory.getDocumentFor(
         'needed-when-embedded': true,
         required: false,
         caption: 'Date & Time',
-      }),
-      eventFactory.addResource('fields', 'event-image').withAttributes({
-        'is-metadata': true,
-        'field-type': '@cardstack/core-types::decorative-image',
-        'needed-when-embedded': false,
-        required: false,
       }),
       eventFactory.addResource('fields', 'event-location').withAttributes({
         'is-metadata': true,
@@ -91,31 +98,35 @@ let eventCardTemplate = eventFactory.getDocumentFor(
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
         required: false,
+        caption: 'City',
       }),
       eventFactory.addResource('fields', 'event-admission').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
         required: false,
+        caption: 'Admission',
       }),
       eventFactory.addResource('fields', 'event-cta').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
         required: false,
+        caption: 'CTA text',
       }),
       eventFactory.addResource('fields', 'event-description').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
         required: false,
-        caption: 'Description'
+        caption: 'Description',
       }),
     ])
     .withRelated(
       'model',
       eventFactory.addResource('local-hub::event-card', 'local-hub::event-card').withAttributes({
-        eventTitle: 'Quarterly Planning Meeting',
+        title: 'Quarterly Planning Meeting',
+        backgroundImage: 'https://images.unsplash.com/photo-1542296140-47fd7d838e76',
+        divider: true,
         eventDatetime: '2020-05-26',
         eventLocation: 'One World Trade Center',
-        eventImage: 'https://images.unsplash.com/photo-1542296140-47fd7d838e76',
         eventCity: 'New York, NY',
         eventAdmission: 'Free',
         eventCta: 'RSVP',
@@ -240,13 +251,13 @@ let eventTicketTemplate = eventFactory.getDocumentFor(
       eventFactory.addResource('fields', 'highlight-title').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
-        required: true,
+        required: false,
         caption: 'Highlight title',
       }),
       eventFactory.addResource('fields', 'divider').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::boolean',
-        'needed-when-embedded': true,
+        'needed-when-embedded': false,
         caption: 'Divider',
       }),
       eventFactory.addResource('fields', 'guest-name').withAttributes({

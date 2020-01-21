@@ -2,7 +2,6 @@
   width: 100%;
   min-height: inherit;
   margin: 0 auto;
-  padding: 50px 30px;
   background-color: var(--white);
   color: black;
   font: 400 15px/1.467 var(--ch-font-family);
@@ -13,14 +12,25 @@
   word-break: break-word;
 }
 
+.cardstack_base-card-isolated .isolated-card--view-fields {
+  display: grid; /* Helpful for ordering fields */
+}
+.cardstack_base-card-isolated .isolated-card--view-fields::before,
+.cardstack_base-card-isolated .isolated-card--view-fields::after {
+  height: 0;
+}
+
 .cardstack_base-card-isolated .field {
   display: grid;
   grid-template-columns: 1fr 1.5fr;
   grid-gap: 35px 50px;
-  width: 100%;
   max-width: 656px;
+  width: 100%;
   margin: 0 auto;
-  padding-bottom: 35px;
+  padding: 0 30px 35px;
+}
+.cardstack_base-card-isolated .field:first-of-type {
+  padding-top: 35px;
 }
 
 .cardstack_base-card-isolated .label {
@@ -36,6 +46,7 @@
 /* Label hidden by default */
 .cardstack_base-card-isolated .title-label,
 .cardstack_base-card-isolated .highlight-title-label,
+.cardstack_base-card-isolated .background-image-label,
 .cardstack_base-card-isolated .body-label {
   display: none;
 }
@@ -43,8 +54,22 @@
 /* Full-width field values by default */
 .cardstack_base-card-isolated .title-value,
 .cardstack_base-card-isolated .highlight-title-value,
+.cardstack_base-card-isolated .background-image-value,
 .cardstack_base-card-isolated .body-value {
   grid-column: 1 / -1;
+}
+
+/* Background-image field */
+.cardstack_base-card-isolated .background-image-field {
+  max-width: 100%;
+  padding: 0;
+  order: -1;
+}
+.cardstack_base-card-isolated .background-image-field .background-image {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  object-position: center;
 }
 
 /* Title value */
@@ -67,9 +92,12 @@
 
 /* TODO: figure out how to deal with styling components */
 .cardstack_base-card-isolated .divider-field {
+  max-width: 596px; /* max-field-width - padding * 2 */
   border-top: 1px solid var(--light-gray);
 }
-.cardstack_base-card-isolated .divider-label,
+.cardstack_base-card-isolated .divider-label {
+  display: none;
+}
 .cardstack_base-card-isolated .divider-value {
   display: none;
 }
