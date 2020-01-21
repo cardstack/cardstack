@@ -6,6 +6,7 @@ import { Promise } from 'rsvp';
 
 const {
   cardstack: { cardTemplates = [] },
+  environment,
 } = ENV;
 
 export default class IndexRoute extends Route {
