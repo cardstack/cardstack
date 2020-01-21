@@ -553,7 +553,7 @@ describe('hub/jsonapi', function() {
       it('can retreive card that has requested user fields included', async function() {
         let rules = { includeFields: ['favoriteToy'] };
         let response = await request
-          .get(`/api/realms/first-ephemeral-realm/cards/${mango.csId}?inclusion=${stringify(rules)}`)
+          .get(`/api/realms/first-ephemeral-realm/cards/${mango.csId}?${stringify(rules)}`)
           .set('Accept', 'application/vnd.api+json');
 
         let { body: doc } = response;
@@ -572,11 +572,111 @@ describe('hub/jsonapi', function() {
         assertSingleResourceDoc(response.body);
       });
 
-      it.skip('can retreive card that has no user fields included', async function() {});
+      it('can retreive card that has no user fields included', async function() {
+        let response = await request
+          .get(`/api/realms/first-ephemeral-realm/cards/${daddy.csId}?includeFieldSet=`)
+          .set('Accept', 'application/vnd.api+json');
 
-      it.skip('can retreive card that has requested included field-set', async function() {});
+        let { body: doc } = response;
 
-      it.skip('can retreive card that has requested included field-set and specific requested user fields included', async function() {});
+        expect(response).hasStatus(200);
+        expect(doc).to.have.nested.property('data.type', 'cards');
+        expect(doc).to.have.nested.property('data.id', daddy.canonicalURL);
+        expect(doc).to.not.have.nested.property('data.attributes.name');
+        expect(doc).to.not.have.nested.property('data.relationships.puppies');
+        expect(doc).to.not.have.property('included');
+        expect(doc.data.attributes?.csId).to.be.ok;
+        expect(doc.data.attributes?.csRealm).to.ok;
+        assertSingleResourceDoc(response.body);
+      });
+
+      it('can retreive card that has requested included field-set', async function() {
+        let rules = { includeFieldSet: 'isolated' };
+        let response = await request
+          .get(`/api/realms/first-ephemeral-realm/cards/${daddy.csId}?${stringify(rules)}`)
+          .set('Accept', 'application/vnd.api+json');
+
+        let { body: doc } = response;
+        let included = doc.included as any[];
+
+        expect(response).hasStatus(200);
+        expect(doc).to.have.nested.property('data.attributes.name');
+        expect(doc).to.have.deep.nested.property('data.relationships.puppies.data', [
+          { type: 'cards', id: vanGogh.canonicalURL },
+          { type: 'cards', id: mango.canonicalURL },
+        ]);
+
+        expect(included.length).to.equal(2);
+        let ids = included.map(i => i.id);
+        expect(ids).to.have.members([vanGogh.canonicalURL, mango.canonicalURL]);
+        let includedVanGogh = included.find(i => i.id === vanGogh.canonicalURL);
+        let includedMango = included.find(i => i.id === mango.canonicalURL);
+
+        expect(includedVanGogh).to.have.nested.property('attributes.name');
+        expect(includedVanGogh).to.not.have.nested.property('attributes.favoriteToy');
+
+        expect(includedMango).to.have.nested.property('attributes.name');
+        expect(includedVanGogh).to.not.have.nested.property('attributes.favoriteToy');
+        assertSingleResourceDoc(response.body);
+      });
+
+      it('can retreive card that has requested included field-set and specific requested user fields included', async function() {
+        let rules = {
+          includeFieldSet: 'isolated',
+          includeFields: [
+            {
+              name: 'puppies',
+              includeFields: [
+                {
+                  name: 'favoriteToy',
+                  includeFields: ['description'],
+                },
+              ],
+            },
+          ],
+        };
+        let response = await request
+          .get(`/api/realms/first-ephemeral-realm/cards/${daddy.csId}?${stringify(rules)}`)
+          .set('Accept', 'application/vnd.api+json');
+
+        let { body: doc } = response;
+        let included = doc.included as any[];
+
+        expect(response).hasStatus(200);
+
+        expect(doc).to.have.nested.property('data.attributes.name');
+        expect(doc).to.have.deep.nested.property('data.relationships.puppies.data', [
+          { type: 'cards', id: vanGogh.canonicalURL },
+          { type: 'cards', id: mango.canonicalURL },
+        ]);
+
+        expect(included.length).to.equal(3);
+        let ids = included.map(i => i.id);
+        expect(ids).to.have.members([vanGogh.canonicalURL, mango.canonicalURL, squeakySnake.canonicalURL]);
+        let includedVanGogh = included.find(i => i.id === vanGogh.canonicalURL);
+        let includedMango = included.find(i => i.id === mango.canonicalURL);
+        let includedSqueakySnake = included?.find(i => i.id === squeakySnake.canonicalURL);
+
+        expect(includedVanGogh).to.have.nested.property('attributes.name', 'Van Gogh');
+        expect(includedVanGogh).to.have.nested.property('attributes.favoriteToy');
+        expect(includedVanGogh).to.have.deep.nested.property('attributes.favoriteToy.relationships.csAdoptsFrom.data', {
+          type: 'cards',
+          id: toyCard.canonicalURL,
+        });
+        expect(includedVanGogh).to.have.nested.property('attributes.favoriteToy.attributes.description', 'a beef bone');
+
+        expect(includedMango).to.have.nested.property('attributes.name', 'Mango');
+        expect(includedMango).to.have.deep.nested.property('relationships.favoriteToy.data', {
+          type: 'cards',
+          id: squeakySnake.canonicalURL,
+        });
+
+        expect(includedSqueakySnake).to.have.nested.property(
+          'attributes.description',
+          'a plush snake with squeaky segments'
+        );
+        assertSingleResourceDoc(response.body);
+      });
     });
   });
 });

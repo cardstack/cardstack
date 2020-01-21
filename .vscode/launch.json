@@ -36,7 +36,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can retreive card that has requested user fields included"],
+      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can retreive card that has no user fields included"],
     },
     {
       "type": "node",
