@@ -22,6 +22,18 @@ export default class ColorPalette extends Component {
     '--ch-dark-op50': '#404040',
   };
 
+  csColors = {
+    '--cs-navy': '#281e78',
+    '--cs-blue': '#0069f9',
+    '--cs-purple': '#6638ff',
+    '--cs-fuschia': '#ac00ff',
+    '--cs-lilac': '#a66dfa',
+    '--cs-cyan': '#00ebe5',
+    '--cs-darker-cyan': '#00b0ad',
+    '--cs-green': '#37eb77',
+    '--cs-yellow': '#c3fc33',
+  };
+
   unthemedCardColors = {
     '--dark-gray': '#404040',
     '--medium-gray': '#707070',
