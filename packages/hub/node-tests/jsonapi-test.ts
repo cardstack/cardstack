@@ -111,14 +111,9 @@ describe('hub/jsonapi', function() {
 
   it('can create a card with a field that has > 1 arity filled with cards as values', async function() {
     let service = (await env.container.lookup('cards')).as(Session.INTERNAL_PRIVILEGED);
-    let puppyCard = await service.create(
-      `${myOrigin}/api/realms/first-ephemeral-realm`,
-      testCard().withField('name', 'string-field').jsonapi
-    );
-    let ownerCard = await service.create(
-      `${myOrigin}/api/realms/first-ephemeral-realm`,
-      testCard().withField('puppies', puppyCard, 'plural').jsonapi
-    );
+    let csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
+    let puppyCard = await service.create(csRealm, testCard().withField('name', 'string-field').jsonapi);
+    let ownerCard = await service.create(csRealm, testCard().withField('puppies', puppyCard, 'plural').jsonapi);
     let response = await request
       .post('/api/realms/first-ephemeral-realm/cards')
       .set('Content-Type', 'application/vnd.api+json')
@@ -127,11 +122,19 @@ describe('hub/jsonapi', function() {
           .withAttributes({
             puppies: [
               testCard()
-                .withAttributes({ name: 'Mango' })
-                .adoptingFrom(puppyCard).jsonapi,
+                .withAttributes({
+                  csRealm,
+                  csId: 'mango',
+                  name: 'Mango',
+                })
+                .adoptingFrom(puppyCard).asCardValue,
               testCard()
-                .withAttributes({ name: 'Van Gogh' })
-                .adoptingFrom(puppyCard).jsonapi,
+                .withAttributes({
+                  csRealm,
+                  csId: 'vangogh',
+                  name: 'Van Gogh',
+                })
+                .adoptingFrom(puppyCard).asCardValue,
             ],
           })
           .adoptingFrom(ownerCard).jsonapi
@@ -140,11 +143,19 @@ describe('hub/jsonapi', function() {
     expect(response.header.location).to.match(/http:\/\/[^/]+\/api\/realms\/first-ephemeral-realm\/cards\/[^/]+/);
     expect(response.body.data.attributes.puppies).to.eql([
       testCard()
-        .withAttributes({ name: 'Mango' })
-        .adoptingFrom(puppyCard).jsonapi,
+        .withAttributes({
+          csRealm,
+          csId: 'mango',
+          name: 'Mango',
+        })
+        .adoptingFrom(puppyCard).asCardValue,
       testCard()
-        .withAttributes({ name: 'Van Gogh' })
-        .adoptingFrom(puppyCard).jsonapi,
+        .withAttributes({
+          csRealm,
+          csId: 'vangogh',
+          name: 'Van Gogh',
+        })
+        .adoptingFrom(puppyCard).asCardValue,
     ]);
     assertSingleResourceDoc(response.body);
   });
