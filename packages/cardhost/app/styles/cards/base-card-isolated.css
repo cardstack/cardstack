@@ -90,6 +90,19 @@
   text-transform: capitalize;
 }
 
+/* CTA type */
+.cardstack_base-card-isolated .cta {
+  min-height: 45px;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: calc(22 / 15);
+  letter-spacing: 0.03em;
+  padding-top: 11px;
+  padding-bottom: 11px;
+}
+
+
 /* TODO: figure out how to deal with styling components */
 .cardstack_base-card-isolated .divider-field {
   width: calc(100% - 60px);

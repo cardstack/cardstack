@@ -37,9 +37,6 @@
 .event-card-isolated .event-cta-field {
   grid-area: cta;
   padding-bottom: 0;
-  font-size: 13px;
-  line-height: 1.285;
-  font-weight: 600;
 }
 .event-card-isolated .event-city-field {
   grid-area: city;
@@ -83,9 +80,10 @@
 
 .event-card-isolated .event-cta-field {
   margin-left: 0;
+  text-align: right;
 }
 
-.event-card-isolated .event-cta-value {
+.event-card-isolated .event-cta-cta {
   width: 128px;
   min-height: 35px;
   margin-left: auto;
@@ -93,5 +91,8 @@
   border-radius: 5px;
   background-color: #0076ff;
   color: white;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.285;
   text-align: center;
 }
