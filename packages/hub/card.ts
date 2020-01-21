@@ -811,11 +811,10 @@ export class FieldCard extends Card {
       await Promise.all(
         value.map(async v => {
           let id: string = v.id;
-          let copy = await this.patch({ data: v });
-          let priorRawItemData = Array.isArray(priorFieldValue) ? priorFieldValue.find(i => i.id === id) : null;
-          let priorItemCard =
-            priorRawItemData != null ? await this.service.instantiate({ data: priorRawItemData }) : null;
-          await copy.validate(priorItemCard, realm);
+          let oldValueRawData = Array.isArray(priorFieldValue) ? priorFieldValue.find(i => i.id === id) : null;
+          let oldValueCard = oldValueRawData != null ? await this.patch({ data: oldValueRawData }) : null;
+          let newValueCard = await this.patch({ data: v });
+          await newValueCard.validate(oldValueCard, realm);
         })
       );
     } else {
