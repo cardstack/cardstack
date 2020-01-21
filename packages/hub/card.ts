@@ -146,7 +146,14 @@ export class Card {
     let csFields = jsonapi.data.attributes?.csFields;
     if (csFields) {
       if (!isPlainObject(csFields)) {
-        throw new CardstackError(`csFields must be an object`);
+        throw new CardstackError(`csFields must be an object`, { status: 400 });
+      }
+      let invalidUserField = Object.keys(csFields).find(field => cardstackFieldPattern.test(field));
+      if (invalidUserField) {
+        throw new CardstackError(
+          `Cannot create user field '${invalidUserField}'. 'cs' prefixed fields are reserved for system use only.`,
+          { status: 400 }
+        );
       }
       this.csFields = csFields as J.Object;
     }

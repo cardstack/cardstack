@@ -265,6 +265,38 @@ describe('hub/card-service', function() {
       }
     });
 
+    it('rejects the creation of a "cs" prefixed field at create', async function() {
+      let doc = {
+        data: {
+          type: 'cards',
+          attributes: {
+            csFields: {
+              csBadField: {
+                relationships: {
+                  csAdoptsFrom: {
+                    data: {
+                      type: 'cards',
+                      id: canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'string-field' }),
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(
+          /Cannot create user field 'csBadField'. 'cs' prefixed fields are reserved for system use only/
+        );
+      }
+    });
+
     it('applies string field type validation at create', async function() {
       let doc = testCard()
         .withAttributes({
