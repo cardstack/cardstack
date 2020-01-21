@@ -15,6 +15,7 @@ import mergeWith from 'lodash/mergeWith';
 import flatten from 'lodash/flatten';
 import uniqBy from 'lodash/uniqBy';
 import difference from 'lodash/difference';
+import intersection from 'lodash/intersection';
 import isObjectLike from 'lodash/isObjectLike';
 import { ResponseMeta } from './pgsearch/pgclient';
 import * as J from 'json-typescript';
@@ -130,6 +131,20 @@ export class Card {
     enclosingCard: Card | undefined,
     protected service: ScopedCardService
   ) {
+    if (typeof jsonapi.data.attributes === 'object' && typeof jsonapi.data.relationships === 'object') {
+      let dupeFields = intersection(Object.keys(jsonapi.data.attributes), Object.keys(jsonapi.data.relationships));
+      if (dupeFields.length) {
+        throw new CardstackError(
+          `The field${dupeFields.length > 1 ? 's' : ''} ${dupeFields.join(
+            ','
+          )} cannot appear in both the relationships and attributes of a card`,
+          {
+            status: 400,
+          }
+        );
+      }
+    }
+
     this.attributes = jsonapi.data.attributes;
     this.relationships = jsonapi.data.relationships;
     this.meta = jsonapi.data.meta;

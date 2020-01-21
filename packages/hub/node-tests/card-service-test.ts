@@ -564,6 +564,49 @@ describe('hub/card-service', function() {
         expect(await address.value('state')).to.equal('NY');
       });
 
+      it('rejects a card-as-value that has a field that appears in both the attributes and the relationships of an interior card', async function() {
+        let friendCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('friend', userCard)
+            .adoptingFrom(userCard).jsonapi
+        );
+        let homeAddress = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({
+              streetAddress: '123 Bone St.',
+              city: 'Barkyville',
+              state: 'MA',
+              zip: '01234',
+            })
+            .adoptingFrom(addressCard).jsonapi
+        );
+        try {
+          await service.create(
+            `${myOrigin}/api/realms/first-ephemeral-realm`,
+            testCard()
+              .withAttributes({
+                name: 'Van Gogh',
+                friend: testCard()
+                  .withAttributes({
+                    name: 'Mango',
+                    address: (await homeAddress.asPristineDoc()).jsonapi.data,
+                  })
+                  .withRelationships({ address: homeAddress })
+                  .adoptingFrom(friendCard).asCardValue,
+              })
+              .adoptingFrom(friendCard).jsonapi
+          );
+          throw new Error('should not have created card');
+        } catch (err) {
+          expect(err).hasStatus(400);
+          expect(err.detail).to.match(
+            /The field address cannot appear in both the relationships and attributes of a card/
+          );
+        }
+      });
+
       it('cannnot set an interior field with arity > 1 when the interior cards are not addressable', async function() {
         let personCard = await service.create(
           `${myOrigin}/api/realms/first-ephemeral-realm`,

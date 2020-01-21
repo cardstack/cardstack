@@ -36,7 +36,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can patch an interior field with arity > 1 when the interior cards are addressable"],
+      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "rejects a card-as-value that has a field that appears in both the attributes and the relationships of an interior card"],
     },
     {
       "type": "node",

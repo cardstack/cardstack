@@ -12,6 +12,7 @@ import {
   ResourceLinkage,
   ResourceIdentifierObject,
 } from 'jsonapi-typescript';
+import intersection from 'lodash/intersection';
 import CardstackError from './error';
 import { assertJSONValue } from './json-validation';
 
@@ -94,6 +95,21 @@ function assertResourceObject(obj: any, pointer: string[]): asserts obj is Resou
 
   if (obj.hasOwnProperty('relationships')) {
     assertRelationshipsObject(obj.relationships, pointer.concat('relationships'));
+  }
+
+  if (obj.hasOwnProperty('attributes') && obj.hasOwnProperty('relationships')) {
+    let dupeFields = intersection(Object.keys(obj.attributes), Object.keys(obj.relationships));
+    if (dupeFields.length) {
+      throw new CardstackError(
+        `The field${dupeFields.length > 1 ? 's' : ''} ${dupeFields.join(
+          ','
+        )} cannot appear in both the relationships and attributes of a resource.`,
+        {
+          source: { pointer: pointer.concat(['attributes', dupeFields[0]]).join('/') },
+          status: 400,
+        }
+      );
+    }
   }
 
   if (obj.hasOwnProperty('links')) {

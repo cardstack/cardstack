@@ -46,6 +46,33 @@ describe('hub/jsonapi', function() {
     );
   });
 
+  it('errors correctly for invalid jsonapi in post body (a field appears in both attributes and in relationships)', async function() {
+    let response = await request
+      .post('/api/realms/first-ephemeral-realm/cards')
+      .set('Content-Type', 'application/vnd.api+json')
+      .send(
+        JSON.stringify({
+          data: {
+            type: 'cards',
+            attributes: {
+              dupeField: 'bad',
+            },
+            relationships: {
+              dupeField: {
+                data: null,
+              },
+            },
+          },
+        })
+      );
+    expect(response.status).to.equal(400);
+    expect(response.body.errors).has.length(1);
+    expect(response.body.errors[0]).property(
+      'detail',
+      'The field dupeField cannot appear in both the relationships and attributes of a resource.'
+    );
+  });
+
   it('errors correctly for local realm on remote-realms endpoint', async function() {
     let response = await request
       .post(`/api/remote-realms/${encodeURIComponent(myOrigin + '/api/realms/first-ephemeral-realm')}/cards`)
