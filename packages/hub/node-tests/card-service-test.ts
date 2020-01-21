@@ -5,6 +5,7 @@ import { CARDSTACK_PUBLIC_REALM } from '../realm';
 import { Session } from '../session';
 import { createTestEnv, TestEnv } from './helpers';
 import { testCard } from './test-card';
+import { Value } from 'json-typescript';
 
 describe('hub/card-service', function() {
   describe('read-write', function() {
@@ -92,6 +93,24 @@ describe('hub/card-service', function() {
       } catch (err) {
         expect(err).hasStatus(400);
         expect(err.message).to.match(/The card .* adopts from multiple parents.* Multiple adoption is not allowed/);
+      }
+    });
+
+    it('does not support csAdoptsFrom as an attribute', async function() {
+      let parentCard = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, testCard().jsonapi);
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, {
+          data: {
+            type: 'cards',
+            attributes: {
+              csAdoptsFrom: ((await parentCard.asPristineDoc()).jsonapi.data as unknown) as Value,
+            },
+          },
+        });
+        throw new Error(`should not be able to create card`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.message).to.match(/csAdoptsFrom must be a reference, not a value/);
       }
     });
 
