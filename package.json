@@ -22,7 +22,6 @@
     "@types/sinon": "^7.5.1",
     "@typescript-eslint/eslint-plugin": "^2.5.0",
     "@typescript-eslint/parser": "^2.5.0",
-    "@typescript-eslint/parser": "^1.7.0",
     "babel-eslint": "^10.0.1",
     "chai": "^4.2.0",
     "eslint": "^5.8.0",
