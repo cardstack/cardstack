@@ -90,6 +90,11 @@
   text-transform: capitalize;
 }
 
+/* Link type */
+.cardstack_base-card-isolated .link {
+  grid-column: 1 / -1;
+}
+
 /* CTA type */
 .cardstack_base-card-isolated .cta {
   min-height: 45px;
@@ -113,5 +118,12 @@
   display: none;
 }
 .cardstack_base-card-isolated .divider-value {
+  display: none;
+}
+
+
+
+/* Wedding Invitation Base Card */
+.cardstack_base-card-isolated .wedding-intro-text-field {
   display: none;
 }

@@ -1,0 +1,156 @@
+@import url('https://fonts.googleapis.com/css?family=Arya:400,700&display=swap');
+
+.wedding-invitation-isolated {
+    font-family: 'Arya', sans-serif;
+    background-color: #363144;
+    background-image: url('/assets/images/cards/wedding-invitation/wedding-background.svg');
+    background-repeat: no-repeat;
+    background-position: 50% -260px;
+    background-size: 100%;
+}
+
+.wedding-invitation-isolated .isolated-card--view-fields {
+    grid-template-columns: 1fr 1fr;
+}
+
+.field {
+    grid-column: 1 / -1;
+    display: block;
+    padding: 0;
+    text-align: center;
+    font-size: 14px;
+    line-height: calc(21 / 14);
+    letter-spacing: 0.1em;
+}
+
+.label {
+    display: none;
+}
+
+.value {
+    color: white;
+    text-transform: uppercase;
+}
+
+.title-field,
+.divider-field {
+    display: none;
+}
+
+.wedding-intro-text-field {
+    order: -1;
+    padding-top: 146px;
+    padding-bottom: 69px;
+}
+.wedding-website-field {
+    order: 10;
+    z-index: 4;
+    white-space: nowrap;
+}
+.wedding-rsvp-cta-field {
+    z-index: 5;
+}
+.wedding-groom-field {
+    padding-bottom: 69px;
+}
+.wedding-date-field {
+    grid-column: 1;
+    text-align: right;
+}
+.wedding-time-field {
+    grid-column: 2;
+    text-align: left;
+}
+.wedding-reception-address-field {
+    max-width: 300px;
+    padding-bottom: 43px;
+}
+.wedding-rsvp-date-field {
+    padding-bottom: 12px;
+}
+.wedding-website-field {
+    margin-top: -30px;
+    padding: 52px 40px 22px;
+    background-color: #221E2B;
+}
+.wedding-website-link {
+    display: block;
+    color: #FF4A72;
+    font-weight: 400;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.wedding-intro-text-value {
+    margin: 0 auto;
+    max-width: 250px;
+    font-family: 'Didot', serif;
+    font-style: italic;
+    text-transform: none;
+    font-size: 20px;
+    line-height: calc(30 / 20);
+    letter-spacing: 0.05em;
+}
+
+.wedding-bride-value,
+.wedding-groom-value {
+    font-family: 'Didot', serif;
+    font-style: italic;
+    text-transform: capitalize;
+    font-size: 40px;
+    line-height: 1;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.wedding-groom-value::before {
+    content: '&';
+    display: block;
+    font-size: 42px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+
+.wedding-date-value,
+.wedding-time-value {
+    font-size: 25px;
+    letter-spacing: 0.05em;
+    line-height: calc(30 / 25);
+}
+.wedding-time-value::before {
+    padding-left: 0.3em;
+    display: inline-block;
+    content: 'at';
+}
+
+.wedding-rsvp-date-value::before {
+    display: inline-block;
+    content: 'Please RSVP by';
+}
+
+.wedding-rsvp-cta-cta {
+    width: 302px;
+    height: 58px;
+    background: transparent;
+    background-image: url('/assets/images/cards/wedding-invitation/wedding-rsvp.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-size: 30px;
+    font-family: inherit;
+    font-weight: bold;
+    line-height: calc(54 / 30);
+    letter-spacing: 0.1em;
+    padding: 0;
+}
+
+.wedding-rsvp-cta-cta:hover {
+    background-color: transparent;
+}
+
+.wedding-website-link:focus,
+.wedding-rsvp-cta-cta:focus {
+    outline: none;
+    background-color: transparent;
+    text-decoration: underline;
+}

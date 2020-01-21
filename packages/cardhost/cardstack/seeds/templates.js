@@ -390,10 +390,10 @@ let weddingInvitationTemplate = eventFactory.getDocumentFor(
       }),
       eventFactory.addResource('fields', 'wedding-website').withAttributes({
         'is-metadata': true,
-        'field-type': '@cardstack/core-types::case-insensitive',
+        'field-type': '@cardstack/core-types::link',
         required: false,
         'needed-when-embedded': false,
-        caption: 'Website',
+        caption: 'www.rufusandwillainwonderland.com',
       }),
       eventFactory.addResource('fields', 'wedding-rsvp-cta').withAttributes({
         'is-metadata': true,
