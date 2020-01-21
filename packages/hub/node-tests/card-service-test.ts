@@ -1507,11 +1507,53 @@ describe('hub/card-service', function() {
         mommy: AddressableCard,
         mango: AddressableCard,
         vanGogh: AddressableCard,
-        squeakySnake: AddressableCard;
+        squeakySnake: AddressableCard,
+        personCard: AddressableCard,
+        friendCard: AddressableCard,
+        personA: AddressableCard,
+        personB: AddressableCard;
 
       before(async function() {
         env = await createTestEnv();
         service = (await env.container.lookup('cards')).as(Session.EVERYONE);
+
+        personCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard().withField('name', 'string-field').jsonapi
+        );
+
+        friendCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withField('name', 'string-field')
+            .withField('friends', personCard, 'plural')
+            .withField('bestFriend', personCard)
+            .adoptingFrom(personCard).jsonapi
+        );
+
+        personA = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({ name: 'Person A' })
+            .adoptingFrom(friendCard).jsonapi
+        );
+
+        personB = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard()
+            .withAttributes({ name: 'Person B' })
+            .withRelationships({ bestFriend: personA })
+            .adoptingFrom(friendCard).jsonapi
+        );
+
+        personA = await service.update(personA, {
+          data: {
+            type: 'cards',
+            relationships: {
+              bestFriend: { data: { type: 'cards', id: personB.canonicalURL } },
+            },
+          },
+        });
 
         toyCard = await service.create(
           `${myOrigin}/api/realms/first-ephemeral-realm`,
@@ -1937,7 +1979,7 @@ describe('hub/card-service', function() {
         expect(doc).to.not.have.property('included');
       });
 
-      it('does not return user fields if the card does not have field set rules for the requested field set', async function() {
+      it('does not return user fields if the card does not have csFieldSet rules for the requested field-set', async function() {
         let { jsonapi: doc } = await daddy.asPristineDoc({
           includeFieldSet: 'embedded',
         });
@@ -1951,6 +1993,25 @@ describe('hub/card-service', function() {
         expect(doc).to.not.have.nested.property('data.relationships.puppies');
         expect(doc).to.not.have.property('included');
       });
+
+      it('can handle an included card that has a relationship to the primary card', async function() {
+        let { jsonapi: doc } = await personA.asPristineDoc();
+        expect(doc.included?.length).to.equal(4);
+        let ids = doc?.included?.map(i => i.id);
+        expect(ids).to.have.members([
+          canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }),
+          personCard.canonicalURL,
+          friendCard.canonicalURL,
+          personB.canonicalURL,
+        ]);
+        let includedPersonB = doc?.included?.find(i => i.id === personB.canonicalURL);
+        expect(includedPersonB).to.have.deep.nested.property('relationships.bestFriend.data', {
+          type: 'cards',
+          id: personA.canonicalURL,
+        });
+      });
+
+      it.skip('can handle an included card that has a relationship to the primary card in arity > 1 field', async function() {});
 
       it.skip('can handle a cycle within in the included cards', async function() {});
 

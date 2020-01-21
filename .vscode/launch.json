@@ -36,7 +36,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can include fields based on csFieldSets in a card and specified include fields"]
+      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can handle an included card that has a relationship to the primary card"]
     },
     {
       "type": "node",

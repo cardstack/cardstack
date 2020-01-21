@@ -13,6 +13,7 @@ import isPlainObject from 'lodash/isPlainObject';
 import mergeWith from 'lodash/mergeWith';
 import flatten from 'lodash/flatten';
 import uniqBy from 'lodash/uniqBy';
+import difference from 'lodash/difference';
 import isObjectLike from 'lodash/isObjectLike';
 import { ResponseMeta } from './pgsearch/pgclient';
 import * as J from 'json-typescript';
@@ -425,10 +426,14 @@ export class Card {
           resources.push(await card.serialize(rules, foundMoreIncluded));
         })
       );
-      if (foundMoreIncluded.size === 0) {
+      // Using this approach so we can break cycles in the included graph
+      let newIncludedIds = difference([...foundMoreIncluded.keys()], [...included.keys()]);
+      if (newIncludedIds.length === 0) {
         return uniqBy(resources, 'id');
       }
-      included = foundMoreIncluded;
+      for (let newIncludedId of newIncludedIds) {
+        included.set(newIncludedId, foundMoreIncluded.get(newIncludedId)!);
+      }
     }
   }
 
