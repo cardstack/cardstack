@@ -4,10 +4,10 @@
   "main": "index.js",
   "license": "MIT",
   "peerDependencies": {
-    "@cardstack/hub": "0.16.16"
+    "@cardstack/hub": "*"
   },
   "devDependencies": {
-    "@cardstack/hub": "0.16.16"
+    "@cardstack/hub": "0.16.22"
   },
   "dependencies": {
     "jsonapi-typescript": "^0.1.3"

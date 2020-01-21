@@ -3,9 +3,12 @@
 let glob = require('glob');
 let path = require('path');
 
-let packages = glob.sync('./packages/*/package.json').map(p => {
-  return require(path.join(process.cwd(), p));
-});
+let packages = glob
+  .sync('./packages/*/package.json')
+  .concat(glob.sync('./cards/*/package.json'))
+  .map(p => {
+    return require(path.join(process.cwd(), p));
+  });
 
 let ownPackages = new Map();
 for (let pkg of packages) {
