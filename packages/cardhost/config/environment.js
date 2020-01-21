@@ -66,6 +66,13 @@ module.exports = function(environment) {
     ENV['@cardstack/ui-components'] = {
       debounceSpeed: 10,
     };
+
+    ENV.percy = {
+      breakpointsConfig: {
+        desktop: 1280,
+      },
+      defaultBreakpoints: ['desktop'],
+    };
   }
 
   // if (environment === 'production') {
