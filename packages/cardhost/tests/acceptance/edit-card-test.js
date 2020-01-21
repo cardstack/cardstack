@@ -138,7 +138,7 @@ module('Acceptance | card edit', function(hooks) {
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await visit(`/cards/${card1Id}`);
-    assert.dom('[data-test-field="published"] [data-test-boolean-field-viewer-value]').hasText(`false`);
+    assert.dom('[data-test-field="published"] [data-test-boolean-field-viewer-value]').hasText(`No`);
 
     let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
@@ -255,7 +255,7 @@ module('Acceptance | card edit', function(hooks) {
 
     await visit(`/cards/${card1Id}`);
     assert
-      .dom('[data-test-field="image"] [data-test-decorative-image-field-viewer-value]')
+      .dom('[data-test-field="image"] [data-test-decorative-image-field-viewer-value] img')
       .hasAttribute('src', 'http://example.com/testimage.jpg');
 
     let cardJson = find('[data-test-card-json]').innerHTML;
