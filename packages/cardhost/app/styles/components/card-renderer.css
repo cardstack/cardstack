@@ -21,7 +21,7 @@
 
 .card-renderer-isolated.view {
   max-width: 100%;
-  padding-top: 0;
+  padding-top: 50px;
 }
 
 /* Resetting styles so that view mode styling does not affect other modes */
@@ -35,23 +35,24 @@
 /* Card Renderer Header */
 /* We need the wrapper to mask the border of the content when scrolling */
 .card-renderer-isolated--header--wrapper {
-  visibility: hidden;
   background-color: var(--ch-default);
   position: sticky;
   top: 80px;
   z-index: 11;
-
-  transition: visibility var(--ch-transition-time);
-}
-
-.card-renderer-isolated.layout .card-renderer-isolated--header--wrapper,
-.card-renderer-isolated.edit .card-renderer-isolated--header--wrapper,
-.card-renderer-isolated--header--wrapper.selected {
-  visibility: visible;
 }
 
 .card-renderer-isolated.view .card-renderer-isolated--header--wrapper {
   background-color: var(--ch-light-background);
+  position: absolute;
+  top: 50px;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  bottom: 100px;
+}
+
+.card-renderer-isolated.view .card-renderer-isolated--header--wrapper.selected {
+  top: 0px;
 }
 
 .card-renderer-isolated.edit .card-renderer-isolated--header--wrapper,
@@ -60,7 +61,6 @@
 }
 
 .card-renderer-isolated.schema .card-renderer-isolated--header--wrapper {
-  visibility: visible;
   background-color: var(--ch-deep-background);
 }
 
