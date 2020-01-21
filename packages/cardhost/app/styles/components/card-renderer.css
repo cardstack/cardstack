@@ -19,10 +19,6 @@
   min-height: var(--card-renderer-height);
 }
 
-.card-renderer-isolated.view {
-  max-width: 100%;
-  padding-top: 0;
-}
 
 /* Resetting styles so that view mode styling does not affect other modes */
 .card-renderer-isolated.schema .isolated-card,
