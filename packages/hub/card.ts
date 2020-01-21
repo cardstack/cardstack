@@ -810,11 +810,12 @@ export class FieldCard extends Card {
       }
       await Promise.all(
         value.map(async v => {
+          let id: string = v.id;
           let copy = await this.patch({ data: v });
-          // TODO: this priorFieldValue is an array of raw (still serialized)
-          // card values. It needs to get deserialized and then matched by
-          // identity with each `v`.
-          await copy.validate(priorFieldValue, realm);
+          let priorRawItemData = Array.isArray(priorFieldValue) ? priorFieldValue.find(i => i.id === id) : null;
+          let priorItemCard =
+            priorRawItemData != null ? await this.service.instantiate({ data: priorRawItemData }) : null;
+          await copy.validate(priorItemCard, realm);
         })
       );
     } else {

@@ -593,7 +593,70 @@ describe('hub/card-service', function() {
         }
       });
 
-      it.skip('can set an interior field with arity > 1 when the interior cards are addressable', async function() {});
+      it('can patch an interior field with arity > 1 when the interior cards are addressable', async function() {
+        let csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
+        let personCard = await service.create(
+          csRealm,
+          testCard()
+            .withField('name', 'string-field')
+            .withField('addresses', addressCard, 'plural').jsonapi
+        );
+        let address1 = testCard()
+          .withAttributes({
+            csRealm,
+            csId: 'address1',
+            streetAddress: '123 Bone St.',
+            city: 'Barkyville',
+            state: 'MA',
+            zip: '01234',
+          })
+          .adoptingFrom(addressCard);
+        let address2 = testCard()
+          .withAttributes({
+            csRealm,
+            csId: 'address2',
+            streetAddress: '456 Treat Street',
+            city: 'Wag Town',
+            state: 'MA',
+            zip: '05678',
+          })
+          .adoptingFrom(addressCard);
+        let address3 = testCard()
+          .withAttributes({
+            csRealm,
+            csId: 'address3',
+            streetAddress: '789 Treat Street',
+            city: 'Wag Town',
+            state: 'MA',
+            zip: '05678',
+          })
+          .adoptingFrom(addressCard);
+
+        let person = await service.create(
+          csRealm,
+          testCard()
+            .withAttributes({
+              name: 'Van Gogh',
+              addresses: [address1.asCardValue, address2.asCardValue],
+            })
+            .adoptingFrom(personCard).jsonapi
+        );
+
+        let updatedPerson = await service.update(person, {
+          data: {
+            type: 'cards',
+            attributes: {
+              addresses: [address1.asCardValue as Value, address3.asCardValue as Value],
+            },
+          },
+        });
+
+        expect(await updatedPerson.value('name')).to.equal('Van Gogh');
+        let addresses = await updatedPerson.value('addresses');
+        expect(addresses.length).to.equal(2);
+        expect(await addresses[0].value('streetAddress')).to.equal('123 Bone St.');
+        expect(await addresses[1].value('streetAddress')).to.equal('789 Treat Street');
+      });
 
       it('applies field type validation to interior field of composite field', async function() {
         let doc = testCard()
