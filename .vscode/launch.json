@@ -36,7 +36,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "does not support csAdoptsFrom as an attribute"],
+      "args": ["packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "cannnot set an interior field with arity > 1 when the interior cards are not addressable"],
     },
     {
       "type": "node",

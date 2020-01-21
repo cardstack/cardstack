@@ -802,6 +802,12 @@ export class FieldCard extends Card {
     }
 
     if (this.csFieldArity === 'plural' && Array.isArray(value)) {
+      if (value.some(i => i.id == null)) {
+        throw new CardstackError(
+          `Cannot set field '${this.name}' of card ${this.enclosingCard.canonicalURL} with non-addressable cards. Fields with arity > 1 can only be set with addressable cards.`,
+          { status: 400 }
+        );
+      }
       await Promise.all(
         value.map(async v => {
           let copy = await this.patch({ data: v });

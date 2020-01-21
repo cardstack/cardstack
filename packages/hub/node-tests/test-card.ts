@@ -165,7 +165,7 @@ export class TestCard {
       }
     }
 
-    let doc = {
+    let doc: SingleResourceDoc = {
       data: {
         type: 'cards',
         attributes,
@@ -173,19 +173,24 @@ export class TestCard {
       },
     };
     if (this.csId) {
-      doc.data.attributes.csId = this.csId;
+      doc.data.attributes!.csId = this.csId;
     }
 
     if (this.csRealm) {
-      doc.data.attributes.csRealm = this.csRealm;
+      doc.data.attributes!.csRealm = this.csRealm;
     }
 
     if (this.csOriginalRealm) {
-      doc.data.attributes.csOriginalRealm = this.csOriginalRealm;
+      doc.data.attributes!.csOriginalRealm = this.csOriginalRealm;
+    }
+
+    if (this.csId != null && this.csRealm != null) {
+      let { csRealm, csOriginalRealm, csId } = this;
+      doc.data.id = canonicalURL({ csRealm, csOriginalRealm, csId });
     }
 
     if (this.parent) {
-      doc.data.relationships.csAdoptsFrom = {
+      doc.data.relationships!.csAdoptsFrom = {
         data: { type: 'cards', id: canonicalURL(this.parent) },
       };
     }
@@ -197,7 +202,7 @@ export class TestCard {
           csFields[fieldName] = testCard.asCardValue;
         }
       }
-      doc.data.attributes.csFields = csFields;
+      doc.data.attributes!.csFields = csFields;
     }
 
     return doc;

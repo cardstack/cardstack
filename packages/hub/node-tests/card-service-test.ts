@@ -541,7 +541,7 @@ describe('hub/card-service', function() {
                 city: 'Barkyville',
                 state: 'MA',
                 zip: '01234',
-              }).jsonapi.data,
+              }).asCardValue,
             })
             .adoptingFrom(userCard).jsonapi
         );
@@ -563,6 +563,37 @@ describe('hub/card-service', function() {
         expect(await address.value('streetAddress')).to.equal('123 Bone St.');
         expect(await address.value('state')).to.equal('NY');
       });
+
+      it('cannnot set an interior field with arity > 1 when the interior cards are not addressable', async function() {
+        let personCard = await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          testCard().withField('addresses', addressCard, 'plural').jsonapi
+        );
+        try {
+          await service.create(
+            `${myOrigin}/api/realms/first-ephemeral-realm`,
+            testCard()
+              .withAttributes({
+                addresses: [
+                  testCard()
+                    .withAttributes({
+                      streetAddress: '123 Bone St.',
+                      city: 'Barkyville',
+                      state: 'MA',
+                      zip: '01234',
+                    })
+                    .adoptingFrom(addressCard).asCardValue,
+                ],
+              })
+              .adoptingFrom(personCard).jsonapi
+          );
+        } catch (err) {
+          expect(err).hasStatus(400);
+          expect(err.detail).to.match(/Fields with arity > 1 can only be set with addressable cards/);
+        }
+      });
+
+      it.skip('can set an interior field with arity > 1 when the interior cards are addressable', async function() {});
 
       it('applies field type validation to interior field of composite field', async function() {
         let doc = testCard()
@@ -732,7 +763,7 @@ describe('hub/card-service', function() {
             `${myOrigin}/api/realms/first-ephemeral-realm`,
             testCard()
               .withAttributes({
-                puppies: testCard().adoptingFrom(puppyCard).jsonapi.data,
+                puppies: testCard().adoptingFrom(puppyCard).asCardValue,
               })
               .adoptingFrom(ownerCard).jsonapi
           );
@@ -747,7 +778,7 @@ describe('hub/card-service', function() {
             `${myOrigin}/api/realms/first-ephemeral-realm`,
             testCard()
               .withAttributes({
-                address: [testCard().adoptingFrom(addressCard).jsonapi.data],
+                address: [testCard().adoptingFrom(addressCard).asCardValue],
               })
               .adoptingFrom(ownerCard).jsonapi
           );
@@ -759,14 +790,9 @@ describe('hub/card-service', function() {
       });
 
       it('rejects a specific card value when validating a field that has arity > 1', async function() {
-        let puppyCard = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard().withField('name', 'string-field').jsonapi
-        );
-        let ownerCard = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard().withField('puppies', puppyCard, 'plural').jsonapi
-        );
+        let csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
+        let puppyCard = await service.create(csRealm, testCard().withField('name', 'string-field').jsonapi);
+        let ownerCard = await service.create(csRealm, testCard().withField('puppies', puppyCard, 'plural').jsonapi);
         try {
           await service.create(
             `${myOrigin}/api/realms/first-ephemeral-realm`,
@@ -774,11 +800,19 @@ describe('hub/card-service', function() {
               .withAttributes({
                 puppies: [
                   testCard()
-                    .withAttributes({ name: 'mango' })
-                    .adoptingFrom(puppyCard).jsonapi.data,
+                    .withAttributes({
+                      csRealm,
+                      csId: 'mango',
+                      name: 'mango',
+                    })
+                    .adoptingFrom(puppyCard).asCardValue,
                   testCard()
-                    .withAttributes({ name: 42 })
-                    .adoptingFrom(puppyCard).jsonapi.data,
+                    .withAttributes({
+                      csRealm,
+                      csId: 'vangogh',
+                      name: 42,
+                    })
+                    .adoptingFrom(puppyCard).asCardValue,
                 ],
               })
               .adoptingFrom(ownerCard).jsonapi
@@ -1573,14 +1607,12 @@ describe('hub/card-service', function() {
       before(async function() {
         env = await createTestEnv();
         service = (await env.container.lookup('cards')).as(Session.EVERYONE);
+        let csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
 
-        personCard = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard().withField('name', 'string-field').jsonapi
-        );
+        personCard = await service.create(csRealm, testCard().withField('name', 'string-field').jsonapi);
 
         friendCard = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          csRealm,
           testCard()
             .withField('name', 'string-field')
             .withField('friends', personCard, 'plural')
@@ -1589,14 +1621,14 @@ describe('hub/card-service', function() {
         );
 
         personA = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          csRealm,
           testCard()
             .withAttributes({ name: 'Person A' })
             .adoptingFrom(friendCard).jsonapi
         );
 
         personB = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          csRealm,
           testCard()
             .withAttributes({ name: 'Person B' })
             .withRelationships({ bestFriend: personA })
@@ -1613,14 +1645,14 @@ describe('hub/card-service', function() {
         });
 
         personC = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          csRealm,
           testCard()
             .withAttributes({ name: 'Person C' })
             .adoptingFrom(friendCard).jsonapi
         );
 
         personD = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          csRealm,
           testCard()
             .withAttributes({ name: 'Person D' })
             .withRelationships({ friends: [personA, personB, personC] })
@@ -1643,21 +1675,21 @@ describe('hub/card-service', function() {
         });
 
         personE = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          csRealm,
           testCard()
             .withAttributes({ name: 'Person E' })
             .adoptingFrom(friendCard).jsonapi
         );
 
         personF = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          csRealm,
           testCard()
             .withAttributes({ name: 'Person F' })
             .adoptingFrom(friendCard).jsonapi
         );
 
         personG = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          csRealm,
           testCard()
             .withAttributes({ name: 'Person G' })
             .withRelationships({ bestFriend: personF })
@@ -1683,7 +1715,7 @@ describe('hub/card-service', function() {
         });
 
         personH = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          csRealm,
           testCard()
             .withAttributes({ name: 'Person H' })
             .adoptingFrom(friendCard).jsonapi
@@ -1698,13 +1730,10 @@ describe('hub/card-service', function() {
           },
         });
 
-        toyCard = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard().withField('description', 'string-field').jsonapi
-        );
+        toyCard = await service.create(csRealm, testCard().withField('description', 'string-field').jsonapi);
 
         puppyCard = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          csRealm,
           testCard()
             .withAttributes({
               csFieldSets: {
@@ -1715,13 +1744,10 @@ describe('hub/card-service', function() {
             .withField('favoriteToy', toyCard).jsonapi
         );
 
-        dalmatianCard = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
-          testCard().adoptingFrom(puppyCard).jsonapi
-        );
+        dalmatianCard = await service.create(csRealm, testCard().adoptingFrom(puppyCard).jsonapi);
 
         ownerCard = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          csRealm,
           testCard()
             .withAttributes({
               csFieldSets: {
@@ -1733,7 +1759,7 @@ describe('hub/card-service', function() {
         );
 
         squeakySnake = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          csRealm,
           testCard()
             .withAttributes({
               description: 'a plush snake with squeaky segments',
@@ -1742,7 +1768,7 @@ describe('hub/card-service', function() {
         );
 
         vanGogh = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          csRealm,
           testCard()
             .withAttributes({
               name: 'Van Gogh',
@@ -1756,7 +1782,7 @@ describe('hub/card-service', function() {
         );
 
         mango = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          csRealm,
           testCard()
             .withAttributes({
               name: 'Mango',
@@ -1766,7 +1792,7 @@ describe('hub/card-service', function() {
         );
 
         daddy = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          csRealm,
           testCard()
             .withAttributes({
               name: 'Hassan',
@@ -1775,7 +1801,7 @@ describe('hub/card-service', function() {
             .adoptingFrom(ownerCard).jsonapi
         );
         mommy = await service.create(
-          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          csRealm,
           testCard()
             .withAttributes({
               csFieldSets: {
@@ -1785,6 +1811,8 @@ describe('hub/card-service', function() {
               puppies: [
                 testCard()
                   .withAttributes({
+                    csRealm,
+                    csId: 'vangogh',
                     name: 'Van Gogh',
                     favoriteToy: testCard()
                       .withAttributes({
@@ -1795,6 +1823,8 @@ describe('hub/card-service', function() {
                   .adoptingFrom(dalmatianCard).asCardValue,
                 testCard()
                   .withAttributes({
+                    csRealm,
+                    csId: 'mango',
                     name: 'Mango',
                   })
                   .withRelationships({ favoriteToy: squeakySnake })
