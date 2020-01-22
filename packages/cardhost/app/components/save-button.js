@@ -16,6 +16,11 @@ export default class SaveButton extends Component {
 
   @tracked justSaved;
 
+  get cardIsNew() {
+    let card = this.args.card;
+    return card.isNew;
+  }
+
   @task(function*() {
     let card = this.args.card;
     this.statusMsg = null;
@@ -33,13 +38,10 @@ export default class SaveButton extends Component {
   saveCard;
 
   @task(function*() {
-    let card = this.args.card;
-    let cardIsNew = card.isNew;
-
     yield this.saveCard.perform();
 
-    if (cardIsNew) {
-      return this.router.transitionTo('cards.card.edit.fields.schema', card);
+    if (this.cardIsNew) {
+      return this.router.transitionTo('cards.card.edit.fields.schema', this.args.card);
     } else {
       this.justSaved = true;
       yield setTimeout(() => {
@@ -57,7 +59,7 @@ export default class SaveButton extends Component {
 
   @action
   save(element, [isDirty]) {
-    if (isDirty) {
+    if (isDirty && !this.cardIsNew) {
       if (this.args.clickAction) {
         this.args.clickAction();
       } else {

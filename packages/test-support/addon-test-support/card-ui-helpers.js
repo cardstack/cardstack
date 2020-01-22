@@ -16,6 +16,7 @@ export async function setCardId(id) {
   await showCardId();
   await fillIn('#card__id', id);
   await triggerEvent('#card__id', 'keyup');
+  await saveCard('creator');
 }
 
 export async function dragAndDrop(fieldSelector, dropZoneSelector, options) {
