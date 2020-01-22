@@ -5,13 +5,12 @@
   display: grid;
   grid-template-columns: var(--welcome-navbar-width) 1fr;
   grid-template-areas: "navbar main";
-  width: calc(100vw - 200px);
-  height: calc(100vh - 120px);
+  width: 100vw;
+  height: 100vh;
   min-width: 1100px;
   max-width: 1400px;
-  margin: 60px auto;
+  margin: 0;
   background-color: var(--ch-deep-background);
-  border-radius: 10px;
   box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.25);
 }
 
@@ -26,9 +25,9 @@
 
 
 /* Navbar */
-.cardhost-welcome-left-edge--nav {
+/* .cardhost-welcome-left-edge--nav {
   background: url(/assets/images/cardstack-logo.svg) 30px 30px/24px 25px no-repeat;
-}
+} */
 
 .cardhost-welcome-left-edge--nav button {
   background: none;
@@ -42,7 +41,7 @@
 .cardhost-welcome-left-edge--nav ul {
   list-style-type: none;
   margin: 0;
-  padding-top: 130px;
+  padding-top: 30px;
   padding-left: 30px;
   font: 400 13px/18px var(--ch-font-family);
 }
