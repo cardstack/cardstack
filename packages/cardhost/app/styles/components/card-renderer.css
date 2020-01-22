@@ -44,7 +44,7 @@
   background-color: var(--ch-default);
   position: sticky;
   top: 80px;
-  z-index: 11;
+  z-index: var(--ch-card-header-z-index); /* card scrolls under the header */
 
   transition: visibility var(--ch-transition-time);
 }
@@ -113,9 +113,9 @@
   border: none;
   overflow-x: hidden;
   overflow-y: auto;
+  /* z-index: var(--ch-card-z-index); */
 
   transition: var(--ch-card-background-color-animate);
-  z-index: 10;
 }
 
 .card-renderer-isolated.schema .card-renderer-isolated--content {
@@ -124,10 +124,6 @@
 
 .card-renderer-isolated.themer .card-renderer-isolated--content {
   background-color: var(--ch-dark-background);
-}
-
-.card-renderer-isolated.view.selected .card-renderer-isolated--content {
-  z-index: 9;
 }
 
 
