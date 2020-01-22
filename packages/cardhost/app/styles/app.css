@@ -49,6 +49,7 @@ Until that work is done we are statically adding this css
 @import '/assets/fields/string-editor.css';
 @import '/assets/fields/string-viewer.css';
 @import '/assets/fields/link-viewer.css';
+@import '/assets/fields/cta-viewer.css';
 
 :root {
   --ch-font-family: 'Open Sans', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;

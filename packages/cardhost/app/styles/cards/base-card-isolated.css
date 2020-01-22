@@ -92,7 +92,6 @@
 
 /* Link type */
 .cardstack_base-card-isolated .link-viewer {
-  grid-column: 1 / -1;
   color: var(--cobalt-blue);
   text-decoration: underline;
   font-weight: 600;
