@@ -346,19 +346,19 @@ let weddingInvitationTemplate = eventFactory.getDocumentFor(
         'needed-when-embedded': false,
         caption: 'Divider',
       }),
-      eventFactory.addResource('fields', 'wedding-bride').withAttributes({
+      eventFactory.addResource('fields', 'wedding-name-1').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
         'needed-when-embedded': true,
-        caption: 'Bride',
+        caption: 'Name',
       }),
-      eventFactory.addResource('fields', 'wedding-groom').withAttributes({
+      eventFactory.addResource('fields', 'wedding-name-2').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
         'needed-when-embedded': true,
-        caption: 'Groom',
+        caption: 'Name',
       }),
       eventFactory.addResource('fields', 'wedding-date').withAttributes({
         'is-metadata': true,
@@ -415,8 +415,8 @@ let weddingInvitationTemplate = eventFactory.getDocumentFor(
       eventFactory.addResource('local-hub::wedding-invitation', 'local-hub::wedding-invitation').withAttributes({
         title: 'Wedding Invitation',
         divider: true,
-        weddingBride: 'Willa Karciana',
-        weddingGroom: 'Rufus Jackson',
+        weddingName1: 'Willa Karciana',
+        weddingName2: 'Rufus Jackson',
         weddingDate: '2021-06-05',
         weddingTime: '3 PM',
         weddingReceptionAddress: 'The Gorgeous Hotel, 96 Hilton Avenue, San Francisco, CA',

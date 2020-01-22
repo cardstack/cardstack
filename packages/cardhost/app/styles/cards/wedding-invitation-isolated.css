@@ -47,7 +47,7 @@
 .wedding-rsvp-cta-field {
     z-index: 5;
 }
-.wedding-groom-field {
+.wedding-name-2-field {
     padding-bottom: 69px;
 }
 .wedding-reception-address-field {
@@ -81,8 +81,8 @@
     letter-spacing: 0.05em;
 }
 
-.wedding-bride-value,
-.wedding-groom-value {
+.wedding-name-1-value,
+.wedding-name-2-value {
     font-family: 'Didot', serif;
     font-style: italic;
     text-transform: capitalize;
@@ -92,7 +92,7 @@
     white-space: nowrap;
 }
 
-.wedding-groom-value::before {
+.wedding-name-2-value::before {
     content: '&';
     display: block;
     font-size: 42px;
