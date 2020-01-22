@@ -62,7 +62,7 @@
     padding: 52px 40px 22px;
     background-color: #221E2B;
 }
-.wedding-website-link {
+.wedding-website-value {
     display: block;
     color: #FF4A72;
     font-weight: 400;
@@ -116,7 +116,7 @@
     content: 'Please RSVP by';
 }
 
-.wedding-rsvp-cta-cta {
+.wedding-rsvp-cta-value {
     width: 302px;
     height: 58px;
     background: transparent;
@@ -132,12 +132,12 @@
     padding: 0;
 }
 
-.wedding-rsvp-cta-cta:hover {
+.wedding-rsvp-cta-value:hover {
     background-color: transparent;
 }
 
-.wedding-website-link:focus,
-.wedding-rsvp-cta-cta:focus {
+.wedding-website-value:focus,
+.wedding-rsvp-cta-value:focus {
     outline: none;
     background-color: transparent;
     text-decoration: underline;
