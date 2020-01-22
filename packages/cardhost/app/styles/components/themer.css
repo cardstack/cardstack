@@ -153,18 +153,6 @@
   color :var(--ch-default);
 }
 
-.editing-css {
-  padding-left: 0;
-  width: 100%;
-  padding-right: 40%;
-  transition: var(--ch-card-padding-animate), var(--ch-card-background-color-animate);
-  background-color: var(--ch-dark-background);
-}
-
-.editing-css.full-width {
-  padding-right: 0;
-}
-
 .themer--top-edge-container {
   display: grid;
   position: fixed;
@@ -281,4 +269,22 @@
 
 .ch-button--icon.full-width.selected {
   --icon-url: url('/assets/images/buttons/full-width-active.svg');
+}
+
+.editing-css {
+  padding-left: 0;
+  padding-right: 0;
+  width: 100%;
+  transition: var(--ch-card-padding-animate), var(--ch-card-background-color-animate);
+  background-color: var(--ch-dark-background);
+}
+
+.full-width.editing-css .themer.view {
+  width: 100%;
+  padding-right: var(--ch-spacing);
+}
+
+.themer.view {
+  width: var(--ch-card-size);
+  padding: var(--ch-spacing)
 }
