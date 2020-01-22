@@ -160,6 +160,7 @@
 }
 
 .card-renderer-isolated.selected .card-renderer-isolated--header,
+.card-renderer-isolated.layout .card-renderer-isolated--header,
 .card-renderer-isolated.view .card-renderer-isolated--header {
   background-color: var(--ch-highlight);
   border-color: var(--ch-highlight);
@@ -170,6 +171,7 @@
   --icon-color: var(--ch-dark);
 }
 
+.card-renderer-isolated.layout .card-renderer-isolated--card-container,
 .card-renderer-isolated.selected .card-renderer-isolated--card-container {
   border-color: var(--ch-highlight);
 }
