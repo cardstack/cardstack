@@ -418,10 +418,10 @@ let weddingInvitationTemplate = eventFactory.getDocumentFor(
         weddingBride: 'Willa Karciana',
         weddingGroom: 'Rufus Jackson',
         weddingDate: '2021-06-05',
-        weddingTime: '3:00 PM',
+        weddingTime: '3 PM',
         weddingReceptionAddress: 'The Gorgeous Hotel, 96 Hilton Avenue, San Francisco, CA',
         weddingRsvpDate: '2021-05-01',
-        weddingWebsite: 'www.rufusandwillainwonderland.com',
+        weddingWebsite: 'https://www.rufusandwillainwonderland.com',
         weddingRsvpCta: '',
         weddingIntroText: 'Please join us for the wedding of',
       })
