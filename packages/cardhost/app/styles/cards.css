@@ -47,11 +47,6 @@
   grid-template-columns: 1fr;
 }
 
-.cardhost-cards.responsive .card-renderer-isolated {
-  min-width: 375px;
-  max-width: 375px;
-}
-
 .cardhost-cards.full-width .card-renderer-isolated {
   max-width: 100%;
 }
