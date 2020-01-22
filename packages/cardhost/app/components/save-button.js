@@ -3,8 +3,11 @@ import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 import { task } from 'ember-concurrency';
+import { restartableTask } from 'ember-concurrency-decorators';
+import { timeout } from 'ember-concurrency';
 
 const SAVED_HIGHLIGHT_DELAY = 2500;
+const AUTOSAVE_DEBOUNCE = 1000;
 
 export default class SaveButton extends Component {
   @service router;
@@ -46,12 +49,20 @@ export default class SaveButton extends Component {
   })
   saveCardWithState;
 
+  @restartableTask
+  *debounceAndSave() {
+    yield timeout(AUTOSAVE_DEBOUNCE);
+    this.saveCardWithState.perform();
+  }
+
   @action
-  save() {
-    if (this.args.clickAction) {
-      this.args.clickAction();
-    } else {
-      this.saveCardWithState.perform();
+  save(element, [isDirty]) {
+    if (isDirty) {
+      if (this.args.clickAction) {
+        this.args.clickAction();
+      } else {
+        this.debounceAndSave.perform();
+      }
     }
   }
 }

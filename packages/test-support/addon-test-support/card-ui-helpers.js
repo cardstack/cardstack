@@ -81,8 +81,6 @@ export async function createCards(args) {
 }
 
 export async function saveCard(mode, id) {
-  await click(`[data-test-card-save-btn]`);
-
   if (mode === 'creator') {
     if (id) {
       await waitFor(`[data-test-card-schema="${id}"]`, { timeout });
