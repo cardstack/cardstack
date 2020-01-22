@@ -9,7 +9,6 @@ import ENV from '@cardstack/cardhost/config/environment';
 import { fieldTypeMappings, fieldComponents } from '@cardstack/core/utils/mappings';
 
 const { environment } = ENV;
-const duration = 250;
 
 export default class CardManipulator extends Component {
   fieldTypeMappings = fieldTypeMappings;
@@ -26,8 +25,6 @@ export default class CardManipulator extends Component {
   @tracked isDragging;
   @tracked cardId;
   @tracked cardSelected = true;
-
-  duration = duration;
 
   constructor(...args) {
     super(...args);
