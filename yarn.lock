@@ -9490,6 +9490,13 @@ ember-concurrency@^0.9.0:
     ember-compatibility-helpers "^1.2.0"
     ember-maybe-import-regenerator "^0.1.5"
 
+ember-css-url@0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/ember-css-url/-/ember-css-url-0.2.0.tgz#109a04a93a2e3af71c8ac3b56aec42407eb35d0b"
+  integrity sha512-cJIjutYn+x9+LH++gvQwIUFDtH5scb2fSTpkiTytT7YX564uEaStJWIvKXXFT+q7184LakLMsQJ6EVrAQx9VsQ==
+  dependencies:
+    ember-cli-babel "^6.6.0"
+
 "ember-data@github:emberjs/data#1df833396855d956b817540923dd89338463fec2":
   version "3.9.0-canary"
   resolved "https://codeload.github.com/emberjs/data/tar.gz/1df833396855d956b817540923dd89338463fec2"

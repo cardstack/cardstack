@@ -1,6 +1,5 @@
 import Service from '@ember/service';
 import { get, set, uniqBy, merge, cloneDeep, unionBy, difference, partition, startCase } from 'lodash';
-import { hubURL } from '@cardstack/plugin-utils/environment';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { isEmpty } from '@ember/utils';
@@ -462,7 +461,7 @@ class Card {
       internal.fields = unionBy(updatedFields, internal.fields, i => i.name);
     }
 
-    store.isolated.set(this.id, save(internal.session, this.json, this.isNew));
+    store.isolated.set(this.id, save(this.hubURL, internal.session, this.json, this.isNew));
     internal.serverIsolatedData = await store.isolated.get(this.id);
     if (!this.isNew) {
       await invalidate(this.id);
@@ -495,7 +494,7 @@ class Card {
 
     let internal = priv.get(this);
     internal.loadedFormat = format;
-    store[format].set(this.id, load(internal.session, this.id, format));
+    store[format].set(this.id, load(this.hubURL, internal.session, this.id, format));
     if (format === 'isolated') {
       internal.serverIsolatedData = await store[format].get(this.id);
       await invalidate(this.id, get(internal.serverIsolatedData, 'data.meta.version'));
@@ -518,6 +517,11 @@ class Card {
     return this;
   }
 
+  get hubURL() {
+    // FIXME: this is only here until we refactor to move adapter concerns out of Card
+    return `http://localhost:3000`;
+  }
+
   async delete() {
     if (this.isDestroyed) {
       throw new Error('Cannot delete from destroyed card');
@@ -532,7 +536,7 @@ class Card {
     }
 
     let internal = priv.get(this);
-    let response = await fetch(`${hubURL}/api/cards/${encodeURIComponent(this.id)}`, {
+    let response = await fetch(`${this.hubURL}/api/cards/${encodeURIComponent(this.id)}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/vnd.api+json',
@@ -1175,7 +1179,7 @@ async function invalidate(cardId, latestVersion) {
   }
 }
 
-async function save(session, cardDocument, isNew) {
+async function save(hubURL, session, cardDocument, isNew) {
   let id = cardDocument.data.id;
   let url = isNew ? `${hubURL}/api/cards` : `${hubURL}/api/cards/${encodeURIComponent(id)}`;
   let response = await fetch(url, {
@@ -1196,7 +1200,7 @@ async function save(session, cardDocument, isNew) {
   return json;
 }
 
-async function load(session, id, format) {
+async function load(hubURL, session, id, format) {
   let response = await fetch(`${hubURL}/api/cards/${encodeURIComponent(id)}?format=${format}`, {
     headers: {
       'Content-Type': 'application/vnd.api+json',

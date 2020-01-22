@@ -3,12 +3,12 @@
   class="cardhost-left-edge"
   data-test-cardhost-left-edge
 >
-  <nav 
+  <nav
     class="cardhost-left-edge--nav {{@mode}} {{if this.isExpanded "expanded"}}"
   >
     <ul>
       <li class="login-grid">
-        <button 
+        <button
           class="ch-button ch-button--icon-secondary button-cardstack-logo"
           aria-label="expandable menu with login controls"
           aria-expanded={{this.isExpanded}}
@@ -24,27 +24,6 @@
             {{will-destroy this.destroyCloseListener}}
           >
             <h1>Cardstack Builder</h1>
-            <CardstackSession as |session|>
-              {{#if session.isAuthenticated }}
-                <button 
-                  {{on "click" (fn this.logout session.logout)}}
-                  class="cardhost-left-edge-login-buttons"
-                  data-test-logout-button
-                >
-                  Log out
-                </button>
-              {{else}}
-                <MockLogin as |login|>
-                  <button
-                    {{on "click" (fn login "user1")}}
-                    class="cardhost-left-edge-login-buttons"
-                    data-test-login-button
-                  >
-                    Log in
-                  </button>
-                </MockLogin>
-              {{/if}}
-            </CardstackSession>
           </div>
         {{/if}}
       </li>

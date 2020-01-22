@@ -27,6 +27,7 @@ module.exports = function(environment) {
       // when it is created
     },
     cardTemplates: JSON.parse(process.env.CARD_TEMPLATES || null) || [],
+    hubURL: process.env.HUB_URL || 'http://localhost:3000',
   };
 
   if (environment === 'development') {

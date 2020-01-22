@@ -1262,7 +1262,7 @@ module('Unit | Service | data', function() {
       let cardDoc = card.json;
       let index = cardDoc.included.findIndex(i => `${i.type}/${i.id}` === `${card1Id}/${card1Id}`);
       cardDoc.included[index].attributes.title = 'updated title';
-      await updateCard(card1Id, cardDoc);
+      await updateCard(service.hubURL, card1Id, cardDoc);
       assert.equal(card.json.data.attributes.title, 'test title', 'the field value is correct');
       await card.load('isolated');
       assert.equal(card.json.data.attributes.title, 'updated title', 'the field value is correct');
@@ -1897,7 +1897,7 @@ module('Unit | Service | data', function() {
       let cardDoc = person.json;
       let index = cardDoc.included.findIndex(i => `${i.type}/${i.id}` === `${card2Id}/${card2Id}`);
       cardDoc.included[index].attributes.name = 'updated name';
-      await updateCard(card2Id, cardDoc);
+      await updateCard(service.hubURL, card2Id, cardDoc);
       await person.load('isolated');
 
       article = await service.getCard(card1Id, 'embedded');

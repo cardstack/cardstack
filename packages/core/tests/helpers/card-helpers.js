@@ -1,4 +1,3 @@
-import { hubURL } from '@cardstack/plugin-utils/environment';
 import { ciSessionId } from '@cardstack/test-support/environment';
 import { get } from 'lodash';
 
@@ -37,18 +36,7 @@ export function cleanupDefaulValueArtifacts(document) {
   return document;
 }
 
-export async function getCard(id) {
-  let url = `${hubURL}/api/cards/${id}`;
-  let response = await fetch(url, {
-    headers: {
-      authorization: `Bearer ${ciSessionId}`,
-      'content-type': 'application/vnd.api+json',
-    },
-  });
-  return await response.json();
-}
-
-export async function updateCard(id, card) {
+export async function updateCard(hubURL, id, card) {
   let url = `${hubURL}/api/cards/${id}`;
   let response = await fetch(url, {
     method: 'PATCH',

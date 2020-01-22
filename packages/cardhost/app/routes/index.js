@@ -4,10 +4,7 @@ import { inject as service } from '@ember/service';
 import ENV from '@cardstack/cardhost/config/environment';
 import { Promise } from 'rsvp';
 
-const {
-  cardstack: { cardTemplates = [] },
-  environment,
-} = ENV;
+const { environment, cardTemplates = [] } = ENV;
 
 export default class IndexRoute extends Route {
   @service data;
