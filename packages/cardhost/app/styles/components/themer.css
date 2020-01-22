@@ -1,4 +1,6 @@
 .cardhost-card-theme-editor {
+  --editor-header-height: 42px;
+
   position: fixed;
   right: 0;
   top: 0;
@@ -68,6 +70,7 @@
 }
 
 .cardhost-card-theme-editor .editor-container__title {
+  min-height: var(--editor-header-height);
   background-color: var(--ch-default);
   font: 600 13px/18px var(--ch-font-family);
   letter-spacing: 0.035em;
@@ -116,6 +119,10 @@
   overflow: hidden;
   resize: vertical;
   background-color: #1e1e1e;
+}
+
+.cardhost-card-theme-editor .cardhost-monaco-container {
+  max-height: calc(100% - var(--editor-header-height));
 }
 
 .themer--top-edge-container .show-editor-btn, .themer--top-edge-container .hide-editor-btn {
