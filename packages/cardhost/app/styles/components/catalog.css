@@ -30,8 +30,8 @@
 
 .ch-catalog--header-btns {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 20px;
+  right: 20px;
 }
 
 .ch-catalog--header-btn {

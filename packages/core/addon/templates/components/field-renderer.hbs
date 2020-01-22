@@ -1,25 +1,10 @@
 {{! eslint is confused about indentation for else-if }}
 {{! template-lint-disable block-indentation}}
 
-{{#if (and (eq @mode "schema") @dropField)}}
-  <DropZone @dropField={{@dropField}} @position={{@field.position}} />
-{{/if}}
-
 {{!-- TODO: let's think of a more accessible solution here, consider making this a button--}}
 {{!-- TODO: also we should also turn on a11y linting --}}
-<div {{on "click" (fn this.selectField @field)}} {{on "dragstart" (action this.startDragging @field)}} {{on "dragend" (action this.finishDragging)}}
-  class={{concat
-    "field-renderer "
-    @mode
-    "-field "
-    "field-"
-    @field.name
-    " field-type-"
-    this.dasherizedType
-    (if (or @setPosition @removeField) " with-buttons")
-    (if (eq @field @selectedField) " selected")
-  }}
-  tabindex={{@field.position}}
+<section {{on "click" (fn this.selectField @field)}} {{on "dragstart" (action this.startDragging @field)}} {{on "dragend" (action this.finishDragging)}}
+  class="field {{@field.name}}-field {{if @field.preview "preview"}} {{if this.friendlyType (concat "field-type-" this.friendlyType "-" @mode "-field ")}}field-type-{{this.dasherizedType}}-{{@mode}}-field{{if (or @setPosition @removeField) " with-buttons"}}{{if (eq @field @selectedField) " selected"}}"
   data-test-field={{@field.name}}
   data-test-field-type={{@field.type}}
   data-test-field-mode={{@mode}}
@@ -27,7 +12,7 @@
 >
   {{#if @setPosition}}
     <button {{on "mousedown" (action this.initDrag @field)}} {{on "mouseup" (action this.endDrag)}} {{on "dragend" (action (mut this.isDragging) false)}}
-      class="field-renderer--move-btn"
+      class="field--move-btn"
       aria-label="Drag field"
       data-test-field-renderer-move-btn
       data-test-field-renderer-move-btn-position={{@field.position}}
@@ -35,7 +20,7 @@
     </button>
   {{/if}}
 
-  {{#if (eq @mode "view")}}
+  {{#if (or (eq @mode "view") (eq @mode "layout"))}}
     {{#let (component this.fieldViewer) as | FieldViewer |}}
       <FieldViewer @field={{@field}}/>
     {{/let}}
@@ -57,11 +42,11 @@
           {{!-- TODO: Change displayed logo depending on field --}}
           {{! template-lint-disable no-inline-styles }}
           <header
-            class="schema-field-renderer--header"
-            style={{css-url "background-image" "/images/fields/text.svg"}}
+            class="schema-field-renderer--header {{if this.fieldType this.fieldType.type @field.type}}"
+            style={{css-url "background-image" this.fieldType.icon}}
             data-test-field-renderer-type
           >
-            {{@field.name}} ({{this.fieldTypeTitle}})
+            {{@field.name}} ({{if this.fieldType this.fieldType.title @field.name}})
             {{#if @field.isAdopted}}
               <span class="schema-field-renderer--header--detail">Adopted</span>
             {{/if}}
@@ -120,13 +105,18 @@
           {{/if}}
         </div>
       {{else if (and (eq schemaAttr "name") @setFieldName)}}
-        <div data-test-schema-attr={{schemaAttr}}>
+        <div class="ch-input-group" data-test-schema-attr={{schemaAttr}}>
           <TextField
-            @theme="cs-dark"
-            @label="Field Name"
+            @id={{concat "edit-field-name-" @field.nonce "-" this.renderNonce}}
             @value={{this.newFieldName}}
+            @theme="cs-dark"
+            @label="Field ID"
+            @class="ch-input"
             @setValue={{action this.updateFieldName}}
-            @disabled={{@field.isAdopted}} />
+            @disabled={{@field.isAdopted}}
+            @pattern={{@field.fieldNameRegex.source}}
+            @title="Can only contain letters, numbers, dashes, and underscores."
+          />
         </div>
       {{else if (eq schemaAttr "is-meta")}}
         <div class="field-renderer--display" data-test-schema-attr={{schemaAttr}}>
@@ -163,15 +153,20 @@
     {{/each}}
   {{/if}}
 
-  <div class="field-renderer--action">
-    {{#if (and @removeField (not @field.isAdopted))}}
-      {{!-- using field.nonce in case the user deletes the name of the field --}}
-      <button {{on "click" (fn @removeField @field.nonce)}}
-        class="field-renderer--remove-btn"
-        aria-label="Remove"
-        data-test-field-renderer-remove-btn
-      >
-      </button>
-    {{/if}}
-  </div>
-</div>
+  {{#if (and (not-eq @mode "view") (not-eq @mode "layout"))}}
+    <div class="field--action">
+      {{#if (and @removeField (not @field.isAdopted))}}
+        {{!-- using field.nonce in case the user deletes the name of the field --}}
+        <button {{on "click" (fn @removeField @field.nonce)}}
+          class="field--remove-btn"
+          aria-label="Remove"
+          data-test-field-renderer-remove-btn
+        >
+        </button>
+      {{/if}}
+    </div>
+  {{/if}}
+</section>
+{{#if (and (eq @mode "schema") @dropField (not @field.preview))}}
+  <DropZone @dropField={{@dropField}} @position={{inc @field.position}} @toggleStubField={{@toggleStubField}} />
+{{/if}}

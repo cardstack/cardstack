@@ -1,44 +1,23 @@
-{{#if this.cardstackSession.isAuthenticated}}
-  <div class="card-renderer--top-edge-buttons">
-    <button
-      {{on "click" this.delete}}
-      class="ch-button ch-button--icon-secondary delete"
-      data-test-card-editor-delete-btn
-      disabled={{not this.cardstackSession.isAuthenticated}}
-      aria-label="Delete"
-    >
-    </button>
-    <button
-      {{on "click" this.preview}}
-      class="ch-button ch-button--secondary"
-      data-test-card-editor-preview-btn
-      disabled={{not this.cardstackSession.isAuthenticated}}
-    >
-      Preview
-    </button>
-    <SaveButton @card={{this.card}}/>
-  </div>
-{{/if}}
-
-<CardhostLeftEdge />
-
 <section
   class="card-editor"
   data-test-card-edit={{this.card.name}}
   {{did-update this.updateCard @card}}
 >
-  <CardRenderer
-    @card={{this.card}}
-    @mode="edit"
-    @setFieldValue={{action this.setFieldValue}}
-    @format="isolated"
-  />
+  <AnimatedContainer class="card-renderer--container" {{on "click" (action (mut @card.isSelected) (not @card.isSelected))}}>
+    <CardRenderer
+      @card={{this.card}}
+      @mode="edit"
+      @setFieldValue={{action this.setFieldValue}}
+      @format="isolated"
+      @selectField={{action this.selectField}}
+      @selectedField={{this.selectedField}}
+      @cardSelected={{this.card.isSelected}}
+      @cardFocused={{action (mut this.card.isSelected)}} />
+  </AnimatedContainer>
 </section>
 
+{{!-- This is hidden, used in tests --}}
 <section class="cardhost-card-document">
-  <h3>Card Document:</h3>
-  <CodeEditor
-    @code={{this.cardJson}}
-    @language="json"
-  />
+  <h3>Card Document</h3>
+  <code data-test-card-json>{{this.cardJson}}</code>
 </section>

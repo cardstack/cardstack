@@ -16,13 +16,12 @@
 @import '/assets/components/catalog-field.css';
 @import '/assets/components/adopted-from.css';
 @import '/assets/components/themer.css';
+@import '/assets/components/dialog.css';
 
 /* Cardhost styling for core package templates */
 @import '/assets/components/card-renderer.css';
 @import '/assets/components/field-renderer.css';
-@import '/assets/components/field-renderer-schema-field.css';
-@import '/assets/components/field-renderer-edit-field.css';
-@import '/assets/components/field-renderer-view-field.css';
+@import '/assets/components/schema-field-renderer.css';
 @import '/assets/components/drop-zone.css';
 
 /* TODO eventually these will be dynamically added to the DOM.
@@ -30,6 +29,10 @@ Until that work is done we are statically adding this css
 */
 @import '/assets/cards/base-card-isolated.css';
 @import '/assets/cards/base-card-embedded.css';
+/* Themed cards */
+/* @import '/assets/cards/event-card-isolated.css'; */
+/* @import '/assets/cards/event-ticket-isolated.css'; */
+
 @import '/assets/fields/belongs-to-editor.css';
 @import '/assets/fields/belongs-to-viewer.css';
 @import '/assets/fields/boolean-editor.css';
@@ -45,10 +48,11 @@ Until that work is done we are statically adding this css
 @import '/assets/fields/integer-viewer.css';
 @import '/assets/fields/string-editor.css';
 @import '/assets/fields/string-viewer.css';
+@import '/assets/fields/link-viewer.css';
 
 :root {
   --ch-font-family: 'Open Sans', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --ch-left-edge-navbar-width: 80px;
+  --ch-left-edge-navbar-width: 65px;
   --ch-left-edge-panel-width: 330px;
   --ch-right-edge-panel-width: 330px;
 
@@ -57,10 +61,8 @@ Until that work is done we are statically adding this css
   --ch-right-edge-width: calc(var(--ch-right-edge-panel-width) + var(--ch-spacing));
   --ch-bottom-edge-height: 80px;
 
-  --ch-component-width: 260px;
-  --ch-component-height: 40px;
-  --ch-card-size: 496px;
-  --ch-field-width: 384px;
+  --ch-card-size: 496px;    /* min-width and min-height for cards */
+  --ch-field-width: 384px;  /* edit and schema view field-renderer max-width */
   --ch-spacing: 20px;
   --ch-edges-z-index: 10;
   --ch-actions-z-index: 11;
@@ -70,11 +72,6 @@ Until that work is done we are statically adding this css
   --ch-card-padding-animate: padding-right 0.3s ease;
 }
 
-/*
-  TODO:
-  - better positioning for edges (esp on/off state)
-  - link and button focus and disabled states styling
-*/
 * {
   box-sizing: border-box;
 }
@@ -104,25 +101,64 @@ body {
 }
 
 a {
-  --link: white;
-
-  color: var(--link);
+  color: inherit;
   text-decoration: none;
 }
 
 a:hover {
-  --link: var(--ch-highlight);
-
   cursor: pointer;
 }
 
-/* Other */
+/* Ember Animated */
+.animated-tools {
+  z-index: 20;
+}
+
+/* JSON card document -- hidden from view */
+.cardhost-card-document {
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+}
+
+
+/* Other: */
+/* TODO: Refactor these to where they belong  */
 .card-renderer--top-edge-buttons {
   position: fixed;
   top: var(--ch-spacing);
   right: var(--ch-spacing);
   display: flex;
   z-index: var(--ch-actions-z-index);
+}
+
+.card-renderer--top-edge-buttons button + button {
+  margin-left: 10px;
+}
+
+.card-renderer--top-edge-buttons .top-edge--mode-label {
+  padding: 10px;
+  background-color: white;
+  text-transform: uppercase;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 10px;
+  color: var(--ch-dark-op50);
+  margin-right: 20px;
+}
+
+.card-renderer--top-edge-buttons .top-edge--mode-link {
+  display: inline-block;
+}
+
+.card-renderer--top-edge-buttons .top-edge--mode-link span {
+  width: 18px;
+  height: 18px;
+  display: block;
+  text-indent: -9999px;
+  background-image: url(/assets/images/icons/close-circle.svg);
+  background-size: 18px 18px;
+  background-repeat: no-repeat;
 }
 
 .card-schema-updator--search-bar {
@@ -144,52 +180,10 @@ a:hover {
   text-align: right;
 }
 
-.loading-spinner {
-  display: inline-block;
-  position: absolute;
-  top: 0;
-  right: 20px;
-  width: 20px;
-  height: 20px;
-}
 
-.loading-spinner div {
-  box-sizing: border-box;
-  display: block;
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  margin: 8px;
-  border: 2px solid black;
-  border-radius: 50%;
-  animation: loading-spinner 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-  border-color: black transparent transparent transparent;
-}
-.loading-spinner div:nth-child(1) {
-  animation-delay: -0.45s;
-}
-.loading-spinner div:nth-child(2) {
-  animation-delay: -0.3s;
-}
-.loading-spinner div:nth-child(3) {
-  animation-delay: -0.15s;
-}
-@keyframes loading-spinner {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* JSON card document */
-.cardhost-card-document {
-  visibility: hidden;
-  height: 0;
-  overflow: hidden;
-}
-
-.animated-tools {
-  z-index: 20;
+/* TODO: Move to ui-components repo */
+.cs-dark-input.cs-input:disabled,
+.cs-dark-input.cs-input.disabled {
+  -webkit-text-fill-color: var(--cs-dark-field-disabled-text); /* For strangeness in safari */
+  -webkit-text-stroke-color: var(--cs-dark-field-disabled-text);
 }

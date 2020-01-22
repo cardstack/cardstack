@@ -1,0 +1,20 @@
+<section class="card-view" data-test-card-view={{@card.name}}>
+  <AnimatedContainer class="card-renderer--container" {{on "click" (action (mut @card.isSelected) (not @card.isSelected))}}>
+    <CardRenderer
+      @card={{@card}}
+      @mode={{@mode}}
+      @format="isolated"
+      @cardSelected={{@card.isSelected}}
+    />
+  </AnimatedContainer>
+</section>
+
+<style data-test-view-css>
+  {{scope-css @card.isolatedCss @card.name}}
+</style>
+
+{{!-- This is hidden, used in tests --}}
+<section class="cardhost-card-document">
+  <h3>Card Document</h3>
+  <code data-test-card-json>{{this.cardJson}}</code>
+</section>

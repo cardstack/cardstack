@@ -1,21 +1,67 @@
-<aside class="cardhost-left-edge" data-test-cardhost-left-edge>
-  <nav class="cardhost-left-edge--nav {{@mode}}">
+<aside
+  id="cardhost-left-edge"
+  class="cardhost-left-edge"
+  data-test-cardhost-left-edge
+>
+  <nav 
+    class="cardhost-left-edge--nav {{@mode}} {{if this.isExpanded "expanded"}}"
+  >
     <ul>
-      <li>
-        <button disabled class="ch-button ch-button--icon user" aria-label="User">
+      <li class="login-grid">
+        <button 
+          class="ch-button ch-button--icon-secondary button-cardstack-logo"
+          aria-label="expandable menu with login controls"
+          aria-expanded={{this.isExpanded}}
+          {{on "click" this.toggleMenuExpand}}
+          data-test-toggle-left-edge
+        >
+          {{svg-jar "cardstack-logo" width="18px" height="20px"}}
         </button>
+        {{#if this.isExpanded}}
+          <div
+            class="login-grid-right-column"
+            {{did-insert this.registerCloseListener}}
+            {{will-destroy this.destroyCloseListener}}
+          >
+            <h1>Cardstack Builder</h1>
+            <CardstackSession as |session|>
+              {{#if session.isAuthenticated }}
+                <button 
+                  {{on "click" (fn this.logout session.logout)}}
+                  class="cardhost-left-edge-login-buttons"
+                  data-test-logout-button
+                >
+                  Log out
+                </button>
+              {{else}}
+                <MockLogin as |login|>
+                  <button
+                    {{on "click" (fn login "user1")}}
+                    class="cardhost-left-edge-login-buttons"
+                    data-test-login-button
+                  >
+                    Log in
+                  </button>
+                </MockLogin>
+              {{/if}}
+            </CardstackSession>
+          </div>
+        {{/if}}
       </li>
       <li>
-        <button disabled class="ch-button ch-button--icon catalog" aria-label="Catalog">
+        <button disabled class="catalog ch-button ch-button--icon-secondary" aria-label="catalog">
+          {{svg-jar "catalog" width="18px" height="20px"}}
         </button>
       </li>
       <li>
         <LinkTo
           @route="index"
           data-test-library-link
-          class="ch-button ch-button--icon library"
+          class="ch-button ch-button--icon-secondary"
           title="Library"
-        />
+        >
+          {{svg-jar "library" width="20px" height="38px"}}
+        </LinkTo>
       </li>
     </ul>
   </nav>

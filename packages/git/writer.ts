@@ -1,4 +1,4 @@
-import { Repository, Cred, cloneRepo, RemoteConfig, FetchOptions } from './git';
+import { Repository, Cred, RemoteConfig, FetchOptions } from './git';
 
 import { todo } from '@cardstack/plugin-utils/todo-any';
 
@@ -87,16 +87,12 @@ export default class Writer {
     }
 
     if (remote) {
-      this.fetchOpts = {
-        callbacks: {
-          credentials: (url: string, userName: string) => {
-            if (remote && remote.privateKey) {
-              return Cred.sshKeyMemoryNew(userName, remote.publicKey || '', remote.privateKey, remote.passphrase || '');
-            }
-            return Cred.sshKeyFromAgent(userName);
-          },
-        },
-      };
+      this.fetchOpts = new FetchOptions((url, userName) => {
+        if (remote && remote.privateKey) {
+          return Cred.sshKeyMemoryNew(userName, remote.publicKey || '', remote.privateKey, remote.passphrase || '');
+        }
+        return Cred.sshKeyFromAgent(userName);
+      });
     }
   }
 
@@ -165,7 +161,7 @@ export default class Writer {
       let change = await Change.create(this.repo!, meta.version, this.branchPrefix + defaultBranch, this.fetchOpts);
 
       let file = await change.get(this._filenameFor(type, id, isSchema), { allowUpdate: true });
-      let before = JSON.parse(await file.getBuffer());
+      let before = JSON.parse((await file.getBuffer())!.toString());
       let after = patch(before, document);
       // we don't write id & type into the actual file (they're part
       // of the filename). But we want them present on the
@@ -202,7 +198,7 @@ export default class Writer {
       let change = await Change.create(this.repo!, version, this.branchPrefix + defaultBranch, this.fetchOpts);
 
       let file = await change.get(this._filenameFor(type, id, isSchema));
-      let before = JSON.parse(await file.getBuffer());
+      let before = JSON.parse((await file.getBuffer())!.toString());
       file.delete();
       before.id = id;
       before.type = type;
@@ -245,7 +241,7 @@ export default class Writer {
       if (this.remote) {
         // @ts-ignore promisify not typed well apparently?
         let tempRepoPath = await mkdir('cardstack-temp-repo');
-        this.repo = await cloneRepo(this.remote.url, tempRepoPath, {
+        this.repo = await Repository.clone(this.remote.url, tempRepoPath, {
           fetchOpts: this.fetchOpts!,
         });
         return;

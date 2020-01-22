@@ -30,6 +30,11 @@ module.exports = function(environment) {
   };
 
   if (environment === 'development') {
+    ENV['ember-a11y-testing'] = {
+      componentOptions: {
+        turnAuditOff: true, // set to "false" to see accessibility errors hightlighted in the browser. Even if there are no errors, this impacts performance and can lead to unexpected behavior, so it is recommended to only run the audit on-demand.
+      },
+    };
     // ENV.APP.LOG_RESOLVER = true;
     // ENV.APP.LOG_ACTIVE_GENERATION = true;
     // ENV.APP.LOG_TRANSITIONS = true;
@@ -41,6 +46,7 @@ module.exports = function(environment) {
       'local-hub::event-card',
       'local-hub::job-description',
       'local-hub::job-applicant-profile',
+      'local-hub::event-ticket',
     ];
   }
 
@@ -56,6 +62,18 @@ module.exports = function(environment) {
     ENV.APP.autoboot = false;
 
     ENV.cardTemplates = JSON.parse(process.env.CARD_TEMPLATES || null) || ['local-hub::location-card'];
+
+    ENV.animationSpeed = 20;
+    ENV['@cardstack/ui-components'] = {
+      debounceSpeed: 10,
+    };
+
+    ENV.percy = {
+      breakpointsConfig: {
+        desktop: 1280,
+      },
+      defaultBreakpoints: ['desktop'],
+    };
   }
 
   // if (environment === 'production') {

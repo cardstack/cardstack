@@ -7,27 +7,28 @@
   --padding-bottom: var(--ch-bottom-edge-height);
 
   width: 100%;
-  height: 100vh;
-  transition: var(--ch-card-background-color-animate), var(--ch-card-padding-animate);
+  min-height: 100vh;
   background-color: var(--ch-default);
-  overflow: hidden;
   padding-top: var(--padding-top);
   padding-left: var(--padding-left);
   padding-right: var(--padding-right);
-}
 
-/* TODO: Remove this after right-edge is displayed on edit view */
-.cardhost-cards.edit {
-  --padding-left: var(--ch-left-edge-navbar-width);
-  --padding-right: 0;
+  transition: var(--ch-card-background-color-animate);
 }
 
 .cardhost-cards.view {
-  --padding-left: var(--ch-left-edge-navbar-width);
+  background-color: var(--ch-light-background);
 }
 
 .cardhost-cards.schema {
   background-color: var(--ch-deep-background);
+}
+
+.cardhost-cards.schema .login-btn,
+.cardhost-cards.schema .logout-btn {
+  position: absolute;
+  z-index: var(--ch-edges-z-index);
+  left: calc(var(--ch-left-edge-navbar-width) + var(--ch-left-edge-panel-width) + var(--ch-spacing));
 }
 
 .card-creator,
@@ -35,8 +36,13 @@
 .card-view,
 .card-editor {
   display: grid;
+  justify-content: center;
   align-items: flex-start;
-  justify-items: center;
   height: 100%;
   padding: 0 20px;
+}
+
+.card-view,
+.card-editor {
+  grid-template-columns: 1fr;
 }

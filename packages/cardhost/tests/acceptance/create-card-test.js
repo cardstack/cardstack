@@ -3,6 +3,7 @@ import { click, fillIn, find, visit, currentURL, triggerEvent, focus } from '@em
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures';
 import {
+  showCardId,
   addField,
   setCardId,
   createCards,
@@ -31,6 +32,7 @@ module('Acceptance | card create', function(hooks) {
   scenario.setupTest(hooks);
   hooks.beforeEach(function() {
     this.owner.lookup('service:data')._clearCache();
+    this.owner.lookup('service:card-local-storage').clearIds();
   });
 
   test('new cards get a default id', async function(assert) {
@@ -41,7 +43,7 @@ module('Acceptance | card create', function(hooks) {
 
     await saveCard('creator');
 
-    assert.ok(currentURL().match(/\/cards\/new-card-[0-9]+\/schema/));
+    assert.ok(currentURL().match(/\/cards\/new-card-[0-9]+\/edit\/fields\/schema/));
   });
 
   test('card element is selected on initial render', async function(assert) {
@@ -69,6 +71,7 @@ module('Acceptance | card create', function(hooks) {
 
     await addField('title', 'string', true);
     await setCardId(card1Id);
+    await animationsSettled();
     assert.deepEqual(
       [...document.querySelectorAll(`[data-test-isolated-card="${card1Id}"] [data-test-field]`)].map(i =>
         i.getAttribute('data-test-field')
@@ -97,7 +100,8 @@ module('Acceptance | card create', function(hooks) {
     });
 
     assert.equal(currentURL(), `/cards/${card1Id}`);
-    await visit(`/cards/${card1Id}/schema`);
+    await visit(`/cards/${card1Id}/edit/fields/schema`);
+    await showCardId(true);
     assert.dom('.card-renderer-isolated--header').hasText('millenial-puppies');
     assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
 
@@ -109,16 +113,25 @@ module('Acceptance | card create', function(hooks) {
     await click('[data-test-field="body"] [data-test-field-schema-renderer]');
     assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="body"]').hasClass('selected');
     assert.dom('[data-test-field="body"] [data-test-field-renderer-type]').hasText('body (Text)');
+    assert
+      .dom('[data-test-field="body"] [data-test-field-renderer-type]')
+      .hasAttribute('style', 'background-image: url("/images/field-types/text-field-icon.svg")');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isNotChecked();
 
     await click('[data-test-field="author"] [data-test-field-schema-renderer]');
     assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="author"]').hasClass('selected');
     assert.dom('[data-test-field="author"] [data-test-field-renderer-type]').hasText('author (Single-select)');
+    assert
+      .dom('[data-test-field="author"] [data-test-field-renderer-type]')
+      .hasAttribute('style', 'background-image: url("/images/field-types/dropdown-field-icon.svg")');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     await click('[data-test-field="reviewers"] [data-test-field-schema-renderer]');
     assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="reviewers"]').hasClass('selected');
     assert.dom('[data-test-field="reviewers"] [data-test-field-renderer-type]').hasText('reviewers (Multi-select)');
+    assert
+      .dom('[data-test-field="reviewers"] [data-test-field-renderer-type]')
+      .hasAttribute('style', 'background-image: url("/images/field-types/has-many-field-icon.svg")');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     await focus('[data-test-card-renderer-isolated]');
@@ -127,9 +140,9 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
     // TODO: figure out why having the following assertions before the line above ^^^ causes a test failure
     assert.dom('[data-test-card-renderer-isolated]').hasClass('selected');
-    assert.dom('.field-renderer').doesNotHaveClass('selected');
+    assert.dom('[data-test-field]').doesNotHaveClass('selected');
 
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.title, undefined);
     assert.equal(card.data.attributes.body, undefined);
@@ -145,7 +158,6 @@ module('Acceptance | card create', function(hooks) {
     await setCardId(card1Id);
     await addField('title', 'string', true);
     await addField('body', 'string', false);
-    await animationsSettled();
 
     await click('[data-test-field="title"]');
     await animationsSettled();
@@ -182,9 +194,9 @@ module('Acceptance | card create', function(hooks) {
       .hasValue('This is the subtitle');
 
     await dragAndDropNewField('string');
-    assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="field-2"]').hasClass('selected');
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('field-2');
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('field-2');
+    assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="field-1"]').hasClass('selected');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('field-1');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('field-1');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea').hasValue('');
     await percySnapshot(assert);
   });
@@ -205,17 +217,17 @@ module('Acceptance | card create', function(hooks) {
 
     await saveCard('creator', card1Id);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/schema`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields/schema`);
 
     await visit(`/cards/${card1Id}`);
     assert.dom('[data-test-field="subtitle"] [data-test-string-field-viewer-label]').hasText('Subtitle');
     assert.dom('[data-test-field="title"]').doesNotExist();
 
-    await visit(`/cards/${card1Id}/edit`);
+    await visit(`/cards/${card1Id}/edit/fields`);
     assert.dom('[data-test-field="subtitle"] [data-test-cs-component-label="text-field"]').hasText('Subtitle');
     assert.dom('[data-test-field="title"]').doesNotExist();
 
-    await visit(`/cards/${card1Id}/schema`);
+    await visit(`/cards/${card1Id}/edit/fields/schema`);
     assert.dom('[data-test-field="subtitle"] [data-test-field-renderer-label]').hasText('Subtitle');
     await click('[data-test-field="subtitle"]');
 
@@ -223,16 +235,35 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
   });
 
-  test(`removing a field from a card`, async function(assert) {
+  test(`entering invalid field name shows error`, async function(assert) {
     await login();
     await visit('/cards/new');
 
     await setCardId(card1Id);
     await addField('title', 'string', true);
 
-    await removeField('title');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('title');
+    await fillIn('[data-test-schema-attr="name"] input', 'Title!');
+    await triggerEvent('[data-test-schema-attr="name"] input', 'keyup');
 
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('Title!');
+    assert.dom('[data-test-schema-attr="name"] input').hasClass('invalid');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Title');
+    assert
+      .dom('[data-test-right-edge] [data-test-schema-attr="name"] [data-test-cs-component-validation="text-field"]')
+      .hasText('Can only contain letters, numbers, dashes, and underscores.');
+
+    await percySnapshot(assert);
+  });
+
+  test(`removing a field from a card`, async function(assert) {
+    await login();
+    await visit('/cards/new');
+    await setCardId(card1Id);
+    await addField('title', 'string', true);
+    await removeField('title');
     assert.dom('.cardhost-right-edge-panel [data-test-field]').doesNotExist();
+    await animationsSettled();
     await percySnapshot(assert);
   });
 
@@ -245,6 +276,7 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-isolated-card] [data-test-field').exists({ count: 1 });
 
     await click(`[data-test-isolated-card] [data-test-field-renderer-remove-btn]`);
+    await animationsSettled();
     assert.dom('[data-test-isolated-card] [data-test-field').doesNotExist();
   });
 
@@ -273,7 +305,7 @@ module('Acceptance | card create', function(hooks) {
       [...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
       ['title', 'author', 'body']
     );
-    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block');
+    let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.deepEqual(card.data.relationships.fields.data, [
       { type: 'fields', id: 'title' },

@@ -36,10 +36,8 @@ export default class FieldRenderer extends Component {
     return this.args.field.type.replace(/::/g, '/').replace(/@/g, '');
   }
 
-  get fieldTypeTitle() {
-    let { title } = fieldComponents.find(el => el.coreType === this.args.field.type);
-
-    return title;
+  get fieldType() {
+    return fieldComponents.find(el => el.coreType === this.args.field.type);
   }
 
   @action
@@ -63,7 +61,15 @@ export default class FieldRenderer extends Component {
   }
 
   get dasherizedType() {
-    return dasherize(this.sanitizedType.replace(/\//g, '-'));
+    return dasherize(this.args.field.type.replace(/@cardstack\/core-types::/g, ''));
+  }
+
+  get friendlyType() {
+    if (this.dasherizedType === 'case-insensitive' || this.dasherizedType === 'string') {
+      return 'text';
+    }
+
+    return '';
   }
 
   get fieldViewer() {
@@ -76,8 +82,14 @@ export default class FieldRenderer extends Component {
 
   @action
   updateFieldName(newName) {
-    this.newFieldName = newName;
-    this.args.setFieldName(this.args.field.name, this.newFieldName);
+    try {
+      this.args.setFieldName(this.args.field.name, newName);
+      this.newFieldName = newName;
+    } catch (e) {
+      console.error(e); // eslint-disable-line no-console
+      this.statusMsg = `field name ${this.args.field.name} was NOT successfully changed: ${e.message}`;
+      return;
+    }
   }
 
   @action
@@ -93,9 +105,9 @@ export default class FieldRenderer extends Component {
   }
 
   @action
-  selectField(field) {
+  selectField(field, evt) {
     if (this.args.selectField) {
-      this.args.selectField(field);
+      this.args.selectField(field, evt);
     }
   }
 

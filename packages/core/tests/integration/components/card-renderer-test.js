@@ -92,6 +92,9 @@ module('Integration | Component | card-renderer', function(hooks) {
       [...this.element.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
       ['title', 'author']
     );
+    assert.dom(`[data-test-card-renderer-embedded]`).hasClass('card-renderer-embedded');
+    assert.dom(`[data-test-embedded-card="${card1Id}"]`).hasClass('cardstack_base-card-embedded');
+    assert.dom(`[data-test-embedded-card="${card1Id}"]`).hasClass(`${card1Id}-embedded`);
   });
 
   test('it renders isolated card', async function(assert) {
@@ -130,6 +133,9 @@ module('Integration | Component | card-renderer', function(hooks) {
       [...this.element.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
       ['title', 'author', 'body']
     );
+    assert.dom(`[data-test-card-renderer-isolated]`).hasClass('card-renderer-isolated');
+    assert.dom(`[data-test-isolated-card="${card1Id}"].isolated-card.cardstack_base-card-isolated`).exists();
+    assert.dom(`[data-test-isolated-card="${card1Id}"]`).hasClass(`${card1Id}-isolated`);
   });
 
   test('it renders an isolated card that adopts from another card', async function(assert) {
@@ -149,6 +155,8 @@ module('Integration | Component | card-renderer', function(hooks) {
 
     assert.dom(`[data-test-card-renderer-isolated]`).hasClass('event-card');
     assert.dom(`[data-test-card-renderer-isolated]`).hasClass('burcu-birthday-card');
+    assert.dom(`[data-test-isolated-card]`).hasClass(`event-card-isolated`);
+    assert.dom(`[data-test-isolated-card]`).hasClass(`burcu-birthday-card-isolated`);
   });
 
   test('it renders an embedded card that adopts from another card', async function(assert) {
@@ -168,6 +176,8 @@ module('Integration | Component | card-renderer', function(hooks) {
 
     assert.dom(`[data-test-card-renderer-embedded]`).hasClass('event-card');
     assert.dom(`[data-test-card-renderer-embedded]`).hasClass('burcu-birthday-card');
+    assert.dom(`[data-test-embedded-card]`).hasClass(`event-card-embedded`);
+    assert.dom(`[data-test-embedded-card]`).hasClass(`burcu-birthday-card-embedded`);
   });
 
   test('embedded card is wrapped with a link in view mode', async function(assert) {
@@ -182,8 +192,9 @@ module('Integration | Component | card-renderer', function(hooks) {
         @mode="view"
       />
     `);
+    assert.dom('[data-test-card-renderer-embedded]').exists();
     assert.dom(`.card-renderer--embedded-card-link`).exists();
-    assert.dom('.embedded-card.cardstack_base-card').exists();
+    assert.dom(`[data-test-embedded-card=${card1Id}]`).exists();
   });
 
   test('it can render an embedded card without the ability to isolate it', async function(assert) {
@@ -199,8 +210,9 @@ module('Integration | Component | card-renderer', function(hooks) {
         @mode="view"
       />
     `);
+    assert.dom('[data-test-card-renderer-embedded]').exists();
     assert.dom(`.card-renderer--embedded-card-link`).doesNotExist();
-    assert.dom('.embedded-card.cardstack_base-card').exists();
+    assert.dom(`[data-test-embedded-card=${card1Id}]`).exists();
   });
 
   test('embedded card does not have a link to isolated card route in edit mode', async function(assert) {
@@ -215,8 +227,9 @@ module('Integration | Component | card-renderer', function(hooks) {
         @mode="edit"
       />
     `);
+    assert.dom(`[data-test-card-renderer-embedded]`).exists();
     assert.dom(`.card-renderer--embedded-card-link`).doesNotExist();
-    assert.dom('.embedded-card.cardstack_base-card').exists();
+    assert.dom(`[data-test-embedded-card=${card1Id}]`).exists();
   });
 
   test('embedded card does not have a link to isolated card route in schema mode', async function(assert) {
@@ -232,7 +245,7 @@ module('Integration | Component | card-renderer', function(hooks) {
       />
     `);
     assert.dom(`.card-renderer--embedded-card-link`).doesNotExist();
-    assert.dom('.embedded-card.cardstack_base-card').exists();
+    assert.dom(`[data-test-embedded-card=${card1Id}]`).exists();
   });
 
   test('renders an isolated card in edit mode', async function(assert) {
@@ -433,20 +446,35 @@ module('Integration | Component | card-renderer', function(hooks) {
         @format="embedded"
         @mode="view"
         @showName={{true}}
-      />
-    `);
+        />
+      `);
     assert.dom('.embedded-card-label').hasText(card1Id);
   });
 
   test('isolated card can be selected', async function(assert) {
+    let service = this.owner.lookup('service:data');
+    let card = service.createCard(qualifiedCard1Id);
+    this.set('card', card);
+
     await render(hbs`
       <CardRenderer
+        @card={{card}}
         @format="isolated"
         @cardSelected={{true}}
       />
     `);
 
     assert.dom('[data-test-card-renderer-isolated]').hasClass('selected');
+  });
+
+  test('display message if no @card attribute', async function(assert) {
+    await render(hbs`
+      <CardRenderer
+        @format="isolated"
+        @cardSelected={{true}}
+      />
+    `);
+    assert.dom('[data-test-missing-card]').hasTextContaining('must specify a @card attribute');
   });
 
   skip('TODO it adds isolated css into the page when rendering an isolated card', async function(/*assert*/) {});

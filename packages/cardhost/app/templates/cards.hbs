@@ -1,18 +1,38 @@
-{{#let this.target.currentRoute.localName as |mode|}}
-  <div class="
-    cardhost-cards
-    {{mode}}
-    {{if (or (eq mode "add") (eq mode "adopt")) "schema"}}
-    {{this.themerClasses}}"
-    data-test-cardhost-cards>
-    {{#if (not this.cssModeToggle.editingCss)}}
-      <CardhostTopEdge @mode={{mode}}>
-        {{#if (or (eq mode "schema") (eq mode "edit") (eq mode "view"))}}
-          <ViewSwitcher @mode={{mode}} @cardId={{this.target.currentRoute.params.id}} />
-        {{/if}}
-      </CardhostTopEdge>
-    {{/if}}
-
-    {{outlet}}
-  </div>
-{{/let}}
+<div class="
+  cardhost-cards
+  {{this.routeInfo.mode}}
+  {{if (or (eq this.routeInfo.mode "add") (eq this.routeInfo.mode "adopt")) "schema"}}
+  {{if (or (eq this.routeInfo.mode "layout") (eq this.routeInfo.mode "fields")) "edit"}}
+  {{if this.cardstackSession.isAuthenticated "logged-in" "logged-out"}}
+  {{this.themerClasses}}"
+  data-test-cardhost-cards>
+  {{#if (and (not-eq this.routeInfo.mode "view") (not-eq this.routeInfo.mode "themer"))}}
+    <CardhostTopEdge @mode={{this.routeInfo.mode}}>
+      {{#if (or (eq this.routeInfo.mode "layout") (eq this.routeInfo.mode "fields"))}}
+        {{#let this.target.currentRoute.parent.attributes as |card|}}
+          <div class="view-selector">
+            <LinkTo
+              @route="cards.card.edit.layout"
+              @class="view-selector--mode-link"
+              @model={{card}}
+              data-test-view-selector="layout"
+            >
+              {{svg-jar "layout" width="18px" height="17px"}}
+              Layout
+            </LinkTo>
+            <LinkTo
+              @route="cards.card.edit.fields"
+              @class="view-selector--mode-link"
+              @model={{card}}
+              data-test-view-selector="fields"
+            >
+              {{svg-jar "form" width="18px" height="17px"}}
+              Field
+            </LinkTo>
+          </div>
+        {{/let}}
+      {{/if}}
+    </CardhostTopEdge>
+  {{/if}}
+  {{outlet}}
+</div>

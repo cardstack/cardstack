@@ -3,6 +3,8 @@ import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 
 export default class ViewSwitcher extends Component {
+  @service cardstackSession;
+
   views = [
     {
       id: 'view',
@@ -35,8 +37,8 @@ export default class ViewSwitcher extends Component {
   selectView(view) {
     this.selected = view;
 
-    if (this.args.cardId) {
-      this.router.transitionTo(`cards.${view.id}`, this.args.cardId);
+    if (this.args.card) {
+      this.router.transitionTo(`cards.card.${view.id}`, this.args.card);
     }
   }
 }

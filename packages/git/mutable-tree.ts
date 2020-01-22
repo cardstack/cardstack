@@ -2,12 +2,30 @@
 // not-yet-written tree. But you can't recursively put a Treebuilder
 // inside a Treebuilder. That's where this class comes in.
 
-import { Treebuilder, FILEMODE, Repository, Oid, Tree, TreeEntry as NodeGitTreeEntry, Blob } from './git';
+import { Treebuilder, FILEMODE, Repository, Oid, Tree, TreeEntry as ConcreteTreeEntry, Blob } from './git';
 import { todo } from '@cardstack/plugin-utils/todo-any';
 
-const tombstone = undefined;
+interface Tombstone {
+  tombstone: boolean;
+  isTree: Function;
+  getTree: Function;
+}
+const tombstone: Tombstone = {
+  tombstone: true,
+  isTree() {
+    return false;
+  },
+  getTree() {},
+};
 
-type TreeEntry = NodeGitTreeEntry | NewEntry | MutableEntryWrapper | MutableTree | MutableBlob | undefined;
+export type TreeEntry =
+  | ConcreteTreeEntry
+  | NewEntry
+  | MutableEntryWrapper
+  | MutableTree
+  | MutableBlob
+  | Tombstone
+  | undefined;
 
 class MutableTree {
   overlay: Map<string, TreeEntry>;
@@ -23,10 +41,10 @@ class MutableTree {
     let result;
     let entry;
     if (this.tree) {
-      entry = safeEntryByName(this.tree, name);
+      entry = this.tree.entryByName(name);
     }
     if (entry) {
-      result = new MutableEntryWrapper(this.repo, entry);
+      result = new MutableEntryWrapper(this.repo, entry as ConcreteTreeEntry);
     }
     this.overlay.set(name, result);
     return result;
@@ -36,7 +54,7 @@ class MutableTree {
     return this.entryByName(name);
   }
 
-  insert(filename: string, object: TreeEntry, filemode: FILEMODE) {
+  insert(filename: string, object: TreeEntry | Buffer, filemode: FILEMODE) {
     let entry = new NewEntry(this.repo, object, filemode);
     this.overlay.set(filename, entry);
     return entry;
@@ -134,14 +152,14 @@ class MutableBlob {
     return null;
   }
   async write() {
-    return this.repo.createBlobFromBuffer(this.buffer);
+    return await this.repo.createBlobFromBuffer(this.buffer);
   }
 }
 
 class MutableEntryWrapper {
   _mutableTree?: MutableTree;
 
-  constructor(readonly repo: Repository, readonly entry: NodeGitTreeEntry) {}
+  constructor(readonly repo: Repository, readonly entry: ConcreteTreeEntry) {}
   filemode() {
     return this.entry!.filemode();
   }
@@ -172,12 +190,12 @@ class MutableEntryWrapper {
   }
 }
 
-class NewEntry {
+export class NewEntry {
   _filemode: FILEMODE;
   _object: TreeEntry;
   savedId?: Oid;
 
-  constructor(readonly repo: Repository, object: TreeEntry, filemode: FILEMODE) {
+  constructor(readonly repo: Repository, object: TreeEntry | Buffer, filemode: FILEMODE) {
     this._filemode = filemode;
 
     if (this.isTree() && !(object instanceof MutableTree)) {
@@ -185,7 +203,7 @@ class NewEntry {
     } else if (this.isBlob() && object instanceof Buffer) {
       this._object = new MutableBlob(repo, object);
     } else {
-      this._object = object;
+      this._object = object as TreeEntry;
     }
   }
   filemode() {
@@ -198,7 +216,7 @@ class NewEntry {
     return this._filemode & FILEMODE.TREE;
   }
   async getBlob() {
-    return this._object;
+    return this._object as MutableBlob;
   }
   async getTree() {
     return this._object;
@@ -211,7 +229,7 @@ class NewEntry {
     return this.savedId;
   }
 
-  async _write() {
+  async _write(): Promise<Oid | undefined> {
     if (this.isBlob()) {
       if (this._object instanceof MutableBlob) {
         return this._object.write();
@@ -227,15 +245,4 @@ class NewEntry {
 class NotFound extends Error {}
 class OverwriteRejected extends Error {}
 
-export { MutableTree, MutableBlob, safeEntryByName, NotFound, OverwriteRejected };
-
-function safeEntryByName(tree: todo, name: string) {
-  // This is apparently private API. There's unfortunately no public
-  // API for gracefully attempting to retriee and entry that may be
-  // absent.
-  let entry = tree!._entryByName(name);
-  if (entry) {
-    entry.parent = tree;
-  }
-  return entry;
-}
+export { MutableTree, MutableBlob, NotFound, OverwriteRejected };

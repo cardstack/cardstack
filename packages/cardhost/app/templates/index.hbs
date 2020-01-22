@@ -52,7 +52,7 @@
         {{#each this.model.templates as |card|}}
           <LinkTo
             @class="card-renderer--embedded-card-link"
-            @route="cards.adopt"
+            @route="cards.card.adopt"
             @model={{card.name}}
             data-test-embedded-card={{card.name}}
           >

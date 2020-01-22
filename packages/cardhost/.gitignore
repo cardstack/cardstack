@@ -26,4 +26,3 @@
 
 # cardstack-specific
 /.embroider-app-path
-/app/components/cards/**/*

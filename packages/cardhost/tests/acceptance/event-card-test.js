@@ -40,6 +40,7 @@ module('Acceptance | event card', function(hooks) {
 
   hooks.beforeEach(async function() {
     this.owner.lookup('service:data')._clearCache();
+    this.owner.lookup('service:card-local-storage').clearIds();
     // Until we have searching capabilities, we'll just render the contents of the
     // local store. So the first step is to warm up the store.
     await login();

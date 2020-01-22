@@ -6,6 +6,6 @@ export default class CardsIndexController extends Controller {
 
   @action
   viewCard(id) {
-    this.router.transitionTo('cards.view', id);
+    this.router.transitionTo('cards.card.view', id);
   }
 }

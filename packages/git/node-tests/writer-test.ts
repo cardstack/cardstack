@@ -14,7 +14,6 @@ import { promisify } from 'util';
 const realpathPromise = promisify(realpath);
 
 import { todo } from '@cardstack/plugin-utils/todo-any';
-
 describe('git/writer', function() {
   let env: todo, writers: todo, cardServices: todo, repoPath: string, head: string;
 
@@ -112,7 +111,7 @@ describe('git/writer', function() {
 
   afterEach(async function() {
     await temp.cleanup();
-    await cardServices._setupPromise;
+    await (cardServices && cardServices._setupPromise);
     await destroyDefaultEnvironment(env);
   });
 
