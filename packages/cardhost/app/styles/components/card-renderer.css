@@ -158,6 +158,10 @@
   padding: 30px;
 }
 
+.card-renderer-isolated.themer .card-renderer-isolated--card-container {
+  border: none;
+}
+
 
 /* Focus state */
 .card-renderer-isolated:focus {
