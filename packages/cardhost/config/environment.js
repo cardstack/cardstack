@@ -47,6 +47,7 @@ module.exports = function(environment) {
       'local-hub::job-description',
       'local-hub::job-applicant-profile',
       'local-hub::event-ticket',
+      'local-hub::product-card',
     ];
   }
 

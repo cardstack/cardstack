@@ -328,10 +328,104 @@ let eventTicketTemplate = eventFactory.getDocumentFor(
     )
 );
 
+let productCardTemplate = eventFactory.getDocumentFor(
+  eventFactory
+    .addResource('cards', 'local-hub::product-card')
+    .withRelated('adopted-from', { type: 'cards', id: 'local-hub::@cardstack/base-card' })
+    .withRelated('fields', [
+      eventFactory.addResource('fields', 'title').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::string',
+        'needed-when-embedded': true,
+        required: true,
+        caption: 'Title',
+      }),
+      eventFactory.addResource('fields', 'highlight-title').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: false,
+        caption: 'Highlight Title',
+      }),
+      eventFactory.addResource('fields', 'divider').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::boolean',
+        'needed-when-embedded': false,
+        caption: 'Divider',
+      }),
+      eventFactory.addResource('fields', 'product-ranking').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::integer',
+        required: false,
+        caption: 'Score',
+      }),
+      eventFactory.addResource('fields', 'product-company').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::string',
+        'needed-when-embedded': false,
+        required: false,
+        caption: 'Company',
+      }),
+      eventFactory.addResource('fields', 'product-company-logo').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::decorative-image',
+        'needed-when-embedded': true,
+        required: false,
+        caption: 'Logo',
+      }),
+      eventFactory.addResource('fields', 'product-name').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::string',
+        required: false,
+        caption: 'Coffee bean',
+      }),
+      eventFactory.addResource('fields', 'product-image').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::decorative-image',
+        'needed-when-embedded': true,
+        required: false,
+        caption: 'Product image',
+      }),
+      eventFactory.addResource('fields', 'product-description').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: false,
+        caption: 'Description',
+      }),
+      eventFactory.addResource('fields', 'product-link').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::link',
+        required: true,
+        caption: 'View Details',
+      }),
+      eventFactory.addResource('fields', 'product-cta').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::cta',
+        required: true,
+        caption: 'Buy Now',
+      }),
+    ])
+    .withRelated(
+      'model',
+      eventFactory.addResource('local-hub::product-card', 'local-hub::product-card').withAttributes({
+        title: 'Coffee Bean Award 2020 Winners',
+        highlightTitle: '2nd Place',
+        divider: true,
+        productRanking: 2,
+        productCompany: 'Ultra Strong Coffee',
+        productCompanyLogo: '/assets/images/cards/coffee-bean/coffee-logo.svg',
+        productName: 'Kenian Devil Roast',
+        productImage: '/assets/images/cards/coffee-bean/coffee-image.svg',
+        productDescription:
+          'Pleasant aroma, deep acidity, and a unique bergamot flavor – this is a coffee that won’t let you sleep. It is grown in the volcanic soils around Mt. Kenya.',
+      })
+    )
+);
+
 module.exports = [
   locationCardTemplate,
   eventCardTemplate,
   jobCardTemplate,
   jobApplicantProfileTemplate,
   eventTicketTemplate,
+  productCardTemplate,
 ];
