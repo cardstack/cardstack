@@ -194,9 +194,9 @@ module('Acceptance | card create', function(hooks) {
       .hasValue('This is the subtitle');
 
     await dragAndDropNewField('string');
-    assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="field-2"]').hasClass('selected');
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('field-2');
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('field-2');
+    assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="field-1"]').hasClass('selected');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('field-1');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('field-1');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea').hasValue('');
     await percySnapshot(assert);
   });
@@ -259,13 +259,11 @@ module('Acceptance | card create', function(hooks) {
   test(`removing a field from a card`, async function(assert) {
     await login();
     await visit('/cards/new');
-
     await setCardId(card1Id);
     await addField('title', 'string', true);
-
     await removeField('title');
-
     assert.dom('.cardhost-right-edge-panel [data-test-field]').doesNotExist();
+    await animationsSettled();
     await percySnapshot(assert);
   });
 
