@@ -71,7 +71,9 @@
 .card-renderer-isolated--header {
   display: flex;
   justify-content: space-between;
-  padding: 14px 20px;
+  align-items: center;
+  padding: 0 20px;
+  height: 50px;
   color: var(--ch-light-op50);
   background-color: var(--ch-dark-background);
   border: 3px solid var(--ch-dark-background);
@@ -100,6 +102,13 @@
 .card-renderer-isolated.themer .card-renderer-isolated--header {
   background-color: var(--ch-default);
   border-color: var(--ch-default);
+}
+
+.card-renderer-isolated--header .card-renderer--header-link {
+  text-transform: uppercase;
+  padding: 0 5px;
+  border: solid 2px var(--ch-dark);
+  border-radius: 5px;
 }
 
 /* Card Renderer - Outer Wrapper */

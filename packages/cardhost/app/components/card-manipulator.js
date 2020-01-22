@@ -7,9 +7,6 @@ import { startCase } from 'lodash';
 import { task } from 'ember-concurrency';
 import ENV from '@cardstack/cardhost/config/environment';
 import { fieldTypeMappings, fieldComponents } from '@cardstack/core/utils/mappings';
-import move from 'ember-animated/motions/move';
-import resize from 'ember-animated/motions/resize';
-import { printSprites } from 'ember-animated';
 
 const { environment } = ENV;
 const duration = 250;
@@ -241,14 +238,5 @@ export default class CardManipulator extends Component {
   @action startDragging(field, evt) {
     evt.dataTransfer.setData('text', evt.target.id);
     evt.dataTransfer.setData('text/type', field.type);
-  }
-
-  *cardAnimation({ sentSprites, receivedSprites }) {
-    printSprites(arguments[0], 'card animation');
-
-    sentSprites.concat(receivedSprites).forEach(sprite => {
-      move(sprite, { duration });
-      resize(sprite, { duration });
-    });
   }
 }
