@@ -24,13 +24,6 @@
   background-color: var(--ch-deep-background);
 }
 
-.cardhost-cards.schema .login-btn,
-.cardhost-cards.schema .logout-btn {
-  position: absolute;
-  z-index: var(--ch-edges-z-index);
-  left: calc(var(--ch-left-edge-navbar-width) + var(--ch-left-edge-panel-width) + var(--ch-spacing));
-}
-
 .card-creator,
 .card-schema-updator,
 .card-view,
