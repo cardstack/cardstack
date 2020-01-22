@@ -80,3 +80,9 @@
   top: -10px;
   cursor: se-resize;
 }
+
+/* change this when we make this drag accessible */
+
+.resizer:focus {
+  outline: none;
+}
