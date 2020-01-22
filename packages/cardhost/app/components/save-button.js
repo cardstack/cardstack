@@ -58,13 +58,18 @@ export default class SaveButton extends Component {
   }
 
   @action
-  save(element, [isDirty]) {
+  autoSave(element, [isDirty]) {
     if (isDirty && !this.cardIsNew) {
-      if (this.args.clickAction) {
-        this.args.clickAction();
-      } else {
-        this.debounceAndSave.perform();
-      }
+      this.save();
+    }
+  }
+
+  @action
+  save() {
+    if (this.args.clickAction) {
+      this.args.clickAction();
+    } else {
+      this.debounceAndSave.perform();
     }
   }
 }
