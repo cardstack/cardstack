@@ -5,7 +5,7 @@
     background-image: url('/assets/images/cards/wedding-invitation/wedding-rect.svg'), url('/assets/images/cards/wedding-invitation/wedding-roses.svg');
     background-repeat: no-repeat;
     background-position: top 40% center, 50% -420px;
-    background-size: 280px, 100%;
+    background-size: 280px, contain;
 }
 
 .field {
