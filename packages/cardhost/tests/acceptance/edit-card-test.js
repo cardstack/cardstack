@@ -94,7 +94,7 @@ module('Acceptance | card edit', function(hooks) {
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await visit(`/cards/${card1Id}`);
-    assert.dom('[data-test-field="created"] [data-test-date-field-viewer-value]').hasText(`2019-10-08`);
+    assert.dom('[data-test-field="created"] [data-test-date-field-viewer-value]').hasText(`October 8, 2019`);
 
     let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
