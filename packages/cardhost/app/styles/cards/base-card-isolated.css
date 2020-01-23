@@ -90,8 +90,15 @@
   text-transform: capitalize;
 }
 
+/* Link type */
+.cardstack_base-card-isolated .link-viewer {
+  color: var(--cobalt-blue);
+  text-decoration: underline;
+  font-weight: 600;
+}
+
 /* CTA type */
-.cardstack_base-card-isolated .cta {
+.cardstack_base-card-isolated .cta-viewer {
   min-height: 45px;
   border-radius: 6px;
   font-size: 15px;
@@ -101,6 +108,8 @@
   padding-top: 11px;
   padding-bottom: 11px;
 }
+
+
 
 
 /* TODO: figure out how to deal with styling components */
@@ -113,5 +122,12 @@
   display: none;
 }
 .cardstack_base-card-isolated .divider-value {
+  display: none;
+}
+
+
+
+/* Wedding Invitation Base Card */
+.cardstack_base-card-isolated .wedding-intro-text-field {
   display: none;
 }
