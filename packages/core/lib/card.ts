@@ -1,6 +1,5 @@
 import CardstackError from './error';
-import { WriterFactory } from './writer';
-import { PristineDocument, UpstreamDocument, UpstreamIdentity, PristineCollection } from './document';
+import { PristineDocument, UpstreamDocument, UpstreamIdentity, PristineCollection, ResponseMeta } from './document';
 import {
   SingleResourceDoc,
   RelationshipObject,
@@ -17,13 +16,7 @@ import uniqBy from 'lodash/uniqBy';
 import difference from 'lodash/difference';
 import intersection from 'lodash/intersection';
 import isObjectLike from 'lodash/isObjectLike';
-import { ResponseMeta } from './pgsearch/pgclient';
 import * as J from 'json-typescript';
-import { IndexerFactory } from './indexer';
-import { ScopedCardService } from './cards-service';
-import * as FieldHooks from './field-hooks';
-import { inject, getOwner } from './dependency-injection';
-import { Memoize } from 'typescript-memoize';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
 import {
   OcclusionRules,
@@ -34,6 +27,14 @@ import {
   InnerOcclusionRulesOrDefaults,
   Format,
 } from './occlusion-rules';
+import { Container } from './container';
+import { ModuleLoader } from './module-loader';
+import { CardReader } from './card-reader';
+import { CardInstantiator } from './card-instantiator';
+import { Memoize } from 'typescript-memoize';
+import * as FieldHooks from './field-hooks';
+import { WriterFactory } from './writer';
+import { IndexerFactory } from './indexer';
 
 export const apiPrefix = '/api';
 
@@ -75,7 +76,6 @@ export async function makePristineCollection(
   rules: OcclusionRules | undefined
 ): Promise<PristineCollection> {
   let pristineDocs = await Promise.all(cards.map(card => card.asPristineDoc(rules)));
-  // TODO includeds
   return new PristineCollection({
     data: pristineDocs.map(doc => doc.jsonapi.data),
     meta: (meta as unknown) as J.Object,
@@ -83,8 +83,6 @@ export async function makePristineCollection(
 }
 
 export class Card {
-  modules = inject('modules');
-
   // This is the realm the card is stored in.
   readonly csRealm: string;
 
@@ -129,7 +127,9 @@ export class Card {
     jsonapi: SingleResourceDoc,
     realm: string,
     enclosingCard: Card | undefined,
-    protected service: ScopedCardService
+    protected reader: CardReader,
+    protected modules: ModuleLoader,
+    protected container: Container
   ) {
     if (typeof jsonapi.data.attributes === 'object' && typeof jsonapi.data.relationships === 'object') {
       let dupeFields = intersection(Object.keys(jsonapi.data.attributes), Object.keys(jsonapi.data.relationships));
@@ -315,9 +315,9 @@ export class Card {
     } else {
       let refs = rawData.ref;
       if (refs != null && Array.isArray(refs)) {
-        return await Promise.all(refs.map(ref => this.service.get(ref)));
+        return await Promise.all(refs.map(ref => this.reader.get(ref)));
       } else if (refs != null) {
-        return await this.service.get(refs);
+        return await this.reader.get(refs);
       }
     }
   }
@@ -326,12 +326,14 @@ export class Card {
   async field(name: string): Promise<FieldCard> {
     if (this.csFields) {
       if (name in this.csFields) {
-        return await getOwner(this).instantiate(
+        return await this.container.instantiate(
           FieldCard,
           merge({ data: { type: 'cards' } }, { data: this.csFields[name] }),
           name,
           this,
-          this.service
+          this.reader,
+          this.modules,
+          this.container
         );
       }
     }
@@ -450,7 +452,7 @@ export class Card {
       let foundMoreIncluded = new Map<string, OcclusionRulesOrDefaults[]>();
       await Promise.all(
         [...included].map(async ([canonicalURL, rulesArray]) => {
-          let card = await this.service.get(canonicalURL);
+          let card = await this.reader.get(canonicalURL);
           let rules = mergeRules(rulesArray);
           resources.push(await card.serialize(rules, foundMoreIncluded));
         })
@@ -495,18 +497,28 @@ export class Card {
       if (Array.isArray(data)) {
         attributes[field] = await Promise.all(
           data.map(async cardValue => {
-            let interiorCard = await getOwner(this).instantiate(
+            let interiorCard = await this.container.instantiate(
               Card,
               { data: cardValue },
               this.csRealm,
               this,
-              this.service
+              this.reader,
+              this.modules,
+              this.container
             );
             return (await interiorCard.asInteriorCard(interiorRule, included)) as J.Value;
           })
         );
       } else {
-        let interiorCard = await getOwner(this).instantiate(Card, { data }, this.csRealm, this, this.service);
+        let interiorCard = await this.container.instantiate(
+          Card,
+          { data },
+          this.csRealm,
+          this,
+          this.reader,
+          this.modules,
+          this.container
+        );
         attributes[field] = (await interiorCard.asInteriorCard(interiorRule, included)) as J.Value;
       }
     }
@@ -689,7 +701,15 @@ export class Card {
 
   async patch(otherDoc: SingleResourceDoc): Promise<Card> {
     let newDoc = mergeWith({}, (await this.asUpstreamDoc()).jsonapi, otherDoc, everythingButMeta);
-    return await getOwner(this).instantiate(Card, newDoc, this.csRealm, this.enclosingCard, this.service);
+    return await this.container.instantiate(
+      Card,
+      newDoc,
+      this.csRealm,
+      this.enclosingCard,
+      this.reader,
+      this.modules,
+      this.container
+    );
   }
 
   // This is the way that data source plugins think about card IDs. The
@@ -730,7 +750,7 @@ export class Card {
       return card;
     }
 
-    return await this.service.get({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' });
+    return await this.reader.get({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' });
   }
 
   async loadFeature(featureName: 'writer'): Promise<WriterFactory | null>;
@@ -739,7 +759,7 @@ export class Card {
   async loadFeature(featureName: 'field-deserialize'): Promise<null | FieldHooks.deserialize<unknown, unknown>>;
   async loadFeature(featureName: 'field-buildValueExpression'): Promise<null | FieldHooks.buildValueExpression>;
   async loadFeature(featureName: 'field-buildQueryExpression'): Promise<null | FieldHooks.buildQueryExpression>;
-  async loadFeature(featureName: any): Promise<any> {
+  async loadFeature(featureName: string): Promise<any> {
     let card: Card | undefined = this;
     while (card) {
       if (card.csFeatures && featureName in card.csFeatures) {
@@ -764,13 +784,20 @@ export class Card {
 }
 
 export class UnsavedCard extends Card {
-  constructor(jsonapi: SingleResourceDoc, realm: string, protected service: ScopedCardService) {
-    super(jsonapi, realm, undefined, service);
+  constructor(
+    jsonapi: SingleResourceDoc,
+    realm: string,
+    protected reader: CardReader,
+    modules: ModuleLoader,
+    container: Container,
+    private cardInstantiator: CardInstantiator
+  ) {
+    super(jsonapi, realm, undefined, reader, modules, container);
   }
 
   async asAddressableCard(patch: SingleResourceDoc): Promise<AddressableCard> {
     let newDoc = mergeWith({}, (await this.asUpstreamDoc()).jsonapi, patch, everythingButMeta);
-    return await this.service.instantiate(newDoc);
+    return await this.cardInstantiator.instantiate(newDoc);
   }
 }
 
@@ -778,8 +805,15 @@ export class FieldCard extends Card {
   readonly enclosingCard: Card;
   readonly csFieldArity: 'singular' | 'plural' = 'singular';
 
-  constructor(jsonapi: SingleResourceDoc, readonly name: string, enclosingCard: Card, service: ScopedCardService) {
-    super(jsonapi, enclosingCard.csRealm, enclosingCard, service);
+  constructor(
+    jsonapi: SingleResourceDoc,
+    readonly name: string,
+    enclosingCard: Card,
+    reader: CardReader,
+    modules: ModuleLoader,
+    container: Container
+  ) {
+    super(jsonapi, enclosingCard.csRealm, enclosingCard, reader, modules, container);
     this.enclosingCard = enclosingCard;
     if (typeof jsonapi.data.attributes?.csFieldArity === 'string') {
       this.csFieldArity = jsonapi.data.attributes?.csFieldArity === 'plural' ? 'plural' : 'singular';
@@ -868,7 +902,7 @@ export class FieldCard extends Card {
     let newReferences = Array.isArray(newReferenceOrReferences) ? newReferenceOrReferences : [newReferenceOrReferences];
     await Promise.all(
       newReferences.map(async newRef => {
-        let referencedCard = await this.service.get(newRef); // let a 404 error be thrown when not found
+        let referencedCard = await this.reader.get(newRef); // let a 404 error be thrown when not found
         let card = referencedCard;
         while (card) {
           let parent = await card.adoptsFrom();
@@ -905,7 +939,13 @@ export class AddressableCard extends Card implements CardId {
   readonly csId!: string;
   readonly upstreamId!: NonNullable<Card['upstreamId']>;
 
-  constructor(jsonapi: SingleResourceDoc, service: ScopedCardService, identity?: CardId) {
+  constructor(
+    jsonapi: SingleResourceDoc,
+    reader: CardReader,
+    modules: ModuleLoader,
+    container: Container,
+    identity?: CardId
+  ) {
     let actualRealm = identity?.csRealm ?? jsonapi.data.attributes?.csRealm;
     if (typeof actualRealm !== 'string') {
       throw new CardstackError(`card missing required attribute "csRealm": ${JSON.stringify(jsonapi)}`);
@@ -918,7 +958,7 @@ export class AddressableCard extends Card implements CardId {
       jsonapi.data.attributes!.csId = identity.csId;
     }
 
-    super(jsonapi, actualRealm, undefined, service);
+    super(jsonapi, actualRealm, undefined, reader, modules, container);
 
     if ((this as any).csId == null) {
       throw new Error(`Bug: tried to use an UnsavedCard as a Card`);
@@ -927,7 +967,7 @@ export class AddressableCard extends Card implements CardId {
 
   async patch(otherDoc: SingleResourceDoc): Promise<AddressableCard> {
     let newDoc = mergeWith({}, (await this.asUpstreamDoc()).jsonapi, otherDoc, everythingButMeta);
-    return await getOwner(this).instantiate(AddressableCard, newDoc, this.service);
+    return await this.container.instantiate(AddressableCard, newDoc, this.reader, this.modules, this.container);
   }
 
   get canonicalURL(): string {
@@ -940,6 +980,7 @@ export interface CardId {
   csOriginalRealm?: string; // if not set, its implied that its equal to `realm`.
   csId: string;
 }
+
 interface CardValue {
   id?: string;
   attributes?: AttributesObject;

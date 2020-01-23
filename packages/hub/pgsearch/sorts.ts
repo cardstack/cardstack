@@ -1,7 +1,7 @@
 import { CardExpression, separatedByCommas, param, fieldQuery, FieldQuery, fieldValue } from './util';
-import { CardId } from '../card';
+import { CardId } from '@cardstack/core/lib/card';
 import { Primitive } from 'json-typescript';
-import CardstackError from '../error';
+import CardstackError from '@cardstack/core/lib/error';
 
 interface Sort {
   name: string;

@@ -16,6 +16,10 @@ export class UpstreamDocument {
   constructor(public jsonapi: SingleResourceDoc) {}
 }
 
+export interface ResponseMeta {
+  page: { total: number; cursor?: string };
+}
+
 export type UpstreamIdentity = { csOriginalRealm: string; csId: string } | string;
 
 export function upstreamIdToCardId(upstreamId: UpstreamIdentity, csRealm: string): CardId {

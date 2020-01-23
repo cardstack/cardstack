@@ -3,9 +3,11 @@
   "version": "0.0.0",
   "license": "MIT",
   "peerDependencies": {
+    "@cardstack/core": "*",
     "@cardstack/hub": "*"
   },
   "devDependencies": {
+    "@cardstack/core": "0.16.22",
     "@cardstack/hub": "0.16.22"
   }
 }

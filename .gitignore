@@ -16,10 +16,6 @@ package-lock.json
 
 
 # Needed during incremental conversion to typescript
-/cards/base-card/index.js
-/cards/base-card/index.js.map
-/cards/base-card/index.d.ts
-
 /packages/hub/**/*.d.ts
 /packages/hub/**/*.js
 /packages/hub/**/*.js.map
@@ -27,6 +23,10 @@ package-lock.json
 /cards/**/*.d.ts
 /cards/**/*.js
 /cards/**/*.js.map
+
+/packages/core/lib/**/*.d.ts
+/packages/core/lib/**/*.js
+/packages/core/lib/**/*.js.map
 
 /packages/git/**/*.d.ts
 /packages/git/**/*.js

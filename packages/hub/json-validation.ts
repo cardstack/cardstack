@@ -1,4 +1,4 @@
-import CardstackError from './error';
+import CardstackError from '@cardstack/core/lib/error';
 
 export function assertJSONValue(v: any, pointer: string[]) {
   if (v === null) {

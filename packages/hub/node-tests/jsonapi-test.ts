@@ -6,8 +6,8 @@ import { testCard } from './test-card';
 import { stringify } from 'qs';
 import { Session } from '../session';
 import { assertSingleResourceDoc, assertCollectionResourceDoc } from '../jsonapi';
-import { AddressableCard, canonicalURL } from '../card';
-import { CARDSTACK_PUBLIC_REALM } from '../realm';
+import { AddressableCard, canonicalURL } from '@cardstack/core/lib/card';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/lib/realm';
 
 describe('hub/jsonapi', function() {
   let request: supertest.SuperTest<supertest.Test>;

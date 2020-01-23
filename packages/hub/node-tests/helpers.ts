@@ -1,6 +1,8 @@
 import { wireItUp } from '../main';
 import { Container } from '../dependency-injection';
 import PgClient from '../pgsearch/pgclient';
+import { emptyDir } from 'fs-extra';
+import { cardFilesCache } from '../module-service';
 
 export interface TestEnv {
   container: Container;
@@ -17,4 +19,5 @@ export async function createTestEnv(): Promise<TestEnv> {
 async function destroy(this: TestEnv) {
   await this.container.teardown();
   await PgClient.deleteSearchIndexIHopeYouKnowWhatYouAreDoing();
+  await emptyDir(cardFilesCache);
 }

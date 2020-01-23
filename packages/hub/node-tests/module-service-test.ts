@@ -108,14 +108,14 @@ describe('module-service', function() {
   });
 
   it('allows feature code to import from hub peerDependency', async function() {
-    let sampleValidator = `const CardstackError = require('@cardstack/hub/error').default;
+    let sampleValidator = `const CardstackError = require('@cardstack/core/lib/error').default;
        module.exports = function shouldThrow(value){ throw new CardstackError('it worked', { title: 'it worked', status: 654 }) }
      `;
     let card = await cards.create(
       `${myOrigin}/api/realms/first-ephemeral-realm`,
       testCard().withAttributes({
         csPeerDependencies: {
-          '@cardstack/hub': '*',
+          '@cardstack/core': '*',
         },
         csFiles: {
           'validate.js': sampleValidator,

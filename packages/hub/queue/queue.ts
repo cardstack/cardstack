@@ -1,5 +1,6 @@
 import { inject } from '../dependency-injection';
-import { param, PgPrimitive, Expression, separatedByCommas, addExplicitParens, any } from '../pgsearch/util';
+import { param, separatedByCommas, addExplicitParens, any } from '../pgsearch/util';
+import { PgPrimitive, Expression } from '@cardstack/core/lib/expression';
 import { Memoize } from 'typescript-memoize';
 import isEqual from 'lodash/isEqual';
 import logger from '@cardstack/logger';

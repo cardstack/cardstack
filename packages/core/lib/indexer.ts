@@ -1,8 +1,7 @@
-import { AddressableCard } from './card';
-import { Batch } from './pgsearch/pgclient';
-import { UpstreamDocument, UpstreamIdentity, upstreamIdToCardId } from './document';
-import { ScopedCardService } from './cards-service';
-import { getOwner } from './dependency-injection';
+import { AddressableCard } from '@cardstack/core/lib/card';
+import { BatchIndexUpdate } from './batch';
+import { UpstreamDocument, UpstreamIdentity, upstreamIdToCardId } from '@cardstack/core/lib/document';
+import { CardInstantiator } from './card-instantiator';
 
 export interface IndexerFactory<Meta> {
   new (realmCard: AddressableCard): Indexer<Meta>;
@@ -13,11 +12,11 @@ export interface Indexer<Meta> {
 }
 
 export class IndexingOperations {
-  constructor(private realmCard: AddressableCard, private batch: Batch, private cards: ScopedCardService) {}
+  constructor(private realmCard: AddressableCard, private batch: BatchIndexUpdate, private cards: CardInstantiator) {}
 
   async save(upstreamId: UpstreamIdentity, doc: UpstreamDocument) {
     let id = upstreamIdToCardId(upstreamId, this.realmCard.csId);
-    let card = await getOwner(this).instantiate(AddressableCard, doc.jsonapi, this.cards, id);
+    let card = await this.cards.instantiate(doc.jsonapi, id);
     return await this.batch.save(card);
   }
 

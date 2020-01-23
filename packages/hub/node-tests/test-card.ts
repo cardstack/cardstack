@@ -1,7 +1,7 @@
 import { SingleResourceDoc, AttributesObject, RelationshipObject } from 'jsonapi-typescript';
-import { CardId, canonicalURL, cardstackFieldPattern, FieldCard } from '../card';
-import { UpstreamDocument } from '../document';
-import { CARDSTACK_PUBLIC_REALM } from '../realm';
+import { CardId, canonicalURL, cardstackFieldPattern, FieldCard } from '@cardstack/core/lib/card';
+import { UpstreamDocument } from '@cardstack/core/lib/document';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/lib/realm';
 
 export class TestCard {
   private parent: CardId | undefined;

@@ -1,4 +1,4 @@
-import { Card } from './card';
+import { Card } from '@cardstack/core/lib/card';
 import stringify from 'fast-json-stable-stringify';
 import { createHash } from 'crypto';
 import { homedir } from 'os';
@@ -7,10 +7,11 @@ import { existsSync } from 'fs';
 import { Deferred } from './deferred';
 import { outputFile, mkdirp, ensureSymlink } from 'fs-extra';
 import { satisfies, coerce } from 'semver';
+import { ModuleLoader } from '@cardstack/core/lib/module-loader';
 
-export class ModuleService {
-  cardFilesCache = process.env.CARD_FILES_CACHE ?? join(homedir(), '.cardstack', 'card-files-cache');
+export const cardFilesCache = process.env.CARD_FILES_CACHE ?? join(homedir(), '.cardstack', 'card-files-cache');
 
+export class ModuleService implements ModuleLoader {
   activeCards = new Map() as Map<string, Promise<void>>;
 
   writeCounter = 0;
@@ -20,7 +21,7 @@ export class ModuleService {
     // collision resistance
     let hash = createHash('md5');
     hash.update(stringify((await card.asUpstreamDoc()).jsonapi));
-    let cardDir = join(this.cardFilesCache, hash.digest('hex'));
+    let cardDir = join(cardFilesCache, hash.digest('hex'));
     await this.cachedWriteCard(card, cardDir);
     let module = await import(join(cardDir, localModulePath));
     return module[exportedName];
@@ -90,10 +91,13 @@ export class ModuleService {
   }
 
   private async locatePeerDep(packageName: string): Promise<string> {
-    // right now this is the only one that is supported. We can choose to allow
+    // right now these are the only ones that are supported. We can choose to allow
     // any of hub's dependencies here too though.
     if (packageName === '@cardstack/hub') {
       return __dirname;
+    }
+    if (packageName === '@cardstack/core') {
+      return join(__dirname, '..', 'core');
     }
     throw new Error(`peerDependency ${packageName} is not available to cards`);
   }

@@ -1,4 +1,4 @@
-import { Card } from '@cardstack/hub/card';
+import { Card } from '@cardstack/core/lib/card';
 
 export async function validate(value: string, _fieldCard: Card) {
   return typeof value === 'string';

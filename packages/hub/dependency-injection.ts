@@ -1,9 +1,10 @@
 import { Memoize } from 'typescript-memoize';
 import { Deferred } from './deferred';
+import { Container as ContainerInterface, Factory } from '@cardstack/core/lib/container';
 
 let nonce = 0;
 
-export class Container {
+export class Container implements ContainerInterface {
   private cache = new Map() as Map<CacheKey, CacheEntry>;
   private tearingDown: Deferred<void> | undefined;
 
@@ -108,10 +109,6 @@ export class Container {
 
     await this.tearingDown.promise;
   }
-}
-
-export interface Factory<T, A extends unknown[] = []> {
-  new (...a: A): T;
 }
 
 class CacheEntry {

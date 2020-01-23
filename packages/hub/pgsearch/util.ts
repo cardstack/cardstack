@@ -1,11 +1,5 @@
-import * as JSON from 'json-typescript';
-import { CardId } from '../card';
-export type PgPrimitive = number | string | boolean | JSON.Object | JSON.Arr | null;
-
-export interface Param {
-  param: PgPrimitive;
-  kind: 'param';
-}
+import { CardId } from '@cardstack/core/lib/card';
+import { Expression, PgPrimitive, Param } from '@cardstack/core/lib/expression';
 
 export interface FieldQuery {
   typeContext: CardId;
@@ -33,8 +27,6 @@ export interface FieldArity {
 }
 
 export type CardExpression = (string | Param | FieldQuery | FieldValue | FieldArity)[];
-
-export type Expression = (string | Param)[];
 
 export function addExplicitParens(expression: Expression): Expression;
 export function addExplicitParens(expression: CardExpression): CardExpression;

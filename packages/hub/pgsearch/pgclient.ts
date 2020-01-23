@@ -10,11 +10,9 @@ import {
   safeName,
   every,
   CardExpression,
-  Expression,
   any,
   isParam,
   addExplicitParens,
-  PgPrimitive,
   fieldQuery,
   fieldArity,
   fieldValue,
@@ -22,14 +20,24 @@ import {
   FieldValue,
   FieldArity,
 } from './util';
-import { AddressableCard, CardId, Card, FieldCard, cardstackFieldPattern, canonicalURL } from '../card';
-import CardstackError from '../error';
+import { Expression, PgPrimitive } from '@cardstack/core/lib/expression';
+import {
+  AddressableCard,
+  CardId,
+  Card,
+  FieldCard,
+  cardstackFieldPattern,
+  canonicalURL,
+} from '@cardstack/core/lib/card';
+import { ResponseMeta } from '@cardstack/core/lib/document';
+import CardstackError from '@cardstack/core/lib/error';
 import { Query, baseType, Filter, EqFilter, RangeFilter } from '../query';
 import { Sorts } from './sorts';
 import snakeCase from 'lodash/snakeCase';
 import flatten from 'lodash/flatten';
 import assertNever from 'assert-never';
 import { ScopedCardService } from '../cards-service';
+import { BatchIndexUpdate } from '@cardstack/core/lib/batch';
 
 const log = logger('cardstack/pgsearch');
 
@@ -530,14 +538,14 @@ export default class PgClient {
   }
 }
 
-export class Batch {
+export class Batch implements BatchIndexUpdate {
   private generations: {
     [realm: string]: number | undefined;
   } = {};
 
   constructor(private client: PgClient, private cards: ScopedCardService) {}
 
-  async save(card: AddressableCard) {
+  async save(card: AddressableCard): Promise<void> {
     /* eslint-disable @typescript-eslint/camelcase */
     let row = {
       cs_realm: param(card.csRealm),
@@ -553,7 +561,7 @@ export class Batch {
     log.debug('save realm: %s original realm: %s local id: %s', card.csRealm, card.csOriginalRealm, card.csId);
   }
 
-  async delete(id: CardId) {
+  async delete(id: CardId): Promise<void> {
     await this.client.query([
       'delete from cards where ',
       ...every([
@@ -570,11 +578,11 @@ export class Batch {
     );
   }
 
-  createGeneration(realm: string) {
+  createGeneration(realm: string): void {
     this.generations[realm] = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
   }
 
-  async deleteOlderGenerations(realm: string) {
+  async deleteOlderGenerations(realm: string): Promise<void> {
     if (this.generations[realm] == null) {
       throw new CardstackError(
         `tried to remove older generation of cards before new generation was created for realm '${realm}'`
@@ -589,17 +597,13 @@ export class Batch {
     log.debug(`deleted generations other than ${this.generations[realm]} for cards in realm '${realm}'`);
   }
 
-  async done() {}
+  async done(): Promise<void> {}
 }
 
 declare module '@cardstack/hub/dependency-injection' {
   interface KnownServices {
     pgclient: PgClient;
   }
-}
-
-export interface ResponseMeta {
-  page: { total: number; cursor?: string };
 }
 
 type FilterFieldHandler<T> = (fieldCard: FieldCard, expression: T, fieldName: string) => Promise<T>;

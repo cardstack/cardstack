@@ -1,5 +1,5 @@
-import { Card } from '@cardstack/hub/card';
-import { Expression } from '@cardstack/hub/pgsearch/util';
+import { Card } from '@cardstack/core/lib/card';
+import { Expression } from '@cardstack/core/lib/expression';
 
 export function buildQueryExpression(source: Expression, fieldName: string) {
   return ['(', ...source, '->>', { param: fieldName }, ')::bigint'];

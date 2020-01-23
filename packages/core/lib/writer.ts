@@ -1,6 +1,6 @@
 import { Session } from './session';
-import { UpstreamDocument, UpstreamIdentity } from './document';
-import { AddressableCard } from './card';
+import { UpstreamDocument, UpstreamIdentity } from '@cardstack/core/lib/document';
+import { AddressableCard } from '@cardstack/core/lib/card';
 
 export interface WriterFactory {
   new (realmCard: AddressableCard): Writer;

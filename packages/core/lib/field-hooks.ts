@@ -1,5 +1,5 @@
-import { Expression } from './pgsearch/util';
-import { FieldCard } from './card';
+import { Expression } from '@cardstack/core/lib/expression';
+import { FieldCard } from '@cardstack/core/lib/card';
 
 /*
   These hooks allow a card to customize how it behaves when used as a field
