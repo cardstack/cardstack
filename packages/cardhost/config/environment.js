@@ -64,6 +64,8 @@ module.exports = function(environment) {
     ENV.cardTemplates = JSON.parse(process.env.CARD_TEMPLATES || null) || ['local-hub::location-card'];
 
     ENV.animationSpeed = 20;
+    ENV.autosaveDebounce = 10;
+    ENV.autosaveDisabled = true;
     ENV['@cardstack/ui-components'] = {
       debounceSpeed: 10,
     };

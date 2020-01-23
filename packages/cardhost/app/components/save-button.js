@@ -3,9 +3,11 @@ import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 import { task } from 'ember-concurrency';
-import { restartableTask } from 'ember-concurrency-decorators';
+import { restartableTask, enqueueTask } from 'ember-concurrency-decorators';
 import { timeout } from 'ember-concurrency';
+import ENV from '@cardstack/cardhost/config/environment';
 
+const { autosaveDebounce, autosaveDisabled } = ENV;
 const SAVED_HIGHLIGHT_DELAY = 2500;
 const AUTOSAVE_DEBOUNCE = 1000;
 
@@ -16,12 +18,16 @@ export default class SaveButton extends Component {
 
   @tracked justSaved;
 
+  autosaveDebounce = autosaveDebounce || AUTOSAVE_DEBOUNCE;
+  autosaveDisabled = typeof this.args.autosaveDisabled === 'boolean' ? this.args.autosaveDisabled : !!autosaveDisabled;
+
   get cardIsNew() {
     let card = this.args.card;
     return card.isNew;
   }
 
-  @task(function*() {
+  @enqueueTask
+  *saveCard() {
     let card = this.args.card;
     this.statusMsg = null;
 
@@ -34,8 +40,7 @@ export default class SaveButton extends Component {
       this.statusMsg = `card ${card.name} was NOT successfully created: ${e.message}`;
       return;
     }
-  })
-  saveCard;
+  }
 
   @task(function*() {
     let cardIsNew = this.cardIsNew;
@@ -55,13 +60,13 @@ export default class SaveButton extends Component {
 
   @restartableTask
   *debounceAndSave() {
-    yield timeout(AUTOSAVE_DEBOUNCE);
+    yield timeout(this.autosaveDebounce);
     this.saveCardWithState.perform();
   }
 
   @action
   autoSave(element, [isDirty]) {
-    if (isDirty && !this.cardIsNew) {
+    if (isDirty && !this.cardIsNew && !this.autosaveDisabled) {
       if (this.args.clickAction) {
         this.args.clickAction();
       } else {
