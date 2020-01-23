@@ -5,7 +5,7 @@
 .card-renderer-isolated {
   --card-renderer-width: var(--ch-card-size);
   --card-renderer-height: var(--ch-card-size);
-  --card-renderer-header-height: 50px;
+  --card-renderer-header-height: 56px;
 
   position: relative;
   min-width: var(--card-renderer-width);
@@ -24,7 +24,7 @@
 }
 
 .card-renderer-isolated.view {
-  padding-top: 50px;
+  padding-top: var(--card-renderer-header-height);
 }
 
 
@@ -48,7 +48,7 @@
 .card-renderer-isolated.view .card-renderer-isolated--header--wrapper {
   background-color: var(--ch-light-background);
   position: absolute;
-  top: 50px;
+  top: var(--card-renderer-header-height);
   left: 0;
   right: 0;
   z-index: 5;
@@ -77,7 +77,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
-  height: 50px;
+  height: var(--card-renderer-header-height);
   color: var(--ch-light-op50);
   background-color: var(--ch-dark-background);
   border: 3px solid var(--ch-dark-background);
@@ -126,7 +126,7 @@
   border: none;
   overflow-x: hidden;
   overflow-y: auto;
-  /* z-index: var(--ch-card-z-index); */
+  z-index: var(--ch-card-z-index);
 
   transition: var(--ch-card-background-color-animate);
 }
