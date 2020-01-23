@@ -12235,9 +12235,9 @@ isomorphic-git@^0.56.0:
     sha.js "^2.4.9"
     simple-get "^3.0.2"
 
-"isomorphic-git@github:cardstack/isomorphic-git.git":
+"isomorphic-git@github:cardstack/isomorphic-git.git#tmp-installable-for-ci":
   version "0.0.0-development"
-  resolved "https://codeload.github.com/cardstack/isomorphic-git/tar.gz/03e4c9f9e9c53a5f25500eb079ef8d63ac71854b"
+  resolved "https://codeload.github.com/cardstack/isomorphic-git/tar.gz/aa981cb179f6e5d18ba6425a52794a95a8628e0e"
   dependencies:
     async-lock "^1.1.0"
     clean-git-ref "^2.0.1"
