@@ -286,5 +286,5 @@
 
 .themer.view {
   width: var(--ch-card-size);
-  padding: var(--ch-spacing)
+  margin-left: var(--ch-spacing);
 }
