@@ -65,8 +65,7 @@ export async function createCards(args) {
       await addField(name, type, neededWhenEmbedded, index);
     }
     await setCardId(id);
-    await click('[data-test-card-save-btn]');
-    await waitFor(`[data-test-card-schema="${id}"]`, { timeout });
+    await saveCard('creator', id);
 
     await visit(`/cards/${id}/edit/fields`);
     for (let [name, , , value] of args[id]) {
