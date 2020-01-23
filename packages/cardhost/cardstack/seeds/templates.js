@@ -80,12 +80,12 @@ let eventCardTemplate = eventFactory.getDocumentFor(
         required: false,
         caption: 'Background image',
       }),
-      eventFactory.addResource('fields', 'event-datetime').withAttributes({
+      eventFactory.addResource('fields', 'event-date').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::date',
         'needed-when-embedded': true,
         required: false,
-        caption: 'Date & Time',
+        caption: 'Date',
       }),
       eventFactory.addResource('fields', 'event-location').withAttributes({
         'is-metadata': true,
@@ -112,7 +112,7 @@ let eventCardTemplate = eventFactory.getDocumentFor(
         required: false,
         caption: 'RSVP',
       }),
-      eventFactory.addResource('fields', 'event-description').withAttributes({
+      eventFactory.addResource('fields', 'body').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
         required: false,
@@ -125,11 +125,11 @@ let eventCardTemplate = eventFactory.getDocumentFor(
         title: 'Quarterly Planning Meeting',
         backgroundImage: 'https://images.unsplash.com/photo-1542296140-47fd7d838e76',
         divider: true,
-        eventDatetime: '2020-05-26',
+        eventDate: '2020-05-26',
         eventLocation: 'One World Trade Center',
         eventCity: 'New York, NY',
         eventAdmission: 'Free',
-        eventDescription:
+        body:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero.',
         eventCta: '',
       })
@@ -421,81 +421,82 @@ let productCardTemplate = eventFactory.getDocumentFor(
     )
 );
 
-let weddingInvitationTemplate = eventFactory.getDocumentFor(
-  eventFactory
+let weddingFactory = new Factory();
+let weddingInvitationTemplate = weddingFactory.getDocumentFor(
+  weddingFactory
     .addResource('cards', 'local-hub::wedding-invitation')
     .withRelated('adopted-from', { type: 'cards', id: 'local-hub::@cardstack/base-card' })
     .withRelated('fields', [
-      eventFactory.addResource('fields', 'title').withAttributes({
+      weddingFactory.addResource('fields', 'title').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         'needed-when-embedded': true,
         required: true,
         caption: 'Title',
       }),
-      eventFactory.addResource('fields', 'divider').withAttributes({
+      weddingFactory.addResource('fields', 'divider').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::boolean',
         'needed-when-embedded': false,
         caption: 'Divider',
       }),
-      eventFactory.addResource('fields', 'wedding-name-1').withAttributes({
+      weddingFactory.addResource('fields', 'wedding-name-1').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
         'needed-when-embedded': true,
         caption: 'Name',
       }),
-      eventFactory.addResource('fields', 'wedding-name-2').withAttributes({
+      weddingFactory.addResource('fields', 'wedding-name-2').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
         'needed-when-embedded': true,
         caption: 'Name',
       }),
-      eventFactory.addResource('fields', 'wedding-date').withAttributes({
+      weddingFactory.addResource('fields', 'wedding-date').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::date',
         required: true,
         'needed-when-embedded': true,
         caption: 'Wedding date',
       }),
-      eventFactory.addResource('fields', 'wedding-time').withAttributes({
+      weddingFactory.addResource('fields', 'wedding-time').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
         'needed-when-embedded': false,
         caption: 'Wedding time',
       }),
-      eventFactory.addResource('fields', 'wedding-reception-address').withAttributes({
+      weddingFactory.addResource('fields', 'wedding-reception-address').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
         'needed-when-embedded': false,
         caption: 'Reception address',
       }),
-      eventFactory.addResource('fields', 'wedding-rsvp-date').withAttributes({
+      weddingFactory.addResource('fields', 'wedding-rsvp-date').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::date',
         required: true,
         'needed-when-embedded': true,
         caption: 'RSVP by',
       }),
-      eventFactory.addResource('fields', 'wedding-website').withAttributes({
+      weddingFactory.addResource('fields', 'wedding-website').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::link',
         required: false,
         'needed-when-embedded': false,
         caption: 'www.rufusandwillainwonderland.com',
       }),
-      eventFactory.addResource('fields', 'wedding-rsvp-cta').withAttributes({
+      weddingFactory.addResource('fields', 'wedding-rsvp-cta').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::cta',
         required: true,
         'needed-when-embedded': true,
         caption: 'RSVP',
       }),
-      eventFactory.addResource('fields', 'wedding-intro-text').withAttributes({
+      weddingFactory.addResource('fields', 'wedding-intro-text').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: false,
@@ -505,7 +506,7 @@ let weddingInvitationTemplate = eventFactory.getDocumentFor(
     ])
     .withRelated(
       'model',
-      eventFactory.addResource('local-hub::wedding-invitation', 'local-hub::wedding-invitation').withAttributes({
+      weddingFactory.addResource('local-hub::wedding-invitation', 'local-hub::wedding-invitation').withAttributes({
         title: 'Wedding Invitation',
         divider: true,
         weddingName1: 'Willa Karciana',
