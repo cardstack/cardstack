@@ -14,6 +14,10 @@
   letter-spacing: 0.015em;
 }
 
+.card-renderer-isolated.schema {
+  min-width: 400px;
+}
+
 .card-renderer-isolated.schema,
 .card-renderer-isolated.edit {
   min-height: var(--card-renderer-height);
@@ -23,6 +27,7 @@
   max-width: 100%;
   padding-top: 0;
 }
+
 
 /* Resetting styles so that view mode styling does not affect other modes */
 .card-renderer-isolated.schema .isolated-card,
@@ -39,7 +44,7 @@
   background-color: var(--ch-default);
   position: sticky;
   top: 80px;
-  z-index: 11;
+  z-index: var(--ch-card-header-z-index); /* card scrolls under the header */
 
   transition: visibility var(--ch-transition-time);
 }
@@ -108,9 +113,9 @@
   border: none;
   overflow-x: hidden;
   overflow-y: auto;
+  /* z-index: var(--ch-card-z-index); */
 
   transition: var(--ch-card-background-color-animate);
-  z-index: 10;
 }
 
 .card-renderer-isolated.schema .card-renderer-isolated--content {
@@ -119,10 +124,6 @@
 
 .card-renderer-isolated.themer .card-renderer-isolated--content {
   background-color: var(--ch-dark-background);
-}
-
-.card-renderer-isolated.view.selected .card-renderer-isolated--content {
-  z-index: 9;
 }
 
 
@@ -157,6 +158,10 @@
   padding: 30px;
 }
 
+.card-renderer-isolated.themer .card-renderer-isolated--card-container {
+  border: none;
+}
+
 
 /* Focus state */
 .card-renderer-isolated:focus {
@@ -164,6 +169,7 @@
 }
 
 .card-renderer-isolated.selected .card-renderer-isolated--header,
+.card-renderer-isolated.layout .card-renderer-isolated--header,
 .card-renderer-isolated.view .card-renderer-isolated--header {
   background-color: var(--ch-highlight);
   border-color: var(--ch-highlight);
@@ -174,6 +180,7 @@
   --icon-color: var(--ch-dark);
 }
 
+.card-renderer-isolated.layout .card-renderer-isolated--card-container,
 .card-renderer-isolated.selected .card-renderer-isolated--card-container {
   border-color: var(--ch-highlight);
 }

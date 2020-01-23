@@ -129,9 +129,9 @@ let eventCardTemplate = eventFactory.getDocumentFor(
         eventLocation: 'One World Trade Center',
         eventCity: 'New York, NY',
         eventAdmission: 'Free',
-        eventCta: '',
         eventDescription:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero.',
+        eventCta: '',
       })
     )
 );
@@ -421,6 +421,106 @@ let productCardTemplate = eventFactory.getDocumentFor(
     )
 );
 
+let weddingInvitationTemplate = eventFactory.getDocumentFor(
+  eventFactory
+    .addResource('cards', 'local-hub::wedding-invitation')
+    .withRelated('adopted-from', { type: 'cards', id: 'local-hub::@cardstack/base-card' })
+    .withRelated('fields', [
+      eventFactory.addResource('fields', 'title').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        'needed-when-embedded': true,
+        required: true,
+        caption: 'Title',
+      }),
+      eventFactory.addResource('fields', 'divider').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::boolean',
+        'needed-when-embedded': false,
+        caption: 'Divider',
+      }),
+      eventFactory.addResource('fields', 'wedding-name-1').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'Name',
+      }),
+      eventFactory.addResource('fields', 'wedding-name-2').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'Name',
+      }),
+      eventFactory.addResource('fields', 'wedding-date').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::date',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'Wedding date',
+      }),
+      eventFactory.addResource('fields', 'wedding-time').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: true,
+        'needed-when-embedded': false,
+        caption: 'Wedding time',
+      }),
+      eventFactory.addResource('fields', 'wedding-reception-address').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: true,
+        'needed-when-embedded': false,
+        caption: 'Reception address',
+      }),
+      eventFactory.addResource('fields', 'wedding-rsvp-date').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::date',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'RSVP by',
+      }),
+      eventFactory.addResource('fields', 'wedding-website').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::link',
+        required: false,
+        'needed-when-embedded': false,
+        caption: 'www.rufusandwillainwonderland.com',
+      }),
+      eventFactory.addResource('fields', 'wedding-rsvp-cta').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::cta',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'RSVP',
+      }),
+      eventFactory.addResource('fields', 'wedding-intro-text').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: false,
+        'needed-when-embedded': false,
+        caption: 'Intro text',
+      }),
+    ])
+    .withRelated(
+      'model',
+      eventFactory.addResource('local-hub::wedding-invitation', 'local-hub::wedding-invitation').withAttributes({
+        title: 'Wedding Invitation',
+        divider: true,
+        weddingName1: 'Willa Karciana',
+        weddingName2: 'Rufus Jackson',
+        weddingDate: '2021-06-05',
+        weddingTime: '3 PM',
+        weddingReceptionAddress: 'The Gorgeous Hotel, 96 Hilton Avenue, San Francisco, CA',
+        weddingRsvpDate: '2021-05-01',
+        weddingWebsite: 'https://www.rufusandwillainwonderland.com',
+        weddingRsvpCta: '',
+        weddingIntroText: 'Please join us for the wedding of',
+      })
+    )
+);
+
 module.exports = [
   locationCardTemplate,
   eventCardTemplate,
@@ -428,4 +528,5 @@ module.exports = [
   jobApplicantProfileTemplate,
   eventTicketTemplate,
   productCardTemplate,
+  weddingInvitationTemplate,
 ];

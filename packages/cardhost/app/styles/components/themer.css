@@ -1,11 +1,13 @@
 .cardhost-card-theme-editor {
+  --editor-header-height: 42px;
+
   position: fixed;
   right: 0;
   top: 0;
   width: 40%;
   height: 100%;
   background: var(--ch-deep-background);
-  z-index: 11;
+  z-index: calc(var(--ch-top-edge-z-index) + 1);
   padding: 20px;
   transform: translateX(0%);
   opacity: 0.95;
@@ -68,6 +70,7 @@
 }
 
 .cardhost-card-theme-editor .editor-container__title {
+  min-height: var(--editor-header-height);
   background-color: var(--ch-default);
   font: 600 13px/18px var(--ch-font-family);
   letter-spacing: 0.035em;
@@ -118,6 +121,10 @@
   background-color: #1e1e1e;
 }
 
+.cardhost-card-theme-editor .cardhost-monaco-container {
+  max-height: calc(100% - var(--editor-header-height));
+}
+
 .themer--top-edge-container .show-editor-btn, .themer--top-edge-container .hide-editor-btn {
   margin-top: 10px;
   margin-right: 15px;
@@ -152,7 +159,7 @@
   top: var(--ch-spacing);
   right: var(--ch-spacing);
   left: 40px;
-  z-index: 12;
+  z-index: var(--ch-actions-z-index);
   grid-template-columns: auto auto;
 }
 

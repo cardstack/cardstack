@@ -48,6 +48,7 @@ module.exports = function(environment) {
       'local-hub::job-applicant-profile',
       'local-hub::event-ticket',
       'local-hub::product-card',
+      'local-hub::wedding-invitation',
     ];
   }
 
