@@ -13,7 +13,9 @@
     Saving
     <span class="loading-spinner"><div></div><div></div><div></div><div></div></span>
   {{else}}
-    {{#if @card.isDirty}}
+    {{#if @card.isNew}}
+      Create
+    {{else if @card.isDirty}}
       Unsaved
     {{else}}
       Saved {{svg-jar "checkmark" width="12px" height="9px"}}

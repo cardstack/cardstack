@@ -38,9 +38,11 @@ export default class SaveButton extends Component {
   saveCard;
 
   @task(function*() {
+    let cardIsNew = this.cardIsNew;
+
     yield this.saveCard.perform();
 
-    if (this.cardIsNew) {
+    if (cardIsNew) {
       return this.router.transitionTo('cards.card.edit.fields.schema', this.args.card);
     } else {
       this.justSaved = true;
@@ -60,7 +62,11 @@ export default class SaveButton extends Component {
   @action
   autoSave(element, [isDirty]) {
     if (isDirty && !this.cardIsNew) {
-      this.save();
+      if (this.args.clickAction) {
+        this.args.clickAction();
+      } else {
+        this.debounceAndSave.perform();
+      }
     }
   }
 
@@ -69,7 +75,7 @@ export default class SaveButton extends Component {
     if (this.args.clickAction) {
       this.args.clickAction();
     } else {
-      this.debounceAndSave.perform();
+      this.saveCardWithState.perform();
     }
   }
 }
