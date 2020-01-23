@@ -1,5 +1,4 @@
-.field-type-link {
-  color: var(--cobalt-blue);
-  text-decoration: underline;
-  font-weight: 600;
+.field.field-type-link-view-field,
+.field.field-type-link-layout-field {
+  display: block;
 }

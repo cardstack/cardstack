@@ -196,6 +196,22 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-field]').doesNotExist();
   });
 
+  test(`adding a new field after removing one`, async function(assert) {
+    await login();
+    await createCards({
+      [card1Id]: [['body', 'string', false, 'test body']],
+    });
+    await visit(`/cards/${card1Id}/edit/fields/schema`);
+
+    await removeField('body');
+
+    await saveCard('schema');
+    await waitFor(`[data-test-card-schema="${card1Id}"]`);
+    assert.dom('[data-test-field="body"]').doesNotExist();
+    await dragAndDropNewField('string');
+    assert.dom('[data-test-field="field-1"]').exists();
+  });
+
   test(`move a field's position via drag & drop`, async function(assert) {
     await login();
     await createCards({
@@ -288,8 +304,13 @@ module('Acceptance | card schema', function(hooks) {
 
     await dragAndDropNewField('string');
     await animationsSettled();
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('field-3');
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('field-3');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('field-1');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('field-1');
+
+    await dragAndDropNewField('string');
+    await animationsSettled();
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('field-2');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('field-2');
   });
 
   test(`change a field's needed-when-embedded value to true`, async function(assert) {
