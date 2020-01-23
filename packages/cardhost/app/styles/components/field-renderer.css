@@ -4,6 +4,7 @@
   max-width: var(--ch-field-width);
   margin: 0 auto;
   padding-bottom: 12px;
+  background-image: unset;
 }
 
 
@@ -13,6 +14,7 @@
   max-width: var(--ch-field-width);
   margin: 0 auto;
   padding: 20px 0;
+  background-image: unset;
   border: none;
   color: white;
   font: 400 13px/18px var(--ch-font-family);

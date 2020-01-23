@@ -30,9 +30,12 @@ Until that work is done we are statically adding this css
 @import '/assets/cards/base-card-isolated.css';
 @import '/assets/cards/base-card-embedded.css';
 /* Themed cards */
-/* @import '/assets/cards/event-card-isolated.css'; */
-/* @import '/assets/cards/event-ticket-isolated.css'; */
-/* @import '/assets/cards/wedding-invitation-isolated.css'; */
+@import '/assets/cards/event-card-isolated.css';
+@import '/assets/cards/event-card-embedded.css';
+@import '/assets/cards/event-ticket-isolated.css';
+@import '/assets/cards/event-ticket-embedded.css';
+@import '/assets/cards/wedding-invitation-isolated.css';
+@import '/assets/cards/wedding-invitation-embedded.css';
 
 @import '/assets/fields/belongs-to-editor.css';
 @import '/assets/fields/belongs-to-viewer.css';
@@ -65,6 +68,8 @@ Until that work is done we are statically adding this css
 
   --ch-card-size: 496px;    /* min-width and min-height for cards */
   --ch-field-width: 384px;  /* edit and schema view field-renderer max-width */
+  --ch-embedded-card-width: 225px;
+  --ch-embedded-card-height: 225px;
   --ch-spacing: 20px;
   --ch-left-edge-z-index: 30;
   --ch-right-edge-z-index: 20;

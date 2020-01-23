@@ -255,7 +255,7 @@ module('Acceptance | card edit', function(hooks) {
 
     await visit(`/cards/${card1Id}`);
     assert
-      .dom('[data-test-field="image"] [data-test-decorative-image-field-viewer-value] img')
+      .dom('[data-test-field="image"] [data-test-decorative-image-field-viewer-value]')
       .hasAttribute('src', 'http://example.com/testimage.jpg');
 
     let cardJson = find('[data-test-card-json]').innerHTML;

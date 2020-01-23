@@ -15,12 +15,14 @@
 /* Embedded card default styles */
 .cardstack_base-card-embedded {
   width: 100%;
-  min-height: inherit;
+  max-width: 275px;
+  min-height: 225px;
+  max-height: 500px;
   margin: 0 auto;
 
   background-color: white;
   color: black;
-  font: 400 15px/1.467 'Open Sans';
+  font: 400 12px/1.3 'Open Sans';
   letter-spacing: 0.03em;
 
   text-align: left;
@@ -29,11 +31,11 @@
   word-break: break-word;
 }
 
-.cardstack_base-card-embedded .isolated-card--view-fields {
+.cardstack_base-card-embedded .embedded-card--view-fields {
   display: grid; /* Helpful for ordering fields */
 }
-.cardstack_base-card-embedded .isolated-card--view-fields::before,
-.cardstack_base-card-embedded .isolated-card--view-fields::after {
+.cardstack_base-card-embedded .embedded-card--view-fields::before,
+.cardstack_base-card-embedded .embedded-card--view-fields::after {
   height: 0; /* for firefox */
 }
 
@@ -41,7 +43,6 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: 15px 30px;
-  max-width: 400px;
   width: 100%;
   margin: 0 auto;
   padding: 0 15px 15px;
@@ -75,14 +76,19 @@
 /* type: cta */
 /* use `label` for button text and `value` for button link url */
 .cardstack_base-card-embedded .cta-viewer {
-  min-height: 45px;
+  min-height: 30px;
   border-radius: 6px;
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 700;
   line-height: calc(22 / 15);
   letter-spacing: 0.03em;
   padding-top: 11px;
   padding-bottom: 11px;
+}
+
+/* type: decorative-image */
+.cardstack_base-card-embedded .decorative-image-viewer {
+  max-height: 100px;
 }
 
 
@@ -116,7 +122,7 @@
   padding: 0;
   order: -100; /* first item on page */
 }
-.cardstack_base-card-embedded .background-image-field .background-image {
+.cardstack_base-card-embedded .background-image-value {
   width: 100%;
   max-height: 300px;
   object-fit: cover;
@@ -126,7 +132,7 @@
 /* field-name: title */
 .cardstack_base-card-embedded .title-value {
   color: var(--dark-gray);
-  font-size: 25px;
+  font-size: 20px;
   font-weight: bold;
   letter-spacing: 0.015em;
   line-height: 1.2;
@@ -135,7 +141,7 @@
 /* field-name: highlight-title */
 .cardstack_base-card-embedded .highlight-title-value {
   color: var(--red);
-  font-size: 18px;
+  font-size: 15px;
   font-weight: bold;
   letter-spacing: 0.035em;
   text-transform: capitalize;
@@ -143,7 +149,6 @@
 
 /* field-name: divider */
 .cardstack_base-card-embedded .divider-field {
-  width: calc(100% - 60px);
-  max-width: 596px; /* max-field-width - padding * 2 */
+  width: calc(100% - 30px);
   border-top: 1px solid var(--light-gray);
 }

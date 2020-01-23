@@ -71,12 +71,12 @@ let eventCardTemplate = eventFactory.getDocumentFor(
       eventFactory.addResource('fields', 'divider').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::boolean',
-        'needed-when-embedded': false,
+        'needed-when-embedded': true,
       }),
       eventFactory.addResource('fields', 'background-image').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::decorative-image',
-        'needed-when-embedded': false,
+        'needed-when-embedded': true,
         required: false,
         caption: 'Background image',
       }),
@@ -90,25 +90,28 @@ let eventCardTemplate = eventFactory.getDocumentFor(
       eventFactory.addResource('fields', 'event-location').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
-        'needed-when-embedded': false,
+        'needed-when-embedded': true,
         required: false,
         caption: 'Location',
       }),
       eventFactory.addResource('fields', 'event-city').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
+        'needed-when-embedded': true,
         required: false,
         caption: 'City',
       }),
       eventFactory.addResource('fields', 'event-admission').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
+        'needed-when-embedded': true,
         required: false,
         caption: 'Admission',
       }),
       eventFactory.addResource('fields', 'event-cta').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::cta',
+        'needed-when-embedded': true,
         required: false,
         caption: 'RSVP',
       }),
@@ -251,13 +254,14 @@ let eventTicketTemplate = eventFactory.getDocumentFor(
       eventFactory.addResource('fields', 'highlight-title').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
+        'needed-when-embedded': true,
         required: false,
         caption: 'Highlight title',
       }),
       eventFactory.addResource('fields', 'divider').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::boolean',
-        'needed-when-embedded': false,
+        'needed-when-embedded': true,
         caption: 'Divider',
       }),
       eventFactory.addResource('fields', 'guest-name').withAttributes({
@@ -343,13 +347,14 @@ let productCardTemplate = eventFactory.getDocumentFor(
       eventFactory.addResource('fields', 'highlight-title').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
+        'needed-when-embedded': true,
         required: false,
         caption: 'Highlight Title',
       }),
       eventFactory.addResource('fields', 'divider').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::boolean',
-        'needed-when-embedded': false,
+        'needed-when-embedded': true,
         caption: 'Divider',
       }),
       eventFactory.addResource('fields', 'product-ranking').withAttributes({
@@ -361,7 +366,7 @@ let productCardTemplate = eventFactory.getDocumentFor(
       eventFactory.addResource('fields', 'product-company').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
-        'needed-when-embedded': false,
+        'needed-when-embedded': true,
         required: false,
         caption: 'Company',
       }),
@@ -375,6 +380,7 @@ let productCardTemplate = eventFactory.getDocumentFor(
       eventFactory.addResource('fields', 'product-name').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
+        'needed-when-embedded': true,
         required: false,
         caption: 'Coffee bean',
       }),
@@ -388,18 +394,21 @@ let productCardTemplate = eventFactory.getDocumentFor(
       eventFactory.addResource('fields', 'product-description').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
+        'needed-when-embedded': true,
         required: false,
         caption: 'Description',
       }),
       eventFactory.addResource('fields', 'product-link').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::link',
+        'needed-when-embedded': true,
         required: true,
         caption: 'View Details',
       }),
       eventFactory.addResource('fields', 'product-cta').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::cta',
+        'needed-when-embedded': true,
         required: true,
         caption: 'Buy Now',
       }),
@@ -437,17 +446,17 @@ let weddingInvitationTemplate = weddingFactory.getDocumentFor(
       weddingFactory.addResource('fields', 'divider').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::boolean',
-        'needed-when-embedded': false,
+        'needed-when-embedded': true,
         caption: 'Divider',
       }),
-      weddingFactory.addResource('fields', 'wedding-name-1').withAttributes({
+      weddingFactory.addResource('fields', 'wedding-name').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
         'needed-when-embedded': true,
         caption: 'Name',
       }),
-      weddingFactory.addResource('fields', 'wedding-name-2').withAttributes({
+      weddingFactory.addResource('fields', 'wedding-name-partner').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
@@ -465,15 +474,22 @@ let weddingInvitationTemplate = weddingFactory.getDocumentFor(
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
-        'needed-when-embedded': false,
+        'needed-when-embedded': true,
         caption: 'Wedding time',
       }),
       weddingFactory.addResource('fields', 'wedding-reception-address').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
-        'needed-when-embedded': false,
+        'needed-when-embedded': true,
         caption: 'Reception address',
+      }),
+      weddingFactory.addResource('fields', 'wedding-intro-text').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: false,
+        'needed-when-embedded': true,
+        caption: 'Intro text',
       }),
       weddingFactory.addResource('fields', 'wedding-rsvp-date').withAttributes({
         'is-metadata': true,
@@ -486,8 +502,8 @@ let weddingInvitationTemplate = weddingFactory.getDocumentFor(
         'is-metadata': true,
         'field-type': '@cardstack/core-types::link',
         required: false,
-        'needed-when-embedded': false,
-        caption: 'www.rufusandwillainwonderland.com',
+        'needed-when-embedded': true,
+        caption: 'Learn more on our Website',
       }),
       weddingFactory.addResource('fields', 'wedding-rsvp-cta').withAttributes({
         'is-metadata': true,
@@ -496,21 +512,14 @@ let weddingInvitationTemplate = weddingFactory.getDocumentFor(
         'needed-when-embedded': true,
         caption: 'RSVP',
       }),
-      weddingFactory.addResource('fields', 'wedding-intro-text').withAttributes({
-        'is-metadata': true,
-        'field-type': '@cardstack/core-types::case-insensitive',
-        required: false,
-        'needed-when-embedded': false,
-        caption: 'Intro text',
-      }),
     ])
     .withRelated(
       'model',
       weddingFactory.addResource('local-hub::wedding-invitation', 'local-hub::wedding-invitation').withAttributes({
         title: 'Wedding Invitation',
         divider: true,
-        weddingName1: 'Willa Karciana',
-        weddingName2: 'Rufus Jackson',
+        weddingName: 'Willa Karciana',
+        weddingNamePartner: 'Rufus Jackson',
         weddingDate: '2021-06-05',
         weddingTime: '3 PM',
         weddingReceptionAddress: 'The Gorgeous Hotel, 96 Hilton Avenue, San Francisco, CA',

@@ -51,7 +51,7 @@
       <div class="card-catalog">
         {{#each this.model.templates as |card|}}
           <LinkTo
-            @class="card-renderer--embedded-card-link"
+            @class="card-catalog--embedded-card-link"
             @route="cards.card.adopt"
             @model={{card.name}}
             data-test-embedded-card={{card.name}}
@@ -73,19 +73,19 @@
         Common Cards
       </header>
       <div class="card-catalog">
-        <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
+        <LinkTo @route="cards.add" @class="card-catalog--embedded-card-link">
           <div>
             <div class="card-catalog--embedded-card-placeholder icon-common-form"></div>
             <div class="embedded-card-label">Form</div>
           </div>
         </LinkTo>
-        <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
+        <LinkTo @route="cards.add" @class="card-catalog--embedded-card-link">
           <div>
             <div class="card-catalog--embedded-card-placeholder icon-common-layout"></div>
             <div class="embedded-card-label">Layout</div>
           </div>
         </LinkTo>
-        <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
+        <LinkTo @route="cards.add" @class="card-catalog--embedded-card-link">
           <div>
             <div class="card-catalog--embedded-card-placeholder icon-common-collection"></div>
             <div class="embedded-card-label">Collection</div>
@@ -104,7 +104,7 @@
       <div class="card-catalog">
         <LinkTo
           @route="cards.add"
-          @class="card-renderer--embedded-card-link"
+          @class="card-catalog--embedded-card-link"
         >
           <div>
             <div class="card-catalog--embedded-card-placeholder icon-add-card"></div>
