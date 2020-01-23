@@ -181,7 +181,6 @@ module('Acceptance | css editing', function(hooks) {
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
     let themerHasStyle = find('[data-test-preview-css]').innerText.includes('gorgeous styles');
     assert.ok(themerHasStyle);
-    await click('[data-test-card-save-btn]');
     await waitFor(`[data-test-card-save-btn].saved`, { timeout });
     await animationsSettled();
     let viewHasStyle = find('[data-test-view-css]').innerText.includes('gorgeous styles');
@@ -223,7 +222,6 @@ module('Acceptance | css editing', function(hooks) {
     await waitFor('[data-test-editor-pane] textarea');
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
     await click('[data-test-close-editor]');
-    await click('[data-test-card-save-btn]');
     await waitFor(`[data-test-card-save-btn].saved`, { timeout });
     await waitFor('[data-test-cs-component="dropdown"]');
     await selectChoose('[data-test-cs-component="dropdown"]', 'Cardstack default');

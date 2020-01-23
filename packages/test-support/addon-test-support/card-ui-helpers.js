@@ -16,7 +16,6 @@ export async function setCardId(id) {
   await showCardId();
   await fillIn('#card__id', id);
   await triggerEvent('#card__id', 'keyup');
-  await saveCard('creator', id);
 }
 
 export async function dragAndDrop(fieldSelector, dropZoneSelector, options) {
@@ -62,10 +61,10 @@ export async function dragFieldToNewPosition(originalPosition, newPosition) {
 export async function createCards(args) {
   for (let id of Object.keys(args)) {
     await visit('/cards/new');
-    await setCardId(id);
     for (let [index, [name, type, neededWhenEmbedded]] of args[id].entries()) {
       await addField(name, type, neededWhenEmbedded, index);
     }
+    await setCardId(id);
     await click('[data-test-card-save-btn]');
     await waitFor(`[data-test-card-schema="${id}"]`, { timeout });
 
@@ -83,6 +82,7 @@ export async function createCards(args) {
 
 export async function saveCard(mode, id) {
   if (mode === 'creator') {
+    await click(`[data-test-card-save-btn]`);
     if (id) {
       await waitFor(`[data-test-card-schema="${id}"]`, { timeout });
     } else {
