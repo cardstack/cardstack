@@ -5,6 +5,26 @@ import Tree from './git/tree';
 
 const { unlink } = fs.promises;
 
+// Temporary type wrangling until https://github.com/isomorphic-git/isomorphic-git/pull/987 is merged and released
+declare module 'isomorphic-git' {
+  interface ExplicitGitDir {
+    gitdir: string;
+  }
+  interface ImplicitGitDir {
+    dir: string;
+  }
+  type GitDir = ExplicitGitDir | ImplicitGitDir;
+
+  export function findMergeBase(
+    args: GitDir & {
+      core?: string;
+      fs?: any;
+      oids: string[];
+    }
+  ): Promise<string[]>;
+}
+// End temporary type wrangling
+
 import {
   addRemote as igAddRemote,
   checkout as igCheckout,
