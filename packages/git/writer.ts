@@ -1,4 +1,5 @@
-import { Repository, Cred, RemoteConfig, FetchOptions } from './git';
+import { Repository, RemoteConfig, GitConflict, UnknownObjectId } from './git';
+import { FileNotFound, OverwriteRejected } from './git/tree';
 
 import { todo } from '@cardstack/plugin-utils/todo-any';
 
@@ -67,7 +68,6 @@ export default class Writer {
   branchPrefix: string;
   githereumConfig: todo;
   githereum: todo;
-  fetchOpts?: FetchOptions;
   _githereumPromise?: Promise<todo>;
 
   constructor({ repo, idGenerator, basePath, branchPrefix, remote, githereum }: WriterConfig) {
@@ -85,15 +85,6 @@ export default class Writer {
       config.log = log.info.bind(log);
       this.githereumConfig = config;
     }
-
-    if (remote) {
-      this.fetchOpts = new FetchOptions((url, userName) => {
-        if (remote && remote.privateKey) {
-          return Cred.sshKeyMemoryNew(userName, remote.publicKey || '', remote.privateKey, remote.passphrase || '');
-        }
-        return Cred.sshKeyFromAgent(userName);
-      });
-    }
   }
 
   get hasCardSupport() {
@@ -105,7 +96,7 @@ export default class Writer {
     return withErrorHandling(id, type, async () => {
       await this._ensureRepo();
       let type = getType(document);
-      let change = await Change.create(this.repo!, null, this.branchPrefix + defaultBranch, this.fetchOpts);
+      let change = await Change.create(this.repo!, null, this.branchPrefix + defaultBranch, !!this.remote);
 
       let file;
       while (id == null) {
@@ -158,7 +149,7 @@ export default class Writer {
 
     await this._ensureRepo();
     return withErrorHandling(id, type, async () => {
-      let change = await Change.create(this.repo!, meta.version, this.branchPrefix + defaultBranch, this.fetchOpts);
+      let change = await Change.create(this.repo!, meta.version, this.branchPrefix + defaultBranch, !!this.remote);
 
       let file = await change.get(this._filenameFor(type, id, isSchema), { allowUpdate: true });
       let before = JSON.parse((await file.getBuffer())!.toString());
@@ -195,7 +186,7 @@ export default class Writer {
     }
     await this._ensureRepo();
     return withErrorHandling(id, type, async () => {
-      let change = await Change.create(this.repo!, version, this.branchPrefix + defaultBranch, this.fetchOpts);
+      let change = await Change.create(this.repo!, version, this.branchPrefix + defaultBranch, !!this.remote);
 
       let file = await change.get(this._filenameFor(type, id, isSchema));
       let before = JSON.parse((await file.getBuffer())!.toString());
@@ -241,9 +232,7 @@ export default class Writer {
       if (this.remote) {
         // @ts-ignore promisify not typed well apparently?
         let tempRepoPath = await mkdir('cardstack-temp-repo');
-        this.repo = await Repository.clone(this.remote.url, tempRepoPath, {
-          fetchOpts: this.fetchOpts!,
-        });
+        this.repo = await Repository.clone(this.remote.url, tempRepoPath);
         return;
       }
 
@@ -258,7 +247,7 @@ export default class Writer {
       let contract = await this._getGithereumContract();
 
       this.githereum = new Githereum(
-        this.repo!.path(),
+        this.repo!.path,
         this.githereumConfig.repoName,
         contract,
         this.githereumConfig.from,
@@ -346,16 +335,16 @@ async function withErrorHandling(id: string, type: string, fn: Function) {
   try {
     return await fn();
   } catch (err) {
-    if (/Unable to parse OID/i.test(err.message) || /Object not found/i.test(err.message)) {
+    if (err instanceof UnknownObjectId) {
       throw new Error(err.message, { status: 400, source: { pointer: '/data/meta/version' } });
     }
-    if (err instanceof Change.GitConflict) {
+    if (err instanceof GitConflict) {
       throw new Error('Merge conflict', { status: 409 });
     }
-    if (err instanceof Change.OverwriteRejected) {
+    if (err instanceof OverwriteRejected) {
       throw new Error(`id ${id} is already in use for type ${type}`, { status: 409, source: { pointer: '/data/id' } });
     }
-    if (err instanceof Change.NotFound) {
+    if (err instanceof FileNotFound) {
       throw new Error(`${type} with id ${id} does not exist`, {
         status: 404,
         source: { pointer: '/data/id' },
@@ -390,7 +379,7 @@ async function finalizer(this: Writer, pendingChange: todo) {
         file.delete();
       }
     }
-    let version = await change.finalize(signature, this.remote, this.fetchOpts);
+    let version = await change.finalize(signature, this.remote);
     await this._pushToGithereum();
     return { version, hash: file ? file.savedId() : null };
   });
