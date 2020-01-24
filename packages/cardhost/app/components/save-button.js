@@ -9,7 +9,7 @@ import ENV from '@cardstack/cardhost/config/environment';
 
 const { autosaveDebounce, autosaveDisabled } = ENV;
 const SAVED_HIGHLIGHT_DELAY = 2500;
-const AUTOSAVE_DEBOUNCE = 1000;
+const AUTOSAVE_DEBOUNCE = 5000;
 
 export default class SaveButton extends Component {
   @service router;
@@ -26,6 +26,8 @@ export default class SaveButton extends Component {
     return card.isNew;
   }
 
+  // This task needs to be queued, otherwise we will get
+  // 409 conflicts with the `/meta/version`
   @enqueueTask
   *saveCard() {
     let card = this.args.card;
