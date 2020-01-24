@@ -1,6 +1,6 @@
 import { CardId, AddressableCard } from './card';
 
-export interface BatchIndexUpdate {
+export interface BatchedIndexUpdate {
   save: (card: AddressableCard) => Promise<void>;
   delete: (id: CardId) => Promise<void>;
   createGeneration: (realm: string) => void;

@@ -1,5 +1,5 @@
 import { AddressableCard } from '@cardstack/core/lib/card';
-import { BatchIndexUpdate } from './batch';
+import { BatchedIndexUpdate } from './batched-index-update';
 import { UpstreamDocument, UpstreamIdentity, upstreamIdToCardId } from '@cardstack/core/lib/document';
 import { CardInstantiator } from './card-instantiator';
 
@@ -12,7 +12,7 @@ export interface Indexer<Meta> {
 }
 
 export class IndexingOperations {
-  constructor(private realmCard: AddressableCard, private batch: BatchIndexUpdate, private cards: CardInstantiator) {}
+  constructor(private realmCard: AddressableCard, private batch: BatchedIndexUpdate, private cards: CardInstantiator) {}
 
   async save(upstreamId: UpstreamIdentity, doc: UpstreamDocument) {
     let id = upstreamIdToCardId(upstreamId, this.realmCard.csId);

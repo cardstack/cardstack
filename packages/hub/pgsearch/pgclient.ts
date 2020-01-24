@@ -37,7 +37,7 @@ import snakeCase from 'lodash/snakeCase';
 import flatten from 'lodash/flatten';
 import assertNever from 'assert-never';
 import { ScopedCardService } from '../cards-service';
-import { BatchIndexUpdate } from '@cardstack/core/lib/batch';
+import { BatchedIndexUpdate } from '@cardstack/core/lib/batched-index-update';
 
 const log = logger('cardstack/pgsearch');
 
@@ -538,7 +538,7 @@ export default class PgClient {
   }
 }
 
-export class Batch implements BatchIndexUpdate {
+export class Batch implements BatchedIndexUpdate {
   private generations: {
     [realm: string]: number | undefined;
   } = {};
