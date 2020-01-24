@@ -1,5 +1,9 @@
 'use strict';
 
+// This is a feature flag supported in ember-cli 3.15+ that gives you faster
+// rebuilds, and it makes rebuilding of addons work in embroider.
+process.env.BROCCOLI_ENABLED_MEMOIZE = 'true';
+
 const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
