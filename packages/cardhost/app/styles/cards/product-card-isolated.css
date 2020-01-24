@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css?family=Rubik:400,700&display=swap');
+
+
+.product-card-isolated {
+    background-color: #0069F9;
+    color: white;
+    font-family: 'Rubik', sans-serif;
+    font-size: 15px;
+    line-height: calc(23 / 15);
+}
+
+.isolated-card--view-fields {
+    padding-top: 80px;
+}
+
+.field {
+    display: block;
+    padding: 0;
+    text-align: center;
+}
+
+.title-field,
+.highlight-title-field,
+.product-company-logo-field,
+product-description-field {
+    display: none;
+}
+
+.label {
+    display: none;
+}
+
+.product-ranking-field {
+    order: -5;
+}
+.product-image-field {
+    order: -4;
+}
+.product-name-field {
+    order: -3;
+}
+.product-company-field {
+    order: -2;
+}
+
+.product-ranking-value::before {
+    content: '#';
+    display: inline-block;
+    font-size: 27px;
+}
+.product-ranking-value {
+    position: absolute;
+    top: 0;
+    right: 20px;
+    font-size: 138px;
+}
+
+.product-image-value {
+    width: 233px;
+    height: 423px;
+    margin: 0 auto 38px;
+}
+
+.product-name-value {
+  padding-bottom: 6px;
+  font-size: 25px;
+  font-weight: bold;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+}
+
+.product-company-value::before {
+    display: inline-block;
+    content: 'by';
+    padding-bottom: 14px;
+}
+
+.product-cta-field {
+    padding-top: 70px;
+    padding-bottom: 30px;
+    background-color: white;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+}
+
+.product-cta-value {
+    width: 80%;
+    min-height: 52px;
+    padding: 0;
+    border-radius: 100px;
+    background-color: black;
+    font-size: 19px;
+    letter-spacing: 0.1em;
+    line-height: calc(52 / 19);
+    text-transform: uppercase;
+}
