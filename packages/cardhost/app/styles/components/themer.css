@@ -284,7 +284,12 @@
   padding-right: var(--ch-spacing);
 }
 
+.card-renderer-isolated.themer.view .card-renderer-isolated--header--wrapper  {
+  left: var(--ch-spacing);
+  right: var(--ch-spacing);
+}
+
 .themer.view {
   width: var(--ch-card-size);
-  margin-left: var(--ch-spacing);
+  padding: var(--ch-spacing);
 }
