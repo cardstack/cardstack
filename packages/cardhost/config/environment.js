@@ -49,6 +49,8 @@ module.exports = function(environment) {
       'local-hub::event-ticket',
       'local-hub::product-card',
       'local-hub::wedding-invitation',
+      'local-hub::photo-card',
+      'local-hub::byline-card',
     ];
   }
 

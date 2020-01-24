@@ -551,6 +551,105 @@ let weddingInvitationTemplate = weddingFactory.getDocumentFor(
     )
 );
 
+let photoFactory = new Factory();
+let photoTemplate = photoFactory.getDocumentFor(
+  photoFactory
+    .addResource('cards', 'local-hub::photo-card')
+    .withRelated('adopted-from', { type: 'cards', id: 'local-hub::@cardstack/base-card' })
+    .withRelated('fields', [
+      photoFactory.addResource('fields', 'image').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::decorative-image',
+        'needed-when-embedded': true,
+        required: true,
+        caption: 'Image URL',
+      }),
+      photoFactory.addResource('fields', 'caption').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'Caption',
+      }),
+      photoFactory.addResource('fields', 'description').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: true,
+        'needed-when-embedded': false,
+        caption: 'Description for a screen reader',
+      }),
+      photoFactory.addResource('fields', 'keywords').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: true,
+        'needed-when-embedded': false,
+        caption: 'Keywords',
+      }),
+      photoFactory.addResource('fields', 'location').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'Location',
+      }),
+      photoFactory.addResource('fields', 'datetime').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::date',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'Date & Time',
+      }),
+      photoFactory.addResource('fields', 'byline').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::belongs-to',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'Byline',
+      }),
+    ])
+    .withRelated(
+      'model',
+      photoFactory.addResource('local-hub::photo-card', 'local-hub::photo-card').withAttributes({
+        image: '/assets/images/cards/photo-skiing/photo-skiing.png',
+        byline: 'local-hub::byline-card',
+        caption: 'Hit the slopes as early as possible for the best snowboarding experience',
+        description: 'Snowboarder riding down a groomed trail on a sunny day',
+        keywords: 'snow, snowboarder, sports, snowsports, wintersports, mountain, powder, blue, white',
+        datetime: '2020-01-25',
+        location: 'Nassfeld, Austria',
+      })
+    )
+);
+
+let bylineFactory = new Factory();
+let bylineTemplate = bylineFactory.getDocumentFor(
+  bylineFactory
+    .addResource('cards', 'local-hub::byline-card')
+    .withRelated('adopted-from', { type: 'cards', id: 'local-hub::@cardstack/base-card' })
+    .withRelated('fields', [
+      bylineFactory.addResource('fields', 'name').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::string',
+        'needed-when-embedded': true,
+        required: true,
+        caption: 'Name',
+      }),
+      bylineFactory.addResource('fields', 'image').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::decorative-image',
+        'needed-when-embedded': true,
+        caption: 'Image',
+      }),
+    ])
+    .withRelated(
+      'model',
+      bylineFactory.addResource('local-hub::byline-card', 'local-hub::byline-card').withAttributes({
+        name: 'Carlos Naipes',
+        image: '/assets/images/cards/photo-skiing/photo-skiing-byline.png',
+      })
+    )
+);
+
 module.exports = [
   locationCardTemplate,
   eventCardTemplate,
@@ -559,4 +658,6 @@ module.exports = [
   eventTicketTemplate,
   productCardTemplate,
   weddingInvitationTemplate,
+  photoTemplate,
+  bylineTemplate,
 ];
