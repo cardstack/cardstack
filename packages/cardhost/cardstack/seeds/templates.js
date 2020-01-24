@@ -345,6 +345,13 @@ let productCardTemplate = productFactory.getDocumentFor(
         required: true,
         caption: 'Title',
       }),
+      productFactory.addResource('fields', 'title-logo').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::decorative-image',
+        'needed-when-embedded': true,
+        required: false,
+        caption: 'Title logo',
+      }),
       productFactory.addResource('fields', 'highlight-title').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
@@ -361,8 +368,16 @@ let productCardTemplate = productFactory.getDocumentFor(
       productFactory.addResource('fields', 'product-ranking').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::integer',
-        required: false,
+        'needed-when-embedded': true,
+        required: true,
         caption: 'Score',
+      }),
+      productFactory.addResource('fields', 'product-rating').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::integer',
+        'needed-when-embedded': true,
+        required: true,
+        caption: 'Rating (Out of 100, in increments of 10)',
       }),
       productFactory.addResource('fields', 'product-company').withAttributes({
         'is-metadata': true,
@@ -383,7 +398,7 @@ let productCardTemplate = productFactory.getDocumentFor(
         'field-type': '@cardstack/core-types::string',
         'needed-when-embedded': true,
         required: false,
-        caption: 'Coffee bean',
+        caption: 'Product name',
       }),
       productFactory.addResource('fields', 'product-image').withAttributes({
         'is-metadata': true,
@@ -395,7 +410,7 @@ let productCardTemplate = productFactory.getDocumentFor(
       productFactory.addResource('fields', 'product-description').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
-        'needed-when-embedded': true,
+        'needed-when-embedded': false,
         required: false,
         caption: 'Description',
       }),
@@ -418,15 +433,19 @@ let productCardTemplate = productFactory.getDocumentFor(
       'model',
       productFactory.addResource('local-hub::product-card', 'local-hub::product-card').withAttributes({
         title: 'Coffee Bean Award 2020 Winners',
+        titleLogo: '/assets/images/cards/coffee-bean/coffee-competition-logo.svg',
         highlightTitle: '2nd Place',
         divider: true,
         productRanking: 2,
+        productRating: 90,
         productCompany: 'Ultra Strong Coffee',
         productCompanyLogo: '/assets/images/cards/coffee-bean/coffee-logo.svg',
         productName: 'Kenian Devil Roast',
         productImage: '/assets/images/cards/coffee-bean/coffee-image.svg',
         productDescription:
           'Pleasant aroma, deep acidity, and a unique bergamot flavor – this is a coffee that won’t let you sleep. It is grown in the volcanic soils around Mt. Kenya.',
+        productLink: '',
+        productCta: '',
       })
     )
 );

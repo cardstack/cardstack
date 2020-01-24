@@ -84,6 +84,7 @@
 
 /* label hidden by default */
 .cardstack_base-card-isolated .title-label,
+.cardstack_base-card-isolated .title-logo-label,
 .cardstack_base-card-isolated .highlight-title-label,
 .cardstack_base-card-isolated .background-image-label,
 .cardstack_base-card-isolated .body-label,
@@ -91,6 +92,7 @@
   display: none;
 }
 
+.cardstack_base-card-isolated .title-logo-field,
 .cardstack_base-card-isolated .divider-value {
   display: none;
 }

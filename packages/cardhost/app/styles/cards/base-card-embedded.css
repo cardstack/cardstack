@@ -108,10 +108,12 @@
 .cardstack_base-card-embedded .highlight-title-label,
 .cardstack_base-card-embedded .background-image-label,
 .cardstack_base-card-embedded .body-label,
-.cardstack_base-card-embedded .divider-label {
+.cardstack_base-card-embedded .divider-label,
+.cardstack_base-card-embedded .title-logo-label {
   display: none;
 }
 
+.cardstack_base-card-embedded .title-logo-field,
 .cardstack_base-card-embedded .divider-value {
   display: none;
 }
@@ -130,6 +132,9 @@
 }
 
 /* field-name: title */
+.cardstack_base-card-embedded .title-field {
+  padding-bottom: 7px;
+}
 .cardstack_base-card-embedded .title-value {
   color: var(--dark-gray);
   font-size: 20px;
@@ -151,4 +156,12 @@
 .cardstack_base-card-embedded .divider-field {
   width: calc(100% - 30px);
   border-top: 1px solid var(--light-gray);
+}
+
+
+/* Product card */
+.cardstack_base-card-embedded .product-rating-field,
+.cardstack_base-card-embedded .product-ranking-field,
+.cardstack_base-card-embedded .field.product-link-field {
+  display: none;
 }
