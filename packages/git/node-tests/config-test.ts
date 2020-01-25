@@ -13,6 +13,7 @@ import { makeRepo } from './support';
 import Change from '../change';
 
 describe('git/config', function() {
+  this.timeout(10000);
   let factory: todo, env: todo, repoPath: string;
 
   beforeEach(async function() {

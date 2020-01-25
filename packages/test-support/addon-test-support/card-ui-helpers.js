@@ -61,12 +61,11 @@ export async function dragFieldToNewPosition(originalPosition, newPosition) {
 export async function createCards(args) {
   for (let id of Object.keys(args)) {
     await visit('/cards/new');
-    await setCardId(id);
     for (let [index, [name, type, neededWhenEmbedded]] of args[id].entries()) {
       await addField(name, type, neededWhenEmbedded, index);
     }
-    await click('[data-test-card-save-btn]');
-    await waitFor(`[data-test-card-schema="${id}"]`, { timeout });
+    await setCardId(id);
+    await saveCard('creator', id);
 
     await visit(`/cards/${id}/edit/fields`);
     for (let [name, , , value] of args[id]) {

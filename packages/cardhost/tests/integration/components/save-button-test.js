@@ -34,4 +34,54 @@ module('Integration | Component | save-button', function(hooks) {
 
     await click('[data-test-card-save-btn]');
   });
+
+  test('autosaves when card is dirty', async function(assert) {
+    assert.expect(1);
+
+    this.owner.register(
+      'service:cardstack-session',
+      Service.extend({
+        isAuthenticated: true,
+      })
+    );
+    this.set('card', {
+      isDirty: false,
+    });
+    this.set('clickAction', () => {
+      assert.ok(true);
+    });
+
+    await render(hbs`<SaveButton @card={{this.card}} @clickAction={{this.clickAction}} @autosaveDisabled={{false}}/>`);
+
+    this.set('card', {
+      isDirty: true,
+    });
+
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  });
+
+  test('can disable autosave', async function(assert) {
+    assert.expect(0);
+
+    this.owner.register(
+      'service:cardstack-session',
+      Service.extend({
+        isAuthenticated: true,
+      })
+    );
+    this.set('card', {
+      isDirty: false,
+    });
+    this.set('clickAction', () => {
+      assert.ok(true);
+    });
+
+    await render(hbs`<SaveButton @card={{this.card}} @clickAction={{this.clickAction}} @autosaveDisabled={{true}}/>`);
+
+    this.set('card', {
+      isDirty: true,
+    });
+
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  });
 });
