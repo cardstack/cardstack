@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css?family=Teko:500&display=swap');
+
+.photo-card-isolated .photo-image-url-field {
+    z-index: 1;
+}
+.photo-card-isolated .field {
+    z-index: 2;
+    display: block;
+    font-family: 'Roboto';
+    color: black;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.035em;
+}
+.photo-card-isolated .label {
+    display: none;
+}
+.photo-card-isolated .photo-description-field {
+    display: none;
+}
+.photo-card-isolated .photo-keywords-field {
+    display: none;
+}
+.photo-card-isolated .photo-image-url-value {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    min-width: 100%;
+    min-height: 100%;
+}
+
+.photo-card-isolated .photo-caption-field {
+    width: 72%;
+    position: relative;
+    display: inline-block;
+    margin-left: 0;
+    top: 70%;
+}
+
+.photo-card-isolated .photo-caption-value {
+    display: inline;
+    background-color: #FF0000;
+    color: white;
+    font-family: 'Teko';
+    font-weight: 500;
+    font-size: 30px;
+    line-height: 45px;
+    letter-spacing: 0.015em;
+    text-transform: uppercase;
+}
+
+
+.photo-card-isolated .byline-card-embedded {
+    width: 150px;
+}
+
+.photo-card-isolated .byline-card-embedded .embedded-card--view-fields {
+    display: grid;
+    grid-template: 'image name';
+    align-items: center;
+}
+
+.photo-card-isolated .byline-card-embedded .byline-image-field {
+    grid-area: image;
+    width: 40px;
+}
+.photo-card-isolated .byline-card-embedded .byline-name-field {
+    grid-area: name;
+}
+.photo-card-isolated .byline-card-embedded .field {
+    padding: 0;
+    margin: 0;
+}
+
