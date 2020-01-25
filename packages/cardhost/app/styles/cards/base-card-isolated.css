@@ -134,3 +134,17 @@
   max-width: 596px; /* max-field-width - padding * 2 */
   border-top: 1px solid var(--light-gray);
 }
+
+
+/* Photo Card */
+/* field-name: photo-image-url */
+.cardstack_base-card-isolated .photo-image-url-field {
+  display: block;
+}
+.cardstack_base-card-isolated .photo-image-url-label {
+  display: none;
+}
+.cardstack_base-card-isolated .photo-image-url-value {
+  max-height: 404px;
+  margin: 0 auto;
+}

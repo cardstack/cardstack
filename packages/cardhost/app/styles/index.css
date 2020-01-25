@@ -129,8 +129,15 @@
   display: block;
 }
 
+.card-catalog > * {
+  width: 225px;
+  margin: 0;
+  padding: 0;
+}
+
 .card-catalog > * > *,
 .card-catalog > * > * > * {
+  height: 225px;
   border-radius: 15px;
   transition: transform var(--ch-card-transition-duration) ease-in-out calc(var(--ch-card-transition-duration) / 3);
 }

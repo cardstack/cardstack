@@ -557,49 +557,49 @@ let photoTemplate = photoFactory.getDocumentFor(
     .addResource('cards', 'local-hub::photo-card')
     .withRelated('adopted-from', { type: 'cards', id: 'local-hub::@cardstack/base-card' })
     .withRelated('fields', [
-      photoFactory.addResource('fields', 'image').withAttributes({
+      photoFactory.addResource('fields', 'photo-image-url').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::decorative-image',
         'needed-when-embedded': true,
         required: true,
         caption: 'Image URL',
       }),
-      photoFactory.addResource('fields', 'caption').withAttributes({
+      photoFactory.addResource('fields', 'photo-caption').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
         'needed-when-embedded': true,
         caption: 'Caption',
       }),
-      photoFactory.addResource('fields', 'description').withAttributes({
+      photoFactory.addResource('fields', 'photo-description').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
         'needed-when-embedded': false,
         caption: 'Description for a screen reader',
       }),
-      photoFactory.addResource('fields', 'keywords').withAttributes({
+      photoFactory.addResource('fields', 'photo-keywords').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
         'needed-when-embedded': false,
         caption: 'Keywords',
       }),
-      photoFactory.addResource('fields', 'location').withAttributes({
+      photoFactory.addResource('fields', 'photo-location').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
         'needed-when-embedded': true,
         caption: 'Location',
       }),
-      photoFactory.addResource('fields', 'datetime').withAttributes({
+      photoFactory.addResource('fields', 'photo-datetime').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::date',
         required: true,
         'needed-when-embedded': true,
         caption: 'Date & Time',
       }),
-      photoFactory.addResource('fields', 'byline').withAttributes({
+      photoFactory.addResource('fields', 'photo-byline').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::belongs-to',
         required: true,
@@ -609,15 +609,17 @@ let photoTemplate = photoFactory.getDocumentFor(
     ])
     .withRelated(
       'model',
-      photoFactory.addResource('local-hub::photo-card', 'local-hub::photo-card').withAttributes({
-        image: '/assets/images/cards/photo-skiing/photo-skiing.png',
-        byline: 'local-hub::byline-card',
-        caption: 'Hit the slopes as early as possible for the best snowboarding experience',
-        description: 'Snowboarder riding down a groomed trail on a sunny day',
-        keywords: 'snow, snowboarder, sports, snowsports, wintersports, mountain, powder, blue, white',
-        datetime: '2020-01-25',
-        location: 'Nassfeld, Austria',
-      })
+      photoFactory
+        .addResource('local-hub::photo-card', 'local-hub::photo-card')
+        .withAttributes({
+          photoImageUrl: '/assets/images/cards/photo-skiing/photo-skiing.png',
+          photoCaption: 'Hit the slopes as early as possible for the best snowboarding experience',
+          photoDescription: 'Snowboarder riding down a groomed trail on a sunny day',
+          photoKeywords: 'snow, snowboarder, sports, snowsports, wintersports, mountain, powder, blue, white',
+          photoDatetime: '2020-01-25',
+          photoLocation: 'Nassfeld, Austria',
+        })
+        .withRelated('photo-byline', { type: 'cards', id: 'local-hub::byline-card' })
     )
 );
 
@@ -627,14 +629,14 @@ let bylineTemplate = bylineFactory.getDocumentFor(
     .addResource('cards', 'local-hub::byline-card')
     .withRelated('adopted-from', { type: 'cards', id: 'local-hub::@cardstack/base-card' })
     .withRelated('fields', [
-      bylineFactory.addResource('fields', 'name').withAttributes({
+      bylineFactory.addResource('fields', 'byline-name').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
         'needed-when-embedded': true,
         required: true,
         caption: 'Name',
       }),
-      bylineFactory.addResource('fields', 'image').withAttributes({
+      bylineFactory.addResource('fields', 'byline-image').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::decorative-image',
         'needed-when-embedded': true,
@@ -644,8 +646,8 @@ let bylineTemplate = bylineFactory.getDocumentFor(
     .withRelated(
       'model',
       bylineFactory.addResource('local-hub::byline-card', 'local-hub::byline-card').withAttributes({
-        name: 'Carlos Naipes',
-        image: '/assets/images/cards/photo-skiing/photo-skiing-byline.png',
+        bylineName: 'Carlos Naipes',
+        bylineImage: '/assets/images/cards/photo-skiing/photo-skiing-byline.png',
       })
     )
 );

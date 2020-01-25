@@ -15,16 +15,11 @@
 /* Embedded card default styles */
 .cardstack_base-card-embedded {
   width: 100%;
-  max-width: 275px;
-  min-height: 225px;
-  max-height: 500px;
-  margin: 0 auto;
-
+  margin: 0;
   background-color: white;
   color: black;
   font: 400 12px/1.3 'Open Sans';
   letter-spacing: 0.03em;
-
   text-align: left;
   overflow: hidden;
   overflow-wrap: break-word;
@@ -164,4 +159,17 @@
 .cardstack_base-card-embedded .product-ranking-field,
 .cardstack_base-card-embedded .field.product-link-field {
   display: none;
+}
+
+
+/* Photo card */
+.cardstack_base-card-embedded .photo-image-url-field {
+  display: block;
+}
+.cardstack_base-card-embedded .photo-image-url-label {
+  display: none;
+}
+.cardstack_base-card-embedded .photo-image-url-value {
+  max-height: 204px;
+  margin: 0 auto;
 }
