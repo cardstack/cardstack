@@ -1,8 +1,8 @@
 import { module, skip } from 'qunit';
 import { visit, currentURL } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
-import Fixtures from '@cardstack/test-support/fixtures';
-import { createCards } from '@cardstack/test-support/card-ui-helpers';
+import Fixtures from '../helpers/fixtures';
+import { createCards } from '../helpers/card-ui-helpers';
 import { percySnapshot } from 'ember-percy';
 import { setupMockUser, login } from '../helpers/login';
 

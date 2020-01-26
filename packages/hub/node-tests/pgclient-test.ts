@@ -1,7 +1,7 @@
 import { param } from '../pgsearch/util';
 import { createTestEnv, TestEnv } from './helpers';
-import { testCard } from './test-card';
-import { Session } from '../session';
+import { testCard } from '@cardstack/test-support/test-card';
+import { Session } from '@cardstack/core/session';
 
 describe('hub/pgclient', function() {
   let env: TestEnv;

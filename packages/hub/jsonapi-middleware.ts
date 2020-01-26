@@ -6,15 +6,15 @@ import mimeMatch from 'mime-match';
 import KoaBody from 'koa-body';
 import { Memoize } from 'typescript-memoize';
 import { inject } from './dependency-injection';
-import CardstackError from '@cardstack/core/lib/error';
+import CardstackError from '@cardstack/core/error';
 import { SessionContext } from './authentication-middleware';
 import { assertSingleResourceDoc } from './jsonapi';
-import { myOrigin } from './origin';
-import { makePristineCollection, apiPrefix, AddressableCard, CardId } from '@cardstack/core/lib/card';
+import { myOrigin } from '@cardstack/core/origin';
+import { makePristineCollection, apiPrefix, AddressableCard, CardId } from '@cardstack/core/card';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { parse } from 'qs';
 import { assertQuery } from './query';
-import { OcclusionRules, assertOcclusionRules } from '@cardstack/core/lib/occlusion-rules';
+import { OcclusionRules, assertOcclusionRules } from '@cardstack/core/occlusion-rules';
 
 const apiPrefixPattern = new RegExp(`^${apiPrefix}/(.*)`);
 

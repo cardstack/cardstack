@@ -1,5 +1,5 @@
-import { Card } from '@cardstack/core/lib/card';
-import { Expression } from '@cardstack/core/lib/expression';
+import { Card } from '@cardstack/core/card';
+import { Expression } from '@cardstack/core/expression';
 
 export function buildQueryExpression(source: Expression, fieldName: string) {
   return ['(', ...source, '->>', { param: fieldName }, ')::bigint'];

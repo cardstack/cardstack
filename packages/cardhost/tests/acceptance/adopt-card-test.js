@@ -1,7 +1,7 @@
 import { module, test, skip } from 'qunit';
 import { click, find, visit, currentURL, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
-import Fixtures from '@cardstack/test-support/fixtures';
+import Fixtures from '../helpers/fixtures';
 import {
   showCardId,
   addField,
@@ -10,7 +10,7 @@ import {
   saveCard,
   setFieldValue,
   removeField,
-} from '@cardstack/test-support/card-ui-helpers';
+} from '../helpers/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { animationsSettled } from 'ember-animated/test-support';

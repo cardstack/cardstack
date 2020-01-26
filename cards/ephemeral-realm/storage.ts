@@ -1,6 +1,6 @@
-import { UpstreamDocument, UpstreamIdentity } from '@cardstack/core/lib/document';
+import { UpstreamDocument, UpstreamIdentity } from '@cardstack/core/document';
 import { MetaObject } from 'jsonapi-typescript';
-import CardstackError from '@cardstack/core/lib/error';
+import CardstackError from '@cardstack/core/error';
 
 interface StoreEntry {
   id: UpstreamIdentity;

@@ -1,5 +1,5 @@
-import { CardId } from '@cardstack/core/lib/card';
-import { Expression, PgPrimitive, Param } from '@cardstack/core/lib/expression';
+import { CardId } from '@cardstack/core/card';
+import { Expression, PgPrimitive, Param } from '@cardstack/core/expression';
 
 export interface FieldQuery {
   typeContext: CardId;

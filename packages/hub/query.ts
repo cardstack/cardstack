@@ -1,7 +1,7 @@
-import { CardId } from '@cardstack/core/lib/card';
+import { CardId } from '@cardstack/core/card';
 import * as JSON from 'json-typescript';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/lib/realm';
-import CardstackError from '@cardstack/core/lib/error';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import CardstackError from '@cardstack/core/error';
 import { assertJSONValue, assertJSONPrimitive } from './json-validation';
 
 export interface Query {

@@ -1,8 +1,8 @@
 import { TestEnv, createTestEnv } from './helpers';
-import { testCard } from './test-card';
-import { myOrigin } from '../origin';
+import { testCard } from '@cardstack/test-support/test-card';
+import { myOrigin } from '@cardstack/core/origin';
 import { ScopedCardService } from '../cards-service';
-import { Session } from '../session';
+import { Session } from '@cardstack/core/session';
 import { ModuleService } from '../module-service';
 import { tmpdir } from 'os';
 import { join } from 'path';
@@ -108,7 +108,7 @@ describe('module-service', function() {
   });
 
   it('allows feature code to import from hub peerDependency', async function() {
-    let sampleValidator = `const CardstackError = require('@cardstack/core/lib/error').default;
+    let sampleValidator = `const CardstackError = require('@cardstack/core/error').default;
        module.exports = function shouldThrow(value){ throw new CardstackError('it worked', { title: 'it worked', status: 654 }) }
      `;
     let card = await cards.create(

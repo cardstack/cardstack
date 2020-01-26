@@ -6,7 +6,7 @@ import { dasherize } from '@ember/string';
 import { startCase } from 'lodash';
 import { task } from 'ember-concurrency';
 import ENV from '@cardstack/cardhost/config/environment';
-import { fieldTypeMappings, fieldComponents } from '@cardstack/core/utils/mappings';
+import { fieldTypeMappings, fieldComponents } from '../utils/mappings';
 
 const { environment } = ENV;
 

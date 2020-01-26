@@ -1,6 +1,6 @@
 import { Memoize } from 'typescript-memoize';
 import { Deferred } from './deferred';
-import { Container as ContainerInterface, Factory } from '@cardstack/core/lib/container';
+import { Container as ContainerInterface, Factory } from '@cardstack/core/container';
 
 let nonce = 0;
 

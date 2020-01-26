@@ -1,8 +1,8 @@
-import { AddressableCard, CardId, canonicalURL } from '@cardstack/core/lib/card';
+import { AddressableCard, CardId, canonicalURL } from '@cardstack/core/card';
 import { Query } from './query';
-import { myOrigin } from './origin';
-import { testCard } from './node-tests/test-card';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/lib/realm';
+import { myOrigin } from '@cardstack/core/origin';
+import { testCard } from '../test-support/test-card';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import { ScopedCardService } from './cards-service';
 
 async function ephemeralRealms(cards: ScopedCardService) {

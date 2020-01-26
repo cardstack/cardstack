@@ -20,24 +20,17 @@ import {
   FieldValue,
   FieldArity,
 } from './util';
-import { Expression, PgPrimitive } from '@cardstack/core/lib/expression';
-import {
-  AddressableCard,
-  CardId,
-  Card,
-  FieldCard,
-  cardstackFieldPattern,
-  canonicalURL,
-} from '@cardstack/core/lib/card';
-import { ResponseMeta } from '@cardstack/core/lib/document';
-import CardstackError from '@cardstack/core/lib/error';
+import { Expression, PgPrimitive } from '@cardstack/core/expression';
+import { AddressableCard, CardId, Card, FieldCard, cardstackFieldPattern, canonicalURL } from '@cardstack/core/card';
+import { ResponseMeta } from '@cardstack/core/document';
+import CardstackError from '@cardstack/core/error';
 import { Query, baseType, Filter, EqFilter, RangeFilter } from '../query';
 import { Sorts } from './sorts';
 import snakeCase from 'lodash/snakeCase';
 import flatten from 'lodash/flatten';
 import assertNever from 'assert-never';
 import { ScopedCardService } from '../cards-service';
-import { BatchedIndexUpdate } from '@cardstack/core/lib/batched-index-update';
+import { BatchedIndexUpdate } from '@cardstack/core/batched-index-update';
 
 const log = logger('cardstack/pgsearch');
 

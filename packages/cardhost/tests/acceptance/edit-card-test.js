@@ -1,8 +1,8 @@
 import { module, test } from 'qunit';
 import { find, visit, currentURL } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
-import Fixtures from '@cardstack/test-support/fixtures';
-import { setFieldValue, createCards, saveCard } from '@cardstack/test-support/card-ui-helpers';
+import Fixtures from '../helpers/fixtures';
+import { setFieldValue, createCards, saveCard } from '../helpers/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 
 const card1Id = 'millenial-puppies';

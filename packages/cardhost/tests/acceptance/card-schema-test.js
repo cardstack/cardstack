@@ -1,7 +1,7 @@
 import { module, test } from 'qunit';
 import { click, find, visit, currentURL, waitFor, fillIn, triggerEvent } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
-import Fixtures from '@cardstack/test-support/fixtures';
+import Fixtures from '../helpers/fixtures';
 import {
   showCardId,
   addField,
@@ -10,7 +10,7 @@ import {
   removeField,
   dragAndDropNewField,
   dragFieldToNewPosition,
-} from '@cardstack/test-support/card-ui-helpers';
+} from '../helpers/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 import { animationsSettled } from 'ember-animated/test-support';
 

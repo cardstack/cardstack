@@ -1,4 +1,4 @@
-import { Card } from '@cardstack/core/lib/card';
+import { Card } from '@cardstack/core/card';
 import stringify from 'fast-json-stable-stringify';
 import { createHash } from 'crypto';
 import { homedir } from 'os';
@@ -7,7 +7,7 @@ import { existsSync } from 'fs';
 import { Deferred } from './deferred';
 import { outputFile, mkdirp, ensureSymlink } from 'fs-extra';
 import { satisfies, coerce } from 'semver';
-import { ModuleLoader } from '@cardstack/core/lib/module-loader';
+import { ModuleLoader } from '@cardstack/core/module-loader';
 
 export const cardFilesCache = process.env.CARD_FILES_CACHE ?? join(homedir(), '.cardstack', 'card-files-cache');
 
@@ -23,7 +23,8 @@ export class ModuleService implements ModuleLoader {
     hash.update(stringify((await card.asUpstreamDoc()).jsonapi));
     let cardDir = join(cardFilesCache, hash.digest('hex'));
     await this.cachedWriteCard(card, cardDir);
-    let module = await import(join(cardDir, localModulePath));
+    // tslint:disable-next-line
+    let module = await import(join(cardDir, localModulePath)); // we are using ESM for module loading
     return module[exportedName];
   }
 

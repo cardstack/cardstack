@@ -3,8 +3,7 @@ module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: './tsconfig.json',
-    ecmaVersion: 2017,
+    ecmaVersion: 2018,
     sourceType: 'module',
   },
   plugins: ['ember', '@typescript-eslint', 'prettier'],

@@ -1,13 +1,13 @@
 import Koa from 'koa';
 import supertest from 'supertest';
-import { myOrigin } from '../origin';
+import { myOrigin } from '@cardstack/core/origin';
 import { TestEnv, createTestEnv } from './helpers';
-import { testCard } from './test-card';
+import { testCard } from '@cardstack/test-support/test-card';
 import { stringify } from 'qs';
-import { Session } from '../session';
+import { Session } from '@cardstack/core/session';
 import { assertSingleResourceDoc, assertCollectionResourceDoc } from '../jsonapi';
-import { AddressableCard, canonicalURL } from '@cardstack/core/lib/card';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/lib/realm';
+import { AddressableCard, canonicalURL } from '@cardstack/core/card';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 describe('hub/jsonapi', function() {
   let request: supertest.SuperTest<supertest.Test>;

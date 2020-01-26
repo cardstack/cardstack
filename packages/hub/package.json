@@ -38,6 +38,7 @@
   },
   "devDependencies": {
     "@cardstack/eslint-config": "0.16.22",
+    "@cardstack/test-support": "0.16.22",
     "@types/supertest": "^2.0.8",
     "supertest": "^4.0.2"
   },

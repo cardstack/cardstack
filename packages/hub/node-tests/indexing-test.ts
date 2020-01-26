@@ -1,10 +1,10 @@
 import { TestEnv, createTestEnv } from './helpers';
 import { EphemeralStorage } from '../../../cards/ephemeral-realm/storage';
 import IndexingService from '../indexing';
-import { testCard } from './test-card';
-import { myOrigin } from '../origin';
+import { testCard } from '@cardstack/test-support/test-card';
+import { myOrigin } from '@cardstack/core/origin';
 import CardsService from '../cards-service';
-import { Session } from '../session';
+import { Session } from '@cardstack/core/session';
 import { wireItUp } from '../main';
 
 describe('hub/indexing', function() {

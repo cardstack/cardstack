@@ -1,11 +1,11 @@
-import { Session } from './session';
+import { Session } from '@cardstack/core/session';
 import { inject, getOwner, injectionReady } from './dependency-injection';
-import { myOrigin } from './origin';
-import { IndexingOperations } from '@cardstack/core/lib/indexer';
+import { myOrigin } from '@cardstack/core/origin';
+import { IndexingOperations } from '@cardstack/core/indexer';
 import * as JSON from 'json-typescript';
 import { upsert, param } from './pgsearch/util';
-import { Expression } from '@cardstack/core/lib/expression';
-import { CardId } from '@cardstack/core/lib/card';
+import { Expression } from '@cardstack/core/expression';
+import { CardId } from '@cardstack/core/card';
 
 export default class IndexingService {
   cards = inject('cards');

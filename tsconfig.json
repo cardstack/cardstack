@@ -1,8 +1,9 @@
 {
-  "include": ["./packages/**/*.ts", "./packages/**/*.js", "./scripts/**/*.js", "./cards/**/*.ts"],
+  "include": ["./packages/**/*.ts", "./packages/**/*.js", "./scripts/**/*.js", "./cards/**/*.ts" ],
   "compilerOptions": {
     "target": "es2017",
     "module": "commonjs",
+    "moduleResolution": "Node",
     "declaration": true,
     "typeRoots": ["node_modules/@types", "types"],
     "esModuleInterop": true,
@@ -20,6 +21,6 @@
     "packages/*/node_modules",
     "cards/*/tmp",
     "cards/*/dist",
-    "tmp"
+    "tmp",
   ]
 }

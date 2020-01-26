@@ -1,20 +1,20 @@
-import { Session } from './session';
-import { UnsavedCard, AddressableCard, CardId, canonicalURLToCardId, Card } from '@cardstack/core/lib/card';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/lib/realm';
-import { ResponseMeta } from '@cardstack/core/lib/document';
-import CardstackError from '@cardstack/core/lib/error';
-import { myOrigin } from './origin';
+import { Session } from '@cardstack/core/session';
+import { asCardId, UnsavedCard, AddressableCard, CardId, Card } from '@cardstack/core/card';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { ResponseMeta } from '@cardstack/core/document';
+import CardstackError from '@cardstack/core/error';
+import { myOrigin } from '@cardstack/core/origin';
 import { search as scaffoldSearch, get as scaffoldGet } from './scaffolding';
 import { getOwner, inject } from './dependency-injection';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { Query } from './query';
-import { Writer } from '@cardstack/core/lib/writer';
+import { Writer } from '@cardstack/core/writer';
 import { join } from 'path';
 import { assertSingleResourceDoc } from './jsonapi';
 import merge from 'lodash/merge';
 import { readdirSync, existsSync, statSync, readFileSync } from 'fs-extra';
-import { CardReader } from '@cardstack/core/lib/card-reader';
-import { CardInstantiator } from '@cardstack/core/lib/card-instantiator';
+import { CardReader } from '@cardstack/core/card-reader';
+import { CardInstantiator } from '@cardstack/core/card-instantiator';
 
 export default class CardsService {
   pgclient = inject('pgclient');
@@ -28,19 +28,19 @@ export class ScopedCardService implements CardReader, CardInstantiator {
   constructor(private cards: CardsService, private session: Session) {}
 
   async instantiate(jsonapi: SingleResourceDoc, imposeIdentity?: CardId): Promise<AddressableCard> {
-    let featureLoader = await getOwner(this.cards).lookup('modules');
+    let moduleLoader = await getOwner(this.cards).lookup('modules');
     return await getOwner(this.cards).instantiate(
       AddressableCard,
       jsonapi,
       this,
-      featureLoader,
+      moduleLoader,
       getOwner(this.cards),
       imposeIdentity
     );
   }
 
   async create(realm: string, doc: SingleResourceDoc): Promise<AddressableCard> {
-    let featureLoader = await getOwner(this.cards).lookup('modules');
+    let moduleLoader = await getOwner(this.cards).lookup('modules');
     let realmCard = await this.getRealm(realm);
     let writer = await this.loadWriter(realmCard);
     let card: UnsavedCard = await getOwner(this.cards).instantiate(
@@ -48,7 +48,7 @@ export class ScopedCardService implements CardReader, CardInstantiator {
       doc,
       realm,
       this,
-      featureLoader,
+      moduleLoader,
       getOwner(this.cards),
       this
     );
@@ -204,14 +204,6 @@ export class ScopedCardService implements CardReader, CardInstantiator {
     json.data.attributes!.csPeerDependencies = (await import(join(cardDir, 'package.json'))).peerDependencies;
 
     return await this.instantiate(json, id);
-  }
-}
-
-function asCardId(idOrURL: CardId | string): CardId {
-  if (typeof idOrURL === 'string') {
-    return canonicalURLToCardId(idOrURL);
-  } else {
-    return idOrURL;
   }
 }
 

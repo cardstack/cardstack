@@ -15,7 +15,7 @@ import {
   Included,
 } from 'jsonapi-typescript';
 import intersection from 'lodash/intersection';
-import CardstackError from '@cardstack/core/lib/error';
+import CardstackError from '@cardstack/core/error';
 import { assertJSONValue } from './json-validation';
 
 export function assertCollectionResourceDoc(
