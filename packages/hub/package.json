@@ -11,6 +11,7 @@
   "dependencies": {
     "@cardstack/core": "0.16.22",
     "@cardstack/logger": "^0.2.0",
+    "@std/esm": "^0.26.0",
     "@types/fs-extra": "^8.0.1",
     "@types/koa": "^2.0.52",
     "@types/koa-route": "^3.2.4",
