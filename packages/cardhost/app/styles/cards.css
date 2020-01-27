@@ -20,6 +20,10 @@
   background-color: var(--ch-light-background);
 }
 
+.cardhost-cards.edit {
+  background-color: var(--ch-medium-background);
+}
+
 .cardhost-cards.schema {
   background-color: var(--ch-deep-background);
 }

@@ -3,7 +3,7 @@
   data-test-card-edit={{this.card.name}}
   {{did-update this.updateCard @card}}
 >
-  <AnimatedContainer class="card-renderer--container" {{on "click" (action (mut @card.isSelected) (not @card.isSelected))}}>
+  <div class="card-renderer--container">
     <CardRenderer
       @card={{this.card}}
       @mode="edit"
@@ -13,7 +13,7 @@
       @selectedField={{this.selectedField}}
       @cardSelected={{this.card.isSelected}}
       @cardFocused={{action (mut this.card.isSelected)}} />
-  </AnimatedContainer>
+  </div>
 </section>
 
 {{!-- This is hidden, used in tests --}}

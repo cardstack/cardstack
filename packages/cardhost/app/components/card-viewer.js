@@ -1,7 +1,7 @@
-import Component from '@glimmer/component';
+import CardManipulator from './card-manipulator';
 import { inject as service } from '@ember/service';
 
-export default class CardViewer extends Component {
+export default class CardViewer extends CardManipulator {
   @service router;
   @service cardstackSession;
 
