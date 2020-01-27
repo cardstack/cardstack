@@ -1,7 +1,7 @@
 <CardhostTopEdge @mode="themer" />
 <ThemerToolbar @model={{this.model}} />
 
-<section data-test-card-view={{this.model.name}}>
+<section class="card-view" data-test-card-view={{this.model.name}}>
   <CardRenderer
     @card={{this.model}}
     @format="isolated"

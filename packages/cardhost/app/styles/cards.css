@@ -24,6 +24,22 @@
   background-color: var(--ch-deep-background);
 }
 
+.cardhost-cards.editing-css {
+  padding-left: 20px;
+  padding-right: 20px;
+  background-color: var(--ch-dark-background);
+  transition: var(--ch-card-padding-animate),
+              var(--ch-card-background-color-animate);
+}
+
+.cardhost-cards.full-width.editing-css .themer.view {
+  width: 100%;
+}
+
+.cardhost-cards.responsive.editing-css .themer.view {
+  max-width: var(--ch-card-size);
+}
+
 .card-creator,
 .card-schema-updator,
 .card-view,
