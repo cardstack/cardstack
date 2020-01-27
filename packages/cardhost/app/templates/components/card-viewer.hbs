@@ -1,12 +1,12 @@
 <section class="card-view" data-test-card-view={{@card.name}}>
-  <AnimatedContainer class="card-renderer--container" {{on "click" (action (mut @card.isSelected) (not @card.isSelected))}}>
+  <div class="card-renderer--container" role="button" {{on "mouseover" (action (mut @card.isSelected) true)}} {{on "mouseout" (action (mut @card.isSelected) false)}}>
     <CardRenderer
       @card={{@card}}
       @mode={{@mode}}
       @format="isolated"
       @cardSelected={{@card.isSelected}}
     />
-  </AnimatedContainer>
+  </div>
 </section>
 
 <style data-test-view-css>

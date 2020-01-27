@@ -144,7 +144,7 @@ a:hover {
   margin-left: 10px;
 }
 
-.card-renderer--top-edge-buttons .top-edge--mode-label {
+.top-edge--mode-label {
   padding: 10px;
   background-color: white;
   text-transform: uppercase;
@@ -155,15 +155,18 @@ a:hover {
   margin-right: 20px;
 }
 
-.card-renderer--top-edge-buttons .top-edge--mode-link {
-  display: inline-block;
+.top-edge--mode-link {
+  display: inline-flex;
 }
 
-.card-renderer--top-edge-buttons .top-edge--mode-link span {
+.top-edge--mode-link span {
   width: 18px;
   height: 18px;
   display: block;
   text-indent: -9999px;
+    text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
   background-image: url(/assets/images/icons/close-circle.svg);
   background-size: 18px 18px;
   background-repeat: no-repeat;
