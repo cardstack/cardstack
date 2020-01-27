@@ -2,9 +2,6 @@
   margin: 0 auto;
 }
 
-.card-renderer-embedded {
-  width: 100%;
-}
 .card-renderer--embedded-card-link:focus {
   outline: 0;
 }

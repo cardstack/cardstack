@@ -119,8 +119,7 @@
 .card-catalog {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(3, minmax(225px, 1fr));
-  grid-template-rows: minmax(225px, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   grid-gap: 90px 30px;
   justify-items: center;
   margin: 0;
@@ -131,14 +130,14 @@
 }
 
 .card-catalog > * {
-  width: 100%;
+  width: 225px;
   margin: 0;
   padding: 0;
 }
 
 .card-catalog > * > *,
 .card-catalog > * > * > * {
-  min-height: 225px;
+  height: 225px;
   border-radius: 15px;
   transition: transform var(--ch-card-transition-duration) ease-in-out calc(var(--ch-card-transition-duration) / 3);
 }
@@ -160,9 +159,6 @@
 }
 
 .card-catalog--embedded-card-placeholder {
-  width: 225px;
-  height: 225px;
-  margin: 0 auto;
   background-color: var(--welcome-placeholder-card);
   background-position: center center;
   background-repeat: no-repeat;
@@ -183,8 +179,8 @@
 }
 
 .cardhost-section .embedded-card-label {
+  width: 225px;
   height: auto;
-  min-height: auto;
   padding-top: 30px;
   font-size: 13px;
   text-align: center;
