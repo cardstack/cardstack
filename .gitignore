@@ -13,6 +13,7 @@ lerna-debug.log
 tmp
 .DS_Store
 package-lock.json
+.embroider-app-path
 
 
 # Needed during incremental conversion to typescript
@@ -28,12 +29,12 @@ package-lock.json
 /packages/core/**/*.js
 /packages/core/**/*.js.map
 
-# /packages/cardhost/app/services/data.d.ts
-# /packages/cardhost/app/services/data.js
-# /packages/cardhost/app/services/data.js.map
-# /packages/cardhost/app/services/cardstack-session.d.ts
-# /packages/cardhost/app/services/cardstack-session.js
-# /packages/cardhost/app/services/cardstack-session.js.map
+/packages/cardhost/app/services/data.d.ts
+/packages/cardhost/app/services/data.js
+/packages/cardhost/app/services/data.js.map
+/packages/cardhost/app/services/cardstack-session.d.ts
+/packages/cardhost/app/services/cardstack-session.js
+/packages/cardhost/app/services/cardstack-session.js.map
 /packages/cardhost/tests/helpers/fixtures.d.ts
 /packages/cardhost/tests/helpers/fixtures.js
 /packages/cardhost/tests/helpers/fixtures.js.map
@@ -73,10 +74,27 @@ package-lock.json
 # generated files you may end up with if you run the cli blueprint directly
 packages/cli/node-tests/sample-cards/*/node_modules/**/*
 
+# unconventional js
+/blueprints/*/files/
+/vendor/
+
+# compiled output
+/dist/
+/tmp/
+
+# dependencies
+/bower_components/
+/deploy/node_modules/
+
+# misc
+/coverage/
+
+# ember-try
+/.node_modules.ember-try/
+/bower.json.ember-try
+/package.json.ember-try
+
 # this is for eslint ignore, which is also using this file as a list of things to not lint
-/tests/**/node_modules/@cardstack/**/*.js
-/tests/**/node_modules/@cardstack/**/*.js.map
-/tests/**/node_modules/@cardstack/**/*.d.ts
 /packages/**/node_modules/@cardstack/**/*.js
 /packages/**/node_modules/@cardstack/**/*.js.map
 /packages/**/node_modules/@cardstack/**/*.d.ts

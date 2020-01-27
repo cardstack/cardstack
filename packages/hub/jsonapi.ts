@@ -38,7 +38,7 @@ export function assertCollectionResourceDoc(
   }
   data.every((r, index) => assertResourceObject(r, pointer.concat(['data', `[${index}]`])));
 
-  if (body.hasOwnProperty('included')) {
+  if ('included' in body) {
     assertIncluded(body.included, pointer.concat('included'));
   }
 
@@ -54,7 +54,7 @@ export function assertSingleResourceDoc(body: any, pointer: string[] = ['']): as
   }
   assertResourceObject(body.data, pointer.concat('data'));
 
-  if (body.hasOwnProperty('included')) {
+  if ('included' in body) {
     assertIncluded(body.included, pointer.concat('included'));
   }
   assertDocBase(body, pointer);
@@ -71,11 +71,11 @@ function assertIncluded(included: any, pointer: string[]): asserts included is I
 }
 
 function assertDocBase(body: any, pointer: string[]) {
-  if (body.hasOwnProperty('jsonapi')) {
+  if ('jsonapi' in body) {
     assertImplementationInfo(body.jsonapi, pointer.concat('jsonapi'));
   }
 
-  if (body.hasOwnProperty('links')) {
+  if ('links' in body) {
     let linksPointer = pointer.concat('links');
     try {
       assertLinks(body.links, linksPointer);
@@ -96,7 +96,7 @@ function assertDocBase(body: any, pointer: string[]) {
     }
   }
 
-  if (body.hasOwnProperty('meta')) {
+  if ('meta' in body) {
     assertMetaObject(body.meta, pointer.concat('meta'));
   }
 }
@@ -109,7 +109,7 @@ function assertResourceObject(obj: any, pointer: string[]): asserts obj is Resou
     });
   }
 
-  if (obj.hasOwnProperty('id') && typeof obj.id !== 'string') {
+  if ('id' in obj && typeof obj.id !== 'string') {
     throw new CardstackError('id is not a string', {
       source: { pointer: pointer.concat('id').join('/') },
       status: 400,
@@ -123,15 +123,15 @@ function assertResourceObject(obj: any, pointer: string[]): asserts obj is Resou
     });
   }
 
-  if (obj.hasOwnProperty('attributes')) {
+  if ('attributes' in obj) {
     assertAttributesObject(obj.attributes, pointer.concat('attributes'));
   }
 
-  if (obj.hasOwnProperty('relationships')) {
+  if ('relationships' in obj) {
     assertRelationshipsObject(obj.relationships, pointer.concat('relationships'));
   }
 
-  if (obj.hasOwnProperty('attributes') && obj.hasOwnProperty('relationships')) {
+  if ('attributes' in obj && 'relationships' in obj) {
     let dupeFields = intersection(Object.keys(obj.attributes), Object.keys(obj.relationships));
     if (dupeFields.length) {
       throw new CardstackError(
@@ -146,11 +146,11 @@ function assertResourceObject(obj: any, pointer: string[]): asserts obj is Resou
     }
   }
 
-  if (obj.hasOwnProperty('links')) {
+  if ('links' in obj) {
     assertLinks(obj.links, pointer.concat('links'));
   }
 
-  if (obj.hasOwnProperty('meta')) {
+  if ('meta' in obj) {
     assertMetaObject(obj.meta, pointer.concat('meta'));
   }
 }
@@ -176,10 +176,10 @@ function assertLinks(obj: any, pointer: string[]): asserts obj is Links {
       status: 400,
     });
   }
-  if (obj.hasOwnProperty('self')) {
+  if ('self' in obj) {
     assertLink(obj.self, pointer.concat('self'));
   }
-  if (obj.hasOwnProperty('related')) {
+  if ('related' in obj) {
     assertLink(obj.related, pointer.concat('related'));
   }
 }
@@ -200,7 +200,7 @@ function assertLink(obj: any, pointer: string[]): asserts obj is Link {
       status: 400,
     });
   }
-  if (obj.hasOwnProperty('meta')) {
+  if ('meta' in obj) {
     assertMetaObject(obj.meta, pointer.concat('meta'));
   }
 }
@@ -213,7 +213,7 @@ function assertPaginationLinks(obj: any, pointer: string[]): asserts obj is Pagi
     });
   }
   ['first', 'last', 'prev', 'next'].every(
-    field => !obj.hasOwnproperty(field) || obj[field] === null || assertLink(obj[field], pointer.concat(field))
+    field => !(field in obj) || obj[field] === null || assertLink(obj[field], pointer.concat(field))
   );
 }
 
@@ -224,10 +224,10 @@ function assertImplementationInfo(obj: any, pointer: string[]): asserts obj is I
       status: 400,
     });
   }
-  if (obj.hasOwnProperty('meta')) {
+  if ('meta' in obj) {
     assertMetaObject(obj.meta, pointer.concat('meta'));
   }
-  if (obj.hasOwnProperty('version') && typeof obj.version !== 'string') {
+  if ('version' in obj && typeof obj.version !== 'string') {
     throw new CardstackError('version must be a string', {
       source: { pointer: pointer.concat('version').join('/') },
       status: 400,
@@ -253,22 +253,22 @@ function assertRelationshipObject(obj: any, pointer: string[]): asserts obj is R
     });
   }
 
-  if (!['meta', 'data', 'links'].some(field => obj.hasOwnProperty(field))) {
+  if (!['meta', 'data', 'links'].some(field => field in obj)) {
     throw new CardstackError('relationship must have at least one of: meta, data, links', {
       source: { pointer: pointer.join('/') },
       status: 400,
     });
   }
 
-  if (obj.hasOwnProperty('meta')) {
+  if ('meta' in obj) {
     assertMetaObject(obj.meta, pointer.concat('meta'));
   }
 
-  if (obj.hasOwnProperty('data')) {
+  if ('data' in obj) {
     assertResourceLinkage(obj.data, pointer.concat('data'));
   }
 
-  if (obj.hasOwnProperty('links')) {
+  if ('links' in obj) {
     assertLinks(obj.links, pointer.concat('links'));
   }
 }
@@ -291,7 +291,7 @@ function assertResourceIdentifierObject(obj: any, pointer: string[]): asserts ob
       status: 400,
     });
   }
-  if (obj.hasOwnProperty('meta')) {
+  if ('meta' in obj) {
     assertMetaObject(obj.meta, pointer.concat('meta'));
   }
   if (typeof obj.type !== 'string') {

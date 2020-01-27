@@ -10,8 +10,7 @@
   "description": "Stock API server for the Cardstack tech stack.",
   "dependencies": {
     "@cardstack/core": "0.16.22",
-    "@cardstack/logger": "^0.2.0",
-    "@std/esm": "^0.26.0",
+    "@cardstack/logger": "^0.2.1",
     "@types/fs-extra": "^8.0.1",
     "@types/koa": "^2.0.52",
     "@types/koa-route": "^3.2.4",
@@ -20,6 +19,7 @@
     "@types/qs": "^6.9.0",
     "@types/semver": "^6.2.0",
     "assert-never": "^1.2.0",
+    "esm": "^3.2.25",
     "fast-json-stable-stringify": "^2.1.0",
     "fs-extra": "^8.1.0",
     "json-typescript": "^1.1.2",
@@ -46,7 +46,7 @@
     "node": ">= 12"
   },
   "scripts": {
-    "test": "mocha ../test-support/bin/run.js --timeout 5000"
+    "test": "mocha -r esm ../test-support/bin/run.js --timeout 5000"
   },
   "volta": {
     "node": "12.13.1"

@@ -1,4 +1,5 @@
 import { CardId } from '@cardstack/core/card';
+import isPlainObject from 'lodash/isPlainObject';
 import { Expression, PgPrimitive, Param } from '@cardstack/core/expression';
 
 export interface FieldQuery {
@@ -54,7 +55,7 @@ export function param(value: PgPrimitive): Param {
 }
 
 export function isParam(expression: any): expression is Param {
-  return expression?.hasOwnProperty('param');
+  return isPlainObject(expression) && 'param' in expression;
 }
 
 export function every(expressions: Expression[]): Expression;

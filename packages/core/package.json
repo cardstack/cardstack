@@ -6,7 +6,7 @@
   "license": "MIT",
   "author": "Hassan Abdel-Rahman <hassan.abdelrahman@gmail.com>",
   "dependencies": {
-    "@cardstack/logger": "^0.2.0",
+    "@cardstack/logger": "^0.2.1",
     "http-status-codes": "^1.4.0",
     "json-typescript": "^1.1.2",
     "jsonapi-typescript": "^0.1.3",

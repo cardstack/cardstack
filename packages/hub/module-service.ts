@@ -23,7 +23,7 @@ export class ModuleService implements ModuleLoader {
     hash.update(stringify((await card.asUpstreamDoc()).jsonapi));
     let cardDir = join(cardFilesCache, hash.digest('hex'));
     await this.cachedWriteCard(card, cardDir);
-    // tslint:disable-next-line
+    // @ts-ignore
     let module = await import(join(cardDir, localModulePath)); // we are using ESM for module loading
     return module[exportedName];
   }
@@ -83,6 +83,7 @@ export class ModuleService implements ModuleLoader {
   private async linkPeerDependencies(deps: NonNullable<Card['csPeerDependencies']>, outDir: string) {
     for (let [packageName, range] of Object.entries(deps)) {
       let peerDepDir = await this.locatePeerDep(packageName);
+      // @ts-ignore
       let version = (await import(join(peerDepDir, 'package.json'))).version as string;
       if (!satisfies(coerce(version)!, range)) {
         throw new Error(`version ${range} of ${packageName} is not available to cards on this hub`);

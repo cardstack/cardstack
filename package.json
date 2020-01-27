@@ -24,6 +24,7 @@
     "@typescript-eslint/parser": "^2.5.0",
     "babel-eslint": "^10.0.1",
     "chai": "^4.2.0",
+    "ember-template-lint": "^1.13.2",
     "eslint": "^5.8.0",
     "eslint-config-prettier": "^6.7.0",
     "eslint-plugin-ember": "^5.0.0",
@@ -43,7 +44,8 @@
     "test": "npm run lint:deps && npm run lint:js && npm run node-tests && npm run ember-tests",
     "node-tests": "mocha ./packages/test-support/bin/run.js --timeout 10000",
     "lint:deps": "node scripts/find-bad-deps.js",
-    "lint:js": "eslint . --cache --ignore-path .gitignore --ext=js,ts",
+    "lint:js": "eslint . --cache --ignore-path .gitignore --ext=js,ts && cd packages/cardhost && ../../node_modules/.bin/ember-template-lint ember-template-lint .",
+    "lint:hbs": "cd packages/cardhost && ../../node_modules/.bin/ember-template-lint ember-template-lint .",
     "ember-tests": "node packages/test-support/ember-test-runner.js packages",
     "server": "node packages/hub/bin/server.js"
   },

@@ -187,6 +187,7 @@ export class ScopedCardService implements CardReader, CardInstantiator {
     if (!existsSync(cardDir)) {
       throw new CardstackError(`Card '${id.csId}' not found in public realm`, { status: 404 });
     }
+    // @ts-ignore
     let json = await import(join(cardDir, 'card.json'));
     assertSingleResourceDoc(json);
 
@@ -201,6 +202,7 @@ export class ScopedCardService implements CardReader, CardInstantiator {
     json.data.attributes!.csFiles = walkFiles(cardDir);
 
     // and our peerDeps match the ones from package.json
+    // @ts-ignore
     json.data.attributes!.csPeerDependencies = (await import(join(cardDir, 'package.json'))).peerDependencies;
 
     return await this.instantiate(json, id);

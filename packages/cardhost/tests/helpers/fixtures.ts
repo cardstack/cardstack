@@ -14,7 +14,5 @@ export default class Fixtures {
     this.config;
   }
 
-  setupTest(_hooks: any) {
-    throw new Error(`Fixtures for V2 API not yet implemented`);
-  }
+  setupTest(_hooks: any) {}
 }

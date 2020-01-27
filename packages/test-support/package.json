@@ -11,8 +11,9 @@
     "url": "git+https://github.com/cardstack/cardstack.git"
   },
   "dependencies": {
-    "@cardstack/logger": "^0.2.0",
+    "@cardstack/logger": "^0.2.1",
     "chai": "^4.2.0",
+    "esm": "^3.2.25",
     "glob": "^7.1.1",
     "require-uncached": "^1.0.3"
   },

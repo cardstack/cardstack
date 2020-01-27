@@ -15,6 +15,7 @@ module.exports = function(defaults) {
   }
 
   let app = new EmberApp(defaults, {
+    hinting: false, // we are doing this as part of the project level linting
     prember: {
       // we're not pre-rendering any URLs yet, but we still need prember because
       // our deployment infrastructure already expects `_empty.html` to exist
