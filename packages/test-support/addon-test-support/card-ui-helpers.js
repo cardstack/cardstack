@@ -18,6 +18,11 @@ export async function setCardId(id) {
   await triggerEvent('#card__id', 'keyup');
 }
 
+export async function setCardName(name) {
+  await fillIn('#card__name', name);
+  await click('[data-test-create-card-btn]');
+}
+
 export async function dragAndDrop(fieldSelector, dropZoneSelector, options) {
   await triggerEvent(fieldSelector, 'mousedown');
   await triggerEvent(fieldSelector, 'dragstart', options);

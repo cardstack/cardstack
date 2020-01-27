@@ -50,10 +50,8 @@
       </header>
       <div class="card-catalog">
         {{#each this.model.templates as |card|}}
-          <LinkTo
+          <Cta {{on "click" (fn this.openCardNameDialog card)}}
             @class="card-renderer--embedded-card-link"
-            @route="cards.card.adopt"
-            @model={{card.name}}
             data-test-embedded-card={{card.name}}
           >
             <CardRenderer
@@ -62,7 +60,7 @@
               @preventIsolation={{true}}
               @showName={{true}}
             />
-          </LinkTo>
+          </Cta>
         {{/each}}
       </div>
     </section>
@@ -102,16 +100,22 @@
         New Blank Card
       </header>
       <div class="card-catalog">
-        <LinkTo
-          @route="cards.add"
+        <Cta {{on "click" (fn this.openCardNameDialog)}}
           @class="card-renderer--embedded-card-link"
         >
           <div>
             <div class="card-catalog--embedded-card-placeholder icon-add-card"></div>
             <div class="embedded-card-label">Blank Card</div>
           </div>
-        </LinkTo>
+        </Cta>
       </div>
     </section>
   </main>
 </div>
+
+{{#if this.showDialog}}
+  <CardNameDialog
+    @model={{this.cardModel}}
+    @closeDialog={{fn (mut this.showDialog) false}}
+  />
+{{/if}}

@@ -7,6 +7,8 @@ export default class IndexController extends Controller {
   @service scroller;
 
   @tracked selectedSection = 'recent-cards';
+  @tracked cardModel;
+  @tracked showDialog;
 
   @action
   scrollToSection(sectionId) {
@@ -18,5 +20,14 @@ export default class IndexController extends Controller {
       elementOffset: 160,
       doneScrolling: () => (this.selectedSection = sectionId),
     });
+  }
+
+  @action
+  openCardNameDialog(model/*, evt*/) {
+    if (arguments.length === 2) {
+      this.cardModel = model;
+    }
+
+    this.showDialog = true;
   }
 }

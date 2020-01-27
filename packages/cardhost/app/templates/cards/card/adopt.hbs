@@ -1,1 +1,16 @@
-<CardCreator @adoptedFrom={{this.model}}/>
+<CardhostLeftEdge />
+
+<Dialog open={{true}} @title="Create a New Card">
+  <p class="dialog--message">
+    Give your card a meaningful name!
+  </p>
+  <TextField
+    @id="card__name"
+    @placeholder="i.e. Millenial Puppies"
+    @setValue={{action this.updateCardName}}
+  />
+  <div class="dialog--button-group">
+    <Cta @variant="secondary">Cancel</Cta>
+    <Cta {{on "click" this.createCard}} data-test-create-card-btn>Create</Cta>
+  </div>
+</Dialog>
