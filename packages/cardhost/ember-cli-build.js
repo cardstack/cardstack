@@ -128,14 +128,6 @@ module.exports = function(defaults) {
             },
           },
         },
-        {
-          package: 'ember-toolbars',
-          components: {
-            '<InTopToolbar/>': {
-              yieldsSafeComponents: [true],
-            },
-          },
-        },
       ],
     });
   })();

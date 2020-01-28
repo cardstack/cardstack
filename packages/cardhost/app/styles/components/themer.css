@@ -7,7 +7,6 @@
   width: 40%;
   height: 100%;
   background: var(--ch-deep-background);
-  z-index: calc(var(--ch-top-edge-z-index) + 1);
   padding: 20px;
   transform: translateX(0%);
   opacity: 0.95;
@@ -125,7 +124,8 @@
   max-height: calc(100% - var(--editor-header-height));
 }
 
-.themer--top-edge-container .show-editor-btn, .themer--top-edge-container .hide-editor-btn {
+.themer--top-edge-container .show-editor-btn,
+.themer--top-edge-container .hide-editor-btn {
   margin-top: 10px;
   margin-right: 15px;
   cursor: pointer;
@@ -136,7 +136,8 @@
   cursor: pointer;
 }
 
-.themer--top-edge-container .cs-component-cta, .themer--top-edge-container .save-button {
+.themer--top-edge-container .cs-component-cta,
+.themer--top-edge-container .save-button {
   width: 150px;
   margin-left: 20px;
   align-self: start;
@@ -155,12 +156,9 @@
 
 .themer--top-edge-container {
   display: grid;
-  position: fixed;
-  top: var(--ch-spacing);
-  right: var(--ch-spacing);
-  left: 40px;
-  z-index: var(--ch-actions-z-index);
   grid-template-columns: auto auto;
+  padding: 20px;
+  background: var(--ch-dark-background);
 }
 
 .themer--top-edge-container .ch-button {
@@ -269,14 +267,6 @@
 
 .ch-button--icon.full-width.selected {
   --icon-url: url('/assets/images/buttons/full-width-active.svg');
-}
-
-.editing-css {
-  padding-left: 0;
-  padding-right: 0;
-  width: 100%;
-  transition: var(--ch-card-padding-animate), var(--ch-card-background-color-animate);
-  background-color: var(--ch-dark-background);
 }
 
 .full-width.editing-css .themer.view {

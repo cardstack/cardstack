@@ -6,12 +6,23 @@
   {{if this.cardstackSession.isAuthenticated "logged-in" "logged-out"}}
   {{this.themerClasses}}"
   data-test-cardhost-cards>
-  {{#if (and (not-eq this.routeInfo.mode "view") (not-eq this.routeInfo.mode "themer"))}}
+  <CardstackEdges>
     {{#let this.target.currentRoute.parent.attributes as |card|}}
-      <CardstackEdge @edge="top" @componentToShow={{component "cardhost-top-edge" mode=this.routeInfo.mode card=card}}>
-        <InTopToolbar />
-      </CardstackEdge>
+      {{#if (eq this.routeInfo.mode "themer")}}
+        <CardstackEdge @edge="top" @componentToShow={{component "themer-toolbar" model=card}}>
+          <InTopToolbar />
+        </CardstackEdge>
+      {{else if (not-eq this.routeInfo.mode "view")}}
+        <CardstackEdge @edge="top" @componentToShow={{component "cardhost-top-edge" mode=this.routeInfo.mode card=card}}>
+          <InTopToolbar />
+        </CardstackEdge>
+      {{/if}}
     {{/let}}
-  {{/if}}
-  {{outlet}}
+
+    <CardstackEdge @edge="left" @componentToShow={{component "cardhost-left-edge"}}>
+      <InLeftToolbar />
+    </CardstackEdge>
+
+    {{outlet}}
+  </CardstackEdges>
 </div>

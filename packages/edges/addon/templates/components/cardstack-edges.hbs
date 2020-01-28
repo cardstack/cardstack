@@ -1,13 +1,13 @@
-{{#toolbar-manager 
+{{#toolbar-manager
   class="cardstack-edges"
   topRightCornerBelongsTo="top"
-  topLeftCornerBelongsTo="top"
+  topLeftCornerBelongsTo="left"
   bottomLeftCornerBelongsTo="bottom"
   bottomRightCornerBelongsTo="bottom"
 }}
   {{#each cardstackEdges.topLevelComponents as |componentName|}}
-    {{component 
-      componentName 
+    {{component
+      componentName
       edges=(hash launcher = (component "fixed-within-toolbars" top=0 right=0))
     }}
   {{/each}}

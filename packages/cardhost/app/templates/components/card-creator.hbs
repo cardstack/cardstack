@@ -1,13 +1,3 @@
-{{#if this.cardstackSession.isAuthenticated}}
-  <CardstackEdge @edge="top" @componentToShow={{component "cardhost-top-edge" mode="schema" card=this.card}}>
-    <InTopToolbar />
-  </CardstackEdge>
-{{/if}}
-
-<CardstackEdge @edge="left" @componentToShow={{component "cardhost-left-edge" mode="schema"}}>
-  <InLeftToolbar/>
-</CardstackEdge>
-
 <CardstackEdge
   @edge="right"
   @componentToShow={{component "right-edge"
@@ -23,19 +13,6 @@
   }}>
   <InRightToolbar/>
 </CardstackEdge>
-
-{{!-- <RightEdge
-  @card={{this.card}}
-  @mode="schema"
-  @selectedField={{this.selectedField}}
-  @selectField={{action this.selectField}}
-  @setNeededWhenEmbedded={{this.setNeededWhenEmbedded}}
-  @setFieldName={{this.setFieldName}}
-  @setFieldLabel={{this.setFieldLabel}}
-  @setFieldInstructions={{this.setFieldInstructions}}
-  @updateCardId={{this.updateCardId}}
-  @cardSelected={{this.cardSelected}}
-/> --}}
 
 <section class="card-creator" data-test-card-creator {{did-update this.updateCard @card}}>
   {{#if this.card}}

@@ -31,8 +31,8 @@ export default class CardCreator extends CardManipulator {
       once we clarify how card ids and names work. See:
       https://github.com/cardstack/cardstack/issues/1150
     */
-    schedule('afterRender', this, function() {
-      document.querySelector('#card__id').focus();
-    });
+    // schedule('afterRender', this, function() {
+    //   document.querySelector('#card__id').focus();
+    // });
   }
 }

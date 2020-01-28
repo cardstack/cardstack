@@ -12,6 +12,7 @@
   max-width: var(--card-renderer-width);
   font: 400 16px/22px var(--ch-font-family);
   letter-spacing: 0.015em;
+  z-index: 0;
 }
 
 .card-renderer-isolated.schema {
@@ -134,10 +135,6 @@
 
 .card-renderer-isolated.schema .card-renderer-isolated--content {
   color: var(--ch-light);
-}
-
-.card-renderer-isolated.themer .card-renderer-isolated--content {
-  background-color: var(--ch-dark-background);
 }
 
 
