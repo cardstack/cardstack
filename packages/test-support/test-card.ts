@@ -254,6 +254,12 @@ export class TestCard {
   }
 }
 
+export interface TestCardWithId extends TestCard {
+  csId: string;
+  csRealm: string;
+  csOriginalRealm: string;
+}
+
 interface FieldValues {
   csRealm?: string;
   csOriginalRealm?: string;
@@ -264,12 +270,6 @@ interface FieldValues {
 interface FieldRefs {
   csAdoptsFrom?: CardId;
   [fieldName: string]: CardId | TestCardWithId | CardId[] | TestCardWithId[] | undefined;
-}
-
-interface TestCardWithId extends TestCard {
-  csId: string;
-  csRealm: string;
-  csOriginalRealm: string;
 }
 
 export function testCard(): TestCard {

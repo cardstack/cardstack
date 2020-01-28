@@ -1,15 +1,118 @@
 import { module, test, skip } from 'qunit';
 import { myOrigin } from '@cardstack/core/origin';
 import { setupTest } from 'ember-qunit';
-import { testCard } from '@cardstack/test-support/test-card';
+import { testCard, TestCardWithId } from '@cardstack/test-support/test-card';
 import Fixtures from '../../helpers/fixtures';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import DataService from '../../../app/services/data';
 
 const csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
 
 module('Unit | Service | data', function() {
-  module('non-mutating tests', function() {
-    skip('it can get a card', async function() {});
+  module('non-mutating tests', function(hooks) {
+    let toyCard: TestCardWithId = testCard()
+      .withAttributes({
+        csRealm,
+        csId: 'toy-card',
+      })
+      .withField('description', 'string-field');
+
+    let puppyCard: TestCardWithId = testCard()
+      .withAttributes({
+        csRealm,
+        csId: 'puppy-card',
+        csFieldSets: {
+          embedded: ['name'],
+        },
+      })
+      .withField('name', 'string-field')
+      .withField('favoriteToy', toyCard);
+
+    let dalmatianCard: TestCardWithId = testCard()
+      .withAttributes({
+        csRealm,
+        csId: 'dalmatian-card',
+      })
+      .adoptingFrom(puppyCard);
+
+    let ownerCard: TestCardWithId = testCard()
+      .withAttributes({
+        csRealm,
+        csId: 'owner-card',
+        csFieldSets: {
+          isolated: ['name', 'puppies'],
+        },
+      })
+      .withField('name', 'string-field')
+      .withField('puppies', puppyCard, 'plural');
+
+    let squeakySnake: TestCardWithId = testCard()
+      .withAttributes({
+        csRealm,
+        csId: 'squeaky-snake',
+        description: 'a plush snake with squeaky segments',
+      })
+      .adoptingFrom(toyCard);
+
+    let vanGogh: TestCardWithId = testCard()
+      .withAttributes({
+        csRealm,
+        csId: 'vangogh',
+        name: 'Van Gogh',
+        favoriteToy: testCard()
+          .withAttributes({
+            description: 'a beef bone',
+          })
+          .adoptingFrom(toyCard).asCardValue,
+      })
+      .adoptingFrom(dalmatianCard);
+
+    let mango: TestCardWithId = testCard()
+      .withAttributes({
+        csRealm,
+        csId: 'mango',
+        name: 'Mango',
+      })
+      .withRelationships({ favoriteToy: squeakySnake })
+      .adoptingFrom(dalmatianCard);
+
+    let daddy: TestCardWithId = testCard()
+      .withAttributes({
+        csRealm,
+        csId: 'hassan',
+        name: 'Hassan',
+      })
+      .withRelationships({ puppies: [vanGogh, mango] })
+      .adoptingFrom(ownerCard);
+
+    let mommy: TestCardWithId = testCard()
+      .withAttributes({
+        csRealm,
+        csId: 'mariko',
+        csFieldSets: {
+          embedded: ['name'],
+        },
+        name: 'Mariko',
+        puppies: [vanGogh.asCardValue, mango.asCardValue],
+      })
+      .adoptingFrom(ownerCard);
+
+    const scenario = new Fixtures({
+      create: [toyCard, puppyCard, dalmatianCard, ownerCard, squeakySnake, vanGogh, mango, daddy, mommy],
+    });
+
+    setupTest(hooks);
+    scenario.setupTestWithBeforeAndAfter(hooks);
+
+    test('it can get a card by id', async function(assert) {
+      let service = this.owner.lookup('service:data') as DataService;
+      let card = await service.load(mango);
+
+      assert.equal(card.csId, mango.csId, 'the csId is correct');
+      assert.equal(card.csRealm, mango.csRealm, 'the csRealm is correct');
+      assert.equal(card.csOriginalRealm, card.csRealm, 'the csOriginalRealm is correct');
+    });
+
     skip('it can search for cards', async function() {});
     skip("it can get a value of a card's primitive field", async function() {});
     skip('it can get a card-as-value value of a card field', async function() {});
@@ -34,7 +137,7 @@ module('Unit | Service | data', function() {
     scenario.setupTest(hooks);
 
     test('it creates an UnsavedCard', async function(assert) {
-      let service = this.owner.lookup('service:data');
+      let service = this.owner.lookup('service:data') as DataService;
       let card = await service.create(
         csRealm,
         testCard().withAutoAttributes({
@@ -48,19 +151,20 @@ module('Unit | Service | data', function() {
     });
 
     test('it saves an UnsavedCard', async function(assert) {
-      let service = this.owner.lookup('service:data');
+      let service = this.owner.lookup('service:data') as DataService;
       let card = await service.create(
         csRealm,
         testCard().withAutoAttributes({
           name: 'Van Gogh',
         }).jsonapi
       );
-      card = await service.save(card);
 
-      assert.ok(card.csId, 'the card csId exists');
-      assert.equal(card.csRealm, csRealm, 'the card csRealm is correct');
-      assert.equal(card.csOriginalRealm, csRealm, 'the card csOriginalRealm is correct');
-      assert.equal(await card.value('name'), 'Van Gogh', 'the card user field value is correct');
+      let savedCard = await service.save(card);
+
+      assert.ok(savedCard.csId, 'the card csId exists');
+      assert.equal(savedCard.csRealm, csRealm, 'the card csRealm is correct');
+      assert.equal(savedCard.csOriginalRealm, csRealm, 'the card csOriginalRealm is correct');
+      assert.equal(await savedCard.value('name'), 'Van Gogh', 'the card user field value is correct');
     });
 
     skip('it patches an addressable card', async function() {});

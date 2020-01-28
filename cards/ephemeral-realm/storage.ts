@@ -28,7 +28,7 @@ export class EphemeralStorage {
     let key = [realm, originalRealm, csId].map(encodeURIComponent).join('/');
     let entry = this._store.get(key);
 
-    if (entry && String(entry.generation) !== String(ifMatch)) {
+    if (entry && entry.doc != null && String(entry.generation) !== String(ifMatch)) {
       throw new CardstackError('Merge conflict', {
         status: 409,
         source: doc ? { pointer: '/data/meta/version' } : { header: 'If-Match' },
