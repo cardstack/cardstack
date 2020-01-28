@@ -13,13 +13,15 @@
   padding-left: var(--padding-left);
   padding-right: var(--padding-right);
 
-  transition: padding-left var(--ch-transition-time) ease-in-out,
-              var(--ch-card-padding-animate),
-              var(--ch-card-background-color-animate);
+  transition: var(--ch-card-background-color-animate);
 }
 
 .cardhost-cards.view {
-  padding-left: var(--ch-left-edge-navbar-width);
+  background-color: var(--ch-light-background);
+}
+
+.cardhost-cards.edit {
+  background-color: var(--ch-medium-background);
 }
 
 .cardhost-cards.schema {
@@ -31,15 +33,13 @@
 .card-view,
 .card-editor {
   display: grid;
+  justify-content: center;
   align-items: flex-start;
-  justify-items: center;
   height: 100%;
   padding: 0 20px;
 }
 
-
-@media (max-width: 1440px) {
-  .cardhost-cards.edit {
-    padding-left: var(--ch-left-edge-navbar-width);
-  }
+.card-view,
+.card-editor {
+  grid-template-columns: 1fr;
 }

@@ -1,4 +1,4 @@
-import { Cred, Merge, Repository, Reset, RemoteConfig, FetchOptions } from './git';
+import { Repository, RemoteConfig } from './git';
 
 import { promisify } from 'util';
 import mkdirpcb from 'mkdirp';
@@ -15,7 +15,6 @@ const log = logger('cardstack/git');
 
 interface RemoteCache {
   repo: Repository;
-  fetchOpts: FetchOptions;
   repoPath: string;
 }
 
@@ -34,11 +33,10 @@ class GitLocalCache {
       return existingRepo.repo;
     }
 
-    let { repo, fetchOpts, repoPath } = await this._makeRepo(remote);
+    let { repo, repoPath } = await this._makeRepo(remote);
 
     this._remotes.set(remote.url, {
       repo,
-      fetchOpts,
       repoPath,
     });
 
@@ -58,12 +56,6 @@ class GitLocalCache {
 
     let repoPath = join(cacheDirectory, filenamifyUrl(remote.url));
 
-    let fetchOpts = new FetchOptions((url, userName) =>
-      remote.privateKey
-        ? Cred.sshKeyMemoryNew(userName, remote.publicKey || '', remote.privateKey, remote.passphrase || '')
-        : Cred.sshKeyFromAgent(userName)
-    );
-
     log.info('creating local repo cache for %s in %s', remote.url, repoPath);
 
     let repo;
@@ -79,29 +71,24 @@ class GitLocalCache {
 
         await mkdirp(repoPath);
 
-        repo = await Repository.clone(remote.url, repoPath, {
-          fetchOpts,
-        });
+        repo = await Repository.clone(remote.url, repoPath);
       }
     } else {
       log.info('cloning %s into %s', remote.url, repoPath);
       await mkdirp(repoPath);
 
-      repo = await Repository.clone(remote.url, repoPath, {
-        fetchOpts,
-      });
+      repo = await Repository.clone(remote.url, repoPath);
     }
 
     return {
       repo,
-      fetchOpts,
       repoPath,
     };
   }
 
   async fetchAllFromRemote(remoteUrl: string) {
-    let { repo, fetchOpts } = this._remotes.get(remoteUrl)!;
-    return await repo.fetchAll(fetchOpts);
+    let { repo } = this._remotes.get(remoteUrl)!;
+    return await repo.fetchAll();
   }
 
   async pullRepo(remoteUrl: string, targetBranch: string) {
@@ -117,16 +104,16 @@ class GitLocalCache {
       if (e.message.startsWith('no reference found for shorthand')) {
         log.info('no local branch for %s on %s. Creating it now...', targetBranch, remoteUrl);
         let headCommit = await repo.getHeadCommit();
-        let ref = await repo.createBranch(targetBranch, headCommit, false);
+        let ref = await repo.createBranch(targetBranch, headCommit);
         await repo.checkoutBranch(ref);
         let remoteCommit = await repo.getReferenceCommit(`refs/remotes/origin/${targetBranch}`);
-        Reset.hardReset(repo, remoteCommit);
+        await repo.reset(remoteCommit, true);
       } else {
         throw e;
       }
     }
 
-    await repo.mergeBranches(targetBranch, `origin/${targetBranch}`, null, Merge.FASTFORWARD_ONLY);
+    await repo.mergeBranches(targetBranch, `origin/${targetBranch}`);
   }
 }
 

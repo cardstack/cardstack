@@ -1,6 +1,36 @@
 {{! template-lint-disable }}
+<h3>Cardhost palette</h3>
 <div class="color-palette">
   {{#each-in this.colors as |name value|}}
+    <div>
+      <div class="color-palette--block {{name}}" style="background-color: var({{name}})">
+        {{value}}
+      </div>
+      <div class="ui-components--notes color-palette--code">
+        <code>{{name}}</code>
+      </div>
+    </div>
+  {{/each-in}}
+</div>
+
+<h3>Cardstack general palette</h3>
+<div class="color-palette">
+  {{#each-in this.csColors as |name value|}}
+    <div>
+      <div class="color-palette--block {{name}}" style="background-color: var({{name}})">
+        {{value}}
+      </div>
+      <div class="ui-components--notes color-palette--code">
+        <code>{{name}}</code>
+      </div>
+    </div>
+  {{/each-in}}
+</div>
+
+<h3>Unthemed card content palette</h3>
+<h3>(Use the below variables only for unthemed (default) card content)</h3>
+<div class="color-palette">
+  {{#each-in this.unthemedCardColors as |name value|}}
     <div>
       <div class="color-palette--block {{name}}" style="background-color: var({{name}})">
         {{value}}

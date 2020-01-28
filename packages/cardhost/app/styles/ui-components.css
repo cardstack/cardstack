@@ -143,6 +143,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, 250px);
   grid-gap: var(--ch-spacing);
+  padding-bottom: 40px;
 }
 .color-palette--block {
   width: 250px;
@@ -155,7 +156,8 @@
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
 }
 .color-palette--block.--ch-light,
-.color-palette--block.--ch-light-background {
+.color-palette--block.--ch-light-background,
+.color-palette--block.--white {
   color: black;
 }
 .color-palette--code.cardhost-monaco-container {

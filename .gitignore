@@ -34,9 +34,9 @@ package-lock.json
 /packages/git/writer.d.ts
 /packages/git/writer.js
 /packages/git/writer.js.map
-/packages/git/mutable-tree.d.ts
-/packages/git/mutable-tree.js
-/packages/git/mutable-tree.js.map
+/packages/git/git/tree.d.ts
+/packages/git/git/tree.js
+/packages/git/git/tree.js.map
 /packages/git/node-tests/change-test.js
 /packages/git/node-tests/change-test.js.map
 /packages/git/node-tests/change-test.d.ts

@@ -9,7 +9,7 @@
   color: white;
   font: 400 13px/18px var(--ch-font-family);
   letter-spacing: 0.035em;
-  z-index: var(--ch-edges-z-index);
+  z-index: var(--ch-right-edge-z-index);
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
   overflow-y: auto;
 }
@@ -20,9 +20,9 @@
 
 .pill-selector {
   display: flex;
-  min-width: var(--ch-component-width);
+  min-width: 260px;
   width: 100%;
-  height: var(--ch-component-height);
+  height: 40px;
   background-color: var(--ch-default);
   color: white;
   font: 400 13px/18px var(--ch-font-family);

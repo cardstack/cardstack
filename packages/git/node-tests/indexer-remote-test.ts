@@ -10,18 +10,13 @@ const { createDefaultEnvironment, destroyDefaultEnvironment } = require('@cardst
 import { makeRepo } from './support';
 
 import { join } from 'path';
-import { readFileSync } from 'fs';
-import { Cred, Remote, FetchOptions } from '../git';
+import { Remote } from '../git';
 
 import service from '../service';
-
-const privateKey = readFileSync(join(__dirname, 'git-ssh-server', 'cardstack-test-key'), 'utf8');
 
 function toResource(doc: todo) {
   return doc.data;
 }
-
-const fetchOpts = new FetchOptions((url, userName) => Cred.sshKeyMemoryNew(userName, '', privateKey, ''));
 
 async function resetRemote() {
   let root = await temp.mkdir('cardstack-server-test');
@@ -41,8 +36,8 @@ async function resetRemote() {
     }),
   });
 
-  let remote = await Remote.create(tempRepo.repo, 'origin', 'ssh://root@localhost:9022/root/data-test');
-  await remote.push(['+refs/heads/master:refs/heads/master'], fetchOpts);
+  let remote = await Remote.create(tempRepo.repo, 'origin', 'http://root:password@localhost:8838/git/repo');
+  await remote.push('refs/heads/master', 'refs/heads/master', { force: true });
 
   return tempRepo;
 }
@@ -66,8 +61,7 @@ describe('git/indexer remote config', function() {
       params: {
         repo: '/user/repo',
         remote: {
-          url: 'ssh://root@localhost:9022/root/data-test',
-          privateKey,
+          url: 'http://root:password@localhost:8838/git/repo',
         },
       },
     });
@@ -85,8 +79,7 @@ describe('git/indexer remote config', function() {
       'source-type': '@cardstack/git',
       params: {
         remote: {
-          url: 'ssh://root@localhost:9022/root/data-test',
-          privateKey,
+          url: 'http://root:password@localhost:8838/git/repo',
         },
       },
     });
@@ -141,8 +134,7 @@ describe('git/indexer cloning', function() {
       'source-type': '@cardstack/git',
       params: {
         remote: {
-          url: 'ssh://root@localhost:9022/root/data-test',
-          privateKey,
+          url: 'http://root:password@localhost:8838/git/repo',
           cacheDir,
         },
       },

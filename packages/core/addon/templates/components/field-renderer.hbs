@@ -20,7 +20,7 @@
     </button>
   {{/if}}
 
-  {{#if (eq @mode "view")}}
+  {{#if (or (eq @mode "view") (eq @mode "layout"))}}
     {{#let (component this.fieldViewer) as | FieldViewer |}}
       <FieldViewer @field={{@field}}/>
     {{/let}}
@@ -42,7 +42,7 @@
           {{!-- TODO: Change displayed logo depending on field --}}
           {{! template-lint-disable no-inline-styles }}
           <header
-            class="schema-field-renderer--header {{if this.fieldType this.fieldType.id @field.type}}"
+            class="schema-field-renderer--header {{if this.fieldType this.fieldType.type @field.type}}"
             style={{css-url "background-image" this.fieldType.icon}}
             data-test-field-renderer-type
           >
@@ -153,7 +153,7 @@
     {{/each}}
   {{/if}}
 
-  {{#if (not (eq @mode "view"))}}
+  {{#if (and (not-eq @mode "view") (not-eq @mode "layout"))}}
     <div class="field--action">
       {{#if (and @removeField (not @field.isAdopted))}}
         {{!-- using field.nonce in case the user deletes the name of the field --}}
