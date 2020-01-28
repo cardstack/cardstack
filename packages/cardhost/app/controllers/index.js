@@ -23,7 +23,7 @@ export default class IndexController extends Controller {
   }
 
   @action
-  openCardNameDialog(model/*, evt*/) {
+  openCardNameDialog(model /*, evt*/) {
     if (arguments.length === 2) {
       this.cardModel = model;
     }

@@ -12,6 +12,12 @@
   letter-spacing: 0.035em;
 }
 
+.dialog.dark {
+  color: var(--ch-light);
+  background-color: var(--ch-default);
+  --icon-color: var(--ch-light);
+}
+
 .dialog--title {
   display: flex;
   margin: 0;

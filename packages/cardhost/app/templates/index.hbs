@@ -114,8 +114,15 @@
 </div>
 
 {{#if this.showDialog}}
-  <CardNameDialog
-    @model={{this.cardModel}}
-    @closeDialog={{fn (mut this.showDialog) false}}
-  />
+  {{to-elsewhere
+    named="cardhost-modal"
+    send=(component
+            "card-name-dialog"
+            mode="dark"
+            icon="icon-blank-card"
+            model=this.cardModel
+            closeDialog=(fn (mut this.showDialog) false)
+          )
+    outsideParams=(hash outsideClick=(fn (mut this.showDialog) false))
+  }}
 {{/if}}

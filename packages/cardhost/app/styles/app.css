@@ -196,3 +196,25 @@ a:hover {
   -webkit-text-fill-color: var(--cs-dark-field-disabled-text); /* For strangeness in safari */
   -webkit-text-stroke-color: var(--cs-dark-field-disabled-text);
 }
+
+/* Cardhost Modal */
+.cardhost-modal-backdrop {
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--black);
+  opacity: 0.6;
+  z-index: 999;
+}
+
+.cardhost-modal-container {
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

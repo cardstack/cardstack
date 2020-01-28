@@ -1,16 +1,14 @@
-<div class="card-name-dialog--container">
-  <Dialog open={{true}} @title="Create a New Card">
-    <p class="dialog--message">
-      Give your card a meaningful name
-    </p>
-    <TextField
-      @id="card__name"
-      @placeholder="i.e. Millenial Puppies"
-      @setValue={{action this.updateCardName}}
-    />
-    <div class="dialog--button-group">
-      <Cta {{on "click" this.args.closeDialog}} @variant="secondary">Cancel</Cta>
-      <Cta {{on "click" this.createCard}} data-test-create-card-btn>Create</Cta>
-    </div>
-  </Dialog>
-</div>
+<Dialog open={{true}} @title="Create a New Card" @mode={{@mode}} @icon={{@icon}}>
+  <p class="dialog--message">
+    Give your card a meaningful name
+  </p>
+  <TextField
+    @id="card__name"
+    @placeholder="i.e. Millenial Puppies"
+    @setValue={{action this.updateCardName}}
+  />
+  <div class="dialog--button-group">
+    <Cta {{on "click" this.args.closeDialog}} @variant="secondary primary">Cancel</Cta>
+    <Cta {{on "click" this.createCard}} @variant="primary" data-test-create-card-btn>Create</Cta>
+  </div>
+</Dialog>
