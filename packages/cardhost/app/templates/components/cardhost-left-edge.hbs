@@ -3,12 +3,12 @@
   class="cardhost-left-edge"
   data-test-cardhost-left-edge
 >
-  <nav 
+  <nav
     class="cardhost-left-edge--nav {{@mode}} {{if this.isExpanded "expanded"}}"
   >
     <ul>
       <li class="login-grid">
-        <button 
+        <button
           class="ch-button ch-button--icon-secondary button-cardstack-logo"
           aria-label="expandable menu with login controls"
           aria-expanded={{this.isExpanded}}
@@ -26,7 +26,7 @@
             <h1>Cardstack Builder</h1>
             <CardstackSession as |session|>
               {{#if session.isAuthenticated }}
-                <button 
+                <button
                   {{on "click" (fn this.logout session.logout)}}
                   class="cardhost-left-edge-login-buttons"
                   data-test-logout-button
@@ -65,6 +65,38 @@
       </li>
     </ul>
   </nav>
+
+  {{#if (eq @mode "schema")}}
+    <section class="ch-catalog">
+      <header class="ch-catalog--header">
+        <h3 class="ch-catalog--title">Card Catalog</h3>
+      </header>
+      <div class="ch-catalog--content" tabindex="0" >
+        <div class="ch-catalog--fields">
+          {{#each this.fieldComponents as |field|}}
+            <div
+              class="ch-catalog-field"
+              role="button"
+              draggable="true"
+              {{on "mousedown" (action this.initDrag field)}}
+              {{on "dragend" (action (mut this.isDragging) false)}}
+              {{on "dragstart" (action this.startDragging field)}}
+              data-test-card-add-field-draggable={{field.type}}
+            >
+              {{! template-lint-disable no-inline-styles}}
+              <div class="ch-catalog-field--icon" style={{css-url "background-image" field.icon}}></div>
+              <div>
+                <h4 class="ch-catalog-field--title">{{field.title}}</h4>
+                {{#if field.description}}
+                  <p class="ch-catalog-field--description">{{field.description}}</p>
+                {{/if}}
+              </div>
+            </div>
+          {{/each}}
+        </div>
+      </div>
+    </section>
+  {{/if}}
 
   {{yield}}
 </aside>

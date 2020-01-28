@@ -1,11 +1,12 @@
 .cardhost-left-edge {
-  position: fixed;
+  /* position: fixed;
   top: 0;
-  left: 0;
-  height: 100%;
+  left: 0; */
+  /* height: 100%; */
+  height: calc(100% - 80px);
   display: flex;
   flex-flow: row nowrap;
-  z-index: var(--ch-left-edge-z-index);
+  /* z-index: var(--ch-left-edge-z-index); */
 }
 
 .cardhost-left-edge--nav {

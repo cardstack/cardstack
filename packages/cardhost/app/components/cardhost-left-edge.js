@@ -2,8 +2,12 @@ import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import { fieldTypeMappings, fieldComponents } from '@cardstack/core/utils/mappings';
 
 export default class CardhostTopEdgeComponent extends Component {
+  fieldTypeMappings = fieldTypeMappings;
+  fieldComponents = fieldComponents;
+
   @service cardstackSession;
   @tracked isExpanded = false;
 
@@ -55,5 +59,15 @@ export default class CardhostTopEdgeComponent extends Component {
   destroyCloseListener() {
     document.querySelector('body').removeEventListener('click', this.closeListener);
     document.querySelector('body').removeEventListener('focusin', this.closeListener);
+  }
+
+  @action
+  initDrag() {
+    this.isDragging = true;
+  }
+
+  @action startDragging(field, evt) {
+    evt.dataTransfer.setData('text', evt.target.id);
+    evt.dataTransfer.setData('text/type', field.type);
   }
 }

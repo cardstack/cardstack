@@ -1,3 +1,54 @@
 <div class="cardhost-top-edge {{@mode}}" data-test-cardhost-top-edge>
-  {{yield}}
+  {{#if (or (eq @mode "layout") (eq @mode "fields"))}}
+    <div class="view-selector">
+      <LinkTo
+        @route="cards.card.edit.layout"
+        @class="view-selector--mode-link"
+        @model={{@card}}
+        data-test-view-selector="layout"
+      >
+        {{svg-jar "layout" width="18px" height="17px"}}
+        Layout
+      </LinkTo>
+      <LinkTo
+        @route="cards.card.edit.fields"
+        @class="view-selector--mode-link"
+        @model={{@card}}
+        data-test-view-selector="fields"
+      >
+        {{svg-jar "form" width="18px" height="17px"}}
+        Field
+      </LinkTo>
+    </div>
+
+    <div class="card-renderer--top-edge-buttons">
+      <div class="top-edge--mode-label">
+        Edit Mode
+        <LinkTo
+          @route="cards.card.view"
+          @class="top-edge--mode-link view"
+          @model={{@card}}
+          data-test-top-edge-link="view"
+        >
+          <span>Preview</span>
+        </LinkTo>
+      </div>
+      <SaveButton @card={{@card}} />
+    </div>
+  {{else if (eq @mode "schema")}}
+    <div class="card-renderer--top-edge-buttons">
+      <div class="top-edge--mode-label">
+        Schema Mode
+        <LinkTo
+          @route="cards.card.edit.fields"
+          @class="top-edge--mode-link edit"
+          @model={{@card}}
+          data-test-top-edge-link="edit"
+        >
+          <span>Edit</span>
+        </LinkTo>
+      </div>
+      <SaveButton @card={{@card}}/>
+    </div>
+  {{/if}}
 </div>

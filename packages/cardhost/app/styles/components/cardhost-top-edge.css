@@ -1,19 +1,19 @@
 .cardhost-top-edge {
-  --padding-left: var(--ch-left-edge-width);
-  --padding-right: var(--ch-right-edge-width);
+  /* --padding-left: var(--ch-left-edge-width);
+  --padding-right: var(--ch-right-edge-width); */
 
-  padding-left: var(--padding-left);
-  padding-right: var(--padding-right);
+  /* padding-left: var(--padding-left);
+  padding-right: var(--padding-right); */
   height: var(--ch-top-edge-height);
-  position: fixed;
+  /* position: fixed;
   top: 0;
   right: 0;
-  left: 0;
+  left: 0; */
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: right;
-  z-index: var(--ch-top-edge-z-index);
+  /* z-index: var(--ch-top-edge-z-index); */
   background-color: var(--ch-default);
   transition: background-color var(--ch-transition-time);
 }

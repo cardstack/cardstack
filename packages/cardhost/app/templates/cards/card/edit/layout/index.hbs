@@ -1,9 +1,9 @@
 <CardViewer @card={{this.model}} @mode="layout"/>
 
 {{#if this.cardstackSession.isAuthenticated}}
-  <RightEdge
+  {{!-- <RightEdge
     @card={{this.model}}
-    @cardSelected={{true}} {{!-- Change this when we want to display different right-edge options --}}
+    @cardSelected={{true}}
   >
     <div class="right-edge--section" data-test-appearance-section>
       <div class="right-edge--section-header " data-test-section-header>
@@ -32,5 +32,19 @@
         </div>
       </div>
     </div>
-  </RightEdge>
+  </RightEdge> --}}
+
+  <CardstackEdge
+    @edge="right"
+    @componentToShow={{component "right-edge"
+      mode="layout"
+      card=this.model
+      cardSelected=true
+      themerOptions=this.themerOptions
+      selectedTheme=this.selectedTheme
+      handleThemeChange=this.handleThemeChange
+      createTheme=(action this.createTheme)
+    }}>
+    <InRightToolbar/>
+  </CardstackEdge>
 {{/if}}

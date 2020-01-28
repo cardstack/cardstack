@@ -1,53 +1,30 @@
 {{#if this.cardstackSession.isAuthenticated}}
-  <div class="card-renderer--top-edge-buttons">
-    <div class="top-edge--mode-label">
-      Schema Mode
-      <LinkTo
-        @route="cards.card.edit.fields"
-        @class="top-edge--mode-link edit"
-        @model={{this.card}}
-        data-test-top-edge-link="edit"
-      >
-        <span>Edit</span>
-      </LinkTo>
-    </div>
-    <SaveButton @card={{this.card}} />
-  </div>
+  <CardstackEdge @edge="top" @componentToShow={{component "cardhost-top-edge" mode="schema" card=this.card}}>
+    <InTopToolbar />
+  </CardstackEdge>
 {{/if}}
 
-<CardhostLeftEdge @mode="schema">
-  <section class="ch-catalog">
-    <header class="ch-catalog--header">
-      <h3 class="ch-catalog--title">Card Catalog</h3>
-    </header>
-    <div class="ch-catalog--content" tabindex="0">
-      <div class="ch-catalog--fields">
-        {{#each this.fieldComponents as |field|}}
-          <div
-            class="ch-catalog-field"
-            role="button"
-            draggable="true"
-            {{on "mousedown" (action this.initDrag field)}}
-            {{on "dragend" (action (mut this.isDragging) false)}}
-            {{on "dragstart" (action this.startDragging field)}}
-            data-test-card-add-field-draggable={{field.type}}
-          >
-            {{! template-lint-disable no-inline-styles}}
-            <div class="ch-catalog-field--icon" style={{css-url "background-image" field.icon}}></div>
-            <div>
-              <h4 class="ch-catalog-field--title">{{field.title}}</h4>
-              {{#if field.description}}
-                <p class="ch-catalog-field--description">{{field.description}}</p>
-              {{/if}}
-            </div>
-          </div>
-        {{/each}}
-      </div>
-    </div>
-  </section>
-</CardhostLeftEdge>
+<CardstackEdge @edge="left" @componentToShow={{component "cardhost-left-edge" mode="schema"}}>
+  <InLeftToolbar/>
+</CardstackEdge>
 
-<RightEdge
+<CardstackEdge
+  @edge="right"
+  @componentToShow={{component "right-edge"
+    mode="schema"
+    card=this.card
+    selectedField=this.selectedField
+    selectField=(action this.selectField)
+    setNeededWhenEmbedded=this.setNeededWhenEmbedded
+    setFieldName=this.setFieldName
+    setFieldLabel=this.setFieldLabel
+    setFieldInstructions=this.setFieldInstructions
+    cardSelected=this.cardSelected
+  }}>
+  <InRightToolbar/>
+</CardstackEdge>
+
+{{!-- <RightEdge
   @card={{this.card}}
   @mode="schema"
   @selectedField={{this.selectedField}}
@@ -56,23 +33,21 @@
   @setFieldName={{this.setFieldName}}
   @setFieldLabel={{this.setFieldLabel}}
   @setFieldInstructions={{this.setFieldInstructions}}
-  @cardSelected={{this.cardSelected}} />
+  @cardSelected={{this.cardSelected}} /> --}}
 
-<SquishableContainer>
-  <section class="card-schema-updator" data-test-card-schema={{@card.name}} {{did-update this.updateCard @card}}>
-    <CardRenderer
-      @card={{this.card}}
-      @format="isolated"
-      @mode="schema"
-      @removeField={{action this.removeField}}
-      @selectField={{action this.selectField}}
-      @setPosition={{action this.setPosition}}
-      @selectedField={{this.selectedField}}
-      @dropField={{action this.dropField}}
-      @cardSelected={{this.cardSelected}}
-      @cardFocused={{action (mut this.cardSelected)}} />
-  </section>
-</SquishableContainer>
+<section class="card-schema-updator" data-test-card-schema={{@card.name}} {{did-update this.updateCard @card}}>
+  <CardRenderer
+    @card={{this.card}}
+    @format="isolated"
+    @mode="schema"
+    @removeField={{action this.removeField}}
+    @selectField={{action this.selectField}}
+    @setPosition={{action this.setPosition}}
+    @selectedField={{this.selectedField}}
+    @dropField={{action this.dropField}}
+    @cardSelected={{this.cardSelected}}
+    @cardFocused={{action (mut this.cardSelected)}} />
+</section>
 
 {{!-- This is hidden, used in tests --}}
 <section class="cardhost-card-document">

@@ -124,5 +124,34 @@
       </div>
     {{/animated-value}}
   </AnimatedContainer>
-  {{yield}}
+
+  {{#if (eq @mode "layout")}}
+    <div class="right-edge--section" data-test-appearance-section>
+      <div class="right-edge--section-header " data-test-section-header>
+        Appearance
+      </div>
+      <div class="right-edge--items-container">
+        <div class="right-edge--item">
+          <Dropdown
+            @theme="cs-dark"
+            @searchEnabled={{false}}
+            @label="Choose a theme:"
+            @options={{@themerOptions}}
+            @selected={{@selectedTheme}}
+            @setValue={{@handleThemeChange}}
+          />
+        </div>
+        <div class="right-edge--item">
+          <Cta
+            {{on "click" @createTheme}}
+            @variant="secondary responsive"
+            @theme="cs-dark"
+            data-test-card-custom-style-button
+          >
+            New Custom Style
+          </Cta>
+        </div>
+      </div>
+    </div>
+  {{/if}}
 </div>

@@ -1,46 +1,30 @@
-<CardhostTopEdge @mode="schema">
-  {{!-- TODO: DRY buttons --}}
-  {{#if this.cardstackSession.isAuthenticated}}
-    <div class="card-renderer--top-edge-buttons">
-      <SaveButton @card={{this.card}}/>
-    </div>
-  {{/if}}
-</CardhostTopEdge>
+{{#if this.cardstackSession.isAuthenticated}}
+  <CardstackEdge @edge="top" @componentToShow={{component "cardhost-top-edge" mode="schema" card=this.card}}>
+    <InTopToolbar />
+  </CardstackEdge>
+{{/if}}
 
-<CardhostLeftEdge @mode="schema">
-  {{!-- TODO: DRY catalog section --}}
-  <section class="ch-catalog">
-    <header class="ch-catalog--header">
-      <h3 class="ch-catalog--title">Card Catalog</h3>
-    </header>
-    <div class="ch-catalog--content" tabindex="0" >
-      <div class="ch-catalog--fields">
-        {{#each this.fieldComponents as |field|}}
-          <div
-            class="ch-catalog-field"
-            role="button"
-            draggable="true"
-            {{on "mousedown" (action this.initDrag field)}}
-            {{on "dragend" (action (mut this.isDragging) false)}}
-            {{on "dragstart" (action this.startDragging field)}}
-            data-test-card-add-field-draggable={{field.type}}
-          >
-            {{! template-lint-disable no-inline-styles}}
-            <div class="ch-catalog-field--icon" style={{css-url "background-image" field.icon}}></div>
-            <div>
-              <h4 class="ch-catalog-field--title">{{field.title}}</h4>
-              {{#if field.description}}
-                <p class="ch-catalog-field--description">{{field.description}}</p>
-              {{/if}}
-            </div>
-          </div>
-        {{/each}}
-      </div>
-    </div>
-  </section>
-</CardhostLeftEdge>
+<CardstackEdge @edge="left" @componentToShow={{component "cardhost-left-edge" mode="schema"}}>
+  <InLeftToolbar/>
+</CardstackEdge>
 
-<RightEdge
+<CardstackEdge
+  @edge="right"
+  @componentToShow={{component "right-edge"
+    mode="schema"
+    card=this.card
+    selectedField=this.selectedField
+    selectField=(action this.selectField)
+    setNeededWhenEmbedded=this.setNeededWhenEmbedded
+    setFieldName=this.setFieldName
+    setFieldLabel=this.setFieldLabel
+    setFieldInstructions=this.setFieldInstructions
+    cardSelected=this.cardSelected
+  }}>
+  <InRightToolbar/>
+</CardstackEdge>
+
+{{!-- <RightEdge
   @card={{this.card}}
   @mode="schema"
   @selectedField={{this.selectedField}}
@@ -51,7 +35,7 @@
   @setFieldInstructions={{this.setFieldInstructions}}
   @updateCardId={{this.updateCardId}}
   @cardSelected={{this.cardSelected}}
-/>
+/> --}}
 
 <section class="card-creator" data-test-card-creator {{did-update this.updateCard @card}}>
   {{#if this.card}}

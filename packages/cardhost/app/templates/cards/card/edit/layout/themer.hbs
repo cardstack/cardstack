@@ -1,4 +1,6 @@
-<CardhostTopEdge @mode="themer" />
+<CardstackEdge @edge="top" @componentToShow={{component "cardhost-top-edge" mode="themer"}}>
+  <InTopToolbar />
+</CardstackEdge>
 <ThemerToolbar @model={{this.model}} />
 
 <section data-test-card-view={{this.model.name}}>

@@ -1,7 +1,7 @@
 .right-edge {
-  position: fixed;
+  /* position: fixed;
   right: var(--ch-spacing);
-  top: var(--ch-top-edge-height);
+  top: var(--ch-top-edge-height); */
   width: var(--ch-right-edge-panel-width);
   max-height: calc(100vh - var(--ch-top-edge-height) - var(--ch-bottom-edge-height));
   border-radius: 10px;
@@ -9,7 +9,7 @@
   color: white;
   font: 400 13px/18px var(--ch-font-family);
   letter-spacing: 0.035em;
-  z-index: var(--ch-right-edge-z-index);
+  /* z-index: var(--ch-right-edge-z-index); */
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
   overflow-y: auto;
 }

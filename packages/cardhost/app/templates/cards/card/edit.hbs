@@ -1,20 +1,11 @@
 {{#if (and (not-eq this.routeInfo.mode "themer") (not-eq this.routeInfo.mode "schema"))}}
-  <div class="card-renderer--top-edge-buttons">
-    <div class="top-edge--mode-label">
-      Edit Mode
-      <LinkTo
-        @route="cards.card.view"
-        @class="top-edge--mode-link view"
-        @model={{this.model}}
-        data-test-top-edge-link="view"
-      >
-        <span>Preview</span>
-      </LinkTo>
-    </div>
-    <SaveButton @card={{this.model}} />
-  </div>
+  <CardstackEdge @edge="top" @componentToShow={{component "cardhost-top-edge" mode=this.routeInfo.mode card=this.model}}>
+    <InTopToolbar />
+  </CardstackEdge>
 
-  <CardhostLeftEdge />
+  <CardstackEdge @edge="left" @componentToShow={{component "cardhost-left-edge"}}>
+    <InLeftToolbar />
+  </CardstackEdge>
 {{/if}}
 
 {{outlet}}

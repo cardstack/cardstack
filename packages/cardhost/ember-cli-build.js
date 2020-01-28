@@ -120,6 +120,22 @@ module.exports = function(defaults) {
             },
           },
         },
+        {
+          package: '@cardstack/edges',
+          components: {
+            '<CardstackEdge/>': {
+              acceptsComponentArguments: ['componentToShow'],
+            },
+          },
+        },
+        {
+          package: 'ember-toolbars',
+          components: {
+            '<InTopToolbar/>': {
+              yieldsSafeComponents: [true],
+            },
+          },
+        },
       ],
     });
   })();
