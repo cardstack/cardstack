@@ -50,7 +50,7 @@
       </header>
       <div class="card-catalog">
         {{#each this.model.templates as |card|}}
-          <Cta {{on "click" (fn this.openCardNameDialog card)}}
+          <Cta {{on "click" (fn this.openCardNameDialog "Adopt a Card" card)}}
             @class="card-renderer--embedded-card-link"
             data-test-embedded-card={{card.name}}
           >
@@ -100,7 +100,7 @@
         New Blank Card
       </header>
       <div class="card-catalog">
-        <Cta {{on "click" (fn this.openCardNameDialog)}}
+        <Cta {{on "click" (fn this.openCardNameDialog "Create a New Card")}}
           @class="card-renderer--embedded-card-link"
         >
           <div>
@@ -120,6 +120,7 @@
             "card-name-dialog"
             mode="dark"
             icon="icon-blank-card"
+            title=this.dialogTitle
             model=this.cardModel
             closeDialog=(fn (mut this.showDialog) false)
           )

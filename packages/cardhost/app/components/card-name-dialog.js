@@ -20,6 +20,10 @@ export default class CardNameDialog extends Component {
     return dasherize(this.name).toLowerCase();
   }
 
+  get title() {
+    return this.args.title || 'Create a New Card';
+  }
+
   @task(function*() {
     let adoptedFrom;
 

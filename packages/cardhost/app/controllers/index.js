@@ -8,6 +8,7 @@ export default class IndexController extends Controller {
 
   @tracked selectedSection = 'recent-cards';
   @tracked cardModel;
+  @tracked dialogTitle;
   @tracked showDialog;
 
   @action
@@ -23,11 +24,13 @@ export default class IndexController extends Controller {
   }
 
   @action
-  openCardNameDialog(model /*, evt*/) {
-    if (arguments.length === 2) {
+  openCardNameDialog(title, model /*, evt*/) {
+    if (arguments.length > 2) {
       this.cardModel = model;
     }
-
+    if (arguments.length > 1) {
+      this.dialogTitle = title;
+    }
     this.showDialog = true;
   }
 }
