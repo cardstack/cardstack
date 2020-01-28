@@ -24,6 +24,12 @@ export default class CardNameDialog extends Component {
     return this.args.title || 'Create a New Card';
   }
 
+  willDestroy() {
+    if (this.args.closeDialog) {
+      this.args.closeDialog();
+    }
+  }
+
   @task(function*() {
     let adoptedFrom;
 

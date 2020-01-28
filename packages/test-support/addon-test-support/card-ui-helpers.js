@@ -8,14 +8,9 @@ export async function showCardId(toggleDetailsSection = false) {
 
   if (toggleDetailsSection) {
     await click('[data-test-right-edge-section-toggle="details"]');
-    await animationsSettled();
   }
-}
 
-export async function setCardId(id) {
-  await showCardId();
-  await fillIn('#card__id', id);
-  await triggerEvent('#card__id', 'keyup');
+  await animationsSettled();
 }
 
 export async function setCardName(name) {
@@ -65,12 +60,15 @@ export async function dragFieldToNewPosition(originalPosition, newPosition) {
 
 export async function createCards(args) {
   for (let id of Object.keys(args)) {
-    await visit('/cards/new');
+    await visit('/');
+    await click('[data-test-new-blank-card-btn]');
+    await setCardName(id);
+    await click('[data-test-configure-schema-btn]');
+
     for (let [index, [name, type, neededWhenEmbedded]] of args[id].entries()) {
       await addField(name, type, neededWhenEmbedded, index);
     }
-    await setCardId(id);
-    await saveCard('creator', id);
+    await saveCard();
 
     await visit(`/cards/${id}/edit/fields`);
     for (let [name, , , value] of args[id]) {
@@ -79,23 +77,14 @@ export async function createCards(args) {
       }
       await setFieldValue(name, value);
     }
-    await saveCard('editor', id);
+    await saveCard();
     await visit(`/cards/${id}`);
   }
 }
 
-export async function saveCard(mode, id) {
+export async function saveCard() {
   await click(`[data-test-card-save-btn]`);
-
-  if (mode === 'creator') {
-    if (id) {
-      await waitFor(`[data-test-card-schema="${id}"]`, { timeout });
-    } else {
-      await waitFor('[data-test-card-schema^="new-card-"]', { timeout });
-    }
-  } else {
-    await waitFor(`[data-test-card-save-btn].saved`, { timeout });
-  }
+  await waitFor(`[data-test-card-save-btn].saved`, { timeout });
   await animationsSettled();
 }
 

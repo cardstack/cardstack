@@ -50,7 +50,6 @@ module('Acceptance | card create', function(hooks) {
 
   test('creating a card', async function(assert) {
     await login();
-    await visit('/cards/new');
 
     assert.equal(currentURL(), '/cards/new');
     await percySnapshot([assert.test.module.name, assert.test.testName, 'new'].join(' | '));
@@ -112,6 +111,30 @@ module('Acceptance | card create', function(hooks) {
     assert.equal(card.data.relationships.author, undefined);
     assert.deepEqual(card.data.relationships.reviewers, undefined);
     await percySnapshot([assert.test.module.name, assert.test.testName, 'data-entered'].join(' | '));
+  });
+
+  test('creating a card from the homepage', async function(assert) {
+    await login();
+    await visit('/');
+
+    assert.equal(currentURL(), '/');
+    await percySnapshot(assert);
+    await click('[data-test-new-blank-card-btn]');
+    await setCardName(card1Name);
+
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+    await click('[data-test-configure-schema-btn]');
+
+    assert.dom('.card-renderer-isolated--header').hasText('millenial-puppies');
+
+    await addField('title', 'string', true);
+    await addField('body', 'string', false);
+    await addField('author', 'related card', true);
+    await addField('reviewers', 'related cards', true);
+
+    await showCardId(true);
+    assert.dom('.card-renderer-isolated--header').hasText('millenial-puppies');
+    assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
   });
 
   test(`selecting a field`, async function(assert) {
@@ -180,7 +203,7 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
 
-    await saveCard('creator', card1Id);
+    await saveCard();
 
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields/schema`);
 
@@ -267,7 +290,7 @@ module('Acceptance | card create', function(hooks) {
       ['title', 'author', 'body']
     );
 
-    await saveCard('creator', card1Id);
+    await saveCard();
 
     await visit(`/cards/${card1Id}`);
     assert.deepEqual(

@@ -102,6 +102,7 @@
       <div class="card-catalog">
         <Cta {{on "click" (fn this.openCardNameDialog "Create a New Card")}}
           @class="card-renderer--embedded-card-link"
+          data-test-new-blank-card-btn
         >
           <div>
             <div class="card-catalog--embedded-card-placeholder icon-add-card"></div>
