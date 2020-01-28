@@ -7,15 +7,10 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Cardhost Hub",
-      "cwd": "${workspaceRoot}/packages/cardhost",
+      "name": "Launch Hub",
+      "cwd": "${workspaceRoot}/packages/hub",
       "console": "integratedTerminal",
       "env": {
-        "CARDSTACK_SESSIONS_KEY": "OQUQi8NH0asrYgeoE10ijOFBhd/P1BU8HZP/rNqO5nw=",
-        "PGSEARCH_NAMESPACE": "cardstack_data_development",
-        "INITIAL_DATA_DIR": "${workspaceFolder}/packages/cardhost/cardstack",
-        "HUB_ENVIRONMENT": "test",
-        "PORT": "3000"
       },
       "args": ["${workspaceFolder}/packages/hub/bin/cardstack-hub.js"]
     },
@@ -36,7 +31,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["-r", "esm", "packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can get a card back out"],
+      "args": ["-r", "esm", "packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can create card"],
     },
     {
       "type": "node",

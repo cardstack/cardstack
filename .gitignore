@@ -35,9 +35,15 @@ package-lock.json
 /packages/cardhost/app/services/cardstack-session.d.ts
 /packages/cardhost/app/services/cardstack-session.js
 /packages/cardhost/app/services/cardstack-session.js.map
+/packages/cardhost/app/utils/scaffolding.d.ts
+/packages/cardhost/app/utils/scaffolding.js
+/packages/cardhost/app/utils/scaffolding.js.map
 /packages/cardhost/tests/helpers/fixtures.d.ts
 /packages/cardhost/tests/helpers/fixtures.js
 /packages/cardhost/tests/helpers/fixtures.js.map
+/packages/cardhost/tests/unit/services/data-test.d.ts
+/packages/cardhost/tests/unit/services/data-test.js
+/packages/cardhost/tests/unit/services/data-test.js.map
 
 /packages/git/**/*.d.ts
 /packages/git/**/*.js
