@@ -2,39 +2,36 @@ import { module, test, skip } from 'qunit';
 import { myOrigin } from '@cardstack/core/origin';
 import { setupTest } from 'ember-qunit';
 import { testCard } from '@cardstack/test-support/test-card';
+import Fixtures from '../../helpers/fixtures';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 const csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
 
-// const scenario = new Fixtures({
-//   destroy() {
-//     return [
-//       { type: 'cards', id: card7Id },
-//       { type: 'cards', id: card6Id },
-//       { type: 'cards', id: card5Id },
-//       { type: 'cards', id: card4Id },
-//       { type: 'cards', id: card3Id },
-//       { type: 'cards', id: card2Id },
-//       { type: 'cards', id: card1Id },
-//     ];
-//   },
-// });
-
 module('Unit | Service | data', function() {
+  module('non-mutating tests', function() {
+    skip('it can get a card', async function() {});
+    skip('it can search for cards', async function() {});
+    skip("it can get a value of a card's primitive field", async function() {});
+    skip('it can get a card-as-value value of a card field', async function() {});
+    skip('it can get a card-as-reference value of a card field', async function() {});
+    skip('it can get a card-as-value value of a card artity > 1 field', async function() {});
+    skip('it can get a card-as-reference value of a card artity > 1 field', async function() {});
+    skip('it can get a card with fully expanded pristine doc', async function() {});
+    skip('it can get a card with isolated fieldset format', async function() {});
+    skip('it can get a card with embedded fieldset format', async function() {});
+    skip('it can get a card with specific field includes', async function() {});
+    skip('it can get a card with an isolated field set and specified field includes', async function() {});
+  });
+
   module('mutating tests', function(hooks) {
+    const scenario = new Fixtures({
+      destroy: {
+        cardTypes: [{ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }],
+      },
+    });
+
     setupTest(hooks);
-    // scenario.setupTest(hooks);
-
-    hooks.beforeEach(async function() {
-      // await this.owner
-      //   .lookup('service:mock-login')
-      //   .get('login')
-      //   .perform('sample-user');
-      // this.owner.lookup('service:data')._clearCache();
-    });
-
-    hooks.afterEach(async function() {
-      // this.owner.lookup('service:data')._clearCache();
-    });
+    scenario.setupTest(hooks);
 
     test('it creates an UnsavedCard', async function(assert) {
       let service = this.owner.lookup('service:data');
@@ -50,7 +47,7 @@ module('Unit | Service | data', function() {
       assert.equal(await card.value('name'), 'Van Gogh', 'the card user field value is correct');
     });
 
-    skip('it saves an UnsavedCard', async function(assert) {
+    test('it saves an UnsavedCard', async function(assert) {
       let service = this.owner.lookup('service:data');
       let card = await service.create(
         csRealm,
@@ -65,5 +62,10 @@ module('Unit | Service | data', function() {
       assert.equal(card.csOriginalRealm, csRealm, 'the card csOriginalRealm is correct');
       assert.equal(await card.value('name'), 'Van Gogh', 'the card user field value is correct');
     });
+
+    skip('it patches an addressable card', async function() {});
+    skip('it deletes a card', async function() {});
+    skip("it changes a card's parent card", async function() {});
+    skip('it changes to a parent card are reflected in child cards', async function() {});
   });
 });

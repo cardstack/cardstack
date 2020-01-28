@@ -17,17 +17,14 @@ export default class DataService extends Service implements CardInstantiator {
   get hubURL(): string {
     return 'http://localhost:3000';
   }
-
   // TODO glimmer memoizes this, right?
   get reader(): CardReader {
     return new Reader(this);
   }
-
   // TODO glimmer memoizes this, right?
   get moduleLoader(): ModuleLoader {
     return new Loader();
   }
-
   // TODO glimmer memoizes this, right?
   get container(): ContainerInterface {
     return new Container();
@@ -44,17 +41,13 @@ export default class DataService extends Service implements CardInstantiator {
   }
 
   async save(card: UnsavedCard | AddressableCard): Promise<AddressableCard> {
-    let { csRealm, csId } = card;
-    let doc = await card.asUpstreamDoc();
-    let url = csId
-      ? `${this.hubURL}/api/realms/${encodeURIComponent(csRealm)}/cards/${encodeURIComponent(csId)}`
-      : `${this.hubURL}/api/realms/${encodeURIComponent(csRealm)}/cards`;
+    let url = this.localURL(card as CardId);
     let response = await fetch(url, {
-      method: csId ? 'PATCH' : 'POST',
+      method: card.csId != null ? 'PATCH' : 'POST',
       headers: {
         'Content-Type': 'application/vnd.api+json',
       },
-      body: JSON.stringify(doc),
+      body: JSON.stringify((await card.asUpstreamDoc()).jsonapi),
     });
 
     let json = (await response.json()) as SingleResourceDoc;
@@ -66,23 +59,9 @@ export default class DataService extends Service implements CardInstantiator {
     return await this.instantiate(json);
   }
 
-  // TODO Need to be able to load card's that come from remote realms. How to
-  // tell if card's realm is a local realm or a remote realm?
   async load(idOrURL: CardId | string, _occlusionRules?: OcclusionRulesOrDefaults): Promise<AddressableCard> {
-    let { csRealm, csId, csOriginalRealm } = asCardId(idOrURL);
-    if (!csRealm || !csId) {
-      throw new Error(`could not load card ${JSON.stringify(idOrURL)}: missing csRealm and/or csId`);
-    }
-    let isLocalRealm = csRealm.includes(this.hubURL);
-    let requestRealm = isLocalRealm ? csRealm.split('/').pop() : csRealm;
-    let url = isLocalRealm
-      ? `${this.hubURL}/api/realms/${encodeURIComponent(requestRealm!)}/cards/${encodeURIComponent(csId)}`
-      : csOriginalRealm
-      ? `${this.hubURL}/api/remote-realms/${encodeURIComponent(requestRealm!)}/cards/${encodeURIComponent(
-          csOriginalRealm
-        )}/${encodeURIComponent(csId)}`
-      : `${this.hubURL}/api/remote-realms/${encodeURIComponent(requestRealm!)}/cards/${encodeURIComponent(csId)}`;
-
+    let id = asCardId(idOrURL);
+    let url = this.localURL(id);
     let response = await fetch(url, {
       headers: {
         'Content-Type': 'application/vnd.api+json',
@@ -95,6 +74,34 @@ export default class DataService extends Service implements CardInstantiator {
     }
     return await this.instantiate(json);
   }
+
+  private localURL(csRealm: string, csOriginalRealm?: string): string;
+  private localURL(id: CardId): string;
+  private localURL(idOrCsRealm: CardId | string, csOriginalRealm?: string): string {
+    let csRealm: string | undefined, csId: string | undefined;
+    if (typeof idOrCsRealm === 'string') {
+      csRealm = idOrCsRealm;
+    } else {
+      ({ csRealm, csId, csOriginalRealm } = idOrCsRealm);
+    }
+    if (csRealm == null) {
+      throw new Error(`Must specify a csRealm either as a string or as part of a CardId`);
+    }
+
+    let isLocalRealm = csRealm.includes(this.hubURL);
+    let requestRealm = isLocalRealm ? csRealm.split('/').pop() : csRealm;
+    let url = isLocalRealm
+      ? `${this.hubURL}/api/realms/${encodeURIComponent(requestRealm!)}/cards`
+      : csOriginalRealm
+      ? `${this.hubURL}/api/remote-realms/${encodeURIComponent(requestRealm!)}/cards/${encodeURIComponent(
+          csOriginalRealm
+        )}`
+      : `${this.hubURL}/api/remote-realms/${encodeURIComponent(requestRealm!)}/cards`;
+    if (csId != null) {
+      url = `${url}/${encodeURIComponent(csId)}`;
+    }
+    return url;
+  }
 }
 
 class Reader implements CardReader {
@@ -103,7 +110,10 @@ class Reader implements CardReader {
   async get(id: CardId): Promise<AddressableCard>;
   async get(canonicalURL: string): Promise<AddressableCard>;
   async get(idOrURL: CardId | string): Promise<AddressableCard> {
-    return await this.dataService.load(idOrURL);
+    // TODO: this goes to the server, we'll eventually want to do something
+    // smarter here, like return any supplied included resources that were
+    // passed into the Card.
+    return await this.dataService.load(idOrURL, 'upstream');
   }
 }
 
