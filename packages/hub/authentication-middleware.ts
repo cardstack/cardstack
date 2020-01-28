@@ -7,9 +7,9 @@ export interface SessionContext {
 
 export default class AuthenticationMiddleware {
   middleware() {
-    return (ctxt: Koa.Context, next: Koa.Next) => {
+    return async (ctxt: Koa.Context, next: Koa.Next) => {
       ctxt.state.cardstackSession = Session.EVERYONE;
-      next();
+      await next();
     };
   }
 }

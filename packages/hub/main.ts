@@ -111,7 +111,7 @@ async function httpLogging(ctxt: Koa.Context, next: Koa.Next) {
   log.info('finish %s %s %s', ctxt.request.method, ctxt.request.originalUrl, ctxt.response.status);
 }
 
-function cors(ctxt: Koa.Context, next: Koa.Next) {
+export async function cors(ctxt: Koa.Context, next: Koa.Next) {
   ctxt.response.set('Access-Control-Allow-Origin', '*');
   if (ctxt.request.method === 'OPTIONS') {
     ctxt.response.set('Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE,OPTIONS');
@@ -119,5 +119,5 @@ function cors(ctxt: Koa.Context, next: Koa.Next) {
     ctxt.status = 200;
     return;
   }
-  next();
+  await next();
 }

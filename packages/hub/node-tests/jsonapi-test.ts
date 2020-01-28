@@ -6,6 +6,7 @@ import { testCard } from '@cardstack/test-support/test-card';
 import { stringify } from 'qs';
 import { Session } from '@cardstack/core/session';
 import { assertSingleResourceDoc, assertCollectionResourceDoc } from '../jsonapi';
+import { cors } from '../main';
 import { AddressableCard, canonicalURL } from '@cardstack/core/card';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
@@ -18,6 +19,9 @@ describe('hub/jsonapi', function() {
       env = await createTestEnv();
       let app = new Koa();
       let jsonapi = await env.container.lookup('jsonapi-middleware');
+      // keeping this stack a bit more real, as it revealed real async issues
+      app.use(cors);
+      app.use((await env.container.lookup('authentication-middleware')).middleware());
       app.use(jsonapi.middleware());
       request = supertest(app.callback());
     });
@@ -95,9 +99,9 @@ describe('hub/jsonapi', function() {
         .post('/api/realms/first-ephemeral-realm/cards')
         .set('Content-Type', 'application/vnd.api+json')
         .send(testCard().jsonapi);
-      assertSingleResourceDoc(response.body);
       expect(response).hasStatus(201);
       expect(response.header.location).to.match(/http:\/\/[^/]+\/api\/realms\/first-ephemeral-realm\/cards\/[^/]+/);
+      assertSingleResourceDoc(response.body);
     });
 
     it('can create a card with a field that has > 1 arity filled with cards as references', async function() {
@@ -436,6 +440,9 @@ describe('hub/jsonapi', function() {
         env = await createTestEnv();
         let app = new Koa();
         let jsonapi = await env.container.lookup('jsonapi-middleware');
+        // keeping this stack a bit more real, as it revealed real async issues
+        app.use(cors);
+        app.use((await env.container.lookup('authentication-middleware')).middleware());
         app.use(jsonapi.middleware());
         request = supertest(app.callback());
         let service = (await env.container.lookup('cards')).as(Session.EVERYONE);
