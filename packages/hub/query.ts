@@ -2,6 +2,7 @@ import { CardId } from '@cardstack/core/card';
 import * as JSON from 'json-typescript';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import CardstackError from '@cardstack/core/error';
+import  isEqual from 'lodash/isEqual';
 import { assertJSONValue, assertJSONPrimitive } from './json-validation';
 
 export interface Query {
@@ -129,6 +130,9 @@ export function assertFilter(filter: any, pointer: string[]): asserts filter is 
 
   if ('type' in filter) {
     assertCardId(filter.type, pointer.concat('type'));
+    if (isEqual(Object.keys(filter), ['type'])) {
+      return; // This is a pure card type filter
+    }
   }
 
   if ('any' in filter) {
