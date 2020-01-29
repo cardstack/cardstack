@@ -24,10 +24,6 @@
   letter-spacing: 0.015em;
 }
 
-.card-renderer-isolated.schema {
-  min-width: 400px;
-}
-
 .card-renderer-isolated.schema,
 .card-renderer-isolated.edit {
   min-height: var(--card-renderer-height);

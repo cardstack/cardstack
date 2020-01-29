@@ -7,6 +7,13 @@ import { startCase } from 'lodash';
 import { task } from 'ember-concurrency';
 import ENV from '@cardstack/cardhost/config/environment';
 import { fieldTypeMappings, fieldComponents } from '../utils/mappings';
+import { chooseNextToLeft, chooseNextToRight, chooseNextToUp, chooseNextToDown, makeTarget } from '../motions/drag';
+
+const LEFT_ARROW = 37;
+const UP_ARROW = 38;
+const RIGHT_ARROW = 39;
+const DOWN_ARROW = 40;
+const SPACE = 32;
 
 const { environment } = ENV;
 
@@ -244,5 +251,105 @@ export default class CardManipulator extends Component {
   @action startDragging(field, evt) {
     evt.dataTransfer.setData('text', evt.target.id);
     evt.dataTransfer.setData('text/type', field.type);
+  }
+
+  @action
+  handleKey(field, event) {
+    let activeField = this.fieldComponents.find(field => field.dragState);
+
+    if (activeField) {
+      let xStep = 0;
+      let yStep = 0;
+      switch (event.keyCode) {
+        case RIGHT_ARROW:
+          xStep = 1;
+          break;
+        case LEFT_ARROW:
+          xStep = -1;
+          break;
+        case DOWN_ARROW:
+          yStep = 1;
+          break;
+        case UP_ARROW:
+          yStep = -1;
+          break;
+        case SPACE:
+          activeField.set('dragState', null);
+          event.stopPropagation();
+          return false;
+      }
+      if (xStep || yStep) {
+        activeField.dragState.xStep += xStep;
+        activeField.dragState.yStep += yStep;
+        event.stopPropagation();
+        return false;
+      }
+    } else {
+      let elements = [...document.querySelectorAll('.fields .field-card')].filter(element => element !== event.target);
+      let targets = [...elements].map(element => makeTarget(element.getBoundingClientRect(), element));
+      let currentTarget = makeTarget(event.target.getBoundingClientRect(), event.target);
+      let nextTarget;
+
+      switch (event.keyCode) {
+        case RIGHT_ARROW:
+          nextTarget = chooseNextToRight(currentTarget, targets);
+          break;
+        case LEFT_ARROW:
+          nextTarget = chooseNextToLeft(currentTarget, targets);
+          break;
+        case DOWN_ARROW:
+          nextTarget = chooseNextToDown(currentTarget, targets);
+          break;
+        case UP_ARROW:
+          nextTarget = chooseNextToUp(currentTarget, targets);
+          break;
+        case SPACE:
+          this.beginDragging(field, event);
+          event.stopPropagation();
+          return false;
+      }
+      if (nextTarget) {
+        nextTarget.payload.focus();
+        event.stopPropagation();
+        return false;
+      }
+    }
+  }
+
+  @action
+  beginDragging(field, event) {
+    let dragState;
+
+    function stopMouse() {
+      field.dragState = null;
+      window.removeEventListener('mouseup', stopMouse);
+      window.removeEventListener('mousemove', updateMouse);
+    }
+
+    function updateMouse(event) {
+      dragState.latestPointerX = event.x;
+      dragState.latestPointerY = event.y;
+    }
+
+    if (event instanceof KeyboardEvent) {
+      // This is a keyboard-controlled "drag" instead of a real mouse
+      // drag.
+      dragState = {
+        usingKeyboard: true,
+        xStep: 0,
+        yStep: 0,
+      };
+    } else {
+      dragState = {
+        usingKeyboard: false,
+        initialPointerX: event.x,
+        initialPointerY: event.y,
+        latestPointerX: event.x,
+        latestPointerY: event.y,
+      };
+      window.addEventListener('mouseup', stopMouse);
+      window.addEventListener('mousemove', updateMouse);
+    }
+    field.dragState = dragState;
   }
 }
