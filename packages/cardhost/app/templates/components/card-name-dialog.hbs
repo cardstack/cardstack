@@ -1,11 +1,10 @@
 <Dialog open={{true}} @title={{this.title}} @mode={{@mode}} @icon={{@icon}}>
-  <p class="dialog--message">
-    Give your card a meaningful name
-  </p>
   <TextField
     @id="card__name"
-    @placeholder="i.e. Millenial Puppies"
-    @setValue={{action this.updateCardName}}
+    @label="Give your card a name"
+    @theme="cs-dark"
+    @placeholder="i.e. My New Card"
+    @setValue={{this.updateCardName}}
   />
   <div class="dialog--button-group">
     {{#if @closeDialog}}

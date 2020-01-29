@@ -5,6 +5,7 @@
       role="button"
       class={{this.containerClass}}
       {{on "click" (fn this.outsideClick outsideParams.outsideClick)}}
+      data-test-cardhost-modal-container
     >
       {{component args}}
     </div>
