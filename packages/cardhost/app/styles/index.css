@@ -135,6 +135,17 @@
   padding: 0;
 }
 
+.card-catalog > .cs-component-cta {
+  position: relative;
+  text-align: left;
+}
+
+.card-catalog a {
+  display: block;
+  /* relative so that the labels can be absolutely positioned */
+  position: relative;
+}
+
 .card-catalog > * > *,
 .card-catalog > * > * > * {
   height: 225px;

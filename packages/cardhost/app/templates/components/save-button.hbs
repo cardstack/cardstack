@@ -4,7 +4,7 @@
   class={{concat
     "save-button "
     (if this.justSaved "just-saved ")
-    (if (not @card.isDirty) "saved ")
+    (if (not (or @card.isDirty this.saveCard.isRunning)) "saved ")
   }}
   data-test-card-save-btn
   {{did-update this.autoSave @card.isDirty}}

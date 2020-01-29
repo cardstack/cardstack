@@ -10,6 +10,13 @@
   color: var(--ch-dark);
   font: 400 14px/1.43 var(--ch-font-family);
   letter-spacing: 0.035em;
+  outline: none;
+}
+
+.dialog.dark {
+  color: var(--ch-light);
+  background-color: var(--ch-dark-background);
+  --icon-color: var(--ch-light);
 }
 
 .dialog--title {
