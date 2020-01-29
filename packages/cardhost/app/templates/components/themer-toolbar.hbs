@@ -4,7 +4,7 @@
       class="ch-button ch-button--icon responsive {{if (eq this.cssModeToggle.width "small") "selected"}}"
       {{on "click" (fn this.cssModeToggle.setWidth "small")}}
       aria-label="Show the card in small size"
-      data-test-responsive-btn
+      data-test-small-btn
     >
       Small
     </button>
@@ -13,7 +13,7 @@
       class="ch-button ch-button--icon medium {{if (eq this.cssModeToggle.width "medium") "selected"}}"
       {{on "click" (fn this.cssModeToggle.setWidth "medium")}}
       aria-label="Show the card in medium size"
-      data-test-responsive-btn
+      data-test-medium-btn
     >
       Medium
     </button>
@@ -22,7 +22,7 @@
       class="ch-button ch-button--icon full-width {{if (eq this.cssModeToggle.width "large") "selected"}}"
       {{on "click" (fn this.cssModeToggle.setWidth "large")}}
       aria-label="Show the card in full width size"
-      data-test-full-width-btn
+      data-test-large-btn
     >
       Large
     </button>

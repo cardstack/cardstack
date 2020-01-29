@@ -159,16 +159,29 @@ module('Acceptance | css editing', function(hooks) {
     await visit(`/cards/${card1Id}/edit/layout`);
     await click('[data-test-card-custom-style-button]');
     assert.equal(currentURL(), `/cards/${card1Id}/edit/layout/themer`);
+    await click('[data-test-dock-bottom]'); // dock to bottom so we can see better in Percy Screnshots
     // make sure initial state is correct
-    assert.dom('[data-test-responsive-btn]').exists();
-    assert.dom('[data-test-responsive-btn]').hasClass('selected');
-    assert.dom('[data-test-full-width-btn]').exists();
-    assert.dom('[data-test-full-width-btn]').doesNotHaveClass('selected');
-    assert.dom('[data-test-cardhost-cards]').hasClass('responsive');
+    assert.dom('[data-test-small-btn]').exists();
+    assert.dom('[data-test-small-btn]').hasClass('selected');
+    assert.dom('[data-test-medium-btn]').exists();
+    assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-large-btn]').exists();
+    assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--small');
+    await waitForAnimation(() => percySnapshot(assert));
     // toggle to full width
-    await click('[data-test-full-width-btn]');
-    assert.dom('[data-test-full-width-btn]').hasClass('selected');
-    assert.dom('[data-test-cardhost-cards]').hasClass('full-width');
+    await click('[data-test-medium-btn]');
+    assert.dom('[data-test-medium-btn]').hasClass('selected');
+    assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--medium');
+    assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
+    await waitForAnimation(() => percySnapshot(assert));
+
+    await click('[data-test-large-btn]');
+    assert.dom('[data-test-large-btn]').hasClass('selected');
+    assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--large');
+    assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
     await waitForAnimation(() => percySnapshot(assert));
   });
 
