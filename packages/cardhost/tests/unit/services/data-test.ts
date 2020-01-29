@@ -98,11 +98,14 @@ module('Unit | Service | data', function() {
       .adoptingFrom(ownerCard);
 
     const scenario = new Fixtures({
-      create: [toyCard, puppyCard, dalmatianCard, ownerCard, squeakySnake, vanGogh, mango, daddy, mommy],
+      // Note that order doesn't matter--the Fixtures class will figure out all
+      // the cards' dependencies and create/destroy the cards in the correct
+      // order.
+      create: [daddy, mommy, toyCard, puppyCard, dalmatianCard, ownerCard, squeakySnake, vanGogh, mango],
     });
 
     setupTest(hooks);
-    scenario.setupTestWithBeforeAndAfter(hooks);
+    scenario.setupModule(hooks);
 
     test('it can get a card by id', async function(assert) {
       let service = this.owner.lookup('service:data') as DataService;

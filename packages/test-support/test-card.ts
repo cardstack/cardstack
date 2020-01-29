@@ -208,6 +208,13 @@ export class TestCard {
     return doc;
   }
 
+  get canonicalURL(): string | undefined {
+    if (this.csId && this.csRealm) {
+      return canonicalURL({ csId: this.csId, csRealm: this.csRealm, csOriginalRealm: this.csOriginalRealm });
+    }
+    return undefined;
+  }
+
   get asCardValue(): {
     id?: string;
     attributes?: AttributesObject;

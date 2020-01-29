@@ -1,9 +1,13 @@
 /// <reference types="qunit" />
 
-import { TestCardWithId } from '@cardstack/test-support/test-card';
-import { CardId } from '@cardstack/core/card';
+import DAGMap from 'dag-map';
+import { TestCardWithId, TestCard } from '@cardstack/test-support/test-card';
+import { CardId, canonicalURL } from '@cardstack/core/card';
 import { stringify } from 'qs';
-import { CollectionResourceDoc, ResourceObject, SingleResourceDoc } from 'jsonapi-typescript';
+import flatten from 'lodash/flatten';
+import uniq from 'lodash/uniq';
+import { CollectionResourceDoc, ResourceObject, SingleResourceDoc, ResourceIdentifierObject } from 'jsonapi-typescript';
+import isPlainObject from 'lodash/isPlainObject';
 
 const hubURL = 'http://localhost:3000';
 
@@ -20,18 +24,14 @@ export default class Fixtures {
 
   constructor(private config: FixtureConfig) {}
 
+  setupModule(hooks: NestedHooks) {
+    hooks.before(async () => await this.setup());
+    hooks.after(async () => await this.teardown());
+  }
+
   setupTest(hooks: NestedHooks) {
-    this.setupTestWithBeforeEachAndAfterEach(hooks);
-  }
-
-  setupTestWithBeforeAndAfter(hooks: NestedHooks) {
-    hooks.before(async () => await this.setup());
-    hooks.after(async () => await this.teardown());
-  }
-
-  setupTestWithBeforeEachAndAfterEach(hooks: NestedHooks) {
-    hooks.before(async () => await this.setup());
-    hooks.after(async () => await this.teardown());
+    hooks.beforeEach(async () => await this.setup());
+    hooks.afterEach(async () => await this.teardown());
   }
 
   async setup() {
@@ -39,10 +39,8 @@ export default class Fixtures {
       return;
     }
     let cardResources: ResourceObject[] = [];
-    // TODO: consider using an adoption chain based DAG instead for creating
-    // these in the correct order.
-    for (let card of this.config.create) {
-      cardResources.push(await createCard(card));
+    for (let testCard of inDependencyOrder(this.config.create)) {
+      cardResources.push(await createCard(testCard));
     }
     this.createdCards = cardResources.map(
       i =>
@@ -55,34 +53,57 @@ export default class Fixtures {
   }
 
   async teardown() {
+    let cardsToDestroy: ResourceObject[] = [];
     if (Array.isArray(this.createdCards)) {
-      // TODO Right now we are relying on the fact that the dev is specifying the
-      // cards to create/delete in the correct order it would be better to rely
-      // on an adoption chain based DAG instead.
-      let cardIdsToDestroy = [...this.createdCards, ...(this.config.destroy?.cards || [])].reverse();
-      let cardsToDestroy = await Promise.all(cardIdsToDestroy.map(getCard));
-      for (let card of cardsToDestroy) {
-        let version = card.meta?.version;
-        await deleteCard((card.attributes as unknown) as CardId, String(version));
-      }
+      let cardIdsToDestroy = [...this.createdCards, ...(this.config.destroy?.cards || [])];
+      cardsToDestroy = [...(await Promise.all(cardIdsToDestroy.map(getCard)))];
     }
 
     if (Array.isArray(this.config.destroy?.cardTypes)) {
-      for (let cardType of this.config.destroy!.cardTypes) {
-        let cardsToDestroy = await getCardsOfType(cardType);
-        // TODO using a Promise.all for deletion can be problematic if you have
-        // cards that derive from one another. What we should really do is to
-        // create a DAG of cards based on their adoption chains and delete from
-        // the leaves up.
-        await Promise.all(
-          cardsToDestroy.map(card => {
-            let version = card.meta?.version;
-            return deleteCard((card.attributes as unknown) as CardId, String(version));
-          })
-        );
-      }
+      cardsToDestroy = cardsToDestroy.concat(
+        flatten(await Promise.all(this.config.destroy!.cardTypes.map(getCardsOfType)))
+      );
+    }
+    for (let card of inDependencyOrder(cardsToDestroy).reverse()) {
+      await deleteCard((card.attributes as unknown) as CardId, String(card.meta?.version));
     }
   }
+}
+
+function inDependencyOrder(cards: ResourceObject[]): ResourceObject[];
+function inDependencyOrder(cards: TestCardWithId[]): TestCardWithId[];
+function inDependencyOrder(cards: any[]): any[] {
+  let dag = new DAGMap<TestCardWithId>();
+
+  for (let card of cards) {
+    let json: ResourceObject = 'jsonapi' in card ? card.jsonapi.data : card;
+    dag.add(canonicalURL((json.attributes as unknown) as CardId), card, undefined, getRelatedIds(json));
+  }
+  let sortedCreatedCards: TestCardWithId[] = [];
+  dag.each((_key, value) => sortedCreatedCards.push(value!));
+  // filter out any built-in cards, as those are never supplied in the fixtures
+  // and only appear as parent references with undefined values in the DAG.
+  return sortedCreatedCards.filter(Boolean);
+}
+
+function getRelatedIds(cardValue: TestCard['asCardValue']): string[] {
+  return uniq(
+    flatten([
+      ...Object.values(cardValue.relationships || {}).map(value => {
+        if (!('data' in value) || value.data == null) {
+          return;
+        }
+        if (Array.isArray(value.data)) {
+          return (value.data as ResourceIdentifierObject[]).map(i => i.id);
+        } else {
+          return value.data.id;
+        }
+      }),
+      ...Object.values(cardValue.attributes || {}).map(value =>
+        isPlainObject(value) ? getRelatedIds(value as TestCard['asCardValue']) : null
+      ),
+    ]).filter(Boolean)
+  ) as string[];
 }
 
 async function getCardsOfType(cardType: CardId): Promise<ResourceObject[]> {
