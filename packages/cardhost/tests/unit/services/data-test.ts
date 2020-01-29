@@ -1,4 +1,4 @@
-import { module, test, skip } from 'qunit';
+import { module, test } from 'qunit';
 import { myOrigin } from '@cardstack/core/origin';
 import { setupTest } from 'ember-qunit';
 import { cardDocument, CardDocumentWithId } from '@cardstack/core/card-document';
@@ -370,9 +370,81 @@ module('Unit | Service | data', function() {
       assert.equal(await card.value('name'), 'Van Gogh', 'the card user field value is correct');
     });
 
-    skip("it can validate a card's user-field values", async function() {});
+    test('it can validate primitive string field', async function(assert) {
+      let service = this.owner.lookup('service:data') as DataService;
+      let doc = cardDocument()
+        .withAttributes({
+          title: 42,
+        })
+        .withField('title', 'string-field');
 
-    skip('rejects saving a card when there is invalid data in the user fields', async function() {});
+      try {
+        await service.create(csRealm, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        assert.equal(err.status, 400);
+        assert.ok(err.detail.match(/field title on card .* failed type validation for value: 42/));
+      }
+
+      doc = cardDocument()
+        .withAttributes({
+          title: 'test',
+        })
+        .withField('title', 'string-field');
+      let card = await service.create(csRealm, doc.jsonapi);
+      assert.ok(card);
+      assert.equal(await card.value('title'), 'test');
+    });
+
+    test('it can validate primitive boolean field', async function(assert) {
+      let service = this.owner.lookup('service:data') as DataService;
+      let doc = cardDocument()
+        .withAttributes({
+          isCool: 42,
+        })
+        .withField('isCool', 'boolean-field');
+
+      try {
+        await service.create(csRealm, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        assert.equal(err.status, 400);
+        assert.ok(err.detail.match(/field isCool on card .* failed type validation for value: 42/));
+      }
+      doc = cardDocument()
+        .withAttributes({
+          isCool: true,
+        })
+        .withField('isCool', 'boolean-field');
+      let card = await service.create(csRealm, doc.jsonapi);
+      assert.ok(card);
+      assert.equal(await card.value('isCool'), true);
+    });
+
+    test('it can validate primitive integer field', async function(assert) {
+      let service = this.owner.lookup('service:data') as DataService;
+      let doc = cardDocument()
+        .withAttributes({
+          puppyCount: 'what',
+        })
+        .withField('puppyCount', 'integer-field');
+
+      try {
+        await service.create(csRealm, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        assert.equal(err.status, 400);
+        assert.ok(err.detail.match(/field puppyCount on card .* failed type validation for value: "what"/));
+      }
+      doc = cardDocument()
+        .withAttributes({
+          puppyCount: 42,
+        })
+        .withField('puppyCount', 'integer-field');
+      let card = await service.create(csRealm, doc.jsonapi);
+      assert.ok(card);
+      assert.equal(await card.value('puppyCount'), 42);
+    });
 
     test('it saves an UnsavedCard', async function(assert) {
       let service = this.owner.lookup('service:data') as DataService;
@@ -448,7 +520,7 @@ module('Unit | Service | data', function() {
         await service.load(savedCard);
         throw new Error('should not be able to find the deleted card');
       } catch (err) {
-        assert.ok(err.message.match(/404: Not Found/), 'the card could not be found');
+        assert.equal(err.status, 404);
       }
     });
   });

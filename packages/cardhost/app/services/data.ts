@@ -2,7 +2,7 @@ import Service from '@ember/service';
 import { inject as service } from '@ember/service';
 import { UnsavedCard, CardId, Card, AddressableCard, asCardId } from '@cardstack/core/card';
 import { CardstackSession } from './cardstack-session';
-import { SingleResourceDoc, CollectionResourceDoc } from 'jsonapi-typescript';
+import { SingleResourceDoc, CollectionResourceDoc, DocWithErrors } from 'jsonapi-typescript';
 import { CardInstantiator } from '@cardstack/core/card-instantiator';
 import { ModuleLoader } from '@cardstack/core/module-loader';
 import { Container as ContainerInterface } from '@cardstack/core/container';
@@ -11,6 +11,9 @@ import { CardReader } from '@cardstack/core/card-reader';
 import { loadModule } from '../utils/scaffolding';
 import { Query } from '@cardstack/core/query';
 import { stringify } from 'qs';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { myOrigin } from '@cardstack/core/origin';
+import CardstackError from '@cardstack/core/error';
 
 export default class DataService extends Service implements CardInstantiator {
   @service cardstackSession!: CardstackSession;
@@ -38,7 +41,11 @@ export default class DataService extends Service implements CardInstantiator {
 
   async create(realm: string, doc: SingleResourceDoc): Promise<UnsavedCard> {
     // TODO need to instantiate this from the container
-    return new UnsavedCard(doc, realm, this.reader, this.moduleLoader, this.container, this);
+    let card = new UnsavedCard(doc, realm, this.reader, this.moduleLoader, this.container, this);
+
+    let realmCard = await this.getRealm(realm);
+    await card.validate(null, realmCard);
+    return card;
   }
 
   async save(card: UnsavedCard | AddressableCard): Promise<AddressableCard> {
@@ -50,13 +57,11 @@ export default class DataService extends Service implements CardInstantiator {
       },
       body: JSON.stringify((await card.asUpstreamDoc()).jsonapi),
     });
-
-    let json = (await response.json()) as SingleResourceDoc;
-
     if (!response.ok) {
-      throw new Error(`Cannot save card ${response.status}: ${response.statusText} - ${JSON.stringify(json)}`);
+      await handleJsonApiError(response);
     }
 
+    let json = (await response.json()) as SingleResourceDoc;
     return await this.instantiate(json);
   }
 
@@ -67,13 +72,16 @@ export default class DataService extends Service implements CardInstantiator {
     } = await card.serializeAsJsonAPIDoc({});
     let { version } = meta;
 
-    await fetch(url, {
+    let response = await fetch(url, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/vnd.api+json',
         'If-Match': String(version || ''),
       },
     });
+    if (!response.ok) {
+      await handleJsonApiError(response);
+    }
   }
 
   async load(idOrURL: CardId | string): Promise<AddressableCard> {
@@ -86,11 +94,11 @@ export default class DataService extends Service implements CardInstantiator {
         'Content-Type': 'application/vnd.api+json',
       },
     });
+    if (!response.ok) {
+      await handleJsonApiError(response);
+    }
 
     let json = (await response.json()) as SingleResourceDoc;
-    if (!response.ok) {
-      throw new Error(`Cannot load card ${response.status}: ${response.statusText} - ${JSON.stringify(json)}`);
-    }
     return await this.instantiate(json);
   }
 
@@ -102,8 +110,31 @@ export default class DataService extends Service implements CardInstantiator {
         'Content-Type': 'application/vnd.api+json',
       },
     });
+    if (!response.ok) {
+      await handleJsonApiError(response);
+    }
     let { data: cards } = (await response.json()) as CollectionResourceDoc;
     return await Promise.all(cards.map(data => this.instantiate({ data })));
+  }
+
+  // This is the same manner in which we get the realm card in
+  // @cardsatck/hub/card-services. maybe this can move into the Card class sin
+  // it looks like it wants to be isomorphic.
+  private async getRealm(realm: string): Promise<AddressableCard> {
+    let realms = await this.search({
+      filter: {
+        type: { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'realm' },
+        eq: {
+          csRealm: `${myOrigin}/api/realms/meta`,
+          csId: realm,
+        },
+      },
+    });
+
+    if (realms.length === 0) {
+      throw new CardstackError(`no such realm "${realm}"`, { status: 400 });
+    }
+    return realms[0];
   }
 
   private localURL(csRealm: string, csOriginalRealm?: string): string;
@@ -133,6 +164,12 @@ export default class DataService extends Service implements CardInstantiator {
     }
     return url;
   }
+}
+
+async function handleJsonApiError(response: Response) {
+  let jsonapiError = (await response.json()) as DocWithErrors;
+  let detail = jsonapiError.errors.length ? jsonapiError.errors[0].detail : JSON.stringify(jsonapiError);
+  throw new CardstackError(detail!, { status: response.status });
 }
 
 class Reader implements CardReader {
