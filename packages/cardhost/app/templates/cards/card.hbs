@@ -1,0 +1,5 @@
+{{outlet}}
+
+{{#if this.attemptedLeaveTransition}}
+  <CardhostModal @component={{component "save-warning-dialog" proceed=(action 'proceed') stay=(action 'stay')}}/>
+{{/if}}

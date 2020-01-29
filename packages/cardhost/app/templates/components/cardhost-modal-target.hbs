@@ -1,0 +1,16 @@
+{{#from-elsewhere name="cardhost-modal" as |modalComponent outsideParams|}}
+  {{#if modalComponent}}
+    <div class="cardhost-modal--backdrop"></div>
+    <div
+      role="button"
+      class="cardhost-modal--container"
+      onclick={{action
+        (cs-exact-target ".cardhost-modal--container" outsideParams.outsideClick)
+      }}
+    >
+      <div class="cardhost-modal--dialog" >
+        {{component modalComponent}}
+      </div>
+    </div>
+  {{/if}}
+{{/from-elsewhere}}

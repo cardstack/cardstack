@@ -1,0 +1,11 @@
+<Dialog open={{true}} @icon="warning" @title="Unsaved Changes">
+  <p class="dialog--message">
+    You have some unsaved changes in this card. If you proceed to change the view or
+    navigate away, they will be lost. If you want to save changes, please stay in this
+    view and save them. Do you want to proceed, or stay?
+  </p>
+  <div class="dialog--button-group">
+    <Cta @variant="secondary" {{on "click" @proceed}}>Proceed</Cta>
+    <Cta {{on "click" @stay}}>Stay</Cta>
+  </div>
+</Dialog>

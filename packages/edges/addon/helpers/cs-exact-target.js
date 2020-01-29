@@ -1,9 +1,8 @@
 import { helper } from '@ember/component/helper';
-import $ from 'jquery';
 
 export default helper(function([selector, handler]) {
   return function(event) {
-    if ($(event.target).is(selector) && handler) {
+    if (event.target.matches(selector) && handler) {
       return handler(event);
     }
   };
