@@ -230,8 +230,26 @@
   filter: alpha(opacity=50);
 }
 
-.ch-button--icon.responsive {
+.ch-button--icon.responsive,
+.ch-button--icon.medium {
   --icon-url: url('/assets/images/buttons/responsive-inactive.svg');
+  width: auto;
+  height: auto;
+  padding-top: 25px;
+  background-size: 25px 25px;
+  background-position: top;
+  justify-content: center;
+  align-items: flex-end;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.ch-button--icon.medium.selected {
+  --icon-url: url('/assets/images/buttons/medium-active.svg');
+}
+
+.ch-button--icon.medium {
+  --icon-url: url('/assets/images/buttons/medium-inactive.svg');
   width: auto;
   height: auto;
   padding-top: 25px;
@@ -248,7 +266,8 @@
 }
 
 .ch-button--icon.responsive:hover,
-.ch-button--icon.full-width:hover {
+.ch-button--icon.full-width:hover,
+.ch-button--icon.medium:hover {
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
@@ -279,9 +298,21 @@
   background-color: var(--ch-dark-background);
 }
 
-.full-width.editing-css .themer.view {
-  width: 100%;
-  padding-right: var(--ch-spacing);
+.editing-css .themer.view {
+  padding: var(--ch-spacing);
+}
+
+.editing-css.themer-card-width--small .themer.view {
+  width: var(--ch-card-size);
+}
+
+
+.editing-css.themer-card-width--medium .themer.view {
+  width: var(--ch-card-size-medium);
+}
+
+.editing-css.themer-card-width--large .themer.view {
+  width: var(--ch-card-size-large);
 }
 
 .card-renderer-isolated.themer.view .card-renderer-isolated--header--wrapper  {
@@ -289,7 +320,6 @@
   right: var(--ch-spacing);
 }
 
-.themer.view {
-  width: var(--ch-card-size);
-  padding: var(--ch-spacing);
+.editing-css .cardstack_base-card-isolated .field {
+  max-width: 100%;
 }
