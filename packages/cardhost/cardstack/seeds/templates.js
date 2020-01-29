@@ -71,48 +71,51 @@ let eventCardTemplate = eventFactory.getDocumentFor(
       eventFactory.addResource('fields', 'divider').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::boolean',
-        'needed-when-embedded': false,
+        'needed-when-embedded': true,
       }),
       eventFactory.addResource('fields', 'background-image').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::decorative-image',
-        'needed-when-embedded': false,
+        'needed-when-embedded': true,
         required: false,
         caption: 'Background image',
       }),
-      eventFactory.addResource('fields', 'event-datetime').withAttributes({
+      eventFactory.addResource('fields', 'event-date').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::date',
         'needed-when-embedded': true,
         required: false,
-        caption: 'Date & Time',
+        caption: 'Date',
       }),
       eventFactory.addResource('fields', 'event-location').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
-        'needed-when-embedded': false,
+        'needed-when-embedded': true,
         required: false,
         caption: 'Location',
       }),
       eventFactory.addResource('fields', 'event-city').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
+        'needed-when-embedded': true,
         required: false,
         caption: 'City',
       }),
       eventFactory.addResource('fields', 'event-admission').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
+        'needed-when-embedded': true,
         required: false,
         caption: 'Admission',
       }),
       eventFactory.addResource('fields', 'event-cta').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::cta',
+        'needed-when-embedded': true,
         required: false,
         caption: 'RSVP',
       }),
-      eventFactory.addResource('fields', 'event-description').withAttributes({
+      eventFactory.addResource('fields', 'body').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
         required: false,
@@ -125,11 +128,11 @@ let eventCardTemplate = eventFactory.getDocumentFor(
         title: 'Quarterly Planning Meeting',
         backgroundImage: 'https://images.unsplash.com/photo-1542296140-47fd7d838e76',
         divider: true,
-        eventDatetime: '2020-05-26',
+        eventDate: '2020-05-26',
         eventLocation: 'One World Trade Center',
         eventCity: 'New York, NY',
         eventAdmission: 'Free',
-        eventDescription:
+        body:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero.',
         eventCta: '',
       })
@@ -251,13 +254,14 @@ let eventTicketTemplate = eventFactory.getDocumentFor(
       eventFactory.addResource('fields', 'highlight-title').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
+        'needed-when-embedded': true,
         required: false,
         caption: 'Highlight title',
       }),
       eventFactory.addResource('fields', 'divider').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::boolean',
-        'needed-when-embedded': false,
+        'needed-when-embedded': true,
         caption: 'Divider',
       }),
       eventFactory.addResource('fields', 'guest-name').withAttributes({
@@ -328,95 +332,214 @@ let eventTicketTemplate = eventFactory.getDocumentFor(
     )
 );
 
-let weddingInvitationTemplate = eventFactory.getDocumentFor(
-  eventFactory
+let productFactory = new Factory();
+let productCardTemplate = productFactory.getDocumentFor(
+  productFactory
+    .addResource('cards', 'local-hub::product-card')
+    .withRelated('adopted-from', { type: 'cards', id: 'local-hub::@cardstack/base-card' })
+    .withRelated('fields', [
+      productFactory.addResource('fields', 'title').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::string',
+        'needed-when-embedded': true,
+        required: true,
+        caption: 'Title',
+      }),
+      productFactory.addResource('fields', 'title-logo').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::decorative-image',
+        'needed-when-embedded': true,
+        required: false,
+        caption: 'Title logo',
+      }),
+      productFactory.addResource('fields', 'highlight-title').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        'needed-when-embedded': true,
+        required: false,
+        caption: 'Highlight Title',
+      }),
+      productFactory.addResource('fields', 'divider').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::boolean',
+        'needed-when-embedded': true,
+        caption: 'Divider',
+      }),
+      productFactory.addResource('fields', 'product-ranking').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::integer',
+        'needed-when-embedded': true,
+        required: true,
+        caption: 'Score',
+      }),
+      productFactory.addResource('fields', 'product-rating').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::integer',
+        'needed-when-embedded': true,
+        required: true,
+        caption: 'Rating (Out of 100, in increments of 10)',
+      }),
+      productFactory.addResource('fields', 'product-company').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::string',
+        'needed-when-embedded': true,
+        required: false,
+        caption: 'Company',
+      }),
+      productFactory.addResource('fields', 'product-company-logo').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::decorative-image',
+        'needed-when-embedded': true,
+        required: false,
+        caption: 'Logo',
+      }),
+      productFactory.addResource('fields', 'product-name').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::string',
+        'needed-when-embedded': true,
+        required: false,
+        caption: 'Product name',
+      }),
+      productFactory.addResource('fields', 'product-image').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::decorative-image',
+        'needed-when-embedded': true,
+        required: false,
+        caption: 'Product image',
+      }),
+      productFactory.addResource('fields', 'product-description').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        'needed-when-embedded': false,
+        required: false,
+        caption: 'Description',
+      }),
+      productFactory.addResource('fields', 'product-link').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::link',
+        'needed-when-embedded': true,
+        required: true,
+        caption: 'View Details',
+      }),
+      productFactory.addResource('fields', 'product-cta').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::cta',
+        'needed-when-embedded': true,
+        required: true,
+        caption: 'Buy Now',
+      }),
+    ])
+    .withRelated(
+      'model',
+      productFactory.addResource('local-hub::product-card', 'local-hub::product-card').withAttributes({
+        title: 'Coffee Bean Award 2020 Winners',
+        titleLogo: '/assets/images/cards/coffee-bean/coffee-competition-logo.svg',
+        highlightTitle: '2nd Place',
+        divider: true,
+        productRanking: 2,
+        productRating: 90,
+        productCompany: 'Ultra Strong Coffee',
+        productCompanyLogo: '/assets/images/cards/coffee-bean/coffee-logo.svg',
+        productName: 'Kenian Devil Roast',
+        productImage: '/assets/images/cards/coffee-bean/coffee-image.svg',
+        productDescription:
+          'Pleasant aroma, deep acidity, and a unique bergamot flavor – this is a coffee that won’t let you sleep. It is grown in the volcanic soils around Mt. Kenya.',
+        productLink: '',
+        productCta: '',
+      })
+    )
+);
+
+let weddingFactory = new Factory();
+let weddingInvitationTemplate = weddingFactory.getDocumentFor(
+  weddingFactory
     .addResource('cards', 'local-hub::wedding-invitation')
     .withRelated('adopted-from', { type: 'cards', id: 'local-hub::@cardstack/base-card' })
     .withRelated('fields', [
-      eventFactory.addResource('fields', 'title').withAttributes({
+      weddingFactory.addResource('fields', 'title').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         'needed-when-embedded': true,
         required: true,
         caption: 'Title',
       }),
-      eventFactory.addResource('fields', 'divider').withAttributes({
+      weddingFactory.addResource('fields', 'divider').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::boolean',
-        'needed-when-embedded': false,
+        'needed-when-embedded': true,
         caption: 'Divider',
       }),
-      eventFactory.addResource('fields', 'wedding-name-1').withAttributes({
+      weddingFactory.addResource('fields', 'wedding-name').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
         'needed-when-embedded': true,
         caption: 'Name',
       }),
-      eventFactory.addResource('fields', 'wedding-name-2').withAttributes({
+      weddingFactory.addResource('fields', 'wedding-name-partner').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
         'needed-when-embedded': true,
         caption: 'Name',
       }),
-      eventFactory.addResource('fields', 'wedding-date').withAttributes({
+      weddingFactory.addResource('fields', 'wedding-date').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::date',
         required: true,
         'needed-when-embedded': true,
         caption: 'Wedding date',
       }),
-      eventFactory.addResource('fields', 'wedding-time').withAttributes({
+      weddingFactory.addResource('fields', 'wedding-time').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
-        'needed-when-embedded': false,
+        'needed-when-embedded': true,
         caption: 'Wedding time',
       }),
-      eventFactory.addResource('fields', 'wedding-reception-address').withAttributes({
+      weddingFactory.addResource('fields', 'wedding-reception-address').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
-        'needed-when-embedded': false,
+        'needed-when-embedded': true,
         caption: 'Reception address',
       }),
-      eventFactory.addResource('fields', 'wedding-rsvp-date').withAttributes({
+      weddingFactory.addResource('fields', 'wedding-intro-text').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: false,
+        'needed-when-embedded': true,
+        caption: 'Intro text',
+      }),
+      weddingFactory.addResource('fields', 'wedding-rsvp-date').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::date',
         required: true,
         'needed-when-embedded': true,
         caption: 'RSVP by',
       }),
-      eventFactory.addResource('fields', 'wedding-website').withAttributes({
+      weddingFactory.addResource('fields', 'wedding-website').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::link',
         required: false,
-        'needed-when-embedded': false,
-        caption: 'www.rufusandwillainwonderland.com',
+        'needed-when-embedded': true,
+        caption: 'Learn more on our Website',
       }),
-      eventFactory.addResource('fields', 'wedding-rsvp-cta').withAttributes({
+      weddingFactory.addResource('fields', 'wedding-rsvp-cta').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::cta',
         required: true,
         'needed-when-embedded': true,
         caption: 'RSVP',
       }),
-      eventFactory.addResource('fields', 'wedding-intro-text').withAttributes({
-        'is-metadata': true,
-        'field-type': '@cardstack/core-types::case-insensitive',
-        required: false,
-        'needed-when-embedded': false,
-        caption: 'Intro text',
-      }),
     ])
     .withRelated(
       'model',
-      eventFactory.addResource('local-hub::wedding-invitation', 'local-hub::wedding-invitation').withAttributes({
+      weddingFactory.addResource('local-hub::wedding-invitation', 'local-hub::wedding-invitation').withAttributes({
         title: 'Wedding Invitation',
         divider: true,
-        weddingName1: 'Willa Karciana',
-        weddingName2: 'Rufus Jackson',
+        weddingName: 'Willa Karciana',
+        weddingNamePartner: 'Rufus Jackson',
         weddingDate: '2021-06-05',
         weddingTime: '3 PM',
         weddingReceptionAddress: 'The Gorgeous Hotel, 96 Hilton Avenue, San Francisco, CA',
@@ -428,11 +551,115 @@ let weddingInvitationTemplate = eventFactory.getDocumentFor(
     )
 );
 
+let photoFactory = new Factory();
+let photoTemplate = photoFactory.getDocumentFor(
+  photoFactory
+    .addResource('cards', 'local-hub::photo-card')
+    .withRelated('adopted-from', { type: 'cards', id: 'local-hub::@cardstack/base-card' })
+    .withRelated('fields', [
+      photoFactory.addResource('fields', 'photo-image-url').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::decorative-image',
+        'needed-when-embedded': true,
+        required: true,
+        caption: 'Image URL',
+      }),
+      photoFactory.addResource('fields', 'photo-caption').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'Caption',
+      }),
+      photoFactory.addResource('fields', 'photo-description').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: true,
+        'needed-when-embedded': false,
+        caption: 'Description for a screen reader',
+      }),
+      photoFactory.addResource('fields', 'photo-keywords').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: true,
+        'needed-when-embedded': false,
+        caption: 'Keywords',
+      }),
+      photoFactory.addResource('fields', 'photo-location').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'Location',
+      }),
+      photoFactory.addResource('fields', 'photo-datetime').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::date',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'Date & Time',
+      }),
+      photoFactory.addResource('fields', 'photo-byline').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::belongs-to',
+        required: true,
+        'needed-when-embedded': true,
+        caption: 'Byline',
+      }),
+    ])
+    .withRelated(
+      'model',
+      photoFactory
+        .addResource('local-hub::photo-card', 'local-hub::photo-card')
+        .withAttributes({
+          photoImageUrl: '/assets/images/cards/photo-skiing/photo-skiing.png',
+          photoCaption: 'Hit the slopes as early as possible for the best snowboarding experience',
+          photoDescription: 'Snowboarder riding down a groomed trail on a sunny day',
+          photoKeywords: 'snow, snowboarder, sports, snowsports, wintersports, mountain, powder, blue, white',
+          photoDatetime: '2020-01-25',
+          photoLocation: 'Nassfeld, Austria',
+        })
+        .withRelated('photo-byline', { type: 'cards', id: 'local-hub::byline-card' })
+    )
+);
+
+let bylineFactory = new Factory();
+let bylineTemplate = bylineFactory.getDocumentFor(
+  bylineFactory
+    .addResource('cards', 'local-hub::byline-card')
+    .withRelated('adopted-from', { type: 'cards', id: 'local-hub::@cardstack/base-card' })
+    .withRelated('fields', [
+      bylineFactory.addResource('fields', 'byline-name').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::string',
+        'needed-when-embedded': true,
+        required: true,
+        caption: 'Name',
+      }),
+      bylineFactory.addResource('fields', 'byline-image').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::decorative-image',
+        'needed-when-embedded': true,
+        caption: 'Image',
+      }),
+    ])
+    .withRelated(
+      'model',
+      bylineFactory.addResource('local-hub::byline-card', 'local-hub::byline-card').withAttributes({
+        bylineName: 'Carlos Naipes',
+        bylineImage: '/assets/images/cards/photo-skiing/photo-skiing-byline.png',
+      })
+    )
+);
+
 module.exports = [
   locationCardTemplate,
   eventCardTemplate,
   jobCardTemplate,
   jobApplicantProfileTemplate,
   eventTicketTemplate,
+  productCardTemplate,
   weddingInvitationTemplate,
+  photoTemplate,
+  bylineTemplate,
 ];

@@ -51,7 +51,7 @@
       <div class="card-catalog">
         {{#each this.model.templates as |card|}}
           <Cta {{on "click" (fn this.openCardNameDialog "Adopt a Card" card)}}
-            @class="card-renderer--embedded-card-link"
+            @class="card-catalog--embedded-card-link"
             data-test-embedded-card={{card.name}}
             data-test-adopt-card-btn
           >
@@ -72,19 +72,19 @@
         Common Cards
       </header>
       <div class="card-catalog">
-        <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
+        <LinkTo @route="cards.add" @class="card-catalog--embedded-card-link">
           <div>
             <div class="card-catalog--embedded-card-placeholder icon-common-form"></div>
             <div class="embedded-card-label">Form</div>
           </div>
         </LinkTo>
-        <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
+        <LinkTo @route="cards.add" @class="card-catalog--embedded-card-link">
           <div>
             <div class="card-catalog--embedded-card-placeholder icon-common-layout"></div>
             <div class="embedded-card-label">Layout</div>
           </div>
         </LinkTo>
-        <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
+        <LinkTo @route="cards.add" @class="card-catalog--embedded-card-link">
           <div>
             <div class="card-catalog--embedded-card-placeholder icon-common-collection"></div>
             <div class="embedded-card-label">Collection</div>
@@ -102,7 +102,7 @@
       </header>
       <div class="card-catalog">
         <Cta {{on "click" (fn this.openCardNameDialog "Create a New Card")}}
-          @class="card-renderer--embedded-card-link"
+          @class="card-catalog--embedded-card-link"
           data-test-new-blank-card-btn
         >
           <div>
