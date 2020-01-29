@@ -1,16 +1,15 @@
 .cardhost-welcome-page {
-  --welcome-navbar-width: 210px;
+  --welcome-navbar-width: 255px;
   --welcome-placeholder-card: #acaac6;
   display: grid;
   grid-template-columns: var(--welcome-navbar-width) 1fr;
-  grid-template-areas:
-    "navbar main";
+  grid-template-areas: "navbar main";
   min-width: 615px;
   width: 100%;
   max-width: 1440px;
   height: 100vh;
   margin: 0;
-  padding-left: 120px;
+  padding-left: var(--ch-left-edge-navbar-width);
 }
 .cardhost-welcome-page.no-navbar {
   grid-template-columns: 1fr;
@@ -26,6 +25,7 @@
 .cardhost-welcome-page > main {
   grid-area: main;
   max-width: 100%;
+  padding: 60px 30px 0;
 }
 
 
@@ -46,8 +46,8 @@
 .cardhost-welcome-left-edge--nav ul {
   list-style-type: none;
   margin: 0;
-  padding-top: 20px;
-  padding-left: 20px;
+  padding-top: 15px;
+  padding-left: 30px;
   font: 400 13px/18px var(--ch-font-family);
 }
 
@@ -86,7 +86,6 @@
 
 /* Main */
 .cardhost-catalog {
-  padding: 60px 20px 0;
   overflow-y: auto;
 }
 
@@ -220,11 +219,13 @@
 .featured-cards-catalog {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(225px, 1fr));
-  grid-gap: 50px 15px;
+  grid-gap: 90px 30px;
 }
 
 .featured-card {
-  min-height: 550px;
+  width: 100%;
+  min-height: 488px;
+  background-position: top center;
   background-repeat: no-repeat;
   background-size: contain;
 }
