@@ -23,7 +23,7 @@ export const fieldComponents = [
     title: 'Text',
     description: 'All-purpose text field',
     type: 'string',
-    icon: `/images/field-types/text-field-icon.svg`,
+    icon: `/assets/images/field-types/text-field-icon.svg`,
   },
   {
     id: 'text-field-case-insensitive',
@@ -31,7 +31,7 @@ export const fieldComponents = [
     title: 'Text (case-insensitive)',
     description: 'Case-insensitive text field',
     type: 'case-insensitive string',
-    icon: `/images/field-types/text-field-icon.svg`,
+    icon: `/assets/images/field-types/text-field-icon.svg`,
   },
   {
     id: 'checkbox',
@@ -39,7 +39,7 @@ export const fieldComponents = [
     title: 'Checkbox',
     description: 'True/false (boolean) values',
     type: 'boolean',
-    icon: `/images/field-types/checkbox-field-icon.svg`,
+    icon: `/assets/images/field-types/checkbox-field-icon.svg`,
   },
   {
     id: 'date-field',
@@ -47,7 +47,7 @@ export const fieldComponents = [
     title: 'Date',
     description: 'Date field',
     type: 'date',
-    icon: `/images/field-types/date-field-icon.svg`,
+    icon: `/assets/images/field-types/date-field-icon.svg`,
   },
   {
     id: 'number',
@@ -55,7 +55,7 @@ export const fieldComponents = [
     title: 'Number',
     description: 'Integer number field',
     type: 'integer',
-    icon: `/images/field-types/number.png`,
+    icon: `/assets/images/field-types/number.png`,
   },
   {
     id: 'dropdown',
@@ -63,7 +63,7 @@ export const fieldComponents = [
     title: 'Single-select',
     description: 'Single select dropdown',
     type: 'related card',
-    icon: `/images/field-types/dropdown-field-icon.svg`,
+    icon: `/assets/images/field-types/dropdown-field-icon.svg`,
   },
   {
     id: 'dropdown-multi',
@@ -71,7 +71,7 @@ export const fieldComponents = [
     title: 'Multi-select',
     description: 'Multiple select dropdown',
     type: 'related cards',
-    icon: `/images/field-types/has-many-field-icon.svg`,
+    icon: `/assets/images/field-types/has-many-field-icon.svg`,
   },
   {
     id: 'decorative-image',
@@ -79,7 +79,7 @@ export const fieldComponents = [
     title: 'Decorative image',
     description: 'Use this for hero images',
     type: 'decorative image',
-    icon: `/images/field-types/image-field-icon.svg`,
+    icon: `/assets/images/field-types/image-field-icon.svg`,
   },
   {
     id: 'cta',
@@ -87,7 +87,7 @@ export const fieldComponents = [
     title: 'Button link',
     description: 'Call to action',
     type: 'cta',
-    icon: `/images/field-types/cta-field-icon.svg`,
+    icon: `/assets/images/field-types/cta-field-icon.svg`,
   },
   {
     id: 'link',
@@ -95,7 +95,7 @@ export const fieldComponents = [
     title: 'Link',
     description: 'Link to another website',
     type: 'link',
-    icon: `/images/field-types/link-field-icon.svg`,
+    icon: `/assets/images/field-types/link-field-icon.svg`,
   },
   // We'll need to figure out how to deal with the other types of ui-components, ex:
   // {
@@ -103,13 +103,13 @@ export const fieldComponents = [
   //   title: 'Text Area',
   //   description: 'Multi-line text field',
   //   type: 'string',
-  //   icon: `/images/field-types/textarea.png`
+  //   icon: `/assets/images/field-types/textarea.png`
   // },
   // {
   //   id: 'phone-number-field',
   //   title: 'Phone Number',
   //   description: 'Description',
   //   type: 'string',
-  //   icon: `/images/field-types/phone-field-icon.svg`
+  //   icon: `/assets/images/field-types/phone-field-icon.svg`
   // },
 ];

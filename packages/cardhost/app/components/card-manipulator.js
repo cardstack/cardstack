@@ -6,7 +6,7 @@ import { dasherize } from '@ember/string';
 import { startCase } from 'lodash';
 import { task } from 'ember-concurrency';
 import ENV from '@cardstack/cardhost/config/environment';
-import { fieldTypeMappings, fieldComponents } from '@cardstack/core/utils/mappings';
+import { fieldTypeMappings, fieldComponents } from '../utils/mappings';
 
 const { environment } = ENV;
 
@@ -46,7 +46,7 @@ export default class CardManipulator extends Component {
   get newFieldName() {
     /**
       Returns field name in the form field-12, incrementing from the highest
-      existing field number. Ex: if the highest is field-15, this will return 
+      existing field number. Ex: if the highest is field-15, this will return
       field-16. If there are no fields, it returns field-1.
     */
     let existingFields = this.card.isolatedFields.map(field => field.name);

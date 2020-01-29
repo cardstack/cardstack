@@ -51,7 +51,7 @@ module.exports = function(defaults) {
       },
       packageRules: [
         {
-          package: '@cardstack/core',
+          package: '@cardstack/cardhost',
           appModules: {
             'components/card-renderer.js': {
               dependsOnComponents: [

@@ -3,6 +3,9 @@
 
 {{!-- TODO: let's think of a more accessible solution here, consider making this a button--}}
 {{!-- TODO: also we should also turn on a11y linting --}}
+
+{{! TODO: Will, please resolve this linting error VVVV }}
+{{! template-lint-disable no-invalid-interactive}}
 <section {{on "click" (fn this.selectField @field)}} {{on "dragstart" (action this.startDragging @field)}} {{on "dragend" (action this.finishDragging)}}
   class="field {{@field.name}}-field {{if @field.preview "preview"}} {{if this.friendlyType (concat "field-type-" this.friendlyType "-" @mode "-field ")}}field-type-{{this.dasherizedType}}-{{@mode}}-field{{if (or @setPosition @removeField) " with-buttons"}}{{if (eq @field @selectedField) " selected"}}"
   data-test-field={{@field.name}}
