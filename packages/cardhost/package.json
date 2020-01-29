@@ -30,7 +30,6 @@
   "devDependencies": {
     "@cardstack/authentication": "0.16.23",
     "@cardstack/base-card": "0.16.23",
-    "@cardstack/core": "0.16.23",
     "@cardstack/di": "0.16.23",
     "@cardstack/ephemeral": "0.16.23",
     "@cardstack/eslint-config": "0.16.23",

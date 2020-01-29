@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { fieldComponents } from '@cardstack/core/utils/mappings';
+import { fieldComponents } from '../utils/mappings';
 import { tracked } from '@glimmer/tracking';
 import { action, set } from '@ember/object';
 import fade from 'ember-animated/transitions/fade';
