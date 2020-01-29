@@ -170,9 +170,7 @@ module('Unit | Service | data', function() {
       assert.equal(await savedCard.value('name'), 'Van Gogh', 'the card user field value is correct');
     });
 
-    skip('it patches an addressable card', async function() {});
+    skip('it patches a card', async function() {});
     skip('it deletes a card', async function() {});
-    skip("it changes a card's parent card", async function() {});
-    skip('it changes to a parent card are reflected in child cards', async function() {});
   });
 });

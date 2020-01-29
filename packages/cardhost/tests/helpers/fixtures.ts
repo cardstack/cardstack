@@ -82,7 +82,7 @@ function inDependencyOrder(cards: any[]): any[] {
   let sortedCreatedCards: TestCardWithId[] = [];
   dag.each((_key, value) => sortedCreatedCards.push(value!));
   // filter out any built-in cards, as those are never supplied in the fixtures
-  // and only appear as parent references with undefined values in the DAG.
+  // and only appear as references with undefined values in the DAG.
   return sortedCreatedCards.filter(Boolean);
 }
 
