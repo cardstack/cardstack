@@ -1,117 +1,134 @@
-<div class="cardhost-welcome-page">
-  <nav class="cardhost-welcome-left-edge--nav" data-test-cardhost-welcome-left-edge>
-    <ul>
-      <li>
-        <button {{on "click" (fn this.scrollToSection "recent-cards")}} class="left-edge-icon {{if (eq this.selectedSection "recent-cards") "active"}}">
-          {{svg-jar "clock" width="15px" height="15px" aria-hidden="true"}}
-          Recent Cards
-        </button>
-      </li>
-      <li>
-        <button {{on "click" (fn this.scrollToSection "saved-templates")}} class="left-edge-icon {{if (eq this.selectedSection "saved-templates") "active"}}">
-          {{svg-jar "saved" width="15px" height="15px" aria-hidden="true"}}
-          Saved Templates
-        </button>
-      </li>
-      <li>
-        <button {{on "click" (fn this.scrollToSection "common-cards")}} class="left-edge-icon {{if (eq this.selectedSection "common-cards") "active"}}">
-          {{svg-jar "cards" width="15px" height="15px" aria-hidden="true"}}
-          Common Cards
-        </button>
-      </li>
-      <li>
-        <button {{on "click" (fn this.scrollToSection "add-card")}} class="left-edge-icon {{if (eq this.selectedSection "add-card") "active"}}">
-          {{svg-jar "add" width="15px" height="15px" aria-hidden="true"}}
-          New Blank Card
-        </button>
-      </li>
-    </ul>
-  </nav>
+<CardhostLeftEdge />
 
-  <main class="cardhost-catalog">
-    <section class="cardhost-section cardhost-section--recent-cards">
-      <header class="cardhost-section--header recent-cards">
-        {{svg-jar "clock" width="28px" height="28px"}}
-        Recent Cards
-      </header>
-      <div class="card-catalog">
-        {{#each this.model.catalog as |card|}}
-          {{#if (not (eq card.name "@cardstack/base-card"))}}
-            <CardRenderer @card={{card}} @format="embedded" @showName={{true}}/>
-          {{/if}}
-        {{/each}}
-      </div>
-    </section>
+  <div class="cardhost-welcome-page{{unless this.cardstackSession.isAuthenticated " no-navbar"}}">
+    {{#if this.cardstackSession.isAuthenticated}}
+      <nav class="cardhost-welcome-left-edge--nav" data-test-cardhost-welcome-left-edge>
+        <ul>
+          <li>
+            <button {{on "click" (fn this.scrollToSection "recent-cards")}} class="left-edge-icon {{if (eq this.selectedSection "recent-cards") "active"}}">
+              {{svg-jar "clock" width="15px" height="15px" aria-hidden="true"}}
+              Recent Cards
+            </button>
+          </li>
+          <li>
+            <button {{on "click" (fn this.scrollToSection "saved-templates")}} class="left-edge-icon {{if (eq this.selectedSection "saved-templates") "active"}}">
+              {{svg-jar "saved" width="15px" height="15px" aria-hidden="true"}}
+              Saved Templates
+            </button>
+          </li>
+          <li>
+            <button {{on "click" (fn this.scrollToSection "common-cards")}} class="left-edge-icon {{if (eq this.selectedSection "common-cards") "active"}}">
+              {{svg-jar "cards" width="15px" height="15px" aria-hidden="true"}}
+              Common Cards
+            </button>
+          </li>
+          <li>
+            <button {{on "click" (fn this.scrollToSection "add-card")}} class="left-edge-icon {{if (eq this.selectedSection "add-card") "active"}}">
+              {{svg-jar "add" width="15px" height="15px" aria-hidden="true"}}
+              New Blank Card
+            </button>
+          </li>
+        </ul>
+      </nav>
+    {{/if}}
 
-    <section class="cardhost-section cardhost-section--saved-templates">
-      <header class="cardhost-section--header saved-templates">
-        {{svg-jar "saved" width="28px" height="28px"}}
-        Saved Templates
-      </header>
-      <div class="card-catalog">
-        {{#each this.model.templates as |card|}}
-          <LinkTo
-            @class="card-renderer--embedded-card-link"
-            @route="cards.card.adopt"
-            @model={{card.name}}
-            data-test-embedded-card={{card.name}}
-          >
-            <CardRenderer
-              @card={{card}}
-              @format="embedded"
-              @preventIsolation={{true}}
-              @showName={{true}}
-            />
-          </LinkTo>
-        {{/each}}
-      </div>
-    </section>
+    <main class="cardhost-catalog">
+      {{#if this.cardstackSession.isAuthenticated}}
+        <section class="cardhost-section cardhost-section--recent-cards">
+          <header class="cardhost-section--header recent-cards">
+            {{svg-jar "clock" width="28px" height="28px"}}
+            Recent Cards
+          </header>
+          <div class="card-catalog">
+            {{#each this.model.catalog as |card|}}
+              {{#if (not (eq card.name "@cardstack/base-card"))}}
+                <CardRenderer @card={{card}} @format="embedded" @showName={{true}}/>
+              {{/if}}
+            {{/each}}
+          </div>
+        </section>
 
-    <section class="cardhost-section cardhost-section--common-cards">
-      <header class="cardhost-section--header common-cards">
-        {{svg-jar "cards" width="28px" height="28px"}}
-        Common Cards
-      </header>
-      <div class="card-catalog">
-        <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
-          <div>
-            <div class="card-catalog--embedded-card-placeholder icon-common-form"></div>
-            <div class="embedded-card-label">Form</div>
+        <section class="cardhost-section cardhost-section--saved-templates">
+          <header class="cardhost-section--header saved-templates">
+            {{svg-jar "saved" width="28px" height="28px"}}
+            Saved Templates
+          </header>
+          <div class="card-catalog">
+            {{#each this.model.templates as |card|}}
+              <LinkTo
+                @class="card-renderer--embedded-card-link"
+                @route="cards.card.adopt"
+                @model={{card.name}}
+                data-test-embedded-card={{card.name}}
+              >
+                <CardRenderer
+                  @card={{card}}
+                  @format="embedded"
+                  @preventIsolation={{true}}
+                  @showName={{true}}
+                />
+              </LinkTo>
+            {{/each}}
           </div>
-        </LinkTo>
-        <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
-          <div>
-            <div class="card-catalog--embedded-card-placeholder icon-common-layout"></div>
-            <div class="embedded-card-label">Layout</div>
-          </div>
-        </LinkTo>
-        <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
-          <div>
-            <div class="card-catalog--embedded-card-placeholder icon-common-collection"></div>
-            <div class="embedded-card-label">Collection</div>
-          </div>
-        </LinkTo>
-      </div>
-    </section>
+        </section>
 
-    <section class="cardhost-section cardhost-section--add-card">
-      <header class="cardhost-section--header add-card">
-        <a href="#new-blank-card" title="New Blank Card" class="permalink">
-          {{svg-jar "add" width="28px" height="28px"}}
-        </a>
-        New Blank Card
-      </header>
-      <div class="card-catalog">
-        <LinkTo
-          @route="cards.add"
-          @class="card-renderer--embedded-card-link"
-        >
-          <div>
-            <div class="card-catalog--embedded-card-placeholder icon-add-card"></div>
-            <div class="embedded-card-label">Blank Card</div>
+        <section class="cardhost-section cardhost-section--common-cards">
+          <header class="cardhost-section--header common-cards">
+            {{svg-jar "cards" width="28px" height="28px"}}
+            Common Cards
+          </header>
+          <div class="card-catalog">
+            <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
+              <div>
+                <div class="card-catalog--embedded-card-placeholder icon-common-form"></div>
+                <div class="embedded-card-label">Form</div>
+              </div>
+            </LinkTo>
+            <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
+              <div>
+                <div class="card-catalog--embedded-card-placeholder icon-common-layout"></div>
+                <div class="embedded-card-label">Layout</div>
+              </div>
+            </LinkTo>
+            <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
+              <div>
+                <div class="card-catalog--embedded-card-placeholder icon-common-collection"></div>
+                <div class="embedded-card-label">Collection</div>
+              </div>
+            </LinkTo>
           </div>
-        </LinkTo>
-      </div>
-    </section>
-  </main>
-</div>
+        </section>
+
+        <section class="cardhost-section cardhost-section--add-card">
+          <header class="cardhost-section--header add-card">
+            <a href="#new-blank-card" title="New Blank Card" class="permalink">
+              {{svg-jar "add" width="28px" height="28px"}}
+            </a>
+            New Blank Card
+          </header>
+          <div class="card-catalog">
+            <LinkTo
+              @route="cards.add"
+              @class="card-renderer--embedded-card-link"
+            >
+              <div>
+                <div class="card-catalog--embedded-card-placeholder icon-add-card"></div>
+                <div class="embedded-card-label">Blank Card</div>
+              </div>
+            </LinkTo>
+          </div>
+        </section>
+      {{/if}}
+      <section class="cardhost-section cardhost-section--featured-cards">
+        <header class="cardhost-section--header featured-cards">
+          {{svg-jar "cards" width="28px" height="28px"}}
+          Featured Cards
+        </header>
+        <div class="featured-cards-catalog">
+          {{#each this.featuredCards as |card|}}
+            <div class="featured-card" style={{css-url "background-image" card.preview}}></div>
+          {{/each}}
+        </div>
+      </section>
+    </main>
+  </div>

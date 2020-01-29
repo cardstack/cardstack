@@ -1,33 +1,37 @@
 .cardhost-welcome-page {
   --welcome-navbar-width: 210px;
   --welcome-placeholder-card: #acaac6;
-
   display: grid;
   grid-template-columns: var(--welcome-navbar-width) 1fr;
-  grid-template-areas: "navbar main";
-  width: calc(100vw - 200px);
-  height: calc(100vh - 120px);
-  min-width: 1100px;
-  max-width: 1400px;
-  margin: 60px auto;
-  background-color: var(--ch-deep-background);
-  border-radius: 10px;
-  box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.25);
+  grid-template-areas:
+    "navbar main";
+  min-width: 615px;
+  width: 100%;
+  max-width: 1440px;
+  height: 100vh;
+  margin: 0;
+  padding-left: 120px;
+}
+.cardhost-welcome-page.no-navbar {
+  grid-template-columns: 1fr;
+  grid-template-areas: "main main";
 }
 
 .cardhost-welcome-page > nav {
   grid-area: navbar;
   width: var(--welcome-navbar-width);
+  padding: 60px 0;
 }
 
 .cardhost-welcome-page > main {
   grid-area: main;
+  max-width: 100%;
 }
 
 
 /* Navbar */
 .cardhost-welcome-left-edge--nav {
-  background: url(/assets/images/cardstack-logo.svg) 30px 30px/24px 25px no-repeat;
+  position: fixed;
 }
 
 .cardhost-welcome-left-edge--nav button {
@@ -42,8 +46,8 @@
 .cardhost-welcome-left-edge--nav ul {
   list-style-type: none;
   margin: 0;
-  padding-top: 130px;
-  padding-left: 30px;
+  padding-top: 20px;
+  padding-left: 20px;
   font: 400 13px/18px var(--ch-font-family);
 }
 
@@ -82,7 +86,7 @@
 
 /* Main */
 .cardhost-catalog {
-  padding: 0 40px;
+  padding: 60px 20px 0;
   overflow-y: auto;
 }
 
@@ -90,6 +94,10 @@
 /* Section */
 .cardhost-section {
   padding-bottom: 110px;
+}
+
+.cardhost-section:first-of-type .cardhost-section--header {
+  padding-top: 10px;
 }
 
 .cardhost-section + .cardhost-section {
@@ -119,7 +127,7 @@
 .card-catalog {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(225px, 1fr));
   grid-gap: 90px 30px;
   justify-items: center;
   margin: 0;
@@ -173,16 +181,16 @@
 }
 
 .card-catalog--embedded-card-placeholder.icon-common-form {
-  background-image: url(/assets/images/icon-common-form.svg);
+  background-image: url(/assets/images/cards/started-page/icon-common-form.svg);
 }
 .card-catalog--embedded-card-placeholder.icon-common-layout {
-  background-image: url(/assets/images/icon-common-layout.svg);
+  background-image: url(/assets/images/cards/started-page/icon-common-layout.svg);
 }
 .card-catalog--embedded-card-placeholder.icon-common-collection {
-  background-image: url(/assets/images/icon-common-collection.svg);
+  background-image: url(/assets/images/cards/started-page/icon-common-collection.svg);
 }
 .card-catalog--embedded-card-placeholder.icon-add-card {
-  background-image: url(/assets/images/icon-blank-card.svg);
+  background-image: url(/assets/images/cards/started-page/icon-blank-card.svg);
 }
 
 .cardhost-section .embedded-card-label {
@@ -201,4 +209,30 @@
 
 .card-catalog .card-renderer--embedded-card-link:focus .embedded-card-label {
   color: var(--ch-highlight);
+}
+
+/* Featured cards section */
+.featured-cards-catalog {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(225px, 1fr));
+  grid-gap: 50px 15px;
+}
+
+.featured-card {
+  min-height: 550px;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+
+@media (max-width: 615px) {
+  .cardhost-welcome-page {
+    display: block;
+    min-width: auto;
+    padding-left: 80px;
+  }
+
+  .cardhost-welcome-left-edge--nav {
+    display: none;
+  }
 }
