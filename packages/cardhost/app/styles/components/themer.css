@@ -300,6 +300,7 @@
 
 .editing-css .themer.view {
   padding: var(--ch-spacing);
+  transition: width 0.3s ease;
 }
 
 .editing-css.themer-card-width--small .themer.view {
@@ -318,8 +319,4 @@
 .card-renderer-isolated.themer.view .card-renderer-isolated--header--wrapper  {
   left: var(--ch-spacing);
   right: var(--ch-spacing);
-}
-
-.editing-css .cardstack_base-card-isolated .field {
-  max-width: 100%;
 }
