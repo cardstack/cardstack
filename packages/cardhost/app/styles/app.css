@@ -17,7 +17,6 @@
 @import '/assets/components/adopted-from.css';
 @import '/assets/components/themer.css';
 @import '/assets/components/dialog.css';
-@import '/assets/components/card-name-dialog.css';
 
 /* Cardhost styling for core package templates */
 @import '/assets/components/card-renderer.css';
