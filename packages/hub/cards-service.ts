@@ -7,7 +7,7 @@ import { myOrigin } from '@cardstack/core/origin';
 import { search as scaffoldSearch, get as scaffoldGet } from './scaffolding';
 import { getOwner, inject } from './dependency-injection';
 import { SingleResourceDoc } from 'jsonapi-typescript';
-import { Query } from './query';
+import { Query } from '@cardstack/core/query';
 import { Writer } from '@cardstack/core/writer';
 import { join } from 'path';
 import { assertSingleResourceDoc } from './jsonapi';

@@ -13,7 +13,7 @@ import { myOrigin } from '@cardstack/core/origin';
 import { makePristineCollection, apiPrefix, AddressableCard, CardId } from '@cardstack/core/card';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { parse } from 'qs';
-import { assertQuery } from './query';
+import { assertQuery } from '@cardstack/core/query';
 import { OcclusionRules, assertOcclusionRules } from '@cardstack/core/occlusion-rules';
 
 const apiPrefixPattern = new RegExp(`^${apiPrefix}/(.*)`);

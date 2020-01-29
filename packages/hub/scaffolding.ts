@@ -1,5 +1,5 @@
 import { AddressableCard, CardId, canonicalURL } from '@cardstack/core/card';
-import { Query } from './query';
+import { Query } from '@cardstack/core/query';
 import { myOrigin } from '@cardstack/core/origin';
 import { cardDocument } from '@cardstack/core/card-document';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';

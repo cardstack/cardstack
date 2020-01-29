@@ -5,6 +5,8 @@ import { cardDocument, CardDocumentWithId } from '@cardstack/core/card-document'
 import Fixtures from '../../helpers/fixtures';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import DataService from '../../../app/services/data';
+import { Card, AddressableCard, canonicalURL } from '@cardstack/core/card';
+import { ResourceIdentifierObject, RelationshipsWithData } from 'jsonapi-typescript';
 
 const csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
 
@@ -26,6 +28,7 @@ module('Unit | Service | data', function() {
         },
       })
       .withField('name', 'string-field')
+      .withField('houseBroken', 'boolean-field')
       .withField('favoriteToy', toyCard);
 
     let dalmatianCard: CardDocumentWithId = cardDocument()
@@ -33,6 +36,7 @@ module('Unit | Service | data', function() {
         csRealm,
         csId: 'dalmatian-card',
       })
+      .withField('numberOfSpots', 'integer-field')
       .adoptingFrom(puppyCard);
 
     let ownerCard: CardDocumentWithId = cardDocument()
@@ -59,6 +63,8 @@ module('Unit | Service | data', function() {
         csRealm,
         csId: 'vangogh',
         name: 'Van Gogh',
+        numberOfSpots: 150,
+        houseBroken: true,
         favoriteToy: cardDocument()
           .withAttributes({
             description: 'a beef bone',
@@ -72,6 +78,8 @@ module('Unit | Service | data', function() {
         csRealm,
         csId: 'mango',
         name: 'Mango',
+        numberOfSpots: 100,
+        houseBroken: false,
       })
       .withRelationships({ favoriteToy: squeakySnake })
       .adoptingFrom(dalmatianCard);
@@ -116,17 +124,226 @@ module('Unit | Service | data', function() {
       assert.equal(card.csOriginalRealm, card.csRealm, 'the csOriginalRealm is correct');
     });
 
-    skip('it can search for cards', async function() {});
-    skip("it can get a value of a card's primitive field", async function() {});
-    skip('it can get a card-as-value value of a card field', async function() {});
-    skip('it can get a card-as-reference value of a card field', async function() {});
-    skip('it can get a card-as-value value of a card artity > 1 field', async function() {});
-    skip('it can get a card-as-reference value of a card artity > 1 field', async function() {});
-    skip('it can get a card with fully expanded pristine doc', async function() {});
-    skip('it can get a card with isolated fieldset format', async function() {});
-    skip('it can get a card with embedded fieldset format', async function() {});
-    skip('it can get a card with specific field includes', async function() {});
-    skip('it can get a card with an isolated field set and specified field includes', async function() {});
+    test('it can search for cards', async function(assert) {
+      let service = this.owner.lookup('service:data') as DataService;
+      let foundCards = await service.search({
+        filter: {
+          type: puppyCard,
+          eq: {
+            name: 'Mango',
+          },
+        },
+      });
+
+      assert.equal(foundCards.length, 1, 'the correct number of cards is returned');
+      assert.equal(foundCards[0].canonicalURL, mango.canonicalURL, 'the correct card is found');
+    });
+
+    test("it can get a value of a card's primitive fields", async function(assert) {
+      let service = this.owner.lookup('service:data') as DataService;
+      let card = await service.load(vanGogh);
+
+      assert.equal(await card.value('name'), 'Van Gogh', 'the user-field value is correct');
+      assert.equal(await card.value('numberOfSpots'), 150, 'the user-field value is correct');
+      assert.equal(await card.value('houseBroken'), true, 'the user-field value is correct');
+    });
+
+    test('it can get a card-as-value value of a card field', async function(assert) {
+      let service = this.owner.lookup('service:data') as DataService;
+      let card = await service.load(vanGogh);
+
+      let toy = await card.value('favoriteToy');
+      assert.ok(toy instanceof Card, 'user-field value deserialized correctly');
+      assert.notOk(toy instanceof AddressableCard, 'user-field value deserialized correctly');
+      assert.equal(await toy.value('description'), 'a beef bone', 'user-field value is correct');
+    });
+
+    test('it can get a card-as-reference value of a card field', async function(assert) {
+      let service = this.owner.lookup('service:data') as DataService;
+      let card = await service.load(mango);
+
+      let toy = await card.value('favoriteToy');
+      assert.ok(toy instanceof AddressableCard, 'user-field value deserialized correctly');
+      assert.equal(
+        await toy.value('description'),
+        'a plush snake with squeaky segments',
+        'user-field value deserialized correctly'
+      );
+    });
+
+    test('it can get a card-as-value value of a card artity > 1 field', async function(assert) {
+      let service = this.owner.lookup('service:data') as DataService;
+      let card = await service.load(mommy);
+
+      let puppies: any[] = await card.value('puppies');
+      assert.equal(puppies.length, 2, 'arity of user-field value is correct');
+      assert.ok(
+        puppies.every(i => i instanceof Card),
+        'user-field values deserialized correctly'
+      );
+      assert.ok(
+        puppies.every(i => !(i instanceof AddressableCard)),
+        'user-field values deserialized correctly'
+      );
+      assert.equal(await puppies[0].value('name'), 'Van Gogh', 'the user-field value is correct');
+      assert.equal(await puppies[1].value('name'), 'Mango', 'the user-field value is correct');
+    });
+
+    test('it can get a card-as-reference value of a card artity > 1 field', async function(assert) {
+      let service = this.owner.lookup('service:data') as DataService;
+      let card = await service.load(daddy);
+
+      let puppies: any[] = await card.value('puppies');
+      assert.equal(puppies.length, 2, 'arity of user-field value is correct');
+      assert.ok(
+        puppies.every(i => i instanceof AddressableCard),
+        'user-field values deserialized correctly'
+      );
+      assert.equal(await puppies[0].value('name'), 'Van Gogh', 'the user-field value is correct');
+      assert.equal(await puppies[1].value('name'), 'Mango', 'the user-field value is correct');
+    });
+
+    test('it can get a card with fully expanded pristine doc', async function(assert) {
+      let service = this.owner.lookup('service:data') as DataService;
+      let card = await service.load(daddy);
+
+      let { jsonapi: doc } = await card.asPristineDoc('everything');
+      assert.equal(doc.data.type, 'cards');
+      assert.equal(doc.data.id, daddy.canonicalURL);
+      assert.equal(doc.data.attributes?.name, 'Hassan');
+      assert.deepEqual((doc.data.relationships?.puppies as RelationshipsWithData).data, [
+        { type: 'cards', id: vanGogh.canonicalURL } as ResourceIdentifierObject,
+        { type: 'cards', id: mango.canonicalURL } as ResourceIdentifierObject,
+      ]);
+      let included = doc.included as any[];
+
+      assert.equal(included.length, 8);
+      let includedIds = included.map(i => i.id);
+      assert.deepEqual(includedIds.sort(), [
+        dalmatianCard.canonicalURL,
+        mango.canonicalURL,
+        ownerCard.canonicalURL,
+        puppyCard.canonicalURL,
+        squeakySnake.canonicalURL,
+        toyCard.canonicalURL,
+        vanGogh.canonicalURL,
+        canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }),
+      ]);
+
+      let includedSqueakySnake = included.find(i => i.id === squeakySnake.canonicalURL);
+      assert.equal(includedSqueakySnake.attributes.description, 'a plush snake with squeaky segments');
+
+      let includedVanGogh = included.find(i => i.id === vanGogh.canonicalURL);
+      assert.equal(includedVanGogh.attributes.name, 'Van Gogh');
+      assert.equal(includedVanGogh.attributes.favoriteToy.attributes.description, 'a beef bone');
+      assert.deepEqual(includedVanGogh.attributes.favoriteToy.relationships.csAdoptsFrom.data, {
+        type: 'cards',
+        id: toyCard.canonicalURL,
+      });
+
+      let includedMango = included.find(i => i.id === mango.canonicalURL);
+      assert.equal(includedMango.attributes.name, 'Mango');
+      assert.deepEqual(includedMango.relationships.favoriteToy.data, {
+        type: 'cards',
+        id: squeakySnake.canonicalURL,
+      });
+    });
+
+    test('it can get a card with isolated fieldset format', async function(assert) {
+      let service = this.owner.lookup('service:data') as DataService;
+      let card = await service.load(daddy);
+
+      let { jsonapi: doc } = await card.asPristineDoc({
+        includeFieldSet: 'isolated',
+      });
+      assert.ok(doc.data.attributes?.name);
+      assert.deepEqual((doc.data.relationships?.puppies as RelationshipsWithData).data, [
+        { type: 'cards', id: vanGogh.canonicalURL } as ResourceIdentifierObject,
+        { type: 'cards', id: mango.canonicalURL } as ResourceIdentifierObject,
+      ]);
+
+      let included = doc.included as any[];
+      assert.equal(included.length, 2);
+      let ids = included.map(i => i.id);
+      assert.deepEqual(ids.sort(), [mango.canonicalURL, vanGogh.canonicalURL]);
+      let includedVanGogh = included.find(i => i.id === vanGogh.canonicalURL);
+      let includedMango = included.find(i => i.id === mango.canonicalURL);
+
+      assert.ok(includedVanGogh.attributes.name);
+      assert.notOk(includedVanGogh.attributes.favoriteToy);
+
+      assert.ok(includedMango.attributes.name);
+      assert.notOk(includedVanGogh.attributes.favoriteToy);
+    });
+
+    test('it can get a card with embedded fieldset format', async function(assert) {
+      let service = this.owner.lookup('service:data') as DataService;
+      let card = await service.load(mommy);
+      let { jsonapi: doc } = await card.asPristineDoc({
+        includeFieldSet: 'embedded',
+      });
+      assert.ok(doc.data.attributes?.name, 'Mariko');
+      assert.notOk(doc.data.attributes?.puppies);
+      assert.notOk(doc.included);
+    });
+
+    test('it can get a card with specific field includes', async function(assert) {
+      let service = this.owner.lookup('service:data') as DataService;
+      let card = await service.load(vanGogh);
+      let { jsonapi: doc } = await card.asPristineDoc({ includeFields: ['name'] });
+      assert.equal(doc.data.attributes?.name, 'Van Gogh');
+      assert.notOk(doc.data.attributes?.favoriteToy);
+      assert.notOk(doc.included);
+    });
+
+    test('it can get a card with an isolated field set and specified field includes', async function(assert) {
+      let service = this.owner.lookup('service:data') as DataService;
+      let card = await service.load(daddy);
+
+      let { jsonapi: doc } = await card.asPristineDoc({
+        includeFieldSet: 'isolated',
+        includeFields: [
+          {
+            name: 'puppies',
+            includeFields: [
+              {
+                name: 'favoriteToy',
+                includeFields: ['description'],
+              },
+            ],
+          },
+        ],
+      });
+      assert.ok(doc.data.attributes?.name);
+      assert.deepEqual((doc.data.relationships?.puppies as RelationshipsWithData).data, [
+        { type: 'cards', id: vanGogh.canonicalURL } as ResourceIdentifierObject,
+        { type: 'cards', id: mango.canonicalURL } as ResourceIdentifierObject,
+      ]);
+
+      let included = doc.included as any[];
+      assert.equal(included.length, 3);
+      let ids = included.map(i => i.id);
+      assert.deepEqual(ids.sort(), [mango.canonicalURL, squeakySnake.canonicalURL, vanGogh.canonicalURL]);
+      let includedVanGogh = included.find(i => i.id === vanGogh.canonicalURL);
+      let includedMango = included.find(i => i.id === mango.canonicalURL);
+      let includedSqueakySnake = included.find(i => i.id === squeakySnake.canonicalURL);
+
+      assert.equal(includedVanGogh.attributes?.name, 'Van Gogh');
+      assert.ok(includedVanGogh.attributes.favoriteToy);
+      assert.deepEqual(includedVanGogh.attributes.favoriteToy.relationships.csAdoptsFrom.data, {
+        type: 'cards',
+        id: toyCard.canonicalURL,
+      });
+      assert.equal(includedVanGogh.attributes.favoriteToy.attributes.description, 'a beef bone');
+
+      assert.equal(includedMango.attributes.name, 'Mango');
+      assert.deepEqual(includedMango.relationships.favoriteToy.data, {
+        type: 'cards',
+        id: squeakySnake.canonicalURL,
+      });
+
+      assert.equal(includedSqueakySnake.attributes.description, 'a plush snake with squeaky segments');
+    });
   });
 
   module('mutating tests', function(hooks) {
@@ -152,6 +369,10 @@ module('Unit | Service | data', function() {
       assert.equal(card.csOriginalRealm, csRealm, 'the card csOriginalRealm is correct');
       assert.equal(await card.value('name'), 'Van Gogh', 'the card user field value is correct');
     });
+
+    skip("it can validate a card's user-field values", async function() {});
+
+    skip('rejects saving a card when there is invalid data in the user fields', async function() {});
 
     test('it saves an UnsavedCard', async function(assert) {
       let service = this.owner.lookup('service:data') as DataService;

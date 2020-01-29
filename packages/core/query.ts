@@ -1,9 +1,9 @@
-import { CardId } from '@cardstack/core/card';
+import { CardId } from './card';
 import * as JSON from 'json-typescript';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
-import CardstackError from '@cardstack/core/error';
+import { CARDSTACK_PUBLIC_REALM } from './realm';
+import CardstackError from './error';
 import isEqual from 'lodash/isEqual';
-import { assertJSONValue, assertJSONPrimitive } from '@cardstack/hub/json-validation';
+import { assertJSONValue, assertJSONPrimitive } from './json-validation';
 
 export interface Query {
   filter?: Filter;

@@ -2,14 +2,15 @@ import Service from '@ember/service';
 import { inject as service } from '@ember/service';
 import { UnsavedCard, CardId, Card, AddressableCard, asCardId } from '@cardstack/core/card';
 import { CardstackSession } from './cardstack-session';
-import { SingleResourceDoc } from 'jsonapi-typescript';
+import { SingleResourceDoc, CollectionResourceDoc } from 'jsonapi-typescript';
 import { CardInstantiator } from '@cardstack/core/card-instantiator';
 import { ModuleLoader } from '@cardstack/core/module-loader';
 import { Container as ContainerInterface } from '@cardstack/core/container';
 import { Factory } from '@cardstack/core/container';
-import { OcclusionRulesOrDefaults } from '@cardstack/core/occlusion-rules';
 import { CardReader } from '@cardstack/core/card-reader';
 import { loadModule } from '../utils/scaffolding';
+import { Query } from '@cardstack/core/query';
+import { stringify } from 'qs';
 
 export default class DataService extends Service implements CardInstantiator {
   @service cardstackSession!: CardstackSession;
@@ -75,8 +76,10 @@ export default class DataService extends Service implements CardInstantiator {
     });
   }
 
-  async load(idOrURL: CardId | string, _occlusionRules?: OcclusionRulesOrDefaults): Promise<AddressableCard> {
+  async load(idOrURL: CardId | string): Promise<AddressableCard> {
     let id = asCardId(idOrURL);
+    // TODO This is loading "everything", with no occlusion. We should settle on
+    // a sane level of occusion.
     let url = this.localURL(id);
     let response = await fetch(url, {
       headers: {
@@ -89,6 +92,18 @@ export default class DataService extends Service implements CardInstantiator {
       throw new Error(`Cannot load card ${response.status}: ${response.statusText} - ${JSON.stringify(json)}`);
     }
     return await this.instantiate(json);
+  }
+
+  async search(query: Query): Promise<AddressableCard[]> {
+    // TODO This is loading "everything", with no occlusion. We should settle on
+    // a sane level of occusion.
+    let response = await fetch(`${this.hubURL}/api/cards?${stringify(query)}`, {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+    });
+    let { data: cards } = (await response.json()) as CollectionResourceDoc;
+    return await Promise.all(cards.map(data => this.instantiate({ data })));
   }
 
   private localURL(csRealm: string, csOriginalRealm?: string): string;
@@ -129,7 +144,7 @@ class Reader implements CardReader {
     // TODO: this goes to the server, we'll eventually want to do something
     // smarter here, like return any supplied included resources that were
     // passed into the Card.
-    return await this.dataService.load(idOrURL, 'upstream');
+    return await this.dataService.load(idOrURL);
   }
 }
 

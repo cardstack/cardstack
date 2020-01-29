@@ -24,7 +24,7 @@ import { Expression, PgPrimitive } from '@cardstack/core/expression';
 import { AddressableCard, CardId, Card, FieldCard, cardstackFieldPattern, canonicalURL } from '@cardstack/core/card';
 import { ResponseMeta } from '@cardstack/core/document';
 import CardstackError from '@cardstack/core/error';
-import { Query, baseType, Filter, EqFilter, RangeFilter } from '../query';
+import { Query, baseType, Filter, EqFilter, RangeFilter } from '@cardstack/core/query';
 import { Sorts } from './sorts';
 import snakeCase from 'lodash/snakeCase';
 import flatten from 'lodash/flatten';
