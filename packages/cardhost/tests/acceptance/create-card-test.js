@@ -137,6 +137,20 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
   });
 
+  test('card name dialog state is correct', async function(assert) {
+    await login();
+    await visit('/');
+
+    assert.equal(currentURL(), '/');
+    await click('[data-test-adopt-card-btn]');
+    await click('[data-test-cancel-create-btn]');
+    await click('[data-test-new-blank-card-btn]');
+    await setCardName(card1Name);
+
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+    assert.dom('[data-test-field]').doesNotExist();
+  });
+
   test(`selecting a field`, async function(assert) {
     await login();
     await visit('/cards/new');

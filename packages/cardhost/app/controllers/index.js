@@ -33,4 +33,10 @@ export default class IndexController extends Controller {
     }
     this.showDialog = true;
   }
+
+  @action
+  closeDialog() {
+    this.showDialog = false;
+    this.cardModel = null;
+  }
 }

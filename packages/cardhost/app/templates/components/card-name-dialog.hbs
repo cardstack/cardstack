@@ -9,7 +9,7 @@
   />
   <div class="dialog--button-group">
     {{#if @closeDialog}}
-      <Cta {{on "click" @closeDialog}} @variant="secondary primary">Cancel</Cta>
+      <Cta {{on "click" @closeDialog}} @variant="secondary primary" data-test-cancel-create-btn>Cancel</Cta>
     {{/if}}
     <Cta {{on "click" this.createCard}} @variant="primary" data-test-create-card-btn>Create</Cta>
   </div>
