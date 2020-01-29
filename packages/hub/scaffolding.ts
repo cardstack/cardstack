@@ -1,7 +1,7 @@
 import { AddressableCard, CardId, canonicalURL } from '@cardstack/core/card';
 import { Query } from './query';
 import { myOrigin } from '@cardstack/core/origin';
-import { testCard } from '../test-support/test-card';
+import { cardDocument } from '@cardstack/core/card-document';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import { ScopedCardService } from './cards-service';
 
@@ -9,7 +9,7 @@ async function ephemeralRealms(cards: ScopedCardService) {
   return [
     // The realm card for the meta realm
     await cards.instantiate(
-      testCard()
+      cardDocument()
         .withAutoAttributes({
           csRealm: `${myOrigin}/api/realms/meta`,
           csOriginalRealm: `${myOrigin}/api/realms/meta`,
@@ -18,7 +18,7 @@ async function ephemeralRealms(cards: ScopedCardService) {
         .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi
     ),
     await cards.instantiate(
-      testCard()
+      cardDocument()
         .withAutoAttributes({
           csRealm: `${myOrigin}/api/realms/meta`,
           csOriginalRealm: `${myOrigin}/api/realms/meta`,
@@ -27,7 +27,7 @@ async function ephemeralRealms(cards: ScopedCardService) {
         .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi
     ),
     await cards.instantiate(
-      testCard()
+      cardDocument()
         .withAutoAttributes({
           csRealm: `${myOrigin}/api/realms/meta`,
           csOriginalRealm: `http://example.com/api/realms/meta`,

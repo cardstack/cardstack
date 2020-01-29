@@ -3,12 +3,12 @@ import { CardId, canonicalURL, cardstackFieldPattern, FieldCard } from '@cardsta
 import { UpstreamDocument } from '@cardstack/core/document';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
-export class TestCard {
+export class CardDocument {
   private parent: CardId | undefined;
   private csFieldValues: Map<string, any> = new Map();
   private userFieldValues: Map<string, any> = new Map();
   private userFieldRefs: Map<string, CardId | CardId[] | undefined> = new Map();
-  private fields: Map<string, TestCard | null> = new Map();
+  private fields: Map<string, CardDocument | null> = new Map();
 
   csId?: string;
   csOriginalRealm?: string;
@@ -45,22 +45,22 @@ export class TestCard {
         // a user field
         this.userFieldValues.set(field, value);
         if (!this.fields.has(field) && autoCreateField) {
-          this.fields.set(field, new TestCard().adoptingFrom(this.guessValueType(value)));
+          this.fields.set(field, new CardDocument().adoptingFrom(this.guessValueType(value)));
         }
       }
     }
   }
 
-  withAttributes(values: FieldValues & { csId: string; csRealm: string }): TestCardWithId;
-  withAttributes<T extends TestCard>(this: T, values: FieldValues): T;
-  withAttributes(values: FieldValues): TestCard | TestCardWithId {
+  withAttributes(values: FieldValues & { csId: string; csRealm: string }): CardDocumentWithId;
+  withAttributes<T extends CardDocument>(this: T, values: FieldValues): T;
+  withAttributes(values: FieldValues): CardDocument | CardDocumentWithId {
     this.setAttributes(values, false);
     return this;
   }
 
-  withAutoAttributes(values: FieldValues & { csId: string; csRealm: string }): TestCardWithId;
-  withAutoAttributes<T extends TestCard>(this: T, values: FieldValues): T;
-  withAutoAttributes(values: FieldValues): TestCard | TestCardWithId {
+  withAutoAttributes(values: FieldValues & { csId: string; csRealm: string }): CardDocumentWithId;
+  withAutoAttributes<T extends CardDocument>(this: T, values: FieldValues): T;
+  withAutoAttributes(values: FieldValues): CardDocument | CardDocumentWithId {
     this.setAttributes(values, true);
     return this;
   }
@@ -84,7 +84,7 @@ export class TestCard {
         if (!this.fields.has(field) && autoCreateField) {
           this.fields.set(
             field,
-            new TestCard().adoptingFrom(
+            new CardDocument().adoptingFrom(
               this.guessReferenceType(!Array.isArray(value) ? value : value.length ? value[0] : undefined)
             )
           );
@@ -93,31 +93,31 @@ export class TestCard {
     }
   }
 
-  withRelationships<T extends TestCard>(this: T, values: FieldRefs): T {
+  withRelationships<T extends CardDocument>(this: T, values: FieldRefs): T {
     this.setRelationships(values, false);
     return this;
   }
 
-  withAutoRelationships<T extends TestCard>(this: T, values: FieldRefs): T {
+  withAutoRelationships<T extends CardDocument>(this: T, values: FieldRefs): T {
     this.setRelationships(values, true);
     return this;
   }
 
-  withField<T extends TestCard>(
+  withField<T extends CardDocument>(
     this: T,
     name: string,
     fieldShorthand: string,
     arity?: FieldCard['csFieldArity'],
     values?: FieldValues
   ): T;
-  withField<T extends TestCard>(
+  withField<T extends CardDocument>(
     this: T,
     name: string,
     fieldCard: CardId,
     arity?: FieldCard['csFieldArity'],
     values?: FieldValues
   ): T;
-  withField<T extends TestCard>(this: T, name: string, fieldCard: null): T;
+  withField<T extends CardDocument>(this: T, name: string, fieldCard: null): T;
   withField(
     name: string,
     fieldCard: string | CardId | null,
@@ -135,7 +135,7 @@ export class TestCard {
 
     this.fields.set(
       name,
-      new TestCard()
+      new CardDocument()
         .withAutoAttributes(values)
         .withAttributes({ csFieldArity: arity })
         .adoptingFrom(fieldCard)
@@ -238,7 +238,7 @@ export class TestCard {
     return new UpstreamDocument(this.jsonapi);
   }
 
-  adoptingFrom<T extends TestCard>(this: T, parent: CardId): T {
+  adoptingFrom<T extends CardDocument>(this: T, parent: CardId): T {
     this.parent = parent;
     return this;
   }
@@ -253,15 +253,15 @@ export class TestCard {
     }
   }
 
-  private guessReferenceType(value: CardId | TestCardWithId | undefined): CardId {
-    if (value instanceof TestCard && value.parent) {
+  private guessReferenceType(value: CardId | CardDocumentWithId | undefined): CardId {
+    if (value instanceof CardDocument && value.parent) {
       return value.parent;
     }
     return { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base-card' };
   }
 }
 
-export interface TestCardWithId extends TestCard {
+export interface CardDocumentWithId extends CardDocument {
   csId: string;
   csRealm: string;
   csOriginalRealm: string;
@@ -276,9 +276,9 @@ interface FieldValues {
 
 interface FieldRefs {
   csAdoptsFrom?: CardId;
-  [fieldName: string]: CardId | TestCardWithId | CardId[] | TestCardWithId[] | undefined;
+  [fieldName: string]: CardId | CardDocumentWithId | CardId[] | CardDocumentWithId[] | undefined;
 }
 
-export function testCard(): TestCard {
-  return new TestCard();
+export function cardDocument(): CardDocument {
+  return new CardDocument();
 }

@@ -1,6 +1,6 @@
 import { param } from '../pgsearch/util';
 import { createTestEnv, TestEnv } from './helpers';
-import { testCard } from '@cardstack/test-support/test-card';
+import { cardDocument } from '@cardstack/core/card-document';
 import { Session } from '@cardstack/core/session';
 
 describe('hub/pgclient', function() {
@@ -27,7 +27,7 @@ describe('hub/pgclient', function() {
     let cardsService = await env.container.lookup('cards');
     let cards = cardsService.as(Session.INTERNAL_PRIVILEGED);
     let card = await cards.instantiate(
-      testCard().withAutoAttributes({ csId: 'card-1', csRealm: `http://hassan.com/realm`, hello: 'world' }).jsonapi
+      cardDocument().withAutoAttributes({ csId: 'card-1', csRealm: `http://hassan.com/realm`, hello: 'world' }).jsonapi
     );
 
     let batch = pgclient.beginCardBatch(cards);

@@ -1,5 +1,5 @@
 import { TestEnv, createTestEnv } from './helpers';
-import { testCard } from '@cardstack/test-support/test-card';
+import { cardDocument } from '@cardstack/core/card-document';
 import { myOrigin } from '@cardstack/core/origin';
 import { ScopedCardService } from '../cards-service';
 import { Session } from '@cardstack/core/session';
@@ -27,7 +27,7 @@ describe('module-service', function() {
     let sampleValidator = `module.exports = function isValid(value){ return value === 42; }`;
     let card = await cards.create(
       `${myOrigin}/api/realms/first-ephemeral-realm`,
-      testCard().withAttributes({
+      cardDocument().withAttributes({
         csFiles: { 'validate.js': sampleValidator },
       }).jsonapi
     );
@@ -44,7 +44,7 @@ describe('module-service', function() {
     let other = `module.exports = function(){ return 'the-value'; }`;
     let card = await cards.create(
       `${myOrigin}/api/realms/first-ephemeral-realm`,
-      testCard().withAttributes({
+      cardDocument().withAttributes({
         csFiles: {
           'validate.js': sampleValidator,
           'other.js': other,
@@ -61,7 +61,7 @@ describe('module-service', function() {
     let sampleValidator = `exports.v = function isValid(value){ return value === 42; }`;
     let card = await cards.create(
       `${myOrigin}/api/realms/first-ephemeral-realm`,
-      testCard().withAttributes({
+      cardDocument().withAttributes({
         csFiles: { 'validate.js': sampleValidator },
       }).jsonapi
     );
@@ -75,7 +75,7 @@ describe('module-service', function() {
     let sampleValidator = `exports.v = function isValid(value){ return value === 42; }`;
     let card = await cards.create(
       `${myOrigin}/api/realms/first-ephemeral-realm`,
-      testCard().withAttributes({
+      cardDocument().withAttributes({
         csFiles: {
           lib: { 'validate.js': sampleValidator },
         },
@@ -94,7 +94,7 @@ describe('module-service', function() {
     let other = `module.exports = function(){ return 'the-value'; }`;
     let card = await cards.create(
       `${myOrigin}/api/realms/first-ephemeral-realm`,
-      testCard().withAttributes({
+      cardDocument().withAttributes({
         csFiles: {
           'validate.js': sampleValidator,
           'other.js': other,
@@ -113,7 +113,7 @@ describe('module-service', function() {
      `;
     let card = await cards.create(
       `${myOrigin}/api/realms/first-ephemeral-realm`,
-      testCard().withAttributes({
+      cardDocument().withAttributes({
         csPeerDependencies: {
           '@cardstack/core': '*',
         },
@@ -135,7 +135,7 @@ describe('module-service', function() {
   it('asserts when peerDependency is out of range', async function() {
     let card = await cards.create(
       `${myOrigin}/api/realms/first-ephemeral-realm`,
-      testCard().withAttributes({
+      cardDocument().withAttributes({
         csPeerDependencies: {
           '@cardstack/hub': '>1000',
         },
@@ -155,7 +155,7 @@ describe('module-service', function() {
   it('asserts when peerDependency is not available', async function() {
     let card = await cards.create(
       `${myOrigin}/api/realms/first-ephemeral-realm`,
-      testCard().withAttributes({
+      cardDocument().withAttributes({
         csPeerDependencies: {
           lodash: '*',
         },
@@ -177,7 +177,7 @@ describe('module-service', function() {
     let goodJS = `exports.good = 42;`;
     let card = await cards.create(
       `${myOrigin}/api/realms/first-ephemeral-realm`,
-      testCard().withAttributes({
+      cardDocument().withAttributes({
         csPeerDependencies: {
           '@cardstack/hub': '*',
         },

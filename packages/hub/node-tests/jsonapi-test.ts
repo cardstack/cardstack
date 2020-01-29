@@ -2,7 +2,7 @@ import Koa from 'koa';
 import supertest from 'supertest';
 import { myOrigin } from '@cardstack/core/origin';
 import { TestEnv, createTestEnv } from './helpers';
-import { testCard } from '@cardstack/test-support/test-card';
+import { cardDocument } from '@cardstack/core/card-document';
 import { stringify } from 'qs';
 import { Session } from '@cardstack/core/session';
 import { assertSingleResourceDoc, assertCollectionResourceDoc } from '../jsonapi';
@@ -98,7 +98,7 @@ describe('hub/jsonapi', function() {
       let response = await request
         .post('/api/realms/first-ephemeral-realm/cards')
         .set('Content-Type', 'application/vnd.api+json')
-        .send(testCard().jsonapi);
+        .send(cardDocument().jsonapi);
       expect(response).hasStatus(201);
       expect(response.header.location).to.match(/http:\/\/[^/]+\/api\/realms\/first-ephemeral-realm\/cards\/[^/]+/);
       assertSingleResourceDoc(response.body);
@@ -108,21 +108,21 @@ describe('hub/jsonapi', function() {
       let service = (await env.container.lookup('cards')).as(Session.INTERNAL_PRIVILEGED);
       let puppyCard = await service.create(
         `${myOrigin}/api/realms/first-ephemeral-realm`,
-        testCard().withField('name', 'string-field').jsonapi
+        cardDocument().withField('name', 'string-field').jsonapi
       );
       let ownerCard = await service.create(
         `${myOrigin}/api/realms/first-ephemeral-realm`,
-        testCard().withField('puppies', puppyCard, 'plural').jsonapi
+        cardDocument().withField('puppies', puppyCard, 'plural').jsonapi
       );
       let mango = await service.create(
         `${myOrigin}/api/realms/first-ephemeral-realm`,
-        testCard()
+        cardDocument()
           .withAttributes({ name: 'Mango ' })
           .adoptingFrom(puppyCard).jsonapi
       );
       let vanGogh = await service.create(
         `${myOrigin}/api/realms/first-ephemeral-realm`,
-        testCard()
+        cardDocument()
           .withAttributes({ name: 'Mango ' })
           .adoptingFrom(puppyCard).jsonapi
       );
@@ -130,7 +130,7 @@ describe('hub/jsonapi', function() {
         .post('/api/realms/first-ephemeral-realm/cards')
         .set('Content-Type', 'application/vnd.api+json')
         .send(
-          testCard()
+          cardDocument()
             .withRelationships({ puppies: [mango, vanGogh] })
             .adoptingFrom(ownerCard).jsonapi
         );
@@ -146,23 +146,23 @@ describe('hub/jsonapi', function() {
     it('can create a card with a field that has > 1 arity filled with cards as values', async function() {
       let service = (await env.container.lookup('cards')).as(Session.INTERNAL_PRIVILEGED);
       let csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
-      let puppyCard = await service.create(csRealm, testCard().withField('name', 'string-field').jsonapi);
-      let ownerCard = await service.create(csRealm, testCard().withField('puppies', puppyCard, 'plural').jsonapi);
+      let puppyCard = await service.create(csRealm, cardDocument().withField('name', 'string-field').jsonapi);
+      let ownerCard = await service.create(csRealm, cardDocument().withField('puppies', puppyCard, 'plural').jsonapi);
       let response = await request
         .post('/api/realms/first-ephemeral-realm/cards')
         .set('Content-Type', 'application/vnd.api+json')
         .send(
-          testCard()
+          cardDocument()
             .withAttributes({
               puppies: [
-                testCard()
+                cardDocument()
                   .withAttributes({
                     csRealm,
                     csId: 'mango',
                     name: 'Mango',
                   })
                   .adoptingFrom(puppyCard).asCardValue,
-                testCard()
+                cardDocument()
                   .withAttributes({
                     csRealm,
                     csId: 'vangogh',
@@ -176,14 +176,14 @@ describe('hub/jsonapi', function() {
       expect(response).hasStatus(201);
       expect(response.header.location).to.match(/http:\/\/[^/]+\/api\/realms\/first-ephemeral-realm\/cards\/[^/]+/);
       expect(response.body.data.attributes.puppies).to.eql([
-        testCard()
+        cardDocument()
           .withAttributes({
             csRealm,
             csId: 'mango',
             name: 'Mango',
           })
           .adoptingFrom(puppyCard).asCardValue,
-        testCard()
+        cardDocument()
           .withAttributes({
             csRealm,
             csId: 'vangogh',
@@ -198,7 +198,7 @@ describe('hub/jsonapi', function() {
       let response = await request
         .post('/api/realms/first-ephemeral-realm/cards')
         .set('Content-Type', 'application/vnd.api+json')
-        .send(testCard().withAutoAttributes({ foo: 'bar', hello: 'world' }).jsonapi);
+        .send(cardDocument().withAutoAttributes({ foo: 'bar', hello: 'world' }).jsonapi);
       let cardDoc = response.body;
       let csId = cardDoc.data.attributes.csId;
       cardDoc.data.attributes.foo = 'poo';
@@ -218,7 +218,7 @@ describe('hub/jsonapi', function() {
       let response = await request
         .post('/api/realms/first-ephemeral-realm/cards')
         .set('Content-Type', 'application/vnd.api+json')
-        .send(testCard().withAutoAttributes({ foo: 'bar', hello: 'world' }).jsonapi);
+        .send(cardDocument().withAutoAttributes({ foo: 'bar', hello: 'world' }).jsonapi);
       let csId = response.body.data.attributes.csId;
 
       response = await request
@@ -234,7 +234,7 @@ describe('hub/jsonapi', function() {
       let response = await request
         .post('/api/realms/first-ephemeral-realm/cards')
         .set('Content-Type', 'application/vnd.api+json')
-        .send(testCard().withAutoAttributes({ foo: 'bar', hello: 'world' }).jsonapi);
+        .send(cardDocument().withAutoAttributes({ foo: 'bar', hello: 'world' }).jsonapi);
       let csId = response.body.data.attributes.csId;
 
       response = await request
@@ -253,7 +253,7 @@ describe('hub/jsonapi', function() {
       let response = await request
         .post('/api/realms/first-ephemeral-realm/cards')
         .set('Content-Type', 'application/vnd.api+json')
-        .send(testCard().jsonapi);
+        .send(cardDocument().jsonapi);
       let csId = response.body.data.attributes.csId;
       let version = response.body.data.meta.version;
 
@@ -281,7 +281,7 @@ describe('hub/jsonapi', function() {
       let response = await request
         .post('/api/realms/first-ephemeral-realm/cards')
         .set('Content-Type', 'application/vnd.api+json')
-        .send(testCard().withAutoAttributes({ hello: 'world' }).jsonapi);
+        .send(cardDocument().withAutoAttributes({ hello: 'world' }).jsonapi);
       expect(response).hasStatus(201);
 
       response = await request
@@ -298,7 +298,7 @@ describe('hub/jsonapi', function() {
         .post('/api/realms/first-ephemeral-realm/cards')
         .set('Content-Type', 'application/vnd.api+json')
         .send(
-          testCard().withAutoAttributes({ csOriginalRealm: 'https://somewhere/else', csId: '432', hello: 'world' })
+          cardDocument().withAutoAttributes({ csOriginalRealm: 'https://somewhere/else', csId: '432', hello: 'world' })
             .jsonapi
         );
       expect(response).hasStatus(201);
@@ -317,7 +317,7 @@ describe('hub/jsonapi', function() {
       let response = await request
         .post(`/api/remote-realms/${encodeURIComponent('http://example.com/api/realms/second-ephemeral-realm')}/cards`)
         .set('Content-Type', 'application/vnd.api+json')
-        .send(testCard().withAutoAttributes({ hello: 'world' }).jsonapi);
+        .send(cardDocument().withAutoAttributes({ hello: 'world' }).jsonapi);
       expect(response).hasStatus(201);
 
       response = await request
@@ -334,7 +334,7 @@ describe('hub/jsonapi', function() {
         .post(`/api/remote-realms/${encodeURIComponent('http://example.com/api/realms/second-ephemeral-realm')}/cards`)
         .set('Content-Type', 'application/vnd.api+json')
         .send(
-          testCard().withAutoAttributes({ csOriginalRealm: 'https://somewhere/else', csId: '432', hello: 'world' })
+          cardDocument().withAutoAttributes({ csOriginalRealm: 'https://somewhere/else', csId: '432', hello: 'world' })
             .jsonapi
         );
       expect(response).hasStatus(201);
@@ -353,15 +353,15 @@ describe('hub/jsonapi', function() {
       await request
         .post('/api/realms/first-ephemeral-realm/cards')
         .set('Content-Type', 'application/vnd.api+json')
-        .send(testCard().jsonapi);
+        .send(cardDocument().jsonapi);
       await request
         .post('/api/realms/first-ephemeral-realm/cards')
         .set('Content-Type', 'application/vnd.api+json')
-        .send(testCard().withAutoAttributes({ foo: 'bar' }).jsonapi);
+        .send(cardDocument().withAutoAttributes({ foo: 'bar' }).jsonapi);
       await request
         .post('/api/realms/second-ephemeral-realm/cards')
         .set('Content-Type', 'application/vnd.api+json')
-        .send(testCard().withAutoAttributes({ foo: 'bar' }).jsonapi);
+        .send(cardDocument().withAutoAttributes({ foo: 'bar' }).jsonapi);
 
       let filter = {
         filter: {
@@ -380,7 +380,7 @@ describe('hub/jsonapi', function() {
         await request
           .post('/api/realms/first-ephemeral-realm/cards')
           .set('Content-Type', 'application/vnd.api+json')
-          .send(testCard().withAutoAttributes({ foo: 'bar' }).jsonapi);
+          .send(cardDocument().withAutoAttributes({ foo: 'bar' }).jsonapi);
       }
 
       let filter = {
@@ -448,11 +448,11 @@ describe('hub/jsonapi', function() {
         let service = (await env.container.lookup('cards')).as(Session.EVERYONE);
         let csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
 
-        toyCard = await service.create(csRealm, testCard().withField('description', 'string-field').jsonapi);
+        toyCard = await service.create(csRealm, cardDocument().withField('description', 'string-field').jsonapi);
 
         puppyCard = await service.create(
           csRealm,
-          testCard()
+          cardDocument()
             .withAttributes({
               csFieldSets: {
                 embedded: ['name'],
@@ -462,11 +462,11 @@ describe('hub/jsonapi', function() {
             .withField('favoriteToy', toyCard).jsonapi
         );
 
-        dalmatianCard = await service.create(csRealm, testCard().adoptingFrom(puppyCard).jsonapi);
+        dalmatianCard = await service.create(csRealm, cardDocument().adoptingFrom(puppyCard).jsonapi);
 
         ownerCard = await service.create(
           csRealm,
-          testCard()
+          cardDocument()
             .withAttributes({
               csFieldSets: {
                 isolated: ['name', 'puppies'],
@@ -478,7 +478,7 @@ describe('hub/jsonapi', function() {
 
         squeakySnake = await service.create(
           csRealm,
-          testCard()
+          cardDocument()
             .withAttributes({
               description: 'a plush snake with squeaky segments',
             })
@@ -487,10 +487,10 @@ describe('hub/jsonapi', function() {
 
         vanGogh = await service.create(
           csRealm,
-          testCard()
+          cardDocument()
             .withAttributes({
               name: 'Van Gogh',
-              favoriteToy: testCard()
+              favoriteToy: cardDocument()
                 .withAttributes({
                   description: 'a beef bone',
                 })
@@ -501,7 +501,7 @@ describe('hub/jsonapi', function() {
 
         mango = await service.create(
           csRealm,
-          testCard()
+          cardDocument()
             .withAttributes({
               name: 'Mango',
             })
@@ -511,7 +511,7 @@ describe('hub/jsonapi', function() {
 
         daddy = await service.create(
           csRealm,
-          testCard()
+          cardDocument()
             .withAttributes({
               name: 'Hassan',
             })

@@ -1,7 +1,7 @@
 /// <reference types="qunit" />
 
 import DAGMap from 'dag-map';
-import { TestCardWithId, TestCard } from '@cardstack/test-support/test-card';
+import { CardDocumentWithId, CardDocument } from '@cardstack/core/card-document';
 import { CardId, canonicalURL } from '@cardstack/core/card';
 import { stringify } from 'qs';
 import flatten from 'lodash/flatten';
@@ -12,7 +12,7 @@ import isPlainObject from 'lodash/isPlainObject';
 const hubURL = 'http://localhost:3000';
 
 export interface FixtureConfig {
-  create?: TestCardWithId[];
+  create?: CardDocumentWithId[];
   destroy?: {
     cards?: CardId[];
     cardTypes?: CardId[];
@@ -39,8 +39,8 @@ export default class Fixtures {
       return;
     }
     let cardResources: ResourceObject[] = [];
-    for (let testCard of inDependencyOrder(this.config.create)) {
-      cardResources.push(await createCard(testCard));
+    for (let card of inDependencyOrder(this.config.create)) {
+      cardResources.push(await createCard(card));
     }
     this.createdCards = cardResources.map(
       i =>
@@ -71,22 +71,22 @@ export default class Fixtures {
 }
 
 function inDependencyOrder(cards: ResourceObject[]): ResourceObject[];
-function inDependencyOrder(cards: TestCardWithId[]): TestCardWithId[];
+function inDependencyOrder(cards: CardDocumentWithId[]): CardDocumentWithId[];
 function inDependencyOrder(cards: any[]): any[] {
-  let dag = new DAGMap<TestCardWithId>();
+  let dag = new DAGMap<CardDocumentWithId>();
 
   for (let card of cards) {
     let json: ResourceObject = 'jsonapi' in card ? card.jsonapi.data : card;
     dag.add(canonicalURL((json.attributes as unknown) as CardId), card, undefined, getRelatedIds(json));
   }
-  let sortedCreatedCards: TestCardWithId[] = [];
+  let sortedCreatedCards: CardDocumentWithId[] = [];
   dag.each((_key, value) => sortedCreatedCards.push(value!));
   // filter out any built-in cards, as those are never supplied in the fixtures
   // and only appear as references with undefined values in the DAG.
   return sortedCreatedCards.filter(Boolean);
 }
 
-function getRelatedIds(cardValue: TestCard['asCardValue']): string[] {
+function getRelatedIds(cardValue: CardDocument['asCardValue']): string[] {
   return uniq(
     flatten([
       ...Object.values(cardValue.relationships || {}).map(value => {
@@ -100,7 +100,7 @@ function getRelatedIds(cardValue: TestCard['asCardValue']): string[] {
         }
       }),
       ...Object.values(cardValue.attributes || {}).map(value =>
-        isPlainObject(value) ? getRelatedIds(value as TestCard['asCardValue']) : null
+        isPlainObject(value) ? getRelatedIds(value as CardDocument['asCardValue']) : null
       ),
     ]).filter(Boolean)
   ) as string[];
@@ -137,7 +137,7 @@ async function getCard(id: CardId): Promise<ResourceObject> {
   return json.data;
 }
 
-async function createCard(card: TestCardWithId): Promise<ResourceObject> {
+async function createCard(card: CardDocumentWithId): Promise<ResourceObject> {
   let response = await fetch(localURL(card, true), {
     method: 'POST',
     headers: {

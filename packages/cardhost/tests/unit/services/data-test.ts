@@ -1,7 +1,7 @@
 import { module, test, skip } from 'qunit';
 import { myOrigin } from '@cardstack/core/origin';
 import { setupTest } from 'ember-qunit';
-import { testCard, TestCardWithId } from '@cardstack/test-support/test-card';
+import { cardDocument, CardDocumentWithId } from '@cardstack/core/card-document';
 import Fixtures from '../../helpers/fixtures';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import DataService from '../../../app/services/data';
@@ -10,14 +10,14 @@ const csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
 
 module('Unit | Service | data', function() {
   module('non-mutating tests', function(hooks) {
-    let toyCard: TestCardWithId = testCard()
+    let toyCard: CardDocumentWithId = cardDocument()
       .withAttributes({
         csRealm,
         csId: 'toy-card',
       })
       .withField('description', 'string-field');
 
-    let puppyCard: TestCardWithId = testCard()
+    let puppyCard: CardDocumentWithId = cardDocument()
       .withAttributes({
         csRealm,
         csId: 'puppy-card',
@@ -28,14 +28,14 @@ module('Unit | Service | data', function() {
       .withField('name', 'string-field')
       .withField('favoriteToy', toyCard);
 
-    let dalmatianCard: TestCardWithId = testCard()
+    let dalmatianCard: CardDocumentWithId = cardDocument()
       .withAttributes({
         csRealm,
         csId: 'dalmatian-card',
       })
       .adoptingFrom(puppyCard);
 
-    let ownerCard: TestCardWithId = testCard()
+    let ownerCard: CardDocumentWithId = cardDocument()
       .withAttributes({
         csRealm,
         csId: 'owner-card',
@@ -46,7 +46,7 @@ module('Unit | Service | data', function() {
       .withField('name', 'string-field')
       .withField('puppies', puppyCard, 'plural');
 
-    let squeakySnake: TestCardWithId = testCard()
+    let squeakySnake: CardDocumentWithId = cardDocument()
       .withAttributes({
         csRealm,
         csId: 'squeaky-snake',
@@ -54,12 +54,12 @@ module('Unit | Service | data', function() {
       })
       .adoptingFrom(toyCard);
 
-    let vanGogh: TestCardWithId = testCard()
+    let vanGogh: CardDocumentWithId = cardDocument()
       .withAttributes({
         csRealm,
         csId: 'vangogh',
         name: 'Van Gogh',
-        favoriteToy: testCard()
+        favoriteToy: cardDocument()
           .withAttributes({
             description: 'a beef bone',
           })
@@ -67,7 +67,7 @@ module('Unit | Service | data', function() {
       })
       .adoptingFrom(dalmatianCard);
 
-    let mango: TestCardWithId = testCard()
+    let mango: CardDocumentWithId = cardDocument()
       .withAttributes({
         csRealm,
         csId: 'mango',
@@ -76,7 +76,7 @@ module('Unit | Service | data', function() {
       .withRelationships({ favoriteToy: squeakySnake })
       .adoptingFrom(dalmatianCard);
 
-    let daddy: TestCardWithId = testCard()
+    let daddy: CardDocumentWithId = cardDocument()
       .withAttributes({
         csRealm,
         csId: 'hassan',
@@ -85,7 +85,7 @@ module('Unit | Service | data', function() {
       .withRelationships({ puppies: [vanGogh, mango] })
       .adoptingFrom(ownerCard);
 
-    let mommy: TestCardWithId = testCard()
+    let mommy: CardDocumentWithId = cardDocument()
       .withAttributes({
         csRealm,
         csId: 'mariko',
@@ -143,7 +143,7 @@ module('Unit | Service | data', function() {
       let service = this.owner.lookup('service:data') as DataService;
       let card = await service.create(
         csRealm,
-        testCard().withAutoAttributes({
+        cardDocument().withAutoAttributes({
           name: 'Van Gogh',
         }).jsonapi
       );
@@ -157,7 +157,7 @@ module('Unit | Service | data', function() {
       let service = this.owner.lookup('service:data') as DataService;
       let card = await service.create(
         csRealm,
-        testCard().withAutoAttributes({
+        cardDocument().withAutoAttributes({
           name: 'Van Gogh',
         }).jsonapi
       );

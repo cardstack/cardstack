@@ -1,7 +1,7 @@
 import { TestEnv, createTestEnv } from './helpers';
 import { EphemeralStorage } from '../../../cards/ephemeral-realm/storage';
 import IndexingService from '../indexing';
-import { testCard } from '@cardstack/test-support/test-card';
+import { cardDocument } from '@cardstack/core/card-document';
 import { myOrigin } from '@cardstack/core/origin';
 import CardsService from '../cards-service';
 import { Session } from '@cardstack/core/session';
@@ -23,7 +23,7 @@ describe('hub/indexing', function() {
 
   it('it can index a realm', async function() {
     let csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
-    let card = testCard().withAutoAttributes({ csRealm, csId: '1', foo: 'bar' });
+    let card = cardDocument().withAutoAttributes({ csRealm, csId: '1', foo: 'bar' });
     storage.store(card.upstreamDoc, card.csId, card.csRealm);
 
     await indexing.update();
@@ -36,7 +36,7 @@ describe('hub/indexing', function() {
     let csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
     let card = await cards
       .as(Session.INTERNAL_PRIVILEGED)
-      .create(csRealm, testCard().withAutoAttributes({ csRealm, csId: '1', foo: 'bar' }).jsonapi);
+      .create(csRealm, cardDocument().withAutoAttributes({ csRealm, csId: '1', foo: 'bar' }).jsonapi);
     storage.store(null, card.csId, card.csRealm, storage.getEntry(card, csRealm)?.generation);
     await indexing.update();
 
@@ -49,9 +49,9 @@ describe('hub/indexing', function() {
   it('it can index multiple realms', async function() {
     let realm1 = `${myOrigin}/api/realms/first-ephemeral-realm`;
     let realm2 = `http://example.com/api/realms/second-ephemeral-realm`;
-    let card = testCard().withAutoAttributes({ csRealm: realm1, csId: '1', foo: 'bar' });
+    let card = cardDocument().withAutoAttributes({ csRealm: realm1, csId: '1', foo: 'bar' });
     storage.store(card.upstreamDoc, card.csId, card.csRealm);
-    card = testCard().withAutoAttributes({ csRealm: realm2, csId: '1', foo: 'bar' });
+    card = cardDocument().withAutoAttributes({ csRealm: realm2, csId: '1', foo: 'bar' });
     storage.store(card.upstreamDoc, card.csId, card.csRealm);
 
     await indexing.update();
@@ -67,13 +67,13 @@ describe('hub/indexing', function() {
 
     // card is indexed in torn down ephemeral storage
     // This card will _not_ live through the container teardown
-    let card = testCard().withAutoAttributes({ csRealm: realm, csId: '1', foo: 'bar' });
+    let card = cardDocument().withAutoAttributes({ csRealm: realm, csId: '1', foo: 'bar' });
     storage.store(card.upstreamDoc, card.csId, card.csRealm);
     await indexing.update();
 
     // card is not yet indexed in torn down ephemeral storage
     // This card will _not_ live through the container teardown
-    card = testCard().withAutoAttributes({ csRealm: realm, csId: '2', foo: 'bar' });
+    card = cardDocument().withAutoAttributes({ csRealm: realm, csId: '2', foo: 'bar' });
     storage.store(await card.upstreamDoc, card.csId, card.csRealm);
     await env.container.teardown();
     env.container = await wireItUp();
@@ -85,7 +85,7 @@ describe('hub/indexing', function() {
 
     // card is not yet indexed in new ephemeral storage
     // This card _will_ live through the container teardown
-    card = testCard().withAutoAttributes({ csRealm: realm, csId: '3', foo: 'bar' });
+    card = cardDocument().withAutoAttributes({ csRealm: realm, csId: '3', foo: 'bar' });
     storage.store(await card.upstreamDoc, card.csId, card.csRealm);
     await indexing.update();
 
@@ -110,7 +110,7 @@ describe('hub/indexing', function() {
 
     let steps = await cards.as(Session.INTERNAL_PRIVILEGED).create(
       realm,
-      testCard()
+      cardDocument()
         .withField('foo', 'string-field')
         .withField('step', 'integer-field').jsonapi
     );
@@ -128,7 +128,7 @@ describe('hub/indexing', function() {
     }
 
     // Add a new card
-    let card = testCard()
+    let card = cardDocument()
       .withAttributes({ csRealm: realm, csId: '1', foo: 'bar', step: 1 })
       .adoptingFrom(steps);
     storage.store(card.upstreamDoc, card.csId, card.csRealm);
@@ -136,14 +136,14 @@ describe('hub/indexing', function() {
     expect(await cardsWithStep(1)).to.equal(1);
 
     // Add another new card
-    card = testCard()
+    card = cardDocument()
       .withAttributes({ csRealm: realm, csId: '2', foo: 'bar', step: 2 })
       .adoptingFrom(steps);
     storage.store(card.upstreamDoc, card.csId, card.csRealm);
 
     // Maniuplate existing card so we would notice if it gets indexed when it shouldn't.
     await storage.inThePast(async () => {
-      card = testCard()
+      card = cardDocument()
         .withAttributes({ csRealm: realm, csId: '1', foo: 'bar', step: 2 })
         .adoptingFrom(steps);
       storage.store(card.upstreamDoc, card.csId, card.csRealm, storage.getEntry('1', realm)?.generation);
@@ -154,14 +154,14 @@ describe('hub/indexing', function() {
     expect(n).to.equal(1);
 
     // Update first card
-    card = testCard()
+    card = cardDocument()
       .withAttributes({ csRealm: realm, csId: '1', foo: 'bar', step: 3 })
       .adoptingFrom(steps);
     storage.store(card.upstreamDoc, card.csId, card.csRealm, storage.getEntry('1', realm)?.generation);
 
     // Maniuplate other existing card so we would notice if it gets indexed when it shouldn't.
     await storage.inThePast(async () => {
-      card = testCard()
+      card = cardDocument()
         .withAttributes({ csRealm: realm, csId: '2', foo: 'bar', step: 3 })
         .adoptingFrom(steps);
       storage.store(card.upstreamDoc, card.csId, card.csRealm, storage.getEntry('2', realm)?.generation);
@@ -175,7 +175,7 @@ describe('hub/indexing', function() {
 
     // Maniuplate other existing card so we would notice if it gets indexed when it shouldn't.
     await storage.inThePast(async () => {
-      card = testCard()
+      card = cardDocument()
         .withAttributes({ csRealm: realm, csId: '1', foo: 'bar', step: 4 })
         .adoptingFrom(steps);
       storage.store(card.upstreamDoc, card.csId, card.csRealm, storage.getEntry('1', realm)?.generation);
