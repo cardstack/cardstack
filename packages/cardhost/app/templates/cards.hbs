@@ -8,20 +8,17 @@
   data-test-cardhost-cards>
   <CardstackEdges>
     {{#let this.target.currentRoute.parent.attributes as |card|}}
-      {{#if (eq this.routeInfo.mode "themer")}}
-        <CardstackEdge @edge="top" @componentToShow={{component "themer-toolbar" model=card}}>
-          <InTopToolbar />
-        </CardstackEdge>
-      {{else if (not-eq this.routeInfo.mode "view")}}
+      {{#if (and (not-eq this.routeInfo.mode "view") (not-eq this.routeInfo.mode "themer"))}}
         <CardstackEdge @edge="top" @componentToShow={{component "cardhost-top-edge" mode=this.routeInfo.mode card=card}}>
           <InTopToolbar />
         </CardstackEdge>
       {{/if}}
+      {{#if (and (not-eq this.routeInfo.mode "schema") (not-eq this.routeInfo.mode "add") (not-eq this.routeInfo.mode "adopt"))}}
+        <CardstackEdge @edge="left" @componentToShow={{component "cardhost-left-edge"}}>
+          <InLeftToolbar />
+        </CardstackEdge>
+      {{/if}}
     {{/let}}
-
-    <CardstackEdge @edge="left" @componentToShow={{component "cardhost-left-edge"}}>
-      <InLeftToolbar />
-    </CardstackEdge>
 
     {{outlet}}
   </CardstackEdges>

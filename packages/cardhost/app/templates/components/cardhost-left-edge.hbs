@@ -66,7 +66,7 @@
     </ul>
   </nav>
 
-  {{#if (eq @mode "schema")}}
+  {{#if (or (eq @mode "schema") (eq @mode "adopt"))}}
     <section class="ch-catalog">
       <header class="ch-catalog--header">
         <h3 class="ch-catalog--title">Card Catalog</h3>

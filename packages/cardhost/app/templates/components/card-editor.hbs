@@ -1,3 +1,10 @@
+<CardstackEdge @edge="right" @componentToShow={{component "right-edge" mode="fields" card=this.card cardSelected=true}}>
+  <InRightToolbar/>
+</CardstackEdge>
+<CardstackEdge @edge="left" @componentToShow={{component "cardhost-left-edge"}}>
+  <InLeftToolbar />
+</CardstackEdge>
+
 <section
   class="card-editor"
   data-test-card-edit={{this.card.name}}

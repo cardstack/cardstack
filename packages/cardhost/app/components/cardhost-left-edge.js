@@ -9,6 +9,7 @@ export default class CardhostTopEdgeComponent extends Component {
   fieldComponents = fieldComponents;
 
   @service cardstackSession;
+  @service edges;
   @tracked isExpanded = false;
 
   @action

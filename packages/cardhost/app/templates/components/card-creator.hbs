@@ -1,3 +1,11 @@
+<CardstackEdge @edge="top" @componentToShow={{component "cardhost-top-edge" mode="add" card=this.card}}>
+  <InTopToolbar />
+</CardstackEdge>
+
+<CardstackEdge @edge="left" @componentToShow={{component "cardhost-left-edge" mode="schema" card=this.card}}>
+  <InLeftToolbar />
+</CardstackEdge>
+
 <CardstackEdge
   @edge="right"
   @componentToShow={{component "right-edge"
