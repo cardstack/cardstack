@@ -9,6 +9,11 @@
 }
 .cardstack_base-card-isolated .cardstack_base-card-embedded .label {
   font-size: 10px;
+  padding-left: 15px;
+}
+.cardstack_base-card-isolated .cardstack_base-card-embedded .field {
+  padding: 0 0 15px;
+  grid-gap: 0 50px;
 }
 
 
@@ -42,6 +47,7 @@
   margin: 0 auto;
   padding: 0 15px 15px;
 }
+.cardstack_base-card-embedded .field.field-type-belongs-to-view-field,
 .cardstack_base-card-embedded .field:first-of-type {
   padding-top: 15px;
 }

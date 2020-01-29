@@ -31,13 +31,19 @@
 .event-card-isolated .event-city-field {
   grid-area: city;
   padding-bottom: 0;
+  max-width: calc(656px / 2);
+  margin-right: 0;
 }
 .event-card-isolated .event-admission-field {
   grid-area: admission;
+  max-width: calc(656px / 2);
+  margin-right: 0;
 }
 .event-card-isolated .event-cta-field {
   grid-area: button;
   text-align: right;
+  max-width: calc(656px / 2);
+  margin-left: 0;
 }
 .event-card-isolated .divider-field {
   grid-area: divider;

@@ -10,104 +10,107 @@
     letter-spacing: 0.03em;
 }
 
-.isolated-card--view-fields {
+.product-card-isolated .isolated-card--view-fields {
+    max-width: 800px;
+    margin: 0 auto;
     padding-top: 80px;
 }
 
-.field {
+.product-card-isolated .field {
     display: block;
     padding: 0;
     text-align: center;
     order: 5;
 }
-.product-image-field {
+.product-card-isolated .product-image-field {
     order: 1;
 }
-.product-name-field {
+.product-card-isolated .product-name-field {
     order: 2;
 }
-.product-company-field {
+.product-card-isolated .product-company-field {
     order: 3;
 }
 
-.title-field,
-.highlight-title-field,
-.product-company-logo-field,
-.product-description-field {
+.product-card-isolated .title-field,
+.product-card-isolated .highlight-title-field,
+.product-card-isolated .divider-field,
+.product-card-isolated .product-company-logo-field,
+.product-card-isolated .product-description-field {
     display: none;
 }
-.label {
+.product-card-isolated .label {
     display: none;
 }
 
 
-.title-logo-field {
+.product-card-isolated .title-logo-field {
     position: absolute;
     top: 17px;
     left: 19.5px;
 }
 
-.product-ranking-field {
+.product-card-isolated .product-ranking-field {
     position: absolute;
     display: inline-block;
     top: 10px;
     right: 27px;
     width: auto;
 }
-.product-ranking-value::before {
+.product-card-isolated .product-ranking-value::before {
     content: '#';
     font-size: 40px;
     line-height: 2.5;
     vertical-align: top;
     margin-right: -25px;
 }
-.product-ranking-value {
+.product-card-isolated .product-ranking-value {
     font-family: 'Teko', sans-serif;
     font-size: 185px;
     line-height: 1;
 }
 
-.product-image-value {
+.product-card-isolated .product-image-value {
     width: 75%;
     margin: 0 auto 38px;
 }
-.product-name-value {
+.product-card-isolated .product-name-value {
   padding-bottom: 6px;
   font-size: 25px;
   font-weight: bold;
   letter-spacing: 0.03em;
   line-height: 1.2;
 }
-.product-company-value::before {
+.product-card-isolated .product-company-value::before {
     display: inline-block;
     content: 'by';
     padding-bottom: 14px;
 }
-.product-link-field {
+.product-card-isolated .product-link-field {
     padding-top: 24px;
     padding-bottom: 24px;
     background-color: white;
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
 }
-.product-link-value::before {
+.product-card-isolated .product-link-value::before {
     content: '+';
     display: inline-block;
     margin-right: 5px;
 }
-.product-link-value {
+.product-card-isolated .product-link-value {
     color: black;
     font-weight: normal;
     text-decoration: none;
     letter-spacing: 0.03em;
 }
 
-.product-cta-field {
+.product-card-isolated .product-cta-field {
     padding-top: 4px;
     padding-bottom: 30px;
     background-color: white;
 }
-.product-cta-value {
+.product-card-isolated .product-cta-value {
     width: 80%;
     min-height: 52px;
     padding: 0;
@@ -120,12 +123,12 @@
 }
 
 /* Product Rating Stars */
-.product-rating-field {
+.product-card-isolated .product-rating-field {
     width: 100px;
     color: transparent;
     padding-bottom: 25px;
 }
-.product-rating-value {
+.product-card-isolated .product-rating-value {
     display: none;
 }
 .product-rating-value.integer-100,
@@ -141,8 +144,8 @@
 .product-rating-value.integer-0 {
     display: block;
     background-repeat: no-repeat;
-    background-position: top center, 0% top, 25% top, center top, 75% top, 100% top;
-    background-size: 100px 14px, auto 14px, auto 14px, auto 14px, auto 14px, auto 14px;
+    background-position: top center, 0% top, 25% top, 49% top, 74% top, 98% top;
+    background-size: 100px 14px, 13px 14px, 13px 14px, 13px 14px, 13px 14px, 13px 14px;
 }
 .product-rating-value.integer-100 {
     background-image:

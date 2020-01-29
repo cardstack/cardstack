@@ -41,7 +41,8 @@
 }
 
 .cardhost-cards.responsive.editing-css .themer.view {
-  max-width: var(--ch-card-size);
+  min-width: calc(var(--ch-card-size) - 6px); /* subtracting border */
+  max-width: calc(var(--ch-card-size) - 6px);
 }
 
 .card-creator,

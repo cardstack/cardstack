@@ -35,6 +35,7 @@ Until that work is done we are statically adding this css
 /* @import '/assets/cards/event-ticket-isolated.css'; */
 /* @import '/assets/cards/wedding-invitation-isolated.css'; */
 /* @import '/assets/cards/product-card-isolated.css'; */
+/* @import '/assets/cards/photo-card-isolated.css'; */
 
 @import '/assets/fields/belongs-to-editor.css';
 @import '/assets/fields/belongs-to-viewer.css';
