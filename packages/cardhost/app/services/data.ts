@@ -59,6 +59,22 @@ export default class DataService extends Service implements CardInstantiator {
     return await this.instantiate(json);
   }
 
+  async delete(card: AddressableCard): Promise<void> {
+    let url = this.localURL(card as CardId);
+    let {
+      data: { meta = {} },
+    } = await card.serializeAsJsonAPIDoc({});
+    let { version } = meta;
+
+    await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+        'If-Match': String(version || ''),
+      },
+    });
+  }
+
   async load(idOrURL: CardId | string, _occlusionRules?: OcclusionRulesOrDefaults): Promise<AddressableCard> {
     let id = asCardId(idOrURL);
     let url = this.localURL(id);

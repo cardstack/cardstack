@@ -163,14 +163,72 @@ module('Unit | Service | data', function() {
       );
 
       let savedCard = await service.save(card);
-
       assert.ok(savedCard.csId, 'the card csId exists');
       assert.equal(savedCard.csRealm, csRealm, 'the card csRealm is correct');
       assert.equal(savedCard.csOriginalRealm, csRealm, 'the card csOriginalRealm is correct');
       assert.equal(await savedCard.value('name'), 'Van Gogh', 'the card user field value is correct');
+
+      let retreivedCard = await service.load(savedCard);
+      assert.equal(retreivedCard.csId, savedCard.csId, 'the card csId isCorect');
+      assert.equal(retreivedCard.csRealm, csRealm, 'the card csRealm is correct');
+      assert.equal(retreivedCard.csOriginalRealm, csRealm, 'the card csOriginalRealm is correct');
+      assert.equal(await retreivedCard.value('name'), 'Van Gogh', 'the card user field value is correct');
     });
 
-    skip('it patches a card', async function() {});
-    skip('it deletes a card', async function() {});
+    test('it patches a card', async function(assert) {
+      let service = this.owner.lookup('service:data') as DataService;
+      let card = await service.create(
+        csRealm,
+        cardDocument().withAutoAttributes({
+          name: 'Van Gogh',
+          favoriteColor: 'teal',
+        }).jsonapi
+      );
+
+      let savedCard = await service.save(card);
+      let patchedCard = await savedCard.patch({
+        data: {
+          type: 'cards',
+          attributes: {
+            favoriteColor: 'orange',
+          },
+        },
+      });
+
+      let updatedCard = await service.save(patchedCard);
+      assert.equal(updatedCard.csId, savedCard.csId, 'the card csId isCorect');
+      assert.equal(updatedCard.csRealm, csRealm, 'the card csRealm is correct');
+      assert.equal(updatedCard.csOriginalRealm, csRealm, 'the card csOriginalRealm is correct');
+      assert.equal(await updatedCard.value('name'), 'Van Gogh', 'the card user field value is correct');
+      assert.equal(await updatedCard.value('favoriteColor'), 'orange', 'the card user field value is correct');
+
+      let retreivedCard = await service.load(savedCard);
+      assert.equal(retreivedCard.csId, savedCard.csId, 'the card csId isCorect');
+      assert.equal(retreivedCard.csRealm, csRealm, 'the card csRealm is correct');
+      assert.equal(retreivedCard.csOriginalRealm, csRealm, 'the card csOriginalRealm is correct');
+      assert.equal(await retreivedCard.value('name'), 'Van Gogh', 'the card user field value is correct');
+      assert.equal(await retreivedCard.value('favoriteColor'), 'orange', 'the card user field value is correct');
+    });
+
+    test('it deletes a card', async function(assert) {
+      let service = this.owner.lookup('service:data') as DataService;
+      let card = await service.create(
+        csRealm,
+        cardDocument().withAutoAttributes({
+          name: 'Van Gogh',
+          favoriteColor: 'teal',
+        }).jsonapi
+      );
+
+      let savedCard = await service.save(card);
+      await service.delete(savedCard);
+
+      try {
+        await service.load(savedCard);
+        throw new Error('should not be able to find the deleted card');
+      } catch (err) {
+        assert.ok(err.message.match(/404: Not Found/), 'the card could not be found');
+      }
+    });
   });
 });
