@@ -270,26 +270,3 @@
 .ch-button--icon.full-width.selected {
   --icon-url: url('/assets/images/buttons/full-width-active.svg');
 }
-
-.editing-css {
-  padding-left: 0;
-  padding-right: 0;
-  width: 100%;
-  transition: var(--ch-card-padding-animate), var(--ch-card-background-color-animate);
-  background-color: var(--ch-dark-background);
-}
-
-.full-width.editing-css .themer.view {
-  width: 100%;
-  padding-right: var(--ch-spacing);
-}
-
-.card-renderer-isolated.themer.view .card-renderer-isolated--header--wrapper  {
-  left: var(--ch-spacing);
-  right: var(--ch-spacing);
-}
-
-.themer.view {
-  width: var(--ch-card-size);
-  padding: var(--ch-spacing);
-}

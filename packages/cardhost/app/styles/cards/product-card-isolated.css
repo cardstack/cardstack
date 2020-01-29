@@ -1,0 +1,223 @@
+@import url('https://fonts.googleapis.com/css?family=Rubik:400,700&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Teko:700&display=swap');
+
+.product-card-isolated {
+    background-color: #0069F9;
+    color: white;
+    font-family: 'Rubik', sans-serif;
+    font-size: 15px;
+    line-height: calc(23 / 15);
+    letter-spacing: 0.03em;
+}
+
+.product-card-isolated .isolated-card--view-fields {
+    max-width: 800px;
+    margin: 0 auto;
+    padding-top: 80px;
+}
+
+.product-card-isolated .field {
+    display: block;
+    padding: 0;
+    text-align: center;
+    order: 5;
+}
+.product-card-isolated .product-image-field {
+    order: 1;
+}
+.product-card-isolated .product-name-field {
+    order: 2;
+}
+.product-card-isolated .product-company-field {
+    order: 3;
+}
+
+.product-card-isolated .title-field,
+.product-card-isolated .highlight-title-field,
+.product-card-isolated .divider-field,
+.product-card-isolated .product-company-logo-field,
+.product-card-isolated .product-description-field {
+    display: none;
+}
+.product-card-isolated .label {
+    display: none;
+}
+
+
+.product-card-isolated .title-logo-field {
+    position: absolute;
+    top: 17px;
+    left: 19.5px;
+}
+
+.product-card-isolated .product-ranking-field {
+    position: absolute;
+    display: inline-block;
+    top: 10px;
+    right: 27px;
+    width: auto;
+}
+.product-card-isolated .product-ranking-value::before {
+    content: '#';
+    font-size: 40px;
+    line-height: 2.5;
+    vertical-align: top;
+    margin-right: -25px;
+}
+.product-card-isolated .product-ranking-value {
+    font-family: 'Teko', sans-serif;
+    font-size: 185px;
+    line-height: 1;
+}
+
+.product-card-isolated .product-image-value {
+    width: 75%;
+    margin: 0 auto 38px;
+}
+.product-card-isolated .product-name-value {
+  padding-bottom: 6px;
+  font-size: 25px;
+  font-weight: bold;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+}
+.product-card-isolated .product-company-value::before {
+    display: inline-block;
+    content: 'by';
+    padding-bottom: 14px;
+}
+.product-card-isolated .product-link-field {
+    padding-top: 24px;
+    padding-bottom: 24px;
+    background-color: white;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+}
+.product-card-isolated .product-link-value::before {
+    content: '+';
+    display: inline-block;
+    margin-right: 5px;
+}
+.product-card-isolated .product-link-value {
+    color: black;
+    font-weight: normal;
+    text-decoration: none;
+    letter-spacing: 0.03em;
+}
+
+.product-card-isolated .product-cta-field {
+    padding-top: 4px;
+    padding-bottom: 30px;
+    background-color: white;
+}
+.product-card-isolated .product-cta-value {
+    width: 80%;
+    min-height: 52px;
+    padding: 0;
+    border-radius: 100px;
+    background-color: black;
+    font-size: 19px;
+    letter-spacing: 0.1em;
+    line-height: calc(52 / 19);
+    text-transform: uppercase;
+}
+
+/* Product Rating Stars */
+.product-card-isolated .product-rating-field {
+    width: 100px;
+    color: transparent;
+    padding-bottom: 25px;
+}
+.product-card-isolated .product-rating-value {
+    display: none;
+}
+.product-rating-value.integer-100,
+.product-rating-value.integer-90,
+.product-rating-value.integer-80,
+.product-rating-value.integer-70,
+.product-rating-value.integer-60,
+.product-rating-value.integer-50,
+.product-rating-value.integer-40,
+.product-rating-value.integer-30,
+.product-rating-value.integer-20,
+.product-rating-value.integer-10,
+.product-rating-value.integer-0 {
+    display: block;
+    background-repeat: no-repeat;
+    background-position: top center, 0% top, 25% top, 49% top, 74% top, 98% top;
+    background-size: 100px 14px, 13px 14px, 13px 14px, 13px 14px, 13px 14px, 13px 14px;
+}
+.product-rating-value.integer-100 {
+    background-image:
+    url('/assets/images/cards/coffee-bean/stars-empty.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg');
+}
+.product-rating-value.integer-90 {
+    background-image:
+    url('/assets/images/cards/coffee-bean/stars-empty.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_half.svg');
+}
+.product-rating-value.integer-80 {
+    background-image:
+    url('/assets/images/cards/coffee-bean/stars-empty.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg');
+}
+.product-rating-value.integer-70 {
+    background-image:
+    url('/assets/images/cards/coffee-bean/stars-empty.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_half.svg');
+}
+.product-rating-value.integer-60 {
+    background-image:
+    url('/assets/images/cards/coffee-bean/stars-empty.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg');
+}
+.product-rating-value.integer-50 {
+    background-image:
+    url('/assets/images/cards/coffee-bean/stars-empty.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_half.svg');
+}
+.product-rating-value.integer-40 {
+    background-image:
+    url('/assets/images/cards/coffee-bean/stars-empty.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg');
+}
+.product-rating-value.integer-30 {
+    background-image:
+    url('/assets/images/cards/coffee-bean/stars-empty.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_half.svg');
+}
+.product-rating-value.integer-20 {
+    background-image:
+    url('/assets/images/cards/coffee-bean/stars-empty.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_filled.svg');
+}
+.product-rating-value.integer-10 {
+    background-image:
+    url('/assets/images/cards/coffee-bean/stars-empty.svg'),
+    url('/assets/images/cards/coffee-bean/icon_star_half.svg');
+}
+.product-rating-value.integer-0 {
+    background-image:
+    url('/assets/images/cards/coffee-bean/stars-empty.svg');
+}

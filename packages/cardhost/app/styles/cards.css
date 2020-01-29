@@ -28,6 +28,23 @@
   background-color: var(--ch-deep-background);
 }
 
+.cardhost-cards.editing-css {
+  padding-left: 20px;
+  padding-right: 20px;
+  background-color: var(--ch-dark-background);
+  transition: var(--ch-card-padding-animate),
+              var(--ch-card-background-color-animate);
+}
+
+.cardhost-cards.full-width.editing-css .themer.view {
+  width: 100%;
+}
+
+.cardhost-cards.responsive.editing-css .themer.view {
+  min-width: calc(var(--ch-card-size) - 6px); /* subtracting border */
+  max-width: calc(var(--ch-card-size) - 6px);
+}
+
 .card-creator,
 .card-schema-updator,
 .card-view,
