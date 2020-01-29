@@ -7,7 +7,7 @@ export default class CardhostModalTarget extends Component {
 
   @action
   outsideClick(closeFn, evt) {
-    if (evt.target === this.containerClass && typeof closeFn === 'function') {
+    if (evt.target.className === this.containerClass && typeof closeFn === 'function') {
       closeFn();
     }
   }
