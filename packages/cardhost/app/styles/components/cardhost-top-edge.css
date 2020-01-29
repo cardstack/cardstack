@@ -28,6 +28,8 @@
   background-color: var(--ch-medium-background);
 }
 
+.cardhost-top-edge.add,
+.cardhost-top-edge.adopt,
 .cardhost-top-edge.schema {
   background-color: var(--ch-deep-background);
 }

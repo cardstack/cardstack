@@ -1,4 +1,4 @@
-<dialog class="dialog" data-test-dialog-box ...attributes>
+<dialog class="dialog {{@mode}}" tabindex="0" data-test-dialog-box {{autofocus}} ...attributes>
   {{#if @title}}
     <h1 class="dialog--title">
       {{svg-jar @icon width="20px" height="20px"}} {{@title}}
