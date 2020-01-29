@@ -30,7 +30,7 @@ export default class EditorPane extends Component {
 
   get width() {
     if (this.cssModeToggle.dockLocation === 'right') {
-      return '60%';
+      return 'calc(100% - var(--ch-card-size))';
     } else {
       return '100%';
     }
