@@ -10,6 +10,10 @@ module.exports = function(defaults) {
   // figure out how we want to do this for real.
   if (!process.env.HUB_URL) {
     console.log('Starting Cardstack Hub...'); // eslint-disable-line no-console
+    if (process.env.EMBER_ENV === 'test') {
+      process.env.PGDATABASE = `test_db_${Math.floor(100000 * Math.random())}`;
+      console.log(`  creating hub DB ${process.env.PGDATABASE}`); // eslint-disable-line no-console
+    }
     let bin = path.resolve(path.join(__dirname, '..', '..', 'packages', 'hub', 'bin', 'cardstack-hub.js'));
     spawn(process.execPath, [bin], { stdio: [0, 1, 2, 'ipc'] });
   }
