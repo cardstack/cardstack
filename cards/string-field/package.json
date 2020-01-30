@@ -1,7 +1,10 @@
 {
-  "name": "string-field",
+  "name": "@cardstack/string-field-card",
   "version": "0.0.0",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "@cardstack/core": "*",
     "@cardstack/hub": "*"

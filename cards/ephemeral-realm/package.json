@@ -1,8 +1,11 @@
 {
-  "name": "ephemeral-realm",
+  "name": "@cardstack/ephemeral-realm-card",
   "version": "0.0.0",
   "main": "index.js",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "@cardstack/core": "*",
     "@cardstack/hub": "*"

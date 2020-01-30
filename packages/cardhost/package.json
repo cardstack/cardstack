@@ -28,6 +28,10 @@
     "test": "ember test"
   },
   "devDependencies": {
+    "@cardstack/base-card": "*",
+    "@cardstack/boolean-field-card": "*",
+    "@cardstack/integer-field-card": "*",
+    "@cardstack/string-field-card": "*",
     "@cardstack/core": "0.16.22",
     "@cardstack/eslint-config": "0.16.22",
     "@cardstack/hub": "0.16.22",
