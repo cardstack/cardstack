@@ -1,29 +1,31 @@
-<CardhostLeftEdge />
+<CardhostLeftEdge @mode="index-page" />
 
-<div class="cardhost-welcome-page{{unless this.cardstackSession.isAuthenticated " no-navbar"}}">
+<div class="cardhost-catalog {{unless this.cardstackSession.isAuthenticated "no-navbar"}}">
+  <h1 class="cardhost-catalog--title">Card Builder</h1>
+
   {{#if this.cardstackSession.isAuthenticated}}
-    <nav class="cardhost-welcome-left-edge--nav" data-test-cardhost-welcome-left-edge>
+    <nav class="cardhost-catalog--nav" data-test-cardhost-welcome-left-edge>
       <ul>
         <li>
-          <button {{on "click" (fn this.scrollToSection "recent-cards")}} class="left-edge-icon {{if (eq this.selectedSection "recent-cards") "active"}}">
+          <button {{on "click" (fn this.scrollToSection "recent-cards")}} class="cardhost-catalog--nav-button {{if (eq this.selectedSection "recent-cards") "active"}}">
             {{svg-jar "clock" width="15px" height="15px" aria-hidden="true"}}
             Recent Cards
           </button>
         </li>
         <li>
-          <button {{on "click" (fn this.scrollToSection "saved-templates")}} class="left-edge-icon {{if (eq this.selectedSection "saved-templates") "active"}}">
+          <button {{on "click" (fn this.scrollToSection "saved-templates")}} class="cardhost-catalog--nav-button {{if (eq this.selectedSection "saved-templates") "active"}}">
             {{svg-jar "saved" width="15px" height="15px" aria-hidden="true"}}
             Saved Templates
           </button>
         </li>
         <li>
-          <button {{on "click" (fn this.scrollToSection "common-cards")}} class="left-edge-icon {{if (eq this.selectedSection "common-cards") "active"}}">
+          <button {{on "click" (fn this.scrollToSection "common-cards")}} class="cardhost-catalog--nav-button {{if (eq this.selectedSection "common-cards") "active"}}">
             {{svg-jar "cards" width="15px" height="15px" aria-hidden="true"}}
             Common Cards
           </button>
         </li>
         <li>
-          <button {{on "click" (fn this.scrollToSection "add-card")}} class="left-edge-icon {{if (eq this.selectedSection "add-card") "active"}}">
+          <button {{on "click" (fn this.scrollToSection "add-card")}} class="cardhost-catalog--nav-button {{if (eq this.selectedSection "add-card") "active"}}">
             {{svg-jar "add" width="15px" height="15px" aria-hidden="true"}}
             New Blank Card
           </button>
@@ -32,7 +34,7 @@
     </nav>
   {{/if}}
 
-  <main class="cardhost-catalog">
+  <main class="cardhost-catalog--main">
     {{#if this.cardstackSession.isAuthenticated}}
       <section class="cardhost-section cardhost-section--recent-cards">
         <header class="cardhost-section--header recent-cards">

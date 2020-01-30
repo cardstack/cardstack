@@ -3,19 +3,19 @@
   class="cardhost-left-edge"
   data-test-cardhost-left-edge
 >
-  <nav 
+  <nav
     class="cardhost-left-edge--nav {{@mode}} {{if this.isExpanded "expanded"}}"
   >
     <ul>
       <li class="login-grid">
-        <button 
-          class="ch-button ch-button--icon-secondary button-cardstack-logo"
+        <button
+          class="cardhost-left-edge--nav-button cardstack-logo-button"
           aria-label="expandable menu with login controls"
           aria-expanded={{this.isExpanded}}
           {{on "click" this.toggleMenuExpand}}
           data-test-toggle-left-edge
         >
-          {{svg-jar "cardstack-logo" width="18px" height="20px"}}
+          {{svg-jar "cardstack-logo" width="21px" height="23px"}}
         </button>
         {{#if this.isExpanded}}
           <div
@@ -26,7 +26,7 @@
             <h1>Cardstack Builder</h1>
             <CardstackSession as |session|>
               {{#if session.isAuthenticated }}
-                <button 
+                <button
                   {{on "click" (fn this.logout session.logout)}}
                   class="cardhost-left-edge-login-buttons"
                   data-test-logout-button
@@ -49,18 +49,18 @@
         {{/if}}
       </li>
       <li>
-        <button disabled class="catalog ch-button ch-button--icon-secondary" aria-label="catalog">
-          {{svg-jar "catalog" width="18px" height="20px"}}
+        <button disabled class="cardhost-left-edge--nav-button card-catalog-button" aria-label="catalog">
+          {{svg-jar "card-catalog" width="20px" height="20px"}}
         </button>
       </li>
       <li>
         <LinkTo
           @route="index"
           data-test-library-link
-          class="ch-button ch-button--icon-secondary"
+          class="cardhost-left-edge--nav-button library-button"
           title="Library"
         >
-          {{svg-jar "library" width="20px" height="38px"}}
+          {{svg-jar "library" width="21px" height="13px"}}
         </LinkTo>
       </li>
     </ul>

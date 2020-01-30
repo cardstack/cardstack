@@ -57,7 +57,7 @@ Until that work is done we are statically adding this css
 
 :root {
   --ch-font-family: 'Open Sans', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --ch-left-edge-navbar-width: 65px;
+  --ch-left-edge-navbar-width: 80px;
   --ch-left-edge-panel-width: 330px;
   --ch-right-edge-panel-width: 330px;
 
