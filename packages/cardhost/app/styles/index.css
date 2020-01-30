@@ -1,6 +1,9 @@
 .cardhost-welcome-page {
   --welcome-navbar-width: 255px;
   --welcome-placeholder-card: #acaac6;
+  --starter-page-background: #f6f5fa;
+  --starter-page-card-hover: rgba(0,0,0,0.1);
+
   display: grid;
   grid-template-columns: var(--welcome-navbar-width) 1fr;
   grid-template-areas: "navbar main";
@@ -10,7 +13,10 @@
   height: 100vh;
   margin: 0;
   padding-left: var(--ch-left-edge-navbar-width);
+  background-color: var(--starter-page-background);
+  color: var(--ch-dark);
 }
+
 .cardhost-welcome-page.no-navbar {
   grid-template-columns: 1fr;
   grid-template-areas: "main main";
@@ -26,6 +32,10 @@
   grid-area: main;
   max-width: 100%;
   padding: 60px 30px 0;
+}
+
+.cardhost-welcome-page.no-navbar > main {
+  padding-left: 60px;
 }
 
 
@@ -56,14 +66,11 @@
 }
 
 .cardhost-welcome-left-edge--nav ul li .left-edge-icon {
-  --icon-color: var(--ch-light-op50);
   display: flex;
   align-items: center;
-  color: var(--ch-light-op50);
-  fill: var(--ch-light-op50);
-  stroke: var(--ch-light-op50);
+  color: var(--ch-foreground);
 
-  transition: color var(--ch-card-transition-duration), fill var(--ch-card-transition-duration), stroke var(--ch-card-transition-duration);
+  transition: color var(--ch-card-transition-duration);
 }
 
 .cardhost-welcome-left-edge--nav ul li .left-edge-icon > svg {
@@ -72,15 +79,11 @@
 
 .cardhost-welcome-left-edge--nav ul li .left-edge-icon:hover,
 .cardhost-welcome-left-edge--nav ul li .left-edge-icon.active {
-  --icon-color: var(--ch-highlight);
-  color: var(--ch-light);
-  fill: var(--ch-highlight);
+  color: var(--ch-dark);
 }
 
 .cardhost-welcome-left-edge--nav ul li .left-edge-icon:focus {
-  --icon-color: var(--ch-highlight);
-  color: var(--ch-highlight);
-  fill: var(--ch-highlight);
+  color: var(--ch-dark);
   outline: 0;
 }
 
@@ -100,7 +103,7 @@
 }
 
 .cardhost-section + .cardhost-section {
-  border-top: solid 1px var(--ch-border);
+  border-top: solid 1px var(--ch-light-op60);
 }
 
 .cardhost-section--header {
@@ -112,13 +115,7 @@
 }
 
 .cardhost-section--header svg {
-  --icon-color: var(--ch-highlight);
   margin-right: 20px;
-  fill: var(--ch-highlight);
-}
-
-.cardhost-section--header .permalink {
-  font-size: 36px;
 }
 
 
@@ -132,25 +129,10 @@
   margin: 0;
 }
 
-.card-catalog a {
-  display: block;
-}
-
 .card-catalog > * {
   width: 225px;
   margin: 0;
   padding: 0;
-}
-
-.card-catalog > .cs-component-cta {
-  position: relative;
-  text-align: left;
-}
-
-.card-catalog a {
-  display: block;
-  /* relative so that the labels can be absolutely positioned */
-  position: relative;
 }
 
 .card-catalog > * > *,
@@ -170,9 +152,14 @@
 .card-catalog > *:hover > * > .card-catalog--embedded-card-placeholder,
 .card-catalog > *:focus > * > .card-catalog--embedded-card-placeholder {
   transform: scale(0.9);
-  box-shadow: 0px 0px 0px 35px var(--ch-hover);
+  box-shadow: 0px 0px 0px 35px var(--starter-page-card-hover);
 }
+
+.card-catalog--embedded-card-link,
+.card-catalog--embedded-card-link:hover,
 .card-catalog--embedded-card-link:focus {
+  --cs-button-hover: transparent;
+  background: none;
   outline: 0;
 }
 
@@ -200,16 +187,18 @@
   width: 225px;
   height: auto;
   padding-top: 30px;
+  color: var(--ch-dark);
   font-size: 13px;
+  font-weight: 400;
   text-align: center;
 }
 
 .card-catalog > *:hover .embedded-card-label {
-  color: var(--ch-light);
+  color: var(--ch-dark);
 }
 
 .card-catalog--embedded-card-link:focus .embedded-card-label {
-  color: var(--ch-highlight);
+  color: var(--ch-dark);
 }
 
 /* Featured cards section */
@@ -232,7 +221,7 @@
   .cardhost-welcome-page {
     display: block;
     min-width: auto;
-    padding-left: 80px;
+    padding-left: 60px;
   }
 
   .cardhost-welcome-left-edge--nav {

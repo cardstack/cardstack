@@ -56,7 +56,7 @@
         <div class="card-catalog">
           {{#each this.model.templates as |card|}}
             <Cta {{on "click" (fn this.openCardNameDialog "Adopt a Card" card)}}
-              @class="card-catalog--embedded-card-link"
+              class="card-catalog--embedded-card-link"
               data-test-embedded-card={{card.name}}
               data-test-adopt-card-btn
             >
@@ -100,14 +100,12 @@
 
       <section class="cardhost-section cardhost-section--add-card">
         <header class="cardhost-section--header add-card">
-          <a href="#new-blank-card" title="New Blank Card" class="permalink">
-            {{svg-jar "add" width="28px" height="28px"}}
-          </a>
+          {{svg-jar "add" width="28px" height="28px"}}
           New Blank Card
         </header>
         <div class="card-catalog">
           <Cta {{on "click" (fn this.openCardNameDialog "Create a New Card")}}
-            @class="card-catalog--embedded-card-link"
+            class="card-catalog--embedded-card-link"
             data-test-new-blank-card-btn
           >
             <div>
