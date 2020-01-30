@@ -10,7 +10,7 @@ import CardstackError from '@cardstack/core/error';
 import { SessionContext } from './authentication-middleware';
 import { assertSingleResourceDoc } from './jsonapi';
 import { myOrigin } from '@cardstack/core/origin';
-import { makePristineCollection, apiPrefix, AddressableCard, CardId } from '@cardstack/core/card';
+import { makeCollection, apiPrefix, AddressableCard, CardId } from '@cardstack/core/card';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { parse } from 'qs';
 import { assertQuery } from '@cardstack/core/query';
@@ -102,7 +102,7 @@ export default class JSONAPIMiddleware {
       }
     }
     let card = await this.cards.as(ctxt.state.cardstackSession).create(realm.href, body);
-    ctxt.body = (await card.asPristineDoc()).jsonapi;
+    ctxt.body = await card.serializeAsJsonAPIDoc();
     ctxt.status = 201;
     ctxt.set('location', this.localURLFor(card));
   }
@@ -110,7 +110,7 @@ export default class JSONAPIMiddleware {
   async getCard(ctxt: KoaRoute.Context<SessionContext, {}>) {
     let card = await this.cards.as(ctxt.state.cardstackSession).get(cardIdFromRoute(ctxt));
     let rules = this.occlusionRulesFromRequest(ctxt);
-    ctxt.body = (await card.asPristineDoc(rules)).jsonapi;
+    ctxt.body = await card.serializeAsJsonAPIDoc(rules);
     ctxt.status = 200;
   }
 
@@ -123,7 +123,7 @@ export default class JSONAPIMiddleware {
   async patchCard(ctxt: KoaRoute.Context<SessionContext, {}>) {
     let body = this.documentFromBody(ctxt);
     let card = await this.cards.as(ctxt.state.cardstackSession).update(cardIdFromRoute(ctxt), body);
-    ctxt.body = (await card.asPristineDoc()).jsonapi;
+    ctxt.body = await card.serializeAsJsonAPIDoc();
     ctxt.status = 200;
   }
 
@@ -133,8 +133,8 @@ export default class JSONAPIMiddleware {
 
     let { cards, meta } = await this.cards.as(ctxt.state.cardstackSession).search(query);
     let rules = this.occlusionRulesFromRequest(ctxt);
-    let collection = await makePristineCollection(cards, meta, rules);
-    ctxt.body = collection.jsonapi;
+    let collection = await makeCollection(cards, meta, rules);
+    ctxt.body = collection;
     ctxt.status = 200;
   }
 

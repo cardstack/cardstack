@@ -1,11 +1,12 @@
 import CardstackError from './error';
-import { PristineDocument, UpstreamDocument, UpstreamIdentity, PristineCollection, ResponseMeta } from './document';
+import { UpstreamDocument, UpstreamIdentity, ResponseMeta } from './document';
 import {
   SingleResourceDoc,
   RelationshipObject,
   ResourceObject,
   AttributesObject,
   RelationshipsObject,
+  CollectionResourceDoc,
 } from 'jsonapi-typescript';
 import cloneDeep from 'lodash/cloneDeep';
 import isPlainObject from 'lodash/isPlainObject';
@@ -19,7 +20,6 @@ import isObjectLike from 'lodash/isObjectLike';
 import * as J from 'json-typescript';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
 import {
-  OcclusionRules,
   OcclusionFieldSets,
   InnerOcclusionRules,
   assertOcclusionFieldSets,
@@ -78,16 +78,21 @@ export function asCardId(idOrURL: CardId | string): CardId {
 
 export const cardstackFieldPattern = /^cs[A-Z]/;
 
-export async function makePristineCollection(
+export async function makeCollection(
   cards: AddressableCard[],
   meta: ResponseMeta,
-  rules: OcclusionRules | undefined
-): Promise<PristineCollection> {
-  let pristineDocs = await Promise.all(cards.map(card => card.asPristineDoc(rules)));
-  return new PristineCollection({
-    data: pristineDocs.map(doc => doc.jsonapi.data),
+  rules?: OcclusionRulesOrDefaults
+): Promise<CollectionResourceDoc> {
+  let pristineDocs = await Promise.all(cards.map(card => card.serializeAsJsonAPIDoc(rules)));
+  let doc: CollectionResourceDoc = {
+    data: pristineDocs.map(doc => doc.data),
     meta: (meta as unknown) as J.Object,
-  });
+  };
+  let included = uniqBy(flatten(pristineDocs.map(i => i.included).filter(Boolean)), 'id') as ResourceObject[];
+  if (included.length) {
+    doc.included = included;
+  }
+  return doc;
 }
 
 export class Card {
@@ -634,7 +639,7 @@ export class Card {
   }
 
   // we might wanna think about getting rid of the PristineDocument Type and just use this instead...
-  async serializeAsJsonAPIDoc(rules: OcclusionRulesOrDefaults): Promise<SingleResourceDoc> {
+  async serializeAsJsonAPIDoc(rules: OcclusionRulesOrDefaults = 'everything'): Promise<SingleResourceDoc> {
     let includedMap = new Map<string, OcclusionRulesOrDefaults[]>();
     let data = await this.serialize(rules, includedMap);
     let jsonapi: SingleResourceDoc = { data };
@@ -647,10 +652,6 @@ export class Card {
 
   async asUpstreamDoc(): Promise<UpstreamDocument> {
     return new UpstreamDocument(await this.serializeAsJsonAPIDoc('upstream'));
-  }
-
-  async asPristineDoc(rules: OcclusionRulesOrDefaults = 'everything'): Promise<PristineDocument> {
-    return new PristineDocument(await this.serializeAsJsonAPIDoc(rules));
   }
 
   async asSearchDoc(visitedCards: string[] = []): Promise<J.Object> {

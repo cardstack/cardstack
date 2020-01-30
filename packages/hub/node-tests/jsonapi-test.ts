@@ -372,6 +372,8 @@ describe('hub/jsonapi', function() {
 
       expect(response).hasStatus(200);
       expect(response.body?.data.length).to.equal(2);
+      expect(response.body?.included.length).to.equal(1);
+      expect(response.body?.included[0].id).to.equal(canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }));
       assertCollectionResourceDoc(response.body);
     });
 

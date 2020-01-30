@@ -544,7 +544,7 @@ export class Batch implements BatchedIndexUpdate {
       cs_realm: param(card.csRealm),
       cs_original_realm: param(card.csOriginalRealm),
       cs_id: param(card.csId),
-      pristine_doc: param(((await card.asPristineDoc()).jsonapi as unknown) as JSON.Object),
+      pristine_doc: param(((await card.serializeAsJsonAPIDoc()) as unknown) as JSON.Object),
       search_doc: param(((await card.asSearchDoc()) as unknown) as JSON.Object),
       generation: param(this.generations[card.csRealm] || null),
     };

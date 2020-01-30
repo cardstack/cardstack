@@ -52,7 +52,7 @@ describe('hub/card-service', function() {
     it("adds upstream data source's version to the card's meta", async function() {
       let doc = cardDocument();
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
-      expect((await card.asPristineDoc()).jsonapi.data.meta?.version).to.be.ok;
+      expect((await card.serializeAsJsonAPIDoc()).data.meta?.version).to.be.ok;
     });
 
     it('can create a card that adopts from another', async function() {
@@ -103,7 +103,7 @@ describe('hub/card-service', function() {
           data: {
             type: 'cards',
             attributes: {
-              csAdoptsFrom: ((await parentCard.asPristineDoc()).jsonapi.data as unknown) as Value,
+              csAdoptsFrom: ((await parentCard.serializeAsJsonAPIDoc()).data as unknown) as Value,
             },
           },
         });
@@ -118,12 +118,12 @@ describe('hub/card-service', function() {
       let doc = cardDocument().withAutoAttributes({ foo: 'bar' });
       let storage = await env.container.lookup('ephemeralStorage');
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
-      let version = (await card.asPristineDoc()).jsonapi.data.meta?.version as number;
+      let version = (await card.serializeAsJsonAPIDoc()).data.meta?.version as number;
 
-      let jsonapi = (await card.asPristineDoc()).jsonapi;
+      let jsonapi = await card.serializeAsJsonAPIDoc();
       jsonapi.data.attributes!.foo = 'poo';
       card = await service.update(card, jsonapi);
-      let newVersion = (await card.asPristineDoc()).jsonapi.data.meta?.version as number;
+      let newVersion = (await card.serializeAsJsonAPIDoc()).data.meta?.version as number;
 
       expect(await card.value('foo')).to.equal('poo');
       expect(newVersion).to.be.ok;
@@ -135,7 +135,7 @@ describe('hub/card-service', function() {
       let doc = cardDocument().withAutoAttributes({ foo: 'bar' });
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
 
-      let jsonapi = (await card.asPristineDoc()).jsonapi;
+      let jsonapi = await card.serializeAsJsonAPIDoc();
       jsonapi.data.attributes!.foo = 'poo';
       card = await service.update(card.canonicalURL, jsonapi);
 
@@ -146,7 +146,7 @@ describe('hub/card-service', function() {
       let doc = cardDocument().withAutoAttributes({ foo: 'bar', hello: 'world' });
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
 
-      let jsonapi = (await card.asPristineDoc()).jsonapi;
+      let jsonapi = await card.serializeAsJsonAPIDoc();
       jsonapi.data.attributes!.foo = 'poo';
       delete jsonapi.data.attributes!.hello;
 
@@ -160,7 +160,7 @@ describe('hub/card-service', function() {
       let doc = cardDocument().withAutoAttributes({ foo: 'bar' });
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
 
-      let jsonapi = (await card.asPristineDoc()).jsonapi;
+      let jsonapi = await card.serializeAsJsonAPIDoc();
       jsonapi.data.attributes!.foo = 'poo';
       delete jsonapi.data.meta!.version;
 
@@ -177,7 +177,7 @@ describe('hub/card-service', function() {
       let doc = cardDocument();
       let storage = await env.container.lookup('ephemeralStorage');
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
-      let version = (await card.asPristineDoc()).jsonapi.data.meta?.version as number;
+      let version = (await card.serializeAsJsonAPIDoc()).data.meta?.version as number;
       expect(storage.entriesNewerThan(card.csRealm).filter(entry => Boolean(entry.doc)).length).to.equal(1);
 
       await service.delete(card, version);
@@ -194,7 +194,7 @@ describe('hub/card-service', function() {
     it('can delete a card by canonical URL', async function() {
       let doc = cardDocument();
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
-      let version = (await card.asPristineDoc()).jsonapi.data.meta?.version as number;
+      let version = (await card.serializeAsJsonAPIDoc()).data.meta?.version as number;
 
       await service.delete(card.canonicalURL, version);
 
@@ -210,7 +210,7 @@ describe('hub/card-service', function() {
       let doc = cardDocument();
       let storage = await env.container.lookup('ephemeralStorage');
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
-      let version = (await card.asPristineDoc()).jsonapi.data.meta?.version as number;
+      let version = (await card.serializeAsJsonAPIDoc()).data.meta?.version as number;
       let badVersion = version - 1;
 
       try {
@@ -591,7 +591,7 @@ describe('hub/card-service', function() {
                 friend: cardDocument()
                   .withAttributes({
                     name: 'Mango',
-                    address: (await homeAddress.asPristineDoc()).jsonapi.data,
+                    address: (await homeAddress.serializeAsJsonAPIDoc()).data,
                   })
                   .withRelationships({ address: homeAddress })
                   .adoptingFrom(friendCard).asCardValue,
@@ -1269,7 +1269,7 @@ describe('hub/card-service', function() {
           cardDocument()
             .withAttributes({
               name: 'Hassan',
-              puppy: (await vanGogh.asPristineDoc()).jsonapi.data,
+              puppy: (await vanGogh.serializeAsJsonAPIDoc()).data,
             })
             .adoptingFrom(onlyPuppyOwnerCardByVal).jsonapi
         );
@@ -1278,7 +1278,7 @@ describe('hub/card-service', function() {
           cardDocument()
             .withAttributes({
               name: 'Mariko',
-              puppy: (await mango.asPristineDoc()).jsonapi.data,
+              puppy: (await mango.serializeAsJsonAPIDoc()).data,
             })
             .adoptingFrom(onlyPuppyOwnerCardByVal).jsonapi
         );
@@ -1324,7 +1324,7 @@ describe('hub/card-service', function() {
           cardDocument()
             .withAttributes({
               name: 'Mariko',
-              puppies: [(await vanGogh.asPristineDoc()).jsonapi.data, (await mango.asPristineDoc()).jsonapi.data],
+              puppies: [(await vanGogh.serializeAsJsonAPIDoc()).data, (await mango.serializeAsJsonAPIDoc()).data],
             })
             .adoptingFrom(ownerCardByVal).jsonapi
         );
@@ -1333,7 +1333,7 @@ describe('hub/card-service', function() {
           cardDocument()
             .withAttributes({
               name: 'Hassan',
-              puppies: [(await vanGogh.asPristineDoc()).jsonapi.data, (await mango.asPristineDoc()).jsonapi.data],
+              puppies: [(await vanGogh.serializeAsJsonAPIDoc()).data, (await mango.serializeAsJsonAPIDoc()).data],
             })
             .adoptingFrom(ownerCardByVal).jsonapi
         );
@@ -1343,7 +1343,7 @@ describe('hub/card-service', function() {
           cardDocument()
             .withAttributes({
               name: 'Dog Heaven',
-              puppies: [(await ringo.asPristineDoc()).jsonapi.data],
+              puppies: [(await ringo.serializeAsJsonAPIDoc()).data],
             })
             .adoptingFrom(ownerCardByVal).jsonapi
         );
@@ -1958,7 +1958,7 @@ describe('hub/card-service', function() {
       });
 
       it('recursively includes all resources and fields when getting the pristine doc if no rules are provided', async function() {
-        let { jsonapi: doc } = await daddy.asPristineDoc();
+        let doc = await daddy.serializeAsJsonAPIDoc();
 
         expect(doc).to.have.nested.property('data.type', 'cards');
         expect(doc).to.have.nested.property('data.id', daddy.canonicalURL);
@@ -2010,14 +2010,14 @@ describe('hub/card-service', function() {
       });
 
       it('can include a primitive field when getting the pristine doc', async function() {
-        let { jsonapi: doc } = await vanGogh.asPristineDoc({ includeFields: ['name'] });
+        let doc = await vanGogh.serializeAsJsonAPIDoc({ includeFields: ['name'] });
         expect(doc).to.have.nested.property('data.attributes.name', 'Van Gogh');
         expect(doc).to.not.have.nested.property('data.attributes.favoriteToy');
         expect(doc).to.not.have.property('included');
       });
 
       it('can occlude all user fields when an empty rule "{}" is specified', async function() {
-        let { jsonapi: doc } = await daddy.asPristineDoc({});
+        let doc = await daddy.serializeAsJsonAPIDoc({});
         expect(doc).to.have.nested.property('data.type', 'cards');
         expect(doc).to.have.nested.property('data.id', daddy.canonicalURL);
         expect(doc).to.not.have.nested.property('data.attributes.name');
@@ -2026,7 +2026,7 @@ describe('hub/card-service', function() {
       });
 
       it('does not occlude system fields as part of evaluating the occusion rules', async function() {
-        let { jsonapi: doc } = await ownerCard.asPristineDoc({});
+        let doc = await ownerCard.serializeAsJsonAPIDoc({});
         expect(doc.data.attributes?.csId).to.be.ok;
         expect(doc.data.attributes?.csRealm).to.ok;
         expect(doc.data.attributes?.csFields).to.be.ok;
@@ -2037,7 +2037,7 @@ describe('hub/card-service', function() {
       // (see test above), but we can include a rule to include the adoptsFrom
       // resource in the resulting document.
       it('can include a csAdoptsFrom reference', async function() {
-        let { jsonapi: doc } = await vanGogh.asPristineDoc({ includeFields: ['csAdoptsFrom'] });
+        let doc = await vanGogh.serializeAsJsonAPIDoc({ includeFields: ['csAdoptsFrom'] });
         expect(doc).to.not.have.nested.property('data.attributes.name', 'Van Gogh');
         expect(doc).to.not.have.nested.property('data.attributes.favoriteToy');
         let included = doc.included as any[];
@@ -2046,7 +2046,7 @@ describe('hub/card-service', function() {
       });
 
       it('can include a field filled by card-as-value when getting the pristine doc', async function() {
-        let { jsonapi: doc } = await vanGogh.asPristineDoc({ includeFields: ['favoriteToy'] });
+        let doc = await vanGogh.serializeAsJsonAPIDoc({ includeFields: ['favoriteToy'] });
         expect(doc).to.not.have.nested.property('data.attributes.name');
         expect(doc).to.have.nested.property('data.attributes.favoriteToy');
         expect(doc).to.have.deep.nested.property('data.attributes.favoriteToy.relationships.csAdoptsFrom.data', {
@@ -2058,7 +2058,7 @@ describe('hub/card-service', function() {
       });
 
       it('can include a field filled by card-as-reference when getting the pristine doc', async function() {
-        let { jsonapi: doc } = await mango.asPristineDoc({ includeFields: ['favoriteToy'] });
+        let doc = await mango.serializeAsJsonAPIDoc({ includeFields: ['favoriteToy'] });
         expect(doc).to.not.have.nested.property('data.attributes.name');
         expect(doc).to.have.deep.nested.property('data.relationships.favoriteToy.data', {
           type: 'cards',
@@ -2071,7 +2071,7 @@ describe('hub/card-service', function() {
       });
 
       it('can include an interior card-as-value field when getting the pristine doc', async function() {
-        let { jsonapi: doc } = await vanGogh.asPristineDoc({
+        let doc = await vanGogh.serializeAsJsonAPIDoc({
           includeFields: [{ name: 'favoriteToy', includeFields: ['description'] }],
         });
         expect(doc).to.not.have.nested.property('data.attributes.name');
@@ -2085,7 +2085,7 @@ describe('hub/card-service', function() {
       });
 
       it('can include an interior card-as-reference field when getting the pristine doc', async function() {
-        let { jsonapi: doc } = await mango.asPristineDoc({
+        let doc = await mango.serializeAsJsonAPIDoc({
           includeFields: [{ name: 'favoriteToy', includeFields: ['description'] }],
         });
         expect(doc).to.not.have.nested.property('data.attributes.name');
@@ -2100,7 +2100,7 @@ describe('hub/card-service', function() {
       });
 
       it('can include an interior card-as-reference field from a field with arity > 1 when getting the pristine doc', async function() {
-        let { jsonapi: doc } = await daddy.asPristineDoc({
+        let doc = await daddy.serializeAsJsonAPIDoc({
           includeFields: [
             {
               name: 'puppies',
@@ -2143,7 +2143,7 @@ describe('hub/card-service', function() {
       });
 
       it('can include an interior card-as-value field from a field with arity > 1 when getting the pristine doc', async function() {
-        let { jsonapi: doc } = await mommy.asPristineDoc({
+        let doc = await mommy.serializeAsJsonAPIDoc({
           includeFields: [
             {
               name: 'puppies',
@@ -2178,7 +2178,7 @@ describe('hub/card-service', function() {
       });
 
       it('can include fields based on csFieldSets in a card', async function() {
-        let { jsonapi: doc } = await daddy.asPristineDoc({
+        let doc = await daddy.serializeAsJsonAPIDoc({
           includeFieldSet: 'isolated',
         });
         expect(doc).to.have.nested.property('data.attributes.name');
@@ -2202,7 +2202,7 @@ describe('hub/card-service', function() {
       });
 
       it('can include fields based on csFieldSets in a card and specified include fields', async function() {
-        let { jsonapi: doc } = await daddy.asPristineDoc({
+        let doc = await daddy.serializeAsJsonAPIDoc({
           includeFieldSet: 'isolated',
           includeFields: [
             {
@@ -2251,7 +2251,7 @@ describe('hub/card-service', function() {
       });
 
       it('can include fields based on csFieldSets that overrides inherited csFieldSets', async function() {
-        let { jsonapi: doc } = await mommy.asPristineDoc({
+        let doc = await mommy.serializeAsJsonAPIDoc({
           includeFieldSet: 'embedded',
         });
         expect(doc).to.have.nested.property('data.attributes.name', 'Mariko');
@@ -2260,7 +2260,7 @@ describe('hub/card-service', function() {
       });
 
       it('does not return user fields if the card does not have csFieldSet rules for the requested field-set', async function() {
-        let { jsonapi: doc } = await daddy.asPristineDoc({
+        let doc = await daddy.serializeAsJsonAPIDoc({
           includeFieldSet: 'embedded',
         });
         expect(doc).to.have.nested.property('data.type', 'cards');
@@ -2275,7 +2275,7 @@ describe('hub/card-service', function() {
       });
 
       it('can handle an included card that has a relationship to the primary card', async function() {
-        let { jsonapi: doc } = await personA.asPristineDoc();
+        let doc = await personA.serializeAsJsonAPIDoc();
         let included = doc.included as any[];
         expect(included.length).to.equal(4);
         let ids = included.map(i => i.id);
@@ -2293,7 +2293,7 @@ describe('hub/card-service', function() {
       });
 
       it('can handle an included card that has a relationship to the primary card in arity > 1 field', async function() {
-        let { jsonapi: doc } = await personC.asPristineDoc();
+        let doc = await personC.serializeAsJsonAPIDoc();
         let included = doc.included as any[];
         expect(included.length).to.equal(6);
         let ids = included.map(i => i.id);
@@ -2314,7 +2314,7 @@ describe('hub/card-service', function() {
       });
 
       it('can handle a cycle within the included cards', async function() {
-        let { jsonapi: doc } = await personE.asPristineDoc();
+        let doc = await personE.serializeAsJsonAPIDoc();
         let included = doc.included as any[];
         expect(included.length).to.equal(5);
         let ids = included.map(i => i.id);
@@ -2338,7 +2338,7 @@ describe('hub/card-service', function() {
       });
 
       it('can handle a primary card that is related to itself', async function() {
-        let { jsonapi: doc } = await personH.asPristineDoc();
+        let doc = await personH.serializeAsJsonAPIDoc();
         let included = doc.included as any[];
         expect(included.length).to.equal(3);
         let ids = included.map(i => i.id);

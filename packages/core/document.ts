@@ -1,15 +1,5 @@
-import { SingleResourceDoc, CollectionResourceDoc } from 'jsonapi-typescript';
+import { SingleResourceDoc } from 'jsonapi-typescript';
 import { CardId } from './card';
-
-export class PristineDocument {
-  kind = 'pristine';
-  constructor(public jsonapi: SingleResourceDoc) {}
-}
-
-export class PristineCollection {
-  kind = 'pristine-collection';
-  constructor(public jsonapi: CollectionResourceDoc) {}
-}
 
 export class UpstreamDocument {
   kind = 'upstream';

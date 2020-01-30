@@ -207,7 +207,7 @@ module('Unit | Service | data', function() {
       let service = this.owner.lookup('service:data') as DataService;
       let card = await service.load(daddy);
 
-      let { jsonapi: doc } = await card.asPristineDoc('everything');
+      let doc = await card.serializeAsJsonAPIDoc('everything');
       assert.equal(doc.data.type, 'cards');
       assert.equal(doc.data.id, daddy.canonicalURL);
       assert.equal(doc.data.attributes?.name, 'Hassan');
@@ -253,7 +253,7 @@ module('Unit | Service | data', function() {
       let service = this.owner.lookup('service:data') as DataService;
       let card = await service.load(daddy);
 
-      let { jsonapi: doc } = await card.asPristineDoc({
+      let doc = await card.serializeAsJsonAPIDoc({
         includeFieldSet: 'isolated',
       });
       assert.ok(doc.data.attributes?.name);
@@ -279,7 +279,7 @@ module('Unit | Service | data', function() {
     test('it can get a card with embedded fieldset format', async function(assert) {
       let service = this.owner.lookup('service:data') as DataService;
       let card = await service.load(mommy);
-      let { jsonapi: doc } = await card.asPristineDoc({
+      let doc = await card.serializeAsJsonAPIDoc({
         includeFieldSet: 'embedded',
       });
       assert.ok(doc.data.attributes?.name, 'Mariko');
@@ -290,7 +290,7 @@ module('Unit | Service | data', function() {
     test('it can get a card with specific field includes', async function(assert) {
       let service = this.owner.lookup('service:data') as DataService;
       let card = await service.load(vanGogh);
-      let { jsonapi: doc } = await card.asPristineDoc({ includeFields: ['name'] });
+      let doc = await card.serializeAsJsonAPIDoc({ includeFields: ['name'] });
       assert.equal(doc.data.attributes?.name, 'Van Gogh');
       assert.notOk(doc.data.attributes?.favoriteToy);
       assert.notOk(doc.included);
@@ -300,7 +300,7 @@ module('Unit | Service | data', function() {
       let service = this.owner.lookup('service:data') as DataService;
       let card = await service.load(daddy);
 
-      let { jsonapi: doc } = await card.asPristineDoc({
+      let doc = await card.serializeAsJsonAPIDoc({
         includeFieldSet: 'isolated',
         includeFields: [
           {
