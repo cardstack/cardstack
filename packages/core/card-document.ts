@@ -7,7 +7,7 @@ export class CardDocument {
   private parent: CardId | undefined;
   private csFieldValues: Map<string, any> = new Map();
   private userFieldValues: Map<string, any> = new Map();
-  private userFieldRefs: Map<string, CardId | CardId[] | undefined> = new Map();
+  private userFieldRefs: Map<string, CardDocument | CardDocument[] | CardId | CardId[] | undefined> = new Map();
   private fields: Map<string, CardDocument | null> = new Map();
 
   csId?: string;
@@ -156,11 +156,12 @@ export class CardDocument {
     for (let [key, value] of this.userFieldRefs.entries()) {
       if (Array.isArray(value)) {
         relationships[key] = {
-          data: value.map(i => ({ type: 'cards', id: canonicalURL(i) })),
+          data: (value as any[]).map((i: CardId | CardDocument) => ({ type: 'cards', id: getRelatedCanonicalURL(i) })),
         };
-      } else {
+      } else if (value != null) {
+        let id = getRelatedCanonicalURL(value);
         relationships[key] = {
-          data: value == null ? null : { type: 'cards', id: canonicalURL(value) },
+          data: value == null ? null : { type: 'cards', id },
         };
       }
     }
@@ -281,4 +282,16 @@ interface FieldRefs {
 
 export function cardDocument(): CardDocument {
   return new CardDocument();
+}
+
+function getRelatedCanonicalURL(idOrDoc: CardDocument | CardId): string {
+  if (idOrDoc instanceof CardDocument) {
+    if (idOrDoc.csId == null || idOrDoc.csRealm == null) {
+      throw new Error(`Cannot create relationship in card document because related CardDocument is not addressable`);
+    }
+    return canonicalURL(idOrDoc as CardId);
+  } else if (idOrDoc) {
+    return canonicalURL(idOrDoc);
+  }
+  throw new Error(`Cannot create relationship in card document because there is no related card id`);
 }

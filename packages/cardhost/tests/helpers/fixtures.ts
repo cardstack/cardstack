@@ -12,7 +12,8 @@ import isPlainObject from 'lodash/isPlainObject';
 const hubURL = 'http://localhost:3000';
 
 export interface FixtureConfig {
-  create?: CardDocumentWithId[];
+  create?: CardDocument[];
+  csRealm?: string;
   destroy?: {
     cards?: CardId[];
     cardTypes?: CardId[];
@@ -39,6 +40,8 @@ export default class Fixtures {
       return;
     }
     let cardResources: ResourceObject[] = [];
+    assignCardIds(this.config.create, this.config.csRealm);
+
     for (let card of inDependencyOrder(this.config.create)) {
       cardResources.push(await createCard(card));
     }
@@ -178,4 +181,27 @@ function localURL(id: CardId, isCreate?: true): string {
     url = `${url}/${encodeURIComponent(csId)}`;
   }
   return url;
+}
+
+function makeId(): string {
+  return String(Math.floor(Math.random() * Number.MAX_SAFE_INTEGER));
+}
+
+function assignCardIds(cards: CardDocument[], csRealm?: string): asserts cards is CardDocumentWithId[] {
+  for (let card of cards) {
+    if (card.csId != null && card.csRealm != null) {
+      continue;
+    }
+
+    if (csRealm == null && card.csRealm == null) {
+      throw new Error(`Must specify csRealm in the Fixture constructor in order to assign test card's a csRealm.`);
+    }
+    if (card.csRealm == null) {
+      card.csRealm = csRealm;
+      card.csOriginalRealm = csRealm;
+    }
+    if (card.csId == null) {
+      card.csId = makeId();
+    }
+  }
 }

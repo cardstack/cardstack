@@ -11,9 +11,8 @@ import { CardReader } from '@cardstack/core/card-reader';
 import { loadModule } from '../utils/scaffolding';
 import { Query } from '@cardstack/core/query';
 import { stringify } from 'qs';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
-import { myOrigin } from '@cardstack/core/origin';
 import CardstackError from '@cardstack/core/error';
+import { OcclusionRules } from '@cardstack/core/occlusion-rules';
 
 export default class DataService extends Service implements CardInstantiator {
   @service cardstackSession!: CardstackSession;
@@ -41,11 +40,7 @@ export default class DataService extends Service implements CardInstantiator {
 
   async create(realm: string, doc: SingleResourceDoc): Promise<UnsavedCard> {
     // TODO need to instantiate this from the container
-    let card = new UnsavedCard(doc, realm, this.reader, this.moduleLoader, this.container, this);
-
-    let realmCard = await this.getRealm(realm);
-    await card.validate(null, realmCard);
-    return card;
+    return new UnsavedCard(doc, realm, this.reader, this.moduleLoader, this.container, this);
   }
 
   async save(card: UnsavedCard | AddressableCard): Promise<AddressableCard> {
@@ -67,16 +62,13 @@ export default class DataService extends Service implements CardInstantiator {
 
   async delete(card: AddressableCard): Promise<void> {
     let url = this.localURL(card as CardId);
-    let {
-      data: { meta = {} },
-    } = await card.serializeAsJsonAPIDoc({});
-    let { version } = meta;
+    let version = card.meta?.version || '';
 
     let response = await fetch(url, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/vnd.api+json',
-        'If-Match': String(version || ''),
+        'If-Match': String(version),
       },
     });
     if (!response.ok) {
@@ -84,11 +76,12 @@ export default class DataService extends Service implements CardInstantiator {
     }
   }
 
-  async load(idOrURL: CardId | string): Promise<AddressableCard> {
+  async load(idOrURL: CardId | string, rules: OcclusionRules | 'everything'): Promise<AddressableCard> {
     let id = asCardId(idOrURL);
-    // TODO This is loading "everything", with no occlusion. We should settle on
-    // a sane level of occusion.
     let url = this.localURL(id);
+    if (rules !== 'everything') {
+      url = `${url}?${stringify(rules)}`;
+    }
     let response = await fetch(url, {
       headers: {
         'Content-Type': 'application/vnd.api+json',
@@ -102,10 +95,12 @@ export default class DataService extends Service implements CardInstantiator {
     return await this.instantiate(json);
   }
 
-  async search(query: Query): Promise<AddressableCard[]> {
-    // TODO This is loading "everything", with no occlusion. We should settle on
-    // a sane level of occusion.
-    let response = await fetch(`${this.hubURL}/api/cards?${stringify(query)}`, {
+  async search(query: Query, rules: OcclusionRules | 'everything'): Promise<AddressableCard[]> {
+    let url = `${this.hubURL}/api/cards?${stringify(query)}`;
+    if (rules !== 'everything') {
+      url = `${url}&${stringify(rules)}`;
+    }
+    let response = await fetch(url, {
       headers: {
         'Content-Type': 'application/vnd.api+json',
       },
@@ -115,26 +110,6 @@ export default class DataService extends Service implements CardInstantiator {
     }
     let { data: cards } = (await response.json()) as CollectionResourceDoc;
     return await Promise.all(cards.map(data => this.instantiate({ data })));
-  }
-
-  // This is the same manner in which we get the realm card in
-  // @cardsatck/hub/card-services. maybe this can move into the Card class sin
-  // it looks like it wants to be isomorphic.
-  private async getRealm(realm: string): Promise<AddressableCard> {
-    let realms = await this.search({
-      filter: {
-        type: { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'realm' },
-        eq: {
-          csRealm: `${myOrigin}/api/realms/meta`,
-          csId: realm,
-        },
-      },
-    });
-
-    if (realms.length === 0) {
-      throw new CardstackError(`no such realm "${realm}"`, { status: 400 });
-    }
-    return realms[0];
   }
 
   private localURL(csRealm: string, csOriginalRealm?: string): string;
@@ -180,8 +155,10 @@ class Reader implements CardReader {
   async get(idOrURL: CardId | string): Promise<AddressableCard> {
     // TODO: this goes to the server, we'll eventually want to do something
     // smarter here, like return any supplied included resources that were
-    // passed into the Card.
-    return await this.dataService.load(idOrURL);
+    // passed into the Card. And if the subsequent loads occur, they may
+    // overfetch a resource that is needed in a different get for this
+    // card--let's harness any over fetching efficiently.
+    return await this.dataService.load(idOrURL, 'everything');
   }
 }
 

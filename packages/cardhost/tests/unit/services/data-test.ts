@@ -117,7 +117,7 @@ module('Unit | Service | data', function() {
 
     test('it can get a card by id', async function(assert) {
       let service = this.owner.lookup('service:data') as DataService;
-      let card = await service.load(mango);
+      let card = await service.load(mango, 'everything');
 
       assert.equal(card.csId, mango.csId, 'the csId is correct');
       assert.equal(card.csRealm, mango.csRealm, 'the csRealm is correct');
@@ -126,14 +126,17 @@ module('Unit | Service | data', function() {
 
     test('it can search for cards', async function(assert) {
       let service = this.owner.lookup('service:data') as DataService;
-      let foundCards = await service.search({
-        filter: {
-          type: puppyCard,
-          eq: {
-            name: 'Mango',
+      let foundCards = await service.search(
+        {
+          filter: {
+            type: puppyCard,
+            eq: {
+              name: 'Mango',
+            },
           },
         },
-      });
+        'everything'
+      );
 
       assert.equal(foundCards.length, 1, 'the correct number of cards is returned');
       assert.equal(foundCards[0].canonicalURL, mango.canonicalURL, 'the correct card is found');
@@ -141,7 +144,7 @@ module('Unit | Service | data', function() {
 
     test("it can get a value of a card's primitive fields", async function(assert) {
       let service = this.owner.lookup('service:data') as DataService;
-      let card = await service.load(vanGogh);
+      let card = await service.load(vanGogh, 'everything');
 
       assert.equal(await card.value('name'), 'Van Gogh', 'the user-field value is correct');
       assert.equal(await card.value('numberOfSpots'), 150, 'the user-field value is correct');
@@ -150,7 +153,7 @@ module('Unit | Service | data', function() {
 
     test('it can get a card-as-value value of a card field', async function(assert) {
       let service = this.owner.lookup('service:data') as DataService;
-      let card = await service.load(vanGogh);
+      let card = await service.load(vanGogh, 'everything');
 
       let toy = await card.value('favoriteToy');
       assert.ok(toy instanceof Card, 'user-field value deserialized correctly');
@@ -160,7 +163,7 @@ module('Unit | Service | data', function() {
 
     test('it can get a card-as-reference value of a card field', async function(assert) {
       let service = this.owner.lookup('service:data') as DataService;
-      let card = await service.load(mango);
+      let card = await service.load(mango, 'everything');
 
       let toy = await card.value('favoriteToy');
       assert.ok(toy instanceof AddressableCard, 'user-field value deserialized correctly');
@@ -173,7 +176,7 @@ module('Unit | Service | data', function() {
 
     test('it can get a card-as-value value of a card artity > 1 field', async function(assert) {
       let service = this.owner.lookup('service:data') as DataService;
-      let card = await service.load(mommy);
+      let card = await service.load(mommy, 'everything');
 
       let puppies: any[] = await card.value('puppies');
       assert.equal(puppies.length, 2, 'arity of user-field value is correct');
@@ -191,7 +194,7 @@ module('Unit | Service | data', function() {
 
     test('it can get a card-as-reference value of a card artity > 1 field', async function(assert) {
       let service = this.owner.lookup('service:data') as DataService;
-      let card = await service.load(daddy);
+      let card = await service.load(daddy, 'everything');
 
       let puppies: any[] = await card.value('puppies');
       assert.equal(puppies.length, 2, 'arity of user-field value is correct');
@@ -205,7 +208,7 @@ module('Unit | Service | data', function() {
 
     test('it can get a card with fully expanded pristine doc', async function(assert) {
       let service = this.owner.lookup('service:data') as DataService;
-      let card = await service.load(daddy);
+      let card = await service.load(daddy, 'everything');
 
       let doc = await card.serializeAsJsonAPIDoc('everything');
       assert.equal(doc.data.type, 'cards');
@@ -251,7 +254,7 @@ module('Unit | Service | data', function() {
 
     test('it can get a card with isolated fieldset format', async function(assert) {
       let service = this.owner.lookup('service:data') as DataService;
-      let card = await service.load(daddy);
+      let card = await service.load(daddy, 'everything');
 
       let doc = await card.serializeAsJsonAPIDoc({
         includeFieldSet: 'isolated',
@@ -278,7 +281,7 @@ module('Unit | Service | data', function() {
 
     test('it can get a card with embedded fieldset format', async function(assert) {
       let service = this.owner.lookup('service:data') as DataService;
-      let card = await service.load(mommy);
+      let card = await service.load(mommy, 'everything');
       let doc = await card.serializeAsJsonAPIDoc({
         includeFieldSet: 'embedded',
       });
@@ -289,7 +292,7 @@ module('Unit | Service | data', function() {
 
     test('it can get a card with specific field includes', async function(assert) {
       let service = this.owner.lookup('service:data') as DataService;
-      let card = await service.load(vanGogh);
+      let card = await service.load(vanGogh, 'everything');
       let doc = await card.serializeAsJsonAPIDoc({ includeFields: ['name'] });
       assert.equal(doc.data.attributes?.name, 'Van Gogh');
       assert.notOk(doc.data.attributes?.favoriteToy);
@@ -298,7 +301,7 @@ module('Unit | Service | data', function() {
 
     test('it can get a card with an isolated field set and specified field includes', async function(assert) {
       let service = this.owner.lookup('service:data') as DataService;
-      let card = await service.load(daddy);
+      let card = await service.load(daddy, 'everything');
 
       let doc = await card.serializeAsJsonAPIDoc({
         includeFieldSet: 'isolated',
@@ -370,82 +373,6 @@ module('Unit | Service | data', function() {
       assert.equal(await card.value('name'), 'Van Gogh', 'the card user field value is correct');
     });
 
-    test('it can validate primitive string field', async function(assert) {
-      let service = this.owner.lookup('service:data') as DataService;
-      let doc = cardDocument()
-        .withAttributes({
-          title: 42,
-        })
-        .withField('title', 'string-field');
-
-      try {
-        await service.create(csRealm, doc.jsonapi);
-        throw new Error(`should not have been able to create`);
-      } catch (err) {
-        assert.equal(err.status, 400);
-        assert.ok(err.detail.match(/field title on card .* failed type validation for value: 42/));
-      }
-
-      doc = cardDocument()
-        .withAttributes({
-          title: 'test',
-        })
-        .withField('title', 'string-field');
-      let card = await service.create(csRealm, doc.jsonapi);
-      assert.ok(card);
-      assert.equal(await card.value('title'), 'test');
-    });
-
-    test('it can validate primitive boolean field', async function(assert) {
-      let service = this.owner.lookup('service:data') as DataService;
-      let doc = cardDocument()
-        .withAttributes({
-          isCool: 42,
-        })
-        .withField('isCool', 'boolean-field');
-
-      try {
-        await service.create(csRealm, doc.jsonapi);
-        throw new Error(`should not have been able to create`);
-      } catch (err) {
-        assert.equal(err.status, 400);
-        assert.ok(err.detail.match(/field isCool on card .* failed type validation for value: 42/));
-      }
-      doc = cardDocument()
-        .withAttributes({
-          isCool: true,
-        })
-        .withField('isCool', 'boolean-field');
-      let card = await service.create(csRealm, doc.jsonapi);
-      assert.ok(card);
-      assert.equal(await card.value('isCool'), true);
-    });
-
-    test('it can validate primitive integer field', async function(assert) {
-      let service = this.owner.lookup('service:data') as DataService;
-      let doc = cardDocument()
-        .withAttributes({
-          puppyCount: 'what',
-        })
-        .withField('puppyCount', 'integer-field');
-
-      try {
-        await service.create(csRealm, doc.jsonapi);
-        throw new Error(`should not have been able to create`);
-      } catch (err) {
-        assert.equal(err.status, 400);
-        assert.ok(err.detail.match(/field puppyCount on card .* failed type validation for value: "what"/));
-      }
-      doc = cardDocument()
-        .withAttributes({
-          puppyCount: 42,
-        })
-        .withField('puppyCount', 'integer-field');
-      let card = await service.create(csRealm, doc.jsonapi);
-      assert.ok(card);
-      assert.equal(await card.value('puppyCount'), 42);
-    });
-
     test('it saves an UnsavedCard', async function(assert) {
       let service = this.owner.lookup('service:data') as DataService;
       let card = await service.create(
@@ -461,7 +388,7 @@ module('Unit | Service | data', function() {
       assert.equal(savedCard.csOriginalRealm, csRealm, 'the card csOriginalRealm is correct');
       assert.equal(await savedCard.value('name'), 'Van Gogh', 'the card user field value is correct');
 
-      let retreivedCard = await service.load(savedCard);
+      let retreivedCard = await service.load(savedCard, 'everything');
       assert.equal(retreivedCard.csId, savedCard.csId, 'the card csId isCorect');
       assert.equal(retreivedCard.csRealm, csRealm, 'the card csRealm is correct');
       assert.equal(retreivedCard.csOriginalRealm, csRealm, 'the card csOriginalRealm is correct');
@@ -495,7 +422,7 @@ module('Unit | Service | data', function() {
       assert.equal(await updatedCard.value('name'), 'Van Gogh', 'the card user field value is correct');
       assert.equal(await updatedCard.value('favoriteColor'), 'orange', 'the card user field value is correct');
 
-      let retreivedCard = await service.load(savedCard);
+      let retreivedCard = await service.load(savedCard, 'everything');
       assert.equal(retreivedCard.csId, savedCard.csId, 'the card csId isCorect');
       assert.equal(retreivedCard.csRealm, csRealm, 'the card csRealm is correct');
       assert.equal(retreivedCard.csOriginalRealm, csRealm, 'the card csOriginalRealm is correct');
@@ -517,7 +444,7 @@ module('Unit | Service | data', function() {
       await service.delete(savedCard);
 
       try {
-        await service.load(savedCard);
+        await service.load(savedCard, 'everything');
         throw new Error('should not be able to find the deleted card');
       } catch (err) {
         assert.equal(err.status, 404);
