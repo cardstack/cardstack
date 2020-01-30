@@ -1,5 +1,5 @@
 .event-ticket-isolated {
-    padding: 50px 0;
+    padding: 0 0 50px;
     background-color: #FFEE6E;
     background-image: url('/assets/images/cards/event-ticket/ticket-confetti.svg');
     background-size: 100vw;

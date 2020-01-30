@@ -43,7 +43,7 @@ module('Acceptance | card edit', function(hooks) {
 
     await setFieldValue('body', 'updated body');
 
-    await saveCard('editor', card1Id);
+    await saveCard();
 
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
@@ -65,7 +65,7 @@ module('Acceptance | card edit', function(hooks) {
 
     await setFieldValue('email', 'hassan@nowhere.dog');
 
-    await saveCard('editor', card1Id);
+    await saveCard();
 
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
@@ -89,7 +89,7 @@ module('Acceptance | card edit', function(hooks) {
 
     await setFieldValue('created', '2019-10-08');
 
-    await saveCard('editor', card1Id);
+    await saveCard();
 
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
@@ -111,7 +111,7 @@ module('Acceptance | card edit', function(hooks) {
 
     await setFieldValue('likes', 110);
 
-    await saveCard('editor', card1Id);
+    await saveCard();
 
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
@@ -133,7 +133,7 @@ module('Acceptance | card edit', function(hooks) {
 
     await setFieldValue('published', false);
 
-    await saveCard('editor', card1Id);
+    await saveCard();
 
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
@@ -162,7 +162,7 @@ module('Acceptance | card edit', function(hooks) {
 
     await setFieldValue('reviewers', `${card2Id},${card3Id}`);
 
-    await saveCard('editor', card1Id);
+    await saveCard();
 
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
@@ -217,7 +217,7 @@ module('Acceptance | card edit', function(hooks) {
 
     await setFieldValue('author', card2Id);
 
-    await saveCard('editor', card1Id);
+    await saveCard();
 
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
@@ -249,13 +249,13 @@ module('Acceptance | card edit', function(hooks) {
 
     await setFieldValue('image', 'http://example.com/testimage.jpg');
 
-    await saveCard('editor', card1Id);
+    await saveCard();
 
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
     await visit(`/cards/${card1Id}`);
     assert
-      .dom('[data-test-field="image"] [data-test-decorative-image-field-viewer-value] img')
+      .dom('[data-test-field="image"] [data-test-decorative-image-field-viewer-value]')
       .hasAttribute('src', 'http://example.com/testimage.jpg');
 
     let cardJson = find('[data-test-card-json]').innerHTML;
@@ -273,7 +273,7 @@ module('Acceptance | card edit', function(hooks) {
 
     await setFieldValue('portfolioLink', 'https://example.com/new-portfolio');
 
-    await saveCard('editor', card1Id);
+    await saveCard();
 
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 
@@ -295,7 +295,7 @@ module('Acceptance | card edit', function(hooks) {
 
     await setFieldValue('rsvp', 'https://example.com/new-rsvp');
 
-    await saveCard('editor', card1Id);
+    await saveCard();
 
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
 

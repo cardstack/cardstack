@@ -29,9 +29,13 @@ Until that work is done we are statically adding this css
 */
 @import '/assets/cards/base-card-isolated.css';
 @import '/assets/cards/base-card-embedded.css';
+
 /* Themed cards */
 /* @import '/assets/cards/event-card-isolated.css'; */
 /* @import '/assets/cards/event-ticket-isolated.css'; */
+/* @import '/assets/cards/wedding-invitation-isolated.css'; */
+/* @import '/assets/cards/product-card-isolated.css'; */
+/* @import '/assets/cards/photo-card-isolated.css'; */
 
 @import '/assets/fields/belongs-to-editor.css';
 @import '/assets/fields/belongs-to-viewer.css';
@@ -197,4 +201,26 @@ a:hover {
 .cs-dark-input.cs-input.disabled {
   -webkit-text-fill-color: var(--cs-dark-field-disabled-text); /* For strangeness in safari */
   -webkit-text-stroke-color: var(--cs-dark-field-disabled-text);
+}
+
+/* Cardhost Modal */
+.cardhost-modal-backdrop {
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--black);
+  opacity: 0.6;
+  z-index: 999;
+}
+
+.cardhost-modal-container {
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

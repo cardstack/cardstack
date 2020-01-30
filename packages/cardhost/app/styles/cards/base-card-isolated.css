@@ -2,10 +2,12 @@
   width: 100%;
   min-height: inherit;
   margin: 0 auto;
-  background-color: var(--white);
+
+  background-color: white;
   color: black;
-  font: 400 15px/1.467 var(--ch-font-family);
+  font: 400 15px/1.467 'Open Sans';
   letter-spacing: 0.03em;
+
   text-align: left;
   overflow: hidden;
   overflow-wrap: break-word;
@@ -17,7 +19,7 @@
 }
 .cardstack_base-card-isolated .isolated-card--view-fields::before,
 .cardstack_base-card-isolated .isolated-card--view-fields::after {
-  height: 0;
+  height: 0; /* for firefox */
 }
 
 .cardstack_base-card-isolated .field {
@@ -43,61 +45,20 @@
   text-transform: uppercase;
 }
 
-/* Label hidden by default */
-.cardstack_base-card-isolated .title-label,
-.cardstack_base-card-isolated .highlight-title-label,
-.cardstack_base-card-isolated .background-image-label,
-.cardstack_base-card-isolated .body-label {
-  display: none;
-}
 
-/* Full-width field values by default */
-.cardstack_base-card-isolated .title-value,
-.cardstack_base-card-isolated .highlight-title-value,
-.cardstack_base-card-isolated .background-image-value,
-.cardstack_base-card-isolated .body-value {
-  grid-column: 1 / -1;
-}
+/**** SPECIAL CORE TYPES ****/
+/* has-many and belongs-to field values, which are embedded cards, are full-width by default */
 
-/* Background-image field */
-.cardstack_base-card-isolated .background-image-field {
-  max-width: 100%;
-  padding: 0;
-  order: -1;
-}
-.cardstack_base-card-isolated .background-image-field .background-image {
-  width: 100%;
-  max-height: 300px;
-  object-fit: cover;
-  object-position: center;
-}
-
-/* Title value */
-.cardstack_base-card-isolated .title-value {
-  color: var(--dark-gray);
-  font-size: 25px;
-  font-weight: bold;
-  letter-spacing: 0.015em;
-  line-height: 1.2;
-}
-
-/* Highlight Title value */
-.cardstack_base-card-isolated .highlight-title-value {
-  color: var(--red);
-  font-size: 18px;
-  font-weight: bold;
-  letter-spacing: 0.035em;
-  text-transform: capitalize;
-}
-
-/* Link type */
+/* type: link */
+/* use `label` for link text and `value` for link url */
 .cardstack_base-card-isolated .link-viewer {
   color: var(--cobalt-blue);
   text-decoration: underline;
   font-weight: 600;
 }
 
-/* CTA type */
+/* type: cta */
+/* use `label` for button text and `value` for button link url */
 .cardstack_base-card-isolated .cta-viewer {
   min-height: 45px;
   border-radius: 6px;
@@ -110,24 +71,80 @@
 }
 
 
+/**** SPECIAL FIELD NAMES ****/
 
+/* full-width by default */
+.cardstack_base-card-isolated .title-field,
+.cardstack_base-card-isolated .highlight-title-field,
+.cardstack_base-card-isolated .background-image-field,
+.cardstack_base-card-isolated .body-field,
+.cardstack_base-card-isolated .divider-field {
+  display: block;
+}
 
-/* TODO: figure out how to deal with styling components */
+/* label hidden by default */
+.cardstack_base-card-isolated .title-label,
+.cardstack_base-card-isolated .title-logo-label,
+.cardstack_base-card-isolated .highlight-title-label,
+.cardstack_base-card-isolated .background-image-label,
+.cardstack_base-card-isolated .body-label,
+.cardstack_base-card-isolated .divider-label {
+  display: none;
+}
+
+.cardstack_base-card-isolated .title-logo-field,
+.cardstack_base-card-isolated .divider-value {
+  display: none;
+}
+
+/* field-name: background-image */
+.cardstack_base-card-isolated .background-image-field {
+  max-width: 100%;
+  padding: 0;
+  order: -100; /* first item on page */
+}
+.cardstack_base-card-isolated .background-image-value {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* field-name: title */
+.cardstack_base-card-isolated .title-value {
+  color: var(--dark-gray);
+  font-size: 25px;
+  font-weight: bold;
+  letter-spacing: 0.015em;
+  line-height: 1.2;
+}
+
+/* field-name: highlight-title */
+.cardstack_base-card-isolated .highlight-title-value {
+  color: var(--red);
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 0.035em;
+  text-transform: capitalize;
+}
+
+/* field-name: divider */
 .cardstack_base-card-isolated .divider-field {
   width: calc(100% - 60px);
   max-width: 596px; /* max-field-width - padding * 2 */
   border-top: 1px solid var(--light-gray);
 }
-.cardstack_base-card-isolated .divider-label {
+
+
+/* Photo Card */
+/* field-name: photo-image-url */
+.cardstack_base-card-isolated .photo-image-url-field {
+  display: block;
+}
+.cardstack_base-card-isolated .photo-image-url-label {
   display: none;
 }
-.cardstack_base-card-isolated .divider-value {
-  display: none;
-}
-
-
-
-/* Wedding Invitation Base Card */
-.cardstack_base-card-isolated .wedding-intro-text-field {
-  display: none;
+.cardstack_base-card-isolated .photo-image-url-value {
+  max-height: 404px;
+  margin: 0 auto;
 }
