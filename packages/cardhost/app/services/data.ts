@@ -16,6 +16,7 @@ import { OcclusionRules } from '@cardstack/core/occlusion-rules';
 
 export default class DataService extends Service implements CardInstantiator {
   @service cardstackSession!: CardstackSession;
+  private memoizeCache: { [functionName: string]: any } = {};
 
   get hubURL(): string {
     return 'http://localhost:3000';
@@ -23,13 +24,13 @@ export default class DataService extends Service implements CardInstantiator {
 
   // some day we'll have a @memo decorator. until then, here's some real basic memoization...
   get reader(): CardReader {
-    return getMemoizedValue<Reader>('reader', () => new Reader(this));
+    return this.getMemoizedValue<Reader>('reader', () => new Reader(this));
   }
   get moduleLoader(): ModuleLoader {
-    return getMemoizedValue<Loader>('moduleLoader', () => new Loader());
+    return this.getMemoizedValue<Loader>('moduleLoader', () => new Loader());
   }
   get container(): ContainerInterface {
-    return getMemoizedValue<Container>('container', () => new Container());
+    return this.getMemoizedValue<Container>('container', () => new Container());
   }
 
   async instantiate(jsonapi: SingleResourceDoc, imposeIdentity?: CardId): Promise<AddressableCard> {
@@ -138,6 +139,13 @@ export default class DataService extends Service implements CardInstantiator {
     }
     return url;
   }
+
+  private getMemoizedValue<T>(fnName: string, fn: () => T): T {
+    if (this.memoizeCache[fnName] === undefined) {
+      this.memoizeCache[fnName] = fn();
+    }
+    return this.memoizeCache[fnName];
+  }
 }
 
 async function handleJsonApiError(response: Response) {
@@ -171,12 +179,4 @@ class Container implements ContainerInterface {
   async instantiate<T, A extends unknown[]>(factory: Factory<T, A>, ...args: A): Promise<T> {
     return new factory(...args); // TODO instantiate from the container
   }
-}
-
-const memoizeCache: { [functionName: string]: any } = {};
-function getMemoizedValue<T>(fnName: string, fn: () => T): T {
-  if (memoizeCache[fnName] === undefined) {
-    memoizeCache[fnName] = fn();
-  }
-  return memoizeCache[fnName];
 }
