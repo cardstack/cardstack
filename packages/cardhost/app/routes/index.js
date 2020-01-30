@@ -42,9 +42,6 @@ export default class IndexRoute extends Route {
     if (environment === 'development') {
       // prime the store with seed models
       recent.push(await this.data.getCard('local-hub::why-doors', 'embedded'));
-      recent.push(await this.data.getCard('local-hub::carlos', 'embedded'));
-      recent.push(await this.data.getCard('local-hub::photo-card-template', 'embedded'));
-      recent.push(await this.data.getCard('local-hub::wedding-invitation-template', 'embedded'));
     }
 
     return {

@@ -132,6 +132,7 @@
         {{#each this.featuredCards as |card|}}
           <LinkTo @route="cards.card.view" @model={{card.id}} class="card-catalog--card-link">
             <div class="card-catalog--card-renderer">
+              {{! template-lint-disable no-inline-styles }}
               <div class="featured-card" style={{css-url "background-image" card.preview}}></div>
               <div class="card-catalog--card-label">{{card.title}}</div>
             </div>
