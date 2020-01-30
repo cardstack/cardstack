@@ -14,14 +14,14 @@ import { stringify } from 'qs';
 import CardstackError from '@cardstack/core/error';
 import { OcclusionRules } from '@cardstack/core/occlusion-rules';
 
-const memoizeCache: { [functionName: string]: any } = {};
-
 export default class DataService extends Service implements CardInstantiator {
   @service cardstackSession!: CardstackSession;
 
   get hubURL(): string {
     return 'http://localhost:3000';
   }
+
+  // some day we'll have a @memo decorator. until then, here's some real basic memoization...
   get reader(): CardReader {
     return getMemoizedValue<Reader>('reader', () => new Reader(this));
   }
@@ -173,6 +173,7 @@ class Container implements ContainerInterface {
   }
 }
 
+const memoizeCache: { [functionName: string]: any } = {};
 function getMemoizedValue<T>(fnName: string, fn: () => T): T {
   if (memoizeCache[fnName] === undefined) {
     memoizeCache[fnName] = fn();
