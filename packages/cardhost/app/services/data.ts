@@ -14,23 +14,22 @@ import { stringify } from 'qs';
 import CardstackError from '@cardstack/core/error';
 import { OcclusionRules } from '@cardstack/core/occlusion-rules';
 
+const memoizeCache: { [functionName: string]: any } = {};
+
 export default class DataService extends Service implements CardInstantiator {
   @service cardstackSession!: CardstackSession;
 
   get hubURL(): string {
     return 'http://localhost:3000';
   }
-  // TODO glimmer memoizes this, right?
   get reader(): CardReader {
-    return new Reader(this);
+    return getMemoizedValue<Reader>('reader', () => new Reader(this));
   }
-  // TODO glimmer memoizes this, right?
   get moduleLoader(): ModuleLoader {
-    return new Loader();
+    return getMemoizedValue<Loader>('moduleLoader', () => new Loader());
   }
-  // TODO glimmer memoizes this, right?
   get container(): ContainerInterface {
-    return new Container();
+    return getMemoizedValue<Container>('container', () => new Container());
   }
 
   async instantiate(jsonapi: SingleResourceDoc, imposeIdentity?: CardId): Promise<AddressableCard> {
@@ -172,4 +171,11 @@ class Container implements ContainerInterface {
   async instantiate<T, A extends unknown[]>(factory: Factory<T, A>, ...args: A): Promise<T> {
     return new factory(...args); // TODO instantiate from the container
   }
+}
+
+function getMemoizedValue<T>(fnName: string, fn: () => T): T {
+  if (memoizeCache[fnName] === undefined) {
+    memoizeCache[fnName] = fn();
+  }
+  return memoizeCache[fnName];
 }
