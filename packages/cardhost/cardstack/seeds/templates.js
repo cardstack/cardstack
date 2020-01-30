@@ -629,18 +629,18 @@ let bylineTemplate = bylineFactory.getDocumentFor(
     .addResource('cards', 'local-hub::byline-card')
     .withRelated('adopted-from', { type: 'cards', id: 'local-hub::@cardstack/base-card' })
     .withRelated('fields', [
+      bylineFactory.addResource('fields', 'byline-image').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::decorative-image',
+        'needed-when-embedded': true,
+        caption: 'Image',
+      }),
       bylineFactory.addResource('fields', 'byline-name').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
         'needed-when-embedded': true,
         required: true,
         caption: 'Name',
-      }),
-      bylineFactory.addResource('fields', 'byline-image').withAttributes({
-        'is-metadata': true,
-        'field-type': '@cardstack/core-types::decorative-image',
-        'needed-when-embedded': true,
-        caption: 'Image',
       }),
     ])
     .withRelated(

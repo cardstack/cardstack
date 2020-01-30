@@ -42,7 +42,14 @@
         <div class="card-catalog">
           {{#each this.model.catalog as |card|}}
             {{#if (not (eq card.name "@cardstack/base-card"))}}
-              <CardRenderer @card={{card}} @format="embedded" @showName={{true}}/>
+              <LinkTo @route="cards.card.view" @model={{card.name}} class="card-catalog--card-link">
+                <CardRenderer
+                  @class="card-catalog--card-renderer"
+                  @card={{card}}
+                  @format="embedded"
+                  @preventIsolation={{true}}
+                  @showName={{true}} />
+              </LinkTo>
             {{/if}}
           {{/each}}
         </div>
@@ -56,16 +63,15 @@
         <div class="card-catalog">
           {{#each this.model.templates as |card|}}
             <Cta {{on "click" (fn this.openCardNameDialog "Adopt a Card" card)}}
-              class="card-catalog--embedded-card-link"
+              class="card-catalog--card-link"
               data-test-embedded-card={{card.name}}
-              data-test-adopt-card-btn
-            >
+              data-test-adopt-card-btn>
               <CardRenderer
+                @class="card-catalog--card-renderer"
                 @card={{card}}
                 @format="embedded"
                 @preventIsolation={{true}}
-                @showName={{true}}
-              />
+                @showName={{true}} />
             </Cta>
           {{/each}}
         </div>
@@ -77,22 +83,22 @@
           Common Cards
         </header>
         <div class="card-catalog">
-          <LinkTo @route="cards.add" @class="card-catalog--embedded-card-link">
-            <div>
-              <div class="card-catalog--embedded-card-placeholder icon-common-form"></div>
-              <div class="embedded-card-label">Form</div>
+          <LinkTo @route="cards.add" @class="card-catalog--card-link">
+            <div class="card-catalog--card-renderer">
+              <div class="card-catalog--card-placeholder icon-common-form"></div>
+              <div class="card-catalog--card-label">Form</div>
             </div>
           </LinkTo>
-          <LinkTo @route="cards.add" @class="card-catalog--embedded-card-link">
-            <div>
-              <div class="card-catalog--embedded-card-placeholder icon-common-layout"></div>
-              <div class="embedded-card-label">Layout</div>
+          <LinkTo @route="cards.add" @class="card-catalog--card-link">
+            <div class="card-catalog--card-renderer">
+              <div class="card-catalog--card-placeholder icon-common-layout"></div>
+              <div class="card-catalog--card-label">Layout</div>
             </div>
           </LinkTo>
-          <LinkTo @route="cards.add" @class="card-catalog--embedded-card-link">
-            <div>
-              <div class="card-catalog--embedded-card-placeholder icon-common-collection"></div>
-              <div class="embedded-card-label">Collection</div>
+          <LinkTo @route="cards.add" @class="card-catalog--card-link">
+            <div class="card-catalog--card-renderer">
+              <div class="card-catalog--card-placeholder icon-common-collection"></div>
+              <div class="card-catalog--card-label">Collection</div>
             </div>
           </LinkTo>
         </div>
@@ -105,12 +111,12 @@
         </header>
         <div class="card-catalog">
           <Cta {{on "click" (fn this.openCardNameDialog "Create a New Card")}}
-            class="card-catalog--embedded-card-link"
+            class="card-catalog--card-link"
             data-test-new-blank-card-btn
           >
-            <div>
-              <div class="card-catalog--embedded-card-placeholder icon-add-card"></div>
-              <div class="embedded-card-label">Blank Card</div>
+            <div class="card-catalog--card-renderer">
+              <div class="card-catalog--card-placeholder icon-add-card"></div>
+              <div class="card-catalog--card-label">Blank Card</div>
             </div>
           </Cta>
         </div>
@@ -122,9 +128,14 @@
         {{svg-jar "cards" width="28px" height="28px"}}
         Featured Cards
       </header>
-      <div class="featured-cards-catalog">
+      <div class="card-catalog">
         {{#each this.featuredCards as |card|}}
-          <div class="featured-card" style={{css-url "background-image" card.preview}}></div>
+          <LinkTo @route="cards.card.view" @model={{card.id}} class="card-catalog--card-link">
+            <div class="card-catalog--card-renderer">
+              <div class="featured-card" style={{css-url "background-image" card.preview}}></div>
+              <div class="card-catalog--card-label">{{card.title}}</div>
+            </div>
+          </LinkTo>
         {{/each}}
       </div>
     </section>
