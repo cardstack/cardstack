@@ -1,1 +1,4 @@
-<img src={{@field.value}} alt="" class="image-{{@field.name}} type-image" data-test-decorative-image-field-viewer-value>
+<div class="label {{@field.name}}-label" data-test-decorative-image-field-viewer-label>
+  {{@field.label}}
+</div>
+<img src={{@field.value}} alt="" class="value {{@field.name}}-value decorative-image-viewer" data-test-decorative-image-field-viewer-value>

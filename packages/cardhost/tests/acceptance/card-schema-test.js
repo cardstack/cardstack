@@ -44,7 +44,7 @@ module('Acceptance | card schema', function(hooks) {
 
     await addField('title', 'string', true);
 
-    await saveCard('schema', card1Id);
+    await saveCard();
     await visit(`/cards/${card1Id}/edit/fields/schema`);
     await animationsSettled();
     await click('[data-test-field="title"]');
@@ -52,7 +52,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-field="title"] [data-test-field-renderer-type]').hasText('title (Text)');
     assert
       .dom('[data-test-field="title"] [data-test-field-renderer-type]')
-      .hasAttribute('style', 'background-image: url("/images/field-types/text-field-icon.svg")');
+      .hasAttribute('style', 'background-image: url("/assets/images/field-types/text-field-icon.svg")');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     let cardJson = find('[data-test-card-json]').innerHTML;
@@ -109,7 +109,7 @@ module('Acceptance | card schema', function(hooks) {
       .dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea')
       .hasValue('fill this in with your subheader');
 
-    await saveCard('schema', card1Id);
+    await saveCard();
     assert.dom('[data-test-field="title"]').doesNotExist();
 
     let cardJson = find('[data-test-card-json]').innerHTML;
@@ -155,7 +155,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('title');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('TITLE');
 
-    await saveCard('schema', card1Id);
+    await saveCard();
 
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields/schema`);
 
@@ -185,7 +185,7 @@ module('Acceptance | card schema', function(hooks) {
 
     await removeField('body');
 
-    await saveCard('schema');
+    await saveCard();
     await waitFor(`[data-test-card-schema="${card1Id}"]`);
 
     assert.dom('[data-test-field="body"]').doesNotExist();
@@ -194,6 +194,22 @@ module('Acceptance | card schema', function(hooks) {
     assert.equal(card.data.attributes.body, undefined);
 
     assert.dom('[data-test-right-edge] [data-test-field]').doesNotExist();
+  });
+
+  test(`adding a new field after removing one`, async function(assert) {
+    await login();
+    await createCards({
+      [card1Id]: [['body', 'string', false, 'test body']],
+    });
+    await visit(`/cards/${card1Id}/edit/fields/schema`);
+
+    await removeField('body');
+
+    await saveCard();
+    await waitFor(`[data-test-card-schema="${card1Id}"]`);
+    assert.dom('[data-test-field="body"]').doesNotExist();
+    await dragAndDropNewField('string');
+    assert.dom('[data-test-field="field-1"]').exists();
   });
 
   test(`move a field's position via drag & drop`, async function(assert) {
@@ -237,7 +253,7 @@ module('Acceptance | card schema', function(hooks) {
       ['body', 'author', 'title']
     );
 
-    await saveCard('schema', card1Id);
+    await saveCard();
 
     assert.deepEqual(
       [...document.querySelectorAll(`[data-test-isolated-card="${card1Id}"] [data-test-field]`)].map(i =>
@@ -288,8 +304,13 @@ module('Acceptance | card schema', function(hooks) {
 
     await dragAndDropNewField('string');
     await animationsSettled();
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('field-3');
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('field-3');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('field-1');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('field-1');
+
+    await dragAndDropNewField('string');
+    await animationsSettled();
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('field-2');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('field-2');
   });
 
   test(`change a field's needed-when-embedded value to true`, async function(assert) {
@@ -309,7 +330,7 @@ module('Acceptance | card schema', function(hooks) {
     let field = card.included.find(i => `${i.type}/${i.id}` === 'fields/title');
     assert.equal(field.attributes['needed-when-embedded'], true);
 
-    await saveCard('schema', card1Id);
+    await saveCard();
     await visit(`/cards/${card1Id}/edit/fields/schema`);
     await click('[data-test-field="title"]');
 
@@ -337,7 +358,7 @@ module('Acceptance | card schema', function(hooks) {
     let field = card.included.find(i => `${i.type}/${i.id}` === 'fields/title');
     assert.equal(field.attributes['needed-when-embedded'], false);
 
-    await saveCard('schema', card1Id);
+    await saveCard();
     await visit(`/cards/${card1Id}/edit/fields/schema`);
     await click('[data-test-field="title"]');
 

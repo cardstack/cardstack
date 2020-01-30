@@ -11,8 +11,8 @@
     "@cardstack/hub": "*"
   },
   "devDependencies": {
-    "@cardstack/core": "0.16.22",
-    "@cardstack/hub": "0.16.22"
+    "@cardstack/core": "0.16.23",
+    "@cardstack/hub": "0.16.23"
   },
   "dependencies": {
     "jsonapi-typescript": "^0.1.3"

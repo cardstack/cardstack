@@ -9,6 +9,6 @@
     "@cardstack/hub": "*"
   },
   "devDependencies": {
-    "@cardstack/hub": "0.16.22"
+    "@cardstack/hub": "0.16.23"
   }
 }

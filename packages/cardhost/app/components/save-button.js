@@ -3,8 +3,13 @@ import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 import { task } from 'ember-concurrency';
+import { restartableTask, enqueueTask } from 'ember-concurrency-decorators';
+import { timeout } from 'ember-concurrency';
+import ENV from '@cardstack/cardhost/config/environment';
 
+const { autosaveDebounce, autosaveDisabled } = ENV;
 const SAVED_HIGHLIGHT_DELAY = 2500;
+const AUTOSAVE_DEBOUNCE = 5000;
 
 export default class SaveButton extends Component {
   @service router;
@@ -13,7 +18,18 @@ export default class SaveButton extends Component {
 
   @tracked justSaved;
 
-  @task(function*() {
+  autosaveDebounce = autosaveDebounce || AUTOSAVE_DEBOUNCE;
+  autosaveDisabled = typeof this.args.autosaveDisabled === 'boolean' ? this.args.autosaveDisabled : !!autosaveDisabled;
+
+  get cardIsNew() {
+    let card = this.args.card;
+    return card.isNew;
+  }
+
+  // This task needs to be queued, otherwise we will get
+  // 409 conflicts with the `/meta/version`
+  @enqueueTask
+  *saveCard() {
     let card = this.args.card;
     this.statusMsg = null;
 
@@ -26,25 +42,35 @@ export default class SaveButton extends Component {
       this.statusMsg = `card ${card.name} was NOT successfully created: ${e.message}`;
       return;
     }
-  })
-  saveCard;
+  }
 
   @task(function*() {
-    let card = this.args.card;
-    let cardIsNew = card.isNew;
-
     yield this.saveCard.perform();
 
-    if (cardIsNew) {
-      return this.router.transitionTo('cards.card.edit.fields.schema', card);
-    } else {
-      this.justSaved = true;
-      yield setTimeout(() => {
-        this.justSaved = false;
-      }, SAVED_HIGHLIGHT_DELAY);
-    }
+    this.justSaved = true;
+
+    yield setTimeout(() => {
+      this.justSaved = false;
+    }, SAVED_HIGHLIGHT_DELAY);
   })
   saveCardWithState;
+
+  @restartableTask
+  *debounceAndSave() {
+    yield timeout(this.autosaveDebounce);
+    this.saveCardWithState.perform();
+  }
+
+  @action
+  autoSave(element, [isDirty]) {
+    if (isDirty && !this.cardIsNew && !this.autosaveDisabled) {
+      if (this.args.clickAction) {
+        this.args.clickAction();
+      } else {
+        this.debounceAndSave.perform();
+      }
+    }
+  }
 
   @action
   save() {

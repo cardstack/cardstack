@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/hub",
-  "version": "0.16.22",
+  "version": "0.16.23",
   "bin": {
     "cardstack-hub": "./bin/cardstack-hub.js"
   },
@@ -9,7 +9,7 @@
   "repository": "https://github.com/cardstack/cardstack",
   "description": "Stock API server for the Cardstack tech stack.",
   "dependencies": {
-    "@cardstack/core": "0.16.22",
+    "@cardstack/core": "0.16.23",
     "@cardstack/logger": "^0.2.1",
     "@types/fs-extra": "^8.0.1",
     "@types/koa": "^2.0.52",
@@ -37,8 +37,8 @@
     "typescript-memoize": "^1.0.0-alpha.3"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.16.22",
-    "@cardstack/test-support": "0.16.22",
+    "@cardstack/eslint-config": "0.16.23",
+    "@cardstack/test-support": "0.16.23",
     "@types/supertest": "^2.0.8",
     "supertest": "^4.0.2"
   },

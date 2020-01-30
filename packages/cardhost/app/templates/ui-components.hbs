@@ -69,8 +69,12 @@
 --ch-card-size: 496px;   /* min-width and min-height for cards */
 --ch-field-width: 384px; /* edit and schema view field-renderer max-width */
 --ch-spacing: 20px;
---ch-edges-z-index: 10;
---ch-actions-z-index: 11;
+--ch-left-edge-z-index: 30;
+--ch-right-edge-z-index: 20;
+--ch-top-edge-z-index: 20;
+--ch-actions-z-index: 25;
+--ch-card-header-z-index: 15;
+--ch-card-z-index: 10;
 --ch-transition-time: 250ms;
 --ch-card-transition-duration: 300ms;
 --ch-card-background-color-animate: background-color 0.5s ease;
@@ -531,7 +535,7 @@
       <div class="ch-catalog--content">
         <div class="ch-catalog--fields">
           <div class="ch-catalog-field" role="button" draggable="true">
-            <div class="ch-catalog-field--icon" style={{css-url "background-image" "/images/field-types/text-field-icon.svg"}}></div>
+            <div class="ch-catalog-field--icon" style={{css-url "background-image" "/assets/images/field-types/text-field-icon.svg"}}></div>
             <div>
               <h4 class="ch-catalog-field--title">Text</h4>
               <p class="ch-catalog-field--description">All-purpose text field</p>

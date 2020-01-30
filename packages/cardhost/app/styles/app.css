@@ -29,7 +29,14 @@ Until that work is done we are statically adding this css
 */
 @import '/assets/cards/base-card-isolated.css';
 @import '/assets/cards/base-card-embedded.css';
-@import '/assets/cards/event-card-isolated.css';
+
+/* Themed cards */
+/* @import '/assets/cards/event-card-isolated.css'; */
+/* @import '/assets/cards/event-ticket-isolated.css'; */
+/* @import '/assets/cards/wedding-invitation-isolated.css'; */
+/* @import '/assets/cards/product-card-isolated.css'; */
+/* @import '/assets/cards/photo-card-isolated.css'; */
+
 @import '/assets/fields/belongs-to-editor.css';
 @import '/assets/fields/belongs-to-viewer.css';
 @import '/assets/fields/boolean-editor.css';
@@ -46,6 +53,7 @@ Until that work is done we are statically adding this css
 @import '/assets/fields/string-editor.css';
 @import '/assets/fields/string-viewer.css';
 @import '/assets/fields/link-viewer.css';
+@import '/assets/fields/cta-viewer.css';
 
 :root {
   --ch-font-family: 'Open Sans', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -59,11 +67,14 @@ Until that work is done we are statically adding this css
   --ch-bottom-edge-height: 80px;
 
   --ch-card-size: 496px;    /* min-width and min-height for cards */
-  --ch-min-card-width: 400px;
   --ch-field-width: 384px;  /* edit and schema view field-renderer max-width */
   --ch-spacing: 20px;
-  --ch-edges-z-index: 10;
-  --ch-actions-z-index: 11;
+  --ch-left-edge-z-index: 30;
+  --ch-right-edge-z-index: 20;
+  --ch-top-edge-z-index: 20;
+  --ch-actions-z-index: 25;
+  --ch-card-header-z-index: 15;
+  --ch-card-z-index: 10;
   --ch-transition-time: 250ms;
   --ch-card-transition-duration: 300ms;
   --ch-card-background-color-animate: background-color 0.5s ease;
@@ -109,7 +120,7 @@ a:hover {
 
 /* Ember Animated */
 .animated-tools {
-  z-index: 20;
+  z-index: 50;
 }
 
 /* JSON card document -- hidden from view */
@@ -134,7 +145,7 @@ a:hover {
   margin-left: 10px;
 }
 
-.card-renderer--top-edge-buttons .top-edge--mode-label {
+.top-edge--mode-label {
   padding: 10px;
   background-color: white;
   text-transform: uppercase;
@@ -145,15 +156,18 @@ a:hover {
   margin-right: 20px;
 }
 
-.card-renderer--top-edge-buttons .top-edge--mode-link {
-  display: inline-block;
+.top-edge--mode-link {
+  display: inline-flex;
 }
 
-.card-renderer--top-edge-buttons .top-edge--mode-link span {
+.top-edge--mode-link span {
   width: 18px;
   height: 18px;
   display: block;
   text-indent: -9999px;
+    text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
   background-image: url(/assets/images/icons/close-circle.svg);
   background-size: 18px 18px;
   background-repeat: no-repeat;
@@ -184,4 +198,26 @@ a:hover {
 .cs-dark-input.cs-input.disabled {
   -webkit-text-fill-color: var(--cs-dark-field-disabled-text); /* For strangeness in safari */
   -webkit-text-stroke-color: var(--cs-dark-field-disabled-text);
+}
+
+/* Cardhost Modal */
+.cardhost-modal-backdrop {
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--black);
+  opacity: 0.6;
+  z-index: 999;
+}
+
+.cardhost-modal-container {
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

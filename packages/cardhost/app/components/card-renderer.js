@@ -87,7 +87,7 @@ export default class CardRenderer extends Component {
     });
   }
 
-  *contentAnimation({ keptSprites }) {
+  *borderAnimation({ keptSprites }) {
     keptSprites.forEach(sprite => {
       adjustCSS('border-top-right-radius', sprite, { duration });
       adjustCSS('border-top-left-radius', sprite, { duration });

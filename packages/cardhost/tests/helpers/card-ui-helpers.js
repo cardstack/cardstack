@@ -1,21 +1,31 @@
 import { click, find, triggerEvent, fillIn, visit, waitFor } from '@ember/test-helpers';
+import { animationsSettled } from 'ember-animated/test-support';
 
 const timeout = 5000;
 
-export async function showCardId() {
+export async function showCardId(toggleDetailsSection = false) {
   await click(`.card-renderer-isolated`);
+
+  if (toggleDetailsSection) {
+    await click('[data-test-right-edge-section-toggle="details"]');
+  }
+
+  await animationsSettled();
 }
 
-export async function setCardId(id) {
-  await showCardId();
-  await fillIn('#card__id', id);
-  await triggerEvent('#card__id', 'keyup');
+export async function setCardName(name) {
+  await fillIn('#card__name', name);
+  await click('[data-test-create-card-btn]');
+  await waitFor(`[data-test-card-save-btn]`, { timeout });
 }
 
 export async function dragAndDrop(fieldSelector, dropZoneSelector, options) {
   await triggerEvent(fieldSelector, 'mousedown');
   await triggerEvent(fieldSelector, 'dragstart', options);
+  await triggerEvent(dropZoneSelector, 'dragenter', options);
+  await animationsSettled();
   await triggerEvent(dropZoneSelector, 'drop', options);
+  await animationsSettled();
 }
 
 export async function dragAndDropNewField(type, position = 0) {
@@ -51,24 +61,32 @@ export async function dragFieldToNewPosition(originalPosition, newPosition) {
 
 export async function createCards(args) {
   for (let id of Object.keys(args)) {
-    await visit('/cards/new');
-    await setCardId(id);
+    await visit('/');
+    await click('[data-test-new-blank-card-btn]');
+    await setCardName(id);
+    await click('[data-test-configure-schema-btn]');
+
     for (let [index, [name, type, neededWhenEmbedded]] of args[id].entries()) {
       await addField(name, type, neededWhenEmbedded, index);
     }
-    await click('[data-test-card-creator-save-btn]');
-    await waitFor(`[data-test-card-view="${id}"]`, { timeout });
+    await saveCard();
 
-    await visit(`/cards/${id}/edit`);
+    await visit(`/cards/${id}/edit/fields`);
     for (let [name, , , value] of args[id]) {
       if (value == null) {
         continue;
       }
       await setFieldValue(name, value);
     }
-    await click('[data-test-card-editor-save-btn]');
-    await waitFor(`[data-test-card-view="${id}"]`, { timeout });
+    await saveCard();
+    await visit(`/cards/${id}`);
   }
+}
+
+export async function saveCard() {
+  await click(`[data-test-card-save-btn]`);
+  await waitFor(`[data-test-card-save-btn].saved`, { timeout });
+  await animationsSettled();
 }
 
 export async function addField(name, type, isEmbedded, position) {
@@ -80,6 +98,8 @@ export async function addField(name, type, isEmbedded, position) {
   if (isEmbedded) {
     await click('[data-test-schema-attr="embedded"] input[type="checkbox"]');
   }
+
+  await animationsSettled();
 }
 
 export async function setFieldValue(name, value) {

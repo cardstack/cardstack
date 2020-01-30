@@ -1,12 +1,13 @@
-<Cta {{on "click" this.save}}
+<Cta
+  {{on "click" this.save}}
   @variant="primary"
   class={{concat
     "save-button "
     (if this.justSaved "just-saved ")
-    (if (not @card.isDirty) "saved ")
+    (if (not (or @card.isDirty this.saveCard.isRunning)) "saved ")
   }}
   data-test-card-save-btn
-  @disabled={{not (and this.cardstackSession.isAuthenticated @card.isDirty)}}
+  {{did-update this.autoSave @card.isDirty}}
 >
   {{#if this.saveCard.isRunning}}
     Saving

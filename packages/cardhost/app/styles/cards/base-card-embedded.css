@@ -1,29 +1,4 @@
-.cardstack_base-card-embedded {
-  margin: 0;
-  padding: 20px;
-  background-color: white;
-  color: black;
-  font: 400 13px/1.385 var(--ch-font-family);
-  letter-spacing: 0;
-  overflow: hidden;
-  overflow-wrap: break-word;
-  word-break: break-word;
-}
-
-.cardstack_base-card-embedded .cardstack_base-card-embedded {
-  padding: 0;
-}
-
-.cardstack_base-card-embedded .field {
-  padding-bottom: 15px;
-}
-
-.cardstack_base-card-embedded .label {
-  padding-bottom: 4px;
-  color: var(--ch-dark-op50);
-}
-
-/* Embedded card in isolated card */
+/* Embedded card inside an isolated card */
 .cardstack_base-card-isolated .cardstack_base-card-embedded {
   margin: inherit;
   padding: inherit;
@@ -32,7 +7,178 @@
   font: inherit;
   letter-spacing: inherit;
 }
-
+.cardstack_base-card-isolated .cardstack_base-card-embedded .label {
+  font-size: 10px;
+  padding-left: 15px;
+}
 .cardstack_base-card-isolated .cardstack_base-card-embedded .field {
-  padding-bottom: 0;
+  padding: 0 0 15px;
+  grid-gap: 0 50px;
+}
+
+
+/* Embedded card default styles */
+.cardstack_base-card-embedded {
+  width: 100%;
+  margin: 0;
+  background-color: white;
+  color: black;
+  font: 400 10px/1.2 'Open Sans';
+  letter-spacing: 0.03em;
+  text-align: left;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.cardstack_base-card-embedded .embedded-card--view-fields {
+  display: grid; /* Helpful for ordering fields */
+}
+.cardstack_base-card-embedded .embedded-card--view-fields::before,
+.cardstack_base-card-embedded .embedded-card--view-fields::after {
+  height: 0; /* for firefox */
+}
+
+.cardstack_base-card-embedded .field {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  grid-gap: 0 10px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 15px 15px;
+}
+.cardstack_base-card-embedded .field.field-type-belongs-to-view-field,
+.cardstack_base-card-embedded .field:first-of-type {
+  padding-top: 15px;
+}
+
+.cardstack_base-card-embedded .label {
+  padding-bottom: 4px;
+  color: var(--black);
+  font-size: 7px;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  line-height: 1.364;
+  text-transform: uppercase;
+}
+
+
+/**** SPECIAL CORE TYPES ****/
+/* has-many and belongs-to field values, which are embedded cards, are full-width by default */
+
+/* type: link */
+/* use `label` for link text and `value` for link url */
+.cardstack_base-card-embedded .link-viewer {
+  color: var(--cobalt-blue);
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+/* type: cta */
+/* use `label` for button text and `value` for button link url */
+.cardstack_base-card-embedded .cta-viewer {
+  min-height: 30px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: calc(22 / 15);
+  letter-spacing: 0.03em;
+  padding-top: 11px;
+  padding-bottom: 11px;
+}
+
+/* type: decorative-image */
+.cardstack_base-card-embedded .decorative-image-viewer {
+  max-height: 70px;
+}
+
+
+/**** SPECIAL FIELD NAMES ****/
+
+/* full-width by default */
+.cardstack_base-card-embedded .title-field,
+.cardstack_base-card-embedded .highlight-title-field,
+.cardstack_base-card-embedded .background-image-field,
+.cardstack_base-card-embedded .body-field,
+.cardstack_base-card-embedded .divider-field {
+  display: block;
+}
+
+/* label hidden by default */
+.cardstack_base-card-embedded .title-label,
+.cardstack_base-card-embedded .highlight-title-label,
+.cardstack_base-card-embedded .background-image-label,
+.cardstack_base-card-embedded .body-label,
+.cardstack_base-card-embedded .divider-label,
+.cardstack_base-card-embedded .title-logo-label {
+  display: none;
+}
+
+.cardstack_base-card-embedded .title-logo-field,
+.cardstack_base-card-embedded .divider-value {
+  display: none;
+}
+
+/* field-name: background-image */
+.cardstack_base-card-embedded .background-image-field {
+  max-width: 100%;
+  padding: 0;
+  order: -100; /* first item on page */
+}
+.cardstack_base-card-embedded .background-image-value {
+  width: 100%;
+  max-height: 150px;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* field-name: title */
+.cardstack_base-card-embedded .title-field {
+  padding-bottom: 7px;
+}
+.cardstack_base-card-embedded .title-value {
+  color: var(--dark-gray);
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 0.015em;
+  line-height: 1.2;
+}
+
+/* field-name: highlight-title */
+.cardstack_base-card-embedded .highlight-title-value {
+  color: var(--red);
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 0.035em;
+  text-transform: capitalize;
+}
+
+/* field-name: divider */
+.cardstack_base-card-embedded .divider-field {
+  width: calc(100% - 30px);
+  border-top: 1px solid var(--light-gray);
+}
+
+
+/* Product card */
+.cardstack_base-card-embedded .product-rating-field,
+.cardstack_base-card-embedded .product-ranking-field,
+.cardstack_base-card-embedded .field.product-link-field {
+  display: none;
+}
+
+
+/* Photo card */
+.cardstack_base-card-embedded .photo-image-url-field {
+  display: block;
+}
+.cardstack_base-card-embedded .photo-image-url-label {
+  display: none;
+}
+.cardstack_base-card-embedded .photo-image-url-value {
+  width: 100%;
+  max-height: 150px;
+  margin: 0 auto;
+  object-fit: cover;
+  object-position: top center;
 }

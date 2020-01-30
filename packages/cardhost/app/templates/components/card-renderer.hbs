@@ -34,7 +34,7 @@ Ember Concurrency into the rendering of the card component here.
                   <LinkTo
                     @route="cards.card.edit.fields"
                     @model={{@card}}
-                    @class="card-renderer--edit-link"
+                    @class="card-renderer--header-link"
                     data-test-card-edit-link
                   >
                     Edit
@@ -50,12 +50,22 @@ Ember Concurrency into the rendering of the card component here.
                 {{svg-jar "event" width="18px" height="20px"}}
               {{/if}}
               <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.name "Blank Card"}}</span>
+              {{#if (eq @mode "edit")}}
+                <LinkTo
+                  @route="cards.card.view"
+                  @model={{@card}}
+                  @class="card-renderer--header-link"
+                  data-test-card-done-link
+                >
+                  Done
+                </LinkTo>
+              {{/if}}
             </header>
           </div>
         {{/if}}
         <div class="card-renderer-isolated--content">
           <AnimatedContainer>
-            {{#animated-value @card watch="isSelected" use=this.contentAnimation}}
+            {{#animated-value @card watch="isSelected" use=this.borderAnimation}}
               <div class="card-renderer-isolated--card-container {{if @cardSelected "selected"}}">
                 {{#if (and @dropField ) }}
                   <DropZone
