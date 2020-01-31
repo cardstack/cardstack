@@ -29,6 +29,9 @@ package-lock.json
 /packages/core/**/*.js
 /packages/core/**/*.js.map
 
+/packages/cardhost/app/routes/index.d.ts
+/packages/cardhost/app/routes/index.js
+/packages/cardhost/app/routes/index.js.map
 /packages/cardhost/app/services/data.d.ts
 /packages/cardhost/app/services/data.js
 /packages/cardhost/app/services/data.js.map
