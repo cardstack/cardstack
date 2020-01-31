@@ -46,6 +46,10 @@
   all: unset;
 }
 
+.card-renderer-isolated.schema .field {
+  position: static;
+}
+
 
 /* Card Renderer Header */
 /* We need the wrapper to mask the border of the content when scrolling */

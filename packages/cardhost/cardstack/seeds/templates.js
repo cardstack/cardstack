@@ -90,7 +90,6 @@ let eventCardTemplate = eventFactory.getDocumentFor(
       eventFactory.addResource('fields', 'event-location').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
-        'needed-when-embedded': true,
         required: false,
         caption: 'Location',
       }),
@@ -111,7 +110,6 @@ let eventCardTemplate = eventFactory.getDocumentFor(
       eventFactory.addResource('fields', 'event-cta').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::cta',
-        'needed-when-embedded': true,
         required: false,
         caption: 'RSVP',
       }),
@@ -264,18 +262,22 @@ let eventTicketTemplate = eventFactory.getDocumentFor(
         'needed-when-embedded': true,
         caption: 'Divider',
       }),
+      eventFactory.addResource('fields', 'event-title').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::case-insensitive',
+        required: true,
+        caption: 'Event title',
+      }),
       eventFactory.addResource('fields', 'guest-name').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
-        'needed-when-embedded': true,
         caption: 'Guest name',
       }),
       eventFactory.addResource('fields', 'number-of-tickets').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::integer',
         required: true,
-        'needed-when-embedded': true,
         caption: 'Number of tickets',
       }),
       eventFactory.addResource('fields', 'date').withAttributes({
@@ -289,28 +291,24 @@ let eventTicketTemplate = eventFactory.getDocumentFor(
         'is-metadata': true,
         'field-type': '@cardstack/core-types::boolean',
         required: true,
-        'needed-when-embedded': true,
         caption: 'Wheelchair access',
       }),
       eventFactory.addResource('fields', 'section').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
-        'needed-when-embedded': true,
         caption: 'Section',
       }),
       eventFactory.addResource('fields', 'features').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
-        'needed-when-embedded': true,
         caption: 'VIP package',
       }),
       eventFactory.addResource('fields', 'qr-code').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::decorative-image',
         required: true,
-        'needed-when-embedded': true,
         caption: 'QR code',
       }),
     ])
@@ -320,6 +318,7 @@ let eventTicketTemplate = eventFactory.getDocumentFor(
         title: 'Never Empty Cup Launch Party',
         highlightTitle: 'VIP Guest Ticket',
         divider: true,
+        eventTitle: 'Launch Party',
         guestName: 'Charlie Peel',
         numberOfTickets: 4,
         date: '2020-02-27',
@@ -348,7 +347,6 @@ let productCardTemplate = productFactory.getDocumentFor(
       productFactory.addResource('fields', 'title-logo').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::decorative-image',
-        'needed-when-embedded': true,
         required: false,
         caption: 'Title logo',
       }),
@@ -375,7 +373,6 @@ let productCardTemplate = productFactory.getDocumentFor(
       productFactory.addResource('fields', 'product-rating').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::integer',
-        'needed-when-embedded': true,
         required: true,
         caption: 'Rating (Out of 100, in increments of 10)',
       }),
@@ -389,7 +386,6 @@ let productCardTemplate = productFactory.getDocumentFor(
       productFactory.addResource('fields', 'product-company-logo').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::decorative-image',
-        'needed-when-embedded': true,
         required: false,
         caption: 'Logo',
       }),
@@ -410,21 +406,18 @@ let productCardTemplate = productFactory.getDocumentFor(
       productFactory.addResource('fields', 'product-description').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
-        'needed-when-embedded': false,
         required: false,
         caption: 'Description',
       }),
       productFactory.addResource('fields', 'product-link').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::link',
-        'needed-when-embedded': true,
         required: true,
         caption: 'View Details',
       }),
       productFactory.addResource('fields', 'product-cta').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::cta',
-        'needed-when-embedded': true,
         required: true,
         caption: 'Buy Now',
       }),
@@ -501,14 +494,12 @@ let weddingInvitationTemplate = weddingFactory.getDocumentFor(
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
-        'needed-when-embedded': true,
         caption: 'Reception address',
       }),
       weddingFactory.addResource('fields', 'wedding-intro-text').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: false,
-        'needed-when-embedded': true,
         caption: 'Intro text',
       }),
       weddingFactory.addResource('fields', 'wedding-rsvp-date').withAttributes({
@@ -522,14 +513,12 @@ let weddingInvitationTemplate = weddingFactory.getDocumentFor(
         'is-metadata': true,
         'field-type': '@cardstack/core-types::link',
         required: false,
-        'needed-when-embedded': true,
         caption: 'Learn more on our Website',
       }),
       weddingFactory.addResource('fields', 'wedding-rsvp-cta').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::cta',
         required: true,
-        'needed-when-embedded': true,
         caption: 'RSVP',
       }),
     ])
@@ -575,35 +564,30 @@ let photoTemplate = photoFactory.getDocumentFor(
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
-        'needed-when-embedded': false,
         caption: 'Description for a screen reader',
       }),
       photoFactory.addResource('fields', 'photo-keywords').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
-        'needed-when-embedded': false,
         caption: 'Keywords',
       }),
       photoFactory.addResource('fields', 'photo-location').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::case-insensitive',
         required: true,
-        'needed-when-embedded': true,
         caption: 'Location',
       }),
       photoFactory.addResource('fields', 'photo-datetime').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::date',
         required: true,
-        'needed-when-embedded': true,
         caption: 'Date & Time',
       }),
       photoFactory.addResource('fields', 'photo-byline').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::belongs-to',
         required: true,
-        'needed-when-embedded': true,
         caption: 'Byline',
       }),
     ])
@@ -629,18 +613,18 @@ let bylineTemplate = bylineFactory.getDocumentFor(
     .addResource('cards', 'local-hub::byline-card')
     .withRelated('adopted-from', { type: 'cards', id: 'local-hub::@cardstack/base-card' })
     .withRelated('fields', [
+      bylineFactory.addResource('fields', 'byline-image').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::decorative-image',
+        'needed-when-embedded': true,
+        caption: 'Image',
+      }),
       bylineFactory.addResource('fields', 'byline-name').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string',
         'needed-when-embedded': true,
         required: true,
         caption: 'Name',
-      }),
-      bylineFactory.addResource('fields', 'byline-image').withAttributes({
-        'is-metadata': true,
-        'field-type': '@cardstack/core-types::decorative-image',
-        'needed-when-embedded': true,
-        caption: 'Image',
       }),
     ])
     .withRelated(

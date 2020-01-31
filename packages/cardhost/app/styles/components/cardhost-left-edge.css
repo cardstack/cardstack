@@ -14,6 +14,9 @@
   transition: width 0.2s ease;
   overflow: hidden;
 }
+.cardhost-left-edge--nav.index-page {
+  background-color: var(--ch-default);
+}
 
 .cardhost-left-edge--nav > ul {
   display: flex;
@@ -21,7 +24,7 @@
   justify-content: flex-end;
   height: 100%;
   margin: 0;
-  padding: 20px 0 20px 10px;
+  padding: 20px;
   list-style-type: none;
 }
 
@@ -41,9 +44,44 @@
   border-radius: 10px;
 }
 
-.button-cardstack-logo {
+
+.cardhost-left-edge--nav-button {
+  --icon-color: var(--ch-highlight);
+  display: block;
+  background: none;
+  border: none;
+  border-radius: 100px;
   width: 40px;
   height: 40px;
+  padding: 5px;
+  line-height: 2;
+  text-align: center;
+}
+
+.cardhost-left-edge--nav-button svg {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.cardhost-left-edge--nav-button:not(:disabled):hover {
+  --icon-color: var(--ch-highlight-hover);
+  cursor: pointer;
+}
+.cardhost-left-edge--nav-button:not(:disabled):focus {
+  outline: 0;
+  border: 1px solid var(--ch-highlight-hover);
+}
+
+.cardhost-left-edge--nav-button.cardstack-logo-button {
+  background-color: white;
+  border-radius: 100px;
+}
+.cardhost-left-edge--nav-button.cardstack-logo-button:not(:disabled):hover {
+  background-color: var(--ch-light-background);
+}
+
+.cardhost-left-edge--nav-button:disabled {
+  --icon-color: var(--ch-light-op40);
 }
 
 .cardhost-left-edge--nav.expanded {
@@ -54,7 +92,7 @@
 
 .login-grid {
   display: grid;
-  grid-template-columns: 30px 290px;
+  grid-template-columns: 40px 290px;
   grid-column-gap: 50px;
 }
 
