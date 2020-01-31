@@ -6,6 +6,7 @@ import { tracked } from '@glimmer/tracking';
 export default class CardhostTopEdgeComponent extends Component {
   @service cardstackSession;
   @tracked isExpanded = false;
+  @tracked showCatalog = false;
 
   @action
   toggleMenuExpand() {
@@ -55,5 +56,10 @@ export default class CardhostTopEdgeComponent extends Component {
   destroyCloseListener() {
     document.querySelector('body').removeEventListener('click', this.closeListener);
     document.querySelector('body').removeEventListener('focusin', this.closeListener);
+  }
+
+  @action
+  toggleCatalog() {
+    this.showCatalog = !this.showCatalog;
   }
 }

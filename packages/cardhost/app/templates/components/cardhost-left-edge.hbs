@@ -49,7 +49,7 @@
         {{/if}}
       </li>
       <li>
-        <button disabled class="cardhost-left-edge--nav-button card-catalog-button" aria-label="catalog">
+        <button {{on "click" this.toggleCatalog}} class="cardhost-left-edge--nav-button card-catalog-button" aria-label="catalog">
           {{svg-jar "card-catalog" width="20px" height="20px"}}
         </button>
       </li>
@@ -68,3 +68,7 @@
 
   {{yield}}
 </aside>
+
+{{#if this.showCatalog}}
+  {{in-bottom-toolbar show=(component "card-catalog")}}
+{{/if}}
