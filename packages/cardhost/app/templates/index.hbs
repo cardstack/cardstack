@@ -1,7 +1,9 @@
 <CardhostLeftEdge @mode="index-page" />
 
-<div class="cardhost-catalog {{unless this.cardstackSession.isAuthenticated "no-navbar"}}">
-  <h1 class="cardhost-catalog--title">Card Builder</h1>
+<div class="cardhost-catalog {{unless this.cardstackSession.isAuthenticated "logged-out"}}">
+  <div class="cardhost-catalog--header">
+    <h1 class="cardhost-catalog--header-title">Card Builder</h1>
+  </div>
 
   {{#if this.cardstackSession.isAuthenticated}}
     <nav class="cardhost-catalog--nav" data-test-cardhost-welcome-left-edge>
