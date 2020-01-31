@@ -44,9 +44,9 @@ export default class DataService extends Service implements CardInstantiator {
   }
 
   async save(card: UnsavedCard | AddressableCard): Promise<AddressableCard> {
-    let url = this.localURL(card as CardId);
+    let url = this.localURL(card);
     let response = await fetch(url, {
-      method: card.csId != null ? 'PATCH' : 'POST',
+      method: 'isUnsaved' in card ? 'POST' : 'PATCH',
       headers: {
         'Content-Type': 'application/vnd.api+json',
       },
@@ -61,7 +61,7 @@ export default class DataService extends Service implements CardInstantiator {
   }
 
   async delete(card: AddressableCard): Promise<void> {
-    let url = this.localURL(card as CardId);
+    let url = this.localURL(card);
     let version = card.meta?.version || '';
 
     let response = await fetch(url, {
@@ -114,12 +114,16 @@ export default class DataService extends Service implements CardInstantiator {
 
   private localURL(csRealm: string, csOriginalRealm?: string): string;
   private localURL(id: CardId): string;
-  private localURL(idOrCsRealm: CardId | string, csOriginalRealm?: string): string {
+  private localURL(card: Card): string;
+  private localURL(idOrCardOrCsRealm: Card | CardId | string, csOriginalRealm?: string): string {
     let csRealm: string | undefined, csId: string | undefined;
-    if (typeof idOrCsRealm === 'string') {
-      csRealm = idOrCsRealm;
+    if (idOrCardOrCsRealm instanceof Card) {
+      ({ csRealm, csId, csOriginalRealm } = idOrCardOrCsRealm);
+    }
+    if (typeof idOrCardOrCsRealm === 'string') {
+      csRealm = idOrCardOrCsRealm;
     } else {
-      ({ csRealm, csId, csOriginalRealm } = idOrCsRealm);
+      ({ csRealm, csId, csOriginalRealm } = idOrCardOrCsRealm);
     }
     if (csRealm == null) {
       throw new Error(`Must specify a csRealm either as a string or as part of a CardId`);
@@ -134,7 +138,7 @@ export default class DataService extends Service implements CardInstantiator {
           csOriginalRealm
         )}`
       : `${this.hubURL}/api/remote-realms/${encodeURIComponent(requestRealm!)}/cards`;
-    if (csId != null) {
+    if (csId != null && typeof idOrCardOrCsRealm !== 'string' && !('isUnsaved' in idOrCardOrCsRealm)) {
       url = `${url}/${encodeURIComponent(csId)}`;
     }
     return url;

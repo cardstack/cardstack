@@ -395,6 +395,26 @@ module('Unit | Service | data', function() {
       assert.equal(await retreivedCard.value('name'), 'Van Gogh', 'the card user field value is correct');
     });
 
+    test('it saves an UnsavedCard with user supplied csId', async function(assert) {
+      let service = this.owner.lookup('service:data') as DataService;
+      let card = await service.create(
+        csRealm,
+        cardDocument()
+          .withAttributes({
+            csId: 'vangogh',
+          })
+          .withAutoAttributes({
+            name: 'Van Gogh',
+          }).jsonapi
+      );
+
+      let savedCard = await service.save(card);
+      assert.equal(savedCard.csId, 'vangogh');
+
+      let retreivedCard = await service.load(savedCard, 'everything');
+      assert.equal(retreivedCard.csId, savedCard.csId, 'the card csId isCorect');
+    });
+
     test('it patches a card', async function(assert) {
       let service = this.owner.lookup('service:data') as DataService;
       let card = await service.create(

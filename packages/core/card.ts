@@ -793,6 +793,8 @@ export class Card {
 }
 
 export class UnsavedCard extends Card {
+  readonly isUnsaved = true;
+
   constructor(
     jsonapi: SingleResourceDoc,
     realm: string,
