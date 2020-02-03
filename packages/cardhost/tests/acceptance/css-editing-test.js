@@ -199,21 +199,6 @@ module('Acceptance | css editing', function(hooks) {
     assert.dom('[data-test-cs-component="dropdown"]').doesNotContainText('Custom');
   });
 
-  test('dropdown displays custom theme for cards with custom CSS', async function(assert) {
-    await login();
-    await createCards(cardData);
-    await visit(`/cards/${card1Id}/edit/layout`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/layout`);
-    await click('[data-test-card-custom-style-button]');
-    await waitFor('[data-test-editor-pane] textarea');
-    await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
-    await click('[data-test-close-editor]');
-    await waitFor('[data-test-cs-component="dropdown"]');
-    assert.dom('[data-test-cs-component="dropdown"]').exists();
-    assert.dom('[data-test-cs-component="dropdown"]').containsText('Custom');
-    assert.dom('[data-test-cs-component="dropdown"]').doesNotContainText('default');
-  });
-
   test('selecting default theme resets css', async function(assert) {
     await login();
     await createCards(cardData);
@@ -229,5 +214,22 @@ module('Acceptance | css editing', function(hooks) {
     await selectChoose('[data-test-cs-component="dropdown"]', 'Cardstack default');
     assert.dom('[data-test-cs-component="dropdown"]').doesNotContainText('Custom');
     assert.dom('[data-test-view-css]').doesNotContainText('gorgeous styles');
+  });
+
+  test('buttons and dropdowns reflect custom style state', async function(assert) {
+    await login();
+    await createCards(cardData);
+    await visit(`/cards/${card1Id}/edit/layout`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/layout`);
+    assert.dom('[data-test-card-custom-style-button]').includesText('New Custom Theme');
+    assert.dom('[data-test-style-dropdown]').includesText('Cardstack default');
+    assert.dom('[data-test-style-dropdown]').doesNotIncludeText('Custom');
+    await click('[data-test-card-custom-style-button]');
+    await waitFor('[data-test-editor-pane] textarea');
+    await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
+    await click('[data-test-close-editor]');
+    assert.dom('[data-test-card-custom-style-button]').includesText('Edit Custom Theme');
+    assert.dom('[data-test-style-dropdown]').includesText('Custom');
+    assert.dom('[data-test-style-dropdown]').doesNotIncludeText('default');
   });
 });
