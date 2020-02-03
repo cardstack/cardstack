@@ -10,7 +10,7 @@
         Appearance
       </div>
       <div class="right-edge--items-container">
-        <div class="right-edge--item">
+        <div class="right-edge--item" data-test-style-dropdown>
           <Dropdown
             @theme="cs-dark"
             @searchEnabled={{false}}
@@ -27,7 +27,11 @@
             @theme="cs-dark"
             data-test-card-custom-style-button
           >
-            New Custom Style
+            {{#if this.isDefault}}
+              New Custom Theme
+            {{else}}
+              Edit Custom Theme
+            {{/if}}
           </Cta>
         </div>
       </div>
