@@ -40,11 +40,9 @@
     <div class="card-builder--section-grid">
       {{#each this.featuredCards as |card|}}
         <LinkTo @route="cards.card.view" @model={{card.id}} class="card-builder--section-card-link">
-          <div class="card-builder--section-card-renderer">
-            {{! template-lint-disable no-inline-styles }}
-            <div class="card-builder--section-card" style={{css-url "background-image" card.preview}}></div>
-            <div class="card-builder--section-card-label">{{card.title}}</div>
-          </div>
+          {{! template-lint-disable no-inline-styles }}
+          <div class="card-builder--section-card" style={{css-url "background-image" card.preview}}></div>
+          <div class="card-builder--section-card-label">{{card.title}}</div>
         </LinkTo>
       {{/each}}
     </div>

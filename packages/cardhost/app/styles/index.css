@@ -1,19 +1,21 @@
 .card-builder {
-  --index-page-background: #f6f5fa;
-  --index-page-card-hover: rgba(0,0,0,0.1);
+  --card-builder-background: #f6f5fa;
+  --card-builder-hover: rgba(0,0,0,0.1);
+  --card-builder-card-width: 263px;
+  --card-builder-horizontal-padding: 38px;
 
   width: 100%;
   height: 100%;
   min-height: 100vh;
   margin: 0;
   padding-left: var(--ch-left-edge-navbar-width);
-  background-color: var(--index-page-background);
+  background-color: var(--card-builder-background);
   color: var(--ch-dark);
 }
 
 .card-builder--header {
   margin: 0;
-  padding: 26px 28px 39px;
+  padding: 26px var(--card-builder-horizontal-padding) 39px;
   font-size: 20px;
   font-weight: 700;
   line-height: calc(27 / 20);
@@ -26,7 +28,7 @@
   display: flex;
   align-items: center;
   margin: 0;
-  padding: 30px 28px;
+  padding: 30px var(--card-builder-horizontal-padding);
   font-size: 26px;
   line-height: calc(36 / 26);
   font-weight: 400;
@@ -40,17 +42,16 @@
 .card-builder--section-grid {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(4, 253px);
-  grid-gap: 30px;
+  grid-template-columns: repeat(4, var(--card-builder-card-width));
+  grid-gap: 15px;
   margin: 0;
-  padding: 15px 28px 45px;
+  padding: 15px var(--card-builder-horizontal-padding) 45px;
   overflow-x: auto;
 }
 
 .card-builder--section-card-link {
-  width: 253px;
   margin: 0;
-  padding-right: 28px;
+  padding-right: var(--card-builder-horizontal-padding);
   background: none;
 }
 
@@ -60,16 +61,14 @@
   outline: 0;
 }
 
-.card-builder--section-card-link:hover > .card-builder--section-card-renderer > .card-builder--section-card,
-.card-builder--section-card-link:focus > .card-builder--section-card-renderer > .card-builder--section-card {
+.card-builder--section-card-link:hover > .card-builder--section-card,
+.card-builder--section-card-link:focus > .card-builder--section-card {
   transform: scale(0.9);
-  box-shadow: 0px 0px 0px 35px var(--index-page-card-hover);
+  box-shadow: 0px 0px 0px 35px var(--card-builder-hover);
   transition: all 0.3s ease;
 }
 
 .card-builder--section-card-label {
-  width: 225px;
-  height: auto;
   padding-top: 30px;
   color: var(--ch-dark);
   font-size: 13px;
@@ -90,15 +89,8 @@
 
 @media (max-width: 615px) {
   .card-builder {
-    padding-left: 80px;
-  }
-
-  .card-builder--header-title {
-    padding-bottom: 26px;
-  }
-
-  .card-builder--section {
-    padding-bottom: 60px;
+    --card-builder-card-width: 253px;
+    --card-builder-horizontal-padding: 28px;
   }
 
   .card-builder--section-header {
@@ -108,9 +100,5 @@
   .card-builder--section-header svg {
     height: 22px;
     margin-right: 15px;
-  }
-
-  .card-builder--section-grid {
-    grid-gap: 60px 30px;
   }
 }
