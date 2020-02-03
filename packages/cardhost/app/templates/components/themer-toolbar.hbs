@@ -1,21 +1,30 @@
 <header class="themer--top-edge-container">
   <div class="themer--top-edge-width-controls">
     <button
-      class="ch-button ch-button--icon responsive {{if this.cssModeToggle.isResponsive "selected"}}"
-      {{on "click" this.cssModeToggle.useResponsiveWidth}}
-      aria-label="Show the card in responsive size"
-      data-test-responsive-btn
+      class="ch-button ch-button--icon responsive {{if (eq this.cssModeToggle.width "small") "selected"}}"
+      {{on "click" (fn this.cssModeToggle.setWidth "small")}}
+      aria-label="Show the card in small size"
+      data-test-small-btn
     >
-      Responsive
+      Small
     </button>
 
     <button
-      class="ch-button ch-button--icon full-width {{if this.cssModeToggle.isResponsive "" "selected"}}"
-      {{on "click" this.cssModeToggle.useFullWidth}}
-      aria-label="Show the card in full width size"
-      data-test-full-width-btn
+      class="ch-button ch-button--icon medium {{if (eq this.cssModeToggle.width "medium") "selected"}}"
+      {{on "click" (fn this.cssModeToggle.setWidth "medium")}}
+      aria-label="Show the card in medium size"
+      data-test-medium-btn
     >
-      Full Width
+      Medium
+    </button>
+
+    <button
+      class="ch-button ch-button--icon full-width {{if (eq this.cssModeToggle.width "large") "selected"}}"
+      {{on "click" (fn this.cssModeToggle.setWidth "large")}}
+      aria-label="Show the card in full width size"
+      data-test-large-btn
+    >
+      Large
     </button>
   </div>
 
