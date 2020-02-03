@@ -1,30 +1,29 @@
-<aside
-  id="cardhost-left-edge"
-  class="cardhost-left-edge"
-  data-test-cardhost-left-edge
->
-  <nav
-    class="cardhost-left-edge--nav {{@mode}} {{if this.isExpanded "expanded"}}"
+<CardstackSession as |session|>
+  <aside
+    id="cardhost-left-edge"
+    class="cardhost-left-edge"
+    data-test-cardhost-left-edge
   >
-    <ul>
-      <li class="login-grid">
-        <button
-          class="cardhost-left-edge--nav-button cardstack-logo-button"
-          aria-label="expandable menu with login controls"
-          aria-expanded={{this.isExpanded}}
-          {{on "click" this.toggleMenuExpand}}
-          data-test-toggle-left-edge
-        >
-          {{svg-jar "cardstack-logo" width="21px" height="23px"}}
-        </button>
-        {{#if this.isExpanded}}
-          <div
-            class="login-grid-right-column"
-            {{did-insert this.registerCloseListener}}
-            {{will-destroy this.destroyCloseListener}}
+    <nav
+      class="cardhost-left-edge--nav {{@mode}} {{if this.isExpanded "expanded"}}"
+    >
+      <ul>
+        <li class="login-grid">
+          <button
+            class="cardhost-left-edge--nav-button cardstack-logo-button"
+            aria-label="expandable menu with login controls"
+            aria-expanded={{this.isExpanded}}
+            {{on "click" this.toggleMenuExpand}}
+            data-test-toggle-left-edge
           >
-            <h1>Cardstack Builder</h1>
-            <CardstackSession as |session|>
+            {{svg-jar "cardstack-logo" width="21px" height="23px"}}
+          </button>
+          {{#if this.isExpanded}}
+            <div
+              class="login-grid-right-column"
+              {{did-insert this.registerCloseListener}}
+              {{will-destroy this.destroyCloseListener}}
+            >
               {{#if session.isAuthenticated }}
                 <button
                   {{on "click" (fn this.logout session.logout)}}
@@ -44,30 +43,30 @@
                   </button>
                 </MockLogin>
               {{/if}}
-            </CardstackSession>
-          </div>
-        {{/if}}
-      </li>
-      <li>
-        <button {{on "click" this.toggleCatalog}} class="cardhost-left-edge--nav-button card-catalog-button" aria-label="catalog">
-          {{svg-jar "card-catalog" width="20px" height="20px"}}
-        </button>
-      </li>
-      <li>
-        <LinkTo
-          @route="index"
-          data-test-library-link
-          class="cardhost-left-edge--nav-button library-button"
-          title="Library"
-        >
-          {{svg-jar "library" width="21px" height="13px"}}
-        </LinkTo>
-      </li>
-    </ul>
-  </nav>
+            </div>
+          {{/if}}
+        </li>
+        <li>
+          <button disabled={{not session.isAuthenticated}} {{on "click" this.toggleCatalog}} class="cardhost-left-edge--nav-button card-catalog-button" aria-label="catalog">
+            {{svg-jar "card-catalog" width="20px" height="20px"}}
+          </button>
+        </li>
+        <li>
+          <LinkTo
+            @route="index"
+            data-test-library-link
+            class="cardhost-left-edge--nav-button library-button"
+            title="Library"
+          >
+            {{svg-jar "library" width="21px" height="13px"}}
+          </LinkTo>
+        </li>
+      </ul>
+    </nav>
 
-  {{yield}}
-</aside>
+    {{yield}}
+  </aside>
+</CardstackSession>
 
 {{#if this.showCatalog}}
   {{in-bottom-toolbar show=(component "card-catalog")}}
