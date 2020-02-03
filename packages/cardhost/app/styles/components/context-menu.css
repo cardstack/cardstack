@@ -5,4 +5,47 @@
   background-color: transparent;
   margin-left: 10px;
   font-size: 0.8em;
+  cursor: pointer;
 }
+
+.context-menu-nav {
+  display: inline-block;
+}
+
+.context-menu-items {
+  position: absolute;
+  z-index: var(--ch-actions-z-index);
+  background-color: var(--ch-light);
+  border-radius: 10px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+  top: 30px;
+  font-size: 0.8em;
+  padding-left: 0;
+  margin-left: 10px;
+  min-width: 200px;
+}
+
+.context-menu-items li {
+  text-decoration: none;
+  list-style: none;
+  font-weight: normal;
+  padding: 3px 40px;
+}
+
+.context-menu-items li.heading {
+  font-weight: 600;
+  margin-left: 0;
+  padding-left: 20px;
+  margin-top: 10px;
+}
+
+.context-menu-items li:hover {
+  background-color: var(--ch-light-background);
+}
+
+.context-menu-items li.heading:hover,
+.context-menu-items li.divider:hover {
+  background-color: transparent;
+}
+
+
