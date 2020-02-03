@@ -23,16 +23,18 @@
     <div class="ch-catalog--content" tabindex="0">
       <div class="ch-catalog--fields">
         {{#each this.fieldComponents as |field|}}
-          <div class="ch-catalog-field" tabindex="-1" onkeydown={{action this.handleKey field}} onmousedown={{action this.beginDragging field}} data-test-card-add-field-draggable={{field.type}}>
-            {{! template-lint-disable no-inline-styles}}
-            <div class="ch-catalog-field--icon" style={{css-url "background-image" field.icon}}></div>
-            <div>
-              <h4 class="ch-catalog-field--title">{{field.title}}</h4>
-              {{#if field.description}}
-                <p class="ch-catalog-field--description">{{field.description}}</p>
-              {{/if}}
+          {{#animated-value field watch="dragState"}}
+            <div class="ch-catalog-field" tabindex="-1" onkeydown={{action this.handleKey field}} onmousedown={{action this.beginDragging field}} data-test-card-add-field-draggable={{field.type}}>
+              {{! template-lint-disable no-inline-styles}}
+              <div class="ch-catalog-field--icon" style={{css-url "background-image" field.icon}}></div>
+              <div>
+                <h4 class="ch-catalog-field--title">{{field.title}}</h4>
+                {{#if field.description}}
+                  <p class="ch-catalog-field--description">{{field.description}}</p>
+                {{/if}}
+              </div>
             </div>
-          </div>
+          {{/animated-value}}
         {{/each}}
       </div>
     </div>
