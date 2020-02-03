@@ -1,8 +1,12 @@
 import Component from '@ember/component';
 import { action } from '@ember/object';
+import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
 export default class Library extends Component {
+  @service scroller;
+
+  @tracked selectedSection = 'recent-cards';
   @tracked cardModel;
   @tracked dialogTitle;
   @tracked showDialog;
@@ -22,5 +26,17 @@ export default class Library extends Component {
   closeDialog() {
     this.showDialog = false;
     this.cardModel = null;
+  }
+
+  @action
+  scrollToSection(sectionId) {
+    if (!sectionId) {
+      return;
+    }
+    this.scroller.scrollToSection({
+      selector: `.library-section--${sectionId}`,
+      elementOffset: 50,
+      doneScrolling: () => (this.selectedSection = sectionId),
+    });
   }
 }

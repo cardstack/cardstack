@@ -2,25 +2,25 @@
   <nav class="library--nav" data-test-library-nav>
     <ul>
       <li>
-        <button class="library--nav-button">
+        <button {{on "click" (fn this.scrollToSection "recent-cards")}} class="library--nav-button {{if (eq this.selectedSection "recent-cards") "active"}}">
           {{svg-jar "clock" width="15px" height="15px" aria-hidden="true"}}
           Recent Cards
         </button>
       </li>
       <li>
-        <button class="library--nav-button">
+        <button {{on "click" (fn this.scrollToSection "saved-templates")}} class="library--nav-button {{if (eq this.selectedSection "saved-templates") "active"}}">
           {{svg-jar "saved" width="15px" height="15px" aria-hidden="true"}}
           Saved Templates
         </button>
       </li>
       <li>
-        <button class="library--nav-button">
+        <button {{on "click" (fn this.scrollToSection "common-cards")}} class="library--nav-button {{if (eq this.selectedSection "common-cards") "active"}}">
           {{svg-jar "cards" width="15px" height="15px" aria-hidden="true"}}
           Common Cards
         </button>
       </li>
       <li>
-        <button class="library--nav-button">
+        <button {{on "click" (fn this.scrollToSection "add-card")}} class="library--nav-button {{if (eq this.selectedSection "add-card") "active"}}">
           {{svg-jar "add" width="15px" height="15px" aria-hidden="true"}}
           New Blank Card
         </button>
@@ -28,7 +28,7 @@
     </ul>
   </nav>
   <div class="library--main">
-    <section class="library-section">
+    <section class="library-section library-section--recent-cards">
       <header class="library-section--header">
         {{svg-jar "clock" width="28px" height="28px"}}
         Recent Cards
@@ -49,7 +49,7 @@
       </div>
     </section>
 
-    <section class="library-section">
+    <section class="library-section library-section--saved-templates">
       <header class="library-section--header">
         {{svg-jar "saved" width="28px" height="28px"}}
         Saved Templates
@@ -71,7 +71,7 @@
       </div>
     </section>
 
-    <section class="library-section">
+    <section class="library-section library-section--common-cards">
       <header class="library-section--header">
         {{svg-jar "cards" width="28px" height="28px"}}
         Common Cards
@@ -98,7 +98,7 @@
       </div>
     </section>
 
-    <section class="library-section">
+    <section class="library-section library-section--add-card">
       <header class="library-section--header">
         {{svg-jar "add" width="28px" height="28px"}}
         New Blank Card
