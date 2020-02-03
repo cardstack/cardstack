@@ -10,23 +10,26 @@
   grid-template-areas:
     "title  title"
     "navbar main";
-  min-width: 615px;
   width: 100%;
-  max-width: 1440px;
-  height: 100vh;
+  height: 100%;
+  min-height: 100vh;
   margin: 0;
   padding-left: var(--ch-left-edge-navbar-width);
   background-color: var(--index-page-background);
   color: var(--ch-dark);
 }
 
-.cardhost-catalog.no-navbar {
-  grid-template-columns: 1fr;
-  grid-template-areas: "main main";
+.cardhost-catalog.logged-out {
+  display: block;
 }
 
-.cardhost-catalog--title {
+.cardhost-catalog--header {
   grid-area: title;
+  min-height: 92px;
+}
+
+.cardhost-catalog--header-title {
+  position: fixed;
   margin: 0;
   padding: 26px 28px 39px;
   font-size: 20px;
@@ -37,6 +40,10 @@
   text-transform: uppercase;
 }
 
+.cardhost-catalog.logged-out .cardhost-catalog--header-title {
+  position: static;
+}
+
 .cardhost-catalog--nav {
   grid-area: navbar;
   width: var(--catalog-navbar-width);
@@ -45,12 +52,12 @@
 
 .cardhost-catalog--main {
   grid-area: main;
-  max-width: 100%;
+  max-width: 1440px;
   padding: 30px 28px 0;
   overflow-y: auto;
 }
 
-.cardhost-catalog.no-navbar > .cardhost-catalog--main {
+.cardhost-catalog.logged-out > .cardhost-catalog--main {
   padding-left: 60px;
 }
 
@@ -116,7 +123,9 @@
   display: flex;
   align-items: center;
   padding: 45px 0;
-  font: 400 26px/36px var(--ch-font-family);
+  font-size: 26px;
+  line-height: calc(36 / 26);
+  font-weight: 400;
   letter-spacing: 0.015em;
 }
 
@@ -212,11 +221,40 @@
 @media (max-width: 615px) {
   .cardhost-catalog {
     display: block;
-    min-width: auto;
-    padding-left: 60px;
+    padding-left: 80px;
+  }
+
+  .cardhost-catalog--header {
+    min-height: auto;
+  }
+
+  .cardhost-catalog--header-title {
+    position: static;
+    padding-bottom: 26px;
   }
 
   .cardhost-catalog--nav {
     display: none;
+  }
+
+  .cardhost-catalog.logged-out > .cardhost-catalog--main {
+    padding-left: 28px;
+  }
+
+  .cardhost-section {
+    padding-bottom: 60px;
+  }
+
+  .cardhost-section--header {
+    font-size: 22px;
+  }
+
+  .cardhost-section--header svg {
+    height: 22px;
+    margin-right: 15px;
+  }
+
+  .card-catalog {
+    grid-gap: 60px 30px;
   }
 }
