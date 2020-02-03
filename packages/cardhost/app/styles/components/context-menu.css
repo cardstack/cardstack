@@ -1,0 +1,8 @@
+.context-menu-button {
+  padding: 5px 7px;
+  border: solid 1px var(--ch-border);
+  border-radius: 20px;
+  background-color: transparent;
+  margin-left: 10px;
+  font-size: 0.8em;
+}

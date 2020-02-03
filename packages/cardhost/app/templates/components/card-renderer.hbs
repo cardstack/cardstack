@@ -51,14 +51,17 @@ Ember Concurrency into the rendering of the card component here.
               {{/if}}
               <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.name "Blank Card"}}</span>
               {{#if (eq @mode "edit")}}
-                <LinkTo
-                  @route="cards.card.view"
-                  @model={{@card}}
-                  @class="card-renderer--header-link"
-                  data-test-card-done-link
-                >
-                  Done
-                </LinkTo>
+                <div>
+                  <LinkTo
+                    @route="cards.card.view"
+                    @model={{@card}}
+                    @class="card-renderer--header-link"
+                    data-test-card-done-link
+                  >
+                    Done Editing
+                  </LinkTo>
+                  <ContextMenu />
+                </div>
               {{/if}}
             </header>
           </div>
