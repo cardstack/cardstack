@@ -26,7 +26,7 @@
   display: flex;
   align-items: center;
   margin: 0;
-  padding: 30px 28px 45px;
+  padding: 30px 28px;
   font-size: 26px;
   line-height: calc(36 / 26);
   font-weight: 400;
@@ -40,17 +40,17 @@
 .card-builder--section-grid {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(4, 225px);
+  grid-template-columns: repeat(4, 253px);
   grid-gap: 30px;
   margin: 0;
-  padding: 30px 28px;
+  padding: 15px 28px 45px;
   overflow-x: auto;
 }
 
 .card-builder--section-card-link {
-  width: 225px;
+  width: 253px;
   margin: 0;
-  padding: 0;
+  padding-right: 28px;
   background: none;
 }
 
