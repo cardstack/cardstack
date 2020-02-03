@@ -97,10 +97,8 @@ Until that work is done we are statically adding this css
 }
 
 body {
-  min-width: 100%;
-  min-height: 100%;
+  position: fixed;
   width: 100%;
-  height: auto;
   margin: 0;
   background-color: var(--ch-default);
   color: white;
@@ -122,6 +120,11 @@ a:hover {
 /* Ember Animated */
 .animated-tools {
   z-index: 50;
+}
+
+/* TODO: Remove when using ember-toolbars for all edges */
+.cst-bottom {
+  z-index: 25;
 }
 
 /* JSON card document -- hidden from view */

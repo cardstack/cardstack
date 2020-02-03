@@ -2,16 +2,16 @@
   /* TODO: make this a grid. do not use padding to determine card view zone */
 
   --padding-top: var(--ch-top-edge-height);
-  --padding-left: var(--ch-left-edge-width);
+  /* --padding-left: var(--ch-left-edge-width);
   --padding-right: var(--ch-right-edge-width);
-  --padding-bottom: var(--ch-bottom-edge-height);
+  --padding-bottom: var(--ch-bottom-edge-height); */
 
   width: 100%;
   min-height: 100vh;
   background-color: var(--ch-default);
   padding-top: var(--padding-top);
-  padding-left: var(--padding-left);
-  padding-right: var(--padding-right);
+  /* padding-left: var(--padding-left);
+  padding-right: var(--padding-right); */
 
   transition: var(--ch-card-background-color-animate);
 }

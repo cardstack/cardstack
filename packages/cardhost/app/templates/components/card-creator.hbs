@@ -55,18 +55,19 @@
 
 <section class="card-creator" data-test-card-creator {{did-update this.updateCard @card}}>
   {{#if this.card}}
-    <CardRenderer
-      @card={{this.card}}
-      @format="isolated"
-      @mode="schema"
-      @removeField={{action this.removeField}}
-      @setPosition={{action this.setPosition}}
-      @selectField={{action this.selectField}}
-      @selectedField={{this.selectedField}}
-      @dropField={{action this.dropField}}
-      @cardSelected={{this.cardSelected}}
-      @cardFocused={{action (mut this.cardSelected)}}
-    />
+    <div class="card-renderer--container">
+      <CardRenderer
+        @card={{this.card}}
+        @format="isolated"
+        @mode="schema"
+        @removeField={{action this.removeField}}
+        @setPosition={{action this.setPosition}}
+        @selectField={{action this.selectField}}
+        @selectedField={{this.selectedField}}
+        @dropField={{action this.dropField}}
+        @cardSelected={{this.cardSelected}}
+        @cardFocused={{action (mut this.cardSelected)}} />
+    </div>
   {{/if}}
 </section>
 
