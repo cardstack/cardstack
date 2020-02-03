@@ -1,0 +1,198 @@
+.library {
+  --catalog-navbar-width: 255px;
+  --catalog-placeholder-card: #acaac6;
+  --catalog-border: #dedede;
+
+  display: grid;
+  grid-template-columns: var(--catalog-navbar-width) 1fr;
+  grid-template-areas: "navbar main";
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding-left: var(--ch-left-edge-navbar-width);
+  background-color: var(--ch-deep-background);
+  color: var(--ch-light);
+}
+
+.library--nav {
+  grid-area: navbar;
+  width: var(--catalog-navbar-width);
+  padding: 30px 0;
+}
+
+.library--main {
+  grid-area: main;
+  max-width: 1440px;
+  padding: 30px 28px 0;
+  overflow-y: auto;
+}
+
+
+/* Navbar list */
+.library--nav ul {
+  position: fixed;
+  list-style-type: none;
+  margin: 0;
+  padding-top: 15px;
+  padding-left: 28px;
+  font: 400 13px/18px var(--ch-font-family);
+}
+
+.library--nav ul li + li {
+  margin-top: 18px;
+}
+
+.library--nav-button {
+  display: flex;
+  align-items: center;
+  background: none;
+  box-shadow: none;
+  border: none;
+  font: 400 13px/18px var(--ch-font-family);
+  color: var(--ch-foreground);
+  letter-spacing: 0.015em;
+  transition: color var(--ch-card-transition-duration);
+}
+
+.library--nav-button > svg {
+  margin-right: 14px;
+}
+
+.library--nav-button:not(:disabled):focus {
+  outline: 0;
+  text-decoration: underline;
+  text-decoration-color: var(--ch-highlight);
+  text-underline-position: under;
+}
+
+.library--nav-button:not(:disabled):hover,
+.library--nav-button:not(:disabled).active {
+  color: var(--ch-dark);
+  cursor: pointer;
+}
+
+
+/* Catalog section */
+.library-section {
+  padding-bottom: 110px;
+}
+
+.library-section:first-of-type .library-section--header {
+  padding-top: 10px;
+}
+
+.library-section + .library-section {
+  border-top: 1px solid var(--catalog-border);
+}
+
+.library-section--header {
+  display: flex;
+  align-items: center;
+  padding: 45px 0;
+  font-size: 26px;
+  line-height: calc(36 / 26);
+  font-weight: 400;
+  letter-spacing: 0.015em;
+}
+
+.library-section--header svg {
+  margin-right: 20px;
+}
+
+.library-section--grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(225px, 1fr));
+  grid-gap: 90px 30px;
+  justify-items: center;
+  margin: 0;
+}
+
+.library--card-link {
+  width: 225px;
+  margin: 0;
+  padding: 0;
+  background: none;
+}
+
+.library--card-link:hover,
+.library--card-link:focus {
+  --cs-button-hover: transparent;
+  outline: 0;
+}
+
+.library--card-renderer > .embedded-card,
+.library--card-renderer > .card--card-placeholder {
+  height: 225px;
+  border-radius: 15px;
+  transition: transform var(--ch-card-transition-duration) ease-in-out calc(var(--ch-card-transition-duration) / 3);
+}
+
+.library--card-link:hover > .library--card-renderer > .embedded-card,
+.library--card-link:focus > .library--card-renderer > .embedded-card,
+.library--card-link:hover > .library--card-renderer > .library--card-placeholder,
+.library--card-link:focus > .library--card-renderer > .library--card-placeholder {
+  transform: scale(0.9);
+  box-shadow: 0px 0px 0px 35px var(--index-page-card-hover);
+  transition: all 0.3s ease;
+}
+
+.library--card-placeholder {
+  background-color: var(--catalog-placeholder-card);
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: 50px 56px;
+}
+.library--card-placeholder.icon-common-form {
+  background-image: url(/assets/images/cards/started-page/icon-common-form.svg);
+}
+.library--card-placeholder.icon-common-layout {
+  background-image: url(/assets/images/cards/started-page/icon-common-layout.svg);
+}
+.library--card-placeholder.icon-common-collection {
+  background-image: url(/assets/images/cards/started-page/icon-common-collection.svg);
+}
+.library--card-placeholder.icon-add-card {
+  background-image: url(/assets/images/cards/started-page/icon-blank-card.svg);
+}
+
+.library--card-renderer .embedded-card-label,
+.library--card-label {
+  width: 225px;
+  height: auto;
+  padding-top: 30px;
+  color: var(--ch-dark);
+  font-size: 13px;
+  font-weight: 400;
+  text-align: center;
+}
+
+
+@media (max-width: 615px) {
+  .library {
+    display: block;
+    padding-left: 80px;
+  }
+
+  .library--nav {
+    display: none;
+  }
+
+  .library-section {
+    padding-bottom: 60px;
+  }
+
+  .library-section--header {
+    font-size: 22px;
+  }
+
+  .library-section--header svg {
+    height: 22px;
+    margin-right: 15px;
+  }
+
+  .library-section--grid {
+    grid-gap: 60px 30px;
+  }
+}

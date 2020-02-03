@@ -1,151 +1,55 @@
 <CardhostLeftEdge @mode="index-page" />
 
-<div class="cardhost-catalog {{unless this.cardstackSession.isAuthenticated "logged-out"}}">
-  <div class="cardhost-catalog--header">
-    <h1 class="cardhost-catalog--header-title">Card Builder</h1>
-  </div>
+<main class="card-builder">
+  <h1 class="card-builder--header">Card Builder</h1>
 
-  {{#if this.cardstackSession.isAuthenticated}}
-    <nav class="cardhost-catalog--nav" data-test-cardhost-welcome-left-edge>
-      <ul>
-        <li>
-          <button {{on "click" (fn this.scrollToSection "recent-cards")}} class="cardhost-catalog--nav-button {{if (eq this.selectedSection "recent-cards") "active"}}">
-            {{svg-jar "clock" width="15px" height="15px" aria-hidden="true"}}
-            Recent Cards
-          </button>
-        </li>
-        <li>
-          <button {{on "click" (fn this.scrollToSection "saved-templates")}} class="cardhost-catalog--nav-button {{if (eq this.selectedSection "saved-templates") "active"}}">
-            {{svg-jar "saved" width="15px" height="15px" aria-hidden="true"}}
-            Saved Templates
-          </button>
-        </li>
-        <li>
-          <button {{on "click" (fn this.scrollToSection "common-cards")}} class="cardhost-catalog--nav-button {{if (eq this.selectedSection "common-cards") "active"}}">
-            {{svg-jar "cards" width="15px" height="15px" aria-hidden="true"}}
-            Common Cards
-          </button>
-        </li>
-        <li>
-          <button {{on "click" (fn this.scrollToSection "add-card")}} class="cardhost-catalog--nav-button {{if (eq this.selectedSection "add-card") "active"}}">
-            {{svg-jar "add" width="15px" height="15px" aria-hidden="true"}}
-            New Blank Card
-          </button>
-        </li>
-      </ul>
-    </nav>
-  {{/if}}
-
-  <main class="cardhost-catalog--main">
-    {{#if this.cardstackSession.isAuthenticated}}
-      <section class="cardhost-section cardhost-section--recent-cards">
-        <header class="cardhost-section--header recent-cards">
-          {{svg-jar "clock" width="28px" height="28px"}}
+  {{!-- <nav class="cardhost-catalog--nav" data-test-cardhost-welcome-left-edge>
+    <ul>
+      <li>
+        <button {{on "click" (fn this.scrollToSection "recent-cards")}} class="cardhost-catalog--nav-button {{if (eq this.selectedSection "recent-cards") "active"}}">
+          {{svg-jar "clock" width="15px" height="15px" aria-hidden="true"}}
           Recent Cards
-        </header>
-        <div class="card-catalog">
-          {{#each this.model.catalog as |card|}}
-            {{#if (not (eq card.name "@cardstack/base-card"))}}
-              <LinkTo @route="cards.card.view" @model={{card.name}} class="card-catalog--card-link">
-                <CardRenderer
-                  @class="card-catalog--card-renderer"
-                  @card={{card}}
-                  @format="embedded"
-                  @preventIsolation={{true}}
-                  @showName={{true}} />
-              </LinkTo>
-            {{/if}}
-          {{/each}}
-        </div>
-      </section>
-
-      <section class="cardhost-section cardhost-section--saved-templates">
-        <header class="cardhost-section--header saved-templates">
-          {{svg-jar "saved" width="28px" height="28px"}}
+        </button>
+      </li>
+      <li>
+        <button {{on "click" (fn this.scrollToSection "saved-templates")}} class="cardhost-catalog--nav-button {{if (eq this.selectedSection "saved-templates") "active"}}">
+          {{svg-jar "saved" width="15px" height="15px" aria-hidden="true"}}
           Saved Templates
-        </header>
-        <div class="card-catalog">
-          {{#each this.model.templates as |card|}}
-            <Cta {{on "click" (fn this.openCardNameDialog "Adopt a Card" card)}}
-              class="card-catalog--card-link"
-              data-test-embedded-card={{card.name}}
-              data-test-adopt-card-btn>
-              <CardRenderer
-                @class="card-catalog--card-renderer"
-                @card={{card}}
-                @format="embedded"
-                @preventIsolation={{true}}
-                @showName={{true}} />
-            </Cta>
-          {{/each}}
-        </div>
-      </section>
-
-      <section class="cardhost-section cardhost-section--common-cards">
-        <header class="cardhost-section--header common-cards">
-          {{svg-jar "cards" width="28px" height="28px"}}
+        </button>
+      </li>
+      <li>
+        <button {{on "click" (fn this.scrollToSection "common-cards")}} class="cardhost-catalog--nav-button {{if (eq this.selectedSection "common-cards") "active"}}">
+          {{svg-jar "cards" width="15px" height="15px" aria-hidden="true"}}
           Common Cards
-        </header>
-        <div class="card-catalog">
-          <LinkTo @route="cards.add" @class="card-catalog--card-link">
-            <div class="card-catalog--card-renderer">
-              <div class="card-catalog--card-placeholder icon-common-form"></div>
-              <div class="card-catalog--card-label">Form</div>
-            </div>
-          </LinkTo>
-          <LinkTo @route="cards.add" @class="card-catalog--card-link">
-            <div class="card-catalog--card-renderer">
-              <div class="card-catalog--card-placeholder icon-common-layout"></div>
-              <div class="card-catalog--card-label">Layout</div>
-            </div>
-          </LinkTo>
-          <LinkTo @route="cards.add" @class="card-catalog--card-link">
-            <div class="card-catalog--card-renderer">
-              <div class="card-catalog--card-placeholder icon-common-collection"></div>
-              <div class="card-catalog--card-label">Collection</div>
-            </div>
-          </LinkTo>
-        </div>
-      </section>
-
-      <section class="cardhost-section cardhost-section--add-card">
-        <header class="cardhost-section--header add-card">
-          {{svg-jar "add" width="28px" height="28px"}}
+        </button>
+      </li>
+      <li>
+        <button {{on "click" (fn this.scrollToSection "add-card")}} class="cardhost-catalog--nav-button {{if (eq this.selectedSection "add-card") "active"}}">
+          {{svg-jar "add" width="15px" height="15px" aria-hidden="true"}}
           New Blank Card
-        </header>
-        <div class="card-catalog">
-          <Cta {{on "click" (fn this.openCardNameDialog "Create a New Card")}}
-            class="card-catalog--card-link"
-            data-test-new-blank-card-btn
-          >
-            <div class="card-catalog--card-renderer">
-              <div class="card-catalog--card-placeholder icon-add-card"></div>
-              <div class="card-catalog--card-label">Blank Card</div>
-            </div>
-          </Cta>
-        </div>
-      </section>
-    {{/if}}
+        </button>
+      </li>
+    </ul>
+  </nav> --}}
 
-    <section class="cardhost-section cardhost-section--featured-cards">
-      <header class="cardhost-section--header featured-cards">
-        {{svg-jar "cards" width="28px" height="28px"}}
-        Featured Cards
-      </header>
-      <div class="card-catalog">
-        {{#each this.featuredCards as |card|}}
-          <LinkTo @route="cards.card.view" @model={{card.id}} class="card-catalog--card-link">
-            <div class="card-catalog--card-renderer">
-              {{! template-lint-disable no-inline-styles }}
-              <div class="featured-card" style={{css-url "background-image" card.preview}}></div>
-              <div class="card-catalog--card-label">{{card.title}}</div>
-            </div>
-          </LinkTo>
-        {{/each}}
-      </div>
-    </section>
-  </main>
-</div>
+  <section class="card-builder--section">
+    <h2 class="card-builder--section-header">
+      {{svg-jar "cards" width="28px" height="28px"}}
+      Featured Cards
+    </h2>
+    <div class="card-builder--section-grid">
+      {{#each this.featuredCards as |card|}}
+        <LinkTo @route="cards.card.view" @model={{card.id}} class="card-builder--section-card-link">
+          <div class="card-builder--section-card-renderer">
+            {{! template-lint-disable no-inline-styles }}
+            <div class="card-builder--section-card" style={{css-url "background-image" card.preview}}></div>
+            <div class="card-builder--section-card-label">{{card.title}}</div>
+          </div>
+        </LinkTo>
+      {{/each}}
+    </div>
+  </section>
+</main>
 
 {{#if this.showDialog}}
   {{to-elsewhere

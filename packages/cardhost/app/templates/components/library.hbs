@@ -1,0 +1,120 @@
+<div class="library">
+  <nav class="library--nav" data-test-library-nav>
+    <ul>
+      <li>
+        <button class="library--nav-button">
+          {{svg-jar "clock" width="15px" height="15px" aria-hidden="true"}}
+          Recent Cards
+        </button>
+      </li>
+      <li>
+        <button class="library--nav-button">
+          {{svg-jar "saved" width="15px" height="15px" aria-hidden="true"}}
+          Saved Templates
+        </button>
+      </li>
+      <li>
+        <button class="library--nav-button">
+          {{svg-jar "cards" width="15px" height="15px" aria-hidden="true"}}
+          Common Cards
+        </button>
+      </li>
+      <li>
+        <button class="library--nav-button">
+          {{svg-jar "add" width="15px" height="15px" aria-hidden="true"}}
+          New Blank Card
+        </button>
+      </li>
+    </ul>
+  </nav>
+  <div class="library--main">
+    <section class="library-section">
+      <header class="library-section--header">
+        {{svg-jar "clock" width="28px" height="28px"}}
+        Recent Cards
+      </header>
+      <div class="library-section--grid">
+        {{!-- {{#each this.model.catalog as |card|}}
+          {{#if (not (eq card.name "@cardstack/base-card"))}}
+            <LinkTo @route="cards.card.view" @model={{card.name}} class="library--card-link">
+              <CardRenderer
+                @class="library--card-renderer"
+                @card={{card}}
+                @format="embedded"
+                @preventIsolation={{true}}
+                @showName={{true}} />
+            </LinkTo>
+          {{/if}}
+        {{/each}} --}}
+      </div>
+    </section>
+
+    <section class="library-section">
+      <header class="library-section--header">
+        {{svg-jar "saved" width="28px" height="28px"}}
+        Saved Templates
+      </header>
+      <div class="library-section--grid">
+        {{!-- {{#each this.model.templates as |card|}}
+          <Cta {{on "click" (fn this.openCardNameDialog "Adopt a Card" card)}}
+            class="library--card-link"
+            data-test-embedded-card={{card.name}}
+            data-test-adopt-card-btn>
+            <CardRenderer
+              @class="library--card-renderer"
+              @card={{card}}
+              @format="embedded"
+              @preventIsolation={{true}}
+              @showName={{true}} />
+          </Cta>
+        {{/each}} --}}
+      </div>
+    </section>
+
+    <section class="library-section">
+      <header class="library-section--header">
+        {{svg-jar "cards" width="28px" height="28px"}}
+        Common Cards
+      </header>
+      <div class="library-section--grid">
+        <LinkTo @route="cards.add" @class="library--card-link">
+          <div class="library--card-renderer">
+            <div class="library--card-placeholder icon-common-form"></div>
+            <div class="library--card-label">Form</div>
+          </div>
+        </LinkTo>
+        <LinkTo @route="cards.add" @class="library--card-link">
+          <div class="library--card-renderer">
+            <div class="library--card-placeholder icon-common-layout"></div>
+            <div class="library--card-label">Layout</div>
+          </div>
+        </LinkTo>
+        <LinkTo @route="cards.add" @class="library--card-link">
+          <div class="library--card-renderer">
+            <div class="library--card-placeholder icon-common-collection"></div>
+            <div class="library--card-label">Collection</div>
+          </div>
+        </LinkTo>
+      </div>
+    </section>
+
+    <section class="library-section">
+        <header class="library-section--header">
+          {{svg-jar "add" width="28px" height="28px"}}
+          New Blank Card
+        </header>
+        <div class="library-section--grid">
+          {{!-- <Cta {{on "click" (fn this.openCardNameDialog "Create a New Card")}}
+            class="library--card-link"
+            data-test-new-blank-card-btn
+          >
+            <div class="library--card-renderer">
+              <div class="library--card-placeholder icon-add-card"></div>
+              <div class="library--card-label">Blank Card</div>
+            </div>
+          </Cta> --}}
+        </div>
+      </section>
+
+  </div>
+</div>
