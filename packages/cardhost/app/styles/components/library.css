@@ -3,6 +3,8 @@
   --library-placeholder-card: #acaac6;
   --library-nav-color: #6b6a80;
   --library-border-color: #373748;
+  --library-grid-col-width: 265px; /* card-min-size + padding * 2 */
+  --library-card-min-size: 225px;
 
   display: grid;
   grid-template-columns: var(--library-navbar-width) 1fr;
@@ -105,16 +107,18 @@
 .library-section--grid {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(auto-fill, 265px);
+  grid-template-columns: repeat(auto-fill, var(--library-grid-col-width));
   grid-gap: 5px 30px;
   justify-items: center;
   margin: 0;
 }
 
 .library--card-link {
+  width: 100%;
   margin: 0;
   padding: 20px;
   background: none;
+  border: none;
 }
 
 .library--card-link:hover,
@@ -125,6 +129,8 @@
 
 .library--card-renderer > .embedded-card,
 .library--card-renderer > .library--card-placeholder {
+  min-width: var(--library-card-min-size);
+  min-height: var(--library-card-min-size);
   border-radius: 15px;
   transition: transform var(--ch-card-transition-duration) ease-in-out calc(var(--ch-card-transition-duration) / 3);
 }
@@ -139,8 +145,6 @@
 }
 
 .library--card-placeholder {
-  width: 225px;
-  height: 225px;
   background-color: var(--library-placeholder-card);
   background-position: center center;
   background-repeat: no-repeat;

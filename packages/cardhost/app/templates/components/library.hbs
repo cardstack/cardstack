@@ -34,7 +34,7 @@
         Recent Cards
       </header>
       <div class="library-section--grid">
-        {{!-- {{#each this.model.catalog as |card|}}
+        {{#each this.model.catalog as |card|}}
           {{#if (not (eq card.name "@cardstack/base-card"))}}
             <LinkTo @route="cards.card.view" @model={{card.name}} class="library--card-link">
               <CardRenderer
@@ -45,7 +45,7 @@
                 @showName={{true}} />
             </LinkTo>
           {{/if}}
-        {{/each}} --}}
+        {{/each}}
       </div>
     </section>
 
@@ -55,7 +55,7 @@
         Saved Templates
       </header>
       <div class="library-section--grid">
-        {{!-- {{#each this.model.templates as |card|}}
+        {{#each this.model.templates as |card|}}
           <Cta {{on "click" (fn this.openCardNameDialog "Adopt a Card" card)}}
             class="library--card-link"
             data-test-embedded-card={{card.name}}
@@ -67,7 +67,7 @@
               @preventIsolation={{true}}
               @showName={{true}} />
           </Cta>
-        {{/each}} --}}
+        {{/each}}
       </div>
     </section>
 
