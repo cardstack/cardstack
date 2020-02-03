@@ -99,22 +99,36 @@
     </section>
 
     <section class="library-section">
-        <header class="library-section--header">
-          {{svg-jar "add" width="28px" height="28px"}}
-          New Blank Card
-        </header>
-        <div class="library-section--grid">
-          {{!-- <Cta {{on "click" (fn this.openCardNameDialog "Create a New Card")}}
-            class="library--card-link"
-            data-test-new-blank-card-btn
-          >
-            <div class="library--card-renderer">
-              <div class="library--card-placeholder icon-add-card"></div>
-              <div class="library--card-label">Blank Card</div>
-            </div>
-          </Cta> --}}
-        </div>
-      </section>
-
+      <header class="library-section--header">
+        {{svg-jar "add" width="28px" height="28px"}}
+        New Blank Card
+      </header>
+      <div class="library-section--grid">
+        <Cta {{on "click" this.openCardNameDialog}}
+          class="library--card-link"
+          data-test-new-blank-card-btn
+        >
+          <div class="library--card-renderer">
+            <div class="library--card-placeholder icon-add-card"></div>
+            <div class="library--card-label">Blank Card</div>
+          </div>
+        </Cta>
+      </div>
+    </section>
   </div>
+
+  {{#if this.showDialog}}
+    {{to-elsewhere
+      named="cardhost-modal"
+      send=(component
+              "card-name-dialog"
+              mode="dark"
+              icon="icon-blank-card"
+              title=this.dialogTitle
+              model=this.cardModel
+              closeDialog=this.closeDialog
+            )
+      outsideParams=(hash outsideClick=this.closeDialog)
+    }}
+  {{/if}}
 </div>
