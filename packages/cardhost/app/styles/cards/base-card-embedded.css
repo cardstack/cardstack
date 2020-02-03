@@ -89,7 +89,7 @@
 
 /* type: decorative-image */
 .cardstack_base-card-embedded .decorative-image-viewer {
-  max-height: 70px;
+  max-height: 50px;
 }
 
 
@@ -127,7 +127,7 @@
 }
 .cardstack_base-card-embedded .background-image-value {
   width: 100%;
-  max-height: 150px;
+  max-height: 75px;
   object-fit: cover;
   object-position: center;
 }
@@ -177,7 +177,7 @@
 }
 .cardstack_base-card-embedded .photo-image-url-value {
   width: 100%;
-  max-height: 150px;
+  max-height: 130px;
   margin: 0 auto;
   object-fit: cover;
   object-position: top center;
