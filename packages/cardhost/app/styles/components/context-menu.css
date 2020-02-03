@@ -23,6 +23,7 @@
   padding-left: 0;
   margin-left: 10px;
   min-width: 200px;
+  padding-bottom: 10px;
 }
 
 .context-menu-items li {
@@ -43,9 +44,28 @@
   background-color: var(--ch-light-background);
 }
 
+.context-menu-items hr {
+  border: solid 1px var(--ch-light-background);
+}
+
 .context-menu-items li.heading:hover,
 .context-menu-items li.divider:hover {
   background-color: transparent;
 }
 
+/* Shows a checkmark next to the active route in the context menu */
+.context-menu-items li a.active:before {
+  content: "";
+  display: block;
+  width: 12px;
+  height: 9px;
+  background-image: url(/assets/images/icons/checkmark.svg);
+  background-size: cover;
+  position: absolute;
+  margin-left: -20px;
+  margin-top: 5px;
+}
 
+.context-menu-items li a.active.ignore-active:before {
+  width: 0;
+}
