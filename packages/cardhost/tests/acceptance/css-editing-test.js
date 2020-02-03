@@ -31,7 +31,7 @@ const waitForAnimation = function(cb) {
     setTimeout(() => {
       cb();
       resolve('done');
-    }, 1000);
+    }, 2000);
   });
 };
 
