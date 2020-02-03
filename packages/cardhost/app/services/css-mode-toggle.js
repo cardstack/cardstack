@@ -5,7 +5,7 @@ import { action } from '@ember/object';
 export default class CssModeToggleService extends Service {
   @tracked visible = true;
   @tracked dockLocation = 'right';
-  @tracked isResponsive = true;
+  @tracked width = 'small'; // width can be small, medium, or large
 
   @action
   dockRight() {
@@ -28,12 +28,8 @@ export default class CssModeToggleService extends Service {
   }
 
   @action
-  useFullWidth() {
-    this.isResponsive = false;
-  }
-
-  @action
-  useResponsiveWidth() {
-    this.isResponsive = true;
+  setWidth(width) {
+    // width can be small, medium, or large
+    this.width = width;
   }
 }

@@ -38,6 +38,7 @@
   padding-top: 0;
   background-color: var(--ch-dark-background);
   border-bottom: 2px solid var(--ch-default);
+  grid-column-gap: unset; /* needed for firefox, or the grid rules for .cardstack_base-card-embedded .field will conflict */
 }
 
 .card-renderer-isolated.schema .field.with-buttons:last-of-type {

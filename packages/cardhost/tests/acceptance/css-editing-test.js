@@ -31,7 +31,7 @@ const waitForAnimation = function(cb) {
     setTimeout(() => {
       cb();
       resolve('done');
-    }, 1000);
+    }, 2000);
   });
 };
 
@@ -159,16 +159,29 @@ module('Acceptance | css editing', function(hooks) {
     await visit(`/cards/${card1Id}/edit/layout`);
     await click('[data-test-card-custom-style-button]');
     assert.equal(currentURL(), `/cards/${card1Id}/edit/layout/themer`);
+    await click('[data-test-dock-bottom]'); // dock to bottom so we can see better in Percy Screnshots
     // make sure initial state is correct
-    assert.dom('[data-test-responsive-btn]').exists();
-    assert.dom('[data-test-responsive-btn]').hasClass('selected');
-    assert.dom('[data-test-full-width-btn]').exists();
-    assert.dom('[data-test-full-width-btn]').doesNotHaveClass('selected');
-    assert.dom('[data-test-cardhost-cards]').hasClass('responsive');
+    assert.dom('[data-test-small-btn]').exists();
+    assert.dom('[data-test-small-btn]').hasClass('selected');
+    assert.dom('[data-test-medium-btn]').exists();
+    assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-large-btn]').exists();
+    assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--small');
+    await waitForAnimation(() => percySnapshot(assert));
     // toggle to full width
-    await click('[data-test-full-width-btn]');
-    assert.dom('[data-test-full-width-btn]').hasClass('selected');
-    assert.dom('[data-test-cardhost-cards]').hasClass('full-width');
+    await click('[data-test-medium-btn]');
+    assert.dom('[data-test-medium-btn]').hasClass('selected');
+    assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--medium');
+    assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
+    await waitForAnimation(() => percySnapshot(assert));
+
+    await click('[data-test-large-btn]');
+    assert.dom('[data-test-large-btn]').hasClass('selected');
+    assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--large');
+    assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
     await waitForAnimation(() => percySnapshot(assert));
   });
 
@@ -199,21 +212,6 @@ module('Acceptance | css editing', function(hooks) {
     assert.dom('[data-test-cs-component="dropdown"]').doesNotContainText('Custom');
   });
 
-  test('dropdown displays custom theme for cards with custom CSS', async function(assert) {
-    await login();
-    await createCards(cardData);
-    await visit(`/cards/${card1Id}/edit/layout`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/layout`);
-    await click('[data-test-card-custom-style-button]');
-    await waitFor('[data-test-editor-pane] textarea');
-    await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
-    await click('[data-test-close-editor]');
-    await waitFor('[data-test-cs-component="dropdown"]');
-    assert.dom('[data-test-cs-component="dropdown"]').exists();
-    assert.dom('[data-test-cs-component="dropdown"]').containsText('Custom');
-    assert.dom('[data-test-cs-component="dropdown"]').doesNotContainText('default');
-  });
-
   test('selecting default theme resets css', async function(assert) {
     await login();
     await createCards(cardData);
@@ -229,5 +227,22 @@ module('Acceptance | css editing', function(hooks) {
     await selectChoose('[data-test-cs-component="dropdown"]', 'Cardstack default');
     assert.dom('[data-test-cs-component="dropdown"]').doesNotContainText('Custom');
     assert.dom('[data-test-view-css]').doesNotContainText('gorgeous styles');
+  });
+
+  test('buttons and dropdowns reflect custom style state', async function(assert) {
+    await login();
+    await createCards(cardData);
+    await visit(`/cards/${card1Id}/edit/layout`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/layout`);
+    assert.dom('[data-test-card-custom-style-button]').includesText('New Custom Theme');
+    assert.dom('[data-test-style-dropdown]').includesText('Cardstack default');
+    assert.dom('[data-test-style-dropdown]').doesNotIncludeText('Custom');
+    await click('[data-test-card-custom-style-button]');
+    await waitFor('[data-test-editor-pane] textarea');
+    await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
+    await click('[data-test-close-editor]');
+    assert.dom('[data-test-card-custom-style-button]').includesText('Edit Custom Theme');
+    assert.dom('[data-test-style-dropdown]').includesText('Custom');
+    assert.dom('[data-test-style-dropdown]').doesNotIncludeText('default');
   });
 });

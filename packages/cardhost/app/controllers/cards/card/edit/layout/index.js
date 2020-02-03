@@ -9,8 +9,21 @@ export default class CardLayoutIndexController extends Controller {
   @service cardstackSession;
   resizeable = true;
 
+  get isDefault() {
+    let css = this.model.isolatedCss;
+
+    if (css) {
+      // Some cards have a null value for isolatedCss, so we have to typecheck
+      // For the comparison, first strip out whitespace and newlines so that extra whitespace doesn't register as a custom theme
+      css = css.replace(/\s*|[\r\n]/g, '');
+      return css === '' || css === '.cardstack_base-card-isolated{}';
+    } else {
+      return true;
+    }
+  }
+
   @tracked
-  themerOptions = [{ name: 'Cardstack default' }, { name: 'Custom theme' }];
+  themerOptions = [{ name: 'Cardstack default' }, { name: 'Custom' }];
 
   @action
   createTheme() {
@@ -18,16 +31,7 @@ export default class CardLayoutIndexController extends Controller {
   }
 
   get selectedTheme() {
-    let css = this.model.isolatedCss;
-    let isDefault = true;
-
-    if (css) {
-      // Some cards have a null value for isolatedCss, so we have to typecheck
-      // For the comparison, first strip out whitespace and newlines so that extra whitespace doesn't register as a custom theme
-      css = css.replace(/\s*|[\r\n]/g, '');
-      isDefault = css === '' || css === '.cardstack_base-card-isolated{}';
-    }
-    return isDefault ? { name: 'Cardstack default' } : { name: 'Custom theme' };
+    return this.isDefault ? { name: 'Cardstack default' } : { name: 'Custom' };
   }
 
   @action
