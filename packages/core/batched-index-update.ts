@@ -1,4 +1,5 @@
-import { CardId, AddressableCard } from './card';
+import { AddressableCard } from './card';
+import { CardId } from './card-id';
 
 export interface BatchedIndexUpdate {
   save: (card: AddressableCard) => Promise<void>;

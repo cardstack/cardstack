@@ -31,6 +31,7 @@ Ember Concurrency into the rendering of the card component here.
                 {{/if}}
                 <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.name "Blank Card"}}</span>
                 {{#if this.cardstackSession.isAuthenticated}}
+                  {{!-- disabling this while we are working out the models
                   <LinkTo
                     @route="cards.card.edit.fields"
                     @model={{@card}}
@@ -39,6 +40,9 @@ Ember Concurrency into the rendering of the card component here.
                   >
                     Edit
                   </LinkTo>
+                  --}}
+                  {{!-- this is a placeholder link --}}
+                  <a class="card-renderer--header-link">Edit</a>
                 {{/if}}
               </header>
             </div>
@@ -51,6 +55,7 @@ Ember Concurrency into the rendering of the card component here.
               {{/if}}
               <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.name "Blank Card"}}</span>
               {{#if (eq @mode "edit")}}
+                {{!-- disabling this while we are working out the models
                 <LinkTo
                   @route="cards.card.view"
                   @model={{@card}}
@@ -59,6 +64,9 @@ Ember Concurrency into the rendering of the card component here.
                 >
                   Done
                 </LinkTo>
+                --}}
+                {{!-- this is a placeholder link --}}
+                <a class="card-renderer--header-link">Done</a>
               {{/if}}
             </header>
           </div>
@@ -76,7 +84,6 @@ Ember Concurrency into the rendering of the card component here.
                 {{/if}}
                 <Isolated
                   @card={{@card}}
-                  @fields={{this.fields}}
                   @mode={{this.mode}}
                   @setFieldValue={{@setFieldValue}}
                   @setFieldName={{@setFieldName}}
@@ -103,17 +110,24 @@ Ember Concurrency into the rendering of the card component here.
         data-test-card-renderer-embedded
       >
         {{#if (and (eq this.mode "view") (not @preventIsolation))}}
+          {{!-- disabling this while we are working out the models
           <LinkTo
             @class="card-renderer--embedded-card-link"
             @route="cards.card.view"
             @model={{@card.name}}
             aria-label={{@card.name}}
           >
+          --}}
+          {{!-- this is a placeholder link --}}
+          <a class="card-renderer--embedded-card-link">
             <Embedded @card={{@card}} @mode={{this.mode}} />
             {{#if @showName}}
               <div class="embedded-card-label">{{@card.name}}</div>
             {{/if}}
+          </a>
+          {{!-- disabling this while we are working out the models
           </LinkTo>
+          --}}
         {{else}}
           <Embedded @card={{@card}} @mode={{this.mode}} />
           {{#if @showName}}

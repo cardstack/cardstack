@@ -2,7 +2,6 @@ import Component from '@glimmer/component';
 import { dasherize } from '@ember/string';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
-import { fieldComponents } from '../utils/mappings';
 
 const defaultSchemaAttrs = ['title', 'type', 'is-meta', 'name', 'instructions', 'embedded'];
 
@@ -37,7 +36,9 @@ export default class FieldRenderer extends Component {
   }
 
   get fieldType() {
-    return fieldComponents.find(el => el.coreType === this.args.field.type);
+    // return fieldComponents.find(el => el.coreType === this.args.field.type);
+    // TODO use the field card's properties here instead...
+    return null;
   }
 
   @action

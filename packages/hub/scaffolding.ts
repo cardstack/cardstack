@@ -1,4 +1,5 @@
-import { AddressableCard, CardId, canonicalURL } from '@cardstack/core/card';
+import { AddressableCard } from '@cardstack/core/card';
+import { CardId, canonicalURL } from '@cardstack/core/card-id';
 import { Query } from '@cardstack/core/query';
 import { myOrigin } from '@cardstack/core/origin';
 import { cardDocument } from '@cardstack/core/card-document';

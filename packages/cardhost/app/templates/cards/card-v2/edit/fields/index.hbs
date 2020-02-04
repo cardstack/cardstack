@@ -1,0 +1,9 @@
+<CardEditor @card={{this.model}} as |card setFieldValue selectedField|>
+  <RightEdge
+    @card={{card}}
+    @selectedField={{selectedField}}
+    @setFieldValue={{setFieldValue}}
+    @mode="fields"
+    @cardSelected={{true}} {{!-- Change this when we want to display different right-edge options --}}
+  />
+</CardEditor>

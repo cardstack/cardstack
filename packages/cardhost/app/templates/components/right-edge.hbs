@@ -40,7 +40,7 @@
                         <div class="right-edge--item">
                           <Cta @variant="secondary responsive" @theme="cs-dark">
                             <LinkTo
-                              @route="cards.card.edit.fields.schema"
+                              @route="cards.card-v2.edit.fields.schema"
                               @class="right-edge--configure-schema-link"
                               @model={{@card}}
                               data-test-configure-schema-btn
@@ -71,8 +71,8 @@
                             @label="Card ID"
                             @placeholder="e.g. millenial-puppies"
                             @value={{this.cardName}}
-                            @setValue={{action this.updateCardId}}
-                            @disabled={{or (not @updateCardId) (not @card.isNew)}} />
+                            @setValue={{action this.updateCardName}}
+                            @disabled={{not @setFieldValue}} />
                         </div>
                         <div class="right-edge--item">
                           <div class="right-edge--label">Internal ID</div>
@@ -105,6 +105,8 @@
                     </div>
                     <div class="right-edge--items-container">
                       <div class="right-edge--item">
+                        TODO RENDER FIELD IN SCHEMA MODE HERE
+                        {{!--
                         <FieldRenderer
                           @field={{field}}
                           @mode="schema"
@@ -113,6 +115,7 @@
                           @setFieldLabel={{@setFieldLabel}}
                           @setFieldInstructions={{@setFieldInstructions}}
                           @schemaAttrs={{array "label" "name" "instructions" "embedded"}} />
+                          --}}
                       </div>
                     </div>
                   </div>

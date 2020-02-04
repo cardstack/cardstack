@@ -1,5 +1,4 @@
 import Component from '@glimmer/component';
-import { fieldComponents } from '../utils/mappings';
 import { tracked } from '@glimmer/tracking';
 import { action, set } from '@ember/object';
 import fade from 'ember-animated/transitions/fade';
@@ -12,7 +11,7 @@ const { animationSpeed } = ENV;
 const duration = 250;
 
 export default class RightEdge extends Component {
-  @tracked cardName = this.args.card.name;
+  @tracked cardName = this.args.card.csTitle;
   @tracked cardSelected = this.args.cardSelected;
   @tracked options = {};
   @tracked expandedSections = ['template'];
@@ -30,8 +29,7 @@ export default class RightEdge extends Component {
 
   get selectedFieldTitle() {
     if (this.args.selectedField) {
-      let { title } = fieldComponents.findBy('coreType', this.args.selectedField.type);
-      return title;
+      return this.args.selectedField.name;
     }
 
     return '';
@@ -43,17 +41,17 @@ export default class RightEdge extends Component {
 
   @action
   updateCard(element, [card, cardSelected]) {
-    this.cardName = card.name;
+    this.cardName = card.csTitle;
     set(this.options, 'selectedContent', cardSelected ? 'card' : 'field');
   }
 
   @action
-  updateCardId(id) {
-    if (!this.args.updateCardId) {
+  updateCardName(name) {
+    if (!this.args.setFieldValue) {
       return;
     }
 
-    this.args.updateCardId(id);
+    this.args.setFieldValue('csTitle', name);
   }
 
   @action

@@ -29,9 +29,24 @@ package-lock.json
 /packages/core/**/*.js
 /packages/core/**/*.js.map
 
+/packages/cardhost/app/components/scaffold-loader.d.ts
+/packages/cardhost/app/components/scaffold-loader.js
+/packages/cardhost/app/components/scaffold-loader.js.map
+/packages/cardhost/app/controllers/cards/card-v2/**/*.d.ts
+/packages/cardhost/app/controllers/cards/card-v2/**/*.js
+/packages/cardhost/app/controllers/cards/card-v2/**/*.js.map
+/packages/cardhost/app/helpers/stringify.d.ts
+/packages/cardhost/app/helpers/stringify.js
+/packages/cardhost/app/helpers/stringify.js.map
 /packages/cardhost/app/routes/index.d.ts
 /packages/cardhost/app/routes/index.js
 /packages/cardhost/app/routes/index.js.map
+/packages/cardhost/app/routes/cards/card-v2.d.ts
+/packages/cardhost/app/routes/cards/card-v2.js
+/packages/cardhost/app/routes/cards/card-v2.js.map
+/packages/cardhost/app/routes/cards/card-v2/**/*.d.ts
+/packages/cardhost/app/routes/cards/card-v2/**/*.js
+/packages/cardhost/app/routes/cards/card-v2/**/*.js.map
 /packages/cardhost/app/services/data.d.ts
 /packages/cardhost/app/services/data.js
 /packages/cardhost/app/services/data.js.map

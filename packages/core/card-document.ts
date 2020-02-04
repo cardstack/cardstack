@@ -1,7 +1,14 @@
-import { SingleResourceDoc, AttributesObject, RelationshipObject } from 'jsonapi-typescript';
-import { CardId, canonicalURL, cardstackFieldPattern, FieldCard } from './card';
+import {
+  SingleResourceDoc,
+  AttributesObject,
+  RelationshipObject,
+  ResourceIdentifierObject,
+  MetaObject,
+} from 'jsonapi-typescript';
+import { CardId, canonicalURL, cardstackFieldPattern, FieldArity, canonicalURLToCardId } from './card-id';
 import { UpstreamDocument } from './document';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
+import cloneDeep from 'lodash/cloneDeep';
 
 export class CardDocument {
   private parent: CardId | undefined;
@@ -9,6 +16,7 @@ export class CardDocument {
   private userFieldValues: Map<string, any> = new Map();
   private userFieldRefs: Map<string, CardDocument | CardDocument[] | CardId | CardId[] | undefined> = new Map();
   private fields: Map<string, CardDocument | null> = new Map();
+  private meta: MetaObject | undefined;
 
   csId?: string;
   csOriginalRealm?: string;
@@ -31,6 +39,8 @@ export class CardDocument {
               this.csOriginalRealm = value;
             }
             break;
+          case 'csTitle':
+          case 'csDescription':
           case 'csFeatures':
           case 'csFiles':
           case 'csFieldArity':
@@ -38,6 +48,8 @@ export class CardDocument {
           case 'csFieldSets':
             this.csFieldValues.set(field, value);
             break;
+          case 'csFields':
+            throw new Error(`use .withFields() to set csFields`);
           default:
             throw new Error(`unknown cardstack field ${field}`);
         }
@@ -62,6 +74,11 @@ export class CardDocument {
   withAutoAttributes<T extends CardDocument>(this: T, values: FieldValues): T;
   withAutoAttributes(values: FieldValues): CardDocument | CardDocumentWithId {
     this.setAttributes(values, true);
+    return this;
+  }
+
+  withMeta(meta: MetaObject): CardDocument | CardDocumentWithId {
+    this.meta = meta;
     return this;
   }
 
@@ -107,21 +124,21 @@ export class CardDocument {
     this: T,
     name: string,
     fieldShorthand: string,
-    arity?: FieldCard['csFieldArity'],
+    arity?: FieldArity,
     values?: FieldValues
   ): T;
   withField<T extends CardDocument>(
     this: T,
     name: string,
     fieldCard: CardId,
-    arity?: FieldCard['csFieldArity'],
+    arity?: FieldArity,
     values?: FieldValues
   ): T;
   withField<T extends CardDocument>(this: T, name: string, fieldCard: null): T;
   withField(
     name: string,
     fieldCard: string | CardId | null,
-    arity: FieldCard['csFieldArity'] = 'singular',
+    arity: FieldArity = 'singular',
     values: FieldValues = {}
   ): this {
     if (fieldCard == null) {
@@ -206,6 +223,10 @@ export class CardDocument {
       doc.data.attributes!.csFields = csFields;
     }
 
+    if (this.meta) {
+      doc.data.meta = cloneDeep(this.meta);
+    }
+
     return doc;
   }
 
@@ -282,6 +303,41 @@ interface FieldRefs {
 
 export function cardDocument(): CardDocument {
   return new CardDocument();
+}
+
+export function cardDocumentFromJsonAPI(sourceDoc: SingleResourceDoc): CardDocument {
+  let { relationships = {}, attributes = {}, meta } = sourceDoc.data;
+  let fields = attributes.csFields;
+  delete attributes.csFields;
+  let fieldRefs: FieldRefs = {};
+  for (let [field, ref] of Object.entries(relationships)) {
+    if (!('data' in ref)) {
+      continue;
+    }
+    if (Array.isArray(ref.data)) {
+      fieldRefs[field] = (ref.data as ResourceIdentifierObject[]).map(i => canonicalURLToCardId(i.id));
+    } else if (ref.data) {
+      fieldRefs[field] = canonicalURLToCardId(ref.data.id);
+    }
+  }
+
+  let doc = new CardDocument();
+  if (meta) {
+    doc.withMeta(meta);
+  }
+  if (fields) {
+    for (let [name, value] of Object.entries(fields)) {
+      let arity = value.attributes?.csFieldArity || 'singular';
+      let fieldCardId = canonicalURLToCardId(value.relationships?.csAdoptsFrom?.data?.id) || {
+        csRealm: CARDSTACK_PUBLIC_REALM,
+        csId: 'base',
+      };
+      doc.withField(name, fieldCardId, arity);
+    }
+  }
+  doc.withAttributes(attributes).withRelationships(fieldRefs);
+
+  return doc;
 }
 
 function getRelatedCanonicalURL(idOrDoc: CardDocument | CardId): string {

@@ -2,6 +2,8 @@
   "data": {
     "type": "cards",
     "attributes": {
+      "csTitle": "Checkbox",
+      "csDescription": "True/false (boolean) values",
       "csFeatures": {
         "field-validate": ["field-hooks.js", "validate"],
         "field-deserialize": ["field-hooks.js", "deserialize"]

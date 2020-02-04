@@ -1,6 +1,5 @@
 import { action } from '@ember/object';
 import CardManipulator from './card-manipulator';
-import { schedule } from '@ember/runloop';
 
 export default class CardCreator extends CardManipulator {
   constructor(...args) {
@@ -17,22 +16,22 @@ export default class CardCreator extends CardManipulator {
   }
 
   @action
-  updateCardId(id) {
-    let newCard = this.data.createCard(`local-hub::${id}`, this.args.adoptedFrom);
-    if (this.card) {
-      for (let field of this.card.fields.filter(i => !i.isAdopted)) {
-        newCard.addField(field);
-      }
-    }
-    this.card = newCard;
-
-    /*
-      FIXME: THIS IS A COMPLETE HACK. This problem should go away
-      once we clarify how card ids and names work. See:
-      https://github.com/cardstack/cardstack/issues/1150
-    */
-    schedule('afterRender', this, function() {
-      document.querySelector('#card__id').focus();
-    });
+  updateCardId(/*id*/) {
+    // TODO this is totally different now, just change the csTitle of the card...
+    // let newCard = this.data.createCard(`local-hub::${id}`, this.args.adoptedFrom);
+    // if (this.card) {
+    //   for (let field of this.card.fields.filter(i => !i.isAdopted)) {
+    //     newCard.addField(field);
+    //   }
+    // }
+    // this.card = newCard;
+    // /*
+    //   FIXME: THIS IS A COMPLETE HACK. This problem should go away
+    //   once we clarify how card ids and names work. See:
+    //   https://github.com/cardstack/cardstack/issues/1150
+    // */
+    // schedule('afterRender', this, function() {
+    //   document.querySelector('#card__id').focus();
+    // });
   }
 }

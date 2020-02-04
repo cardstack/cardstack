@@ -5,7 +5,7 @@ import { IndexingOperations } from '@cardstack/core/indexer';
 import * as JSON from 'json-typescript';
 import { upsert, param } from './pgsearch/util';
 import { Expression } from '@cardstack/core/expression';
-import { CardId } from '@cardstack/core/card';
+import { CardId } from '@cardstack/core/card-id';
 
 export default class IndexingService {
   cards = inject('cards');

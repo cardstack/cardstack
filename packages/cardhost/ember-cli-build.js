@@ -68,6 +68,14 @@ module.exports = function(defaults) {
         {
           package: '@cardstack/cardhost',
           appModules: {
+            'components/scaffold-loader.js': {
+              dependsOnComponents: [
+                '<Scaffolding::Base::CatalogEntryLayout/>',
+                '<Scaffolding::BooleanField::CatalogEntryLayout/>',
+                '<Scaffolding::IntegerField::CatalogEntryLayout/>',
+                '<Scaffolding::StringField::CatalogEntryLayout/>',
+              ],
+            },
             'components/card-renderer.js': {
               dependsOnComponents: [
                 '<Cards::Cardstack::BaseCard::Isolated/>',

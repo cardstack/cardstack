@@ -1,4 +1,4 @@
-import { CardId } from './card';
+import { CardId } from './card-id';
 import * as JSON from 'json-typescript';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
 import CardstackError from './error';

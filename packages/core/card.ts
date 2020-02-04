@@ -35,48 +35,11 @@ import { Memoize } from 'typescript-memoize';
 import * as FieldHooks from './field-hooks';
 import { WriterFactory } from './writer';
 import { IndexerFactory } from './indexer';
+import { CardId, FieldArity, canonicalURLToCardId, canonicalURL, cardstackFieldPattern } from './card-id';
+import { CardDocument, cardDocumentFromJsonAPI } from './card-document';
+import Component from '@glimmer/component';
 
 export const apiPrefix = '/api';
-
-export function canonicalURLToCardId(url: string): CardId {
-  let parts = url.split('/');
-  let csId = parts.pop()!;
-  let nextPart = parts.pop()!;
-  let originalRealm;
-  if (nextPart !== 'cards') {
-    originalRealm = nextPart;
-    parts.pop();
-  }
-  return {
-    csRealm: parts.join('/'),
-    csOriginalRealm: originalRealm == null ? undefined : decodeURIComponent(originalRealm),
-    csId: decodeURIComponent(csId),
-  };
-}
-
-export function canonicalURL(id: CardId): string {
-  let isHome = !id.csOriginalRealm || id.csOriginalRealm === id.csRealm;
-  if (isHome) {
-    return [id.csRealm, 'cards', encodeURIComponent(id.csId)].join('/');
-  } else {
-    return [
-      id.csRealm,
-      'cards',
-      encodeURIComponent(id.csOriginalRealm ?? id.csRealm),
-      encodeURIComponent(id.csId),
-    ].join('/');
-  }
-}
-
-export function asCardId(idOrURL: CardId | string): CardId {
-  if (typeof idOrURL === 'string') {
-    return canonicalURLToCardId(idOrURL);
-  } else {
-    return idOrURL;
-  }
-}
-
-export const cardstackFieldPattern = /^cs[A-Z]/;
 
 export async function makeCollection(
   cards: AddressableCard[],
@@ -108,6 +71,8 @@ export class Card {
   // chosen by the hub.
   readonly csId: string | undefined;
 
+  readonly csTitle: string | undefined;
+  readonly csDescription: string | undefined;
   readonly csFiles: CardFiles | undefined;
   readonly csPeerDependencies: PeerDependencies | undefined;
   readonly csFieldSets: OcclusionFieldSets | undefined;
@@ -186,6 +151,14 @@ export class Card {
       this.csFields = csFields as J.Object;
     }
 
+    if (typeof jsonapi.data.attributes?.csTitle === 'string') {
+      this.csTitle = jsonapi.data.attributes?.csTitle;
+    }
+
+    if (typeof jsonapi.data.attributes?.csDescription === 'string') {
+      this.csDescription = jsonapi.data.attributes?.csDescription;
+    }
+
     let csFiles = jsonapi.data.attributes?.csFiles;
     if (csFiles) {
       assertCSFiles(csFiles);
@@ -229,6 +202,21 @@ export class Card {
       assertOcclusionFieldSets(csFieldSets, `csFieldSets`);
       this.csFieldSets = csFieldSets;
     }
+  }
+
+  @Memoize()
+  get document(): CardDocument {
+    let jsonapi: SingleResourceDoc = { data: { type: 'cards' } };
+    if (this.attributes) {
+      jsonapi.data.attributes = this.attributes;
+    }
+    if (this.relationships) {
+      jsonapi.data.relationships = this.relationships;
+    }
+    if (this.meta) {
+      jsonapi.data.meta = this.meta;
+    }
+    return cardDocumentFromJsonAPI(jsonapi);
   }
 
   async validate(priorCard: Card | null, realm: AddressableCard, _forDeletion?: true) {
@@ -358,6 +346,32 @@ export class Card {
     }
   }
 
+  // TODO needs testing!
+  @Memoize()
+  async fields(): Promise<FieldCard[]> {
+    let fields: FieldCard[] = [];
+    let card: Card | undefined = this;
+    while (card) {
+      if (card.csFields) {
+        for (let [name, value] of Object.entries(card.csFields)) {
+          fields.push(
+            await this.container.instantiate(
+              FieldCard,
+              merge({ data: { type: 'cards' } }, { data: value }),
+              name,
+              this,
+              this.reader,
+              this.modules,
+              this.container
+            )
+          );
+        }
+      }
+      card = await card.adoptsFrom();
+    }
+    return fields;
+  }
+
   @Memoize()
   async adoptionChain(): Promise<AddressableCard[]> {
     let adoptionChain: AddressableCard[] = [];
@@ -410,8 +424,14 @@ export class Card {
     if (this.csRealm !== this.csOriginalRealm) {
       data.attributes.csOriginalRealm = this.csOriginalRealm;
     }
-    if (this.csId) {
+    if (this.csId != null) {
       data.attributes.csId = this.csId;
+    }
+    if (this.csTitle != null) {
+      data.attributes.csTitle = this.csTitle;
+    }
+    if (this.csDescription != null) {
+      data.attributes.csDescription = this.csDescription;
     }
     if (this.csFields) {
       data.attributes.csFields = this.csFields;
@@ -768,6 +788,11 @@ export class Card {
   async loadFeature(featureName: 'field-deserialize'): Promise<null | FieldHooks.deserialize<unknown, unknown>>;
   async loadFeature(featureName: 'field-buildValueExpression'): Promise<null | FieldHooks.buildValueExpression>;
   async loadFeature(featureName: 'field-buildQueryExpression'): Promise<null | FieldHooks.buildQueryExpression>;
+  async loadFeature(featureName: 'isolated-layout'): Promise<null | Component>;
+  async loadFeature(featureName: 'embedded-layout'): Promise<null | Component>;
+  async loadFeature(featureName: 'field-view-layout'): Promise<null | Component>;
+  async loadFeature(featureName: 'field-edit-layout'): Promise<null | Component>;
+  async loadFeature(featureName: 'catalog-entry-layout'): Promise<null | Component>;
   async loadFeature(featureName: string): Promise<any> {
     let card: Card | undefined = this;
     while (card) {
@@ -814,7 +839,7 @@ export class UnsavedCard extends Card {
 
 export class FieldCard extends Card {
   readonly enclosingCard: Card;
-  readonly csFieldArity: 'singular' | 'plural' = 'singular';
+  readonly csFieldArity: FieldArity = 'singular';
 
   constructor(
     jsonapi: SingleResourceDoc,
@@ -984,12 +1009,6 @@ export class AddressableCard extends Card implements CardId {
   get canonicalURL(): string {
     return canonicalURL(this);
   }
-}
-
-export interface CardId {
-  csRealm: string;
-  csOriginalRealm?: string; // if not set, its implied that its equal to `realm`.
-  csId: string;
 }
 
 interface CardValue {

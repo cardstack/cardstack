@@ -1,5 +1,5 @@
 import { CardExpression, separatedByCommas, param, fieldQuery, FieldQuery, fieldValue } from './util';
-import { CardId } from '@cardstack/core/card';
+import { CardId } from '@cardstack/core/card-id';
 import { Primitive } from 'json-typescript';
 import CardstackError from '@cardstack/core/error';
 

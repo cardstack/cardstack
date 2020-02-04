@@ -1,4 +1,5 @@
-import { AddressableCard, canonicalURL } from '@cardstack/core/card';
+import { AddressableCard } from '@cardstack/core/card';
+import { canonicalURL } from '@cardstack/core/card-id';
 import { ScopedCardService } from '../cards-service';
 import { myOrigin } from '@cardstack/core/origin';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
@@ -1370,6 +1371,8 @@ describe('hub/card-service', function() {
       after(async function() {
         await env.destroy();
       });
+
+      it.skip('can get all the field cards (including adopted fields)', async function() {});
 
       it('can equality filter by string user field', async function() {
         let results = await service.search({

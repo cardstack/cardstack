@@ -1,5 +1,6 @@
 import { Session } from '@cardstack/core/session';
-import { asCardId, UnsavedCard, AddressableCard, CardId, Card } from '@cardstack/core/card';
+import { UnsavedCard, AddressableCard, Card } from '@cardstack/core/card';
+import { asCardId, CardId } from '@cardstack/core/card-id';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import { ResponseMeta } from '@cardstack/core/document';
 import CardstackError from '@cardstack/core/error';

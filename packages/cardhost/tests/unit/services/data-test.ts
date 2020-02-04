@@ -5,7 +5,8 @@ import { cardDocument, CardDocumentWithId } from '@cardstack/core/card-document'
 import Fixtures from '../../helpers/fixtures';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import DataService from '../../../app/services/data';
-import { Card, AddressableCard, canonicalURL } from '@cardstack/core/card';
+import { Card, AddressableCard } from '@cardstack/core/card';
+import { canonicalURL } from '@cardstack/core/card-id';
 import { ResourceIdentifierObject, RelationshipsWithData } from 'jsonapi-typescript';
 
 const csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;

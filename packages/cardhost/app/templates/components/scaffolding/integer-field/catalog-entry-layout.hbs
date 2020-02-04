@@ -1,0 +1,12 @@
+{{! template-lint-disable no-inline-styles}}
+<div
+  class="ch-catalog-field--icon"
+  style={{css-url "background-image" "/assets/images/field-types/integer-field-icon.png"}}>
+</div>
+
+<div>
+  <h4 class="ch-catalog-field--title">{{@card.csTitle}}</h4>
+  {{#if @card.csDescription}}
+    <p class="ch-catalog-field--description">{{@card.csDescription}}</p>
+  {{/if}}
+</div>

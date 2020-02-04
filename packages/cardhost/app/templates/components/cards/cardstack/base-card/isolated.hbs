@@ -4,32 +4,38 @@
   data-test-isolated-card={{@card.name}}
   data-test-isolated-card-mode={{@mode}}
 >
-  <AnimatedContainer class={{if (or (eq @mode "view") (eq @mode "layout")) "isolated-card--view-fields"}}>
-    {{#animated-each @fields key="nonce" use=this.transition duration=this.duration as |field|}}
-      {{#if @setFieldValue}}
-        <FieldRenderer
-          @field={{field}}
-          @mode={{@mode}}
-          @setFieldValue={{fn @setFieldValue field.name}}
-          @selectField={{@selectField}}
-          @selectedField={{@selectedField}}
-        />
-      {{else if (or @setNeededWhenEmbedded @setPosition @removeField @setFieldName)}}
-        <FieldRenderer
-          @field={{field}}
-          @mode={{@mode}}
-          @dropField={{@dropField}}
-          @removeField={{@removeField}}
-          @toggleStubField={{@toggleStubField}}
-          @setPosition={{@setPosition}}
-          @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
-          @setFieldName={{@setFieldName}}
-          @selectField={{@selectField}}
-          @selectedField={{@selectedField}}
-        />
-      {{else}}
-        <FieldRenderer @field={{field}} @mode={{@mode}}/>
-      {{/if}}
-    {{/animated-each}}
-  </AnimatedContainer>
+  {{!-- probably need a busy indicator while we are loading the fields --}}
+  {{#unless this.loadFields.isRunning}}
+    <AnimatedContainer class={{if (or (eq @mode "view") (eq @mode "layout")) "isolated-card--view-fields"}}>
+      {{#animated-each this.fields key="nonce" use=this.transition duration=this.duration as |field|}}
+        TODO RENDER FIELD IN SCHEMA MODE HERE
+        {{!--
+        {{#if @setFieldValue}}
+          <FieldRenderer
+            @field={{field}}
+            @mode={{@mode}}
+            @setFieldValue={{fn @setFieldValue field.name}}
+            @selectField={{@selectField}}
+            @selectedField={{@selectedField}}
+          />
+        {{else if (or @setNeededWhenEmbedded @setPosition @removeField @setFieldName)}}
+          <FieldRenderer
+            @field={{field}}
+            @mode={{@mode}}
+            @dropField={{@dropField}}
+            @removeField={{@removeField}}
+            @toggleStubField={{@toggleStubField}}
+            @setPosition={{@setPosition}}
+            @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+            @setFieldName={{@setFieldName}}
+            @selectField={{@selectField}}
+            @selectedField={{@selectedField}}
+          />
+        {{else}}
+          <FieldRenderer @field={{field}} @mode={{@mode}}/>
+        {{/if}}
+        --}}
+      {{/animated-each}}
+    </AnimatedContainer>
+  {{/unless}}
 </div>

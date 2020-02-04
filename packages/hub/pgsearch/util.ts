@@ -1,4 +1,4 @@
-import { CardId } from '@cardstack/core/card';
+import { CardId } from '@cardstack/core/card-id';
 import isPlainObject from 'lodash/isPlainObject';
 import { Expression, PgPrimitive, Param } from '@cardstack/core/expression';
 

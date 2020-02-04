@@ -1,6 +1,7 @@
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
-import { UnsavedCard, CardId, Card, AddressableCard, asCardId } from '@cardstack/core/card';
+import { UnsavedCard, Card, AddressableCard } from '@cardstack/core/card';
+import { CardId, asCardId } from '@cardstack/core/card-id';
 import { CardstackSession } from './cardstack-session';
 import { SingleResourceDoc, CollectionResourceDoc, DocWithErrors } from 'jsonapi-typescript';
 import { CardInstantiator } from '@cardstack/core/card-instantiator';

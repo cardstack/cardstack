@@ -2,6 +2,8 @@
   "data": {
     "type": "cards",
     "attributes": {
+      "csTitle": "Number",
+      "csDescription": "Integer number field",
       "csFeatures": {
         "field-validate": ["field-hooks.js", "validate"],
         "field-deserialize": ["field-hooks.js", "deserialize"],

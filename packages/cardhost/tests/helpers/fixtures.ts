@@ -2,7 +2,7 @@
 
 import DAGMap from 'dag-map';
 import { CardDocumentWithId, CardDocument } from '@cardstack/core/card-document';
-import { CardId, canonicalURL } from '@cardstack/core/card';
+import { CardId, canonicalURL } from '@cardstack/core/card-id';
 import { stringify } from 'qs';
 import flatten from 'lodash/flatten';
 import uniq from 'lodash/uniq';
