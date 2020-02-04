@@ -9,11 +9,7 @@
     </h2>
     <div class="card-builder--section-grid">
       {{#each this.featuredCards as |card|}}
-        <LinkTo
-          @route="cards.card.view" @model={{card.id}}
-          class="card-builder--section-card-link"
-          data-test-featured-card={{card-id}}
-        >
+        <LinkTo @route="cards.card.view" @model={{card.id}} class="card-builder--section-card-link" data-test-featured-card={{card.id}}>
           {{! template-lint-disable no-inline-styles }}
           <div class="card-builder--section-card" style={{css-url "background-image" card.preview}}></div>
           <div class="card-builder--section-card-label">{{card.title}}</div>

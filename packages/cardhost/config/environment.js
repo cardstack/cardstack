@@ -65,7 +65,14 @@ module.exports = function(environment) {
     ENV.APP.rootElement = '#ember-testing';
     ENV.APP.autoboot = false;
 
-    ENV.cardTemplates = JSON.parse(process.env.CARD_TEMPLATES || null) || ['local-hub::location-card'];
+    ENV.cardTemplates = JSON.parse(process.env.CARD_TEMPLATES || null) || [
+      'local-hub::location-card',
+      'local-hub::event-ticket',
+      'local-hub::product-card',
+      'local-hub::wedding-invitation',
+      'local-hub::photo-card',
+      'local-hub::byline-card',
+    ];
 
     ENV.animationSpeed = 20;
     ENV.autosaveDebounce = 10;

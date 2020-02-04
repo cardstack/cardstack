@@ -66,9 +66,10 @@ module('Acceptance | library', function(hooks) {
 
   test(`viewing library`, async function(assert) {
     await visit(`/`);
+    assert.dom('[data-test-library-button]').exists();
+    assert.dom('[data-test-library-link]').doesNotExist();
     await click('[data-test-library-button]');
     assert.dom('[data-test-library]').exists();
-    assert.dom('[data-test-library-nav]').exists();
     assert.dom(`[data-test-embedded-card=${card1Id}]`).exists();
     assert.dom(`[data-test-embedded-card=${card2Id}]`).exists();
     assert.dom(`[data-test-embedded-card=${card3Id}]`).exists();
@@ -89,6 +90,16 @@ module('Acceptance | library', function(hooks) {
     assert.dom('[data-test-library]').exists();
   });
 
+  test(`signing out while library is toggled on`, async function(assert) {
+    await visit(`/`);
+    await click('[data-test-library-button]');
+    assert.dom('[data-test-library]').exists();
+    await click('[data-test-toggle-left-edge]');
+    await click('[data-test-logout-button]');
+    assert.dom('[data-test-library]').doesNotExist();
+    assert.dom('[data-test-library-button]').isDisabled();
+  });
+
   test(`created card ids are in local storage`, async function(assert) {
     await visit(`/`);
     assert.equal(currentURL(), '/');
@@ -101,7 +112,7 @@ module('Acceptance | library', function(hooks) {
   test(`isolating a card`, async function(assert) {
     await visit('/');
     assert.equal(currentURL(), '/');
-    await click('[data-test-catalog-button]');
+    await click('[data-test-library-button]');
     await animationsSettled();
     assert.dom(`[data-test-embedded-card=${card2Id}]`).exists();
     await click(`[data-test-embedded-card=${card2Id}]`);
@@ -113,14 +124,18 @@ module('Acceptance | library', function(hooks) {
     await percySnapshot(assert);
   });
 
-  test('can navigate to index page via left edge', async function(assert) {
+  test('can navigate to index route via library link from other routes', async function(assert) {
     await visit(`/cards/${card1Id}`);
     assert.equal(currentURL(), `/cards/${card1Id}`);
     await waitFor(`[data-test-card-view=${card1Id}]`, {
       timeout,
     });
+    assert.dom('[data-test-library-button]').doesNotExist();
+    assert.dom('[data-test-library-link]').exists();
     await click('[data-test-library-link]');
     assert.equal(currentURL(), '/');
     assert.dom('[data-test-featured-card]').exists({ count: 4 });
+    assert.dom('[data-test-library-button]').exists();
+    assert.dom('[data-test-library-link]').doesNotExist();
   });
 });

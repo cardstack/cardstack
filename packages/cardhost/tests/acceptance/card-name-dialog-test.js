@@ -34,14 +34,14 @@ module('Acceptance | card name dialog', function(hooks) {
     assert.equal(currentURL(), '/');
     await click('[data-test-library-button]');
     assert.dom('[data-test-library]').exists();
-    await click('[data-test-adopt-card-btn]');
+    await click('[data-test-library-adopt-card-btn]');
     await percySnapshot([assert.test.module.name, assert.test.testName, 'adopt dialog'].join(' | '));
     assert.dom('[data-test-dialog-box]').exists();
     assert.dom('[data-test-dialog-box] .dialog--title').hasTextContaining('Adopt a Card');
     await click('[data-test-cancel-create-btn]'); // close dialog by clicking cancel button
     assert.dom('[data-test-dialog-box]').doesNotExist();
 
-    await click('[data-test-adopt-card-btn]');
+    await click('[data-test-library-adopt-card-btn]');
     assert.dom('[data-test-dialog-box]').exists();
     await click('[data-test-cardhost-modal-container]'); // close dialog by clicking modal container
     assert.dom('[data-test-dialog-box]').doesNotExist();
