@@ -44,12 +44,11 @@
   border-radius: 10px;
 }
 
-
 .cardhost-left-edge--nav-button {
   --icon-color: var(--ch-highlight);
   display: block;
   background: none;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 100px;
   width: 40px;
   height: 40px;
@@ -65,18 +64,24 @@
 
 .cardhost-left-edge--nav-button:not(:disabled):hover {
   --icon-color: var(--ch-highlight-hover);
+  background-color: var(--ch-hover);
+  border-color: var(--ch-border);
   cursor: pointer;
 }
 .cardhost-left-edge--nav-button:not(:disabled):focus {
   outline: 0;
-  border: 1px solid var(--ch-highlight-hover);
+  background-color: var(--ch-hover);
+  border-color: var(--ch-border);
 }
 
 .cardhost-left-edge--nav-button.cardstack-logo-button {
-  background-color: white;
-  border-radius: 100px;
+  background-color: var(--ch-default);
 }
-.cardhost-left-edge--nav-button.cardstack-logo-button:not(:disabled):hover {
+
+.cardhost-left-edge--nav.index-page .cardhost-left-edge--nav-button.cardstack-logo-button {
+  background-color: white;
+}
+.cardhost-left-edge--nav.index-page .cardhost-left-edge--nav-button.cardstack-logo-button:not(:disabled):hover {
   background-color: var(--ch-light-background);
 }
 

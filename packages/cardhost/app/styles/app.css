@@ -70,7 +70,7 @@ Until that work is done we are statically adding this css
   --ch-card-size: 496px;    /* min-width and min-height for cards */
   --ch-card-size-medium: 930px;
   --ch-card-size-large: 100%;
-  
+
   --ch-field-width: 384px;  /* edit and schema view field-renderer max-width */
   --ch-spacing: 20px;
   --ch-left-edge-z-index: 30;
@@ -100,7 +100,7 @@ Until that work is done we are statically adding this css
 }
 
 body {
-  position: fixed;
+  position: fixed; /* This is needed to prevent background scroll when bottom-edge is open */
   width: 100%;
   margin: 0;
   background-color: var(--ch-default);
@@ -125,10 +125,6 @@ a:hover {
   z-index: 50;
 }
 
-/* TODO: Remove when using ember-toolbars for all edges */
-.cst-bottom {
-  z-index: 25;
-}
 
 /* JSON card document -- hidden from view */
 .cardhost-card-document {
