@@ -25,22 +25,24 @@
               {{will-destroy this.destroyCloseListener}}
             >
               {{#if session.isAuthenticated }}
-                <button
+                <Cta
                   {{on "click" (fn this.logout session.logout)}}
+                  @variant="primary secondary"
                   class="cardhost-left-edge-login-buttons"
                   data-test-logout-button
                 >
                   Log out
-                </button>
+                </Cta>
               {{else}}
                 <MockLogin as |login|>
-                  <button
+                  <Cta
                     {{on "click" (fn login "user1")}}
+                    @variant="primary"
                     class="cardhost-left-edge-login-buttons"
                     data-test-login-button
                   >
                     Log in
-                  </button>
+                  </Cta>
                 </MockLogin>
               {{/if}}
             </div>

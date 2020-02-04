@@ -97,19 +97,12 @@
 
 .login-grid {
   display: grid;
-  grid-template-columns: 40px 290px;
+  grid-template-columns: 40px auto;
   grid-column-gap: 50px;
 }
 
 .cardhost-left-edge-login-buttons {
-  border: none;
-  background-color: transparent;
-  box-shadow: none;
-  color: var(--ch-highlight);
-  padding: 0;
-  margin: 0;
-  font-size: 16px;
-  cursor: pointer;
+  width: 100%;
 }
 
 .cardhost-left-edge-login-buttons:hover {
