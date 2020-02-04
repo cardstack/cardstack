@@ -9,21 +9,22 @@
 }
 
 .context-menu-nav {
-  display: inline-block;
-}
-
-.context-menu-items {
   position: absolute;
   z-index: var(--ch-actions-z-index);
   background-color: var(--ch-light);
   border-radius: 10px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
-  top: 30px;
-  font-size: 0.8em;
-  padding-left: 0;
+  top: 42px;
+  right: -150px;
   margin-left: 10px;
-  min-width: 200px;
+  width: 200px;
   padding-bottom: 10px;
+}
+
+.context-menu-items {
+  padding-left: 0;
+  font-size: 0.8em;
+  color: var(--ch-dark);
 }
 
 .context-menu-items li {
@@ -31,6 +32,11 @@
   list-style: none;
   font-weight: normal;
   padding: 3px 40px;
+}
+
+.context-menu-items li a {
+  display: block;
+  width: 100%;
 }
 
 .context-menu-items li.heading {
@@ -59,7 +65,7 @@
   display: block;
   width: 12px;
   height: 9px;
-  background-image: url(/assets/images/icons/checkmark.svg);
+  background-image: url("/assets/images/icons/checkmark-active.svg");
   background-size: cover;
   position: absolute;
   margin-left: -20px;

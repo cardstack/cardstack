@@ -1,0 +1,55 @@
+<div class="card-renderer-isolated--header--wrapper {{if @cardSelected "selected"}}">
+  <header class="card-renderer-isolated--header">
+    {{#if (or (eq (safe-css-string @card.adoptedFromName) "event-card") (eq (safe-css-string @card.name) "event-card"))}}
+      {{svg-jar "event" width="18px" height="20px"}}
+    {{/if}}
+    <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.name "Blank Card"}}</span>
+    {{#if this.cardstackSession.isAuthenticated}}
+      <div>
+        <LinkTo
+          @route={{@buttonRoute}}
+          @model={{@card}}
+          @class="card-renderer--header-link"
+          data-test-card-header-button
+        >
+          {{@buttonText}}
+        </LinkTo>
+        <button {{on "click" this.toggleMenu}} class="context-menu-button" data-test-context-menu
+          aria-label="More options menu" aria-expanded={{this.showContextMenu}}>
+          {{svg-jar "three-dots" width="12px" height="7px" aria-hidden=true}}
+        </button>
+      </div>
+    {{/if}}
+  </header>
+</div>
+{{log @cardSelected}}
+{{!-- This is outside of the header div so that it can have a higher z-index than the header --}}
+{{#if (and this.contextMenuOpened @cardSelected)}}
+  <nav class="context-menu-nav">
+    <ul class="context-menu-items">
+      <li class="heading">Switch mode</li>
+      <li>
+        <LinkTo @route="cards.card.view" @model={{@card}}>View</LinkTo>
+      </li>
+      <li>
+        <LinkTo @route="cards.card.edit.fields" @model={{@card}}>Edit</LinkTo>
+      </li>
+      <li>
+        <LinkTo @route="cards.card.edit.fields.schema" @model={{@card}}>Schema</LinkTo>
+      </li>
+      <li>
+        <LinkTo @route="cards.card" @model={{@card}} @class="ignore-active">Preview</LinkTo>
+      </li>
+      {{!-- TODO implement functionality for these items and uncomment them --}}
+      {{!-- <li class="divider">
+        <hr>
+      </li>
+      <li class="heading">Actions</li>
+      <li>Share</li>
+      <li>Save</li>
+      <li>Archive</li>
+      <li>Copy</li>
+      <li>Delete</li> --}}
+    </ul>
+  </nav>
+{{/if}}
