@@ -36,7 +36,12 @@
       <div class="library-section--grid">
         {{#each this.model.catalog as |card|}}
           {{#if (not (eq card.name "@cardstack/base-card"))}}
-            <LinkTo @route="cards.card.view" @model={{card.name}} class="library--card-link">
+            <LinkTo
+              @route="cards.card.view"
+              @model={{card.name}}
+              class="library--card-link"
+              data-test-library-recent-card-link
+            >
               <CardRenderer
                 @class="library--card-renderer"
                 @card={{card}}
@@ -59,7 +64,8 @@
           <Cta {{on "click" (fn this.openCardNameDialog "Adopt a Card" card)}}
             class="library--card-link"
             data-test-embedded-card={{card.name}}
-            data-test-adopt-card-btn>
+            data-test-library-adopt-card-btn
+          >
             <CardRenderer
               @class="library--card-renderer"
               @card={{card}}
@@ -77,19 +83,19 @@
         Common Cards
       </header>
       <div class="library-section--grid">
-        <LinkTo @route="cards.add" @class="library--card-link">
+        <LinkTo @route="cards.add" @class="library--card-link" data-test-library-common-card-link>
           <div class="library--card-renderer">
             <div class="library--card-placeholder icon-common-form"></div>
             <div class="library--card-label">Form</div>
           </div>
         </LinkTo>
-        <LinkTo @route="cards.add" @class="library--card-link">
+        <LinkTo @route="cards.add" @class="library--card-link" data-test-library-common-card-link>
           <div class="library--card-renderer">
             <div class="library--card-placeholder icon-common-layout"></div>
             <div class="library--card-label">Layout</div>
           </div>
         </LinkTo>
-        <LinkTo @route="cards.add" @class="library--card-link">
+        <LinkTo @route="cards.add" @class="library--card-link" data-test-library-common-card-link>
           <div class="library--card-renderer">
             <div class="library--card-placeholder icon-common-collection"></div>
             <div class="library--card-label">Collection</div>
@@ -106,7 +112,7 @@
       <div class="library-section--grid">
         <Cta {{on "click" (fn this.openCardNameDialog "Create a New Card")}}
           class="library--card-link"
-          data-test-new-blank-card-btn
+          data-test-library-new-blank-card-btn
         >
           <div class="library--card-renderer">
             <div class="library--card-placeholder icon-add-card"></div>

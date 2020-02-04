@@ -48,9 +48,8 @@
         </li>
         <li>
           <button
-            {{on "click" this.toggleCatalog}}
-            disabled={{not session.isAuthenticated}}
-            class="cardhost-left-edge--nav-button card-catalog-button"
+            disabled={{true}}
+            class="cardhost-left-edge--nav-button"
             aria-label="catalog"
             data-test-catalog-button
           >
@@ -58,14 +57,26 @@
           </button>
         </li>
         <li>
-          <LinkTo
-            @route="index"
-            data-test-library-link
-            class="cardhost-left-edge--nav-button library-button"
-            title="Library"
-          >
-            {{svg-jar "library" width="21px" height="13px"}}
-          </LinkTo>
+          {{#if @displayLibrary}}
+            <button
+              {{on "click" this.toggleLibrary}}
+              disabled={{not session.isAuthenticated}}
+              class="cardhost-left-edge--nav-button"
+              aria-label="library"
+              data-test-library-button
+            >
+              {{svg-jar "library" width="21px" height="13px"}}
+            </button>
+          {{else}}
+            <LinkTo
+              @route="index"
+              data-test-library-link
+              class="cardhost-left-edge--nav-button"
+              title="Homepage"
+            >
+              {{svg-jar "library" width="21px" height="13px"}}
+            </LinkTo>
+          {{/if}}
         </li>
       </ul>
     </nav>
@@ -74,6 +85,6 @@
   </aside>
 </CardstackSession>
 
-{{#if this.showCatalog}}
+{{#if this.showLibrary}}
   {{in-bottom-toolbar show=(component "library" model=@model)}}
 {{/if}}

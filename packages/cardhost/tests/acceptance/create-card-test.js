@@ -119,9 +119,9 @@ module('Acceptance | card create', function(hooks) {
 
     assert.equal(currentURL(), '/');
     await percySnapshot(assert);
-    await click('[data-test-catalog-button]');
+    await click('[data-test-library-button]');
     assert.dom('[data-test-library]').exists();
-    await click('[data-test-new-blank-card-btn]');
+    await click('[data-test-library-new-blank-card-btn]');
     await setCardName(card1Name);
 
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
