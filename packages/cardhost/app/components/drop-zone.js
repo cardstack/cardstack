@@ -1,9 +1,12 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import { inject as service } from '@ember/service';
 
 export default class DropZone extends Component {
   @tracked dropZoneStatus = 'outside';
+
+  @service draggedField;
 
   get stubField() {
     return {
@@ -20,6 +23,14 @@ export default class DropZone extends Component {
 
   @action
   updateStatus(status) {
+    let draggedField = this.draggedField.getField();
+
+    console.log('draggedField', draggedField);
+
+    if (!draggedField) {
+      return;
+    }
+
     this.dropZoneStatus = status;
 
     if (this.args.toggleStubField) {

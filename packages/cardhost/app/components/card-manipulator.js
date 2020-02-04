@@ -7,7 +7,9 @@ import { startCase } from 'lodash';
 import { task } from 'ember-concurrency';
 import ENV from '@cardstack/cardhost/config/environment';
 import { fieldTypeMappings, fieldComponents } from '../utils/mappings';
-import { chooseNextToLeft, chooseNextToRight, chooseNextToUp, chooseNextToDown, makeTarget } from '../motions/drag';
+import drag, { chooseNextToUp, chooseNextToDown, makeTarget } from '../motions/drag';
+import move from 'ember-animated/motions/move';
+import { printSprites } from 'ember-animated';
 
 const LEFT_ARROW = 37;
 const UP_ARROW = 38;
@@ -19,12 +21,12 @@ const { environment } = ENV;
 
 export default class CardManipulator extends Component {
   fieldTypeMappings = fieldTypeMappings;
-  fieldComponents = fieldComponents;
 
   @service data;
   @service router;
   @service cardstackSession;
   @service cssModeToggle;
+  @service draggedField;
 
   @tracked statusMsg;
   @tracked card;
@@ -32,6 +34,7 @@ export default class CardManipulator extends Component {
   @tracked isDragging;
   @tracked cardId;
   @tracked cardSelected = true;
+  @tracked fieldComponents = fieldComponents;
 
   constructor(...args) {
     super(...args);
@@ -195,23 +198,29 @@ export default class CardManipulator extends Component {
   }
 
   @action dropField(position, onFinishDrop, evt) {
+    let draggedField = this.draggedField.getField();
+
+    if (!draggedField) {
+      return;
+    }
     onFinishDrop();
+
     let field;
-    let type = evt.dataTransfer.getData('text/type');
-    if (type) {
-      field = this.card.addField({
-        type: this.fieldTypeMappings[type],
-        position: position,
-        name: this.newFieldName,
-        neededWhenEmbedded: false,
-      });
-    } else {
-      let fieldName = evt.dataTransfer.getData('text/field-name');
+
+    if (draggedField.name) {
+      let fieldName = draggedField.name;
       if (fieldName) {
         field = this.card.getField(fieldName);
         let newPosition = field.position < position ? position - 1 : position;
         this.setPosition(fieldName, newPosition);
       }
+    } else {
+      field = this.card.addField({
+        type: this.fieldTypeMappings[draggedField.type],
+        position: position,
+        name: this.newFieldName,
+        neededWhenEmbedded: false,
+      });
     }
     this.isDragging = false;
 
@@ -254,6 +263,11 @@ export default class CardManipulator extends Component {
   }
 
   @action
+  activateKeyboardNav() {
+    document.querySelector('.ch-catalog--fields .ch-catalog-field').focus();
+  }
+
+  @action
   handleKey(field, event) {
     let activeField = this.fieldComponents.find(field => field.dragState);
 
@@ -285,18 +299,14 @@ export default class CardManipulator extends Component {
         return false;
       }
     } else {
-      let elements = [...document.querySelectorAll('.fields .field-card')].filter(element => element !== event.target);
+      let elements = [...document.querySelectorAll('.ch-catalog--fields .ch-catalog-field')].filter(
+        element => element !== event.target
+      );
       let targets = [...elements].map(element => makeTarget(element.getBoundingClientRect(), element));
       let currentTarget = makeTarget(event.target.getBoundingClientRect(), event.target);
       let nextTarget;
 
       switch (event.keyCode) {
-        case RIGHT_ARROW:
-          nextTarget = chooseNextToRight(currentTarget, targets);
-          break;
-        case LEFT_ARROW:
-          nextTarget = chooseNextToLeft(currentTarget, targets);
-          break;
         case DOWN_ARROW:
           nextTarget = chooseNextToDown(currentTarget, targets);
           break;
@@ -319,9 +329,11 @@ export default class CardManipulator extends Component {
   @action
   beginDragging(field, event) {
     let dragState;
+    let draggedFieldService = this.draggedField;
 
     function stopMouse() {
       field.dragState = null;
+      draggedFieldService.clearField();
       window.removeEventListener('mouseup', stopMouse);
       window.removeEventListener('mousemove', updateMouse);
     }
@@ -329,6 +341,22 @@ export default class CardManipulator extends Component {
     function updateMouse(event) {
       dragState.latestPointerX = event.x;
       dragState.latestPointerY = event.y;
+      event.target.style.visibility = 'hidden';
+      let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
+      event.target.style.visibility = 'visible';
+      let currentDropzone = draggedFieldService.getDropzone();
+      let dropzoneBelow = elemBelow.closest('.drop-zone');
+      console.log('currentDropzone', currentDropzone, 'dropzoneBelow', dropzoneBelow);
+      if (currentDropzone !== dropzoneBelow) {
+        if (currentDropzone) {
+          draggedFieldService.clearDropzone();
+        }
+        if (dropzoneBelow) {
+          draggedFieldService.setDropzone(elemBelow);
+        }
+      }
+      // field.dragState = dragState;
+      // console.log('dragState', JSON.stringify(field.dragState, null, 2));
     }
 
     if (event instanceof KeyboardEvent) {
@@ -351,5 +379,20 @@ export default class CardManipulator extends Component {
       window.addEventListener('mousemove', updateMouse);
     }
     field.dragState = dragState;
+    this.draggedField.setField(field);
+    this.fieldComponents = this.fieldComponents.map(obj => (obj.id === field.id ? field : obj)); // oh glimmer, you so silly...
+    // this.fieldComponents = this.fieldComponents;
+  }
+
+  *transition({ keptSprites }) {
+    printSprites(arguments[0], 'cardTransition');
+    let activeSprite = keptSprites.find(sprite => sprite.owner.value.dragState);
+    let others = keptSprites.filter(sprite => sprite !== activeSprite);
+    if (activeSprite) {
+      drag(activeSprite, {
+        others,
+      });
+    }
+    others.forEach(move);
   }
 }
