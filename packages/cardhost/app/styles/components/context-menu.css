@@ -59,8 +59,11 @@
   background-color: transparent;
 }
 
-/* Shows a checkmark next to the active route in the context menu */
-.context-menu-items li a.active:before {
+/* Shows a checkmark next to the active route in the context menu.
+ * We can't use Ember's regular "active" classes because they apply
+ * to links to parent routes too.
+*/
+.context-menu-items li a.checked:before {
   content: "";
   display: block;
   width: 12px;
@@ -70,8 +73,4 @@
   position: absolute;
   margin-left: -20px;
   margin-top: 5px;
-}
-
-.context-menu-items li a.active.ignore-active:before {
-  width: 0;
 }

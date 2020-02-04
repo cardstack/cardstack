@@ -29,7 +29,7 @@ Ember Concurrency into the rendering of the card component here.
               @card={{@card}}
               @buttonRoute="cards.card.edit.fields"
               @buttonText="Edit"
-              @mode={{@mode}}
+              @mode={{this.mode}}
             />
           {{/animated-value}}
         {{else}}
@@ -37,8 +37,8 @@ Ember Concurrency into the rendering of the card component here.
             @card={{@card}}
             @buttonRoute="cards.card.view"
             @buttonText="Done Editing"
-            @mode={{@mode}}
-            @showHeader={{true}}
+            @mode={{this.mode}}
+            @alwaysShowHeader={{true}}
           />
         {{/if}}
         <div class="card-renderer-isolated--content">

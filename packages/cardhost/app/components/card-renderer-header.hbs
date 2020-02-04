@@ -22,24 +22,25 @@
     {{/if}}
   </header>
 </div>
-{{log @cardSelected}}
+
 {{!-- This is outside of the header div so that it can have a higher z-index than the header --}}
-{{#if (and this.contextMenuOpened @cardSelected)}}
-  <nav class="context-menu-nav">
+{{#if this.showContextMenu}}
+  <nav class="context-menu-nav" {{will-destroy this.resetMenu}}>
     <ul class="context-menu-items">
       <li class="heading">Switch mode</li>
       <li>
-        <LinkTo @route="cards.card.view" @model={{@card}}>View</LinkTo>
+        <LinkTo @route="cards.card.view" @model={{@card}} @class={{if (eq @mode "view") "checked"}}>View</LinkTo>
       </li>
       <li>
-        <LinkTo @route="cards.card.edit.fields" @model={{@card}}>Edit</LinkTo>
+        <LinkTo @route="cards.card.edit.fields" @model={{@card}} @class={{if (eq @mode "edit") "checked"}}>Edit</LinkTo>
       </li>
       <li>
-        <LinkTo @route="cards.card.edit.fields.schema" @model={{@card}}>Schema</LinkTo>
+        <LinkTo @route="cards.card.edit.fields.schema" @model={{@card}}  @class={{if (eq @mode "schema") "checked"}}>Schema</LinkTo>
       </li>
       <li>
-        <LinkTo @route="cards.card" @model={{@card}} @class="ignore-active">Preview</LinkTo>
+        <LinkTo @route="cards.card.edit.layout" @model={{@card}} @class={{if (eq @mode "layout") "checked"}}>Layout</LinkTo>
       </li>
+
       {{!-- TODO implement functionality for these items and uncomment them --}}
       {{!-- <li class="divider">
         <hr>
@@ -53,3 +54,5 @@
     </ul>
   </nav>
 {{/if}}
+
+{{log @mode}}
