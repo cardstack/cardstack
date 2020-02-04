@@ -14,8 +14,6 @@ import adjustCSS from 'ember-animated/motions/adjust-css';
 const duration = 250;
 // TODO This will be part of the official API. Move this into core as it solidifies
 export default class CardRenderer extends Component {
-  @service cardstackSession;
-
   @tracked componentName;
   @tracked mode;
   @tracked cardFocused = () => {};
