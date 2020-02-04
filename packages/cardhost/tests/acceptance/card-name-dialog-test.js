@@ -32,6 +32,8 @@ module('Acceptance | card name dialog', function(hooks) {
     await visit('/');
 
     assert.equal(currentURL(), '/');
+    await click('[data-test-catalog-button]');
+    assert.dom('[data-test-library]').exists();
     await click('[data-test-adopt-card-btn]');
     await percySnapshot([assert.test.module.name, assert.test.testName, 'adopt dialog'].join(' | '));
     assert.dom('[data-test-dialog-box]').exists();

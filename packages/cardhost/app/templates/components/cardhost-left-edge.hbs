@@ -47,7 +47,13 @@
           {{/if}}
         </li>
         <li>
-          <button disabled={{not session.isAuthenticated}} {{on "click" this.toggleCatalog}} class="cardhost-left-edge--nav-button card-catalog-button" aria-label="catalog">
+          <button
+            {{on "click" this.toggleCatalog}}
+            disabled={{not session.isAuthenticated}}
+            class="cardhost-left-edge--nav-button card-catalog-button"
+            aria-label="catalog"
+            data-test-catalog-button
+          >
             {{svg-jar "card-catalog" width="20px" height="20px"}}
           </button>
         </li>

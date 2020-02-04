@@ -1,4 +1,4 @@
-<div class="library">
+<div class="library" data-test-library>
   <nav class="library--nav" data-test-library-nav>
     <ul>
       <li>
@@ -104,7 +104,7 @@
         New Blank Card
       </header>
       <div class="library-section--grid">
-        <Cta {{on "click" this.openCardNameDialog}}
+        <Cta {{on "click" (fn this.openCardNameDialog "Create a New Card")}}
           class="library--card-link"
           data-test-new-blank-card-btn
         >
