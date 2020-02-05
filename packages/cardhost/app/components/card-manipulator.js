@@ -26,7 +26,7 @@ export default class CardManipulator extends Component {
   @service router;
   @service cardstackSession;
   @service cssModeToggle;
-  @service draggedField;
+  @service draggable;
 
   @tracked statusMsg;
   @tracked card;
@@ -198,17 +198,18 @@ export default class CardManipulator extends Component {
   }
 
   @action dropField(position, onFinishDrop, evt) {
-    let draggedField = this.draggedField.getField();
+    let draggable = this.draggable.getField();
 
-    if (!draggedField) {
+    if (!draggable) {
       return;
     }
+
     onFinishDrop();
 
     let field;
 
-    if (draggedField.name) {
-      let fieldName = draggedField.name;
+    if (draggable.name) {
+      let fieldName = draggable.name;
       if (fieldName) {
         field = this.card.getField(fieldName);
         let newPosition = field.position < position ? position - 1 : position;
@@ -216,13 +217,15 @@ export default class CardManipulator extends Component {
       }
     } else {
       field = this.card.addField({
-        type: this.fieldTypeMappings[draggedField.type],
+        type: this.fieldTypeMappings[draggable.type],
         position: position,
         name: this.newFieldName,
         neededWhenEmbedded: false,
       });
     }
-    this.isDragging = false;
+
+    this.draggable.clearField();
+    this.draggable.clearDropzone();
 
     if (field) {
       this.selectField(field, evt);
@@ -327,39 +330,57 @@ export default class CardManipulator extends Component {
   }
 
   @action
-  beginDragging(field, event) {
+  selectFieldType(field) {
+    if (!this.draggable.isDragging()) {
+      this.draggable.setField(field);
+    } else {
+      this.draggable.setDragging(false);
+    }
+  }
+
+  @action
+  beginDragging(field, dragEvent) {
     let dragState;
-    let draggedFieldService = this.draggedField;
+    let draggableService = this.draggable;
 
     function stopMouse() {
       field.dragState = null;
-      draggedFieldService.clearField();
+      let dropzone = draggableService.getDropzone();
+      if (dropzone) {
+        draggableService.drop();
+      }
       window.removeEventListener('mouseup', stopMouse);
       window.removeEventListener('mousemove', updateMouse);
+      return false;
     }
 
     function updateMouse(event) {
       dragState.latestPointerX = event.x;
       dragState.latestPointerY = event.y;
-      event.target.style.visibility = 'hidden';
+
+      draggableService.setDragging(true);
+
+      // in order for the drop zone to trigger a mouseenter/mouseleave event
+      // we need to temporarily hide the dragged element
+      let fieldEl = dragEvent.target.closest('.ch-catalog-field');
+      fieldEl.style.visibility = 'hidden';
       let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
-      event.target.style.visibility = 'visible';
-      let currentDropzone = draggedFieldService.getDropzone();
+      fieldEl.style.visibility = 'visible';
+
+      let currentDropzone = draggableService.getDropzone();
       let dropzoneBelow = elemBelow.closest('.drop-zone');
-      console.log('currentDropzone', currentDropzone, 'dropzoneBelow', dropzoneBelow);
+
       if (currentDropzone !== dropzoneBelow) {
         if (currentDropzone) {
-          draggedFieldService.clearDropzone();
+          draggableService.clearDropzone();
         }
         if (dropzoneBelow) {
-          draggedFieldService.setDropzone(elemBelow);
+          draggableService.setDropzone(elemBelow);
         }
       }
-      // field.dragState = dragState;
-      // console.log('dragState', JSON.stringify(field.dragState, null, 2));
     }
 
-    if (event instanceof KeyboardEvent) {
+    if (dragEvent instanceof KeyboardEvent) {
       // This is a keyboard-controlled "drag" instead of a real mouse
       // drag.
       dragState = {
@@ -370,18 +391,17 @@ export default class CardManipulator extends Component {
     } else {
       dragState = {
         usingKeyboard: false,
-        initialPointerX: event.x,
-        initialPointerY: event.y,
-        latestPointerX: event.x,
-        latestPointerY: event.y,
+        initialPointerX: dragEvent.x,
+        initialPointerY: dragEvent.y,
+        latestPointerX: dragEvent.x,
+        latestPointerY: dragEvent.y,
       };
       window.addEventListener('mouseup', stopMouse);
       window.addEventListener('mousemove', updateMouse);
     }
     field.dragState = dragState;
-    this.draggedField.setField(field);
+    this.draggable.setField(field);
     this.fieldComponents = this.fieldComponents.map(obj => (obj.id === field.id ? field : obj)); // oh glimmer, you so silly...
-    // this.fieldComponents = this.fieldComponents;
   }
 
   *transition({ keptSprites }) {

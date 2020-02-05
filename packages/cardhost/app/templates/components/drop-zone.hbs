@@ -3,9 +3,14 @@
     class="drop-zone"
     role="button"
     {{on "mouseup" (action @dropField @position (fn this.updateStatus "dropped"))}}
+    {{on "click" (action @dropField @position (fn this.updateStatus "dropped"))}}
+    {{on "drop" (action @dropField @position (fn this.updateStatus "dropped"))}}
     {{on "mouseover" (action this.dragOver)}}
     {{on "mouseenter" (action this.updateStatus "dragging")}}
     {{on "mouseleave" (action this.updateStatus "outside")}}
+    {{on "dragover" (action this.dragOver)}}
+    {{on "dragenter" (action this.updateStatus "dragging")}}
+    {{on "dragleave" (action this.updateStatus "outside")}}
     data-test-drop-zone={{@position}}
     aria-label="drop zone {{@position}}"
   >
