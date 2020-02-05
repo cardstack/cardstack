@@ -88,7 +88,7 @@
 </CardstackSession>
 
 {{#if this.isLibraryOpen}}
-  <button {{on "click" this.hideLibrary}} class="hide-library--button">
+  <button {{on "click" this.hideLibrary}} class="hide-library--button" data-test-library-close-button>
     <span class="hide-library--button-icon">{{svg-jar "library" width="21px" height="21px"}}</span>
     <span class="hide-library--button-text">Hide Library</span>
   </button>

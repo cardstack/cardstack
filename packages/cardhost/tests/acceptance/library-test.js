@@ -80,24 +80,12 @@ module('Acceptance | library', function(hooks) {
     await percySnapshot(assert);
   });
 
-  test(`toggling library via left edge`, async function(assert) {
+  test(`closing library panel`, async function(assert) {
     await visit(`/`);
     await click('[data-test-library-button]');
     assert.dom('[data-test-library]').exists();
-    await click('[data-test-library-button]');
+    await click('[data-test-library-close-button]');
     assert.dom('[data-test-library]').doesNotExist();
-    await click('[data-test-library-button]');
-    assert.dom('[data-test-library]').exists();
-  });
-
-  test(`signing out while library is toggled on`, async function(assert) {
-    await visit(`/`);
-    await click('[data-test-library-button]');
-    assert.dom('[data-test-library]').exists();
-    await click('[data-test-toggle-left-edge]');
-    await click('[data-test-logout-button]');
-    assert.dom('[data-test-library]').doesNotExist();
-    assert.dom('[data-test-library-button]').isDisabled();
   });
 
   test(`created card ids are in local storage`, async function(assert) {
