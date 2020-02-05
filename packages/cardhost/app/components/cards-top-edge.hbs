@@ -1,0 +1,24 @@
+<CardhostTopEdge @mode={{@mode}}>
+  {{#if (or (eq @mode "layout") (eq @mode "fields"))}}
+    <div class="view-selector">
+      <LinkTo
+        @route="cards.card.edit.layout"
+        @class="view-selector--mode-link"
+        @model={{@card}}
+        data-test-view-selector="layout"
+      >
+        {{svg-jar "layout" width="18px" height="17px"}}
+        Layout
+      </LinkTo>
+      <LinkTo
+        @route="cards.card.edit.fields"
+        @class="view-selector--mode-link"
+        @model={{@card}}
+        data-test-view-selector="fields"
+      >
+        {{svg-jar "form" width="18px" height="17px"}}
+        Field
+      </LinkTo>
+    </div>
+  {{/if}}
+</CardhostTopEdge>
