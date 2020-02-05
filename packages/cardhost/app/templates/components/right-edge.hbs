@@ -38,16 +38,27 @@
                     {{#if (eq @mode "fields")}}
                       <div class="right-edge--items-container">
                         <div class="right-edge--item">
-                          <Cta @variant="secondary responsive" @theme="cs-dark">
-                            <LinkTo
-                              @route="cards.card.edit.fields.schema"
-                              @class="right-edge--configure-schema-link"
-                              @model={{@card}}
-                              data-test-configure-schema-btn
-                            >
-                              Configure Schema
-                            </LinkTo>
-                          </Cta>
+                          <LinkTo
+                            @route="cards.card.edit.fields.schema"
+                            @class="right-edge--configure-schema-link cs-component-cta secondary responsive cs-dark-cta"
+                            @model={{@card}}
+                            data-test-configure-schema-btn
+                          >
+                            Configure Schema
+                          </LinkTo>
+                        </div>
+                      </div>
+                    {{else if (eq @mode "schema")}}
+                      <div class="right-edge--items-container">
+                        <div class="right-edge--item">
+                          <LinkTo
+                            @route="cards.card.edit.fields"
+                            @class="right-edge--configure-schema-link cs-component-cta secondary responsive cs-dark-cta"
+                            @model={{@card}}
+                            data-test-return-to-editing
+                          >
+                            Return to Editing
+                          </LinkTo>
                         </div>
                       </div>
                     {{/if}}
