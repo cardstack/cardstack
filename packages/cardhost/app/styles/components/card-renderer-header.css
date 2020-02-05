@@ -21,6 +21,16 @@
   padding-bottom: 10px;
 }
 
+/* Whenever there's a fixed header, use alternate layout */
+.edit .context-menu-nav,
+.schema .context-menu-nav {
+  position: fixed;
+  top: auto;
+  right: auto;
+  margin-left: calc(var(--ch-card-size) - 50px);
+  margin-top: -13px;
+}
+
 .context-menu-items {
   padding-left: 0;
   font-size: 0.8em;
