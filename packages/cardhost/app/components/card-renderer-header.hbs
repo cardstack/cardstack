@@ -24,7 +24,7 @@
 </div>
 
 {{!-- This is outside of the header div so that it can have a higher z-index than the header --}}
-{{#if (and @contextMenuOpen @cardSelected)}}
+{{#if this.showMenu}}
   <nav class="context-menu-nav">
     <ul class="context-menu-items">
       <li class="heading">Switch mode</li>
