@@ -35,7 +35,7 @@ export default class Library extends Component {
     }
     this.scroller.scrollToSection({
       selector: `.library-section--${sectionId}`,
-      elementOffset: 50,
+      elementOffset: 60,
       doneScrolling: () => (this.selectedSection = sectionId),
     });
   }
