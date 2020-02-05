@@ -4,7 +4,7 @@ import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import { dasherize } from '@ember/string';
 import { startCase } from 'lodash';
-import { task } from 'ember-concurrency';
+import { task, waitForProperty } from 'ember-concurrency';
 import ENV from '@cardstack/cardhost/config/environment';
 import { fieldTypeMappings, fieldComponents } from '../utils/mappings';
 import drag, { chooseNextToUp, chooseNextToDown, makeTarget } from '../motions/drag';
@@ -273,26 +273,33 @@ export default class CardManipulator extends Component {
   @action
   handleKey(field, event) {
     let activeField = this.fieldComponents.find(field => field.dragState);
+    let dropzones = [...document.querySelectorAll('.drop-zone')];
+    let activeDropzone = 0;
 
     if (activeField) {
       let xStep = 0;
       let yStep = 0;
       switch (event.keyCode) {
         case RIGHT_ARROW:
-          xStep = 1;
+          this.draggable.triggerEvent(dropzones[activeDropzone], 'mouseenter');
           break;
         case LEFT_ARROW:
-          xStep = -1;
+          this.draggable.triggerEvent(dropzones[activeDropzone], 'mouseleave');
           break;
         case DOWN_ARROW:
-          yStep = 1;
+          this.draggable.triggerEvent(dropzones[activeDropzone++], 'mouseleave');
+          this.draggable.triggerEvent(dropzones[activeDropzone], 'mouseenter');
           break;
         case UP_ARROW:
-          yStep = -1;
+          this.draggable.triggerEvent(dropzones[activeDropzone--], 'mouseleave');
+          this.draggable.triggerEvent(dropzones[activeDropzone], 'mouseenter');
           break;
         case SPACE:
-          activeField.set('dragState', null);
+          activeField.dragState = null;
           event.stopPropagation();
+          for (let element of dropzones) {
+            element.classList.remove('keyboard-highlight');
+          }
           return false;
       }
       if (xStep || yStep) {
@@ -319,6 +326,9 @@ export default class CardManipulator extends Component {
         case SPACE:
           this.beginDragging(field, event);
           event.stopPropagation();
+          for (let element of dropzones) {
+            element.classList.add('keyboard-highlight');
+          }
           return false;
       }
       if (nextTarget) {
@@ -329,9 +339,16 @@ export default class CardManipulator extends Component {
     }
   }
 
+  @task(function*() {
+    for (let element of [...document.querySelectorAll('.drop-zone')]) {
+      element.classList.add('keyboard-highlight');
+    }
+  })
+  hoverDropzones;
+
   @action
   selectFieldType(field) {
-    if (!this.draggable.isDragging()) {
+    if (!this.draggable.isDragging) {
       this.draggable.setField(field);
     } else {
       this.draggable.setDragging(false);

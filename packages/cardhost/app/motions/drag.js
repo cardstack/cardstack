@@ -101,22 +101,6 @@ class Drag extends Motion {
 
         // adjust our transform to match the latest relative mouse motion
         sprite.translate(dx + initialTx - sprite.transform.tx, dy + initialTy - sprite.transform.ty);
-
-        // now this is our own absolute center position
-        // let x = dx + this.dragStartX + sprite.absoluteFinalBounds.width / 2;
-        // let y = dy + this.dragStartY + sprite.absoluteFinalBounds.height / 2;
-
-        // let ownDistance = (x - ownTarget.x) * (x - ownTarget.x) + (y - ownTarget.y) * (y - ownTarget.y);
-        // let closerTarget = targets.find(target => {
-        //   let partialX = target.x - x;
-        //   let partialY = target.y - y;
-        //   let distance = partialX * partialX + partialY * partialY;
-        //   return distance < ownDistance;
-        // });
-
-        // if (closerTarget && this.opts.onCollision) {
-        //   this.opts.onCollision(closerTarget.payload);
-        // }
       }
       yield rAF();
     }

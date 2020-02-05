@@ -11,6 +11,11 @@
   z-index: 100;
 }
 
+.drop-zone.keyboard-highlight {
+  border: dashed 3px blue;
+  background-color: var(--ch-light-background);
+}
+
 .drop-zone--container.dragging .drop-zone {
   height: 170px;
 }

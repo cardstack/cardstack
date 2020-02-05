@@ -1,12 +1,6 @@
 import Service from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
-function triggerEvent(el, type) {
-  var e = document.createEvent('HTMLEvents');
-  e.initEvent(type, false, true);
-  el.dispatchEvent(e);
-}
-
 export default class DraggableService extends Service {
   @tracked field;
   @tracked dropzone;
@@ -38,7 +32,7 @@ export default class DraggableService extends Service {
    */
   setDropzone(element) {
     this.dropzone = element;
-    triggerEvent(element, 'mouseenter');
+    this.triggerEvent(element, 'mouseenter');
   }
 
   /**
@@ -53,7 +47,7 @@ export default class DraggableService extends Service {
    */
   clearDropzone() {
     if (this.dropzone) {
-      triggerEvent(this.dropzone, 'mouseleave');
+      this.triggerEvent(this.dropzone, 'mouseleave');
       this.dropzone = null;
     }
   }
@@ -68,7 +62,7 @@ export default class DraggableService extends Service {
   /**
    * Check if dragging
    */
-  isDragging() {
+  get isDragging() {
     return this.dragging;
   }
 
@@ -77,8 +71,14 @@ export default class DraggableService extends Service {
    */
   drop() {
     if (this.dropzone && this.field) {
-      triggerEvent(this.dropzone, 'mouseup');
+      this.triggerEvent(this.dropzone, 'mouseup');
       this.dropzone = null;
     }
+  }
+
+  triggerEvent(el, type) {
+    var e = document.createEvent('HTMLEvents');
+    e.initEvent(type, false, true);
+    el.dispatchEvent(e);
   }
 }
