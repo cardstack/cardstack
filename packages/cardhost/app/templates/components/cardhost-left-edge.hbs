@@ -61,7 +61,7 @@
         <li>
           {{#if @displayLibrary}}
             <button
-              {{on "click" this.toggleLibrary}}
+              {{on "click" this.showLibrary}}
               disabled={{not session.isAuthenticated}}
               class="cardhost-left-edge--nav-button"
               aria-label="library"
@@ -87,6 +87,10 @@
   </aside>
 </CardstackSession>
 
-{{#if this.showLibrary}}
+{{#if this.isLibraryOpen}}
+  <button {{on "click" this.hideLibrary}} class="hide-library--button">
+    <span class="hide-library--button-icon">{{svg-jar "library" width="21px" height="21px"}}</span>
+    <span class="hide-library--button-text">Hide Library</span>
+  </button>
   {{in-bottom-toolbar show=(component "library" model=@model)}}
 {{/if}}

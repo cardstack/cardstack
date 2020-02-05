@@ -113,3 +113,48 @@
   margin-top: 4px;
   font-weight: 600px;
 }
+
+.hide-library--button {
+  position: absolute;
+  top: var(--ch-spacing);
+  left: var(--ch-spacing);
+  z-index: 35;
+
+  display: block;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  min-width: 124px;
+  background: none;
+  border: none;
+}
+
+.hide-library--button-text {
+  display: inline-block;
+  color: var(--ch-light);
+  font-size: 13px;
+  line-height: calc(18 / 13);
+  letter-spacing: 0.015em;
+  opacity: 0.5;
+  transition: opacity var(--ch-card-transition-duration);
+}
+.hide-library--button:hover .hide-library--button-text {
+  opacity: 1;
+}
+
+.hide-library--button-icon {
+  --icon-color: var(--ch-deep-background);
+  display: inline-block;
+  width: 40px;
+  height: 100%;
+  margin-right: 8px;
+  padding: 5px;
+  background-color: var(--ch-highlight);
+  border-radius: 100px;
+  text-align: center;
+}
+.hide-library--button-icon svg {
+  display: inline-block;
+  vertical-align: middle;
+  height: 100%;
+}

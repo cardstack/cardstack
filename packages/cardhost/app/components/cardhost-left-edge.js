@@ -6,7 +6,7 @@ import { tracked } from '@glimmer/tracking';
 export default class CardhostTopEdgeComponent extends Component {
   @service cardstackSession;
   @tracked isExpanded = false;
-  @tracked showLibrary = false;
+  @tracked isLibraryOpen = false;
 
   @action
   toggleMenuExpand() {
@@ -18,7 +18,7 @@ export default class CardhostTopEdgeComponent extends Component {
   @action
   logout(sessionLogout) {
     sessionLogout();
-    this.showLibrary = false;
+    this.hideLibrary();
     let cardId = this.router.currentRoute.parent.params.name;
     if (cardId) {
       this.router.transitionTo('cards.card.view', cardId);
@@ -60,7 +60,12 @@ export default class CardhostTopEdgeComponent extends Component {
   }
 
   @action
-  toggleLibrary() {
-    this.showLibrary = !this.showLibrary;
+  showLibrary() {
+    this.isLibraryOpen = true;
+  }
+
+  @action
+  hideLibrary() {
+    this.isLibraryOpen = false;
   }
 }
