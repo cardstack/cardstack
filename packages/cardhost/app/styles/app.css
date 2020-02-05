@@ -176,21 +176,6 @@ a:hover {
   background-repeat: no-repeat;
 }
 
-.card-schema-updator--search-bar {
-  position: absolute;
-  right: var(--ch-spacing);
-  bottom: var(--ch-spacing);
-}
-
-.card-schema-updator--search-bar > .ch-search-bar {
-  min-width: 230px;
-}
-
-.card-creator--new-card {
-  width: 300px;
-  margin: var(--ch-spacing) auto;
-}
-
 .field-creator--field-btn-wrapper {
   text-align: right;
 }

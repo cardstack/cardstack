@@ -63,7 +63,6 @@
 }
 
 .cardhost-left-edge--nav-button:not(:disabled):hover {
-  --icon-color: var(--ch-highlight-hover);
   background-color: var(--ch-hover);
   border-color: var(--ch-border);
   cursor: pointer;

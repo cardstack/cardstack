@@ -1,11 +1,8 @@
-<CardhostTopEdge @mode="schema">
-  {{!-- TODO: DRY buttons --}}
-  {{#if this.cardstackSession.isAuthenticated}}
-    <div class="card-renderer--top-edge-buttons">
-      <SaveButton @card={{this.card}}/>
-    </div>
-  {{/if}}
-</CardhostTopEdge>
+{{#if this.cardstackSession.isAuthenticated}}
+  <div class="card-renderer--top-edge-buttons">
+    <SaveButton @card={{this.card}}/>
+  </div>
+{{/if}}
 
 <CardhostLeftEdge @mode="schema">
   {{!-- TODO: DRY catalog section --}}
@@ -53,21 +50,19 @@
   @cardSelected={{this.cardSelected}}
 />
 
-<section class="card-creator" data-test-card-creator {{did-update this.updateCard @card}}>
+<section class="card-renderer--container card-renderer--schema-container" data-test-card-creator {{did-update this.updateCard @card}}>
   {{#if this.card}}
-    <div class="card-renderer--container">
-      <CardRenderer
-        @card={{this.card}}
-        @format="isolated"
-        @mode="schema"
-        @removeField={{action this.removeField}}
-        @setPosition={{action this.setPosition}}
-        @selectField={{action this.selectField}}
-        @selectedField={{this.selectedField}}
-        @dropField={{action this.dropField}}
-        @cardSelected={{this.cardSelected}}
-        @cardFocused={{action (mut this.cardSelected)}} />
-    </div>
+    <CardRenderer
+      @card={{this.card}}
+      @format="isolated"
+      @mode="schema"
+      @removeField={{action this.removeField}}
+      @setPosition={{action this.setPosition}}
+      @selectField={{action this.selectField}}
+      @selectedField={{this.selectedField}}
+      @dropField={{action this.dropField}}
+      @cardSelected={{this.cardSelected}}
+      @cardFocused={{action (mut this.cardSelected)}} />
   {{/if}}
 </section>
 
