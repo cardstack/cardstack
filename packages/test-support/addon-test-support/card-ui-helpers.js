@@ -29,13 +29,10 @@ export async function dragAndDrop(fieldSelector, dropZoneSelector, options) {
 }
 
 export async function dragAndDropNewField(type, position = 0) {
-  let options = {
-    dataTransfer: {
-      getData: () => type,
-      setData: () => {},
-    },
-  };
-  await dragAndDrop(`[data-test-card-add-field-draggable="${type}"]`, `[data-test-drop-zone="${position}"]`, options);
+  await click(`[data-test-card-add-field-draggable="${type}"]`);
+  await triggerEvent(`[data-test-drop-zone="${position}"]`, 'mouseenter');
+  await click(`[data-test-drop-zone="${position}"]`);
+  await animationsSettled();
 }
 
 // NOTE: Position is 0-based
