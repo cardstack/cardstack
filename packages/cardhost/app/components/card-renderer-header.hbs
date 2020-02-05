@@ -15,7 +15,7 @@
           {{@buttonText}}
         </LinkTo>
         <button {{on "click" this.toggleMenu}} class="context-menu-button" data-test-context-menu
-          aria-label="More options menu" aria-expanded={{this.showContextMenu}}>
+          aria-label="More options menu" aria-expanded={{@contextMenuOpen}}>
           {{svg-jar "three-dots" width="12px" height="7px" aria-hidden=true}}
         </button>
       </div>
@@ -24,8 +24,8 @@
 </div>
 
 {{!-- This is outside of the header div so that it can have a higher z-index than the header --}}
-{{#if this.showContextMenu}}
-  <nav class="context-menu-nav" {{will-destroy this.resetMenu}}>
+{{#if (and @contextMenuOpen @cardSelected)}}
+  <nav class="context-menu-nav">
     <ul class="context-menu-items">
       <li class="heading">Switch mode</li>
       <li>

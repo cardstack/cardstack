@@ -1,10 +1,12 @@
 <section class="card-view" data-test-card-view={{@card.name}}>
-  <div class="card-renderer--container" role="button" {{on "mouseenter" (action (mut @card.isSelected) true)}} {{on "mouseleave" (action (mut @card.isSelected) false)}}>
+  <div class="card-renderer--container" role="button" {{on "mouseenter" (fn this.setSelected true)}} {{on "mouseleave" (fn this.setSelected false)}}>
     <CardRenderer
       @card={{@card}}
       @mode={{@mode}}
       @format="isolated"
-      @cardSelected={{@card.isSelected}}
+      @cardSelected={{this.isSelected}}
+      @contextMenuOpen={{this.contextMenuOpen}}
+      @setContextMenu={{this.setContextMenu}}
     />
   </div>
 </section>
