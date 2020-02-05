@@ -8,10 +8,8 @@ export default class CardsController extends Controller {
   @service routeInfo;
 
   get themerClasses() {
-    if (this.onThemerRoute && this.cssModeToggle.isResponsive) {
-      return 'responsive editing-css';
-    } else if (this.onThemerRoute && !this.cssModeToggle.isResponsive) {
-      return 'full-width editing-css';
+    if (this.onThemerRoute) {
+      return `editing-css themer-card-width--${this.cssModeToggle.width}`; // width is small, medium, or large
     } else {
       return '';
     }

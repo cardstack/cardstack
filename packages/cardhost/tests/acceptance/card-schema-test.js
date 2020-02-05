@@ -377,4 +377,13 @@ module('Acceptance | card schema', function(hooks) {
 
     assert.dom(`[data-test-right-edge] [data-test-no-adoption]`).hasText('No Adoption');
   });
+
+  test(`can navigate from schema to edit via return to editing button `, async function(assert) {
+    await login();
+    await visit(`/cards/@cardstack%2Fbase-card/edit/fields/schema`);
+    assert.equal(currentURL(), `/cards/@cardstack%2Fbase-card/edit/fields/schema`);
+    assert.dom('[data-test-return-to-editing]').hasText('Return to Editing');
+    await click('[data-test-return-to-editing]');
+    assert.equal(currentURL(), `/cards/@cardstack%2Fbase-card/edit/fields`);
+  });
 });
