@@ -38,8 +38,7 @@ if (process.env.HUB_ENVIRONMENT === 'production') {
       params: {
         branchPrefix: process.env.GIT_BRANCH_PREFIX,
         remote: {
-          url: 'git@github.com:cardstack/builder-data.git',
-          privateKey: process.env.GIT_PRIVATE_KEY,
+          url: process.env.GIT_REPO,
         },
       },
     },
