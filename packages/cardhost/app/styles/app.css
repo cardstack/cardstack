@@ -125,6 +125,10 @@ a:hover {
   z-index: 50;
 }
 
+/* TODO: Remove this when we use ember-toolbars for all edges */
+.cst-bottom {
+  z-index: 30; /* This is so that bottom edge is above the left edge */
+}
 
 /* JSON card document -- hidden from view */
 .cardhost-card-document {
