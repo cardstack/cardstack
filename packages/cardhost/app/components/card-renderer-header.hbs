@@ -14,7 +14,7 @@
         >
           {{@buttonText}}
         </LinkTo>
-        <button {{on "click" this.toggleMenu}} class="context-menu-button" data-test-context-menu
+        <button {{on "click" this.toggleMenu}} class="context-menu-button" data-test-context-menu-button
           aria-label="More options menu" aria-expanded={{@contextMenuOpen}}>
           {{svg-jar "three-dots" width="12px" height="7px" aria-hidden=true}}
         </button>
@@ -26,19 +26,19 @@
 {{!-- This is outside of the header div so that it can have a higher z-index than the header --}}
 {{#if this.showMenu}}
   <nav class="context-menu-nav">
-    <ul class="context-menu-items">
+    <ul class="context-menu-items" data-test-context-menu-items>
       <li class="heading">Switch mode</li>
       <li>
-        <LinkTo @route="cards.card.view" @model={{@card}} @class={{if (eq @mode "view") "checked"}}>View</LinkTo>
+        <LinkTo @route="cards.card.view" @model={{@card}} @class={{if (eq @mode "view") "checked"}} data-test-context-view>View</LinkTo>
       </li>
       <li>
-        <LinkTo @route="cards.card.edit.fields" @model={{@card}} @class={{if (eq @mode "edit") "checked"}}>Edit</LinkTo>
+        <LinkTo @route="cards.card.edit.fields" @model={{@card}} @class={{if (eq @mode "edit") "checked"}} data-test-context-edit>Edit</LinkTo>
       </li>
       <li>
-        <LinkTo @route="cards.card.edit.fields.schema" @model={{@card}}  @class={{if (eq @mode "schema") "checked"}}>Schema</LinkTo>
+        <LinkTo @route="cards.card.edit.fields.schema" @model={{@card}}  @class={{if (eq @mode "schema") "checked"}} data-test-context-schema>Schema</LinkTo>
       </li>
       <li>
-        <LinkTo @route="cards.card.edit.layout" @model={{@card}} @class={{if (eq @mode "layout") "checked"}}>Layout</LinkTo>
+        <LinkTo @route="cards.card.edit.layout" @model={{@card}} @class={{if (eq @mode "layout") "checked"}} data-test-context-layout>Layout</LinkTo>
       </li>
 
       {{!-- TODO implement functionality for these items and uncomment them --}}

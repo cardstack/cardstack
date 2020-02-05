@@ -1,5 +1,5 @@
 <section class="card-view" data-test-card-view={{@card.name}}>
-  <div class="card-renderer--container" role="button" {{on "mouseenter" (fn this.setSelected true)}} {{on "mouseleave" (fn this.setSelected false)}}>
+  <div class="card-renderer--container" role="button" {{on "mouseenter" (fn this.setSelected true)}} {{on "mouseleave" (fn this.setSelected false)}} data-test-card-renderer>
     <CardRenderer
       @card={{@card}}
       @mode={{@mode}}
