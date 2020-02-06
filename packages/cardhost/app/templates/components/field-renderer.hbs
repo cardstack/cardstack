@@ -6,15 +6,19 @@
 
 {{! TODO: Will, please resolve this linting error VVVV }}
 {{! template-lint-disable no-invalid-interactive}}
-<section {{on "click" (fn this.selectField @field)}} {{on "dragstart" (action this.startDragging @field)}} {{on "dragend" (action this.finishDragging)}}
-  class="field {{@field.name}}-field {{if @field.preview "preview"}} {{if this.friendlyType (concat "field-type-" this.friendlyType "-" @mode "-field ")}}field-type-{{this.dasherizedType}}-{{@mode}}-field{{if (or @setPosition @removeField) " with-buttons"}}{{if (eq @field @selectedField) " selected"}}"
+<section {{on "click" (fn this.selectField @field)}}
+  {{on "dragstart" (action this.startDragging @field)}}
+  {{on "dragend" (action this.finishDragging)}}
+  class="field {{@field.name}}-field {{if this.isStubField "preview"}} {{if this.friendlyType (concat "field-type-" this.friendlyType "-" @mode "-field ")}}field-type-{{this.dasherizedType}}-{{@mode}}-field{{if (or @setPosition @removeField) " with-buttons"}}{{if (eq @field @selectedField) " selected"}}"
   data-test-field={{@field.name}}
-  data-test-field-type={{@field.type}}
+  data-test-field-type={{@field.csTitle}}
   data-test-field-mode={{@mode}}
   {{did-update this.updateFieldProperties this.nonce}}
 >
   {{#if @setPosition}}
-    <button {{on "mousedown" (action this.initDrag @field)}} {{on "mouseup" (action this.endDrag)}} {{on "dragend" (action (mut this.isDragging) false)}}
+    <button {{on "mousedown" (action this.initDrag @field)}}
+      {{on "mouseup" (action this.endDrag)}}
+      {{on "dragend" (action (mut this.isDragging) false)}}
       class="field--move-btn"
       aria-label="Drag field"
       data-test-field-renderer-move-btn
@@ -24,52 +28,44 @@
   {{/if}}
 
   {{#if (or (eq @mode "view") (eq @mode "layout"))}}
-    {{#let (component this.fieldViewer) as | FieldViewer |}}
-      <FieldViewer @field={{@field}}/>
-    {{/let}}
+    <ScaffoldLoader @card={{@field}} @feature="field-view-layout" />
   {{else if (eq @mode "edit")}}
-    {{#let (component this.fieldEditor) as | FieldEditor |}}
-      <FieldEditor
-        @field={{@field}}
-        @setFieldValue={{@setFieldValue}}
-      />
-    {{/let}}
+    <ScaffoldLoader @card={{@field}} @feature="field-edit-layout" @setFieldValue={{@setFieldValue}} />
   {{else if (eq @mode "schema")}}
     {{!-- TODO we should extract the schema editing stuff into a seaprate component --}}
-      {{#if (includes this.schemaAttrs "title")}}
-        <div
-          class="schema-field-renderer"
-          data-test-field-schema-renderer
-          {{did-insert this.focusParentElement}}
+    {{#if (includes this.schemaAttrs "title")}}
+      <div
+        class="schema-field-renderer"
+        data-test-field-schema-renderer
+        {{did-insert this.focusParentElement}}
+      >
+        {{!-- TODO: Change displayed logo depending on field --}}
+        {{! template-lint-disable no-inline-styles }}
+        <header
+          class="schema-field-renderer--header"
+          data-test-field-renderer-type
         >
-          {{!-- TODO: Change displayed logo depending on field --}}
-          {{! template-lint-disable no-inline-styles }}
-          <header
-            class="schema-field-renderer--header {{if this.fieldType this.fieldType.type @field.type}}"
-            style={{css-url "background-image" this.fieldType.icon}}
-            data-test-field-renderer-type
-          >
-            {{@field.name}} ({{if this.fieldType this.fieldType.title @field.name}})
-            {{#if @field.isAdopted}}
-              <span class="schema-field-renderer--header--detail">Adopted</span>
-            {{/if}}
-          </header>
-          <div class="schema-field-renderer--content">
-            <div class="schema-field-renderer--name" data-test-field-renderer-label>
-              {{@field.label}}
-            </div>
-            <div class="schema-field-renderer--value" data-test-field-renderer-value>
-              {{@field.value}}
-            </div>
+          {{if this.isStubField "New Field" @field.name}} ({{this.fieldType}})
+          {{#if @field.isAdopted}}
+            <span class="schema-field-renderer--header--detail">Adopted</span>
+          {{/if}}
+        </header>
+        <div class="schema-field-renderer--content">
+          <div class="schema-field-renderer--name" data-test-field-renderer-label>
+            {{this.fieldDisplayName}}
+          </div>
+          <div class="schema-field-renderer--value" data-test-field-renderer-value>
+            {{this.fieldValue}}
           </div>
         </div>
-      {{/if}}
+      </div>
+    {{/if}}
     {{#each this.schemaAttrs as |schemaAttr|}}
       {{#if (eq schemaAttr "type")}}
         <div class="field-renderer--display" data-test-schema-attr={{schemaAttr}}>
           <span class="field-renderer--display-label">Field Type</span>
           <span data-test-field-renderer-field-type>
-            {{@field.type}}
+            {{@field.csTitle}}
           </span>
         </div>
       {{else if (eq schemaAttr "label")}}
@@ -85,7 +81,7 @@
             <div class="field-renderer--display">
               <span class="field-renderer--display-label">Field Label</span>
               <span data-test-field-renderer-field-label>
-                {{@field.label}}
+                {{@field.csTitle}}
               </span>
             </div>
           {{/if}}
@@ -120,13 +116,6 @@
             @pattern={{@field.fieldNameRegex.source}}
             @title="Can only contain letters, numbers, dashes, and underscores."
           />
-        </div>
-      {{else if (eq schemaAttr "is-meta")}}
-        <div class="field-renderer--display" data-test-schema-attr={{schemaAttr}}>
-          <span class="field-renderer--display-label">Export as Metadata</span>
-          <span data-test-field-renderer-is-meta>
-            {{if @field.json.data.attributes.is-metadata "true" "false"}}
-          </span>
         </div>
       {{else if (eq schemaAttr "embedded")}}
         <div data-test-schema-attr={{schemaAttr}}>
@@ -170,6 +159,6 @@
     </div>
   {{/if}}
 </section>
-{{#if (and (eq @mode "schema") @dropField (not @field.preview))}}
+{{#if (and (eq @mode "schema") @dropField (not this.isStubField))}}
   <DropZone @dropField={{@dropField}} @position={{inc @field.position}} @toggleStubField={{@toggleStubField}} />
 {{/if}}

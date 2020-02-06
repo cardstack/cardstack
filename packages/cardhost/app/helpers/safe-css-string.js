@@ -5,5 +5,10 @@ export default helper(function([string]) {
     return;
   }
 
-  return string.replace(/@/g, '').replace(/\//g, '-');
+  return string
+    .replace(/https:\/\//g, '')
+    .replace(/@/g, '')
+    .replace(/\s/g, '-')
+    .replace(/\./g, '-')
+    .replace(/\//g, '-');
 });

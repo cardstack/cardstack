@@ -1373,6 +1373,7 @@ describe('hub/card-service', function() {
       });
 
       it.skip('can get all the field cards (including adopted fields)', async function() {});
+      it.skip("a field card can indicate if it is the enclosing card's own field or if it is adopted", async function() {});
 
       it('can equality filter by string user field', async function() {
         let results = await service.search({

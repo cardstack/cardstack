@@ -1,15 +1,14 @@
-{{!-- TODO move this into the @cardstack/base-card package when we support runtime js compilation --}}
-<div
-  class="isolated-card cardstack_base-card-isolated {{safe-css-string @card.name}}-isolated {{safe-css-string @card.adoptedFromName}}-isolated"
-  data-test-isolated-card={{@card.name}}
-  data-test-isolated-card-mode={{@mode}}
->
-  {{!-- probably need a busy indicator while we are loading the fields --}}
-  {{#unless this.loadFields.isRunning}}
+{{#unless this.loadCard.isRunning}}
+  <div
+    class="isolated-card {{safe-css-string this.adoptedFromId}}--isolated"
+    data-test-isolated-card={{@card.csTitle}}
+    data-test-isolated-card-mode={{@mode}}
+  >
     <AnimatedContainer class={{if (or (eq @mode "view") (eq @mode "layout")) "isolated-card--view-fields"}}>
-      {{#animated-each this.fields key="nonce" use=this.transition duration=this.duration as |field|}}
-        TODO RENDER FIELD IN SCHEMA MODE HERE
-        {{!--
+      {{!-- TODO need Ed's help: this animated-each does not seem to be changing when a "stub" fields is added to the array,
+            but a normal #each is working... --}}
+      {{!-- {{#animated-each @fields use=this.transition duration=this.duration as |field|}} --}}
+      {{#each @fields as |field|}}
         {{#if @setFieldValue}}
           <FieldRenderer
             @field={{field}}
@@ -34,8 +33,9 @@
         {{else}}
           <FieldRenderer @field={{field}} @mode={{@mode}}/>
         {{/if}}
-        --}}
-      {{/animated-each}}
+      {{/each}}
+      {{!--{{/animated-each}} --}}
     </AnimatedContainer>
-  {{/unless}}
-</div>
+
+  </div>
+{{/unless}}

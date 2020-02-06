@@ -170,6 +170,8 @@ class Reader implements CardReader {
     // passed into the Card. And if the subsequent loads occur, they may
     // overfetch a resource that is needed in a different get for this
     // card--let's harness any over fetching efficiently.
+
+    // TODO let's not use the server for the built-in cards at the very least...
     return await this.dataService.load(idOrURL, 'everything');
   }
 }

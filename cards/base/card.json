@@ -2,6 +2,7 @@
   "data": {
     "type": "cards",
     "attributes": {
+      "csTitle": "Base Card",
       "csFeatures": {
       }
     },

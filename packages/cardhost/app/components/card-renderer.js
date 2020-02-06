@@ -1,21 +1,18 @@
 import Component from '@glimmer/component';
-import { dasherize } from '@ember/string';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import move from 'ember-animated/motions/move';
 import adjustCSS from 'ember-animated/motions/adjust-css';
-
-// TODO we'll need to use EC in order to be able to isolate cards
-// (due to the need to await the load of the isolated format of a card)
-// import { task } from "ember-concurrency";
+import { task } from 'ember-concurrency';
 
 const duration = 250;
 // TODO This will be part of the official API. Move this into core as it solidifies
 export default class CardRenderer extends Component {
   @service cardstackSession;
 
-  @tracked componentName;
+  @tracked actualFields;
+  @tracked fields;
   @tracked mode;
   @tracked cardFocused = () => {};
 
@@ -23,38 +20,45 @@ export default class CardRenderer extends Component {
 
   constructor(...args) {
     super(...args);
-
-    // TODO eventually this will be derived based on the presence of a card's
-    // custom template/component assets, and we'll use the @card.id for the
-    // component name
-    this.componentName = '@cardstack/base-card';
     this.mode = this.args.mode || 'view';
 
     if (this.args.cardFocused) {
       this.cardFocused = this.args.cardFocused;
     }
+    this.initCard.perform();
+  }
 
-    // if (this.args.card && this.args.format === 'isolated') {
-    //   this.fields = A(Object.assign([], this.args.card.isolatedFields));
-    // }
+  @task(function*() {
+    yield this.loadCard.perform();
+  })
+  initCard;
+
+  @task(function*() {
+    this.actualFields = yield this.args.card.fields();
+    this.fields = [...this.actualFields];
+  })
+  loadCard;
+
+  @(task(function*(field, position, isAdding) {
+    yield this.loadCard.last.finally();
+
+    if (isAdding) {
+      this.fields.splice(position, 0, field);
+    } else {
+      this.fields.splice(position, 1);
+    }
+    this.fields = this.fields;
+  }).enqueue())
+  updateFields;
+
+  @action
+  cardUpdated() {
+    this.loadCard.perform();
   }
 
   @action
-  updateFields(/*element, [fields]*/) {
-    // if (this.args.mode === 'schema') {
-    //   this.fields = A(Object.assign([], fields));
-    // }
-  }
-
-  @action
-  toggleStubField(/*field, position, addField*/) {
-    // if (position || position === 0) {
-    //   if (addField) {
-    //     this.fields.insertAt(position, field);
-    //   } else {
-    //     this.fields.removeAt(position);
-    //   }
-    // }
+  toggleStubField(field, position, isAdding) {
+    this.updateFields.perform(field, position, isAdding);
   }
 
   @action
@@ -65,18 +69,6 @@ export default class CardRenderer extends Component {
   @action
   focusCard(element, [value]) {
     this.cardFocused(value);
-  }
-
-  get sanitizedName() {
-    return this.componentName.replace(/@/g, '');
-  }
-
-  get embeddedComponentName() {
-    return `cards/${dasherize(this.sanitizedName)}/embedded`;
-  }
-
-  get isolatedComponentName() {
-    return `cards/${dasherize(this.sanitizedName)}/isolated`;
   }
 
   *headerAnimation({ keptSprites }) {

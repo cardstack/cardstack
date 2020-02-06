@@ -1,19 +1,21 @@
 import Component from '@glimmer/component';
-import { dasherize } from '@ember/string';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import { task } from 'ember-concurrency';
 
-const defaultSchemaAttrs = ['title', 'type', 'is-meta', 'name', 'instructions', 'embedded'];
+const defaultSchemaAttrs = ['title', 'type', 'name', 'instructions', 'embedded'];
 
 // These are the field attributes that will trigger onFieldChanged()
 // to be called when the values of this attributes change
-const onFieldChangedDependencies = ['nonce', 'name', 'label', 'instructions'];
+// const onFieldChangedDependencies = ['nonce', 'name', 'label', 'instructions'];
 
 let renderNonce = 0;
 export default class FieldRenderer extends Component {
   @tracked newFieldName;
   @tracked newFieldLabel;
   @tracked newFieldInstructions;
+  @tracked fieldValue;
+  @tracked fieldType;
   @tracked currentNonce;
   @tracked renderNonce;
 
@@ -23,22 +25,38 @@ export default class FieldRenderer extends Component {
     this.newFieldName = this.args.field.name;
     this.newFieldLabel = this.args.field.label;
     this.newFieldInstructions = this.args.field.instructions;
+
     this.currentNonce = this.nonce;
     this.renderNonce = renderNonce++;
+
+    this.loadField.perform();
   }
+
+  @task(function*() {
+    if (this.isStubField) {
+      this.fieldType = 'New Field';
+    } else {
+      this.fieldValue = yield this.args.field.enclosingCard.value(this.args.field.name);
+      let fieldTypeCard = yield this.args.field.adoptsFrom();
+      this.fieldType = fieldTypeCard.csTitle;
+    }
+  })
+  loadField;
 
   get schemaAttrs() {
     return this.args.schemaAttrs || defaultSchemaAttrs;
   }
 
-  get sanitizedType() {
-    return this.args.field.type.replace(/::/g, '/').replace(/@/g, '');
-  }
+  // get sanitizedType() {
+  //   return this.args.field.type.replace(/::/g, '/').replace(/@/g, '');
+  // }
 
-  get fieldType() {
-    // return fieldComponents.find(el => el.coreType === this.args.field.type);
-    // TODO use the field card's properties here instead...
-    return null;
+  // get fieldType() {
+  //   return fieldComponents.find(el => el.coreType === this.args.field.type);
+  // }
+
+  get isStubField() {
+    return this.args.field.csOriginalRealm === 'stub-card';
   }
 
   @action
@@ -46,8 +64,8 @@ export default class FieldRenderer extends Component {
     if (nonce !== this.currentNonce) {
       this.currentNonce = this.nonce;
       this.newFieldName = this.args.field.name;
-      this.newFieldLabel = this.args.field.label;
-      this.newFieldInstructions = this.args.field.instructions;
+      // this.newFieldLabel = this.args.field.label;
+      // this.newFieldInstructions = this.args.field.instructions;
     }
     return null;
   }
@@ -57,28 +75,32 @@ export default class FieldRenderer extends Component {
     element.parentElement.focus({ preventScroll: true });
   }
 
-  get nonce() {
-    return onFieldChangedDependencies.map(i => this.args.field[i]).join('::');
-  }
+  // get nonce() {
+  //   return onFieldChangedDependencies.map(i => this.args.field[i]).join('::');
+  // }
 
-  get dasherizedType() {
-    return dasherize(this.args.field.type.replace(/@cardstack\/core-types::/g, ''));
-  }
+  // get dasherizedType() {
+  //   return dasherize(this.args.field.type.replace(/@cardstack\/core-types::/g, ''));
+  // }
 
-  get friendlyType() {
-    if (this.dasherizedType === 'case-insensitive' || this.dasherizedType === 'string') {
-      return 'text';
-    }
+  // get friendlyType() {
+  //   if (this.dasherizedType === 'case-insensitive' || this.dasherizedType === 'string') {
+  //     return 'text';
+  //   }
 
-    return '';
-  }
+  //   return '';
+  // }
 
-  get fieldViewer() {
-    return `fields/${dasherize(this.sanitizedType)}-viewer`;
-  }
+  // get fieldViewer() {
+  //   return `fields/${dasherize(this.sanitizedType)}-viewer`;
+  // }
 
-  get fieldEditor() {
-    return `fields/${dasherize(this.sanitizedType)}-editor`;
+  // get fieldEditor() {
+  //   return `fields/${dasherize(this.sanitizedType)}-editor`;
+  // }
+
+  get fieldDisplayName() {
+    return this.args.field.csTitle || this.args.field.name;
   }
 
   @action

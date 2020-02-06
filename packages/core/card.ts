@@ -76,7 +76,7 @@ export class Card {
   readonly csFiles: CardFiles | undefined;
   readonly csPeerDependencies: PeerDependencies | undefined;
   readonly csFieldSets: OcclusionFieldSets | undefined;
-  private readonly csFields: { [name: string]: any } | undefined;
+  readonly csFields: { [name: string]: any } | undefined;
   private readonly csFeatures: { [name: string]: string | [string, string] } | undefined;
 
   // if this card is stored inside another, this is the other
@@ -854,6 +854,11 @@ export class FieldCard extends Card {
     if (typeof jsonapi.data.attributes?.csFieldArity === 'string') {
       this.csFieldArity = jsonapi.data.attributes?.csFieldArity === 'plural' ? 'plural' : 'singular';
     }
+  }
+
+  // TODO test this
+  get isAdopted(): boolean {
+    return !Object.keys(this.enclosingCard.csFields || {}).includes(this.name);
   }
 
   async validateValue(priorFieldValue: any, value: any, realm: AddressableCard) {

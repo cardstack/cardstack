@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
 import move from 'ember-animated/motions/move';
 import { fadeIn, fadeOut } from 'ember-animated/motions/opacity';
+import { tracked } from '@glimmer/tracking';
 import { task } from 'ember-concurrency';
 import ENV from '@cardstack/cardhost/config/environment';
 
@@ -8,17 +9,20 @@ const { animationSpeed } = ENV;
 const duration = 250;
 
 export default class IsolatedComponent extends Component {
+  @tracked adoptedFromId;
+
   duration = animationSpeed || duration;
 
   constructor(...args) {
     super(...args);
-    this.loadFields.perform();
+    this.loadCard.perform();
   }
 
   @task(function*() {
-    this.fields = yield this.args.card.fields();
+    let parent = yield this.args.card.adoptsFrom();
+    this.adoptedFromId = parent.canonicalURL;
   })
-  loadFields;
+  loadCard;
 
   *transition({ insertedSprites, keptSprites, removedSprites }) {
     if (insertedSprites.length) {

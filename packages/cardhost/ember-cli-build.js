@@ -71,15 +71,13 @@ module.exports = function(defaults) {
             'components/scaffold-loader.js': {
               dependsOnComponents: [
                 '<Scaffolding::Base::CatalogEntryLayout/>',
+                '<Scaffolding::Base::EmbeddedLayout/>',
+                '<Scaffolding::Base::IsolatedLayout/>',
                 '<Scaffolding::BooleanField::CatalogEntryLayout/>',
                 '<Scaffolding::IntegerField::CatalogEntryLayout/>',
                 '<Scaffolding::StringField::CatalogEntryLayout/>',
-              ],
-            },
-            'components/card-renderer.js': {
-              dependsOnComponents: [
-                '<Cards::Cardstack::BaseCard::Isolated/>',
-                '<Cards::Cardstack::BaseCard::Embedded/>',
+                '<Scaffolding::StringField::FieldEditLayout/>',
+                '<Scaffolding::StringField::FieldViewLayout/>',
               ],
             },
             'components/field-renderer.js': {
