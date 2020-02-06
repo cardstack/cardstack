@@ -467,6 +467,24 @@ module('Integration | Component | card-renderer', function(hooks) {
     assert.dom('[data-test-card-renderer-isolated]').hasClass('selected');
   });
 
+  test('isolated card cannot be selected if not logged in', async function(assert) {
+    let service = this.owner.lookup('service:data');
+    let session = this.owner.lookup('service:session');
+    await session.invalidate();
+    let card = service.createCard(qualifiedCard1Id);
+    this.set('card', card);
+
+    await render(hbs`
+      <CardRenderer
+        @card={{card}}
+        @format="isolated"
+        @cardSelected={{true}}
+      />
+    `);
+
+    assert.dom('[data-test-card-renderer-isolated]').hasNoClass('selected');
+  });
+
   test('display message if no @card attribute', async function(assert) {
     await render(hbs`
       <CardRenderer
