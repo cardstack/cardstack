@@ -3,6 +3,7 @@
     "type": "cards",
     "attributes": {
       "csTitle": "Base Card",
+      "csDescription": "This represents cards of any type",
       "csFeatures": {
       }
     },

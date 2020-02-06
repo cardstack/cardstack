@@ -792,7 +792,6 @@ export class Card {
   async loadFeature(featureName: 'embedded-layout'): Promise<null | Component>;
   async loadFeature(featureName: 'field-view-layout'): Promise<null | Component>;
   async loadFeature(featureName: 'field-edit-layout'): Promise<null | Component>;
-  async loadFeature(featureName: 'catalog-entry-layout'): Promise<null | Component>;
   async loadFeature(featureName: string): Promise<any> {
     let card: Card | undefined = this;
     while (card) {

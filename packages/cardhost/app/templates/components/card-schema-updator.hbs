@@ -34,7 +34,15 @@
               {{on "dragstart" (action this.startDragging field)}}
               data-test-card-add-field-draggable={{field.canonicalURL}}
             >
-              <Scaffold @card={{field}} @feature="catalog-entry-layout"/>
+              <div class="ch-catalog-field--icon">
+                {{!-- TODO need to add card icon to the API and render here --}}
+              </div>
+              <div>
+                <h4 class="ch-catalog-field--title">{{field.csTitle}}</h4>
+                {{#if field.csDescription}}
+                  <p class="ch-catalog-field--description">{{field.csDescription}}</p>
+                {{/if}}
+              </div>
             </div>
           {{/each}}
         {{/unless}}

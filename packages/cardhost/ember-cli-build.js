@@ -70,12 +70,8 @@ module.exports = function(defaults) {
           appModules: {
             'components/scaffold.js': {
               dependsOnComponents: [
-                '<Scaffolding::Base::CatalogEntryLayout/>',
                 '<Scaffolding::Base::EmbeddedLayout/>',
                 '<Scaffolding::Base::IsolatedLayout/>',
-                '<Scaffolding::BooleanField::CatalogEntryLayout/>',
-                '<Scaffolding::IntegerField::CatalogEntryLayout/>',
-                '<Scaffolding::StringField::CatalogEntryLayout/>',
                 '<Scaffolding::StringField::FieldEditLayout/>',
                 '<Scaffolding::StringField::FieldViewLayout/>',
               ],
