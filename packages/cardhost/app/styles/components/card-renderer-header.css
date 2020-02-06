@@ -25,8 +25,9 @@
 .edit .context-menu-nav {
   position: fixed;
   top: auto;
-  margin-left: 410px;
+  margin-left: 405px;
   margin-top: -13px;
+  right: auto;
 }
 
 .schema .context-menu-nav {
