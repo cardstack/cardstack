@@ -5,6 +5,7 @@ import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import move from 'ember-animated/motions/move';
 import adjustCSS from 'ember-animated/motions/adjust-css';
+import { inject as service } from '@ember/service';
 
 // TODO we'll need to use EC in order to be able to isolate cards
 // (due to the need to await the load of the isolated format of a card)
@@ -13,6 +14,7 @@ import adjustCSS from 'ember-animated/motions/adjust-css';
 const duration = 250;
 // TODO This will be part of the official API. Move this into core as it solidifies
 export default class CardRenderer extends Component {
+  @service cardstackSession;
   @tracked componentName;
   @tracked mode;
   @tracked cardFocused = () => {};
@@ -76,6 +78,10 @@ export default class CardRenderer extends Component {
 
   get isolatedComponentName() {
     return `cards/${dasherize(this.sanitizedName)}/isolated`;
+  }
+
+  get showEditMode() {
+    return this.cardstackSession.isAuthenticated && this.args.cardSelected;
   }
 
   *headerAnimation({ keptSprites }) {

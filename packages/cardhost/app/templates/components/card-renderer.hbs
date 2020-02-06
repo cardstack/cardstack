@@ -12,7 +12,7 @@ Ember Concurrency into the rendering of the card component here.
           {{this.mode}}
           {{safe-css-string @card.adoptedFromName}}
           {{safe-css-string @card.name}}
-          {{if @cardSelected "selected"}}
+          {{if this.showEditMode "selected"}}
           {{if this.fields.length "has-fields" "no-fields"}}
           {{@class}}
         "
@@ -23,9 +23,9 @@ Ember Concurrency into the rendering of the card component here.
         {{did-update this.updateFields @card.isolatedFields}}
       >
         {{#if (eq @mode "view")}}
-          {{#animated-value @isSelected use=this.headerAnimation}}
+          {{#animated-value this.showEditMode use=this.headerAnimation}}
             <CardRendererHeader 
-              @cardSelected={{@cardSelected}}
+              @cardSelected={{this.showEditMode}}
               @card={{@card}}
               @buttonRoute="cards.card.edit.fields"
               @buttonText="Edit"
@@ -48,7 +48,7 @@ Ember Concurrency into the rendering of the card component here.
         <div class="card-renderer-isolated--content">
           <AnimatedContainer>
             {{#animated-value @isSelected use=this.borderAnimation}}
-              <div class="card-renderer-isolated--card-container {{if @cardSelected "selected"}}">
+              <div class="card-renderer-isolated--card-container {{if this.showEditMode "selected"}}">
                 {{#if (and @dropField ) }}
                   <DropZone
                     @dropField={{@dropField}}
