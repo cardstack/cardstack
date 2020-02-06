@@ -347,10 +347,11 @@ export default class CardManipulator extends Component {
   hoverDropzones;
 
   @action
-  selectFieldType(field) {
+  selectFieldType(field, event) {
     if (!this.draggable.isDragging) {
-      this.draggable.setField(field);
+      this.beginDragging(field, event);
     } else {
+      this.draggable.clearField();
       this.draggable.setDragging(false);
     }
   }
@@ -365,7 +366,11 @@ export default class CardManipulator extends Component {
       let dropzone = draggableService.getDropzone();
       if (dropzone) {
         draggableService.drop();
+      } else {
+        // we mouseup somewhere that isn't a dropzone
+        draggableService.clearField();
       }
+
       window.removeEventListener('mouseup', stopMouse);
       window.removeEventListener('mousemove', updateMouse);
       return false;
