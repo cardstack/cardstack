@@ -1,9 +1,4 @@
 .cardhost-top-edge {
-  --padding-left: var(--ch-left-edge-width);
-  --padding-right: var(--ch-right-edge-width);
-
-  padding-left: var(--padding-left);
-  padding-right: var(--padding-right);
   height: var(--ch-top-edge-height);
   position: fixed;
   top: 0;
@@ -15,7 +10,7 @@
   text-align: right;
   z-index: var(--ch-top-edge-z-index);
   background-color: var(--ch-default);
-  transition: background-color var(--ch-transition-time);
+  transition: var(--ch-card-background-color-animate);
 }
 
 .cardhost-top-edge.view {
@@ -31,6 +26,8 @@
 .cardhost-top-edge.add,
 .cardhost-top-edge.adopt,
 .cardhost-top-edge.schema {
+  padding-left: var(--ch-left-edge-width);
+  padding-right: var(--ch-right-edge-width);
   background-color: var(--ch-deep-background);
 }
 

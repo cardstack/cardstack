@@ -1,19 +1,17 @@
 <section
-  class="card-editor"
+  class="card-renderer--container"
   data-test-card-edit={{this.card.name}}
   {{did-update this.updateCard @card}}
 >
-  <div class="card-renderer--container">
-    <CardRenderer
-      @card={{this.card}}
-      @mode="edit"
-      @setFieldValue={{action this.setFieldValue}}
-      @format="isolated"
-      @selectField={{action this.selectField}}
-      @selectedField={{this.selectedField}}
-      @cardSelected={{this.card.isSelected}}
-      @cardFocused={{action (mut this.card.isSelected)}} />
-  </div>
+  <CardRenderer
+    @card={{this.card}}
+    @mode="edit"
+    @setFieldValue={{action this.setFieldValue}}
+    @format="isolated"
+    @selectField={{action this.selectField}}
+    @selectedField={{this.selectedField}}
+    @cardSelected={{this.card.isSelected}}
+    @cardFocused={{action (mut this.card.isSelected)}} />
 </section>
 
 {{!-- This is hidden, used in tests --}}

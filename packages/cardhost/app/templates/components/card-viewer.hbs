@@ -1,12 +1,12 @@
-<section class="card-view" data-test-card-view={{@card.name}}>
-  <div class="card-renderer--container" role="button" {{on "mouseover" (action (mut @card.isSelected) true)}} {{on "mouseout" (action (mut @card.isSelected) false)}}>
+<section class="card-renderer--container" data-test-card-view={{@card.name}}>
+  <button class="card-renderer--wrapper-button" {{on "mouseover" (action (mut @card.isSelected) true)}} {{on "mouseout" (action (mut @card.isSelected) false)}}>
     <CardRenderer
       @card={{@card}}
       @mode={{@mode}}
       @format="isolated"
       @cardSelected={{@card.isSelected}}
     />
-  </div>
+  </button>
 </section>
 
 <style data-test-view-css>

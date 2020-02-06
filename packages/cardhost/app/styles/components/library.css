@@ -1,0 +1,200 @@
+.library {
+  --library-navbar-width: 260px;
+  --library-placeholder-card: #acaac6;
+  --library-nav-color: #6b6a80;
+  --library-border-color: #373748;
+  --library-grid-col-width: 265px; /* card-min-size + padding * 2 */
+  --library-card-min-size: 225px;
+
+  display: grid;
+  grid-template-columns: var(--library-navbar-width) 1fr;
+  grid-template-areas: "navbar main";
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  background-color: var(--ch-deep-background);
+  color: var(--ch-light);
+}
+
+.library--nav {
+  grid-area: navbar;
+  width: var(--library-navbar-width);
+  margin-top: 80px;
+  padding: 50px 40px;
+}
+
+.library--main {
+  grid-area: main;
+  max-width: 1440px;
+  height: 100%;
+  padding: 44px 40px;
+  overflow-y: auto;
+}
+
+
+/* Navbar list */
+.library--nav ul {
+  position: fixed;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.library--nav ul li + li {
+  margin-top: 18px;
+}
+
+.library--nav-button {
+  --icon-color: var(--library-nav-color);
+  display: flex;
+  align-items: center;
+  background: none;
+  box-shadow: none;
+  border: none;
+  font: 400 13px/18px var(--ch-font-family);
+  color: var(--library-nav-color);
+  letter-spacing: 0.015em;
+  transition: color var(--ch-card-transition-duration);
+}
+
+.library--nav-button > svg {
+  margin-right: 14px;
+}
+
+.library--nav-button:not(:disabled):focus {
+  --icon-color: var(--ch-highlight);
+  outline: 0;
+  color: var(--ch-highlight);
+}
+
+.library--nav-button:not(:disabled):hover,
+.library--nav-button:not(:disabled).active {
+  --icon-color: var(--ch-highlight);
+  color: var(--ch-light);
+  cursor: pointer;
+}
+
+
+/* Catalog section */
+.library-section {
+  padding-bottom: 48px;
+}
+
+.library-section + .library-section {
+  border-top: 1px solid var(--library-border-color);
+}
+
+.library-section:first-of-type > .library-section--header {
+  padding-top: 80px;
+}
+
+.library-section--header {
+  --icon-color: var(--ch-highlight);
+  display: flex;
+  align-items: center;
+  padding: 48px 0 29px;
+  font-size: 26px;
+  font-weight: 400;
+  line-height: calc(36 / 26);
+  letter-spacing: 0.015em;
+}
+
+.library-section--header svg {
+  margin-right: 20px;
+}
+
+.library-section--grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, var(--library-grid-col-width));
+  grid-gap: 5px 30px;
+  justify-items: center;
+  margin: 0;
+}
+
+.library--card-link {
+  width: 100%;
+  margin: 0;
+  padding: 20px;
+  background: none;
+  border: none;
+}
+
+.library--card-link:hover,
+.library--card-link:focus {
+  --cs-button-hover: transparent;
+  outline: 0;
+}
+
+.library--card-renderer > .embedded-card,
+.library--card-renderer > .library--card-placeholder {
+  min-width: var(--library-card-min-size);
+  min-height: var(--library-card-min-size);
+  border-radius: 15px;
+  transition: transform var(--ch-card-transition-duration) ease-in-out calc(var(--ch-card-transition-duration) / 3);
+}
+
+.library--card-link:hover > .library--card-renderer > .embedded-card,
+.library--card-link:focus > .library--card-renderer > .embedded-card,
+.library--card-link:hover > .library--card-renderer > .library--card-placeholder,
+.library--card-link:focus > .library--card-renderer > .library--card-placeholder {
+  transform: scale(0.9);
+  box-shadow: 0px 0px 0px 35px var(--ch-hover);
+  transition: all 0.3s ease;
+}
+
+.library--card-placeholder {
+  background-color: var(--library-placeholder-card);
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: 50px 56px;
+}
+.library--card-placeholder.icon-common-form {
+  background-image: url(/assets/images/cards/started-page/icon-common-form.svg);
+}
+.library--card-placeholder.icon-common-layout {
+  background-image: url(/assets/images/cards/started-page/icon-common-layout.svg);
+}
+.library--card-placeholder.icon-common-collection {
+  background-image: url(/assets/images/cards/started-page/icon-common-collection.svg);
+}
+.library--card-placeholder.icon-add-card {
+  background-image: url(/assets/images/cards/started-page/icon-blank-card.svg);
+}
+
+.library--card-renderer .embedded-card-label,
+.library--card-label {
+  padding-top: 26px;
+  color: var(--ch-light);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.015em;
+  line-height: calc(17 / 15);
+  text-align: center;
+}
+
+
+@media (max-width: 615px) {
+  .library {
+    display: block;
+    padding-top: 80px;
+    padding-left: var(--ch-spacing);
+  }
+
+  .library--nav {
+    display: none;
+  }
+
+  .library-section:first-of-type > .library-section--header {
+    padding-top: 0;
+  }
+
+  .library-section--header {
+    font-size: 22px;
+  }
+
+  .library-section--header svg {
+    height: 22px;
+    margin-right: 15px;
+  }
+}

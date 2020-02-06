@@ -59,7 +59,7 @@
   @setFieldInstructions={{this.setFieldInstructions}}
   @cardSelected={{this.cardSelected}} />
 
-<section class="card-schema-updator" data-test-card-schema={{@card.name}} {{did-update this.updateCard @card}}>
+<section class="card-renderer--container card-renderer--schema-container" data-test-card-schema={{@card.name}} {{did-update this.updateCard @card}}>
   <CardRenderer
     @card={{this.card}}
     @format="isolated"
