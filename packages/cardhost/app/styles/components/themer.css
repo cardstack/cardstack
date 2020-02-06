@@ -290,16 +290,9 @@
   --icon-url: url('/assets/images/buttons/full-width-active.svg');
 }
 
-.editing-css {
-  padding-left: 0;
-  padding-right: 0;
-  width: 100%;
-  transition: var(--ch-card-padding-animate), var(--ch-card-background-color-animate);
-  background-color: var(--ch-dark-background);
-}
-
 .editing-css .themer.view {
-  padding: var(--ch-spacing);
+  margin-left: 0;
+  padding-top: 0;
   transition: width 0.3s ease;
 }
 
@@ -307,16 +300,10 @@
   width: var(--ch-card-size);
 }
 
-
 .editing-css.themer-card-width--medium .themer.view {
   width: var(--ch-card-size-medium);
 }
 
 .editing-css.themer-card-width--large .themer.view {
   width: var(--ch-card-size-large);
-}
-
-.card-renderer-isolated.themer.view .card-renderer-isolated--header--wrapper  {
-  left: var(--ch-spacing);
-  right: var(--ch-spacing);
 }

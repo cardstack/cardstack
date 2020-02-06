@@ -5,6 +5,7 @@
 
 @import '/assets/index.css';
 @import '/assets/cards.css';
+@import '/assets/components/library.css';
 @import '/assets/components/view-switcher.css';
 @import '/assets/components/right-edge.css';
 @import '/assets/components/cardhost-left-edge.css';
@@ -70,7 +71,7 @@ Until that work is done we are statically adding this css
   --ch-card-size: 496px;    /* min-width and min-height for cards */
   --ch-card-size-medium: 930px;
   --ch-card-size-large: 100%;
-  
+
   --ch-field-width: 384px;  /* edit and schema view field-renderer max-width */
   --ch-spacing: 20px;
   --ch-left-edge-z-index: 30;
@@ -100,10 +101,8 @@ Until that work is done we are statically adding this css
 }
 
 body {
-  min-width: 100%;
-  min-height: 100%;
+  position: fixed; /* This is needed to prevent background scroll when bottom-edge is open */
   width: 100%;
-  height: auto;
   margin: 0;
   background-color: var(--ch-default);
   color: white;
@@ -125,6 +124,11 @@ a:hover {
 /* Ember Animated */
 .animated-tools {
   z-index: 50;
+}
+
+/* TODO: Remove this when we use ember-toolbars for all edges */
+.cst-bottom {
+  z-index: 30; /* This is so that bottom edge is above the left edge */
 }
 
 /* JSON card document -- hidden from view */
@@ -175,21 +179,6 @@ a:hover {
   background-image: url(/assets/images/icons/close-circle.svg);
   background-size: 18px 18px;
   background-repeat: no-repeat;
-}
-
-.card-schema-updator--search-bar {
-  position: absolute;
-  right: var(--ch-spacing);
-  bottom: var(--ch-spacing);
-}
-
-.card-schema-updator--search-bar > .ch-search-bar {
-  min-width: 230px;
-}
-
-.card-creator--new-card {
-  width: 300px;
-  margin: var(--ch-spacing) auto;
 }
 
 .field-creator--field-btn-wrapper {

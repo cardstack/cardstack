@@ -1,5 +1,5 @@
-<section class="card-view" data-test-card-view={{@card.name}}>
-  <div class="card-renderer--container" role="button" {{on "mouseenter" (fn this.setSelected true)}} {{on "mouseleave" (fn this.setSelected false)}} data-test-card-renderer>
+<section class="card-renderer--container" data-test-card-view={{@card.name}}>
+  <button class="card-renderer--wrapper-button" {{on "mouseenter" (fn this.setSelected true)}} {{on "mouseleave" (fn this.setSelected false)}} data-test-card-renderer>
     <CardRenderer
       @card={{@card}}
       @mode={{@mode}}
@@ -8,7 +8,7 @@
       @contextMenuOpen={{this.contextMenuOpen}}
       @setContextMenu={{this.setContextMenu}}
     />
-  </div>
+  </button>
 </section>
 
 <style data-test-view-css>

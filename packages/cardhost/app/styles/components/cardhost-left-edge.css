@@ -44,12 +44,11 @@
   border-radius: 10px;
 }
 
-
 .cardhost-left-edge--nav-button {
   --icon-color: var(--ch-highlight);
   display: block;
   background: none;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 100px;
   width: 40px;
   height: 40px;
@@ -64,19 +63,24 @@
 }
 
 .cardhost-left-edge--nav-button:not(:disabled):hover {
-  --icon-color: var(--ch-highlight-hover);
+  background-color: var(--ch-hover);
+  border-color: var(--ch-border);
   cursor: pointer;
 }
 .cardhost-left-edge--nav-button:not(:disabled):focus {
   outline: 0;
-  border: 1px solid var(--ch-highlight-hover);
+  background-color: var(--ch-hover);
+  border-color: var(--ch-border);
 }
 
 .cardhost-left-edge--nav-button.cardstack-logo-button {
-  background-color: white;
-  border-radius: 100px;
+  background-color: var(--ch-default);
 }
-.cardhost-left-edge--nav-button.cardstack-logo-button:not(:disabled):hover {
+
+.cardhost-left-edge--nav.index-page .cardhost-left-edge--nav-button.cardstack-logo-button {
+  background-color: white;
+}
+.cardhost-left-edge--nav.index-page .cardhost-left-edge--nav-button.cardstack-logo-button:not(:disabled):hover {
   background-color: var(--ch-light-background);
 }
 
@@ -92,19 +96,12 @@
 
 .login-grid {
   display: grid;
-  grid-template-columns: 40px 290px;
+  grid-template-columns: 40px auto;
   grid-column-gap: 50px;
 }
 
 .cardhost-left-edge-login-buttons {
-  border: none;
-  background-color: transparent;
-  box-shadow: none;
-  color: var(--ch-highlight);
-  padding: 0;
-  margin: 0;
-  font-size: 16px;
-  cursor: pointer;
+  width: 100%;
 }
 
 .cardhost-left-edge-login-buttons:hover {
@@ -119,4 +116,49 @@
 
 .context-menu-items li.divider {
   padding: 0;
+}
+
+.hide-library--button {
+  position: absolute;
+  top: var(--ch-spacing);
+  left: var(--ch-spacing);
+  z-index: 35;
+
+  display: block;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  min-width: 124px;
+  background: none;
+  border: none;
+}
+
+.hide-library--button-text {
+  display: inline-block;
+  color: var(--ch-light);
+  font-size: 13px;
+  line-height: calc(18 / 13);
+  letter-spacing: 0.015em;
+  opacity: 0.5;
+  transition: opacity var(--ch-card-transition-duration);
+}
+.hide-library--button:hover .hide-library--button-text {
+  opacity: 1;
+}
+
+.hide-library--button-icon {
+  --icon-color: var(--ch-deep-background);
+  display: inline-block;
+  width: 40px;
+  height: 100%;
+  margin-right: 8px;
+  padding: 5px;
+  background-color: var(--ch-highlight);
+  border-radius: 100px;
+  text-align: center;
+}
+.hide-library--button-icon svg {
+  display: inline-block;
+  vertical-align: middle;
+  height: 100%;
 }
