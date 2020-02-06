@@ -137,61 +137,6 @@ a:hover {
   overflow: hidden;
 }
 
-
-/* Other: */
-/* TODO: Refactor these to where they belong  */
-.card-renderer--top-edge-buttons {
-  position: fixed;
-  top: var(--ch-spacing);
-  right: var(--ch-spacing);
-  display: flex;
-  z-index: var(--ch-actions-z-index);
-}
-
-.card-renderer--top-edge-buttons button + button {
-  margin-left: 10px;
-}
-
-.top-edge--mode-label {
-  padding: 10px;
-  background-color: white;
-  text-transform: uppercase;
-  font-size: 16px;
-  font-weight: bold;
-  border-radius: 10px;
-  color: var(--ch-dark-op50);
-  margin-right: 20px;
-}
-
-.top-edge--mode-link {
-  display: inline-flex;
-}
-
-.top-edge--mode-link span {
-  width: 18px;
-  height: 18px;
-  display: block;
-  text-indent: -9999px;
-    text-indent: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  background-image: url(/assets/images/icons/close-circle.svg);
-  background-size: 18px 18px;
-  background-repeat: no-repeat;
-}
-
-.field-creator--field-btn-wrapper {
-  text-align: right;
-}
-
-
-/* TODO: Move to ui-components repo */
-.cs-dark-input.cs-input:disabled,
-.cs-dark-input.cs-input.disabled {
-  -webkit-text-fill-color: var(--cs-dark-field-disabled-text); /* For strangeness in safari */
-  -webkit-text-stroke-color: var(--cs-dark-field-disabled-text);
-}
-
 /* Cardhost Modal */
 .cardhost-modal-backdrop {
   position: fixed;
@@ -212,4 +157,16 @@ a:hover {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Other */
+.field-creator--field-btn-wrapper {
+  text-align: right;
+}
+
+/* TODO: Move to ui-components repo */
+.cs-dark-input.cs-input:disabled,
+.cs-dark-input.cs-input.disabled {
+  -webkit-text-fill-color: var(--cs-dark-field-disabled-text); /* For strangeness in safari */
+  -webkit-text-stroke-color: var(--cs-dark-field-disabled-text);
 }
