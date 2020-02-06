@@ -30,17 +30,24 @@
   right: auto;
 }
 
+.context-menu-sticky-wrapper {
+  position: sticky;
+  z-index: var(--ch-actions-z-index);
+  margin-left: 89%;
+}
+
 .schema .context-menu-nav {
+  right: auto;
   position: fixed;
-  margin-left: 0;
-  top: 125px;
-  right: var(--ch-right-edge-width);
+  margin-top: 80px;
 }
 
 .context-menu-items {
   padding-left: 0;
+  padding-top: 10px;
   font-size: 0.8em;
   color: var(--ch-dark);
+  margin: 0;
 }
 
 .context-menu-items li {
@@ -59,7 +66,6 @@
   font-weight: 600;
   margin-left: 0;
   padding-left: 20px;
-  margin-top: 10px;
 }
 
 .context-menu-items li:hover {

@@ -67,11 +67,11 @@ module('Acceptance | card create', function(hooks) {
 
     await showCardId(true);
     assert.dom('.card-renderer-isolated--header').containsText('millenial-puppies');
-    assert.dom('[data-test-internal-card-id]').containsText('local-hub::millenial-puppies');
+    assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
 
     await click('[data-test-field="title"] [data-test-field-schema-renderer]');
     assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="title"]').hasClass('selected');
-    assert.dom('[data-test-field="title"] [data-test-field-renderer-type]').containsText('title (Text)');
+    assert.dom('[data-test-field="title"] [data-test-field-renderer-type]').hasText('title (Text)');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     await click('[data-test-field="body"] [data-test-field-schema-renderer]');
