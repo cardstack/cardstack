@@ -1,20 +1,18 @@
-{{#if this.componentName}}
-  {{#let (component this.componentName) as | Component |}}
-    <Component
-      @card={{@card}}
-      @fields={{@fields}}
-      @mode={{@mode}}
-      @setFieldValue={{@setFieldValue}}
-      @setFieldName={{@setFieldName}}
-      @removeField={{@removeField}}
-      @toggleStubField={{@toggleStubField}}
-      @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
-      @setPosition={{@setPosition}}
-      @selectField={{@selectField}}
-      @selectedField={{@selectedField}}
-      @dropField={{@dropField}}
-    >
-      {{yield}}
-    </Component>
-  {{/let}}
-{{/if}}
+{{#let (component this.componentName) as | Component |}}
+  <Component
+    @card={{@card}}
+    @fields={{@fields}}
+    @mode={{@mode}}
+    @setFieldValue={{@setFieldValue}}
+    @setFieldName={{@setFieldName}}
+    @removeField={{@removeField}}
+    @toggleStubField={{@toggleStubField}}
+    @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+    @setPosition={{@setPosition}}
+    @selectField={{@selectField}}
+    @selectedField={{@selectedField}}
+    @dropField={{@dropField}}
+  >
+    {{yield}}
+  </Component>
+{{/let}}

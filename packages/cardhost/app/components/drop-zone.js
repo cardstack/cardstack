@@ -25,7 +25,7 @@ export default class DropZone extends Component {
       }).jsonapi
     );
     this.args.toggleStubField(field, this.args.position, this.isOverDropZone);
-  }).drop())
+  }).restartable())
   createStubFieldCard;
 
   @action

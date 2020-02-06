@@ -1,6 +1,4 @@
-{{!-- TODO we should probably show some kind of loading indicator when this.loadCard.isRunning is true --}}
-
-{{#if (and @card (not this.initCard.isRunning))}}
+{{#if @card}}
   {{#if (eq @format "isolated")}}
     {{!-- TODO we are no longer providing CSS classnames for the adopted card--rather we need to do this for real by using CSS from the card payload itself --}}
     <section
@@ -125,6 +123,4 @@
       {{/if}}
     </div>
   {{/if}}
-{{else}}
-  <div class="card-renderer-missing-card" data-test-missing-card>You must specify a @card attribute</div>
 {{/if}}

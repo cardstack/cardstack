@@ -4,33 +4,21 @@ import { dasherize } from '@ember/string';
 // @ts-ignore
 import { tracked } from '@glimmer/tracking';
 import { Card } from '@cardstack/core/card';
-// @ts-ignore
-import { task } from 'ember-concurrency';
 
 export default class ScaffoldComponent extends Component<{
   card: Card;
   feature: string;
 }> {
   @tracked componentName!: string | undefined;
+  // Warning--async in the loading of feature components can lead to jank in the
+  // card-renderer. If you are searching for the cause of jank, careful
+  // attention should be paid to any async necessary to load features that are
+  // components.
 
   constructor(owner: unknown, args: any) {
     super(owner, args);
-    this.loadCard.perform();
-  }
 
-  @task(function*(this: ScaffoldComponent) {
-    if (!this.args.card || !this.args.feature) {
-      return;
-    }
-    let csId: string | undefined;
-    if (this.args.card.csId) {
-      csId = this.args.card.csId;
-    } else {
-      let parent = yield this.args.card.adoptsFrom();
-      csId = parent.csId;
-    }
-
+    let csId = this.args.card.csId || this.args.card.adoptsFromId?.csId;
     this.componentName = `scaffolding/${dasherize(csId!)}/${dasherize(this.args.feature)}`;
-  })
-  loadCard: any;
+  }
 }

@@ -22,6 +22,7 @@ export default class CardManipulator extends Component {
   @tracked isDragging;
   @tracked cardId;
   @tracked cardSelected = true;
+  @tracked addFieldPromise;
 
   constructor(...args) {
     super(...args);
@@ -78,6 +79,10 @@ export default class CardManipulator extends Component {
     let patchedCard = yield this.patchCard.perform(doc);
     let field = yield patchedCard.field(fieldName);
     this.card = patchedCard;
+
+    if (this.addFieldResolve) {
+      this.addFieldResolve();
+    }
     this.selectField(field, evt);
   }).enqueue())
   handleNewFieldAdded;
@@ -191,6 +196,21 @@ export default class CardManipulator extends Component {
   }
 
   @action dropField(position, onFinishDrop, evt) {
+    if (this.addFieldResolve) {
+      this.addFieldResolve();
+    }
+    // This is to address race conditions around the asynchronicity of creating
+    // a new field and removing the "drop shadow" of the field to be dropped. We
+    // are providing the card-renderer a promise for the patching of the card
+    // with a new field, as well as the ability to see the state of the promise
+    // before it tries to await the promise which is important to get the timing
+    // of the shadow disappearance correct.
+    this.addFieldPromise = queryablePromise(
+      new Promise(resolve => {
+        this.addFieldResolve = resolve;
+      })
+    );
+
     onFinishDrop();
     let field;
     let cardId = evt.dataTransfer.getData('text/cardId');
@@ -247,4 +267,36 @@ export default class CardManipulator extends Component {
     evt.dataTransfer.setData('text', evt.target.id);
     evt.dataTransfer.setData('text/cardId', field.canonicalURL);
   }
+}
+
+function queryablePromise(promise) {
+  if (promise.isResolved) return promise;
+
+  let isPending = true;
+  let isRejected = false;
+  let isFulfilled = false;
+
+  let result = promise.then(
+    resolve => {
+      isFulfilled = true;
+      isPending = false;
+      return resolve;
+    },
+    reject => {
+      isRejected = true;
+      isPending = false;
+      throw reject;
+    }
+  );
+
+  result.isFulfilled = function() {
+    return isFulfilled;
+  };
+  result.isPending = function() {
+    return isPending;
+  };
+  result.isRejected = function() {
+    return isRejected;
+  };
+  return result;
 }

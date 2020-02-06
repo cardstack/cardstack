@@ -1,37 +1,35 @@
-{{#unless this.loadCard.isRunning}}
-  <div
-    class="isolated-card {{safe-css-string this.adoptedFromId}}--isolated"
-    data-test-isolated-card={{@card.csTitle}}
-    data-test-isolated-card-mode={{@mode}}
-  >
-    <AnimatedContainer class={{if (or (eq @mode "view") (eq @mode "layout")) "isolated-card--view-fields"}}>
-      {{#animated-each @fields use=this.transition duration=this.duration as |field|}}
-        {{#if @setFieldValue}}
-          <FieldRenderer
-            @field={{field}}
-            @mode={{@mode}}
-            @setFieldValue={{fn @setFieldValue field.name}}
-            @selectField={{@selectField}}
-            @selectedField={{@selectedField}}
-          />
-        {{else if (or @setNeededWhenEmbedded @setPosition @removeField @setFieldName)}}
-          <FieldRenderer
-            @field={{field}}
-            @mode={{@mode}}
-            @dropField={{@dropField}}
-            @removeField={{@removeField}}
-            @toggleStubField={{@toggleStubField}}
-            @setPosition={{@setPosition}}
-            @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
-            @setFieldName={{@setFieldName}}
-            @selectField={{@selectField}}
-            @selectedField={{@selectedField}}
-          />
-        {{else}}
-          <FieldRenderer @field={{field}} @mode={{@mode}}/>
-        {{/if}}
-      {{/animated-each}}
-    </AnimatedContainer>
+<div
+  class="isolated-card {{safe-css-string this.adoptedFromId}}--isolated"
+  data-test-isolated-card={{@card.csTitle}}
+  data-test-isolated-card-mode={{@mode}}
+>
+  <AnimatedContainer class={{if (or (eq @mode "view") (eq @mode "layout")) "isolated-card--view-fields"}}>
+    {{#animated-each @fields use=this.transition duration=this.duration as |field|}}
+      {{#if @setFieldValue}}
+        <FieldRenderer
+          @field={{field}}
+          @mode={{@mode}}
+          @setFieldValue={{fn @setFieldValue field.name}}
+          @selectField={{@selectField}}
+          @selectedField={{@selectedField}}
+        />
+      {{else if (or @setNeededWhenEmbedded @setPosition @removeField @setFieldName)}}
+        <FieldRenderer
+          @field={{field}}
+          @mode={{@mode}}
+          @dropField={{@dropField}}
+          @removeField={{@removeField}}
+          @toggleStubField={{@toggleStubField}}
+          @setPosition={{@setPosition}}
+          @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+          @setFieldName={{@setFieldName}}
+          @selectField={{@selectField}}
+          @selectedField={{@selectedField}}
+        />
+      {{else}}
+        <FieldRenderer @field={{field}} @mode={{@mode}}/>
+      {{/if}}
+    {{/animated-each}}
+  </AnimatedContainer>
 
-  </div>
-{{/unless}}
+</div>

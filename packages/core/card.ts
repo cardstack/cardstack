@@ -39,6 +39,8 @@ import { CardId, FieldArity, canonicalURLToCardId, canonicalURL, cardstackFieldP
 import { CardDocument, cardDocumentFromJsonAPI } from './card-document';
 import Component from '@glimmer/component';
 
+let nonce = 0;
+
 export const apiPrefix = '/api';
 
 export async function makeCollection(
@@ -70,6 +72,10 @@ export class Card {
   // it may be chosen by the person creating the card. In others it may be
   // chosen by the hub.
   readonly csId: string | undefined;
+
+  // this is a really basic means to provide all the cards (including
+  // UnsavedCards and interior cards) some form of identity within the container
+  readonly nonce: number = ++nonce;
 
   readonly csTitle: string | undefined;
   readonly csDescription: string | undefined;
@@ -780,6 +786,19 @@ export class Card {
     }
 
     return await this.reader.get({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' });
+  }
+
+  get adoptsFromId(): CardId | undefined {
+    let baseCardURL = canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' });
+    if (this.canonicalURL === baseCardURL) {
+      // base card has no parent
+      return undefined;
+    }
+    let data = this.rawData('csAdoptsFrom');
+    if (data && 'ref' in data && !Array.isArray(data.ref)) {
+      return data.ref;
+    }
+    return { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' };
   }
 
   async loadFeature(featureName: 'writer'): Promise<WriterFactory | null>;
