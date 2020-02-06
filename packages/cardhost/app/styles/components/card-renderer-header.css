@@ -15,20 +15,25 @@
   border-radius: 10px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
   top: 42px;
-  right: -150px;
-  margin-left: 10px;
+  right: -130px;
   width: 200px;
   padding-bottom: 10px;
 }
 
-/* Whenever there's a fixed header, use alternate layout */
-.edit .context-menu-nav,
-.schema .context-menu-nav {
+/* Whenever there's a fixed header, like in edit and schema, use alternate layout */
+
+.edit .context-menu-nav {
   position: fixed;
   top: auto;
-  right: auto;
-  margin-left: calc(var(--ch-card-size) - 50px);
+  margin-left: 410px;
   margin-top: -13px;
+}
+
+.schema .context-menu-nav {
+  position: fixed;
+  margin-left: 0;
+  top: 125px;
+  right: var(--ch-right-edge-width);
 }
 
 .context-menu-items {
