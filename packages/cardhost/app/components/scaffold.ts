@@ -7,7 +7,7 @@ import { Card } from '@cardstack/core/card';
 // @ts-ignore
 import { task } from 'ember-concurrency';
 
-export default class ScaffoldLoader extends Component<{
+export default class ScaffoldComponent extends Component<{
   card: Card;
   feature: string;
 }> {
@@ -18,7 +18,7 @@ export default class ScaffoldLoader extends Component<{
     this.loadCard.perform();
   }
 
-  @task(function*(this: ScaffoldLoader) {
+  @task(function*(this: ScaffoldComponent) {
     if (!this.args.card || !this.args.feature) {
       return;
     }

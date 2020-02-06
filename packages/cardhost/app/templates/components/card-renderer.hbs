@@ -70,7 +70,7 @@
                   @toggleStubField={{this.toggleStubField}}
                 />
               {{/if}}
-              <ScaffoldLoader
+              <Scaffold
                 @card={{@card}}
                 @feature="isolated-layout"
                 @fields={{this.fields}}
@@ -103,7 +103,7 @@
         --}}
         {{!-- this is a placeholder link --}}
         <a class="card-renderer--embedded-card-link">
-          <ScaffoldLoader
+          <Scaffold
             @card={{@card}}
             @feature="embedded-layout"
             @mode={{this.mode}} />
@@ -115,7 +115,7 @@
         </LinkTo>
         --}}
       {{else}}
-        <ScaffoldLoader
+        <Scaffold
           @card={{@card}}
           @feature="embedded-layout"
           @mode={{this.mode}} />

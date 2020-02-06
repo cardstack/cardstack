@@ -5,10 +5,7 @@
     data-test-isolated-card-mode={{@mode}}
   >
     <AnimatedContainer class={{if (or (eq @mode "view") (eq @mode "layout")) "isolated-card--view-fields"}}>
-      {{!-- TODO need Ed's help: this animated-each does not seem to be changing when a "stub" fields is added to the array,
-            but a normal #each is working... --}}
-      {{!-- {{#animated-each @fields use=this.transition duration=this.duration as |field|}} --}}
-      {{#each @fields as |field|}}
+      {{#animated-each @fields use=this.transition duration=this.duration as |field|}}
         {{#if @setFieldValue}}
           <FieldRenderer
             @field={{field}}
@@ -33,8 +30,7 @@
         {{else}}
           <FieldRenderer @field={{field}} @mode={{@mode}}/>
         {{/if}}
-      {{/each}}
-      {{!--{{/animated-each}} --}}
+      {{/animated-each}}
     </AnimatedContainer>
 
   </div>

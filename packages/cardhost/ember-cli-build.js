@@ -68,7 +68,7 @@ module.exports = function(defaults) {
         {
           package: '@cardstack/cardhost',
           appModules: {
-            'components/scaffold-loader.js': {
+            'components/scaffold.js': {
               dependsOnComponents: [
                 '<Scaffolding::Base::CatalogEntryLayout/>',
                 '<Scaffolding::Base::EmbeddedLayout/>',

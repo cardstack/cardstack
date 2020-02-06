@@ -34,7 +34,7 @@
               {{on "dragstart" (action this.startDragging field)}}
               data-test-card-add-field-draggable={{field.canonicalURL}}
             >
-              <ScaffoldLoader @card={{field}} @feature="catalog-entry-layout"/>
+              <Scaffold @card={{field}} @feature="catalog-entry-layout"/>
             </div>
           {{/each}}
         {{/unless}}
@@ -49,7 +49,7 @@
   @selectedField={{this.selectedField}}
   @selectField={{action this.selectField}}
   @setNeededWhenEmbedded={{this.setNeededWhenEmbedded}}
-  @setFieldValue={{this.setFieldValue}}
+  @setFieldName={{this.setFieldName}}
   @setFieldLabel={{this.setFieldLabel}}
   @setFieldInstructions={{this.setFieldInstructions}}
   @cardSelected={{this.cardSelected}} />

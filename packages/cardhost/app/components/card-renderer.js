@@ -47,7 +47,9 @@ export default class CardRenderer extends Component {
     } else {
       this.fields.splice(position, 1);
     }
-    this.fields = this.fields;
+    // this identity map is necessary because of REASONS. animated-each doesn't
+    // seem to pick it up otherwise.
+    this.fields = this.fields.map(i => i);
   }).enqueue())
   updateFields;
 
