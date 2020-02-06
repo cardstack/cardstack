@@ -47,31 +47,6 @@
   margin-left: 10px;
 }
 
-.top-edge--mode-label {
-  padding: 10px;
-  background-color: white;
-  text-transform: uppercase;
-  font-size: 16px;
-  font-weight: bold;
-  border-radius: 10px;
-  color: var(--ch-dark-op50);
-  margin-right: 20px;
-}
-
-.top-edge--mode-link {
-  display: inline-flex;
-}
-
-.top-edge--mode-link span {
-  width: 18px;
-  height: 18px;
-  display: block;
-  text-indent: -9999px;
-    text-indent: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
 .view-selector {
   width: 300px;
   display: flex;
@@ -104,17 +79,59 @@
   margin-right: 15px;
 }
 
-
-/* Mode indicator button */
-.mode-indicator-button.cs-component-cta {
-  width: 180px;
+/* Mode indicator label and link */
+.top-edge--mode {
+  --mode-container-width: 190px;
+  --mode-container-height: 40px;
+  --mode-link-width: 45px;
+  display: flex;
+  flex-flow: row nowrap;
+  width: var(--mode-container-width);
+  min-height: var(--mode-container-height);
   max-width: 100%;
-  padding: 11px 35px 11px 40px;
-  background-image: url('/assets/images/icons/edit.svg'), url('/assets/images/icons/close.svg');
-  background-position: center left 14px, center right 15px;
-  background-repeat: no-repeat;
-  background-size: 13px 13px, 10px 10px;
+}
+.top-edge--mode-label {
+  display: inline-block;
+  width: calc(var(--mode-container-width) - var(--mode-link-width));
+  height: 100%;
+  padding: 11px 0 11px 15px;
+  border-radius: 100px 0 0 100px;
+  background-color: var(--ch-highlight);
+  color: var(--ch-dark);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: calc(18 / 13);
+  letter-spacing: 0.035em;
   text-align: left;
+  text-transform: capitalize;
+}
+.top-edge--mode-label svg {
+  display: inline-block;
+  margin-right: 10px;
+}
+.top-edge--mode-link {
+  display: inline-block;
+  width: var(--mode-link-width);
+  height: 100%;
+  margin-left: -1px;
+  border-radius: 0 100px 100px 0;
+  background-color: var(--ch-highlight);
+  background-image: url('/assets/images/icons/close.svg');
+  background-position: center right 15px;
+  background-repeat: no-repeat;
+  background-size: 10px 10px;
+}
+.top-edge--mode-link:hover {
+  background-color: var(--ch-highlight-hover);
+}
+.top-edge--mode-link span {
+  width: 18px;
+  height: 18px;
+  display: block;
+  text-indent: -9999px;
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 

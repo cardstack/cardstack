@@ -1,8 +1,20 @@
 {{#if (and (not-eq this.routeInfo.mode "themer") (not-eq this.routeInfo.mode "schema"))}}
   <div class="card-renderer--top-edge-buttons">
-    <Cta title="Leave edit mode" {{on "click" this.leaveEditMode}} @variant="primary" class="mode-indicator-button" data-test-top-edge-link="view">
-      Edit Mode
-    </Cta>
+    <div class="top-edge--mode">
+      <span class="top-edge--mode-label">
+        {{svg-jar "edit" width="13px" height="13px"}}
+        Edit Mode
+      </span>
+      <LinkTo
+        title="Close edit mode"
+        @route="cards.card.view"
+        @class="top-edge--mode-link"
+        @model={{this.model}}
+        data-test-top-edge-link="view"
+      >
+        <span>View</span>
+      </LinkTo>
+    </div>
     <SaveButton @card={{this.model}} />
   </div>
 
