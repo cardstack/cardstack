@@ -297,8 +297,13 @@ export default class CardManipulator extends Component {
       let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
       fieldEl.style.visibility = 'visible';
 
-      let currentDropzone = draggableService.getDropzone();
+      // this can happen when you drag the mouse outside the viewport
+      if (!elemBelow) {
+        return;
+      }
+
       let dropzoneBelow = elemBelow.closest('.drop-zone');
+      let currentDropzone = draggableService.getDropzone();
 
       if (currentDropzone !== dropzoneBelow) {
         if (currentDropzone) {
