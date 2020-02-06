@@ -81,7 +81,7 @@ export default class CardRenderer extends Component {
   }
 
   get showEditMode() {
-    return this.cardstackSession.isAuthenticated && this.args.cardSelected;
+    return this.cardstackSession.isAuthenticated && this.args.card.isSelected;
   }
 
   *headerAnimation({ keptSprites }) {

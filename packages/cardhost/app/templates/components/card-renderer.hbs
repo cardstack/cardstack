@@ -4,6 +4,7 @@ The process of rendering a card is fundamentally async as we'll need to load the
 as well as waiting for the card component to be compiled by embroider. Make sure to build in
 Ember Concurrency into the rendering of the card component here.
 --}}
+
 {{#if @card}}
   {{#if (eq @format "isolated")}}
     {{#let (component this.isolatedComponentName) as | Isolated |}}
@@ -12,7 +13,7 @@ Ember Concurrency into the rendering of the card component here.
           {{this.mode}}
           {{safe-css-string @card.adoptedFromName}}
           {{safe-css-string @card.name}}
-          {{if this.showEditMode "selected"}}
+          {{if (and this.cardstackSession.isAuthenticated @card.isSelected) "selected"}}
           {{if this.fields.length "has-fields" "no-fields"}}
           {{@class}}
         "
@@ -25,7 +26,7 @@ Ember Concurrency into the rendering of the card component here.
         {{#if (eq @mode "view")}}
             {{#animated-value @card watch="isSelected" use=this.headerAnimation}}
               <CardRendererHeader 
-                @cardSelected={{@card.isSelected}}
+                @cardSelected={{if (and this.cardstackSession.isAuthenticated @card.isSelected) true}}
                 @card={{@card}}
                 @buttonRoute="cards.card.edit.fields"
                 @buttonText="Edit"
@@ -46,9 +47,9 @@ Ember Concurrency into the rendering of the card component here.
           />
         {{/if}}
         <div class="card-renderer-isolated--content">
-          <AnimatedContainer>
-            {{#animated-value @isSelected use=this.borderAnimation}}
-              <div class="card-renderer-isolated--card-container {{if this.showEditMode "selected"}}">
+          {{!-- <AnimatedContainer> --}}
+            {{#animated-value @card watch="isSelected" use=this.borderAnimation}}
+              <div class="card-renderer-isolated--card-container {{if (and this.cardstackSession.isAuthenticated @card.isSelected) "selected"}}">
                 {{#if (and @dropField ) }}
                   <DropZone
                     @dropField={{@dropField}}
@@ -71,7 +72,7 @@ Ember Concurrency into the rendering of the card component here.
                   @dropField={{@dropField}} />
               </div>
             {{/animated-value}}
-          </AnimatedContainer>
+          {{!-- </AnimatedContainer> --}}
         </div>
       </section>
     {{/let}}
