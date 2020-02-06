@@ -8,7 +8,7 @@ function easeInOutCubic(t) {
 export default class ScrollerService extends Service {
   @tracked currentlyScrolledTo;
   @tracked isScrolling = false;
-  @tracked scrollingElementSelector = '.cardhost-catalog--main'; // refactor if we reuse this for something else
+  @tracked scrollingElementSelector = '.library--main'; // refactor if we reuse this for something else
 
   setScrollingElement(element) {
     this.scrollingElementSelector = element;

@@ -37,7 +37,7 @@ const scenario = new Fixtures({
   },
 });
 
-module('Acceptance | catalog', function(hooks) {
+module('Acceptance | library', function(hooks) {
   setupApplicationTest(hooks);
   scenario.setupTest(hooks);
 
@@ -64,12 +64,28 @@ module('Acceptance | catalog', function(hooks) {
     this.owner.lookup('service:card-local-storage').clearIds();
   });
 
-  test(`viewing catalog`, async function(assert) {
+  test(`viewing library`, async function(assert) {
     await visit(`/`);
+    assert.dom('[data-test-library-button]').exists();
+    assert.dom('[data-test-library-link]').doesNotExist();
+    await click('[data-test-library-button]');
+    assert.dom('[data-test-library]').exists();
     assert.dom(`[data-test-embedded-card=${card1Id}]`).exists();
     assert.dom(`[data-test-embedded-card=${card2Id}]`).exists();
     assert.dom(`[data-test-embedded-card=${card3Id}]`).exists();
+    assert.dom('[data-test-library-recent-card-link]').exists();
+    assert.dom('[data-test-library-adopt-card-btn]').exists();
+    assert.dom('[data-test-library-common-card-link]').exists({ count: 3 });
+    assert.dom('[data-test-library-new-blank-card-btn]').exists();
     await percySnapshot(assert);
+  });
+
+  test(`closing library panel`, async function(assert) {
+    await visit(`/`);
+    await click('[data-test-library-button]');
+    assert.dom('[data-test-library]').exists();
+    await click('[data-test-library-close-button]');
+    assert.dom('[data-test-library]').doesNotExist();
   });
 
   test(`created card ids are in local storage`, async function(assert) {
@@ -84,6 +100,7 @@ module('Acceptance | catalog', function(hooks) {
   test(`isolating a card`, async function(assert) {
     await visit('/');
     assert.equal(currentURL(), '/');
+    await click('[data-test-library-button]');
     await animationsSettled();
     assert.dom(`[data-test-embedded-card=${card2Id}]`).exists();
     await click(`[data-test-embedded-card=${card2Id}]`);
@@ -95,16 +112,18 @@ module('Acceptance | catalog', function(hooks) {
     await percySnapshot(assert);
   });
 
-  test('can navigate to catalog via left edge', async function(assert) {
+  test('can navigate to index route via library link from other routes', async function(assert) {
     await visit(`/cards/${card1Id}`);
     assert.equal(currentURL(), `/cards/${card1Id}`);
     await waitFor(`[data-test-card-view=${card1Id}]`, {
       timeout,
     });
+    assert.dom('[data-test-library-button]').doesNotExist();
+    assert.dom('[data-test-library-link]').exists();
     await click('[data-test-library-link]');
-    await waitFor(`[data-test-embedded-card=${card1Id}]`, {
-      timeout,
-    });
     assert.equal(currentURL(), '/');
+    assert.dom('[data-test-featured-card]').exists({ count: 4 });
+    assert.dom('[data-test-library-button]').exists();
+    assert.dom('[data-test-library-link]').doesNotExist();
   });
 });

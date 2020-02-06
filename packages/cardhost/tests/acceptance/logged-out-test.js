@@ -71,4 +71,22 @@ module('Acceptance | logged-out', function(hooks) {
     await visit(`/cards/${card1Id}/edit/fields/schema`);
     assert.equal(currentURL(), `/cards/${card1Id}`);
   });
+
+  test('viewing index page', async function(assert) {
+    await visit(`/`);
+    assert.equal(currentURL(), `/`);
+    assert.dom('[data-test-card-builder]').exists();
+    assert.dom('[data-test-featured-card]').exists({ count: 4 });
+    assert.dom('[data-test-cardhost-left-edge]').exists();
+    assert.dom('[data-test-library-button]').isDisabled();
+
+    await click('[data-test-featured-card="product-card"]');
+    assert.equal(currentURL(), `/cards/product-card`);
+    assert.dom('[data-test-library-button]').doesNotExist();
+    assert.dom('[data-test-library-link]').exists();
+
+    await click('[data-test-library-link]');
+    assert.equal(currentURL(), `/`);
+    assert.dom('[data-test-library-button]').isDisabled();
+  });
 });
