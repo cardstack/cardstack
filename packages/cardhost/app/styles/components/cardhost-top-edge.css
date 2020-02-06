@@ -70,9 +70,6 @@
     text-indent: 100%;
   white-space: nowrap;
   overflow: hidden;
-  background-image: url(/assets/images/icons/close-circle.svg);
-  background-size: 18px 18px;
-  background-repeat: no-repeat;
 }
 
 .view-selector {
@@ -106,6 +103,20 @@
 .view-selector .view-selector--mode-link svg {
   margin-right: 15px;
 }
+
+
+/* Mode indicator button */
+.mode-indicator-button.cs-component-cta {
+  width: 180px;
+  max-width: 100%;
+  padding: 11px 35px 11px 40px;
+  background-image: url('/assets/images/icons/edit.svg'), url('/assets/images/icons/close.svg');
+  background-position: center left 14px, center right 15px;
+  background-repeat: no-repeat;
+  background-size: 13px 13px, 10px 10px;
+  text-align: left;
+}
+
 
 @media (max-width: 1440px) {
   .cardhost-top-edge.view,
