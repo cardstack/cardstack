@@ -25,7 +25,9 @@ export default class CardRendererHeaderComponent extends Component {
   toggleMenu() {
     if (this.args.setContextMenu) {
       // if a setContextMenu function exists, use it, and rely only on state from the parent
-      this.args.setContextMenu(!this.args.contextMenuOpen);
+      let newVal = !this.args.contextMenuOpen;
+      this.localMenuOpen = !this.localMenuOpen;
+      this.args.setContextMenu(newVal);
     } else {
       this.localMenuOpen = !this.localMenuOpen;
     }
@@ -34,9 +36,16 @@ export default class CardRendererHeaderComponent extends Component {
   get showMenu() {
     if (this.args.setContextMenu) {
       // if a setContextMenu function exists, use it, and rely only on state from the parent
-      return this.args.contextMenuOpen && this.args.cardSelected;
+      return this.localMenuOpen && this.args.cardSelected;
     } else {
       return this.localMenuOpen;
+    }
+  }
+
+  @action
+  resetMenu() {
+    if (!this.args.cardSelected) {
+      this.localMenuOpen = false;
     }
   }
 }

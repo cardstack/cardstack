@@ -1,5 +1,5 @@
 <section class="card-renderer--container" data-test-card-view={{@card.name}}>
-  <button class="card-renderer--wrapper-button" {{on "mouseenter" (fn this.setSelected true)}} {{on "mouseleave" (fn this.setSelected false)}} data-test-card-renderer>
+  <button class="card-renderer--wrapper-button" {{on "mouseenter" (action (mut @card.isSelected) true)}} {{on "mouseleave" (action (mut @card.isSelected) false)}} data-test-card-renderer>
     <CardRenderer
       @card={{@card}}
       @mode={{@mode}}

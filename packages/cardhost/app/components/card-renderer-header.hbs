@@ -1,4 +1,4 @@
-<div class="card-renderer-isolated--header--wrapper {{if @cardSelected "selected"}}">
+<div class="card-renderer-isolated--header--wrapper {{if @cardSelected "selected"}}" {{did-update this.resetMenu @cardSelected}}>
   <header class="card-renderer-isolated--header">
     {{#if (or (eq (safe-css-string @card.adoptedFromName) "event-card") (eq (safe-css-string @card.name) "event-card"))}}
       {{svg-jar "event" width="18px" height="20px"}}
