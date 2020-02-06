@@ -4,18 +4,12 @@ import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import { dasherize } from '@ember/string';
 import { startCase } from 'lodash';
-import { task, waitForProperty } from 'ember-concurrency';
+import { task } from 'ember-concurrency';
 import ENV from '@cardstack/cardhost/config/environment';
 import { fieldTypeMappings, fieldComponents } from '../utils/mappings';
-import drag, { chooseNextToUp, chooseNextToDown, makeTarget } from '../motions/drag';
+import drag from '../motions/drag';
 import move from 'ember-animated/motions/move';
 import { printSprites } from 'ember-animated';
-
-const LEFT_ARROW = 37;
-const UP_ARROW = 38;
-const RIGHT_ARROW = 39;
-const DOWN_ARROW = 40;
-const SPACE = 32;
 
 const { environment } = ENV;
 
@@ -259,92 +253,6 @@ export default class CardManipulator extends Component {
     this.selectedField = field;
     this.cardSelected = false;
   }
-
-  @action startDragging(field, evt) {
-    evt.dataTransfer.setData('text', evt.target.id);
-    evt.dataTransfer.setData('text/type', field.type);
-  }
-
-  @action
-  activateKeyboardNav() {
-    document.querySelector('.ch-catalog--fields .ch-catalog-field').focus();
-  }
-
-  @action
-  handleKey(field, event) {
-    let activeField = this.fieldComponents.find(field => field.dragState);
-    let dropzones = [...document.querySelectorAll('.drop-zone')];
-    let activeDropzone = 0;
-
-    if (activeField) {
-      let xStep = 0;
-      let yStep = 0;
-      switch (event.keyCode) {
-        case RIGHT_ARROW:
-          this.draggable.triggerEvent(dropzones[activeDropzone], 'mouseenter');
-          break;
-        case LEFT_ARROW:
-          this.draggable.triggerEvent(dropzones[activeDropzone], 'mouseleave');
-          break;
-        case DOWN_ARROW:
-          this.draggable.triggerEvent(dropzones[activeDropzone++], 'mouseleave');
-          this.draggable.triggerEvent(dropzones[activeDropzone], 'mouseenter');
-          break;
-        case UP_ARROW:
-          this.draggable.triggerEvent(dropzones[activeDropzone--], 'mouseleave');
-          this.draggable.triggerEvent(dropzones[activeDropzone], 'mouseenter');
-          break;
-        case SPACE:
-          activeField.dragState = null;
-          event.stopPropagation();
-          for (let element of dropzones) {
-            element.classList.remove('keyboard-highlight');
-          }
-          return false;
-      }
-      if (xStep || yStep) {
-        activeField.dragState.xStep += xStep;
-        activeField.dragState.yStep += yStep;
-        event.stopPropagation();
-        return false;
-      }
-    } else {
-      let elements = [...document.querySelectorAll('.ch-catalog--fields .ch-catalog-field')].filter(
-        element => element !== event.target
-      );
-      let targets = [...elements].map(element => makeTarget(element.getBoundingClientRect(), element));
-      let currentTarget = makeTarget(event.target.getBoundingClientRect(), event.target);
-      let nextTarget;
-
-      switch (event.keyCode) {
-        case DOWN_ARROW:
-          nextTarget = chooseNextToDown(currentTarget, targets);
-          break;
-        case UP_ARROW:
-          nextTarget = chooseNextToUp(currentTarget, targets);
-          break;
-        case SPACE:
-          this.beginDragging(field, event);
-          event.stopPropagation();
-          for (let element of dropzones) {
-            element.classList.add('keyboard-highlight');
-          }
-          return false;
-      }
-      if (nextTarget) {
-        nextTarget.payload.focus();
-        event.stopPropagation();
-        return false;
-      }
-    }
-  }
-
-  @task(function*() {
-    for (let element of [...document.querySelectorAll('.drop-zone')]) {
-      element.classList.add('keyboard-highlight');
-    }
-  })
-  hoverDropzones;
 
   @action
   selectFieldType(field, event) {

@@ -24,13 +24,11 @@
       <div
         class="ch-catalog--fields"
         tabindex="0"
-        {{on "focus" (fn this.activateKeyboardNav)}}
       >
         {{#animated-each this.fieldComponents use=this.transition watch="dragState" as |field|}}
           <div
             class="ch-catalog-field"
             tabindex="-1"
-            {{on "keydown" (fn this.handleKey field)}}
             {{on "mousedown" (fn this.beginDragging field)}}
             {{on "click" (fn this.selectFieldType field)}}
             data-test-card-add-field-draggable={{field.type}}
