@@ -54,12 +54,12 @@
   text-decoration: none;
   list-style: none;
   font-weight: normal;
-  padding: 3px 40px;
 }
 
 .context-menu-items li a {
   display: block;
   width: 100%;
+  padding: 3px 40px;
 }
 
 .context-menu-items li.heading {
