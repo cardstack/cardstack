@@ -4,7 +4,7 @@
   data-test-isolated-card={{@card.name}}
   data-test-isolated-card-mode={{@mode}}
 >
-  <AnimatedContainer class={{if (or (eq @mode "view") (eq @mode "layout")) "isolated-card--view-fields"}}>
+  <AnimatedContainer @motion={{this.resizeAfterDelay}} class={{if (or (eq @mode "view") (eq @mode "layout")) "isolated-card--view-fields"}}>
     {{#animated-each @fields key="nonce" use=this.transition duration=this.duration as |field|}}
       {{#if @setFieldValue}}
         <FieldRenderer
