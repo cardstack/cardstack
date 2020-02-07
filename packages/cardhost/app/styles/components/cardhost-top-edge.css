@@ -43,7 +43,8 @@
   z-index: var(--ch-actions-z-index);
 }
 
-.card-renderer--top-edge-buttons button + button {
+.card-renderer--top-edge-buttons > button + button,
+.card-renderer--top-edge-buttons > div + button {
   margin-left: 10px;
 }
 
@@ -80,8 +81,8 @@
 }
 
 /* Mode indicator label and link */
-.top-edge--mode {
-  --mode-container-width: 190px;
+.mode-indicator {
+  --mode-container-width: 180px;
   --mode-container-height: 40px;
   --mode-link-width: 45px;
   display: flex;
@@ -90,7 +91,7 @@
   min-height: var(--mode-container-height);
   max-width: 100%;
 }
-.top-edge--mode-label {
+.mode-indicator--label {
   display: inline-block;
   width: calc(var(--mode-container-width) - var(--mode-link-width));
   height: 100%;
@@ -105,11 +106,11 @@
   text-align: left;
   text-transform: capitalize;
 }
-.top-edge--mode-label svg {
+.mode-indicator--label svg {
   display: inline-block;
   margin-right: 10px;
 }
-.top-edge--mode-link {
+.mode-indicator--link {
   display: inline-block;
   width: var(--mode-link-width);
   height: 100%;
@@ -121,10 +122,10 @@
   background-repeat: no-repeat;
   background-size: 10px 10px;
 }
-.top-edge--mode-link:hover {
+.mode-indicator--link:hover {
   background-color: var(--ch-highlight-hover);
 }
-.top-edge--mode-link span {
+.mode-indicator--link span {
   width: 18px;
   height: 18px;
   display: block;
@@ -140,4 +141,33 @@
   .cardhost-top-edge.edit {
     --padding-left: var(--ch-left-edge-navbar-width);
   }
+}
+
+/* Old styles, remove after updating all mode buttons */
+.top-edge--mode-label {
+  padding: 10px;
+  background-color: white;
+  text-transform: uppercase;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 10px;
+  color: var(--ch-dark-op50);
+  margin-right: 20px;
+}
+
+.top-edge--mode-link {
+  display: inline-flex;
+}
+
+.top-edge--mode-link span {
+  width: 18px;
+  height: 18px;
+  display: block;
+  text-indent: -9999px;
+    text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  background-image: url(/assets/images/icons/close-circle.svg);
+  background-size: 18px 18px;
+  background-repeat: no-repeat;
 }

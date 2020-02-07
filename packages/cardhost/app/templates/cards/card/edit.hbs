@@ -1,14 +1,14 @@
 {{#if (and (not-eq this.routeInfo.mode "themer") (not-eq this.routeInfo.mode "schema"))}}
   <div class="card-renderer--top-edge-buttons">
-    <div class="top-edge--mode">
-      <span class="top-edge--mode-label">
+    <div class="mode-indicator">
+      <span class="mode-indicator--label">
         {{svg-jar "edit" width="13px" height="13px"}}
         Edit Mode
       </span>
       <LinkTo
         title="Close edit mode"
         @route="cards.card.view"
-        @class="top-edge--mode-link"
+        @class="mode-indicator--link"
         @model={{this.model}}
         data-test-top-edge-link="view"
       >
