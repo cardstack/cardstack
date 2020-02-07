@@ -4,6 +4,7 @@ The process of rendering a card is fundamentally async as we'll need to load the
 as well as waiting for the card component to be compiled by embroider. Make sure to build in
 Ember Concurrency into the rendering of the card component here.
 --}}
+
 {{#if @card}}
   {{#if (eq @format "isolated")}}
     {{#let (component this.isolatedComponentName) as | Isolated |}}
@@ -12,7 +13,7 @@ Ember Concurrency into the rendering of the card component here.
           {{this.mode}}
           {{safe-css-string @card.adoptedFromName}}
           {{safe-css-string @card.name}}
-          {{if this.showEditMode "selected"}}
+          {{if (and this.cardstackSession.isAuthenticated @card.isSelected) "selected"}}
           {{if this.fields.length "has-fields" "no-fields"}}
           {{@class}}
         "
@@ -24,72 +25,53 @@ Ember Concurrency into the rendering of the card component here.
       >
         {{#if (eq @mode "view")}}
           {{#animated-value @card watch="isSelected" use=this.headerAnimation}}
-            <div class="card-renderer-isolated--header--wrapper {{if this.showEditMode "selected"}}">
-              <header class="card-renderer-isolated--header">
-                {{#if (or (eq (safe-css-string @card.adoptedFromName) "event-card") (eq (safe-css-string @card.name) "event-card"))}}
-                  {{svg-jar "event" width="18px" height="20px"}}
-                {{/if}}
-                <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.name "Blank Card"}}</span>
-                {{#if this.cardstackSession.isAuthenticated}}
-                  <LinkTo
-                    @route="cards.card.edit.fields"
-                    @model={{@card}}
-                    @class="card-renderer--header-link"
-                    data-test-card-edit-link
-                  >
-                    Edit
-                  </LinkTo>
-                {{/if}}
-              </header>
-            </div>
+            <CardRendererHeader 
+              @cardSelected={{if (and this.cardstackSession.isAuthenticated @card.isSelected) true}}
+              @card={{@card}}
+              @buttonRoute="cards.card.edit.fields"
+              @buttonText="Edit"
+              @mode={{this.mode}}
+              @contextMenuOpen={{@contextMenuOpen}}
+              @setContextMenu={{@setContextMenu}}
+            />
           {{/animated-value}}
         {{else}}
-          <div class="card-renderer-isolated--header--wrapper">
-            <header class="card-renderer-isolated--header">
-              {{#if (or (eq (safe-css-string @card.adoptedFromName) "event-card") (eq (safe-css-string @card.name) "event-card"))}}
-                {{svg-jar "event" width="18px" height="20px"}}
-              {{/if}}
-              <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.name "Blank Card"}}</span>
-              {{#if (eq @mode "edit")}}
-                <LinkTo
-                  @route="cards.card.view"
-                  @model={{@card}}
-                  @class="card-renderer--header-link"
-                  data-test-card-done-link
-                >
-                  Done
-                </LinkTo>
-              {{/if}}
-            </header>
-          </div>
+          <CardRendererHeader
+            @cardSelected={{true}}
+            @card={{@card}}
+            @buttonRoute="cards.card.view"
+            @buttonText="Done Editing"
+            @mode={{this.mode}}
+            @contextMenuOpen={{@contextMenuOpen}}
+            @setContextMenu={{@setContextMenu}}
+          />
         {{/if}}
         <div class="card-renderer-isolated--content">
-          <AnimatedContainer>
-            {{#animated-value @card watch="isSelected" use=this.borderAnimation}}
-              <div class="card-renderer-isolated--card-container {{if this.showEditMode "selected"}}">
-                {{#if @dropField}}
-                  <DropZone
-                    @dropField={{@dropField}}
-                    @position={{0}}
-                    @toggleStubField={{this.toggleStubField}}
-                  />
-                {{/if}}
-                <Isolated
-                  @card={{@card}}
-                  @fields={{this.fields}}
-                  @mode={{this.mode}}
-                  @setFieldValue={{@setFieldValue}}
-                  @setFieldName={{@setFieldName}}
-                  @removeField={{@removeField}}
+          {{#animated-value @card watch="isSelected" use=this.borderAnimation}}
+            <div class="card-renderer-isolated--card-container {{if (and this.cardstackSession.isAuthenticated @card.isSelected) "selected"}}">
+              {{#if @dropField}}
+                <DropZone
+                  @dropField={{@dropField}}
+                  @position={{0}}
                   @toggleStubField={{this.toggleStubField}}
-                  @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
-                  @setPosition={{@setPosition}}
-                  @selectField={{@selectField}}
-                  @selectedField={{@selectedField}}
-                  @dropField={{@dropField}} />
-              </div>
-            {{/animated-value}}
-          </AnimatedContainer>
+                />
+              {{/if}}
+              <Isolated
+                @card={{@card}}
+                @fields={{this.fields}}
+                @mode={{this.mode}}
+                @setFieldValue={{@setFieldValue}}
+                @setFieldName={{@setFieldName}}
+                @removeField={{@removeField}}
+                @toggleStubField={{this.toggleStubField}}
+                @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+                @setPosition={{@setPosition}}
+                @selectField={{@selectField}}
+                @selectedField={{@selectedField}}
+                @dropField={{@dropField}}
+              />
+            </div>
+          {{/animated-value}}
         </div>
       </section>
     {{/let}}

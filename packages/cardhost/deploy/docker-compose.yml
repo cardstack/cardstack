@@ -5,7 +5,7 @@ services:
     image: ${ECR_ENDPOINT}@${DIGEST}
     deploy:
       labels:
-        cardstack_travis_build: ${TRAVIS_BUILD_ID}
+        cardstack_travis_build: ${GITHUB_BUILD_ID}
       replicas: 1
       update_config:
         order: start-first
@@ -27,11 +27,12 @@ services:
       - CARDSTACK_SESSIONS_KEY
       - CARD_TEMPLATES
       - INITIAL_DATA_DIR
-      - TRAVIS_BRANCH
+      - GITHUB_BRANCH
       - S3_IMAGE_BUCKET
       - S3_IMAGE_UPLOAD_ACCESS_KEY_ID
       - S3_IMAGE_UPLOAD_SECRET_ACCESS_KEY
       - GIT_PRIVATE_KEY
+      - GIT_REPO
       - GIT_BRANCH_PREFIX
       - GITHUB_CLIENT_ID
       - GITHUB_CLIENT_SECRET

@@ -115,6 +115,10 @@
   font-weight: 600px;
 }
 
+.context-menu-items li.divider {
+  padding: 0;
+}
+
 .hide-library--button {
   position: absolute;
   top: var(--ch-spacing);
