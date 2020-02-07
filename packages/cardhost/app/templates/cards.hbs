@@ -1,5 +1,6 @@
 <div class="
   cardhost-cards
+  {{if this.draggable.isDragging "dragging"}}
   {{this.routeInfo.mode}}
   {{if (or (eq this.routeInfo.mode "add") (eq this.routeInfo.mode "adopt")) "schema"}}
   {{if (or (eq this.routeInfo.mode "layout") (eq this.routeInfo.mode "fields")) "edit"}}

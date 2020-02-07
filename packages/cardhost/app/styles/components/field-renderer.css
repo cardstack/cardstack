@@ -45,6 +45,11 @@
   border-bottom-color: transparent;
 }
 
+
+.card-renderer-isolated.schema .field.with-buttons.preview .schema-field-renderer {
+  opacity: 0.4;
+}
+
 .card-renderer-isolated.schema .field--move-btn {
   width: 14px;
   height: 18px;

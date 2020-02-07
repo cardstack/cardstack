@@ -50,11 +50,11 @@ Until that work is done we are statically adding this css
 @import '/assets/cards/base-card-embedded.css';
 
 /* Themed cards */
-@import '/assets/cards/event-card-isolated.css';
+/* @import '/assets/cards/event-card-isolated.css';
 @import '/assets/cards/event-ticket-isolated.css';
 @import '/assets/cards/wedding-invitation-isolated.css';
 @import '/assets/cards/product-card-isolated.css';
-@import '/assets/cards/photo-card-isolated.css';
+@import '/assets/cards/photo-card-isolated.css'; */
 
 :root {
   --ch-font-family: 'Open Sans', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;

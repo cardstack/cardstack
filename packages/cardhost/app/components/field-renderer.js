@@ -2,6 +2,7 @@ import Component from '@glimmer/component';
 import { dasherize } from '@ember/string';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import { inject as service } from '@ember/service';
 import { fieldComponents } from '../utils/mappings';
 
 const defaultSchemaAttrs = ['title', 'type', 'is-meta', 'name', 'instructions', 'embedded'];
@@ -17,6 +18,8 @@ export default class FieldRenderer extends Component {
   @tracked newFieldInstructions;
   @tracked currentNonce;
   @tracked renderNonce;
+
+  @service draggable;
 
   constructor(...args) {
     super(...args);
@@ -122,11 +125,13 @@ export default class FieldRenderer extends Component {
   }
 
   @action startDragging(field, evt) {
+    this.draggable.setField(field);
     evt.dataTransfer.setData('text', evt.target.id);
     evt.dataTransfer.setData('text/field-name', field.name);
   }
 
   @action finishDragging(evt) {
+    this.draggable.clearField();
     evt.target.setAttribute('draggable', 'false');
   }
 }

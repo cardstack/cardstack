@@ -22,3 +22,7 @@
 .cardhost-cards.themer {
   background-color: var(--ch-dark-background);
 }
+
+.cardhost-cards.dragging * {
+  user-select: none;
+}
