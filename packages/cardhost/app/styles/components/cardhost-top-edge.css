@@ -60,10 +60,14 @@
   display: flex;
   justify-content: space-around;
   align-items: center;
-  background-color: var(--ch-deep-background);
+  background-color: var(--ch-default);
   border: solid 1px var(--ch-border);
   height: 40px;
   border-radius: 20px;
+  font-size: 13px;
+  line-height: calc(18 / 13);
+  letter-spacing: 0.035em;
+  overflow: hidden;
 }
 
 .view-selector .view-selector--mode-link {
@@ -75,16 +79,24 @@
   height: 100%;
 }
 
+.view-selector .view-selector--mode-link:not(.active) {
+  --icon-color: var(--cs-field-disabled-text);
+  color: var(--cs-field-disabled-text);
+}
+
 .view-selector .view-selector--mode-link.active {
   --icon-color: var(--ch-highlight);
+  background-color: var(--ch-deep-background);
+  color: var(--ch-highlight);
 }
 
 .view-selector .view-selector--mode-link:first-child {
   border-right: solid 1px var(--ch-border);
 }
 
-.view-selector .view-selector--mode-link svg {
-  margin-right: 15px;
+.view-selector .view-selector--mode-link > svg {
+  display: inline-block;
+  margin-right: 9px;
 }
 
 
