@@ -92,7 +92,7 @@ module('Acceptance | css editing', function(hooks) {
     await createCards(cardData);
     await visit(`/cards/${card1Id}`);
 
-    await click('[data-test-card-edit-link]');
+    await click('[data-test-card-header-button]');
     await waitFor(`[data-test-card-edit="${card1Id}"]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
@@ -105,7 +105,6 @@ module('Acceptance | css editing', function(hooks) {
     assert.dom('[data-test-card-renderer-isolated]').hasClass('selected');
     await click('[data-test-card-custom-style-button]');
     assert.dom('[data-test-editor-pane]').exists();
-    assert.dom('[data-test-card-renderer-isolated]').doesNotHaveClass('selected');
   });
 
   test('closing the editor', async function(assert) {
@@ -115,7 +114,6 @@ module('Acceptance | css editing', function(hooks) {
     await click('[data-test-card-custom-style-button]');
     assert.equal(currentURL(), `/cards/${card1Id}/edit/layout/themer`);
     assert.dom('[data-test-close-editor]').exists();
-    assert.dom('[data-test-card-renderer-isolated]').doesNotHaveClass('selected');
     await click('[data-test-close-editor]');
     assert.equal(currentURL(), `/cards/${card1Id}/edit/layout`);
     assert.dom('[data-test-editor-pane]').doesNotExist();

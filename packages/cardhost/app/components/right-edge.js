@@ -13,7 +13,6 @@ const duration = 250;
 
 export default class RightEdge extends Component {
   @tracked cardName = this.args.card.name;
-  @tracked cardSelected = this.args.cardSelected;
   @tracked options = {};
   @tracked expandedSections = ['template'];
 

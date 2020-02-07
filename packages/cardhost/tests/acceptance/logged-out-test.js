@@ -38,12 +38,12 @@ module('Acceptance | logged-out', function(hooks) {
     await click('[data-test-toggle-left-edge]');
     assert.equal(currentURL(), `/cards/${card1Id}`);
 
-    assert.dom('[data-test-card-edit-link]').doesNotExist();
+    assert.dom('[data-test-card-header-button]').doesNotExist();
     await percySnapshot(assert);
     await click('[data-test-toggle-left-edge]');
     await click('[data-test-login-button]');
-    await waitFor('[data-test-card-edit-link]');
-    assert.dom('[data-test-card-edit-link]').exists();
+    await waitFor('[data-test-card-header-button]');
+    assert.dom('[data-test-card-header-button]').exists();
   });
 
   test('edit route redirects to view for unauthenticated users', async function(assert) {

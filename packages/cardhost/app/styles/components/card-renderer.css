@@ -126,11 +126,6 @@
 
 .card-renderer-isolated--header svg {
   --icon-color: var(--ch-light-op50);
-
-  margin-right: 13px;
-  width: 18px;
-  height: 20px;
-
   transition: stroke var(--ch-transition-time);
 }
 
@@ -144,10 +139,10 @@
 }
 
 .card-renderer-isolated--header .card-renderer--header-link {
-  text-transform: uppercase;
-  padding: 0 5px;
-  border: solid 1px var(--ch-dark);
-  border-radius: 5px;
+  padding: 5px 20px;
+  border: solid 1px var(--ch-border);
+  border-radius: 20px;
+  font-size: 0.8em;
 }
 
 /* Card Renderer - Outer Wrapper */
