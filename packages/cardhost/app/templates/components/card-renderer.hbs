@@ -49,7 +49,7 @@ Ember Concurrency into the rendering of the card component here.
         <div class="card-renderer-isolated--content">
           {{#animated-value @card watch="isSelected" use=this.borderAnimation}}
             <div class="card-renderer-isolated--card-container {{if (and this.cardstackSession.isAuthenticated @card.isSelected) "selected"}}">
-              {{#if (and @dropField ) }}
+              {{#if @dropField}}
                 <DropZone
                   @dropField={{@dropField}}
                   @position={{0}}
@@ -64,11 +64,7 @@ Ember Concurrency into the rendering of the card component here.
                 @setFieldName={{@setFieldName}}
                 @removeField={{@removeField}}
                 @toggleStubField={{this.toggleStubField}}
-                @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
-                @setPosition={{@setPosition}}
-                @selectField={{@selectField}}
-                @selectedField={{@selectedField}}
-                @dropField={{@dropField}} />
+              />
             </div>
           {{/animated-value}}
         </div>
