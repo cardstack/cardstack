@@ -72,11 +72,7 @@
   justify-content: center;
   width: 150px;
   height: 100%;
-}
-
-.view-selector .view-selector--mode-link:not(.active) {
-  --icon-color: var(--cs-field-disabled-text);
-  color: var(--cs-field-disabled-text);
+  color: var(--ch-light-op50);
 }
 
 .view-selector .view-selector--mode-link.active {

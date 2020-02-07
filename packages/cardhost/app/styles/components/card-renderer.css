@@ -2,7 +2,9 @@
   --scroll-bottom-padding: 80px;
 
   height: 100vh;
+  width: 100%;
   padding-top: var(--ch-top-edge-height);
+  padding-left: var(--ch-left-edge-navbar-width);
   padding-bottom: var(--scroll-bottom-padding);
   overflow-y: auto;
   transition: padding var(--ch-transition-time);
@@ -43,6 +45,7 @@
   max-width: 100%;
   font: 400 16px/22px var(--ch-font-family);
   letter-spacing: 0.015em;
+  transition: width 0.3s ease;
 }
 
 .card-renderer-isolated.schema,

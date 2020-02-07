@@ -77,19 +77,19 @@
 
 /* Mode indicator link button with icon label */
 .mode-indicator {
-  --mode-container-width: 180px;
+  --mode-container-width: 150px;
   --mode-container-height: 40px;
-  --mode-link-width: 45px;
+  --mode-link-width: 35px;
   display: flex;
   flex-flow: row nowrap;
   width: var(--mode-container-width);
-  min-height: var(--mode-container-height);
+  height: var(--mode-container-height);
   max-width: 100%;
 }
 .mode-indicator--label {
   display: inline-block;
   width: calc(var(--mode-container-width) - var(--mode-link-width));
-  height: inherit;
+  height: 100%;
   padding: 11px 0 11px 15px;
   border-radius: 100px 0 0 100px;
   background-color: var(--ch-highlight);
@@ -108,7 +108,7 @@
 .mode-indicator--link {
   display: inline-block;
   width: var(--mode-link-width);
-  height: inherit;
+  height: 100%;
   margin-left: -1px;
   border-radius: 0 100px 100px 0;
   background-color: var(--ch-highlight);
@@ -137,6 +137,7 @@
 .edge-actions-button.cs-component-cta.primary {
   --icon-color: var(--ch-dark);
   min-width: 40px;
+  height: 40px;
   padding: 10px 9px 11px 12px;
   border-color: var(--ch-highlight);
   line-height: 0;
@@ -152,6 +153,8 @@
 
 /* Save Button */
 .save-button.cs-component-cta.primary {
+  min-width: 120px;
+  height: 40px;
   position: relative;
   transition: background-color var(--transition-duration);
 }
@@ -159,7 +162,7 @@
 .save-button.cs-component-cta.primary.saved svg {
   position: absolute;
   top: 14px;
-  right: 20px;
+  right: 10px;
   opacity: 0.5;
 }
 

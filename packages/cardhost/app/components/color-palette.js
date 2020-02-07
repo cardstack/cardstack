@@ -17,7 +17,7 @@ export default class ColorPalette extends Component {
     '--ch-light': '#fff',
     '--ch-dark': '#000',
     '--ch-light-op40': '#6b6971',
-    '--ch-light-op50': 'rgba(255, 255, 255, 0.5)',
+    '--ch-light-op50': '#afafb7',
     '--ch-light-op60': '#cfcfd2',
     '--ch-dark-op50': '#404040',
   };
