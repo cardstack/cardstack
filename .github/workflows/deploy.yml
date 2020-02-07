@@ -1,0 +1,70 @@
+name: Node CI
+
+on:
+  push:
+    branches:
+      - github-deploy
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10.x
+    - name: Set up build cache (yarn)
+      uses: actions/cache@preview
+      with:
+        path: ~/.cache/yarn
+        key: ${{ runner.os }}-yarn
+    - name: Set up build cache (eslint)
+      uses: actions/cache@preview
+      with:
+        path: .eslintcache
+        key: ${{ runner.os }}-eslint
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch
+    - name: Deploy
+      env:
+        CI: true
+        PGHOST: localhost
+        PGPORT: 5444
+        AWS_ACCESS_KEY_ID: AKIAZ444BSFYHW3OKFOD
+        demo_EMBER_DEPLOY_AWS_ACCESS_KEY_ID: AKIAZ444BSFYA3J2FWMZ
+        demo_LOG_LEVELS: '*=info,cardstack/performance/writers=debug'
+        demo_CARD_TEMPLATES: '["local-hub::location-card-template", "local-hub::event-card"]'
+        demo_PGHOST: builder-hub20191010154607345600000008.cbuq0sp3cf76.us-east-1.rds.amazonaws.com
+        demo_PGPORT: 5432
+        demo_PGUSER: cardstack
+        demo_PUBLIC_HUB_URL: https://builder-hub.stack.cards
+        demo_SWARM_CONTROLLER: sc.builder.stack.cards
+        ECR_ENDPOINT: 680542703984.dkr.ecr.us-east-1.amazonaws.com/builder
+        demo_GIT_REPO: ${{ secrets.demo_GIT_REPO }}
+        demo_PGPASSWORD: ${{ secrets.demo_PGPASSWORD }}
+        demo_CARDSTACK_SESSIONS_KEY: ${{ secrets.demo_CARDSTACK_SESSIONS_KEY }}
+        demo_EMBER_DEPLOY_AWS_SECRET_ACCESS_KEY: ${{ secrets.demo_EMBER_DEPLOY_AWS_SECRET_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        GITHUB_BRANCH: ${{ steps.extract_branch.outputs.branch }}
+
+      # Run id is not available yet so use datetime string instead
+      # https://github.community/t5/GitHub-Actions/Getting-the-run-id-of-a-run-in-Github-Actions/td-p/36567
+      run: |
+        export GITHUB_BUILD_ID=$(date +%Y%m%d%H%M%S)
+        mkdir -p ~/.ssh/
+        docker network create cardstack
+        docker run -d --rm --network cardstack -p 5444:5432 --name postgres cardstack/pg-test
+        docker run -d --rm --network cardstack -p 8838:80 --name git-http cardstack/git-http-server
+        echo "$SSH_PRIVATE_KEY" > $HOME/.ssh/id_rsa && chmod 400 $HOME/.ssh/id_rsa
+        sudo apt-get install socat
+        pip install --user awscli
+        aws ecr --region us-east-1 get-login --no-include-email | bash
+        yarn --cwd ./packages/cardhost/deploy install
+        cd ./packages/cardhost
+        node ./deploy/build.js
+        TARGET_NAME="builder.stack.cards" ./deploy/deploy.sh demo github-deploy
