@@ -66,7 +66,6 @@
   fill: var(--ch-light-op40);
 }
 
-/* TODO: Refactor these as components */
 
 /* Mode indicator link button with icon label */
 .mode-indicator {
@@ -126,30 +125,20 @@
 }
 
 
-/* Round icon button with no text */
-.edge-actions-button {
+/* Edge actions button */
+.edge-actions-button.cs-component-cta.primary {
   --icon-color: var(--ch-dark);
-  display: inline-block;
   min-width: 40px;
-  min-height: 40px;
   padding: 10px 9px 11px 12px;
-  background-color: var(--ch-highlight);
-  border: 1px solid var(--ch-highlight);
-  border-radius: 100px;
+  border-color: var(--ch-highlight);
   line-height: 0;
-  text-align: center;
 }
-.edge-actions-button svg {
+.edge-actions-button > svg {
   display: inline-block;
 }
 .edge-actions-button:not(:disabled):hover,
 .edge-actions-button:not(:disabled):focus {
-  background-color: var(--ch-highlight-hover);
   border-color: var(--ch-highlight-hover);
-  outline: 0;
-}
-.edge-actions-button:not(:disabled):hover {
-  cursor: pointer;
 }
 
 
