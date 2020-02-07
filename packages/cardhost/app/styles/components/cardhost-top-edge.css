@@ -18,11 +18,6 @@
   z-index: 10;
 }
 
-.cardhost-top-edge.fields,
-.cardhost-top-edge.layout {
-  background-color: var(--ch-default);
-}
-
 .cardhost-top-edge.add,
 .cardhost-top-edge.adopt,
 .cardhost-top-edge.schema {
