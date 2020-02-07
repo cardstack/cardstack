@@ -10,7 +10,7 @@
 }
 
 .cardhost-cards.edit {
-  background-color: var(--ch-medium-background);
+  background-color: var(--ch-default);
 }
 
 .cardhost-cards.schema,

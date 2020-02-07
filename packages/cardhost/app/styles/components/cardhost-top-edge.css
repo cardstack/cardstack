@@ -20,7 +20,7 @@
 
 .cardhost-top-edge.fields,
 .cardhost-top-edge.layout {
-  background-color: var(--ch-medium-background);
+  background-color: var(--ch-default);
 }
 
 .cardhost-top-edge.add,
@@ -38,7 +38,7 @@
 .card-renderer--top-edge-preview-button {
   position: fixed;
   top: var(--ch-spacing);
-  left: calc(var(--ch-left-edge-navbar-width) + var(--ch-spacing));
+  left: var(--ch-left-edge-navbar-width);
   z-index: var(--ch-actions-z-index);
 }
 
