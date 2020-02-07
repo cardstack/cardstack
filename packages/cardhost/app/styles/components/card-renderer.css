@@ -90,11 +90,6 @@
   top: 0px;
 }
 
-.card-renderer-isolated.edit .card-renderer-isolated--header--wrapper,
-.card-renderer-isolated.layout .card-renderer-isolated--header--wrapper {
-  background-color: var(--ch-medium-background);
-}
-
 .card-renderer-isolated.schema .card-renderer-isolated--header--wrapper {
   background-color: var(--ch-deep-background);
 }
