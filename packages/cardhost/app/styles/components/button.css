@@ -66,6 +66,14 @@
   fill: var(--ch-light-op40);
 }
 
+/* Preview link button */
+.preview-link {
+  background-image: url('/assets/images/buttons/eye-on.svg');
+  background-position: left 11px center;
+  background-repeat: no-repeat;
+  background-size: 18px 14px;
+}
+
 
 /* Mode indicator link button with icon label */
 .mode-indicator {

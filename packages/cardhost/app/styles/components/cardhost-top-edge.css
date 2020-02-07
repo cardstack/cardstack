@@ -35,6 +35,13 @@
   background-color: var(--ch-dark-background);
 }
 
+.card-renderer--top-edge-preview-button {
+  position: fixed;
+  top: var(--ch-spacing);
+  left: calc(var(--ch-left-edge-navbar-width) + var(--ch-spacing));
+  z-index: var(--ch-actions-z-index);
+}
+
 .card-renderer--top-edge-buttons {
   position: fixed;
   top: var(--ch-spacing);
