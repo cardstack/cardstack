@@ -256,7 +256,6 @@ export default class CardManipulator extends Component {
 
   @action
   selectFieldType(field, event) {
-    console.log('CLICK');
     if (!this.draggable.isDragging) {
       this.beginDragging(field, event);
     } else {
@@ -267,12 +266,10 @@ export default class CardManipulator extends Component {
 
   @action
   beginDragging(field, dragEvent) {
-    console.log('MOUSE DOWN');
     let dragState;
     let draggableService = this.draggable;
 
     function stopMouse() {
-      console.log('MOUSE UP');
       field.dragState = null;
       let dropzone = draggableService.getDropzone();
       if (dropzone) {
@@ -286,14 +283,17 @@ export default class CardManipulator extends Component {
       window.removeEventListener('mousemove', updateMouse);
 
       // remove ghost element from DOM
-      document.getElementById('ghost-element').remove();
+      let ghostEl = document.getElementById('ghost-element');
+      if (ghostEl) {
+        ghostEl.remove();
+      }
+
       this.fieldComponents = this.fieldComponents.map(obj => obj); // oh glimmer, you so silly...
 
       return false;
     }
 
     function updateMouse(event) {
-      console.log('MOUSE MOVE');
       dragState.latestPointerX = event.x;
       dragState.latestPointerY = event.y;
 
@@ -340,7 +340,7 @@ export default class CardManipulator extends Component {
         latestPointerX: dragEvent.x,
         latestPointerY: dragEvent.y,
       };
-      window.addEventListener('mouseup', stopMouse);
+      window.addEventListener('mouseup', stopMouse.bind(this));
       window.addEventListener('mousemove', updateMouse);
     }
     field.dragState = dragState;
@@ -352,27 +352,35 @@ export default class CardManipulator extends Component {
   *transition({ keptSprites }) {
     printSprites(arguments[0], 'cardTransition');
     let activeSprite = keptSprites.find(sprite => sprite.owner.value.dragState);
-    let ghostElement = activeSprite.element.cloneNode(true);
-    for (let [key, value] of Object.entries(activeSprite.initialComputedStyle)) {
-      ghostElement.style[key] = value;
-    }
-    let { top, left } = activeSprite.initialBounds;
-    ghostElement.style.position = 'fixed';
-    ghostElement.style.top = top;
-    ghostElement.style.left = left;
-    ghostElement.style.zIndex = '0'; // must be higher than the left edge z-index of '30'
-    ghostElement.style.opacity = '0.3';
-    ghostElement.id = 'ghost-element';
-
     let others = keptSprites.filter(sprite => sprite !== activeSprite);
+
     if (activeSprite) {
       drag(activeSprite, {
         others,
       });
+      let ghostElement = getGhostFromSprite(activeSprite);
+      activeSprite.element.parentElement.appendChild(ghostElement);
+      others.forEach(move);
     } else {
-      debugger;
+      keptSprites.forEach(sprite => {
+        move(sprite, { duration: 300 });
+      });
     }
-    others.forEach(move);
-    activeSprite.element.parentElement.appendChild(ghostElement);
   }
+}
+
+function getGhostFromSprite(sprite) {
+  let ghostElement = sprite.element.cloneNode(true);
+  for (let [key, value] of Object.entries(sprite.initialComputedStyle)) {
+    ghostElement.style[key] = value;
+  }
+  let { top, left } = sprite.initialBounds;
+  ghostElement.style.position = 'fixed';
+  ghostElement.style.top = top;
+  ghostElement.style.left = left;
+  ghostElement.style.zIndex = '0'; // must be higher than the left edge z-index of '30'
+  ghostElement.style.opacity = '0.3';
+  ghostElement.id = 'ghost-element';
+
+  return ghostElement;
 }
