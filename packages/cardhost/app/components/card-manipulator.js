@@ -256,6 +256,7 @@ export default class CardManipulator extends Component {
 
   @action
   selectFieldType(field, event) {
+    console.log('CLICK');
     if (!this.draggable.isDragging) {
       this.beginDragging(field, event);
     } else {
@@ -266,10 +267,12 @@ export default class CardManipulator extends Component {
 
   @action
   beginDragging(field, dragEvent) {
+    console.log('MOUSE DOWN');
     let dragState;
     let draggableService = this.draggable;
 
     function stopMouse() {
+      console.log('MOUSE UP');
       field.dragState = null;
       let dropzone = draggableService.getDropzone();
       if (dropzone) {
@@ -281,10 +284,16 @@ export default class CardManipulator extends Component {
 
       window.removeEventListener('mouseup', stopMouse);
       window.removeEventListener('mousemove', updateMouse);
+
+      // remove ghost element from DOM
+      document.getElementById('ghost-element').remove();
+      this.fieldComponents = this.fieldComponents.map(obj => obj); // oh glimmer, you so silly...
+
       return false;
     }
 
     function updateMouse(event) {
+      console.log('MOUSE MOVE');
       dragState.latestPointerX = event.x;
       dragState.latestPointerY = event.y;
 
@@ -336,18 +345,34 @@ export default class CardManipulator extends Component {
     }
     field.dragState = dragState;
     this.draggable.setField(field);
-    this.fieldComponents = this.fieldComponents.map(obj => (obj.id === field.id ? field : obj)); // oh glimmer, you so silly...
+    // this.fieldComponents = this.fieldComponents.map(obj => (obj.id === field.id ? field : obj)); // oh glimmer, you so silly...
+    this.fieldComponents = this.fieldComponents.map(obj => obj); // oh glimmer, you so silly...
   }
 
   *transition({ keptSprites }) {
     printSprites(arguments[0], 'cardTransition');
     let activeSprite = keptSprites.find(sprite => sprite.owner.value.dragState);
+    let ghostElement = activeSprite.element.cloneNode(true);
+    for (let [key, value] of Object.entries(activeSprite.initialComputedStyle)) {
+      ghostElement.style[key] = value;
+    }
+    let { top, left } = activeSprite.initialBounds;
+    ghostElement.style.position = 'fixed';
+    ghostElement.style.top = top;
+    ghostElement.style.left = left;
+    ghostElement.style.zIndex = '0'; // must be higher than the left edge z-index of '30'
+    ghostElement.style.opacity = '0.3';
+    ghostElement.id = 'ghost-element';
+
     let others = keptSprites.filter(sprite => sprite !== activeSprite);
     if (activeSprite) {
       drag(activeSprite, {
         others,
       });
+    } else {
+      debugger;
     }
     others.forEach(move);
+    activeSprite.element.parentElement.appendChild(ghostElement);
   }
 }
