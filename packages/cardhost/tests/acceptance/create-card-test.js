@@ -100,7 +100,7 @@ module('Acceptance | card create', function(hooks) {
 
     await focus('[data-test-card-renderer-isolated]');
     await animationsSettled();
-    assert.dom('.card-renderer-isolated--header').hasText('millenial-puppies');
+    assert.dom('.card-renderer-isolated--header').containsText('millenial-puppies');
     assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
     assert.dom('[data-test-card-renderer-isolated]').hasClass('selected');
 
@@ -127,7 +127,7 @@ module('Acceptance | card create', function(hooks) {
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
     await click('[data-test-configure-schema-btn]');
 
-    assert.dom('.card-renderer-isolated--header').hasText('millenial-puppies');
+    assert.dom('.card-renderer-isolated--header').includesText('millenial-puppies');
 
     await addField('title', 'string', true);
     await addField('body', 'string', false);
@@ -135,7 +135,7 @@ module('Acceptance | card create', function(hooks) {
     await addField('reviewers', 'related cards', true);
 
     await showCardId(true);
-    assert.dom('.card-renderer-isolated--header').hasText('millenial-puppies');
+    assert.dom('.card-renderer-isolated--header').includesText('millenial-puppies');
     assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
   });
 
