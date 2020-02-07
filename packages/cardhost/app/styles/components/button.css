@@ -67,6 +67,39 @@
 }
 
 
+/* TODO: Move to UI-components library */
+/* Round icon button with no text */
+.icon-button--primary {
+  --icon-color: var(--ch-dark);
+  display: inline-block;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 5px;
+  background-color: var(--ch-highlight);
+  border: 1px solid var(--ch-highlight);
+  border-radius: 100px;
+  line-height: 0;
+  text-align: center;
+}
+.icon-button--primary svg {
+  display: inline-block;
+}
+.icon-button--primary:not(:disabled):hover,
+.icon-button--primary:not(:disabled):focus {
+  background-color: var(--ch-highlight-hover);
+  border-color: var(--ch-highlight-hover);
+  outline: 0;
+}
+.icon-button--primary:not(:disabled):hover {
+  cursor: pointer;
+}
+
+.icon-button--primary.edge-actions-btn {
+  padding: 10px 9px 11px 12px;
+}
+
+
+
 /* Save Button */
 .save-button.cs-component-cta.primary {
   position: relative;

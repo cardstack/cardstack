@@ -122,8 +122,10 @@
   background-repeat: no-repeat;
   background-size: 10px 10px;
 }
-.mode-indicator--link:hover {
+.mode-indicator--link:hover,
+.mode-indicator--link:focus {
   background-color: var(--ch-highlight-hover);
+  outline: 0;
 }
 .mode-indicator--link span {
   width: 18px;
