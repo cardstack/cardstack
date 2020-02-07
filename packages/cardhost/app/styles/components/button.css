@@ -89,7 +89,7 @@
 .mode-indicator--label {
   display: inline-block;
   width: calc(var(--mode-container-width) - var(--mode-link-width));
-  height: 100%;
+  height: inherit;
   padding: 11px 0 11px 15px;
   border-radius: 100px 0 0 100px;
   background-color: var(--ch-highlight);
@@ -108,7 +108,7 @@
 .mode-indicator--link {
   display: inline-block;
   width: var(--mode-link-width);
-  height: 100%;
+  height: inherit;
   margin-left: -1px;
   border-radius: 0 100px 100px 0;
   background-color: var(--ch-highlight);
