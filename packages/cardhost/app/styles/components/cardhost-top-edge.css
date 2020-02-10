@@ -104,15 +104,13 @@
   margin-right: 9px;
 }
 
-@media (max-width: 1010px) {
+@media (max-width: 1036px) {
   .cardhost-top-edge {
     grid-template-columns: auto 1fr var(--ch-right-edge-panel-width);
   }
 
   .card-renderer--top-edge-size-buttons {
-    position: absolute;
-    top: var(--ch-top-edge-height);
-    left: 0;
+    display: none;
   }
 }
 
@@ -122,8 +120,7 @@
     grid-gap: 10px;
   }
 
-  .card-renderer--top-edge-buttons .mode-indicator,
-  .card-renderer--top-edge-size-buttons {
+  .card-renderer--top-edge-buttons .mode-indicator {
     display: none;
   }
 
