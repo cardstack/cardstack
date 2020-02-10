@@ -28,6 +28,9 @@ export default class RightEdge extends Component {
   }
 
   get selectedFieldTitle() {
+    if (this.args.selectedFieldName) {
+      return this.args.selectedFieldName;
+    }
     if (this.args.selectedField) {
       return this.args.selectedField.name;
     }

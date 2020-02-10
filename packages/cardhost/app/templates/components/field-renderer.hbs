@@ -69,12 +69,12 @@
         </div>
       {{else if (eq schemaAttr "label")}}
         <div data-test-schema-attr={{schemaAttr}}>
-          {{#if @setFieldLabel}}
+          {{#if @setFieldCardValue}}
             <TextField
               @theme="cs-dark"
               @label="Field Label"
               @value={{this.newFieldLabel}}
-              @setValue={{action this.updateFieldLabel}}
+              @setValue={{perform this.updateFieldLabel}}
               @disabled={{@field.isAdopted}} />
           {{else}}
             <div class="field-renderer--display">
@@ -87,17 +87,17 @@
         </div>
       {{else if (eq schemaAttr "instructions")}}
         <div data-test-schema-attr={{schemaAttr}}>
-          {{#if @setFieldInstructions}}
+          {{#if @setFieldCardValue}}
             <TextArea
               @theme="cs-dark"
               @label="Helper Text"
               @value={{this.newFieldInstructions}}
-              @setValue={{action this.updateFieldInstructions}} />
+              @setValue={{perform this.updateFieldInstructions}} />
           {{else}}
             <div class="field-renderer--display">
               <span class="field-renderer--display-label">Helper Text</span>
               <span data-test-field-renderer-field-instructions>
-                {{@field.instructions}}
+                {{@field.csDescription}}
               </span>
             </div>
           {{/if}}

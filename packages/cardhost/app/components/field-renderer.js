@@ -6,10 +6,6 @@ import kebabCase from 'lodash/kebabCase';
 
 const defaultSchemaAttrs = ['title', 'type', 'name', 'instructions', 'embedded'];
 
-// These are the field attributes that will trigger onFieldChanged()
-// to be called when the values of this attributes change
-// const onFieldChangedDependencies = ['nonce', 'name', 'label', 'instructions'];
-
 export default class FieldRenderer extends Component {
   @tracked newFieldName;
   @tracked currentFieldName;
@@ -25,8 +21,8 @@ export default class FieldRenderer extends Component {
 
     this.newFieldName = this.args.field.name;
     this.currentFieldName = this.args.field.name;
-    this.newFieldLabel = this.args.field.label;
-    this.newFieldInstructions = this.args.field.instructions;
+    this.newFieldLabel = this.args.field.csTitle;
+    this.newFieldInstructions = this.args.field.csDescription;
     this.loadField.perform();
   }
 
@@ -48,23 +44,27 @@ export default class FieldRenderer extends Component {
       this.currentFieldName = newName;
     } catch (e) {
       console.error(e); // eslint-disable-line no-console
-      this.statusMsg = `field name ${this.currentFieldNAme} was NOT successfully changed: ${e.message}`;
+      this.statusMsg = `field name ${this.currentFieldName} was NOT successfully changed: ${e.message}`;
       return;
     }
   }).restartable())
   updateFieldName;
 
+  @(task(function*(newLabel) {
+    this.newFieldLabel = newLabel;
+    yield this.args.setFieldCardValue.perform(this.currentFieldName, 'csTitle', newLabel);
+  }).restartable())
+  updateFieldLabel;
+
+  @(task(function*(instructions) {
+    this.newFieldInstructions = instructions;
+    yield this.args.setFieldCardValue.perform(this.currentFieldName, 'csDescription', instructions);
+  }).restartable())
+  updateFieldInstructions;
+
   get schemaAttrs() {
     return this.args.schemaAttrs || defaultSchemaAttrs;
   }
-
-  // get sanitizedType() {
-  //   return this.args.field.type.replace(/::/g, '/').replace(/@/g, '');
-  // }
-
-  // get fieldType() {
-  //   return fieldComponents.find(el => el.coreType === this.args.field.type);
-  // }
 
   get isSelected() {
     return (
@@ -81,49 +81,17 @@ export default class FieldRenderer extends Component {
     return this.newFieldName || this.args.field.name;
   }
 
+  get fieldLabel() {
+    return this.newFieldLabel || this.args.field.csTitle;
+  }
+
   @action
   focusParentElement(element) {
     element.parentElement.focus({ preventScroll: true });
   }
 
-  // get nonce() {
-  //   return onFieldChangedDependencies.map(i => this.args.field[i]).join('::');
-  // }
-
-  // get dasherizedType() {
-  //   return dasherize(this.args.field.type.replace(/@cardstack\/core-types::/g, ''));
-  // }
-
-  // get friendlyType() {
-  //   if (this.dasherizedType === 'case-insensitive' || this.dasherizedType === 'string') {
-  //     return 'text';
-  //   }
-
-  //   return '';
-  // }
-
-  // get fieldViewer() {
-  //   return `fields/${dasherize(this.sanitizedType)}-viewer`;
-  // }
-
-  // get fieldEditor() {
-  //   return `fields/${dasherize(this.sanitizedType)}-editor`;
-  // }
-
   get fieldDisplayName() {
-    return this.args.field.csTitle || this.args.field.name;
-  }
-
-  @action
-  updateFieldLabel(newLabel) {
-    this.newFieldLabel = newLabel;
-    this.args.setFieldLabel(this.args.field.name, this.newFieldLabel);
-  }
-
-  @action
-  updateFieldInstructions(instructions) {
-    this.newFieldInstructions = instructions;
-    this.args.setFieldInstructions(this.args.field.name, this.newFieldInstructions);
+    return this.fieldLabel || this.fieldName;
   }
 
   @action

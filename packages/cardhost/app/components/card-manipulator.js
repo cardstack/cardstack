@@ -111,21 +111,25 @@ export default class CardManipulator extends Component {
   deleteCard;
 
   @(task(function*(oldFieldName, newFieldName) {
-    let value = yield this.card.value(oldFieldName);
     let field = yield this.card.field(oldFieldName);
     let doc = this.card.document;
-    doc.withoutField(oldFieldName);
-    if (value != null) {
-      doc.withField(newFieldName, field.adoptsFromId, field.csFieldArity, value);
-    } else {
-      doc.withField(newFieldName, field.adoptsFromId, field.csFieldArity);
-    }
+    doc.withoutField(oldFieldName).withField(newFieldName, field.document, field.csFieldArity);
 
     let patchedCard = yield this.patchCard.perform(doc);
     this.card = patchedCard;
     this.selectedFieldName = newFieldName;
   }).restartable())
   setFieldName;
+
+  @(task(function*(fieldName, property, value) {
+    let field = yield this.card.field(fieldName);
+    let doc = this.card.document.withField(fieldName, field.document, field.csFieldArity, {
+      [property]: value,
+    });
+    let patchedCard = yield this.patchCard.perform(doc);
+    this.card = patchedCard;
+  }).restartable())
+  setFieldCardValue;
 
   @action
   removeField(fieldNonce) {

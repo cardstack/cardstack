@@ -157,6 +157,20 @@ describe('hub/card-service', function() {
       expect(await card.value('hello')).to.equal('world');
     });
 
+    it('can patch csFields', async function() {
+      let doc = cardDocument().withField('foo', 'string-field', 'singular');
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+      let field = await card.field('foo');
+      expect(field.csTitle).to.be.undefined;
+
+      let updated = card.document;
+      updated.withField('foo', 'string-field', 'singular', { csTitle: 'FoOo' });
+      card = await service.update(card, updated.jsonapi);
+
+      field = await card.field('foo');
+      expect(field.csTitle).to.equal('FoOo');
+    });
+
     it('can remove a field with an attribute value from a card with a patch', async function() {
       let doc: any = cardDocument().withAutoAttributes({ foo: 'bar' }).jsonapi;
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc);

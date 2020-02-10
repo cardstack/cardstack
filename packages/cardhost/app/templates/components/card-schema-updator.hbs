@@ -55,11 +55,11 @@
   @card={{this.card}}
   @mode="schema"
   @selectedField={{this.selectedField}}
+  @selectedFieldName={{this.selectedFieldName}}
   @selectField={{action this.selectField}}
+  @setFieldCardValue={{this.setFieldCardValue}}
   @setNeededWhenEmbedded={{this.setNeededWhenEmbedded}}
   @setFieldName={{this.setFieldName}}
-  @setFieldLabel={{this.setFieldLabel}}
-  @setFieldInstructions={{this.setFieldInstructions}}
   @cardSelected={{this.cardSelected}} />
 
 <section class="card-schema-updator" data-test-card-schema={{@card.name}} {{did-update this.updateCard @card}}>

@@ -135,33 +135,45 @@ export class CardDocument {
   withField<T extends CardDocument>(
     this: T,
     name: string,
-    fieldCard: CardId,
+    fieldCardId: CardId,
     arity?: FieldArity,
     values?: FieldValues
   ): T;
-  withField<T extends CardDocument>(this: T, name: string, fieldCard: null): T;
+  withField<T extends CardDocument>(
+    this: T,
+    name: string,
+    fieldCard: CardDocument,
+    arity?: FieldArity,
+    values?: FieldValues
+  ): T;
+  withField<T extends CardDocument>(this: T, name: string, fieldCardId: null): T;
   withField(
     name: string,
-    fieldCard: string | CardId | null,
+    fieldCardOrId: string | CardId | CardDocument | null,
     arity: FieldArity = 'singular',
     values: FieldValues = {}
   ): this {
-    if (fieldCard == null) {
+    if (fieldCardOrId == null) {
       this.fields.set(name, null);
       return this;
     }
 
-    if (typeof fieldCard === 'string') {
-      fieldCard = { csRealm: CARDSTACK_PUBLIC_REALM, csId: fieldCard };
+    if (typeof fieldCardOrId === 'string') {
+      fieldCardOrId = { csRealm: CARDSTACK_PUBLIC_REALM, csId: fieldCardOrId };
     }
 
-    this.fields.set(
-      name,
-      new CardDocument()
-        .withAutoAttributes(values)
-        .withAttributes({ csFieldArity: arity })
-        .adoptingFrom(fieldCard)
-    );
+    if (fieldCardOrId instanceof CardDocument) {
+      this.fields.set(name, fieldCardOrId.withAutoAttributes(values).withAttributes({ csFieldArity: arity }));
+    } else {
+      this.fields.set(
+        name,
+        new CardDocument()
+          .withAutoAttributes(values)
+          .withAttributes({ csFieldArity: arity })
+          .adoptingFrom(fieldCardOrId)
+      );
+    }
+
     return this;
   }
 
@@ -337,7 +349,7 @@ export function cardDocumentFromJsonAPI(sourceDoc: SingleResourceDoc): CardDocum
         csRealm: CARDSTACK_PUBLIC_REALM,
         csId: 'base',
       };
-      doc.withField(name, fieldCardId, arity);
+      doc.withField(name, fieldCardId, arity, value.attributes);
     }
   }
   doc.withAttributes(attributes).withRelationships(fieldRefs);
