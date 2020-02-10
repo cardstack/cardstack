@@ -9,7 +9,6 @@ import ENV from '@cardstack/cardhost/config/environment';
 import { fieldTypeMappings, fieldComponents } from '../utils/mappings';
 import drag from '../motions/drag';
 import move from 'ember-animated/motions/move';
-import { printSprites } from 'ember-animated';
 
 const { environment } = ENV;
 
@@ -345,12 +344,10 @@ export default class CardManipulator extends Component {
     }
     field.dragState = dragState;
     this.draggable.setField(field);
-    // this.fieldComponents = this.fieldComponents.map(obj => (obj.id === field.id ? field : obj)); // oh glimmer, you so silly...
     this.fieldComponents = this.fieldComponents.map(obj => obj); // oh glimmer, you so silly...
   }
 
   *transition({ keptSprites }) {
-    printSprites(arguments[0], 'cardTransition');
     let activeSprite = keptSprites.find(sprite => sprite.owner.value.dragState);
     let others = keptSprites.filter(sprite => sprite !== activeSprite);
 
@@ -378,8 +375,8 @@ function getGhostFromSprite(sprite) {
   ghostElement.style.position = 'fixed';
   ghostElement.style.top = top;
   ghostElement.style.left = left;
-  ghostElement.style.zIndex = '0'; // must be higher than the left edge z-index of '30'
-  ghostElement.style.opacity = '0.3';
+  ghostElement.style.zIndex = '0';
+  ghostElement.style.opacity = '0.4';
   ghostElement.id = 'ghost-element';
 
   return ghostElement;
