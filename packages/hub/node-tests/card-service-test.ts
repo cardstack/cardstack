@@ -157,6 +157,37 @@ describe('hub/card-service', function() {
       expect(await card.value('hello')).to.equal('world');
     });
 
+    it('can remove a field with an attribute value from a card with a patch', async function() {
+      let doc: any = cardDocument().withAutoAttributes({ foo: 'bar' }).jsonapi;
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc);
+
+      delete doc.data.attributes.csFields.foo;
+      let updatedCard = await service.update(card, doc);
+
+      try {
+        await updatedCard.field('foo');
+        throw new Error(`should not be able to get field`);
+      } catch (err) {
+        expect(err.detail).to.equal('no such field "foo"');
+      }
+    });
+
+    it('can remove a field with a relationships value from a card with a patch', async function() {
+      let related = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, cardDocument().jsonapi);
+      let doc: any = cardDocument().withAutoRelationships({ foo: related }).jsonapi;
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc);
+
+      delete doc.data.attributes.csFields.foo;
+      card = await service.update(card, doc);
+
+      try {
+        await card.field('foo');
+        throw new Error(`should not be able to get field`);
+      } catch (err) {
+        expect(err.detail).to.equal('no such field "foo"');
+      }
+    });
+
     it('it does not update a card that uses ephemeral storage when the meta.version is missing', async function() {
       let doc = cardDocument().withAutoAttributes({ foo: 'bar' });
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
@@ -723,7 +754,7 @@ describe('hub/card-service', function() {
         }
       });
 
-      it('rejects composite field value with unknown interior field', async function() {
+      it('ignores composite field value with unknown interior field', async function() {
         let doc = cardDocument()
           .withAttributes({
             name: 'Mango',
@@ -735,9 +766,10 @@ describe('hub/card-service', function() {
           })
           .adoptingFrom(userCard);
 
+        let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
         try {
-          await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
-          throw new Error(`should not have been able to create`);
+          await card.field('badField');
+          throw new Error(`should not be able to get field value`);
         } catch (err) {
           expect(err).hasStatus(400);
           expect(err.detail).to.match(/no such field "badField"/);

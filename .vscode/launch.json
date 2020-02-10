@@ -31,7 +31,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["-r", "esm", "packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can search for cards"],
+      "args": ["-r", "esm", "packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can remove a field with a relationships value from a card with a patch"],
     },
     {
       "type": "node",

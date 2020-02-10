@@ -279,7 +279,7 @@ export class CardDocument {
     if (value instanceof CardDocument && value.parent) {
       return value.parent;
     }
-    return { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base-card' };
+    return { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' };
   }
 }
 

@@ -11,7 +11,6 @@ import {
 import cloneDeep from 'lodash/cloneDeep';
 import isPlainObject from 'lodash/isPlainObject';
 import merge from 'lodash/merge';
-import mergeWith from 'lodash/mergeWith';
 import flatten from 'lodash/flatten';
 import uniqBy from 'lodash/uniqBy';
 import difference from 'lodash/difference';
@@ -734,8 +733,69 @@ export class Card {
     return doc;
   }
 
+  protected async patchDoc(target: SingleResourceDoc, source: SingleResourceDoc): Promise<SingleResourceDoc> {
+    let interiorCard: CardValue = Object.create(null);
+    let otherInteriorCard: CardValue = Object.create(null);
+    if (target.data?.attributes) {
+      interiorCard.attributes = target.data.attributes;
+    }
+    if (source.data?.attributes) {
+      otherInteriorCard.attributes = source.data.attributes;
+    }
+    if (target.data?.relationships) {
+      interiorCard.relationships = target.data.relationships;
+    }
+    if (source.data?.relationships) {
+      otherInteriorCard.relationships = source.data.relationships;
+    }
+    let patched = await this.patchInteriorCards(interiorCard, otherInteriorCard);
+
+    // Cleanup any field values whose field definitions were removed as a result of the merge
+    // TODO what about interior cards whose csField definitions have changed?
+    let csAdoptsFrom = patched?.relationships?.csAdoptsFrom;
+    let parentURL: string | undefined;
+    if (csAdoptsFrom && 'data' in csAdoptsFrom && csAdoptsFrom.data && !Array.isArray(csAdoptsFrom.data)) {
+      parentURL = csAdoptsFrom.data.id;
+    }
+    let parent = await this.reader.get(
+      parentURL ? canonicalURLToCardId(parentURL) : { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }
+    );
+    let fieldNames = [...(await parent.fields()).map(i => i.name), ...Object.keys(patched?.attributes?.csFields || {})];
+    let removedFields = difference(
+      [
+        ...Object.keys(patched?.attributes || {}).filter(i => !cardstackFieldPattern.test(i)),
+        ...Object.keys(patched?.relationships || {}).filter(i => !cardstackFieldPattern.test(i)),
+      ],
+      fieldNames
+    );
+    for (let field of removedFields) {
+      if (patched?.attributes) {
+        delete patched.attributes[field];
+      }
+      if (patched?.relationships) {
+        delete patched.relationships[field];
+      }
+    }
+
+    let patchedDoc: SingleResourceDoc = {
+      data: {
+        type: 'cards',
+        ...(patched || {}),
+      },
+    };
+    if (source.data?.id != null) {
+      patchedDoc.data.id = source.data.id;
+    }
+    if (source.data?.meta) {
+      patchedDoc.data.meta = cloneDeep(source.data.meta);
+    } else if (target.data?.meta) {
+      patchedDoc.data.meta = cloneDeep(target.data.meta);
+    }
+    return patchedDoc;
+  }
+
   async patch(otherDoc: SingleResourceDoc): Promise<Card> {
-    let newDoc = mergeWith({}, (await this.asUpstreamDoc()).jsonapi, otherDoc, everythingButMeta);
+    let newDoc = await this.patchDoc((await this.asUpstreamDoc()).jsonapi, otherDoc);
     return await this.container.instantiate(
       Card,
       newDoc,
@@ -833,6 +893,94 @@ export class Card {
     }
     return undefined;
   }
+
+  private async patchInteriorCards(
+    target: CardValue | null | undefined,
+    source: CardValue | null | undefined
+  ): Promise<CardValue | null> {
+    if (!source && !target) {
+      return null;
+    }
+    if (!target && source) {
+      return cloneDeep(source);
+    }
+    if (!source && target) {
+      return cloneDeep(target);
+    }
+
+    let merged = Object.create(null);
+    if (target?.id != null || source?.id != null) {
+      merged.id = source?.id ?? target?.id;
+    }
+
+    if (target?.relationships || source?.relationships) {
+      merged.relationships = Object.create(null);
+      for (let doc of [target, source]) {
+        for (let [key, value] of Object.entries(doc?.relationships || {})) {
+          if (value == null || !('data' in value)) {
+            // we dont merge "links" style relationships, only "data" style relationships
+            merged!.relationships[key] = null;
+            continue;
+          }
+          if (Array.isArray(value.data)) {
+            merged.relationships[key] = { data: [...value.data] };
+          } else if (isPlainObject(value.data)) {
+            merged.relationships[key] = { data: { ...value.data } };
+          } else if (value.data == null) {
+            merged.relationships[key].data = null;
+          }
+        }
+      }
+    }
+
+    if (target?.attributes || source?.attributes) {
+      merged.attributes = Object.create(null);
+      for (let doc of [target, source]) {
+        for (let [key, value] of Object.entries(doc?.attributes || {})) {
+          if (
+            Array.isArray(value) &&
+            !cardstackFieldPattern.test(key) &&
+            (value.length === 0 ||
+              value.every(
+                interiorCard =>
+                  typeof interiorCard === 'object' &&
+                  !Array.isArray(interiorCard) &&
+                  isPlainObject(interiorCard) &&
+                  interiorCard!.id != null
+              ))
+          ) {
+            // this is a collection of interior cards with identity mappings
+            merged.attributes[key] = await Promise.all(
+              value.map(interiorCard =>
+                this.patchInteriorCards(
+                  ((target?.attributes?.[key] || []) as CardValue[]).find(
+                    i => i.id === (interiorCard as CardValue)!.id
+                  ),
+                  ((source?.attributes?.[key] || []) as CardValue[]).find(i => i.id === (interiorCard as CardValue)!.id)
+                )
+              )
+            );
+          } else if (isPlainObject(value) && !cardstackFieldPattern.test(key)) {
+            // we are making an assumption that we dont want to apply interior
+            // card patching logic in the system fields. Currently the closest we
+            // come to this is the csFields--but we really don't want to apply
+            // interior card patching logic for that, otherwise we wont be able to
+            // remove fields from a card.
+            merged.attributes[key] = await this.patchInteriorCards(
+              target?.attributes?.[key] as CardValue | null | undefined,
+              source?.attributes?.[key] as CardValue | null | undefined
+            );
+          } else if (typeof value !== 'object') {
+            merged.attributes[key] = value;
+          } else {
+            merged.attributes[key] = cloneDeep(value);
+          }
+        }
+      }
+    }
+
+    return merged as CardValue;
+  }
 }
 
 export class UnsavedCard extends Card {
@@ -850,7 +998,7 @@ export class UnsavedCard extends Card {
   }
 
   async asAddressableCard(patch: SingleResourceDoc): Promise<AddressableCard> {
-    let newDoc = mergeWith({}, (await this.asUpstreamDoc()).jsonapi, patch, everythingButMeta);
+    let newDoc = await this.patchDoc((await this.asUpstreamDoc()).jsonapi, patch);
     return await this.cardInstantiator.instantiate(newDoc);
   }
 }
@@ -1025,7 +1173,7 @@ export class AddressableCard extends Card implements CardId {
   }
 
   async patch(otherDoc: SingleResourceDoc): Promise<AddressableCard> {
-    let newDoc = mergeWith({}, (await this.asUpstreamDoc()).jsonapi, otherDoc, everythingButMeta);
+    let newDoc = await this.patchDoc((await this.asUpstreamDoc()).jsonapi, otherDoc);
     return await this.container.instantiate(AddressableCard, newDoc, this.reader, this.modules, this.container);
   }
 
@@ -1092,13 +1240,6 @@ function assertFeatures(features: any): asserts features is Card['csFeatures'] {
     throw new Error(
       `csFeatures.${name} must be "moduleName: string" or "[moduleName, exportedName]: [string, string]"`
     );
-  }
-}
-
-function everythingButMeta(_objValue: any, srcValue: any, key: string) {
-  if (key === 'meta') {
-    // meta fields don't merge, the new entire "meta" object overwrites
-    return srcValue;
   }
 }
 
