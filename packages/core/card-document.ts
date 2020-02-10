@@ -120,6 +120,11 @@ export class CardDocument {
     return this;
   }
 
+  withoutField<T extends CardDocument>(this: T, name: string): T {
+    this.fields.delete(name);
+    return this;
+  }
+
   withField<T extends CardDocument>(
     this: T,
     name: string,

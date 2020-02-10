@@ -2,7 +2,6 @@ import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
-import { startCase } from 'lodash';
 import { task } from 'ember-concurrency';
 import ENV from '@cardstack/cardhost/config/environment';
 import { fieldCards } from '../utils/scaffolding';
@@ -19,6 +18,7 @@ export default class CardManipulator extends Component {
   @tracked statusMsg;
   @tracked card;
   @tracked selectedField;
+  @tracked selectedFieldName;
   @tracked isDragging;
   @tracked cardId;
   @tracked cardSelected = true;
@@ -110,6 +110,23 @@ export default class CardManipulator extends Component {
   })
   deleteCard;
 
+  @(task(function*(oldFieldName, newFieldName) {
+    let value = yield this.card.value(oldFieldName);
+    let field = yield this.card.field(oldFieldName);
+    let doc = this.card.document;
+    doc.withoutField(oldFieldName);
+    if (value != null) {
+      doc.withField(newFieldName, field.adoptsFromId, field.csFieldArity, value);
+    } else {
+      doc.withField(newFieldName, field.adoptsFromId, field.csFieldArity);
+    }
+
+    let patchedCard = yield this.patchCard.perform(doc);
+    this.card = patchedCard;
+    this.selectedFieldName = newFieldName;
+  }).restartable())
+  setFieldName;
+
   @action
   removeField(fieldNonce) {
     if (fieldNonce == null || !this.card) {
@@ -119,7 +136,7 @@ export default class CardManipulator extends Component {
     // using field nonce in order to be resiliant to the scenario where the user deletes the name of the field too
     let field = this.card.getFieldByNonce(fieldNonce);
 
-    if (field === this.selectedField) {
+    if (field.name === this.selectedField.name) {
       this.cardSelected = true;
     }
 
@@ -162,12 +179,6 @@ export default class CardManipulator extends Component {
       return;
     }
     this.card.getField(fieldName).setValue(value);
-  }
-
-  @action
-  setFieldName(oldFieldName, newFieldName) {
-    this.card.getField(oldFieldName).setName(newFieldName);
-    this.card.getField(newFieldName).setLabel(startCase(newFieldName));
   }
 
   @action
@@ -241,7 +252,7 @@ export default class CardManipulator extends Component {
     }
 
     // Toggling the selected field in tests is baffling me, using something more brute force
-    if (environment === 'test' && this.selectedField === field) {
+    if (environment === 'test' && this.selectedField.name === field.name) {
       return;
     }
 
@@ -260,6 +271,14 @@ export default class CardManipulator extends Component {
     }
 
     this.selectedField = field;
+    // I'm treating both the selectedField and the selectedFieldName separately
+    // because renaming a field creates a whole new field instance, which has
+    // some really awkward animation side effects--so renamed fields still
+    // operate against the older field instance (from before the rename). This
+    // is _not_ ideal.... A better approach would be to use a modal to prompt a
+    // user for the field name when they change it. Then things would look much
+    // more consistent when the new field is instantiated.
+    this.selectedFieldName = null;
     this.cardSelected = false;
   }
 

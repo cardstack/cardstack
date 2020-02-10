@@ -9,11 +9,10 @@
 <section {{on "click" (fn this.selectField @field)}}
   {{on "dragstart" (action this.startDragging @field)}}
   {{on "dragend" (action this.finishDragging)}}
-  class="field {{@field.name}}-field {{if this.isStubField "preview"}} {{if this.friendlyType (concat "field-type-" this.friendlyType "-" @mode "-field ")}}field-type-{{this.dasherizedType}}-{{@mode}}-field{{if (or @setPosition @removeField) " with-buttons"}}{{if (eq @field @selectedField) " selected"}}"
-  data-test-field={{@field.name}}
+  class="field {{this.fieldName}}-field {{if this.isStubField "preview"}} {{if this.friendlyType (concat "field-type-" this.friendlyType "-" @mode "-field ")}}field-type-{{this.dasherizedType}}-{{@mode}}-field{{if (or @setPosition @removeField) " with-buttons"}}{{if this.isSelected " selected"}}"
+  data-test-field={{this.fieldName}}
   data-test-field-type={{@field.csTitle}}
   data-test-field-mode={{@mode}}
-  {{did-update this.updateFieldProperties this.nonce}}
 >
   {{#if @setPosition}}
     <button {{on "mousedown" (action this.initDrag @field)}}
@@ -45,7 +44,7 @@
           class="schema-field-renderer--header"
           data-test-field-renderer-type
         >
-          {{if this.isStubField "New Field" @field.name}} ({{this.fieldType}})
+          {{if this.isStubField "New Field" this.fieldName}} ({{this.fieldType}})
           {{#if @field.isAdopted}}
             <span class="schema-field-renderer--header--detail">Adopted</span>
           {{/if}}
@@ -111,7 +110,7 @@
             @theme="cs-dark"
             @label="Field ID"
             @class="ch-input"
-            @setValue={{action this.updateFieldName}}
+            @setValue={{perform this.updateFieldName}}
             @disabled={{@field.isAdopted}}
             @pattern={{@field.fieldNameRegex.source}}
             @title="Can only contain letters, numbers, dashes, and underscores."
@@ -124,7 +123,7 @@
               @theme="cs-dark"
               @label="Available When Embedded"
               @checked={{@field.neededWhenEmbedded}}
-              @setChecked={{fn @setNeededWhenEmbedded @field.name}}
+              @setChecked={{fn @setNeededWhenEmbedded this.fieldName}}
               @disabled={{@field.isAdopted}} />
           {{else}}
             <div class="field-renderer--display">

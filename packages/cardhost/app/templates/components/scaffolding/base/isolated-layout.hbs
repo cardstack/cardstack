@@ -12,6 +12,7 @@
           @setFieldValue={{fn @setFieldValue field.name}}
           @selectField={{@selectField}}
           @selectedField={{@selectedField}}
+          @selectedFieldName={{@selectedFieldName}}
         />
       {{else if (or @setNeededWhenEmbedded @setPosition @removeField @setFieldName)}}
         <FieldRenderer
@@ -25,6 +26,7 @@
           @setFieldName={{@setFieldName}}
           @selectField={{@selectField}}
           @selectedField={{@selectedField}}
+          @selectedFieldName={{@selectedFieldName}}
         />
       {{else}}
         <FieldRenderer @field={{field}} @mode={{@mode}}/>

@@ -2,6 +2,7 @@ import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { task } from 'ember-concurrency';
+import kebabCase from 'lodash/kebabCase';
 
 const defaultSchemaAttrs = ['title', 'type', 'name', 'instructions', 'embedded'];
 
@@ -9,9 +10,9 @@ const defaultSchemaAttrs = ['title', 'type', 'name', 'instructions', 'embedded']
 // to be called when the values of this attributes change
 // const onFieldChangedDependencies = ['nonce', 'name', 'label', 'instructions'];
 
-let renderNonce = 0;
 export default class FieldRenderer extends Component {
   @tracked newFieldName;
+  @tracked currentFieldName;
   @tracked newFieldLabel;
   @tracked newFieldInstructions;
   @tracked fieldValue;
@@ -23,12 +24,9 @@ export default class FieldRenderer extends Component {
     super(...args);
 
     this.newFieldName = this.args.field.name;
+    this.currentFieldName = this.args.field.name;
     this.newFieldLabel = this.args.field.label;
     this.newFieldInstructions = this.args.field.instructions;
-
-    this.currentNonce = this.nonce;
-    this.renderNonce = renderNonce++;
-
     this.loadField.perform();
   }
 
@@ -43,6 +41,19 @@ export default class FieldRenderer extends Component {
   })
   loadField;
 
+  @(task(function*(newName) {
+    newName = kebabCase(newName);
+    try {
+      yield this.args.setFieldName.perform(this.currentFieldName, newName);
+      this.currentFieldName = newName;
+    } catch (e) {
+      console.error(e); // eslint-disable-line no-console
+      this.statusMsg = `field name ${this.currentFieldNAme} was NOT successfully changed: ${e.message}`;
+      return;
+    }
+  }).restartable())
+  updateFieldName;
+
   get schemaAttrs() {
     return this.args.schemaAttrs || defaultSchemaAttrs;
   }
@@ -55,19 +66,19 @@ export default class FieldRenderer extends Component {
   //   return fieldComponents.find(el => el.coreType === this.args.field.type);
   // }
 
+  get isSelected() {
+    return (
+      this.args.selectedField &&
+      (this.args.selectedField.name === this.args.field.name || this.args.selectedFieldName === this.args.field.name)
+    );
+  }
+
   get isStubField() {
     return this.args.field.csOriginalRealm === 'stub-card';
   }
 
-  @action
-  updateFieldProperties(element, [nonce]) {
-    if (nonce !== this.currentNonce) {
-      this.currentNonce = this.nonce;
-      this.newFieldName = this.args.field.name;
-      // this.newFieldLabel = this.args.field.label;
-      // this.newFieldInstructions = this.args.field.instructions;
-    }
-    return null;
+  get fieldName() {
+    return this.newFieldName || this.args.field.name;
   }
 
   @action
@@ -101,18 +112,6 @@ export default class FieldRenderer extends Component {
 
   get fieldDisplayName() {
     return this.args.field.csTitle || this.args.field.name;
-  }
-
-  @action
-  updateFieldName(newName) {
-    try {
-      this.args.setFieldName(this.args.field.name, newName);
-      this.newFieldName = newName;
-    } catch (e) {
-      console.error(e); // eslint-disable-line no-console
-      this.statusMsg = `field name ${this.args.field.name} was NOT successfully changed: ${e.message}`;
-      return;
-    }
   }
 
   @action
