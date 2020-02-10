@@ -1,6 +1,6 @@
 <div class="cardhost-top-edge {{@mode}}" data-test-cardhost-top-edge>
   {{#if (or (eq @mode "layout") (eq @mode "fields"))}}
-    <div class="card-renderer--top-edge-preview-button">
+    <div class="card-renderer--top-edge-preview-button {{if (eq @mode "fields") "hidden"}}">
       {{!-- TODO: Make this navigate to Preview route --}}
       <LinkTo
         @route="cards.card.view"
@@ -31,33 +31,33 @@
         Field
       </LinkTo>
     </div>
+    <div class="card-renderer--top-edge-size-buttons {{if (eq @mode "fields") "hidden"}}">
+      <button
+        class="ch-button ch-button--icon card-size-btn {{if (eq this.cssModeToggle.width "small") "selected"}}"
+        {{on "click" (fn this.cssModeToggle.setWidth "small")}}
+        aria-label="Show the card in small size"
+        data-test-small-btn
+      >
+        S
+      </button>
+      <button
+        class="ch-button ch-button--icon card-size-btn {{if (eq this.cssModeToggle.width "medium") "selected"}}"
+        {{on "click" (fn this.cssModeToggle.setWidth "medium")}}
+        aria-label="Show the card in medium size"
+        data-test-medium-btn
+      >
+        M
+      </button>
+      <button
+        class="ch-button ch-button--icon card-size-btn {{if (eq this.cssModeToggle.width "large") "selected"}}"
+        {{on "click" (fn this.cssModeToggle.setWidth "large")}}
+        aria-label="Show the card in full width size"
+        data-test-large-btn
+      >
+        L
+      </button>
+    </div>
     <div class="card-renderer--top-edge-buttons">
-      <div class="card-size-buttons">
-        <button
-          class="ch-button ch-button--icon card-size-btn {{if (eq this.cssModeToggle.width "small") "selected"}}"
-          {{on "click" (fn this.cssModeToggle.setWidth "small")}}
-          aria-label="Show the card in small size"
-          data-test-small-btn
-        >
-          S
-        </button>
-        <button
-          class="ch-button ch-button--icon card-size-btn {{if (eq this.cssModeToggle.width "medium") "selected"}}"
-          {{on "click" (fn this.cssModeToggle.setWidth "medium")}}
-          aria-label="Show the card in medium size"
-          data-test-medium-btn
-        >
-          M
-        </button>
-        <button
-          class="ch-button ch-button--icon card-size-btn {{if (eq this.cssModeToggle.width "large") "selected"}}"
-          {{on "click" (fn this.cssModeToggle.setWidth "large")}}
-          aria-label="Show the card in full width size"
-          data-test-large-btn
-        >
-          L
-        </button>
-      </div>
       <div class="mode-indicator">
         <span class="mode-indicator--label">
           {{svg-jar "edit" width="13px" height="13px"}}
@@ -79,7 +79,7 @@
         {{svg-jar "actions" width="16px" height="16px"}}
       </Cta>
     </div>
-  {{else}}
-    {{yield}}
   {{/if}}
+
+  {{yield}}
 </div>

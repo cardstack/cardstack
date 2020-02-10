@@ -2,10 +2,12 @@
   height: var(--ch-top-edge-height);
   position: fixed;
   top: 0;
-  right: 0;
-  left: 0;
-  display: flex;
-  justify-content: center;
+  right: var(--ch-spacing);
+  left: var(--ch-left-edge-navbar-width);
+  display: grid;
+  grid-template-columns: auto 1fr auto var(--ch-right-edge-panel-width);
+  grid-gap: var(--ch-spacing);
+  justify-items: center;
   align-items: center;
   text-align: right;
   z-index: var(--ch-top-edge-z-index);
@@ -26,21 +28,33 @@
   background-color: var(--ch-deep-background);
 }
 
+.cardhost-top-edge.add + .card-renderer--top-edge-buttons,
+.cardhost-top-edge.adopt + .card-renderer--top-edge-buttons,
+.cardhost-top-edge.schema + .card-renderer--top-edge-buttons {
+  position: fixed;
+  top: var(--ch-spacing);
+  right: var(--ch-spacing);
+}
+
 .cardhost-top-edge.themer {
   background-color: var(--ch-dark-background);
 }
 
 .card-renderer--top-edge-preview-button {
-  position: fixed;
-  top: var(--ch-spacing);
-  left: var(--ch-left-edge-navbar-width);
   z-index: var(--ch-actions-z-index);
 }
 
+.card-renderer--top-edge-preview-button,
+.card-renderer--top-edge-size-buttons {
+  transition: visibility 0.3s ease;
+}
+
+.card-renderer--top-edge-preview-button.hidden,
+.card-renderer--top-edge-size-buttons.hidden {
+  visibility: collapse;
+}
+
 .card-renderer--top-edge-buttons {
-  position: fixed;
-  top: var(--ch-spacing);
-  right: var(--ch-spacing);
   display: flex;
   z-index: var(--ch-actions-z-index);
 }
@@ -90,11 +104,41 @@
   margin-right: 9px;
 }
 
+@media (max-width: 1010px) {
+  .cardhost-top-edge {
+    grid-template-columns: auto 1fr var(--ch-right-edge-panel-width);
+  }
 
-@media (max-width: 1440px) {
-  .cardhost-top-edge.view,
-  .cardhost-top-edge.edit {
-    --padding-left: var(--ch-left-edge-navbar-width);
+  .card-renderer--top-edge-size-buttons {
+    position: absolute;
+    top: var(--ch-top-edge-height);
+    left: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  .cardhost-top-edge {
+    grid-template-columns: auto auto auto;
+    grid-gap: 10px;
+  }
+
+  .card-renderer--top-edge-buttons .mode-indicator,
+  .card-renderer--top-edge-size-buttons {
+    display: none;
+  }
+
+  .view-selector {
+    width: 280px;
+  }
+
+  .preview-link.cs-component-cta.primary {
+    min-width: 105px;
+    text-align: right;
+  }
+
+  .save-button.cs-component-cta.primary {
+    min-width: 100px;
+    margin-left: 0;
   }
 }
 
