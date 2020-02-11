@@ -8,15 +8,25 @@
       class="cardhost-left-edge--nav {{@mode}} {{if this.isExpanded "expanded"}}"
     >
       <ul>
+        <li>
+          <LinkTo
+            @route="index"
+            class="cardhost-left-edge--nav-button cardstack-logo-button"
+            title="Homepage"
+            data-test-home-link
+          >
+            {{svg-jar "cardstack-logo" width="21px" height="23px"}}
+          </LinkTo>
+        </li>
         <li class="login-grid">
           <button
-            class="cardhost-left-edge--nav-button cardstack-logo-button"
+            class="cardhost-left-edge--nav-button profile-button"
             aria-label="expandable menu with login controls"
             aria-expanded={{this.isExpanded}}
             {{on "click" this.toggleMenuExpand}}
             data-test-toggle-left-edge
           >
-            {{svg-jar "cardstack-logo" width="21px" height="23px"}}
+            {{svg-jar "user" width="18px" height="20px"}}
           </button>
           {{#if this.isExpanded}}
             <div

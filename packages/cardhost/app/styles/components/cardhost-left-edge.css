@@ -32,10 +32,6 @@
   margin-top: 20px;
 }
 
-.cardhost-left-edge--nav li:first-child {
-  margin-bottom: auto;
-}
-
 .cardhost-left-edge--nav li .ch-button--icon-secondary {
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
 }
@@ -98,6 +94,7 @@
   display: grid;
   grid-template-columns: 40px auto;
   grid-column-gap: 50px;
+  margin-bottom: auto; /* push it to the top of the flexbox nav */
 }
 
 .cardhost-left-edge-login-buttons {
