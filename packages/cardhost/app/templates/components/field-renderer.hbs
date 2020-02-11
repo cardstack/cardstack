@@ -122,14 +122,14 @@
             <Checkbox
               @theme="cs-dark"
               @label="Available When Embedded"
-              @checked={{@field.neededWhenEmbedded}}
-              @setChecked={{fn @setNeededWhenEmbedded this.fieldName}}
+              @checked={{this.neededWhenEmbedded}}
+              @setChecked={{perform @setNeededWhenEmbedded this.currentFieldName}}
               @disabled={{@field.isAdopted}} />
           {{else}}
             <div class="field-renderer--display">
               <span class="field-renderer--display-label">Available When Embedded</span>
               <span data-test-field-renderer-embedded>
-                {{if @field.neededWhenEmbedded "true" "false"}}
+                {{if this.neededWhenEmbedded "true" "false"}}
               </span>
             </div>
           {{/if}}

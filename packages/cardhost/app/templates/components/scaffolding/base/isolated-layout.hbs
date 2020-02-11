@@ -8,6 +8,7 @@
       {{#if @setFieldValue}}
         <FieldRenderer
           @field={{field}}
+          @card={{@card}}
           @mode={{@mode}}
           @setFieldValue={{fn @setFieldValue field.name}}
           @selectField={{@selectField}}
@@ -17,6 +18,7 @@
       {{else if (or @setNeededWhenEmbedded @setPosition @removeField @setFieldName)}}
         <FieldRenderer
           @field={{field}}
+          @card={{@card}}
           @mode={{@mode}}
           @dropField={{@dropField}}
           @removeField={{@removeField}}

@@ -13,8 +13,7 @@ export default class FieldRenderer extends Component {
   @tracked newFieldInstructions;
   @tracked fieldValue;
   @tracked fieldType;
-  @tracked currentNonce;
-  @tracked renderNonce;
+  @tracked neededWhenEmbedded;
 
   constructor(...args) {
     super(...args);
@@ -23,6 +22,10 @@ export default class FieldRenderer extends Component {
     this.currentFieldName = this.args.field.name;
     this.newFieldLabel = this.args.field.csTitle;
     this.newFieldInstructions = this.args.field.csDescription;
+    this.neededWhenEmbedded =
+      this.args.card.csFieldSets && Array.isArray(this.args.card.csFieldSets.embedded)
+        ? this.args.card.csFieldSets.embedded.includes(this.args.field.name)
+        : false;
     this.loadField.perform();
   }
 
