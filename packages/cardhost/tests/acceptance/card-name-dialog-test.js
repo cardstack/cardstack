@@ -51,7 +51,7 @@ module('Acceptance | card name dialog', function(hooks) {
     await percySnapshot([assert.test.module.name, assert.test.testName, 'new card dialog'].join(' | '));
     await setCardName(card1Name);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields/schema`);
     assert.dom('[data-test-field]').doesNotExist();
   });
 });

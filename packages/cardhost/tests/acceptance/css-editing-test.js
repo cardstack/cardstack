@@ -102,7 +102,6 @@ module('Acceptance | css editing', function(hooks) {
 
     assert.equal(currentURL(), `/cards/${card1Id}/edit/layout`);
     assert.dom(`[data-test-card-view="${card1Id}"]`).exists();
-    assert.dom('[data-test-card-renderer-isolated]').hasClass('selected');
     await click('[data-test-card-custom-style-button]');
     assert.dom('[data-test-editor-pane]').exists();
   });
@@ -118,7 +117,6 @@ module('Acceptance | css editing', function(hooks) {
     assert.equal(currentURL(), `/cards/${card1Id}/edit/layout`);
     assert.dom('[data-test-editor-pane]').doesNotExist();
     assert.dom('[data-test-card-custom-style-button]').exists();
-    assert.dom('[data-test-card-renderer-isolated]').hasClass('selected');
   });
 
   test('hiding the editor', async function(assert) {

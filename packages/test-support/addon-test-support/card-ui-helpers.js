@@ -62,7 +62,6 @@ export async function createCards(args) {
     await click('[data-test-library-button]');
     await click('[data-test-library-new-blank-card-btn]');
     await setCardName(id);
-    await click('[data-test-configure-schema-btn]');
 
     for (let [index, [name, type, neededWhenEmbedded]] of args[id].entries()) {
       await addField(name, type, neededWhenEmbedded, index);
