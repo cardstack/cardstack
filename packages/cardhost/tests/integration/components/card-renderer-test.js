@@ -454,7 +454,7 @@ module('Integration | Component | card-renderer', function(hooks) {
   test('isolated card can be selected', async function(assert) {
     let service = this.owner.lookup('service:data');
     let card = service.createCard(qualifiedCard1Id);
-    this.set('cardSelected', true);
+    card.isSelected = true;
     this.set('card', card);
 
     await render(hbs`
