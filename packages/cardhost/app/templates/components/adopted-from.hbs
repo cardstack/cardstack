@@ -11,29 +11,30 @@
     />
     <div class="adopted-card--text">
       <span data-test-adopted-card-name>
-        {{if
-          (eq @card.name "@cardstack/base-card")
-          "Base Card"
-          @card.name
-        }}
+        {{@card.csTitle}}
       </span>
-      {{#if @card.adoptedFromName}}
+      {{#if @parentCard}}
         <div class="adopted-card--view">
           <span
             class="adopted-card--view-text"
             data-test-adopted-card-adopted-card-name
           >
-            {{if
-              (eq @card.adoptedFromName "@cardstack/base-card")
-              "Base Card"
-              @card.adoptedFromName
-            }}
+            {{@parentCard.csTitle}}
           </span>
         </div>
       {{/if}}
     </div>
   </div>
   <div class="section-btn-container">
+    {{!-- Changing the parent card is not yet really supported in new-hub.
+    It can technically happen, be we haven't put in place all the guardrails
+    to effectively migrate your card's data into a different card type if
+    there are field conflicts. And changing the parent card of your card to
+    the base card, specifically, seems unuseful if there is not yet a way to
+    set more specific card as your parent as a second step. it will be a
+    bunch of engineering work for questionable user benefit. Let's just
+    hold off until we can do the actual thing here.
+
     <button
       class={{concat
         "section-btn "
@@ -45,5 +46,6 @@
     >
       Remove
     </button>
+    --}}
   </div>
 {{/if}}

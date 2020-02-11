@@ -23,24 +23,24 @@
     <div class="ch-catalog--content" tabindex="0">
       <div class="ch-catalog--fields">
         {{!-- Eventually this will be a search that allows you to find cards to use for your card's fields --}}
-        {{#unless this.loadFieldCards.isRunning}}
-          {{#each this.fieldCards as |field|}}
+        {{#unless this.load.isRunning}}
+          {{#each this.catalogEntries as |entry|}}
             <div
               class="ch-catalog-field"
               role="button"
               draggable="true"
-              {{on "mousedown" (action this.initDrag field)}}
+              {{on "mousedown" (action this.initDrag entry)}}
               {{on "dragend" (action (mut this.isDragging) false)}}
-              {{on "dragstart" (action this.startDragging field)}}
-              data-test-card-add-field-draggable={{field.canonicalURL}}
+              {{on "dragstart" (action this.startDragging entry)}}
+              data-test-card-add-field-draggable={{entry.canonicalURL}}
             >
               <div class="ch-catalog-field--icon">
                 {{!-- TODO need to add card icon to the API and render here --}}
               </div>
               <div>
-                <h4 class="ch-catalog-field--title">{{field.csTitle}}</h4>
-                {{#if field.csDescription}}
-                  <p class="ch-catalog-field--description">{{field.csDescription}}</p>
+                <h4 class="ch-catalog-field--title">{{entry.csTitle}}</h4>
+                {{#if entry.csDescription}}
+                  <p class="ch-catalog-field--description">{{entry.csDescription}}</p>
                 {{/if}}
               </div>
             </div>
@@ -51,16 +51,20 @@
   </section>
 </CardhostLeftEdge>
 
-<RightEdge
-  @card={{this.card}}
-  @mode="schema"
-  @selectedField={{this.selectedField}}
-  @selectedFieldName={{this.selectedFieldName}}
-  @selectField={{action this.selectField}}
-  @setFieldCardValue={{this.setFieldCardValue}}
-  @setNeededWhenEmbedded={{this.setNeededWhenEmbedded}}
-  @setFieldName={{this.setFieldName}}
-  @cardSelected={{this.cardSelected}} />
+{{#unless this.load.isRunning}}
+  <RightEdge
+    @card={{this.card}}
+    @mode="schema"
+    @parentCard={{this.parentCard}}
+    @grandParentCard={{this.grandParentCard}}
+    @selectedField={{this.selectedField}}
+    @selectedFieldName={{this.selectedFieldName}}
+    @selectField={{action this.selectField}}
+    @setFieldCardValue={{this.setFieldCardValue}}
+    @setNeededWhenEmbedded={{this.setNeededWhenEmbedded}}
+    @setFieldName={{this.setFieldName}}
+    @cardSelected={{this.cardSelected}} />
+{{/unless}}
 
 <section class="card-schema-updator" data-test-card-schema={{@card.name}} {{did-update this.updateCard @card}}>
   <CardRenderer

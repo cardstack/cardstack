@@ -18,6 +18,9 @@ export default class CardManipulator extends Component {
 
   @tracked statusMsg;
   @tracked card;
+  @tracked catalogEntries;
+  @tracked parentCard;
+  @tracked grandParentCard;
   @tracked selectedField;
   @tracked selectedFieldName;
   @tracked isDragging;
@@ -29,7 +32,7 @@ export default class CardManipulator extends Component {
     super(...args);
 
     this.card = this.args.card;
-    this.loadFieldCards.perform();
+    this.load.perform();
   }
 
   get cardJson() {
@@ -93,9 +96,15 @@ export default class CardManipulator extends Component {
   handleNewFieldAdded;
 
   @task(function*() {
-    this.fieldCards = yield fieldCards(this.data);
+    let [catalogEntries, parentCard] = yield Promise.all([fieldCards(this.data), this.args.card.adoptsFrom()]);
+
+    this.catalogEntries = catalogEntries;
+    this.parentCard = parentCard;
+    if (parentCard) {
+      this.grandParentCard = yield parentCard.adoptsFrom();
+    }
   })
-  loadFieldCards;
+  load;
 
   @(task(function*(doc) {
     return yield this.card.patch(doc.jsonapi);
