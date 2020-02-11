@@ -64,10 +64,9 @@ module('Acceptance | library', function(hooks) {
     this.owner.lookup('service:card-local-storage').clearIds();
   });
 
-  test(`viewing library`, async function(assert) {
+  test(`viewing library from index page`, async function(assert) {
     await visit(`/`);
     assert.dom('[data-test-library-button]').exists();
-    assert.dom('[data-test-library-link]').doesNotExist();
     await click('[data-test-library-button]');
     assert.dom('[data-test-library]').exists();
     assert.dom(`[data-test-embedded-card=${card1Id}]`).exists();
@@ -108,22 +107,6 @@ module('Acceptance | library', function(hooks) {
     await waitFor(`[data-test-card-view=${card2Id}]`, {
       timeout,
     });
-
     await percySnapshot(assert);
-  });
-
-  test('can navigate to index route via library link from other routes', async function(assert) {
-    await visit(`/cards/${card1Id}`);
-    assert.equal(currentURL(), `/cards/${card1Id}`);
-    await waitFor(`[data-test-card-view=${card1Id}]`, {
-      timeout,
-    });
-    assert.dom('[data-test-library-button]').doesNotExist();
-    assert.dom('[data-test-library-link]').exists();
-    await click('[data-test-library-link]');
-    assert.equal(currentURL(), '/');
-    assert.dom('[data-test-featured-card]').exists({ count: 4 });
-    assert.dom('[data-test-library-button]').exists();
-    assert.dom('[data-test-library-link]').doesNotExist();
   });
 });

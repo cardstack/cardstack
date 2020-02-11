@@ -69,26 +69,15 @@
           </button>
         </li>
         <li>
-          {{#if @displayLibrary}}
-            <button
-              {{on "click" this.showLibrary}}
-              disabled={{not session.isAuthenticated}}
-              class="cardhost-left-edge--nav-button"
-              aria-label="library"
-              data-test-library-button
-            >
-              {{svg-jar "library" width="21px" height="21px"}}
-            </button>
-          {{else}}
-            <LinkTo
-              @route="index"
-              data-test-library-link
-              class="cardhost-left-edge--nav-button library-button"
-              title="Homepage"
-            >
-              {{svg-jar "library" width="21px" height="21px"}}
-            </LinkTo>
-          {{/if}}
+          <button
+            {{on "click" this.showLibrary}}
+            disabled={{not session.isAuthenticated}}
+            class="cardhost-left-edge--nav-button"
+            aria-label="library"
+            data-test-library-button
+          >
+            {{svg-jar "library" width="21px" height="21px"}}
+          </button>
         </li>
       </ul>
     </nav>
