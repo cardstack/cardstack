@@ -8925,6 +8925,16 @@ ember-toolbars@^0.5.1:
     ember-elsewhere "^1.1.0"
     liquid-fire "^0.30.0"
 
+ember-toolbars@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/ember-toolbars/-/ember-toolbars-0.6.0.tgz#0dca9479630e5f3079c8b8956e1540d5a6543efc"
+  integrity sha512-nil5uxYIAH6dLI2xTzuaOmNXrCIL+jUDjBiE2rsjDXpeTTiTxa2LJmefcYLWwUF2zVEmlsV6MmoL94Um55ip5g==
+  dependencies:
+    ember-cli-babel "^7.13.0"
+    ember-cli-htmlbars "^4.2.0"
+    ember-elsewhere "^1.1.0"
+    liquid-fire "^0.31.0"
+
 ember-truth-helpers@^2.0.0, ember-truth-helpers@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/ember-truth-helpers/-/ember-truth-helpers-2.1.0.tgz#d4dab4eee7945aa2388126485977baeb33ca0798"
@@ -12643,6 +12653,20 @@ liquid-fire@^0.30.0:
     ember-cli-htmlbars "^3.0.1"
     ember-cli-version-checker "^3.1.3"
     ember-copy "^1.0.0"
+    match-media "^0.2.0"
+    velocity-animate "^1.5.2"
+
+liquid-fire@^0.31.0:
+  version "0.31.0"
+  resolved "https://registry.yarnpkg.com/liquid-fire/-/liquid-fire-0.31.0.tgz#6dc9f4785b5a06dcbe1a7ca4e8b130ac595ee2f5"
+  integrity sha512-KVI2vBB+6I1kvkOSD/S/Vjq5hYqlFw3zBLiRoCSIDj9LMWmm2GEKvQcmpxiqgsdjMS2VAFaqUd+9BJFRvCmIjA==
+  dependencies:
+    broccoli-funnel "^2.0.2"
+    broccoli-merge-trees "^3.0.2"
+    broccoli-stew "^2.1.0"
+    ember-cli-babel "^7.7.3"
+    ember-cli-htmlbars "^3.0.1"
+    ember-cli-version-checker "^3.1.3"
     match-media "^0.2.0"
     velocity-animate "^1.5.2"
 
