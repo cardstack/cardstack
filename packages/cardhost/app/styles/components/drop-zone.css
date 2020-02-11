@@ -5,9 +5,9 @@
 
 .drop-zone {
   width: 100%;
-  height: 50px;
+  height: 150px;
   position: absolute;
-  top: -25px;
+  top: -75px;
   z-index: 100;
 }
 
@@ -17,7 +17,7 @@
 }
 
 .drop-zone--container.dragging .drop-zone {
-  height: 170px;
+  height: 270px;
 }
 
 .drop-zone--container .drop-zone--description .drop-zone--preview--container {
