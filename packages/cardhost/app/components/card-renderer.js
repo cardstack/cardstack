@@ -6,12 +6,14 @@ import { action } from '@ember/object';
 import move from 'ember-animated/motions/move';
 import adjustCSS from 'ember-animated/motions/adjust-css';
 import { inject as service } from '@ember/service';
+import ENV from '@cardstack/cardhost/config/environment';
 
 // TODO we'll need to use EC in order to be able to isolate cards
 // (due to the need to await the load of the isolated format of a card)
 // import { task } from "ember-concurrency";
+const { animationSpeed } = ENV;
+const duration = animationSpeed || 250;
 
-const duration = 250;
 // TODO This will be part of the official API. Move this into core as it solidifies
 export default class CardRenderer extends Component {
   @service cardstackSession;
