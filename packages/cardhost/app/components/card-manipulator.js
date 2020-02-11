@@ -276,6 +276,8 @@ export default class CardManipulator extends Component {
       } else {
         // we mouseup somewhere that isn't a dropzone
         draggableService.clearField();
+        // we do this so that we can animate the field back to the left edge
+        this.fieldComponents = this.fieldComponents.map(obj => obj); // oh glimmer, you so silly...
       }
 
       window.removeEventListener('mouseup', stopMouse);
@@ -286,8 +288,6 @@ export default class CardManipulator extends Component {
       if (ghostEl) {
         ghostEl.remove();
       }
-
-      this.fieldComponents = this.fieldComponents.map(obj => obj); // oh glimmer, you so silly...
 
       return false;
     }
