@@ -209,7 +209,7 @@ module('Acceptance | card adoption', function(hooks) {
     await saveCard();
     assert.equal(currentURL(), `/cards/${card2Id}/edit/fields`);
 
-    await click('[data-test-top-edge-link="view"]');
+    await click('[data-test-mode-indicator-link="view"]');
     await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
     assert.dom('[data-test-field="treats-available"] [data-test-boolean-field-viewer-value]').hasText('Yes');
     assert.dom('[data-test-field="address"] [data-test-string-field-viewer-value]').hasText('105 Barkley Lane');

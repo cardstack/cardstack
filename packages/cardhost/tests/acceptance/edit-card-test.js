@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { find, visit, currentURL } from '@ember/test-helpers';
+import { find, visit, currentURL, click } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures';
 import { setFieldValue, createCards, saveCard } from '@cardstack/test-support/card-ui-helpers';
@@ -305,6 +305,47 @@ module('Acceptance | card edit', function(hooks) {
     let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.rsvp, 'https://example.com/new-rsvp');
+  });
+
+  test(`displays fields mode top edge`, async function(assert) {
+    await login();
+    await createCards({
+      [card1Id]: [['body', 'string', false, 'test body']],
+    });
+    await visit(`/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+
+    assert.dom('[data-test-cardhost-top-edge]').exists();
+    assert.dom('[data-test-top-edge-preview-link]').isNotVisible();
+    assert.dom('[data-test-top-edge-size-buttons]').isNotVisible();
+    assert.dom('[data-test-view-selector]').exists();
+    assert.dom('[data-test-view-selector="fields"]').hasClass('active');
+    assert.dom('[data-test-mode-indicator]').exists();
+    assert.dom('[data-test-mode-indicator-label]').hasClass('edit');
+
+    await click('[data-test-mode-indicator-link="view"]');
+    assert.equal(currentURL(), `/cards/${card1Id}`);
+  });
+
+  test(`displays layout mode top edge`, async function(assert) {
+    await login();
+    await createCards({
+      [card1Id]: [['body', 'string', false, 'test body']],
+    });
+    await visit(`/cards/${card1Id}/edit/layout`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/layout`);
+
+    assert.dom('[data-test-cardhost-top-edge]').exists();
+    assert.dom('[data-test-top-edge-preview-link]').isVisible();
+    assert.dom('[data-test-top-edge-size-buttons]').isVisible();
+    assert.dom('[data-test-view-selector]').exists();
+    assert.dom('[data-test-view-selector="layout"]').hasClass('active');
+    assert.dom('[data-test-mode-indicator]').exists();
+    assert.dom('[data-test-mode-indicator-label]').hasClass('edit');
+    assert.dom('[data-test-actions-btn]').exists();
+
+    await click('[data-test-mode-indicator-link="view"]');
+    assert.equal(currentURL(), `/cards/${card1Id}`);
   });
 
   test(`displays the right edge`, async function(assert) {

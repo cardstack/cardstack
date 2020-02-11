@@ -1,6 +1,6 @@
 <div class="cardhost-top-edge {{@mode}}" data-test-cardhost-top-edge>
   {{#if (or (eq @mode "layout") (eq @mode "fields"))}}
-    <div class="card-renderer--top-edge-preview-button {{if (eq @mode "fields") "hidden"}}">
+    <div class="card-renderer--top-edge-preview-button {{if (eq @mode "fields") "hidden"}}" data-test-top-edge-preview-link>
       {{!-- TODO: Make this navigate to Preview route --}}
       <LinkTo
         @route="cards.card.view"
@@ -11,7 +11,7 @@
         Preview
       </LinkTo>
     </div>
-    <div class="view-selector">
+    <div class="view-selector" data-test-view-selector>
       <LinkTo
         @route="cards.card.edit.layout"
         @class="view-selector--mode-link"
@@ -31,7 +31,7 @@
         Field
       </LinkTo>
     </div>
-    <div class="card-renderer--top-edge-size-buttons {{if (eq @mode "fields") "hidden"}}">
+    <div class="card-renderer--top-edge-size-buttons {{if (eq @mode "fields") "hidden"}}" data-test-top-edge-size-buttons>
       <button
         class="ch-button ch-button--icon card-size-btn {{if (eq this.cssModeToggle.width "small") "selected"}}"
         {{on "click" (fn this.cssModeToggle.setWidth "small")}}
@@ -58,21 +58,11 @@
       </button>
     </div>
     <div class="card-renderer--top-edge-buttons">
-      <div class="mode-indicator">
-        <span class="mode-indicator--label">
-          {{svg-jar "edit" width="13px" height="13px"}}
-          Edit Mode
-        </span>
-        <LinkTo
-          title="Close edit mode"
-          @route="cards.card.view"
-          @class="mode-indicator--link"
-          @model={{@card}}
-          data-test-top-edge-link="view"
-        >
-          <span>View</span>
-        </LinkTo>
-      </div>
+      <ModeIndicator
+        @card={{@card}}
+        @route="cards.card.view"
+        @mode="edit"
+        @linkTo="view" />
       <SaveButton @card={{@card}} />
       {{!-- TODO: Make this open the Actions menu --}}
       <Cta @variant="primary" class="edge-actions-button" data-test-edge-actions-btn>
