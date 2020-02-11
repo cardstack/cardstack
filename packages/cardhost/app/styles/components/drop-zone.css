@@ -5,9 +5,9 @@
 
 .drop-zone {
   width: 100%;
-  height: 150px;
+  height: 50px;
   position: absolute;
-  top: -75px;
+  top: -25px;
   z-index: 100;
 }
 
@@ -16,14 +16,24 @@
   background-color: var(--ch-light-background);
 }
 
-.drop-zone--container.dragging .drop-zone {
+/* ember-animated drag has started */
+.cardhost-cards.dragging .drop-zone--container .drop-zone {
+  top: -75px;
+}
+
+/* ember-animated drag has started, but is not yet over a dropzone */
+.cardhost-cards.dragging .drop-zone--container:not(.dragging) .drop-zone {
+  height: 150px;
+}
+
+/* ember-animated drag has started, and is over a dropzone */
+.cardhost-cards.dragging .drop-zone--container.dragging .drop-zone {
   height: 270px;
 }
 
-/*  if we're not dragging a field, drop-zone shouldn't accept
-    mouse events so that we can click on an existing field */
-.cardhost-cards:not(.dragging) .drop-zone--container .drop-zone {
-  pointer-events: none;
+/* native drag has started, and is over a dropzone */
+.cardhost-cards:not(.dragging) .drop-zone--container.dragging .drop-zone {
+  height: 170px;
 }
 
 .drop-zone--container .drop-zone--description .drop-zone--preview--container {
