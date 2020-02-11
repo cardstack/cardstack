@@ -20,6 +20,12 @@
   height: 270px;
 }
 
+/*  if we're not dragging a field, drop-zone shouldn't accept
+    mouse events so that we can click on an existing field */
+.cardhost-cards:not(.dragging) .drop-zone--container .drop-zone {
+  pointer-events: none;
+}
+
 .drop-zone--container .drop-zone--description .drop-zone--preview--container {
   pointer-events: none;
 }
