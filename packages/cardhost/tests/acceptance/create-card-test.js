@@ -40,9 +40,7 @@ module('Acceptance | card create', function(hooks) {
     await visit('/cards/new');
     await setCardName(card1Name);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
-
-    await click('[data-test-configure-schema-btn]');
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields/schema`);
 
     assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('Base Card');
     assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').doesNotExist();
@@ -55,8 +53,7 @@ module('Acceptance | card create', function(hooks) {
     await percySnapshot([assert.test.module.name, assert.test.testName, 'new'].join(' | '));
     await setCardName(card1Name);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
-    await click('[data-test-configure-schema-btn]');
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields/schema`);
 
     assert.dom('.card-renderer-isolated--header').containsText('millenial-puppies');
 
@@ -124,8 +121,7 @@ module('Acceptance | card create', function(hooks) {
     await click('[data-test-library-new-blank-card-btn]');
     await setCardName(card1Name);
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
-    await click('[data-test-configure-schema-btn]');
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields/schema`);
 
     assert.dom('.card-renderer-isolated--header').includesText('millenial-puppies');
 
@@ -144,7 +140,6 @@ module('Acceptance | card create', function(hooks) {
     await visit('/cards/new');
 
     await setCardName(card1Name);
-    await click('[data-test-configure-schema-btn]');
     await addField('title', 'string', true);
     await addField('body', 'string', false);
 
@@ -195,7 +190,6 @@ module('Acceptance | card create', function(hooks) {
     await visit('/cards/new');
 
     await setCardName(card1Name);
-    await click('[data-test-configure-schema-btn]');
     await addField('title', 'string', true);
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('title');
@@ -230,7 +224,6 @@ module('Acceptance | card create', function(hooks) {
     await visit('/cards/new');
 
     await setCardName(card1Name);
-    await click('[data-test-configure-schema-btn]');
     await addField('title', 'string', true);
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('title');
@@ -251,7 +244,6 @@ module('Acceptance | card create', function(hooks) {
     await login();
     await visit('/cards/new');
     await setCardName(card1Name);
-    await click('[data-test-configure-schema-btn]');
     await addField('title', 'string', true);
     await removeField('title');
     assert.dom('.cardhost-right-edge-panel [data-test-field]').doesNotExist();
@@ -264,7 +256,6 @@ module('Acceptance | card create', function(hooks) {
     await visit('/cards/new');
 
     await setCardName(card1Name);
-    await click('[data-test-configure-schema-btn]');
     await addField('', 'string', true);
     assert.dom('[data-test-isolated-card] [data-test-field').exists({ count: 1 });
 
@@ -280,7 +271,6 @@ module('Acceptance | card create', function(hooks) {
     assert.equal(currentURL(), '/cards/new');
 
     await setCardName(card1Name);
-    await click('[data-test-configure-schema-btn]');
     await addField('title', 'string', true);
     await addField('body', 'string', false, 1);
     await addField('author', 'string', false, 1);

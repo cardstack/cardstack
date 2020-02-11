@@ -13,7 +13,7 @@ Ember Concurrency into the rendering of the card component here.
           {{this.mode}}
           {{safe-css-string @card.adoptedFromName}}
           {{safe-css-string @card.name}}
-          {{if (and this.cardstackSession.isAuthenticated @card.isSelected) "selected"}}
+          {{if (and this.cardstackSession.isAuthenticated @cardSelected) "selected"}}
           {{if this.fields.length "has-fields" "no-fields"}}
           {{@class}}
         "
@@ -25,7 +25,7 @@ Ember Concurrency into the rendering of the card component here.
       >
         {{#if (eq @mode "view")}}
           {{#animated-value @card watch="isSelected" use=this.headerAnimation}}
-            <CardRendererHeader 
+            <CardRendererHeader
               @cardSelected={{if (and this.cardstackSession.isAuthenticated @card.isSelected) true}}
               @card={{@card}}
               @buttonRoute="cards.card.edit.fields"
