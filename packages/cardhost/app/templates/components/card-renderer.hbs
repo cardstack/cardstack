@@ -26,7 +26,7 @@ Ember Concurrency into the rendering of the card component here.
         {{#if (eq @mode "view")}}
           {{#animated-value @card watch="isSelected" use=this.headerAnimation}}
             <CardRendererHeader
-              @cardSelected={{if (and this.cardstackSession.isAuthenticated @card.isSelected) true}}
+              @cardSelected={{if (and this.cardstackSession.isAuthenticated @cardSelected) true}}
               @card={{@card}}
               @buttonRoute="cards.card.edit.fields"
               @buttonText="Edit"

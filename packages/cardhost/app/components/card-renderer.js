@@ -80,10 +80,6 @@ export default class CardRenderer extends Component {
     return `cards/${dasherize(this.sanitizedName)}/isolated`;
   }
 
-  get showEditMode() {
-    return this.cardstackSession.isAuthenticated && this.args.card.isSelected;
-  }
-
   *headerAnimation({ keptSprites }) {
     keptSprites.forEach(sprite => {
       move(sprite, { duration });
