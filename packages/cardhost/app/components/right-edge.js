@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action, set } from '@ember/object';
+import { task } from 'ember-concurrency';
 import fade from 'ember-animated/transitions/fade';
 import resize from 'ember-animated/motions/resize';
 import { easeInAndOut } from 'ember-animated/easings/cosine';
@@ -48,14 +49,13 @@ export default class RightEdge extends Component {
     set(this.options, 'selectedContent', cardSelected ? 'card' : 'field');
   }
 
-  @action
-  updateCardName(name) {
-    if (!this.args.setFieldValue) {
+  @(task(function*(name) {
+    if (!this.args.setCardValue) {
       return;
     }
-
-    this.args.setFieldValue('csTitle', name);
-  }
+    yield this.args.setCardValue.perform('csTitle', name);
+  }).restartable())
+  updateCardName;
 
   @action
   toggleSection(section) {

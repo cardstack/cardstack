@@ -147,8 +147,7 @@
   {{#if (and (not-eq @mode "view") (not-eq @mode "layout"))}}
     <div class="field--action">
       {{#if (and @removeField (not @field.isAdopted))}}
-        {{!-- using field.nonce in case the user deletes the name of the field --}}
-        <button {{on "click" (fn @removeField @field.nonce)}}
+        <button {{on "click" (perform @removeField this.currentFieldName)}}
           class="field--remove-btn"
           aria-label="Remove"
           data-test-field-renderer-remove-btn

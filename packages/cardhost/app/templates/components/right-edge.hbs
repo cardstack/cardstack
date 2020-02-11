@@ -61,17 +61,21 @@
                           <TextField
                             @theme="cs-dark"
                             @class="hide-in-percy"
-                            @id="card__id"
-                            @label="Card ID"
+                            @id="card_name"
+                            @label="Card Name"
                             @placeholder="e.g. millenial-puppies"
                             @value={{this.cardName}}
-                            @setValue={{action this.updateCardName}}
-                            @disabled={{not @setFieldValue}} />
+                            @setValue={{perform this.updateCardName}}
+                            @disabled={{not @setCardValue}} />
                         </div>
                         <div class="right-edge--item">
-                          <div class="right-edge--label">Internal ID</div>
+                          <div class="right-edge--label">Card ID</div>
                           <div class="hide-in-percy" data-test-internal-card-id>
-                            {{@card.id}}
+                            {{#if @card.canoncalURL}}
+                              {{@card.canonicalURL}}
+                            {{else}}
+                              (save card first)
+                            {{/if}}
                           </div>
                         </div>
                       </div>

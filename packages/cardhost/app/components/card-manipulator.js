@@ -111,6 +111,7 @@ export default class CardManipulator extends Component {
   }).enqueue())
   patchCard;
 
+  // TODO rework for new API
   @task(function*() {
     this.statusMsg = null;
     try {
@@ -155,6 +156,15 @@ export default class CardManipulator extends Component {
   }).restartable())
   setFieldCardValue;
 
+  @(task(function*(field, value) {
+    let doc = this.card.document.withAttributes({
+      [field]: value,
+    });
+    let patchedCard = yield this.patchCard.perform(doc);
+    this.card = patchedCard;
+  }).restartable())
+  setCardValue;
+
   @(task(function*(fieldName, neededWhenEmbedded, evt) {
     // this prevents 2-way data binding from trying to alter the Field
     // instance's neededWhenEmbedded value, which is bound to the input
@@ -186,21 +196,26 @@ export default class CardManipulator extends Component {
   }).restartable())
   setNeededWhenEmbedded;
 
-  @action
-  removeField(fieldNonce) {
-    if (fieldNonce == null || !this.card) {
-      return;
+  @(task(function*(fieldName) {
+    let doc = this.card.document;
+    let csFieldSets = cloneDeep(this.card.csFieldSets) || { isolated: [], embedded: [] };
+
+    for (let format of ['isolated', 'embedded']) {
+      if (Array.isArray(csFieldSets[format]) && csFieldSets[format].includes(fieldName)) {
+        csFieldSets[format] = [...csFieldSets[format].filter(i => i !== fieldName)];
+      }
     }
+    doc.withoutField(fieldName).withAttributes({ csFieldSets });
 
-    // using field nonce in order to be resiliant to the scenario where the user deletes the name of the field too
-    let field = this.card.getFieldByNonce(fieldNonce);
-
-    if (field.name === this.selectedField.name) {
+    let patchedCard = yield this.patchCard.perform(doc);
+    this.card = patchedCard;
+    if (this.selectedField.name === fieldName || this.selectedFieldName === fieldName) {
       this.cardSelected = true;
+      this.selectedFieldName = null;
+      this.selectedField = null;
     }
-
-    field.remove();
-  }
+  }).drop())
+  removeField;
 
   @action
   setPosition(fieldName, position) {
@@ -210,24 +225,6 @@ export default class CardManipulator extends Component {
 
     let card = this.card;
     card.moveField(card.getField(fieldName), position);
-  }
-
-  @action
-  setFieldValue(fieldName, value) {
-    if (!fieldName || !this.card) {
-      return;
-    }
-    this.card.getField(fieldName).setValue(value);
-  }
-
-  @action
-  setFieldLabel(fieldName, label) {
-    this.card.getField(fieldName).setLabel(label);
-  }
-
-  @action
-  setFieldInstructions(fieldName, instructions) {
-    this.card.getField(fieldName).setInstructions(instructions);
   }
 
   @action

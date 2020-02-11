@@ -398,25 +398,25 @@
       @field={{this.model.sampleTitleField}}
       @format="isolated"
       @mode="edit"
-      @setFieldValue={{action this.noop}} />
+      @setCardValue={{perform this.noopTask}} />
     <CodeEditor
       @code='<FieldRenderer
   @field=@field
   @format="isolated"
   @mode="edit"
-  @setFieldValue=@setFieldValue />' @language="html" />
+  @setCardValue=@setCardValue />' @language="html" />
 
     <h4>Date Editor</h4>
     <FieldRenderer
       @field={{this.model.sampleDateField}}
       @format="isolated"
       @mode="edit"
-      @setFieldValue={{action this.noop}} />
+      @setCardValue={{perform this.noopTask}} />
     <CodeEditor @code='<FieldRenderer
   @field=@field
   @format="isolated"
   @mode="edit"
-  @setFieldValue=@setFieldValue />' @language="html" />
+  @setCardValue=@setCardValue />' @language="html" />
 
     <h4>Textarea</h4>
     <div class="ui-components--notes">
@@ -439,12 +439,12 @@
       @field={{this.model.sampleLocationField}}
       @format="isolated"
       @mode="edit"
-      @setFieldValue={{action this.noop}} />
+      @setCardValue={{perform this.noopTask}} />
     <CodeEditor @code='<FieldRenderer
   @field=\{{@field}}
   @format="isolated"
   @mode="edit"
-  @setFieldValue=\{{@setFieldValue}} />' @language="html" />
+  @setCardValue=\{{@setCardValue}} />' @language="html" />
 
     <h4>Image</h4>
     <div class="ui-components--notes">
@@ -454,12 +454,12 @@
       @field={{this.model.sampleImageField}}
       @format="isolated"
       @mode="edit"
-      @setFieldValue={{action this.noop}} />
+      @setCardValue={{perform this.noopTask}} />
     <CodeEditor @code='<FieldRenderer
   @field=\{{@field}}
   @format="isolated"
   @mode="edit"
-  @setFieldValue=\{{@setFieldValue}} />' @language="html" />
+  @setCardValue=\{{@setCardValue}} />' @language="html" />
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col" id="card-renderer">
@@ -470,7 +470,7 @@
         @format="isolated"
         @mode="schema"
         @setPosition={{action this.noop}}
-        @removeField={{action this.noop}} />
+        @removeField={{perform this.noopTask}} />
       <CodeEditor @code='<CardRenderer
   @card=@card
   @format="isolated"
@@ -483,13 +483,13 @@
         @card={{this.model}}
         @format="isolated"
         @mode="edit"
-        @setFieldValue={{action this.noop}}
+        @setCardValue={{perform this.noopTask}}
       />
       <CodeEditor @code='<CardRenderer
   @card=@card
   @format="isolated"
   @mode="edit"
-  @setFieldValue=@setFieldValue />' @language="html" />
+  @setCardValue=@setCardValue />' @language="html" />
 
       <h3>View mode</h3>
       <CardRenderer

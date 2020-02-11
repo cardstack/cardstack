@@ -60,6 +60,7 @@
     @selectedField={{this.selectedField}}
     @selectedFieldName={{this.selectedFieldName}}
     @selectField={{action this.selectField}}
+    @setCardValue={{this.setCardValue}}
     @setFieldCardValue={{this.setFieldCardValue}}
     @setNeededWhenEmbedded={{this.setNeededWhenEmbedded}}
     @setFieldName={{this.setFieldName}}
@@ -72,7 +73,7 @@
     @format="isolated"
     @mode="schema"
     @addFieldPromise={{this.addFieldPromise}}
-    @removeField={{action this.removeField}}
+    @removeField={{this.removeField}}
     @selectField={{action this.selectField}}
     @setPosition={{action this.setPosition}}
     @selectedField={{this.selectedField}}

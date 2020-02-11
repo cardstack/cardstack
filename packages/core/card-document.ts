@@ -49,7 +49,13 @@ export class CardDocument {
             this.csFieldValues.set(field, value);
             break;
           case 'csFields':
-            throw new Error(`use .withFields() to set csFields`);
+            for (let [fieldName, fieldCardValue] of Object.entries(value || {})) {
+              if (typeof fieldCardValue !== 'object') {
+                continue;
+              }
+              this.withField(fieldName, cardDocumentFromJsonAPI({ data: { type: 'cards', ...fieldCardValue } }));
+            }
+            break;
           default:
             throw new Error(`unknown cardstack field ${field}`);
         }
@@ -163,6 +169,7 @@ export class CardDocument {
     }
 
     if (fieldCardOrId instanceof CardDocument) {
+      arity = (fieldCardOrId.asCardValue.attributes?.csFieldArity as FieldArity) || arity;
       this.fields.set(name, fieldCardOrId.withAutoAttributes(values).withAttributes({ csFieldArity: arity }));
     } else {
       this.fields.set(
@@ -230,15 +237,13 @@ export class CardDocument {
       };
     }
 
-    if (this.fields.size) {
-      let csFields = Object.create(null);
-      for (let [fieldName, testCard] of this.fields) {
-        if (testCard) {
-          csFields[fieldName] = testCard.asCardValue;
-        }
+    let csFields = Object.create(null);
+    for (let [fieldName, testCard] of this.fields) {
+      if (testCard) {
+        csFields[fieldName] = testCard.asCardValue;
       }
-      doc.data.attributes!.csFields = csFields;
     }
+    doc.data.attributes!.csFields = csFields;
 
     if (this.meta) {
       doc.data.meta = cloneDeep(this.meta);
