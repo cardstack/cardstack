@@ -28,6 +28,7 @@ export default class CardManipulator extends Component {
   @tracked cardId;
   @tracked cardSelected = true;
   @tracked fieldComponents = fieldComponents;
+  @tracked stopMouse;
 
   constructor(...args) {
     super(...args);
@@ -280,7 +281,7 @@ export default class CardManipulator extends Component {
         this.fieldComponents = this.fieldComponents.map(obj => obj); // oh glimmer, you so silly...
       }
 
-      window.removeEventListener('mouseup', stopMouse);
+      window.removeEventListener('mouseup', this.stopMouse);
       window.removeEventListener('mousemove', updateMouse);
 
       // remove ghost element from DOM
@@ -339,7 +340,8 @@ export default class CardManipulator extends Component {
         latestPointerX: dragEvent.x,
         latestPointerY: dragEvent.y,
       };
-      window.addEventListener('mouseup', stopMouse.bind(this));
+      this.stopMouse = stopMouse.bind(this);
+      window.addEventListener('mouseup', this.stopMouse);
       window.addEventListener('mousemove', updateMouse);
     }
     field.dragState = dragState;
