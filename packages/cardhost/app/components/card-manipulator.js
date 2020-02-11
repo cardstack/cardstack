@@ -32,6 +32,7 @@ export default class CardManipulator extends Component {
     super(...args);
 
     this.card = this.args.card;
+    this.originalCard = this.args.card;
     this.load.perform();
   }
 

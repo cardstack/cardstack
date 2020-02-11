@@ -5,7 +5,7 @@
     data-test-embedded-card-mode={{@mode}}>
     <div class={{if (or (eq @mode "view") (eq @mode "layout")) "embedded-card--view-fields"}}>
       {{#each this.fields as | field |}}
-        <FieldRenderer @field={{field}} @mode={{@mode}}/>
+        <FieldRenderer @card={{@card}} @field={{field}} @mode={{@mode}}/>
       {{/each}}
     </div>
   </div>

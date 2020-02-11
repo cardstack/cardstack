@@ -1,7 +1,9 @@
-<TextField
-  @id={{concat "edit-" @field.name "-field-value"}}
-  @className={{if @field.instructions "with-instructions"}}
-  @label={{@field.label}}
-  @helperText={{@field.instructions}}
-  @value={{this.fieldValue}}
-  @setValue={{action this.updateFieldValue}} />
+{{#unless this.load.isRunning}}
+  <TextField
+    @id={{concat "edit-" @card.nonce "-field-value"}}
+    @className={{if @card.csDescription "with-instructions"}}
+    @label={{@card.csTitle}}
+    @helperText={{@card.csDescription}}
+    @value={{this.fieldValue}}
+    @setValue={{perform this.updateFieldValue}} />
+{{/unless}}

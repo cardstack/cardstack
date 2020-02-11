@@ -5,12 +5,12 @@
 >
   <AnimatedContainer class={{if (or (eq @mode "view") (eq @mode "layout")) "isolated-card--view-fields"}}>
     {{#animated-each @fields use=this.transition duration=this.duration as |field|}}
-      {{#if @setFieldValue}}
+      {{#if @setCardValue}}
         <FieldRenderer
           @field={{field}}
           @card={{@card}}
           @mode={{@mode}}
-          @setFieldValue={{fn @setFieldValue field.name}}
+          @setCardValue={{@setCardValue}}
           @selectField={{@selectField}}
           @selectedField={{@selectedField}}
           @selectedFieldName={{@selectedFieldName}}
@@ -31,7 +31,7 @@
           @selectedFieldName={{@selectedFieldName}}
         />
       {{else}}
-        <FieldRenderer @field={{field}} @mode={{@mode}}/>
+        <FieldRenderer @card={{@card}} @field={{field}} @mode={{@mode}}/>
       {{/if}}
     {{/animated-each}}
   </AnimatedContainer>

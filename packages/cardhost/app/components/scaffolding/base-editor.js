@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
+import { task } from 'ember-concurrency';
 
 export default class BaseEditor extends Component {
   @tracked fieldValue;
@@ -8,14 +8,18 @@ export default class BaseEditor extends Component {
   constructor(...args) {
     super(...args);
 
-    if (this.args.field && this.args.field.value) {
-      this.fieldValue = this.args.field.value;
-    }
+    this.load.perform();
   }
 
-  @action
-  updateFieldValue(value) {
+  // Note that this.args.cardcard is actually a FieldCard. Typescript will eventually make this more obvious...
+  @task(function*() {
+    this.fieldValue = yield this.args.card.enclosingCard.value(this.args.card.name);
+  })
+  load;
+
+  @(task(function*(value) {
     this.fieldValue = value;
-    this.args.setFieldValue(value);
-  }
+    yield this.args.setCardValue.perform(this.args.card.name, value);
+  }).restartable())
+  updateFieldValue;
 }
