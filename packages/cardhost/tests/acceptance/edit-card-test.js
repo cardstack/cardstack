@@ -1,6 +1,7 @@
 import { module, test } from 'qunit';
 import { find, visit, currentURL, click } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
+import { percySnapshot } from 'ember-percy';
 import Fixtures from '@cardstack/test-support/fixtures';
 import { setFieldValue, createCards, saveCard } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
@@ -322,6 +323,7 @@ module('Acceptance | card edit', function(hooks) {
     assert.dom('[data-test-view-selector="fields"]').hasClass('active');
     assert.dom('[data-test-mode-indicator]').exists();
     assert.dom('[data-test-mode-indicator-label]').hasClass('edit');
+    await percySnapshot(assert);
 
     await click('[data-test-mode-indicator-link="view"]');
     assert.equal(currentURL(), `/cards/${card1Id}`);
@@ -343,6 +345,7 @@ module('Acceptance | card edit', function(hooks) {
     assert.dom('[data-test-mode-indicator]').exists();
     assert.dom('[data-test-mode-indicator-label]').hasClass('edit');
     assert.dom('[data-test-actions-btn]').exists();
+    await percySnapshot(assert);
 
     await click('[data-test-mode-indicator-link="view"]');
     assert.equal(currentURL(), `/cards/${card1Id}`);

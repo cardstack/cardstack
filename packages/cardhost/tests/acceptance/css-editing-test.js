@@ -155,6 +155,29 @@ module('Acceptance | css editing', function(hooks) {
     await login();
     await createCards(cardData);
     await visit(`/cards/${card1Id}/edit/layout`);
+    assert.dom('[data-test-small-btn]').exists();
+    assert.dom('[data-test-small-btn]').hasClass('selected');
+    assert.dom('[data-test-medium-btn]').exists();
+    assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-large-btn]').exists();
+    assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--small');
+    await waitForAnimation(() => percySnapshot(assert));
+    // toggle to full width
+    await click('[data-test-medium-btn]');
+    assert.dom('[data-test-medium-btn]').hasClass('selected');
+    assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--medium');
+    assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
+    await waitForAnimation(() => percySnapshot(assert));
+
+    await click('[data-test-large-btn]');
+    assert.dom('[data-test-large-btn]').hasClass('selected');
+    assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--large');
+    assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
+    await waitForAnimation(() => percySnapshot(assert));
+
     await click('[data-test-card-custom-style-button]');
     assert.equal(currentURL(), `/cards/${card1Id}/edit/layout/themer`);
     await click('[data-test-dock-bottom]'); // dock to bottom so we can see better in Percy Screnshots
