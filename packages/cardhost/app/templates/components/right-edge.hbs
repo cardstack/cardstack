@@ -90,11 +90,7 @@
                 {{#animated-value @selectedField use=this.fade duration=this.duration as |field|}}
                   <div class="right-edge--section">
                     <div class="right-edge--section-header" data-test-section-header>
-                      <AnimatedContainer>
-                        {{#animated-value this.selectedFieldTitle use=this.fade duration=this.duration as |fieldTitle|}}
-                          <div class="right-edge--selected-field-title">{{fieldTitle}} Field</div>
-                        {{/animated-value}}
-                      </AnimatedContainer>
+                      <div class="right-edge--selected-field-title">{{@selectedFieldType}} Field</div>
                       {{#if field.isAdopted}}
                         <div class="right-edge--section-header--adopted">
                           Adopted from {{field.card.adoptedFrom.name}}

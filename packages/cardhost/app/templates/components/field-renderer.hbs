@@ -29,7 +29,12 @@
   {{#if (or (eq @mode "view") (eq @mode "layout"))}}
     <Scaffold @card={{@field}} @feature="field-view-layout" />
   {{else if (eq @mode "edit")}}
-    <Scaffold @card={{@field}} @feature="field-edit-layout" @setCardValue={{@setCardValue}} />
+    <Scaffold
+      @card={{@field}}
+      @feature="field-edit-layout"
+      @setCardValue={{@setCardValue}}
+      @setCardReference={{@setCardReference}}
+    />
   {{else if (eq @mode "schema")}}
     {{!-- TODO we should extract the schema editing stuff into a seaprate component --}}
     {{#if (includes this.schemaAttrs "title")}}

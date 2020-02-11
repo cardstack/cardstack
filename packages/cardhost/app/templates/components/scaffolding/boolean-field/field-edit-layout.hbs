@@ -1,0 +1,29 @@
+{{#unless this.load.isRunning}}
+  <div class="boolean-editor" {{did-insert (action this.setChecked)}}>
+    <label
+      for={{concat "edit-" @card.name "-field-value"}}
+      class="cs-input-group--label"
+      data-test-date-field-editor-label
+    >
+      {{@card.csTitle}}
+    </label>
+    <Input
+      @id={{concat this.idPrefix "-true"}}
+      @class="cardstack-core-types-field-value-true"
+      @name={{concat "field" this.nonce "-boolean-field-value"}}
+      @checked={{this.fieldValue}}
+      @type="radio"
+      @click={{perform this.updateFieldValue}}
+    />
+    <label for={{concat this.idPrefix "-true"}}>True</label>
+    <Input
+      @id={{concat this.idPrefix "-false"}}
+      @class="cardstack-core-types-field-value-false"
+      @name={{concat "field" this.nonce "-boolean-field-value"}}
+      @checked={{not this.fieldValue}}
+      @type="radio"
+      @click={{perform this.updateFieldValue}}
+    />
+    <label for={{concat this.idPrefix "-false"}}>False</label>
+  </div>
+{{/unless}}

@@ -4,6 +4,7 @@
   setCardValue=this.setCardValue
   selectedField=this.selectedField
   selectedFieldName=this.selectedFieldName
+  selectedFieldType=this.selectedFieldType
 )}}
 
 <section
@@ -16,6 +17,7 @@
       @card={{this.originalCard}}
       @mode="edit"
       @setCardValue={{this.setCardValue}}
+      @setCardReference={{this.setCardReference}}
       @format="isolated"
       @selectField={{action this.selectField}}
       @selectedField={{this.selectedField}}

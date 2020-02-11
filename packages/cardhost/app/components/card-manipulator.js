@@ -23,6 +23,7 @@ export default class CardManipulator extends Component {
   @tracked grandParentCard;
   @tracked selectedField;
   @tracked selectedFieldName;
+  @tracked selectedFieldType;
   @tracked isDragging;
   @tracked cardId;
   @tracked cardSelected = true;
@@ -43,13 +44,6 @@ export default class CardManipulator extends Component {
     return JSON.stringify(this.card.document.jsonapi, null, 2);
   }
 
-  get isDirtyStr() {
-    // TODO this component will have to own dirying the card (meaning no other
-    // components should alter the card on their own!) Eventually this will be
-    // the job of orbit.
-    return this.card.isDirty.toString();
-  }
-
   @(task(function*() {
     /**
       Returns field name in the form field-12, incrementing from the highest
@@ -63,18 +57,6 @@ export default class CardManipulator extends Component {
     return `field-${newNumber}`;
   }).drop())
   getNewFieldName;
-
-  // Since the Card API is immutable, I don't think we need this anymore--we can
-  // probably get rid of the {{did-update}} modifier
-  @action
-  updateCard(/*element, [card]*/) {
-    // TODO this needs to be reworked. Also, we should make sure that only this
-    // component is able to manipulate the workd, as opposed to letting other
-    // components manipulate the card.
-    // if (!card.isNew) {
-    //   this.card = card;
-    // }
-  }
 
   @(task(function*(cardId, evt) {
     let doc = this.card.document;
@@ -96,6 +78,16 @@ export default class CardManipulator extends Component {
   }).enqueue())
   handleNewFieldAdded;
 
+  @(task(function*() {
+    if (!this.selectedField) {
+      return;
+    }
+
+    let fieldType = yield this.selectedField.adoptsFrom();
+    this.selectedFieldType = fieldType.csTitle;
+  }).restartable())
+  loadSelectedField;
+
   @task(function*() {
     let [catalogEntries, parentCard] = yield Promise.all([fieldCards(this.data), this.args.card.adoptsFrom()]);
 
@@ -114,15 +106,15 @@ export default class CardManipulator extends Component {
 
   // TODO rework for new API
   @task(function*() {
-    this.statusMsg = null;
-    try {
-      yield this.card.delete();
-    } catch (e) {
-      console.error(e); // eslint-disable-line no-console
-      this.statusMsg = `card ${this.card.name} was NOT successfully deleted: ${e.message}`;
-      return;
-    }
-    this.router.transitionTo('index');
+    // this.statusMsg = null;
+    // try {
+    //   yield this.card.delete();
+    // } catch (e) {
+    //   console.error(e); // eslint-disable-line no-console
+    //   this.statusMsg = `card ${this.card.name} was NOT successfully deleted: ${e.message}`;
+    //   return;
+    // }
+    // this.router.transitionTo('index');
   })
   deleteCard;
 
@@ -165,6 +157,15 @@ export default class CardManipulator extends Component {
     this.card = patchedCard;
   }).restartable())
   setCardValue;
+
+  @(task(function*(field, cardId) {
+    let doc = this.card.document.withRelationships({
+      [field]: cardId,
+    });
+    let patchedCard = yield this.patchCard.perform(doc);
+    this.card = patchedCard;
+  }).restartable())
+  setCardReference;
 
   @(task(function*(fieldName, neededWhenEmbedded, evt) {
     // this prevents 2-way data binding from trying to alter the Field
@@ -214,6 +215,7 @@ export default class CardManipulator extends Component {
       this.cardSelected = true;
       this.selectedFieldName = null;
       this.selectedField = null;
+      this.selectedFieldType = null;
     }
   }).drop())
   removeField;
@@ -317,6 +319,7 @@ export default class CardManipulator extends Component {
     // more consistent when the new field is instantiated.
     this.selectedFieldName = null;
     this.cardSelected = false;
+    this.loadSelectedField.perform();
   }
 
   @action startDragging(field, evt) {

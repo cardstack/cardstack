@@ -5,34 +5,22 @@
 >
   <AnimatedContainer class={{if (or (eq @mode "view") (eq @mode "layout")) "isolated-card--view-fields"}}>
     {{#animated-each @fields use=this.transition duration=this.duration as |field|}}
-      {{#if @setCardValue}}
-        <FieldRenderer
-          @field={{field}}
-          @card={{@card}}
-          @mode={{@mode}}
-          @setCardValue={{@setCardValue}}
-          @selectField={{@selectField}}
-          @selectedField={{@selectedField}}
-          @selectedFieldName={{@selectedFieldName}}
-        />
-      {{else if (or @setNeededWhenEmbedded @setPosition @removeField @setFieldName)}}
-        <FieldRenderer
-          @field={{field}}
-          @card={{@card}}
-          @mode={{@mode}}
-          @dropField={{@dropField}}
-          @removeField={{@removeField}}
-          @toggleStubField={{@toggleStubField}}
-          @setPosition={{@setPosition}}
-          @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
-          @setFieldName={{@setFieldName}}
-          @selectField={{@selectField}}
-          @selectedField={{@selectedField}}
-          @selectedFieldName={{@selectedFieldName}}
-        />
-      {{else}}
-        <FieldRenderer @card={{@card}} @field={{field}} @mode={{@mode}}/>
-      {{/if}}
+      <FieldRenderer
+        @field={{field}}
+        @card={{@card}}
+        @mode={{@mode}}
+        @dropField={{@dropField}}
+        @removeField={{@removeField}}
+        @toggleStubField={{@toggleStubField}}
+        @setPosition={{@setPosition}}
+        @setCardValue={{@setCardValue}}
+        @setCardReference={{@setCardReference}}
+        @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+        @setFieldName={{@setFieldName}}
+        @selectField={{@selectField}}
+        @selectedField={{@selectedField}}
+        @selectedFieldName={{@selectedFieldName}}
+      />
     {{/animated-each}}
   </AnimatedContainer>
 

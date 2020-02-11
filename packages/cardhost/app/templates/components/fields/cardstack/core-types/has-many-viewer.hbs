@@ -1,9 +1,0 @@
-<div class="label {{@field.name}}-label" data-test-has-many-field-viewer-label>
-  {{@field.label}}
-</div>
-<div class="value {{@field.name}}-value" data-test-has-many-field-viewer-value>
-  {{#each @field.value key="id" as | card |}}
-    <CardRenderer @card={{card}} @format="embedded"/>
-    <br>
-  {{/each}}
-</div>

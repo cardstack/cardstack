@@ -1,5 +1,6 @@
-import BaseEditor from './base-editor';
+import BaseEditor from '../base-editor';
 import { tracked } from '@glimmer/tracking';
+import { task } from 'ember-concurrency';
 import { action } from '@ember/object';
 
 let nonce = 0;
@@ -12,19 +13,26 @@ export default class BooleanEditor extends BaseEditor {
   }
 
   get idPrefix() {
-    return `edit-${this.args.field.name}-${this.nonce}-field-value`;
+    return `edit-${this.args.card.name}-${this.nonce}-field-value`;
   }
+
+  @task(function*() {
+    yield this.load.last.finally();
+
+    let checkedInput = document.getElementById(`${this.idPrefix}-${String(Boolean(this.fieldValue))}`);
+    checkedInput.checked = true;
+  })
+  initialize;
 
   @action
   setChecked() {
-    let checkedInput = document.getElementById(`${this.idPrefix}-${String(Boolean(this.fieldValue))}`);
-    checkedInput.checked = true;
+    this.initialize.perform();
   }
 
-  @action
-  updateFieldValue({ target: { id } }) {
+  @(task(function*({ target: { id } }) {
     let value = id.includes('true');
     this.fieldValue = value;
-    this.args.setFieldValue(value);
-  }
+    yield this.args.setCardValue.perform(this.args.card.name, value);
+  }).restartable())
+  updateFieldValue;
 }

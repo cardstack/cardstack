@@ -11,10 +11,10 @@ export default class BaseEditor extends Component {
     this.load.perform();
   }
 
-  // Note that this.args.cardcard is actually a FieldCard. Typescript will eventually make this more obvious...
-  @task(function*() {
+  // Note that this.args.card is actually a FieldCard. Typescript will eventually make this more obvious...
+  @(task(function*() {
     this.fieldValue = yield this.args.card.enclosingCard.value(this.args.card.name);
-  })
+  }).drop())
   load;
 
   @(task(function*(value) {
