@@ -20,7 +20,7 @@
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
   top: 42px;
   right: -130px;
-  width: 200px;
+  width: 230px;
   padding-bottom: 10px;
 }
 
@@ -101,16 +101,6 @@
   margin-top: 5px;
 }
 
-.context-menu-save-symbol {
+.context-menu-items > li > svg {
   margin-right: 6px;
-  font-size: 0.6em;
-  vertical-align: top;
-}
-
-.context-menu-save-symbol--success {
-  color: var(--ch-success);
-}
-
-.context-menu-save-symbol--error {
-  color: var(--red);
 }

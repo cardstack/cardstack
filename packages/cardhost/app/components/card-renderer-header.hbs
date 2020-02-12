@@ -37,14 +37,14 @@
             {{did-update this.autosave.kickoff @card.isDirty @card}}
         >
           {{#if this.autosave.hasError}}
-            <span class="context-menu-save-symbol context-menu-save-symbol--error" aria-hidden>&#11044;</span>
+            {{svg-jar "error" width="10px" height="10px"}}
             Failed to save
           {{else if @card.isDirty}}
-            <span class="context-menu-save-symbol context-menu-save-symbol--success" aria-hidden>&#11044;</span>
+            {{svg-jar "warning" width="10px" height="10px"}}
             Saving...
           {{else}}
-            <span class="context-menu-save-symbol context-menu-save-symbol--success" aria-hidden>&#11044;</span>
-            Saved {{this.autosave.lastSavedTime}}
+            {{svg-jar "success" width="10px" height="10px"}}
+            Saved {{moment-from-now this.autosave.lastSavedTime}}
           {{/if}}
         </li>
         <li class="divider">

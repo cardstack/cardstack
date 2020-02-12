@@ -7,6 +7,7 @@ import { task } from 'ember-concurrency';
 import { restartableTask, enqueueTask } from 'ember-concurrency-decorators';
 import { timeout } from 'ember-concurrency';
 import ENV from '@cardstack/cardhost/config/environment';
+import moment from 'moment';
 
 const { autosaveDebounce, autosaveDisabled } = ENV;
 const SAVED_HIGHLIGHT_DELAY = 2500;
@@ -18,7 +19,7 @@ export default class AutosaveService extends Service {
   @service cardLocalStorage;
 
   @tracked hasError;
-  @tracked lastSavedTime;
+  @tracked lastSavedTime = moment();
 
   // These are properties of the service so that we can change them to true for service-specific tests.
   autosaveDisabled = autosaveDisabled;
@@ -40,7 +41,7 @@ export default class AutosaveService extends Service {
       // remove the next line once we have progressive data handling
       this.cardLocalStorage.addRecentCardId(card.id);
       this.hasError = false;
-      this.lastSavedTime = '3 min ago'; // TODO with moment
+      this.lastSavedTime = moment();
     } catch (e) {
       this.handleSaveError(e, card);
       return;
@@ -67,7 +68,7 @@ export default class AutosaveService extends Service {
   @action
   kickoff(el, [isDirty, card]) {
     this.hasError = false; // if there's an error and a user switches cards, wipe out error state
-    this.lastSavedTime = null;
+    this.lastSavedTime = moment();
     if (isDirty && !this.autosaveDisabled) {
       this.debounceAndSave.perform(card);
     }
