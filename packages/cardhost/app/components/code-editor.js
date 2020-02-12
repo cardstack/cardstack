@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import requirejsPolyfill from '@cardstack/requirejs-monaco-ember-polyfill';
-import * as monaco from 'monaco-editor';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
 import { action } from '@ember/object';
 import { restartableTask } from 'ember-concurrency-decorators';
 import { timeout } from 'ember-concurrency';

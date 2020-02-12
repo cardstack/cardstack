@@ -170,6 +170,3 @@
     </div>
   {{/if}}
 </section>
-{{#if (and (eq @mode "schema") @dropField (not @field.preview))}}
-  <DropZone @dropField={{@dropField}} @position={{inc @field.position}} @toggleStubField={{@toggleStubField}} />
-{{/if}}
