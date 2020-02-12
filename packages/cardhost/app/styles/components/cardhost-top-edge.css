@@ -2,10 +2,12 @@
   height: var(--ch-top-edge-height);
   position: fixed;
   top: 0;
-  right: 0;
-  left: 0;
-  display: flex;
-  justify-content: center;
+  right: var(--ch-spacing);
+  left: var(--ch-left-edge-navbar-width);
+  display: grid;
+  grid-template-columns: auto 1fr auto var(--ch-right-edge-panel-width);
+  grid-gap: var(--ch-spacing);
+  justify-items: center;
   align-items: center;
   text-align: right;
   z-index: var(--ch-top-edge-z-index);
@@ -18,11 +20,6 @@
   z-index: 10;
 }
 
-.cardhost-top-edge.fields,
-.cardhost-top-edge.layout {
-  background-color: var(--ch-medium-background);
-}
-
 .cardhost-top-edge.add,
 .cardhost-top-edge.adopt,
 .cardhost-top-edge.schema {
@@ -31,19 +28,83 @@
   background-color: var(--ch-deep-background);
 }
 
+.cardhost-top-edge.add + .card-renderer--top-edge-buttons,
+.cardhost-top-edge.adopt + .card-renderer--top-edge-buttons,
+.cardhost-top-edge.schema + .card-renderer--top-edge-buttons {
+  position: fixed;
+  top: var(--ch-spacing);
+  right: var(--ch-spacing);
+}
+
 .cardhost-top-edge.themer {
   background-color: var(--ch-dark-background);
 }
 
+.card-renderer--top-edge-preview-button {
+  z-index: var(--ch-actions-z-index);
+}
+
+.card-renderer--top-edge-preview-button,
+.card-renderer--top-edge-size-buttons {
+  transition: visibility 0.3s ease;
+}
+
+.card-renderer--top-edge-preview-button.hidden,
+.card-renderer--top-edge-size-buttons.hidden {
+  visibility: collapse;
+}
+
+.card-renderer--top-edge-buttons {
+  display: flex;
+  z-index: var(--ch-actions-z-index);
+}
+
+.card-renderer--top-edge-buttons > button + button,
+.card-renderer--top-edge-buttons > div + button {
+  margin-left: 10px;
+}
+
+/* Preview link button */
+.preview-link {
+  background-image: url('/assets/images/buttons/eye-on.svg');
+  background-position: left 11px center;
+  background-repeat: no-repeat;
+  background-size: 18px 14px;
+}
+
+
+/* Edge actions button */
+.edge-actions-button.cs-component-cta.primary {
+  --icon-color: var(--ch-dark);
+  min-width: 40px;
+  height: 40px;
+  padding: 10px 9px 11px 12px;
+  border-color: var(--ch-highlight);
+  line-height: 0;
+}
+.edge-actions-button > svg {
+  display: inline-block;
+}
+.edge-actions-button:not(:disabled):hover,
+.edge-actions-button:not(:disabled):focus {
+  border-color: var(--ch-highlight-hover);
+}
+
+
+/* View selector toggle */
 .view-selector {
   width: 300px;
   display: flex;
   justify-content: space-around;
   align-items: center;
-  background-color: var(--ch-deep-background);
+  background-color: var(--ch-default);
   border: solid 1px var(--ch-border);
   height: 40px;
   border-radius: 20px;
+  font-size: 13px;
+  line-height: calc(18 / 13);
+  letter-spacing: 0.035em;
+  overflow: hidden;
 }
 
 .view-selector .view-selector--mode-link {
@@ -53,23 +114,84 @@
   justify-content: center;
   width: 150px;
   height: 100%;
+  color: var(--ch-light-op50);
 }
 
 .view-selector .view-selector--mode-link.active {
   --icon-color: var(--ch-highlight);
+  background-color: var(--ch-deep-background);
+  color: var(--ch-highlight);
 }
 
 .view-selector .view-selector--mode-link:first-child {
   border-right: solid 1px var(--ch-border);
 }
 
-.view-selector .view-selector--mode-link svg {
-  margin-right: 15px;
+.view-selector .view-selector--mode-link > svg {
+  display: inline-block;
+  margin-right: 9px;
 }
 
-@media (max-width: 1440px) {
-  .cardhost-top-edge.view,
-  .cardhost-top-edge.edit {
-    --padding-left: var(--ch-left-edge-navbar-width);
+@media (max-width: 1036px) {
+  .cardhost-top-edge {
+    grid-template-columns: auto 1fr var(--ch-right-edge-panel-width);
   }
+
+  .card-renderer--top-edge-size-buttons {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .cardhost-top-edge {
+    grid-template-columns: auto auto auto;
+    grid-gap: 10px;
+  }
+
+  .card-renderer--top-edge-buttons .mode-indicator {
+    display: none;
+  }
+
+  .view-selector {
+    width: 280px;
+  }
+
+  .preview-link.cs-component-cta.primary {
+    min-width: 105px;
+    text-align: right;
+  }
+
+  .save-button.cs-component-cta.primary {
+    min-width: 100px;
+    margin-left: 0;
+  }
+}
+
+/* Old styles, remove after updating all mode buttons */
+.top-edge--mode-label {
+  padding: 10px;
+  background-color: white;
+  text-transform: uppercase;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 10px;
+  color: var(--ch-dark-op50);
+  margin-right: 20px;
+}
+
+.top-edge--mode-link {
+  display: inline-flex;
+}
+
+.top-edge--mode-link span {
+  width: 18px;
+  height: 18px;
+  display: block;
+  text-indent: -9999px;
+    text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  background-image: url(/assets/images/icons/close-circle.svg);
+  background-size: 18px 18px;
+  background-repeat: no-repeat;
 }

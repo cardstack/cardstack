@@ -14,7 +14,8 @@
   transition: width 0.2s ease;
   overflow: hidden;
 }
-.cardhost-left-edge--nav.index-page {
+.cardhost-left-edge--nav.index-page,
+.cardhost-left-edge--nav.edit {
   background-color: var(--ch-default);
 }
 

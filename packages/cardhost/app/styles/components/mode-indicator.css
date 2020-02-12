@@ -1,0 +1,62 @@
+.mode-indicator {
+  --mode-container-width: 150px;
+  --mode-container-height: 40px;
+  --mode-link-width: 35px;
+  display: flex;
+  flex-flow: row nowrap;
+  width: var(--mode-container-width);
+  height: var(--mode-container-height);
+  max-width: 100%;
+}
+
+.mode-indicator--label {
+  display: inline-block;
+  width: calc(var(--mode-container-width) - var(--mode-link-width));
+  height: 100%;
+  padding: 11px 0 11px 15px;
+  border-radius: 100px 0 0 100px;
+  background-color: var(--ch-highlight);
+  color: var(--ch-dark);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: calc(18 / 13);
+  letter-spacing: 0.035em;
+  text-align: left;
+  text-transform: capitalize;
+}
+.mode-indicator--label.edit {
+  padding-left: 38px;
+  background-image: url('/assets/images/icons/edit.svg');
+  background-position: left 15px top 13px;
+  background-repeat: no-repeat;
+  background-size: 13px 13px;
+}
+
+.mode-indicator--link {
+  display: inline-block;
+  width: var(--mode-link-width);
+  height: 100%;
+  margin-left: -1px;
+  border-radius: 0 100px 100px 0;
+  background-color: var(--ch-highlight);
+  background-image: url('/assets/images/icons/close.svg');
+  background-position: center right 15px;
+  background-repeat: no-repeat;
+  background-size: 10px 10px;
+}
+
+.mode-indicator--link:hover,
+.mode-indicator--link:focus {
+  background-color: var(--ch-highlight-hover);
+  outline: 0;
+}
+
+.mode-indicator--link span {
+  width: 18px;
+  height: 18px;
+  display: block;
+  text-indent: -9999px;
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}

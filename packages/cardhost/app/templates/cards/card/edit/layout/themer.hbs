@@ -1,13 +1,14 @@
 <ThemerToolbar @model={{this.model}} />
 
 <section class="card-renderer--container" data-test-card-view={{this.model.name}}>
-  <CardRenderer
-    @card={{this.model}}
-    @format="isolated"
-    @mode="view"
-    @class="themer"
-    @cardSelected={{false}}
-  />
+  <div class="card-renderer--inner-container themer-container">
+    <CardRenderer
+      @card={{this.model}}
+      @format="isolated"
+      @mode="view"
+      @class="themer"
+      @cardSelected={{false}} />
+  </div>
 </section>
 
 <div data-test-editor-pane>

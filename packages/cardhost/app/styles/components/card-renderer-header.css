@@ -22,7 +22,7 @@
 
 /* Whenever there's a fixed header, like in edit and schema, use alternate layout */
 
-.edit .context-menu-nav {
+.fields .context-menu-nav {
   position: fixed;
   top: auto;
   margin-left: 405px;
@@ -34,12 +34,21 @@
   position: sticky;
   z-index: var(--ch-actions-z-index);
   margin-left: 89%;
+  transition: margin var(--ch-transition-time);
 }
 
+.layout.themer-card-width--medium .context-menu-sticky-wrapper {
+  margin-left: 94%;
+}
+.layout.themer-card-width--large .context-menu-sticky-wrapper {
+  margin-left: 97%;
+}
+
+.layout .context-menu-nav,
 .schema .context-menu-nav {
   right: auto;
   position: fixed;
-  margin-top: 80px;
+  margin-top: 82px;
 }
 
 .context-menu-items {

@@ -16,7 +16,7 @@
   --ch-dark: #000;
   --ch-alert: #ff0000;
   --ch-light-op40: #6b6971;         /* disabled border/stroke color on dark bg */
-  --ch-light-op50: rgba(255, 255, 255, 0.5);  /* inactive titles with icons */
+  --ch-light-op50: #afafb7;         /* inactive titles with icons */
   --ch-light-op60: #cfcfd2;         /* regular label on dark bg */
   --ch-dark-op50: #404040;          /* regular label on light bg */
 
