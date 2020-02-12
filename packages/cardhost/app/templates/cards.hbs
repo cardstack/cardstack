@@ -11,39 +11,24 @@
       {{#if (or (eq this.routeInfo.mode "layout") (eq this.routeInfo.mode "fields"))}}
         {{#let this.target.currentRoute.parent.attributes as |card|}}
           <div class="view-selector">
-            {{!-- disabling this while we are working out the models
             <LinkTo
-              @route="cards.card.edit.layout"
+              @route="cards.card-v2.edit.layout"
               @class="view-selector--mode-link"
-              @model={{card}}
+              @model={{card.canonicalURL}}
               data-test-view-selector="layout"
             >
               {{svg-jar "layout" width="18px" height="17px"}}
               Layout
             </LinkTo>
-            --}}
-            {{!-- this is a placeholder link --}}
-            <a class="view-selector--mode-link">
-              {{svg-jar "layout" width="18px" height="17px"}}
-              Layout
-            </a>
-            {{!-- disabling this while we are working out the models
             <LinkTo
-
-              @route="cards.card.edit.fields"
+              @route="cards.card-v2.edit.fields"
               @class="view-selector--mode-link"
-              @model={{card}}
+              @model={{card.canonicalURL}}
               data-test-view-selector="fields"
             >
               {{svg-jar "form" width="18px" height="17px"}}
               Field
             </LinkTo>
-            --}}
-            {{!-- this is a placeholder link --}}
-            <a class="view-selector--mode-link">
-              {{svg-jar "form" width="18px" height="17px"}}
-              Field
-            </a>
           </div>
         {{/let}}
       {{/if}}

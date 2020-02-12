@@ -13,6 +13,9 @@ Router.map(function() {
     // back into the /cards/card route when ready
     this.route('card-v2', { path: '/v2/:id' }, function() {
       this.route('edit', function() {
+        this.route('layout', function() {
+          this.route('themer');
+        });
         this.route('fields', function() {
           this.route('schema');
         });

@@ -20,18 +20,14 @@
             <header class="card-renderer-isolated--header">
               <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.csTitle "Blank Card"}}</span>
               {{#if this.cardstackSession.isAuthenticated}}
-                {{!-- disabling this while we are working out the models
                 <LinkTo
-                  @route="cards.card.edit.fields"
-                  @model={{@card}}
+                  @route="cards.card-v2.edit.fields"
+                  @model={{@card.canonicalURL}}
                   @class="card-renderer--header-link"
                   data-test-card-edit-link
                 >
                   Edit
                 </LinkTo>
-                --}}
-                {{!-- this is a placeholder link --}}
-                <a class="card-renderer--header-link">Edit</a>
               {{/if}}
             </header>
           </div>
