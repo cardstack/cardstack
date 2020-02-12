@@ -86,7 +86,7 @@
     "ember-resolver": "^7.0.0",
     "ember-source": "~3.15.0",
     "ember-test-selectors": "^3.0.0",
-    "ember-toolbars": "^0.5.1",
+    "ember-toolbars": "^0.6.0",
     "eslint-plugin-ember": "^7.7.1",
     "eslint-plugin-mocha": "^5.2.0",
     "eslint-plugin-node": "^10.0.0",
@@ -98,7 +98,7 @@
     "scope-css": "^1.2.1"
   },
   "engines": {
-    "node": "8.* || >= 10.*"
+    "node": ">= 10.*"
   },
   "ember": {
     "edition": "octane"
