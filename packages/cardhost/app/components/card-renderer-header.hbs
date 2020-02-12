@@ -28,6 +28,12 @@
   <div class={{if (eq @mode "schema") "context-menu-sticky-wrapper"}}>
     <nav class="context-menu-nav" role="navigation" aria-labelledby="switch-mode">
       <ul class="context-menu-items" data-test-context-menu-items>
+        <li class="heading">
+          {{if @card.isDirty 'Saving...' 'Saved!' }}
+        </li>
+        <li class="divider">
+          <hr>
+        </li>
         <li id="switch-mode" class="heading">Switch mode</li>
         <li>
           <LinkTo @route="cards.card.view" @model={{@card}} @class={{if (eq @mode "view") "checked"}} data-test-context-view>View</LinkTo>
