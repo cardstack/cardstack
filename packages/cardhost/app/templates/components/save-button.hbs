@@ -4,16 +4,16 @@
   class={{concat
     "save-button "
     (if this.justSaved "just-saved ")
-    (if (not (or @card.isDirty this.saveCard.isRunning)) "saved ")
+    (if (not (or @isDirty this.saveCard.isRunning)) "saved ")
   }}
   data-test-card-save-btn
-  {{did-update this.autoSave @card.isDirty}}
+  {{did-update this.autoSave @card}}
 >
   {{#if this.saveCard.isRunning}}
     Saving
     <span class="loading-spinner"><div></div><div></div><div></div><div></div></span>
   {{else}}
-    {{#if @card.isDirty}}
+    {{#if @isDirty}}
       Save
     {{else}}
       Saved {{svg-jar "checkmark" width="12px" height="9px"}}

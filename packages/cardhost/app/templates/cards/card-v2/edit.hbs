@@ -17,7 +17,11 @@
         <span>Preview</span>
       </a>
     </div>
-    <SaveButton @card={{this.model}} />
+    <SaveButton
+      @card={{this.model.card}}
+      @isDirty={{this.model.isDirty}}
+      @updateCard={{action "updateCard"}}
+    />
   </div>
 
   <CardhostLeftEdge />

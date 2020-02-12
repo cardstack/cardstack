@@ -1,21 +1,34 @@
 import Route from '@ember/routing/route';
 import { inject as service } from '@ember/service';
 import DataService from '../../services/data';
-import { Card } from '@cardstack/core/card';
+import { AddressableCard } from '@cardstack/core/card';
 
 export interface RouteParams {
   id: string;
 }
 
+export interface Model {
+  card: AddressableCard;
+  isDirty: boolean;
+}
+
 export default class CardsCardV2 extends Route {
   @service data!: DataService;
 
-  model({ id }: RouteParams): Promise<Card> {
-    return this.data.load(id, 'everything');
+  async model({ id }: RouteParams): Promise<Model> {
+    return {
+      card: await this.data.load(id, 'everything'),
+      isDirty: false, // This is a temporary place to track model dirtiness until we integrate OrbitJS
+    };
   }
 
-  serialize(model: Card): RouteParams {
-    let id = model.canonicalURL;
+  serialize(model: Model): RouteParams {
+    let { card } = model;
+    if (!card) {
+      throw new Error(`Cannot render the ${this.routeName} route when no card is provided in model`);
+    }
+
+    let id = card.canonicalURL;
     if (id) {
       return { id };
     }

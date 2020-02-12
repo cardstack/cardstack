@@ -89,7 +89,7 @@ export class Card {
 
   private readonly attributes: SingleResourceDoc['data']['attributes'];
   private readonly relationships: SingleResourceDoc['data']['relationships'];
-  public readonly meta: SingleResourceDoc['data']['meta'];
+  readonly meta: SingleResourceDoc['data']['meta'];
 
   // Identity invariants:
   //

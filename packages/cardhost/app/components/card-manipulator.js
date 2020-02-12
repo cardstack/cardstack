@@ -32,7 +32,17 @@ export default class CardManipulator extends Component {
   constructor(...args) {
     super(...args);
 
+    // We're separating this out because we really need to be careful when we
+    // patch the card as it triggers rerendering of all the downstream
+    // components with resulting awkward animations. So we are using @card as
+    // the most current card model, and this.card as the card model that the
+    // downstream components are consuming that is sensitive to rerenders.
+    // Currently we are only updating this.card when we add a new field, aside
+    // from that, the downstream components's field editor components' own state
+    // should still reflect @cards based on all the patches they have triggered.
+    // This is not ideal...
     this.card = this.args.card;
+
     this.originalCard = this.args.card;
     this.load.perform();
   }
@@ -100,7 +110,9 @@ export default class CardManipulator extends Component {
   load;
 
   @(task(function*(doc) {
-    return yield this.card.patch(doc.jsonapi);
+    let updatedCard = yield this.args.card.patch(doc.jsonapiWithoutMeta);
+    this.args.updateCard(updatedCard, true);
+    return updatedCard;
   }).enqueue())
   patchCard;
 

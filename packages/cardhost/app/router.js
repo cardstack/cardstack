@@ -8,7 +8,6 @@ export default class Router extends EmberRouter {
 
 Router.map(function() {
   this.route('cards', function() {
-    this.route('render');
     this.route('add', { path: '/add' });
     // using card-v2 to build out the app with the new data service. consolidate
     // back into the /cards/card route when ready

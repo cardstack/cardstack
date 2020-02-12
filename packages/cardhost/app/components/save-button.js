@@ -12,19 +12,13 @@ const SAVED_HIGHLIGHT_DELAY = 2500;
 const AUTOSAVE_DEBOUNCE = 5000;
 
 export default class SaveButton extends Component {
-  @service router;
+  @service data;
   @service cardstackSession;
-  @service cardLocalStorage;
 
   @tracked justSaved;
 
   autosaveDebounce = autosaveDebounce || AUTOSAVE_DEBOUNCE;
   autosaveDisabled = typeof this.args.autosaveDisabled === 'boolean' ? this.args.autosaveDisabled : !!autosaveDisabled;
-
-  get cardIsNew() {
-    let card = this.args.card;
-    return card.isNew;
-  }
 
   // This task needs to be queued, otherwise we will get
   // 409 conflicts with the `/meta/version`
@@ -34,12 +28,11 @@ export default class SaveButton extends Component {
     this.statusMsg = null;
 
     try {
-      yield card.save();
-      // remove the next line once we have progressive data handling
-      this.cardLocalStorage.addRecentCardId(card.id);
+      let savedCard = yield this.data.save(card);
+      this.args.updateCard(savedCard, false);
     } catch (e) {
       console.error(e); // eslint-disable-line no-console
-      this.statusMsg = `card ${card.name} was NOT successfully created: ${e.message}`;
+      this.statusMsg = `card ${card.csTitle} was NOT successfully created: ${e.message}`;
       return;
     }
   }
@@ -62,8 +55,8 @@ export default class SaveButton extends Component {
   }
 
   @action
-  autoSave(element, [isDirty]) {
-    if (isDirty && !this.cardIsNew && !this.autosaveDisabled) {
+  autoSave() {
+    if (this.args.isDirty && !this.autosaveDisabled) {
       if (this.args.clickAction) {
         this.args.clickAction();
       } else {

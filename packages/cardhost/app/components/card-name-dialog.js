@@ -34,8 +34,8 @@ export default class CardNameDialog extends Component {
         csTitle: this.name,
       }).jsonapi
     );
-    let savedCard = yield this.data.save(newCard);
-    this.router.transitionTo('cards.card-v2.edit', savedCard);
+    let card = yield this.data.save(newCard);
+    this.router.transitionTo('cards.card-v2.edit', { card });
   })
   createCardTask;
 

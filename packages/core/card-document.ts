@@ -184,6 +184,12 @@ export class CardDocument {
     return this;
   }
 
+  get jsonapiWithoutMeta(): SingleResourceDoc {
+    let jsonapi = this.jsonapi;
+    delete jsonapi.data.meta;
+    return jsonapi;
+  }
+
   get jsonapi(): SingleResourceDoc {
     let attributes = Object.create(null);
     for (let [key, value] of this.userFieldValues.entries()) {

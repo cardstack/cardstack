@@ -1,6 +1,7 @@
-<CardEditor @card={{this.model}} as |card args|>
+<CardEditor @card={{this.model.card}} @updateCard={{action "updateCard"}} as |card args|>
   <RightEdge
     @card={{card}}
+    @currentCard={{this.model.card}}
     @parentCard={{get args "parentCard"}}
     @grandParentCard={{get args "grandParentCard"}}
     @selectedField={{get args "selectedField"}}
