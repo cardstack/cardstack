@@ -17,7 +17,8 @@ export default class AutosaveService extends Service {
   @service cardstackSession;
   @service cardLocalStorage;
 
-  @tracked hasError; // TODO based on EC task state
+  @tracked hasError;
+  @tracked lastSavedTime;
 
   // These are properties of the service so that we can change them to true for service-specific tests.
   autosaveDisabled = autosaveDisabled;
@@ -64,8 +65,9 @@ export default class AutosaveService extends Service {
   }
 
   @action
-  initAutosave(el, [isDirty, card]) {
+  kickoff(el, [isDirty, card]) {
     this.hasError = false; // if there's an error and a user switches cards, wipe out error state
+    this.lastSavedTime = null;
     if (isDirty && !this.autosaveDisabled) {
       this.debounceAndSave.perform(card);
     }

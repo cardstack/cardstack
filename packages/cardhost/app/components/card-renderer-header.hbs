@@ -33,8 +33,8 @@
       <ul class="context-menu-items" data-test-context-menu-items>
         <li 
           class="heading"
-            {{did-insert this.autosave.initAutosave @card.isDirty @card}}
-            {{did-update this.autosave.initAutosave @card.isDirty @card}}
+            {{did-insert this.autosave.kickoff @card.isDirty @card}}
+            {{did-update this.autosave.kickoff @card.isDirty @card}}
         >
           {{#if this.autosave.hasError}}
             <span class="context-menu-save-symbol context-menu-save-symbol--error" aria-hidden>&#11044;</span>
@@ -44,7 +44,7 @@
             Saving...
           {{else}}
             <span class="context-menu-save-symbol context-menu-save-symbol--success" aria-hidden>&#11044;</span>
-            Saved
+            Saved {{this.autosave.lastSavedTime}}
           {{/if}}
         </li>
         <li class="divider">
