@@ -637,6 +637,7 @@ describe('hub/jsonapi', function() {
             {
               name: 'puppies',
               includeFields: [
+                'name',
                 {
                   name: 'favoriteToy',
                   includeFields: ['description'],

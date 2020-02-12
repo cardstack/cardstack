@@ -222,7 +222,7 @@ export class CardDocument {
       doc.data.attributes!.csRealm = this.csRealm;
     }
 
-    if (this.csOriginalRealm) {
+    if (this.csOriginalRealm && this.csOriginalRealm !== this.csRealm) {
       doc.data.attributes!.csOriginalRealm = this.csOriginalRealm;
     }
 

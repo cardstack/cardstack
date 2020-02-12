@@ -5,9 +5,7 @@ export interface OcclusionRules {
   includeFields?: (string | InnerOcclusionRules)[];
   includeFieldSet?: Format;
 }
-export type Format = keyof OcclusionFieldSets;
-export type OcclusionRulesOrDefaults = OcclusionRules | 'everything' | 'upstream';
-export type InnerOcclusionRulesOrDefaults = InnerOcclusionRules[] | 'everything' | 'upstream';
+export type Format = keyof OcclusionFieldSets | 'everything' | 'upstream';
 
 export interface OcclusionFieldSets {
   isolated: (string | InnerOcclusionRules)[];
