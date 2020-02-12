@@ -31,7 +31,8 @@ module.exports = function(defaults) {
   // along with the exports of each module as its value.
   app.import('node_modules/monaco-editor/dev/vs/editor/editor.main.css');
 
-  let languages = ['typescript', 'javascript', 'html', 'css'];
+  const languages = ['html', 'css'];
+  const features = ['accessibilityHelp', 'colorDetector', 'find', 'folding', 'hover', 'suggest', 'toggleHighContrast'];
 
   return (function() {
     const Webpack = require('@embroider/webpack').Webpack;
@@ -48,7 +49,7 @@ module.exports = function(defaults) {
       },
       packagerOptions: {
         webpackConfig: {
-          plugins: [new MonacoWebpackPlugin({ languages })],
+          plugins: [new MonacoWebpackPlugin({ languages, features })],
         },
       },
       packageRules: [
