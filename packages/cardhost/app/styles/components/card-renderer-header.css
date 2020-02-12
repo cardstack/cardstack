@@ -8,6 +8,10 @@
   cursor: pointer;
 }
 
+.context-menu-button.context-menu-button---error {
+  border: solid 2px var(--red);
+}
+
 .context-menu-nav {
   position: absolute;
   z-index: var(--ch-actions-z-index);
@@ -95,4 +99,18 @@
   position: absolute;
   margin-left: -20px;
   margin-top: 5px;
+}
+
+.context-menu-save-symbol {
+  margin-right: 6px;
+  font-size: 0.6em;
+  vertical-align: top;
+}
+
+.context-menu-save-symbol--success {
+  color: var(--ch-success);
+}
+
+.context-menu-save-symbol--error {
+  color: var(--red);
 }

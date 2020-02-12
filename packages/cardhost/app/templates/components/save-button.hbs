@@ -6,8 +6,6 @@
     (if (not (or @card.isDirty this.saveCard.isRunning)) "saved ")
   }}
   data-test-card-save-btn
-  {{did-insert this.autosave.initAutosave @card.isDirty @card}}
-  {{did-update this.autosave.initAutosave @card.isDirty @card}}
 >
   {{#if this.saveCard.isRunning}}
     Saving

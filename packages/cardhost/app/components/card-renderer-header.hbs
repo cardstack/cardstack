@@ -14,8 +14,11 @@
         >
           {{@buttonText}}
         </LinkTo>
-        <button {{on "click" this.toggleMenu}} class="context-menu-button" data-test-context-menu-button
-          aria-label="Open card mode options menu" aria-expanded={{@contextMenuOpen}}>
+        <button 
+          {{on "click" this.toggleMenu}} 
+          class="context-menu-button {{if this.autosave.hasError "context-menu-button---error"}}" data-test-context-menu-button
+          aria-label="Open card mode options menu" aria-expanded={{@contextMenuOpen}}
+        >
           {{svg-jar "three-dots" width="12px" height="7px" aria-hidden=true}}
         </button>
       </div>
@@ -28,8 +31,21 @@
   <div class={{if (eq @mode "schema") "context-menu-sticky-wrapper"}}>
     <nav class="context-menu-nav" role="navigation" aria-labelledby="switch-mode">
       <ul class="context-menu-items" data-test-context-menu-items>
-        <li class="heading">
-          {{if @card.isDirty "Saving..." "Saved!" }}
+        <li 
+          class="heading"
+            {{did-insert this.autosave.initAutosave @card.isDirty @card}}
+            {{did-update this.autosave.initAutosave @card.isDirty @card}}
+        >
+          {{#if this.autosave.hasError}}
+            <span class="context-menu-save-symbol context-menu-save-symbol--error" aria-hidden>&#11044;</span>
+            Failed to save
+          {{else if @card.isDirty}}
+            <span class="context-menu-save-symbol context-menu-save-symbol--success" aria-hidden>&#11044;</span>
+            Saving...
+          {{else}}
+            <span class="context-menu-save-symbol context-menu-save-symbol--success" aria-hidden>&#11044;</span>
+            Saved
+          {{/if}}
         </li>
         <li class="divider">
           <hr>
