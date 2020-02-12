@@ -5,7 +5,7 @@
   data-test-isolated-card-mode={{@mode}}
 >
   <AnimatedContainer class={{if (or (eq @mode "view") (eq @mode "layout")) "isolated-card--view-fields"}}>
-    {{#animated-each @fields key="nonce" use=this.transition duration=this.duration as |field|}}
+    {{#animated-each @fields key="nonce" watch="dragState" use=this.transition duration=this.duration as |field|}}
       {{#if @setFieldValue}}
         <FieldRenderer
           @field={{field}}
@@ -15,20 +15,45 @@
           @selectedField={{@selectedField}}
         />
       {{else if (or @setNeededWhenEmbedded @setPosition @removeField @setFieldName)}}
-        <FieldRenderer
-          @field={{field}}
-          @mode={{@mode}}
-          @dropField={{@dropField}}
-          @removeField={{@removeField}}
-          @toggleStubField={{@toggleStubField}}
-          @setPosition={{@setPosition}}
-          @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
-          @setFieldName={{@setFieldName}}
-          @selectField={{@selectField}}
-          @selectedField={{@selectedField}}
-        />
-        {{#if (and (eq @mode "schema") @dropField (not field.preview))}}
-          <DropZone @dropField={{@dropField}} @position={{inc field.position}} @toggleStubField={{@toggleStubField}} />
+        <div class="field-renderer--wrapper"
+          tabindex="-1"
+          {{on "mousedown" (fn this.draggable.beginDragging field @card)}}
+          {{on "click" (fn this.draggable.clickDraggable field @card)}}
+          data-test-card-add-field-draggable={{field.type}}
+        >
+            {{!-- {{on "mousedown" (action this.initMousedown)}}
+            {{on "click" (action this.initClick)}} --}}
+          <button
+            class="field--move-btn"
+            aria-label="Drag field"
+            data-test-field-renderer-move-btn
+            data-test-field-renderer-move-btn-position={{field.position}}
+          >
+          </button>
+          <FieldRenderer
+            @field={{field}}
+            @mode={{@mode}}
+            @removeField={{@removeField}}
+            @setPosition={{@setPosition}}
+            @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+            @setFieldName={{@setFieldName}}
+            @selectField={{@selectField}}
+            @selectedField={{@selectedField}}
+          />
+          <div class="field--action">
+            {{#if (and @removeField (not field.isAdopted))}}
+              {{!-- using field.nonce in case the user deletes the name of the field --}}
+              <button {{on "click" (fn @removeField field.nonce)}}
+                class="field--remove-btn"
+                aria-label="Remove"
+                data-test-field-renderer-remove-btn
+              >
+              </button>
+            {{/if}}
+          </div>
+        </div>
+        {{#if (and (eq @mode "schema") (not field.preview))}}
+          <DropZone @position={{inc field.position}} @toggleStubField={{@toggleStubField}} />
         {{/if}}
       {{else}}
         <FieldRenderer @field={{field}} @mode={{@mode}}/>

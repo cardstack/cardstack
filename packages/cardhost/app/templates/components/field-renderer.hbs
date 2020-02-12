@@ -13,16 +13,6 @@
   data-test-field-mode={{@mode}}
   {{did-update this.updateFieldProperties this.nonce}}
 >
-  {{#if @setPosition}}
-    <button {{on "mousedown" (action this.initDrag @field)}} {{on "mouseup" (action this.endDrag)}} {{on "dragend" (fn this.draggable.setDragging false)}}
-      class="field--move-btn"
-      aria-label="Drag field"
-      data-test-field-renderer-move-btn
-      data-test-field-renderer-move-btn-position={{@field.position}}
-    >
-    </button>
-  {{/if}}
-
   {{#if (or (eq @mode "view") (eq @mode "layout"))}}
     {{#let (component this.fieldViewer) as | FieldViewer |}}
       <FieldViewer @field={{@field}}/>
@@ -154,19 +144,5 @@
           data-test-schema-attr={{schemaAttr}} />
       {{/if}}
     {{/each}}
-  {{/if}}
-
-  {{#if (and (not-eq @mode "view") (not-eq @mode "layout"))}}
-    <div class="field--action">
-      {{#if (and @removeField (not @field.isAdopted))}}
-        {{!-- using field.nonce in case the user deletes the name of the field --}}
-        <button {{on "click" (fn @removeField @field.nonce)}}
-          class="field--remove-btn"
-          aria-label="Remove"
-          data-test-field-renderer-remove-btn
-        >
-        </button>
-      {{/if}}
-    </div>
   {{/if}}
 </section>

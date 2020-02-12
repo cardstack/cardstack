@@ -22,6 +22,10 @@
   opacity: unset;
 }
 
+.card-renderer-isolated.schema .field-renderer--wrapper {
+  display: flex;
+}
+
 .card-renderer-isolated.schema .background-image-field {
   visibility: visible;
   height: auto;

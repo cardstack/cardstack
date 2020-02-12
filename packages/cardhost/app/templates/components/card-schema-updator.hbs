@@ -8,12 +8,12 @@
         class="ch-catalog--fields"
         tabindex="0"
       >
-        {{#animated-each this.fieldComponents use=this.transition watch="dragState,dropTo" as |field|}}
+        {{#animated-each this.draggable.fieldComponents use=this.transition watch="dragState,dropTo" as |field|}}
           <div
             class="ch-catalog-field"
             tabindex="-1"
-            {{on "mousedown" (fn this.beginDragging field)}}
-            {{on "click" (fn this.selectFieldType field)}}
+            {{on "mousedown" (fn this.draggable.beginDragging field this.card)}}
+            {{on "click" (fn this.draggable.clickDraggable field this.card)}}
             data-test-card-add-field-draggable={{field.type}}
           >
             {{! template-lint-disable no-inline-styles}}
@@ -52,7 +52,6 @@
       @selectField={{action this.selectField}}
       @setPosition={{action this.setPosition}}
       @selectedField={{this.selectedField}}
-      @dropField={{action this.dropField}}
       @cardSelected={{this.cardSelected}}
       @cardFocused={{action (mut this.cardSelected)}} />
   </div>

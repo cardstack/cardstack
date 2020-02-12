@@ -97,11 +97,19 @@ class Drag extends Motion {
         }
       } else {
         // these track relative motion since the drag started
-        let dx = dragState.latestPointerX - dragState.initialPointerX;
-        let dy = dragState.latestPointerY - dragState.initialPointerY;
+        let dx = dragState.latestPointerX - dragState.initialPointerX + initialTx - sprite.transform.tx;
+        let dy = dragState.latestPointerY - dragState.initialPointerY + initialTy - sprite.transform.ty;
 
         // adjust our transform to match the latest relative mouse motion
-        sprite.translate(dx + initialTx - sprite.transform.tx, dy + initialTy - sprite.transform.ty);
+        if (this.opts.direction && this.opts.direction !== 'both') {
+          if (this.opts.direction === 'x') {
+            sprite.translate(dx, 0);
+          } else if (this.opts.direction === 'y') {
+            sprite.translate(0, dy);
+          }
+        } else {
+          sprite.translate(dx, dy);
+        }
       }
       yield rAF();
     }

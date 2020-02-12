@@ -1,28 +1,44 @@
 import Component from '@glimmer/component';
+import { inject as service } from '@ember/service';
+import { action } from '@ember/object';
 import scaleBy from '../../../../motions/scale';
 import move from 'ember-animated/motions/move';
 import opacity from 'ember-animated/motions/opacity';
 import { easeInAndOut } from 'ember-animated/easings/cosine';
-
-import { fadeOut } from 'ember-animated/motions/opacity';
+import { fadeIn, fadeOut } from 'ember-animated/motions/opacity';
+import { printSprites } from 'ember-animated';
+import drag from '../../../../motions/drag';
 import ENV from '@cardstack/cardhost/config/environment';
 
 const { animationSpeed } = ENV;
 const duration = 250;
 
 export default class IsolatedComponent extends Component {
+  @service draggable;
+
   duration = animationSpeed || duration;
 
   *transition({ insertedSprites, keptSprites, removedSprites }) {
+    printSprites(arguments[0], 'field transitions');
     let scaleFrom = 0.1;
 
-    if (insertedSprites.length) {
-      // don't fade out fields when saving a card
-      if (insertedSprites.length !== removedSprites.length) {
-        removedSprites.forEach(fadeOut);
-      }
+    let activeSprite = keptSprites.find(sprite => sprite.owner.value.dragState);
+    let others = keptSprites.filter(sprite => sprite !== activeSprite);
+
+    if (activeSprite) {
+      drag(activeSprite, {
+        others,
+        direction: 'y',
+      });
+      yield Promise.all(others.map(move));
     } else {
-      yield Promise.all(removedSprites.map(fadeOut));
+      if (insertedSprites.length) {
+        removedSprites.forEach(fadeOut);
+      } else {
+        yield Promise.all(removedSprites.map(fadeOut));
+      }
+      yield Promise.all(keptSprites.map(move));
+      insertedSprites.forEach(fadeIn);
     }
     yield Promise.all(keptSprites.map(move));
 
@@ -45,4 +61,32 @@ export default class IsolatedComponent extends Component {
       }
     });
   }
+
+  @action
+  initMousedown(evt) {
+    this.draggable.triggerEvent(evt.target.parentNode, 'mousedown');
+  }
+
+  @action
+  initClick(evt) {
+    this.draggable.triggerEvent(evt.target.parentNode, 'click');
+  }
+
+  // *transition({ keptSprites }) {
+  //   let activeSprite = keptSprites.find(sprite => sprite.owner.value.dragState);
+  //   let others = keptSprites.filter(sprite => sprite !== activeSprite);
+
+  //   if (activeSprite) {
+  //     drag(activeSprite, {
+  //       others,
+  //     });
+  //     let ghostElement = getGhostFromSprite(activeSprite);
+  //     activeSprite.element.parentElement.appendChild(ghostElement);
+  //     others.forEach(move);
+  //   } else {
+  //     keptSprites.forEach(sprite => {
+  //       move(sprite, { duration: 300 });
+  //     });
+  //   }
+  // }
 }
