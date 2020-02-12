@@ -7,6 +7,7 @@ export default class CardsController extends Controller {
   @service router;
   @service routeInfo;
   @service draggable;
+  @service library;
 
   get themerClasses() {
     if (this.hasThemerTools) {

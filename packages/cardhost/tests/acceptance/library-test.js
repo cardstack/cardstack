@@ -79,6 +79,21 @@ module('Acceptance | library', function(hooks) {
     await percySnapshot(assert);
   });
 
+  test(`viewing library from a view page`, async function(assert) {
+    await visit(`/cards/${card1Id}`);
+    assert.dom('[data-test-library-button]').exists();
+    await click('[data-test-library-button]');
+    assert.dom('[data-test-library]').exists();
+    assert.dom(`[data-test-embedded-card=${card1Id}]`).exists();
+    assert.dom(`[data-test-embedded-card=${card2Id}]`).exists();
+    assert.dom(`[data-test-embedded-card=${card3Id}]`).exists();
+    assert.dom('[data-test-library-recent-card-link]').exists();
+    assert.dom('[data-test-library-adopt-card-btn]').exists();
+    assert.dom('[data-test-library-common-card-link]').exists({ count: 3 });
+    assert.dom('[data-test-library-new-blank-card-btn]').exists();
+    await percySnapshot(assert);
+  });
+
   test(`closing library panel`, async function(assert) {
     await visit(`/`);
     await click('[data-test-library-button]');

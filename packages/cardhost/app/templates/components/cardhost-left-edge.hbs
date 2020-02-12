@@ -4,9 +4,7 @@
     class="cardhost-left-edge"
     data-test-cardhost-left-edge
   >
-    <nav
-      class="cardhost-left-edge--nav {{@mode}} {{if this.isExpanded "expanded"}}"
-    >
+    <nav class="cardhost-left-edge--nav {{@mode}} {{if this.isExpanded "expanded"}}">
       <ul>
         <li>
           <LinkTo
@@ -20,7 +18,7 @@
         </li>
         <li class="login-grid">
           <button
-            class="cardhost-left-edge--nav-button profile-button"
+            class="cardhost-left-edge--nav-button profile-button {{if this.isExpanded "selected"}}"
             aria-label="expandable menu with login controls"
             aria-expanded={{this.isExpanded}}
             {{on "click" this.toggleMenuExpand}}
@@ -60,8 +58,8 @@
         </li>
         <li>
           <button
-            disabled={{true}}
-            class="cardhost-left-edge--nav-button"
+            disabled={{not-eq @mode "schema"}}
+            class="cardhost-left-edge--nav-button {{if (eq @mode "schema") "selected"}}"
             aria-label="catalog"
             data-test-catalog-button
           >
@@ -70,7 +68,7 @@
         </li>
         <li>
           <button
-            {{on "click" this.showLibrary}}
+            {{on "click" (fn this.library.displayLibrary true)}}
             disabled={{not session.isAuthenticated}}
             class="cardhost-left-edge--nav-button"
             aria-label="library"
@@ -85,11 +83,3 @@
     {{yield}}
   </aside>
 </CardstackSession>
-
-{{#if this.isLibraryOpen}}
-  <button {{on "click" this.hideLibrary}} class="hide-library--button" data-test-library-close-button>
-    <span class="hide-library--button-icon">{{svg-jar "library" width="21px" height="21px"}}</span>
-    <span class="hide-library--button-text">Hide Library</span>
-  </button>
-  {{in-bottom-toolbar show=(component "library" model=@model)}}
-{{/if}}

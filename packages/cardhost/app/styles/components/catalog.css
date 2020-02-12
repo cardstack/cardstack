@@ -1,7 +1,7 @@
 .ch-catalog {
   width: var(--ch-left-edge-panel-width);
-  background-color: var(--ch-light-background);
-  color: black;
+  background-color: var(--ch-dark-background);
+  color: var(--ch-light);
   overflow: hidden;
 }
 
@@ -16,7 +16,7 @@
   padding: 20px;
   font-size: 20px;
   font-weight: 600;
-  letter-spacing: 0;
+  letter-spacing: 0.015em;
   line-height: 27px;
 }
 

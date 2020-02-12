@@ -4,6 +4,7 @@ import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
 export default class Library extends Component {
+  @service library;
   @service scroller;
 
   @tracked selectedSection = 'recent-cards';

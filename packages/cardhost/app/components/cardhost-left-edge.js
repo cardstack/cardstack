@@ -5,8 +5,8 @@ import { tracked } from '@glimmer/tracking';
 
 export default class CardhostLeftEdgeComponent extends Component {
   @service cardstackSession;
+  @service library;
   @tracked isExpanded = false;
-  @tracked isLibraryOpen = false;
 
   @action
   toggleMenuExpand() {
@@ -18,7 +18,7 @@ export default class CardhostLeftEdgeComponent extends Component {
   @action
   logout(sessionLogout) {
     sessionLogout();
-    this.hideLibrary();
+    this.library.displayLibrary(false);
     let cardId = this.router.currentRoute.parent.params.name;
     if (cardId) {
       this.router.transitionTo('cards.card.view', cardId);
@@ -57,15 +57,5 @@ export default class CardhostLeftEdgeComponent extends Component {
   destroyCloseListener() {
     document.querySelector('body').removeEventListener('click', this.closeListener);
     document.querySelector('body').removeEventListener('focusin', this.closeListener);
-  }
-
-  @action
-  showLibrary() {
-    this.isLibraryOpen = true;
-  }
-
-  @action
-  hideLibrary() {
-    this.isLibraryOpen = false;
   }
 }
