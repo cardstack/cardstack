@@ -1,5 +1,9 @@
 import Service from '@ember/service';
 import { tracked } from '@glimmer/tracking';
+import ENV from '@cardstack/cardhost/config/environment';
+
+const { animationSpeed } = ENV;
+const duration = animationSpeed || 1000;
 
 function easeInOutCubic(t) {
   return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
@@ -14,7 +18,7 @@ export default class ScrollerService extends Service {
     this.scrollingElementSelector = element;
   }
 
-  scrollToSection({ selector, duration = 1000, elementOffset = 60, doneScrolling }) {
+  scrollToSection({ selector, elementOffset = 60, doneScrolling }) {
     if (this.currentlyScrolledTo === selector) {
       return;
     }
