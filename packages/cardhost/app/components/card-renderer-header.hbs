@@ -44,7 +44,7 @@
             Saving...
           {{else}}
             {{svg-jar "success" width="10px" height="10px"}}
-            Saved {{moment-from-now this.autosave.lastSavedTime}}
+            Saved {{moment-from-now this.autosave.lastSavedTime interval=30000}}
           {{/if}}
         </li>
         <li class="divider">
