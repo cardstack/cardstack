@@ -9,7 +9,6 @@ import ENV from '@cardstack/cardhost/config/environment';
 import { fieldTypeMappings, fieldComponents } from '../utils/mappings';
 import drag from '../motions/drag';
 import move from 'ember-animated/motions/move';
-import { printSprites } from 'ember-animated';
 
 const { environment } = ENV;
 
@@ -29,6 +28,7 @@ export default class CardManipulator extends Component {
   @tracked cardId;
   @tracked cardSelected = true;
   @tracked fieldComponents = fieldComponents;
+  @tracked stopMouse;
 
   constructor(...args) {
     super(...args);
@@ -277,10 +277,19 @@ export default class CardManipulator extends Component {
       } else {
         // we mouseup somewhere that isn't a dropzone
         draggableService.clearField();
+        // we do this so that we can animate the field back to the left edge
+        this.fieldComponents = this.fieldComponents.map(obj => obj); // oh glimmer, you so silly...
       }
 
-      window.removeEventListener('mouseup', stopMouse);
+      window.removeEventListener('mouseup', this.stopMouse);
       window.removeEventListener('mousemove', updateMouse);
+
+      // remove ghost element from DOM
+      let ghostEl = document.getElementById('ghost-element');
+      if (ghostEl) {
+        ghostEl.remove();
+      }
+
       return false;
     }
 
@@ -331,23 +340,46 @@ export default class CardManipulator extends Component {
         latestPointerX: dragEvent.x,
         latestPointerY: dragEvent.y,
       };
-      window.addEventListener('mouseup', stopMouse);
+      this.stopMouse = stopMouse.bind(this);
+      window.addEventListener('mouseup', this.stopMouse);
       window.addEventListener('mousemove', updateMouse);
     }
     field.dragState = dragState;
     this.draggable.setField(field);
-    this.fieldComponents = this.fieldComponents.map(obj => (obj.id === field.id ? field : obj)); // oh glimmer, you so silly...
+    this.fieldComponents = this.fieldComponents.map(obj => obj); // oh glimmer, you so silly...
   }
 
   *transition({ keptSprites }) {
-    printSprites(arguments[0], 'cardTransition');
     let activeSprite = keptSprites.find(sprite => sprite.owner.value.dragState);
     let others = keptSprites.filter(sprite => sprite !== activeSprite);
+
     if (activeSprite) {
       drag(activeSprite, {
         others,
       });
+      let ghostElement = getGhostFromSprite(activeSprite);
+      activeSprite.element.parentElement.appendChild(ghostElement);
+      others.forEach(move);
+    } else {
+      keptSprites.forEach(sprite => {
+        move(sprite, { duration: 300 });
+      });
     }
-    others.forEach(move);
   }
+}
+
+function getGhostFromSprite(sprite) {
+  let ghostElement = sprite.element.cloneNode(true);
+  for (let [key, value] of Object.entries(sprite.initialComputedStyle)) {
+    ghostElement.style[key] = value;
+  }
+  let { top, left } = sprite.initialBounds;
+  ghostElement.style.position = 'fixed';
+  ghostElement.style.top = top;
+  ghostElement.style.left = left;
+  ghostElement.style.zIndex = '0';
+  ghostElement.style.opacity = '0.4';
+  ghostElement.id = 'ghost-element';
+
+  return ghostElement;
 }
