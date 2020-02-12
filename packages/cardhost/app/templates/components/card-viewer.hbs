@@ -1,5 +1,5 @@
-<section class="card-view" data-test-card-view={{@card.name}}>
-  {{!-- TODO don't monkey patch the Card API please! --}}
+<section class="card-view" data-test-card-view={{@card.csTitle}}>
+  {{!-- ugh, we're monkey patching the Card API --}}
   <div class="card-renderer--container" role="button" {{on "mouseover" (action (mut @card.isSelected) true)}} {{on "mouseout" (action (mut @card.isSelected) false)}}>
     <CardRenderer
       @card={{@card}}
@@ -11,11 +11,18 @@
 </section>
 
 <style data-test-view-css>
-  {{scope-css @card.isolatedCss @card.name}}
+  {{scope-css this.isolatedCss (concat (safe-css-string @card.canonicalURL) "--isolated")}}
 </style>
 
 {{!-- This is hidden, used in tests --}}
-<section class="cardhost-card-document">
+<section class="_cardhost-card-document">
   <h3>Card Document</h3>
-  <code data-test-card-json>{{this.cardJson}}</code>
+  <pre data-test-card-json>{{this.cardJson}}</pre>
 </section>
+
+{{yield this.card
+  (hash
+    parentCard=this.parentCard
+    grandParentCard=this.grandParentCard
+  )
+}}

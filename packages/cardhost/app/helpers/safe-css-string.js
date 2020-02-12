@@ -6,7 +6,8 @@ export default helper(function([string]) {
   }
 
   return string
-    .replace(/https:\/\//g, '')
+    .replace(/http[s]?:\/\//g, '')
+    .replace(/localhost:\d*/g, 'localhost')
     .replace(/@/g, '')
     .replace(/\s/g, '-')
     .replace(/\./g, '-')

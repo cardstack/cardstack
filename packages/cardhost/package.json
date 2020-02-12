@@ -44,6 +44,7 @@
     "@embroider/core": "^0.10.0",
     "@embroider/webpack": "^0.10.0",
     "@glimmer/component": "^1.0.0",
+    "@glimmer/tracking": "^1.0.0",
     "@types/ember": "^3.1.1",
     "@types/ember-qunit": "^3.4.7",
     "@types/ember__test-helpers": "^0.7.9",

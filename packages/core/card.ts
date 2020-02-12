@@ -11,6 +11,7 @@ import {
 import cloneDeep from 'lodash/cloneDeep';
 import isPlainObject from 'lodash/isPlainObject';
 import merge from 'lodash/merge';
+import get from 'lodash/get';
 import flatten from 'lodash/flatten';
 import uniqBy from 'lodash/uniqBy';
 import difference from 'lodash/difference';
@@ -40,6 +41,7 @@ import Component from '@glimmer/component';
 
 let nonce = 0;
 
+const nonJSFileExtenstions = Object.freeze(['css']);
 export const apiPrefix = '/api';
 
 export async function makeCollection(
@@ -82,7 +84,7 @@ export class Card {
   readonly csPeerDependencies: PeerDependencies | undefined;
   readonly csFieldSets: OcclusionFieldSets | undefined;
   readonly csFields: { [name: string]: any } | undefined;
-  private readonly csFeatures: { [name: string]: string | [string, string] } | undefined;
+  readonly csFeatures: { [name: string]: string | [string, string] } | undefined;
 
   // if this card is stored inside another, this is the other
   readonly enclosingCard: Card | undefined;
@@ -860,6 +862,13 @@ export class Card {
     }
     return { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' };
   }
+  get adoptsFromURL(): string | undefined {
+    let id = this.adoptsFromId;
+    if (id) {
+      return canonicalURL(id);
+    }
+    return undefined;
+  }
 
   async loadFeature(featureName: 'writer'): Promise<WriterFactory | null>;
   async loadFeature(featureName: 'indexer'): Promise<IndexerFactory<J.Value> | null>;
@@ -871,13 +880,26 @@ export class Card {
   async loadFeature(featureName: 'embedded-layout'): Promise<null | Component>;
   async loadFeature(featureName: 'field-view-layout'): Promise<null | Component>;
   async loadFeature(featureName: 'field-edit-layout'): Promise<null | Component>;
+  async loadFeature(featureName: 'isolated-css'): Promise<null | string>;
+  async loadFeature(featureName: 'embedded-css'): Promise<null | string>;
   async loadFeature(featureName: string): Promise<any> {
     let card: Card | undefined = this;
     while (card) {
       if (card.csFeatures && featureName in card.csFeatures) {
         let location = card.csFeatures[featureName];
         if (typeof location === 'string') {
-          return await this.modules.load(card, location);
+          // For the non-js based resources, just return the file contents
+          let fileContents: string | undefined;
+          let [, extension] = location.split('.');
+          if (
+            extension &&
+            nonJSFileExtenstions.includes(extension) &&
+            (fileContents = get(card.csFiles, location.replace(/\//g, '.')) as string) != null
+          ) {
+            return fileContents;
+          } else if (!extension || !nonJSFileExtenstions.includes(extension)) {
+            return await this.modules.load(card, location);
+          }
         } else {
           return await this.modules.load(card, ...location);
         }

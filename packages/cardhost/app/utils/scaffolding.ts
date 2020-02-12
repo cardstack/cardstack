@@ -23,3 +23,6 @@ export async function loadModule(card: Card, localModulePath: string, exportedNa
   let module = await import(`@cardstack/${card.csId}-card/${localModulePath}`); // we are using ESM for module loading
   return module[exportedName];
 }
+
+export const isolatedCssFile = 'isolated.css';
+export const embeddedCssFile = 'embedded.css';

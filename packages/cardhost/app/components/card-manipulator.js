@@ -28,6 +28,7 @@ export default class CardManipulator extends Component {
   @tracked cardId;
   @tracked cardSelected = true;
   @tracked addFieldPromise;
+  @tracked isolatedCss;
 
   constructor(...args) {
     super(...args);
@@ -99,10 +100,15 @@ export default class CardManipulator extends Component {
   loadSelectedField;
 
   @task(function*() {
-    let [catalogEntries, parentCard] = yield Promise.all([fieldCards(this.data), this.args.card.adoptsFrom()]);
+    let [catalogEntries, parentCard, isolatedCss] = yield Promise.all([
+      fieldCards(this.data),
+      this.args.card.adoptsFrom(),
+      this.args.card.loadFeature('isolated-css'),
+    ]);
 
     this.catalogEntries = catalogEntries;
     this.parentCard = parentCard;
+    this.isolatedCss = isolatedCss;
     if (parentCard) {
       this.grandParentCard = yield parentCard.adoptsFrom();
     }
