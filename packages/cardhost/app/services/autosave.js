@@ -17,8 +17,10 @@ export default class AutosaveService extends Service {
   @service cardstackSession;
   @service cardLocalStorage;
 
-  @tracked justSaved;
+  @tracked hasError; // TODO based on EC task state
 
+  // These are properties of the service so that we can change them to true for service-specific tests.
+  autosaveDisabled = autosaveDisabled;
   autosaveDebounce = autosaveDebounce || AUTOSAVE_DEBOUNCE;
 
   get cardIsNew() {
@@ -36,17 +38,17 @@ export default class AutosaveService extends Service {
       yield card.save();
       // remove the next line once we have progressive data handling
       this.cardLocalStorage.addRecentCardId(card.id);
+      this.hasError = false;
+      this.lastSavedTime = '3 min ago'; // TODO with moment
     } catch (e) {
-      console.error(e); // eslint-disable-line no-console
-      this.statusMsg = `card ${card.name} was NOT successfully created: ${e.message}`;
+      this.handleSaveError(e, card);
       return;
     }
   }
 
+  // TODO - remove this
   @task(function*(card) {
     yield this.saveCard.perform(card);
-
-    this.justSaved = true;
 
     yield setTimeout(() => {
       this.justSaved = false;
@@ -56,35 +58,29 @@ export default class AutosaveService extends Service {
 
   @restartableTask
   *debounceAndSave(card) {
+    // The maximum frequency of save requests is enforced here
     yield timeout(this.autosaveDebounce);
     this.saveCardWithState.perform(card);
   }
 
   @action
   initAutosave(el, [isDirty, card]) {
-    if (isDirty && !autosaveDisabled) {
+    this.hasError = false; // if there's an error and a user switches cards, wipe out error state
+    if (isDirty && !this.autosaveDisabled) {
       this.debounceAndSave.perform(card);
     }
   }
 
   @action
   saveOnce() {
+    // This skips debouncing. Only use it for "click to save" type UI.
     this.saveCardWithState.perform();
   }
+
+  @action
+  handleSaveError(e, card) {
+    console.error(e); // eslint-disable-line no-console
+    this.statusMsg = `card ${card.name} was NOT successfully created: ${e.message}`;
+    this.hasError = true;
+  }
 }
-
-/*
-initAutosave
-in afterModel
-
-finalAutosave
-on willTransition for the route model
-
-??? cancelSave
-
-handleError
-
-@tracked
-hasError bool
-
-*/
