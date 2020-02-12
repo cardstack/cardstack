@@ -71,11 +71,7 @@
                         <div class="right-edge--item">
                           <div class="right-edge--label">Card ID</div>
                           <div class="hide-in-percy" data-test-internal-card-id>
-                            {{#if @card.canoncalURL}}
-                              {{@card.canonicalURL}}
-                            {{else}}
-                              (save card first)
-                            {{/if}}
+                            {{@card.canonicalURL}}
                           </div>
                         </div>
                       </div>
