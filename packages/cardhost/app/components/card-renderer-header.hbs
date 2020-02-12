@@ -29,7 +29,7 @@
     <nav class="context-menu-nav" role="navigation" aria-labelledby="switch-mode">
       <ul class="context-menu-items" data-test-context-menu-items>
         <li class="heading">
-          {{if @card.isDirty 'Saving...' 'Saved!' }}
+          {{if @card.isDirty "Saving..." "Saved!" }}
         </li>
         <li class="divider">
           <hr>
@@ -47,17 +47,6 @@
         <li>
           <LinkTo @route="cards.card.edit.layout" @model={{@card}} @class={{if (eq @mode "layout") "checked"}} data-test-context-layout>Layout</LinkTo>
         </li>
-
-        {{!-- TODO implement functionality for these items and uncomment them --}}
-        {{!-- <li class="divider">
-          <hr>
-        </li>
-        <li class="heading">Actions</li>
-        <li>Share</li>
-        <li>Save</li>
-        <li>Archive</li>
-        <li>Copy</li>
-        <li>Delete</li> --}}
       </ul>
     </nav>
   </div>
