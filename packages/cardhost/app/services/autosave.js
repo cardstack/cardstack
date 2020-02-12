@@ -20,7 +20,6 @@ export default class AutosaveService extends Service {
   @tracked justSaved;
 
   autosaveDebounce = autosaveDebounce || AUTOSAVE_DEBOUNCE;
-  autosaveDisabled = typeof this.args.autosaveDisabled === 'boolean' ? this.args.autosaveDisabled : !!autosaveDisabled;
 
   get cardIsNew() {
     let card = this.args.card;
@@ -30,8 +29,7 @@ export default class AutosaveService extends Service {
   // This task needs to be queued, otherwise we will get
   // 409 conflicts with the `/meta/version`
   @enqueueTask
-  *saveCard() {
-    let card = this.args.card;
+  *saveCard(card) {
     this.statusMsg = null;
 
     try {
@@ -45,8 +43,8 @@ export default class AutosaveService extends Service {
     }
   }
 
-  @task(function*() {
-    yield this.saveCard.perform();
+  @task(function*(card) {
+    yield this.saveCard.perform(card);
 
     this.justSaved = true;
 
@@ -57,28 +55,36 @@ export default class AutosaveService extends Service {
   saveCardWithState;
 
   @restartableTask
-  *debounceAndSave() {
+  *debounceAndSave(card) {
     yield timeout(this.autosaveDebounce);
+    this.saveCardWithState.perform(card);
+  }
+
+  @action
+  initAutosave(el, [isDirty, card]) {
+    if (isDirty && !autosaveDisabled) {
+      this.debounceAndSave.perform(card);
+    }
+  }
+
+  @action
+  saveOnce() {
     this.saveCardWithState.perform();
   }
-
-  @action
-  autoSave(element, [isDirty]) {
-    if (isDirty && !this.autosaveDisabled) {
-      if (this.args.clickAction) {
-        this.args.clickAction();
-      } else {
-        this.debounceAndSave.perform();
-      }
-    }
-  }
-
-  @action
-  save() {
-    if (this.args.clickAction) {
-      this.args.clickAction();
-    } else {
-      this.saveCardWithState.perform();
-    }
-  }
 }
+
+/*
+initAutosave
+in afterModel
+
+finalAutosave
+on willTransition for the route model
+
+??? cancelSave
+
+handleError
+
+@tracked
+hasError bool
+
+*/

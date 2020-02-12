@@ -1,5 +1,4 @@
 <Cta
-  {{on "click" this.save}}
   @variant="primary"
   class={{concat
     "save-button "
@@ -7,8 +6,8 @@
     (if (not (or @card.isDirty this.saveCard.isRunning)) "saved ")
   }}
   data-test-card-save-btn
-  {{did-insert this.autoSave @card.isDirty}}
-  {{did-update this.autoSave @card.isDirty}}
+  {{did-insert this.autosave.initAutosave @card.isDirty @card}}
+  {{did-update this.autosave.initAutosave @card.isDirty @card}}
 >
   {{#if this.saveCard.isRunning}}
     Saving
