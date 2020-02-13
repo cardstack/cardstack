@@ -16,17 +16,10 @@ import flatten from 'lodash/flatten';
 import uniqBy from 'lodash/uniqBy';
 import difference from 'lodash/difference';
 import intersection from 'lodash/intersection';
-import isObjectLike from 'lodash/isObjectLike';
+import isEqual from 'lodash/isEqual';
 import * as J from 'json-typescript';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
-import {
-  OcclusionFieldSets,
-  InnerOcclusionRules,
-  assertOcclusionFieldSets,
-  OcclusionRulesOrDefaults,
-  InnerOcclusionRulesOrDefaults,
-  Format,
-} from './occlusion-rules';
+import { OcclusionFieldSets, assertOcclusionFieldSets, Format, OcclusionRules } from './occlusion-rules';
 import { Container } from './container';
 import { ModuleLoader } from './module-loader';
 import { CardReader } from './card-reader';
@@ -47,7 +40,7 @@ export const apiPrefix = '/api';
 export async function makeCollection(
   cards: AddressableCard[],
   meta: ResponseMeta,
-  rules?: OcclusionRulesOrDefaults
+  rules?: OcclusionRules
 ): Promise<CollectionResourceDoc> {
   let pristineDocs = await Promise.all(cards.map(card => card.serializeAsJsonAPIDoc(rules)));
   let doc: CollectionResourceDoc = {
@@ -279,6 +272,19 @@ export class Card {
     }
   }
 
+  @Memoize()
+  private async allFieldNames(): Promise<string[]> {
+    let fields = [];
+    for (let card of [this, ...(await this.adoptionChain())]) {
+      if (card.csFields) {
+        for (let name of Object.keys(card.csFields)) {
+          fields.push(name);
+        }
+      }
+    }
+    return fields;
+  }
+
   private fieldsWithData(): string[] {
     let names: string[];
     if (this.attributes && this.relationships) {
@@ -332,25 +338,29 @@ export class Card {
 
   @Memoize()
   async field(name: string): Promise<FieldCard> {
-    if (this.csFields) {
-      if (name in this.csFields) {
-        return await this.container.instantiate(
-          FieldCard,
-          merge({ data: { type: 'cards' } }, { data: this.csFields[name] }),
-          name,
-          this,
-          this.reader,
-          this.modules,
-          this.container
-        );
-      }
-    }
-    let parent = await this.adoptsFrom();
-    if (parent) {
-      return await parent.field(name);
+    let data;
+
+    if (name === 'csAdoptsFrom') {
+      data = {};
+    } else if (this.csFields && name in this.csFields) {
+      data = this.csFields[name];
     } else {
+      let parent = await this.adoptsFrom();
+      if (parent) {
+        return await parent.field(name);
+      }
       throw new CardstackError(`no such field "${name}"`, { status: 400 });
     }
+
+    return await this.container.instantiate(
+      FieldCard,
+      merge({ data: { type: 'cards' } }, { data }),
+      name,
+      this,
+      this.reader,
+      this.modules,
+      this.container
+    );
   }
 
   // TODO needs testing!
@@ -392,13 +402,54 @@ export class Card {
     return adoptionChain;
   }
 
+  private async rulesForField(fieldName: string, rules: OcclusionRules): Promise<OcclusionRules | false> {
+    if (rules.includeFields) {
+      if (rules.includeFields.includes(fieldName)) {
+        // the shorthand form defaults to meaning "embedded"
+        return { includeFieldSet: 'embedded' };
+      }
+      for (let rule of rules.includeFields) {
+        if (typeof rule !== 'string' && rule.name === fieldName) {
+          return rule;
+        }
+      }
+    }
+    if (rules.includeFieldSet) {
+      let set = await this.fieldSet(rules.includeFieldSet);
+      let rule = set.get(fieldName);
+      if (rule) {
+        return rule;
+      }
+    }
+    // do not include this field at all
+    return false;
+  }
+
   @Memoize()
-  private async fieldSet(format: Format): Promise<Map<string, InnerOcclusionRules | true>> {
-    let fieldSet: Map<string, InnerOcclusionRules | true> = new Map();
+  private async fieldSet(format: Format): Promise<Map<string, OcclusionRules>> {
+    let fieldSet: Map<string, OcclusionRules> = new Map();
+
+    if (format === 'everything') {
+      for (let field of await this.allFieldNames()) {
+        fieldSet.set(field, { includeFieldSet: 'everything' });
+      }
+      fieldSet.set('csAdoptsFrom', { includeFieldSet: 'everything' });
+      return fieldSet;
+    }
+
+    if (format === 'upstream') {
+      for (let field of await this.allFieldNames()) {
+        // todo: skip computed fields here
+        fieldSet.set(field, { includeFieldSet: 'upstream' });
+      }
+      fieldSet.set('csAdoptsFrom', { includeFieldSet: 'upstream' });
+      return fieldSet;
+    }
+
     if (this.csFieldSets?.[format]) {
       for (let fieldRule of this.csFieldSets[format]) {
         if (typeof fieldRule === 'string') {
-          fieldSet.set(fieldRule, true);
+          fieldSet.set(fieldRule, { includeFieldSet: 'embedded' });
         } else {
           fieldSet.set(fieldRule.name, fieldRule);
         }
@@ -414,13 +465,10 @@ export class Card {
     }
   }
 
-  private async serialize(
-    rules: OcclusionRulesOrDefaults,
-    included: Map<string, OcclusionRulesOrDefaults[]>
-  ): Promise<ResourceObject> {
+  private async serialize(rules: OcclusionRules, included: Map<string, OcclusionRules[]>): Promise<ResourceObject> {
     let data = Object.create(null);
 
-    if (this instanceof AddressableCard) {
+    if (this.csId != null) {
       data.id = this.canonicalURL;
     }
 
@@ -467,15 +515,20 @@ export class Card {
       };
     }
 
-    for (let field of ['csAdoptsFrom', ...this.fieldsWithData()]) {
-      let rawData = this.rawData(field);
+    for (let fieldName of ['csAdoptsFrom', ...this.fieldsWithData()]) {
+      let rawData = this.rawData(fieldName);
       if (!rawData) {
         continue;
       }
+      let fieldRules = await this.rulesForField(fieldName, rules);
+      if (!fieldRules) {
+        continue;
+      }
+      let field = await this.field(fieldName);
       if ('value' in rawData) {
-        await this.applyRulesForAttribute(data.attributes, field, rules, rawData.value, included);
+        await this.applyRulesForAttribute(data.attributes, field, fieldRules, rawData.value, included);
       } else {
-        await this.applyRulesForRelationship(data.relationships, field, rules, rawData.ref, included);
+        await this.applyRulesForRelationship(data.relationships, field, fieldRules, rawData.ref, included);
       }
     }
 
@@ -486,10 +539,10 @@ export class Card {
     return data;
   }
 
-  private async serializeIncluded(included: Map<string, OcclusionRulesOrDefaults[]>): Promise<ResourceObject[]> {
+  private async serializeIncluded(included: Map<string, OcclusionRules[]>): Promise<ResourceObject[]> {
     let resources: ResourceObject[] = [];
     while (true) {
-      let foundMoreIncluded = new Map<string, OcclusionRulesOrDefaults[]>();
+      let foundMoreIncluded = new Map<string, OcclusionRules[]>();
       await Promise.all(
         [...included].map(async ([canonicalURL, rulesArray]) => {
           let card = await this.reader.get(canonicalURL);
@@ -510,147 +563,69 @@ export class Card {
 
   private async applyRulesForAttribute(
     attributes: AttributesObject,
-    field: string,
-    rules: OcclusionRulesOrDefaults,
+    field: FieldCard,
+    rules: OcclusionRules,
     data: any,
-    included: Map<string, OcclusionRulesOrDefaults[]>
+    included: Map<string, OcclusionRules[]>
   ): Promise<void> {
-    let includeFields = await this.includeFieldsForField(rules, field);
-    if (includeFields === 'everything' || includeFields === 'upstream') {
-      attributes[field] = cloneDeep(data);
-    } else if (rules) {
-      if (!includeFields.length) {
-        return;
-      }
-      if (includeFields.find(i => i.name === field) && !isObjectLike(data)) {
-        attributes[field] = data;
-        return;
-      }
+    if (await field.hasFeature('field-deserialize')) {
+      // this field's value is not a Card, it's a scalar. So no deeper occlusion
+      // is needed, the whole value is in.
+      attributes[field.name] = data;
+      return;
+    }
 
-      let interiorIncludeFields = flatten(
-        typeof includeFields !== 'string' ? includeFields.map(i => i.includeFields || []) : []
-      );
-      let interiorRule: OcclusionRulesOrDefaults =
-        typeof includeFields !== 'string' ? { includeFields: interiorIncludeFields } : includeFields;
-      setInteriorCardFieldSet(rules, interiorRule);
-
-      if (Array.isArray(data)) {
-        attributes[field] = await Promise.all(
-          data.map(async cardValue => {
-            let interiorCard = await this.container.instantiate(
-              Card,
-              { data: cardValue },
-              this.csRealm,
-              this,
-              this.reader,
-              this.modules,
-              this.container
-            );
-            return (await interiorCard.asInteriorCard(interiorRule, included)) as J.Value;
-          })
-        );
-      } else {
-        let interiorCard = await this.container.instantiate(
-          Card,
-          { data },
-          this.csRealm,
-          this,
-          this.reader,
-          this.modules,
-          this.container
-        );
-        attributes[field] = (await interiorCard.asInteriorCard(interiorRule, included)) as J.Value;
-      }
+    let cardOrCards = await this.value(field.name);
+    if (field.csFieldArity === 'plural') {
+      let cards = cardOrCards as Card[];
+      attributes[field.name] = (await Promise.all(cards.map(card => card.asInteriorCard(rules, included)))) as J.Arr;
+    } else {
+      let card = cardOrCards as Card;
+      attributes[field.name] = (await card.asInteriorCard(rules, included)) as J.Value;
     }
   }
 
   private async applyRulesForRelationship(
     relationships: RelationshipsObject,
-    field: string,
-    rules: OcclusionRulesOrDefaults,
+    field: FieldCard,
+    rules: OcclusionRules,
     reference: CardId | CardId[] | undefined,
-    included: Map<string, OcclusionRulesOrDefaults[]>
+    included: Map<string, OcclusionRules[]>
   ): Promise<void> {
-    let includeFields = await this.includeFieldsForField(rules, field);
-    if (includeFields === 'everything' || includeFields === 'upstream' || includeFields.length) {
-      if (Array.isArray(reference)) {
-        relationships[field] = {
-          data: reference.map(id => ({ type: 'cards', id: canonicalURL(id) })),
-        };
-      } else if (reference) {
-        relationships[field] = {
-          data: { type: 'cards', id: canonicalURL(reference) },
-        };
-      } else {
-        relationships[field] = { data: null };
-      }
+    if (field.csFieldArity === 'plural') {
+      relationships[field.name] = {
+        data: (reference as CardId[]).map(id => ({ type: 'cards', id: canonicalURL(id) })),
+      };
+    } else if (reference) {
+      relationships[field.name] = {
+        data: { type: 'cards', id: canonicalURL(reference as CardId) },
+      };
+    } else {
+      relationships[field.name] = { data: null };
     }
 
     if (!reference) {
       return;
     }
 
-    if (includeFields === 'upstream') {
-      // how to handle situation where the upstream doc provided to the Card
-      // constuctor had included? is it our responsibility to mirror any
-      // supplied included resources to the Card constuctor in the
-      // asUpstream() response?
-      return;
-    }
-    let interiorIncludeFields = flatten(
-      typeof includeFields !== 'string' ? includeFields.map(i => i.includeFields || []) : []
-    );
-    let relationshipRule: OcclusionRulesOrDefaults =
-      typeof includeFields !== 'string' ? { includeFields: interiorIncludeFields } : includeFields;
-    setInteriorCardFieldSet(rules, relationshipRule);
-
-    if (includeFields === 'everything' || includeFields.length) {
-      if (Array.isArray(reference)) {
-        for (let id of reference) {
-          let includedRules = included.get(canonicalURL(id)) || [];
-          includedRules.push(relationshipRule);
-          included.set(canonicalURL(id), includedRules);
-        }
-      } else {
-        let includedRules = included.get(canonicalURL(reference)) || [];
-        includedRules.push(relationshipRule);
-        included.set(canonicalURL(reference), includedRules);
+    if (Array.isArray(reference)) {
+      for (let id of reference) {
+        let includedRules = included.get(canonicalURL(id)) || [];
+        includedRules.push(rules);
+        included.set(canonicalURL(id), includedRules);
       }
+    } else {
+      let includedRules = included.get(canonicalURL(reference)) || [];
+      includedRules.push(rules);
+      included.set(canonicalURL(reference), includedRules);
     }
-  }
-
-  private async includeFieldsForField(
-    rules: OcclusionRulesOrDefaults,
-    field: string
-  ): Promise<InnerOcclusionRulesOrDefaults> {
-    let includeFields: InnerOcclusionRules[] = [];
-    if (rules === 'everything') {
-      return 'everything';
-    }
-    if (rules === 'upstream') {
-      return 'upstream';
-    }
-
-    if (rules.includeFieldSet) {
-      let fieldSetRules = (await this.fieldSet(rules.includeFieldSet)).get(field);
-      if (fieldSetRules) {
-        includeFields.push(fieldSetRules === true ? { name: field } : fieldSetRules);
-      }
-    }
-    includeFields = [
-      ...includeFields,
-      ...((rules.includeFields || []).filter(i => typeof i !== 'string' && i.name === field) as InnerOcclusionRules[]),
-    ];
-    if (rules.includeFields?.includes(field)) {
-      includeFields.push({ name: field });
-    }
-    return includeFields;
   }
 
   private async asInteriorCard(
-    rules: OcclusionRulesOrDefaults = 'everything',
-    includedMap: Map<string, OcclusionRulesOrDefaults[]>
+    rules: OcclusionRules = { includeFieldSet: 'everything' },
+    includedMap: Map<string, OcclusionRules[]>
   ): Promise<CardValue> {
+    this.serialize(rules, includedMap);
     let { id, attributes, relationships } = await this.serialize(rules, includedMap);
     let interiorJson: CardValue = {};
     if (id != null) {
@@ -666,8 +641,8 @@ export class Card {
   }
 
   // we might wanna think about getting rid of the PristineDocument Type and just use this instead...
-  async serializeAsJsonAPIDoc(rules: OcclusionRulesOrDefaults = 'everything'): Promise<SingleResourceDoc> {
-    let includedMap = new Map<string, OcclusionRulesOrDefaults[]>();
+  async serializeAsJsonAPIDoc(rules: OcclusionRules = { includeFieldSet: 'everything' }): Promise<SingleResourceDoc> {
+    let includedMap = new Map<string, OcclusionRules[]>();
     let data = await this.serialize(rules, includedMap);
     let jsonapi: SingleResourceDoc = { data };
     let included = (await this.serializeIncluded(includedMap)).filter(i => i.id !== this.canonicalURL);
@@ -678,7 +653,7 @@ export class Card {
   }
 
   async asUpstreamDoc(): Promise<UpstreamDocument> {
-    return new UpstreamDocument(await this.serializeAsJsonAPIDoc('upstream'));
+    return new UpstreamDocument(await this.serializeAsJsonAPIDoc({ includeFieldSet: 'upstream' }));
   }
 
   async asSearchDoc(visitedCards: string[] = []): Promise<J.Object> {
@@ -868,6 +843,18 @@ export class Card {
       return canonicalURL(id);
     }
     return undefined;
+  }
+
+  @Memoize()
+  async hasFeature(featureName: string): Promise<boolean> {
+    if (this.csFeatures && featureName in this.csFeatures) {
+      return true;
+    }
+    let parent = await this.adoptsFrom();
+    if (parent) {
+      return parent.hasFeature(featureName);
+    }
+    return false;
   }
 
   async loadFeature(featureName: 'writer'): Promise<WriterFactory | null>;
@@ -1160,6 +1147,19 @@ export class FieldCard extends Card {
     }
     return await this.patch({ data: value });
   }
+
+  async patch(otherDoc: SingleResourceDoc): Promise<FieldCard> {
+    let newDoc = await this.patchDoc((await this.asUpstreamDoc()).jsonapi, otherDoc);
+    return await this.container.instantiate(
+      FieldCard,
+      newDoc,
+      this.name,
+      this.enclosingCard,
+      this.reader,
+      this.modules,
+      this.container
+    );
+  }
 }
 
 export class AddressableCard extends Card implements CardId {
@@ -1284,28 +1284,18 @@ function relationshipToCardId(ref: RelationshipObject): CardId | CardId[] | unde
   }
 }
 
-function mergeRules(rules: OcclusionRulesOrDefaults[]): OcclusionRulesOrDefaults {
+function mergeRules(rules: OcclusionRules[]): OcclusionRules {
   if (rules.length === 0) {
     throw new Error(`bug: this should never happen`);
   }
   if (rules.length === 1) {
     return rules[0];
   }
-  if (rules.find(i => i === 'everything')) {
-    return 'everything';
+  if (rules.slice(1).every(rule => isEqual(rule, rules[0]))) {
+    return rules[0];
   }
-  throw new Error(`unimplemented: mergeRules`);
-}
-
-// need to run this by Ed, this assumes that all interior cards will return
-// embedded field sets if the outer card was requested with a fieldset.
-function setInteriorCardFieldSet(rules: OcclusionRulesOrDefaults, interiorCardRules: OcclusionRulesOrDefaults): void {
-  if (
-    typeof rules === 'object' &&
-    rules.includeFieldSet &&
-    interiorCardRules !== 'everything' &&
-    interiorCardRules !== 'upstream'
-  ) {
-    interiorCardRules.includeFieldSet = 'embedded';
-  }
+  // to implement correctly, mergeRules will need to become a method on Card
+  // because it needs to run `this.fieldSet()` to expand field sets into
+  // individual fields.
+  throw new Error(`mergeRules: unimplemented`);
 }

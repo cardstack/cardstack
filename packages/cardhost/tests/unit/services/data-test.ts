@@ -211,7 +211,7 @@ module('Unit | Service | data', function() {
       let service = this.owner.lookup('service:data') as DataService;
       let card = await service.load(daddy, 'everything');
 
-      let doc = await card.serializeAsJsonAPIDoc('everything');
+      let doc = await card.serializeAsJsonAPIDoc({ includeFieldSet: 'everything' });
       assert.equal(doc.data.type, 'cards');
       assert.equal(doc.data.id, daddy.canonicalURL);
       assert.equal(doc.data.attributes?.name, 'Hassan');

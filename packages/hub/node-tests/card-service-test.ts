@@ -1995,7 +1995,7 @@ describe('hub/card-service', function() {
         await env.destroy();
       });
 
-      it('omits included cards when getting the upstream doc', async function() {
+      it('serializes the upstream doc', async function() {
         let { jsonapi: doc } = await daddy.asUpstreamDoc();
         expect(doc).to.have.nested.property('data.type', 'cards');
         expect(doc).to.have.nested.property('data.id', daddy.canonicalURL);
@@ -2004,7 +2004,6 @@ describe('hub/card-service', function() {
           { type: 'cards', id: vanGogh.canonicalURL },
           { type: 'cards', id: mango.canonicalURL },
         ]);
-        expect(doc).to.not.have.property('included');
       });
 
       it('recursively includes all resources and fields when getting the pristine doc if no rules are provided', async function() {
@@ -2258,6 +2257,7 @@ describe('hub/card-service', function() {
             {
               name: 'puppies',
               includeFields: [
+                'name',
                 {
                   name: 'favoriteToy',
                   includeFields: ['description'],
