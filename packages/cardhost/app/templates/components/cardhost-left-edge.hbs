@@ -68,7 +68,7 @@
         </li>
         <li>
           <button
-            {{on "click" (fn this.library.displayLibrary true)}}
+            {{on "click" this.library.show}}
             disabled={{not session.isAuthenticated}}
             class="cardhost-left-edge--nav-button"
             aria-label="library"

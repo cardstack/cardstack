@@ -18,7 +18,7 @@ export default class CardhostLeftEdgeComponent extends Component {
   @action
   logout(sessionLogout) {
     sessionLogout();
-    this.library.displayLibrary(false);
+    this.library.hide();
     let cardId = this.router.currentRoute.parent.params.name;
     if (cardId) {
       this.router.transitionTo('cards.card.view', cardId);

@@ -51,6 +51,6 @@ export default class CardsRoute extends Route {
 
   @action
   willTransition() {
-    this.library.displayLibrary(false);
+    this.library.hide();
   }
 }

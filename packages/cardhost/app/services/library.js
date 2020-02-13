@@ -6,7 +6,12 @@ export default class LibraryService extends Service {
   @tracked visible = false;
 
   @action
-  displayLibrary(isVisible) {
-    this.visible = isVisible;
+  show() {
+    this.visible = true;
+  }
+
+  @action
+  hide() {
+    this.visible = false;
   }
 }
