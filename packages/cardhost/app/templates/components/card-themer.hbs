@@ -1,0 +1,24 @@
+<section class="card-view" data-test-card-view={{this.card.csTitle}}>
+  <CardRenderer
+    @card={{@card}}
+    @format="isolated"
+    @mode="view"
+    @class="themer"
+    @cardSelected={{false}}
+    @cardLoaded={{perform this.waitForCss}}
+  />
+</section>
+
+{{#if this.isCardReady}}
+  <div data-test-editor-pane>
+    <EditorPane data-test-dock-location={{this.cssModeToggle.dockLocation}}
+      @css={{this.isolatedCss}}
+      @card={{this.card}}
+      @updateCode={{this.updateCss}}
+    />
+  </div>
+{{/if}}
+
+<style data-test-view-css>
+  {{scope-css this.isolatedCss (concat (safe-css-string this.card.canonicalURL) "--isolated")}}
+</style>

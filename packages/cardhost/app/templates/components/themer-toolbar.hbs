@@ -61,6 +61,10 @@
       Close
     </Cta>
 
-    <SaveButton @card={{@model}} />
+    <SaveButton
+      @card={{@model.card}}
+      @isDirty={{@model.isDirty}}
+      @updateCard={{@updateCard}}
+    />
   </div>
 </header>

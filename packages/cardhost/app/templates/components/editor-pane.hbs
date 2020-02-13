@@ -10,7 +10,7 @@
     <div class="editor-section" aria-label={{this.monacoKeyboardInstructions}}>
       <CodeEditor
         @title="CSS"
-        @code={{@model.isolatedCss}}
+        @code={{@css}}
         @language="css"
         @readOnly={{false}}
         @resizable={{true}}
@@ -25,7 +25,7 @@
         @code={{this.markup}}
         @language="handlebars"
         @readOnly={{true}}
-        @resizable={{true}} 
+        @resizable={{true}}
       />
     </div>
     {{svg-jar "icon-grabber" class="drag-handle"}}
@@ -33,5 +33,5 @@
 </ReSizable>
 
 <style data-test-preview-css>
-  {{scope-css @model.isolatedCss @model.name}}
+  {{scope-css @css (concat (safe-css-string this.args.card.canonicalURL) "--isolated")}}
 </style>

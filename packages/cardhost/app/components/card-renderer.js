@@ -4,12 +4,14 @@ import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import move from 'ember-animated/motions/move';
 import adjustCSS from 'ember-animated/motions/adjust-css';
-import { task } from 'ember-concurrency';
+import { task, waitForProperty } from 'ember-concurrency';
+import { scheduleOnce } from '@ember/runloop';
 
 const duration = 250;
 // TODO This will be part of the official API. Move this into core as it solidifies
 export default class CardRenderer extends Component {
   @service cardstackSession;
+  @service('-ea-motion') motion;
 
   @tracked actualFields;
   @tracked fields;
@@ -25,17 +27,31 @@ export default class CardRenderer extends Component {
     if (this.args.cardFocused) {
       this.cardFocused = this.args.cardFocused;
     }
-    this.loadCard.perform();
+    this.doOnLoadComplete.perform();
   }
 
-  @task(function*() {
+  @(task(function*() {
     this.actualFields = yield this.args.card.fields();
     this.fields = [...this.actualFields];
-  })
+  }).drop())
   loadCard;
 
+  @task(function*() {
+    yield this.loadCard.perform();
+    if (typeof this.args.cardLoaded === 'function') {
+      let onRenderComplete;
+      let render = new Promise(res => (onRenderComplete = res));
+      yield this.loadCard.last.then();
+      scheduleOnce('afterRender', this, onRenderComplete);
+      yield render;
+      yield waitForProperty(this.motion, 'isAnimating', false);
+      yield this.args.cardLoaded();
+    }
+  })
+  doOnLoadComplete;
+
   @(task(function*(field, position, isAdding) {
-    yield this.loadCard.last.finally();
+    yield this.loadCard.perform();
 
     if (!this.args.addFieldPromise || this.args.addFieldPromise.isFulfilled()) {
       if (isAdding) {

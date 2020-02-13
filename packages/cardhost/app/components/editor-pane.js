@@ -5,7 +5,6 @@ import { tracked } from '@glimmer/tracking';
 export default class EditorPane extends Component {
   @service cssModeToggle;
   @tracked markup;
-  @tracked css = this.args.model.isolatedCss;
   monacoKeyboardInstructions =
     'Once you focus on the editable code blocks, Tab becomes a tab character in the code. To escape Tab trapping, use Ctrl+M on Windows and Linux, or use Ctrl+Shift+M on OSX. Then the next Tab key will move focus out of the editor.';
 

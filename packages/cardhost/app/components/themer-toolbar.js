@@ -8,6 +8,6 @@ export default class ThemerToolbarComponent extends Component {
 
   @action
   close() {
-    this.router.transitionTo('cards.card.edit.layout', this.args.model);
+    this.router.transitionTo('cards.card-v2.edit.layout', this.args.model);
   }
 }

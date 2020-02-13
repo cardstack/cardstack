@@ -9,7 +9,7 @@ import { isolatedCssFile } from '../../../../../utils/scaffolding';
 import { Model } from '../../../../../routes/cards/card-v2';
 import EditCardV2Controller from '../../edit';
 
-interface ThemeOption {
+export interface ThemeOption {
   name: string;
 }
 
