@@ -2,20 +2,14 @@
   <div class="card-renderer--top-edge-buttons">
     <div class="top-edge--mode-label">
       Edit Mode
-      {{!-- disabling this while we are working out the models
         <LinkTo
-          @route="cards.card.view"
+          @route="cards.card-v2.view"
           @class="top-edge--mode-link view"
           @model={{this.model}}
           data-test-top-edge-link="view"
         >
           <span>Preview</span>
         </LinkTo>
-      --}}
-      {{!-- this is a placeholder link --}}
-      <a class="top-edge--mode-link view">
-        <span>Preview</span>
-      </a>
     </div>
     <SaveButton
       @card={{this.model.card}}

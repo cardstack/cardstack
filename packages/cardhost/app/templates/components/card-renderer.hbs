@@ -36,18 +36,14 @@
           <header class="card-renderer-isolated--header">
             <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.csTitle "Blank Card"}}</span>
             {{#if (eq @mode "edit")}}
-              {{!-- disabling this while we are working out the models
               <LinkTo
-                @route="cards.card.view"
-                @model={{@card}}
+                @route="cards.card-v2.view"
+                @model={{@card.canonicalURL}}
                 @class="card-renderer--header-link"
                 data-test-card-done-link
               >
                 Done
               </LinkTo>
-              --}}
-              {{!-- this is a placeholder link --}}
-              <a class="card-renderer--header-link">Done</a>
             {{/if}}
           </header>
         </div>
@@ -94,27 +90,13 @@
       data-test-card-renderer-embedded
     >
       {{#if (and (eq this.mode "view") (not @preventIsolation))}}
-        {{!-- disabling this while we are working out the models
         <LinkTo
           @class="card-renderer--embedded-card-link"
-          @route="cards.card.view"
-          @model={{@card.csTitle}}
+          @route="cards.card-v2.view"
+          @model={{@card.canonicalURL}}
           aria-label={{@card.csTitle}}
         >
-        --}}
-        {{!-- this is a placeholder link --}}
-        <a class="card-renderer--embedded-card-link">
-          <Scaffold
-            @card={{@card}}
-            @feature="embedded-layout"
-            @mode={{this.mode}} />
-          {{#if @showName}}
-            <div class="embedded-card-label">{{@card.csTitle}}</div>
-          {{/if}}
-        </a>
-        {{!-- disabling this while we are working out the models
         </LinkTo>
-        --}}
       {{else}}
         <Scaffold
           @card={{@card}}
