@@ -27,14 +27,15 @@ export default class CardNameDialog extends Component {
   }
 
   @task(function*() {
-    // TODO need to handle adoptedFrom arg
-    let newCard = yield this.data.create(
-      getUserRealm(),
-      cardDocument().withAttributes({
-        csTitle: this.name,
-      }).jsonapi
-    );
-    let card = yield this.data.save(newCard);
+    let doc = cardDocument().withAttributes({
+      csTitle: this.name,
+    });
+    if (this.args.adoptsFrom) {
+      doc.adoptingFrom(this.args.adoptsFrom);
+    }
+
+    let unsavedCard = yield this.data.create(getUserRealm(), doc.jsonapi);
+    let card = yield this.data.save(unsavedCard);
     this.router.transitionTo('cards.card-v2.edit', { card });
   })
   createCardTask;

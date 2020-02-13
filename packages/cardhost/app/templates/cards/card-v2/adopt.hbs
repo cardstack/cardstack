@@ -1,0 +1,12 @@
+<CardhostLeftEdge />
+
+{{to-elsewhere
+  named="cardhost-modal"
+  send=(component
+          "card-name-dialog"
+          title="Adopt a Card"
+          mode="dark"
+          icon="icon-blank-card"
+          adoptsFrom=this.model.card
+        )
+}}

@@ -18,7 +18,21 @@ export default class ScaffoldComponent extends Component<{
   constructor(owner: unknown, args: any) {
     super(owner, args);
 
-    let csId = this.args.card.adoptsFromId?.csId || this.args.card.csId;
+    let csId: string;
+    if (!this.args.card.adoptsFromId) {
+      csId = 'base';
+    }
+
+    switch (this.args.card.adoptsFromId?.csId) {
+      case 'string-field':
+      case 'integer-field':
+      case 'boolean-field':
+        csId = this.args.card.adoptsFromId?.csId;
+        break;
+
+      default:
+        csId = 'base';
+    }
     this.componentName = `scaffolding/${dasherize(csId!)}/${dasherize(this.args.feature)}`;
   }
 }
