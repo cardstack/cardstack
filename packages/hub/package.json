@@ -46,7 +46,7 @@
     "node": ">= 12"
   },
   "scripts": {
-    "test": "mocha -r esm ../test-support/bin/run.js --timeout 10000"
+    "test": "mocha -r esm ../test-support/bin/run.js --timeout 20000"
   },
   "volta": {
     "node": "12.13.1"
