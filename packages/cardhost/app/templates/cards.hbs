@@ -8,9 +8,9 @@
   {{this.themerClasses}}"
   data-test-cardhost-cards
 >
-  {{#unless (eq this.routeInfo.mode "cards")}}
+  {{#if (not-eq this.routeInfo.mode "cards")}}
     <CardhostTopEdge @mode={{this.routeInfo.mode}} @card={{this.target.currentRoute.parent.attributes}} />
-  {{/unless}}
+  {{/if}}
 
   {{outlet}}
 </div>

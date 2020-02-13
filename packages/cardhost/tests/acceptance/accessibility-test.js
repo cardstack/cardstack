@@ -63,7 +63,7 @@ module('Acceptance | accessibility', function(hooks) {
     assert.ok(true, 'no a11y errors found for themer');
 
     await visit('/');
-    assert.equal(currentURL(), `/`);
+    assert.equal(currentURL(), `/cards`);
     assert.ok(true, 'no a11y errors found for index');
   });
 });

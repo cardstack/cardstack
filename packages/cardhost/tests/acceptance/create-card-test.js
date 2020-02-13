@@ -114,7 +114,7 @@ module('Acceptance | card create', function(hooks) {
     await login();
     await visit('/');
 
-    assert.equal(currentURL(), '/');
+    assert.equal(currentURL(), '/cards');
     await percySnapshot(assert);
     await click('[data-test-library-button]');
     assert.dom('[data-test-library]').exists();

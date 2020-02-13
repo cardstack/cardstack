@@ -77,7 +77,7 @@ module('Acceptance | logged-out', function(hooks) {
   test('viewing index page', async function(assert) {
     await login();
     await visit(`/`);
-    assert.equal(currentURL(), `/`);
+    assert.equal(currentURL(), `/cards`);
     assert.dom('[data-test-card-builder]').exists();
     assert.dom('[data-test-featured-card]').exists({ count: 4 });
     assert.dom('[data-test-cardhost-left-edge]').exists();
@@ -109,6 +109,6 @@ module('Acceptance | logged-out', function(hooks) {
     assert.equal(currentURL(), `/cards/${card1Id}`);
     assert.dom('[data-test-home-link]').exists();
     await click('[data-test-home-link]');
-    assert.equal(currentURL(), `/`);
+    assert.equal(currentURL(), `/cards`);
   });
 });

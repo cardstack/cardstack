@@ -48,15 +48,9 @@ module('Acceptance | library', function(hooks) {
     // local store. So the first step is to warm up the store.
     await login();
     await createCards({
-      [card3Id]: [
-        ['name', 'string', true, 'Hassan Abdel-Rahman'],
-        ['email', 'case-insensitive string', false, 'hassan@nowhere.dog'],
-      ],
-      [card2Id]: [
-        ['name', 'string', true, 'Van Gogh'],
-        ['email', 'string', false, 'vangogh@nowhere.dog'],
-      ],
       [card1Id]: [['title', 'string', true, 'The Millenial Puppy']],
+      [card2Id]: [['title', 'string', true, 'The Fancy Kitten']],
+      [card3Id]: [['title', 'string', true, 'Venus the Guppy']],
     });
   });
 
@@ -95,7 +89,7 @@ module('Acceptance | library', function(hooks) {
   });
 
   test(`closing library panel`, async function(assert) {
-    await visit(`/`);
+    await visit(`/cards`);
     await click('[data-test-library-button]');
     assert.dom('[data-test-library]').exists();
     await click('[data-test-library-close-button]');
@@ -103,8 +97,8 @@ module('Acceptance | library', function(hooks) {
   });
 
   test(`created card ids are in local storage`, async function(assert) {
-    await visit(`/`);
-    assert.equal(currentURL(), '/');
+    await visit(`/cards`);
+    assert.equal(currentURL(), '/cards');
     let ids = this.owner.lookup('service:card-local-storage').getRecentCardIds();
     assert.ok(ids.includes(qualifiedCard1Id));
     assert.ok(ids.includes(qualifiedCard2Id));
@@ -112,8 +106,8 @@ module('Acceptance | library', function(hooks) {
   });
 
   test(`isolating a card`, async function(assert) {
-    await visit('/');
-    assert.equal(currentURL(), '/');
+    await visit('/cards');
+    assert.equal(currentURL(), '/cards');
     await click('[data-test-library-button]');
     await animationsSettled();
     assert.dom(`[data-test-embedded-card=${card2Id}]`).exists();
@@ -122,6 +116,23 @@ module('Acceptance | library', function(hooks) {
     await waitFor(`[data-test-card-view=${card2Id}]`, {
       timeout,
     });
+    assert.dom(`[data-test-card-view=${card2Id}]`).containsText('The Fancy Kitten');
     await percySnapshot(assert);
+  });
+
+  test(`transitioning to a different card`, async function(assert) {
+    await visit(`/cards/${card1Id}`);
+    assert.equal(currentURL(), `/cards/${card1Id}`);
+    assert.dom(`[data-test-card-view=${card1Id}]`).containsText('The Millenial Puppy');
+    await click('[data-test-library-button]');
+    await animationsSettled();
+    assert.dom(`[data-test-embedded-card=${card3Id}]`).exists();
+    await click(`[data-test-embedded-card=${card3Id}]`);
+    assert.equal(currentURL(), `/cards/${card3Id}`);
+    await waitFor(`[data-test-card-view=${card3Id}]`, {
+      timeout,
+    });
+    assert.dom(`[data-test-card-view=${card3Id}]`).doesNotContainText('The Millenial Puppy');
+    assert.dom(`[data-test-card-view=${card3Id}]`).containsText('Venus the Guppy');
   });
 });
