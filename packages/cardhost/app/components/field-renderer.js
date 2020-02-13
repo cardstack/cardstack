@@ -33,7 +33,9 @@ export default class FieldRenderer extends Component {
     if (this.isStubField) {
       this.fieldType = 'New Field';
     } else {
-      this.fieldValue = yield this.args.field.enclosingCard.value(this.args.field.name);
+      if (this.args.field.enclosingCard) {
+        this.fieldValue = yield this.args.field.enclosingCard.value(this.args.field.name);
+      }
       let fieldTypeCard = yield this.args.field.adoptsFrom();
       this.fieldType = fieldTypeCard.csTitle;
     }
@@ -77,7 +79,7 @@ export default class FieldRenderer extends Component {
   }
 
   get isStubField() {
-    return this.args.field.csOriginalRealm === 'stub-card';
+    return this.args.field.csRealm === 'stub-card';
   }
 
   get fieldName() {
