@@ -222,8 +222,8 @@ export class Card {
   async validate(priorCard: Card | null, realm: AddressableCard, _forDeletion?: true) {
     for (let name of this.fieldsWithData()) {
       // cast is safe because all fieldsWithData have non-null rawData
-      let rawData = this.rawData(name)!;
-      let priorRawData = priorCard?.rawData(name);
+      let rawData = (await this.rawData(name))!;
+      let priorRawData = await priorCard?.rawData(name);
       let field = await this.field(name);
       if ('value' in rawData) {
         let { value } = rawData;
@@ -236,7 +236,7 @@ export class Card {
       } else {
         let cardIds = rawData.ref;
         this.assertArity(field, name, cardIds);
-        let priorRawData = priorCard?.rawData(name);
+        let priorRawData = await priorCard?.rawData(name);
         let priorRef: CardId | CardId[] | undefined = undefined;
         if (priorRawData && 'ref' in priorRawData) {
           priorRef = priorRawData.ref;
@@ -299,7 +299,12 @@ export class Card {
     return names.filter(name => !cardstackFieldPattern.test(name));
   }
 
-  private rawData(fieldName: string): RawData {
+  private async rawData(fieldName: string): Promise<RawData> {
+    let field = await this.field(fieldName);
+    let compute = await field.loadFeature('compute');
+    if (compute) {
+      return await compute();
+    }
     if (this.attributes) {
       if (fieldName in this.attributes) {
         return { value: this.attributes[fieldName] };
@@ -315,7 +320,7 @@ export class Card {
 
   // gets the value of a field. Its type is governed by the schema of this card.
   async value(fieldName: string): Promise<any> {
-    let rawData = this.rawData(fieldName);
+    let rawData = await this.rawData(fieldName);
     if (rawData == null) {
       return rawData;
     }
@@ -430,17 +435,19 @@ export class Card {
     let fieldSet: Map<string, OcclusionRules> = new Map();
 
     if (format === 'everything') {
-      for (let field of await this.allFieldNames()) {
-        fieldSet.set(field, { includeFieldSet: 'everything' });
+      for (let fieldName of await this.allFieldNames()) {
+        fieldSet.set(fieldName, { includeFieldSet: 'everything' });
       }
       fieldSet.set('csAdoptsFrom', { includeFieldSet: 'everything' });
       return fieldSet;
     }
 
     if (format === 'upstream') {
-      for (let field of await this.allFieldNames()) {
-        // todo: skip computed fields here
-        fieldSet.set(field, { includeFieldSet: 'upstream' });
+      for (let fieldName of await this.allFieldNames()) {
+        let field = await this.field(fieldName);
+        if (!(await field.isComputed())) {
+          fieldSet.set(fieldName, { includeFieldSet: 'upstream' });
+        }
       }
       fieldSet.set('csAdoptsFrom', { includeFieldSet: 'upstream' });
       return fieldSet;
@@ -505,18 +512,27 @@ export class Card {
     }
 
     data.relationships = Object.create(null);
-    let adoptsFrom = await this.adoptsFrom();
+    let adoptsFrom = this.adoptsFromId;
     if (adoptsFrom) {
+      let url = canonicalURL(adoptsFrom);
       data.relationships.csAdoptsFrom = {
         data: {
           type: 'cards',
-          id: adoptsFrom.canonicalURL,
+          id: url,
         },
       };
+      let fieldRules = await this.rulesForField('csAdoptsFrom', rules);
+      if (fieldRules) {
+        // you're allowed to include csAdoptsFrom in the occlusion rules, in
+        // which case it can end up in included
+        let includedRules = included.get(url) || [];
+        includedRules.push(fieldRules);
+        included.set(url, includedRules);
+      }
     }
 
-    for (let fieldName of ['csAdoptsFrom', ...this.fieldsWithData()]) {
-      let rawData = this.rawData(fieldName);
+    for (let fieldName of await this.allFieldNames()) {
+      let rawData = await this.rawData(fieldName);
       if (!rawData) {
         continue;
       }
@@ -682,7 +698,7 @@ export class Card {
     // via value or reference. At a future time, when we add occlusion to guide
     // how to construct "embedded" cards we'll revisit this logic to make sure
     // the search doc follows the occlusion boundary.
-    for (let fieldName of this.fieldsWithData()) {
+    for (let fieldName of await this.allFieldNames()) {
       let value = await this.value(fieldName);
       let field = await this.field(fieldName);
       let fullFieldName = `${field.enclosingCard.canonicalURL}/${fieldName}`;
@@ -812,16 +828,10 @@ export class Card {
       return;
     }
 
-    // this cast is safe because:
-    //   1. Our constructor asserted that relationships.csAdoptsFrom was
-    //      singular, not plural.
-    //   2. There's no way to customize the FieldCard for csAdoptsFrom to
-    //      provide an alternative deserialize() hook.
-    let card = (await this.value('csAdoptsFrom')) as AddressableCard | null;
-    if (card) {
-      return card;
+    let adoptsFromId = this.adoptsFromId;
+    if (adoptsFromId) {
+      return await this.reader.get(adoptsFromId);
     }
-
     return await this.reader.get({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' });
   }
 
@@ -831,9 +841,8 @@ export class Card {
       // base card has no parent
       return undefined;
     }
-    let data = this.rawData('csAdoptsFrom');
-    if (data && 'ref' in data && !Array.isArray(data.ref)) {
-      return data.ref;
+    if (this.relationships?.csAdoptsFrom) {
+      return relationshipToCardId(this.relationships.csAdoptsFrom) as CardId | undefined;
     }
     return { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' };
   }
@@ -869,6 +878,7 @@ export class Card {
   async loadFeature(featureName: 'field-edit-layout'): Promise<null | Component>;
   async loadFeature(featureName: 'isolated-css'): Promise<null | string>;
   async loadFeature(featureName: 'embedded-css'): Promise<null | string>;
+  async loadFeature(featureName: 'compute'): Promise<null | (() => RawData)>;
   async loadFeature(featureName: string): Promise<any> {
     let card: Card | undefined = this;
     while (card) {
@@ -1029,6 +1039,10 @@ export class FieldCard extends Card {
     if (typeof jsonapi.data.attributes?.csFieldArity === 'string') {
       this.csFieldArity = jsonapi.data.attributes?.csFieldArity === 'plural' ? 'plural' : 'singular';
     }
+  }
+
+  async isComputed(): Promise<boolean> {
+    return await this.hasFeature('compute');
   }
 
   // TODO test this
