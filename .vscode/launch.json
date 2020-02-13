@@ -31,7 +31,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["-r", "esm", "packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can create a card with a field that has > 1 arity filled with cards as value"],
+      "args": ["-r", "esm", "packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "recomputes when a field in the computed field itself changes"],
     },
     {
       "type": "node",

@@ -303,7 +303,7 @@ export class Card {
     let field = await this.field(fieldName);
     let compute = await field.loadFeature('compute');
     if (compute) {
-      return await compute();
+      return await compute({ field, card: this });
     }
     if (this.attributes) {
       if (fieldName in this.attributes) {
@@ -878,7 +878,7 @@ export class Card {
   async loadFeature(featureName: 'field-edit-layout'): Promise<null | Component>;
   async loadFeature(featureName: 'isolated-css'): Promise<null | string>;
   async loadFeature(featureName: 'embedded-css'): Promise<null | string>;
-  async loadFeature(featureName: 'compute'): Promise<null | (() => RawData)>;
+  async loadFeature(featureName: 'compute'): Promise<null | ((context: { field: FieldCard; card: Card }) => RawData)>;
   async loadFeature(featureName: string): Promise<any> {
     let card: Card | undefined = this;
     while (card) {
