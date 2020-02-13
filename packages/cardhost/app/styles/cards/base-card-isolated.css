@@ -1,3 +1,8 @@
+/* TODO this needs to move into the cards/base/isolated.css file--it is ready now */
+
+/* TODO we need to move all the styles for embedded cards (like photos, images,
+fields, etc..) into their respective card packages. */
+
 .cardstack_base-card-isolated {
   width: 100%;
   min-height: inherit;

@@ -1,3 +1,5 @@
+/* TODO this needs to move into the cards/base/embedded.css file--it is ready now */
+
 /* Embedded card inside an isolated card */
 .cardstack_base-card-isolated .cardstack_base-card-embedded {
   margin: inherit;
