@@ -62,6 +62,7 @@ class Drag extends Motion {
     sprite.applyStyles({
       'z-index': '1',
       outline,
+      'box-shadow': '0px 15px 30px 0px rgba(0,0,0,0.25)',
     });
 
     // when we first start a new "keyboard" drag, adjust the active

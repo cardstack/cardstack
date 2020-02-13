@@ -1,6 +1,7 @@
 .drop-zone--container {
   height: 0;
   position: relative;
+  z-index: 10;
 }
 
 .drop-zone {
@@ -23,7 +24,7 @@
 
 /* ember-animated drag has started, but is not yet over a dropzone */
 .cardhost-cards.dragging .drop-zone--container:not(.dragging) .drop-zone {
-  height: 150px;
+  height: 175px;
 }
 
 /* ember-animated drag has started, and is over a dropzone */
