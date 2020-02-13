@@ -12,7 +12,7 @@
         {{#let this.target.currentRoute.parent.attributes as |model|}}
           <div class="view-selector">
             <LinkTo
-              @route="cards.card-v2.edit.layout"
+              @route="cards.card.edit.layout"
               @class="view-selector--mode-link"
               @model={{model}}
               data-test-view-selector="layout"
@@ -21,7 +21,7 @@
               Layout
             </LinkTo>
             <LinkTo
-              @route="cards.card-v2.edit.fields"
+              @route="cards.card.edit.fields"
               @class="view-selector--mode-link"
               @model={{model}}
               data-test-view-selector="fields"

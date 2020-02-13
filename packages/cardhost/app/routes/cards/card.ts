@@ -12,7 +12,7 @@ export interface Model {
   isDirty: boolean;
 }
 
-export default class CardsCardV2 extends Route {
+export default class CardsCard extends Route {
   @service data!: DataService;
 
   async model({ id }: RouteParams): Promise<Model> {

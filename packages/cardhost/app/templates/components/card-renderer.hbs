@@ -20,7 +20,7 @@
               <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.csTitle "Blank Card"}}</span>
               {{#if this.cardstackSession.isAuthenticated}}
                 <LinkTo
-                  @route="cards.card-v2.edit.fields"
+                  @route="cards.card.edit.fields"
                   @model={{@card.canonicalURL}}
                   @class="card-renderer--header-link"
                   data-test-card-edit-link
@@ -37,7 +37,7 @@
             <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.csTitle "Blank Card"}}</span>
             {{#if (eq @mode "edit")}}
               <LinkTo
-                @route="cards.card-v2.view"
+                @route="cards.card.view"
                 @model={{@card.canonicalURL}}
                 @class="card-renderer--header-link"
                 data-test-card-done-link
@@ -92,7 +92,7 @@
       {{#if (and (eq this.mode "view") (not @preventIsolation))}}
         <LinkTo
           @class="card-renderer--embedded-card-link"
-          @route="cards.card-v2.view"
+          @route="cards.card.view"
           @model={{@card.canonicalURL}}
           aria-label={{@card.csTitle}}
         >

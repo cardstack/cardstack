@@ -36,7 +36,7 @@ export default class CardNameDialog extends Component {
 
     let unsavedCard = yield this.data.create(getUserRealm(), doc.jsonapi);
     let card = yield this.data.save(unsavedCard);
-    this.router.transitionTo('cards.card-v2.edit', { card });
+    this.router.transitionTo('cards.card.edit', { card });
   })
   createCardTask;
 
