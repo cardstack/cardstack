@@ -8,7 +8,7 @@
         class="ch-catalog--fields"
         tabindex="0"
       >
-        {{#animated-each this.fieldComponents use=this.transition watch="dragState" as |field|}}
+        {{#animated-each this.fieldComponents use=this.transition watch="dragState,dropTo" as |field|}}
           <div
             class="ch-catalog-field"
             tabindex="-1"

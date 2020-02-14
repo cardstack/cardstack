@@ -9,6 +9,8 @@ import ENV from '@cardstack/cardhost/config/environment';
 import { fieldTypeMappings, fieldComponents } from '../utils/mappings';
 import drag from '../motions/drag';
 import move from 'ember-animated/motions/move';
+import scaleBy from '../motions/scale';
+import { parallel } from 'ember-animated';
 
 const { environment } = ENV;
 
@@ -368,9 +370,19 @@ export default class CardManipulator extends Component {
       activeSprite.element.parentElement.appendChild(ghostElement);
       others.forEach(move);
     } else {
-      keptSprites.forEach(sprite => {
-        move(sprite, { duration: 300 });
-      });
+      let droppedSprite = keptSprites.find(sprite => sprite.owner.value.dropTo);
+      if (droppedSprite) {
+        let scaleTo = 0.1;
+        let dropZoneEl = droppedSprite.owner.value.dropTo;
+        let position = parseInt(dropZoneEl.dataset.dropZonePosition) + 1;
+        let targetField = document.querySelector(
+          `.isolated-card section:nth-of-type(${position}) .schema-field-renderer`
+        );
+        let { width, height } = targetField.getBoundingClientRect();
+        droppedSprite.endTranslatedBy(((1 - scaleTo) / 2) * width, ((1 - scaleTo) / 2) * height);
+        yield parallel(scaleBy(droppedSprite, { by: scaleTo }), move(droppedSprite));
+        droppedSprite.owner.value.dropTo = null;
+      }
     }
   }
 }

@@ -12,6 +12,7 @@
     {{on "dragenter" (fn this.updateStatus "dragging")}}
     {{on "dragleave" (fn this.updateStatus "outside")}}
     data-test-drop-zone={{@position}}
+    data-drop-zone-position={{@position}}
     aria-label="drop zone {{@position}}"
   >
     <div class="drop-zone--description {{this.dropZoneStatus}}">
