@@ -1,0 +1,26 @@
+<div class="card-size-toggle" data-test-card-size-toggle ...attributes>
+  <button
+    class="ch-button ch-button--icon card-size-btn {{if (eq this.cssModeToggle.width "small") "selected"}}"
+    {{on "click" (fn this.cssModeToggle.setWidth "small")}}
+    aria-label="Show the card in small size"
+    data-test-small-btn
+  >
+    S
+  </button>
+  <button
+    class="ch-button ch-button--icon card-size-btn {{if (eq this.cssModeToggle.width "medium") "selected"}}"
+    {{on "click" (fn this.cssModeToggle.setWidth "medium")}}
+    aria-label="Show the card in medium size"
+    data-test-medium-btn
+  >
+    M
+  </button>
+  <button
+    class="ch-button ch-button--icon card-size-btn {{if (eq this.cssModeToggle.width "large") "selected"}}"
+    {{on "click" (fn this.cssModeToggle.setWidth "large")}}
+    aria-label="Show the card in full width size"
+    data-test-large-btn
+  >
+    L
+  </button>
+</div>
