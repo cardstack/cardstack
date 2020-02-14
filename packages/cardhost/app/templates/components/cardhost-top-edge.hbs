@@ -1,5 +1,19 @@
 <div class="cardhost-top-edge {{@mode}}" data-test-cardhost-top-edge>
-  {{#if (or (eq @mode "layout") (eq @mode "fields"))}}
+  {{#if (eq @mode "schema")}}
+    <div class="card-renderer--top-edge-buttons schema-mode">
+      <ModeIndicator
+        @card={{@card}}
+        @route="cards.card.edit.fields"
+        @mode="schema"
+        @linkTo="edit" />
+      <SaveButton @card={{@card}} />
+      {{!-- TODO: Make this open the Actions menu --}}
+      <Cta @variant="primary" class="edge-actions-button" aria-label="Display actions menu" data-test-edge-actions-btn>
+        {{svg-jar "actions" width="16px" height="16px"}}
+      </Cta>
+    </div>
+
+  {{else if (or (eq @mode "layout") (eq @mode "fields"))}}
     <div class="card-renderer--top-edge-preview-button {{if (eq @mode "fields") "hidden"}}" data-test-top-edge-preview-link>
       {{!-- TODO: Make this navigate to Preview route --}}
       <LinkTo
