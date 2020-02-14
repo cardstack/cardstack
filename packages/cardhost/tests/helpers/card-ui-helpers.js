@@ -1,16 +1,24 @@
-import { click, find, triggerEvent, fillIn, visit, waitFor } from '@ember/test-helpers';
+import { click, focus, find, triggerEvent, fillIn, visit, waitFor } from '@ember/test-helpers';
 import { animationsSettled } from 'ember-animated/test-support';
+import { canonicalURL } from '@cardstack/core/card-id';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 const timeout = 5000;
 
 export async function showCardId(toggleDetailsSection = false) {
-  await click(`.card-renderer-isolated`);
+  await focus(`.card-renderer-isolated`);
+  await waitFor(`.adopted-card`, { timeout });
 
   if (toggleDetailsSection) {
     await click('[data-test-right-edge-section-toggle="details"]');
   }
 
   await animationsSettled();
+}
+
+export async function selectField(name) {
+  await click(`[data-test-field="${name}"] [data-test-field-schema-renderer]`);
+  await waitFor(`[data-test-field="${name}"][data-test-loaded="true"]`);
 }
 
 export async function setCardName(name) {
@@ -25,17 +33,25 @@ export async function dragAndDrop(fieldSelector, dropZoneSelector, options) {
   await triggerEvent(dropZoneSelector, 'dragenter', options);
   await animationsSettled();
   await triggerEvent(dropZoneSelector, 'drop', options);
+  await waitFor(`[data-test-card-patched="true"]`);
   await animationsSettled();
 }
 
-export async function dragAndDropNewField(type, position = 0) {
+export async function dragAndDropNewField(fieldId, position = 0) {
+  if (fieldId.indexOf('http') !== 0) {
+    fieldId = canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: fieldId });
+  }
   let options = {
     dataTransfer: {
-      getData: () => type,
+      getData: () => fieldId,
       setData: () => {},
     },
   };
-  await dragAndDrop(`[data-test-card-add-field-draggable="${type}"]`, `[data-test-drop-zone="${position}"]`, options);
+  await dragAndDrop(
+    `[data-test-card-add-field-draggable="${fieldId}"]`,
+    `[data-test-drop-zone="${position}"]`,
+    options
+  );
 }
 
 // NOTE: Position is 0-based
@@ -89,16 +105,19 @@ export async function saveCard() {
   await animationsSettled();
 }
 
-export async function addField(name, type, isEmbedded, position) {
-  await dragAndDropNewField(type, position);
+export async function addField(name, fieldId, isEmbedded, position) {
+  await dragAndDropNewField(fieldId, position);
 
+  await waitFor('[data-test-schema-attr="name"] input', { timeout });
   await fillIn('[data-test-schema-attr="name"] input', name);
   await triggerEvent('[data-test-schema-attr="name"] input', 'keyup');
+  await waitFor(`[data-test-field="${name}"][data-test-loaded="true"]`);
 
   if (isEmbedded) {
     await click('[data-test-schema-attr="embedded"] input[type="checkbox"]');
   }
 
+  await waitFor(`[data-test-card-patched="true"]`);
   await animationsSettled();
 }
 
@@ -117,8 +136,10 @@ export async function setFieldValue(name, value) {
     await fillIn(`#edit-${name}-field-value`, value);
     await triggerEvent(`#edit-${name}-field-value`, 'keyup');
   }
+  await waitFor(`[data-test-card-patched="true"]`);
 }
 
 export async function removeField(name) {
   await click(`[data-test-field="${name}"] [data-test-field-renderer-remove-btn]`);
+  await waitFor(`[data-test-card-patched="true"]`);
 }

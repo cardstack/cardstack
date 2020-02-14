@@ -309,7 +309,7 @@ export default class CardManipulator extends Component {
     }
 
     // Toggling the selected field in tests is baffling me, using something more brute force
-    if (environment === 'test' && this.selectedField.name === field.name) {
+    if (environment === 'test' && this.selectedField && this.selectedField.name === field.name) {
       return;
     }
 

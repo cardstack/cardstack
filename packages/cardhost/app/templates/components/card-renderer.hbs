@@ -9,6 +9,7 @@
       "
       tabindex="0"
       data-test-card-renderer-isolated
+      data-test-loaded={{this.loadCard.isIdle}}
       {{on "focus" (action this.cardIsFocused true)}}
       {{did-insert this.focusCard true}}
       {{did-update this.cardUpdated @card}}

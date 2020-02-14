@@ -72,7 +72,10 @@
     @cardSelected={{this.cardSelected}} />
 {{/unless}}
 
-<section class="card-schema-updator" data-test-card-schema={{@card.name}}>
+<section class="card-schema-updator"
+  data-test-card-schema={{@card.name}}
+  data-test-card-patched={{stringify this.patchCard.isIdle}}
+>
   <CardRenderer
     @card={{this.card}}
     @format="isolated"

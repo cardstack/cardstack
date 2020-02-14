@@ -13,6 +13,7 @@
   data-test-field={{this.fieldName}}
   data-test-field-type={{@field.csTitle}}
   data-test-field-mode={{@mode}}
+  data-test-loaded={{stringify this.loadField.isIdle}}
 >
   {{#if @setPosition}}
     <button {{on "mousedown" (action this.initDrag @field)}}
