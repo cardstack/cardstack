@@ -125,17 +125,16 @@ describe('hub/computed-fields', function() {
       expect(await card.value('agePlusOne')).to.equal(10);
     });
 
-    it.skip('recomputes when a field in the computed field itself changes', async function() {
+    it('recomputes when a field in the computed field itself changes', async function() {
       let card = await service.create(
         `${myOrigin}/api/realms/first-ephemeral-realm`,
         cardDocument()
           .adoptingFrom(templateCard)
           .withAttributes({ age: 8, height: 40 }).jsonapi
       );
-      // FIXME: this doesn't add a field, it replaces all fields
-      let modified = await templateCard.patch(
-        cardDocument().withField('agePlusOne', plusOne, 'singular', { otherFieldName: 'height' }).jsonapi
-      );
+      let doc = (await templateCard.serializeAsJsonAPIDoc()) as any;
+      doc.data.attributes.csFields.agePlusOne.attributes.otherFieldName = 'height';
+      let modified = await templateCard.patch(doc);
       await service.update(templateCard, await modified.serializeAsJsonAPIDoc({ includeFieldSet: 'upstream' }));
       card = await service.get(card);
       expect(await card.value('agePlusOne')).to.equal(41);
