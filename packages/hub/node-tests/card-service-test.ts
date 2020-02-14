@@ -534,6 +534,39 @@ describe('hub/card-service', function() {
       expect(await updatedCard.value('puppyCount')).to.equal(42);
     });
 
+    it('can set field order', async function() {
+      let puppyCard = await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        cardDocument().withField('name', 'string-field').jsonapi
+      );
+
+      let mango = await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        cardDocument()
+          .withAttributes({
+            csFieldOrder: ['numberOfSpots', 'name'],
+          })
+          .withField('numberOfSpots', 'integer-field')
+          .adoptingFrom(puppyCard).jsonapi
+      );
+      expect(mango.csFieldOrder).to.eql(['numberOfSpots', 'name']);
+    });
+
+    it('rejects non-existant field in field order', async function() {
+      try {
+        await service.create(
+          `${myOrigin}/api/realms/first-ephemeral-realm`,
+          cardDocument().withAttributes({
+            csFieldOrder: ['badField'],
+          }).jsonapi
+        );
+        throw new Error(`should not have been able to update`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(/no such field "badField"/);
+      }
+    });
+
     describe('fields filled with cards', function() {
       let addressCard: AddressableCard, userCard: AddressableCard;
 

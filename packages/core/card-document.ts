@@ -46,6 +46,7 @@ export class CardDocument {
           case 'csFieldArity':
           case 'csPeerDependencies':
           case 'csFieldSets':
+          case 'csFieldOrder':
             this.csFieldValues.set(field, value);
             break;
           case 'csFields':

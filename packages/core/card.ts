@@ -79,6 +79,7 @@ export class Card {
   readonly csFieldSets: OcclusionFieldSets | undefined;
   readonly csFields: { [name: string]: any } | undefined;
   readonly csFeatures: { [name: string]: string | [string, string] } | undefined;
+  readonly csFieldOrder: FieldOrder | undefined;
 
   // if this card is stored inside another, this is the other
   readonly enclosingCard: Card | undefined;
@@ -158,6 +159,12 @@ export class Card {
 
     if (typeof jsonapi.data.attributes?.csDescription === 'string') {
       this.csDescription = jsonapi.data.attributes?.csDescription;
+    }
+
+    let csFieldOrder = jsonapi.data.attributes?.csFieldOrder;
+    if (csFieldOrder) {
+      assertFieldOrder(csFieldOrder);
+      this.csFieldOrder = csFieldOrder;
     }
 
     let csFiles = jsonapi.data.attributes?.csFiles;
@@ -247,6 +254,12 @@ export class Card {
         } else if (cardIds) {
           await field.validateReference(priorRef, cardIds, realm);
         }
+      }
+    }
+
+    if (this.csFieldOrder) {
+      for (let fieldName of this.csFieldOrder) {
+        await this.field(fieldName); // nonexistant fields will throw here
       }
     }
   }
@@ -510,6 +523,9 @@ export class Card {
     }
     if (this.csFiles) {
       data.attributes.csFiles = this.csFiles;
+    }
+    if (this.csFieldOrder) {
+      data.attributes.csFieldOrder = this.csFieldOrder;
     }
     if (this.csPeerDependencies) {
       data.attributes.csPeerDependencies = this.csPeerDependencies;
@@ -786,6 +802,14 @@ export class Card {
     for (let field of removedFields) {
       if (patched?.attributes) {
         delete patched.attributes[field];
+
+        if (
+          patched.attributes.csFieldOrder &&
+          Array.isArray(patched.attributes.csFieldOrder) &&
+          patched.attributes.csFieldOrder.includes(field)
+        ) {
+          patched.attributes.csFieldOrder.splice(patched.attributes.csFieldOrder.indexOf(field), 1);
+        }
       }
       if (patched?.relationships) {
         delete patched.relationships[field];
@@ -1256,10 +1280,22 @@ interface CardValue {
 interface CardFiles {
   [filename: string]: string | CardFiles;
 }
+
+type FieldOrder = string[];
+
 interface PeerDependencies {
   [packageName: string]: string;
 }
 type RawData = { ref: CardId | CardId[] | null } | { value: any } | null;
+
+function assertFieldOrder(order: any): asserts order is FieldOrder {
+  if (!Array.isArray(order)) {
+    throw new Error(`csFieldOrder must be an array`);
+  }
+  if (order.find(i => typeof i !== 'string')) {
+    throw new Error(`csFieldOrder cannot contain a non-string item`);
+  }
+}
 
 function assertCSFiles(files: any, pathContext = [] as string[]): asserts files is CardFiles {
   if (!isPlainObject(files)) {
