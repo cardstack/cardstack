@@ -23,8 +23,6 @@
 .cardhost-top-edge.add,
 .cardhost-top-edge.adopt,
 .cardhost-top-edge.schema {
-  padding-left: var(--ch-left-edge-width);
-  padding-right: var(--ch-right-edge-width);
   background-color: var(--ch-deep-background);
 }
 
@@ -62,6 +60,10 @@
 .card-renderer--top-edge-buttons > button + button,
 .card-renderer--top-edge-buttons > div + button {
   margin-left: 10px;
+}
+
+.card-renderer--top-edge-buttons.schema-mode {
+  grid-column-end: -1;
 }
 
 /* Preview link button */
@@ -165,33 +167,4 @@
     min-width: 100px;
     margin-left: 0;
   }
-}
-
-/* Old styles, remove after updating all mode buttons */
-.top-edge--mode-label {
-  padding: 10px;
-  background-color: white;
-  text-transform: uppercase;
-  font-size: 16px;
-  font-weight: bold;
-  border-radius: 10px;
-  color: var(--ch-dark-op50);
-  margin-right: 20px;
-}
-
-.top-edge--mode-link {
-  display: inline-flex;
-}
-
-.top-edge--mode-link span {
-  width: 18px;
-  height: 18px;
-  display: block;
-  text-indent: -9999px;
-    text-indent: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  background-image: url(/assets/images/icons/close-circle.svg);
-  background-size: 18px 18px;
-  background-repeat: no-repeat;
 }
