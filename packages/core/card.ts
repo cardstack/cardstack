@@ -31,6 +31,7 @@ import { IndexerFactory } from './indexer';
 import { CardId, FieldArity, canonicalURLToCardId, canonicalURL, cardstackFieldPattern } from './card-id';
 import { CardDocument, cardDocumentFromJsonAPI } from './card-document';
 import Component from '@glimmer/component';
+import assertNever from 'assert-never';
 
 let nonce = 0;
 
@@ -237,7 +238,7 @@ export class Card {
         let cardIds = rawData.ref;
         this.assertArity(field, name, cardIds);
         let priorRawData = await priorCard?.rawData(name);
-        let priorRef: CardId | CardId[] | undefined = undefined;
+        let priorRef: CardId | CardId[] | null = null;
         if (priorRawData && 'ref' in priorRawData) {
           priorRef = priorRawData.ref;
         }
@@ -320,17 +321,23 @@ export class Card {
 
   // gets the value of a field. Its type is governed by the schema of this card.
   async value(fieldName: string): Promise<any> {
+    let field = await this.field(fieldName);
     let rawData = await this.rawData(fieldName);
     if (rawData == null) {
-      return rawData;
+      if (field.csFieldArity === 'plural') {
+        return [];
+      } else {
+        return null;
+      }
     }
     if ('value' in rawData) {
       let field = await this.field(fieldName);
       let value = rawData.value;
       if (field.csFieldArity === 'plural' && Array.isArray(value)) {
         return await Promise.all(value.map(v => field.deserializeValue(v)));
+      } else {
+        return await field.deserializeValue(value);
       }
-      return await field.deserializeValue(value);
     } else {
       let refs = rawData.ref;
       if (refs != null && Array.isArray(refs)) {
@@ -605,7 +612,7 @@ export class Card {
     relationships: RelationshipsObject,
     field: FieldCard,
     rules: OcclusionRules,
-    reference: CardId | CardId[] | undefined,
+    reference: CardId | CardId[] | null,
     included: Map<string, OcclusionRules[]>
   ): Promise<void> {
     if (field.csFieldArity === 'plural') {
@@ -702,24 +709,39 @@ export class Card {
       let value = await this.value(fieldName);
       let field = await this.field(fieldName);
       let fullFieldName = `${field.enclosingCard.canonicalURL}/${fieldName}`;
-      if (value instanceof Card) {
-        if (value.canonicalURL == null || !visitedCards.includes(value.canonicalURL)) {
-          doc[fullFieldName] = await value.asSearchDoc(
-            [...visitedCards, value.canonicalURL].filter(Boolean) as string[]
-          );
-        }
-      } else if (Array.isArray(value) && value.every(i => i instanceof Card)) {
-        doc[fullFieldName] = (
-          await Promise.all(
-            value.map(i => {
-              if (i.canonicalURL == null || !visitedCards.includes(i.canonicalURL)) {
-                return i.asSearchDoc([...visitedCards, i.canonicalURL].filter(Boolean) as string[]);
-              }
-            })
-          )
-        ).filter(Boolean);
-      } else {
+      if (await field.isScalar()) {
         doc[fullFieldName] = value;
+      } else {
+        switch (field.csFieldArity) {
+          case 'singular':
+            if (value) {
+              let card = value as Card;
+              if (card.canonicalURL == null || !visitedCards.includes(card.canonicalURL)) {
+                doc[fullFieldName] = await card.asSearchDoc(
+                  [...visitedCards, card.canonicalURL].filter(Boolean) as string[]
+                );
+              }
+            } else {
+              doc[fullFieldName] = null;
+            }
+            break;
+          case 'plural':
+            {
+              let cards = value as Card[];
+              doc[fullFieldName] = (
+                await Promise.all(
+                  cards.map(i => {
+                    if (i.canonicalURL == null || !visitedCards.includes(i.canonicalURL)) {
+                      return i.asSearchDoc([...visitedCards, i.canonicalURL].filter(Boolean) as string[]);
+                    }
+                  })
+                )
+              ).filter(Boolean) as J.Object[];
+            }
+            break;
+          default:
+            assertNever(field.csFieldArity);
+        }
       }
     }
 
@@ -1045,6 +1067,13 @@ export class FieldCard extends Card {
     return await this.hasFeature('compute');
   }
 
+  // when true, this field has its own special value type that is not a Card.
+  // this will be true for all the "basic" built in field cards like
+  // "integer-field" and "string-field".
+  async isScalar(): Promise<boolean> {
+    return await this.hasFeature('field-deserialize');
+  }
+
   // TODO test this
   get isAdopted(): boolean {
     return !Object.keys(this.enclosingCard.csFields || {}).includes(this.name);
@@ -1104,8 +1133,8 @@ export class FieldCard extends Card {
   }
 
   async validateReference(
-    _priorReferenceOrReferences: CardId | CardId[] | undefined,
-    newReferenceOrReferences: CardId | CardId[] | undefined,
+    _priorReferenceOrReferences: CardId | CardId[] | null,
+    newReferenceOrReferences: CardId | CardId[] | null,
     _realm: AddressableCard
   ) {
     if (!newReferenceOrReferences) {
@@ -1230,7 +1259,7 @@ interface CardFiles {
 interface PeerDependencies {
   [packageName: string]: string;
 }
-type RawData = { ref: CardId | CardId[] | undefined } | { value: any } | null;
+type RawData = { ref: CardId | CardId[] | null } | { value: any } | null;
 
 function assertCSFiles(files: any, pathContext = [] as string[]): asserts files is CardFiles {
   if (!isPlainObject(files)) {
@@ -1279,7 +1308,7 @@ function assertFeatures(features: any): asserts features is Card['csFeatures'] {
   }
 }
 
-function relationshipToCardId(ref: RelationshipObject): CardId | CardId[] | undefined {
+function relationshipToCardId(ref: RelationshipObject): CardId | CardId[] | null {
   if ('links' in ref && ref.links.related) {
     let url = typeof ref.links.related === 'string' ? ref.links.related : ref.links.related.href;
     return canonicalURLToCardId(url);
@@ -1296,6 +1325,7 @@ function relationshipToCardId(ref: RelationshipObject): CardId | CardId[] | unde
       return ref.data.map(i => canonicalURLToCardId(i.id));
     }
   }
+  return null;
 }
 
 function mergeRules(rules: OcclusionRules[]): OcclusionRules {
