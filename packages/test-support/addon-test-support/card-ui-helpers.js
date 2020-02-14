@@ -81,8 +81,7 @@ export async function createCards(args) {
 }
 
 export async function saveCard() {
-  await click(`[data-test-card-save-btn]`);
-  await waitFor(`[data-test-card-save-btn].saved`, { timeout });
+  await waitFor('[data-test-card-is-dirty="no"]', { timeout });
   await animationsSettled();
 }
 

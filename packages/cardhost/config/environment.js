@@ -76,7 +76,7 @@ module.exports = function(environment) {
 
     ENV.animationSpeed = 20;
     ENV.autosaveDebounce = 10;
-    ENV.autosaveDisabled = true;
+    ENV.autosaveDisabled = false;
     ENV['@cardstack/ui-components'] = {
       debounceSpeed: 10,
     };
