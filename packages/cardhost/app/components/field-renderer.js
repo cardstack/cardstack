@@ -119,6 +119,9 @@ export default class FieldRenderer extends Component {
   @action startDragging(field, evt) {
     evt.dataTransfer.setData('text', evt.target.id);
     evt.dataTransfer.setData('text/field-name', field.name);
+    evt.dataTransfer.setData('text/field-label', field.csTitle);
+    evt.dataTransfer.setData('text/field-type', field.adoptsFromURL);
+    evt.dataTransfer.setData('text/start-position', this.args.position);
   }
 
   @action finishDragging(evt) {

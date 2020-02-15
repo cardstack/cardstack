@@ -57,7 +57,7 @@
 
 {{#unless this.load.isRunning}}
   <RightEdge
-    @card={{this.card}}
+    @card={{@card}}
     @mode="schema"
     @parentCard={{this.parentCard}}
     @grandParentCard={{this.grandParentCard}}
@@ -77,13 +77,13 @@
   data-test-card-patched={{stringify this.patchCard.isIdle}}
 >
   <CardRenderer
-    @card={{this.card}}
+    @card={{@card}}
     @format="isolated"
     @mode="schema"
-    @addFieldPromise={{this.addFieldPromise}}
+    @fieldOrderPromise={{this.fieldOrderPromise}}
     @removeField={{this.removeField}}
     @selectField={{action this.selectField}}
-    @setPosition={{action this.setPosition}}
+    @setPosition={{perform this.setPosition}}
     @selectedField={{this.selectedField}}
     @selectedFieldName={{this.selectedFieldName}}
     @dropField={{action this.dropField}}

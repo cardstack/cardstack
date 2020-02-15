@@ -32,7 +32,15 @@ export default class CardRenderer extends Component {
 
   @(task(function*() {
     this.actualFields = yield this.args.card.fields();
-    this.fields = [...this.actualFields];
+    let fieldOrder = this.args.card.csFieldOrder;
+    if (!fieldOrder) {
+      this.fields = [...this.actualFields];
+    } else {
+      this.fields = [
+        ...fieldOrder.map(i => this.actualFields.find(j => i === j.name)),
+        ...this.actualFields.filter(i => !fieldOrder.includes(i.name)),
+      ];
+    }
   }).drop())
   loadCard;
 
@@ -51,9 +59,8 @@ export default class CardRenderer extends Component {
   doOnLoadComplete;
 
   @(task(function*(field, position, isAdding) {
-    yield this.loadCard.perform();
-
-    if (!this.args.addFieldPromise || this.args.addFieldPromise.isFulfilled()) {
+    yield this.loadCard.last.then();
+    if (!this.args.fieldOrderPromise || this.args.fieldOrderPromise.isFulfilled()) {
       if (isAdding) {
         this.fields.splice(position, 0, field);
       } else if (!isAdding) {
@@ -63,13 +70,13 @@ export default class CardRenderer extends Component {
       // we want to time this so that we don't try to remove the field "drop
       // shadow" before the new field has been added--otherwise it looks like a
       // field was added, then removed, and then readded.
-      yield Promise.resolve(this.args.addFieldPromise);
+      yield Promise.resolve(this.args.fieldOrderPromise);
     }
 
     // this identity map is necessary because of REASONS. animated-each doesn't
     // seem to pick it up otherwise.
     this.fields = this.fields.map(i => i);
-  }).enqueue())
+  }).restartable())
   updateFields;
 
   @action

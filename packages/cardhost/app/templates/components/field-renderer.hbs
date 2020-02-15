@@ -22,7 +22,7 @@
       class="field--move-btn"
       aria-label="Drag field"
       data-test-field-renderer-move-btn
-      data-test-field-renderer-move-btn-position={{@field.position}}
+      data-test-field-renderer-move-btn-position={{@position}}
     >
     </button>
   {{/if}}
@@ -164,5 +164,5 @@
   {{/if}}
 </section>
 {{#if (and (eq @mode "schema") @dropField (not this.isStubField))}}
-  <DropZone @dropField={{@dropField}} @position={{inc @field.position}} @toggleStubField={{@toggleStubField}} />
+  <DropZone @dropField={{@dropField}} @position={{inc @position}} @toggleStubField={{@toggleStubField}} />
 {{/if}}

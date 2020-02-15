@@ -4,9 +4,10 @@
   data-test-isolated-card-mode={{@mode}}
 >
   <AnimatedContainer class={{if (or (eq @mode "view") (eq @mode "layout")) "isolated-card--view-fields"}}>
-    {{#animated-each @fields use=this.transition duration=this.duration as |field|}}
+    {{#animated-each @fields use=this.transition duration=this.duration as |field index|}}
       <FieldRenderer
         @field={{field}}
+        @position={{index}}
         @card={{@card}}
         @mode={{@mode}}
         @dropField={{@dropField}}
