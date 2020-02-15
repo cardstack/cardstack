@@ -13,12 +13,12 @@
   <div data-test-editor-pane>
     <EditorPane data-test-dock-location={{this.cssModeToggle.dockLocation}}
       @css={{this.isolatedCss}}
-      @card={{this.card}}
+      @card={{@card}}
       @updateCode={{this.updateCss}}
     />
   </div>
 {{/if}}
 
 <style data-test-view-css>
-  {{scope-css this.isolatedCss (concat (safe-css-string this.card.canonicalURL) "--isolated")}}
+  {{scope-css this.isolatedCss (concat (safe-css-string @card.canonicalURL) "--isolated")}}
 </style>

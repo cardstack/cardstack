@@ -71,35 +71,26 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-internal-card-id]').hasText(decodeURIComponent(cardId));
 
     await selectField('title');
-    assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="title"]').hasClass('selected');
+    assert.dom('[data-test-isolated-card] [data-test-field="title"]').hasClass('selected');
     assert.dom('[data-test-field="title"] [data-test-field-renderer-type]').hasText('title (Text)');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     await selectField('body');
-    assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="body"]').hasClass('selected');
+    assert.dom('[data-test-isolated-card] [data-test-field="body"]').hasClass('selected');
     assert.dom('[data-test-field="body"] [data-test-field-renderer-type]').hasText('body (Text)');
-    assert
-      .dom('[data-test-field="body"] [data-test-field-renderer-type]')
-      .hasAttribute('style', 'background-image: url("/assets/images/field-types/text-field-icon.svg")');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isNotChecked();
 
     await selectField('author');
-    assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="author"]').hasClass('selected');
-    assert.dom('[data-test-field="author"] [data-test-field-renderer-type]').hasText('author (Single-select)');
-    assert
-      .dom('[data-test-field="author"] [data-test-field-renderer-type]')
-      .hasAttribute('style', 'background-image: url("/assets/images/field-types/dropdown-field-icon.svg")');
+    assert.dom('[data-test-isolated-card] [data-test-field="author"]').hasClass('selected');
+    assert.dom('[data-test-field="author"] [data-test-field-renderer-type]').hasText('author (Base Card)');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     await selectField('reviewers');
-    assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="reviewers"]').hasClass('selected');
-    assert.dom('[data-test-field="reviewers"] [data-test-field-renderer-type]').hasText('reviewers (Multi-select)');
-    assert
-      .dom('[data-test-field="reviewers"] [data-test-field-renderer-type]')
-      .hasAttribute('style', 'background-image: url("/assets/images/field-types/has-many-field-icon.svg")');
+    assert.dom('[data-test-isolated-card] [data-test-field="reviewers"]').hasClass('selected');
+    assert.dom('[data-test-field="reviewers"] [data-test-field-renderer-type]').hasText('reviewers (Base Card)');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
-    await showCardId(true);
+    await showCardId();
     await animationsSettled();
     assert.dom('.card-renderer-isolated--header').hasText('Millenial Puppies');
     assert.dom('[data-test-internal-card-id]').hasTextContaining(decodeURIComponent(cardId));
@@ -110,7 +101,7 @@ module('Acceptance | card create', function(hooks) {
     assert.equal(card.data.attributes.title, undefined);
     assert.equal(card.data.attributes.body, undefined);
     assert.equal(card.data.relationships.author, undefined);
-    assert.deepEqual(card.data.relationships.reviewers, undefined);
+    assert.equal(card.data.relationships.reviewers, undefined);
     await percySnapshot([assert.test.module.name, assert.test.testName, 'data-entered'].join(' | '));
   });
 

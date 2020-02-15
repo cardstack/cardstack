@@ -79,7 +79,7 @@ module('Integration | Component | field-renderer', function(hooks) {
     <FieldRenderer
       @field={{field}}
       @mode="view"
-      @selectField={{action selectField}}
+      @selectField={{perform selectField}}
     />
     `);
 

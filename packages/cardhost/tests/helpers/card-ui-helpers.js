@@ -17,7 +17,7 @@ export async function showCardId(toggleDetailsSection = false) {
 }
 
 export async function selectField(name) {
-  await click(`[data-test-field="${name}"] [data-test-field-schema-renderer]`);
+  await click(`.isolated-card [data-test-field="${name}"]`);
   await waitFor(`[data-test-field="${name}"][data-test-loaded="true"]`);
 }
 
@@ -43,7 +43,7 @@ export async function dragAndDropNewField(fieldId, position = 0) {
   }
   let options = {
     dataTransfer: {
-      getData: () => fieldId,
+      getData: key => (key === 'text/cardId' ? fieldId : undefined),
       setData: () => {},
     },
   };
@@ -108,10 +108,14 @@ export async function saveCard() {
 export async function addField(name, fieldId, isEmbedded, position) {
   await dragAndDropNewField(fieldId, position);
 
+  await waitFor(`[data-test-card-fields-ready="true"]`);
+  await click(`.isolated-card [data-test-field="field-1"]`);
+  await waitFor(`.right-edge [data-test-field="field-1"][data-test-loaded="true"]`);
+
   await waitFor('[data-test-schema-attr="name"] input', { timeout });
   await fillIn('[data-test-schema-attr="name"] input', name);
   await triggerEvent('[data-test-schema-attr="name"] input', 'keyup');
-  await waitFor(`[data-test-field="${name}"][data-test-loaded="true"]`);
+  await waitFor(`.isolated-card [data-test-field="${name}"][data-test-loaded="true"]`);
 
   if (isEmbedded) {
     await click('[data-test-schema-attr="embedded"] input[type="checkbox"]');

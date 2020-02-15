@@ -1,4 +1,4 @@
-{{yield this.card (hash
+{{yield @card (hash
   parentCard=this.parentCard
   grandParentCard=this.grandParentCard
   setCardValue=this.setCardValue
@@ -9,7 +9,7 @@
 
 <section
   class="card-editor"
-  data-test-card-edit={{this.card.name}}
+  data-test-card-edit={{@card.name}}
 >
   <div class="card-renderer--container">
     <CardRenderer
@@ -18,7 +18,7 @@
       @setCardValue={{this.setCardValue}}
       @setCardReference={{this.setCardReference}}
       @format="isolated"
-      @selectField={{action this.selectField}}
+      @selectField={{perform this.selectField}}
       @selectedField={{this.selectedField}}
       @selectedFieldName={{this.selectedFieldName}}
       @cardSelected={{this.originalCard.isSelected}}

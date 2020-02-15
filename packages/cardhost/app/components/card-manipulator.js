@@ -75,7 +75,7 @@ export default class CardManipulator extends Component {
     if (this.fieldOrderResolve) {
       this.fieldOrderResolve();
     }
-    this.selectField(field, evt);
+    yield this.selectField.perform(field, evt);
   }).enqueue())
   addField;
 
@@ -92,7 +92,7 @@ export default class CardManipulator extends Component {
     if (this.fieldOrderResolve) {
       this.fieldOrderResolve();
     }
-    this.selectField(field, evt);
+    yield this.selectField.perform(field, evt);
   }).drop())
   setPosition;
 
@@ -286,13 +286,13 @@ export default class CardManipulator extends Component {
     this.isDragging = false;
   }
 
-  @action selectField(field, evt) {
+  @(task(function*(field, evt) {
     if (field && field.isDestroyed) {
       return;
     }
 
     // Toggling the selected field in tests is baffling me, using something more brute force
-    if (environment === 'test' && this.selectedField && this.selectedField.name === field.name) {
+    if (environment === 'test' && this.selectedField === field) {
       return;
     }
 
@@ -320,8 +320,9 @@ export default class CardManipulator extends Component {
     // more consistent when the new field is instantiated.
     this.selectedFieldName = null;
     this.cardSelected = false;
-    this.loadSelectedField.perform();
-  }
+    yield this.loadSelectedField.perform();
+  }).restartable())
+  selectField;
 
   @action startDragging(field, evt) {
     evt.dataTransfer.setData('text', evt.target.id);
