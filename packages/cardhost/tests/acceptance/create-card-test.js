@@ -1,5 +1,5 @@
-import { module, test, skip } from 'qunit';
-import { click, fillIn, find, visit, currentURL, triggerEvent, waitFor } from '@ember/test-helpers';
+import { module, test } from 'qunit';
+import { click, fillIn, find, visit, currentURL, triggerEvent, waitFor, blur } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
 import {
@@ -9,7 +9,9 @@ import {
   saveCard,
   dragAndDropNewField,
   selectField,
+  waitForFieldNameChange,
   removeField,
+  waitForCardPatch,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -91,7 +93,6 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     await showCardId();
-    await animationsSettled();
     assert.dom('.card-renderer-isolated--header').hasText('Millenial Puppies');
     assert.dom('[data-test-internal-card-id]').hasTextContaining(decodeURIComponent(cardId));
     assert.dom('[data-test-card-renderer-isolated]').hasClass('selected');
@@ -102,6 +103,11 @@ module('Acceptance | card create', function(hooks) {
     assert.equal(card.data.attributes.body, undefined);
     assert.equal(card.data.relationships.author, undefined);
     assert.equal(card.data.relationships.reviewers, undefined);
+    assert.ok(card.data.attributes.csFields.title);
+    assert.ok(card.data.attributes.csFields.body);
+    assert.ok(card.data.attributes.csFields.author);
+    assert.ok(card.data.attributes.csFields.reviewers);
+
     await percySnapshot([assert.test.module.name, assert.test.testName, 'data-entered'].join(' | '));
   });
 
@@ -113,21 +119,24 @@ module('Acceptance | card create', function(hooks) {
     await percySnapshot(assert);
     await click('[data-test-new-blank-card-btn]');
     await setCardName(card1Name);
+    let cardId = currentURL()
+      .replace('/cards/', '')
+      .replace('/edit/fields', '');
 
     assert.ok(/^\/cards\/.*\/edit\/fields$/.test(currentURL()), 'URL is correct');
     await click('[data-test-configure-schema-btn]');
     await waitFor('[data-test-right-edge]', { timeout });
 
-    assert.dom('.card-renderer-isolated--header').hasText('millenial-puppies');
+    assert.dom('.card-renderer-isolated--header').hasText('Millenial Puppies');
 
-    await addField('title', 'string', true);
-    await addField('body', 'string', false);
-    await addField('author', 'related card', true);
-    await addField('reviewers', 'related cards', true);
+    await addField('title', 'string-field', true);
+    await addField('body', 'string-field', false);
+    await addField('author', 'base', true);
+    await addField('reviewers', 'base', true);
 
     await showCardId(true);
-    assert.dom('.card-renderer-isolated--header').hasText('millenial-puppies');
-    assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
+    assert.dom('.card-renderer-isolated--header').hasText('Millenial Puppies');
+    assert.dom('[data-test-internal-card-id]').hasText(decodeURIComponent(cardId));
   });
 
   test(`selecting a field`, async function(assert) {
@@ -137,47 +146,51 @@ module('Acceptance | card create', function(hooks) {
     await setCardName(card1Name);
     await click('[data-test-configure-schema-btn]');
     await waitFor('[data-test-right-edge]', { timeout });
-    await addField('title', 'string', true);
-    await addField('body', 'string', false);
 
-    await click('[data-test-field="title"]');
-    await animationsSettled();
+    await addField('title', 'string-field', true);
+    await addField('body', 'string-field', false);
+
+    await selectField('title');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('title');
 
     await fillIn('[data-test-right-edge] [data-test-schema-attr="name"] input', 'subtitle');
     await triggerEvent(`[data-test-right-edge] [data-test-schema-attr="name"] input`, 'keyup');
-    await animationsSettled();
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
+    await waitForFieldNameChange('subtitle');
 
-    await fillIn('[data-test-right-edge] [data-test-schema-attr="label"] input', 'subtitle');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('');
+
+    await fillIn('[data-test-right-edge] [data-test-schema-attr="label"] input', 'subtitle label');
     await triggerEvent(`[data-test-right-edge] [data-test-schema-attr="label"] input`, 'keyup');
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('subtitle');
+    await waitForCardPatch();
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('subtitle label');
 
     await fillIn('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea', 'This is the subtitle');
     await triggerEvent(`[data-test-right-edge] [data-test-schema-attr="instructions"] textarea`, 'keyup');
+    await blur(`[data-test-right-edge] [data-test-schema-attr="instructions"] textarea`);
+    await waitForCardPatch();
     assert
       .dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea')
       .hasValue('This is the subtitle');
 
-    await click('[data-test-field="body"] [data-test-field-schema-renderer]');
-    assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="body"]').hasClass('selected');
+    await selectField('body');
+    assert.dom('[data-test-isolated-card] [data-test-field="body"]').hasClass('selected');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('body');
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Body');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea').hasValue('');
 
-    await click('[data-test-field="subtitle"] [data-test-field-schema-renderer]');
-    assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="subtitle"]').hasClass('selected');
+    await selectField('subtitle');
+    assert.dom('[data-test-isolated-card] [data-test-field="subtitle"]').hasClass('selected');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('subtitle');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('subtitle label');
     assert
       .dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea')
       .hasValue('This is the subtitle');
 
-    await dragAndDropNewField('string');
-    assert.dom('[data-test-isolated-card="millenial-puppies"] [data-test-field="field-1"]').hasClass('selected');
+    await dragAndDropNewField('string-field');
+    assert.dom('[data-test-isolated-card] [data-test-field="field-1"]').hasClass('selected');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('field-1');
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('field-1');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea').hasValue('');
     await percySnapshot(assert);
   });
@@ -189,14 +202,17 @@ module('Acceptance | card create', function(hooks) {
     await setCardName(card1Name);
     await click('[data-test-configure-schema-btn]');
     await waitFor('[data-test-right-edge]', { timeout });
-    await addField('title', 'string', true);
+    await addField('title', 'string-field', true);
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('title');
     await fillIn('[data-test-schema-attr="name"] input', 'subtitle');
     await triggerEvent('[data-test-schema-attr="name"] input', 'keyup');
+    await waitForFieldNameChange('subtitle');
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
+    await fillIn('[data-test-right-edge] [data-test-schema-attr="label"] input', 'Subtitle');
+    await triggerEvent(`[data-test-right-edge] [data-test-schema-attr="label"] input`, 'keyup');
+    await waitForCardPatch();
 
     await saveCard();
 
@@ -206,19 +222,26 @@ module('Acceptance | card create', function(hooks) {
       .replace('/edit/fields/schema', '');
 
     await visit(`/cards/${card1Id}`);
+    await animationsSettled();
     assert.dom('[data-test-field="subtitle"] [data-test-string-field-viewer-label]').hasText('Subtitle');
     assert.dom('[data-test-field="title"]').doesNotExist();
 
     await visit(`/cards/${card1Id}/edit/fields`);
+    await animationsSettled();
     assert.dom('[data-test-field="subtitle"] [data-test-cs-component-label="text-field"]').hasText('Subtitle');
     assert.dom('[data-test-field="title"]').doesNotExist();
 
     await visit(`/cards/${card1Id}/edit/fields/schema`);
+    await animationsSettled();
     assert.dom('[data-test-field="subtitle"] [data-test-field-renderer-label]').hasText('Subtitle');
-    await click('[data-test-field="subtitle"]');
 
+    await selectField('subtitle');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
+
+    let cardJson = find('[data-test-card-json]').innerHTML;
+    let card = JSON.parse(cardJson);
+    assert.ok(card.data.attributes.csFields.subtitle);
   });
 
   test(`entering invalid field name shows error`, async function(assert) {
@@ -228,7 +251,7 @@ module('Acceptance | card create', function(hooks) {
     await setCardName(card1Name);
     await click('[data-test-configure-schema-btn]');
     await waitFor('[data-test-right-edge]', { timeout });
-    await addField('title', 'string', true);
+    await addField('title', 'string-field', true);
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('title');
     await fillIn('[data-test-schema-attr="name"] input', 'Title!');
@@ -236,7 +259,7 @@ module('Acceptance | card create', function(hooks) {
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('Title!');
     assert.dom('[data-test-schema-attr="name"] input').hasClass('invalid');
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Title');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('');
     assert
       .dom('[data-test-right-edge] [data-test-schema-attr="name"] [data-test-cs-component-validation="text-field"]')
       .hasText('Can only contain letters, numbers, dashes, and underscores.');
@@ -247,14 +270,20 @@ module('Acceptance | card create', function(hooks) {
   test(`removing a field from a card`, async function(assert) {
     await login();
     await visit('/cards/add');
+
     await setCardName(card1Name);
     await click('[data-test-configure-schema-btn]');
     await waitFor('[data-test-right-edge]', { timeout });
-    await addField('title', 'string', true);
+    await addField('title', 'string-field', true);
+
     await removeField('title');
+
     assert.dom('.cardhost-right-edge-panel [data-test-field]').doesNotExist();
-    await animationsSettled();
     await percySnapshot(assert);
+
+    let cardJson = find('[data-test-card-json]').innerHTML;
+    let card = JSON.parse(cardJson);
+    assert.deepEqual(card.data.attributes.csFields, {});
   });
 
   test(`removing a field from a card that has an empty name`, async function(assert) {
@@ -264,15 +293,21 @@ module('Acceptance | card create', function(hooks) {
     await setCardName(card1Name);
     await click('[data-test-configure-schema-btn]');
     await waitFor('[data-test-right-edge]', { timeout });
-    await addField('', 'string', true);
-    assert.dom('[data-test-isolated-card] [data-test-field').exists({ count: 1 });
+    await addField('', 'string-field', true);
+    assert.dom('[data-test-isolated-card] [data-test-field]').exists({ count: 1 });
 
-    await click(`[data-test-isolated-card] [data-test-field-renderer-remove-btn]`);
+    await click(`[data-test-field] [data-test-field-renderer-remove-btn]`);
+    await waitForCardPatch();
     await animationsSettled();
-    assert.dom('[data-test-isolated-card] [data-test-field').doesNotExist();
+
+    assert.dom('[data-test-isolated-card] [data-test-field]').doesNotExist();
+
+    let cardJson = find('[data-test-card-json]').innerHTML;
+    let card = JSON.parse(cardJson);
+    assert.deepEqual(card.data.attributes.csFields, {});
   });
 
-  skip('can add a field at a particular position', async function(assert) {
+  test('can add a field at a particular position', async function(assert) {
     await login();
     await visit('/cards/add');
 
@@ -282,12 +317,12 @@ module('Acceptance | card create', function(hooks) {
       .replace('/edit/fields', '');
     await click('[data-test-configure-schema-btn]');
     await waitFor('[data-test-right-edge]', { timeout });
-    await addField('title', 'string', true);
-    await addField('body', 'string', false, 1);
-    await addField('author', 'string', false, 1);
+    await addField('title', 'string-field', true);
+    await addField('body', 'string-field', false, 1);
+    await addField('author', 'string-field', false, 1);
 
     assert.deepEqual(
-      [...document.querySelectorAll(`[data-test-isolated-card="${card1Id}"] [data-test-field]`)].map(i =>
+      [...document.querySelectorAll(`[data-test-isolated-card] [data-test-field]`)].map(i =>
         i.getAttribute('data-test-field')
       ),
       ['title', 'author', 'body']
@@ -296,16 +331,13 @@ module('Acceptance | card create', function(hooks) {
     await saveCard();
 
     await visit(`/cards/${card1Id}`);
+    await animationsSettled();
     assert.deepEqual(
       [...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
       ['title', 'author', 'body']
     );
     let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
-    assert.deepEqual(card.data.relationships.fields.data, [
-      { type: 'fields', id: 'title' },
-      { type: 'fields', id: 'author' },
-      { type: 'fields', id: 'body' },
-    ]);
+    assert.deepEqual(card.data.attributes.csFieldOrder, ['title', 'author', 'body']);
   });
 });

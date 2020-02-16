@@ -11,11 +11,6 @@
       <div class="right-edge--section--container">
         <AnimatedContainer>
           {{#animated-if @cardSelected use=this.fade duration=this.duration}}
-            {{!--
-            TODO each of these section is collapsable.
-            Waiting until ember animated/liquid fire is available
-            before implemnenting that, as that will make this easy
-            --}}
             <div class="right-edge--sections">
               <div class="right-edge--section">
                 <button {{on "click" (fn this.toggleSection "template")}} class="section-toggle-btn {{if (includes this.expandedSections "template") "expanded"}}" data-test-right-edge-section-toggle="template">

@@ -118,7 +118,7 @@
             @class="ch-input"
             @setValue={{perform this.updateFieldName}}
             @disabled={{@field.isAdopted}}
-            @pattern={{@field.fieldNameRegex.source}}
+            @pattern={{this.fieldNameRegex.source}}
             @title="Can only contain letters, numbers, dashes, and underscores."
           />
         </div>

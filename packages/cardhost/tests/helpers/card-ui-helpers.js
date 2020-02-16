@@ -16,9 +16,28 @@ export async function showCardId(toggleDetailsSection = false) {
   await animationsSettled();
 }
 
+export async function waitForFieldToLoadInRightEdge(name) {
+  await waitFor(`.right-edge [data-test-field="${name}"][data-test-loaded="true"]`);
+}
+
+export async function waitForFieldOrderUpdate() {
+  await waitFor(`[data-test-card-fields-ready="true"]`);
+}
+
+export async function waitForCardPatch() {
+  await waitFor(`[data-test-card-patched="true"]`);
+}
+
+export async function waitForFieldNameChange(name) {
+  await waitFor(`.isolated-card [data-test-field="${name}"][data-test-loaded="true"]`);
+  await waitForCardPatch();
+  await animationsSettled();
+}
+
 export async function selectField(name) {
   await click(`.isolated-card [data-test-field="${name}"]`);
-  await waitFor(`[data-test-field="${name}"][data-test-loaded="true"]`);
+  await waitForFieldToLoadInRightEdge(name);
+  await animationsSettled();
 }
 
 export async function setCardName(name) {
@@ -33,7 +52,8 @@ export async function dragAndDrop(fieldSelector, dropZoneSelector, options) {
   await triggerEvent(dropZoneSelector, 'dragenter', options);
   await animationsSettled();
   await triggerEvent(dropZoneSelector, 'drop', options);
-  await waitFor(`[data-test-card-patched="true"]`);
+  await waitForCardPatch();
+  await waitForFieldOrderUpdate();
   await animationsSettled();
 }
 
@@ -100,28 +120,29 @@ export async function createCards(args) {
 }
 
 export async function saveCard() {
+  await waitForCardPatch();
   await click(`[data-test-card-save-btn]`);
   await waitFor(`[data-test-card-save-btn].saved`, { timeout });
+  await waitForCardPatch();
   await animationsSettled();
 }
 
 export async function addField(name, fieldId, isEmbedded, position) {
   await dragAndDropNewField(fieldId, position);
 
-  await waitFor(`[data-test-card-fields-ready="true"]`);
   await click(`.isolated-card [data-test-field="field-1"]`);
-  await waitFor(`.right-edge [data-test-field="field-1"][data-test-loaded="true"]`);
+  await waitForFieldToLoadInRightEdge('field-1');
 
   await waitFor('[data-test-schema-attr="name"] input', { timeout });
   await fillIn('[data-test-schema-attr="name"] input', name);
   await triggerEvent('[data-test-schema-attr="name"] input', 'keyup');
-  await waitFor(`.isolated-card [data-test-field="${name}"][data-test-loaded="true"]`);
+  await waitForFieldNameChange(name);
 
   if (isEmbedded) {
     await click('[data-test-schema-attr="embedded"] input[type="checkbox"]');
   }
 
-  await waitFor(`[data-test-card-patched="true"]`);
+  await waitForCardPatch();
   await animationsSettled();
 }
 
@@ -140,10 +161,11 @@ export async function setFieldValue(name, value) {
     await fillIn(`#edit-${name}-field-value`, value);
     await triggerEvent(`#edit-${name}-field-value`, 'keyup');
   }
-  await waitFor(`[data-test-card-patched="true"]`);
+  await waitForCardPatch();
 }
 
 export async function removeField(name) {
   await click(`[data-test-field="${name}"] [data-test-field-renderer-remove-btn]`);
-  await waitFor(`[data-test-card-patched="true"]`);
+  await waitForCardPatch();
+  await waitForFieldOrderUpdate();
 }

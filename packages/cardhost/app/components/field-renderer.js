@@ -4,9 +4,11 @@ import { tracked } from '@glimmer/tracking';
 import { task } from 'ember-concurrency';
 import kebabCase from 'lodash/kebabCase';
 
-const defaultSchemaAttrs = ['title', 'type', 'name', 'instructions', 'embedded'];
+const defaultSchemaAttrs = Object.freeze(['title', 'type', 'name', 'instructions', 'embedded']);
+const fieldNameRegex = Object.freeze(/^[a-zA-Z]\w*$/);
 
 export default class FieldRenderer extends Component {
+  fieldNameRegex = fieldNameRegex;
   @tracked newFieldName;
   @tracked currentFieldName;
   @tracked newFieldLabel;
