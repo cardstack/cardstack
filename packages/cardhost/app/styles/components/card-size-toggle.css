@@ -2,6 +2,8 @@
   display: inline-grid;
   grid-template-columns: repeat(3, 1fr);
   grid-gap: 5px;
+  min-width: 107px;
+  max-width: 130px;
 }
 
 .card-size-btn.ch-button {

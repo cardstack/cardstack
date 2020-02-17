@@ -9,6 +9,8 @@
       <li><a href="#font">Font</a></li>
       <li><a href="#palette">Color Palette</a></li>
       <li><a href="#buttons">Buttons</a></li>
+      <li><a href="#card-size-toggle">Card Size Toggle</a></li>
+      <li><a href="#mode-indicator">Mode Indicator</a></li>
       <li><a href="#view-switcher">View Switcher</a></li>
       <li><a href="#form-components">Cardstack Form UI Components:</a>
         <ul>
@@ -124,6 +126,14 @@
     <SaveButton @card={{this.model}} />
     <CodeEditor @code='<SaveButton @card=\{{card}} />' @language="html" />
 
+    <h3>Preview Link Button</h3>
+    <PreviewLinkButton @model={{this.model}} />
+    <CodeEditor @code='<PreviewLinkButton @model=\{{card}} />' @language="html" />
+
+    <h3>Edge Actions Button</h3>
+    <EdgeActionsButton />
+    <CodeEditor @code='<EdgeActionsButton />' @language="html" />
+
     <h3>Icon Buttons</h3>
     <h4>- Default icon button</h4>
     <div>
@@ -167,6 +177,38 @@
     <CodeEditor @code='<button disabled class="ch-button ch-button--icon-secondary" aria-label="user">
   \{{svg-jar "user" width="18px" height="20px"}}
 </button>' @language="html" />
+  </section>
+
+  <section class="ui-components--section ui-components--grid-2-col" id="card-size-toggle">
+    <h2>Card Size Toggle buttons</h2>
+    <CardSizeToggle />
+    <CodeEditor @code='<CardSizeToggle />' @language="html" />
+  </section>
+
+  <section class="ui-components--section ui-components--grid-2-col" id="mode-indicator">
+    <h2>Mode Indicator (label and link)</h2>
+    <div>
+      <ModeIndicator
+        @card={{this.model}}
+        @route="cards.card.view"
+        @mode="edit"
+        @linkTo="view" /> <br>
+      <ModeIndicator
+        @card={{this.model}}
+        @route="cards.card.edit.layout"
+        @mode="themer"
+        @linkTo="layout" /> <br>
+      <ModeIndicator
+        @card={{this.card}}
+        @route="cards.card.edit.fields"
+        @mode="schema"
+        @linkTo="edit" />
+    </div>
+    <CodeEditor @code='<ModeIndicator
+  @card=\{{card}}
+  @route=\{{routeTo}}
+  @mode=\{{currentMode}}
+  @linkTo=\{{linkToMode}} />' @language="html" />
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col" id="view-switcher">

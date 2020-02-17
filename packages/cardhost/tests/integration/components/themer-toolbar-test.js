@@ -9,6 +9,7 @@ module('Integration | Component | themer-toolbar', function(hooks) {
   test('it renders', async function(assert) {
     this.set('model', {});
     await render(hbs`<ThemerToolbar @model={{this.model}}/>`);
+    assert.dom('[data-test-themer-toolbar]').exists();
     assert.dom('[data-test-preview-link-btn]').exists();
     assert.dom('[data-test-card-size-toggle]').exists();
     assert.dom('[data-test-small-btn]').hasClass('selected');

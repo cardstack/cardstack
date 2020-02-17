@@ -7,23 +7,12 @@
         @mode="schema"
         @linkTo="edit" />
       <SaveButton @card={{@card}} />
-      {{!-- TODO: Make this open the Actions menu --}}
-      <Cta @variant="primary" class="edge-actions-button" aria-label="Display actions menu" data-test-edge-actions-btn>
-        {{svg-jar "actions" width="16px" height="16px"}}
-      </Cta>
+      <EdgeActionsButton />
     </div>
 
   {{else if (or (eq @mode "layout") (eq @mode "fields"))}}
     <div class="card-renderer--top-edge-preview-button {{if (eq @mode "fields") "hidden"}}" data-test-top-edge-preview-link>
-      {{!-- TODO: Make this navigate to Preview route --}}
-      <LinkTo
-        @route="cards.card.view"
-        @model={{@card}}
-        @class="preview-link cs-component-cta primary secondary cs-dark"
-        data-test-preview-link-btn
-      >
-        Preview
-      </LinkTo>
+      <PreviewLinkButton @model={{@card}} />
     </div>
     <div class="view-selector" data-test-view-selector>
       <LinkTo
@@ -53,12 +42,7 @@
         @mode="edit"
         @linkTo="view" />
       <SaveButton @card={{@card}} />
-      {{!-- TODO: Make this open the Actions menu --}}
-      <Cta @variant="primary" class="edge-actions-button" aria-label="Display actions menu" data-test-edge-actions-btn>
-        {{svg-jar "actions" width="16px" height="16px"}}
-      </Cta>
+      <EdgeActionsButton />
     </div>
   {{/if}}
-
-  {{yield}}
 </div>

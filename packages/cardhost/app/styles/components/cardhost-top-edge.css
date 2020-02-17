@@ -68,36 +68,6 @@
   grid-column-end: -1;
 }
 
-/* Preview link button */
-.preview-link.cs-component-cta {
-  min-width: 130px;
-  height: 40px;
-  padding-left: 38px;
-  background-image: url('/assets/images/buttons/eye-on.svg');
-  background-position: left 11px center;
-  background-repeat: no-repeat;
-  background-size: 18px 14px;
-  text-align: left;
-}
-
-
-/* Edge actions button */
-.edge-actions-button.cs-component-cta.primary {
-  --icon-color: var(--ch-dark);
-  min-width: 40px;
-  height: 40px;
-  padding: 10px 9px 11px 12px;
-  border-color: var(--ch-highlight);
-  line-height: 0;
-}
-.edge-actions-button > svg {
-  display: inline-block;
-}
-.edge-actions-button:not(:disabled):hover,
-.edge-actions-button:not(:disabled):focus {
-  border-color: var(--ch-highlight-hover);
-}
-
 
 /* View selector toggle */
 .view-selector {
@@ -139,6 +109,7 @@
   display: inline-block;
   margin-right: 9px;
 }
+
 
 @media (max-width: 1036px) {
   .cardhost-top-edge {
