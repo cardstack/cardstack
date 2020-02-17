@@ -1,4 +1,10 @@
-<div class="right-edge" data-test-right-edge {{did-update this.updateCard @card @cardSelected}}>
+<div class="right-edge"
+  data-test-right-edge
+  data-test-field-source-loaded={{stringify this.loadFieldSource.isIdle}}
+  {{did-update this.updateCard @card @cardSelected}}
+  {{did-update this.loadSelectedField @selectedField @selectedFieldName @cardSelected}}
+  {{did-insert this.loadSelectedField}}
+>
   {{!-- TODO: make this a component --}}
   <div class="right-edge--pill-selector-container">
     <div class="pill-selector">
@@ -90,7 +96,7 @@
                       <div class="right-edge--selected-field-title">{{@selectedFieldType}} Field</div>
                       {{#if field.isAdopted}}
                         <div class="right-edge--section-header--adopted">
-                          Adopted from {{field.card.adoptedFrom.name}}
+                          Adopted from {{if this.loadFieldSource.isIdle this.selectedFieldSource}}
                         </div>
                       {{/if}}
                     </div>

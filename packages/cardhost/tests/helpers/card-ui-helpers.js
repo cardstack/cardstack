@@ -24,6 +24,7 @@ export async function waitForSchemaViewToLoad() {
 
 export async function waitForFieldToLoadInRightEdge(name) {
   await waitFor(`.right-edge [data-test-field="${name}"][data-test-loaded="true"]`);
+  await waitFor(`.right-edge[data-test-field-source-loaded="true"]`);
   await animationsSettled();
 }
 

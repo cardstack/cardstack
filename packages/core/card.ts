@@ -1103,6 +1103,17 @@ export class FieldCard extends Card {
     return !Object.keys(this.enclosingCard.csFields || {}).includes(this.name);
   }
 
+  // TODO test this
+  async source(): Promise<Card | undefined> {
+    let card: Card | undefined = await this.enclosingCard;
+    while (card) {
+      if (card.csFields && this.name in card.csFields) {
+        return card;
+      }
+      card = await card.adoptsFrom();
+    }
+  }
+
   async validateValue(priorFieldValue: any, value: any, realm: AddressableCard) {
     let validate = await this.loadFeature('field-validate');
     if (validate) {

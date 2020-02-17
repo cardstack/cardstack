@@ -32,6 +32,10 @@ export default class CardNameDialog extends Component {
     });
     if (this.args.adoptsFrom) {
       doc.adoptingFrom(this.args.adoptsFrom);
+      let csFieldOrder = this.args.adoptsFrom.csFieldOrder;
+      if (csFieldOrder) {
+        doc.setAttributes({ csFieldOrder });
+      }
     }
 
     let unsavedCard = yield this.data.create(getUserRealm(), doc.jsonapi);

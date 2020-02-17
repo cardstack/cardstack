@@ -16,6 +16,7 @@ export default class RightEdge extends Component {
   @tracked cardSelected = this.args.cardSelected;
   @tracked options = {};
   @tracked expandedSections = ['template'];
+  @tracked selectedFieldSource;
 
   fade = fade;
   duration = animationSpeed || duration;
@@ -45,6 +46,23 @@ export default class RightEdge extends Component {
     yield this.args.setCardValue.perform('csTitle', name);
   }).restartable())
   updateCardName;
+
+  @(task(function*() {
+    if (this.args.selectedField || this.args.selectedFieldName) {
+      let field = this.args.selectedField;
+      if (this.args.selectedFieldName) {
+        field = yield this.args.card.field(this.args.selectedFieldName);
+      }
+      let source = yield field.source();
+      this.selectedFieldSource = source.csTitle;
+    }
+  }).restartable())
+  loadFieldSource;
+
+  @action
+  loadSelectedField() {
+    this.loadFieldSource.perform();
+  }
 
   @action
   toggleSection(section) {
