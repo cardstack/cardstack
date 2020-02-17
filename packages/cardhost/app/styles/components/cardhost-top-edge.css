@@ -36,6 +36,8 @@
 
 .cardhost-top-edge.themer {
   background-color: var(--ch-dark-background);
+  right: 0;
+  left: 0;
 }
 
 .card-renderer--top-edge-preview-button {
