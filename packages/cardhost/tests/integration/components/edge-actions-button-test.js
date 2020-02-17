@@ -3,11 +3,12 @@ import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
-module('Integration | Component | cardhost-top-edge', function(hooks) {
+module('Integration | Component | edge-actions-button', function(hooks) {
   setupRenderingTest(hooks);
 
   test('it renders', async function(assert) {
-    await render(hbs`<CardhostTopEdge />`);
-    assert.dom('[data-test-cardhost-top-edge]').exists();
+    await render(hbs`<EdgeActionsButton />`);
+    assert.dom('[data-test-edge-actions-btn]').exists();
+    assert.dom('[data-test-edge-actions-btn] svg').exists();
   });
 });

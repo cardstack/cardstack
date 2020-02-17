@@ -26,3 +26,15 @@
 .cardhost-cards.dragging * {
   user-select: none;
 }
+
+.themer-card-width--small .card-renderer-isolated {
+  width: var(--ch-card-size);
+}
+
+.themer-card-width--medium .card-renderer-isolated {
+  width: var(--ch-card-size-medium);
+}
+
+.themer-card-width--large .card-renderer-isolated {
+  width: var(--ch-card-size-large);
+}

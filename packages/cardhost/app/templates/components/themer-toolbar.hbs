@@ -1,75 +1,38 @@
-<header class="themer--top-edge-container">
-  <div class="themer--top-edge-width-controls">
-    <button
-      class="ch-button ch-button--icon responsive {{if (eq this.cssModeToggle.width "small") "selected"}}"
-      {{on "click" (fn this.cssModeToggle.setWidth "small")}}
-      aria-label="Show the card in small size"
-      data-test-small-btn
-    >
-      Small
-    </button>
-
-    <button
-      class="ch-button ch-button--icon medium {{if (eq this.cssModeToggle.width "medium") "selected"}}"
-      {{on "click" (fn this.cssModeToggle.setWidth "medium")}}
-      aria-label="Show the card in medium size"
-      data-test-medium-btn
-    >
-      Medium
-    </button>
-
-    <button
-      class="ch-button ch-button--icon full-width {{if (eq this.cssModeToggle.width "large") "selected"}}"
-      {{on "click" (fn this.cssModeToggle.setWidth "large")}}
-      aria-label="Show the card in full width size"
-      data-test-large-btn
-    >
-      Large
-    </button>
+<header class="themer-toolbar" data-test-themer-toolbar>
+  <div class="themer-toolbar--controls-left">
+    <PreviewLinkButton @model={{@model}} />
+    <CardSizeToggle />
   </div>
-
-  <div class="themer--top-edge-pane-controls">
+  <div class="themer-toolbar--controls-right">
     {{#if this.cssModeToggle.visible}}
       <button
         class="ch-button ch-button--icon eye-on"
         aria-label="Hide the CSS editor"
         {{on "click" this.cssModeToggle.hideEditor}}
-        data-test-hide-editor-btn
-      >
-      </button>
+        data-test-hide-editor-btn />
     {{else}}
       <button
         class="ch-button ch-button--icon eye-off"
         aria-label="Show the CSS editor"
         {{on "click" this.cssModeToggle.showEditor}}
-        data-test-show-editor-btn
-      >
-      </button>
+        data-test-show-editor-btn />
     {{/if}}
-
     <button
-      class="ch-button ch-button--icon dock-bottom {{if (eq this.cssModeToggle.dockLocation "bottom") "selected"}}"
+      class="ch-button ch-button--icon dock-btn dock-bottom {{if (eq this.cssModeToggle.dockLocation "bottom") "selected"}}"
       {{on "click" this.cssModeToggle.dockBottom}}
       aria-label="Dock the CSS editor to the bottom"
-      data-test-dock-bottom
-    >
-    </button>
-
+      data-test-dock-bottom />
     <button
-      class="ch-button ch-button--icon dock-right {{if (eq this.cssModeToggle.dockLocation "right") "selected"}}"
+      class="ch-button ch-button--icon dock-btn dock-right {{if (eq this.cssModeToggle.dockLocation "right") "selected"}}"
       {{on "click" this.cssModeToggle.dockRight}}
       aria-label="Dock the CSS editor to the right"
-      data-test-dock-right
-    >
-    </button>
-
-    <Cta {{on "click" this.close}}
-      data-test-close-editor
-      @variant="secondary primary"
-    >
-      Close
-    </Cta>
-
+      data-test-dock-right />
+    <ModeIndicator
+      @card={{@model}}
+      @route="cards.card.edit.layout"
+      @mode="themer"
+      @linkTo="layout" />
     <SaveButton @card={{@model}} />
+    <EdgeActionsButton />
   </div>
 </header>

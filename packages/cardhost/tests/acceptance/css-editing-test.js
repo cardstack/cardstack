@@ -112,8 +112,8 @@ module('Acceptance | css editing', function(hooks) {
     await visit(`/cards/${card1Id}/edit/layout`);
     await click('[data-test-card-custom-style-button]');
     assert.equal(currentURL(), `/cards/${card1Id}/edit/layout/themer`);
-    assert.dom('[data-test-close-editor]').exists();
-    await click('[data-test-close-editor]');
+    assert.dom('[data-test-mode-indicator-link="layout"]').exists();
+    await click('[data-test-mode-indicator-link="layout"]');
     assert.equal(currentURL(), `/cards/${card1Id}/edit/layout`);
     assert.dom('[data-test-editor-pane]').doesNotExist();
     assert.dom('[data-test-card-custom-style-button]').exists();
@@ -226,7 +226,7 @@ module('Acceptance | css editing', function(hooks) {
     assert.dom('[data-test-large-btn]').hasClass('selected');
     assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
 
-    await click('[data-test-close-editor]');
+    await click('[data-test-mode-indicator-link="layout"]');
     await visit(`/cards/${card1Id}/edit/layout`);
     assert.dom('[data-test-large-btn]').hasClass('selected');
     assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
@@ -267,7 +267,7 @@ module('Acceptance | css editing', function(hooks) {
     await click('[data-test-card-custom-style-button]');
     await waitFor('[data-test-editor-pane] textarea');
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
-    await click('[data-test-close-editor]');
+    await click('[data-test-mode-indicator-link="layout"]');
     await click('[data-test-card-save-btn]');
     await waitFor(`[data-test-card-save-btn].saved`, { timeout });
     await waitFor('[data-test-cs-component="dropdown"]');
@@ -287,7 +287,7 @@ module('Acceptance | css editing', function(hooks) {
     await click('[data-test-card-custom-style-button]');
     await waitFor('[data-test-editor-pane] textarea');
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
-    await click('[data-test-close-editor]');
+    await click('[data-test-mode-indicator-link="layout"]');
     assert.dom('[data-test-card-custom-style-button]').includesText('Edit Custom Theme');
     assert.dom('[data-test-style-dropdown]').includesText('Custom');
     assert.dom('[data-test-style-dropdown]').doesNotIncludeText('default');

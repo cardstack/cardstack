@@ -3,7 +3,7 @@ import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
-module('Integration | Component | mode indicator', function(hooks) {
+module('Integration | Component | mode-indicator', function(hooks) {
   setupRenderingTest(hooks);
 
   test('it renders', async function(assert) {
@@ -12,7 +12,7 @@ module('Integration | Component | mode indicator', function(hooks) {
     assert.dom('[data-test-mode-indicator]').exists();
   });
 
-  test('it renders with mode and link-to', async function(assert) {
+  test('it renders', async function(assert) {
     this.set('model', { id: 'card-1' });
     await render(hbs`
     <ModeIndicator

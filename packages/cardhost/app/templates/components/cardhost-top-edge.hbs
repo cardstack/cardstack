@@ -1,30 +1,17 @@
 <div class="cardhost-top-edge {{@mode}}" data-test-cardhost-top-edge>
   {{#if (eq @mode "schema")}}
-    <div class="card-renderer--top-edge-buttons schema-mode">
+    <div class="cardhost-top-edge--buttons schema-mode">
       <ModeIndicator
         @card={{@card}}
         @route="cards.card.edit.fields"
         @mode="schema"
         @linkTo="edit" />
       <SaveButton @card={{@card}} />
-      {{!-- TODO: Make this open the Actions menu --}}
-      <Cta @variant="primary" class="edge-actions-button" aria-label="Display actions menu" data-test-edge-actions-btn>
-        {{svg-jar "actions" width="16px" height="16px"}}
-      </Cta>
+      <EdgeActionsButton />
     </div>
 
   {{else if (or (eq @mode "layout") (eq @mode "fields"))}}
-    <div class="card-renderer--top-edge-preview-button {{if (eq @mode "fields") "hidden"}}" data-test-top-edge-preview-link>
-      {{!-- TODO: Make this navigate to Preview route --}}
-      <LinkTo
-        @route="cards.card.view"
-        @model={{@card}}
-        @class="preview-link cs-component-cta primary secondary cs-dark"
-        data-test-preview-link-btn
-      >
-        Preview
-      </LinkTo>
-    </div>
+    <PreviewLinkButton @model={{@card}} class="cardhost-top-edge--preview-button {{if (eq @mode "fields") "hidden"}}" data-test-top-edge-preview-link />
     <div class="view-selector" data-test-view-selector>
       <LinkTo
         @route="cards.card.edit.layout"
@@ -45,45 +32,15 @@
         Field
       </LinkTo>
     </div>
-    <div class="card-renderer--top-edge-size-buttons {{if (eq @mode "fields") "hidden"}}" data-test-top-edge-size-buttons>
-      <button
-        class="ch-button ch-button--icon card-size-btn {{if (eq this.cssModeToggle.width "small") "selected"}}"
-        {{on "click" (fn this.cssModeToggle.setWidth "small")}}
-        aria-label="Show the card in small size"
-        data-test-small-btn
-      >
-        S
-      </button>
-      <button
-        class="ch-button ch-button--icon card-size-btn {{if (eq this.cssModeToggle.width "medium") "selected"}}"
-        {{on "click" (fn this.cssModeToggle.setWidth "medium")}}
-        aria-label="Show the card in medium size"
-        data-test-medium-btn
-      >
-        M
-      </button>
-      <button
-        class="ch-button ch-button--icon card-size-btn {{if (eq this.cssModeToggle.width "large") "selected"}}"
-        {{on "click" (fn this.cssModeToggle.setWidth "large")}}
-        aria-label="Show the card in full width size"
-        data-test-large-btn
-      >
-        L
-      </button>
-    </div>
-    <div class="card-renderer--top-edge-buttons">
+    <CardSizeToggle class="cardhost-top-edge--size-buttons {{if (eq @mode "fields") "hidden"}}" data-test-top-edge-size-buttons />
+    <div class="cardhost-top-edge--buttons">
       <ModeIndicator
         @card={{@card}}
         @route="cards.card.view"
         @mode="edit"
         @linkTo="view" />
       <SaveButton @card={{@card}} />
-      {{!-- TODO: Make this open the Actions menu --}}
-      <Cta @variant="primary" class="edge-actions-button" aria-label="Display actions menu" data-test-edge-actions-btn>
-        {{svg-jar "actions" width="16px" height="16px"}}
-      </Cta>
+      <EdgeActionsButton />
     </div>
   {{/if}}
-
-  {{yield}}
 </div>

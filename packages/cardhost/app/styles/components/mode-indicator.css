@@ -31,12 +31,16 @@
   background-repeat: no-repeat;
   background-size: 13px 13px;
 }
-.mode-indicator--label.schema {
+.mode-indicator--label.schema,
+.mode-indicator--label.themer {
   padding-left: 38px;
   background-image: url('/assets/images/icons/schema-2.svg');
   background-position: left 11px top 12px;
   background-repeat: no-repeat;
   background-size: 19px 16px;
+}
+.mode-indicator--label.themer {
+  background-image: url('/assets/images/icons/themer.svg');
 }
 
 .mode-indicator--link {
