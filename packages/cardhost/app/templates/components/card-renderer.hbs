@@ -97,6 +97,10 @@
           @model={{@card.canonicalURL}}
           aria-label={{@card.csTitle}}
         >
+          <Scaffold
+            @card={{@card}}
+            @feature="embedded-layout"
+            @mode={{this.mode}} />
         </LinkTo>
       {{else}}
         <Scaffold

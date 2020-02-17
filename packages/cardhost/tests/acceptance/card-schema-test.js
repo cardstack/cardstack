@@ -5,7 +5,6 @@ import Fixtures from '../helpers/fixtures';
 import {
   showCardId,
   addField,
-  createCards,
   saveCard,
   removeField,
   dragAndDropNewField,

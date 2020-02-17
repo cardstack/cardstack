@@ -186,7 +186,7 @@ export default class CardManipulator extends Component {
   }).restartable())
   setCardReference;
 
-  @(task(function*(fieldName, neededWhenEmbedded, evt) {
+  @(task(function*(fieldName, neededWhenEmbedded) {
     let doc = this.args.card.document;
     let csFieldSets = cloneDeep(this.args.card.csFieldSets) || { isolated: [], embedded: [] };
     if (neededWhenEmbedded && Array.isArray(csFieldSets.embedded) && !csFieldSets.embedded.includes(fieldName)) {

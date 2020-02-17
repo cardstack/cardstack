@@ -47,6 +47,16 @@ export async function waitForCardLoad() {
   }
 }
 
+export async function waitForEmbeddedCardLoad(cardId) {
+  await waitFor(`[data-test-embedded-card="${cardId}"][data-test-embedded-card-loaded="true"]`);
+  let fields = [...document.querySelectorAll(`[data-test-embedded-card="${cardId}"] [data-test-field]`)].map(i =>
+    i.getAttribute('data-test-field')
+  );
+  for (let field of fields) {
+    await waitFor(`[data-test-embedded-card="${cardId}"] [data-test-field="${field}"][data-test-loaded="true"]`);
+  }
+}
+
 export async function waitForFieldNameChange(name) {
   await waitFor(`.isolated-card [data-test-field="${name}"][data-test-loaded="true"]`);
   await waitForCardPatch();
@@ -175,19 +185,16 @@ export async function addField(name, fieldId, isEmbedded, position) {
 }
 
 export async function setFieldValue(name, value) {
-  let type = find(`[data-test-field="${name}"]`).getAttribute('data-test-field-type');
-  if (type === '@cardstack/core-types::boolean') {
+  let type = find(`[data-test-field="${name}"]`).getAttribute('data-test-field-type-id');
+  if (type.includes('/boolean-field')) {
     if (value) {
       await click(`[data-test-field="${name}"] .cardstack-core-types-field-value-true`);
     } else {
       await click(`[data-test-field="${name}"] .cardstack-core-types-field-value-false`);
     }
-  } else if (type === '@cardstack/core-types::has-many' && Array.isArray(value)) {
-    await fillIn(`#edit-${name}-field-value`, value.join(','));
-    await triggerEvent(`#edit-${name}-field-value`, 'keyup');
   } else {
-    await fillIn(`#edit-${name}-field-value`, value);
-    await triggerEvent(`#edit-${name}-field-value`, 'keyup');
+    await fillIn(`[data-test-field="${name}"] input`, value);
+    await triggerEvent(`[data-test-field="${name}"] input`, 'keyup');
   }
   await waitForCardPatch();
 }

@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { click, fillIn, find, visit, currentURL, triggerEvent, waitFor, blur } from '@ember/test-helpers';
+import { click, fillIn, find, visit, currentURL, triggerEvent, blur } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
 import {
@@ -20,7 +20,6 @@ import { animationsSettled } from 'ember-animated/test-support';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 const card1Name = 'Millenial Puppies';
-const timeout = 5000;
 
 const scenario = new Fixtures({
   destroy: {

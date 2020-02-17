@@ -12,6 +12,7 @@
   class="field {{this.fieldName}}-field {{if this.isStubField "preview"}} {{if (or @setPosition @removeField) "with-buttons"}} {{if this.isSelected "selected"}}"
   data-test-field={{this.fieldName}}
   data-test-field-mode={{@mode}}
+  data-test-field-type-id={{this.fieldTypeId}}
   data-test-loaded={{stringify this.loadField.isIdle}}
 >
   {{#if @setPosition}}
