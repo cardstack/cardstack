@@ -1,69 +1,60 @@
 import { module, test } from 'qunit';
-import { visit, currentURL, waitFor } from '@ember/test-helpers';
+import { visit } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
-import { createCards } from '../helpers/card-ui-helpers';
-import { setupMockUser, login } from '../helpers/login';
+import { waitForCardLoad, waitForSchemaViewToLoad, waitForThemerLoad } from '../helpers/card-ui-helpers';
+import { login } from '../helpers/login';
+import { cardDocument } from '@cardstack/core/card-document';
+import { myOrigin } from '@cardstack/core/origin';
 import a11yAudit from 'ember-a11y-testing/test-support/audit';
 
-const timeout = 2000;
-const card1Id = 'millenial-puppies';
-const qualifiedCard1Id = `local-hub::${card1Id}`;
-
+const csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
+const testCard = cardDocument()
+  .withAttributes({
+    csRealm,
+    csId: 'millenial-puppies',
+    csTitle: 'Millenial Puppies',
+    body: 'test body',
+  })
+  .withField('body', 'string-field', 'singular', { csTitle: 'Body' });
+const cardPath = encodeURIComponent(testCard.canonicalURL);
 const scenario = new Fixtures({
-  create(factory) {
-    setupMockUser(factory);
-  },
-  destroy() {
-    return [{ type: 'cards', id: qualifiedCard1Id }];
-  },
+  create: [testCard],
 });
 
 module('Acceptance | accessibility', function(hooks) {
   setupApplicationTest(hooks);
-  scenario.setupTest(hooks);
-  hooks.beforeEach(function() {
-    this.owner.lookup('service:data')._clearCache();
-    this.owner.lookup('service:card-local-storage').clearIds();
-  });
+  scenario.setupModule(hooks);
 
   test('basic a11y tests for main routes', async function(assert) {
     await login();
-    await createCards({
-      [card1Id]: [['body', 'string', false, 'test body']],
-    });
 
-    await visit(`/cards/${card1Id}`);
-    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
-    assert.equal(currentURL(), `/cards/${card1Id}`);
+    await visit(`/cards/${cardPath}`);
+    await waitForCardLoad();
     await a11yAudit();
     assert.ok(true, 'no a11y errors found for view');
 
-    await visit(`/cards/${card1Id}/edit/fields`);
-    await waitFor(`[data-test-card-edit="${card1Id}"]`, { timeout });
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+    await visit(`/cards/${cardPath}/edit/fields`);
+    await waitForCardLoad();
     await a11yAudit();
     assert.ok(true, 'no a11y errors found for edit fields');
 
-    await visit(`/cards/${card1Id}/edit/layout`);
-    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/layout`);
+    await visit(`/cards/${cardPath}/edit/layout`);
+    await waitForCardLoad();
     await a11yAudit();
     assert.ok(true, 'no a11y errors found for edit layout');
 
-    await visit(`/cards/${card1Id}/edit/fields/schema`);
-    await waitFor(`[data-test-card-schema="${card1Id}"]`, { timeout });
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields/schema`);
+    await visit(`/cards/${cardPath}/edit/fields/schema`);
+    await waitForSchemaViewToLoad();
     await a11yAudit();
     assert.ok(true, 'no a11y errors found for schema');
 
-    await visit(`/cards/${card1Id}/edit/layout/themer`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/layout/themer`);
+    await visit(`/cards/${cardPath}/edit/layout/themer`);
+    await waitForThemerLoad();
     await a11yAudit();
     assert.ok(true, 'no a11y errors found for themer');
 
     await visit('/');
-    assert.equal(currentURL(), `/`);
     assert.ok(true, 'no a11y errors found for index');
   });
 });
