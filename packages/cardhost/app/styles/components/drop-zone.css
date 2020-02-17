@@ -1,6 +1,7 @@
 .drop-zone--container {
   height: 0;
   position: relative;
+  z-index: 10;
 }
 
 .drop-zone {
