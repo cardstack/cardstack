@@ -72,7 +72,6 @@ export default class DraggableService extends Service {
   drop() {
     if (this.dropzone && this.field) {
       this.triggerEvent(this.dropzone, 'mouseup');
-      this.dropzone = null;
     }
   }
 
