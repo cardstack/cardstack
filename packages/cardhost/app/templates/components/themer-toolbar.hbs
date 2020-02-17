@@ -1,7 +1,18 @@
 <header class="themer--top-edge-container">
-  <CardSizeToggle />
+  <div class="themer-toolbar--controls-container-left">
+    {{!-- TODO: Make this navigate to Preview route --}}
+    <LinkTo
+      @route="cards.card.view"
+      @model={{@model}}
+      @class="preview-link cs-component-cta primary secondary cs-dark"
+      data-test-preview-link-btn
+    >
+      Preview
+    </LinkTo>
+    <CardSizeToggle />
+  </div>
 
-  <div class="themer--top-edge-pane-controls">
+  <div class="themer-toolbar--controls-container-right">
     {{#if this.cssModeToggle.visible}}
       <button
         class="ch-button ch-button--icon eye-on"
@@ -21,7 +32,7 @@
     {{/if}}
 
     <button
-      class="ch-button ch-button--icon dock-bottom {{if (eq this.cssModeToggle.dockLocation "bottom") "selected"}}"
+      class="ch-button ch-button--icon dock-btn dock-bottom {{if (eq this.cssModeToggle.dockLocation "bottom") "selected"}}"
       {{on "click" this.cssModeToggle.dockBottom}}
       aria-label="Dock the CSS editor to the bottom"
       data-test-dock-bottom
@@ -29,20 +40,25 @@
     </button>
 
     <button
-      class="ch-button ch-button--icon dock-right {{if (eq this.cssModeToggle.dockLocation "right") "selected"}}"
+      class="ch-button ch-button--icon dock-btn dock-right {{if (eq this.cssModeToggle.dockLocation "right") "selected"}}"
       {{on "click" this.cssModeToggle.dockRight}}
       aria-label="Dock the CSS editor to the right"
       data-test-dock-right
     >
     </button>
 
-    <Cta {{on "click" this.close}}
-      data-test-close-editor
-      @variant="secondary primary"
-    >
-      Close
-    </Cta>
+    <ModeIndicator
+      @card={{@model}}
+      @route="cards.card.edit.layout"
+      @mode="themer"
+      @linkTo="layout"
+      data-test-close-editor />
 
     <SaveButton @card={{@model}} />
+
+    {{!-- TODO: Make this open the Actions menu --}}
+    <Cta @variant="primary" class="edge-actions-button" aria-label="Display actions menu" data-test-edge-actions-btn>
+      {{svg-jar "actions" width="16px" height="16px"}}
+    </Cta>
   </div>
 </header>
