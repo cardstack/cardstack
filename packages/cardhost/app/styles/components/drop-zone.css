@@ -24,7 +24,7 @@
 
 /* ember-animated drag has started, but is not yet over a dropzone */
 .cardhost-cards.dragging .drop-zone--container:not(.dragging) .drop-zone {
-  height: 175px;
+  height: 150px;
 }
 
 /* ember-animated drag has started, and is over a dropzone */
