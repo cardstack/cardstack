@@ -1,6 +1,6 @@
 <div class="cardhost-top-edge {{@mode}}" data-test-cardhost-top-edge>
   {{#if (eq @mode "schema")}}
-    <div class="card-renderer--top-edge-buttons schema-mode">
+    <div class="cardhost-top-edge--buttons schema-mode">
       <ModeIndicator
         @card={{@card}}
         @route="cards.card.edit.fields"
@@ -11,9 +11,7 @@
     </div>
 
   {{else if (or (eq @mode "layout") (eq @mode "fields"))}}
-    <div class="card-renderer--top-edge-preview-button {{if (eq @mode "fields") "hidden"}}" data-test-top-edge-preview-link>
-      <PreviewLinkButton @model={{@card}} />
-    </div>
+    <PreviewLinkButton @model={{@card}} class="cardhost-top-edge--preview-button {{if (eq @mode "fields") "hidden"}}" data-test-top-edge-preview-link />
     <div class="view-selector" data-test-view-selector>
       <LinkTo
         @route="cards.card.edit.layout"
@@ -35,7 +33,7 @@
       </LinkTo>
     </div>
     <CardSizeToggle class="cardhost-top-edge--size-buttons {{if (eq @mode "fields") "hidden"}}" data-test-top-edge-size-buttons />
-    <div class="card-renderer--top-edge-buttons">
+    <div class="cardhost-top-edge--buttons">
       <ModeIndicator
         @card={{@card}}
         @route="cards.card.view"
