@@ -16,28 +16,45 @@ export async function showCardId(toggleDetailsSection = false) {
   await animationsSettled();
 }
 
+export async function waitForSchemaViewToLoad() {
+  await waitFor('[data-test-right-edge]', { timeout });
+  await waitForCardLoad();
+  await animationsSettled();
+}
+
 export async function waitForFieldToLoadInRightEdge(name) {
   await waitFor(`.right-edge [data-test-field="${name}"][data-test-loaded="true"]`);
+  await animationsSettled();
 }
 
 export async function waitForFieldOrderUpdate() {
   await waitFor(`[data-test-card-fields-ready="true"]`);
+  await animationsSettled();
 }
 
 export async function waitForCardPatch() {
   await waitFor(`[data-test-card-patched="true"]`);
+  await animationsSettled();
+}
+
+export async function waitForCardLoad() {
+  await waitFor(`[data-test-card-loaded="true"]`);
+  let fields = [...document.querySelectorAll(`.isolated-card [data-test-field]`)].map(i =>
+    i.getAttribute('data-test-field')
+  );
+  for (let field of fields) {
+    await waitFor(`.isolated-card [data-test-field="${field}"][data-test-loaded="true"]`);
+  }
 }
 
 export async function waitForFieldNameChange(name) {
   await waitFor(`.isolated-card [data-test-field="${name}"][data-test-loaded="true"]`);
   await waitForCardPatch();
-  await animationsSettled();
 }
 
 export async function selectField(name) {
   await click(`.isolated-card [data-test-field="${name}"]`);
   await waitForFieldToLoadInRightEdge(name);
-  await animationsSettled();
 }
 
 export async function setCardName(name) {
@@ -78,14 +95,25 @@ export async function dragAndDropNewField(fieldId, position = 0) {
 export async function dragFieldToNewPosition(originalPosition, newPosition) {
   newPosition = originalPosition < newPosition ? newPosition + 1 : newPosition;
   let fieldName;
+  let startPosition;
   let options = {
     dataTransfer: {
-      getData: type => {
-        if (type === 'text/field-name') {
+      getData: key => {
+        if (key === 'text/field-name') {
           return fieldName;
         }
+        if (key === 'text/start-position') {
+          return startPosition;
+        }
       },
-      setData: (type, name) => (fieldName = name),
+      setData: (key, value) => {
+        if (key === 'text/field-name') {
+          fieldName = value;
+        }
+        if (key === 'text/start-position') {
+          startPosition = value;
+        }
+      },
     },
   };
   await dragAndDrop(
@@ -168,4 +196,5 @@ export async function removeField(name) {
   await click(`[data-test-field="${name}"] [data-test-field-renderer-remove-btn]`);
   await waitForCardPatch();
   await waitForFieldOrderUpdate();
+  await animationsSettled();
 }

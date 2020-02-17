@@ -5,7 +5,7 @@ import { task } from 'ember-concurrency';
 import kebabCase from 'lodash/kebabCase';
 
 const defaultSchemaAttrs = Object.freeze(['title', 'type', 'name', 'instructions', 'embedded']);
-const fieldNameRegex = Object.freeze(/^[a-zA-Z]\w*$/);
+const fieldNameRegex = Object.freeze(/^[a-zA-Z][\w-]*$/);
 
 export default class FieldRenderer extends Component {
   fieldNameRegex = fieldNameRegex;

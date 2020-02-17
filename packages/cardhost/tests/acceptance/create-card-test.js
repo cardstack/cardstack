@@ -10,6 +10,7 @@ import {
   dragAndDropNewField,
   selectField,
   waitForFieldNameChange,
+  waitForSchemaViewToLoad,
   removeField,
   waitForCardPatch,
 } from '../helpers/card-ui-helpers';
@@ -39,7 +40,7 @@ module('Acceptance | card create', function(hooks) {
     assert.ok(/^\/cards\/.*\/edit\/fields$/.test(currentURL()), 'URL is correct');
 
     await click('[data-test-configure-schema-btn]');
-    await waitFor('[data-test-right-edge]', { timeout });
+    await waitForSchemaViewToLoad();
 
     assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('Base Card');
     assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').doesNotExist();
@@ -59,7 +60,7 @@ module('Acceptance | card create', function(hooks) {
 
     assert.ok(/^\/cards\/.*\/edit\/fields$/.test(currentURL()), 'URL is correct');
     await click('[data-test-configure-schema-btn]');
-    await waitFor('[data-test-right-edge]', { timeout });
+    await waitForSchemaViewToLoad();
 
     assert.dom('.card-renderer-isolated--header').hasText('Millenial Puppies');
 
@@ -125,7 +126,7 @@ module('Acceptance | card create', function(hooks) {
 
     assert.ok(/^\/cards\/.*\/edit\/fields$/.test(currentURL()), 'URL is correct');
     await click('[data-test-configure-schema-btn]');
-    await waitFor('[data-test-right-edge]', { timeout });
+    await waitForSchemaViewToLoad();
 
     assert.dom('.card-renderer-isolated--header').hasText('Millenial Puppies');
 
@@ -145,7 +146,7 @@ module('Acceptance | card create', function(hooks) {
 
     await setCardName(card1Name);
     await click('[data-test-configure-schema-btn]');
-    await waitFor('[data-test-right-edge]', { timeout });
+    await waitForSchemaViewToLoad();
 
     await addField('title', 'string-field', true);
     await addField('body', 'string-field', false);
@@ -201,7 +202,7 @@ module('Acceptance | card create', function(hooks) {
 
     await setCardName(card1Name);
     await click('[data-test-configure-schema-btn]');
-    await waitFor('[data-test-right-edge]', { timeout });
+    await waitForSchemaViewToLoad();
     await addField('title', 'string-field', true);
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('title');
@@ -250,7 +251,7 @@ module('Acceptance | card create', function(hooks) {
 
     await setCardName(card1Name);
     await click('[data-test-configure-schema-btn]');
-    await waitFor('[data-test-right-edge]', { timeout });
+    await waitForSchemaViewToLoad();
     await addField('title', 'string-field', true);
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('title');
@@ -273,7 +274,7 @@ module('Acceptance | card create', function(hooks) {
 
     await setCardName(card1Name);
     await click('[data-test-configure-schema-btn]');
-    await waitFor('[data-test-right-edge]', { timeout });
+    await waitForSchemaViewToLoad();
     await addField('title', 'string-field', true);
 
     await removeField('title');
@@ -292,7 +293,7 @@ module('Acceptance | card create', function(hooks) {
 
     await setCardName(card1Name);
     await click('[data-test-configure-schema-btn]');
-    await waitFor('[data-test-right-edge]', { timeout });
+    await waitForSchemaViewToLoad();
     await addField('', 'string-field', true);
     assert.dom('[data-test-isolated-card] [data-test-field]').exists({ count: 1 });
 
@@ -316,7 +317,7 @@ module('Acceptance | card create', function(hooks) {
       .replace('/cards/', '')
       .replace('/edit/fields', '');
     await click('[data-test-configure-schema-btn]');
-    await waitFor('[data-test-right-edge]', { timeout });
+    await waitForSchemaViewToLoad();
     await addField('title', 'string-field', true);
     await addField('body', 'string-field', false, 1);
     await addField('author', 'string-field', false, 1);

@@ -22,7 +22,13 @@
                 <AnimatedContainer class="right-edge--animation-container">
                   {{#animated-if (includes this.expandedSections "template") use=this.fade duration=this.duration}}
                     <div class="right-edge--items-container">
-                      <AdoptedFrom @card={{@parentCard}} @parentCard={{@grandParentCard}}/>
+                      {{#if @parentCard}}
+                        <AdoptedFrom @card={{@parentCard}} @parentCard={{@grandParentCard}}/>
+                      {{else}}
+                        <div data-test-no-adoption>
+                          No Adoption
+                        </div>
+                      {{/if}}
                     </div>
                     {{#if (eq @mode "fields")}}
                       <div class="right-edge--items-container">

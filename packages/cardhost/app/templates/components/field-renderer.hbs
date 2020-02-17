@@ -9,9 +9,8 @@
 <section {{on "click" (fn this.selectField @field)}}
   {{on "dragstart" (action this.startDragging @field)}}
   {{on "dragend" (action this.finishDragging)}}
-  class="field {{this.fieldName}}-field {{if this.isStubField "preview"}} {{if this.friendlyType (concat "field-type-" this.friendlyType "-" @mode "-field ")}}field-type-{{this.dasherizedType}}-{{@mode}}-field{{if (or @setPosition @removeField) " with-buttons"}}{{if this.isSelected " selected"}}"
+  class="field {{this.fieldName}}-field {{if this.isStubField "preview"}} {{if (or @setPosition @removeField) "with-buttons"}} {{if this.isSelected "selected"}}"
   data-test-field={{this.fieldName}}
-  data-test-field-type={{@field.csTitle}}
   data-test-field-mode={{@mode}}
   data-test-loaded={{stringify this.loadField.isIdle}}
 >

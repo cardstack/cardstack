@@ -20,7 +20,9 @@ export default class IsolatedComponent extends Component {
 
   @task(function*() {
     let parent = yield this.args.card.adoptsFrom();
-    this.adoptedFromId = parent.canonicalURL;
+    if (parent) {
+      this.adoptedFromId = parent.canonicalURL;
+    }
   })
   loadCard;
 
