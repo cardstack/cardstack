@@ -15,7 +15,7 @@ export default class EmbeddedComponent extends Component {
     let parent = yield this.args.card.adoptsFrom();
     this.adoptedFromId = parent.canonicalURL;
     let fields = this.args.card.csFieldSets ? this.args.card.csFieldSets.embedded : [];
-    this.fields = yield Promise.all(fields.map(field => this.args.card.field(field)));
+    this.fields = yield Promise.all((fields || []).map(field => this.args.card.field(field)));
   })
   loadCard;
 }

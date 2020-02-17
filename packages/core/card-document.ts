@@ -296,6 +296,8 @@ export class CardDocument {
 
   private guessValueType(value: any): CardId {
     switch (typeof value) {
+      case 'number':
+        return { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'integer-field' };
       case 'boolean':
         return { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'boolean-field' };
       case 'string':
