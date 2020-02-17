@@ -47,6 +47,17 @@ export async function waitForCardLoad() {
   }
 }
 
+export async function waitForThemerLoad() {
+  await waitForCardLoad();
+  await waitFor('[data-test-themer-loaded]');
+  await animationsSettled();
+}
+
+export async function waitForCssLoad() {
+  await waitFor('[data-test-css-loaded]');
+  await animationsSettled();
+}
+
 export async function waitForEmbeddedCardLoad(cardId) {
   await waitFor(`[data-test-embedded-card="${cardId}"][data-test-embedded-card-loaded="true"]`);
   let fields = [...document.querySelectorAll(`[data-test-embedded-card="${cardId}"] [data-test-field]`)].map(i =>

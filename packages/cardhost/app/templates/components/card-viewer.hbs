@@ -1,4 +1,6 @@
-<section class="card-view" data-test-card-view={{@card.csTitle}}
+<section class="card-view"
+  data-test-card-view={{@card.canonicalURL}}
+  data-test-css-loaded={{this.loadCss.isIdle}}
   {{did-update (perform this.loadCss) @card}}
 >
   {{!-- ugh, we're monkey patching the Card API --}}

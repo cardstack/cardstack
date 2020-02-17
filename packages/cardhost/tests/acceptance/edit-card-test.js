@@ -28,10 +28,10 @@ const testCard = cardDocument()
     body: 'test body',
     published: true,
   })
-  .withField('body', 'string-field', 'singular')
-  .withField('likes', 'integer-field', 'singular')
-  .withField('published', 'boolean-field', 'singular')
-  .withField('author', 'base', 'singular');
+  .withField('body', 'string-field')
+  .withField('likes', 'integer-field')
+  .withField('published', 'boolean-field')
+  .withField('author', 'base');
 const cardPath = encodeURIComponent(testCard.canonicalURL);
 const scenario = new Fixtures({
   create: [author, testCard],

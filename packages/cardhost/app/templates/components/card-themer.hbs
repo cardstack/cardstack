@@ -1,4 +1,7 @@
-<section class="card-view" data-test-card-view={{this.card.csTitle}}>
+<section class="card-view" data-test-card-view={{this.card.canonicalURL}}
+  data-test-card-patched={{stringify this.patchCard.isIdle}}
+  data-test-themer-loaded={{stringify this.isCardReady}}
+>
   <CardRenderer
     @card={{@card}}
     @format="isolated"
