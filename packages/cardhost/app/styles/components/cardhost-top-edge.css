@@ -39,13 +39,10 @@
 }
 
 .cardhost-top-edge--buttons {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 120px 40px;
+  grid-gap: 10px;
   z-index: var(--ch-actions-z-index);
-}
-
-.cardhost-top-edge--buttons > button + button,
-.cardhost-top-edge--buttons > div + button {
-  margin-left: 10px;
 }
 
 .cardhost-top-edge--buttons.schema-mode {

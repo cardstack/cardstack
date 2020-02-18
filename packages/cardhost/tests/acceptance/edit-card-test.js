@@ -342,8 +342,8 @@ module('Acceptance | card edit', function(hooks) {
     assert.dom('[data-test-top-edge-size-buttons]').hasClass('hidden');
     assert.dom('[data-test-view-selector]').exists();
     assert.dom('[data-test-view-selector="fields"]').hasClass('active');
-    assert.dom('[data-test-mode-indicator]').exists();
-    assert.dom('[data-test-mode-indicator-label]').hasClass('edit');
+    assert.dom('[data-test-mode-indicator-link="view"]').exists();
+    assert.dom('[data-test-mode-indicator]').containsText('edit mode');
     assert.dom('[data-test-edge-actions-btn]').exists();
     await percySnapshot(assert);
   });
@@ -363,8 +363,8 @@ module('Acceptance | card edit', function(hooks) {
     assert.dom('[data-test-top-edge-size-buttons]').doesNotHaveClass('hidden');
     assert.dom('[data-test-view-selector]').exists();
     assert.dom('[data-test-view-selector="layout"]').hasClass('active');
-    assert.dom('[data-test-mode-indicator]').exists();
-    assert.dom('[data-test-mode-indicator-label]').hasClass('edit');
+    assert.dom('[data-test-mode-indicator-link="view"]').exists();
+    assert.dom('[data-test-mode-indicator]').containsText('edit mode');
     assert.dom('[data-test-edge-actions-btn]').exists();
     await percySnapshot(assert);
   });
