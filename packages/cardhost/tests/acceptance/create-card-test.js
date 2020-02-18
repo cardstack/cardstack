@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { click, fillIn, find, visit, currentURL, triggerEvent, focus } from '@ember/test-helpers';
+import { click, fillIn, find, visit, currentURL, triggerEvent, focus, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures';
 import {
@@ -17,6 +17,8 @@ import { animationsSettled } from 'ember-animated/test-support';
 const card1Name = 'Millenial Puppies';
 const card1Id = 'millenial-puppies';
 const qualifiedCard1Id = `local-hub::${card1Id}`;
+
+const timeout = 5000;
 
 const scenario = new Fixtures({
   create(factory) {
@@ -296,5 +298,17 @@ module('Acceptance | card create', function(hooks) {
       { type: 'fields', id: 'author' },
       { type: 'fields', id: 'body' },
     ]);
+  });
+
+  test('autosave works', async function(assert) {
+    // autosave is disabled by default in tests, so we turn it on and make one change to see if it works
+    await login();
+    await visit('/cards/new');
+    this.owner.lookup('service:autosave').autosaveDisabled = false;
+    await setCardName(card1Name);
+    assert.dom('[data-test-card-is-dirty="no"]').exists();
+    await waitFor('[data-test-card-is-dirty="yes"]', { timeout });
+    await waitFor('[data-test-card-is-dirty="no"]', { timeout });
+    assert.dom('[data-test-card-is-dirty="no"]').exists();
   });
 });

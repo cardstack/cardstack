@@ -53,7 +53,8 @@ export default class AutosaveService extends Service {
     this.hasError = false; // if there's an error and a user switches cards, wipe out error state
     this.lastSavedTime = moment();
 
-    if (environment === 'test') {
+    if (environment === 'test' && this.autosaveDisabled === true) {
+      // In most tests, we call _saveOnceInTests explcitly and pass it _card, instead of using autosave
       this._card = card;
       return;
     }
@@ -65,7 +66,8 @@ export default class AutosaveService extends Service {
 
   @action
   _saveOnceInTests() {
-    // This skips debouncing. Only use it for "click to save" type UI.
+    // This skips debouncing. Only use it for "click to save" type tests
+    // where autosave cannot be used, i.e. tests that make multiple changes to a card
     this.saveCard.perform(this._card);
   }
 
