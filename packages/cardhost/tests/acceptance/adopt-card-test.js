@@ -1,5 +1,6 @@
 import { module, test } from 'qunit';
 import { click, find, visit, currentURL } from '@ember/test-helpers';
+import { login } from '../helpers/login';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
 import {
@@ -51,6 +52,10 @@ module('Acceptance | card adoption', function(hooks) {
   setupApplicationTest(hooks);
   parentScenario.setupModule(hooks);
   scenario.setupTest(hooks);
+
+  hooks.beforeEach(async function() {
+    await login();
+  });
 
   test('adopted fields are present', async function(assert) {
     await setupAdoptedCard();

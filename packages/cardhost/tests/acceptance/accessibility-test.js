@@ -26,9 +26,11 @@ module('Acceptance | accessibility', function(hooks) {
   setupApplicationTest(hooks);
   scenario.setupModule(hooks);
 
-  test('basic a11y tests for main routes', async function(assert) {
+  hooks.beforeEach(async function() {
     await login();
+  });
 
+  test('basic a11y tests for main routes', async function(assert) {
     await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
     await a11yAudit();

@@ -32,8 +32,11 @@ module('Acceptance | card create', function(hooks) {
   setupApplicationTest(hooks);
   scenario.setupTest(hooks);
 
-  test('right edge shows base card as adopted from card', async function(assert) {
+  hooks.beforeEach(async function() {
     await login();
+  });
+
+  test('right edge shows base card as adopted from card', async function(assert) {
     await visit('/cards/add');
     await setCardName(card1Name);
 
@@ -47,8 +50,6 @@ module('Acceptance | card create', function(hooks) {
   });
 
   test('creating a card', async function(assert) {
-    await login();
-
     await visit('/cards/add');
     assert.equal(currentURL(), '/cards/add');
 
@@ -113,7 +114,6 @@ module('Acceptance | card create', function(hooks) {
   });
 
   test('creating a card from the homepage', async function(assert) {
-    await login();
     await visit('/');
 
     assert.equal(currentURL(), '/');
@@ -157,7 +157,6 @@ module('Acceptance | card create', function(hooks) {
   });
 
   test(`selecting a field`, async function(assert) {
-    await login();
     await visit('/cards/add');
 
     await setCardName(card1Name);
@@ -213,7 +212,6 @@ module('Acceptance | card create', function(hooks) {
   });
 
   test(`renaming a card's field`, async function(assert) {
-    await login();
     await visit('/cards/add');
 
     await setCardName(card1Name);
@@ -262,7 +260,6 @@ module('Acceptance | card create', function(hooks) {
   });
 
   test(`entering invalid field name shows error`, async function(assert) {
-    await login();
     await visit('/cards/add');
 
     await setCardName(card1Name);
@@ -285,7 +282,6 @@ module('Acceptance | card create', function(hooks) {
   });
 
   test(`removing a field from a card`, async function(assert) {
-    await login();
     await visit('/cards/add');
 
     await setCardName(card1Name);
@@ -304,7 +300,6 @@ module('Acceptance | card create', function(hooks) {
   });
 
   test(`removing a field from a card that has an empty name`, async function(assert) {
-    await login();
     await visit('/cards/add');
 
     await setCardName(card1Name);
@@ -325,7 +320,6 @@ module('Acceptance | card create', function(hooks) {
   });
 
   test('can add a field at a particular position', async function(assert) {
-    await login();
     await visit('/cards/add');
 
     await setCardName(card1Name);

@@ -41,8 +41,11 @@ module('Acceptance | card edit', function(hooks) {
   setupApplicationTest(hooks);
   scenario.setupTest(hooks);
 
-  test(`setting a string field`, async function(assert) {
+  hooks.beforeEach(async function() {
     await login();
+  });
+
+  test(`setting a string field`, async function(assert) {
     await visit(`/cards/${cardPath}/edit/fields`);
     await waitForCardLoad();
 
@@ -63,7 +66,6 @@ module('Acceptance | card edit', function(hooks) {
   });
 
   skip('setting a date field', async function(assert) {
-    await login();
     await visit(`/cards/${cardPath}/edit/fields`);
     await waitForCardLoad();
 
@@ -80,7 +82,6 @@ module('Acceptance | card edit', function(hooks) {
   });
 
   test('setting an integer field', async function(assert) {
-    await login();
     await visit(`/cards/${cardPath}/edit/fields`);
     await waitForCardLoad();
 
@@ -97,7 +98,6 @@ module('Acceptance | card edit', function(hooks) {
   });
 
   test('setting a boolean field', async function(assert) {
-    await login();
     await visit(`/cards/${cardPath}/edit/fields`);
     await waitForCardLoad();
 
@@ -114,7 +114,6 @@ module('Acceptance | card edit', function(hooks) {
   });
 
   test(`setting a base card field as reference with singular arity`, async function(assert) {
-    await login();
     await visit(`/cards/${cardPath}/edit/fields`);
     await waitForCardLoad();
 
@@ -141,7 +140,6 @@ module('Acceptance | card edit', function(hooks) {
   skip(`setting a card field as value with plural arity`, async function() {});
 
   test(`displays the right edge`, async function(assert) {
-    await login();
     await visit(`/cards/${cardPath}/edit/fields`);
     await waitForCardLoad();
 

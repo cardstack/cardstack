@@ -48,8 +48,11 @@ module('Acceptance | card schema', function(hooks) {
   setupApplicationTest(hooks);
   scenario.setupTest(hooks);
 
-  test(`adding a new field to a card`, async function(assert) {
+  hooks.beforeEach(async function() {
     await login();
+  });
+
+  test(`adding a new field to a card`, async function(assert) {
     await visit(`/cards/${cardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();
     assert.equal(currentURL(), `/cards/${cardPath}/edit/fields/schema`);
@@ -73,7 +76,6 @@ module('Acceptance | card schema', function(hooks) {
   });
 
   test(`Can change a card's name`, async function(assert) {
-    await login();
     await visit(`/cards/${cardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();
     await showCardId(true);
@@ -93,7 +95,6 @@ module('Acceptance | card schema', function(hooks) {
   });
 
   test(`can expand a right edge section`, async function(assert) {
-    await login();
     await visit(`/cards/${cardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();
 
@@ -105,7 +106,6 @@ module('Acceptance | card schema', function(hooks) {
   });
 
   test(`changing the label for a field`, async function(assert) {
-    await login();
     await visit(`/cards/${cardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();
 
@@ -135,7 +135,6 @@ module('Acceptance | card schema', function(hooks) {
   });
 
   test(`adding a new field after removing one`, async function(assert) {
-    await login();
     await visit(`/cards/${cardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();
 
@@ -147,7 +146,6 @@ module('Acceptance | card schema', function(hooks) {
   });
 
   test(`move a field's position via drag & drop`, async function(assert) {
-    await login();
     await visit(`/cards/${cardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();
 
@@ -186,7 +184,6 @@ module('Acceptance | card schema', function(hooks) {
   });
 
   test(`change a field's needed-when-embedded value to true`, async function(assert) {
-    await login();
     await visit(`/cards/${cardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();
 
@@ -212,7 +209,6 @@ module('Acceptance | card schema', function(hooks) {
   });
 
   test(`change a field's needed-when-embedded value to false`, async function(assert) {
-    await login();
     await visit(`/cards/${cardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();
 
@@ -238,7 +234,6 @@ module('Acceptance | card schema', function(hooks) {
   });
 
   test(`can navigate to base card schema`, async function(assert) {
-    await login();
     let baseCardPath = encodeURIComponent(canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }));
     await visit(`/cards/${baseCardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();

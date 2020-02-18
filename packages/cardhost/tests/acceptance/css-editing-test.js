@@ -47,14 +47,14 @@ const waitForAnimation = function(cb) {
 module('Acceptance | css editing', function(hooks) {
   setupApplicationTest(hooks);
   scenario.setupTest(hooks);
-  hooks.beforeEach(function() {
+  hooks.beforeEach(async function() {
     // any time you visit the editor page, you need to set resizable to
     // false, or tests will time out.
     this.owner.lookup('controller:cards.card.view').resizable = false;
+    await login();
   });
 
   test('can view code editor', async function(assert) {
-    await login();
     await visit(`/cards/${cardPath}/edit/layout/themer`);
     await waitForThemerLoad();
 
@@ -65,7 +65,6 @@ module('Acceptance | css editing', function(hooks) {
   });
 
   test('can dock code editor to bottom', async function(assert) {
-    await login();
     await visit(`/cards/${cardPath}/edit/layout/themer`);
     await waitForThemerLoad();
 
@@ -76,7 +75,6 @@ module('Acceptance | css editing', function(hooks) {
   });
 
   test('navigating to custom styles', async function(assert) {
-    await login();
     await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
 
@@ -100,7 +98,6 @@ module('Acceptance | css editing', function(hooks) {
   });
 
   test('closing the editor', async function(assert) {
-    await login();
     await visit(`/cards/${cardPath}/edit/layout`);
     await waitForCardLoad();
 
@@ -121,7 +118,6 @@ module('Acceptance | css editing', function(hooks) {
   });
 
   test('hiding the editor', async function(assert) {
-    await login();
     await visit(`/cards/${cardPath}/edit/layout`);
     await waitForCardLoad();
 
@@ -137,7 +133,6 @@ module('Acceptance | css editing', function(hooks) {
   });
 
   test('toggling editor docking', async function(assert) {
-    await login();
     await visit(`/cards/${cardPath}/edit/layout`);
     await waitForCardLoad();
 
@@ -157,7 +152,6 @@ module('Acceptance | css editing', function(hooks) {
   });
 
   test('toggling card width', async function(assert) {
-    await login();
     await visit(`/cards/${cardPath}/edit/layout`);
     await waitForCardLoad();
 
@@ -180,7 +174,6 @@ module('Acceptance | css editing', function(hooks) {
   });
 
   test('can save CSS edits', async function(assert) {
-    await login();
     await visit(`/cards/${cardPath}/edit/layout`);
     await waitForCardLoad();
 
@@ -197,7 +190,6 @@ module('Acceptance | css editing', function(hooks) {
   });
 
   test('dropdown displays default theme for new cards', async function(assert) {
-    await login();
     await visit(`/cards/${cardPath}/edit/layout`);
     await waitForCardLoad();
 
@@ -208,7 +200,6 @@ module('Acceptance | css editing', function(hooks) {
   });
 
   test('dropdown displays custom theme for cards with custom CSS', async function(assert) {
-    await login();
     await visit(`/cards/${cardPath}/edit/layout`);
     await waitForCardLoad();
     await click('[data-test-card-custom-style-button]');
@@ -225,7 +216,6 @@ module('Acceptance | css editing', function(hooks) {
   });
 
   test('selecting default theme resets css', async function(assert) {
-    await login();
     await visit(`/cards/${cardPath}/edit/layout`);
     await waitForCardLoad();
     await click('[data-test-card-custom-style-button]');

@@ -42,8 +42,11 @@ module('Acceptance | card view', function(hooks) {
   setupApplicationTest(hooks);
   scenario.setupModule(hooks);
 
-  test(`viewing a card`, async function(assert) {
+  hooks.beforeEach(async function() {
     await login();
+  });
+
+  test(`viewing a card`, async function(assert) {
     await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
     await waitForEmbeddedCardLoad(author.canonicalURL);
@@ -80,7 +83,6 @@ module('Acceptance | card view', function(hooks) {
   });
 
   test('can navigate to the base-card', async function(assert) {
-    await login();
     let baseCardPath = encodeURIComponent(canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }));
 
     await visit(`/cards/${baseCardPath}`);

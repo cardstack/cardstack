@@ -16,13 +16,27 @@ export default class CardhostTopEdgeComponent extends Component {
 
   @action
   logout(sessionLogout) {
-    sessionLogout();
-    let cardId = this.router.currentRoute.parent.params.name;
+    sessionLogout.bind(this.cardstackSession)();
+    let cardId;
+    let route = this.router.currentRoute;
+    while (route) {
+      cardId = route.params.id;
+      if (!cardId) {
+        route = route.parent;
+      } else {
+        break;
+      }
+    }
     if (cardId) {
       this.router.transitionTo('cards.card.view', cardId);
     } else {
       this.router.transitionTo('index');
     }
+  }
+
+  @action
+  login(sessionLogin, username) {
+    sessionLogin.bind(this.cardstackSession)(username);
   }
 
   @action
