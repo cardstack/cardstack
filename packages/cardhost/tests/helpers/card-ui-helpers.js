@@ -22,6 +22,11 @@ export async function waitForSchemaViewToLoad() {
   await animationsSettled();
 }
 
+export async function waitForTemplatesLoad() {
+  await waitFor('[data-test-templates-loaded="true"]', { timeout });
+  await animationsSettled();
+}
+
 export async function waitForFieldToLoadInRightEdge(name) {
   await waitFor(`.right-edge [data-test-field="${name}"][data-test-loaded="true"]`, { timeout });
   await waitFor(`.right-edge[data-test-field-source-loaded="true"]`, { timeout });

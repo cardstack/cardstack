@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { click, visit, currentURL } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
-import { waitForEmbeddedCardLoad, waitForCardLoad } from '../helpers/card-ui-helpers';
+import { waitForEmbeddedCardLoad, waitForCardLoad, waitForTemplatesLoad } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { cardDocument } from '@cardstack/core/card-document';
@@ -102,6 +102,7 @@ const scenario = new Fixtures({
 
 async function waitForCatalogLoad() {
   await Promise.all(cards.map(card => waitForEmbeddedCardLoad(card.canonicalURL)));
+  await waitForTemplatesLoad();
 }
 
 module('Acceptance | catalog', function(hooks) {
@@ -132,10 +133,10 @@ module('Acceptance | catalog', function(hooks) {
     );
 
     assert.deepEqual(
-      [...document.querySelectorAll(`[data-test-templates] [data-test-catalog-entry]`)].map(i =>
-        i.getAttribute('data-test-embedded-card')
+      [...document.querySelectorAll(`[data-test-templates] [data-test-adopt-card-btn]`)].map(i =>
+        i.getAttribute('data-test-adopt-card-btn')
       ),
-      [entry2.canonicalURL, entry1.canonicalURL]
+      [template2.canonicalURL, template1.canonicalURL]
     );
     await percySnapshot(assert);
   });

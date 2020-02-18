@@ -12,8 +12,8 @@ const size = 100;
 export default class IndexRoute extends Route {
   @service data!: DataService;
 
-  async model(): Promise<{ catalog: AddressableCard[]; templates: AddressableCard[] }> {
-    let [catalog, templates] = await Promise.all([
+  async model(): Promise<{ cards: AddressableCard[]; catalogEntries: AddressableCard[] }> {
+    let [cards, catalogEntries] = await Promise.all([
       this.data.search(
         // TODO we really want this filter to not include catalog-entry cards. I
         // think we'll need to introduce a new type of filter to be able to
@@ -38,7 +38,7 @@ export default class IndexRoute extends Route {
         { includeFieldSet: 'embedded' }
       ),
     ]);
-    return { catalog, templates };
+    return { cards, catalogEntries };
   }
 
   @action

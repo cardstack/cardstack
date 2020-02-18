@@ -32,6 +32,9 @@ package-lock.json
 /packages/cardhost/app/components/scaffold.d.ts
 /packages/cardhost/app/components/scaffold.js
 /packages/cardhost/app/components/scaffold.js.map
+/packages/cardhost/app/components/card-templates.d.ts
+/packages/cardhost/app/components/card-templates.js
+/packages/cardhost/app/components/card-templates.js.map
 /packages/cardhost/app/controllers/cards/card/**/*.d.ts
 /packages/cardhost/app/controllers/cards/card/**/*.js
 /packages/cardhost/app/controllers/cards/card/**/*.js.map
