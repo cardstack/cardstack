@@ -15,7 +15,9 @@
           {{@buttonText}}
         </LinkTo>
         <button 
-          {{on "click" this.toggleMenu}} 
+          {{on "click" this.toggleMenu}}
+          {{did-insert this.autosave.kickoff @card.isDirty @card}}
+          {{did-update this.autosave.kickoff @card.isDirty @card}}
           class="context-menu-button {{if this.autosave.hasError "context-menu-button---error"}}" data-test-context-menu-button
           aria-label="Open card mode options menu" aria-expanded={{@contextMenuOpen}}
         >
@@ -31,11 +33,7 @@
   <div class={{if (eq @mode "schema") "context-menu-sticky-wrapper"}}>
     <nav class="context-menu-nav" role="navigation" aria-labelledby="switch-mode">
       <ul class="context-menu-items" data-test-context-menu-items>
-        <li 
-          class="heading"
-            {{did-insert this.autosave.kickoff @card.isDirty @card}}
-            {{did-update this.autosave.kickoff @card.isDirty @card}}
-        >
+        <li class="heading">
           {{#if this.autosave.hasError}}
             {{svg-jar "error" width="10px" height="10px"}}
             Failed to save
