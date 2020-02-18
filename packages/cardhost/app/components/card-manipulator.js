@@ -30,6 +30,7 @@ export default class CardManipulator extends Component {
   @tracked fieldComponents = fieldComponents;
   @tracked stopMouse;
   @tracked updateMouse;
+  @tracked justDropped;
 
   constructor(...args) {
     super(...args);
@@ -258,8 +259,7 @@ export default class CardManipulator extends Component {
 
   @action
   selectFieldType(field, event) {
-    if (!this.draggable.isDragging) {
-      console.log('click, begin dragging');
+    if (!this.draggable.isDragging && !this.justDropped) {
       this.beginDragging(field, event);
     } else {
       this.draggable.clearField();
@@ -285,14 +285,16 @@ export default class CardManipulator extends Component {
       // we do this so that we can animate the field back to the left edge
       self.fieldComponents = self.fieldComponents.map(obj => obj); // oh glimmer, you so silly...
 
-
       // remove ghost element from DOM
       let ghostEl = document.getElementById('ghost-element');
       if (ghostEl) {
         ghostEl.remove();
       }
 
-      console.log('removing event handlers');
+      // this tells the click event that follows not to do anything
+      self.justDropped = true;
+      setTimeout(() => (self.justDropped = false), 1000);
+
       window.removeEventListener('mousemove', updateMouse, false);
       window.removeEventListener('mouseup', stopMouse, false);
       return false;
