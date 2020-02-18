@@ -306,7 +306,6 @@ module('Acceptance | card create', function(hooks) {
     await visit('/cards/new');
     this.owner.lookup('service:autosave').autosaveDisabled = false;
     await setCardName(card1Name);
-    assert.dom('[data-test-card-is-dirty="no"]').exists();
     await waitFor('[data-test-card-is-dirty="yes"]', { timeout });
     await waitFor('[data-test-card-is-dirty="no"]', { timeout });
     assert.dom('[data-test-card-is-dirty="no"]').exists();
