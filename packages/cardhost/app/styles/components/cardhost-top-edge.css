@@ -125,9 +125,4 @@
     min-width: 105px;
     text-align: right;
   }
-
-  .save-button.cs-component-cta.primary {
-    min-width: 100px;
-    margin-left: 0;
-  }
 }
