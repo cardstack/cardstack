@@ -14,80 +14,42 @@
   background-color: var(--ch-default);
   transition: var(--ch-card-background-color-animate);
 }
-
 .cardhost-top-edge.view {
   background-color: var(--ch-light-background);
   z-index: 10;
 }
-
-.cardhost-top-edge.add,
-.cardhost-top-edge.adopt,
 .cardhost-top-edge.schema {
-  padding-left: var(--ch-left-edge-width);
-  padding-right: var(--ch-right-edge-width);
   background-color: var(--ch-deep-background);
 }
-
-.cardhost-top-edge.add + .card-renderer--top-edge-buttons,
-.cardhost-top-edge.adopt + .card-renderer--top-edge-buttons,
-.cardhost-top-edge.schema + .card-renderer--top-edge-buttons {
-  position: fixed;
-  top: var(--ch-spacing);
-  right: var(--ch-spacing);
-}
-
 .cardhost-top-edge.themer {
   background-color: var(--ch-dark-background);
+  right: 0;
+  left: 0;
 }
 
-.card-renderer--top-edge-preview-button {
+.cardhost-top-edge--preview-button,
+.cardhost-top-edge--size-buttons {
   z-index: var(--ch-actions-z-index);
-}
-
-.card-renderer--top-edge-preview-button,
-.card-renderer--top-edge-size-buttons {
   transition: visibility 0.3s ease;
 }
 
-.card-renderer--top-edge-preview-button.hidden,
-.card-renderer--top-edge-size-buttons.hidden {
+.cardhost-top-edge--preview-button.hidden,
+.cardhost-top-edge--size-buttons.hidden {
   visibility: collapse;
 }
 
-.card-renderer--top-edge-buttons {
+.cardhost-top-edge--buttons {
   display: flex;
   z-index: var(--ch-actions-z-index);
 }
 
-.card-renderer--top-edge-buttons > button + button,
-.card-renderer--top-edge-buttons > div + button {
+.cardhost-top-edge--buttons > button + button,
+.cardhost-top-edge--buttons > div + button {
   margin-left: 10px;
 }
 
-/* Preview link button */
-.preview-link {
-  background-image: url('/assets/images/buttons/eye-on.svg');
-  background-position: left 11px center;
-  background-repeat: no-repeat;
-  background-size: 18px 14px;
-}
-
-
-/* Edge actions button */
-.edge-actions-button.cs-component-cta.primary {
-  --icon-color: var(--ch-dark);
-  min-width: 40px;
-  height: 40px;
-  padding: 10px 9px 11px 12px;
-  border-color: var(--ch-highlight);
-  line-height: 0;
-}
-.edge-actions-button > svg {
-  display: inline-block;
-}
-.edge-actions-button:not(:disabled):hover,
-.edge-actions-button:not(:disabled):focus {
-  border-color: var(--ch-highlight-hover);
+.cardhost-top-edge--buttons.schema-mode {
+  grid-column-end: -1;
 }
 
 
@@ -132,12 +94,13 @@
   margin-right: 9px;
 }
 
+
 @media (max-width: 1036px) {
   .cardhost-top-edge {
     grid-template-columns: auto 1fr var(--ch-right-edge-panel-width);
   }
 
-  .card-renderer--top-edge-size-buttons {
+  .cardhost-top-edge--size-buttons {
     display: none;
   }
 }
@@ -148,7 +111,7 @@
     grid-gap: 10px;
   }
 
-  .card-renderer--top-edge-buttons .mode-indicator {
+  .cardhost-top-edge--buttons .mode-indicator {
     display: none;
   }
 
@@ -165,33 +128,4 @@
     min-width: 100px;
     margin-left: 0;
   }
-}
-
-/* Old styles, remove after updating all mode buttons */
-.top-edge--mode-label {
-  padding: 10px;
-  background-color: white;
-  text-transform: uppercase;
-  font-size: 16px;
-  font-weight: bold;
-  border-radius: 10px;
-  color: var(--ch-dark-op50);
-  margin-right: 20px;
-}
-
-.top-edge--mode-link {
-  display: inline-flex;
-}
-
-.top-edge--mode-link span {
-  width: 18px;
-  height: 18px;
-  display: block;
-  text-indent: -9999px;
-    text-indent: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  background-image: url(/assets/images/icons/close-circle.svg);
-  background-size: 18px 18px;
-  background-repeat: no-repeat;
 }
