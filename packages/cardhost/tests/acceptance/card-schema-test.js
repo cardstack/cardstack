@@ -1,6 +1,7 @@
 import { module, test } from 'qunit';
 import { click, find, visit, currentURL, waitFor, fillIn, triggerEvent } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
+import { percySnapshot } from 'ember-percy';
 import Fixtures from '@cardstack/test-support/fixtures';
 import {
   showCardId,
@@ -385,5 +386,35 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-return-to-editing]').hasText('Return to Editing');
     await click('[data-test-return-to-editing]');
     assert.equal(currentURL(), `/cards/@cardstack%2Fbase-card/edit/fields`);
+  });
+
+  test(`displays the top edge`, async function(assert) {
+    await login();
+    await createCards({
+      [card1Id]: [['title', 'string', true, 'test title']],
+    });
+    await visit(`/cards/${card1Id}/edit/fields/schema`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields/schema`);
+
+    assert.dom('[data-test-cardhost-top-edge]').exists();
+    assert.dom('[data-test-mode-indicator]').exists();
+    assert.dom('[data-test-mode-indicator-label]').hasClass('schema');
+    assert.dom('[data-test-edge-actions-btn]').exists();
+    await percySnapshot(assert);
+  });
+
+  test(`can navigate to edit mode using the top edge`, async function(assert) {
+    await login();
+    await createCards({
+      [card1Id]: [['body', 'string', false, 'test body']],
+    });
+    await visit(`/cards/${card1Id}/edit/fields/schema`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields/schema`);
+    assert.dom('[data-test-mode-indicator-link="edit"]').exists();
+    assert.dom('[data-test-mode-indicator-label]').containsText('schema mode');
+
+    await click('[data-test-mode-indicator-link="edit"]');
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+    assert.dom('[data-test-mode-indicator-label]').containsText('edit mode');
   });
 });

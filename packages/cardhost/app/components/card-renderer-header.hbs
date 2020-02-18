@@ -30,7 +30,7 @@
 
 {{!-- This is outside of the header div so that it can have a higher z-index than the header --}}
 {{#if this.showMenu}}
-  <div class={{if (eq @mode "schema") "context-menu-sticky-wrapper"}}>
+  <div class={{if (or (eq @mode "schema") (eq @mode "layout")) "context-menu-sticky-wrapper"}}>
     <nav class="context-menu-nav" role="navigation" aria-labelledby="switch-mode">
       <ul class="context-menu-items" data-test-context-menu-items>
         <li class="heading">

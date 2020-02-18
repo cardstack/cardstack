@@ -10,7 +10,7 @@
 }
 
 .cardhost-cards.edit {
-  background-color: var(--ch-medium-background);
+  background-color: var(--ch-default);
 }
 
 .cardhost-cards.schema,
@@ -25,4 +25,16 @@
 
 .cardhost-cards.dragging * {
   user-select: none;
+}
+
+.themer-card-width--small .card-renderer-isolated {
+  width: var(--ch-card-size);
+}
+
+.themer-card-width--medium .card-renderer-isolated {
+  width: var(--ch-card-size-medium);
+}
+
+.themer-card-width--large .card-renderer-isolated {
+  width: var(--ch-card-size-large);
 }

@@ -29,6 +29,7 @@ export default class CardManipulator extends Component {
   @tracked cardSelected = true;
   @tracked fieldComponents = fieldComponents;
   @tracked stopMouse;
+  @tracked updateMouse;
 
   constructor(...args) {
     super(...args);
@@ -220,6 +221,7 @@ export default class CardManipulator extends Component {
 
     this.draggable.clearField();
     this.draggable.clearDropzone();
+    this.draggable.setDragging(false);
 
     if (field) {
       this.selectField(field, evt);
@@ -281,8 +283,8 @@ export default class CardManipulator extends Component {
         this.fieldComponents = this.fieldComponents.map(obj => obj); // oh glimmer, you so silly...
       }
 
-      window.removeEventListener('mouseup', this.stopMouse);
-      window.removeEventListener('mousemove', updateMouse);
+      window.removeEventListener('mouseup', this.stopMouse, false);
+      window.removeEventListener('mousemove', this.updateMouse, false);
 
       // remove ghost element from DOM
       let ghostEl = document.getElementById('ghost-element');
@@ -341,8 +343,9 @@ export default class CardManipulator extends Component {
         latestPointerY: dragEvent.y,
       };
       this.stopMouse = stopMouse.bind(this);
-      window.addEventListener('mouseup', this.stopMouse);
-      window.addEventListener('mousemove', updateMouse);
+      this.updateMouse = updateMouse.bind(this);
+      window.addEventListener('mouseup', this.stopMouse, false);
+      window.addEventListener('mousemove', this.updateMouse, false);
     }
     field.dragState = dragState;
     this.draggable.setField(field);

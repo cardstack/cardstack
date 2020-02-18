@@ -9,14 +9,14 @@ export default class CardsController extends Controller {
   @service draggable;
 
   get themerClasses() {
-    if (this.onThemerRoute) {
+    if (this.hasThemerTools) {
       return `editing-css themer-card-width--${this.cssModeToggle.width}`; // width is small, medium, or large
     } else {
       return '';
     }
   }
 
-  get onThemerRoute() {
-    return this.router.currentRoute.localName === 'themer';
+  get hasThemerTools() {
+    return this.routeInfo.mode === 'themer' || this.routeInfo.mode === 'layout';
   }
 }

@@ -1,20 +1,3 @@
-{{#if this.cardstackSession.isAuthenticated}}
-  <div class="card-renderer--top-edge-buttons">
-    <div class="top-edge--mode-label">
-      Schema Mode
-      <LinkTo
-        @route="cards.card.edit.fields"
-        @class="top-edge--mode-link edit"
-        @model={{this.card}}
-        data-test-top-edge-link="edit"
-      >
-        <span>Edit</span>
-      </LinkTo>
-    </div>
-    <SaveButton @card={{this.card}} />
-  </div>
-{{/if}}
-
 <CardhostLeftEdge @mode="schema">
   <section class="ch-catalog">
     <header class="ch-catalog--header">
@@ -59,18 +42,20 @@
   @setFieldInstructions={{this.setFieldInstructions}}
   @cardSelected={{this.cardSelected}} />
 
-<section class="card-renderer--container card-renderer--schema-container" data-test-card-schema={{@card.name}} {{did-update this.updateCard @card}}>
-  <CardRenderer
-    @card={{this.card}}
-    @format="isolated"
-    @mode="schema"
-    @removeField={{action this.removeField}}
-    @selectField={{action this.selectField}}
-    @setPosition={{action this.setPosition}}
-    @selectedField={{this.selectedField}}
-    @dropField={{action this.dropField}}
-    @cardSelected={{this.cardSelected}}
-    @cardFocused={{action (mut this.cardSelected)}} />
+<section class="card-renderer--container" data-test-card-schema={{@card.name}} {{did-update this.updateCard @card}}>
+  <div class="card-renderer--inner-container schema-container">
+    <CardRenderer
+      @card={{this.card}}
+      @format="isolated"
+      @mode="schema"
+      @removeField={{action this.removeField}}
+      @selectField={{action this.selectField}}
+      @setPosition={{action this.setPosition}}
+      @selectedField={{this.selectedField}}
+      @dropField={{action this.dropField}}
+      @cardSelected={{this.cardSelected}}
+      @cardFocused={{action (mut this.cardSelected)}} />
+  </div>
 </section>
 
 {{!-- This is hidden, used in tests --}}

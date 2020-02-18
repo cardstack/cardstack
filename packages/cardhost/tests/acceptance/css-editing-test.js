@@ -112,8 +112,8 @@ module('Acceptance | css editing', function(hooks) {
     await visit(`/cards/${card1Id}/edit/layout`);
     await click('[data-test-card-custom-style-button]');
     assert.equal(currentURL(), `/cards/${card1Id}/edit/layout/themer`);
-    assert.dom('[data-test-close-editor]').exists();
-    await click('[data-test-close-editor]');
+    assert.dom('[data-test-mode-indicator-link="layout"]').exists();
+    await click('[data-test-mode-indicator-link="layout"]');
     assert.equal(currentURL(), `/cards/${card1Id}/edit/layout`);
     assert.dom('[data-test-editor-pane]').doesNotExist();
     assert.dom('[data-test-card-custom-style-button]').exists();
@@ -149,7 +149,7 @@ module('Acceptance | css editing', function(hooks) {
     assert.dom('[data-test-dock-location="right"]');
   });
 
-  test('toggling card width', async function(assert) {
+  test('themer mode: toggling card width', async function(assert) {
     await login();
     await createCards(cardData);
     await visit(`/cards/${card1Id}/edit/layout`);
@@ -179,6 +179,57 @@ module('Acceptance | css editing', function(hooks) {
     assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
     await waitForAnimation(() => percySnapshot(assert));
+  });
+
+  test('layout mode: toggling card width', async function(assert) {
+    await login();
+    await createCards(cardData);
+    await visit(`/cards/${card1Id}/edit/layout`);
+    assert.dom('[data-test-small-btn]').exists();
+    assert.dom('[data-test-small-btn]').hasClass('selected');
+    assert.dom('[data-test-medium-btn]').exists();
+    assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-large-btn]').exists();
+    assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--small');
+    await waitForAnimation(() => percySnapshot(assert));
+    // toggle to full width
+    await click('[data-test-medium-btn]');
+    assert.dom('[data-test-medium-btn]').hasClass('selected');
+    assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--medium');
+    assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
+    await waitForAnimation(() => percySnapshot(assert));
+
+    await click('[data-test-large-btn]');
+    assert.dom('[data-test-large-btn]').hasClass('selected');
+    assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--large');
+    assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
+    await waitForAnimation(() => percySnapshot(assert));
+  });
+
+  test('changing card size should change card size in both themer and layout modes', async function(assert) {
+    await login();
+    await createCards(cardData);
+    await visit(`/cards/${card1Id}/edit/layout`);
+    await click('[data-test-medium-btn]');
+    assert.dom('[data-test-medium-btn]').hasClass('selected');
+
+    await click('[data-test-card-custom-style-button]');
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/layout/themer`);
+    assert.dom('[data-test-medium-btn]').hasClass('selected');
+    assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
+
+    await click('[data-test-large-btn]');
+    assert.dom('[data-test-large-btn]').hasClass('selected');
+    assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
+
+    await click('[data-test-mode-indicator-link="layout"]');
+    await visit(`/cards/${card1Id}/edit/layout`);
+    assert.dom('[data-test-large-btn]').hasClass('selected');
+    assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
   });
 
   test('can save CSS edits', async function(assert) {
@@ -215,6 +266,7 @@ module('Acceptance | css editing', function(hooks) {
     await click('[data-test-card-custom-style-button]');
     await waitFor('[data-test-editor-pane] textarea');
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
+    await click('[data-test-mode-indicator-link="layout"]');
     await click('[data-test-close-editor]');
     await waitFor('[data-test-cs-component="dropdown"]');
     await selectChoose('[data-test-cs-component="dropdown"]', 'Cardstack default');
@@ -233,7 +285,7 @@ module('Acceptance | css editing', function(hooks) {
     await click('[data-test-card-custom-style-button]');
     await waitFor('[data-test-editor-pane] textarea');
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
-    await click('[data-test-close-editor]');
+    await click('[data-test-mode-indicator-link="layout"]');
     assert.dom('[data-test-card-custom-style-button]').includesText('Edit Custom Theme');
     assert.dom('[data-test-style-dropdown]').includesText('Custom');
     assert.dom('[data-test-style-dropdown]').doesNotIncludeText('default');
