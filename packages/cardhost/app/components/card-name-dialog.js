@@ -39,10 +39,12 @@ export default class CardNameDialog extends Component {
 
     let newCard = this.data.createCard(`local-hub::${this.cardId}`, adoptedFrom);
 
+    yield newCard.save();
+
     if (adoptedFrom) {
-      this.router.transitionTo('cards.card.edit', newCard);
+      this.router.transitionTo('cards.card.edit.fields', newCard.name);
     } else {
-      this.router.transitionTo('cards.card.edit.fields.schema', newCard);
+      this.router.transitionTo('cards.card.edit.fields.schema', newCard.name);
     }
   })
   createCardTask;
