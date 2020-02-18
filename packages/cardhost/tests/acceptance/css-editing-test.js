@@ -241,7 +241,7 @@ module('Acceptance | css editing', function(hooks) {
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
     let themerHasStyle = find('[data-test-preview-css]').innerText.includes('gorgeous styles');
     assert.ok(themerHasStyle);
-    await click('[data-test-close-editor]');
+    await click('[data-test-mode-indicator-link="layout"]');
     await animationsSettled();
     let viewHasStyle = find('[data-test-view-css]').innerText.includes('gorgeous styles');
     assert.ok(viewHasStyle);
@@ -267,7 +267,7 @@ module('Acceptance | css editing', function(hooks) {
     await waitFor('[data-test-editor-pane] textarea');
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
     await click('[data-test-mode-indicator-link="layout"]');
-    await click('[data-test-close-editor]');
+    await click('[data-test-mode-indicator-link="layout"]');
     await waitFor('[data-test-cs-component="dropdown"]');
     await selectChoose('[data-test-cs-component="dropdown"]', 'Cardstack default');
     assert.dom('[data-test-cs-component="dropdown"]').doesNotContainText('Custom');

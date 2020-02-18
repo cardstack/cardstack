@@ -3,7 +3,6 @@ import Service from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
-import { task } from 'ember-concurrency';
 import { restartableTask, enqueueTask } from 'ember-concurrency-decorators';
 import { timeout } from 'ember-concurrency';
 import ENV from '@cardstack/cardhost/config/environment';
