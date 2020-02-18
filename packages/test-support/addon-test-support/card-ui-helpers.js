@@ -1,4 +1,4 @@
-import { click, find, triggerEvent, fillIn, visit, waitFor } from '@ember/test-helpers';
+import { click, find, triggerEvent, fillIn, visit, waitFor, getContext } from '@ember/test-helpers';
 import { animationsSettled } from 'ember-animated/test-support';
 
 const timeout = 5000;
@@ -81,6 +81,9 @@ export async function createCards(args) {
 }
 
 export async function saveCard() {
+  getContext()
+    .owner.lookup('service:autosave')
+    ._saveOnceInTests();
   await waitFor('[data-test-card-is-dirty="no"]', { timeout });
   await animationsSettled();
 }
