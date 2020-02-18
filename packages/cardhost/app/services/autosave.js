@@ -9,7 +9,7 @@ import { timeout } from 'ember-concurrency';
 import ENV from '@cardstack/cardhost/config/environment';
 import moment from 'moment';
 
-const { autosaveDebounce, autosaveDisabled } = ENV;
+const { autosaveDebounce, autosaveDisabled, environment } = ENV;
 const SAVED_HIGHLIGHT_DELAY = 2500;
 const AUTOSAVE_DEBOUNCE = 5000;
 
@@ -24,11 +24,6 @@ export default class AutosaveService extends Service {
   // These are properties of the service so that we can change them to true for service-specific tests.
   autosaveDisabled = autosaveDisabled;
   autosaveDebounce = autosaveDebounce || AUTOSAVE_DEBOUNCE;
-
-  get cardIsNew() {
-    let card = this.args.card;
-    return card.isNew;
-  }
 
   // This task needs to be queued, otherwise we will get
   // 409 conflicts with the `/meta/version`
@@ -69,15 +64,21 @@ export default class AutosaveService extends Service {
   kickoff(el, [isDirty, card]) {
     this.hasError = false; // if there's an error and a user switches cards, wipe out error state
     this.lastSavedTime = moment();
+
+    if (environment === 'test') {
+      this._card = card;
+      return;
+    }
+
     if (isDirty && !this.autosaveDisabled) {
       this.debounceAndSave.perform(card);
     }
   }
 
   @action
-  saveOnce() {
+  _saveOnceInTests() {
     // This skips debouncing. Only use it for "click to save" type UI.
-    this.saveCardWithState.perform();
+    this.saveCardWithState.perform(this._card);
   }
 
   @action
