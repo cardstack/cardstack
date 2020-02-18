@@ -278,6 +278,12 @@ export default class CardManipulator extends Component {
       if (dropzone) {
         self.draggable.drop();
         field.dropTo = dropzone;
+
+        // this tells the click event that follows not to do anything
+        self.justDropped = true;
+        setTimeout(function() {
+          self.justDropped = false;
+        }, 1000);
       } else {
         // we mouseup somewhere that isn't a dropzone
         self.draggable.clearField();
@@ -290,10 +296,6 @@ export default class CardManipulator extends Component {
       if (ghostEl) {
         ghostEl.remove();
       }
-
-      // this tells the click event that follows not to do anything
-      self.justDropped = true;
-      setTimeout(() => (self.justDropped = false), 1000);
 
       window.removeEventListener('mousemove', updateMouse, false);
       window.removeEventListener('mouseup', stopMouse, false);

@@ -25,14 +25,13 @@ export default class DropZone extends Component {
   }
 
   @action
-  updateStatus(status, evt) {
+  updateStatus(status) {
     let draggedField = this.draggable.getField();
 
     if (!draggedField) {
       return;
     }
 
-    console.log('event', evt.type, 'status:', status);
     this.dropZoneStatus = status;
 
     if (this.args.toggleStubField) {

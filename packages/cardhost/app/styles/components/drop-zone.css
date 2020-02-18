@@ -9,7 +9,6 @@
   height: 50px;
   position: absolute;
   top: -25px;
-  border: dashed 3px red;
   z-index: 100;
 }
 
