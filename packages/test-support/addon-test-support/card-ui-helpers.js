@@ -16,7 +16,6 @@ export async function showCardId(toggleDetailsSection = false) {
 export async function setCardName(name) {
   await fillIn('#card__name', name);
   await click('[data-test-create-card-btn]');
-  await waitFor(`[data-test-card-save-btn]`, { timeout });
 }
 
 export async function dragAndDrop(fieldSelector, dropZoneSelector, options) {

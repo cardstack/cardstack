@@ -20,7 +20,6 @@ module('Integration | Component | themer-toolbar', function(hooks) {
     assert.dom('[data-test-mode-indicator]').exists();
     assert.dom('[data-test-mode-indicator]').containsText('themer mode');
     assert.dom('[data-test-mode-indicator-link="layout"]').exists();
-    assert.dom('[data-test-card-save-btn]').exists();
     assert.dom('[data-test-edge-actions-btn]').exists();
   });
 });

@@ -19,7 +19,7 @@
 
 .themer-toolbar--controls-right {
   display: grid;
-  grid-template-columns: 40px 40px 40px auto auto 40px;
+  grid-template-columns: 40px 40px 40px auto 40px;
   grid-gap: 15px;
   justify-self: end;
   padding: 0 20px;
