@@ -8,6 +8,7 @@ import { Deferred } from './deferred';
 import { outputFile, mkdirp, ensureSymlink } from 'fs-extra';
 import { satisfies, coerce } from 'semver';
 import { ModuleLoader } from '@cardstack/core/module-loader';
+import { SingleResourceDoc } from 'jsonapi-typescript';
 
 export const cardFilesCache = process.env.CARD_FILES_CACHE ?? join(homedir(), '.cardstack', 'card-files-cache');
 
@@ -20,7 +21,7 @@ export class ModuleService implements ModuleLoader {
     // using md5 because this is just for cache validation, not cryptographic
     // collision resistance
     let hash = createHash('md5');
-    hash.update(stringify((await card.asUpstreamDoc()).jsonapi));
+    hash.update(stringify(await toIdempotentDoc(card)));
     let cardDir = join(cardFilesCache, hash.digest('hex'));
     await this.cachedWriteCard(card, cardDir);
     // @ts-ignore
@@ -109,4 +110,21 @@ declare module '@cardstack/hub/dependency-injection' {
   interface KnownServices {
     modules: ModuleService;
   }
+}
+
+async function toIdempotentDoc(card: Card): Promise<SingleResourceDoc> {
+  let idempotentDoc = (await card.asUpstreamDoc()).jsonapi;
+  if (idempotentDoc.data.attributes) {
+    delete idempotentDoc.data.attributes.csCreated;
+    delete idempotentDoc.data.attributes.csUpdated;
+  }
+  if (idempotentDoc.included) {
+    for (let resource of idempotentDoc.included) {
+      if (resource.attributes) {
+        delete resource.attributes.csCreated;
+        delete resource.attributes.csUpdated;
+      }
+    }
+  }
+  return idempotentDoc;
 }

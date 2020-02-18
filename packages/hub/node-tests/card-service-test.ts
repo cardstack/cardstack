@@ -1256,6 +1256,7 @@ describe('hub/card-service', function() {
           `${myOrigin}/api/realms/first-ephemeral-realm`,
           cardDocument()
             .withAttributes({
+              csCreated: '2020-01-01T01:00:00Z',
               name: 'Van Gogh',
               weightInPounds: 55,
               rating: 11,
@@ -1267,6 +1268,7 @@ describe('hub/card-service', function() {
           `${myOrigin}/api/realms/first-ephemeral-realm`,
           cardDocument()
             .withAttributes({
+              csCreated: '2020-01-01T03:00:00Z',
               name: 'Mango',
               weightInPounds: 7,
               rating: 11,
@@ -1278,6 +1280,7 @@ describe('hub/card-service', function() {
           `${myOrigin}/api/realms/first-ephemeral-realm`,
           cardDocument()
             .withAttributes({
+              csCreated: '2020-01-01T02:00:00Z',
               name: 'Ringo',
               weightInPounds: 60,
               rating: 11,
@@ -1454,6 +1457,10 @@ describe('hub/card-service', function() {
       it.skip('can get all the field cards (including adopted fields)', async function() {});
       it.skip("a field card can indicate if it is the enclosing card's own field or if it is adopted", async function() {});
       it.skip("a field card can return the 'source' card in the adoption chain that defined the field", async function() {});
+      it.skip('new cards have a csCreated attribute', async function() {});
+      it.skip('the csCreated attribute does not change when a card is patched', async function() {});
+      it.skip('the csUpdated attribute changes when a card is patched', async function() {});
+      it.skip('interior card do not have a csCreated nor a csUpdated attribute', async function() {});
 
       it('can equality filter by string user field', async function() {
         let results = await service.search({
@@ -1736,6 +1743,22 @@ describe('hub/card-service', function() {
         expect(results.cards.length).to.equal(3);
         let ids = results.cards.map(i => i.canonicalURL);
         expect(ids).to.eql([mango.canonicalURL, ringo.canonicalURL, vanGogh.canonicalURL]);
+      });
+
+      it('can sort by csCreated', async function() {
+        let results = await service.search({
+          filter: {
+            type: puppyCard,
+            range: {
+              name: { gte: 'A' },
+            },
+          },
+          sort: 'csCreated',
+        });
+
+        expect(results.cards.length).to.equal(3);
+        let ids = results.cards.map(i => i.canonicalURL);
+        expect(ids).to.eql([vanGogh.canonicalURL, ringo.canonicalURL, mango.canonicalURL]);
       });
 
       it('can compound sort', async function() {

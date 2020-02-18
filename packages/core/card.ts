@@ -81,6 +81,10 @@ export class Card {
   readonly csFeatures: { [name: string]: string | [string, string] } | undefined;
   readonly csFieldOrder: FieldOrder | undefined;
 
+  // Interior cards do not have an independent csCreated/csUpdated value
+  readonly csCreated: Date | undefined;
+  readonly csUpdated: Date | undefined;
+
   // if this card is stored inside another, this is the other
   readonly enclosingCard: Card | undefined;
 
@@ -159,6 +163,15 @@ export class Card {
 
     if (typeof jsonapi.data.attributes?.csDescription === 'string') {
       this.csDescription = jsonapi.data.attributes?.csDescription;
+    }
+
+    if (typeof jsonapi.data.attributes?.csCreated === 'string') {
+      this.csCreated = new Date(jsonapi.data.attributes?.csCreated);
+    } else if (!enclosingCard) {
+      this.csCreated = new Date();
+    }
+    if (!enclosingCard) {
+      this.csUpdated = new Date();
     }
 
     let csFieldOrder = jsonapi.data.attributes?.csFieldOrder;
@@ -533,6 +546,12 @@ export class Card {
     if (this.csFieldSets) {
       data.attributes.csFieldSets = this.csFieldSets;
     }
+    if (this.csCreated) {
+      data.attributes.csCreated = this.csCreated.toISOString();
+    }
+    if (this.csUpdated) {
+      data.attributes.csUpdated = this.csUpdated.toISOString();
+    }
 
     data.relationships = Object.create(null);
     let adoptsFrom = this.adoptsFromId;
@@ -705,6 +724,19 @@ export class Card {
     }
 
     doc.csAdoptionChain = (await this.adoptionChain()).map(i => i.canonicalURL);
+
+    if (typeof this.csTitle === 'string') {
+      doc.csTitle = this.csTitle;
+    }
+    if (typeof this.csDescription === 'string') {
+      doc.csDescription = this.csDescription;
+    }
+    if (this.csCreated) {
+      doc.csCreated = this.csCreated.toISOString();
+    }
+    if (this.csUpdated) {
+      doc.csUpdated = this.csUpdated.toISOString();
+    }
 
     // What about card fields that a user had decided to fill in with a
     // relationship to a card? Do we include that card in the search doc? It

@@ -40,6 +40,8 @@ export class CardDocument {
             }
             break;
           case 'csTitle':
+          case 'csCreated':
+          case 'csUpdated':
           case 'csDescription':
           case 'csFeatures':
           case 'csFiles':
