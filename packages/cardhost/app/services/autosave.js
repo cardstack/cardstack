@@ -10,7 +10,6 @@ import ENV from '@cardstack/cardhost/config/environment';
 import moment from 'moment';
 
 const { autosaveDebounce, autosaveDisabled, environment } = ENV;
-const SAVED_HIGHLIGHT_DELAY = 2500;
 const AUTOSAVE_DEBOUNCE = 5000;
 
 export default class AutosaveService extends Service {
@@ -43,21 +42,11 @@ export default class AutosaveService extends Service {
     }
   }
 
-  // TODO - remove this
-  @task(function*(card) {
-    yield this.saveCard.perform(card);
-
-    yield setTimeout(() => {
-      this.justSaved = false;
-    }, SAVED_HIGHLIGHT_DELAY);
-  })
-  saveCardWithState;
-
   @restartableTask
   *debounceAndSave(card) {
     // The maximum frequency of save requests is enforced here
     yield timeout(this.autosaveDebounce);
-    this.saveCardWithState.perform(card);
+    yield this.saveCard.perform(card);
   }
 
   @action
@@ -78,7 +67,7 @@ export default class AutosaveService extends Service {
   @action
   _saveOnceInTests() {
     // This skips debouncing. Only use it for "click to save" type UI.
-    this.saveCardWithState.perform(this._card);
+    this.saveCard.perform(this._card);
   }
 
   @action
