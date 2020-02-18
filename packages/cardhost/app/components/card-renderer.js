@@ -51,10 +51,13 @@ export default class CardRenderer extends Component {
 
   @action
   toggleStubField(field, position, addField) {
+    // console.log('toggleStubField', field.name, 'at position', position, addField ? 'add' : 'remove');
     if (position || position === 0) {
       if (addField) {
+        console.log('adding field', field.name, 'at position', position);
         this.fields.insertAt(position, field);
       } else {
+        console.log('removing field', this.fields[position].name, 'at position', position);
         this.fields.removeAt(position);
       }
     }

@@ -10,6 +10,7 @@ export default class DraggableService extends Service {
    * Sets the currently dragged field
    */
   setField(field) {
+    console.log('setting field to ', field.id);
     this.field = field;
   }
 
@@ -24,6 +25,7 @@ export default class DraggableService extends Service {
    * Clears the dragged field
    */
   clearField() {
+    console.log('clearing field');
     this.field = null;
   }
 
@@ -47,6 +49,7 @@ export default class DraggableService extends Service {
    */
   clearDropzone() {
     if (this.dropzone) {
+      console.log('clearing dropzone');
       this.triggerEvent(this.dropzone, 'mouseleave');
       this.dropzone = null;
     }
@@ -56,6 +59,7 @@ export default class DraggableService extends Service {
    * Set the dragging flag
    */
   setDragging(val) {
+    console.log('set dragging to', val);
     this.dragging = val;
   }
 
