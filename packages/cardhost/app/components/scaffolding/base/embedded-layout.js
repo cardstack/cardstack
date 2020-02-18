@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { task } from 'ember-concurrency';
 
-export default class EmbeddedComponent extends Component {
+export default class BaseEmbeddedComponent extends Component {
   @tracked adoptedFromId;
   @tracked fields;
 

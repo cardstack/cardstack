@@ -13,6 +13,7 @@ import {
   waitForSchemaViewToLoad,
   removeField,
   waitForCardPatch,
+  waitForEmbeddedCardLoad,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -116,7 +117,13 @@ module('Acceptance | card create', function(hooks) {
     await visit('/');
 
     assert.equal(currentURL(), '/');
-    await percySnapshot(assert);
+    assert.deepEqual(
+      [...document.querySelectorAll(`[data-test-recent-cards] [data-test-embedded-card]`)].map(i =>
+        i.getAttribute('data-test-embedded-card')
+      ),
+      []
+    );
+
     await click('[data-test-new-blank-card-btn]');
     await setCardName(card1Name);
     let cardId = currentURL()
@@ -137,6 +144,16 @@ module('Acceptance | card create', function(hooks) {
     await showCardId(true);
     assert.dom('.card-renderer-isolated--header').hasText('Millenial Puppies');
     assert.dom('[data-test-internal-card-id]').hasText(decodeURIComponent(cardId));
+
+    await click('[data-test-library-link]');
+    await waitForEmbeddedCardLoad(decodeURIComponent(cardId));
+    assert.equal(currentURL(), '/');
+    assert.deepEqual(
+      [...document.querySelectorAll(`[data-test-recent-cards] [data-test-embedded-card]`)].map(i =>
+        i.getAttribute('data-test-embedded-card')
+      ),
+      [decodeURIComponent(cardId)]
+    );
   });
 
   test(`selecting a field`, async function(assert) {

@@ -34,7 +34,7 @@
         {{svg-jar "clock" width="28px" height="28px"}}
         Recent Cards
       </header>
-      <div class="card-catalog">
+      <div class="card-catalog" data-test-recent-cards>
         {{#each this.model.catalog as |card|}}
           {{#if (not (eq card.name "@cardstack/base-card"))}}
             <CardRenderer @card={{card}} @format="embedded" @showName={{true}}/>
@@ -48,7 +48,7 @@
         {{svg-jar "saved" width="28px" height="28px"}}
         Saved Templates
       </header>
-      <div class="card-catalog">
+      <div class="card-catalog" data-test-templates>
         {{#each this.model.templates as |card|}}
           <Cta {{on "click" (fn this.openCardNameDialog "Adopt a Card" card)}}
             @class="card-catalog--embedded-card-link"

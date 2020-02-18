@@ -8,7 +8,7 @@ import ENV from '@cardstack/cardhost/config/environment';
 const { animationSpeed } = ENV;
 const duration = 250;
 
-export default class IsolatedComponent extends Component {
+export default class BaseIsolatedComponent extends Component {
   @tracked adoptedFromId;
 
   duration = animationSpeed || duration;

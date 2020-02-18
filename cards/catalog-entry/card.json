@@ -5,32 +5,12 @@
       "csTitle": "Catalog Entry",
       "csDescription": "This in an item in the catalog",
       "csFields": {
-        "card-template": {
+        "card": {
           "relationships": {
             "csAdoptsFrom": {
               "data": {
                 "type": "cards",
                 "id": "https://base.cardstack.com/public/cards/base"
-              }
-            }
-          }
-        },
-        "description": {
-          "relationships": {
-            "csAdoptsFrom": {
-              "data": {
-                "type": "cards",
-                "id": "https://base.cardstack.com/public/cards/string-field"
-              }
-            }
-          }
-        },
-        "name": {
-          "relationships": {
-            "csAdoptsFrom": {
-              "data": {
-                "type": "cards",
-                "id": "https://base.cardstack.com/public/cards/string-field"
               }
             }
           }

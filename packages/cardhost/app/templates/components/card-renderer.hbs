@@ -88,7 +88,7 @@
   {{else if (eq @format "embedded")}}
     <div class="card-renderer-embedded
         {{concat (safe-css-string (if @card.canonicalURL @card.canonicalURL @card.adoptsFromURL)) "--embedded" }}"
-      data-test-card-renderer-embedded
+      data-test-card-renderer-embedded={{@card.canonicalURL}}
     >
       {{#if (and (eq this.mode "view") (not @preventIsolation))}}
         <LinkTo

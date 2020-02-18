@@ -23,54 +23,56 @@ export async function waitForSchemaViewToLoad() {
 }
 
 export async function waitForFieldToLoadInRightEdge(name) {
-  await waitFor(`.right-edge [data-test-field="${name}"][data-test-loaded="true"]`);
-  await waitFor(`.right-edge[data-test-field-source-loaded="true"]`);
+  await waitFor(`.right-edge [data-test-field="${name}"][data-test-loaded="true"]`, { timeout });
+  await waitFor(`.right-edge[data-test-field-source-loaded="true"]`, { timeout });
   await animationsSettled();
 }
 
 export async function waitForFieldOrderUpdate() {
-  await waitFor(`[data-test-card-fields-ready="true"]`);
+  await waitFor(`[data-test-card-fields-ready="true"]`, { timeout });
   await animationsSettled();
 }
 
 export async function waitForCardPatch() {
-  await waitFor(`[data-test-card-patched="true"]`);
+  await waitFor(`[data-test-card-patched="true"]`, { timeout });
   await animationsSettled();
 }
 
 export async function waitForCardLoad() {
-  await waitFor(`[data-test-card-loaded="true"]`);
+  await waitFor(`[data-test-card-loaded="true"]`, { timeout });
   let fields = [...document.querySelectorAll(`.isolated-card [data-test-field]`)].map(i =>
     i.getAttribute('data-test-field')
   );
   for (let field of fields) {
-    await waitFor(`.isolated-card [data-test-field="${field}"][data-test-loaded="true"]`);
+    await waitFor(`.isolated-card [data-test-field="${field}"][data-test-loaded="true"]`, { timeout });
   }
 }
 
 export async function waitForThemerLoad() {
   await waitForCardLoad();
-  await waitFor('[data-test-themer-loaded]');
+  await waitFor('[data-test-themer-loaded]', { timeout });
   await animationsSettled();
 }
 
 export async function waitForCssLoad() {
-  await waitFor('[data-test-css-loaded]');
+  await waitFor('[data-test-css-loaded]', { timeout });
   await animationsSettled();
 }
 
 export async function waitForEmbeddedCardLoad(cardId) {
-  await waitFor(`[data-test-embedded-card="${cardId}"][data-test-embedded-card-loaded="true"]`);
+  await waitFor(`[data-test-embedded-card="${cardId}"][data-test-embedded-card-loaded="true"]`, { timeout });
   let fields = [...document.querySelectorAll(`[data-test-embedded-card="${cardId}"] [data-test-field]`)].map(i =>
     i.getAttribute('data-test-field')
   );
   for (let field of fields) {
-    await waitFor(`[data-test-embedded-card="${cardId}"] [data-test-field="${field}"][data-test-loaded="true"]`);
+    await waitFor(`[data-test-embedded-card="${cardId}"] [data-test-field="${field}"][data-test-loaded="true"]`, {
+      timeout,
+    });
   }
 }
 
 export async function waitForFieldNameChange(name) {
-  await waitFor(`.isolated-card [data-test-field="${name}"][data-test-loaded="true"]`);
+  await waitFor(`.isolated-card [data-test-field="${name}"][data-test-loaded="true"]`, { timeout });
   await waitForCardPatch();
 }
 
