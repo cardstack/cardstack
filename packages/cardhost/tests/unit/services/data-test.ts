@@ -299,55 +299,6 @@ module('Unit | Service | data', function() {
       assert.notOk(doc.data.attributes?.favoriteToy);
       assert.notOk(doc.included);
     });
-
-    test('it can get a card with an isolated field set and specified field includes', async function(assert) {
-      let service = this.owner.lookup('service:data') as DataService;
-      let card = await service.load(daddy, 'everything');
-
-      let doc = await card.serializeAsJsonAPIDoc({
-        includeFieldSet: 'isolated',
-        includeFields: [
-          {
-            name: 'puppies',
-            includeFields: [
-              {
-                name: 'favoriteToy',
-                includeFields: ['description'],
-              },
-            ],
-          },
-        ],
-      });
-      assert.ok(doc.data.attributes?.name);
-      assert.deepEqual((doc.data.relationships?.puppies as RelationshipsWithData).data, [
-        { type: 'cards', id: vanGogh.canonicalURL } as ResourceIdentifierObject,
-        { type: 'cards', id: mango.canonicalURL } as ResourceIdentifierObject,
-      ]);
-
-      let included = doc.included as any[];
-      assert.equal(included.length, 3);
-      let ids = included.map(i => i.id);
-      assert.deepEqual(ids.sort(), [mango.canonicalURL, squeakySnake.canonicalURL, vanGogh.canonicalURL]);
-      let includedVanGogh = included.find(i => i.id === vanGogh.canonicalURL);
-      let includedMango = included.find(i => i.id === mango.canonicalURL);
-      let includedSqueakySnake = included.find(i => i.id === squeakySnake.canonicalURL);
-
-      assert.equal(includedVanGogh.attributes?.name, 'Van Gogh');
-      assert.ok(includedVanGogh.attributes.favoriteToy);
-      assert.deepEqual(includedVanGogh.attributes.favoriteToy.relationships.csAdoptsFrom.data, {
-        type: 'cards',
-        id: toyCard.canonicalURL,
-      });
-      assert.equal(includedVanGogh.attributes.favoriteToy.attributes.description, 'a beef bone');
-
-      assert.equal(includedMango.attributes.name, 'Mango');
-      assert.deepEqual(includedMango.relationships.favoriteToy.data, {
-        type: 'cards',
-        id: squeakySnake.canonicalURL,
-      });
-
-      assert.equal(includedSqueakySnake.attributes.description, 'a plush snake with squeaky segments');
-    });
   });
 
   module('mutating tests', function(hooks) {

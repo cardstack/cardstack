@@ -45,7 +45,7 @@
     "lint:deps": "node scripts/find-bad-deps.js",
     "lint:js": "eslint . --cache --ignore-path .gitignore --ext=js,ts && cd packages/cardhost && ../../node_modules/.bin/ember-template-lint ember-template-lint .",
     "lint:hbs": "cd packages/cardhost && ../../node_modules/.bin/ember-template-lint ember-template-lint .",
-    "ember-tests": "node packages/test-support/ember-test-runner.js packages",
+    "ember-tests": "cd packages/cardhost && ../../node_modules/.bin/ember test",
     "server": "node packages/hub/bin/server.js"
   },
   "workspaces": [
