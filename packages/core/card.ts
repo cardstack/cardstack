@@ -165,13 +165,15 @@ export class Card {
       this.csDescription = jsonapi.data.attributes?.csDescription;
     }
 
-    if (typeof jsonapi.data.attributes?.csCreated === 'string') {
+    if (typeof jsonapi.data.attributes?.csCreated === 'string' && !enclosingCard) {
       this.csCreated = new Date(jsonapi.data.attributes?.csCreated);
     } else if (!enclosingCard) {
       this.csCreated = new Date();
+      this.csUpdated = this.csCreated;
     }
-    if (!enclosingCard) {
-      this.csUpdated = new Date();
+
+    if (typeof jsonapi.data.attributes?.csUpdated === 'string' && !enclosingCard) {
+      this.csUpdated = new Date(jsonapi.data.attributes?.csUpdated);
     }
 
     let csFieldOrder = jsonapi.data.attributes?.csFieldOrder;

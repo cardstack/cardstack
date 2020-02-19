@@ -202,6 +202,66 @@ describe('hub/card-service', function() {
       }
     });
 
+    it('new cards have a csCreated and a csUpdated attribute', async function() {
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, cardDocument().jsonapi);
+      let csCreated = card.csCreated?.toISOString();
+      let csUpdated = card.csUpdated?.toISOString();
+      expect(card.csCreated).to.be.ok;
+      expect(card.csUpdated).to.be.ok;
+      expect(csCreated).to.equal(csUpdated);
+
+      card = await service.get(card);
+      expect(card.csCreated).to.be.ok;
+      expect(card.csUpdated).to.be.ok;
+      expect(card.csCreated?.toISOString()).to.equal(csCreated);
+      expect(card.csUpdated?.toISOString()).to.equal(csCreated);
+    });
+
+    it('the csCreated attribute does not change when a card is patched', async function() {
+      let doc = cardDocument().withField('foo', 'string-field');
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+      let csCreated = card.csCreated?.toISOString();
+
+      doc.withAttributes({ foo: 'bar' });
+      let updatedCard = await service.update(card, doc.jsonapi);
+      expect(updatedCard.csCreated?.toISOString()).to.equal(csCreated);
+      card = await service.get(card);
+      expect(card.csCreated?.toISOString()).to.equal(csCreated);
+    });
+
+    it('the csUpdated attribute changes when a card is patched', async function() {
+      let doc = cardDocument().withField('foo', 'string-field');
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+      let csUpdated = card.csUpdated?.toISOString();
+
+      doc.withAttributes({ foo: 'bar' });
+      let updatedCard = await service.update(card, doc.jsonapi);
+      expect(updatedCard.csUpdated).to.be.ok;
+      expect(updatedCard.csUpdated?.toISOString()).to.not.equal(csUpdated);
+
+      csUpdated = updatedCard.csUpdated?.toISOString();
+      card = await service.get(card);
+      expect(card.csUpdated?.toISOString()).to.equal(csUpdated);
+    });
+
+    it('interior cards do not have a csCreated nor a csUpdated attribute', async function() {
+      let interiorCardType = await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        cardDocument().jsonapi
+      );
+      let card = await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        cardDocument()
+          .withAttributes({
+            card: cardDocument().adoptingFrom(interiorCardType).asCardValue,
+          })
+          .withField('card', interiorCardType).jsonapi
+      );
+      let interiorCard = await card.value('card');
+      expect(interiorCard.csCreated).to.be.undefined;
+      expect(interiorCard.csUpdated).to.be.undefined;
+    });
+
     it('it does not update a card that uses ephemeral storage when the meta.version is missing', async function() {
       let doc = cardDocument().withAutoAttributes({ foo: 'bar' });
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
@@ -1457,10 +1517,6 @@ describe('hub/card-service', function() {
       it.skip('can get all the field cards (including adopted fields)', async function() {});
       it.skip("a field card can indicate if it is the enclosing card's own field or if it is adopted", async function() {});
       it.skip("a field card can return the 'source' card in the adoption chain that defined the field", async function() {});
-      it.skip('new cards have a csCreated attribute', async function() {});
-      it.skip('the csCreated attribute does not change when a card is patched', async function() {});
-      it.skip('the csUpdated attribute changes when a card is patched', async function() {});
-      it.skip('interior card do not have a csCreated nor a csUpdated attribute', async function() {});
 
       it('can equality filter by string user field', async function() {
         let results = await service.search({

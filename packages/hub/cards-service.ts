@@ -78,6 +78,10 @@ export class ScopedCardService implements CardReader, CardInstantiator {
   async update(canonicalURL: string, doc: SingleResourceDoc): Promise<AddressableCard>;
   async update(idOrURL: CardId | string, doc: SingleResourceDoc): Promise<AddressableCard> {
     let id = asCardId(idOrURL);
+    if (!doc.data.attributes) {
+      doc.data.attributes = {};
+    }
+    doc.data.attributes.csUpdated = new Date().toISOString();
     let realmCard = await this.getRealm(id.csRealm);
     let writer = await this.loadWriter(realmCard);
     let previousCard = await this.get(id);
