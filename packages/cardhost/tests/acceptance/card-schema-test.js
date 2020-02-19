@@ -397,7 +397,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields/schema`);
 
     assert.dom('[data-test-cardhost-top-edge]').exists();
-    assert.dom('[data-test-mode-indicator-link="view"]').exists();
+    assert.dom('[data-test-mode-indicator-link="edit"]').exists();
     assert.dom('[data-test-mode-indicator]').containsText('schema mode');
     assert.dom('[data-test-edge-actions-btn]').exists();
     await percySnapshot(assert);
