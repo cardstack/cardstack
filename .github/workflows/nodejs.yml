@@ -33,13 +33,6 @@ jobs:
       run: |
         yarn lint:deps
         yarn lint:js
-    - name: wait for db
-      run: node packages/pgsearch/node-tests/wait-for-db.js
-      env:
-        PGHOST: localhost
-        PGPORT: 5444
-        PGUSER: postgres
-
     - name: Node tests
       run: yarn node-tests
       env:
