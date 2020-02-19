@@ -38,7 +38,6 @@ export default class CardNameDialog extends Component {
     }
 
     let newCard = this.data.createCard(`local-hub::${this.cardId}`, adoptedFrom);
-
     yield newCard.save();
 
     if (adoptedFrom) {

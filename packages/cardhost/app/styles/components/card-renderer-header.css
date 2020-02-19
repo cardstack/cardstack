@@ -8,6 +8,10 @@
   cursor: pointer;
 }
 
+.context-menu-button.context-menu-button---error {
+  border: solid 2px var(--red);
+}
+
 .context-menu-nav {
   position: absolute;
   z-index: var(--ch-actions-z-index);
@@ -16,7 +20,7 @@
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
   top: 42px;
   right: -130px;
-  width: 200px;
+  width: 230px;
   padding-bottom: 10px;
 }
 
@@ -104,4 +108,8 @@
   position: absolute;
   margin-left: -20px;
   margin-top: 5px;
+}
+
+.context-menu-items > li > svg {
+  margin-right: 6px;
 }
