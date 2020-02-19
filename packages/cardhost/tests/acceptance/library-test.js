@@ -10,9 +10,9 @@ import { animationsSettled } from 'ember-animated/test-support';
 const timeout = 2000;
 const card1Id = 'millenial-puppies';
 const qualifiedCard1Id = `local-hub::${card1Id}`;
-const card2Id = 'van-gogh';
+const card2Id = 'fancy-kitten';
 const qualifiedCard2Id = `local-hub::${card2Id}`;
-const card3Id = 'hassan';
+const card3Id = 'venus-guppy';
 const qualifiedCard3Id = `local-hub::${card3Id}`;
 
 const scenario = new Fixtures({
