@@ -41,6 +41,8 @@
 .cardhost-top-edge--buttons {
   display: flex;
   z-index: var(--ch-actions-z-index);
+  width: 100%;
+  justify-content: flex-end;
 }
 
 .cardhost-top-edge--buttons > button + button,
@@ -122,10 +124,5 @@
   .preview-link.cs-component-cta.primary {
     min-width: 105px;
     text-align: right;
-  }
-
-  .save-button.cs-component-cta.primary {
-    min-width: 100px;
-    margin-left: 0;
   }
 }
