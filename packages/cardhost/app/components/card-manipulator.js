@@ -262,18 +262,21 @@ export default class CardManipulator extends Component {
     if (!this.draggable.isDragging && !this.justDropped) {
       this.beginDragging(field, event);
     } else {
-      this.draggable.clearField();
       this.draggable.setDragging(false);
     }
   }
 
   @action
   beginDragging(field, dragEvent) {
+    // we're clicking on a draggable that's already being dragged
+    if (this.draggable.isDragging) {
+      return;
+    }
     let dragState;
     let self = this;
 
     function stopMouse() {
-      field.dragState = null;
+      field.dragState = dragState = null;
       let dropzone = self.draggable.getDropzone();
       if (dropzone) {
         self.draggable.drop();
@@ -286,8 +289,9 @@ export default class CardManipulator extends Component {
         }, 1000);
       } else {
         // we mouseup somewhere that isn't a dropzone
-        self.draggable.clearField();
       }
+      self.draggable.clearField();
+
       // we do this so that we can animate the field back to the left edge
       self.fieldComponents = self.fieldComponents.map(obj => obj); // oh glimmer, you so silly...
 

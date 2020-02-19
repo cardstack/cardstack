@@ -53,9 +53,19 @@ export default class CardRenderer extends Component {
   toggleStubField(field, position, addField) {
     if (position || position === 0) {
       if (addField) {
-        this.fields.insertAt(position, field);
+        // remove other stub fields first
+        this.fields = this.fields.filter(field => !field.preview);
+        // check if adding at the end
+        if (position < this.fields.length) {
+          this.fields.insertAt(position, field);
+        } else {
+          this.fields.addObject(field);
+        }
       } else {
-        this.fields.removeAt(position);
+        // don't remove a field that's not a stub field
+        if (this.fields[position].preview) {
+          this.fields.removeAt(position);
+        }
       }
     }
   }
