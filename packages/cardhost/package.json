@@ -23,6 +23,7 @@
   "devDependencies": {
     "@cardstack/base-card": "*",
     "@cardstack/boolean-field-card": "*",
+    "@cardstack/catalog-entry-card": "*",
     "@cardstack/core": "0.16.23",
     "@cardstack/eslint-config": "0.16.23",
     "@cardstack/hub": "0.16.23",
@@ -71,7 +72,6 @@
     "ember-concurrency": "^0.10.0",
     "ember-concurrency-decorators": "^1.0.0",
     "ember-css-url": "0.2.0",
-    "ember-data": "github:emberjs/data#1df833396855d956b817540923dd89338463fec2",
     "ember-decorators": "^3.1.0",
     "ember-elsewhere": "^1.1.0",
     "ember-export-application-global": "^2.0.1",
