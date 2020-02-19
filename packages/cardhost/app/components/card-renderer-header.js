@@ -34,6 +34,12 @@ export default class CardRendererHeaderComponent extends Component {
     }
   }
 
+  @action
+  closeMenu() {
+    this.localMenuOpen = false;
+    this.args.setContextMenu(false);
+  }
+
   get showMenu() {
     if (this.args.setContextMenu) {
       // if a setContextMenu function exists, use it, and rely only on state from the parent
