@@ -9,7 +9,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "fs-extra": "^7.0.0",
+    "fs-extra": "^8.0.1",
     "glob": "^7.1.2",
     "js-yaml": "^3.12.0"
   },

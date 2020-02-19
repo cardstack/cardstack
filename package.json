@@ -6,7 +6,10 @@
   "author": "Edward Faulkner <edward@eaf4.com>",
   "license": "MIT",
   "engines": {
-    "node": ">= 7.7"
+    "node": ">= 12"
+  },
+  "resolutions": {
+    "fs-extra": "^8.0.1"
   },
   "dependencies": {
     "@types/chai": "^4.2.6",
