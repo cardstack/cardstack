@@ -15,11 +15,6 @@ jobs:
       with:
         path: ~/.cache/yarn
         key: ${{ runner.os }}-yarn
-    - name: Set up build cache (eslint)
-      uses: actions/cache@preview
-      with:
-        path: .eslintcache
-        key: ${{ runner.os }}-eslint
     - name: Checkout
       uses: actions/checkout@v1
     - name: Start prereqs
