@@ -31,7 +31,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["-r", "esm", "packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "can sort by a csField"],
+      "args": ["-r", "esm", "packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "a field card can return the enclosing card which is the card that has defined a value for the field"],
     },
     {
       "type": "node",

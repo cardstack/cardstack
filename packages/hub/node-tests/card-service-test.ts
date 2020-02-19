@@ -1514,9 +1514,34 @@ describe('hub/card-service', function() {
         await env.destroy();
       });
 
-      it.skip('can get all the field cards (including adopted fields)', async function() {});
-      it.skip("a field card can indicate if it is the enclosing card's own field or if it is adopted", async function() {});
-      it.skip("a field card can return the 'source' card in the adoption chain that defined the field", async function() {});
+      it('can get all the field cards (including adopted fields)', async function() {
+        let card = await service.get(cupcake);
+        let fields = await card.fields();
+        expect(fields.map(i => i.name)).to.have.members(['meme', 'name', 'weightInPounds', 'pottyTrained', 'rating']);
+      });
+
+      it("a field card can indicate if it is the enclosing card's own field or if it is adopted", async function() {
+        let card = await service.get(puppyMemeCard);
+        let field = await card.field('meme');
+        expect(field.isAdopted).to.equal(false);
+
+        field = await card.field('name');
+        expect(field.isAdopted).to.equal(true);
+      });
+
+      it('a field card can return the source card in the adoption chain that defined the field', async function() {
+        let card = await service.get(cupcake);
+        let field = await card.field('name');
+
+        expect(field.sourceCard?.canonicalURL).to.equal(puppyCard.canonicalURL);
+      });
+
+      it('a field card can return the enclosing card which is the card that has defined a value for the field', async function() {
+        let card = await service.get(cupcake);
+        let field = await card.field('name');
+
+        expect(field.enclosingCard?.canonicalURL).to.equal(card.canonicalURL);
+      });
 
       it('can equality filter by string user field', async function() {
         let results = await service.search({

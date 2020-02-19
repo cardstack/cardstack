@@ -53,8 +53,7 @@ export default class RightEdge extends Component {
       if (this.args.selectedFieldName) {
         field = yield this.args.card.field(this.args.selectedFieldName);
       }
-      let source = yield field.source();
-      this.selectedFieldSource = source.csTitle;
+      this.selectedFieldSource = field.sourceCard.csTitle;
     }
   }).restartable())
   loadFieldSource;

@@ -118,8 +118,8 @@ module('Acceptance | catalog', function(hooks) {
     await waitForCatalogLoad();
 
     assert.deepEqual(
-      [...document.querySelectorAll(`[data-test-recent-cards] [data-test-embedded-card]`)].map(i =>
-        i.getAttribute('data-test-embedded-card')
+      [...document.querySelectorAll(`[data-test-recent-cards] > [data-test-card-renderer-embedded]`)].map(i =>
+        i.getAttribute('data-test-card-renderer-embedded')
       ),
       [
         entry2.canonicalURL,

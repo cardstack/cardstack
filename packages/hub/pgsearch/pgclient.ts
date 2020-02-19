@@ -316,7 +316,7 @@ export default class PgClient {
   }
 
   private async walkFilterFieldPath(
-    enclosingCard: Card,
+    sourceCard: Card,
     path: string,
     expression: Expression,
     handleLeafField: FilterFieldHandler<Expression>,
@@ -324,7 +324,7 @@ export default class PgClient {
     handleInteriorField?: FilterFieldHandlerWithEntryAndExit<Expression>
   ): Promise<Expression>;
   private async walkFilterFieldPath(
-    enclosingCard: Card,
+    sourceCard: Card,
     path: string,
     expression: CardExpression,
     handleLeafField: FilterFieldHandler<CardExpression>,
@@ -332,7 +332,7 @@ export default class PgClient {
     handleInteriorField?: FilterFieldHandlerWithEntryAndExit<CardExpression>
   ): Promise<CardExpression>;
   private async walkFilterFieldPath(
-    enclosingCard: Card,
+    sourceCard: Card,
     path: string,
     expression: Expression,
     handleLeafField: FilterFieldHandler<any[]>,
@@ -346,8 +346,8 @@ export default class PgClient {
     if (isCsField && handleCsField) {
       expression = await handleCsField(expression, currentSegment);
     } else if (!isCsField) {
-      let fieldCard = await enclosingCard.field(currentSegment);
-      let fullFieldName = `${fieldCard.enclosingCard.canonicalURL}/${currentSegment}`;
+      let fieldCard = await sourceCard.field(currentSegment);
+      let fullFieldName = `${fieldCard.sourceCard.canonicalURL}/${currentSegment}`;
       if (isLeaf) {
         expression = await handleLeafField(fieldCard, expression, fullFieldName);
       } else {

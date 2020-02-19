@@ -85,8 +85,15 @@ export class Card {
   readonly csCreated: Date | undefined;
   readonly csUpdated: Date | undefined;
 
-  // if this card is stored inside another, this is the other
-  readonly enclosingCard: Card | undefined;
+  // If this card is stored inside another, this is the card that originally
+  // defined this card (which may be a prior ancestor in the adoption chain from
+  // the direct enclosing card). Not to be confused with the enclosingCard which
+  // is the immediate card enclosing this card irrespective of adoption chain.
+  // In terms of FieldCards, the enclosing card is the card that holds the value
+  // for the field card, where the source card is the card that defined the
+  // schema for the FieldCard (and may not necessarily be the card that holds the
+  // value for the field).
+  readonly sourceCard: Card | undefined;
 
   private readonly attributes: SingleResourceDoc['data']['attributes'];
   private readonly relationships: SingleResourceDoc['data']['relationships'];
@@ -110,7 +117,7 @@ export class Card {
   constructor(
     jsonapi: SingleResourceDoc,
     realm: string,
-    enclosingCard: Card | undefined,
+    sourceCard: Card | undefined,
     protected reader: CardReader,
     protected modules: ModuleLoader,
     protected container: Container
@@ -133,7 +140,7 @@ export class Card {
     this.relationships = jsonapi.data.relationships;
     this.meta = jsonapi.data.meta;
 
-    this.enclosingCard = enclosingCard;
+    this.sourceCard = sourceCard;
     this.csRealm = realm;
     this.csOriginalRealm =
       typeof jsonapi.data.attributes?.csOriginalRealm === 'string' ? jsonapi.data.attributes.csOriginalRealm : realm;
@@ -165,14 +172,14 @@ export class Card {
       this.csDescription = jsonapi.data.attributes?.csDescription;
     }
 
-    if (typeof jsonapi.data.attributes?.csCreated === 'string' && !enclosingCard) {
+    if (typeof jsonapi.data.attributes?.csCreated === 'string' && !sourceCard) {
       this.csCreated = new Date(jsonapi.data.attributes?.csCreated);
-    } else if (!enclosingCard) {
+    } else if (!sourceCard) {
       this.csCreated = new Date();
       this.csUpdated = this.csCreated;
     }
 
-    if (typeof jsonapi.data.attributes?.csUpdated === 'string' && !enclosingCard) {
+    if (typeof jsonapi.data.attributes?.csUpdated === 'string' && !sourceCard) {
       this.csUpdated = new Date(jsonapi.data.attributes?.csUpdated);
     }
 
@@ -378,6 +385,10 @@ export class Card {
 
   @Memoize()
   async field(name: string): Promise<FieldCard> {
+    return await this._field(name, this);
+  }
+
+  private async _field(name: string, enclosingCard: Card): Promise<FieldCard> {
     let data;
 
     if (name === 'csAdoptsFrom') {
@@ -387,7 +398,7 @@ export class Card {
     } else {
       let parent = await this.adoptsFrom();
       if (parent) {
-        return await parent.field(name);
+        return await parent._field(name, enclosingCard);
       }
       throw new CardstackError(`no such field "${name}"`, { status: 400 });
     }
@@ -397,31 +408,21 @@ export class Card {
       merge({ data: { type: 'cards' } }, { data }),
       name,
       this,
+      enclosingCard,
       this.reader,
       this.modules,
       this.container
     );
   }
 
-  // TODO needs testing!
   @Memoize()
   async fields(): Promise<FieldCard[]> {
     let fields: FieldCard[] = [];
     let card: Card | undefined = this;
     while (card) {
       if (card.csFields) {
-        for (let [name, value] of Object.entries(card.csFields)) {
-          fields.push(
-            await this.container.instantiate(
-              FieldCard,
-              merge({ data: { type: 'cards' } }, { data: value }),
-              name,
-              this,
-              this.reader,
-              this.modules,
-              this.container
-            )
-          );
+        for (let name of Object.keys(card.csFields)) {
+          fields.push(await card._field(name, this));
         }
       }
       card = await card.adoptsFrom();
@@ -758,7 +759,7 @@ export class Card {
     for (let fieldName of await this.allFieldNames()) {
       let value = await this.value(fieldName);
       let field = await this.field(fieldName);
-      let fullFieldName = `${field.enclosingCard.canonicalURL}/${fieldName}`;
+      let fullFieldName = `${field.sourceCard.canonicalURL}/${fieldName}`;
       if (await field.isScalar()) {
         doc[fullFieldName] = value;
       } else {
@@ -873,7 +874,7 @@ export class Card {
       Card,
       newDoc,
       this.csRealm,
-      this.enclosingCard,
+      this.sourceCard,
       this.reader,
       this.modules,
       this.container
@@ -1103,19 +1104,22 @@ export class UnsavedCard extends Card {
 }
 
 export class FieldCard extends Card {
+  readonly sourceCard: Card;
   readonly enclosingCard: Card;
   readonly csFieldArity: FieldArity = 'singular';
 
   constructor(
     jsonapi: SingleResourceDoc,
     readonly name: string,
+    sourceCard: Card,
     enclosingCard: Card,
     reader: CardReader,
     modules: ModuleLoader,
     container: Container
   ) {
-    super(jsonapi, enclosingCard.csRealm, enclosingCard, reader, modules, container);
+    super(jsonapi, sourceCard.csRealm, sourceCard, reader, modules, container);
     this.enclosingCard = enclosingCard;
+    this.sourceCard = sourceCard;
     if (typeof jsonapi.data.attributes?.csFieldArity === 'string') {
       this.csFieldArity = jsonapi.data.attributes?.csFieldArity === 'plural' ? 'plural' : 'singular';
     }
@@ -1137,17 +1141,6 @@ export class FieldCard extends Card {
     return !Object.keys(this.enclosingCard.csFields || {}).includes(this.name);
   }
 
-  // TODO test this
-  async source(): Promise<Card | undefined> {
-    let card: Card | undefined = await this.enclosingCard;
-    while (card) {
-      if (card.csFields && this.name in card.csFields) {
-        return card;
-      }
-      card = await card.adoptsFrom();
-    }
-  }
-
   async validateValue(priorFieldValue: any, value: any, realm: AddressableCard) {
     let validate = await this.loadFeature('field-validate');
     if (validate) {
@@ -1159,7 +1152,7 @@ export class FieldCard extends Card {
             .filter(Boolean);
           throw new CardstackError(
             `field ${this.name} on card ${
-              this.enclosingCard.canonicalURL
+              this.sourceCard.canonicalURL
             } failed type validation for values: ${JSON.stringify(invalidItems)}`,
             { status: 400 }
           );
@@ -1169,7 +1162,7 @@ export class FieldCard extends Card {
         if (!(await validate(value, this))) {
           throw new CardstackError(
             `field ${this.name} on card ${
-              this.enclosingCard.canonicalURL
+              this.sourceCard.canonicalURL
             } failed type validation for value: ${JSON.stringify(value)}`,
             { status: 400 }
           );
@@ -1181,7 +1174,7 @@ export class FieldCard extends Card {
     if (this.csFieldArity === 'plural' && Array.isArray(value)) {
       if (value.some(i => i.id == null)) {
         throw new CardstackError(
-          `Cannot set field '${this.name}' of card ${this.enclosingCard.canonicalURL} with non-addressable cards. Fields with arity > 1 can only be set with addressable cards.`,
+          `Cannot set field '${this.name}' of card ${this.sourceCard.canonicalURL} with non-addressable cards. Fields with arity > 1 can only be set with addressable cards.`,
           { status: 400 }
         );
       }
@@ -1243,7 +1236,7 @@ export class FieldCard extends Card {
           card = parent;
         }
         throw new CardstackError(
-          `field ${this.name} on card ${this.enclosingCard.canonicalURL} failed card-type validation for reference: ${
+          `field ${this.name} on card ${this.sourceCard.canonicalURL} failed card-type validation for reference: ${
             referencedCard.canonicalURL
           }. The referenced card must adopt from: ${fieldType!.canonicalURL}`,
           { status: 400 }
@@ -1266,6 +1259,7 @@ export class FieldCard extends Card {
       FieldCard,
       newDoc,
       this.name,
+      this.sourceCard,
       this.enclosingCard,
       this.reader,
       this.modules,

@@ -25,10 +25,12 @@ export default class FieldRenderer extends Component {
     this.currentFieldName = this.args.field.name;
     this.newFieldLabel = this.args.field.csTitle;
     this.newFieldInstructions = this.args.field.csDescription;
-    this.neededWhenEmbedded =
-      this.args.card.csFieldSets && Array.isArray(this.args.card.csFieldSets.embedded)
-        ? this.args.card.csFieldSets.embedded.includes(this.args.field.name)
-        : false;
+    if (this.args.field.enclosingCard) {
+      this.neededWhenEmbedded =
+        this.args.field.enclosingCard.csFieldSets && Array.isArray(this.args.field.enclosingCard.csFieldSets.embedded)
+          ? this.args.field.enclosingCard.csFieldSets.embedded.includes(this.args.field.name)
+          : false;
+    }
     this.loadField.perform();
   }
 
