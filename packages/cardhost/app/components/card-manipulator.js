@@ -30,6 +30,7 @@ export default class CardManipulator extends Component {
   @tracked fieldComponents = fieldComponents;
   @tracked stopMouse;
   @tracked updateMouse;
+  @tracked justDropped;
 
   constructor(...args) {
     super(...args);
@@ -199,7 +200,7 @@ export default class CardManipulator extends Component {
       return;
     }
 
-    onFinishDrop();
+    onFinishDrop(evt);
 
     let field;
 
@@ -258,7 +259,7 @@ export default class CardManipulator extends Component {
 
   @action
   selectFieldType(field, event) {
-    if (!this.draggable.isDragging) {
+    if (!this.draggable.isDragging && !this.justDropped) {
       this.beginDragging(field, event);
     } else {
       this.draggable.clearField();
@@ -269,22 +270,26 @@ export default class CardManipulator extends Component {
   @action
   beginDragging(field, dragEvent) {
     let dragState;
-    let draggableService = this.draggable;
+    let self = this;
 
     function stopMouse() {
       field.dragState = null;
-      let dropzone = draggableService.getDropzone();
+      let dropzone = self.draggable.getDropzone();
       if (dropzone) {
-        draggableService.drop();
+        self.draggable.drop();
+        field.dropTo = dropzone;
+
+        // this tells the click event that follows not to do anything
+        self.justDropped = true;
+        setTimeout(function() {
+          self.justDropped = false;
+        }, 1000);
       } else {
         // we mouseup somewhere that isn't a dropzone
-        draggableService.clearField();
-        // we do this so that we can animate the field back to the left edge
-        this.fieldComponents = this.fieldComponents.map(obj => obj); // oh glimmer, you so silly...
+        self.draggable.clearField();
       }
-
-      window.removeEventListener('mouseup', this.stopMouse, false);
-      window.removeEventListener('mousemove', this.updateMouse, false);
+      // we do this so that we can animate the field back to the left edge
+      self.fieldComponents = self.fieldComponents.map(obj => obj); // oh glimmer, you so silly...
 
       // remove ghost element from DOM
       let ghostEl = document.getElementById('ghost-element');
@@ -292,6 +297,8 @@ export default class CardManipulator extends Component {
         ghostEl.remove();
       }
 
+      window.removeEventListener('mousemove', updateMouse, false);
+      window.removeEventListener('mouseup', stopMouse, false);
       return false;
     }
 
@@ -299,7 +306,7 @@ export default class CardManipulator extends Component {
       dragState.latestPointerX = event.x;
       dragState.latestPointerY = event.y;
 
-      draggableService.setDragging(true);
+      self.draggable.setDragging(true);
 
       // in order for the drop zone to trigger a mouseenter/mouseleave event
       // we need to temporarily hide the dragged element
@@ -314,14 +321,14 @@ export default class CardManipulator extends Component {
       }
 
       let dropzoneBelow = elemBelow.closest('.drop-zone');
-      let currentDropzone = draggableService.getDropzone();
+      let currentDropzone = self.draggable.getDropzone();
 
       if (currentDropzone !== dropzoneBelow) {
         if (currentDropzone) {
-          draggableService.clearDropzone();
+          self.draggable.clearDropzone();
         }
         if (dropzoneBelow) {
-          draggableService.setDropzone(elemBelow);
+          self.draggable.setDropzone(elemBelow);
         }
       }
     }
@@ -342,10 +349,8 @@ export default class CardManipulator extends Component {
         latestPointerX: dragEvent.x,
         latestPointerY: dragEvent.y,
       };
-      this.stopMouse = stopMouse.bind(this);
-      this.updateMouse = updateMouse.bind(this);
-      window.addEventListener('mouseup', this.stopMouse, false);
-      window.addEventListener('mousemove', this.updateMouse, false);
+      window.addEventListener('mouseup', stopMouse, false);
+      window.addEventListener('mousemove', updateMouse, false);
     }
     field.dragState = dragState;
     this.draggable.setField(field);
