@@ -8,9 +8,6 @@
   "engines": {
     "node": ">= 12"
   },
-  "resolutions": {
-    "fs-extra": "7.0.1"
-  },
   "dependencies": {
     "@types/chai": "^4.2.6",
     "@types/chai-as-promised": "^7.1.2",
