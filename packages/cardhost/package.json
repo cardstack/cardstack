@@ -9,12 +9,8 @@
     "doc": "doc",
     "test": "tests"
   },
-  "keywords": [
-    "cardstack-plugin"
-  ],
-  "cardstack-plugin": {
-    "api-version": 1,
-    "src": "cardstack"
+  "resolutions": {
+    "fs-extra": "^8.0.1"
   },
   "scripts": {
     "build": "ember build",
