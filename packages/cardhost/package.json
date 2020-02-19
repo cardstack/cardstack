@@ -9,9 +9,6 @@
     "doc": "doc",
     "test": "tests"
   },
-  "resolutions": {
-    "fs-extra": "^8.0.1"
-  },
   "scripts": {
     "build": "ember build",
     "lint:hbs": "ember-template-lint .",
