@@ -46,4 +46,14 @@ module('Acceptance | card mode navigation', function(hooks) {
     await click('[data-test-context-menu-button]');
     assert.dom('[data-test-context-menu-items] .checked').hasText('View');
   });
+
+  test('clicking outside the context menu closes it', async function(assert) {
+    await login();
+    await visit(`/cards/@cardstack%2Fbase-card/edit/fields`);
+    assert.equal(currentURL(), `/cards/@cardstack%2Fbase-card/edit/fields`);
+    await click('[data-test-context-menu-button]');
+    assert.dom('[data-test-context-menu-items]').exists();
+    await click('[data-test-card-renderer-header]');
+    assert.dom('[data-test-context-menu-items]').doesNotExist();
+  });
 });
