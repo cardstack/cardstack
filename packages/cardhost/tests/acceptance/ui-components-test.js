@@ -1,7 +1,10 @@
 import { module, test } from 'qunit';
-import { visit, currentURL, settled } from '@ember/test-helpers';
+import { visit, currentURL } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import { percySnapshot } from 'ember-percy';
+import Fixtures from '../helpers/fixtures';
+import { waitForSchemaViewToLoad } from '../helpers/card-ui-helpers';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 // Monaco takes a while to render, and it varies, so we pause
 // for 2s in order to get more stable Percy Snapshots.
@@ -14,14 +17,22 @@ const waitForMonacoRender = function(cb) {
   });
 };
 
+const scenario = new Fixtures({
+  destroy: {
+    cardTypes: [{ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }],
+  },
+});
+
 module('Acceptance | ui components', function(hooks) {
   setupApplicationTest(hooks);
+  scenario.setupTest(hooks);
 
   test('visiting /ui-components', async function(assert) {
     await visit('/ui-components');
+    await waitForSchemaViewToLoad();
 
     assert.equal(currentURL(), '/ui-components');
-    await settled();
+
     await waitForMonacoRender(() => percySnapshot(assert));
   });
 });
