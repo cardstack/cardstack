@@ -29,7 +29,7 @@
 
 /* ember-animated drag has started, and is over a dropzone */
 .cardhost-cards.dragging .drop-zone--container.dragging .drop-zone {
-  height: 270px;
+  height: 220px;
 }
 
 /* native drag has started, and is over a dropzone */
