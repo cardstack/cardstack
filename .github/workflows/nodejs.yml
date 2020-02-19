@@ -36,14 +36,12 @@ jobs:
     - name: Node tests
       run: yarn node-tests
       env:
-        CI: true
         PGHOST: localhost
         PGPORT: 5444
         PGUSER: postgres
     - name: Ember tests
       run: yarn ember-tests
       env:
-        CI: true
         PGHOST: localhost
         PGPORT: 5444
         PGUSER: postgres
