@@ -10,6 +10,7 @@
   grid-template-columns: var(--library-navbar-width) 1fr;
   grid-template-areas: "navbar main";
   width: 100%;
+  min-width: 100vw;
   height: 100vh;
   margin: 0;
   background-color: var(--ch-deep-background);
