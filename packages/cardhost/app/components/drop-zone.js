@@ -25,10 +25,11 @@ export default class DropZone extends Component {
   }
 
   @action
-  updateStatus(status) {
+  updateStatus(status, event) {
     let draggedField = this.draggable.getField();
 
-    if (!draggedField) {
+    // either no dragged field, or event triggered by a human
+    if (!draggedField || event.isTrusted) {
       return;
     }
 

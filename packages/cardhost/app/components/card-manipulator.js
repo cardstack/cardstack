@@ -312,19 +312,14 @@ export default class CardManipulator extends Component {
 
       self.draggable.setDragging(true);
 
-      // in order for the drop zone to trigger a mouseenter/mouseleave event
-      // we need to temporarily hide the dragged element
-      let fieldEl = dragEvent.target.closest('.ch-catalog-field');
-      fieldEl.style.visibility = 'hidden';
-      let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
-      fieldEl.style.visibility = 'visible';
+      let elemsBelow = document.elementsFromPoint(event.clientX, event.clientY);
 
       // this can happen when you drag the mouse outside the viewport
-      if (!elemBelow) {
+      if (!elemsBelow.length) {
         return;
       }
 
-      let dropzoneBelow = elemBelow.closest('.drop-zone');
+      let dropzoneBelow = elemsBelow.find(el => el.classList.contains('drop-zone'));
       let currentDropzone = self.draggable.getDropzone();
 
       if (currentDropzone !== dropzoneBelow) {
@@ -332,7 +327,7 @@ export default class CardManipulator extends Component {
           self.draggable.clearDropzone();
         }
         if (dropzoneBelow) {
-          self.draggable.setDropzone(elemBelow);
+          self.draggable.setDropzone(dropzoneBelow);
         }
       }
     }
