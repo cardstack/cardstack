@@ -33,7 +33,6 @@ export default class DropZone extends Component {
       return;
     }
 
-    console.log('event.type: ', event.type);
     this.dropZoneStatus = status;
 
     if (this.args.toggleStubField) {
