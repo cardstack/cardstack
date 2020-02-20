@@ -12120,27 +12120,6 @@ isobject@^4.0.0:
   resolved "https://registry.yarnpkg.com/isobject/-/isobject-4.0.0.tgz#3f1c9155e73b192022a80819bacd0343711697b0"
   integrity sha512-S/2fF5wH8SJA/kmwr6HYhK/RI/OkhD84k8ntalo0iJjZikgq1XFvR5M8NPT1x5F7fBwCG3qHfnzeP/Vh/ZxCUA==
 
-isomorphic-git@0.78.0:
-  version "0.78.0"
-  resolved "https://registry.yarnpkg.com/isomorphic-git/-/isomorphic-git-0.78.0.tgz#298534a43227074a7b51a8b59dc2355607c6e659"
-  integrity sha512-jpCQwp97GcfSO/ZK2Ws8ZBw4ahm0gLKnCcrsIg2jmbmsk/bmtpYPAJUYjVbOTAeSWSL7UyjKPq0wS7JmimrpoA==
-  dependencies:
-    async-lock "^1.1.0"
-    clean-git-ref "^2.0.1"
-    crc-32 "^1.2.0"
-    diff3 "0.0.3"
-    git-apply-delta "0.0.7"
-    globalyzer "^0.1.4"
-    globrex "^0.1.2"
-    ignore "^5.1.4"
-    marky "^1.2.1"
-    minimisted "^2.0.0"
-    pako "^1.0.10"
-    pify "^4.0.1"
-    readable-stream "^3.4.0"
-    sha.js "^2.4.9"
-    simple-get "^3.0.2"
-
 isomorphic-git@^0.56.0:
   version "0.56.0"
   resolved "https://registry.yarnpkg.com/isomorphic-git/-/isomorphic-git-0.56.0.tgz#20bce0bf98f01dc4bd507df7789078349b64b4d3"
@@ -12159,6 +12138,26 @@ isomorphic-git@^0.56.0:
     pako "^1.0.10"
     pify "^4.0.1"
     readable-stream "^3.1.1"
+    sha.js "^2.4.9"
+    simple-get "^3.0.2"
+
+"isomorphic-git@git+https://github.com/cardstack/isomorphic-git#dc6b94635f5012ccc6ebfdcc637c7253833a0bb8":
+  version "0.0.0-development"
+  resolved "git+https://github.com/cardstack/isomorphic-git#dc6b94635f5012ccc6ebfdcc637c7253833a0bb8"
+  dependencies:
+    async-lock "^1.1.0"
+    clean-git-ref "^2.0.1"
+    crc-32 "^1.2.0"
+    diff3 "0.0.3"
+    git-apply-delta "0.0.7"
+    globalyzer "^0.1.4"
+    globrex "^0.1.2"
+    ignore "^5.1.4"
+    marky "^1.2.1"
+    minimisted "^2.0.0"
+    pako "^1.0.10"
+    pify "^4.0.1"
+    readable-stream "^3.4.0"
     sha.js "^2.4.9"
     simple-get "^3.0.2"
 
