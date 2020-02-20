@@ -29,8 +29,7 @@
           {{#if this.isExpanded}}
             <div
               class="login-grid-right-column"
-              {{did-insert this.registerCloseListener}}
-              {{will-destroy this.destroyCloseListener}}
+              {{click-outside this.closeLeftEdge ignore=".cardhost-left-edge--nav-button"}}
             >
               {{#if session.isAuthenticated }}
                 <Cta

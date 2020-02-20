@@ -111,4 +111,15 @@ module('Acceptance | logged-out', function(hooks) {
     await click('[data-test-home-link]');
     assert.equal(currentURL(), `/cards`);
   });
+
+  test('clicking outside the login panel closes it', async function(assert) {
+    await visit(`/`);
+    assert.equal(currentURL(), `/`);
+    await waitFor('[data-test-toggle-left-edge]');
+    await click('[data-test-toggle-left-edge]');
+    await waitFor('[data-test-login-button]');
+    assert.dom('[data-test-login-button]').exists();
+    await click('[data-test-card-builder]');
+    assert.dom('[data-test-login-button]').doesNotExist();
+  });
 });

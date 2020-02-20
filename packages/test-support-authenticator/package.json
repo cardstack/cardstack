@@ -6,13 +6,13 @@
   "cardstack-plugin": {
     "api-version": 1
   },
-  "version": "0.16.24",
+  "version": "0.16.25",
   "dependencies": {
-    "@cardstack/di": "0.16.24",
-    "@cardstack/plugin-utils": "0.16.24"
+    "@cardstack/di": "0.16.25",
+    "@cardstack/plugin-utils": "0.16.25"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.16.24"
+    "@cardstack/eslint-config": "0.16.25"
   },
   "author": "Edward Faulkner <edward@eaf4.com>",
   "license": "MIT",

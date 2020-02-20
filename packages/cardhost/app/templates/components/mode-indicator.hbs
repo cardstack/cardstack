@@ -1,13 +1,11 @@
-<div class="mode-indicator" data-test-mode-indicator>
-  <span class="mode-indicator--label {{@mode}}" data-test-mode-indicator-label>
-    {{@mode}} mode
-  </span>
-  <LinkTo
-    @route={{@route}}
-    @model={{@card}}
-    @class="mode-indicator--link"
-    data-test-mode-indicator-link={{@linkTo}}
-  >
-    <span>{{@linkTo}}</span>
-  </LinkTo>
-</div>
+<LinkTo
+  @route={{@route}}
+  @model={{@card}}
+  @class={{concat "mode-indicator mode-indicator--" @mode}}
+  title={{concat "Link to " @linkTo " mode"}}
+  aria-label={{concat "Link to " @linkTo " mode"}}
+  data-test-mode-indicator-link={{@linkTo}}
+  data-test-mode-indicator
+>
+  {{@mode}} mode
+</LinkTo>

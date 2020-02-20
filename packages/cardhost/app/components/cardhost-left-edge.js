@@ -58,4 +58,14 @@ export default class CardhostLeftEdgeComponent extends Component {
     document.querySelector('body').removeEventListener('click', this.closeListener);
     document.querySelector('body').removeEventListener('focusin', this.closeListener);
   }
+
+  @action
+  showLibrary() {
+    this.isLibraryOpen = true;
+  }
+
+  @action
+  hideLibrary() {
+    this.isLibraryOpen = false;
+  }
 }

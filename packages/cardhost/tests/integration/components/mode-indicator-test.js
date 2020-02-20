@@ -12,7 +12,7 @@ module('Integration | Component | mode-indicator', function(hooks) {
     assert.dom('[data-test-mode-indicator]').exists();
   });
 
-  test('it renders', async function(assert) {
+  test('it renders with label and link-to', async function(assert) {
     this.set('model', { id: 'card-1' });
     await render(hbs`
     <ModeIndicator
@@ -22,8 +22,7 @@ module('Integration | Component | mode-indicator', function(hooks) {
       @linkTo="view" />
     `);
 
-    assert.dom('[data-test-mode-indicator]').exists();
-    assert.dom('[data-test-mode-indicator-label]').hasText('edit mode');
     assert.dom('[data-test-mode-indicator-link="view"]').exists();
+    assert.dom('[data-test-mode-indicator]').containsText('edit mode');
   });
 });

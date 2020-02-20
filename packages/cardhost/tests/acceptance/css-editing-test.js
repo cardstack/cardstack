@@ -112,8 +112,8 @@ module('Acceptance | css editing', function(hooks) {
     await visit(`/cards/${card1Id}/edit/layout`);
     await click('[data-test-card-custom-style-button]');
     assert.equal(currentURL(), `/cards/${card1Id}/edit/layout/themer`);
-    assert.dom('[data-test-mode-indicator-link="layout"]').exists();
-    await click('[data-test-mode-indicator-link="layout"]');
+    assert.dom('[data-test-mode-indicator-link="edit"]').exists();
+    await click('[data-test-mode-indicator-link="edit"]');
     assert.equal(currentURL(), `/cards/${card1Id}/edit/layout`);
     assert.dom('[data-test-editor-pane]').doesNotExist();
     assert.dom('[data-test-card-custom-style-button]').exists();
@@ -226,8 +226,8 @@ module('Acceptance | css editing', function(hooks) {
     assert.dom('[data-test-large-btn]').hasClass('selected');
     assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
 
-    await click('[data-test-mode-indicator-link="layout"]');
-    await visit(`/cards/${card1Id}/edit/layout`);
+    await click('[data-test-mode-indicator-link="edit"]');
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/layout`);
     assert.dom('[data-test-large-btn]').hasClass('selected');
     assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
   });
@@ -241,7 +241,7 @@ module('Acceptance | css editing', function(hooks) {
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
     let themerHasStyle = find('[data-test-preview-css]').innerText.includes('gorgeous styles');
     assert.ok(themerHasStyle);
-    await click('[data-test-mode-indicator-link="layout"]');
+    await click('[data-test-mode-indicator-link="edit"]');
     await animationsSettled();
     let viewHasStyle = find('[data-test-view-css]').innerText.includes('gorgeous styles');
     assert.ok(viewHasStyle);
@@ -266,7 +266,7 @@ module('Acceptance | css editing', function(hooks) {
     await click('[data-test-card-custom-style-button]');
     await waitFor('[data-test-editor-pane] textarea');
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
-    await click('[data-test-mode-indicator-link="layout"]');
+    await click('[data-test-mode-indicator-link="edit"]');
     await waitFor('[data-test-cs-component="dropdown"]');
     await selectChoose('[data-test-cs-component="dropdown"]', 'Cardstack default');
     assert.dom('[data-test-cs-component="dropdown"]').doesNotContainText('Custom');
@@ -284,7 +284,7 @@ module('Acceptance | css editing', function(hooks) {
     await click('[data-test-card-custom-style-button]');
     await waitFor('[data-test-editor-pane] textarea');
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
-    await click('[data-test-mode-indicator-link="layout"]');
+    await click('[data-test-mode-indicator-link="edit"]');
     assert.dom('[data-test-card-custom-style-button]').includesText('Edit Custom Theme');
     assert.dom('[data-test-style-dropdown]').includesText('Custom');
     assert.dom('[data-test-style-dropdown]').doesNotIncludeText('default');
