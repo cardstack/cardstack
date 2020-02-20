@@ -3,6 +3,9 @@ import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
+import { task } from 'ember-concurrency';
+import { A } from '@ember/array';
+
 export default class Library extends Component {
   @service library;
   @service scroller;
@@ -11,6 +14,29 @@ export default class Library extends Component {
   @tracked cardModel;
   @tracked dialogTitle;
   @tracked showDialog;
+  @tracked recentCards = A([]);
+
+  @service cardLocalStorage;
+  @service data;
+
+  constructor(...args) {
+    super(...args);
+
+    let ids = this.cardLocalStorage.getRecentCardIds();
+    this.getRecentCardsTask.perform(ids);
+  }
+
+  @task(function*(ids) {
+    let recents = [];
+
+    for (let id of ids) {
+      let card = yield this.data.getCard(id, 'embedded');
+      recents.push(card);
+    }
+
+    this.recentCards = recents;
+  })
+  getRecentCardsTask;
 
   @action
   openCardNameDialog(title, model /*, evt*/) {
