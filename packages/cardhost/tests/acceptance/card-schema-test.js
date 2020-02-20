@@ -399,8 +399,8 @@ module('Acceptance | card schema', function(hooks) {
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields/schema`);
 
     assert.dom('[data-test-cardhost-top-edge]').exists();
-    assert.dom('[data-test-mode-indicator]').exists();
-    assert.dom('[data-test-mode-indicator-label]').hasClass('schema');
+    assert.dom('[data-test-mode-indicator-link="edit"]').exists();
+    assert.dom('[data-test-mode-indicator]').containsText('schema mode');
     assert.dom('[data-test-edge-actions-btn]').exists();
     await percySnapshot(assert);
   });
@@ -413,11 +413,11 @@ module('Acceptance | card schema', function(hooks) {
     await visit(`/cards/${card1Id}/edit/fields/schema`);
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields/schema`);
     assert.dom('[data-test-mode-indicator-link="edit"]').exists();
-    assert.dom('[data-test-mode-indicator-label]').containsText('schema mode');
+    assert.dom('[data-test-mode-indicator]').containsText('schema mode');
 
     await click('[data-test-mode-indicator-link="edit"]');
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
-    assert.dom('[data-test-mode-indicator-label]').containsText('edit mode');
+    assert.dom('[data-test-mode-indicator]').containsText('edit mode');
   });
 
   test('autosave works', async function(assert) {
