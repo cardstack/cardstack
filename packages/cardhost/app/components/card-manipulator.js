@@ -6,7 +6,8 @@ import { task } from 'ember-concurrency';
 import ENV from '@cardstack/cardhost/config/environment';
 import { fieldCards } from '../utils/scaffolding';
 import cloneDeep from 'lodash/cloneDeep';
-import { canonicalURLToCardId } from '@cardstack/core/card-id';
+import drag from '../motions/drag';
+import move from 'ember-animated/motions/move';
 
 const { environment } = ENV;
 
@@ -15,6 +16,7 @@ export default class CardManipulator extends Component {
   @service router;
   @service cardstackSession;
   @service cssModeToggle;
+  @service draggable;
 
   @tracked statusMsg;
   @tracked card;
@@ -29,6 +31,9 @@ export default class CardManipulator extends Component {
   @tracked cardSelected = true;
   @tracked fieldOrderPromise;
   @tracked isolatedCss;
+  @tracked stopMouse;
+  @tracked updateMouse;
+  @tracked justDropped;
 
   constructor(...args) {
     super(...args);
@@ -58,7 +63,7 @@ export default class CardManipulator extends Component {
   }).drop())
   getNewFieldName;
 
-  @(task(function*(cardId, position, evt) {
+  @(task(function*(fieldCard, position, evt) {
     let doc = this.args.card.document;
 
     let fieldName = yield this.getNewFieldName.perform();
@@ -68,7 +73,7 @@ export default class CardManipulator extends Component {
     csFieldSets.isolated = csFieldSets.isolated || [];
     csFieldSets.isolated.push(fieldName);
 
-    doc.withField(fieldName, canonicalURLToCardId(cardId)).withAttributes({ csFieldSets, csFieldOrder });
+    doc.withField(fieldName, fieldCard).withAttributes({ csFieldSets, csFieldOrder });
     let patchedCard = yield this.patchCard.perform(doc);
     let field = yield patchedCard.field(fieldName);
 
@@ -227,7 +232,7 @@ export default class CardManipulator extends Component {
 
   @action
   preview() {
-    this.router.transitionTo('cards.card.edit.layout', this.args.card);
+    this.router.transitionTo('cards.card.edit.layout', this.args.card.canonicalURL);
   }
 
   @action
@@ -256,26 +261,30 @@ export default class CardManipulator extends Component {
       })
     );
 
-    onFinishDrop();
-    let cardId = evt.dataTransfer.getData('text/cardId');
-    if (cardId) {
-      this.addField.perform(cardId, position, evt);
-    } else {
-      let fieldName = evt.dataTransfer.getData('text/field-name');
-      let startPosition = Number(evt.dataTransfer.getData('text/start-position'));
-      if (fieldName) {
-        let newPosition = startPosition < position ? position - 1 : position;
-        this.setPosition.perform(fieldName, newPosition, evt);
-      }
-    }
-    this.isDragging = false;
-  }
-
-  @(task(function*(field, evt) {
-    if (field && field.isDestroyed) {
+    let droppedField = this.draggable.getField();
+    if (!droppedField) {
       return;
     }
 
+    onFinishDrop();
+    let isMovedField =
+      droppedField.enclosingCard && droppedField.enclosingCard.canonicalURL === this.args.card.canonicalURL;
+    if (!isMovedField) {
+      this.addField.perform(droppedField, position, evt);
+    } else {
+      let startPosition = this.draggable.getStartingPosition();
+      if (droppedField.name && startPosition != null) {
+        let newPosition = startPosition < position ? position - 1 : position;
+        this.setPosition.perform(droppedField.name, newPosition, evt);
+      }
+    }
+
+    this.draggable.clearField();
+    this.draggable.clearDropzone();
+    this.draggable.setDragging(false);
+  }
+
+  @(task(function*(field, evt) {
     // Toggling the selected field in tests is baffling me, using something more brute force
     if (environment === 'test' && this.selectedField === field) {
       return;
@@ -309,10 +318,154 @@ export default class CardManipulator extends Component {
   }).restartable())
   selectField;
 
-  @action startDragging(field, evt) {
-    evt.dataTransfer.setData('text', evt.target.id);
-    evt.dataTransfer.setData('text/cardId', field.canonicalURL);
+  @action
+  selectFieldType(field, event) {
+    if (!this.draggable.isDragging && !this.justDropped) {
+      this.beginDragging(field, event);
+    } else {
+      this.draggable.clearField();
+      this.draggable.setDragging(false);
+    }
   }
+
+  @action
+  beginDragging(field, dragEvent) {
+    let dragState;
+    let self = this;
+
+    // WARNING! we do a lot of monkey patching of the FieldCard API below--this
+    // is super dangerous because the API is immutable, and there is no
+    // guarantee that the field instance isn't thrown away be the time you need
+    // to get the value that you slapped on it. We really need to figure out a
+    // different approach than setting arbitrary values on the FieldCard.
+    function stopMouse() {
+      field.dragState = null;
+      let dropzone = self.draggable.getDropzone();
+      if (dropzone) {
+        self.draggable.drop();
+        field.dropTo = dropzone;
+
+        // this tells the click event that follows not to do anything
+        self.justDropped = true;
+        setTimeout(function() {
+          self.justDropped = false;
+        }, 1000);
+      } else {
+        // we mouseup somewhere that isn't a dropzone
+        self.draggable.clearField();
+      }
+
+      // WARNING! we monkey patched the immutable card instances in the catalog.
+      // There is no guarantee that state you set on these instances is carried
+      // forward. This is working against our card API.
+
+      // we do this so that we can animate the field back to the left edge.
+      self.catalogEntries = self.catalogEntries.map(i => i);
+
+      // remove ghost element from DOM
+      let ghostEl = document.getElementById('ghost-element');
+      if (ghostEl) {
+        ghostEl.remove();
+      }
+
+      window.removeEventListener('mousemove', updateMouse, false);
+      window.removeEventListener('mouseup', stopMouse, false);
+      return false;
+    }
+
+    function updateMouse(event) {
+      dragState.latestPointerX = event.x;
+      dragState.latestPointerY = event.y;
+
+      self.draggable.setDragging(true);
+
+      // in order for the drop zone to trigger a mouseenter/mouseleave event
+      // we need to temporarily hide the dragged element
+      let fieldEl = dragEvent.target.closest('.ch-catalog-field');
+      fieldEl.style.visibility = 'hidden';
+      let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
+      fieldEl.style.visibility = 'visible';
+
+      // this can happen when you drag the mouse outside the viewport
+      if (!elemBelow) {
+        return;
+      }
+
+      let dropzoneBelow = elemBelow.closest('.drop-zone');
+      let currentDropzone = self.draggable.getDropzone();
+
+      if (currentDropzone !== dropzoneBelow) {
+        if (currentDropzone) {
+          self.draggable.clearDropzone();
+        }
+        if (dropzoneBelow) {
+          self.draggable.setDropzone(elemBelow);
+        }
+      }
+    }
+
+    if (dragEvent instanceof KeyboardEvent) {
+      // This is a keyboard-controlled "drag" instead of a real mouse
+      // drag.
+      dragState = {
+        usingKeyboard: true,
+        xStep: 0,
+        yStep: 0,
+      };
+    } else {
+      dragState = {
+        usingKeyboard: false,
+        initialPointerX: dragEvent.x,
+        initialPointerY: dragEvent.y,
+        latestPointerX: dragEvent.x,
+        latestPointerY: dragEvent.y,
+      };
+      window.addEventListener('mouseup', stopMouse, false);
+      window.addEventListener('mousemove', updateMouse, false);
+    }
+
+    // WARNING! this is not good. we should not be monkey patching our immutable
+    // card API with this stuff. There is no guarantee that things that you set
+    // are carried forward as the cards are patched.
+    field.dragState = dragState;
+
+    this.draggable.setField(field);
+    this.catalogEntries = this.catalogEntries.map(i => i);
+  }
+
+  *transition({ keptSprites }) {
+    let activeSprite = keptSprites.find(sprite => sprite.owner.value.dragState);
+    let others = keptSprites.filter(sprite => sprite !== activeSprite);
+
+    if (activeSprite) {
+      drag(activeSprite, {
+        others,
+      });
+      let ghostElement = getGhostFromSprite(activeSprite);
+      activeSprite.element.parentElement.appendChild(ghostElement);
+      others.forEach(move);
+    } else {
+      keptSprites.forEach(sprite => {
+        move(sprite, { duration: 300 });
+      });
+    }
+  }
+}
+
+function getGhostFromSprite(sprite) {
+  let ghostElement = sprite.element.cloneNode(true);
+  for (let [key, value] of Object.entries(sprite.initialComputedStyle)) {
+    ghostElement.style[key] = value;
+  }
+  let { top, left } = sprite.initialBounds;
+  ghostElement.style.position = 'fixed';
+  ghostElement.style.top = top;
+  ghostElement.style.left = left;
+  ghostElement.style.zIndex = '0';
+  ghostElement.style.opacity = '0.4';
+  ghostElement.id = 'ghost-element';
+
+  return ghostElement;
 }
 
 function queryablePromise(promise) {

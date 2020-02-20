@@ -1,8 +1,15 @@
 import { module, test, skip } from 'qunit';
-import { find, visit, currentURL } from '@ember/test-helpers';
+import { find, visit, currentURL, click } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
+import { percySnapshot } from 'ember-percy';
 import Fixtures from '../helpers/fixtures';
-import { setFieldValue, saveCard, waitForCardLoad, waitForEmbeddedCardLoad } from '../helpers/card-ui-helpers';
+import {
+  setFieldValue,
+  saveCard,
+  waitForCardLoad,
+  waitForEmbeddedCardLoad,
+  encodeColons,
+} from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { cardDocument } from '@cardstack/core/card-document';
 import { myOrigin } from '@cardstack/core/origin';
@@ -138,6 +145,59 @@ module('Acceptance | card edit', function(hooks) {
   skip(`setting a base card field as reference with plural arity`, async function() {});
   skip(`setting a card field as value with singular arity`, async function() {});
   skip(`setting a card field as value with plural arity`, async function() {});
+
+  test(`can navigate to view mode using the top edge`, async function(assert) {
+    await visit(`/cards/${cardPath}/edit/fields`);
+    await waitForCardLoad();
+
+    assert.dom('[data-test-mode-indicator-link="view"]').exists();
+
+    await click('[data-test-mode-indicator-link="view"]');
+    await waitForCardLoad();
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
+
+    await visit(`/cards/${cardPath}/edit/layout`);
+    await waitForCardLoad();
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/layout`);
+
+    await click('[data-test-mode-indicator-link="view"]');
+    await waitForCardLoad();
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
+  });
+
+  test(`fields mode displays the top edge`, async function(assert) {
+    await visit(`/cards/${cardPath}/edit/fields`);
+    await waitForCardLoad();
+
+    assert.dom('[data-test-cardhost-top-edge]').exists();
+    assert.dom('[data-test-top-edge-preview-link]').exists();
+    assert.dom('[data-test-top-edge-size-buttons]').exists();
+    assert.dom('[data-test-top-edge-preview-link]').hasClass('hidden');
+    assert.dom('[data-test-top-edge-size-buttons]').hasClass('hidden');
+    assert.dom('[data-test-view-selector]').exists();
+    assert.dom('[data-test-view-selector="fields"]').hasClass('active');
+    assert.dom('[data-test-mode-indicator]').exists();
+    assert.dom('[data-test-mode-indicator-label]').hasClass('edit');
+    assert.dom('[data-test-edge-actions-btn]').exists();
+    await percySnapshot(assert);
+  });
+
+  test(`layout mode displays the top edge with additional controls`, async function(assert) {
+    await visit(`/cards/${cardPath}/edit/layout`);
+    await waitForCardLoad();
+
+    assert.dom('[data-test-cardhost-top-edge]').exists();
+    assert.dom('[data-test-top-edge-preview-link]').exists();
+    assert.dom('[data-test-top-edge-size-buttons]').exists();
+    assert.dom('[data-test-top-edge-preview-link]').doesNotHaveClass('hidden');
+    assert.dom('[data-test-top-edge-size-buttons]').doesNotHaveClass('hidden');
+    assert.dom('[data-test-view-selector]').exists();
+    assert.dom('[data-test-view-selector="layout"]').hasClass('active');
+    assert.dom('[data-test-mode-indicator]').exists();
+    assert.dom('[data-test-mode-indicator-label]').hasClass('edit');
+    assert.dom('[data-test-edge-actions-btn]').exists();
+    await percySnapshot(assert);
+  });
 
   test(`displays the right edge`, async function(assert) {
     await visit(`/cards/${cardPath}/edit/fields`);

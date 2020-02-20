@@ -2,6 +2,8 @@ import Route from '@ember/routing/route';
 import { inject as service } from '@ember/service';
 import DataService from '../../services/data';
 import { AddressableCard } from '@cardstack/core/card';
+import { action } from '@ember/object';
+import { set } from '@ember/object';
 
 export interface RouteParams {
   id: string;
@@ -33,5 +35,12 @@ export default class CardsCard extends Route {
       return { id };
     }
     throw new Error(`Cannot render an unsaved card in the ${this.routeName} route`);
+  }
+
+  @action
+  updateCardModel(card: AddressableCard, isDirty: boolean) {
+    let model = this.modelFor(this.routeName) as Model;
+    set(model, 'isDirty', isDirty);
+    set(model, 'card', card);
   }
 }

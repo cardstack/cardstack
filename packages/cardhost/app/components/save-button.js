@@ -20,10 +20,7 @@ export default class SaveButton extends Component {
   autosaveDebounce = autosaveDebounce || AUTOSAVE_DEBOUNCE;
   autosaveDisabled = typeof this.args.autosaveDisabled === 'boolean' ? this.args.autosaveDisabled : !!autosaveDisabled;
 
-  // This task needs to be queued, otherwise we will get
-  // 409 conflicts with the `/meta/version`
-  @enqueueTask
-  *saveCard() {
+  @task(function*() {
     let card = this.args.card;
     this.statusMsg = null;
 
@@ -35,9 +32,13 @@ export default class SaveButton extends Component {
       this.statusMsg = `card ${card.csTitle} was NOT successfully created: ${e.message}`;
       return;
     }
-  }
+  })
+  saveCard;
 
-  @task(function*() {
+  // This task needs to be queued, otherwise we will get
+  // 409 conflicts with the `/meta/version`
+  @enqueueTask
+  *saveCardWithState() {
     yield this.saveCard.perform();
 
     this.justSaved = true;
@@ -45,8 +46,7 @@ export default class SaveButton extends Component {
     yield setTimeout(() => {
       this.justSaved = false;
     }, SAVED_HIGHLIGHT_DELAY);
-  })
-  saveCardWithState;
+  }
 
   @restartableTask
   *debounceAndSave() {

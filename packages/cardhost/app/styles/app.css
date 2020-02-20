@@ -5,18 +5,26 @@
 
 @import '/assets/index.css';
 @import '/assets/cards.css';
+@import '/assets/components/library.css';
+@import '/assets/components/save-button.css';
+@import '/assets/components/mode-indicator.css';
 @import '/assets/components/view-switcher.css';
+@import '/assets/components/card-size-toggle.css';
 @import '/assets/components/right-edge.css';
 @import '/assets/components/cardhost-left-edge.css';
 @import '/assets/components/cardhost-top-edge.css';
 @import '/assets/components/button.css';
+@import '/assets/components/preview-link-button.css';
+@import '/assets/components/edge-actions-button.css';
 @import '/assets/components/search-bar.css';
 @import '/assets/components/filter-bar.css';
 @import '/assets/components/catalog.css';
 @import '/assets/components/catalog-field.css';
 @import '/assets/components/adopted-from.css';
+@import '/assets/components/themer-toolbar.css';
 @import '/assets/components/themer.css';
 @import '/assets/components/dialog.css';
+@import '/assets/components/card-renderer-header.css';
 
 /* Cardhost styling for core package templates */
 @import '/assets/components/card-renderer.css';
@@ -27,16 +35,6 @@
 /* TODO eventually these will be dynamically added to the DOM.
 Until that work is done we are statically adding this css
 */
-@import '/assets/cards/base-card-isolated.css';
-@import '/assets/cards/base-card-embedded.css';
-
-/* Themed cards */
-/* @import '/assets/cards/event-card-isolated.css'; */
-/* @import '/assets/cards/event-ticket-isolated.css'; */
-/* @import '/assets/cards/wedding-invitation-isolated.css'; */
-/* @import '/assets/cards/product-card-isolated.css'; */
-/* @import '/assets/cards/photo-card-isolated.css'; */
-
 @import '/assets/fields/belongs-to-editor.css';
 @import '/assets/fields/belongs-to-viewer.css';
 @import '/assets/fields/boolean-editor.css';
@@ -55,9 +53,19 @@ Until that work is done we are statically adding this css
 @import '/assets/fields/link-viewer.css';
 @import '/assets/fields/cta-viewer.css';
 
+@import '/assets/cards/base-card-isolated.css';
+@import '/assets/cards/base-card-embedded.css';
+
+/* Themed cards */
+/* @import '/assets/cards/event-card-isolated.css';
+@import '/assets/cards/event-ticket-isolated.css';
+@import '/assets/cards/wedding-invitation-isolated.css';
+@import '/assets/cards/product-card-isolated.css';
+@import '/assets/cards/photo-card-isolated.css'; */
+
 :root {
   --ch-font-family: 'Open Sans', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --ch-left-edge-navbar-width: 65px;
+  --ch-left-edge-navbar-width: 80px;
   --ch-left-edge-panel-width: 330px;
   --ch-right-edge-panel-width: 330px;
 
@@ -67,6 +75,9 @@ Until that work is done we are statically adding this css
   --ch-bottom-edge-height: 80px;
 
   --ch-card-size: 496px;    /* min-width and min-height for cards */
+  --ch-card-size-medium: 930px;
+  --ch-card-size-large: 100%;
+
   --ch-field-width: 384px;  /* edit and schema view field-renderer max-width */
   --ch-spacing: 20px;
   --ch-left-edge-z-index: 30;
@@ -96,10 +107,8 @@ Until that work is done we are statically adding this css
 }
 
 body {
-  min-width: 100%;
-  min-height: 100%;
+  position: fixed; /* This is needed to prevent background scroll when bottom-edge is open */
   width: 100%;
-  height: auto;
   margin: 0;
   background-color: var(--ch-default);
   color: white;
@@ -123,81 +132,16 @@ a:hover {
   z-index: 50;
 }
 
+/* TODO: Remove this when we use ember-toolbars for all edges */
+.cst-bottom {
+  z-index: 30; /* This is so that bottom edge is above the left edge */
+}
+
 /* JSON card document -- hidden from view */
 .cardhost-card-document {
   visibility: hidden;
   height: 0;
   overflow: hidden;
-}
-
-
-/* Other: */
-/* TODO: Refactor these to where they belong  */
-.card-renderer--top-edge-buttons {
-  position: fixed;
-  top: var(--ch-spacing);
-  right: var(--ch-spacing);
-  display: flex;
-  z-index: var(--ch-actions-z-index);
-}
-
-.card-renderer--top-edge-buttons button + button {
-  margin-left: 10px;
-}
-
-.top-edge--mode-label {
-  padding: 10px;
-  background-color: white;
-  text-transform: uppercase;
-  font-size: 16px;
-  font-weight: bold;
-  border-radius: 10px;
-  color: var(--ch-dark-op50);
-  margin-right: 20px;
-}
-
-.top-edge--mode-link {
-  display: inline-flex;
-}
-
-.top-edge--mode-link span {
-  width: 18px;
-  height: 18px;
-  display: block;
-  text-indent: -9999px;
-    text-indent: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  background-image: url(/assets/images/icons/close-circle.svg);
-  background-size: 18px 18px;
-  background-repeat: no-repeat;
-}
-
-.card-schema-updator--search-bar {
-  position: absolute;
-  right: var(--ch-spacing);
-  bottom: var(--ch-spacing);
-}
-
-.card-schema-updator--search-bar > .ch-search-bar {
-  min-width: 230px;
-}
-
-.card-creator--new-card {
-  width: 300px;
-  margin: var(--ch-spacing) auto;
-}
-
-.field-creator--field-btn-wrapper {
-  text-align: right;
-}
-
-
-/* TODO: Move to ui-components repo */
-.cs-dark-input.cs-input:disabled,
-.cs-dark-input.cs-input.disabled {
-  -webkit-text-fill-color: var(--cs-dark-field-disabled-text); /* For strangeness in safari */
-  -webkit-text-stroke-color: var(--cs-dark-field-disabled-text);
 }
 
 /* Cardhost Modal */
@@ -220,4 +164,16 @@ a:hover {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Other */
+.field-creator--field-btn-wrapper {
+  text-align: right;
+}
+
+/* TODO: Move to ui-components repo */
+.cs-dark-input.cs-input:disabled,
+.cs-dark-input.cs-input.disabled {
+  -webkit-text-fill-color: var(--cs-dark-field-disabled-text); /* For strangeness in safari */
+  -webkit-text-stroke-color: var(--cs-dark-field-disabled-text);
 }

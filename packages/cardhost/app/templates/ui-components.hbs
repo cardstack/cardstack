@@ -9,6 +9,8 @@
       <li><a href="#font">Font</a></li>
       <li><a href="#palette">Color Palette</a></li>
       <li><a href="#buttons">Buttons</a></li>
+      <li><a href="#card-size-toggle">Card Size Toggle</a></li>
+      <li><a href="#mode-indicator">Mode Indicator</a></li>
       <li><a href="#view-switcher">View Switcher</a></li>
       <li><a href="#form-components">Cardstack Form UI Components:</a>
         <ul>
@@ -124,6 +126,14 @@
     <SaveButton @card={{this.model}} />
     <CodeEditor @code='<SaveButton @card=\{{card}} />' @language="html" />
 
+    <h3>Preview Link Button</h3>
+    <PreviewLinkButton @model={{this.model.card}} />
+    <CodeEditor @code='<PreviewLinkButton @model=\{{card}} />' @language="html" />
+
+    <h3>Edge Actions Button</h3>
+    <EdgeActionsButton />
+    <CodeEditor @code='<EdgeActionsButton />' @language="html" />
+
     <h3>Icon Buttons</h3>
     <h4>- Default icon button</h4>
     <div>
@@ -167,6 +177,38 @@
     <CodeEditor @code='<button disabled class="ch-button ch-button--icon-secondary" aria-label="user">
   \{{svg-jar "user" width="18px" height="20px"}}
 </button>' @language="html" />
+  </section>
+
+  <section class="ui-components--section ui-components--grid-2-col" id="card-size-toggle">
+    <h2>Card Size Toggle buttons</h2>
+    <CardSizeToggle />
+    <CodeEditor @code='<CardSizeToggle />' @language="html" />
+  </section>
+
+  <section class="ui-components--section ui-components--grid-2-col" id="mode-indicator">
+    <h2>Mode Indicator (label and link)</h2>
+    <div>
+      <ModeIndicator
+        @card={{this.model.card}}
+        @route="cards.card.view"
+        @mode="edit"
+        @linkTo="view" /> <br>
+      <ModeIndicator
+        @card={{this.model.card}}
+        @route="cards.card.edit.layout"
+        @mode="themer"
+        @linkTo="layout" /> <br>
+      <ModeIndicator
+        @card={{this.model.card}}
+        @route="cards.card.edit.fields"
+        @mode="schema"
+        @linkTo="edit" />
+    </div>
+    <CodeEditor @code='<ModeIndicator
+  @card=\{{card}}
+  @route=\{{routeTo}}
+  @mode=\{{currentMode}}
+  @linkTo=\{{linkToMode}} />' @language="html" />
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col" id="view-switcher">
@@ -363,16 +405,16 @@
     <CodeEditor
       @code='<RightEdge
   @mode="schema"
-  @card=@card
-  @parentCard=@parentCard
-  @grandParentCard=@grandParentCard
-  @selectedField=@selectedField
-  @selectedFieldType=@selectedFieldType
-  @selectField=@selectField
-  @setFieldName=@setFieldName
-  @setFieldCardValue=@setFieldCardValue
-  @setCardValue=@setCardValue
-  @setNeededWhenEmbedded=@setNeededWhenEmbedded />'  @language="html" />
+  @card=\{{@card}}
+  @parentCard=\{{@parentCard}}
+  @grandParentCard=\{{@grandParentCard}}
+  @selectedField=\{{@selectedField}}
+  @selectedFieldType=\{{@selectedFieldType}}
+  @selectField={{@selectField}}
+  @setFieldName=\{{@setFieldName}}
+  @setFieldCardValue=\{{@setFieldCardValue}}
+  @setCardValue=\{{@setCardValue}}
+  @setNeededWhenEmbedded=\{{@setNeededWhenEmbedded}} />'  @language="html" />
 
     <h3>Card Selected</h3>
     <RightEdge
@@ -386,11 +428,11 @@
     <CodeEditor
       @code='<RightEdge
   @mode="schema"
-  @card=@card
-  @parentCard=@parentCard
-  @grandParentCard=@grandParentCard
-  @setCardValue=@setCardValue
-  @cardSelected=true />'  @language="html" />
+  @card=\{{@card}}
+  @parentCard=\{{@parentCard}}
+  @grandParentCard=\{{@grandParentCard}}
+  @setCardValue=\{{@setCardValue}}
+  @cardSelected=\{{true}} />'  @language="html" />
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col" id="field-renderer">
@@ -402,7 +444,7 @@
       @mode="view" />
     <CodeEditor
       @code='<FieldRenderer
-  @field=@field
+  @field=\{{@field}}
   @format="isolated"
   @mode="view" />' @language="html" />
 
@@ -413,7 +455,7 @@
         @mode="schema" />
     <CodeEditor
       @code='<FieldRenderer
-  @field=@field
+  @field=\{{@field}}
   @format="isolated"
   @mode="schema" />' @language="html" />
 
@@ -427,10 +469,10 @@
       @setCardValue={{perform this.noopTask}} />
     <CodeEditor
       @code='<FieldRenderer
-  @field=@field
+  @field=\{{@field}}
   @format="isolated"
   @mode="edit"
-  @setCardValue=@setCardValue />' @language="html" />
+  @setCardValue=\{{@setCardValue}} />' @language="html" />
 
     <h4>Date Editor</h4>
     <FieldRenderer
@@ -439,10 +481,10 @@
       @mode="edit"
       @setCardValue={{perform this.noopTask}} />
     <CodeEditor @code='<FieldRenderer
-  @field=@field
+  @field=\{{@field}}
   @format="isolated"
   @mode="edit"
-  @setCardValue=@setCardValue />' @language="html" />
+  @setCardValue=\{{@setCardValue}} />' @language="html" />
 
     <h4>Textarea</h4>
     <div class="ui-components--notes">
@@ -498,11 +540,11 @@
         @setPosition={{action this.noop}}
         @removeField={{perform this.noopTask}} />
       <CodeEditor @code='<CardRenderer
-  @card=@card
+  @card=\{{@card}}
   @format="isolated"
   @mode="schema"
-  @setPosition=@setPosition
-  @removeField=@removeField />' @language="html" />
+  @setPosition=\{{@setPosition}}
+  @removeField=\{{@removeField}} />' @language="html" />
 
       <h3>Edit mode</h3>
       <CardRenderer
@@ -512,10 +554,10 @@
         @setCardValue={{perform this.noopTask}}
       />
       <CodeEditor @code='<CardRenderer
-  @card=@card
+  @card=\{{@card}}
   @format="isolated"
   @mode="edit"
-  @setCardValue=@setCardValue />' @language="html" />
+  @setCardValue=\{{@setCardValue}} />' @language="html" />
 
       <h3>View mode</h3>
       <CardRenderer
@@ -523,7 +565,7 @@
         @format="isolated"
         @mode="view" />
       <CodeEditor @code='<CardRenderer
-  @card=@card
+  @card=\{{@card}}
   @format="isolated"
   @mode="view" />' @language="html" />
   </section>

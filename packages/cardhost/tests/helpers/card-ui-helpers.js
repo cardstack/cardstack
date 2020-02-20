@@ -45,11 +45,11 @@ export async function waitForCardPatch() {
 
 export async function waitForCardLoad() {
   await waitFor(`[data-test-card-loaded="true"]`, { timeout });
-  let fields = [...document.querySelectorAll(`.isolated-card [data-test-field]`)].map(i =>
+  let fields = [...document.querySelectorAll(`[data-test-isolated-card] [data-test-field]`)].map(i =>
     i.getAttribute('data-test-field')
   );
   for (let field of fields) {
-    await waitFor(`.isolated-card [data-test-field="${field}"][data-test-loaded="true"]`, { timeout });
+    await waitFor(`[data-test-isolated-card] [data-test-field="${field}"][data-test-loaded="true"]`, { timeout });
   }
 }
 
@@ -77,12 +77,12 @@ export async function waitForEmbeddedCardLoad(cardId) {
 }
 
 export async function waitForFieldNameChange(name) {
-  await waitFor(`.isolated-card [data-test-field="${name}"][data-test-loaded="true"]`, { timeout });
+  await waitFor(`[data-test-isolated-card] [data-test-field="${name}"][data-test-loaded="true"]`, { timeout });
   await waitForCardPatch();
 }
 
 export async function selectField(name) {
-  await click(`.isolated-card [data-test-field="${name}"]`);
+  await click(`[data-test-isolated-card] [data-test-field="${name}"]`);
   await waitForFieldToLoadInRightEdge(name);
 }
 
@@ -90,6 +90,10 @@ export async function setCardName(name) {
   await fillIn('#card__name', name);
   await click('[data-test-create-card-btn]');
   await waitFor(`[data-test-card-save-btn]`, { timeout });
+
+  if (document.querySelector('[data-test-card-name-dialog-is-adopted-card="false"]')) {
+    await waitForSchemaViewToLoad();
+  }
 }
 
 export async function dragAndDrop(fieldSelector, dropZoneSelector, options) {
@@ -104,20 +108,17 @@ export async function dragAndDrop(fieldSelector, dropZoneSelector, options) {
 }
 
 export async function dragAndDropNewField(fieldId, position = 0) {
+  await waitFor(`[data-test-catalog-loaded="true"]`, { timeout });
   if (fieldId.indexOf('http') !== 0) {
     fieldId = canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: fieldId });
   }
-  let options = {
-    dataTransfer: {
-      getData: key => (key === 'text/cardId' ? fieldId : undefined),
-      setData: () => {},
-    },
-  };
-  await dragAndDrop(
-    `[data-test-card-add-field-draggable="${fieldId}"]`,
-    `[data-test-drop-zone="${position}"]`,
-    options
-  );
+  await click(`[data-test-card-add-field-draggable="${fieldId}"]`);
+  await triggerEvent(`[data-test-drop-zone="${position}"]`, 'mouseenter');
+  await click(`[data-test-drop-zone="${position}"]`);
+  await animationsSettled();
+  await waitForCardPatch();
+  await waitForFieldOrderUpdate();
+  await animationsSettled();
 }
 
 // NOTE: Position is 0-based
@@ -187,7 +188,7 @@ export async function saveCard() {
 export async function addField(name, fieldId, isEmbedded, position) {
   await dragAndDropNewField(fieldId, position);
 
-  await click(`.isolated-card [data-test-field="field-1"]`);
+  await click(`[data-test-isolated-card] [data-test-field="field-1"]`);
   await waitForFieldToLoadInRightEdge('field-1');
 
   await waitFor('[data-test-schema-attr="name"] input', { timeout });
@@ -223,4 +224,8 @@ export async function removeField(name) {
   await waitForCardPatch();
   await waitForFieldOrderUpdate();
   await animationsSettled();
+}
+
+export function encodeColons(string) {
+  return string.replace(/:/g, encodeURIComponent(':'));
 }

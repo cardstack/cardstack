@@ -1,5 +1,31 @@
 .card-renderer--container {
-  margin: 0 auto;
+  --scroll-bottom-padding: 80px;
+
+  height: 100vh;
+  width: 100%;
+  padding-top: var(--ch-top-edge-height);
+  padding-bottom: var(--scroll-bottom-padding);
+  overflow-y: auto;
+  transition: padding var(--ch-transition-time);
+}
+
+.card-renderer--inner-container {
+  padding-right: var(--ch-right-edge-width);
+  padding-left: var(--ch-left-edge-navbar-width);
+  transition: padding var(--ch-transition-time);
+}
+
+.card-renderer--inner-container.schema-container {
+  padding-left: var(--ch-left-edge-width);
+}
+
+.card-renderer--inner-container.view-container {
+  padding-right: 0;
+}
+
+.card-renderer--inner-container.themer-container {
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .card-renderer--embedded-card-link:focus {
@@ -18,14 +44,13 @@
   --card-renderer-header-height: 56px;
 
   position: relative;
-  min-width: var(--card-renderer-width);
-  max-width: var(--card-renderer-width);
+  margin: 0 auto;
+  padding: 0 var(--ch-spacing);
+  width: var(--card-renderer-width);
+  max-width: 100%;
   font: 400 16px/22px var(--ch-font-family);
   letter-spacing: 0.015em;
-}
-
-.card-renderer-isolated.schema {
-  min-width: 400px;
+  transition: width 0.3s ease;
 }
 
 .card-renderer-isolated.schema,
@@ -34,7 +59,6 @@
 }
 
 .card-renderer-isolated.view {
-  max-width: 100%;
   padding-top: var(--card-renderer-header-height);
 }
 
@@ -46,13 +70,17 @@
   all: unset;
 }
 
+.card-renderer-isolated.schema .field {
+  position: static;
+}
+
 
 /* Card Renderer Header */
 /* We need the wrapper to mask the border of the content when scrolling */
 .card-renderer-isolated--header--wrapper {
   background-color: var(--ch-default);
   position: sticky;
-  top: 80px;
+  top: 0;
   z-index: var(--ch-card-header-z-index); /* card scrolls under the header */
 }
 
@@ -60,8 +88,8 @@
   background-color: var(--ch-light-background);
   position: absolute;
   top: var(--card-renderer-header-height);
-  left: 0;
-  right: 0;
+  left: var(--ch-spacing);
+  right: var(--ch-spacing);
   z-index: 5;
   bottom: 100px;
 }
@@ -70,22 +98,12 @@
   top: 0px;
 }
 
-.card-renderer-isolated.edit .card-renderer-isolated--header--wrapper,
-.card-renderer-isolated.layout .card-renderer-isolated--header--wrapper {
-  background-color: var(--ch-medium-background);
-}
-
 .card-renderer-isolated.schema .card-renderer-isolated--header--wrapper {
   background-color: var(--ch-deep-background);
 }
 
 .card-renderer-isolated.themer .card-renderer-isolated--header--wrapper {
   background-color: var(--ch-dark-background);
-}
-
-.card-renderer-isolated.themer.view .card-renderer-isolated--header--wrapper  {
-  left: var(--ch-spacing);
-  right: var(--ch-spacing);
 }
 
 .card-renderer-isolated--header {
@@ -111,11 +129,6 @@
 
 .card-renderer-isolated--header svg {
   --icon-color: var(--ch-light-op50);
-
-  margin-right: 13px;
-  width: 18px;
-  height: 20px;
-
   transition: stroke var(--ch-transition-time);
 }
 
@@ -129,23 +142,20 @@
 }
 
 .card-renderer-isolated--header .card-renderer--header-link {
-  text-transform: uppercase;
-  padding: 0 5px;
-  border: solid 1px var(--ch-dark);
-  border-radius: 5px;
+  padding: 5px 20px;
+  border: solid 1px var(--ch-border);
+  border-radius: 20px;
+  font-size: 0.8em;
 }
 
 /* Card Renderer - Outer Wrapper */
-/* Needed for scroll behavior */
 .card-renderer-isolated--content {
   position: relative;
   min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
-  padding-bottom: 80px;
+  padding-bottom: var(--scroll-bottom-padding);
   background-color: transparent;
   color: var(--ch-dark);
   border: none;
-  overflow-x: hidden;
-  overflow-y: auto;
   z-index: var(--ch-card-z-index);
 
   transition: var(--ch-card-background-color-animate);

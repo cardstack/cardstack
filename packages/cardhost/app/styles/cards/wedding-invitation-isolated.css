@@ -49,13 +49,14 @@
 .wedding-invitation-isolated .wedding-rsvp-cta-field {
     z-index: 5;
 }
-.wedding-invitation-isolated .wedding-name-2-field {
+.wedding-invitation-isolated .wedding-name-partner-field {
     padding-bottom: 69px;
 }
 .wedding-invitation-isolated .wedding-reception-address-field {
     max-width: 300px;
     padding-bottom: 43px;
 }
+.wedding-invitation-isolated .wedding-time-field,
 .wedding-invitation-isolated .wedding-rsvp-date-field {
     padding-bottom: 12px;
 }
@@ -83,8 +84,8 @@
     letter-spacing: 0.05em;
 }
 
-.wedding-invitation-isolated .wedding-name-1-value,
-.wedding-invitation-isolated .wedding-name-2-value {
+.wedding-invitation-isolated .wedding-name-value,
+.wedding-invitation-isolated .wedding-name-partner-value {
     font-family: 'Didot', serif;
     font-style: italic;
     text-transform: capitalize;
@@ -94,7 +95,7 @@
     white-space: nowrap;
 }
 
-.wedding-invitation-isolated .wedding-name-2-value::before {
+.wedding-invitation-isolated .wedding-name-partner-value::before {
     content: '&';
     display: block;
     font-size: 42px;

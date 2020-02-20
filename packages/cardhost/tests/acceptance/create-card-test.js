@@ -10,7 +10,6 @@ import {
   dragAndDropNewField,
   selectField,
   waitForFieldNameChange,
-  waitForSchemaViewToLoad,
   removeField,
   waitForCardPatch,
   waitForEmbeddedCardLoad,
@@ -39,11 +38,9 @@ module('Acceptance | card create', function(hooks) {
   test('right edge shows base card as adopted from card', async function(assert) {
     await visit('/cards/add');
     await setCardName(card1Name);
+    await showCardId();
 
-    assert.ok(/^\/cards\/.*\/edit\/fields$/.test(currentURL()), 'URL is correct');
-
-    await click('[data-test-configure-schema-btn]');
-    await waitForSchemaViewToLoad();
+    assert.ok(/^\/cards\/.*\/edit\/fields\/schema$/.test(currentURL()), 'URL is correct');
 
     assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('Base Card');
     assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').doesNotExist();
@@ -57,13 +54,11 @@ module('Acceptance | card create', function(hooks) {
     await setCardName(card1Name);
     let cardId = currentURL()
       .replace('/cards/', '')
-      .replace('/edit/fields', '');
+      .replace('/edit/fields/schema', '');
 
-    assert.ok(/^\/cards\/.*\/edit\/fields$/.test(currentURL()), 'URL is correct');
-    await click('[data-test-configure-schema-btn]');
-    await waitForSchemaViewToLoad();
+    assert.ok(/^\/cards\/.*\/edit\/fields\/schema$/.test(currentURL()), 'URL is correct');
 
-    assert.dom('.card-renderer-isolated--header').hasText('Millenial Puppies');
+    assert.dom('.card-renderer-isolated--header-title').hasText('Millenial Puppies');
 
     await addField('title', 'string-field', true);
     await addField('body', 'string-field', false);
@@ -71,7 +66,7 @@ module('Acceptance | card create', function(hooks) {
     await addField('reviewers', 'base', true);
 
     await showCardId(true);
-    assert.dom('.card-renderer-isolated--header').hasText('Millenial Puppies');
+    assert.dom('.card-renderer-isolated--header-title').hasText('Millenial Puppies');
     assert.dom('[data-test-internal-card-id]').hasText(decodeURIComponent(cardId));
 
     await selectField('title');
@@ -95,7 +90,7 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     await showCardId();
-    assert.dom('.card-renderer-isolated--header').hasText('Millenial Puppies');
+    assert.dom('.card-renderer-isolated--header-title').hasText('Millenial Puppies');
     assert.dom('[data-test-internal-card-id]').hasTextContaining(decodeURIComponent(cardId));
     assert.dom('[data-test-card-renderer-isolated]').hasClass('selected');
 
@@ -117,24 +112,24 @@ module('Acceptance | card create', function(hooks) {
     await visit('/');
 
     assert.equal(currentURL(), '/');
+    await click('[data-test-library-button]');
+
     assert.deepEqual(
-      [...document.querySelectorAll(`[data-test-recent-cards] [data-test-embedded-card]`)].map(i =>
+      [...document.querySelectorAll(`[data-test-library-recent-card-link] [data-test-embedded-card]`)].map(i =>
         i.getAttribute('data-test-embedded-card')
       ),
       []
     );
 
-    await click('[data-test-new-blank-card-btn]');
+    await click('[data-test-library-new-blank-card-btn]');
     await setCardName(card1Name);
     let cardId = currentURL()
       .replace('/cards/', '')
-      .replace('/edit/fields', '');
+      .replace('/edit/fields/schema', '');
 
-    assert.ok(/^\/cards\/.*\/edit\/fields$/.test(currentURL()), 'URL is correct');
-    await click('[data-test-configure-schema-btn]');
-    await waitForSchemaViewToLoad();
+    assert.ok(/^\/cards\/.*\/edit\/fields\/schema$/.test(currentURL()), 'URL is correct');
 
-    assert.dom('.card-renderer-isolated--header').hasText('Millenial Puppies');
+    assert.dom('.card-renderer-isolated--header-title').hasText('Millenial Puppies');
 
     await addField('title', 'string-field', true);
     await addField('body', 'string-field', false);
@@ -142,14 +137,16 @@ module('Acceptance | card create', function(hooks) {
     await addField('reviewers', 'base', true);
 
     await showCardId(true);
-    assert.dom('.card-renderer-isolated--header').hasText('Millenial Puppies');
+    assert.dom('.card-renderer-isolated--header-title').hasText('Millenial Puppies');
     assert.dom('[data-test-internal-card-id]').hasText(decodeURIComponent(cardId));
 
     await click('[data-test-library-link]');
+    await click('[data-test-library-button]');
     await waitForEmbeddedCardLoad(decodeURIComponent(cardId));
     assert.equal(currentURL(), '/');
+
     assert.deepEqual(
-      [...document.querySelectorAll(`[data-test-recent-cards] [data-test-embedded-card]`)].map(i =>
+      [...document.querySelectorAll(`[data-test-library-recent-card-link] [data-test-embedded-card]`)].map(i =>
         i.getAttribute('data-test-embedded-card')
       ),
       [decodeURIComponent(cardId)]
@@ -160,9 +157,6 @@ module('Acceptance | card create', function(hooks) {
     await visit('/cards/add');
 
     await setCardName(card1Name);
-    await click('[data-test-configure-schema-btn]');
-    await waitForSchemaViewToLoad();
-
     await addField('title', 'string-field', true);
     await addField('body', 'string-field', false);
 
@@ -215,8 +209,6 @@ module('Acceptance | card create', function(hooks) {
     await visit('/cards/add');
 
     await setCardName(card1Name);
-    await click('[data-test-configure-schema-btn]');
-    await waitForSchemaViewToLoad();
     await addField('title', 'string-field', true);
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('title');
@@ -263,8 +255,6 @@ module('Acceptance | card create', function(hooks) {
     await visit('/cards/add');
 
     await setCardName(card1Name);
-    await click('[data-test-configure-schema-btn]');
-    await waitForSchemaViewToLoad();
     await addField('title', 'string-field', true);
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('title');
@@ -285,8 +275,6 @@ module('Acceptance | card create', function(hooks) {
     await visit('/cards/add');
 
     await setCardName(card1Name);
-    await click('[data-test-configure-schema-btn]');
-    await waitForSchemaViewToLoad();
     await addField('title', 'string-field', true);
 
     await removeField('title');
@@ -303,8 +291,6 @@ module('Acceptance | card create', function(hooks) {
     await visit('/cards/add');
 
     await setCardName(card1Name);
-    await click('[data-test-configure-schema-btn]');
-    await waitForSchemaViewToLoad();
     await addField('', 'string-field', true);
     assert.dom('[data-test-isolated-card] [data-test-field]').exists({ count: 1 });
 
@@ -325,9 +311,7 @@ module('Acceptance | card create', function(hooks) {
     await setCardName(card1Name);
     let card1Id = currentURL()
       .replace('/cards/', '')
-      .replace('/edit/fields', '');
-    await click('[data-test-configure-schema-btn]');
-    await waitForSchemaViewToLoad();
+      .replace('/edit/fields/schema', '');
     await addField('title', 'string-field', true);
     await addField('body', 'string-field', false, 1);
     await addField('author', 'string-field', false, 1);

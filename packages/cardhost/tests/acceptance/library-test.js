@@ -2,9 +2,15 @@ import { module, test } from 'qunit';
 import { click, visit, currentURL } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
-import { waitForEmbeddedCardLoad, waitForCardLoad, waitForTemplatesLoad } from '../helpers/card-ui-helpers';
+import {
+  waitForEmbeddedCardLoad,
+  waitForCardLoad,
+  waitForTemplatesLoad,
+  encodeColons,
+} from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
+import { animationsSettled } from 'ember-animated/test-support';
 import { cardDocument } from '@cardstack/core/card-document';
 import { myOrigin } from '@cardstack/core/origin';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
@@ -100,12 +106,12 @@ const scenario = new Fixtures({
   create: cards,
 });
 
-async function waitForCatalogLoad() {
+async function waitForLibraryLoad() {
   await Promise.all(cards.map(card => waitForEmbeddedCardLoad(card.canonicalURL)));
   await waitForTemplatesLoad();
 }
 
-module('Acceptance | catalog', function(hooks) {
+module('Acceptance | library', function(hooks) {
   setupApplicationTest(hooks);
   scenario.setupModule(hooks);
 
@@ -113,14 +119,20 @@ module('Acceptance | catalog', function(hooks) {
     await login();
   });
 
-  test(`viewing catalog`, async function(assert) {
+  test(`viewing library`, async function(assert) {
     await visit(`/`);
-    await waitForCatalogLoad();
+
+    assert.dom('[data-test-library-button]').exists();
+    assert.dom('[data-test-library-link]').doesNotExist();
+    await click('[data-test-library-button]');
+    await waitForLibraryLoad();
+
+    assert.dom('[data-test-library]').exists();
 
     assert.deepEqual(
-      [...document.querySelectorAll(`[data-test-recent-cards] > [data-test-card-renderer-embedded]`)].map(i =>
-        i.getAttribute('data-test-card-renderer-embedded')
-      ),
+      [
+        ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
+      ].map(i => i.getAttribute('data-test-card-renderer-embedded')),
       [
         entry2.canonicalURL,
         entry1.canonicalURL,
@@ -133,35 +145,50 @@ module('Acceptance | catalog', function(hooks) {
     );
 
     assert.deepEqual(
-      [...document.querySelectorAll(`[data-test-templates] [data-test-adopt-card-btn]`)].map(i =>
-        i.getAttribute('data-test-adopt-card-btn')
+      [...document.querySelectorAll(`[data-test-templates] [data-test-library-adopt-card-btn]`)].map(i =>
+        i.getAttribute('data-test-library-adopt-card-btn')
       ),
       [template2.canonicalURL, template1.canonicalURL]
     );
     await percySnapshot(assert);
   });
 
+  test('featured cards are displayed', async function() {
+    // TODO - use a card wrapper like we do for templates...
+  });
+
+  test(`closing library panel`, async function(assert) {
+    await visit(`/`);
+    await click('[data-test-library-button]');
+    await animationsSettled();
+
+    assert.dom('[data-test-library]').exists();
+    await click('[data-test-library-close-button]');
+    assert.dom('[data-test-library]').doesNotExist();
+  });
+
   test(`isolating a card`, async function(assert) {
     await visit(`/`);
-    await waitForCatalogLoad();
+    await click('[data-test-library-button]');
+    await waitForLibraryLoad();
 
-    await click(`[data-test-card-renderer-embedded="${card2.canonicalURL}"] a`);
+    await click(`[data-test-library-recent-card-link="${card2.canonicalURL}"]`);
     await waitForCardLoad();
-    assert.equal(
-      currentURL().replace(/:/g, encodeURIComponent(':')),
-      `/cards/${encodeURIComponent(card2.canonicalURL)}`
-    );
+    assert.equal(encodeColons(currentURL()), `/cards/${encodeURIComponent(card2.canonicalURL)}`);
 
     await percySnapshot(assert);
   });
 
-  test('can navigate to catalog via left edge', async function(assert) {
+  test('can navigate to index route via library link from other routes', async function(assert) {
     await visit(`/cards/${encodeURIComponent(card1.canonicalURL)}`);
     await waitForCardLoad();
 
+    assert.dom('[data-test-library-button]').doesNotExist();
+    assert.dom('[data-test-library-link]').exists();
     await click('[data-test-library-link]');
-    await waitForCatalogLoad();
-
     assert.equal(currentURL(), '/');
+
+    assert.dom('[data-test-library-button]').exists();
+    assert.dom('[data-test-library-link]').doesNotExist();
   });
 });

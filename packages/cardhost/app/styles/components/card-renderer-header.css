@@ -1,0 +1,107 @@
+.context-menu-button {
+  padding: 5px 7px;
+  border: solid 1px var(--ch-border);
+  border-radius: 20px;
+  background-color: transparent;
+  margin-left: 10px;
+  font-size: 0.8em;
+  cursor: pointer;
+}
+
+.context-menu-nav {
+  position: absolute;
+  z-index: var(--ch-actions-z-index);
+  background-color: var(--ch-light);
+  border-radius: 10px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+  top: 42px;
+  right: -130px;
+  width: 200px;
+  padding-bottom: 10px;
+}
+
+/* Whenever there's a fixed header, like in edit and schema, use alternate layout */
+
+.fields .context-menu-nav {
+  position: fixed;
+  top: auto;
+  margin-left: 405px;
+  margin-top: -13px;
+  right: auto;
+}
+
+.context-menu-sticky-wrapper {
+  position: sticky;
+  z-index: var(--ch-actions-z-index);
+  margin-left: 89%;
+  transition: margin var(--ch-transition-time);
+}
+
+.layout.themer-card-width--medium .context-menu-sticky-wrapper {
+  margin-left: 94%;
+}
+.layout.themer-card-width--large .context-menu-sticky-wrapper {
+  margin-left: 97%;
+}
+
+.layout .context-menu-nav,
+.schema .context-menu-nav {
+  right: auto;
+  position: fixed;
+  margin-top: 82px;
+}
+
+.context-menu-items {
+  padding-left: 0;
+  padding-top: 10px;
+  font-size: 0.8em;
+  color: var(--ch-dark);
+  margin: 0;
+}
+
+.context-menu-items li {
+  text-decoration: none;
+  list-style: none;
+  font-weight: normal;
+}
+
+.context-menu-items li a {
+  display: block;
+  width: 100%;
+  padding: 3px 40px;
+}
+
+.context-menu-items li.heading {
+  font-weight: 600;
+  margin-left: 0;
+  padding-left: 20px;
+}
+
+.context-menu-items li:hover {
+  background-color: var(--ch-light-background);
+}
+
+.context-menu-items hr {
+  border: solid 1px var(--ch-light-background);
+}
+
+.context-menu-items li.heading:hover,
+.context-menu-items li.divider:hover {
+  background-color: transparent;
+}
+
+/* Shows a checkmark next to the active route in the context menu.
+ * We can't use Ember's regular "active" classes because they apply
+ * to links to parent routes too.
+*/
+.context-menu-items li a.checked:before {
+  content: "";
+  display: block;
+  width: 12px;
+  height: 9px;
+  background-image: url("/assets/images/icons/checkmark-active.svg");
+  background-size: cover;
+  position: absolute;
+  margin-left: -20px;
+  margin-top: 5px;
+}

@@ -1,6 +1,7 @@
 import { module, test } from 'qunit';
 import { click, find, visit, currentURL, fillIn, triggerEvent, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
+import { percySnapshot } from 'ember-percy';
 import Fixtures from '../helpers/fixtures';
 import {
   showCardId,
@@ -13,6 +14,7 @@ import {
   waitForCardPatch,
   waitForCardLoad,
   selectField,
+  encodeColons,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { animationsSettled } from 'ember-animated/test-support';
@@ -84,14 +86,14 @@ module('Acceptance | card schema', function(hooks) {
     await triggerEvent('#card_name', 'keyup');
     await waitForCardPatch();
     assert.dom('#card_name').hasValue('New Card Name');
-    assert.dom('.card-renderer-isolated--header').hasText('New Card Name');
+    assert.dom('.card-renderer-isolated--header-title').hasText('New Card Name');
 
     await saveCard();
     await visit(`/cards/${cardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();
     await showCardId();
     assert.dom('#card_name').hasValue('New Card Name');
-    assert.dom('.card-renderer-isolated--header').hasText('New Card Name');
+    assert.dom('.card-renderer-isolated--header-title').hasText('New Card Name');
   });
 
   test(`can expand a right edge section`, async function(assert) {
@@ -110,7 +112,7 @@ module('Acceptance | card schema', function(hooks) {
     await waitForSchemaViewToLoad();
 
     await selectField('title');
-    assert.dom('.isolated-card [data-test-field="title"] [data-test-field-renderer-label]').hasText('title');
+    assert.dom('[data-test-isolated-card] [data-test-field="title"] [data-test-field-renderer-label]').hasText('title');
 
     await fillIn('[data-test-right-edge] [data-test-schema-attr="label"] input', 'TITLE');
     await triggerEvent('[data-test-right-edge] [data-test-schema-attr="label"] input', 'keyup');
@@ -123,15 +125,17 @@ module('Acceptance | card schema', function(hooks) {
     await visit(`/cards/${cardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();
 
-    assert.dom('.isolated-card [data-test-field="title"] [data-test-field-renderer-value]').hasText('test title');
-    assert.dom('.isolated-card [data-test-field="title"] [data-test-field-renderer-label]').hasText('TITLE');
+    assert
+      .dom('[data-test-isolated-card] [data-test-field="title"] [data-test-field-renderer-value]')
+      .hasText('test title');
+    assert.dom('[data-test-isolated-card] [data-test-field="title"] [data-test-field-renderer-label]').hasText('TITLE');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('title');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('TITLE');
 
     await visit(`/cards/${cardPath}/edit/fields`);
     await waitForCardLoad();
-    assert.dom('.isolated-card [data-test-field="title"] .cs-input').hasValue('test title');
-    assert.dom('.isolated-card [data-test-field="title"] .cs-input-group--label').hasText('TITLE');
+    assert.dom('[data-test-isolated-card] [data-test-field="title"] .cs-input').hasValue('test title');
+    assert.dom('[data-test-isolated-card] [data-test-field="title"] .cs-input-group--label').hasText('TITLE');
   });
 
   test(`adding a new field after removing one`, async function(assert) {
@@ -150,32 +154,42 @@ module('Acceptance | card schema', function(hooks) {
     await waitForSchemaViewToLoad();
 
     assert.deepEqual(
-      [...document.querySelectorAll(`.isolated-card [data-test-field]`)].map(i => i.getAttribute('data-test-field')),
+      [...document.querySelectorAll(`[data-test-isolated-card] [data-test-field]`)].map(i =>
+        i.getAttribute('data-test-field')
+      ),
       ['title', 'author', 'body']
     );
 
     await dragFieldToNewPosition(0, 1);
     assert.deepEqual(
-      [...document.querySelectorAll(`.isolated-card [data-test-field]`)].map(i => i.getAttribute('data-test-field')),
+      [...document.querySelectorAll(`[data-test-isolated-card] [data-test-field]`)].map(i =>
+        i.getAttribute('data-test-field')
+      ),
       ['author', 'title', 'body']
     );
 
     await dragFieldToNewPosition(1, 2);
     assert.deepEqual(
-      [...document.querySelectorAll(`.isolated-card [data-test-field]`)].map(i => i.getAttribute('data-test-field')),
+      [...document.querySelectorAll(`[data-test-isolated-card] [data-test-field]`)].map(i =>
+        i.getAttribute('data-test-field')
+      ),
       ['author', 'body', 'title']
     );
 
     await dragFieldToNewPosition(1, 0);
     assert.deepEqual(
-      [...document.querySelectorAll(`.isolated-card [data-test-field]`)].map(i => i.getAttribute('data-test-field')),
+      [...document.querySelectorAll(`[data-test-isolated-card] [data-test-field]`)].map(i =>
+        i.getAttribute('data-test-field')
+      ),
       ['body', 'author', 'title']
     );
 
     await saveCard();
 
     assert.deepEqual(
-      [...document.querySelectorAll(`.isolated-card [data-test-field]`)].map(i => i.getAttribute('data-test-field')),
+      [...document.querySelectorAll(`[data-test-isolated-card] [data-test-field]`)].map(i =>
+        i.getAttribute('data-test-field')
+      ),
       ['body', 'author', 'title']
     );
     let cardJson = find('[data-test-card-json]').innerHTML;
@@ -241,5 +255,41 @@ module('Acceptance | card schema', function(hooks) {
     await focus(`.card-renderer-isolated`);
     await waitFor(`[data-test-no-adoption]`, { timeout });
     assert.dom(`[data-test-right-edge] [data-test-no-adoption]`).hasText('No Adoption');
+  });
+
+  test(`can navigate from schema to edit via "return to editing" button`, async function(assert) {
+    await visit(`/cards/${cardPath}/edit/fields/schema`);
+    await waitForSchemaViewToLoad();
+
+    assert.dom('[data-test-return-to-editing]').hasText('Return to Editing');
+    await click('[data-test-return-to-editing]');
+    await waitForCardLoad();
+
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/fields`);
+  });
+
+  test(`displays the top edge`, async function(assert) {
+    await visit(`/cards/${cardPath}/edit/fields/schema`);
+    await waitForSchemaViewToLoad();
+
+    assert.dom('[data-test-cardhost-top-edge]').exists();
+    assert.dom('[data-test-mode-indicator]').exists();
+    assert.dom('[data-test-mode-indicator-label]').hasClass('schema');
+    assert.dom('[data-test-edge-actions-btn]').exists();
+    await percySnapshot(assert);
+  });
+
+  test(`can navigate to edit mode using the top edge`, async function(assert) {
+    await visit(`/cards/${cardPath}/edit/fields/schema`);
+    await waitForSchemaViewToLoad();
+
+    assert.dom('[data-test-mode-indicator-link="edit"]').exists();
+    assert.dom('[data-test-mode-indicator-label]').containsText('schema mode');
+
+    await click('[data-test-mode-indicator-link="edit"]');
+    await waitForCardLoad();
+
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/fields`);
+    assert.dom('[data-test-mode-indicator-label]').containsText('edit mode');
   });
 });

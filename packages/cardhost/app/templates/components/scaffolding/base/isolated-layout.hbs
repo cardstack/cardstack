@@ -4,10 +4,10 @@
   data-test-isolated-card-mode={{@mode}}
 >
   <AnimatedContainer class={{if (or (eq @mode "view") (eq @mode "layout")) "isolated-card--view-fields"}}>
-    {{#animated-each @fields use=this.transition duration=this.duration as |field index|}}
+    {{#animated-each @fields use=this.transition duration=this.duration as |field|}}
       <FieldRenderer
         @field={{field}}
-        @position={{index}}
+        @position={{field.position}}
         @mode={{@mode}}
         @dropField={{@dropField}}
         @removeField={{@removeField}}
@@ -21,6 +21,14 @@
         @selectedField={{@selectedField}}
         @selectedFieldName={{@selectedFieldName}}
       />
+      {{#if (and (eq @mode "schema") @dropField (not (eq field.csRealm "stub-card")))}}
+        <DropZone
+          @card={{@card}}
+          @dropField={{@dropField}}
+          @position={{inc field.position}}
+          @toggleStubField={{@toggleStubField}}
+        />
+      {{/if}}
     {{/animated-each}}
   </AnimatedContainer>
 

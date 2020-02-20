@@ -50,7 +50,7 @@
           class="schema-field-renderer--header"
           data-test-field-renderer-type
         >
-          {{if this.isStubField "New Field" this.fieldName}} ({{this.fieldType}})
+          {{if this.stubFieldName this.stubFieldName this.fieldName}} ({{this.fieldType}})
           {{#if @field.isAdopted}}
             <span class="schema-field-renderer--header--detail">Adopted</span>
           {{/if}}
@@ -163,6 +163,3 @@
     </div>
   {{/if}}
 </section>
-{{#if (and (eq @mode "schema") @dropField (not this.isStubField))}}
-  <DropZone @dropField={{@dropField}} @position={{inc @position}} @toggleStubField={{@toggleStubField}} />
-{{/if}}

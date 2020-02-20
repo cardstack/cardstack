@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { visit, currentURL, waitFor, click } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
-import { waitForCardLoad, waitForSchemaViewToLoad } from '../helpers/card-ui-helpers';
+import { waitForCardLoad, waitForSchemaViewToLoad, encodeColons } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { cardDocument } from '@cardstack/core/card-document';
@@ -37,14 +37,14 @@ module('Acceptance | logged-out', function(hooks) {
     await click('[data-test-toggle-left-edge]');
     await animationsSettled();
     assert.equal(currentURL(), `/cards/${cardPath}`);
-    assert.dom('[data-test-card-edit-link]').doesNotExist();
+    assert.dom('[data-test-card-header-button]').doesNotExist();
     await percySnapshot(assert);
 
     await click('[data-test-toggle-left-edge]');
     await click('[data-test-login-button]');
-    await waitFor('[data-test-card-edit-link]');
+    await waitFor('[data-test-card-header-button]');
     await animationsSettled();
-    assert.dom('[data-test-card-edit-link]').exists();
+    assert.dom('[data-test-card-header-button]').exists();
   });
 
   test('edit route redirects to view for unauthenticated users', async function(assert) {
@@ -56,11 +56,11 @@ module('Acceptance | logged-out', function(hooks) {
     await click('[data-test-toggle-left-edge]');
     await click('[data-test-logout-button]');
     await animationsSettled();
-    assert.equal(currentURL().replace(/:/g, encodeURIComponent(':')), `/cards/${cardPath}`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
 
     await visit(`/cards/${cardPath}/edit/fields`);
     await waitForCardLoad();
-    assert.equal(currentURL().replace(/:/g, encodeURIComponent(':')), `/cards/${cardPath}`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
   });
 
   test('schema route redirects to view for unauthenticated users', async function(assert) {
@@ -72,10 +72,10 @@ module('Acceptance | logged-out', function(hooks) {
     await click('[data-test-toggle-left-edge]');
     await click('[data-test-logout-button]');
     await animationsSettled();
-    assert.equal(currentURL().replace(/:/g, encodeURIComponent(':')), `/cards/${cardPath}`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
 
     await visit(`/cards/${cardPath}/edit/fields/schema`);
-    assert.equal(currentURL().replace(/:/g, encodeURIComponent(':')), `/cards/${cardPath}`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
   });
 
   test('layout route redirects to view for unauthenticated users', async function(assert) {
@@ -87,10 +87,10 @@ module('Acceptance | logged-out', function(hooks) {
     await click('[data-test-toggle-left-edge]');
     await click('[data-test-logout-button]');
     await animationsSettled();
-    assert.equal(currentURL().replace(/:/g, encodeURIComponent(':')), `/cards/${cardPath}`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
 
     await visit(`/cards/${cardPath}/edit/layout`);
-    assert.equal(currentURL().replace(/:/g, encodeURIComponent(':')), `/cards/${cardPath}`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
   });
 
   test('themer route redirects to view for unauthenticated users', async function(assert) {
@@ -103,6 +103,28 @@ module('Acceptance | logged-out', function(hooks) {
     await animationsSettled();
 
     await visit(`/cards/${cardPath}/edit/layout/themer`);
-    assert.equal(currentURL().replace(/:/g, encodeURIComponent(':')), `/cards/${cardPath}`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
+  });
+
+  test('viewing index page when logged out', async function(assert) {
+    await visit(`/`);
+    await click('[data-test-toggle-left-edge]');
+    await click('[data-test-logout-button]');
+
+    assert.equal(currentURL(), `/`);
+    assert.dom('[data-test-card-builder]').exists();
+    assert.dom('[data-test-featured-card]').exists({ count: 4 });
+    assert.dom('[data-test-cardhost-left-edge]').exists();
+    assert.dom('[data-test-library-button]').isDisabled();
+
+    await visit(`/cards/${cardPath}`);
+    await waitForCardLoad();
+    assert.equal(currentURL(), `/cards/${cardPath}`);
+    assert.dom('[data-test-library-button]').doesNotExist();
+    assert.dom('[data-test-library-link]').exists();
+
+    await click('[data-test-library-link]');
+    assert.equal(currentURL(), `/`);
+    assert.dom('[data-test-library-button]').isDisabled();
   });
 });

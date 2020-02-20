@@ -1,225 +1,125 @@
 /* TODO this needs to move into the photo card package now */
 
-@import url('https://fonts.googleapis.com/css?family=Rubik:400,700&display=swap');
-@import url('https://fonts.googleapis.com/css?family=Teko:700&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Teko:500&display=swap');
 
-.product-card-isolated {
-    background-color: #0069F9;
-    color: white;
-    font-family: 'Rubik', sans-serif;
-    font-size: 15px;
-    line-height: calc(23 / 15);
-    letter-spacing: 0.03em;
+.photo-card-isolated {
+    min-height: 812px;
+    background-color: black;
 }
 
-.product-card-isolated .isolated-card--view-fields {
+.photo-card-isolated .isolated-card--view-fields {
+    min-height: inherit;
     max-width: 800px;
     margin: 0 auto;
-    padding-top: 80px;
 }
 
-.product-card-isolated .field {
+.photo-card-isolated .photo-image-url-field {
+    z-index: 1;
+}
+
+.photo-card-isolated .field {
+    z-index: 2;
     display: block;
-    padding: 0;
-    text-align: center;
-    order: 5;
-}
-.product-card-isolated .product-image-field {
-    order: 1;
-}
-.product-card-isolated .product-name-field {
-    order: 2;
-}
-.product-card-isolated .product-company-field {
-    order: 3;
-}
-
-.product-card-isolated .title-field,
-.product-card-isolated .highlight-title-field,
-.product-card-isolated .divider-field,
-.product-card-isolated .product-company-logo-field,
-.product-card-isolated .product-description-field {
-    display: none;
-}
-.product-card-isolated .label {
-    display: none;
-}
-
-
-.product-card-isolated .title-logo-field {
-    position: absolute;
-    top: 17px;
-    left: 19.5px;
-}
-
-.product-card-isolated .product-ranking-field {
-    position: absolute;
-    display: inline-block;
-    top: 10px;
-    right: 27px;
-    width: auto;
-}
-.product-card-isolated .product-ranking-value::before {
-    content: '#';
-    font-size: 40px;
-    line-height: 2.5;
-    vertical-align: top;
-    margin-right: -25px;
-}
-.product-card-isolated .product-ranking-value {
-    font-family: 'Teko', sans-serif;
-    font-size: 185px;
-    line-height: 1;
-}
-
-.product-card-isolated .product-image-value {
-    width: 75%;
-    margin: 0 auto 38px;
-}
-.product-card-isolated .product-name-value {
-  padding-bottom: 6px;
-  font-size: 25px;
-  font-weight: bold;
-  letter-spacing: 0.03em;
-  line-height: 1.2;
-}
-.product-card-isolated .product-company-value::before {
-    display: inline-block;
-    content: 'by';
-    padding-bottom: 14px;
-}
-.product-card-isolated .product-link-field {
-    padding-top: 24px;
-    padding-bottom: 24px;
-    background-color: white;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-}
-.product-card-isolated .product-link-value::before {
-    content: '+';
-    display: inline-block;
-    margin-right: 5px;
-}
-.product-card-isolated .product-link-value {
+    font-family: 'Roboto';
     color: black;
-    font-weight: normal;
-    text-decoration: none;
-    letter-spacing: 0.03em;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.035em;
 }
 
-.product-card-isolated .product-cta-field {
-    padding-top: 4px;
-    padding-bottom: 30px;
-    background-color: white;
+.photo-card-isolated .label {
+    display: none;
 }
-.product-card-isolated .product-cta-value {
-    width: 80%;
-    min-height: 52px;
-    padding: 0;
-    border-radius: 100px;
-    background-color: black;
-    font-size: 19px;
-    letter-spacing: 0.1em;
-    line-height: calc(52 / 19);
+
+.photo-card-isolated .photo-description-field,
+.photo-card-isolated .photo-keywords-field {
+    display: none;
+}
+
+.photo-card-isolated .photo-image-url-value {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    min-width: 100%;
+    min-height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.photo-card-isolated .photo-caption-field {
+    max-width: 338px;
+    position: relative;
+    margin-left: 0;
+    top: 40%;
+}
+.photo-card-isolated .photo-caption-value {
+    display: inline;
+    background-color: #FF0000;
+    color: white;
+    font-family: 'Teko';
+    font-weight: 500;
+    font-size: 30px;
+    line-height: 45px;
+    letter-spacing: 0.015em;
     text-transform: uppercase;
 }
 
-/* Product Rating Stars */
-.product-card-isolated .product-rating-field {
-    width: 100px;
-    color: transparent;
-    padding-bottom: 25px;
+
+.photo-card-isolated .photo-location-field {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    max-width: 100%;
+    background-color: white;
+    padding: 26px 30px;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    box-shadow: 0 -3px 6px rgba(0,0,0,0.07);
 }
-.product-card-isolated .product-rating-value {
-    display: none;
-}
-.product-rating-value.integer-100,
-.product-rating-value.integer-90,
-.product-rating-value.integer-80,
-.product-rating-value.integer-70,
-.product-rating-value.integer-60,
-.product-rating-value.integer-50,
-.product-rating-value.integer-40,
-.product-rating-value.integer-30,
-.product-rating-value.integer-20,
-.product-rating-value.integer-10,
-.product-rating-value.integer-0 {
-    display: block;
+.photo-card-isolated .photo-location-value {
+    background-image: url('/assets/images/cards/photo-skiing/photo-location-icon.svg');
+    background-size: 16px 23px;
+    background-position: left bottom;
     background-repeat: no-repeat;
-    background-position: top center, 0% top, 25% top, center top, 75% top, 100% top;
-    background-size: 100px 14px, auto 14px, auto 14px, auto 14px, auto 14px, auto 14px;
+    padding-left: 27px;
+    line-height: 23px;
 }
-.product-rating-value.integer-100 {
-    background-image:
-    url('/assets/images/cards/coffee-bean/stars-empty.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg');
+
+.photo-card-isolated .photo-datetime-field {
+    width: auto;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 30px;
 }
-.product-rating-value.integer-90 {
-    background-image:
-    url('/assets/images/cards/coffee-bean/stars-empty.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_half.svg');
+
+.photo-card-isolated .photo-byline-field {
+  position: absolute;
+  top: 22px;
+  left: 0;
 }
-.product-rating-value.integer-80 {
-    background-image:
-    url('/assets/images/cards/coffee-bean/stars-empty.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg');
+
+.photo-card-isolated .byline-card-embedded {
+  width: 150px;
 }
-.product-rating-value.integer-70 {
-    background-image:
-    url('/assets/images/cards/coffee-bean/stars-empty.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_half.svg');
+
+.photo-card-isolated .byline-card-embedded .embedded-card--view-fields {
+  display: grid;
+  grid-template: 'image name';
+  align-items: center;
 }
-.product-rating-value.integer-60 {
-    background-image:
-    url('/assets/images/cards/coffee-bean/stars-empty.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg');
+
+.photo-card-isolated .byline-card-embedded .byline-image-field {
+  grid-area: image;
+  width: 40px;
 }
-.product-rating-value.integer-50 {
-    background-image:
-    url('/assets/images/cards/coffee-bean/stars-empty.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_half.svg');
+.photo-card-isolated .byline-card-embedded .byline-name-field {
+  grid-area: name;
+  color: white;
 }
-.product-rating-value.integer-40 {
-    background-image:
-    url('/assets/images/cards/coffee-bean/stars-empty.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg');
-}
-.product-rating-value.integer-30 {
-    background-image:
-    url('/assets/images/cards/coffee-bean/stars-empty.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_half.svg');
-}
-.product-rating-value.integer-20 {
-    background-image:
-    url('/assets/images/cards/coffee-bean/stars-empty.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_filled.svg');
-}
-.product-rating-value.integer-10 {
-    background-image:
-    url('/assets/images/cards/coffee-bean/stars-empty.svg'),
-    url('/assets/images/cards/coffee-bean/icon_star_half.svg');
-}
-.product-rating-value.integer-0 {
-    background-image:
-    url('/assets/images/cards/coffee-bean/stars-empty.svg');
+.photo-card-isolated .byline-card-embedded .field {
+  padding: 0;
+  margin: 0;
 }

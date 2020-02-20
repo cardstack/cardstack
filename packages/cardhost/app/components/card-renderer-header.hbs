@@ -1,0 +1,55 @@
+<div class="card-renderer-isolated--header--wrapper {{if @cardSelected "selected"}}" {{did-update this.resetMenu @cardSelected}}>
+  <header class="card-renderer-isolated--header">
+    <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.csTitle "Blank Card"}}</span>
+    {{#if this.cardstackSession.isAuthenticated}}
+      <div>
+        <LinkTo
+          @route={{@buttonRoute}}
+          @model={{@card.canonicalURL}}
+          @class="card-renderer--header-link"
+          data-test-card-header-button
+        >
+          {{@buttonText}}
+        </LinkTo>
+        <button {{on "click" this.toggleMenu}} class="context-menu-button" data-test-context-menu-button
+          aria-label="Open card mode options menu" aria-expanded={{@contextMenuOpen}}>
+          {{svg-jar "three-dots" width="12px" height="7px" aria-hidden=true}}
+        </button>
+      </div>
+    {{/if}}
+  </header>
+</div>
+
+{{!-- This is outside of the header div so that it can have a higher z-index than the header --}}
+{{#if this.showMenu}}
+  <div class={{if (or (eq @mode "schema") (eq @mode "layout")) "context-menu-sticky-wrapper"}}>
+    <nav class="context-menu-nav" role="navigation" aria-labelledby="switch-mode">
+      <ul class="context-menu-items" data-test-context-menu-items>
+        <li id="switch-mode" class="heading">Switch mode</li>
+        <li>
+          <LinkTo @route="cards.card.view" @model={{@card.canonicalURL}} @class={{if (eq @mode "view") "checked"}} data-test-context-view>View</LinkTo>
+        </li>
+        <li>
+          <LinkTo @route="cards.card.edit.fields" @model={{@card.canonicalURL}} @class={{if (eq @mode "edit") "checked"}} data-test-context-edit>Edit</LinkTo>
+        </li>
+        <li>
+          <LinkTo @route="cards.card.edit.fields.schema" @model={{@card.canonicalURL}} @class={{if (eq @mode "schema") "checked"}} data-test-context-schema>Schema</LinkTo>
+        </li>
+        <li>
+          <LinkTo @route="cards.card.edit.layout" @model={{@card.canonicalURL}} @class={{if (eq @mode "layout") "checked"}} data-test-context-layout>Layout</LinkTo>
+        </li>
+
+        {{!-- TODO implement functionality for these items and uncomment them --}}
+        {{!-- <li class="divider">
+          <hr>
+        </li>
+        <li class="heading">Actions</li>
+        <li>Share</li>
+        <li>Save</li>
+        <li>Archive</li>
+        <li>Copy</li>
+        <li>Delete</li> --}}
+      </ul>
+    </nav>
+  </div>
+{{/if}}

@@ -7,16 +7,7 @@ module('Integration | Component | cardhost-top-edge', function(hooks) {
   setupRenderingTest(hooks);
 
   test('it renders', async function(assert) {
-    // Set any properties with this.set('myProperty', 'value');
-    // Handle any actions with this.set('myAction', function(val) { ... });
-
-    // Template block usage:
-    await render(hbs`
-      <CardhostTopEdge>
-        template block text
-      </CardhostTopEdge>
-    `);
-
-    assert.ok(this.element.textContent.trim().includes('template block text'));
+    await render(hbs`<CardhostTopEdge />`);
+    assert.dom('[data-test-cardhost-top-edge]').exists();
   });
 });

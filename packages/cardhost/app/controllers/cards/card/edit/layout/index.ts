@@ -22,13 +22,17 @@ export default class CardLayoutIndexController extends EditCardController {
   @tracked
   themerOptions: ThemeOption[] = [{ name: 'Template theme' }, { name: 'Custom theme' }];
 
+  get isDefault(): boolean {
+    return !this.model.card.csFiles?.[isolatedCssFile];
+  }
+
   @action
   createTheme() {
     this.router.transitionTo('cards.card.edit.layout.themer', this.model);
   }
 
   get selectedTheme(): ThemeOption {
-    let name = this.model.card.csFiles?.[isolatedCssFile] ? 'Custom theme' : 'Template theme';
+    let name = this.isDefault ? 'Template theme' : 'Custom theme';
     return { name };
   }
 

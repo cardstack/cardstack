@@ -3,6 +3,7 @@ import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { task } from 'ember-concurrency';
 import kebabCase from 'lodash/kebabCase';
+import { inject as service } from '@ember/service';
 
 const defaultSchemaAttrs = Object.freeze(['title', 'type', 'name', 'instructions', 'embedded']);
 const fieldNameRegex = Object.freeze(/^[a-zA-Z][\w-]*$/);
@@ -17,6 +18,8 @@ export default class FieldRenderer extends Component {
   @tracked fieldType;
   @tracked fieldTypeId;
   @tracked neededWhenEmbedded;
+
+  @service draggable;
 
   constructor(...args) {
     super(...args);
@@ -35,16 +38,12 @@ export default class FieldRenderer extends Component {
   }
 
   @task(function*() {
-    if (this.isStubField) {
-      this.fieldType = 'New Field';
-    } else {
-      if (this.args.field.enclosingCard) {
-        this.fieldValue = yield this.args.field.enclosingCard.value(this.args.field.name);
-      }
-      let fieldTypeCard = yield this.args.field.adoptsFrom();
-      this.fieldType = fieldTypeCard.csTitle;
-      this.fieldTypeId = fieldTypeCard.canonicalURL;
+    if (this.args.field.enclosingCard) {
+      this.fieldValue = yield this.args.field.enclosingCard.value(this.args.field.name);
     }
+    let fieldTypeCard = yield this.args.field.adoptsFrom();
+    this.fieldType = fieldTypeCard.csTitle;
+    this.fieldTypeId = fieldTypeCard.canonicalURL;
   })
   loadField;
 
@@ -88,6 +87,13 @@ export default class FieldRenderer extends Component {
     return this.args.field.csRealm === 'stub-card';
   }
 
+  get stubFieldName() {
+    if (!this.isStubField) {
+      return null;
+    }
+
+    return this.args.field.csDescription || this.args.field.csTitle;
+  }
   get fieldName() {
     return this.newFieldName || this.args.field.name;
   }
@@ -122,15 +128,12 @@ export default class FieldRenderer extends Component {
     this.isDragging = null;
   }
 
-  @action startDragging(field, evt) {
-    evt.dataTransfer.setData('text', evt.target.id);
-    evt.dataTransfer.setData('text/field-name', field.name);
-    evt.dataTransfer.setData('text/field-label', field.csTitle);
-    evt.dataTransfer.setData('text/field-type', field.adoptsFromURL);
-    evt.dataTransfer.setData('text/start-position', this.args.position);
+  @action startDragging(field) {
+    this.draggable.setField(field, this.args.position);
   }
 
   @action finishDragging(evt) {
+    this.draggable.clearField();
     evt.target.setAttribute('draggable', 'false');
   }
 }

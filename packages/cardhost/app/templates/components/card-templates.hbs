@@ -1,15 +1,15 @@
-
-<div class="card-catalog"
+<div class="library-section--grid"
   data-test-templates
   data-test-templates-loaded={{stringify this.loadTemplates.isIdle}}
 >
   {{#each this.templates as |card|}}
     <Cta {{on "click" (fn @openCardNameDialog "Adopt a Card" card)}}
-      @class="card-catalog--embedded-card-link"
+      @class="library--card-link"
       data-test-embedded-card={{card.name}}
-      data-test-adopt-card-btn={{card.canonicalURL}}
+      data-test-library-adopt-card-btn={{card.canonicalURL}}
     >
       <CardRenderer
+        @class="library--card-renderer"
         @card={{card}}
         @format="embedded"
         @preventIsolation={{true}}

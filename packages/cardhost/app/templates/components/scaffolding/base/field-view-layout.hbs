@@ -1,10 +1,8 @@
-{{#unless this.load.isRunning}}
-  <div class="label {{@card.name}}-label" data-test-belongs-to-field-viewer-label>
-    {{@card.csTitle}}
-  </div>
-  <div class="value {{@card.name}}-value" data-test-belongs-to-field-viewer-value>
-    {{#if this.fieldValue}}
-      <CardRenderer @card={{this.fieldValue}} @format="embedded"/>
-    {{/if}}
-  </div>
-{{/unless}}
+<div class="label {{@card.name}}-label" data-test-belongs-to-field-viewer-label>
+  {{@card.csTitle}}
+</div>
+<div class="value {{@card.name}}-value" data-test-belongs-to-field-viewer-value>
+  {{#if this.fieldValue}}
+    <CardRenderer @card={{this.fieldValue}} @format="embedded"/>
+  {{/if}}
+</div>

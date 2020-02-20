@@ -1,38 +1,12 @@
 <div class="
   cardhost-cards
+  {{if this.draggable.isDragging "dragging"}}
   {{this.routeInfo.mode}}
   {{if (or (eq this.routeInfo.mode "add") (eq this.routeInfo.mode "adopt")) "schema"}}
   {{if (or (eq this.routeInfo.mode "layout") (eq this.routeInfo.mode "fields")) "edit"}}
   {{if this.cardstackSession.isAuthenticated "logged-in" "logged-out"}}
   {{this.themerClasses}}"
-  data-test-cardhost-cards>
-  {{#if (and (not-eq this.routeInfo.mode "view") (not-eq this.routeInfo.mode "themer"))}}
-    <CardhostTopEdge @mode={{this.routeInfo.mode}}>
-      {{#if (or (eq this.routeInfo.mode "layout") (eq this.routeInfo.mode "fields"))}}
-        {{#let this.target.currentRoute.parent.attributes as |model|}}
-          <div class="view-selector">
-            <LinkTo
-              @route="cards.card.edit.layout"
-              @class="view-selector--mode-link"
-              @model={{model}}
-              data-test-view-selector="layout"
-            >
-              {{svg-jar "layout" width="18px" height="17px"}}
-              Layout
-            </LinkTo>
-            <LinkTo
-              @route="cards.card.edit.fields"
-              @class="view-selector--mode-link"
-              @model={{model}}
-              data-test-view-selector="fields"
-            >
-              {{svg-jar "form" width="18px" height="17px"}}
-              Field
-            </LinkTo>
-          </div>
-        {{/let}}
-      {{/if}}
-    </CardhostTopEdge>
-  {{/if}}
+  data-test-cardhost-cards
+>
   {{outlet}}
 </div>

@@ -5,27 +5,56 @@ import { tracked } from '@glimmer/tracking';
 import { task } from 'ember-concurrency';
 import { cardDocument } from '@cardstack/core/card-document';
 
+let nonce = 0;
 export default class DropZone extends Component {
   @service data;
+  @service draggable;
   @tracked dropZoneStatus = 'outside';
+  @tracked nonce = nonce++;
 
   get isOverDropZone() {
     return this.dropZoneStatus === 'dragging';
   }
 
   @(task(function*() {
-    let field = yield this.data.create(
-      'stub-card',
-      // TODO we should really have this field adopt from the field being
-      // dragged too so that we can show the card type in the stub field
-      cardDocument().withAttributes({ csTitle: 'New Field' }).jsonapi
-    );
-    this.args.toggleStubField(field, this.args.position, this.isOverDropZone);
-  }).drop())
+    if (!this.isOverDropZone) {
+      this.args.toggleStubField(this.nonce);
+    } else {
+      let field = this.draggable.getField();
+      let csAdoptsFrom;
+      let csTitle;
+      let csId;
+      let csDescription;
+
+      if (field.enclosingCard) {
+        csAdoptsFrom = field.adoptsFromId;
+        csTitle = field.name;
+        csDescription = field.csTitle;
+      } else {
+        csAdoptsFrom = field;
+        csTitle = 'New Field';
+      }
+
+      let dropShadowField = yield this.data.create(
+        'stub-card',
+        cardDocument()
+          .withAttributes({ csId, csTitle, csDescription })
+          .adoptingFrom(csAdoptsFrom).jsonapi
+      );
+      dropShadowField.dropZoneNonce = this.nonce;
+      this.args.toggleStubField(this.nonce, this.args.position, dropShadowField);
+    }
+  }).restartable())
   createStubFieldCard;
 
   @action
   updateStatus(status) {
+    let draggedField = this.draggable.getField();
+
+    if (!draggedField) {
+      return;
+    }
+
     this.dropZoneStatus = status;
 
     if (this.args.toggleStubField) {

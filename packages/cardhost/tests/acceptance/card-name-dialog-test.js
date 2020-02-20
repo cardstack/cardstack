@@ -47,9 +47,10 @@ module('Acceptance | card name dialog', function(hooks) {
 
   test('can create a card that uses a template from the catalog', async function(assert) {
     await visit('/');
+    await click('[data-test-library-button]');
     await waitForTemplatesLoad();
 
-    await click('[data-test-adopt-card-btn]');
+    await click('[data-test-library-adopt-card-btn]');
     await percySnapshot([assert.test.module.name, assert.test.testName, 'adopt dialog'].join(' | '));
     assert.dom('[data-test-dialog-box]').exists();
     assert.dom('[data-test-dialog-box] .dialog--title').hasTextContaining('Adopt a Card');
@@ -66,9 +67,10 @@ module('Acceptance | card name dialog', function(hooks) {
 
   test('can create a new card that does not leverage a template from the catalog', async function(assert) {
     await visit('/');
+    await click('[data-test-library-button]');
     await waitForTemplatesLoad();
 
-    await click('[data-test-new-blank-card-btn]');
+    await click('[data-test-library-new-blank-card-btn]');
     assert.dom('[data-test-dialog-box] .dialog--title').hasTextContaining('Create a New Card');
     await percySnapshot([assert.test.module.name, assert.test.testName, 'new card dialog'].join(' | '));
     await setCardName(cardName);
@@ -83,9 +85,10 @@ module('Acceptance | card name dialog', function(hooks) {
 
   test('can cancel creation of a card by clicking outside the dialog', async function(assert) {
     await visit('/');
+    await click('[data-test-library-button]');
     await waitForTemplatesLoad();
 
-    await click('[data-test-adopt-card-btn]');
+    await click('[data-test-library-adopt-card-btn]');
     await click('[data-test-cardhost-modal-container]'); // close dialog by clicking modal container
     assert.dom('[data-test-dialog-box]').doesNotExist();
     assert.equal(currentURL(), '/');
@@ -93,9 +96,10 @@ module('Acceptance | card name dialog', function(hooks) {
 
   test('can cancel creation of a card by clicking the cancel button', async function(assert) {
     await visit('/');
+    await click('[data-test-library-button]');
     await waitForTemplatesLoad();
 
-    await click('[data-test-adopt-card-btn]');
+    await click('[data-test-library-adopt-card-btn]');
     await click('[data-test-cancel-create-btn]'); // close dialog by clicking cancel button
     assert.dom('[data-test-dialog-box]').doesNotExist();
     assert.equal(currentURL(), '/');

@@ -8,6 +8,7 @@ import {
   saveCard,
   waitForCardPatch,
   waitForCssLoad,
+  encodeColons,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -40,7 +41,7 @@ const waitForAnimation = function(cb) {
     setTimeout(() => {
       cb();
       resolve('done');
-    }, 1000);
+    }, 2000);
   });
 };
 
@@ -78,15 +79,15 @@ module('Acceptance | css editing', function(hooks) {
     await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
 
-    await click('[data-test-card-edit-link]');
+    await click('[data-test-card-header-button]');
     await waitForCardLoad();
 
-    assert.equal(currentURL().replace(/:/g, encodeURIComponent(':')), `/cards/${cardPath}/edit/fields`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/fields`);
 
     await click('[data-test-view-selector="layout"]');
     await waitForCardLoad();
 
-    assert.equal(currentURL().replace(/:/g, encodeURIComponent(':')), `/cards/${cardPath}/edit/layout`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/layout`);
     assert.dom(`[data-test-card-view="${testCard.canonicalURL}"]`).exists();
     assert.dom('[data-test-card-renderer-isolated]').hasClass('selected');
 
@@ -94,7 +95,6 @@ module('Acceptance | css editing', function(hooks) {
     await waitForThemerLoad();
 
     assert.dom('[data-test-editor-pane]').exists();
-    assert.dom('[data-test-card-renderer-isolated]').doesNotHaveClass('selected');
   });
 
   test('closing the editor', async function(assert) {
@@ -104,17 +104,13 @@ module('Acceptance | css editing', function(hooks) {
     await click('[data-test-card-custom-style-button]');
     await waitForThemerLoad();
 
-    assert.dom('[data-test-close-editor]').exists();
-    assert.dom('[data-test-card-renderer-isolated]').doesNotHaveClass('selected');
+    assert.dom('[data-test-mode-indicator-link="layout"]').exists();
+    await click('[data-test-mode-indicator-link="layout"]');
+    await waitForCardLoad();
 
-    await click('[data-test-close-editor]');
-
-    assert.equal(currentURL().replace(/:/g, encodeURIComponent(':')), `/cards/${cardPath}/edit/layout`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/layout`);
     assert.dom('[data-test-editor-pane]').doesNotExist();
     assert.dom('[data-test-card-custom-style-button]').exists();
-
-    // Hassan: I'm unsure what impact this actually has, but this class is not actually set here...
-    // assert.dom('[data-test-card-renderer-isolated]').hasClass('selected');
   });
 
   test('hiding the editor', async function(assert) {
@@ -151,26 +147,92 @@ module('Acceptance | css editing', function(hooks) {
     assert.dom('[data-test-dock-location="right"]');
   });
 
-  test('toggling card width', async function(assert) {
+  test('themer mode: toggling card width', async function(assert) {
     await visit(`/cards/${cardPath}/edit/layout`);
     await waitForCardLoad();
 
     await click('[data-test-card-custom-style-button]');
     await waitForThemerLoad();
+    await click('[data-test-dock-bottom]'); // dock to bottom so we can see better in Percy Screnshots
 
     // make sure initial state is correct
-    assert.dom('[data-test-responsive-btn]').exists();
-    assert.dom('[data-test-responsive-btn]').hasClass('selected');
-    assert.dom('[data-test-full-width-btn]').exists();
-    assert.dom('[data-test-full-width-btn]').doesNotHaveClass('selected');
-    assert.dom('[data-test-cardhost-cards]').hasClass('responsive');
+    assert.dom('[data-test-small-btn]').exists();
+    assert.dom('[data-test-small-btn]').hasClass('selected');
+    assert.dom('[data-test-medium-btn]').exists();
+    assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-large-btn]').exists();
+    assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--small');
+    await waitForAnimation(() => percySnapshot(assert));
 
     // toggle to full width
-    await click('[data-test-full-width-btn]');
-    assert.dom('[data-test-full-width-btn]').hasClass('selected');
-    assert.dom('[data-test-cardhost-cards]').hasClass('full-width');
-
+    await click('[data-test-medium-btn]');
+    assert.dom('[data-test-medium-btn]').hasClass('selected');
+    assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--medium');
+    assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
     await waitForAnimation(() => percySnapshot(assert));
+
+    await click('[data-test-large-btn]');
+    assert.dom('[data-test-large-btn]').hasClass('selected');
+    assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--large');
+    assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
+    await waitForAnimation(() => percySnapshot(assert));
+  });
+
+  test('layout mode: toggling card width', async function(assert) {
+    await visit(`/cards/${cardPath}/edit/layout`);
+    await waitForCardLoad();
+
+    assert.dom('[data-test-small-btn]').exists();
+    assert.dom('[data-test-small-btn]').hasClass('selected');
+    assert.dom('[data-test-medium-btn]').exists();
+    assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-large-btn]').exists();
+    assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--small');
+    await waitForAnimation(() => percySnapshot(assert));
+
+    // toggle to full width
+    await click('[data-test-medium-btn]');
+    assert.dom('[data-test-medium-btn]').hasClass('selected');
+    assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--medium');
+    assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
+    await waitForAnimation(() => percySnapshot(assert));
+
+    await click('[data-test-large-btn]');
+    assert.dom('[data-test-large-btn]').hasClass('selected');
+    assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--large');
+    assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
+    await waitForAnimation(() => percySnapshot(assert));
+  });
+
+  test('changing card size should change card size in both themer and layout modes', async function(assert) {
+    await visit(`/cards/${cardPath}/edit/layout`);
+    await waitForCardLoad();
+
+    await click('[data-test-medium-btn]');
+    assert.dom('[data-test-medium-btn]').hasClass('selected');
+
+    await click('[data-test-card-custom-style-button]');
+    await waitForThemerLoad();
+
+    assert.dom('[data-test-medium-btn]').hasClass('selected');
+    assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
+
+    await click('[data-test-large-btn]');
+    assert.dom('[data-test-large-btn]').hasClass('selected');
+    assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
+
+    await click('[data-test-mode-indicator-link="layout"]');
+    await waitForCardLoad();
+
+    assert.dom('[data-test-large-btn]').hasClass('selected');
+    assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
   });
 
   test('can save CSS edits', async function(assert) {
@@ -207,7 +269,7 @@ module('Acceptance | css editing', function(hooks) {
 
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
     await waitForCardPatch();
-    await click('[data-test-close-editor]');
+    await click('[data-test-mode-indicator-link="layout"]');
 
     await waitFor('[data-test-cs-component="dropdown"]');
     assert.dom('[data-test-cs-component="dropdown"]').exists();
@@ -223,7 +285,7 @@ module('Acceptance | css editing', function(hooks) {
 
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
     await waitForCardPatch();
-    await click('[data-test-close-editor]');
+    await click('[data-test-mode-indicator-link="layout"]');
     await saveCard();
 
     await waitFor('[data-test-cs-component="dropdown"]');
@@ -233,5 +295,27 @@ module('Acceptance | css editing', function(hooks) {
 
     assert.dom('[data-test-cs-component="dropdown"]').doesNotContainText('Custom');
     assert.dom('[data-test-view-css]').doesNotContainText('gorgeous styles');
+  });
+
+  test('buttons and dropdowns reflect custom style state', async function(assert) {
+    await visit(`/cards/${cardPath}/edit/layout`);
+    await waitForCardLoad();
+
+    assert.dom('[data-test-card-custom-style-button]').includesText('New Custom Theme');
+    assert.dom('[data-test-style-dropdown]').includesText('Template theme');
+    assert.dom('[data-test-style-dropdown]').doesNotIncludeText('Custom');
+
+    await click('[data-test-card-custom-style-button]');
+    await waitForThemerLoad();
+
+    await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
+    await waitForCardPatch();
+    await click('[data-test-mode-indicator-link="layout"]');
+    await saveCard();
+
+    await waitFor('[data-test-cs-component="dropdown"]');
+    assert.dom('[data-test-card-custom-style-button]').includesText('Edit Custom Theme');
+    assert.dom('[data-test-style-dropdown]').includesText('Custom');
+    assert.dom('[data-test-style-dropdown]').doesNotIncludeText('Template theme');
   });
 });

@@ -38,7 +38,7 @@ export default class ViewSwitcher extends Component {
     this.selected = view;
 
     if (this.args.card) {
-      this.router.transitionTo(`cards.card.${view.id}`, this.args.card);
+      this.router.transitionTo(`cards.card.${view.id}`, this.args.card.canonicalURL);
     }
   }
 }

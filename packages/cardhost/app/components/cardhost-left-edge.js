@@ -3,9 +3,10 @@ import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 
-export default class CardhostTopEdgeComponent extends Component {
+export default class CardhostLeftEdgeComponent extends Component {
   @service cardstackSession;
   @tracked isExpanded = false;
+  @tracked isLibraryOpen = false;
 
   @action
   toggleMenuExpand() {
@@ -17,6 +18,8 @@ export default class CardhostTopEdgeComponent extends Component {
   @action
   logout(sessionLogout) {
     sessionLogout.bind(this.cardstackSession)();
+    this.hideLibrary();
+
     let cardId;
     let route = this.router.currentRoute;
     while (route) {
@@ -69,5 +72,15 @@ export default class CardhostTopEdgeComponent extends Component {
   destroyCloseListener() {
     document.querySelector('body').removeEventListener('click', this.closeListener);
     document.querySelector('body').removeEventListener('focusin', this.closeListener);
+  }
+
+  @action
+  showLibrary() {
+    this.isLibraryOpen = true;
+  }
+
+  @action
+  hideLibrary() {
+    this.isLibraryOpen = false;
   }
 }

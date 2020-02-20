@@ -1,4 +1,10 @@
-<Dialog open={{true}} @title={{this.title}} @mode={{@mode}} @icon={{@icon}}>
+<Dialog
+  open={{true}}
+  @title={{this.title}}
+  @mode={{@mode}}
+  @icon={{@icon}}
+  data-test-card-name-dialog-is-adopted-card={{if this.args.adoptsFrom "true" "false"}}
+>
   <TextField
     @id="card__name"
     @label="Give your card a name"

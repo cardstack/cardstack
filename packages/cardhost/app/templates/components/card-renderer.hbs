@@ -3,8 +3,8 @@
     <section
       class="card-renderer-isolated
         {{this.mode}}
-        {{if @cardSelected "selected"}}
-        {{if this.fields.length "has-fields" "no-fields"}}
+        {{if (and this.cardstackSession.isAuthenticated @cardSelected) "selected"}}
+        {{concat "field-count-" this.fields.length}}
         {{@class}}
       "
       tabindex="0"
@@ -16,78 +16,69 @@
     >
       {{#if (eq @mode "view")}}
         {{#animated-value @card watch="isSelected" use=this.headerAnimation}}
-          <div class="card-renderer-isolated--header--wrapper {{if @cardSelected "selected"}}">
-            <header class="card-renderer-isolated--header">
-              <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.csTitle "Blank Card"}}</span>
-              {{#if this.cardstackSession.isAuthenticated}}
-                <LinkTo
-                  @route="cards.card.edit.fields"
-                  @model={{@card.canonicalURL}}
-                  @class="card-renderer--header-link"
-                  data-test-card-edit-link
-                >
-                  Edit
-                </LinkTo>
-              {{/if}}
-            </header>
-          </div>
+          <CardRendererHeader
+            @cardSelected={{if (and this.cardstackSession.isAuthenticated @cardSelected) true}}
+            @card={{@card}}
+            @buttonRoute="cards.card.edit.fields"
+            @buttonText="Edit"
+            @mode={{this.mode}}
+            @contextMenuOpen={{@contextMenuOpen}}
+            @setContextMenu={{@setContextMenu}}
+          />
         {{/animated-value}}
       {{else}}
-        <div class="card-renderer-isolated--header--wrapper">
-          <header class="card-renderer-isolated--header">
-            <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.csTitle "Blank Card"}}</span>
-            {{#if (eq @mode "edit")}}
-              <LinkTo
-                @route="cards.card.view"
-                @model={{@card.canonicalURL}}
-                @class="card-renderer--header-link"
-                data-test-card-done-link
-              >
-                Done
-              </LinkTo>
-            {{/if}}
-          </header>
-        </div>
+        <CardRendererHeader
+          @cardSelected={{true}}
+          @card={{@card}}
+          @buttonRoute="cards.card.view"
+          @buttonText="Done Editing"
+          @mode={{this.mode}}
+          @contextMenuOpen={{@contextMenuOpen}}
+          @setContextMenu={{@setContextMenu}}
+        />
       {{/if}}
       {{!-- This is the card boundary, please don't set any card specific classes any higher in the DOM than this. --}}
       {{!-- If we need card specific styling above this level, then let's chat about it.                           --}}
       <div class="card-renderer-isolated--content
         {{concat (safe-css-string (if @card.canonicalURL @card.canonicalURL @card.adoptsFromURL)) "--isolated" }}
       ">
-        <AnimatedContainer>
-          {{#animated-value @card watch="isSelected" use=this.borderAnimation}}
-            <div class="card-renderer-isolated--card-container {{if @cardSelected "selected"}}">
-              {{#if (and @dropField ) }}
-                <DropZone
-                  @dropField={{@dropField}}
-                  @position={{0}}
-                  @toggleStubField={{this.toggleStubField}}
-                />
-              {{/if}}
-              <Scaffold
+        {{#animated-value @card watch="isSelected" use=this.borderAnimation}}
+          <div class="card-renderer-isolated--card-container {{if (and this.cardstackSession.isAuthenticated @card.isSelected) "selected"}}">
+            {{#if @dropField}}
+              <DropZone
                 @card={{@card}}
-                @feature="isolated-layout"
-                @fields={{this.fields}}
-                @mode={{this.mode}}
-                @setFieldName={{@setFieldName}}
-                @setCardValue={{@setCardValue}}
-                @setCardReference={{@setCardReference}}
-                @removeField={{@removeField}}
+                @dropField={{@dropField}}
+                @position={{0}}
                 @toggleStubField={{this.toggleStubField}}
-                @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
-                @setPosition={{@setPosition}}
-                @selectField={{@selectField}}
-                @selectedField={{@selectedField}}
-                @selectedFieldName={{@selectedFieldName}}
-                @dropField={{@dropField}} />
-            </div>
-          {{/animated-value}}
-        </AnimatedContainer>
+              />
+            {{/if}}
+            <Scaffold
+              @card={{@card}}
+              @feature="isolated-layout"
+              @fields={{this.fields}}
+              @mode={{this.mode}}
+              @setFieldName={{@setFieldName}}
+              @setCardValue={{@setCardValue}}
+              @setCardReference={{@setCardReference}}
+              @removeField={{@removeField}}
+              @toggleStubField={{this.toggleStubField}}
+              @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+              @setPosition={{@setPosition}}
+              @selectField={{@selectField}}
+              @selectedField={{@selectedField}}
+              @selectedFieldName={{@selectedFieldName}}
+              @dropField={{@dropField}}
+            />
+          </div>
+        {{/animated-value}}
       </div>
     </section>
   {{else if (eq @format "embedded")}}
-    <div class="card-renderer-embedded
-        {{concat (safe-css-string (if @card.canonicalURL @card.canonicalURL @card.adoptsFromURL)) "--embedded" }}"
+    <div
+      class="card-renderer-embedded
+        {{concat (safe-css-string (if @card.canonicalURL @card.canonicalURL @card.adoptsFromURL)) "--embedded" }}
+        {{@class}}
+      "
       data-test-card-renderer-embedded={{@card.canonicalURL}}
     >
       {{#if (and (eq this.mode "view") (not @preventIsolation))}}

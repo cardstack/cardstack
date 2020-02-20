@@ -13,7 +13,6 @@ const duration = 250;
 
 export default class RightEdge extends Component {
   @tracked cardName = this.args.card.csTitle;
-  @tracked cardSelected = this.args.cardSelected;
   @tracked options = {};
   @tracked expandedSections = ['template'];
   @tracked selectedFieldSource;
@@ -53,7 +52,10 @@ export default class RightEdge extends Component {
       if (this.args.selectedFieldName) {
         field = yield this.args.card.field(this.args.selectedFieldName);
       }
-      this.selectedFieldSource = field.sourceCard.csTitle;
+
+      if (field.sourceCard) {
+        this.selectedFieldSource = field.sourceCard.csTitle;
+      }
     }
   }).restartable())
   loadFieldSource;

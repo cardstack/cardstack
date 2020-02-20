@@ -6,18 +6,17 @@ export default class CardsController extends Controller {
   @service cardstackSession;
   @service router;
   @service routeInfo;
+  @service draggable;
 
   get themerClasses() {
-    if (this.onThemerRoute && this.cssModeToggle.isResponsive) {
-      return 'responsive editing-css';
-    } else if (this.onThemerRoute && !this.cssModeToggle.isResponsive) {
-      return 'full-width editing-css';
+    if (this.hasThemerTools) {
+      return `editing-css themer-card-width--${this.cssModeToggle.width}`; // width is small, medium, or large
     } else {
       return '';
     }
   }
 
-  get onThemerRoute() {
-    return this.router.currentRoute.localName === 'themer';
+  get hasThemerTools() {
+    return this.routeInfo.mode === 'themer' || this.routeInfo.mode === 'layout';
   }
 }

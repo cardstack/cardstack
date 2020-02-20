@@ -200,7 +200,9 @@ module('Acceptance | card adoption', function(hooks) {
     await setFieldValue('zip', '01234');
 
     await saveCard();
-    await click('[data-test-top-edge-link="view"]');
+    assert.equal(currentURL(), `/cards/${cardId}/edit/fields`);
+
+    await click('[data-test-mode-indicator-link="view"]');
     await waitForCardLoad();
 
     assert.dom('[data-test-field="treats-available"] [data-test-boolean-field-viewer-value]').hasText('Yes');

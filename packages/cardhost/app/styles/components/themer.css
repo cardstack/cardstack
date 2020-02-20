@@ -125,25 +125,6 @@
   max-height: calc(100% - var(--editor-header-height));
 }
 
-.themer--top-edge-container .show-editor-btn, .themer--top-edge-container .hide-editor-btn {
-  margin-top: 10px;
-  margin-right: 15px;
-  cursor: pointer;
-}
-
-.themer--top-edge-container .dock-btn {
-  margin: 10px 15px;
-  cursor: pointer;
-}
-
-.themer--top-edge-container .cs-component-cta, .themer--top-edge-container .save-button {
-  width: 150px;
-  margin-left: 20px;
-  align-self: start;
-  display: inline-block;
-  vertical-align: top;
-}
-
 .cardhost-card-theme-editor .editor-container.editor-pane--container-highlighted {
   border: 2px solid var(--ch-highlight);
 }
@@ -153,120 +134,7 @@
   color :var(--ch-default);
 }
 
-.themer--top-edge-container {
-  display: grid;
-  position: fixed;
-  top: var(--ch-spacing);
-  right: var(--ch-spacing);
-  left: 40px;
-  z-index: var(--ch-actions-z-index);
-  grid-template-columns: auto auto;
-}
-
-.themer--top-edge-container .ch-button {
-  color: var(--ch-light);
-}
-
-.themer--top-edge-container .ch-button.selected {
-  color: var(--ch-highlight);
-}
-
-.themer--top-edge-width-controls {
-  justify-self: start;
-}
-
-.themer--top-edge-pane-controls {
-  justify-self: end;
-}
-
-.themer--top-edge-width-controls .ch-button + .ch-button {
-  margin-left: 45px;
-}
-
-.ch-button--icon.eye-on {
-  --icon-url: url('/assets/images/buttons/eye-on.svg');
-  background-size: 30px;
-  margin-right: 20px;
-}
-.ch-button--icon.eye-on:hover {
-  --icon-url: url('/assets/images/buttons/eye-on.svg');
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-
-.ch-button--icon.eye-off {
-  --icon-url: url('/assets/images/buttons/eye-off.svg');
-  background-size: 30px;
-  margin-right: 20px;
-}
-
-.ch-button--icon.eye-off:hover {
-  --icon-url: url('/assets/images/buttons/eye-off.svg');
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-
-.ch-button--icon.dock-right {
-  --icon-url: url('/assets/images/buttons/dock-right-secondary.svg');
-  background-size: 25px 25px;
-}
-
-.ch-button--icon.dock-right.selected {
-  --icon-url: url('/assets/images/buttons/dock-right.svg');
-}
-
-.ch-button--icon.dock-bottom {
-  --icon-url: url('/assets/images/buttons/dock-bottom-secondary.svg');
-  background-size: 25px 25px;
-}
-
-.ch-button--icon.dock-bottom.selected {
-  --icon-url: url('/assets/images/buttons/dock-bottom.svg');
-}
-
-.ch-button--icon.dock-bottom:hover,
-.ch-button--icon.dock-right:hover {
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-
-.ch-button--icon.responsive {
-  --icon-url: url('/assets/images/buttons/responsive-inactive.svg');
-  width: auto;
-  height: auto;
-  padding-top: 25px;
-  background-size: 25px 25px;
-  background-position: top;
-  justify-content: center;
-  align-items: flex-end;
-  box-shadow: none;
-  border-radius: 0;
-}
-
-.ch-button--icon.responsive.selected {
-  --icon-url: url('/assets/images/buttons/responsive-active.svg');
-}
-
-.ch-button--icon.responsive:hover,
-.ch-button--icon.full-width:hover {
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-
-.ch-button--icon.full-width {
-  --icon-url: url('/assets/images/buttons/full-width-inactive.svg');
-  width: auto;
-  height: auto;
-  padding-top: 25px;
-  background-size: 20px 20px;
-  background-position: top;
-  display: inline-flex;
-  justify-content: center;
-  align-items: flex-end;
-  box-shadow: none;
-  border-radius: 0;
-}
-
-.ch-button--icon.full-width.selected {
-  --icon-url: url('/assets/images/buttons/full-width-active.svg');
+.editing-css .themer.view {
+  margin-left: 0;
+  padding-top: 0;
 }

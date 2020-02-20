@@ -1,8 +1,6 @@
-{{#unless this.load.isRunning}}
-  <div class="label {{@card.name}}-label" data-test-boolean-field-viewer-label>
-    {{@card.csTitle}}
-  </div>
-  <div class="value {{@card.name}}-value" data-test-boolean-field-viewer-value>
-    {{#if this.fieldValue}}Yes{{else}}No{{/if}}
-  </div>
-{{/unless}}
+<div class="label {{@card.name}}-label" data-test-boolean-field-viewer-label>
+  {{@card.csTitle}}
+</div>
+<div class="value {{@card.name}}-value" data-test-boolean-field-viewer-value>
+  {{#if this.fieldValue}}Yes{{else}}No{{/if}}
+</div>

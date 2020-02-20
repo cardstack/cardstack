@@ -8,10 +8,10 @@
 )}}
 
 <section
-  class="card-editor"
-  data-test-card-edit={{@card.name}}
+  class="card-renderer--container"
+  data-test-card-edit={{@card.canonicalURL}}
 >
-  <div class="card-renderer--container"
+  <div class="card-renderer--inner-container edit-container"
     data-test-card-patched={{stringify this.patchCard.isIdle}}
   >
     <CardRenderer

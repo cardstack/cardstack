@@ -1,9 +1,7 @@
-{{#unless this.load.isRunning}}
-  <TextField
-    @type="number"
-    @id={{concat "edit-" @card.nonce "-field-value"}}
-    @label={{@card.csTitle}}
-    @helperText={{@card.csDescription}}
-    @value={{this.fieldValue}}
-    @setValue={{perform this.updateFieldValue}} />
-{{/unless}}
+<TextField
+  @type="number"
+  @id={{concat "edit-" @card.nonce "-field-value"}}
+  @label={{@card.csTitle}}
+  @helperText={{@card.csDescription}}
+  @value={{this.fieldValue}}
+  @setValue={{perform this.updateFieldValue}} />

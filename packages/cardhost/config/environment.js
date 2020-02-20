@@ -26,7 +26,6 @@ module.exports = function(environment) {
       // Here you can pass flags/options to your application instance
       // when it is created
     },
-    cardTemplates: JSON.parse(process.env.CARD_TEMPLATES || null) || [],
     hubURL: process.env.HUB_URL || 'http://localhost:3000',
   };
 
@@ -41,18 +40,6 @@ module.exports = function(environment) {
     // ENV.APP.LOG_TRANSITIONS = true;
     // ENV.APP.LOG_TRANSITIONS_INTERNAL = true;
     // ENV.APP.LOG_VIEW_LOOKUPS = true;
-
-    ENV.cardTemplates = JSON.parse(process.env.CARD_TEMPLATES || null) || [
-      'local-hub::location-card',
-      'local-hub::event-card',
-      'local-hub::job-description',
-      'local-hub::job-applicant-profile',
-      'local-hub::event-ticket',
-      'local-hub::product-card',
-      'local-hub::wedding-invitation',
-      'local-hub::photo-card',
-      'local-hub::byline-card',
-    ];
   }
 
   if (environment === 'test') {
@@ -65,8 +52,6 @@ module.exports = function(environment) {
 
     ENV.APP.rootElement = '#ember-testing';
     ENV.APP.autoboot = false;
-
-    ENV.cardTemplates = JSON.parse(process.env.CARD_TEMPLATES || null) || ['local-hub::location-card'];
 
     ENV.animationSpeed = 20;
     ENV.autosaveDebounce = 10;

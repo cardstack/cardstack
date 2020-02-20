@@ -1,0 +1,13 @@
+<div class="mode-indicator" data-test-mode-indicator>
+  <span class="mode-indicator--label {{@mode}}" data-test-mode-indicator-label>
+    {{@mode}} mode
+  </span>
+  <LinkTo
+    @route={{@route}}
+    @model={{@card.canonicalURL}}
+    @class="mode-indicator--link"
+    data-test-mode-indicator-link={{@linkTo}}
+  >
+    <span>{{@linkTo}}</span>
+  </LinkTo>
+</div>

@@ -1,0 +1,10 @@
+.preview-link.cs-component-cta {
+  min-width: 130px;
+  height: 40px;
+  padding-left: 38px;
+  background-image: url('/assets/images/buttons/eye-on.svg');
+  background-position: left 11px center;
+  background-repeat: no-repeat;
+  background-size: 18px 14px;
+  text-align: left;
+}
