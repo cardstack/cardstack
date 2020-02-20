@@ -17,7 +17,8 @@
         <button 
           {{on "click" this.toggleMenu}}
           {{did-insert this.autosave.kickoff @card.isDirty @card}}
-          {{did-update this.autosave.kickoff @card.isDirty @card}}
+          {{!-- Need to watch isRunning since multiple isDirty changes don't result in state changes --}}
+          {{did-update this.autosave.kickoff @card.isDirty @card this.autosave.kickoff.isRunning}}
           class="context-menu-button {{if this.autosave.hasError "context-menu-button---error"}}" data-test-context-menu-button
           aria-label="Open card mode options menu" aria-expanded={{@contextMenuOpen}}
         >
