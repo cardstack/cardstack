@@ -1,4 +1,7 @@
-<div class="card-renderer-isolated--header--wrapper {{if @cardSelected "selected"}}" {{did-update this.resetMenu @cardSelected}}>
+<div 
+  class="card-renderer-isolated--header--wrapper {{if @cardSelected "selected"}}" {{did-update this.resetMenu @cardSelected}}
+  data-test-card-renderer-header
+>
   <header class="card-renderer-isolated--header">
     {{#if (or (eq (safe-css-string @card.adoptedFromName) "event-card") (eq (safe-css-string @card.name) "event-card"))}}
       {{svg-jar "event" width="18px" height="20px"}}
@@ -31,7 +34,10 @@
 
 {{!-- This is outside of the header div so that it can have a higher z-index than the header --}}
 {{#if this.showMenu}}
-  <div class={{if (or (eq @mode "schema") (eq @mode "layout")) "context-menu-sticky-wrapper"}}>
+  <div
+    {{click-outside this.closeMenu ignore=".context-menu-button"}}
+    class={{if (or (eq @mode "schema") (eq @mode "layout")) "context-menu-sticky-wrapper"}}
+  >
     <nav class="context-menu-nav" role="navigation" aria-labelledby="switch-mode">
       <ul class="context-menu-items" data-test-context-menu-items>
         <li class="heading">
