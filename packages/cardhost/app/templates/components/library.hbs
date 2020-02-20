@@ -38,7 +38,7 @@
         Recent Cards
       </header>
       <div class="library-section--grid">
-        {{#each this.recentCards as |card|}}
+        {{#each this.library.recentCards as |card|}}
           {{#if (not (eq card.name "@cardstack/base-card"))}}
             <LinkTo
               @route="cards.card.view"
