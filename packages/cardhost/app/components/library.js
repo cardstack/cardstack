@@ -5,10 +5,15 @@ import { tracked } from '@glimmer/tracking';
 
 import { task } from 'ember-concurrency';
 import { A } from '@ember/array';
+import ENV from '@cardstack/cardhost/config/environment';
+
+const { environment } = ENV;
 
 export default class Library extends Component {
   @service library;
   @service scroller;
+  @service cardLocalStorage;
+  @service data;
 
   @tracked selectedSection = 'recent-cards';
   @tracked cardModel;
@@ -16,25 +21,42 @@ export default class Library extends Component {
   @tracked showDialog;
   @tracked recentCards = A([]);
 
-  @service cardLocalStorage;
-  @service data;
-
   constructor(...args) {
     super(...args);
 
-    let ids = this.cardLocalStorage.getRecentCardIds();
-    this.getRecentCardsTask.perform(ids);
+    this.getRecentCardsTask.perform();
   }
 
-  @task(function*(ids) {
-    let recents = [];
+  @task(function*() {
+    let ids = this.cardLocalStorage.getRecentCardIds();
+
+    let recent = [];
 
     for (let id of ids) {
-      let card = yield this.data.getCard(id, 'embedded');
-      recents.push(card);
+      // unshift so that latest cards go to the front
+      // Replace with datetime check in the future
+      recent.unshift(
+        yield this.data.getCard(id, 'embedded').catch(err => {
+          // if there is a 404'd card in local storage, clear them
+          if (err.message.includes('404')) {
+            this.cardLocalStorage.clearIds();
+            if (environment !== 'test') {
+              // needed because otherwise the app remains in a broken state
+              window.location.reload();
+            }
+          } else {
+            throw err;
+          }
+        })
+      );
     }
 
-    this.recentCards = recents;
+    if (environment === 'development') {
+      // prime the store with seed models
+      recent.push(yield this.data.getCard('local-hub::why-doors', 'embedded'));
+    }
+
+    this.recentCards = recent;
   })
   getRecentCardsTask;
 
