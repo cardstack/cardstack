@@ -9,6 +9,7 @@
   height: 50px;
   position: absolute;
   top: -25px;
+  /* border: dashed 3px red; */
   z-index: 100;
 }
 
@@ -29,12 +30,17 @@
 
 /* ember-animated drag has started, and is over a dropzone */
 .cardhost-cards.dragging .drop-zone--container.dragging .drop-zone {
+  height: 270px;
+}
+
+/* native drag has started, and is over a dropzone */
+.cardhost-cards:not(.dragging) .drop-zone--container.dragging .drop-zone {
   height: 220px;
 }
 
 /* native drag has started, and is over a dropzone */
 .cardhost-cards:not(.dragging) .drop-zone--container.dragging .drop-zone {
-  height: 170px;
+  height: 220px;
 }
 
 .drop-zone--container .drop-zone--description .drop-zone--preview--container {

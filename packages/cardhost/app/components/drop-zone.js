@@ -28,11 +28,12 @@ export default class DropZone extends Component {
   updateStatus(status, event) {
     let draggedField = this.draggable.getField();
 
-    // either no dragged field, or event triggered by a human
-    if (!draggedField || event.isTrusted) {
+    // either no dragged field, or mouse event triggered by a human
+    if (!draggedField || (event.isTrusted && (event.type === 'mouseenter' || event.type === 'mouseleave'))) {
       return;
     }
 
+    console.log('event.type: ', event.type);
     this.dropZoneStatus = status;
 
     if (this.args.toggleStubField) {
