@@ -18,6 +18,8 @@ import { animationsSettled } from 'ember-animated/test-support';
 const card1Id = 'millenial-puppies';
 const qualifiedCard1Id = `local-hub::${card1Id}`;
 
+const timeout = 10000;
+
 const scenario = new Fixtures({
   create(factory) {
     setupMockUser(factory);
@@ -416,5 +418,28 @@ module('Acceptance | card schema', function(hooks) {
     await click('[data-test-mode-indicator-link="edit"]');
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
     assert.dom('[data-test-mode-indicator]').containsText('edit mode');
+  });
+
+  test('autosave works', async function(assert) {
+    // autosave is disabled by default in tests, so we turn it on and make one change to see if it works
+    await login();
+    await createCards({
+      [card1Id]: [['body', 'string', false, 'test body']],
+    });
+    this.owner.lookup('service:autosave').autosaveDisabled = false;
+    await visit(`/cards/${card1Id}/edit/fields/schema`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields/schema`);
+    assert.dom('[data-test-card-is-dirty="no"]').exists();
+    // don't use addField here, because it makes multiple changes that don't work great for autosave
+    // behavior in tests.
+    let type = 'string';
+    let position = 0;
+    await click(`[data-test-card-add-field-draggable="${type}"]`);
+    await triggerEvent(`[data-test-drop-zone="${position}"]`, 'mouseenter');
+    await click(`[data-test-drop-zone="${position}"]`);
+    await waitFor('[data-test-card-is-dirty="yes"]', { timeout });
+    await animationsSettled();
+    await waitFor('[data-test-card-is-dirty="no"]', { timeout });
+    assert.dom('[data-test-card-is-dirty="no"]').exists();
   });
 });

@@ -43,6 +43,8 @@
   grid-template-columns: 1fr 120px 40px;
   grid-gap: 10px;
   z-index: var(--ch-actions-z-index);
+  width: 100%;
+  justify-content: flex-end;
 }
 
 .cardhost-top-edge--buttons.schema-mode {
@@ -119,10 +121,5 @@
   .preview-link.cs-component-cta.primary {
     min-width: 105px;
     text-align: right;
-  }
-
-  .save-button.cs-component-cta.primary {
-    min-width: 100px;
-    margin-left: 0;
   }
 }

@@ -19,6 +19,7 @@ disappears, the submenu closes too.
 
 export default class CardRendererHeaderComponent extends Component {
   @service cardstackSession;
+  @service autosave;
   @tracked localMenuOpen = false;
 
   @action

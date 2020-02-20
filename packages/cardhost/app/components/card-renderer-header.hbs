@@ -14,8 +14,13 @@
         >
           {{@buttonText}}
         </LinkTo>
-        <button {{on "click" this.toggleMenu}} class="context-menu-button" data-test-context-menu-button
-          aria-label="Open card mode options menu" aria-expanded={{@contextMenuOpen}}>
+        <button 
+          {{on "click" this.toggleMenu}}
+          {{did-insert this.autosave.kickoff @card.isDirty @card}}
+          {{did-update this.autosave.kickoff @card.isDirty @card}}
+          class="context-menu-button {{if this.autosave.hasError "context-menu-button---error"}}" data-test-context-menu-button
+          aria-label="Open card mode options menu" aria-expanded={{@contextMenuOpen}}
+        >
           {{svg-jar "three-dots" width="12px" height="7px" aria-hidden=true}}
         </button>
       </div>
@@ -28,6 +33,21 @@
   <div class={{if (or (eq @mode "schema") (eq @mode "layout")) "context-menu-sticky-wrapper"}}>
     <nav class="context-menu-nav" role="navigation" aria-labelledby="switch-mode">
       <ul class="context-menu-items" data-test-context-menu-items>
+        <li class="heading">
+          {{#if this.autosave.hasError}}
+            {{svg-jar "error" width="10px" height="10px"}}
+            Failed to save
+          {{else if @card.isDirty}}
+            {{svg-jar "warning" width="10px" height="10px"}}
+            Saving...
+          {{else}}
+            {{svg-jar "success" width="10px" height="10px"}}
+            Saved {{moment-from-now this.autosave.lastSavedTime interval=30000}}
+          {{/if}}
+        </li>
+        <li class="divider">
+          <hr>
+        </li>
         <li id="switch-mode" class="heading">Switch mode</li>
         <li>
           <LinkTo @route="cards.card.view" @model={{@card}} @class={{if (eq @mode "view") "checked"}} data-test-context-view>View</LinkTo>
@@ -41,17 +61,6 @@
         <li>
           <LinkTo @route="cards.card.edit.layout" @model={{@card}} @class={{if (eq @mode "layout") "checked"}} data-test-context-layout>Layout</LinkTo>
         </li>
-
-        {{!-- TODO implement functionality for these items and uncomment them --}}
-        {{!-- <li class="divider">
-          <hr>
-        </li>
-        <li class="heading">Actions</li>
-        <li>Share</li>
-        <li>Save</li>
-        <li>Archive</li>
-        <li>Copy</li>
-        <li>Delete</li> --}}
       </ul>
     </nav>
   </div>

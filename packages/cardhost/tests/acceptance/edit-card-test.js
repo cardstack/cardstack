@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { find, visit, currentURL, click } from '@ember/test-helpers';
+import { find, visit, currentURL, click, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import { percySnapshot } from 'ember-percy';
 import Fixtures from '@cardstack/test-support/fixtures';
@@ -12,6 +12,8 @@ const card2Id = 'van-gogh';
 const qualifiedCard2Id = `local-hub::${card2Id}`;
 const card3Id = 'hassan';
 const qualifiedCard3Id = `local-hub::${card3Id}`;
+
+const timeout = 5000;
 
 const scenario = new Fixtures({
   create(factory) {
@@ -381,5 +383,21 @@ module('Acceptance | card edit', function(hooks) {
     assert.dom('[data-test-internal-card-id]').doesNotExist();
     assert.dom('[data-test-appearance-section]').doesNotExist();
     assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('Base Card');
+  });
+
+  test('autosave works', async function(assert) {
+    // autosave is disabled by default in tests, so we turn it on and make one change to see if it works
+    await login();
+    await createCards({
+      [card1Id]: [['body', 'string', false, 'test body']],
+    });
+    await visit(`/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+    assert.dom('[data-test-card-is-dirty="no"]').exists();
+    this.owner.lookup('service:autosave').autosaveDisabled = false;
+    await setFieldValue('body', 'this will autosave');
+    await waitFor('[data-test-card-is-dirty="yes"]', { timeout });
+    await waitFor('[data-test-card-is-dirty="no"]', { timeout });
+    assert.dom('[data-test-card-is-dirty="no"]').exists();
   });
 });

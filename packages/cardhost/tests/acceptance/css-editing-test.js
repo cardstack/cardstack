@@ -241,8 +241,7 @@ module('Acceptance | css editing', function(hooks) {
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
     let themerHasStyle = find('[data-test-preview-css]').innerText.includes('gorgeous styles');
     assert.ok(themerHasStyle);
-    await click('[data-test-card-save-btn]');
-    await waitFor(`[data-test-card-save-btn].saved`, { timeout });
+    await click('[data-test-mode-indicator-link="layout"]');
     await animationsSettled();
     let viewHasStyle = find('[data-test-view-css]').innerText.includes('gorgeous styles');
     assert.ok(viewHasStyle);
@@ -268,8 +267,6 @@ module('Acceptance | css editing', function(hooks) {
     await waitFor('[data-test-editor-pane] textarea');
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
     await click('[data-test-mode-indicator-link="edit"]');
-    await click('[data-test-card-save-btn]');
-    await waitFor(`[data-test-card-save-btn].saved`, { timeout });
     await waitFor('[data-test-cs-component="dropdown"]');
     await selectChoose('[data-test-cs-component="dropdown"]', 'Cardstack default');
     assert.dom('[data-test-cs-component="dropdown"]').doesNotContainText('Custom');
@@ -291,5 +288,21 @@ module('Acceptance | css editing', function(hooks) {
     assert.dom('[data-test-card-custom-style-button]').includesText('Edit Custom Theme');
     assert.dom('[data-test-style-dropdown]').includesText('Custom');
     assert.dom('[data-test-style-dropdown]').doesNotIncludeText('default');
+  });
+
+  test('autosave works', async function(assert) {
+    // autosave is disabled by default in tests, so we turn it on and make one change to see if it works
+    await login();
+    await createCards(cardData);
+    await visit(`/cards/${card1Id}/edit/layout`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/layout`);
+    assert.dom('[data-test-card-is-dirty="no"]').exists();
+    this.owner.lookup('service:autosave').autosaveDisabled = false;
+    await click('[data-test-card-custom-style-button]');
+    await waitFor('[data-test-editor-pane] textarea');
+    await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
+    await waitFor('[data-test-card-is-dirty="yes"]', { timeout });
+    await waitFor('[data-test-card-is-dirty="no"]', { timeout });
+    assert.dom('[data-test-card-is-dirty="no"]').exists();
   });
 });
