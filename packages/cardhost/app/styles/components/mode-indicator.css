@@ -1,14 +1,15 @@
 .mode-indicator {
-  --mode-container-width: 170px;
+  --mode-container-width: 240px;
   --mode-container-height: 40px;
   --mode-icon: url('');
-  --mode-icon-position: left 11px top 12px;
-  --mode-icon-size: 19px 16px;
+  --mode-icon-position: left 13px top 12px;
+  --mode-icon-size: 1rem 1rem;
 
-  display: inline-block;
-  width: var(--mode-container-width);
-  height: var(--mode-container-height);
+  display: block;
+  min-width: var(--mode-container-width);
+  width: 100%;
   max-width: 100%;
+  height: var(--mode-container-height);
   padding: 11px 38px;
   background-color: var(--ch-highlight);
   background-image: var(--mode-icon), url('/assets/images/icons/close.svg');

@@ -40,11 +40,11 @@
 
 .cardhost-top-edge--buttons {
   display: grid;
-  grid-template-columns: 1fr 120px 40px;
-  grid-gap: 10px;
+  grid-template-columns: 1fr 40px;
+  grid-gap: 20px;
   z-index: var(--ch-actions-z-index);
   width: 100%;
-  justify-content: flex-end;
+  justify-items: flex-end;
 }
 
 .cardhost-top-edge--buttons.schema-mode {
