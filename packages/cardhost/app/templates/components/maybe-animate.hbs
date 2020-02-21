@@ -1,0 +1,22 @@
+{{#if (eq @component "animated-each")}}
+  {{#if (eq @mode "edit")}}
+    {{#each @fields as |field|}}
+      {{yield field}}
+    {{/each}}
+  {{else}}
+    {{#animated-each @fields key=@key use=@use duration=@duration as |field|}}
+      {{yield field}}
+    {{/animated-each}}
+  {{/if}}
+{{else}}
+  {{#if (eq @mode "view")}}
+    {{#let (component @component) as |Component|}}
+      <Component card={{@card}} watch={{@watch}} key={{@key}} use={{@animation}} duration={{@duration}}>
+        {{yield}}
+      </Component>
+    {{/let}}
+  {{else}}
+    {{yield}}
+  {{/if}}
+{{/if}}
+

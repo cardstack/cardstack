@@ -44,9 +44,7 @@ export default class CardRenderer extends Component {
 
   @action
   updateFields(element, [fields]) {
-    if (this.args.mode === 'schema' || this.args.mode === 'view') {
-      this.fields = A(Object.assign([], fields));
-    }
+    this.fields = A(Object.assign([], fields));
   }
 
   @action

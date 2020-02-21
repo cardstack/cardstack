@@ -48,7 +48,7 @@ Ember Concurrency into the rendering of the card component here.
           />
         {{/if}}
         <div class="card-renderer-isolated--content">
-          {{#animated-value @card watch="isSelected" use=this.borderAnimation}}
+          <MaybeAnimate @component="animated-value" @mode={{this.mode}} @card={{@card}} @watch="isSelected" @animation={{this.borderAnimation}}>
             <div class="card-renderer-isolated--card-container {{if (and this.cardstackSession.isAuthenticated @card.isSelected) "selected"}}">
               {{#if @dropField}}
                 <DropZone
@@ -72,7 +72,7 @@ Ember Concurrency into the rendering of the card component here.
                 @dropField={{@dropField}}
               />
             </div>
-          {{/animated-value}}
+          </MaybeAnimate>
         </div>
       </section>
     {{/let}}
