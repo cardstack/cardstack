@@ -1,4 +1,4 @@
-name: Node CI
+name: Deploy
 
 on:
   push:
@@ -9,22 +9,25 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v1
     - name: Install Node.js
       uses: actions/setup-node@v1
       with:
         node-version: 10.x
     - name: Set up build cache (yarn)
-      uses: actions/cache@preview
+      uses: actions/cache@v1
       with:
         path: ~/.cache/yarn
-        key: ${{ runner.os }}-yarn
+        key: ${{ runner.os }}-${{ hashFiles('/**/yarn.lock') }}
     - name: Set up build cache (eslint)
-      uses: actions/cache@preview
+      uses: actions/cache@v1
       with:
         path: .eslintcache
         key: ${{ runner.os }}-eslint
     - name: Checkout
       uses: actions/checkout@v1
+    - name: yarn install
+      run: yarn install
     - name: Extract branch name
       shell: bash
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
