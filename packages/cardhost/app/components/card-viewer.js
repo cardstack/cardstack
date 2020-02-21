@@ -1,4 +1,3 @@
-import { task } from 'ember-concurrency';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import CardManipulator from './card-manipulator';
@@ -8,11 +7,6 @@ export default class CardViewer extends CardManipulator {
   @tracked contextMenuOpen = false;
 
   resizeable = true;
-
-  @(task(function*() {
-    this.isolatedCss = yield this.args.card.loadFeature('isolated-css');
-  }).drop())
-  loadCss;
 
   @action
   setSelected(bool) {

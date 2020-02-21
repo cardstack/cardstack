@@ -7,7 +7,6 @@ import {
   waitForCardLoad,
   saveCard,
   waitForCardPatch,
-  waitForCssLoad,
   encodeColons,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
@@ -15,8 +14,18 @@ import { percySnapshot } from 'ember-percy';
 import { selectChoose } from 'ember-power-select/test-support';
 import { cardDocument } from '@cardstack/core/card-document';
 import { myOrigin } from '@cardstack/core/origin';
+import { isolatedCssFile } from '@cardstack/cardhost/utils/scaffolding';
 
 const csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
+const parentCard = cardDocument().withAttributes({
+  csRealm,
+  csId: 'parent-card',
+  csTitle: 'Parent Card',
+  csFeatures: { 'isolated-css': isolatedCssFile },
+  csFiles: {
+    [isolatedCssFile]: 'base css',
+  },
+});
 const testCard = cardDocument()
   .withAttributes({
     csRealm,
@@ -28,10 +37,11 @@ const testCard = cardDocument()
   })
   .withField('title', 'string-field')
   .withField('author', 'string-field')
-  .withField('body', 'string-field');
+  .withField('body', 'string-field')
+  .adoptingFrom(parentCard);
 const cardPath = encodeURIComponent(testCard.canonicalURL);
 const scenario = new Fixtures({
-  create: [testCard],
+  create: [parentCard, testCard],
 });
 
 // let animation finish before taking screenshot
@@ -236,19 +246,59 @@ module('Acceptance | css editing', function(hooks) {
   });
 
   test('can save CSS edits', async function(assert) {
+    await visit(`/cards/${cardPath}`);
+    await waitForCardLoad();
+
+    assert.dom(`[data-test-view-css="themer"]`).doesNotExist();
+    assert.dom(`[data-test-view-css="${testCard.canonicalURL}"]`).exists();
+    assert.ok(
+      find(`[data-test-view-css="${testCard.canonicalURL}"]`).innerText.includes('base css'),
+      'base style is correct'
+    );
+
     await visit(`/cards/${cardPath}/edit/layout`);
     await waitForCardLoad();
+
+    assert.dom(`[data-test-view-css="themer"]`).doesNotExist();
+    assert.dom(`[data-test-view-css="${testCard.canonicalURL}"]`).exists();
+    assert.ok(
+      find(`[data-test-view-css="${testCard.canonicalURL}"]`).innerText.includes('base css'),
+      'base style is correct'
+    );
 
     await click('[data-test-card-custom-style-button]');
     await waitForThemerLoad();
 
+    assert.dom(`[data-test-view-css="${testCard.canonicalURL}"]`).doesNotExist();
+    assert.dom(`[data-test-view-css="themer"]`).exists();
+    assert.ok(find(`[data-test-view-css="themer"]`).innerText.includes('base css'), 'themer style is correct');
+
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
-    let themerHasStyle = find('[data-test-preview-css]').innerText.includes('gorgeous styles');
-    assert.ok(themerHasStyle);
+    assert.ok(find(`[data-test-view-css="themer"]`).innerText.includes('gorgeous styles'), 'themer style is correct');
 
     await saveCard();
-    let viewHasStyle = find('[data-test-view-css]').innerText.includes('gorgeous styles');
-    assert.ok(viewHasStyle);
+    assert.dom(`[data-test-view-css="${testCard.canonicalURL}"]`).doesNotExist();
+    assert.ok(find(`[data-test-view-css="themer"]`).innerText.includes('gorgeous styles'), 'themer style is correct');
+
+    await visit(`/cards/${cardPath}/edit/layout`);
+    await waitForCardLoad();
+
+    assert.dom(`[data-test-view-css="themer"]`).doesNotExist();
+    assert.dom(`[data-test-view-css="${testCard.canonicalURL}"]`).exists();
+    assert.ok(
+      find(`[data-test-view-css="${testCard.canonicalURL}"]`).innerText.includes('gorgeous styles'),
+      'base style is correct'
+    );
+
+    await visit(`/cards/${cardPath}`);
+    await waitForCardLoad();
+
+    assert.dom(`[data-test-view-css="themer"]`).doesNotExist();
+    assert.dom(`[data-test-view-css="${testCard.canonicalURL}"]`).exists();
+    assert.ok(
+      find(`[data-test-view-css="${testCard.canonicalURL}"]`).innerText.includes('gorgeous styles'),
+      'base style is correct'
+    );
   });
 
   test('dropdown displays default theme for new cards', async function(assert) {
@@ -291,10 +341,10 @@ module('Acceptance | css editing', function(hooks) {
     await waitFor('[data-test-cs-component="dropdown"]');
     await selectChoose('[data-test-cs-component="dropdown"]', 'Template theme');
     await waitForCardPatch();
-    await waitForCssLoad();
+    await waitForCardLoad();
 
     assert.dom('[data-test-cs-component="dropdown"]').doesNotContainText('Custom');
-    assert.dom('[data-test-view-css]').doesNotContainText('gorgeous styles');
+    assert.dom('[data-test-view-css]').containsText('base css');
   });
 
   test('buttons and dropdowns reflect custom style state', async function(assert) {

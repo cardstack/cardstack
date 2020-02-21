@@ -9,6 +9,8 @@
       @mode="view"
       @class="themer"
       @cardSelected={{false}}
+      @suppressCss={{true}}
+      @suppressHeader={{true}}
       @cardLoaded={{perform this.waitForCss}}
     />
   </div>
@@ -24,6 +26,10 @@
   </div>
 {{/if}}
 
-<style data-test-view-css>
-  {{scope-css this.isolatedCss (concat (safe-css-string @card.canonicalURL) "--isolated")}}
+<style data-test-view-css="themer">
+  {{#if this.isolatedCss}}
+    {{scope-css this.isolatedCss (concat (safe-css-string @card.canonicalURL) "--isolated")}}
+  {{else}}
+    {{scope-css this.loadingCss (concat (safe-css-string @card.canonicalURL) "--isolated")}}
+  {{/if}}
 </style>

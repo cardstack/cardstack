@@ -14,7 +14,7 @@
       {{did-insert this.focusCard true}}
       {{did-update this.cardUpdated @card}}
     >
-      {{#if (eq @mode "view")}}
+      {{#if (and (eq @mode "view") (not @suppressHeader))}}
         {{#animated-value @card watch="isSelected" use=this.headerAnimation}}
           <CardRendererHeader
             @cardSelected={{if (and this.cardstackSession.isAuthenticated @cardSelected) true}}
@@ -26,7 +26,7 @@
             @setContextMenu={{@setContextMenu}}
           />
         {{/animated-value}}
-      {{else}}
+      {{else if (not @suppressHeader)}}
         <CardRendererHeader
           @cardSelected={{true}}
           @card={{@card}}
@@ -42,16 +42,8 @@
       <div class="card-renderer-isolated--content
         {{concat (safe-css-string (if @card.canonicalURL @card.canonicalURL @card.adoptsFromURL)) "--isolated" }}
       ">
-        {{#animated-value @card watch="isSelected" use=this.borderAnimation}}
-          <div class="card-renderer-isolated--card-container {{if (and this.cardstackSession.isAuthenticated @card.isSelected) "selected"}}">
-            {{#if @dropField}}
-              <DropZone
-                @card={{@card}}
-                @dropField={{@dropField}}
-                @position={{0}}
-                @toggleStubField={{this.toggleStubField}}
-              />
-            {{/if}}
+        {{#if @suppressHeader}}
+          <div class="card-renderer-isolated--card-container card-boundary isolated">
             <Scaffold
               @card={{@card}}
               @feature="isolated-layout"
@@ -70,7 +62,37 @@
               @dropField={{@dropField}}
             />
           </div>
-        {{/animated-value}}
+        {{else}}
+          {{#animated-value @card watch="isSelected" use=this.borderAnimation}}
+            <div class="card-renderer-isolated--card-container card-boundary isolated {{if (and this.cardstackSession.isAuthenticated @card.isSelected) "selected"}}">
+              {{#if @dropField}}
+                <DropZone
+                  @card={{@card}}
+                  @dropField={{@dropField}}
+                  @position={{0}}
+                  @toggleStubField={{this.toggleStubField}}
+                />
+              {{/if}}
+              <Scaffold
+                @card={{@card}}
+                @feature="isolated-layout"
+                @fields={{this.fields}}
+                @mode={{this.mode}}
+                @setFieldName={{@setFieldName}}
+                @setCardValue={{@setCardValue}}
+                @setCardReference={{@setCardReference}}
+                @removeField={{@removeField}}
+                @toggleStubField={{this.toggleStubField}}
+                @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+                @setPosition={{@setPosition}}
+                @selectField={{@selectField}}
+                @selectedField={{@selectedField}}
+                @selectedFieldName={{@selectedFieldName}}
+                @dropField={{@dropField}}
+              />
+            </div>
+          {{/animated-value}}
+        {{/if}}
       </div>
     </section>
   {{else if (eq @format "embedded")}}
@@ -80,6 +102,7 @@
         {{@class}}
       "
       data-test-card-renderer-embedded={{@card.canonicalURL}}
+      data-test-card-renderer-embedded-loaded={{stringify this.loadCard.isIdle}}
     >
       {{#if (and (eq this.mode "view") (not @preventIsolation))}}
         <LinkTo
@@ -103,5 +126,30 @@
         {{/if}}
       {{/if}}
     </div>
+  {{/if}}
+
+  {{!-- TODO eventually we need to get smarter about writing out this CSS so that
+  we eliminate dupe style definitions. Maybe there is a service that actually has
+  the ability to know what all cards are on the page and spit out the most
+  efficient CSS so that cards that leverage a common parent's CSS all get
+  collasped into a single style element --}}
+  {{#if (and (not this.css) this.loadCard.isRunning)}}
+    <style
+      data-test-view-css={{@card.canonicalURL}}
+      data-test-view-css-format={{@format}}
+    >
+      {{#if (eq @format "isolated")}}
+        {{scope-css this.loadingIsolatedCss (concat (safe-css-string @card.canonicalURL) "--" @format)}}
+      {{else}}
+        {{scope-css this.loadingEmbeddedCss (concat (safe-css-string @card.canonicalURL) "--" @format)}}
+      {{/if}}
+    </style>
+  {{else if this.css}}
+    <style
+      data-test-view-css={{@card.canonicalURL}}
+      data-test-view-css-format={{@format}}
+    >
+      {{scope-css this.css (concat (safe-css-string @card.canonicalURL) "--" @format)}}
+    </style>
   {{/if}}
 {{/if}}

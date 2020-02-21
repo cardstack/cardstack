@@ -1,7 +1,5 @@
 <section class="card-renderer--container"
   data-test-card-view={{@card.canonicalURL}}
-  data-test-css-loaded={{this.loadCss.isIdle}}
-  {{did-update (perform this.loadCss) @card}}
 >
   {{!-- ugh, we're monkey patching the Card API --}}
   <div role="button" class="card-renderer--inner-container {{@mode}}-container" {{on "mouseenter" (action (mut @card.isSelected) true)}} {{on "mouseleave" (action (mut @card.isSelected) false)}}>
@@ -15,10 +13,6 @@
     />
   </div>
 </section>
-
-<style data-test-view-css>
-  {{scope-css this.isolatedCss (concat (safe-css-string @card.canonicalURL) "--isolated")}}
-</style>
 
 {{!-- This is hidden, used in tests --}}
 <section class="cardhost-card-document">

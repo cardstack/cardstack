@@ -59,12 +59,10 @@ export async function waitForThemerLoad() {
   await animationsSettled();
 }
 
-export async function waitForCssLoad() {
-  await waitFor('[data-test-css-loaded]', { timeout });
-  await animationsSettled();
-}
-
 export async function waitForEmbeddedCardLoad(cardId) {
+  await waitFor(`[data-test-card-renderer-embedded="${cardId}"][data-test-card-renderer-embedded-loaded="true"]`, {
+    timeout,
+  });
   await waitFor(`[data-test-embedded-card="${cardId}"][data-test-embedded-card-loaded="true"]`, { timeout });
   let fields = [...document.querySelectorAll(`[data-test-embedded-card="${cardId}"] [data-test-field]`)].map(i =>
     i.getAttribute('data-test-field')

@@ -21,8 +21,21 @@ export default class CardRenderer extends Component {
   @tracked previousFieldNames;
   @tracked fields;
   @tracked mode;
+  @tracked css;
   @tracked fieldsToRemove = new Map();
   @tracked cardFocused = () => {};
+  loadingIsolatedCss = `
+    .card-renderer-isolated--card-container {
+      background-color: white;
+      color: white;
+    }
+  `;
+  loadingEmbeddedCss = `
+    .embedded-card {
+      background-color: white;
+      color: white;
+    }
+  `;
 
   duration = duration;
 
@@ -37,7 +50,13 @@ export default class CardRenderer extends Component {
   }
 
   @(task(function*() {
-    let actualFields = yield this.args.card.fields();
+    let tasks = [this.args.card.fields()];
+    if (!this.args.suppressCss && (this.mode === 'view' || this.mode === 'layout')) {
+      tasks.push(this.args.card.loadFeature(`${this.args.format}-css`));
+    }
+    let [actualFields, css] = yield Promise.all(tasks);
+    this.css = css;
+
     if (Array.isArray(this.previousFieldNames)) {
       let addedFieldNames = difference(
         actualFields.map(f => f.name),
@@ -89,31 +108,25 @@ export default class CardRenderer extends Component {
 
   @(task(function*(nonce, position, field) {
     yield this.loadCard.last.then();
-    // eslint-disable-next-line no-console
-    console.log(
-      `Received request to ${field ? 'add' : 'remove'} field with nonce ${nonce}${
-        field ? ' at position ' + position : ''
-      }`
-    );
     // these events arent always delivered in order. instead of trying to manage
     // this with an array, we use an identity map for the drop zones so
     // we can more easily remove the correct drop zone regardless of position.
     if (!this.args.fieldOrderPromise || this.args.fieldOrderPromise.isFulfilled()) {
       if (field && !this.fields.find(f => f.dropZoneNonce === nonce)) {
-        console.log(`Adding field at position ${position} with nonce ${nonce}`); // eslint-disable-line no-console
         let outstandingStubFields = this.fields.filter(f => f.csRealm === 'stub-card');
         for (let fieldToRemove of outstandingStubFields) {
-          this.fieldsToRemove.set(
-            fieldToRemove.dropZoneNonce,
-            this.autoRemoveStubField.perform(fieldToRemove.dropZoneNonce)
-          );
+          if (!this.fieldsToRemove.has(fieldToRemove.dropZoneNonce)) {
+            this.fieldsToRemove.set(
+              fieldToRemove.dropZoneNonce,
+              this.autoRemoveStubField.perform(fieldToRemove.dropZoneNonce)
+            );
+          }
         }
         this.fields.splice(position, 0, field);
       } else if (!field) {
-        if (this.fieldsToRemove.get(nonce)) {
+        if (this.fieldsToRemove.has(nonce)) {
           this.fieldsToRemove.get(nonce).cancel();
         }
-        console.log(`Removing field at with nonce ${nonce}`); // eslint-disable-line no-console
         this.fields = this.fields.filter(f => f.dropZoneNonce !== nonce);
       }
     } else if (!field) {
@@ -132,10 +145,6 @@ export default class CardRenderer extends Component {
   @(task(function*(nonce) {
     yield timeout(750);
     if (this.fieldsToRemove.get(nonce)) {
-      // eslint-disable-next-line no-console
-      console.log(
-        `Auto removing field at with nonce ${nonce} because a new stub-field was added when a stub field was already present`
-      );
       this.fields = this.fields.filter(f => f.dropZoneNonce !== nonce);
       this.fieldsToRemove.delete(nonce);
     }

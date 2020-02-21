@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { click, visit, currentURL } from '@ember/test-helpers';
+import { click, visit, currentURL, find } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
 import {
@@ -13,6 +13,7 @@ import { percySnapshot } from 'ember-percy';
 import { animationsSettled } from 'ember-animated/test-support';
 import { cardDocument } from '@cardstack/core/card-document';
 import { myOrigin } from '@cardstack/core/origin';
+import { embeddedCssFile } from '@cardstack/cardhost/utils/scaffolding';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 const csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
@@ -22,6 +23,10 @@ const template1 = cardDocument()
     csId: 'user-template',
     csTitle: 'User Template',
     csCreated: '2020-01-01T14:00:00Z',
+    csFeatures: { 'embedded-css': embeddedCssFile },
+    csFiles: {
+      [embeddedCssFile]: 'template1 css',
+    },
   })
   .withField('name', 'string-field')
   .withField('email', 'string-field');
@@ -31,6 +36,10 @@ const template2 = cardDocument()
     csId: 'article-template',
     csTitle: 'Article Template',
     csCreated: '2020-01-01T16:00:00Z',
+    csFeatures: { 'embedded-css': embeddedCssFile },
+    csFiles: {
+      [embeddedCssFile]: 'template2 css',
+    },
   })
   .withField('title', 'string-field')
   .withField('body', 'string-field');
@@ -151,6 +160,21 @@ module('Acceptance | library', function(hooks) {
       [template2.canonicalURL, template1.canonicalURL]
     );
     await percySnapshot(assert);
+  });
+
+  test('card embedded css is rendered for the cards in the library', async function(assert) {
+    await visit(`/`);
+    await click('[data-test-library-button]');
+    await waitForLibraryLoad();
+
+    assert.ok(
+      find(`[data-test-view-css="${card1.canonicalURL}"]`).innerText.includes('template1 css'),
+      'embedded card style is correct'
+    );
+    assert.ok(
+      find(`[data-test-view-css="${card3.canonicalURL}"]`).innerText.includes('template2 css'),
+      'embedded card style is correct'
+    );
   });
 
   test('featured cards are displayed', async function() {

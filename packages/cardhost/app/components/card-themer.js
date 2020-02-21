@@ -8,6 +8,13 @@ import { tracked } from '@glimmer/tracking';
 export default class CardThemer extends CardManipulator {
   @service cssModeToggle;
   @tracked isCardReady = false;
+  @tracked isolatedCss;
+  loadingCss = `
+    .card-renderer-isolated--card-container {
+      background-color: white;
+      color: white;
+    }
+  `;
 
   @(task(function*(css) {
     yield this.load.last.finally();
