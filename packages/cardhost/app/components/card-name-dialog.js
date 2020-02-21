@@ -4,6 +4,9 @@ import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { dasherize } from '@ember/string';
 import { task } from 'ember-concurrency';
+import ENV from '@cardstack/cardhost/config/environment';
+
+const { environment } = ENV;
 
 export default class CardNameDialog extends Component {
   @service router;
@@ -38,12 +41,15 @@ export default class CardNameDialog extends Component {
     }
 
     let newCard = this.data.createCard(`local-hub::${this.cardId}`, adoptedFrom);
-    yield newCard.save();
+
+    if (environment !== 'test') {
+      yield newCard.save();
+    }
 
     if (adoptedFrom) {
-      this.router.transitionTo('cards.card.edit.fields', newCard.name);
+      this.router.transitionTo('cards.card.edit.fields', newCard);
     } else {
-      this.router.transitionTo('cards.card.edit.fields.schema', newCard.name);
+      this.router.transitionTo('cards.card.edit.fields.schema', newCard);
     }
   })
   createCardTask;

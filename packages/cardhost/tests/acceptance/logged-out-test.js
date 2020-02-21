@@ -113,8 +113,8 @@ module('Acceptance | logged-out', function(hooks) {
   });
 
   test('clicking outside the login panel closes it', async function(assert) {
-    await visit(`/`);
-    assert.equal(currentURL(), `/`);
+    await visit(`/cards`);
+    assert.equal(currentURL(), `/cards`);
     await waitFor('[data-test-toggle-left-edge]');
     await click('[data-test-toggle-left-edge]');
     await waitFor('[data-test-login-button]');
