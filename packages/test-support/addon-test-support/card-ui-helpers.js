@@ -57,9 +57,7 @@ export async function dragFieldToNewPosition(originalPosition, newPosition) {
 
 export async function createCards(args) {
   for (let id of Object.keys(args)) {
-    await visit('/');
-    await click('[data-test-library-button]');
-    await click('[data-test-library-new-blank-card-btn]');
+    await visit('/cards/new');
     await setCardName(id);
 
     for (let [index, [name, type, neededWhenEmbedded]] of args[id].entries()) {
