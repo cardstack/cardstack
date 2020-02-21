@@ -17,24 +17,19 @@
   background-color: var(--ch-light-background);
 }
 
-/* ember-animated drag has started */
+/* drag has started */
 .cardhost-cards.dragging .drop-zone--container .drop-zone {
   top: -75px;
 }
 
-/* ember-animated drag has started, but is not yet over a dropzone */
+/* drag has started, but is not yet over a dropzone */
 .cardhost-cards.dragging .drop-zone--container:not(.dragging) .drop-zone {
   height: 150px;
 }
 
-/* ember-animated drag has started, and is over a dropzone */
+/* drag has started, and is over a dropzone */
 .cardhost-cards.dragging .drop-zone--container.dragging .drop-zone {
-  height: 220px;
-}
-
-/* native drag has started, and is over a dropzone */
-.cardhost-cards:not(.dragging) .drop-zone--container.dragging .drop-zone {
-  height: 170px;
+  height: 270px;
 }
 
 .drop-zone--container .drop-zone--description .drop-zone--preview--container {
