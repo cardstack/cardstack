@@ -1,0 +1,11 @@
+<div
+  data-test-catalog-entries
+  data-test-catalog-entries-loaded={{stringify this.loadCards.isIdle}}
+  ...attributes
+>
+  {{#each this.entries as |card index|}}
+    {{#let (get @catalogEntries index) as |entry|}}
+      {{yield card entry}}
+    {{/let}}
+  {{/each}}
+</div>

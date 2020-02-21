@@ -2,12 +2,18 @@ import { module, test } from 'qunit';
 import { visit, currentURL, waitFor, click } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
-import { waitForCardLoad, waitForSchemaViewToLoad, encodeColons } from '../helpers/card-ui-helpers';
+import {
+  waitForCardLoad,
+  waitForSchemaViewToLoad,
+  encodeColons,
+  waitForCatalogEntriesToLoad,
+} from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { cardDocument } from '@cardstack/core/card-document';
 import { myOrigin } from '@cardstack/core/origin';
 import { animationsSettled } from 'ember-animated/test-support';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 const csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
 const testCard = cardDocument().withAutoAttributes({
@@ -15,10 +21,23 @@ const testCard = cardDocument().withAutoAttributes({
   csId: 'millenial-puppies',
   title: 'The Millenial Puppy',
 });
+const entry = cardDocument()
+  .withAttributes({
+    csRealm,
+    csId: 'entry',
+    csTitle: 'The Millenial Puppy',
+    type: 'featured',
+  })
+  .withRelationships({ card: testCard })
+  .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'catalog-entry' });
 const cardPath = encodeURIComponent(testCard.canonicalURL);
 const scenario = new Fixtures({
-  create: [testCard],
+  create: [testCard, entry],
 });
+
+async function waitForFeaturedCardsLoad() {
+  await waitForCatalogEntriesToLoad('[data-test-featured-cards]');
+}
 
 module('Acceptance | logged-out', function(hooks) {
   setupApplicationTest(hooks);
@@ -110,10 +129,11 @@ module('Acceptance | logged-out', function(hooks) {
     await visit(`/`);
     await click('[data-test-toggle-left-edge]');
     await click('[data-test-logout-button]');
+    await waitForFeaturedCardsLoad();
 
     assert.equal(currentURL(), `/`);
     assert.dom('[data-test-card-builder]').exists();
-    assert.dom('[data-test-featured-card]').exists({ count: 4 });
+    assert.dom('[data-test-featured-card]').exists({ count: 1 });
     assert.dom('[data-test-cardhost-left-edge]').exists();
     assert.dom('[data-test-library-button]').isDisabled();
 

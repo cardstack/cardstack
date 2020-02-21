@@ -26,6 +26,9 @@ const parentCard = cardDocument()
     csId: 'address-card',
     csTitle: 'Address Card',
     csFieldOrder: ['address', 'city', 'state', 'zip'],
+    csFieldSets: {
+      isolated: ['address', 'city', 'state', 'zip'],
+    },
   })
   .withField('address', 'string-field')
   .withField('city', 'string-field')

@@ -7,7 +7,6 @@ import {
   waitForSchemaViewToLoad,
   waitForThemerLoad,
   waitForTemplatesLoad,
-  waitForEmbeddedCardLoad,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { cardDocument } from '@cardstack/core/card-document';
@@ -20,6 +19,10 @@ const testCard = cardDocument()
     csRealm,
     csId: 'millenial-puppies',
     csTitle: 'Millenial Puppies',
+    csFieldSets: {
+      isolated: ['body'],
+      embedded: ['body'],
+    },
     body: 'test body',
   })
   .withField('body', 'string-field', 'singular', { csTitle: 'Body' });
@@ -90,7 +93,7 @@ module('Acceptance | accessibility', function(hooks) {
 
     await click('[data-test-library-button]');
     await waitForTemplatesLoad();
-    await waitForEmbeddedCardLoad(testCard.canonicalURL);
+    await waitForCardLoad(testCard.canonicalURL);
     await waitForCssTransitions();
     await a11yAudit();
     assert.ok(true, 'no a11y errors found for library');

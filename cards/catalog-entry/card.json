@@ -4,6 +4,10 @@
     "attributes": {
       "csTitle": "Catalog Entry",
       "csDescription": "This in an item in the catalog",
+      "csFieldSets": {
+        "embedded": [ "card", "type" ],
+        "isolated": [ "card", "type" ]
+      },
       "csFields": {
         "card": {
           "relationships": {
@@ -11,6 +15,16 @@
               "data": {
                 "type": "cards",
                 "id": "https://base.cardstack.com/public/cards/base"
+              }
+            }
+          }
+        },
+        "type": {
+          "relationships": {
+            "csAdoptsFrom": {
+              "data": {
+                "type": "cards",
+                "id": "https://base.cardstack.com/public/cards/string-field"
               }
             }
           }

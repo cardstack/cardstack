@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { find, visit, currentURL } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
-import { waitForCardLoad, waitForEmbeddedCardLoad } from '../helpers/card-ui-helpers';
+import { waitForCardLoad } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { cardDocument } from '@cardstack/core/card-document';
@@ -16,6 +16,7 @@ const author = cardDocument().withAutoAttributes({
   csId: 'van-gogh',
   csFieldSets: {
     embedded: ['name'],
+    isolated: ['name', 'email'],
   },
   name: 'Van Gogh',
   email: 'vangogh@nowhere.dog',
@@ -26,6 +27,7 @@ const testCard = cardDocument()
     csId: 'millenial-puppies',
     csFieldSets: {
       embedded: ['title', 'author', 'likes'],
+      isolated: ['title', 'author', 'likes', 'body', 'published'],
     },
     title: 'The Millenial Puppy',
     body: 'It can be difficult these days to deal with the discerning tastes of the millenial puppy.',
@@ -48,8 +50,8 @@ module('Acceptance | card view', function(hooks) {
 
   test(`viewing a card`, async function(assert) {
     await visit(`/cards/${cardPath}`);
-    await waitForCardLoad();
-    await waitForEmbeddedCardLoad(author.canonicalURL);
+    await waitForCardLoad(testCard.canonicalURL);
+    await waitForCardLoad(author.canonicalURL);
 
     assert.equal(currentURL(), `/cards/${cardPath}`);
     assert.dom('[data-test-field="title"] [data-test-string-field-viewer-value]').hasText('The Millenial Puppy');

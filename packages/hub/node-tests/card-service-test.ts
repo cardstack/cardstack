@@ -1514,12 +1514,6 @@ describe('hub/card-service', function() {
         await env.destroy();
       });
 
-      it('can get all the field cards (including adopted fields)', async function() {
-        let card = await service.get(cupcake);
-        let fields = await card.fields();
-        expect(fields.map(i => i.name)).to.have.members(['meme', 'name', 'weightInPounds', 'pottyTrained', 'rating']);
-      });
-
       it("a field card can indicate if it is the enclosing card's own field or if it is adopted", async function() {
         let card = await service.get(puppyMemeCard);
         let field = await card.field('meme');
@@ -2038,7 +2032,12 @@ describe('hub/card-service', function() {
             .withField('favoriteToy', toyCard).jsonapi
         );
 
-        dalmatianCard = await service.create(csRealm, cardDocument().adoptingFrom(puppyCard).jsonapi);
+        dalmatianCard = await service.create(
+          csRealm,
+          cardDocument()
+            .withField('numberOfSpots', 'integer-field')
+            .adoptingFrom(puppyCard).jsonapi
+        );
 
         ownerCard = await service.create(
           csRealm,
@@ -2046,6 +2045,7 @@ describe('hub/card-service', function() {
             .withAttributes({
               csFieldSets: {
                 isolated: ['name', 'puppies'],
+                embedded: ['name'],
               },
             })
             .withField('name', 'string-field')
@@ -2131,6 +2131,18 @@ describe('hub/card-service', function() {
 
       after(async function() {
         await env.destroy();
+      });
+
+      it('can get all the field cards (including adopted fields)', async function() {
+        let card = await service.get(mango);
+        let fields = await card.fields();
+        expect(fields.map(i => i.name)).to.have.members(['name', 'favoriteToy', 'numberOfSpots']);
+      });
+
+      it('can get all the field cards for a given set of occlusion rules', async function() {
+        let card = await service.get(daddy);
+        let fields = await card.fields({ includeFieldSet: 'embedded' });
+        expect(fields.map(i => i.name)).to.have.members(['name']);
       });
 
       it('serializes the upstream doc', async function() {
@@ -2448,18 +2460,12 @@ describe('hub/card-service', function() {
       });
 
       it('does not return user fields if the card does not have csFieldSet rules for the requested field-set', async function() {
-        let doc = await daddy.serializeAsJsonAPIDoc({
+        let doc = await squeakySnake.serializeAsJsonAPIDoc({
           includeFieldSet: 'embedded',
         });
         expect(doc).to.have.nested.property('data.type', 'cards');
-        expect(doc).to.have.nested.property('data.id', daddy.canonicalURL);
-        expect(doc).to.have.deep.nested.property('data.relationships.csAdoptsFrom.data', {
-          type: 'cards',
-          id: ownerCard.canonicalURL,
-        });
-        expect(doc).to.not.have.nested.property('data.attributes.name');
-        expect(doc).to.not.have.nested.property('data.relationships.puppies');
-        expect(doc).to.not.have.property('included');
+        expect(doc).to.have.nested.property('data.id', squeakySnake.canonicalURL);
+        expect(doc).to.not.have.nested.property('data.attributes.description');
       });
 
       it('can handle an included card that has a relationship to the primary card', async function() {

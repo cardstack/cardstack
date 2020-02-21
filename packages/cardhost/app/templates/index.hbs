@@ -7,14 +7,27 @@
       {{svg-jar "cards" width="28px" height="28px"}}
       Featured Cards
     </h2>
-    <div class="card-builder--section-grid">
-      {{#each this.featuredCards as |card|}}
-        <LinkTo @route="cards.card.view" @model={{card.canonicalURL}} class="card-builder--section-card-link" data-test-featured-card={{card.canonicalURL}}>
-          {{! template-lint-disable no-inline-styles }}
-          <div class="card-builder--section-card" style={{css-url "background-image" card.csPreviewImageURL}}></div>
-          <div class="card-builder--section-card-label">{{card.csTitle}}</div>
-        </LinkTo>
-      {{/each}}
-    </div>
+    <CatalogEntries
+      class="card-builder--section-grid"
+      @catalogEntries={{this.model.featuredEntries}}
+      data-test-featured-cards
+      as |card entry|
+    >
+      <LinkTo
+        @route="cards.card.view"
+        @model={{card.canonicalURL}}
+        class="card-builder--section-card-link"
+        data-test-featured-card={{card.canonicalURL}}
+      >
+        <CardRenderer
+          @card={{card}}
+          @class="card-builder--section-card"
+          @mode="view"
+          @format="isolated"
+          @suppressHeader={{true}}
+        />
+        <div class="card-builder--section-card-label" data-test-featured-card-title>{{entry.csTitle}}</div>
+      </LinkTo>
+    </CatalogEntries>
   </section>
 </main>

@@ -67,7 +67,10 @@ export default class CardManipulator extends Component {
     let doc = this.args.card.document;
 
     let fieldName = yield this.getNewFieldName.perform();
-    let csFieldSets = cloneDeep(this.args.card.csFieldSets) || { isolated: [], embedded: [] };
+    let isolatedFields = yield this.args.card.fields({ includeFieldSet: 'isolated' });
+    let embeddedFields = yield this.args.card.fields({ includeFieldSet: 'embedded' });
+    let csFieldSets = { isolated: isolatedFields.map(f => f.name), embedded: embeddedFields.map(f => f.name) };
+
     let csFieldOrder = [...(this.args.card.csFieldOrder || [])];
     csFieldOrder.splice(position, 0, fieldName);
     csFieldSets.isolated = csFieldSets.isolated || [];
@@ -120,7 +123,7 @@ export default class CardManipulator extends Component {
 
     this.catalogEntries = catalogEntries;
     this.parentCard = parentCard;
-    this.isolatedCss = isolatedCss;
+    this.isolatedCss = isolatedCss; // this is for the themer specifically
     if (parentCard) {
       this.grandParentCard = yield parentCard.adoptsFrom();
     }
@@ -143,7 +146,6 @@ export default class CardManipulator extends Component {
   @(task(function*(oldFieldName, newFieldName) {
     let field = yield this.args.card.field(oldFieldName);
     let doc = this.args.card.document;
-    let csFieldSets = cloneDeep(this.args.card.csFieldSets) || { isolated: [], embedded: [] };
     let csFieldOrder = [...(this.args.card.csFieldOrder || [])];
 
     let index = csFieldOrder.indexOf(oldFieldName);
@@ -151,15 +153,20 @@ export default class CardManipulator extends Component {
       csFieldOrder[index] = newFieldName;
     }
 
-    for (let format of ['isolated', 'embedded']) {
-      if (Array.isArray(csFieldSets[format]) && csFieldSets[format].includes(oldFieldName)) {
-        csFieldSets[format] = [...csFieldSets[format].filter(i => i !== oldFieldName), newFieldName];
-      }
-    }
     doc
       .withoutField(oldFieldName)
       .withField(newFieldName, field.document, field.csFieldArity)
-      .withAttributes({ csFieldSets, csFieldOrder });
+      .withAttributes({ csFieldOrder });
+
+    if (this.args.card.csFieldSets) {
+      let csFieldSets = cloneDeep(this.args.card.csFieldSets);
+      for (let format of ['isolated', 'embedded']) {
+        if (Array.isArray(csFieldSets[format]) && csFieldSets[format].includes(oldFieldName)) {
+          csFieldSets[format] = [...csFieldSets[format].filter(i => i !== oldFieldName), newFieldName];
+        }
+      }
+      doc.withAttributes({ csFieldSets });
+    }
 
     yield this.patchCard.perform(doc);
     this.selectedFieldName = newFieldName;
@@ -193,7 +200,10 @@ export default class CardManipulator extends Component {
 
   @(task(function*(fieldName, neededWhenEmbedded) {
     let doc = this.args.card.document;
-    let csFieldSets = cloneDeep(this.args.card.csFieldSets) || { isolated: [], embedded: [] };
+    let isolatedFields = yield this.args.card.fields({ includeFieldSet: 'isolated' });
+    let embeddedFields = yield this.args.card.fields({ includeFieldSet: 'embedded' });
+    let csFieldSets = { isolated: isolatedFields.map(f => f.name), embedded: embeddedFields.map(f => f.name) };
+
     if (neededWhenEmbedded && Array.isArray(csFieldSets.embedded) && !csFieldSets.embedded.includes(fieldName)) {
       csFieldSets.embedded.push(fieldName);
     } else if (!neededWhenEmbedded && Array.isArray(csFieldSets.embedded) && csFieldSets.embedded.includes(fieldName)) {
@@ -208,17 +218,20 @@ export default class CardManipulator extends Component {
 
   @(task(function*(fieldName) {
     let doc = this.args.card.document;
-    let csFieldSets = cloneDeep(this.args.card.csFieldSets) || { isolated: [], embedded: [] };
     let csFieldOrder = [...(this.args.card.csFieldOrder || [])];
 
     csFieldOrder = csFieldOrder.filter(i => i !== fieldName);
+    doc.withoutField(fieldName).withAttributes({ csFieldOrder });
 
-    for (let format of ['isolated', 'embedded']) {
-      if (Array.isArray(csFieldSets[format]) && csFieldSets[format].includes(fieldName)) {
-        csFieldSets[format] = [...csFieldSets[format].filter(i => i !== fieldName)];
+    if (this.args.card.csFieldSets) {
+      let csFieldSets = cloneDeep(this.args.card.csFieldSets);
+      for (let format of ['isolated', 'embedded']) {
+        if (Array.isArray(csFieldSets[format]) && csFieldSets[format].includes(fieldName)) {
+          csFieldSets[format] = [...csFieldSets[format].filter(i => i !== fieldName)];
+        }
       }
+      doc.withAttributes({ csFieldSets });
     }
-    doc.withoutField(fieldName).withAttributes({ csFieldSets, csFieldOrder });
 
     yield this.patchCard.perform(doc);
     if (this.selectedField.name === fieldName || this.selectedFieldName === fieldName) {

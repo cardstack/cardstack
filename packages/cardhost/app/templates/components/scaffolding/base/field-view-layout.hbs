@@ -3,6 +3,6 @@
 </div>
 <div class="value {{@card.name}}-value" data-test-belongs-to-field-viewer-value>
   {{#if this.fieldValue}}
-    <CardRenderer @card={{this.fieldValue}} @format="embedded"/>
+    <CardRenderer @card={{this.fieldValue}} @mode="view" @format="embedded"/>
   {{/if}}
 </div>

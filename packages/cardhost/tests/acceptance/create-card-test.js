@@ -12,7 +12,7 @@ import {
   waitForFieldNameChange,
   removeField,
   waitForCardPatch,
-  waitForEmbeddedCardLoad,
+  waitForCardLoad,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -142,7 +142,7 @@ module('Acceptance | card create', function(hooks) {
 
     await click('[data-test-library-link]');
     await click('[data-test-library-button]');
-    await waitForEmbeddedCardLoad(decodeURIComponent(cardId));
+    await waitForCardLoad(decodeURIComponent(cardId));
     assert.equal(currentURL(), '/');
 
     assert.deepEqual(

@@ -68,6 +68,15 @@ export class CardDocument {
         if (!this.fields.has(field) && autoCreateField) {
           this.fields.set(field, new CardDocument().adoptingFrom(this.guessValueType(value)));
         }
+
+        if (!values.csFieldSets && autoCreateField) {
+          let csFieldSets = this.csFieldValues.get('csFieldSets') || {};
+          csFieldSets.isolated = csFieldSets.isolated || [];
+          csFieldSets.embedded = csFieldSets.embedded || [];
+          csFieldSets.isolated.push(field);
+          csFieldSets.embedded.push(field);
+          this.csFieldValues.set('csFieldSets', csFieldSets);
+        }
       }
     }
   }

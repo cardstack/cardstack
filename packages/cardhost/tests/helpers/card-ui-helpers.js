@@ -22,8 +22,26 @@ export async function waitForSchemaViewToLoad() {
   await animationsSettled();
 }
 
-export async function waitForTemplatesLoad() {
-  await waitFor('[data-test-templates-loaded="true"]', { timeout });
+export async function waitForCatalogEntriesToLoad(catalogEntriesTypeTestSelector) {
+  await waitFor(
+    `${catalogEntriesTypeTestSelector ? catalogEntriesTypeTestSelector : ''}[data-test-catalog-entries-loaded="true"]`,
+    { timeout }
+  );
+  let cards = [
+    ...document.querySelectorAll(
+      `${catalogEntriesTypeTestSelector || `[data-test-catalog-entries]`} [data-test-card-renderer]`
+    ),
+  ].map(i => i.getAttribute('data-test-card-renderer'));
+  for (let card of cards) {
+    await waitForCardLoad(card);
+    let cardSelector = `[data-test-card-renderer="${card}"]`;
+    let fields = [...document.querySelectorAll(`${cardSelector} [data-test-field]`)].map(i =>
+      i.getAttribute('data-test-field')
+    );
+    for (let field of fields) {
+      await waitFor(`${cardSelector} [data-test-field="${field}"][data-test-loaded="true"]`, { timeout });
+    }
+  }
   await animationsSettled();
 }
 
@@ -43,34 +61,37 @@ export async function waitForCardPatch() {
   await animationsSettled();
 }
 
-export async function waitForCardLoad() {
-  await waitFor(`[data-test-card-loaded="true"]`, { timeout });
-  let fields = [...document.querySelectorAll(`[data-test-isolated-card] [data-test-field]`)].map(i =>
-    i.getAttribute('data-test-field')
-  );
-  for (let field of fields) {
-    await waitFor(`[data-test-isolated-card] [data-test-field="${field}"][data-test-loaded="true"]`, { timeout });
-  }
-}
-
 export async function waitForThemerLoad() {
   await waitForCardLoad();
   await waitFor('[data-test-themer-loaded]', { timeout });
   await animationsSettled();
 }
 
-export async function waitForEmbeddedCardLoad(cardId) {
-  await waitFor(`[data-test-card-renderer-embedded="${cardId}"][data-test-card-renderer-embedded-loaded="true"]`, {
-    timeout,
-  });
-  await waitFor(`[data-test-embedded-card="${cardId}"][data-test-embedded-card-loaded="true"]`, { timeout });
-  let fields = [...document.querySelectorAll(`[data-test-embedded-card="${cardId}"] [data-test-field]`)].map(i =>
-    i.getAttribute('data-test-field')
-  );
-  for (let field of fields) {
-    await waitFor(`[data-test-embedded-card="${cardId}"] [data-test-field="${field}"][data-test-loaded="true"]`, {
+export async function waitForCardLoad(cardId) {
+  if (cardId) {
+    await waitFor(`[data-test-card-renderer="${cardId}"][data-test-card-loaded="true"]`, {
       timeout,
     });
+    let fields = [...document.querySelectorAll(`[data-test-card-renderer="${cardId}"] [data-test-field]`)].map(i =>
+      i.getAttribute('data-test-field')
+    );
+    for (let field of fields) {
+      await waitFor(`[data-test-card-renderer="${cardId}"] [data-test-field="${field}"][data-test-loaded="true"]`, {
+        timeout,
+      });
+    }
+  } else {
+    await waitFor(`[data-test-card-renderer][data-test-card-loaded="true"]`, {
+      timeout,
+    });
+    let fields = [...document.querySelectorAll(`[data-test-card-renderer] [data-test-field]`)].map(i =>
+      i.getAttribute('data-test-field')
+    );
+    for (let field of fields) {
+      await waitFor(`[data-test-card-renderer] [data-test-field="${field}"][data-test-loaded="true"]`, {
+        timeout,
+      });
+    }
   }
 }
 

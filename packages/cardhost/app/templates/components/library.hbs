@@ -57,10 +57,26 @@
         {{svg-jar "saved" width="28px" height="28px"}}
         Saved Templates
       </header>
-      <CardTemplates
-        @catalogEntries={{this.model.catalogEntries}}
-        @openCardNameDialog={{this.openCardNameDialog}}
-      />
+      <CatalogEntries
+        class="library-section-grid"
+        @catalogEntries={{this.model.templateEntries}}
+        data-test-templates
+        as |template|
+      >
+        <Cta {{on "click" (fn this.openCardNameDialog "Adopt a Card" template)}}
+          @class="library--card-link"
+          data-test-embedded-card={{template.canonicalURL}}
+          data-test-library-adopt-card-btn={{template.canonicalURL}}
+        >
+          <CardRenderer
+            @class="library--card-renderer"
+            @card={{template}}
+            @format="embedded"
+            @preventIsolation={{true}}
+            @showName={{true}}
+          />
+        </Cta>
+      </CatalogEntries>
     </section>
 
     <section class="library-section library-section--common-cards">

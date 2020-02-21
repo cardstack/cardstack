@@ -12,8 +12,12 @@ const size = 100;
 export default class IndexRoute extends Route {
   @service data!: DataService;
 
-  async model(): Promise<{ cards: AddressableCard[]; catalogEntries: AddressableCard[] }> {
-    let [cards, catalogEntries] = await Promise.all([
+  async model(): Promise<{
+    cards: AddressableCard[];
+    templateEntries: AddressableCard[];
+    featuredEntries: AddressableCard[];
+  }> {
+    let [cards, templateEntries, featuredEntries] = await Promise.all([
       this.data.search(
         // TODO we really want this filter to not include catalog-entry cards. I
         // think we'll need to introduce a new type of filter to be able to
@@ -31,14 +35,36 @@ export default class IndexRoute extends Route {
         {
           filter: {
             type: catalogEntry,
+            eq: {
+              type: 'template',
+            },
           },
+          // Note that we are sorting these items on the date the catalog entry
+          // was created, not on the date that the underlying card was created
+          // (which is simple to change if that's what we want).
           sort: '-csCreated',
           page: { size },
         },
         { includeFieldSet: 'embedded' }
       ),
+      this.data.search(
+        {
+          filter: {
+            type: catalogEntry,
+            eq: {
+              type: 'featured',
+            },
+          },
+          // Note that we are sorting these items on the date the catalog entry
+          // was created, not on the date that the underlying card was created
+          // (which is simple to change if that's what we want).
+          sort: '-csCreated',
+          page: { size },
+        },
+        { includeFieldSet: 'isolated' }
+      ),
     ]);
-    return { cards, catalogEntries };
+    return { cards, templateEntries, featuredEntries };
   }
 
   @action

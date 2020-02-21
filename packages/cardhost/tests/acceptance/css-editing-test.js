@@ -17,15 +17,22 @@ import { myOrigin } from '@cardstack/core/origin';
 import { isolatedCssFile } from '@cardstack/cardhost/utils/scaffolding';
 
 const csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
-const parentCard = cardDocument().withAttributes({
-  csRealm,
-  csId: 'parent-card',
-  csTitle: 'Parent Card',
-  csFeatures: { 'isolated-css': isolatedCssFile },
-  csFiles: {
-    [isolatedCssFile]: 'base css',
-  },
-});
+const parentCard = cardDocument()
+  .withAttributes({
+    csRealm,
+    csId: 'parent-card',
+    csTitle: 'Parent Card',
+    csFeatures: { 'isolated-css': isolatedCssFile },
+    csFiles: {
+      [isolatedCssFile]: 'base css',
+    },
+    csFieldSets: {
+      isolated: ['title', 'author', 'body'],
+    },
+  })
+  .withField('title', 'string-field')
+  .withField('author', 'string-field')
+  .withField('body', 'string-field');
 const testCard = cardDocument()
   .withAttributes({
     csRealm,
@@ -35,9 +42,6 @@ const testCard = cardDocument()
     author: 'Van Gogh',
     body: 'It can be difficult these days to deal with the discerning tastes of the millenial puppy.',
   })
-  .withField('title', 'string-field')
-  .withField('author', 'string-field')
-  .withField('body', 'string-field')
   .adoptingFrom(parentCard);
 const cardPath = encodeURIComponent(testCard.canonicalURL);
 const scenario = new Fixtures({

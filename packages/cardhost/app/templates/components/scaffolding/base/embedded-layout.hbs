@@ -1,10 +1,9 @@
 <div
   class="embedded-card card-boundary embedded"
   data-test-embedded-card={{@card.canonicalURL}}
-  data-test-embedded-card-loaded={{stringify this.loadCard.isIdle}}
   data-test-embedded-card-mode={{@mode}}>
   <div class={{if (or (eq @mode "view") (eq @mode "layout")) "embedded-card--view-fields"}}>
-    {{#each this.fields as | field |}}
+    {{#each @fields as | field |}}
       <FieldRenderer @field={{field}} @mode={{@mode}}/>
     {{/each}}
   </div>

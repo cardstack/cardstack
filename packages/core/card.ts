@@ -416,12 +416,16 @@ export class Card {
   }
 
   @Memoize()
-  async fields(): Promise<FieldCard[]> {
+  async fields(rules: OcclusionRules = { includeFieldSet: 'everything' }): Promise<FieldCard[]> {
     let fields: FieldCard[] = [];
     let card: Card | undefined = this;
     while (card) {
       if (card.csFields) {
         for (let name of Object.keys(card.csFields)) {
+          let fieldRules = await this.rulesForField(name, rules);
+          if (!fieldRules) {
+            continue;
+          }
           fields.push(await card._field(name, this));
         }
       }

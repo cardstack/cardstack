@@ -11,7 +11,6 @@ export default class Library extends Component {
   @tracked adoptFromCard;
   @tracked dialogTitle;
   @tracked showDialog;
-  @tracked templates;
 
   @action
   openCardNameDialog(title, adoptFromCard) {

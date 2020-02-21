@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { click, visit, currentURL } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
-import { setCardName, waitForTemplatesLoad, waitForCardLoad, showCardId } from '../helpers/card-ui-helpers';
+import { setCardName, waitForCatalogEntriesToLoad, waitForCardLoad, showCardId } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
@@ -17,6 +17,10 @@ const parentCard = cardDocument()
     csRealm,
     csId: 'user-card',
     csTitle: 'User Card',
+    csFieldSets: {
+      embedded: ['name'],
+      isolated: ['name'],
+    },
   })
   .withField('name', 'string-field');
 const entry = cardDocument()
@@ -25,9 +29,7 @@ const entry = cardDocument()
     csId: 'entry',
     csTitle: 'User Template',
     csDescription: 'This is a template for creating users',
-    csFieldSets: {
-      embedded: ['card'],
-    },
+    type: 'template',
   })
   .withRelationships({ card: parentCard })
   .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'catalog-entry' });
@@ -37,6 +39,10 @@ const scenario = new Fixtures({
     cardTypes: [{ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }],
   },
 });
+
+async function waitForTemplatesToLoad() {
+  await waitForCatalogEntriesToLoad('[data-test-templates]');
+}
 
 module('Acceptance | card name dialog', function(hooks) {
   setupApplicationTest(hooks);
@@ -48,7 +54,7 @@ module('Acceptance | card name dialog', function(hooks) {
   test('can create a card that uses a template from the catalog', async function(assert) {
     await visit('/');
     await click('[data-test-library-button]');
-    await waitForTemplatesLoad();
+    await waitForTemplatesToLoad();
 
     await click('[data-test-library-adopt-card-btn]');
     await percySnapshot([assert.test.module.name, assert.test.testName, 'adopt dialog'].join(' | '));
@@ -68,7 +74,7 @@ module('Acceptance | card name dialog', function(hooks) {
   test('can create a new card that does not leverage a template from the catalog', async function(assert) {
     await visit('/');
     await click('[data-test-library-button]');
-    await waitForTemplatesLoad();
+    await waitForTemplatesToLoad();
 
     await click('[data-test-library-new-blank-card-btn]');
     assert.dom('[data-test-dialog-box] .dialog--title').hasTextContaining('Create a New Card');
@@ -86,7 +92,7 @@ module('Acceptance | card name dialog', function(hooks) {
   test('can cancel creation of a card by clicking outside the dialog', async function(assert) {
     await visit('/');
     await click('[data-test-library-button]');
-    await waitForTemplatesLoad();
+    await waitForTemplatesToLoad();
 
     await click('[data-test-library-adopt-card-btn]');
     await click('[data-test-cardhost-modal-container]'); // close dialog by clicking modal container
@@ -97,7 +103,7 @@ module('Acceptance | card name dialog', function(hooks) {
   test('can cancel creation of a card by clicking the cancel button', async function(assert) {
     await visit('/');
     await click('[data-test-library-button]');
-    await waitForTemplatesLoad();
+    await waitForTemplatesToLoad();
 
     await click('[data-test-library-adopt-card-btn]');
     await click('[data-test-cancel-create-btn]'); // close dialog by clicking cancel button

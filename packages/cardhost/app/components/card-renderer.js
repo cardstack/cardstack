@@ -50,7 +50,14 @@ export default class CardRenderer extends Component {
   }
 
   @(task(function*() {
-    let tasks = [this.args.card.fields()];
+    // This means that we only occlude fields based on format when you ask for a
+    // card to be rendered in its view mode. Meaning that in the edit mode you
+    // can see all fields regardless of fieldset rules. I think this is
+    // correct... (not to be confused with the rules around permissions which
+    // are totally separate to the format based occlusion rules).
+    let fieldsetFormatRule = this.mode === 'view' ? this.args.format : 'everything';
+
+    let tasks = [this.args.card.fields({ includeFieldSet: fieldsetFormatRule })];
     if (!this.args.suppressCss && (this.mode === 'view' || this.mode === 'layout')) {
       tasks.push(this.args.card.loadFeature(`${this.args.format}-css`));
     }
@@ -79,7 +86,7 @@ export default class CardRenderer extends Component {
       this.fields = [...this.actualFields];
     } else {
       this.fields = [
-        ...fieldOrder.map(i => this.actualFields.find(j => i === j.name)),
+        ...fieldOrder.map(i => this.actualFields.find(j => i === j.name)).filter(Boolean),
         ...this.actualFields.filter(i => !fieldOrder.includes(i.name)),
       ];
     }

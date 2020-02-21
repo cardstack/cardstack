@@ -8,7 +8,8 @@
         {{@class}}
       "
       tabindex="0"
-      data-test-card-renderer-isolated
+      data-test-card-renderer-isolated={{@card.canonicalURL}}
+      data-test-card-renderer={{@card.canonicalURL}}
       data-test-card-loaded={{stringify this.loadCard.isIdle}}
       {{on "focus" (action this.cardIsFocused true)}}
       {{did-insert this.focusCard true}}
@@ -102,7 +103,8 @@
         {{@class}}
       "
       data-test-card-renderer-embedded={{@card.canonicalURL}}
-      data-test-card-renderer-embedded-loaded={{stringify this.loadCard.isIdle}}
+      data-test-card-renderer={{@card.canonicalURL}}
+      data-test-card-loaded={{stringify this.loadCard.isIdle}}
     >
       {{#if (and (eq this.mode "view") (not @preventIsolation))}}
         <LinkTo
@@ -113,12 +115,14 @@
         >
           <Scaffold
             @card={{@card}}
+            @fields={{this.fields}}
             @feature="embedded-layout"
             @mode={{this.mode}} />
         </LinkTo>
       {{else}}
         <Scaffold
           @card={{@card}}
+          @fields={{this.fields}}
           @feature="embedded-layout"
           @mode={{this.mode}} />
         {{#if @showName}}

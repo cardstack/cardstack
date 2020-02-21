@@ -33,6 +33,7 @@ const testCard = cardDocument()
     csFieldOrder: ['title', 'author', 'body'],
     csFieldSets: {
       embedded: ['author'],
+      isolated: ['title', 'author', 'body'],
     },
     title: 'test title',
     author: 'test author',

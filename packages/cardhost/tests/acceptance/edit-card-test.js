@@ -3,13 +3,7 @@ import { find, visit, currentURL, click } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import { percySnapshot } from 'ember-percy';
 import Fixtures from '../helpers/fixtures';
-import {
-  setFieldValue,
-  saveCard,
-  waitForCardLoad,
-  waitForEmbeddedCardLoad,
-  encodeColons,
-} from '../helpers/card-ui-helpers';
+import { setFieldValue, saveCard, waitForCardLoad, encodeColons } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { cardDocument } from '@cardstack/core/card-document';
 import { myOrigin } from '@cardstack/core/origin';
@@ -19,9 +13,6 @@ const author = cardDocument().withAutoAttributes({
   csRealm,
   csId: 'vangogh',
   name: 'Van Gogh',
-  csFieldSets: {
-    embedded: ['name'],
-  },
 });
 const testCard = cardDocument()
   .withAttributes({
@@ -29,7 +20,7 @@ const testCard = cardDocument()
     csId: 'millenial-puppies',
     csTitle: 'Millenial Puppies',
     csFieldSets: {
-      isolated: ['author'],
+      isolated: ['body', 'likes', 'published', 'author'],
     },
     likes: 100,
     body: 'test body',
@@ -129,7 +120,7 @@ module('Acceptance | card edit', function(hooks) {
 
     await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
-    await waitForEmbeddedCardLoad(author.canonicalURL);
+    await waitForCardLoad(author.canonicalURL);
     assert
       .dom(
         `[data-test-field="author"] [data-test-embedded-card="${author.canonicalURL}"] [data-test-field="name"] [data-test-string-field-viewer-value]`
