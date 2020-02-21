@@ -5,7 +5,15 @@
   data-test-isolated-card-mode={{@mode}}
 >
   <AnimatedContainer class={{if (or (eq @mode "view") (eq @mode "layout")) "isolated-card--view-fields"}}>
-    <MaybeAnimate @mode={{@mode}} @fields={{@fields}} @component="animated-each" @key="nonce" @use={{this.transition}} @duration={{this.duration}} as |field|>
+    <MaybeAnimate
+      @mode={{@mode}}
+      @animationMode="schema"
+      @component="animated-each"
+      @content={{@fields}}
+      @key="nonce"
+      @use={{this.transition}}
+      @duration={{this.duration}} as |field|
+    >
       {{#if @setFieldValue}}
         <FieldRenderer
           @field={{field}}
