@@ -10,7 +10,7 @@ import { fieldTypeMappings, fieldComponents } from '../utils/mappings';
 import drag from '../motions/drag';
 import move from 'ember-animated/motions/move';
 import scaleBy from '../motions/scale';
-import { parallel } from 'ember-animated';
+import { parallel, printSprites } from 'ember-animated';
 import { fadeOut } from 'ember-animated/motions/opacity';
 
 const { environment } = ENV;
@@ -360,6 +360,7 @@ export default class CardManipulator extends Component {
   }
 
   *transition({ keptSprites }) {
+    printSprites(arguments[0], 'field transition');
     let activeSprite = keptSprites.find(sprite => sprite.owner.value.dragState);
     let others = keptSprites.filter(sprite => sprite !== activeSprite);
 
