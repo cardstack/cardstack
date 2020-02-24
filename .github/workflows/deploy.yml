@@ -6,11 +6,15 @@ on:
       - master
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
     steps:
     - name: Run all tests before deploy
       uses: ./.github/workflows/nodejs
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
     - uses: actions/checkout@v1
     - name: Install Node.js
       uses: actions/setup-node@v1
