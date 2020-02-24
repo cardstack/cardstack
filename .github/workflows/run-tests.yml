@@ -3,11 +3,11 @@ name: Node CI
 on: [push]
 
 jobs:
-  # only run tests for pushes to master as part of the deploy Action, where we set is_deploying to true.
-  # vars specified using `with:` are automatically all-caps and prefixed with INPUT
-  if: github.ref != 'refs/heads/master' || INPUT_IS_DEPLOYING 
   build:
     runs-on: ubuntu-latest
+    # only run tests for pushes to master as part of the deploy Action, where we set is_deploying to true.
+    # vars specified using `with:` are automatically all-caps and prefixed with INPUT
+    if: github.ref != 'refs/heads/master' || INPUT_IS_DEPLOYING 
     steps:
     - uses: actions/checkout@v1
     - name: Install Node.js
