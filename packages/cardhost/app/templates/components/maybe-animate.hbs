@@ -1,6 +1,14 @@
 {{#if (eq @component "animated-each")}}
   {{#if (and @animationMode (eq @mode @animationMode))}}
-    {{#animated-each @content key=@key use=@use duration=@duration as |field|}}
+    {{#animated-each
+        @content
+        key=@key
+        watch=@watch
+        group=@group
+        use=@use
+        duration=@duration
+        initialInsertion=@initialInsertion
+        finalRemoval=@finalRemoval as |field|}}
       {{yield field}}
     {{/animated-each}}
   {{else}}
@@ -10,13 +18,20 @@
   {{/if}}
 {{else}}
   {{#if (and @animationMode (eq @mode @animationMode))}}
-    {{#let (component @component) as |Component|}}
-      <Component @card={{@content}} @watch={{@watch}} @use={{@use}} @duration={{@duration}}>
-        {{yield}}
-      </Component>
-    {{/let}}
+    {{#animated-value
+        @content
+        key=@key
+        watch=@watch
+        group=@group
+        use=@use
+        duration=@duration
+        initialInsertion=@initialInsertion
+        finalRemoval=@finalRemoval as |c|}}
+      {{yield c}}
+    {{/animated-value}}
   {{else}}
-    {{yield}}
+    {{#let @content as |c|}}
+      {{yield c}}
+    {{/let}}
   {{/if}}
 {{/if}}
-
