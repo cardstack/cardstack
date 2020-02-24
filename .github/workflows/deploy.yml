@@ -11,7 +11,7 @@ jobs:
     steps:
     - name: Run all tests before deploy
       uses: ./.github/workflows/nodejs
-      with:
+      env:
         is_deploying: true
   deploy:
     runs-on: ubuntu-latest
