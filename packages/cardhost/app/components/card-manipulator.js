@@ -11,6 +11,7 @@ import drag from '../motions/drag';
 import move from 'ember-animated/motions/move';
 import scaleBy from '../motions/scale';
 import { parallel } from 'ember-animated';
+import { fadeOut } from 'ember-animated/motions/opacity';
 
 const { environment } = ENV;
 
@@ -380,7 +381,7 @@ export default class CardManipulator extends Component {
         );
         let { width, height } = targetField.getBoundingClientRect();
         droppedSprite.endTranslatedBy(((1 - scaleTo) / 2) * width, ((1 - scaleTo) / 2) * height);
-        yield parallel(scaleBy(droppedSprite, { by: scaleTo }), move(droppedSprite));
+        yield parallel(scaleBy(droppedSprite, { by: scaleTo }), move(droppedSprite), fadeOut(droppedSprite));
         droppedSprite.owner.value.dropTo = null;
       }
     }
