@@ -55,6 +55,7 @@ export default class CardRenderer extends Component {
       if (addField) {
         // remove other stub fields first
         this.fields = this.fields.filter(field => !field.preview);
+        console.log('adding field', field.name, 'at position', position);
         // check if adding at the end
         if (position < this.fields.length) {
           this.fields.insertAt(position, field);
@@ -64,6 +65,7 @@ export default class CardRenderer extends Component {
       } else {
         // don't remove a field that's not a stub field
         if (this.fields[position].preview) {
+          console.log('removing field', this.fields[position].name, 'at position', position);
           this.fields.removeAt(position);
         }
       }

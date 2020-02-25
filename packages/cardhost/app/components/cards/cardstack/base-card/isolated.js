@@ -19,7 +19,7 @@ export default class IsolatedComponent extends Component {
   duration = animationSpeed || duration;
 
   *transition({ insertedSprites, keptSprites, removedSprites }) {
-    printSprites(arguments[0], 'field transitions');
+    // printSprites(arguments[0], 'field transitions');
     let scaleFrom = 0.1;
 
     let activeSprite = keptSprites.find(sprite => sprite.owner.value.dragState);

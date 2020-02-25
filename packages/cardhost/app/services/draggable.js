@@ -150,9 +150,10 @@ export default class DraggableService extends Service {
     } else {
       this.setCard(card);
     }
-    console.log('MOUSE DOWN', dragEvent.target);
+    console.log('MOUSE DOWN');
 
     function stopMouse() {
+      console.log('MOUSE UP');
       field.dragState = dragState = null;
       let dropzone = self.getDropzone();
       if (dropzone) {
@@ -178,12 +179,13 @@ export default class DraggableService extends Service {
         ghostEl.remove();
       }
 
-      window.removeEventListener('mousemove', updateMouse, false);
-      window.removeEventListener('mouseup', stopMouse, false);
+      window.removeEventListener('mousemove', updateMouse);
+      window.removeEventListener('mouseup', stopMouse);
       return false;
     }
 
     function updateMouse(event) {
+      // console.log('MOUSE MOVE');
       dragState.latestPointerX = event.x;
       dragState.latestPointerY = event.y;
 
@@ -225,8 +227,8 @@ export default class DraggableService extends Service {
         latestPointerX: dragEvent.x,
         latestPointerY: dragEvent.y,
       };
-      window.addEventListener('mouseup', stopMouse, false);
-      window.addEventListener('mousemove', updateMouse, false);
+      window.addEventListener('mouseup', stopMouse);
+      window.addEventListener('mousemove', updateMouse);
     }
     field.dragState = dragState;
     this.setField(field);
@@ -244,7 +246,7 @@ export default class DraggableService extends Service {
 
     let field;
 
-    if (draggedField.name) {  
+    if (draggedField.name) {
       let fieldName = draggedField.name;
       if (fieldName) {
         let card = draggedField.card;
@@ -264,6 +266,7 @@ export default class DraggableService extends Service {
     this.clearField();
     this.clearCard();
     this.clearDropzone();
+    this.setDragging(false);
 
     onFinishDrop(field, evt);
   }

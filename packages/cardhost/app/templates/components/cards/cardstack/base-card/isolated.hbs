@@ -17,8 +17,6 @@
       {{else if (or @setNeededWhenEmbedded @setPosition @removeField @setFieldName)}}
         <section class="field-renderer--wrapper"
           tabindex="-1"
-          {{on "mousedown" (fn this.draggable.beginDragging field @card)}}
-          {{on "click" (fn this.draggable.clickDraggable field @card)}}
           data-test-card-add-field-draggable={{field.type}}
         >
             {{!-- {{on "mousedown" (action this.initMousedown)}}
@@ -26,6 +24,8 @@
           <button
             class="field--move-btn"
             aria-label="Drag field"
+            {{on "mousedown" (fn this.draggable.beginDragging field @card @toggleStubField)}}
+            {{on "click" (fn this.draggable.clickDraggable field @card @toggleStubField)}}
             data-test-field-renderer-move-btn
             data-test-field-renderer-move-btn-position={{field.position}}
           >
