@@ -1,0 +1,37 @@
+{{#if (eq @component "animated-each")}}
+  {{#if (and @animationMode (eq @mode @animationMode))}}
+    {{#animated-each
+        @content
+        key=@key
+        watch=@watch
+        group=@group
+        use=@use
+        duration=@duration
+        initialInsertion=@initialInsertion
+        finalRemoval=@finalRemoval as |field|}}
+      {{yield field}}
+    {{/animated-each}}
+  {{else}}
+    {{#each @content as |field|}}
+      {{yield field}}
+    {{/each}}
+  {{/if}}
+{{else}}
+  {{#if (and @animationMode (eq @mode @animationMode))}}
+    {{#animated-value
+        @content
+        key=@key
+        watch=@watch
+        group=@group
+        use=@use
+        duration=@duration
+        initialInsertion=@initialInsertion
+        finalRemoval=@finalRemoval as |c|}}
+      {{yield c}}
+    {{/animated-value}}
+  {{else}}
+    {{#let @content as |c|}}
+      {{yield c}}
+    {{/let}}
+  {{/if}}
+{{/if}}

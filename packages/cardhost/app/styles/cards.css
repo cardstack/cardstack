@@ -1,21 +1,18 @@
 .cardhost-cards {
   width: 100%;
-  min-height: 100vh;
-  background-color: var(--ch-default);
-  transition: var(--ch-card-background-color-animate);
-}
-
-.cardhost-cards.view {
+  height: 100vh;
+  margin: 0;
   background-color: var(--ch-light-background);
+  color: var(--ch-dark);
+  overflow-y: auto;
+  transition: var(--ch-card-background-color-animate);
 }
 
 .cardhost-cards.edit {
   background-color: var(--ch-default);
 }
 
-.cardhost-cards.schema,
-.cardhost-cards.add,
-.cardhost-cards.adopt {
+.cardhost-cards.schema {
   background-color: var(--ch-deep-background);
 }
 

@@ -72,6 +72,7 @@
 .cardhost-card-theme-editor .editor-container__title {
   min-height: var(--editor-header-height);
   background-color: var(--ch-default);
+  color: var(--ch-light);
   font: 600 13px/18px var(--ch-font-family);
   letter-spacing: 0.035em;
   padding: 12px;
