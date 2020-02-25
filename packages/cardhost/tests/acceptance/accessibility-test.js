@@ -5,13 +5,14 @@ import Fixtures from '../helpers/fixtures';
 import {
   waitForCardLoad,
   waitForSchemaViewToLoad,
+  waitForCatalogEntriesToLoad,
   waitForThemerLoad,
-  waitForTemplatesLoad,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { cardDocument } from '@cardstack/core/card-document';
 import { myOrigin } from '@cardstack/core/origin';
 import a11yAudit from 'ember-a11y-testing/test-support/audit';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 const csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
 const testCard = cardDocument()
@@ -26,13 +27,44 @@ const testCard = cardDocument()
     body: 'test body',
   })
   .withField('body', 'string-field', 'singular', { csTitle: 'Body' });
+const featuredEntry = cardDocument()
+  .withAttributes({
+    csRealm,
+    csId: 'featured-entry',
+    csTitle: 'Featured: The Millenial Puppy',
+    csDescription: 'This super hot article about these puppies that are pooping all over the place.',
+    csCreated: '2020-01-01T19:00:00Z',
+    type: 'featured',
+  })
+  .withRelationships({ card: testCard })
+  .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'catalog-entry' });
+const templateEntry = cardDocument()
+  .withAttributes({
+    csRealm,
+    csId: 'template-entry',
+    csTitle: 'Article Template',
+    csCreated: '2020-01-01T19:00:00Z',
+    type: 'template',
+  })
+  .withRelationships({ card: testCard })
+  .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'catalog-entry' });
 const cardPath = encodeURIComponent(testCard.canonicalURL);
 const scenario = new Fixtures({
-  create: [testCard],
+  create: [testCard, featuredEntry, templateEntry],
 });
 
 async function waitForCssTransitions() {
   return new Promise(res => setTimeout(() => res(), 1000));
+}
+
+async function waitForFeaturedCardsLoad() {
+  await waitForCatalogEntriesToLoad('[data-test-featured-cards]');
+  await waitForCardLoad(testCard.canonicalURL);
+}
+
+async function waitForLibraryLoad() {
+  await waitForCatalogEntriesToLoad('[data-test-templates]');
+  await waitForCardLoad(testCard.canonicalURL);
 }
 
 module('Acceptance | accessibility', function(hooks) {
@@ -87,13 +119,13 @@ module('Acceptance | accessibility', function(hooks) {
   // our nav buttons are failing contrast tests
   skip('basic a11y tests for library (FIXME: nav buttons failing contrast test)', async function(assert) {
     await visit('/');
+    await waitForFeaturedCardsLoad();
     await waitForCssTransitions();
     await a11yAudit();
     assert.ok(true, 'no a11y errors found for library featured cards');
 
     await click('[data-test-library-button]');
-    await waitForTemplatesLoad();
-    await waitForCardLoad(testCard.canonicalURL);
+    await waitForLibraryLoad();
     await waitForCssTransitions();
     await a11yAudit();
     assert.ok(true, 'no a11y errors found for library');
