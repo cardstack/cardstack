@@ -32,7 +32,9 @@ export default class CardNameDialog extends Component {
     });
     if (this.args.adoptsFrom) {
       doc.adoptingFrom(this.args.adoptsFrom);
-      let csFieldOrder = this.args.adoptsFrom.csFieldOrder;
+      let csFieldOrder = Array.isArray(this.args.adoptsFrom.csFieldOrder)
+        ? [...this.args.adoptsFrom.csFieldOrder]
+        : undefined;
       if (csFieldOrder) {
         doc.setAttributes({ csFieldOrder });
       }

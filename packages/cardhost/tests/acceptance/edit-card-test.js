@@ -3,7 +3,13 @@ import { find, visit, currentURL, click } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import { percySnapshot } from 'ember-percy';
 import Fixtures from '../helpers/fixtures';
-import { setFieldValue, saveCard, waitForCardLoad, encodeColons } from '../helpers/card-ui-helpers';
+import {
+  setFieldValue,
+  saveCard,
+  waitForCardLoad,
+  encodeColons,
+  waitForCardAutosave,
+} from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { cardDocument } from '@cardstack/core/card-document';
 import { myOrigin } from '@cardstack/core/origin';
@@ -167,8 +173,8 @@ module('Acceptance | card edit', function(hooks) {
     assert.dom('[data-test-top-edge-size-buttons]').hasClass('hidden');
     assert.dom('[data-test-view-selector]').exists();
     assert.dom('[data-test-view-selector="fields"]').hasClass('active');
-    assert.dom('[data-test-mode-indicator]').exists();
-    assert.dom('[data-test-mode-indicator-label]').hasClass('edit');
+    assert.dom('[data-test-mode-indicator-link="view"]').exists();
+    assert.dom('[data-test-mode-indicator]').containsText('edit mode');
     assert.dom('[data-test-edge-actions-btn]').exists();
     await percySnapshot(assert);
   });
@@ -184,8 +190,8 @@ module('Acceptance | card edit', function(hooks) {
     assert.dom('[data-test-top-edge-size-buttons]').doesNotHaveClass('hidden');
     assert.dom('[data-test-view-selector]').exists();
     assert.dom('[data-test-view-selector="layout"]').hasClass('active');
-    assert.dom('[data-test-mode-indicator]').exists();
-    assert.dom('[data-test-mode-indicator-label]').hasClass('edit');
+    assert.dom('[data-test-mode-indicator-link="view"]').exists();
+    assert.dom('[data-test-mode-indicator]').containsText('edit mode');
     assert.dom('[data-test-edge-actions-btn]').exists();
     await percySnapshot(assert);
   });
@@ -198,5 +204,23 @@ module('Acceptance | card edit', function(hooks) {
     assert.dom('[data-test-internal-card-id]').doesNotExist();
     assert.dom('[data-test-appearance-section]').doesNotExist();
     assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('Base Card');
+  });
+
+  test('autosave works', async function(assert) {
+    await visit(`/cards/${cardPath}/edit/fields`);
+    await waitForCardLoad();
+
+    this.owner.lookup('service:autosave').autosaveDisabled = false;
+    await setFieldValue('body', 'this will autosave');
+    await waitForCardAutosave();
+    this.owner.lookup('service:autosave').autosaveDisabled = true;
+
+    await visit(`/cards/${cardPath}`);
+    await waitForCardLoad();
+    assert.dom('[data-test-field="body"] [data-test-string-field-viewer-value]').hasText(`this will autosave`);
+
+    let cardJson = find('[data-test-card-json]').innerHTML;
+    let card = JSON.parse(cardJson);
+    assert.equal(card.data.attributes.body, `this will autosave`);
   });
 });

@@ -16,12 +16,27 @@ export interface Model {
 
 export default class CardsCard extends Route {
   @service data!: DataService;
+  @service autosave!: {
+    setCardModel: any; // this is actually a task which is really hard to describe in TS
+    saveCard: any; // this is actually a task which is really hard to describe in TS
+    bindCardUpdated: (fn: Function) => void;
+  };
 
   async model({ id }: RouteParams): Promise<Model> {
+    await Promise.resolve(this.autosave.saveCard.last);
     return {
       card: await this.data.load(id, 'everything'),
       isDirty: false, // This is a temporary place to track model dirtiness until we integrate OrbitJS
     };
+  }
+
+  async beforeModel() {
+    this.autosave.bindCardUpdated(this.updateCardModel.bind(this));
+    await this.autosave.setCardModel.perform().then();
+  }
+
+  async afterModel(model: Model) {
+    await this.autosave.setCardModel.perform(model).then();
   }
 
   serialize(model: Model): RouteParams {
@@ -40,7 +55,16 @@ export default class CardsCard extends Route {
   @action
   updateCardModel(card: AddressableCard, isDirty: boolean) {
     let model = this.modelFor(this.routeName) as Model;
-    set(model, 'isDirty', isDirty);
-    set(model, 'card', card);
+
+    // This is to guard against an autosave that was kicked off right as we
+    // switched routes. This protects against the case where the model that we
+    // care about for our route is for a different card now. In that scenario,
+    // this invocation can be disregarded (we'll pick up the updated model state
+    // the next time we enter the old card's route via the data service's load
+    // method).
+    if (model.card.canonicalURL === card.canonicalURL) {
+      set(model, 'isDirty', isDirty);
+      set(model, 'card', card);
+    }
   }
 }

@@ -13,6 +13,7 @@ import {
   removeField,
   waitForCardPatch,
   waitForCardLoad,
+  waitForCardAutosave,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -309,9 +310,6 @@ module('Acceptance | card create', function(hooks) {
     await visit('/cards/add');
 
     await setCardName(card1Name);
-    let card1Id = currentURL()
-      .replace('/cards/', '')
-      .replace('/edit/fields/schema', '');
     await addField('title', 'string-field', true);
     await addField('body', 'string-field', false, 1);
     await addField('author', 'string-field', false, 1);
@@ -323,16 +321,28 @@ module('Acceptance | card create', function(hooks) {
       ['title', 'author', 'body']
     );
 
-    await saveCard();
-
-    await visit(`/cards/${card1Id}`);
-    await animationsSettled();
-    assert.deepEqual(
-      [...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
-      ['title', 'author', 'body']
-    );
     let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.deepEqual(card.data.attributes.csFieldOrder, ['title', 'author', 'body']);
+  });
+
+  test('autosave works', async function(assert) {
+    await visit('/cards/add');
+    await setCardName(card1Name);
+    let card1Id = currentURL()
+      .replace('/cards/', '')
+      .replace('/edit/fields/schema', '');
+    this.owner.lookup('service:autosave').autosaveDisabled = false;
+    await addField('title', 'string-field', true);
+    await waitForCardAutosave();
+    this.owner.lookup('service:autosave').autosaveDisabled = true;
+
+    await visit(`/cards/${card1Id}`);
+    await waitForCardLoad();
+
+    assert.dom('[data-test-field="title"]').exists();
+    let cardJson = find('[data-test-card-json]').innerHTML;
+    let card = JSON.parse(cardJson);
+    assert.ok(card.data.attributes.csFields['title']);
   });
 });

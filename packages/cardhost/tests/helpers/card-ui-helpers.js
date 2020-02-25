@@ -1,4 +1,4 @@
-import { click, focus, find, triggerEvent, fillIn, visit, waitFor } from '@ember/test-helpers';
+import { click, focus, find, triggerEvent, fillIn, visit, waitFor, waitUntil, getContext } from '@ember/test-helpers';
 import { animationsSettled } from 'ember-animated/test-support';
 import { canonicalURL } from '@cardstack/core/card-id';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
@@ -16,9 +16,9 @@ export async function showCardId(toggleDetailsSection = false) {
   await animationsSettled();
 }
 
-export async function waitForSchemaViewToLoad() {
+export async function waitForSchemaViewToLoad(cardId) {
   await waitFor('[data-test-right-edge]', { timeout });
-  await waitForCardLoad();
+  await waitForCardLoad(cardId);
   await animationsSettled();
 }
 
@@ -106,12 +106,15 @@ export async function selectField(name) {
 }
 
 export async function setCardName(name) {
+  let isNotAdopted = document.querySelector('[data-test-card-name-dialog-is-adopted-card="false"]');
   await fillIn('#card__name', name);
   await click('[data-test-create-card-btn]');
-  await waitFor(`[data-test-card-save-btn]`, { timeout });
 
-  if (document.querySelector('[data-test-card-name-dialog-is-adopted-card="false"]')) {
+  if (isNotAdopted) {
     await waitForSchemaViewToLoad();
+  } else {
+    await waitFor(`[data-test-card-edit]`, { timeout });
+    await waitForCardLoad();
   }
 }
 
@@ -198,8 +201,18 @@ export async function createCards(args) {
 
 export async function saveCard() {
   await waitForCardPatch();
-  await click(`[data-test-card-save-btn]`);
-  await waitFor(`[data-test-card-save-btn].saved`, { timeout });
+  // We are reaching around the autosave mechanism here (which is disabled in
+  // the test environment) for tests that rely on a persisted card state.
+  await getContext()
+    .owner.lookup('service:autosave')
+    .saveCard.perform()
+    .then();
+  await waitForCardPatch();
+  await animationsSettled();
+}
+
+export async function waitForCardAutosave() {
+  await waitUntil(() => getContext().owner.lookup('service:autosave').debounceAndSave.isIdle, { timeout });
   await waitForCardPatch();
   await animationsSettled();
 }

@@ -18,7 +18,7 @@
   {{#if @setPosition}}
     <button {{on "mousedown" (action this.initDrag @field)}}
       {{on "mouseup" (action this.endDrag)}}
-      {{on "dragend" (action (mut this.isDragging) false)}}
+      {{on "dragend" (fn this.draggable.setDragging false)}}
       class="field--move-btn"
       aria-label="Drag field"
       data-test-field-renderer-move-btn

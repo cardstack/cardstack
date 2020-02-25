@@ -17,6 +17,9 @@ export default class CardThemer extends CardManipulator {
   `;
 
   @(task(function*(css) {
+    if (this.autosave.saveCard.last) {
+      yield this.autosave.saveCard.last.then();
+    }
     yield this.load.last.finally();
 
     this.isolatedCss = css;

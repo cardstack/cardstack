@@ -43,7 +43,7 @@
       <div class="card-renderer-isolated--content
         {{concat (safe-css-string (if @card.canonicalURL @card.canonicalURL @card.adoptsFromURL)) "--isolated" }}
       ">
-        {{#if @suppressHeader}}
+        {{#if (or @suppressHeader @noHeaderAnimation)}}
           <div class="card-renderer-isolated--card-container card-boundary isolated">
             <Scaffold
               @card={{@card}}
@@ -137,23 +137,25 @@
   the ability to know what all cards are on the page and spit out the most
   efficient CSS so that cards that leverage a common parent's CSS all get
   collasped into a single style element --}}
-  {{#if (and (not this.css) this.loadCard.isRunning)}}
-    <style
-      data-test-view-css={{@card.canonicalURL}}
-      data-test-view-css-format={{@format}}
-    >
-      {{#if (eq @format "isolated")}}
-        {{scope-css this.loadingIsolatedCss (concat (safe-css-string @card.canonicalURL) "--" @format)}}
-      {{else}}
-        {{scope-css this.loadingEmbeddedCss (concat (safe-css-string @card.canonicalURL) "--" @format)}}
-      {{/if}}
-    </style>
-  {{else if this.css}}
-    <style
-      data-test-view-css={{@card.canonicalURL}}
-      data-test-view-css-format={{@format}}
-    >
-      {{scope-css this.css (concat (safe-css-string @card.canonicalURL) "--" @format)}}
-    </style>
-  {{/if}}
+  {{#unless @suppressCss}}
+    {{#if (and (not this.css) this.loadCard.isRunning)}}
+      <style
+        data-test-view-css={{@card.canonicalURL}}
+        data-test-view-css-format={{@format}}
+      >
+        {{#if (eq @format "isolated")}}
+          {{scope-css this.loadingIsolatedCss (concat (safe-css-string @card.canonicalURL) "--" @format)}}
+        {{else}}
+          {{scope-css this.loadingEmbeddedCss (concat (safe-css-string @card.canonicalURL) "--" @format)}}
+        {{/if}}
+      </style>
+    {{else if this.css}}
+      <style
+        data-test-view-css={{@card.canonicalURL}}
+        data-test-view-css-format={{@format}}
+      >
+        {{scope-css this.css (concat (safe-css-string @card.canonicalURL) "--" @format)}}
+      </style>
+    {{/if}}
+  {{/unless}}
 {{/if}}

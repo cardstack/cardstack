@@ -1,4 +1,8 @@
-<CardViewer @card={{this.model.card}} @mode="layout" as |card args|>
+<CardViewer
+  @card={{this.model.card}}
+  @noHeaderAnimation={{true}}
+  @mode="layout" as |card args|
+>
   {{#if this.cardstackSession.isAuthenticated}}
     <RightEdge
       @card={{card}}

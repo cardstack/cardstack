@@ -8,6 +8,7 @@ import {
   saveCard,
   waitForCardPatch,
   encodeColons,
+  waitForCardAutosave,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -59,7 +60,11 @@ const waitForAnimation = function(cb) {
   });
 };
 
-module('Acceptance | css editing', function(hooks) {
+// If the chrome browser window doesn't have focus while running these tests,
+// then you'll get false test failures. I think there might be some kind of
+// monaco depedency on having the chrome browser have focus in order for the CSS
+// to bet set correctly.
+module('Acceptance | css editing (make sure browser window has focus!)', function(hooks) {
   setupApplicationTest(hooks);
   scenario.setupTest(hooks);
   hooks.beforeEach(async function() {
@@ -103,7 +108,6 @@ module('Acceptance | css editing', function(hooks) {
 
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/layout`);
     assert.dom(`[data-test-card-view="${testCard.canonicalURL}"]`).exists();
-    assert.dom('[data-test-card-renderer-isolated]').hasClass('selected');
 
     await click('[data-test-card-custom-style-button]');
     await waitForThemerLoad();
@@ -118,8 +122,8 @@ module('Acceptance | css editing', function(hooks) {
     await click('[data-test-card-custom-style-button]');
     await waitForThemerLoad();
 
-    assert.dom('[data-test-mode-indicator-link="layout"]').exists();
-    await click('[data-test-mode-indicator-link="layout"]');
+    assert.dom('[data-test-mode-indicator-link="edit"]').exists();
+    await click('[data-test-mode-indicator-link="edit"]');
     await waitForCardLoad();
 
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/layout`);
@@ -242,7 +246,7 @@ module('Acceptance | css editing', function(hooks) {
     assert.dom('[data-test-large-btn]').hasClass('selected');
     assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
 
-    await click('[data-test-mode-indicator-link="layout"]');
+    await click('[data-test-mode-indicator-link="edit"]');
     await waitForCardLoad();
 
     assert.dom('[data-test-large-btn]').hasClass('selected');
@@ -279,12 +283,12 @@ module('Acceptance | css editing', function(hooks) {
 
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
     assert.ok(find(`[data-test-view-css="themer"]`).innerText.includes('gorgeous styles'), 'themer style is correct');
-
     await saveCard();
+
     assert.dom(`[data-test-view-css="${testCard.canonicalURL}"]`).doesNotExist();
     assert.ok(find(`[data-test-view-css="themer"]`).innerText.includes('gorgeous styles'), 'themer style is correct');
 
-    await visit(`/cards/${cardPath}/edit/layout`);
+    await click('[data-test-mode-indicator-link="edit"]');
     await waitForCardLoad();
 
     assert.dom(`[data-test-view-css="themer"]`).doesNotExist();
@@ -322,8 +326,9 @@ module('Acceptance | css editing', function(hooks) {
     await waitForThemerLoad();
 
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
-    await waitForCardPatch();
-    await click('[data-test-mode-indicator-link="layout"]');
+    await saveCard();
+    await click('[data-test-mode-indicator-link="edit"]');
+    await waitForCardLoad();
 
     await waitFor('[data-test-cs-component="dropdown"]');
     assert.dom('[data-test-cs-component="dropdown"]').exists();
@@ -338,9 +343,9 @@ module('Acceptance | css editing', function(hooks) {
     await waitForThemerLoad();
 
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
-    await waitForCardPatch();
-    await click('[data-test-mode-indicator-link="layout"]');
     await saveCard();
+    await click('[data-test-mode-indicator-link="edit"]');
+    await waitForCardLoad();
 
     await waitFor('[data-test-cs-component="dropdown"]');
     await selectChoose('[data-test-cs-component="dropdown"]', 'Template theme');
@@ -363,13 +368,34 @@ module('Acceptance | css editing', function(hooks) {
     await waitForThemerLoad();
 
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
-    await waitForCardPatch();
-    await click('[data-test-mode-indicator-link="layout"]');
     await saveCard();
+    await click('[data-test-mode-indicator-link="edit"]');
+    await waitForCardLoad();
 
     await waitFor('[data-test-cs-component="dropdown"]');
     assert.dom('[data-test-card-custom-style-button]').includesText('Edit Custom Theme');
     assert.dom('[data-test-style-dropdown]').includesText('Custom');
     assert.dom('[data-test-style-dropdown]').doesNotIncludeText('Template theme');
+  });
+
+  test('autosave works', async function(assert) {
+    await visit(`/cards/${cardPath}/edit/layout`);
+    await waitForCardLoad();
+
+    await click('[data-test-card-custom-style-button]');
+    await waitForThemerLoad();
+
+    this.owner.lookup('service:autosave').autosaveDisabled = false;
+    await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
+    await waitForCardPatch();
+    await waitForCardAutosave();
+    this.owner.lookup('service:autosave').autosaveDisabled = true;
+
+    await visit(`/cards/${cardPath}/edit/layout`);
+    await waitForCardLoad();
+    assert.ok(
+      find(`[data-test-view-css="${testCard.canonicalURL}"]`).innerText.includes('gorgeous styles'),
+      'base style is correct'
+    );
   });
 });

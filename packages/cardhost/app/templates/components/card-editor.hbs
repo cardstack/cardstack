@@ -23,9 +23,9 @@
       @selectField={{perform this.selectField}}
       @selectedField={{this.selectedField}}
       @selectedFieldName={{this.selectedFieldName}}
-      @cardSelected={{this.originalCard.isSelected}}
-      {{!-- ugh, we're monkey patching the Card API --}}
-      @cardFocused={{action (mut this.originalCard.isSelected)}} />
+      @cardSelected={{true}}
+      @noHeaderAnimation={{true}}
+    />
   </div>
 </section>
 

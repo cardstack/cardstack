@@ -15,6 +15,7 @@ import {
   waitForCardLoad,
   selectField,
   encodeColons,
+  waitForCardAutosave,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { animationsSettled } from 'ember-animated/test-support';
@@ -274,8 +275,8 @@ module('Acceptance | card schema', function(hooks) {
     await waitForSchemaViewToLoad();
 
     assert.dom('[data-test-cardhost-top-edge]').exists();
-    assert.dom('[data-test-mode-indicator]').exists();
-    assert.dom('[data-test-mode-indicator-label]').hasClass('schema');
+    assert.dom('[data-test-mode-indicator-link="edit"]').exists();
+    assert.dom('[data-test-mode-indicator]').containsText('schema mode');
     assert.dom('[data-test-edge-actions-btn]').exists();
     await percySnapshot(assert);
   });
@@ -285,12 +286,30 @@ module('Acceptance | card schema', function(hooks) {
     await waitForSchemaViewToLoad();
 
     assert.dom('[data-test-mode-indicator-link="edit"]').exists();
-    assert.dom('[data-test-mode-indicator-label]').containsText('schema mode');
+    assert.dom('[data-test-mode-indicator]').containsText('schema mode');
 
     await click('[data-test-mode-indicator-link="edit"]');
     await waitForCardLoad();
 
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/fields`);
-    assert.dom('[data-test-mode-indicator-label]').containsText('edit mode');
+    assert.dom('[data-test-mode-indicator]').containsText('edit mode');
+  });
+
+  test('autosave works', async function(assert) {
+    await visit(`/cards/${cardPath}/edit/fields/schema`);
+    await waitForSchemaViewToLoad();
+
+    this.owner.lookup('service:autosave').autosaveDisabled = false;
+    await addField('new-title', 'string-field', true);
+    await waitForCardAutosave();
+    this.owner.lookup('service:autosave').autosaveDisabled = true;
+
+    await visit(`/cards/${cardPath}`);
+    await waitForCardLoad();
+
+    assert.dom('[data-test-field="new-title"]').exists();
+    let cardJson = find('[data-test-card-json]').innerHTML;
+    let card = JSON.parse(cardJson);
+    assert.ok(card.data.attributes.csFields['new-title']);
   });
 });

@@ -12,6 +12,7 @@ import {
   removeField,
   waitForSchemaViewToLoad,
   selectField,
+  waitForCardPatch,
   waitForCardLoad,
 } from '../helpers/card-ui-helpers';
 import { cardDocument } from '@cardstack/core/card-document';
@@ -116,7 +117,7 @@ module('Acceptance | card adoption', function(hooks) {
       ['address', 'treats-available', 'city', 'state', 'zip']
     );
 
-    await saveCard();
+    await waitForCardPatch();
     await showCardId();
     assert.deepEqual(
       [...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
@@ -279,17 +280,19 @@ module('Acceptance | card adoption', function(hooks) {
       .replace('/edit/fields', '');
 
     await visit(`/cards/${cardId}/edit/fields/schema`);
-    await waitForSchemaViewToLoad();
+    await waitForSchemaViewToLoad(decodeURIComponent(cardId));
     await addField('number-of-bones', 'integer-field', true);
     await saveCard();
 
     await visit(`/cards/${grandChildId}/edit/fields/schema`);
-    await waitForSchemaViewToLoad();
+    await waitForSchemaViewToLoad(decodeURIComponent(grandChildId));
 
     assert.deepEqual(
-      [...document.querySelectorAll(`[data-test-isolated-card] [data-test-field]`)].map(i =>
-        i.getAttribute('data-test-field')
-      ),
+      [
+        ...document.querySelectorAll(
+          `[data-test-isolated-card="${decodeURIComponent(grandChildId)}"] [data-test-field]`
+        ),
+      ].map(i => i.getAttribute('data-test-field')),
       ['treats-available', 'address', 'city', 'state', 'zip', 'number-of-bones']
     );
     assert.dom('[data-test-field="number-of-bones"] .schema-field-renderer--header--detail').hasText('Adopted');

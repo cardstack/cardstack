@@ -19,6 +19,7 @@ disappears, the submenu closes too.
 
 export default class CardRendererHeaderComponent extends Component {
   @service cardstackSession;
+  @service autosave;
   @tracked localMenuOpen = false;
 
   @action
@@ -30,6 +31,14 @@ export default class CardRendererHeaderComponent extends Component {
       this.args.setContextMenu(newVal);
     } else {
       this.localMenuOpen = !this.localMenuOpen;
+    }
+  }
+
+  @action
+  closeMenu() {
+    this.localMenuOpen = false;
+    if (this.args.setContextMenu) {
+      this.args.setContextMenu(false);
     }
   }
 

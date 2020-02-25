@@ -8,12 +8,17 @@ import { CardstackSession } from '../../../../../services/cardstack-session';
 import { isolatedCssFile } from '../../../../../utils/scaffolding';
 import { Model } from '../../../../../routes/cards/card';
 import EditCardController from '../../edit';
+import { Card } from '@cardstack/core/card';
 
 export interface ThemeOption {
   name: string;
 }
 
 export default class CardLayoutIndexController extends EditCardController {
+  @service autosave!: {
+    saveCard: any; // this is actually a task which is really hard to describe in TS
+    cardUpdated: (card: Card, isDirty: boolean) => void;
+  };
   @service cssModeToggle!: { visible: boolean; dockLocation: 'right' | 'bottom'; isResponsive: boolean };
   @service router!: Router;
   @service cardstackSession!: CardstackSession;
@@ -37,6 +42,10 @@ export default class CardLayoutIndexController extends EditCardController {
   }
 
   @(task(function*(this: CardLayoutIndexController, val: ThemeOption) {
+    if (this.autosave.saveCard.last) {
+      yield this.autosave.saveCard.last.then();
+    }
+
     if (val.name !== 'Template theme') {
       return;
     }
@@ -54,7 +63,7 @@ export default class CardLayoutIndexController extends EditCardController {
 
     if (csFiles || csFeatures) {
       let patchedCard = yield card.patch(doc.jsonapiWithoutMeta);
-      this.send('updateCardModel', patchedCard, true);
+      this.autosave.cardUpdated(patchedCard, true);
     }
   }).restartable())
   handleThemeChange: any;

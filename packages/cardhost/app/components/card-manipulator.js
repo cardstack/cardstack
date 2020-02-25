@@ -13,6 +13,7 @@ const { environment } = ENV;
 
 export default class CardManipulator extends Component {
   @service data;
+  @service autosave;
   @service router;
   @service cardstackSession;
   @service cssModeToggle;
@@ -64,6 +65,9 @@ export default class CardManipulator extends Component {
   getNewFieldName;
 
   @(task(function*(fieldCard, position, evt) {
+    if (this.autosave.saveCard.last) {
+      yield this.autosave.saveCard.last.then();
+    }
     let doc = this.args.card.document;
 
     let fieldName = yield this.getNewFieldName.perform();
@@ -88,6 +92,9 @@ export default class CardManipulator extends Component {
   addField;
 
   @(task(function*(fieldName, newPosition, evt) {
+    if (this.autosave.saveCard.last) {
+      yield this.autosave.saveCard.last.then();
+    }
     let doc = this.args.card.document;
     let csFieldOrder = [...(this.args.card.csFieldOrder || [])];
     csFieldOrder = csFieldOrder.filter(i => i !== fieldName);
@@ -132,7 +139,7 @@ export default class CardManipulator extends Component {
 
   @(task(function*(doc) {
     let updatedCard = yield this.args.card.patch(doc.jsonapiWithoutMeta);
-    this.args.updateCard(updatedCard, true);
+    this.autosave.cardUpdated(updatedCard, true);
     return updatedCard;
   }).enqueue())
   patchCard;
@@ -144,6 +151,9 @@ export default class CardManipulator extends Component {
   deleteCard;
 
   @(task(function*(oldFieldName, newFieldName) {
+    if (this.autosave.saveCard.last) {
+      yield this.autosave.saveCard.last.then();
+    }
     let field = yield this.args.card.field(oldFieldName);
     let doc = this.args.card.document;
     let csFieldOrder = [...(this.args.card.csFieldOrder || [])];
@@ -174,6 +184,9 @@ export default class CardManipulator extends Component {
   setFieldName;
 
   @(task(function*(fieldName, property, value) {
+    if (this.autosave.saveCard.last) {
+      yield this.autosave.saveCard.last.then();
+    }
     let field = yield this.args.card.field(fieldName);
     let doc = this.args.card.document.withField(fieldName, field.document, field.csFieldArity, {
       [property]: value,
@@ -183,6 +196,9 @@ export default class CardManipulator extends Component {
   setFieldCardValue;
 
   @(task(function*(field, value) {
+    if (this.autosave.saveCard.last) {
+      yield this.autosave.saveCard.last.then();
+    }
     let doc = this.args.card.document.withAttributes({
       [field]: value,
     });
@@ -191,6 +207,9 @@ export default class CardManipulator extends Component {
   setCardValue;
 
   @(task(function*(field, cardId) {
+    if (this.autosave.saveCard.last) {
+      yield this.autosave.saveCard.last.then();
+    }
     let doc = this.args.card.document.withRelationships({
       [field]: cardId,
     });
@@ -199,6 +218,9 @@ export default class CardManipulator extends Component {
   setCardReference;
 
   @(task(function*(fieldName, neededWhenEmbedded) {
+    if (this.autosave.saveCard.last) {
+      yield this.autosave.saveCard.last.then();
+    }
     let doc = this.args.card.document;
     let isolatedFields = yield this.args.card.fields({ includeFieldSet: 'isolated' });
     let embeddedFields = yield this.args.card.fields({ includeFieldSet: 'embedded' });
@@ -217,6 +239,9 @@ export default class CardManipulator extends Component {
   setNeededWhenEmbedded;
 
   @(task(function*(fieldName) {
+    if (this.autosave.saveCard.last) {
+      yield this.autosave.saveCard.last.then();
+    }
     let doc = this.args.card.document;
     let csFieldOrder = [...(this.args.card.csFieldOrder || [])];
 
@@ -336,13 +361,16 @@ export default class CardManipulator extends Component {
     if (!this.draggable.isDragging && !this.justDropped) {
       this.beginDragging(field, event);
     } else {
-      this.draggable.clearField();
       this.draggable.setDragging(false);
     }
   }
 
   @action
   beginDragging(field, dragEvent) {
+    // we're clicking on a draggable that's already being dragged
+    if (this.draggable.isDragging) {
+      return;
+    }
     let dragState;
     let self = this;
 
@@ -352,7 +380,7 @@ export default class CardManipulator extends Component {
     // to get the value that you slapped on it. We really need to figure out a
     // different approach than setting arbitrary values on the FieldCard.
     function stopMouse() {
-      field.dragState = null;
+      field.dragState = dragState = null;
       let dropzone = self.draggable.getDropzone();
       if (dropzone) {
         self.draggable.drop();
@@ -365,8 +393,8 @@ export default class CardManipulator extends Component {
         }, 1000);
       } else {
         // we mouseup somewhere that isn't a dropzone
-        self.draggable.clearField();
       }
+      self.draggable.clearField();
 
       // WARNING! we monkey patched the immutable card instances in the catalog.
       // There is no guarantee that state you set on these instances is carried
@@ -392,19 +420,14 @@ export default class CardManipulator extends Component {
 
       self.draggable.setDragging(true);
 
-      // in order for the drop zone to trigger a mouseenter/mouseleave event
-      // we need to temporarily hide the dragged element
-      let fieldEl = dragEvent.target.closest('.ch-catalog-field');
-      fieldEl.style.visibility = 'hidden';
-      let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
-      fieldEl.style.visibility = 'visible';
+      let elemsBelow = document.elementsFromPoint(event.clientX, event.clientY);
 
       // this can happen when you drag the mouse outside the viewport
-      if (!elemBelow) {
+      if (!elemsBelow.length) {
         return;
       }
 
-      let dropzoneBelow = elemBelow.closest('.drop-zone');
+      let dropzoneBelow = elemsBelow.find(el => el.classList.contains('drop-zone'));
       let currentDropzone = self.draggable.getDropzone();
 
       if (currentDropzone !== dropzoneBelow) {
@@ -412,7 +435,7 @@ export default class CardManipulator extends Component {
           self.draggable.clearDropzone();
         }
         if (dropzoneBelow) {
-          self.draggable.setDropzone(elemBelow);
+          self.draggable.setDropzone(dropzoneBelow);
         }
       }
     }

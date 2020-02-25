@@ -6,11 +6,6 @@
         @route="cards.card.edit.fields"
         @mode="schema"
         @linkTo="edit" />
-      <SaveButton
-        @card={{@card}}
-        @isDirty={{@isDirty}}
-        @updateCard={{@updateCard}}
-      />
       <EdgeActionsButton />
     </div>
 
@@ -43,11 +38,6 @@
         @route="cards.card.view"
         @mode="edit"
         @linkTo="view" />
-      <SaveButton
-        @card={{@card}}
-        @isDirty={{@isDirty}}
-        @updateCard={{@updateCard}}
-      />
       <EdgeActionsButton />
     </div>
   {{/if}}

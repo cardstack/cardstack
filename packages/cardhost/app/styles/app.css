@@ -6,7 +6,6 @@
 @import '/assets/index.css';
 @import '/assets/cards.css';
 @import '/assets/components/library.css';
-@import '/assets/components/save-button.css';
 @import '/assets/components/mode-indicator.css';
 @import '/assets/components/view-switcher.css';
 @import '/assets/components/card-size-toggle.css';
@@ -64,7 +63,7 @@ Until that work is done we are statically adding this css
   --ch-font-family: 'Open Sans', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --ch-left-edge-navbar-width: 80px;
   --ch-left-edge-panel-width: 330px;
-  --ch-right-edge-panel-width: 330px;
+  --ch-right-edge-panel-width: 300px;
 
   --ch-top-edge-height: 80px;
   --ch-left-edge-width: calc(var(--ch-left-edge-panel-width) + var(--ch-left-edge-navbar-width));
