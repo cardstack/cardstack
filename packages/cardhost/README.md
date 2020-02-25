@@ -7,7 +7,7 @@ The cardhost is an application container that hosts cards. The cardhost is deplo
 You will need the following things properly installed on your computer.
 
 * [Git](https://git-scm.com/)
-* [Node.js](https://nodejs.org/) (with npm)
+* [Node.js](https://nodejs.org/) version 10.x (with npm)
 * [Ember CLI](https://ember-cli.com/)
 * [Google Chrome](https://google.com/chrome/)'
 * [Docker](https://www.docker.com/products/docker-desktop)
