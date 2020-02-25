@@ -140,6 +140,7 @@ export default class DraggableService extends Service {
     if (this.isDragging) {
       return;
     }
+
     let dragState;
     let self = this;
 
@@ -232,23 +233,14 @@ export default class DraggableService extends Service {
     this.fieldComponents = this.fieldComponents.map(obj => obj); // oh glimmer, you so silly...
   }
 
-  @action
-  selectFieldType(field, event) {
-    if (!this.isDragging && !this.justDropped) {
-      this.beginDragging(field, event);
-    } else {
-      this.setDragging(false);
-    }
-  }
-
-  @action dropField(position, onFinishDrop, evt) {
+  @action dropField(position, onStartDrop, onFinishDrop, evt) {
     let draggedField = this.getField();
 
     if (!draggedField) {
       return;
     }
 
-    onFinishDrop(evt);
+    onStartDrop(evt);
 
     let field;
 
@@ -273,8 +265,6 @@ export default class DraggableService extends Service {
     this.clearCard();
     this.clearDropzone();
 
-    if (field) {
-      // this.selectField(field, evt);
-    }
+    onFinishDrop(field, evt);
   }
 }

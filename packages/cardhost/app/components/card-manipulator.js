@@ -225,7 +225,7 @@ export default class CardManipulator extends Component {
         let dropZoneEl = droppedSprite.owner.value.dropTo;
         let position = parseInt(dropZoneEl.dataset.dropZonePosition) + 1;
         let targetField = document.querySelector(
-          `.isolated-card .field-renderer--wrapper:nth-of-type(${position}) .schema-field-renderer`
+          `.isolated-card section.field-renderer--wrapper:nth-of-type(${position}) .schema-field-renderer`
         );
         let { width, height } = targetField.getBoundingClientRect();
         droppedSprite.endTranslatedBy(((1 - scaleTo) / 2) * width, ((1 - scaleTo) / 2) * height);

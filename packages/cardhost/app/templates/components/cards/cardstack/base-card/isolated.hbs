@@ -15,7 +15,7 @@
           @selectedField={{@selectedField}}
         />
       {{else if (or @setNeededWhenEmbedded @setPosition @removeField @setFieldName)}}
-        <div class="field-renderer--wrapper"
+        <section class="field-renderer--wrapper"
           tabindex="-1"
           {{on "mousedown" (fn this.draggable.beginDragging field @card)}}
           {{on "click" (fn this.draggable.clickDraggable field @card)}}
@@ -51,9 +51,9 @@
               </button>
             {{/if}}
           </div>
-        </div>
+        </section>
         {{#if (and (eq @mode "schema") (not field.preview))}}
-          <DropZone @position={{inc field.position}} @toggleStubField={{@toggleStubField}} />
+          <DropZone @position={{inc field.position}} @toggleStubField={{@toggleStubField}} @selectField={{@selectField}} />
         {{/if}}
       {{else}}
         <FieldRenderer @field={{field}} @mode={{@mode}}/>
