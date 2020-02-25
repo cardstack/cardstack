@@ -1,7 +1,7 @@
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
 import { UnsavedCard, Card, AddressableCard } from '@cardstack/core/card';
-import { CardId, asCardId } from '@cardstack/core/card-id';
+import { CardId, asCardId, canonicalURL } from '@cardstack/core/card-id';
 import { CardstackSession } from './cardstack-session';
 import { SingleResourceDoc, CollectionResourceDoc, DocWithErrors } from 'jsonapi-typescript';
 import { CardInstantiator } from '@cardstack/core/card-instantiator';
@@ -14,6 +14,11 @@ import { Query } from '@cardstack/core/query';
 import { stringify } from 'qs';
 import CardstackError from '@cardstack/core/error';
 import { OcclusionRules } from '@cardstack/core/occlusion-rules';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+
+// Caching at the module scope to help speed up the tests. Since this is a
+// singleton anyways, that should be ok.
+const cache: Map<string, Promise<AddressableCard>> = new Map();
 
 export default class DataService extends Service implements CardInstantiator {
   @service cardstackSession!: CardstackSession;
@@ -79,21 +84,43 @@ export default class DataService extends Service implements CardInstantiator {
 
   async load(idOrURL: CardId | string, rules: OcclusionRules | 'everything'): Promise<AddressableCard> {
     let id = asCardId(idOrURL);
+    let cardURL = canonicalURL(id);
+
+    let isBuiltInCard =
+      id.csRealm === CARDSTACK_PUBLIC_REALM && (!id.csOriginalRealm || id.csOriginalRealm === CARDSTACK_PUBLIC_REALM);
+
     let url = this.localURL(id);
     if (rules !== 'everything') {
       url = `${url}?${stringify(rules)}`;
     }
-    let response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/vnd.api+json',
-      },
-    });
-    if (!response.ok) {
-      await handleJsonApiError(response);
+
+    if (isBuiltInCard && cache.has(cardURL)) {
+      return (await cache.get(cardURL))!;
     }
 
-    let json = (await response.json()) as SingleResourceDoc;
-    return await this.instantiate(json);
+    let cardPromise = new Promise<AddressableCard>(async (resolve, reject) => {
+      let response = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/vnd.api+json',
+        },
+      });
+      if (!response.ok) {
+        reject(response);
+      } else {
+        let json = (await response.json()) as SingleResourceDoc;
+        resolve(await this.instantiate(json));
+      }
+    });
+    if (isBuiltInCard) {
+      cache.set(cardURL, cardPromise);
+    }
+    let result: AddressableCard;
+    try {
+      result = await cardPromise;
+    } catch (err) {
+      await handleJsonApiError(err);
+    }
+    return result!; // if there is no card we throw 404 above, so by this point there will always be a card
   }
 
   async search(query: Query, rules: OcclusionRules | 'everything'): Promise<AddressableCard[]> {
@@ -170,8 +197,6 @@ class Reader implements CardReader {
     // passed into the Card. And if the subsequent loads occur, they may
     // overfetch a resource that is needed in a different get for this
     // card--let's harness any over fetching efficiently.
-
-    // TODO let's not use the server for the built-in cards at the very least...
     return await this.dataService.load(idOrURL, 'everything');
   }
 }
