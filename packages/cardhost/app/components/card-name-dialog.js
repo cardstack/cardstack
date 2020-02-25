@@ -11,11 +11,6 @@ export default class CardNameDialog extends Component {
   @service data;
   @tracked name;
 
-  @action
-  updateCardName(name) {
-    this.name = name;
-  }
-
   get title() {
     return this.args.title || 'Create a New Card';
   }
@@ -23,6 +18,18 @@ export default class CardNameDialog extends Component {
   willDestroy() {
     if (this.args.closeDialog) {
       this.args.closeDialog();
+    }
+  }
+
+  @action
+  updateCardName(name) {
+    this.name = name;
+  }
+
+  @action
+  keyDown(event) {
+    if (event.which === 13) {
+      this.createCard();
     }
   }
 

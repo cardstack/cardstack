@@ -1,8 +1,14 @@
 import { module, test } from 'qunit';
-import { click, visit, currentURL } from '@ember/test-helpers';
+import { click, visit, currentURL, triggerKeyEvent, fillIn } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
-import { setCardName, waitForCatalogEntriesToLoad, waitForCardLoad, showCardId } from '../helpers/card-ui-helpers';
+import {
+  setCardName,
+  waitForCatalogEntriesToLoad,
+  waitForCardLoad,
+  showCardId,
+  waitForSchemaViewToLoad,
+} from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
@@ -87,6 +93,19 @@ module('Acceptance | card name dialog', function(hooks) {
     assert.ok(currentURL().includes('/edit/fields'));
     assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('Base Card');
     assert.dom('[data-test-isolated-card] [data-test-field]').doesNotExist();
+  });
+
+  test('can use the enter key to confirm card name from dialog', async function(assert) {
+    await visit('/');
+    await click('[data-test-library-button]');
+    await waitForTemplatesToLoad();
+
+    await click('[data-test-library-new-blank-card-btn]');
+    await fillIn('#card__name', cardName);
+    await triggerKeyEvent('#card__name', 'keydown', 'Enter');
+    await waitForSchemaViewToLoad();
+
+    assert.dom('.card-renderer-isolated--header-title').hasText(cardName);
   });
 
   test('can cancel creation of a card by clicking outside the dialog', async function(assert) {
