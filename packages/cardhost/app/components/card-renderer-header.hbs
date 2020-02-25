@@ -4,7 +4,7 @@
 >
   <header class="card-renderer-isolated--header">
     {{#if (or (eq (safe-css-string @card.adoptedFromName) "event-card") (eq (safe-css-string @card.name) "event-card"))}}
-      {{svg-jar "event" width="18px" height="20px"}}
+      {{svg-jar "event" width="30px" height="20px" class="card-renderer-isolated--header-icon"}}
     {{/if}}
     <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.name "Blank Card"}}</span>
     {{#if this.cardstackSession.isAuthenticated}}
