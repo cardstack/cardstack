@@ -33,14 +33,16 @@ export default class IsolatedComponent extends Component {
       yield Promise.all(others.map(move));
     } else {
       if (insertedSprites.length) {
-        removedSprites.forEach(fadeOut);
+        if (insertedSprites.length !== removedSprites.length) {
+          removedSprites.forEach(fadeOut);
+        }
       } else {
         yield Promise.all(removedSprites.map(fadeOut));
       }
       yield Promise.all(keptSprites.map(move));
       insertedSprites.forEach(fadeIn);
     }
-    yield Promise.all(keptSprites.map(move));
+    // yield Promise.all(keptSprites.map(move));
 
     insertedSprites.forEach(sprite => {
       let field = sprite.owner.value;

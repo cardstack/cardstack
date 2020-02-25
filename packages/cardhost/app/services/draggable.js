@@ -244,7 +244,7 @@ export default class DraggableService extends Service {
 
     let field;
 
-    if (draggedField.name) {
+    if (draggedField.name) {  
       let fieldName = draggedField.name;
       if (fieldName) {
         let card = draggedField.card;
