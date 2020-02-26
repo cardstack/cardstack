@@ -117,9 +117,19 @@ body {
   line-height: 1.2;
 }
 
-/* Prevent overscroll bounce across all browsers. Should use `overscroll-behavior: none` once there is better cross-browser support. */
+/* The next two rules prevent overscroll bounce across all browsers. We should use solely `overscroll-behavior: none` once there is better cross-browser support. */
 html {
   overflow: hidden;
+}
+
+@supports (overscroll-behavior: none) {
+  html {
+    overflow: initial;
+  }
+
+  body {
+    overscroll-behavior: none;
+  }
 }
 
 a {
