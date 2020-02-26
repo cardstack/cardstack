@@ -37,7 +37,6 @@ if (process.env.HUB_ENVIRONMENT === 'production') {
       'source-type': '@cardstack/git',
       params: {
         branchPrefix: process.env.GIT_BRANCH_PREFIX,
-        cardTypes: ['local-hub::@cardstack/base-card'],
         remote: {
           url: process.env.GIT_REPO,
         },

@@ -309,17 +309,6 @@ class GitUpdater {
       if (doc) {
         if (isInternalCard(type, id)) {
           await this._ensureBaseCard();
-
-          let chain = (await adoptionChain(doc, this.getInternalCard.bind(this))).map((i: todo) => i.data.id);
-          if (!intersection(this.cardTypes, chain).length) {
-            log.trace(
-              `the card ${id} is not indexable by this data source because it's adoption chain (${JSON.stringify(
-                chain
-              )}) is not part of the configured data source's card types: ${JSON.stringify(this.cardTypes)}`
-            );
-            return;
-          }
-
           log.trace(`indexing card ${id}`);
           await ops.save(type, id, doc);
         } else {
