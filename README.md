@@ -6,7 +6,6 @@ Join the discussion around developing on the Cardstack framework on [Discord](ht
 
 ## Orientation
 
-
 This is a monorepo. Each directory under `packages` is distributed as a standalone NPM package under the `@cardstack` NPM namespace. Each package is a Cardstack plugin. A family of Cardstack plugins comes together to provide both browser-side and server-side functionality of a Cardstack application.
 
 Many Cardstack plugins are also [Ember addons](https://ember-cli.com/extending/#developing-addons-and-blueprints), which is the standard way for a Cardstack plugin to provide client-side functionality.
