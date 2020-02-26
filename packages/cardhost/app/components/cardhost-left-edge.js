@@ -5,20 +5,19 @@ import { tracked } from '@glimmer/tracking';
 
 export default class CardhostLeftEdgeComponent extends Component {
   @service cardstackSession;
+  @service library;
+  @service router;
   @tracked isExpanded = false;
-  @tracked isLibraryOpen = false;
 
   @action
   toggleMenuExpand() {
     this.isExpanded = !this.isExpanded;
   }
 
-  @service router;
-
   @action
   logout(sessionLogout) {
     sessionLogout.bind(this.cardstackSession)();
-    this.hideLibrary();
+    this.library.hide();
 
     let cardId;
     let route = this.router.currentRoute;
@@ -45,15 +44,5 @@ export default class CardhostLeftEdgeComponent extends Component {
   @action
   closeLeftEdge() {
     this.isExpanded = false;
-  }
-
-  @action
-  showLibrary() {
-    this.isLibraryOpen = true;
-  }
-
-  @action
-  hideLibrary() {
-    this.isLibraryOpen = false;
   }
 }

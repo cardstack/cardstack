@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { find, visit, currentURL } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
-import { waitForCardLoad } from '../helpers/card-ui-helpers';
+import { waitForCardLoad, waitForTestsToEnd } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { cardDocument } from '@cardstack/core/card-document';
@@ -46,6 +46,9 @@ module('Acceptance | card view', function(hooks) {
 
   hooks.beforeEach(async function() {
     await login();
+  });
+  hooks.afterEach(async function() {
+    await waitForTestsToEnd();
   });
 
   test(`viewing a card`, async function(assert) {

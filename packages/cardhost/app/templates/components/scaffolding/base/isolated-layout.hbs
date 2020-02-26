@@ -4,7 +4,14 @@
   data-test-isolated-card-mode={{@mode}}
 >
   <AnimatedContainer class={{if (or (eq @mode "view") (eq @mode "layout")) "isolated-card--view-fields"}}>
-    {{#animated-each @fields use=this.transition duration=this.duration as |field|}}
+    <MaybeAnimate
+      @mode={{@mode}}
+      @animationMode="schema"
+      @component="animated-each"
+      @content={{@fields}}
+      @key="nonce"
+      @use={{this.transition}}
+      @duration={{this.duration}} as |field|>
       <FieldRenderer
         @field={{field}}
         @position={{field.position}}
@@ -29,7 +36,7 @@
           @toggleStubField={{@toggleStubField}}
         />
       {{/if}}
-    {{/animated-each}}
+    </MaybeAnimate>
   </AnimatedContainer>
 
 </div>

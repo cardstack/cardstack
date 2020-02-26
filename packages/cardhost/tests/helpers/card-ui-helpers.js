@@ -1,9 +1,34 @@
-import { click, focus, find, triggerEvent, fillIn, visit, waitFor, waitUntil, getContext } from '@ember/test-helpers';
+import {
+  click,
+  focus,
+  find,
+  triggerEvent,
+  fillIn,
+  visit,
+  waitFor,
+  waitUntil,
+  getContext,
+  currentURL,
+} from '@ember/test-helpers';
 import { animationsSettled } from 'ember-animated/test-support';
 import { canonicalURL } from '@cardstack/core/card-id';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 const timeout = 5000;
+
+export async function waitForTestsToEnd() {
+  // need to wait for library service to finish. we reload the library in a
+  // non-blocking fashion on document saves, so we need to make sure to not let
+  // that async leak into other tests.
+  await waitForLibraryServiceToIdle();
+}
+
+export async function waitForLibraryServiceToIdle() {
+  let libraryService = getContext().owner.lookup('service:library');
+  if (libraryService.load.last) {
+    await libraryService.load.last.finally();
+  }
+}
 
 export async function showCardId(toggleDetailsSection = false) {
   await focus(`.card-renderer-isolated`);
@@ -114,7 +139,10 @@ export async function setCardName(name) {
     await waitForSchemaViewToLoad();
   } else {
     await waitFor(`[data-test-card-edit]`, { timeout });
-    await waitForCardLoad();
+    let cardId = currentURL()
+      .replace('/cards/', '')
+      .replace('/edit/fields', '');
+    await waitForCardLoad(decodeURIComponent(cardId));
   }
 }
 

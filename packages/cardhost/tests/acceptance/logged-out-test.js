@@ -7,6 +7,8 @@ import {
   waitForSchemaViewToLoad,
   encodeColons,
   waitForCatalogEntriesToLoad,
+  waitForTestsToEnd,
+  waitForLibraryServiceToIdle,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -36,12 +38,16 @@ const scenario = new Fixtures({
 });
 
 async function waitForFeaturedCardsLoad() {
+  await waitForLibraryServiceToIdle();
   await waitForCatalogEntriesToLoad('[data-test-featured-cards]');
 }
 
 module('Acceptance | logged-out', function(hooks) {
   setupApplicationTest(hooks);
   scenario.setupModule(hooks);
+  hooks.afterEach(async function() {
+    await waitForTestsToEnd();
+  });
 
   test('viewing a card while logged out', async function(assert) {
     await login();
@@ -56,6 +62,8 @@ module('Acceptance | logged-out', function(hooks) {
     await click('[data-test-toggle-left-edge]');
     await animationsSettled();
     assert.equal(currentURL(), `/cards/${cardPath}`);
+    assert.dom('[data-test-library-button]').isDisabled();
+    assert.dom('[data-test-catalog-button]').isDisabled();
     assert.dom('[data-test-card-header-button]').doesNotExist();
     await percySnapshot(assert);
 
@@ -125,31 +133,70 @@ module('Acceptance | logged-out', function(hooks) {
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
   });
 
-  test('viewing index page when logged out', async function(assert) {
+  test('viewing index page', async function(assert) {
+    await login();
     await visit(`/`);
-    await click('[data-test-toggle-left-edge]');
-    await click('[data-test-logout-button]');
+
+    assert.equal(currentURL(), `/cards`);
     await waitForFeaturedCardsLoad();
 
-    assert.equal(currentURL(), `/`);
+    assert.dom('[data-test-card-builder]').exists();
+    assert.dom('[data-test-featured-card]').exists({ count: 1 });
+    assert.dom('[data-test-cardhost-left-edge]').exists();
+    assert.dom('.cardhost-left-edge--nav-button').exists({ count: 4 });
+    assert.dom('[data-test-library-button]').isNotDisabled();
+
+    await click('[data-test-toggle-left-edge]');
+    await click('[data-test-logout-button]');
+    await animationsSettled();
+
+    assert.equal(currentURL(), `/cards`);
     assert.dom('[data-test-card-builder]').exists();
     assert.dom('[data-test-featured-card]').exists({ count: 1 });
     assert.dom('[data-test-cardhost-left-edge]').exists();
     assert.dom('[data-test-library-button]').isDisabled();
+  });
 
-    await visit(`/cards/${cardPath}`);
-    await waitForCardLoad();
-    assert.equal(currentURL(), `/cards/${cardPath}`);
-    assert.dom('[data-test-library-button]').doesNotExist();
-    assert.dom('[data-test-library-link]').exists();
+  test('viewing library', async function(assert) {
+    await login();
+    await visit(`/`);
 
-    await click('[data-test-library-link]');
-    assert.equal(currentURL(), `/`);
+    assert.equal(currentURL(), `/cards`);
+    await click('[data-test-library-button]');
+    await waitForLibraryServiceToIdle();
+    await waitForCardLoad(testCard.canonicalURL);
+
+    await click('[data-test-toggle-left-edge]');
+    await click('[data-test-logout-button]');
+    await animationsSettled();
+
+    assert.equal(currentURL(), `/cards`);
+    assert.dom('[data-test-library]').doesNotExist();
+    assert.dom('[data-test-featured-card]').exists({ count: 1 });
+    assert.dom('[data-test-cardhost-left-edge]').exists();
     assert.dom('[data-test-library-button]').isDisabled();
   });
 
+  test('can navigate to index page from view mode', async function(assert) {
+    await login();
+    await visit(`/cards/${cardPath}`);
+    await waitForCardLoad();
+    assert.equal(currentURL(), `/cards/${cardPath}`);
+
+    await click('[data-test-toggle-left-edge]');
+    await click('[data-test-logout-button]');
+    await animationsSettled();
+
+    await click('[data-test-toggle-left-edge]');
+    assert.equal(currentURL(), `/cards/${cardPath}`);
+    assert.dom('[data-test-home-link]').exists();
+
+    await click('[data-test-home-link]');
+    assert.equal(currentURL(), `/cards`);
+  });
+
   test('clicking outside the login panel closes it', async function(assert) {
-    await visit(`/`);
+    await visit(`/cards`);
     await click('[data-test-toggle-left-edge]');
     await click('[data-test-logout-button]');
 

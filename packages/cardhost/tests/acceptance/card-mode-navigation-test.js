@@ -6,7 +6,7 @@ import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { cardDocument } from '@cardstack/core/card-document';
 import { myOrigin } from '@cardstack/core/origin';
-import { waitForCardLoad, waitForSchemaViewToLoad, encodeColons } from '../helpers/card-ui-helpers';
+import { waitForCardLoad, waitForSchemaViewToLoad, encodeColons, waitForTestsToEnd } from '../helpers/card-ui-helpers';
 
 const csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
 const testCard = cardDocument().withAutoAttributes({
@@ -25,6 +25,9 @@ module('Acceptance | card mode navigation', function(hooks) {
 
   hooks.beforeEach(async function() {
     await login();
+  });
+  hooks.afterEach(async function() {
+    await waitForTestsToEnd();
   });
 
   test('can use the context menu to switch modes', async function(assert) {

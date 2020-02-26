@@ -14,6 +14,8 @@ import {
   waitForCardPatch,
   waitForCardLoad,
   waitForCardAutosave,
+  waitForTestsToEnd,
+  waitForLibraryServiceToIdle,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -34,6 +36,9 @@ module('Acceptance | card create', function(hooks) {
 
   hooks.beforeEach(async function() {
     await login();
+  });
+  hooks.afterEach(async function() {
+    await waitForTestsToEnd();
   });
 
   test('right edge shows base card as adopted from card', async function(assert) {
@@ -109,16 +114,17 @@ module('Acceptance | card create', function(hooks) {
     await percySnapshot([assert.test.module.name, assert.test.testName, 'data-entered'].join(' | '));
   });
 
-  test('creating a card from the homepage', async function(assert) {
+  test('creating a card from the library', async function(assert) {
     await visit('/');
 
-    assert.equal(currentURL(), '/');
+    assert.equal(currentURL(), '/cards');
     await click('[data-test-library-button]');
+    await waitForLibraryServiceToIdle();
 
     assert.deepEqual(
-      [...document.querySelectorAll(`[data-test-library-recent-card-link] [data-test-embedded-card]`)].map(i =>
-        i.getAttribute('data-test-embedded-card')
-      ),
+      [
+        ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
+      ].map(i => i.getAttribute('data-test-card-renderer-embedded')),
       []
     );
 
@@ -141,15 +147,15 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('.card-renderer-isolated--header-title').hasText('Millenial Puppies');
     assert.dom('[data-test-internal-card-id]').hasText(decodeURIComponent(cardId));
 
-    await click('[data-test-library-link]');
     await click('[data-test-library-button]');
+    await waitForLibraryServiceToIdle();
     await waitForCardLoad(decodeURIComponent(cardId));
-    assert.equal(currentURL(), '/');
+    assert.equal(currentURL(), `/cards/${cardId}/edit/fields/schema`);
 
     assert.deepEqual(
-      [...document.querySelectorAll(`[data-test-library-recent-card-link] [data-test-embedded-card]`)].map(i =>
-        i.getAttribute('data-test-embedded-card')
-      ),
+      [
+        ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
+      ].map(i => i.getAttribute('data-test-card-renderer-embedded')),
       [decodeURIComponent(cardId)]
     );
   });

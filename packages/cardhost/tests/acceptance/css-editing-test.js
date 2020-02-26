@@ -9,6 +9,7 @@ import {
   waitForCardPatch,
   encodeColons,
   waitForCardAutosave,
+  waitForTestsToEnd,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -72,6 +73,9 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     // false, or tests will time out.
     this.owner.lookup('controller:cards.card.view').resizable = false;
     await login();
+  });
+  hooks.afterEach(async function() {
+    await waitForTestsToEnd();
   });
 
   test('can view code editor', async function(assert) {

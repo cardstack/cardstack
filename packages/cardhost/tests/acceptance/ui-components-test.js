@@ -3,7 +3,7 @@ import { visit, currentURL } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import { percySnapshot } from 'ember-percy';
 import Fixtures from '../helpers/fixtures';
-import { waitForSchemaViewToLoad } from '../helpers/card-ui-helpers';
+import { waitForSchemaViewToLoad, waitForTestsToEnd } from '../helpers/card-ui-helpers';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 // Monaco takes a while to render, and it varies, so we pause
@@ -26,6 +26,9 @@ const scenario = new Fixtures({
 module('Acceptance | ui components', function(hooks) {
   setupApplicationTest(hooks);
   scenario.setupTest(hooks);
+  hooks.afterEach(async function() {
+    await waitForTestsToEnd();
+  });
 
   test('visiting /ui-components', async function(assert) {
     await visit('/ui-components');

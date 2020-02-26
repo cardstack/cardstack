@@ -7,6 +7,7 @@ import {
   waitForSchemaViewToLoad,
   waitForCatalogEntriesToLoad,
   waitForThemerLoad,
+  waitForTestsToEnd,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { cardDocument } from '@cardstack/core/card-document';
@@ -74,6 +75,9 @@ module('Acceptance | accessibility', function(hooks) {
   hooks.beforeEach(async function() {
     await login();
   });
+  hooks.afterEach(async function() {
+    await waitForTestsToEnd();
+  });
 
   test('basic a11y tests for card view', async function(assert) {
     await visit(`/cards/${cardPath}`);
@@ -122,7 +126,7 @@ module('Acceptance | accessibility', function(hooks) {
     await waitForFeaturedCardsLoad();
     await waitForCssTransitions();
     await a11yAudit();
-    assert.ok(true, 'no a11y errors found for library featured cards');
+    assert.ok(true, 'no a11y errors found for index');
 
     await click('[data-test-library-button]');
     await waitForLibraryLoad();

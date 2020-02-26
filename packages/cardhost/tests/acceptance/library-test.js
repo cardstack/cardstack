@@ -2,7 +2,14 @@ import { module, test } from 'qunit';
 import { click, visit, currentURL, find } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
-import { waitForCardLoad, waitForCatalogEntriesToLoad, encodeColons } from '../helpers/card-ui-helpers';
+import {
+  waitForCardLoad,
+  waitForCatalogEntriesToLoad,
+  encodeColons,
+  waitForTestsToEnd,
+  waitForSchemaViewToLoad,
+  waitForLibraryServiceToIdle,
+} from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { animationsSettled } from 'ember-animated/test-support';
@@ -145,12 +152,25 @@ const entry4 = cardDocument()
 
 const cards = [entry1, entry2, entry3, entry4, template1, template2, card1, card2, card3, card4];
 const featuredCards = [card3, card4];
+const cardsSortedByCreatedDescending = [
+  entry4,
+  entry3,
+  entry2,
+  entry1,
+  template2,
+  template1,
+  card1,
+  card2,
+  card3,
+  card4,
+];
 
 const scenario = new Fixtures({
   create: cards,
 });
 
 async function waitForLibraryLoad() {
+  await waitForLibraryServiceToIdle();
   await waitForCatalogEntriesToLoad('[data-test-templates]');
   await Promise.all(cards.map(card => waitForCardLoad(card.canonicalURL)));
 }
@@ -166,12 +186,15 @@ module('Acceptance | library', function(hooks) {
   hooks.beforeEach(async function() {
     await login();
   });
+  hooks.afterEach(async function() {
+    await waitForTestsToEnd();
+  });
 
   test(`viewing library`, async function(assert) {
     await visit(`/`);
+    assert.equal(currentURL(), '/cards');
 
     assert.dom('[data-test-library-button]').exists();
-    assert.dom('[data-test-library-link]').doesNotExist();
     await click('[data-test-library-button]');
     await waitForLibraryLoad();
 
@@ -181,18 +204,7 @@ module('Acceptance | library', function(hooks) {
       [
         ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
       ].map(i => i.getAttribute('data-test-card-renderer-embedded')),
-      [
-        entry4.canonicalURL,
-        entry3.canonicalURL,
-        entry2.canonicalURL,
-        entry1.canonicalURL,
-        template2.canonicalURL,
-        template1.canonicalURL,
-        card1.canonicalURL,
-        card2.canonicalURL,
-        card3.canonicalURL,
-        card4.canonicalURL,
-      ]
+      cardsSortedByCreatedDescending.map(c => c.canonicalURL)
     );
 
     assert.deepEqual(
@@ -288,8 +300,62 @@ module('Acceptance | library', function(hooks) {
     assert.dom('[data-test-library]').doesNotExist();
   });
 
+  test('visit library from card view', async function(assert) {
+    await visit(`/cards/${encodeURIComponent(card1.canonicalURL)}`);
+    await waitForCardLoad();
+
+    assert.dom('[data-test-library-button]').exists();
+    await click('[data-test-library-button]');
+    await waitForLibraryLoad();
+
+    assert.equal(currentURL(), `/cards/${encodeURIComponent(card1.canonicalURL)}`);
+    assert.dom('[data-test-library]').exists();
+    assert.deepEqual(
+      [
+        ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
+      ].map(i => i.getAttribute('data-test-card-renderer-embedded')),
+      cardsSortedByCreatedDescending.map(c => c.canonicalURL)
+    );
+  });
+
+  test('visit library from card edit', async function(assert) {
+    await visit(`/cards/${encodeURIComponent(card1.canonicalURL)}/edit/fields`);
+    await waitForCardLoad();
+
+    assert.dom('[data-test-library-button]').exists();
+    await click('[data-test-library-button]');
+    await waitForLibraryLoad();
+
+    assert.equal(currentURL(), `/cards/${encodeURIComponent(card1.canonicalURL)}/edit/fields`);
+    assert.dom('[data-test-library]').exists();
+    assert.deepEqual(
+      [
+        ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
+      ].map(i => i.getAttribute('data-test-card-renderer-embedded')),
+      cardsSortedByCreatedDescending.map(c => c.canonicalURL)
+    );
+  });
+
+  test('visit library from card schema', async function(assert) {
+    await visit(`/cards/${encodeURIComponent(card1.canonicalURL)}/edit/fields/schema`);
+    await waitForSchemaViewToLoad();
+
+    assert.dom('[data-test-library-button]').exists();
+    await click('[data-test-library-button]');
+    await waitForLibraryLoad();
+
+    assert.equal(currentURL(), `/cards/${encodeURIComponent(card1.canonicalURL)}/edit/fields/schema`);
+    assert.dom('[data-test-library]').exists();
+    assert.deepEqual(
+      [
+        ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
+      ].map(i => i.getAttribute('data-test-card-renderer-embedded')),
+      cardsSortedByCreatedDescending.map(c => c.canonicalURL)
+    );
+  });
+
   test(`isolating a card`, async function(assert) {
-    await visit(`/`);
+    await visit(`/cards`);
     await click('[data-test-library-button]');
     await waitForLibraryLoad();
 
@@ -300,16 +366,43 @@ module('Acceptance | library', function(hooks) {
     await percySnapshot(assert);
   });
 
-  test('can navigate to index route via library link from other routes', async function(assert) {
+  test(`can use library to view card from /cards route`, async function(assert) {
+    await visit(`/cards`);
+    await click('[data-test-library-button]');
+    await waitForLibraryLoad();
+
+    await click(`[data-test-library-recent-card-link="${card3.canonicalURL}"]`);
+    assert.dom('[data-test-library]').doesNotExist();
+    await waitForCardLoad();
+    assert.equal(encodeColons(currentURL()), `/cards/${encodeURIComponent(card3.canonicalURL)}`);
+    assert.dom(`[data-test-isolated-card="${card3.canonicalURL}"]`).exists();
+  });
+
+  test(`can use library to view card from a specific card view route`, async function(assert) {
     await visit(`/cards/${encodeURIComponent(card1.canonicalURL)}`);
     await waitForCardLoad();
 
-    assert.dom('[data-test-library-button]').doesNotExist();
-    assert.dom('[data-test-library-link]').exists();
-    await click('[data-test-library-link]');
-    assert.equal(currentURL(), '/');
+    await click('[data-test-library-button]');
+    await waitForLibraryLoad();
 
-    assert.dom('[data-test-library-button]').exists();
-    assert.dom('[data-test-library-link]').doesNotExist();
+    await click(`[data-test-library-recent-card-link="${card3.canonicalURL}"]`);
+    assert.dom('[data-test-library]').doesNotExist();
+    await waitForCardLoad();
+    assert.equal(encodeColons(currentURL()), `/cards/${encodeURIComponent(card3.canonicalURL)}`);
+    assert.dom(`[data-test-isolated-card="${card3.canonicalURL}"]`).exists();
+  });
+
+  test(`can use library to view current card`, async function(assert) {
+    await visit(`/cards/${encodeURIComponent(card3.canonicalURL)}`);
+    await waitForCardLoad();
+
+    await click('[data-test-library-button]');
+    await waitForLibraryLoad();
+
+    await click(`[data-test-library-recent-card-link="${card3.canonicalURL}"]`);
+    assert.dom('[data-test-library]').doesNotExist();
+    await waitForCardLoad();
+    assert.equal(encodeColons(currentURL()), `/cards/${encodeURIComponent(card3.canonicalURL)}`);
+    assert.dom(`[data-test-isolated-card="${card3.canonicalURL}"]`).exists();
   });
 });

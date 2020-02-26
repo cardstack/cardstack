@@ -14,9 +14,12 @@ import {
   selectField,
   waitForCardPatch,
   waitForCardLoad,
+  waitForTestsToEnd,
+  waitForLibraryServiceToIdle,
 } from '../helpers/card-ui-helpers';
 import { cardDocument } from '@cardstack/core/card-document';
 import { myOrigin } from '@cardstack/core/origin';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 const childName = 'vangogh-work-address';
 const grandChildName = 'mango-work-address';
@@ -27,6 +30,7 @@ const parentCard = cardDocument()
     csId: 'address-card',
     csTitle: 'Address Card',
     csFieldOrder: ['address', 'city', 'state', 'zip'],
+    csCreated: '2020-01-01T15:00:00Z',
     csFieldSets: {
       isolated: ['address', 'city', 'state', 'zip'],
     },
@@ -35,9 +39,19 @@ const parentCard = cardDocument()
   .withField('city', 'string-field')
   .withField('state', 'string-field')
   .withField('zip', 'string-field');
+const entry = cardDocument()
+  .withAttributes({
+    csRealm,
+    csId: 'template-entry',
+    csTitle: 'Address Card',
+    csCreated: '2020-01-01T17:00:00Z',
+    type: 'template',
+  })
+  .withRelationships({ card: parentCard })
+  .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'catalog-entry' });
 const parentCardPath = encodeURIComponent(parentCard.canonicalURL);
 const parentScenario = new Fixtures({
-  create: [parentCard],
+  create: [parentCard, entry],
 });
 const scenario = new Fixtures({
   destroy: {
@@ -59,6 +73,9 @@ module('Acceptance | card adoption', function(hooks) {
 
   hooks.beforeEach(async function() {
     await login();
+  });
+  hooks.afterEach(async function() {
+    await waitForTestsToEnd();
   });
 
   test('adopted fields are present', async function(assert) {
@@ -92,6 +109,41 @@ module('Acceptance | card adoption', function(hooks) {
     let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.deepEqual(card.data.relationships.csAdoptsFrom.data, { type: 'cards', id: parentCard.canonicalURL });
+  });
+
+  test('can create adopted card from the library', async function(assert) {
+    await visit('/');
+
+    assert.equal(currentURL(), '/cards');
+    await click('[data-test-library-button]');
+    await waitForLibraryServiceToIdle();
+    await waitForCardLoad(parentCard.canonicalURL);
+
+    assert.deepEqual(
+      [
+        ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
+      ].map(i => i.getAttribute('data-test-card-renderer-embedded')),
+      [entry.canonicalURL, parentCard.canonicalURL]
+    );
+
+    await click('[data-test-library-adopt-card-btn]');
+    await setCardName(childName);
+    let childId = currentURL()
+      .replace('/cards/', '')
+      .replace('/edit/fields', '');
+    assert.ok(/^\/cards\/.*\/edit\/fields$/.test(currentURL()), 'URL is correct');
+
+    await click('[data-test-library-button]');
+    await waitForLibraryServiceToIdle();
+    await waitForCardLoad(decodeURIComponent(childId));
+    assert.equal(currentURL(), `/cards/${childId}/edit/fields`);
+
+    assert.deepEqual(
+      [
+        ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
+      ].map(i => i.getAttribute('data-test-card-renderer-embedded')),
+      [decodeURIComponent(childId), entry.canonicalURL, parentCard.canonicalURL]
+    );
   });
 
   test('it displays the adopted card in the right edge', async function(assert) {

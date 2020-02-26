@@ -16,6 +16,7 @@ import {
   selectField,
   encodeColons,
   waitForCardAutosave,
+  waitForTestsToEnd,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { animationsSettled } from 'ember-animated/test-support';
@@ -54,6 +55,9 @@ module('Acceptance | card schema', function(hooks) {
 
   hooks.beforeEach(async function() {
     await login();
+  });
+  hooks.afterEach(async function() {
+    await waitForTestsToEnd();
   });
 
   test(`adding a new field to a card`, async function(assert) {

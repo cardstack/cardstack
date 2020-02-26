@@ -9,6 +9,7 @@ import {
   waitForCardLoad,
   encodeColons,
   waitForCardAutosave,
+  waitForTestsToEnd,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { cardDocument } from '@cardstack/core/card-document';
@@ -47,6 +48,9 @@ module('Acceptance | card edit', function(hooks) {
 
   hooks.beforeEach(async function() {
     await login();
+  });
+  hooks.afterEach(async function() {
+    await waitForTestsToEnd();
   });
 
   test(`setting a string field`, async function(assert) {

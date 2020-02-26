@@ -43,10 +43,23 @@
       <div class="card-renderer-isolated--content
         {{concat (safe-css-string (if @card.canonicalURL @card.canonicalURL @card.adoptsFromURL)) "--isolated" }}
       ">
-        {{#if (or @suppressHeader @noHeaderAnimation)}}
-          <div class="card-renderer-isolated--card-container card-boundary isolated">
+        <MaybeAnimate
+          @mode={{this.mode}}
+          @animationMode="view"
+          @content={{@card}}
+          @watch="isSelected"
+          @use={{this.borderAnimation}} as |card|>
+          <div class="card-renderer-isolated--card-container card-boundary isolated {{if (and this.cardstackSession.isAuthenticated card.isSelected) "selected"}}">
+            {{#if @dropField}}
+              <DropZone
+                @card={{card}}
+                @dropField={{@dropField}}
+                @position={{0}}
+                @toggleStubField={{this.toggleStubField}}
+              />
+            {{/if}}
             <Scaffold
-              @card={{@card}}
+              @card={{card}}
               @feature="isolated-layout"
               @fields={{this.fields}}
               @mode={{this.mode}}
@@ -63,37 +76,7 @@
               @dropField={{@dropField}}
             />
           </div>
-        {{else}}
-          {{#animated-value @card watch="isSelected" use=this.borderAnimation}}
-            <div class="card-renderer-isolated--card-container card-boundary isolated {{if (and this.cardstackSession.isAuthenticated @card.isSelected) "selected"}}">
-              {{#if @dropField}}
-                <DropZone
-                  @card={{@card}}
-                  @dropField={{@dropField}}
-                  @position={{0}}
-                  @toggleStubField={{this.toggleStubField}}
-                />
-              {{/if}}
-              <Scaffold
-                @card={{@card}}
-                @feature="isolated-layout"
-                @fields={{this.fields}}
-                @mode={{this.mode}}
-                @setFieldName={{@setFieldName}}
-                @setCardValue={{@setCardValue}}
-                @setCardReference={{@setCardReference}}
-                @removeField={{@removeField}}
-                @toggleStubField={{this.toggleStubField}}
-                @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
-                @setPosition={{@setPosition}}
-                @selectField={{@selectField}}
-                @selectedField={{@selectedField}}
-                @selectedFieldName={{@selectedFieldName}}
-                @dropField={{@dropField}}
-              />
-            </div>
-          {{/animated-value}}
-        {{/if}}
+        </MaybeAnimate>
       </div>
     </section>
   {{else if (eq @format "embedded")}}

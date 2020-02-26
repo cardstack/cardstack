@@ -8,6 +8,7 @@ import {
   waitForCardLoad,
   showCardId,
   waitForSchemaViewToLoad,
+  waitForTestsToEnd,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -56,9 +57,12 @@ module('Acceptance | card name dialog', function(hooks) {
   hooks.beforeEach(async function() {
     await login();
   });
+  hooks.afterEach(async function() {
+    await waitForTestsToEnd();
+  });
 
   test('can create a card that uses a template from the catalog', async function(assert) {
-    await visit('/');
+    await visit('/cards');
     await click('[data-test-library-button]');
     await waitForTemplatesToLoad();
 
@@ -78,7 +82,7 @@ module('Acceptance | card name dialog', function(hooks) {
   });
 
   test('can create a new card that does not leverage a template from the catalog', async function(assert) {
-    await visit('/');
+    await visit('/cards');
     await click('[data-test-library-button]');
     await waitForTemplatesToLoad();
 
@@ -96,7 +100,7 @@ module('Acceptance | card name dialog', function(hooks) {
   });
 
   test('can use the enter key to confirm card name from dialog', async function(assert) {
-    await visit('/');
+    await visit('/cards');
     await click('[data-test-library-button]');
     await waitForTemplatesToLoad();
 
@@ -109,24 +113,24 @@ module('Acceptance | card name dialog', function(hooks) {
   });
 
   test('can cancel creation of a card by clicking outside the dialog', async function(assert) {
-    await visit('/');
+    await visit('/cards');
     await click('[data-test-library-button]');
     await waitForTemplatesToLoad();
 
     await click('[data-test-library-adopt-card-btn]');
     await click('[data-test-cardhost-modal-container]'); // close dialog by clicking modal container
     assert.dom('[data-test-dialog-box]').doesNotExist();
-    assert.equal(currentURL(), '/');
+    assert.equal(currentURL(), '/cards');
   });
 
   test('can cancel creation of a card by clicking the cancel button', async function(assert) {
-    await visit('/');
+    await visit('/cards');
     await click('[data-test-library-button]');
     await waitForTemplatesToLoad();
 
     await click('[data-test-library-adopt-card-btn]');
     await click('[data-test-cancel-create-btn]'); // close dialog by clicking cancel button
     assert.dom('[data-test-dialog-box]').doesNotExist();
-    assert.equal(currentURL(), '/');
+    assert.equal(currentURL(), '/cards');
   });
 });
