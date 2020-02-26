@@ -106,12 +106,16 @@ export async function waitForCardLoad(cardId) {
       });
     }
   } else {
-    await waitFor(`[data-test-card-renderer][data-test-card-loaded="true"]`, {
+    // not specfying a card ID means that you want the isolated card for this route
+    let [, , cardId] = currentURL().split('/');
+    await waitFor(`[data-test-card-renderer-isolated][data-test-card-loaded="true"]`, {
       timeout,
     });
-    let fields = [...document.querySelectorAll(`[data-test-card-renderer] [data-test-field]`)].map(i =>
-      i.getAttribute('data-test-field')
-    );
+    let fields = [
+      ...document.querySelectorAll(
+        `[data-test-card-renderer-isolated="${decodeURIComponent(cardId)}"] [data-test-field]`
+      ),
+    ].map(i => i.getAttribute('data-test-field'));
     for (let field of fields) {
       await waitFor(`[data-test-card-renderer] [data-test-field="${field}"][data-test-loaded="true"]`, {
         timeout,
