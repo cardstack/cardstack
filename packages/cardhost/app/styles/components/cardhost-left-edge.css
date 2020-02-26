@@ -83,7 +83,7 @@
 }
 
 .cardhost-left-edge--nav-button:disabled {
-  --icon-color: var(--ch-light-op40);
+  --icon-color: var(--ch-light-op50);
 }
 
 .cardhost-left-edge--nav.expanded {
