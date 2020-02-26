@@ -16,6 +16,7 @@ import {
   waitForCardAutosave,
   waitForTestsToEnd,
   waitForLibraryServiceToIdle,
+  getEncodedCardIdFromURL,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -58,9 +59,7 @@ module('Acceptance | card create', function(hooks) {
 
     await percySnapshot([assert.test.module.name, assert.test.testName, 'new'].join(' | '));
     await setCardName(card1Name);
-    let cardId = currentURL()
-      .replace('/cards/', '')
-      .replace('/edit/fields/schema', '');
+    let cardId = getEncodedCardIdFromURL();
 
     assert.ok(/^\/cards\/.*\/edit\/fields\/schema$/.test(currentURL()), 'URL is correct');
 
@@ -130,12 +129,9 @@ module('Acceptance | card create', function(hooks) {
 
     await click('[data-test-library-new-blank-card-btn]');
     await setCardName(card1Name);
-    let cardId = currentURL()
-      .replace('/cards/', '')
-      .replace('/edit/fields/schema', '');
+    let cardId = getEncodedCardIdFromURL();
 
     assert.ok(/^\/cards\/.*\/edit\/fields\/schema$/.test(currentURL()), 'URL is correct');
-
     assert.dom('.card-renderer-isolated--header-title').hasText('Millenial Puppies');
 
     await addField('title', 'string-field', true);
@@ -231,9 +227,7 @@ module('Acceptance | card create', function(hooks) {
     await saveCard();
 
     assert.ok(/^\/cards\/.*\/edit\/fields\/schema$/.test(currentURL()), 'URL is correct');
-    let card1Id = currentURL()
-      .replace('/cards/', '')
-      .replace('/edit/fields/schema', '');
+    let card1Id = getEncodedCardIdFromURL();
 
     await visit(`/cards/${card1Id}`);
     await animationsSettled();
@@ -335,9 +329,7 @@ module('Acceptance | card create', function(hooks) {
   test('autosave works', async function(assert) {
     await visit('/cards/add');
     await setCardName(card1Name);
-    let card1Id = currentURL()
-      .replace('/cards/', '')
-      .replace('/edit/fields/schema', '');
+    let card1Id = getEncodedCardIdFromURL();
     this.owner.lookup('service:autosave').autosaveDisabled = false;
     await addField('title', 'string-field', true);
     await waitForCardAutosave();

@@ -15,6 +15,7 @@ import {
   waitForCardPatch,
   waitForCardLoad,
   waitForTestsToEnd,
+  getEncodedCardIdFromURL,
   waitForLibraryServiceToIdle,
 } from '../helpers/card-ui-helpers';
 import { cardDocument } from '@cardstack/core/card-document';
@@ -128,9 +129,7 @@ module('Acceptance | card adoption', function(hooks) {
 
     await click('[data-test-library-adopt-card-btn]');
     await setCardName(childName);
-    let childId = currentURL()
-      .replace('/cards/', '')
-      .replace('/edit/fields', '');
+    let childId = getEncodedCardIdFromURL();
     assert.ok(/^\/cards\/.*\/edit\/fields$/.test(currentURL()), 'URL is correct');
 
     await click('[data-test-library-button]');
@@ -183,9 +182,7 @@ module('Acceptance | card adoption', function(hooks) {
 
   test('can remove own field', async function(assert) {
     await setupAdoptedCard();
-    let cardId = currentURL()
-      .replace('/cards/', '')
-      .replace('/edit/fields/schema', '');
+    let cardId = getEncodedCardIdFromURL();
     await addField('treats-available', 'boolean-field', false);
     await saveCard();
 
@@ -233,9 +230,7 @@ module('Acceptance | card adoption', function(hooks) {
 
   test('can edit the data of an adopted card', async function(assert) {
     await setupAdoptedCard();
-    let cardId = currentURL()
-      .replace('/cards/', '')
-      .replace('/edit/fields/schema', '');
+    let cardId = getEncodedCardIdFromURL();
     await addField('treats-available', 'boolean-field', false);
     await saveCard();
 
@@ -278,9 +273,7 @@ module('Acceptance | card adoption', function(hooks) {
 
   test('can create a card that has an adoption chain of multiple cards', async function(assert) {
     await setupAdoptedCard();
-    let cardId = currentURL()
-      .replace('/cards/', '')
-      .replace('/edit/fields/schema', '');
+    let cardId = getEncodedCardIdFromURL();
     await addField('treats-available', 'boolean-field', true);
     await saveCard();
     await showCardId();
@@ -319,17 +312,13 @@ module('Acceptance | card adoption', function(hooks) {
 
   test('adopted card can receive upstream changes', async function(assert) {
     await setupAdoptedCard();
-    let cardId = currentURL()
-      .replace('/cards/', '')
-      .replace('/edit/fields/schema', '');
+    let cardId = getEncodedCardIdFromURL();
     await addField('treats-available', 'boolean-field', true);
     await saveCard();
 
     await visit(`/cards/${cardId}/adopt`);
     await setCardName(grandChildName);
-    let grandChildId = currentURL()
-      .replace('/cards/', '')
-      .replace('/edit/fields', '');
+    let grandChildId = getEncodedCardIdFromURL();
 
     await visit(`/cards/${cardId}/edit/fields/schema`);
     await waitForSchemaViewToLoad(decodeURIComponent(cardId));

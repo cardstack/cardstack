@@ -107,14 +107,12 @@ export async function waitForCardLoad(cardId) {
     }
   } else {
     // not specfying a card ID means that you want the isolated card for this route
-    let [, , cardId] = currentURL().split('/');
+    let cardId = getCardIdFromURL();
     await waitFor(`[data-test-card-renderer-isolated][data-test-card-loaded="true"]`, {
       timeout,
     });
     let fields = [
-      ...document.querySelectorAll(
-        `[data-test-card-renderer-isolated="${decodeURIComponent(cardId)}"] [data-test-field]`
-      ),
+      ...document.querySelectorAll(`[data-test-card-renderer-isolated="${cardId}"] [data-test-field]`),
     ].map(i => i.getAttribute('data-test-field'));
     for (let field of fields) {
       await waitFor(`[data-test-card-renderer] [data-test-field="${field}"][data-test-loaded="true"]`, {
@@ -143,10 +141,7 @@ export async function setCardName(name) {
     await waitForSchemaViewToLoad();
   } else {
     await waitFor(`[data-test-card-edit]`, { timeout });
-    let cardId = currentURL()
-      .replace('/cards/', '')
-      .replace('/edit/fields', '');
-    await waitForCardLoad(decodeURIComponent(cardId));
+    await waitForCardLoad(getCardIdFromURL());
   }
 }
 
@@ -292,4 +287,12 @@ export async function removeField(name) {
 
 export function encodeColons(string) {
   return string.replace(/:/g, encodeURIComponent(':'));
+}
+
+export function getEncodedCardIdFromURL() {
+  let [, , cardId] = currentURL().split('/');
+  return cardId;
+}
+export function getCardIdFromURL() {
+  return decodeURIComponent(getEncodedCardIdFromURL());
 }
