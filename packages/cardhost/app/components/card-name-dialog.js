@@ -37,6 +37,8 @@ export default class CardNameDialog extends Component {
   keyDown(event) {
     if (event.which === 13) {
       this.createCard();
+    } else if (event.which === 27 && this.args.closeDialog) {
+      this.args.closeDialog();
     }
   }
 
