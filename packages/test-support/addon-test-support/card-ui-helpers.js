@@ -74,6 +74,7 @@ export async function createCards(args) {
     }
     await saveCard();
     await visit(`/cards/${id}`);
+    await animationsSettled();
   }
 }
 
@@ -107,11 +108,11 @@ export async function setFieldValue(name, value) {
       await click(`[data-test-field="${name}"] .cardstack-core-types-field-value-false`);
     }
   } else if (type === '@cardstack/core-types::has-many' && Array.isArray(value)) {
-    await fillIn(`#edit-${name}-field-value`, value.join(','));
-    await triggerEvent(`#edit-${name}-field-value`, 'keyup');
+    await fillIn(`[data-test-edit-field="${name}"]`, value.join(','));
+    await triggerEvent(`[data-test-edit-field="${name}"]`, 'keyup');
   } else {
-    await fillIn(`#edit-${name}-field-value`, value);
-    await triggerEvent(`#edit-${name}-field-value`, 'keyup');
+    await fillIn(`[data-test-edit-field="${name}"]`, value);
+    await triggerEvent(`[data-test-edit-field="${name}"]`, 'keyup');
   }
 }
 
