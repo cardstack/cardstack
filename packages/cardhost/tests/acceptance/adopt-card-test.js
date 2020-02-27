@@ -52,6 +52,7 @@ async function setupAdoptedCard() {
   await visit(`/cards/${card1Id}/adopt`);
   await setCardName(card2Id);
   await click('[data-test-configure-schema-btn]');
+  await animationsSettled();
 }
 
 module('Acceptance | card adoption', function(hooks) {
