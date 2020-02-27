@@ -2,17 +2,16 @@ import logger from '@cardstack/logger';
 import Session from '@cardstack/plugin-utils/session';
 import { declareInjections } from '@cardstack/di';
 import { todo } from '@cardstack/plugin-utils/todo-any';
-import { get, set, isEqual, unset, isEmpty } from 'lodash';
-import { SingleResourceDoc, CollectionResourceDoc, RelationshipsWithData } from 'jsonapi-typescript';
+import { SingleResourceDoc, CollectionResourceDoc } from 'jsonapi-typescript';
 import cardUtils from '@cardstack/plugin-utils/card-utils';
 import baseCard from '@cardstack/base-card';
 
 const log = logger('cardstack/card-services');
 
-const { adaptCardToFormat, adaptCardCollectionToFormat, cardComputedFields } = cardUtils;
+const { adaptCardToFormat, adaptCardCollectionToFormat } = cardUtils;
 
 // cards are not schema, so we are creating this here instead of bootstrap-schema.js
-async function setupBaseCard(pgsearchClient: todo, searchers: todo, writers: todo, currentSchema: todo) {
+async function setupBaseCard(pgsearchClient: todo, searchers: todo, writers: todo) {
   await pgsearchClient.ensureDatabaseSetup();
   let currentInternalBaseCard: SingleResourceDoc | undefined;
   try {
@@ -32,53 +31,7 @@ async function setupBaseCard(pgsearchClient: todo, searchers: todo, writers: tod
     log.info(`Base card doesn't exist yet, creating @cardstack/base-card...`);
     await writers.create(Session.INTERNAL_PRIVILEGED, 'cards', baseCard);
   } else {
-    let version = get(currentInternalBaseCard, 'data.meta.version');
-    let source = get(currentInternalBaseCard, 'data.meta.source');
-    let schema = await currentSchema.getSchema();
-    let dataSource = schema.getDataSource(source);
-
-    if (dataSource && dataSource.sourceType === '@cardstack/ephemeral') {
-      // the currentBaseCard actually doesn't exist--it's left over from the last time the index was running
-      log.info(`Base card doesn't exist yet, creating @cardstack/base-card...`);
-      await writers.create(Session.INTERNAL_PRIVILEGED, 'cards', baseCard);
-    } else {
-      let currentBaseCard: SingleResourceDoc = await adaptCardToFormat(
-        schema,
-        Session.INTERNAL_PRIVILEGED,
-        currentInternalBaseCard,
-        'isolated',
-        searchers
-      );
-      unset(currentBaseCard, 'data.attributes.metadata-summary');
-      for (let resource of (currentBaseCard.included || []).concat(currentBaseCard.data)) {
-        delete resource.meta;
-        if (isEmpty(resource.attributes || {})) {
-          delete resource.attributes;
-        }
-        if (isEmpty(resource.relationships || {})) {
-          delete resource.relationships;
-        }
-      }
-      for (let computedField of cardComputedFields) {
-        unset(currentBaseCard, `data.attributes.${computedField}`);
-        unset(currentBaseCard, `data.relationships.${computedField}`);
-      }
-      for (let rel of Object.keys(baseCard.data.relationships || {})) {
-        if (!(baseCard.data.relationships![rel] as RelationshipsWithData).data) {
-          unset(baseCard.data.relationships, rel);
-        }
-      }
-      unset(currentBaseCard, 'data.attributes.field-order');
-      if (!isEqual(currentBaseCard, baseCard)) {
-        log.debug('the current base card:', JSON.stringify(currentBaseCard, null, 2));
-        log.debug('new base card:', JSON.stringify(baseCard, null, 2));
-        log.info(`Base card is out of date, updating @cardstack/base-card...`);
-        set(baseCard, 'data.meta.version', version);
-        await writers.update(Session.INTERNAL_PRIVILEGED, 'cards', baseCard.data.id, baseCard);
-      } else {
-        log.info(`Base card is up to date.`);
-      }
-    }
+    log.info(`Base card exists.`);
   }
 }
 
@@ -105,7 +58,7 @@ export = declareInjections(
       this.searchers = searchers;
       this.currentSchema = currentSchema;
 
-      this._setupPromise = setupBaseCard(pgsearchClient, searchers, writers, currentSchema);
+      this._setupPromise = setupBaseCard(pgsearchClient, searchers, writers);
     }
 
     async get(session: Session, id: string, format: string) {
