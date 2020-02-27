@@ -50,6 +50,15 @@ describe('hub/card-service', function() {
       expect(foundCard.canonicalURL).equals(card.canonicalURL);
     });
 
+    it('deserializes date field values as strings', async function() {
+      let doc = cardDocument()
+        .withAttributes({ birthday: '2019-10-30' })
+        .withField('birthday', 'date-field');
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+      let date = await card.value('birthday');
+      expect(date).to.equal('2019-10-30');
+    });
+
     it("adds upstream data source's version to the card's meta", async function() {
       let doc = cardDocument();
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
@@ -495,6 +504,98 @@ describe('hub/card-service', function() {
       expect(await card.value('puppyCount')).to.equal(42);
     });
 
+    it('applies date field type validation at create', async function() {
+      let doc = cardDocument()
+        .withAttributes({ birthday: 'what' })
+        .withField('birthday', 'date-field');
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(/field birthday on card .* failed type validation for value: "what"/);
+      }
+
+      doc = cardDocument()
+        .withAttributes({ birthday: '2020-12-45' })
+        .withField('birthday', 'date-field');
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(/field birthday on card .* failed type validation for value: "2020-12-45"/);
+      }
+
+      doc = cardDocument()
+        .withAttributes({ birthday: '2020-20-12' })
+        .withField('birthday', 'date-field');
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(/field birthday on card .* failed type validation for value: "2020-20-12"/);
+      }
+
+      doc = cardDocument()
+        .withAttributes({ birthday: 5 })
+        .withField('birthday', 'date-field');
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(/field birthday on card .* failed type validation for value: 5/);
+      }
+
+      doc = cardDocument()
+        .withAttributes({ birthday: '99999-01-01' })
+        .withField('birthday', 'date-field');
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(/field birthday on card .* failed type validation for value: "99999-01-01"/);
+      }
+
+      doc = cardDocument()
+        .withAttributes({ birthday: '2019-10-30' })
+        .withField('birthday', 'date-field');
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+      expect(card).is.ok;
+      expect(await card.value('birthday')).to.equal('2019-10-30');
+    });
+
+    it('rejects dates that are not in a simplified ISO-8601 format of YYYY-MM-DD', async function() {
+      let doc = cardDocument()
+        .withAttributes({ birthday: '10/30/2019' })
+        .withField('birthday', 'date-field');
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(/field birthday on card .* failed type validation for value: "10\/30\/2019"/);
+      }
+    });
+
+    it('rejects dates that specify a time, e.g. 2020-02-27T12:00:00Z (this requires a ISO-8601 date-time field so we can respect timezones)', async function() {
+      let doc = cardDocument()
+        .withAttributes({ birthday: '2019-10-30T00:00:00Z' })
+        .withField('birthday', 'date-field');
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(
+          /field birthday on card .* failed type validation for value: "2019-10-30T00:00:00Z"/
+        );
+      }
+    });
+
     it('applies string field type validation during update', async function() {
       let card = await service.create(
         `${myOrigin}/api/realms/first-ephemeral-realm`,
@@ -559,6 +660,39 @@ describe('hub/card-service', function() {
       });
       expect(updatedCard).is.ok;
       expect(await updatedCard.value('isCool')).to.equal(true);
+    });
+
+    it('applies date field type validation during update', async function() {
+      let card = await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        cardDocument().withField('birthday', 'date-field').jsonapi
+      );
+
+      try {
+        await service.update(card, {
+          data: {
+            type: 'cards',
+            attributes: {
+              birthday: 'what',
+            },
+          },
+        });
+        throw new Error(`should not have been able to update`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(/field birthday on card .* failed type validation for value: "what"/);
+      }
+
+      let updatedCard = await service.update(card, {
+        data: {
+          type: 'cards',
+          attributes: {
+            birthday: '2019-10-30',
+          },
+        },
+      });
+      expect(updatedCard).is.ok;
+      expect(await updatedCard.value('birthday')).to.equal('2019-10-30');
     });
 
     it('applies integer field type validation during update', async function() {
@@ -1310,6 +1444,7 @@ describe('hub/card-service', function() {
             .withField('name', 'string-field')
             .withField('weightInPounds', 'integer-field')
             .withField('rating', 'integer-field')
+            .withField('birthday', 'date-field')
             .withField('pottyTrained', 'boolean-field').jsonapi
         );
         vanGogh = await service.create(
@@ -1320,6 +1455,7 @@ describe('hub/card-service', function() {
               name: 'Van Gogh',
               weightInPounds: 55,
               rating: 11,
+              birthday: '2016-11-19',
               pottyTrained: true,
             })
             .adoptingFrom(puppyCard).jsonapi
@@ -1332,6 +1468,7 @@ describe('hub/card-service', function() {
               name: 'Mango',
               weightInPounds: 7,
               rating: 11,
+              birthday: '2019-10-30',
               pottyTrained: false,
             })
             .adoptingFrom(puppyCard).jsonapi
@@ -1344,6 +1481,7 @@ describe('hub/card-service', function() {
               name: 'Ringo',
               weightInPounds: 60,
               rating: 11,
+              birthday: '2000-06-01',
               pottyTrained: true,
             })
             .adoptingFrom(puppyCard).jsonapi
@@ -1602,6 +1740,20 @@ describe('hub/card-service', function() {
         expect(ids).to.have.members([vanGogh.canonicalURL, ringo.canonicalURL]);
       });
 
+      it('can use a range filter against a date field', async function() {
+        let results = await service.search({
+          filter: {
+            type: puppyCard,
+            range: {
+              birthday: { lte: '2018-01-01' },
+            },
+          },
+        });
+        expect(results.cards.length).to.equal(2);
+        let ids = results.cards.map(i => i.canonicalURL);
+        expect(ids).to.have.members([ringo.canonicalURL, vanGogh.canonicalURL]);
+      });
+
       it('can use a range filter against a string field', async function() {
         let results = await service.search({
           filter: {
@@ -1802,6 +1954,21 @@ describe('hub/card-service', function() {
         expect(results.cards.length).to.equal(3);
         let ids = results.cards.map(i => i.canonicalURL);
         expect(ids).to.eql([mango.canonicalURL, vanGogh.canonicalURL, ringo.canonicalURL]);
+      });
+
+      it('can sort by date field', async function() {
+        let results = await service.search({
+          filter: {
+            type: puppyCard,
+            range: {
+              birthday: { gt: '2015-01-01' },
+            },
+          },
+          sort: 'birthday',
+        });
+        expect(results.cards.length).to.equal(2);
+        let ids = results.cards.map(i => i.canonicalURL);
+        expect(ids).to.eql([vanGogh.canonicalURL, mango.canonicalURL]);
       });
 
       it('can sort by string field', async function() {
