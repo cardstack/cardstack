@@ -246,15 +246,15 @@ module('Acceptance | library', function(hooks) {
     await waitForLibraryLoad();
 
     assert.ok(
-      find(`[data-test-view-css="${card1.canonicalURL}"][data-test-view-css-format="embedded"]`).innerText.includes(
-        'template1 css'
-      ),
+      find(
+        `[data-test-css-format="embedded"][data-test-css-cards="[${card1.canonicalURL},${template1.canonicalURL},${card2.canonicalURL}]"]`
+      ).innerText.includes('template1 css'),
       'embedded card style is correct'
     );
     assert.ok(
-      find(`[data-test-view-css="${card3.canonicalURL}"][data-test-view-css-format="embedded"]`).innerText.includes(
-        'template2 css'
-      ),
+      find(
+        `[data-test-css-format="embedded"][data-test-css-cards="[${template2.canonicalURL},${card3.canonicalURL},${card4.canonicalURL}]"]`
+      ).innerText.includes('template2 css'),
       'embedded card style is correct'
     );
   });
@@ -277,13 +277,13 @@ module('Acceptance | library', function(hooks) {
       .dom(`[data-test-featured-card="${card4.canonicalURL}"] [data-test-featured-card-title]`)
       .hasText('Featured: Why Doors?');
     assert.ok(
-      find(`[data-test-view-css="${card3.canonicalURL}"][data-test-view-css-format="isolated"]`).innerText.includes(
+      find(`[data-test-css-format="isolated"][data-test-css-cards="[${card3.canonicalURL}]"`).innerText.includes(
         'card3 isolated css'
       ),
       'featured card style is correct'
     );
     assert.ok(
-      find(`[data-test-view-css="${card4.canonicalURL}"][data-test-view-css-format="isolated"]`).innerText.includes(
+      find(`[data-test-css-format="isolated"][data-test-css-cards="[${card4.canonicalURL}]"`).innerText.includes(
         'card4 isolated css'
       ),
       'featured card style is correct'

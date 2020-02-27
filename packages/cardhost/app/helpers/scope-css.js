@@ -1,17 +1,17 @@
 import { helper } from '@ember/component/helper';
+import { safeCssString } from './safe-css-string';
+import uniq from 'lodash/uniq';
 import scope from 'scope-css';
 
-/** Prefixes all CSS rules with the parent class name
- Requires two params, the CSS and a class name or ID to add to the front of every rule.
- Example: 
- `{{scope-css ".something { color: blue; }" ".parent-class"}}`
- Returns this string:
- ".parent-class .something { color: blue; }"
-*/
-
-export default helper(function scopeCss(params) {
-  if (!params[0] || !params[1]) {
+export default helper(function scopeCss([css, cardOrCards, format]) {
+  if (!css || !cardOrCards) {
     return '';
   }
-  return scope(params[0], `.${params[1]}`);
+
+  if (Array.isArray(cardOrCards) && format) {
+    let prefixes = uniq(cardOrCards.map(card => `.${safeCssString(card.canonicalURL)}--${format}`));
+    return scope(css, prefixes.join(', '));
+  }
+
+  return scope(css, `.${safeCssString(cardOrCards.canonicalURL)}--${format}`);
 });

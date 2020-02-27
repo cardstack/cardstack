@@ -3,16 +3,16 @@ import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
-let scoped = `.my-card .a {}
-.my-card .b {}`;
+let scoped = `.my-card--isolated .a {}
+.my-card--isolated .b {}`;
 
 module('Integration | Helper | scope-css', function(hooks) {
   setupRenderingTest(hooks);
 
-  // Replace this with your real tests.
   test('it renders', async function(assert) {
+    this.set('card', { canonicalURL: 'my-card' });
     await render(hbs`{{scope-css ".a {}
-.b {}" "my-card"}}`);
+.b {}" card "isolated"}}`);
     assert.equal(this.element.textContent.trim(), scoped);
   });
 });

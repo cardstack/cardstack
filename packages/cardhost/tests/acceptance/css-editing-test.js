@@ -10,6 +10,7 @@ import {
   encodeColons,
   waitForCardAutosave,
   waitForTestsToEnd,
+  getCardIdFromURL,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -261,54 +262,60 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
 
-    assert.dom(`[data-test-view-css="themer"]`).doesNotExist();
-    assert.dom(`[data-test-view-css="${testCard.canonicalURL}"]`).exists();
+    assert.dom(`[data-test-themer-css]`).doesNotExist();
+    assert.dom(`[data-test-css-format="isolated"][data-test-css-cards="[${testCard.canonicalURL}]"]`).exists();
     assert.ok(
-      find(`[data-test-view-css="${testCard.canonicalURL}"]`).innerText.includes('base css'),
+      find(`[data-test-css-cards="[${testCard.canonicalURL}]"]`).innerText.includes('base css'),
       'base style is correct'
     );
 
     await visit(`/cards/${cardPath}/edit/layout`);
     await waitForCardLoad();
 
-    assert.dom(`[data-test-view-css="themer"]`).doesNotExist();
-    assert.dom(`[data-test-view-css="${testCard.canonicalURL}"]`).exists();
+    assert.dom(`[data-test-themer-css]`).doesNotExist();
+    assert.dom(`[data-test-css-format="isolated"][data-test-css-cards="[${testCard.canonicalURL}]"]`).exists();
     assert.ok(
-      find(`[data-test-view-css="${testCard.canonicalURL}"]`).innerText.includes('base css'),
+      find(`[data-test-css-format="isolated"][data-test-css-cards="[${testCard.canonicalURL}]"]`).innerText.includes(
+        'base css'
+      ),
       'base style is correct'
     );
 
     await click('[data-test-card-custom-style-button]');
     await waitForThemerLoad();
 
-    assert.dom(`[data-test-view-css="${testCard.canonicalURL}"]`).doesNotExist();
-    assert.dom(`[data-test-view-css="themer"]`).exists();
-    assert.ok(find(`[data-test-view-css="themer"]`).innerText.includes('base css'), 'themer style is correct');
+    assert.dom(`[data-test-css-format="isolated"][data-test-css-cards="[${testCard.canonicalURL}"]`).doesNotExist();
+    assert.dom(`[data-test-themer-css]`).exists();
+    assert.ok(find(`[data-test-themer-css]`).innerText.includes('base css'), 'themer style is correct');
 
     await fillIn('[data-test-editor-pane] textarea', 'gorgeous styles');
-    assert.ok(find(`[data-test-view-css="themer"]`).innerText.includes('gorgeous styles'), 'themer style is correct');
+    assert.ok(find(`[data-test-themer-css]`).innerText.includes('gorgeous styles'), 'themer style is correct');
     await saveCard();
 
-    assert.dom(`[data-test-view-css="${testCard.canonicalURL}"]`).doesNotExist();
-    assert.ok(find(`[data-test-view-css="themer"]`).innerText.includes('gorgeous styles'), 'themer style is correct');
+    assert.dom(`[data-test-css-format="isolated"][data-test-css-cards="[${testCard.canonicalURL}]"]`).doesNotExist();
+    assert.ok(find(`[data-test-themer-css]`).innerText.includes('gorgeous styles'), 'themer style is correct');
 
     await click('[data-test-mode-indicator-link="edit"]');
     await waitForCardLoad();
 
-    assert.dom(`[data-test-view-css="themer"]`).doesNotExist();
-    assert.dom(`[data-test-view-css="${testCard.canonicalURL}"]`).exists();
+    assert.dom(`[data-test-themer-css]`).doesNotExist();
+    assert.dom(`[data-test-css-format="isolated"][data-test-css-cards="[${testCard.canonicalURL}]"]`).exists();
     assert.ok(
-      find(`[data-test-view-css="${testCard.canonicalURL}"]`).innerText.includes('gorgeous styles'),
+      find(`[data-test-css-format="isolated"][data-test-css-cards="[${testCard.canonicalURL}]"]`).innerText.includes(
+        'gorgeous styles'
+      ),
       'base style is correct'
     );
 
     await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
 
-    assert.dom(`[data-test-view-css="themer"]`).doesNotExist();
-    assert.dom(`[data-test-view-css="${testCard.canonicalURL}"]`).exists();
+    assert.dom(`[data-test-themer-css]`).doesNotExist();
+    assert.dom(`[data-test-css-format="isolated"][data-test-css-cards="[${testCard.canonicalURL}]"]`).exists();
     assert.ok(
-      find(`[data-test-view-css="${testCard.canonicalURL}"]`).innerText.includes('gorgeous styles'),
+      find(`[data-test-css-format="isolated"][data-test-css-cards="[${testCard.canonicalURL}]"]`).innerText.includes(
+        'gorgeous styles'
+      ),
       'base style is correct'
     );
   });
@@ -357,7 +364,9 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     await waitForCardLoad();
 
     assert.dom('[data-test-cs-component="dropdown"]').doesNotContainText('Custom');
-    assert.dom('[data-test-view-css]').containsText('base css');
+    assert
+      .dom(`[data-test-css-format="isolated"][data-test-css-cards="[${getCardIdFromURL()}]"]`)
+      .containsText('base css');
   });
 
   test('buttons and dropdowns reflect custom style state', async function(assert) {
@@ -398,7 +407,9 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     await visit(`/cards/${cardPath}/edit/layout`);
     await waitForCardLoad();
     assert.ok(
-      find(`[data-test-view-css="${testCard.canonicalURL}"]`).innerText.includes('gorgeous styles'),
+      find(`[data-test-css-format="isolated"][data-test-css-cards="[${testCard.canonicalURL}]"]`).innerText.includes(
+        'gorgeous styles'
+      ),
       'base style is correct'
     );
   });

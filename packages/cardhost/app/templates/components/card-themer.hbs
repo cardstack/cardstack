@@ -26,10 +26,10 @@
   </div>
 {{/if}}
 
-<style data-test-view-css="themer">
+<style data-test-themer-css>
   {{#if this.isolatedCss}}
-    {{scope-css this.isolatedCss (concat (safe-css-string @card.canonicalURL) "--isolated")}}
+    {{scope-css this.isolatedCss @card "isolated"}}
   {{else}}
-    {{scope-css this.loadingCss (concat (safe-css-string @card.canonicalURL) "--isolated")}}
+    {{scope-css this.loadingCss @card "isolated"}}
   {{/if}}
 </style>

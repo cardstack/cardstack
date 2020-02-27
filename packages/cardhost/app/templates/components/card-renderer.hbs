@@ -13,7 +13,8 @@
       data-test-card-loaded={{stringify this.loadCard.isIdle}}
       {{on "focus" (action this.cardIsFocused true)}}
       {{did-insert this.focusCard true}}
-      {{did-update this.cardUpdated @card}}
+      {{did-update this.cardUpdated @card @suppressCss}}
+      {{will-destroy this.removeCardCss}}
     >
       {{#if (and (eq @mode "view") (not @suppressHeader))}}
         {{#animated-value @card watch="isSelected" use=this.headerAnimation}}
@@ -88,6 +89,7 @@
       data-test-card-renderer-embedded={{@card.canonicalURL}}
       data-test-card-renderer={{@card.canonicalURL}}
       data-test-card-loaded={{stringify this.loadCard.isIdle}}
+      {{will-destroy this.removeCardCss}}
     >
       {{#if (and (eq this.mode "view") (not @preventIsolation))}}
         <LinkTo
@@ -115,29 +117,20 @@
     </div>
   {{/if}}
 
-  {{!-- TODO eventually we need to get smarter about writing out this CSS so that
-  we eliminate dupe style definitions. Maybe there is a service that actually has
-  the ability to know what all cards are on the page and spit out the most
-  efficient CSS so that cards that leverage a common parent's CSS all get
-  collasped into a single style element --}}
+  {{!-- this is only for when we are loading the css and want to show a
+  placeholder style. After the css is loaded the CssManager component takes
+  over the handling of this card's css --}}
   {{#unless @suppressCss}}
     {{#if (and (not this.css) this.loadCard.isRunning)}}
       <style
-        data-test-view-css={{@card.canonicalURL}}
-        data-test-view-css-format={{@format}}
+        data-test-css-loading={{@card.canonicalURL}}
+        data-test-css-format={{@format}}
       >
         {{#if (eq @format "isolated")}}
-          {{scope-css this.loadingIsolatedCss (concat (safe-css-string @card.canonicalURL) "--" @format)}}
+          {{scope-css this.loadingIsolatedCss @card @format}}
         {{else}}
-          {{scope-css this.loadingEmbeddedCss (concat (safe-css-string @card.canonicalURL) "--" @format)}}
+          {{scope-css this.loadingEmbeddedCss @card @format}}
         {{/if}}
-      </style>
-    {{else if this.css}}
-      <style
-        data-test-view-css={{@card.canonicalURL}}
-        data-test-view-css-format={{@format}}
-      >
-        {{scope-css this.css (concat (safe-css-string @card.canonicalURL) "--" @format)}}
       </style>
     {{/if}}
   {{/unless}}

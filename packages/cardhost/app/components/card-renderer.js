@@ -15,6 +15,7 @@ const duration = animationSpeed || 250;
 
 export default class CardRenderer extends Component {
   @service cardstackSession;
+  @service('css') cssService;
   @service('-ea-motion') motion;
 
   @tracked actualFields;
@@ -65,8 +66,10 @@ export default class CardRenderer extends Component {
     let [actualFields, css] = yield Promise.all(tasks);
     if (!this.args.suppressCss) {
       this.css = css;
+      this.cssService.addCard(this.args.card, this.args.format, css);
     } else {
       this.css = undefined;
+      this.cssService.removeCard(this.args.card, this.args.format);
     }
 
     if (Array.isArray(this.previousFieldNames)) {
@@ -162,6 +165,11 @@ export default class CardRenderer extends Component {
     }
   }).enqueue())
   autoRemoveStubField;
+
+  @action
+  removeCardCss() {
+    this.cssService.removeCard(this.args.card, this.args.format);
+  }
 
   @action
   cardUpdated() {

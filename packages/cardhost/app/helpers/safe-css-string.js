@@ -1,6 +1,5 @@
 import { helper } from '@ember/component/helper';
-
-export default helper(function([string]) {
+export function safeCssString(string) {
   if (!string) {
     return;
   }
@@ -12,4 +11,8 @@ export default helper(function([string]) {
     .replace(/\s/g, '-')
     .replace(/\./g, '-')
     .replace(/\//g, '-');
+}
+
+export default helper(function([string]) {
+  return safeCssString(string);
 });
