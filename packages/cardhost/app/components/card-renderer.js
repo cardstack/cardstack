@@ -7,6 +7,7 @@ import { action } from '@ember/object';
 import move from 'ember-animated/motions/move';
 import resize from 'ember-animated/motions/resize';
 import adjustCSS from 'ember-animated/motions/adjust-css';
+import opacity from 'ember-animated/motions/opacity';
 import { easeInAndOut } from 'ember-animated/easings/cosine';
 import { parallel } from 'ember-animated';
 import ENV from '@cardstack/cardhost/config/environment';
@@ -120,5 +121,14 @@ export default class CardRenderer extends Component {
       adjustCSS('border-top-right-radius', sprite, { duration });
       adjustCSS('border-top-left-radius', sprite, { duration });
     });
+  }
+
+  *contentTransition({ receivedSprites }) {
+    if (receivedSprites.length) {
+      receivedSprites.forEach(sprite => {
+        sprite.moveToFinalPosition();
+        opacity(sprite, { from: 0, easing: easeInAndOut, duration });
+      });
+    }
   }
 }
