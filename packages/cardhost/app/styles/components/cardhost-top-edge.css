@@ -30,12 +30,12 @@
 .cardhost-top-edge--preview-button,
 .cardhost-top-edge--size-buttons {
   z-index: var(--ch-actions-z-index);
-  transition: visibility 0.3s ease;
+  transition: transform var(--ch-transition-time) ease-in-out;
 }
 
 .cardhost-top-edge--preview-button.hidden,
 .cardhost-top-edge--size-buttons.hidden {
-  visibility: collapse;
+  transform: translateY(-200%);
 }
 
 .cardhost-top-edge--buttons {
