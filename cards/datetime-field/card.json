@@ -2,8 +2,8 @@
   "data": {
     "type": "cards",
     "attributes": {
-      "csTitle": "Date",
-      "csDescription": "Date field",
+      "csTitle": "Date-time",
+      "csDescription": "Date-time field",
       "csFeatures": {
         "field-buildValueExpression": ["field-hooks.js", "buildValueExpression"],
         "field-validate": ["field-hooks.js", "validate"],

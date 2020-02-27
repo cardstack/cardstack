@@ -31,7 +31,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["-r", "esm", "packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "deserializes date-field values as strings"],
+      "args": ["-r", "esm", "packages/test-support/bin/run.js", "--timeout", "200000", "--grep", "throws if you try to filter by a non ISO 8601 datetime"],
     },
     {
       "type": "node",

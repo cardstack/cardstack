@@ -1,9 +1,33 @@
 import { Card } from '@cardstack/core/card';
+import { Expression } from '@cardstack/core/expression';
+import { isParam } from '@cardstack/hub/pgsearch/util';
+import CardstackError from '@cardstack/core/error';
 
-const dateFormat = /^\d\d\d\d-[01]\d-[0123]\d$/;
+const dateFormat = /^\d{4,6}-[01]\d-[0123]\d$/;
+
+export function buildValueExpression(expression: Expression): Expression {
+  let [value] = expression;
+  let date: string | undefined;
+  if (isParam(value)) {
+    date = value.param as string;
+  } else if (typeof value === 'string') {
+    date = value;
+  } else {
+    throw new CardstackError(`Do not know how to process value expression ${JSON.stringify(value)} as a date`, {
+      status: 400,
+    });
+  }
+
+  if (!_validate(date)) {
+    throw new CardstackError(`The value expression in the query '${date}' is not a valid YYYY-MM-DD date`, {
+      status: 400,
+    });
+  }
+  return expression;
+}
 
 export async function validate(value: string, _fieldCard: Card) {
-  return typeof value === 'string' && dateFormat.test(value) && !isNaN(Date.parse(value));
+  return _validate(value);
 }
 
 // We serialize this card as a string instead of as a Date because Date objects
@@ -14,4 +38,8 @@ export async function validate(value: string, _fieldCard: Card) {
 // difference between the hub and the client.
 export async function deserialize(value: string, _fieldCard: Card) {
   return value;
+}
+
+function _validate(date: string) {
+  return typeof date === 'string' && dateFormat.test(date) && !isNaN(Date.parse(date));
 }

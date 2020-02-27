@@ -59,6 +59,16 @@ describe('hub/card-service', function() {
       expect(date).to.equal('2019-10-30');
     });
 
+    it('deserializes datetime field values as Dates', async function() {
+      let doc = cardDocument()
+        .withAttributes({ appointment: '2020-03-07T14:00:00.000Z' })
+        .withField('appointment', 'datetime-field');
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+      let date = (await card.value('appointment')) as Date;
+      expect(date instanceof Date).to.equal(true, 'the datetime field value is an instance of Date');
+      expect(date.toISOString()).to.equal('2020-03-07T14:00:00.000Z');
+    });
+
     it("adds upstream data source's version to the card's meta", async function() {
       let doc = cardDocument();
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
@@ -550,14 +560,14 @@ describe('hub/card-service', function() {
       }
 
       doc = cardDocument()
-        .withAttributes({ birthday: '99999-01-01' })
+        .withAttributes({ birthday: '9999999-01-01' })
         .withField('birthday', 'date-field');
       try {
         await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
         throw new Error(`should not have been able to create`);
       } catch (err) {
         expect(err).hasStatus(400);
-        expect(err.detail).to.match(/field birthday on card .* failed type validation for value: "99999-01-01"/);
+        expect(err.detail).to.match(/field birthday on card .* failed type validation for value: "9999999-01-01"/);
       }
 
       doc = cardDocument()
@@ -566,6 +576,165 @@ describe('hub/card-service', function() {
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
       expect(card).is.ok;
       expect(await card.value('birthday')).to.equal('2019-10-30');
+    });
+
+    it('applies datetime field type validation at create', async function() {
+      let doc = cardDocument()
+        .withAttributes({ appointment: 'what' })
+        .withField('appointment', 'datetime-field');
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(/field appointment on card .* failed type validation for value: "what"/);
+      }
+
+      doc = cardDocument()
+        .withAttributes({ appointment: '2020-12-45T00:00:00.000Z' })
+        .withField('appointment', 'datetime-field');
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(
+          /field appointment on card .* failed type validation for value: "2020-12-45T00:00:00.000Z"/
+        );
+      }
+
+      doc = cardDocument()
+        .withAttributes({ appointment: '2020-20-12T00:00:00.000Z' })
+        .withField('appointment', 'datetime-field');
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(
+          /field appointment on card .* failed type validation for value: "2020-20-12T00:00:00.000Z"/
+        );
+      }
+
+      doc = cardDocument()
+        .withAttributes({ appointment: 5 })
+        .withField('appointment', 'datetime-field');
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(/field appointment on card .* failed type validation for value: 5/);
+      }
+
+      doc = cardDocument()
+        .withAttributes({ appointment: '9999999-01-01T00:00:00.000Z' })
+        .withField('appointment', 'datetime-field');
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(
+          /field appointment on card .* failed type validation for value: "9999999-01-01T00:00:00.000Z"/
+        );
+      }
+
+      doc = cardDocument()
+        .withAttributes({ appointment: '2020-03-07' })
+        .withField('appointment', 'datetime-field');
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(/field appointment on card .* failed type validation for value: "2020-03-07"/);
+      }
+
+      doc = cardDocument()
+        .withAttributes({ appointment: '2020-03-07T14:00:00.000' }) // missing "Z" which is the indicator that the time is in UTC
+        .withField('appointment', 'datetime-field');
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(
+          /field appointment on card .* failed type validation for value: "2020-03-07T14:00:00.000"/
+        );
+      }
+
+      doc = cardDocument()
+        .withAttributes({ appointment: '2020-03-07T34:00:00.000Z' })
+        .withField('appointment', 'datetime-field');
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(
+          /field appointment on card .* failed type validation for value: "2020-03-07T34:00:00.000Z"/
+        );
+      }
+
+      doc = cardDocument()
+        .withAttributes({ appointment: '2020-03-07T14:70:00.000Z' })
+        .withField('appointment', 'datetime-field');
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(
+          /field appointment on card .* failed type validation for value: "2020-03-07T14:70:00.000Z"/
+        );
+      }
+
+      doc = cardDocument()
+        .withAttributes({ appointment: '2020-03-07T14:00:70.000Z' })
+        .withField('appointment', 'datetime-field');
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(
+          /field appointment on card .* failed type validation for value: "2020-03-07T14:00:70.000Z"/
+        );
+      }
+
+      doc = cardDocument()
+        .withAttributes({ appointment: '2020-03-07T14:00:00Z' })
+        .withField('appointment', 'datetime-field');
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(
+          /field appointment on card .* failed type validation for value: "2020-03-07T14:00:00Z"/
+        );
+      }
+
+      doc = cardDocument()
+        .withAttributes({ appointment: '2020-03-07T14:00:00.00Z' })
+        .withField('appointment', 'datetime-field');
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(
+          /field appointment on card .* failed type validation for value: "2020-03-07T14:00:00.00Z"/
+        );
+      }
+
+      doc = cardDocument()
+        .withAttributes({ appointment: '2020-03-07T14:00:00.999Z' })
+        .withField('appointment', 'datetime-field');
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+      expect(card).is.ok;
+      expect((await card.value('appointment')).toISOString()).to.equal('2020-03-07T14:00:00.999Z');
     });
 
     it('rejects dates that are not in a simplified ISO-8601 format of YYYY-MM-DD', async function() {
@@ -581,7 +750,7 @@ describe('hub/card-service', function() {
       }
     });
 
-    it('rejects dates that specify a time, e.g. 2020-02-27T12:00:00Z (this requires a ISO-8601 date-time field so we can respect timezones)', async function() {
+    it('rejects dates that specify a time, e.g. 2020-02-27T12:00:00Z (this requires the ISO-8601 datetime-field so we can respect timezones)', async function() {
       let doc = cardDocument()
         .withAttributes({ birthday: '2019-10-30T00:00:00Z' })
         .withField('birthday', 'date-field');
@@ -693,6 +862,39 @@ describe('hub/card-service', function() {
       });
       expect(updatedCard).is.ok;
       expect(await updatedCard.value('birthday')).to.equal('2019-10-30');
+    });
+
+    it('applies datetime field type validation during update', async function() {
+      let card = await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        cardDocument().withField('appointment', 'datetime-field').jsonapi
+      );
+
+      try {
+        await service.update(card, {
+          data: {
+            type: 'cards',
+            attributes: {
+              appointment: 'what',
+            },
+          },
+        });
+        throw new Error(`should not have been able to update`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(/field appointment on card .* failed type validation for value: "what"/);
+      }
+
+      let updatedCard = await service.update(card, {
+        data: {
+          type: 'cards',
+          attributes: {
+            appointment: '2020-03-07T14:00:00.000Z',
+          },
+        },
+      });
+      expect(updatedCard).is.ok;
+      expect((await updatedCard.value('appointment')).toISOString()).to.equal('2020-03-07T14:00:00.000Z');
     });
 
     it('applies integer field type validation during update', async function() {
@@ -1445,6 +1647,7 @@ describe('hub/card-service', function() {
             .withField('weightInPounds', 'integer-field')
             .withField('rating', 'integer-field')
             .withField('birthday', 'date-field')
+            .withField('lastPoop', 'datetime-field')
             .withField('pottyTrained', 'boolean-field').jsonapi
         );
         vanGogh = await service.create(
@@ -1456,6 +1659,7 @@ describe('hub/card-service', function() {
               weightInPounds: 55,
               rating: 11,
               birthday: '2016-11-19',
+              lastPoop: '2020-02-27T06:00:00.000Z',
               pottyTrained: true,
             })
             .adoptingFrom(puppyCard).jsonapi
@@ -1469,6 +1673,7 @@ describe('hub/card-service', function() {
               weightInPounds: 7,
               rating: 11,
               birthday: '2019-10-30',
+              lastPoop: '2020-02-27T10:00:00.000Z',
               pottyTrained: false,
             })
             .adoptingFrom(puppyCard).jsonapi
@@ -1482,6 +1687,7 @@ describe('hub/card-service', function() {
               weightInPounds: 60,
               rating: 11,
               birthday: '2000-06-01',
+              lastPoop: '2012-12-31T14:00:00.000Z',
               pottyTrained: true,
             })
             .adoptingFrom(puppyCard).jsonapi
@@ -1754,6 +1960,20 @@ describe('hub/card-service', function() {
         expect(ids).to.have.members([ringo.canonicalURL, vanGogh.canonicalURL]);
       });
 
+      it('can use a range filter against a datetime field', async function() {
+        let results = await service.search({
+          filter: {
+            type: puppyCard,
+            range: {
+              lastPoop: { gt: '2020-02-27T00:00:00.000Z' },
+            },
+          },
+        });
+        expect(results.cards.length).to.equal(2);
+        let ids = results.cards.map(i => i.canonicalURL);
+        expect(ids).to.have.members([mango.canonicalURL, vanGogh.canonicalURL]);
+      });
+
       it('can use a range filter against a string field', async function() {
         let results = await service.search({
           filter: {
@@ -1969,6 +2189,21 @@ describe('hub/card-service', function() {
         expect(results.cards.length).to.equal(2);
         let ids = results.cards.map(i => i.canonicalURL);
         expect(ids).to.eql([vanGogh.canonicalURL, mango.canonicalURL]);
+      });
+
+      it('can sort by datetime field', async function() {
+        let results = await service.search({
+          filter: {
+            type: puppyCard,
+            range: {
+              lastPoop: { gt: '2020-02-27T00:00:00.000Z' },
+            },
+          },
+          sort: '-lastPoop',
+        });
+        expect(results.cards.length).to.equal(2);
+        let ids = results.cards.map(i => i.canonicalURL);
+        expect(ids).to.eql([mango.canonicalURL, vanGogh.canonicalURL]);
       });
 
       it('can sort by string field', async function() {
