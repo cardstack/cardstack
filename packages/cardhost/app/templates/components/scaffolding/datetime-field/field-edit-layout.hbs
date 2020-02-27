@@ -1,0 +1,7 @@
+<TextField
+  @type="datetime-local"
+  @id={{concat "edit-" @card.nonce "-field-value"}}
+  @label={{@card.csTitle}}
+  @helperText={{@card.csDescription}}
+  @value={{this.fieldValue}}
+  @setValue={{perform this.updateFieldValue}} />

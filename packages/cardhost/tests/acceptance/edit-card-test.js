@@ -27,15 +27,19 @@ const testCard = cardDocument()
     csId: 'millenial-puppies',
     csTitle: 'Millenial Puppies',
     csFieldSets: {
-      isolated: ['body', 'likes', 'published', 'author'],
+      isolated: ['body', 'likes', 'published', 'author', 'appointment', 'birthday'],
     },
     likes: 100,
+    birthday: '2019-10-30',
+    appointment: '2020-03-07T14:00:00.000Z',
     body: 'test body',
     published: true,
   })
   .withField('body', 'string-field')
   .withField('likes', 'integer-field')
   .withField('published', 'boolean-field')
+  .withField('birthday', 'date-field')
+  .withField('appointment', 'datetime-field')
   .withField('author', 'base');
 const cardPath = encodeURIComponent(testCard.canonicalURL);
 const scenario = new Fixtures({
@@ -73,20 +77,38 @@ module('Acceptance | card edit', function(hooks) {
     assert.equal(card.data.attributes.body, `updated body`);
   });
 
-  skip('setting a date field', async function(assert) {
+  test('setting a date field', async function(assert) {
     await visit(`/cards/${cardPath}/edit/fields`);
     await waitForCardLoad();
 
-    await setFieldValue('created', '2019-10-08');
+    await setFieldValue('birthday', '2016-11-19');
     await saveCard();
 
     await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
-    assert.dom('[data-test-field="created"] [data-test-date-field-viewer-value]').hasText(`October 8, 2019`);
+    assert.dom('[data-test-field="birthday"] [data-test-date-field-viewer-value]').hasText(`November 19, 2016`);
 
     let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
-    assert.equal(card.data.attributes.created, `2019-10-08`);
+    assert.equal(card.data.attributes.birthday, `2016-11-19`);
+  });
+
+  test('setting a datetime field', async function(assert) {
+    await visit(`/cards/${cardPath}/edit/fields`);
+    await waitForCardLoad();
+
+    await setFieldValue('appointment', '2020-03-07T13:00');
+    await saveCard();
+
+    await visit(`/cards/${cardPath}`);
+    await waitForCardLoad();
+    assert
+      .dom('[data-test-field="appointment"] [data-test-datetime-field-viewer-value]')
+      .hasText(`March 7, 2020 1:00pm`);
+
+    let cardJson = find('[data-test-card-json]').innerHTML;
+    let card = JSON.parse(cardJson);
+    assert.equal(card.data.attributes.appointment, new Date('2020-03-07T13:00').toISOString());
   });
 
   test('setting an integer field', async function(assert) {

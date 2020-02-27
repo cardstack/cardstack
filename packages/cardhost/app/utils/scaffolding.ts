@@ -9,6 +9,8 @@ export async function fieldCards(data: DataService): Promise<AddressableCard[]> 
       { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'string-field' },
       { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'boolean-field' },
       { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'integer-field' },
+      { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'date-field' },
+      { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'datetime-field' },
       { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' },
     ].map(id => data.load(id, 'everything'))
   );

@@ -1,0 +1,10 @@
+<div class="label {{@card.nonce}}-label" data-test-datetime-field-viewer-label>
+  {{@card.csTitle}}
+</div>
+<div class="value {{@card.nonce}}-value" data-test-datetime-field-viewer-value>
+  {{#if this.fieldValue}}
+    {{moment-format this.fieldValue "MMMM D, YYYY h:mma"}}
+  {{else}}
+    No date
+  {{/if}}
+</div>

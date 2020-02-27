@@ -3,7 +3,7 @@
     "type": "cards",
     "attributes": {
       "csTitle": "Date-time",
-      "csDescription": "Date-time field",
+      "csDescription": "Date-time field (e.g. an appointment)",
       "csFeatures": {
         "field-buildValueExpression": ["field-hooks.js", "buildValueExpression"],
         "field-validate": ["field-hooks.js", "validate"],

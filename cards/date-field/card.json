@@ -3,7 +3,7 @@
     "type": "cards",
     "attributes": {
       "csTitle": "Date",
-      "csDescription": "Date field",
+      "csDescription": "Date field (e.g. a birthday)",
       "csFeatures": {
         "field-buildValueExpression": ["field-hooks.js", "buildValueExpression"],
         "field-validate": ["field-hooks.js", "validate"],
