@@ -32,8 +32,6 @@ jobs:
         key: ${{ runner.os }}-eslint
     - name: Checkout
       uses: actions/checkout@v1
-    - name: yarn install
-      run: yarn install
     - name: Extract branch name
       shell: bash
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
@@ -45,7 +43,7 @@ jobs:
         PGPORT: 5444
         AWS_ACCESS_KEY_ID: AKIAZ444BSFYHW3OKFOD
         demo_EMBER_DEPLOY_AWS_ACCESS_KEY_ID: AKIAZ444BSFYA3J2FWMZ
-        demo_LOG_LEVELS: '*=info,cardstack/performance/writers=debug'
+        demo_LOG_LEVELS: '*=info,cardstack/performance/writers=debug,cardstack/card-services=debug,cardstack/git=trace'
         demo_CARD_TEMPLATES: '["local-hub::location-card-template", "local-hub::event-card"]'
         demo_PGHOST: builder-hub20191010154607345600000008.cbuq0sp3cf76.us-east-1.rds.amazonaws.com
         demo_PGPORT: 5432

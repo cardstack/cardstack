@@ -1,15 +1,22 @@
-import Component from '@ember/component';
+import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
 export default class Library extends Component {
+  @service library;
   @service scroller;
 
   @tracked selectedSection = 'recent-cards';
   @tracked cardModel;
   @tracked dialogTitle;
   @tracked showDialog;
+
+  constructor(...args) {
+    super(...args);
+
+    this.library.getRecentCardsTask.perform();
+  }
 
   @action
   openCardNameDialog(title, model /*, evt*/) {

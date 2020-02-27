@@ -1,4 +1,8 @@
 <div class="library" data-test-library>
+  <button {{on "click" this.library.hide}} class="hide-library--button" data-test-library-close-button>
+    <span class="hide-library--button-icon">{{svg-jar "library" width="21px" height="21px"}}</span>
+    <span class="hide-library--button-text">Hide Library</span>
+  </button>
   <nav class="library--nav" data-test-library-nav>
     <ul>
       <li>
@@ -34,7 +38,7 @@
         Recent Cards
       </header>
       <div class="library-section--grid">
-        {{#each this.model.catalog as |card|}}
+        {{#each this.library.recentCards as |card|}}
           {{#if (not (eq card.name "@cardstack/base-card"))}}
             <LinkTo
               @route="cards.card.view"
@@ -60,7 +64,7 @@
         Saved Templates
       </header>
       <div class="library-section--grid">
-        {{#each this.model.templates as |card|}}
+        {{#each @templates as |card|}}
           <Cta {{on "click" (fn this.openCardNameDialog "Adopt a Card" card)}}
             class="library--card-link"
             data-test-embedded-card={{card.name}}

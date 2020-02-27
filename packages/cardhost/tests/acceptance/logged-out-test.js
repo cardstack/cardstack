@@ -38,6 +38,8 @@ module('Acceptance | logged-out', function(hooks) {
     await click('[data-test-toggle-left-edge]');
     assert.equal(currentURL(), `/cards/${card1Id}`);
 
+    assert.dom('[data-test-library-button]').isDisabled();
+    assert.dom('[data-test-catalog-button]').isDisabled();
     assert.dom('[data-test-card-header-button]').doesNotExist();
     await percySnapshot(assert);
     await click('[data-test-toggle-left-edge]');
@@ -73,26 +75,46 @@ module('Acceptance | logged-out', function(hooks) {
   });
 
   test('viewing index page', async function(assert) {
+    await login();
     await visit(`/`);
-    assert.equal(currentURL(), `/`);
+    assert.equal(currentURL(), `/cards`);
     assert.dom('[data-test-card-builder]').exists();
     assert.dom('[data-test-featured-card]').exists({ count: 4 });
     assert.dom('[data-test-cardhost-left-edge]').exists();
-    assert.dom('[data-test-library-button]').isDisabled();
+    assert.dom('.cardhost-left-edge--nav-button').exists({ count: 4 });
+    assert.dom('[data-test-library-button]').isNotDisabled();
+    await click('[data-test-toggle-left-edge]');
+    await click('[data-test-logout-button]');
+    await click('[data-test-toggle-left-edge]');
 
-    await click('[data-test-featured-card="product-card"]');
-    assert.equal(currentURL(), `/cards/product-card`);
-    assert.dom('[data-test-library-button]').doesNotExist();
-    assert.dom('[data-test-library-link]').exists();
-
-    await click('[data-test-library-link]');
-    assert.equal(currentURL(), `/`);
+    assert.dom('[data-test-card-builder]').exists();
+    assert.dom('[data-test-featured-card]').exists({ count: 4 });
+    assert.dom('[data-test-cardhost-left-edge]').exists();
+    assert.dom('.cardhost-left-edge--nav-button').exists({ count: 4 });
     assert.dom('[data-test-library-button]').isDisabled();
+    assert.dom('[data-test-catalog-button]').isDisabled();
+    await percySnapshot(assert);
+  });
+
+  test('can navigate to index page from view mode', async function(assert) {
+    await login();
+    await createCards({
+      [card1Id]: [['title', 'string', true, 'The Millenial Puppy']],
+    });
+    await visit(`/cards/${card1Id}`);
+    assert.equal(currentURL(), `/cards/${card1Id}`);
+    await click('[data-test-toggle-left-edge]');
+    await click('[data-test-logout-button]');
+    await click('[data-test-toggle-left-edge]');
+    assert.equal(currentURL(), `/cards/${card1Id}`);
+    assert.dom('[data-test-home-link]').exists();
+    await click('[data-test-home-link]');
+    assert.equal(currentURL(), `/cards`);
   });
 
   test('clicking outside the login panel closes it', async function(assert) {
-    await visit(`/`);
-    assert.equal(currentURL(), `/`);
+    await visit(`/cards`);
+    assert.equal(currentURL(), `/cards`);
     await waitFor('[data-test-toggle-left-edge]');
     await click('[data-test-toggle-left-edge]');
     await waitFor('[data-test-login-button]');

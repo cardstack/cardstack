@@ -1,16 +1,9 @@
 .card-builder {
-  --card-builder-background: #f6f5fa;
   --card-builder-hover: rgba(0,0,0,0.1);
   --card-builder-card-width: 263px;
   --card-builder-horizontal-padding: 38px;
 
-  width: 100%;
-  height: 100vh;
-  margin: 0;
   padding-left: var(--ch-left-edge-navbar-width);
-  background-color: var(--card-builder-background);
-  color: var(--ch-dark);
-  overflow-y: auto;
 }
 
 .card-builder--header {

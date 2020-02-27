@@ -72,10 +72,10 @@ import Change from './change';
 import logger from '@cardstack/logger';
 const log = logger('cardstack/git');
 import service from './service';
-import { set, intersection } from 'lodash';
+import { set } from 'lodash';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
-const { isInternalCard, adoptionChain } = require('@cardstack/plugin-utils/card-utils');
+const { isInternalCard } = require('@cardstack/plugin-utils/card-utils');
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 const { declareInjections } = require('@cardstack/di');
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
@@ -217,7 +217,7 @@ class GitUpdater {
   }
 
   async updateContent(meta: todo, hints: todo[], ops: todo) {
-    log.debug(`starting updateContent()`);
+    log.debug(`starting updateContent() for cardTypes: ${JSON.stringify(this.cardTypes)}`);
     await this._loadCommit();
     let originalTree;
     if (meta && meta.commit) {
@@ -309,12 +309,7 @@ class GitUpdater {
       if (doc) {
         if (isInternalCard(type, id)) {
           await this._ensureBaseCard();
-
-          let chain = (await adoptionChain(doc, this.getInternalCard.bind(this))).map((i: todo) => i.data.id);
-          if (!intersection(this.cardTypes, chain).length) {
-            return;
-          }
-
+          log.trace(`indexing card ${id}`);
           await ops.save(type, id, doc);
         } else {
           await ops.save(type, id, { data: doc });

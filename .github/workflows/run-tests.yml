@@ -1,6 +1,6 @@
 name: Node CI
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -48,7 +48,18 @@ jobs:
         PGHOST: localhost
         PGPORT: 5444
         PGUSER: postgres
-    - name: Ember tests
+    - name: Ember tests with percy
+      if: github.event_name == 'pull_request'
+      run: yarn ember-tests
+      env:
+        CI: true
+        PGHOST: localhost
+        PGPORT: 5444
+        PGUSER: postgres
+        PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
+
+    - name: Ember tests without percy
+      if: github.event_name != 'pull_request'
       run: yarn ember-tests
       env:
         CI: true

@@ -29,9 +29,9 @@ module('Acceptance | card name dialog', function(hooks) {
 
   test('card name dialog state is correct', async function(assert) {
     await login();
-    await visit('/');
+    await visit('/cards');
 
-    assert.equal(currentURL(), '/');
+    assert.equal(currentURL(), '/cards');
     await click('[data-test-library-button]');
     assert.dom('[data-test-library]').exists();
     await click('[data-test-library-adopt-card-btn]');

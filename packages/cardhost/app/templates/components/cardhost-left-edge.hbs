@@ -4,24 +4,32 @@
     class="cardhost-left-edge"
     data-test-cardhost-left-edge
   >
-    <nav
-      class="cardhost-left-edge--nav {{@mode}} {{if this.isExpanded "expanded"}}"
-    >
+    <nav class="cardhost-left-edge--nav {{@mode}} {{if this.isExpanded "expanded"}}">
       <ul>
+        <li>
+          <LinkTo
+            @route="index"
+            class="cardhost-left-edge--nav-button cardstack-logo-button"
+            title="Homepage"
+            data-test-home-link
+          >
+            {{svg-jar "cardstack-logo" width="23px" height="25px"}}
+          </LinkTo>
+        </li>
         <li class="login-grid">
           <button
-            class="cardhost-left-edge--nav-button cardstack-logo-button"
+            class="cardhost-left-edge--nav-button profile-button {{if this.isExpanded "selected"}}"
             aria-label="expandable menu with login controls"
             aria-expanded={{this.isExpanded}}
             {{on "click" this.toggleMenuExpand}}
             data-test-toggle-left-edge
           >
-            {{svg-jar "cardstack-logo" width="21px" height="23px"}}
+            {{svg-jar "user" width="18px" height="20px"}}
           </button>
           {{#if this.isExpanded}}
             <div
               class="login-grid-right-column"
-              {{click-outside this.closeLeftEdge ignore=".cardhost-left-edge--nav-button"}}
+              {{click-outside this.closeLeftEdge ignore=".cardhost-left-edge--nav"}}
             >
               {{#if session.isAuthenticated }}
                 <Cta
@@ -49,8 +57,8 @@
         </li>
         <li>
           <button
-            disabled={{true}}
-            class="cardhost-left-edge--nav-button"
+            disabled={{not-eq @mode "schema"}}
+            class="cardhost-left-edge--nav-button {{if (eq @mode "schema") "selected"}}"
             aria-label="catalog"
             data-test-catalog-button
           >
@@ -58,26 +66,15 @@
           </button>
         </li>
         <li>
-          {{#if @displayLibrary}}
-            <button
-              {{on "click" this.showLibrary}}
-              disabled={{not session.isAuthenticated}}
-              class="cardhost-left-edge--nav-button"
-              aria-label="library"
-              data-test-library-button
-            >
-              {{svg-jar "library" width="21px" height="21px"}}
-            </button>
-          {{else}}
-            <LinkTo
-              @route="index"
-              data-test-library-link
-              class="cardhost-left-edge--nav-button library-button"
-              title="Homepage"
-            >
-              {{svg-jar "library" width="21px" height="21px"}}
-            </LinkTo>
-          {{/if}}
+          <button
+            {{on "click" this.library.show}}
+            disabled={{not session.isAuthenticated}}
+            class="cardhost-left-edge--nav-button"
+            aria-label="library"
+            data-test-library-button
+          >
+            {{svg-jar "library" width="21px" height="21px"}}
+          </button>
         </li>
       </ul>
     </nav>
@@ -85,11 +82,3 @@
     {{yield}}
   </aside>
 </CardstackSession>
-
-{{#if this.isLibraryOpen}}
-  <button {{on "click" this.hideLibrary}} class="hide-library--button" data-test-library-close-button>
-    <span class="hide-library--button-icon">{{svg-jar "library" width="21px" height="21px"}}</span>
-    <span class="hide-library--button-text">Hide Library</span>
-  </button>
-  {{in-bottom-toolbar show=(component "library" model=@model)}}
-{{/if}}

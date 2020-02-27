@@ -230,6 +230,15 @@
 }
 
 
+.card-renderer-isolated--header-icon {
+  padding-right: 10px;
+  width: 40px;
+}
+
+.card-renderer-isolated--header-title {
+  width: 100%;
+}
+
 /* TODO: fade card if field-renderer is selected */
 /* .card-renderer-isolated.faded::before {
   content: '';
