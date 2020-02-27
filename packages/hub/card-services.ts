@@ -3,13 +3,13 @@ import Session from '@cardstack/plugin-utils/session';
 import { declareInjections } from '@cardstack/di';
 import { todo } from '@cardstack/plugin-utils/todo-any';
 import { get, set, isEqual, unset, isEmpty } from 'lodash';
-import { SingleResourceDoc, CollectionResourceDoc } from 'jsonapi-typescript';
+import { SingleResourceDoc, CollectionResourceDoc, RelationshipsWithData } from 'jsonapi-typescript';
 import cardUtils from '@cardstack/plugin-utils/card-utils';
 import baseCard from '@cardstack/base-card';
 
 const log = logger('cardstack/card-services');
 
-const { adaptCardToFormat, adaptCardCollectionToFormat } = cardUtils;
+const { adaptCardToFormat, adaptCardCollectionToFormat, cardComputedFields } = cardUtils;
 
 // cards are not schema, so we are creating this here instead of bootstrap-schema.js
 async function setupBaseCard(pgsearchClient: todo, searchers: todo, writers: todo, currentSchema: todo) {
@@ -59,6 +59,16 @@ async function setupBaseCard(pgsearchClient: todo, searchers: todo, writers: tod
           delete resource.relationships;
         }
       }
+      for (let computedField of cardComputedFields) {
+        unset(currentBaseCard, `data.attributes.${computedField}`);
+        unset(currentBaseCard, `data.relationships.${computedField}`);
+      }
+      for (let rel of Object.keys(baseCard.data.relationships || {})) {
+        if (!(baseCard.data.relationships![rel] as RelationshipsWithData).data) {
+          unset(baseCard.data.relationships, rel);
+        }
+      }
+      unset(currentBaseCard, 'data.attributes.field-order');
       if (!isEqual(currentBaseCard, baseCard)) {
         log.debug('the current base card:', JSON.stringify(currentBaseCard, null, 2));
         log.debug('new base card:', JSON.stringify(baseCard, null, 2));

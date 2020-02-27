@@ -1216,6 +1216,7 @@ export = {
   resolveDocument,
   adaptCardToFormat,
   cardContextFromId,
+  cardComputedFields,
   cardBrowserAssetFields,
   generateInternalCardFormat,
   adaptCardCollectionToFormat,
