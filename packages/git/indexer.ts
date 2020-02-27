@@ -72,10 +72,10 @@ import Change from './change';
 import logger from '@cardstack/logger';
 const log = logger('cardstack/git');
 import service from './service';
-import { set, intersection } from 'lodash';
+import { set } from 'lodash';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
-const { isInternalCard, adoptionChain } = require('@cardstack/plugin-utils/card-utils');
+const { isInternalCard } = require('@cardstack/plugin-utils/card-utils');
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 const { declareInjections } = require('@cardstack/di');
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
