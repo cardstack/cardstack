@@ -442,4 +442,33 @@ module('Acceptance | card schema', function(hooks) {
     await waitFor('[data-test-card-is-dirty="no"]', { timeout });
     assert.dom('[data-test-card-is-dirty="no"]').exists();
   });
+
+  test(`can be navigated to using the left-edge catalog button`, async function(assert) {
+    let cardId = '@cardstack%2Fbase-card';
+
+    await login();
+    await visit(`/cards/${cardId}`);
+    assert.equal(currentURL(), `/cards/${cardId}`);
+    assert.dom('[data-test-catalog-button]').isNotDisabled();
+    assert.dom('[data-test-catalog-button]').doesNotHaveClass('selected');
+    await click('[data-test-catalog-button]');
+    assert.equal(currentURL(), `/cards/${cardId}/edit/fields/schema`);
+    assert.dom('[data-test-catalog-button]').isDisabled();
+    assert.dom('[data-test-catalog-button]').hasClass('selected');
+
+    await visit(`/cards/${cardId}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${cardId}/edit/fields`);
+    await click('[data-test-catalog-button]');
+    assert.equal(currentURL(), `/cards/${cardId}/edit/fields/schema`);
+
+    await visit(`/cards/${cardId}/edit/layout`);
+    assert.equal(currentURL(), `/cards/${cardId}/edit/layout`);
+    await click('[data-test-catalog-button]');
+    assert.equal(currentURL(), `/cards/${cardId}/edit/fields/schema`);
+
+    await click('[data-test-card-header-button]');
+    assert.equal(currentURL(), `/cards/${cardId}`);
+    await click('[data-test-catalog-button]');
+    assert.equal(currentURL(), `/cards/${cardId}/edit/fields/schema`);
+  });
 });

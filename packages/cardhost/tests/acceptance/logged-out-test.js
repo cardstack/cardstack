@@ -83,6 +83,7 @@ module('Acceptance | logged-out', function(hooks) {
     assert.dom('[data-test-cardhost-left-edge]').exists();
     assert.dom('.cardhost-left-edge--nav-button').exists({ count: 4 });
     assert.dom('[data-test-library-button]').isNotDisabled();
+    assert.dom('[data-test-catalog-button]').isDisabled();
     await click('[data-test-toggle-left-edge]');
     await click('[data-test-logout-button]');
     await click('[data-test-toggle-left-edge]');
