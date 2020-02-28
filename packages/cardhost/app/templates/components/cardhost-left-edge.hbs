@@ -57,7 +57,8 @@
         </li>
         <li>
           <button
-            disabled={{not-eq @mode "schema"}}
+            {{on "click" this.transitionToSchema}}
+            disabled={{or (not session.isAuthenticated) (eq @mode "index") (eq @mode "schema")}}
             class="cardhost-left-edge--nav-button {{if (eq @mode "schema") "selected"}}"
             aria-label="catalog"
             data-test-catalog-button

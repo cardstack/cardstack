@@ -6,14 +6,13 @@ import { tracked } from '@glimmer/tracking';
 export default class CardhostLeftEdgeComponent extends Component {
   @service cardstackSession;
   @service library;
+  @service router;
   @tracked isExpanded = false;
 
   @action
   toggleMenuExpand() {
     this.isExpanded = !this.isExpanded;
   }
-
-  @service router;
 
   @action
   logout(sessionLogout) {
@@ -33,12 +32,10 @@ export default class CardhostLeftEdgeComponent extends Component {
   }
 
   @action
-  showLibrary() {
-    this.isLibraryOpen = true;
-  }
-
-  @action
-  hideLibrary() {
-    this.isLibraryOpen = false;
+  transitionToSchema() {
+    let cardId = this.router.currentRoute.parent.params.name || this.router.currentRoute.parent.attributes.name;
+    if (cardId) {
+      this.router.transitionTo('cards.card.edit.fields.schema', cardId);
+    }
   }
 }
