@@ -23,6 +23,7 @@
   "devDependencies": {
     "@cardstack/base-card": "*",
     "@cardstack/boolean-field-card": "*",
+    "@cardstack/call-to-action-field-card": "*",
     "@cardstack/catalog-entry-card": "*",
     "@cardstack/core": "0.16.31",
     "@cardstack/date-field-card": "*",

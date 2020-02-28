@@ -27,7 +27,7 @@ const testCard = cardDocument()
     csId: 'millenial-puppies',
     csTitle: 'Millenial Puppies',
     csFieldSets: {
-      isolated: ['body', 'likes', 'published', 'author', 'appointment', 'birthday', 'link', 'image'],
+      isolated: ['body', 'likes', 'published', 'author', 'appointment', 'birthday', 'link', 'image', 'cta'],
     },
     likes: 100,
     birthday: '2019-10-30',
@@ -41,6 +41,7 @@ const testCard = cardDocument()
   .withField('birthday', 'date-field')
   .withField('appointment', 'datetime-field')
   .withField('link', 'url-field', 'singular', { csTitle: 'Awesome Link' })
+  .withField('cta', 'call-to-action-field', 'singular', { csTitle: 'Call to action' })
   .withField('image', 'image-reference-field', 'singular', { csTitle: 'Awesome Image' })
   .withField('author', 'base');
 const cardPath = encodeURIComponent(testCard.canonicalURL);
@@ -130,6 +131,25 @@ module('Acceptance | card edit', function(hooks) {
     let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.link, 'https://cardstack.com');
+  });
+
+  test('setting a call-to-action field', async function(assert) {
+    await visit(`/cards/${cardPath}/edit/fields`);
+    await waitForCardLoad();
+
+    await setFieldValue('cta', 'https://cardstack.com');
+    await saveCard();
+
+    await visit(`/cards/${cardPath}`);
+    await waitForCardLoad();
+    assert.dom('[data-test-field="cta"] [data-test-cta-field-viewer-value]').hasText(`Call to action`);
+    assert
+      .dom('[data-test-field="cta"] [data-test-cta-field-viewer-value]')
+      .hasAttribute('href', 'https://cardstack.com/');
+
+    let cardJson = find('[data-test-card-json]').innerHTML;
+    let card = JSON.parse(cardJson);
+    assert.equal(card.data.attributes.cta, 'https://cardstack.com');
   });
 
   test('setting an image reference field', async function(assert) {

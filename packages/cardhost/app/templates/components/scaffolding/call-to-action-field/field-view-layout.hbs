@@ -1,0 +1,11 @@
+{{#if this.fieldValue}}
+  <a
+    class="value {{@card.name}}-value cta-viewer cs-component-cta"
+    href={{this.fieldValue}}
+    target="_blank"
+    rel="noopener noreferrer"
+    data-test-cta-field-viewer-value
+  >
+    {{@card.csTitle}}
+  </a>
+{{/if}}
