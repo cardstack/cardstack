@@ -10,7 +10,7 @@
     "@cardstack/hub": "*"
   },
   "devDependencies": {
-    "@cardstack/core": "0.16.31",
-    "@cardstack/hub": "0.16.31"
+    "@cardstack/core": "0.16.32",
+    "@cardstack/hub": "0.16.32"
   }
 }

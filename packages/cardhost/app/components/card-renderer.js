@@ -3,11 +3,15 @@ import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import move from 'ember-animated/motions/move';
+import resize from 'ember-animated/motions/resize';
 import adjustCSS from 'ember-animated/motions/adjust-css';
 import { task, waitForProperty, timeout } from 'ember-concurrency';
 import { scheduleOnce } from '@ember/runloop';
 import difference from 'lodash/difference';
 import { set } from '@ember/object';
+import opacity from 'ember-animated/motions/opacity';
+import { easeInAndOut } from 'ember-animated/easings/cosine';
+import { parallel } from 'ember-animated';
 import ENV from '@cardstack/cardhost/config/environment';
 
 const { animationSpeed } = ENV;
@@ -47,7 +51,7 @@ export default class CardRenderer extends Component {
     if (this.args.cardFocused) {
       this.cardFocused = this.args.cardFocused;
     }
-    this.doOnLoadComplete.perform();
+    this.initialLoad.perform();
   }
 
   @(task(function*() {
@@ -104,6 +108,8 @@ export default class CardRenderer extends Component {
         set(field, 'position', position++);
       }
     }
+
+    set(this.args.card, 'mode', this.mode);
   }).drop())
   loadCard;
 
@@ -119,7 +125,7 @@ export default class CardRenderer extends Component {
       yield this.args.cardLoaded();
     }
   })
-  doOnLoadComplete;
+  initialLoad;
 
   @(task(function*(nonce, position, field) {
     yield this.loadCard.last.then();
@@ -191,16 +197,41 @@ export default class CardRenderer extends Component {
     this.cardFocused(value);
   }
 
-  *headerAnimation({ keptSprites }) {
+  *headerAnimation({ keptSprites, receivedSprites }) {
     keptSprites.forEach(sprite => {
       move(sprite, { duration });
     });
+
+    if (receivedSprites.length) {
+      receivedSprites.forEach(sprite => {
+        sprite.applyStyles({ 'z-index': '1', 'background-color': 'transparent' });
+        parallel(move(sprite, { easing: easeInAndOut, duration }), resize(sprite, { easing: easeInAndOut, duration }));
+      });
+    }
   }
 
-  *borderAnimation({ keptSprites }) {
+  *cardTransition({ keptSprites, receivedSprites }) {
+    if (receivedSprites.length) {
+      receivedSprites.forEach(sprite => {
+        sprite.applyStyles({ 'z-index': '16' });
+        parallel(move(sprite, { easing: easeInAndOut, duration }), resize(sprite, { easing: easeInAndOut, duration }));
+        adjustCSS('border-top-right-radius', sprite, { duration });
+        adjustCSS('border-top-left-radius', sprite, { duration });
+      });
+    }
+
     keptSprites.forEach(sprite => {
       adjustCSS('border-top-right-radius', sprite, { duration });
       adjustCSS('border-top-left-radius', sprite, { duration });
     });
+  }
+
+  *contentTransition({ receivedSprites }) {
+    if (receivedSprites.length) {
+      receivedSprites.forEach(sprite => {
+        sprite.moveToFinalPosition();
+        opacity(sprite, { from: 0, easing: easeInAndOut, duration });
+      });
+    }
   }
 }

@@ -16,29 +16,31 @@
       {{did-update this.cardUpdated @card @suppressCss}}
       {{will-destroy this.removeCardCss}}
     >
-      {{#if (and (eq @mode "view") (not @suppressHeader))}}
-        {{#animated-value @card watch="isSelected" use=this.headerAnimation}}
+      {{#unless @suppressHeader}}
+        {{#if (eq @mode "view")}}
+          {{#animated-value @card watch="isSelected" use=this.headerAnimation}}
+            <CardRendererHeader
+              @cardSelected={{if (and this.cardstackSession.isAuthenticated @cardSelected) true}}
+              @card={{@card}}
+              @buttonRoute="cards.card.edit.fields"
+              @buttonText="Edit"
+              @mode={{this.mode}}
+              @contextMenuOpen={{@contextMenuOpen}}
+              @setContextMenu={{@setContextMenu}}
+            />
+          {{/animated-value}}
+        {{else}}
           <CardRendererHeader
-            @cardSelected={{if (and this.cardstackSession.isAuthenticated @cardSelected) true}}
+            @cardSelected={{true}}
             @card={{@card}}
-            @buttonRoute="cards.card.edit.fields"
-            @buttonText="Edit"
+            @buttonRoute="cards.card.view"
+            @buttonText="Done Editing"
             @mode={{this.mode}}
             @contextMenuOpen={{@contextMenuOpen}}
             @setContextMenu={{@setContextMenu}}
           />
-        {{/animated-value}}
-      {{else if (not @suppressHeader)}}
-        <CardRendererHeader
-          @cardSelected={{true}}
-          @card={{@card}}
-          @buttonRoute="cards.card.view"
-          @buttonText="Done Editing"
-          @mode={{this.mode}}
-          @contextMenuOpen={{@contextMenuOpen}}
-          @setContextMenu={{@setContextMenu}}
-        />
-      {{/if}}
+        {{/if}}
+      {{/unless}}
       {{!-- This is the card boundary, please don't set any card specific classes any higher in the DOM than this. --}}
       {{!-- If we need card specific styling above this level, then let's chat about it.                           --}}
       <div class="card-renderer-isolated--content
@@ -50,7 +52,10 @@
           @content={{@card}}
           @watch="isSelected"
           @use={{this.borderAnimation}} as |card|>
-          <div class="card-renderer-isolated--card-container card-boundary isolated {{if (and this.cardstackSession.isAuthenticated card.isSelected) "selected"}}">
+          {{!-- the "card-boundary" class in the div below is necessary for the card's custom CSS.
+          This is the top level selector that people should be specifying in the themer when they
+          style their cards. --}}
+          <div class="card-renderer-isolated--card-container card-boundary {{if (and this.cardstackSession.isAuthenticated card.isSelected) "selected"}}">
             {{#if @dropField}}
               <DropZone
                 @card={{card}}

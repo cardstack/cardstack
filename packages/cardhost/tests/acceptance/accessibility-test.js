@@ -111,8 +111,7 @@ module('Acceptance | accessibility', function(hooks) {
     assert.ok(true, 'no a11y errors found for schema');
   });
 
-  // The monaco line numbers are failing the contrast test
-  skip('basic a11y tests for themer (FIXME: monaco line numbers failing contrast tests)', async function(assert) {
+  test('basic a11y tests for themer (FIXME: monaco line numbers failing contrast tests)', async function(assert) {
     await visit(`/cards/${cardPath}/edit/layout/themer`);
     await waitForThemerLoad();
     await waitForCssTransitions();

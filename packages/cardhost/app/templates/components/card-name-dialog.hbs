@@ -12,6 +12,7 @@
     @placeholder="i.e. My New Card"
     @setValue={{this.updateCardName}}
     {{on "keydown" this.keyDown}}
+    {{autofocus}}
   />
   <div class="dialog--button-group">
     {{#if @closeDialog}}

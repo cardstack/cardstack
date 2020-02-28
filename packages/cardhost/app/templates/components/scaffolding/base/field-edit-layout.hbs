@@ -1,6 +1,6 @@
 <TextField
-  @id={{concat "edit-" @card.name "-field-value"}}
   @label={{@card.csTitle}}
   @helperText={{this.fieldInstructions}}
   @value={{this.fieldValue}}
-  @setValue={{perform this.updateFieldValue}} />
+  @setValue={{perform this.updateFieldValue}}
+  data-test-edit-field={{@card.name}} />

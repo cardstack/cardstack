@@ -10,7 +10,6 @@ function easeInOutCubic(t) {
 }
 
 export default class ScrollerService extends Service {
-  @tracked currentlyScrolledTo;
   @tracked isScrolling = false;
   @tracked scrollingElementSelector = '.library--main'; // refactor if we reuse this for something else
 
@@ -19,10 +18,6 @@ export default class ScrollerService extends Service {
   }
 
   scrollToSection({ selector, elementOffset = 60, doneScrolling }) {
-    if (this.currentlyScrolledTo === selector) {
-      return;
-    }
-
     let element = document.querySelector(selector);
     let scrollingElement = document.querySelector(this.scrollingElementSelector);
 
@@ -61,7 +56,5 @@ export default class ScrollerService extends Service {
     };
 
     animatedScroll();
-
-    this.currentlyScrolledTo = selector;
   }
 }
