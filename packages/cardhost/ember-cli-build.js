@@ -87,6 +87,8 @@ module.exports = function(defaults) {
                 '<Scaffolding::DateField::FieldViewLayout/>',
                 '<Scaffolding::DatetimeField::FieldEditLayout/>',
                 '<Scaffolding::DatetimeField::FieldViewLayout/>',
+                '<Scaffolding::UrlField::FieldEditLayout/>',
+                '<Scaffolding::UrlField::FieldViewLayout/>',
               ],
             },
           },

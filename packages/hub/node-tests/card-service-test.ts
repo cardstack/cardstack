@@ -50,6 +50,16 @@ describe('hub/card-service', function() {
       expect(foundCard.canonicalURL).equals(card.canonicalURL);
     });
 
+    it('deserializes url field values as URLs', async function() {
+      let doc = cardDocument()
+        .withAttributes({ link: 'https://cardstack.com' })
+        .withField('link', 'url-field');
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+      let url = (await card.value('link')) as URL;
+      expect(url instanceof URL).to.equal(true, 'url-field deserializes to a URL instance');
+      expect(url.toString()).to.equal('https://cardstack.com/');
+    });
+
     it('deserializes date field values as strings', async function() {
       let doc = cardDocument()
         .withAttributes({ birthday: '2019-10-30' })
@@ -763,6 +773,31 @@ describe('hub/card-service', function() {
           /field birthday on card .* failed type validation for value: "2019-10-30T00:00:00Z"/
         );
       }
+    });
+
+    it('applies url field type validation', async function() {
+      let doc = cardDocument()
+        .withAttributes({
+          link: 'not a url',
+        })
+        .withField('link', 'url-field');
+
+      try {
+        await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+        throw new Error(`should not have been able to create`);
+      } catch (err) {
+        expect(err).hasStatus(400);
+        expect(err.detail).to.match(/field link on card .* failed type validation for value: "not a url"/);
+      }
+
+      doc = cardDocument()
+        .withAttributes({
+          link: 'https://cardstack.com',
+        })
+        .withField('link', 'url-field');
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+      expect(card).is.ok;
+      expect((await card.value('link')).toString()).to.equal('https://cardstack.com/');
     });
 
     it('applies string field type validation during update', async function() {

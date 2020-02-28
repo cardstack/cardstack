@@ -29,6 +29,7 @@ export default class ScaffoldComponent extends Component<{
       case 'boolean-field':
       case 'date-field':
       case 'datetime-field':
+      case 'url-field':
         csId = this.args.card.adoptsFromId?.csId;
         break;
 

@@ -27,7 +27,7 @@ const testCard = cardDocument()
     csId: 'millenial-puppies',
     csTitle: 'Millenial Puppies',
     csFieldSets: {
-      isolated: ['body', 'likes', 'published', 'author', 'appointment', 'birthday'],
+      isolated: ['body', 'likes', 'published', 'author', 'appointment', 'birthday', 'link'],
     },
     likes: 100,
     birthday: '2019-10-30',
@@ -40,6 +40,7 @@ const testCard = cardDocument()
   .withField('published', 'boolean-field')
   .withField('birthday', 'date-field')
   .withField('appointment', 'datetime-field')
+  .withField('link', 'url-field', 'singular', { csTitle: 'Awesome Link' })
   .withField('author', 'base');
 const cardPath = encodeURIComponent(testCard.canonicalURL);
 const scenario = new Fixtures({
@@ -109,6 +110,25 @@ module('Acceptance | card edit', function(hooks) {
     let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.appointment, new Date('2020-03-07T13:00').toISOString());
+  });
+
+  test('setting a url field', async function(assert) {
+    await visit(`/cards/${cardPath}/edit/fields`);
+    await waitForCardLoad();
+
+    await setFieldValue('link', 'https://cardstack.com');
+    await saveCard();
+
+    await visit(`/cards/${cardPath}`);
+    await waitForCardLoad();
+    assert.dom('[data-test-field="link"] [data-test-link-field-viewer-value]').hasText(`Awesome Link`);
+    assert
+      .dom('[data-test-field="link"] [data-test-link-field-viewer-value]')
+      .hasAttribute('href', 'https://cardstack.com/');
+
+    let cardJson = find('[data-test-card-json]').innerHTML;
+    let card = JSON.parse(cardJson);
+    assert.equal(card.data.attributes.link, 'https://cardstack.com');
   });
 
   test('setting an integer field', async function(assert) {

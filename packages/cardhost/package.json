@@ -34,6 +34,7 @@
     "@cardstack/string-field-card": "*",
     "@cardstack/test-support": "0.16.31",
     "@cardstack/ui-components": "^0.2.21",
+    "@cardstack/url-field-card": "*",
     "@ember/jquery": "^1.1.0",
     "@ember/optional-features": "^1.1.0",
     "@ember/render-modifiers": "^1.0.2",
