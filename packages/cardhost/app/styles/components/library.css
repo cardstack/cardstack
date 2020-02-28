@@ -47,19 +47,21 @@
   min-width: 124px;
   background: none;
   border: none;
+  cursor: pointer;
 }
 
 .hide-library--button-text {
   display: inline-block;
-  color: var(--ch-light);
+  color: var(--ch-light-op50);
   font-size: 13px;
   line-height: calc(18 / 13);
   letter-spacing: 0.015em;
-  opacity: 0.5;
-  transition: opacity var(--ch-card-transition-duration);
-}
-.hide-library--button:hover .hide-library--button-text {
   opacity: 1;
+  transition: color var(--ch-card-transition-duration);
+}
+
+.hide-library--button:hover .hide-library--button-text {
+  color: var(--ch-light);
 }
 
 .hide-library--button-icon {
@@ -94,14 +96,14 @@
 }
 
 .library--nav-button {
-  --icon-color: var(--library-nav-color);
+  --icon-color: var(--ch-light-op50);
   display: flex;
   align-items: center;
   background: none;
   box-shadow: none;
   border: none;
   font: 400 13px/18px var(--ch-font-family);
-  color: var(--library-nav-color);
+  color: var(--ch-light-op50);
   letter-spacing: 0.015em;
   transition: color var(--ch-card-transition-duration);
 }
