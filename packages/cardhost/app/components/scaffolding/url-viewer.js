@@ -1,4 +1,4 @@
-import BaseEditor from '../base-editor';
+import BaseEditor from './base-editor';
 import { task } from 'ember-concurrency';
 
 export default class URLViewer extends BaseEditor {

@@ -1,0 +1,17 @@
+{
+  "data": {
+    "type": "cards",
+    "attributes": {
+      "csTitle": "Image",
+      "csDescription": "Use this for hero images"
+    },
+    "relationships": {
+      "csAdoptsFrom": {
+        "data": {
+          "type": "cards",
+          "id": "https://base.cardstack.com/public/cards/url-field"
+        }
+      }
+    }
+  }
+}

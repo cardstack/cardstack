@@ -79,6 +79,8 @@ module.exports = function(defaults) {
                 '<Scaffolding::Base::FieldViewLayout/>',
                 '<Scaffolding::StringField::FieldEditLayout/>',
                 '<Scaffolding::StringField::FieldViewLayout/>',
+                '<Scaffolding::ImageReferenceField::FieldEditLayout/>',
+                '<Scaffolding::ImageReferenceField::FieldViewLayout/>',
                 '<Scaffolding::IntegerField::FieldEditLayout/>',
                 '<Scaffolding::IntegerField::FieldViewLayout/>',
                 '<Scaffolding::BooleanField::FieldEditLayout/>',

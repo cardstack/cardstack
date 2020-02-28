@@ -12,6 +12,7 @@ export async function fieldCards(data: DataService): Promise<AddressableCard[]> 
       { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'date-field' },
       { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'datetime-field' },
       { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'url-field' },
+      { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'image-reference-field' },
       { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' },
     ].map(id => data.load(id, 'everything'))
   );

@@ -29,6 +29,7 @@
     "@cardstack/datetime-field-card": "*",
     "@cardstack/eslint-config": "0.16.31",
     "@cardstack/hub": "0.16.31",
+    "@cardstack/image-reference-field-card": "*",
     "@cardstack/integer-field-card": "*",
     "@cardstack/requirejs-monaco-ember-polyfill": "^0.0.1",
     "@cardstack/string-field-card": "*",

@@ -27,7 +27,7 @@ const testCard = cardDocument()
     csId: 'millenial-puppies',
     csTitle: 'Millenial Puppies',
     csFieldSets: {
-      isolated: ['body', 'likes', 'published', 'author', 'appointment', 'birthday', 'link'],
+      isolated: ['body', 'likes', 'published', 'author', 'appointment', 'birthday', 'link', 'image'],
     },
     likes: 100,
     birthday: '2019-10-30',
@@ -41,6 +41,7 @@ const testCard = cardDocument()
   .withField('birthday', 'date-field')
   .withField('appointment', 'datetime-field')
   .withField('link', 'url-field', 'singular', { csTitle: 'Awesome Link' })
+  .withField('image', 'image-reference-field', 'singular', { csTitle: 'Awesome Image' })
   .withField('author', 'base');
 const cardPath = encodeURIComponent(testCard.canonicalURL);
 const scenario = new Fixtures({
@@ -129,6 +130,28 @@ module('Acceptance | card edit', function(hooks) {
     let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.link, 'https://cardstack.com');
+  });
+
+  test('setting an image reference field', async function(assert) {
+    const imageURL =
+      'https://resources.cardstack.com/assets/images/contributors/jen-c80f27e85c9404453b8c65754694619e.jpg';
+
+    await visit(`/cards/${cardPath}/edit/fields`);
+    await waitForCardLoad();
+
+    await setFieldValue('image', imageURL);
+    await saveCard();
+
+    await visit(`/cards/${cardPath}`);
+    await waitForCardLoad();
+    assert.dom('[data-test-field="image"] [data-test-image-reference-field-viewer-label]').hasText(`Awesome Image`);
+    assert
+      .dom('[data-test-field="image"] [data-test-image-reference-field-viewer-value]')
+      .hasAttribute('src', imageURL);
+
+    let cardJson = find('[data-test-card-json]').innerHTML;
+    let card = JSON.parse(cardJson);
+    assert.equal(card.data.attributes.image, imageURL);
   });
 
   test('setting an integer field', async function(assert) {
