@@ -528,6 +528,7 @@
   @setCardValue=\{{@setCardValue}} />' @language="html" />
   </section>
 
+  {{!-- using 3 different cards below because a card cant be in more than one mode simulanteously --}}
   <section class="ui-components--section ui-components--grid-2-col" id="card-renderer">
     <h2>Card Renderer</h2>
       <h3>Schema mode</h3>
@@ -546,7 +547,7 @@
 
       <h3>Edit mode</h3>
       <CardRenderer
-        @card={{this.model.card}}
+        @card={{this.model.card2}}
         @format="isolated"
         @mode="edit"
         @setCardValue={{perform this.noopTask}}
@@ -559,7 +560,7 @@
 
       <h3>View mode</h3>
       <CardRenderer
-        @card={{this.model.card}}
+        @card={{this.model.card3}}
         @format="isolated"
         @mode="view" />
       <CodeEditor @code='<CardRenderer

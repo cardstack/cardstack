@@ -5,9 +5,6 @@ import { percySnapshot } from 'ember-percy';
 import Fixtures from '../helpers/fixtures';
 import { waitForSchemaViewToLoad, waitForTestsToEnd } from '../helpers/card-ui-helpers';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
-import QUnit from 'qunit';
-
-QUnit.config.testTimeout = 30000; // this test takes awhile...
 
 // Monaco takes a while to render, and it varies, so we pause
 // for 2s in order to get more stable Percy Snapshots.

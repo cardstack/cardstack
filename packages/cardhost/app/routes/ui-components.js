@@ -56,8 +56,12 @@ export default class UIComponentsRoute extends Route {
         .withField('address', 'string-field', 'singular', { csTitle: 'location' }).jsonapi
     );
     let card = await this.data.save(unsavedCard);
+    let card2 = await this.data.save(unsavedCard);
+    let card3 = await this.data.save(unsavedCard);
     return {
       card,
+      card2,
+      card3,
       parentCard,
       grandParentCard: await this.data.load({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }),
       sampleName: await card.field('sample-name'),
