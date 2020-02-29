@@ -15,6 +15,10 @@ export default class CssService extends Service {
   @tracked cssMap = new Map<string, CssEntry>();
 
   addCard(card: AddressableCard, format: Format, css: string) {
+    if (css == null) {
+      return;
+    }
+
     this.removeCard(card, format, false);
 
     let cssEntry = this.cssMap.get(css);
@@ -35,23 +39,27 @@ export default class CssService extends Service {
   // removing one of the card instances from the page doesn't remove all of the
   // css on the page for the card.
   removeCard(card: AddressableCard, format: Format, invalidateGlimmer = true) {
-    let [css, cssEntry] =
-      [...this.cssMap].find(
+    let entries =
+      [...this.cssMap].filter(
         ([_key, value]) =>
           value.format === format &&
-          value.cards.map(c => `${c.canonicalURL}:${c.nonce}`).includes(`${card.canonicalURL}:${card.nonce}`)
+          value.cards
+            .map(c => `${c.canonicalURL}:${format === 'embedded' ? c.nonce : ''}`)
+            .includes(`${card.canonicalURL}:${format === 'embedded' ? card.nonce : ''}`)
       ) || [];
-    if (!cssEntry || !css) {
-      return;
-    }
-    if (cssEntry.cards.length === 1) {
-      this.cssMap.delete(css);
-    } else if (cssEntry.cards.length > 1) {
-      cssEntry.cards.splice(
-        cssEntry.cards.map(c => `${c.canonicalURL}:${c.nonce}`).indexOf(`${card.canonicalURL}:${card.nonce}`),
-        1
-      );
-      set(cssEntry, 'cards', sortBy(cssEntry.cards, 'canonicalURL')); // this is so the tests can be deterministic
+    for (let [css, cssEntry] of entries) {
+      if (!cssEntry) {
+        continue;
+      }
+      if (cssEntry.cards.length === 1) {
+        this.cssMap.delete(css);
+      } else if (cssEntry.cards.length > 1) {
+        cssEntry.cards.splice(
+          cssEntry.cards.map(c => `${c.canonicalURL}:${c.nonce}`).indexOf(`${card.canonicalURL}:${card.nonce}`),
+          1
+        );
+        set(cssEntry, 'cards', sortBy(cssEntry.cards, 'canonicalURL')); // this is so the tests can be deterministic
+      }
     }
 
     if (invalidateGlimmer) {

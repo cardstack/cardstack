@@ -44,6 +44,10 @@ export default class FieldRenderer extends Component {
     let fieldTypeCard = yield this.args.field.adoptsFrom();
     this.fieldType = fieldTypeCard.csTitle;
     this.fieldTypeId = fieldTypeCard.canonicalURL;
+
+    if (typeof this.args.loadedField === 'function') {
+      this.args.loadedField(this.args.field.name);
+    }
   })
   loadField;
 

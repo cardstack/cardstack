@@ -8,6 +8,7 @@ import adjustCSS from 'ember-animated/motions/adjust-css';
 import { task, waitForProperty, timeout } from 'ember-concurrency';
 import { scheduleOnce } from '@ember/runloop';
 import difference from 'lodash/difference';
+import isEqual from 'lodash/isEqual';
 import { set } from '@ember/object';
 import opacity from 'ember-animated/motions/opacity';
 import { easeInAndOut } from 'ember-animated/easings/cosine';
@@ -16,8 +17,10 @@ import ENV from '@cardstack/cardhost/config/environment';
 
 const { animationSpeed } = ENV;
 const duration = animationSpeed || 250;
+let fieldsLoadedNonce = 0;
 
 export default class CardRenderer extends Component {
+  loadedFields = [];
   @service cardstackSession;
   @service('css') cssService;
   @service('-ea-motion') motion;
@@ -51,18 +54,37 @@ export default class CardRenderer extends Component {
     if (this.args.cardFocused) {
       this.cardFocused = this.args.cardFocused;
     }
+    set(this.args.card, 'mode', this.mode); // ugh, not a great solution...
     this.initialLoad.perform();
   }
 
-  @(task(function*() {
+  get animatedWatchField() {
+    switch (this.mode) {
+      case 'view':
+        return 'isSelected';
+      case 'schema':
+        return 'fieldsLoadedNonce';
+
+      default:
+        return 'mode';
+    }
+  }
+
+  @task(function*() {
     // This means that we only occlude fields based on format when you ask for a
     // card to be rendered in its view mode. Meaning that in the edit mode you
     // can see all fields regardless of fieldset rules. I think this is
     // correct... (not to be confused with the rules around permissions which
     // are totally separate to the format based occlusion rules).
     let fieldsetFormatRule = this.mode === 'view' ? this.args.format : 'everything';
+    return yield this.args.card.fields({ includeFieldSet: fieldsetFormatRule });
+  })
+  getFields;
 
-    let tasks = [this.args.card.fields({ includeFieldSet: fieldsetFormatRule })];
+  @(task(function*() {
+    this.loadedFields = [];
+
+    let tasks = [this.getFields.perform()];
     if (!this.args.suppressCss && (this.mode === 'view' || this.mode === 'layout')) {
       tasks.push(this.args.card.loadFeature(`${this.args.format}-css`));
     }
@@ -127,6 +149,18 @@ export default class CardRenderer extends Component {
   })
   initialLoad;
 
+  @(task(function*(fieldName) {
+    let fields = yield this.getFields.perform();
+    this.loadedFields.push(fieldName);
+    if (isEqual(fields.map(f => f.name).sort(), this.loadedFields.sort())) {
+      // this is not ideal that we are monkey patching the card API. we're doing
+      // so for the benefit of ember-animated's animated-value watch, maybe in
+      // the future we can create a wrapper around card for this kind of thing.
+      set(this.args.card, 'fieldsLoadedNonce', ++fieldsLoadedNonce);
+    }
+  }).enqueue())
+  loadedField;
+
   @(task(function*(nonce, position, field) {
     yield this.loadCard.last.then();
     // these events arent always delivered in order. instead of trying to manage
@@ -183,8 +217,8 @@ export default class CardRenderer extends Component {
   }
 
   @action
-  toggleStubField(field, position, isAdding) {
-    this.updateFields.perform(field, position, isAdding);
+  toggleStubField(nonce, position, field) {
+    this.updateFields.perform(nonce, position, field);
   }
 
   @action
