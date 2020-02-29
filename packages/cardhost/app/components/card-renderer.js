@@ -90,7 +90,10 @@ export default class CardRenderer extends Component {
     }
 
     let [actualFields, css] = yield Promise.all(tasks);
-    if (!this.args.suppressCss) {
+    if (
+      !this.args.suppressCss &&
+      !(this.args.format === 'isolated' && (this.mode === 'schema' || this.mode === 'edit'))
+    ) {
       this.css = css;
       this.cssService.addCard(this.args.card, this.args.format, css);
     } else {
