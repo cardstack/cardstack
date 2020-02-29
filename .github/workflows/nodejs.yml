@@ -39,7 +39,6 @@ jobs:
       if: github.event_name == 'pull_request'
       run: yarn ember-tests
       env:
-        CI: true
         PGHOST: localhost
         PGPORT: 5444
         PGUSER: postgres
