@@ -9,16 +9,7 @@ export default class CardhostLeftEdgeComponent extends Component {
   @service router;
   @tracked isExpanded = false;
 
-  @action
-  toggleMenuExpand() {
-    this.isExpanded = !this.isExpanded;
-  }
-
-  @action
-  logout(sessionLogout) {
-    sessionLogout.bind(this.cardstackSession)();
-    this.library.hide();
-
+  get cardId() {
     let cardId;
     let route = this.router.currentRoute;
     while (route) {
@@ -29,8 +20,21 @@ export default class CardhostLeftEdgeComponent extends Component {
         break;
       }
     }
-    if (cardId) {
-      this.router.transitionTo('cards.card.view', cardId);
+    return cardId;
+  }
+
+  @action
+  toggleMenuExpand() {
+    this.isExpanded = !this.isExpanded;
+  }
+
+  @action
+  logout(sessionLogout) {
+    sessionLogout.bind(this.cardstackSession)();
+    this.library.hide();
+
+    if (this.cardId) {
+      this.router.transitionTo('cards.card.view', this.cardId);
     } else {
       this.router.transitionTo('index');
     }
