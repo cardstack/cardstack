@@ -36,7 +36,7 @@ export default class ReSizable extends Component {
   }
 
   get maxHeight() {
-    return typeof this.args.maxHeight === 'number' ? this.args.maxWidth : document.body.clientHeight;
+    return typeof this.args.maxHeight === 'number' ? this.args.maxHeight : document.body.clientHeight;
   }
 
   @action
