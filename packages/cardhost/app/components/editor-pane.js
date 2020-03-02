@@ -44,6 +44,16 @@ export default class EditorPane extends Component {
     }
   }
 
+  get maxWidth() {
+    // the left edge is 80px wide. Do not allow dragging past the left edge.
+    return document.body.clientWidth - 80;
+  }
+
+  get maxHeight() {
+    // the top edge is 80px tall. Do not allow dragging past the top edge.
+    return document.body.clientHeight - 80;
+  }
+
   get classNames() {
     let classes = [];
 
