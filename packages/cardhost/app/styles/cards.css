@@ -17,7 +17,7 @@
 }
 
 .cardhost-cards.themer {
-  background-color: var(--ch-dark-background);
+  background-color: var(--ch-foreground);
 }
 
 .cardhost-cards.dragging * {

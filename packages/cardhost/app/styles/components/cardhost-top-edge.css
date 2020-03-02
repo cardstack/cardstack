@@ -22,7 +22,7 @@
   background-color: var(--ch-deep-background);
 }
 .cardhost-top-edge.themer {
-  background-color: var(--ch-dark-background);
+  background-color: transparent;
   right: 0;
   left: 0;
 }

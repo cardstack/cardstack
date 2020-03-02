@@ -86,3 +86,7 @@
 .resizer:focus {
   outline: none;
 }
+
+.resizer:focus .drag-handle {
+  outline: initial;
+}

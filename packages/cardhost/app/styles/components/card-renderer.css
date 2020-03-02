@@ -165,11 +165,6 @@
   color: var(--ch-light);
 }
 
-.card-renderer-isolated.themer .card-renderer-isolated--content {
-  background-color: var(--ch-dark-background);
-}
-
-
 /* Card Renderer - Inner Wrapper */
 .card-renderer-isolated .card-renderer-isolated--card-container {
   border: 3px solid transparent;
