@@ -2169,7 +2169,7 @@ describe('hub/card-service', function() {
             size: 1000,
           },
         });
-        expect(results.cards.length).to.equal(26);
+        expect(results.cards.length).to.equal(29);
       });
 
       it("filtering by interior card's csAdoptsFrom field", async function() {

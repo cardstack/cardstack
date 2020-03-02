@@ -19,7 +19,7 @@ import { cardDocument } from '@cardstack/core/card-document';
 import { myOrigin } from '@cardstack/core/origin';
 import { isolatedCssFile } from '@cardstack/cardhost/utils/scaffolding';
 
-const csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
+const csRealm = `${myOrigin}/api/realms/default`;
 const parentCard = cardDocument()
   .withAttributes({
     csRealm,

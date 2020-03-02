@@ -16,6 +16,10 @@ import { EphemeralStorage } from '../../cards/ephemeral-realm/storage';
 import PgClient from './pgsearch/pgclient';
 import IndexingService from './indexing';
 import Queue from './queue/queue';
+import { myOrigin } from '@cardstack/core/origin';
+import { Session } from '@cardstack/core/session';
+import { cardDocument } from '@cardstack/core/card-document';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 const log = logger('cardstack/server');
 
@@ -36,6 +40,9 @@ export async function makeServer(container?: Container) {
   if (!container) {
     container = await wireItUp();
   }
+
+  await setupRealms(container);
+
   let app = new Koa();
   app.use(cors);
   app.use(httpLogging);
@@ -88,6 +95,68 @@ async function runServer(config: StartupConfig) {
   log.info('server listening on %s', config.port);
   if (process.connected) {
     process.send!('hub hello');
+  }
+}
+
+async function setupRealms(container: Container) {
+  let cards = (await container.lookup('cards')).as(Session.INTERNAL_PRIVILEGED);
+  const metaRealm = `${myOrigin}/api/realms/meta`;
+
+  let hasMetaRealm;
+  try {
+    await cards.get({ csRealm: metaRealm, csId: metaRealm });
+    hasMetaRealm = true;
+  } catch (e) {
+    if (e.status !== 404) {
+      throw e;
+    }
+    hasMetaRealm = false;
+  }
+
+  if (!hasMetaRealm) {
+    log.info(`Creating ephemeral-based meta realm.`);
+    await cards.create(
+      metaRealm,
+      cardDocument()
+        .withAttributes({
+          csRealm: metaRealm,
+          csId: metaRealm,
+          csTitle: `Meta Realm`,
+          csDescription: `This card controls the configuration of the meta realm which is the realm that holds all of your realm cards.`,
+        })
+        // TODO right now this is hard coded to the ephemeral-realm. Once the git
+        // realm is ready we should use that instead (or alternatively the file
+        // realm), when the hub environment is not in test mode.
+        .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi
+    );
+  }
+
+  let hasDefaultRealm;
+  try {
+    await cards.get({ csRealm: metaRealm, csId: `${myOrigin}/api/realms/default` });
+    hasDefaultRealm = true;
+  } catch (e) {
+    if (e.status !== 404) {
+      throw e;
+    }
+    hasDefaultRealm = false;
+  }
+  if (!hasDefaultRealm) {
+    log.info(`Creating ephemeral-based default realm.`);
+    await cards.create(
+      metaRealm,
+      cardDocument()
+        .withAttributes({
+          csRealm: metaRealm,
+          csId: `${myOrigin}/api/realms/default`,
+          csTitle: `Default Realm`,
+          csDescription: `This card controls the configuration of your hub's default realm. This is the realm that cards are written to by default.`,
+        })
+        // TODO right now this is hard coded to the ephemeral-realm. Once the git
+        // realm is ready we should use that instead (or alternatively the file
+        // realm), when the hub environment is not in test mode.
+        .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi
+    );
   }
 }
 

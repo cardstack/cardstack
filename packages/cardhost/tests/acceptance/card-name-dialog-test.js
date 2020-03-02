@@ -18,7 +18,7 @@ import { myOrigin } from '@cardstack/core/origin';
 
 const cardName = 'Millenial Puppies';
 
-const csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
+const csRealm = `${myOrigin}/api/realms/default`;
 const parentCard = cardDocument()
   .withAttributes({
     csRealm,

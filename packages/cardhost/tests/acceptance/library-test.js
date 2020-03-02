@@ -18,7 +18,7 @@ import { myOrigin } from '@cardstack/core/origin';
 import { embeddedCssFile, isolatedCssFile } from '@cardstack/cardhost/utils/scaffolding';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
-const csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
+const csRealm = `${myOrigin}/api/realms/default`;
 const template1 = cardDocument()
   .withAttributes({
     csRealm,
@@ -165,6 +165,14 @@ const cardsSortedByCreatedDescending = [
   card4,
 ];
 
+function filterRealmCards(cardIds) {
+  return cardIds.filter(
+    i =>
+      i !== 'http://localhost:3000/api/realms/meta/cards/http%3A%2F%2Flocalhost%3A3000%2Fapi%2Frealms%2Fdefault' &&
+      i !== 'http://localhost:3000/api/realms/meta/cards/http%3A%2F%2Flocalhost%3A3000%2Fapi%2Frealms%2Fmeta'
+  );
+}
+
 const scenario = new Fixtures({
   create: cards,
 });
@@ -201,9 +209,11 @@ module('Acceptance | library', function(hooks) {
     assert.dom('[data-test-library]').exists();
 
     assert.deepEqual(
-      [
-        ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
-      ].map(i => i.getAttribute('data-test-card-renderer-embedded')),
+      filterRealmCards(
+        [
+          ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
+        ].map(i => i.getAttribute('data-test-card-renderer-embedded'))
+      ),
       cardsSortedByCreatedDescending.map(c => c.canonicalURL)
     );
 
@@ -311,9 +321,11 @@ module('Acceptance | library', function(hooks) {
     assert.equal(currentURL(), `/cards/${encodeURIComponent(card1.canonicalURL)}`);
     assert.dom('[data-test-library]').exists();
     assert.deepEqual(
-      [
-        ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
-      ].map(i => i.getAttribute('data-test-card-renderer-embedded')),
+      filterRealmCards(
+        [
+          ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
+        ].map(i => i.getAttribute('data-test-card-renderer-embedded'))
+      ),
       cardsSortedByCreatedDescending.map(c => c.canonicalURL)
     );
   });
@@ -329,9 +341,11 @@ module('Acceptance | library', function(hooks) {
     assert.equal(currentURL(), `/cards/${encodeURIComponent(card1.canonicalURL)}/edit/fields`);
     assert.dom('[data-test-library]').exists();
     assert.deepEqual(
-      [
-        ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
-      ].map(i => i.getAttribute('data-test-card-renderer-embedded')),
+      filterRealmCards(
+        [
+          ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
+        ].map(i => i.getAttribute('data-test-card-renderer-embedded'))
+      ),
       cardsSortedByCreatedDescending.map(c => c.canonicalURL)
     );
   });
@@ -347,9 +361,11 @@ module('Acceptance | library', function(hooks) {
     assert.equal(currentURL(), `/cards/${encodeURIComponent(card1.canonicalURL)}/edit/fields/schema`);
     assert.dom('[data-test-library]').exists();
     assert.deepEqual(
-      [
-        ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
-      ].map(i => i.getAttribute('data-test-card-renderer-embedded')),
+      filterRealmCards(
+        [
+          ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
+        ].map(i => i.getAttribute('data-test-card-renderer-embedded'))
+      ),
       cardsSortedByCreatedDescending.map(c => c.canonicalURL)
     );
   });

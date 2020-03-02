@@ -26,7 +26,7 @@ import { canonicalURL } from '@cardstack/core/card-id';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 const timeout = 5000;
-const csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
+const csRealm = `${myOrigin}/api/realms/default`;
 const testCard = cardDocument()
   .withAttributes({
     csRealm,

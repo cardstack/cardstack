@@ -6,6 +6,7 @@ import * as JSON from 'json-typescript';
 import { upsert, param } from './pgsearch/util';
 import { Expression } from '@cardstack/core/expression';
 import { CardId } from '@cardstack/core/card-id';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 export default class IndexingService {
   cards = inject('cards');
@@ -49,6 +50,7 @@ export default class IndexingService {
     // explicitely set the page size here to something very high...
     let { cards: realms } = await this.cards.as(Session.INTERNAL_PRIVILEGED).search({
       filter: {
+        type: { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'realm' },
         eq: {
           csRealm: `${myOrigin}/api/realms/meta`,
         },

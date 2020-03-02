@@ -5,7 +5,6 @@ import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import { ResponseMeta } from '@cardstack/core/document';
 import CardstackError from '@cardstack/core/error';
 import { myOrigin } from '@cardstack/core/origin';
-import { search as scaffoldSearch, get as scaffoldGet } from './scaffolding';
 import { getOwner, inject } from './dependency-injection';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { Query } from '@cardstack/core/query';
@@ -16,6 +15,7 @@ import merge from 'lodash/merge';
 import { readdirSync, existsSync, statSync, readFileSync } from 'fs-extra';
 import { CardReader } from '@cardstack/core/card-reader';
 import { CardInstantiator } from '@cardstack/core/card-instantiator';
+import { cardDocument } from '@cardstack/core/card-document';
 
 export default class CardsService {
   pgclient = inject('pgclient');
@@ -114,11 +114,6 @@ export class ScopedCardService implements CardReader, CardInstantiator {
   }
 
   async search(query: Query): Promise<{ cards: AddressableCard[]; meta: ResponseMeta }> {
-    let cards = await scaffoldSearch(query, this);
-    if (cards) {
-      return { cards, meta: { page: { total: cards.length } } };
-    }
-
     let { cards: foundCards, meta } = await this.cards.pgclient.search(this, query);
     return { cards: foundCards, meta };
   }
@@ -139,10 +134,6 @@ export class ScopedCardService implements CardReader, CardInstantiator {
     // value yet but we will onc we implement custom searchers and realm grants.
     await this.getRealm(id.csRealm);
 
-    let card = await scaffoldGet(id, this);
-    if (card) {
-      return card;
-    }
     // TODO dont create a scoped card service here
     return await this.cards.pgclient.get(this, id);
   }
@@ -181,10 +172,31 @@ export class ScopedCardService implements CardReader, CardInstantiator {
       },
     });
 
-    if (realms.length === 0) {
+    // In the scenario where we are trying to create the meta realm, we need to
+    // actually have builtin meta realm that exists as a bridge to allow us to
+    // create a meta realm. In that case we'll return a one-time temp ephemeral
+    // based meta realm. After our actual meta realm has been created via the
+    // process, we can use the real one.
+    if (realms.length === 0 && realm === `${myOrigin}/api/realms/meta`) {
+      return await this.getTempMetaRealm();
+    } else if (realms.length === 0) {
       throw new CardstackError(`no such realm "${realm}"`, { status: 400 });
     }
+
     return realms[0];
+  }
+
+  // This is only used as a bridge to creating the _actual_ meta realm (breaks
+  // the chicken/egg problem)
+  private async getTempMetaRealm() {
+    return this.instantiate(
+      cardDocument()
+        .withAutoAttributes({
+          csRealm: `${myOrigin}/api/realms/meta`,
+          csId: `${myOrigin}/api/realms/meta`,
+        })
+        .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi
+    );
   }
 
   private async getBuiltIn(id: CardId): Promise<AddressableCard> {

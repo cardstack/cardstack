@@ -10,7 +10,7 @@ import { myOrigin } from '@cardstack/core/origin';
 import { canonicalURL } from '@cardstack/core/card-id';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
-const csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
+const csRealm = `${myOrigin}/api/realms/default`;
 const author = cardDocument().withAutoAttributes({
   csRealm,
   csId: 'van-gogh',
