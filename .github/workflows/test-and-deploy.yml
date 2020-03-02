@@ -57,7 +57,7 @@ jobs:
         PGUSER: postgres
         PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
     - name: Ember tests without percy
-      if: github.event_name != 'pull_request'
+      if: github.event_name != 'pull_request' && github.ref != 'refs/heads/master'
       run: yarn ember-tests
       env:
         CI: true
@@ -90,7 +90,8 @@ jobs:
       shell: bash
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
       id: extract_branch
-    - name: Deploy
+    - name: Deploy Demo
+      if: github.ref == 'refs/heads/master'
       env:
         CI: true
         PGHOST: localhost
@@ -129,3 +130,43 @@ jobs:
         cd ./packages/cardhost
         node ./deploy/build.js
         TARGET_NAME="builder.stack.cards" ./deploy/deploy.sh demo github-deploy
+    - name: Deploy to production
+      if: github.ref == 'refs/heads/production'
+      env:
+        CI: true
+        PGHOST: localhost
+        PGPORT: 5444
+        AWS_ACCESS_KEY_ID: AKIAZ444BSFYHW3OKFOD
+        production_EMBER_DEPLOY_AWS_ACCESS_KEY_ID: AKIAZ444BSFYAYFFMG7E
+        production_LOG_LEVELS: '*=info,cardstack/performance/writers=debug,cardstack/card-services=debug,cardstack/git=trace'
+        production_CARD_TEMPLATES: '["local-hub::location-card-template", "local-hub::event-card"]'
+        production_PGHOST: builder-prod-hub20191219222942603100000008.cbuq0sp3cf76.us-east-1.rds.amazonaws.com
+        production_PGPORT: 5432
+        production_PGUSER: cardstack
+        production_PUBLIC_HUB_URL: https://builder-prod-hub.card.space
+        production_SWARM_CONTROLLER: sc.builder.card.space
+        ECR_ENDPOINT: 680542703984.dkr.ecr.us-east-1.amazonaws.com/builder
+        production_GIT_REPO: ${{ secrets.production_GIT_REPO }}
+        production_PGPASSWORD: ${{ secrets.production_PGPASSWORD }}
+        production_CARDSTACK_SESSIONS_KEY: ${{ secrets.production_CARDSTACK_SESSIONS_KEY }}
+        production_EMBER_DEPLOY_AWS_SECRET_ACCESS_KEY: ${{ secrets.production_EMBER_DEPLOY_AWS_SECRET_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        GITHUB_BRANCH: ${{ steps.extract_branch.outputs.branch }}
+
+      # Run id is not available yet so use datetime string instead
+      # https://github.community/t5/GitHub-Actions/Getting-the-run-id-of-a-run-in-Github-Actions/td-p/36567
+      run: |
+        export GITHUB_BUILD_ID=$(date +%Y%m%d%H%M%S)
+        mkdir -p ~/.ssh/
+        docker network create cardstack
+        docker run -d --rm --network cardstack -p 5444:5432 --name postgres cardstack/pg-test
+        docker run -d --rm --network cardstack -p 8838:80 --name git-http cardstack/git-http-server
+        echo "$SSH_PRIVATE_KEY" > $HOME/.ssh/id_rsa && chmod 400 $HOME/.ssh/id_rsa
+        sudo apt-get install socat
+        pip install --user awscli
+        aws ecr --region us-east-1 get-login --no-include-email | bash
+        yarn --cwd ./packages/cardhost/deploy install
+        cd ./packages/cardhost
+        node ./deploy/build.js
+        TARGET_NAME="builder.card.space" ./deploy/deploy.sh demo github-deploy
