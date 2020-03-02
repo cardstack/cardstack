@@ -10,7 +10,7 @@ export default helper(function scopeCss([css, cardOrCards, format]) {
 
   if (Array.isArray(cardOrCards) && format) {
     let prefixes = uniq(cardOrCards.map(card => `.${safeCssString(card.canonicalURL)}--${format}`));
-    return scope(css, prefixes.join(', '));
+    return scope.replace(css, `${prefixes.map(p => `${p} $1`).join(', ')}$2`);
   }
 
   return scope(css, `.${safeCssString(cardOrCards.canonicalURL)}--${format}`);
