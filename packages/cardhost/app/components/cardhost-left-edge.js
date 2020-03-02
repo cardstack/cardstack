@@ -2,11 +2,16 @@ import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import ENV from '@cardstack/cardhost/config/environment';
+
+const { useMockLogin } = ENV;
 
 export default class CardhostLeftEdgeComponent extends Component {
   @service cardstackSession;
   @service library;
   @tracked isExpanded = false;
+
+  useMockLogin = useMockLogin;
 
   @action
   toggleMenuExpand() {

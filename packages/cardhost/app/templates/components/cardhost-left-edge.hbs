@@ -41,16 +41,20 @@
                   Log out
                 </Cta>
               {{else}}
-                <MockLogin as |login|>
-                  <Cta
-                    {{on "click" (fn login "user1")}}
-                    @variant="primary"
-                    class="cardhost-left-edge-login-buttons"
-                    data-test-login-button
-                  >
-                    Log in
-                  </Cta>
-                </MockLogin>
+                {{#if this.useMockLogin}}
+                  <MockLogin as |login|>
+                    <Cta
+                      {{on "click" (fn login "user1")}}
+                      @variant="primary"
+                      class="cardhost-left-edge-login-buttons"
+                      data-test-login-button
+                    >
+                      Log in
+                    </Cta>
+                  </MockLogin>
+                {{else}}
+                  <a href="https://bagby-cardstack-test-2.glitch.me/login">Login</a>
+                {{/if}}
               {{/if}}
             </div>
           {{/if}}

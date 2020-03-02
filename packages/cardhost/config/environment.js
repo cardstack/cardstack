@@ -52,6 +52,8 @@ module.exports = function(environment) {
       'local-hub::photo-card',
       'local-hub::byline-card',
     ];
+
+    ENV.useMockLogin = false;
   }
 
   if (environment === 'test') {
