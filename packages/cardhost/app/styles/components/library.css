@@ -164,12 +164,14 @@
   margin: 0;
 }
 
-.library--card-link {
+.library--card-link,
+.library--card-link.cs-component-cta {
   width: 100%;
   margin: 0;
   padding: 20px;
   background: none;
   border: none;
+  border-radius: 0;
 }
 
 .library--card-link:hover,
@@ -183,7 +185,7 @@
   min-width: var(--library-card-min-size);
   min-height: var(--library-card-min-size);
   border-radius: 15px;
-  transition: transform var(--ch-card-transition-duration) ease-in-out calc(var(--ch-card-transition-duration) / 3);
+  transition: transform var(--ch-card-transition-duration) ease-in-out;
 }
 
 .library--card-link:hover > .library--card-renderer > .embedded-card,
