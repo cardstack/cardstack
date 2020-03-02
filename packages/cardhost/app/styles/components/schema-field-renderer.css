@@ -1,0 +1,100 @@
+.schema-field-renderer {
+  --field-width: var(--ch-field-width);
+  --field-height: 112px;
+  --field-header-height: 36px;
+
+  width: 100%;
+  max-width: var(--field-width);
+  min-height: var(--field-height);
+  color: var(--ch-dark-op50);
+  -webkit-text-fill-color: var(--ch-dark-op50); /* For strangeness in safari */
+  -webkit-text-stroke-color: var(--ch-dark-op50);
+  font: 400 16px/22px var(--ch-font-family);
+  letter-spacing: 0.015em;
+  text-align: left;
+  overflow: hidden;
+}
+
+.schema-field-renderer--header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: var(--field-header-height);
+  padding: 6px 15px 6px 40px;
+  border: 3px solid var(--ch-light-background);
+  border-radius: 5px 5px 0 0;
+  background-position: 15px center;
+  background-size: 15px 15px;
+  background-repeat: no-repeat;
+  background-color: var(--ch-light-background);
+  color: black;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.385;
+  text-transform: capitalize;
+  transition: background-color var(--ch-transition-time),
+              border-color var(--ch-transition-time),
+              border-radius var(--ch-transition-time);
+}
+
+header.schema-field-renderer--header.new-field {
+  padding-left: 20px;
+  transition: padding-left var(--ch-transition-time);
+}
+
+/* For text-field and case-insensitive text-field icon */
+header.schema-field-renderer--header.string {
+  background-size: 12px 15px;
+}
+
+.schema-field-renderer--header--detail {
+  opacity: 0.25;
+}
+
+.schema-field-renderer--content {
+  min-height: calc(var(--field-height) - var(--field-header-height));
+  padding: 10px var(--ch-spacing);
+  background-color: white;
+  border: 3px solid white;
+  border-top: none;
+  border-radius: 0 0 5px 5px;
+  transition: border-radius var(--ch-transition-time);
+}
+
+.schema-field-renderer--name {
+  display: block;
+  padding-bottom: 10px;
+  font-size: 11px;
+  line-height: 1.364;
+  letter-spacing: 0.035em;
+  text-transform: capitalize;
+}
+
+.schema-field-renderer--value {
+  display: block;
+  max-height: 200px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.schema-field-renderer:hover {
+  cursor: pointer;
+}
+
+.field:focus {
+  outline: 0;
+}
+
+.field:focus .schema-field-renderer .schema-field-renderer--header,
+.card-renderer-isolated:not(.selected) .field.selected .schema-field-renderer .schema-field-renderer--header {
+  background-color: var(--ch-highlight);
+  border-color: var(--ch-highlight);
+}
+
+.field:focus .schema-field-renderer .schema-field-renderer--content,
+.card-renderer-isolated:not(.selected) .field.selected .schema-field-renderer .schema-field-renderer--content {
+  border-color: var(--ch-highlight);
+}

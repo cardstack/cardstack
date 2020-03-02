@@ -1,0 +1,172 @@
+{{! eslint is confused about indentation for else-if }}
+{{! template-lint-disable block-indentation}}
+
+{{!-- TODO: let's think of a more accessible solution here, consider making this a button--}}
+{{!-- TODO: also we should also turn on a11y linting --}}
+
+{{! TODO: Will, please resolve this linting error VVVV }}
+{{! template-lint-disable no-invalid-interactive}}
+<section {{on "click" (fn this.selectField @field)}} {{on "dragstart" (action this.startDragging @field)}} {{on "dragend" (action this.finishDragging)}}
+  class="field {{@field.name}}-field {{if @field.preview "preview"}} {{if this.friendlyType (concat "field-type-" this.friendlyType "-" @mode "-field ")}}field-type-{{this.dasherizedType}}-{{@mode}}-field{{if (or @setPosition @removeField) " with-buttons"}}{{if (eq @field @selectedField) " selected"}}"
+  data-test-field={{@field.name}}
+  data-test-field-type={{@field.type}}
+  data-test-field-mode={{@mode}}
+  {{did-update this.updateFieldProperties this.nonce}}
+>
+  {{#if @setPosition}}
+    <button {{on "mousedown" (action this.initDrag @field)}} {{on "mouseup" (action this.endDrag)}} {{on "dragend" (fn this.draggable.setDragging false)}}
+      class="field--move-btn"
+      aria-label="Drag field"
+      data-test-field-renderer-move-btn
+      data-test-field-renderer-move-btn-position={{@field.position}}
+    >
+    </button>
+  {{/if}}
+
+  {{#if (or (eq @mode "view") (eq @mode "layout"))}}
+    {{#let (component this.fieldViewer) as | FieldViewer |}}
+      <FieldViewer @field={{@field}}/>
+    {{/let}}
+  {{else if (eq @mode "edit")}}
+    {{#let (component this.fieldEditor) as | FieldEditor |}}
+      <FieldEditor
+        @field={{@field}}
+        @setFieldValue={{@setFieldValue}}
+      />
+    {{/let}}
+  {{else if (eq @mode "schema")}}
+    {{!-- TODO we should extract the schema editing stuff into a seaprate component --}}
+      {{#if (includes this.schemaAttrs "title")}}
+        <div
+          class="schema-field-renderer"
+          data-test-field-schema-renderer
+          {{did-insert this.focusParentElement}}
+        >
+          {{!-- TODO: Change displayed logo depending on field --}}
+          {{! template-lint-disable no-inline-styles }}
+          <header
+            class="schema-field-renderer--header {{if this.fieldType this.fieldType.type @field.type}}"
+            style={{css-url "background-image" this.fieldType.icon}}
+            data-test-field-renderer-type
+          >
+            {{@field.name}} ({{if this.fieldType this.fieldType.title @field.name}})
+            {{#if @field.isAdopted}}
+              <span class="schema-field-renderer--header--detail">Adopted</span>
+            {{/if}}
+          </header>
+          <div class="schema-field-renderer--content">
+            <div class="schema-field-renderer--name" data-test-field-renderer-label>
+              {{@field.label}}
+            </div>
+            <div class="schema-field-renderer--value" data-test-field-renderer-value>
+              {{@field.value}}
+            </div>
+          </div>
+        </div>
+      {{/if}}
+    {{#each this.schemaAttrs as |schemaAttr|}}
+      {{#if (eq schemaAttr "type")}}
+        <div class="field-renderer--display" data-test-schema-attr={{schemaAttr}}>
+          <span class="field-renderer--display-label">Field Type</span>
+          <span data-test-field-renderer-field-type>
+            {{@field.type}}
+          </span>
+        </div>
+      {{else if (eq schemaAttr "label")}}
+        <div data-test-schema-attr={{schemaAttr}}>
+          {{#if @setFieldLabel}}
+            <TextField
+              @theme="cs-dark"
+              @label="Field Label"
+              @value={{this.newFieldLabel}}
+              @setValue={{action this.updateFieldLabel}}
+              @disabled={{@field.isAdopted}} />
+          {{else}}
+            <div class="field-renderer--display">
+              <span class="field-renderer--display-label">Field Label</span>
+              <span data-test-field-renderer-field-label>
+                {{@field.label}}
+              </span>
+            </div>
+          {{/if}}
+        </div>
+      {{else if (eq schemaAttr "instructions")}}
+        <div data-test-schema-attr={{schemaAttr}}>
+          {{#if @setFieldInstructions}}
+            <TextArea
+              @theme="cs-dark"
+              @label="Helper Text"
+              @value={{this.newFieldInstructions}}
+              @setValue={{action this.updateFieldInstructions}} />
+          {{else}}
+            <div class="field-renderer--display">
+              <span class="field-renderer--display-label">Helper Text</span>
+              <span data-test-field-renderer-field-instructions>
+                {{@field.instructions}}
+              </span>
+            </div>
+          {{/if}}
+        </div>
+      {{else if (and (eq schemaAttr "name") @setFieldName)}}
+        <div class="ch-input-group" data-test-schema-attr={{schemaAttr}}>
+          <TextField
+            @id={{concat "edit-field-name-" @field.nonce "-" this.renderNonce}}
+            @value={{this.newFieldName}}
+            @theme="cs-dark"
+            @label="Field ID"
+            @class="ch-input"
+            @setValue={{action this.updateFieldName}}
+            @disabled={{@field.isAdopted}}
+            @pattern={{@field.fieldNameRegex.source}}
+            @title="Can only contain letters, numbers, dashes, and underscores."
+          />
+        </div>
+      {{else if (eq schemaAttr "is-meta")}}
+        <div class="field-renderer--display" data-test-schema-attr={{schemaAttr}}>
+          <span class="field-renderer--display-label">Export as Metadata</span>
+          <span data-test-field-renderer-is-meta>
+            {{if @field.json.data.attributes.is-metadata "true" "false"}}
+          </span>
+        </div>
+      {{else if (eq schemaAttr "embedded")}}
+        <div data-test-schema-attr={{schemaAttr}}>
+          {{#if @setNeededWhenEmbedded}}
+            <Checkbox
+              @theme="cs-dark"
+              @label="Available When Embedded"
+              @checked={{@field.neededWhenEmbedded}}
+              @setChecked={{fn @setNeededWhenEmbedded @field.name}}
+              @disabled={{@field.isAdopted}} />
+          {{else}}
+            <div class="field-renderer--display">
+              <span class="field-renderer--display-label">Available When Embedded</span>
+              <span data-test-field-renderer-embedded>
+                {{if @field.neededWhenEmbedded "true" "false"}}
+              </span>
+            </div>
+          {{/if}}
+        </div>
+      {{else if (eq schemaAttr "required")}}
+        <Checkbox
+          @theme="cs-dark"
+          @label="Required"
+          @checked={{@field.required}}
+          data-test-schema-attr={{schemaAttr}} />
+      {{/if}}
+    {{/each}}
+  {{/if}}
+
+  {{#if (and (not-eq @mode "view") (not-eq @mode "layout"))}}
+    <div class="field--action">
+      {{#if (and @removeField (not @field.isAdopted))}}
+        {{!-- using field.nonce in case the user deletes the name of the field --}}
+        <button {{on "click" (fn @removeField @field.nonce)}}
+          class="field--remove-btn"
+          aria-label="Remove"
+          data-test-field-renderer-remove-btn
+        >
+        </button>
+      {{/if}}
+    </div>
+  {{/if}}
+</section>

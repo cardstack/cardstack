@@ -1,34 +1,18 @@
-import { Branch, Commit, Merge, Repository, Signature, Tree, FILEMODE, FetchOptions, CommitOpts } from './git';
-
-import { todo } from '@cardstack/plugin-utils/todo-any';
-
-import { MutableTree, NotFound, OverwriteRejected } from './mutable-tree';
-
-import moment from 'moment-timezone';
+import { Commit, Merge, Repository, CommitOpts, BranchNotFound, Oid } from './git';
+import Tree, { TreeEntry, FileNotFound, OverwriteRejected, FILEMODE } from './git/tree';
 
 import crypto from 'crypto';
 import delay from 'delay';
 import logger from '@cardstack/logger';
 const log = logger('cardstack/git');
 
-class GitConflict extends Error {
-  constructor(public index: todo) {
-    super();
-    this.index = index;
-  }
-}
-
 export default class Change {
-  static GitConflict = GitConflict;
-  static NotFound = NotFound;
-  static OverwriteRejected = OverwriteRejected;
-
   static async createInitial(repoPath: string, targetBranch: string) {
-    let repo = await Repository.init(repoPath, 1);
-    return new this(repo, targetBranch, null, [], null, null);
+    let repo = await Repository.initBare(repoPath);
+    return new this(repo, targetBranch, undefined, []);
   }
 
-  static async createBranch(repo: Repository, parentId: string, targetBranch: string, fetchOpts?: FetchOptions) {
+  static async createBranch(repo: Repository, parentId: string, targetBranch: string) {
     let parentCommit;
     if (parentId) {
       parentCommit = await Commit.lookup(repo, parentId);
@@ -40,15 +24,15 @@ export default class Change {
       parentTree = await parentCommit.getTree();
       parents.push(parentCommit);
     }
-    return new this(repo, targetBranch, parentTree, parents, parentCommit, fetchOpts);
+    return new this(repo, targetBranch, parentTree, parents, parentCommit);
   }
 
-  static async create(repo: Repository, parentId: string | null, targetBranch: string, fetchOpts?: FetchOptions) {
+  static async create(repo: Repository, parentId: string | null, targetBranch: string, isRemote?: boolean) {
     let parentCommit;
     if (parentId) {
       parentCommit = await Commit.lookup(repo, parentId);
     } else {
-      parentCommit = await headCommit(repo, targetBranch, fetchOpts);
+      parentCommit = await headCommit(repo, targetBranch, !!isRemote);
     }
 
     let parentTree;
@@ -57,34 +41,31 @@ export default class Change {
       parentTree = await parentCommit.getTree();
       parents.push(parentCommit);
     }
-    return new this(repo, targetBranch, parentTree, parents, parentCommit, fetchOpts);
+    return new this(repo, targetBranch, parentTree, parents, parentCommit, isRemote);
   }
 
-  root: todo;
+  root: Tree;
+  isRemote: boolean;
 
   constructor(
-    public repo: todo,
+    public repo: Repository,
     public targetBranch: string,
-    public parentTree: todo,
-    public parents: todo,
-    public parentCommit: todo,
-    public fetchOpts: todo
+    public parentTree: Tree | undefined,
+    public parents: Commit[],
+    public parentCommit?: Commit,
+    isRemote?: boolean
   ) {
     this.repo = repo;
-    this.parentTree = parentTree;
-    this.root = new MutableTree(repo, parentTree);
-    this.parents = parents;
-    this.parentCommit = parentCommit;
-    this.targetBranch = targetBranch;
-    this.fetchOpts = fetchOpts;
+    this.root = parentTree || Tree.create(repo, parentTree);
+    this.isRemote = !!isRemote;
   }
 
   async _headCommit() {
-    return headCommit(this.repo, this.targetBranch, this.fetchOpts);
+    return headCommit(this.repo, this.targetBranch, this.isRemote);
   }
 
   async get(path: string, { allowCreate, allowUpdate }: { allowCreate?: boolean; allowUpdate?: boolean } = {}) {
-    let { tree, leaf, leafName } = await this.root.fileAtPath(path, allowCreate);
+    let { tree, leaf, leafName } = await this.root.fileAtPath(path, !!allowCreate);
     return new FileHandle(tree, leaf, leafName, !!allowUpdate, path);
   }
 
@@ -96,15 +77,15 @@ export default class Change {
     let needsFetchAll = false;
 
     while (delayTime <= 5000) {
-      mergeCommit = await this._makeMergeCommit(newCommit, commitOpts);
+      mergeCommit = await this._makeMergeCommit(newCommit!, commitOpts);
 
       try {
-        if (this.fetchOpts) {
+        if (this.isRemote) {
           // needsFetchAll only gets set to true if the retry block has failed once
           if (needsFetchAll) {
             // pull remote before allowing process to continue, allowing us to
             // (hopefully) recover from upstream getting out of sync
-            await this.repo.fetchAll(this.fetchOpts);
+            await this.repo.fetchAll();
           }
           await this._pushCommit(mergeCommit);
         } else {
@@ -120,129 +101,86 @@ export default class Change {
         continue;
       }
 
-      if (this.fetchOpts && !this.repo.isBare()) {
-        await this.repo.fetchAll(this.fetchOpts);
-        await this.repo.mergeBranches(
-          this.targetBranch,
-          `origin/${this.targetBranch}`,
-          null,
-          Merge.PREFERENCE.FASTFORWARD_ONLY
-        );
+      if (this.isRemote && !this.repo.isBare()) {
+        await this.repo.fetchAll();
+        await this.repo.mergeBranches(this.targetBranch, `origin/${this.targetBranch}`);
       }
 
-      return mergeCommit.id().tostrS();
+      return mergeCommit.id().toString();
     }
 
     throw new Error('Failed to finalise commit and could not recover. ');
   }
 
   async _makeCommit(commitOpts: CommitOpts) {
-    let treeOid = await this.root.write(true);
-
-    if (treeOid && this.parentTree && treeOid.equal(this.parentTree.id())) {
+    if (!this.root.dirty) {
       return this.parentCommit;
     }
+    let treeOid = await this.root.write(true);
 
-    let tree = await Tree.lookup(this.repo, treeOid, undefined);
-    let { author, committer } = signature(commitOpts);
-    let commitOid = await Commit.create(
-      this.repo,
-      // @ts-ignore types don't know null is valid for second argument
-      null,
-      author,
-      committer,
-      'UTF-8',
-      commitOpts.message,
-      tree,
-      this.parents.length,
-      this.parents
-    );
+    let tree = await Tree.lookup(this.repo, treeOid!);
+    let commitOid = await Commit.create(this.repo, commitOpts, tree, this.parents);
+
     return Commit.lookup(this.repo, commitOid);
   }
 
-  async _pushCommit(mergeCommit: todo) {
+  async _pushCommit(mergeCommit: Commit) {
     const remoteBranchName = `temp-remote-${crypto.randomBytes(20).toString('hex')}`;
-    await Branch.create(this.repo, remoteBranchName, mergeCommit, 0);
+    await this.repo.createBranch(remoteBranchName, mergeCommit);
 
     let remote = await this.repo.getRemote('origin');
 
     try {
-      await remote.push([`refs/heads/${remoteBranchName}:refs/heads/${this.targetBranch}`], this.fetchOpts);
+      await remote.push(`refs/heads/${remoteBranchName}`, `refs/heads/${this.targetBranch}`, { force: true });
     } catch (err) {
       // pull remote before allowing process to continue
-      await this.repo.fetchAll(this.fetchOpts);
+      await this.repo.fetchAll();
       throw err;
     }
   }
 
-  async _makeMergeCommit(newCommit: todo, commitOpts: CommitOpts) {
+  async _makeMergeCommit(newCommit: Commit, commitOpts: CommitOpts) {
     let headCommit = await this._headCommit();
 
     if (!headCommit) {
       // new branch, so no merge needed
       return newCommit;
     }
-    let baseOid = await Merge.base(this.repo, newCommit, headCommit.id());
+    let baseOid = await Merge.base(this.repo, newCommit.id(), headCommit.id());
     if (baseOid.equal(headCommit.id())) {
       // fast forward (we think), so no merge needed
       return newCommit;
     }
-    let index = await Merge.commits(this.repo, newCommit, headCommit);
-    if (index.hasConflicts()) {
-      throw new GitConflict(index);
-    }
-    let treeOid = await index.writeTreeTo(this.repo);
-    let tree = await Tree.lookup(this.repo, treeOid);
-    let { author, committer } = signature(commitOpts);
-    let mergeCommitOid = await Commit.create(
-      this.repo,
-      // @ts-ignore null isn't recognized as valid second param
-      null,
-      author,
-      committer,
-      'UTF-8',
-      `Clean merge into ${this.targetBranch}`,
-      tree,
-      2,
-      [newCommit, headCommit]
-    );
-    return await Commit.lookup(this.repo, mergeCommitOid);
+
+    commitOpts.message = `Clean merge into ${this.targetBranch}`;
+
+    let mergeResult = await Merge.perform(this.repo, newCommit, headCommit, commitOpts);
+
+    return await Commit.lookup(this.repo, mergeResult.oid!);
   }
 
-  async _applyCommit(commit: todo) {
+  async _applyCommit(commit: Commit) {
     let headCommit = await this._headCommit();
 
     if (!headCommit) {
       return await this._newBranch(commit);
     }
 
-    let headRef = await Branch.lookup(this.repo, this.targetBranch, Branch.BRANCH.LOCAL);
-    await headRef.setTarget(commit.id(), 'fast forward');
+    let headRef = await this.repo.lookupLocalBranch(this.targetBranch);
+    await headRef.setTarget(commit.id());
   }
 
-  async _newBranch(newCommit: todo) {
-    await Branch.create(this.repo, this.targetBranch, newCommit, 0);
+  async _newBranch(newCommit: Commit) {
+    await this.repo.createBranch(this.targetBranch, newCommit);
   }
-}
-
-function signature(commitOpts: CommitOpts) {
-  let date = commitOpts.authorDate || moment();
-  let author = Signature.create(commitOpts.authorName, commitOpts.authorEmail, date.unix(), date.utcOffset());
-  let committer = commitOpts.committerName
-    ? Signature.create(commitOpts.committerName, commitOpts.committerEmail!, date.unix(), date.utcOffset())
-    : author;
-  return {
-    author,
-    committer,
-  };
 }
 
 class FileHandle {
-  public mode: number;
+  public mode: FILEMODE;
 
   constructor(
-    public tree: todo,
-    public leaf: todo,
+    public tree: Tree,
+    public leaf: TreeEntry | undefined,
     public name: string,
     public allowUpdate: boolean,
     public path: string
@@ -260,7 +198,7 @@ class FileHandle {
   }
   async getBuffer() {
     if (this.leaf) {
-      return (await this.leaf.getBlob()).content();
+      return (await this.leaf!.getBlob()!).content();
     }
   }
   exists() {
@@ -280,31 +218,29 @@ class FileHandle {
   }
   delete() {
     if (!this.leaf) {
-      throw new NotFound(`No such file ${this.path}`);
+      throw new FileNotFound(`No such file ${this.path}`);
     }
     this.tree.delete(this.name);
-    this.leaf = null;
+    this.leaf = undefined;
   }
-  savedId() {
+  savedId(): Oid | undefined {
     // this is available only after our change has been finalized
-    if (this.leaf.savedId) {
-      return this.leaf.savedId.tostrS();
-    }
+    return this.leaf && this.leaf.id()!;
   }
 }
 
 module.exports = Change;
 
-async function headCommit(repo: todo, targetBranch: string, fetchOpts: todo) {
+async function headCommit(repo: Repository, targetBranch: string, isRemote: boolean) {
   let headRef;
   try {
-    if (fetchOpts) {
-      headRef = await Branch.lookup(repo, `origin/${targetBranch}`, Branch.BRANCH.REMOTE);
+    if (isRemote) {
+      headRef = await repo.lookupRemoteBranch('origin', targetBranch);
     } else {
-      headRef = await Branch.lookup(repo, targetBranch, Branch.BRANCH.LOCAL);
+      headRef = await repo.lookupLocalBranch(targetBranch);
     }
   } catch (err) {
-    if (err.errorFunction !== 'Branch.lookup') {
+    if (err.constructor !== BranchNotFound) {
       throw err;
     }
   }

@@ -1,6 +1,7 @@
-<div {{did-insert (action this.setChecked)}}>
+<div class="boolean-editor" {{did-insert (action this.setChecked)}}>
   <label
     for={{concat "edit-" @field.name "-field-value"}}
+    class="cs-input-group--label"
     data-test-date-field-editor-label
   >
     {{@field.label}}

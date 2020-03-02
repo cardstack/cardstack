@@ -1,0 +1,73 @@
+.event-card-isolated .isolated-card--view-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+      'image        image'
+      'title        title'
+      'city         button'
+      'admission    button'
+      'divider      divider';
+}
+
+.event-card-isolated .field {
+  display: block;
+  grid-column: 1 / -1;
+}
+
+.event-card-isolated .event-city-label,
+.event-card-isolated .event-admission-label {
+  display: none;
+}
+.event-card-isolated .body-label {
+  display: block;
+}
+
+.event-card-isolated .background-image-field {
+  grid-area: image;
+}
+.event-card-isolated .title-field {
+  grid-area: title;
+}
+.event-card-isolated .event-city-field {
+  grid-area: city;
+  padding-bottom: 0;
+  max-width: calc(656px / 2);
+  margin-right: 0;
+}
+.event-card-isolated .event-admission-field {
+  grid-area: admission;
+  max-width: calc(656px / 2);
+  margin-right: 0;
+}
+.event-card-isolated .event-cta-field {
+  grid-area: button;
+  text-align: right;
+  max-width: calc(656px / 2);
+  margin-left: 0;
+}
+.event-card-isolated .divider-field {
+  grid-area: divider;
+}
+
+.event-card-isolated .title-value {
+  font-size: 28px;
+  line-height: 1.285;
+}
+.event-card-isolated .event-city-value {
+  opacity: 0.5;
+  font-size: 13px;
+  line-height: 1.285;
+}
+.event-card-isolated .event-admission-value {
+  font-size: 13px;
+  line-height: 1.285;
+  font-weight: 700;
+}
+.event-card-isolated .event-cta-value {
+  width: 128px;
+  min-height: 35px;
+  padding: 10px 15px;
+  background-color: #0076ff;
+  font-size: 13px;
+  line-height: 1.285;
+}

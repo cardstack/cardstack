@@ -65,17 +65,17 @@
 
 */
 
-import { Repository, Branch, Commit, RemoteConfig, TreeEntry } from './git';
+import { Repository, Commit, RemoteConfig, RepoNotFound } from './git';
+import Tree, { TreeEntry } from './git/tree';
 
 import Change from './change';
-import { safeEntryByName } from './mutable-tree';
 import logger from '@cardstack/logger';
 const log = logger('cardstack/git');
 import service from './service';
-import { set, intersection } from 'lodash';
+import { set } from 'lodash';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
-const { isInternalCard, adoptionChain } = require('@cardstack/plugin-utils/card-utils');
+const { isInternalCard } = require('@cardstack/plugin-utils/card-utils');
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 const { declareInjections } = require('@cardstack/di');
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
@@ -137,7 +137,7 @@ module.exports = declareInjections(
         try {
           this.repo = await Repository.open(this.repoPath!);
         } catch (e) {
-          if (/(could not find repository from|Failed to resolve path)/i.test(e.message)) {
+          if (e instanceof RepoNotFound) {
             let change = await Change.createInitial(this.repoPath!, 'master');
             this.repo = change.repo;
 
@@ -172,12 +172,12 @@ module.exports = declareInjections(
 class GitUpdater {
   commit?: Commit;
   commitId?: string;
-  rootTree: todo;
+  rootTree?: Tree;
 
   constructor(
     readonly repo: Repository,
     readonly branch: string,
-    readonly basePath: todo[],
+    readonly basePath: string[][],
     readonly searchers: todo,
     readonly cardTypes: string[],
     readonly owner: todo
@@ -188,7 +188,7 @@ class GitUpdater {
 
     let ops = new Gather(models);
     await this._loadCommit();
-    await this._indexTree(ops, null, this.rootTree, {
+    await this._indexTree(ops, undefined, this.rootTree, {
       only: this.basePath.concat(['schema']),
     });
     return models.map(m => m.data);
@@ -217,7 +217,7 @@ class GitUpdater {
   }
 
   async updateContent(meta: todo, hints: todo[], ops: todo) {
-    log.debug(`starting updateContent()`);
+    log.debug(`starting updateContent() for cardTypes: ${JSON.stringify(this.cardTypes)}`);
     await this._loadCommit();
     let originalTree;
     if (meta && meta.commit) {
@@ -248,7 +248,7 @@ class GitUpdater {
   async _loadCommit() {
     if (!this.commit) {
       this.commit = await this._commitAtBranch(this.branch);
-      this.commitId = this.commit.id().tostrS();
+      this.commitId = this.commit.sha();
     }
     if (!this.rootTree) {
       this.rootTree = await this.commit.getTree();
@@ -256,11 +256,11 @@ class GitUpdater {
   }
 
   async _commitAtBranch(branchName: string) {
-    let branch = await Branch.lookup(this.repo, branchName, Branch.BRANCH.LOCAL);
+    let branch = await this.repo.lookupLocalBranch(branchName);
     return Commit.lookup(this.repo, branch.target());
   }
 
-  async _indexTree(ops: todo, oldTree: todo, newTree: todo, filter?: todo) {
+  async _indexTree(ops: todo, oldTree?: Tree, newTree?: Tree, filter?: todo) {
     let seen = new Map();
     if (newTree) {
       for (let newEntry of newTree.entries()) {
@@ -285,11 +285,11 @@ class GitUpdater {
     }
   }
 
-  async _indexEntry(ops: todo, name: string, oldTree: todo, newEntry: todo, filter: todo) {
+  async _indexEntry(ops: todo, name: string, oldTree: Tree | undefined, newEntry: TreeEntry, filter: todo) {
     let oldEntry;
     if (oldTree) {
-      oldEntry = safeEntryByName(oldTree, name);
-      if (oldEntry && oldEntry.id().equal(newEntry.id())) {
+      oldEntry = oldTree.entryByName(name);
+      if (oldEntry && oldEntry.id() && oldEntry.id()!.equal(newEntry.id()!)) {
         // We can prune whole subtrees when we find an identical
         // entry. Which is kinda the point of Git's data
         // structure in the first place.
@@ -299,7 +299,7 @@ class GitUpdater {
     if (newEntry.isTree()) {
       await this._indexTree(
         ops,
-        oldEntry && oldEntry.isTree() ? await oldEntry.getTree() : null,
+        oldEntry && oldEntry.isTree() ? await oldEntry.getTree() : undefined,
         await newEntry.getTree(),
         nextFilter(filter)
       );
@@ -309,12 +309,7 @@ class GitUpdater {
       if (doc) {
         if (isInternalCard(type, id)) {
           await this._ensureBaseCard();
-
-          let chain = (await adoptionChain(doc, this.getInternalCard.bind(this))).map((i: todo) => i.data.id);
-          if (!intersection(this.cardTypes, chain).length) {
-            return;
-          }
-
+          log.trace(`indexing card ${id}`);
           await ops.save(type, id, doc);
         } else {
           await ops.save(type, id, { data: doc });
@@ -323,16 +318,16 @@ class GitUpdater {
     }
   }
 
-  async _deleteEntry(ops: todo, oldEntry: todo, filter: todo) {
+  async _deleteEntry(ops: todo, oldEntry: TreeEntry, filter: todo) {
     if (oldEntry.isTree()) {
-      await this._indexTree(ops, await oldEntry.getTree(), nextFilter(filter));
+      await this._indexTree(ops, await oldEntry.getTree(), undefined, nextFilter(filter));
     } else {
       let { type, id } = identify(oldEntry);
       await ops.delete(type, id);
     }
   }
 
-  async _entryToDoc(type: string, id: string, entry: todo) {
+  async _entryToDoc(type: string, id: string, entry: TreeEntry) {
     entry.isBlob();
     let contents = (await entry.getBlob()).content().toString('utf8');
     let doc;
@@ -357,10 +352,10 @@ class GitUpdater {
       doc.type = type;
       doc.id = id;
       set(doc, 'meta.version', this.commitId);
-      set(doc, 'meta.hash', entry.id().tostrS());
+      set(doc, 'meta.hash', entry.id()!.sha);
     } else {
       set(doc, 'data.meta.version', this.commitId);
-      set(doc, 'data.meta.hash', entry.id().tostrS());
+      set(doc, 'data.meta.hash', entry.id()!.sha);
     }
 
     return doc;

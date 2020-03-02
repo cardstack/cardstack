@@ -1,48 +1,37 @@
 .cardhost-cards {
-  /* TODO: make this a grid. do not use padding to determine card view zone */
-
-  --padding-top: var(--ch-top-edge-height);
-  --padding-left: var(--ch-left-edge-width);
-  --padding-right: var(--ch-right-edge-width);
-  --padding-bottom: var(--ch-bottom-edge-height);
-
   width: 100%;
   height: 100vh;
-  transition: var(--ch-card-background-color-animate), var(--ch-card-padding-animate);
-  background-color: var(--ch-default);
-  overflow: hidden;
-  padding-top: var(--padding-top);
-  padding-left: var(--padding-left);
-  padding-right: var(--padding-right);
-  padding-bottom: var(--padding-bottom);
+  margin: 0;
+  background-color: var(--ch-light-background);
+  color: var(--ch-dark);
+  overflow-y: auto;
+  transition: var(--ch-card-background-color-animate);
 }
 
-/* TODO: Remove this after right-edge is displayed on edit view */
 .cardhost-cards.edit {
-  --padding-left: var(--ch-left-edge-navbar-width);
-  --padding-right: 0;
-}
-
-.cardhost-cards.view {
-  --padding-left: var(--ch-left-edge-navbar-width);
-}
-
-.cardhost-cards.add,
-.cardhost-cards.adopt {
-  background: url('/assets/images/schema-grid-tile.png') center/60px repeat;
+  background-color: var(--ch-default);
 }
 
 .cardhost-cards.schema {
   background-color: var(--ch-deep-background);
 }
 
-.card-creator,
-.card-schema-updator,
-.card-view,
-.card-editor {
-  display: grid;
-  align-items: flex-start;
-  justify-items: center;
-  height: 100%;
-  padding: 0 20px;
+.cardhost-cards.themer {
+  background-color: var(--ch-dark-background);
+}
+
+.cardhost-cards.dragging * {
+  user-select: none;
+}
+
+.themer-card-width--small .card-renderer-isolated {
+  width: var(--ch-card-size);
+}
+
+.themer-card-width--medium .card-renderer-isolated {
+  width: var(--ch-card-size-medium);
+}
+
+.themer-card-width--large .card-renderer-isolated {
+  width: var(--ch-card-size-large);
 }

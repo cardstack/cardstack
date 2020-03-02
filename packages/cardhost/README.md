@@ -7,7 +7,7 @@ The cardhost is an application container that hosts cards. The cardhost is deplo
 You will need the following things properly installed on your computer.
 
 * [Git](https://git-scm.com/)
-* [Node.js](https://nodejs.org/) (with npm)
+* [Node.js](https://nodejs.org/) version 10.x (with npm)
 * [Ember CLI](https://ember-cli.com/)
 * [Google Chrome](https://google.com/chrome/)'
 * [Docker](https://www.docker.com/products/docker-desktop)
@@ -22,12 +22,15 @@ You will need the following things properly installed on your computer.
 ## Running / Development
 
 * `yarn start-prereqs`
-* `yarn start-hub`
+* `INDEX_INTERVAL=120 yarn start-hub`
 * In a new tab, `yarn start-ember`
 
 
 * Visit your app at [http://localhost:4200](http://localhost:4200).
 * Visit your tests at [http://localhost:4200/tests](http://localhost:4200/tests).
+
+`INDEX_INTERVAL` determines how often the hub should reindex data, in minutes.
+It is recommended to set this number high for local development.
 
 ### Code Generators
 

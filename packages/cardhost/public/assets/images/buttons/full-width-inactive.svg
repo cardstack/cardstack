@@ -1,9 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="22" height="20" viewBox="0 0 22 20">
-  <g id="Icon_Desktop" transform="translate(1 1)">
-    <g id="Group_625" data-name="Group 625">
-      <rect id="Rectangle_581" data-name="Rectangle 581" width="20" height="14" rx="2" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-      <path id="Path_456" data-name="Path 456" d="M8,21h8" transform="translate(-2 -3)" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-      <path id="Path_457" data-name="Path 457" d="M12,17v4" transform="translate(-2 -3)" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-    </g>
-  </g>
-</svg>
+<svg height="20" viewBox="0 0 22 20" width="22" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" transform="translate(1 1)"><rect height="14" rx="2" width="20"/><g transform="translate(-2 -3)"><path d="m8 21h8"/><path d="m12 17v4"/></g></g></svg>

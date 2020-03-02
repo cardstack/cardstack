@@ -17,7 +17,6 @@
     "@types/mocha": "^5.2.6",
     "@types/moment-timezone": "^0.5.12",
     "@types/node": "11.13.8",
-    "@types/nodegit": "^0.24.13",
     "@types/rimraf": "^2.0.3",
     "@types/sinon": "^7.5.1",
     "@types/temp": "^0.8.34",

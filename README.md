@@ -1,6 +1,4 @@
-
-Cardstack Application Framework
-===============================
+# Cardstack Application Framework
 
 This is the main repo for [Cardstack](https://www.cardstack.com/), an open source application architecture for building cohesive experiences on open, decentralized infrastructure.
 
@@ -28,7 +26,7 @@ In development, we use `lerna` to manage the inter-dependencies of all the packa
 There is work-in-progress to make Cardstack Hub automatically manage docker-based microservices, but for the present you need to start these things up manually to run the full test suite:
 
     docker run -d -p 5432:5432 --rm cardstack/pg-test
-    docker run -d -p 9022:22 --rm cardstack/git-test
+    docker run -d -p 8838:80 --rm cardstack/git-http-server
 
 ## Project-wide Policy and Community Governance
 

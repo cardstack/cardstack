@@ -1,0 +1,122 @@
+{{!--
+TODO this component should be responsible for deciding which format of the card to render.
+The process of rendering a card is fundamentally async as we'll need to load the card data,
+as well as waiting for the card component to be compiled by embroider. Make sure to build in
+Ember Concurrency into the rendering of the card component here.
+--}}
+
+{{#if @card}}
+  {{#if (eq @format "isolated")}}
+    {{#let (component this.isolatedComponentName) as | Isolated |}}
+      <AnimatedContainer>
+        <section
+          class="card-renderer-isolated
+            {{this.mode}}
+            {{safe-css-string @card.adoptedFromName}}
+            {{safe-css-string @card.name}}
+            {{if (and this.cardstackSession.isAuthenticated @cardSelected) "selected"}}
+            {{concat "field-count-" this.fields.length}}
+            {{@class}}
+          "
+          tabindex="0"
+          data-test-card-renderer-isolated
+          data-test-card-is-dirty={{if @card.isDirty "yes" "no"}}
+          {{on "focus" (action this.cardIsFocused true)}}
+          {{did-insert this.focusCard true}}
+          {{did-update this.updateFields @card.isolatedFields}}
+        >
+          {{#if (eq @mode "view")}}
+            {{#animated-value @card watch="isSelected" use=this.headerAnimation group="header"}}
+              <CardRendererHeader
+                @cardSelected={{if (and this.cardstackSession.isAuthenticated @cardSelected) true}}
+                @card={{@card}}
+                @buttonRoute="cards.card.edit.fields"
+                @buttonText="Edit"
+                @mode={{this.mode}}
+                @contextMenuOpen={{@contextMenuOpen}}
+                @setContextMenu={{@setContextMenu}}
+              />
+            {{/animated-value}}
+          {{else}}
+            <AnimatedContainer>
+              {{#animated-value @card watch=this.mode use=this.headerAnimation group="header"}}
+                <CardRendererHeader
+                  @cardSelected={{true}}
+                  @card={{@card}}
+                  @buttonRoute="cards.card.view"
+                  @buttonText="Done Editing"
+                  @mode={{this.mode}}
+                  @contextMenuOpen={{@contextMenuOpen}}
+                  @setContextMenu={{@setContextMenu}}
+                />
+              {{/animated-value}}
+            </AnimatedContainer>
+          {{/if}}
+          <AnimatedContainer class="card-renderer-isolated--content">
+            {{#animated-value @card watch=(if (eq this.mode "view") "isSelected" this.mode) use=this.cardTransition group="body"}}
+              <div class="card-renderer-isolated--card-container {{if (and this.cardstackSession.isAuthenticated @card.isSelected) "selected"}}">
+                <AnimatedContainer>
+                  {{#animated-value @card use=this.contentTransition group="content"}}
+                    {{#if @dropField}}
+                      <DropZone
+                        @dropField={{@dropField}}
+                        @position={{0}}
+                        @toggleStubField={{this.toggleStubField}}
+                      />
+                    {{/if}}
+                    <Isolated
+                      @card={{@card}}
+                      @fields={{this.fields}}
+                      @mode={{this.mode}}
+                      @setFieldValue={{@setFieldValue}}
+                      @setFieldName={{@setFieldName}}
+                      @removeField={{@removeField}}
+                      @toggleStubField={{this.toggleStubField}}
+                      @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+                      @setPosition={{@setPosition}}
+                      @selectField={{@selectField}}
+                      @selectedField={{@selectedField}}
+                      @dropField={{@dropField}}
+                    />
+                  {{/animated-value}}
+                </AnimatedContainer>
+              </div>
+            {{/animated-value}}
+          </AnimatedContainer>
+        </section>
+      </AnimatedContainer>
+    {{/let}}
+  {{else if (eq @format "embedded")}}
+    {{#let (component this.embeddedComponentName) as | Embedded |}}
+      <div
+        class="card-renderer-embedded
+          {{safe-css-string @card.adoptedFromName}}
+          {{safe-css-string @card.name}}
+          {{@class}}
+        "
+        data-test-card-renderer-embedded
+      >
+        {{#if (and (eq this.mode "view") (not @preventIsolation))}}
+          <LinkTo
+            @class="card-renderer--embedded-card-link"
+            @route="cards.card.view"
+            @model={{@card.name}}
+            aria-label={{@card.name}}
+          >
+            <Embedded @card={{@card}} @mode={{this.mode}} />
+            {{#if @showName}}
+              <div class="embedded-card-label">{{@card.name}}</div>
+            {{/if}}
+          </LinkTo>
+        {{else}}
+          <Embedded @card={{@card}} @mode={{this.mode}} />
+          {{#if @showName}}
+            <div class="embedded-card-label">{{@card.name}}</div>
+          {{/if}}
+        {{/if}}
+      </div>
+    {{/let}}
+  {{/if}}
+{{else}}
+  <div class="card-renderer-missing-card" data-test-missing-card>You must specify a @card attribute</div>
+{{/if}}

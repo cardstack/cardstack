@@ -1,0 +1,17 @@
+<Dialog open={{true}} @title={{this.title}} @mode={{@mode}} @icon={{@icon}}>
+  <TextField
+    @id="card__name"
+    @label="Give your card a name"
+    @theme="cs-dark"
+    @placeholder="i.e. My New Card"
+    @setValue={{this.updateCardName}}
+    {{on "keydown" this.keyDown}}
+    {{autofocus}}
+  />
+  <div class="dialog--button-group">
+    {{#if @closeDialog}}
+      <Cta {{on "click" @closeDialog}} @variant="secondary primary" data-test-cancel-create-btn>Cancel</Cta>
+    {{/if}}
+    <Cta {{on "click" this.createCard}} @variant="primary" data-test-create-card-btn>Create</Cta>
+  </div>
+</Dialog>

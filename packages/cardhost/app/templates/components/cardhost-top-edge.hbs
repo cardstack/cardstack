@@ -1,28 +1,44 @@
 <div class="cardhost-top-edge {{@mode}}" data-test-cardhost-top-edge>
-  {{#cardstack-session as |session|}}
-    <div class="login-box">
-      {{#if session.isAuthenticated }}
-        <button
-          class="ch-button ch-button--secondary"
-          id="logout-button"
-          onclick={{action session.logout}}
-        >
-          Logout
-        </button>
-      {{else}}
-        {{#mock-login as |login|}}
-          <button
-            id="login-button"
-            class="ch-button"
-            onclick={{action login "user1"}}
-            data-test-cardstack="login-button"
-          >
-            Login
-          </button>
-        {{/mock-login}}
-      {{/if}}
+  {{#if (eq @mode "schema")}}
+    <div class="cardhost-top-edge--buttons schema-mode">
+      <ModeIndicator
+        @card={{@card}}
+        @route="cards.card.edit.fields"
+        @mode="schema"
+        @linkTo="edit" />
+      <EdgeActionsButton />
     </div>
-  {{/cardstack-session}}
 
-  {{yield}}
+  {{else if (or (eq @mode "layout") (eq @mode "fields"))}}
+    <PreviewLinkButton @model={{@card}} class="cardhost-top-edge--preview-button {{if (eq @mode "fields") "hidden"}}" data-test-top-edge-preview-link />
+    <div class="view-selector" data-test-view-selector>
+      <LinkTo
+        @route="cards.card.edit.layout"
+        @class="view-selector--mode-link"
+        @model={{@card}}
+        data-test-view-selector="layout"
+      >
+        {{svg-jar "layout" width="18px" height="17px"}}
+        Layout
+      </LinkTo>
+      <LinkTo
+        @route="cards.card.edit.fields"
+        @class="view-selector--mode-link"
+        @model={{@card}}
+        data-test-view-selector="fields"
+      >
+        {{svg-jar "form" width="19px" height="15px"}}
+        Field
+      </LinkTo>
+    </div>
+    <CardSizeToggle class="cardhost-top-edge--size-buttons {{if (eq @mode "fields") "hidden"}}" data-test-top-edge-size-buttons />
+    <div class="cardhost-top-edge--buttons">
+      <ModeIndicator
+        @card={{@card}}
+        @route="cards.card.view"
+        @mode="edit"
+        @linkTo="view" />
+      <EdgeActionsButton />
+    </div>
+  {{/if}}
 </div>

@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import requirejsPolyfill from '@cardstack/requirejs-monaco-ember-polyfill';
-import * as monaco from 'monaco-editor';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
 import { action } from '@ember/object';
 import { restartableTask } from 'ember-concurrency-decorators';
 import { timeout } from 'ember-concurrency';
@@ -89,10 +89,13 @@ export default class CodeEditor extends Component {
     } else {
       el.style.height = '100%';
     }
+
+    let customThemeName = 'vsCodeA11y';
+    this.createCustomTheme(customThemeName);
     // `create` constructs a code editor and inserts it into the DOM
     let editor = monaco.editor.create(el, {
       model: codeModel,
-      theme: 'vs-dark',
+      theme: customThemeName,
       readOnly: this.readOnly,
       minimap: { enabled: false },
       wordWrap: 'on',
@@ -110,6 +113,21 @@ export default class CodeEditor extends Component {
     if (this.resizable && ENV.environment !== 'test') {
       this.startResizeWatcher.perform(el);
     }
+  }
+
+  createCustomTheme(customThemeName) {
+    // Increase the contrast of a few things so they pass color contrast checks.
+    // This modifies the monaco instance so we don't return anything.
+    // Token rules follow partial matches. string will match a token with type: string,
+    // string.double.js or string.html. Tokens can be inspected using F1 > Developer: Inspect Tokens
+    monaco.editor.defineTheme(customThemeName, {
+      base: 'vs-dark',
+      inherit: true,
+      rules: [{ token: 'comment', foreground: 'ffffff' }],
+      colors: {
+        'editorLineNumber.foreground': '#FFF',
+      },
+    });
   }
 
   @action

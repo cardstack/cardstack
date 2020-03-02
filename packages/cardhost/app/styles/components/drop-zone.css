@@ -1,50 +1,99 @@
-:root {
-  --ch-drop-zone-transition-duration: 200ms;
-}
 .drop-zone--container {
-  height: 20px;
-  background-color: var(--ch-dark-background);
-  border-top: 2px solid var(--ch-default);
-}
-
-.drop-zone--container.outside {
-  transition: height var(--ch-drop-zone-transition-duration) cubic-bezier(0.445, 0.05, 0.55, 0.95);
-}
-
-.drop-zone--container.dragging {
-  height: 158px;
-  transition: height var(--ch-drop-zone-transition-duration) cubic-bezier(0.445, 0.05, 0.55, 0.95);
+  height: 0;
+  position: relative;
+  z-index: 10;
 }
 
 .drop-zone {
-  background-color: transparent;
   width: 100%;
+  height: 50px;
+  position: absolute;
+  top: -25px;
+  z-index: 100;
+}
+
+.drop-zone.keyboard-highlight {
+  border: dashed 3px blue;
+  background-color: var(--ch-light-background);
+}
+
+/* drag has started */
+.cardhost-cards.dragging .drop-zone--container .drop-zone {
+  top: -75px;
+}
+
+/* drag has started, but is not yet over a dropzone */
+.cardhost-cards.dragging .drop-zone--container:not(.dragging) .drop-zone {
+  height: 150px;
+}
+
+/* drag has started, and is over a dropzone */
+.cardhost-cards.dragging .drop-zone--container.dragging .drop-zone {
+  height: 270px;
 }
 
 .drop-zone--container .drop-zone--description .drop-zone--preview--container {
   pointer-events: none;
-  padding: 0 53px;
 }
 
 .drop-zone .drop-zone--description {
   pointer-events: none;
-  height: 120px;
+  height: 170px;
   opacity: 0.5;
-  padding: 0;
+  padding: 30px 0;
   color: white;
   font-size: 16px;
   line-height: 22px;
-  text-align: center;
 }
 
 .drop-zone--description--text {
   display: none;
 }
 
-.drop-zone .drop-zone--description.dragging {
-  opacity: 1;
-}
-
 .drop-zone .drop-zone--drag-drop-icon {
   display: none;
+}
+
+/* In relation to Card Renderer */
+.card-renderer-isolated--card-container > .drop-zone--container {
+  border-top: none;
+}
+
+/* No fields, dragging a field */
+.card-renderer-isolated.field-count-1 .drop-zone--container.dragging .drop-zone {
+  min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
+}
+
+/* One field, dragging a field */
+.card-renderer-isolated.field-count-2 .field.with-buttons + .drop-zone--container.dragging .drop-zone {
+  min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height) - 170px);
+}
+
+.card-renderer-isolated.field-count-0 .drop-zone {
+  position: static;
+  min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-renderer-isolated.field-count-0 .drop-zone .drop-zone--description {
+  width: 100%;
+  border: none;
+  font-size: 16px;
+}
+
+.card-renderer-isolated.field-count-0 .drop-zone .drop-zone--description .drop-zone--description--text {
+  display: block;
+  text-align: center;
+}
+
+.card-renderer-isolated.field-count-0 .drop-zone .drop-zone--drag-drop-icon {
+  --icon-color: #fff;
+  --icon-opacity: 0.5;
+  display: block;
+  margin-top: 10px;
+  text-align: center;
 }

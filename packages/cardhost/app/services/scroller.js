@@ -1,24 +1,23 @@
 import Service from '@ember/service';
 import { tracked } from '@glimmer/tracking';
+import ENV from '@cardstack/cardhost/config/environment';
+
+const { animationSpeed } = ENV;
+const duration = animationSpeed || 1000;
 
 function easeInOutCubic(t) {
   return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
 }
 
 export default class ScrollerService extends Service {
-  @tracked currentlyScrolledTo;
   @tracked isScrolling = false;
-  @tracked scrollingElementSelector = '.cardhost-catalog'; // refactor if we reuse this for something else
+  @tracked scrollingElementSelector = '.library--main'; // refactor if we reuse this for something else
 
   setScrollingElement(element) {
     this.scrollingElementSelector = element;
   }
 
-  scrollToSection({ selector, duration = 1000, elementOffset = 60, doneScrolling }) {
-    if (this.currentlyScrolledTo === selector) {
-      return;
-    }
-
+  scrollToSection({ selector, elementOffset = 60, doneScrolling }) {
     let element = document.querySelector(selector);
     let scrollingElement = document.querySelector(this.scrollingElementSelector);
 
@@ -57,7 +56,5 @@ export default class ScrollerService extends Service {
     };
 
     animatedScroll();
-
-    this.currentlyScrolledTo = selector;
   }
 }

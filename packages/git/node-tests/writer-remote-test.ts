@@ -1,4 +1,4 @@
-import { Cred, cloneRepo, createRemote, Repository, logFromCommit } from '../git';
+import { Repository, Remote } from '../git';
 
 const { createDefaultEnvironment, destroyDefaultEnvironment } = require('@cardstack/test-support/env'); // eslint-disable-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 
@@ -7,8 +7,6 @@ const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 import { todo } from '@cardstack/plugin-utils/todo-any';
 
-import { join } from 'path';
-import { readFileSync } from 'fs';
 import { promisify } from 'util';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
@@ -20,16 +18,7 @@ import service from '../service';
 
 const mkdir = promisify(temp.mkdir);
 
-const privateKey = readFileSync(join(__dirname, 'git-ssh-server', 'cardstack-test-key'), 'utf8');
 import { fake, replace } from 'sinon';
-
-const fetchOpts = {
-  callbacks: {
-    credentials: (url: string, userName: string) => {
-      return Cred.sshKeyMemoryNew(userName, '', privateKey, '');
-    },
-  },
-};
 
 async function resetRemote() {
   let root = await temp.mkdir('cardstack-server-test');
@@ -57,8 +46,8 @@ async function resetRemote() {
     ),
   });
 
-  let remote = await createRemote(tempRepo.repo, 'origin', 'ssh://root@localhost:9022/root/data-test');
-  await remote.push(['+refs/heads/master:refs/heads/master'], fetchOpts);
+  let remote = await Remote.create(tempRepo.repo, 'origin', 'http://root:password@localhost:8838/git/repo');
+  await remote.push('refs/heads/master', 'refs/heads/master', { force: true });
   return tempRepo;
 }
 
@@ -71,6 +60,8 @@ describe('git/writer with remote', function() {
     head: string,
     remoteRepo: Repository;
 
+  this.timeout(10000);
+
   beforeEach(async function() {
     let tempRepo = await resetRemote();
 
@@ -82,16 +73,13 @@ describe('git/writer with remote', function() {
     tempRepoPath = await mkdir('cardstack-temp-test-repo');
     tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
 
-    repo = await cloneRepo('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
-      fetchOpts,
-    });
+    repo = await Repository.clone('http://root:password@localhost:8838/git/repo', tempRemoteRepoPath);
 
     let dataSource = factory.addResource('data-sources').withAttributes({
       'source-type': '@cardstack/git',
       params: {
         remote: {
-          url: 'ssh://root@localhost:9022/root/data-test',
-          privateKey,
+          url: 'http://root:password@localhost:8838/git/repo',
           cacheDir: tempRepoPath,
         },
       },
@@ -126,7 +114,7 @@ describe('git/writer with remote', function() {
           },
         },
       });
-      await repo.fetch('origin', fetchOpts);
+      await repo.fetchAll();
       let saved = await inRepo(tempRemoteRepoPath).getJSONContents(
         'origin/master',
         `contents/events/${record.id}.json`
@@ -159,7 +147,7 @@ describe('git/writer with remote', function() {
         .has.deep.property('meta.version')
         .not.equal(head);
 
-      await repo.fetch('origin', fetchOpts);
+      await repo.fetchAll();
       let updated = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/event-1.json`);
 
       expect(updated).to.deep.equal({
@@ -173,7 +161,7 @@ describe('git/writer with remote', function() {
     it('successfully merges updates when repo is out of sync', async function() {
       this.timeout(20000);
 
-      let change = await Change.create(remoteRepo, head, 'master', fetchOpts);
+      let change = await Change.create(remoteRepo, head, 'master');
 
       let file = await change.get('contents/events/event-2.json', { allowUpdate: true });
 
@@ -211,7 +199,7 @@ describe('git/writer with remote', function() {
         .has.deep.property('meta.version')
         .not.equal(head);
 
-      await repo.fetch('origin', fetchOpts);
+      await repo.fetchAll();
       let updated = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/event-1.json`);
 
       expect(updated).to.deep.equal({
@@ -225,7 +213,7 @@ describe('git/writer with remote', function() {
     it('successfully merges updates when same file is out of sync', async function() {
       this.timeout(20000);
 
-      let change = await Change.create(remoteRepo, head, 'master', fetchOpts);
+      let change = await Change.create(remoteRepo, head, 'master');
 
       let file = await change.get('contents/events/event-1.json', { allowUpdate: true });
 
@@ -249,7 +237,7 @@ describe('git/writer with remote', function() {
       });
 
       let remote = await remoteRepo.getRemote('origin');
-      await remote.push(['refs/heads/master:refs/heads/master'], fetchOpts);
+      await remote.push('refs/heads/master', 'refs/heads/master', { force: true });
 
       let { data: record } = await writers.update(env.session, 'events', 'event-1', {
         data: {
@@ -268,7 +256,7 @@ describe('git/writer with remote', function() {
         .has.deep.property('meta.version')
         .not.equal(head);
 
-      await repo.fetch('origin', fetchOpts);
+      await repo.fetchAll();
       let updated = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/event-1.json`);
 
       expect(updated).to.deep.equal({
@@ -284,7 +272,7 @@ describe('git/writer with remote', function() {
     it('deletes document', async function() {
       await writers.delete(env.session, head, 'events', 'event-1');
 
-      await repo.fetch('origin', fetchOpts);
+      await repo.fetchAll();
 
       let articles = (await inRepo(tempRemoteRepoPath).listTree('origin/master', 'contents/events')).map(a => a.name);
       expect(articles).to.not.contain('event-1.json');
@@ -297,29 +285,28 @@ describe('git/writer with remote', function() {
 describe('git/writer with empty remote', function() {
   let env: todo, writers: todo, repo: Repository, tempRepoPath, tempRemoteRepoPath: string;
 
+  this.timeout(10000);
+
   beforeEach(async function() {
     let root = await temp.mkdir('cardstack-server-test');
 
     let { repo: remoteRepo } = await makeRepo(root);
 
-    let remote = await createRemote(remoteRepo, 'origin', 'ssh://root@localhost:9022/root/data-test');
-    await remote.push(['+refs/heads/master:refs/heads/master'], fetchOpts);
+    let remote = await Remote.create(remoteRepo, 'origin', 'http://root:password@localhost:8838/git/repo');
+    await remote.push('refs/heads/master', 'refs/heads/master', { force: true });
 
     let factory = new JSONAPIFactory();
 
     tempRepoPath = await mkdir('cardstack-temp-test-repo');
     tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
 
-    repo = await cloneRepo('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
-      fetchOpts,
-    });
+    repo = await Repository.clone('http://root:password@localhost:8838/git/repo', tempRemoteRepoPath);
 
     let dataSource = factory.addResource('data-sources').withAttributes({
       'source-type': '@cardstack/git',
       params: {
         remote: {
-          url: 'ssh://root@localhost:9022/root/data-test',
-          privateKey,
+          url: 'http://root:password@localhost:8838/git/repo',
           cacheDir: tempRepoPath,
         },
       },
@@ -354,7 +341,7 @@ describe('git/writer with empty remote', function() {
           },
         },
       });
-      await repo.fetch('origin', fetchOpts);
+      await repo.fetchAll();
       let saved = await inRepo(tempRemoteRepoPath).getJSONContents(
         'origin/master',
         `contents/events/${record.id}.json`
@@ -381,16 +368,13 @@ describe('git/writer-remote/githereum', function() {
     tempRepoPath = await mkdir('cardstack-temp-test-repo');
     tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
 
-    await cloneRepo('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
-      fetchOpts,
-    });
+    await Repository.clone('http://root:password@localhost:8838/git/repo', tempRemoteRepoPath);
 
     let dataSource = factory.addResource('data-sources', 'git').withAttributes({
       'source-type': '@cardstack/git',
       params: {
         remote: {
-          url: 'ssh://root@localhost:9022/root/data-test',
-          privateKey,
+          url: 'http://root:password@localhost:8838/git/repo',
           cacheDir: tempRepoPath,
         },
         githereum: {
@@ -446,7 +430,7 @@ describe('git/writer-remote/githereum', function() {
     let repo = await Repository.open(githereum.repoPath);
     let firstCommitOnMaster = await repo.getMasterCommit();
 
-    let history = await logFromCommit(firstCommitOnMaster);
+    let history = await firstCommitOnMaster.getLog();
 
     expect(history.length).to.equal(2);
 

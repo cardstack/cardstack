@@ -5,7 +5,17 @@ Since this is a pre-1.0 project,
 it will track only significant breaking changes
 and features, and is not intended to be an exhaustive list.
 
-## [Unreleased]
+## [v0.16.22]
+
+### Added
+- core type `link` #1255
+- core type `cta` #1255
+
+## [v0.16.13]
+
+### Added
+
+- Feature: image core type
 
 ## [v0.14.22] - 2019-08-15
 

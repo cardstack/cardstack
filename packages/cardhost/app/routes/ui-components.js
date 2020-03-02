@@ -31,7 +31,7 @@ export default class UIComponentsRoute extends Route {
         {
           name: 'main-image',
           label: 'image',
-          type: '@cardstack/core-types::string',
+          type: '@cardstack/core-types::decorative-image',
           value: 'https://images.unsplash.com/photo-1542296140-47fd7d838e76',
         },
         {
@@ -39,6 +39,20 @@ export default class UIComponentsRoute extends Route {
           label: 'date',
           type: '@cardstack/core-types::date',
           value: '2019-09-26',
+        },
+        {
+          name: 'social-link',
+          label: 'Follow us on Twitter',
+          type: '@cardstack/core-types::link',
+          value: 'https://example.com',
+          helperText: 'The label will be the text displayed for the link. Use the Edit mode to set the link.',
+        },
+        {
+          name: 'rsvp',
+          label: 'RSVP',
+          type: '@cardstack/core-types::cta',
+          value: 'https://example.com',
+          helperText: 'The label will be the text displayed on the button. Use the Edit mode to set the link.',
         },
       ],
 
@@ -81,7 +95,7 @@ export default class UIComponentsRoute extends Route {
       sampleImageField: {
         name: 'image',
         label: 'image',
-        type: '@cardstack/core-types::string',
+        type: '@cardstack/core-types::decorative-image',
         value: 'https://images.unsplash.com/photo-1542296140-47fd7d838e76',
       },
 

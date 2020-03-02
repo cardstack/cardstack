@@ -1,5 +1,9 @@
 'use strict';
 
+// This is a feature flag supported in ember-cli 3.15+ that gives you faster
+// rebuilds, and it makes rebuilding of addons work in embroider.
+process.env.BROCCOLI_ENABLED_MEMOIZE = 'true';
+
 const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
@@ -27,6 +31,9 @@ module.exports = function(defaults) {
   // along with the exports of each module as its value.
   app.import('node_modules/monaco-editor/dev/vs/editor/editor.main.css');
 
+  const languages = ['html', 'css'];
+  const features = ['accessibilityHelp', 'colorDetector', 'find', 'folding', 'hover', 'suggest', 'toggleHighContrast'];
+
   return (function() {
     const Webpack = require('@embroider/webpack').Webpack;
     const { join } = require('path');
@@ -42,12 +49,12 @@ module.exports = function(defaults) {
       },
       packagerOptions: {
         webpackConfig: {
-          plugins: [new MonacoWebpackPlugin(/*{languages: ['javascript', 'typescript']}*/)],
+          plugins: [new MonacoWebpackPlugin({ languages, features })],
         },
       },
       packageRules: [
         {
-          package: '@cardstack/core',
+          package: '@cardstack/cardhost',
           appModules: {
             'components/card-renderer.js': {
               dependsOnComponents: [
@@ -71,6 +78,12 @@ module.exports = function(defaults) {
                 '<Fields::Cardstack::CoreTypes::BelongsToEditor/>',
                 '<Fields::Cardstack::CoreTypes::HasManyViewer/>',
                 '<Fields::Cardstack::CoreTypes::HasManyEditor/>',
+                '<Fields::Cardstack::CoreTypes::DecorativeImageViewer/>',
+                '<Fields::Cardstack::CoreTypes::DecorativeImageEditor/>',
+                '<Fields::Cardstack::CoreTypes::CtaViewer/>',
+                '<Fields::Cardstack::CoreTypes::CtaEditor/>',
+                '<Fields::Cardstack::CoreTypes::LinkViewer/>',
+                '<Fields::Cardstack::CoreTypes::LinkEditor/>',
               ],
             },
           },

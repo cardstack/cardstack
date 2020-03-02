@@ -1,27 +1,10 @@
-<CardhostTopEdge @mode="schema">
-  {{!-- TODO: DRY buttons --}}
-  {{#if this.cardstackSession.isAuthenticated}}
-    <div class="card-renderer--top-edge-buttons">
-      <button
-        {{on "click" this.preview}}
-        class="ch-button ch-button--secondary"
-        data-test-card-creator-preview-btn
-        disabled={{not this.cardstackSession.isAuthenticated}}
-      >
-        Preview
-      </button>
-      <SaveButton @card={{this.card}}/>
-    </div>
-  {{/if}}
-</CardhostTopEdge>
-
-{{#unless this.cssModeToggle.editingCss}}
-  <CardhostLeftEdge @mode="schema">
-    {{!-- TODO: DRY catalog section --}}
-    <section class="ch-catalog">
-      <header class="ch-catalog--header">
-        <h3 class="ch-catalog--title">Card Catalog</h3>
-      </header>
+<CardhostLeftEdge @mode="schema">
+  {{!-- TODO: DRY catalog section --}}
+  <section class="ch-catalog">
+    <header class="ch-catalog--header">
+      <h3 class="ch-catalog--title">Card Catalog</h3>
+    </header>
+    <div class="ch-catalog--content" tabindex="0" >
       <div class="ch-catalog--fields">
         {{#each this.fieldComponents as |field|}}
           <div
@@ -44,12 +27,13 @@
           </div>
         {{/each}}
       </div>
-    </section>
-  </CardhostLeftEdge>
-{{/unless}}
+    </div>
+  </section>
+</CardhostLeftEdge>
 
 <RightEdge
   @card={{this.card}}
+  @mode="schema"
   @selectedField={{this.selectedField}}
   @selectField={{action this.selectField}}
   @setNeededWhenEmbedded={{this.setNeededWhenEmbedded}}
@@ -60,29 +44,28 @@
   @cardSelected={{this.cardSelected}}
 />
 
-<section class="card-creator" data-test-card-creator {{did-update this.updateCard @card}}>
-  {{#if this.card}}
-    <CardRenderer
-      @card={{this.card}}
-      @format="isolated"
-      @mode="schema"
-      @removeField={{action this.removeField}}
-      @setPosition={{action this.setPosition}}
-      @selectField={{action this.selectField}}
-      @selectedField={{this.selectedField}}
-      @dropField={{action this.dropField}}
-      @cardSelected={{this.cardSelected}}
-      @cardFocused={{action (mut this.cardSelected)}}
-    />
-  {{/if}}
+<section class="card-renderer--container" data-test-card-creator {{did-update this.updateCard @card}}>
+  <div class="card-renderer--schema-container">
+    {{#if this.card}}
+      <CardRenderer
+        @card={{this.card}}
+        @format="isolated"
+        @mode="schema"
+        @removeField={{action this.removeField}}
+        @setPosition={{action this.setPosition}}
+        @selectField={{action this.selectField}}
+        @selectedField={{this.selectedField}}
+        @dropField={{action this.dropField}}
+        @cardSelected={{this.cardSelected}}
+        @cardFocused={{action (mut this.cardSelected)}} />
+    {{/if}}
+  </div>
 </section>
 
 {{#if this.card}}
+  {{!-- This is hidden, used in tests --}}
   <section class="cardhost-card-document">
     <h3>Card Document</h3>
-    <CodeEditor
-      @code={{this.cardJson}}
-      @language="json"
-    />
+    <code data-test-card-json>{{this.cardJson}}</code>
   </section>
 {{/if}}

@@ -1,31 +1,37 @@
-import { click, find, triggerEvent, fillIn, visit, waitFor } from '@ember/test-helpers';
+import { click, find, triggerEvent, fillIn, visit, waitFor, getContext } from '@ember/test-helpers';
+import { animationsSettled } from 'ember-animated/test-support';
 
 const timeout = 5000;
 
-export async function showCardId() {
+export async function showCardId(toggleDetailsSection = false) {
   await click(`.card-renderer-isolated`);
+
+  if (toggleDetailsSection) {
+    await click('[data-test-right-edge-section-toggle="details"]');
+  }
+
+  await animationsSettled();
 }
 
-export async function setCardId(id) {
-  await showCardId();
-  await fillIn('#card__id', id);
-  await triggerEvent('#card__id', 'keyup');
+export async function setCardName(name) {
+  await fillIn('#card__name', name);
+  await click('[data-test-create-card-btn]');
 }
 
 export async function dragAndDrop(fieldSelector, dropZoneSelector, options) {
   await triggerEvent(fieldSelector, 'mousedown');
   await triggerEvent(fieldSelector, 'dragstart', options);
+  await triggerEvent(dropZoneSelector, 'dragenter', options);
+  await animationsSettled();
   await triggerEvent(dropZoneSelector, 'drop', options);
+  await animationsSettled();
 }
 
 export async function dragAndDropNewField(type, position = 0) {
-  let options = {
-    dataTransfer: {
-      getData: () => type,
-      setData: () => {},
-    },
-  };
-  await dragAndDrop(`[data-test-card-add-field-draggable="${type}"]`, `[data-test-drop-zone="${position}"]`, options);
+  await click(`[data-test-card-add-field-draggable="${type}"]`);
+  await triggerEvent(`[data-test-drop-zone="${position}"]`, 'mouseenter');
+  await click(`[data-test-drop-zone="${position}"]`);
+  await animationsSettled();
 }
 
 // NOTE: Position is 0-based
@@ -52,37 +58,32 @@ export async function dragFieldToNewPosition(originalPosition, newPosition) {
 export async function createCards(args) {
   for (let id of Object.keys(args)) {
     await visit('/cards/new');
-    await setCardId(id);
+    await setCardName(id);
+
     for (let [index, [name, type, neededWhenEmbedded]] of args[id].entries()) {
       await addField(name, type, neededWhenEmbedded, index);
     }
-    await click('[data-test-card-save-btn]');
-    await waitFor(`[data-test-card-schema="${id}"]`, { timeout });
+    await saveCard();
 
-    await visit(`/cards/${id}/edit`);
+    await visit(`/cards/${id}/edit/fields`);
     for (let [name, , , value] of args[id]) {
       if (value == null) {
         continue;
       }
       await setFieldValue(name, value);
     }
-    await saveCard('editor', id);
+    await saveCard();
     await visit(`/cards/${id}`);
+    await animationsSettled();
   }
 }
 
-export async function saveCard(mode, id) {
-  await click(`[data-test-card-save-btn]`);
-
-  if (mode === 'creator') {
-    if (id) {
-      await waitFor(`[data-test-card-schema="${id}"]`, { timeout });
-    } else {
-      await waitFor('[data-test-card-schema^="new-card-"]', { timeout });
-    }
-  } else {
-    await waitFor(`[data-test-card-save-btn].saved`, { timeout });
-  }
+export async function saveCard() {
+  getContext()
+    .owner.lookup('service:autosave')
+    ._saveOnceInTests();
+  await waitFor('[data-test-card-is-dirty="no"]', { timeout });
+  await animationsSettled();
 }
 
 export async function addField(name, type, isEmbedded, position) {
@@ -94,6 +95,8 @@ export async function addField(name, type, isEmbedded, position) {
   if (isEmbedded) {
     await click('[data-test-schema-attr="embedded"] input[type="checkbox"]');
   }
+
+  await animationsSettled();
 }
 
 export async function setFieldValue(name, value) {
@@ -105,11 +108,11 @@ export async function setFieldValue(name, value) {
       await click(`[data-test-field="${name}"] .cardstack-core-types-field-value-false`);
     }
   } else if (type === '@cardstack/core-types::has-many' && Array.isArray(value)) {
-    await fillIn(`#edit-${name}-field-value`, value.join(','));
-    await triggerEvent(`#edit-${name}-field-value`, 'keyup');
+    await fillIn(`[data-test-edit-field="${name}"]`, value.join(','));
+    await triggerEvent(`[data-test-edit-field="${name}"]`, 'keyup');
   } else {
-    await fillIn(`#edit-${name}-field-value`, value);
-    await triggerEvent(`#edit-${name}-field-value`, 'keyup');
+    await fillIn(`[data-test-edit-field="${name}"]`, value);
+    await triggerEvent(`[data-test-edit-field="${name}"]`, 'keyup');
   }
 }
 

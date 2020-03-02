@@ -1,24 +1,84 @@
-<aside class="cardhost-left-edge" data-test-cardhost-left-edge>
-  <nav class="cardhost-left-edge--nav {{@mode}}">
-    <ul>
-      <li>
-        <button disabled class="ch-button ch-button--icon user" aria-label="User">
-        </button>
-      </li>
-      <li>
-        <button disabled class="ch-button ch-button--icon catalog" aria-label="Catalog">
-        </button>
-      </li>
-      <li>
-        <LinkTo
-          @route="index"
-          data-test-library-link
-          class="ch-button ch-button--icon library"
-          title="Library"
-        />
-      </li>
-    </ul>
-  </nav>
+<CardstackSession as |session|>
+  <aside
+    id="cardhost-left-edge"
+    class="cardhost-left-edge"
+    data-test-cardhost-left-edge
+  >
+    <nav class="cardhost-left-edge--nav {{@mode}} {{if this.isExpanded "expanded"}}">
+      <ul>
+        <li>
+          <LinkTo
+            @route="index"
+            class="cardhost-left-edge--nav-button cardstack-logo-button"
+            title="Homepage"
+            data-test-home-link
+          >
+            {{svg-jar "cardstack-logo" width="23px" height="25px"}}
+          </LinkTo>
+        </li>
+        <li class="login-grid">
+          <button
+            class="cardhost-left-edge--nav-button profile-button {{if this.isExpanded "selected"}}"
+            aria-label="expandable menu with login controls"
+            aria-expanded={{this.isExpanded}}
+            {{on "click" this.toggleMenuExpand}}
+            data-test-toggle-left-edge
+          >
+            {{svg-jar "user" width="18px" height="20px"}}
+          </button>
+          {{#if this.isExpanded}}
+            <div
+              class="login-grid-right-column"
+              {{click-outside this.closeLeftEdge ignore=".cardhost-left-edge--nav"}}
+            >
+              {{#if session.isAuthenticated }}
+                <Cta
+                  {{on "click" (fn this.logout session.logout)}}
+                  @variant="primary secondary"
+                  class="cardhost-left-edge-login-buttons"
+                  data-test-logout-button
+                >
+                  Log out
+                </Cta>
+              {{else}}
+                <MockLogin as |login|>
+                  <Cta
+                    {{on "click" (fn login "user1")}}
+                    @variant="primary"
+                    class="cardhost-left-edge-login-buttons"
+                    data-test-login-button
+                  >
+                    Log in
+                  </Cta>
+                </MockLogin>
+              {{/if}}
+            </div>
+          {{/if}}
+        </li>
+        <li>
+          <button
+            disabled={{not-eq @mode "schema"}}
+            class="cardhost-left-edge--nav-button {{if (eq @mode "schema") "selected"}}"
+            aria-label="catalog"
+            data-test-catalog-button
+          >
+            {{svg-jar "card-catalog" width="20px" height="20px"}}
+          </button>
+        </li>
+        <li>
+          <button
+            {{on "click" this.library.show}}
+            disabled={{not session.isAuthenticated}}
+            class="cardhost-left-edge--nav-button"
+            aria-label="library"
+            data-test-library-button
+          >
+            {{svg-jar "library" width="21px" height="21px"}}
+          </button>
+        </li>
+      </ul>
+    </nav>
 
-  {{yield}}
-</aside>
+    {{yield}}
+  </aside>
+</CardstackSession>

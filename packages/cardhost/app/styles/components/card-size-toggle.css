@@ -1,0 +1,31 @@
+.card-size-toggle {
+  display: inline-grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 5px;
+  min-width: 107px;
+  max-width: 130px;
+}
+
+.card-size-btn.ch-button {
+  min-width: initial;
+  padding: 5px 10px; /* to increase clickable area */
+  color: var(--ch-light-op50);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.015em;
+  line-height: calc(26 / 13);
+}
+
+.card-size-btn.ch-button:focus,
+.card-size-btn.ch-button:hover {
+  color: var(--ch-light);
+}
+
+.card-size-btn.ch-button.selected {
+  color: var(--ch-highlight);
+}
+
+.card-size-btn.ch-button:focus:hover,
+.card-size-btn.ch-button.selected:hover {
+  color: var(--ch-highlight-hover);
+}

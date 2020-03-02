@@ -1,6 +1,6 @@
-<div class="view-field--label" data-test-date-field-viewer-label>
+<div class="label {{@field.name}}-label" data-test-date-field-viewer-label>
   {{@field.label}}
 </div>
-<div class="view-field--value" data-test-date-field-viewer-value>
-  {{@field.value}}
+<div class="value {{@field.name}}-value" data-test-date-field-viewer-value>
+  {{moment-format @field.value "MMMM D, YYYY"}}
 </div>

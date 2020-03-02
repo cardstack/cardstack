@@ -13,8 +13,7 @@ export default class EditorPane extends Component {
     super(...arguments);
     // getting markup must be done in the constuctor to guarantee that it
     // resolves before the code editor is rendered.
-    let cardMarkup = document.querySelector('.card-renderer-isolated--content');
-    this.markup = cardMarkup ? cardMarkup.innerHTML.toString().trim() : '';
+    this.markup = this.getCardMarkup();
   }
 
   get directions() {
@@ -31,7 +30,7 @@ export default class EditorPane extends Component {
 
   get width() {
     if (this.cssModeToggle.dockLocation === 'right') {
-      return '60%';
+      return 'calc(100% - var(--ch-card-size))';
     } else {
       return '100%';
     }
@@ -59,5 +58,18 @@ export default class EditorPane extends Component {
     }
 
     return classes.join(' ');
+  }
+
+  getCardMarkup() {
+    let cardMarkup = document.querySelector('.card-renderer-isolated--card-container');
+
+    if (cardMarkup) {
+      return cardMarkup.innerHTML
+        .toString()
+        .replace(/<!---->/gi, '')
+        .trim();
+    } else {
+      return '';
+    }
   }
 }

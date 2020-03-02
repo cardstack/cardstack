@@ -1,6 +1,6 @@
 <TextField
-  @id={{concat "edit-" @field.name "-field-value"}}
   @label={{@field.label}}
-  @placeholder="Card ID"
+  @helperText={{this.fieldInstructions}}
   @value={{this.fieldValue}}
-  @changeAction={{action this.updateFieldValue}} />
+  @setValue={{action this.updateFieldValue}}
+  data-test-edit-field={{@field.name}} />

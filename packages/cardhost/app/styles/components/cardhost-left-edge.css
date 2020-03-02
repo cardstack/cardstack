@@ -5,27 +5,28 @@
   height: 100%;
   display: flex;
   flex-flow: row nowrap;
-  z-index: var(--ch-edges-z-index);
+  z-index: var(--ch-left-edge-z-index);
 }
 
 .cardhost-left-edge--nav {
+  background-color: var(--ch-default);
   width: var(--ch-left-edge-navbar-width);
+  overflow: hidden;
+  transition: width 0.2s ease, var(--ch-card-background-color-animate);
 }
 
-.cardhost-left-edge--nav.schema,
-.cardhost-left-edge--nav.new,
-.cardhost-left-edge--nav.adopt {
-  background-color: var(--ch-deep-background);
+.cardhost-left-edge--nav.schema {
+  background-color: var(--ch-dark-background);
+  border-right: 2px solid var(--ch-default);
 }
 
 .cardhost-left-edge--nav > ul {
   display: flex;
   flex-flow: column nowrap;
   justify-content: flex-end;
-  align-items: center;
   height: 100%;
   margin: 0;
-  padding: 20px 0;
+  padding: 20px;
   list-style-type: none;
 }
 
@@ -33,6 +34,85 @@
   margin-top: 20px;
 }
 
-.cardhost-left-edge--nav li:first-child {
-  margin-bottom: auto;
+.cardhost-left-edge--nav li .ch-button--icon-secondary {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.cardhost-left-edge--nav li .ch-button--icon-secondary.catalog {
+  border-radius: 10px;
+}
+
+.cardhost-left-edge--nav-button {
+  --icon-color: var(--ch-highlight);
+  display: block;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 100px;
+  width: 40px;
+  height: 40px;
+  padding: 5px;
+  line-height: 2;
+  text-align: center;
+}
+
+.cardhost-left-edge--nav-button svg {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.cardhost-left-edge--nav-button:not(:disabled):hover {
+  background-color: var(--ch-hover);
+  border-color: var(--ch-border);
+  cursor: pointer;
+}
+.cardhost-left-edge--nav-button:not(:disabled):focus {
+  outline: 0;
+  background-color: var(--ch-hover);
+  border-color: var(--ch-border);
+}
+
+.cardhost-left-edge--nav-button.selected {
+  --icon-color: var(--ch-dark);
+  background-color: var(--ch-highlight);
+  border-color: var(--ch-border);
+}
+
+.cardhost-left-edge--nav-button.selected:hover,
+.cardhost-left-edge--nav-button.selected:focus {
+  background-color: var(--ch-highlight-hover);
+}
+
+.cardhost-left-edge--nav-button:disabled {
+  --icon-color: var(--ch-light-op50);
+}
+
+.cardhost-left-edge--nav.expanded {
+  background-color: var(--ch-deep-background);
+  width: 320px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+}
+
+.login-grid {
+  display: grid;
+  grid-template-columns: 40px auto;
+  grid-column-gap: 50px;
+  margin-bottom: auto; /* push it to the top of the flexbox nav */
+}
+
+.cardhost-left-edge-login-buttons {
+  width: 100%;
+}
+
+.cardhost-left-edge-login-buttons:hover {
+  color: var(--ch-highlight-hover)
+}
+
+.cardhost-left-edge--nav h1 {
+  font-size: 20px;
+  margin-top: 4px;
+  font-weight: 600px;
+}
+
+.context-menu-items li.divider {
+  padding: 0;
 }

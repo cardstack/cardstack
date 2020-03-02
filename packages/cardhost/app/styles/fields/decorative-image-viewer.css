@@ -1,0 +1,5 @@
+.field-type-decorative-image-view-field img,
+.field-type-decorative-image-layout-field img {
+  display: block;
+  max-width: 100%;
+}

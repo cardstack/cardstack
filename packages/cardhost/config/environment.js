@@ -30,6 +30,11 @@ module.exports = function(environment) {
   };
 
   if (environment === 'development') {
+    ENV['ember-a11y-testing'] = {
+      componentOptions: {
+        turnAuditOff: true, // set to "false" to see accessibility errors hightlighted in the browser. Even if there are no errors, this impacts performance and can lead to unexpected behavior, so it is recommended to only run the audit on-demand.
+      },
+    };
     // ENV.APP.LOG_RESOLVER = true;
     // ENV.APP.LOG_ACTIVE_GENERATION = true;
     // ENV.APP.LOG_TRANSITIONS = true;
@@ -39,6 +44,13 @@ module.exports = function(environment) {
     ENV.cardTemplates = JSON.parse(process.env.CARD_TEMPLATES || null) || [
       'local-hub::location-card',
       'local-hub::event-card',
+      'local-hub::job-description',
+      'local-hub::job-applicant-profile',
+      'local-hub::event-ticket',
+      'local-hub::product-card',
+      'local-hub::wedding-invitation',
+      'local-hub::photo-card',
+      'local-hub::byline-card',
     ];
   }
 
@@ -53,7 +65,28 @@ module.exports = function(environment) {
     ENV.APP.rootElement = '#ember-testing';
     ENV.APP.autoboot = false;
 
-    ENV.cardTemplates = JSON.parse(process.env.CARD_TEMPLATES || null) || ['local-hub::location-card'];
+    ENV.cardTemplates = JSON.parse(process.env.CARD_TEMPLATES || null) || [
+      'local-hub::location-card',
+      'local-hub::event-ticket',
+      'local-hub::product-card',
+      'local-hub::wedding-invitation',
+      'local-hub::photo-card',
+      'local-hub::byline-card',
+    ];
+
+    ENV.animationSpeed = 20;
+    ENV.autosaveDebounce = 10;
+    ENV.autosaveDisabled = true;
+    ENV['@cardstack/ui-components'] = {
+      debounceSpeed: 10,
+    };
+
+    ENV.percy = {
+      breakpointsConfig: {
+        desktop: 1280,
+      },
+      defaultBreakpoints: ['desktop'],
+    };
   }
 
   // if (environment === 'production') {

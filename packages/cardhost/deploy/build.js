@@ -31,9 +31,9 @@ codeLayerFiles.forEach(serverFile => {
   });
 });
 
-let dockerImageLabel = specialBranches.includes(process.env.TRAVIS_BRANCH)
-  ? process.env.TRAVIS_BRANCH
-  : process.env.TRAVIS_BUILD_ID || 'latest';
+let dockerImageLabel = specialBranches.includes(process.env.GITHUB_BRANCH)
+  ? process.env.GITHUB_BRANCH
+  : process.env.GITHUB_BUILD_ID || 'latest';
 
 try {
   process.stdout.write(`Retrieving docker build from ${process.env.ECR_ENDPOINT}:${dockerImageLabel} ...`);

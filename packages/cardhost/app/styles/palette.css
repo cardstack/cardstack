@@ -3,12 +3,12 @@
   --ch-hover: #272330;
   --ch-disabled: #393642;
   --ch-dark-background: #41404d;     /* right-edge panel background */
+  --ch-medium-background: #b7b1ba;   /* edit mode background */
   --ch-light-background: #e9e9ed;    /* left-edge catalog bg, field-renderer header bg */
   --ch-deep-background: #141428;     /* use sparsely (homepage, themer, and schema view backgrounds) */
   --ch-foreground: #5a586a;          /* right-edge dropdown, pill selector, checkbox background */
   --ch-foreground-hover: #434050;
   --ch-highlight: #00ebe5;           /* form components focus border state, links hover state */
-  --ch-highlight-light: #9af6f3;     /* disabled saved button */
   --ch-highlight-hover: #00b0ad;
   --ch-success: #37eb77;
   --ch-border: #5b596e;              /* button, search-bar, and view-switcher borders */
@@ -16,7 +16,17 @@
   --ch-dark: #000;
   --ch-alert: #ff0000;
   --ch-light-op40: #6b6971;         /* disabled border/stroke color on dark bg */
-  --ch-light-op50: rgba(255, 255, 255, 0.5);  /* inactive titles with icons */
+  --ch-light-op50: #afafb7;         /* inactive titles with icons */
   --ch-light-op60: #cfcfd2;         /* regular label on dark bg */
   --ch-dark-op50: #404040;          /* regular label on light bg */
+
+
+  /* Only for UNTHEMED CARD CONTENT (Unthemed default card styling) */
+  --dark-gray: #404040;
+  --medium-gray: #707070;
+  --light-gray: rgba(112, 112, 112, 0.25);
+  --red: #ff0000;
+  --black: #000;
+  --white: #fff;
+  --cobalt-blue: #0069F9;         /* used for links */
 }

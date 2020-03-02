@@ -143,6 +143,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, 250px);
   grid-gap: var(--ch-spacing);
+  padding-bottom: 40px;
 }
 .color-palette--block {
   width: 250px;
@@ -155,7 +156,8 @@
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
 }
 .color-palette--block.--ch-light,
-.color-palette--block.--ch-light-background {
+.color-palette--block.--ch-light-background,
+.color-palette--block.--white {
   color: black;
 }
 .color-palette--code.cardhost-monaco-container {
@@ -171,4 +173,17 @@
 .ui-components .ch-button--icon.responsive,
 .ui-components .ch-button--icon.full-width {
   color: var(--ch-light);
+}
+
+
+/* System Dialog */
+.ui-components--dialog-container {
+  width: 100%;
+  height: 260px;
+}
+.ui-components--dialog-container.dialog-small {
+  height: 100px;
+}
+.ui-components--dialog-container.dialog-medium {
+  height: 160px;
 }

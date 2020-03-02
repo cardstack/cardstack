@@ -8,8 +8,8 @@ import { setupMockUser, login } from '../helpers/login';
 
 const eventData = [
   ['image', 'string', true, "https',//images.unsplash.com/]photo-1542296140-47fd7d838e76"],
-  ['title', 'string', true, 'Ember Meetup NYC'],
-  ['date', 'date', true, '2019-09-26'],
+  ['title', 'string', true, 'Quarterly Planning Meeting'],
+  ['date', 'date', true, '2020-05-26'],
   ['location', 'string', true, 'One World Trade Center'],
   ['city', 'string', true, 'New York, NY'],
   ['admission', 'string', true, 'Free'],
@@ -40,6 +40,7 @@ module('Acceptance | event card', function(hooks) {
 
   hooks.beforeEach(async function() {
     this.owner.lookup('service:data')._clearCache();
+    this.owner.lookup('service:card-local-storage').clearIds();
     // Until we have searching capabilities, we'll just render the contents of the
     // local store. So the first step is to warm up the store.
     await login();

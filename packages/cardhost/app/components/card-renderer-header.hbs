@@ -1,0 +1,74 @@
+<div 
+  class="card-renderer-isolated--header--wrapper {{if @cardSelected "selected"}}" {{did-update this.resetMenu @cardSelected}}
+  data-test-card-renderer-header
+>
+  <header class="card-renderer-isolated--header">
+    {{#if (or (eq (safe-css-string @card.adoptedFromName) "event-card") (eq (safe-css-string @card.name) "event-card"))}}
+      {{svg-jar "event" width="30px" height="20px" class="card-renderer-isolated--header-icon"}}
+    {{/if}}
+    <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.name "Blank Card"}}</span>
+    {{#if this.cardstackSession.isAuthenticated}}
+      <div>
+        <LinkTo
+          @route={{@buttonRoute}}
+          @model={{@card}}
+          @class="card-renderer--header-link"
+          data-test-card-header-button
+        >
+          {{@buttonText}}
+        </LinkTo>
+        <button 
+          {{on "click" this.toggleMenu}}
+          {{did-insert this.autosave.kickoff @card.isDirty @card}}
+          {{!-- Need to watch isRunning since multiple isDirty changes don't result in state changes --}}
+          {{did-update this.autosave.kickoff @card.isDirty @card this.autosave.kickoff.isRunning}}
+          class="context-menu-button {{if this.autosave.hasError "context-menu-button---error"}}" data-test-context-menu-button
+          aria-label="Open card mode options menu" aria-expanded={{@contextMenuOpen}}
+        >
+          {{svg-jar "three-dots" width="12px" height="7px" aria-hidden=true}}
+        </button>
+      </div>
+    {{/if}}
+  </header>
+</div>
+
+{{!-- This is outside of the header div so that it can have a higher z-index than the header --}}
+{{#if this.showMenu}}
+  <div
+    {{click-outside this.closeMenu ignore=".context-menu-button"}}
+    class={{if (or (eq @mode "schema") (eq @mode "layout")) "context-menu-sticky-wrapper"}}
+  >
+    <nav class="context-menu-nav" role="navigation" aria-labelledby="switch-mode">
+      <ul class="context-menu-items" data-test-context-menu-items>
+        <li class="heading">
+          {{#if this.autosave.hasError}}
+            {{svg-jar "error" width="10px" height="10px"}}
+            Failed to save
+          {{else if @card.isDirty}}
+            {{svg-jar "warning" width="10px" height="10px"}}
+            Saving...
+          {{else}}
+            {{svg-jar "success" width="10px" height="10px"}}
+            Saved {{moment-from-now this.autosave.lastSavedTime interval=30000}}
+          {{/if}}
+        </li>
+        <li class="divider">
+          <hr>
+        </li>
+        <li id="switch-mode" class="heading">Switch mode</li>
+        <li>
+          <LinkTo @route="cards.card.view" @model={{@card}} @class={{if (eq @mode "view") "checked"}} data-test-context-view>View</LinkTo>
+        </li>
+        <li>
+          <LinkTo @route="cards.card.edit.fields" @model={{@card}} @class={{if (eq @mode "edit") "checked"}} data-test-context-edit>Edit</LinkTo>
+        </li>
+        <li>
+          <LinkTo @route="cards.card.edit.fields.schema" @model={{@card}}  @class={{if (eq @mode "schema") "checked"}} data-test-context-schema>Schema</LinkTo>
+        </li>
+        <li>
+          <LinkTo @route="cards.card.edit.layout" @model={{@card}} @class={{if (eq @mode "layout") "checked"}} data-test-context-layout>Layout</LinkTo>
+        </li>
+      </ul>
+    </nav>
+  </div>
+{{/if}}
