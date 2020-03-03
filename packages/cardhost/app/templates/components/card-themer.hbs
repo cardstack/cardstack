@@ -17,13 +17,11 @@
 </section>
 
 {{#if this.isCardReady}}
-  <div data-test-editor-pane>
-    <EditorPane data-test-dock-location={{this.cssModeToggle.dockLocation}}
-      @css={{this.isolatedCss}}
-      @card={{@card}}
-      @updateCode={{this.updateCss}}
-    />
-  </div>
+  <EditorPane data-test-dock-location={{this.cssModeToggle.dockLocation}}
+    @css={{this.isolatedCss}}
+    @card={{@card}}
+    @updateCode={{this.updateCss}}
+  />
 {{/if}}
 
 <style data-test-themer-css>
