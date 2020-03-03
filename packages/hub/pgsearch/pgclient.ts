@@ -299,7 +299,12 @@ export default class PgClient {
       },
       // csField handler
       async (_expression, csField) => {
-        return csFieldExpressions[csField] || singular;
+        let fn = csFieldExpressions[csField];
+        if (typeof fn === 'function') {
+          return fn();
+        } else {
+          return singular;
+        }
       },
       // interior field handler
       {
@@ -464,7 +469,10 @@ export default class PgClient {
     } else if ('every' in filter) {
       return every(filter.every.map(item => this.filterCondition(typeContext, item)));
     } else if ('not' in filter) {
-      return ['NOT', ...addExplicitParens(this.filterCondition(typeContext, filter.not))];
+      return every([
+        this.typeCondition(typeContext),
+        ['NOT', ...addExplicitParens(this.filterCondition(typeContext, filter.not))],
+      ]);
     } else if ('eq' in filter) {
       return this.eqCondition(typeContext, filter);
     } else if ('range' in filter) {
@@ -507,7 +515,18 @@ export default class PgClient {
           // query and value sub-expressions. For example, for the csAdoptsFrom
           // field we actually need to filter against values that appear in the
           // adoption chain array.
-          csAdoptsFrom: ['jsonb_array_elements_text(', query, ') =', v],
+          csAdoptsFrom: () => {
+            // when the csAdoptsFrom is at the root of the path (and hence there
+            // are no child nodes in the path), then we treat this query more
+            // like the `this.typeCondition()` style query as we are filtering
+            // the enclosing cards of the result set as opposed to interior
+            // cards of the result set.
+            if (query.path.split('.').length === 1) {
+              return [query, '?| array[', v, ']'];
+            } else {
+              return ['jsonb_array_elements_text(', query, ') =', v];
+            }
+          },
         },
         'filter'
       ),

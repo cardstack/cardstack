@@ -22,7 +22,7 @@ export interface FieldArity {
   path: string;
   singular: CardExpression;
   plural: CardExpression;
-  csFieldExpressions: { [csFieldName: string]: CardExpression };
+  csFieldExpressions: { [csFieldName: string]: () => CardExpression };
   errorHint: string;
   kind: 'field-arity';
 }

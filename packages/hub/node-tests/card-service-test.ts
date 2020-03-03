@@ -2192,6 +2192,50 @@ describe('hub/card-service', function() {
         ]);
       });
 
+      it("filtering by enclosing card's csAdoptsFrom field", async function() {
+        // testing with adoption heirarchy: puppyCard -> puppyMemeCard -> puppyDankMemeCard
+        let results = await service.search({
+          filter: {
+            type: puppyCard,
+            eq: {
+              csAdoptsFrom: puppyMemeCard.canonicalURL,
+            },
+          },
+        });
+
+        expect(results.cards.length).to.equal(4);
+        let ids = results.cards.map(i => i.canonicalURL);
+        expect(ids).to.have.members([
+          puppyDankMemeCard.canonicalURL,
+          noIdea.canonicalURL,
+          cupcake.canonicalURL,
+          disappointed.canonicalURL,
+        ]);
+      });
+
+      it("inverting a filter by enclosing card's csAdoptsFrom field", async function() {
+        // testing with adoption heirarchy: puppyCard -> puppyMemeCard -> puppyDankMemeCard
+        let results = await service.search({
+          filter: {
+            type: puppyCard,
+            not: {
+              eq: {
+                csAdoptsFrom: puppyMemeCard.canonicalURL,
+              },
+            },
+          },
+        });
+
+        expect(results.cards.length).to.equal(4);
+        let ids = results.cards.map(i => i.canonicalURL);
+        expect(ids).to.have.members([
+          puppyMemeCard.canonicalURL, // because the puppy meme card doesn't adopt itself
+          vanGogh.canonicalURL,
+          ringo.canonicalURL,
+          mango.canonicalURL,
+        ]);
+      });
+
       it.skip('TODO: prefix filtering', async function() {});
       it.skip('TODO: exists filtering', async function() {});
 
