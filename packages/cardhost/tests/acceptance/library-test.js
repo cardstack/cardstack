@@ -68,7 +68,7 @@ module('Acceptance | library', function(hooks) {
     assert.dom(`[data-test-embedded-card=${card3Id}]`).exists();
     assert.dom('[data-test-library-recent-card-link]').exists({ count: 3 });
     assert.dom('[data-test-library-adopt-card-btn]').exists({ count: 6 });
-    assert.dom('[data-test-library-common-card-link]').exists({ count: 3 });
+    assert.dom('[data-test-library-common-card-button]').exists({ count: 3 });
     assert.dom('[data-test-library-new-blank-card-btn]').exists({ count: 1 });
     await percySnapshot(assert);
 
@@ -81,7 +81,7 @@ module('Acceptance | library', function(hooks) {
     assert.dom(`[data-test-embedded-card=${card3Id}]`).exists();
     assert.dom('[data-test-library-recent-card-link]').exists({ count: 3 });
     assert.dom('[data-test-library-adopt-card-btn]').exists({ count: 6 });
-    assert.dom('[data-test-library-common-card-link]').exists({ count: 3 });
+    assert.dom('[data-test-library-common-card-button]').exists({ count: 3 });
     assert.dom('[data-test-library-new-blank-card-btn]').exists({ count: 1 });
 
     await visit(`/cards/${card1Id}/edit/fields`);
@@ -92,7 +92,7 @@ module('Acceptance | library', function(hooks) {
     assert.dom(`[data-test-embedded-card=${card3Id}]`).exists();
     assert.dom('[data-test-library-recent-card-link]').exists({ count: 3 });
     assert.dom('[data-test-library-adopt-card-btn]').exists({ count: 6 });
-    assert.dom('[data-test-library-common-card-link]').exists({ count: 3 });
+    assert.dom('[data-test-library-common-card-button]').exists({ count: 3 });
     assert.dom('[data-test-library-new-blank-card-btn]').exists({ count: 1 });
 
     await visit(`/cards/${card1Id}/edit/fields/schema`);
@@ -103,7 +103,7 @@ module('Acceptance | library', function(hooks) {
     assert.dom(`[data-test-embedded-card=${card3Id}]`).exists();
     assert.dom('[data-test-library-recent-card-link]').exists({ count: 3 });
     assert.dom('[data-test-library-adopt-card-btn]').exists({ count: 6 });
-    assert.dom('[data-test-library-common-card-link]').exists({ count: 3 });
+    assert.dom('[data-test-library-common-card-button]').exists({ count: 3 });
     assert.dom('[data-test-library-new-blank-card-btn]').exists({ count: 1 });
   });
 
