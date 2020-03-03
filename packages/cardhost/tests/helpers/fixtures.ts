@@ -69,15 +69,6 @@ export default class Fixtures {
       );
     }
 
-    // skip over realm cards for now, assume those are not being manipuated by
-    // tests (we will want to revisit this later and perhaps write some more
-    // sophisticated filters that lets us perform negation in the adoption chain).
-    cardsToDestroy = cardsToDestroy.filter(
-      card =>
-        (card.relationships?.csAdoptsFrom as any)?.data?.id !==
-        canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' })
-    );
-
     for (let card of inDependencyOrder(cardsToDestroy).reverse()) {
       await deleteCard((card.attributes as unknown) as CardId, String(card.meta?.version));
     }
@@ -124,6 +115,14 @@ async function getCardsOfType(cardType: CardId): Promise<ResourceObject[]> {
   let filter = {
     filter: {
       type: cardType,
+      // skip over realm cards for now, assume those are not being manipuated by
+      // tests (we will want to revisit this later and rework our destroy to be a
+      // filter that skips over ephemeral realm cards like below)
+      not: {
+        eq: {
+          csAdoptsFrom: canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }),
+        },
+      },
     },
     page: {
       size: 1000,
