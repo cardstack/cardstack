@@ -51,7 +51,11 @@ export default class EditorPane extends Component {
 
   get maxHeight() {
     // the top edge is 80px tall. Do not allow dragging past the top edge.
-    return document.body.clientHeight - 80;
+    if (this.cssModeToggle.dockLocation === 'right') {
+      return '100%';
+    } else {
+      return document.body.clientHeight - 80;
+    }
   }
 
   get classNames() {
