@@ -5,13 +5,11 @@ import Change from './lib/change';
 import logger from '@cardstack/logger';
 const log = logger('cardstack/git/indexer');
 import service from './lib/service';
-import { set } from 'lodash';
 
 const defaultBranch = 'master';
 
 import { Indexer, IndexingOperations } from '@cardstack/core/indexer';
 import { UpstreamDocument } from '@cardstack/core/document';
-import { cardDocumentFromJsonAPI } from '@cardstack/core/card-document';
 import { AddressableCard } from '@cardstack/core/card';
 import { extractSettings } from './lib/git-settings';
 
@@ -37,34 +35,7 @@ export default class GitIndexer implements Indexer<GitMeta> {
   }
 
   async update(meta: GitMeta, ops: IndexingOperations) {
-    // let { identity, generation } = meta || {};
-    // let newGeneration = this.ephemeralStorage.currentGeneration;
-
-    // if (identity !== this.ephemeralStorage.identity) {
-    //   generation = undefined;
-    //   await ops.beginReplaceAll();
-    // }
-
-    // let entries = this.ephemeralStorage.entriesNewerThan(this.realmCard.csId, generation);
-    // for (let entry of entries) {
-    //   if (entry.doc) {
-    //     await ops.save(entry.id, entry.doc);
-    //   } else {
-    //     await ops.delete(entry.id);
-    //   }
-    // }
-
-    // if (identity !== this.ephemeralStorage.identity) {
-    //   await ops.finishReplaceAll();
-    // }
-
-    // return {
-    //   identity: this.ephemeralStorage.identity,
-    //   generation: newGeneration,
-    // };
-
-    //     async beginUpdate() {
-    log.debug(`starting beginUpdate()`);
+    log.debug(`starting update()`);
     await this._ensureRepo();
 
     let targetBranch = this.branchPrefix + defaultBranch;
@@ -72,13 +43,12 @@ export default class GitIndexer implements Indexer<GitMeta> {
     if (this.remote) {
       await service.pullRepo(this.remote.url, targetBranch);
     }
-    log.debug(`ending beginUpdate()`);
 
     let updater = new GitUpdater(this.repo!, targetBranch, this.basePath);
 
-    return await updater.updateContent(meta, ops);
-    //     }
-    //   }
+    let result = await updater.updateContent(meta, ops);
+    log.debug(`ending update()`);
+    return result;
   }
 
   async _ensureRepo() {

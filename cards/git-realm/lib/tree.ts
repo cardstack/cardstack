@@ -26,7 +26,7 @@ export default class Tree {
   private _entries: TreeEntry[];
 
   private oid?: Oid;
-  public dirty: boolean = false;
+  public dirty = false;
 
   constructor(
     private readonly repo: Repository,
