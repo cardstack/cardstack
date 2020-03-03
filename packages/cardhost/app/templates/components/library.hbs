@@ -91,24 +91,24 @@
         Common Cards
       </header>
       <div class="library-section--grid">
-        <LinkTo @route="cards.add" @class="library--card-link" data-test-library-common-card-link>
+        <Cta {{on "click" (fn this.openCardNameDialog "Create a New Card")}} class="library--card-link" data-test-library-common-card-button>
           <div class="library--card-renderer">
             <div class="library--card-placeholder icon-common-form"></div>
             <div class="library--card-label">Form</div>
           </div>
-        </LinkTo>
-        <LinkTo @route="cards.add" @class="library--card-link" data-test-library-common-card-link>
+        </Cta>
+        <Cta {{on "click" (fn this.openCardNameDialog "Create a New Card")}} class="library--card-link" data-test-library-common-card-button>
           <div class="library--card-renderer">
             <div class="library--card-placeholder icon-common-layout"></div>
             <div class="library--card-label">Layout</div>
           </div>
-        </LinkTo>
-        <LinkTo @route="cards.add" @class="library--card-link" data-test-library-common-card-link>
+        </Cta>
+        <Cta {{on "click" (fn this.openCardNameDialog "Create a New Card")}} class="library--card-link" data-test-library-common-card-button>
           <div class="library--card-renderer">
             <div class="library--card-placeholder icon-common-collection"></div>
             <div class="library--card-label">Collection</div>
           </div>
-        </LinkTo>
+        </Cta>
       </div>
     </section>
 
