@@ -14,6 +14,9 @@
 
 .cardhost-cards.schema {
   background-color: var(--ch-deep-background);
+  background-image: url('/assets/images/grid-tile.png');
+  background-repeat: repeat;
+  background-size: 55px;
 }
 
 .cardhost-cards.themer {
