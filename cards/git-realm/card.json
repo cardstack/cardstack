@@ -1,0 +1,23 @@
+{
+  "data": {
+    "type": "cards",
+    "attributes": {
+      "csFeatures": {
+        "writer": "writer.js",
+        "indexer": "indexer.js"
+      },
+      "csFields": {
+        "repo": {
+          "relationships": {
+            "csAdoptsFrom": {
+              "data": {
+                "type": "cards",
+                "id": "https://base.cardstack.com/public/cards/string-field"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

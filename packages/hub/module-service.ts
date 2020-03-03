@@ -20,10 +20,17 @@ export class ModuleService implements ModuleLoader {
   async load(card: Card, localModulePath: string, exportedName = 'default'): Promise<any> {
     // using md5 because this is just for cache validation, not cryptographic
     // collision resistance
-    let hash = createHash('md5');
-    hash.update(stringify(await toIdempotentDoc(card)));
-    let cardDir = join(cardFilesCache, hash.digest('hex'));
-    await this.cachedWriteCard(card, cardDir);
+
+    let cardDir;
+
+    if (card.cardDir) {
+      cardDir = card.cardDir;
+    } else {
+      let hash = createHash('md5');
+      hash.update(stringify(await toIdempotentDoc(card)));
+      cardDir = join(cardFilesCache, hash.digest('hex'));
+      await this.cachedWriteCard(card, cardDir);
+    }
     // @ts-ignore
     let module = await import(join(cardDir, localModulePath)); // we are using ESM for module loading
     return module[exportedName];

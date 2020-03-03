@@ -95,7 +95,9 @@ export class Card {
   // value for the field).
   readonly sourceCard: Card | undefined;
 
-  private readonly attributes: SingleResourceDoc['data']['attributes'];
+  // TODO: should this remain private? I needed to access the attributes in the
+  // git writer but it was private before
+  readonly attributes: SingleResourceDoc['data']['attributes'];
   private readonly relationships: SingleResourceDoc['data']['relationships'];
   readonly meta: SingleResourceDoc['data']['meta'];
 
@@ -247,6 +249,10 @@ export class Card {
       jsonapi.data.meta = this.meta;
     }
     return cardDocumentFromJsonAPI(jsonapi);
+  }
+
+  get cardDir(): string | undefined {
+    return this.meta && (this.meta.cardDir as string);
   }
 
   async validate(priorCard: Card | null, realm: AddressableCard, _forDeletion?: true) {

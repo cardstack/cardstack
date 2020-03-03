@@ -212,6 +212,9 @@ export class ScopedCardService implements CardReader, CardInstantiator {
     merge(json, {
       data: {
         attributes: {},
+        meta: {
+          cardDir,
+        },
       },
     });
 
