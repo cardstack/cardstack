@@ -169,4 +169,4 @@ jobs:
         yarn --cwd ./packages/cardhost/deploy install
         cd ./packages/cardhost
         node ./deploy/build.js
-        TARGET_NAME="builder.card.space" ./deploy/deploy.sh demo github-deploy
+        TARGET_NAME="builder.card.space" ./deploy/deploy.sh production github-deploy
