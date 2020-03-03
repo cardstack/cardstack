@@ -9,7 +9,7 @@
     "test": "mocha ../test-support/bin/run.js"
   },
   "dependencies": {
-    "@cardstack/di": "0.16.23",
+    "@cardstack/di": "0.16.32",
     "@cardstack/logger": "^0.2.0",
     "delay": "^4.1.0",
     "fast-json-stable-stringify": "^2.1.0",
@@ -28,8 +28,8 @@
     "@cardstack/hub": "*"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.16.23",
-    "@cardstack/test-support": "0.16.23",
+    "@cardstack/eslint-config": "0.16.32",
+    "@cardstack/test-support": "0.16.32",
     "sinon": "7.2.3"
   },
   "engines": {
