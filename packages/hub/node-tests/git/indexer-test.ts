@@ -123,13 +123,6 @@
 //     await destroyDefaultEnvironment(env);
 //   });
 
-//   it('processes first empty branch', async function() {
-//     let { head } = await makeRepo(root);
-//     await start();
-//     let indexerState = await client.loadMeta({ branch: 'master', id: dataSource.id });
-//     expect(indexerState.commit).to.equal(head);
-//   });
-
 //   it('indexes newly added document', async function() {
 //     let { repo, head } = await makeRepo(root);
 

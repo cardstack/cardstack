@@ -7,8 +7,12 @@ import { Session } from '@cardstack/core/session';
 // import { wireItUp } from '../../main';
 import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import Change from '../../../../cards/git-realm/lib/change';
+import { commitOpts, makeRepo } from './support';
 
-import { makeRepo } from './support';
+function idToCanonicalUrl(id: string) {
+  return `${myOrigin}/api/realms/test-git-repo/cards/${id}`;
+}
 
 describe('hub/git/indexing', function() {
   let env: TestEnv, indexing: IndexingService, cards: CardsService, service: ScopedCardService;
@@ -39,12 +43,37 @@ describe('hub/git/indexing', function() {
   it('processes first empty branch', async function() {
     let { head } = await makeRepo(root);
 
-    console.log('about to update');
     await indexing.update();
 
     let indexerState = await indexing.loadMeta(repoRealm);
-    debugger;
     expect(indexerState!.commit).to.equal(head);
+  });
+
+  it('indexes newly added document', async function() {
+    let { repo, head } = await makeRepo(root);
+
+    await indexing.update();
+
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get('contents/articles/hello-world.json', { allowCreate: true });
+    file.setContent(
+      JSON.stringify(
+        cardDocument()
+          .withField('title', 'string-field')
+          .withAttributes({ title: 'hello world' }).jsonapi
+      )
+    );
+    head = await change.finalize(commitOpts());
+
+    await indexing.update();
+
+    let indexerState = await indexing.loadMeta(repoRealm);
+
+    expect(indexerState!.commit).to.equal(head);
+
+    let foundCard = await service.get(idToCanonicalUrl('hello-world'));
+
+    expect(foundCard.attributes!.title).to.equal('hello world');
   });
 
   // it('it can index a realm', async function() {

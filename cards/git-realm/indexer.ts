@@ -2,19 +2,16 @@ import { Repository, Commit, RemoteConfig, RepoNotFound } from './lib/git';
 import Tree, { TreeEntry } from './lib/tree';
 
 import Change from './lib/change';
-// import logger from '@cardstack/logger';
-// const log = logger('cardstack/git/indexer');
-const log = {
-  debug: console.log.bind(console),
-  info: console.log.bind(console),
-  warn: console.log.bind(console),
-};
+import logger from '@cardstack/logger';
+const log = logger('cardstack/git/indexer');
 import service from './lib/service';
 import { set } from 'lodash';
 
 const defaultBranch = 'master';
 
 import { Indexer, IndexingOperations } from '@cardstack/core/indexer';
+import { UpstreamDocument } from '@cardstack/core/document';
+import { cardDocumentFromJsonAPI } from '@cardstack/core/card-document';
 import { AddressableCard } from '@cardstack/core/card';
 import { extractSettings } from './lib/git-settings';
 
@@ -67,7 +64,6 @@ export default class GitIndexer implements Indexer<GitMeta> {
     // };
 
     //     async beginUpdate() {
-    console.log('here i am');
     log.debug(`starting beginUpdate()`);
     await this._ensureRepo();
 
@@ -216,11 +212,10 @@ class GitUpdater {
         nextFilter(filter)
       );
     } else if (/\.json$/i.test(newEntry.path())) {
-      let { type, id } = identify(newEntry);
-      let doc = await this._entryToDoc(type, id, newEntry);
+      let { id } = identify(newEntry);
+      let doc = await this._entryToDoc(newEntry);
       if (doc) {
-        throw new Error('HERE!');
-        // await ops.save(id, { data: doc });
+        await ops.save(id, doc);
       }
     }
   }
@@ -234,7 +229,7 @@ class GitUpdater {
     }
   }
 
-  async _entryToDoc(type: string, id: string, entry: TreeEntry) {
+  async _entryToDoc(entry: TreeEntry): Promise<UpstreamDocument | undefined> {
     entry.isBlob();
     let contents = (await entry.getBlob()).content().toString('utf8');
     let doc;
@@ -244,23 +239,7 @@ class GitUpdater {
       log.warn('Ignoring record with invalid json at %s', entry.path());
       return;
     }
-
-    // A note on the cardstack meta versioning protocol:
-    //
-    // meta.version is a point-in-time version indicator. If you
-    // change and then undo, you should end up at a different
-    // version than where you started. In the git data-source,
-    // meta.version is the ID of a commit.
-    //
-    // meta.hash is a content hash. If you change and then undo, you
-    // should end up back at the original meta.hash. In this git
-    // data-source, this is ID of a blob.
-    doc.type = type;
-    doc.id = id;
-    set(doc, 'meta.version', this.commitId);
-    set(doc, 'meta.hash', entry.id()!.sha);
-
-    return doc;
+    return new UpstreamDocument(doc);
   }
 }
 
