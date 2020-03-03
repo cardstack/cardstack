@@ -19,7 +19,7 @@
   z-index: 10;
 }
 .cardhost-top-edge.schema {
-  background-color: var(--ch-deep-background);
+  background-color: transparent;
 }
 .cardhost-top-edge.themer {
   background-color: var(--ch-dark-background);
