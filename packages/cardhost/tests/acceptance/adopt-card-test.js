@@ -24,7 +24,7 @@ import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 const childName = 'vangogh-work-address';
 const grandChildName = 'mango-work-address';
-const csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
+const csRealm = `${myOrigin}/api/realms/default`;
 const parentCard = cardDocument()
   .withAttributes({
     csRealm,
@@ -120,12 +120,7 @@ module('Acceptance | card adoption', function(hooks) {
     await waitForLibraryServiceToIdle();
     await waitForCardLoad(parentCard.canonicalURL);
 
-    assert.deepEqual(
-      [
-        ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
-      ].map(i => i.getAttribute('data-test-card-renderer-embedded')),
-      [entry.canonicalURL, parentCard.canonicalURL]
-    );
+    let cardCount = [...document.querySelectorAll(`[data-test-library-recent-card-link]`)].length;
 
     await click('[data-test-library-adopt-card-btn]');
     await setCardName(childName);
@@ -137,11 +132,17 @@ module('Acceptance | card adoption', function(hooks) {
     await waitForCardLoad(decodeURIComponent(childId));
     assert.equal(currentURL(), `/cards/${childId}/edit/fields`);
 
-    assert.deepEqual(
-      [
-        ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
-      ].map(i => i.getAttribute('data-test-card-renderer-embedded')),
-      [decodeURIComponent(childId), entry.canonicalURL, parentCard.canonicalURL]
+    assert.equal(
+      [...document.querySelectorAll(`[data-test-library-recent-card-link]`)].length,
+      cardCount + 1,
+      'a card was added to the library'
+    );
+    assert.equal(
+      [...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`)]
+        .map(i => i.getAttribute('data-test-card-renderer-embedded'))
+        .includes(decodeURIComponent(childId)),
+      true,
+      'the newly created card appears in the library'
     );
   });
 

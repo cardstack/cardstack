@@ -15,7 +15,7 @@ import { myOrigin } from '@cardstack/core/origin';
 import a11yAudit from 'ember-a11y-testing/test-support/audit';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
-const csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
+const csRealm = `${myOrigin}/api/realms/default`;
 const testCard = cardDocument()
   .withAttributes({
     csRealm,

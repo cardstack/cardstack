@@ -8,6 +8,7 @@ import flatten from 'lodash/flatten';
 import uniq from 'lodash/uniq';
 import { CollectionResourceDoc, ResourceObject, SingleResourceDoc, ResourceIdentifierObject } from 'jsonapi-typescript';
 import isPlainObject from 'lodash/isPlainObject';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 const hubURL = 'http://localhost:3000';
 
@@ -67,6 +68,16 @@ export default class Fixtures {
         flatten(await Promise.all(this.config.destroy!.cardTypes.map(getCardsOfType)))
       );
     }
+
+    // skip over realm cards for now, assume those are not being manipuated by
+    // tests (we will want to revisit this later and perhaps write some more
+    // sophisticated filters that lets us perform negation in the adoption chain).
+    cardsToDestroy = cardsToDestroy.filter(
+      card =>
+        (card.relationships?.csAdoptsFrom as any)?.data?.id !==
+        canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' })
+    );
+
     for (let card of inDependencyOrder(cardsToDestroy).reverse()) {
       await deleteCard((card.attributes as unknown) as CardId, String(card.meta?.version));
     }

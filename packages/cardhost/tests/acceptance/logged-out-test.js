@@ -17,7 +17,7 @@ import { myOrigin } from '@cardstack/core/origin';
 import { animationsSettled } from 'ember-animated/test-support';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
-const csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
+const csRealm = `${myOrigin}/api/realms/default`;
 const testCard = cardDocument().withAutoAttributes({
   csRealm,
   csId: 'millenial-puppies',

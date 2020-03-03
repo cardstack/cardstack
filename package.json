@@ -41,7 +41,7 @@
     "compile": "tsc",
     "prepare": "npm run compile",
     "test": "npm run lint:deps && npm run lint:js && npm run node-tests && npm run ember-tests",
-    "node-tests": "mocha ./packages/test-support/bin/run.js --timeout 20000",
+    "node-tests": "mocha ./packages/test-support/bin/run.js --timeout 60000",
     "lint:deps": "node scripts/find-bad-deps.js",
     "lint:js": "eslint . --cache --ignore-path .gitignore --ext=js,ts && cd packages/cardhost && ../../node_modules/.bin/ember-template-lint ember-template-lint .",
     "lint:hbs": "cd packages/cardhost && ../../node_modules/.bin/ember-template-lint ember-template-lint .",

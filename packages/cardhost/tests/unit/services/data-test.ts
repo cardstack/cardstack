@@ -9,7 +9,7 @@ import { Card, AddressableCard } from '@cardstack/core/card';
 import { canonicalURL } from '@cardstack/core/card-id';
 import { ResourceIdentifierObject, RelationshipsWithData } from 'jsonapi-typescript';
 
-const csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
+const csRealm = `${myOrigin}/api/realms/default`;
 
 module('Unit | Service | data', function() {
   module('non-mutating tests', function(hooks) {

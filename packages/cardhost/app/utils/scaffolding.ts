@@ -20,7 +20,7 @@ export async function fieldCards(data: DataService): Promise<AddressableCard[]> 
 }
 
 export function getUserRealm() {
-  return `${myOrigin}/api/realms/first-ephemeral-realm`;
+  return `${myOrigin}/api/realms/default`;
 }
 
 export async function loadModule(card: Card, localModulePath: string, exportedName = 'default') {

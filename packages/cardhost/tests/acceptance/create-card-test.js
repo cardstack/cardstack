@@ -120,12 +120,7 @@ module('Acceptance | card create', function(hooks) {
     await click('[data-test-library-button]');
     await waitForLibraryServiceToIdle();
 
-    assert.deepEqual(
-      [
-        ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
-      ].map(i => i.getAttribute('data-test-card-renderer-embedded')),
-      []
-    );
+    let cardCount = [...document.querySelectorAll(`[data-test-library-recent-card-link]`)].length;
 
     await click('[data-test-library-new-blank-card-btn]');
     await setCardName(card1Name);
@@ -148,11 +143,17 @@ module('Acceptance | card create', function(hooks) {
     await waitForCardLoad(decodeURIComponent(cardId));
     assert.equal(currentURL(), `/cards/${cardId}/edit/fields/schema`);
 
-    assert.deepEqual(
-      [
-        ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
-      ].map(i => i.getAttribute('data-test-card-renderer-embedded')),
-      [decodeURIComponent(cardId)]
+    assert.equal(
+      [...document.querySelectorAll(`[data-test-library-recent-card-link]`)].length,
+      cardCount + 1,
+      'a card was added to the library'
+    );
+    assert.equal(
+      [...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`)]
+        .map(i => i.getAttribute('data-test-card-renderer-embedded'))
+        .includes(decodeURIComponent(cardId)),
+      true,
+      'the newly created card appears in the library'
     );
   });
 
