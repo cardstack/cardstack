@@ -1,37 +1,41 @@
-<ReSizable
-  ...attributes
-  class="cardhost-card-theme-editor"
-  @width={{this.width}}
-  @directions={{this.directions}}
-  @height={{this.height}}
-  @classNames={{this.classNames}}
->
-  <div class="resizable-content">
-    <div class="editor-section" aria-label={{this.monacoKeyboardInstructions}}>
-      <CodeEditor
-        @title="CSS"
-        @code={{@model.isolatedCss}}
-        @language="css"
-        @readOnly={{false}}
-        @resizable={{true}}
-        @updateCode={{@updateCode}}
-        class="editor-pane--container-highlighted"
-      />
-    </div>
+<div class="themer-editor-pane" data-test-editor-pane>
+  <ReSizable
+    ...attributes
+    class="cardhost-card-theme-editor"
+    @width={{this.width}}
+    @directions={{this.directions}}
+    @height={{this.height}}
+    @classNames={{this.classNames}}
+    @maxWidth={{this.maxWidth}}
+    @maxHeight={{this.maxHeight}}
+  >
+    <div class="resizable-content">
+      <div class="editor-section" aria-label={{this.monacoKeyboardInstructions}}>
+        <CodeEditor
+          @title="CSS"
+          @code={{@model.isolatedCss}}
+          @language="css"
+          @readOnly={{false}}
+          @resizable={{true}}
+          @updateCode={{@updateCode}}
+          class="editor-pane--container-highlighted"
+        />
+      </div>
 
-    <div class="editor-section">
-      <CodeEditor
-        @title="HTML"
-        @code={{this.markup}}
-        @language="handlebars"
-        @readOnly={{true}}
-        @resizable={{true}} 
-      />
+      <div class="editor-section">
+        <CodeEditor
+          @title="HTML"
+          @code={{this.markup}}
+          @language="handlebars"
+          @readOnly={{true}}
+          @resizable={{true}} 
+        />
+      </div>
+      {{svg-jar "icon-grabber" class="drag-handle"}}
     </div>
-    {{svg-jar "icon-grabber" class="drag-handle"}}
-  </div>
-</ReSizable>
+  </ReSizable>
 
-<style data-test-preview-css>
-  {{scope-css @model.isolatedCss @model.name}}
-</style>
+  <style data-test-preview-css>
+    {{scope-css @model.isolatedCss @model.name}}
+  </style>
+</div>

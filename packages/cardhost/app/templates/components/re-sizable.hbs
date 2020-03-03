@@ -3,9 +3,8 @@
   ...attributes
   id={{this.elementId}}
   style={{this.style}}
-  {{did-insert this.setElement}}
   {{did-insert this.setStyle @width @height}}
-  {{did-update this.setStyle @width @height}}
+  {{did-update this.setStyle @width @height @directions}}
   >
 
   {{#each this.directions as |dir|}}
