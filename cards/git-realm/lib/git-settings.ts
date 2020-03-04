@@ -24,8 +24,8 @@ export function extractSettings(realmCard: AddressableCard): IndexerSettings {
     throw new CardstackError('You must provide a repo attribute when instantiating the git realm card');
   }
 
-  let branchPrefix = (attributes.branch ?? '') as string;
-  let basePath = (attributes.basePath as string) ?? undefined;
+  let branchPrefix = await realmCard.value('branch');
+  let basePath = await realmCard.value('basePath');
 
   // TODO: handle remote config
   // if (typeof attributes.remote == 'object' && attributes.remote.url && attributes.remote.cacheDir) {
