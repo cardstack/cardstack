@@ -103,8 +103,19 @@ async function setupRealms(container: Container) {
   const metaRealm = `${myOrigin}/api/realms/meta`;
 
   let hasMetaRealm;
+  let metaRealmCard = cardDocument()
+    .withAttributes({
+      csRealm: metaRealm,
+      csId: metaRealm,
+      csTitle: `Meta Realm`,
+      csDescription: `This card controls the configuration of the meta realm which is the realm that holds all of your realm cards.`,
+    })
+    // TODO right now this is hard coded to the ephemeral-realm. Once the git
+    // realm is ready we should use that instead (or alternatively the file
+    // realm), when the hub environment is not in test mode.
+    .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi;
   try {
-    await cards.get({ csRealm: metaRealm, csId: metaRealm });
+    await cards.get({ csRealm: metaRealm, csId: metaRealm }, metaRealmCard);
     hasMetaRealm = true;
   } catch (e) {
     if (e.status !== 404) {
@@ -115,20 +126,7 @@ async function setupRealms(container: Container) {
 
   if (!hasMetaRealm) {
     log.info(`Creating ephemeral-based meta realm.`);
-    await cards.create(
-      metaRealm,
-      cardDocument()
-        .withAttributes({
-          csRealm: metaRealm,
-          csId: metaRealm,
-          csTitle: `Meta Realm`,
-          csDescription: `This card controls the configuration of the meta realm which is the realm that holds all of your realm cards.`,
-        })
-        // TODO right now this is hard coded to the ephemeral-realm. Once the git
-        // realm is ready we should use that instead (or alternatively the file
-        // realm), when the hub environment is not in test mode.
-        .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi
-    );
+    await cards.create(metaRealm, metaRealmCard);
   }
 
   let hasDefaultRealm;
