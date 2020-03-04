@@ -226,6 +226,9 @@ function identify(entry: TreeEntry) {
     let filename = parts[parts.length - 1];
     id = filename.replace(/\.json$/, '');
   }
+
+  id = decodeURIComponent(id);
+
   return { type, id };
 }
 

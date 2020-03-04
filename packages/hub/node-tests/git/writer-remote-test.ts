@@ -143,10 +143,7 @@ describe('hub/git/writer with remote', function() {
       let cardInRepo = await service.create(repoRealm, cardDoc.jsonapi);
 
       await repo.fetchAll();
-      let saved = await inRepo(tempRemoteRepoPath).getJSONContents(
-        'origin/master',
-        `contents/cards/${cardInRepo.csId}.json`
-      );
+      let saved = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `cards/${cardInRepo.csId}.json`);
       expect(saved.data.attributes.title).to.equal('Second Article');
     });
   });

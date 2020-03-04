@@ -55,7 +55,7 @@ describe('hub/git/indexing', function() {
     await indexing.update();
 
     let change = await Change.create(repo, head, 'master');
-    let file = await change.get('contents/articles/hello-world.json', { allowCreate: true });
+    let file = await change.get('cards/hello-world.json', { allowCreate: true });
     file.setContent(
       JSON.stringify(
         cardDocument()
@@ -72,6 +72,33 @@ describe('hub/git/indexing', function() {
     expect(indexerState!.commit).to.equal(head);
 
     let foundCard = await service.get(idToCanonicalUrl('hello-world'));
+
+    expect(await foundCard.value('title')).to.equal('hello world');
+  });
+
+  it('indexes a url-encoded id card', async function() {
+    let { repo, head } = await makeRepo(root);
+
+    await indexing.update();
+
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get('cards/foo%2Fbar%2Fbaz.json', { allowCreate: true });
+    file.setContent(
+      JSON.stringify(
+        cardDocument()
+          .withField('title', 'string-field')
+          .withAttributes({ title: 'hello world' }).jsonapi
+      )
+    );
+    head = await change.finalize(commitOpts());
+
+    await indexing.update();
+
+    let indexerState = await indexing.loadMeta(repoRealm);
+
+    expect(indexerState!.commit).to.equal(head);
+
+    let foundCard = await service.get(idToCanonicalUrl('foo%2Fbar%2Fbaz'));
 
     expect(await foundCard.value('title')).to.equal('hello world');
   });
