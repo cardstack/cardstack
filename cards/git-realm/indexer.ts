@@ -20,14 +20,16 @@ interface GitMeta {
 type PathSpec = string | string[];
 
 export default class GitIndexer implements Indexer<GitMeta> {
-  repoPath: string;
-  basePath: PathSpec[];
-  branchPrefix: string;
+  repoPath = '';
+  basePath: PathSpec[] = [];
+  branchPrefix = '';
   remote?: RemoteConfig;
   repo?: Repository;
 
-  constructor(realmCard: AddressableCard) {
-    let settings = extractSettings(realmCard);
+  constructor(private realmCard: AddressableCard) {}
+
+  async ready(): Promise<void> {
+    let settings = await extractSettings(this.realmCard);
     this.repoPath = settings.repo;
     this.basePath = settings.basePath ? settings.basePath.split('/') : [];
     this.branchPrefix = settings.branchPrefix;

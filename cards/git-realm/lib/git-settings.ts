@@ -9,23 +9,15 @@ import { RemoteConfig } from './git';
 import CardstackError from '@cardstack/core/error';
 import { AddressableCard } from '@cardstack/core/card';
 
-export function extractSettings(realmCard: AddressableCard): IndexerSettings {
-  let attributes = realmCard.attributes;
+export async function extractSettings(realmCard: AddressableCard): Promise<IndexerSettings> {
+  let repo = await realmCard.value('repo');
 
-  if (!attributes) {
-    throw new CardstackError('You must provide attributes to configure the git realm card');
-  }
-
-  let repo;
-
-  if (typeof attributes.repo == 'string') {
-    repo = await realmCard.value('repo');
-  } else {
+  if (typeof repo != 'string') {
     throw new CardstackError('You must provide a repo attribute when instantiating the git realm card');
   }
 
-  let branchPrefix = await realmCard.value('branch');
-  let basePath = await realmCard.value('basePath');
+  let branchPrefix = (await realmCard.value('branch')) ?? '';
+  let basePath = (await realmCard.value('basePath')) ?? undefined;
 
   // TODO: handle remote config
   // if (typeof attributes.remote == 'object' && attributes.remote.url && attributes.remote.cacheDir) {

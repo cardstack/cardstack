@@ -59,12 +59,10 @@ import stringify from 'fast-json-stable-stringify';
 
 const defaultBranch = 'master';
 
-function getType(document: UpstreamDocument) {
-  return `cards`;
-}
+const type = 'cards';
 
 function getId(document: UpstreamDocument) {
-  return document.canonicalURL;
+  return document.jsonapi.data.id;
 }
 
 // function getMeta(model: todo) {
@@ -84,10 +82,10 @@ export default class GitWriter implements Writer {
   myEmail: string;
   myName: string;
   remote?: RemoteConfig;
-  repoPath: string;
+  repoPath = '';
   basePath?: string;
   repo?: Repository;
-  branchPrefix: string;
+  branchPrefix = '';
   githereumConfig: todo;
   githereum: todo;
   _githereumPromise?: Promise<todo>;
@@ -96,8 +94,10 @@ export default class GitWriter implements Writer {
     let hostname = os.hostname();
     this.myName = `PID${process.pid} on ${hostname}`;
     this.myEmail = `${os.userInfo().username}@${hostname}`;
+  }
 
-    let settings = extractSettings(realmCard);
+  async ready(): Promise<void> {
+    let settings = await extractSettings(this.realmCard);
     this.repoPath = settings.repo;
     this.basePath = settings.basePath;
     this.branchPrefix = settings.branchPrefix;
@@ -112,7 +112,6 @@ export default class GitWriter implements Writer {
       id = upstreamIdToString(createId);
     }
 
-    let type = getType(document);
     // let cardId: UpstreamIdentity | undefined;
     // if (id) {
     //   cardId = upstreamIdToCardId(id, this.realmCard.csId).csId;
@@ -186,8 +185,6 @@ export default class GitWriter implements Writer {
         source: { pointer: '/data/meta/version' },
       });
     }
-
-    let type = getType(document);
 
     // return this.ephemeralStorage.store(doc, id, this.realmCard.csId, String(version))!;
     // }

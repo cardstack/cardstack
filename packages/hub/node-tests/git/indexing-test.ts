@@ -73,7 +73,7 @@ describe('hub/git/indexing', function() {
 
     let foundCard = await service.get(idToCanonicalUrl('hello-world'));
 
-    expect(foundCard.attributes!.title).to.equal('hello world');
+    expect(await foundCard.value('title')).to.equal('hello world');
   });
 
   // it('it can index a realm', async function() {

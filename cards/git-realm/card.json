@@ -16,6 +16,26 @@
               }
             }
           }
+        },
+        "branch": {
+          "relationships": {
+            "csAdoptsFrom": {
+              "data": {
+                "type": "cards",
+                "id": "https://base.cardstack.com/public/cards/string-field"
+              }
+            }
+          }
+        },
+        "basePath": {
+          "relationships": {
+            "csAdoptsFrom": {
+              "data": {
+                "type": "cards",
+                "id": "https://base.cardstack.com/public/cards/string-field"
+              }
+            }
+          }
         }
       }
     }
