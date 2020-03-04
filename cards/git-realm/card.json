@@ -36,6 +36,26 @@
               }
             }
           }
+        },
+        "remoteUrl": {
+          "relationships": {
+            "csAdoptsFrom": {
+              "data": {
+                "type": "cards",
+                "id": "https://base.cardstack.com/public/cards/string-field"
+              }
+            }
+          }
+        },
+        "remoteCacheDir": {
+          "relationships": {
+            "csAdoptsFrom": {
+              "data": {
+                "type": "cards",
+                "id": "https://base.cardstack.com/public/cards/string-field"
+              }
+            }
+          }
         }
       }
     }

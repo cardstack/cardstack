@@ -82,7 +82,7 @@ export default class GitWriter implements Writer {
   myEmail: string;
   myName: string;
   remote?: RemoteConfig;
-  repoPath = '';
+  repoPath?: string;
   basePath?: string;
   repo?: Repository;
   branchPrefix = '';
@@ -298,7 +298,7 @@ export default class GitWriter implements Writer {
         return;
       }
 
-      this.repo = await Repository.open(this.repoPath);
+      this.repo = await Repository.open(this.repoPath!);
     }
   }
 

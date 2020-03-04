@@ -16,7 +16,6 @@ import { makeRepo, inRepo } from './support';
 import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';
 
 describe('hub/git/writer', function() {
-  // let env: todo, writers: todo, cardServices: todo, repoPath: string, head: string;
   this.timeout(10000);
   let env: TestEnv;
   let service: ScopedCardService;

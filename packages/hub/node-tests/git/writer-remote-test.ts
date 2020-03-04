@@ -1,4 +1,11 @@
-// import { Repository, Remote } from '../git';
+import { Repository, Remote } from '../../../../cards/git-realm/lib/git';
+import GitService from '../../../../cards/git-realm/lib/service';
+import { TestEnv, createTestEnv } from '../helpers';
+import { cardDocument, CardDocument } from '@cardstack/core/card-document';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { myOrigin } from '@cardstack/core/origin';
+import { ScopedCardService } from '../../cards-service';
+import { Session } from '@cardstack/core/session';
 
 // const { createDefaultEnvironment, destroyDefaultEnvironment } = require('@cardstack/test-support/env'); // eslint-disable-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 
@@ -19,342 +26,358 @@
 // const mkdir = promisify(temp.mkdir);
 
 // import { fake, replace } from 'sinon';
+import { makeRepo, inRepo } from './support';
+import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';
 
-// async function resetRemote() {
-//   let root = await temp.mkdir('cardstack-server-test');
+const repoRealm = `${myOrigin}/api/realms/test-git-repo`;
 
-//   let tempRepo = await makeRepo(root, {
-//     'contents/events/event-1.json': JSON.stringify(
-//       {
-//         attributes: {
-//           title: 'This is a test event',
-//           'published-date': '2018-09-25',
-//         },
-//       },
-//       null,
-//       2
-//     ),
-//     'contents/events/event-2.json': JSON.stringify(
-//       {
-//         attributes: {
-//           title: 'This is another test event',
-//           'published-date': '2018-10-25',
-//         },
-//       },
-//       null,
-//       2
-//     ),
-//   });
+async function resetRemote() {
+  let tmpDir = await mkTmpDir({ unsafeCleanup: true });
+  let root = tmpDir.path;
 
-//   let remote = await Remote.create(tempRepo.repo, 'origin', 'http://root:password@localhost:8838/git/repo');
-//   await remote.push('refs/heads/master', 'refs/heads/master', { force: true });
-//   return tempRepo;
-// }
+  let tempRepo = await makeRepo(root, {
+    'contents/events/event-1.json': JSON.stringify(
+      {
+        attributes: {
+          title: 'This is a test event',
+          'published-date': '2018-09-25',
+        },
+      },
+      null,
+      2
+    ),
+    'contents/events/event-2.json': JSON.stringify(
+      {
+        attributes: {
+          title: 'This is another test event',
+          'published-date': '2018-10-25',
+        },
+      },
+      null,
+      2
+    ),
+  });
 
-// describe('git/writer with remote', function() {
-//   let env: todo,
-//     writers: todo,
-//     repo: Repository,
-//     tempRepoPath,
-//     tempRemoteRepoPath: string,
-//     head: string,
-//     remoteRepo: Repository;
+  let remote = await Remote.create(tempRepo.repo, 'origin', 'http://root:password@localhost:8838/git/repo');
+  await remote.push('refs/heads/master', 'refs/heads/master', { force: true });
+  return tempRepo;
+}
 
-//   this.timeout(10000);
+describe('hub/git/writer with remote', function() {
+  let env: TestEnv,
+    repo: Repository,
+    tempRepoDir: DirectoryResult,
+    tempRemoteRepoDir: DirectoryResult,
+    tempRepoPath: string,
+    tempRemoteRepoPath: string,
+    // head: string,
+    // remoteRepo: Repository,
+    service: ScopedCardService,
+    repoDoc: CardDocument;
 
-//   beforeEach(async function() {
-//     let tempRepo = await resetRemote();
+  this.timeout(10000);
 
-//     head = tempRepo.head;
-//     remoteRepo = tempRepo.repo;
+  beforeEach(async function() {
+    env = await createTestEnv();
+    service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
+    // let tempRepo = await resetRemote();
+    await resetRemote();
 
-//     let factory = new JSONAPIFactory();
+    // head = tempRepo.head;
+    // remoteRepo = tempRepo.repo;
 
-//     tempRepoPath = await mkdir('cardstack-temp-test-repo');
-//     tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
+    // let factory = new JSONAPIFactory();
 
-//     repo = await Repository.clone('http://root:password@localhost:8838/git/repo', tempRemoteRepoPath);
+    tempRepoDir = await mkTmpDir({ unsafeCleanup: true });
+    tempRemoteRepoDir = await mkTmpDir({ unsafeCleanup: true });
+    tempRepoPath = tempRepoDir.path;
+    tempRemoteRepoPath = tempRemoteRepoDir.path;
 
-//     let dataSource = factory.addResource('data-sources').withAttributes({
-//       'source-type': '@cardstack/git',
-//       params: {
-//         remote: {
-//           url: 'http://root:password@localhost:8838/git/repo',
-//           cacheDir: tempRepoPath,
-//         },
-//       },
-//     });
+    repo = await Repository.clone('http://root:password@localhost:8838/git/repo', tempRemoteRepoPath);
 
-//     factory
-//       .addResource('content-types', 'events')
-//       .withRelated('fields', [
-//         factory.addResource('fields', 'title').withAttributes({ fieldType: '@cardstack/core-types::string' }),
-//         factory.addResource('fields', 'published-date').withAttributes({ fieldType: '@cardstack/core-types::string' }),
-//       ])
-//       .withRelated('data-source', dataSource);
+    repoDoc = cardDocument()
+      .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'git-realm' })
+      .withAttributes({
+        remoteUrl: 'http://root:password@localhost:8838/git/repo',
+        remoteCacheDir: tempRepoPath,
+        csId: repoRealm,
+      });
 
-//     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
-//     writers = env.lookup('hub:writers');
-//   });
+    await service.create(`${myOrigin}/api/realms/meta`, repoDoc.jsonapi);
 
-//   afterEach(async function() {
-//     await temp.cleanup();
-//     await destroyDefaultEnvironment(env);
-//     service.clearCache();
-//   });
+    // let dataSource = factory.addResource('data-sources').withAttributes({
+    //   'source-type': '@cardstack/git',
+    //   params: {
+    //     remote: {
+    //       url: '',
+    //       cacheDir: tempRepoPath,
+    //     },
+    //   },
+    // });
 
-//   describe('create', function() {
-//     it('saves attributes', async function() {
-//       let { data: record } = await writers.create(env.session, 'events', {
-//         data: {
-//           type: 'events',
-//           attributes: {
-//             title: 'Second Event',
-//             'published-date': '2018-09-01',
-//           },
-//         },
-//       });
-//       await repo.fetchAll();
-//       let saved = await inRepo(tempRemoteRepoPath).getJSONContents(
-//         'origin/master',
-//         `contents/events/${record.id}.json`
-//       );
-//       expect(saved).to.deep.equal({
-//         attributes: {
-//           title: 'Second Event',
-//           'published-date': '2018-09-01',
-//         },
-//       });
-//     });
-//   });
+    // factory
+    //   .addResource('content-types', 'events')
+    //   .withRelated('fields', [
+    //     factory.addResource('fields', 'title').withAttributes({ fieldType: '@cardstack/core-types::string' }),
+    //     factory.addResource('fields', 'published-date').withAttributes({ fieldType: '@cardstack/core-types::string' }),
+    //   ])
+    //   .withRelated('data-source', dataSource);
 
-//   describe('update', function() {
-//     it('returns updated document', async function() {
-//       let { data: record } = await writers.update(env.session, 'events', 'event-1', {
-//         data: {
-//           id: 'event-1',
-//           type: 'events',
-//           attributes: {
-//             title: 'Updated title',
-//           },
-//           meta: {
-//             version: head,
-//           },
-//         },
-//       });
-//       expect(record).has.deep.property('attributes.title', 'Updated title');
-//       expect(record)
-//         .has.deep.property('meta.version')
-//         .not.equal(head);
+    // env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+    // writers = env.lookup('hub:writers');
+  });
 
-//       await repo.fetchAll();
-//       let updated = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/event-1.json`);
+  afterEach(async function() {
+    await tempRepoDir.cleanup();
+    await tempRemoteRepoDir.cleanup();
+    await env.destroy();
+    GitService.clearCache();
+  });
 
-//       expect(updated).to.deep.equal({
-//         attributes: {
-//           title: 'Updated title',
-//           'published-date': '2018-09-25',
-//         },
-//       });
-//     });
+  describe('create', function() {
+    it('saves attributes', async function() {
+      let cardDoc = cardDocument().withAutoAttributes({
+        title: 'Second Article',
+      });
 
-//     it('successfully merges updates when repo is out of sync', async function() {
-//       this.timeout(20000);
+      let cardInRepo = await service.create(repoRealm, cardDoc.jsonapi);
 
-//       let change = await Change.create(remoteRepo, head, 'master');
+      await repo.fetchAll();
+      let saved = await inRepo(tempRemoteRepoPath).getJSONContents(
+        'origin/master',
+        `contents/cards/${cardInRepo.csId}.json`
+      );
+      expect(saved.data.attributes.title).to.equal('Second Article');
+    });
+  });
 
-//       let file = await change.get('contents/events/event-2.json', { allowUpdate: true });
+  //   describe('update', function() {
+  //     it('returns updated document', async function() {
+  //       let { data: record } = await writers.update(env.session, 'events', 'event-1', {
+  //         data: {
+  //           id: 'event-1',
+  //           type: 'events',
+  //           attributes: {
+  //             title: 'Updated title',
+  //           },
+  //           meta: {
+  //             version: head,
+  //           },
+  //         },
+  //       });
+  //       expect(record).has.deep.property('attributes.title', 'Updated title');
+  //       expect(record)
+  //         .has.deep.property('meta.version')
+  //         .not.equal(head);
 
-//       file.setContent(
-//         JSON.stringify({
-//           attributes: {
-//             title: 'This is a test event',
-//             'published-date': '2019-09-25',
-//           },
-//         })
-//       );
+  //       await repo.fetchAll();
+  //       let updated = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/event-1.json`);
 
-//       await change.finalize({
-//         authorName: 'John Milton',
-//         authorEmail: 'john@paradiselost.com',
-//         message: 'I probably shouldnt update this out of sync',
-//       });
+  //       expect(updated).to.deep.equal({
+  //         attributes: {
+  //           title: 'Updated title',
+  //           'published-date': '2018-09-25',
+  //         },
+  //       });
+  //     });
 
-//       await remoteRepo.getRemote('origin');
+  //     it('successfully merges updates when repo is out of sync', async function() {
+  //       this.timeout(20000);
 
-//       let { data: record } = await writers.update(env.session, 'events', 'event-1', {
-//         data: {
-//           id: 'event-1',
-//           type: 'events',
-//           attributes: {
-//             title: 'Updated title',
-//           },
-//           meta: {
-//             version: head,
-//           },
-//         },
-//       });
-//       expect(record).has.deep.property('attributes.title', 'Updated title');
-//       expect(record)
-//         .has.deep.property('meta.version')
-//         .not.equal(head);
+  //       let change = await Change.create(remoteRepo, head, 'master');
 
-//       await repo.fetchAll();
-//       let updated = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/event-1.json`);
+  //       let file = await change.get('contents/events/event-2.json', { allowUpdate: true });
 
-//       expect(updated).to.deep.equal({
-//         attributes: {
-//           title: 'Updated title',
-//           'published-date': '2018-09-25',
-//         },
-//       });
-//     });
+  //       file.setContent(
+  //         JSON.stringify({
+  //           attributes: {
+  //             title: 'This is a test event',
+  //             'published-date': '2019-09-25',
+  //           },
+  //         })
+  //       );
 
-//     it('successfully merges updates when same file is out of sync', async function() {
-//       this.timeout(20000);
+  //       await change.finalize({
+  //         authorName: 'John Milton',
+  //         authorEmail: 'john@paradiselost.com',
+  //         message: 'I probably shouldnt update this out of sync',
+  //       });
 
-//       let change = await Change.create(remoteRepo, head, 'master');
+  //       await remoteRepo.getRemote('origin');
 
-//       let file = await change.get('contents/events/event-1.json', { allowUpdate: true });
+  //       let { data: record } = await writers.update(env.session, 'events', 'event-1', {
+  //         data: {
+  //           id: 'event-1',
+  //           type: 'events',
+  //           attributes: {
+  //             title: 'Updated title',
+  //           },
+  //           meta: {
+  //             version: head,
+  //           },
+  //         },
+  //       });
+  //       expect(record).has.deep.property('attributes.title', 'Updated title');
+  //       expect(record)
+  //         .has.deep.property('meta.version')
+  //         .not.equal(head);
 
-//       file.setContent(
-//         JSON.stringify(
-//           {
-//             attributes: {
-//               title: 'This is a test event',
-//               'published-date': '2018-09-25',
-//             },
-//           },
-//           null,
-//           2
-//         )
-//       );
+  //       await repo.fetchAll();
+  //       let updated = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/event-1.json`);
 
-//       await change.finalize({
-//         authorName: 'John Milton',
-//         authorEmail: 'john@paradiselost.com',
-//         message: 'I probably shouldnt update this out of sync',
-//       });
+  //       expect(updated).to.deep.equal({
+  //         attributes: {
+  //           title: 'Updated title',
+  //           'published-date': '2018-09-25',
+  //         },
+  //       });
+  //     });
 
-//       let remote = await remoteRepo.getRemote('origin');
-//       await remote.push('refs/heads/master', 'refs/heads/master', { force: true });
+  //     it('successfully merges updates when same file is out of sync', async function() {
+  //       this.timeout(20000);
 
-//       let { data: record } = await writers.update(env.session, 'events', 'event-1', {
-//         data: {
-//           id: 'event-1',
-//           type: 'events',
-//           attributes: {
-//             title: 'Updated title',
-//           },
-//           meta: {
-//             version: head,
-//           },
-//         },
-//       });
-//       expect(record).has.deep.property('attributes.title', 'Updated title');
-//       expect(record)
-//         .has.deep.property('meta.version')
-//         .not.equal(head);
+  //       let change = await Change.create(remoteRepo, head, 'master');
 
-//       await repo.fetchAll();
-//       let updated = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/event-1.json`);
+  //       let file = await change.get('contents/events/event-1.json', { allowUpdate: true });
 
-//       expect(updated).to.deep.equal({
-//         attributes: {
-//           title: 'Updated title',
-//           'published-date': '2018-09-25',
-//         },
-//       });
-//     });
-//   });
+  //       file.setContent(
+  //         JSON.stringify(
+  //           {
+  //             attributes: {
+  //               title: 'This is a test event',
+  //               'published-date': '2018-09-25',
+  //             },
+  //           },
+  //           null,
+  //           2
+  //         )
+  //       );
 
-//   describe('delete', function() {
-//     it('deletes document', async function() {
-//       await writers.delete(env.session, head, 'events', 'event-1');
+  //       await change.finalize({
+  //         authorName: 'John Milton',
+  //         authorEmail: 'john@paradiselost.com',
+  //         message: 'I probably shouldnt update this out of sync',
+  //       });
 
-//       await repo.fetchAll();
+  //       let remote = await remoteRepo.getRemote('origin');
+  //       await remote.push('refs/heads/master', 'refs/heads/master', { force: true });
 
-//       let articles = (await inRepo(tempRemoteRepoPath).listTree('origin/master', 'contents/events')).map(a => a.name);
-//       expect(articles).to.not.contain('event-1.json');
-//     });
+  //       let { data: record } = await writers.update(env.session, 'events', 'event-1', {
+  //         data: {
+  //           id: 'event-1',
+  //           type: 'events',
+  //           attributes: {
+  //             title: 'Updated title',
+  //           },
+  //           meta: {
+  //             version: head,
+  //           },
+  //         },
+  //       });
+  //       expect(record).has.deep.property('attributes.title', 'Updated title');
+  //       expect(record)
+  //         .has.deep.property('meta.version')
+  //         .not.equal(head);
 
-//     // TODO: come up with testing scenarios for conflicts
-//   });
-// });
+  //       await repo.fetchAll();
+  //       let updated = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/event-1.json`);
 
-// describe('git/writer with empty remote', function() {
-//   let env: todo, writers: todo, repo: Repository, tempRepoPath, tempRemoteRepoPath: string;
+  //       expect(updated).to.deep.equal({
+  //         attributes: {
+  //           title: 'Updated title',
+  //           'published-date': '2018-09-25',
+  //         },
+  //       });
+  //     });
+  //   });
 
-//   this.timeout(10000);
+  //   describe('delete', function() {
+  //     it('deletes document', async function() {
+  //       await writers.delete(env.session, head, 'events', 'event-1');
 
-//   beforeEach(async function() {
-//     let root = await temp.mkdir('cardstack-server-test');
+  //       await repo.fetchAll();
 
-//     let { repo: remoteRepo } = await makeRepo(root);
+  //       let articles = (await inRepo(tempRemoteRepoPath).listTree('origin/master', 'contents/events')).map(a => a.name);
+  //       expect(articles).to.not.contain('event-1.json');
+  //     });
 
-//     let remote = await Remote.create(remoteRepo, 'origin', 'http://root:password@localhost:8838/git/repo');
-//     await remote.push('refs/heads/master', 'refs/heads/master', { force: true });
+  //     // TODO: come up with testing scenarios for conflicts
+  //   });
+  // });
 
-//     let factory = new JSONAPIFactory();
+  // describe('git/writer with empty remote', function() {
+  //   let env: todo, writers: todo, repo: Repository, tempRepoPath, tempRemoteRepoPath: string;
 
-//     tempRepoPath = await mkdir('cardstack-temp-test-repo');
-//     tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
+  //   this.timeout(10000);
 
-//     repo = await Repository.clone('http://root:password@localhost:8838/git/repo', tempRemoteRepoPath);
+  //   beforeEach(async function() {
+  //     let root = await temp.mkdir('cardstack-server-test');
 
-//     let dataSource = factory.addResource('data-sources').withAttributes({
-//       'source-type': '@cardstack/git',
-//       params: {
-//         remote: {
-//           url: 'http://root:password@localhost:8838/git/repo',
-//           cacheDir: tempRepoPath,
-//         },
-//       },
-//     });
+  //     let { repo: remoteRepo } = await makeRepo(root);
 
-//     factory
-//       .addResource('content-types', 'events')
-//       .withRelated('fields', [
-//         factory.addResource('fields', 'title').withAttributes({ fieldType: '@cardstack/core-types::string' }),
-//         factory.addResource('fields', 'published-date').withAttributes({ fieldType: '@cardstack/core-types::string' }),
-//       ])
-//       .withRelated('data-source', dataSource);
+  //     let remote = await Remote.create(remoteRepo, 'origin', 'http://root:password@localhost:8838/git/repo');
+  //     await remote.push('refs/heads/master', 'refs/heads/master', { force: true });
 
-//     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
-//     writers = env.lookup('hub:writers');
-//   });
+  //     let factory = new JSONAPIFactory();
 
-//   afterEach(async function() {
-//     await temp.cleanup();
-//     await destroyDefaultEnvironment(env);
-//     service.clearCache();
-//   });
+  //     tempRepoPath = await mkdir('cardstack-temp-test-repo');
+  //     tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
 
-//   describe('create', function() {
-//     it('allows you to create a record in an empty git repo', async function() {
-//       let { data: record } = await writers.create(env.session, 'events', {
-//         data: {
-//           type: 'events',
-//           attributes: {
-//             title: 'Fresh Event',
-//             'published-date': '2018-09-01',
-//           },
-//         },
-//       });
-//       await repo.fetchAll();
-//       let saved = await inRepo(tempRemoteRepoPath).getJSONContents(
-//         'origin/master',
-//         `contents/events/${record.id}.json`
-//       );
-//       expect(saved).to.deep.equal({
-//         attributes: {
-//           title: 'Fresh Event',
-//           'published-date': '2018-09-01',
-//         },
-//       });
-//     });
-//   });
-// });
+  //     repo = await Repository.clone('http://root:password@localhost:8838/git/repo', tempRemoteRepoPath);
+
+  //     let dataSource = factory.addResource('data-sources').withAttributes({
+  //       'source-type': '@cardstack/git',
+  //       params: {
+  //         remote: {
+  //           url: 'http://root:password@localhost:8838/git/repo',
+  //           cacheDir: tempRepoPath,
+  //         },
+  //       },
+  //     });
+
+  //     factory
+  //       .addResource('content-types', 'events')
+  //       .withRelated('fields', [
+  //         factory.addResource('fields', 'title').withAttributes({ fieldType: '@cardstack/core-types::string' }),
+  //         factory.addResource('fields', 'published-date').withAttributes({ fieldType: '@cardstack/core-types::string' }),
+  //       ])
+  //       .withRelated('data-source', dataSource);
+
+  //     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+  //     writers = env.lookup('hub:writers');
+  //   });
+
+  //   afterEach(async function() {
+  //     await temp.cleanup();
+  //     await destroyDefaultEnvironment(env);
+  //     service.clearCache();
+  //   });
+
+  //   describe('create', function() {
+  //     it('allows you to create a record in an empty git repo', async function() {
+  //       let { data: record } = await writers.create(env.session, 'events', {
+  //         data: {
+  //           type: 'events',
+  //           attributes: {
+  //             title: 'Fresh Event',
+  //             'published-date': '2018-09-01',
+  //           },
+  //         },
+  //       });
+  //       await repo.fetchAll();
+  //       let saved = await inRepo(tempRemoteRepoPath).getJSONContents(
+  //         'origin/master',
+  //         `contents/events/${record.id}.json`
+  //       );
+  //       expect(saved).to.deep.equal({
+  //         attributes: {
+  //           title: 'Fresh Event',
+  //           'published-date': '2018-09-01',
+  //         },
+  //       });
+  //     });
+  //   });
+});
 
 // describe('git/writer-remote/githereum', function() {
 //   let env: todo, writers: todo, tempRepoPath, tempRemoteRepoPath, githereum: todo, fakeContract: todo, writer;
