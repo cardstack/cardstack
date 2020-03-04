@@ -29,8 +29,7 @@ export default class IndexingService {
     let batch = this.pgclient.beginCardBatch(scopedService);
     let indexer = await getOwner(this).instantiate(indexerFactory, realmCard);
 
-    let metaResult = await this.pgclient.query(['select params from meta where cs_realm = ', param(realmCard.csId)]);
-    let meta = metaResult.rowCount ? (metaResult.rows[0].params as JSON.Object) : null;
+    let meta = await this.loadMeta(realmCard.csId);
 
     let io = await getOwner(this).instantiate(IndexingOperations, realmCard, batch, scopedService);
     let newMeta = await indexer.update(meta, io);
@@ -41,6 +40,11 @@ export default class IndexingService {
         params: param(newMeta || null),
       }) as Expression
     );
+  }
+
+  async loadMeta(csId: string) {
+    let metaResult = await this.pgclient.query(['select params from meta where cs_realm = ', param(csId)]);
+    return metaResult.rowCount ? (metaResult.rows[0].params as JSON.Object) : null;
   }
 
   // For all the realms ensure that each realm has run indexing at least once

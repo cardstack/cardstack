@@ -22,3 +22,11 @@ export function upstreamIdToCardId(upstreamId: UpstreamIdentity, csRealm: string
   }
   return { csRealm, csOriginalRealm, csId };
 }
+
+export function upstreamIdToString(upstreamId: UpstreamIdentity): string {
+  if (typeof upstreamId === 'string') {
+    return upstreamId;
+  } else {
+    return upstreamId.csId;
+  }
+}
