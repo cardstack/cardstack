@@ -17,6 +17,8 @@ import { cardDocument } from '@cardstack/core/card-document';
 import { myOrigin } from '@cardstack/core/origin';
 import { embeddedCssFile, isolatedCssFile } from '@cardstack/cardhost/utils/scaffolding';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { canonicalURL } from '@cardstack/core/card-id';
+import get from 'lodash/get';
 
 const csRealm = `${myOrigin}/api/realms/default`;
 const template1 = cardDocument()
@@ -152,24 +154,21 @@ const entry4 = cardDocument()
 
 const cards = [entry1, entry2, entry3, entry4, template1, template2, card1, card2, card3, card4];
 const featuredCards = [card3, card4];
-const cardsSortedByCreatedDescending = [
-  entry4,
-  entry3,
-  entry2,
-  entry1,
-  template2,
-  template1,
-  card1,
-  card2,
-  card3,
-  card4,
-];
+const cardsSortedByCreatedDescending = [template2, template1, card1, card2, card3, card4];
 
 function filterRealmCards(cardIds) {
   return cardIds.filter(
     i =>
       i !== 'http://localhost:3000/api/realms/meta/cards/http%3A%2F%2Flocalhost%3A3000%2Fapi%2Frealms%2Fdefault' &&
       i !== 'http://localhost:3000/api/realms/meta/cards/http%3A%2F%2Flocalhost%3A3000%2Fapi%2Frealms%2Fmeta'
+  );
+}
+
+function nonCatalogEntries(cards) {
+  return cards.filter(
+    card =>
+      get(card, `jsonapi.data.relationships.csAdoptsFrom.data.id`) !==
+      canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'catalog-entry' })
   );
 }
 
@@ -180,7 +179,7 @@ const scenario = new Fixtures({
 async function waitForLibraryLoad() {
   await waitForLibraryServiceToIdle();
   await waitForCatalogEntriesToLoad('[data-test-templates]');
-  await Promise.all(cards.map(card => waitForCardLoad(card.canonicalURL)));
+  await Promise.all(nonCatalogEntries(cards).map(card => waitForCardLoad(card.canonicalURL)));
 }
 async function waitForFeaturedCardsLoad() {
   await waitForCatalogEntriesToLoad('[data-test-featured-cards]');
@@ -216,6 +215,16 @@ module('Acceptance | library', function(hooks) {
       ),
       cardsSortedByCreatedDescending.map(c => c.canonicalURL)
     );
+
+    for (let entry of [entry1, entry2, entry3, entry4]) {
+      assert.equal(
+        [...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`)]
+          .map(i => i.getAttribute('data-test-card-renderer-embedded'))
+          .includes(entry.canonicalURL),
+        false,
+        'catalog entry card does not appear in recent cards'
+      );
+    }
 
     assert.deepEqual(
       [...document.querySelectorAll(`[data-test-templates] [data-test-library-adopt-card-btn]`)].map(i =>

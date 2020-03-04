@@ -3,6 +3,7 @@ import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import { task } from 'ember-concurrency';
+import { canonicalURL } from '@cardstack/core/card-id';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 const catalogEntry = Object.freeze({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'catalog-entry' });
@@ -26,12 +27,14 @@ export default class LibraryService extends Service {
   @task(function*() {
     let [recentCards, templateEntries, featuredEntries] = yield Promise.all([
       this.data.search(
-        // TODO we really want this filter to not include catalog-entry cards. I
-        // think we'll need to introduce a new type of filter to be able to
-        // filter out just a specific type of card from the result set.
         {
           filter: {
             type: { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' },
+            not: {
+              eq: {
+                csAdoptsFrom: canonicalURL(catalogEntry),
+              },
+            },
           },
           sort: '-csCreated',
           page: { size },
