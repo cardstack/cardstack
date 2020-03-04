@@ -64,7 +64,7 @@ function getType(document: UpstreamDocument) {
 }
 
 function getId(document: UpstreamDocument) {
-  return document.jsonapi.data.id;
+  return document.canonicalURL;
 }
 
 // function getMeta(model: todo) {
