@@ -122,9 +122,9 @@
   align-items: center;
   padding: 0 20px;
   height: var(--card-renderer-header-height);
-  color: var(--ch-light-op50);
-  background-color: var(--ch-dark-background);
-  border: 3px solid var(--ch-dark-background);
+  color: var(--ch-light);
+  background-color: var(--ch-disabled);
+  border: 3px solid var(--ch-disabled);
   border-radius: 10px 10px 0 0;
   font-weight: 600;
   overflow: hidden;
@@ -138,8 +138,19 @@
 }
 
 .card-renderer-isolated--header svg {
-  --icon-color: var(--ch-light-op50);
+  --icon-color: var(--ch-light);
   transition: stroke var(--ch-transition-time);
+}
+
+.card-renderer-isolated--header svg.card-renderer-isolated--header-icon {
+  --icon-color: var(--ch-highlight);
+  padding-right: 10px;
+  width: 40px;
+}
+
+.card-renderer-isolated--header-title {
+  width: 100%;
+  color: var(--ch-light);
 }
 
 .card-renderer--edit-link {
@@ -160,13 +171,7 @@
 
 /* Card Renderer - Outer Wrapper */
 .card-renderer-isolated--content {
-  /* position: relative;
-  min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height)); */
   padding-bottom: var(--scroll-bottom-padding);
-  /* background-color: transparent;
-  color: var(--ch-dark);
-  border: none; */
-  /* transition: var(--ch-card-background-color-animate); */
 }
 
 .card-renderer-isolated.schema .card-renderer-isolated--content {
@@ -237,8 +242,15 @@
   color: var(--ch-dark);
 }
 
+.card-renderer-isolated.selected .card-renderer-isolated--header-title,
+.card-renderer-isolated.layout .card-renderer-isolated--header-title,
+.card-renderer-isolated.view .card-renderer-isolated--header-title {
+  color: var(--ch-dark);
+}
+
 .card-renderer-isolated.selected .card-renderer-isolated--header svg,
-.card-renderer-isolated.layout .card-renderer-isolated--header svg {
+.card-renderer-isolated.layout .card-renderer-isolated--header svg,
+.card-renderer-isolated.view .card-renderer-isolated--header svg {
   --icon-color: var(--ch-dark);
 }
 
@@ -246,28 +258,3 @@
 .card-renderer-isolated.selected .card-renderer-isolated--card-container {
   border-color: var(--ch-highlight);
 }
-
-
-.card-renderer-isolated--header-icon {
-  padding-right: 10px;
-  width: 40px;
-}
-
-.card-renderer-isolated--header-title {
-  width: 100%;
-}
-
-/* TODO: fade card if field-renderer is selected */
-/* .card-renderer-isolated.faded::before {
-  content: '';
-  display: block;
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  bottom: 0;
-  background-color: var(--ch-default);
-  opacity: 0.35;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 5;
-} */
