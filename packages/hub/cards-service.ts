@@ -15,7 +15,6 @@ import merge from 'lodash/merge';
 import { readdirSync, existsSync, statSync, readFileSync } from 'fs-extra';
 import { CardReader } from '@cardstack/core/card-reader';
 import { CardInstantiator } from '@cardstack/core/card-instantiator';
-import { cardDocument } from '@cardstack/core/card-document';
 
 export default class CardsService {
   pgclient = inject('pgclient');
@@ -42,7 +41,7 @@ export class ScopedCardService implements CardReader, CardInstantiator {
 
   async create(realm: string, doc: SingleResourceDoc): Promise<AddressableCard> {
     let moduleLoader = await getOwner(this.cards).lookup('modules');
-    let realmCard = await this.getRealm(realm);
+    let realmCard = await this.getRealm(realm, doc);
     let writer = await this.loadWriter(realmCard);
     let card: UnsavedCard = await getOwner(this.cards).instantiate(
       UnsavedCard,
@@ -119,8 +118,9 @@ export class ScopedCardService implements CardReader, CardInstantiator {
   }
 
   async get(id: CardId): Promise<AddressableCard>;
+  async get(id: CardId, metaRealmCard: SingleResourceDoc): Promise<AddressableCard>;
   async get(canonicalURL: string): Promise<AddressableCard>;
-  async get(idOrURL: CardId | string): Promise<AddressableCard> {
+  async get(idOrURL: CardId | string, metaRealmCard?: SingleResourceDoc): Promise<AddressableCard> {
     let id = asCardId(idOrURL);
 
     if (
@@ -132,7 +132,7 @@ export class ScopedCardService implements CardReader, CardInstantiator {
 
     // this exists to throw if there's no such realm. We're not using the return
     // value yet but we will onc we implement custom searchers and realm grants.
-    await this.getRealm(id.csRealm);
+    await this.getRealm(id.csRealm, metaRealmCard);
 
     // TODO dont create a scoped card service here
     return await this.cards.pgclient.get(this, id);
@@ -148,7 +148,7 @@ export class ScopedCardService implements CardReader, CardInstantiator {
     return await getOwner(this.cards).instantiate(writerFactory, realmCard);
   }
 
-  private async getRealm(realm: string): Promise<AddressableCard> {
+  private async getRealm(realm: string, metaRealmCard?: SingleResourceDoc): Promise<AddressableCard> {
     // This searches by realm and csId. Even though it doesn't search by
     // originalRealm, it's unique because of the special property that Realm
     // cards have that their csId contains the complete URL to the realm. So
@@ -172,31 +172,20 @@ export class ScopedCardService implements CardReader, CardInstantiator {
       },
     });
 
-    // In the scenario where we are trying to create the meta realm, we need to
-    // actually have builtin meta realm that exists as a bridge to allow us to
-    // create a meta realm. In that case we'll return a one-time temp ephemeral
-    // based meta realm. After our actual meta realm has been created via the
-    // process, we can use the real one.
-    if (realms.length === 0 && realm === `${myOrigin}/api/realms/meta`) {
-      return await this.getTempMetaRealm();
+    // In the scenario where we are trying to create the meta realm, the
+    // document that we are trying to create is the realm that we need.
+    if (
+      realms.length === 0 &&
+      realm === `${myOrigin}/api/realms/meta` &&
+      metaRealmCard?.data.attributes?.csRealm === realm &&
+      metaRealmCard?.data.attributes.csId === realm
+    ) {
+      return await this.instantiate(metaRealmCard);
     } else if (realms.length === 0) {
       throw new CardstackError(`no such realm "${realm}"`, { status: 400 });
     }
 
     return realms[0];
-  }
-
-  // This is only used as a bridge to creating the _actual_ meta realm (breaks
-  // the chicken/egg problem)
-  private async getTempMetaRealm() {
-    return this.instantiate(
-      cardDocument()
-        .withAutoAttributes({
-          csRealm: `${myOrigin}/api/realms/meta`,
-          csId: `${myOrigin}/api/realms/meta`,
-        })
-        .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi
-    );
   }
 
   private async getBuiltIn(id: CardId): Promise<AddressableCard> {
