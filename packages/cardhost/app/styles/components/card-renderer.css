@@ -1,12 +1,16 @@
 .card-renderer--container {
   --scroll-bottom-padding: 80px;
 
-  height: 100vh;
+  height: calc(100vh - var(--ch-top-edge-height));
   width: 100%;
-  padding-top: var(--ch-top-edge-height);
-  padding-bottom: var(--scroll-bottom-padding);
+  margin-top: var(--ch-top-edge-height);
   overflow-y: auto;
   transition: padding var(--ch-transition-time);
+}
+
+.cardhost-cards.view .card-renderer--container {
+  height: 100vh;
+  margin-top: 0;
 }
 
 .card-renderer--inner-container {
@@ -59,7 +63,7 @@
 }
 
 .card-renderer-isolated.view {
-  padding-top: var(--card-renderer-header-height);
+  margin-top: var(--ch-top-edge-height);
 }
 
 
@@ -76,24 +80,33 @@
 
 
 /* Card Renderer Header */
-/* We need the wrapper to mask the border of the content when scrolling */
-.card-renderer-isolated--header--wrapper {
-  background-color: var(--ch-default);
+.card-renderer-isolated--header-container {
   position: sticky;
   top: 0;
   z-index: var(--ch-card-header-z-index); /* card scrolls under the header */
+}
+
+.card-renderer-isolated--view-header-container {
+  position: sticky;
+  height: var(--card-renderer-header-height);
+  z-index: 5;
+}
+.card-renderer-isolated--view-header-container.selected {
+  z-index: var(--ch-card-header-z-index);
+}
+
+/* We need the wrapper bg to mask the scrolling content that peeks through border-radius */
+.card-renderer-isolated--header--wrapper {
+  background-color: var(--ch-default);
 }
 
 .card-renderer-isolated.view .card-renderer-isolated--header--wrapper {
   background-color: var(--ch-light-background);
   position: absolute;
   top: var(--card-renderer-header-height);
-  left: var(--ch-spacing);
-  right: var(--ch-spacing);
-  z-index: 5;
+  width: 100%;
   bottom: 100px;
 }
-
 .card-renderer-isolated.view .card-renderer-isolated--header--wrapper.selected {
   top: 0px;
 }
@@ -176,6 +189,7 @@
   border-radius: 0 0 10px 10px;
   overflow: hidden;
   min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
+  margin-top: -3px;
   background: var(--ch-light);
 
   transition: background-color var(--ch-transition-time),

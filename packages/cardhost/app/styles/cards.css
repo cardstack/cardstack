@@ -1,26 +1,31 @@
 .cardhost-cards {
+  --bg-color: var(--ch-light-background);
+  --edit-bg: var(--ch-default);
+  --themer-bg: var(--ch-dark-background);
+  --schema-bg: var(--ch-deep-background);
+
   width: 100%;
   height: 100vh;
   margin: 0;
-  background-color: var(--ch-light-background);
+  background-color: var(--bg-color);
   color: var(--ch-dark);
   overflow-y: auto;
   transition: var(--ch-card-background-color-animate);
 }
 
 .cardhost-cards.edit {
-  background-color: var(--ch-default);
-}
-
-.cardhost-cards.schema {
-  background-color: var(--ch-deep-background);
-  background-image: url('/assets/images/grid-tile.png');
-  background-repeat: repeat;
-  background-size: 55px;
+  --bg-color: var(--edit-bg);
 }
 
 .cardhost-cards.themer {
-  background-color: var(--ch-dark-background);
+  --bg-color: var(--themer-bg);
+}
+
+.cardhost-cards.schema {
+  --bg-color: var(--schema-bg);
+  background-image: url('/assets/images/grid-tile.png');
+  background-repeat: repeat;
+  background-size: 55px;
 }
 
 .cardhost-cards.dragging * {

@@ -26,19 +26,21 @@ Ember Concurrency into the rendering of the card component here.
           {{did-update this.updateFields @card.isolatedFields}}
         >
           {{#if (eq @mode "view")}}
-            {{#animated-value @card watch="isSelected" use=this.headerAnimation group="header"}}
-              <CardRendererHeader
-                @cardSelected={{if (and this.cardstackSession.isAuthenticated @cardSelected) true}}
-                @card={{@card}}
-                @buttonRoute="cards.card.edit.fields"
-                @buttonText="Edit"
-                @mode={{this.mode}}
-                @contextMenuOpen={{@contextMenuOpen}}
-                @setContextMenu={{@setContextMenu}}
-              />
-            {{/animated-value}}
+            <AnimatedContainer class="card-renderer-isolated--view-header-container {{if (and this.cardstackSession.isAuthenticated @cardSelected) "selected"}}">
+              {{#animated-value @card watch="isSelected" use=this.headerAnimation group="header"}}
+                <CardRendererHeader
+                  @cardSelected={{if (and this.cardstackSession.isAuthenticated @cardSelected) true}}
+                  @card={{@card}}
+                  @buttonRoute="cards.card.edit.fields"
+                  @buttonText="Edit"
+                  @mode={{this.mode}}
+                  @contextMenuOpen={{@contextMenuOpen}}
+                  @setContextMenu={{@setContextMenu}}
+                />
+              {{/animated-value}}
+            </AnimatedContainer>
           {{else}}
-            <AnimatedContainer>
+            <AnimatedContainer class="card-renderer-isolated--header-container">
               {{#animated-value @card watch=this.mode use=this.headerAnimation group="header"}}
                 <CardRendererHeader
                   @cardSelected={{true}}
