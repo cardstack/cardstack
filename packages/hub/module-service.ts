@@ -21,11 +21,11 @@ export class ModuleService implements ModuleLoader {
     // using md5 because this is just for cache validation, not cryptographic
     // collision resistance
 
-    let cardDir;
+    // using a type-unsafe cast here, becase we don't want to add cardDir to the
+    // card public api
+    let cardDir = (card as any)?.meta?.cardDir;
 
-    if (card.cardDir) {
-      cardDir = card.cardDir;
-    } else {
+    if (!cardDir) {
       let hash = createHash('md5');
       hash.update(stringify(await toIdempotentDoc(card)));
       cardDir = join(cardFilesCache, hash.digest('hex'));
