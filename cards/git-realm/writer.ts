@@ -60,7 +60,7 @@ import stringify from 'fast-json-stable-stringify';
 const defaultBranch = 'master';
 
 function getType(document: UpstreamDocument) {
-  return document.jsonapi.data.type;
+  return `cards`;
 }
 
 function getId(document: UpstreamDocument) {
