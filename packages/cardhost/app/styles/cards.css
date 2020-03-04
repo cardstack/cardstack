@@ -1,5 +1,6 @@
 .cardhost-cards {
-  --bg-color: var(--ch-light-background);
+  --bg-color: var(--view-bg);
+  --view-bg: var(--ch-light-background);
   --edit-bg: var(--ch-default);
   --themer-bg: var(--ch-dark-background);
   --schema-bg: var(--ch-deep-background);
@@ -42,4 +43,40 @@
 
 .themer-card-width--large .card-renderer-isolated {
   width: var(--ch-card-size-large);
+}
+
+.card-renderer--container {
+  --scroll-bottom-padding: 80px;
+
+  height: calc(100vh - var(--ch-top-edge-height));
+  width: 100%;
+  margin-top: var(--ch-top-edge-height);
+  overflow-y: auto;
+  transition: margin-top var(--ch-transition-time),
+              padding-top var(--ch-transition-time);
+}
+
+.cardhost-cards.view:not(.themer) .card-renderer--container {
+  box-sizing: content-box;
+  margin-top: 0;
+  padding-top: var(--ch-top-edge-height);
+}
+
+.card-renderer--inner-container {
+  padding-right: var(--ch-right-edge-width);
+  padding-left: var(--ch-left-edge-navbar-width);
+  transition: padding var(--ch-transition-time);
+}
+
+.card-renderer--inner-container.schema-container {
+  padding-left: var(--ch-left-edge-width);
+}
+
+.card-renderer--inner-container.view-container {
+  padding-right: 0;
+}
+
+.card-renderer--inner-container.themer-container {
+  padding-left: var(--ch-left-edge-navbar-width);
+  padding-right: 0;
 }

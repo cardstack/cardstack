@@ -1,23 +1,11 @@
-/* Card Renderer Header */
-.card-renderer-isolated--header-container {
-  position: sticky;
-  top: 0;
-  z-index: var(--ch-card-header-z-index); /* card scrolls under the header */
-}
-
-.card-renderer-isolated.view:not(.themer) .card-renderer-isolated--view-header-container {
-  top: 0;
-  height: var(--card-renderer-header-height);
-  z-index: 5;
-}
-
-/* We need the wrapper bg to mask the scrolling content that peeks through border-radius */
 .card-renderer-isolated--header--wrapper {
-  background-color: var(--ch-default);
+  --bg-color: var(--edit-bg);
+  background-color: var(--bg-color);
+  /* We need the wrapper bg to mask the scrolling content that peeks through border-radius */
 }
 
 .card-renderer-isolated.view .card-renderer-isolated--header--wrapper {
-  background-color: var(--ch-light-background);
+  --bg-color: var(--view-bg);
   position: absolute;
   top: var(--card-renderer-header-height);
   height: inherit;
@@ -29,11 +17,11 @@
 }
 
 .card-renderer-isolated.schema .card-renderer-isolated--header--wrapper {
-  background-color: var(--ch-deep-background);
+  --bg-color: var(--schema-bg);
 }
 
 .card-renderer-isolated.themer .card-renderer-isolated--header--wrapper {
-  background-color: var(--ch-dark-background);
+  --bg-color: var(--themer-bg);
 }
 
 .card-renderer-isolated--header {
