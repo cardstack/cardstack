@@ -19,7 +19,7 @@ export function extractSettings(realmCard: AddressableCard): IndexerSettings {
   let repo;
 
   if (typeof attributes.repo == 'string') {
-    repo = attributes.repo;
+    repo = await realmCard.value('repo');
   } else {
     throw new CardstackError('You must provide a repo attribute when instantiating the git realm card');
   }
