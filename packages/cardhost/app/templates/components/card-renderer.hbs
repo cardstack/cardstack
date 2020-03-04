@@ -53,7 +53,7 @@ Ember Concurrency into the rendering of the card component here.
             {{/animated-value}}
           </AnimatedContainer>
         {{/if}}
-        <div class="card-renderer-isolated--content">
+        <AnimatedContainer class="card-renderer-isolated--content">
           {{#animated-value @card watch=(if (eq this.mode "view") "isSelected") use=this.cardTransition group="body"}}
             <div class="card-renderer-isolated--card-container {{if (and this.cardstackSession.isAuthenticated @card.isSelected) "selected"}}">
               <AnimatedContainer>
@@ -83,7 +83,7 @@ Ember Concurrency into the rendering of the card component here.
               </AnimatedContainer>
             </div>
           {{/animated-value}}
-        </div>
+        </AnimatedContainer>
       </section>
     {{/let}}
   {{else if (eq @format "embedded")}}

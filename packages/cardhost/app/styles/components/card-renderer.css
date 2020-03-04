@@ -9,10 +9,10 @@
               padding-top var(--ch-transition-time);
 }
 
-.cardhost-cards.logged-out .card-renderer--container {
+.cardhost-cards.view:not(.themer) .card-renderer--container {
   box-sizing: content-box;
   margin-top: 0;
-  padding-top: 80px;
+  padding-top: var(--ch-top-edge-height);
 }
 
 .card-renderer--inner-container {

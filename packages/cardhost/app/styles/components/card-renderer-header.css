@@ -6,7 +6,6 @@
 }
 
 .card-renderer-isolated.view:not(.themer) .card-renderer-isolated--view-header-container {
-  position: sticky;
   top: 0;
   height: var(--card-renderer-header-height);
   z-index: 5;
