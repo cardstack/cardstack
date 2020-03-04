@@ -1,3 +1,119 @@
+/* Card Renderer Header */
+.card-renderer-isolated--header-container {
+  position: sticky;
+  top: 0;
+  z-index: var(--ch-card-header-z-index); /* card scrolls under the header */
+}
+
+.card-renderer-isolated.view:not(.themer) .card-renderer-isolated--view-header-container {
+  position: sticky;
+  top: 0;
+  height: var(--card-renderer-header-height);
+  z-index: 5;
+}
+
+/* We need the wrapper bg to mask the scrolling content that peeks through border-radius */
+.card-renderer-isolated--header--wrapper {
+  background-color: var(--ch-default);
+}
+
+.card-renderer-isolated.view .card-renderer-isolated--header--wrapper {
+  background-color: var(--ch-light-background);
+  position: absolute;
+  top: var(--card-renderer-header-height);
+  height: inherit;
+  width: 100%;
+  bottom: 100px;
+}
+.card-renderer-isolated.view .card-renderer-isolated--header--wrapper.selected {
+  top: 0px;
+}
+
+.card-renderer-isolated.schema .card-renderer-isolated--header--wrapper {
+  background-color: var(--ch-deep-background);
+}
+
+.card-renderer-isolated.themer .card-renderer-isolated--header--wrapper {
+  background-color: var(--ch-dark-background);
+}
+
+.card-renderer-isolated--header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  height: var(--card-renderer-header-height);
+  color: var(--ch-light);
+  background-color: var(--ch-disabled);
+  border: 3px solid var(--ch-disabled);
+  border-radius: 10px 10px 0 0;
+  font-weight: 600;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-transform: capitalize;
+
+  transition: background-color var(--ch-transition-time),
+              color var(--ch-transition-time),
+              border-color var(--ch-transition-time);
+}
+
+.card-renderer-isolated--header svg {
+  --icon-color: var(--ch-light);
+  transition: stroke var(--ch-transition-time);
+}
+
+.card-renderer-isolated--header svg.card-renderer-isolated--header-icon {
+  --icon-color: var(--ch-highlight);
+  padding-right: 10px;
+  width: 40px;
+}
+
+.card-renderer-isolated--header-title {
+  width: 100%;
+  color: var(--ch-light);
+}
+
+.card-renderer-isolated.themer .card-renderer-isolated--header {
+  background-color: var(--ch-default);
+  border-color: var(--ch-default);
+}
+
+.card-renderer-isolated--header .card-renderer--header-link {
+  padding: 5px 20px;
+  border: 1px solid var(--ch-light-op40);
+  border-radius: 20px;
+  font-size: 0.8em;
+}
+
+.card-renderer--edit-link {
+  margin-left: auto;
+}
+
+
+/* Focus/selected state */
+.card-renderer-isolated.selected .card-renderer-isolated--header,
+.card-renderer-isolated.layout .card-renderer-isolated--header,
+.card-renderer-isolated.view .card-renderer-isolated--header {
+  background-color: var(--ch-highlight);
+  border-color: var(--ch-highlight);
+  color: var(--ch-dark);
+}
+
+.card-renderer-isolated.selected .card-renderer-isolated--header-title,
+.card-renderer-isolated.layout .card-renderer-isolated--header-title,
+.card-renderer-isolated.view .card-renderer-isolated--header-title {
+  color: var(--ch-dark);
+}
+
+.card-renderer-isolated.selected .card-renderer-isolated--header svg,
+.card-renderer-isolated.layout .card-renderer-isolated--header svg,
+.card-renderer-isolated.view .card-renderer-isolated--header svg {
+  --icon-color: var(--ch-dark);
+}
+
+
+/* Context menu button */
 .context-menu-button {
   padding: 5px 7px;
   border: 1px solid var(--ch-light-op40);
