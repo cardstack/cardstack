@@ -153,10 +153,6 @@
   color: var(--ch-light);
 }
 
-.card-renderer--edit-link {
-  margin-left: auto;
-}
-
 .card-renderer-isolated.themer .card-renderer-isolated--header {
   background-color: var(--ch-default);
   border-color: var(--ch-default);
@@ -164,10 +160,15 @@
 
 .card-renderer-isolated--header .card-renderer--header-link {
   padding: 5px 20px;
-  border: solid 1px var(--ch-border);
+  border: 1px solid var(--ch-light-op40);
   border-radius: 20px;
   font-size: 0.8em;
 }
+
+.card-renderer--edit-link {
+  margin-left: auto;
+}
+
 
 /* Card Renderer - Outer Wrapper */
 .card-renderer-isolated--content {
