@@ -95,8 +95,6 @@ export class Card {
   // value for the field).
   readonly sourceCard: Card | undefined;
 
-  // TODO: should this remain private? I needed to access the attributes in the
-  // git writer but it was private before
   private readonly attributes: SingleResourceDoc['data']['attributes'];
   private readonly relationships: SingleResourceDoc['data']['relationships'];
   readonly meta: SingleResourceDoc['data']['meta'];
