@@ -105,6 +105,11 @@ Until that work is done we are statically adding this css
   }
 }
 
+html,
+body {
+  height: 100%;
+}
+
 body {
   position: fixed; /* This is needed to prevent background scroll when bottom-edge is open */
   width: 100%;
