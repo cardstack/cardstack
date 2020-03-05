@@ -53,6 +53,13 @@ module.exports = function(deployTarget) {
     ENV.cloudfront.distribution = 'EFVU91CWZ0Z5M';
   }
 
+  if (deployTarget === 'production') {
+    ENV.build.environment = 'production';
+    ENV.s3Assets.bucket = ENV.s3Pages.bucket = 'builder-prod-web';
+    ENV.s3Assets.region = ENV.s3Pages.region = 'us-east-1';
+    ENV.cloudfront.distribution = 'ENI8I3HGY0NM0';
+  }
+
   // Note: if you need to build some configuration asynchronously, you can return
   // a promise that resolves with the ENV object instead of returning the
   // ENV object synchronously.
