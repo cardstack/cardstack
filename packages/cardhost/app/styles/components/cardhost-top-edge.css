@@ -15,6 +15,7 @@
 }
 
 .cardhost-top-edge.themer {
+  background-color: transparent;
   right: 0;
   left: 0;
 }
