@@ -21,7 +21,7 @@
           <button
             class="cardhost-left-edge--nav-button profile-button {{if this.isExpanded "selected"}}"
             aria-label="expandable menu with login controls"
-            aria-expanded={{this.isExpanded}}
+            aria-expanded={{if this.isExpanded "true" "false"}}
             {{on "click" this.toggleMenuExpand}}
             data-test-toggle-left-edge
           >

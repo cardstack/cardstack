@@ -22,6 +22,10 @@
   --bg-color: var(--themer-bg);
 }
 
+.cardhost-cards.themer {
+  background-color: var(--ch-foreground);
+}
+
 .cardhost-cards.schema {
   --bg-color: var(--schema-bg);
   background-image: url('/assets/images/grid-tile.png');

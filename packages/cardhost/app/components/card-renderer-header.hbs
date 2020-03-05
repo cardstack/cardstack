@@ -19,7 +19,7 @@
           {{did-insert this.autosave.kickoff @card}}
           {{did-update this.autosave.kickoff @card }}
           class="context-menu-button {{if this.autosave.hasError "context-menu-button---error"}}" data-test-context-menu-button
-          aria-label="Open card mode options menu" aria-expanded={{@contextMenuOpen}}
+          aria-label="Open card mode options menu" aria-expanded={{if @contextMenuOpen "true" "false"}}
         >
           {{svg-jar "three-dots" width="12px" height="7px" aria-hidden=true}}
         </button>
