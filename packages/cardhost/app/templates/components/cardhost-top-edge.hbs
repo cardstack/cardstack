@@ -9,12 +9,11 @@
       <EdgeActionsButton />
     </div>
   {{else if (eq @mode "preview")}}
-    {{!-- TODO: link to where we came from --}}
     <ModeIndicator
-      @card={{@card}}
-      @route="cards.card.edit.layout"
+      @card={{@card.name}}
+      @route={{if @previousTransition @previousTransition.name "cards.card.edit.layout"}}
       @mode="preview"
-      @linkTo="edit-layout" />
+      @linkTo={{if @previousTransition "previous" "edit-layout"}} />
     <CardSizeToggle class="cardhost-top-edge--size-buttons" data-test-top-edge-size-buttons />
     <EdgeActionsButton />
   {{else if (or (eq @mode "layout") (eq @mode "fields"))}}

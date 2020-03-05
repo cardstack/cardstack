@@ -96,7 +96,7 @@
     grid-template-columns: auto 1fr var(--ch-right-edge-panel-width);
   }
 
-  .cardhost-top-edge--size-buttons {
+  .cardhost-top-edge.layout .cardhost-top-edge--size-buttons {
     display: none;
   }
 }
