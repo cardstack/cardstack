@@ -3,6 +3,9 @@
 import Koa from 'koa';
 import logger from '@cardstack/logger';
 import { Registry, Container } from './dependency-injection';
+import { homedir } from 'os';
+import { join } from 'path';
+import { mkdirp } from 'fs-extra';
 
 import JSONAPIMiddleware from './jsonapi-middleware';
 import CardsService from './cards-service';
@@ -20,8 +23,14 @@ import { myOrigin } from '@cardstack/core/origin';
 import { Session } from '@cardstack/core/session';
 import { cardDocument } from '@cardstack/core/card-document';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { Repository } from '@cardstack/git-realm-card/lib/git';
+import { existsSync } from 'fs';
+import { SingleResourceDoc } from 'jsonapi-typescript';
 
 const log = logger('cardstack/server');
+const metaRealm = `${myOrigin}/api/realms/meta`;
+export const localDefaultRealmRepo = join(homedir(), '.cardstack', 'default-realm');
+export const localMetaRealmRepo = join(homedir(), '.cardstack', 'meta-realm');
 
 export async function wireItUp() {
   let registry = new Registry();
@@ -99,63 +108,24 @@ async function runServer(config: StartupConfig) {
 }
 
 async function setupRealms(container: Container) {
-  let cards = (await container.lookup('cards')).as(Session.INTERNAL_PRIVILEGED);
-  const metaRealm = `${myOrigin}/api/realms/meta`;
-
-  let hasMetaRealm;
-  let metaRealmCard = cardDocument()
-    .withAttributes({
-      csRealm: metaRealm,
-      csId: metaRealm,
-      csTitle: `Meta Realm`,
-      csDescription: `This card controls the configuration of the meta realm which is the realm that holds all of your realm cards.`,
-    })
-    // TODO right now this is hard coded to the ephemeral-realm. Once the git
-    // realm is ready we should use that instead (or alternatively the file
-    // realm), when the hub environment is not in test mode.
-    .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi;
-  try {
-    await cards.get({ csRealm: metaRealm, csId: metaRealm }, metaRealmCard);
-    hasMetaRealm = true;
-  } catch (e) {
-    if (e.status !== 404) {
-      throw e;
-    }
-    hasMetaRealm = false;
-  }
-
-  if (!hasMetaRealm) {
-    log.info(`Creating ephemeral-based meta realm.`);
-    await cards.create(metaRealm, metaRealmCard);
-  }
-
-  let hasDefaultRealm;
-  try {
-    await cards.get({ csRealm: metaRealm, csId: `${myOrigin}/api/realms/default` });
-    hasDefaultRealm = true;
-  } catch (e) {
-    if (e.status !== 404) {
-      throw e;
-    }
-    hasDefaultRealm = false;
-  }
-  if (!hasDefaultRealm) {
-    log.info(`Creating ephemeral-based default realm.`);
-    await cards.create(
-      metaRealm,
-      cardDocument()
-        .withAttributes({
-          csRealm: metaRealm,
-          csId: `${myOrigin}/api/realms/default`,
-          csTitle: `Default Realm`,
-          csDescription: `This card controls the configuration of your hub's default realm. This is the realm that cards are written to by default.`,
-        })
-        // TODO right now this is hard coded to the ephemeral-realm. Once the git
-        // realm is ready we should use that instead (or alternatively the file
-        // realm), when the hub environment is not in test mode.
-        .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi
-    );
-  }
+  await assertRealmExists(container, {
+    csRealm: metaRealm,
+    csId: metaRealm,
+    csTitle: 'Meta Realm',
+    csDescription: `This card controls the configuration of the meta realm which is the realm that holds all of your realm cards.`,
+    // TODO use remote repo env var for meta realm, otherwise use a local
+    // repo.
+    repo: localMetaRealmRepo,
+  });
+  await assertRealmExists(container, {
+    csRealm: metaRealm,
+    csId: `${myOrigin}/api/realms/default`,
+    csTitle: `Default Realm`,
+    csDescription: `This card controls the configuration of your hub's default realm. This is the realm that cards are written to by default.`,
+    // TODO use remote repo env var for meta realm, otherwise use a local
+    // repo.
+    repo: localDefaultRealmRepo,
+  });
 }
 
 interface StartupConfig {
@@ -187,4 +157,79 @@ export async function cors(ctxt: Koa.Context, next: Koa.Next) {
     return;
   }
   await next();
+}
+
+interface RealmAttrs {
+  csRealm: string;
+  csId: string;
+  csTitle: string;
+  csDescription: string;
+  repo?: string;
+}
+
+async function assertRealmExists(container: Container, realmAttrs: RealmAttrs): Promise<void> {
+  let { csRealm, csId, repo } = realmAttrs;
+  let realmCard = getRealmCard(realmAttrs);
+
+  let cards = (await container.lookup('cards')).as(Session.INTERNAL_PRIVILEGED);
+  let hasRealm: boolean;
+  try {
+    if (csRealm === metaRealm && csId === metaRealm) {
+      // In the case the meta realm doesn't exist yet we need to supply a meta
+      // realm card document that the cards.get() can fall back on, as the meta
+      // realm document needs to be available in order for cards.get() to work.
+      await cards.get({ csRealm, csId }, realmCard);
+    } else {
+      await cards.get({ csRealm, csId });
+    }
+    hasRealm = true;
+  } catch (e) {
+    if (e.status !== 404) {
+      throw e;
+    }
+    hasRealm = false;
+  }
+
+  let isLocalRepo = true; // TODO update to deal with remote repos...
+  if (!hasRealm) {
+    log.info(`Creating realm ${csId}.`);
+    if (isLocalRepo && repo) {
+      await assertRepoExists(repo);
+    }
+    await cards.create(metaRealm, realmCard);
+  }
+}
+
+function getRealmCard(realmAttrs: RealmAttrs): SingleResourceDoc {
+  let { csRealm, csId, csTitle, csDescription, repo } = realmAttrs;
+  // in order to prevent test leakage, we'll use ephemeral-based realms when it
+  // looks like you are running tests.
+  if (process.env.EMBER_ENV === 'test') {
+    return cardDocument()
+      .withAttributes({
+        csRealm,
+        csId,
+        csTitle,
+        csDescription,
+      })
+      .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi;
+  } else {
+    return cardDocument()
+      .withAttributes({
+        csRealm,
+        csId,
+        csTitle,
+        csDescription,
+        repo,
+      })
+      .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'git-realm' }).jsonapi;
+  }
+}
+
+// TODO probably we should move this into the realm card
+async function assertRepoExists(path: string) {
+  if (!existsSync(path)) {
+    await mkdirp(path);
+    Repository.initBare(path);
+  }
 }

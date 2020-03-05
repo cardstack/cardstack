@@ -13,7 +13,7 @@
     "build": "ember build",
     "lint:hbs": "ember-template-lint .",
     "lint:js": "eslint .",
-    "start-prereqs": "docker run -d -p 5432:5432 --rm --name cardstack-pg cardstack/pg-test",
+    "start-prereqs": "rm -rf $HOME/.cardstack && docker run -d -p 5432:5432 --rm --name cardstack-pg cardstack/pg-test",
     "stop-prereqs": "docker stop cardstack-pg",
     "start": "node ./node_modules/.bin/ember s",
     "start-hub": "node ./node_modules/.bin/ember hub:start",

@@ -10,6 +10,7 @@
   "description": "Stock API server for the Cardstack tech stack.",
   "dependencies": {
     "@cardstack/core": "0.16.32",
+    "@cardstack/git-realm-card": "*",
     "@cardstack/logger": "^0.2.1",
     "@types/fs-extra": "^8.0.1",
     "@types/koa": "^2.0.52",
