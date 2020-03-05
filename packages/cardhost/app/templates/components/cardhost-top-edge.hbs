@@ -15,6 +15,7 @@
       @route="cards.card.edit.layout"
       @mode="preview"
       @linkTo="edit-layout" />
+    <CardSizeToggle class="cardhost-top-edge--size-buttons" data-test-top-edge-size-buttons />
   {{else if (or (eq @mode "layout") (eq @mode "fields"))}}
     <PreviewLinkButton @model={{@card}} class="cardhost-top-edge--preview-button {{if (eq @mode "fields") "hidden"}}" data-test-top-edge-preview-link />
     <div class="view-selector" data-test-view-selector>
