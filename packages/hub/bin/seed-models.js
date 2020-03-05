@@ -51,7 +51,7 @@ setupContainer(options, dataSources)
   })
   .then(() => {
     if (process.env.HUB_ENVIRONMENT === 'production') {
-      log.info('Skipped loading seeds for production')
+      log.info('Skipped loading seeds for production');
     } else {
       log.info('Completed loading seed models');
     }
