@@ -21,6 +21,7 @@ Router.map(function() {
           this.route('schema');
         });
       });
+      this.route('preview');
     });
   });
   this.route('ui-components');

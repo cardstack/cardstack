@@ -89,8 +89,10 @@
   padding: 30px;
 }
 
-.card-renderer-isolated.themer .card-renderer-isolated--card-container {
+.card-renderer-isolated.view.themer .card-renderer-isolated--card-container,
+.card-renderer-isolated.view.preview .card-renderer-isolated--card-container {
   border: none;
+  border-radius: 10px;
 }
 
 

@@ -4,6 +4,7 @@
   --edit-bg: var(--ch-default);
   --themer-bg: var(--ch-dark-background);
   --schema-bg: var(--ch-deep-background);
+  --preview-bg: var(--ch-foreground);
 
   width: 100%;
   height: 100vh;
@@ -20,6 +21,10 @@
 
 .cardhost-cards.themer {
   --bg-color: var(--themer-bg);
+}
+
+.cardhost-cards.preview {
+  --bg-color: var(--preview-bg);
 }
 
 .cardhost-cards.schema {
@@ -78,5 +83,10 @@
 
 .card-renderer--inner-container.themer-container {
   padding-left: var(--ch-left-edge-navbar-width);
+  padding-right: 0;
+}
+
+.card-renderer--inner-container.preview-container {
+  padding-left: 0;
   padding-right: 0;
 }

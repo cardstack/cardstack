@@ -1,11 +1,9 @@
 .card-renderer-isolated--header--wrapper {
-  --bg-color: var(--edit-bg);
   background-color: var(--bg-color);
   /* We need the wrapper bg to mask the scrolling content that peeks through border-radius */
 }
 
 .card-renderer-isolated.view .card-renderer-isolated--header--wrapper {
-  --bg-color: var(--view-bg);
   position: absolute;
   top: var(--card-renderer-header-height);
   height: inherit;
@@ -14,14 +12,6 @@
 }
 .card-renderer-isolated.view .card-renderer-isolated--header--wrapper.selected {
   top: 0px;
-}
-
-.card-renderer-isolated.schema .card-renderer-isolated--header--wrapper {
-  --bg-color: var(--schema-bg);
-}
-
-.card-renderer-isolated.themer .card-renderer-isolated--header--wrapper {
-  --bg-color: var(--themer-bg);
 }
 
 .card-renderer-isolated--header {
