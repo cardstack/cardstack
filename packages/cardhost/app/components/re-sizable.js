@@ -36,14 +36,7 @@ export default class ReSizable extends Component {
   }
 
   get maxHeight() {
-    return typeof this.args.maxHeight === 'number' ? this.args.maxWidth : document.body.clientHeight;
-  }
-
-  @action
-  setElement() {
-    // done this way so that we only query once. If this was a getter instead,
-    //it would be called 100s of times a second, because it us used by the mousemove event.
-    this.el = document.querySelector(`#${this.elementId}`);
+    return typeof this.args.maxHeight === 'number' ? this.args.maxHeight : document.body.clientHeight;
   }
 
   get lockAspectRatio() {
@@ -56,6 +49,11 @@ export default class ReSizable extends Component {
 
   @action
   setStyle(el, [width, height]) {
+    if (!this.el) {
+      // done this way so that we only query once. If this was a getter instead,
+      //it would be called 100s of times a second, because it us used by the mousemove event.
+      this.el = el;
+    }
     this.elementWidth = width;
     this.elementHeight = height;
     let s = '';

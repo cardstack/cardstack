@@ -2,7 +2,7 @@
   position: fixed;
   top: var(--ch-spacing);
   right: 0;
-  left: 0;
+  left: var(--ch-left-edge-navbar-width);
   display: grid;
   grid-template-columns: minmax(auto, var(--ch-card-size)) auto;
   grid-gap: 20px;

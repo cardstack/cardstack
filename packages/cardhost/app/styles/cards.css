@@ -1,23 +1,36 @@
 .cardhost-cards {
+  --bg-color: var(--view-bg);
+  --view-bg: var(--ch-light-background);
+  --edit-bg: var(--ch-default);
+  --themer-bg: var(--ch-dark-background);
+  --schema-bg: var(--ch-deep-background);
+
   width: 100%;
   height: 100vh;
   margin: 0;
-  background-color: var(--ch-light-background);
+  background-color: var(--bg-color);
   color: var(--ch-dark);
   overflow-y: auto;
   transition: var(--ch-card-background-color-animate);
 }
 
 .cardhost-cards.edit {
-  background-color: var(--ch-default);
+  --bg-color: var(--edit-bg);
 }
 
-.cardhost-cards.schema {
-  background-color: var(--ch-deep-background);
+.cardhost-cards.themer {
+  --bg-color: var(--themer-bg);
 }
 
 .cardhost-cards.themer {
   background-color: var(--ch-foreground);
+}
+
+.cardhost-cards.schema {
+  --bg-color: var(--schema-bg);
+  background-image: url('/assets/images/grid-tile.png');
+  background-repeat: repeat;
+  background-size: 55px;
 }
 
 .cardhost-cards.dragging * {
@@ -34,4 +47,40 @@
 
 .themer-card-width--large .card-renderer-isolated {
   width: var(--ch-card-size-large);
+}
+
+.card-renderer--container {
+  --scroll-bottom-padding: 80px;
+
+  height: calc(100vh - var(--ch-top-edge-height));
+  width: 100%;
+  margin-top: var(--ch-top-edge-height);
+  overflow-y: auto;
+  transition: margin-top var(--ch-transition-time),
+              padding-top var(--ch-transition-time);
+}
+
+.cardhost-cards.view:not(.themer) .card-renderer--container {
+  box-sizing: content-box;
+  margin-top: 0;
+  padding-top: var(--ch-top-edge-height);
+}
+
+.card-renderer--inner-container {
+  padding-right: var(--ch-right-edge-width);
+  padding-left: var(--ch-left-edge-navbar-width);
+  transition: padding var(--ch-transition-time);
+}
+
+.card-renderer--inner-container.schema-container {
+  padding-left: var(--ch-left-edge-width);
+}
+
+.card-renderer--inner-container.view-container {
+  padding-right: 0;
+}
+
+.card-renderer--inner-container.themer-container {
+  padding-left: var(--ch-left-edge-navbar-width);
+  padding-right: 0;
 }

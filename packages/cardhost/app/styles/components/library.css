@@ -1,7 +1,6 @@
 .library {
   --library-navbar-width: 260px;
   --library-placeholder-card: #acaac6;
-  --library-nav-color: #6b6a80;
   --library-border-color: #373748;
   --library-grid-col-width: 265px; /* card-min-size + padding * 2 */
   --library-card-min-size: 225px;
@@ -27,7 +26,8 @@
 .library--main {
   grid-area: main;
   max-width: 1440px;
-  height: 100%;
+  min-height: 100%;
+  height: auto;
   padding: 44px 40px;
   overflow-y: auto;
 }
@@ -169,6 +169,11 @@
   padding: 20px;
   background: none;
   border: none;
+  border-radius: 0;
+}
+
+.library--card-link.cs-component-cta {
+  border-radius: 0;
 }
 
 .library--card-link:hover,
@@ -179,10 +184,10 @@
 
 .library--card-renderer > .embedded-card,
 .library--card-renderer > .library--card-placeholder {
-  min-width: var(--library-card-min-size);
-  min-height: var(--library-card-min-size);
+  width: var(--library-card-min-size);
+  height: var(--library-card-min-size);
   border-radius: 15px;
-  transition: transform var(--ch-card-transition-duration) ease-in-out calc(var(--ch-card-transition-duration) / 3);
+  transition: transform var(--ch-card-transition-duration) ease-in-out;
 }
 
 .library--card-link:hover > .library--card-renderer > .embedded-card,

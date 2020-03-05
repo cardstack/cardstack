@@ -11,16 +11,9 @@
   align-items: center;
   text-align: right;
   z-index: var(--ch-top-edge-z-index);
-  background-color: var(--ch-default);
   transition: var(--ch-card-background-color-animate);
 }
-.cardhost-top-edge.view {
-  background-color: var(--ch-light-background);
-  z-index: 10;
-}
-.cardhost-top-edge.schema {
-  background-color: var(--ch-deep-background);
-}
+
 .cardhost-top-edge.themer {
   background-color: transparent;
   right: 0;
