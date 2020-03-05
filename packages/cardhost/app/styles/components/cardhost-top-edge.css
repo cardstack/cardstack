@@ -20,7 +20,8 @@
 }
 
 .cardhost-top-edge.preview {
-  left: var(--ch-spacing);
+  grid-template-columns: auto 1fr 40px;
+  justify-items: end;
 }
 
 .cardhost-top-edge--preview-button,
