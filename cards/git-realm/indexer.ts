@@ -20,7 +20,7 @@ interface GitMeta {
 type PathSpec = string | string[];
 
 export default class GitIndexer implements Indexer<GitMeta> {
-  repoPath = '';
+  repoPath?: string;
   basePath: PathSpec[] = [];
   branchPrefix = '';
   remote?: RemoteConfig;
@@ -226,6 +226,9 @@ function identify(entry: TreeEntry) {
     let filename = parts[parts.length - 1];
     id = filename.replace(/\.json$/, '');
   }
+
+  id = decodeURIComponent(id);
+
   return { type, id };
 }
 

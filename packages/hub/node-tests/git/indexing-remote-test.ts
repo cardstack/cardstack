@@ -7,101 +7,133 @@ import { Session } from '@cardstack/core/session';
 // import { wireItUp } from '../../main';
 import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
-import Change from '../../../../cards/git-realm/lib/change';
-import { commitOpts, makeRepo } from './support';
+import { makeRepo } from './support';
+import { Remote } from '../../../../cards/git-realm/lib/git';
 
 function idToCanonicalUrl(id: string) {
   return `${myOrigin}/api/realms/test-git-repo/cards/${id}`;
 }
 
-describe('hub/git/indexing', function() {
+async function resetRemote() {
+  let root = (await mkTmpDir({ unsafeCleanup: true })).path;
+
+  let tempRepo = await makeRepo(root, {
+    'contents/events/event-1.json': JSON.stringify(
+      cardDocument()
+        .withField('title', 'string-field')
+        .withAttributes({ title: 'hello world' }).jsonapi
+    ),
+    'contents/events/event-2.json': JSON.stringify(
+      cardDocument()
+        .withField('title', 'string-field')
+        .withAttributes({ title: 'goodbye world' }).jsonapi
+    ),
+  });
+
+  let remote = await Remote.create(tempRepo.repo, 'origin', 'http://root:password@localhost:8838/git/repo');
+  await remote.push('refs/heads/master', 'refs/heads/master', { force: true });
+
+  return tempRepo;
+}
+describe('hub/git/indexing-remote', function() {
   let env: TestEnv, indexing: IndexingService, cards: CardsService, service: ScopedCardService;
   let repoRealm = `${myOrigin}/api/realms/test-git-repo`;
-  let tmpDir: DirectoryResult;
-  let root: string;
+  // let tmpDir: DirectoryResult;
+  // let root: string;
+  let head: string;
   let repoDoc: CardDocument;
+  let tempRepoDir: DirectoryResult, tempRepoPath: string;
+  // tempRemoteRepoPath: string;
 
   beforeEach(async function() {
     env = await createTestEnv();
     indexing = await env.container.lookup('indexing');
     cards = await env.container.lookup('cards');
-    tmpDir = await mkTmpDir({ unsafeCleanup: true });
-    root = tmpDir.path;
+    // tmpDir = await mkTmpDir({ unsafeCleanup: true });
+    // root = tmpDir.path;
     service = cards.as(Session.EVERYONE);
+
+    let tempRepo = await resetRemote();
+
+    head = tempRepo.head;
+
+    tempRepoDir = await mkTmpDir({ unsafeCleanup: true });
+    // tempRemoteRepoDir = await mkTmpDir({ unsafeCleanup: true });
+    tempRepoPath = tempRepoDir.path;
+    // tempRemoteRepoPath = tempRemoteRepoDir.path;
 
     repoDoc = cardDocument()
       .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'git-realm' })
-      .withAttributes({ repo: root, csId: repoRealm });
+      .withAttributes({
+        remoteUrl: 'http://root:password@localhost:8838/git/repo',
+        remoteCacheDir: tempRepoPath,
+        csId: repoRealm,
+      });
 
     await service.create(`${myOrigin}/api/realms/meta`, repoDoc.jsonapi);
+
+    //     start = async function() {
+    //       env = await createDefaultEnvironment(join(__dirname, '..'), factory.getModels());
+    //       indexer = env.lookup('hub:indexers');
+    //       searcher = env.lookup('hub:searchers');
+    //       client = env.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`);
+    //     };
+    //   });
   });
 
   afterEach(async function() {
     await env.destroy();
   });
 
-  it('processes first empty branch', async function() {
-    let { head } = await makeRepo(root);
-
+  it('clones the remote repo', async function() {
     await indexing.update();
-
     let indexerState = await indexing.loadMeta(repoRealm);
     expect(indexerState!.commit).to.equal(head);
   });
 
-  it('indexes newly added document', async function() {
-    let { repo, head } = await makeRepo(root);
-
+  it('indexes existing data in the remote after it is cloned', async function() {
     await indexing.update();
-
-    let change = await Change.create(repo, head, 'master');
-    let file = await change.get('cards/hello-world.json', { allowCreate: true });
-    file.setContent(
-      JSON.stringify(
-        cardDocument()
-          .withField('title', 'string-field')
-          .withAttributes({ title: 'hello world' }).jsonapi
-      )
-    );
-    head = await change.finalize(commitOpts());
-
-    await indexing.update();
-
-    let indexerState = await indexing.loadMeta(repoRealm);
-
-    expect(indexerState!.commit).to.equal(head);
-
-    let foundCard = await service.get(idToCanonicalUrl('hello-world'));
-
+    let foundCard = await service.get(idToCanonicalUrl('event-1'));
     expect(await foundCard.value('title')).to.equal('hello world');
+    foundCard = await service.get(idToCanonicalUrl('event-2'));
+    expect(await foundCard.value('title')).to.equal('goodbye world');
   });
 
-  it('indexes a url-encoded id card', async function() {
-    let { repo, head } = await makeRepo(root);
+  // it('processes first empty branch', async function() {
+  //   let { head } = await makeRepo(root);
 
-    await indexing.update();
+  //   await indexing.update();
 
-    let change = await Change.create(repo, head, 'master');
-    let file = await change.get('cards/foo%2Fbar%2Fbaz.json', { allowCreate: true });
-    file.setContent(
-      JSON.stringify(
-        cardDocument()
-          .withField('title', 'string-field')
-          .withAttributes({ title: 'hello world' }).jsonapi
-      )
-    );
-    head = await change.finalize(commitOpts());
+  //   let indexerState = await indexing.loadMeta(repoRealm);
+  //   expect(indexerState!.commit).to.equal(head);
+  // });
 
-    await indexing.update();
+  // it('indexes newly added document', async function() {
+  //   let { repo, head } = await makeRepo(root);
 
-    let indexerState = await indexing.loadMeta(repoRealm);
+  //   await indexing.update();
 
-    expect(indexerState!.commit).to.equal(head);
+  //   let change = await Change.create(repo, head, 'master');
+  //   let file = await change.get('contents/articles/hello-world.json', { allowCreate: true });
+  //   file.setContent(
+  //     JSON.stringify(
+  //       cardDocument()
+  //         .withField('title', 'string-field')
+  //         .withAttributes({ title: 'hello world' }).jsonapi
+  //     )
+  //   );
+  //   head = await change.finalize(commitOpts());
 
-    let foundCard = await service.get(idToCanonicalUrl('foo%2Fbar%2Fbaz'));
+  //   await indexing.update();
 
-    expect(await foundCard.value('title')).to.equal('hello world');
-  });
+  //   let indexerState = await indexing.loadMeta(repoRealm);
+
+  //   expect(indexerState!.commit).to.equal(head);
+
+  //   let foundCard = await service.get(idToCanonicalUrl('hello-world'));
+
+  //   expect(await foundCard.value('title')).to.equal('hello world');
+  // });
 
   // it('it can index a realm', async function() {
   //   let csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;

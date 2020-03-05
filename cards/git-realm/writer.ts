@@ -82,7 +82,7 @@ export default class GitWriter implements Writer {
   myEmail: string;
   myName: string;
   remote?: RemoteConfig;
-  repoPath = '';
+  repoPath?: string;
   basePath?: string;
   repo?: Repository;
   branchPrefix = '';
@@ -147,7 +147,7 @@ export default class GitWriter implements Writer {
       meta.version = version;
       document.jsonapi.data.meta = meta;
 
-      return { saved: document, version };
+      return { saved: document, version, id };
     });
   }
 
@@ -286,8 +286,15 @@ export default class GitWriter implements Writer {
 
   _filenameFor(type: string, id: string) {
     let base = this.basePath ? this.basePath + '/' : '';
-    let category = 'contents';
-    return `${base}${category}/${type}/${id}.json`;
+    let encodedId = encodeURIComponent(id);
+    let start: string;
+
+    if (base) {
+      start = `${base}/`;
+    } else {
+      start = '';
+    }
+    return `${start}${type}/${encodedId}.json`;
   }
 
   async _ensureRepo() {
@@ -298,7 +305,7 @@ export default class GitWriter implements Writer {
         return;
       }
 
-      this.repo = await Repository.open(this.repoPath);
+      this.repo = await Repository.open(this.repoPath!);
     }
   }
 

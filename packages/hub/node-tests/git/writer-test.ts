@@ -16,7 +16,6 @@ import { makeRepo, inRepo } from './support';
 import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';
 
 describe('hub/git/writer', function() {
-  // let env: todo, writers: todo, cardServices: todo, repoPath: string, head: string;
   this.timeout(10000);
   let env: TestEnv;
   let service: ScopedCardService;
@@ -155,7 +154,32 @@ describe('hub/git/writer', function() {
 
       let cardInRepo = await service.create(repoRealm, cardDoc.jsonapi);
 
-      let saved = await inRepo(repoPath).getJSONContents('master', `contents/cards/${cardInRepo.csId}.json`);
+      let saved = await inRepo(repoPath).getJSONContents('master', `cards/${cardInRepo.csId}.json`);
+      expect(saved.data.attributes.title).to.equal('Second Article');
+    });
+
+    it('saves cards with an id', async function() {
+      let cardDoc = cardDocument()
+        .withAutoAttributes({
+          title: 'Second Article',
+        })
+        .withAttributes({ csId: 'custom-id' });
+
+      await service.create(repoRealm, cardDoc.jsonapi);
+
+      let saved = await inRepo(repoPath).getJSONContents('master', `cards/custom-id.json`);
+      expect(saved.data.attributes.title).to.equal('Second Article');
+    });
+
+    it('url encodes id', async function() {
+      let cardDoc = cardDocument()
+        .withAutoAttributes({
+          title: 'Second Article',
+        })
+        .withAttributes({ csId: 'foo/bar/baz' });
+
+      await service.create(repoRealm, cardDoc.jsonapi);
+      let saved = await inRepo(repoPath).getJSONContents('master', `cards/foo%2Fbar%2Fbaz.json`);
       expect(saved.data.attributes.title).to.equal('Second Article');
     });
 
@@ -375,7 +399,7 @@ describe('hub/git/writer', function() {
       expect(newVersion).to.be.ok;
       expect(newVersion).to.not.equal(version);
 
-      let saved = await inRepo(repoPath).getJSONContents('master', `contents/cards/${savedCard.csId}.json`);
+      let saved = await inRepo(repoPath).getJSONContents('master', `cards/${savedCard.csId}.json`);
       expect(saved.data.attributes.title).to.equal('Updated document');
       // expect(storage.getEntry(card, card.csRealm)?.doc?.jsonapi.data.attributes?.foo).to.equal('poo');
     });
@@ -820,16 +844,16 @@ describe('hub/git/writer', function() {
     });
 
     it('can delete a card', async function() {
-      let saved = await inRepo(repoPath).getJSONContents('master', `contents/cards/${savedCard.csId}.json`);
+      let saved = await inRepo(repoPath).getJSONContents('master', `cards/${savedCard.csId}.json`);
       expect(saved.data.attributes.title).to.equal('Initial document');
 
       let version = (await savedCard.serializeAsJsonAPIDoc()).data.meta?.version as string;
 
-      let repoContents = (await inRepo(repoPath).listTree('master', 'contents/cards')).map(a => a.name);
+      let repoContents = (await inRepo(repoPath).listTree('master', 'cards')).map(a => a.name);
       expect(repoContents).to.include(`${savedCard.csId}.json`);
       await service.delete(savedCard, version);
 
-      repoContents = (await inRepo(repoPath).listTree('master', 'contents/cards')).map(a => a.name);
+      repoContents = (await inRepo(repoPath).listTree('master', 'cards')).map(a => a.name);
       expect(repoContents).not.to.include(`${savedCard.csId}.json`);
     });
 
