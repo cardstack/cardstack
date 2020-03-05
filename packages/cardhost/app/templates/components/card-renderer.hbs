@@ -19,19 +19,21 @@
       >
         {{#unless @suppressHeader}}
           {{#if (eq @mode "view")}}
-            {{#animated-value @card watch="isSelected" use=this.headerAnimation}}
-              <CardRendererHeader
-                @cardSelected={{if (and this.cardstackSession.isAuthenticated @cardSelected) true}}
-                @card={{@card}}
-                @buttonRoute="cards.card.edit.fields"
-                @buttonText="Edit"
-                @mode={{this.mode}}
-                @contextMenuOpen={{@contextMenuOpen}}
-                @setContextMenu={{@setContextMenu}}
-              />
-            {{/animated-value}}
+            <AnimatedContainer class="card-renderer-isolated--animated-view-header">
+              {{#animated-value @card watch="isSelected" use=this.headerAnimation}}
+                <CardRendererHeader
+                  @cardSelected={{if (and this.cardstackSession.isAuthenticated @cardSelected) true}}
+                  @card={{@card}}
+                  @buttonRoute="cards.card.edit.fields"
+                  @buttonText="Edit"
+                  @mode={{this.mode}}
+                  @contextMenuOpen={{@contextMenuOpen}}
+                  @setContextMenu={{@setContextMenu}}
+                />
+              {{/animated-value}}
+            </AnimatedContainer>
           {{else}}
-            <AnimatedContainer>
+            <AnimatedContainer class="card-renderer-isolated--animated-header">
               {{#animated-value @card watch=this.animatedWatchField use=this.headerAnimation group="header"}}
                 <CardRendererHeader
                   @cardSelected={{true}}
@@ -49,7 +51,7 @@
         {{!-- This is the card boundary, please don't set any card specific classes any higher in the DOM than this. --}}
         {{!-- If we need card specific styling above this level, then let's chat about it.                           --}}
         <AnimatedContainer
-          class="card-renderer-isolated--content
+          class="card-renderer-isolated--animated-content
             {{concat (safe-css-string (if @card.canonicalURL @card.canonicalURL @card.adoptsFromURL)) "--isolated" }}
           "
         >

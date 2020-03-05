@@ -1,43 +1,3 @@
-.card-renderer--container {
-  --scroll-bottom-padding: 80px;
-
-  height: 100vh;
-  width: 100%;
-  padding-top: var(--ch-top-edge-height);
-  padding-bottom: var(--scroll-bottom-padding);
-  overflow-y: auto;
-  transition: padding var(--ch-transition-time);
-}
-
-.card-renderer--inner-container {
-  padding-right: var(--ch-right-edge-width);
-  padding-left: var(--ch-left-edge-navbar-width);
-  transition: padding var(--ch-transition-time);
-}
-
-.card-renderer--inner-container.schema-container {
-  padding-left: var(--ch-left-edge-width);
-}
-
-.card-renderer--inner-container.view-container {
-  padding-right: 0;
-}
-
-.card-renderer--inner-container.themer-container {
-  padding-left: var(--ch-left-edge-navbar-width);
-  padding-right: 0;
-}
-
-.card-renderer--embedded-card-link:focus {
-  outline: 0;
-}
-.card-renderer--embedded-card-link:focus > .embedded-card {
-  border: 1px solid var(--ch-highlight);
-}
-.card-renderer--embedded-card-link:focus > .embedded-card-label {
-  color: var(--ch-highlight);
-}
-
 .card-renderer-isolated {
   --card-renderer-width: var(--ch-card-size);
   --card-renderer-height: var(--ch-card-size);
@@ -62,11 +22,6 @@
   background-color: var(--ch-dark-background);
 }
 
-.card-renderer-isolated.view {
-  padding-top: var(--card-renderer-header-height);
-}
-
-
 /* Resetting styles so that view mode styling does not affect other modes */
 .card-renderer-isolated.schema .isolated-card,
 .card-renderer-isolated.edit .isolated-card,
@@ -79,111 +34,44 @@
 }
 
 
-/* Card Renderer Header */
-/* We need the wrapper to mask the border of the content when scrolling */
-.card-renderer-isolated--header--wrapper {
-  background-color: var(--ch-default);
+/* Card Renderer - Header wrapper */
+.card-renderer-isolated--animated-header {
   position: sticky;
   top: 0;
   z-index: var(--ch-card-header-z-index); /* card scrolls under the header */
 }
 
-.card-renderer-isolated.view .card-renderer-isolated--header--wrapper {
-  background-color: var(--ch-light-background);
-  position: absolute;
-  top: var(--card-renderer-header-height);
-  left: var(--ch-spacing);
-  right: var(--ch-spacing);
-  z-index: 5;
-  bottom: 100px;
-}
-
-.card-renderer-isolated.view .card-renderer-isolated--header--wrapper.selected {
-  top: 0px;
-}
-
-.card-renderer-isolated.schema .card-renderer-isolated--header--wrapper {
-  background-color: var(--ch-deep-background);
-}
-
-.card-renderer-isolated.themer .card-renderer-isolated--header--wrapper {
-  background-color: var(--ch-dark-background);
-}
-
-.card-renderer-isolated--header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
+.card-renderer-isolated.view:not(.themer) .card-renderer-isolated--animated-view-header {
+  top: 0;
   height: var(--card-renderer-header-height);
-  color: var(--ch-light-op50);
-  background-color: var(--ch-dark-background);
-  border: 3px solid var(--ch-dark-background);
-  border-radius: 10px 10px 0 0;
-  font-weight: 600;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  text-transform: capitalize;
-
-  transition: background-color var(--ch-transition-time),
-              color var(--ch-transition-time),
-              border-color var(--ch-transition-time);
+  z-index: 5;
 }
 
-.card-renderer-isolated--header svg {
-  --icon-color: var(--ch-light-op50);
-  transition: stroke var(--ch-transition-time);
-}
 
-.card-renderer--edit-link {
-  margin-left: auto;
-}
-
-.card-renderer-isolated.themer .card-renderer-isolated--header {
-  background-color: var(--ch-default);
-  border-color: var(--ch-default);
-}
-
-.card-renderer-isolated--header .card-renderer--header-link {
-  padding: 5px 20px;
-  border: solid 1px var(--ch-border);
-  border-radius: 20px;
-  font-size: 0.8em;
-}
-
-/* Card Renderer - Outer Wrapper */
-.card-renderer-isolated--content {
-  position: relative;
-  min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
+/* Card Renderer - Content wrapper */
+.card-renderer-isolated--animated-content {
   padding-bottom: var(--scroll-bottom-padding);
-  background-color: transparent;
-  color: var(--ch-dark);
-  border: none;
-  z-index: var(--ch-card-z-index);
-
-  transition: var(--ch-card-background-color-animate);
 }
 
-.card-renderer-isolated.schema .card-renderer-isolated--content {
-  color: var(--ch-light);
-}
-
-.card-renderer-isolated.themer .card-renderer-isolated--content {
-  background-color: var(--ch-dark-background);
-}
-
-
-/* Card Renderer - Inner Wrapper */
 .card-renderer-isolated .card-renderer-isolated--card-container {
+  position: relative;
   border: 3px solid transparent;
   border-radius: 0 0 10px 10px;
   overflow: hidden;
   min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
-  background: var(--ch-light);
+  background-color: var(--ch-light);
+  z-index: 5;
 
   transition: background-color var(--ch-transition-time),
               border-color var(--ch-transition-time);
+}
+
+.card-renderer-isolated.selected .card-renderer-isolated--card-container {
+  z-index: 4;
+}
+
+.card-renderer-isolated:not(.view) {
+  margin-top: -3px;
 }
 
 .card-renderer-isolated.view .card-renderer-isolated--card-container {
@@ -201,7 +89,6 @@
 }
 
 .card-renderer-isolated.edit .card-renderer-isolated--card-container {
-  background-color: var(--ch-light);
   padding: 30px;
 }
 
@@ -215,45 +102,17 @@
   outline: 0;
 }
 
-.card-renderer-isolated.selected .card-renderer-isolated--header,
-.card-renderer-isolated.layout .card-renderer-isolated--header,
-.card-renderer-isolated.view .card-renderer-isolated--header {
-  background-color: var(--ch-highlight);
-  border-color: var(--ch-highlight);
-  color: var(--ch-dark);
-}
-
-.card-renderer-isolated.selected .card-renderer-isolated--header svg,
-.card-renderer-isolated.layout .card-renderer-isolated--header svg {
-  --icon-color: var(--ch-dark);
-}
-
 .card-renderer-isolated.layout .card-renderer-isolated--card-container,
 .card-renderer-isolated.selected .card-renderer-isolated--card-container {
   border-color: var(--ch-highlight);
 }
 
-
-.card-renderer-isolated--header-icon {
-  padding-right: 10px;
-  width: 40px;
+.card-renderer--embedded-card-link:focus {
+  outline: 0;
 }
-
-.card-renderer-isolated--header-title {
-  width: 100%;
+.card-renderer--embedded-card-link:focus > .embedded-card {
+  border: 1px solid var(--ch-highlight);
 }
-
-/* TODO: fade card if field-renderer is selected */
-/* .card-renderer-isolated.faded::before {
-  content: '';
-  display: block;
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  bottom: 0;
-  background-color: var(--ch-default);
-  opacity: 0.35;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 5;
-} */
+.card-renderer--embedded-card-link:focus > .embedded-card-label {
+  color: var(--ch-highlight);
+}
