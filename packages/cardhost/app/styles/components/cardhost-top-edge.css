@@ -10,14 +10,17 @@
   justify-items: center;
   align-items: center;
   text-align: right;
+  background-color: transparent;
   z-index: var(--ch-top-edge-z-index);
-  transition: var(--ch-card-background-color-animate);
 }
 
 .cardhost-top-edge.themer {
-  background-color: transparent;
   right: 0;
   left: 0;
+}
+
+.cardhost-top-edge.preview {
+  left: var(--ch-spacing);
 }
 
 .cardhost-top-edge--preview-button,
