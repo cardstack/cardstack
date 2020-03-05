@@ -32,6 +32,10 @@ describe('hub/indexing', function() {
     expect(indexedCard).to.be.ok;
   });
 
+  it.skip('TODO it can start indexing a realm as soon as a realm card is created', async function() {
+    // the act of creating a realm card should immediately trigger that realm to be indexed
+  });
+
   it('it can remove a document from the index if the document was removed from the data source', async function() {
     let csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
     let card = await cards.create(
