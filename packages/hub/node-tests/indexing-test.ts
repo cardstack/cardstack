@@ -3,18 +3,18 @@ import { EphemeralStorage } from '../../../cards/ephemeral-realm/storage';
 import IndexingService from '../indexing';
 import { cardDocument } from '@cardstack/core/card-document';
 import { myOrigin } from '@cardstack/core/origin';
-import CardsService from '../cards-service';
+import { ScopedCardService } from '../cards-service';
 import { Session } from '@cardstack/core/session';
 import { wireItUp } from '../main';
 
 describe('hub/indexing', function() {
-  let env: TestEnv, storage: EphemeralStorage, indexing: IndexingService, cards: CardsService;
+  let env: TestEnv, storage: EphemeralStorage, indexing: IndexingService, cards: ScopedCardService;
 
   beforeEach(async function() {
     env = await createTestEnv();
     storage = await env.container.lookup('ephemeralStorage');
     indexing = await env.container.lookup('indexing');
-    cards = await env.container.lookup('cards');
+    cards = (await await env.container.lookup('cards')).as(Session.INTERNAL_PRIVILEGED);
   });
 
   afterEach(async function() {
@@ -28,19 +28,20 @@ describe('hub/indexing', function() {
 
     await indexing.update();
 
-    let indexedCard = await cards.as(Session.INTERNAL_PRIVILEGED).get(card);
+    let indexedCard = await cards.get(card);
     expect(indexedCard).to.be.ok;
   });
 
   it('it can remove a document from the index if the document was removed from the data source', async function() {
     let csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
-    let card = await cards
-      .as(Session.INTERNAL_PRIVILEGED)
-      .create(csRealm, cardDocument().withAutoAttributes({ csRealm, csId: '1', foo: 'bar' }).jsonapi);
+    let card = await cards.create(
+      csRealm,
+      cardDocument().withAutoAttributes({ csRealm, csId: '1', foo: 'bar' }).jsonapi
+    );
     storage.store(null, card.csId, card.csRealm, storage.getEntry(card, csRealm)?.generation);
     await indexing.update();
 
-    let { cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
+    let { cards: results } = await cards.search({
       filter: { eq: { csId: '1' } },
     });
     expect(results.length).to.equal(0);
@@ -56,7 +57,7 @@ describe('hub/indexing', function() {
 
     await indexing.update();
 
-    let { cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
+    let { cards: results } = await cards.search({
       filter: { eq: { csId: '1' } },
     });
     expect(results.length).to.equal(2);
@@ -78,7 +79,7 @@ describe('hub/indexing', function() {
     await env.container.teardown();
     env.container = await wireItUp();
 
-    cards = await env.container.lookup('cards');
+    cards = (await env.container.lookup('cards')).as(Session.INTERNAL_PRIVILEGED);
     indexing = await env.container.lookup('indexing');
     storage = await env.container.lookup('ephemeralStorage');
     (await env.container.lookup('queue')).launchJobRunner();
@@ -89,17 +90,17 @@ describe('hub/indexing', function() {
     storage.store(await card.upstreamDoc, card.csId, card.csRealm);
     await indexing.update();
 
-    let { cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
+    let { cards: results } = await cards.search({
       filter: { eq: { csId: '1' } },
     });
     expect(results.length).to.equal(0);
 
-    ({ cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
+    ({ cards: results } = await cards.search({
       filter: { eq: { csId: '2' } },
     }));
     expect(results.length).to.equal(0);
 
-    ({ cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
+    ({ cards: results } = await cards.search({
       filter: { eq: { csId: '3' } },
     }));
     expect(results.length).to.equal(1);
@@ -108,7 +109,7 @@ describe('hub/indexing', function() {
   it('it does not index unchanged cards since the last time the ephemeral realm was indexed', async function() {
     let realm = `${myOrigin}/api/realms/first-ephemeral-realm`;
 
-    let steps = await cards.as(Session.INTERNAL_PRIVILEGED).create(
+    let steps = await cards.create(
       realm,
       cardDocument()
         .withField('foo', 'string-field')
@@ -116,7 +117,7 @@ describe('hub/indexing', function() {
     );
 
     async function cardsWithStep(n: number): Promise<number> {
-      let found = await cards.as(Session.INTERNAL_PRIVILEGED).search({
+      let found = await cards.search({
         filter: {
           type: steps,
           eq: {
