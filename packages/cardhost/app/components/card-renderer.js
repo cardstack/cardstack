@@ -118,6 +118,7 @@ export default class CardRenderer extends Component {
     }
 
     keptSprites.forEach(sprite => {
+      sprite.applyStyles({ 'z-index': '5' });
       adjustCSS('border-top-right-radius', sprite, { duration });
       adjustCSS('border-top-left-radius', sprite, { duration });
     });
