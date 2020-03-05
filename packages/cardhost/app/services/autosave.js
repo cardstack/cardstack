@@ -5,10 +5,11 @@ import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 import { restartableTask, enqueueTask } from 'ember-concurrency-decorators';
 import { timeout } from 'ember-concurrency';
+import { set } from '@ember/object';
 import ENV from '@cardstack/cardhost/config/environment';
 
 const { autosaveDebounce, autosaveDisabled, environment } = ENV;
-const AUTOSAVE_DEBOUNCE = 5000;
+const AUTOSAVE_DEBOUNCE = 6000;
 
 export default class AutosaveService extends Service {
   @service data;
@@ -34,7 +35,14 @@ export default class AutosaveService extends Service {
   }
 
   bindCardUpdated(cardUpdatedFn) {
-    this.cardUpdated = cardUpdatedFn;
+    this._cardUpdatedFn = cardUpdatedFn;
+  }
+
+  cardUpdated(updatedCard) {
+    if (typeof this._cardUpdatedFn === 'function') {
+      this._cardUpdatedFn(updatedCard, true);
+    }
+    this.kickoff();
   }
 
   get isDirty() {
@@ -51,18 +59,23 @@ export default class AutosaveService extends Service {
   *saveCard() {
     this.statusMsg = null;
 
+    let savedCard;
     try {
       if (!this.card) {
         throw new Error(`autosave service was never initialized with a card model when card route was entered`);
       }
-      let savedCard = yield this.data.save(this.card);
-      this.cardUpdated(savedCard, false);
+      savedCard = yield this.data.save(this.card);
     } catch (e) {
       console.error(e); // eslint-disable-line no-console
       this.hasError = true;
       this.statusMsg = `card ${this.card.csTitle} was NOT successfully created: ${e.message}`;
       return;
     }
+
+    this._cardUpdatedFn(savedCard, false);
+
+    // Make sure queued card saves have latest version number
+    set(this.model, 'card', yield this.card.patch({ data: { type: 'cards', meta: savedCard.meta } })); // This is not ideal, please save us orbit...
   }
 
   @restartableTask

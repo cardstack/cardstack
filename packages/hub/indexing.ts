@@ -7,6 +7,8 @@ import { upsert, param } from './pgsearch/util';
 import { Expression } from '@cardstack/core/expression';
 import { CardId } from '@cardstack/core/card-id';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { SingleResourceDoc } from 'jsonapi-typescript';
+import { AddressableCard } from '@cardstack/core/card';
 
 export default class IndexingService {
   cards = inject('cards');
@@ -18,9 +20,24 @@ export default class IndexingService {
     this.queue.register('index_realm', this.indexRealm.bind(this));
   }
 
-  private async indexRealm(realmCardId: CardId) {
+  // This is necessary for booting a new hub that is using a remote-repo for
+  // it's meta realm. In this case the index doesn't even know about its meta
+  // realm, so we need to provide the meta realm card so the index can boot
+  // itself.
+  async indexMetaRealm(metaRealmDocument: SingleResourceDoc) {
+    let scopedService = this.cards.as(Session.INTERNAL_PRIVILEGED);
+    let metaRealm = await scopedService.instantiate(metaRealmDocument);
+    await this._indexRealm(metaRealm);
+  }
+
+  async indexRealm(realmCardId: CardId) {
     let scopedService = this.cards.as(Session.INTERNAL_PRIVILEGED);
     let realmCard = await scopedService.get(realmCardId);
+    await this._indexRealm(realmCard);
+  }
+
+  private async _indexRealm(realmCard: AddressableCard) {
+    let scopedService = this.cards.as(Session.INTERNAL_PRIVILEGED);
     let indexerFactory = await realmCard.loadFeature('indexer');
     if (!indexerFactory) {
       return;

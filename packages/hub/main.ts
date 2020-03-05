@@ -31,6 +31,7 @@ const log = logger('cardstack/server');
 const metaRealm = `${myOrigin}/api/realms/meta`;
 export const localDefaultRealmRepo = join(homedir(), '.cardstack', 'default-realm');
 export const localMetaRealmRepo = join(homedir(), '.cardstack', 'meta-realm');
+export const localCardCatalogRepo = join(homedir(), '.cardstack', 'card-catalog-realm');
 
 export async function wireItUp() {
   let registry = new Registry();
@@ -108,24 +109,47 @@ async function runServer(config: StartupConfig) {
 }
 
 async function setupRealms(container: Container) {
-  await assertRealmExists(container, {
+  let metaRealmConfig: RealmAttrs = {
     csRealm: metaRealm,
     csId: metaRealm,
     csTitle: 'Meta Realm',
     csDescription: `This card controls the configuration of the meta realm which is the realm that holds all of your realm cards.`,
-    // TODO use remote repo env var for meta realm, otherwise use a local
-    // repo.
-    repo: localMetaRealmRepo,
-  });
-  await assertRealmExists(container, {
+  };
+
+  let defaultRealmConfig: RealmAttrs = {
     csRealm: metaRealm,
     csId: `${myOrigin}/api/realms/default`,
     csTitle: `Default Realm`,
     csDescription: `This card controls the configuration of your hub's default realm. This is the realm that cards are written to by default.`,
-    // TODO use remote repo env var for meta realm, otherwise use a local
-    // repo.
-    repo: localDefaultRealmRepo,
-  });
+  };
+
+  if (process.env.EMBER_ENV !== 'test') {
+    if (process.env.META_REALM_URL) {
+      metaRealmConfig.remoteUrl = process.env.META_REALM_URL;
+      metaRealmConfig.remoteCacheDir = localMetaRealmRepo;
+    } else {
+      metaRealmConfig.repo = localMetaRealmRepo;
+    }
+    if (process.env.DEFAULT_REALM_URL) {
+      defaultRealmConfig.remoteUrl = process.env.DEFAULT_REALM_URL;
+      defaultRealmConfig.remoteCacheDir = localDefaultRealmRepo;
+    } else {
+      defaultRealmConfig.repo = localDefaultRealmRepo;
+    }
+  }
+
+  await assertRealmExists(container, metaRealmConfig);
+  await assertRealmExists(container, defaultRealmConfig);
+
+  // In the scenario where your realms are remote git realms, let's kick off an
+  // initial index update so we can get the index in-sync with the remote repo.
+  if (process.env.EMBER_ENV !== 'test' && (process.env.DEFAULT_REALM_URL || process.env.META_REALM_URL)) {
+    let indexing = await container.lookup('indexing');
+    // I'd prefer calling indexing.update() here, but the indexing jobs never
+    // seem to resolve. Maybe the queue isn't ready to service jobs at this
+    // point?
+    indexing.indexRealm(defaultRealmConfig); // intentionally not awaiting this...
+  }
 }
 
 interface StartupConfig {
@@ -165,11 +189,13 @@ interface RealmAttrs {
   csTitle: string;
   csDescription: string;
   repo?: string;
+  remoteUrl?: string;
+  remoteCacheDir?: string;
 }
 
 async function assertRealmExists(container: Container, realmAttrs: RealmAttrs): Promise<void> {
-  let { csRealm, csId, repo } = realmAttrs;
-  let realmCard = getRealmCard(realmAttrs);
+  let { csRealm, csId, repo, remoteCacheDir } = realmAttrs;
+  let realmCardDoc = getRealmCardDoc(realmAttrs);
 
   let cards = (await container.lookup('cards')).as(Session.INTERNAL_PRIVILEGED);
   let hasRealm: boolean;
@@ -178,7 +204,7 @@ async function assertRealmExists(container: Container, realmAttrs: RealmAttrs): 
       // In the case the meta realm doesn't exist yet we need to supply a meta
       // realm card document that the cards.get() can fall back on, as the meta
       // realm document needs to be available in order for cards.get() to work.
-      await cards.get({ csRealm, csId }, realmCard);
+      await cards.get({ csRealm, csId }, realmCardDoc);
     } else {
       await cards.get({ csRealm, csId });
     }
@@ -190,18 +216,34 @@ async function assertRealmExists(container: Container, realmAttrs: RealmAttrs): 
     hasRealm = false;
   }
 
-  let isLocalRepo = true; // TODO update to deal with remote repos...
   if (!hasRealm) {
     log.info(`Creating realm ${csId}.`);
-    if (isLocalRepo && repo) {
+    if (repo) {
       await assertRepoExists(repo);
+    } else if (remoteCacheDir) {
+      await mkdirp(remoteCacheDir);
     }
-    await cards.create(metaRealm, realmCard);
+
+    try {
+      await cards.create(metaRealm, realmCardDoc);
+    } catch (e) {
+      if (csRealm === metaRealm && csId === metaRealm && e.status === 409 && e.detail.includes('is already in use')) {
+        log.info('Indexing meta realm to discover all the realms for this hub');
+        await indexMetaRealm(container, realmCardDoc);
+      } else {
+        throw e;
+      }
+    }
   }
 }
 
-function getRealmCard(realmAttrs: RealmAttrs): SingleResourceDoc {
-  let { csRealm, csId, csTitle, csDescription, repo } = realmAttrs;
+async function indexMetaRealm(container: Container, metaRealmDoc: SingleResourceDoc): Promise<void> {
+  let indexing = await container.lookup('indexing');
+  await indexing.indexMetaRealm(metaRealmDoc);
+}
+
+function getRealmCardDoc(realmAttrs: RealmAttrs): SingleResourceDoc {
+  let { csRealm, csId, csTitle, csDescription, repo, remoteUrl, remoteCacheDir } = realmAttrs;
   // in order to prevent test leakage, we'll use ephemeral-based realms when it
   // looks like you are running tests.
   if (process.env.EMBER_ENV === 'test') {
@@ -214,15 +256,22 @@ function getRealmCard(realmAttrs: RealmAttrs): SingleResourceDoc {
       })
       .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi;
   } else {
-    return cardDocument()
+    let doc = cardDocument()
       .withAttributes({
         csRealm,
         csId,
         csTitle,
         csDescription,
-        repo,
       })
-      .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'git-realm' }).jsonapi;
+      .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'git-realm' });
+
+    if (repo) {
+      doc.withAttributes({ repo });
+    } else if (remoteUrl && remoteCacheDir) {
+      doc.withAttributes({ remoteUrl, remoteCacheDir });
+    }
+
+    return doc.jsonapi;
   }
 }
 
