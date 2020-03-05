@@ -11,6 +11,7 @@ const { environment } = ENV;
 export default class CardNameDialog extends Component {
   @service router;
   @service data;
+  @service overlays;
 
   @tracked name;
 
@@ -52,9 +53,14 @@ export default class CardNameDialog extends Component {
     let newCard = this.data.createCard(`local-hub::${this.cardId}`, adoptedFrom);
 
     if (environment !== 'test') {
-      yield newCard.save();
+      this.overlays.setOverlayState('showLoading', true);
+      yield newCard.save().catch(() => {
+        // if there's a problem saving, go back to showing the dialog
+        this.overlays.setOverlayState('showLoading', false);
+        return;
+      });
     }
-
+    this.overlays.reset();
     if (adoptedFrom) {
       this.router.transitionTo('cards.card.edit.fields', newCard);
     } else {
