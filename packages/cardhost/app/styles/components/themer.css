@@ -16,9 +16,8 @@
 .cardhost-card-theme-editor.bottom-docked {
   top: auto;
   bottom: 0;
-  left: 0;
+  left: var(--ch-left-edge-navbar-width);
   height: 40%;
-  width: 100%;
   transform: translateY(0%);
 }
 

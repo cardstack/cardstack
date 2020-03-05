@@ -30,9 +30,9 @@ export default class EditorPane extends Component {
 
   get width() {
     if (this.cssModeToggle.dockLocation === 'right') {
-      return 'calc(100% - var(--ch-card-size))';
+      return 'calc(100% - var(--ch-card-size) - var(--ch-left-edge-navbar-width))';
     } else {
-      return '100%';
+      return 'calc(100% - var(--ch-left-edge-navbar-width)';
     }
   }
 
@@ -41,6 +41,20 @@ export default class EditorPane extends Component {
       return '100%';
     } else {
       return '40%';
+    }
+  }
+
+  get maxWidth() {
+    // the left edge is 80px wide. Do not allow dragging past the left edge.
+    return document.body.clientWidth - 80;
+  }
+
+  get maxHeight() {
+    // the top edge is 80px tall. Do not allow dragging past the top edge.
+    if (this.cssModeToggle.dockLocation === 'right') {
+      return '100%';
+    } else {
+      return document.body.clientHeight - 80;
     }
   }
 
