@@ -61,7 +61,8 @@
               padding-top var(--ch-transition-time);
 }
 
-.cardhost-cards.view .card-renderer--container {
+.cardhost-cards.view .card-renderer--container,
+.cardhost-cards.preview .card-renderer--container {
   box-sizing: content-box;
   margin-top: 0;
   padding-top: var(--ch-top-edge-height);
