@@ -5,9 +5,7 @@ import Fixtures from '@cardstack/test-support/fixtures';
 import { createCards } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
-import { animationsSettled } from 'ember-animated/test-support';
 
-const timeout = 20000;
 const card1Id = 'millenial-puppies';
 const qualifiedCard1Id = `local-hub::${card1Id}`;
 const card2Id = 'van-gogh';
