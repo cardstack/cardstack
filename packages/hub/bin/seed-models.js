@@ -41,10 +41,20 @@ setupContainer(options, dataSources)
     log.info(`loading ${seedModels.length} seed models`);
     log.debug(`loading seeds:\n${JSON.stringify(seedModels.null, 2)}`);
 
-    return loadSeeds(container, seedModels);
+    if (process.env.HUB_ENVIRONMENT === 'production') {
+      // Do not use seeds in production, because they would cause
+      // conflicts with with matching cards in git data sources
+      return;
+    } else {
+      return loadSeeds(container, seedModels);
+    }
   })
   .then(() => {
-    log.info('Completed loading seed models');
+    if (process.env.HUB_ENVIRONMENT === 'production') {
+      log.info('Skipped loading seeds for production');
+    } else {
+      log.info('Completed loading seed models');
+    }
     process.exit(0);
   })
   .catch(err => {
