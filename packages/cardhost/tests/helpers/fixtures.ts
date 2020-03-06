@@ -184,7 +184,7 @@ function localURL(id: CardId, isCreate?: true): string {
   let requestRealm = isLocalRealm ? csRealm.split('/').pop() : csRealm;
   let url = isLocalRealm
     ? `${hubURL}/api/realms/${encodeURIComponent(requestRealm!)}/cards`
-    : csOriginalRealm
+    : csOriginalRealm && csOriginalRealm !== csRealm && !isCreate && csId != null
     ? `${hubURL}/api/remote-realms/${encodeURIComponent(requestRealm!)}/cards/${encodeURIComponent(csOriginalRealm)}`
     : `${hubURL}/api/remote-realms/${encodeURIComponent(requestRealm!)}/cards`;
   if (csId != null && !isCreate) {

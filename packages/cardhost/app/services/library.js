@@ -3,10 +3,11 @@ import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import { task } from 'ember-concurrency';
-import { canonicalURL } from '@cardstack/core/card-id';
+import { getUserRealm } from '../utils/scaffolding';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 const catalogEntry = Object.freeze({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'catalog-entry' });
+const cardCatalogRealm = 'https://cardstack.com/api/realms/card-catalog';
 // TODO need to think through pagination on the library page...
 const size = 100;
 
@@ -25,27 +26,31 @@ export default class LibraryService extends Service {
   }
 
   @task(function*() {
-    let [recentCards, templateEntries, featuredEntries] = yield Promise.all([
-      this.data.search(
-        {
-          filter: {
-            type: { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' },
-            not: {
-              eq: {
-                csAdoptsFrom: canonicalURL(catalogEntry),
-              },
-            },
+    return yield this.data.search(
+      {
+        filter: {
+          type: { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' },
+          eq: {
+            csRealm: getUserRealm(),
           },
-          sort: '-csCreated',
-          page: { size },
         },
-        { includeFieldSet: 'embedded' }
-      ),
+        sort: '-csCreated',
+        page: { size },
+      },
+      { includeFieldSet: 'embedded' }
+    );
+  })
+  loadUserRealm;
+
+  @task(function*() {
+    let [recentCards, templateEntries, featuredEntries] = yield Promise.all([
+      this.loadUserRealm.perform(),
       this.data.search(
         {
           filter: {
             type: catalogEntry,
             eq: {
+              csRealm: cardCatalogRealm,
               type: 'template',
             },
           },
@@ -62,6 +67,7 @@ export default class LibraryService extends Service {
           filter: {
             type: catalogEntry,
             eq: {
+              csRealm: cardCatalogRealm,
               type: 'featured',
             },
           },

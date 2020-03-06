@@ -19,12 +19,11 @@ import {
   waitForLibraryServiceToIdle,
 } from '../helpers/card-ui-helpers';
 import { cardDocument } from '@cardstack/core/card-document';
-import { myOrigin } from '@cardstack/core/origin';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 const childName = 'vangogh-work-address';
 const grandChildName = 'mango-work-address';
-const csRealm = `${myOrigin}/api/realms/default`;
+const csRealm = 'https://cardstack.com/api/realms/card-catalog';
 const parentCard = cardDocument()
   .withAttributes({
     csRealm,

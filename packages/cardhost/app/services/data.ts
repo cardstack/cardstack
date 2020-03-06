@@ -22,7 +22,7 @@ const cache: Map<string, Promise<AddressableCard>> = new Map();
 
 export default class DataService extends Service implements CardInstantiator {
   @service cardstackSession!: CardstackSession;
-  @service library!: { load: any }; // This is actually an EC task which is really hard to type in TS
+  @service library!: { loadUserRealm: any }; // This is actually an EC task which is really hard to type in TS
   private memoizeCache: { [functionName: string]: any } = {};
 
   get hubURL(): string {
@@ -67,7 +67,7 @@ export default class DataService extends Service implements CardInstantiator {
 
     // don't block on this as part of saving (but that means make sure to not
     // leak async in the tests)...
-    this.library.load.perform();
+    this.library.loadUserRealm.perform();
     return await this.instantiate(json);
   }
 
@@ -164,14 +164,15 @@ export default class DataService extends Service implements CardInstantiator {
 
     let isLocalRealm = csRealm.includes(this.hubURL);
     let requestRealm = isLocalRealm ? csRealm.split('/').pop() : csRealm;
+    let isCreate = typeof idOrCardOrCsRealm !== 'string' && 'isUnsaved' in idOrCardOrCsRealm;
     let url = isLocalRealm
       ? `${this.hubURL}/api/realms/${encodeURIComponent(requestRealm!)}/cards`
-      : csOriginalRealm
+      : csOriginalRealm && csOriginalRealm !== csRealm && !isCreate && csId != null
       ? `${this.hubURL}/api/remote-realms/${encodeURIComponent(requestRealm!)}/cards/${encodeURIComponent(
           csOriginalRealm
         )}`
       : `${this.hubURL}/api/remote-realms/${encodeURIComponent(requestRealm!)}/cards`;
-    if (csId != null && typeof idOrCardOrCsRealm !== 'string' && !('isUnsaved' in idOrCardOrCsRealm)) {
+    if (csId != null && !isCreate) {
       url = `${url}/${encodeURIComponent(csId)}`;
     }
     return url;

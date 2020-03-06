@@ -23,16 +23,18 @@ import { myOrigin } from '@cardstack/core/origin';
 import { Session } from '@cardstack/core/session';
 import { cardDocument } from '@cardstack/core/card-document';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
-import { Repository } from '@cardstack/git-realm-card/lib/git';
+import Change from '@cardstack/git-realm-card/lib/change';
 import { existsSync } from 'fs';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 
+const INDEXING_INTERVAL = 10 * 60 * 1000;
 const log = logger('cardstack/server');
 const metaRealm = `${myOrigin}/api/realms/meta`;
-const INDEXING_INTERVAL = 10 * 60 * 1000;
-export const localDefaultRealmRepo = join(homedir(), '.cardstack', 'default-realm');
-export const localMetaRealmRepo = join(homedir(), '.cardstack', 'meta-realm');
-export const localCardCatalogRepo = join(homedir(), '.cardstack', 'card-catalog-realm');
+const cardCatalogRealm = 'https://cardstack.com/api/realms/card-catalog';
+const cardCatalogRepo = 'https://github.com/cardstack/card-catalog.git';
+const localDefaultRealmRepo = join(homedir(), '.cardstack', 'default-realm');
+const localMetaRealmRepo = join(homedir(), '.cardstack', 'meta-realm');
+const localCardCatalogRepo = join(homedir(), '.cardstack', 'card-catalog-realm');
 
 export async function wireItUp() {
   let registry = new Registry();
@@ -146,6 +148,13 @@ async function setupRealms(container: Container) {
     csDescription: `This card controls the configuration of your hub's default realm. This is the realm that cards are written to by default.`,
   };
 
+  let cardCatalogRealmConfig: RealmAttrs = {
+    csRealm: metaRealm,
+    csId: cardCatalogRealm,
+    csTitle: 'Card Catalog',
+    csDescription: `The Cardstack curated catalog of cards.`,
+  };
+
   if (process.env.EMBER_ENV !== 'test') {
     if (process.env.META_REALM_URL) {
       metaRealmConfig.remoteUrl = process.env.META_REALM_URL;
@@ -159,10 +168,14 @@ async function setupRealms(container: Container) {
     } else {
       defaultRealmConfig.repo = localDefaultRealmRepo;
     }
+
+    cardCatalogRealmConfig.remoteUrl = cardCatalogRepo;
+    cardCatalogRealmConfig.remoteCacheDir = localCardCatalogRepo;
   }
 
   await assertRealmExists(container, metaRealmConfig);
   await assertRealmExists(container, defaultRealmConfig);
+  await assertRealmExists(container, cardCatalogRealmConfig);
 }
 
 interface StartupConfig {
@@ -292,6 +305,11 @@ function getRealmCardDoc(realmAttrs: RealmAttrs): SingleResourceDoc {
 async function assertRepoExists(path: string) {
   if (!existsSync(path)) {
     await mkdirp(path);
-    Repository.initBare(path);
+    let change = await Change.createInitial(path, 'master');
+    await change.finalize({
+      authorName: 'hub',
+      authorEmail: 'hub@cardstack',
+      message: 'Created realm',
+    });
   }
 }

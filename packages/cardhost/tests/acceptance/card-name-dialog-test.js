@@ -14,11 +14,10 @@ import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import { cardDocument } from '@cardstack/core/card-document';
-import { myOrigin } from '@cardstack/core/origin';
 
 const cardName = 'Millenial Puppies';
 
-const csRealm = `${myOrigin}/api/realms/default`;
+const csRealm = 'https://cardstack.com/api/realms/card-catalog';
 const parentCard = cardDocument()
   .withAttributes({
     csRealm,
