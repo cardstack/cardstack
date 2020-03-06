@@ -249,10 +249,6 @@ export class Card {
     return cardDocumentFromJsonAPI(jsonapi);
   }
 
-  get cardDir(): string | undefined {
-    return this.meta && (this.meta.cardDir as string);
-  }
-
   async validate(priorCard: Card | null, realm: AddressableCard, _forDeletion?: true) {
     for (let name of this.fieldsWithData()) {
       // cast is safe because all fieldsWithData have non-null rawData
