@@ -73,7 +73,7 @@ module('Acceptance | logged-out', function(hooks) {
     assert.equal(currentURL(), `/cards/${card1Id}/edit/layout`);
     await click('[data-test-toggle-left-edge]');
     await click('[data-test-logout-button]');
-    await visit(`/cards/${card1Id}/edit/fields/layout`);
+    await visit(`/cards/${card1Id}/edit/layout`);
     assert.equal(currentURL(), `/cards/${card1Id}`);
 
     await login();
