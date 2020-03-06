@@ -29,6 +29,7 @@ import { SingleResourceDoc } from 'jsonapi-typescript';
 
 const log = logger('cardstack/server');
 const metaRealm = `${myOrigin}/api/realms/meta`;
+const INDEXING_INTERVAL = 10 * 60 * 1000;
 export const localDefaultRealmRepo = join(homedir(), '.cardstack', 'default-realm');
 export const localMetaRealmRepo = join(homedir(), '.cardstack', 'meta-realm');
 export const localCardCatalogRepo = join(homedir(), '.cardstack', 'card-catalog-realm');
@@ -52,6 +53,15 @@ export async function makeServer(container?: Container) {
   }
 
   await setupRealms(container);
+
+  if (process.env.EMBER_ENV !== 'test') {
+    await startQueueRunners(container);
+
+    // Intentionally not awaiting this promise to prevent indexing from blocking
+    // the hub booting process. Since we skip this in tests, we shouldn't have
+    // to worry about leaking async.
+    synchronizeIndex(container);
+  }
 
   let app = new Koa();
   app.use(cors);
@@ -108,6 +118,19 @@ async function runServer(config: StartupConfig) {
   }
 }
 
+async function startQueueRunners(container: Container) {
+  let queue = await container.lookup('queue');
+  await queue.launchJobRunner();
+}
+
+async function synchronizeIndex(container: Container) {
+  let indexing = await container.lookup('indexing');
+  while (true) {
+    await indexing.update();
+    await new Promise(res => setTimeout(() => res(), INDEXING_INTERVAL));
+  }
+}
+
 async function setupRealms(container: Container) {
   let metaRealmConfig: RealmAttrs = {
     csRealm: metaRealm,
@@ -140,16 +163,6 @@ async function setupRealms(container: Container) {
 
   await assertRealmExists(container, metaRealmConfig);
   await assertRealmExists(container, defaultRealmConfig);
-
-  // In the scenario where your realms are remote git realms, let's kick off an
-  // initial index update so we can get the index in-sync with the remote repo.
-  if (process.env.EMBER_ENV !== 'test' && (process.env.DEFAULT_REALM_URL || process.env.META_REALM_URL)) {
-    let indexing = await container.lookup('indexing');
-    // I'd prefer calling indexing.update() here, but the indexing jobs never
-    // seem to resolve. Maybe the queue isn't ready to service jobs at this
-    // point?
-    indexing.indexRealm(defaultRealmConfig); // intentionally not awaiting this...
-  }
 }
 
 interface StartupConfig {
