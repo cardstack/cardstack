@@ -20,8 +20,8 @@ Router.map(function() {
         this.route('fields', function() {
           this.route('schema');
         });
+        this.route('preview');
       });
-      this.route('preview');
     });
   });
   this.route('ui-components');

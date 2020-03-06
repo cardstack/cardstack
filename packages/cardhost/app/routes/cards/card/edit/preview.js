@@ -1,4 +1,4 @@
-import CardModelRoute from './card-model-route';
+import CardModelRoute from '../card-model-route';
 
 export default class PreviewCardRoute extends CardModelRoute {
   beforeModel(transition) {
