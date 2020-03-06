@@ -1,4 +1,4 @@
-import { TestEnv, createTestEnv } from './helpers';
+import { TestEnv, createTestEnv, seedTestRealms } from './helpers';
 import { EphemeralStorage } from '../../../cards/ephemeral-realm/storage';
 import IndexingService from '../indexing';
 import { cardDocument } from '@cardstack/core/card-document';
@@ -82,6 +82,7 @@ describe('hub/indexing', function() {
     storage.store(await card.upstreamDoc, card.csId, card.csRealm);
     await env.container.teardown();
     env.container = await wireItUp();
+    await seedTestRealms(env.container);
 
     cards = (await env.container.lookup('cards')).as(Session.INTERNAL_PRIVILEGED);
     indexing = await env.container.lookup('indexing');

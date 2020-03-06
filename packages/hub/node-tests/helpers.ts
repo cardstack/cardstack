@@ -13,7 +13,7 @@ export interface TestEnv {
   destroy(): Promise<void>;
 }
 
-async function seedTestRealms(container: Container): Promise<void> {
+export async function seedTestRealms(container: Container): Promise<void> {
   let cards = (await container.lookup('cards')).as(Session.INTERNAL_PRIVILEGED);
   const metaRealm = `${myOrigin}/api/realms/meta`;
 
