@@ -57,7 +57,7 @@ From the root of the repository:
 
 ### Deploying
 
-Deploying is done from `master` automatically via CI/CD.
+Deploying is done from `master` and `production` automatically via CI/CD.
 
 ## Further Reading / Useful Links
 
