@@ -9,7 +9,7 @@ import { set } from '@ember/object';
 import ENV from '@cardstack/cardhost/config/environment';
 
 const { autosaveDebounce, autosaveDisabled, environment } = ENV;
-const AUTOSAVE_DEBOUNCE = 6000;
+const AUTOSAVE_DEBOUNCE = 5000;
 
 export default class AutosaveService extends Service {
   @service data;

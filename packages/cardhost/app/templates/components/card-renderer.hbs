@@ -20,7 +20,7 @@
         {{#unless @suppressHeader}}
           {{#if (eq @mode "view")}}
             <AnimatedContainer class="card-renderer-isolated--animated-view-header">
-              {{#animated-value @card watch="isSelected" use=this.headerAnimation}}
+              {{#animated-value @card watch="isSelected" use=this.headerAnimation group="header"}}
                 <CardRendererHeader
                   @cardSelected={{if (and this.cardstackSession.isAuthenticated @cardSelected) true}}
                   @card={{@card}}
