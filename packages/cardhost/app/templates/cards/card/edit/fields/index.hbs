@@ -1,8 +1,4 @@
-<CardEditor
-  @card={{this.model.card}}
-  @noHeaderAnimation={{true}}
-  as |card args|
->
+<CardEditor @card={{this.model.card}} as |card args|>
   <RightEdge
     @card={{card}}
     @parentCard={{get args "parentCard"}}
