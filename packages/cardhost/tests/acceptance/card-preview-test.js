@@ -5,6 +5,7 @@ import Fixtures from '@cardstack/test-support/fixtures';
 import { createCards } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
+import { animationsSettled } from 'ember-animated/test-support';
 
 const card1Id = 'millenial-puppies';
 const qualifiedCard1Id = `local-hub::${card1Id}`;
@@ -63,6 +64,7 @@ module('Acceptance | card preview', function(hooks) {
 
     await visit(`/cards/${card1Id}/edit/preview`);
     assert.equal(currentURL(), `/cards/${card1Id}/edit/preview`);
+    await animationsSettled();
 
     // can render page contents
     assert.dom('[data-test-cardhost-cards]').hasClass('preview');
