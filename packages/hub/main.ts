@@ -128,7 +128,15 @@ async function startQueueRunners(container: Container) {
 async function synchronizeIndex(container: Container) {
   let indexing = await container.lookup('indexing');
   while (true) {
-    await indexing.update();
+    try {
+      await indexing.update();
+    } catch (e) {
+      // Logging this error since we are not intentionally awaiting this
+      // function which means that this exception would otherwise be hidden
+      // behind a rejected promise that we are ignoring.
+      log.error(`Encountered an unexpected error while indexing: ${e.message || e.detail}\n${JSON.stringify(e.stack)}`);
+      throw e;
+    }
     await new Promise(res => setTimeout(() => res(), INDEXING_INTERVAL));
   }
 }
