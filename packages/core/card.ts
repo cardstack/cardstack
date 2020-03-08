@@ -336,6 +336,13 @@ export class Card {
   }
 
   private async rawData(fieldName: string): Promise<RawData> {
+    // in the scenario where we are validating the prior card, we might
+    // encounter a newly added field that exists in the updated card, but not
+    // the prior card.
+    if (!(await this.hasField(fieldName))) {
+      return null;
+    }
+
     let field = await this.field(fieldName);
     let compute = await field.loadFeature('compute');
     if (compute) {
@@ -385,10 +392,19 @@ export class Card {
 
   @Memoize()
   async field(name: string): Promise<FieldCard> {
-    return await this._field(name, this);
+    let field = await this._field(name, this);
+    if (!field) {
+      throw new CardstackError(`no such field "${name}"`, { status: 400 });
+    }
+    return field;
   }
 
-  private async _field(name: string, enclosingCard: Card): Promise<FieldCard> {
+  @Memoize()
+  async hasField(name: string): Promise<boolean> {
+    return Boolean(await this._field(name, this));
+  }
+
+  private async _field(name: string, enclosingCard: Card): Promise<FieldCard | undefined> {
     let data;
 
     if (name === 'csAdoptsFrom') {
@@ -400,7 +416,7 @@ export class Card {
       if (parent) {
         return await parent._field(name, enclosingCard);
       }
-      throw new CardstackError(`no such field "${name}"`, { status: 400 });
+      return;
     }
 
     return await this.container.instantiate(
@@ -426,7 +442,11 @@ export class Card {
           if (!fieldRules) {
             continue;
           }
-          fields.push(await card._field(name, this));
+          let field = await card._field(name, this);
+          if (!field) {
+            throw new CardstackError(`no such field "${name}"`, { status: 400 });
+          }
+          fields.push(field);
         }
       }
       card = await card.adoptsFrom();

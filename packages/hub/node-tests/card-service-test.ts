@@ -200,6 +200,15 @@ describe('hub/card-service', function() {
       expect(field.csTitle).to.equal('FoOo');
     });
 
+    it('can add a new field that has a field value', async function() {
+      let doc = cardDocument().withAutoAttributes({ foo: 'bar', hello: 'world' });
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+      doc = card.document.withAttributes({ boo: 'baz' }).withField('boo', 'string-field');
+      card = await service.update(card, doc.jsonapi);
+
+      expect(await card.value('boo')).to.equal('baz');
+    });
+
     it('can remove a field with an attribute value from a card with a patch', async function() {
       let doc: any = cardDocument().withAutoAttributes({ foo: 'bar' }).jsonapi;
       let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc);
