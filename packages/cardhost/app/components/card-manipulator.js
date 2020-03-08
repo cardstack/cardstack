@@ -262,7 +262,7 @@ export default class CardManipulator extends Component {
     }
 
     yield this.patchCard.perform(doc);
-    if (this.selectedField.name === fieldName || this.selectedFieldName === fieldName) {
+    if ((this.selectedField && this.selectedField.name === fieldName) || this.selectedFieldName === fieldName) {
       this.cardSelected = true;
       this.selectedFieldName = null;
       this.selectedField = null;
