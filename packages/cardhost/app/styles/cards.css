@@ -77,8 +77,6 @@
   padding-left: var(--ch-left-edge-panel-width);
 }
 
-.card-renderer--inner-container.view-container,
-.card-renderer--inner-container.themer-container,
-.card-renderer--inner-container.preview-container {
+.card-renderer--inner-container.view-container {
   padding-right: 0;
 }
