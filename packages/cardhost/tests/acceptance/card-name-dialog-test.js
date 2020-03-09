@@ -1,10 +1,11 @@
 import { module, test } from 'qunit';
-import { click, visit, currentURL } from '@ember/test-helpers';
+import { click, visit, currentURL, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures';
 import { setCardName } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
+import { animationsSettled } from 'ember-animated/test-support';
 
 const card1Name = 'Millenial Puppies';
 const card1Id = 'millenial-puppies';
@@ -53,5 +54,37 @@ module('Acceptance | card name dialog', function(hooks) {
 
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields/schema`);
     assert.dom('[data-test-field]').doesNotExist();
+  });
+
+  test('can close the dialog', async function(assert) {
+    await login();
+    await visit('/cards');
+
+    assert.equal(currentURL(), '/cards');
+    await click('[data-test-library-button]');
+    assert.dom('[data-test-library]').exists();
+
+    await click('[data-test-library-new-blank-card-btn]');
+    assert.dom('[data-test-dialog-box] .dialog--title').hasTextContaining('Create a New Card');
+
+    await click('[data-test-cancel-create-btn]');
+    assert.dom('[data-test-dialog-box] .dialog--title').doesNotExist();
+  });
+
+  test('loading screen can appear over the dialog', async function(assert) {
+    await login();
+    await visit('/cards');
+
+    assert.equal(currentURL(), '/cards');
+    await click('[data-test-library-button]');
+    assert.dom('[data-test-library]').exists();
+
+    await click('[data-test-library-new-blank-card-btn]');
+    assert.dom('[data-test-dialog-box] .dialog--title').hasTextContaining('Create a New Card');
+    this.owner.lookup('service:overlays').setOverlayState('showLoading', true);
+    await waitFor('[data-test-loading-screen]');
+    assert.dom('[data-test-loading-screen]').hasText('Generating Card');
+    await animationsSettled();
+    await percySnapshot(assert);
   });
 });

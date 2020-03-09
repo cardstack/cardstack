@@ -6,6 +6,7 @@ import { tracked } from '@glimmer/tracking';
 export default class Library extends Component {
   @service library;
   @service scroller;
+  @service overlays;
 
   @tracked selectedSection = 'recent-cards';
   @tracked cardModel;
