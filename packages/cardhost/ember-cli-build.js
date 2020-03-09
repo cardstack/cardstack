@@ -12,7 +12,7 @@ const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 module.exports = function(defaults) {
   // This is just a placeholder for starting the backend in our tests until we
   // figure out how we want to do this for real.
-  if (!process.env.HUB_URL && !process.env.TARGET_NAME) {
+  if (!process.env.HUB_URL) {
     console.log('Starting Cardstack Hub...'); // eslint-disable-line no-console
     if (process.env.EMBER_ENV === 'test') {
       process.env.PGDATABASE = `test_db_${Math.floor(100000 * Math.random())}`;
