@@ -5,6 +5,7 @@
 /packages/*/tmp
 /packages/*/vendor
 /packages/cardhost/deploy/node_modules
+/packages/cardhost/deploy/context
 .eslintcache
 .vagrant
 .nvmrc

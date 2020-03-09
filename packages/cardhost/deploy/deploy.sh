@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ex
+set -e
 target_env=$1;
 docker_image_label=$2
 
@@ -55,8 +55,8 @@ DOCKER_HOST=$remote node deploy/watch-docker.js $GITHUB_BUILD_ID
 
 # only include env vars necessary for ember deploy
 docker run --rm --network cardstack \
-          --env HUB_URL=$PUBLIC_HUB_URL \
           --env AWS_SECRET_ACCESS_KEY=$EMBER_DEPLOY_AWS_SECRET_ACCESS_KEY \
           --env AWS_ACCESS_KEY_ID=$EMBER_DEPLOY_AWS_ACCESS_KEY_ID \
+          --env HUB_URL \
           --env TARGET_NAME \
           cardhost ./node_modules/.bin/ember deploy $target_env --verbose
