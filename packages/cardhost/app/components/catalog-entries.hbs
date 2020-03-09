@@ -1,6 +1,6 @@
 <div
   data-test-catalog-entries
-  data-test-catalog-entries-loaded={{stringify this.loadCards.isIdle}}
+  data-test-catalog-entries-loaded={{json-stringify this.loadCards.isIdle}}
   ...attributes
 >
   {{#each this.entries as |card index|}}

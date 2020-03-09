@@ -12,7 +12,7 @@
   data-test-card-edit={{@card.canonicalURL}}
 >
   <div class="card-renderer--inner-container edit-container"
-    data-test-card-patched={{stringify this.patchCard.isIdle}}
+    data-test-card-patched={{json-stringify this.patchCard.isIdle}}
   >
     <CardRenderer
       @card={{this.originalCard}}
