@@ -4,7 +4,6 @@ This is the main repo for [Cardstack](https://www.cardstack.com/), an open sourc
 
 Join the discussion around developing on the Cardstack framework on [Discord](https://discord.gg/apepFje).
 
-
 ## Orientation
 
 This is a monorepo. Each directory under `packages` is distributed as a standalone NPM package under the `@cardstack` NPM namespace. Each package is a Cardstack plugin. A family of Cardstack plugins comes together to provide both browser-side and server-side functionality of a Cardstack application.
