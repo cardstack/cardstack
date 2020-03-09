@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/catalog-entry-card",
-  "version": "0.18.1",
+  "version": "0.18.2",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -9,6 +9,6 @@
     "@cardstack/hub": "*"
   },
   "devDependencies": {
-    "@cardstack/hub": "0.18.1"
+    "@cardstack/hub": "0.18.2"
   }
 }
