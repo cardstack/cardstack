@@ -189,10 +189,23 @@ export class ScopedCardService implements CardReader, CardInstantiator {
   }
 
   private async getBuiltIn(id: CardId): Promise<AddressableCard> {
-    let cardDir = join(__dirname, '..', '..', 'cards', id.csId);
-    if (!existsSync(cardDir)) {
+    // Dont assume we are in a mono repo (this is not always the case). The
+    // built in cards are npm dependencies, so search for it in the node
+    // modules. Mono repos will have the benefit of symlinked packages, so we
+    // are not losing anything by this approach, rather we are being
+    // accomodating to hubs that have yarn installed their @cardstack deps.
+    let cardDirs = require.resolve.paths(`@cardstack/${id.csId}-card`);
+    let cardDir;
+    for (let dir of cardDirs || []) {
+      if (existsSync(`${dir}/@cardstack/${id.csId}-card`)) {
+        cardDir = `${dir}/@cardstack/${id.csId}-card`;
+        break;
+      }
+    }
+    if (!cardDirs || !cardDir) {
       throw new CardstackError(`Card '${id.csId}' not found in public realm`, { status: 404 });
     }
+
     // @ts-ignore
     let json = await import(join(cardDir, 'card.json'));
     assertSingleResourceDoc(json);

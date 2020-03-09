@@ -31,7 +31,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["-r", "esm", "packages/test-support/bin/run.js", "--timeout", "600000", "--grep", "ephemeral cards do not persist in the index between container teardowns"],
+      "args": ["-r", "esm", "packages/test-support/bin/run.js", "--timeout", "600000", "--grep", "can get a card back out"],
     },
     {
       "type": "node",
