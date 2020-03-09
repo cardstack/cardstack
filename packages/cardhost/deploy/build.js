@@ -24,7 +24,6 @@ copySync(join(root, 'package.json'), join(context, 'dep-layer/package.json'));
 copySync(join(`${root}/../..`, 'yarn.lock'), join(context, 'dep-layer/yarn.lock'));
 
 // code-layer contains everything else, which is much cheaper to rebuild (no yarn install)
-copySync(join(root, 'cardstack'), join(context, 'code-layer/cardstack'));
 codeLayerFiles.forEach(serverFile => {
   glob.sync(join(root, serverFile)).forEach(filename => {
     copySync(filename, join(context, 'code-layer', filename.replace(root, '')));
