@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/call-to-action-field-card",
-  "version": "0.18.2",
+  "version": "0.18.3",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -10,7 +10,7 @@
     "@cardstack/hub": "*"
   },
   "devDependencies": {
-    "@cardstack/core": "0.18.2",
-    "@cardstack/hub": "0.18.2"
+    "@cardstack/core": "0.18.3",
+    "@cardstack/hub": "0.18.3"
   }
 }
