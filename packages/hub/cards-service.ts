@@ -225,7 +225,9 @@ function walkFiles(dir: string): NonNullable<Card['csFiles']> {
     let fullName = join(dir, name);
     let stat = statSync(fullName);
     if (stat.isDirectory()) {
-      output[name] = walkFiles(fullName);
+      if (name !== 'node_modules') {
+        output[name] = walkFiles(fullName);
+      }
     } else {
       output[name] = readFileSync(fullName, 'utf8');
     }
