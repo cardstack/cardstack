@@ -11,7 +11,7 @@
         tabindex="0"
         data-test-card-renderer-isolated={{@card.canonicalURL}}
         data-test-card-renderer={{@card.canonicalURL}}
-        data-test-card-loaded={{json-stringify this.loadCard.isIdle}}
+        data-test-card-loaded={{stringify this.loadCard.isIdle}}
         {{on "focus" (action this.cardIsFocused true)}}
         {{did-insert this.focusCard true}}
         {{did-update this.cardUpdated @card @suppressCss @mode}}
@@ -107,7 +107,7 @@
       "
       data-test-card-renderer-embedded={{@card.canonicalURL}}
       data-test-card-renderer={{@card.canonicalURL}}
-      data-test-card-loaded={{json-stringify this.loadCard.isIdle}}
+      data-test-card-loaded={{stringify this.loadCard.isIdle}}
       {{will-destroy this.removeCardCss}}
     >
       {{#if (and (eq this.mode "view") (not @preventIsolation))}}

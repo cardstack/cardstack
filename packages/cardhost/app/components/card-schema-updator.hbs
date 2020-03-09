@@ -1,6 +1,6 @@
 <CardhostLeftEdge
   @mode="schema"
-  data-test-catalog-loaded={{json-stringify this.load.isIdle}}
+  data-test-catalog-loaded={{stringify this.load.isIdle}}
 >
   <section class="ch-catalog">
     <header class="ch-catalog--header">
@@ -53,8 +53,8 @@
 
 <section class="card-renderer--container"
   data-test-card-schema={{@card.name}}
-  data-test-card-patched={{json-stringify this.patchCard.isIdle}}
-  data-test-card-fields-ready={{json-stringify (and this.addField.isIdle this.setPosition.isIdle)}}
+  data-test-card-patched={{stringify this.patchCard.isIdle}}
+  data-test-card-fields-ready={{stringify (and this.addField.isIdle this.setPosition.isIdle)}}
 >
   <div class="card-renderer--inner-container schema-container">
     <CardRenderer
