@@ -48,7 +48,7 @@ module('Acceptance | logged-out', function(hooks) {
     assert.dom('[data-test-card-header-button]').exists();
   });
 
-  test('edit route redirects to view for unauthenticated users', async function(assert) {
+  test('edit route and its descendants redirect to view for unauthenticated users', async function(assert) {
     await login();
     await createCards({
       [card1Id]: [['title', 'string', true, 'The Millenial Puppy']],
@@ -59,18 +59,38 @@ module('Acceptance | logged-out', function(hooks) {
     await click('[data-test-logout-button]');
     await visit(`/cards/${card1Id}/edit/fields`);
     assert.equal(currentURL(), `/cards/${card1Id}`);
-  });
 
-  test('schema route redirects to view for unauthenticated users', async function(assert) {
     await login();
-    await createCards({
-      [card1Id]: [['title', 'string', true, 'The Millenial Puppy']],
-    });
     await visit(`/cards/${card1Id}/edit/fields/schema`);
     assert.equal(currentURL(), `/cards/${card1Id}/edit/fields/schema`);
     await click('[data-test-toggle-left-edge]');
     await click('[data-test-logout-button]');
     await visit(`/cards/${card1Id}/edit/fields/schema`);
+    assert.equal(currentURL(), `/cards/${card1Id}`);
+
+    await login();
+    await visit(`/cards/${card1Id}/edit/layout`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/layout`);
+    await click('[data-test-toggle-left-edge]');
+    await click('[data-test-logout-button]');
+    await visit(`/cards/${card1Id}/edit/layout`);
+    assert.equal(currentURL(), `/cards/${card1Id}`);
+
+    await login();
+    await visit(`/cards/${card1Id}/edit/layout/themer`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/layout/themer`);
+    await click('[data-test-toggle-left-edge]');
+    await click('[data-test-logout-button]');
+    await visit(`/cards/${card1Id}/edit/layout/themer`);
+    assert.equal(currentURL(), `/cards/${card1Id}`);
+
+    await login();
+    await visit(`/cards/${card1Id}/edit/preview`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/preview`);
+    await click('[data-test-mode-indicator]');
+    await click('[data-test-toggle-left-edge]');
+    await click('[data-test-logout-button]');
+    await visit(`/cards/${card1Id}/edit/preview`);
     assert.equal(currentURL(), `/cards/${card1Id}`);
   });
 

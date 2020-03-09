@@ -50,6 +50,11 @@
   padding-bottom: var(--scroll-bottom-padding);
 }
 
+.card-renderer-isolated.schema .card-renderer-isolated--content {
+  color: var(--ch-light);
+}
+
+/* Card Renderer - Inner Wrapper */
 .card-renderer-isolated .card-renderer-isolated--card-container {
   position: relative;
   border: 3px solid transparent;
@@ -89,8 +94,10 @@
   padding: 30px;
 }
 
-.card-renderer-isolated.themer .card-renderer-isolated--card-container {
+.card-renderer-isolated.view.themer .card-renderer-isolated--card-container,
+.card-renderer-isolated.view.preview .card-renderer-isolated--card-container {
   border: none;
+  border-radius: 10px;
 }
 
 

@@ -3,7 +3,7 @@
   right: var(--ch-spacing);
   top: var(--ch-top-edge-height);
   width: var(--ch-right-edge-panel-width);
-  max-height: calc(100vh - var(--ch-top-edge-height) - var(--ch-bottom-edge-height));
+  max-height: calc(100% - var(--ch-top-edge-height) - var(--ch-bottom-edge-height));
   border-radius: 10px;
   background-color: var(--ch-dark-background);
   color: white;

@@ -10,13 +10,18 @@
   justify-items: center;
   align-items: center;
   text-align: right;
+  background-color: transparent;
   z-index: var(--ch-top-edge-z-index);
-  transition: var(--ch-card-background-color-animate);
 }
 
 .cardhost-top-edge.themer {
   right: 0;
   left: 0;
+}
+
+.cardhost-top-edge.preview {
+  grid-template-columns: auto 1fr 40px;
+  justify-items: end;
 }
 
 .cardhost-top-edge--preview-button,
@@ -91,7 +96,8 @@
     grid-template-columns: auto 1fr var(--ch-right-edge-panel-width);
   }
 
-  .cardhost-top-edge--size-buttons {
+  .cardhost-top-edge.fields .cardhost-top-edge--size-buttons,
+  .cardhost-top-edge.layout .cardhost-top-edge--size-buttons {
     display: none;
   }
 }

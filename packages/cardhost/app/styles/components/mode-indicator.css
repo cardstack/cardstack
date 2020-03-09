@@ -37,6 +37,9 @@
 .mode-indicator--themer {
   --mode-icon: url('/assets/images/icons/themer.svg');
 }
+.mode-indicator--preview {
+  --mode-icon: url('/assets/images/icons/eye.svg');
+}
 
 .mode-indicator:hover,
 .mode-indicator:focus {

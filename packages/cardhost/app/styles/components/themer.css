@@ -6,11 +6,11 @@
   top: 0;
   width: 40%;
   height: 100%;
-  background: var(--ch-deep-background);
+  background: var(--ch-dark);
   z-index: calc(var(--ch-top-edge-z-index) + 1);
   padding: 20px;
   transform: translateX(0%);
-  opacity: 0.95;
+  opacity: 0.90;
 }
 
 .cardhost-card-theme-editor.bottom-docked {
@@ -24,15 +24,6 @@
 .cardhost-card-theme-editor.right-docked .resizable-content {
   padding-top: 50px;
 }
-
-.cardhost-card-theme-editor.hidden {
-  transform: translateX(100%);
-}
-
-.cardhost-card-theme-editor.bottom-docked.hidden {
-  transform: translateY(100%);
-}
-
 
 .cardhost-card-theme-editor .resizable-content {
   position: relative;

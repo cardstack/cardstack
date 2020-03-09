@@ -19,24 +19,10 @@
 
 .themer-toolbar--controls-right {
   display: grid;
-  grid-template-columns: 40px 40px 40px auto 40px;
+  grid-template-columns: 40px 40px auto 40px;
   grid-gap: 15px;
   justify-self: end;
   padding: 0 20px;
-}
-
-.ch-button--icon.eye-on {
-  --icon-url: url('/assets/images/buttons/eye-on.svg');
-  background-size: 30px;
-}
-.ch-button--icon.eye-off {
-  --icon-url: url('/assets/images/buttons/eye-off.svg');
-  background-size: 30px;
-}
-.ch-button--icon.eye-on:hover,
-.ch-button--icon.eye-off:hover {
-  opacity: 0.55;
-  filter: alpha(opacity=55);
 }
 
 .ch-button--icon.dock-right {
