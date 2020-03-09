@@ -48,4 +48,4 @@ CMD remote_syslog --hostname "${TARGET_ENV:-unknown_env}_$(hostname)" && ./node_
 # This configuration will cause the container to restart after
 # 30 seconds without a successful response.
 HEALTHCHECK --interval=30s --timeout=30s --start-period=30s --retries=3 CMD curl -f -H "Accept:application/vnd.api+json" \
-  "http://localhost:3000/api/cards?filter[type][csRealm]=https%3A%2F%2Fbase.cardstack.com%2Fpublic&filter[type][csId]=realm&filter[eq][csRealm]=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Frealms%2Fmeta&page[size]=1" || exit 1
+  "http://localhost:3000/api/cards?page[size]=1" || exit 1
