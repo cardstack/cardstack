@@ -13,6 +13,7 @@
     "@types/chai-as-promised": "^7.1.2",
     "@types/console-ui": "^2.2.3",
     "@types/filenamify-url": "^1.0.1",
+    "@types/json-stable-stringify": "^1.0.32",
     "@types/mkdirp": "^0.5.2",
     "@types/mocha": "^5.2.6",
     "@types/moment-timezone": "^0.5.12",
