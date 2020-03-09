@@ -24,6 +24,7 @@ RUN BUILD_ONLY=true yarn install \
   && yarn cache clean
 
 COPY code-layer/ ./
+RUN ./node_modules/.bin/tsc
 
 # This service helps you easily access Docker container logs.
 # Log file emitters can be managed in PaperTrail's dashboard.
