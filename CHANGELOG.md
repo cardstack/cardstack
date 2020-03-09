@@ -5,6 +5,19 @@ Since this is a pre-1.0 project,
 it will track only significant breaking changes
 and features, and is not intended to be an exhaustive list.
 
+## [v0.17.0]
+
+This release concludes a series of 409 conflict bugfixes
+for the base card and seeded featured cards.
+The bugfix work starteds in `v0.16.27`. See #1437
+
+### Changed
+
+- Breaking - Seeds no longer run for production deployments.
+You must create seed data via the Card Builder UI
+or in a data source directly. This fixes some 409 conflict issues
+for featured cardsin deployed environments. See #1411
+
 ## [v0.16.22]
 
 ### Added
