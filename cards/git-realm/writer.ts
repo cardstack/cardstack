@@ -208,7 +208,7 @@ export default class GitWriter implements Writer {
 
       let signature = await this._commitOptions('update', type, cardId, session);
 
-      file.setContent(stringify(document.jsonapi));
+      file.setContent(stringify(document.jsonapi, { space: 2 }));
       version = await change.finalize(signature);
 
       meta = Object.assign({}, document.jsonapi.data.meta);
