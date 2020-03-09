@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/git-realm-card",
-  "version": "0.16.32",
+  "version": "0.17.0",
   "description": "Git data source plugin for @cardstack/hub.",
   "repository": "https://github.com/cardstack/cardstack",
   "license": "MIT",
@@ -9,7 +9,7 @@
     "test": "mocha ../test-support/bin/run.js"
   },
   "dependencies": {
-    "@cardstack/di": "0.16.32",
+    "@cardstack/di": "0.17.0",
     "@cardstack/logger": "^0.2.0",
     "delay": "^4.1.0",
     "filenamify-url": "^1.0.0",
@@ -28,8 +28,8 @@
     "@cardstack/hub": "*"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.16.32",
-    "@cardstack/test-support": "0.16.32",
+    "@cardstack/eslint-config": "0.17.0",
+    "@cardstack/test-support": "0.17.0",
     "sinon": "7.2.3"
   },
   "engines": {

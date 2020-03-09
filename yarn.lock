@@ -1995,10 +1995,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@cardstack/di@0.16.32":
-  version "0.16.32"
-  resolved "https://registry.yarnpkg.com/@cardstack/di/-/di-0.16.32.tgz#eaf17149136de19b61854d90222b8b4344aa173a"
-  integrity sha512-am2rWTQ7WXiNUW5iJqtOxaJY5pM2YEKMLizMcPfk08Iqpv0RfG3czrr98rB3Ttl5xPE9z7SfhGd683jvDxlSNA==
+"@cardstack/di@0.17.0":
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/@cardstack/di/-/di-0.17.0.tgz#fbd14b58479df9cf34b50c1969edd379bfadf812"
+  integrity sha512-zH3To6vw2pBkqNhTBpk+MyzI7ViKKqYNknBgXClMUlEMuogymomGf6p/VcMRbJFXm9+FTbdZtq+PBVux8vTGOQ==
   dependencies:
     "@glimmer/di" "^0.2.0"
     "@types/resolve" "^0.0.8"
