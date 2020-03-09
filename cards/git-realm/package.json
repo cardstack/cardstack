@@ -9,7 +9,6 @@
     "access": "public"
   },
   "dependencies": {
-    "@cardstack/di": "0.17.0",
     "@cardstack/logger": "^0.2.0",
     "delay": "^4.1.0",
     "filenamify-url": "^1.0.0",
