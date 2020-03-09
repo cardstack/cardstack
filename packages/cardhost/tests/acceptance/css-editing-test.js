@@ -140,6 +140,7 @@ module('Acceptance | css editing', function(hooks) {
     await createCards(cardData);
     await visit(`/cards/${card1Id}/edit/layout`);
     await click('[data-test-card-custom-style-button]');
+    await animationsSettled();
     assert.equal(currentURL(), `/cards/${card1Id}/edit/layout/themer`);
     await click('[data-test-dock-bottom]'); // dock to bottom so we can see better in Percy Screnshots
     // make sure initial state is correct
@@ -199,6 +200,7 @@ module('Acceptance | css editing', function(hooks) {
     await login();
     await createCards(cardData);
     await visit(`/cards/${card1Id}/edit/layout/themer`);
+    assert.equal(currentURL(), `/cards/${card1Id}/edit/layout/themer`);
     assert.dom('[data-test-small-btn]').hasClass('selected');
     assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
 
@@ -212,6 +214,7 @@ module('Acceptance | css editing', function(hooks) {
     assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
 
     await click('[data-test-preview-link-btn]');
+    await animationsSettled();
     assert.equal(currentURL(), `/cards/${card1Id}/edit/preview`);
     assert.dom('[data-test-medium-btn]').hasClass('selected');
     assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
@@ -245,6 +248,7 @@ module('Acceptance | css editing', function(hooks) {
     assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
 
     await click('[data-test-preview-link-btn]');
+    await animationsSettled();
     assert.equal(currentURL(), `/cards/${card1Id}/edit/preview`);
     assert.dom('[data-test-small-btn]').hasClass('selected');
     assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
