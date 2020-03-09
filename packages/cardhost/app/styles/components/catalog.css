@@ -1,4 +1,7 @@
 .ch-catalog {
+  position: fixed;
+  top: 0;
+  height: 100%;
   width: var(--ch-left-edge-panel-width);
   background-color: var(--ch-dark-background);
   color: var(--ch-light);

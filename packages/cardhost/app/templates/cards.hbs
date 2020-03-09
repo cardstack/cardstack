@@ -2,15 +2,19 @@
   cardhost-cards
   {{if this.draggable.isDragging "dragging"}}
   {{this.routeInfo.mode}}
-  {{if (or (eq this.routeInfo.mode "add") (eq this.routeInfo.mode "adopt")) "schema"}}
-  {{if (or (eq this.routeInfo.mode "layout") (eq this.routeInfo.mode "fields")) "edit"}}
+  {{if (or (eq this.mode "add") (eq this.mode "adopt")) "schema"}}
+  {{if (or (eq this.mode "layout") (eq this.mode "fields")) "edit"}}
   {{if this.cardstackSession.isAuthenticated "logged-in" "logged-out"}}
   {{this.themerClasses}}"
   data-test-cardhost-cards
 >
-  {{#if (not-eq this.routeInfo.mode "cards")}}
-    <CardhostTopEdge @mode={{this.routeInfo.mode}} @card={{this.target.currentRoute.parent.attributes}} @previousTransition={{this.previousTransition}} />
-  {{/if}}
+  {{#unless this.hideTopEdge}}
+    <CardhostTopEdge @mode={{this.mode}} @card={{this.target.currentRoute.parent.attributes}} @previousTransition={{this.previousTransition}} />
+  {{/unless}}
+
+  {{#unless this.hideLeftEdge}}
+    {{in-left-toolbar show=(component "cardhost-left-edge" mode=this.mode)}}
+  {{/unless}}
 
   {{outlet}}
 </div>

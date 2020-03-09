@@ -2,8 +2,6 @@
   --card-builder-hover: rgba(0,0,0,0.1);
   --card-builder-card-width: 263px;
   --card-builder-horizontal-padding: 38px;
-
-  padding-left: var(--ch-left-edge-navbar-width);
 }
 
 .card-builder--header {

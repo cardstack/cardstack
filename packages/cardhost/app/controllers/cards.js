@@ -9,6 +9,10 @@ export default class CardsController extends Controller {
   @service draggable;
   @service library;
 
+  get mode() {
+    return this.routeInfo.mode || 'view';
+  }
+
   get themerClasses() {
     if (this.hasThemerTools) {
       return `editing-css themer-card-width--${this.cssModeToggle.width}`; // width is small, medium, or large
@@ -18,6 +22,14 @@ export default class CardsController extends Controller {
   }
 
   get hasThemerTools() {
-    return this.routeInfo.mode === 'themer' || this.routeInfo.mode === 'layout' || this.routeInfo.mode === 'preview';
+    return this.mode === 'themer' || this.mode === 'layout' || this.mode === 'preview';
+  }
+
+  get hideTopEdge() {
+    return this.mode === 'cards' || this.mode === 'view';
+  }
+
+  get hideLeftEdge() {
+    return this.mode === 'preview';
   }
 }
