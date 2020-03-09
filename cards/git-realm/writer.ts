@@ -55,7 +55,7 @@ import { AddressableCard } from '@cardstack/core/card';
 //   }
 // }
 
-import stringify from 'fast-json-stable-stringify';
+import stringify from 'json-stable-stringify';
 
 const defaultBranch = 'master';
 
@@ -139,7 +139,7 @@ export default class GitWriter implements Writer {
 
       let signature = await this._commitOptions('create', type, id, session);
 
-      file.setContent(stringify(document.jsonapi));
+      file.setContent(stringify(document.jsonapi, { space: 2 }));
       let version = await change.finalize(signature);
       let meta: MetaObject | undefined;
 
