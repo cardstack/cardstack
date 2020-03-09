@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/git-realm-card",
-  "version": "0.0.1",
+  "version": "0.16.32",
   "description": "Git data source plugin for @cardstack/hub.",
   "repository": "https://github.com/cardstack/cardstack",
   "license": "MIT",

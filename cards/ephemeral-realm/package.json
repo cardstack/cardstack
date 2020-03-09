@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/ephemeral-realm-card",
-  "version": "0.0.0",
+  "version": "0.16.32",
   "main": "index.js",
   "license": "MIT",
   "publishConfig": {

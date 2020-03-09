@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/integer-field-card",
-  "version": "0.0.0",
+  "version": "0.16.32",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
