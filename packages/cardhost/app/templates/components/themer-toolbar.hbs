@@ -4,19 +4,6 @@
     <CardSizeToggle />
   </div>
   <div class="themer-toolbar--controls-right">
-    {{#if this.cssModeToggle.visible}}
-      <button
-        class="ch-button ch-button--icon eye-on"
-        aria-label="Hide the CSS editor"
-        {{on "click" this.cssModeToggle.hideEditor}}
-        data-test-hide-editor-btn />
-    {{else}}
-      <button
-        class="ch-button ch-button--icon eye-off"
-        aria-label="Show the CSS editor"
-        {{on "click" this.cssModeToggle.showEditor}}
-        data-test-show-editor-btn />
-    {{/if}}
     <button
       class="ch-button ch-button--icon dock-btn dock-bottom {{if (eq this.cssModeToggle.dockLocation "bottom") "selected"}}"
       {{on "click" this.cssModeToggle.dockBottom}}

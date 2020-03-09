@@ -8,7 +8,7 @@ Ember Concurrency into the rendering of the card component here.
 {{#if @card}}
   {{#if (eq @format "isolated")}}
     {{#let (component this.isolatedComponentName) as | Isolated |}}
-      <section
+      <AnimatedContainer
         class="card-renderer-isolated
           {{this.mode}}
           {{safe-css-string @card.adoptedFromName}}
@@ -84,7 +84,7 @@ Ember Concurrency into the rendering of the card component here.
             </div>
           {{/animated-value}}
         </AnimatedContainer>
-      </section>
+      </AnimatedContainer>
     {{/let}}
   {{else if (eq @format "embedded")}}
     {{#let (component this.embeddedComponentName) as | Embedded |}}

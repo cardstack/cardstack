@@ -25,15 +25,6 @@
   padding-top: 50px;
 }
 
-.cardhost-card-theme-editor.hidden {
-  transform: translateX(100%);
-}
-
-.cardhost-card-theme-editor.bottom-docked.hidden {
-  transform: translateY(100%);
-}
-
-
 .cardhost-card-theme-editor .resizable-content {
   position: relative;
   width: 100%;
