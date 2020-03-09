@@ -18,6 +18,6 @@ export default class CardsController extends Controller {
   }
 
   get hasThemerTools() {
-    return this.routeInfo.mode === 'themer' || this.routeInfo.mode === 'layout';
+    return this.routeInfo.mode === 'themer' || this.routeInfo.mode === 'layout' || this.routeInfo.mode === 'preview';
   }
 }

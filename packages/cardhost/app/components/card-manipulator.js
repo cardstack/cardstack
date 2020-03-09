@@ -4,7 +4,8 @@ import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import { dasherize } from '@ember/string';
 import { startCase } from 'lodash';
-import { task } from 'ember-concurrency';
+import { task, timeout } from 'ember-concurrency';
+import { restartableTask } from 'ember-concurrency-decorators';
 import ENV from '@cardstack/cardhost/config/environment';
 import { fieldTypeMappings, fieldComponents } from '../utils/mappings';
 import drag from '../motions/drag';
@@ -13,7 +14,8 @@ import scaleBy from '../motions/scale';
 import { parallel } from 'ember-animated';
 import { fadeOut } from 'ember-animated/motions/opacity';
 
-const { environment } = ENV;
+const { environment, clickDragDebounceMs } = ENV;
+const CLICK_DRAG_DEBOUNCE_MS = 100; // ¯\_(ツ)_/¯
 
 export default class CardManipulator extends Component {
   fieldTypeMappings = fieldTypeMappings;
@@ -34,6 +36,8 @@ export default class CardManipulator extends Component {
   @tracked stopMouse;
   @tracked updateMouse;
   @tracked justDropped;
+
+  clickDragDebounce = clickDragDebounceMs || CLICK_DRAG_DEBOUNCE_MS;
 
   constructor(...args) {
     super(...args);
@@ -263,18 +267,24 @@ export default class CardManipulator extends Component {
   @action
   selectFieldType(field, event) {
     if (!this.draggable.isDragging && !this.justDropped) {
-      this.beginDragging(field, event);
+      this.beginDragging.perform(field, event);
     } else {
       this.draggable.setDragging(false);
     }
   }
 
-  @action
-  beginDragging(field, dragEvent) {
+  @restartableTask
+  *beginDragging(field, dragEvent) {
     // we're clicking on a draggable that's already being dragged
     if (this.draggable.isDragging) {
       return;
     }
+
+    // if the user clicks, the initial mousedown event will occur
+    // first, wait for the mousedown -> mouseup -> click sequence
+    // to happen before doing all the work
+    yield timeout(this.clickDragDebounce);
+
     let dragState;
     let self = this;
 
@@ -383,6 +393,8 @@ export default class CardManipulator extends Component {
         droppedSprite.endTranslatedBy(((1 - scaleTo) / 2) * width, ((1 - scaleTo) / 2) * height);
         yield parallel(scaleBy(droppedSprite, { by: scaleTo }), move(droppedSprite), fadeOut(droppedSprite));
         droppedSprite.owner.value.dropTo = null;
+      } else {
+        others.forEach(move);
       }
     }
   }

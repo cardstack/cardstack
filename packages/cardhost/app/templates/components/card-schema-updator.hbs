@@ -12,7 +12,7 @@
           <div
             class="ch-catalog-field"
             tabindex="-1"
-            {{on "mousedown" (fn this.beginDragging field)}}
+            {{on "mousedown" (perform this.beginDragging field)}}
             {{on "click" (fn this.selectFieldType field)}}
             data-test-card-add-field-draggable={{field.type}}
           >
