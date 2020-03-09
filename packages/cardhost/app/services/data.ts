@@ -15,7 +15,10 @@ import { stringify } from 'qs';
 import CardstackError from '@cardstack/core/error';
 import { OcclusionRules } from '@cardstack/core/occlusion-rules';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+//@ts-ignore
+import ENV from '@cardstack/cardhost/config/environment';
 
+const { hubURL } = ENV;
 // Caching at the module scope to help speed up the tests. Since this is a
 // singleton anyways, that should be ok.
 const cache: Map<string, Promise<AddressableCard>> = new Map();
@@ -26,7 +29,7 @@ export default class DataService extends Service implements CardInstantiator {
   private memoizeCache: { [functionName: string]: any } = {};
 
   get hubURL(): string {
-    return 'http://localhost:3000';
+    return hubURL;
   }
 
   // some day we'll have a @memo decorator. until then, here's some real basic memoization...

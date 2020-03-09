@@ -8,7 +8,7 @@ const root = resolve(join(__dirname, '..'));
 const specialBranches = ['master', 'production'];
 const context = join(root, 'deploy/context');
 const depLayerFiles = ['package.json'];
-const codeLayerFiles = ['cardstack', 'config', 'app', 'public', 'ember-cli-build.js', '.ember-cli.js'];
+const codeLayerFiles = ['config', 'app', 'public', 'ember-cli-build.js', '.ember-cli.js'];
 
 emptyDirSync(context);
 copySync(join(root, 'deploy/Dockerfile'), join(context, 'Dockerfile'));

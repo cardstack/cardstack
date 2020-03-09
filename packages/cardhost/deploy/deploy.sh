@@ -15,28 +15,18 @@ for variable in PGHOST \
                 PGPASSWORD \
                 EMBER_DEPLOY_AWS_ACCESS_KEY_ID \
                 EMBER_DEPLOY_AWS_SECRET_ACCESS_KEY \
-                GITHUB_CLIENT_ID \
-                GITHUB_CLIENT_SECRET \
-                GITHUB_TOKEN \
-                PUBLIC_HUB_URL \
+                HUB_URL \
+                META_REALM_URL \
+                DEFAULT_REALM_URL \
                 SWARM_CONTROLLER \
-                S3_IMAGE_BUCKET \
-                S3_IMAGE_UPLOAD_ACCESS_KEY_ID \
-                S3_IMAGE_UPLOAD_SECRET_ACCESS_KEY \
                 LOG_LEVELS \
-                CARD_TEMPLATES \
-                GIT_PRIVATE_KEY \
-                GIT_BRANCH_PREFIX \
-                GIT_REPO \
-                CARDSTACK_SESSIONS_KEY \
-                INDEX_INTERVAL; do
+                CARDSTACK_SESSIONS_KEY; do
     command="export ${variable}=\$${target_env}_${variable}"
     eval $command
 done
 
 #env agnostic env vars
 for variable in GITHUB_BRANCH \
-                WEBHOOK_URL \
                 ECR_ENDPOINT; do
     command="export ${variable}=\$${variable}"
     eval $command
@@ -68,9 +58,5 @@ docker run --rm --network cardstack \
           --env HUB_URL=$PUBLIC_HUB_URL \
           --env AWS_SECRET_ACCESS_KEY=$EMBER_DEPLOY_AWS_SECRET_ACCESS_KEY \
           --env AWS_ACCESS_KEY_ID=$EMBER_DEPLOY_AWS_ACCESS_KEY_ID \
-          --env TRAVIS_COMMIT \
-          --env WEBHOOK_URL \
           --env TARGET_NAME \
-          --env CARD_TEMPLATES \
-          --env GIT_REPO \
           cardhost ./node_modules/.bin/ember deploy $target_env --verbose

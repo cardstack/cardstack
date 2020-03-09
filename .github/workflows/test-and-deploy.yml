@@ -72,7 +72,8 @@ jobs:
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
       id: extract_branch
     - name: Deploy Demo
-      if: github.ref == 'refs/heads/master'
+      # if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/new-hub-deploy'
       env:
         PGHOST: localhost
         PGPORT: 5444
@@ -82,10 +83,11 @@ jobs:
         demo_PGHOST: builder-hub20191010154607345600000008.cbuq0sp3cf76.us-east-1.rds.amazonaws.com
         demo_PGPORT: 5432
         demo_PGUSER: cardstack
-        demo_PUBLIC_HUB_URL: https://builder-hub.stack.cards
+        demo_HUB_URL: https://builder-hub.stack.cards
         demo_SWARM_CONTROLLER: sc.builder.stack.cards
         ECR_ENDPOINT: 680542703984.dkr.ecr.us-east-1.amazonaws.com/builder
-        demo_GIT_REPO: ${{ secrets.demo_GIT_REPO }}
+        demo_META_REALM_URL: ${{ secrets.demo_META_REALM_URL }}
+        demo_DEFAULT_REALM_URL: ${{ secrets.demo_DEFAULT_REALM_URL }}
         demo_PGPASSWORD: ${{ secrets.demo_PGPASSWORD }}
         demo_CARDSTACK_SESSIONS_KEY: ${{ secrets.demo_CARDSTACK_SESSIONS_KEY }}
         demo_EMBER_DEPLOY_AWS_SECRET_ACCESS_KEY: ${{ secrets.demo_EMBER_DEPLOY_AWS_SECRET_ACCESS_KEY }}
@@ -120,10 +122,11 @@ jobs:
         production_PGHOST: builder-prod-hub20191219222942603100000008.cbuq0sp3cf76.us-east-1.rds.amazonaws.com
         production_PGPORT: 5432
         production_PGUSER: cardstack
-        production_PUBLIC_HUB_URL: https://builder-prod-hub.card.space
+        production_HUB_URL: https://builder-prod-hub.card.space
         production_SWARM_CONTROLLER: sc.builder.card.space
         ECR_ENDPOINT: 680542703984.dkr.ecr.us-east-1.amazonaws.com/builder
-        production_GIT_REPO: ${{ secrets.production_GIT_REPO }}
+        production_META_REALM_URL: ${{ secrets.production_META_REALM_URL }}
+        production_DEFAULT_REALM_URL: ${{ secrets.production_DEFAULT_REALM_URL }}
         production_PGPASSWORD: ${{ secrets.production_PGPASSWORD }}
         production_CARDSTACK_SESSIONS_KEY: ${{ secrets.production_CARDSTACK_SESSIONS_KEY }}
         production_EMBER_DEPLOY_AWS_SECRET_ACCESS_KEY: ${{ secrets.production_EMBER_DEPLOY_AWS_SECRET_ACCESS_KEY }}
