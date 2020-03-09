@@ -42,7 +42,7 @@ destination:\n\
 pid_file: /var/run/remote_syslog.pid'\
 > /etc/log_files.yml
 
-CMD remote_syslog --hostname "${TARGET_ENV:-unknown_env}_$(hostname)" && ./node_modules/@cardstack/hub/bin/cardstack.js 2>&1 | tee -a /srv/hub/logs/node.log
+CMD remote_syslog --hostname "${TARGET_ENV:-unknown_env}_$(hostname)" && ./node_modules/@cardstack/hub/bin/cardstack-hub.js 2>&1 | tee -a /srv/hub/logs/node.log
 
 # Change this if your content-types are not publically readable.
 # This configuration will cause the container to restart after
