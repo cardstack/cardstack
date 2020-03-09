@@ -5,8 +5,8 @@
   "repository": "https://github.com/cardstack/cardstack",
   "license": "MIT",
   "author": "Edward Faulkner <edward@eaf4.com>",
-  "scripts": {
-    "test": "mocha ../test-support/bin/run.js"
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "@cardstack/di": "0.17.0",
@@ -31,12 +31,5 @@
     "@cardstack/eslint-config": "0.18.0",
     "@cardstack/test-support": "0.18.0",
     "sinon": "7.2.3"
-  },
-  "engines": {
-    "node": ">= 7.7"
-  },
-  "ember-addon": {
-    "defaultBlueprint": "cardstack-git-seeds"
-  },
-  "gitHead": "409020ef401822d485e208887069a513477e2a7b"
+  }
 }
