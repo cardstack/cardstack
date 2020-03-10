@@ -8,18 +8,23 @@
   {{this.themerClasses}}"
   data-test-cardhost-cards
 >
-  <ToolbarManager @topLeftCornerBelongsTo="left" @animationDuration={{250}}>
-  {{#unless this.hideTopEdge}}
-    <CardhostTopEdge @mode={{this.mode}} @card={{this.target.currentRoute.parent.attributes}} @previousTransition={{this.previousTransition}} />
-  {{/unless}}
-
-  {{#unless this.hideLeftEdge}}
-    {{in-left-toolbar show=(component "cardhost-left-edge" mode=this.mode)}}
-  {{/unless}}
-
-  {{outlet}}
+  <ToolbarManager @topLeftCornerBelongsTo="left" @topRightCornerBelongsTo="top" @animationDuration={{250}}>
+    {{outlet}}
   </ToolbarManager>
 </div>
+
+{{#unless this.hideTopEdge}}
+  {{in-top-toolbar show=(
+    component "cardhost-top-edge"
+    mode=this.mode
+    card=this.target.currentRoute.parent.attributes
+    previousTransition=this.previousTransition
+  )}}
+{{/unless}}
+
+{{#unless this.hideLeftEdge}}
+  {{in-left-toolbar show=(component "cardhost-left-edge" mode=this.mode)}}
+{{/unless}}
 
 {{#if this.library.visible}}
   {{in-bottom-toolbar show=(component "library" templates=this.model)}}

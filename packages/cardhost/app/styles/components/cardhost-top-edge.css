@@ -1,22 +1,18 @@
 .cardhost-top-edge {
   height: var(--ch-top-edge-height);
-  position: fixed;
-  top: 0;
-  right: var(--ch-spacing);
-  left: var(--ch-left-edge-navbar-width);
   display: grid;
   grid-template-columns: auto 1fr auto var(--ch-right-edge-panel-width);
   grid-gap: var(--ch-spacing);
   justify-items: center;
   align-items: center;
+  margin: 0 var(--ch-spacing);
   text-align: right;
-  background-color: transparent;
-  z-index: var(--ch-top-edge-z-index);
 }
 
 .cardhost-top-edge.themer {
-  right: 0;
-  left: 0;
+  grid-template-columns: 1fr;
+  justify-items: initial;
+  margin: 0;
 }
 
 .cardhost-top-edge.preview {
@@ -26,7 +22,6 @@
 
 .cardhost-top-edge--preview-button,
 .cardhost-top-edge--size-buttons {
-  z-index: var(--ch-actions-z-index);
   transition: transform var(--ch-transition-time) ease-in-out;
 }
 
@@ -39,7 +34,6 @@
   display: grid;
   grid-template-columns: 1fr 40px;
   grid-gap: 20px;
-  z-index: var(--ch-actions-z-index);
   width: 100%;
   justify-items: flex-end;
 }

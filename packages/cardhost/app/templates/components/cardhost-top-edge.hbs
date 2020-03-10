@@ -47,5 +47,7 @@
         @linkTo="view" />
       <EdgeActionsButton />
     </div>
+  {{else if (eq @mode "themer")}}
+    <ThemerToolbar @model={{@card}} />
   {{/if}}
 </div>

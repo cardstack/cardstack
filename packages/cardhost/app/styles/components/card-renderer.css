@@ -38,7 +38,7 @@
   z-index: var(--ch-card-header-z-index); /* card scrolls under the header */
 }
 
-.card-renderer-isolated.view:not(.themer) .card-renderer-isolated--animated-view-header {
+.card-renderer-isolated.view:not(.themer):not(.preview) .card-renderer-isolated--animated-view-header {
   top: 0;
   height: var(--card-renderer-header-height);
   z-index: 5;

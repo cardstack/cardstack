@@ -2,7 +2,6 @@
   height: 100%;
   display: flex;
   flex-flow: row nowrap;
-  z-index: var(--ch-left-edge-z-index);
 }
 
 .cardhost-left-edge--nav {

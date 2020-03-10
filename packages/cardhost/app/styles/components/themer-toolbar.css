@@ -1,12 +1,7 @@
 .themer-toolbar {
-  position: fixed;
-  top: var(--ch-spacing);
-  right: 0;
-  left: var(--ch-left-edge-navbar-width);
   display: grid;
   grid-template-columns: minmax(auto, var(--ch-card-size)) auto;
-  grid-gap: 20px;
-  z-index: var(--ch-actions-z-index);
+  grid-gap: var(--ch-spacing);
 }
 
 .themer-toolbar--controls-left {
