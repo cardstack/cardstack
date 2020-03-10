@@ -54,17 +54,21 @@ export default class CardNameDialog extends Component {
 
     if (environment !== 'test') {
       this.overlays.setOverlayState('showLoading', true);
-      yield newCard.save().catch(() => {
-        // if there's a problem saving, go back to showing the dialog
-        this.overlays.setOverlayState('showLoading', false);
-        return;
-      });
-    }
-    this.overlays.reset();
-    if (adoptedFrom) {
-      this.router.transitionTo('cards.card.edit.fields', newCard);
-    } else {
-      this.router.transitionTo('cards.card.edit.fields.schema', newCard);
+      yield newCard
+        .save()
+        .then(() => {
+          this.overlays.reset();
+          if (adoptedFrom) {
+            this.router.transitionTo('cards.card.edit.fields', newCard);
+          } else {
+            this.router.transitionTo('cards.card.edit.fields.schema', newCard);
+          }
+        })
+        .catch(() => {
+          // if there's a problem saving, go back to showing the dialog
+          this.overlays.setOverlayState('showLoading', false);
+          return;
+        });
     }
   })
   createCardTask;
