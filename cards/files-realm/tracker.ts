@@ -84,6 +84,8 @@ export class FilesTracker {
     this.state.set(directory, now);
   }
 
+  notifyFileDidChange(_fullPath: string): void {}
+
   private crawl(cardsDirectory: string): Map<string, Entry> {
     let output: Map<string, Entry> = new Map();
     for (let name of readdirSync(cardsDirectory)) {

@@ -3,13 +3,13 @@ import { myOrigin } from '@cardstack/core/origin';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import { Session } from '@cardstack/core/session';
 import { createTestEnv, TestEnv } from '../helpers';
-import { cardDocument, CardDocument } from '@cardstack/core/card-document';
+import { cardDocument } from '@cardstack/core/card-document';
 import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';
 import IndexingService from '../../indexing';
-import { outputJSONSync, removeSync, outputFileSync } from 'fs-extra';
+import { removeSync, outputFileSync } from 'fs-extra';
 import { join } from 'path';
-import { Card } from '@cardstack/core/card';
 import { FilesTracker } from '@cardstack/files-realm-card/tracker';
+import { writeCard } from '@cardstack/files-realm-card/writer';
 
 describe('hub/files-realm/indexer', function() {
   this.timeout(10000);
@@ -36,16 +36,18 @@ describe('hub/files-realm/indexer', function() {
       .withAttributes({ directory: filesPath, csId: filesRealm });
 
     await service.create(`${myOrigin}/api/realms/meta`, filesDoc.jsonapi);
-    manuallyCreateCard(join(filesPath, 'first-card'), {
-      cardDocument: cardDocument().withAttributes({
+    writeCard(
+      join(filesPath, 'first-card'),
+      cardDocument().withAttributes({
         csId: 'first-card',
         csDescription: 'The first card',
         csFiles: { 'example.hbs': 'Hello world' },
-      }),
-    });
-    manuallyCreateCard(join(filesPath, 'second-card'), {
-      cardDocument: cardDocument().withAttributes({ csId: 'second-card', csDescription: 'The second card' }),
-    });
+      }).jsonapi
+    );
+    writeCard(
+      join(filesPath, 'second-card'),
+      cardDocument().withAttributes({ csId: 'second-card', csDescription: 'The second card' }).jsonapi
+    );
   });
 
   afterEach(async function() {
@@ -59,9 +61,10 @@ describe('hub/files-realm/indexer', function() {
     let { cards } = await service.search({ filter: { eq: { csRealm: filesRealm, csId: 'my-card' } } });
     expect(cards).lengthOf(0);
 
-    manuallyCreateCard(join(filesPath, 'my-card'), {
-      cardDocument: cardDocument().withAttributes({ csId: 'my-card', csDescription: 'My Card' }),
-    });
+    writeCard(
+      join(filesPath, 'my-card'),
+      cardDocument().withAttributes({ csId: 'my-card', csDescription: 'My Card' }).jsonapi
+    );
 
     let count = tracker.operationsCount;
     await indexing.update();
@@ -155,23 +158,3 @@ describe('hub/files-realm/indexer', function() {
     expect(cards[0].csDescription).to.equal('The second card');
   });
 });
-
-function manuallyCreateCard(cardPath: string, opts: { packageJSON?: any; cardDocument: CardDocument }) {
-  let cardJSON = opts.cardDocument.jsonapi;
-  if (cardJSON.data.attributes?.csFiles) {
-    writeCSFiles(cardPath, cardJSON.data.attributes?.csFiles as NonNullable<Card['csFiles']>);
-    delete cardJSON.data.attributes.csFiles;
-  }
-  outputJSONSync(join(cardPath, 'package.json'), opts.packageJSON ?? {});
-  outputJSONSync(join(cardPath, 'card.json'), cardJSON);
-}
-
-function writeCSFiles(outDir: string, files: NonNullable<Card['csFiles']>) {
-  for (let [name, entry] of Object.entries(files)) {
-    if (typeof entry === 'string') {
-      outputFileSync(join(outDir, name), entry, 'utf8');
-    } else {
-      writeCSFiles(join(outDir, name), entry);
-    }
-  }
-}
