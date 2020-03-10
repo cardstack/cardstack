@@ -157,4 +157,14 @@ describe('hub/files-realm/indexer', function() {
     expect(cards).lengthOf(1);
     expect(cards[0].csDescription).to.equal('The second card');
   });
+
+  it('updates a card when notified about a file change', async function() {
+    let filename = join(filesPath, 'first-card', 'example.hbs');
+    outputFileSync(filename, 'Goodbye');
+    tracker.notifyFileDidChange(filename);
+    await tracker.somePromiseGoesHere();
+  });
+
+  it('updates a card when notified about a file that was deleted', async function() {});
+  it('deletes a card when notified about a file change', async function() {});
 });
