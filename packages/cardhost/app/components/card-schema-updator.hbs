@@ -16,7 +16,7 @@
           <div
             class="ch-catalog-field"
             tabindex="-1"
-            {{on "mousedown" (fn this.beginDragging entry)}}
+            {{on "mousedown" (perform this.beginDragging entry)}}
             {{on "click" (fn this.selectFieldType entry)}}
             data-test-card-add-field-draggable={{entry.canonicalURL}}
           >

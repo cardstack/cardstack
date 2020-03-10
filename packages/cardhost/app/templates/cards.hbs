@@ -9,7 +9,11 @@
   data-test-cardhost-cards
 >
   {{#if (not-eq this.routeInfo.mode "cards")}}
-    <CardhostTopEdge @mode={{this.routeInfo.mode}} @card={{this.currentCard}} />
+    <CardhostTopEdge
+      @mode={{this.routeInfo.mode}}
+      @card={{this.currentCard}}
+      @previousTransition={{this.previousTransition}}
+    />
   {{/if}}
 
   {{outlet}}

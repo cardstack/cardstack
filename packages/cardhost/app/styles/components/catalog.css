@@ -26,6 +26,8 @@
 
 .ch-catalog--header {
   position: relative;
+  background-color: var(--ch-dark-background);
+  z-index: 10;
 }
 
 .ch-catalog--header-btns {

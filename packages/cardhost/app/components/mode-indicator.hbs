@@ -3,7 +3,7 @@
   @model={{@card.canonicalURL}}
   @class={{concat "mode-indicator mode-indicator--" @mode}}
   title={{concat "Link to " @linkTo " mode"}}
-  aria-label={{concat "Link to " @linkTo " mode"}}
+  aria-label={{concat @linkTo " mode"}}
   data-test-mode-indicator-link={{@linkTo}}
   data-test-mode-indicator
 >

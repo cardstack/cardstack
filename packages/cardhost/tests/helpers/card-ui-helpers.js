@@ -134,7 +134,7 @@ export async function selectField(name) {
 
 export async function setCardName(name) {
   let isNotAdopted = document.querySelector('[data-test-card-name-dialog-is-adopted-card="false"]');
-  await fillIn('#card__name', name);
+  await fillIn('[data-test-card-name]', name);
   await click('[data-test-create-card-btn]');
 
   if (isNotAdopted) {

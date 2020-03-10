@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { click, visit, currentURL, triggerKeyEvent, fillIn } from '@ember/test-helpers';
+import { click, visit, currentURL, triggerKeyEvent, fillIn, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
 import {
@@ -14,6 +14,7 @@ import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import { cardDocument } from '@cardstack/core/card-document';
+import { animationsSettled } from 'ember-animated/test-support';
 
 const cardName = 'Millenial Puppies';
 
@@ -104,8 +105,8 @@ module('Acceptance | card name dialog', function(hooks) {
     await waitForTemplatesToLoad();
 
     await click('[data-test-library-new-blank-card-btn]');
-    await fillIn('#card__name', cardName);
-    await triggerKeyEvent('#card__name', 'keydown', 'Enter');
+    await fillIn('[data-test-card-name]', cardName);
+    await triggerKeyEvent('[data-test-card-name]', 'keydown', 'Enter');
     await waitForSchemaViewToLoad();
 
     assert.dom('.card-renderer-isolated--header-title').hasText(cardName);
@@ -131,5 +132,19 @@ module('Acceptance | card name dialog', function(hooks) {
     await click('[data-test-cancel-create-btn]'); // close dialog by clicking cancel button
     assert.dom('[data-test-dialog-box]').doesNotExist();
     assert.equal(currentURL(), '/cards');
+  });
+
+  test('loading screen can appear over the dialog', async function(assert) {
+    await visit('/cards');
+    await click('[data-test-library-button]');
+    await waitForTemplatesToLoad();
+
+    await click('[data-test-library-new-blank-card-btn]');
+    this.owner.lookup('service:overlays').setOverlayState('showLoading', true);
+
+    await waitFor('[data-test-loading-screen]');
+    assert.dom('[data-test-loading-screen]').hasText('Generating Card');
+    await animationsSettled();
+    await percySnapshot(assert);
   });
 });

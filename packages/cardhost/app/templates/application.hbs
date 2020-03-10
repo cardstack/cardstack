@@ -6,4 +6,10 @@
 
 <CardhostModalTarget/>
 
+{{#animated-if this.overlays.showLoading use=this.fade}}
+  <Loading />
+{{else}}
+  <CardhostModalTarget/>
+{{/animated-if}}
+
 <CssManager/>
