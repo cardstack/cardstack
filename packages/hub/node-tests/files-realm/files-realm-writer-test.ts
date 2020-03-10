@@ -110,7 +110,7 @@ describe('hub/files-realm-writer', function() {
     card = await service.get(card);
     expect(card.csFiles).to.deep.equal({
       'example.css': 'literally the best style',
-      inner: { 'example.hbs': 'Hello Mars' },
+      inner: { 'example.hbs': 'Hello World' },
     });
   });
 
@@ -146,8 +146,7 @@ describe('hub/files-realm-writer', function() {
     );
 
     let name = serializedCardName(card);
-    expect(card.meta!.version).is.ok('the card has been assigned a meta.version');
-    await service.delete(card, card.meta!.version as string);
+    await service.delete(card);
 
     expect(existsSync(join(filesPath, name))).to.equal(false, 'The card folder doesnt exist');
   });
@@ -155,7 +154,7 @@ describe('hub/files-realm-writer', function() {
 
 function serializedCardName(card: AddressableCard): string {
   let parts: string[] = [];
-  if (card.csOriginalRealm) {
+  if (card.csOriginalRealm !== card.csRealm) {
     parts.push(card.csOriginalRealm);
   }
   parts.push(card.csId);

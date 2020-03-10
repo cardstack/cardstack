@@ -3,7 +3,8 @@
     "type": "cards",
     "attributes": {
       "csFeatures": {
-        "indexer": "indexer.js"
+        "indexer": "indexer.js",
+        "writer": "writer.js"
       },
       "csFields": {
         "directory": {
