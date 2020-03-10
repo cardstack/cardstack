@@ -15,6 +15,7 @@ import AuthenticationMiddleware from './authentication-middleware';
 // TODO: we need to let cards register services in a safely namespaced way,
 // instead of this hack
 import { EphemeralStorage } from '@cardstack/ephemeral-realm-card/storage';
+import { FilesTracker } from '@cardstack/files-realm-card/tracker';
 
 import PgClient from './pgsearch/pgclient';
 import IndexingService from './indexing';
@@ -41,6 +42,7 @@ export async function wireItUp() {
   registry.register('authentication-middleware', AuthenticationMiddleware);
   registry.register('jsonapi-middleware', JSONAPIMiddleware);
   registry.register('ephemeralStorage', EphemeralStorage);
+  registry.register('filesTracker', FilesTracker);
   registry.register('cards', CardsService);
   registry.register('modules', ModuleService);
   registry.register('pgclient', PgClient);
