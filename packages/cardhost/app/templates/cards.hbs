@@ -8,6 +8,7 @@
   {{this.themerClasses}}"
   data-test-cardhost-cards
 >
+  <ToolbarManager @topLeftCornerBelongsTo="left" @animationDuration={{250}}>
   {{#unless this.hideTopEdge}}
     <CardhostTopEdge @mode={{this.mode}} @card={{this.target.currentRoute.parent.attributes}} @previousTransition={{this.previousTransition}} />
   {{/unless}}
@@ -17,6 +18,7 @@
   {{/unless}}
 
   {{outlet}}
+  </ToolbarManager>
 </div>
 
 {{#if this.library.visible}}

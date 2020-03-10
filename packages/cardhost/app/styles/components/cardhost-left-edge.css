@@ -6,10 +6,14 @@
 }
 
 .cardhost-left-edge--nav {
-  background-color: var(--ch-default);
   width: var(--ch-left-edge-navbar-width);
   overflow: hidden;
-  transition: width 0.2s ease, var(--ch-card-background-color-animate);
+  transition: width 0.2s ease;
+}
+
+.cardhost-left-edge--nav.cards,
+.cardhost-left-edge--nav.view {
+  background-color: var(--ch-default);
 }
 
 .cardhost-left-edge--nav.schema {
