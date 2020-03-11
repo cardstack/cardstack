@@ -81,6 +81,7 @@ Until that work is done we are statically adding this css
   --ch-field-width: 384px;  /* edit and schema view field-renderer max-width */
   --ch-spacing: 20px;
   --ch-bottom-edge-z-index: 30;
+  --ch-left-edge-z-index: 30;
   --ch-right-edge-z-index: 20;
   --ch-top-edge-z-index: 20;
   --ch-actions-z-index: 25;
@@ -157,9 +158,14 @@ a:hover {
 .cst-top {
   z-index: var(--ch-top-edge-z-index);
 }
-
 .cst-bottom {
   z-index: var(--ch-bottom-edge-z-index); /* This is so that bottom edge is above the left edge */
+}
+.cst-left {
+  z-index: var(--ch-left-edge-z-index);
+}
+.cst-right {
+  z-index: var(--ch-right-edge-z-index);
 }
 
 /* JSON card document -- hidden from view */
