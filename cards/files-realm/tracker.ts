@@ -3,18 +3,37 @@ import { join } from 'path';
 import logger from '@cardstack/logger';
 import { UpstreamDocument, UpstreamIdentity } from '@cardstack/core/document';
 import { Entry, readCard, crawl } from '@cardstack/core/card-file';
+import { statSync, Stats } from 'fs-extra';
+import { inject } from '@cardstack/hub/dependency-injection';
+import { AddressableCard } from '@cardstack/core/card';
+import * as J from 'json-typescript';
 
 const log = logger('files-realm-tracker');
+
+export interface TrackerParams {
+  fileChanged?: string;
+}
 
 // This holds the persistent state for the files-realm while the hub is running.
 // It deals with file watching and noticing incremental changes.
 export class FilesTracker {
+  indexing = inject('indexing');
+
   operationsCount = 0;
 
   private state: Map<string, Map<string, Entry>> = new Map();
   private ids: Map<string, UpstreamIdentity> = new Map();
+  private subscriptions: Map<string, AddressableCard> = new Map();
 
-  async update(directory: string, ops: IndexingOperations): Promise<void> {
+  async update(realmCard: AddressableCard, ops: IndexingOperations, params: TrackerParams | null): Promise<void> {
+    let directory = await realmCard.value('directory');
+
+    if (params?.fileChanged) {
+      await this.targetedUpdate(ops, directory, params.fileChanged);
+      return;
+    }
+
+    this.subscribe(directory, realmCard);
     let now = crawl(directory);
     let previous = this.state.get(directory);
 
@@ -30,20 +49,8 @@ export class FilesTracker {
         if (previous && !changed(previous.get(name), entry)) {
           continue;
         }
-
-        try {
-          let cardDir = join(directory, name);
-          let json = readCard(cardDir, entry);
-          let upstreamId = {
-            csId: json.data.attributes!.csId as string,
-            csOriginalRealm: json.data.attributes!.csOriginalRealm as string,
-          };
-          await ops.save(upstreamId, new UpstreamDocument(json));
-          this.operationsCount++;
-          this.ids.set(cardDir, upstreamId);
-        } catch (err) {
-          log.warn(`Ignoring card in ${directory} because: ${err}`);
-        }
+        let cardDir = join(directory, name);
+        await this.reindexCard(cardDir, entry, directory, ops);
       } else {
         // we found a file in within the top-level cards directory, we ignore
         // those.
@@ -81,7 +88,68 @@ export class FilesTracker {
     this.state.set(directory, now);
   }
 
-  notifyFileDidChange(_fullPath: string): void {}
+  private async reindexCard(cardDir: string, entry: Map<string, Entry>, directory: string, ops: IndexingOperations) {
+    try {
+      let json = readCard(cardDir, entry);
+      let upstreamId = {
+        csId: json.data.attributes!.csId as string,
+        csOriginalRealm: json.data.attributes!.csOriginalRealm as string,
+      };
+      await ops.save(upstreamId, new UpstreamDocument(json));
+      this.operationsCount++;
+      this.ids.set(cardDir, upstreamId);
+    } catch (err) {
+      log.warn(`Ignoring card in ${directory} because: ${err}`);
+    }
+  }
+
+  private async targetedUpdate(ops: IndexingOperations, directory: string, fileChanged: string): Promise<void> {
+    if (!fileChanged.startsWith(directory)) {
+      throw new Error(
+        `bug in files-realm tracker: got told about a file that's not ours: ${fileChanged} vs ${directory}`
+      );
+    }
+    let cardDirName = fileChanged.slice(directory.length + 1).split('/')[0];
+    let cardDir = join(directory, cardDirName);
+    let stat: Stats | undefined;
+    try {
+      stat = statSync(cardDir);
+    } catch (err) {
+      if (err.code !== 'ENOENT') {
+        throw err;
+      }
+    }
+    if (stat && stat.isDirectory()) {
+      let entry = crawl(cardDir);
+      await this.reindexCard(cardDir, entry, directory, ops);
+    } else {
+      let upstreamId = this.ids.get(cardDir);
+      if (upstreamId) {
+        await ops.delete(upstreamId);
+        this.operationsCount++;
+      }
+    }
+  }
+
+  private subscribe(directory: string, realmCard: AddressableCard) {
+    this.subscriptions.set(directory, realmCard);
+  }
+
+  notifyFileDidChange(fullPath: string): void {
+    this.notifyFileDidChangeAndWait(fullPath).catch(err =>
+      log.error(`Error while notifying file change %s: %s`, fullPath, err)
+    );
+  }
+
+  async notifyFileDidChangeAndWait(fullPath: string): Promise<void> {
+    let directory = [...this.subscriptions.keys()].find(d => fullPath.startsWith(d));
+    if (!directory) {
+      log.debug(`Notified about a file we're not interested in: ${fullPath}`);
+      return;
+    }
+    let params: TrackerParams = { fileChanged: fullPath };
+    await this.indexing.updateRealm(this.subscriptions.get(directory)!, params as J.Object);
+  }
 }
 
 function changed(previous: Entry | undefined, current: Map<string, Entry>): boolean {

@@ -8,7 +8,7 @@ export interface IndexerFactory<Meta = unknown, Params = unknown> {
 }
 
 export interface Indexer<Meta = unknown, Params = unknown> {
-  update(meta: Meta, ops: IndexingOperations, params: Params): Promise<Meta | void>;
+  update(meta: Meta, ops: IndexingOperations, params: Params | null): Promise<Meta | void>;
 }
 
 export class IndexingOperations {

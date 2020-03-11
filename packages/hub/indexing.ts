@@ -2,7 +2,7 @@ import { Session } from '@cardstack/core/session';
 import { inject, getOwner, injectionReady } from './dependency-injection';
 import { myOrigin } from '@cardstack/core/origin';
 import { IndexingOperations } from '@cardstack/core/indexer';
-import * as JSON from 'json-typescript';
+import * as J from 'json-typescript';
 import { upsert, param } from './pgsearch/util';
 import { Expression } from '@cardstack/core/expression';
 import { CardId, canonicalURL } from '@cardstack/core/card-id';
@@ -54,17 +54,17 @@ export default class IndexingService {
     await this.pgclient.query(
       upsert('meta', 'meta_pkey', {
         ['cs_realm']: param(realmCard.csId),
-        params: param((newMeta as JSON.Value) || null),
+        params: param((newMeta as J.Value) || null),
       }) as Expression
     );
   }
 
   async loadMeta(csId: string) {
     let metaResult = await this.pgclient.query(['select params from meta where cs_realm = ', param(csId)]);
-    return metaResult.rowCount ? (metaResult.rows[0].params as JSON.Object) : null;
+    return metaResult.rowCount ? (metaResult.rows[0].params as J.Object) : null;
   }
 
-  async updateRealm(realm: CardId, realmSpecificParams?: JSON.Value): Promise<unknown> {
+  async updateRealm(realm: CardId, realmSpecificParams?: J.Value): Promise<void> {
     let job = await this.queue.publish(
       'index_realm',
       {
@@ -77,7 +77,7 @@ export default class IndexingService {
       },
       { queueName: canonicalURL(realm) }
     );
-    return job.done;
+    await job.done;
   }
 
   // For all the realms ensure that each realm has run indexing at least once
