@@ -1,4 +1,4 @@
-import { module, test } from 'qunit';
+import { module, test, skip } from 'qunit';
 import { click, visit, currentURL, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures';
@@ -71,7 +71,7 @@ module('Acceptance | card name dialog', function(hooks) {
     assert.dom('[data-test-dialog-box] .dialog--title').doesNotExist();
   });
 
-  test('loading screen can appear over the dialog', async function(assert) {
+  skip('loading screen can appear over the dialog', async function(assert) {
     await login();
     await visit('/cards');
 
