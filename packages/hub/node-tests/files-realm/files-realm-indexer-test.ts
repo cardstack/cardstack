@@ -9,7 +9,7 @@ import IndexingService from '../../indexing';
 import { removeSync, outputFileSync } from 'fs-extra';
 import { join } from 'path';
 import { FilesTracker } from '@cardstack/files-realm-card/tracker';
-import { writeCard } from '@cardstack/files-realm-card/writer';
+import { writeCard } from '@cardstack/core/card-file';
 
 describe('hub/files-realm/indexer', function() {
   this.timeout(10000);

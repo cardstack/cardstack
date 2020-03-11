@@ -2,7 +2,7 @@ import { IndexingOperations } from '@cardstack/core/indexer';
 import { join } from 'path';
 import logger from '@cardstack/logger';
 import { UpstreamDocument, UpstreamIdentity } from '@cardstack/core/document';
-import { Entry, readCard, crawl } from '@cardstack/core/card-file-utils';
+import { Entry, readCard, crawl } from '@cardstack/core/card-file';
 
 const log = logger('files-realm-tracker');
 

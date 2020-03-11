@@ -2,12 +2,11 @@ import { Writer } from '@cardstack/core/writer';
 import { Session } from '@cardstack/core/session';
 import { UpstreamDocument, UpstreamIdentity } from '@cardstack/core/document';
 import { inject } from '@cardstack/hub/dependency-injection';
-import { AddressableCard, Card } from '@cardstack/core/card';
+import { AddressableCard } from '@cardstack/core/card';
 import crypto from 'crypto';
-import { pathExistsSync, outputJSONSync, outputFileSync, removeSync } from 'fs-extra';
+import { pathExistsSync, removeSync } from 'fs-extra';
 import { join } from 'path';
-import cloneDeep from 'lodash/cloneDeep';
-import { SingleResourceDoc } from 'jsonapi-typescript';
+import { writeCard } from '@cardstack/core/card-file';
 
 export default class FilesWriter implements Writer {
   filesTracker = inject('filesTracker');
@@ -66,27 +65,6 @@ export default class FilesWriter implements Writer {
       return upstreamId;
     } else {
       return `${upstreamId.csOriginalRealm}_${upstreamId.csId}`;
-    }
-  }
-}
-
-export function writeCard(cardPath: string, doc: SingleResourceDoc) {
-  if (doc.data.attributes?.csFiles) {
-    writeCSFiles(cardPath, doc.data.attributes?.csFiles as NonNullable<Card['csFiles']>);
-    doc = cloneDeep(doc);
-    delete doc.data.attributes!.csFiles;
-  }
-
-  outputJSONSync(join(cardPath, 'package.json'), {});
-  outputJSONSync(join(cardPath, 'card.json'), doc);
-}
-
-function writeCSFiles(outDir: string, files: NonNullable<Card['csFiles']>) {
-  for (let [name, entry] of Object.entries(files)) {
-    if (typeof entry === 'string') {
-      outputFileSync(join(outDir, name), entry, 'utf8');
-    } else {
-      writeCSFiles(join(outDir, name), entry);
     }
   }
 }
