@@ -15,10 +15,12 @@ describe('hub/indexing', function() {
     storage = await env.container.lookup('ephemeralStorage');
     indexing = await env.container.lookup('indexing');
     cards = (await await env.container.lookup('cards')).as(Session.INTERNAL_PRIVILEGED);
+    delete (global as any).__cardstackHubIndexingTest;
   });
 
   afterEach(async function() {
     await env.destroy();
+    delete (global as any).__cardstackHubIndexingTest;
   });
 
   it('it can index a realm', async function() {
@@ -193,5 +195,35 @@ describe('hub/indexing', function() {
     // stable case
     await indexing.update();
     expect(await cardsWithStep(4)).to.equal(0);
+  });
+
+  it(`can index one realm by itself with realm-specific parameters`, async function() {
+    const metaRealm = `${myOrigin}/api/realms/meta`;
+
+    (global as any).__cardstackHubIndexingTest = [];
+
+    let indexerSource = `
+    module.exports = class MyIndexer {
+      update(meta, ops, params) {
+        global.__cardstackHubIndexingTest.push(params);
+      }
+    }
+    `;
+
+    let realmCard = await cards.create(
+      metaRealm,
+      cardDocument().withAttributes({
+        csRealm: metaRealm,
+        csId: `${myOrigin}/api/realms/my-test-realm`,
+        csFeatures: {
+          indexer: 'indexer.js',
+        },
+        csFiles: {
+          'indexer.js': indexerSource,
+        },
+      }).jsonapi
+    );
+    await indexing.updateRealm(realmCard, { mySpecialArguments: 42 });
+    expect((global as any).__cardstackHubIndexingTest).deep.equal([{ mySpecialArguments: 42 }]);
   });
 });

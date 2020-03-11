@@ -5,7 +5,7 @@ import { IndexingOperations } from '@cardstack/core/indexer';
 import * as JSON from 'json-typescript';
 import { upsert, param } from './pgsearch/util';
 import { Expression } from '@cardstack/core/expression';
-import { CardId } from '@cardstack/core/card-id';
+import { CardId, canonicalURL } from '@cardstack/core/card-id';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { AddressableCard } from '@cardstack/core/card';
@@ -27,16 +27,16 @@ export default class IndexingService {
   async indexMetaRealm(metaRealmDocument: SingleResourceDoc) {
     let scopedService = this.cards.as(Session.INTERNAL_PRIVILEGED);
     let metaRealm = await scopedService.instantiate(metaRealmDocument);
-    await this._indexRealm(metaRealm);
+    await this._indexRealm(metaRealm, null);
   }
 
-  async indexRealm(realmCardId: CardId) {
+  async indexRealm(args: { realmCardId: CardId; params?: unknown }) {
     let scopedService = this.cards.as(Session.INTERNAL_PRIVILEGED);
-    let realmCard = await scopedService.get(realmCardId);
-    await this._indexRealm(realmCard);
+    let realmCard = await scopedService.get(args.realmCardId);
+    await this._indexRealm(realmCard, args.params);
   }
 
-  private async _indexRealm(realmCard: AddressableCard) {
+  private async _indexRealm(realmCard: AddressableCard, params: unknown) {
     let scopedService = this.cards.as(Session.INTERNAL_PRIVILEGED);
     let indexerFactory = await realmCard.loadFeature('indexer');
     if (!indexerFactory) {
@@ -49,12 +49,12 @@ export default class IndexingService {
     let meta = await this.loadMeta(realmCard.csId);
 
     let io = await getOwner(this).instantiate(IndexingOperations, realmCard, batch, scopedService);
-    let newMeta = await indexer.update(meta, io);
+    let newMeta = await indexer.update(meta, io, params);
     await batch.done();
     await this.pgclient.query(
       upsert('meta', 'meta_pkey', {
         ['cs_realm']: param(realmCard.csId),
-        params: param(newMeta || null),
+        params: param((newMeta as JSON.Value) || null),
       }) as Expression
     );
   }
@@ -62,6 +62,22 @@ export default class IndexingService {
   async loadMeta(csId: string) {
     let metaResult = await this.pgclient.query(['select params from meta where cs_realm = ', param(csId)]);
     return metaResult.rowCount ? (metaResult.rows[0].params as JSON.Object) : null;
+  }
+
+  async updateRealm(realm: CardId, realmSpecificParams?: JSON.Value): Promise<unknown> {
+    let job = await this.queue.publish(
+      'index_realm',
+      {
+        realmCardId: {
+          csRealm: realm.csRealm,
+          csOriginalRealm: realm.csOriginalRealm ?? realm.csRealm,
+          csId: realm.csId,
+        },
+        params: realmSpecificParams ?? null,
+      },
+      { queueName: canonicalURL(realm) }
+    );
+    return job.done;
   }
 
   // For all the realms ensure that each realm has run indexing at least once
@@ -81,7 +97,13 @@ export default class IndexingService {
       realms.map(async realmCard => {
         let job = await this.queue.publish(
           'index_realm',
-          { csRealm: realmCard.csRealm, csOriginalRealm: realmCard.csOriginalRealm, csId: realmCard.csId },
+          {
+            realmCardId: {
+              csRealm: realmCard.csRealm,
+              csOriginalRealm: realmCard.csOriginalRealm,
+              csId: realmCard.csId,
+            },
+          },
           { queueName: realmCard.canonicalURL }
         );
         return job.done;
