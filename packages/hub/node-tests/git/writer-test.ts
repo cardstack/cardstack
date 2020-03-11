@@ -437,7 +437,7 @@ describe('hub/git/writer', function() {
       expect(savedCard.csFiles).to.deep.equal({
         inner: { 'example.hbs': 'Hello Mars' },
       });
-      let innerCardFile = await inRepo(repoPath).getContents('master', `cards/custom-id/inner/example.hbs`);
+      let innerCardFile = await inRepo(repoPath).getContents('master', `cards/${savedCard.csId}/inner/example.hbs`);
       expect(innerCardFile).to.equal('Hello Mars');
     });
 
@@ -458,9 +458,9 @@ describe('hub/git/writer', function() {
         inner: { 'example.hbs': 'Hello World' },
       });
 
-      let innerCardFile = await inRepo(repoPath).getContents('master', `cards/custom-id/inner/example.hbs`);
+      let innerCardFile = await inRepo(repoPath).getContents('master', `cards/${savedCard.csId}/inner/example.hbs`);
       expect(innerCardFile).to.equal('Hello World');
-      innerCardFile = await inRepo(repoPath).getContents('master', `cards/custom-id/example.css`);
+      innerCardFile = await inRepo(repoPath).getContents('master', `cards/${savedCard.csId}/example.css`);
       expect(innerCardFile).to.equal('literally the best style');
     });
 
@@ -475,9 +475,9 @@ describe('hub/git/writer', function() {
       expect(savedCard.csFiles).to.deep.equal({});
 
       let saved = await inRepo(repoPath).getJSONContents('master', `cards/${savedCard.csId}/card.json`);
-      expect(saved).to.be.ok('the card.json still exists');
-      let repoContents = (await inRepo(repoPath).listTree('master', 'cards')).map(a => a.name);
-      expect(repoContents).not.to.include(`${savedCard.csId}/inner`);
+      expect(saved.data.attributes.title).to.equal('Initial document');
+      let repoContents = (await inRepo(repoPath).listTree('master', `cards/${savedCard.csId}`)).map(a => a.name);
+      expect(repoContents).not.to.include(`inner`);
     });
 
     // it('requires id in body', async function() {

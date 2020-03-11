@@ -31,7 +31,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["-r", "esm", "packages/test-support/bin/run.js", "--timeout", "600000", "--grep", "hub/git/writer.*saves attributes"],
+      "args": ["-r", "esm", "packages/test-support/bin/run.js", "--timeout", "600000", "--grep", "hub/git/writer.*can remove a card's inner file"],
     },
     {
       "type": "node",

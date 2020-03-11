@@ -9,7 +9,7 @@ import os from 'os';
 import process from 'process';
 import CardstackError from '@cardstack/core/error';
 import { dir as mkTmpDir } from 'tmp-promise';
-import { MetaObject, SingleResourceDoc } from 'jsonapi-typescript';
+import { MetaObject } from 'jsonapi-typescript';
 import { extractSettings } from './lib/git-settings';
 // import { PrimaryData } from 'jsonapi-typescript';
 
@@ -55,8 +55,6 @@ import { writeCard } from '@cardstack/core/card-file';
 //     this.ephemeralStorage.store(null, id, this.realmCard.csId, version);
 //   }
 // }
-
-import stringify from 'json-stable-stringify';
 
 const defaultBranch = 'master';
 
@@ -203,20 +201,14 @@ export default class GitWriter implements Writer {
 
     return withErrorHandling(cardId, type, async () => {
       let change = await Change.create(this.repo!, version as string, this.branchPrefix + defaultBranch, !!this.remote);
-      let file = await change.get(this._cardDirectoryFor(type, cardId), { allowUpdate: true });
-      let before = JSON.parse((await file.getBuffer())!.toString()) as SingleResourceDoc;
-      // let after = patch(before, document);
 
-      document.jsonapi.data.attributes = Object.assign({}, before.data.attributes, document.jsonapi.data.attributes);
-      document.jsonapi.data.relationships = Object.assign(
-        {},
-        before.data.relationships,
-        document.jsonapi.data.relationships
-      );
+      let cardDir = this._cardDirectoryFor(type, cardId);
+      await writeCard(cardDir, document.jsonapi, async (path: string, content: string) => {
+        let file = await change.get(path, { allowCreate: true, allowUpdate: true });
+        file.setContent(content);
+      });
 
       let signature = await this._commitOptions('update', type, cardId, session);
-
-      file.setContent(stringify(document.jsonapi, { space: 2 }));
       version = await change.finalize(signature);
 
       meta = Object.assign({}, document.jsonapi.data.meta);
