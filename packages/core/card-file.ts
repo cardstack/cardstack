@@ -1,30 +1,33 @@
-import { outputJSONSync, outputFileSync, readJsonSync, readFileSync, statSync, readdirSync } from 'fs-extra';
+import { readJsonSync, readFileSync, statSync, readdirSync } from 'fs-extra';
 import { join } from 'path';
 import cloneDeep from 'lodash/cloneDeep';
 import merge from 'lodash/merge';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { Card } from './card';
 import { assertSingleResourceDoc } from './jsonapi';
+import stringify from 'json-stable-stringify';
 
 export type Entry = { mtime: number; size: number } | Map<string, Entry>;
 
-export function writeCard(cardPath: string, doc: SingleResourceDoc) {
+type WriteFn = (path: string, contents: string) => Promise<void>;
+
+export async function writeCard(cardPath: string, doc: SingleResourceDoc, writeFn: WriteFn): Promise<void> {
   if (doc.data.attributes?.csFiles) {
-    writeCSFiles(cardPath, doc.data.attributes?.csFiles as NonNullable<Card['csFiles']>);
+    await writeCSFiles(cardPath, doc.data.attributes?.csFiles as NonNullable<Card['csFiles']>, writeFn);
     doc = cloneDeep(doc);
     delete doc.data.attributes!.csFiles;
   }
 
-  outputJSONSync(join(cardPath, 'package.json'), {});
-  outputJSONSync(join(cardPath, 'card.json'), doc);
+  await writeFn(join(cardPath, 'package.json'), stringify({}, { space: 2 }));
+  await writeFn(join(cardPath, 'card.json'), stringify(doc, { space: 2 }));
 }
 
-function writeCSFiles(outDir: string, files: NonNullable<Card['csFiles']>) {
+async function writeCSFiles(outDir: string, files: NonNullable<Card['csFiles']>, writeFn: WriteFn): Promise<void> {
   for (let [name, entry] of Object.entries(files)) {
     if (typeof entry === 'string') {
-      outputFileSync(join(outDir, name), entry, 'utf8');
+      await writeFn(join(outDir, name), entry);
     } else {
-      writeCSFiles(join(outDir, name), entry);
+      await writeCSFiles(join(outDir, name), entry, writeFn);
     }
   }
 }

@@ -4,7 +4,7 @@ import { UpstreamDocument, UpstreamIdentity } from '@cardstack/core/document';
 import { inject } from '@cardstack/hub/dependency-injection';
 import { AddressableCard } from '@cardstack/core/card';
 import crypto from 'crypto';
-import { pathExistsSync, removeSync } from 'fs-extra';
+import { pathExistsSync, removeSync, outputFileSync } from 'fs-extra';
 import { join } from 'path';
 import { writeCard } from '@cardstack/core/card-file';
 
@@ -23,7 +23,7 @@ export default class FilesWriter implements Writer {
     }
 
     let cardDir = join(realmDir, cardDirName);
-    let saved = this.createOrUpdateCard(cardDir, doc);
+    let saved = await this.createOrUpdateCard(cardDir, doc);
     return { saved, id: upstreamId ?? cardDirName };
   }
 
@@ -32,7 +32,7 @@ export default class FilesWriter implements Writer {
     let cardDirName = this.upstreamIdToCardDirName(id);
     let cardDir = join(realmDir, cardDirName);
     removeSync(cardDir);
-    let saved = this.createOrUpdateCard(cardDir, doc);
+    let saved = await this.createOrUpdateCard(cardDir, doc);
     return saved;
   }
 
@@ -43,8 +43,10 @@ export default class FilesWriter implements Writer {
     removeSync(cardDir);
   }
 
-  private createOrUpdateCard(cardDir: string, doc: UpstreamDocument) {
-    writeCard(cardDir, doc.jsonapi);
+  private async createOrUpdateCard(cardDir: string, doc: UpstreamDocument): Promise<UpstreamDocument> {
+    await writeCard(cardDir, doc.jsonapi, async (path: string, contents: string) => {
+      outputFileSync(path, contents, 'utf8');
+    });
     let meta = Object.assign({}, doc.jsonapi.data.meta);
     meta.cardDir = cardDir;
     doc.jsonapi.data.meta = meta;

@@ -139,6 +139,7 @@ export default class GitWriter implements Writer {
 
       let signature = await this._commitOptions('create', type, id, session);
 
+      // TODO use the card-file module to write the card....
       file.setContent(stringify(document.jsonapi, { space: 2 }));
       let version = await change.finalize(signature);
       let meta: MetaObject | undefined;
