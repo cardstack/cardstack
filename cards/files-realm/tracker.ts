@@ -7,6 +7,7 @@ import { statSync, Stats } from 'fs-extra';
 import { inject } from '@cardstack/hub/dependency-injection';
 import { AddressableCard } from '@cardstack/core/card';
 import * as J from 'json-typescript';
+import sane from 'sane';
 
 const log = logger('files-realm-tracker');
 
@@ -23,7 +24,7 @@ export class FilesTracker {
 
   private state: Map<string, Map<string, Entry>> = new Map();
   private ids: Map<string, UpstreamIdentity> = new Map();
-  private subscriptions: Map<string, AddressableCard> = new Map();
+  private subscriptions: Map<string, { realm: AddressableCard; watcher: undefined | sane.Watcher }> = new Map();
 
   async update(realmCard: AddressableCard, ops: IndexingOperations, params: TrackerParams | null): Promise<void> {
     let directory = await realmCard.value('directory');
@@ -33,7 +34,7 @@ export class FilesTracker {
       return;
     }
 
-    this.subscribe(directory, realmCard);
+    await this.subscribe(directory, realmCard);
     let now = crawl(directory);
     let previous = this.state.get(directory);
 
@@ -131,24 +132,45 @@ export class FilesTracker {
     }
   }
 
-  private subscribe(directory: string, realmCard: AddressableCard) {
-    this.subscriptions.set(directory, realmCard);
+  private async subscribe(directory: string, realmCard: AddressableCard): Promise<void> {
+    if (this.subscriptions.has(directory)) {
+      return;
+    }
+    let enabled: boolean = (await realmCard.value('watcherEnabled')) ?? true;
+    if (!enabled) {
+      this.subscriptions.set(directory, { realm: realmCard, watcher: undefined });
+      return;
+    }
+
+    let watcher = sane(directory, { ignored: ['node_modules'] });
+    watcher.on('add', (filepath, root) => this.notifyFileDidChange(root, filepath));
+    watcher.on('change', (filepath, root) => this.notifyFileDidChange(root, filepath));
+    watcher.on('delete', (filepath, root) => this.notifyFileDidChange(root, filepath));
+    this.subscriptions.set(directory, { realm: realmCard, watcher });
   }
 
-  notifyFileDidChange(fullPath: string): void {
-    this.notifyFileDidChangeAndWait(fullPath).catch(err =>
-      log.error(`Error while notifying file change %s: %s`, fullPath, err)
+  notifyFileDidChange(realmDir: string, relativeFile: string): void {
+    this.notifyFileDidChangeAndWait(realmDir, relativeFile).catch(err =>
+      log.error(`Error while notifying file change %s/%s: %s`, realmDir, relativeFile, err)
     );
   }
 
-  async notifyFileDidChangeAndWait(fullPath: string): Promise<void> {
-    let directory = [...this.subscriptions.keys()].find(d => fullPath.startsWith(d));
-    if (!directory) {
-      log.debug(`Notified about a file we're not interested in: ${fullPath}`);
+  async notifyFileDidChangeAndWait(realmDir: string, relativeFile: string): Promise<void> {
+    let sub = this.subscriptions.get(realmDir);
+    if (!sub) {
+      log.debug(`Notified about a file we're not subscribed to: realm=${realmDir}, file=${relativeFile}`);
       return;
     }
-    let params: TrackerParams = { fileChanged: fullPath };
-    await this.indexing.updateRealm(this.subscriptions.get(directory)!, params as J.Object);
+    let params: TrackerParams = { fileChanged: join(realmDir, relativeFile) };
+    await this.indexing.updateRealm(sub.realm, params as J.Object);
+  }
+
+  async willTeardown() {
+    for (let { watcher } of this.subscriptions.values()) {
+      if (watcher) {
+        watcher.close();
+      }
+    }
   }
 }
 

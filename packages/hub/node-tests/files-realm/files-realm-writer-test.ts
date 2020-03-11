@@ -24,7 +24,7 @@ describe('hub/files-realm-writer', function() {
     filesPath = tmpDir.path;
     let filesDoc = cardDocument()
       .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'files-realm' })
-      .withAttributes({ directory: filesPath, csId: filesRealm });
+      .withAttributes({ directory: filesPath, csId: filesRealm, watcherEnabled: false });
 
     await service.create(`${myOrigin}/api/realms/meta`, filesDoc.jsonapi);
   });

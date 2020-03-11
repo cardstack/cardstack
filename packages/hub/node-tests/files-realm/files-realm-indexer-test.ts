@@ -33,7 +33,7 @@ describe('hub/files-realm/indexer', function() {
 
     filesDoc = cardDocument()
       .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'files-realm' })
-      .withAttributes({ directory: filesPath, csId: filesRealm });
+      .withAttributes({ directory: filesPath, csId: filesRealm, watcherEnabled: false });
 
     await service.create(`${myOrigin}/api/realms/meta`, filesDoc.jsonapi);
     writeCard(
@@ -168,7 +168,7 @@ describe('hub/files-realm/indexer', function() {
     outputFileSync(canaryFile, '// this should not show up in the search index');
 
     let count = tracker.operationsCount;
-    await tracker.notifyFileDidChangeAndWait(filename);
+    await tracker.notifyFileDidChangeAndWait(filesPath, join('first-card', 'example.hbs'));
 
     let { cards } = await service.search(query);
     expect(cards).lengthOf(1);
@@ -191,7 +191,7 @@ describe('hub/files-realm/indexer', function() {
     outputFileSync(canaryFile, '// this should not show up in the search index');
 
     let count = tracker.operationsCount;
-    await tracker.notifyFileDidChangeAndWait(cardDir);
+    await tracker.notifyFileDidChangeAndWait(filesPath, 'first-card');
 
     let { cards } = await service.search(query);
     expect(cards).lengthOf(0);

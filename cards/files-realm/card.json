@@ -16,6 +16,16 @@
               }
             }
           }
+        },
+        "watcherEnabled": {
+          "relationships": {
+            "csAdoptsFrom": {
+              "data": {
+                "type": "cards",
+                "id": "https://base.cardstack.com/public/cards/boolean-field"
+              }
+            }
+          }
         }
       }
     }
