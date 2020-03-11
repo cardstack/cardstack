@@ -154,7 +154,7 @@ describe('hub/git/writer', function() {
 
       let cardInRepo = await service.create(repoRealm, cardDoc.jsonapi);
 
-      let saved = await inRepo(repoPath).getJSONContents('master', `cards/${cardInRepo.csId}.json`);
+      let saved = await inRepo(repoPath).getJSONContents('master', `cards/${cardInRepo.csId}/card.json`);
       expect(saved.data.attributes.title).to.equal('Second Article');
     });
 

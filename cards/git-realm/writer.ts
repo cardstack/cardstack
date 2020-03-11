@@ -4,7 +4,7 @@ import { FileNotFound, OverwriteRejected } from './lib/tree';
 import { todo } from './lib/todo-any';
 
 import crypto from 'crypto';
-import Change from './lib/change';
+import Change, { FileHandle } from './lib/change';
 import os from 'os';
 import process from 'process';
 import CardstackError from '@cardstack/core/error';
@@ -18,6 +18,7 @@ import { Session } from '@cardstack/core/session';
 import { UpstreamDocument, UpstreamIdentity, upstreamIdToCardId, upstreamIdToString } from '@cardstack/core/document';
 import { inject } from '@cardstack/hub/dependency-injection';
 import { AddressableCard } from '@cardstack/core/card';
+import { writeCard } from '@cardstack/core/card-file';
 
 // import { Session } from '@cardstack/core/session';
 // import { UpstreamDocument, UpstreamIdentity } from '@cardstack/core/document';
@@ -121,10 +122,12 @@ export default class GitWriter implements Writer {
       await this._ensureRepo();
       let change = await Change.create(this.repo!, null, this.branchPrefix + defaultBranch, !!this.remote);
 
-      let file;
+      let file: FileHandle;
       while (id == null) {
         let candidateId = this._generateId();
-        let candidateFile = await change.get(this._filenameFor(type, candidateId), { allowCreate: true });
+        let candidateFile = await change.get(`${this._cardDirectoryFor(type, candidateId)}/card.json`, {
+          allowCreate: true,
+        });
         if (!candidateFile.exists()) {
           id = candidateId;
           file = candidateFile;
@@ -132,15 +135,19 @@ export default class GitWriter implements Writer {
       }
 
       document.jsonapi.data.attributes!.csId = id;
+      let cardJsonFileName = `${this._cardDirectoryFor(type, id)}/card.json`;
 
-      if (!file) {
-        file = await change.get(this._filenameFor(type, id), { allowCreate: true });
-      }
+      await writeCard(this._cardDirectoryFor(type, id), document.jsonapi, async (path: string, content: string) => {
+        let cardFile;
+        if (file && path === cardJsonFileName) {
+          cardFile = file;
+        } else {
+          cardFile = await change.get(path, { allowCreate: true });
+        }
+        cardFile.setContent(content);
+      });
 
       let signature = await this._commitOptions('create', type, id, session);
-
-      // TODO use the card-file module to write the card....
-      file.setContent(stringify(document.jsonapi, { space: 2 }));
       let version = await change.finalize(signature);
       let meta: MetaObject | undefined;
 
@@ -196,7 +203,7 @@ export default class GitWriter implements Writer {
 
     return withErrorHandling(cardId, type, async () => {
       let change = await Change.create(this.repo!, version as string, this.branchPrefix + defaultBranch, !!this.remote);
-      let file = await change.get(this._filenameFor(type, cardId), { allowUpdate: true });
+      let file = await change.get(this._cardDirectoryFor(type, cardId), { allowUpdate: true });
       let before = JSON.parse((await file.getBuffer())!.toString()) as SingleResourceDoc;
       // let after = patch(before, document);
 
@@ -255,7 +262,7 @@ export default class GitWriter implements Writer {
     return withErrorHandling(cardId.csId, type, async () => {
       let change = await Change.create(this.repo!, version, this.branchPrefix + defaultBranch, !!this.remote);
 
-      let file = await change.get(this._filenameFor(type, cardId.csId));
+      let file = await change.get(this._cardDirectoryFor(type, cardId.csId));
       file.delete();
       let signature = await this._commitOptions('delete', type, cardId.csId, session);
       await change.finalize(signature);
@@ -285,7 +292,7 @@ export default class GitWriter implements Writer {
     };
   }
 
-  _filenameFor(type: string, id: string) {
+  _cardDirectoryFor(type: string, id: string) {
     let base = this.basePath ? this.basePath + '/' : '';
     let encodedId = encodeURIComponent(id);
     let start: string;
@@ -295,7 +302,7 @@ export default class GitWriter implements Writer {
     } else {
       start = '';
     }
-    return `${start}${type}/${encodedId}.json`;
+    return `${start}${type}/${encodedId}`;
   }
 
   async _ensureRepo() {

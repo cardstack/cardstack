@@ -9,7 +9,7 @@ import stringify from 'json-stable-stringify';
 
 export type Entry = { mtime: number; size: number } | Map<string, Entry>;
 
-type WriteFn = (path: string, contents: string) => Promise<void>;
+type WriteFn = (path: string, content: string) => Promise<void>;
 
 export async function writeCard(cardPath: string, doc: SingleResourceDoc, writeFn: WriteFn): Promise<void> {
   if (doc.data.attributes?.csFiles) {

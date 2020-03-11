@@ -44,8 +44,8 @@ export default class FilesWriter implements Writer {
   }
 
   private async createOrUpdateCard(cardDir: string, doc: UpstreamDocument): Promise<UpstreamDocument> {
-    await writeCard(cardDir, doc.jsonapi, async (path: string, contents: string) => {
-      outputFileSync(path, contents, 'utf8');
+    await writeCard(cardDir, doc.jsonapi, async (path: string, content: string) => {
+      outputFileSync(path, content, 'utf8');
     });
     let meta = Object.assign({}, doc.jsonapi.data.meta);
     meta.cardDir = cardDir;

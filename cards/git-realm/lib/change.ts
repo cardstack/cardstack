@@ -175,7 +175,7 @@ export default class Change {
   }
 }
 
-class FileHandle {
+export class FileHandle {
   public mode: FILEMODE;
 
   constructor(
