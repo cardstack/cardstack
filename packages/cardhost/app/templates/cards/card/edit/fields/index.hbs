@@ -1,7 +1,8 @@
-<RightEdge
-  @card={{this.model}}
-  @mode="fields"
-  @cardSelected={{true}} {{!-- Change this when we want to display different right-edge options --}}
-/>
+{{in-right-toolbar show=(
+  component "right-edge"
+  card=this.model
+  mode="fields"
+  cardSelected=true
+)}}
 
 <CardEditor @card={{this.model}}/>
