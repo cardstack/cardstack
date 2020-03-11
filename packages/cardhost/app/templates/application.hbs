@@ -4,8 +4,8 @@
 
 <AnimatedTools @hideUntilKeys="Ctrl-Shift-KeyA" />
 
-{{#animated-if this.overlays.showLoading use=this.fade}}
+{{#if this.showLoading }}
   <Loading />
 {{else}}
   <CardhostModalTarget/>
-{{/animated-if}}
+{{/if}}
