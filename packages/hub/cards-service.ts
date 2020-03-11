@@ -10,7 +10,7 @@ import { SingleResourceDoc } from 'jsonapi-typescript';
 import { Query } from '@cardstack/core/query';
 import { Writer } from '@cardstack/core/writer';
 import { join } from 'path';
-import { assertSingleResourceDoc } from './jsonapi';
+import { assertSingleResourceDoc } from '@cardstack/core/jsonapi';
 import merge from 'lodash/merge';
 import { readdirSync, existsSync, statSync, readFileSync } from 'fs-extra';
 import { CardReader } from '@cardstack/core/card-reader';
