@@ -54,12 +54,14 @@ export default class CardNameDialog extends Component {
 
     if (environment !== 'test') {
       this.overlays.setOverlayState('showLoading', true);
-      yield newCard.save().catch(() => {
-        // if there's a problem saving, go back to showing the dialog
+      try {
+        yield newCard.save();
+      } catch (err) {
         this.overlays.setOverlayState('showLoading', false);
         return;
-      });
+      }
     }
+
     this.overlays.reset();
     if (adoptedFrom) {
       this.router.transitionTo('cards.card.edit.fields', newCard);
