@@ -1,40 +1,13 @@
 <CardViewer @card={{this.model}} @mode="layout"/>
 
-{{#if this.cardstackSession.isAuthenticated}}
-  <RightEdge
-    @card={{this.model}}
-    @cardSelected={{true}} {{!-- Change this when we want to display different right-edge options --}}
-  >
-    <div class="right-edge--section" data-test-appearance-section>
-      <div class="right-edge--section-header " data-test-section-header>
-        Appearance
-      </div>
-      <div class="right-edge--items-container">
-        <div class="right-edge--item" data-test-style-dropdown>
-          <Dropdown
-            @theme="cs-dark"
-            @searchEnabled={{false}}
-            @label="Choose a theme:"
-            @options={{this.themerOptions}}
-            @selected={{this.selectedTheme}}
-            @setValue={{this.handleThemeChange}}
-          />
-        </div>
-        <div class="right-edge--item">
-          <Cta
-            {{on "click" this.createTheme}}
-            @variant="secondary responsive"
-            @theme="cs-dark"
-            data-test-card-custom-style-button
-          >
-            {{#if this.isDefault}}
-              New Custom Theme
-            {{else}}
-              Edit Custom Theme
-            {{/if}}
-          </Cta>
-        </div>
-      </div>
-    </div>
-  </RightEdge>
-{{/if}}
+{{in-right-toolbar show=(
+  component "right-edge"
+  card=this.model
+  mode="layout"
+  cardSelected=true
+  isDefault=this.isDefault
+  createTheme=this.createTheme
+  themerOptions=this.themerOptions
+  selectedTheme=this.selectedTheme
+  handleThemeChange=this.handleThemeChange
+)}}

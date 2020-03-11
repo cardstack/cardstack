@@ -65,7 +65,39 @@
                   {{/animated-if}}
                 </AnimatedContainer>
               </div>
-              {{#if (eq @mode "schema")}}
+              {{#if (eq @mode "layout")}}
+                <div class="right-edge--section" data-test-appearance-section>
+                  <div class="right-edge--section-header " data-test-section-header>
+                    Appearance
+                  </div>
+                  <div class="right-edge--items-container">
+                    <div class="right-edge--item" data-test-style-dropdown>
+                      <Dropdown
+                        @theme="cs-dark"
+                        @searchEnabled={{false}}
+                        @label="Choose a theme:"
+                        @options={{@themerOptions}}
+                        @selected={{@selectedTheme}}
+                        @setValue={{@handleThemeChange}}
+                      />
+                    </div>
+                    <div class="right-edge--item">
+                      <Cta
+                        {{on "click" @createTheme}}
+                        @variant="secondary responsive"
+                        @theme="cs-dark"
+                        data-test-card-custom-style-button
+                      >
+                        {{#if @isDefault}}
+                          New Custom Theme
+                        {{else}}
+                          Edit Custom Theme
+                        {{/if}}
+                      </Cta>
+                    </div>
+                  </div>
+                </div>
+              {{else if (eq @mode "schema")}}
                 <div class="right-edge--section">
                   <button {{on "click" (fn this.toggleSection "details")}} class="section-toggle-btn {{if (includes this.expandedSections "details") "expanded"}}" data-test-right-edge-section-toggle="details">
                     Toggle
