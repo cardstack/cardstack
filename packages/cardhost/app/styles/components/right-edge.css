@@ -1,7 +1,4 @@
 .right-edge {
-  /* position: fixed;
-  right: var(--ch-spacing);
-  top: var(--ch-top-edge-height); */
   width: var(--ch-right-edge-panel-width);
   max-height: calc(100% - var(--ch-top-edge-height) - var(--ch-bottom-edge-height));
   margin-right: var(--ch-spacing);

@@ -1,1 +1,15 @@
 {{outlet}}
+
+{{#if (or (eq this.routeInfo.mode "layout") (eq this.routeInfo.mode "fields"))}}
+  {{in-right-toolbar show=(
+    component "right-edge"
+    card=this.model
+    mode=this.routeInfo.mode
+    cardSelected=true
+    isDefault=this.isDefault
+    createTheme=this.createTheme
+    themerOptions=this.themerOptions
+    selectedTheme=this.selectedTheme
+    handleThemeChange=this.handleThemeChange
+  )}}
+{{/if}}
