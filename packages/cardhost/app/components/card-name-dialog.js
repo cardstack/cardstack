@@ -53,16 +53,9 @@ export default class CardNameDialog extends Component {
     let newCard = this.data.createCard(`local-hub::${this.cardId}`, adoptedFrom);
 
     if (environment !== 'test') {
-      this.overlays.setOverlayState('showLoading', true);
-      try {
-        yield newCard.save();
-      } catch (err) {
-        this.overlays.setOverlayState('showLoading', false);
-        return;
-      }
+      yield newCard.save();
     }
 
-    this.overlays.reset();
     if (adoptedFrom) {
       this.router.transitionTo('cards.card.edit.fields', newCard);
     } else {
