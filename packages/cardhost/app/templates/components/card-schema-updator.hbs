@@ -29,7 +29,20 @@
   </div>
 </section>
 
-<RightEdge
+{{in-right-toolbar show=(
+  component "right-edge"
+  card=this.card
+  mode="schema"
+  selectedField=this.selectedField
+  selectField=(action this.selectField)
+  setNeededWhenEmbedded=this.setNeededWhenEmbedded
+  setFieldName=this.setFieldName
+  setFieldLabel=this.setFieldLabel
+  setFieldInstructions=this.setFieldInstructions
+  cardSelected=this.cardSelected
+)}}
+
+{{!-- <RightEdge
   @card={{this.card}}
   @mode="schema"
   @selectedField={{this.selectedField}}
@@ -38,7 +51,7 @@
   @setFieldName={{this.setFieldName}}
   @setFieldLabel={{this.setFieldLabel}}
   @setFieldInstructions={{this.setFieldInstructions}}
-  @cardSelected={{this.cardSelected}} />
+  @cardSelected={{this.cardSelected}} /> --}}
 
 <section class="card-renderer--container" data-test-card-schema={{@card.name}} {{did-update this.updateCard @card}}>
   <div class="card-renderer--inner-container schema-container">

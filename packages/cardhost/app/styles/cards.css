@@ -80,7 +80,6 @@
 }
 
 .card-renderer--inner-container {
-  padding-right: var(--ch-right-edge-width);
   transition: padding var(--ch-transition-time);
 }
 
