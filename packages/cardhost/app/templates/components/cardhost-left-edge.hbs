@@ -1,7 +1,7 @@
 <CardstackSession as |session|>
   <aside
     id="cardhost-left-edge"
-    class="cardhost-left-edge"
+    class="cardhost-left-edge cardhost-left-edge--{{@mode}}"
     data-test-cardhost-left-edge
   >
     <nav class="cardhost-left-edge--nav {{@mode}} {{if this.isExpanded "expanded"}}">
@@ -78,7 +78,8 @@
         </li>
       </ul>
     </nav>
-
-    {{yield}}
+    <div class="cardhost-left-edge--catalog {{if (eq @mode "schema") "slide-in"}}">
+      <CardCatalog />
+    </div>
   </aside>
 </CardstackSession>

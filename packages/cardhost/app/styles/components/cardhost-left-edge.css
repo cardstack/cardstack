@@ -5,14 +5,10 @@
 }
 
 .cardhost-left-edge--nav {
+  background-color: var(--ch-default);
   width: var(--ch-left-edge-navbar-width);
   overflow: hidden;
-  transition: width 0.2s ease;
-}
-
-.cardhost-left-edge--nav.cards,
-.cardhost-left-edge--nav.view {
-  background-color: var(--ch-default);
+  transition: width 0.2s ease, background-color 0.2s ease;
 }
 
 .cardhost-left-edge--nav.schema {
@@ -115,4 +111,17 @@
 
 .context-menu-items li.divider {
   padding: 0;
+}
+
+.cardhost-left-edge--catalog {
+  transform: translateX(-100%);
+  z-index: -1;
+  width: 0;
+  transition: transform var(--ch-transition-time) ease, width var(--ch-transition-time) ease;
+}
+
+.cardhost-left-edge--catalog.slide-in {
+  background-color: var(--ch-dark-background);
+  transform: translateX(0);
+  width: 330px;
 }

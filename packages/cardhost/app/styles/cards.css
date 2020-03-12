@@ -83,10 +83,6 @@
   transition: padding var(--ch-transition-time);
 }
 
-.card-renderer--inner-container.schema-container {
-  padding-left: var(--ch-left-edge-panel-width);
-}
-
 .card-renderer--inner-container.view-container {
   padding-right: 0;
 }
