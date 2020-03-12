@@ -10,6 +10,7 @@ import { removeSync, outputFileSync } from 'fs-extra';
 import { join } from 'path';
 import { FilesTracker } from '@cardstack/files-realm-card/tracker';
 import { writeCard } from '@cardstack/core/card-file';
+import { SingleResourceDoc } from 'jsonapi-typescript';
 
 describe('hub/files-realm/indexer', function() {
   this.timeout(10000);
@@ -36,7 +37,7 @@ describe('hub/files-realm/indexer', function() {
       .withAttributes({ directory: filesPath, csId: filesRealm, watcherEnabled: false });
 
     await service.create(`${myOrigin}/api/realms/meta`, filesDoc.jsonapi);
-    writeCard(
+    await makeCard(
       join(filesPath, 'first-card'),
       cardDocument().withAttributes({
         csId: 'first-card',
@@ -44,7 +45,7 @@ describe('hub/files-realm/indexer', function() {
         csFiles: { 'example.hbs': 'Hello world' },
       }).jsonapi
     );
-    writeCard(
+    await makeCard(
       join(filesPath, 'second-card'),
       cardDocument().withAttributes({ csId: 'second-card', csDescription: 'The second card' }).jsonapi
     );
@@ -61,7 +62,7 @@ describe('hub/files-realm/indexer', function() {
     let { cards } = await service.search({ filter: { eq: { csRealm: filesRealm, csId: 'my-card' } } });
     expect(cards).lengthOf(0);
 
-    writeCard(
+    await makeCard(
       join(filesPath, 'my-card'),
       cardDocument().withAttributes({ csId: 'my-card', csDescription: 'My Card' }).jsonapi
     );
@@ -203,3 +204,9 @@ describe('hub/files-realm/indexer', function() {
     expect(tracker.operationsCount).to.equal(count + 1, 'wrong number of operations');
   });
 });
+
+async function makeCard(path: string, doc: SingleResourceDoc) {
+  await writeCard(path, doc, async (path: string, contents: string) => {
+    outputFileSync(path, contents, 'utf8');
+  });
+}

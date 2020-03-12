@@ -154,7 +154,7 @@ describe('hub/git/writer', function() {
 
       let cardInRepo = await service.create(repoRealm, cardDoc.jsonapi);
 
-      let saved = await inRepo(repoPath).getJSONContents('master', `cards/${cardInRepo.csId}.json`);
+      let saved = await inRepo(repoPath).getJSONContents('master', `cards/${cardInRepo.csId}/card.json`);
       expect(saved.data.attributes.title).to.equal('Second Article');
     });
 
@@ -167,8 +167,27 @@ describe('hub/git/writer', function() {
 
       await service.create(repoRealm, cardDoc.jsonapi);
 
-      let saved = await inRepo(repoPath).getJSONContents('master', `cards/custom-id.json`);
+      let saved = await inRepo(repoPath).getJSONContents('master', `cards/custom-id/card.json`);
       expect(saved.data.attributes.title).to.equal('Second Article');
+    });
+
+    it('saves inner card files', async function() {
+      let cardDoc = cardDocument()
+        .withAutoAttributes({
+          title: 'Second Article',
+        })
+        .withAttributes({
+          csId: 'custom-id',
+          csFiles: { inner: { 'example.hbs': 'Hello World' } },
+        });
+
+      let card = await service.create(repoRealm, cardDoc.jsonapi);
+      expect(card.csFiles).to.deep.equal({
+        inner: { 'example.hbs': 'Hello World' },
+      });
+
+      let innerCardFile = await inRepo(repoPath).getContents('master', `cards/custom-id/inner/example.hbs`);
+      expect(innerCardFile).to.equal('Hello World');
     });
 
     it('url encodes id', async function() {
@@ -179,7 +198,7 @@ describe('hub/git/writer', function() {
         .withAttributes({ csId: 'foo/bar/baz' });
 
       await service.create(repoRealm, cardDoc.jsonapi);
-      let saved = await inRepo(repoPath).getJSONContents('master', `cards/foo%2Fbar%2Fbaz.json`);
+      let saved = await inRepo(repoPath).getJSONContents('master', `cards/foo%2Fbar%2Fbaz/card.json`);
       expect(saved.data.attributes.title).to.equal('Second Article');
     });
 
@@ -378,6 +397,7 @@ describe('hub/git/writer', function() {
     beforeEach(async function() {
       savedDoc = cardDocument().withAutoAttributes({
         title: 'Initial document',
+        csFiles: { inner: { 'example.hbs': 'Hello World' } },
       });
 
       savedCard = await service.create(repoRealm, savedDoc.jsonapi);
@@ -399,9 +419,65 @@ describe('hub/git/writer', function() {
       expect(newVersion).to.be.ok;
       expect(newVersion).to.not.equal(version);
 
-      let saved = await inRepo(repoPath).getJSONContents('master', `cards/${savedCard.csId}.json`);
+      let saved = await inRepo(repoPath).getJSONContents('master', `cards/${savedCard.csId}/card.json`);
       expect(saved.data.attributes.title).to.equal('Updated document');
       // expect(storage.getEntry(card, card.csRealm)?.doc?.jsonapi.data.attributes?.foo).to.equal('poo');
+    });
+
+    it("can update a card's inner files", async function() {
+      let version = (await savedCard.serializeAsJsonAPIDoc()).data.meta?.version;
+      expect(version).to.be.ok;
+
+      let jsonapi = await savedCard.serializeAsJsonAPIDoc();
+      jsonapi.data.attributes!.csFiles = {
+        inner: { 'example.hbs': 'Hello Mars' },
+      };
+      savedCard = await service.update(savedCard, jsonapi);
+
+      expect(savedCard.csFiles).to.deep.equal({
+        inner: { 'example.hbs': 'Hello Mars' },
+      });
+      let innerCardFile = await inRepo(repoPath).getContents('master', `cards/${savedCard.csId}/inner/example.hbs`);
+      expect(innerCardFile).to.equal('Hello Mars');
+    });
+
+    it('can add a new card inner file', async function() {
+      let version = (await savedCard.serializeAsJsonAPIDoc()).data.meta?.version;
+      expect(version).to.be.ok;
+
+      let jsonapi = await savedCard.serializeAsJsonAPIDoc();
+      jsonapi.data.attributes!.csFiles = {
+        'example.css': 'literally the best style',
+        inner: { 'example.hbs': 'Hello World' },
+      };
+
+      savedCard = await service.update(savedCard, jsonapi);
+
+      expect(savedCard.csFiles).to.deep.equal({
+        'example.css': 'literally the best style',
+        inner: { 'example.hbs': 'Hello World' },
+      });
+
+      let innerCardFile = await inRepo(repoPath).getContents('master', `cards/${savedCard.csId}/inner/example.hbs`);
+      expect(innerCardFile).to.equal('Hello World');
+      innerCardFile = await inRepo(repoPath).getContents('master', `cards/${savedCard.csId}/example.css`);
+      expect(innerCardFile).to.equal('literally the best style');
+    });
+
+    it("can remove a card's inner file", async function() {
+      let version = (await savedCard.serializeAsJsonAPIDoc()).data.meta?.version;
+      expect(version).to.be.ok;
+
+      let jsonapi = await savedCard.serializeAsJsonAPIDoc();
+      jsonapi.data.attributes!.csFiles = {};
+      savedCard = await service.update(savedCard, jsonapi);
+
+      expect(savedCard.csFiles).to.deep.equal({});
+
+      let saved = await inRepo(repoPath).getJSONContents('master', `cards/${savedCard.csId}/card.json`);
+      expect(saved.data.attributes.title).to.equal('Initial document');
+      let repoContents = (await inRepo(repoPath).listTree('master', `cards/${savedCard.csId}`)).map(a => a.name);
+      expect(repoContents).not.to.include(`inner`);
     });
 
     // it('requires id in body', async function() {
@@ -844,17 +920,14 @@ describe('hub/git/writer', function() {
     });
 
     it('can delete a card', async function() {
-      let saved = await inRepo(repoPath).getJSONContents('master', `cards/${savedCard.csId}.json`);
-      expect(saved.data.attributes.title).to.equal('Initial document');
+      let version = savedCard.meta?.version as string;
 
-      let version = (await savedCard.serializeAsJsonAPIDoc()).data.meta?.version as string;
-
-      let repoContents = (await inRepo(repoPath).listTree('master', 'cards')).map(a => a.name);
-      expect(repoContents).to.include(`${savedCard.csId}.json`);
+      let repoContents = (await inRepo(repoPath).listTree('master', `cards/${savedCard.csId}`)).map(a => a.name);
+      expect(repoContents).to.include(`card.json`);
       await service.delete(savedCard, version);
 
       repoContents = (await inRepo(repoPath).listTree('master', 'cards')).map(a => a.name);
-      expect(repoContents).not.to.include(`${savedCard.csId}.json`);
+      expect(repoContents).not.to.include(`${savedCard.csId}`);
     });
 
     //   it('rejects missing document', async function() {

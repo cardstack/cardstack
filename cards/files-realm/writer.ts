@@ -4,9 +4,10 @@ import { UpstreamDocument, UpstreamIdentity } from '@cardstack/core/document';
 import { inject } from '@cardstack/hub/dependency-injection';
 import { AddressableCard } from '@cardstack/core/card';
 import crypto from 'crypto';
-import { pathExistsSync, removeSync } from 'fs-extra';
+import { pathExistsSync, removeSync, outputFileSync } from 'fs-extra';
 import { join } from 'path';
 import { writeCard } from '@cardstack/core/card-file';
+import { upstreamIdToCardDirName } from '@cardstack/core/card-id';
 
 export default class FilesWriter implements Writer {
   filesTracker = inject('filesTracker');
@@ -19,32 +20,34 @@ export default class FilesWriter implements Writer {
     if (!upstreamId) {
       cardDirName = this.pickId(realmDir);
     } else {
-      cardDirName = this.upstreamIdToCardDirName(upstreamId);
+      cardDirName = upstreamIdToCardDirName(upstreamId);
     }
 
     let cardDir = join(realmDir, cardDirName);
-    let saved = this.createOrUpdateCard(cardDir, doc);
+    let saved = await this.createOrUpdateCard(cardDir, doc);
     return { saved, id: upstreamId ?? cardDirName };
   }
 
   async update(_session: Session, id: UpstreamIdentity, doc: UpstreamDocument) {
     let realmDir = await this.realmCard.value('directory');
-    let cardDirName = this.upstreamIdToCardDirName(id);
+    let cardDirName = upstreamIdToCardDirName(id);
     let cardDir = join(realmDir, cardDirName);
     removeSync(cardDir);
-    let saved = this.createOrUpdateCard(cardDir, doc);
+    let saved = await this.createOrUpdateCard(cardDir, doc);
     return saved;
   }
 
   async delete(_session: Session, id: UpstreamIdentity) {
     let realmDir = await this.realmCard.value('directory');
-    let cardDirName = this.upstreamIdToCardDirName(id);
+    let cardDirName = upstreamIdToCardDirName(id);
     let cardDir = join(realmDir, cardDirName);
     removeSync(cardDir);
   }
 
-  private createOrUpdateCard(cardDir: string, doc: UpstreamDocument) {
-    writeCard(cardDir, doc.jsonapi);
+  private async createOrUpdateCard(cardDir: string, doc: UpstreamDocument): Promise<UpstreamDocument> {
+    await writeCard(cardDir, doc.jsonapi, async (path: string, content: string) => {
+      outputFileSync(path, content, 'utf8');
+    });
     let meta = Object.assign({}, doc.jsonapi.data.meta);
     meta.cardDir = cardDir;
     doc.jsonapi.data.meta = meta;
@@ -57,14 +60,6 @@ export default class FilesWriter implements Writer {
       if (!pathExistsSync(join(realmDir, id))) {
         return id;
       }
-    }
-  }
-
-  private upstreamIdToCardDirName(upstreamId: UpstreamIdentity): string {
-    if (typeof upstreamId === 'string') {
-      return upstreamId;
-    } else {
-      return `${upstreamId.csOriginalRealm}_${upstreamId.csId}`;
     }
   }
 }

@@ -1,9 +1,12 @@
+import { statSync, readdirSync, readJsonSync, readFileSync, Stats } from 'fs-extra';
 import { IndexingOperations } from '@cardstack/core/indexer';
 import { join } from 'path';
+import merge from 'lodash/merge';
 import logger from '@cardstack/logger';
 import { UpstreamDocument, UpstreamIdentity } from '@cardstack/core/document';
-import { Entry, readCard, crawl } from '@cardstack/core/card-file';
-import { statSync, Stats } from 'fs-extra';
+import { assertSingleResourceDoc } from '@cardstack/core/jsonapi';
+import { Card } from '@cardstack/core/card';
+import { SingleResourceDoc } from 'jsonapi-typescript';
 import { inject } from '@cardstack/hub/dependency-injection';
 import { AddressableCard } from '@cardstack/core/card';
 import * as J from 'json-typescript';
@@ -91,7 +94,7 @@ export class FilesTracker {
 
   private async reindexCard(cardDir: string, entry: Map<string, Entry>, directory: string, ops: IndexingOperations) {
     try {
-      let json = readCard(cardDir, entry);
+      let json = assembleCard(cardDir, entry);
       let upstreamId = {
         csId: json.data.attributes!.csId as string,
         csOriginalRealm: json.data.attributes!.csOriginalRealm as string,
@@ -208,6 +211,85 @@ function changed(previous: Entry | undefined, current: Map<string, Entry>): bool
     }
   }
   return false;
+}
+
+type Entry = { mtime: number; size: number } | Map<string, Entry>;
+
+function crawl(cardsDirectory: string): Map<string, Entry> {
+  let output: Map<string, Entry> = new Map();
+  for (let name of readdirSync(cardsDirectory)) {
+    if (name.startsWith('.') || name === 'node_modules') {
+      continue;
+    }
+    let fullName = join(cardsDirectory, name);
+    let stat = statSync(fullName);
+    if (stat.isDirectory()) {
+      output.set(name, crawl(fullName));
+    } else {
+      output.set(name, { mtime: stat.mtime.getDate(), size: stat.size });
+    }
+  }
+  return output;
+}
+
+function assembleCard(cardDirectory: string, files: Map<string, Entry>): SingleResourceDoc {
+  let pkg;
+  try {
+    pkg = readJsonSync(join(cardDirectory, 'package.json'));
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      throw new Error(`Card does not have a valid package.json file`);
+    }
+    throw err;
+  }
+
+  let json;
+  try {
+    json = readJsonSync(join(cardDirectory, 'card.json'));
+    assertSingleResourceDoc(json);
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      throw new Error(`Card does not have a valid card.json file`);
+    }
+    if ('isCardstackError' in err) {
+      throw new Error(`card.json is invalid because: ${err}`);
+    }
+    throw err;
+  }
+
+  // ensure we have an attributes object
+  merge(json, {
+    data: {
+      attributes: {},
+      meta: {
+        cardDir: cardDirectory,
+      },
+    },
+  });
+
+  // then ensure that csFiles reflects our true on disk files only
+  json.data.attributes!.csFiles = loadFiles(cardDirectory, files, ['package.json', 'card.json']);
+
+  // and our peerDeps match the ones from package.json
+  // @ts-ignore
+  json.data.attributes!.csPeerDependencies = pkg.peerDependencies;
+  return json;
+}
+
+function loadFiles(dir: string, files: Map<string, Entry>, exclude: string[] = []) {
+  let output: NonNullable<Card['csFiles']> = Object.create(null);
+  for (let [name, entry] of files) {
+    if (exclude.includes(name)) {
+      continue;
+    }
+    let fullName = join(dir, name);
+    if (entry instanceof Map) {
+      output[name] = loadFiles(fullName, entry);
+    } else {
+      output[name] = readFileSync(fullName, 'utf8');
+    }
+  }
+  return output;
 }
 
 declare module '@cardstack/hub/dependency-injection' {

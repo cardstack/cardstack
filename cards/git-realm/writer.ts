@@ -1,5 +1,5 @@
-import { Repository, RemoteConfig, GitConflict, UnknownObjectId } from './lib/git';
-import { FileNotFound, OverwriteRejected } from './lib/tree';
+import { Repository, RemoteConfig, GitConflict, UnknownObjectId, Commit } from './lib/git';
+import Tree, { FileNotFound, OverwriteRejected, TreeEntry } from './lib/tree';
 
 import { todo } from './lib/todo-any';
 
@@ -9,15 +9,17 @@ import os from 'os';
 import process from 'process';
 import CardstackError from '@cardstack/core/error';
 import { dir as mkTmpDir } from 'tmp-promise';
-import { MetaObject, SingleResourceDoc } from 'jsonapi-typescript';
+import { MetaObject } from 'jsonapi-typescript';
 import { extractSettings } from './lib/git-settings';
 // import { PrimaryData } from 'jsonapi-typescript';
 
 import { Writer } from '@cardstack/core/writer';
 import { Session } from '@cardstack/core/session';
-import { UpstreamDocument, UpstreamIdentity, upstreamIdToCardId, upstreamIdToString } from '@cardstack/core/document';
+import { UpstreamDocument, UpstreamIdentity } from '@cardstack/core/document';
 import { inject } from '@cardstack/hub/dependency-injection';
 import { AddressableCard } from '@cardstack/core/card';
+import { writeCard } from '@cardstack/core/card-file';
+import { upstreamIdToCardDirName } from '@cardstack/core/card-id';
 
 // import { Session } from '@cardstack/core/session';
 // import { UpstreamDocument, UpstreamIdentity } from '@cardstack/core/document';
@@ -55,15 +57,9 @@ import { AddressableCard } from '@cardstack/core/card';
 //   }
 // }
 
-import stringify from 'json-stable-stringify';
-
 const defaultBranch = 'master';
 
 const type = 'cards';
-
-function getId(document: UpstreamDocument) {
-  return document.jsonapi.data.id;
-}
 
 // function getMeta(model: todo) {
 //   return model.data ? model.data.meta : model.meta;
@@ -105,41 +101,35 @@ export default class GitWriter implements Writer {
   }
 
   async create(session: Session, document: UpstreamDocument, upstreamId: UpstreamIdentity | null) {
-    let createId = upstreamId || getId(document);
-    let id: string | undefined;
-
-    if (createId) {
-      id = upstreamIdToString(createId);
+    let cardDirName: string;
+    if (!upstreamId) {
+      cardDirName = upstreamIdToCardDirName(await this.generateId());
+      if (!document.jsonapi.data.attributes) {
+        document.jsonapi.data.attributes = Object.create(null);
+      }
+      document.jsonapi.data.attributes!.csId = cardDirName;
+    } else {
+      cardDirName = upstreamIdToCardDirName(upstreamId);
+      if (!document.jsonapi.data.attributes) {
+        document.jsonapi.data.attributes = Object.create(null);
+      }
+      document.jsonapi.data.attributes!.csId = typeof upstreamId === 'string' ? upstreamId : upstreamId.csId;
+      if (typeof upstreamId === 'object' && upstreamId.csOriginalRealm != null) {
+        document.jsonapi.data.attributes!.csOriginalRealm = upstreamId.csOriginalRealm;
+      }
     }
 
-    // let cardId: UpstreamIdentity | undefined;
-    // if (id) {
-    //   cardId = upstreamIdToCardId(id, this.realmCard.csId).csId;
-    // }
-
-    return withErrorHandling(id, type, async () => {
-      await this._ensureRepo();
+    let cardDir = this.cardDirectoryFor(cardDirName);
+    return withErrorHandling(cardDir, async () => {
+      await this.ensureRepo();
       let change = await Change.create(this.repo!, null, this.branchPrefix + defaultBranch, !!this.remote);
 
-      let file;
-      while (id == null) {
-        let candidateId = this._generateId();
-        let candidateFile = await change.get(this._filenameFor(type, candidateId), { allowCreate: true });
-        if (!candidateFile.exists()) {
-          id = candidateId;
-          file = candidateFile;
-        }
-      }
+      await writeCard(cardDir, document.jsonapi, async (path: string, content: string) => {
+        let file = await change.get(path, { allowCreate: true });
+        file.setContent(content);
+      });
 
-      document.jsonapi.data.attributes!.csId = id;
-
-      if (!file) {
-        file = await change.get(this._filenameFor(type, id), { allowCreate: true });
-      }
-
-      let signature = await this._commitOptions('create', type, id, session);
-
-      file.setContent(stringify(document.jsonapi, { space: 2 }));
+      let signature = await this._commitOptions('create', cardDirName, session);
       let version = await change.finalize(signature);
       let meta: MetaObject | undefined;
 
@@ -147,7 +137,7 @@ export default class GitWriter implements Writer {
       meta.version = version;
       document.jsonapi.data.meta = meta;
 
-      return { saved: document, version, id };
+      return { saved: document, version, id: upstreamId ?? cardDirName };
     });
   }
 
@@ -174,7 +164,7 @@ export default class GitWriter implements Writer {
   // }
 
   async update(session: Session, id: UpstreamIdentity, document: UpstreamDocument): Promise<UpstreamDocument> {
-    let cardId = upstreamIdToCardId(id, this.realmCard.csId).csId;
+    let cardDirName = upstreamIdToCardDirName(id);
 
     let meta = document.jsonapi.data.meta;
 
@@ -185,30 +175,19 @@ export default class GitWriter implements Writer {
         source: { pointer: '/data/meta/version' },
       });
     }
+    await this.ensureRepo();
 
-    // return this.ephemeralStorage.store(doc, id, this.realmCard.csId, String(version))!;
-    // }
-
-    // async prepareUpdate(session: Session, type: string, id: string, document: todo, isSchema: boolean) {
-
-    await this._ensureRepo();
-
-    return withErrorHandling(cardId, type, async () => {
+    let cardDir = this.cardDirectoryFor(cardDirName);
+    return withErrorHandling(cardDir, async () => {
       let change = await Change.create(this.repo!, version as string, this.branchPrefix + defaultBranch, !!this.remote);
-      let file = await change.get(this._filenameFor(type, cardId), { allowUpdate: true });
-      let before = JSON.parse((await file.getBuffer())!.toString()) as SingleResourceDoc;
-      // let after = patch(before, document);
 
-      document.jsonapi.data.attributes = Object.assign({}, before.data.attributes, document.jsonapi.data.attributes);
-      document.jsonapi.data.relationships = Object.assign(
-        {},
-        before.data.relationships,
-        document.jsonapi.data.relationships
-      );
+      await this.deleteCardTree(cardDir, change);
+      await writeCard(cardDir, document.jsonapi, async (path: string, content: string) => {
+        let file = await change.get(path, { allowCreate: true, allowUpdate: true });
+        file.setContent(content);
+      });
 
-      let signature = await this._commitOptions('update', type, cardId, session);
-
-      file.setContent(stringify(document.jsonapi, { space: 2 }));
+      let signature = await this._commitOptions('update', cardDirName, session);
       version = await change.finalize(signature);
 
       meta = Object.assign({}, document.jsonapi.data.meta);
@@ -235,14 +214,9 @@ export default class GitWriter implements Writer {
   }
 
   async delete(session: Session, id: UpstreamIdentity, version: string) {
-    let cardId = upstreamIdToCardId(id, this.realmCard.csId);
+    let cardDirName = upstreamIdToCardDirName(id);
+    let cardDir = this.cardDirectoryFor(cardDirName);
 
-    let card = await this.cards.as(session).get(cardId);
-
-    let jsonApiDoc = await card.serializeAsJsonAPIDoc();
-    let type = jsonApiDoc.data.type;
-
-    // async prepareDelete(session: Session, version: string, type: string, id: string, isSchema: boolean) {
     if (!version) {
       throw new CardstackError('version is required', {
         status: 400,
@@ -250,18 +224,17 @@ export default class GitWriter implements Writer {
       });
     }
 
-    await this._ensureRepo();
-    return withErrorHandling(cardId.csId, type, async () => {
+    await this.ensureRepo();
+    return withErrorHandling(cardDir, async () => {
       let change = await Change.create(this.repo!, version, this.branchPrefix + defaultBranch, !!this.remote);
 
-      let file = await change.get(this._filenameFor(type, cardId.csId));
-      file.delete();
-      let signature = await this._commitOptions('delete', type, cardId.csId, session);
+      await this.deleteCardTree(cardDir, change);
+      let signature = await this._commitOptions('delete', cardDirName, session);
       await change.finalize(signature);
     });
   }
 
-  async _commitOptions(operation: string, type: string, id: string, session: Session) {
+  async _commitOptions(operation: string, id: string, session: Session) {
     if (!session.unimplementedSession) {
       throw new CardstackError('Session not implemented');
       // let user = await session.loadUser();
@@ -284,9 +257,56 @@ export default class GitWriter implements Writer {
     };
   }
 
-  _filenameFor(type: string, id: string) {
+  private async rootTree(): Promise<Tree | undefined> {
+    await this.ensureRepo();
+    if (!this.repo) {
+      return;
+    }
+    let branchName = this.branchPrefix + defaultBranch;
+    let branch = await this.repo.lookupLocalBranch(branchName);
+    let headCommit = await Commit.lookup(this.repo, branch.target());
+    return await headCommit.getTree();
+  }
+
+  private async cardTree(cardDir: string): Promise<Tree | undefined> {
+    let cardTree = await this.rootTree();
+    if (!cardTree) {
+      return;
+    }
+
+    let cardDirSegments = cardDir.split('/');
+    while (cardTree && cardDirSegments.length) {
+      let entry: TreeEntry | undefined = cardTree.entryByName(cardDirSegments.shift()!);
+      if (!entry || !entry.isTree()) {
+        return;
+      }
+      cardTree = await entry.getTree();
+    }
+    return cardTree;
+  }
+
+  private async deleteCardTree(cardDir: string, change: Change): Promise<void> {
+    let cardTree = await this.cardTree(cardDir);
+    if (!cardTree) {
+      return;
+    }
+
+    await this.deleteTree(cardTree, change);
+  }
+
+  private async deleteTree(tree: Tree, change: Change) {
+    for (let entry of tree.entries()) {
+      if (entry.isTree()) {
+        await this.deleteTree(await entry.getTree(), change);
+      } else {
+        let file = await change.get(entry.path());
+        file.delete();
+      }
+    }
+  }
+
+  private cardDirectoryFor(cardDir: string) {
     let base = this.basePath ? this.basePath + '/' : '';
-    let encodedId = encodeURIComponent(id);
     let start: string;
 
     if (base) {
@@ -294,10 +314,10 @@ export default class GitWriter implements Writer {
     } else {
       start = '';
     }
-    return `${start}${type}/${encodedId}.json`;
+    return `${start}${type}/${cardDir}`;
   }
 
-  async _ensureRepo() {
+  private async ensureRepo() {
     if (!this.repo) {
       if (this.remote) {
         let tempRepoPath = (await mkTmpDir()).path;
@@ -309,17 +329,23 @@ export default class GitWriter implements Writer {
     }
   }
 
-  _generateId() {
-    // 20 bytes is good enough for git, so it's good enough for
-    // me. In practice we probably have a lower collision
-    // probability too, because we're allowed to retry if we know
-    // the id is already in use (so we can really only collide
-    // with things that have not yet merged into our branch).
-    return crypto.randomBytes(20).toString('hex');
+  private async generateId() {
+    let rootTree = await this.rootTree();
+    if (!rootTree) {
+      throw new Error(`Could not generate card ID because there is no repo for this git realm`);
+    }
+
+    while (true) {
+      let id = crypto.randomBytes(20).toString('hex');
+      let cardTree = await this.cardTree(this.cardDirectoryFor(id));
+      if (!cardTree) {
+        return id;
+      }
+    }
   }
 }
 
-async function withErrorHandling(id: string | undefined, type: string, fn: Function) {
+async function withErrorHandling(cardDir: string | undefined, fn: Function) {
   try {
     return await fn();
   } catch (err) {
@@ -330,13 +356,13 @@ async function withErrorHandling(id: string | undefined, type: string, fn: Funct
       throw new CardstackError('Merge conflict', { status: 409 });
     }
     if (err instanceof OverwriteRejected) {
-      throw new CardstackError(`id ${id} is already in use for type ${type}`, {
+      throw new CardstackError(`The cardDir ${cardDir} is already in use`, {
         status: 409,
         source: { pointer: '/data/id' },
       });
     }
     if (err instanceof FileNotFound) {
-      throw new CardstackError(`${type} with id ${id} does not exist`, {
+      throw new CardstackError(`The cardDir ${cardDir} does not exist`, {
         status: 404,
         source: { pointer: '/data/id' },
       });
