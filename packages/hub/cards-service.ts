@@ -118,9 +118,9 @@ export class ScopedCardService implements CardReader, CardInstantiator {
   }
 
   async get(id: CardId): Promise<AddressableCard>;
-  async get(id: CardId, metaRealmCard: SingleResourceDoc): Promise<AddressableCard>;
+  async get(id: CardId): Promise<AddressableCard>;
   async get(canonicalURL: string): Promise<AddressableCard>;
-  async get(idOrURL: CardId | string, metaRealmCard?: SingleResourceDoc): Promise<AddressableCard> {
+  async get(idOrURL: CardId | string): Promise<AddressableCard> {
     let id = asCardId(idOrURL);
 
     if (
@@ -132,7 +132,7 @@ export class ScopedCardService implements CardReader, CardInstantiator {
 
     // this exists to throw if there's no such realm. We're not using the return
     // value yet but we will onc we implement custom searchers and realm grants.
-    await this.getRealm(id.csRealm, metaRealmCard);
+    await this.getRealm(id.csRealm);
 
     // TODO dont create a scoped card service here
     return await this.cards.pgclient.get(this, id);

@@ -144,48 +144,76 @@ async function synchronizeIndex(container: Container) {
 }
 
 async function setupRealms(container: Container) {
-  let metaRealmConfig: RealmAttrs = {
+  let metaRealmDoc = cardDocument().withAttributes({
     csRealm: metaRealm,
     csId: metaRealm,
     csTitle: 'Meta Realm',
     csDescription: `This card controls the configuration of the meta realm which is the realm that holds all of your realm cards.`,
-  };
+  });
 
-  let defaultRealmConfig: RealmAttrs = {
+  let defaultRealmDoc = cardDocument().withAttributes({
     csRealm: metaRealm,
     csId: `${myOrigin}/api/realms/default`,
     csTitle: `Default Realm`,
     csDescription: `This card controls the configuration of your hub's default realm. This is the realm that cards are written to by default.`,
-  };
+  });
 
-  let cardCatalogRealmConfig: RealmAttrs = {
+  let cardCatalogRealmDoc = cardDocument().withAttributes({
     csRealm: metaRealm,
     csId: cardCatalogRealm,
     csTitle: 'Card Catalog',
     csDescription: `The Cardstack curated catalog of cards.`,
-  };
+  });
 
-  if (process.env.EMBER_ENV !== 'test') {
+  if (process.env.EMBER_ENV === 'test') {
+    // in order to prevent test leakage, we'll use ephemeral-based realms when it
+    // looks like you are running tests.
+    metaRealmDoc.adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi;
+    defaultRealmDoc.adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi;
+    cardCatalogRealmDoc.adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi;
+  } else {
+    metaRealmDoc.adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'git-realm' });
+    cardCatalogRealmDoc.adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'git-realm' });
+
     if (process.env.META_REALM_URL) {
-      metaRealmConfig.remoteUrl = process.env.META_REALM_URL;
-      metaRealmConfig.remoteCacheDir = localMetaRealmRepo;
+      metaRealmDoc.withAttributes({
+        remoteUrl: process.env.META_REALM_URL,
+        remoteCacheDir: localMetaRealmRepo,
+      });
     } else {
-      metaRealmConfig.repo = localMetaRealmRepo;
+      metaRealmDoc.withAttributes({
+        repo: localMetaRealmRepo,
+      });
     }
     if (process.env.DEFAULT_REALM_URL) {
-      defaultRealmConfig.remoteUrl = process.env.DEFAULT_REALM_URL;
-      defaultRealmConfig.remoteCacheDir = localDefaultRealmRepo;
+      defaultRealmDoc.withAttributes({
+        remoteUrl: process.env.DEFAULT_REALM_URL,
+        remoteCacheDir: localDefaultRealmRepo,
+      });
+      defaultRealmDoc.adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'git-realm' });
+    } else if (process.env.DEV_DIR) {
+      // this is temporary until we get the real UI working to facilitate this
+      defaultRealmDoc
+        .withAttributes({
+          directory: process.env.DEV_DIR,
+        })
+        .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'files-realm' });
     } else {
-      defaultRealmConfig.repo = localDefaultRealmRepo;
+      defaultRealmDoc.withAttributes({
+        repo: localDefaultRealmRepo,
+      });
+      defaultRealmDoc.adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'git-realm' });
     }
 
-    cardCatalogRealmConfig.remoteUrl = cardCatalogRepo;
-    cardCatalogRealmConfig.remoteCacheDir = localCardCatalogRepo;
+    cardCatalogRealmDoc.withAttributes({
+      remoteUrl: cardCatalogRepo,
+      remoteCacheDir: localCardCatalogRepo,
+    });
   }
 
-  await assertRealmExists(container, metaRealmConfig);
-  await assertRealmExists(container, defaultRealmConfig);
-  await assertRealmExists(container, cardCatalogRealmConfig);
+  await assertRealmExists(container, metaRealmDoc.jsonapi);
+  await assertRealmExists(container, defaultRealmDoc.jsonapi);
+  await assertRealmExists(container, cardCatalogRealmDoc.jsonapi);
 }
 
 interface StartupConfig {
@@ -219,37 +247,25 @@ export async function cors(ctxt: Koa.Context, next: Koa.Next) {
   await next();
 }
 
-interface RealmAttrs {
-  csRealm: string;
-  csId: string;
-  csTitle: string;
-  csDescription: string;
-  repo?: string;
-  remoteUrl?: string;
-  remoteCacheDir?: string;
-}
-
-async function assertRealmExists(container: Container, realmAttrs: RealmAttrs): Promise<void> {
-  let { csRealm, csId, repo, remoteCacheDir } = realmAttrs;
-  let realmCardDoc = getRealmCardDoc(realmAttrs);
+async function assertRealmExists(container: Container, realmCardDoc: SingleResourceDoc): Promise<void> {
+  let { csRealm, csId, repo, remoteCacheDir } = realmCardDoc.data.attributes as any;
 
   let cards = (await container.lookup('cards')).as(Session.INTERNAL_PRIVILEGED);
-  let hasRealm: boolean;
+  let hasRealm = false;
   try {
-    if (csRealm === metaRealm && csId === metaRealm) {
-      // In the case the meta realm doesn't exist yet we need to supply a meta
-      // realm card document that the cards.get() can fall back on, as the meta
-      // realm document needs to be available in order for cards.get() to work.
-      await cards.get({ csRealm, csId }, realmCardDoc);
-    } else {
+    // We always start with a fresh meta realm, otherwise we'll create the realm
+    // card if we don't see it in the index. In the case the meta realm already
+    // has realm cards (it's a remote git realm), the first index of the meta
+    // realm will clear any of these asserted realms with the real realms it
+    // should be using.
+    if (csId !== metaRealm) {
       await cards.get({ csRealm, csId });
+      hasRealm = true;
     }
-    hasRealm = true;
   } catch (e) {
     if (e.status !== 404) {
       throw e;
     }
-    hasRealm = false;
   }
 
   if (!hasRealm) {
@@ -276,39 +292,6 @@ async function assertRealmExists(container: Container, realmAttrs: RealmAttrs): 
 async function indexMetaRealm(container: Container, metaRealmDoc: SingleResourceDoc): Promise<void> {
   let indexing = await container.lookup('indexing');
   await indexing.indexMetaRealm(metaRealmDoc);
-}
-
-function getRealmCardDoc(realmAttrs: RealmAttrs): SingleResourceDoc {
-  let { csRealm, csId, csTitle, csDescription, repo, remoteUrl, remoteCacheDir } = realmAttrs;
-  // in order to prevent test leakage, we'll use ephemeral-based realms when it
-  // looks like you are running tests.
-  if (process.env.EMBER_ENV === 'test') {
-    return cardDocument()
-      .withAttributes({
-        csRealm,
-        csId,
-        csTitle,
-        csDescription,
-      })
-      .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi;
-  } else {
-    let doc = cardDocument()
-      .withAttributes({
-        csRealm,
-        csId,
-        csTitle,
-        csDescription,
-      })
-      .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'git-realm' });
-
-    if (repo) {
-      doc.withAttributes({ repo });
-    } else if (remoteUrl && remoteCacheDir) {
-      doc.withAttributes({ remoteUrl, remoteCacheDir });
-    }
-
-    return doc.jsonapi;
-  }
 }
 
 // TODO probably we should move this into the realm card
