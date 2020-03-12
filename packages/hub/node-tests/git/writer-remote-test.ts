@@ -138,7 +138,6 @@ describe('hub/git/writer with remote', function() {
     it('saves attributes', async function() {
       let cardDoc = cardDocument().withAutoAttributes({
         title: 'Second Article',
-        csFiles: { inner: { 'example.hbs': 'Hello World' } },
       });
 
       let cardInRepo = await service.create(repoRealm, cardDoc.jsonapi);
@@ -149,8 +148,18 @@ describe('hub/git/writer with remote', function() {
         `cards/${cardInRepo.csId}/card.json`
       );
       expect(saved.data.attributes.title).to.equal('Second Article');
+    });
+
+    it('saves inner card file', async function() {
+      let cardDoc = cardDocument().withAutoAttributes({
+        csFiles: { inner: { 'example.hbs': 'Hello World' } },
+      });
+
+      let cardInRepo = await service.create(repoRealm, cardDoc.jsonapi);
+
+      await repo.fetchAll();
       let innerCardFile = await inRepo(tempRemoteRepoPath).getContents(
-        'master',
+        'origin/master',
         `cards/${cardInRepo.csId}/inner/example.hbs`
       );
       expect(innerCardFile).to.equal('Hello World');

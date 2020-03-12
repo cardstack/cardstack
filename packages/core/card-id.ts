@@ -1,3 +1,5 @@
+import { UpstreamIdentity } from './document';
+
 export interface CardId {
   csRealm: string;
   csOriginalRealm?: string; // if not set, its implied that its equal to `realm`.
@@ -41,6 +43,14 @@ export function asCardId(idOrURL: CardId | string): CardId {
     return canonicalURLToCardId(idOrURL);
   } else {
     return idOrURL;
+  }
+}
+
+export function upstreamIdToCardDirName(upstreamId: UpstreamIdentity): string {
+  if (typeof upstreamId === 'string') {
+    return encodeURIComponent(upstreamId);
+  } else {
+    return encodeURIComponent(`${upstreamId.csOriginalRealm}_${upstreamId.csId}`);
   }
 }
 

@@ -920,13 +920,10 @@ describe('hub/git/writer', function() {
     });
 
     it('can delete a card', async function() {
-      let saved = await inRepo(repoPath).getJSONContents('master', `cards/${savedCard.csId}.json`);
-      expect(saved.data.attributes.title).to.equal('Initial document');
+      let version = savedCard.meta?.version as string;
 
-      let version = (await savedCard.serializeAsJsonAPIDoc()).data.meta?.version as string;
-
-      let repoContents = (await inRepo(repoPath).listTree('master', 'cards')).map(a => a.name);
-      expect(repoContents).to.include(`${savedCard.csId}/card.json`);
+      let repoContents = (await inRepo(repoPath).listTree('master', `cards/${savedCard.csId}`)).map(a => a.name);
+      expect(repoContents).to.include(`card.json`);
       await service.delete(savedCard, version);
 
       repoContents = (await inRepo(repoPath).listTree('master', 'cards')).map(a => a.name);

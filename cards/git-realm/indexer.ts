@@ -38,7 +38,7 @@ export default class GitIndexer implements Indexer<GitMeta> {
 
   async update(meta: GitMeta, ops: IndexingOperations) {
     log.debug(`starting update()`);
-    await this._ensureRepo();
+    await this.ensureRepo();
 
     let targetBranch = this.branchPrefix + defaultBranch;
 
@@ -53,7 +53,7 @@ export default class GitIndexer implements Indexer<GitMeta> {
     return result;
   }
 
-  async _ensureRepo() {
+  private async ensureRepo() {
     if (!this.repo) {
       if (this.remote) {
         log.info('Getting remote repo for %s from service', this.remote.url);

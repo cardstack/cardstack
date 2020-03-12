@@ -7,6 +7,7 @@ import crypto from 'crypto';
 import { pathExistsSync, removeSync, outputFileSync } from 'fs-extra';
 import { join } from 'path';
 import { writeCard } from '@cardstack/core/card-file';
+import { upstreamIdToCardDirName } from '@cardstack/core/card-id';
 
 export default class FilesWriter implements Writer {
   filesTracker = inject('filesTracker');
@@ -19,7 +20,7 @@ export default class FilesWriter implements Writer {
     if (!upstreamId) {
       cardDirName = this.pickId(realmDir);
     } else {
-      cardDirName = this.upstreamIdToCardDirName(upstreamId);
+      cardDirName = upstreamIdToCardDirName(upstreamId);
     }
 
     let cardDir = join(realmDir, cardDirName);
@@ -29,7 +30,7 @@ export default class FilesWriter implements Writer {
 
   async update(_session: Session, id: UpstreamIdentity, doc: UpstreamDocument) {
     let realmDir = await this.realmCard.value('directory');
-    let cardDirName = this.upstreamIdToCardDirName(id);
+    let cardDirName = upstreamIdToCardDirName(id);
     let cardDir = join(realmDir, cardDirName);
     removeSync(cardDir);
     let saved = await this.createOrUpdateCard(cardDir, doc);
@@ -38,7 +39,7 @@ export default class FilesWriter implements Writer {
 
   async delete(_session: Session, id: UpstreamIdentity) {
     let realmDir = await this.realmCard.value('directory');
-    let cardDirName = this.upstreamIdToCardDirName(id);
+    let cardDirName = upstreamIdToCardDirName(id);
     let cardDir = join(realmDir, cardDirName);
     removeSync(cardDir);
   }
@@ -59,14 +60,6 @@ export default class FilesWriter implements Writer {
       if (!pathExistsSync(join(realmDir, id))) {
         return id;
       }
-    }
-  }
-
-  private upstreamIdToCardDirName(upstreamId: UpstreamIdentity): string {
-    if (typeof upstreamId === 'string') {
-      return upstreamId;
-    } else {
-      return `${upstreamId.csOriginalRealm}_${upstreamId.csId}`;
     }
   }
 }
