@@ -79,7 +79,7 @@ jobs:
         AWS_ACCESS_KEY_ID: AKIAZ444BSFYHW3OKFOD
         demo_EMBER_DEPLOY_AWS_ACCESS_KEY_ID: AKIAZ444BSFYA3J2FWMZ
         demo_LOG_LEVELS: '*=info'
-        demo_PGHOST: builder-hub20191010154607345600000008.cbuq0sp3cf76.us-east-1.rds.amazonaws.com
+        demo_PGHOST: builder-hub20200312050415491100000001.cbuq0sp3cf76.us-east-1.rds.amazonaws.com
         demo_PGPORT: 5432
         demo_PGUSER: cardstack
         demo_HUB_URL: https://builder-hub.stack.cards
