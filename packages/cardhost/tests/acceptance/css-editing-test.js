@@ -172,7 +172,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     assert.dom('[data-test-large-btn]').exists();
     assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--small');
-    await waitForAnimation(() => percySnapshot('small card width'));
+    await waitForAnimation(() => percySnapshot('themer: small card width'));
 
     // toggle to full width
     await click('[data-test-medium-btn]');
@@ -180,14 +180,14 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--medium');
     assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
-    await waitForAnimation(() => percySnapshot('medium card width'));
+    await waitForAnimation(() => percySnapshot('themer: medium card width'));
 
     await click('[data-test-large-btn]');
     assert.dom('[data-test-large-btn]').hasClass('selected');
     assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--large');
     assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
-    await waitForAnimation(() => percySnapshot('large card width'));
+    await waitForAnimation(() => percySnapshot('themer: large card width'));
   });
 
   test('layout mode: toggling card width', async function(assert) {
@@ -201,7 +201,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     assert.dom('[data-test-large-btn]').exists();
     assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--small');
-    await waitForAnimation(() => percySnapshot(assert));
+    await waitForAnimation(() => percySnapshot('layout: small card width'));
 
     // toggle to full width
     await click('[data-test-medium-btn]');
@@ -209,14 +209,14 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--medium');
     assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
-    await waitForAnimation(() => percySnapshot(assert));
+    await waitForAnimation(() => percySnapshot('layout: medium card width'));
 
     await click('[data-test-large-btn]');
     assert.dom('[data-test-large-btn]').hasClass('selected');
     assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--large');
     assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
-    await waitForAnimation(() => percySnapshot(assert));
+    await waitForAnimation(() => percySnapshot('layout large card width'));
   });
 
   test('changing card size should change card size in both themer and preview modes', async function(assert) {
@@ -227,7 +227,6 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     assert.dom('[data-test-small-btn]').hasClass('selected');
     assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
-    await waitForAnimation(() => percySnapshot(assert));
 
     await click('[data-test-medium-btn]');
     assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
@@ -248,13 +247,13 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-medium-btn]').hasClass('selected');
     assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
-    await waitForAnimation(() => percySnapshot(assert));
+    await waitForAnimation(() => percySnapshot('preview: medium card width'));
 
     await click('[data-test-large-btn]');
     assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-large-btn]').hasClass('selected');
-    await waitForAnimation(() => percySnapshot(assert));
+    await waitForAnimation(() => percySnapshot('preview: large card width'));
 
     await click('[data-test-mode-indicator]');
     await waitForCardLoad();
@@ -297,7 +296,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     assert.dom('[data-test-small-btn]').hasClass('selected');
     assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
-    await waitForAnimation(() => percySnapshot(assert));
+    await waitForAnimation(() => percySnapshot('preview: small card width'));
   });
 
   test('can save CSS edits', async function(assert) {
