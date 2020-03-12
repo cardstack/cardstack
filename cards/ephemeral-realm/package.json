@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/ephemeral-realm-card",
-  "version": "0.18.8",
+  "version": "0.18.9",
   "main": "index.js",
   "license": "MIT",
   "publishConfig": {
@@ -11,8 +11,8 @@
     "@cardstack/hub": "*"
   },
   "devDependencies": {
-    "@cardstack/core": "0.18.8",
-    "@cardstack/hub": "0.18.8"
+    "@cardstack/core": "0.18.9",
+    "@cardstack/hub": "0.18.9"
   },
   "dependencies": {
     "jsonapi-typescript": "^0.1.3"
