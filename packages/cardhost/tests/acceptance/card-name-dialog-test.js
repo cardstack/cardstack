@@ -1,4 +1,4 @@
-import { module, test } from 'qunit';
+import { module, test, skip } from 'qunit';
 import { click, visit, currentURL, triggerKeyEvent, fillIn, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
@@ -134,7 +134,7 @@ module('Acceptance | card name dialog', function(hooks) {
     assert.equal(currentURL(), '/cards');
   });
 
-  test('loading screen can appear over the dialog', async function(assert) {
+  skip('loading screen can appear over the dialog', async function(assert) {
     await visit('/cards');
     await click('[data-test-library-button]');
     await waitForTemplatesToLoad();

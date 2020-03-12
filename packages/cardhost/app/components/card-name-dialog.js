@@ -5,9 +5,6 @@ import { tracked } from '@glimmer/tracking';
 import { task } from 'ember-concurrency';
 import { cardDocument } from '@cardstack/core/card-document';
 import { getUserRealm } from '../utils/scaffolding';
-import ENV from '@cardstack/cardhost/config/environment';
-
-const { environment } = ENV;
 
 export default class CardNameDialog extends Component {
   @service router;
@@ -54,19 +51,8 @@ export default class CardNameDialog extends Component {
       }
     }
 
-    if (environment !== 'test') {
-      this.overlays.setOverlayState('showLoading', true);
-    }
-    let card;
-    try {
-      let unsavedCard = yield this.data.create(getUserRealm(), doc.jsonapi);
-      card = yield this.data.save(unsavedCard);
-    } catch (e) {
-      // if there's a problem saving, go back to showing the dialog
-      this.overlays.setOverlayState('showLoading', false);
-      throw e;
-    }
-    this.overlays.reset();
+    let unsavedCard = yield this.data.create(getUserRealm(), doc.jsonapi);
+    let card = yield this.data.save(unsavedCard);
 
     if (this.args.adoptsFrom) {
       this.router.transitionTo('cards.card.edit.fields', { card });
