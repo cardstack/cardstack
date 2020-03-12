@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/eslint-config",
-  "version": "0.17.0",
+  "version": "0.18.9",
   "description": "Shared eslint config for cardstack packages.",
   "main": "index.js",
   "scripts": {
@@ -21,8 +21,8 @@
   },
   "homepage": "https://github.com/cardstack/cardstack#readme",
   "peerDependencies": {
-    "@typescript-eslint/eslint-plugin": "^1.7.0",
-    "@typescript-eslint/parser": "^1.7.0",
+    "@typescript-eslint/eslint-plugin": "^2.5.0",
+    "@typescript-eslint/parser": "^2.5.0",
     "eslint": "^5.8.0",
     "eslint-config-prettier": "^6.7.0",
     "eslint-plugin-ember": "^5.0.0",

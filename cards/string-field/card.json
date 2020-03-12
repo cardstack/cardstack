@@ -1,0 +1,16 @@
+{
+  "data": {
+    "type": "cards",
+    "attributes": {
+      "csTitle": "Text",
+      "csDescription": "All-purpose text field",
+      "csFeatures": {
+        "field-validate": ["field-hooks.js", "validate"],
+        "field-deserialize": ["field-hooks.js", "deserialize"]
+      }
+    },
+    "relationships": {
+
+    }
+  }
+}

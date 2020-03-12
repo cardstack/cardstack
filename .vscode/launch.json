@@ -7,131 +7,12 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Cardhost Hub",
-      "cwd": "${workspaceRoot}/packages/cardhost",
+      "name": "Launch Hub",
+      "cwd": "${workspaceRoot}/packages/hub",
       "console": "integratedTerminal",
       "env": {
-        "CARDSTACK_SESSIONS_KEY": "OQUQi8NH0asrYgeoE10ijOFBhd/P1BU8HZP/rNqO5nw=",
-        "PGSEARCH_NAMESPACE": "cardstack_data_development",
-        "INITIAL_DATA_DIR": "${workspaceFolder}/packages/cardhost/cardstack",
-        "HUB_ENVIRONMENT": "test",
-        "PORT": "3000"
       },
       "args": ["${workspaceFolder}/packages/hub/bin/cardstack-hub.js"]
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch Models Dummy App",
-      "cwd": "${workspaceRoot}/packages/models",
-      "program": "${workspaceRoot}/packages/models/node_modules/ember-cli/bin/ember",
-      "args": ["s"]
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch Dummy Models Hub",
-      "cwd": "${workspaceRoot}/packages/models",
-      "console": "integratedTerminal",
-      "env": {
-        "CARDSTACK_SESSIONS_KEY": "OQUQi8NH0asrYgeoE10ijOFBhd/P1BU8HZP/rNqO5nw=",
-        "PGSEARCH_NAMESPACE": "cardstack_data_development",
-        "INITIAL_DATA_DIR": "${workspaceFolder}/packages/models/tests/dummy/cardstack",
-        "HUB_ENVIRONMENT": "test",
-        "PORT": "3000"
-      },
-      "args": ["${workspaceFolder}/packages/hub/bin/cardstack-hub.js"]
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch CodeGen Dummy App",
-      "cwd": "${workspaceRoot}/packages/codegen",
-      "program": "${workspaceRoot}/packages/codegen/node_modules/ember-cli/bin/ember",
-      "args": ["s"]
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch Dummy Core Hub",
-      "cwd": "${workspaceRoot}/packages/core",
-      "console": "integratedTerminal",
-      "program": "${workspaceFolder}/packages/hub/bin/cardstack-hub.js",
-      "env": {
-        "CARDSTACK_SESSIONS_KEY": "OQUQi8NH0asrYgeoE10ijOFBhd/P1BU8HZP/rNqO5nw=",
-        "PGSEARCH_NAMESPACE": "cardstack_data_development",
-        "INITIAL_DATA_DIR": "${workspaceFolder}/packages/core/tests/dummy/cardstack",
-        "HUB_ENVIRONMENT": "test",
-        "PORT": "3000"
-      }
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch Authentication Test Suite",
-      "cwd": "${workspaceRoot}/packages/authentication",
-      "program": "${workspaceRoot}/packages/authentication/node_modules/ember-cli/bin/ember",
-      "args": ["test"]
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch Dummy Image Hub",
-      "cwd": "${workspaceRoot}/packages/image",
-      "console": "integratedTerminal",
-      "env": {
-        "CARDSTACK_SESSIONS_KEY": "OQUQi8NH0asrYgeoE10ijOFBhd/P1BU8HZP/rNqO5nw=",
-        "PGSEARCH_NAMESPACE": "cardstack_data_development",
-        "INITIAL_DATA_DIR": "${workspaceFolder}/packages/image/tests/dummy/cardstack",
-        "PORT": "3000"
-      },
-      "args": ["${workspaceFolder}/packages/hub/bin/cardstack-hub.js"]
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch Dummy Routing Hub",
-      "cwd": "${workspaceRoot}/packages/routing",
-      "console": "integratedTerminal",
-      "program": "${workspaceFolder}/packages/hub/bin/cardstack-hub.js",
-      "env": {
-        "CARDSTACK_SESSIONS_KEY": "OQUQi8NH0asrYgeoE10ijOFBhd/P1BU8HZP/rNqO5nw=",
-        "PGSEARCH_NAMESPACE": "cardstack_data_development",
-        "INITIAL_DATA_DIR": "${workspaceFolder}/packages/routing/tests/dummy/cardstack",
-        "HUB_ENVIRONMENT": "test",
-        "PORT": "3000"
-      }
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch Dummy Tools Hub",
-      "cwd": "${workspaceRoot}/packages/tools",
-      "console": "integratedTerminal",
-      "env": {
-        "CARDSTACK_SESSIONS_KEY": "OQUQi8NH0asrYgeoE10ijOFBhd/P1BU8HZP/rNqO5nw=",
-        "PGSEARCH_NAMESPACE": "cardstack_data_development",
-        "INITIAL_DATA_DIR": "${workspaceFolder}/packages/tools/tests/dummy/cardstack",
-        "HUB_ENVIRONMENT": "test",
-        "PORT": "3000"
-      },
-      "args": ["${workspaceFolder}/packages/hub/bin/cardstack-hub.js"]
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch tools test server",
-      "cwd": "${workspaceRoot}/packages/tools",
-      "console": "integratedTerminal",
-      "env": {
-        "CARDSTACK_SESSIONS_KEY": "OQUQi8NH0asrYgeoE10ijOFBhd/P1BU8HZP/rNqO5nw=",
-        "PGSEARCH_NAMESPACE": "cardstack_data_development",
-        "INITIAL_DATA_DIR": "${workspaceFolder}/packages/tools/tests/dummy/cardstack",
-        "HUB_ENVIRONMENT": "test",
-        "PORT": "3000"
-      },
-      "program": "${workspaceRoot}/packages/routing/node_modules/ember-cli/bin/ember",
-      "args": ["test", "--server"]
     },
     {
       "name": "Ember test browser",
@@ -145,60 +26,12 @@
       "request": "launch",
       "name": "Launch Test Suite",
       "program": "${workspaceRoot}/node_modules/.bin/_mocha",
-      "console": "integratedTerminal",
       "cwd": "${workspaceRoot}",
       "env": {
-        "HUB_ENVIRONMENT": "test",
+        "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": [
-        "packages/test-support/bin/run.js",
-        "--timeout",
-        "200000",
-        //  "--grep",
-        //  "hub/card-services"
-      ]
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch Truffle Tests",
-      "cwd": "${workspaceRoot}/packages/ethereum",
-      "program": "${workspaceRoot}/packages/ethereum/node_modules/.bin/truffle",
-      "console": "integratedTerminal",
-      "env": {
-        "HUB_ENVIRONMENT": "test"
-      },
-      "args": [
-        "test",
-        "${workspaceRoot}/packages/ethereum/truffle-tests/*-test.js"
-      ]
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch Ethereum Transaction Index",
-      "cwd": "${workspaceRoot}/packages/ethereum",
-      "program": "${workspaceRoot}/packages/ethereum/scripts/build-index.js",
-      "console": "integratedTerminal",
-      "env": {
-        "HUB_ENVIRONMENT": "development"
-      },
-      "args": [
-        "--start=3926000",
-        "--progressFrequency=10",
-        "--workerCount=1",
-        "--jsonRpcUrl=ws://localhost:8546"
-      ]
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "load first-card",
-      "cwd": "${workspaceRoot}/packages/cli",
-      "program": "${workspaceRoot}/packages/cli/bin/cardstack.js",
-      "args": ["load", "-c", "./node-tests/sample-cards/first-card", "-d", "./blueprints"],
-      "outputCapture": "std"
+      "args": ["-r", "esm", "packages/test-support/bin/run.js", "--timeout", "600000", "--grep", "indexes a url-encoded id card"],
     },
     {
       "type": "node",
@@ -211,6 +44,6 @@
         "JOBS": "1"
       },
       "outputCapture": "std"
-    },
+    }
   ]
 }

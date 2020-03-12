@@ -1,70 +1,84 @@
-import { module, test, skip } from 'qunit';
-import { click, find, visit, currentURL, waitFor } from '@ember/test-helpers';
+import { module, test } from 'qunit';
+import { click, find, visit, currentURL } from '@ember/test-helpers';
+import { login } from '../helpers/login';
 import { setupApplicationTest } from 'ember-qunit';
-import Fixtures from '@cardstack/test-support/fixtures';
+import Fixtures from '../helpers/fixtures';
 import {
   showCardId,
   addField,
   setCardName,
-  createCards,
   saveCard,
   setFieldValue,
   removeField,
-} from '@cardstack/test-support/card-ui-helpers';
-import { setupMockUser, login } from '../helpers/login';
-import { percySnapshot } from 'ember-percy';
-import { animationsSettled } from 'ember-animated/test-support';
+  waitForSchemaViewToLoad,
+  selectField,
+  waitForCardPatch,
+  waitForCardLoad,
+  waitForTestsToEnd,
+  getEncodedCardIdFromURL,
+  waitForLibraryServiceToIdle,
+} from '../helpers/card-ui-helpers';
+import { cardDocument } from '@cardstack/core/card-document';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
-const timeout = 20000;
-const card1Id = 'address-card';
-const card2Id = 'vangogh-work-address';
-const card3Id = 'mango-work-address';
-const qualifiedCard1Id = `local-hub::${card1Id}`;
-const qualifiedCard2Id = `local-hub::${card2Id}`;
-const qualifiedCard3Id = `local-hub::${card3Id}`;
-
+const childName = 'vangogh-work-address';
+const grandChildName = 'mango-work-address';
+const csRealm = 'https://cardstack.com/api/realms/card-catalog';
+const parentCard = cardDocument()
+  .withAttributes({
+    csRealm,
+    csId: 'address-card',
+    csTitle: 'Address Card',
+    csFieldOrder: ['address', 'city', 'state', 'zip'],
+    csCreated: '2020-01-01T15:00:00Z',
+    csFieldSets: {
+      isolated: ['address', 'city', 'state', 'zip'],
+    },
+  })
+  .withField('address', 'string-field')
+  .withField('city', 'string-field')
+  .withField('state', 'string-field')
+  .withField('zip', 'string-field');
+const entry = cardDocument()
+  .withAttributes({
+    csRealm,
+    csId: 'template-entry',
+    csTitle: 'Address Card',
+    csCreated: '2020-01-01T17:00:00Z',
+    type: 'template',
+  })
+  .withRelationships({ card: parentCard })
+  .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'catalog-entry' });
+const parentCardPath = encodeURIComponent(parentCard.canonicalURL);
+const parentScenario = new Fixtures({
+  create: [parentCard, entry],
+});
 const scenario = new Fixtures({
-  create(factory) {
-    setupMockUser(factory);
-  },
-  destroy() {
-    return [
-      { type: 'cards', id: qualifiedCard3Id },
-      { type: 'cards', id: qualifiedCard2Id },
-      { type: 'cards', id: qualifiedCard1Id },
-    ];
+  destroy: {
+    cardTypes: [parentCard],
   },
 });
 
-async function setupParentCard() {
-  await login();
-  await createCards({
-    [card1Id]: [
-      ['address', 'string', true],
-      ['city', 'string', true],
-      ['state', 'string', true],
-      ['zip', 'string', true],
-    ],
-  });
-}
-
 async function setupAdoptedCard() {
-  await visit(`/cards/${card1Id}/adopt`);
-  await setCardName(card2Id);
+  await visit(`/cards/${parentCardPath}/adopt`);
+  await setCardName(childName);
   await click('[data-test-configure-schema-btn]');
-  await animationsSettled();
+  await waitForSchemaViewToLoad();
 }
 
 module('Acceptance | card adoption', function(hooks) {
   setupApplicationTest(hooks);
+  parentScenario.setupModule(hooks);
   scenario.setupTest(hooks);
-  hooks.beforeEach(function() {
-    this.owner.lookup('service:data')._clearCache();
-    this.owner.lookup('service:card-local-storage').clearIds();
+
+  hooks.beforeEach(async function() {
+    await login();
+  });
+  hooks.afterEach(async function() {
+    await waitForTestsToEnd();
   });
 
   test('adopted fields are present', async function(assert) {
-    await setupParentCard();
     await setupAdoptedCard();
 
     assert.deepEqual(
@@ -79,15 +93,14 @@ module('Acceptance | card adoption', function(hooks) {
     assert.dom('[data-test-field="state"] .schema-field-renderer--header--detail').hasText('Adopted');
     assert.dom('[data-test-field="zip"] .schema-field-renderer--header--detail').hasText('Adopted');
 
-    await click('[data-test-field="address"]');
-    assert.dom('.right-edge--section-header--adopted').hasText('Adopted from address-card');
+    await selectField('address');
+    assert.dom('.right-edge--section-header--adopted').hasText('Adopted from Address Card');
   });
 
   test('can create adopted card', async function(assert) {
-    await setupParentCard();
-    await visit(`/cards/${card1Id}/adopt`);
-    await percySnapshot(assert);
-    await setCardName(card2Id);
+    await visit(`/cards/${parentCardPath}/adopt`);
+    await setCardName(childName);
+    await waitForCardLoad();
 
     assert.deepEqual(
       [...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
@@ -95,26 +108,57 @@ module('Acceptance | card adoption', function(hooks) {
     );
     let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
-    assert.deepEqual(card.data.relationships['adopted-from'].data, { type: 'cards', id: qualifiedCard1Id });
-    assert.deepEqual(card.data.relationships.fields.data, []);
+    assert.deepEqual(card.data.relationships.csAdoptsFrom.data, { type: 'cards', id: parentCard.canonicalURL });
+  });
+
+  test('can create adopted card from the library', async function(assert) {
+    await visit('/');
+
+    assert.equal(currentURL(), '/cards');
+    await click('[data-test-library-button]');
+    await waitForLibraryServiceToIdle();
+    await waitForCardLoad(parentCard.canonicalURL);
+
+    let cardCount = [...document.querySelectorAll(`[data-test-library-recent-card-link]`)].length;
+
+    await click('[data-test-library-adopt-card-btn]');
+    await setCardName(childName);
+    let childId = getEncodedCardIdFromURL();
+    assert.ok(/^\/cards\/.*\/edit\/fields$/.test(currentURL()), 'URL is correct');
+
+    await click('[data-test-library-button]');
+    await waitForLibraryServiceToIdle();
+    await waitForCardLoad(decodeURIComponent(childId));
+    assert.equal(currentURL(), `/cards/${childId}/edit/fields`);
+
+    assert.equal(
+      [...document.querySelectorAll(`[data-test-library-recent-card-link]`)].length,
+      cardCount + 1,
+      'a card was added to the library'
+    );
+    assert.equal(
+      [...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`)]
+        .map(i => i.getAttribute('data-test-card-renderer-embedded'))
+        .includes(decodeURIComponent(childId)),
+      true,
+      'the newly created card appears in the library'
+    );
   });
 
   test('it displays the adopted card in the right edge', async function(assert) {
-    await setupParentCard();
     await setupAdoptedCard();
     await showCardId(true);
 
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText(card1Id);
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('Address Card');
     assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').hasText('Base Card');
   });
 
   test('can add a field at a particular position', async function(assert) {
-    await setupParentCard();
     await setupAdoptedCard();
-    await addField('treats-available', 'boolean', false, 1);
-    assert.dom('[data-test-field="treats-avialable"] .schema-field-renderer--header--detail').doesNotExist();
+    await addField('treats-available', 'boolean-field', false, 1);
+    assert.dom('[data-test-field="treats-available"] .schema-field-renderer--header--detail').doesNotExist();
 
-    await click('[data-test-field="treats-available"]');
+    await selectField('treats-available');
     assert.dom('.right-edge--section-header--adopted').doesNotExist();
 
     assert.deepEqual(
@@ -124,7 +168,7 @@ module('Acceptance | card adoption', function(hooks) {
       ['address', 'treats-available', 'city', 'state', 'zip']
     );
 
-    await saveCard();
+    await waitForCardPatch();
     await showCardId();
     assert.deepEqual(
       [...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
@@ -132,24 +176,25 @@ module('Acceptance | card adoption', function(hooks) {
     );
     let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
-    assert.deepEqual(card.data.relationships['adopted-from'].data, { type: 'cards', id: qualifiedCard1Id });
-    assert.deepEqual(card.data.relationships.fields.data, [{ type: 'fields', id: 'treats-available' }]);
+    assert.deepEqual(card.data.relationships.csAdoptsFrom.data, { type: 'cards', id: parentCard.canonicalURL });
+    assert.ok(card.data.attributes.csFields['treats-available']);
   });
 
   test('can remove own field', async function(assert) {
-    await setupParentCard();
     await setupAdoptedCard();
-    await addField('treats-available', 'boolean', false);
-
+    let cardId = getEncodedCardIdFromURL();
+    await addField('treats-available', 'boolean-field', false);
     await saveCard();
 
     assert.dom('[data-test-field="treats-available"]').exists();
     let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
-    assert.deepEqual(card.data.relationships['adopted-from'].data, { type: 'cards', id: qualifiedCard1Id });
-    assert.deepEqual(card.data.relationships.fields.data, [{ type: 'fields', id: 'treats-available' }]);
+    assert.deepEqual(card.data.relationships.csAdoptsFrom.data, { type: 'cards', id: parentCard.canonicalURL });
+    assert.ok(card.data.attributes.csFields['treats-available']);
 
-    await visit(`/cards/${card2Id}/edit/fields/schema`);
+    await visit(`/cards/${cardId}/edit/fields/schema`);
+    await waitForSchemaViewToLoad();
+
     await removeField('treats-available');
     await saveCard();
     await showCardId();
@@ -160,39 +205,37 @@ module('Acceptance | card adoption', function(hooks) {
     );
     cardJson = find('[data-test-card-json]').innerHTML;
     card = JSON.parse(cardJson);
-    assert.deepEqual(card.data.relationships['adopted-from'].data, { type: 'cards', id: qualifiedCard1Id });
-    assert.deepEqual(card.data.relationships.fields.data, []);
+    assert.deepEqual(card.data.relationships.csAdoptsFrom.data, { type: 'cards', id: parentCard.canonicalURL });
+    assert.deepEqual(card.data.attributes.csFields, {});
   });
 
   test("can't remove an adopted field", async function(assert) {
-    await setupParentCard();
     await setupAdoptedCard();
 
     assert.dom('[data-test-field-renderer-remove-btn]').doesNotExist();
   });
 
   test("can't edit adopted field's name, label, or embedded properties", async function(assert) {
-    await setupParentCard();
     await setupAdoptedCard();
 
-    await click('[data-test-field="address"]');
+    await selectField('address');
+
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('address');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').isDisabled();
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Address');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').isDisabled();
-    assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isNotChecked();
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isDisabled();
   });
 
-  // Need to complete issue #980 first
-  skip("TODO can edit adopted fields's helper text", async function(/*assert*/) {});
-
   test('can edit the data of an adopted card', async function(assert) {
-    await setupParentCard();
     await setupAdoptedCard();
-    await addField('treats-available', 'boolean', false);
+    let cardId = getEncodedCardIdFromURL();
+    await addField('treats-available', 'boolean-field', false);
     await saveCard();
-    await visit(`/cards/${card2Id}/edit/fields`);
+
+    await visit(`/cards/${cardId}/edit/fields`);
+    await waitForCardLoad();
 
     assert.deepEqual(
       [...document.querySelectorAll(`[data-test-isolated-card] [data-test-field]`)].map(i =>
@@ -208,10 +251,11 @@ module('Acceptance | card adoption', function(hooks) {
     await setFieldValue('zip', '01234');
 
     await saveCard();
-    assert.equal(currentURL(), `/cards/${card2Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${cardId}/edit/fields`);
 
     await click('[data-test-mode-indicator-link="view"]');
-    await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
+    await waitForCardLoad();
+
     assert.dom('[data-test-field="treats-available"] [data-test-boolean-field-viewer-value]').hasText('Yes');
     assert.dom('[data-test-field="address"] [data-test-string-field-viewer-value]').hasText('105 Barkley Lane');
     assert.dom('[data-test-field="city"] [data-test-string-field-viewer-value]').hasText('Puppyville');
@@ -228,19 +272,21 @@ module('Acceptance | card adoption', function(hooks) {
   });
 
   test('can create a card that has an adoption chain of multiple cards', async function(assert) {
-    await setupParentCard();
     await setupAdoptedCard();
-    await addField('treats-available', 'boolean', true);
+    let cardId = getEncodedCardIdFromURL();
+    await addField('treats-available', 'boolean-field', true);
     await saveCard();
     await showCardId();
 
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText(card1Id);
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('Address Card');
     assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').hasText('Base Card');
 
-    await visit(`/cards/${card2Id}/adopt`);
-    await setCardName(card3Id);
+    await visit(`/cards/${cardId}/adopt`);
+    await setCardName(grandChildName);
     await click('[data-test-configure-schema-btn]');
-    await addField('number-of-bones', 'integer', true, 5);
+    await waitForSchemaViewToLoad();
+
+    await addField('number-of-bones', 'integer-field', true, 5);
 
     assert.deepEqual(
       [...document.querySelectorAll(`[data-test-isolated-card] [data-test-field]`)].map(i =>
@@ -252,62 +298,44 @@ module('Acceptance | card adoption', function(hooks) {
     await saveCard();
     await showCardId();
 
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText(card2Id);
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').hasText(card1Id);
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText(childName);
+    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').hasText('Address Card');
     assert.deepEqual(
       [...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
       ['treats-available', 'address', 'city', 'state', 'zip', 'number-of-bones']
     );
     let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
-    assert.deepEqual(card.data.relationships['adopted-from'].data, { type: 'cards', id: qualifiedCard2Id });
-    assert.deepEqual(card.data.relationships.fields.data, [{ type: 'fields', id: 'number-of-bones' }]);
+    assert.deepEqual(card.data.relationships.csAdoptsFrom.data, { type: 'cards', id: decodeURIComponent(cardId) });
+    assert.ok(card.data.attributes.csFields['number-of-bones']);
   });
 
   test('adopted card can receive upstream changes', async function(assert) {
-    await setupParentCard();
     await setupAdoptedCard();
-    await addField('treats-available', 'boolean', true);
+    let cardId = getEncodedCardIdFromURL();
+    await addField('treats-available', 'boolean-field', true);
     await saveCard();
-    await visit(`/cards/${card1Id}/edit/fields/schema`);
-    await addField('number-of-bones', 'integer', true);
+
+    await visit(`/cards/${cardId}/adopt`);
+    await setCardName(grandChildName);
+    let grandChildId = getEncodedCardIdFromURL();
+
+    await visit(`/cards/${cardId}/edit/fields/schema`);
+    await waitForSchemaViewToLoad(decodeURIComponent(cardId));
+    await addField('number-of-bones', 'integer-field', true);
     await saveCard();
-    await visit(`/cards/${card2Id}/edit/fields/schema`);
-    await animationsSettled();
+
+    await visit(`/cards/${grandChildId}/edit/fields/schema`);
+    await waitForSchemaViewToLoad(decodeURIComponent(grandChildId));
 
     assert.deepEqual(
-      [...document.querySelectorAll(`[data-test-isolated-card] [data-test-field]`)].map(i =>
-        i.getAttribute('data-test-field')
-      ),
+      [
+        ...document.querySelectorAll(
+          `[data-test-isolated-card="${decodeURIComponent(grandChildId)}"] [data-test-field]`
+        ),
+      ].map(i => i.getAttribute('data-test-field')),
       ['treats-available', 'address', 'city', 'state', 'zip', 'number-of-bones']
     );
     assert.dom('[data-test-field="number-of-bones"] .schema-field-renderer--header--detail').hasText('Adopted');
   });
-
-  test('removing adoptedFrom card makes it adopted from base card', async function(assert) {
-    await setupParentCard();
-    await setupAdoptedCard();
-    await showCardId();
-
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText(card1Id);
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').hasText('Base Card');
-
-    await click(`[data-test-right-edge] [data-test-remove-adopted-from-btn]`);
-    await waitFor('[data-test-right-edge] [data-test-remove-adopted-from-btn]:not(.is-running)', { timeout });
-
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('Base Card');
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').doesNotExist();
-  });
-
-  test('remove button is disabled if adopted from base card', async function(assert) {
-    await setupParentCard();
-    await visit(`/cards/${card1Id}/edit/fields/schema`);
-
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('Base Card');
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').doesNotExist();
-    assert.dom('[data-test-right-edge] [data-test-remove-adopted-from-btn]').isDisabled();
-  });
-
-  // Waiting on UI designs
-  skip('TODO cannot add a field that has the same name as an adopted field', async function(/*assert*/) {});
 });

@@ -1,10 +1,10 @@
 {
   "eslint.validate": ["javascript", "typescript"],
-  "editor.formatOnSave": false,
   "[javascript]": {
     "editor.formatOnSave": true
   },
   "[typescript]": {
     "editor.formatOnSave": true
-  }
+  },
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

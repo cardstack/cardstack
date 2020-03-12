@@ -6,24 +6,26 @@
   "author": "Edward Faulkner <edward@eaf4.com>",
   "license": "MIT",
   "engines": {
-    "node": ">= 7.7"
+    "node": ">= 12"
   },
   "dependencies": {
     "@types/chai": "^4.2.6",
     "@types/chai-as-promised": "^7.1.2",
     "@types/console-ui": "^2.2.3",
     "@types/filenamify-url": "^1.0.1",
+    "@types/json-stable-stringify": "^1.0.32",
     "@types/mkdirp": "^0.5.2",
     "@types/mocha": "^5.2.6",
     "@types/moment-timezone": "^0.5.12",
     "@types/node": "11.13.8",
     "@types/rimraf": "^2.0.3",
     "@types/sinon": "^7.5.1",
-    "@types/temp": "^0.8.34",
-    "@typescript-eslint/eslint-plugin": "^1.7.0",
-    "@typescript-eslint/parser": "^1.7.0",
+    "@types/tmp": "^0.1.0",
+    "@typescript-eslint/eslint-plugin": "^2.5.0",
+    "@typescript-eslint/parser": "^2.5.0",
     "babel-eslint": "^10.0.1",
-    "chai": "^3.5.0",
+    "chai": "^4.2.0",
+    "ember-template-lint": "^1.13.2",
     "eslint": "^5.8.0",
     "eslint-config-prettier": "^6.7.0",
     "eslint-plugin-ember": "^5.0.0",
@@ -34,25 +36,26 @@
     "lerna": "3.16.4",
     "mocha": "^5.2.0",
     "prettier": "^1.19.1",
-    "typescript": "3.4.5"
+    "typescript": "3.7.2"
   },
   "scripts": {
     "clean": "git clean -x -f",
     "compile": "tsc",
     "prepare": "npm run compile",
     "test": "npm run lint:deps && npm run lint:js && npm run node-tests && npm run ember-tests",
-    "node-tests": "mocha ./packages/test-support/bin/run.js --timeout 10000",
+    "node-tests": "mocha ./packages/test-support/bin/run.js --timeout 60000",
     "lint:deps": "node scripts/find-bad-deps.js",
-    "lint:js": "eslint . --cache --ignore-path .gitignore --ext=js,ts",
-    "ember-tests": "node packages/test-support/ember-test-runner.js packages",
+    "lint:js": "eslint . --cache --ignore-path .gitignore --ext=js,ts && cd packages/cardhost && ../../node_modules/.bin/ember-template-lint ember-template-lint .",
+    "lint:hbs": "cd packages/cardhost && ../../node_modules/.bin/ember-template-lint ember-template-lint .",
+    "ember-tests": "cd packages/cardhost && ../../node_modules/.bin/ember test",
     "server": "node packages/hub/bin/server.js"
   },
   "workspaces": [
     "packages/*",
     "cards/*"
   ],
+  "private": true,
   "volta": {
-    "node": "10.12.0"
-  },
-  "private": true
+    "node": "12.13.1"
+  }
 }

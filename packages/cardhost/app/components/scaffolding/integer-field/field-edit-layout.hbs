@@ -1,0 +1,7 @@
+<TextField
+  @type="number"
+  @label={{@card.csTitle}}
+  @helperText={{@card.csDescription}}
+  @value={{this.fieldValue}}
+  @setValue={{perform this.updateFieldValue}}
+  data-test-edit-field={{@card.name}} />

@@ -1,3 +1,5 @@
+/* TODO this needs to move into the event card package now */
+
 .event-card-isolated .isolated-card--view-fields {
   display: grid;
   grid-template-columns: 1fr 1fr;

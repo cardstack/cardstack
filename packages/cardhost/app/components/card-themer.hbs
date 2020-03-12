@@ -1,0 +1,33 @@
+<section class="card-renderer--container" data-test-card-view={{this.card.canonicalURL}}
+  data-test-card-patched={{stringify this.patchCard.isIdle}}
+  data-test-themer-loaded={{stringify this.isCardReady}}
+>
+  <div class="card-renderer--inner-container themer-container">
+    <CardRenderer
+      @card={{@card}}
+      @format="isolated"
+      @mode="view"
+      @class="themer"
+      @cardSelected={{false}}
+      @suppressCss={{true}}
+      @suppressHeader={{true}}
+      @cardLoaded={{perform this.waitForCss}}
+    />
+  </div>
+</section>
+
+{{#if this.isCardReady}}
+  <EditorPane data-test-dock-location={{this.cssModeToggle.dockLocation}}
+    @css={{this.isolatedCss}}
+    @card={{@card}}
+    @updateCode={{this.updateCss}}
+  />
+{{/if}}
+
+<style data-test-themer-css>
+  {{#if this.isolatedCss}}
+    {{scope-css this.isolatedCss @card "isolated"}}
+  {{else}}
+    {{scope-css this.loadingCss @card "isolated"}}
+  {{/if}}
+</style>

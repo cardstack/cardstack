@@ -1,0 +1,16 @@
+{
+  "name": "@cardstack/date-field-card",
+  "version": "0.18.9",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@cardstack/core": "*",
+    "@cardstack/hub": "*"
+  },
+  "devDependencies": {
+    "@cardstack/core": "0.18.9",
+    "@cardstack/hub": "0.18.9"
+  }
+}

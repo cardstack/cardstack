@@ -1,7 +1,12 @@
-<RightEdge
-  @card={{this.model}}
-  @mode="fields"
-  @cardSelected={{true}} {{!-- Change this when we want to display different right-edge options --}}
-/>
-
-<CardEditor @card={{this.model}}/>
+<CardEditor @card={{this.model.card}} as |card args|>
+  <RightEdge
+    @card={{card}}
+    @parentCard={{get args "parentCard"}}
+    @grandParentCard={{get args "grandParentCard"}}
+    @selectedField={{get args "selectedField"}}
+    @selectedFieldType={{get args "selectedFieldType"}}
+    @setCardValue={{get args "setCardValue"}}
+    @mode="fields"
+    @cardSelected={{true}} {{!-- Change this when we want to display different right-edge options --}}
+  />
+</CardEditor>

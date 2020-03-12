@@ -1,0 +1,6 @@
+{{#if this.fieldValue}}
+  <div class="label {{@card.name}}-label" data-test-image-reference-field-viewer-label>
+    {{@card.csTitle}}
+  </div>
+  <img src={{this.fieldValue}} alt="" class="value {{@card.name}}-value decorative-image-viewer" data-test-image-reference-field-viewer-value>
+{{/if}}

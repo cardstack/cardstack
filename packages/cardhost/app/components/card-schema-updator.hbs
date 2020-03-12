@@ -1,0 +1,80 @@
+<CardhostLeftEdge
+  @mode="schema"
+  data-test-catalog-loaded={{stringify this.load.isIdle}}
+>
+  <section class="ch-catalog">
+    <header class="ch-catalog--header">
+      <h3 class="ch-catalog--title">Card Catalog</h3>
+    </header>
+    <div class="ch-catalog--content">
+      <div
+        class="ch-catalog--fields"
+        tabindex="0"
+      >
+        {{!-- Eventually this will be a search that allows you to find cards to use for your card's fields --}}
+        {{#animated-each this.catalogEntries use=this.transition watch="dragState,dropTo" as |entry|}}
+          <div
+            class="ch-catalog-field"
+            tabindex="-1"
+            {{on "mousedown" (perform this.beginDragging entry)}}
+            {{on "click" (fn this.selectFieldType entry)}}
+            data-test-card-add-field-draggable={{entry.canonicalURL}}
+          >
+            <div class="ch-catalog-field--icon">
+              {{!-- TODO need to add card icon to the API and render here --}}
+            </div>
+            <div>
+              <h4 class="ch-catalog-field--title">{{entry.csTitle}}</h4>
+              {{#if entry.csDescription}}
+                <p class="ch-catalog-field--description">{{entry.csDescription}}</p>
+              {{/if}}
+            </div>
+          </div>
+        {{/animated-each}}
+      </div>
+    </div>
+  </section>
+</CardhostLeftEdge>
+
+<RightEdge
+  @card={{@card}}
+  @mode="schema"
+  @parentCard={{this.parentCard}}
+  @grandParentCard={{this.grandParentCard}}
+  @selectedField={{this.selectedField}}
+  @selectedFieldName={{this.selectedFieldName}}
+  @selectedFieldType={{this.selectedFieldType}}
+  @selectField={{perform this.selectField}}
+  @setCardValue={{this.setCardValue}}
+  @setFieldCardValue={{this.setFieldCardValue}}
+  @setNeededWhenEmbedded={{this.setNeededWhenEmbedded}}
+  @setFieldName={{this.setFieldName}}
+  @cardSelected={{this.cardSelected}} />
+
+<section class="card-renderer--container"
+  data-test-card-schema={{@card.name}}
+  data-test-card-patched={{stringify this.patchCard.isIdle}}
+  data-test-card-fields-ready={{stringify (and this.addField.isIdle this.setPosition.isIdle)}}
+>
+  <div class="card-renderer--inner-container schema-container">
+    <CardRenderer
+      @card={{@card}}
+      @format="isolated"
+      @mode="schema"
+      @fieldOrderPromise={{this.fieldOrderPromise}}
+      @removeField={{this.removeField}}
+      @selectField={{perform this.selectField}}
+      @setPosition={{perform this.setPosition}}
+      @selectedField={{this.selectedField}}
+      @selectedFieldName={{this.selectedFieldName}}
+      @dropField={{action this.dropField}}
+      @cardSelected={{this.cardSelected}}
+      @cardFocused={{action (mut this.cardSelected)}} />
+  </div>
+</section>
+
+{{!-- This is hidden, used in tests --}}
+<section class="cardhost-card-document">
+  <h3>Card Document</h3>
+  <pre data-test-card-json>{{this.cardJson}}</pre>
+</section>

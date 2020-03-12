@@ -1,0 +1,43 @@
+<div
+  class="isolated-card"
+  data-test-isolated-card={{@card.canonicalURL}}
+  data-test-isolated-card-mode={{@mode}}
+>
+  <AnimatedContainer class={{if (or (eq @mode "view") (eq @mode "layout")) "isolated-card--view-fields"}}>
+    <MaybeAnimate
+      @mode={{@mode}}
+      @animationMode="schema"
+      @component="animated-each"
+      @content={{@fields}}
+      @key="nonce"
+      @use={{this.transition}}
+      @duration={{this.duration}} as |field|>
+      <FieldRenderer
+        @field={{field}}
+        @position={{field.position}}
+        @mode={{@mode}}
+        @dropField={{@dropField}}
+        @removeField={{@removeField}}
+        @toggleStubField={{@toggleStubField}}
+        @setPosition={{@setPosition}}
+        @setCardValue={{@setCardValue}}
+        @setCardReference={{@setCardReference}}
+        @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+        @setFieldName={{@setFieldName}}
+        @selectField={{@selectField}}
+        @selectedField={{@selectedField}}
+        @loadedField={{@loadedField}}
+        @selectedFieldName={{@selectedFieldName}}
+      />
+      {{#if (and (eq @mode "schema") @dropField (not (eq field.csRealm "stub-card")))}}
+        <DropZone
+          @card={{@card}}
+          @dropField={{@dropField}}
+          @position={{inc field.position}}
+          @toggleStubField={{@toggleStubField}}
+        />
+      {{/if}}
+    </MaybeAnimate>
+  </AnimatedContainer>
+
+</div>

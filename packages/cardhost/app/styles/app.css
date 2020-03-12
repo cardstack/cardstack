@@ -53,9 +53,6 @@ Until that work is done we are statically adding this css
 @import '/assets/fields/link-viewer.css';
 @import '/assets/fields/cta-viewer.css';
 
-@import '/assets/cards/base-card-isolated.css';
-@import '/assets/cards/base-card-embedded.css';
-
 /* Themed cards */
 /* @import '/assets/cards/event-card-isolated.css';
 @import '/assets/cards/event-ticket-isolated.css';

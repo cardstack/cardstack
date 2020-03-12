@@ -1,23 +1,23 @@
 import Component from '@glimmer/component';
-import { dasherize } from '@ember/string';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import { task } from 'ember-concurrency';
+import kebabCase from 'lodash/kebabCase';
 import { inject as service } from '@ember/service';
-import { fieldComponents } from '../utils/mappings';
 
-const defaultSchemaAttrs = ['title', 'type', 'is-meta', 'name', 'instructions', 'embedded'];
+const defaultSchemaAttrs = Object.freeze(['title', 'type', 'name', 'instructions', 'embedded']);
+const fieldNameRegex = Object.freeze(/^[a-zA-Z][\w-]*$/);
 
-// These are the field attributes that will trigger onFieldChanged()
-// to be called when the values of this attributes change
-const onFieldChangedDependencies = ['nonce', 'name', 'label', 'instructions'];
-
-let renderNonce = 0;
 export default class FieldRenderer extends Component {
+  fieldNameRegex = fieldNameRegex;
   @tracked newFieldName;
+  @tracked currentFieldName;
   @tracked newFieldLabel;
   @tracked newFieldInstructions;
-  @tracked currentNonce;
-  @tracked renderNonce;
+  @tracked fieldValue;
+  @tracked fieldType;
+  @tracked fieldTypeId;
+  @tracked neededWhenEmbedded;
 
   @service draggable;
 
@@ -25,33 +25,85 @@ export default class FieldRenderer extends Component {
     super(...args);
 
     this.newFieldName = this.args.field.name;
-    this.newFieldLabel = this.args.field.label;
-    this.newFieldInstructions = this.args.field.instructions;
-    this.currentNonce = this.nonce;
-    this.renderNonce = renderNonce++;
+    this.currentFieldName = this.args.field.name;
+    this.newFieldLabel = this.args.field.csTitle;
+    this.newFieldInstructions = this.args.field.csDescription;
+    if (this.args.field.enclosingCard) {
+      this.neededWhenEmbedded =
+        this.args.field.enclosingCard.csFieldSets && Array.isArray(this.args.field.enclosingCard.csFieldSets.embedded)
+          ? this.args.field.enclosingCard.csFieldSets.embedded.includes(this.args.field.name)
+          : false;
+    }
+    this.loadField.perform();
   }
+
+  @task(function*() {
+    if (this.args.field.enclosingCard) {
+      this.fieldValue = yield this.args.field.enclosingCard.value(this.args.field.name);
+    }
+    let fieldTypeCard = yield this.args.field.adoptsFrom();
+    this.fieldType = fieldTypeCard.csTitle;
+    this.fieldTypeId = fieldTypeCard.canonicalURL;
+
+    if (typeof this.args.loadedField === 'function') {
+      this.args.loadedField(this.args.field.name);
+    }
+  })
+  loadField;
+
+  @(task(function*(newName) {
+    newName = kebabCase(newName);
+    try {
+      yield this.args.setFieldName.perform(this.currentFieldName, newName);
+      this.currentFieldName = newName;
+    } catch (e) {
+      console.error(e); // eslint-disable-line no-console
+      this.statusMsg = `field name ${this.currentFieldName} was NOT successfully changed: ${e.message}`;
+      return;
+    }
+  }).restartable())
+  updateFieldName;
+
+  @(task(function*(newLabel) {
+    this.newFieldLabel = newLabel;
+    yield this.args.setFieldCardValue.perform(this.currentFieldName, 'csTitle', newLabel);
+  }).restartable())
+  updateFieldLabel;
+
+  @(task(function*(instructions) {
+    this.newFieldInstructions = instructions;
+    yield this.args.setFieldCardValue.perform(this.currentFieldName, 'csDescription', instructions);
+  }).restartable())
+  updateFieldInstructions;
 
   get schemaAttrs() {
     return this.args.schemaAttrs || defaultSchemaAttrs;
   }
 
-  get sanitizedType() {
-    return this.args.field.type.replace(/::/g, '/').replace(/@/g, '');
+  get isSelected() {
+    return (
+      this.args.selectedField &&
+      (this.args.selectedField.name === this.args.field.name || this.args.selectedFieldName === this.args.field.name)
+    );
   }
 
-  get fieldType() {
-    return fieldComponents.find(el => el.coreType === this.args.field.type);
+  get isStubField() {
+    return this.args.field.csRealm === 'stub-card';
   }
 
-  @action
-  updateFieldProperties(element, [nonce]) {
-    if (nonce !== this.currentNonce) {
-      this.currentNonce = this.nonce;
-      this.newFieldName = this.args.field.name;
-      this.newFieldLabel = this.args.field.label;
-      this.newFieldInstructions = this.args.field.instructions;
+  get stubFieldName() {
+    if (!this.isStubField) {
+      return null;
     }
-    return null;
+
+    return this.args.field.csDescription || this.args.field.csTitle;
+  }
+  get fieldName() {
+    return this.newFieldName || this.args.field.name;
+  }
+
+  get fieldLabel() {
+    return this.newFieldLabel || this.args.field.csTitle;
   }
 
   @action
@@ -59,52 +111,8 @@ export default class FieldRenderer extends Component {
     element.parentElement.focus({ preventScroll: true });
   }
 
-  get nonce() {
-    return onFieldChangedDependencies.map(i => this.args.field[i]).join('::');
-  }
-
-  get dasherizedType() {
-    return dasherize(this.args.field.type.replace(/@cardstack\/core-types::/g, ''));
-  }
-
-  get friendlyType() {
-    if (this.dasherizedType === 'case-insensitive' || this.dasherizedType === 'string') {
-      return 'text';
-    }
-
-    return '';
-  }
-
-  get fieldViewer() {
-    return `fields/${dasherize(this.sanitizedType)}-viewer`;
-  }
-
-  get fieldEditor() {
-    return `fields/${dasherize(this.sanitizedType)}-editor`;
-  }
-
-  @action
-  updateFieldName(newName) {
-    try {
-      this.args.setFieldName(this.args.field.name, newName);
-      this.newFieldName = newName;
-    } catch (e) {
-      console.error(e); // eslint-disable-line no-console
-      this.statusMsg = `field name ${this.args.field.name} was NOT successfully changed: ${e.message}`;
-      return;
-    }
-  }
-
-  @action
-  updateFieldLabel(newLabel) {
-    this.newFieldLabel = newLabel;
-    this.args.setFieldLabel(this.args.field.name, this.newFieldLabel);
-  }
-
-  @action
-  updateFieldInstructions(instructions) {
-    this.newFieldInstructions = instructions;
-    this.args.setFieldInstructions(this.args.field.name, this.newFieldInstructions);
+  get fieldDisplayName() {
+    return this.fieldLabel || this.fieldName;
   }
 
   @action
@@ -124,10 +132,8 @@ export default class FieldRenderer extends Component {
     this.draggable.setDragging(false);
   }
 
-  @action startDragging(field, evt) {
-    this.draggable.setField(field);
-    evt.dataTransfer.setData('text', evt.target.id);
-    evt.dataTransfer.setData('text/field-name', field.name);
+  @action startDragging(field) {
+    this.draggable.setField(field, this.args.position);
   }
 
   @action finishDragging(evt) {

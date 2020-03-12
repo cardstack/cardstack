@@ -4,8 +4,12 @@
 
 <AnimatedTools @hideUntilKeys="Ctrl-Shift-KeyA" />
 
-{{#if this.showLoading }}
+<CardhostModalTarget/>
+
+{{#if this.overlays.showLoading}}
   <Loading />
 {{else}}
   <CardhostModalTarget/>
 {{/if}}
+
+<CssManager/>

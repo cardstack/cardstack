@@ -1,6 +1,0 @@
-{{!-- TODO Let's eventually refactor this "if" condition out --}}
-{{#if isNewContent}}
-  {{cardstack-content content=model format="isolated"}}
-{{else}}
-  {{cardstack-content content=model.primaryCard format="isolated" params=model.params setParam=(action 'setParam')}}
-{{/if}}

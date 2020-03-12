@@ -1,7 +1,7 @@
 import Component from '@glimmer/component';
-import { fieldComponents } from '../utils/mappings';
 import { tracked } from '@glimmer/tracking';
 import { action, set } from '@ember/object';
+import { task } from 'ember-concurrency';
 import fade from 'ember-animated/transitions/fade';
 import resize from 'ember-animated/motions/resize';
 import { easeInAndOut } from 'ember-animated/easings/cosine';
@@ -12,9 +12,10 @@ const { animationSpeed } = ENV;
 const duration = 250;
 
 export default class RightEdge extends Component {
-  @tracked cardName = this.args.card.name;
+  @tracked cardName = this.args.card.csTitle;
   @tracked options = {};
   @tracked expandedSections = ['template'];
+  @tracked selectedFieldSource;
 
   fade = fade;
   duration = animationSpeed || duration;
@@ -27,32 +28,41 @@ export default class RightEdge extends Component {
     }
   }
 
-  get selectedFieldTitle() {
-    if (this.args.selectedField) {
-      let { title } = fieldComponents.findBy('coreType', this.args.selectedField.type);
-      return title;
-    }
-
-    return '';
-  }
-
   get selectedContent() {
     return this.args.cardSelected ? 'card' : 'field';
   }
 
   @action
   updateCard(element, [card, cardSelected]) {
-    this.cardName = card.name;
+    this.cardName = card.csTitle;
     set(this.options, 'selectedContent', cardSelected ? 'card' : 'field');
   }
 
-  @action
-  updateCardId(id) {
-    if (!this.args.updateCardId) {
+  @(task(function*(name) {
+    if (!this.args.setCardValue) {
       return;
     }
+    yield this.args.setCardValue.perform('csTitle', name);
+  }).restartable())
+  updateCardName;
 
-    this.args.updateCardId(id);
+  @(task(function*() {
+    if (this.args.selectedField || this.args.selectedFieldName) {
+      let field = this.args.selectedField;
+      if (this.args.selectedFieldName) {
+        field = yield this.args.card.field(this.args.selectedFieldName);
+      }
+
+      if (field.sourceCard) {
+        this.selectedFieldSource = field.sourceCard.csTitle;
+      }
+    }
+  }).restartable())
+  loadFieldSource;
+
+  @action
+  loadSelectedField() {
+    this.loadFieldSource.perform();
   }
 
   @action

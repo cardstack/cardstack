@@ -1,0 +1,35 @@
+{{yield @card (hash
+  parentCard=this.parentCard
+  grandParentCard=this.grandParentCard
+  setCardValue=this.setCardValue
+  selectedField=this.selectedField
+  selectedFieldName=this.selectedFieldName
+  selectedFieldType=this.selectedFieldType
+)}}
+
+<section
+  class="card-renderer--container"
+  data-test-card-edit={{@card.canonicalURL}}
+>
+  <div class="card-renderer--inner-container edit-container"
+    data-test-card-patched={{stringify this.patchCard.isIdle}}
+  >
+    <CardRenderer
+      @card={{this.originalCard}}
+      @mode="edit"
+      @setCardValue={{this.setCardValue}}
+      @setCardReference={{this.setCardReference}}
+      @format="isolated"
+      @selectField={{perform this.selectField}}
+      @selectedField={{this.selectedField}}
+      @selectedFieldName={{this.selectedFieldName}}
+      @cardSelected={{true}}
+    />
+  </div>
+</section>
+
+{{!-- This is hidden, used in tests --}}
+<section class="cardhost-card-document">
+  <h3>Card Document</h3>
+  <pre data-test-card-json>{{this.cardJson}}</pre>
+</section>

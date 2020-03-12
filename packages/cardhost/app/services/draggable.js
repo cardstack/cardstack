@@ -3,14 +3,16 @@ import { tracked } from '@glimmer/tracking';
 
 export default class DraggableService extends Service {
   @tracked field;
+  @tracked startingPosition;
   @tracked dropzone;
   @tracked dragging;
 
   /**
    * Sets the currently dragged field
    */
-  setField(field) {
+  setField(field, startingPosition) {
     this.field = field;
+    this.startingPosition = startingPosition;
   }
 
   /**
@@ -21,10 +23,18 @@ export default class DraggableService extends Service {
   }
 
   /**
+   * Gets the starting position of the dragged field
+   */
+  getStartingPosition() {
+    return this.startingPosition;
+  }
+
+  /**
    * Clears the dragged field
    */
   clearField() {
     this.field = null;
+    this.startingPosition = null;
   }
 
   /**

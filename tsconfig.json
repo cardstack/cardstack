@@ -1,22 +1,26 @@
 {
-  "include": ["./packages/**/*.ts", "./cards/**/*.ts"],
+  "include": ["./packages/**/*.ts", "./packages/**/*.js", "./scripts/**/*.js", "./cards/**/*.ts" ],
   "compilerOptions": {
     "target": "es2017",
-    "module": "commonjs",
+    "module": "es6",
+    "moduleResolution": "Node",
     "declaration": true,
     "typeRoots": ["node_modules/@types", "types"],
     "esModuleInterop": true,
     "sourceMap": true,
     "experimentalDecorators": true,
     "allowUnreachableCode": false,
-    "strict": true
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
   },
   "exclude": [
     "node_modules",
     "packages/*/tmp",
     "packages/*/dist",
+    "packages/*/node_modules",
     "cards/*/tmp",
     "cards/*/dist",
-    "tmp"
+    "tmp",
   ]
 }

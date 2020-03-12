@@ -5,10 +5,25 @@
 process.env.BROCCOLI_ENABLED_MEMOIZE = 'true';
 
 const EmberApp = require('ember-cli/lib/broccoli/ember-app');
+const { spawn } = require('child_process');
+const path = require('path');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = function(defaults) {
+  // This is just a placeholder for starting the backend in our tests until we
+  // figure out how we want to do this for real.
+  if (!process.env.HUB_URL) {
+    console.log('Starting Cardstack Hub...'); // eslint-disable-line no-console
+    if (process.env.EMBER_ENV === 'test') {
+      process.env.PGDATABASE = `test_db_${Math.floor(100000 * Math.random())}`;
+      console.log(`  creating hub DB ${process.env.PGDATABASE}`); // eslint-disable-line no-console
+    }
+    let bin = path.resolve(path.join(__dirname, '..', '..', 'packages', 'hub', 'bin', 'cardstack-hub.js'));
+    spawn(process.execPath, [bin], { stdio: [0, 1, 2, 'ipc'] });
+  }
+
   let app = new EmberApp(defaults, {
+    hinting: false, // we are doing this as part of the project level linting
     prember: {
       // we're not pre-rendering any URLs yet, but we still need prember because
       // our deployment infrastructure already expects `_empty.html` to exist
@@ -56,34 +71,28 @@ module.exports = function(defaults) {
         {
           package: '@cardstack/cardhost',
           appModules: {
-            'components/card-renderer.js': {
+            'components/scaffold.js': {
               dependsOnComponents: [
-                '<Cards::Cardstack::BaseCard::Isolated/>',
-                '<Cards::Cardstack::BaseCard::Embedded/>',
-              ],
-            },
-            'components/field-renderer.js': {
-              dependsOnComponents: [
-                '<Fields::Cardstack::CoreTypes::StringViewer/>',
-                '<Fields::Cardstack::CoreTypes::StringEditor/>',
-                '<Fields::Cardstack::CoreTypes::IntegerViewer/>',
-                '<Fields::Cardstack::CoreTypes::IntegerEditor/>',
-                '<Fields::Cardstack::CoreTypes::DateViewer/>',
-                '<Fields::Cardstack::CoreTypes::DateEditor/>',
-                '<Fields::Cardstack::CoreTypes::BooleanViewer/>',
-                '<Fields::Cardstack::CoreTypes::BooleanEditor/>',
-                '<Fields::Cardstack::CoreTypes::CaseInsensitiveViewer/>',
-                '<Fields::Cardstack::CoreTypes::CaseInsensitiveEditor/>',
-                '<Fields::Cardstack::CoreTypes::BelongsToViewer/>',
-                '<Fields::Cardstack::CoreTypes::BelongsToEditor/>',
-                '<Fields::Cardstack::CoreTypes::HasManyViewer/>',
-                '<Fields::Cardstack::CoreTypes::HasManyEditor/>',
-                '<Fields::Cardstack::CoreTypes::DecorativeImageViewer/>',
-                '<Fields::Cardstack::CoreTypes::DecorativeImageEditor/>',
-                '<Fields::Cardstack::CoreTypes::CtaViewer/>',
-                '<Fields::Cardstack::CoreTypes::CtaEditor/>',
-                '<Fields::Cardstack::CoreTypes::LinkViewer/>',
-                '<Fields::Cardstack::CoreTypes::LinkEditor/>',
+                '<Scaffolding::Base::EmbeddedLayout/>',
+                '<Scaffolding::Base::IsolatedLayout/>',
+                '<Scaffolding::Base::FieldEditLayout/>',
+                '<Scaffolding::Base::FieldViewLayout/>',
+                '<Scaffolding::CallToActionField::FieldEditLayout/>',
+                '<Scaffolding::CallToActionField::FieldViewLayout/>',
+                '<Scaffolding::StringField::FieldEditLayout/>',
+                '<Scaffolding::StringField::FieldViewLayout/>',
+                '<Scaffolding::ImageReferenceField::FieldEditLayout/>',
+                '<Scaffolding::ImageReferenceField::FieldViewLayout/>',
+                '<Scaffolding::IntegerField::FieldEditLayout/>',
+                '<Scaffolding::IntegerField::FieldViewLayout/>',
+                '<Scaffolding::BooleanField::FieldEditLayout/>',
+                '<Scaffolding::BooleanField::FieldViewLayout/>',
+                '<Scaffolding::DateField::FieldEditLayout/>',
+                '<Scaffolding::DateField::FieldViewLayout/>',
+                '<Scaffolding::DatetimeField::FieldEditLayout/>',
+                '<Scaffolding::DatetimeField::FieldViewLayout/>',
+                '<Scaffolding::UrlField::FieldEditLayout/>',
+                '<Scaffolding::UrlField::FieldViewLayout/>',
               ],
             },
           },

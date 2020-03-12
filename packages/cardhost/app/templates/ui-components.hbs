@@ -123,7 +123,7 @@
 <Cta @variant="responsive primary secondary" @disabled=\{{true}}>Responsive Secondary Primary</Cta>' @language="html" />
 
     <h3>Preview Link Button</h3>
-    <PreviewLinkButton @model={{this.model}} />
+    <PreviewLinkButton @model={{this.model.card}} />
     <CodeEditor @code='<PreviewLinkButton @model=\{{card}} />' @language="html" />
 
     <h3>Edge Actions Button</h3>
@@ -185,19 +185,19 @@
     <h2>Mode Indicator (label and link)</h2>
     <div>
       <ModeIndicator
-        @card={{this.model}}
+        @card={{this.model.card}}
         @route="cards.card.view"
         @mode="edit"
         @linkTo="view" />
       <br>
       <ModeIndicator
-        @card={{this.model}}
+        @card={{this.model.card}}
         @route="cards.card.edit.layout"
         @mode="themer"
         @linkTo="layout" />
       <br>
       <ModeIndicator
-        @card={{this.card}}
+        @card={{this.model.card}}
         @route="cards.card.edit.fields"
         @mode="schema"
         @linkTo="edit" />
@@ -390,44 +390,70 @@
 
   <section class="ui-components--section ui-components--grid-2-col" id="right-edge">
     <h2>Right Edge</h2>
+    <h3>Field Selected</h3>
     <RightEdge
-      @selectedField={{this.model.isolatedFields.firstObject}}
+      @mode="schema"
+      @card={{this.model.card}}
+      @selectedField={{this.model.sampleName}}
       @selectField={{action this.noop}}
       @setFieldName={{this.noop}}
-      @setFieldLabel={{this.noop}}
-      @setFieldInstructions={{this.noop}}
+      @setFieldCardValue={{this.noop}}
+      @setCardValue={{this.noop}}
       @setNeededWhenEmbedded={{this.noop}} />
     <CodeEditor
       @code='<RightEdge
-  @selectedField=@selectedField
-  @selectField=@selectField
-  @setFieldName=@setFieldName
-  @setFieldLabel=@setFieldLabel
-  @setFieldInstructions=@setFieldInstructions
-  @setNeededWhenEmbedded=@setNeededWhenEmbedded />'  @language="html" />
+  @mode="schema"
+  @card=\{{@card}}
+  @parentCard=\{{@parentCard}}
+  @grandParentCard=\{{@grandParentCard}}
+  @selectedField=\{{@selectedField}}
+  @selectedFieldType=\{{@selectedFieldType}}
+  @selectField={{@selectField}}
+  @setFieldName=\{{@setFieldName}}
+  @setFieldCardValue=\{{@setFieldCardValue}}
+  @setCardValue=\{{@setCardValue}}
+  @setNeededWhenEmbedded=\{{@setNeededWhenEmbedded}} />'  @language="html" />
+
+    <h3>Card Selected</h3>
+    <RightEdge
+      @mode="schema"
+      @card={{this.model.card}}
+      @parentCard={{this.model.parentCard}}
+      @grandParentCard={{this.model.grandParentCard}}
+      @setCardValue={{this.noop}}
+      @cardSelected={{true}}
+    />
+    <CodeEditor
+      @code='<RightEdge
+  @mode="schema"
+  @card=\{{@card}}
+  @parentCard=\{{@parentCard}}
+  @grandParentCard=\{{@grandParentCard}}
+  @setCardValue=\{{@setCardValue}}
+  @cardSelected=\{{true}} />'  @language="html" />
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col" id="field-renderer">
     <h2>Field Renderer</h2>
     <h3>View mode</h3>
     <FieldRenderer
-      @field={{this.model.sampleLocationField}}
+      @field={{this.model.sampleLocation}}
       @format="isolated"
       @mode="view" />
     <CodeEditor
       @code='<FieldRenderer
-  @field=@field
+  @field=\{{@field}}
   @format="isolated"
   @mode="view" />' @language="html" />
 
     <h3>Schema mode</h3>
     <FieldRenderer
-        @field={{this.model.sampleNameField}}
+        @field={{this.model.sampleName}}
         @format="isolated"
         @mode="schema" />
     <CodeEditor
       @code='<FieldRenderer
-  @field=@field
+  @field=\{{@field}}
   @format="isolated"
   @mode="schema" />' @language="html" />
 
@@ -435,28 +461,28 @@
 
     <h4>String Editor</h4>
     <FieldRenderer
-      @field={{this.model.sampleTitleField}}
+      @field={{this.model.sampleTitle}}
       @format="isolated"
       @mode="edit"
-      @setFieldValue={{action this.noop}} />
+      @setCardValue={{perform this.noopTask}} />
     <CodeEditor
       @code='<FieldRenderer
-  @field=@field
+  @field=\{{@field}}
   @format="isolated"
   @mode="edit"
-  @setFieldValue=@setFieldValue />' @language="html" />
+  @setCardValue=\{{@setCardValue}} />' @language="html" />
 
     <h4>Date Editor</h4>
     <FieldRenderer
-      @field={{this.model.sampleDateField}}
+      @field={{this.model.sampleDate}}
       @format="isolated"
       @mode="edit"
-      @setFieldValue={{action this.noop}} />
+      @setCardValue={{perform this.noopTask}} />
     <CodeEditor @code='<FieldRenderer
-  @field=@field
+  @field=\{{@field}}
   @format="isolated"
   @mode="edit"
-  @setFieldValue=@setFieldValue />' @language="html" />
+  @setCardValue=\{{@setCardValue}} />' @language="html" />
 
     <h4>Textarea</h4>
     <div class="ui-components--notes">
@@ -476,68 +502,69 @@
       <p>Note: Currently this icon only appears if the field name is <code>address</code> or <code>location</code>.</p>
     </div>
     <FieldRenderer
-      @field={{this.model.sampleLocationField}}
+      @field={{this.model.sampleLocation}}
       @format="isolated"
       @mode="edit"
-      @setFieldValue={{action this.noop}} />
+      @setCardValue={{perform this.noopTask}} />
     <CodeEditor @code='<FieldRenderer
   @field=\{{@field}}
   @format="isolated"
   @mode="edit"
-  @setFieldValue=\{{@setFieldValue}} />' @language="html" />
+  @setCardValue=\{{@setCardValue}} />' @language="html" />
 
     <h4>Image</h4>
     <div class="ui-components--notes">
       <p>Currently this is just rendering a <code>TextField</code> component.</p>
     </div>
     <FieldRenderer
-      @field={{this.model.sampleImageField}}
+      @field={{this.model.sampleImage}}
       @format="isolated"
       @mode="edit"
-      @setFieldValue={{action this.noop}} />
+      @setCardValue={{perform this.noopTask}} />
     <CodeEditor @code='<FieldRenderer
   @field=\{{@field}}
   @format="isolated"
   @mode="edit"
-  @setFieldValue=\{{@setFieldValue}} />' @language="html" />
+  @setCardValue=\{{@setCardValue}} />' @language="html" />
   </section>
 
+  {{!-- using 3 different cards below because a card cant be in more than one mode simulanteously --}}
   <section class="ui-components--section ui-components--grid-2-col" id="card-renderer">
     <h2>Card Renderer</h2>
       <h3>Schema mode</h3>
       <CardRenderer
-        @card={{this.model}}
+        @card={{this.model.card}}
         @format="isolated"
         @mode="schema"
         @setPosition={{action this.noop}}
-        @removeField={{action this.noop}} />
+        @removeField={{perform this.noopTask}} />
       <CodeEditor @code='<CardRenderer
-  @card=@card
+  @card=\{{@card}}
   @format="isolated"
   @mode="schema"
-  @setPosition=@setPosition
-  @removeField=@removeField />' @language="html" />
+  @setPosition=\{{@setPosition}}
+  @removeField=\{{@removeField}} />' @language="html" />
 
       <h3>Edit mode</h3>
       <CardRenderer
-        @card={{this.model}}
+        @card={{this.model.card2}}
         @format="isolated"
         @mode="edit"
-        @setFieldValue={{action this.noop}}
+        @setCardValue={{perform this.noopTask}}
       />
       <CodeEditor @code='<CardRenderer
-  @card=@card
+  @card=\{{@card}}
   @format="isolated"
   @mode="edit"
-  @setFieldValue=@setFieldValue />' @language="html" />
+  @setCardValue=\{{@setCardValue}} />' @language="html" />
 
       <h3>View mode</h3>
       <CardRenderer
-        @card={{this.model}}
+        @card={{this.model.card3}}
         @format="isolated"
         @mode="view" />
       <CodeEditor @code='<CardRenderer
-  @card=@card
+  @card=\{{@card}}
   @format="isolated"
   @mode="view" />' @language="html" />
   </section>

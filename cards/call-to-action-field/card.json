@@ -1,0 +1,17 @@
+{
+  "data": {
+    "type": "cards",
+    "attributes": {
+      "csTitle": "Button link",
+      "csDescription": "Call to action"
+    },
+    "relationships": {
+      "csAdoptsFrom": {
+        "data": {
+          "type": "cards",
+          "id": "https://base.cardstack.com/public/cards/url-field"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,168 @@
+/* This is the embedded base card template. All cards will inherit this CSS if
+no custom CSS is provided for the card.*/
+
+/* Embedded card default styles */
+.card-boundary {
+  width: 100%;
+  margin: 0;
+  background-color: white;
+  color: black;
+  font: 400 10px/1.2 'Open Sans';
+  letter-spacing: 0.03em;
+  text-align: left;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.card-boundary .embedded-card--view-fields {
+  display: grid; /* Helpful for ordering fields */
+}
+.card-boundary .embedded-card--view-fields::before,
+.card-boundary .embedded-card--view-fields::after {
+  height: 0; /* for firefox */
+}
+
+.card-boundary .field {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  grid-gap: 0 10px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 15px 15px;
+}
+.card-boundary .field.field-type-belongs-to-view-field,
+.card-boundary .field:first-of-type {
+  padding-top: 15px;
+}
+
+.card-boundary .label {
+  padding-bottom: 4px;
+  color: var(--black);
+  font-size: 7px;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  line-height: 1.364;
+  text-transform: uppercase;
+}
+
+
+/**** SPECIAL CORE TYPES ****/
+/* has-many and belongs-to field values, which are embedded cards, are full-width by default */
+
+/* type: link */
+/* use `label` for link text and `value` for link url */
+.card-boundary .link-viewer {
+  color: var(--cobalt-blue);
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+/* type: cta */
+/* use `label` for button text and `value` for button link url */
+.card-boundary .cta-viewer {
+  min-height: 30px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: calc(22 / 15);
+  letter-spacing: 0.03em;
+  padding-top: 11px;
+  padding-bottom: 11px;
+}
+
+/* type: decorative-image */
+.card-boundary .decorative-image-viewer {
+  max-height: 50px;
+}
+
+
+/**** SPECIAL FIELD NAMES ****/
+
+/* full-width by default */
+.card-boundary .title-field,
+.card-boundary .highlight-title-field,
+.card-boundary .background-image-field,
+.card-boundary .body-field,
+.card-boundary .divider-field {
+  display: block;
+}
+
+/* label hidden by default */
+.card-boundary .title-label,
+.card-boundary .highlight-title-label,
+.card-boundary .background-image-label,
+.card-boundary .body-label,
+.card-boundary .divider-label,
+.card-boundary .title-logo-label {
+  display: none;
+}
+
+.card-boundary .title-logo-field,
+.card-boundary .divider-value {
+  display: none;
+}
+
+/* field-name: background-image */
+.card-boundary .background-image-field {
+  max-width: 100%;
+  padding: 0;
+  order: -100; /* first item on page */
+}
+.card-boundary .background-image-value {
+  width: 100%;
+  max-height: 75px;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* field-name: title */
+.card-boundary .title-field {
+  padding-bottom: 7px;
+}
+.card-boundary .title-value {
+  color: var(--dark-gray);
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 0.015em;
+  line-height: 1.2;
+}
+
+/* field-name: highlight-title */
+.card-boundary .highlight-title-value {
+  color: var(--red);
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 0.035em;
+  text-transform: capitalize;
+}
+
+/* field-name: divider */
+.card-boundary .divider-field {
+  width: calc(100% - 30px);
+  border-top: 1px solid var(--light-gray);
+}
+
+
+/* Product card */
+.card-boundary .product-rating-field,
+.card-boundary .product-ranking-field,
+.card-boundary .field.product-link-field {
+  display: none;
+}
+
+
+/* Photo card */
+.card-boundary .photo-image-url-field {
+  display: block;
+}
+.card-boundary .photo-image-url-label {
+  display: none;
+}
+.card-boundary .photo-image-url-value {
+  width: 100%;
+  max-height: 130px;
+  margin: 0 auto;
+  object-fit: cover;
+  object-position: top center;
+}

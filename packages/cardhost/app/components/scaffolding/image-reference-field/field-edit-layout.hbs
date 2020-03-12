@@ -1,0 +1,7 @@
+<TextField
+  @className="decorative-image-url-input"
+  @label={{@card.csTitle}}
+  @helperText={{@card.csDescription}}
+  @value={{this.fieldValue}}
+  @setValue={{perform this.updateFieldValue}}
+  data-test-edit-field={{@card.name}} />

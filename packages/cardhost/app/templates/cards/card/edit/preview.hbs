@@ -1,14 +1,11 @@
-<section class="card-renderer--container" data-test-card-view={{this.model.name}}>
+<section class="card-renderer--container" data-test-card-preview={{this.model.card.canonicalURL}}>
   <div class="card-renderer--inner-container preview-container">
     <CardRenderer
-      @card={{this.model}}
+      @card={{this.model.card}}
       @format="isolated"
       @mode="view"
       @class="preview"
+      @suppressHeader={{true}}
       @cardSelected={{false}} />
   </div>
 </section>
-
-<style data-test-view-css>
-  {{scope-css this.model.isolatedCss this.model.name}}
-</style>

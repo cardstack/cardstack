@@ -1,0 +1,14 @@
+{{#each this.cssEntries as |cssEntry|}}
+  {{#let (get cssEntry 0) as |css|}}
+    {{#let (get cssEntry 1) as |source|}}
+      <style
+        data-test-css-format={{source.format}}
+        data-test-css-cards={{replace-all (stringify (uniq (map source.cards this.cardEntryMap))) "\""}}
+      >
+        {{#if css}}
+          {{scope-css css source.cards source.format}}
+        {{/if}}
+      </style>
+    {{/let}}
+  {{/let}}
+{{/each}}

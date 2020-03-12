@@ -1,11 +1,12 @@
+const ts = require('./-ts');
 module.exports = {
   root: true,
-  parser: 'babel-eslint',
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2018,
     sourceType: 'module',
   },
-  plugins: ['ember', 'prettier'],
+  plugins: ['ember', '@typescript-eslint', 'prettier'],
   extends: ['eslint:recommended', 'plugin:ember/recommended'],
   env: {
     browser: true,
@@ -14,7 +15,13 @@ module.exports = {
   rules: {
     'no-restricted-globals': [2, 'find'],
     'keyword-spacing': [2],
+    'no-constant-condition': ['error', { checkLoops: false }],
 
     'prettier/prettier': 'error',
   },
+  overrides: [
+    Object.assign({}, ts, {
+      files: ['**/*.ts'],
+    }),
+  ],
 };

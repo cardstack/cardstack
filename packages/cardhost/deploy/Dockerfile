@@ -1,4 +1,4 @@
-FROM node:10
+FROM node:12
 WORKDIR /srv/hub
 
 COPY dep-layer/ ./
@@ -24,15 +24,16 @@ RUN BUILD_ONLY=true yarn install \
   && yarn cache clean
 
 COPY code-layer/ ./
+RUN ./node_modules/.bin/tsc
 
 # This service helps you easily access Docker container logs.
 # Log file emitters can be managed in PaperTrail's dashboard.
 RUN curl -L https://github.com/papertrail/remote_syslog2/releases/download/v0.20/remote-syslog2_0.20_amd64.deb -o remote-syslog2.deb \
- && dpkg -i ./remote-syslog2.deb \
- && apt-get install -f \
- && rm ./remote-syslog2.deb
+  && dpkg -i ./remote-syslog2.deb \
+  && apt-get install -f \
+  && rm ./remote-syslog2.deb
 RUN mkdir -p /srv/hub/logs \
-&& echo '\
+  && echo '\
 files: \n\
  - /srv/hub/logs/node.log\n\
 destination:\n\
@@ -42,9 +43,9 @@ destination:\n\
 pid_file: /var/run/remote_syslog.pid'\
 > /etc/log_files.yml
 
-CMD remote_syslog --hostname "${TARGET_ENV:-unknown_env}_$(hostname)" && yarn start-hub 2>&1 | tee -a /srv/hub/logs/node.log
+CMD remote_syslog --hostname "${TARGET_ENV:-unknown_env}_$(hostname)" && ./node_modules/@cardstack/hub/bin/cardstack-hub.js 2>&1 | tee -a /srv/hub/logs/node.log
 
-# Change this if your content-types are not publically readable.
 # This configuration will cause the container to restart after
 # 30 seconds without a successful response.
-HEALTHCHECK --interval=30s --timeout=30s --start-period=30s --retries=3 CMD curl -f -H "Accept:application/vnd.api+json" http://localhost:3000/api/content-types || exit 1
+HEALTHCHECK --interval=30s --timeout=30s --start-period=30s --retries=3 CMD curl -f -H "Accept:application/vnd.api+json" \
+  "http://localhost:3000/api/cards?page%5Bsize%5D=1" || exit 1

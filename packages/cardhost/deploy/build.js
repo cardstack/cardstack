@@ -8,7 +8,7 @@ const root = resolve(join(__dirname, '..'));
 const specialBranches = ['master', 'production'];
 const context = join(root, 'deploy/context');
 const depLayerFiles = ['package.json'];
-const codeLayerFiles = ['cardstack', 'config', 'app', 'public', 'ember-cli-build.js', '.ember-cli.js'];
+const codeLayerFiles = ['config', 'app', 'public', 'ember-cli-build.js', '.ember-cli.js'];
 
 emptyDirSync(context);
 copySync(join(root, 'deploy/Dockerfile'), join(context, 'Dockerfile'));
@@ -24,7 +24,7 @@ copySync(join(root, 'package.json'), join(context, 'dep-layer/package.json'));
 copySync(join(`${root}/../..`, 'yarn.lock'), join(context, 'dep-layer/yarn.lock'));
 
 // code-layer contains everything else, which is much cheaper to rebuild (no yarn install)
-copySync(join(root, 'cardstack'), join(context, 'code-layer/cardstack'));
+copySync(join(root, 'deploy', 'tsconfig.json'), join(context, 'code-layer/tsconfig.json'));
 codeLayerFiles.forEach(serverFile => {
   glob.sync(join(root, serverFile)).forEach(filename => {
     copySync(filename, join(context, 'code-layer', filename.replace(root, '')));

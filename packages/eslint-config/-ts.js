@@ -4,6 +4,12 @@ module.exports = {
     // "unsupported", even though we're transpiling them first.
     'node/no-unsupported-features': 'off',
 
+    // Type overloads cause false positives. typescript errors on duplicates, so
+    // this doesn't need to be replaced.
+    'no-dupe-class-members': 'off',
+
+    semi: 'off',
+    '@typescript-eslint/semi': ['error'],
     '@typescript-eslint/adjacent-overload-signatures': 'error',
     '@typescript-eslint/array-type': 'error',
     '@typescript-eslint/ban-types': 'error',
@@ -13,19 +19,18 @@ module.exports = {
     indent: 'off',
     '@typescript-eslint/indent': 'off',
     '@typescript-eslint/member-delimiter-style': 'error',
-    '@typescript-eslint/no-angle-bracket-type-assertion': 'error',
+    '@typescript-eslint/consistent-type-assertions': 'error',
     'no-array-constructor': 'off',
     '@typescript-eslint/no-array-constructor': 'error',
     '@typescript-eslint/no-empty-interface': 'error',
     '@typescript-eslint/no-inferrable-types': 'error',
     '@typescript-eslint/no-misused-new': 'error',
     '@typescript-eslint/no-namespace': 'error',
-    '@typescript-eslint/no-object-literal-type-assertion': 'error',
-    '@typescript-eslint/no-triple-slash-reference': 'error',
+    '@typescript-eslint/triple-slash-reference': 'error',
     'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': 'error',
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/no-var-requires': 'error',
-    '@typescript-eslint/prefer-interface': 'error',
+    '@typescript-eslint/consistent-type-definitions': 'error',
     '@typescript-eslint/prefer-namespace-keyword': 'error',
     '@typescript-eslint/type-annotation-spacing': 'error',
     '@typescript-eslint/no-require-imports': 'error',

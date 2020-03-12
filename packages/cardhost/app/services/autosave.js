@@ -5,76 +5,97 @@ import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 import { restartableTask, enqueueTask } from 'ember-concurrency-decorators';
 import { timeout } from 'ember-concurrency';
+import { set } from '@ember/object';
 import ENV from '@cardstack/cardhost/config/environment';
-import moment from 'moment';
 
 const { autosaveDebounce, autosaveDisabled, environment } = ENV;
 const AUTOSAVE_DEBOUNCE = 5000;
 
 export default class AutosaveService extends Service {
-  @service router;
-  @service cardstackSession;
-  @service cardLocalStorage;
-
+  @service data;
+  @tracked model;
   @tracked hasError;
-  @tracked lastSavedTime = moment();
 
   // These are properties of the service so that we can change them to true for service-specific tests.
   autosaveDisabled = autosaveDisabled;
   autosaveDebounce = autosaveDebounce || AUTOSAVE_DEBOUNCE;
 
+  @enqueueTask
+  *setCardModel(model) {
+    if (this.debounceAndSave.isRunning && this.saveCard.isIdle) {
+      this.debounceAndSave.last.cancel();
+      yield this.saveCard.perform();
+      this.model = model;
+    } else if (this.debounceAndSave.isRunning && this.saveCard.isRunning) {
+      yield this.saveCard.last.then();
+      this.model = model;
+    } else {
+      this.model = model;
+    }
+  }
+
+  bindCardUpdated(cardUpdatedFn) {
+    this._cardUpdatedFn = cardUpdatedFn;
+  }
+
+  cardUpdated(updatedCard) {
+    if (typeof this._cardUpdatedFn === 'function') {
+      this._cardUpdatedFn(updatedCard, true);
+    }
+    this.kickoff();
+  }
+
+  get isDirty() {
+    return this.model ? this.model.isDirty : undefined;
+  }
+
+  get card() {
+    return this.model ? this.model.card : undefined;
+  }
+
   // This task needs to be queued, otherwise we will get
   // 409 conflicts with the `/meta/version`
   @enqueueTask
-  *saveCard(card) {
+  *saveCard() {
     this.statusMsg = null;
 
+    let savedCard;
     try {
-      yield card.save();
-      // remove the next line once we have progressive data handling
-      this.cardLocalStorage.addRecentCardId(card.id);
-      this.hasError = false;
-      this.lastSavedTime = moment();
+      if (!this.card) {
+        throw new Error(`autosave service was never initialized with a card model when card route was entered`);
+      }
+      savedCard = yield this.data.save(this.card);
     } catch (e) {
-      this.handleSaveError(e, card);
+      console.error(e); // eslint-disable-line no-console
+      this.hasError = true;
+      this.statusMsg = `card ${this.card.csTitle} was NOT successfully created: ${e.message}`;
       return;
     }
+
+    this._cardUpdatedFn(savedCard, false);
+
+    // Make sure queued card saves have latest version number
+    set(this.model, 'card', yield this.card.patch({ data: { type: 'cards', meta: savedCard.meta } })); // This is not ideal, please save us orbit...
   }
 
   @restartableTask
-  *debounceAndSave(card) {
+  *debounceAndSave() {
+    yield this.setCardModel.last.then();
     // The maximum frequency of save requests is enforced here
     yield timeout(this.autosaveDebounce);
-    yield this.saveCard.perform(card);
+    yield this.saveCard.perform();
   }
 
   @action
-  kickoff(el, [isDirty, card]) {
+  kickoff() {
     this.hasError = false; // if there's an error and a user switches cards, wipe out error state
-    this.lastSavedTime = moment();
 
-    if (environment === 'test' && this.autosaveDisabled === true) {
-      // In most tests, we call _saveOnceInTests explcitly and pass it _card, instead of using autosave
-      this._card = card;
+    if (environment === 'test' && this.autosaveDisabled) {
       return;
     }
 
-    if (isDirty && !this.autosaveDisabled) {
-      this.debounceAndSave.perform(card);
+    if (this.cardUpdated && this.card && this.isDirty && !this.autosaveDisabled) {
+      this.debounceAndSave.perform();
     }
-  }
-
-  @action
-  _saveOnceInTests() {
-    // This skips debouncing. Only use it for "click to save" type tests
-    // where autosave cannot be used, i.e. tests that make multiple changes to a card
-    this.saveCard.perform(this._card);
-  }
-
-  @action
-  handleSaveError(e, card) {
-    console.error(e); // eslint-disable-line no-console
-    this.statusMsg = `card ${card.name} was NOT successfully created: ${e.message}`;
-    this.hasError = true;
   }
 }

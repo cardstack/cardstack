@@ -3,55 +3,88 @@ import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import { task } from 'ember-concurrency';
-import ENV from '@cardstack/cardhost/config/environment';
+import { getUserRealm } from '../utils/scaffolding';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
-const { environment } = ENV;
+const catalogEntry = Object.freeze({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'catalog-entry' });
+const cardCatalogRealm = 'https://cardstack.com/api/realms/card-catalog';
+// TODO need to think through pagination on the library page...
+const size = 100;
 
 export default class LibraryService extends Service {
-  @service cardLocalStorage;
   @service data;
 
   @tracked visible = false;
   @tracked recentCards;
+  @tracked templateEntries;
+  @tracked featuredEntries;
 
   constructor(...args) {
     super(...args);
 
-    this.getRecentCardsTask.perform();
+    this.load.perform();
   }
 
   @task(function*() {
-    let ids = this.cardLocalStorage.getRecentCardIds();
-
-    let recent = [];
-
-    for (let id of ids) {
-      // unshift so that latest cards go to the front
-      // Replace with datetime check in the future
-      recent.unshift(
-        yield this.data.getCard(id, 'embedded').catch(err => {
-          // if there is a 404'd card in local storage, clear them
-          if (err.message.includes('404')) {
-            this.cardLocalStorage.clearIds();
-            if (environment !== 'test') {
-              // needed because otherwise the app remains in a broken state
-              window.location.reload();
-            }
-          } else {
-            throw err;
-          }
-        })
-      );
-    }
-
-    if (environment === 'development') {
-      // prime the store with seed models
-      recent.push(yield this.data.getCard('local-hub::why-doors', 'embedded'));
-    }
-
-    this.recentCards = recent;
+    return yield this.data.search(
+      {
+        filter: {
+          type: { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' },
+          eq: {
+            csRealm: getUserRealm(),
+          },
+        },
+        sort: '-csCreated',
+        page: { size },
+      },
+      { includeFieldSet: 'embedded' }
+    );
   })
-  getRecentCardsTask;
+  loadUserRealm;
+
+  @task(function*() {
+    let [recentCards, templateEntries, featuredEntries] = yield Promise.all([
+      this.loadUserRealm.perform(),
+      this.data.search(
+        {
+          filter: {
+            type: catalogEntry,
+            eq: {
+              csRealm: cardCatalogRealm,
+              type: 'template',
+            },
+          },
+          // Note that we are sorting these items on the date the catalog entry
+          // was created, not on the date that the underlying card was created
+          // (which is simple to change if that's what we want).
+          sort: '-csCreated',
+          page: { size },
+        },
+        { includeFieldSet: 'embedded' }
+      ),
+      this.data.search(
+        {
+          filter: {
+            type: catalogEntry,
+            eq: {
+              csRealm: cardCatalogRealm,
+              type: 'featured',
+            },
+          },
+          // Note that we are sorting these items on the date the catalog entry
+          // was created, not on the date that the underlying card was created
+          // (which is simple to change if that's what we want).
+          sort: '-csCreated',
+          page: { size },
+        },
+        { includeFieldSet: 'isolated' }
+      ),
+    ]);
+    this.recentCards = recentCards;
+    this.templateEntries = templateEntries;
+    this.featuredEntries = featuredEntries;
+  })
+  load;
 
   @action
   show() {

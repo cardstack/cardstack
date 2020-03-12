@@ -1,0 +1,17 @@
+{
+  "data": {
+    "type": "cards",
+    "attributes": {
+      "csTitle": "Date",
+      "csDescription": "Date field (e.g. date of birth)",
+      "csFeatures": {
+        "field-buildValueExpression": ["field-hooks.js", "buildValueExpression"],
+        "field-validate": ["field-hooks.js", "validate"],
+        "field-deserialize": ["field-hooks.js", "deserialize"]
+      }
+    },
+    "relationships": {
+
+    }
+  }
+}

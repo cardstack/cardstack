@@ -1,56 +1,78 @@
-import { module, test } from 'qunit';
-import { find, visit, currentURL, click, waitFor } from '@ember/test-helpers';
+import { module, test, skip } from 'qunit';
+import { find, visit, currentURL, click } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import { percySnapshot } from 'ember-percy';
-import Fixtures from '@cardstack/test-support/fixtures';
-import { setFieldValue, createCards, saveCard } from '@cardstack/test-support/card-ui-helpers';
-import { setupMockUser, login } from '../helpers/login';
+import Fixtures from '../helpers/fixtures';
+import {
+  setFieldValue,
+  saveCard,
+  waitForCardLoad,
+  encodeColons,
+  waitForCardAutosave,
+  waitForTestsToEnd,
+} from '../helpers/card-ui-helpers';
+import { login } from '../helpers/login';
+import { cardDocument } from '@cardstack/core/card-document';
+import { myOrigin } from '@cardstack/core/origin';
 
-const card1Id = 'millenial-puppies';
-const qualifiedCard1Id = `local-hub::${card1Id}`;
-const card2Id = 'van-gogh';
-const qualifiedCard2Id = `local-hub::${card2Id}`;
-const card3Id = 'hassan';
-const qualifiedCard3Id = `local-hub::${card3Id}`;
-
-const timeout = 5000;
-
+const csRealm = `${myOrigin}/api/realms/default`;
+const author = cardDocument().withAutoAttributes({
+  csRealm,
+  csId: 'vangogh',
+  name: 'Van Gogh',
+});
+const testCard = cardDocument()
+  .withAttributes({
+    csRealm,
+    csId: 'millenial-puppies',
+    csTitle: 'Millenial Puppies',
+    csFieldSets: {
+      isolated: ['body', 'likes', 'published', 'author', 'appointment', 'birthday', 'link', 'image', 'cta'],
+    },
+    likes: 100,
+    birthday: '2019-10-30',
+    appointment: '2020-03-07T14:00:00.000Z',
+    body: 'test body',
+    published: true,
+  })
+  .withField('body', 'string-field')
+  .withField('likes', 'integer-field')
+  .withField('published', 'boolean-field')
+  .withField('birthday', 'date-field')
+  .withField('appointment', 'datetime-field')
+  .withField('link', 'url-field', 'singular', { csTitle: 'Awesome Link' })
+  .withField('cta', 'call-to-action-field', 'singular', { csTitle: 'Call to action' })
+  .withField('image', 'image-reference-field', 'singular', { csTitle: 'Awesome Image' })
+  .withField('author', 'base');
+const cardPath = encodeURIComponent(testCard.canonicalURL);
 const scenario = new Fixtures({
-  create(factory) {
-    setupMockUser(factory);
-  },
-  destroy() {
-    return [
-      { type: 'cards', id: qualifiedCard1Id },
-      { type: 'cards', id: qualifiedCard2Id },
-      { type: 'cards', id: qualifiedCard3Id },
-    ];
-  },
+  create: [author, testCard],
 });
 
 module('Acceptance | card edit', function(hooks) {
   setupApplicationTest(hooks);
   scenario.setupTest(hooks);
-  hooks.beforeEach(function() {
-    this.owner.lookup('service:data')._clearCache();
-    this.owner.lookup('service:card-local-storage').clearIds();
+
+  hooks.beforeEach(async function() {
+    await login();
+  });
+  hooks.afterEach(async function() {
+    await waitForTestsToEnd();
   });
 
   test(`setting a string field`, async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [['body', 'string', false, 'test body']],
-    });
-    await visit(`/cards/${card1Id}/edit/fields`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+    await visit(`/cards/${cardPath}/edit/fields`);
+    await waitForCardLoad();
+
+    assert.equal(currentURL(), `/cards/${cardPath}/edit/fields`);
 
     await setFieldValue('body', 'updated body');
-
     await saveCard();
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${cardPath}/edit/fields`);
 
-    await visit(`/cards/${card1Id}`);
+    await visit(`/cards/${cardPath}`);
+    await waitForCardLoad();
     assert.dom('[data-test-field="body"] [data-test-string-field-viewer-value]').hasText(`updated body`);
 
     let cardJson = find('[data-test-card-json]').innerHTML;
@@ -58,67 +80,109 @@ module('Acceptance | card edit', function(hooks) {
     assert.equal(card.data.attributes.body, `updated body`);
   });
 
-  test('setting a case-insensitive field', async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [['email', 'case-insensitive string', false, 'vangogh@nowhere.dog']],
-    });
-    await visit(`/cards/${card1Id}/edit/fields`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+  test('setting a date field', async function(assert) {
+    await visit(`/cards/${cardPath}/edit/fields`);
+    await waitForCardLoad();
 
-    await setFieldValue('email', 'hassan@nowhere.dog');
-
+    await setFieldValue('birthday', '2016-11-19');
     await saveCard();
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
-
-    await visit(`/cards/${card1Id}`);
-    assert
-      .dom('[data-test-field="email"] [data-test-case-insensitive-field-viewer-value]')
-      .hasText(`hassan@nowhere.dog`);
+    await visit(`/cards/${cardPath}`);
+    await waitForCardLoad();
+    assert.dom('[data-test-field="birthday"] [data-test-date-field-viewer-value]').hasText(`November 19, 2016`);
 
     let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
-    assert.equal(card.data.attributes.email, `hassan@nowhere.dog`);
+    assert.equal(card.data.attributes.birthday, `2016-11-19`);
   });
 
-  test('setting a date field', async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [['created', 'date', false, '2019-10-07']],
-    });
-    await visit(`/cards/${card1Id}/edit/fields`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+  test('setting a datetime field', async function(assert) {
+    await visit(`/cards/${cardPath}/edit/fields`);
+    await waitForCardLoad();
 
-    await setFieldValue('created', '2019-10-08');
-
+    await setFieldValue('appointment', '2020-03-07T13:00');
     await saveCard();
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
-
-    await visit(`/cards/${card1Id}`);
-    assert.dom('[data-test-field="created"] [data-test-date-field-viewer-value]').hasText(`October 8, 2019`);
+    await visit(`/cards/${cardPath}`);
+    await waitForCardLoad();
+    assert
+      .dom('[data-test-field="appointment"] [data-test-datetime-field-viewer-value]')
+      .hasText(`March 7, 2020 1:00pm`);
 
     let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
-    assert.equal(card.data.attributes.created, `2019-10-08`);
+    assert.equal(card.data.attributes.appointment, new Date('2020-03-07T13:00').toISOString());
+  });
+
+  test('setting a url field', async function(assert) {
+    await visit(`/cards/${cardPath}/edit/fields`);
+    await waitForCardLoad();
+
+    await setFieldValue('link', 'https://cardstack.com');
+    await saveCard();
+
+    await visit(`/cards/${cardPath}`);
+    await waitForCardLoad();
+    assert.dom('[data-test-field="link"] [data-test-link-field-viewer-value]').hasText(`Awesome Link`);
+    assert
+      .dom('[data-test-field="link"] [data-test-link-field-viewer-value]')
+      .hasAttribute('href', 'https://cardstack.com/');
+
+    let cardJson = find('[data-test-card-json]').innerHTML;
+    let card = JSON.parse(cardJson);
+    assert.equal(card.data.attributes.link, 'https://cardstack.com');
+  });
+
+  test('setting a call-to-action field', async function(assert) {
+    await visit(`/cards/${cardPath}/edit/fields`);
+    await waitForCardLoad();
+
+    await setFieldValue('cta', 'https://cardstack.com');
+    await saveCard();
+
+    await visit(`/cards/${cardPath}`);
+    await waitForCardLoad();
+    assert.dom('[data-test-field="cta"] [data-test-cta-field-viewer-value]').hasText(`Call to action`);
+    assert
+      .dom('[data-test-field="cta"] [data-test-cta-field-viewer-value]')
+      .hasAttribute('href', 'https://cardstack.com/');
+
+    let cardJson = find('[data-test-card-json]').innerHTML;
+    let card = JSON.parse(cardJson);
+    assert.equal(card.data.attributes.cta, 'https://cardstack.com');
+  });
+
+  test('setting an image reference field', async function(assert) {
+    const imageURL =
+      'https://resources.cardstack.com/assets/images/contributors/jen-c80f27e85c9404453b8c65754694619e.jpg';
+
+    await visit(`/cards/${cardPath}/edit/fields`);
+    await waitForCardLoad();
+
+    await setFieldValue('image', imageURL);
+    await saveCard();
+
+    await visit(`/cards/${cardPath}`);
+    await waitForCardLoad();
+    assert.dom('[data-test-field="image"] [data-test-image-reference-field-viewer-label]').hasText(`Awesome Image`);
+    assert
+      .dom('[data-test-field="image"] [data-test-image-reference-field-viewer-value]')
+      .hasAttribute('src', imageURL);
+
+    let cardJson = find('[data-test-card-json]').innerHTML;
+    let card = JSON.parse(cardJson);
+    assert.equal(card.data.attributes.image, imageURL);
   });
 
   test('setting an integer field', async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [['likes', 'integer', false, 100]],
-    });
-    await visit(`/cards/${card1Id}/edit/fields`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+    await visit(`/cards/${cardPath}/edit/fields`);
+    await waitForCardLoad();
 
     await setFieldValue('likes', 110);
-
     await saveCard();
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
-
-    await visit(`/cards/${card1Id}`);
+    await visit(`/cards/${cardPath}`);
+    await waitForCardLoad();
     assert.dom('[data-test-field="likes"] [data-test-integer-field-viewer-value]').hasText(`110`);
 
     let cardJson = find('[data-test-card-json]').innerHTML;
@@ -127,20 +191,14 @@ module('Acceptance | card edit', function(hooks) {
   });
 
   test('setting a boolean field', async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [['published', 'boolean', false, true]],
-    });
-    await visit(`/cards/${card1Id}/edit/fields`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+    await visit(`/cards/${cardPath}/edit/fields`);
+    await waitForCardLoad();
 
     await setFieldValue('published', false);
-
     await saveCard();
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
-
-    await visit(`/cards/${card1Id}`);
+    await visit(`/cards/${cardPath}`);
+    await waitForCardLoad();
     assert.dom('[data-test-field="published"] [data-test-boolean-field-viewer-value]').hasText(`No`);
 
     let cardJson = find('[data-test-card-json]').innerHTML;
@@ -148,194 +206,54 @@ module('Acceptance | card edit', function(hooks) {
     assert.equal(card.data.attributes.published, false);
   });
 
-  test('setting a has-many cards field', async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [['reviewers', 'related cards', true, `${card3Id}`]],
-      [card2Id]: [
-        ['name', 'string', true, 'Van Gogh'],
-        ['email', 'case-insensitive string', false, 'vangogh@nowhere.dog'],
-      ],
-      [card3Id]: [
-        ['name', 'string', true, 'Hassan Abdel-Rahman'],
-        ['email', 'case-insensitive string', false, 'hassan@nowhere.dog'],
-      ],
-    });
-    await visit(`/cards/${card1Id}/edit/fields`);
+  test(`setting a base card field as reference with singular arity`, async function(assert) {
+    await visit(`/cards/${cardPath}/edit/fields`);
+    await waitForCardLoad();
 
-    await setFieldValue('reviewers', `${card2Id},${card3Id}`);
-
+    await setFieldValue('author', author.canonicalURL);
     await saveCard();
 
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
-
-    await visit(`/cards/${card1Id}`);
+    await visit(`/cards/${cardPath}`);
+    await waitForCardLoad();
+    await waitForCardLoad(author.canonicalURL);
     assert
       .dom(
-        `[data-test-field="reviewers"] [data-test-embedded-card="${card2Id}"] [data-test-field="name"] [data-test-string-field-viewer-value]`
+        `[data-test-field="author"] [data-test-embedded-card="${author.canonicalURL}"] [data-test-field="name"] [data-test-string-field-viewer-value]`
       )
       .hasText('Van Gogh');
-    assert
-      .dom(
-        `[data-test-field="reviewers"] [data-test-embedded-card="${card3Id}"] [data-test-field="name"] [data-test-string-field-viewer-value]`
-      )
-      .hasText('Hassan Abdel-Rahman');
-    assert.deepEqual(
-      [...document.querySelectorAll(`[data-test-field="reviewers"] [data-test-embedded-card]`)].map(i =>
-        i.getAttribute('data-test-embedded-card')
-      ),
-      [card2Id, card3Id]
-    );
-    assert
-      .dom(`[data-test-field="reviewers"] [data-test-embedded-card="${card2Id}"] [data-test-field="email"]`)
-      .doesNotExist();
-    assert
-      .dom(`[data-test-field="reviewers"] [data-test-embedded-card="${card3Id}"] [data-test-field="email"]`)
-      .doesNotExist();
 
     let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
-    assert.deepEqual(card.data.relationships.reviewers.data, [
-      { type: 'cards', id: qualifiedCard2Id },
-      { type: 'cards', id: qualifiedCard3Id },
-    ]);
-    let userCard1 = card.included.find(i => `${i.type}/${i.id}` === `cards/${qualifiedCard2Id}`);
-    assert.equal(userCard1.attributes.name, 'Van Gogh');
-    assert.equal(userCard1.attributes.email, undefined);
-    let userCard2 = card.included.find(i => `${i.type}/${i.id}` === `cards/${qualifiedCard3Id}`);
-    assert.equal(userCard2.attributes.name, 'Hassan Abdel-Rahman');
-    assert.equal(userCard2.attributes.email, undefined);
+    assert.deepEqual(card.data.relationships.author.data, { type: 'cards', id: author.canonicalURL });
   });
 
-  test(`setting a belongs-to card field`, async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [['author', 'related card', true]],
-      [card2Id]: [
-        ['name', 'string', true, 'Van Gogh'],
-        ['email', 'case-insensitive string', false, 'vangogh@nowhere.dog'],
-      ],
-    });
-    await visit(`/cards/${card1Id}/edit/fields`);
-
-    await setFieldValue('author', card2Id);
-
-    await saveCard();
-
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
-
-    await visit(`/cards/${card1Id}`);
-    assert
-      .dom(
-        `[data-test-field="author"] [data-test-embedded-card="${card2Id}"] [data-test-field="name"] [data-test-string-field-viewer-value]`
-      )
-      .hasText('Van Gogh');
-    assert
-      .dom(`[data-test-field="author"] [data-test-embedded-card="${card2Id}"] [data-test-field="email"]`)
-      .doesNotExist();
-
-    let cardJson = find('[data-test-card-json]').innerHTML;
-    let card = JSON.parse(cardJson);
-    assert.deepEqual(card.data.relationships.author.data, { type: 'cards', id: qualifiedCard2Id });
-    let userCard = card.included.find(i => `${i.type}/${i.id}` === `cards/${qualifiedCard2Id}`);
-    assert.equal(userCard.attributes.name, 'Van Gogh');
-    assert.equal(userCard.attributes.email, undefined);
-  });
-
-  test(`setting an image`, async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [['image', 'decorative image', false, 'test image']],
-    });
-    await visit(`/cards/${card1Id}/edit/fields`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
-
-    await setFieldValue('image', 'http://example.com/testimage.jpg');
-
-    await saveCard();
-
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
-
-    await visit(`/cards/${card1Id}`);
-    assert
-      .dom('[data-test-field="image"] [data-test-decorative-image-field-viewer-value]')
-      .hasAttribute('src', 'http://example.com/testimage.jpg');
-
-    let cardJson = find('[data-test-card-json]').innerHTML;
-    let card = JSON.parse(cardJson);
-    assert.equal(card.data.attributes.image, 'http://example.com/testimage.jpg');
-  });
-
-  test(`setting an link field`, async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [['portfolioLink', 'link', false, 'https://example.com/old-portfolio']],
-    });
-    await visit(`/cards/${card1Id}/edit/fields`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
-
-    await setFieldValue('portfolioLink', 'https://example.com/new-portfolio');
-
-    await saveCard();
-
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
-
-    await visit(`/cards/${card1Id}`);
-    assert.dom('[data-test-link-field-viewer-value]').hasAttribute('href', 'https://example.com/new-portfolio');
-
-    let cardJson = find('[data-test-card-json]').innerHTML;
-    let card = JSON.parse(cardJson);
-    assert.equal(card.data.attributes.portfolioLink, 'https://example.com/new-portfolio');
-  });
-
-  test(`setting a cta field`, async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [['rsvp', 'cta', false, 'https://example.com/old-rsvp']],
-    });
-    await visit(`/cards/${card1Id}/edit/fields`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
-
-    await setFieldValue('rsvp', 'https://example.com/new-rsvp');
-
-    await saveCard();
-
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
-
-    await visit(`/cards/${card1Id}`);
-    assert.dom('[data-test-cta-field-viewer-value]').hasAttribute('href', 'https://example.com/new-rsvp');
-
-    let cardJson = find('[data-test-card-json]').innerHTML;
-    let card = JSON.parse(cardJson);
-    assert.equal(card.data.attributes.rsvp, 'https://example.com/new-rsvp');
-  });
+  // TODO need UI designs for these
+  skip(`setting a base card field as reference with plural arity`, async function() {});
+  skip(`setting a card field as value with singular arity`, async function() {});
+  skip(`setting a card field as value with plural arity`, async function() {});
 
   test(`can navigate to view mode using the top edge`, async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [['body', 'string', false, 'test body']],
-    });
-    await visit(`/cards/${card1Id}/edit/fields`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+    await visit(`/cards/${cardPath}/edit/fields`);
+    await waitForCardLoad();
+
     assert.dom('[data-test-mode-indicator-link="view"]').exists();
 
     await click('[data-test-mode-indicator-link="view"]');
-    assert.equal(currentURL(), `/cards/${card1Id}`);
+    await waitForCardLoad();
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
 
-    await visit(`/cards/${card1Id}/edit/layout`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/layout`);
+    await visit(`/cards/${cardPath}/edit/layout`);
+    await waitForCardLoad();
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/layout`);
 
     await click('[data-test-mode-indicator-link="view"]');
-    assert.equal(currentURL(), `/cards/${card1Id}`);
+    await waitForCardLoad();
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
   });
 
   test(`fields mode displays the top edge`, async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [['body', 'string', false, 'test body']],
-    });
-    await visit(`/cards/${card1Id}/edit/fields`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+    await visit(`/cards/${cardPath}/edit/fields`);
+    await waitForCardLoad();
 
     assert.dom('[data-test-cardhost-top-edge]').exists();
     assert.dom('[data-test-top-edge-preview-link]').exists();
@@ -351,12 +269,8 @@ module('Acceptance | card edit', function(hooks) {
   });
 
   test(`layout mode displays the top edge with additional controls`, async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [['body', 'string', false, 'test body']],
-    });
-    await visit(`/cards/${card1Id}/edit/layout`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/layout`);
+    await visit(`/cards/${cardPath}/edit/layout`);
+    await waitForCardLoad();
 
     assert.dom('[data-test-cardhost-top-edge]').exists();
     assert.dom('[data-test-top-edge-preview-link]').exists();
@@ -372,12 +286,8 @@ module('Acceptance | card edit', function(hooks) {
   });
 
   test(`displays the right edge`, async function(assert) {
-    await login();
-    await createCards({
-      [card1Id]: [['body', 'string', false, 'test body']],
-    });
-    await visit(`/cards/${card1Id}/edit/fields`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
+    await visit(`/cards/${cardPath}/edit/fields`);
+    await waitForCardLoad();
 
     assert.dom('[data-test-right-edge]').exists();
     assert.dom('[data-test-internal-card-id]').doesNotExist();
@@ -386,18 +296,20 @@ module('Acceptance | card edit', function(hooks) {
   });
 
   test('autosave works', async function(assert) {
-    // autosave is disabled by default in tests, so we turn it on and make one change to see if it works
-    await login();
-    await createCards({
-      [card1Id]: [['body', 'string', false, 'test body']],
-    });
-    await visit(`/cards/${card1Id}/edit/fields`);
-    assert.equal(currentURL(), `/cards/${card1Id}/edit/fields`);
-    assert.dom('[data-test-card-is-dirty="no"]').exists();
+    await visit(`/cards/${cardPath}/edit/fields`);
+    await waitForCardLoad();
+
     this.owner.lookup('service:autosave').autosaveDisabled = false;
     await setFieldValue('body', 'this will autosave');
-    await waitFor('[data-test-card-is-dirty="yes"]', { timeout });
-    await waitFor('[data-test-card-is-dirty="no"]', { timeout });
-    assert.dom('[data-test-card-is-dirty="no"]').exists();
+    await waitForCardAutosave();
+    this.owner.lookup('service:autosave').autosaveDisabled = true;
+
+    await visit(`/cards/${cardPath}`);
+    await waitForCardLoad();
+    assert.dom('[data-test-field="body"] [data-test-string-field-viewer-value]').hasText(`this will autosave`);
+
+    let cardJson = find('[data-test-card-json]').innerHTML;
+    let card = JSON.parse(cardJson);
+    assert.equal(card.data.attributes.body, `this will autosave`);
   });
 });
