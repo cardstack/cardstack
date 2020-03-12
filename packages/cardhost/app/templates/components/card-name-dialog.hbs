@@ -12,6 +12,12 @@
     {{#if @closeDialog}}
       <Cta {{on "click" @closeDialog}} @variant="secondary primary" data-test-cancel-create-btn>Cancel</Cta>
     {{/if}}
-    <Cta {{on "click" this.createCard}} @variant="primary" data-test-create-card-btn>Create</Cta>
+    <Cta {{on "click" this.createCard}} @variant="primary" data-test-create-card-btn>
+      {{#if this.createCardTask.isRunning}}
+        <img alt="Creating a card. Please wait." src="/assets/images/icons/spinner_black.png" class="card-name-dialog-spinner loading-spinner"> 
+      {{else}}
+        Create
+      {{/if}}
+    </Cta>
   </div>
 </Dialog>

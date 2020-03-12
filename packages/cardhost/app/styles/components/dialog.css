@@ -62,3 +62,7 @@
 .dialog--button-group button + button {
   margin-left: 9px;
 }
+
+.card-name-dialog-spinner {
+  height: 1em;
+}
