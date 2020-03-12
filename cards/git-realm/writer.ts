@@ -104,8 +104,19 @@ export default class GitWriter implements Writer {
     let cardDirName: string;
     if (!upstreamId) {
       cardDirName = upstreamIdToCardDirName(await this.generateId());
+      if (!document.jsonapi.data.attributes) {
+        document.jsonapi.data.attributes = Object.create(null);
+      }
+      document.jsonapi.data.attributes!.csId = cardDirName;
     } else {
       cardDirName = upstreamIdToCardDirName(upstreamId);
+      if (!document.jsonapi.data.attributes) {
+        document.jsonapi.data.attributes = Object.create(null);
+      }
+      document.jsonapi.data.attributes!.csId = typeof upstreamId === 'string' ? upstreamId : upstreamId.csId;
+      if (typeof upstreamId === 'object' && upstreamId.csOriginalRealm != null) {
+        document.jsonapi.data.attributes!.csOriginalRealm = upstreamId.csOriginalRealm;
+      }
     }
 
     let cardDir = this.cardDirectoryFor(cardDirName);

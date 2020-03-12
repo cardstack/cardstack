@@ -4,30 +4,27 @@ import { cardDocument, CardDocument } from '@cardstack/core/card-document';
 import { myOrigin } from '@cardstack/core/origin';
 import CardsService, { ScopedCardService } from '../../cards-service';
 import { Session } from '@cardstack/core/session';
-// import { wireItUp } from '../../main';
 import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import { makeRepo } from './support';
 import { Remote } from '../../../../cards/git-realm/lib/git';
 
-function idToCanonicalUrl(id: string) {
-  return `${myOrigin}/api/realms/test-git-repo/cards/${id}`;
-}
-
 async function resetRemote() {
   let root = (await mkTmpDir({ unsafeCleanup: true })).path;
 
   let tempRepo = await makeRepo(root, {
-    'contents/events/event-1.json': JSON.stringify(
+    'cards/event-1/card.json': JSON.stringify(
       cardDocument()
         .withField('title', 'string-field')
-        .withAttributes({ title: 'hello world' }).jsonapi
+        .withAttributes({ csId: 'event-1', title: 'hello world' }).jsonapi
     ),
-    'contents/events/event-2.json': JSON.stringify(
+    'cards/event-1/package.json': '{}',
+    'cards/event-2/card.json': JSON.stringify(
       cardDocument()
         .withField('title', 'string-field')
-        .withAttributes({ title: 'goodbye world' }).jsonapi
+        .withAttributes({ csId: 'event-2', title: 'goodbye world' }).jsonapi
     ),
+    'cards/event-2/package.json': '{}',
   });
 
   let remote = await Remote.create(tempRepo.repo, 'origin', 'http://root:password@localhost:8838/git/repo');
@@ -93,9 +90,9 @@ describe('hub/git/indexing-remote', function() {
 
   it('indexes existing data in the remote after it is cloned', async function() {
     await indexing.update();
-    let foundCard = await service.get(idToCanonicalUrl('event-1'));
+    let foundCard = await service.get({ csRealm: repoRealm, csId: 'event-1' });
     expect(await foundCard.value('title')).to.equal('hello world');
-    foundCard = await service.get(idToCanonicalUrl('event-2'));
+    foundCard = await service.get({ csRealm: repoRealm, csId: 'event-2' });
     expect(await foundCard.value('title')).to.equal('goodbye world');
   });
 

@@ -9,9 +9,12 @@ import service from './lib/service';
 const defaultBranch = 'master';
 
 import { Indexer, IndexingOperations } from '@cardstack/core/indexer';
-import { UpstreamDocument } from '@cardstack/core/document';
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard, Card } from '@cardstack/core/card';
 import { extractSettings } from './lib/git-settings';
+import { assertSingleResourceDoc } from '@cardstack/core/jsonapi';
+import { SingleResourceDoc } from 'jsonapi-typescript';
+import merge from 'lodash/merge';
+import { UpstreamDocument } from '@cardstack/core/document';
 
 interface GitMeta {
   commit?: string;
@@ -92,7 +95,7 @@ class GitUpdater {
 
   async updateContent(meta: GitMeta, ops: IndexingOperations) {
     log.debug(`starting updateContent()`);
-    await this._loadCommit();
+    await this.loadCommit();
     let originalTree;
     if (meta && meta.commit) {
       try {
@@ -107,7 +110,7 @@ class GitUpdater {
     if (!originalTree) {
       await ops.beginReplaceAll();
     }
-    await this._indexTree(ops, originalTree, this.rootTree, {
+    await this.indexTree(ops, originalTree, this.rootTree, {
       only: this.basePath.concat([['schema', 'contents', 'cards']]),
     });
     if (!originalTree) {
@@ -119,9 +122,9 @@ class GitUpdater {
     };
   }
 
-  async _loadCommit() {
+  private async loadCommit() {
     if (!this.commit) {
-      this.commit = await this._commitAtBranch(this.branch);
+      this.commit = await this.commitAtBranch(this.branch);
       this.commitId = this.commit.sha();
     }
     if (!this.rootTree) {
@@ -129,12 +132,12 @@ class GitUpdater {
     }
   }
 
-  async _commitAtBranch(branchName: string) {
+  private async commitAtBranch(branchName: string) {
     let branch = await this.repo.lookupLocalBranch(branchName);
     return Commit.lookup(this.repo, branch.target());
   }
 
-  async _indexTree(ops: IndexingOperations, oldTree?: Tree, newTree?: Tree, filter?: Filter | null) {
+  private async indexTree(ops: IndexingOperations, oldTree?: Tree, newTree?: Tree, filter?: Filter | null) {
     let seen = new Map();
     if (newTree) {
       for (let newEntry of newTree.entries()) {
@@ -143,7 +146,7 @@ class GitUpdater {
           continue;
         }
         seen.set(name, true);
-        await this._indexEntry(ops, name, oldTree, newEntry, filter);
+        await this.indexEntry(ops, name, oldTree, newEntry, filter);
       }
     }
     if (oldTree) {
@@ -153,13 +156,13 @@ class GitUpdater {
           continue;
         }
         if (!seen.get(name)) {
-          await this._deleteEntry(ops, oldEntry, filter);
+          await this.deleteEntry(ops, oldEntry, filter);
         }
       }
     }
   }
 
-  async _indexEntry(
+  private async indexEntry(
     ops: IndexingOperations,
     name: string,
     oldTree: Tree | undefined,
@@ -176,43 +179,133 @@ class GitUpdater {
         return;
       }
     }
-    if (newEntry.isTree()) {
-      await this._indexTree(
+    if (newEntry.isTree() && (await newEntry.getTree()).entryByName('card.json')) {
+      let cardTree = await newEntry.getTree();
+      let cardEntries = await this.crawlCard(cardTree);
+      // Let's re-index this card since something is different (otherwise the
+      // pruning above would have recocognized that the card subtree was
+      // unchanged).
+      let json = await this.assembleCard(cardTree, cardEntries);
+      let upstreamId = {
+        csId: json.data.attributes!.csId as string,
+        csOriginalRealm: json.data.attributes!.csOriginalRealm as string,
+      };
+      await ops.save(upstreamId, new UpstreamDocument(json));
+    } else if (newEntry.isTree()) {
+      await this.indexTree(
         ops,
         oldEntry && oldEntry.isTree() ? await oldEntry.getTree() : undefined,
         await newEntry.getTree(),
         nextFilter(filter)
       );
-    } else if (/\.json$/i.test(newEntry.path())) {
-      let { id } = identify(newEntry);
-      let doc = await this._entryToDoc(newEntry);
-      if (doc) {
-        await ops.save(id, doc);
-      }
     }
   }
 
-  async _deleteEntry(ops: IndexingOperations, oldEntry: TreeEntry, filter?: Filter | null) {
+  private async deleteEntry(ops: IndexingOperations, oldEntry: TreeEntry, filter?: Filter | null) {
+    // TODO don't descend below the cardDir
     if (oldEntry.isTree()) {
-      await this._indexTree(ops, await oldEntry.getTree(), undefined, nextFilter(filter));
+      await this.indexTree(ops, await oldEntry.getTree(), undefined, nextFilter(filter));
     } else {
       let { id } = identify(oldEntry);
       await ops.delete(id);
     }
   }
 
-  async _entryToDoc(entry: TreeEntry): Promise<UpstreamDocument | undefined> {
-    entry.isBlob();
-    let contents = (await entry.getBlob()).content().toString('utf8');
-    let doc;
-    try {
-      doc = JSON.parse(contents);
-    } catch (err) {
-      log.warn('Ignoring record with invalid json at %s', entry.path());
-      return;
+  private async crawlCard(cardTree: Tree): Promise<Map<string, Entry>> {
+    let output: Map<string, Entry> = new Map();
+    for (let entry of cardTree.entries()) {
+      if (entry.isTree()) {
+        output.set(entry.path(), await this.crawlCard(await entry.getTree()));
+      } else {
+        output.set(entry.path(), entry);
+      }
     }
-    return new UpstreamDocument(doc);
+    return output;
   }
+
+  private async assembleCard(cardTree: Tree, files: Map<string, Entry>): Promise<SingleResourceDoc> {
+    let pkgEntry = cardTree.entryByName('package.json');
+    if (!pkgEntry || !pkgEntry.isBlob()) {
+      throw new Error(`Card is missing package.json file`);
+    }
+    let pkgContents = await entryToString(pkgEntry);
+    if (!pkgContents) {
+      throw new Error(`Card has empty package.json file`);
+    }
+    let pkg = JSON.parse(pkgContents);
+
+    let cardJsonEntry = cardTree.entryByName('card.json');
+    if (!cardJsonEntry || !cardJsonEntry.isBlob()) {
+      throw new Error(`Card is missing card.json file`);
+    }
+    let json;
+    try {
+      json = await entryToDoc(cardJsonEntry);
+    } catch (err) {
+      if ('isCardstackError' in err) {
+        throw new Error(`card.json is invalid because: ${err}`);
+      }
+      throw err;
+    }
+    if (!json) {
+      throw new Error(`card.json is empty`);
+    }
+
+    // ensure we have an attributes object
+    merge(json, {
+      data: {
+        attributes: {},
+      },
+    });
+
+    // then ensure that csFiles reflects our true on disk files only
+    json.data.attributes!.csFiles = await loadFiles(cardTree, '', files, ['package.json', 'card.json']);
+
+    // and our peerDeps match the ones from package.json
+    // @ts-ignore
+    json.data.attributes!.csPeerDependencies = pkg.peerDependencies;
+    return json;
+  }
+}
+
+type Entry = TreeEntry | Map<string, Entry>;
+
+async function loadFiles(
+  cardTree: Tree,
+  subDirectory: string,
+  files: Map<string, Entry>,
+  exclude: string[] = []
+): Promise<NonNullable<Card['csFiles']>> {
+  let output: NonNullable<Card['csFiles']> = Object.create(null);
+  let cardDir = cardTree.path();
+  for (let [name, entry] of files) {
+    let csFileName = name.slice(cardDir.length + subDirectory.length + 1);
+    if (exclude.includes(csFileName)) {
+      continue;
+    }
+    if (entry instanceof Map) {
+      output[csFileName] = await loadFiles(cardTree, `${subDirectory}/${csFileName}`, entry);
+    } else {
+      output[csFileName] = (await entryToString(entry)) || '';
+    }
+  }
+  return output;
+}
+
+async function entryToString(entry: TreeEntry): Promise<string | undefined> {
+  if (entry.isBlob()) {
+    return (await entry.getBlob()).content().toString('utf8');
+  }
+}
+async function entryToDoc(entry: TreeEntry): Promise<SingleResourceDoc | undefined> {
+  let contents = await entryToString(entry);
+  if (contents == null) {
+    return;
+  }
+
+  let json = JSON.parse(contents);
+  assertSingleResourceDoc(json);
+  return json;
 }
 
 function identify(entry: TreeEntry) {

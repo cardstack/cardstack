@@ -4,15 +4,10 @@ import { cardDocument, CardDocument } from '@cardstack/core/card-document';
 import { myOrigin } from '@cardstack/core/origin';
 import CardsService, { ScopedCardService } from '../../cards-service';
 import { Session } from '@cardstack/core/session';
-// import { wireItUp } from '../../main';
 import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import Change from '../../../../cards/git-realm/lib/change';
-import { commitOpts, makeRepo } from './support';
-
-function idToCanonicalUrl(id: string) {
-  return `${myOrigin}/api/realms/test-git-repo/cards/${id}`;
-}
+import { commitOpts, makeRepo, inRepo } from './support';
 
 describe('hub/git/indexing', function() {
   let env: TestEnv, indexing: IndexingService, cards: CardsService, service: ScopedCardService;
@@ -52,17 +47,17 @@ describe('hub/git/indexing', function() {
   it('indexes newly added document', async function() {
     let { repo, head } = await makeRepo(root);
 
-    await indexing.update();
-
     let change = await Change.create(repo, head, 'master');
-    let file = await change.get('cards/hello-world.json', { allowCreate: true });
+    let file = await change.get('cards/hello-world/card.json', { allowCreate: true });
     file.setContent(
       JSON.stringify(
         cardDocument()
           .withField('title', 'string-field')
-          .withAttributes({ title: 'hello world' }).jsonapi
+          .withAttributes({ csId: 'hello-world', title: 'hello world' }).jsonapi
       )
     );
+    file = await change.get('cards/hello-world/package.json', { allowCreate: true });
+    file.setContent('{}');
     head = await change.finalize(commitOpts());
 
     await indexing.update();
@@ -71,25 +66,114 @@ describe('hub/git/indexing', function() {
 
     expect(indexerState!.commit).to.equal(head);
 
-    let foundCard = await service.get(idToCanonicalUrl('hello-world'));
+    let foundCard = await service.get({ csRealm: repoRealm, csId: 'hello-world' });
 
     expect(await foundCard.value('title')).to.equal('hello world');
+  });
+
+  it('indexes card with added inner file', async function() {
+    let { repo } = await makeRepo(root);
+
+    let card = await service.create(repoRealm, cardDocument().jsonapi);
+
+    let head = (await inRepo(root).getCommit('master')).id;
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get(`cards/${card.csId}/inner/example.hbs`, { allowCreate: true });
+    file.setContent('Hello World');
+    head = await change.finalize(commitOpts());
+
+    await indexing.update();
+
+    let updatedCard = await service.get(card);
+    expect(updatedCard.csFiles).to.deep.equal({
+      inner: { 'example.hbs': 'Hello World' },
+    });
+  });
+
+  it('indexes card with updated inner file', async function() {
+    let { repo } = await makeRepo(root);
+
+    let card = await service.create(
+      repoRealm,
+      cardDocument().withAttributes({
+        csFiles: { inner: { 'example.hbs': 'Hello World' } },
+      }).jsonapi
+    );
+
+    let head = (await inRepo(root).getCommit('master')).id;
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get(`cards/${card.csId}/inner/example.hbs`, { allowUpdate: true });
+    file.setContent('Hello Mars');
+    head = await change.finalize(commitOpts());
+
+    await indexing.update();
+
+    let updatedCard = await service.get(card);
+    expect(updatedCard.csFiles).to.deep.equal({
+      inner: { 'example.hbs': 'Hello Mars' },
+    });
+  });
+
+  it('indexes card with removed inner file', async function() {
+    let { repo } = await makeRepo(root);
+
+    let card = await service.create(
+      repoRealm,
+      cardDocument().withAttributes({
+        csFiles: { inner: { 'example.hbs': 'Hello World' } },
+      }).jsonapi
+    );
+
+    let head = (await inRepo(root).getCommit('master')).id;
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get(`cards/${card.csId}/inner/example.hbs`);
+    file.delete();
+    head = await change.finalize(commitOpts());
+
+    await indexing.update();
+
+    let updatedCard = await service.get(card);
+    expect(updatedCard.csFiles).to.deep.equal({});
+  });
+
+  it('removes a card that is no longer in git', async function() {
+    let { repo } = await makeRepo(root);
+
+    let card = await service.create(repoRealm, cardDocument().jsonapi);
+    let head = (await inRepo(root).getCommit('master')).id;
+    let change = await Change.create(repo, head, 'master');
+
+    // right now cards without inner files only have 2 files: card.json and package.json
+    let file = await change.get(`cards/${card.csId}/card.json`);
+    file.delete();
+    file = await change.get(`cards/${card.csId}/package.json`);
+    file.delete();
+    head = await change.finalize(commitOpts());
+
+    await indexing.update();
+
+    try {
+      await service.get(card);
+      throw new Error(`Should not be able to get the card`);
+    } catch (e) {
+      expect(e).hasStatus(404);
+    }
   });
 
   it('indexes a url-encoded id card', async function() {
     let { repo, head } = await makeRepo(root);
 
-    await indexing.update();
-
     let change = await Change.create(repo, head, 'master');
-    let file = await change.get('cards/foo%2Fbar%2Fbaz.json', { allowCreate: true });
+    let file = await change.get('cards/foo%2Fbar%2Fbaz/card.json', { allowCreate: true });
     file.setContent(
       JSON.stringify(
         cardDocument()
           .withField('title', 'string-field')
-          .withAttributes({ title: 'hello world' }).jsonapi
+          .withAttributes({ csId: 'foo/bar/baz', title: 'hello world' }).jsonapi
       )
     );
+    file = await change.get('cards/foo%2Fbar%2Fbaz/package.json', { allowCreate: true });
+    file.setContent('{}');
     head = await change.finalize(commitOpts());
 
     await indexing.update();
@@ -98,7 +182,7 @@ describe('hub/git/indexing', function() {
 
     expect(indexerState!.commit).to.equal(head);
 
-    let foundCard = await service.get(idToCanonicalUrl('foo%2Fbar%2Fbaz'));
+    let foundCard = await service.get({ csRealm: repoRealm, csId: 'foo/bar/baz' });
 
     expect(await foundCard.value('title')).to.equal('hello world');
   });
