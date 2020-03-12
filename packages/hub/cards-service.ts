@@ -10,7 +10,7 @@ import { SingleResourceDoc } from 'jsonapi-typescript';
 import { Query } from '@cardstack/core/query';
 import { Writer } from '@cardstack/core/writer';
 import { join } from 'path';
-import { assertSingleResourceDoc } from './jsonapi';
+import { assertSingleResourceDoc } from '@cardstack/core/jsonapi';
 import merge from 'lodash/merge';
 import { readdirSync, existsSync, statSync, readFileSync } from 'fs-extra';
 import { CardReader } from '@cardstack/core/card-reader';
@@ -97,9 +97,9 @@ export class ScopedCardService implements CardReader, CardInstantiator {
     return updatedCard;
   }
 
-  async delete(id: CardId, version: string | number): Promise<void>;
-  async delete(canonicalURL: string, version: string | number): Promise<void>;
-  async delete(idOrURL: CardId | string, version: string | number): Promise<void> {
+  async delete(id: CardId, version?: string | number | undefined): Promise<void>;
+  async delete(canonicalURL: string, version?: string | number | undefined): Promise<void>;
+  async delete(idOrURL: CardId | string, version?: string | number | undefined): Promise<void> {
     let id = asCardId(idOrURL);
     let realmCard = await this.getRealm(id.csRealm);
     let writer = await this.loadWriter(realmCard);

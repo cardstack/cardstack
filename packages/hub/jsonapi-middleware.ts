@@ -8,7 +8,7 @@ import { Memoize } from 'typescript-memoize';
 import { inject } from './dependency-injection';
 import CardstackError from '@cardstack/core/error';
 import { SessionContext } from './authentication-middleware';
-import { assertSingleResourceDoc } from './jsonapi';
+import { assertSingleResourceDoc } from '@cardstack/core/jsonapi';
 import { myOrigin } from '@cardstack/core/origin';
 import { makeCollection, apiPrefix, AddressableCard } from '@cardstack/core/card';
 import { CardId } from '@cardstack/core/card-id';

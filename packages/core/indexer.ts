@@ -3,12 +3,12 @@ import { BatchedIndexUpdate } from './batched-index-update';
 import { UpstreamDocument, UpstreamIdentity, upstreamIdToCardId } from './document';
 import { CardInstantiator } from './card-instantiator';
 
-export interface IndexerFactory<Meta> {
-  new (realmCard: AddressableCard): Indexer<Meta>;
+export interface IndexerFactory<Meta = unknown, Params = unknown> {
+  new (realmCard: AddressableCard): Indexer<Meta, Params>;
 }
 
-export interface Indexer<Meta> {
-  update(meta: Meta, ops: IndexingOperations): Promise<Meta | void>;
+export interface Indexer<Meta = unknown, Params = unknown> {
+  update(meta: Meta, ops: IndexingOperations, params: Params | null): Promise<Meta | void>;
 }
 
 export class IndexingOperations {

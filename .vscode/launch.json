@@ -31,7 +31,7 @@
         "HUB_ENVIRONMENT": "test"
         // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
-      "args": ["-r", "esm", "packages/test-support/bin/run.js", "--timeout", "600000", "--grep", "can get a card back out"],
+      "args": ["-r", "esm", "packages/test-support/bin/run.js", "--timeout", "600000", "--grep", "hub/files-realm/indexer.*when notified"],
     },
     {
       "type": "node",

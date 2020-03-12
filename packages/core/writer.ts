@@ -15,5 +15,5 @@ export interface Writer {
 
   update(session: Session, id: UpstreamIdentity, doc: UpstreamDocument): Promise<UpstreamDocument>;
 
-  delete(session: Session, id: UpstreamIdentity, version: string | number): Promise<void>;
+  delete(session: Session, id: UpstreamIdentity, version: string | number | undefined): Promise<void>;
 }

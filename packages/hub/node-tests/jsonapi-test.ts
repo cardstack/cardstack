@@ -5,7 +5,7 @@ import { TestEnv, createTestEnv } from './helpers';
 import { cardDocument } from '@cardstack/core/card-document';
 import { stringify } from 'qs';
 import { Session } from '@cardstack/core/session';
-import { assertSingleResourceDoc, assertCollectionResourceDoc } from '../jsonapi';
+import { assertSingleResourceDoc, assertCollectionResourceDoc } from '@cardstack/core/jsonapi';
 import { cors } from '../main';
 import { AddressableCard } from '@cardstack/core/card';
 import { canonicalURL } from '@cardstack/core/card-id';

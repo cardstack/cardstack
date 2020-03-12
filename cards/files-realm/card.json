@@ -1,0 +1,33 @@
+{
+  "data": {
+    "type": "cards",
+    "attributes": {
+      "csFeatures": {
+        "indexer": "indexer.js",
+        "writer": "writer.js"
+      },
+      "csFields": {
+        "directory": {
+          "relationships": {
+            "csAdoptsFrom": {
+              "data": {
+                "type": "cards",
+                "id": "https://base.cardstack.com/public/cards/string-field"
+              }
+            }
+          }
+        },
+        "watcherEnabled": {
+          "relationships": {
+            "csAdoptsFrom": {
+              "data": {
+                "type": "cards",
+                "id": "https://base.cardstack.com/public/cards/boolean-field"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -17,6 +17,7 @@
     "@cardstack/date-field-card": "0.18.8",
     "@cardstack/datetime-field-card": "0.18.8",
     "@cardstack/ephemeral-realm-card": "0.18.8",
+    "@cardstack/files-realm-card": "0.18.8",
     "@cardstack/git-realm-card": "0.18.8",
     "@cardstack/image-reference-field-card": "0.18.8",
     "@cardstack/integer-field-card": "0.18.8",

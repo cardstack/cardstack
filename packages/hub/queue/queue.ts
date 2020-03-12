@@ -195,7 +195,7 @@ export default class Queue {
           // find the queue with the oldest job that isn't running, and return
           // all jobs on that queue, locking them. SKIP LOCKED means we won't
           // see any jobs that are already running.
-          `select * from jobs where queue=(select queue from jobs where status='unfulfilled' order by created_at limit 1) for update skip locked`,
+          `select * from jobs where status='unfulfilled' and queue=(select queue from jobs where status='unfulfilled' order by created_at limit 1) for update skip locked`,
         ]);
         if (jobs.rowCount === 0) {
           log.trace(`found no work`);
