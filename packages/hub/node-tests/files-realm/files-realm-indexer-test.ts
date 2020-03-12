@@ -34,7 +34,7 @@ describe('hub/files-realm/indexer', function() {
 
     filesDoc = cardDocument()
       .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'files-realm' })
-      .withAttributes({ directory: filesPath, csId: filesRealm });
+      .withAttributes({ directory: filesPath, csId: filesRealm, watcherEnabled: false });
 
     await service.create(`${myOrigin}/api/realms/meta`, filesDoc.jsonapi);
     await makeCard(
@@ -160,14 +160,49 @@ describe('hub/files-realm/indexer', function() {
   });
 
   it('updates a card when notified about a file change', async function() {
+    await indexing.update();
+    let query = { filter: { eq: { csRealm: filesRealm, csId: 'first-card' } } };
     let filename = join(filesPath, 'first-card', 'example.hbs');
     outputFileSync(filename, 'Goodbye');
-    tracker.notifyFileDidChange(filename);
-    await tracker.somePromiseGoesHere();
+
+    let canaryFile = join(filesPath, 'second-card', 'not-notified.js');
+    outputFileSync(canaryFile, '// this should not show up in the search index');
+
+    let count = tracker.operationsCount;
+    await tracker.notifyFileDidChangeAndWait(filesPath, join('first-card', 'example.hbs'));
+
+    let { cards } = await service.search(query);
+    expect(cards).lengthOf(1);
+    expect(cards[0].csFiles?.['example.hbs']).to.equal('Goodbye');
+
+    ({ cards } = await service.search({ filter: { eq: { csRealm: filesRealm, csId: 'second-card' } } }));
+    expect(cards).lengthOf(1);
+    expect(cards[0].csFiles).deep.equal({});
+
+    expect(tracker.operationsCount).to.equal(count + 1, 'wrong number of operations');
   });
 
-  it('updates a card when notified about a file that was deleted', async function() {});
-  it('deletes a card when notified about a file change', async function() {});
+  it('deletes a card when notified about a file change', async function() {
+    await indexing.update();
+    let query = { filter: { eq: { csRealm: filesRealm, csId: 'first-card' } } };
+    let cardDir = join(filesPath, 'first-card');
+    removeSync(cardDir);
+
+    let canaryFile = join(filesPath, 'second-card', 'not-notified.js');
+    outputFileSync(canaryFile, '// this should not show up in the search index');
+
+    let count = tracker.operationsCount;
+    await tracker.notifyFileDidChangeAndWait(filesPath, 'first-card');
+
+    let { cards } = await service.search(query);
+    expect(cards).lengthOf(0);
+
+    ({ cards } = await service.search({ filter: { eq: { csRealm: filesRealm, csId: 'second-card' } } }));
+    expect(cards).lengthOf(1);
+    expect(cards[0].csFiles).deep.equal({});
+
+    expect(tracker.operationsCount).to.equal(count + 1, 'wrong number of operations');
+  });
 });
 
 async function makeCard(path: string, doc: SingleResourceDoc) {

@@ -972,7 +972,7 @@ export class Card {
   }
 
   async loadFeature(featureName: 'writer'): Promise<WriterFactory | null>;
-  async loadFeature(featureName: 'indexer'): Promise<IndexerFactory<J.Value> | null>;
+  async loadFeature(featureName: 'indexer'): Promise<IndexerFactory | null>;
   async loadFeature(featureName: 'field-validate'): Promise<null | FieldHooks.validate<unknown>>;
   async loadFeature(featureName: 'field-deserialize'): Promise<null | FieldHooks.deserialize<unknown, unknown>>;
   async loadFeature(featureName: 'field-buildValueExpression'): Promise<null | FieldHooks.buildValueExpression>;
