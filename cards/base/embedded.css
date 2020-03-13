@@ -3,8 +3,10 @@ no custom CSS is provided for the card.*/
 
 /* Embedded card default styles */
 .card-boundary {
-  width: 100%;
+  width: 225px;
+  height: 225px;
   margin: 0;
+  border-radius: 10px;
   background-color: white;
   color: black;
   font: 400 10px/1.2 'Open Sans';
