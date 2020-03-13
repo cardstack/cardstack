@@ -9,6 +9,7 @@ import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import Change from '../../../../cards/git-realm/lib/change';
 import { join } from 'path';
 import { commitOpts, makeRepo, inRepo } from './support';
+import { AddressableCard } from '@cardstack/core/card';
 
 describe('hub/git/indexing', function() {
   let env: TestEnv, indexing: IndexingService, cards: CardsService, service: ScopedCardService;
@@ -50,6 +51,8 @@ describe('hub/git/indexing', function() {
   it('indexes newly added document', async function() {
     let { repo, head } = await makeRepo(root);
 
+    await indexing.update(); // we want the next indexing to be incremental
+
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('cards/hello-world/card.json', { allowCreate: true });
     file.setContent(
@@ -79,6 +82,8 @@ describe('hub/git/indexing', function() {
 
     let card = await service.create(repoRealm, cardDocument().jsonapi);
 
+    await indexing.update(); // we want the next indexing to be incremental
+
     let head = (await inRepo(root).getCommit('master')).id;
     let change = await Change.create(repo, head, 'master');
     let file = await change.get(`cards/${card.csId}/inner/example.hbs`, { allowCreate: true });
@@ -102,6 +107,8 @@ describe('hub/git/indexing', function() {
         csFiles: { inner: { 'example.hbs': 'Hello World' } },
       }).jsonapi
     );
+
+    await indexing.update(); // we want the next indexing to be incremental
 
     let head = (await inRepo(root).getCommit('master')).id;
     let change = await Change.create(repo, head, 'master');
@@ -127,6 +134,8 @@ describe('hub/git/indexing', function() {
       }).jsonapi
     );
 
+    await indexing.update(); // we want the next indexing to be incremental
+
     let head = (await inRepo(root).getCommit('master')).id;
     let change = await Change.create(repo, head, 'master');
     let file = await change.get(`cards/${card.csId}/inner/example.hbs`);
@@ -145,6 +154,8 @@ describe('hub/git/indexing', function() {
     let card = await service.create(repoRealm, cardDocument().jsonapi);
     let head = (await inRepo(root).getCommit('master')).id;
     let change = await Change.create(repo, head, 'master');
+
+    await indexing.update(); // we want the next indexing to be incremental
 
     // right now cards without inner files only have 2 files: card.json and package.json
     let file = await change.get(`cards/${card.csId}/card.json`);
@@ -188,6 +199,44 @@ describe('hub/git/indexing', function() {
     let foundCard = await service.get({ csRealm: repoRealm, csId: 'foo/bar/baz' });
 
     expect(await foundCard.value('title')).to.equal('hello world');
+  });
+
+  it('indexes cards in dependency order', async function() {
+    let { repo, head } = await makeRepo(root);
+    let author = cardDocument().withAutoAttributes({
+      csId: 'mango',
+      csRealm: repoRealm,
+      name: 'Mango',
+    });
+    let article = cardDocument()
+      .withAutoAttributes({
+        csId: 'article',
+        csRealm: repoRealm,
+        title: 'Things I Chew',
+        body: 'Literally everything.',
+      })
+      .withAutoRelationships({ author });
+
+    let change = await Change.create(repo, head, 'master');
+    // because this card's directory "article" is alphabetically before the card
+    // it depends on, "mango", the natural tendency is that it will be indexed
+    // first--it looks like the isomorphic git's Tree API gets entries in
+    // alphabetical order.
+    let file = await change.get('cards/article/card.json', { allowCreate: true });
+    file.setContent(JSON.stringify(article.jsonapi));
+    file = await change.get('cards/article/package.json', { allowCreate: true });
+    file.setContent('{}');
+
+    file = await change.get('cards/mango/card.json', { allowCreate: true });
+    file.setContent(JSON.stringify(author.jsonapi));
+    file = await change.get('cards/mango/package.json', { allowCreate: true });
+    file.setContent('{}');
+
+    head = await change.finalize(commitOpts());
+    await indexing.update();
+
+    let card = await service.get(article);
+    expect(((await card.value('author')) as AddressableCard).canonicalURL).to.equal(author.canonicalURL);
   });
 
   // it('it can index a realm', async function() {

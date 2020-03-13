@@ -14,7 +14,8 @@ import { extractSettings } from './lib/git-settings';
 import { assertSingleResourceDoc } from '@cardstack/core/jsonapi';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import merge from 'lodash/merge';
-import { UpstreamDocument } from '@cardstack/core/document';
+import { UpstreamDocument, UpstreamIdentity } from '@cardstack/core/document';
+import { inDependencyOrder } from '@cardstack/core/card-document';
 
 interface GitMeta {
   commit?: string;
@@ -90,6 +91,7 @@ class GitUpdater {
   commit?: Commit;
   commitId?: string;
   rootTree?: Tree;
+  docsToIndex: Map<SingleResourceDoc, UpstreamIdentity> = new Map();
 
   constructor(readonly repo: Repository, readonly branch: string, readonly basePath: PathSpec[]) {}
 
@@ -110,9 +112,15 @@ class GitUpdater {
     if (!originalTree) {
       await ops.beginReplaceAll();
     }
-    await this.indexTree(ops, originalTree, this.rootTree, {
-      only: this.basePath.concat([['schema', 'contents', 'cards']]),
+    await this.findEntriesToIndex(ops, originalTree, this.rootTree, {
+      only: this.basePath.concat([['cards']]),
     });
+
+    for (let doc of inDependencyOrder([...this.docsToIndex.keys()])) {
+      let upstreamId = this.docsToIndex.get(doc);
+      await ops.save(upstreamId!, new UpstreamDocument(doc));
+    }
+
     if (!originalTree) {
       await ops.finishReplaceAll();
     }
@@ -137,7 +145,7 @@ class GitUpdater {
     return Commit.lookup(this.repo, branch.target());
   }
 
-  private async indexTree(ops: IndexingOperations, oldTree?: Tree, newTree?: Tree, filter?: Filter | null) {
+  private async findEntriesToIndex(ops: IndexingOperations, oldTree?: Tree, newTree?: Tree, filter?: Filter | null) {
     let seen = new Map();
     if (newTree) {
       for (let newEntry of newTree.entries()) {
@@ -146,7 +154,7 @@ class GitUpdater {
           continue;
         }
         seen.set(name, true);
-        await this.indexEntry(ops, name, oldTree, newEntry, filter);
+        await this.collectEntriesToIndex(ops, name, oldTree, newEntry, filter);
       }
     }
     if (oldTree) {
@@ -162,7 +170,7 @@ class GitUpdater {
     }
   }
 
-  private async indexEntry(
+  private async collectEntriesToIndex(
     ops: IndexingOperations,
     name: string,
     oldTree: Tree | undefined,
@@ -190,9 +198,9 @@ class GitUpdater {
         csId: json.data.attributes!.csId as string,
         csOriginalRealm: json.data.attributes!.csOriginalRealm as string,
       };
-      await ops.save(upstreamId, new UpstreamDocument(json));
+      this.docsToIndex.set(json, upstreamId);
     } else if (newEntry.isTree()) {
-      await this.indexTree(
+      await this.findEntriesToIndex(
         ops,
         oldEntry && oldEntry.isTree() ? await oldEntry.getTree() : undefined,
         await newEntry.getTree(),
@@ -202,12 +210,14 @@ class GitUpdater {
   }
 
   private async deleteEntry(ops: IndexingOperations, oldEntry: TreeEntry, filter?: Filter | null) {
-    // TODO don't descend below the cardDir
-    if (oldEntry.isTree()) {
-      await this.indexTree(ops, await oldEntry.getTree(), undefined, nextFilter(filter));
-    } else {
-      let { id } = identify(oldEntry);
-      await ops.delete(id);
+    if (oldEntry.isTree() && (await oldEntry.getTree()).entryByName('card.json')) {
+      let cardTree = await oldEntry.getTree();
+      let json = await entryToDoc(cardTree.entryByName('card.json')!);
+      if (json?.data.attributes) {
+        await ops.delete(json.data.attributes as UpstreamIdentity);
+      }
+    } else if (oldEntry.isTree()) {
+      await this.findEntriesToIndex(ops, await oldEntry.getTree(), undefined, nextFilter(filter));
     }
   }
 
@@ -306,23 +316,6 @@ async function entryToDoc(entry: TreeEntry): Promise<SingleResourceDoc | undefin
   let json = JSON.parse(contents);
   assertSingleResourceDoc(json);
   return json;
-}
-
-function identify(entry: TreeEntry) {
-  let type, id;
-  let parts = entry.path().split('/');
-  if (parts[0] === 'cards' && parts.length > 1) {
-    parts.shift();
-    id = type = parts.join('/').replace(/\.json$/, '');
-  } else {
-    type = parts[parts.length - 2] || 'tops';
-    let filename = parts[parts.length - 1];
-    id = filename.replace(/\.json$/, '');
-  }
-
-  id = decodeURIComponent(id);
-
-  return { type, id };
 }
 
 interface Filter {

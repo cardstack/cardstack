@@ -54,7 +54,6 @@
     "@types/rsvp": "^4.0.3",
     "babel-eslint": "^10.0.2",
     "broccoli-asset-rev": "^3.0.0",
-    "dag-map": "^2.0.2",
     "ember-a11y-testing": "^2.0.0",
     "ember-animated": "0.10.0",
     "ember-animated-tools": "^0.4.1",

@@ -1,13 +1,10 @@
 /// <reference types="qunit" />
 
-import DAGMap from 'dag-map';
-import { CardDocumentWithId, CardDocument } from '@cardstack/core/card-document';
+import { CardDocumentWithId, CardDocument, inDependencyOrder } from '@cardstack/core/card-document';
 import { CardId, canonicalURL } from '@cardstack/core/card-id';
 import { stringify } from 'qs';
 import flatten from 'lodash/flatten';
-import uniq from 'lodash/uniq';
-import { CollectionResourceDoc, ResourceObject, SingleResourceDoc, ResourceIdentifierObject } from 'jsonapi-typescript';
-import isPlainObject from 'lodash/isPlainObject';
+import { CollectionResourceDoc, ResourceObject, SingleResourceDoc } from 'jsonapi-typescript';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 const hubURL = 'http://localhost:3000';
@@ -73,42 +70,6 @@ export default class Fixtures {
       await deleteCard((card.attributes as unknown) as CardId, String(card.meta?.version));
     }
   }
-}
-
-function inDependencyOrder(cards: ResourceObject[]): ResourceObject[];
-function inDependencyOrder(cards: CardDocumentWithId[]): CardDocumentWithId[];
-function inDependencyOrder(cards: any[]): any[] {
-  let dag = new DAGMap<CardDocumentWithId>();
-
-  for (let card of cards) {
-    let json: ResourceObject = 'jsonapi' in card ? card.jsonapi.data : card;
-    dag.add(canonicalURL((json.attributes as unknown) as CardId), card, undefined, getRelatedIds(json));
-  }
-  let sortedCreatedCards: CardDocumentWithId[] = [];
-  dag.each((_key, value) => sortedCreatedCards.push(value!));
-  // filter out any built-in cards, as those are never supplied in the fixtures
-  // and only appear as references with undefined values in the DAG.
-  return sortedCreatedCards.filter(Boolean);
-}
-
-function getRelatedIds(cardValue: CardDocument['asCardValue']): string[] {
-  return uniq(
-    flatten([
-      ...Object.values(cardValue.relationships || {}).map(value => {
-        if (!('data' in value) || value.data == null) {
-          return;
-        }
-        if (Array.isArray(value.data)) {
-          return (value.data as ResourceIdentifierObject[]).map(i => i.id);
-        } else {
-          return value.data.id;
-        }
-      }),
-      ...Object.values(cardValue.attributes || {}).map(value =>
-        isPlainObject(value) ? getRelatedIds(value as CardDocument['asCardValue']) : null
-      ),
-    ]).filter(Boolean)
-  ) as string[];
 }
 
 async function getCardsOfType(cardType: CardId): Promise<ResourceObject[]> {
