@@ -6,15 +6,14 @@ Join the discussion around developing on the Cardstack framework on [Discord](ht
 
 ## Orientation
 
-This is a monorepo. Each directory under `packages` is distributed as a standalone NPM package under the `@cardstack` NPM namespace. Each package is a Cardstack plugin. A family of Cardstack plugins comes together to provide both browser-side and server-side functionality of a Cardstack application.
-
-Many Cardstack plugins are also [Ember addons](https://ember-cli.com/extending/#developing-addons-and-blueprints), which is the standard way for a Cardstack plugin to provide client-side functionality.
+This is a monorepo. Each directory under `packages` and `cards` is distributed as a standalone NPM package under the `@cardstack` NPM namespace.
 
 ## Developing and Testing within this Repo
+We use `volta` to manage our global javascript dependencies. In this case, specifically, we use it to manage node and yarn. To use it simply install it following the instructions here: https://docs.volta.sh/guide/getting-started
 
 In development, we use `lerna` to manage the inter-dependencies of all the packages. To get started:
 
- 1. Install node >= 8.
+ 1. Install node >= 12.
  2. Install yarn >= 0.28 (earlier versions work but will not benefit from [Workspaces](https://yarnpkg.com/blog/2017/08/02/introducing-workspaces/)).
  3. `yarn global add lerna` (use >= 2.0.0 for yarn workspaces integration)
  4. `lerna bootstrap`
