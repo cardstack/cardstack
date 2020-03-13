@@ -1,0 +1,17 @@
+{
+  "data": {
+    "type": "cards",
+    "attributes": {
+      "csTitle": "Image from relative URL",
+      "csDescription": "Use this for hero images that leverage a relative URL (no \"https://\" in the URL)."
+    },
+    "relationships": {
+      "csAdoptsFrom": {
+        "data": {
+          "type": "cards",
+          "id": "https://base.cardstack.com/public/cards/string-field"
+        }
+      }
+    }
+  }
+}
