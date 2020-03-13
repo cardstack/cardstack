@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/files-realm-card",
-  "version": "0.18.11",
+  "version": "0.18.12",
   "main": "index.js",
   "license": "MIT",
   "publishConfig": {
@@ -11,8 +11,8 @@
     "@cardstack/hub": "*"
   },
   "devDependencies": {
-    "@cardstack/core": "0.18.11",
-    "@cardstack/hub": "0.18.11"
+    "@cardstack/core": "0.18.12",
+    "@cardstack/hub": "0.18.12"
   },
   "dependencies": {
     "@cardstack/logger": "^0.2.1",
