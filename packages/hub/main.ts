@@ -25,7 +25,7 @@ import { Session } from '@cardstack/core/session';
 import { cardDocument } from '@cardstack/core/card-document';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import Change from '@cardstack/git-realm-card/lib/change';
-import { existsSync } from 'fs';
+import { Repository, RepoNotFound } from '@cardstack/git-realm-card/lib/git';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 
 const INDEXING_INTERVAL = 10 * 60 * 1000;
@@ -33,9 +33,9 @@ const log = logger('cardstack/server');
 const metaRealm = `${myOrigin}/api/realms/meta`;
 const cardCatalogRealm = 'https://cardstack.com/api/realms/card-catalog';
 const cardCatalogRepo = 'https://github.com/cardstack/card-catalog.git';
-const localDefaultRealmRepo = join(homedir(), '.cardstack', 'default-realm');
-const localMetaRealmRepo = join(homedir(), '.cardstack', 'meta-realm');
-const localCardCatalogRepo = join(homedir(), '.cardstack', 'card-catalog-realm');
+const localDefaultRealmRepo = 'default-realm';
+const localMetaRealmRepo = 'meta-realm';
+const localCardCatalogRepo = 'card-catalog-realm';
 
 export async function wireItUp() {
   let registry = new Registry();
@@ -248,7 +248,7 @@ export async function cors(ctxt: Koa.Context, next: Koa.Next) {
 }
 
 async function assertRealmExists(container: Container, realmCardDoc: SingleResourceDoc): Promise<void> {
-  let { csRealm, csId, repo, remoteCacheDir } = realmCardDoc.data.attributes as any;
+  let { csRealm, csId, repo } = realmCardDoc.data.attributes as any;
 
   let cards = (await container.lookup('cards')).as(Session.INTERNAL_PRIVILEGED);
   let hasRealm = false;
@@ -272,8 +272,6 @@ async function assertRealmExists(container: Container, realmCardDoc: SingleResou
     log.info(`Creating realm ${csId}.`);
     if (repo) {
       await assertRepoExists(repo);
-    } else if (remoteCacheDir) {
-      await mkdirp(remoteCacheDir);
     }
 
     try {
@@ -295,9 +293,15 @@ async function indexMetaRealm(container: Container, metaRealmDoc: SingleResource
 }
 
 // TODO probably we should move this into the realm card
-async function assertRepoExists(path: string) {
-  if (!existsSync(path)) {
-    await mkdirp(path);
+async function assertRepoExists(repoDirName: string) {
+  let path = join(process.env.REPO_ROOT_DIR || join(homedir(), '.cardstack'), repoDirName);
+  await mkdirp(path);
+  try {
+    await Repository.open(path);
+  } catch (err) {
+    if (!(err instanceof RepoNotFound)) {
+      throw err;
+    }
     let change = await Change.createInitial(path, 'master');
     await change.finalize({
       authorName: 'hub',

@@ -35,19 +35,14 @@ async function resetRemote() {
 describe('hub/git/indexing-remote', function() {
   let env: TestEnv, indexing: IndexingService, cards: CardsService, service: ScopedCardService;
   let repoRealm = `${myOrigin}/api/realms/test-git-repo`;
-  // let tmpDir: DirectoryResult;
-  // let root: string;
   let head: string;
   let repoDoc: CardDocument;
-  let tempRepoDir: DirectoryResult, tempRepoPath: string;
-  // tempRemoteRepoPath: string;
+  let tempRepoDir: DirectoryResult;
 
   beforeEach(async function() {
     env = await createTestEnv();
     indexing = await env.container.lookup('indexing');
     cards = await env.container.lookup('cards');
-    // tmpDir = await mkTmpDir({ unsafeCleanup: true });
-    // root = tmpDir.path;
     service = cards.as(Session.EVERYONE);
 
     let tempRepo = await resetRemote();
@@ -55,15 +50,14 @@ describe('hub/git/indexing-remote', function() {
     head = tempRepo.head;
 
     tempRepoDir = await mkTmpDir({ unsafeCleanup: true });
-    // tempRemoteRepoDir = await mkTmpDir({ unsafeCleanup: true });
-    tempRepoPath = tempRepoDir.path;
-    // tempRemoteRepoPath = tempRemoteRepoDir.path;
+    process.env.REPO_ROOT_DIR = tempRepoDir.path;
+    let remoteCacheDir = 'test-repo';
 
     repoDoc = cardDocument()
       .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'git-realm' })
       .withAttributes({
         remoteUrl: 'http://root:password@localhost:8838/git/repo',
-        remoteCacheDir: tempRepoPath,
+        remoteCacheDir,
         csId: repoRealm,
       });
 
