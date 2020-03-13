@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/boolean-field-card",
-  "version": "0.18.10",
+  "version": "0.18.11",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -10,7 +10,7 @@
     "@cardstack/hub": "*"
   },
   "devDependencies": {
-    "@cardstack/core": "0.18.10",
-    "@cardstack/hub": "0.18.10"
+    "@cardstack/core": "0.18.11",
+    "@cardstack/hub": "0.18.11"
   }
 }
