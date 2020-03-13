@@ -33,6 +33,7 @@
     "@cardstack/image-reference-field-card": "0.18.10",
     "@cardstack/integer-field-card": "0.18.10",
     "@cardstack/requirejs-monaco-ember-polyfill": "^0.0.1",
+    "@cardstack/relative-image-reference-field-card": "0.18.10",
     "@cardstack/string-field-card": "0.18.10",
     "@cardstack/test-support": "0.18.10",
     "@cardstack/ui-components": "^0.2.21",
