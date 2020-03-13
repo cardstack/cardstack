@@ -23,6 +23,7 @@
     "@cardstack/integer-field-card": "0.18.10",
     "@cardstack/logger": "^0.2.1",
     "@cardstack/realm-card": "0.18.10",
+    "@cardstack/relative-image-reference-field-card": "0.18.10",
     "@cardstack/string-field-card": "0.18.10",
     "@cardstack/url-field-card": "0.18.10",
     "@types/fs-extra": "^8.0.1",
