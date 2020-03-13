@@ -65,6 +65,7 @@
     "test": "mocha -r esm ../test-support/bin/run.js --timeout 60000"
   },
   "volta": {
-    "node": "12.13.1"
+    "node": "12.13.1",
+    "yarn": "1.22.0"
   }
 }

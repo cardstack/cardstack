@@ -31,5 +31,9 @@
     "@cardstack/eslint-config": "0.18.11",
     "@cardstack/test-support": "0.18.11",
     "sinon": "7.2.3"
+  },
+  "volta": {
+    "node": "12.13.1",
+    "yarn": "1.22.0"
   }
 }

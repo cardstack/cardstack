@@ -115,6 +115,7 @@
     "edition": "octane"
   },
   "volta": {
-    "node": "12.13.1"
+    "node": "12.13.1",
+    "yarn": "1.22.0"
   }
 }

@@ -12,5 +12,9 @@
   "devDependencies": {
     "@cardstack/core": "0.18.11",
     "@cardstack/hub": "0.18.11"
+  },
+  "volta": {
+    "node": "12.13.1",
+    "yarn": "1.22.0"
   }
 }
