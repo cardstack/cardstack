@@ -68,10 +68,7 @@ describe('hub/git/writer with remote', function() {
     repo: Repository,
     tempRepoDir: DirectoryResult,
     tempRemoteRepoDir: DirectoryResult,
-    tempRepoPath: string,
     tempRemoteRepoPath: string,
-    // head: string,
-    // remoteRepo: Repository,
     service: ScopedCardService,
     repoDoc: CardDocument;
 
@@ -90,8 +87,9 @@ describe('hub/git/writer with remote', function() {
 
     tempRepoDir = await mkTmpDir({ unsafeCleanup: true });
     tempRemoteRepoDir = await mkTmpDir({ unsafeCleanup: true });
-    tempRepoPath = tempRepoDir.path;
+    process.env.REPO_ROOT_DIR = tempRepoDir.path;
     tempRemoteRepoPath = tempRemoteRepoDir.path;
+    let remoteCacheDir = 'test-repo';
 
     repo = await Repository.clone('http://root:password@localhost:8838/git/repo', tempRemoteRepoPath);
 
@@ -99,7 +97,7 @@ describe('hub/git/writer with remote', function() {
       .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'git-realm' })
       .withAttributes({
         remoteUrl: 'http://root:password@localhost:8838/git/repo',
-        remoteCacheDir: tempRepoPath,
+        remoteCacheDir,
         csId: repoRealm,
       });
 

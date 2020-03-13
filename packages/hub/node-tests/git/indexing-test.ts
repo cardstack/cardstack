@@ -7,6 +7,7 @@ import { Session } from '@cardstack/core/session';
 import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import Change from '../../../../cards/git-realm/lib/change';
+import { join } from 'path';
 import { commitOpts, makeRepo, inRepo } from './support';
 
 describe('hub/git/indexing', function() {
@@ -21,12 +22,14 @@ describe('hub/git/indexing', function() {
     indexing = await env.container.lookup('indexing');
     cards = await env.container.lookup('cards');
     tmpDir = await mkTmpDir({ unsafeCleanup: true });
-    root = tmpDir.path;
+    process.env.REPO_ROOT_DIR = tmpDir.path;
+    let repo = 'test-repo';
+    root = join(tmpDir.path, repo);
     service = cards.as(Session.EVERYONE);
 
     repoDoc = cardDocument()
       .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'git-realm' })
-      .withAttributes({ repo: root, csId: repoRealm });
+      .withAttributes({ repo, csId: repoRealm });
 
     await service.create(`${myOrigin}/api/realms/meta`, repoDoc.jsonapi);
   });
