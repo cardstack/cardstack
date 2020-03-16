@@ -44,7 +44,7 @@
       <div class="library-section--grid">
         {{#each this.library.recentCards as |card|}}
           <Cta {{on "click" (fn this.visitCard card)}}
-            @class="library--card-link"
+            class="library--card-link"
             data-test-library-recent-card-link={{card.canonicalURL}}
           >
             <CardRenderer
@@ -64,13 +64,13 @@
         Saved Templates
       </header>
       <CatalogEntries
-        class="library-section-grid"
+        class="library-section--grid"
         @catalogEntries={{this.library.templateEntries}}
         data-test-templates
         as |template|
       >
         <Cta {{on "click" (fn this.openCardNameDialog "Adopt a Card" template)}}
-          @class="library--card-link"
+          class="library--card-link"
           data-test-embedded-card={{template.canonicalURL}}
           data-test-library-adopt-card-btn={{template.canonicalURL}}
         >

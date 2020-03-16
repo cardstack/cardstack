@@ -1,8 +1,9 @@
 .card-builder {
   --card-builder-hover: rgba(0,0,0,0.1);
-  --card-builder-card-width: 263px;
+  --card-builder-grid-col-width: 255px;
   --card-builder-horizontal-padding: 38px;
 
+  height: 100%;
   padding-left: var(--ch-left-edge-navbar-width);
 }
 
@@ -35,7 +36,7 @@
 .card-builder--section-grid {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(4, var(--card-builder-card-width));
+  grid-template-columns: repeat(4, var(--card-builder-grid-col-width));
   grid-gap: 15px;
   margin: 0;
   padding: 15px var(--card-builder-horizontal-padding) 45px;
@@ -44,7 +45,7 @@
 
 .card-builder--section-card-link {
   margin: 0;
-  padding-right: var(--card-builder-horizontal-padding);
+  padding: 15px;
   background: none;
 }
 
@@ -58,7 +59,7 @@
 .card-builder--section-card-link:focus > .card-builder--section-card {
   transform: scale(0.9);
   box-shadow: 0px 0px 0px 35px var(--card-builder-hover);
-  transition: all 0.3s ease;
+  transition: all var(--ch-card-transition-duration) ease-in-out;
 }
 
 .card-builder--section-card-label {
@@ -70,19 +71,13 @@
 }
 
 .card-builder--section-card {
-  width: 100%;
-  min-height: 488px;
-  background-position: top center;
-  background-repeat: no-repeat;
-  background-size: contain;
   border-radius: 15px;
-  transition: transform var(--ch-card-transition-duration) ease-in-out calc(var(--ch-card-transition-duration) / 3);
+  transition: transform var(--ch-card-transition-duration) ease-in-out;
 }
 
 
 @media (max-width: 615px) {
   .card-builder {
-    --card-builder-card-width: 253px;
     --card-builder-horizontal-padding: 28px;
   }
 
