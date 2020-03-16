@@ -77,6 +77,7 @@ Until that work is done we are statically adding this css
 
   --ch-field-width: 384px;  /* edit and schema view field-renderer max-width */
   --ch-spacing: 20px;
+  --ch-bottom-edge-z-index: 30;
   --ch-left-edge-z-index: 30;
   --ch-right-edge-z-index: 20;
   --ch-top-edge-z-index: 20;
@@ -150,9 +151,12 @@ a:hover {
   z-index: 50;
 }
 
-/* TODO: Remove this when we use ember-toolbars for all edges */
+/* ember-toolbars edges */
 .cst-bottom {
-  z-index: 30; /* This is so that bottom edge is above the left edge */
+  z-index: var(--ch-bottom-edge-z-index);
+}
+.cst-top {
+  z-index: var(--ch-top-edge-z-index);
 }
 
 /* JSON card document -- hidden from view */

@@ -33,4 +33,8 @@ export default class CardsController extends Controller {
   get hasThemerTools() {
     return this.routeInfo.mode === 'themer' || this.routeInfo.mode === 'layout' || this.routeInfo.mode === 'preview';
   }
+
+  get hideTopEdge() {
+    return this.routeInfo.mode === 'cards' || this.routeInfo.mode === 'view';
+  }
 }

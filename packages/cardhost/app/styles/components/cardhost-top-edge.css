@@ -1,9 +1,6 @@
 .cardhost-top-edge {
   height: var(--ch-top-edge-height);
-  position: fixed;
-  top: 0;
-  right: var(--ch-spacing);
-  left: var(--ch-left-edge-navbar-width);
+  margin-left: var(--ch-left-edge-navbar-width);
   display: grid;
   grid-template-columns: auto 1fr auto var(--ch-right-edge-panel-width);
   grid-gap: var(--ch-spacing);

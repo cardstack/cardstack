@@ -8,16 +8,19 @@
   {{this.themerClasses}}"
   data-test-cardhost-cards
 >
-  {{#if (not-eq this.routeInfo.mode "cards")}}
-    <CardhostTopEdge
-      @mode={{this.routeInfo.mode}}
-      @card={{this.currentCard}}
-      @previousTransition={{this.previousTransition}}
-    />
-  {{/if}}
-
-  {{outlet}}
+  <ToolbarManager>
+    {{outlet}}
+  </ToolbarManager>
 </div>
+
+{{#unless this.hideTopEdge}}
+  {{in-top-toolbar show=(
+    component "cardhost-top-edge"
+    mode=this.routeInfo.mode
+    card=this.currentCard
+    previousTransition=this.previousTransition
+  )}}
+{{/unless}}
 
 {{#if this.library.visible}}
   {{in-bottom-toolbar show=(component "library")}}
