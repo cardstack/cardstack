@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/cardhost",
-  "version": "0.18.9",
+  "version": "0.18.12",
   "description": "The stock Ember app blueprint that hosts Cardstack Cards.",
   "repository": "",
   "license": "MIT",
@@ -21,22 +21,23 @@
     "test": "ember test"
   },
   "devDependencies": {
-    "@cardstack/base-card": "0.18.9",
-    "@cardstack/boolean-field-card": "0.18.9",
-    "@cardstack/call-to-action-field-card": "0.18.9",
-    "@cardstack/catalog-entry-card": "0.18.9",
-    "@cardstack/core": "0.18.9",
-    "@cardstack/date-field-card": "0.18.9",
-    "@cardstack/datetime-field-card": "0.18.9",
-    "@cardstack/eslint-config": "0.18.9",
-    "@cardstack/hub": "0.18.9",
-    "@cardstack/image-reference-field-card": "0.18.9",
-    "@cardstack/integer-field-card": "0.18.9",
+    "@cardstack/base-card": "0.18.12",
+    "@cardstack/boolean-field-card": "0.18.12",
+    "@cardstack/call-to-action-field-card": "0.18.12",
+    "@cardstack/catalog-entry-card": "0.18.12",
+    "@cardstack/core": "0.18.12",
+    "@cardstack/date-field-card": "0.18.12",
+    "@cardstack/datetime-field-card": "0.18.12",
+    "@cardstack/eslint-config": "0.18.12",
+    "@cardstack/hub": "0.18.12",
+    "@cardstack/image-reference-field-card": "0.18.12",
+    "@cardstack/integer-field-card": "0.18.12",
+    "@cardstack/relative-image-reference-field-card": "0.18.12",
     "@cardstack/requirejs-monaco-ember-polyfill": "^0.0.1",
-    "@cardstack/string-field-card": "0.18.9",
-    "@cardstack/test-support": "0.18.9",
+    "@cardstack/string-field-card": "0.18.12",
+    "@cardstack/test-support": "0.18.12",
     "@cardstack/ui-components": "^0.2.21",
-    "@cardstack/url-field-card": "0.18.9",
+    "@cardstack/url-field-card": "0.18.12",
     "@ember/jquery": "^1.1.0",
     "@ember/optional-features": "^1.1.0",
     "@ember/render-modifiers": "^1.0.2",
@@ -53,7 +54,6 @@
     "@types/rsvp": "^4.0.3",
     "babel-eslint": "^10.0.2",
     "broccoli-asset-rev": "^3.0.0",
-    "dag-map": "^2.0.2",
     "ember-a11y-testing": "^2.0.0",
     "ember-animated": "0.10.0",
     "ember-animated-tools": "^0.4.1",
@@ -114,6 +114,7 @@
     "edition": "octane"
   },
   "volta": {
-    "node": "12.13.1"
+    "node": "12.13.1",
+    "yarn": "1.22.0"
   }
 }

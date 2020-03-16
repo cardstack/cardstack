@@ -31,6 +31,7 @@ export default class ScaffoldComponent extends Component<{
       case 'datetime-field':
       case 'url-field':
       case 'image-reference-field':
+      case 'relative-image-reference-field':
       case 'call-to-action-field':
         csId = this.args.card.adoptsFromId?.csId;
         break;

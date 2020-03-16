@@ -27,7 +27,18 @@ const testCard = cardDocument()
     csId: 'millenial-puppies',
     csTitle: 'Millenial Puppies',
     csFieldSets: {
-      isolated: ['body', 'likes', 'published', 'author', 'appointment', 'birthday', 'link', 'image', 'cta'],
+      isolated: [
+        'body',
+        'likes',
+        'published',
+        'author',
+        'appointment',
+        'birthday',
+        'link',
+        'image',
+        'relativeImage',
+        'cta',
+      ],
     },
     likes: 100,
     birthday: '2019-10-30',
@@ -43,6 +54,7 @@ const testCard = cardDocument()
   .withField('link', 'url-field', 'singular', { csTitle: 'Awesome Link' })
   .withField('cta', 'call-to-action-field', 'singular', { csTitle: 'Call to action' })
   .withField('image', 'image-reference-field', 'singular', { csTitle: 'Awesome Image' })
+  .withField('relativeImage', 'relative-image-reference-field', 'singular', { csTitle: 'Awesome Relative Image' })
   .withField('author', 'base');
 const cardPath = encodeURIComponent(testCard.canonicalURL);
 const scenario = new Fixtures({
@@ -172,6 +184,29 @@ module('Acceptance | card edit', function(hooks) {
     let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.image, imageURL);
+  });
+
+  test('setting a relative image reference field', async function(assert) {
+    const imageURL = '/assets/images/contributors/jen-c80f27e85c9404453b8c65754694619e.jpg';
+
+    await visit(`/cards/${cardPath}/edit/fields`);
+    await waitForCardLoad();
+
+    await setFieldValue('relativeImage', imageURL);
+    await saveCard();
+
+    await visit(`/cards/${cardPath}`);
+    await waitForCardLoad();
+    assert
+      .dom('[data-test-field="relativeImage"] [data-test-image-reference-field-viewer-label]')
+      .hasText(`Awesome Relative Image`);
+    assert
+      .dom('[data-test-field="relativeImage"] [data-test-image-reference-field-viewer-value]')
+      .hasAttribute('src', imageURL);
+
+    let cardJson = find('[data-test-card-json]').innerHTML;
+    let card = JSON.parse(cardJson);
+    assert.equal(card.data.attributes['relativeImage'], imageURL);
   });
 
   test('setting an integer field', async function(assert) {

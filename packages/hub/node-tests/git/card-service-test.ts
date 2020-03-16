@@ -1,5 +1,3 @@
-// import { AddressableCard } from '@cardstack/core/card';
-// import { canonicalURL } from '@cardstack/core/card-id';
 import { ScopedCardService } from '../../cards-service';
 import { myOrigin } from '@cardstack/core/origin';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
@@ -7,8 +5,8 @@ import { Session } from '@cardstack/core/session';
 import { createTestEnv, TestEnv } from '../helpers';
 import { cardDocument } from '@cardstack/core/card-document';
 import { makeRepo } from './support';
+import { join } from 'path';
 import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';
-// import { Value } from 'json-typescript';
 
 describe('hub/git/card-service', function() {
   describe('read-write', function() {
@@ -24,9 +22,10 @@ describe('hub/git/card-service', function() {
       service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
 
       tmpDir = await mkTmpDir({ unsafeCleanup: true });
-      repoPath = tmpDir.path;
+      process.env.REPO_ROOT_DIR = tmpDir.path;
+      repoPath = 'test-repo';
 
-      await makeRepo(repoPath);
+      await makeRepo(join(tmpDir.path, repoPath));
 
       repoDoc = cardDocument()
         .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'git-realm' })

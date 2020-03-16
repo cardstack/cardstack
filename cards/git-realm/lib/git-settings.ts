@@ -5,11 +5,17 @@ interface IndexerSettings {
   remote?: RemoteConfig;
 }
 import { RemoteConfig } from './git';
+import { homedir } from 'os';
+import { join } from 'path';
+import { mkdirp } from 'fs-extra';
 
 import CardstackError from '@cardstack/core/error';
 import { AddressableCard } from '@cardstack/core/card';
 
 export async function extractSettings(realmCard: AddressableCard): Promise<IndexerSettings> {
+  // In order to allow git realm cards to be portable, let's let the hub decide
+  // where the repo dir, as the root dir in one hub may not exist in another hub.
+  const repoRootDir = process.env.REPO_ROOT_DIR || join(homedir(), '.cardstack');
   let repo = (await realmCard.value('repo')) ?? undefined;
   let remoteUrl = (await realmCard.value('remoteUrl')) ?? undefined;
   let remoteCacheDir = (await realmCard.value('remoteCacheDir')) ?? undefined;
@@ -18,6 +24,11 @@ export async function extractSettings(realmCard: AddressableCard): Promise<Index
 
   let remote: RemoteConfig | undefined;
 
+  if (repo) {
+    repo = join(repoRootDir, repo);
+    await mkdirp(repo);
+  }
+
   if (remoteUrl) {
     if (!remoteCacheDir) {
       throw new CardstackError('You must provide a remoteCacheDir for remote repo config');
@@ -25,8 +36,9 @@ export async function extractSettings(realmCard: AddressableCard): Promise<Index
 
     remote = {
       url: remoteUrl,
-      cacheDir: remoteCacheDir,
+      cacheDir: join(repoRootDir, remoteCacheDir),
     };
+    await mkdirp(remote.cacheDir);
   }
   if (repo && (remoteUrl || remoteCacheDir)) {
     throw new Error('You cannot define the repo param with either the remoteUrl param or the remoteCacheDir param');

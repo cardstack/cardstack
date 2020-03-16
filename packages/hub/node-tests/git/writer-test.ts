@@ -14,6 +14,7 @@ import { createTestEnv, TestEnv } from '../helpers';
 import { cardDocument, CardDocument } from '@cardstack/core/card-document';
 import { makeRepo, inRepo } from './support';
 import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';
+import { join } from 'path';
 
 describe('hub/git/writer', function() {
   this.timeout(10000);
@@ -29,13 +30,15 @@ describe('hub/git/writer', function() {
     service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
 
     tmpDir = await mkTmpDir({ unsafeCleanup: true });
-    repoPath = tmpDir.path;
+    process.env.REPO_ROOT_DIR = tmpDir.path;
+    let repo = 'test-repo';
+    repoPath = join(tmpDir.path, repo);
 
     await makeRepo(repoPath);
 
     repoDoc = cardDocument()
       .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'git-realm' })
-      .withAttributes({ repo: repoPath, csId: repoRealm });
+      .withAttributes({ repo, csId: repoRealm });
 
     await service.create(`${myOrigin}/api/realms/meta`, repoDoc.jsonapi);
 

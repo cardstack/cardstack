@@ -9,6 +9,11 @@ import { CardId, canonicalURL, cardstackFieldPattern, FieldArity, canonicalURLTo
 import { UpstreamDocument } from './document';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
 import cloneDeep from 'lodash/cloneDeep';
+import DAGMap from 'dag-map';
+import flatten from 'lodash/flatten';
+import uniq from 'lodash/uniq';
+import { ResourceObject } from 'jsonapi-typescript';
+import isPlainObject from 'lodash/isPlainObject';
 
 export class CardDocument {
   private parent: CardId | undefined;
@@ -380,6 +385,53 @@ export function cardDocumentFromJsonAPI(sourceDoc: SingleResourceDoc): CardDocum
   doc.withAttributes(attributes).withRelationships(fieldRefs);
 
   return doc;
+}
+
+interface CardDAGEntry {
+  cardResource: ResourceObject;
+  cardArtifact: ResourceObject | CardDocumentWithId | SingleResourceDoc;
+}
+
+export function inDependencyOrder(cards: ResourceObject[]): ResourceObject[];
+export function inDependencyOrder(cards: CardDocumentWithId[]): CardDocumentWithId[];
+export function inDependencyOrder(cards: SingleResourceDoc[]): SingleResourceDoc[];
+export function inDependencyOrder(cards: any[]): any[] {
+  let dag = new DAGMap<CardDAGEntry>();
+
+  for (let card of cards) {
+    let json: ResourceObject = 'jsonapi' in card ? card.jsonapi.data : 'data' in card ? card.data : card;
+    dag.add(
+      canonicalURL((json.attributes as unknown) as CardId),
+      { cardResource: json, cardArtifact: card },
+      undefined,
+      getRelatedIds(json)
+    );
+  }
+  let sortedCreatedCards: CardDAGEntry[] = [];
+  dag.each((_key, value) => sortedCreatedCards.push(value!));
+  // filter out any built-in cards, as those are never supplied in the fixtures
+  // and only appear as references with undefined values in the DAG.
+  return sortedCreatedCards.filter(Boolean).map(c => c.cardArtifact);
+}
+
+function getRelatedIds(cardValue: CardDocument['asCardValue']): string[] {
+  return uniq(
+    flatten([
+      ...Object.values(cardValue.relationships || {}).map(value => {
+        if (!('data' in value) || value.data == null) {
+          return;
+        }
+        if (Array.isArray(value.data)) {
+          return (value.data as ResourceIdentifierObject[]).map(i => i.id);
+        } else {
+          return value.data.id;
+        }
+      }),
+      ...Object.values(cardValue.attributes || {}).map(value =>
+        isPlainObject(value) ? getRelatedIds(value as CardDocument['asCardValue']) : null
+      ),
+    ]).filter(Boolean)
+  ) as string[];
 }
 
 function getRelatedCanonicalURL(idOrDoc: CardDocument | CardId): string {

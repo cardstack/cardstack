@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/url-field-card",
-  "version": "0.18.9",
+  "version": "0.18.12",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -10,7 +10,11 @@
     "@cardstack/hub": "*"
   },
   "devDependencies": {
-    "@cardstack/core": "0.18.9",
-    "@cardstack/hub": "0.18.9"
+    "@cardstack/core": "0.18.12",
+    "@cardstack/hub": "0.18.12"
+  },
+  "volta": {
+    "node": "12.13.1",
+    "yarn": "1.22.0"
   }
 }
