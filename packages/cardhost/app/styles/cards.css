@@ -57,15 +57,11 @@
   width: 100%;
   margin-top: var(--ch-top-edge-height);
   overflow-y: auto;
-  transition: margin-top var(--ch-transition-time),
-              padding-top var(--ch-transition-time);
 }
 
 .cardhost-cards.view .card-renderer--container,
 .cardhost-cards.preview .card-renderer--container {
-  box-sizing: content-box;
-  margin-top: 0;
-  padding-top: var(--ch-top-edge-height);
+  height: 100%;
 }
 
 .card-renderer--inner-container {
