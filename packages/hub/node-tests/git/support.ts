@@ -83,7 +83,7 @@ async function run(command: string, args: string[], opts: Record<string, string>
     });
     p.on('close', function(code) {
       if (code !== 0) {
-        let err: StdOutError = new Error(command + ' ' + args.join(' ') + ' exited with nonzero status');
+        let err: StdOutError = new Error(`${command} ${args.join(' ')} exited with nonzero status: ${stderr}`);
         err.stderr = stderr;
         err.stdout = stdout;
         reject(err);
