@@ -11,7 +11,7 @@
   margin: 0;
   background-color: var(--bg-color);
   color: var(--ch-dark);
-  overflow-y: auto;
+  overflow-y: hidden;
   transition: var(--ch-card-background-color-animate);
 }
 
@@ -25,6 +25,12 @@
 
 .cardhost-cards.preview {
   --bg-color: var(--preview-bg);
+}
+
+.cardhost-cards.view,
+.cardhost-cards.preview,
+.cardhost-cards.cards {
+  overflow-y: auto;
 }
 
 .cardhost-cards.schema {
@@ -57,15 +63,12 @@
   width: 100%;
   margin-top: var(--ch-top-edge-height);
   overflow-y: auto;
-  transition: margin-top var(--ch-transition-time),
-              padding-top var(--ch-transition-time);
 }
 
 .cardhost-cards.view .card-renderer--container,
 .cardhost-cards.preview .card-renderer--container {
-  box-sizing: content-box;
-  margin-top: 0;
-  padding-top: var(--ch-top-edge-height);
+  height: 100%;
+  overflow-y: initial;
 }
 
 .card-renderer--inner-container {

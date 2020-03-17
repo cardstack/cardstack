@@ -236,7 +236,7 @@ export default class CardRenderer extends Component {
 
   *headerAnimation({ keptSprites, receivedSprites }) {
     keptSprites.forEach(sprite => {
-      move(sprite, { duration });
+      parallel(move(sprite, { easing: easeInAndOut, duration }), resize(sprite, { easing: easeInAndOut, duration }));
     });
 
     if (receivedSprites.length) {
@@ -259,6 +259,7 @@ export default class CardRenderer extends Component {
 
     keptSprites.forEach(sprite => {
       sprite.applyStyles({ 'z-index': '5' });
+      parallel(move(sprite, { easing: easeInAndOut, duration }), resize(sprite, { easing: easeInAndOut, duration }));
       adjustCSS('border-top-right-radius', sprite, { duration });
       adjustCSS('border-top-left-radius', sprite, { duration });
     });

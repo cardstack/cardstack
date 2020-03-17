@@ -21,7 +21,7 @@
     <div class="view-selector" data-test-view-selector>
       <LinkTo
         @route="cards.card.edit.layout"
-        @class="view-selector--mode-link"
+        @class="view-selector--mode-link {{if (eq @mode "layout") "active"}}"
         @model={{@card.canonicalURL}}
         data-test-view-selector="layout"
       >
@@ -30,7 +30,7 @@
       </LinkTo>
       <LinkTo
         @route="cards.card.edit.fields"
-        @class="view-selector--mode-link"
+        @class="view-selector--mode-link {{if (eq @mode "fields") "active"}}"
         @model={{@card.canonicalURL}}
         data-test-view-selector="fields"
       >
