@@ -60,7 +60,7 @@ export default class Change {
     this.isRemote = !!isRemote;
   }
 
-  async _headCommit() {
+  private async headCommit() {
     return headCommit(this.repo, this.targetBranch, this.isRemote);
   }
 
@@ -70,14 +70,14 @@ export default class Change {
   }
 
   async finalize(commitOpts: CommitOpts) {
-    let newCommit = await this._makeCommit(commitOpts);
+    let newCommit = await this.makeCommit(commitOpts);
 
     let delayTime = 500;
     let mergeCommit;
     let needsFetchAll = false;
 
     while (delayTime <= 5000) {
-      mergeCommit = await this._makeMergeCommit(newCommit!, commitOpts);
+      mergeCommit = await this.makeMergeCommit(newCommit!, commitOpts);
 
       try {
         if (this.isRemote) {
@@ -87,9 +87,9 @@ export default class Change {
             // (hopefully) recover from upstream getting out of sync
             await this.repo.fetchAll();
           }
-          await this._pushCommit(mergeCommit);
+          await this.pushCommit(mergeCommit);
         } else {
-          await this._applyCommit(mergeCommit);
+          await this.applyCommit(mergeCommit);
         }
       } catch (err) {
         log.warn('Failed to finalize commit "%s"', err);
@@ -112,7 +112,7 @@ export default class Change {
     throw new Error('Failed to finalise commit and could not recover. ');
   }
 
-  async _makeCommit(commitOpts: CommitOpts) {
+  private async makeCommit(commitOpts: CommitOpts) {
     if (!this.root.dirty) {
       return this.parentCommit;
     }
@@ -124,7 +124,7 @@ export default class Change {
     return Commit.lookup(this.repo, commitOid);
   }
 
-  async _pushCommit(mergeCommit: Commit) {
+  private async pushCommit(mergeCommit: Commit) {
     const remoteBranchName = `temp-remote-${crypto.randomBytes(20).toString('hex')}`;
     await this.repo.createBranch(remoteBranchName, mergeCommit);
 
@@ -139,8 +139,8 @@ export default class Change {
     }
   }
 
-  async _makeMergeCommit(newCommit: Commit, commitOpts: CommitOpts) {
-    let headCommit = await this._headCommit();
+  private async makeMergeCommit(newCommit: Commit, commitOpts: CommitOpts) {
+    let headCommit = await this.headCommit();
 
     if (!headCommit) {
       // new branch, so no merge needed
@@ -159,18 +159,18 @@ export default class Change {
     return await Commit.lookup(this.repo, mergeResult.oid!);
   }
 
-  async _applyCommit(commit: Commit) {
-    let headCommit = await this._headCommit();
+  private async applyCommit(commit: Commit) {
+    let headCommit = await this.headCommit();
 
     if (!headCommit) {
-      return await this._newBranch(commit);
+      return await this.newBranch(commit);
     }
 
     let headRef = await this.repo.lookupLocalBranch(this.targetBranch);
     await headRef.setTarget(commit.id());
   }
 
-  async _newBranch(newCommit: Commit) {
+  private async newBranch(newCommit: Commit) {
     await this.repo.createBranch(this.targetBranch, newCommit);
   }
 }

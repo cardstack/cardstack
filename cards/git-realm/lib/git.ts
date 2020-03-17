@@ -1,4 +1,5 @@
 import fs, { existsSync } from 'fs';
+import http from 'isomorphic-git/http/node';
 import { join } from 'path';
 
 import Tree from './tree';
@@ -37,7 +38,6 @@ import {
   listBranches as igListBranches,
   log as igLog,
   merge as igMerge,
-  plugins as igPlugins,
   push as igPush,
   readCommit as igReadCommit,
   resolveRef as igResolveRef,
@@ -47,8 +47,6 @@ import {
   // types
   ReadCommitResult,
 } from 'isomorphic-git';
-
-igPlugins.set('fs', fs);
 
 export interface RemoteConfig {
   url: string;
@@ -75,7 +73,7 @@ export class Repository {
     let bare = !existsSync(join(path, '.git'));
 
     try {
-      let opts = bare ? { gitdir: path } : { dir: path };
+      let opts = bare ? { fs, gitdir: path } : { fs, dir: path };
       // Try to get the current branch to check if it's really a git repo or not
       await igCurrentBranch(opts);
     } catch (e) {
@@ -85,12 +83,14 @@ export class Repository {
   }
 
   static async initBare(gitdir: string): Promise<Repository> {
-    await igInit({ gitdir, bare: true });
+    await igInit({ gitdir, bare: true, fs });
     return await Repository.open(gitdir);
   }
 
   static async clone(url: string, dir: string) {
     await igClone({
+      fs,
+      http,
       url,
       dir,
     });
@@ -109,6 +109,7 @@ export class Repository {
 
   async getMasterCommit(): Promise<Commit> {
     let sha = await igResolveRef({
+      fs,
       gitdir: this.gitdir,
       ref: 'master',
     });
@@ -121,6 +122,7 @@ export class Repository {
 
   async createBlobFromBuffer(buffer: Buffer): Promise<Oid> {
     let sha = await igWriteBlob({
+      fs,
       gitdir: this.gitdir,
       blob: buffer,
     });
@@ -130,12 +132,15 @@ export class Repository {
 
   async fetchAll() {
     await igFetch({
+      fs,
+      http,
       gitdir: this.gitdir,
     });
   }
 
   async mergeBranches(to: string, from: string) {
     await igMerge({
+      fs,
       gitdir: this.gitdir,
       ours: to,
       theirs: from,
@@ -149,6 +154,7 @@ export class Repository {
 
   async createBranch(targetBranch: string, headCommit: Commit): Promise<Reference> {
     await igWriteRef({
+      fs,
       gitdir: this.gitdir,
       ref: `refs/heads/${targetBranch}`,
       value: headCommit.sha(),
@@ -160,6 +166,7 @@ export class Repository {
 
   async checkoutBranch(reference: Reference) {
     await igCheckout({
+      fs,
       dir: this.path,
       gitdir: this.gitdir,
       ref: reference.toString(),
@@ -175,7 +182,7 @@ export class Repository {
   }
 
   async lookupLocalBranch(branchName: string) {
-    let branches = await igListBranches({ gitdir: this.gitdir });
+    let branches = await igListBranches({ fs, gitdir: this.gitdir });
 
     if (branches.includes(branchName)) {
       return await this.lookupReference(`refs/heads/${branchName}`);
@@ -185,7 +192,7 @@ export class Repository {
   }
 
   async lookupRemoteBranch(remote: string, branchName: string) {
-    let branches = await igListBranches({ gitdir: this.gitdir, remote });
+    let branches = await igListBranches({ fs, gitdir: this.gitdir, remote });
 
     if (branches.includes(branchName)) {
       return await this.lookupReference(`refs/remotes/${remote}/${branchName}`);
@@ -200,19 +207,21 @@ export class Repository {
 
   async reset(commit: Commit, hard: boolean) {
     let ref = await igCurrentBranch({
+      fs,
       gitdir: this.gitdir,
       fullname: true,
     });
 
     await igWriteRef({
+      fs,
       gitdir: this.gitdir,
-      ref: ref!,
+      ref: ref as string,
       value: commit.sha(),
     });
 
     if (hard) {
       await unlink(join(this.gitdir, 'index'));
-      await igCheckout({ dir: this.path, ref: ref! });
+      await igCheckout({ fs, dir: this.path, ref: ref as string });
     }
   }
 
@@ -225,6 +234,7 @@ export class Commit {
   static async create(repo: Repository, commitOpts: CommitOpts, tree: Tree, parents: Commit[]): Promise<Oid> {
     let sha = await igCommit(
       Object.assign(formatCommitOpts(commitOpts), {
+        fs,
         gitdir: repo.gitdir,
         tree: tree.id()!.toString(),
         parent: parents.map(p => p.sha()),
@@ -237,6 +247,7 @@ export class Commit {
   static async lookup(repo: Repository, id: Oid | string): Promise<Commit> {
     try {
       let commitInfo = await igReadCommit({
+        fs,
         gitdir: repo.gitdir,
         oid: id.toString(),
       });
@@ -262,6 +273,7 @@ export class Commit {
 
   async getLog() {
     return await igLog({
+      fs,
       gitdir: this.repo.gitdir,
       ref: this.sha(),
     });
@@ -293,6 +305,7 @@ class Reference {
 
   static async lookup(repo: Repository, reference: string) {
     let sha = await igResolveRef({
+      fs,
       gitdir: repo.gitdir,
       ref: reference,
     });
@@ -306,6 +319,7 @@ class Reference {
 
   async setTarget(id: Oid): Promise<void> {
     await igWriteRef({
+      fs,
       gitdir: this.repo.gitdir,
       ref: this.reference,
       value: id.toString(),
@@ -321,6 +335,7 @@ class Reference {
 export class Remote {
   static async create(repo: Repository, remote: string, url: string): Promise<Remote> {
     await igAddRemote({
+      fs,
       gitdir: await repo.gitdir,
       remote,
       url,
@@ -335,6 +350,8 @@ export class Remote {
     await igPush(
       Object.assign(
         {
+          fs,
+          http,
           gitdir: await this.repo.gitdir,
           remote: this.remote,
           ref,
@@ -352,7 +369,7 @@ function formatCommitOpts(commitOpts: CommitOpts) {
   let author = {
     name: commitOpts.authorName,
     email: commitOpts.authorEmail,
-    date: commitDate.toDate(),
+    timestamp: commitDate.unix(),
     timezoneOffset: -commitDate.utcOffset(),
   };
 
@@ -377,6 +394,7 @@ export class Merge {
 
   static async base(repo: Repository, one: Oid, two: Oid): Promise<Oid> {
     let oids = await igFindMergeBase({
+      fs,
       gitdir: repo.gitdir,
       oids: [one.toString(), two.toString()],
     });
@@ -387,6 +405,7 @@ export class Merge {
     try {
       let res = await igMerge(
         Object.assign(formatCommitOpts(commitOpts), {
+          fs,
           gitdir: repo.gitdir,
           ours: ourCommit.sha(),
           theirs: theirCommit.sha(),
@@ -395,7 +414,7 @@ export class Merge {
 
       return res;
     } catch (e) {
-      if (e.code === 'MergeNotSupportedFail') {
+      if (e.code === 'MergeNotSupportedError') {
         throw new GitConflict();
       } else {
         throw e;

@@ -37,6 +37,9 @@ class RepoExplorer {
   async getContents(refSpec: string, path: string) {
     return (await this.runGit('show', `${refSpec}:${path}`)).stdout;
   }
+  async push() {
+    return (await this.runGit('push')).stdout;
+  }
   async getJSONContents(refSpec: string, path: string) {
     return JSON.parse((await this.runGit('show', `${refSpec}:${path}`)).stdout);
   }
