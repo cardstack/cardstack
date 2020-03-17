@@ -16,9 +16,9 @@ import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 const timeout = 5000;
 
-export async function waitForAnimation(cb) {
+export async function waitForAnimation(promise) {
   await new Promise(res => setTimeout(() => res(), 1000));
-  await cb();
+  await promise();
 }
 
 export async function waitForTestsToEnd() {

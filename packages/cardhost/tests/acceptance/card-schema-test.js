@@ -283,7 +283,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-mode-indicator-link="edit"]').exists();
     assert.dom('[data-test-mode-indicator]').containsText('schema mode');
     assert.dom('[data-test-edge-actions-btn]').exists();
-    await waitForAnimation(() => percySnapshot('themer: small card width'));
+    await waitForAnimation(() => await percySnapshot('themer: small card width'));
   });
 
   test(`can navigate to edit mode using the top edge`, async function(assert) {

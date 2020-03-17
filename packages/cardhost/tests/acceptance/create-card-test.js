@@ -207,7 +207,7 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('field-1');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea').hasValue('');
-    await waitForAnimation(() => percySnapshot(assert));
+    await waitForAnimation(() => await percySnapshot(assert));
   });
 
   test(`renaming a card's field`, async function(assert) {
@@ -271,7 +271,7 @@ module('Acceptance | card create', function(hooks) {
       .dom('[data-test-right-edge] [data-test-schema-attr="name"] [data-test-cs-component-validation="text-field"]')
       .hasText('Can only contain letters, numbers, dashes, and underscores.');
 
-    await waitForAnimation(() => percySnapshot(assert));
+    await waitForAnimation(() => await percySnapshot(assert));
   });
 
   test(`removing a field from a card`, async function(assert) {
