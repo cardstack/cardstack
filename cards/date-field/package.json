@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/date-field-card",
-  "version": "0.18.12",
+  "version": "0.18.13",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -10,8 +10,8 @@
     "@cardstack/hub": "*"
   },
   "devDependencies": {
-    "@cardstack/core": "0.18.12",
-    "@cardstack/hub": "0.18.12"
+    "@cardstack/core": "0.18.13",
+    "@cardstack/hub": "0.18.13"
   },
   "volta": {
     "node": "12.13.1",
