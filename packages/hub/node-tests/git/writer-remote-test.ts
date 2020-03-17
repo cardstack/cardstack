@@ -15,10 +15,11 @@ import stringify from 'json-stable-stringify';
 import IndexingService from '../../indexing';
 
 const repoRealm = `${myOrigin}/api/realms/test-git-repo`;
+let rootDir: DirectoryResult;
 
 async function resetRemote() {
-  let tmpDir = await mkTmpDir({ unsafeCleanup: true });
-  let root = tmpDir.path;
+  rootDir = await mkTmpDir({ unsafeCleanup: true });
+  let root = rootDir.path;
 
   let tempRepo = await makeRepo(root, {
     'cards/event-1/card.json': stringify(
@@ -88,6 +89,7 @@ describe('hub/git/writer with remote', function() {
   });
 
   afterEach(async function() {
+    await rootDir.cleanup();
     await tempRepoDir.cleanup();
     await tempRemoteRepoDir.cleanup();
     await env.destroy();

@@ -12,8 +12,12 @@ import Change from '@cardstack/git-realm-card/lib/change';
 import { commitOpts, makeRepo, inRepo } from './support';
 import stringify from 'json-stable-stringify';
 
+let rootDir: DirectoryResult;
+
 async function resetRemote() {
-  let tmpDir = await (await mkTmpDir({ unsafeCleanup: true })).path;
+  rootDir = await mkTmpDir({ unsafeCleanup: true });
+
+  let tmpDir = rootDir.path;
   let tempRepo = await makeRepo(tmpDir, {
     'cards/event-1/card.json': stringify(
       cardDocument()
@@ -76,6 +80,7 @@ describe('hub/git/indexing-remote', function() {
   });
 
   afterEach(async function() {
+    await rootDir.cleanup();
     await tempRepoDir.cleanup();
     await tempRemoteRepoDir.cleanup();
     await env.destroy();
