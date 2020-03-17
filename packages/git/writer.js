@@ -240,6 +240,11 @@ module.exports = class Writer {
       log.info("Githereum is enabled, triggering push");
       // make sure only one push is ongoing at a time, by creating a chain of
       // promises here
+
+      if (!this._githereumPromise && this.githereumConfig.debounce) {
+        this._githereumPromise = new Promise(resolve => setTimeout(resolve, this.githereumConfig.debounce));
+      }
+
       this._githereumPromise = Promise.resolve(this._githereumPromise).then(() => {
         log.info("Starting githereum push");
         return this.githereum.push(this.githereumConfig.tag).then(() =>
