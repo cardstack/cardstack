@@ -162,7 +162,6 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     assert.dom('[data-test-large-btn]').exists();
     assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--small');
-    await waitForAnimation(async () => await percySnapshot('themer: small card width'));
 
     // toggle to full width
     await click('[data-test-medium-btn]');
@@ -178,6 +177,13 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
     await waitForAnimation(async () => await percySnapshot('themer: large card width'));
+
+    await click('[data-test-small-btn]');
+    assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-cardhost-cards]').hasClass('themer-card-width--small');
+    assert.dom('[data-test-small-btn]').hasClass('selected');
+    assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
+    await waitForAnimation(async () => await percySnapshot('themer: small card width'));
   });
 
   test('layout mode: toggling card width', async function(assert) {
