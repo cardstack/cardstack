@@ -22,6 +22,7 @@ async function resetRemote() {
       { space: 2 }
     ),
     'cards/event-1/package.json': '{}',
+    'cards/event-1/example.css': 'the best styles',
     'cards/event-2/card.json': stringify(
       cardDocument()
         .withField('title', 'string-field')
@@ -90,10 +91,45 @@ describe('hub/git/indexing-remote', function() {
   it('indexes existing data in the remote after it is cloned', async function() {
     await indexing.update();
 
+    let indexerState = await indexing.loadMeta(csRealm);
+    expect(indexerState!.commit).to.equal(head);
+
     let foundCard = await service.get({ csRealm: repoRealm, csId: 'event-1' });
     expect(await foundCard.value('title')).to.equal('hello world');
+    expect(foundCard.csFiles).to.deep.equal({
+      'example.css': 'the best styles',
+    });
     foundCard = await service.get({ csRealm: repoRealm, csId: 'event-2' });
     expect(await foundCard.value('title')).to.equal('goodbye world');
+  });
+
+  it('indexes added cards', async function() {
+    await indexing.update(); // we want the next indexing to be incremental
+
+    let change = await Change.create(remoteRepo, head, 'master');
+    let file = await change.get('cards/hello-world/card.json', { allowCreate: true });
+    file.setContent(
+      stringify(
+        cardDocument()
+          .withField('title', 'string-field')
+          .withAttributes({ csId: 'hello-world', title: 'hello world' }).jsonapi,
+        { space: 2 }
+      )
+    );
+    file = await change.get('cards/hello-world/package.json', { allowCreate: true });
+    file.setContent('{}');
+    head = await change.finalize(commitOpts());
+    await inRepo(remoteRepo.path).push();
+
+    let count = indexing.operationsCount;
+    await indexing.update();
+    expect(indexing.operationsCount).to.equal(count + 1, 'wrong number of operations');
+
+    let indexerState = await indexing.loadMeta(csRealm);
+    expect(indexerState!.commit).to.equal(head);
+
+    let foundCard = await service.get({ csRealm: repoRealm, csId: 'hello-world' });
+    expect(await foundCard.value('title')).to.equal('hello world');
   });
 
   it('indexes updated card', async function() {
@@ -110,18 +146,21 @@ describe('hub/git/indexing-remote', function() {
         { space: 2 }
       )
     );
-    await change.finalize(commitOpts());
+    head = await change.finalize(commitOpts());
     await inRepo(remoteRepo.path).push();
 
     let count = indexing.operationsCount;
     await indexing.update();
     expect(indexing.operationsCount).to.equal(count + 1, 'wrong number of operations');
 
+    let indexerState = await indexing.loadMeta(csRealm);
+    expect(indexerState!.commit).to.equal(head);
+
     let updatedCard = await service.get({ csRealm, csId: 'event-1' });
     expect(await updatedCard.value('title')).to.equal('updated title');
   });
 
-  it('indexes card with inner file', async function() {
+  it('indexes card with added inner file', async function() {
     await indexing.update(); // we want the next indexing to be incremental
 
     let change = await Change.create(remoteRepo, head, 'master');
@@ -134,10 +173,56 @@ describe('hub/git/indexing-remote', function() {
     await indexing.update();
     expect(indexing.operationsCount).to.equal(count + 1, 'wrong number of operations');
 
+    let indexerState = await indexing.loadMeta(csRealm);
+    expect(indexerState!.commit).to.equal(head);
+
     let updatedCard = await service.get({ csRealm, csId: 'event-1' });
     expect(updatedCard.csFiles).to.deep.equal({
+      'example.css': 'the best styles',
       inner: { 'example.hbs': 'Hello World' },
     });
+  });
+
+  it('indexes card with updated inner file', async function() {
+    await indexing.update(); // we want the next indexing to be incremental
+
+    let change = await Change.create(remoteRepo, head, 'master');
+    let file = await change.get(`cards/event-1/example.css`, { allowUpdate: true });
+    file.setContent('adequate styles');
+    head = await change.finalize(commitOpts());
+    await inRepo(remoteRepo.path).push();
+
+    let count = indexing.operationsCount;
+    await indexing.update();
+    expect(indexing.operationsCount).to.equal(count + 1, 'wrong number of operations');
+
+    let indexerState = await indexing.loadMeta(csRealm);
+    expect(indexerState!.commit).to.equal(head);
+
+    let updatedCard = await service.get({ csRealm, csId: 'event-1' });
+    expect(updatedCard.csFiles).to.deep.equal({
+      'example.css': 'adequate styles',
+    });
+  });
+
+  it('indexes card with removed inner file', async function() {
+    await indexing.update(); // we want the next indexing to be incremental
+
+    let change = await Change.create(remoteRepo, head, 'master');
+    let file = await change.get(`cards/event-1/example.css`);
+    file.delete();
+    head = await change.finalize(commitOpts());
+    await inRepo(remoteRepo.path).push();
+
+    let count = indexing.operationsCount;
+    await indexing.update();
+    expect(indexing.operationsCount).to.equal(count + 1, 'wrong number of operations');
+
+    let indexerState = await indexing.loadMeta(csRealm);
+    expect(indexerState!.commit).to.equal(head);
+
+    let updatedCard = await service.get({ csRealm, csId: 'event-2' });
+    expect(updatedCard.csFiles).to.deep.equal({});
   });
 
   it('removes a card that is no longer in git', async function() {
@@ -150,12 +235,17 @@ describe('hub/git/indexing-remote', function() {
     file.delete();
     file = await change.get(`cards/event-1/package.json`);
     file.delete();
-    await change.finalize(commitOpts());
+    file = await change.get(`cards/event-1/example.css`);
+    file.delete();
+    head = await change.finalize(commitOpts());
     await inRepo(remoteRepo.path).push();
 
     let count = indexing.operationsCount;
     await indexing.update();
     expect(indexing.operationsCount).to.equal(count + 1, 'wrong number of operations');
+
+    let indexerState = await indexing.loadMeta(csRealm);
+    expect(indexerState!.commit).to.equal(head);
 
     try {
       await service.get({ csRealm, csId: 'event-1' });

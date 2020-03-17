@@ -10,6 +10,7 @@ import Change from '../../../../cards/git-realm/lib/change';
 import { join } from 'path';
 import { commitOpts, makeRepo, inRepo } from './support';
 import { AddressableCard } from '@cardstack/core/card';
+import stringify from 'json-stable-stringify';
 
 describe('hub/git/indexing', function() {
   let env: TestEnv, indexing: IndexingService, cards: CardsService, service: ScopedCardService;
@@ -56,10 +57,11 @@ describe('hub/git/indexing', function() {
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('cards/hello-world/card.json', { allowCreate: true });
     file.setContent(
-      JSON.stringify(
+      stringify(
         cardDocument()
           .withField('title', 'string-field')
-          .withAttributes({ csId: 'hello-world', title: 'hello world' }).jsonapi
+          .withAttributes({ csId: 'hello-world', title: 'hello world' }).jsonapi,
+        { space: 2 }
       )
     );
     file = await change.get('cards/hello-world/package.json', { allowCreate: true });
@@ -71,11 +73,9 @@ describe('hub/git/indexing', function() {
     expect(indexing.operationsCount).to.equal(count + 1, 'wrong number of operations');
 
     let indexerState = await indexing.loadMeta(repoRealm);
-
     expect(indexerState!.commit).to.equal(head);
 
     let foundCard = await service.get({ csRealm: repoRealm, csId: 'hello-world' });
-
     expect(await foundCard.value('title')).to.equal('hello world');
   });
 
@@ -190,10 +190,11 @@ describe('hub/git/indexing', function() {
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('cards/foo%2Fbar%2Fbaz/card.json', { allowCreate: true });
     file.setContent(
-      JSON.stringify(
+      stringify(
         cardDocument()
           .withField('title', 'string-field')
-          .withAttributes({ csId: 'foo/bar/baz', title: 'hello world' }).jsonapi
+          .withAttributes({ csId: 'foo/bar/baz', title: 'hello world' }).jsonapi,
+        { space: 2 }
       )
     );
     file = await change.get('cards/foo%2Fbar%2Fbaz/package.json', { allowCreate: true });
@@ -233,12 +234,12 @@ describe('hub/git/indexing', function() {
     // first--it looks like the isomorphic git's Tree API gets entries in
     // alphabetical order.
     let file = await change.get('cards/article/card.json', { allowCreate: true });
-    file.setContent(JSON.stringify(article.jsonapi));
+    file.setContent(stringify(article.jsonapi, { space: 2 }));
     file = await change.get('cards/article/package.json', { allowCreate: true });
     file.setContent('{}');
 
     file = await change.get('cards/mango/card.json', { allowCreate: true });
-    file.setContent(JSON.stringify(author.jsonapi));
+    file.setContent(stringify(author.jsonapi, { space: 2 }));
     file = await change.get('cards/mango/package.json', { allowCreate: true });
     file.setContent('{}');
 
