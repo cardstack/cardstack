@@ -11,7 +11,6 @@ import CardstackError from '@cardstack/core/error';
 import { dir as mkTmpDir } from 'tmp-promise';
 import { MetaObject } from 'jsonapi-typescript';
 import { extractSettings } from './lib/git-settings';
-// import { PrimaryData } from 'jsonapi-typescript';
 
 import { Writer } from '@cardstack/core/writer';
 import { Session } from '@cardstack/core/session';
@@ -21,56 +20,7 @@ import { AddressableCard } from '@cardstack/core/card';
 import { writeCard } from '@cardstack/core/card-file';
 import { upstreamIdToCardDirName } from '@cardstack/core/card-id';
 
-// import { Session } from '@cardstack/core/session';
-// import { UpstreamDocument, UpstreamIdentity } from '@cardstack/core/document';
-// import { inject } from '@cardstack/hub/dependency-injection';
-// import { AddressableCard } from '@cardstack/core/card';
-// import CardstackError from '@cardstack/core/error';
-
-// let counter = 0;
-
-// export default class EphemeralWriter implements Writer {
-//   ephemeralStorage = inject('ephemeralStorage');
-
-//   constructor(private realmCard: AddressableCard) {}
-
-//   async create(_session: Session, doc: UpstreamDocument, upstreamId: UpstreamIdentity | null) {
-//     let id = upstreamId ?? String(counter++);
-//     let saved = this.ephemeralStorage.store(doc, id, this.realmCard.csId);
-//     return { saved: saved!, id };
-//   }
-
-//   async update(_session: Session, id: UpstreamIdentity, doc: UpstreamDocument) {
-//     let version = doc.jsonapi.data.meta?.version;
-//     if (version == null) {
-//       throw new CardstackError('missing required field "meta.version"', {
-//         status: 400,
-//         source: { pointer: '/data/meta/version' },
-//       });
-//     }
-
-//     return this.ephemeralStorage.store(doc, id, this.realmCard.csId, String(version))!;
-//   }
-
-//   async delete(_session: Session, id: UpstreamIdentity, version: string | number) {
-//     this.ephemeralStorage.store(null, id, this.realmCard.csId, version);
-//   }
-// }
-
 const defaultBranch = 'master';
-
-const type = 'cards';
-
-// function getMeta(model: todo) {
-//   return model.data ? model.data.meta : model.meta;
-// }
-
-// interface WriterConfig {
-//   repo: string;
-//   basePath?: string;
-//   branchPrefix?: string;
-//   remote?: RemoteConfig;
-// }
 
 export default class GitWriter implements Writer {
   cards = inject('cards');
@@ -141,28 +91,6 @@ export default class GitWriter implements Writer {
     });
   }
 
-  // async finalize(pendingChange: todo) {
-  //   let { id, type, change, file, signature } = pendingChange;
-  //   return withErrorHandling(id, type, async () => {
-  //     if (file) {
-  //       if (pendingChange.finalDocument) {
-  //         // use stringify library instead of JSON.stringify, since JSON's method
-  //         // is non-deterministic and could produce unnecessary diffs
-  //         file.setContent(
-  //           stringify({
-  //             attributes: pendingChange.finalDocument.attributes,
-  //             relationships: pendingChange.finalDocument.relationships,
-  //           })
-  //         );
-  //       } else {
-  //         file.delete();
-  //       }
-  //     }
-  //     let version = await change.finalize(signature, this.remote);
-  //     return { version, hash: file ? file.savedId() : null };
-  //   });
-  // }
-
   async update(session: Session, id: UpstreamIdentity, document: UpstreamDocument): Promise<UpstreamDocument> {
     let cardDirName = upstreamIdToCardDirName(id);
 
@@ -195,21 +123,6 @@ export default class GitWriter implements Writer {
       document.jsonapi.data.meta = meta;
 
       return document;
-
-      // before.id = id;
-      // before.type = type;
-      // after.id = document.id;
-      // after.type = document.type;
-      // return {
-      //   originalDocument: before,
-      //   finalDocument: after,
-      //   finalizer: finalizer.bind(this),
-      //   type,
-      //   id,
-      //   signature,
-      //   change,
-      //   file,
-      // };
     });
   }
 
@@ -237,23 +150,14 @@ export default class GitWriter implements Writer {
   async _commitOptions(operation: string, id: string, session: Session) {
     if (!session.unimplementedSession) {
       throw new CardstackError('Session not implemented');
-      // let user = await session.loadUser();
-      // let userAttributes = (user && user.data && user.data.attributes) || {};
     }
-
-    // return {
-    //   authorName: userAttributes['full-name'] || userAttributes.name || 'Anonymous Coward',
-    //   authorEmail: userAttributes.email || 'anon@example.com',
-    //   committerName: this.myName,
-    //   committerEmail: this.myEmail,
-    //   message: `${operation} ${type} ${String(id).slice(12)}`,
-    // };
+    // TODO use user session data when we add that capability
     return {
       authorName: 'Anonymous Coward',
       authorEmail: 'anon@example.com',
       committerName: this.myName,
       committerEmail: this.myEmail,
-      message: `${operation} ${type} ${String(id).slice(12)}`,
+      message: `${operation} ${String(id).slice(12)}`,
     };
   }
 
@@ -314,7 +218,7 @@ export default class GitWriter implements Writer {
     } else {
       start = '';
     }
-    return `${start}${type}/${cardDir}`;
+    return `${start}cards/${cardDir}`;
   }
 
   private async ensureRepo() {
@@ -370,62 +274,3 @@ async function withErrorHandling(cardDir: string | undefined, fn: Function) {
     throw err;
   }
 }
-
-// async function finalizer(this: GitWriter, pendingChange: todo) {
-//   let { id, type, change, file, signature } = pendingChange;
-//   return withErrorHandling(id, type, async () => {
-//     if (file) {
-//       if (pendingChange.finalDocument) {
-//         // use stringify library instead of JSON.stringify, since JSON's method
-//         // is non-deterministic and could produce unnecessary diffs
-//         file.setContent(
-//           stringify({
-//             attributes: pendingChange.finalDocument.attributes,
-//             relationships: pendingChange.finalDocument.relationships,
-//           })
-//         );
-//       } else {
-//         file.delete();
-//       }
-//     }
-//     let version = await change.finalize(signature, this.remote);
-//     return { version, hash: file ? file.savedId() : null };
-//   });
-// }
-
-// import { Writer } from '@cardstack/core/writer';
-// import { Session } from '@cardstack/core/session';
-// import { UpstreamDocument, UpstreamIdentity } from '@cardstack/core/document';
-// import { inject } from '@cardstack/hub/dependency-injection';
-// import { AddressableCard } from '@cardstack/core/card';
-// import CardstackError from '@cardstack/core/error';
-
-// let counter = 0;
-
-// export default class EphemeralWriter implements Writer {
-//   ephemeralStorage = inject('ephemeralStorage');
-
-//   constructor(private realmCard: AddressableCard) {}
-
-//   async create(_session: Session, doc: UpstreamDocument, upstreamId: UpstreamIdentity | null) {
-//     let id = upstreamId ?? String(counter++);
-//     let saved = this.ephemeralStorage.store(doc, id, this.realmCard.csId);
-//     return { saved: saved!, id };
-//   }
-
-//   async update(_session: Session, id: UpstreamIdentity, doc: UpstreamDocument) {
-//     let version = doc.jsonapi.data.meta?.version;
-//     if (version == null) {
-//       throw new CardstackError('missing required field "meta.version"', {
-//         status: 400,
-//         source: { pointer: '/data/meta/version' },
-//       });
-//     }
-
-//     return this.ephemeralStorage.store(doc, id, this.realmCard.csId, String(version))!;
-//   }
-
-//   async delete(_session: Session, id: UpstreamIdentity, version: string | number) {
-//     this.ephemeralStorage.store(null, id, this.realmCard.csId, version);
-//   }
-// }

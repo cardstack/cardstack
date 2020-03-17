@@ -56,6 +56,8 @@
     "@cardstack/eslint-config": "0.18.12",
     "@cardstack/test-support": "0.18.12",
     "@types/supertest": "^2.0.8",
+    "json-stable-stringify": "^1.0.1",
+    "moment-timezone": "^0.5.11",
     "supertest": "^4.0.2"
   },
   "engines": {

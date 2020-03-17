@@ -1,6 +1,7 @@
 import { Repository, Oid } from './git';
 import { readTree, ReadTreeResult, TreeEntry as igTreeEntry, readBlob, writeTree, writeBlob } from 'isomorphic-git';
 import { join } from 'path';
+import fs from 'fs';
 
 export const enum FILEMODE {
   TREE = '040000',
@@ -13,6 +14,7 @@ export const enum FILEMODE {
 export default class Tree {
   static async lookup(repo: Repository, oid: Oid, containingEntry?: TreeEntry) {
     let readResult = await readTree({
+      fs,
       gitdir: repo.gitdir,
       oid: oid.sha,
     });
@@ -131,6 +133,7 @@ export default class Tree {
 
     if (this.entries().length || allowEmpty) {
       let sha = await writeTree({
+        fs,
         gitdir: this.repo.gitdir,
         tree: this.entries().map(e => e.toTreeObject()),
       });
@@ -145,7 +148,7 @@ export default class Tree {
 
 interface Blob {
   id: Oid | null;
-  content(): Buffer;
+  content(): Uint8Array;
 }
 
 export class TreeEntry {
@@ -215,6 +218,7 @@ export class TreeEntry {
     }
 
     let sha = await writeBlob({
+      fs,
       gitdir: this.repo.gitdir,
       blob: this.contents as Buffer,
     });
@@ -262,6 +266,7 @@ export class TreeEntry {
       };
     }
     let { blob: content } = await readBlob({
+      fs,
       gitdir: this.repo.gitdir,
       oid: this.entry!.oid,
     });

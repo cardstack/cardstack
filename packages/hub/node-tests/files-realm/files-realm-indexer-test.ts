@@ -67,9 +67,9 @@ describe('hub/files-realm/indexer', function() {
       cardDocument().withAttributes({ csId: 'my-card', csDescription: 'My Card' }).jsonapi
     );
 
-    let count = tracker.operationsCount;
+    let count = indexing.operationsCount;
     await indexing.update();
-    expect(tracker.operationsCount).to.equal(count + 1, 'wrong number of operations');
+    expect(indexing.operationsCount).to.equal(count + 1, 'wrong number of operations');
 
     ({ cards } = await service.search({ filter: { eq: { csRealm: filesRealm, csId: 'my-card' } } }));
     expect(cards).lengthOf(1);
@@ -86,9 +86,9 @@ describe('hub/files-realm/indexer', function() {
 
     outputFileSync(join(filesPath, 'first-card', 'example.hbs'), 'Goodbye');
 
-    let count = tracker.operationsCount;
+    let count = indexing.operationsCount;
     await indexing.update();
-    expect(tracker.operationsCount).to.equal(count + 1, 'wrong number of operations');
+    expect(indexing.operationsCount).to.equal(count + 1, 'wrong number of operations');
 
     ({ cards } = await service.search(query));
     expect(cards).lengthOf(1);
@@ -105,9 +105,9 @@ describe('hub/files-realm/indexer', function() {
 
     outputFileSync(join(filesPath, 'first-card', 'inner', 'new.hbs'), 'New File');
 
-    let count = tracker.operationsCount;
+    let count = indexing.operationsCount;
     await indexing.update();
-    expect(tracker.operationsCount).to.equal(count + 1, 'wrong number of operations');
+    expect(indexing.operationsCount).to.equal(count + 1, 'wrong number of operations');
 
     ({ cards } = await service.search(query));
     expect(cards).lengthOf(1);
@@ -124,9 +124,9 @@ describe('hub/files-realm/indexer', function() {
 
     removeSync(join(filesPath, 'first-card', 'example.hbs'));
 
-    let count = tracker.operationsCount;
+    let count = indexing.operationsCount;
     await indexing.update();
-    expect(tracker.operationsCount).to.equal(count + 1, 'wrong number of operations');
+    expect(indexing.operationsCount).to.equal(count + 1, 'wrong number of operations');
 
     ({ cards } = await service.search(query));
     expect(cards).lengthOf(1);
@@ -150,9 +150,9 @@ describe('hub/files-realm/indexer', function() {
 
     removeSync(join(filesPath, 'first-card'));
 
-    let count = tracker.operationsCount;
+    let count = indexing.operationsCount;
     await indexing.update();
-    expect(tracker.operationsCount).to.equal(count + 1, 'wrong number of operations');
+    expect(indexing.operationsCount).to.equal(count + 1, 'wrong number of operations');
 
     ({ cards } = await service.search(query));
     expect(cards).lengthOf(1);
@@ -168,7 +168,7 @@ describe('hub/files-realm/indexer', function() {
     let canaryFile = join(filesPath, 'second-card', 'not-notified.js');
     outputFileSync(canaryFile, '// this should not show up in the search index');
 
-    let count = tracker.operationsCount;
+    let count = indexing.operationsCount;
     await tracker.notifyFileDidChangeAndWait(filesPath, join('first-card', 'example.hbs'));
 
     let { cards } = await service.search(query);
@@ -179,7 +179,7 @@ describe('hub/files-realm/indexer', function() {
     expect(cards).lengthOf(1);
     expect(cards[0].csFiles).deep.equal({});
 
-    expect(tracker.operationsCount).to.equal(count + 1, 'wrong number of operations');
+    expect(indexing.operationsCount).to.equal(count + 1, 'wrong number of operations');
   });
 
   it('deletes a card when notified about a file change', async function() {
@@ -191,7 +191,7 @@ describe('hub/files-realm/indexer', function() {
     let canaryFile = join(filesPath, 'second-card', 'not-notified.js');
     outputFileSync(canaryFile, '// this should not show up in the search index');
 
-    let count = tracker.operationsCount;
+    let count = indexing.operationsCount;
     await tracker.notifyFileDidChangeAndWait(filesPath, 'first-card');
 
     let { cards } = await service.search(query);
@@ -201,7 +201,7 @@ describe('hub/files-realm/indexer', function() {
     expect(cards).lengthOf(1);
     expect(cards[0].csFiles).deep.equal({});
 
-    expect(tracker.operationsCount).to.equal(count + 1, 'wrong number of operations');
+    expect(indexing.operationsCount).to.equal(count + 1, 'wrong number of operations');
   });
 });
 
