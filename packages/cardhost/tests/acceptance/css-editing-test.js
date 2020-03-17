@@ -12,6 +12,7 @@ import {
   waitForTestsToEnd,
   getCardIdFromURL,
   getEncodedCardIdFromURL,
+  waitForAnimation,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -51,17 +52,6 @@ const cardPath = encodeURIComponent(testCard.canonicalURL);
 const scenario = new Fixtures({
   create: [parentCard, testCard],
 });
-
-// let animation finish before taking screenshot
-
-const waitForAnimation = function(cb) {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      cb();
-      resolve('done');
-    }, 1000);
-  });
-};
 
 // If the chrome browser window doesn't have focus while running these tests,
 // then you'll get false test failures. I think there might be some kind of
