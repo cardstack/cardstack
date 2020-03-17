@@ -1,7 +1,7 @@
 import { Session } from '@cardstack/core/session';
 import { inject, getOwner, injectionReady } from './dependency-injection';
 import { myOrigin } from '@cardstack/core/origin';
-import { IndexingOperations } from '@cardstack/core/indexer';
+import { IndexingOperations, IndexingTracker } from '@cardstack/core/indexer';
 import * as J from 'json-typescript';
 import { upsert, param } from './pgsearch/util';
 import { Expression } from '@cardstack/core/expression';
@@ -10,10 +10,11 @@ import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { AddressableCard } from '@cardstack/core/card';
 
-export default class IndexingService {
+export default class IndexingService implements IndexingTracker {
   cards = inject('cards');
   pgclient = inject('pgclient');
   queue = inject('queue');
+  operationsCount = 0;
 
   async ready() {
     await injectionReady(this, 'queue');
@@ -36,6 +37,10 @@ export default class IndexingService {
     await this._indexRealm(realmCard, args.params);
   }
 
+  increaseOperationsCount() {
+    this.operationsCount++;
+  }
+
   private async _indexRealm(realmCard: AddressableCard, params: unknown) {
     let scopedService = this.cards.as(Session.INTERNAL_PRIVILEGED);
     let indexerFactory = await realmCard.loadFeature('indexer');
@@ -48,7 +53,7 @@ export default class IndexingService {
 
     let meta = await this.loadMeta(realmCard.csId);
 
-    let io = await getOwner(this).instantiate(IndexingOperations, realmCard, batch, scopedService);
+    let io = await getOwner(this).instantiate(IndexingOperations, realmCard, batch, scopedService, this);
     let newMeta = await indexer.update(meta, io, params);
     await batch.done();
     await this.pgclient.query(

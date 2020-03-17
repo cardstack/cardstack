@@ -37,6 +37,9 @@ class RepoExplorer {
   async getContents(refSpec: string, path: string) {
     return (await this.runGit('show', `${refSpec}:${path}`)).stdout;
   }
+  async push(remote = 'origin', branch = 'master') {
+    return (await this.runGit('push', '--set-upstream', remote, branch)).stdout;
+  }
   async getJSONContents(refSpec: string, path: string) {
     return JSON.parse((await this.runGit('show', `${refSpec}:${path}`)).stdout);
   }
@@ -80,7 +83,7 @@ async function run(command: string, args: string[], opts: Record<string, string>
     });
     p.on('close', function(code) {
       if (code !== 0) {
-        let err: StdOutError = new Error(command + ' ' + args.join(' ') + ' exited with nonzero status');
+        let err: StdOutError = new Error(`${command} ${args.join(' ')} exited with nonzero status: ${stderr}`);
         err.stderr = stderr;
         err.stdout = stdout;
         reject(err);

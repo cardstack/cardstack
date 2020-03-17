@@ -113,7 +113,8 @@ class GitLocalCache {
       }
     }
 
-    await repo.mergeBranches(targetBranch, `origin/${targetBranch}`);
+    await repo.fetchAll();
+    await repo.mergeBranches(targetBranch, `remotes/origin/${targetBranch}`);
   }
 }
 

@@ -85,8 +85,6 @@ export default class GitIndexer implements Indexer<GitMeta> {
   }
 }
 
-// );
-
 class GitUpdater {
   commit?: Commit;
   commitId?: string;
@@ -304,7 +302,7 @@ async function loadFiles(
 
 async function entryToString(entry: TreeEntry): Promise<string | undefined> {
   if (entry.isBlob()) {
-    return (await entry.getBlob()).content().toString('utf8');
+    return Buffer.from((await entry.getBlob()).content()).toString('utf8');
   }
 }
 async function entryToDoc(entry: TreeEntry): Promise<SingleResourceDoc | undefined> {

@@ -1,4 +1,5 @@
 import { TestEnv, createTestEnv } from '../helpers';
+import GitService from '@cardstack/git-realm-card/lib/service';
 import IndexingService from '../../indexing';
 import { cardDocument, CardDocument } from '@cardstack/core/card-document';
 import { myOrigin } from '@cardstack/core/origin';
@@ -6,23 +7,31 @@ import CardsService, { ScopedCardService } from '../../cards-service';
 import { Session } from '@cardstack/core/session';
 import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
-import { makeRepo } from './support';
-import { Remote } from '../../../../cards/git-realm/lib/git';
+import { Remote, Repository } from '@cardstack/git-realm-card/lib/git';
+import Change from '@cardstack/git-realm-card/lib/change';
+import { commitOpts, makeRepo, inRepo } from './support';
+import stringify from 'json-stable-stringify';
+
+let rootDir: DirectoryResult;
 
 async function resetRemote() {
-  let root = (await mkTmpDir({ unsafeCleanup: true })).path;
+  rootDir = await mkTmpDir({ unsafeCleanup: true });
 
-  let tempRepo = await makeRepo(root, {
-    'cards/event-1/card.json': JSON.stringify(
+  let tmpDir = rootDir.path;
+  let tempRepo = await makeRepo(tmpDir, {
+    'cards/event-1/card.json': stringify(
       cardDocument()
         .withField('title', 'string-field')
-        .withAttributes({ csId: 'event-1', title: 'hello world' }).jsonapi
+        .withAttributes({ csId: 'event-1', title: 'hello world' }).jsonapi,
+      { space: 2 }
     ),
     'cards/event-1/package.json': '{}',
-    'cards/event-2/card.json': JSON.stringify(
+    'cards/event-1/example.css': 'the best styles',
+    'cards/event-2/card.json': stringify(
       cardDocument()
         .withField('title', 'string-field')
-        .withAttributes({ csId: 'event-2', title: 'goodbye world' }).jsonapi
+        .withAttributes({ csId: 'event-2', title: 'goodbye world' }).jsonapi,
+      { space: 2 }
     ),
     'cards/event-2/package.json': '{}',
   });
@@ -36,8 +45,12 @@ describe('hub/git/indexing-remote', function() {
   let env: TestEnv, indexing: IndexingService, cards: CardsService, service: ScopedCardService;
   let repoRealm = `${myOrigin}/api/realms/test-git-repo`;
   let head: string;
+  let remoteRepo: Repository;
+  let csRealm: string;
   let repoDoc: CardDocument;
   let tempRepoDir: DirectoryResult;
+  let tempRemoteRepoDir: DirectoryResult;
+  let tempRemoteRepoPath: string;
 
   beforeEach(async function() {
     env = await createTestEnv();
@@ -45,13 +58,15 @@ describe('hub/git/indexing-remote', function() {
     cards = await env.container.lookup('cards');
     service = cards.as(Session.EVERYONE);
 
-    let tempRepo = await resetRemote();
-
-    head = tempRepo.head;
+    ({ head, repo: remoteRepo } = await resetRemote());
 
     tempRepoDir = await mkTmpDir({ unsafeCleanup: true });
+    tempRemoteRepoDir = await mkTmpDir({ unsafeCleanup: true });
     process.env.REPO_ROOT_DIR = tempRepoDir.path;
+    tempRemoteRepoPath = tempRemoteRepoDir.path;
     let remoteCacheDir = 'test-repo';
+
+    await Repository.clone('http://root:password@localhost:8838/git/repo', tempRemoteRepoPath);
 
     repoDoc = cardDocument()
       .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'git-realm' })
@@ -61,19 +76,15 @@ describe('hub/git/indexing-remote', function() {
         csId: repoRealm,
       });
 
-    await service.create(`${myOrigin}/api/realms/meta`, repoDoc.jsonapi);
-
-    //     start = async function() {
-    //       env = await createDefaultEnvironment(join(__dirname, '..'), factory.getModels());
-    //       indexer = env.lookup('hub:indexers');
-    //       searcher = env.lookup('hub:searchers');
-    //       client = env.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`);
-    //     };
-    //   });
+    ({ csId: csRealm } = await service.create(`${myOrigin}/api/realms/meta`, repoDoc.jsonapi));
   });
 
   afterEach(async function() {
+    await rootDir.cleanup();
+    await tempRepoDir.cleanup();
+    await tempRemoteRepoDir.cleanup();
     await env.destroy();
+    GitService.clearCache();
   });
 
   it('clones the remote repo', async function() {
@@ -84,213 +95,168 @@ describe('hub/git/indexing-remote', function() {
 
   it('indexes existing data in the remote after it is cloned', async function() {
     await indexing.update();
+
+    let indexerState = await indexing.loadMeta(csRealm);
+    expect(indexerState!.commit).to.equal(head);
+
     let foundCard = await service.get({ csRealm: repoRealm, csId: 'event-1' });
     expect(await foundCard.value('title')).to.equal('hello world');
+    expect(foundCard.csFiles).to.deep.equal({
+      'example.css': 'the best styles',
+    });
     foundCard = await service.get({ csRealm: repoRealm, csId: 'event-2' });
     expect(await foundCard.value('title')).to.equal('goodbye world');
   });
 
-  // it('processes first empty branch', async function() {
-  //   let { head } = await makeRepo(root);
+  it('indexes added cards', async function() {
+    await indexing.update(); // we want the next indexing to be incremental
 
-  //   await indexing.update();
+    let change = await Change.create(remoteRepo, head, 'master');
+    let file = await change.get('cards/hello-world/card.json', { allowCreate: true });
+    file.setContent(
+      stringify(
+        cardDocument()
+          .withField('title', 'string-field')
+          .withAttributes({ csId: 'hello-world', title: 'hello world' }).jsonapi,
+        { space: 2 }
+      )
+    );
+    file = await change.get('cards/hello-world/package.json', { allowCreate: true });
+    file.setContent('{}');
+    head = await change.finalize(commitOpts());
+    await inRepo(remoteRepo.path).push();
 
-  //   let indexerState = await indexing.loadMeta(repoRealm);
-  //   expect(indexerState!.commit).to.equal(head);
-  // });
+    let count = indexing.operationsCount;
+    await indexing.update();
+    expect(indexing.operationsCount).to.equal(count + 1, 'wrong number of operations');
 
-  // it('indexes newly added document', async function() {
-  //   let { repo, head } = await makeRepo(root);
+    let indexerState = await indexing.loadMeta(csRealm);
+    expect(indexerState!.commit).to.equal(head);
 
-  //   await indexing.update();
+    let foundCard = await service.get({ csRealm: repoRealm, csId: 'hello-world' });
+    expect(await foundCard.value('title')).to.equal('hello world');
+  });
 
-  //   let change = await Change.create(repo, head, 'master');
-  //   let file = await change.get('contents/articles/hello-world.json', { allowCreate: true });
-  //   file.setContent(
-  //     JSON.stringify(
-  //       cardDocument()
-  //         .withField('title', 'string-field')
-  //         .withAttributes({ title: 'hello world' }).jsonapi
-  //     )
-  //   );
-  //   head = await change.finalize(commitOpts());
+  it('indexes updated card', async function() {
+    await indexing.update(); // we want the next indexing to be incremental
 
-  //   await indexing.update();
+    let change = await Change.create(remoteRepo, head, 'master');
+    let file = await change.get(`cards/event-1/card.json`, { allowUpdate: true });
+    file.setContent(
+      stringify(
+        cardDocument().withAutoAttributes({
+          csId: 'event-1',
+          title: 'updated title',
+        }).jsonapi,
+        { space: 2 }
+      )
+    );
+    head = await change.finalize(commitOpts());
+    await inRepo(remoteRepo.path).push();
 
-  //   let indexerState = await indexing.loadMeta(repoRealm);
+    let count = indexing.operationsCount;
+    await indexing.update();
+    expect(indexing.operationsCount).to.equal(count + 1, 'wrong number of operations');
 
-  //   expect(indexerState!.commit).to.equal(head);
+    let indexerState = await indexing.loadMeta(csRealm);
+    expect(indexerState!.commit).to.equal(head);
 
-  //   let foundCard = await service.get(idToCanonicalUrl('hello-world'));
+    let updatedCard = await service.get({ csRealm, csId: 'event-1' });
+    expect(await updatedCard.value('title')).to.equal('updated title');
+  });
 
-  //   expect(await foundCard.value('title')).to.equal('hello world');
-  // });
+  it('indexes card with added inner file', async function() {
+    await indexing.update(); // we want the next indexing to be incremental
 
-  // it('it can index a realm', async function() {
-  //   let csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
-  //   let card = cardDocument().withAutoAttributes({ csRealm, csId: '1', foo: 'bar' });
-  //   storage.store(card.upstreamDoc, card.csId, card.csRealm);
+    let change = await Change.create(remoteRepo, head, 'master');
+    let file = await change.get(`cards/event-1/inner/example.hbs`, { allowCreate: true });
+    file.setContent('Hello World');
+    head = await change.finalize(commitOpts());
+    await inRepo(remoteRepo.path).push();
 
-  //   await indexing.update();
+    let count = indexing.operationsCount;
+    await indexing.update();
+    expect(indexing.operationsCount).to.equal(count + 1, 'wrong number of operations');
 
-  //   let indexedCard = await cards.as(Session.INTERNAL_PRIVILEGED).get(card);
-  //   expect(indexedCard).to.be.ok;
-  // });
+    let indexerState = await indexing.loadMeta(csRealm);
+    expect(indexerState!.commit).to.equal(head);
 
-  // it('it can remove a document from the index if the document was removed from the data source', async function() {
-  //   let csRealm = `${myOrigin}/api/realms/first-ephemeral-realm`;
-  //   let card = await cards
-  //     .as(Session.INTERNAL_PRIVILEGED)
-  //     .create(csRealm, cardDocument().withAutoAttributes({ csRealm, csId: '1', foo: 'bar' }).jsonapi);
-  //   storage.store(null, card.csId, card.csRealm, storage.getEntry(card, csRealm)?.generation);
-  //   await indexing.update();
+    let updatedCard = await service.get({ csRealm, csId: 'event-1' });
+    expect(updatedCard.csFiles).to.deep.equal({
+      'example.css': 'the best styles',
+      inner: { 'example.hbs': 'Hello World' },
+    });
+  });
 
-  //   let { cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
-  //     filter: { eq: { csId: '1' } },
-  //   });
-  //   expect(results.length).to.equal(0);
-  // });
+  it('indexes card with updated inner file', async function() {
+    await indexing.update(); // we want the next indexing to be incremental
 
-  // it('it can index multiple realms', async function() {
-  //   let realm1 = `${myOrigin}/api/realms/first-ephemeral-realm`;
-  //   let realm2 = `http://example.com/api/realms/second-ephemeral-realm`;
-  //   let card = cardDocument().withAutoAttributes({ csRealm: realm1, csId: '1', foo: 'bar' });
-  //   storage.store(card.upstreamDoc, card.csId, card.csRealm);
-  //   card = cardDocument().withAutoAttributes({ csRealm: realm2, csId: '1', foo: 'bar' });
-  //   storage.store(card.upstreamDoc, card.csId, card.csRealm);
+    let change = await Change.create(remoteRepo, head, 'master');
+    let file = await change.get(`cards/event-1/example.css`, { allowUpdate: true });
+    file.setContent('adequate styles');
+    head = await change.finalize(commitOpts());
+    await inRepo(remoteRepo.path).push();
 
-  //   await indexing.update();
+    let count = indexing.operationsCount;
+    await indexing.update();
+    expect(indexing.operationsCount).to.equal(count + 1, 'wrong number of operations');
 
-  //   let { cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
-  //     filter: { eq: { csId: '1' } },
-  //   });
-  //   expect(results.length).to.equal(2);
-  // });
+    let indexerState = await indexing.loadMeta(csRealm);
+    expect(indexerState!.commit).to.equal(head);
 
-  // it('ephemeral cards do not persist in the index between container teardowns', async function() {
-  //   let realm = `${myOrigin}/api/realms/first-ephemeral-realm`;
+    let updatedCard = await service.get({ csRealm, csId: 'event-1' });
+    expect(updatedCard.csFiles).to.deep.equal({
+      'example.css': 'adequate styles',
+    });
+  });
 
-  //   // card is indexed in torn down ephemeral storage
-  //   // This card will _not_ live through the container teardown
-  //   let card = cardDocument().withAutoAttributes({ csRealm: realm, csId: '1', foo: 'bar' });
-  //   storage.store(card.upstreamDoc, card.csId, card.csRealm);
-  //   await indexing.update();
+  it('indexes card with removed inner file', async function() {
+    await indexing.update(); // we want the next indexing to be incremental
 
-  //   // card is not yet indexed in torn down ephemeral storage
-  //   // This card will _not_ live through the container teardown
-  //   card = cardDocument().withAutoAttributes({ csRealm: realm, csId: '2', foo: 'bar' });
-  //   storage.store(await card.upstreamDoc, card.csId, card.csRealm);
-  //   await env.container.teardown();
-  //   env.container = await wireItUp();
+    let change = await Change.create(remoteRepo, head, 'master');
+    let file = await change.get(`cards/event-1/example.css`);
+    file.delete();
+    head = await change.finalize(commitOpts());
+    await inRepo(remoteRepo.path).push();
 
-  //   cards = await env.container.lookup('cards');
-  //   indexing = await env.container.lookup('indexing');
-  //   storage = await env.container.lookup('ephemeralStorage');
-  //   (await env.container.lookup('queue')).launchJobRunner();
+    let count = indexing.operationsCount;
+    await indexing.update();
+    expect(indexing.operationsCount).to.equal(count + 1, 'wrong number of operations');
 
-  //   // card is not yet indexed in new ephemeral storage
-  //   // This card _will_ live through the container teardown
-  //   card = cardDocument().withAutoAttributes({ csRealm: realm, csId: '3', foo: 'bar' });
-  //   storage.store(await card.upstreamDoc, card.csId, card.csRealm);
-  //   await indexing.update();
+    let indexerState = await indexing.loadMeta(csRealm);
+    expect(indexerState!.commit).to.equal(head);
 
-  //   let { cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
-  //     filter: { eq: { csId: '1' } },
-  //   });
-  //   expect(results.length).to.equal(0);
+    let updatedCard = await service.get({ csRealm, csId: 'event-2' });
+    expect(updatedCard.csFiles).to.deep.equal({});
+  });
 
-  //   ({ cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
-  //     filter: { eq: { csId: '2' } },
-  //   }));
-  //   expect(results.length).to.equal(0);
+  it('removes a card that is no longer in git', async function() {
+    await indexing.update(); // we want the next indexing to be incremental
+    let card = await service.get({ csRealm, csId: 'event-1' });
+    expect(card).to.be.ok;
 
-  //   ({ cards: results } = await cards.as(Session.INTERNAL_PRIVILEGED).search({
-  //     filter: { eq: { csId: '3' } },
-  //   }));
-  //   expect(results.length).to.equal(1);
-  // });
+    let change = await Change.create(remoteRepo, head, 'master');
+    let file = await change.get(`cards/event-1/card.json`);
+    file.delete();
+    file = await change.get(`cards/event-1/package.json`);
+    file.delete();
+    file = await change.get(`cards/event-1/example.css`);
+    file.delete();
+    head = await change.finalize(commitOpts());
+    await inRepo(remoteRepo.path).push();
 
-  // it('it does not index unchanged cards since the last time the ephemeral realm was indexed', async function() {
-  //   let realm = `${myOrigin}/api/realms/first-ephemeral-realm`;
+    let count = indexing.operationsCount;
+    await indexing.update();
+    expect(indexing.operationsCount).to.equal(count + 1, 'wrong number of operations');
 
-  //   let steps = await cards.as(Session.INTERNAL_PRIVILEGED).create(
-  //     realm,
-  //     cardDocument()
-  //       .withField('foo', 'string-field')
-  //       .withField('step', 'integer-field').jsonapi
-  //   );
+    let indexerState = await indexing.loadMeta(csRealm);
+    expect(indexerState!.commit).to.equal(head);
 
-  //   async function cardsWithStep(n: number): Promise<number> {
-  //     let found = await cards.as(Session.INTERNAL_PRIVILEGED).search({
-  //       filter: {
-  //         type: steps,
-  //         eq: {
-  //           step: n,
-  //         },
-  //       },
-  //     });
-  //     return found.cards.length;
-  //   }
-
-  //   // Add a new card
-  //   let card = cardDocument()
-  //     .withAttributes({ csRealm: realm, csId: '1', foo: 'bar', step: 1 })
-  //     .adoptingFrom(steps);
-  //   storage.store(card.upstreamDoc, card.csId, card.csRealm);
-  //   await indexing.update();
-  //   expect(await cardsWithStep(1)).to.equal(1);
-
-  //   // Add another new card
-  //   card = cardDocument()
-  //     .withAttributes({ csRealm: realm, csId: '2', foo: 'bar', step: 2 })
-  //     .adoptingFrom(steps);
-  //   storage.store(card.upstreamDoc, card.csId, card.csRealm);
-
-  //   // Maniuplate existing card so we would notice if it gets indexed when it shouldn't.
-  //   await storage.inThePast(async () => {
-  //     card = cardDocument()
-  //       .withAttributes({ csRealm: realm, csId: '1', foo: 'bar', step: 2 })
-  //       .adoptingFrom(steps);
-  //     storage.store(card.upstreamDoc, card.csId, card.csRealm, storage.getEntry('1', realm)?.generation);
-  //   });
-
-  //   await indexing.update();
-  //   let n = await cardsWithStep(2);
-  //   expect(n).to.equal(1);
-
-  //   // Update first card
-  //   card = cardDocument()
-  //     .withAttributes({ csRealm: realm, csId: '1', foo: 'bar', step: 3 })
-  //     .adoptingFrom(steps);
-  //   storage.store(card.upstreamDoc, card.csId, card.csRealm, storage.getEntry('1', realm)?.generation);
-
-  //   // Maniuplate other existing card so we would notice if it gets indexed when it shouldn't.
-  //   await storage.inThePast(async () => {
-  //     card = cardDocument()
-  //       .withAttributes({ csRealm: realm, csId: '2', foo: 'bar', step: 3 })
-  //       .adoptingFrom(steps);
-  //     storage.store(card.upstreamDoc, card.csId, card.csRealm, storage.getEntry('2', realm)?.generation);
-  //   });
-
-  //   await indexing.update();
-  //   expect(await cardsWithStep(3)).to.equal(1);
-
-  //   // Delete card 2
-  //   storage.store(null, card.csId, card.csRealm, storage.getEntry('2', realm)?.generation);
-
-  //   // Maniuplate other existing card so we would notice if it gets indexed when it shouldn't.
-  //   await storage.inThePast(async () => {
-  //     card = cardDocument()
-  //       .withAttributes({ csRealm: realm, csId: '1', foo: 'bar', step: 4 })
-  //       .adoptingFrom(steps);
-  //     storage.store(card.upstreamDoc, card.csId, card.csRealm, storage.getEntry('1', realm)?.generation);
-  //   });
-
-  //   await indexing.update();
-  //   expect(await cardsWithStep(4)).to.equal(0);
-
-  //   // stable case
-  //   await indexing.update();
-  //   expect(await cardsWithStep(4)).to.equal(0);
-  // });
+    try {
+      await service.get({ csRealm, csId: 'event-1' });
+      throw new Error(`Should not be able to get the card`);
+    } catch (e) {
+      expect(e).hasStatus(404);
+    }
+  });
 });

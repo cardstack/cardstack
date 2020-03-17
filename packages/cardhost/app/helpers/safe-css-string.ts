@@ -1,5 +1,5 @@
 import { helper } from '@ember/component/helper';
-export function safeCssString(string) {
+export function safeCssString(string: string) {
   if (!string) {
     return;
   }

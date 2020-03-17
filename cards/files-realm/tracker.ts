@@ -23,8 +23,6 @@ export interface TrackerParams {
 export class FilesTracker {
   indexing = inject('indexing');
 
-  operationsCount = 0;
-
   private state: Map<string, Map<string, Entry>> = new Map();
   private ids: Map<string, UpstreamIdentity> = new Map();
   private subscriptions: Map<string, { realm: AddressableCard; watcher: undefined | sane.Watcher }> = new Map();
@@ -82,7 +80,6 @@ export class FilesTracker {
             throw new Error(`bug in files-realm tracker. Missing upstream id.`);
           }
           await ops.delete(upstreamId);
-          this.operationsCount++;
           this.ids.delete(cardDir);
         }
       }
@@ -100,7 +97,6 @@ export class FilesTracker {
         csOriginalRealm: json.data.attributes!.csOriginalRealm as string,
       };
       await ops.save(upstreamId, new UpstreamDocument(json));
-      this.operationsCount++;
       this.ids.set(cardDir, upstreamId);
     } catch (err) {
       log.warn(`Ignoring card in ${directory} because: ${err}`);
@@ -130,7 +126,6 @@ export class FilesTracker {
       let upstreamId = this.ids.get(cardDir);
       if (upstreamId) {
         await ops.delete(upstreamId);
-        this.operationsCount++;
       }
     }
   }
