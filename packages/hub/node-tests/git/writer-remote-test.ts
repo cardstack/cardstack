@@ -159,7 +159,7 @@ describe('hub/git/writer with remote', function() {
       expect(saved.data.attributes.title).to.equal('updated title');
     });
 
-    it('successfully merges updates when repo is out of sync', async function() {
+    it.skip('successfully merges updates when repo is out of sync', async function() {
       await indexing.update();
 
       let change = await Change.create(remoteRepo, head, 'master');
@@ -202,7 +202,7 @@ describe('hub/git/writer with remote', function() {
       expect(updated).to.have.nested.property('data.attributes.publishedDate', '2018-09-25');
     });
 
-    it('successfully merges updates when same file is out of sync', async function() {
+    it.skip('successfully merges updates when same file is out of sync', async function() {
       await indexing.update();
 
       let change = await Change.create(remoteRepo, head, 'master');
