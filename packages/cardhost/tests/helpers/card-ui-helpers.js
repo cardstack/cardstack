@@ -16,6 +16,11 @@ import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 const timeout = 5000;
 
+export async function waitForAnimation(promise) {
+  await new Promise(res => setTimeout(() => res(), 1000));
+  await promise();
+}
+
 export async function waitForTestsToEnd() {
   // need to wait for library service to finish. we reload the library in a
   // non-blocking fashion on document saves, so we need to make sure to not let
