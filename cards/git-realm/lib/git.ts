@@ -253,7 +253,7 @@ export class Commit {
       });
       return new Commit(repo, commitInfo);
     } catch (e) {
-      if (e.code == 'ReadObjectFail') {
+      if (e.code == 'NotFoundError') {
         throw new UnknownObjectId();
       } else {
         throw e;
