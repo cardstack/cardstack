@@ -67,7 +67,6 @@ describe('hub/git/writer with remote', function() {
     let tempRepo = await resetRemote();
     head = tempRepo.head;
     remoteRepo = tempRepo.repo;
-    await resetRemote();
 
     tempRepoDir = await mkTmpDir({ unsafeCleanup: true });
     tempRemoteRepoDir = await mkTmpDir({ unsafeCleanup: true });
@@ -159,7 +158,7 @@ describe('hub/git/writer with remote', function() {
       expect(saved.data.attributes.title).to.equal('updated title');
     });
 
-    it.skip('successfully merges updates when repo is out of sync', async function() {
+    it('successfully merges updates when repo is out of sync', async function() {
       await indexing.update();
 
       let change = await Change.create(remoteRepo, head, 'master');
@@ -179,7 +178,7 @@ describe('hub/git/writer with remote', function() {
         authorEmail: 'john@paradiselost.com',
         message: 'I probably shouldnt update this out of sync',
       });
-      await remoteRepo.getRemote('origin');
+
       let updatedCard = await service.update(
         { csRealm, csId: 'event-1' },
         {
@@ -202,7 +201,7 @@ describe('hub/git/writer with remote', function() {
       expect(updated).to.have.nested.property('data.attributes.publishedDate', '2018-09-25');
     });
 
-    it.skip('successfully merges updates when same file is out of sync', async function() {
+    it('successfully merges updates when same file is out of sync', async function() {
       await indexing.update();
 
       let change = await Change.create(remoteRepo, head, 'master');
@@ -222,6 +221,7 @@ describe('hub/git/writer with remote', function() {
         authorEmail: 'john@paradiselost.com',
         message: 'I probably shouldnt update this out of sync',
       });
+
       let remote = await remoteRepo.getRemote('origin');
       await remote.push('refs/heads/master', 'refs/heads/master', { force: true });
       let updatedCard = await service.update(
