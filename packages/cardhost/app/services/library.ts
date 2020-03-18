@@ -2,9 +2,12 @@ import Service from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
+//@ts-ignore
 import { task } from 'ember-concurrency';
 import { getUserRealm } from '../utils/scaffolding';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import DataService from './data';
+import { AddressableCard } from '@cardstack/core/card';
 
 const catalogEntry = Object.freeze({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'catalog-entry' });
 const cardCatalogRealm = 'https://cardstack.com/api/realms/card-catalog';
@@ -12,20 +15,20 @@ const cardCatalogRealm = 'https://cardstack.com/api/realms/card-catalog';
 const size = 100;
 
 export default class LibraryService extends Service {
-  @service data;
+  @service data!: DataService;
 
   @tracked visible = false;
-  @tracked recentCards;
-  @tracked templateEntries;
-  @tracked featuredEntries;
+  @tracked recentCards: AddressableCard[] = [];
+  @tracked templateEntries: AddressableCard[] = [];
+  @tracked featuredEntries: AddressableCard[] = [];
 
-  constructor(...args) {
+  constructor(...args: any[]) {
     super(...args);
 
     this.load.perform();
   }
 
-  @task(function*() {
+  @task(function*(this: LibraryService) {
     return yield this.data.search(
       {
         filter: {
@@ -40,9 +43,9 @@ export default class LibraryService extends Service {
       { includeFieldSet: 'embedded' }
     );
   })
-  loadUserRealm;
+  loadUserRealm: any; //TS and EC don't play nice;
 
-  @task(function*() {
+  @task(function*(this: LibraryService) {
     let [recentCards, templateEntries, featuredEntries] = yield Promise.all([
       this.loadUserRealm.perform(),
       this.data.search(
@@ -84,7 +87,7 @@ export default class LibraryService extends Service {
     this.templateEntries = templateEntries;
     this.featuredEntries = featuredEntries;
   })
-  load;
+  load: any; // TS and EC don't play nice
 
   @action
   show() {
