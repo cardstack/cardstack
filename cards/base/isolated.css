@@ -93,6 +93,11 @@ when we get CSS isolation working, this will become impossible. */
   padding-bottom: 11px;
 }
 
+/* type: decorative-image */
+.card-boundary .decorative-image-viewer {
+  max-width: 100%;
+}
+
 
 /**** SPECIAL FIELD NAMES ****/
 
