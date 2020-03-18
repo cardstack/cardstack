@@ -1,16 +1,17 @@
 import Service from '@ember/service';
 import { tracked } from '@glimmer/tracking';
+import { Card } from '@cardstack/core/card';
 
 export default class DraggableService extends Service {
-  @tracked field;
-  @tracked startingPosition;
-  @tracked dropzone;
-  @tracked dragging;
+  @tracked field: Card | undefined;
+  @tracked startingPosition: number | undefined;
+  @tracked dropzone: HTMLElement | undefined;
+  @tracked dragging = false;
 
   /**
    * Sets the currently dragged field
    */
-  setField(field, startingPosition) {
+  setField(field: Card, startingPosition: number) {
     this.field = field;
     this.startingPosition = startingPosition;
   }
@@ -33,14 +34,14 @@ export default class DraggableService extends Service {
    * Clears the dragged field
    */
   clearField() {
-    this.field = null;
-    this.startingPosition = null;
+    this.field = undefined;
+    this.startingPosition = undefined;
   }
 
   /**
    * Set the hovered drop zone
    */
-  setDropzone(element) {
+  setDropzone(element: HTMLElement) {
     this.dropzone = element;
     this.triggerEvent(element, 'mouseenter');
   }
@@ -58,15 +59,15 @@ export default class DraggableService extends Service {
   clearDropzone() {
     if (this.dropzone) {
       this.triggerEvent(this.dropzone, 'mouseleave');
-      this.dropzone = null;
+      this.dropzone = undefined;
     }
   }
 
   /**
    * Set the dragging flag
    */
-  setDragging(val) {
-    this.dragging = val;
+  setDragging(isDragging: boolean) {
+    this.dragging = isDragging;
   }
 
   /**
@@ -85,7 +86,7 @@ export default class DraggableService extends Service {
     }
   }
 
-  triggerEvent(el, type) {
+  triggerEvent(el: HTMLElement, type: string) {
     var e = document.createEvent('HTMLEvents');
     e.initEvent(type, false, true);
     el.dispatchEvent(e);

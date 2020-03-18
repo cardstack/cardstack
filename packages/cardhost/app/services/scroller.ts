@@ -1,11 +1,12 @@
 import Service from '@ember/service';
 import { tracked } from '@glimmer/tracking';
+//@ts-ignore
 import ENV from '@cardstack/cardhost/config/environment';
 
 const { animationSpeed } = ENV;
 const duration = animationSpeed || 1000;
 
-function easeInOutCubic(t) {
+function easeInOutCubic(t: number) {
   return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
 }
 
@@ -13,15 +14,23 @@ export default class ScrollerService extends Service {
   @tracked isScrolling = false;
   @tracked scrollingElementSelector = '.library--main'; // refactor if we reuse this for something else
 
-  setScrollingElement(element) {
-    this.scrollingElementSelector = element;
+  setScrollingElement(selector: string) {
+    this.scrollingElementSelector = selector;
   }
 
-  scrollToSection({ selector, elementOffset = 60, doneScrolling }) {
-    let element = document.querySelector(selector);
-    let scrollingElement = document.querySelector(this.scrollingElementSelector);
+  scrollToSection({
+    selector,
+    elementOffset = 60,
+    doneScrolling,
+  }: {
+    selector: string;
+    elementOffset: number;
+    doneScrolling: () => void;
+  }) {
+    let element = document.querySelector(selector) as HTMLElement;
+    let scrollingElement = document.querySelector(this.scrollingElementSelector) as HTMLElement;
 
-    if (!element) {
+    if (!element || !scrollingElement) {
       return;
     }
 
@@ -35,7 +44,7 @@ export default class ScrollerService extends Service {
     );
 
     let animatedScroll = () => {
-      if (this.isDestroyed) {
+      if (this.isDestroyed || !scrollingElement) {
         return;
       }
       let now = Date.now();

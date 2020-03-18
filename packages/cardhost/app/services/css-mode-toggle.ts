@@ -2,10 +2,13 @@ import Service from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 
+type Width = 'small' | 'medium' | 'large';
+type DockLocation = 'right' | 'bottom';
+
 export default class CssModeToggleService extends Service {
   @tracked visible = true;
-  @tracked dockLocation = 'right';
-  @tracked width = 'small'; // width can be small, medium, or large
+  @tracked dockLocation: DockLocation = 'right';
+  @tracked width: Width = 'small';
 
   @action
   dockRight() {
@@ -28,8 +31,7 @@ export default class CssModeToggleService extends Service {
   }
 
   @action
-  setWidth(width) {
-    // width can be small, medium, or large
+  setWidth(width: Width) {
     this.width = width;
   }
 }

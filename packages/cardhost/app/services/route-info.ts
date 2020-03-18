@@ -1,8 +1,9 @@
 import Service from '@ember/service';
+import RouterService from '@ember/routing/router-service';
 import { inject as service } from '@ember/service';
 
 export default class RouteInfoService extends Service {
-  @service router;
+  @service router!: RouterService;
 
   get mode() {
     let routeSegements = this.router.currentRoute.name.split('.');

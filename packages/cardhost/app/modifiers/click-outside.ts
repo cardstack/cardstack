@@ -1,3 +1,4 @@
+//@ts-ignore
 import { modifier } from 'ember-modifier';
 
 /*
@@ -29,16 +30,20 @@ you will want to ignore that button's clicks.
 See https://github.com/ember-modifier/ember-modifier to learn more about modifiers.
 */
 
-export default modifier(function clickOutside(element, [onOutside], { ignore }) {
-  const handleClickOutside = function(event) {
+export default modifier(function clickOutside(
+  element: HTMLElement,
+  [onOutside]: [() => void],
+  { ignore }: { ignore: string }
+) {
+  const handleClickOutside = function(event: Event) {
     // if the click is inside, ignore it
-    if (element.contains(event.target)) {
+    if (event.target instanceof Node && element.contains(event.target)) {
       return;
     }
 
     let ignoreEl = document.querySelector(ignore);
     // if the click is on an ignored element, ignore it
-    if (ignoreEl && ignoreEl.contains(event.target)) {
+    if (ignoreEl && event.target instanceof Node && ignoreEl.contains(event.target)) {
       return;
     } else {
       // otherwise, call the method
@@ -47,12 +52,12 @@ export default modifier(function clickOutside(element, [onOutside], { ignore }) 
   };
 
   // register handlers
-  document.querySelector('body').addEventListener('click', handleClickOutside);
-  document.querySelector('body').addEventListener('focusin', handleClickOutside);
+  document!.querySelector('body')!.addEventListener('click', handleClickOutside);
+  document!.querySelector('body')!.addEventListener('focusin', handleClickOutside);
 
   // When the element the modifier is destroyed, tear down the events.
   return () => {
-    document.querySelector('body').removeEventListener('click', handleClickOutside);
-    document.querySelector('body').removeEventListener('focusin', handleClickOutside);
+    document!.querySelector('body')!.removeEventListener('click', handleClickOutside);
+    document!.querySelector('body')!.removeEventListener('focusin', handleClickOutside);
   };
 });
