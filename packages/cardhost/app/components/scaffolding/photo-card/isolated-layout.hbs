@@ -1,0 +1,52 @@
+<div
+  class="isolated-card"
+  data-test-isolated-card={{@card.canonicalURL}}
+  data-test-isolated-card-mode={{@mode}}
+>
+  <AnimatedContainer class={{if (or (eq @mode "view") (eq @mode "layout")) "isolated-card--view-fields"}}>
+    <MaybeAnimate
+      @mode={{@mode}}
+      @animationMode="schema"
+      @component="animated-each"
+      @content={{if this.bylineIsEditable @fields (filter @fields this.notByline)}}
+      @key="nonce"
+      @use={{this.transition}}
+      @duration={{this.duration}} as |field|>
+      <FieldRenderer
+        @field={{field}}
+        @position={{field.position}}
+        @mode={{@mode}}
+        @dropField={{@dropField}}
+        @removeField={{@removeField}}
+        @toggleStubField={{@toggleStubField}}
+        @setPosition={{@setPosition}}
+        @setCardValue={{@setCardValue}}
+        @setCardReference={{@setCardReference}}
+        @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+        @setFieldName={{@setFieldName}}
+        @selectField={{@selectField}}
+        @selectedField={{@selectedField}}
+        @loadedField={{@loadedField}}
+        @selectedFieldName={{@selectedFieldName}}
+      />
+      {{#if (and (eq @mode "schema") @dropField (not (eq field.csRealm "stub-card")))}}
+        <DropZone
+          @card={{@card}}
+          @dropField={{@dropField}}
+          @position={{inc field.position}}
+          @toggleStubField={{@toggleStubField}}
+        />
+      {{/if}}
+    </MaybeAnimate>
+    {{#unless this.bylineIsEditable}}
+      <div class="byline-info field">
+        <div class="byline-name-field">
+          {{this.bylineName}}
+        </div>
+        <div class="byline-image-field">
+          <img src={{this.bylineImageURL}} alt="" class="decorative-image-viewer">
+        </div>
+      </div>
+    {{/unless}}
+  </AnimatedContainer>
+</div>

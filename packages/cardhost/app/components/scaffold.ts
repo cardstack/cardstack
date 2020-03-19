@@ -23,21 +23,26 @@ export default class ScaffoldComponent extends Component<{
       csId = 'base';
     }
 
-    switch (this.args.card.adoptsFromId?.csId) {
-      case 'string-field':
-      case 'integer-field':
-      case 'boolean-field':
-      case 'date-field':
-      case 'datetime-field':
-      case 'url-field':
-      case 'image-reference-field':
-      case 'relative-image-reference-field':
-      case 'call-to-action-field':
-        csId = this.args.card.adoptsFromId?.csId;
-        break;
+    if (this.args.card.csId && ['photo-card'].includes(this.args.card.csId)) {
+      csId = this.args.card.csId;
+    } else {
+      switch (this.args.card.adoptsFromId?.csId) {
+        case 'photo-card':
+        case 'string-field':
+        case 'integer-field':
+        case 'boolean-field':
+        case 'date-field':
+        case 'datetime-field':
+        case 'url-field':
+        case 'image-reference-field':
+        case 'relative-image-reference-field':
+        case 'call-to-action-field':
+          csId = this.args.card.adoptsFromId?.csId;
+          break;
 
-      default:
-        csId = 'base';
+        default:
+          csId = 'base';
+      }
     }
     this.componentName = `scaffolding/${dasherize(csId!)}/${dasherize(this.args.feature)}`;
   }
