@@ -6,6 +6,7 @@
 /packages/*/vendor
 /packages/cardhost/deploy/node_modules
 /packages/cardhost/deploy/context
+/packages/cardhost/deploy/dist
 .eslintcache
 .vagrant
 .nvmrc

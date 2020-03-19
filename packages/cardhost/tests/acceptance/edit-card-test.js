@@ -13,9 +13,8 @@ import {
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { cardDocument } from '@cardstack/core/card-document';
-import { myOrigin } from '@cardstack/core/origin';
 
-const csRealm = `${myOrigin}/api/realms/default`;
+const csRealm = `http://localhost:3000/api/realms/default`;
 const author = cardDocument().withAutoAttributes({
   csRealm,
   csId: 'vangogh',

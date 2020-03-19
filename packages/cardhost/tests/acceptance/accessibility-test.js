@@ -11,11 +11,10 @@ import {
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { cardDocument } from '@cardstack/core/card-document';
-import { myOrigin } from '@cardstack/core/origin';
 import a11yAudit from 'ember-a11y-testing/test-support/audit';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
-const csRealm = `${myOrigin}/api/realms/default`;
+const csRealm = `http://localhost:3000/api/realms/default`;
 const testCard = cardDocument()
   .withAttributes({
     csRealm,

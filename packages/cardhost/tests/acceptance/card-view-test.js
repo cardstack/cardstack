@@ -6,11 +6,10 @@ import { waitForCardLoad, waitForTestsToEnd } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { cardDocument } from '@cardstack/core/card-document';
-import { myOrigin } from '@cardstack/core/origin';
 import { canonicalURL } from '@cardstack/core/card-id';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
-const csRealm = `${myOrigin}/api/realms/default`;
+const csRealm = `http://localhost:3000/api/realms/default`;
 const author = cardDocument().withAutoAttributes({
   csRealm,
   csId: 'van-gogh',

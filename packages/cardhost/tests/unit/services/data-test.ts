@@ -1,5 +1,4 @@
 import { module, test } from 'qunit';
-import { myOrigin } from '@cardstack/core/origin';
 import { setupTest } from 'ember-qunit';
 import { cardDocument, CardDocumentWithId } from '@cardstack/core/card-document';
 import Fixtures from '../../helpers/fixtures';
@@ -9,7 +8,7 @@ import { Card, AddressableCard } from '@cardstack/core/card';
 import { canonicalURL } from '@cardstack/core/card-id';
 import { ResourceIdentifierObject, RelationshipsWithData } from 'jsonapi-typescript';
 
-const csRealm = `${myOrigin}/api/realms/default`;
+const csRealm = `http://localhost:3000/api/realms/default`;
 
 module('Unit | Service | data', function() {
   module('non-mutating tests', function(hooks) {
