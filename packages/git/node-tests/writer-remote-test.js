@@ -353,11 +353,10 @@ describe('git/writer with empty remote', function() {
 
 
 describe('git/writer-remote/githereum', function() {
-  let env, writers, tempRepoPath, tempRemoteRepoPath, githereum, fakeContract, writer;
+  let env, writers, tempRepoPath, tempRemoteRepoPath, githereum, fakeContract, writer, fakePush;
   this.timeout(20000);
 
-  beforeEach(async function() {
-
+  async function setup(debounce) {
     await resetRemote();
 
     let factory = new JSONAPIFactory();
@@ -381,7 +380,8 @@ describe('git/writer-remote/githereum', function() {
             githereum: {
               contractAddress: '0xD8B92BE4420Fe70b62FF5e5F8eE5CF87871952e1',
               tag: 'test-tag',
-              repoName: 'githereum-repo'
+              repoName: 'githereum-repo',
+              debounce
             }
           }
         });
@@ -410,30 +410,12 @@ describe('git/writer-remote/githereum', function() {
     await writer._ensureGithereum();
     githereum = writer.githereum;
 
-  });
-
-  afterEach(async function() {
-    await temp.cleanup();
-    await destroyDefaultEnvironment(env);
-    service.clearCache();
-  });
-
-
-  it('writes to githereum if configured when writing', async function () {
-    let fakePush = fake.returns(new Promise(resolve => resolve()));
-
+    fakePush = fake.returns(new Promise(resolve => resolve()));
     replace(githereum, 'push', fakePush);
+  }
 
-    await writers.create(env.session, 'articles', {
-      data: {
-        type: 'articles',
-        attributes: {
-          title: 'An article'
-        }
-      }
-    });
-
-    let repo = await Repository.open(githereum.repoPath);
+  async function countCommits(repoPath) {
+    let repo = await Repository.open(repoPath);
     let firstCommitOnMaster = await repo.getMasterCommit();
     let commitCount = 0;
 
@@ -445,6 +427,34 @@ describe('git/writer-remote/githereum', function() {
       history.start();
     });
 
+    return commitCount;
+  }
+
+  afterEach(async function() {
+    await temp.cleanup();
+    await destroyDefaultEnvironment(env);
+    service.clearCache();
+  });
+
+  async function sleep(ms) {
+    await new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  it('writes to githereum if configured when writing', async function () {
+    await setup();
+
+
+    await writers.create(env.session, 'articles', {
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'An article'
+        }
+      }
+    });
+
+    let commitCount = await countCommits(githereum.repoPath);
+
     expect(commitCount).to.equal(2);
 
     expect(githereum.contract).to.equal(fakeContract);
@@ -455,5 +465,58 @@ describe('git/writer-remote/githereum', function() {
     expect(fakePush.callCount).to.equal(1);
     expect(fakePush.calledWith('test-tag')).to.be.ok;
   });
+
+  it('debounces githereum writes if configured when writing', async function() {
+    await setup(1000);
+
+    await writers.create(env.session, 'articles', {
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'An article'
+        }
+      }
+    });
+
+
+    expect(await countCommits(githereum.repoPath)).to.equal(2);
+    expect(githereum.contract).to.equal(fakeContract);
+    expect(githereum.repoName).to.equal("githereum-repo");
+
+    expect(fakePush.callCount).to.equal(0);
+
+    await writers.create(env.session, 'articles', {
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'Second article'
+        }
+      }
+    });
+
+    expect(await countCommits(githereum.repoPath)).to.equal(3);
+    expect(fakePush.callCount).to.equal(0);
+    await sleep(1000);
+    expect(fakePush.callCount).to.equal(1);
+
+    await writers.create(env.session, 'articles', {
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'Third article'
+        }
+      }
+    });
+
+    expect(fakePush.callCount).to.equal(1);
+    await sleep(100);
+    expect(fakePush.callCount).to.equal(1);
+    await sleep(800);
+    expect(fakePush.callCount).to.equal(1);
+    await sleep(200);
+    expect(fakePush.callCount).to.equal(2);
+
+  });
+
 
 });

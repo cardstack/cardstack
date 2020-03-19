@@ -15,6 +15,7 @@
   "dependencies": {
     "@cardstack/logger": "^0.2.0",
     "@cardstack/plugin-utils": "0.14.49",
+    "debounce-promise": "^3.1.2",
     "delay": "^4.1.0",
     "filenamify-url": "^1.0.0",
     "githereum": "0.0.1",

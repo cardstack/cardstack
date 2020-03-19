@@ -14,6 +14,8 @@ const temp = require('temp').track();
 const Githereum = require('githereum/githereum');
 const GithereumContract = require("githereum/build/contracts/Githereum.json");
 const TruffleContract = require("truffle-contract");
+const debounce = require('debounce-promise');
+
 
 const log = require('@cardstack/logger')('cardstack/git');
 const stringify = require('json-stable-stringify-without-jsonify');
@@ -233,28 +235,29 @@ module.exports = class Writer {
     }
   }
 
+
   async _pushToGithereum() {
     await this._ensureGithereum();
 
     if(this.githereum) {
       log.info("Githereum is enabled, triggering push");
-      // make sure only one push is ongoing at a time, by creating a chain of
-      // promises here
 
-      if (!this._githereumPromise && this.githereumConfig.debounce) {
-        this._githereumPromise = new Promise(resolve => setTimeout(resolve, this.githereumConfig.debounce));
+      if (!this._githereumPushDebounced) {
+        this._githereumPushDebounced = debounce(() => {
+          log.info("Starting githereum push");
+          return this.githereum.push(this.githereumConfig.tag).then(() =>
+            log.info("Githereum push complete")
+          ).catch(e => {
+            log.error("Error pushing to githereum:", e, e.stack);
+          });
+
+        }, this.githereumConfig.debounce || 0);
       }
 
-      this._githereumPromise = Promise.resolve(this._githereumPromise).then(() => {
-        log.info("Starting githereum push");
-        return this.githereum.push(this.githereumConfig.tag).then(() =>
-          log.info("Githereum push complete")
-        ).catch(e => {
-          log.error("Error pushing to githereum:", e, e.stack);
-        });
-      });
+      this._githereumPushDebounced();
+
     } else {
-      log.info("Githereum is disabled");
+      log.debug("Githereum is disabled");
     }
   }
 };
