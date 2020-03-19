@@ -50,7 +50,7 @@ export default class GitIndexer implements Indexer<GitMeta> {
       await service.pullRepo(this.remote.url, targetBranch);
     }
 
-    let updater = new GitUpdater(this.repo!, targetBranch, this.basePath);
+    let updater = new GitUpdater(this.realmCard, this.repo!, targetBranch, this.basePath);
 
     let result = await updater.updateContent(meta, ops);
     log.debug(`ending update()`);
@@ -91,7 +91,12 @@ class GitUpdater {
   rootTree?: Tree;
   docsToIndex: Map<SingleResourceDoc, UpstreamIdentity> = new Map();
 
-  constructor(readonly repo: Repository, readonly branch: string, readonly basePath: PathSpec[]) {}
+  constructor(
+    readonly realmCard: AddressableCard,
+    readonly repo: Repository,
+    readonly branch: string,
+    readonly basePath: PathSpec[]
+  ) {}
 
   async updateContent(meta: GitMeta, ops: IndexingOperations) {
     log.debug(`starting updateContent()`);
@@ -114,7 +119,8 @@ class GitUpdater {
       only: this.basePath.concat([['cards']]),
     });
 
-    for (let doc of inDependencyOrder([...this.docsToIndex.keys()])) {
+    let docsInOrder = inDependencyOrder([...this.docsToIndex.keys()], this.realmCard.csId);
+    for (let doc of docsInOrder) {
       let upstreamId = this.docsToIndex.get(doc);
       await ops.save(upstreamId!, new UpstreamDocument(doc));
     }
