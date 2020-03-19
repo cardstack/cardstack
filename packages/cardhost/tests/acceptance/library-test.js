@@ -84,10 +84,9 @@ const catalogCard1 = cardDocument()
     csId: 'millenial-puppy',
     csTitle: 'The Millenial Puppy',
     csCreated: '2020-01-01T08:00:00Z',
-    csFeatures: { 'isolated-css': isolatedCssFile, 'embedded-css': embeddedCssFile },
+    csFeatures: { 'isolated-css': isolatedCssFile },
     csFiles: {
       [isolatedCssFile]: 'card3 isolated css',
-      [embeddedCssFile]: 'card3 embedded css',
     },
     title: 'The Millenial Puppies of Today',
     body: 'Omg, these puppies are pooping everywhere!',
@@ -99,10 +98,9 @@ const catalogCard2 = cardDocument()
     csId: 'why-doors',
     csTitle: 'Why Doors?',
     csCreated: '2020-01-01T07:00:00Z',
-    csFeatures: { 'isolated-css': isolatedCssFile, 'embedded-css': embeddedCssFile },
+    csFeatures: { 'isolated-css': isolatedCssFile },
     csFiles: {
       [isolatedCssFile]: 'card4 isolated css',
-      [embeddedCssFile]: 'card4 embedded css',
     },
     title: 'Why Doors?',
     body: "What's the deal with doors?",
@@ -266,8 +264,8 @@ module('Acceptance | library', function(hooks) {
       [...document.querySelectorAll(`[data-test-featured-card]`)].map(i => i.getAttribute('data-test-featured-card')),
       [catalogCard2.canonicalURL, catalogCard1.canonicalURL]
     );
-    assert.dom(`[data-test-featured-card="${catalogCard1.canonicalURL}"] [data-test-embedded-card]`).exists();
-    assert.dom(`[data-test-featured-card="${catalogCard2.canonicalURL}"] [data-test-embedded-card]`).exists();
+    assert.dom(`[data-test-featured-card="${catalogCard1.canonicalURL}"] [data-test-isolated-card]`).exists();
+    assert.dom(`[data-test-featured-card="${catalogCard2.canonicalURL}"] [data-test-isolated-card]`).exists();
     assert
       .dom(`[data-test-featured-card="${catalogCard1.canonicalURL}"] [data-test-featured-card-title]`)
       .hasText('Featured: The Millenial Puppy');
@@ -275,14 +273,14 @@ module('Acceptance | library', function(hooks) {
       .dom(`[data-test-featured-card="${catalogCard2.canonicalURL}"] [data-test-featured-card-title]`)
       .hasText('Featured: Why Doors?');
     assert.ok(
-      find(`[data-test-css-format="embedded"][data-test-css-cards="[${catalogCard1.canonicalURL}]"`).innerText.includes(
-        'card3 embedded css'
+      find(`[data-test-css-format="isolated"][data-test-css-cards="[${catalogCard1.canonicalURL}]"`).innerText.includes(
+        'card3 isolated css'
       ),
       'featured card style is correct'
     );
     assert.ok(
-      find(`[data-test-css-format="embedded"][data-test-css-cards="[${catalogCard2.canonicalURL}]"`).innerText.includes(
-        'card4 embedded css'
+      find(`[data-test-css-format="isolated"][data-test-css-cards="[${catalogCard2.canonicalURL}]"`).innerText.includes(
+        'card4 isolated css'
       ),
       'featured card style is correct'
     );
