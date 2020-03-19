@@ -37,6 +37,7 @@
   position: relative;
   display: grid;
   grid-template-columns: repeat(4, var(--card-builder-grid-col-width));
+  grid-template-rows: 380px;
   grid-gap: 15px;
   margin: 0;
   padding: 15px var(--card-builder-horizontal-padding) 45px;
@@ -44,11 +45,15 @@
 }
 
 .card-builder--section-card-link {
+  position: relative;
+  width: 240px;
+  height: 410px;
   margin: 0;
-  padding: 15px;
+  /* padding: 15px; */
   background: none;
 }
 
+/* TODO: Fix hover effects */
 .card-builder--section-card-link:hover,
 .card-builder--section-card-link:focus {
   --cs-button-hover: transparent;
@@ -63,6 +68,10 @@
 }
 
 .card-builder--section-card-label {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+
   padding-top: 30px;
   color: var(--ch-dark);
   font-size: 13px;
@@ -73,6 +82,13 @@
 .card-builder--section-card {
   border-radius: 15px;
   transition: transform var(--ch-card-transition-duration) ease-in-out;
+}
+
+.card-builder--section-card-scale-wrapper {
+  transform: scale(0.50) translate(-50%, -50%);
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 

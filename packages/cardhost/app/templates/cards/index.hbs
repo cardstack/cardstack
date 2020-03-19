@@ -19,14 +19,15 @@
         class="card-builder--section-card-link"
         data-test-featured-card={{card.canonicalURL}}
       >
-        <CardRenderer
-          @card={{card}}
-          @class="card-builder--section-card"
-          @mode="view"
-          @format="embedded"
-          @preventIsolation={{true}}
-          @suppressHeader={{true}}
-        />
+        <div class="card-builder--section-card-scale-wrapper">
+          <CardRenderer
+            @card={{card}}
+            @class="card-builder--section-card"
+            @mode="view"
+            @format="isolated"
+            @suppressHeader={{true}}
+          />
+        </div>
         <div
           class="card-builder--section-card-label"
           data-test-featured-card-title
