@@ -88,7 +88,7 @@
     "ember-percy": "^1.6.0",
     "ember-qunit": "^4.6.0",
     "ember-resolver": "^7.0.0",
-    "ember-source": "~3.15.0",
+    "ember-source": "~3.16.0",
     "ember-svg-jar": "^2.2.3",
     "ember-test-selectors": "^3.0.0",
     "ember-toolbars": "^0.6.0",
