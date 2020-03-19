@@ -115,5 +115,12 @@
   "volta": {
     "node": "12.13.1",
     "yarn": "1.22.0"
+  },
+  "dependencies": {
+    "broccoli-funnel": "^3.0.2",
+    "broccoli-merge-trees": "^4.1.0",
+    "broccoli-node-api": "^1.7.0",
+    "broccoli-source": "^3.0.0",
+    "esm": "^3.2.25"
   }
 }

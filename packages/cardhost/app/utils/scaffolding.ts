@@ -24,9 +24,11 @@ export function getUserRealm() {
   return `${myOrigin}/api/realms/default`;
 }
 
-export async function loadModule(card: Card, localModulePath: string, exportedName = 'default') {
+export const scaffoldedLocalURL = 'http://localhost:3000';
+
+export async function loadModule(_card: Card, localModulePath: string, exportedName = 'default') {
   // @ts-ignore
-  let module = await import(`@cardstack/${card.csId}-card/${localModulePath}`); // we are using ESM for module loading
+  let module = await import(`../browser-entrypoints/${localModulePath}`); // we are using ESM for module loading
   return module[exportedName];
 }
 

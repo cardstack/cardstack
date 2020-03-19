@@ -85,6 +85,9 @@ package-lock.json
 /packages/cardhost/tests/unit/services/data-test.d.ts
 /packages/cardhost/tests/unit/services/data-test.js
 /packages/cardhost/tests/unit/services/data-test.js.map
+/packages/cardhost/lib/**/*.d.ts
+/packages/cardhost/lib/**/*.js
+/packages/cardhost/lib/**/*.js.map
 
 /packages/git/**/*.d.ts
 /packages/git/**/*.js

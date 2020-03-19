@@ -19,6 +19,18 @@ export class ModuleService implements ModuleLoader {
   writeCounter = 0;
 
   async load(card: Card, localModulePath: string, exportedName = 'default'): Promise<any> {
+    let fullPath = await this.locate(card, localModulePath);
+    // @ts-ignore
+    let module = await import(fullPath); // we are using ESM for module loading
+    return module[exportedName];
+  }
+
+  async locate(card: Card, localModulePath: string): Promise<string> {
+    let cardDir = await this.getCardDir(card);
+    return join(cardDir, localModulePath);
+  }
+
+  private async getCardDir(card: Card): Promise<string> {
     // using md5 because this is just for cache validation, not cryptographic
     // collision resistance
 
@@ -29,12 +41,10 @@ export class ModuleService implements ModuleLoader {
     if (!cardDir) {
       let hash = createHash('md5');
       hash.update(stringify(await toIdempotentDoc(card)));
-      cardDir = join(cardFilesCache, hash.digest('hex'));
+      cardDir = join(cardFilesCache, 'cards', hash.digest('hex'));
       await this.cachedWriteCard(card, cardDir);
     }
-    // @ts-ignore: we are using ESM for module loading but typescript doesn't know that's safe
-    let module = await import(join(cardDir, localModulePath));
-    return module[exportedName];
+    return cardDir;
   }
 
   private async cachedWriteCard(card: Card, outDir: string): Promise<void> {
@@ -92,7 +102,7 @@ export class ModuleService implements ModuleLoader {
   private async linkPeerDependencies(deps: NonNullable<Card['csPeerDependencies']>, outDir: string) {
     for (let [packageName, range] of Object.entries(deps)) {
       let peerDepDir = await this.locatePeerDep(packageName);
-      // @ts-ignore
+      // @ts-ignore: because we're using ESM as a loader, but typescript doesn't know that's safe.
       let version = (await import(join(peerDepDir, 'package.json'))).version as string;
       if (!satisfies(coerce(version)!, range)) {
         throw new Error(`version ${range} of ${packageName} is not available to cards on this hub`);

@@ -5,11 +5,11 @@ import logger from '@cardstack/logger';
 import { Registry, Container } from './dependency-injection';
 import { homedir } from 'os';
 import { join } from 'path';
-import { mkdirp } from 'fs-extra';
+import { mkdirp, outputFileSync } from 'fs-extra';
 
 import JSONAPIMiddleware from './jsonapi-middleware';
 import CardsService from './cards-service';
-import { ModuleService } from './module-service';
+import { ModuleService, cardFilesCache } from './module-service';
 import AuthenticationMiddleware from './authentication-middleware';
 
 // TODO: we need to let cards register services in a safely namespaced way,
@@ -102,6 +102,18 @@ export function bootEnvironment() {
     log.info(`Shutting down because connected parent process has already exited.`);
     process.exit(0);
   }
+
+  // TODO: this is a stand-in for actually emitting all the browser entrypoints
+  // for cards we know about before sending the hubStartupComplete message, so
+  // the first ember-cli build will contain them all.
+  outputFileSync(
+    join(cardFilesCache, 'browser-entrypoints', 'example.js'),
+    `export default function(){ return 'hello world' }`
+  );
+  if (process.send) {
+    process.send({ hubStartupComplete: true });
+  }
+
   process.on('disconnect', () => {
     log.info(`Hub shutting down because connected parent process exited.`);
     process.exit(0);
@@ -117,9 +129,6 @@ async function runServer(config: StartupConfig) {
   let app = await makeServer();
   app.listen(config.port);
   log.info('server listening on %s', config.port);
-  if (process.connected) {
-    process.send!('hub hello');
-  }
 }
 
 async function startQueueRunners(container: Container) {

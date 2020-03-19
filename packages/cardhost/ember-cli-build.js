@@ -5,24 +5,15 @@
 process.env.BROCCOLI_ENABLED_MEMOIZE = 'true';
 
 const EmberApp = require('ember-cli/lib/broccoli/ember-app');
-const { spawn } = require('child_process');
-const path = require('path');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+const esmRequire = require('esm')(module, { cjs: true });
+const { appTree } = esmRequire('./lib/hub-integration');
 
 module.exports = function(defaults) {
-  // This is just a placeholder for starting the backend in our tests until we
-  // figure out how we want to do this for real.
-  if (!process.env.HUB_URL) {
-    console.log('Starting Cardstack Hub...'); // eslint-disable-line no-console
-    if (process.env.EMBER_ENV === 'test') {
-      process.env.PGDATABASE = `test_db_${Math.floor(100000 * Math.random())}`;
-      console.log(`  creating hub DB ${process.env.PGDATABASE}`); // eslint-disable-line no-console
-    }
-    let bin = path.resolve(path.join(__dirname, '..', '..', 'packages', 'hub', 'bin', 'cardstack-hub.js'));
-    spawn(process.execPath, [bin], { stdio: [0, 1, 2, 'ipc'] });
-  }
-
   let app = new EmberApp(defaults, {
+    trees: {
+      app: appTree(),
+    },
     hinting: false, // we are doing this as part of the project level linting
     prember: {
       // we're not pre-rendering any URLs yet, but we still need prember because

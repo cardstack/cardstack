@@ -1,6 +1,10 @@
 'use strict';
 
 module.exports = function(environment) {
+  if (!process.env.HUB_URL) {
+    throw new Error(`missing HUB_URL`);
+  }
+
   let ENV = {
     modulePrefix: '@cardstack/cardhost',
     environment,
@@ -26,7 +30,7 @@ module.exports = function(environment) {
       // Here you can pass flags/options to your application instance
       // when it is created
     },
-    hubURL: process.env.HUB_URL || 'http://localhost:3000',
+    hubURL: process.env.HUB_URL,
   };
 
   if (environment === 'development') {
