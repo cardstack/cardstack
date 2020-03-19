@@ -1,5 +1,5 @@
 import { ScopedCardService } from '../../cards-service';
-import { myOrigin } from '@cardstack/core/origin';
+import { myOrigin } from '../../origin';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import { AddressableCard } from '@cardstack/core/card';
 import { Session } from '@cardstack/core/session';

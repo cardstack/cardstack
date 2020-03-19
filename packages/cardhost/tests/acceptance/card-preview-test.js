@@ -5,10 +5,9 @@ import Fixtures from '../helpers/fixtures';
 import { waitForCardLoad, waitForTestsToEnd, encodeColons, waitForThemerLoad } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { cardDocument } from '@cardstack/core/card-document';
-import { myOrigin } from '@cardstack/core/origin';
 import { percySnapshot } from 'ember-percy';
 
-const csRealm = `${myOrigin}/api/realms/default`;
+const csRealm = `http://localhost:3000/api/realms/default`;
 const author = cardDocument().withAutoAttributes({
   csRealm,
   csId: 'van-gogh',

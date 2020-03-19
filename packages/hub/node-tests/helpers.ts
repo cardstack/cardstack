@@ -5,7 +5,7 @@ import { emptyDir } from 'fs-extra';
 import { cardFilesCache } from '../module-service';
 import { Session } from '@cardstack/core/session';
 import { cardDocument } from '@cardstack/core/card-document';
-import { myOrigin } from '@cardstack/core/origin';
+import { myOrigin } from '../origin';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 export interface TestEnv {

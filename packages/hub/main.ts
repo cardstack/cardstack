@@ -20,7 +20,7 @@ import { FilesTracker } from '@cardstack/files-realm-card/tracker';
 import PgClient from './pgsearch/pgclient';
 import IndexingService from './indexing';
 import Queue from './queue/queue';
-import { myOrigin } from '@cardstack/core/origin';
+import { myOrigin } from './origin';
 import { Session } from '@cardstack/core/session';
 import { cardDocument } from '@cardstack/core/card-document';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';

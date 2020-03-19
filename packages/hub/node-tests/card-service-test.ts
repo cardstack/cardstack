@@ -1,7 +1,7 @@
 import { AddressableCard } from '@cardstack/core/card';
 import { canonicalURL } from '@cardstack/core/card-id';
 import { ScopedCardService } from '../cards-service';
-import { myOrigin } from '@cardstack/core/origin';
+import { myOrigin } from '../origin';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import { Session } from '@cardstack/core/session';
 import { createTestEnv, TestEnv } from './helpers';

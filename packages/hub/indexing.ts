@@ -1,6 +1,6 @@
 import { Session } from '@cardstack/core/session';
 import { inject, getOwner, injectionReady } from './dependency-injection';
-import { myOrigin } from '@cardstack/core/origin';
+import { myOrigin } from './origin';
 import { IndexingOperations, IndexingTracker } from '@cardstack/core/indexer';
 import * as J from 'json-typescript';
 import { upsert, param } from './pgsearch/util';

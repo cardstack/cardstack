@@ -1,7 +1,7 @@
 import { TestEnv, createTestEnv } from '../helpers';
 import IndexingService from '../../indexing';
 import { cardDocument, CardDocument } from '@cardstack/core/card-document';
-import { myOrigin } from '@cardstack/core/origin';
+import { myOrigin } from '../../origin';
 import CardsService, { ScopedCardService } from '../../cards-service';
 import { Session } from '@cardstack/core/session';
 import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';

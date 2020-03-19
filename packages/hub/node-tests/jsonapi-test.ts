@@ -1,6 +1,6 @@
 import Koa from 'koa';
 import supertest from 'supertest';
-import { myOrigin } from '@cardstack/core/origin';
+import { myOrigin } from '../origin';
 import { TestEnv, createTestEnv } from './helpers';
 import { cardDocument } from '@cardstack/core/card-document';
 import { stringify } from 'qs';

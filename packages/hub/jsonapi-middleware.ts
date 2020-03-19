@@ -9,7 +9,7 @@ import { inject } from './dependency-injection';
 import CardstackError from '@cardstack/core/error';
 import { SessionContext } from './authentication-middleware';
 import { assertSingleResourceDoc } from '@cardstack/core/jsonapi';
-import { myOrigin } from '@cardstack/core/origin';
+import { myOrigin } from './origin';
 import { makeCollection, apiPrefix, AddressableCard } from '@cardstack/core/card';
 import { CardId } from '@cardstack/core/card-id';
 import { SingleResourceDoc } from 'jsonapi-typescript';

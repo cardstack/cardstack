@@ -1,5 +1,5 @@
 import { AddressableCard } from '@cardstack/core/card';
-import { myOrigin } from '@cardstack/core/origin';
+import { myOrigin } from '../origin';
 import { Session } from '@cardstack/core/session';
 import { createTestEnv, TestEnv } from './helpers';
 import { cardDocument } from '@cardstack/core/card-document';

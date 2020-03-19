@@ -22,12 +22,11 @@ import {
 import { login } from '../helpers/login';
 import { animationsSettled } from 'ember-animated/test-support';
 import { cardDocument } from '@cardstack/core/card-document';
-import { myOrigin } from '@cardstack/core/origin';
 import { canonicalURL } from '@cardstack/core/card-id';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 const timeout = 5000;
-const csRealm = `${myOrigin}/api/realms/default`;
+const csRealm = `http://localhost:3000/api/realms/default`;
 const testCard = cardDocument()
   .withAttributes({
     csRealm,
