@@ -9619,18 +9619,19 @@ ember-source-channel-url@^2.0.1:
   dependencies:
     got "^8.0.1"
 
-ember-source@~3.15.0:
-  version "3.15.0"
-  resolved "https://registry.yarnpkg.com/ember-source/-/ember-source-3.15.0.tgz#f6500c6d289ce58231bf1e6695c4974df2be7390"
-  integrity sha512-daTELJBDMGqAmQb/Puxdk1YR204/zs1DEiEMQWlqbtmhphAoDUbGi9ifJu20ajP/IcOCWw9Vp7aPzguTohWF7w==
+ember-source@~3.16.0:
+  version "3.16.3"
+  resolved "https://registry.yarnpkg.com/ember-source/-/ember-source-3.16.3.tgz#080ded36d6b43ed1ee8e9a13ed4cebf27a50db6a"
+  integrity sha512-A5IuTBDnxM4zK5IOaoePOchmgaKm4iYuYfQZVsvuPoczm89SBTKuQZnsXFp2ZI8Sc17ALm1Euc9Lc10TNy2KXw==
   dependencies:
     "@babel/helper-module-imports" "^7.0.0"
     "@babel/plugin-transform-block-scoping" "^7.6.2"
     "@babel/plugin-transform-object-assign" "^7.2.0"
-    "@ember/edition-utils" "^1.1.1"
+    "@ember/edition-utils" "^1.2.0"
     babel-plugin-debug-macros "^0.3.3"
     babel-plugin-filter-imports "^3.0.0"
     broccoli-concat "^3.7.4"
+    broccoli-debug "^0.6.4"
     broccoli-funnel "^2.0.2"
     broccoli-merge-trees "^3.0.2"
     chalk "^2.4.2"
