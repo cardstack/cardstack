@@ -81,8 +81,7 @@ module('Acceptance | card preview', function(hooks) {
     await percySnapshot(assert);
   });
 
-  test('can navigate to the page that opened it or default to layout mode', async function(assert) {
-    // can return to layout mode
+  test('can navigate to the to previous page (layout) mode when closed', async function(assert) {
     await visit(`/cards/${cardPath}/edit/layout`);
     await waitForCardLoad();
 
@@ -104,8 +103,9 @@ module('Acceptance | card preview', function(hooks) {
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/layout`);
     assert.dom('[data-test-card-renderer-isolated]').hasClass('layout');
     assert.dom('[data-test-isolated-card-mode="layout"]').exists();
+  });
 
-    // can return to themer mode
+  test('can navigate to the to previous page (themer) when closed', async function(assert) {
     await visit(`/cards/${cardPath}/edit/layout/themer`);
     await waitForCardLoad();
 
@@ -124,8 +124,9 @@ module('Acceptance | card preview', function(hooks) {
 
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/layout/themer`);
     assert.dom('[data-test-card-renderer-isolated]').hasClass('themer', 'can return to themer');
+  });
 
-    // can default to layout mode
+  test('can navigate to the to layout page when closed if there is no previous page', async function(assert) {
     await visit(`/cards/${cardPath}/edit/preview`);
     await waitForCardLoad();
 

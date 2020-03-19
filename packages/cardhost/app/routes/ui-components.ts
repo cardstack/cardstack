@@ -3,9 +3,10 @@ import { inject as service } from '@ember/service';
 import { cardDocument } from '@cardstack/core/card-document';
 import { getUserRealm } from '../utils/scaffolding';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import DataService from '../services/data';
 
 export default class UIComponentsRoute extends Route {
-  @service data;
+  @service data!: DataService;
   async model() {
     let unsavedParent = await this.data.create(
       getUserRealm(),
@@ -63,7 +64,7 @@ export default class UIComponentsRoute extends Route {
       card2,
       card3,
       parentCard,
-      grandParentCard: await this.data.load({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }),
+      grandParentCard: await this.data.load({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }, 'everything'),
       sampleName: await card.field('sample-name'),
       sampleTitle: await card.field('sample-title'),
       sampleDate: await card.field('datetime'),
