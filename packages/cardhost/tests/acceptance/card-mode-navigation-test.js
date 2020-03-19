@@ -5,7 +5,13 @@ import Fixtures from '../helpers/fixtures';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { cardDocument } from '@cardstack/core/card-document';
-import { waitForCardLoad, waitForSchemaViewToLoad, encodeColons, waitForTestsToEnd, setCardName } from '../helpers/card-ui-helpers';
+import {
+  waitForCardLoad,
+  waitForSchemaViewToLoad,
+  encodeColons,
+  waitForTestsToEnd,
+  setCardName,
+} from '../helpers/card-ui-helpers';
 
 const csRealm = `http://localhost:3000/api/realms/default`;
 const testCard = cardDocument().withAutoAttributes({
