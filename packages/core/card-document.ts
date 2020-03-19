@@ -392,20 +392,33 @@ interface CardDAGEntry {
   cardArtifact: ResourceObject | CardDocumentWithId | SingleResourceDoc;
 }
 
-export function inDependencyOrder(cards: ResourceObject[]): ResourceObject[];
-export function inDependencyOrder(cards: CardDocumentWithId[]): CardDocumentWithId[];
-export function inDependencyOrder(cards: SingleResourceDoc[]): SingleResourceDoc[];
-export function inDependencyOrder(cards: any[]): any[] {
+export function inDependencyOrder(cards: ResourceObject[], fromUpstreamRealmId?: string): ResourceObject[];
+export function inDependencyOrder(cards: CardDocumentWithId[], fromUpstreamRealmId?: string): CardDocumentWithId[];
+export function inDependencyOrder(cards: SingleResourceDoc[], fromUpstreamRealmId?: string): SingleResourceDoc[];
+export function inDependencyOrder(cards: any[], fromUpstreamRealmId?: string): any[] {
   let dag = new DAGMap<CardDAGEntry>();
 
   for (let card of cards) {
     let json: ResourceObject = 'jsonapi' in card ? card.jsonapi.data : 'data' in card ? card.data : card;
-    dag.add(
-      canonicalURL((json.attributes as unknown) as CardId),
-      { cardResource: json, cardArtifact: card },
-      undefined,
-      getRelatedIds(json)
-    );
+    let cardId: {
+      csId?: string;
+      csRealm?: string;
+      csOriginalRealm?: string;
+    } = {};
+    if (typeof json.attributes?.csId !== 'string') {
+      throw new Error(`Cannot sort card that has no csId`);
+    }
+    cardId.csId = json.attributes.csId;
+    if (fromUpstreamRealmId || typeof json.attributes?.csRealm === 'string') {
+      cardId.csRealm = fromUpstreamRealmId ?? (json.attributes?.csRealm as string);
+    } else {
+      throw new Error(`Cannot sort card that has no csRealm`);
+    }
+    if (typeof json.attributes.csOriginalRealm === 'string' && json.attributes.csOriginalRealm !== cardId.csRealm) {
+      cardId.csRealm = json.attributes.csOriginalRealm;
+    }
+
+    dag.add(canonicalURL(cardId as CardId), { cardResource: json, cardArtifact: card }, undefined, getRelatedIds(json));
   }
   let sortedCreatedCards: CardDAGEntry[] = [];
   dag.each((_key, value) => sortedCreatedCards.push(value!));
@@ -430,6 +443,7 @@ function getRelatedIds(cardValue: CardDocument['asCardValue']): string[] {
       ...Object.values(cardValue.attributes || {}).map(value =>
         isPlainObject(value) ? getRelatedIds(value as CardDocument['asCardValue']) : null
       ),
+      ...Object.values(cardValue.attributes?.csFields || {}).map(fieldCard => getRelatedIds(fieldCard)),
     ]).filter(Boolean)
   ) as string[];
 }
