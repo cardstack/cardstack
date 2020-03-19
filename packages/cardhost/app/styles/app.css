@@ -32,33 +32,6 @@
 @import '/assets/components/schema-field-renderer.css';
 @import '/assets/components/drop-zone.css';
 
-/* TODO eventually these will be dynamically added to the DOM.
-Until that work is done we are statically adding this css
-*/
-@import '/assets/fields/belongs-to-editor.css';
-@import '/assets/fields/belongs-to-viewer.css';
-@import '/assets/fields/boolean-editor.css';
-@import '/assets/fields/boolean-viewer.css';
-@import '/assets/fields/case-insensitive-editor.css';
-@import '/assets/fields/case-insensitive-viewer.css';
-@import '/assets/fields/date-editor.css';
-@import '/assets/fields/date-viewer.css';
-@import '/assets/fields/decorative-image-viewer.css';
-@import '/assets/fields/has-many-editor.css';
-@import '/assets/fields/has-many-viewer.css';
-@import '/assets/fields/integer-editor.css';
-@import '/assets/fields/integer-viewer.css';
-@import '/assets/fields/string-editor.css';
-@import '/assets/fields/string-viewer.css';
-@import '/assets/fields/link-viewer.css';
-@import '/assets/fields/cta-viewer.css';
-
-/* Themed cards */
-/* @import '/assets/cards/event-card-isolated.css';
-@import '/assets/cards/event-ticket-isolated.css';
-@import '/assets/cards/wedding-invitation-isolated.css';
-@import '/assets/cards/product-card-isolated.css';
-@import '/assets/cards/photo-card-isolated.css'; */
 
 :root {
   --ch-font-family: 'Open Sans', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;

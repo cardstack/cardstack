@@ -2,22 +2,27 @@
 
 @import url('https://fonts.googleapis.com/css?family=Teko:500&display=swap');
 
-.photo-card-isolated {
+.card-boundary {
     min-height: 812px;
     background-color: black;
 }
 
-.photo-card-isolated .isolated-card--view-fields {
+.isolated-card--view-fields {
+    display: grid;
     min-height: inherit;
     max-width: 800px;
     margin: 0 auto;
 }
+.isolated-card--view-fields::before,
+.isolated-card--view-fields::after {
+    height: 0; /* for firefox */
+}
 
-.photo-card-isolated .photo-image-url-field {
+.photo-image-url-field {
     z-index: 1;
 }
 
-.photo-card-isolated .field {
+.field {
     z-index: 2;
     display: block;
     font-family: 'Roboto';
@@ -27,16 +32,16 @@
     letter-spacing: 0.035em;
 }
 
-.photo-card-isolated .label {
+.label {
     display: none;
 }
 
-.photo-card-isolated .photo-description-field,
-.photo-card-isolated .photo-keywords-field {
+.photo-description-field,
+.photo-keywords-field {
     display: none;
 }
 
-.photo-card-isolated .photo-image-url-value {
+.photo-image-url-value {
     position: absolute;
     top: 0;
     left: 0;
@@ -48,13 +53,13 @@
     object-position: center;
 }
 
-.photo-card-isolated .photo-caption-field {
+.photo-caption-field {
     max-width: 338px;
     position: relative;
     margin-left: 0;
     top: 40%;
 }
-.photo-card-isolated .photo-caption-value {
+.photo-caption-value {
     display: inline;
     background-color: #FF0000;
     color: white;
@@ -67,7 +72,7 @@
 }
 
 
-.photo-card-isolated .photo-location-field {
+.photo-location-field {
     position: absolute;
     bottom: 0;
     width: 100%;
@@ -78,7 +83,7 @@
     border-top-right-radius: 20px;
     box-shadow: 0 -3px 6px rgba(0,0,0,0.07);
 }
-.photo-card-isolated .photo-location-value {
+.photo-location-value {
     background-image: url('/assets/images/cards/photo-skiing/photo-location-icon.svg');
     background-size: 16px 23px;
     background-position: left bottom;
@@ -87,7 +92,7 @@
     line-height: 23px;
 }
 
-.photo-card-isolated .photo-datetime-field {
+.photo-datetime-field {
     width: auto;
     position: absolute;
     bottom: 0;
@@ -95,31 +100,31 @@
     padding: 30px;
 }
 
-.photo-card-isolated .photo-byline-field {
+.photo-byline-field {
   position: absolute;
   top: 22px;
   left: 0;
 }
 
-.photo-card-isolated .byline-card-embedded {
+.byline-card-embedded {
   width: 150px;
 }
 
-.photo-card-isolated .byline-card-embedded .embedded-card--view-fields {
+.byline-card-embedded .embedded-card--view-fields {
   display: grid;
   grid-template: 'image name';
   align-items: center;
 }
 
-.photo-card-isolated .byline-card-embedded .byline-image-field {
+.byline-card-embedded .byline-image-field {
   grid-area: image;
   width: 40px;
 }
-.photo-card-isolated .byline-card-embedded .byline-name-field {
+.byline-card-embedded .byline-name-field {
   grid-area: name;
   color: white;
 }
-.photo-card-isolated .byline-card-embedded .field {
+.byline-card-embedded .field {
   padding: 0;
   margin: 0;
 }

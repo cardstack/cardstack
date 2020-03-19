@@ -1,7 +1,8 @@
 .card-builder {
-  --card-builder-hover: rgba(0,0,0,0.1);
-  --card-builder-grid-col-width: 255px;
+  --card-builder-hover: rgba(0, 0, 0, 0.1);
   --card-builder-horizontal-padding: 38px;
+  --card-builder-grid-col-width: 250px;
+  --card-builder-grid-row-height: 422px;
 
   height: 100%;
   padding-left: var(--ch-left-edge-navbar-width);
@@ -37,6 +38,7 @@
   position: relative;
   display: grid;
   grid-template-columns: repeat(4, var(--card-builder-grid-col-width));
+  grid-template-rows: var(--card-builder-grid-row-height);
   grid-gap: 15px;
   margin: 0;
   padding: 15px var(--card-builder-horizontal-padding) 45px;
@@ -44,8 +46,10 @@
 }
 
 .card-builder--section-card-link {
+  position: relative;
+  width: inherit;
+  height: inherit;
   margin: 0;
-  padding: 15px;
   background: none;
 }
 
@@ -55,24 +59,38 @@
   outline: 0;
 }
 
-.card-builder--section-card-link:hover > .card-builder--section-card,
-.card-builder--section-card-link:focus > .card-builder--section-card {
+.card-builder--section-card-link:hover .card-builder--section-card,
+.card-builder--section-card-link:focus .card-builder--section-card {
   transform: scale(0.9);
   box-shadow: 0px 0px 0px 35px var(--card-builder-hover);
   transition: all var(--ch-card-transition-duration) ease-in-out;
 }
 
+.card-builder--section-card-scale-wrapper {
+  transform: scale(0.50) translate(-50%, -50%);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%; /* since it's scaled down by 50% */
+  height: 200%;
+  margin: 0 auto;
+}
+
+.card-builder--section-card-scale-wrapper > .card-builder--section-card {
+  padding: 0;
+  border-radius: 15px;
+  transition: transform var(--ch-card-transition-duration) ease-in-out;
+}
+
 .card-builder--section-card-label {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
   padding-top: 30px;
   color: var(--ch-dark);
   font-size: 13px;
   font-weight: 400;
   text-align: center;
-}
-
-.card-builder--section-card {
-  border-radius: 15px;
-  transition: transform var(--ch-card-transition-duration) ease-in-out;
 }
 
 

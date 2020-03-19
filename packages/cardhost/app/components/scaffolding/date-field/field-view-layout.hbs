@@ -1,7 +1,7 @@
-<div class="label {{@card.nonce}}-label" data-test-date-field-viewer-label>
+<div class="label {{@card.name}}-label" data-test-date-field-viewer-label>
   {{@card.csTitle}}
 </div>
-<div class="value {{@card.nonce}}-value" data-test-date-field-viewer-value>
+<div class="value {{@card.name}}-value" data-test-date-field-viewer-value>
   {{#if this.fieldValue}}
     {{moment-format this.fieldValue "MMMM D, YYYY"}}
   {{/if}}
