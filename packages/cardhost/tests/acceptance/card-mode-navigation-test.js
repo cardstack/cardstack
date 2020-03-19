@@ -5,7 +5,7 @@ import Fixtures from '../helpers/fixtures';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { cardDocument } from '@cardstack/core/card-document';
-import { waitForCardLoad, waitForSchemaViewToLoad, encodeColons, waitForTestsToEnd } from '../helpers/card-ui-helpers';
+import { waitForCardLoad, waitForSchemaViewToLoad, encodeColons, waitForTestsToEnd, setCardName } from '../helpers/card-ui-helpers';
 
 const csRealm = `http://localhost:3000/api/realms/default`;
 const testCard = cardDocument().withAutoAttributes({
@@ -67,6 +67,21 @@ module('Acceptance | card mode navigation', function(hooks) {
     await waitFor('[data-test-context-menu-button]');
     await click('[data-test-context-menu-button]');
     assert.dom('[data-test-context-menu-items] .checked').hasText('View');
+  });
+
+  test('can use the context menu to adopt from a card', async function(assert) {
+    await visit(`/cards/${cardPath}/edit/fields`);
+    await waitForCardLoad();
+
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/fields`);
+    await click('[data-test-context-menu-button]');
+
+    await click('[data-test-context-adopt]');
+    await waitFor('[data-test-card-name]');
+    let adoptedCardName = 'Adopted Millennial Puppies';
+    await setCardName(adoptedCardName);
+    assert.ok(/^\/cards\/.*\/edit\/fields$/.test(currentURL()), 'URL is correct');
+    assert.dom('.card-renderer-isolated--header-title').hasText(adoptedCardName);
   });
 
   test('clicking outside the context menu closes it', async function(assert) {
