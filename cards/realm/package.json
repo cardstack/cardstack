@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/realm-card",
-  "version": "0.18.13",
+  "version": "0.18.14",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -9,7 +9,7 @@
     "@cardstack/hub": "*"
   },
   "devDependencies": {
-    "@cardstack/hub": "0.18.13"
+    "@cardstack/hub": "0.18.14"
   },
   "volta": {
     "node": "12.13.1",
