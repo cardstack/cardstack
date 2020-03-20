@@ -9,6 +9,7 @@ import { outputFile, mkdirp, ensureSymlink } from 'fs-extra';
 import { satisfies, coerce } from 'semver';
 import { ModuleLoader } from '@cardstack/core/module-loader';
 import { SingleResourceDoc } from 'jsonapi-typescript';
+import merge from 'lodash/merge';
 
 export const cardFilesCache = process.env.CARD_FILES_CACHE ?? join(homedir(), '.cardstack', 'card-files-cache');
 
@@ -120,7 +121,7 @@ declare module '@cardstack/hub/dependency-injection' {
 }
 
 async function toIdempotentDoc(card: Card): Promise<SingleResourceDoc> {
-  let idempotentDoc = (await card.asUpstreamDoc()).jsonapi;
+  let idempotentDoc = merge((await card.asUpstreamDoc()).jsonapi, { data: { attributes: { csRealm: card.csRealm } } });
   if (idempotentDoc.data.attributes) {
     delete idempotentDoc.data.attributes.csCreated;
     delete idempotentDoc.data.attributes.csUpdated;

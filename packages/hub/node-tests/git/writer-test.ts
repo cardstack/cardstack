@@ -74,6 +74,19 @@ describe('hub/git/writer', function() {
       expect(saved.data.attributes.title).to.equal('Second Article');
     });
 
+    it('does not write csRealm to serialized card.json in git', async function() {
+      let cardDoc = cardDocument()
+        .withAutoAttributes({
+          title: 'Second Article',
+        })
+        .withAttributes({ csId: 'custom-id' });
+
+      await service.create(repoRealm, cardDoc.jsonapi);
+
+      let saved = await inRepo(repoPath).getJSONContents('master', `cards/custom-id/card.json`);
+      expect(saved.data.attributes.csRealm).to.be.undefined;
+    });
+
     it('saves inner card files', async function() {
       let cardDoc = cardDocument()
         .withAutoAttributes({
@@ -147,6 +160,7 @@ describe('hub/git/writer', function() {
 
       let saved = await inRepo(repoPath).getJSONContents('master', `cards/${savedCard.csId}/card.json`);
       expect(saved.data.attributes.title).to.equal('Updated document');
+      expect(saved.data.attributes.csRealm).to.be.undefined;
     });
 
     it("can update a card's inner files", async function() {

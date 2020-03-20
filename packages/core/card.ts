@@ -541,7 +541,13 @@ export class Card {
 
     data.type = 'cards';
     data.attributes = Object.create(null);
-    data.attributes.csRealm = this.csRealm;
+
+    // Don't put the csRealm in the upstream doc--its redundant, and makes the
+    // cards less portable (e.g. resuing a card from a files realm in a git
+    // realm).
+    if (rules.includeFieldSet !== 'upstream') {
+      data.attributes.csRealm = this.csRealm;
+    }
 
     if (this.csRealm !== this.csOriginalRealm) {
       data.attributes.csOriginalRealm = this.csOriginalRealm;
@@ -893,7 +899,10 @@ export class Card {
   }
 
   async patch(otherDoc: SingleResourceDoc): Promise<Card> {
-    let newDoc = await this.patchDoc((await this.asUpstreamDoc()).jsonapi, otherDoc);
+    let newDoc = await this.patchDoc(
+      merge((await this.asUpstreamDoc()).jsonapi, { data: { attributes: { csRealm: this.csRealm } } }),
+      otherDoc
+    );
     return await this.container.instantiate(
       Card,
       newDoc,
@@ -1122,7 +1131,10 @@ export class UnsavedCard extends Card {
   }
 
   async asAddressableCard(patch: SingleResourceDoc): Promise<AddressableCard> {
-    let newDoc = await this.patchDoc((await this.asUpstreamDoc()).jsonapi, patch);
+    let newDoc = await this.patchDoc(
+      merge((await this.asUpstreamDoc()).jsonapi, { data: { attributes: { csRealm: this.csRealm } } }),
+      patch
+    );
     return await this.cardInstantiator.instantiate(newDoc);
   }
 }
@@ -1278,7 +1290,12 @@ export class FieldCard extends Card {
   }
 
   async patch(otherDoc: SingleResourceDoc): Promise<FieldCard> {
-    let newDoc = await this.patchDoc((await this.asUpstreamDoc()).jsonapi, otherDoc);
+    let newDoc = await this.patchDoc(
+      merge((await this.asUpstreamDoc()).jsonapi, {
+        data: { attributes: { csRealm: this.csRealm } },
+      }),
+      otherDoc
+    );
     return await this.container.instantiate(
       FieldCard,
       newDoc,
@@ -1325,7 +1342,10 @@ export class AddressableCard extends Card implements CardId {
   }
 
   async patch(otherDoc: SingleResourceDoc): Promise<AddressableCard> {
-    let newDoc = await this.patchDoc((await this.asUpstreamDoc()).jsonapi, otherDoc);
+    let newDoc = await this.patchDoc(
+      merge((await this.asUpstreamDoc()).jsonapi, { data: { attributes: { csRealm: this.csRealm } } }),
+      otherDoc
+    );
     return await this.container.instantiate(AddressableCard, newDoc, this.reader, this.modules, this.container);
   }
 

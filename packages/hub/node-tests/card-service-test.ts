@@ -2639,6 +2639,7 @@ describe('hub/card-service', function() {
         let { jsonapi: doc } = await daddy.asUpstreamDoc();
         expect(doc).to.have.nested.property('data.type', 'cards');
         expect(doc).to.have.nested.property('data.id', daddy.canonicalURL);
+        expect(doc).to.not.have.nested.property('data.attributes.csRealm', 'csRealm is not included in upstream doc');
         expect(doc).to.have.nested.property('data.attributes.name', 'Hassan');
         expect(doc).to.have.deep.nested.property('data.relationships.puppies.data', [
           { type: 'cards', id: vanGogh.canonicalURL },

@@ -65,7 +65,8 @@ export class ScopedCardService implements CardReader, CardInstantiator {
     }
 
     let csId = typeof upstreamIdFromWriter === 'object' ? upstreamIdFromWriter.csId : upstreamIdFromWriter;
-    let savedCard = await card.asAddressableCard(merge(saved.jsonapi, { data: { attributes: { csId } } }));
+    let csRealm = realmCard.csId;
+    let savedCard = await card.asAddressableCard(merge(saved.jsonapi, { data: { attributes: { csId, csRealm } } }));
     let batch = this.cards.pgclient.beginCardBatch(this);
     await batch.save(savedCard);
     await batch.done();
@@ -82,13 +83,14 @@ export class ScopedCardService implements CardReader, CardInstantiator {
     }
     doc.data.attributes.csUpdated = new Date().toISOString();
     let realmCard = await this.getRealm(id.csRealm);
+    let csRealm = realmCard.csId;
     let writer = await this.loadWriter(realmCard);
     let previousCard = await this.get(id);
-    let updatedCard = await previousCard.patch(doc);
+    let updatedCard = await previousCard.patch(merge(doc, { data: { attributes: { csRealm } } }));
     await updatedCard.validate(previousCard, realmCard);
 
     let saved = await writer.update(this.session, updatedCard.upstreamId, await updatedCard.asUpstreamDoc());
-    updatedCard = await updatedCard.patch(saved.jsonapi);
+    updatedCard = await updatedCard.patch(merge(saved.jsonapi, { data: { attributes: { csRealm } } }));
 
     let batch = this.cards.pgclient.beginCardBatch(this);
     await batch.save(updatedCard);

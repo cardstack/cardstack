@@ -12,6 +12,7 @@ import { CardReader } from '@cardstack/core/card-reader';
 import { loadModule, scaffoldedLocalURL } from '../utils/scaffolding';
 import { Query } from '@cardstack/core/query';
 import { stringify } from 'qs';
+import merge from 'lodash/merge';
 import CardstackError from '@cardstack/core/error';
 import { OcclusionRules } from '@cardstack/core/occlusion-rules';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
@@ -60,7 +61,9 @@ export default class DataService extends Service implements CardInstantiator {
       headers: {
         'Content-Type': 'application/vnd.api+json',
       },
-      body: JSON.stringify((await card.asUpstreamDoc()).jsonapi),
+      body: JSON.stringify(
+        merge((await card.asUpstreamDoc()).jsonapi, { data: { attributes: { csRealm: card.csRealm } } })
+      ),
     });
     if (!response.ok) {
       await handleJsonApiError(response);
