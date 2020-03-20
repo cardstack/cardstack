@@ -1,12 +1,32 @@
 import { Motion, rAF } from 'ember-animated';
+import Sprite from 'ember-animated/-private/sprite';
+import { BaseOptions } from 'ember-animated/-private/motion';
+//@ts-ignore
 import move from 'ember-animated/motions/move';
 
-export default function drag(sprite, opts) {
+export default function drag(sprite: Sprite, opts?: Options) {
   return new Drag(sprite, opts).run();
 }
 
-class Drag extends Motion {
-  constructor(sprite, opts) {
+interface Options extends BaseOptions {
+  others: Sprite[];
+  onCollision?: (payload: any) => void;
+}
+
+interface Target {
+  x: number;
+  y: number;
+  payload: any;
+}
+
+class Drag extends Motion<Options> {
+  prior?: Drag | null;
+  dragStartX: number | null;
+  dragStartY: number | null;
+  xStep: number | null;
+  yStep: number | null;
+
+  constructor(sprite: Sprite, opts?: Options) {
     super(sprite, opts);
     this.prior = null;
 
@@ -23,11 +43,11 @@ class Drag extends Motion {
     this.yStep = null;
   }
 
-  interrupted(motions) {
-    this.prior = motions.find(m => m instanceof this.constructor);
+  interrupted(motions: Motion<Options>[]) {
+    this.prior = motions.find(m => m instanceof Drag) as Drag;
   }
 
-  *animate() {
+  *animate(this: Drag) {
     let sprite = this.sprite;
 
     let initialTx, initialTy;
@@ -36,8 +56,8 @@ class Drag extends Motion {
       this.dragStartY = this.prior.dragStartY;
       this.xStep = this.prior.xStep;
       this.yStep = this.prior.yStep;
-      initialTx = sprite.transform.tx - sprite.absoluteInitialBounds.left + this.dragStartX;
-      initialTy = sprite.transform.ty - sprite.absoluteInitialBounds.top + this.dragStartY;
+      initialTx = sprite.transform.tx - sprite.absoluteInitialBounds.left + (this.dragStartX || 0);
+      initialTy = sprite.transform.ty - sprite.absoluteInitialBounds.top + (this.dragStartY || 0);
     } else {
       this.dragStartX = sprite.absoluteInitialBounds.left;
       this.dragStartY = sprite.absoluteInitialBounds.top;
@@ -48,10 +68,12 @@ class Drag extends Motion {
     }
 
     // targets are all in absolute screen coordinates
-    let targets = this.opts.others.map(s => makeTarget(s.absoluteFinalBounds, s));
-    let ownTarget = makeTarget(sprite.absoluteFinalBounds, sprite);
+    let targets = (this.opts.others || [])
+      .map(s => (s.absoluteFinalBounds ? makeTarget(s.absoluteFinalBounds, s) : null))
+      .filter(Boolean) as Target[];
+    let ownTarget = sprite.absoluteFinalBounds ? makeTarget(sprite.absoluteFinalBounds, sprite) : null;
 
-    let dragState = sprite.owner.value.dragState;
+    let dragState = (sprite?.owner?.value as any)?.dragState;
     let outline;
     if (dragState && dragState.usingKeyboard) {
       outline = 'dashed red';
@@ -71,28 +93,28 @@ class Drag extends Motion {
       yield move(sprite);
     }
 
-    while (sprite.owner.value.dragState) {
-      let dragState = sprite.owner.value.dragState;
+    while ((sprite?.owner?.value as any)?.dragState) {
+      let dragState = (sprite?.owner?.value as any)?.dragState;
       if (dragState.usingKeyboard) {
-        sprite.element.focus();
+        (sprite.element as HTMLElement).focus();
         let chosenTarget = ownTarget;
-        while (this.xStep > dragState.xStep) {
+        while (chosenTarget && typeof this.xStep === 'number' && this.xStep > dragState.xStep) {
           chosenTarget = chooseNextToLeft(chosenTarget, targets);
           this.xStep -= 1;
         }
-        while (this.xStep < dragState.xStep) {
+        while (chosenTarget && typeof this.xStep === 'number' && this.xStep < dragState.xStep) {
           chosenTarget = chooseNextToRight(chosenTarget, targets);
           this.xStep += 1;
         }
-        while (this.yStep > dragState.yStep) {
+        while (chosenTarget && typeof this.yStep === 'number' && this.yStep > dragState.yStep) {
           chosenTarget = chooseNextToUp(chosenTarget, targets);
           this.yStep -= 1;
         }
-        while (this.yStep < dragState.yStep) {
+        while (chosenTarget && typeof this.yStep === 'number' && this.yStep < dragState.yStep) {
           chosenTarget = chooseNextToDown(chosenTarget, targets);
           this.yStep += 1;
         }
-        if (chosenTarget !== ownTarget && this.opts.onCollision) {
+        if (chosenTarget && chosenTarget !== ownTarget && this.opts.onCollision) {
           this.opts.onCollision(chosenTarget.payload);
         }
       } else {
@@ -108,7 +130,7 @@ class Drag extends Motion {
   }
 }
 
-export function makeTarget(bounds, payload) {
+export function makeTarget(bounds: DOMRect, payload: any): Target {
   return {
     x: bounds.left + bounds.width / 2,
     y: bounds.top + bounds.height / 2,
@@ -116,7 +138,7 @@ export function makeTarget(bounds, payload) {
   };
 }
 
-export function chooseNextToLeft(chosenTarget, targets) {
+export function chooseNextToLeft(chosenTarget: Target, targets: Target[]) {
   let candidates = targets.filter(target => {
     if (target.x >= chosenTarget.x) {
       return false;
@@ -127,7 +149,7 @@ export function chooseNextToLeft(chosenTarget, targets) {
   return closest(chosenTarget, candidates) || chosenTarget;
 }
 
-export function chooseNextToRight(chosenTarget, targets) {
+export function chooseNextToRight(chosenTarget: Target, targets: Target[]) {
   let candidates = targets.filter(target => {
     if (target.x < chosenTarget.x) {
       return false;
@@ -138,7 +160,7 @@ export function chooseNextToRight(chosenTarget, targets) {
   return closest(chosenTarget, candidates) || chosenTarget;
 }
 
-export function chooseNextToUp(chosenTarget, targets) {
+export function chooseNextToUp(chosenTarget: Target, targets: Target[]) {
   let candidates = targets.filter(target => {
     if (target.y >= chosenTarget.y) {
       return false;
@@ -149,7 +171,7 @@ export function chooseNextToUp(chosenTarget, targets) {
   return closest(chosenTarget, candidates) || chosenTarget;
 }
 
-export function chooseNextToDown(chosenTarget, targets) {
+export function chooseNextToDown(chosenTarget: Target, targets: Target[]) {
   let candidates = targets.filter(target => {
     if (target.y < chosenTarget.y) {
       return false;
@@ -160,7 +182,7 @@ export function chooseNextToDown(chosenTarget, targets) {
   return closest(chosenTarget, candidates) || chosenTarget;
 }
 
-function closest(chosenTarget, candidates) {
+function closest(chosenTarget: Target, candidates: Target[]) {
   let closest;
   let closestDistance;
   for (let candidate of candidates) {

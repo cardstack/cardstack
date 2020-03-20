@@ -1,17 +1,28 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
+import RouterService from '@ember/routing/router-service';
 import { tracked } from '@glimmer/tracking';
+//@ts-ignore
 import { task } from 'ember-concurrency';
 import { cardDocument } from '@cardstack/core/card-document';
 import { getUserRealm } from '../utils/scaffolding';
+import { AddressableCard } from '@cardstack/core/card';
+import DataService from '../services/data';
+import OverlaysService from '../services/overlays';
 
-export default class CardNameDialog extends Component {
-  @service router;
-  @service data;
-  @service overlays;
+export default class CardNameDialog extends Component<{
+  title: string;
+  mode: string;
+  icon: string;
+  adoptsFrom: AddressableCard;
+  closeDialog: () => void;
+}> {
+  @service router!: RouterService;
+  @service data!: DataService;
+  @service overlays!: OverlaysService;
 
-  @tracked name;
+  @tracked name?: string;
 
   get title() {
     return this.args.title || 'Create a New Card';
@@ -24,12 +35,12 @@ export default class CardNameDialog extends Component {
   }
 
   @action
-  updateCardName(name) {
+  updateCardName(name: string) {
     this.name = name;
   }
 
   @action
-  keyDown(event) {
+  keyDown(event: KeyboardEvent) {
     if (event.which === 13) {
       this.createCard();
     } else if (event.which === 27 && this.args.closeDialog) {
@@ -37,7 +48,7 @@ export default class CardNameDialog extends Component {
     }
   }
 
-  @task(function*() {
+  @task(function*(this: CardNameDialog) {
     let doc = cardDocument().withAttributes({
       csTitle: this.name,
     });
@@ -47,7 +58,7 @@ export default class CardNameDialog extends Component {
         ? [...this.args.adoptsFrom.csFieldOrder]
         : undefined;
       if (csFieldOrder) {
-        doc.setAttributes({ csFieldOrder });
+        doc.withAttributes({ csFieldOrder });
       }
     }
 
@@ -60,7 +71,7 @@ export default class CardNameDialog extends Component {
       this.router.transitionTo('cards.card.edit.fields.schema', { card });
     }
   })
-  createCardTask;
+  createCardTask: any;
 
   @action
   createCard() {

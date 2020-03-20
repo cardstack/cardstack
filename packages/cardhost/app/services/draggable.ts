@@ -1,17 +1,17 @@
 import Service from '@ember/service';
 import { tracked } from '@glimmer/tracking';
-import { Card } from '@cardstack/core/card';
+import { FieldCard, AddressableCard } from '@cardstack/core/card';
 
 export default class DraggableService extends Service {
-  @tracked field: Card | undefined;
-  @tracked startingPosition: number | undefined;
-  @tracked dropzone: HTMLElement | undefined;
+  @tracked field?: AddressableCard | FieldCard;
+  @tracked startingPosition?: number;
+  @tracked dropzone?: HTMLElement;
   @tracked dragging = false;
 
   /**
    * Sets the currently dragged field
    */
-  setField(field: Card, startingPosition: number) {
+  setField(field: AddressableCard | FieldCard, startingPosition?: number) {
     this.field = field;
     this.startingPosition = startingPosition;
   }
