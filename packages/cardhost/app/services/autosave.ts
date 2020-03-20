@@ -46,9 +46,9 @@ export default class AutosaveService extends Service {
     this.cardUpdatedFn = cardUpdatedFn;
   }
 
-  cardUpdated(updatedCard: AddressableCard) {
+  cardUpdated(updatedCard: AddressableCard, isDirty = false) {
     if (typeof this.cardUpdatedFn === 'function') {
-      this.cardUpdatedFn(updatedCard, true);
+      this.cardUpdatedFn(updatedCard, isDirty);
     }
     this.kickoff();
   }

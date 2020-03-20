@@ -1140,22 +1140,18 @@ export class UnsavedCard extends Card {
 }
 
 export class FieldCard extends Card {
-  readonly sourceCard: Card;
-  readonly enclosingCard: Card;
   readonly csFieldArity: FieldArity = 'singular';
 
   constructor(
     jsonapi: SingleResourceDoc,
     readonly name: string,
-    sourceCard: Card,
-    enclosingCard: Card,
+    readonly sourceCard: Card,
+    readonly enclosingCard: Card,
     reader: CardReader,
     modules: ModuleLoader,
     container: Container
   ) {
     super(jsonapi, sourceCard.csRealm, sourceCard, reader, modules, container);
-    this.enclosingCard = enclosingCard;
-    this.sourceCard = sourceCard;
     if (typeof jsonapi.data.attributes?.csFieldArity === 'string') {
       this.csFieldArity = jsonapi.data.attributes?.csFieldArity === 'plural' ? 'plural' : 'singular';
     }
