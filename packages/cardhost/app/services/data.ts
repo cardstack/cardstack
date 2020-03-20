@@ -9,7 +9,7 @@ import { ModuleLoader } from '@cardstack/core/module-loader';
 import { Container as ContainerInterface } from '@cardstack/core/container';
 import { Factory } from '@cardstack/core/container';
 import { CardReader } from '@cardstack/core/card-reader';
-import { loadModule, scaffoldedLocalURL } from '../utils/scaffolding';
+import { loadModule } from '../utils/scaffolding';
 import { Query } from '@cardstack/core/query';
 import { stringify } from 'qs';
 import merge from 'lodash/merge';
@@ -168,7 +168,7 @@ export default class DataService extends Service implements CardInstantiator {
       throw new Error(`Must specify a csRealm either as a string or as part of a CardId`);
     }
 
-    let isLocalRealm = csRealm.includes(scaffoldedLocalURL);
+    let isLocalRealm = csRealm.includes(this.hubURL);
     let requestRealm = isLocalRealm ? csRealm.split('/').pop() : csRealm;
     let isCreate = typeof idOrCardOrCsRealm !== 'string' && 'isUnsaved' in idOrCardOrCsRealm;
     let url = isLocalRealm
