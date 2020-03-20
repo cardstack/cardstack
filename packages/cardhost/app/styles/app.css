@@ -135,10 +135,6 @@ a:hover {
   z-index: var(--ch-left-edge-z-index);
 }
 
-.cardhost-cards:not(.schema) .cst-top {
-  margin-left: 80px !important;
-}
-
 /* JSON card document -- hidden from view */
 .cardhost-card-document {
   visibility: hidden;
