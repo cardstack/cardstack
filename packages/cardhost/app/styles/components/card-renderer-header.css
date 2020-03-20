@@ -112,7 +112,7 @@
   border-radius: 10px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
   top: 42px;
-  right: -130px;
+  right: -180px;
   width: 230px;
   padding-bottom: 10px;
 }
@@ -121,9 +121,9 @@
 
 .fields .context-menu-nav {
   position: fixed;
-  top: auto;
   margin-left: 405px;
   margin-top: -13px;
+  top: 135px;
   right: auto;
 }
 
