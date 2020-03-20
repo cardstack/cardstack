@@ -55,6 +55,18 @@ describe('hub/files-realm-writer', function() {
     expect(card.csDescription).to.equal('new card');
   });
 
+  it('does not write csRealm to serialized card.json in filesystem', async function() {
+    let doc = cardDocument().withAttributes({
+      csDescription: 'new card',
+    });
+
+    let card = await service.create(filesRealm, doc.jsonapi);
+    let name = serializedCardName(card);
+    let cardJsonFile = join(filesPath, name, 'card.json');
+    let cardJson = readJSONSync(cardJsonFile);
+    expect(cardJson.data.attributes.csRealm).to.be.undefined;
+  });
+
   it('can update a card with changed inner csFile', async function() {
     let card = await service.create(
       filesRealm,
@@ -75,6 +87,7 @@ describe('hub/files-realm-writer', function() {
     expect(existsSync(cardJsonFile)).to.equal(true, 'The card.json file exists');
     let cardJson = readJSONSync(cardJsonFile);
     expect(cardJson.data.attributes.csDescription).to.equal('updated card');
+    expect(cardJson.data.attributes.csRealm).to.be.undefined;
 
     let innerCardFileName = join(filesPath, name, 'inner', 'example.hbs');
     expect(existsSync(innerCardFileName)).to.equal(true, 'The inner card csFile exists');
