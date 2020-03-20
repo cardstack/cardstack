@@ -63,6 +63,11 @@
           >
             {{svg-jar "card-catalog" width="20px" height="20px"}}
           </button>
+          {{#if (eq @mode "schema")}}
+            <div class="cardhost-left-edge--catalog-wrapper">
+              <Catalog @card={{@card}} />
+            </div>
+          {{/if}}
         </li>
         <li>
           <button
@@ -77,7 +82,5 @@
         </li>
       </ul>
     </nav>
-
-    {{yield}}
   </aside>
 {{/let}}

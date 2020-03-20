@@ -49,4 +49,8 @@ export default class CardsController extends Controller {
   get hideTopEdge() {
     return this.routeInfo.mode === 'cards' || this.routeInfo.mode === 'view';
   }
+
+  get hideLeftEdge() {
+    return this.routeInfo.mode === 'preview';
+  }
 }

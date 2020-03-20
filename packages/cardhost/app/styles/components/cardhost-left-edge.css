@@ -1,7 +1,4 @@
 .cardhost-left-edge {
-  position: fixed;
-  top: 0;
-  left: 0;
   height: 100%;
   display: flex;
   flex-flow: row nowrap;
@@ -18,6 +15,8 @@
 .cardhost-left-edge--nav.schema {
   background-color: var(--ch-dark-background);
   border-right: 2px solid var(--ch-default);
+  width: var(--ch-left-edge-width);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
 }
 
 .cardhost-left-edge--nav > ul {
@@ -90,6 +89,21 @@
   background-color: var(--ch-deep-background);
   width: 320px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+}
+
+.cardhost-left-edge--nav.schema.expanded {
+  width: calc(320px + var(--ch-left-edge-panel-width));
+}
+
+.cardhost-left-edge--nav.schema.expanded .login-grid-right-column {
+  width: 190px;
+}
+
+.cardhost-left-edge--catalog-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .login-grid {

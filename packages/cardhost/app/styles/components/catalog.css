@@ -1,5 +1,6 @@
 .ch-catalog {
   width: var(--ch-left-edge-panel-width);
+  height: 100%;
   background-color: var(--ch-dark-background);
   color: var(--ch-light);
   overflow: hidden;

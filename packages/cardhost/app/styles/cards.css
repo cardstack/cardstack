@@ -78,7 +78,7 @@
 }
 
 .card-renderer--inner-container.schema-container {
-  padding-left: var(--ch-left-edge-width);
+  padding-left: 0;
 }
 
 .card-renderer--inner-container.view-container {

@@ -1,0 +1,32 @@
+<section class="ch-catalog" data-test-catalog-loaded={{stringify this.load.isIdle}}>
+  <header class="ch-catalog--header">
+    <h3 class="ch-catalog--title">Card Catalog</h3>
+  </header>
+  <div class="ch-catalog--content">
+    <div
+      class="ch-catalog--fields"
+      tabindex="0"
+    >
+      {{!-- Eventually this will be a search that allows you to find cards to use for your card's fields --}}
+      {{#animated-each this.catalogEntries use=this.transition watch="dragState,dropTo" as |entry|}}
+        <div
+          class="ch-catalog-field"
+          tabindex="-1"
+          {{on "mousedown" (perform this.beginDragging entry)}}
+          {{on "click" (fn this.selectFieldType entry)}}
+          data-test-card-add-field-draggable={{entry.canonicalURL}}
+        >
+          <div class="ch-catalog-field--icon">
+            {{!-- TODO need to add card icon to the API and render here --}}
+          </div>
+          <div>
+            <h4 class="ch-catalog-field--title">{{entry.csTitle}}</h4>
+            {{#if entry.csDescription}}
+              <p class="ch-catalog-field--description">{{entry.csDescription}}</p>
+            {{/if}}
+          </div>
+        </div>
+      {{/animated-each}}
+    </div>
+  </div>
+</section>
