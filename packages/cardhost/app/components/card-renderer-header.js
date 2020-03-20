@@ -2,6 +2,7 @@ import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import moment from 'moment';
 
 /*
 This component has two modes, essentially.
@@ -55,6 +56,16 @@ export default class CardRendererHeaderComponent extends Component {
   resetMenu() {
     if (!this.args.cardSelected) {
       this.localMenuOpen = false;
+    }
+  }
+
+  get updated() {
+    // This is needed because sending empty strings or null to the moment helper
+    // causes warnings. It ensures the helper always receives a date.
+    if (this.args.card && this.args.card.csUpdated) {
+      return this.args.card.csUpdated;
+    } else {
+      return moment();
     }
   }
 }
