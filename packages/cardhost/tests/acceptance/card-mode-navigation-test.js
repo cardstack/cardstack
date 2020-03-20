@@ -20,8 +20,18 @@ const testCard = cardDocument().withAutoAttributes({
   title: 'The Millenial Puppy',
 });
 const cardPath = encodeURIComponent(testCard.canonicalURL);
+
+const adoptableTestCard = cardDocument().withAutoAttributes({
+  csRealm,
+  csId: 'gen-z-puppies',
+  title: 'The Gen Z Puppy',
+});
+const adoptableCardPath = encodeURIComponent(adoptableTestCard.canonicalURL);
 const scenario = new Fixtures({
-  create: [testCard],
+  create: [testCard, adoptableTestCard],
+  destroy: {
+    cardTypes: [adoptableTestCard],
+  },
 });
 
 module('Acceptance | card mode navigation', function(hooks) {
@@ -76,18 +86,18 @@ module('Acceptance | card mode navigation', function(hooks) {
   });
 
   test('can use the context menu to adopt from a card', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/fields`);
+    await visit(`/cards/${adoptableCardPath}/edit/fields`);
     await waitForCardLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/fields`);
+    assert.equal(encodeColons(currentURL()), `/cards/${adoptableCardPath}/edit/fields`);
     await click('[data-test-context-menu-button]');
 
     await click('[data-test-context-adopt]');
     await waitFor('[data-test-card-name]');
-    let adoptedCardName = 'Adopted Millennial Puppies';
-    await setCardName(adoptedCardName);
+    let adopteeCardName = 'Adopted Gen Z Puppies';
+    await setCardName(adopteeCardName);
     assert.ok(/^\/cards\/.*\/edit\/fields$/.test(currentURL()), 'URL is correct');
-    assert.dom('.card-renderer-isolated--header-title').hasText(adoptedCardName);
+    assert.dom('.card-renderer-isolated--header-title').hasText(adopteeCardName);
   });
 
   test('clicking outside the context menu closes it', async function(assert) {
