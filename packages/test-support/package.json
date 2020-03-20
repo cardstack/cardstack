@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/test-support",
-  "version": "0.18.15",
+  "version": "0.18.16",
   "description": "Shared test support for cardstack packages.",
   "main": "index.js",
   "scripts": {
@@ -18,9 +18,9 @@
     "require-uncached": "^1.0.3"
   },
   "devDependencies": {
-    "@cardstack/core": "0.18.15",
-    "@cardstack/eslint-config": "0.18.15",
-    "@cardstack/test-support": "0.18.15",
+    "@cardstack/core": "0.18.16",
+    "@cardstack/eslint-config": "0.18.16",
+    "@cardstack/test-support": "0.18.16",
     "jsonapi-typescript": "^0.1.3"
   },
   "author": "Edward Faulkner <edward@eaf4.com>",
