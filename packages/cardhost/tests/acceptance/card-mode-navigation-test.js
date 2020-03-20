@@ -5,13 +5,7 @@ import Fixtures from '../helpers/fixtures';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { cardDocument } from '@cardstack/core/card-document';
-import {
-  waitForCardLoad,
-  waitForSchemaViewToLoad,
-  encodeColons,
-  waitForTestsToEnd,
-  setCardName,
-} from '../helpers/card-ui-helpers';
+import { waitForCardLoad, waitForSchemaViewToLoad, encodeColons, waitForTestsToEnd } from '../helpers/card-ui-helpers';
 
 const csRealm = `http://localhost:3000/api/realms/default`;
 const testCard = cardDocument().withAutoAttributes({
@@ -20,18 +14,8 @@ const testCard = cardDocument().withAutoAttributes({
   title: 'The Millenial Puppy',
 });
 const cardPath = encodeURIComponent(testCard.canonicalURL);
-
-const adoptableTestCard = cardDocument().withAutoAttributes({
-  csRealm,
-  csId: 'gen-z-puppies',
-  title: 'The Gen Z Puppy',
-});
-const adoptableCardPath = encodeURIComponent(adoptableTestCard.canonicalURL);
 const scenario = new Fixtures({
-  create: [testCard, adoptableTestCard],
-  destroy: {
-    cardTypes: [adoptableTestCard],
-  },
+  create: [testCard],
 });
 
 module('Acceptance | card mode navigation', function(hooks) {
@@ -83,21 +67,6 @@ module('Acceptance | card mode navigation', function(hooks) {
     await waitFor('[data-test-context-menu-button]');
     await click('[data-test-context-menu-button]');
     assert.dom('[data-test-context-menu-items] .checked').hasText('View');
-  });
-
-  test('can use the context menu to adopt from a card', async function(assert) {
-    await visit(`/cards/${adoptableCardPath}/edit/fields`);
-    await waitForCardLoad();
-
-    assert.equal(encodeColons(currentURL()), `/cards/${adoptableCardPath}/edit/fields`);
-    await click('[data-test-context-menu-button]');
-
-    await click('[data-test-context-adopt]');
-    await waitFor('[data-test-card-name]');
-    let adopteeCardName = 'Adopted Gen Z Puppies';
-    await setCardName(adopteeCardName);
-    assert.ok(/^\/cards\/.*\/edit\/fields$/.test(currentURL()), 'URL is correct');
-    assert.dom('.card-renderer-isolated--header-title').hasText(adopteeCardName);
   });
 
   test('clicking outside the context menu closes it', async function(assert) {
