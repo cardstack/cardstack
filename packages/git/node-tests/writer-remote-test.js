@@ -2,6 +2,8 @@ const {
   Cred,
   Clone,
   Remote,
+  Repository,
+  Revwalk
 } = require('nodegit');
 
 const {
@@ -21,6 +23,7 @@ const service = require('../service');
 const mkdir = promisify(temp.mkdir);
 
 const privateKey = readFileSync(join(__dirname, 'git-ssh-server', 'cardstack-test-key'), 'utf8');
+const { fake, replace } = require('sinon');
 
 const fetchOpts = {
   callbacks: {
@@ -346,4 +349,169 @@ describe('git/writer with empty remote', function() {
       });
     });
   });
+});
+
+
+describe('git/writer-remote/githereum', function() {
+  let env, writers, tempRepoPath, tempRemoteRepoPath, githereum, fakeContract, writer, fakePush;
+  this.timeout(20000);
+
+  async function setup(debounce) {
+    await resetRemote();
+
+    let factory = new JSONAPIFactory();
+
+    tempRepoPath = await mkdir('cardstack-temp-test-repo');
+    tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
+
+    await Clone('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
+      fetchOpts,
+    });
+
+    let dataSource = factory.addResource('data-sources', 'git')
+        .withAttributes({
+          'source-type': '@cardstack/git',
+          params: {
+            remote: {
+              url: 'ssh://root@localhost:9022/root/data-test',
+              privateKey,
+              cacheDir: tempRepoPath,
+            },
+            githereum: {
+              contractAddress: '0xD8B92BE4420Fe70b62FF5e5F8eE5CF87871952e1',
+              tag: 'test-tag',
+              repoName: 'githereum-repo',
+              debounce
+            }
+          }
+        });
+
+
+    factory.addResource('content-types', 'articles')
+      .withRelated('fields', [
+        factory.addResource('fields', 'title').withAttributes({ fieldType: '@cardstack/core-types::string' }),
+        factory.addResource('fields', 'primary-image').withAttributes({ fieldType: '@cardstack/core-types::belongs-to' })
+      ]).withRelated('data-source', dataSource);
+
+    factory.addResource('plugin-configs', '@cardstack/hub')
+      .withRelated(
+        'default-data-source',
+        dataSource
+      );
+
+    env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+    writers = env.lookup('hub:writers');
+
+    let schema = await writers.currentSchema.getSchema();
+    writer = schema.getDataSource('git').writer;
+
+    fakeContract = {};
+    replace(writer, '_getGithereumContract', fake.returns(fakeContract));
+    await writer._ensureGithereum();
+    githereum = writer.githereum;
+
+    fakePush = fake.returns(new Promise(resolve => resolve()));
+    replace(githereum, 'push', fakePush);
+  }
+
+  async function countCommits(repoPath) {
+    let repo = await Repository.open(repoPath);
+    let firstCommitOnMaster = await repo.getMasterCommit();
+    let commitCount = 0;
+
+    await new Promise((resolve, reject) => {
+      let history = firstCommitOnMaster.history(Revwalk.SORT.TIME);
+      history.on("commit", () => commitCount += 1);
+      history.on('end', resolve);
+      history.on('error', reject);
+      history.start();
+    });
+
+    return commitCount;
+  }
+
+  afterEach(async function() {
+    await temp.cleanup();
+    await destroyDefaultEnvironment(env);
+    service.clearCache();
+  });
+
+  async function sleep(ms) {
+    await new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  it('writes to githereum if configured when writing', async function () {
+    await setup();
+
+    await writers.create(env.session, 'articles', {
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'An article'
+        }
+      }
+    });
+
+
+    expect(githereum.contract).to.equal(fakeContract);
+    expect(githereum.repoName).to.equal("githereum-repo");
+
+
+    // push is called with the correct tag
+    expect(fakePush.callCount).to.equal(1);
+    expect(fakePush.calledWith('test-tag')).to.be.ok;
+  });
+
+  it('debounces githereum writes if configured when writing', async function() {
+    await setup(1000);
+
+    await writers.create(env.session, 'articles', {
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'An article'
+        }
+      }
+    });
+
+
+    expect(githereum.contract).to.equal(fakeContract);
+    expect(githereum.repoName).to.equal("githereum-repo");
+
+    expect(fakePush.callCount).to.equal(0);
+
+    await writers.create(env.session, 'articles', {
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'Second article'
+        }
+      }
+    });
+
+
+    expect(fakePush.callCount).to.equal(0);
+    await sleep(1000);
+    expect(fakePush.callCount).to.equal(1);
+
+    await writers.create(env.session, 'articles', {
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'Third article'
+        }
+      }
+    });
+
+    expect(fakePush.callCount).to.equal(1);
+    await sleep(100);
+    expect(fakePush.callCount).to.equal(1);
+    await sleep(800);
+    expect(fakePush.callCount).to.equal(1);
+    await sleep(200);
+    expect(fakePush.callCount).to.equal(2);
+
+  });
+
+
 });
