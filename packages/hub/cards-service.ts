@@ -1,20 +1,20 @@
-import { Session } from '@cardstack/core/session';
+import { Session } from './session';
 import { UnsavedCard, AddressableCard, Card } from './card';
-import { asCardId, CardId } from '@cardstack/core/card-id';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { asCardId, CardId } from './card-id';
+import { CARDSTACK_PUBLIC_REALM } from './realm';
 import { ResponseMeta } from './document';
-import CardstackError from '@cardstack/core/error';
+import { CardstackError } from './error';
 import { myOrigin } from './origin';
 import { getOwner, inject } from './dependency-injection';
 import { SingleResourceDoc } from 'jsonapi-typescript';
-import { Query } from '@cardstack/core/query';
-import { Writer } from '@cardstack/core/writer';
+import { Query } from './query';
+import { Writer } from './writer';
 import { join } from 'path';
-import { assertSingleResourceDoc } from '@cardstack/core/jsonapi';
+import { assertSingleResourceDoc } from './jsonapi';
 import merge from 'lodash/merge';
 import { readdirSync, existsSync, statSync, readFileSync } from 'fs-extra';
-import { CardReader } from '@cardstack/core/card-reader';
-import { CardInstantiator } from '@cardstack/core/card-instantiator';
+import { CardReader } from './card-reader';
+import { CardInstantiator } from './card-instantiator';
 
 export default class CardsService {
   pgclient = inject('pgclient');

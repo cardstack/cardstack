@@ -2,10 +2,10 @@ import { module, test } from 'qunit';
 import { setupTest } from 'ember-qunit';
 import { cardDocument } from '@cardstack/hub';
 import Fixtures from '../../helpers/fixtures';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 import DataService from '../../../app/services/data';
 import { Card, AddressableCard } from '@cardstack/hub';
-import { canonicalURL } from '@cardstack/core/card-id';
+import { canonicalURL } from '@cardstack/hub';
 import { ResourceIdentifierObject, RelationshipsWithData } from 'jsonapi-typescript';
 
 const csRealm = `http://localhost:3000/api/realms/default`;

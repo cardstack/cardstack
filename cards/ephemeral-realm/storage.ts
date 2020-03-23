@@ -1,6 +1,6 @@
 import { UpstreamDocument, UpstreamIdentity } from '@cardstack/hub';
 import { MetaObject } from 'jsonapi-typescript';
-import CardstackError from '@cardstack/core/error';
+import { Error } from '@cardstack/hub';
 
 interface StoreEntry {
   id: UpstreamIdentity;
@@ -29,7 +29,7 @@ export class EphemeralStorage {
     let entry = this._store.get(key);
 
     if (entry && entry.doc != null && String(entry.generation) !== String(ifMatch)) {
-      throw new CardstackError('Merge conflict', {
+      throw new Error('Merge conflict', {
         status: 409,
         source: doc ? { pointer: '/data/meta/version' } : { header: 'If-Match' },
       });

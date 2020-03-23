@@ -24,7 +24,6 @@
     "truffle-contract": "^4.0.30"
   },
   "peerDependencies": {
-    "@cardstack/core": "*",
     "@cardstack/hub": "*"
   },
   "devDependencies": {

@@ -20,12 +20,12 @@ import {
   FieldValue,
   FieldArity,
 } from './util';
-import { Expression, PgPrimitive } from '@cardstack/core/expression';
+import { Expression, PgPrimitive } from '../expression';
 import { AddressableCard, Card, FieldCard } from '../card';
-import { CardId, cardstackFieldPattern, canonicalURL } from '@cardstack/core/card-id';
+import { CardId, cardstackFieldPattern, canonicalURL } from '../card-id';
 import { ResponseMeta } from '../document';
-import CardstackError from '@cardstack/core/error';
-import { Query, baseType, Filter, EqFilter, RangeFilter } from '@cardstack/core/query';
+import { CardstackError } from '../error';
+import { Query, baseType, Filter, EqFilter, RangeFilter } from '../query';
 import { Sorts } from './sorts';
 import snakeCase from 'lodash/snakeCase';
 import flatten from 'lodash/flatten';

@@ -7,18 +7,18 @@ import crypto from 'crypto';
 import Change from './lib/change';
 import os from 'os';
 import process from 'process';
-import CardstackError from '@cardstack/core/error';
+import { Error } from '@cardstack/hub';
 import { dir as mkTmpDir } from 'tmp-promise';
 import { MetaObject } from 'jsonapi-typescript';
 import { extractSettings } from './lib/git-settings';
 
-import { Writer } from '@cardstack/core/writer';
-import { Session } from '@cardstack/core/session';
+import { Writer } from '@cardstack/hub';
+import { Session } from '@cardstack/hub';
 import { UpstreamDocument, UpstreamIdentity } from '@cardstack/hub';
 import { inject } from '@cardstack/hub/dependency-injection';
 import { AddressableCard } from '@cardstack/hub';
-import { writeCard } from '@cardstack/core/card-file';
-import { upstreamIdToCardDirName } from '@cardstack/core/card-id';
+import { writeCard } from '@cardstack/hub';
+import { upstreamIdToCardDirName } from '@cardstack/hub';
 
 const defaultBranch = 'master';
 
@@ -98,7 +98,7 @@ export default class GitWriter implements Writer {
 
     let version = meta?.version;
     if (version == null) {
-      throw new CardstackError('missing required field "meta.version"', {
+      throw new Error('missing required field "meta.version"', {
         status: 400,
         source: { pointer: '/data/meta/version' },
       });
@@ -131,7 +131,7 @@ export default class GitWriter implements Writer {
     let cardDir = this.cardDirectoryFor(cardDirName);
 
     if (!version) {
-      throw new CardstackError('version is required', {
+      throw new Error('version is required', {
         status: 400,
         source: { pointer: '/data/meta/version' },
       });
@@ -149,7 +149,7 @@ export default class GitWriter implements Writer {
 
   async _commitOptions(operation: string, id: string, session: Session) {
     if (!session.unimplementedSession) {
-      throw new CardstackError('Session not implemented');
+      throw new Error('Session not implemented');
     }
     // TODO use user session data when we add that capability
     return {
@@ -254,19 +254,19 @@ async function withErrorHandling(cardDir: string | undefined, fn: Function) {
     return await fn();
   } catch (err) {
     if (err instanceof UnknownObjectId) {
-      throw new CardstackError(err.message, { status: 400, source: { pointer: '/data/meta/version' } });
+      throw new Error(err.message, { status: 400, source: { pointer: '/data/meta/version' } });
     }
     if (err instanceof GitConflict) {
-      throw new CardstackError('Merge conflict', { status: 409 });
+      throw new Error('Merge conflict', { status: 409 });
     }
     if (err instanceof OverwriteRejected) {
-      throw new CardstackError(`The cardDir ${cardDir} is already in use`, {
+      throw new Error(`The cardDir ${cardDir} is already in use`, {
         status: 409,
         source: { pointer: '/data/id' },
       });
     }
     if (err instanceof FileNotFound) {
-      throw new CardstackError(`The cardDir ${cardDir} does not exist`, {
+      throw new Error(`The cardDir ${cardDir} does not exist`, {
         status: 404,
         source: { pointer: '/data/id' },
       });

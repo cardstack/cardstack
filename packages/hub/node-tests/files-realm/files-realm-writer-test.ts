@@ -1,7 +1,7 @@
 import { ScopedCardService } from '../../cards-service';
 import { myOrigin } from '../../origin';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
-import { Session } from '@cardstack/core/session';
+import { CARDSTACK_PUBLIC_REALM } from '../../realm';
+import { Session } from '../../session';
 import { createTestEnv, TestEnv } from '../helpers';
 import { cardDocument } from '../../card-document';
 import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';

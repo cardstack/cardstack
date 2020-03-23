@@ -12,7 +12,7 @@ import {
 import { login } from '../helpers/login';
 import { cardDocument } from '@cardstack/hub';
 import a11yAudit from 'ember-a11y-testing/test-support/audit';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 
 const csRealm = `http://localhost:3000/api/realms/default`;
 const testCard = cardDocument()

@@ -19,7 +19,7 @@ import {
   waitForLibraryServiceToIdle,
 } from '../helpers/card-ui-helpers';
 import { cardDocument } from '@cardstack/hub';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 
 const childName = 'vangogh-work-address';
 const grandChildName = 'mango-work-address';

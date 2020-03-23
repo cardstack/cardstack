@@ -11,7 +11,7 @@ const defaultBranch = 'master';
 import { Indexer, IndexingOperations } from '@cardstack/hub';
 import { AddressableCard, Card } from '@cardstack/hub';
 import { extractSettings } from './lib/git-settings';
-import { assertSingleResourceDoc } from '@cardstack/core/jsonapi';
+import { assertSingleResourceDoc } from '@cardstack/hub';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import merge from 'lodash/merge';
 import { UpstreamDocument, UpstreamIdentity } from '@cardstack/hub';

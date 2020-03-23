@@ -1,5 +1,5 @@
 import isPlainObject from 'lodash/isPlainObject';
-import CardstackError from './error';
+import { CardstackError } from './error';
 
 export interface OcclusionRules {
   includeFields?: (string | InnerOcclusionRules)[];

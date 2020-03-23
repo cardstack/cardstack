@@ -1,6 +1,6 @@
 import BaseEditor from '../base-editor';
 import { task } from 'ember-concurrency';
-import { canonicalURLToCardId } from '@cardstack/core/card-id';
+import { canonicalURLToCardId } from '@cardstack/hub';
 
 export default class BaseCardFieldEditLayout extends BaseEditor {
   constructor(...args) {

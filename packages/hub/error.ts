@@ -21,7 +21,7 @@ interface ErrorDetails {
   };
 }
 
-class CardstackError extends Error {
+export class CardstackError extends Error {
   detail: string;
   status: number;
   title?: string;
@@ -64,5 +64,3 @@ class CardstackError extends Error {
     }
   }
 }
-
-export default CardstackError;

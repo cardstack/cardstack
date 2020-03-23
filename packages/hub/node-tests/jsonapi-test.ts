@@ -4,12 +4,12 @@ import { myOrigin } from '../origin';
 import { TestEnv, createTestEnv } from './helpers';
 import { cardDocument } from '../card-document';
 import { stringify } from 'qs';
-import { Session } from '@cardstack/core/session';
-import { assertSingleResourceDoc, assertCollectionResourceDoc } from '@cardstack/core/jsonapi';
+import { Session } from '../session';
+import { assertSingleResourceDoc, assertCollectionResourceDoc } from '../jsonapi';
 import { cors } from '../main';
 import { AddressableCard } from '../card';
-import { canonicalURL } from '@cardstack/core/card-id';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { canonicalURL } from '../card-id';
+import { CARDSTACK_PUBLIC_REALM } from '../realm';
 
 describe('hub/jsonapi', function() {
   let request: supertest.SuperTest<supertest.Test>;

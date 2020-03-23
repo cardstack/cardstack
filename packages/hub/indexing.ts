@@ -1,15 +1,15 @@
-import { Session } from '@cardstack/core/session';
+import { Session } from './session';
 import { inject, getOwner, injectionReady } from './dependency-injection';
 import { myOrigin } from './origin';
 import * as J from 'json-typescript';
 import { upsert, param } from './pgsearch/util';
-import { Expression } from '@cardstack/core/expression';
-import { CardId, canonicalURL } from '@cardstack/core/card-id';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { Expression } from './expression';
+import { CardId, canonicalURL } from './card-id';
+import { CARDSTACK_PUBLIC_REALM } from './realm';
 import { SingleResourceDoc } from 'jsonapi-typescript';
-import { AddressableCard } from '@cardstack/hub';
+import { AddressableCard } from './card';
 import { Batch } from './pgsearch/pgclient';
-import { CardInstantiator } from '@cardstack/core/card-instantiator';
+import { CardInstantiator } from './card-instantiator';
 import { UpstreamIdentity, UpstreamDocument, upstreamIdToCardId } from './document';
 
 export default class IndexingService implements IndexingTracker {

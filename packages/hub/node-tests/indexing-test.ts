@@ -4,7 +4,7 @@ import IndexingService from '../indexing';
 import { cardDocument } from '../card-document';
 import { myOrigin } from '../origin';
 import { ScopedCardService } from '../cards-service';
-import { Session } from '@cardstack/core/session';
+import { Session } from '../session';
 import { wireItUp } from '../main';
 
 describe('hub/indexing', function() {

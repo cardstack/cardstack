@@ -1,7 +1,7 @@
 import { ScopedCardService } from '../../cards-service';
 import { myOrigin } from '../../origin';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
-import { Session } from '@cardstack/core/session';
+import { CARDSTACK_PUBLIC_REALM } from '../../realm';
+import { Session } from '../../session';
 import { createTestEnv, TestEnv } from '../helpers';
 import { cardDocument } from '../../card-document';
 import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';
@@ -9,7 +9,7 @@ import IndexingService from '../../indexing';
 import { removeSync, outputFileSync } from 'fs-extra';
 import { join } from 'path';
 import { FilesTracker } from '@cardstack/files-realm-card/tracker';
-import { writeCard } from '@cardstack/core/card-file';
+import { writeCard } from '../../card-file';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 
 describe('hub/files-realm/indexer', function() {

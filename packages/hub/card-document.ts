@@ -5,9 +5,9 @@ import {
   ResourceIdentifierObject,
   MetaObject,
 } from 'jsonapi-typescript';
-import { CardId, canonicalURL, cardstackFieldPattern, FieldArity, canonicalURLToCardId } from '@cardstack/core/card-id';
+import { CardId, canonicalURL, cardstackFieldPattern, FieldArity, canonicalURLToCardId } from './card-id';
 import { UpstreamDocument } from './document';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { CARDSTACK_PUBLIC_REALM } from './realm';
 import cloneDeep from 'lodash/cloneDeep';
 import DAGMap from 'dag-map';
 import flatten from 'lodash/flatten';

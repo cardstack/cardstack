@@ -4,7 +4,7 @@ import { join } from 'path';
 import merge from 'lodash/merge';
 import logger from '@cardstack/logger';
 import { UpstreamDocument, UpstreamIdentity } from '@cardstack/hub';
-import { assertSingleResourceDoc } from '@cardstack/core/jsonapi';
+import { assertSingleResourceDoc } from '@cardstack/hub';
 import { Card } from '@cardstack/hub';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { inject } from '@cardstack/hub/dependency-injection';

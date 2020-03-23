@@ -1,7 +1,7 @@
 import { Card } from '@cardstack/hub';
-import { Expression } from '@cardstack/core/expression';
+import { Expression } from '@cardstack/hub';
 import { isParam } from '@cardstack/hub/pgsearch/util';
-import CardstackError from '@cardstack/core/error';
+import { Error } from '@cardstack/hub';
 
 const dateFormat = /^\d{4,6}-[01]\d-[0123]\d$/;
 
@@ -13,13 +13,13 @@ export function buildValueExpression(expression: Expression): Expression {
   } else if (typeof value === 'string') {
     date = value;
   } else {
-    throw new CardstackError(`Do not know how to process value expression ${JSON.stringify(value)} as a date`, {
+    throw new Error(`Do not know how to process value expression ${JSON.stringify(value)} as a date`, {
       status: 400,
     });
   }
 
   if (!_validate(date)) {
-    throw new CardstackError(`The value expression in the query '${date}' is not a valid YYYY-MM-DD date`, {
+    throw new Error(`The value expression in the query '${date}' is not a valid YYYY-MM-DD date`, {
       status: 400,
     });
   }

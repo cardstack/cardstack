@@ -7,7 +7,7 @@ import { existsSync } from 'fs';
 import { Deferred } from './deferred';
 import { outputFile, mkdirp, ensureSymlink } from 'fs-extra';
 import { satisfies, coerce } from 'semver';
-import { ModuleLoader } from '@cardstack/core/module-loader';
+import { ModuleLoader } from './module-loader';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import merge from 'lodash/merge';
 
@@ -106,9 +106,6 @@ export class ModuleService implements ModuleLoader {
     // any of hub's dependencies here too though.
     if (packageName === '@cardstack/hub') {
       return __dirname;
-    }
-    if (packageName === '@cardstack/core') {
-      return join(__dirname, '..', 'core');
     }
     throw new Error(`peerDependency ${packageName} is not available to cards`);
   }

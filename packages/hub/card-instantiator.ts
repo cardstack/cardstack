@@ -1,4 +1,4 @@
-import { AddressableCard } from '@cardstack/hub';
+import { AddressableCard } from './card';
 import { CardId } from './card-id';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 

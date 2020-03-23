@@ -1,7 +1,7 @@
 import { Card, AddressableCard } from '@cardstack/hub';
 import { myOrigin } from './origin';
 import DataService from '../services/data';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 
 export async function fieldCards(data: DataService): Promise<AddressableCard[]> {
   return await Promise.all(

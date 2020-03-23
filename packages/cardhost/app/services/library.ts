@@ -5,7 +5,7 @@ import { inject as service } from '@ember/service';
 //@ts-ignore
 import { task } from 'ember-concurrency';
 import { getUserRealm } from '../utils/scaffolding';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 import DataService from './data';
 import { AddressableCard } from '@cardstack/hub';
 

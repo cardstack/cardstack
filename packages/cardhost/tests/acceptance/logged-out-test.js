@@ -14,7 +14,7 @@ import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { cardDocument } from '@cardstack/hub';
 import { animationsSettled } from 'ember-animated/test-support';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 
 const csRealm = 'https://cardstack.com/api/realms/card-catalog';
 const testCard = cardDocument().withAutoAttributes({

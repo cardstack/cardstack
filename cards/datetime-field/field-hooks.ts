@@ -1,6 +1,6 @@
 import { Card } from '@cardstack/hub';
-import { Expression } from '@cardstack/core/expression';
-import CardstackError from '@cardstack/core/error';
+import { Expression } from '@cardstack/hub';
+import { Error } from '@cardstack/hub';
 import { isParam } from '@cardstack/hub/pgsearch/util';
 
 // Format is YYYY-MM-DDTHH:mm:ss.sssZ (allows up to 6 digit years)
@@ -14,13 +14,13 @@ export function buildValueExpression(expression: Expression): Expression {
   } else if (typeof value === 'string') {
     dateTime = value;
   } else {
-    throw new CardstackError(`Do not know how to process value expression ${JSON.stringify(value)} as a date-time`, {
+    throw new Error(`Do not know how to process value expression ${JSON.stringify(value)} as a date-time`, {
       status: 400,
     });
   }
 
   if (!_validate(dateTime)) {
-    throw new CardstackError(
+    throw new Error(
       `The value expression in the query '${dateTime}' is not a valid ISO 8601 date-time (YYYY-MM-DDTHH:mm:ss.sssZ)`,
       { status: 400 }
     );

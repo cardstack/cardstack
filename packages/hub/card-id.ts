@@ -1,4 +1,4 @@
-import { UpstreamIdentity } from '@cardstack/hub';
+import { UpstreamIdentity } from './document';
 
 export interface CardId {
   csRealm: string;

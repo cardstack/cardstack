@@ -1,5 +1,5 @@
 import { Card } from '@cardstack/hub';
-import { Expression } from '@cardstack/core/expression';
+import { Expression } from '@cardstack/hub';
 
 export function buildQueryExpression(source: Expression, fieldName: string) {
   return ['(', ...source, '->>', { param: fieldName }, ')::bigint'];

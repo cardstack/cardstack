@@ -1,7 +1,7 @@
 import { join } from 'path';
 import cloneDeep from 'lodash/cloneDeep';
 import { SingleResourceDoc } from 'jsonapi-typescript';
-import { Card } from '@cardstack/hub';
+import { Card } from './card';
 import stringify from 'json-stable-stringify';
 
 type WriteFn = (path: string, content: string) => Promise<void>;

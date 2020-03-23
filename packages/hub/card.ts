@@ -1,4 +1,4 @@
-import CardstackError from '@cardstack/core/error';
+import { CardstackError } from './error';
 import { UpstreamDocument, UpstreamIdentity, ResponseMeta } from './document';
 import {
   SingleResourceDoc,
@@ -18,17 +18,17 @@ import difference from 'lodash/difference';
 import intersection from 'lodash/intersection';
 import isEqual from 'lodash/isEqual';
 import * as J from 'json-typescript';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
-import { OcclusionFieldSets, assertOcclusionFieldSets, Format, OcclusionRules } from '@cardstack/core/occlusion-rules';
-import { Container } from '@cardstack/core/container';
-import { ModuleLoader } from '@cardstack/core/module-loader';
-import { CardReader } from '@cardstack/core/card-reader';
-import { CardInstantiator } from '@cardstack/core/card-instantiator';
+import { CARDSTACK_PUBLIC_REALM } from './realm';
+import { OcclusionFieldSets, assertOcclusionFieldSets, Format, OcclusionRules } from './occlusion-rules';
+import { Container } from './container';
+import { ModuleLoader } from './module-loader';
+import { CardReader } from './card-reader';
+import { CardInstantiator } from './card-instantiator';
 import { Memoize } from 'typescript-memoize';
-import * as FieldHooks from '@cardstack/core/field-hooks';
-import { WriterFactory } from '@cardstack/core/writer';
+import * as FieldHooks from './field-hooks';
+import { WriterFactory } from './writer';
 import { IndexerFactory } from './indexing';
-import { CardId, FieldArity, canonicalURLToCardId, canonicalURL, cardstackFieldPattern } from '@cardstack/core/card-id';
+import { CardId, FieldArity, canonicalURLToCardId, canonicalURL, cardstackFieldPattern } from './card-id';
 import { CardDocument, cardDocumentFromJsonAPI } from './card-document';
 import assertNever from 'assert-never';
 
