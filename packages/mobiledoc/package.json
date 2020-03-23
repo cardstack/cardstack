@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/mobiledoc",
-  "version": "0.14.24",
+  "version": "0.14.24-patch.1",
   "description": "Mobiledoc field plugin for cardstack",
   "keywords": [
     "ember-addon",
@@ -28,9 +28,9 @@
     "test-node": "mocha ../test-support/bin/run.js"
   },
   "dependencies": {
-    "@cardstack/card-picker": "0.14.24",
-    "@cardstack/data": "0.14.24",
-    "@cardstack/image": "0.14.24",
+    "@cardstack/card-picker": "0.14.24-patch.1",
+    "@cardstack/data": "0.14.24-patch.1",
+    "@cardstack/image": "0.14.24-patch.1",
     "ember-cli-babel": "^7.1.2",
     "ember-cli-htmlbars": "^3.0.0",
     "ember-concurrency": "^0.10.0",
@@ -42,11 +42,11 @@
     "mobiledoc-text-renderer": "^0.3.2"
   },
   "devDependencies": {
-    "@cardstack/authentication": "0.14.24",
-    "@cardstack/ephemeral": "0.14.24",
-    "@cardstack/eslint-config": "0.14.24",
-    "@cardstack/test-support": "0.14.24",
-    "@cardstack/tools": "0.14.24",
+    "@cardstack/authentication": "0.14.24-patch.1",
+    "@cardstack/ephemeral": "0.14.24-patch.1",
+    "@cardstack/eslint-config": "0.14.24-patch.1",
+    "@cardstack/test-support": "0.14.24-patch.1",
+    "@cardstack/tools": "0.14.24-patch.1",
     "@ember/jquery": "^0.6.0",
     "@ember/optional-features": "^0.6.3",
     "broccoli-asset-rev": "^2.7.0",

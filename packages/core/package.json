@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/core",
-  "version": "0.14.24",
+  "version": "0.14.24-patch.1",
   "description": "Core API for cardstack cards",
   "keywords": [
     "ember-addon",
@@ -27,18 +27,18 @@
     "node-tests": "mocha ../test-support/bin/run.js"
   },
   "dependencies": {
-    "@cardstack/authentication": "0.14.24",
-    "@cardstack/di": "0.14.24",
-    "@cardstack/jsonapi": "0.14.24",
+    "@cardstack/authentication": "0.14.24-patch.1",
+    "@cardstack/di": "0.14.24-patch.1",
+    "@cardstack/jsonapi": "0.14.24-patch.1",
     "@cardstack/logger": "^0.2.0",
-    "@cardstack/plugin-utils": "0.14.24",
+    "@cardstack/plugin-utils": "0.14.24-patch.1",
     "ember-cli-babel": "^7.1.2",
     "lodash": "^4.17.11"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.14.24",
-    "@cardstack/mock-auth": "0.14.24",
-    "@cardstack/test-support": "0.14.24",
+    "@cardstack/eslint-config": "0.14.24-patch.1",
+    "@cardstack/mock-auth": "0.14.24-patch.1",
+    "@cardstack/test-support": "0.14.24-patch.1",
     "@ember/optional-features": "^0.6.3",
     "broccoli-asset-rev": "^2.7.0",
     "ember-cli": "~3.8.2",

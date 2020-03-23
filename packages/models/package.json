@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/models",
-  "version": "0.14.24",
+  "version": "0.14.24-patch.1",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon",
@@ -26,9 +26,9 @@
     "test:all": "ember try:each"
   },
   "dependencies": {
-    "@cardstack/codegen": "0.14.24",
-    "@cardstack/di": "0.14.24",
-    "@cardstack/plugin-utils": "0.14.24",
+    "@cardstack/codegen": "0.14.24-patch.1",
+    "@cardstack/di": "0.14.24-patch.1",
+    "@cardstack/plugin-utils": "0.14.24-patch.1",
     "ember-auto-import": "^1.4.0",
     "ember-cli-babel": "^7.1.2",
     "ember-data-relationship-tracker": "^0.3.2",
@@ -39,12 +39,12 @@
     "lodash-es": "^4.17.11"
   },
   "devDependencies": {
-    "@cardstack/authentication": "0.14.24",
-    "@cardstack/ephemeral": "0.14.24",
-    "@cardstack/eslint-config": "0.14.24",
-    "@cardstack/jsonapi": "0.14.24",
-    "@cardstack/mock-auth": "0.14.24",
-    "@cardstack/test-support": "0.14.24",
+    "@cardstack/authentication": "0.14.24-patch.1",
+    "@cardstack/ephemeral": "0.14.24-patch.1",
+    "@cardstack/eslint-config": "0.14.24-patch.1",
+    "@cardstack/jsonapi": "0.14.24-patch.1",
+    "@cardstack/mock-auth": "0.14.24-patch.1",
+    "@cardstack/test-support": "0.14.24-patch.1",
     "@ember/jquery": "^0.6.0",
     "@ember/optional-features": "^0.6.3",
     "broccoli-asset-rev": "^2.7.0",
