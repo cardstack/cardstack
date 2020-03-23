@@ -1,4 +1,4 @@
-import { Card } from '@cardstack/core/card';
+import { Card } from '@cardstack/hub';
 import CardModelRoute from '../card-model-route';
 
 export default class CardsCardEditIndexRoute extends CardModelRoute {

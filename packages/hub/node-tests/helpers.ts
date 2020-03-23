@@ -3,10 +3,10 @@ import { Container } from '../dependency-injection';
 import PgClient from '../pgsearch/pgclient';
 import { emptyDir } from 'fs-extra';
 import { cardFilesCache } from '../module-service';
-import { Session } from '@cardstack/core/session';
-import { cardDocument } from '@cardstack/core/card-document';
+import { Session } from '../session';
+import { cardDocument } from '../card-document';
 import { myOrigin } from '../origin';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { CARDSTACK_PUBLIC_REALM } from '../realm';
 
 export interface TestEnv {
   container: Container;

@@ -1,12 +1,12 @@
 import { ScopedCardService } from '../../cards-service';
 import { myOrigin } from '../../origin';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
-import { Session } from '@cardstack/core/session';
+import { CARDSTACK_PUBLIC_REALM } from '../../realm';
+import { Session } from '../../session';
 import { createTestEnv, TestEnv } from '../helpers';
-import { cardDocument } from '@cardstack/core/card-document';
+import { cardDocument } from '../../card-document';
 import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';
 import { existsSync, readJSONSync, readFileSync } from 'fs-extra';
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard } from '../../card';
 import { join } from 'path';
 
 describe('hub/files-realm-writer', function() {

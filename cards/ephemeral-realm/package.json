@@ -7,11 +7,9 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@cardstack/core": "*",
     "@cardstack/hub": "*"
   },
   "devDependencies": {
-    "@cardstack/core": "0.18.16",
     "@cardstack/hub": "0.18.16"
   },
   "dependencies": {

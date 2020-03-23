@@ -1,5 +1,5 @@
 import Koa from 'koa';
-import { Session } from '@cardstack/core/session';
+import { Session } from './session';
 
 export interface SessionContext {
   cardstackSession: Session;

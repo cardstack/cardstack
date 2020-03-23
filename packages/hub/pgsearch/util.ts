@@ -1,6 +1,6 @@
-import { CardId } from '@cardstack/core/card-id';
+import { CardId } from '../card-id';
 import isPlainObject from 'lodash/isPlainObject';
-import { Expression, PgPrimitive, Param } from '@cardstack/core/expression';
+import { Expression, PgPrimitive, Param } from '../expression';
 
 export interface FieldQuery {
   typeContext: CardId;

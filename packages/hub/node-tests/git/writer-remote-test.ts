@@ -1,15 +1,15 @@
 import { Repository, Remote } from '../../../../cards/git-realm/lib/git';
 import GitService from '@cardstack/git-realm-card/lib/service';
 import { TestEnv, createTestEnv } from '../helpers';
-import { cardDocument, CardDocument } from '@cardstack/core/card-document';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { cardDocument, CardDocument } from '../../card-document';
+import { CARDSTACK_PUBLIC_REALM } from '../../realm';
 import { myOrigin } from '../../origin';
 import { ScopedCardService } from '../../cards-service';
-import { Session } from '@cardstack/core/session';
+import { Session } from '../../session';
 
 import { makeRepo, inRepo } from './support';
 import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard } from '../../card';
 import Change from '@cardstack/git-realm-card/lib/change';
 import stringify from 'json-stable-stringify';
 import IndexingService from '../../indexing';

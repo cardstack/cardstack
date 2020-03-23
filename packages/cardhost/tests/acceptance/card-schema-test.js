@@ -21,9 +21,9 @@ import {
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { animationsSettled } from 'ember-animated/test-support';
-import { cardDocument } from '@cardstack/core/card-document';
-import { canonicalURL } from '@cardstack/core/card-id';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { cardDocument } from '@cardstack/hub';
+import { canonicalURL } from '@cardstack/hub';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 
 const timeout = 5000;
 const csRealm = `http://localhost:3000/api/realms/default`;

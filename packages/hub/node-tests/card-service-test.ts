@@ -1,11 +1,11 @@
-import { AddressableCard } from '@cardstack/core/card';
-import { canonicalURL } from '@cardstack/core/card-id';
+import { AddressableCard } from '../card';
+import { canonicalURL } from '../card-id';
 import { ScopedCardService } from '../cards-service';
 import { myOrigin } from '../origin';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
-import { Session } from '@cardstack/core/session';
+import { CARDSTACK_PUBLIC_REALM } from '../realm';
+import { Session } from '../session';
 import { createTestEnv, TestEnv } from './helpers';
-import { cardDocument } from '@cardstack/core/card-document';
+import { cardDocument } from '../card-document';
 import { Value } from 'json-typescript';
 
 describe('hub/card-service', function() {

@@ -1,4 +1,4 @@
-import { Card } from '@cardstack/core/card';
+import { Card } from '@cardstack/hub';
 
 export async function validate(value: string, _fieldCard: Card) {
   let isValidUrl;

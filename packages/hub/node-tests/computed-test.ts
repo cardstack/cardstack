@@ -1,9 +1,9 @@
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard } from '../card';
 import { myOrigin } from '../origin';
-import { Session } from '@cardstack/core/session';
+import { Session } from '../session';
 import { createTestEnv, TestEnv } from './helpers';
-import { cardDocument } from '@cardstack/core/card-document';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { cardDocument } from '../card-document';
+import { CARDSTACK_PUBLIC_REALM } from '../realm';
 import { ScopedCardService } from '../cards-service';
 
 describe('hub/computed-fields', function() {

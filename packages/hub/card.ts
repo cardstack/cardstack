@@ -1,4 +1,4 @@
-import CardstackError from './error';
+import { CardstackError } from './error';
 import { UpstreamDocument, UpstreamIdentity, ResponseMeta } from './document';
 import {
   SingleResourceDoc,
@@ -27,10 +27,9 @@ import { CardInstantiator } from './card-instantiator';
 import { Memoize } from 'typescript-memoize';
 import * as FieldHooks from './field-hooks';
 import { WriterFactory } from './writer';
-import { IndexerFactory } from './indexer';
+import { IndexerFactory } from './indexing';
 import { CardId, FieldArity, canonicalURLToCardId, canonicalURL, cardstackFieldPattern } from './card-id';
 import { CardDocument, cardDocumentFromJsonAPI } from './card-document';
-import Component from '@glimmer/component';
 import assertNever from 'assert-never';
 
 let nonce = 0;
@@ -986,10 +985,10 @@ export class Card {
   async loadFeature(featureName: 'field-deserialize'): Promise<null | FieldHooks.deserialize<unknown, unknown>>;
   async loadFeature(featureName: 'field-buildValueExpression'): Promise<null | FieldHooks.buildValueExpression>;
   async loadFeature(featureName: 'field-buildQueryExpression'): Promise<null | FieldHooks.buildQueryExpression>;
-  async loadFeature(featureName: 'isolated-layout'): Promise<null | Component>;
-  async loadFeature(featureName: 'embedded-layout'): Promise<null | Component>;
-  async loadFeature(featureName: 'field-view-layout'): Promise<null | Component>;
-  async loadFeature(featureName: 'field-edit-layout'): Promise<null | Component>;
+  async loadFeature(featureName: 'isolated-layout'): Promise<null | unknown>;
+  async loadFeature(featureName: 'embedded-layout'): Promise<null | unknown>;
+  async loadFeature(featureName: 'field-view-layout'): Promise<null | unknown>;
+  async loadFeature(featureName: 'field-edit-layout'): Promise<null | unknown>;
   async loadFeature(featureName: 'isolated-css'): Promise<null | string>;
   async loadFeature(featureName: 'embedded-css'): Promise<null | string>;
   async loadFeature(featureName: 'compute'): Promise<null | ((context: { field: FieldCard; card: Card }) => RawData)>;

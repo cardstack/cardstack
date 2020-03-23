@@ -9,8 +9,8 @@ import { homedir } from 'os';
 import { join } from 'path';
 import { mkdirp } from 'fs-extra';
 
-import CardstackError from '@cardstack/core/error';
-import { AddressableCard } from '@cardstack/core/card';
+import { Error } from '@cardstack/hub';
+import { AddressableCard } from '@cardstack/hub';
 
 export async function extractSettings(realmCard: AddressableCard): Promise<IndexerSettings> {
   // In order to allow git realm cards to be portable, let's let the hub decide
@@ -31,7 +31,7 @@ export async function extractSettings(realmCard: AddressableCard): Promise<Index
 
   if (remoteUrl) {
     if (!remoteCacheDir) {
-      throw new CardstackError('You must provide a remoteCacheDir for remote repo config');
+      throw new Error('You must provide a remoteCacheDir for remote repo config');
     }
 
     remote = {

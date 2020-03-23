@@ -1,6 +1,6 @@
-import { Indexer, IndexingOperations } from '@cardstack/core/indexer';
+import { Indexer, IndexingOperations } from '@cardstack/hub';
 import { inject } from '@cardstack/hub/dependency-injection';
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard } from '@cardstack/hub';
 
 interface EphemeralMeta {
   identity: number;

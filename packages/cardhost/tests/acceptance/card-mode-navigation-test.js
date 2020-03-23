@@ -4,7 +4,7 @@ import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
-import { cardDocument } from '@cardstack/core/card-document';
+import { cardDocument } from '@cardstack/hub';
 import { waitForCardLoad, waitForSchemaViewToLoad, encodeColons, waitForTestsToEnd } from '../helpers/card-ui-helpers';
 
 const csRealm = `http://localhost:3000/api/realms/default`;

@@ -65,6 +65,10 @@ module.exports = function(defaults) {
       packagerOptions: {
         webpackConfig: {
           plugins: [new MonacoWebpackPlugin({ languages, features })],
+          node: {
+            // TODO: we need this for something in hub, let's not.
+            path: true,
+          },
         },
       },
       packageRules: [

@@ -18,7 +18,6 @@
     "require-uncached": "^1.0.3"
   },
   "devDependencies": {
-    "@cardstack/core": "0.18.16",
     "@cardstack/eslint-config": "0.18.16",
     "@cardstack/test-support": "0.18.16",
     "jsonapi-typescript": "^0.1.3"

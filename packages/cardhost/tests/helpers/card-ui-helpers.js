@@ -11,8 +11,8 @@ import {
   currentURL,
 } from '@ember/test-helpers';
 import { animationsSettled } from 'ember-animated/test-support';
-import { canonicalURL } from '@cardstack/core/card-id';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { canonicalURL } from '@cardstack/hub';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 
 const timeout = 5000;
 

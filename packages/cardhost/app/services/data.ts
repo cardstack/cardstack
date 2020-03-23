@@ -1,21 +1,20 @@
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
-import { UnsavedCard, Card, AddressableCard } from '@cardstack/core/card';
-import { CardId, asCardId, canonicalURL } from '@cardstack/core/card-id';
+import { UnsavedCard, Card, AddressableCard } from '@cardstack/hub';
+import { CardId, asCardId, canonicalURL } from '@cardstack/hub';
 import { CardstackSession } from './cardstack-session';
 import { SingleResourceDoc, CollectionResourceDoc, DocWithErrors } from 'jsonapi-typescript';
-import { CardInstantiator } from '@cardstack/core/card-instantiator';
-import { ModuleLoader } from '@cardstack/core/module-loader';
-import { Container as ContainerInterface } from '@cardstack/core/container';
-import { Factory } from '@cardstack/core/container';
-import { CardReader } from '@cardstack/core/card-reader';
+import { CardInstantiator } from '@cardstack/hub';
+import { ModuleLoader } from '@cardstack/hub';
+import { Container as ContainerInterface, Factory } from '@cardstack/hub';
+import { CardReader } from '@cardstack/hub';
 import { loadModule } from '../utils/scaffolding';
-import { Query } from '@cardstack/core/query';
+import { Query } from '@cardstack/hub';
 import { stringify } from 'qs';
 import merge from 'lodash/merge';
-import CardstackError from '@cardstack/core/error';
-import { OcclusionRules } from '@cardstack/core/occlusion-rules';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { Error } from '@cardstack/hub';
+import { OcclusionRules } from '@cardstack/hub';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 //@ts-ignore
 import ENV from '@cardstack/cardhost/config/environment';
 
@@ -195,7 +194,7 @@ export default class DataService extends Service implements CardInstantiator {
 async function handleJsonApiError(response: Response) {
   let jsonapiError = (await response.json()) as DocWithErrors;
   let detail = jsonapiError.errors.length ? jsonapiError.errors[0].detail : JSON.stringify(jsonapiError);
-  throw new CardstackError(detail!, { status: response.status });
+  throw new Error(detail!, { status: response.status });
 }
 
 class Reader implements CardReader {

@@ -12,8 +12,8 @@ import {
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
-import { cardDocument } from '@cardstack/core/card-document';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
+import { cardDocument } from '@cardstack/hub';
 import { animationsSettled } from 'ember-animated/test-support';
 
 const cardName = 'Millenial Puppies';
