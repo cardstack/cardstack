@@ -7,7 +7,7 @@ export { CardReader } from './card-reader';
 export { Factory, Container } from './container';
 export { CardInstantiator } from './card-instantiator';
 export { ModuleLoader } from './module-loader';
-export { canonicalURL, upstreamIdToCardDirName, CardId, asCardId } from './card-id';
+export { canonicalURL, upstreamIdToCardDirName, CardId, asCardId, canonicalURLToCardId } from './card-id';
 export { OcclusionRules } from './occlusion-rules';
 export { writeCard } from './card-file';
 export { Writer, WriterFactory } from './writer';
