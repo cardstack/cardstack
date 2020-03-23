@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/core-types",
-  "version": "0.14.24",
+  "version": "0.14.241",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon",
@@ -24,8 +24,8 @@
     "test": "ember try:each"
   },
   "dependencies": {
-    "@cardstack/di": "0.14.24",
-    "@cardstack/edges": "0.14.24",
+    "@cardstack/di": "0.14.241",
+    "@cardstack/edges": "0.14.241",
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1",
     "ember-cli-postcss": "^4.1.1",
@@ -36,14 +36,14 @@
     "postcss-import": "^9.1.0"
   },
   "devDependencies": {
-    "@cardstack/ephemeral": "0.14.24",
-    "@cardstack/eslint-config": "0.14.24",
-    "@cardstack/jsonapi": "0.14.24",
-    "@cardstack/models": "0.14.24",
-    "@cardstack/plugin-utils": "0.14.24",
-    "@cardstack/rendering": "0.14.24",
-    "@cardstack/test-support": "0.14.24",
-    "@cardstack/tools": "0.14.24",
+    "@cardstack/ephemeral": "0.14.241",
+    "@cardstack/eslint-config": "0.14.241",
+    "@cardstack/jsonapi": "0.14.241",
+    "@cardstack/models": "0.14.241",
+    "@cardstack/plugin-utils": "0.14.241",
+    "@cardstack/rendering": "0.14.241",
+    "@cardstack/test-support": "0.14.241",
+    "@cardstack/tools": "0.14.241",
     "@ember/jquery": "^0.6.0",
     "broccoli-asset-rev": "^2.4.5",
     "ember-cli": "^3.0.0",

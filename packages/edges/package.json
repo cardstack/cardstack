@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/edges",
-  "version": "0.14.24",
+  "version": "0.14.241",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon"

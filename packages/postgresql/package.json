@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/postgresql",
-  "version": "0.14.24",
+  "version": "0.14.241",
   "description": "PostgreSQL data source plugin for @cardstack/hub.",
   "repository": "https://github.com/cardstack/cardstack",
   "author": "Edward Faulkner <edward@eaf4.com>",
@@ -9,15 +9,15 @@
     "node": ">= 7.7"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.14.24",
-    "@cardstack/test-support": "0.14.24",
+    "@cardstack/eslint-config": "0.14.241",
+    "@cardstack/test-support": "0.14.241",
     "koa": "2",
     "supertest": "^2.0.1"
   },
   "dependencies": {
-    "@cardstack/di": "0.14.24",
+    "@cardstack/di": "0.14.241",
     "@cardstack/logger": "^0.2.0",
-    "@cardstack/plugin-utils": "0.14.24",
+    "@cardstack/plugin-utils": "0.14.241",
     "jsonpatch": "^3.0.1",
     "lodash": "^4.17.11",
     "node-pg-migrate": "3.5.0",
