@@ -515,15 +515,15 @@ export default class CardManipulator extends Component {
     }
   }
 
-  *catalogTransition({ insertedSprites, removedSprites }) {
+  *catalogTransition({ insertedSprites, removedSprites, duration }) {
     for (let sprite of insertedSprites) {
       sprite.startAtPixel({ x: -window.innerWidth });
-      move(sprite, { easing: easeOut });
+      move(sprite, { easing: easeOut, duration });
     }
 
     for (let sprite of removedSprites) {
       sprite.endAtPixel({ x: -window.innerWidth });
-      move(sprite, { easing: easeIn });
+      move(sprite, { easing: easeIn, duration });
     }
   }
 }
