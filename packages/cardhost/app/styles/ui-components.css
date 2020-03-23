@@ -187,3 +187,9 @@
 .ui-components--dialog-container.dialog-medium {
   height: 160px;
 }
+
+
+/* Catalog section */
+.ui-components--catalog > .ch-catalog {
+  position: static;
+}

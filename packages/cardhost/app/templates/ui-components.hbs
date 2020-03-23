@@ -580,7 +580,7 @@
   @placeholder="Filter Results" />' @language="html" />
   </section>
 
-  <section class="ui-components--section ui-components--grid-2-col" id="catalog">
+  <section class="ui-components--section ui-components--grid-2-col ui-components--catalog" id="catalog">
     <h2>Catalog</h2>
     <section class="ch-catalog">
       <header class="ch-catalog--header">
@@ -589,7 +589,9 @@
           <button class="ch-catalog--header-btn sidebar active" aria-label="View as sidebar"></button>
           <button class="ch-catalog--header-btn grid" aria-label="View as grid"></button>
         </div>
-        <TextField @theme="filter-bar" @placeholder="Filter Results" />
+        <div class="ch-catalog--header-filter">
+          <TextField @theme="filter-bar" @placeholder="Filter Results" />
+        </div>
       </header>
       <div class="ch-catalog--content">
         <div class="ch-catalog--fields">

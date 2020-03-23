@@ -72,3 +72,7 @@
 .ch-catalog--header-btn + .ch-catalog--header-btn {
   margin-left: 10px;
 }
+
+.ch-catalog--header-filter {
+  padding: 0 var(--ch-spacing);
+}
