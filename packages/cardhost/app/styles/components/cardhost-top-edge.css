@@ -2,7 +2,7 @@
   height: var(--ch-top-edge-height);
   margin: 0 var(--ch-spacing);
   display: grid;
-  grid-template-columns: auto 1fr auto var(--ch-right-edge-panel-width);
+  grid-template-columns: 130px 1fr 130px var(--ch-right-edge-panel-width);
   grid-gap: var(--ch-spacing);
   justify-items: center;
   align-items: center;
