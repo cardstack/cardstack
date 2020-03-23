@@ -123,6 +123,11 @@ a:hover {
 .animated-tools {
   z-index: 50;
 }
+.cardhost-animated-orphans {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
 
 /* ember-toolbars edges */
 .cst-bottom {

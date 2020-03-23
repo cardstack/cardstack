@@ -2,7 +2,7 @@
   position: fixed;
   top: 0;
   bottom: 0;
-  left: 80px;
+  left: var(--ch-left-edge-navbar-width);
   width: var(--ch-left-edge-panel-width);
   height: 100%;
   background-color: var(--ch-dark-background);
