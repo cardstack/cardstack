@@ -1,6 +1,6 @@
 {{#if @card}}
   {{#if (eq @format "isolated")}}
-    <div
+    <AnimatedContainer
       class="card-renderer-isolated
         {{this.mode}}
         {{if (and this.cardstackSession.isAuthenticated @cardSelected) "selected"}}
@@ -50,7 +50,7 @@
       {{/unless}}
       {{!-- This is the card boundary, please don't set any card specific classes any higher in the DOM than this. --}}
       {{!-- If we need card specific styling above this level, then let's chat about it.                           --}}
-      <div
+      <AnimatedContainer
         class="card-renderer-isolated--animated-content
           {{concat (safe-css-string (if @card.canonicalURL @card.canonicalURL @card.adoptsFromURL)) "--isolated" }}
         "
@@ -64,38 +64,40 @@
             {{if (and this.cardstackSession.isAuthenticated @card.isSelected) "selected"}}
             "
           >
-            {{#animated-value @card watch=this.animatedWatchField use=this.contentTransition group="content"}}
-              {{#if @dropField}}
-                <DropZone
+            <AnimatedContainer>
+              {{#animated-value @card watch=this.animatedWatchField use=this.contentTransition group="content"}}
+                {{#if @dropField}}
+                  <DropZone
+                    @card={{@card}}
+                    @dropField={{@dropField}}
+                    @position={{0}}
+                    @toggleStubField={{this.toggleStubField}}
+                  />
+                {{/if}}
+                <Scaffold
                   @card={{@card}}
-                  @dropField={{@dropField}}
-                  @position={{0}}
+                  @feature="isolated-layout"
+                  @fields={{this.fields}}
+                  @mode={{this.mode}}
+                  @setFieldName={{@setFieldName}}
+                  @setCardValue={{@setCardValue}}
+                  @setCardReference={{@setCardReference}}
+                  @removeField={{@removeField}}
                   @toggleStubField={{this.toggleStubField}}
+                  @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+                  @setPosition={{@setPosition}}
+                  @selectField={{@selectField}}
+                  @selectedField={{@selectedField}}
+                  @selectedFieldName={{@selectedFieldName}}
+                  @dropField={{@dropField}}
+                  @loadedField={{perform this.loadedField}}
                 />
-              {{/if}}
-              <Scaffold
-                @card={{@card}}
-                @feature="isolated-layout"
-                @fields={{this.fields}}
-                @mode={{this.mode}}
-                @setFieldName={{@setFieldName}}
-                @setCardValue={{@setCardValue}}
-                @setCardReference={{@setCardReference}}
-                @removeField={{@removeField}}
-                @toggleStubField={{this.toggleStubField}}
-                @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
-                @setPosition={{@setPosition}}
-                @selectField={{@selectField}}
-                @selectedField={{@selectedField}}
-                @selectedFieldName={{@selectedFieldName}}
-                @dropField={{@dropField}}
-                @loadedField={{perform this.loadedField}}
-              />
-            {{/animated-value}}
+              {{/animated-value}}
+            </AnimatedContainer>
           </div>
         {{/animated-value}}
-      </div>
-    </div>
+      </AnimatedContainer>
+    </AnimatedContainer>
   {{else if (eq @format "embedded")}}
     <div
       class="card-renderer-embedded
