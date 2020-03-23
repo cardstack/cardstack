@@ -32,8 +32,8 @@ export class ModuleService implements ModuleLoader {
       cardDir = join(cardFilesCache, hash.digest('hex'));
       await this.cachedWriteCard(card, cardDir);
     }
-    // @ts-ignore
-    let module = await import(join(cardDir, localModulePath)); // we are using ESM for module loading
+    // @ts-ignore: we are using ESM for module loading but typescript doesn't know that's safe
+    let module = await import(join(cardDir, localModulePath));
     return module[exportedName];
   }
 
