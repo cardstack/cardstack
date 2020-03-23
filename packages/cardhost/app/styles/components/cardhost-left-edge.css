@@ -18,6 +18,11 @@
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
 }
 
+.cardhost-left-edge--nav.themer,
+.cardhost-left-edge--nav.preview {
+  background-color: var(--themer-bg);
+}
+
 .cardhost-left-edge--nav > ul {
   display: flex;
   flex-flow: column nowrap;
