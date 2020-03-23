@@ -27,6 +27,6 @@ export default class PhotoCardIsolatedComponent extends BaseIsolatedLayoutCompon
   }
 
   get bylineIsEditable() {
-    return this.args.mode === 'edit' || this.args.model === 'schema';
+    return this.args.mode === 'edit' || this.args.mode === 'schema';
   }
 }
