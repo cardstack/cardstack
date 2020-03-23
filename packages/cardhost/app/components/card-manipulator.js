@@ -12,9 +12,11 @@ import move from 'ember-animated/motions/move';
 import scaleBy from '../motions/scale';
 import { parallel } from 'ember-animated';
 import { fadeOut } from 'ember-animated/motions/opacity';
+import { easeIn, easeOut } from 'ember-animated/easings/cosine';
 
-const { environment, clickDragDebounceMs } = ENV;
+const { environment, clickDragDebounceMs, animationSpeed } = ENV;
 const CLICK_DRAG_DEBOUNCE_MS = 100; // ¯\_(ツ)_/¯
+const DURATION = animationSpeed || 500;
 
 export default class CardManipulator extends Component {
   @service data;
@@ -42,6 +44,7 @@ export default class CardManipulator extends Component {
   @tracked justDropped;
 
   clickDragDebounce = clickDragDebounceMs || CLICK_DRAG_DEBOUNCE_MS;
+  duration = DURATION;
 
   constructor(...args) {
     super(...args);
@@ -509,6 +512,18 @@ export default class CardManipulator extends Component {
       } else {
         others.forEach(move);
       }
+    }
+  }
+
+  *catalogTransition({ insertedSprites, removedSprites }) {
+    for (let sprite of insertedSprites) {
+      sprite.startAtPixel({ x: -window.innerWidth });
+      move(sprite, { easing: easeOut });
+    }
+
+    for (let sprite of removedSprites) {
+      sprite.endAtPixel({ x: -window.innerWidth });
+      move(sprite, { easing: easeIn });
     }
   }
 }
