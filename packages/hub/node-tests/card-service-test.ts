@@ -5,7 +5,7 @@ import { myOrigin } from '../origin';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import { Session } from '@cardstack/core/session';
 import { createTestEnv, TestEnv } from './helpers';
-import { cardDocument } from '@cardstack/core/card-document';
+import { cardDocument } from '../card-document';
 import { Value } from 'json-typescript';
 
 describe('hub/card-service', function() {

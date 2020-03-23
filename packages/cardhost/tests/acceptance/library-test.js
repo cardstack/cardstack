@@ -13,7 +13,7 @@ import {
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { animationsSettled } from 'ember-animated/test-support';
-import { cardDocument } from '@cardstack/core/card-document';
+import { cardDocument } from '@cardstack/hub';
 import { embeddedCssFile, isolatedCssFile } from '@cardstack/cardhost/utils/scaffolding';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 

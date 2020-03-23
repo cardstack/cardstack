@@ -1,7 +1,7 @@
 import { TestEnv, createTestEnv, seedTestRealms } from './helpers';
 import { EphemeralStorage } from '../../../cards/ephemeral-realm/storage';
 import IndexingService from '../indexing';
-import { cardDocument } from '@cardstack/core/card-document';
+import { cardDocument } from '../card-document';
 import { myOrigin } from '../origin';
 import { ScopedCardService } from '../cards-service';
 import { Session } from '@cardstack/core/session';

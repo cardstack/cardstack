@@ -2,7 +2,7 @@ import { Session } from '@cardstack/core/session';
 import { UnsavedCard, AddressableCard, Card } from './card';
 import { asCardId, CardId } from '@cardstack/core/card-id';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
-import { ResponseMeta } from '@cardstack/core/document';
+import { ResponseMeta } from './document';
 import CardstackError from '@cardstack/core/error';
 import { myOrigin } from './origin';
 import { getOwner, inject } from './dependency-injection';

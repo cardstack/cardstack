@@ -3,7 +3,7 @@ import { myOrigin } from '../../origin';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import { Session } from '@cardstack/core/session';
 import { createTestEnv, TestEnv } from '../helpers';
-import { cardDocument } from '@cardstack/core/card-document';
+import { cardDocument } from '../../card-document';
 import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';
 import { existsSync, readJSONSync, readFileSync } from 'fs-extra';
 import { AddressableCard } from '../../card';

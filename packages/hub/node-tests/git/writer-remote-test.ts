@@ -1,7 +1,7 @@
 import { Repository, Remote } from '../../../../cards/git-realm/lib/git';
 import GitService from '@cardstack/git-realm-card/lib/service';
 import { TestEnv, createTestEnv } from '../helpers';
-import { cardDocument, CardDocument } from '@cardstack/core/card-document';
+import { cardDocument, CardDocument } from '../../card-document';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import { myOrigin } from '../../origin';
 import { ScopedCardService } from '../../cards-service';

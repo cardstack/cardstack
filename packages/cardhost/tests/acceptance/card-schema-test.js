@@ -21,7 +21,7 @@ import {
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { animationsSettled } from 'ember-animated/test-support';
-import { cardDocument } from '@cardstack/core/card-document';
+import { cardDocument } from '@cardstack/hub';
 import { canonicalURL } from '@cardstack/core/card-id';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 

@@ -1,5 +1,5 @@
 import CardstackError from '@cardstack/core/error';
-import { UpstreamDocument, UpstreamIdentity, ResponseMeta } from '@cardstack/core/document';
+import { UpstreamDocument, UpstreamIdentity, ResponseMeta } from './document';
 import {
   SingleResourceDoc,
   RelationshipObject,
@@ -29,7 +29,7 @@ import * as FieldHooks from '@cardstack/core/field-hooks';
 import { WriterFactory } from '@cardstack/core/writer';
 import { IndexerFactory } from './indexing';
 import { CardId, FieldArity, canonicalURLToCardId, canonicalURL, cardstackFieldPattern } from '@cardstack/core/card-id';
-import { CardDocument, cardDocumentFromJsonAPI } from '@cardstack/core/card-document';
+import { CardDocument, cardDocumentFromJsonAPI } from './card-document';
 import assertNever from 'assert-never';
 
 let nonce = 0;

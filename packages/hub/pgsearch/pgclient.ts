@@ -23,7 +23,7 @@ import {
 import { Expression, PgPrimitive } from '@cardstack/core/expression';
 import { AddressableCard, Card, FieldCard } from '../card';
 import { CardId, cardstackFieldPattern, canonicalURL } from '@cardstack/core/card-id';
-import { ResponseMeta } from '@cardstack/core/document';
+import { ResponseMeta } from '../document';
 import CardstackError from '@cardstack/core/error';
 import { Query, baseType, Filter, EqFilter, RangeFilter } from '@cardstack/core/query';
 import { Sorts } from './sorts';

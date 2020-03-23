@@ -1,5 +1,5 @@
 import { Session } from './session';
-import { UpstreamDocument, UpstreamIdentity } from './document';
+import { UpstreamDocument, UpstreamIdentity } from '@cardstack/hub';
 import { AddressableCard } from '@cardstack/hub';
 
 export interface WriterFactory {

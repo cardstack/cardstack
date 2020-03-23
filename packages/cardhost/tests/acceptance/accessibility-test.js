@@ -10,7 +10,7 @@ import {
   waitForTestsToEnd,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
-import { cardDocument } from '@cardstack/core/card-document';
+import { cardDocument } from '@cardstack/hub';
 import a11yAudit from 'ember-a11y-testing/test-support/audit';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 

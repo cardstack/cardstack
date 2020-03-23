@@ -1,6 +1,6 @@
 import { Writer } from '@cardstack/core/writer';
 import { Session } from '@cardstack/core/session';
-import { UpstreamDocument, UpstreamIdentity } from '@cardstack/core/document';
+import { UpstreamDocument, UpstreamIdentity } from '@cardstack/hub';
 import { inject } from '@cardstack/hub/dependency-injection';
 import { AddressableCard } from '@cardstack/hub';
 import CardstackError from '@cardstack/core/error';

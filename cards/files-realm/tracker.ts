@@ -3,7 +3,7 @@ import { IndexingOperations } from '@cardstack/hub';
 import { join } from 'path';
 import merge from 'lodash/merge';
 import logger from '@cardstack/logger';
-import { UpstreamDocument, UpstreamIdentity } from '@cardstack/core/document';
+import { UpstreamDocument, UpstreamIdentity } from '@cardstack/hub';
 import { assertSingleResourceDoc } from '@cardstack/core/jsonapi';
 import { Card } from '@cardstack/hub';
 import { SingleResourceDoc } from 'jsonapi-typescript';

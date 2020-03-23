@@ -2,7 +2,7 @@ import { AddressableCard } from '../card';
 import { myOrigin } from '../origin';
 import { Session } from '@cardstack/core/session';
 import { createTestEnv, TestEnv } from './helpers';
-import { cardDocument } from '@cardstack/core/card-document';
+import { cardDocument } from '../card-document';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import { ScopedCardService } from '../cards-service';
 

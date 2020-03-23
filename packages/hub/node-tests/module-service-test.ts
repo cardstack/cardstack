@@ -1,5 +1,5 @@
 import { TestEnv, createTestEnv } from './helpers';
-import { cardDocument } from '@cardstack/core/card-document';
+import { cardDocument } from '../card-document';
 import { myOrigin } from '../origin';
 import { ScopedCardService } from '../cards-service';
 import { Session } from '@cardstack/core/session';

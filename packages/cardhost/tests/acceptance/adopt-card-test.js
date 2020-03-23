@@ -18,7 +18,7 @@ import {
   getEncodedCardIdFromURL,
   waitForLibraryServiceToIdle,
 } from '../helpers/card-ui-helpers';
-import { cardDocument } from '@cardstack/core/card-document';
+import { cardDocument } from '@cardstack/hub';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 
 const childName = 'vangogh-work-address';

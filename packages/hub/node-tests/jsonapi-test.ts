@@ -2,7 +2,7 @@ import Koa from 'koa';
 import supertest from 'supertest';
 import { myOrigin } from '../origin';
 import { TestEnv, createTestEnv } from './helpers';
-import { cardDocument } from '@cardstack/core/card-document';
+import { cardDocument } from '../card-document';
 import { stringify } from 'qs';
 import { Session } from '@cardstack/core/session';
 import { assertSingleResourceDoc, assertCollectionResourceDoc } from '@cardstack/core/jsonapi';

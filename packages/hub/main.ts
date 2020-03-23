@@ -22,7 +22,7 @@ import IndexingService from './indexing';
 import Queue from './queue/queue';
 import { myOrigin } from './origin';
 import { Session } from '@cardstack/core/session';
-import { cardDocument } from '@cardstack/core/card-document';
+import { cardDocument } from './card-document';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import Change from '@cardstack/git-realm-card/lib/change';
 import { Repository, RepoNotFound } from '@cardstack/git-realm-card/lib/git';

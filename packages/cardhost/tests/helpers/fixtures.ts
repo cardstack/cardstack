@@ -1,6 +1,6 @@
 /// <reference types="qunit" />
 
-import { CardDocumentWithId, CardDocument, inDependencyOrder } from '@cardstack/core/card-document';
+import { CardDocumentWithId, CardDocument, inDependencyOrder } from '@cardstack/hub';
 import { CardId, canonicalURL } from '@cardstack/core/card-id';
 import { stringify } from 'qs';
 import flatten from 'lodash/flatten';

@@ -4,7 +4,7 @@ import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import { AddressableCard } from '../../card';
 import { Session } from '@cardstack/core/session';
 import { createTestEnv, TestEnv } from '../helpers';
-import { cardDocument, CardDocument } from '@cardstack/core/card-document';
+import { cardDocument, CardDocument } from '../../card-document';
 import { makeRepo, inRepo } from './support';
 import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';
 import { join } from 'path';

@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupTest } from 'ember-qunit';
-import { cardDocument, CardDocumentWithId } from '@cardstack/core/card-document';
+import { cardDocument } from '@cardstack/hub';
 import Fixtures from '../../helpers/fixtures';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import DataService from '../../../app/services/data';
@@ -12,14 +12,14 @@ const csRealm = `http://localhost:3000/api/realms/default`;
 
 module('Unit | Service | data', function() {
   module('non-mutating tests', function(hooks) {
-    let toyCard: CardDocumentWithId = cardDocument()
+    let toyCard = cardDocument()
       .withAttributes({
         csRealm,
         csId: 'toy-card',
       })
       .withField('description', 'string-field');
 
-    let puppyCard: CardDocumentWithId = cardDocument()
+    let puppyCard = cardDocument()
       .withAttributes({
         csRealm,
         csId: 'puppy-card',
@@ -31,7 +31,7 @@ module('Unit | Service | data', function() {
       .withField('houseBroken', 'boolean-field')
       .withField('favoriteToy', toyCard);
 
-    let dalmatianCard: CardDocumentWithId = cardDocument()
+    let dalmatianCard = cardDocument()
       .withAttributes({
         csRealm,
         csId: 'dalmatian-card',
@@ -39,7 +39,7 @@ module('Unit | Service | data', function() {
       .withField('numberOfSpots', 'integer-field')
       .adoptingFrom(puppyCard);
 
-    let ownerCard: CardDocumentWithId = cardDocument()
+    let ownerCard = cardDocument()
       .withAttributes({
         csRealm,
         csId: 'owner-card',
@@ -50,7 +50,7 @@ module('Unit | Service | data', function() {
       .withField('name', 'string-field')
       .withField('puppies', puppyCard, 'plural');
 
-    let squeakySnake: CardDocumentWithId = cardDocument()
+    let squeakySnake = cardDocument()
       .withAttributes({
         csRealm,
         csId: 'squeaky-snake',
@@ -58,7 +58,7 @@ module('Unit | Service | data', function() {
       })
       .adoptingFrom(toyCard);
 
-    let vanGogh: CardDocumentWithId = cardDocument()
+    let vanGogh = cardDocument()
       .withAttributes({
         csRealm,
         csId: 'vangogh',
@@ -73,7 +73,7 @@ module('Unit | Service | data', function() {
       })
       .adoptingFrom(dalmatianCard);
 
-    let mango: CardDocumentWithId = cardDocument()
+    let mango = cardDocument()
       .withAttributes({
         csRealm,
         csId: 'mango',
@@ -84,7 +84,7 @@ module('Unit | Service | data', function() {
       .withRelationships({ favoriteToy: squeakySnake })
       .adoptingFrom(dalmatianCard);
 
-    let daddy: CardDocumentWithId = cardDocument()
+    let daddy = cardDocument()
       .withAttributes({
         csRealm,
         csId: 'hassan',
@@ -93,7 +93,7 @@ module('Unit | Service | data', function() {
       .withRelationships({ puppies: [vanGogh, mango] })
       .adoptingFrom(ownerCard);
 
-    let mommy: CardDocumentWithId = cardDocument()
+    let mommy = cardDocument()
       .withAttributes({
         csRealm,
         csId: 'mariko',

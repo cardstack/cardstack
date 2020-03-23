@@ -1,4 +1,4 @@
-import { UpstreamDocument, UpstreamIdentity } from '@cardstack/core/document';
+import { UpstreamDocument, UpstreamIdentity } from '@cardstack/hub';
 import { MetaObject } from 'jsonapi-typescript';
 import CardstackError from '@cardstack/core/error';
 

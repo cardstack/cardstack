@@ -1,5 +1,5 @@
 import { SingleResourceDoc } from 'jsonapi-typescript';
-import { CardId } from './card-id';
+import { CardId } from '@cardstack/core/card-id';
 
 export class UpstreamDocument {
   kind = 'upstream';

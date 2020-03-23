@@ -10,7 +10,7 @@ import { SingleResourceDoc } from 'jsonapi-typescript';
 import { AddressableCard } from '@cardstack/hub';
 import { Batch } from './pgsearch/pgclient';
 import { CardInstantiator } from '@cardstack/core/card-instantiator';
-import { UpstreamIdentity, UpstreamDocument, upstreamIdToCardId } from '@cardstack/core/document';
+import { UpstreamIdentity, UpstreamDocument, upstreamIdToCardId } from './document';
 
 export default class IndexingService implements IndexingTracker {
   cards = inject('cards');

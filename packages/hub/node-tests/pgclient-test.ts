@@ -1,6 +1,6 @@
 import { param } from '../pgsearch/util';
 import { createTestEnv, TestEnv } from './helpers';
-import { cardDocument } from '@cardstack/core/card-document';
+import { cardDocument } from '../card-document';
 import { Session } from '@cardstack/core/session';
 
 describe('hub/pgclient', function() {

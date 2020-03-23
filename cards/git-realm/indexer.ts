@@ -14,8 +14,8 @@ import { extractSettings } from './lib/git-settings';
 import { assertSingleResourceDoc } from '@cardstack/core/jsonapi';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import merge from 'lodash/merge';
-import { UpstreamDocument, UpstreamIdentity } from '@cardstack/core/document';
-import { inDependencyOrder } from '@cardstack/core/card-document';
+import { UpstreamDocument, UpstreamIdentity } from '@cardstack/hub';
+import { inDependencyOrder } from '@cardstack/hub';
 
 interface GitMeta {
   commit?: string;
