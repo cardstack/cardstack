@@ -1,15 +1,15 @@
 import { TestEnv, createTestEnv } from '../helpers';
 import IndexingService from '../../indexing';
-import { cardDocument, CardDocument } from '@cardstack/core/card-document';
+import { cardDocument, CardDocument } from '../../card-document';
 import { myOrigin } from '../../origin';
 import CardsService, { ScopedCardService } from '../../cards-service';
-import { Session } from '@cardstack/core/session';
+import { Session } from '../../session';
 import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { CARDSTACK_PUBLIC_REALM } from '../../realm';
 import Change from '../../../../cards/git-realm/lib/change';
 import { join } from 'path';
 import { commitOpts, makeRepo, inRepo } from './support';
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard } from '../../card';
 import stringify from 'json-stable-stringify';
 
 describe('hub/git/indexing', function() {

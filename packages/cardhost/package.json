@@ -25,7 +25,6 @@
     "@cardstack/boolean-field-card": "0.18.16",
     "@cardstack/call-to-action-field-card": "0.18.16",
     "@cardstack/catalog-entry-card": "0.18.16",
-    "@cardstack/core": "0.18.16",
     "@cardstack/date-field-card": "0.18.16",
     "@cardstack/datetime-field-card": "0.18.16",
     "@cardstack/eslint-config": "0.18.16",

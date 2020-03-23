@@ -22,7 +22,7 @@ import {
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { animationsSettled } from 'ember-animated/test-support';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 
 const card1Name = 'Millenial Puppies';
 

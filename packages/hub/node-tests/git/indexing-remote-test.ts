@@ -1,12 +1,12 @@
 import { TestEnv, createTestEnv } from '../helpers';
 import GitService from '@cardstack/git-realm-card/lib/service';
 import IndexingService from '../../indexing';
-import { cardDocument, CardDocument } from '@cardstack/core/card-document';
+import { cardDocument, CardDocument } from '../../card-document';
 import { myOrigin } from '../../origin';
 import CardsService, { ScopedCardService } from '../../cards-service';
-import { Session } from '@cardstack/core/session';
+import { Session } from '../../session';
 import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { CARDSTACK_PUBLIC_REALM } from '../../realm';
 import { Remote, Repository } from '@cardstack/git-realm-card/lib/git';
 import Change from '@cardstack/git-realm-card/lib/change';
 import { commitOpts, makeRepo, inRepo } from './support';

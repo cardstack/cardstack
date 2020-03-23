@@ -3,7 +3,7 @@ import { safeCssString } from './safe-css-string';
 import uniq from 'lodash/uniq';
 //@ts-ignore
 import scope from 'scope-css';
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard } from '@cardstack/hub';
 
 function scopeCss(css: string, cardOrCards: AddressableCard | AddressableCard[], format = 'isolated') {
   if (!css || !cardOrCards) {

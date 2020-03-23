@@ -1,7 +1,7 @@
 import Route from '@ember/routing/route';
 import { inject as service } from '@ember/service';
 import DataService from '../../services/data';
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard } from '@cardstack/hub';
 import { action } from '@ember/object';
 import { set } from '@ember/object';
 

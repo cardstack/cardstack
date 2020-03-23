@@ -1,11 +1,11 @@
 /// <reference types="qunit" />
 
-import { CardDocumentWithId, CardDocument, inDependencyOrder } from '@cardstack/core/card-document';
-import { CardId, canonicalURL } from '@cardstack/core/card-id';
+import { CardDocumentWithId, CardDocument, inDependencyOrder } from '@cardstack/hub';
+import { CardId, canonicalURL } from '@cardstack/hub';
 import { stringify } from 'qs';
 import flatten from 'lodash/flatten';
 import { CollectionResourceDoc, ResourceObject, SingleResourceDoc } from 'jsonapi-typescript';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 
 const hubURL = 'http://localhost:3000';
 

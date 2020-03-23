@@ -1,8 +1,8 @@
 import { TestEnv, createTestEnv } from './helpers';
-import { cardDocument } from '@cardstack/core/card-document';
+import { cardDocument } from '../card-document';
 import { myOrigin } from '../origin';
 import { ScopedCardService } from '../cards-service';
-import { Session } from '@cardstack/core/session';
+import { Session } from '../session';
 import { ModuleService } from '../module-service';
 import { tmpdir } from 'os';
 import { join } from 'path';
@@ -108,14 +108,14 @@ describe('module-service', function() {
   });
 
   it('allows feature code to import from hub peerDependency', async function() {
-    let sampleValidator = `const CardstackError = require('@cardstack/core/error').default;
+    let sampleValidator = `const CardstackError = require('@cardstack/hub').Error;
        module.exports = function shouldThrow(value){ throw new CardstackError('it worked', { title: 'it worked', status: 654 }) }
      `;
     let card = await cards.create(
       `${myOrigin}/api/realms/first-ephemeral-realm`,
       cardDocument().withAttributes({
         csPeerDependencies: {
-          '@cardstack/core': '*',
+          '@cardstack/hub': '*',
         },
         csFiles: {
           'validate.js': sampleValidator,

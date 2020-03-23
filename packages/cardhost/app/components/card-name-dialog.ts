@@ -5,9 +5,9 @@ import RouterService from '@ember/routing/router-service';
 import { tracked } from '@glimmer/tracking';
 //@ts-ignore
 import { task } from 'ember-concurrency';
-import { cardDocument } from '@cardstack/core/card-document';
+import { cardDocument } from '@cardstack/hub';
 import { getUserRealm } from '../utils/scaffolding';
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard } from '@cardstack/hub';
 import DataService from '../services/data';
 import OverlaysService from '../services/overlays';
 

@@ -1,7 +1,7 @@
 import Component from '@glimmer/component';
 // @ts-ignore
 import { task } from 'ember-concurrency';
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard } from '@cardstack/hub';
 import { tracked } from '@glimmer/tracking';
 
 export default class CatalogEntriesComponent extends Component<{

@@ -1,9 +1,9 @@
-import { Writer } from '@cardstack/core/writer';
-import { Session } from '@cardstack/core/session';
-import { UpstreamDocument, UpstreamIdentity } from '@cardstack/core/document';
+import { Writer } from '@cardstack/hub';
+import { Session } from '@cardstack/hub';
+import { UpstreamDocument, UpstreamIdentity } from '@cardstack/hub';
 import { inject } from '@cardstack/hub/dependency-injection';
-import { AddressableCard } from '@cardstack/core/card';
-import CardstackError from '@cardstack/core/error';
+import { AddressableCard } from '@cardstack/hub';
+import { Error } from '@cardstack/hub';
 
 let counter = 0;
 
@@ -21,7 +21,7 @@ export default class EphemeralWriter implements Writer {
   async update(_session: Session, id: UpstreamIdentity, doc: UpstreamDocument) {
     let version = doc.jsonapi.data.meta?.version;
     if (version == null) {
-      throw new CardstackError('missing required field "meta.version"', {
+      throw new Error('missing required field "meta.version"', {
         status: 400,
         source: { pointer: '/data/meta/version' },
       });

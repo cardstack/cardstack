@@ -8,7 +8,7 @@ import { CardstackSession } from '../../../../../services/cardstack-session';
 import { isolatedCssFile } from '../../../../../utils/scaffolding';
 import { Model } from '../../../../../routes/cards/card';
 import EditCardController from '../../edit';
-import { Card } from '@cardstack/core/card';
+import { Card } from '@cardstack/hub';
 
 export interface ThemeOption {
   name: string;

@@ -1,10 +1,10 @@
 import { ScopedCardService } from '../../cards-service';
 import { myOrigin } from '../../origin';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
-import { AddressableCard } from '@cardstack/core/card';
-import { Session } from '@cardstack/core/session';
+import { CARDSTACK_PUBLIC_REALM } from '../../realm';
+import { AddressableCard } from '../../card';
+import { Session } from '../../session';
 import { createTestEnv, TestEnv } from '../helpers';
-import { cardDocument, CardDocument } from '@cardstack/core/card-document';
+import { cardDocument, CardDocument } from '../../card-document';
 import { makeRepo, inRepo } from './support';
 import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';
 import { join } from 'path';

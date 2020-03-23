@@ -1,6 +1,6 @@
 import Service from '@ember/service';
 import { tracked } from '@glimmer/tracking';
-import { FieldCard, AddressableCard } from '@cardstack/core/card';
+import { FieldCard, AddressableCard } from '@cardstack/hub';
 
 export default class DraggableService extends Service {
   @tracked field?: AddressableCard | FieldCard;

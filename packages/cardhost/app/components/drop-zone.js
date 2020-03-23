@@ -3,7 +3,7 @@ import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { task } from 'ember-concurrency';
-import { cardDocument } from '@cardstack/core/card-document';
+import { cardDocument } from '@cardstack/hub';
 
 let nonce = 0;
 export default class DropZone extends Component {
