@@ -1,5 +1,5 @@
-import { Indexer, IndexingOperations } from '@cardstack/core/indexer';
-import { AddressableCard } from '@cardstack/core/card';
+import { Indexer, IndexingOperations } from '@cardstack/hub';
+import { AddressableCard } from '@cardstack/hub';
 import { inject } from '@cardstack/hub/dependency-injection';
 import { TrackerParams } from './tracker';
 

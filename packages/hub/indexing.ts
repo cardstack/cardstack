@@ -1,14 +1,16 @@
 import { Session } from '@cardstack/core/session';
 import { inject, getOwner, injectionReady } from './dependency-injection';
 import { myOrigin } from './origin';
-import { IndexingOperations, IndexingTracker } from '@cardstack/core/indexer';
 import * as J from 'json-typescript';
 import { upsert, param } from './pgsearch/util';
 import { Expression } from '@cardstack/core/expression';
 import { CardId, canonicalURL } from '@cardstack/core/card-id';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import { SingleResourceDoc } from 'jsonapi-typescript';
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard } from '@cardstack/hub';
+import { Batch } from './pgsearch/pgclient';
+import { CardInstantiator } from '@cardstack/core/card-instantiator';
+import { UpstreamIdentity, UpstreamDocument, upstreamIdToCardId } from '@cardstack/core/document';
 
 export default class IndexingService implements IndexingTracker {
   cards = inject('cards');
@@ -120,5 +122,47 @@ export default class IndexingService implements IndexingTracker {
 declare module '@cardstack/hub/dependency-injection' {
   interface KnownServices {
     indexing: IndexingService;
+  }
+}
+
+export interface IndexerFactory<Meta = unknown, Params = unknown> {
+  new (realmCard: AddressableCard): Indexer<Meta, Params>;
+}
+
+export interface Indexer<Meta = unknown, Params = unknown> {
+  update(meta: Meta, ops: IndexingOperations, params: Params | null): Promise<Meta | void>;
+}
+
+export interface IndexingTracker {
+  increaseOperationsCount: () => void;
+}
+
+export class IndexingOperations {
+  constructor(
+    private realmCard: AddressableCard,
+    private batch: Batch,
+    private cards: CardInstantiator,
+    private indexingTracker: IndexingTracker
+  ) {}
+
+  async save(upstreamId: UpstreamIdentity, doc: UpstreamDocument) {
+    let id = upstreamIdToCardId(upstreamId, this.realmCard.csId);
+    let card = await this.cards.instantiate(doc.jsonapi, id);
+    this.indexingTracker.increaseOperationsCount();
+    return await this.batch.save(card);
+  }
+
+  async delete(upstreamId: UpstreamIdentity) {
+    let id = upstreamIdToCardId(upstreamId, this.realmCard.csId);
+    this.indexingTracker.increaseOperationsCount();
+    return await this.batch.delete(id);
+  }
+
+  async beginReplaceAll() {
+    this.batch.createGeneration(this.realmCard.csId);
+  }
+
+  async finishReplaceAll() {
+    await this.batch.deleteOlderGenerations(this.realmCard.csId);
   }
 }

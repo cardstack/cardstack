@@ -6,7 +6,7 @@ import { createTestEnv, TestEnv } from '../helpers';
 import { cardDocument } from '@cardstack/core/card-document';
 import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';
 import { existsSync, readJSONSync, readFileSync } from 'fs-extra';
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard } from '../../card';
 import { join } from 'path';
 
 describe('hub/files-realm-writer', function() {

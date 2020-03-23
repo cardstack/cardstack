@@ -7,7 +7,7 @@ import { task } from 'ember-concurrency';
 import { getUserRealm } from '../utils/scaffolding';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import DataService from './data';
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard } from '@cardstack/hub';
 
 const catalogEntry = Object.freeze({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'catalog-entry' });
 const cardCatalogRealm = 'https://cardstack.com/api/realms/card-catalog';

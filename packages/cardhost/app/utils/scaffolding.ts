@@ -1,4 +1,4 @@
-import { Card, AddressableCard } from '@cardstack/core/card';
+import { Card, AddressableCard } from '@cardstack/hub';
 import { myOrigin } from './origin';
 import DataService from '../services/data';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';

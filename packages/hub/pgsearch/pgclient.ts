@@ -21,7 +21,7 @@ import {
   FieldArity,
 } from './util';
 import { Expression, PgPrimitive } from '@cardstack/core/expression';
-import { AddressableCard, Card, FieldCard } from '@cardstack/core/card';
+import { AddressableCard, Card, FieldCard } from '../card';
 import { CardId, cardstackFieldPattern, canonicalURL } from '@cardstack/core/card-id';
 import { ResponseMeta } from '@cardstack/core/document';
 import CardstackError from '@cardstack/core/error';
@@ -31,7 +31,6 @@ import snakeCase from 'lodash/snakeCase';
 import flatten from 'lodash/flatten';
 import assertNever from 'assert-never';
 import { ScopedCardService } from '../cards-service';
-import { BatchedIndexUpdate } from '@cardstack/core/batched-index-update';
 
 const log = logger('cardstack/pgsearch');
 
@@ -551,7 +550,7 @@ export default class PgClient {
   }
 }
 
-export class Batch implements BatchedIndexUpdate {
+export class Batch {
   private generations: {
     [realm: string]: number | undefined;
   } = {};

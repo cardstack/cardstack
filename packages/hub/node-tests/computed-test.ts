@@ -1,4 +1,4 @@
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard } from '../card';
 import { myOrigin } from '../origin';
 import { Session } from '@cardstack/core/session';
 import { createTestEnv, TestEnv } from './helpers';

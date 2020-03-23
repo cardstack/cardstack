@@ -10,7 +10,7 @@ import { set } from '@ember/object';
 import ENV from '@cardstack/cardhost/config/environment';
 import DataService from './data';
 import { Model } from '../routes/cards/card';
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard } from '@cardstack/hub';
 
 const { autosaveDebounce, autosaveDisabled, environment } = ENV;
 const AUTOSAVE_DEBOUNCE = 5000;

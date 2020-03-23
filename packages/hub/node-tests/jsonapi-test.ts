@@ -7,7 +7,7 @@ import { stringify } from 'qs';
 import { Session } from '@cardstack/core/session';
 import { assertSingleResourceDoc, assertCollectionResourceDoc } from '@cardstack/core/jsonapi';
 import { cors } from '../main';
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard } from '../card';
 import { canonicalURL } from '@cardstack/core/card-id';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 

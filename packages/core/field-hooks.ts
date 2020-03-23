@@ -1,5 +1,5 @@
 import { Expression } from './expression';
-import { FieldCard } from './card';
+import { FieldCard } from '@cardstack/hub';
 
 /*
   These hooks allow a card to customize how it behaves when used as a field

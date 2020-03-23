@@ -1,5 +1,5 @@
-import CardstackError from './error';
-import { UpstreamDocument, UpstreamIdentity, ResponseMeta } from './document';
+import CardstackError from '@cardstack/core/error';
+import { UpstreamDocument, UpstreamIdentity, ResponseMeta } from '@cardstack/core/document';
 import {
   SingleResourceDoc,
   RelationshipObject,
@@ -18,19 +18,18 @@ import difference from 'lodash/difference';
 import intersection from 'lodash/intersection';
 import isEqual from 'lodash/isEqual';
 import * as J from 'json-typescript';
-import { CARDSTACK_PUBLIC_REALM } from './realm';
-import { OcclusionFieldSets, assertOcclusionFieldSets, Format, OcclusionRules } from './occlusion-rules';
-import { Container } from './container';
-import { ModuleLoader } from './module-loader';
-import { CardReader } from './card-reader';
-import { CardInstantiator } from './card-instantiator';
+import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
+import { OcclusionFieldSets, assertOcclusionFieldSets, Format, OcclusionRules } from '@cardstack/core/occlusion-rules';
+import { Container } from '@cardstack/core/container';
+import { ModuleLoader } from '@cardstack/core/module-loader';
+import { CardReader } from '@cardstack/core/card-reader';
+import { CardInstantiator } from '@cardstack/core/card-instantiator';
 import { Memoize } from 'typescript-memoize';
-import * as FieldHooks from './field-hooks';
-import { WriterFactory } from './writer';
-import { IndexerFactory } from './indexer';
-import { CardId, FieldArity, canonicalURLToCardId, canonicalURL, cardstackFieldPattern } from './card-id';
-import { CardDocument, cardDocumentFromJsonAPI } from './card-document';
-import Component from '@glimmer/component';
+import * as FieldHooks from '@cardstack/core/field-hooks';
+import { WriterFactory } from '@cardstack/core/writer';
+import { IndexerFactory } from './indexing';
+import { CardId, FieldArity, canonicalURLToCardId, canonicalURL, cardstackFieldPattern } from '@cardstack/core/card-id';
+import { CardDocument, cardDocumentFromJsonAPI } from '@cardstack/core/card-document';
 import assertNever from 'assert-never';
 
 let nonce = 0;
@@ -986,10 +985,10 @@ export class Card {
   async loadFeature(featureName: 'field-deserialize'): Promise<null | FieldHooks.deserialize<unknown, unknown>>;
   async loadFeature(featureName: 'field-buildValueExpression'): Promise<null | FieldHooks.buildValueExpression>;
   async loadFeature(featureName: 'field-buildQueryExpression'): Promise<null | FieldHooks.buildQueryExpression>;
-  async loadFeature(featureName: 'isolated-layout'): Promise<null | Component>;
-  async loadFeature(featureName: 'embedded-layout'): Promise<null | Component>;
-  async loadFeature(featureName: 'field-view-layout'): Promise<null | Component>;
-  async loadFeature(featureName: 'field-edit-layout'): Promise<null | Component>;
+  async loadFeature(featureName: 'isolated-layout'): Promise<null | unknown>;
+  async loadFeature(featureName: 'embedded-layout'): Promise<null | unknown>;
+  async loadFeature(featureName: 'field-view-layout'): Promise<null | unknown>;
+  async loadFeature(featureName: 'field-edit-layout'): Promise<null | unknown>;
   async loadFeature(featureName: 'isolated-css'): Promise<null | string>;
   async loadFeature(featureName: 'embedded-css'): Promise<null | string>;
   async loadFeature(featureName: 'compute'): Promise<null | ((context: { field: FieldCard; card: Card }) => RawData)>;

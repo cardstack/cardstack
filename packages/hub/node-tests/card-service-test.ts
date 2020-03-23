@@ -1,4 +1,4 @@
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard } from '../card';
 import { canonicalURL } from '@cardstack/core/card-id';
 import { ScopedCardService } from '../cards-service';
 import { myOrigin } from '../origin';

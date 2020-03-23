@@ -16,7 +16,7 @@ import { Writer } from '@cardstack/core/writer';
 import { Session } from '@cardstack/core/session';
 import { UpstreamDocument, UpstreamIdentity } from '@cardstack/core/document';
 import { inject } from '@cardstack/hub/dependency-injection';
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard } from '@cardstack/hub';
 import { writeCard } from '@cardstack/core/card-file';
 import { upstreamIdToCardDirName } from '@cardstack/core/card-id';
 

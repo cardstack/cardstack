@@ -7,7 +7,7 @@ import { tracked } from '@glimmer/tracking';
 import { task } from 'ember-concurrency';
 import { cardDocument } from '@cardstack/core/card-document';
 import { getUserRealm } from '../utils/scaffolding';
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard } from '@cardstack/hub';
 import DataService from '../services/data';
 import OverlaysService from '../services/overlays';
 

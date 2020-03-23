@@ -10,7 +10,7 @@ import { join } from 'path';
 import { mkdirp } from 'fs-extra';
 
 import CardstackError from '@cardstack/core/error';
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard } from '@cardstack/hub';
 
 export async function extractSettings(realmCard: AddressableCard): Promise<IndexerSettings> {
   // In order to allow git realm cards to be portable, let's let the hub decide

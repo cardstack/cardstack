@@ -1,4 +1,4 @@
-import { Card } from '@cardstack/core/card';
+import { Card } from './card';
 import stringify from 'fast-json-stable-stringify';
 import { createHash } from 'crypto';
 import { homedir } from 'os';

@@ -9,7 +9,7 @@ import { Session } from '@cardstack/core/session';
 
 import { makeRepo, inRepo } from './support';
 import { dir as mkTmpDir, DirectoryResult } from 'tmp-promise';
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard } from '../../card';
 import Change from '@cardstack/git-realm-card/lib/change';
 import stringify from 'json-stable-stringify';
 import IndexingService from '../../indexing';

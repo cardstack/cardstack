@@ -1,4 +1,4 @@
-import { Card } from '@cardstack/core/card';
+import { Card } from '@cardstack/hub';
 import { Expression } from '@cardstack/core/expression';
 import CardstackError from '@cardstack/core/error';
 import { isParam } from '@cardstack/hub/pgsearch/util';

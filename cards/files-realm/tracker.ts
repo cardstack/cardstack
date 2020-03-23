@@ -1,14 +1,14 @@
 import { statSync, readdirSync, readJsonSync, readFileSync, Stats } from 'fs-extra';
-import { IndexingOperations } from '@cardstack/core/indexer';
+import { IndexingOperations } from '@cardstack/hub';
 import { join } from 'path';
 import merge from 'lodash/merge';
 import logger from '@cardstack/logger';
 import { UpstreamDocument, UpstreamIdentity } from '@cardstack/core/document';
 import { assertSingleResourceDoc } from '@cardstack/core/jsonapi';
-import { Card } from '@cardstack/core/card';
+import { Card } from '@cardstack/hub';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { inject } from '@cardstack/hub/dependency-injection';
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard } from '@cardstack/hub';
 import * as J from 'json-typescript';
 import sane from 'sane';
 

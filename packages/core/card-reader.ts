@@ -1,4 +1,4 @@
-import { AddressableCard } from './card';
+import { AddressableCard } from '@cardstack/hub';
 import { CardId } from './card-id';
 
 export interface CardReader {

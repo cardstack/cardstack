@@ -5,7 +5,7 @@ import { set } from '@ember/object';
 import RouteInfo from '@ember/routing/-private/route-info';
 import Transition from '@ember/routing/-private/transition';
 import LibraryService from '../services/library';
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard } from '@cardstack/hub';
 
 interface Model {
   featuredEntries: AddressableCard[];

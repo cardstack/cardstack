@@ -9,7 +9,7 @@ import { CARDSTACK_PUBLIC_REALM } from '@cardstack/core/realm';
 import Change from '../../../../cards/git-realm/lib/change';
 import { join } from 'path';
 import { commitOpts, makeRepo, inRepo } from './support';
-import { AddressableCard } from '@cardstack/core/card';
+import { AddressableCard } from '../../card';
 import stringify from 'json-stable-stringify';
 
 describe('hub/git/indexing', function() {

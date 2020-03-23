@@ -3,7 +3,7 @@ import Component from '@glimmer/component';
 import { dasherize } from '@ember/string';
 // @ts-ignore
 import { tracked } from '@glimmer/tracking';
-import { Card } from '@cardstack/core/card';
+import { Card } from '@cardstack/hub';
 
 export default class ScaffoldComponent extends Component<{
   card: Card;

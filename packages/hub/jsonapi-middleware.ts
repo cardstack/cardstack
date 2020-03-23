@@ -10,7 +10,7 @@ import CardstackError from '@cardstack/core/error';
 import { SessionContext } from './authentication-middleware';
 import { assertSingleResourceDoc } from '@cardstack/core/jsonapi';
 import { myOrigin } from './origin';
-import { makeCollection, apiPrefix, AddressableCard } from '@cardstack/core/card';
+import { makeCollection, apiPrefix, AddressableCard } from './card';
 import { CardId } from '@cardstack/core/card-id';
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { parse } from 'qs';
