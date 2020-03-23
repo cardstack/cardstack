@@ -162,7 +162,7 @@ describe('git/writer with remote', function() {
     it('successfully merges updates when repo is out of sync', async function() {
       this.timeout(20000);
 
-      let change = await Change.create(remoteRepo, head, 'master', fetchOpts);
+      let change = await Change.create(remoteRepo, head, 'master');
 
       let file = await change.get('contents/events/event-2.json', { allowUpdate: true });
 
@@ -179,7 +179,8 @@ describe('git/writer with remote', function() {
         message: 'I probably shouldnt update this out of sync'
       });
 
-      await remoteRepo.getRemote('origin');
+      let remote = await remoteRepo.getRemote('origin');
+      await remote.push(["refs/heads/master:refs/heads/master"], fetchOpts);
 
       let { data:record } = await writers.update(env.session, 'events', 'event-1', {
         data: {
@@ -211,7 +212,7 @@ describe('git/writer with remote', function() {
     it('successfully merges updates when same file is out of sync', async function() {
       this.timeout(20000);
 
-      let change = await Change.create(remoteRepo, head, 'master', fetchOpts);
+      let change = await Change.create(remoteRepo, head, 'master');
 
       let file = await change.get('contents/events/event-1.json', { allowUpdate: true });
 
@@ -351,13 +352,11 @@ describe('git/writer with empty remote', function() {
 });
 
 
-
 describe('git/writer-remote/githereum', function() {
-  let env, writers, tempRepoPath, tempRemoteRepoPath, githereum, fakeContract, writer;
+  let env, writers, tempRepoPath, tempRemoteRepoPath, githereum, fakeContract, writer, fakePush;
   this.timeout(20000);
 
-  beforeEach(async function() {
-
+  async function setup(debounce) {
     await resetRemote();
 
     let factory = new JSONAPIFactory();
@@ -381,7 +380,8 @@ describe('git/writer-remote/githereum', function() {
             githereum: {
               contractAddress: '0xD8B92BE4420Fe70b62FF5e5F8eE5CF87871952e1',
               tag: 'test-tag',
-              repoName: 'githereum-repo'
+              repoName: 'githereum-repo',
+              debounce
             }
           }
         });
@@ -410,30 +410,12 @@ describe('git/writer-remote/githereum', function() {
     await writer._ensureGithereum();
     githereum = writer.githereum;
 
-  });
-
-  afterEach(async function() {
-    await temp.cleanup();
-    await destroyDefaultEnvironment(env);
-    service.clearCache();
-  });
-
-
-  it('writes to githereum if configured when writing', async function () {
-    let fakePush = fake.returns(new Promise(resolve => resolve()));
-
+    fakePush = fake.returns(new Promise(resolve => resolve()));
     replace(githereum, 'push', fakePush);
+  }
 
-    await writers.create(env.session, 'articles', {
-      data: {
-        type: 'articles',
-        attributes: {
-          title: 'An article'
-        }
-      }
-    });
-
-    let repo = await Repository.open(githereum.repoPath);
+  async function countCommits(repoPath) {
+    let repo = await Repository.open(repoPath);
     let firstCommitOnMaster = await repo.getMasterCommit();
     let commitCount = 0;
 
@@ -445,7 +427,31 @@ describe('git/writer-remote/githereum', function() {
       history.start();
     });
 
-    expect(commitCount).to.equal(2);
+    return commitCount;
+  }
+
+  afterEach(async function() {
+    await temp.cleanup();
+    await destroyDefaultEnvironment(env);
+    service.clearCache();
+  });
+
+  async function sleep(ms) {
+    await new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  it('writes to githereum if configured when writing', async function () {
+    await setup();
+
+    await writers.create(env.session, 'articles', {
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'An article'
+        }
+      }
+    });
+
 
     expect(githereum.contract).to.equal(fakeContract);
     expect(githereum.repoName).to.equal("githereum-repo");
@@ -455,5 +461,57 @@ describe('git/writer-remote/githereum', function() {
     expect(fakePush.callCount).to.equal(1);
     expect(fakePush.calledWith('test-tag')).to.be.ok;
   });
+
+  it('debounces githereum writes if configured when writing', async function() {
+    await setup(1000);
+
+    await writers.create(env.session, 'articles', {
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'An article'
+        }
+      }
+    });
+
+
+    expect(githereum.contract).to.equal(fakeContract);
+    expect(githereum.repoName).to.equal("githereum-repo");
+
+    expect(fakePush.callCount).to.equal(0);
+
+    await writers.create(env.session, 'articles', {
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'Second article'
+        }
+      }
+    });
+
+
+    expect(fakePush.callCount).to.equal(0);
+    await sleep(1000);
+    expect(fakePush.callCount).to.equal(1);
+
+    await writers.create(env.session, 'articles', {
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'Third article'
+        }
+      }
+    });
+
+    expect(fakePush.callCount).to.equal(1);
+    await sleep(100);
+    expect(fakePush.callCount).to.equal(1);
+    await sleep(800);
+    expect(fakePush.callCount).to.equal(1);
+    await sleep(200);
+    expect(fakePush.callCount).to.equal(2);
+
+  });
+
 
 });
