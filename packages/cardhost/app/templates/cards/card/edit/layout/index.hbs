@@ -1,11 +1,18 @@
 <CardViewer @card={{this.model.card}} @mode="layout" as |card args|>
-  {{#if this.cardstackSession.isAuthenticated}}
-    <RightEdge
+  {{!-- {{in-right-toolbar show=(
+    component "right-edge"
+    card=card
+    parentCard=(get args "parentCard")
+    grandParentCard=(get args "grandParentCard")
+    mode="layout"
+    cardSelected=true
+  )}} --}}
+    {{!-- <RightEdge
       @card={{card}}
       @parentCard={{get args "parentCard"}}
       @grandParentCard={{get args "grandParentCard"}}
-      @cardSelected={{true}} {{!-- Change this when we want to display different right-edge options --}}
-    >
+      @cardSelected={{true}}
+    > --}}
       <div class="right-edge--section" data-test-appearance-section
         data-test-card-patched={{stringify this.handleThemeChange.isIdle}}
       >
@@ -39,6 +46,5 @@
           </div>
         </div>
       </div>
-    </RightEdge>
-  {{/if}}
+    {{!-- </RightEdge> --}}
 </CardViewer>

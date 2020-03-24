@@ -9,7 +9,7 @@ import { remove } from 'lodash';
 import ENV from '@cardstack/cardhost/config/environment';
 
 const { animationSpeed } = ENV;
-const duration = 250;
+const duration = 500;
 
 export default class RightEdge extends Component {
   @tracked cardName = this.args.card.csTitle;
@@ -76,7 +76,7 @@ export default class RightEdge extends Component {
     this.expandedSections = this.expandedSections; // oh glimmer, you so silly...
   }
 
-  *outerTransition({ keptSprites }) {
+  *outerTransition({ keptSprites, duration }) {
     keptSprites.forEach(sprite => {
       resize(sprite, { easing: easeInAndOut, duration });
     });

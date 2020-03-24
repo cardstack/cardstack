@@ -1,11 +1,10 @@
-<div class="right-edge"
+<div class="right-edge right-edge--{{@mode}}"
   data-test-right-edge
   data-test-field-source-loaded={{stringify this.loadFieldSource.isIdle}}
   {{did-update this.updateCard @card @cardSelected}}
   {{did-update this.loadSelectedField @selectedField @selectedFieldName @cardSelected}}
   {{did-insert this.loadSelectedField}}
 >
-  {{!-- TODO: make this a component --}}
   <div class="right-edge--pill-selector-container">
     <div class="pill-selector">
       <div class="pill-option selected">Properties</div>
@@ -14,7 +13,7 @@
   </div>
   <AnimatedContainer>
     {{#animated-value this.options watch="selectedContent" use=this.outerTransition}}
-      <div class="right-edge--section--container">
+      <div>
         <AnimatedContainer>
           {{#animated-if @cardSelected use=this.fade duration=this.duration}}
             <div class="right-edge--sections">
@@ -36,7 +35,7 @@
                         </div>
                       {{/if}}
                     </div>
-                    {{#if (eq @mode "fields")}}
+                    {{#if (eq @mode "edit")}}
                       <div class="right-edge--items-container">
                         <div class="right-edge--item">
                           <LinkTo

@@ -1,1 +1,10 @@
 {{outlet}}
+
+{{#if (or (eq this.model.card.mode "edit") (eq this.model.card.mode "layout"))}}
+  {{in-right-toolbar show=(
+    component "right-edge"
+    card=this.model.card
+    mode=this.model.card.mode
+    cardSelected=true
+  )}}
+{{/if}}

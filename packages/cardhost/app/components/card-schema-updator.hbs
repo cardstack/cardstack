@@ -33,7 +33,24 @@
   </section>
 {{/animated-if}}
 
-<RightEdge
+{{in-right-toolbar show=(
+  component "right-edge"
+  card=@card
+  mode="schema"
+  parentCard=this.parentCard
+  grandParentCard=this.grandParentCard
+  selectedField=this.selectedField
+  selectedFieldName=this.selectedFieldName
+  selectedFieldType=this.selectedFieldType
+  selectField=(perform this.selectField)
+  setCardValue=this.setCardValue
+  setFieldCardValue=this.setFieldCardValue
+  setNeededWhenEmbedded=this.setNeededWhenEmbedded
+  setFieldName=this.setFieldName
+  cardSelected=this.cardSelected
+)}}
+
+{{!-- <RightEdge
   @card={{@card}}
   @mode="schema"
   @parentCard={{this.parentCard}}
@@ -46,7 +63,7 @@
   @setFieldCardValue={{this.setFieldCardValue}}
   @setNeededWhenEmbedded={{this.setNeededWhenEmbedded}}
   @setFieldName={{this.setFieldName}}
-  @cardSelected={{this.cardSelected}} />
+  @cardSelected={{this.cardSelected}} /> --}}
 
 <section class="card-renderer--container"
   data-test-card-schema={{@card.name}}
