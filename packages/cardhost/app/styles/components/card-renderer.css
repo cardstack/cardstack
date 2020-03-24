@@ -18,21 +18,6 @@
   min-height: var(--card-renderer-height);
 }
 
-.card-renderer-isolated.schema .card-boundary {
-  background-color: var(--ch-dark-background);
-}
-
-/* Resetting styles so that view mode styling does not affect other modes */
-.card-renderer-isolated.schema .isolated-card,
-.card-renderer-isolated.edit .isolated-card,
-.card-renderer-isolated.edit .field.field {
-  all: unset;
-}
-
-.card-renderer-isolated.schema .field.field {
-  position: static;
-}
-
 
 /* Card Renderer - Header wrapper */
 .card-renderer-isolated--animated-header {
@@ -90,7 +75,6 @@
 .card-renderer-isolated.schema .card-renderer-isolated--card-container {
   background-color: var(--ch-dark-background);
   border-top: 3px solid var(--ch-default);
-  padding-top: 10px;
 }
 
 .card-renderer-isolated.edit .card-renderer-isolated--card-container {
