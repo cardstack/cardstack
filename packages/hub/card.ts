@@ -25,12 +25,10 @@ import { ModuleLoader } from './module-loader';
 import { CardReader } from './card-reader';
 import { CardInstantiator } from './card-instantiator';
 import { Memoize } from 'typescript-memoize';
-import * as FieldHooks from './field-hooks';
-import { WriterFactory } from './writer';
-import { IndexerFactory } from './indexing';
 import { CardId, FieldArity, canonicalURLToCardId, canonicalURL, cardstackFieldPattern } from './card-id';
 import { CardDocument, cardDocumentFromJsonAPI } from './card-document';
 import assertNever from 'assert-never';
+import { Features } from './features';
 
 let nonce = 0;
 
@@ -979,19 +977,7 @@ export class Card {
     return false;
   }
 
-  async loadFeature(featureName: 'writer'): Promise<WriterFactory | null>;
-  async loadFeature(featureName: 'indexer'): Promise<IndexerFactory | null>;
-  async loadFeature(featureName: 'field-validate'): Promise<null | FieldHooks.validate<unknown>>;
-  async loadFeature(featureName: 'field-deserialize'): Promise<null | FieldHooks.deserialize<unknown, unknown>>;
-  async loadFeature(featureName: 'field-buildValueExpression'): Promise<null | FieldHooks.buildValueExpression>;
-  async loadFeature(featureName: 'field-buildQueryExpression'): Promise<null | FieldHooks.buildQueryExpression>;
-  async loadFeature(featureName: 'isolated-layout'): Promise<null | unknown>;
-  async loadFeature(featureName: 'embedded-layout'): Promise<null | unknown>;
-  async loadFeature(featureName: 'field-view-layout'): Promise<null | unknown>;
-  async loadFeature(featureName: 'field-edit-layout'): Promise<null | unknown>;
-  async loadFeature(featureName: 'isolated-css'): Promise<null | string>;
-  async loadFeature(featureName: 'embedded-css'): Promise<null | string>;
-  async loadFeature(featureName: 'compute'): Promise<null | ((context: { field: FieldCard; card: Card }) => RawData)>;
+  async loadFeature<T extends keyof Features>(featureName: T): Promise<null | Features[T]>;
   async loadFeature(featureName: string): Promise<any> {
     let card: Card | undefined = this;
     while (card) {
@@ -1364,7 +1350,7 @@ type FieldOrder = string[];
 interface PeerDependencies {
   [packageName: string]: string;
 }
-type RawData = { ref: CardId | CardId[] | null } | { value: any } | null;
+export type RawData = { ref: CardId | CardId[] | null } | { value: any } | null;
 
 function assertFieldOrder(order: any): asserts order is FieldOrder {
   if (!Array.isArray(order)) {
