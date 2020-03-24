@@ -29,10 +29,13 @@ import { CardId, FieldArity, canonicalURLToCardId, canonicalURL, cardstackFieldP
 import { CardDocument, cardDocumentFromJsonAPI } from './card-document';
 import assertNever from 'assert-never';
 import { Features } from './features';
+import { createHash } from 'crypto';
+
+// @ts-ignore: no types
+import jsStringEscape from 'js-string-escape';
 
 let nonce = 0;
 
-const nonJSFileExtenstions = Object.freeze(['css']);
 export const apiPrefix = '/api';
 
 export async function makeCollection(
@@ -977,32 +980,74 @@ export class Card {
     return false;
   }
 
-  async loadFeature<T extends keyof Features>(featureName: T): Promise<null | Features[T]>;
-  async loadFeature(featureName: string): Promise<any> {
+  async locateFeature(
+    featureName: keyof Features
+  ): Promise<null | { card: Card; filePath: string; exportName: string }> {
     let card: Card | undefined = this;
     while (card) {
       if (card.csFeatures && featureName in card.csFeatures) {
         let location = card.csFeatures[featureName];
+        let filePath: string;
+        let exportName: string;
         if (typeof location === 'string') {
-          // For the non-js based resources, just return the file contents
-          let fileContents: string | undefined;
-          let [, extension] = location.split('.');
-          if (
-            extension &&
-            nonJSFileExtenstions.includes(extension) &&
-            (fileContents = get(card.csFiles, location.replace(/\//g, '.')) as string) != null
-          ) {
-            return fileContents;
-          } else if (!extension || !nonJSFileExtenstions.includes(extension)) {
-            return await this.modules.load(card, location);
-          }
+          filePath = location;
+          exportName = 'default';
         } else {
-          return await this.modules.load(card, ...location);
+          [filePath, exportName] = location;
         }
+        return { card, filePath, exportName };
       }
       card = await card.adoptsFrom();
     }
     return null;
+  }
+
+  async loadFeature<T extends keyof Features>(featureName: T): Promise<null | Features[T]>;
+  async loadFeature(featureName: keyof Features): Promise<any> {
+    let location = await this.locateFeature(featureName);
+    if (!location) {
+      return null;
+    }
+    let { card, filePath, exportName } = location;
+    let [, extension] = filePath.split('.');
+    if (extension === 'js') {
+      return await this.modules.load(card, filePath, exportName);
+    } else {
+      let fileContents = get(card.csFiles, filePath.replace(/\//g, '.'));
+      if (typeof fileContents !== 'string') {
+        throw new Error(
+          `in card ${card.canonicalURL} feature ${featureName} points at ${filePath} which is not a valid file in csFiles`
+        );
+      }
+      return fileContents;
+    }
+  }
+
+  // `code` maps from content hash to source code
+  // `entrypoints` maps from formats to content hashes
+  async browserEntrypoints(): Promise<{ code: Map<string, string>; entrypoints: Map<Format, string> }> {
+    let code: Map<string, string> = new Map();
+    let entrypoints: Map<Format, string> = new Map();
+    let lines = [];
+
+    let templateSource = await this.loadFeature('isolated-layout');
+    if (!templateSource) {
+      throw new Error(`bug: all cards are supposed to have an isolated-layout because the base card has one`);
+    }
+
+    lines.push(`import { hbs } from 'ember-cli-htmlbars';`);
+    lines.push(
+      'export const isolatedComponent = Ember._setComponentTemplate(Ember._templateOnlyComponent(), hbs("' +
+        jsStringEscape(templateSource) +
+        '"));'
+    );
+    let source = lines.join('\n');
+    let hasher = createHash('md5');
+    hasher.update(source);
+    let contentHash = hasher.digest('hex');
+    code.set(contentHash, source);
+    entrypoints.set('isolated', contentHash);
+    return { code, entrypoints };
   }
 
   get canonicalURL(): string | undefined {

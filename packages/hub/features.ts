@@ -10,10 +10,10 @@ export interface Features {
   'field-deserialize': FieldHooks.deserialize<unknown, unknown>;
   'field-buildValueExpression': FieldHooks.buildValueExpression;
   'field-buildQueryExpression': FieldHooks.buildQueryExpression;
-  'isolated-layout': unknown;
-  'embedded-layout': unknown;
-  'field-view-layout': unknown;
-  'field-edit-layout': unknown;
+  'isolated-layout': string;
+  'embedded-layout': string;
+  'field-view-layout': string;
+  'field-edit-layout': string;
   'isolated-css': string;
   'embedded-css': string;
   compute: (context: { field: FieldCard; card: Card }) => RawData;
