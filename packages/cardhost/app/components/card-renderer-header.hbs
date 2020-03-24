@@ -45,7 +45,7 @@
             Saving...
           {{else}}
             {{svg-jar "success" width="10px" height="10px"}}
-            Saved {{moment-from-now @card.csUpdated interval=30000}}
+            Saved {{moment-from-now this.updated interval=30000}}
           {{/if}}
         </li>
         <li class="divider">
@@ -63,6 +63,13 @@
         </li>
         <li>
           <LinkTo @route="cards.card.edit.layout" @model={{@card.canonicalURL}} @class={{if (eq @mode "layout") "checked"}} data-test-context-layout>Layout</LinkTo>
+        </li>
+        <li class="divider">
+          <hr>
+        </li>
+        <li id="switch-mode" class="heading">Actions</li>
+        <li>
+          <LinkTo @route="cards.card.adopt" @model={{@card.canonicalURL}} data-test-context-adopt>Adopt</LinkTo>
         </li>
       </ul>
     </nav>

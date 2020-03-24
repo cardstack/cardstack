@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { click, find, visit, currentURL } from '@ember/test-helpers';
+import { click, find, visit, currentURL, waitFor } from '@ember/test-helpers';
 import { login } from '../helpers/login';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
@@ -17,6 +17,7 @@ import {
   waitForTestsToEnd,
   getEncodedCardIdFromURL,
   waitForLibraryServiceToIdle,
+  encodeColons,
 } from '../helpers/card-ui-helpers';
 import { cardDocument } from '@cardstack/hub';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
@@ -337,5 +338,23 @@ module('Acceptance | card adoption', function(hooks) {
       ['treats-available', 'address', 'city', 'state', 'zip', 'number-of-bones']
     );
     assert.dom('[data-test-field="number-of-bones"] .schema-field-renderer--header--detail').hasText('Adopted');
+  });
+
+  test('can use the context menu to adopt from a card', async function(assert) {
+    await visit(`/cards/${parentCardPath}/edit/fields`);
+    await waitForCardLoad();
+
+    assert.equal(encodeColons(currentURL()), `/cards/${parentCardPath}/edit/fields`);
+    await click('[data-test-context-menu-button]');
+
+    await click('[data-test-context-adopt]');
+    await waitFor('[data-test-card-name]');
+
+    let adopteeCardName = 'Adopted Gen Z Puppies';
+    await setCardName(adopteeCardName);
+    await waitForCardLoad();
+
+    assert.ok(/^\/cards\/.*\/edit\/fields$/.test(currentURL()), 'URL is correct');
+    assert.dom('.card-renderer-isolated--header-title').hasText(adopteeCardName);
   });
 });
