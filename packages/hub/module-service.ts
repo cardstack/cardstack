@@ -20,8 +20,8 @@ export class ModuleService implements ModuleLoader {
 
   async load(card: Card, localModulePath: string, exportedName = 'default'): Promise<any> {
     let fullPath = await this.locate(card, localModulePath);
-    // @ts-ignore
-    let module = await import(fullPath); // we are using ESM for module loading
+    // @ts-ignore: we are using ESM for module loading but typescript doesn't know that works.
+    let module = await import(fullPath);
     return module[exportedName];
   }
 
