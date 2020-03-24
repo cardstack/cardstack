@@ -47,6 +47,15 @@ export default class CardsController extends Controller {
   }
 
   get hideTopEdge() {
-    return this.routeInfo.mode === 'cards' || this.routeInfo.mode === 'view';
+    return (
+      this.routeInfo.mode === 'cards' ||
+      this.routeInfo.mode === 'view' ||
+      this.routeInfo.mode === 'add' ||
+      this.routeInfo.mode === 'adopt'
+    );
+  }
+
+  get hideLeftEdge() {
+    return this.routeInfo.mode === 'preview' || this.routeInfo.mode === 'add' || this.routeInfo.mode === 'adopt';
   }
 }

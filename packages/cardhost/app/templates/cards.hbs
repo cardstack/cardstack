@@ -8,7 +8,7 @@
   {{this.themerClasses}}"
   data-test-cardhost-cards
 >
-  <ToolbarManager animationDuration={{this.duration}}>
+  <ToolbarManager @topLeftCornerBelongsTo="left" @animationDuration={{this.duration}}>
     {{outlet}}
   </ToolbarManager>
 </div>
@@ -19,6 +19,14 @@
     mode=this.routeInfo.mode
     card=this.currentCard
     previousRoute=this.model.previousRoute
+  )}}
+{{/unless}}
+
+{{#unless this.hideLeftEdge}}
+  {{in-left-toolbar show=(
+    component "cardhost-left-edge"
+    mode=this.routeInfo.mode
+    card=this.currentCard
   )}}
 {{/unless}}
 

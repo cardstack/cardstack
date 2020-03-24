@@ -5,7 +5,6 @@
   --card-builder-grid-row-height: 422px;
 
   height: 100%;
-  padding-left: var(--ch-left-edge-navbar-width);
 }
 
 .card-builder--header {

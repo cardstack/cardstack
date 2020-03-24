@@ -1,8 +1,13 @@
 .ch-catalog {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: var(--ch-left-edge-navbar-width);
   width: var(--ch-left-edge-panel-width);
+  height: 100%;
   background-color: var(--ch-dark-background);
   color: var(--ch-light);
-  overflow: hidden;
+  z-index: calc(var(--ch-left-edge-z-index) - 1);
 }
 
 .ch-catalog--content {
@@ -66,4 +71,8 @@
 
 .ch-catalog--header-btn + .ch-catalog--header-btn {
   margin-left: 10px;
+}
+
+.ch-catalog--header-filter {
+  padding: 0 var(--ch-spacing);
 }

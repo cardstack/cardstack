@@ -1,8 +1,5 @@
-<CardhostLeftEdge
-  @mode="schema"
-  data-test-catalog-loaded={{stringify this.load.isIdle}}
->
-  <section class="ch-catalog">
+{{#animated-if this.load.isIdle initialInsertion=true finalRemoval=true use=this.catalogTransition duration=this.duration}}
+  <section class="ch-catalog" data-test-catalog-loaded={{stringify this.load.isIdle}}>
     <header class="ch-catalog--header">
       <h3 class="ch-catalog--title">Card Catalog</h3>
     </header>
@@ -34,7 +31,7 @@
       </div>
     </div>
   </section>
-</CardhostLeftEdge>
+{{/animated-if}}
 
 <RightEdge
   @card={{@card}}
