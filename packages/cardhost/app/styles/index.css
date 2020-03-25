@@ -1,8 +1,6 @@
 .card-builder {
   --card-builder-hover: rgba(0, 0, 0, 0.1);
   --card-builder-horizontal-padding: 38px;
-  --card-builder-grid-col-width: 250px;
-  --card-builder-grid-row-height: 422px;
 
   height: 100%;
 }
@@ -36,9 +34,9 @@
 .card-builder--section-grid {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(4, var(--card-builder-grid-col-width));
-  grid-template-rows: var(--card-builder-grid-row-height);
-  grid-gap: 15px;
+  grid-template-columns: repeat(4, 225px);
+  grid-template-rows: minmax(554px, auto);
+  gap: 53px;
   margin: 0;
   padding: 15px var(--card-builder-horizontal-padding) 45px;
   overflow-x: auto;
@@ -66,16 +64,17 @@
 }
 
 .card-builder--section-card-scale-wrapper {
-  transform: scale(0.50) translate(-50%, -50%);
+  transform: scale(0.6) translate(-34%, -34%);
   position: absolute;
   top: 0;
   left: 0;
-  width: 200%; /* since it's scaled down by 50% */
-  height: 200%;
+  min-width: 160%;
   margin: 0 auto;
 }
 
 .card-builder--section-card-scale-wrapper > .card-builder--section-card {
+  width: 100%;
+  height: 100%;
   padding: 0;
   border-radius: 15px;
   transition: transform var(--ch-card-transition-duration) ease-in-out;
@@ -86,6 +85,7 @@
   bottom: 0;
   width: 100%;
   padding-top: 30px;
+  padding-bottom: 20px;
   color: var(--ch-dark);
   font-size: 13px;
   font-weight: 400;
