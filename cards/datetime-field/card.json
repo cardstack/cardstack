@@ -2,6 +2,7 @@
   "data": {
     "type": "cards",
     "attributes": {
+      "csId": "datetime-field",
       "csTitle": "Date-time",
       "csDescription": "Date-time field (e.g. an appointment)",
       "csFeatures": {

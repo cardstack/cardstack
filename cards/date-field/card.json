@@ -2,6 +2,7 @@
   "data": {
     "type": "cards",
     "attributes": {
+      "csId": "date-field",
       "csTitle": "Date",
       "csDescription": "Date field (e.g. date of birth)",
       "csFeatures": {

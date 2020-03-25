@@ -2,6 +2,7 @@
   "data": {
     "type": "cards",
     "attributes": {
+      "csId": "url-field",
       "csTitle": "Link",
       "csDescription": "Link to another website",
       "csFeatures": {

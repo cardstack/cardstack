@@ -1,4 +1,4 @@
-import { wireItUp } from '../main';
+import { wireItUp, indexBuiltInCards, builtInCardsDir } from '../main';
 import { Container } from '../dependency-injection';
 import PgClient from '../pgsearch/pgclient';
 import { emptyDir } from 'fs-extra';
@@ -8,6 +8,8 @@ import { cardDocument } from '../card-document';
 import { myOrigin } from '../origin';
 import { CARDSTACK_PUBLIC_REALM } from '../realm';
 
+const metaRealm = `${myOrigin}/api/realms/meta`;
+
 export interface TestEnv {
   container: Container;
   destroy(): Promise<void>;
@@ -15,8 +17,6 @@ export interface TestEnv {
 
 export async function seedTestRealms(container: Container): Promise<void> {
   let cards = (await container.lookup('cards')).as(Session.INTERNAL_PRIVILEGED);
-  const metaRealm = `${myOrigin}/api/realms/meta`;
-
   await cards.create(
     metaRealm,
     cardDocument()
@@ -25,6 +25,16 @@ export async function seedTestRealms(container: Container): Promise<void> {
         csId: metaRealm,
       })
       .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi
+  );
+  await cards.create(
+    metaRealm,
+    cardDocument()
+      .withAttributes({
+        csRealm: metaRealm,
+        csId: CARDSTACK_PUBLIC_REALM,
+        directory: builtInCardsDir,
+      })
+      .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'files-realm' }).jsonapi
   );
   await cards.create(
     metaRealm,
@@ -51,6 +61,7 @@ export async function createTestEnv(): Promise<TestEnv> {
   process.env.PGDATABASE = `test_db_${Math.floor(100000 * Math.random())}`;
   let container = await wireItUp();
   await seedTestRealms(container);
+  await indexBuiltInCards(container);
   (await container.lookup('queue')).launchJobRunner();
   return { container, destroy };
 }

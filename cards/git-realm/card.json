@@ -2,6 +2,7 @@
   "data": {
     "type": "cards",
     "attributes": {
+      "csId": "git-realm",
       "csFeatures": {
         "writer": "writer.js",
         "indexer": "indexer.js"

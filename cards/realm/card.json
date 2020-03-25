@@ -2,6 +2,7 @@
   "data": {
     "type": "cards",
     "attributes": {
+      "csId": "realm",
       "csTitle": "Realm Card",
       "csDescription": "This represents the concept of a realm. All realm cards adopt from this card."
     },

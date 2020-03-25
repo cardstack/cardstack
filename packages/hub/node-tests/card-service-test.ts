@@ -350,6 +350,40 @@ describe('hub/card-service', function() {
       }
     });
 
+    it('does not allow builtin card to be updated', async function() {
+      try {
+        await service.update(
+          { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'string-field' },
+          {
+            data: {
+              type: 'cards',
+              attributes: {
+                csTitle: 'updated',
+              },
+            },
+          }
+        );
+        throw new Error(`Should not be able to update built-in card`);
+      } catch (e) {
+        expect(e).hasStatus(403);
+        expect(e.detail).to.match(/Cannot update built-in card/);
+      }
+      let card = await service.get({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'string-field' });
+      expect(card.csTitle).to.not.equal('updated');
+    });
+
+    it('does not allow builtin card to be deleted', async function() {
+      try {
+        await service.delete({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'string-field' });
+        throw new Error(`Should not be able to delete built-in card`);
+      } catch (e) {
+        expect(e).hasStatus(403);
+        expect(e.detail).to.match(/Cannot delete built-in card/);
+      }
+      let card = await service.get({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'string-field' });
+      expect(card).is.ok;
+    });
+
     it('does not delete a card that uses ephemeral storage when the specified version is not the latest', async function() {
       let doc = cardDocument();
       let storage = await env.container.lookup('ephemeralStorage');
@@ -1654,6 +1688,18 @@ describe('hub/card-service', function() {
           expect(err.message).to.match(/invalid csFiles contents for file outer\/bad/);
         }
       });
+
+      it('can find built-in cards from the index', async function() {
+        let { cards } = await service.search({
+          filter: {
+            eq: {
+              csRealm: CARDSTACK_PUBLIC_REALM,
+              csId: 'string-field',
+            },
+          },
+        });
+        expect(cards.length).to.equal(1);
+      });
     });
 
     describe('user fields', function() {
@@ -2169,7 +2215,7 @@ describe('hub/card-service', function() {
         ]);
       });
 
-      it('can get all cards in the index by filtering for the base card', async function() {
+      it('can get cards in the index by filtering for the base card', async function() {
         let results = await service.search({
           filter: {
             type: { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' },
@@ -2178,7 +2224,7 @@ describe('hub/card-service', function() {
             size: 1000,
           },
         });
-        expect(results.cards.length).to.equal(29);
+        expect(results.cards.length).to.be.greaterThan(20); // this includes all the built-in cards and realm cards too...
       });
 
       it("filtering by interior card's csAdoptsFrom field", async function() {
