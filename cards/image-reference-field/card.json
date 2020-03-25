@@ -2,6 +2,7 @@
   "data": {
     "type": "cards",
     "attributes": {
+      "csId": "image-reference-field",
       "csTitle": "Image",
       "csDescription": "Use this for hero images"
     },

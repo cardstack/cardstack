@@ -37,6 +37,7 @@
     "esm": "^3.2.25",
     "fast-json-stable-stringify": "^2.1.0",
     "fs-extra": "^8.1.0",
+    "glob": "^7.1.2",
     "http-status-codes": "^1.4.0",
     "json-typescript": "^1.1.2",
     "jsonapi-typescript": "^0.1.3",

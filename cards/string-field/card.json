@@ -2,6 +2,7 @@
   "data": {
     "type": "cards",
     "attributes": {
+      "csId": "string-field",
       "csTitle": "Text",
       "csDescription": "All-purpose text field",
       "csFeatures": {

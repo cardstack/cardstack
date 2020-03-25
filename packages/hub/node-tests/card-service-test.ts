@@ -1654,6 +1654,18 @@ describe('hub/card-service', function() {
           expect(err.message).to.match(/invalid csFiles contents for file outer\/bad/);
         }
       });
+
+      it('can find built-in cards from the index', async function() {
+        let { cards } = await service.search({
+          filter: {
+            eq: {
+              csRealm: CARDSTACK_PUBLIC_REALM,
+              csId: 'string-field',
+            },
+          },
+        });
+        expect(cards.length).to.equal(1);
+      });
     });
 
     describe('user fields', function() {
@@ -2169,7 +2181,7 @@ describe('hub/card-service', function() {
         ]);
       });
 
-      it('can get all cards in the index by filtering for the base card', async function() {
+      it('can get cards in the index by filtering for the base card', async function() {
         let results = await service.search({
           filter: {
             type: { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' },
@@ -2178,7 +2190,7 @@ describe('hub/card-service', function() {
             size: 1000,
           },
         });
-        expect(results.cards.length).to.equal(29);
+        expect(results.cards.length).to.be.greaterThan(20); // this includes all the built-in cards and realm cards too...
       });
 
       it("filtering by interior card's csAdoptsFrom field", async function() {

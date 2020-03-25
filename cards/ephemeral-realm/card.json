@@ -2,6 +2,7 @@
   "data": {
     "type": "cards",
     "attributes": {
+      "csId": "ephemeral-realm",
       "csFeatures": {
         "writer": "writer.js",
         "indexer": "indexer.js"

@@ -125,6 +125,12 @@ export class ScopedCardService implements CardReader, CardInstantiator {
   async get(idOrURL: CardId | string): Promise<AddressableCard> {
     let id = asCardId(idOrURL);
 
+    // We use the files realm to index the built-in cards, however, we still
+    // need to leverage this.getBuiltIn() in order to actually bootstrap the
+    // files realm that will be indexing the built-in cards. We need the
+    // machinery of the files-realm card in order for it to index itself as well
+    // as the base realm that adopts from it, and the the fields that the realm
+    // card is comprised of.
     if (
       id.csRealm === CARDSTACK_PUBLIC_REALM &&
       (!id.csOriginalRealm || id.csOriginalRealm === CARDSTACK_PUBLIC_REALM)
@@ -136,7 +142,6 @@ export class ScopedCardService implements CardReader, CardInstantiator {
     // value yet but we will onc we implement custom searchers and realm grants.
     await this.getRealm(id.csRealm);
 
-    // TODO dont create a scoped card service here
     return await this.cards.pgclient.get(this, id);
   }
 
