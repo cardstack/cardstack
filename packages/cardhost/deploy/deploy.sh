@@ -34,8 +34,6 @@ done
 
 export TARGET_ENV="builder-$target_env"
 
-export INITIAL_DATA_DIR=/srv/hub/cardstack
-
 docker tag cardhost $ECR_ENDPOINT:$docker_image_label
 
 # This needs to be exported because our docker-compose.yml below is interpolating it
@@ -59,4 +57,5 @@ docker run --rm --network cardstack \
           --env AWS_ACCESS_KEY_ID=$EMBER_DEPLOY_AWS_ACCESS_KEY_ID \
           --env HUB_URL \
           --env TARGET_NAME \
-          cardhost ./node_modules/.bin/ember deploy $target_env --verbose
+          --workdir /srv/hub/packages/cardhost \
+          cardhost ../../node_modules/.bin/ember deploy $target_env --verbose

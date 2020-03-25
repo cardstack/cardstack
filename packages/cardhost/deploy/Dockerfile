@@ -16,15 +16,11 @@ RUN apt-get update \
 }'\
 >> /etc/logrotate.conf
 
-# BUILD_ONLY tells nodegit that it must compile itself, as opposed to
-# downloading a prebuilt binary. It's necessary because there is a published
-# binary that _appears_ be compatible with our operating system, but isn't
-# really due to the libssl version.
-RUN BUILD_ONLY=true yarn install \
-  && yarn cache clean
+RUN yarn install && yarn cache clean
 
 COPY code-layer/ ./
-RUN ./node_modules/.bin/tsc
+RUN ./node_modules/.bin/tsc --build ./tsconfig.json
+RUN chmod +x ./packages/hub/bin/cardstack-hub.js
 
 # This service helps you easily access Docker container logs.
 # Log file emitters can be managed in PaperTrail's dashboard.
@@ -43,7 +39,7 @@ destination:\n\
 pid_file: /var/run/remote_syslog.pid'\
 > /etc/log_files.yml
 
-CMD remote_syslog --hostname "${TARGET_ENV:-unknown_env}_$(hostname)" && ./node_modules/@cardstack/hub/bin/cardstack-hub.js 2>&1 | tee -a /srv/hub/logs/node.log
+CMD remote_syslog --hostname "${TARGET_ENV:-unknown_env}_$(hostname)" && ./packages/hub/bin/cardstack-hub.js 2>&1 | tee -a /srv/hub/logs/node.log
 
 # This configuration will cause the container to restart after
 # 30 seconds without a successful response.
