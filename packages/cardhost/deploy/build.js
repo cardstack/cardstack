@@ -41,9 +41,9 @@ copySync(join(root, 'package.json'), join(context, 'dep-layer', 'package.json'))
 copySync(join(cardhost, 'package.json'), join(context, 'dep-layer', 'packages', 'cardhost', 'package.json'));
 copySync(join(root, 'yarn.lock'), join(context, 'dep-layer', 'yarn.lock'));
 copySync(join(root, 'tsconfig.json'), join(context, 'dep-layer', 'tsconfig.json'));
+copySync(join(root, 'types'), join(context, 'dep-layer', 'types'));
 
 // code-layer contains everything else, which is much cheaper to rebuild (no yarn install)
-copySync(join(root, 'types'), join(context, 'code-layer', 'types'));
 codeLayerFiles.forEach(serverFile => {
   glob.sync(join(cardhost, serverFile)).forEach(filename => {
     copySync(filename, join(context, 'code-layer', filename.replace(root, '')));
