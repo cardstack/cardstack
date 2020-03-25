@@ -2,6 +2,7 @@
   "data": {
     "type": "cards",
     "attributes": {
+      "csId": "integer-field",
       "csTitle": "Number",
       "csDescription": "Integer number field",
       "csFeatures": {

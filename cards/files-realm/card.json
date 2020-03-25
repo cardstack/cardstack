@@ -2,6 +2,7 @@
   "data": {
     "type": "cards",
     "attributes": {
+      "csId": "files-realm",
       "csFeatures": {
         "indexer": "indexer.js",
         "writer": "writer.js"

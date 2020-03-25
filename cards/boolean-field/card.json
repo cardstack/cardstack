@@ -2,6 +2,7 @@
   "data": {
     "type": "cards",
     "attributes": {
+      "csId": "boolean-field",
       "csTitle": "Checkbox",
       "csDescription": "True/false (boolean) values",
       "csFeatures": {
