@@ -40,7 +40,7 @@
   },
   "scripts": {
     "clean": "git clean -x -f",
-    "compile": "tsc",
+    "compile": "tsc --build ./tsconfig.json",
     "prepare": "npm run compile",
     "test": "npm run lint:deps && npm run lint:js && npm run node-tests && npm run ember-tests",
     "node-tests": "mocha ./packages/test-support/bin/run.js --timeout 60000",

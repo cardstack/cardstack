@@ -16,10 +16,10 @@ RUN apt-get update \
 }'\
 >> /etc/logrotate.conf
 
-RUN BUILD_ONLY=true yarn install && yarn cache clean
+RUN yarn install && yarn cache clean
 
 COPY code-layer/ ./
-RUN ./node_modules/.bin/tsc
+RUN ./node_modules/.bin/tsc --build ./tsconfig.json
 RUN chmod +x ./packages/hub/bin/cardstack-hub.js
 
 # This service helps you easily access Docker container logs.
