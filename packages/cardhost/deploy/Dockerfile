@@ -19,7 +19,8 @@ RUN apt-get update \
 RUN yarn install && yarn cache clean
 
 COPY code-layer/ ./
-RUN ./node_modules/.bin/tsc --skipLibCheck
+RUN ./node_modules/.bin/tsc --skipLibCheck --build ./tsconfig.json
+RUN chmod +x ./packages/hub/bin/cardstack-hub.js
 
 # This service helps you easily access Docker container logs.
 # Log file emitters can be managed in PaperTrail's dashboard.
