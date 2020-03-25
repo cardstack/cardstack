@@ -1,6 +1,6 @@
 import { Session } from './session';
 import { UnsavedCard, AddressableCard, Card } from './card';
-import { asCardId, CardId } from './card-id';
+import { asCardId, CardId, canonicalURL } from './card-id';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
 import { ResponseMeta } from './document';
 import { CardstackError } from './error';
@@ -78,6 +78,9 @@ export class ScopedCardService implements CardReader, CardInstantiator {
   async update(canonicalURL: string, doc: SingleResourceDoc): Promise<AddressableCard>;
   async update(idOrURL: CardId | string, doc: SingleResourceDoc): Promise<AddressableCard> {
     let id = asCardId(idOrURL);
+    if (id.csRealm === CARDSTACK_PUBLIC_REALM) {
+      throw new CardstackError(`Cannot update built-in card ${canonicalURL(id)}`, { status: 403 });
+    }
     if (!doc.data.attributes) {
       doc.data.attributes = {};
     }
@@ -103,6 +106,9 @@ export class ScopedCardService implements CardReader, CardInstantiator {
   async delete(canonicalURL: string, version?: string | number | undefined): Promise<void>;
   async delete(idOrURL: CardId | string, version?: string | number | undefined): Promise<void> {
     let id = asCardId(idOrURL);
+    if (id.csRealm === CARDSTACK_PUBLIC_REALM) {
+      throw new CardstackError(`Cannot delete built-in card ${canonicalURL(id)}`, { status: 403 });
+    }
     let realmCard = await this.getRealm(id.csRealm);
     let writer = await this.loadWriter(realmCard);
     let card = await this.get(id);
