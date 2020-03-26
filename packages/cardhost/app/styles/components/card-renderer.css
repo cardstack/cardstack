@@ -87,6 +87,11 @@
   border-radius: 10px;
 }
 
+.cards .card-renderer-isolated.view .card-renderer-isolated--card-container {
+  border: none;
+  border-radius: 30px;
+}
+
 
 /* Focus state */
 .card-renderer-isolated:focus {
