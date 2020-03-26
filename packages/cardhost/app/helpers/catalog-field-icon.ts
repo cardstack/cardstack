@@ -1,5 +1,7 @@
 import { helper } from '@ember/component/helper';
 
+// TODO - This should really be part of the Card's API, not a front-end helper
+
 export default helper(function catalogFieldIcon([title]) {
   const iconMap = [
     {
