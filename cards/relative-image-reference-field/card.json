@@ -2,6 +2,7 @@
   "data": {
     "type": "cards",
     "attributes": {
+      "csId": "relative-image-reference-field",
       "csTitle": "Image from relative URL",
       "csDescription": "Use this for hero images that leverage a relative URL (no \"https://\" in the URL)."
     },

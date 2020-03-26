@@ -2,6 +2,7 @@
   "data": {
     "type": "cards",
     "attributes": {
+      "csId": "catalog-entry",
       "csTitle": "Catalog Entry",
       "csDescription": "This in an item in the catalog",
       "csFieldSets": {

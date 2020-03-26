@@ -6,6 +6,7 @@ import { Registry, Container } from './dependency-injection';
 import { homedir } from 'os';
 import { join } from 'path';
 import { mkdirp } from 'fs-extra';
+import glob from 'glob';
 
 import JSONAPIMiddleware from './jsonapi-middleware';
 import CardsService from './cards-service';
@@ -37,6 +38,9 @@ const localDefaultRealmRepo = 'default-realm';
 const localMetaRealmRepo = 'meta-realm';
 const localCardCatalogRepo = 'card-catalog-realm';
 
+// Careful: this assumes that you are running the hub from a mono repo context.
+export const builtInCardsDir = join(__dirname, '..', '..', 'cards');
+
 export async function wireItUp() {
   let registry = new Registry();
   registry.register('authentication-middleware', AuthenticationMiddleware);
@@ -57,6 +61,7 @@ export async function makeServer(container?: Container) {
   }
 
   await setupRealms(container);
+  await indexBuiltInCards(container);
 
   if (process.env.EMBER_ENV !== 'test') {
     await startQueueRunners(container);
@@ -151,6 +156,16 @@ async function setupRealms(container: Container) {
     csDescription: `This card controls the configuration of the meta realm which is the realm that holds all of your realm cards.`,
   });
 
+  let baseRealmDoc = cardDocument()
+    .withAttributes({
+      csRealm: metaRealm,
+      csId: CARDSTACK_PUBLIC_REALM,
+      csTitle: 'Base Realm',
+      csDescription: `This card controls the configuration of the base realm which contains all the built-in cards.`,
+      directory: builtInCardsDir,
+    })
+    .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'files-realm' });
+
   let defaultRealmDoc = cardDocument().withAttributes({
     csRealm: metaRealm,
     csId: `${myOrigin}/api/realms/default`,
@@ -212,6 +227,7 @@ async function setupRealms(container: Container) {
   }
 
   await assertRealmExists(container, metaRealmDoc.jsonapi);
+  await assertRealmExists(container, baseRealmDoc.jsonapi);
   await assertRealmExists(container, defaultRealmDoc.jsonapi);
   await assertRealmExists(container, cardCatalogRealmDoc.jsonapi);
 }
@@ -245,6 +261,49 @@ export async function cors(ctxt: Koa.Context, next: Koa.Next) {
     return;
   }
   await next();
+}
+
+export async function indexBuiltInCards(container: Container) {
+  let indexing = await container.lookup('indexing');
+  await indexing.indexRealm({
+    realmCardId: {
+      csRealm: metaRealm,
+      csId: CARDSTACK_PUBLIC_REALM,
+    },
+  });
+  await waitForBuiltInCardsToIndex(container);
+}
+
+async function waitForBuiltInCardsToIndex(container: Container) {
+  let maxAttempts = 100;
+  let cards = await (await container.lookup('cards')).as(Session.INTERNAL_PRIVILEGED);
+  let ids = glob
+    .sync(`${builtInCardsDir}/*`)
+    .map(cardDir => cardDir.split('/').pop())
+    .filter(Boolean) as string[];
+  let attempts = 0;
+  while (attempts++ < maxAttempts) {
+    let results = await Promise.all(
+      ids.map(csId =>
+        cards.search({
+          filter: {
+            eq: {
+              csRealm: CARDSTACK_PUBLIC_REALM,
+              csId,
+            },
+          },
+        })
+      )
+    );
+
+    let cardCount = results.filter(r => Boolean(r.cards.length)).length;
+    if (cardCount === ids.length) {
+      return;
+    }
+
+    log.debug(`waiting for builtin indexing attempt=${attempts}, found=${cardCount}, goal=${ids.length}`);
+  }
+  throw new Error(`Timeout waiting for builtin cards to be indexed.`);
 }
 
 async function assertRealmExists(container: Container, realmCardDoc: SingleResourceDoc): Promise<void> {

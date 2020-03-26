@@ -2,6 +2,7 @@
   "data": {
     "type": "cards",
     "attributes": {
+      "csId": "base",
       "csTitle": "Base Card",
       "csDescription": "This represents cards of any type",
       "csFeatures": {

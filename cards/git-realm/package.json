@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/git-realm-card",
-  "version": "0.18.16",
+  "version": "0.18.17",
   "description": "Git data source plugin for @cardstack/hub.",
   "repository": "https://github.com/cardstack/cardstack",
   "license": "MIT",
@@ -27,8 +27,8 @@
     "@cardstack/hub": "*"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.18.16",
-    "@cardstack/test-support": "0.18.16",
+    "@cardstack/eslint-config": "0.18.17",
+    "@cardstack/test-support": "0.18.17",
     "sinon": "7.2.3"
   },
   "volta": {

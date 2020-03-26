@@ -76,14 +76,25 @@ async function getCardsOfType(cardType: CardId): Promise<ResourceObject[]> {
   let filter = {
     filter: {
       type: cardType,
-      // skip over realm cards for now, assume those are not being manipuated by
-      // tests (we will want to revisit this later and rework our destroy to be a
-      // filter that skips over ephemeral realm cards like below)
-      not: {
-        eq: {
-          csAdoptsFrom: canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }),
+      every: [
+        {
+          // skip over realm cards for now, assume those are not being manipuated by
+          // tests (we will want to revisit this later and rework our destroy to be a
+          // filter that skips over ephemeral realm cards like below)
+          not: {
+            eq: {
+              csAdoptsFrom: canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }),
+            },
+          },
         },
-      },
+        {
+          not: {
+            eq: {
+              csRealm: CARDSTACK_PUBLIC_REALM,
+            },
+          },
+        },
+      ],
     },
     page: {
       size: 1000,

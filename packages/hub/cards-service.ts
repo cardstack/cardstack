@@ -1,6 +1,6 @@
 import { Session } from './session';
 import { UnsavedCard, AddressableCard, Card } from './card';
-import { asCardId, CardId } from './card-id';
+import { asCardId, CardId, canonicalURL } from './card-id';
 import { CARDSTACK_PUBLIC_REALM } from './realm';
 import { ResponseMeta } from './document';
 import { CardstackError } from './error';
@@ -78,6 +78,9 @@ export class ScopedCardService implements CardReader, CardInstantiator {
   async update(canonicalURL: string, doc: SingleResourceDoc): Promise<AddressableCard>;
   async update(idOrURL: CardId | string, doc: SingleResourceDoc): Promise<AddressableCard> {
     let id = asCardId(idOrURL);
+    if (id.csRealm === CARDSTACK_PUBLIC_REALM) {
+      throw new CardstackError(`Cannot update built-in card ${canonicalURL(id)}`, { status: 403 });
+    }
     if (!doc.data.attributes) {
       doc.data.attributes = {};
     }
@@ -103,6 +106,9 @@ export class ScopedCardService implements CardReader, CardInstantiator {
   async delete(canonicalURL: string, version?: string | number | undefined): Promise<void>;
   async delete(idOrURL: CardId | string, version?: string | number | undefined): Promise<void> {
     let id = asCardId(idOrURL);
+    if (id.csRealm === CARDSTACK_PUBLIC_REALM) {
+      throw new CardstackError(`Cannot delete built-in card ${canonicalURL(id)}`, { status: 403 });
+    }
     let realmCard = await this.getRealm(id.csRealm);
     let writer = await this.loadWriter(realmCard);
     let card = await this.get(id);
@@ -125,6 +131,12 @@ export class ScopedCardService implements CardReader, CardInstantiator {
   async get(idOrURL: CardId | string): Promise<AddressableCard> {
     let id = asCardId(idOrURL);
 
+    // We use the files realm to index the built-in cards, however, we still
+    // need to leverage this.getBuiltIn() in order to actually bootstrap the
+    // files realm that will be indexing the built-in cards. We need the
+    // machinery of the files-realm card in order for it to index itself as well
+    // as the base realm that adopts from it, and the the fields that the realm
+    // card is comprised of.
     if (
       id.csRealm === CARDSTACK_PUBLIC_REALM &&
       (!id.csOriginalRealm || id.csOriginalRealm === CARDSTACK_PUBLIC_REALM)
@@ -136,7 +148,6 @@ export class ScopedCardService implements CardReader, CardInstantiator {
     // value yet but we will onc we implement custom searchers and realm grants.
     await this.getRealm(id.csRealm);
 
-    // TODO dont create a scoped card service here
     return await this.cards.pgclient.get(this, id);
   }
 
