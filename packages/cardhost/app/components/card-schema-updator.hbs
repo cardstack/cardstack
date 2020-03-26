@@ -1,6 +1,7 @@
 {{#animated-if this.load.isIdle initialInsertion=true finalRemoval=true use=this.catalogTransition duration=this.duration}}
   <section class="ch-catalog" data-test-catalog-loaded={{stringify this.load.isIdle}}>
     <header class="ch-catalog--header">
+      {{svg-jar "card-catalog" width="20px" height="19px" class="ch-catalog--header-svg" aria-hidden=true}}
       <h3 class="ch-catalog--title">Card Catalog</h3>
     </header>
     <div class="ch-catalog--content">
