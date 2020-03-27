@@ -51,7 +51,7 @@
           data-test-field-renderer-type
         >
           <div class="schema-field-renderer--header--icon">
-            {{svg-jar (catalog-field-icon this.fieldType)}}
+            {{svg-jar (catalog-field-icon this.fieldType) width="15px" height="15px"}}
             {{!-- TODO need to add card icon to the API and render here --}}
           </div>
           <span>{{if this.stubFieldName this.stubFieldName this.fieldName}} ({{this.fieldType}})</span>

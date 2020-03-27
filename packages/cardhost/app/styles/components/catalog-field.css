@@ -30,9 +30,12 @@
 }
 
 .ch-catalog-field--icon {
-  width: 100%;
-  margin: 0 auto;
-  max-width: 16px;
+  margin: auto;
+  max-height: 20px;
+}
+
+.ch-catalog-field--icon > svg {
+  display: block;
 }
 
 .ch-catalog-field--title,

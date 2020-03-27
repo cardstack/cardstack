@@ -48,8 +48,11 @@ header.schema-field-renderer--header.string {
 }
 
 .schema-field-renderer--header--icon {
-  width: 25px;
-  padding-right: 10px;
+  margin-right: 12px;
+}
+
+.schema-field-renderer--header--icon > svg {
+  display: block;
 }
 
 .schema-field-renderer--header--detail {
