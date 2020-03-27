@@ -7,6 +7,7 @@
   margin: 0 auto;
   padding: 0 var(--ch-spacing);
   width: var(--card-renderer-width);
+  min-width: 415px;
   max-width: 100%;
   font: 400 16px/22px var(--ch-font-family);
   letter-spacing: 0.015em;
