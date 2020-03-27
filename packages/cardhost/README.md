@@ -23,15 +23,32 @@ You will need the following things properly installed on your computer.
 ## Running / Development
 
 * `yarn start-prereqs`
-* `INDEX_INTERVAL=120 yarn start-hub`
+* `yarn start-hub`
 * In a new tab, `yarn start-ember`
+* Alternately, start both the back and front end with `yarn start`
 
 
 * Visit your app at [http://localhost:4200](http://localhost:4200).
 * Visit your tests at [http://localhost:4200/tests](http://localhost:4200/tests).
 
-`INDEX_INTERVAL` determines how often the hub should reindex data, in minutes.
-It is recommended to set this number high for local development.
+### Common server configuration
+
+#### `DEV_DIR`
+
+If you would like your cards to be saved to a git repository on your hard drive, specify the path to an existing, separate git repository when you start the servers.
+
+```sh
+yarn stop-prereqs # clear realms and ephemeral cards
+DEV_DIR=path/to/your/git/repo yarn start
+```
+
+#### `HUB_URL`
+
+Use a back end other than the default of `localhost:300`:
+
+```sh
+HUB_URL=http://localhost:8080 npx ember serve
+```
 
 ### Code Generators
 
@@ -40,8 +57,14 @@ Make use of the many generators for code, try `ember help generate` for more det
 ### Running Tests
 
 * `yarn start-prereqs`
+* `yarn test` to run all tests, including linters
 * `ember test`
-* `ember test --server`
+* `ember test --server` to run tests continuously
+* `ember test --filter "some-test-name"` to run specific tests
+
+### Writing tests
+
+See CONTRIBUTING.md
 
 ### Linting
 
