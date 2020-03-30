@@ -60,6 +60,10 @@ From the root of the repository:
 
 Deploying is done from `master` automatically via CI/CD.
 
+If `RECENT_ONLY` is set to true for a target env, such as `production_RECENT_ONLY`,
+the Library will only show cards whose IDs are in local storage, as oppopsed to all cards
+created. This can be useful for demos.
+
 ## Further Reading / Useful Links
 
 * [ember.js](https://emberjs.com/)
