@@ -106,7 +106,7 @@ if (!window.localStorage) {
   );
 }
 
-export default class cardLocalStorageService extends Service {
+export default class CardLocalStorageService extends Service {
   /**
    * Returns an array of card ids from the local browser storage
    */
