@@ -6,7 +6,7 @@ export default helper(function catalogFieldIcon([title]) {
   const iconMap = [
     {
       title: 'Text',
-      icon: 'text-field',
+      icon: 'string-field-icon',
     },
     {
       title: 'Checkbox',
