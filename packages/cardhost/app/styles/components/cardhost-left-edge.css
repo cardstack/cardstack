@@ -63,30 +63,36 @@
   vertical-align: middle;
 }
 
-.cardhost-left-edge--nav-button:not(:disabled):hover {
-  background-color: var(--ch-hover);
-  border-color: var(--ch-border);
+.cardhost-left-edge--nav-button.cardstack-logo-button {
+  padding: 0;
+}
+
+.cardhost-left-edge--nav-button:hover {
   cursor: pointer;
 }
-.cardhost-left-edge--nav-button:not(:disabled):focus {
+
+.cardhost-left-edge--nav-button.icon-button:hover,
+.cardhost-left-edge--nav-button.icon-button:focus {
   outline: 0;
   background-color: var(--ch-hover);
   border-color: var(--ch-border);
 }
 
-.cardhost-left-edge--nav-button.selected {
+.cardhost-left-edge--nav-button.icon-button.selected,
+.cardhost-left-edge--nav-button.catalog-button.selected {
   --icon-color: var(--ch-dark);
   background-color: var(--ch-highlight);
   border-color: var(--ch-border);
 }
 
-.cardhost-left-edge--nav-button.selected:hover,
-.cardhost-left-edge--nav-button.selected:focus {
+.cardhost-left-edge--nav-button.icon-button.selected:hover,
+.cardhost-left-edge--nav-button.icon-button.selected:focus {
   background-color: var(--ch-highlight-hover);
 }
 
 .cardhost-left-edge--nav-button:disabled {
   --icon-color: var(--ch-light-op50);
+  cursor: initial;
 }
 
 .cardhost-left-edge--nav.expanded {

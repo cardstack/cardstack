@@ -1,10 +1,6 @@
 /* Edit Mode */
-.card-renderer-isolated.edit .field {
-  width: 100%;
-  max-width: var(--ch-field-width);
-  margin: 0 auto;
-  padding-bottom: 12px;
-  background-image: unset;
+.card-renderer-isolated.edit .field + .field {
+  margin-top: 20px;
 }
 
 

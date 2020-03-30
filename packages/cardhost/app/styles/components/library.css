@@ -235,6 +235,7 @@
     display: block;
     padding-top: 80px;
     padding-left: var(--ch-spacing);
+    overflow-y: auto;
   }
 
   .library--nav {

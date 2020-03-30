@@ -35,6 +35,7 @@
   grid-area: main;
   padding: 0 50px 150px;
   overflow: auto;
+  scroll-behavior: smooth;
 }
 
 .ui-components--nav > ul {
@@ -192,4 +193,10 @@
 /* Catalog section */
 .ui-components--catalog > .ch-catalog {
   position: static;
+}
+
+
+/* Form fields */
+.ui-components .form-fields h3 {
+  scroll-margin-top: 1em;
 }

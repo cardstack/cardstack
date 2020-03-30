@@ -7,6 +7,7 @@
   margin: 0 auto;
   padding: 0 var(--ch-spacing);
   width: var(--card-renderer-width);
+  min-width: 415px;
   max-width: 100%;
   font: 400 16px/22px var(--ch-font-family);
   letter-spacing: 0.015em;
@@ -16,21 +17,6 @@
 .card-renderer-isolated.schema,
 .card-renderer-isolated.edit {
   min-height: var(--card-renderer-height);
-}
-
-.card-renderer-isolated.schema .card-boundary {
-  background-color: var(--ch-dark-background);
-}
-
-/* Resetting styles so that view mode styling does not affect other modes */
-.card-renderer-isolated.schema .isolated-card,
-.card-renderer-isolated.edit .isolated-card,
-.card-renderer-isolated.edit .field.field {
-  all: unset;
-}
-
-.card-renderer-isolated.schema .field.field {
-  position: static;
 }
 
 
@@ -90,7 +76,6 @@
 .card-renderer-isolated.schema .card-renderer-isolated--card-container {
   background-color: var(--ch-dark-background);
   border-top: 3px solid var(--ch-default);
-  padding-top: 10px;
 }
 
 .card-renderer-isolated.edit .card-renderer-isolated--card-container {
@@ -101,6 +86,11 @@
 .card-renderer-isolated.view.preview .card-renderer-isolated--card-container {
   border: none;
   border-radius: 10px;
+}
+
+.cards .card-renderer-isolated.view .card-renderer-isolated--card-container {
+  border: none;
+  border-radius: 30px;
 }
 
 

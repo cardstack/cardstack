@@ -56,6 +56,10 @@
   border-color: var(--ch-default);
 }
 
+.card-renderer--header-btns {
+  padding-left: 10px;
+}
+
 .card-renderer-isolated--header .card-renderer--header-link {
   padding: 5px 20px;
   border: 1px solid var(--ch-light-op40);

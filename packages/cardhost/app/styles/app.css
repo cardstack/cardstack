@@ -180,3 +180,8 @@ a:hover {
   -webkit-text-fill-color: var(--cs-dark-field-disabled-text); /* For strangeness in safari */
   -webkit-text-stroke-color: var(--cs-dark-field-disabled-text);
 }
+.cs-input-group--helper-text {
+  height: auto;
+  padding-top: 5px;
+  padding-left: 10px;
+}

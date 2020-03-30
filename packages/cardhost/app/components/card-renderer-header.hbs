@@ -5,7 +5,7 @@
   <header class="card-renderer-isolated--header">
     <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.csTitle "Blank Card"}}</span>
     {{#if this.cardstackSession.isAuthenticated}}
-      <div>
+      <div class="card-renderer--header-btns">
         <LinkTo
           @route={{@buttonRoute}}
           @model={{@card.canonicalURL}}
