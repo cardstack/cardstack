@@ -42,7 +42,7 @@ export default helper(function catalogFieldIcon([title]) {
     },
     {
       title: 'Base Card',
-      icon: 'link-field-icon',
+      icon: 'has-many-field-icon',
     },
   ];
 
