@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/hub",
-  "version": "0.14.38",
+  "version": "0.14.38-patch.0",
   "bin": {
     "cardstack-hub": "./bin/cardstack-hub.js",
     "cardstack-generate-key": "./bin/generate-key.js",
@@ -18,16 +18,16 @@
   "description": "Stock API server for the Cardstack tech stack.",
   "dependencies": {
     "@babel/plugin-transform-modules-amd": "^7.2.0",
-    "@cardstack/base-card": "0.14.38",
-    "@cardstack/codegen": "0.14.38",
-    "@cardstack/core-types": "0.14.38",
-    "@cardstack/di": "0.14.38",
-    "@cardstack/handlebars": "0.14.38",
+    "@cardstack/base-card": "0.14.38-patch.0",
+    "@cardstack/codegen": "0.14.38-patch.0",
+    "@cardstack/core-types": "0.14.38-patch.0",
+    "@cardstack/di": "0.14.38-patch.0",
+    "@cardstack/handlebars": "0.14.38-patch.0",
     "@cardstack/logger": "^0.2.0",
-    "@cardstack/pgsearch": "0.14.38",
-    "@cardstack/plugin-utils": "0.14.38",
-    "@cardstack/queue": "0.14.38",
-    "@cardstack/routing": "0.14.38",
+    "@cardstack/pgsearch": "0.14.38-patch.0",
+    "@cardstack/plugin-utils": "0.14.38-patch.0",
+    "@cardstack/queue": "0.14.38-patch.0",
+    "@cardstack/routing": "0.14.38-patch.0",
     "@types/fs-extra": "^5.0.5",
     "broccoli-concat": "^3.2.2",
     "broccoli-funnel": "^2.0.1",
@@ -56,8 +56,8 @@
     "tar-stream": "^1.5.4"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.14.38",
-    "@cardstack/test-support": "0.14.38",
+    "@cardstack/eslint-config": "0.14.38-patch.0",
+    "@cardstack/test-support": "0.14.38-patch.0",
     "koa-better-route": "^0.1.0",
     "supertest": "^2.0.1"
   },

@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/github-auth",
-  "version": "0.14.38",
+  "version": "0.14.38-patch.0",
   "description": "GitHub authentication plugin for Cardstack",
   "keywords": [
     "ember-addon",
@@ -26,9 +26,9 @@
     "test:all": "ember try:each"
   },
   "dependencies": {
-    "@cardstack/di": "0.14.38",
+    "@cardstack/di": "0.14.38-patch.0",
     "@cardstack/logger": "^0.2.0",
-    "@cardstack/plugin-utils": "0.14.38",
+    "@cardstack/plugin-utils": "0.14.38-patch.0",
     "ember-cli-babel": "^7.1.2",
     "ember-cli-htmlbars": "^3.0.0",
     "ember-concurrency": "^0.10.0",
@@ -37,11 +37,11 @@
     "torii": "https://github.com/ef4/torii#925ea3149cc9e35b77e39450cd634c65200768ce"
   },
   "devDependencies": {
-    "@cardstack/authentication": "0.14.38",
-    "@cardstack/eslint-config": "0.14.38",
-    "@cardstack/jsonapi": "0.14.38",
-    "@cardstack/models": "0.14.38",
-    "@cardstack/test-support": "0.14.38",
+    "@cardstack/authentication": "0.14.38-patch.0",
+    "@cardstack/eslint-config": "0.14.38-patch.0",
+    "@cardstack/jsonapi": "0.14.38-patch.0",
+    "@cardstack/models": "0.14.38-patch.0",
+    "@cardstack/test-support": "0.14.38-patch.0",
     "@ember/jquery": "^0.6.0",
     "@ember/optional-features": "^0.6.3",
     "broccoli-asset-rev": "^2.7.0",

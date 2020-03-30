@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/ethereum",
-  "version": "0.14.38",
+  "version": "0.14.38-patch.0",
   "description": "ethereum plugin for Cardstack",
   "keywords": [
     "ember-addon",
@@ -23,12 +23,12 @@
     "private-blockchain": "../../node_modules/.bin/truffle develop"
   },
   "dependencies": {
-    "@cardstack/di": "0.14.38",
-    "@cardstack/hub": "0.14.38",
+    "@cardstack/di": "0.14.38-patch.0",
+    "@cardstack/hub": "0.14.38-patch.0",
     "@cardstack/logger": "^0.2.0",
-    "@cardstack/pgsearch": "0.14.38",
-    "@cardstack/plugin-utils": "0.14.38",
-    "@cardstack/queue": "0.14.38",
+    "@cardstack/pgsearch": "0.14.38-patch.0",
+    "@cardstack/plugin-utils": "0.14.38-patch.0",
+    "@cardstack/queue": "0.14.38-patch.0",
     "command-line-args": "^5.0.2",
     "command-line-usage": "^5.0.5",
     "ember-source": "~2.18.2",
@@ -42,10 +42,10 @@
     "web3": "^1.0.0-beta.37"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.14.38",
-    "@cardstack/jsonapi": "0.14.38",
-    "@cardstack/models": "0.14.38",
-    "@cardstack/test-support": "0.14.38",
+    "@cardstack/eslint-config": "0.14.38-patch.0",
+    "@cardstack/jsonapi": "0.14.38-patch.0",
+    "@cardstack/models": "0.14.38-patch.0",
+    "@cardstack/test-support": "0.14.38-patch.0",
     "loader.js": "^4.2.3",
     "truffle": "git+https://github.com/habdelra/truffle#0858c52378101247b173a434eb672694557c0ee3"
   },
