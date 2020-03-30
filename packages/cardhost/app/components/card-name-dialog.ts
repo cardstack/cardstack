@@ -54,8 +54,15 @@ export default class CardNameDialog extends Component<{
   }
 
   @task(function*(this: CardNameDialog) {
+    let csCreatedBy = '';
+    if (recentOnly) {
+      // If the app is configured to only show recent cards in the library, save the new id to local storage
+      csCreatedBy = this.cardLocalStorage.getDevice();
+    }
+
     let doc = cardDocument().withAttributes({
       csTitle: this.name,
+      csCreatedBy,
     });
     if (this.args.adoptsFrom) {
       doc.adoptingFrom(this.args.adoptsFrom);
@@ -69,11 +76,6 @@ export default class CardNameDialog extends Component<{
 
     let unsavedCard = yield this.data.create(getUserRealm(), doc.jsonapi);
     let card = yield this.data.save(unsavedCard);
-
-    if (recentOnly) {
-      // If the app is configured to only show recent cards in the library, save the new id to local storage
-      this.cardLocalStorage.addRecentCardId(card.csId);
-    }
 
     if (this.args.adoptsFrom) {
       this.router.transitionTo('cards.card.edit.fields', { card });

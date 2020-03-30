@@ -107,8 +107,8 @@ if (!window.localStorage) {
 }
 
 export default class CardLocalStorageService extends Service {
-  getCreatedBy() {
-    let tempId = localStorage.getItem('CreatedBy');
+  getDevice() {
+    let tempId = localStorage.getItem('Device');
     if (tempId === null) {
       return '';
     } else {
@@ -116,24 +116,24 @@ export default class CardLocalStorageService extends Service {
     }
   }
 
-  setCreatedBy() {
+  setDevice() {
     // Per documentation, you should catch errors because private
     // browsers disallow setting items and will throw exceptions
-    let id = this.getCreatedBy() ? this.getCreatedBy : this.generateTempSemiRandomId();
+
+    // if there isn't already an id in local storage, generate it
+    let id = this.getDevice() ? this.getDevice() : this.generateTempSemiRandomId();
     try {
-      localStorage.setItem('CreatedBy', JSON.stringify(id));
+      localStorage.setItem('Device', JSON.stringify(id));
     } catch (err) {
       throw err;
     }
   }
 
-  clearId() {
-    localStorage.removeItem('CreatedBy');
+  clearDevice() {
+    localStorage.removeItem('Device');
   }
 
   generateTempSemiRandomId() {
-    return Math.random()
-      .toString(36)
-      .substring(10);
+    return btoa(Math.random()).slice(0, -5);
   }
 }
