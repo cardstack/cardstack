@@ -1,10 +1,10 @@
-<dialog class="dialog {{@mode}}" tabindex="0" data-test-dialog-box ...attributes>
+<dialog class="dialog {{@mode}} {{@class}}" data-test-dialog-box ...attributes>
   {{#if @title}}
-    <h1 class="dialog--title">
+    <h1 class="dialog--title" data-test-dialog-title>
       {{svg-jar @icon width="20px" height="20px"}} {{@title}}
     </h1>
   {{/if}}
-  <div class="dialog--content">
+  <div class="dialog--content" data-test-dialog-content>
     {{yield}}
   </div>
 </dialog>

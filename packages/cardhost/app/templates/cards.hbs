@@ -33,3 +33,15 @@
 {{#if this.library.visible}}
   {{in-bottom-toolbar show=(component "library")}}
 {{/if}}
+
+{{#if this.showDialog}}
+  {{to-elsewhere
+    named="cardhost-modal"
+    send=(component
+            "user-info-modal"
+            mode="dark"
+            closeDialog=this.closeDialog
+          )
+    outsideParams=(hash outsideClick=this.closeDialog)
+  }}
+{{/if}}

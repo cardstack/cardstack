@@ -68,9 +68,9 @@ module.exports = function(environment) {
     };
   }
 
-  // if (environment === 'production') {
-
-  // }
+  if (environment === 'production') {
+    ENV.displayUserDialog = true;
+  }
 
   return ENV;
 };
