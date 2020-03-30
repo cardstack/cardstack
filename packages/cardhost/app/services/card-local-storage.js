@@ -107,50 +107,33 @@ if (!window.localStorage) {
 }
 
 export default class CardLocalStorageService extends Service {
-  /**
-   * Returns an array of card ids from the local browser storage
-   */
-  getRecentCardIds() {
-    let cardIds = localStorage.getItem('recentCardIds');
-    if (cardIds === null) {
-      return [];
+  getCreatedBy() {
+    let tempId = localStorage.getItem('CreatedBy');
+    if (tempId === null) {
+      return '';
     } else {
-      return JSON.parse(cardIds);
+      return JSON.parse(tempId);
     }
   }
 
-  /**
-   * Accepts the card id as a string, i.e. "local-hub::my-card-id"
-   * This method should only be called by the data service.
-   * localStorage only supports strings, so we have to use stringify
-   * before saving, and parse before using it in JavaScript code.
-   */
-  addRecentCardId(id) {
-    let cardIds = this.getRecentCardIds();
-    if (cardIds.indexOf(id) === -1) {
-      // prevent duplicates
-      cardIds.push(id);
-      // Per documentation, you should catch errors because private
-      // browsers disallow setting items and will throw exceptions
-      try {
-        localStorage.setItem('recentCardIds', JSON.stringify(cardIds));
-      } catch (err) {
-        throw err;
-      }
+  setCreatedBy() {
+    // Per documentation, you should catch errors because private
+    // browsers disallow setting items and will throw exceptions
+    let id = this.getCreatedBy() ? this.getCreatedBy : this.generateTempSemiRandomId();
+    try {
+      localStorage.setItem('CreatedBy', JSON.stringify(id));
+    } catch (err) {
+      throw err;
     }
   }
 
-  /**
-   * Accepts the card id as a string, i.e. "local-hub::my-card-id".
-   * Removes an id from the local storage array.
-   */
-  removeRecentCardId(id) {
-    let cardIds = this.getRecentCardIds();
-    cardIds = cardIds.filter(item => item !== id);
-    localStorage.setItem('recentCardIds', JSON.stringify(cardIds));
+  clearId() {
+    localStorage.removeItem('CreatedBy');
   }
 
-  clearIds() {
-    localStorage.removeItem('recentCardIds');
+  generateTempSemiRandomId() {
+    return Math.random()
+      .toString(36)
+      .substring(10);
   }
 }
