@@ -10,6 +10,10 @@ import { getUserRealm } from '../utils/scaffolding';
 import { AddressableCard } from '@cardstack/hub';
 import DataService from '../services/data';
 import OverlaysService from '../services/overlays';
+//@ts-ignore
+import ENV from '@cardstack/cardhost/config/environment';
+
+const { recentOnly } = ENV;
 
 export default class CardNameDialog extends Component<{
   title: string;
@@ -21,6 +25,7 @@ export default class CardNameDialog extends Component<{
   @service router!: RouterService;
   @service data!: DataService;
   @service overlays!: OverlaysService;
+  @service cardLocalStorage: any;
 
   @tracked name?: string;
 
@@ -64,6 +69,11 @@ export default class CardNameDialog extends Component<{
 
     let unsavedCard = yield this.data.create(getUserRealm(), doc.jsonapi);
     let card = yield this.data.save(unsavedCard);
+
+    if (recentOnly) {
+      // If the app is configured to only show recent cards in the library, save the new id to local storage
+      this.cardLocalStorage.addRecentCardId(card.csId);
+    }
 
     if (this.args.adoptsFrom) {
       this.router.transitionTo('cards.card.edit.fields', { card });
