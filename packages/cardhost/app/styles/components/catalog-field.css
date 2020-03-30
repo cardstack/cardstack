@@ -1,6 +1,7 @@
 .ch-catalog-field {
   width: 290px;
-  height: 80px;
+  max-width: 100%;
+  min-height: 80px;
   display: grid;
   grid-template-columns: 80px 1fr;
   align-items: center;
@@ -32,16 +33,14 @@
 .ch-catalog-field--icon {
   width: 100%;
   height: 100%;
+  padding: 10px;
   background-position: center;
   background-repeat: no-repeat;
   background-size: 20px 20px;
 }
 
-.ch-catalog-field--title,
-.ch-catalog-field--description {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.ch-catalog-field--info {
+  padding: 10px 10px 10px 0;
 }
 
 .ch-catalog-field--title {
