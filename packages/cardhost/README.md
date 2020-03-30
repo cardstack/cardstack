@@ -1,6 +1,7 @@
 # cardhost
 
-The cardhost is an application container that hosts cards. The cardhost is deployed as a stand-alone ember application outside of the mono repo. Because the cardhost is deployed as an isolated module outside of the mono repo, ***if any of its mono repo peer modules change, you'll need to rev the mono repo in order for the deployed cardhost to pick up the changes.***
+The cardhost, aka Card Builder, is an application container that hosts cards. The cardhost is deployed as a stand-alone ember application outside of the mono repo.
+It works together with the Hub.
 
 ## Prerequisites
 
@@ -27,32 +28,31 @@ You will need the following things properly installed on your computer.
 * In a new tab, `yarn start-ember`
 * Alternately, start both the back and front end with `yarn start`
 
-
 * Visit your app at [http://localhost:4200](http://localhost:4200).
 * Visit your tests at [http://localhost:4200/tests](http://localhost:4200/tests).
+
+The cardhost app can only function if it is run together with the back end.
+Both local development and the test suite rely on having access to the full stack.
 
 ### Common server configuration
 
 #### `DEV_DIR`
 
 If you would like your cards to be saved to a git repository on your hard drive, specify the path to an existing, separate git repository when you start the servers.
+Add `cards` to the end of the  path, since that's where cards will be saved.
 
 ```sh
 yarn stop-prereqs # clear realms and ephemeral cards
-DEV_DIR=path/to/your/git/repo yarn start
+DEV_DIR="path/to/your/git/repo/cards" yarn start
 ```
 
 #### `HUB_URL`
 
-Use a back end other than the default of `localhost:300`:
+Use a back end other than the default of `localhost:3000`:
 
 ```sh
 HUB_URL=http://localhost:8080 npx ember serve
 ```
-
-### Code Generators
-
-Make use of the many generators for code, try `ember help generate` for more details
 
 ### Running Tests
 
@@ -81,7 +81,7 @@ From the root of the repository:
 
 ### Deploying
 
-Deploying is done from `master` automatically via CI/CD.
+Deploying is done from `master` automatically via CI/CD with GitHub Actions.
 
 ## Further Reading / Useful Links
 
