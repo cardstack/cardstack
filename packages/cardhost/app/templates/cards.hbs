@@ -34,7 +34,7 @@
   {{in-bottom-toolbar show=(component "library")}}
 {{/if}}
 
-{{#if this.showDialog}}
+{{#if (not (or this.hideDialog this.confirmed))}}
   {{to-elsewhere
     named="cardhost-modal"
     send=(component

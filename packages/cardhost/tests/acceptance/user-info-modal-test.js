@@ -38,9 +38,9 @@ module('Acceptance | user info modal', function(hooks) {
   hooks.beforeEach(async function(assert) {
     await login();
     let controller = this.owner.lookup('controller:cards');
-    assert.equal(controller.showDialog, false, 'dialog is not displayed');
-    controller.set('showDialog', true);
-    assert.equal(controller.showDialog, true, 'dialog is displayed');
+    assert.equal(controller.hideDialog, true, 'dialog is not displayed');
+    controller.set('hideDialog', true);
+    assert.equal(controller.hideDialog, false, 'dialog is displayed');
   });
   hooks.afterEach(async function() {
     await waitForTestsToEnd();

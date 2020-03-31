@@ -10,19 +10,21 @@ import RouteInfoService from '../services/route-info';
 import DraggableService from '../services/draggable';
 import LibraryService from '../services/library';
 
-const { animationSpeed, displayUserDialog } = ENV;
+const { animationSpeed, hideDialog } = ENV;
 const duration = animationSpeed || 500;
 
 export default class CardsController extends Controller {
+  queryParams = ['confirmed'];
+  @tracked confirmed = false;
+
   @service cssModeToggle!: CssModeToggleService;
   @service cardstackSession!: CardstackSessionService;
   @service routeInfo!: RouteInfoService;
   @service draggable!: DraggableService;
   @service library!: LibraryService;
 
-  @tracked showDialog = displayUserDialog || false;
-
   duration = duration;
+  hideDialog = hideDialog;
 
   get currentCard() {
     let card;
@@ -65,6 +67,6 @@ export default class CardsController extends Controller {
 
   @action
   closeDialog() {
-    this.showDialog = false;
+    this.confirmed = true;
   }
 }

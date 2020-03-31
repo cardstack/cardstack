@@ -40,6 +40,8 @@ module.exports = function(environment) {
     // ENV.APP.LOG_TRANSITIONS = true;
     // ENV.APP.LOG_TRANSITIONS_INTERNAL = true;
     // ENV.APP.LOG_VIEW_LOOKUPS = true;
+
+    ENV.hideDialog = true;
   }
 
   if (environment === 'test') {
@@ -52,6 +54,8 @@ module.exports = function(environment) {
 
     ENV.APP.rootElement = '#ember-testing';
     ENV.APP.autoboot = false;
+
+    ENV.hideDialog = true;
 
     ENV.animationSpeed = 20;
     ENV.autosaveDebounce = 10;
@@ -68,9 +72,9 @@ module.exports = function(environment) {
     };
   }
 
-  if (environment === 'production') {
-    ENV.displayUserDialog = true;
-  }
+  // if (environment === 'production') {
+
+  // }
 
   return ENV;
 };
