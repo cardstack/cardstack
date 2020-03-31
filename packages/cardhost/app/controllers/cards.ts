@@ -24,7 +24,7 @@ export default class CardsController extends Controller {
   @service library!: LibraryService;
 
   duration = duration;
-  hideDialog = hideDialog;
+  hideDialog = hideDialog || false;
 
   get currentCard() {
     let card;
