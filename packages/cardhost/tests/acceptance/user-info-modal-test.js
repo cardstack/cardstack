@@ -32,6 +32,9 @@ const entry = cardDocument()
 const cardPath = encodeURIComponent(testCard.canonicalURL);
 const scenario = new Fixtures({
   create: [testCard, entry],
+  destroy: {
+    cardTypes: [{ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }],
+  },
 });
 
 module('Acceptance | user info modal', function(hooks) {
@@ -79,11 +82,15 @@ module('Acceptance | user info modal', function(hooks) {
     await visit(`/cards/${cardPath}/edit/preview`);
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/preview`);
     assert.dom('[data-test-user-info-modal]').exists('modal exists in preview mode');
+  });
 
+  test('it appears on /add route', async function(assert) {
     await visit(`/cards/add`);
     assert.equal(currentURL(), `/cards/add`);
     assert.dom('[data-test-user-info-modal]').exists('modal exists in /add route');
+  });
 
+  test('it appears on /adopt route', async function(assert) {
     await visit(`/cards/${cardPath}/adopt`);
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/adopt`);
     assert.dom('[data-test-user-info-modal]').exists('modal exists in /adopt route');
@@ -115,6 +122,7 @@ module('Acceptance | user info modal', function(hooks) {
 
     await waitForSchemaViewToLoad();
     await click(`[data-test-mode-indicator-link="edit"]`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/fields?confirmed=true`);
     await click(`[data-test-view-selector="layout"]`);
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/layout?confirmed=true`);
     assert.dom('[data-test-user-info-modal]').doesNotExist('modal is hidden in layout mode');
