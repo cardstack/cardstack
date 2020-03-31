@@ -10,8 +10,8 @@ module('Integration | Helper | catalog-field-icon', function(hooks) {
   test('it renders', async function(assert) {
     this.set('inputValue', 'Text');
 
-    await render(hbs`{{catalog-field-icon inputValue}}`);
+    await render(hbs`{{catalog-field-icon this.inputValue}}`);
 
-    assert.equal(this.element.textContent.trim(), 'text-field');
+    assert.equal(this.element.textContent.trim(), 'string-field-icon');
   });
 });

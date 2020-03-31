@@ -52,5 +52,7 @@ export default helper(function catalogFieldIcon([title]) {
 
   if (matched) {
     return matched.icon;
+  } else {
+    return 'string-field-icon';
   }
 });
