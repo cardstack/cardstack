@@ -15,7 +15,7 @@ const duration = animationSpeed || 500;
 
 export default class CardsController extends Controller {
   queryParams = ['confirmed'];
-  @tracked confirmed = false;
+  @tracked confirmed: boolean | undefined;
 
   @service cssModeToggle!: CssModeToggleService;
   @service cardstackSession!: CardstackSessionService;
