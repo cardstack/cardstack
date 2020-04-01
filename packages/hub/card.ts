@@ -586,6 +586,9 @@ export class Card {
     if (this.csCreated) {
       data.attributes.csCreated = this.csCreated.toISOString();
     }
+    if (this.csCreatedBy) {
+      data.attributes.csCreatedBy = this.csCreatedBy;
+    }
     if (this.csUpdated) {
       data.attributes.csUpdated = this.csUpdated.toISOString();
     }
@@ -770,6 +773,9 @@ export class Card {
     }
     if (this.csCreated) {
       doc.csCreated = this.csCreated.toISOString();
+    }
+    if (typeof this.csCreatedBy === 'string') {
+      doc.csCreatedBy = this.csCreatedBy;
     }
     if (this.csUpdated) {
       doc.csUpdated = this.csUpdated.toISOString();

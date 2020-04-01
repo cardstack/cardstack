@@ -26,6 +26,7 @@ export class CardDocument {
   csId?: string;
   csOriginalRealm?: string;
   csRealm?: string;
+  csCreatedBy?: string;
 
   private setAttributes(values: FieldValues, autoCreateField: boolean) {
     for (let [field, value] of Object.entries(values)) {
@@ -44,9 +45,11 @@ export class CardDocument {
               this.csOriginalRealm = value;
             }
             break;
+          case 'csCreatedBy':
+            this.csCreatedBy = value;
+            break;
           case 'csTitle':
           case 'csCreated':
-          case 'csCreatedBy':
           case 'csUpdated':
           case 'csDescription':
           case 'csFeatures':
