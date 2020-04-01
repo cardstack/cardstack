@@ -45,11 +45,9 @@ export class CardDocument {
               this.csOriginalRealm = value;
             }
             break;
-          case 'csCreatedBy':
-            this.csCreatedBy = value;
-            break;
           case 'csTitle':
           case 'csCreated':
+          case 'csCreatedBy':
           case 'csUpdated':
           case 'csDescription':
           case 'csFeatures':
