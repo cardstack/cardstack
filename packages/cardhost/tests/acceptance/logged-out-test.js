@@ -16,6 +16,7 @@ import { cardDocument } from '@cardstack/hub';
 import { animationsSettled } from 'ember-animated/test-support';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 
+const queryParam = '?confirmed=false';
 const csRealm = 'https://cardstack.com/api/realms/card-catalog';
 const testCard = cardDocument().withAutoAttributes({
   csRealm,
@@ -52,7 +53,7 @@ module('Acceptance | logged-out', function(hooks) {
     await login();
     await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
-    assert.equal(currentURL(), `/cards/${cardPath}`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
 
     await click('[data-test-toggle-left-edge]');
     await click('[data-test-logout-button]');
@@ -60,7 +61,7 @@ module('Acceptance | logged-out', function(hooks) {
 
     await click('[data-test-toggle-left-edge]');
     await animationsSettled();
-    assert.equal(currentURL(), `/cards/${cardPath}`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
     assert.dom('[data-test-library-button]').isDisabled();
     assert.dom('[data-test-catalog-button]').isDisabled();
     assert.dom('[data-test-card-header-button]').doesNotExist();
@@ -82,7 +83,7 @@ module('Acceptance | logged-out', function(hooks) {
     await click('[data-test-toggle-left-edge]');
     await click('[data-test-logout-button]');
     await animationsSettled();
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}${queryParam}`);
 
     await visit(`/cards/${cardPath}/edit/fields`);
     await waitForCardLoad();
@@ -98,7 +99,7 @@ module('Acceptance | logged-out', function(hooks) {
     await click('[data-test-toggle-left-edge]');
     await click('[data-test-logout-button]');
     await animationsSettled();
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}${queryParam}`);
 
     await visit(`/cards/${cardPath}/edit/fields/schema`);
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
@@ -113,7 +114,7 @@ module('Acceptance | logged-out', function(hooks) {
     await click('[data-test-toggle-left-edge]');
     await click('[data-test-logout-button]');
     await animationsSettled();
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}${queryParam}`);
 
     await visit(`/cards/${cardPath}/edit/layout`);
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
@@ -187,7 +188,7 @@ module('Acceptance | logged-out', function(hooks) {
     await animationsSettled();
 
     await click('[data-test-toggle-left-edge]');
-    assert.equal(currentURL(), `/cards/${cardPath}`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
     assert.dom('[data-test-home-link]').exists();
 
     await click('[data-test-home-link]');

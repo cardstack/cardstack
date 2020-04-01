@@ -17,6 +17,7 @@ import { cardDocument } from '@cardstack/hub';
 import { embeddedCssFile, isolatedCssFile } from '@cardstack/cardhost/utils/scaffolding';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 
+const queryParam = '?confirmed=false';
 const csRealm = `http://localhost:3000/api/realms/default`;
 const cardCatalogRealm = 'https://cardstack.com/api/realms/card-catalog';
 const template1 = cardDocument()
@@ -356,7 +357,7 @@ module('Acceptance | library', function(hooks) {
 
     await click(`[data-test-library-recent-card-link="${card2.canonicalURL}"]`);
     await waitForCardLoad();
-    assert.equal(encodeColons(currentURL()), `/cards/${encodeURIComponent(card2.canonicalURL)}`);
+    assert.equal(encodeColons(currentURL()), `/cards/${encodeURIComponent(card2.canonicalURL)}${queryParam}`);
 
     await percySnapshot(assert);
   });
@@ -369,7 +370,7 @@ module('Acceptance | library', function(hooks) {
     await click(`[data-test-library-recent-card-link="${card1.canonicalURL}"]`);
     assert.dom('[data-test-library]').doesNotExist();
     await waitForCardLoad();
-    assert.equal(encodeColons(currentURL()), `/cards/${encodeURIComponent(card1.canonicalURL)}`);
+    assert.equal(encodeColons(currentURL()), `/cards/${encodeURIComponent(card1.canonicalURL)}${queryParam}`);
     assert.dom(`[data-test-isolated-card="${card1.canonicalURL}"]`).exists();
   });
 
@@ -383,7 +384,7 @@ module('Acceptance | library', function(hooks) {
     await click(`[data-test-library-recent-card-link="${card2.canonicalURL}"]`);
     assert.dom('[data-test-library]').doesNotExist();
     await waitForCardLoad();
-    assert.equal(encodeColons(currentURL()), `/cards/${encodeURIComponent(card2.canonicalURL)}`);
+    assert.equal(encodeColons(currentURL()), `/cards/${encodeURIComponent(card2.canonicalURL)}${queryParam}`);
     assert.dom(`[data-test-isolated-card="${card2.canonicalURL}"]`).exists();
   });
 
