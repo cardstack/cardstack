@@ -111,7 +111,10 @@ module('Acceptance | card create', function(hooks) {
     assert.ok(card.data.attributes.csFields.author);
     assert.ok(card.data.attributes.csFields.reviewers);
 
-    await percySnapshot([assert.test.module.name, assert.test.testName, 'data-entered'].join(' | '));
+    await animationsSettled();
+    await waitForAnimation(
+      async () => await percySnapshot([assert.test.module.name, assert.test.testName, 'data-entered'].join(' | '))
+    );
   });
 
   test('creating a card from the library', async function(assert) {
@@ -207,6 +210,7 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('field-1');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea').hasValue('');
+    await animationsSettled();
     await waitForAnimation(async () => await percySnapshot(assert));
   });
 

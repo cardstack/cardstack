@@ -282,6 +282,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-mode-indicator-link="edit"]').exists();
     assert.dom('[data-test-mode-indicator]').containsText('schema mode');
     assert.dom('[data-test-edge-actions-btn]').exists();
+    await animationsSettled();
     await waitForAnimation(async () => await percySnapshot(assert));
   });
 

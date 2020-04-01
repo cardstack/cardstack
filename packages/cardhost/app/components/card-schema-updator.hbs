@@ -18,10 +18,9 @@
             {{on "click" (fn this.selectFieldType entry)}}
             data-test-card-add-field-draggable={{entry.canonicalURL}}
           >
-            <div class="ch-catalog-field--icon">
-              {{!-- TODO need to add card icon to the API and render here --}}
-            </div>
-            <div class="ch-catalog-field--info">
+            {{svg-jar (catalog-field-icon entry.csTitle) class="ch-catalog-field--icon"}}
+            {{!-- TODO need to add card icon to the API and render here --}}
+            <div>
               <h4 class="ch-catalog-field--title">{{entry.csTitle}}</h4>
               {{#if entry.csDescription}}
                 <p class="ch-catalog-field--description">{{entry.csDescription}}</p>

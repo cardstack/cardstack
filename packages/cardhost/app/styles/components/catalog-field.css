@@ -31,12 +31,13 @@
 }
 
 .ch-catalog-field--icon {
-  width: 100%;
-  height: 100%;
-  padding: 10px;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 20px 20px;
+  margin: auto;
+  max-height: 20px;
+  max-width: 100%;
+}
+
+.ch-catalog-field--icon > svg {
+  display: block;
 }
 
 .ch-catalog-field--info {
