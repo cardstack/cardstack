@@ -123,7 +123,9 @@ export default class CardLocalStorageService extends Service {
     // if there isn't already an id in local storage, generate it
     let id = this.getDevice() ? this.getDevice() : this.generateTempSemiRandomId();
     try {
-      localStorage.setItem('Device', JSON.stringify(id));
+      let stringified = JSON.stringify(id);
+      localStorage.setItem('Device', stringified);
+      return id;
     } catch (err) {
       throw err;
     }

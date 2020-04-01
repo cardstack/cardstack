@@ -15,14 +15,13 @@ module('Unit | Service | card-local-storage', function(hooks) {
 
   test('can add ids', function(assert) {
     let service = this.owner.lookup('service:card-local-storage');
-    service.setDevice('abcdef');
-    let id = service.getDevice();
-    assert.equal(id, 'abcdef');
+    let id = service.setDevice();
+    assert.equal(id, service.getDevice());
   });
 
   test('can clear ids', function(assert) {
     let service = this.owner.lookup('service:card-local-storage');
-    service.setDevice('abcdef');
+    service.setDevice();
     service.clearDevice();
     let id = service.getDevice();
     assert.notOk(id);
