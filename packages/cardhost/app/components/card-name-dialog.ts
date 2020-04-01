@@ -10,6 +10,7 @@ import { getUserRealm } from '../utils/scaffolding';
 import { AddressableCard } from '@cardstack/hub';
 import DataService from '../services/data';
 import OverlaysService from '../services/overlays';
+import CardLocalStorageService from '../services/card-local-storage';
 //@ts-ignore
 import ENV from '@cardstack/cardhost/config/environment';
 
@@ -25,7 +26,7 @@ export default class CardNameDialog extends Component<{
   @service router!: RouterService;
   @service data!: DataService;
   @service overlays!: OverlaysService;
-  @service cardLocalStorage: any;
+  @service cardLocalStorage!: CardLocalStorageService;
 
   @tracked name?: string;
 

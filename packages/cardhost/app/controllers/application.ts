@@ -1,6 +1,7 @@
 import Controller from '@ember/controller';
 import { inject as service } from '@ember/service';
 import OverlaysService from '../services/overlays';
+import CardLocalStorageService from '../services/card-local-storage';
 //@ts-ignore
 import ENV from '@cardstack/cardhost/config/environment';
 
@@ -8,7 +9,7 @@ const { deviceCardsOnly } = ENV;
 
 export default class ApplicationController extends Controller {
   @service overlays!: OverlaysService;
-  @service cardLocalStorage: any;
+  @service cardLocalStorage!: CardLocalStorageService;
 
   constructor() {
     super(...arguments);

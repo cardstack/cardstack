@@ -7,6 +7,7 @@ import { task } from 'ember-concurrency';
 import { getUserRealm } from '../utils/scaffolding';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 import DataService from './data';
+import CardLocalStorageService from './card-local-storage';
 import { AddressableCard } from '@cardstack/hub';
 //@ts-ignore
 import ENV from '@cardstack/cardhost/config/environment';
@@ -20,7 +21,7 @@ const size = 100;
 
 export default class LibraryService extends Service {
   @service data!: DataService;
-  @service cardLocalStorage: any;
+  @service cardLocalStorage!: CardLocalStorageService;
 
   @tracked visible = false;
   @tracked recentCards: AddressableCard[] = [];
