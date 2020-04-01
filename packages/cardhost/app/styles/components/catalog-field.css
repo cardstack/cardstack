@@ -33,6 +33,7 @@
 .ch-catalog-field--icon {
   margin: auto;
   max-height: 20px;
+  max-width: 100%;
 }
 
 .ch-catalog-field--icon > svg {
