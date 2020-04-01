@@ -5,7 +5,6 @@
       "csId": "base",
       "csTitle": "Base Card",
       "csDescription": "This represents cards of any type",
-      "createdBy": "a user id or temporary identifier",
       "csFeatures": {
         "isolated-css": "isolated.css",
         "embedded-css": "embedded.css"

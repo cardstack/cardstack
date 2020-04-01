@@ -54,15 +54,15 @@ export default class CardNameDialog extends Component<{
   }
 
   @task(function*(this: CardNameDialog) {
-    let createdBy = '';
+    let csCreatedBy = '';
     if (recentOnly) {
       // If the app is configured to only show recent cards in the library, save the new id to local storage
-      createdBy = this.cardLocalStorage.getDevice();
+      csCreatedBy = this.cardLocalStorage.getDevice();
     }
 
     let doc = cardDocument().withAttributes({
       csTitle: this.name,
-      createdBy,
+      csCreatedBy,
     });
     if (this.args.adoptsFrom) {
       doc.adoptingFrom(this.args.adoptsFrom);
