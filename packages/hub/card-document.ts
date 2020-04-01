@@ -46,6 +46,7 @@ export class CardDocument {
             break;
           case 'csTitle':
           case 'csCreated':
+          case 'csCreatedBy':
           case 'csUpdated':
           case 'csDescription':
           case 'csFeatures':

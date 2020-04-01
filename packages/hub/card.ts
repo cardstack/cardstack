@@ -82,6 +82,7 @@ export class Card {
 
   // Interior cards do not have an independent csCreated/csUpdated value
   readonly csCreated: Date | undefined;
+  readonly csCreatedBy: string | undefined;
   readonly csUpdated: Date | undefined;
 
   // If this card is stored inside another, this is the card that originally
@@ -176,6 +177,10 @@ export class Card {
     } else if (!sourceCard) {
       this.csCreated = new Date();
       this.csUpdated = this.csCreated;
+    }
+
+    if (typeof jsonapi.data.attributes?.csCreatedBy === 'string') {
+      this.csCreatedBy = jsonapi.data.attributes?.csCreatedBy;
     }
 
     if (typeof jsonapi.data.attributes?.csUpdated === 'string' && !sourceCard) {

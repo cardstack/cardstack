@@ -13,7 +13,7 @@ import OverlaysService from '../services/overlays';
 //@ts-ignore
 import ENV from '@cardstack/cardhost/config/environment';
 
-const { recentOnly } = ENV;
+const { deviceCardsOnly } = ENV;
 
 export default class CardNameDialog extends Component<{
   title: string;
@@ -55,7 +55,7 @@ export default class CardNameDialog extends Component<{
 
   @task(function*(this: CardNameDialog) {
     let csCreatedBy = '';
-    if (recentOnly) {
+    if (deviceCardsOnly) {
       // If the app is configured to only show recent cards in the library, save the new id to local storage
       csCreatedBy = this.cardLocalStorage.getDevice();
     }

@@ -20,7 +20,7 @@ for variable in PGHOST \
                 DEFAULT_REALM_URL \
                 SWARM_CONTROLLER \
                 LOG_LEVELS \
-                RECENT_ONLY \
+                DEVICE_CARDS_ONLY \
                 CARDSTACK_SESSIONS_KEY; do
     command="export ${variable}=\$${target_env}_${variable}"
     eval $command

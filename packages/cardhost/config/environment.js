@@ -27,7 +27,7 @@ module.exports = function(environment) {
       // when it is created
     },
     hubURL: process.env.HUB_URL || 'http://localhost:3000',
-    recentOnly: process.env.RECENT_ONLY ? true : false // If true, the Library will only show cards whose ids are in local storage or they are in the Catalog.
+    deviceCardsOnly: process.env.DEVICE_CARDS_ONLY ? true : false, // If true, the Library will only show cards whose ids are in local storage or they are in the Catalog.
   };
 
   if (environment === 'development') {

@@ -38,6 +38,7 @@ describe('hub/files-realm-writer', function() {
     let doc = cardDocument().withAttributes({
       csDescription: 'new card',
       csFiles: { inner: { 'example.hbs': 'Hello World' } },
+      csCreatedBy: 'abcdef',
     });
 
     let card = await service.create(filesRealm, doc.jsonapi);
@@ -46,6 +47,7 @@ describe('hub/files-realm-writer', function() {
     expect(existsSync(cardJsonFile)).to.equal(true, 'The card.json file exists');
     let cardJson = readJSONSync(cardJsonFile);
     expect(cardJson.data.attributes.csDescription).to.equal('new card');
+    expect(cardJson.data.attributes.csCreatedBy).to.equal('abcdef');
 
     let innerCardFileName = join(filesPath, name, 'inner', 'example.hbs');
     expect(existsSync(innerCardFileName)).to.equal(true, 'The inner card csFile exists');

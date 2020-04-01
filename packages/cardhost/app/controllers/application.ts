@@ -4,7 +4,7 @@ import OverlaysService from '../services/overlays';
 //@ts-ignore
 import ENV from '@cardstack/cardhost/config/environment';
 
-const { recentOnly } = ENV;
+const { deviceCardsOnly } = ENV;
 
 export default class ApplicationController extends Controller {
   @service overlays!: OverlaysService;
@@ -12,8 +12,8 @@ export default class ApplicationController extends Controller {
 
   constructor() {
     super(...arguments);
-    if (recentOnly) {
-      // If recentOnly env is true, associate cards with a semi-random
+    if (deviceCardsOnly) {
+      // If deviceCardsOnly env is true, associate cards with a semi-random
       // string saved in local storage, so that test users only see
       // their own cards.
       this.cardLocalStorage.setDevice();
