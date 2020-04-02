@@ -48,7 +48,7 @@ module('Acceptance | card create', function(hooks) {
     await setCardName(card1Name);
     await showCardId();
 
-    assert.ok(/^\/cards\/.*\/edit\/fields\/schema(\?confirmed=false)?$/.test(currentURL()), 'URL is correct');
+    assert.ok(/^\/cards\/.*\/edit\/fields\/schema?$/.test(currentURL()), 'URL is correct');
 
     assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('Base Card');
     assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').doesNotExist();
@@ -62,7 +62,7 @@ module('Acceptance | card create', function(hooks) {
     await setCardName(card1Name);
     let cardId = getEncodedCardIdFromURL();
 
-    assert.ok(/^\/cards\/.*\/edit\/fields\/schema(\?confirmed=false)?$/.test(currentURL()), 'URL is correct');
+    assert.ok(/^\/cards\/.*\/edit\/fields\/schema?$/.test(currentURL()), 'URL is correct');
 
     assert.dom('.card-renderer-isolated--header-title').hasText('Millenial Puppies');
 
@@ -127,7 +127,7 @@ module('Acceptance | card create', function(hooks) {
     await setCardName(card1Name);
     let cardId = getEncodedCardIdFromURL();
 
-    assert.ok(/^\/cards\/.*\/edit\/fields\/schema(\?confirmed=false)?$/.test(currentURL()), 'URL is correct');
+    assert.ok(/^\/cards\/.*\/edit\/fields\/schema?$/.test(currentURL()), 'URL is correct');
     assert.dom('.card-renderer-isolated--header-title').hasText('Millenial Puppies');
 
     await addField('title', 'string-field', true);
@@ -228,7 +228,7 @@ module('Acceptance | card create', function(hooks) {
 
     await saveCard();
 
-    assert.ok(/^\/cards\/.*\/edit\/fields\/schema(\?confirmed=false)?$/.test(currentURL()), 'URL is correct');
+    assert.ok(/^\/cards\/.*\/edit\/fields\/schema?$/.test(currentURL()), 'URL is correct');
     let card1Id = getEncodedCardIdFromURL();
 
     await visit(`/cards/${card1Id}`);

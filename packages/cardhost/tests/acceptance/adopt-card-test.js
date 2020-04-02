@@ -125,7 +125,7 @@ module('Acceptance | card adoption', function(hooks) {
     await click('[data-test-library-adopt-card-btn]');
     await setCardName(childName);
     let childId = getEncodedCardIdFromURL();
-    assert.ok(/^\/cards\/.*\/edit\/fields(\?confirmed=false)?$/.test(currentURL()), 'URL is correct');
+    assert.ok(/^\/cards\/.*\/edit\/fields?$/.test(currentURL()), 'URL is correct');
 
     await click('[data-test-library-button]');
     await waitForLibraryServiceToIdle();
@@ -354,7 +354,7 @@ module('Acceptance | card adoption', function(hooks) {
     await setCardName(adopteeCardName);
     await waitForCardLoad();
 
-    assert.ok(/^\/cards\/.*\/edit\/fields(\?confirmed=false)?$/.test(currentURL()), 'URL is correct');
+    assert.ok(/^\/cards\/.*\/edit\/fields?$/.test(currentURL()), 'URL is correct');
     assert.dom('.card-renderer-isolated--header-title').hasText(adopteeCardName);
   });
 });
