@@ -10,6 +10,11 @@ import { getUserRealm } from '../utils/scaffolding';
 import { AddressableCard } from '@cardstack/hub';
 import DataService from '../services/data';
 import OverlaysService from '../services/overlays';
+import CardLocalStorageService from '../services/card-local-storage';
+//@ts-ignore
+import ENV from '@cardstack/cardhost/config/environment';
+
+const { deviceCardsOnly } = ENV;
 
 export default class CardNameDialog extends Component<{
   title: string;
@@ -21,6 +26,7 @@ export default class CardNameDialog extends Component<{
   @service router!: RouterService;
   @service data!: DataService;
   @service overlays!: OverlaysService;
+  @service cardLocalStorage!: CardLocalStorageService;
 
   @tracked name?: string;
 
@@ -49,8 +55,15 @@ export default class CardNameDialog extends Component<{
   }
 
   @task(function*(this: CardNameDialog) {
+    let csCreatedBy = '';
+    if (deviceCardsOnly) {
+      // If the app is configured to only show recent cards in the library, save the new id to local storage
+      csCreatedBy = this.cardLocalStorage.getDevice();
+    }
+
     let doc = cardDocument().withAttributes({
       csTitle: this.name,
+      csCreatedBy,
     });
     if (this.args.adoptsFrom) {
       doc.adoptingFrom(this.args.adoptsFrom);
