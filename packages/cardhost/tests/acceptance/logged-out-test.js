@@ -52,7 +52,7 @@ module('Acceptance | logged-out', function(hooks) {
     await login();
     await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
-    assert.equal(currentURL(), `/cards/${cardPath}`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
 
     await click('[data-test-toggle-left-edge]');
     await click('[data-test-logout-button]');
@@ -60,7 +60,7 @@ module('Acceptance | logged-out', function(hooks) {
 
     await click('[data-test-toggle-left-edge]');
     await animationsSettled();
-    assert.equal(currentURL(), `/cards/${cardPath}`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
     assert.dom('[data-test-library-button]').isDisabled();
     assert.dom('[data-test-catalog-button]').isDisabled();
     assert.dom('[data-test-card-header-button]').doesNotExist();
@@ -187,7 +187,7 @@ module('Acceptance | logged-out', function(hooks) {
     await animationsSettled();
 
     await click('[data-test-toggle-left-edge]');
-    assert.equal(currentURL(), `/cards/${cardPath}`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
     assert.dom('[data-test-home-link]').exists();
 
     await click('[data-test-home-link]');
