@@ -16,7 +16,7 @@ import { parallel } from 'ember-animated';
 import ENV from '@cardstack/cardhost/config/environment';
 
 const { animationSpeed } = ENV;
-const duration = animationSpeed || 250;
+const duration = animationSpeed || 500;
 let fieldsLoadedNonce = 0;
 
 export default class CardRenderer extends Component {

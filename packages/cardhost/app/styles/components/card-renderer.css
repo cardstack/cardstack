@@ -1,6 +1,6 @@
 .card-renderer-isolated {
   --card-renderer-width: var(--ch-card-size);
-  --card-renderer-height: 812px;
+  --card-renderer-height: var(--ch-card-size);
   --card-renderer-header-height: 56px;
 
   position: relative;
@@ -24,23 +24,22 @@
 .card-renderer-isolated--animated-header {
   position: sticky;
   top: 0;
-  z-index: var(--ch-card-header-z-index); /* card scrolls under the header */
+  z-index: var(--ch-card-header-z-index); /* card scrolls under the header (except in view mode) */
 }
 
 .card-renderer-isolated.view:not(.themer) .card-renderer-isolated--animated-view-header {
   top: 0;
   height: var(--card-renderer-header-height);
-  z-index: 5;
 }
 
 
 /* Card Renderer - Content wrapper */
-.card-renderer-isolated.view .card-renderer-isolated--animated-content {
-  z-index: 16;
-}
 .card-renderer-isolated--animated-content {
-  z-index: 5;
   padding-bottom: var(--scroll-bottom-padding);
+}
+
+.card-renderer-isolated.view .card-renderer-isolated--animated-content {
+  z-index: calc(var(--ch-card-header-z-index) + 1);
 }
 
 .card-renderer-isolated.schema .card-renderer-isolated--content {
@@ -53,7 +52,7 @@
   border: 3px solid transparent;
   border-radius: 0 0 10px 10px;
   overflow: hidden;
-  min-height: var(--card-renderer-height);
+  min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
   background-color: var(--ch-light);
   z-index: 5;
 
