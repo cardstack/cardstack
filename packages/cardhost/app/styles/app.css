@@ -52,7 +52,7 @@
   --ch-spacing: 20px;
   --ch-bottom-edge-z-index: 30;
   --ch-left-edge-z-index: 30;
-  --ch-right-edge-z-index: 20;
+  --ch-right-edge-z-index: auto;
   --ch-top-edge-z-index: 20;
   --ch-actions-z-index: 25;
   --ch-card-header-z-index: 15;
