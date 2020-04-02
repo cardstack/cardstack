@@ -20,7 +20,7 @@
       {{#unless @suppressHeader}}
         {{#if (eq @mode "view")}}
           <AnimatedContainer class="card-renderer-isolated--animated-view-header">
-            {{#animated-value @card watch="isSelected" use=this.headerAnimation group="header"}}
+            {{#animated-value @card watch=this.animatedWatchField use=this.headerAnimation group="header"}}
               <CardRendererHeader
                 @cardSelected={{if (and this.cardstackSession.isAuthenticated @cardSelected) true}}
                 @card={{@card}}
@@ -64,8 +64,9 @@
             {{if (and this.cardstackSession.isAuthenticated @card.isSelected) "selected"}}
             "
           >
+          <div>
             <AnimatedContainer>
-              {{#animated-value @card watch=this.animatedWatchField use=this.contentTransition group="content"}}
+              {{#animated-value @card watch=this.animatedWatchField use=@contentTransition group="content"}}
                 <div>
                   {{#if @dropField}}
                     <DropZone
@@ -96,6 +97,7 @@
                 </div>
               {{/animated-value}}
             </AnimatedContainer>
+            </div>
           </div>
         {{/animated-value}}
       </AnimatedContainer>

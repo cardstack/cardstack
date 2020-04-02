@@ -9,10 +9,12 @@ import { fieldCards } from '../utils/scaffolding';
 import cloneDeep from 'lodash/cloneDeep';
 import drag from '../motions/drag';
 import move from 'ember-animated/motions/move';
+import resize from 'ember-animated/motions/resize';
 import scaleBy from '../motions/scale';
 import { parallel } from 'ember-animated';
 import { fadeOut } from 'ember-animated/motions/opacity';
 import { easeIn, easeOut } from 'ember-animated/easings/cosine';
+import opacity from 'ember-animated/motions/opacity';
 
 const { environment, clickDragDebounceMs, animationSpeed } = ENV;
 const CLICK_DRAG_DEBOUNCE_MS = 100; // ¯\_(ツ)_/¯
@@ -525,6 +527,25 @@ export default class CardManipulator extends Component {
       sprite.endAtPixel({ x: -window.innerWidth });
       move(sprite, { easing: easeIn, duration });
     }
+  }
+
+  *contentTransition({ receivedSprites, keptSprites, sentSprites, duration }) {
+    keptSprites.forEach(sprite => {
+      sprite.applyStyles({ 'z-index': '1' });
+      opacity(sprite, { from: 0, easing: easeIn, duration });
+    });
+
+    receivedSprites.forEach(sprite => {
+      sprite.moveToFinalPosition();
+      sprite.applyStyles({ 'z-index': '1' });
+      opacity(sprite, { from: 0, easing: easeIn, duration });
+    });
+
+    sentSprites.forEach(sprite => {
+      sprite.applyStyles({ 'z-index': '1', 'background-color': 'white', 'background-image': 'none' });
+      parallel(move(sprite, { easing: easeOut, duration }), resize(sprite, { easing: easeOut, duration }));
+      opacity(sprite, { to: 0, easing: easeOut, duration: duration / 3 });
+    });
   }
 }
 
