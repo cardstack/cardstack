@@ -238,7 +238,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     await click('[data-test-preview-link-btn]');
     await waitForCardLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardId}/edit/preview`);
+    assert.ok(encodeColons(currentURL()).includes(`/cards/${cardId}/edit/preview`));
     assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-medium-btn]').hasClass('selected');
     assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
@@ -253,7 +253,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     await click('[data-test-mode-indicator]');
     await waitForCardLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardId}/edit/layout`);
+    assert.ok(encodeColons(currentURL()).includes(`/cards/${cardId}/edit/layout`));
     assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-large-btn]').hasClass('selected');
@@ -261,7 +261,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     await click('[data-test-card-custom-style-button]');
     await waitForThemerLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardId}/edit/layout/themer`);
+    assert.ok(encodeColons(currentURL()).includes(`/cards/${cardId}/edit/layout/themer`));
     assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-large-btn]').hasClass('selected');
@@ -269,7 +269,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     await click('[data-test-mode-indicator-link="edit"]');
     await waitForCardLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardId}/edit/layout`);
+    assert.ok(encodeColons(currentURL()).includes(`/cards/${cardId}/edit/layout`));
 
     await click('[data-test-small-btn]');
     assert.dom('[data-test-small-btn]').hasClass('selected');
@@ -279,7 +279,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     await click('[data-test-card-custom-style-button]');
     await waitForThemerLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardId}/edit/layout/themer`);
+    assert.ok(encodeColons(currentURL()).includes(`/cards/${cardId}/edit/layout/themer`));
     assert.dom('[data-test-small-btn]').hasClass('selected');
     assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
@@ -287,7 +287,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     await click('[data-test-preview-link-btn]');
     await waitForCardLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardId}/edit/preview`);
+    assert.ok(encodeColons(currentURL()).includes(`/cards/${cardId}/edit/preview`));
     assert.dom('[data-test-small-btn]').hasClass('selected');
     assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');

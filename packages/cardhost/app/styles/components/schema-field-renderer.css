@@ -17,10 +17,10 @@
 
 .schema-field-renderer--header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   min-height: var(--field-header-height);
-  padding: 6px 15px 6px 40px;
+  padding: 6px 15px;
   border: 3px solid var(--ch-light-background);
   border-radius: 5px 5px 0 0;
   background-position: 15px center;
@@ -45,6 +45,14 @@ header.schema-field-renderer--header.new-field {
 /* For text-field and case-insensitive text-field icon */
 header.schema-field-renderer--header.string {
   background-size: 12px 15px;
+}
+
+.schema-field-renderer--header--icon {
+  margin-right: 12px;
+}
+
+.schema-field-renderer--header--icon > svg {
+  display: block;
 }
 
 .schema-field-renderer--header--detail {

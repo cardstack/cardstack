@@ -50,7 +50,11 @@
           class="schema-field-renderer--header"
           data-test-field-renderer-type
         >
-          {{if this.stubFieldName this.stubFieldName this.fieldName}} ({{this.fieldType}})
+          <div class="schema-field-renderer--header--icon">
+            {{svg-jar (catalog-field-icon this.fieldType) width="15px" height="15px"}}
+            {{!-- TODO need to add card icon to the API and render here --}}
+          </div>
+          <span>{{if this.stubFieldName this.stubFieldName this.fieldName}} ({{this.fieldType}})</span>
           {{#if @field.isAdopted}}
             <span class="schema-field-renderer--header--detail">Adopted</span>
           {{/if}}

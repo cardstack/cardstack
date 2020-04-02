@@ -48,7 +48,7 @@ module('Acceptance | card create', function(hooks) {
     await setCardName(card1Name);
     await showCardId();
 
-    assert.ok(/^\/cards\/.*\/edit\/fields\/schema$/.test(currentURL()), 'URL is correct');
+    assert.ok(/^\/cards\/.*\/edit\/fields\/schema?$/.test(currentURL()), 'URL is correct');
 
     assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('Base Card');
     assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').doesNotExist();
@@ -62,7 +62,7 @@ module('Acceptance | card create', function(hooks) {
     await setCardName(card1Name);
     let cardId = getEncodedCardIdFromURL();
 
-    assert.ok(/^\/cards\/.*\/edit\/fields\/schema$/.test(currentURL()), 'URL is correct');
+    assert.ok(/^\/cards\/.*\/edit\/fields\/schema?$/.test(currentURL()), 'URL is correct');
 
     assert.dom('.card-renderer-isolated--header-title').hasText('Millenial Puppies');
 
@@ -111,7 +111,10 @@ module('Acceptance | card create', function(hooks) {
     assert.ok(card.data.attributes.csFields.author);
     assert.ok(card.data.attributes.csFields.reviewers);
 
-    await percySnapshot([assert.test.module.name, assert.test.testName, 'data-entered'].join(' | '));
+    await animationsSettled();
+    await waitForAnimation(
+      async () => await percySnapshot([assert.test.module.name, assert.test.testName, 'data-entered'].join(' | '))
+    );
   });
 
   test('creating a card from the library', async function(assert) {
@@ -127,7 +130,7 @@ module('Acceptance | card create', function(hooks) {
     await setCardName(card1Name);
     let cardId = getEncodedCardIdFromURL();
 
-    assert.ok(/^\/cards\/.*\/edit\/fields\/schema$/.test(currentURL()), 'URL is correct');
+    assert.ok(/^\/cards\/.*\/edit\/fields\/schema?$/.test(currentURL()), 'URL is correct');
     assert.dom('.card-renderer-isolated--header-title').hasText('Millenial Puppies');
 
     await addField('title', 'string-field', true);
@@ -142,7 +145,7 @@ module('Acceptance | card create', function(hooks) {
     await click('[data-test-library-button]');
     await waitForLibraryServiceToIdle();
     await waitForCardLoad(decodeURIComponent(cardId));
-    assert.equal(currentURL(), `/cards/${cardId}/edit/fields/schema`);
+    assert.ok(currentURL().includes(`/cards/${cardId}/edit/fields/schema`));
 
     assert.equal(
       [...document.querySelectorAll(`[data-test-library-recent-card-link]`)].length,
@@ -207,6 +210,7 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('field-1');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea').hasValue('');
+    await animationsSettled();
     await waitForAnimation(async () => await percySnapshot(assert));
   });
 
@@ -228,7 +232,7 @@ module('Acceptance | card create', function(hooks) {
 
     await saveCard();
 
-    assert.ok(/^\/cards\/.*\/edit\/fields\/schema$/.test(currentURL()), 'URL is correct');
+    assert.ok(/^\/cards\/.*\/edit\/fields\/schema?$/.test(currentURL()), 'URL is correct');
     let card1Id = getEncodedCardIdFromURL();
 
     await visit(`/cards/${card1Id}`);
