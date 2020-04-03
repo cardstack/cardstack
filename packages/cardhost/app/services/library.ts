@@ -7,7 +7,12 @@ import { task } from 'ember-concurrency';
 import { getUserRealm } from '../utils/scaffolding';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 import DataService from './data';
+import CardLocalStorageService from './card-local-storage';
 import { AddressableCard } from '@cardstack/hub';
+//@ts-ignore
+import ENV from '@cardstack/cardhost/config/environment';
+
+const { deviceCardsOnly } = ENV;
 
 const catalogEntry = Object.freeze({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'catalog-entry' });
 const cardCatalogRealm = 'https://cardstack.com/api/realms/card-catalog';
@@ -16,6 +21,7 @@ const size = 100;
 
 export default class LibraryService extends Service {
   @service data!: DataService;
+  @service cardLocalStorage!: CardLocalStorageService;
 
   @tracked visible = false;
   @tracked recentCards: AddressableCard[] = [];
@@ -29,19 +35,36 @@ export default class LibraryService extends Service {
   }
 
   @task(function*(this: LibraryService) {
-    return yield this.data.search(
-      {
-        filter: {
-          type: { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' },
-          eq: {
-            csRealm: getUserRealm(),
+    if (deviceCardsOnly) {
+      // only show recent cards from this device, as identified by a string in local storage
+      return yield this.data.search(
+        {
+          filter: {
+            type: { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' },
+            eq: {
+              csCreatedBy: this.cardLocalStorage.getDevice(),
+            },
           },
+          sort: '-csCreated',
+          page: { size },
         },
-        sort: '-csCreated',
-        page: { size },
-      },
-      { includeFieldSet: 'embedded' }
-    );
+        { includeFieldSet: 'embedded' }
+      );
+    } else {
+      return yield this.data.search(
+        {
+          filter: {
+            type: { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' },
+            eq: {
+              csRealm: getUserRealm(),
+            },
+          },
+          sort: '-csCreated',
+          page: { size },
+        },
+        { includeFieldSet: 'embedded' }
+      );
+    }
   })
   loadUserRealm: any; //TS and EC don't play nice;
 

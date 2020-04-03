@@ -436,6 +436,40 @@ describe('hub/card-service', function() {
       expect(foundCards.cards[0].canonicalURL).to.equal(matchingPost.canonicalURL);
     });
 
+    it('can search by csCreatedBy', async function() {
+      let deviceA = await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        cardDocument().withAttributes({ csCreatedBy: 'abcdef' }).jsonapi
+      );
+
+      let deviceB = await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        cardDocument().withAttributes({ csCreatedBy: 'ghijklm' }).jsonapi
+      );
+
+      let foundA = await service.search({
+        filter: {
+          type: { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' },
+          eq: {
+            csCreatedBy: 'abcdef',
+          },
+        },
+      });
+      expect(foundA.cards.length).to.equal(1);
+      expect(foundA.cards[0].csCreatedBy).to.equal(deviceA.csCreatedBy);
+
+      let foundB = await service.search({
+        filter: {
+          type: { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' },
+          eq: {
+            csCreatedBy: 'ghijklm',
+          },
+        },
+      });
+      expect(foundB.cards.length).to.equal(1);
+      expect(foundB.cards[0].csCreatedBy).to.equal(deviceB.csCreatedBy);
+    });
+
     it('rejects unknown attribute at create', async function() {
       let doc = cardDocument().withAttributes({ badField: 'hello' });
 
