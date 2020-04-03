@@ -64,39 +64,39 @@
             {{if (and this.cardstackSession.isAuthenticated @card.isSelected) "selected"}}
             "
           >
-          <div>
-            <AnimatedContainer>
-              {{#animated-value @card watch=this.animatedWatchField use=@contentTransition group="content"}}
-                <div>
-                  {{#if @dropField}}
-                    <DropZone
+            <div>
+              <AnimatedContainer>
+                {{#animated-value @card watch=this.animatedWatchField use=@contentTransition group="content"}}
+                  <div>
+                    {{#if @dropField}}
+                      <DropZone
+                        @card={{@card}}
+                        @dropField={{@dropField}}
+                        @position={{0}}
+                        @toggleStubField={{this.toggleStubField}}
+                      />
+                    {{/if}}
+                    <Scaffold
                       @card={{@card}}
-                      @dropField={{@dropField}}
-                      @position={{0}}
+                      @feature="isolated-layout"
+                      @fields={{this.fields}}
+                      @mode={{this.mode}}
+                      @setFieldName={{@setFieldName}}
+                      @setCardValue={{@setCardValue}}
+                      @setCardReference={{@setCardReference}}
+                      @removeField={{@removeField}}
                       @toggleStubField={{this.toggleStubField}}
+                      @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+                      @setPosition={{@setPosition}}
+                      @selectField={{@selectField}}
+                      @selectedField={{@selectedField}}
+                      @selectedFieldName={{@selectedFieldName}}
+                      @dropField={{@dropField}}
+                      @loadedField={{perform this.loadedField}}
                     />
-                  {{/if}}
-                  <Scaffold
-                    @card={{@card}}
-                    @feature="isolated-layout"
-                    @fields={{this.fields}}
-                    @mode={{this.mode}}
-                    @setFieldName={{@setFieldName}}
-                    @setCardValue={{@setCardValue}}
-                    @setCardReference={{@setCardReference}}
-                    @removeField={{@removeField}}
-                    @toggleStubField={{this.toggleStubField}}
-                    @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
-                    @setPosition={{@setPosition}}
-                    @selectField={{@selectField}}
-                    @selectedField={{@selectedField}}
-                    @selectedFieldName={{@selectedFieldName}}
-                    @dropField={{@dropField}}
-                    @loadedField={{perform this.loadedField}}
-                  />
-                </div>
-              {{/animated-value}}
-            </AnimatedContainer>
+                  </div>
+                {{/animated-value}}
+              </AnimatedContainer>
             </div>
           </div>
         {{/animated-value}}
