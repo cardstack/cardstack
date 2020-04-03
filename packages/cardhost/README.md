@@ -46,6 +46,11 @@ yarn stop-prereqs # clear realms and ephemeral cards
 DEV_DIR="path/to/your/git/repo/cards" yarn start
 ```
 
+### `DEVICE_CARDS_ONLY` 
+
+Boolean for demo purposes, where if it is true, cards created are associated with a temporary device ID, and only those cards are shown in the library. This is purely presentational and does not
+impact authorization in any way. 
+
 #### `HUB_URL`
 
 Use a back end other than the default of `localhost:3000`:
