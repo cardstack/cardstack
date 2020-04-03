@@ -53,6 +53,8 @@ export default helper(function catalogFieldIcon([title]) {
   if (matched) {
     return matched.icon;
   } else {
-    return 'string-field-icon';
+    // Default to base-card icon if there's no match.
+    // svg-jar errors if no svg is provided.
+    return 'has-many-field-icon';
   }
 });
