@@ -5,6 +5,15 @@ Since this is a pre-1.0 project,
 it will track only significant breaking changes
 and features, and is not intended to be an exhaustive list.
 
+## [v0.18.0]
+
+This version included the work for the "new Hub" aka "Hub v2,"
+a card-centric rewrite of Cardstack internals, APIs, and mental models.
+This is a significant breaking change.
+
+See https://github.com/cardstack/cardstack/pull/1432 to view the change
+in source code.
+
 ## [v0.17.0]
 
 This release concludes a series of 409 conflict bugfixes
