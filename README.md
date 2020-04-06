@@ -2,11 +2,12 @@
 
 This is the main repo for [Cardstack](https://www.cardstack.com/), an open source application architecture for building cohesive experiences on open, decentralized infrastructure.
 
-Join the discussion around developing on the Cardstack framework on [Discord](https://discord.gg/apepFje).
+Join the discussion around developing on the Cardstack framework on [Discord](https://discord.gg/apepFje), and read our documentation on [docs.cardstack.com](https://docs.cardstack.com).
 
 ## Orientation
 
 This is a monorepo. Each directory under `packages` and `cards` is distributed as a standalone NPM package under the `@cardstack` NPM namespace.
+More information is available in the `README.md` within each `package`.
 
 ## Developing and Testing within this Repo
 We use `volta` to manage our global javascript dependencies. In this case, specifically, we use it to manage node and yarn. To use it simply install it following the instructions here: https://docs.volta.sh/guide/getting-started
