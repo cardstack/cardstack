@@ -16,9 +16,10 @@
 .cardhost-card-theme-editor.bottom-docked {
   top: auto;
   bottom: 0;
-  left: var(--ch-left-edge-navbar-width);
+  left: 0;
   height: 40%;
   transform: translateY(0%);
+  z-index: calc(var(--ch-left-edge-z-index) + 1);
 }
 
 .cardhost-card-theme-editor.right-docked .resizable-content {

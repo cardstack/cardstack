@@ -2,6 +2,7 @@ import { module, test, skip } from 'qunit';
 import { find, visit, currentURL, click } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import { percySnapshot } from 'ember-percy';
+import { animationsSettled } from 'ember-animated/test-support';
 import Fixtures from '../helpers/fixtures';
 import {
   setFieldValue,
@@ -288,6 +289,7 @@ module('Acceptance | card edit', function(hooks) {
   test(`fields mode displays the top edge`, async function(assert) {
     await visit(`/cards/${cardPath}/edit/fields`);
     await waitForCardLoad();
+    await animationsSettled();
 
     assert.dom('[data-test-cardhost-top-edge]').exists();
     assert.dom('[data-test-top-edge-preview-link]').exists();

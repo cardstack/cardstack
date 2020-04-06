@@ -17,6 +17,7 @@
 .card-renderer-isolated.schema,
 .card-renderer-isolated.edit {
   min-height: var(--card-renderer-height);
+  max-width: var(--card-renderer-width);
 }
 
 
@@ -24,13 +25,12 @@
 .card-renderer-isolated--animated-header {
   position: sticky;
   top: 0;
-  z-index: var(--ch-card-header-z-index); /* card scrolls under the header */
+  z-index: var(--ch-card-header-z-index); /* card scrolls under the header (except in view mode) */
 }
 
 .card-renderer-isolated.view:not(.themer) .card-renderer-isolated--animated-view-header {
   top: 0;
   height: var(--card-renderer-header-height);
-  z-index: 5;
 }
 
 
@@ -39,7 +39,11 @@
   padding-bottom: var(--scroll-bottom-padding);
 }
 
-.card-renderer-isolated.schema .card-renderer-isolated--content {
+.card-renderer-isolated.view .card-renderer-isolated--animated-content {
+  z-index: calc(var(--ch-card-header-z-index) + 1);
+}
+
+.card-renderer-isolated.schema .card-renderer-isolated--animated-content {
   color: var(--ch-light);
 }
 

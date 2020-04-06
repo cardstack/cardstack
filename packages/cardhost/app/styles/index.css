@@ -1,6 +1,7 @@
 .card-builder {
   --card-builder-hover: rgba(0, 0, 0, 0.1);
   --card-builder-horizontal-padding: 38px;
+  --card-builder-featured-card-width: 375px;
 
   height: 100%;
 }
@@ -68,12 +69,12 @@
   position: absolute;
   top: 0;
   left: 0;
-  min-width: 160%;
   margin: 0 auto;
 }
 
 .card-builder--section-card-scale-wrapper > .card-builder--section-card {
   width: 100%;
+  min-width: var(--card-builder-featured-card-width);
   height: 100%;
   padding: 0;
   border-radius: 30px;
