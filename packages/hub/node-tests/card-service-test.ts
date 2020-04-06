@@ -60,6 +60,15 @@ describe('hub/card-service', function() {
       expect(url.toString()).to.equal('https://cardstack.com/');
     });
 
+    it('has a meaningful toString function', async function() {
+      let doc = cardDocument()
+        .withAttributes({ link: 'https://cardstack.com', csId: 'my-card' })
+        .withField('link', 'url-field');
+      let card = await service.create(`${myOrigin}/api/realms/first-ephemeral-realm`, doc.jsonapi);
+
+      expect(card.toString()).to.equal('Card [my-card]');
+    });
+
     it('deserializes date field values as strings', async function() {
       let doc = cardDocument()
         .withAttributes({ birthday: '2019-10-30' })
