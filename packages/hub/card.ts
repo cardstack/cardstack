@@ -238,6 +238,10 @@ export class Card {
     }
   }
 
+  toString() {
+    return `Card [${this.csId}]`;
+  }
+
   @Memoize()
   get document(): CardDocument {
     let jsonapi: SingleResourceDoc = { data: { type: 'cards' } };
