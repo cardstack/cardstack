@@ -4,6 +4,7 @@ import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
+import { animationsSettled } from 'ember-animated/test-support';
 import { cardDocument } from '@cardstack/hub';
 import { waitForCardLoad, waitForSchemaViewToLoad, encodeColons, waitForTestsToEnd } from '../helpers/card-ui-helpers';
 
@@ -32,6 +33,7 @@ module('Acceptance | card mode navigation', function(hooks) {
   test('can use the context menu to switch modes', async function(assert) {
     await visit(`/cards/${cardPath}/edit/fields`);
     await waitForCardLoad();
+    await animationsSettled();
 
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/fields`);
     await click('[data-test-context-menu-button]');

@@ -17,6 +17,7 @@
 .card-renderer-isolated.schema,
 .card-renderer-isolated.edit {
   min-height: var(--card-renderer-height);
+  max-width: var(--card-renderer-width);
 }
 
 
@@ -42,7 +43,7 @@
   z-index: calc(var(--ch-card-header-z-index) + 1);
 }
 
-.card-renderer-isolated.schema .card-renderer-isolated--content {
+.card-renderer-isolated.schema .card-renderer-isolated--animated-content {
   color: var(--ch-light);
 }
 
