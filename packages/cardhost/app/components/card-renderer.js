@@ -13,10 +13,10 @@ import { set } from '@ember/object';
 import { easeInAndOut } from 'ember-animated/easings/cosine';
 import { parallel } from 'ember-animated';
 import ENV from '@cardstack/cardhost/config/environment';
+import { reads } from '@ember/object/computed';
 
 const { animationSpeed } = ENV;
 const duration = animationSpeed || 500;
-let fieldsLoadedNonce = 0;
 
 export default class CardRenderer extends Component {
   loadedFields = [];
@@ -31,6 +31,14 @@ export default class CardRenderer extends Component {
   @tracked css;
   @tracked fieldsToRemove = new Map();
   @tracked cardFocused = () => {};
+  @tracked fieldsLoadedNonce = 0;
+
+  // These are aliased so they can be watched by animatedWatchFields, as animated-value
+  // does not support key paths in its watch argument
+  @reads('args.card') cardFromArgs;
+  @reads('args.cardSelected') cardSelectedFromArgs;
+  animatedWatchFields = 'cardFromArgs,cardSelectedFromArgs,fieldsLoadedNonce';
+
   loadingIsolatedCss = `
     .card-renderer-isolated--card-container {
       background-color: white;
@@ -55,16 +63,6 @@ export default class CardRenderer extends Component {
     }
     set(this.args.card, 'mode', this.mode); // ugh, not a great solution...
     this.initialLoad.perform();
-  }
-
-  get animatedWatchField() {
-    switch (this.mode) {
-      case 'view':
-        return 'isSelected';
-
-      default:
-        return 'fieldsLoadedNonce';
-    }
   }
 
   @task(function*() {
@@ -153,10 +151,7 @@ export default class CardRenderer extends Component {
     let fields = yield this.getFields.perform();
     this.loadedFields.push(fieldName);
     if (isEqual(fields.map(f => f.name).sort(), this.loadedFields.sort())) {
-      // this is not ideal that we are monkey patching the card API. we're doing
-      // so for the benefit of ember-animated's animated-value watch, maybe in
-      // the future we can create a wrapper around card for this kind of thing.
-      set(this.args.card, 'fieldsLoadedNonce', ++fieldsLoadedNonce);
+      this.fieldsLoadedNonce = ++this.fieldsLoadedNonce;
     }
   }).enqueue())
   loadedField;
@@ -229,6 +224,13 @@ export default class CardRenderer extends Component {
   @action
   focusCard(element, [value]) {
     this.cardFocused(value);
+  }
+
+  @action
+  setIsSelected(value) {
+    if (this.args.setIsSelected) {
+      this.args.setIsSelected(value);
+    }
   }
 
   *headerAnimation({ keptSprites, receivedSprites }) {
