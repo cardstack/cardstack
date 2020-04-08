@@ -1,15 +1,15 @@
 <section class="card-renderer--container"
   data-test-card-view={{@card.canonicalURL}}
 >
-  {{!-- ugh, we're monkey patching the Card API --}}
-  <div role="button" class="card-renderer--inner-container {{@mode}}-container" {{on "mouseenter" (action (mut @card.isSelected) true)}} {{on "mouseleave" (action (mut @card.isSelected) false)}}>
+  <div role="button" class="card-renderer--inner-container {{@mode}}-container">
     <CardRenderer
       @card={{@card}}
       @mode={{@mode}}
       @format="isolated"
-      @cardSelected={{@card.isSelected}}
+      @cardSelected={{this.isSelected}}
       @contextMenuOpen={{this.contextMenuOpen}}
       @setContextMenu={{this.setContextMenu}}
+      @setIsSelected={{action (mut this.isSelected)}}
     />
   </div>
 </section>

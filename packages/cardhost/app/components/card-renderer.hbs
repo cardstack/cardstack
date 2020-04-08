@@ -13,6 +13,7 @@
       data-test-card-renderer={{@card.canonicalURL}}
       data-test-card-loaded={{stringify this.loadCard.isIdle}}
       {{on "focus" (action this.cardIsFocused true)}}
+      {{on "mouseenter" (action this.setIsSelected true)}} {{on "mouseleave" (action this.setIsSelected false)}}
       {{did-insert this.focusCard true}}
       {{did-update this.cardUpdated @card @suppressCss @mode}}
       {{will-destroy this.removeCardCss}}
@@ -20,7 +21,7 @@
       {{#unless @suppressHeader}}
         {{#if (eq @mode "view")}}
           <AnimatedContainer class="card-renderer-isolated--animated-view-header">
-            {{#animated-value @card watch=this.animatedWatchField use=this.headerAnimation group="header"}}
+            {{#animated-value this watch=this.animatedWatchFields use=this.headerAnimation group="header"}}
               <CardRendererHeader
                 @cardSelected={{if (and this.cardstackSession.isAuthenticated @cardSelected) true}}
                 @card={{@card}}
@@ -34,7 +35,7 @@
           </AnimatedContainer>
         {{else}}
           <AnimatedContainer class="card-renderer-isolated--animated-header">
-            {{#animated-value @card watch=this.animatedWatchField use=this.headerAnimation group="header"}}
+            {{#animated-value this watch=this.animatedWatchFields use=this.headerAnimation group="header"}}
               <CardRendererHeader
                 @cardSelected={{true}}
                 @card={{@card}}
@@ -55,18 +56,18 @@
           {{concat (safe-css-string (if @card.canonicalURL @card.canonicalURL @card.adoptsFromURL)) "--isolated" }}
         "
       >
-        {{#animated-value @card watch=this.animatedWatchField use=this.cardTransition group="body"}}
+        {{#animated-value this watch=this.animatedWatchFields use=this.cardTransition group="body"}}
           {{!-- the "card-boundary" class in the div below is necessary for the card's custom CSS.
           This is the top level selector that people should be specifying in the themer when they
           style their cards. --}}
           <div
             class="card-renderer-isolated--card-container card-boundary
-            {{if (and this.cardstackSession.isAuthenticated @card.isSelected) "selected"}}
+            {{if (and this.cardstackSession.isAuthenticated @cardSelected) "selected"}}
             "
           >
             <div>
               <AnimatedContainer>
-                {{#animated-value @card watch=this.animatedWatchField use=@contentTransition group="content"}}
+                {{#animated-value this watch=this.animatedWatchFields use=@contentTransition group="content"}}
                   <div>
                     {{#if @dropField}}
                       <DropZone
@@ -108,6 +109,8 @@
         {{concat (safe-css-string (if @card.canonicalURL @card.canonicalURL @card.adoptsFromURL)) "--embedded" }}
         {{@class}}
       "
+      {{on "mouseenter" (action this.setIsSelected true)}} {{on "mouseleave" (action this.setIsSelected false)}}
+      role="button"
       data-test-card-renderer-embedded={{@card.canonicalURL}}
       data-test-card-renderer={{@card.canonicalURL}}
       data-test-card-loaded={{stringify this.loadCard.isIdle}}
