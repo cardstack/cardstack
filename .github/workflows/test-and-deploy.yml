@@ -1,0 +1,67 @@
+name: Node CI/CD
+
+on: [push]
+
+env:
+  # See https://git.io/vdao3 for details.
+  JOBS: 1
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+    - name: Set up build cache (yarn)
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/yarn
+        key: ${{ runner.os }}-${{ hashFiles('/**/yarn.lock') }}
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: yarn install
+      run: yarn install
+    - name: Linting
+      run: |
+        yarn lint:hbs
+        yarn lint:js
+    - name: Ember tests
+      run: yarn test
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/master'
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+    - name: Set up build cache (yarn)
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/yarn
+        key: ${{ runner.os }}-${{ hashFiles('/**/yarn.lock') }}
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: yarn install
+      run: yarn install
+    - name: Deploy
+      env:
+        DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+      run: |
+        # switch from HTTP to SSH and load our deploy key
+        mkdir ~/.ssh
+        cat <<< "$DEPLOY_KEY" > ~/.ssh/id_ecdsa
+        chmod 600 ~/.ssh/id_ecdsa
+        git remote set-url origin git@github.com:cardstack/boxel
+        git config --replace-all "remote.origin.fetch" "+refs/heads/*:refs/remotes/origin/*"
+        git fetch
+        git branch --track gh-pages origin/gh-pages
+        git config --global user.email "deploy@cardstack.com"
+        git config --global user.name "Cardstack Deploy User"
+        ./node_modules/.bin/ember deploy production --verbose
