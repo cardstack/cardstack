@@ -1,10 +1,17 @@
 .tic-tac-toe-enhanced-page {
+  --light-purple: #5c5a6f;
+  --bright-purple: #6638FF;
+  --dark-purple: #27264C;
+  --dark-blue: #02002C;
+  --bright-blue: #0069F9;
+  --cyan: #00ECE5;
   --cell-size: 230px;
   --piece-size: 206px;
+
   box-sizing: border-box;
   height: 100%;
   min-height: 100vh;
-  background-color: var(--boxel-darkerest-purple);
+  background-color: var(--dark-purple);
   display: grid;
   grid-template-columns: 360px 1fr;
 }
@@ -13,7 +20,7 @@
   box-sizing: border-box;
   display: inline-block;
   text-align: center;
-  background-color: var(--boxel-dark-blue);
+  background-color: var(--dark-blue);
   padding: 300px 75px;
   box-shadow: 0 3px 12px black;
 }
@@ -49,18 +56,18 @@
   width: var(--cell-size);
   height: var(--cell-size);
   padding: 12px;
-  background-color: var(--boxel-dark-blue);
+  background-color: var(--dark-blue);
   text-align: center;
 }
 
 .tic-tac-toe-enhanced-board.dragging .tic-tac-toe-enhanced-cell-tray.draggable {
-  background-color: var(--boxel-light-purple);
+  background-color: var(--light-purple);
   border: dashed 2px #919191;
 }
 
 .tic-tac-toe-enhanced-board.dragging .tic-tac-toe-enhanced-cell-tray.draggable.active {
-  background-color: var(--boxel-dark-blue);
-  border: solid 3px var(--boxel-cyan);
+  background-color: var(--dark-blue);
+  border: solid 3px var(--cyan);
   padding: 9px;
 }
 
@@ -88,9 +95,9 @@
 }
 
 .tic-tac-toe-enhanced-piece.piece-x {
-  background-color: var(--boxel-bright-blue);
+  background-color: var(--bright-blue);
 }
 
 .tic-tac-toe-enhanced-piece.piece-o {
-  background-color: var(--boxel-brighter-purple);
+  background-color: var(--bright-purple);
 }

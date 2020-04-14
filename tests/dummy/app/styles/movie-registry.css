@@ -1,0 +1,123 @@
+.movie-registry {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(40px, auto) 1fr;
+  gap: 30px;
+}
+
+.movie-registry--modal-open {
+  overflow: hidden;
+}
+
+.movie-registry-sidebar {
+  padding-left: 30px;
+  color: white;
+}
+
+.movie-registry-sidebar--close-container {
+  text-align: right;
+}
+
+.movie-registry-sidebar--close-btn {
+  display: inline-block;
+  padding: 35px 27px;
+  line-height: 0.75;
+  color: #FFD800;
+}
+
+.movie-registry-nav__group {
+  font-size: 18px;
+  font-weight: bold;
+  line-height: calc(26/18);
+}
+
+.movie-registry-nav__group > li + li {
+  margin-top: 48px;
+}
+
+.movie-registry-nav__group-sub {
+  padding-top: 26px;
+  font-size: 14px;
+  font-weight: initial;
+  line-height: 1.2;
+}
+
+.movie-registry-nav__group-sub > li + li {
+  margin-top: 1em;
+}
+
+.movie-registry-sidebar--expanded {
+  width: 259px;
+  background-color: #333333;
+}
+
+.movie-registry-main {
+  padding-right: 29px;
+}
+
+.movie-registry-main__header {
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 29px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid #AFAFB7;
+}
+
+.movie-registry-main__results-text {
+  padding-top: 44px;
+  padding-bottom: 41px;
+  font-size: 26px;
+  letter-spacing: 0.015em;
+  line-height: 1.3;
+}
+
+.movie-registry-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 225.25px);
+  grid-auto-rows: 330px;
+  gap: 73.8px 71px;
+  padding-bottom: 71px;
+}
+
+.movie-registry-grid__link {
+  height: 100%;
+  background-color: white;
+}
+
+.movie-item {
+  display: grid;
+  gap: 14px;
+  grid-template-rows: min-content;
+  height: inherit;
+  background-color: white;
+  justify-items: center;
+  text-align: center;
+}
+
+.movie-item__image-container {
+  padding-top: 30px;
+}
+
+.movie-item__poster {
+  display: inline-block;
+  background-color: lightgrey;
+}
+
+.movie-item__details-container {
+  width: 184px;
+  padding-bottom: 11px;
+}
+
+.movie-item__title {
+  font-weight: bold;
+  line-height: calc(19/16);
+}
+
+.movie-item__details {
+  padding-top: 2px;
+  color: #6B6A80;
+  font-size: 13px;
+  line-height: calc(16/13);
+}

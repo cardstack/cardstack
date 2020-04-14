@@ -1,10 +1,14 @@
 .drag-drop-page {
+  --dark-gray: #4a4a4a;
+  --light-purple: #5c5a6f;
+  --dark-purple: #382870;
+
   box-sizing: border-box;
   height: 100%;
   min-height: 100vh;
   margin: 0 auto;
   padding: 100px 20px;
-  background-color: var(--boxel-light-purple);
+  background-color: var(--light-purple);
 }
 
 .tray-container {
@@ -21,7 +25,7 @@
   height: 200px;
   padding: 10px;
   border-radius: 30px;
-  background-color: var(--boxel-darker-gray);
+  background-color: var(--dark-gray);
   text-align: center;
 }
 
@@ -60,7 +64,7 @@
   border-radius: 20px;
 }
 .dragging .draggable-object-target {
-  background-color: var(--boxel-darker-purple);
+  background-color: var(--dark-purple);
 }
 
 .drop-zone-text {

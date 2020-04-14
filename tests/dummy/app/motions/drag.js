@@ -61,7 +61,7 @@ class Drag extends Motion {
     }
 
     sprite.applyStyles({
-      zIndex: 1,
+      'z-index': '1',
       outline
     });
 

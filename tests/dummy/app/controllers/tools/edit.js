@@ -20,7 +20,10 @@ export default class ToolsEditController extends Controller {
   @action
   async save() {
     await this.model.save();
-
-    this.transitionToRoute('articles', this.model);
+    if (this.model.constructor.modelName === 'event') {
+      this.transitionToRoute('events.view', this.model);
+    } else {
+      this.transitionToRoute('articles', this.model);
+    }
   }
 }

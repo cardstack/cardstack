@@ -1,4 +1,4 @@
-<div class="tools-preview">
+<div class="catalog tools-preview">
   <header class="tools-preview--header">
     <h1 class="tools-preview--title">Syndication View</h1>
     <button {{action "edit"}} class="tools-preview--exit-button">
@@ -7,8 +7,8 @@
   </header>
 
   <div class="tools-preview--grid">
-    <Boxel @content={{this.model}} @format="thumbnail" />
-    <Boxel @content={{this.model}} @format="embedded" />
-    <Boxel @content={{this.model}} @format="isolated" />
+    <Article @content={{this.model}} @format="thumbnail" />
+    <Article @content={{this.model}} @format="embedded" />
+    <Article @content={{this.model}} @format="isolated" />
   </div>
 </div>

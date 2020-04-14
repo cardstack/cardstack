@@ -2,7 +2,6 @@ import Controller from '@ember/controller';
 import { action, set } from '@ember/object';
 import move from 'ember-animated/motions/move';
 import drag from '../../motions/drag';
-import { printSprites } from 'ember-animated';
 import { fadeOut } from 'ember-animated/motions/opacity';
 import opacity from 'ember-animated/motions/opacity';
 
@@ -66,15 +65,11 @@ export default class DemoTicTacToeEnhancedController extends Controller {
   }
 
   * previewTransition ({ insertedSprites, removedSprites }) {
-    printSprites(arguments[0], 'transition');
-
     insertedSprites.forEach(opacity);
     removedSprites.forEach(fadeOut);
   }
 
   * dragTransition ({ insertedSprites, removedSprites, keptSprites }) {
-    printSprites(arguments[0], 'transition');
-
     keptSprites.forEach(sprite => {
       drag(sprite, { others: [] });
     });

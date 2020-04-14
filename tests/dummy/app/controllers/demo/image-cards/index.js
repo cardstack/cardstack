@@ -1,7 +1,5 @@
 import Controller from '@ember/controller';
 import { action } from '@ember/object';
-
-// import { printSprites } from 'ember-animated';
 import move from 'ember-animated/motions/move';
 import resize from 'ember-animated/motions/resize';
 import opacity from 'ember-animated/motions/opacity';
@@ -17,8 +15,6 @@ export default class DemoImageCardsIndexController extends Controller {
   }
 
   * transition({ sentSprites }) {
-    // printSprites(arguments[0], "index transition:");
-
     sentSprites.forEach(sprite => {
       move(sprite, { easing: easeOut, duration });
       resize(sprite, { easing: easeOut, duration });
@@ -35,18 +31,16 @@ export default class DemoImageCardsIndexController extends Controller {
       adjustCSS('border-top-right-radius', sprite, { easing: easeOut, duration });
       adjustCSS('border-bottom-left-radius', sprite, { easing: easeOut, duration: duration * 0.4 });
       adjustCSS('border-bottom-right-radius', sprite, { easing: easeOut, duration: duration * 0.4 });
-      sprite.applyStyles({ 'z-index': 1 });
+      sprite.applyStyles({ 'z-index': '1' });
     });
   }
 
   * headerTransition({ sentSprites }) {
-    // printSprites(arguments[0]);
-
     sentSprites.forEach(sprite => {
       move(sprite, { easing: easeOut, duration });
       resize(sprite, { easing: easeOut, duration });
       opacity(sprite, { from: 0, easing: easeOut, duration });
-      sprite.applyStyles({ 'z-index': 1 });
+      sprite.applyStyles({ 'z-index': '1' });
     });
   }
 }

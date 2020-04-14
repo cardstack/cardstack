@@ -1,14 +1,20 @@
 .edit-demo-page {
+  --light-gray: #f8f8f8;
+  --dark-gray: #373741;
+  --light-purple: #5c5a6f;
+  --dark-purple: #343356;
+  --darker-purple: #382870;
+
   box-sizing: border-box;
   height: 100%;
   min-height: 100vh;
   margin: 0 auto;
   padding: 60px 20px;
-  background-color: var(--boxel-light-gray);
+  background-color: var(--light-gray);
 }
 
 .edit-demo-page.edit {
-  background-color: var(--boxel-dark-purple);
+  background-color: var(--dark-purple);
 }
 
 .demo-card {
@@ -16,7 +22,7 @@
   width: 400px;
   padding: 0;
   border-radius: 10px;
-  border: solid 2px var(--boxel-dark-purple);
+  border: solid 2px var(--dark-purple);
   color: black;
   text-align: left;
   margin: auto;
@@ -24,7 +30,7 @@
 }
 
 .demo-card.edit {
-  border-color: var(--boxel-light-gray);
+  border-color: var(--light-gray);
   border-radius: 0px;
 }
 
@@ -33,7 +39,7 @@
   height: 60px;
   box-sizing: border-box;
   padding: 20px;
-  background-color: var(--boxel-darker-purple);
+  background-color: var(--darker-purple);
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
 }
@@ -45,7 +51,7 @@
 }
 
 .demo-card-header.edit {
-  background-color: var(--boxel-light-purple);
+  background-color: var(--light-purple);
   height: 100px;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
@@ -53,13 +59,13 @@
 
 .demo-card-content {
   padding: 20px;
-  background-color: var(--boxel-light-gray);
+  background-color: var(--light-gray);
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
 }
 
 .demo-card-content.edit {
-  background-color: var(--boxel-dark-gray);
+  background-color: var(--dark-gray);
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 0px;
 }

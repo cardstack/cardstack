@@ -1,17 +1,21 @@
 .animate-input-page {
+  --light-gray: #f8f8f8;
+  --light-purple: #5c5a6f;
+  --dark-purple: #343356;
+
   box-sizing: border-box;
   height: 100%;
   min-height: 100vh;
   margin: 0 auto;
   padding: 60px 20px;
-  background-color: var(--boxel-light-purple);
+  background-color: var(--light-purple);
 }
 
 .animate-input-card {
   box-sizing: border-box;
   width: 400px;
   padding: 0;
-  border: solid 2px var(--boxel-dark-purple);
+  border: solid 2px var(--dark-purple);
   color: black;
   text-align: left;
   margin: auto;
@@ -19,7 +23,7 @@
 }
 
 .animate-input-card-header {
-  background-color: var(--boxel-dark-purple);
+  background-color: var(--dark-purple);
   position: relative;
   height: 60px;
   box-sizing: border-box;
@@ -35,7 +39,7 @@
 
 .animate-input-card-content {
   padding: 20px;
-  background-color: var(--boxel-light-gray);
+  background-color: var(--light-gray);
 }
 
 

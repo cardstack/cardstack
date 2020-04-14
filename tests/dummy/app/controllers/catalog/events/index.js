@@ -3,8 +3,7 @@ import { action, set } from '@ember/object';
 import resize from 'ember-animated/motions/resize';
 import move from 'ember-animated/motions/move';
 import adjustCSS from 'ember-animated/motions/adjust-css';
-// import { default as opacity } from 'ember-animated/motions/opacity';
-import { printSprites, wait } from 'ember-animated';
+import { wait } from 'ember-animated';
 
 export let animationDelay = 350;
 export let highlightDuration = 150;
@@ -12,7 +11,7 @@ export let highlightDuration = 150;
 export default class CatalogEventsIndexController extends Controller {
   @action
   select(id) {
-    for (let card of this.model) {
+    for (let card of this.model.content) {
       if (card.id === id) {
         set(card, 'selected', true);
       }
@@ -24,7 +23,7 @@ export default class CatalogEventsIndexController extends Controller {
 
   @action
   unselect(id) {
-    for (let card of this.model) {
+    for (let card of this.model.content) {
       if (card.id === id) {
         set(card, 'selected', false);
       }
@@ -43,8 +42,6 @@ export default class CatalogEventsIndexController extends Controller {
   }
 
   * trayAnimation({ keptSprites, receivedSprites }) {
-    printSprites(arguments[0], 'events tray animation');
-
     if (keptSprites.length) {
       yield wait(animationDelay);
     }
@@ -52,43 +49,39 @@ export default class CatalogEventsIndexController extends Controller {
     keptSprites.forEach(sprite => {
       move(sprite, { duration: highlightDuration });
       resize(sprite, { duration: highlightDuration });
-      sprite.applyStyles({ 'z-index': 1 }); // in case it's overlapping other content
+      sprite.applyStyles({ 'z-index': '1' }); // in case it's overlapping other content
     });
 
     receivedSprites.forEach(sprite => {
       move(sprite);
       resize(sprite);
-      sprite.applyStyles({ 'z-index': 1 });
+      sprite.applyStyles({ 'z-index': '1' });
     });
   }
 
   * holdContent({ keptSprites }) {
-    // printSprites(arguments[0], 'events content');
-
     if (keptSprites.length) {
       yield wait(animationDelay);
     }
 
     keptSprites.forEach(sprite => {
       move(sprite, { duration: highlightDuration });
-      sprite.applyStyles({ 'z-index': 1 });
+      sprite.applyStyles({ 'z-index': '1' });
     });
   }
 
   * imageTransition({ sentSprites }) {
-    // printSprites(arguments[0], 'events image transition');
-
     sentSprites.forEach(sprite => {
       move(sprite);
       resize(sprite);
-      sprite.applyStyles({ 'z-index': 3 });
+      sprite.applyStyles({ 'z-index': '3' });
     });
   }
 
   * headerTransition({ sentSprites }) {
     sentSprites.forEach(sprite => {
       move(sprite);
-      sprite.applyStyles({ 'z-index': 3 });
+      sprite.applyStyles({ 'z-index': '3' });
     });
   }
 
@@ -97,7 +90,7 @@ export default class CatalogEventsIndexController extends Controller {
       move(sprite);
       resize(sprite);
       adjustCSS('font-size', sprite);
-      sprite.applyStyles({ 'z-index': 4 });
+      sprite.applyStyles({ 'z-index': '4' });
     });
   }
 }

@@ -1,0 +1,71 @@
+.movie {
+  position: relative;
+  min-height: 90vh;
+  background-color: white;
+  border-radius: 5px;
+  border: none;
+  padding: 100px 92px 160px 100px;
+}
+
+@media only screen and (max-width: 839px) {
+  .movie {
+    padding: 80px 20px;
+  }
+}
+
+.button-overlay {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1;
+}
+
+.button-overlay--view {
+  display: grid;
+  grid-template-columns: 1fr 40px;
+  top: 0;
+  right: 0;
+  min-width: 124px;
+  height: 40px;
+  background-color: white;
+  border-left: 0.5px solid #AFAFB7;
+  border-bottom: 0.5px solid #AFAFB7;
+  border-bottom-left-radius: 5px;
+}
+
+.button-overlay__edit-btn--view {
+  display: block;
+  padding: 11px 20px 10px 40px;
+  background-image: url('/assets/images/icons/edit-box.svg');
+  background-position: top 13px left 14px;
+  background-repeat: no-repeat;
+  background-size: 14px 14px;
+  font-family: 'Open Sans';
+  font-size: 13px;
+  font-weight: 600;
+  line-height: calc(18/13);
+  letter-spacing: 0.035em;
+}
+
+.button-overlay__gear-btn--view {
+  padding: 11px 10px 10px;
+  background-image: url('/assets/images/icons/gear.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 17px 17px;
+  line-height: 1;
+}
+
+
+/* View mode (default mode) */
+.view-card {
+  display: grid;
+  gap: 42px 0;
+
+}
+
+/* Edit mode */
+.edit-card {
+  display: grid;
+  gap: 60px 0;
+}

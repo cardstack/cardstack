@@ -3,6 +3,8 @@ import { visit, currentURL, click } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 
+const movieId = 'star-wars-the-rise-of-skywalker';
+
 module('Acceptance | navigation', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
@@ -12,44 +14,43 @@ module('Acceptance | navigation', function (hooks) {
   });
 
   test('index route works', async function (assert) {
-    await visit(`/`);
-
-    assert.dom('h1').hasText('Boxel Demo')
-    assert.equal(currentURL(), '/');
+    await visit(`/movie-registry`);
+    assert.equal(currentURL(), `/movie-registry`);
+    assert.dom('[data-test-movie-registry-nav]').exists();
+    assert.dom('[data-test-movie-registry-main]').exists();
+    assert.dom(`[data-test-movie-registry-movie=${movieId}]`).exists();
   });
 
-  test('can create and preview a new article', async function (assert) {
-    await visit(`/catalog`);
+  test('view route works', async function (assert) {
+    await visit(`/movie-registry/${movieId}`);
+    assert.equal(currentURL(), `/movie-registry/${movieId}`);
+    assert.dom('[data-test-movie="view-mode"]').exists();
+    assert.dom('[data-test-view-field]').exists();
+    assert.dom('[data-test-view-field="collection-list"]').exists();
+    assert.dom('[data-test-view-field="collection-grid"]').exists();
+  });
 
-    assert.equal(currentURL(), '/catalog');
-    assert.dom('[data-test-boxel]').exists({ count: 2 });
+  test('edit route works', async function (assert) {
+    await visit(`/movie-registry/${movieId}/edit`);
+    assert.equal(currentURL(), `/movie-registry/${movieId}/edit`);
+    assert.dom('[data-test-movie="edit-mode"]').exists();
+    assert.dom('[data-test-edit-field="collection-editors"]').exists();
+    assert.dom('[data-test-edit-field="form-editors"]').exists();
+  });
 
-    await click('.boxel-tray:nth-of-type(1) .catalog-item');
+  test('can navigate to view route from index', async function (assert) {
+    await visit(`/movie-registry`);
+    await click(`[data-test-movie-registry-movie=${movieId}]`);
+    assert.equal(currentURL(), `/movie-registry/${movieId}`);
+  });
 
-    assert.equal(currentURL(), '/catalog/article/preview');
-
-    // This is failing at the moment for some reason
-
-    // await click('[data-test-edit-button]');
-
-    // assert.equal(currentURL(), '/tools/article/sample/edit');
-
-    // await fillIn('.boxel-component:nth-of-type(1) [data-test-cs-component="text-field"] input', 'What is the meaning of this?');
-    // await fillIn('.boxel-component:nth-of-type(2) [data-test-cs-component="text-field"] input', 'Who are all you people and what are you doing in my house?');
-    // await fillIn('.boxel-component:nth-of-type(3) [data-test-cs-component="text-area"] textarea', 'Lorem ipsum dolor amet gluten-free iPhone humblebrag seitan XOXO deep v kickstarter disrupt banjo salvia lumbersexual trust fund microdosing actually.');
-    // await click('[data-test-tools-button-save]');
-
-    // assert.equal(currentURL(), '/articles/1');
-    // assert.dom('[data-test-boxel-title]').containsText('What is the meaning of this?');
-    // assert.dom('[data-test-boxel-description]').containsText('Who are all you people and what are you doing in my house?');
-    // assert.dom('[data-test-boxel-body]').containsText('Lorem ipsum dolor amet gluten-free iPhone humblebrag seitan');
-
-    // await click('[data-test-tools-button-preview]');
-
-    // assert.equal(currentURL(), '/tools/article/1/preview');
-    // assert.dom('[data-test-boxel]').exists({ count: 3 });
-    // assert.dom('.boxel-thumbnail').exists();
-    // assert.dom('.boxel-article-embedded').exists();
-    // assert.dom('.boxel-article-isolated').exists();
+  test('can navigate between view and edit routes', async function (assert) {
+    await visit(`/movie-registry/${movieId}`);
+    await click(`[data-test-movie-edit-btn]`);
+    assert.equal(currentURL(), `/movie-registry/${movieId}/edit`);
+    assert.dom('[data-test-movie-mode="edit-mode"]').exists();
+    await click(`[data-test-movie-view-btn]`);
+    assert.equal(currentURL(), `/movie-registry/${movieId}`);
+    assert.dom('[data-test-movie-mode="view-mode"]').exists();
   });
 });

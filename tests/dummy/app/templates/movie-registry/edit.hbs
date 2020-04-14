@@ -1,0 +1,7 @@
+<div role="button" {{on "click" this.closeModal}} class="movie-modal-overlay" />
+
+<div class="movie-modal">
+  <div class="movie-scroll-container">
+    <Movie @model={{@model}} @mode={{this.mode}} />
+  </div>
+</div>

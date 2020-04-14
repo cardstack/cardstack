@@ -2,7 +2,6 @@ import Controller from '@ember/controller';
 import { action } from '@ember/object';
 import move from 'ember-animated/motions/move';
 import drag from '../../motions/drag';
-import { printSprites } from 'ember-animated';
 
 export default class DemoDragDropAnimationController extends Controller {
   rightWell = [];
@@ -44,8 +43,6 @@ export default class DemoDragDropAnimationController extends Controller {
   }
 
   * dragTransition ({ keptSprites, receivedSprites }) {
-    printSprites(arguments[0], 'transition');
-
     keptSprites.forEach(sprite => {
       drag(sprite, { others: [] });
     });

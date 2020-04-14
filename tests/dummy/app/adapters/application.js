@@ -1,5 +1,5 @@
-import DS from 'ember-data';
+import JSONAPIAdapter from '@ember-data/adapter/json-api';
 
-export default class ApplicationAdapter extends DS.JSONAPIAdapter {
+export default class ApplicationAdapter extends JSONAPIAdapter {
   namespace = 'api';
 }

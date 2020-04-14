@@ -17,6 +17,8 @@ export default class BoxelComponent extends Component {
   constructor() {
     super(...arguments);
 
+    this.tag = this.args.tag || 'div';
+
     this.plane = this.boxel.currentPlane;
     this.boxel.registerBoxel(this);
   }
@@ -43,11 +45,9 @@ export default class BoxelComponent extends Component {
 
   transition = function*({ sentSprites, receivedSprites }) {
     try {
-      // printSprites(arguments[0]);
-
       receivedSprites.concat(sentSprites).forEach(sprite => {
         sprite.applyStyles({
-          'z-index': 1
+          'z-index': '1'
         });
       });
 
@@ -63,8 +63,6 @@ export default class BoxelComponent extends Component {
 
   resize = function*({ insertedSprites, removedSprites, keptSprites }) {
     try {
-      // printSprites(arguments[0]);
-
       let insertedSprite = insertedSprites[0];
       let removedSprite = removedSprites[0];
 

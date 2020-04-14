@@ -1,3 +1,6 @@
+@import 'tools/tools-edit.css';
+@import 'tools/tools-preview.css';
+
 .tools-header {
   z-index: 10;
   box-sizing: border-box;

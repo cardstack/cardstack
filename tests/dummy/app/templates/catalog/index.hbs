@@ -4,19 +4,15 @@
 
   <div class="card-catalog--grid">
     {{#each this.model as |item|}}
-      <Tray>
-        <article class="catalog-item" role="button" {{action "preview" item.constructor.modelName}}>
-          <div class="catalog-item--boxel-container">
-            <AnimatedContainer>
-              <Boxel @name="{{item.constructor.modelName}}-{{item.id}}" @content={{item}} @format="thumbnail" />
-            </AnimatedContainer>
-          </div>
-          <section class="catalog-item--info-panel">
-            <h3 class="catalog-item--title">{{item.constructor.modelName}} template</h3>
-            <div class="catalog-item--sub-title">By Felix Erland</div>
-          </section>
-        </article>
-      </Tray>
+      <article class="catalog-item" role="button" {{action "preview" item.content.constructor.modelName}}>
+        <div class="catalog-item--boxel-container">
+          <Article @name="{{item.constructor.modelName}}-{{item.id}}" @content={{item}} @format="thumbnail" />
+        </div>
+        <section class="catalog-item--info-panel">
+          <h3 class="catalog-item--title">Sample {{item.content.constructor.modelName}} template</h3>
+          <div class="catalog-item--sub-title">By Felix Erland</div>
+        </section>
+      </article>
     {{/each}}
   </div>
 </section>

@@ -1,100 +1,61 @@
-@import 'catalog.css';
-@import 'catalog-preview.css';
-@import 'tools.css';
-@import 'tools-edit.css';
-@import 'tools-preview.css';
-@import 'articles.css';
-@import 'cards.css';
-@import 'demo/form-cards.css';
-@import 'demo/edit-card.css';
-@import 'demo/field-types.css';
-@import 'demo/animate-input.css';
-@import 'demo/drag-drop-animation.css';
-@import 'demo/image-cards.css';
-@import 'demo/drag-drop.css';
-@import 'demo/tic-tac-toe.css';
-@import 'demo/tic-tac-toe-enhanced.css';
-
-@import 'catalog/create-new.css';
-@import 'catalog/events.css';
-@import 'catalog/events-v2.css';
+@import 'demo/index.css';
+@import 'catalog/index.css';
 @import 'events/view.css';
-@import 'events-v2/view.css';
+@import 'tools.css';
 
-@import 'components/article.css';
-@import 'components/event.css';
+@import 'movie-registry.css';
+@import 'movie-registry/view.css';
+@import 'components/field.css';
+@import 'components/movie.css';
 
-:root {
-  --boxel-light-gray: #f8f8f8;
-  --boxel-light-gray-d5: #d5d5d5;
-  --boxel-darker-light-gray: #9f9f9f;
-  --boxel-darker-gray: #4a4a4a;
-  --boxel-dark-gray: #373741;
-  --boxel-light-purple: #5c5a6f;
-  --boxel-bright-purple: #281e78;
-  --boxel-brighter-purple: #6638FF;
-  --boxel-dark-purple: #343356;
-  --boxel-darker-purple: #382870;
-  --boxel-darkerest-purple: #27264C;
-  --boxel-darkest-purple: #010027;
-  --boxel-dark-blue: #02002C;
-  --boxel-bright-blue: #0069F9;
-  --boxel-cyan: #00ECE5;
+html, body {
+  height: 100%;
 }
 
 body {
-  position: relative;
   margin: 0;
-  background-color: var(--boxel-light-gray);
+  background-color: #f2f2f2;
   color: black;
-  font-family: "Open Sans", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 13px;
-  letter-spacing: 0;
-  line-height: 1.2;
-}
-
-h1,
-h2,
-h3 {
-  margin: 0;
-  font-weight: 600;
-}
-
-p {
-  margin: 0;
-  padding-bottom: 1em;
-}
-
-img {
-  max-width: 100%;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.025em;
+  line-height: 1.5;
+  overscroll-behavior: none;
 }
 
 a {
   color: inherit;
   text-decoration: none;
+  display: inline-block;
 }
 
-a:hover,
-a:focus {
-  color: var(--boxel-dark-purple);
+svg {
+  --icon-color: currentColor;
+  display: inline-block;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-weight: bold;
 }
 
 button {
-  padding: 10px 30px;
-  border: none;
-  border-radius: 10px;
-  background-color: var(--boxel-light-purple);
-  color: white;
-  font-family: 'Open Sans';
-  font-size: 12px;
-  line-height: 1.1;
+  display: inline-block;
+  color: currentColor;
+  font: inherit;
 }
 
-button:hover,
-button:focus {
-  cursor: pointer;
-  background-color: var(--boxel-dark-purple);
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding-left: 0;
 }
+
 
 /* for ember animated */
 .boxel-animated-orphans {
@@ -104,5 +65,23 @@ button:focus {
 }
 
 .animated-tools {
-  z-index: 10;
+  z-index: 100;
 }
+
+
+/* overriding ui-components styles */
+:root {
+  --cs-font-family: Helvetica, Arial, sans-serif;
+  --cs-font: 400 16px/26px var(--cs-font-family);
+  --cs-field-hover: white;
+  --cs-field-height: 50px;
+  --cs-letter-spacing: 0.025em;
+}
+.cs-input-group {
+  display: contents;
+}
+.cs-input-group--label,
+.cs-input-group--helper-text {
+  display: none;
+}
+/*  */

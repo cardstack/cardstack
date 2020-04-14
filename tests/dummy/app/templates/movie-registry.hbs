@@ -1,0 +1,65 @@
+<div class="movie-registry">
+  <aside class="movie-registry-sidebar movie-registry-sidebar--expanded">
+    <div class="movie-registry-sidebar--close-container">
+      <div class="movie-registry-sidebar--close-btn">{{svg-jar "close" width="12px" height="12px"}}</div>
+    </div>
+    <nav class="movie-registry-nav" data-test-movie-registry-nav>
+      <ul class="movie-registry-nav__group">
+        <li>Movies
+          <ul class="movie-registry-nav__group-sub">
+            <li>Showtimes & Tickets</li>
+            <li>Top Rated Movies</li>
+            <li>Most Popular Movies</li>
+            <li>Browse Movies by Genre</li>
+            <li>Top Box Office</li>
+          </ul>
+        </li>
+        <li>TV Shows
+          <ul class="movie-registry-nav__group-sub">
+            <li>Showtimes & Tickets</li>
+            <li>Top Rated Movies</li>
+            <li>Most Popular Movies</li>
+            <li>Browse Movies by Genre</li>
+            <li>Top Box Office</li>
+          </ul>
+        </li>
+        <li>Awards & Events
+          <ul class="movie-registry-nav__group-sub">
+            <li>Showtimes & Tickets</li>
+            <li>Top Rated Movies</li>
+            <li>Most Popular Movies</li>
+            <li>Browse Movies by Genre</li>
+            <li>Top Box Office</li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+  <main class="movie-registry-main" data-test-movie-registry-main>
+    <header class="movie-registry-main__header">
+      <img src="/assets/images/imdb-logo.png" alt="imdb" width="107px" height="52px">
+      {{!-- SEARCH BAR --}}
+    </header>
+    <div>
+      <div class="movie-registry-main__results-text">{{!-- SEARCH RESULT TEXT --}}</div>
+      {{!-- SORT FILTER --}}
+    </div>
+    <div class="movie-registry-grid">
+      {{#each @model.movies as |movie|}}
+        <LinkTo @route="movie-registry.view" @model={{movie.id}} @class="movie-registry-grid__link" data-test-movie-registry-movie={{movie.id}}>
+          <div class="movie-item">
+            <div class="movie-item__image-container">
+              <img class="movie-item__poster" src="/assets/images/{{movie.poster.value}}" alt="{{movie.title.value}} movie poster" width="150px" height="219px">
+            </div>
+            <div class="movie-item__details-container">
+              <div class="movie-item__title">{{movie.title.value}}</div>
+              <div class="movie-item__details">{{movie.year.value}}{{#if movie.type}}, {{movie.type.value}}{{/if}}</div>
+            </div>
+          </div>
+        </LinkTo>
+      {{/each}}
+    </div>
+  </main>
+</div>
+
+{{outlet}}

@@ -1,37 +1,6 @@
-{{#unless @formCards}}
-  {{#animated-value @content group=@name use=this.transition duration=this.duration}}
-    {{#if (eq @format "thumbnail")}}
-      <div class="boxel boxel-thumbnail" data-test-boxel>
-        <div class="boxel-thumbnail--image">
-          <img src={{@content.imageUrl}} alt={{@content.altText}}>
-        </div>
-        <div class="boxel-thumbnail--text">
-          <h3>{{@content.title}}</h3>
-          <p>{{@content.description}}</p>
-        </div>
-      </div>
-    {{else if @component}}
-      <div class="boxel boxel-component" ...attributes data-test-boxel>
-        {{component @component}}
-      </div>
-    {{else}}
-      <div class="boxel {{if this.contentType (concat "boxel-" this.contentType "-" @format) "boxel-default"}}" ...attributes data-test-boxel>
-        {{#if @content}}
-          {{#if (is-component this.contentType)}}
-            {{component this.contentType content=@content format=@format}}
-          {{else}}
-            A {{this.contentType}} component/template must be provided
-          {{/if}}
-        {{else}}
-          {{yield}}
-        {{/if}}
-      </div>
-    {{/if}}
-  {{/animated-value}}
-{{/unless}}
-
-{{#if @formCards}}
-  <div data-test-boxel ...attributes>
+{{#let (element this.tag) as |Tag|}}
+  {{!-- not sure if the tag or class is actually necessary... we will find out as we use this component. --}}
+  <Tag class="boxel {{@class}}" data-test-boxel ...attributes>
     {{yield}}
-  </div>
-{{/if}}
+  </Tag>
+{{/let}}

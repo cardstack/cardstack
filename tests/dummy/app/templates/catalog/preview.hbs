@@ -1,9 +1,7 @@
 <Tray @expanded={{true}}>
   <div class="catalog-preview">
     <div class="catalog-preview--boxel-container">
-      <AnimatedContainer>
-        <Boxel @name="{{this.model.constructor.modelName}}-{{this.model.id}}" @content={{this.model}} @format="embedded" />
-      </AnimatedContainer>
+      <Article @name="{{this.model.constructor.modelName}}-{{this.model.id}}" @content={{this.model}} @format="embedded" />
     </div>
     <section class="catalog-preview--info-panel">
       <header>

@@ -3,7 +3,7 @@ import { action, set } from '@ember/object';
 import resize from 'ember-animated/motions/resize';
 import move from 'ember-animated/motions/move';
 import adjustCSS from 'ember-animated/motions/adjust-css';
-import { printSprites, wait } from 'ember-animated';
+import { wait } from 'ember-animated';
 
 export let animationDelay = 350;
 export let highlightDuration = 150;
@@ -12,7 +12,7 @@ export default class CatalogEventsV2IndexController extends Controller {
   // TODO: Do not do select/unselect actions while other animation is running
   @action
   select(id) {
-    for (let card of this.model) {
+    for (let card of this.model.content) {
       if (card.id === id) {
         set(card, 'selected', true);
       }
@@ -24,7 +24,7 @@ export default class CatalogEventsV2IndexController extends Controller {
 
   @action
   unselect(id) {
-    for (let card of this.model) {
+    for (let card of this.model.content) {
       if (card.id === id) {
         set(card, 'selected', false);
       }
@@ -33,7 +33,7 @@ export default class CatalogEventsV2IndexController extends Controller {
 
   @action
   viewDetailPage(card) {
-    this.transitionToRoute('events-v2.view', card);
+    this.transitionToRoute('catalog.events-v2.view', card);
   }
 
   @action
@@ -42,8 +42,6 @@ export default class CatalogEventsV2IndexController extends Controller {
   }
 
   * trayAnimation({ keptSprites, receivedSprites, sentSprites }) {
-    printSprites(arguments[0], 'tray animation');
-
     if (keptSprites.length) {
       yield wait(animationDelay);
     }
@@ -56,22 +54,20 @@ export default class CatalogEventsV2IndexController extends Controller {
     sentSprites.forEach(sprite => {
       move(sprite);
       resize(sprite);
-      sprite.applyStyles({ 'z-index': 1 });
+      sprite.applyStyles({ 'z-index': '1' });
     });
 
     receivedSprites.forEach(sprite => {
       move(sprite);
       resize(sprite);
-      sprite.applyStyles({ 'z-index': 1 });
+      sprite.applyStyles({ 'z-index': '1' });
     });
   }
 
   * cardTransition({ receivedSprites }) {
-    printSprites(arguments[0], 'card animation');
-
     receivedSprites.forEach(sprite => {
       sprite.moveToFinalPosition();
-      sprite.applyStyles({ 'z-index': 3 });
+      sprite.applyStyles({ 'z-index': '3' });
     });
   }
 
@@ -81,24 +77,24 @@ export default class CatalogEventsV2IndexController extends Controller {
       resize(sprite);
       adjustCSS('border-top-right-radius', sprite);
       adjustCSS('border-top-left-radius', sprite);
-      sprite.applyStyles({ 'z-index': 3 });
+      sprite.applyStyles({ 'z-index': '3' });
     });
 
     receivedSprites.forEach(sprite => {
       sprite.moveToFinalPosition();
-      sprite.applyStyles({ 'z-index': 4 });
+      sprite.applyStyles({ 'z-index': '4' });
     });
   }
 
   * headerTransition({ sentSprites, receivedSprites }) {
     sentSprites.forEach(sprite => {
       move(sprite);
-      sprite.applyStyles({ 'z-index': 3 });
+      sprite.applyStyles({ 'z-index': '3' });
     });
 
     receivedSprites.forEach(sprite => {
       sprite.moveToFinalPosition();
-      sprite.applyStyles({ 'z-index': 4 });
+      sprite.applyStyles({ 'z-index': '4' });
     });
   }
 
@@ -107,12 +103,12 @@ export default class CatalogEventsV2IndexController extends Controller {
       move(sprite);
       resize(sprite);
       adjustCSS('font-size', sprite);
-      sprite.applyStyles({ 'z-index': 4 });
+      sprite.applyStyles({ 'z-index': '4' });
     });
 
     receivedSprites.forEach(sprite => {
       sprite.moveToFinalPosition();
-      sprite.applyStyles({ 'z-index': 5 });
+      sprite.applyStyles({ 'z-index': '5' });
     });
   }
 }

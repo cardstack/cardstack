@@ -1,5 +1,4 @@
-import DS from 'ember-data';
-const { Model, attr, belongsTo } = DS;
+import Model, { attr, belongsTo } from '@ember-data/model';
 
 export default class Article extends Model {
   @attr() title;

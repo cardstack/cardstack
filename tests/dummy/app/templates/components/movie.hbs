@@ -1,0 +1,32 @@
+<div class="movie" data-test-movie="{{@model.id}}" data-test-movie-mode="{{@mode}}-mode">
+  {{#if (eq @mode "edit")}}
+    <div class="button-overlay">
+      <LinkTo
+        @route="movie-registry.view"
+        @model={{@model}}
+        @class={{concat "mode-indicator mode-indicator--" @mode}}
+        data-test-movie-view-btn
+      >
+        {{@mode}} mode
+      </LinkTo>
+    </div>
+  {{else}}
+    <div class="button-overlay button-overlay--view">
+      <LinkTo @route="movie-registry.edit" @model={{@model}} @class="button-overlay__edit-btn--view" data-test-movie-edit-btn>Edit</LinkTo>
+      <LinkTo @route="movie-registry.edit" @model={{@model}} @class="button-overlay__gear-btn--view" aria-label="Configure" />
+    </div>
+  {{/if}}
+
+  <div class="{{@mode}}-card {{@mode}}-card--{{@model.id}}" data-test-movie="{{@mode}}-mode">
+    {{#each-in @model as |fieldName field|}}
+      {{#if (and (not-eq fieldName "id") (not-eq fieldName "year"))}}
+        <Field
+          @mode={{@mode}}
+          @class="movie-input"
+          @field={{field}}
+          @fieldName={{fieldName}}
+        />
+      {{/if}}
+    {{/each-in}}
+  </div>
+</div>

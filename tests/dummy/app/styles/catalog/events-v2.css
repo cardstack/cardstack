@@ -1,4 +1,5 @@
-@import "./events-v2/edit.css";
+@import "events-v2/edit.css";
+@import "events-v2/view.css";
 
 .events-catalog {
   --tray-top: 50px;

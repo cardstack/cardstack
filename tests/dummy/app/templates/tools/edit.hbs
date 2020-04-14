@@ -1,18 +1,18 @@
-<header class="tools-header">
+<header class="catalog tools-header">
   <button {{action "preview"}} class="btn-preview" data-test-tools-button-preview>Preview</button>
   <button {{action "save"}} class="btn-preview" data-test-tools-button-save>Save</button>
 </header>
 
 <div class="tools-edit">
-  <Boxel @name="{{this.model.constructor.modelName}}-new" class="tools-edit--boxel">
+  <Article @name="{{this.model.constructor.modelName}}-new" class="tools-edit--boxel">
     <div class="tools-edit--image-container">
       {{! template-lint-configure no-inline-styles {"allowDynamicStyles": true} }}
       <div class="tools-edit--image" style={{this.backgroundImageUrl}} />
     </div>
     <div class="tools-edit--fields-container">
-      <Boxel @component={{component "text-field" value=this.model.title label="Title"}} />
-      <Boxel @component={{component "text-field" value=this.model.description label="Description"}} />
-      <Boxel @component={{component "text-area" value=this.model.body label="Body"}} />
+      <BoxelField @value={{this.model.title}} @fieldName="title" @label="Title" @model={{this.model}} @mode="edit" />
+      <BoxelField @value={{this.model.description}} @fieldName="description" @label="Description" @model={{this.model}} @mode="edit" />
+      <BoxelField @value={{this.model.body}} @fieldName="body" @label="Body" @model={{this.model}} @mode="edit" />
     </div>
-  </Boxel>
+  </Article>
 </div>
