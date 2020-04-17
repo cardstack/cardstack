@@ -4,11 +4,26 @@
   background-color: white;
   border-radius: 5px;
   border: none;
-  padding: 100px 92px 160px 100px;
+  overflow: hidden;
 }
 
-@media only screen and (max-width: 839px) {
-  .collection-isolated {
-    padding: 80px 20px;
-  }
+.collection-isolated-header__title {
+  padding: 24px 30px 26px;
+  color: black;
+  font-family: var(--boxel-font-family);
+  font-size: 22px;
+  font-weight: normal;
+  line-height: calc(30/22);
+}
+
+.collection-isolated-section {
+  padding: 20px 20px 60px;
+  background-color: #F0F0F0;
+}
+
+.collection-isolated-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(206px, auto));
+  gap: 20px;
+  justify-items: center;
 }

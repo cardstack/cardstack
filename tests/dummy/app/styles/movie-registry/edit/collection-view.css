@@ -2,18 +2,6 @@
   transform: scale(0.9);
 }
 
-.collection-modal-overlay {
-  width: 720px;
-  height: 70px;
-  position: fixed;
-  top: 30px;
-  left: calc((100vw - 720px) / 2);
-  margin: 0 auto;
-  background-color: #C9C8C8;
-  z-index: 2;
-  border-radius: 5px;
-}
-
 .collection-modal {
   position: fixed;
   z-index: 2;
@@ -28,4 +16,15 @@
 .collection-scroll-container {
   padding-top: 90px;
   padding-bottom: 30px;
+}
+
+.collection-modal-overlay {
+  width: 720px;
+  height: 70px;
+  position: fixed;
+  top: 30px;
+  left: calc((100vw - 720px) / 2);
+  margin: 0 auto;
+  background-color: #C9C8C8;
+  border-radius: 5px;
 }

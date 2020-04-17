@@ -8,7 +8,6 @@
 @import 'movie-registry/edit/collection-view.css';
 @import 'components/movie.css';
 @import 'components/field.css';
-@import 'components/actor.css';
 @import 'components/photo.css';
 
 html, body {

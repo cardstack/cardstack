@@ -1,7 +1,6 @@
-<div role="button" {{on "click" this.closeModal}} class="collection-modal-overlay" />
-
 <div class="collection-modal">
   <div class="collection-scroll-container">
+    <div role="button" {{on "click" this.closeModal}} class="collection-modal-overlay" />
     <CollectionIsolated @model={{@model}} />
   </div>
 </div>

@@ -1,3 +1,19 @@
 <div class="collection-isolated">
-  <h1>{{@model.isolatedTitle}}</h1>
+  <header class="collection-isolated-header">
+    <h1 class="collection-isolated-header__title">{{@model.title}} ({{@model.value.length}})</h1>
+    <div>
+      {{!-- Buttons --}}
+    </div>
+  </header>
+  <section class="collection-isolated-section">
+    <div>
+      {{!-- Buttons --}}
+    </div>
+    <div class="collection-isolated-grid">
+      {{#each @model.value as |item|}}
+        <CollectionItem @item={{item}} @mode="edit" @format="grid" />
+      {{/each}}
+    </div>
+  </section>
+
 </div>

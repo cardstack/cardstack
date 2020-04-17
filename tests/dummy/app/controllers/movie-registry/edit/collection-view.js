@@ -8,6 +8,6 @@ export default class MovieRegistryEditCollectionViewController extends Controlle
   @action
   closeModal() {
     this.isModalOpen = false;
-    this.transitionToRoute('index');
+    this.transitionToRoute('movie-registry.edit');
   }
 }

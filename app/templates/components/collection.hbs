@@ -27,8 +27,8 @@
           <BoxelHighlight @on={{this.collectionSelected}} {{on "click" this.collectionSelect}} data-test-collection={{@format}} />
           <BoxelActions @displayHighlightActions={{this.collectionSelected}} data-test-collection-actions={{@format}} />
           <div class="collection-editor collection-editor--{{@format}}">
-            {{#if @field.title}}
-              <h4>{{@field.title}} ({{this.collection.length}})</h4>
+            {{#if @field.embeddedTitle}}
+              <h4>{{@field.embeddedTitle}} ({{this.collection.length}})</h4>
             {{/if}}
             {{#if this.collectionSelected}}
               <div class="collection-editor__select">
@@ -62,9 +62,7 @@
                 <Boxel>
                   <BoxelHighlight @on={{or item.selected item.picked}} {{on "click" (fn this.itemSelect item.id)}} data-test-collection-item={{i}} />
                   <BoxelActions @displayHighlightActions={{item.selected}} data-test-collection-item-actions={{i}} />
-                  {{#let @component as |Component|}}
-                    <Component @content={{item}} @mode={{@mode}} />
-                  {{/let}}
+                  <CollectionItem @item={{item}} @mode={{@mode}} @format={{@format}} />
                 </Boxel>
                 {{#if (and this.collectionSelected (eq @format "grid"))}}
                   <div class="collection-editor__btn-group">
@@ -110,7 +108,7 @@
   {{else if (eq @format "list")}}
     <div class="collection-list" data-test-view-field="collection-list">
       {{#each this.embeddedCollection as |item|}}
-        <Actor @content={{item}} />
+        <CollectionItem @item={{item}} @mode={{@mode}} @format={{@format}} />
       {{/each}}
     </div>
   {{/if}}
