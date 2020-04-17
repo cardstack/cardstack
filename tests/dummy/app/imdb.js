@@ -49,6 +49,7 @@ export default {
       runTime: { type: "time", hours: 2, minutes: 22 },
       releaseDate: { type: "date", value: 20191220 },
       genres: {
+        id: 'genres',
         isCollection: true,
         type: "genres",
         value: [
@@ -63,6 +64,8 @@ export default {
           "The surviving members of the resistance face the First Order once again, and the legendary conflict between the Jedi and the Sith reaches its peak bringing the Skywalker saga to its end.",
       },
       cast: {
+        id: 'cast',
+        title: 'Actor Profiles',
         isCollection: true,
         type: "actors",
         value: [
@@ -125,6 +128,8 @@ export default {
         ],
       },
       photos: {
+        id: 'photos',
+        title: 'Photos',
         isCollection: true,
         type: "photos",
         value: [

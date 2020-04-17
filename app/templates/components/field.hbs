@@ -1,11 +1,11 @@
 {{#if (eq @mode "edit")}}
   {{#if @field.isCollection}}
     {{#if (eq @field.type "genres")}}
-      <Collection @mode={{@mode}} @format="tagList" @field={{@field}} @fieldName={{@fieldName}} />
+      <Collection @mode={{@mode}} @format="tagList" @model={{@field}} @fieldName={{@fieldName}} />
     {{else if (eq @field.type "photos")}}
-      <Collection @mode={{@mode}} @format="grid" @title="Photos" @component="photo" @field={{@field}} @fieldName={{@fieldName}} />
+      <Collection @mode={{@mode}} @format="grid" @component="photo" @model={{@field}} @fieldName={{@fieldName}} />
     {{else if (eq @field.type "actors")}}
-      <Collection @mode={{@mode}} @format="list" @title="Actor Profiles" @component="actor" @field={{@field}} @fieldName={{@fieldName}} />
+      <Collection @mode={{@mode}} @format="list" @component="actor" @model={{@field}} @fieldName={{@fieldName}} />
     {{/if}}
   {{else}}
     <label class="edit-field edit-field--{{dasherize @fieldName}}-field" data-test-edit-field="form-editors">
@@ -43,11 +43,11 @@
     <div class="view-field__value">
       {{#if @field.isCollection}}
         {{#if (eq @field.type "genres")}}
-          <Collection @format="tagList" @field={{@field}} @fieldName={{@fieldName}} />
+          <Collection @format="tagList" @model={{@field}} @fieldName={{@fieldName}} />
         {{else if (eq @field.type "photos")}}
-          <Collection @format="grid" @field={{@field}} @fieldName={{@fieldName}} />
+          <Collection @format="grid" @model={{@field}} @fieldName={{@fieldName}} />
         {{else if (eq @field.type "actors")}}
-          <Collection @format="list" @field={{@field}} @fieldName={{@fieldName}} />
+          <Collection @format="list" @model={{@field}} @fieldName={{@fieldName}} />
         {{/if}}
       {{else}}
         {{#if (eq @field.type "date")}}

@@ -27,7 +27,9 @@
           <BoxelHighlight @on={{this.collectionSelected}} {{on "click" this.collectionSelect}} data-test-collection={{@format}} />
           <BoxelActions @displayHighlightActions={{this.collectionSelected}} data-test-collection-actions={{@format}} />
           <div class="collection-editor collection-editor--{{@format}}">
-            <h4>{{@title}} ({{this.collection.length}})</h4>
+            {{#if @model.title}}
+              <h4>{{@model.title}} ({{this.collection.length}})</h4>
+            {{/if}}
             {{#if this.collectionSelected}}
               <div class="collection-editor__select">
                 <button {{on "click" this.toggleSelectAll}} class="collection-editor__select-btn" aria-label="Select all" data-test-collection-select-all>
@@ -81,7 +83,7 @@
                 {{/if}}
               </div>
             {{/each}}
-            <button class="collection-editor__view-all-btn">View all ({{this.collection.length}})</button>
+            <LinkTo @route="movie-registry.edit.collection" @model={{@model}} class="collection-editor__view-all-btn">View all ({{this.collection.length}})</LinkTo>
             <button class="collection-editor__add-btn">{{svg-jar "icon-plus-circle" width="18px" height="18px"}}</button>
           </div>
         </Boxel>
@@ -90,8 +92,8 @@
   </div>
 {{else}}
   {{#if (eq @format "tagList")}}
-    {{#each @field.value as |genre i|}}
-      {{#if (eq i (sub @field.value.length 1))}}
+    {{#each this.collection as |genre i|}}
+      {{#if (eq i (sub this.collection.length 1))}}
         {{genre.title}}
       {{else}}
         {{genre.title}},
@@ -99,7 +101,7 @@
     {{/each}}
   {{else if (eq @format "grid")}}
     <div class="collection-grid" data-test-view-field="collection-grid">
-      {{#each @field.value as |item|}}
+      {{#each this.collection as |item|}}
         <div class="collection-grid__item">
           <img src="/assets/images/{{item.src}}" alt={{item.altText}}>
         </div>
