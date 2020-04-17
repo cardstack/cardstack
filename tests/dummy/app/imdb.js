@@ -66,6 +66,7 @@ export default {
       cast: {
         id: 'cast',
         title: 'Actor Profiles',
+        isolatedTitle: 'Cast',
         isCollection: true,
         type: "actors",
         value: [

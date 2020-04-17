@@ -16,12 +16,14 @@
   margin-left: calc(800px / -2);
   height: 100%;
   top: 0;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .movie-scroll-container {
-  padding-top: 20px;
+  height: 100vh;
   padding-bottom: 80px;
+  padding-top: 30px;
+  overflow: auto;
 }
 
 

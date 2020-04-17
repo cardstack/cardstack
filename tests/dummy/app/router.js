@@ -1,3 +1,4 @@
+/* eslint-disable ember/routes-segments-snake-case */
 import EmberRouter from '@ember/routing/router';
 import config from './config/environment';
 
@@ -10,7 +11,7 @@ Router.map(function() {
   this.route('movie-registry', function() {
     this.route('view', { path: '/:id' });
     this.route('edit', { path: '/:id/edit' }, function() {
-      this.route('collection', { path: '/collection/:collection_id' });
+      this.route('collection-view', { path: '/collection/:collectionId' });
     });
   });
   this.route('catalog', function() {

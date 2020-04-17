@@ -8,7 +8,7 @@
           <BoxelActions @displayHighlightActions={{this.collectionSelected}} />
           <div class="collection-editor collection-taglist-editor">
             <ul class="collection-taglist-editor__list">
-              {{#each this.collection as |item|}}
+              {{#each this.embeddedCollection as |item|}}
                 <Boxel>
                   <BoxelHighlight @on={{item.selected}} {{on "click" (fn this.itemSelect item.id)}} />
                   <BoxelActions @displayHighlightActions={{item.selected}} />
@@ -27,8 +27,8 @@
           <BoxelHighlight @on={{this.collectionSelected}} {{on "click" this.collectionSelect}} data-test-collection={{@format}} />
           <BoxelActions @displayHighlightActions={{this.collectionSelected}} data-test-collection-actions={{@format}} />
           <div class="collection-editor collection-editor--{{@format}}">
-            {{#if @model.title}}
-              <h4>{{@model.title}} ({{this.collection.length}})</h4>
+            {{#if @field.title}}
+              <h4>{{@field.title}} ({{this.collection.length}})</h4>
             {{/if}}
             {{#if this.collectionSelected}}
               <div class="collection-editor__select">
@@ -83,7 +83,7 @@
                 {{/if}}
               </div>
             {{/each}}
-            <LinkTo @route="movie-registry.edit.collection" @model={{@model}} class="collection-editor__view-all-btn">View all ({{this.collection.length}})</LinkTo>
+            <LinkTo @route="movie-registry.edit.collection-view" @model={{@field.id}} class="collection-editor__view-all-btn">View all ({{this.collection.length}})</LinkTo>
             <button class="collection-editor__add-btn">{{svg-jar "icon-plus-circle" width="18px" height="18px"}}</button>
           </div>
         </Boxel>
@@ -92,7 +92,7 @@
   </div>
 {{else}}
   {{#if (eq @format "tagList")}}
-    {{#each this.collection as |genre i|}}
+    {{#each this.embeddedCollection as |genre i|}}
       {{#if (eq i (sub this.collection.length 1))}}
         {{genre.title}}
       {{else}}
@@ -101,7 +101,7 @@
     {{/each}}
   {{else if (eq @format "grid")}}
     <div class="collection-grid" data-test-view-field="collection-grid">
-      {{#each this.collection as |item|}}
+      {{#each this.embeddedCollection as |item|}}
         <div class="collection-grid__item">
           <img src="/assets/images/{{item.src}}" alt={{item.altText}}>
         </div>
@@ -109,7 +109,7 @@
     </div>
   {{else if (eq @format "list")}}
     <div class="collection-list" data-test-view-field="collection-list">
-      {{#each this.collection as |item|}}
+      {{#each this.embeddedCollection as |item|}}
         <Actor @content={{item}} />
       {{/each}}
     </div>
