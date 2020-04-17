@@ -5,8 +5,10 @@
 
 @import 'movie-registry.css';
 @import 'movie-registry/view.css';
-@import 'components/field.css';
 @import 'components/movie.css';
+@import 'components/field.css';
+@import 'components/actor.css';
+@import 'components/photo.css';
 
 html, body {
   height: 100%;

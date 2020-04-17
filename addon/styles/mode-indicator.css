@@ -10,17 +10,15 @@
   max-width: 100%;
   height: var(--mode-container-height);
   padding: 11px 38px;
-  background-color: var(--cs-highlight);
+  background-color: var(--boxel-highlight);
   background-image: var(--mode-icon), url('/assets/images/icons/close.svg');
   background-position: var(--mode-icon-position), center right 15px;
   background-repeat: no-repeat, no-repeat;
   background-size: var(--mode-icon-size), 10px 10px;
   border-radius: 100px;
   color: black;
-  font-family: 'Open Sans';
-  font-size: 13px;
+  font: var(--boxel-font-sm);
   font-weight: 600;
-  line-height: calc(18 / 13);
   letter-spacing: 0.035em;
   text-align: left;
   text-transform: capitalize;
@@ -43,6 +41,6 @@
 
 .mode-indicator:hover,
 .mode-indicator:focus {
-  background-color: var(--cs-highlight-hover);
+  background-color: var(--boxel-highlight-hover);
   outline: 0;
 }

@@ -1,0 +1,36 @@
+.actor {
+  display: grid;
+  grid-template:
+    "img name" auto
+    "img role" auto /
+    60px auto;
+  gap: 5px 20px;
+  height: 80px;
+  padding: 10px 12px;
+  background-color: white;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  line-height: 1;
+}
+
+.actor--edit-mode {
+  border-color: #AFAFB7;
+}
+
+.actor__img {
+  grid-area: img;
+}
+
+.actor__name {
+  align-self: end;
+  grid-area: name;
+  color: black;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.actor__role {
+  grid-area: role;
+  color: #6B6A80;
+  font-size: 13px;
+}

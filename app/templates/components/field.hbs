@@ -1,59 +1,12 @@
 {{#if (eq @mode "edit")}}
   {{#if @field.isCollection}}
-  <div class="edit-field edit-field--{{dasherize @fieldName}}-field" data-test-edit-field="collection-editors">
-    <div class="edit-field__title">{{humanize (dasherize @fieldName)}}</div>
-    <div class="edit-field__value">
-      {{#if (eq @field.type "genres")}}
-        <div class="collection-editor collection-editor--horizontal-list-view">
-          <ul class="collection-editor__list">
-            {{#each @field.value as |item|}}
-              <li class="collection-editor__list-item">
-                <span class="collection-editor__text">{{item.title}}</span>
-                <button class="collection-editor__btn remove-btn" aria-label="remove">{{svg-jar "close" width="8px" height="8px"}}</button>
-              </li>
-            {{/each}}
-          </ul>
-          <button class="collection-editor__btn add-btn" aria-label="add">{{svg-jar "icon-plus-circle" width="16px" height="16px"}}</button>
-        </div>
-      {{else if (eq @field.type "photos")}}
-        <div class="collection-editor collection-editor--grid-view">
-          <h4>Photos ({{@field.value.length}})</h4>
-          {{#each @field.value as |item|}}
-            <div class="collection-grid-editor__item">
-              <div class="photo">
-                <div class="photo__img-container">
-                  <img src="/assets/images/{{item.src}}" alt={{item.altText}}>
-                </div>
-                <h4 class="photo__title">{{item.title}}</h4>
-                <div class="photo__created">Created {{item.created}}</div>
-              </div>
-              <div class="collection-editor__btn-group">
-                <button class="collection-editor__select-btn" aria-label="select">{{svg-jar "icon-circle" width="16px" height="16px"}}</button>
-                <button class="collection-editor__select-btn" aria-label="remove">{{svg-jar "icon-minus-circle" width="16px" height="16px"}}</button>
-              </div>
-            </div>
-          {{/each}}
-          <button class="collection-editor__view-all-btn">View all ({{@field.value.length}})</button>
-          <button class="collection-editor__add-btn">{{svg-jar "icon-plus-circle" width="18px" height="18px"}}</button>
-        </div>
-        {{else if (eq @field.type "actors")}}
-          <div class="collection-editor collection-editor--vertical-list-view">
-            <h4>Actor Profiles ({{@field.value.length}})</h4>
-            {{#each @field.value as |actor|}}
-              <div class="collection-list-editor__item">
-                <div class="actor">
-                  <img class="actor__img" src="/assets/images/{{actor.profile}}" alt="{{actor.fullName}} profile" width="60px" height="60px">
-                  <div class="actor__name">{{actor.firstName}} {{actor.lastName}}</div>
-                  <div class="actor__role">{{actor.role}}</div>
-                </div>
-              </div>
-            {{/each}}
-            <button class="collection-editor__view-all-btn">View all ({{@field.value.length}})</button>
-            <button class="collection-editor__add-btn">{{svg-jar "icon-plus-circle" width="18px" height="18px"}}</button>
-          </div>
-        {{/if}}
-      </div>
-    </div>
+    {{#if (eq @field.type "genres")}}
+      <Collection @mode={{@mode}} @format="tagList" @field={{@field}} @fieldName={{@fieldName}} />
+    {{else if (eq @field.type "photos")}}
+      <Collection @mode={{@mode}} @format="grid" @title="Photos" @component="photo" @field={{@field}} @fieldName={{@fieldName}} />
+    {{else if (eq @field.type "actors")}}
+      <Collection @mode={{@mode}} @format="list" @title="Actor Profiles" @component="actor" @field={{@field}} @fieldName={{@fieldName}} />
+    {{/if}}
   {{else}}
     <label class="edit-field edit-field--{{dasherize @fieldName}}-field" data-test-edit-field="form-editors">
       <div class="edit-field__title">{{humanize (dasherize @fieldName)}}</div>
@@ -88,42 +41,24 @@
       <div class="view-field__title">{{humanize (dasherize @fieldName)}}</div>
     {{/unless}}
     <div class="view-field__value">
-      {{#if (eq @field.type "date")}}
-        {{moment-format @field.value "MMMM DD, YYYY" "YYYY-MM-DD"}}
-      {{else if (eq @field.type "time")}}
-        {{@field.hours}}h {{@field.minutes}}m
-      {{else if (eq @field.type "image")}}
-        <img src="/assets/images/{{@field.value}}" alt="{{@field.altText}}" width="{{@field.width}}" height="{{@field.height}}">
-      {{else if @field.isCollection}}
-        {{#if (eq @field.type "actors")}}
-          <div class="collection-list" data-test-view-field="collection-list">
-            {{#each @field.value as |actor|}}
-              <div class="actor">
-                <img class="actor__img" src="/assets/images/{{actor.profile}}" alt="{{actor.fullName}} profile" width="60px" height="60px">
-                <div class="actor__name">{{actor.firstName}} {{actor.lastName}}</div>
-                <div class="actor__role">{{actor.role}}</div>
-              </div>
-            {{/each}}
-          </div>
+      {{#if @field.isCollection}}
+        {{#if (eq @field.type "genres")}}
+          <Collection @format="tagList" @field={{@field}} @fieldName={{@fieldName}} />
         {{else if (eq @field.type "photos")}}
-          <div class="collection-grid" data-test-view-field="collection-grid">
-            {{#each @field.value as |item|}}
-              <div class="collection-grid__item">
-                <img src="/assets/images/{{item.src}}" alt={{item.altText}}>
-              </div>
-            {{/each}}
-          </div>
-        {{else}}
-          {{#each @field.value as |genre i|}}
-            {{#if (eq i (sub @field.value.length 1))}}
-              {{genre.title}}
-            {{else}}
-              {{genre.title}},
-            {{/if}}
-          {{/each}}
+          <Collection @format="grid" @field={{@field}} @fieldName={{@fieldName}} />
+        {{else if (eq @field.type "actors")}}
+          <Collection @format="list" @field={{@field}} @fieldName={{@fieldName}} />
         {{/if}}
       {{else}}
-        {{@field.value}}
+        {{#if (eq @field.type "date")}}
+          {{moment-format @field.value "MMMM DD, YYYY" "YYYY-MM-DD"}}
+        {{else if (eq @field.type "time")}}
+          {{@field.hours}}h {{@field.minutes}}m
+        {{else if (eq @field.type "image")}}
+          <img src="/assets/images/{{@field.value}}" alt="{{@field.altText}}" width="{{@field.width}}" height="{{@field.height}}">
+        {{else}}
+          {{@field.value}}
+        {{/if}}
       {{/if}}
     </div>
   </div>

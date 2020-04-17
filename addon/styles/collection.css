@@ -1,0 +1,175 @@
+/* VIEW MODE */
+/* Collection List */
+.collection-list {
+  display: grid;
+  grid-gap: 10px;
+}
+
+/* Collection Grid */
+.collection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 105px);
+  grid-auto-rows: 105px;
+  gap: 10px;
+}
+
+.collection-grid__item > img {
+  object-fit: cover;
+  object-position: center;
+  overflow: hidden;
+  width: 105px;
+  height: 105px;
+}
+
+
+/* EDIT MODE */
+.collection-editor {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+  background-color: #F0F0F0;
+  border: none;
+  border-radius: 5px;
+  line-height: 1;
+  text-align: left;
+}
+
+.collection-editor--grid {
+  grid-template-columns: repeat(auto-fill, 210px);
+}
+
+.collection-editor > h4 {
+  grid-column: 1 / -1;
+  color: black;
+  line-height: calc(22/16);
+  padding: 9px 5px;
+}
+
+.collection-editor__item {
+  position: relative;
+}
+
+.collection-editor__view-all-btn {
+  width: 100%;
+  grid-column: 1 / -1;
+  padding: 11px 0;
+  background: none;
+  color: black;
+  font: var(--boxel-font-sm);
+  border: 1px solid #AFAFB7;
+  border-radius: inherit;
+  text-align: center;
+  z-index: 1;
+}
+
+.collection-editor__add-btn {
+  --icon-bg: var(--boxel-highlight);
+  --icon-border: var(--boxel-highlight);
+  grid-column: 1 / -1;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+  padding: 0;
+  border: none;
+  background: none;
+  z-index: 1;
+}
+
+.collection-editor__btn-group {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: min-content;
+  justify-content: center;
+  gap: 30px;
+  padding: 4px 4px 16px;
+}
+
+.collection-editor button:focus {
+  outline: 0;
+  border: 2px solid var(--boxel-highlight);
+}
+
+.collection-editor__select {
+  display: grid;
+  grid-template-columns: 30px 1fr 30px;
+  gap: 0 7.5px;
+  align-items: center;
+  grid-column: 1 / -1;
+}
+
+.collection-editor__select-btn {
+  display: block;
+  width: 30px;
+  height: 30px;
+  margin: 0 auto;
+  padding: 0;
+  border: none;
+  background: none;
+  z-index: 1;
+}
+
+.collection-editor__select--selected {
+  --icon-bg: var(--boxel-highlight);
+  --icon-border: var(--boxel-highlight);
+}
+
+.collection-editor__select--partial {
+  --icon-bg: var(--boxel-highlight);
+}
+
+.collection-editor__select-all {
+  padding: 10px 35px;
+  background: url('/assets/images/icons/check-mark.svg') center left 15px no-repeat;
+  border: 1px solid #AFAFB7;
+  border-radius: 5px;
+  color: black;
+  font: var(--boxel-font-sm);
+  font-weight: bold;
+  letter-spacing: 0.025em;
+}
+
+
+/* Collection editor -- format: taglist */
+.collection-taglist-editor {
+  grid-template-columns: 1fr 40px;
+}
+
+.collection-taglist-editor__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, max-content));
+  gap: 10px;
+}
+
+.collection-taglist-editor__list-item {
+  display: grid;
+  grid-auto-flow: column;
+  width: auto;
+  min-width: 90px;
+  background-color: white;
+  border-radius: 5px;
+  border: 1px solid #D1D1D1;
+  font-size: 13px;
+  color: #393642;
+}
+
+.collection-taglist-editor__text {
+  margin: auto;
+  padding: 9px 15px 8px;
+}
+
+.collection-taglist-editor__btn {
+  display: block;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+  padding: 0;
+  border: none;
+  background: none;
+  outline: 0;
+}
+
+.collection-taglist-editor__btn.add-btn {
+  --icon-bg: var(--boxel-highlight);
+  --icon-border: var(--boxel-highlight);
+}

@@ -1,0 +1,37 @@
+.boxel-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: grid;
+  grid-auto-flow: column;
+  background-color: var(--boxel-highlight);
+  border-top-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border: none;
+  z-index: 2;
+}
+
+.boxel-actions__btn {
+  border: none;
+  width: 35px;
+  height: 30px;
+  padding: 7px 9px;
+  background-color: transparent;
+  background-size: 16px 16px;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 2;
+}
+
+.boxel-actions__btn:focus {
+  outline: 0;
+  background-color: var(--boxel-highlight-hover);
+}
+
+.boxel-actions__btn--more-actions {
+  background-image: url('/assets/images/icons/more-actions.svg');
+}
+
+.boxel-actions__btn--expand {
+  background-image: url('/assets/images/icons/expand.svg');
+}

@@ -1,14 +1,5 @@
-import Controller from '@ember/controller';
-import { action } from '@ember/object';
-import { tracked } from '@glimmer/tracking';
+import MovieController from './movie';
 
-export default class MovieRegistryViewController extends Controller {
+export default class MovieRegistryViewController extends MovieController {
   mode = 'view';
-  @tracked isModalOpen = true;
-
-  @action
-  closeModal() {
-    this.isModalOpen = false;
-    this.transitionToRoute('index');
-  }
 }

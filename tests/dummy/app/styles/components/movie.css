@@ -40,10 +40,8 @@
   background-position: top 13px left 14px;
   background-repeat: no-repeat;
   background-size: 14px 14px;
-  font-family: 'Open Sans';
-  font-size: 13px;
+  font: var(--boxel-font-sm);
   font-weight: 600;
-  line-height: calc(18/13);
   letter-spacing: 0.035em;
 }
 

@@ -1,0 +1,5 @@
+<div class="actor {{if @mode (concat "actor--" @mode "-mode")}}">
+  <img class="actor__img" src="/assets/images/{{@content.profile}}" alt="{{@content.firstName}} {{@content.lastName}} profile" width="60px" height="60px">
+  <div class="actor__name">{{@content.firstName}} {{@content.lastName}}</div>
+  <div class="actor__role">{{@content.role}}</div>
+</div>

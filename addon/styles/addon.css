@@ -1,0 +1,6 @@
+:root {
+  --boxel-font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+  --boxel-font-sm: 13px/calc(18/13) var(--boxel-font-family);
+  --boxel-highlight: #00ebe5;
+  --boxel-highlight-hover: #00b0ad;
+}
