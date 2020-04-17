@@ -46,7 +46,7 @@
                 </div>
               </div>
             {{/if}}
-            {{#each this.collection as |item i|}}
+            {{#each this.embeddedCollection as |item i|}}
               <div class="collection-editor__item {{if (and this.collectionSelected (eq @format "list")) "collection-editor__select"}}">
                 {{#if (and this.collectionSelected (eq @format "list"))}}
                   <button {{on "click" (fn this.togglePick item.id)}} class="collection-editor__select-btn" aria-label="select" data-test-collection-select-item={{i}}>

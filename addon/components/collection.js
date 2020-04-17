@@ -9,6 +9,10 @@ export default class CollectionComponent extends Component {
   @tracked pickedItems;
   @tracked selectedAll;
 
+  get embeddedCollection() {
+    return this.collection.slice(0, 4);
+  }
+
   @action
   collectionSelect() {
     this.itemUnselect();
