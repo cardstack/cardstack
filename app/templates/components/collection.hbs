@@ -25,7 +25,7 @@
       {{else}}
         <Boxel>
           <BoxelHighlight @on={{this.collectionSelected}} {{on "click" this.collectionSelect}} data-test-collection={{@format}} />
-          <BoxelActions @displayHighlightActions={{this.collectionSelected}} data-test-collection-actions={{@format}} />
+          <BoxelActions @displayHighlightActions={{this.collectionSelected}} @expandRoute="movie-registry.edit.collection-view" @expandId={{@field.id}} data-test-collection-actions={{@format}} />
           <div class="collection-editor collection-editor--{{@format}}">
             {{#if @field.embeddedTitle}}
               <h4>{{@field.embeddedTitle}} ({{this.collection.length}})</h4>

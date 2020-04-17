@@ -52,11 +52,6 @@ export default class CollectionComponent extends Component {
   }
 
   @action
-  expand() {
-    // TODO
-  }
-
-  @action
   togglePick(id) {
     for (let item of this.collection) {
       if (item.id === id) {
