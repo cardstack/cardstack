@@ -5,7 +5,7 @@ import { action } from '@ember/object';
 
 export default class BoxelActions extends Component {
   @service router;
-  @tracked format = this.args.format || 'grid';
+  @tracked format = this.args.format || null;
 
   @action
   expand() {

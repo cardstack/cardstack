@@ -2,7 +2,7 @@
   <header class="collection-isolated-header">
     <h1 class="collection-isolated-header__title">{{@model.title}} ({{@model.value.length}})</h1>
     <button class="collection-isolated__btn more" aria-label="more options" />
-    <button class="collection-isolated__btn contract" aria-label="close collection view" />
+    <button {{on "click" this.close}} class="collection-isolated__btn contract" aria-label="close collection view" />
   </header>
   <section class="collection-isolated-section">
     <div class="collection-isolated-section__actions-row">
