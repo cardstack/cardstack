@@ -31,9 +31,9 @@
       </div>
       <div class="collection-isolated-section__view-formats">
         <div class="collection-isolated-section__btn-trio view-selector">
-          <button {{on "click" (fn @changeFormat "list")}} class="collection-isolated__btn list {{if (eq @format "list") "selected" "unselected"}}" aria-label="view as list"></button>
-          <button {{on "click" (fn @changeFormat "grid")}} class="collection-isolated__btn grid {{if (eq @format "grid") "selected" "unselected"}}" aria-label="view as grid"></button>
-          <button {{on "click" (fn @changeFormat "table")}} class="collection-isolated__btn table {{if (eq @format "table") "selected" "unselected"}}" aria-label="view as table"></button>
+          <button {{on "click" (fn this.changeFormat "list")}} class="collection-isolated__btn list {{if (eq this.format "list") "selected" "unselected"}}" aria-label="view as list"></button>
+          <button {{on "click" (fn this.changeFormat "grid")}} class="collection-isolated__btn grid {{if (eq this.format "grid") "selected" "unselected"}}" aria-label="view as grid"></button>
+          <button {{on "click" (fn this.changeFormat "table")}} class="collection-isolated__btn table {{if (eq this.format "table") "selected" "unselected"}}" aria-label="view as table"></button>
         </div>
       </div>
     </div>
