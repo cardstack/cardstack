@@ -25,13 +25,13 @@
       {{else}}
         <Boxel>
           <BoxelHighlight @on={{this.collectionSelected}} {{on "click" this.collectionSelect}} data-test-collection={{@format}} />
-          <BoxelActions @displayHighlightActions={{this.collectionSelected}} @expandRoute="movie-registry.edit.collection-view" @expandId={{@field.id}} data-test-collection-actions={{@format}} />
+          <BoxelActions @format={{@format}} @displayHighlightActions={{this.collectionSelected}} @expandRoute="movie-registry.edit.collection-view" @expandId={{@field.id}} data-test-collection-actions={{@format}} />
           <div class="collection-editor collection-editor--{{@format}}">
             {{#if @field.embeddedTitle}}
               <h4>{{@field.embeddedTitle}} ({{this.collection.length}})</h4>
             {{/if}}
             {{#if this.collectionSelected}}
-              <div class="collection-editor__select">
+              <div class="collection-editor__select collection-editor__select--full-width">
                 <button {{on "click" this.toggleSelectAll}} class="collection-editor__select-btn" aria-label="Select all" data-test-collection-select-all>
                   {{#if this.selectedAll}}
                     {{svg-jar "icon-circle-selected" class="collection-editor__select--selected" width="16px" height="16px"}}
@@ -49,7 +49,7 @@
               </div>
             {{/if}}
             {{#each this.embeddedCollection as |item i|}}
-              <div class="collection-editor__item {{if (and this.collectionSelected (eq @format "list")) "collection-editor__select"}}">
+              <div class="collection-editor__item {{if (and this.collectionSelected (eq @format "list")) "collection-editor__select collection-editor__select--full-width"}}">
                 {{#if (and this.collectionSelected (eq @format "list"))}}
                   <button {{on "click" (fn this.togglePick item.id)}} class="collection-editor__select-btn" aria-label="select" data-test-collection-select-item={{i}}>
                     {{#if item.picked}}
@@ -61,7 +61,7 @@
                 {{/if}}
                 <Boxel>
                   <BoxelHighlight @on={{or item.selected item.picked}} {{on "click" (fn this.itemSelect item.id)}} data-test-collection-item={{i}} />
-                  <BoxelActions @displayHighlightActions={{item.selected}} data-test-collection-item-actions={{i}} />
+                  <BoxelActions @format={{@format}} @displayHighlightActions={{item.selected}} data-test-collection-item-actions={{i}} />
                   <CollectionItem @item={{item}} @mode={{@mode}} @format={{@format}} />
                 </Boxel>
                 {{#if (and this.collectionSelected (eq @format "grid"))}}
@@ -81,7 +81,7 @@
                 {{/if}}
               </div>
             {{/each}}
-            <LinkTo @route="movie-registry.edit.collection-view" @model={{@field.id}} class="collection-editor__view-all-btn">View all ({{this.collection.length}})</LinkTo>
+            <LinkTo @route="movie-registry.edit.collection-view" @model={{@field.id}} @query={{hash format=@format}} class="collection-editor__view-all-btn">View all ({{this.collection.length}})</LinkTo>
             <button class="collection-editor__add-btn">{{svg-jar "icon-plus-circle" width="18px" height="18px"}}</button>
           </div>
         </Boxel>

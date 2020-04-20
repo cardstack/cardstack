@@ -7,8 +7,40 @@
   overflow: hidden;
 }
 
+.collection-isolated-header {
+  display: grid;
+  grid-template-columns: auto 30px 30px;
+  align-items: center;
+  gap: 0 13px;
+  padding: 24px 26px 26px 30px;
+}
+
+.collection-isolated__btn {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 18px 18px;
+  background-color: transparent;
+  border: none;
+  border-radius: 5px;
+}
+
+.collection-isolated__btn:focus {
+  outline-color: var(--boxel-highlight);
+}
+
+.collection-isolated__btn.more {
+  background-image: url('/assets/images/icons/more-actions.svg');
+  background-size: 16px 16px;
+}
+
+.collection-isolated__btn.contract {
+  background-image: url('/assets/images/icons/contract.svg');
+}
+
 .collection-isolated-header__title {
-  padding: 24px 30px 26px;
   color: black;
   font-family: var(--boxel-font-family);
   font-size: 22px;
@@ -17,8 +49,63 @@
 }
 
 .collection-isolated-section {
-  padding: 20px 20px 60px;
   background-color: #F0F0F0;
+}
+
+.collection-isolated-section__actions-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  padding: 20px;
+  align-items: center;
+}
+
+.collection-isolated-section__filters {
+  height: 30px;
+  padding-right: 20px;
+  border-right: 1px solid #707070;
+}
+
+.collection-isolated-section__view-formats {
+  height: 30px;
+  padding-left: 20px;
+}
+
+.collection-isolated-section__btn-trio {
+  display: grid;
+  grid-template-columns: 30px 30px 30px;
+  gap: 8px;
+}
+
+.collection-isolated__btn.unselected {
+  opacity: 0.25;
+}
+
+.collection-isolated__btn.selected {
+  opacity: 1;
+}
+
+.collection-isolated__btn.sort {
+  background-image: url('/assets/images/icons/sort.svg');
+}
+
+.collection-isolated__btn.filter {
+  background-image: url('/assets/images/icons/filter.svg');
+}
+
+.collection-isolated__btn.search {
+  background-image: url('/assets/images/icons/search.svg');
+}
+
+.collection-isolated__btn.list {
+  background-image: url('/assets/images/icons/list.svg');
+}
+
+.collection-isolated__btn.grid {
+  background-image: url('/assets/images/icons/grid.svg');
+}
+
+.collection-isolated__btn.table {
+  background-image: url('/assets/images/icons/table.svg');
 }
 
 .collection-isolated-grid {
@@ -26,4 +113,15 @@
   grid-template-columns: repeat(auto-fill, minmax(206px, auto));
   gap: 20px;
   justify-items: center;
+  padding: 20px;
+}
+
+
+/* move these */
+.collection-editor__select--isolated {
+  grid-column: 1 / 2;
+}
+
+.collection-editor__select-all--isolated {
+  max-width: 355px;
 }

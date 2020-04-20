@@ -95,6 +95,9 @@
   grid-template-columns: 30px 1fr 30px;
   gap: 0 7.5px;
   align-items: center;
+}
+
+.collection-editor__select--full-width {
   grid-column: 1 / -1;
 }
 

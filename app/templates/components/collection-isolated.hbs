@@ -1,13 +1,41 @@
 <div class="collection-isolated">
   <header class="collection-isolated-header">
     <h1 class="collection-isolated-header__title">{{@model.title}} ({{@model.value.length}})</h1>
-    <div>
-      {{!-- Buttons --}}
-    </div>
+    <button class="collection-isolated__btn more" aria-label="more options" />
+    <button class="collection-isolated__btn contract" aria-label="close collection view" />
   </header>
   <section class="collection-isolated-section">
-    <div>
-      {{!-- Buttons --}}
+    <div class="collection-isolated-section__actions-row">
+      <div class="collection-editor__select collection-editor__select--isolated">
+        <button class="collection-editor__select-btn" aria-label="Select all" data-test-collection-select-all>
+          {{#if this.selectedAll}}
+            {{svg-jar "icon-circle-selected" class="collection-editor__select--selected" width="16px" height="16px"}}
+          {{else}}
+            {{svg-jar "icon-circle" class=(if this.pickedItems "collection-editor__select--partial") width="16px" height="16px"}}
+          {{/if}}
+        </button>
+        <div class="collection-editor__select-all collection-editor__select-all--isolated" data-test-collection-selected-count>
+          {{#if this.pickedItems}}
+            {{this.pickedItems}} selected
+          {{else}}
+            Select all
+          {{/if}}
+        </div>
+      </div>
+      <div class="collection-isolated-section__filters">
+        <div class="collection-isolated-section__btn-trio">
+          <button class="collection-isolated__btn sort" aria-label="sort"></button>
+          <button class="collection-isolated__btn filter" aria-label="filter"></button>
+          <button class="collection-isolated__btn search" aria-label="search"></button>
+        </div>
+      </div>
+      <div class="collection-isolated-section__view-formats">
+        <div class="collection-isolated-section__btn-trio view-selector">
+          <button {{on "click" (fn @changeFormat "list")}} class="collection-isolated__btn list {{if (eq @format "list") "selected" "unselected"}}" aria-label="view as list"></button>
+          <button {{on "click" (fn @changeFormat "grid")}} class="collection-isolated__btn grid {{if (eq @format "grid") "selected" "unselected"}}" aria-label="view as grid"></button>
+          <button {{on "click" (fn @changeFormat "table")}} class="collection-isolated__btn table {{if (eq @format "table") "selected" "unselected"}}" aria-label="view as table"></button>
+        </div>
+      </div>
     </div>
     <div class="collection-isolated-grid">
       {{#each @model.value as |item|}}

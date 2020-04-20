@@ -1,6 +1,6 @@
 <div class="collection-modal">
   <div class="collection-scroll-container">
     <div role="button" {{on "click" this.closeModal}} class="collection-modal-overlay" />
-    <CollectionIsolated @model={{@model}} />
+    <CollectionIsolated @model={{@model}} @format={{this.format}} @changeFormat={{action this.changeFormat}} />
   </div>
 </div>
