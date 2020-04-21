@@ -77,8 +77,6 @@ export default class CollectionComponent extends Component {
 
     if (collection.pickedItems) {
       this.collectionSelect();
-    } else {
-      this.collectionUnselect();
     }
 
     set(collection, 'selectedAll', collection.length === collection.pickedItems);
