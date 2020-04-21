@@ -6,16 +6,12 @@ export default class CollectionComponent extends Component {
   @tracked collection = this.args?.field?.value || this.args?.model?.value;
   @tracked collectionSelected;
   @tracked displayItemActions;
-  // @tracked pickedItems;
-  // @tracked selectedAll;
 
   constructor(...args) {
     super(...args);
     let collection = this.collection;
     set(collection, 'pickedItems', collection.filter(item => item.picked).length);
     set(collection, 'selectedAll', collection.length === collection.pickedItems);
-    // this.collection.pickedItems = this.collection.filter(item => item.picked).length;
-    // this.collection.selectedAll = this.collection.length === this.pickedItems;
   }
 
   get embeddedCollection() {
@@ -80,8 +76,6 @@ export default class CollectionComponent extends Component {
 
     set(collection, 'pickedItems', collection.filter(item => item.picked).length);
     set(collection, 'selectedAll', collection.length === collection.pickedItems);
-    // this.collection.pickedItems = this.collection.filter(item => item.picked).length;
-    // this.collection.selectedAll = this.collection.length === this.collection.pickedItems;
   }
 
   @action
@@ -95,8 +89,6 @@ export default class CollectionComponent extends Component {
       }
       set(collection, 'pickedItems', collection.length);
       set(collection, 'selectedAll', true);
-      // this.collection.selectedAll = true;
-      // this.collection.pickedItems = this.collection.length;
     }
   }
 
@@ -108,13 +100,13 @@ export default class CollectionComponent extends Component {
     }
     set(collection, 'pickedItems', 0);
     set(collection, 'selectedAll', false);
-    // this.collection.selectedAll = false;
-    // this.collection.pickedItems = 0;
   }
 
   @action
   removeItem(id) {
+    this.collection = this.collection.filter(item => item.id !== id);
     let collection = this.collection;
-    this.collection = collection.filter(item => item.id !== id);
+    set(collection, 'pickedItems', collection.filter(item => item.picked).length);
+    set(collection, 'selectedAll', collection.length === collection.pickedItems);
   }
 }

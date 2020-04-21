@@ -1,11 +1,11 @@
 {{#if (eq @mode "edit")}}
   {{#if @field.id}}
     {{#if (eq @field.id "genres")}}
-      <Collection @mode={{@mode}} @format="tagList" @field={{@field}} @fieldName={{@fieldName}} />
+      <Collection @mode={{@mode}} @format="tagList" @field={{@field}} @fieldName={{@fieldName}} @collectionEditRoute={{@collectionEditRoute}} />
     {{else if (eq @field.id "photos")}}
-      <Collection @mode={{@mode}} @format="grid" @field={{@field}} @fieldName={{@fieldName}} />
+      <Collection @mode={{@mode}} @format="grid" @field={{@field}} @fieldName={{@fieldName}} @collectionEditRoute={{@collectionEditRoute}} />
     {{else if (eq @field.id "cast")}}
-      <Collection @mode={{@mode}} @format="list" @field={{@field}} @fieldName={{@fieldName}} />
+      <Collection @mode={{@mode}} @format="list" @field={{@field}} @fieldName={{@fieldName}} @collectionEditRoute={{@collectionEditRoute}} />
     {{/if}}
   {{else}}
     <label class="edit-field edit-field--{{dasherize @fieldName}}-field" data-test-edit-field="form-editors">
