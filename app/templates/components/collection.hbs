@@ -5,8 +5,8 @@
       <div class="edit-field__value">
         {{#if (eq @format "tagList")}}
           <Boxel>
-            <BoxelHighlight @on={{this.collectionSelected}} {{on "click" this.collectionSelect}} />
-            <BoxelActions @displayHighlightActions={{this.collectionSelected}} />
+            <BoxelHighlight @on={{collection.selected}} {{on "click" this.collectionSelect}} />
+            <BoxelActions @displayHighlightActions={{collection.selected}} />
             <div class="collection-editor collection-taglist-editor">
               <ul class="collection-taglist-editor__list">
                 {{#each this.embeddedCollection as |item|}}
@@ -25,13 +25,13 @@
           </Boxel>
         {{else}}
           <Boxel>
-            <BoxelHighlight @on={{this.collectionSelected}} {{on "click" this.collectionSelect}} data-test-collection={{@format}} />
-            <BoxelActions @format={{@format}} @displayHighlightActions={{this.collectionSelected}} @expandRoute="movie-registry.edit.collection-view" @expandId={{@field.id}} data-test-collection-actions={{@format}} />
+            <BoxelHighlight @on={{collection.selected}} {{on "click" this.collectionSelect}} data-test-collection={{@format}} />
+            <BoxelActions @format={{@format}} @displayHighlightActions={{collection.selected}} @expandRoute={{@collectionEditRoute}} @expandId={{@field.id}} data-test-collection-actions={{@format}} />
             <div class="collection-editor collection-editor--{{@format}}">
               {{#if @field.embeddedTitle}}
                 <h4>{{@field.embeddedTitle}} ({{collection.length}})</h4>
               {{/if}}
-              {{#if this.collectionSelected}}
+              {{#if collection.selected}}
                 <div class="collection-editor__select collection-editor__select--full-width">
                   <button {{on "click" this.toggleSelectAll}} class="collection-editor__select-btn" aria-label="Select all" data-test-collection-select-all>
                     {{#if collection.selectedAll}}
@@ -50,8 +50,8 @@
                 </div>
               {{/if}}
               {{#each this.embeddedCollection as |item i|}}
-                <div class="collection-editor__item {{if (and this.collectionSelected (eq @format "list")) "collection-editor__select collection-editor__select--full-width"}}">
-                  {{#if (and this.collectionSelected (eq @format "list"))}}
+                <div class="collection-editor__item {{if (and collection.selected (eq @format "list")) "collection-editor__select collection-editor__select--full-width"}}">
+                  {{#if (and collection.selected (eq @format "list"))}}
                     <button {{on "click" (fn this.togglePick item.id)}} class="collection-editor__select-btn" aria-label="select" data-test-collection-select-item={{i}}>
                       {{#if item.picked}}
                         {{svg-jar "icon-circle-selected" class="collection-editor__select--selected" width="16px" height="16px"}}
@@ -61,11 +61,11 @@
                     </button>
                   {{/if}}
                   <Boxel>
-                    <BoxelHighlight @on={{or item.selected (and this.collectionSelected item.picked)}} {{on "click" (fn this.itemSelect item.id)}} data-test-collection-item={{i}} />
+                    <BoxelHighlight @on={{or item.selected (and collection.selected item.picked)}} {{on "click" (fn this.itemSelect item.id)}} data-test-collection-item={{i}} />
                     <BoxelActions @format={{@format}} @displayHighlightActions={{item.selected}} data-test-collection-item-actions={{i}} />
                     <CollectionItem @item={{item}} @mode={{@mode}} @format={{@format}} />
                   </Boxel>
-                  {{#if (and this.collectionSelected (eq @format "grid"))}}
+                  {{#if (and collection.selected (eq @format "grid"))}}
                     <div class="collection-editor__btn-group collection-editor__btn-group--embedded">
                       <button {{on "click" (fn this.togglePick item.id)}} class="collection-editor__select-btn" aria-label="select" data-test-collection-select-item={{i}}>
                         {{#if item.picked}}
@@ -77,7 +77,7 @@
                       <button {{on "click" (fn this.removeItem item.id)}} class="collection-editor__select-btn" aria-label="remove">{{svg-jar "icon-minus-circle" width="16px" height="16px"}}</button>
                     </div>
                   {{/if}}
-                  {{#if (and this.collectionSelected (eq @format "list"))}}
+                  {{#if (and collection.selected (eq @format "list"))}}
                     <button {{on "click" (fn this.removeItem item.id)}} class="collection-editor__select-btn" aria-label="remove">{{svg-jar "icon-minus-circle" width="16px" height="16px"}}</button>
                   {{/if}}
                 </div>
