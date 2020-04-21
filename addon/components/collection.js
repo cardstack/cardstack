@@ -6,13 +6,16 @@ export default class CollectionComponent extends Component {
   @tracked collection = this.args?.field?.value || this.args?.model?.value;
   @tracked collectionSelected;
   @tracked displayItemActions;
-  @tracked pickedItems;
-  @tracked selectedAll;
+  // @tracked pickedItems;
+  // @tracked selectedAll;
 
   constructor(...args) {
     super(...args);
-    this.pickedItems = this.collection.filter(item => item.picked).length;
-    this.selectedAll = this.collection.length === this.pickedItems;
+    let collection = this.collection;
+    set(collection, 'pickedItems', collection.filter(item => item.picked).length);
+    set(collection, 'selectedAll', collection.length === collection.pickedItems);
+    // this.collection.pickedItems = this.collection.filter(item => item.picked).length;
+    // this.collection.selectedAll = this.collection.length === this.pickedItems;
   }
 
   get embeddedCollection() {
@@ -32,12 +35,13 @@ export default class CollectionComponent extends Component {
 
   @action
   itemSelect(id) {
-    if (this.pickedItems > 1) {
+    let collection = this.collection;
+    if (collection.pickedItems > 1) {
       // if more than 1 item has been picked, continue picking items
       this.togglePick(id);
     } else {
       // else highlight individual items
-      for (let item of this.collection) {
+      for (let item of collection) {
         if (item.id === id) {
           set(item, "selected", true);
         }
@@ -52,7 +56,8 @@ export default class CollectionComponent extends Component {
 
   @action
   itemUnselect() {
-    for (let item of this.collection) {
+    let collection = this.collection;
+    for (let item of collection) {
       set(item, "selected", false);
     }
   }
@@ -65,40 +70,51 @@ export default class CollectionComponent extends Component {
 
   @action
   togglePick(id) {
-    for (let item of this.collection) {
+    let collection = this.collection;
+    for (let item of collection) {
       if (item.id === id) {
         set(item, "picked", !item.picked);
       }
     }
     this.itemUnselect();
-    this.pickedItems = this.collection.filter(item => item.picked).length;
-    this.selectedAll = this.collection.length === this.pickedItems;
+
+    set(collection, 'pickedItems', collection.filter(item => item.picked).length);
+    set(collection, 'selectedAll', collection.length === collection.pickedItems);
+    // this.collection.pickedItems = this.collection.filter(item => item.picked).length;
+    // this.collection.selectedAll = this.collection.length === this.collection.pickedItems;
   }
 
   @action
   toggleSelectAll() {
-    if (this.selectedAll || this.pickedItems) {
+    let collection = this.collection;
+    if (collection.selectedAll || collection.pickedItems) {
       this.unselectAll();
     } else {
-      for (let item of this.collection) {
+      for (let item of collection) {
         set(item, "picked", true);
       }
-      this.selectedAll = true;
-      this.pickedItems = this.collection.length;
+      set(collection, 'pickedItems', collection.length);
+      set(collection, 'selectedAll', true);
+      // this.collection.selectedAll = true;
+      // this.collection.pickedItems = this.collection.length;
     }
   }
 
   @action
   unselectAll() {
-    for (let item of this.collection) {
+    let collection = this.collection;
+    for (let item of collection) {
       set(item, "picked", false);
     }
-    this.selectedAll = false;
-    this.pickedItems = 0;
+    set(collection, 'pickedItems', 0);
+    set(collection, 'selectedAll', false);
+    // this.collection.selectedAll = false;
+    // this.collection.pickedItems = 0;
   }
 
   @action
   removeItem(id) {
-    this.collection = this.collection.filter(item => item.id !== id);
+    let collection = this.collection;
+    this.collection = collection.filter(item => item.id !== id);
   }
 }

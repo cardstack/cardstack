@@ -33,15 +33,15 @@
             {{#if this.collectionSelected}}
               <div class="collection-editor__select collection-editor__select--full-width">
                 <button {{on "click" this.toggleSelectAll}} class="collection-editor__select-btn" aria-label="Select all" data-test-collection-select-all>
-                  {{#if this.selectedAll}}
+                  {{#if this.collection.selectedAll}}
                     {{svg-jar "icon-circle-selected" class="collection-editor__select--selected" width="16px" height="16px"}}
                   {{else}}
-                    {{svg-jar "icon-circle" class=(if this.pickedItems "collection-editor__select--partial") width="16px" height="16px"}}
+                    {{svg-jar "icon-circle" class=(if this.collection.pickedItems "collection-editor__select--partial") width="16px" height="16px"}}
                   {{/if}}
                 </button>
                 <div class="collection-editor__select-all" data-test-collection-selected-count>
-                  {{#if this.pickedItems}}
-                    {{this.pickedItems}} selected
+                  {{#if this.collection.pickedItems}}
+                    {{this.collection.pickedItems}} selected
                   {{else}}
                     Select all
                   {{/if}}
