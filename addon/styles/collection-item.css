@@ -32,7 +32,7 @@
 .collection-item__img {
   margin: auto;
   max-width: 100%;
-  height: auto;
+  object-fit: contain;
 }
 
 .collection-item--list .collection-item__img-container {

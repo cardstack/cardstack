@@ -101,6 +101,7 @@
 
 .collection-editor__select--full-width {
   grid-column: 1 / -1;
+  width: 100%;
 }
 
 .collection-editor__select-btn {
