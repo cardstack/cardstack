@@ -82,12 +82,14 @@
   grid-auto-columns: min-content;
   justify-content: center;
   gap: 30px;
+}
+
+.collection-editor__btn-group--embedded {
   padding: 4px 4px 16px;
 }
 
 .collection-editor button:focus {
-  outline: 0;
-  border: 2px solid var(--boxel-highlight);
+  outline-color: var(--boxel-highlight);
 }
 
 .collection-editor__select {

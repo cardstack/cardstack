@@ -1,8 +1,8 @@
-import Component from '@glimmer/component';
+import CollectionComponent from './collection';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 
-export default class CollectionIsolatedComponent extends Component {
+export default class CollectionIsolatedComponent extends CollectionComponent {
   @tracked format = this.args.format || 'grid';
 
   @action

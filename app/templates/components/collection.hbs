@@ -65,7 +65,7 @@
                   <CollectionItem @item={{item}} @mode={{@mode}} @format={{@format}} />
                 </Boxel>
                 {{#if (and this.collectionSelected (eq @format "grid"))}}
-                  <div class="collection-editor__btn-group">
+                  <div class="collection-editor__btn-group collection-editor__btn-group--embedded">
                     <button {{on "click" (fn this.togglePick item.id)}} class="collection-editor__select-btn" aria-label="select" data-test-collection-select-item={{i}}>
                       {{#if item.picked}}
                         {{svg-jar "icon-circle-selected" class="collection-editor__select--selected" width="16px" height="16px"}}

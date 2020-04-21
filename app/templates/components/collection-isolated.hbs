@@ -1,13 +1,13 @@
 <div class="collection-isolated">
   <header class="collection-isolated-header">
-    <h1 class="collection-isolated-header__title">{{@model.title}} ({{@model.value.length}})</h1>
+    <h1 class="collection-isolated-header__title">{{@model.title}} ({{this.collection.length}})</h1>
     <button class="collection-isolated__btn more" aria-label="more options" />
     <button {{on "click" this.close}} class="collection-isolated__btn contract" aria-label="close collection view" />
   </header>
   <section class="collection-isolated-section">
     <div class="collection-isolated-section__actions-row">
       <div class="collection-editor__select collection-editor__select--isolated">
-        <button class="collection-editor__select-btn" aria-label="Select all" data-test-collection-select-all>
+        <button {{on "click" this.toggleSelectAll}} class="collection-editor__select-btn collection-editor__select-btn--isolated" aria-label="Select all" data-test-collection-select-all>
           {{#if this.selectedAll}}
             {{svg-jar "icon-circle-selected" class="collection-editor__select--selected" width="16px" height="16px"}}
           {{else}}
@@ -38,10 +38,27 @@
       </div>
     </div>
     <div class="collection-isolated-grid">
-      {{#each @model.value as |item|}}
-        <CollectionItem @item={{item}} @mode="edit" @format="grid" />
+      {{#each this.collection as |item i|}}
+        <div>
+          <Boxel>
+            <BoxelHighlight @on={{or item.selected item.picked}} {{on "click" (fn this.itemSelect item.id)}} data-test-collection-item={{i}} />
+            <BoxelActions @format={{this.format}} @displayHighlightActions={{item.selected}} data-test-collection-item-actions={{i}} />
+            <CollectionItem @item={{item}} @mode="edit" @format={{this.format}} />
+          </Boxel>
+          {{#if (eq @format "grid")}}
+            <div class="collection-editor__btn-group collection-editor__btn-group--isolated">
+              <button {{on "click" (fn this.togglePick item.id)}} class="collection-editor__select-btn collection-editor__select-btn--isolated" aria-label="select" data-test-collection-select-item={{i}}>
+                {{#if item.picked}}
+                  {{svg-jar "icon-circle-selected" class="collection-editor__select--selected" width="16px" height="16px"}}
+                {{else}}
+                  {{svg-jar "icon-circle" width="16px" height="16px"}}
+                {{/if}}
+              </button>
+              <button {{on "click" (fn this.removeItem item.id)}} class="collection-editor__select-btn collection-editor__select-btn--isolated" aria-label="remove">{{svg-jar "icon-minus-circle" width="16px" height="16px"}}</button>
+            </div>
+          {{/if}}
+        </div>
       {{/each}}
     </div>
   </section>
-
 </div>

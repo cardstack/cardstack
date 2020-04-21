@@ -113,7 +113,7 @@
   grid-template-columns: repeat(auto-fill, minmax(206px, auto));
   gap: 20px;
   justify-items: center;
-  padding: 20px;
+  padding: 20px 20px 40px;
 }
 
 
@@ -124,4 +124,18 @@
 
 .collection-editor__select-all--isolated {
   max-width: 355px;
+}
+
+
+.collection-editor__btn-group--isolated {
+  padding: 10px;
+}
+
+.collection-editor__select-btn--isolated:focus {
+  outline-color: var(--boxel-highlight);
+}
+
+.collection-editor__select-btn--isolated > svg {
+  display: block;
+  margin: auto;
 }
