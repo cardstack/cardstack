@@ -17,9 +17,4 @@ export default class MovieRegistryEditCollectionViewController extends Controlle
   changeFormat(format) {
     this.format = format;
   }
-
-  @action
-  contract() {
-    this.closeModal();
-  }
 }
