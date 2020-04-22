@@ -28,3 +28,25 @@
   background-color: #C9C8C8;
   border-radius: 5px;
 }
+
+@media only screen and (min-width: 341px) and (max-width: 931px) {
+  .collection-modal {
+    width: 95%;
+    left: 0;
+    margin-left: 2.5%;
+  }
+
+  .collection-modal-overlay {
+    width: 85%;
+    left: 0;
+    margin-left: 7.5%;
+  }
+}
+
+@media only screen and (max-width: 340px) {
+  .collection-modal {
+    width: 300px;
+    left: 0;
+    margin-left: 0;
+  }
+}

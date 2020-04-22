@@ -30,6 +30,10 @@ a {
   display: inline-block;
 }
 
+a:focus {
+  outline-color: var(--boxel-highlight);
+}
+
 svg {
   --icon-color: currentColor;
   display: inline-block;
@@ -49,6 +53,10 @@ button {
   display: inline-block;
   color: currentColor;
   font: inherit;
+}
+
+button:focus {
+  outline-color: var(--boxel-highlight);
 }
 
 ul {
@@ -85,4 +93,3 @@ ul {
 .cs-input-group--helper-text {
   display: none;
 }
-/*  */

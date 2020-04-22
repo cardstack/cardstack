@@ -38,9 +38,9 @@
           </div>
         </div>
       </div>
-      <div class="collection-isolated-grid">
+      <div class="collection-isolated-grid collection-isolated-grid--{{this.format}}">
         {{#each collection as |item i|}}
-          <div class="collection-isolated-grid__item {{if (eq this.format "list") "collection-editor__select collection-editor__select--full-width"}}">
+          <div class="collection-isolated-grid__item {{if (eq this.format "list") "collection-editor__select collection-editor__select--isolated"}}">
             {{#if (eq this.format "list")}}
               <button {{on "click" (fn this.togglePick item.id)}} class="collection-editor__select-btn collection-editor__select-btn--isolated" aria-label="select" data-test-collection-select-item={{i}}>
                 {{#if item.picked}}
@@ -56,7 +56,7 @@
               <CollectionItem @item={{item}} @mode="edit" @format={{this.format}} @isolated={{true}} />
             </Boxel>
             {{#if (eq this.format "grid")}}
-              <div class="collection-editor__btn-group collection-editor__btn-group--isolated">
+              <div class="collection-editor__btn-group">
                 <button {{on "click" (fn this.togglePick item.id)}} class="collection-editor__select-btn collection-editor__select-btn--isolated" aria-label="select" data-test-collection-select-item={{i}}>
                   {{#if item.picked}}
                     {{svg-jar "icon-circle-selected" class="collection-editor__select--selected" width="16px" height="16px"}}

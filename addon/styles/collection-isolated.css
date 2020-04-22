@@ -1,6 +1,5 @@
 .collection-isolated {
   position: relative;
-  min-height: 100vh;
   background-color: white;
   border-radius: 5px;
   border: none;
@@ -54,9 +53,10 @@
 
 .collection-isolated-section__actions-row {
   display: grid;
-  grid-template-columns: 1fr auto auto;
-  padding: 20px;
+  grid-template-columns: minmax(auto, 1fr) auto auto;
+  padding: 20px 20px 20px 13px;
   align-items: center;
+  white-space: nowrap;
 }
 
 .collection-isolated-section__filters {
@@ -110,32 +110,12 @@
 
 .collection-isolated-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(206px, auto));
-  gap: 20px;
+  gap: 10px 20px;
   justify-items: center;
-  padding: 20px 20px 40px;
+  padding: 20px 13px 40px;
 }
 
-
-/* move these */
-.collection-editor__select--isolated {
-  grid-column: 1 / 2;
-}
-
-.collection-editor__select-all--isolated {
-  max-width: 355px;
-}
-
-
-.collection-editor__btn-group--isolated {
-  padding: 10px;
-}
-
-.collection-editor__select-btn--isolated:focus {
-  outline-color: var(--boxel-highlight);
-}
-
-.collection-editor__select-btn--isolated > svg {
-  display: block;
-  margin: auto;
+.collection-isolated-grid--grid {
+  grid-template-columns: repeat(auto-fill, minmax(206px, auto));
+  padding: 20px;
 }
