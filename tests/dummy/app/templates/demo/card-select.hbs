@@ -1,0 +1,10 @@
+<div class="cs-card-select--demo-container">
+  <CardSelect
+    @search={{fn this.search}}
+    @selected={{this.selected}}
+    @labelPath="title.value"
+    @thumbPath="poster.value"
+    @subtitlePath="year.value"
+    @dataSource="Searching IMDB Registry"
+    @onChange={{action (mut this.selected)}} />
+</div>

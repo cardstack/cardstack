@@ -85,6 +85,8 @@ ul {
   --cs-field-hover: white;
   --cs-field-height: 50px;
   --cs-letter-spacing: 0.025em;
+  --cs-purple: #141428;
+  --cs-purple-light: #39384D;
 }
 .cs-input-group {
   display: contents;

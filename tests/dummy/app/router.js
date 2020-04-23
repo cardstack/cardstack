@@ -51,6 +51,7 @@ Router.map(function() {
     this.route('drag-drop-animation');
     this.route('tic-tac-toe');
     this.route('tic-tac-toe-enhanced');
+    this.route('card-select')
   });
 });
 
