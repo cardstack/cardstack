@@ -1,0 +1,18 @@
+<div class="cs-card-select">
+  <PowerSelectTypeahead
+    @placeholder={{or @placeholder "Search"}}
+    @selected={{@selected}}
+    @search={{@search}}
+    @extra={{hash labelPath=@labelPath}}
+    @beforeOptionsComponent={{component "card-select/before-options" dataSource=@dataSource}}
+    @dropdownClass="cs-card-select--dropdown"
+    @onChange={{@onChange}} as |item select|>
+    <CardSelect::Option
+      @item={{item}}
+      @select={{select}}
+      @thumbPath={{@thumbPath}}
+      @subtitlePath={{@subtitlePath}}
+      @labelPath={{@labelPath}}/>
+  </PowerSelectTypeahead>
+</div>
+

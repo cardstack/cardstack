@@ -29,7 +29,7 @@
     "ember-element-helper": "^0.2.0"
   },
   "devDependencies": {
-    "@cardstack/ui-components": "^0.2.21",
+    "@cardstack/ui-components": "cardstack/ui-components#44a38d3",
     "@ember/jquery": "^1.1.0",
     "@ember/optional-features": "^1.3.0",
     "@ember/render-modifiers": "^1.0.2",
@@ -41,6 +41,7 @@
     "ember-animated-tools": "^0.4.1",
     "ember-cli": "~3.17.0",
     "ember-cli-dependency-checker": "^3.1.0",
+    "ember-cli-dependency-lint": "^1.1.3",
     "ember-cli-deploy": "^1.0.2",
     "ember-cli-deploy-build": "^2.0.0",
     "ember-cli-deploy-git": "^1.3.4",
@@ -62,6 +63,9 @@
     "ember-math-helpers": "^2.14.0",
     "ember-maybe-import-regenerator": "^0.1.6",
     "ember-moment": "^8.0.0",
+    "ember-power-calendar-moment": "^0.1.7",
+    "ember-power-select": "^4.0.0",
+    "ember-power-select-typeahead": "alexspeller/ember-power-select-typeahead#6d279fb",
     "ember-qunit": "^4.6.0",
     "ember-resolver": "^7.0.0",
     "ember-source": "3.17.3",
