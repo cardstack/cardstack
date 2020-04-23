@@ -3,40 +3,58 @@ import { tracked } from '@glimmer/tracking';
 import { action, set } from '@ember/object';
 
 export default class CollectionComponent extends Component {
-  @tracked collection = this.args?.field?.value;
-  @tracked collectionSelected;
+  @tracked collection = this.args?.field?.value || this.args?.model?.value;
   @tracked displayItemActions;
-  @tracked pickedItems;
-  @tracked selectedAll;
+
+  constructor(...args) {
+    super(...args);
+    let collection = this.collection;
+    set(collection, 'pickedItems', collection.filter(item => item.picked).length);
+    set(collection, 'selectedAll', collection.length === collection.pickedItems);
+  }
+
+  get embeddedCollection() {
+    return this.collection.slice(0, 4);
+  }
 
   @action
   collectionSelect() {
     this.itemUnselect();
-    this.collectionSelected = true;
+    let collection = this.collection;
+    set(collection, 'selected', true);
   }
 
   @action
   collectionUnselect() {
-    this.collectionSelected = false;
+    let collection = this.collection;
+    set(collection, 'selected', false);
   }
 
   @action
   itemSelect(id) {
-    for (let item of this.collection) {
-      if (item.id === id) {
-        set(item, "selected", true);
+    let collection = this.collection;
+    if (collection.pickedItems > 1) {
+      // if more than 1 item has been picked, continue picking items
+      this.togglePick(id);
+    } else {
+      // else highlight individual items
+      for (let item of collection) {
+        if (item.id === id) {
+          set(item, "selected", true);
+        }
+        else {
+          set(item, "selected", false);
+        }
       }
-      else {
-        set(item, "selected", false);
-      }
+      this.collectionUnselect();
+      this.unselectAll();
     }
-    this.collectionUnselect();
-    this.unselectAll();
   }
 
   @action
   itemUnselect() {
-    for (let item of this.collection) {
+    let collection = this.collection;
+    for (let item of collection) {
       set(item, "selected", false);
     }
   }
@@ -48,44 +66,52 @@ export default class CollectionComponent extends Component {
   }
 
   @action
-  expand() {
-    // TODO
-  }
-
-  @action
   togglePick(id) {
-    for (let item of this.collection) {
+    let collection = this.collection;
+    for (let item of collection) {
       if (item.id === id) {
         set(item, "picked", !item.picked);
       }
     }
-    this.pickedItems = this.collection.filter(item => item.picked).length;
+    set(collection, 'pickedItems', collection.filter(item => item.picked).length);
+
+    if (collection.pickedItems) {
+      this.collectionSelect();
+    }
+
+    set(collection, 'selectedAll', collection.length === collection.pickedItems);
   }
 
   @action
   toggleSelectAll() {
-    if (this.selectedAll) {
+    let collection = this.collection;
+    if (collection.selectedAll || collection.pickedItems) {
       this.unselectAll();
     } else {
-      for (let item of this.collection) {
+      for (let item of collection) {
         set(item, "picked", true);
       }
-      this.selectedAll = true;
-      this.pickedItems = this.collection.length;
+      this.collectionSelect();
+      set(collection, 'pickedItems', collection.length);
+      set(collection, 'selectedAll', true);
     }
   }
 
   @action
   unselectAll() {
-    for (let item of this.collection) {
+    let collection = this.collection;
+    for (let item of collection) {
       set(item, "picked", false);
     }
-    this.selectedAll = false;
-    this.pickedItems = 0;
+    set(collection, 'pickedItems', 0);
+    set(collection, 'selectedAll', false);
   }
 
   @action
   removeItem(id) {
     this.collection = this.collection.filter(item => item.id !== id);
+    let collection = this.collection;
+    set(collection, 'pickedItems', collection.filter(item => item.picked).length);
+    set(collection, 'selectedAll', collection.length === collection.pickedItems);
   }
 }

@@ -1,0 +1,13 @@
+<div class="collection-item collection-item--{{@format}} collection-item--{{@mode}}">
+  <div class="collection-item__img-container">
+    <img
+      class="collection-item__img"
+      src="/assets/images/{{@item.src}}"
+      alt="{{@item.title}}"
+      width={{if (eq @format "grid") 150 60}}
+      height={{if (eq @format "grid") 150 60}}
+    >
+  </div>
+  <h4 class="collection-item__title">{{@item.title}}</h4>
+  <div class="collection-item__detail">{{@item.detail}}</div>
+</div>

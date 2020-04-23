@@ -41,10 +41,12 @@ module('Acceptance | collection', function (hooks) {
 
   test('can bulk-select and unselect items', async function (assert) {
     await visit(`/movie-registry/${movieId}/edit`);
+    assert.dom('[data-test-collection-select-all]').doesNotExist();
     assert.dom('[data-test-collection-select-item="0"]').doesNotExist();
     await click('[data-test-collection="list"]');
     assert.dom('[data-test-collection-select-item="0"]').exists();
     assert.dom('[data-test-collection-select-item="1"]').exists();
+    assert.dom('[data-test-collection-select-all]').exists();
     assert.dom('[data-test-collection-selected-count]').hasText('Select all');
     assert.dom('[data-test-collection-select-all] svg').doesNotHaveClass('collection-editor__select--partial');
     assert.dom('[data-test-collection-select-item="0"] svg').doesNotHaveClass('collection-editor__select--selected');
@@ -63,7 +65,6 @@ module('Acceptance | collection', function (hooks) {
 
   test('can toggle bulk-select and unselect all items', async function (assert) {
     await visit(`/movie-registry/${movieId}/edit`);
-    assert.dom('[data-test-collection-select-all]').doesNotExist();
     await click('[data-test-collection="list"]');
     assert.dom('[data-test-collection-select-all]').exists();
     assert.dom('[data-test-collection-selected-count]').hasText('Select all');
@@ -75,4 +76,24 @@ module('Acceptance | collection', function (hooks) {
     assert.dom('[data-test-collection-selected-count]').hasText('Select all');
     assert.dom('[data-test-collection-select-all] svg').doesNotHaveClass('collection-editor__select--selected');
   });
+
+  test('clicking on select all after selecting an item unselects them all', async function (assert) {
+    await visit(`/movie-registry/${movieId}/edit`);
+    await click('[data-test-collection="list"]');
+    assert.dom('[data-test-collection-select-all]').exists();
+    await click('[data-test-collection-select-item="0"]');
+    assert.dom('[data-test-collection-select-item="0"] svg').hasClass('collection-editor__select--selected');
+    assert.dom('[data-test-collection-selected-count]').hasText('1 selected');
+    assert.dom('[data-test-collection-select-all] svg').hasClass('collection-editor__select--partial');
+    await click('[data-test-collection-select-all]');
+    assert.dom('[data-test-collection-selected-count]').hasText('Select all');
+    assert.dom('[data-test-collection-select-all] svg').doesNotHaveClass('collection-editor__select--selected');
+    assert.dom('[data-test-collection-select-item="0"] svg').doesNotHaveClass('collection-editor__select--selected');
+    await click('[data-test-collection-select-all]');
+    assert.dom('[data-test-collection-selected-count]').includesText('selected');
+    assert.dom('[data-test-collection-select-all] svg').hasClass('collection-editor__select--selected');
+    assert.dom('[data-test-collection-select-item="0"] svg').hasClass('collection-editor__select--selected');
+  });
+
+  // TODO: more tests here
 });
