@@ -72,6 +72,8 @@ export default {
             title: "Carrie Fisher",
             detail: "Leia Organa",
             src: "carrie-fisher.png",
+            firstName: "Carrie",
+            lastName: "Fisher"
           },
           {
             id: "mark-hamill",
@@ -116,6 +118,25 @@ export default {
             src: "naomie-ackie.png",
           },
         ],
+        columns: [
+          {
+            name: 'Name',
+            valuePath: 'title',
+            isFixed: 'left',
+          },
+          {
+            name: 'Id',
+            valuePath: 'id',
+          },
+          {
+            name: 'Role',
+            valuePath: 'detail'
+          },
+          {
+            name: 'Image file',
+            valuePath: 'src',
+          },
+        ]
       },
       photos: {
         id: 'photos',
@@ -128,6 +149,26 @@ export default {
           { id: "sw4", src: "sw4.png", title: "Photo 004", detail: "May 5, 2019", },
           { id: "sw5", src: "sw5.png", title: "Photo 005", detail: "May 5, 2019", },
         ],
+        columns: [
+          {
+            name: 'Title',
+            valuePath: 'title',
+            isFixed: 'left',
+            width: 165
+          },
+          {
+            name: 'Id',
+            valuePath: 'id'
+          },
+          {
+            name: 'Date created',
+            valuePath: 'detail'
+          },
+          {
+            name: 'File',
+            valuePath: 'src'
+          }
+        ]
       },
     },
     {

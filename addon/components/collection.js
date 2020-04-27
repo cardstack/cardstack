@@ -3,7 +3,8 @@ import { tracked } from '@glimmer/tracking';
 import { action, set } from '@ember/object';
 
 export default class CollectionComponent extends Component {
-  @tracked collection = this.args?.field?.value || this.args?.model?.value;
+  @tracked collection = this.args?.field?.value || this.args?.model?.value || this.args?.collection;
+  @tracked tableCols = this.args?.field?.columns || this.args?.model?.columns;
   @tracked displayItemActions;
 
   constructor(...args) {
