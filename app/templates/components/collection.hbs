@@ -96,7 +96,15 @@
                 </LinkTo>
                 <span />
               </div>
-              <button class="collection-editor__add-btn">{{svg-jar "icon-plus-circle" width="18px" height="18px"}}</button>
+
+              <CollectionAddButton
+                @searchFn={{@searchFn}}
+                @field={{@field}}
+                @fieldName={{@fieldName}}
+                @addItem={{this.addItem}}
+                @format={{@format}}
+                @mode={{@mode}}
+                @newItemComponent={{component "collection-item" mode=@mode format=@format}}/>
             </div>
           </Boxel>
         {{/if}}
