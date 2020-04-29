@@ -1,0 +1,37 @@
+[
+  {
+    "catalog_title": "Hit songs",
+    "catalog_description": "Big-selling records",
+    "number_of_songs": "387 items"
+  },
+  {
+    "catalog_title": "Radio-friendly",
+    "catalog_description": "Suitable for mainstream radio",
+    "number_of_songs": "1.300 items"
+  },
+  {
+    "catalog_title": "Love songs",
+    "catalog_description": "—",
+    "number_of_songs": "505 items"
+  },
+  {
+    "catalog_title": "Gary and the whales",
+    "catalog_description": "All songs ever recorded by this band",
+    "number_of_songs": "79 items"
+  },
+  {
+    "catalog_title": "Instrumental",
+    "catalog_description": "—",
+    "number_of_songs": "290 items"
+  },
+  {
+    "catalog_title": "Soundtracks",
+    "catalog_description": "Used in movies and TV shows",
+    "number_of_songs": "112 items"
+  },
+  {
+    "catalog_title": "Unplugged",
+    "catalog_description": "—",
+    "number_of_songs": "166 items"
+  }
+]
