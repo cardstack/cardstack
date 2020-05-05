@@ -20,3 +20,16 @@
   outline: 0;
   border-color: var(--boxel-highlight);
 }
+
+.boxel-highlight--revision-mode {
+  height: auto;
+  width: auto;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+}
+
+.boxel-highlight--revision-mode.boxel-highlight--on {
+  border-color: #37EB77;
+}

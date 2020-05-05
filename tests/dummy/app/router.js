@@ -13,6 +13,7 @@ Router.map(function() {
     this.route('edit', { path: '/:id/edit' }, function() {
       this.route('collection-view', { path: '/collection/:collectionId' });
     });
+    this.route('versions', { path: '/:id/versions' });
   });
   this.route('catalog', function() {
     this.route('preview', { path: '/:model/preview' });

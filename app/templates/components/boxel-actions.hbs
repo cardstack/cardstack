@@ -1,6 +1,12 @@
 {{#if @displayHighlightActions}}
-  <div class="boxel-actions" data-test-boxel-actions ...attributes>
-    <button class="boxel-actions__btn boxel-actions__btn--more-actions" aria-label="more actions" />
-    <button class="boxel-actions__btn boxel-actions__btn--expand" {{on "click" this.expand}} aria-label="expand" />
+  <div class="boxel-actions {{if @revisionMode "boxel-actions--revision-mode"}}" data-test-boxel-actions ...attributes>
+    {{#if @revisionMode}}
+      <div class="boxel-actions__btn boxel-actions__btn--revision-mode {{if @addedItems "boxel-actions__btn--add"}}">
+        {{yield}}
+      </div>
+    {{else}}
+      <button class="boxel-actions__btn boxel-actions__btn--more-actions" aria-label="more actions" />
+      <button class="boxel-actions__btn boxel-actions__btn--expand" {{on "click" this.expand}} aria-label="expand" />
+    {{/if}}
   </div>
 {{/if}}

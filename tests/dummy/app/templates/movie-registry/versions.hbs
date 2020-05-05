@@ -1,0 +1,110 @@
+<section class="versions">
+  <div class="versions-grid">
+    <header class="versions__header">
+      <h1 class="versions__title">Movie Detail - {{@model.movie.title.value}}</h1>
+    </header>
+    {{#if this.isCompView}}
+      <div class="versions__view">
+        <div class="view-selector">
+          <div class="view-selector--mode-link {{if (eq this.view "show-all") "active"}}">
+            Show all
+          </div>
+          <div class="view-selector--mode-link {{if (eq this.view "changes-only") "active"}}">
+            Changes only
+          </div>
+        </div>
+      </div>
+    {{/if}}
+    <div class="versions__mode">
+      <LinkTo @route="movie-registry.view" @model={{@model.movie.id}} @class="mode-indicator mode-indicator--revision">
+        Revision Mode
+      </LinkTo>
+    </div>
+
+    <aside class="versions__nav">
+      <div class="versions__nav--shadow" />
+      <ul>
+        {{#each this.versions as |v|}}
+          <li class="versions-nav-item {{if (eq v.id this.selected) "versions-nav-item--selected"}} {{if (eq this.baseCard v.id) "is-base-card"}} {{if (eq this.comparisonCard v.id) "is-comp-card"}} {{if (and this.baseCard this.comparisonCard) "versions-nav-item--comp-view"}}">
+            <button {{on "click" (fn this.displayVersion v.id)}} class="versions-nav-item__btn versions-nav-item__selection-btn">
+              <div class="version__description">{{v.description}}</div>
+              <div class="version__title">{{v.published}}</div>
+              <div class="version__label">{{if (eq v.id this.latest.id) "Current"}}</div>
+            </button>
+            <button {{on "click" (fn this.setComparison v.id)}} class="versions-nav-item__btn versions-nav-item__hover-btn checkbox">
+              {{svg-jar "icon-circle-selected" width="16px" height="16px"}}
+            </button>
+            <button class="versions-nav-item__btn versions-nav-item__hover-btn more">
+              {{svg-jar "more-vertical" width="16px" height="16px"}}
+            </button>
+          </li>
+        {{/each}}
+      </ul>
+    </aside>
+
+    <AnimatedContainer class="versions__cards {{if this.isCompView "comp-view"}}" {{did-insert this.setPositions}}>
+      {{#if this.isCompView}}
+        <button class="comp-view__swap-btn" {{on "click" this.swap}} aria-label="Swap comparison" />
+        {{#let this.compCardContent as |c|}}
+          <div class="version-card version-card--comp-card {{if (eq c.id this.latest.id) "current"}}">
+            <header class="version-card__header">
+              <div class="version__title">{{c.published}}</div>
+              <div class="version__description">{{c.description}}</div>
+              <div class="version__label">{{if (eq c.id this.latest.id) "Current"}}</div>
+            </header>
+            <div class="version-card--comp-card__arrow" aria-hidden="true" />
+          </div>
+        {{/let}}
+        {{#let this.baseCardContent as |v|}}
+          <div class="version-card version-card--base-card {{if (eq v.id this.latest.id) "current"}}">
+            <header class="version-card__header">
+              <div class="version__title">{{v.published}}</div>
+              <div class="version__description">{{v.description}}</div>
+              <div class="version__label">{{if (eq v.id this.latest.id) "Current"}}</div>
+            </header>
+            <div class="version-card__content">
+              <Movie
+                @model={{v.savedData}}
+                @revisionMode={{true}}
+                @addedFields={{this.addedFields}}
+                @changedFields={{this.changedFields}}
+                @removedFields={{this.removedFields}}
+                @mode="view"
+                @hideButtons={{true}}
+              />
+            </div>
+          </div>
+        {{/let}}
+      {{else}}
+        {{#animated-each this.versions watch="position" key="id" use=this.transition as |v|}}
+          <div class="version-card version-card--{{v.position}} {{if (eq v.id this.latest.id) "current"}} {{if (eq v.id (sub this.latest.id 1)) "current-1"}} {{if (eq v.id (sub this.latest.id 2)) "current-2"}}">
+            <header class="version-card__header">
+              <div class="version__title">{{v.published}}</div>
+              <div class="version__description">{{v.description}}</div>
+              <div class="version__label">{{if (eq v.id this.latest.id) "Current"}}</div>
+              {{#animated-value v watch="position" key="id" use=this.adjustOpacity as |value|}}
+                <button {{on "click" (fn this.displayVersion value.id)}} class="version-card__btn-overlay overlay--{{value.position}} {{if (eq value.id this.latest.id) "overlay--current"}} {{if (eq value.id (sub this.latest.id 1)) "overlay--current-1"}} {{if (eq value.id (sub this.latest.id 2)) "overlay--current-2"}}" />
+              {{/animated-value}}
+            </header>
+            <div class="version-card__content version-card__content--{{v.position}}">
+              {{#animated-value v watch="position" use=this.adjustContent as |value|}}
+                <div class="version-card__inner-wrapper version-card__inner-wrapper--{{value.position}} {{if (eq value.id this.latest.id) "wrapper--current"}} {{if (eq value.id (sub this.latest.id 1)) "wrapper--current-1"}} {{if (eq value.id (sub this.latest.id 2)) "wrapper--current-2"}}">
+                  <Movie
+                    @class="version-card__movie"
+                    @model={{value.savedData}}
+                    @revisionMode={{true}}
+                    @addedFields={{this.addedFields}}
+                    @changedFields={{this.changedFields}}
+                    @removedFields={{this.removedFields}}
+                    @mode="view"
+                    @hideButtons={{true}}
+                  />
+                </div>
+              {{/animated-value}}
+            </div>
+          </div>
+        {{/animated-each}}
+      {{/if}}
+    </AnimatedContainer>
+  </div>
+</section>

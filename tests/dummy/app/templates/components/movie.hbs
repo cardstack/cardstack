@@ -1,4 +1,4 @@
-<div class="movie" data-test-movie="{{@model.id}}" data-test-movie-mode="{{@mode}}-mode">
+<div class="movie {{@class}}" data-test-movie="{{@model.id}}" data-test-movie-mode="{{@mode}}-mode">
   {{#if (eq @mode "edit")}}
     <div class="button-overlay">
       <LinkTo
@@ -11,19 +11,25 @@
       </LinkTo>
     </div>
   {{else}}
-    <div class="button-overlay button-overlay--view">
-      <LinkTo @route="movie-registry.edit" @model={{@model}} @class="button-overlay__edit-btn--view" data-test-movie-edit-btn>Edit</LinkTo>
-      <LinkTo @route="movie-registry.edit" @model={{@model}} @class="button-overlay__gear-btn--view" aria-label="Configure" />
-    </div>
+    {{#unless @hideButtons}}
+      <div class="button-overlay button-overlay--view">
+        <LinkTo @route="movie-registry.edit" @model={{@model}} @class="button-overlay__edit-btn--view" data-test-movie-edit-btn>Edit</LinkTo>
+        <LinkTo @route="movie-registry.versions" @model={{@model.id}} @class="button-overlay__gear-btn--view" aria-label="view version history" />
+      </div>
+    {{/unless}}
   {{/if}}
 
   <div class="{{@mode}}-card {{@mode}}-card--{{@model.id}}" data-test-movie="{{@mode}}-mode">
     {{#each-in @model as |fieldName field|}}
-      {{#if (and (not-eq fieldName "id") (not-eq fieldName "year"))}}
+      {{#if (and (not-eq fieldName "id") (not-eq fieldName "year") (not-eq fieldName "version"))}}
         <Field
           @mode={{@mode}}
           @class="movie-input"
           @field={{field}}
+          @addedFields={{@addedFields}}
+          @changedFields={{@changedFields}}
+          @removedFields={{@removedFields}}
+          @revisionMode={{@revisionMode}}
           @fieldName={{fieldName}}
           @collectionEditRoute="movie-registry.edit.collection-view"
         />

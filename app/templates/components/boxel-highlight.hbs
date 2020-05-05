@@ -1,1 +1,5 @@
-<button class="boxel-highlight {{@class}} {{if @on "boxel-highlight--on"}}" aria-label="highlight item" ...attributes />
+{{#if @revisionMode}}
+  <div class="boxel-highlight boxel-highlight--revision-mode {{@class}} {{if @on "boxel-highlight--on"}}" aria-label="highlight item" ...attributes />
+{{else}}
+  <button class="boxel-highlight {{@class}} {{if @on "boxel-highlight--on"}}" aria-label="highlight item" ...attributes />
+{{/if}}

@@ -40,7 +40,15 @@
     {{#unless @field.hideLabel}}
       <div class="view-field__title">{{humanize (dasherize @fieldName)}}</div>
     {{/unless}}
-    <div class="view-field__value">
+    <Boxel @class="view-field__value">
+      {{#if (or (contains @fieldName @addedFields) (contains @fieldName @changedFields))}}
+        <BoxelHighlight @on={{true}} @revisionMode={{@revisionMode}} />
+        <BoxelActions @displayHighlightActions={{true}} @revisionMode={{@revisionMode}} @addedItems={{contains @fieldName @addedFields}}>
+          {{#if (contains @fieldName @changedFields)}}
+            Edited {{@fieldName}}
+          {{/if}}
+        </BoxelActions>
+      {{/if}}
       {{#if @field.id}}
         {{#if (eq @field.id "genres")}}
           <Collection @format="tagList" @field={{@field}} @fieldName={{@fieldName}} />
@@ -60,6 +68,6 @@
           {{@field.value}}
         {{/if}}
       {{/if}}
-    </div>
+    </Boxel>
   </div>
 {{/if}}

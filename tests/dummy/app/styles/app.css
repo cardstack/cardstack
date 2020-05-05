@@ -5,6 +5,7 @@
 
 @import 'movie-registry.css';
 @import 'movie-registry/view.css';
+@import 'movie-registry/versions.css';
 @import 'movie-registry/edit/collection-view.css';
 @import 'components/movie.css';
 @import 'components/field.css';
@@ -35,7 +36,6 @@ a:focus {
 }
 
 svg {
-  --icon-color: currentColor;
   display: inline-block;
 }
 
