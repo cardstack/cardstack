@@ -1,5 +1,5 @@
 <MediaCollection @model={{@model}} as |item|>
-  <LinkTo class="master-collection" @route="media-registry.collection" @model={{dasherize item.catalog_title}}>
+  <LinkTo class="master-collection" @route="media-registry.collection" @model={{dasherize (trim item.catalog_title)}}>
     <div>
       <h3 class="master-collection__title">{{item.catalog_title}}</h3>
       <div class="master-collection__desc">{{item.catalog_description}}</div>

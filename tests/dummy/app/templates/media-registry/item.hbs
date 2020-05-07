@@ -1,6 +1,6 @@
 <section>
   <header>
-    <img src="/images/covers/{{@model.cover_art}}" alt="{{@model.album}} cover" width="258px" height="258px" />
+    <img src="/media-registry/covers/{{@model.cover_art}}" alt="{{@model.album}} cover" width="258px" height="258px" />
     <h2>{{@model.song_title}}</h2>
     {{!-- isrc --}}
   </header>
@@ -25,9 +25,9 @@
   <aside>
     <h3>In these catalogs</h3>
     <div>
-      {{#each this.catalogs as |catalog|}}
+      {{#each @model.catalog as |catalog|}}
         <div>
-          <LinkTo @route="media-registry.collection" @model={{dasherize catalog}}>
+          <LinkTo @route="media-registry.collection" @model={{dasherize (trim catalog)}}>
             {{catalog}}
           </LinkTo>
         </div>
