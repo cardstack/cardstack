@@ -1,9 +1,9 @@
 {{!-- Breadcrumbs --}}
 
 <MediaCollection @model={{@model}} as |item|>
-  <LinkTo class="collection" @route="media-registry.item" @model={{dasherize item.song_title}}>
+  <LinkTo class="collection" @route="media-registry.item" @model={{dasherize (trim item.song_title)}}>
     <div>
-      <img src="/images/covers/{{item.cover_art}}" alt="{{item.album}} cover" width="182px" height="182px" />
+      <div class="collection__img" style={{css-url "background-image" (concat "/media-registry/covers/" item.cover_art)}} />
       <h3>{{item.song_title}}</h3>
       <div>{{item.artist}}</div>
     </div>

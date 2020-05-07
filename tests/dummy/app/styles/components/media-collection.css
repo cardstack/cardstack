@@ -216,7 +216,10 @@
   font-weight: bold;
 }
 
-.collection img {
-  object-fit: cover;
-  object-position: center;
+.collection__img {
+  width: 182px;
+  height: 182px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
