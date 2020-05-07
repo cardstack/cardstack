@@ -69,3 +69,31 @@
   color: #6B6A80;
   font-size: 13px;
 }
+
+.collection-item--blank-item img {
+  display: none;
+}
+.collection-item--blank-item .collection-item__img-container {
+  padding: 5px;
+}
+
+.collection-item--blank-item .collection-item__img-container::before {
+  background-color: #f2f2f2;
+  width: 100%;
+  content: '';
+}
+
+
+.collection-item--blank-item .collection-item__title {
+  background-color: #f2f2f2;
+  height: 1em;
+  width: 80%;
+  margin: 0 auto;
+}
+
+.collection-item--blank-item .collection-item__detail {
+  background-color: #f2f2f2;
+  height: 1em;
+  width: 50%;
+  margin: 0 auto;
+}

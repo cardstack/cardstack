@@ -115,4 +115,10 @@ export default class CollectionComponent extends Component {
     set(collection, 'pickedItems', collection.filter(item => item.picked).length);
     set(collection, 'selectedAll', collection.length === collection.pickedItems);
   }
+
+  @action
+  addItem(item) {
+    this.collection.push(item);
+  }
+
 }

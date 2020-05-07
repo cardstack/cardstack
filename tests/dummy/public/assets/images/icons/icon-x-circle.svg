@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="17.5" height="17.5" viewBox="0 0 17.5 17.5">
+  <defs>
+    <clipPath id="clip-path">
+      <rect width="17.5" height="17.5" fill="none"/>
+    </clipPath>
+  </defs>
+  <g id="Repeat_Grid_22" data-name="Repeat Grid 22" clip-path="url(#clip-path)">
+    <g id="Group_8049" data-name="Group 8049" transform="translate(-876.25 -1010.25)">
+      <circle id="Ellipse_672" data-name="Ellipse 672" cx="8" cy="8" r="8" transform="translate(877 1011)" fill="#fff" stroke="#000" stroke-width="1.5"/>
+      <g id="icon_Close_stroke_" data-name="icon_Close (stroke)" transform="translate(882 1016)">
+        <path id="Path_7415" data-name="Path 7415" d="M12,6,6,12" transform="translate(-6 -6)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+        <path id="Path_7416" data-name="Path 7416" d="M6,6l6,6" transform="translate(-6 -6)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+      </g>
+    </g>
+  </g>
+</svg>

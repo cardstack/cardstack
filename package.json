@@ -54,6 +54,7 @@
     "ember-cli-uglify": "^3.0.0",
     "ember-cli-update": "^0.53.3",
     "ember-composable-helpers": "^4.0.0",
+    "ember-concurrency-decorators": "^1.0.0",
     "ember-data": "github:emberjs/data#1df833396855d956b817540923dd89338463fec2",
     "ember-disable-prototype-extensions": "^1.1.3",
     "ember-drag-drop": "^0.7.0",

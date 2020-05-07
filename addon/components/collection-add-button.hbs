@@ -1,0 +1,48 @@
+{{#if this.newItem}}
+  <div class="collection-editor__added-new-item">
+    <div class="collection-editor-grid collection-editor-grid--{{@format}}">
+      <div class="collection-editor__item collection-editor__item--new-item">
+        {{component @newItemComponent item=this.newItem}}
+      </div>
+    </div>
+
+
+    New card added to collection
+    {{svg-jar "check-mark" width="18px" height="18px"}}
+  </div>
+{{else}}
+  {{#if this.isAdding}}
+    <div class="collection-editor__adding-new-item">
+
+      <div class="collection-editor-grid collection-editor-grid--{{@format}}">
+        <div class="collection-editor__item">
+          <Boxel>
+            <button class="collection-editor__cancel-btn" {{on "click" (fn (mut this.isAdding) false)}}>
+              {{svg-jar "icon-x-circle" width="18px" height="18px"}}
+            </button>
+            <BoxelHighlight @on={{true}} />
+            {{component @newItemComponent item=this.newItem mode='blank-item'}}
+          </Boxel>
+        </div>
+      </div>
+
+
+      <div class="cs-card-select--demo-container">
+        <CardSelect
+          @search={{@searchFn}}
+          @labelPath="title"
+          @thumbPath="thumb"
+          @subtitlePath="subtitle"
+          @dataSource={{concat "Searching " @fieldName}}
+          @onChange={{perform this.addItem}} />
+      </div>
+
+
+    </div>
+  {{else}}
+    <button class="collection-editor__add-btn" {{on "click" (fn (mut this.isAdding) true)}}>
+      {{svg-jar "icon-plus-circle" width="18px" height="18px"}}
+      Add to this collection
+    </button>
+  {{/if}}
+{{/if}}
