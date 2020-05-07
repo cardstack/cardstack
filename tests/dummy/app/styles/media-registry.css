@@ -1,0 +1,120 @@
+.media-registry {
+  --bunny-records-pink: #FF1D6C;
+  --media-reg-bg: #F5F5F5;
+
+  height: 100%;
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  background-color: var(--media-reg-bg);
+  font: var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-lg);
+}
+
+.media-registry__left-edge {
+  grid-row: 1 / 3;
+  grid-column: 1;
+}
+
+.media-registry__header {
+  position: sticky;
+  top: 0;
+  grid-column: 2;
+  display: grid;
+  grid-template:
+    "title search" auto
+    "nav   nav"    40px / minmax(auto, 450px) 1fr;
+  gap: 50px;
+  padding: 80px 20px 0 30px;
+  background-color: var(--bunny-records-pink);
+  color: white;
+}
+
+.media-registry__header--sm {
+  padding-top: 24px;
+  gap: 20px;
+}
+
+.media-registry__title {
+  grid-area: title;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0 3px;
+  align-items: center;
+  font-size: 19px;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  line-height: 26px;
+  text-transform: uppercase;
+}
+
+.media-registry__header--sm .media-registry__title {
+  font: var(--boxel-font-sm);
+  font-weight: bold;
+}
+
+.media-registry__logo {
+  width: 80px;
+  height: 80px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 40px 54px;
+}
+
+.media-registry__header--sm .media-registry__logo {
+  width: 50px;
+  height: 50px;
+  background-size: 25px 34px;
+}
+
+.media-registry__logo svg {
+  display: block;
+  margin: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.media-registry__nav {
+  grid-area: nav;
+  max-width: 450px;
+  padding-left: 15px;
+  font: var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-lg);
+}
+
+.media-registry__nav ul {
+  height: 40px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0 10px;
+  max-width: 450px;
+}
+
+.media-registry__nav li {
+  padding-left: 15px;
+}
+
+.media-registry__nav li.selected {
+  font-weight: bold;
+  border-bottom: 4px solid white;
+}
+
+.media-registry__search-bar {
+  grid-area: search;
+  align-self: center;
+  justify-self: end;
+  width: 240px;
+  height: 30px;
+  padding: 6px 15px;
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-lg);
+  border-radius: 100px;
+  border: 1px solid white;
+  outline: 0;
+}
+
+.media-registry__content {
+  overflow: auto;
+  min-height: calc(100vh - 250px);
+  max-height: calc(100vh - 132px);
+  padding: 30px;
+}

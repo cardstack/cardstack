@@ -1,12 +1,13 @@
+{{!-- TODO: refactor --}}
 {{#if @displayHighlightActions}}
-  <div class="boxel-actions {{if @revisionMode "boxel-actions--revision-mode"}}" data-test-boxel-actions ...attributes>
+  <div class="boxel-actions {{@class}} {{if @revisionMode "boxel-actions--revision-mode"}}" data-test-boxel-actions ...attributes>
     {{#if @revisionMode}}
       <div class="boxel-actions__btn boxel-actions__btn--revision-mode {{if @addedItems "boxel-actions__btn--add"}}">
         {{yield}}
       </div>
     {{else}}
-      <button class="boxel-actions__btn boxel-actions__btn--more-actions" aria-label="more actions" />
-      <button class="boxel-actions__btn boxel-actions__btn--expand" {{on "click" this.expand}} aria-label="expand" />
+      <button class="boxel-actions__btn {{or @btnLeft "boxel-actions__btn--more-actions"}}" {{on "click" (or @btnLeftAction this.moreActions)}} aria-label="{{or @btnLeft "more actions"}}">{{@btnLeftContent}}</button>
+      <button class="boxel-actions__btn {{or @btnRight "boxel-actions__btn--expand"}}" {{on "click" (or @btnRightAction this.expand)}} aria-label="{{or @btnRight "expand"}}" />
     {{/if}}
   </div>
 {{/if}}

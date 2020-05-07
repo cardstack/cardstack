@@ -8,6 +8,9 @@
   border-top-right-radius: 5px;
   border-bottom-left-radius: 5px;
   border: none;
+  font: var(--boxel-font-sm);
+  font-weight: 600;
+  letter-spacing: 0.035em;
   z-index: 10;
 }
 
@@ -21,6 +24,10 @@
   background-repeat: no-repeat;
   background-position: center;
   z-index: 2;
+}
+
+.boxel-actions__btn:hover {
+  cursor: pointer;
 }
 
 .boxel-actions__btn:focus {

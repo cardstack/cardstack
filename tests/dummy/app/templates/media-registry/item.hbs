@@ -1,0 +1,37 @@
+<section>
+  <header>
+    <img src="/images/covers/{{@model.cover_art}}" alt="{{@model.album}} cover" width="258px" height="258px" />
+    <h2>{{@model.song_title}}</h2>
+    {{!-- isrc --}}
+  </header>
+  <div>
+    <div>
+      <h3>Album</h3>
+      <div>{{@model.album}}</div>
+    </div>
+    <div>
+      <h3>Album type</h3>
+      <div>{{@model.type_of_album}}</div>
+    </div>
+    <div>
+      <h3>Genre</h3>
+      <div>{{@model.genre}}</div>
+    </div>
+    <div>
+      <h3>Length</h3>
+      <div>{{@model.length}}</div>
+    </div>
+  </div>
+  <aside>
+    <h3>In these catalogs</h3>
+    <div>
+      {{#each this.catalogs as |catalog|}}
+        <div>
+          <LinkTo @route="media-registry.collection" @model={{dasherize catalog}}>
+            {{catalog}}
+          </LinkTo>
+        </div>
+      {{/each}}
+    </div>
+  </aside>
+</section>

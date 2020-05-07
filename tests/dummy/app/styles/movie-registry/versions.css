@@ -468,7 +468,7 @@
 }
 
 
-.view-selector {
+.versions__view-selector {
   width: 300px;
   display: flex;
   justify-content: space-around;
@@ -483,7 +483,7 @@
   overflow: hidden;
 }
 
-.view-selector .view-selector--mode-link {
+.versions__view-selector .versions__view-selector--mode-link {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -491,11 +491,11 @@
   height: 100%;
 }
 
-.view-selector .view-selector--mode-link.active {
+.versions__view-selector .versions__view-selector--mode-link.active {
   background-color: var(--boxel-revision-dark-purple);
   color: var(--boxel-highlight);
 }
 
-.view-selector .view-selector--mode-link:first-child {
+.versions__view-selector .versions__view-selector--mode-link:first-child {
   border-right: solid 1px #84829B;
 }

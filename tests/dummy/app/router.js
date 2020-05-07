@@ -8,6 +8,10 @@ class Router extends EmberRouter {
 }
 
 Router.map(function() {
+  this.route('media-registry', function() {
+    this.route('collection', { path: '/collection/:collectionId' });
+    this.route('item', { path: '/item/:itemId' });
+  });
   this.route('movie-registry', function() {
     this.route('view', { path: '/:id' });
     this.route('edit', { path: '/:id/edit' }, function() {

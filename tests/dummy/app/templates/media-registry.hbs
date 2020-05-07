@@ -1,0 +1,23 @@
+<section class="media-registry">
+  <aside class="media-registry__left-edge">
+    <LeftEdgeNav />
+  </aside>
+  <header class="media-registry__header media-registry__header--sm">
+    <h1 class="media-registry__title">
+      <span class="media-registry__logo" style={{css-url "background-image" "/images/media-registry/bunny-logo.svg"}} />
+      <span>Bunny Records</span>
+    </h1>
+    <input class="media-registry__search-bar" type="search" placeholder="Search" />
+    <nav class="media-registry__nav">
+      <ul>
+        <li class="selected">Masters</li>
+        <li>Artists</li>
+        <li>Products</li>
+        <li>Agreements</li>
+      </ul>
+    </nav>
+  </header>
+  <section class="media-registry__content">
+    {{outlet}}
+  </section>
+</section>

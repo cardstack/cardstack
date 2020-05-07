@@ -1,0 +1,39 @@
+<nav class="left-edge-nav">
+  <ul class="left-edge-nav__top-btn-group">
+    <li>
+      <LinkTo @route="media-registry" class="left-edge-nav__btn left-edge-nav__btn--cs-logo" aria-label="home">
+        {{svg-jar "cardstack-logo" width="33px" height="35px"}}
+      </LinkTo>
+    </li>
+    <li>
+      <button class="left-edge-nav__btn left-edge-nav__btn--full" style={{css-url "background-image" "/images/media-registry/bunny-user.svg"}} aria-label="user" />
+    </li>
+  </ul>
+
+  <ul class="left-edge-nav__middle-btn-group">
+    <li>
+      <button class="left-edge-nav__btn left-edge-nav__btn--full" style={{css-url "background-image" "/images/media-registry/button-bunny-records.svg"}} aria-label="user bunny records" />
+    </li>
+    <li>
+      <button class="left-edge-nav__btn left-edge-nav__btn--full" style={{css-url "background-image" "/images/media-registry/button-verify-not-selected.svg"}} aria-label="user verify" />
+    </li>
+  </ul>
+
+  <ul class="left-edge-nav__bottom-btn-group">
+    <li>
+      <button class="left-edge-nav__btn left-edge-nav__btn--icon-only" aria-label="pin">
+        {{svg-jar "pin" width="20px" height="20px"}}
+      </button>
+    </li>
+    <li>
+      <button class="left-edge-nav__btn left-edge-nav__btn--icon-only" aria-label="catalog">
+        {{svg-jar "card-catalog" width="20px" height="20px"}}
+      </button>
+    </li>
+    <li>
+      <button class="left-edge-nav__btn left-edge-nav__btn--icon-only" aria-label="library">
+        {{svg-jar "library" width="21px" height="21px"}}
+      </button>
+    </li>
+  </ul>
+</nav>

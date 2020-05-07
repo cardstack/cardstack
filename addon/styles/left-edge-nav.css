@@ -1,0 +1,56 @@
+.left-edge-nav {
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  width: 80px;
+  height: 100%;
+  padding: 20px;
+  background-color: var(--cs-dark-field-default);
+}
+
+.left-edge-nav ul {
+  display: grid;
+  grid-auto-rows: 40px;
+  gap: 20px;
+  justify-items: center;
+}
+
+.left-edge-nav__top-btn-group {
+  align-self: start;
+}
+
+.left-edge-nav__bottom-btn-group {
+  align-self: end;
+}
+
+
+.left-edge-nav__btn {
+  --icon-color: var(--boxel-highlight);
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+.left-edge-nav__btn svg {
+  display: block;
+  margin: auto;
+}
+
+.left-edge-nav__btn:hover {
+  --icon-color: black;
+  cursor: pointer;
+}
+
+.left-edge-nav__btn--full {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 40px 40px;
+}
+
+
+.left-edge-nav__btn--icon-only:hover {
+  background-color: var(--boxel-highlight);
+  border-radius: 100px;
+}

@@ -1,17 +1,11 @@
 import { module, test } from 'qunit';
 import { visit, currentURL, click } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
-import { setupMirage } from 'ember-cli-mirage/test-support';
 
 const movieId = 'star-wars-the-rise-of-skywalker';
 
 module('Acceptance | navigation', function (hooks) {
   setupApplicationTest(hooks);
-  setupMirage(hooks);
-
-  hooks.beforeEach(async function () {
-    this.server.loadFixtures();
-  });
 
   test('index route works', async function (assert) {
     await visit(`/movie-registry`);

@@ -13,4 +13,7 @@ export default class BoxelActions extends Component {
       this.router.transitionTo(this.args.expandRoute, this.args.expandId, { queryParams: { format: this.format }});
     }
   }
+
+  @action
+  moreActions() {}
 }

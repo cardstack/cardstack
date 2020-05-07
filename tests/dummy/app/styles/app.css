@@ -7,8 +7,13 @@
 @import 'movie-registry/view.css';
 @import 'movie-registry/versions.css';
 @import 'movie-registry/edit/collection-view.css';
+
+@import 'media-registry.css';
+
 @import 'components/movie.css';
 @import 'components/field.css';
+@import 'components/media-collection.css';
+
 
 html, body {
   height: 100%;
