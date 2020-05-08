@@ -1,11 +1,25 @@
-{{!-- Breadcrumbs --}}
+<div class="collection__wrapper">
+  <div class="breadcrumbs">
+    <LinkTo @route="media-registry" @class="breadcrumbs__pill">Master Recordings</LinkTo>
+    <span class="breadcrumbs__carot" />
+    <span class="breadcrumbs__pill breadcrumbs__pill--current">{{humanize @model.title}}</span>
+  </div>
 
-<MediaCollection @model={{@model}} as |item|>
-  <LinkTo class="collection" @route="media-registry.item" @model={{dasherize (trim item.song_title)}}>
-    <div>
-      <div class="collection__img" style={{css-url "background-image" (concat "/media-registry/covers/" item.cover_art)}} />
-      <h3>{{item.song_title}}</h3>
-      <div>{{item.artist}}</div>
-    </div>
-  </LinkTo>
-</MediaCollection>
+  <MediaCollection @model={{@model}} as |item|>
+    <Boxel class="collection__boxel">
+      <BoxelHighlight {{on "click" (fn this.selectOrTransition item)}} @class="collection__highlighter" @on={{item.selected}} />
+      <SelectButton
+        {{on "click" (fn this.toggleSelect item)}}
+        @isSelected={{item.selected}}
+        @class="collection__select-btn {{if item.selected "collection__select-btn--selected"}}"
+      />
+      <div class="collection">
+        <div class="collection__img" style={{css-url "background-image" (concat "/media-registry/covers/" item.cover_art)}}>
+          <button class="collection__play-btn">{{svg-jar "play-btn" width="60px" height="60px"}}</button>
+        </div>
+        <h3 class="collection__title">{{item.song_title}}</h3>
+        <div class="collection__artist">{{item.artist}}</div>
+      </div>
+    </Boxel>
+  </MediaCollection>
+</div>

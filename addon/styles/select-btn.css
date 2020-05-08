@@ -1,0 +1,30 @@
+.select-btn {
+  --icon-bg: white;
+  --icon-border: black;
+  --icon-color: transparent;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: none;
+  border: none;
+  z-index: 1;
+}
+
+.select-btn:hover,
+.select-btn:focus {
+  --icon-bg: var(--boxel-highlight);
+  --icon-border: black;
+  outline: 0;
+}
+
+.select-btn--partial {
+  --icon-bg: var(--boxel-highlight);
+  --icon-border: black;
+  --icon-color: transparent;
+}
+
+.select-btn--selected {
+  --icon-bg: var(--boxel-highlight);
+  --icon-border: var(--boxel-highlight);
+  --icon-color: black;
+}

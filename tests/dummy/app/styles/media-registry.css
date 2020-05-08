@@ -1,11 +1,10 @@
 .media-registry {
   --bunny-records-pink: #FF1D6C;
-  --media-reg-bg: #F5F5F5;
 
   height: 100%;
   display: grid;
   grid-template-columns: 80px 1fr;
-  background-color: var(--media-reg-bg);
+  background-color: #F5F5F5;
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp-lg);
 }
@@ -116,5 +115,4 @@
   overflow: auto;
   min-height: calc(100vh - 250px);
   max-height: calc(100vh - 132px);
-  padding: 30px;
 }

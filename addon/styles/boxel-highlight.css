@@ -10,6 +10,7 @@
   border: 2px solid transparent;
   border-radius: 5px;
   z-index: 1;
+  transition: border-color var(--boxel-transition);
 }
 
 .boxel-highlight:focus {

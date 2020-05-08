@@ -8,4 +8,7 @@
   --boxel-lsp-sm: 0.015em;
   --boxel-highlight: #00ebe5;
   --boxel-highlight-hover: #00b0ad;
+  --boxel-transition: 0.2s ease;
+  --boxel-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  --boxel-box-shadow-hover: 0 3px 10px rgba(0, 0, 0, 0.15);
 }
