@@ -11,6 +11,8 @@ export default class MediaRegistryRoute extends Route {
     return {
       title: 'Master Recordings',
       type: 'master-collection',
+      logoURL: '/media-registry/bunny-logo.svg',
+      company: 'Bunny Records',
       collection
     };
   }

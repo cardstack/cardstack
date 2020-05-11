@@ -1,0 +1,116 @@
+.collection__wrapper {
+  height: calc(100vh - 132px);
+  padding: 0 30px 30px;
+  overflow: hidden;
+}
+
+
+/* Breadcrumbs */
+.breadcrumbs {
+  padding: 20px 0;
+  display: inline-grid;
+  grid-auto-flow: column;
+}
+
+.breadcrumbs__pill {
+  height: 30px;
+  padding: 5px 20px;
+  font: var(--boxel-font-sm);
+  border: 1px solid #D1D1D1;
+  border-radius: 100px;
+}
+
+.breadcrumbs__pill--current {
+  background-color: var(--boxel-highlight);
+  border-color: var(--boxel-highlight);
+}
+
+.breadcrumbs__carot {
+  width: 30px;
+  height: 30px;
+  background: url(/assets/images/icons/carot.svg) center/7px no-repeat;
+}
+
+
+/* Collection Item Wrapper + Actions */
+.collection__boxel {
+  width: 100%;
+  height: 100%;
+}
+
+.collection__highlighter {
+  transition: box-shadow var(--boxel-transition);
+}
+
+.collection__boxel:hover .collection__highlighter,
+.collection__boxel:focus-within .collection__highlighter {
+  box-shadow: var(--boxel-box-shadow);
+  outline: 0;
+}
+
+.collection__select-btn {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.collection__select-btn--selected {
+  display: block;
+}
+
+.collection__select-btn:hover,
+.collection__select-btn:focus,
+.collection__boxel:hover .collection__select-btn,
+.collection__boxel:focus-within .collection__select-btn {
+  display: block;
+}
+
+.collection__play-btn {
+  display: none;
+  position: relative;
+  top: 61px;
+  background: none;
+  border: none;
+  padding: 0;
+  z-index: 1;
+}
+
+.collection__boxel:hover .collection__play-btn,
+.collection__boxel:focus-within .collection__play-btn {
+  display: inline-block;
+}
+
+
+/* Collection Item */
+.collection {
+  display: grid;
+  grid-auto-rows: min-content;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  padding: 20px 20px 0;
+  border-radius: 10px;
+}
+
+.collection__title {
+  padding-top: 9px;
+  padding-bottom: 3px;
+  font: var(--boxel-font);
+  font-weight: 400;
+  letter-spacing: var(--boxel-lsp);
+}
+
+.collection__artist {
+  color: #6B6A80;
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+}
+
+.collection__img {
+  width: 182px;
+  height: 182px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}

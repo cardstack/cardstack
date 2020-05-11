@@ -4,8 +4,8 @@
   </aside>
   <header class="media-registry__header media-registry__header--sm">
     <h1 class="media-registry__title">
-      <span class="media-registry__logo" style={{css-url "background-image" "/media-registry/bunny-logo.svg"}} />
-      <span>Bunny Records</span>
+      <span class="media-registry__logo" style={{css-url "background-image" @model.logoURL}} />
+      <span>{{@model.company}}</span>
     </h1>
     <input class="media-registry__search-bar" type="search" placeholder="Search" />
     <nav class="media-registry__nav">
@@ -17,7 +17,6 @@
       </ul>
     </nav>
   </header>
-  <section class="media-registry__content">
-    {{outlet}}
-  </section>
+
+  {{outlet}}
 </section>

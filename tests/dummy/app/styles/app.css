@@ -7,11 +7,12 @@
 @import 'movie-registry/view.css';
 @import 'movie-registry/versions.css';
 @import 'movie-registry/edit/collection-view.css';
-
-@import 'media-registry.css';
-
 @import 'components/movie.css';
 @import 'components/field.css';
+
+@import 'media-registry.css';
+@import 'media-registry/master-collection.css';
+@import 'media-registry/collection.css';
 @import 'components/media-collection.css';
 
 

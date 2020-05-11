@@ -1,0 +1,112 @@
+.master-collection__wrapper {
+  height: calc(100vh - 132px);
+  padding: 30px;
+  overflow: hidden;
+}
+
+/* Master Collection Item Wrapper + Actions */
+.master-collection__boxel {
+  width: 100%;
+  height: 100%;
+}
+
+.master-collection__highlighter {
+  box-shadow: var(--boxel-box-shadow);
+  transition: box-shadow var(--boxel-transition);
+}
+
+.master-collection__highlighter:hover,
+.master-collection__highlighter:focus {
+  box-shadow: var(--boxel-box-shadow-hover);
+  outline: 0;
+}
+
+.master-collection__select-btn {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.master-collection__select-btn--selected {
+  display: block;
+}
+
+.master-collection__select-btn:hover,
+.master-collection__select-btn:focus,
+.master-collection__boxel:hover .master-collection__select-btn,
+.master-collection__boxel:focus-within .master-collection__select-btn {
+  display: block;
+}
+
+.master-collection__pin-btn {
+  --icon-color: #AFAFB7;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: none;
+  border: none;
+  z-index: 1;
+}
+
+.master-collection__pin-btn:hover,
+.master-collection__pin-btn:focus {
+  --icon-color: var(--boxel-highlight);
+  outline: 0;
+}
+
+.master-collection__pin-btn.pinned {
+  --icon-color: black;
+}
+
+
+/* Master Collection Item */
+.master-collection {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 100px;
+  grid-auto-rows: min-content;
+  padding: 60px 20px 15px;
+  border-radius: 10px;
+}
+
+.master-collection__title,
+.master-collection__desc {
+  grid-column: 1 / -1;
+}
+
+.master-collection__title {
+  font-size: 20px;
+  font-weight: bold;
+  line-height: calc(30/20);
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.master-collection__desc {
+  font: var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.master-collection__covers {
+  margin-top: 43px;
+  width: 190px;
+  height: 80px;
+  background: url('/media-registry/master-covers.svg') center/contain no-repeat;
+}
+
+.master-collection__count {
+  align-self: end;
+  text-align: right;
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+}
+
+.master-collection__num {
+  font: var(--boxel-font-lg);
+  font-size: 30px;
+  font-weight: bold;
+}

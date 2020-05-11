@@ -26,9 +26,11 @@
   padding: 80px 20px 0 30px;
   background-color: var(--bunny-records-pink);
   color: white;
+  height: 250px;
 }
 
 .media-registry__header--sm {
+  height: 132px;
   padding-top: 24px;
   gap: 20px;
 }
@@ -109,10 +111,4 @@
   border-radius: 100px;
   border: 1px solid white;
   outline: 0;
-}
-
-.media-registry__content {
-  overflow: auto;
-  min-height: calc(100vh - 250px);
-  max-height: calc(100vh - 132px);
 }

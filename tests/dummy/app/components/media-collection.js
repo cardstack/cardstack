@@ -4,11 +4,11 @@ import { action, set } from '@ember/object';
 
 export default class MediaCollectionComponent extends Component {
   @tracked collection = this.args.model.collection;
-  @tracked format = this.args.format || 'grid';
 
   constructor(...args) {
     super(...args);
     let collection = this.collection;
+    set(collection, 'format', this.args.format || 'grid');
     set(collection, 'selectedItemCount', collection.filter(item => item.selected).length);
     set(collection, 'selectedAll', collection.length === collection.selectedItemCount);
   }
@@ -18,7 +18,7 @@ export default class MediaCollectionComponent extends Component {
     if (this.args.changeFormat) {
       this.args.changeFormat(val);
     }
-    this.format = val;
+    set(this.collection, 'format', val);
   }
 
   @action

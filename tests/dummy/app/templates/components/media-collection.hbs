@@ -1,13 +1,13 @@
 {{#let @model.collection as |collection|}}
-  <Boxel class="media-collection">
-    <BoxelActions
-      @class="media-collection__btn-overlay"
-      @displayHighlightActions={{true}}
-      @btnLeft="mode-btn"
-      @btnLeftContent="Edit"
-      @btnRight="version-history"
-    />
+  <Boxel class="media-collection media-collection--{{@model.type}}">
     <header class="media-collection__header">
+      <BoxelActions
+        @class="media-collection__btn-overlay"
+        @displayHighlightActions={{true}}
+        @btnLeft="mode-btn"
+        @btnLeftContent="Edit"
+        @btnRight="version-history"
+      />
       <h2 class="media-collection__title">{{humanize @model.title}}</h2>
       <div class="media-collection__count">
         <span>{{@model.collection.length}}</span> {{if (eq @model.type "collection") "Songs" "Collections"}}
@@ -36,27 +36,31 @@
         {{/if}}
         <div class="media_collection__btn-group">
           <div class="media-collection__btn-trio media-collection__filters">
-            <button class="collection-isolated__btn sort" aria-label="sort"></button>
-            <button class="collection-isolated__btn filter" aria-label="filter"></button>
-            <button class="collection-isolated__btn search" aria-label="search"></button>
+            <button class="media-collection__btn sort" aria-label="sort"></button>
+            <button class="media-collection__btn filter" aria-label="filter"></button>
+            <button class="media-collection__btn search" aria-label="search"></button>
           </div>
           <div class="media-collection__btn-trio media-collection__view-selectors">
-            <button {{on "click" (fn this.changeFormat "list")}} class="collection-isolated__btn list {{if (eq this.format "list") "selected" "unselected"}}" aria-label="view as list"></button>
-            <button {{on "click" (fn this.changeFormat "grid")}} class="collection-isolated__btn grid {{if (eq this.format "grid") "selected" "unselected"}}" aria-label="view as grid"></button>
-            <button {{on "click" (fn this.changeFormat "table")}} class="collection-isolated__btn table {{if (eq this.format "table") "selected" "unselected"}}" aria-label="view as table"></button>
+            <button {{on "click" (fn this.changeFormat "list")}} class="media-collection__btn list {{if (eq collection.format "list") "selected" "unselected"}}" aria-label="view as list"></button>
+            <button {{on "click" (fn this.changeFormat "grid")}} class="media-collection__btn grid {{if (eq collection.format "grid") "selected" "unselected"}}" aria-label="view as grid"></button>
+            <button {{on "click" (fn this.changeFormat "table")}} class="media-collection__btn table {{if (eq collection.format "table") "selected" "unselected"}}" aria-label="view as table"></button>
           </div>
         </div>
       </div>
     </header>
 
-    <ul class="media-collection__grid media-collection__grid--{{@model.type}}-grid">
-      {{#each @model.collection as |item|}}
-        <li>
-          {{yield item}}
-        </li>
-      {{/each}}
+    {{#if (eq collection.format "table")}}
+      {{!-- Table here --}}
+    {{else}}
+      <ul class="media-collection__grid media-collection__grid--{{@model.type}}-{{collection.format}}">
+        {{#each @model.collection as |item|}}
+          <li>
+            {{yield item}}
+          </li>
+        {{/each}}
 
-      {{!-- Add new --}}
-    </ul>
+        {{!-- Add new --}}
+      </ul>
+    {{/if}}
   </Boxel>
 {{/let}}
