@@ -1,22 +1,31 @@
 {{#let @model.collection as |collection|}}
-  <Boxel class="media-collection media-collection--{{@model.type}}">
+  <Boxel class="media-collection media-collection--{{@model.type}} media-collection--{{this.format}} media-collection--{{@mode}}">
     <header class="media-collection__header">
-      <BoxelActions
-        @class="media-collection__btn-overlay"
-        @displayHighlightActions={{true}}
-        @btnLeft="mode-btn"
-        @btnLeftContent="Edit"
-        @btnRight="version-history"
-      />
-      <h2 class="media-collection__title">{{humanize @model.title}}</h2>
-      <div class="media-collection__count">
-        <span>{{@model.collection.length}}</span> {{if (eq @model.type "collection") "Songs" "Collections"}}
+      <div class="media-collection__title-row media-collection__title-row--{{@mode}}">
+        {{#if (eq @mode "edit")}}
+          <h2 class="media-collection__title">{{humanize @model.title}}</h2>
+          <button {{on "click" this.transitionToView}} class="mode-indicator mode-indicator--edit">{{@mode}} mode</button>
+        {{else}}
+          <BoxelActions
+            @class="media-collection__btn-overlay"
+            @displayHighlightActions={{true}}
+            @btnLeft="mode-btn"
+            @btnLeftContent="Edit"
+            @btnLeftAction={{this.transitionToEdit}}
+            @btnRight="version-history"
+          />
+          <h2 class="media-collection__title">{{humanize @model.title}}</h2>
+          <div class="media-collection__count">
+            <span>{{@model.collection.length}}</span> {{if (eq @model.type "collection") "Songs" "Collections"}}
+          </div>
+        {{/if}}
       </div>
 
       <div class="media-collection__actions-row">
         <SelectButton
           {{on "click" this.toggleSelectAll}}
           @class="media-collection__select-btn"
+          @mode={{@mode}}
           @isPartial={{collection.selectedItemCount}}
           @isSelected={{collection.selectedAll}}
         />
@@ -41,24 +50,23 @@
             <button class="media-collection__btn search" aria-label="search"></button>
           </div>
           <div class="media-collection__btn-trio media-collection__view-selectors">
-            <button {{on "click" (fn this.changeFormat "list")}} class="media-collection__btn list {{if (eq collection.format "list") "selected" "unselected"}}" aria-label="view as list"></button>
-            <button {{on "click" (fn this.changeFormat "grid")}} class="media-collection__btn grid {{if (eq collection.format "grid") "selected" "unselected"}}" aria-label="view as grid"></button>
-            <button {{on "click" (fn this.changeFormat "table")}} class="media-collection__btn table {{if (eq collection.format "table") "selected" "unselected"}}" aria-label="view as table"></button>
+            <button {{on "click" (fn this.changeFormat "list")}} class="media-collection__btn list {{if (eq this.format "list") "selected" "unselected"}}" aria-label="view as list"></button>
+            <button {{on "click" (fn this.changeFormat "grid")}} class="media-collection__btn grid {{if (eq this.format "grid") "selected" "unselected"}}" aria-label="view as grid"></button>
+            <button {{on "click" (fn this.changeFormat "table")}} class="media-collection__btn table {{if (eq this.format "table") "selected" "unselected"}}" aria-label="view as table"></button>
           </div>
         </div>
       </div>
     </header>
 
-    {{#if (eq collection.format "table")}}
-      {{!-- Table here --}}
+    {{#if (eq this.format "table")}}
+      <MediaCollectionTable @mode={{@mode}} @type={{@model.type}} @collection={{collection}} @columns={{@model.columns}} />
     {{else}}
-      <ul class="media-collection__grid media-collection__grid--{{@model.type}}-{{collection.format}}">
-        {{#each @model.collection as |item|}}
+      <ul class="media-collection__grid media-collection__grid--{{@model.type}}-{{this.format}}">
+        {{#each collection as |item|}}
           <li>
             {{yield item}}
           </li>
         {{/each}}
-
         {{!-- Add new --}}
       </ul>
     {{/if}}

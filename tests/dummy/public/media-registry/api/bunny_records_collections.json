@@ -2,56 +2,74 @@
   {
     "catalog_title": "Golden Girl",
     "catalog_description": "All songs recorded by GG",
-    "number_of_songs": 42
+    "number_of_songs": 42,
+    "top_artists": ["Golden Girl"],
+    "date_created": "Jan 14, 2020"
   },
   {
     "catalog_title": "Extra Long",
     "catalog_description": "Tracks over 4 min",
-    "number_of_songs": 102
+    "number_of_songs": 102,
+    "top_artists": ["Princess May", "Fly me to the moon", "The edge of nowhere"],
+    "date_created": "Jan 14, 2020"
   },
   {
     "catalog_title": "Film Music",
     "catalog_description": "Themes & soundtracks",
-    "number_of_songs": 156
+    "number_of_songs": 156,
+    "top_artists": ["Pia Midina", "BB Clarke"],
+    "date_created": "Jan 14, 2020"
   },
   {
     "catalog_title": "Super Successful",
     "catalog_description": "Popular records across genres & artists",
-    "number_of_songs": 89
+    "number_of_songs": 89,
+    "top_artists": ["Love Monkeys", "Nancy Jay", "Boyband"],
+    "date_created": "Jan 14, 2020"
   },
   {
     "catalog_title": "Batch A ",
     "catalog_description": "Sold to Maxime Records",
-    "number_of_songs": 23
+    "number_of_songs": 23,
+    "top_artists": ["The Francines"],
+    "date_created": "Jan 14, 2020"
   },
   {
     "catalog_title": "Batch B ",
     "catalog_description": "Sold to Philanthropic Music Group",
-    "number_of_songs": 120
+    "number_of_songs": 120,
+    "top_artists": ["Mouthwash", "Patrick Moles", "Sun and Moon"],
+    "date_created": "Jan 14, 2020"
   },
   {
     "catalog_title": "Batch C",
     "catalog_description": "Prepared for transfer to Candle Light Records",
-    "number_of_songs": 211
+    "number_of_songs": 211,
+    "top_artists": ["The Francines"],
+    "date_created": "Jan 14, 2020"
   },
   {
     "catalog_title": "Batch D",
     "catalog_description": "In progress",
-    "number_of_songs": 7
+    "number_of_songs": 7,
+    "date_created": "Jan 14, 2020"
   },
   {
     "catalog_title": "Batch E",
     "catalog_description": "In progress",
-    "number_of_songs": 12
+    "number_of_songs": 12,
+    "date_created": "Jan 14, 2020"
   },
   {
     "catalog_title": "Bunny Hop 1",
     "catalog_description": "—",
-    "number_of_songs": 22
+    "number_of_songs": 22,
+    "date_created": "Jan 14, 2020"
   },
   {
     "catalog_title": "Bunny Hop 2",
     "catalog_description": "—",
-    "number_of_songs": 22
+    "number_of_songs": 22,
+    "date_created": "Jan 14, 2020"
   }
 ]

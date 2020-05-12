@@ -15,11 +15,12 @@
   background-position: var(--mode-icon-position), center right 15px;
   background-repeat: no-repeat, no-repeat;
   background-size: var(--mode-icon-size), 10px 10px;
+  border: none;
   border-radius: 100px;
   color: black;
   font: var(--boxel-font-sm);
   font-weight: 600;
-  letter-spacing: 0.035em;
+  letter-spacing: var(--boxel-lsp-lg);
   text-align: left;
   text-transform: capitalize;
 }

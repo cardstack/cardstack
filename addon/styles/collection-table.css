@@ -64,27 +64,27 @@
   align-items: center;
 }
 
-.et-cell-content {
+.collection-table .et-cell-content {
   display: grid;
   margin-left: -45px;
   grid-template-columns: 45px auto;
   align-items: center;
 }
 
-.et-toggle-select {
+.collection-table .et-toggle-select {
   width: 45px;
   height: 60px;
   background-color: #F0F0F0;
 }
 
-.et-toggle-select input {
+.collection-table .et-toggle-select input {
   width: 45px;
   height: 60px;
   margin: 0;
   opacity: 0;
 }
 
-td > .last-col {
+.collection-table td > .last-col {
   display: grid;
   grid-template-columns: 1fr 45px;
 }
@@ -110,48 +110,48 @@ td > .last-col {
   background-color: white;
 }
 
-td:first-of-type .collection-table__cell {
+.collection-table td:first-of-type .collection-table__cell {
   border-left: 1px solid #AFAFB7;
 }
 
-td:last-of-type .collection-table__cell {
+.collection-table td:last-of-type .collection-table__cell {
   border-right: 1px solid #AFAFB7;
 }
 
-tr:first-of-type td:first-of-type .collection-table__cell {
+.collection-table tr:first-of-type td:first-of-type .collection-table__cell {
   border-top-left-radius: 5px;
 }
 
-tr:first-of-type td:last-of-type .collection-table__cell {
+.collection-table tr:first-of-type td:last-of-type .collection-table__cell {
   border-top-right-radius: 5px;
 }
 
-tr:last-of-type td:first-of-type .collection-table__cell {
+.collection-table tr:last-of-type td:first-of-type .collection-table__cell {
   border-bottom-left-radius: 5px;
 }
 
-tr:last-of-type td:last-of-type .collection-table__cell {
+.collection-table tr:last-of-type td:last-of-type .collection-table__cell {
   border-bottom-right-radius: 5px;
 }
 
-tr.is-selected td:first-of-type .collection-table__cell,
-tr.is-selected td:last-of-type .collection-table__cell {
+.collection-table tr.is-selected td:first-of-type .collection-table__cell,
+.collection-table tr.is-selected td:last-of-type .collection-table__cell {
   border-left-color: transparent;
   border-right-color: transparent;
 }
 
-tr:last-of-type .collection-table__cell {
+.collection-table tr:last-of-type .collection-table__cell {
   border-bottom: 1px solid #AFAFB7;
 }
-tr.is-selected:last-of-type .collection-table__cell {
+.collection-table tr.is-selected:last-of-type .collection-table__cell {
   border-color: transparent;
 }
 
-tr:not(.is-selected) {
+.collection-table tr:not(.is-selected) {
   --tr-border-color: #AFAFB7;
 }
 
-tr.is-selected + tr:not(.is-selected) {
+.collection-table tr.is-selected + tr:not(.is-selected) {
   --tr-border-color: transparent;
 }
 

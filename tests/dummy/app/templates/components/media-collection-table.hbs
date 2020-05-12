@@ -1,0 +1,47 @@
+<EmberTable @class="media-collection-table media-collection-table--{{@type}} media-collection-table--{{@mode}}" as |t|>
+  <t.head
+    @columns={{@columns}}
+    @class="media-collection-table__header"
+  />
+  <t.body
+    @rows={{this.collection}}
+    @estimateRowHeight={{60}}
+    @class="media-collection-table__body" as |b|
+  >
+    <b.row class={{if b.rowValue.selected "is-selected"}} as |r|>
+      <r.cell as |cell column row cellMeta columnMeta|>
+        <Boxel class="media-collection-table__boxel-cell">
+          <BoxelHighlight {{on "click" (fn this.selectOrTransition row)}} @on={{row.selected}} @class="media-collection-table__highlight" />
+          <div class="media-collection-table__cell {{if (eq columnMeta.index 0) "media-collection-table__cell--first-col"}} {{if row.selected "row-group-selected"}} media-collection-table__cell--{{@mode}}">
+            {{#if (eq columnMeta.index 0)}}
+              <SelectButton
+                {{on "click" (fn this.toggleSelect row)}}
+                @mode={{@mode}}
+                @isSelected={{row.selected}}
+                @class="media-collection-table__select-btn media-collection-table__select-btn--{{@mode}} {{if row.selected "media-collection-table__select-btn--selected"}}"
+              />
+              {{#if (not-eq @mode "edit")}}
+                <button class="media-collection-table__play-btn">
+                  {{svg-jar "play-btn-black" width="30px" height="30px"}}
+                </button>
+              {{/if}}
+            {{/if}}
+            <div class="media-collection-table__cell-value {{if (eq columnMeta.index 0) "media-collection-table__cell-value--first-col"}} {{if (eq column.valuePath "cover_art") "media-collection-table__cell-value--img"}}">
+              {{#if (and (eq (add columnMeta.index 1) b.cells.length) (eq @mode "edit"))}}
+                <button {{on "click" (fn this.removeItem row)}} class="media-collection-editor__remove-btn" aria-label="remove">{{svg-jar "icon-minus-circle" width="16px" height="16px"}}</button>
+              {{else if (eq column.valuePath "cover_art")}}
+                <div class="media-collection-table__img-cell" style={{css-url "background-image" (concat "/media-registry/covers/" cell)}} />
+              {{else if (eq column.valuePath "top_artists")}}
+                {{#each cell as |c|}}
+                  {{c}}<br>
+                {{/each}}
+              {{else}}
+                {{cell}}
+              {{/if}}
+            </div>
+          </div>
+        </Boxel>
+      </r.cell>
+    </b.row>
+  </t.body>
+</EmberTable>

@@ -5,7 +5,7 @@
     <span class="breadcrumbs__pill breadcrumbs__pill--current">{{humanize @model.title}}</span>
   </div>
 
-  <MediaCollection @model={{@model}} as |item|>
+  <MediaCollection @model={{@model}} @mode="view" @format="table" as |item|>
     <Boxel class="collection__boxel">
       <BoxelHighlight {{on "click" (fn this.selectOrTransition item)}} @class="collection__highlighter" @on={{item.selected}} />
       <SelectButton
@@ -23,3 +23,5 @@
     </Boxel>
   </MediaCollection>
 </div>
+
+{{outlet}}

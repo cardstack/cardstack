@@ -13,7 +13,9 @@
 @import 'media-registry.css';
 @import 'media-registry/master-collection.css';
 @import 'media-registry/collection.css';
+@import 'media-registry/collection-edit.css';
 @import 'components/media-collection.css';
+@import 'components/media-collection-table.css';
 
 
 html, body {
