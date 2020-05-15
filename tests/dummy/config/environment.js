@@ -51,9 +51,11 @@ module.exports = function(environment) {
     ENV.APP.autoboot = false;
   }
 
+  ENV.rootURL = '/boxel';
+
+
   if (environment === 'production') {
     // here you can enable a production-specific feature
-    ENV.rootURL = '/boxel';
     ENV.locationType = 'hash';
     ENV['ember-cli-mirage'] = {
       enabled: true

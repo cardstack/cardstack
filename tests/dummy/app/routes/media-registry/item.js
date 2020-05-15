@@ -1,13 +1,10 @@
 import Route from '@ember/routing/route';
-import fetch from 'fetch';
 import { dasherize } from '@ember/string';
-
-const MASTER_TRACKS = '/media-registry/api/bunny_records_tracks.json';
+import { fetchCollection } from 'dummy/media';
 
 export default class MediaRegistryItemRoute extends Route {
   async model({ itemId }) {
-    const data = await fetch(MASTER_TRACKS);
-    const records = await data.json();
+    const records = await fetchCollection('bunny_records_tracks');
 
     const record = records.filter(item => {
       if (item.catalog) {
