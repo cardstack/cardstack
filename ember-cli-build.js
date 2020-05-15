@@ -20,7 +20,7 @@ module.exports = function(defaults) {
       fingerprintAssetMap: true,
       prepend: '/boxel/',
       replaceExtensions: ['html', 'css', 'js', 'json'],
-      enabled: true
+      enabled: (process.env.EMBER_ENV !== 'test')
     }
 
     // Add options here
