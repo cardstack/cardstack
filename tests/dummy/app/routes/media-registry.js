@@ -1,12 +1,10 @@
 import Route from '@ember/routing/route';
-import fetch from 'fetch';
-
-const MASTER_COLLECTIONS = '/media-registry/api/bunny_records_collections.json';
+import { fetchCollection } from 'dummy/media';
 
 export default class MediaRegistryRoute extends Route {
   async model() {
-    const res = await fetch(MASTER_COLLECTIONS);
-    const collection = await res.json();
+
+    const collection = await fetchCollection('bunny_records_collections');
 
     return {
       title: 'Master Recordings',
