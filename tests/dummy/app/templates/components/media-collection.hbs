@@ -1,4 +1,4 @@
-{{#let @model.collection as |collection|}}
+{{#let this.collection as |collection|}}
   <Boxel class="media-collection media-collection--{{@model.type}} media-collection--{{this.format}} media-collection--{{@mode}}">
     <header class="media-collection__header">
       <div class="media-collection__title-row media-collection__title-row--{{@mode}}">
@@ -16,7 +16,7 @@
           />
           <h2 class="media-collection__title">{{humanize @model.title}}</h2>
           <div class="media-collection__count">
-            <span>{{@model.collection.length}}</span> {{if (eq @model.type "collection") "Songs" "Collections"}}
+            <span>{{collection.length}}</span> {{if (eq @model.type "collection") "Songs" "Collections"}}
           </div>
         {{/if}}
       </div>
@@ -39,13 +39,14 @@
           {{/if}}
         </div>
         {{#if (and (eq @model.type "collection") collection.selectedItemCount)}}
+
           <button class="media-collection__pill media-collection__pill--dropdown">
             Add to Collection
           </button>
         {{/if}}
         <div class="media_collection__btn-group">
           <div class="media-collection__btn-trio media-collection__filters">
-            <button class="media-collection__btn sort" aria-label="sort"></button>
+            <SortPopup @sortColumns={{this.sortColumns}} @sortColumn={{this.sortColumn}} @sortDirection={{this.sortDirection}} @sort={{this.sort}}/>
             <button class="media-collection__btn filter" aria-label="filter"></button>
             <button class="media-collection__btn search" aria-label="search"></button>
           </div>
@@ -59,7 +60,7 @@
     </header>
 
     {{#if (eq this.format "table")}}
-      <MediaCollectionTable @mode={{@mode}} @type={{@model.type}} @collection={{collection}} @columns={{@model.columns}} />
+      <MediaCollectionTable @mode={{@mode}} @type={{@model.type}} @collection={{collection}} @columns={{@model.columns}} @removeItem={{this.removeItem}} @transition={{@transition}} @sortColumn={{this.sortColumn}} @sortDirection={{this.sortDirection}} @onUpdateSorts={{this.tableSort}}/>
     {{else}}
       <ul class="media-collection__grid media-collection__grid--{{@model.type}}-{{this.format}}">
         {{#each collection as |item|}}

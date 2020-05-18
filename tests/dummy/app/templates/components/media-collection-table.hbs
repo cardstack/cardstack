@@ -1,13 +1,25 @@
 <EmberTable @class="media-collection-table media-collection-table--{{@type}} media-collection-table--{{@mode}}" as |t|>
   <t.head
     @columns={{@columns}}
-    @class="media-collection-table__header"
-  />
+    @onUpdateSorts={{@onUpdateSorts}}
+    @class="media-collection-table__header" as |h|>
+
+    <h.row as |r|>
+      <r.cell as |column|>
+        {{column.name}}
+        {{#if (eq @sortColumn column)}}
+          {{if (eq @sortDirection 'asc') "▲" "▼"}}
+        {{/if}}
+      </r.cell>
+    </h.row>
+
+  </t.head>
   <t.body
-    @rows={{this.collection}}
+    @rows={{@collection}}
     @estimateRowHeight={{60}}
     @class="media-collection-table__body" as |b|
   >
+
     <b.row class={{if b.rowValue.selected "is-selected"}} as |r|>
       <r.cell as |cell column row cellMeta columnMeta|>
         <Boxel class="media-collection-table__boxel-cell">
@@ -28,7 +40,7 @@
             {{/if}}
             <div class="media-collection-table__cell-value {{if (eq columnMeta.index 0) "media-collection-table__cell-value--first-col"}} {{if (eq column.valuePath "cover_art") "media-collection-table__cell-value--img"}}">
               {{#if (and (eq (add columnMeta.index 1) b.cells.length) (eq @mode "edit"))}}
-                <button {{on "click" (fn this.removeItem row)}} class="media-collection-editor__remove-btn" aria-label="remove">{{svg-jar "icon-minus-circle" width="16px" height="16px"}}</button>
+                <button {{on "click" (fn @removeItem row)}} class="media-collection-editor__remove-btn" aria-label="remove">{{svg-jar "icon-minus-circle" width="16px" height="16px"}}</button>
               {{else if (eq column.valuePath "cover_art")}}
                 <div class="media-collection-table__img-cell" style={{css-url "background-image" cell}} />
               {{else if (eq column.valuePath "top_artists")}}

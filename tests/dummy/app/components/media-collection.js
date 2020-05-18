@@ -7,6 +7,9 @@ export default class MediaCollectionComponent extends Component {
   @tracked format = this.args.format || 'grid';
   @service router;
   @tracked collection = this.args.model.collection;
+  @tracked tableCols = this.args?.field?.columns || this.args?.model?.columns;
+  @tracked sortColumn = this.sortColumns ? this.sortColumns[0] : null;
+  @tracked sortDirection = 'asc';
 
   constructor(...args) {
     super(...args);
@@ -60,4 +63,31 @@ export default class MediaCollectionComponent extends Component {
       this.router.transitionTo('media-registry');
     }
   }
+
+  get sortColumns() {
+    return this.tableCols.filter(c => c.isSortable !== false && c.name);
+  }
+
+  @action async sort(column, direction=null) {
+    if (direction) {
+      this.sortDirection = direction
+    } else if (column == this.sortColumn) {
+      this.sortDirection = { asc: 'desc', desc: 'asc' }[this.sortDirection];
+    } else {
+      this.sortDirection = 'asc';
+    }
+    this.sortColumn = column;
+
+    this.collection = (await this.args.sort(this.sortColumn, this.sortDirection)).slice();
+  }
+
+  @action async tableSort(sorts) {
+    let column = this.tableCols.find(c => c.valuePath === sorts[0].valuePath);
+    await this.sort(column);
+  }
+
+  @action async removeItem(item) {
+    this.collection = (await this.args.removeItem(item)).slice()
+  }
+
 }

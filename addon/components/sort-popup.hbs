@@ -1,0 +1,15 @@
+{{#if @sortColumns.length}}
+  <div class="media-collection__btn-wrapper">
+    <BasicDropdown as |dd|>
+      <dd.Trigger><button class="media-collection__btn sort" aria-label="sort"></button></dd.Trigger>
+      <dd.Content class="media-collection__sort-dropdown">
+        <ul>
+          {{#each @sortColumns as |column|}}
+            <SortPopup::Item @sort={{@sort}} @column={{column}} @direction="asc" @sortColumn={{@sortColumn}} @sortDirection={{@sortDirection}}/>
+            <SortPopup::Item @sort={{@sort}} @column={{column}} @direction="desc" @sortColumn={{@sortColumn}} @sortDirection={{@sortDirection}}/>
+          {{/each}}
+        </ul>
+      </dd.Content>
+    </BasicDropdown>
+  </div>
+{{/if}}
