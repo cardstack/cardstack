@@ -81,6 +81,10 @@ export default class MediaCollectionComponent extends Component {
     this.collection = (await this.args.sort(this.sortColumn, this.sortDirection)).slice();
   }
 
+  @action async search(event) {
+    this.collection = (await this.args.search(event.target.value)).slice();
+  }
+
   @action async tableSort(sorts) {
     let column = this.tableCols.find(c => c.valuePath === sorts[0].valuePath);
     await this.sort(column);
