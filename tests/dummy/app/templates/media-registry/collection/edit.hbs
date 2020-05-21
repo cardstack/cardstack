@@ -1,5 +1,5 @@
 <BoxelModal @onClose={{this.transitionToPrevious}}>
   <div class="edit-modal">
-    <MediaCollection @model={{@model}} @mode="edit" @format="table" />
+    <MediaCollection @model={{@model}} @mode="edit" @format="table"  @sort={{this.sort}} @transition={{this.transition}} @removeItem={{this.removeItem}} />
   </div>
 </BoxelModal>

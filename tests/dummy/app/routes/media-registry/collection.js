@@ -38,6 +38,7 @@ export default class MediaRegistryCollectionRoute extends Route {
           name: 'Artwork',
           valuePath: 'cover_art',
           width: 250,
+          isSortable: false,
         },
         {
           name: 'Type of Album',
@@ -53,6 +54,7 @@ export default class MediaRegistryCollectionRoute extends Route {
           name: 'Length',
           valuePath: 'length',
           width: 250,
+          sortType: 'numeric'
         },
         {
           width: 50,
