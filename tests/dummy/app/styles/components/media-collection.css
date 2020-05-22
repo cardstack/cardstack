@@ -155,6 +155,12 @@
   gap: 8px;
 }
 
+.media-collection__btn-trio.media-collection__filters {
+  grid-template-columns: repeat(auto-fit, 30px);
+  width: 125px;
+  justify-content: end;
+}
+
 .media-collection__btn-trio + .media-collection__btn-trio {
   padding-left: 18px;
   border-left: 1px solid #707070;
