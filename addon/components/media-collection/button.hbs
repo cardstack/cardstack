@@ -1,5 +1,5 @@
 <div class="media-collection__btn-wrapper">
-  <BasicDropdown as |dd|>
+  <BasicDropdown @this.verticalPosition="below" @renderInPlace={{true}} as |dd|>
     <dd.Trigger>
       <button class="media-collection__btn {{@button}}" aria-label={{@button}}>
         {{#if @icon}}

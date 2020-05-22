@@ -249,16 +249,21 @@
   line-height: calc(30/22);
 }
 
+
+/* Dropdown */
 .media-collection-dropdown {
-  padding: 20px;
-  box-shadow: 8px 13px 16px 0px rgba(0,0,0,0.5);
-  border-radius: 5px
+  min-width: 210px;
+  padding: 15px 0 15px 20px;
+  box-shadow: 0 5px 15px 0px rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  font: var(--boxel-font-sm);
+  font-weight: bold;
+  letter-spacing: var(--boxel-lsp-sm);
 }
 
-
-.media-collection-dropdown ul li {
-  cursor: pointer;
-  user-select: none;
+.media-collection-dropdown ul {
+  max-height: 175px;
+  overflow: auto;
 }
 
 .media-collection-dropdown.ember-basic-dropdown-content--below.ember-basic-dropdown--transitioning-in {
@@ -269,21 +274,48 @@
   animation: drop-fade-below var(--cs-transition-time) reverse;
 }
 
+.media-collection-dropdown header {
+  padding-bottom: 15px;
+  background-color: white;
+}
+
 .media-collection-dropdown li {
-  padding-left: 15px;
   position: relative;
-  font-size: 0.9em;
-  margin-bottom: 0.5em;
+  padding-left: 10px;
+  padding-right: 10px;
+  opacity: 0.5;
+  font-weight: 400;
+  cursor: pointer;
+  user-select: none;
+}
+
+.media-collection-dropdown li + li {
+  padding-top: 15px;
+}
+
+.media-collection-dropdown li:hover,
+.media-collection-dropdown li:focus {
+  opacity: 1;
 }
 
 .media-collection__sort-dropdown__active::before {
-  content: "✓";
+  --icon-color: var(--boxel-highlight);
+  content: url('/assets/images/icons/checkmark-highlighted.svg');
   position: absolute;
-  left: -7px;
-  font-weight: bold;
-  color: var(--boxel-highlight);
+  left: -10px;
 }
 
-.media-collection__sort-dropdown__active {
+.media-collection-dropdown li.media-collection__sort-dropdown__active {
+  opacity: 1;
   font-weight: bold;
+  transition: opacity var(--boxel-transition), font-weight var(--boxel-transition);
+}
+
+.media-collection-dropdown li span {
+  padding-left: 0.4em;
+}
+
+.media-collection-dropdown li svg {
+  margin-left: 0.1em;
+  margin-right: 0.1em;
 }
