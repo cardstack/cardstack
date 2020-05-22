@@ -1,6 +1,12 @@
 <div class="media-collection__btn-wrapper">
   <BasicDropdown as |dd|>
-    <dd.Trigger><button class="media-collection__btn {{@button}}" aria-label={{@button}}></button></dd.Trigger>
+    <dd.Trigger>
+      <button class="media-collection__btn {{@button}}" aria-label={{@button}}>
+        {{#if @icon}}
+          {{svg-jar @icon width="16px" height="16px"}}
+        {{/if}}
+      </button
+    ></dd.Trigger>
     <dd.Content class="media-collection-dropdown media-collection__{{@button}}-dropdown">
       {{yield}}
     </dd.Content>

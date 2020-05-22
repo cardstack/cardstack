@@ -47,11 +47,11 @@
         <div class="media_collection__btn-group">
           <div class="media-collection__btn-trio media-collection__filters">
             <SortPopup @sortColumns={{this.sortColumns}} @sortColumn={{this.sortColumn}} @sortDirection={{this.sortDirection}} @sort={{this.sort}}/>
-            <MediaCollection::Button @button="filter">
+            <MediaCollection::Button @button="filter" @icon="filter">
             </MediaCollection::Button>
 
             {{#if @search}}
-              <MediaCollection::Button @button="search">
+              <MediaCollection::Button @button="search" @icon="search">
                 <input
                 {{on "input" this.search}}
                 />
@@ -59,9 +59,9 @@
             {{/if}}
           </div>
           <div class="media-collection__btn-trio media-collection__view-selectors">
-            <button {{on "click" (fn this.changeFormat "list")}} class="media-collection__btn list {{if (eq this.format "list") "selected" "unselected"}}" aria-label="view as list"></button>
-            <button {{on "click" (fn this.changeFormat "grid")}} class="media-collection__btn grid {{if (eq this.format "grid") "selected" "unselected"}}" aria-label="view as grid"></button>
-            <button {{on "click" (fn this.changeFormat "table")}} class="media-collection__btn table {{if (eq this.format "table") "selected" "unselected"}}" aria-label="view as table"></button>
+            <button {{on "click" (fn this.changeFormat "list")}} class="media-collection__btn list {{if (eq this.format "list") "selected"}}" aria-label="view as list"></button>
+            <button {{on "click" (fn this.changeFormat "grid")}} class="media-collection__btn grid {{if (eq this.format "grid") "selected"}}" aria-label="view as grid"></button>
+            <button {{on "click" (fn this.changeFormat "table")}} class="media-collection__btn table {{if (eq this.format "table") "selected"}}" aria-label="view as table"></button>
           </div>
         </div>
       </div>
