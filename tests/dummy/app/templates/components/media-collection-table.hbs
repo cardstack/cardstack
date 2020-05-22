@@ -36,9 +36,11 @@
                 @isSelected={{row.selected}}
                 @class="media-collection-table__select-btn media-collection-table__select-btn--{{@mode}} {{if row.selected "media-collection-table__select-btn--selected"}}"
               />
-              <button class="media-collection-table__play-btn">
-                {{svg-jar "play-btn-black" width="30px" height="30px"}}
-              </button>
+              {{#if (not-eq @type "master-collection")}}
+                <button class="media-collection-table__play-btn">
+                  {{svg-jar "play-btn-black" width="30px" height="30px"}}
+                </button>
+              {{/if}}
             {{/if}}
             <div class="media-collection-table__cell-value {{if (eq columnMeta.index 0) "media-collection-table__cell-value--first-col"}} {{if (eq column.valuePath "cover_art") "media-collection-table__cell-value--img"}}">
               {{#if (and (eq (add columnMeta.index 1) b.cells.length) (eq @mode "edit"))}}
