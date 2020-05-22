@@ -253,7 +253,7 @@
 /* Dropdown */
 .media-collection-dropdown {
   min-width: 210px;
-  padding: 15px 0 15px 20px;
+  padding: 15px 0;
   box-shadow: 0 5px 15px 0px rgba(0, 0, 0, 0.25);
   border-radius: 10px;
   font: var(--boxel-font-sm);
@@ -262,6 +262,7 @@
 }
 
 .media-collection-dropdown ul {
+  padding-left: 20px;
   max-height: 175px;
   overflow: auto;
 }
@@ -275,6 +276,7 @@
 }
 
 .media-collection-dropdown header {
+  padding-left: 20px;
   padding-bottom: 15px;
   background-color: white;
 }
@@ -299,7 +301,6 @@
 }
 
 .media-collection__sort-dropdown__active::before {
-  --icon-color: var(--boxel-highlight);
   content: url('/assets/images/icons/checkmark-highlighted.svg');
   position: absolute;
   left: -10px;
