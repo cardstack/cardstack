@@ -1,6 +1,8 @@
 import Controller from '@ember/controller';
 import { action, set } from '@ember/object';
 import { dasherize } from '@ember/string';
+import { get } from '@ember/object';
+import { compare } from '@ember/utils';
 
 export default class MediaRegistryIndexController extends Controller {
   @action
@@ -24,5 +26,10 @@ export default class MediaRegistryIndexController extends Controller {
       let itemId = dasherize(item.catalog_title.trim());
       this.transitionToRoute('media-registry.collection', itemId);
     }
+  }
+
+  @action async sort(column, direction) {
+    let multiplier = (direction === 'asc') ? 1 : -1;
+    return this.model.collection.sort((a, b) => multiplier * compare(get(a, column.valuePath), get(b, column.valuePath)))
   }
 }

@@ -3,11 +3,9 @@ import { action, set } from '@ember/object';
 import { dasherize } from '@ember/string';
 import { get } from '@ember/object';
 import { compare, isBlank } from '@ember/utils';
-import { inject as service } from '@ember/service';
 
 
 export default class MediaRegistryCollectionController extends Controller {
-  @service router;
   @action
   toggleSelect(item) {
     let collection = this.model.collection;
@@ -25,7 +23,6 @@ export default class MediaRegistryCollectionController extends Controller {
       this.transitionToRoute('media-registry.item', itemId);
     }
   }
-
 
   @action async sort(column, direction) {
     let multiplier = (direction === 'asc') ? 1 : -1;
@@ -47,10 +44,5 @@ export default class MediaRegistryCollectionController extends Controller {
         )
       );
     }
-  }
-
-  @action transition(item) {
-    let itemId = dasherize(item.song_title.trim());
-    this.router.transitionTo('media-registry.item', itemId);
   }
 }

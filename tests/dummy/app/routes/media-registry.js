@@ -40,7 +40,7 @@ export default class MediaRegistryRoute extends Route {
           width: 250,
         },
         {
-          width: 50,
+          width: 0,
           isFixed: 'right'
         },
       ],
