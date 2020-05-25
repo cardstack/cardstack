@@ -1,9 +1,4 @@
-import Controller from '@ember/controller';
-import { action } from '@ember/object';
+import MediaRegistryIndexController from './index';
 
-export default class MediaRegistryEditController extends Controller {
-  @action
-  transitionToPrevious() {
-    this.transitionToRoute('media-registry');
-  }
+export default class MediaRegistryEditController extends MediaRegistryIndexController {
 }

@@ -6,10 +6,14 @@
 
     <h.row as |r|>
       <r.cell as |column|>
-        {{column.name}}
-        {{#if (eq @sortColumn column)}}
-          {{if (eq @sortDirection 'asc') "▲" "▼"}}
-        {{/if}}
+        <span class="media-collection-table__header-cell {{if (eq @sortColumn column) "is-sorting"}}">
+          {{column.name}}
+          {{#if (eq @sortColumn column)}}
+            <div class="media-collection-table__sort-arrow {{if (eq @sortDirection "asc") "ascending"}}">
+              {{svg-jar "arrow-down" width="10px" height="10px"}}
+            </div>
+          {{/if}}
+        </span>
       </r.cell>
     </h.row>
 
@@ -32,7 +36,7 @@
                 @isSelected={{row.selected}}
                 @class="media-collection-table__select-btn media-collection-table__select-btn--{{@mode}} {{if row.selected "media-collection-table__select-btn--selected"}}"
               />
-              {{#if (not-eq @mode "edit")}}
+              {{#if (not-eq @type "master-collection")}}
                 <button class="media-collection-table__play-btn">
                   {{svg-jar "play-btn-black" width="30px" height="30px"}}
                 </button>

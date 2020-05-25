@@ -1,5 +1,6 @@
 {{#if @sortColumns.length}}
-  <MediaCollection::Button @button="sort">
+  <MediaCollection::Button @button="sort" @icon="sort">
+    <header>Sort by</header>
     <ul>
       {{#each @sortColumns as |column|}}
         <SortPopup::Item @sort={{@sort}} @column={{column}} @direction="asc" @sortColumn={{@sortColumn}} @sortDirection={{@sortDirection}}/>

@@ -57,7 +57,7 @@ export default class MediaRegistryCollectionRoute extends Route {
           sortType: 'numeric'
         },
         {
-          width: 50,
+          width: 0,
           isFixed: 'right'
         },
       ],
