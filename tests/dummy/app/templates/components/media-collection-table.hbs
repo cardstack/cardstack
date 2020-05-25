@@ -46,7 +46,7 @@
               {{#if (and (eq (add columnMeta.index 1) b.cells.length) (eq @mode "edit"))}}
                 <button {{on "click" (fn @removeItem row)}} class="media-collection-editor__remove-btn" aria-label="remove">{{svg-jar "icon-minus-circle" width="16px" height="16px"}}</button>
               {{else if (eq column.valuePath "cover_art")}}
-                <div class="media-collection-table__img-cell" style={{css-url "background-image" cell}} />
+                <div class="media-collection-table__img-cell" style={{css-url "background-image" row.cover_art_thumb}} />
               {{else if (eq column.valuePath "top_artists")}}
                 {{#each cell as |c|}}
                   {{c}}<br>
