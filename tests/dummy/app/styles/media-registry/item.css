@@ -1,0 +1,115 @@
+/* Includes breadcrumbs */
+.item__wrapper {
+  max-width: 1360px;
+  height: calc(100vh - 132px);
+  padding: 0 30px;
+  z-index: 1;
+}
+
+/* Includes sidebar */
+.item__main {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 0 25px;
+  padding-bottom: 135px;
+}
+
+/* Header + sections */
+.item {
+  padding-bottom: 65px;
+  background-color: white;
+  border-radius: 10px;
+}
+
+
+/* Header */
+.item__header {
+  padding: 60px 50px 50px;
+  background-image: var(--blurhash-image);
+  background-size: cover;
+  background-repeat: no-repeat;
+  border-radius: 10px 10px 0 0;
+}
+
+.item__header-content {
+  max-width: 945px;
+  max-height: 370px;
+  display: grid;
+  grid-template:
+    "img title"   2fr
+    "img artist"  1fr
+    "img details" 1fr / minmax(160px, 260px) 1fr;
+  gap: 0 30px;
+}
+
+.item__img {
+  grid-area: img;
+  align-self: center;
+  position: relative;
+  height: 0;
+  padding-top: 100%;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.item__play-btn {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.item__header-details {
+  grid-area: details;
+  align-self: end;
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 40px;
+}
+
+.item__title {
+  grid-area: title;
+  align-self: end;
+  color: white;
+  font: var(--boxel-font-lg);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.item__artist {
+  grid-area: artist;
+  color: white;
+  font: var(--boxel-font);
+  font-weight: normal;
+  letter-spacing: var(--boxel-lsp);
+}
+
+
+/* Sent to field renderer */
+.item-header-field.field-renderer {
+  grid-template-columns: auto;
+  gap: 3px;
+  padding: 0;
+  justify-items: start;
+  white-space: nowrap;
+}
+
+.item-header-field .field-renderer__title {
+  color: white;
+  font: var(--boxel-font-xs);
+  font-weight: bold;
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+}
+
+.item-header-field .field-renderer__value {
+  color: white;
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+}

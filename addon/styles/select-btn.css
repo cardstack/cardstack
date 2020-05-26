@@ -10,13 +10,17 @@
   z-index: 1;
 }
 
+.select-btn--sm {
+  width: 30px;
+  height: 30px;
+}
+
 .select-btn--edit {
   --icon-bg: transparent;
 }
 
 .select-btn:hover,
 .select-btn:focus {
-  --icon-bg: var(--boxel-highlight);
   --icon-border: black;
   outline: 0;
 }
@@ -31,4 +35,9 @@
   --icon-bg: var(--boxel-highlight);
   --icon-border: var(--boxel-highlight);
   --icon-color: black;
+}
+
+.select-btn > svg {
+  display: block;
+  margin: auto;
 }

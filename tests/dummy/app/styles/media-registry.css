@@ -27,6 +27,7 @@
   background-color: var(--bunny-records-pink);
   color: white;
   height: 250px;
+  z-index: 2;
 }
 
 .media-registry__header--sm {

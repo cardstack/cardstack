@@ -1,14 +1,25 @@
 :root {
   --boxel-font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+
   --boxel-font-lg: 32px/calc(43/32) var(--boxel-font-family);
+  --boxel-font-med: 22px/calc(30/22) var(--boxel-font-family);
   --boxel-font: 16px/calc(22/16) var(--boxel-font-family);
   --boxel-font-sm: 13px/calc(18/13) var(--boxel-font-family);
+  --boxel-font-xs: 11px/calc(15/11) var(--boxel-font-family);
+
+  --boxel-lsp-xxl: 0.1em;
+  --boxel-lsp-xl: 0.05em;
   --boxel-lsp-lg: 0.035em;
   --boxel-lsp: 0.025em;
   --boxel-lsp-sm: 0.015em;
+
+  --boxel-border-color: #d1d1d1;
+  --boxel-border: 1px solid var(--boxel-border-color);
   --boxel-highlight: #00ebe5;
   --boxel-highlight-hover: #00b0ad;
+
   --boxel-transition: 0.2s ease;
-  --boxel-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+
+  --boxel-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
   --boxel-box-shadow-hover: 0 3px 10px rgba(0, 0, 0, 0.15);
 }

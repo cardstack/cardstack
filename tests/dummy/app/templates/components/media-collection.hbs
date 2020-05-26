@@ -1,6 +1,6 @@
 {{#let this.collection as |collection|}}
-  <Boxel class="media-collection media-collection--{{@model.type}} media-collection--{{this.format}} media-collection--{{@mode}}">
-    <header class="media-collection__header">
+  <Boxel class="media-collection media-collection--{{@model.type}} media-collection--{{@mode}}">
+    <header class="media-collection__sticky-header">
       <div class="media-collection__title-row media-collection__title-row--{{@mode}}">
         {{#if (eq @mode "edit")}}
           <h2 class="media-collection__title">{{humanize @model.title}}</h2>
@@ -66,18 +66,21 @@
         </div>
       </div>
     </header>
-
-    {{#if (eq this.format "table")}}
-      <MediaCollectionTable @mode={{@mode}} @type={{@model.type}} @collection={{collection}} @columns={{@model.columns}} @removeItem={{this.removeItem}} @transition={{@transition}} @sortColumn={{this.sortColumn}} @sortDirection={{this.sortDirection}} @onUpdateSorts={{this.tableSort}}/>
-    {{else}}
-      <ul class="media-collection__grid media-collection__grid--{{@model.type}}-{{this.format}}">
-        {{#each collection as |item|}}
-          <li>
-            {{yield item}}
-          </li>
-        {{/each}}
-        {{!-- Add new --}}
-      </ul>
-    {{/if}}
+    <div class="media-collection__scroll-container">
+      <div class="media-collection__inner-container">
+        {{#if (eq this.format "table")}}
+          <MediaCollectionTable @mode={{@mode}} @type={{@model.type}} @collection={{collection}} @columns={{@model.columns}} @removeItem={{this.removeItem}} @transition={{@transition}} @sortColumn={{this.sortColumn}} @sortDirection={{this.sortDirection}} @onUpdateSorts={{this.tableSort}}/>
+        {{else}}
+          <ul class="media-collection__grid media-collection__grid--{{@model.type}}-{{this.format}}">
+            {{#each collection as |item|}}
+              <li>
+                {{yield item}}
+              </li>
+            {{/each}}
+            {{!-- Add new --}}
+          </ul>
+        {{/if}}
+      </div>
+    </div>
   </Boxel>
 {{/let}}

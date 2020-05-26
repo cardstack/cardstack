@@ -1,6 +1,6 @@
 .collection__wrapper {
   height: calc(100vh - 132px);
-  padding: 0 30px 30px;
+  padding: 0 30px;
   overflow: hidden;
 }
 

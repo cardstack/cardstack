@@ -1,0 +1,147 @@
+.boxel-card {
+  display: grid;
+  align-items: center;
+  gap: 3px 15px;
+  padding: 15px;
+  background-color: white;
+  border: 1px solid var(--boxel-border-color);
+  border-radius: 5px;
+  color: black;
+  font: var(--boxel-font);
+  letter-spacing: var(--boxel-lsp);
+  overflow: hidden;
+  transition: box-shadow var(--boxel-transition);
+}
+
+.boxel-card:hover {
+  box-shadow: var(--boxel-box-shadow);
+}
+
+.boxel-card ul {
+  list-style-type: none;
+  margin: 0;
+  padding-left: 0;
+}
+
+.boxel-card--small {
+  width: 100%;
+  max-width: 450px;
+}
+
+.boxel-card__title {
+  margin: 0;
+  font: inherit;
+  font-weight: bold;
+  letter-spacing: inherit;
+}
+
+.boxel-card__description {
+  margin: 0;
+  color: #6B6A80;
+  font: var(--boxel-font-sm);
+}
+
+.boxel-card--with-img {
+  grid-template:
+  "img ."     auto
+  "img ."     auto
+  "img title" auto
+  "img desc"  auto
+  "img ."     auto
+  "img ."     auto / auto 1fr;
+}
+
+.boxel-card--with-img .boxel-card__title {
+  grid-area: title;
+  align-self: end;
+}
+
+.boxel-card--with-img .boxel-card__description {
+  grid-area: desc;
+  align-self: start;
+}
+
+.boxel-card__bg-img {
+  grid-column: 1;
+  grid-area: img;
+  width: 50px;
+  height: 50px;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.boxel-card__fields {
+  padding-top: 25px;
+  grid-column: 1 / -1;
+  display: grid;
+}
+
+.boxel-card__fields--collapsed {
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  gap: 40px;
+}
+
+.boxel-card--edit .boxel-card__fields--collapsed {
+  gap: 30px;
+}
+
+
+/* Card type adjustments */
+/* TODO: make separate card types */
+.boxel-card--musical-work .boxel-card__bg-img {
+  background-size: contain;
+}
+
+.boxel-card--profile .boxel-card__bg-img {
+  border-radius: 100px;
+}
+
+.boxel-card--audio-file .boxel-card__bg-img {
+  height: 34px;
+  background-size: 27px 34px;
+  background-position: top center;
+}
+
+
+/* Grid format */
+.boxel-card--grid.boxel-card--with-img {
+  grid-column: 1 / -1;
+  grid-template: "img" "title" "desc";
+  padding: 10px;
+  justify-items: center;
+  width: 210px;
+  min-height: 285px;
+}
+
+.boxel-card--grid.boxel-card--with-img .boxel-card__bg-img {
+  width: 188px;
+  height: 188px;
+  background-size: cover;
+  background-position: center;
+}
+
+.boxel-card--grid.boxel-card--with-img .boxel-card__title {
+  text-align: center;
+}
+
+
+/* Sent to Field Renderer */
+.boxel-card-field.field-renderer {
+  grid-template-columns: auto;
+  gap: 3px;
+  padding: 0;
+  justify-items: start;
+}
+
+.boxel-card-field .field-renderer__title {
+  color: #AFAFB7;
+  font: var(--boxel-font-xs);
+  font-weight: bold;
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+}
+
+.boxel-card-field .field-renderer__value {
+  font: var(--boxel-font-sm);
+}

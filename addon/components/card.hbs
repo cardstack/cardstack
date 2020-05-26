@@ -1,0 +1,26 @@
+{{#if @model.name}}
+  <Cards::CoverArt @card={{@model}} @variant={{@variant}} @format={{or @format "list"}} @mode={{@mode}} />
+{{else}}
+  <div class="boxel-card boxel-card--{{@variant}} boxel-card--{{@mode}} boxel-card--{{@model.type}} boxel-card--{{or @format "list"}} {{if @model.imgURL "boxel-card--with-img"}}">
+    {{#if @model.imgURL}}
+      <div class="boxel-card__bg-img" style={{css-url "background-image" @model.imgURL}} />
+    {{/if}}
+    <h3 class="boxel-card__title">{{@model.title}}</h3>
+    {{#if @model.description}}
+      <p class="boxel-card__description">{{@model.description}} {{#if @model.descriptionDate}}{{moment-format @model.descriptionDate "MMM DD, YYYY" "YYYY-MM-DD"}}{{/if}}</p>
+    {{/if}}
+    {{#if (and @model.fields (is-array @model.fields))}}
+      <ul class="boxel-card__fields boxel-card__fields--collapsed">
+        {{#each @model.fields as |field|}}
+          <li>
+            <FieldRenderer
+              @class="boxel-card-field"
+              @mode={{@mode}}
+              @field={{field}}
+            />
+          </li>
+        {{/each}}
+      </ul>
+    {{/if}}
+  </div>
+{{/if}}

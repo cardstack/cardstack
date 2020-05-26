@@ -13,10 +13,10 @@
 
 .boxel-modal {
   position: fixed;
-  top: 28px;
-  right: 32px;
-  left: 109px;
-  height: 100vh;
-  z-index: 15;
+  top: 30px;
+  right: 31px;
+  left: 110px;
+  border: none;
   overflow: hidden;
+  z-index: 15;
 }

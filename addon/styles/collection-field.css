@@ -1,0 +1,100 @@
+/* Embedded Collection field (edit mode) */
+.collection-field {
+  max-width: 450px;
+  min-height: 50px;
+  background-color: #F0F0F0;
+  border: none;
+  border-radius: 5px;
+}
+
+.collection-field__header {
+  padding-bottom: 30px;
+}
+
+.collection-field__title {
+  padding: 15px 15px 25px;
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 0.01em;
+  line-height: calc(27/20);
+  text-transform: capitalize;
+}
+
+.collection-field__select-all-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+}
+
+.collection-field__view-all {
+  padding: 0 10px 30px;
+}
+
+.collection-field__footer {
+  padding: 0 10px 30px;
+  text-align: center;
+}
+
+.collection-field__items {
+  display: grid;
+  gap: 10px;
+  padding-bottom: 30px;
+}
+
+.collection-field__items--grid {
+  grid-template-columns: repeat(auto-fill, 210px);
+  justify-content: center;
+  padding-bottom: 15px;
+}
+
+.collection-field__item {
+  display: grid;
+  align-items: center;
+  justify-items: center;
+}
+
+.collection-field__item--list.collection-field__item--belongs-to {
+  grid-template-columns: 1fr 45px;
+  grid-template-rows: 1fr;
+  padding: 10px 0 10px 10px;
+}
+
+.collection-field__item--grid.collection-field__item--belongs-to {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 45px;
+  padding-top: 10px;
+}
+
+.collection-field__item--list.collection-field__item--single {
+  grid-template-columns: 1fr 45px;
+  padding-top: 10px;
+  padding-left: 10px;
+}
+
+.collection-field__item--list.collection-field__item--multiple {
+  grid-template-columns: 45px 1fr 45px;
+}
+
+.collection-field__item--grid.collection-field__item--multiple {
+  padding: 0;
+  grid-template-areas: ". select remove .";
+  grid-template-rows: 1fr 45px;
+  gap: 0 30px;
+}
+
+.collection-field__item--grid.collection-field__item--multiple .collection-field__card {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+
+.collection-field__item--grid.collection-field__item--multiple .collection-field__select-btn {
+  grid-area: select;
+  grid-row: 2;
+}
+
+.collection-field__item--grid.collection-field__item--multiple .collection-field__remove-btn {
+  grid-area: remove;
+  grid-row: 2;
+}
+
+
+
