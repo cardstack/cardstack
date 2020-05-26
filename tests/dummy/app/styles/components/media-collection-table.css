@@ -229,10 +229,6 @@ tr.is-selected + tr.is-selected .media-collection-table__highlight.boxel-highlig
 
 
 /* hack */
-.media-collection-table--view {
-  min-width: calc(100% + 50px);
-}
-
 .media-collection-table__header th:last-of-type .media-collection-table__header-cell {
   padding: 0;
 }

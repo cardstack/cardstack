@@ -21,7 +21,6 @@
 
 /* Body container with bg */
 .item-edit__body-plate {
-  padding-bottom: 65px;
   background-color: white;
   border-radius: 0 0 10px 10px;
 }
