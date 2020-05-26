@@ -15,7 +15,7 @@
 /* Body scroll container */
 .item-edit__scroll-container {
   height: calc(100vh - 90px - 30px);
-  padding-bottom: 80px;
+  padding-bottom: 30px;
   overflow: auto;
 }
 

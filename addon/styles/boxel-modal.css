@@ -8,15 +8,28 @@
   padding: 0;
   border: none;
   background-color: rgba(0, 0, 0, 0.75);
+  text-align: left;
   z-index: 10;
 }
 
 .boxel-modal {
+  --modal-offset-top: 30px;
+  --modal-offset-right: 30px;
+  --modal-offset-left: 110px;
+  --modal-max-width: 1000px;
+
   position: fixed;
-  top: 30px;
-  right: 31px;
-  left: 110px;
+  top: var(--modal-offset-top);
+  left: var(--modal-offset-left);
+  right: var(--modal-offset-right);
+  margin: 0 auto;
   border: none;
   overflow: hidden;
   z-index: 15;
+}
+
+.boxel-modal__inner {
+  width: 100%;
+  max-width: var(--modal-max-width);
+  margin: 0 auto;
 }

@@ -11,7 +11,7 @@
   display: grid;
   grid-template-columns: 3fr 1fr;
   gap: 0 25px;
-  padding-bottom: 135px;
+  padding-bottom: 30px;
 }
 
 /* Header + sections */

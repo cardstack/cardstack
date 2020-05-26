@@ -4,6 +4,7 @@
 
   z-index: 1;
   height: calc(100% - 180px);
+  padding-bottom: 30px;
 }
 
 .media-collection-table > table {

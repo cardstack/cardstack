@@ -38,7 +38,7 @@ export default class MediaRegistryIndexController extends Controller {
 
   @action
   transitionToPrevious() {
-    this.transitionToRoute('media-registry.collection', this.model.title);
+    this.transitionToRoute('media-registry');
   }
 
   @action
