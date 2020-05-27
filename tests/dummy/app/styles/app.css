@@ -13,9 +13,11 @@
 @import 'media-registry.css';
 @import 'media-registry/master-collection.css';
 @import 'media-registry/collection.css';
-@import 'media-registry/collection-edit.css';
+@import 'media-registry/item.css';
+@import 'media-registry/item-edit.css';
 @import 'components/media-collection.css';
 @import 'components/media-collection-table.css';
+@import 'components/media-detail.css';
 
 
 html, body {

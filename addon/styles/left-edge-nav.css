@@ -1,4 +1,5 @@
 .left-edge-nav {
+  position: fixed;
   display: grid;
   align-items: center;
   justify-items: center;

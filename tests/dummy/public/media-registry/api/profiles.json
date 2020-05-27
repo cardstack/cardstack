@@ -1,0 +1,34 @@
+[
+  {
+    "id": "pia-midina",
+    "type": "profile",
+    "title": "Pia Midina",
+    "imgURL": "media-registry/profiles/Pia-Midina.jpg",
+    "fields": [
+      {
+        "title": "website",
+        "value": "www.piamidina.com"
+      },
+      {
+        "title": "no. of recordings",
+        "value": 17
+      }
+    ]
+  },
+  {
+    "id": "francesco-midina",
+    "type": "profile",
+    "title": "Francesco Midina",
+    "imgURL": "media-registry/profiles/francesco-midina.jpg",
+    "fields": [
+      {
+        "title": "website",
+        "value": "www.fmidina.com"
+      },
+      {
+        "title": "no. of recordings",
+        "value": 20
+      }
+    ]
+  }
+]

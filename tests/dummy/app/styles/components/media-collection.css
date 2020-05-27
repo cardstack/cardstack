@@ -1,13 +1,35 @@
 .media-collection {
   height: 100%;
-  background-color: white;
-  border-radius: 10px;
   box-shadow: var(--boxel-box-shadow);
+  border-radius: 10px;
+}
+
+.media-collection__sticky-header {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 2;
+  border-radius: 10px 10px 0 0;
+}
+
+.media-collection__scroll-container {
+  height: calc(100vh - 345px);
+  padding-bottom: 30px;
   overflow: auto;
 }
 
-.media-collection--collection {
-  height: calc(100% - 80px);
+.media-collection__inner-container {
+  min-height: 100%;
+  background-color: white;
+  border-radius: 0 0 10px 10px;
+}
+
+.media-collection--collection.media-collection--view {
+  height: calc(100% - 70px);
+}
+
+.media-collection--collection.media-collection--view .media-collection__scroll-container {
+  height: calc(100% - 152px);
 }
 
 .media-collection--table {
@@ -40,13 +62,6 @@
   width: 40px;
   height: 40px;
   background: url('/assets/images/icons/gear.svg') center/17px 17px no-repeat;
-}
-
-.media-collection__header {
-  position: sticky;
-  top: 0;
-  background-color: white;
-  z-index: 2;
 }
 
 .media-collection__title-row {
@@ -230,23 +245,25 @@
 
 
 /* Edit mode */
-.media-collection--edit {
-  height: 100%;
-  background: none;
+.media-collection--edit .media-collection__scroll-container {
+  height: calc(100vh - 200px);
 }
 
-.media-collection--edit header {
-  background-color: #F0F0F0;
+.media-collection--edit .media-collection__inner-container {
+  background-color: #f0f0f0;
 }
 
 .media-collection__title-row--edit {
   padding: 25px 20px;
-  background-color: white;
 }
 
 .media-collection--edit .media-collection__title {
   font-size: 22px;
   line-height: calc(30/22);
+}
+
+.media-collection--edit .media-collection__actions-row {
+  background-color: #F0F0F0;
 }
 
 

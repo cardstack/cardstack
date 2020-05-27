@@ -1,0 +1,67 @@
+<Boxel>
+  <div class="collection-field">
+    {{#if @belongsToField}}
+      <div class="collection-field__item collection-field__item--{{or @format "list"}} collection-field__item--belongs-to">
+        <Card @variant="small" @model={{@collection}} @mode="view" @format={{@format}} />
+        <IconButton @icon="icon-minus-circle" @class="collection-field__remove-btn" @aria-label="remove" />
+      </div>
+    {{else}}
+      {{#if (gt @collection.length 1)}}
+        <header class="collection-field__header">
+          <h4 class="collection-field__title">{{@title}}</h4>
+          <div class="collection-field__select-all-row">
+            <SelectButton
+              {{!-- {{on "click" this.toggleSelectAll}} --}}
+              @mode={{@mode}}
+              @isPartial={{@collection.selectedItemCount}}
+              @isSelected={{@collection.selectedAll}}
+            />
+            <div class="media-collection__pill media-collection__select-all">
+              {{#if @collection.selectedItemCount}}
+                {{svg-jar "check-mark" width="9px" height="7px"}}
+                {{@collection.selectedItemCount}} selected
+                <button class="media-collection__more-actions">{{svg-jar "more-actions" width="16px" height="16px"}}</button>
+              {{else}}
+                Select all
+              {{/if}}
+            </div>
+          </div>
+        </header>
+      {{/if}}
+      <div class="collection-field__items collection-field__items--{{or @format "list"}}">
+        {{#each @collection as |item|}}
+          <div class="collection-field__item collection-field__item--{{or @format "list"}} {{if (gt @collection.length 1) "collection-field__item--multiple" "collection-field__item--single"}}">
+            {{#if (gt @collection.length 1)}}
+              <SelectButton
+                {{!-- {{on "click" (fn this.toggleSelect item)}} --}}
+                @isSelected={{item.selected}}
+                @class="collection-field__select-btn"
+                @mode="edit"
+              />
+            {{/if}}
+            <Card @class="collection-field__card" @variant="small" @model={{item}} @mode="view" @format={{@format}} />
+            <IconButton @icon="icon-minus-circle" @class="collection-field__remove-btn" @aria-label="remove" />
+          </div>
+        {{/each}}
+      </div>
+      {{#if (gt @collection.length 1)}}
+        <div class="collection-field__view-all">
+          <button class="collection-editor__view-all-btn">
+            View all ({{@collection.length}})
+          </button>
+        </div>
+      {{/if}}
+      <footer class="collection-field__footer">
+        <CollectionAddButton
+          @searchFn={{@searchFn}}
+          @field={{@field}}
+          @fieldName={{@fieldName}}
+          @addItem={{this.addItem}}
+          @format={{@format}}
+          @mode={{@mode}}
+          @newItemComponent={{component "card" variant="small" mode=@mode format=@format}}
+        />
+      </footer>
+    {{/if}}
+  </div>
+</Boxel>

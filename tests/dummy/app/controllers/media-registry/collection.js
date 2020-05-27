@@ -15,6 +15,11 @@ export default class MediaRegistryCollectionController extends MediaRegistryInde
     }
   }
 
+  @action
+  transitionToPrevious() {
+    this.transitionToRoute('media-registry.collection', this.model.title);
+  }
+
   @action async search(query) {
     let collection = this.model.collection;
     if (isBlank(query)) {

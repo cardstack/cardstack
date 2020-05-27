@@ -1,0 +1,12 @@
+{{#each this.detailSections as |s|}}
+  <section class="media-detail-section">
+    <h3 class="media-detail-section__title">{{s.title}}</h3>
+    {{#each s.content as |field|}}
+      <FieldRenderer
+        @mode={{@mode}}
+        @field={{field}}
+        @fieldName={{field.title}}
+      />
+    {{/each}}
+  </section>
+{{/each}}

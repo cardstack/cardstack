@@ -1,0 +1,106 @@
+{{#if (eq @mode "edit")}}
+  {{!-- Edit Mode --}}
+  {{#if (or @field.value.id (is-array @field.value))}}
+    <div class="field-renderer {{@class}}">
+      <h4 class="field-renderer__title">{{humanize @field.title}}</h4>
+      {{#if @field.value.id}}
+        <CollectionField
+          @belongsToField={{true}}
+          @collection={{@field.value}}
+          @format={{@field.format}}
+          @mode="edit"
+        />
+      {{else}}
+        {{#let (filter-by "id" @field.value) (filter-by "title" @field.value) as |collection multiTagList|}}
+          {{#if collection.length}}
+            <CollectionField
+              @collection={{collection}}
+              @format={{@field.format}}
+              @title={{@field.title}}
+              @mode="edit"
+            />
+          {{else if multiTagList.length}}
+            {{!-- Taglist with multiple sections --}}
+            <div class="field-renderer__group">
+              {{#each @field.value as |val|}}
+                <div class="field-renderer__taglist-title">{{val.title}}</div>
+                <ul class="field-renderer__taglist-editor field-renderer__taglist-editor--vertical">
+                  {{#each val.value as |vv|}}
+                    <li class="item__pill">
+                      <span>{{vv}}</span>
+                      <button class="item__remove-btn" aria-label="remove" />
+                    </li>
+                  {{/each}}
+                  <button class="item__add-btn" aria-label="add" />
+                </ul>
+              {{/each}}
+            </div>
+          {{else}}
+            {{!-- Horizontal tagList --}}
+            <ul class="field-renderer__taglist-editor">
+              {{#each @field.value as |val|}}
+                <li class="item__pill">
+                  <span>{{val}}</span>
+                  <button class="item__remove-btn" aria-label="remove" />
+                </li>
+              {{/each}}
+              <button class="item__add-btn" aria-label="add" />
+            </ul>
+          {{/if}}
+        {{/let}}
+      {{/if}}
+    </div>
+  {{else}}
+    <label class="field-renderer">
+      <div class="field-renderer__title">{{humanize @field.title}}</div>
+      <div class="field-renderer__value">
+        {{#if (eq @field.type "dropdown")}}
+          <Dropdown @className="field-renderer__dropdown" @options={{@field.options}} @selected={{@field}} @searchField={{or @searchField "value"}} />
+        {{else if (eq @field.type "textarea")}}
+          <Textarea @type={{@field.type}} @class="field-renderer__input field-renderer__textarea" @value={{@field.value}} />
+        {{else}}
+          <Input @type={{@field.type}} @class="field-renderer__input" @value={{@field.value}} />
+        {{/if}}
+      </div>
+    </label>
+  {{/if}}
+{{else}}
+  {{!-- View Mode --}}
+  <div class="field-renderer {{@class}}">
+    <div class="field-renderer__title">{{humanize @field.title}}</div>
+    <Boxel @class="field-renderer__value">
+      {{#if @field.value}}
+        {{#if @field.value.id}}
+          <Card @variant="small" @model={{@field.value}} @mode="view" />
+        {{else if (is-array @field.value)}}
+          {{#let (filter-by "id" @field.value) (filter-by "title" @field.value) as |collection multiTagList|}}
+            {{#if collection.length}}
+              {{#each @field.value as |val|}}
+                <Card @name={{val.name}} @model={{val}} @variant="small" @mode="view" />
+              {{/each}}
+            {{else if multiTagList.length}}
+              {{#each @field.value as |val|}}
+                <div class="field-renderer__taglist-title">{{val.title}}</div>
+                {{#each val.value as |vv|}}
+                  <div>{{vv}}</div>
+                {{/each}}
+              {{/each}}
+            {{else}}
+              {{#each @field.value as |val|}}
+                {{val}}{{#if (has-next val @field.value)}}, {{/if}}
+              {{/each}}
+            {{/if}}
+          {{/let}}
+        {{else}}
+          {{#if (eq @field.type "date")}}
+            {{moment-format @field.value "MMM DD, YYYY" "YYYY-MM-DD"}}
+          {{else}}
+            {{@field.value}}
+          {{/if}}
+        {{/if}}
+      {{else}}
+        N/A
+      {{/if}}
+    </Boxel>
+  </div>
+{{/if}}

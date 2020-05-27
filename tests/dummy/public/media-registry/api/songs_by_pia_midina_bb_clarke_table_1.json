@@ -4,14 +4,101 @@
     "artist": "Pia Midina",
     "album": "Sunlight",
     "type_of_album": "EP",
-    "genre": "Alternative",
+    "genre": [ "Alternative", "Dream Pop" ],
     "length": "3:11",
     "year": "2019",
+    "catalog_no": "BRN-19230-1238192",
+    "verifi_id": "0x8c2238a6c17e6da2d9cd3303fe7b26079231184ac2f1b6537a11e2301b74ab13",
+    "label": "Bunny Records",
+    "waveform": "media-registry/waveforms/a-day-to-sing-waveform.png",
+    "bitrate": "24-bit / 96 kHz",
+    "language": ["English (en_US)"],
+    "parental_advisory": "Yes",
+    "copyright": "2019 Bunny Records",
+    "musical_work": {
+      "title": "A day to sing",
+      "artist": "Pia Midina",
+      "composer": "Miles Ponia",
+      "writers": [ "Pia Midina", "Miles Ponia" ],
+      "iswc": "T-030247162-2",
+      "verifi_id": "0x1b8932b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d8923ba",
+      "version_type": "Original work",
+      "publisher": "RealTunes Publishing",
+      "copyright": "2019 RealTunes Publishing"
+    },
+    "verifi_registration" : {
+      "verifi_id": "0x8c2238a6c17e6da2d9cd3303fe7b26079231184ac2f1b6537a11e2301b74ab13",
+      "asset_type": "Master Recording",
+      "created_date": "2019-02-18",
+      "updated_date": "2019-12-13",
+      "versions": 7
+    },
+    "library_of_congress_registration": {
+      "title": "A day to sing",
+      "type_of_work": "Sound Recording (Form SR)",
+      "registration_no": "SR0000320217",
+      "registration_date": "2019-02-24"
+    },
+    "recording_date": "2019-01-10",
+    "original_release_date": "2019-04-03",
+    "booklets" : [
+      {
+        "title": "booklet-a-day-to-sing.pdf",
+        "date": "2019-02-19"
+      },
+      {
+        "title": "booklet-a-day-to-sing-translated.pdf",
+        "date": "2019-02-19"
+      }
+    ],
+    "audio_files" : [
+      {
+        "title": "a-day-to-sing.aiff",
+        "date": "2019-04-23",
+        "bitrate": "24-bit / 96 kHz",
+        "duration": "3:11",
+        "img": "media-registry/waveforms/a-day-to-sing-waveform.png"
+      },
+      {
+        "title": "a-day-to-sing-watermarked.aiff",
+        "date": "2019-04-23",
+        "bitrate": "24-bit / 96 kHz",
+        "duration": "3:11",
+        "img": "media-registry/waveforms/a-day-to-sing-waveform.png"
+      }
+    ],
+    "isrc": [
+      {
+        "title": "Primary",
+        "value": "US-S1Z-19-04993"
+      },
+      {
+        "title": "Secondary",
+        "value": ["US-S1Z-19-18292", "US-S1Z-19-39182", "US-S1Z-19-49182"]
+      }
+    ],
     "owner_before_transfer_is_accepted": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc_before_transfer_steve_s_edits": "US-S1Z-22-04993",
     "isrc_after_transfer_steve_s_edits": null,
-    "related_products": null
+    "related_products": [
+      {
+        "id": "sunlight"
+      },
+      {
+        "id": "raging-seasons"
+      }
+    ],
+    "related_works": [
+      {
+        "id": "a-day-to-sing"
+      }
+    ],
+    "producer": "Francesco Midina",
+    "mastering_engineer": "Joel Kaplan",
+    "mixing_engineer": "Mariah Solis",
+    "recording_engineer": "Ian Adams",
+    "background_singer": "Jenny Sparks, Sophia Lanagan, Helen Gellar"
   },
   {
     "song_title": "Change is good",
@@ -25,7 +112,8 @@
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc_before_transfer_steve_s_edits": "US-S1Z-22-04994",
     "isrc_after_transfer_steve_s_edits": null,
-    "related_products": null
+    "related_products": null,
+    "producer": "Francesco Midina"
   },
   {
     "song_title": "Full moon",
@@ -39,7 +127,8 @@
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc_before_transfer_steve_s_edits": "US-S1Z-22-04995",
     "isrc_after_transfer_steve_s_edits": null,
-    "related_products": null
+    "related_products": null,
+    "producer": "Francesco Midina"
   },
   {
     "song_title": "Keep hope alive",
@@ -53,7 +142,8 @@
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc_before_transfer_steve_s_edits": "US-S1Z-22-04996",
     "isrc_after_transfer_steve_s_edits": null,
-    "related_products": null
+    "related_products": null,
+    "producer": "Francesco Midina"
   },
   {
     "song_title": "Leave the door open",
@@ -67,7 +157,8 @@
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc_before_transfer_steve_s_edits": "US-S1Z-22-04997",
     "isrc_after_transfer_steve_s_edits": null,
-    "related_products": null
+    "related_products": null,
+    "producer": "Francesco Midina"
   },
   {
     "song_title": "My heart beats for you",
@@ -81,7 +172,8 @@
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc_before_transfer_steve_s_edits": "US-S1Z-22-04998",
     "isrc_after_transfer_steve_s_edits": null,
-    "related_products": null
+    "related_products": null,
+    "producer": "Francesco Midina"
   },
   {
     "song_title": "Sunshine and moonlight",
@@ -95,7 +187,8 @@
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc_before_transfer_steve_s_edits": "US-S1Z-22-04999",
     "isrc_after_transfer_steve_s_edits": null,
-    "related_products": null
+    "related_products": null,
+    "producer": "Francesco Midina"
   },
   {
     "song_title": "The leaves are changing color",
@@ -109,7 +202,8 @@
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc_before_transfer_steve_s_edits": "US-S1Z-22-05001",
     "isrc_after_transfer_steve_s_edits": "US-S1Z-89-10932",
-    "related_products": null
+    "related_products": null,
+    "producer": "Francesco Midina"
   },
   {
     "song_title": "The leaves are changing color (dance remix) ",
@@ -123,7 +217,8 @@
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc_before_transfer_steve_s_edits": "US-S1Z-22-05002",
     "isrc_after_transfer_steve_s_edits": null,
-    "related_products": null
+    "related_products": null,
+    "producer": "Francesco Midina"
   },
   {
     "song_title": "The prom dress",
@@ -137,7 +232,8 @@
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc_before_transfer_steve_s_edits": "US-S1Z-22-05003",
     "isrc_after_transfer_steve_s_edits": null,
-    "related_products": null
+    "related_products": null,
+    "producer": "Francesco Midina"
   },
   {
     "song_title": "Three wishes",
@@ -151,7 +247,8 @@
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc_before_transfer_steve_s_edits": "US-S1Z-22-05004",
     "isrc_after_transfer_steve_s_edits": null,
-    "related_products": null
+    "related_products": null,
+    "producer": "Francesco Midina"
   },
   {
     "song_title": "Yesterday was my favorite day",
@@ -165,7 +262,8 @@
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc_before_transfer_steve_s_edits": "US-S1Z-22-05005",
     "isrc_after_transfer_steve_s_edits": null,
-    "related_products": null
+    "related_products": null,
+    "producer": "Francesco Midina"
   },
   {
     "song_title": "You are the one",
@@ -179,7 +277,8 @@
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc_before_transfer_steve_s_edits": "US-S1Z-22-05006",
     "isrc_after_transfer_steve_s_edits": null,
-    "related_products": null
+    "related_products": null,
+    "producer": "Francesco Midina"
   },
   {
     "song_title": "Baby boy",
@@ -193,7 +292,8 @@
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc_before_transfer_steve_s_edits": "US-S1Z-17-34980",
     "isrc_after_transfer_steve_s_edits": null,
-    "related_products": null
+    "related_products": null,
+    "producer": "Francesco Midina"
   },
   {
     "song_title": "Dawn to dusk",
@@ -207,7 +307,8 @@
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc_before_transfer_steve_s_edits": "US-S1Z-17-34981",
     "isrc_after_transfer_steve_s_edits": null,
-    "related_products": null
+    "related_products": null,
+    "producer": "Francesco Midina"
   },
   {
     "song_title": "Kill the spider",
@@ -221,7 +322,8 @@
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc_before_transfer_steve_s_edits": "US-S1Z-17-34982",
     "isrc_after_transfer_steve_s_edits": null,
-    "related_products": null
+    "related_products": null,
+    "producer": "Francesco Midina"
   },
   {
     "song_title": "Mutiny",
@@ -235,7 +337,8 @@
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc_before_transfer_steve_s_edits": "US-S1Z-17-34983",
     "isrc_after_transfer_steve_s_edits": null,
-    "related_products": null
+    "related_products": null,
+    "producer": "Francesco Midina"
   },
   {
     "song_title": "Ruby's world",
@@ -249,7 +352,8 @@
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc_before_transfer_steve_s_edits": "US-S1Z-17-34984",
     "isrc_after_transfer_steve_s_edits": null,
-    "related_products": null
+    "related_products": null,
+    "producer": "Francesco Midina"
   },
   {
     "song_title": "The ridiculous nature of people",
@@ -263,7 +367,8 @@
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc_before_transfer_steve_s_edits": "US-S1Z-17-34985",
     "isrc_after_transfer_steve_s_edits": null,
-    "related_products": null
+    "related_products": null,
+    "producer": "Francesco Midina"
   },
   {
     "song_title": "Zodiac lies",
@@ -277,6 +382,7 @@
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc_before_transfer_steve_s_edits": "US-S1Z-17-34986",
     "isrc_after_transfer_steve_s_edits": null,
-    "related_products": null
+    "related_products": null,
+    "producer": "Francesco Midina"
   }
 ]

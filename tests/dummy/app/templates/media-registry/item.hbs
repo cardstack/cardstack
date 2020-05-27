@@ -1,37 +1,63 @@
-<section>
-  <header>
-    <img src="{{@model.cover_art_medium}}" alt="{{@model.album}} cover" width="258px" height="258px" />
-    <h2>{{@model.song_title}}</h2>
-    {{!-- isrc --}}
-  </header>
-  <div>
-    <div>
-      <h3>Album</h3>
-      <div>{{@model.album}}</div>
-    </div>
-    <div>
-      <h3>Album type</h3>
-      <div>{{@model.type_of_album}}</div>
-    </div>
-    <div>
-      <h3>Genre</h3>
-      <div>{{@model.genre}}</div>
-    </div>
-    <div>
-      <h3>Length</h3>
-      <div>{{@model.length}}</div>
-    </div>
+<div class="item__wrapper">
+  <div class="breadcrumbs">
+    <LinkTo @route="media-registry" @class="breadcrumbs__pill">Master Recordings</LinkTo>
+    {{#if @model.fromCollectionId}}
+      <span class="breadcrumbs__carot" />
+      <LinkTo @route="media-registry.collection" @model={{@model.fromCollectionId}} @class="breadcrumbs__pill">
+        {{titleize (humanize @model.fromCollectionId)}}
+      </LinkTo>
+    {{/if}}
+    <span class="breadcrumbs__carot" />
+    <span class="breadcrumbs__pill breadcrumbs__pill--current">Music Detail</span>
   </div>
-  <aside>
-    <h3>In these catalogs</h3>
-    <div>
-      {{#each @model.catalog as |catalog|}}
-        <div>
-          <LinkTo @route="media-registry.collection" @model={{dasherize (trim catalog)}}>
-            {{catalog}}
-          </LinkTo>
+
+  <section class="item__main">
+    <Boxel @tag="section" @class="item">
+      <BoxelActions
+        @class="media-collection__btn-overlay"
+        @displayHighlightActions={{true}}
+        @btnLeft="mode-btn"
+        @btnLeftContent="Edit"
+        @btnLeftAction={{this.transitionToEdit}}
+        @btnRight="version-history"
+      />
+      <header class="item__header" {{blurhash-decoder @model.blur_img 945 370}}>
+        <div class="item__header-content">
+          <div class="item__img" style={{css-url "background-image" @model.cover_art_medium}}>
+            <button class="item__play-btn">{{svg-jar "play-btn" width="60px" height="60px"}}</button>
+          </div>
+          <h1 class="item__title">{{@model.song_title}}</h1>
+          <h2 class="item__artist">{{@model.artist}}</h2>
+          <ul class="item__header-details">
+            {{#each this.headerDetailFields as |field|}}
+              <li>
+                <FieldRenderer
+                  @class="item-header-field"
+                  @mode="view"
+                  @field={{field}}
+                />
+              </li>
+            {{/each}}
+          </ul>
         </div>
-      {{/each}}
-    </div>
-  </aside>
-</section>
+      </header>
+
+      <MediaDetail @model={{@model}} @mode="view" />
+    </Boxel>
+
+    <aside class="item__sidebar">
+      <h3 class="item__sidebar-title">In these catalogs</h3>
+      <div>
+        {{#each @model.catalog as |catalog|}}
+          <div>
+            <LinkTo @route="media-registry.collection" @model={{dasherize (trim catalog)}}>
+              {{catalog}}
+            </LinkTo>
+          </div>
+        {{/each}}
+      </div>
+    </aside>
+  </section>
+</div>
+
+{{outlet}}

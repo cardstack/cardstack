@@ -13,7 +13,9 @@ Router.map(function() {
     this.route('collection', { path: '/collection/:collectionId' }, function() {
       this.route('edit');
     });
-    this.route('item', { path: '/item/:itemId' });
+    this.route('item', { path: '/:itemId' }, function() {
+      this.route('edit');
+    });
   });
   this.route('movie-registry', function() {
     this.route('view', { path: '/:id' });

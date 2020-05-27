@@ -1,0 +1,5 @@
+<div class="boxel-card boxel-card--{{@card.name}} boxel-card--{{@variant}} boxel-card--{{@mode}} boxel-card--{{@format}} boxel-card--with-img cover-art">
+  <div class="boxel-card__bg-img" style={{css-url "background-image" @card.fields.imgURL}} />
+  <h3 class="boxel-card__title">{{@card.fields.title}}</h3>
+  <p class="boxel-card__description">Created {{moment-format @card.fields.date "MMM DD, YYYY" "YYYY-MM-DD"}}</p>
+</div>
