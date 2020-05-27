@@ -29,7 +29,8 @@ module.exports = {
         'testem.js',
         'blueprints/*/index.js',
         'config/**/*.js',
-        'tests/dummy/config/**/*.js'
+        'tests/dummy/config/**/*.js',
+        'generate-thumbs.js'
       ],
       excludedFiles: [
         'addon/**',

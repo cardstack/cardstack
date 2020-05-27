@@ -3,38 +3,24 @@
 boxel
 ==============================================================================
 
-[Short description of the addon.]
 
+Generating multiple image sizes / thumbs from
+`tests/dummy/public/media-registry/covers/`:
 
-Compatibility
-------------------------------------------------------------------------------
+Kill your ember server if it's running otherwise it'll try to rebuild for every
+size generated.
 
-* Ember.js v3.4 or above
-* Ember CLI v2.13 or above
-* Node.js v8 or above
+```sh
 
-
-Installation
-------------------------------------------------------------------------------
-
-```
-ember install boxel
+brew install imagemagick # if not installed already
+cd boxel
+node generate-thumbs.js
 ```
 
+The thumbs / sizes are intended to be committed to the repo for simplicity of
+static deployment
 
-Usage
-------------------------------------------------------------------------------
-
-[Longer description of how to use the addon in apps.]
-
-
-Contributing
-------------------------------------------------------------------------------
-
-See the [Contributing](CONTRIBUTING.md) guide for details.
-
-
-License
-------------------------------------------------------------------------------
-
-This project is licensed under the [MIT License](LICENSE.md).
+Using imgix for dynamic production data makes sense when there is a backend
+server to sign image urls, but for static deployment pregenerating the images is
+way more convenient than pre-signing the images as the necessary hooks do not
+exist in broccoli-asset-rev

@@ -8,12 +8,18 @@
     "type_of_album": "Album",
     "genre": "Pop",
     "length": "2:59",
-    "catalog": ["Film Music", "Golden Girl"],
+    "catalog": [
+      "Film Music",
+      "Golden Girl"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Love-the-Love.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Love-the-Love.jpg",
+    "cover_art_large": "media-registry/covers/large/Love-the-Love.jpg"
   },
   {
     "song_title": "A day to sing",
@@ -24,13 +30,18 @@
     "type_of_album": "EP",
     "genre": "Alternative",
     "length": "3:11",
-    "catalog": ["Film Music"],
+    "catalog": [
+      "Film Music"
+    ],
     "later_batch_f": true,
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": "X",
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Sunlight.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Sunlight.jpg",
+    "cover_art_large": "media-registry/covers/large/Sunlight.jpg"
   },
   {
     "song_title": "A future like this",
@@ -41,12 +52,17 @@
     "type_of_album": "EP",
     "genre": "Pop",
     "length": "3:21",
-    "catalog": ["Film Music"],
+    "catalog": [
+      "Film Music"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Moments.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Moments.jpg",
+    "cover_art_large": "media-registry/covers/large/Moments.jpg"
   },
   {
     "song_title": "Addictions",
@@ -57,12 +73,17 @@
     "type_of_album": "Album",
     "genre": "Alternative",
     "length": "2:47",
-    "catalog": ["Film Music"],
+    "catalog": [
+      "Film Music"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Escape.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Escape.jpg",
+    "cover_art_large": "media-registry/covers/large/Escape.jpg"
   },
   {
     "song_title": "Airplanes go south",
@@ -73,12 +94,17 @@
     "type_of_album": "Album",
     "genre": "Rock",
     "length": "2:55",
-    "catalog": ["Film Music"],
+    "catalog": [
+      "Film Music"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Just-Like-Birds.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Just-Like-Birds.jpg",
+    "cover_art_large": "media-registry/covers/large/Just-Like-Birds.jpg"
   },
   {
     "song_title": "Always in love",
@@ -89,12 +115,17 @@
     "type_of_album": "Single",
     "genre": "Country",
     "length": "3:03",
-    "catalog": ["Film Music"],
+    "catalog": [
+      "Film Music"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Always-In-Love.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Always-In-Love.jpg",
+    "cover_art_large": "media-registry/covers/large/Always-In-Love.jpg"
   },
   {
     "song_title": "Angry",
@@ -105,12 +136,18 @@
     "type_of_album": "Album",
     "genre": "Pop",
     "length": "3:22",
-    "catalog": ["Film Music", "Golden Girl"],
+    "catalog": [
+      "Film Music",
+      "Golden Girl"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Love-the-Love.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Love-the-Love.jpg",
+    "cover_art_large": "media-registry/covers/large/Love-the-Love.jpg"
   },
   {
     "song_title": "Baby boy",
@@ -121,12 +158,17 @@
     "type_of_album": "Album",
     "genre": "Rock",
     "length": "3:03",
-    "catalog": ["Film Music"],
+    "catalog": [
+      "Film Music"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": "X"
+    "search_for_artist_bb_clarke": "X",
+    "cover_art_thumb": "media-registry/covers/thumb/Animals.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Animals.jpg",
+    "cover_art_large": "media-registry/covers/large/Animals.jpg"
   },
   {
     "song_title": "Booby trap",
@@ -137,12 +179,17 @@
     "type_of_album": "Album",
     "genre": "Dance",
     "length": "3:18",
-    "catalog": ["Film Music"],
+    "catalog": [
+      "Film Music"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Have-Fun.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Have-Fun.jpg",
+    "cover_art_large": "media-registry/covers/large/Have-Fun.jpg"
   },
   {
     "song_title": "Car troubles",
@@ -153,12 +200,17 @@
     "type_of_album": "EP",
     "genre": "Techno",
     "length": "2:59",
-    "catalog": ["Film Music"],
+    "catalog": [
+      "Film Music"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Accidents.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Accidents.jpg",
+    "cover_art_large": "media-registry/covers/large/Accidents.jpg"
   },
   {
     "song_title": "Care for him",
@@ -169,12 +221,17 @@
     "type_of_album": "EP",
     "genre": "Alternative",
     "length": "1:48",
-    "catalog": ["Film Music"],
+    "catalog": [
+      "Film Music"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Seven-Sins.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Seven-Sins.jpg",
+    "cover_art_large": "media-registry/covers/large/Seven-Sins.jpg"
   },
   {
     "song_title": "Change is good",
@@ -185,13 +242,18 @@
     "type_of_album": "Single",
     "genre": "Pop",
     "length": "2:45",
-    "catalog": ["Film Music"],
+    "catalog": [
+      "Film Music"
+    ],
     "later_batch_f": true,
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": "X",
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Change-Is-Good.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Change-Is-Good.jpg",
+    "cover_art_large": "media-registry/covers/large/Change-Is-Good.jpg"
   },
   {
     "song_title": "Come closer",
@@ -202,12 +264,17 @@
     "type_of_album": "Album",
     "genre": "Country",
     "length": "3:44",
-    "catalog": ["Film Music"],
+    "catalog": [
+      "Film Music"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Around-the-World.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Around-the-World.jpg",
+    "cover_art_large": "media-registry/covers/large/Around-the-World.jpg"
   },
   {
     "song_title": "Dawn to dusk",
@@ -218,12 +285,17 @@
     "type_of_album": "Album",
     "genre": "Rock",
     "length": "3:10",
-    "catalog": ["Film Music"],
+    "catalog": [
+      "Film Music"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": "X"
+    "search_for_artist_bb_clarke": "X",
+    "cover_art_thumb": "media-registry/covers/thumb/Animals.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Animals.jpg",
+    "cover_art_large": "media-registry/covers/large/Animals.jpg"
   },
   {
     "song_title": "Everyone matters",
@@ -234,12 +306,17 @@
     "type_of_album": "Album",
     "genre": "Rock",
     "length": "3:38",
-    "catalog": ["Batch A"],
+    "catalog": [
+      "Batch A"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Save-Humankind.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Save-Humankind.jpg",
+    "cover_art_large": "media-registry/covers/large/Save-Humankind.jpg"
   },
   {
     "song_title": "Every step you take",
@@ -250,12 +327,17 @@
     "type_of_album": "EP",
     "genre": "Pop",
     "length": "2:39",
-    "catalog": ["Batch B"],
+    "catalog": [
+      "Batch B"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/The-Future-Is-Ours.jpg",
+    "cover_art_medium": "media-registry/covers/medium/The-Future-Is-Ours.jpg",
+    "cover_art_large": "media-registry/covers/large/The-Future-Is-Ours.jpg"
   },
   {
     "song_title": "Forty miles an hour",
@@ -266,12 +348,17 @@
     "type_of_album": "EP",
     "genre": "Pop",
     "length": "3:12",
-    "catalog": ["Batch B"],
+    "catalog": [
+      "Batch B"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Drive-Me-Crazy.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Drive-Me-Crazy.jpg",
+    "cover_art_large": "media-registry/covers/large/Drive-Me-Crazy.jpg"
   },
   {
     "song_title": "Full moon",
@@ -288,7 +375,10 @@
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": "X",
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Full-Moon.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Full-Moon.jpg",
+    "cover_art_large": "media-registry/covers/large/Full-Moon.jpg"
   },
   {
     "song_title": "Hell hell hell",
@@ -299,12 +389,17 @@
     "type_of_album": "Album",
     "genre": "Rock",
     "length": "3:39",
-    "catalog": ["Batch A"],
+    "catalog": [
+      "Batch A"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/All-About-Heaven.jpg",
+    "cover_art_medium": "media-registry/covers/medium/All-About-Heaven.jpg",
+    "cover_art_large": "media-registry/covers/large/All-About-Heaven.jpg"
   },
   {
     "song_title": "Home isn't sweet",
@@ -315,12 +410,17 @@
     "type_of_album": "Single",
     "genre": "Pop",
     "length": "3:48",
-    "catalog": ["Golden Girl"],
+    "catalog": [
+      "Golden Girl"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Home-Isnt-Sweet.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Home-Isnt-Sweet.jpg",
+    "cover_art_large": "media-registry/covers/large/Home-Isnt-Sweet.jpg"
   },
   {
     "song_title": "Infatuated",
@@ -331,12 +431,17 @@
     "type_of_album": "Single",
     "genre": "Rock",
     "length": "2:44",
-    "catalog": ["Super Successful"],
+    "catalog": [
+      "Super Successful"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Infatuated.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Infatuated.jpg",
+    "cover_art_large": "media-registry/covers/large/Infatuated.jpg"
   },
   {
     "song_title": "Keep hope alive",
@@ -353,7 +458,10 @@
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": "X",
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Love-Never-Dies.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Love-Never-Dies.jpg",
+    "cover_art_large": "media-registry/covers/large/Love-Never-Dies.jpg"
   },
   {
     "song_title": "Kill the spider",
@@ -364,13 +472,18 @@
     "type_of_album": "Album",
     "genre": "Rock",
     "length": "3:07",
-    "catalog": ["Film Music"],
+    "catalog": [
+      "Film Music"
+    ],
     "later_batch_f": true,
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": "X"
+    "search_for_artist_bb_clarke": "X",
+    "cover_art_thumb": "media-registry/covers/thumb/Animals.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Animals.jpg",
+    "cover_art_large": "media-registry/covers/large/Animals.jpg"
   },
   {
     "song_title": "Leave the door open",
@@ -387,7 +500,10 @@
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": "X",
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Leave-the-Door-Open.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Leave-the-Door-Open.jpg",
+    "cover_art_large": "media-registry/covers/large/Leave-the-Door-Open.jpg"
   },
   {
     "song_title": "Light at the end of the tunnel",
@@ -398,12 +514,17 @@
     "type_of_album": "EP",
     "genre": "Country",
     "length": "3:17",
-    "catalog": ["Super Successful"],
+    "catalog": [
+      "Super Successful"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Sailing.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Sailing.jpg",
+    "cover_art_large": "media-registry/covers/large/Sailing.jpg"
   },
   {
     "song_title": "Like a washing machine",
@@ -429,12 +550,17 @@
     "type_of_album": "Album",
     "genre": "Alternative",
     "length": "4:01",
-    "catalog": ["Extra Long"],
+    "catalog": [
+      "Extra Long"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/All-About-the-Quality-of-Life.jpg",
+    "cover_art_medium": "media-registry/covers/medium/All-About-the-Quality-of-Life.jpg",
+    "cover_art_large": "media-registry/covers/large/All-About-the-Quality-of-Life.jpg"
   },
   {
     "song_title": "Looks like heaven, feels like hell",
@@ -445,12 +571,17 @@
     "type_of_album": "Album",
     "genre": "Pop",
     "length": "3:50",
-    "catalog": ["Super Successful"],
+    "catalog": [
+      "Super Successful"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Superficial.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Superficial.jpg",
+    "cover_art_large": "media-registry/covers/large/Superficial.jpg"
   },
   {
     "song_title": "Madness",
@@ -476,12 +607,17 @@
     "type_of_album": "Album",
     "genre": "Alternative",
     "length": "4:05",
-    "catalog": ["Extra Long"],
+    "catalog": [
+      "Extra Long"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Love-Conquers-All.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Love-Conquers-All.jpg",
+    "cover_art_large": "media-registry/covers/large/Love-Conquers-All.jpg"
   },
   {
     "song_title": "Mutiny",
@@ -497,7 +633,10 @@
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": "X"
+    "search_for_artist_bb_clarke": "X",
+    "cover_art_thumb": "media-registry/covers/thumb/Animals.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Animals.jpg",
+    "cover_art_large": "media-registry/covers/large/Animals.jpg"
   },
   {
     "song_title": "My heart beats for you",
@@ -514,7 +653,10 @@
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": "X",
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Love-Never-Dies.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Love-Never-Dies.jpg",
+    "cover_art_large": "media-registry/covers/large/Love-Never-Dies.jpg"
   },
   {
     "song_title": "Natural disaster",
@@ -525,12 +667,17 @@
     "type_of_album": "Album",
     "genre": "Pop",
     "length": "2:33",
-    "catalog": ["Batch B"],
+    "catalog": [
+      "Batch B"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Beauty-vs-Reality.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Beauty-vs-Reality.jpg",
+    "cover_art_large": "media-registry/covers/large/Beauty-vs-Reality.jpg"
   },
   {
     "song_title": "Never lonely",
@@ -541,12 +688,17 @@
     "type_of_album": "Single",
     "genre": "Pop",
     "length": "3:21",
-    "catalog": ["Golden Girl"],
+    "catalog": [
+      "Golden Girl"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Never-Lonely.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Never-Lonely.jpg",
+    "cover_art_large": "media-registry/covers/large/Never-Lonely.jpg"
   },
   {
     "song_title": "Nobody",
@@ -557,12 +709,17 @@
     "type_of_album": "EP",
     "genre": "Rock",
     "length": "2:40",
-    "catalog": ["Batch A"],
+    "catalog": [
+      "Batch A"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Little-Lies.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Little-Lies.jpg",
+    "cover_art_large": "media-registry/covers/large/Little-Lies.jpg"
   },
   {
     "song_title": "Nothing to worry about",
@@ -573,12 +730,17 @@
     "type_of_album": "Album",
     "genre": "Alternative",
     "length": "4:15",
-    "catalog": ["Extra Long"],
+    "catalog": [
+      "Extra Long"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Make-Magic.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Make-Magic.jpg",
+    "cover_art_large": "media-registry/covers/large/Make-Magic.jpg"
   },
   {
     "song_title": "On the brink of happiness",
@@ -589,12 +751,17 @@
     "type_of_album": "Single",
     "genre": "Pop",
     "length": "3:40",
-    "catalog": ["Golden Girl"],
+    "catalog": [
+      "Golden Girl"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/On-the-Brink-of-Happiness.jpg",
+    "cover_art_medium": "media-registry/covers/medium/On-the-Brink-of-Happiness.jpg",
+    "cover_art_large": "media-registry/covers/large/On-the-Brink-of-Happiness.jpg"
   },
   {
     "song_title": "Over you",
@@ -605,12 +772,17 @@
     "type_of_album": "Album",
     "genre": "Pop",
     "length": "2:56",
-    "catalog": ["Golden Girl"],
+    "catalog": [
+      "Golden Girl"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Love-the-Love.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Love-the-Love.jpg",
+    "cover_art_large": "media-registry/covers/large/Love-the-Love.jpg"
   },
   {
     "song_title": "Powder snow",
@@ -621,12 +793,17 @@
     "type_of_album": "EP",
     "genre": "Pop",
     "length": "2:41",
-    "catalog": ["Super Successful"],
+    "catalog": [
+      "Super Successful"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Seven-Seasons.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Seven-Seasons.jpg",
+    "cover_art_large": "media-registry/covers/large/Seven-Seasons.jpg"
   },
   {
     "song_title": "Pristine condition",
@@ -652,12 +829,17 @@
     "type_of_album": "Single",
     "genre": "Techno",
     "length": "3:10",
-    "catalog": ["Super Successful"],
+    "catalog": [
+      "Super Successful"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Rollercoaster-of-Emotions.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Rollercoaster-of-Emotions.jpg",
+    "cover_art_large": "media-registry/covers/large/Rollercoaster-of-Emotions.jpg"
   },
   {
     "song_title": "Ruby's world",
@@ -673,7 +855,10 @@
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": "X"
+    "search_for_artist_bb_clarke": "X",
+    "cover_art_thumb": "media-registry/covers/thumb/Animals.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Animals.jpg",
+    "cover_art_large": "media-registry/covers/large/Animals.jpg"
   },
   {
     "song_title": "Shrink the cakes",
@@ -684,12 +869,17 @@
     "type_of_album": "EP",
     "genre": "Rock",
     "length": "3:20",
-    "catalog": ["Batch A"],
+    "catalog": [
+      "Batch A"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Maximum-Mildness.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Maximum-Mildness.jpg",
+    "cover_art_large": "media-registry/covers/large/Maximum-Mildness.jpg"
   },
   {
     "song_title": "Silicone",
@@ -716,12 +906,17 @@
     "type_of_album": "EP",
     "genre": "Pop",
     "length": "3:19",
-    "catalog": ["Batch B"],
+    "catalog": [
+      "Batch B"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Happy-Ever-After.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Happy-Ever-After.jpg",
+    "cover_art_large": "media-registry/covers/large/Happy-Ever-After.jpg"
   },
   {
     "song_title": "Sunshine and moonlight",
@@ -738,7 +933,10 @@
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": "X",
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Sunlight.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Sunlight.jpg",
+    "cover_art_large": "media-registry/covers/large/Sunlight.jpg"
   },
   {
     "song_title": "The air is thin",
@@ -749,12 +947,17 @@
     "type_of_album": "Album",
     "genre": "Pop",
     "length": "2:45",
-    "catalog": ["Batch B"],
+    "catalog": [
+      "Batch B"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/All-About-the-Man.jpg",
+    "cover_art_medium": "media-registry/covers/medium/All-About-the-Man.jpg",
+    "cover_art_large": "media-registry/covers/large/All-About-the-Man.jpg"
   },
   {
     "song_title": "The breadcrumbs in the forest",
@@ -780,12 +983,17 @@
     "type_of_album": "Album",
     "genre": "Rock",
     "length": "3:16",
-    "catalog": ["Batch A"],
+    "catalog": [
+      "Batch A"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Magnitude.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Magnitude.jpg",
+    "cover_art_large": "media-registry/covers/large/Magnitude.jpg"
   },
   {
     "song_title": "The leaves are changing color",
@@ -796,13 +1004,18 @@
     "type_of_album": "EP",
     "genre": "Alternative",
     "length": "3:23",
-    "catalog": ["Film Music"],
+    "catalog": [
+      "Film Music"
+    ],
     "later_batch_f": true,
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": "X",
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Autumn-Leaves.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Autumn-Leaves.jpg",
+    "cover_art_large": "media-registry/covers/large/Autumn-Leaves.jpg"
   },
   {
     "song_title": "The leaves are changing color (dance remix)",
@@ -819,7 +1032,10 @@
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": "X",
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Autumn-Leaves.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Autumn-Leaves.jpg",
+    "cover_art_large": "media-registry/covers/large/Autumn-Leaves.jpg"
   },
   {
     "song_title": "The prom dress",
@@ -836,7 +1052,10 @@
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": "X",
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Graduation-Day.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Graduation-Day.jpg",
+    "cover_art_large": "media-registry/covers/large/Graduation-Day.jpg"
   },
   {
     "song_title": "The ridiculous nature of people",
@@ -847,13 +1066,18 @@
     "type_of_album": "Album",
     "genre": "Rock",
     "length": "2:58",
-    "catalog": ["Film Music"],
+    "catalog": [
+      "Film Music"
+    ],
     "later_batch_f": true,
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": "X"
+    "search_for_artist_bb_clarke": "X",
+    "cover_art_thumb": "media-registry/covers/thumb/Animals.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Animals.jpg",
+    "cover_art_large": "media-registry/covers/large/Animals.jpg"
   },
   {
     "song_title": "The sophomores",
@@ -864,12 +1088,17 @@
     "type_of_album": "Album",
     "genre": "Alternative",
     "length": "4:20",
-    "catalog": ["Extra Long"],
+    "catalog": [
+      "Extra Long"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Good-Times.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Good-Times.jpg",
+    "cover_art_large": "media-registry/covers/large/Good-Times.jpg"
   },
   {
     "song_title": "Three wishes",
@@ -886,7 +1115,10 @@
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": "X",
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Graduation-Day.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Graduation-Day.jpg",
+    "cover_art_large": "media-registry/covers/large/Graduation-Day.jpg"
   },
   {
     "song_title": "We used to be good",
@@ -897,12 +1129,17 @@
     "type_of_album": "Album",
     "genre": "Alternative",
     "length": "4:09",
-    "catalog": ["Extra Long"],
+    "catalog": [
+      "Extra Long"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/More-Than-We-Know.jpg",
+    "cover_art_medium": "media-registry/covers/medium/More-Than-We-Know.jpg",
+    "cover_art_large": "media-registry/covers/large/More-Than-We-Know.jpg"
   },
   {
     "song_title": "When we were younger",
@@ -934,7 +1171,10 @@
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": "X",
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Sunlight.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Sunlight.jpg",
+    "cover_art_large": "media-registry/covers/large/Sunlight.jpg"
   },
   {
     "song_title": "You are the one",
@@ -951,7 +1191,10 @@
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": "X",
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Love-Never-Dies.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Love-Never-Dies.jpg",
+    "cover_art_large": "media-registry/covers/large/Love-Never-Dies.jpg"
   },
   {
     "song_title": "Zig and zag",
@@ -962,12 +1205,17 @@
     "type_of_album": "Single",
     "genre": "Pop",
     "length": "3:02",
-    "catalog": ["Golden Girl"],
+    "catalog": [
+      "Golden Girl"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Zig-and-Zag.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Zig-and-Zag.jpg",
+    "cover_art_large": "media-registry/covers/large/Zig-and-Zag.jpg"
   },
   {
     "song_title": "Zodiac lies",
@@ -978,12 +1226,17 @@
     "type_of_album": "Album",
     "genre": "Rock",
     "length": "3:33",
-    "catalog": ["Film Music"],
+    "catalog": [
+      "Film Music"
+    ],
     "later_batch_f": true,
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": "X"
+    "search_for_artist_bb_clarke": "X",
+    "cover_art_thumb": "media-registry/covers/thumb/Animals.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Animals.jpg",
+    "cover_art_large": "media-registry/covers/large/Animals.jpg"
   }
 ]
