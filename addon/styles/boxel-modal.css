@@ -30,6 +30,7 @@
 
 .boxel-modal__inner {
   width: 100%;
+  height: 100vh;
   max-width: var(--modal-max-width);
   margin: 0 auto;
 }

@@ -10,6 +10,7 @@
   background-color: white;
   border-bottom: 1px solid #D1D1D1;
   border-radius: 10px 10px 0 0;
+  min-width: 415px;
 }
 
 /* Body scroll container */
@@ -23,6 +24,7 @@
 .item-edit__body-plate {
   background-color: white;
   border-radius: 0 0 10px 10px;
+  overflow: hidden;
 }
 
 

@@ -1,8 +1,10 @@
 .field-renderer {
   display: grid;
-  grid-template-columns: minmax(auto, 200px) minmax(auto, 450px);
+  grid-template-columns: 190px 450px;
   gap: 30px;
   padding: 10px;
+  max-width: 690px;
+  margin: 0 auto;
 }
 
 .field-renderer__title {

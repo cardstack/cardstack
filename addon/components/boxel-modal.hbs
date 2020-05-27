@@ -1,6 +1,6 @@
 <button {{on "click" this.onClose}} class="boxel-modal-overlay" />
 
-<div class="boxel-modal">
+<div class="boxel-modal {{@class}}">
   <div class="boxel-modal__inner">
     {{yield}}
   </div>

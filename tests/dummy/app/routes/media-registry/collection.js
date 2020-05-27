@@ -22,7 +22,7 @@ export default class MediaRegistryCollectionRoute extends Route {
           name: 'Song Title',
           valuePath: 'song_title',
           isFixed: 'left',
-          width: 250,
+          width: 350,
         },
         {
           name: 'Artist',

@@ -1,7 +1,7 @@
 .media-detail-section {
   display: grid;
   gap: 10px;
-  padding: 25px 50px 60px;
+  padding: 25px 0 60px;
 }
 
 .media-detail-section + .media-detail-section {
@@ -13,5 +13,15 @@
   font-weight: 600;
   line-height: calc(24/18);
   letter-spacing: 0;
+  padding-left: 45px;
   padding-bottom: 5px;
+}
+
+.media-detail-section--edit {
+  background-color: white;
+  overflow-x: auto;
+}
+
+.media-detail-section__contents {
+  padding: 0 50px;
 }

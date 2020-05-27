@@ -1,7 +1,8 @@
 .media-collection {
   height: 100%;
-  box-shadow: var(--boxel-box-shadow);
+  background-color: white;
   border-radius: 10px;
+  box-shadow: var(--boxel-box-shadow);
 }
 
 .media-collection__sticky-header {
@@ -24,7 +25,7 @@
   border-radius: 0 0 10px 10px;
 }
 
-.media-collection--collection.media-collection--view {
+.media-collection--collection {
   height: calc(100% - 70px);
 }
 
@@ -245,6 +246,11 @@
 
 
 /* Edit mode */
+.media-collection--edit {
+  height: calc(100% - 60px);
+  background-color: #f0f0f0;
+}
+
 .media-collection--edit .media-collection__scroll-container {
   height: calc(100vh - 200px);
 }

@@ -18,6 +18,7 @@
 .item {
   background-color: white;
   border-radius: 10px;
+  box-shadow: var(--boxel-box-shadow);
 }
 
 
