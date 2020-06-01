@@ -2,7 +2,7 @@
   <div class="collection-editor__added-new-item">
     <div class="collection-editor-grid collection-editor-grid--{{@format}}">
       <div class="collection-editor__item collection-editor__item--new-item">
-        {{component @newItemComponent item=this.newItem}}
+        {{component @newItemComponent item=this.newItem model=this.newItem}}
       </div>
     </div>
 
@@ -12,7 +12,7 @@
   </div>
 {{else}}
   {{#if this.isAdding}}
-    <div class="collection-editor__adding-new-item">
+    <div class="collection-editor__adding-new-item" {{did-insert this.focusSearch}}>
 
       <div class="collection-editor-grid collection-editor-grid--{{@format}}">
         <div class="collection-editor__item">
@@ -31,7 +31,7 @@
         <CardSelect
           @search={{@searchFn}}
           @labelPath="title"
-          @thumbPath="thumb"
+          @thumbPath="imgURL"
           @subtitlePath="subtitle"
           @dataSource={{concat "Searching " @fieldName}}
           @onChange={{perform this.addItem}} />

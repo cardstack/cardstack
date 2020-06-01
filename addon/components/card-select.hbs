@@ -6,6 +6,7 @@
     @extra={{hash labelPath=@labelPath}}
     @beforeOptionsComponent={{component "card-select/before-options" dataSource=@dataSource}}
     @dropdownClass="cs-card-select--dropdown"
+    @initiallyOpened={{true}}
     @onChange={{@onChange}} as |item select|>
     <CardSelect::Option
       @item={{item}}
