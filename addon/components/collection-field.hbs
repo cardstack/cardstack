@@ -53,13 +53,13 @@
       {{/if}}
       <footer class="collection-field__footer">
         <CollectionAddButton
-          @searchFn={{@searchFn}}
+          @searchFn={{@field.search}}
           @field={{@field}}
           @fieldName={{@fieldName}}
           @addItem={{this.addItem}}
           @format={{@format}}
           @mode={{@mode}}
-          @newItemComponent={{component "card" variant="small" mode=@mode format=@format}}
+          @newItemComponent={{component "card" variant="small" mode="view" format=@format class="collection-field__card"}}
         />
       </footer>
     {{/if}}

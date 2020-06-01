@@ -159,3 +159,7 @@
     transform: translateY(0);
   }
 }
+
+.cs-card-select--dropdown .ember-power-select-option--search-message {
+  display: none;
+}

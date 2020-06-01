@@ -32,10 +32,16 @@
   margin-bottom: 5px;
 }
 
+.collection-editor__adding-new-item .collection-editor__item .boxel-card--small {
+  border: 1px solid red;
+  min-height: 80px;
+}
+
 .collection-editor__adding-new-item {
   z-index: 1;
   text-align: center;
   margin-left: 1px;
+  min-height: 40px;
 }
 
 .collection-editor__item--new-item {

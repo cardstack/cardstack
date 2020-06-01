@@ -263,9 +263,33 @@ export default class MediaDetailComponent extends Component {
   }
 
   get agreements() {
+
+    let searchResults = [{
+      id: 'exclusive-recording-agreement-2',
+      type: 'agreement',
+      imgURL: '/media-registry/bunny-records-logo.svg',
+      title: 'Second Recording Agreement',
+      fields: [
+        {
+          title: 'assigner',
+          value: `${this.model.artist} (Ref)`
+        },
+        {
+          title: 'assignee',
+          value: `${this.model.owner} (Ref)`
+        },
+        {
+          title: 'active through',
+          value: 'Dec 2024'
+        }
+      ],
+    }];
     return [
       {
         title: 'active',
+        search: async function() {
+          return searchResults;
+        },
         value: [{
           id: 'exclusive-recording-agreement',
           type: 'agreement',
@@ -284,8 +308,9 @@ export default class MediaDetailComponent extends Component {
               title: 'active through',
               value: 'Dec 2023'
             }
-          ]
-        }]
+          ],
+        }
+        ]
       },
     ];
   }
