@@ -1,0 +1,14 @@
+{{!-- "Detail Card" related stuff in various places around the app
+ can be refactored to be an isolated card renderer --}}
+
+{{!-- Detail Card Layout --}}
+<div class="detail-card__layout">
+
+  {{!-- Detail Card --}}
+  <Cards::MusicalWork @model={{@model}} />
+
+  {{!-- Related Cards Sidebar --}}
+  <aside class="item__sidebar">
+    <h3 class="item__sidebar-title">In these catalogs</h3>
+  </aside>
+</div>

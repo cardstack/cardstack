@@ -1,9 +1,13 @@
 <Boxel>
   <div class="collection-field">
     {{#if @belongsToField}}
-      <div class="collection-field__item collection-field__item--{{or @format "list"}} collection-field__item--belongs-to">
-        <Card @variant="small" @model={{@collection}} @mode="view" @format={{@format}} />
-        <IconButton @icon="icon-minus-circle" @class="collection-field__remove-btn" @aria-label="remove" />
+      <div class="collection-field__item collection-field__item--{{or @field.format "list"}} collection-field__item--belongs-to">
+        {{#if @field.value}}
+          {{component (or @field.component "card") model=@field.value mode="view" format=@field.format expandAction=@expandAction}}
+          <IconButton @icon="icon-minus-circle" @class="collection-field__remove-btn" @aria-label="remove" />
+        {{else}}
+          <CollectionAddButton />
+        {{/if}}
       </div>
     {{else}}
       {{#if (gt @collection.length 1)}}
@@ -36,7 +40,7 @@
                 {{!-- {{on "click" (fn this.toggleSelect item)}} --}}
                 @isSelected={{item.selected}}
                 @class="collection-field__select-btn"
-                @mode="edit"
+                @mode={{@mode}}
               />
             {{/if}}
             <Card @class="collection-field__card" @variant="small" @model={{item}} @mode="view" @format={{@format}} />

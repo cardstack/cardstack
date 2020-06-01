@@ -1,14 +1,9 @@
 import Controller from '@ember/controller';
 import { action } from '@ember/object';
 import { dasherize } from '@ember/string';
+import { truncateVerifiId } from '@cardstack/boxel/utils/truncate-verifi-id';
 
 export default class MediaRegistryItemController extends Controller {
-  truncatedVerifiId = function(id) {
-    if (id) {
-      return `${id.slice(0, 6)}...${id.slice(-4)}`;
-    }
-  };
-
   get headerDetailFields() {
     return [
       {
@@ -17,7 +12,7 @@ export default class MediaRegistryItemController extends Controller {
       },
       {
         title: 'verifi id',
-        value: this.truncatedVerifiId(this.model?.details?.verifi_id)
+        value: truncateVerifiId(this.model?.details?.verifi_id)
       },
       {
         title: 'label',
@@ -26,9 +21,23 @@ export default class MediaRegistryItemController extends Controller {
     ];
   }
 
+  get itemId() {
+    return dasherize(this.model?.song_title.trim());
+  }
+
   @action
   transitionToEdit() {
-    let itemId = dasherize(this.model.song_title.trim());
-    this.transitionToRoute('media-registry.item.edit', itemId);
+    this.transitionToRoute('media-registry.item.edit', this.itemId);
+  }
+
+  @action
+  transitionToView() {
+    this.transitionToRoute('media-registry.item', this.itemId);
+  }
+
+  // TODO: Fix this (currently all cards expand to musical work card)
+  @action
+  transitionToMusicalWork() {
+    this.transitionToRoute('media-registry.item.musical-work', this.itemId);
   }
 }

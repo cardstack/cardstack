@@ -7,6 +7,7 @@ export default class MediaRegistryItemRoute extends Route {
     const records = await fetchCollection('bunny_records_tracks');
     const recordDetails = await fetchCollection('songs_by_pia_midina_bb_clarke_table_1');
     const profiles = await fetchCollection('profiles');
+    const musicalWorks = await fetchCollection('musical-works');
 
     const record = records.filter(item => {
       if (item.catalog) {
@@ -27,12 +28,11 @@ export default class MediaRegistryItemRoute extends Route {
     }
 
     if (recordDetail) {
-      const producer = profiles.filter(profile => {
-        return profile.id === dasherize(recordDetail.producer.trim());
-      })[0];
-
+      const producer = profiles.filter(profile => (profile.id === recordDetail.producer_id))[0];
+      const musicalWork = musicalWorks.filter(item => item.iswc === recordDetail.iswc_id)[0];
       record.producer = producer;
       record.details = recordDetail;
+      record.musicalWork = musicalWork;
     }
 
     if (transition && transition?.from?.parent?.params?.collectionId) {

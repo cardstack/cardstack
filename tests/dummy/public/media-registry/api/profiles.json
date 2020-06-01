@@ -3,31 +3,105 @@
     "id": "pia-midina",
     "type": "profile",
     "title": "Pia Midina",
+    "description": "Recording artist & lyricist",
     "imgURL": "media-registry/profiles/Pia-Midina.jpg",
+    "organization": "verifi",
     "fields": [
+      {
+        "title": "ipi #",
+        "value": "618723194"
+      },
+      {
+        "title": "email",
+        "value": "pia.midina@gmail.com"
+      },
       {
         "title": "website",
         "value": "www.piamidina.com"
-      },
-      {
-        "title": "no. of recordings",
-        "value": 17
       }
-    ]
+    ],
+    "ipi": "618723194",
+    "email": "pia.midina@gmail.com",
+    "website": "www.piamidina.com",
+    "number_of_recordings": "17",
+    "phone": "+1 215 612 2103",
+    "date_of_birth": "1996-03-08",
+    "address": "1201 Green St",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zipcode": "19111",
+    "country": "United States"
   },
   {
     "id": "francesco-midina",
     "type": "profile",
     "title": "Francesco Midina",
     "imgURL": "media-registry/profiles/francesco-midina.jpg",
+    "organization": "verifi",
     "fields": [
       {
         "title": "website",
-        "value": "www.fmidina.com"
+        "value": "www.francesco.rocks"
       },
       {
         "title": "no. of recordings",
-        "value": 20
+        "value": 168
+      }
+    ]
+  },
+  {
+    "id": "miles-ponia",
+    "type": "profile",
+    "title": "Miles Ponia",
+    "description": "Composer",
+    "imgURL": "media-registry/profiles/Miles_Ponia.jpg",
+    "fields": [
+      {
+        "title": "email",
+        "value": "miles@gmail.com"
+      },
+      {
+        "title": "phone",
+        "value": "+1 215 920 1167"
+      }
+    ]
+  },
+  {
+    "id": "bb-clarke",
+    "type": "profile",
+    "title": "BB Clarke",
+    "imgURL": "media-registry/profiles/BB-Clarke.jpg",
+    "organization": "verifi",
+    "fields": [
+      {
+        "title": "website",
+        "value": "www.bbclarke.com"
+      },
+      {
+        "title": "no. of recordings",
+        "value": 7
+      }
+    ]
+  },
+  {
+    "id": "francine-stewart",
+    "type": "profile",
+    "title": "Francine Stewart"
+  },
+  {
+    "id": "michelle-harris",
+    "type": "profile",
+    "title": "Michelle Harris",
+    "imgURL": "media-registry/profiles/Michelle-Harris.jpg",
+    "organization": "verifi",
+    "fields": [
+      {
+        "title": "website",
+        "value": "www.musicbymichelle.com"
+      },
+      {
+        "title": "no. of recordings",
+        "value": 353
       }
     ]
   }

@@ -1,13 +1,13 @@
 {{#if (eq @mode "edit")}}
   {{!-- Edit Mode --}}
-  {{#if (or @field.value.id (is-array @field.value))}}
+  {{#if (or (eq @field.type "card") @field.value.id (is-array @field.value))}}
     <div class="field-renderer {{@class}}">
       <h4 class="field-renderer__title">{{humanize @field.title}}</h4>
-      {{#if @field.value.id}}
+      {{#if (or @field.component (eq @field.type "card"))}}
         <CollectionField
           @belongsToField={{true}}
-          @collection={{@field.value}}
-          @format={{@field.format}}
+          @field={{@field}}
+          @expandAction={{@expandAction}}
           @mode="edit"
         />
       {{else}}
@@ -26,12 +26,21 @@
               {{#each @field.value as |val|}}
                 <div class="field-renderer__taglist-title">{{val.title}}</div>
                 <ul class="field-renderer__taglist-editor field-renderer__taglist-editor--vertical">
-                  {{#each val.value as |vv|}}
-                    <li class="item__pill">
-                      <span>{{vv}}</span>
-                      <button class="item__remove-btn" aria-label="remove" />
-                    </li>
-                  {{/each}}
+                  {{#if (is-array val.value)}}
+                    {{#each val.value as |vv|}}
+                      <li class="item__pill">
+                        <span>{{vv}}</span>
+                        <button class="item__remove-btn" aria-label="remove" />
+                      </li>
+                    {{/each}}
+                  {{else}}
+                    {{#if val.value}}
+                      <li class="item__pill">
+                        <span>{{val.value}}</span>
+                        <button class="item__remove-btn" aria-label="remove" />
+                      </li>
+                    {{/if}}
+                  {{/if}}
                   <button class="item__add-btn" aria-label="add" />
                 </ul>
               {{/each}}
@@ -67,24 +76,34 @@
   {{/if}}
 {{else}}
   {{!-- View Mode --}}
-  <div class="field-renderer {{@class}}">
+  <div class="field-renderer {{lowercase (dasherize (trim @field.title))}}-field {{@class}}">
     <div class="field-renderer__title">{{humanize @field.title}}</div>
     <Boxel @class="field-renderer__value">
       {{#if @field.value}}
-        {{#if @field.value.id}}
-          <Card @variant="small" @model={{@field.value}} @mode="view" />
+        {{#if (or @field.component (eq @field.type "card"))}}
+          {{component (or @field.component "card") model=@field.value mode="view" variant="small" expandAction=@expandAction}}
+        {{else if (eq @field.type "collection")}}
+          {{#each @field.value as |val|}}
+            {{component (or @field.component "card") model=val mode="view" variant="small" expandAction=@expandAction}}
+          {{/each}}
         {{else if (is-array @field.value)}}
           {{#let (filter-by "id" @field.value) (filter-by "title" @field.value) as |collection multiTagList|}}
             {{#if collection.length}}
               {{#each @field.value as |val|}}
-                <Card @name={{val.name}} @model={{val}} @variant="small" @mode="view" />
+                <Card @model={{val}} @variant="small" @mode="view" @expandAction={{@expandAction}} />
               {{/each}}
             {{else if multiTagList.length}}
               {{#each @field.value as |val|}}
                 <div class="field-renderer__taglist-title">{{val.title}}</div>
-                {{#each val.value as |vv|}}
-                  <div>{{vv}}</div>
-                {{/each}}
+                {{#if val.value.id}}
+                  <Card @variant="small" @model={{val.value}} @mode="view" @expandAction={{@expandAction}} />
+                {{else}}
+                  {{#each val.value as |vv|}}
+                    <div>{{vv}}</div>
+                  {{else}}
+                    {{or val.value "N/A"}}
+                  {{/each}}
+                {{/if}}
               {{/each}}
             {{else}}
               {{#each @field.value as |val|}}

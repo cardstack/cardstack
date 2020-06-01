@@ -20,8 +20,16 @@
   height: 30px;
   padding: 5px 20px;
   font: var(--boxel-font-sm);
-  border: 1px solid #D1D1D1;
+  letter-spacing: var(--boxel-lsp);
+  border: var(--boxel-border);
   border-radius: 100px;
+  background-color: white;
+  color: black;
+  outline: 0;
+}
+
+.breadcrumbs__pill:hover {
+  cursor: pointer;
 }
 
 .breadcrumbs__pill--current {
