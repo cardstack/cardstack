@@ -4,7 +4,7 @@ import { fetchCollection } from 'dummy/media';
 
 export default class MediaRegistryItemRoute extends Route {
   async model({ itemId }, transition) {
-    const records = await fetchCollection('bunny_records_tracks');
+    const records = await fetchCollection('all_tracks_combined');
     const recordDetails = await fetchCollection('songs_by_pia_midina_bb_clarke_table_1');
     const profiles = await fetchCollection('profiles');
     const musicalWorks = await fetchCollection('musical-works');

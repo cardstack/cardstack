@@ -1,5 +1,6 @@
 .media-registry {
-  --bunny-records-pink: #FF1D6C;
+  --header-background: #FF1D6C;
+  --header-logo-size-sm: 25px 34px;
 
   height: 100%;
   display: grid;
@@ -7,6 +8,11 @@
   background-color: #F5F5F5;
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp-lg);
+}
+
+.media-registry.media-registry--crd_records {
+  --header-background: #0069F9;
+  --header-logo-size-sm: 36px 35px;
 }
 
 .media-registry__left-edge {
@@ -25,7 +31,7 @@
     "nav   nav"    40px / minmax(auto, 450px) 1fr;
   gap: 50px;
   padding: 80px 20px 0 30px;
-  background-color: var(--bunny-records-pink);
+  background-color: var(--header-background);
   color: white;
   height: 250px;
   z-index: 2;
@@ -66,7 +72,7 @@
 .media-registry__header--sm .media-registry__logo {
   width: 50px;
   height: 50px;
-  background-size: 25px 34px;
+  background-size: var(--header-logo-size-sm);
 }
 
 .media-registry__logo svg {

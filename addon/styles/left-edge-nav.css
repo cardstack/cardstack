@@ -1,11 +1,12 @@
 .left-edge-nav {
   position: fixed;
   display: grid;
+  grid-template-rows: auto 1fr;
   align-items: center;
   justify-items: center;
   width: 80px;
   height: 100%;
-  padding: 20px;
+  padding: 0;
   background-color: var(--cs-dark-field-default);
 }
 
@@ -18,6 +19,7 @@
 
 .left-edge-nav__top-btn-group {
   align-self: start;
+  padding-top: 20px;
 }
 
 .left-edge-nav__bottom-btn-group {
@@ -27,11 +29,11 @@
 
 .left-edge-nav__btn {
   --icon-color: var(--boxel-highlight);
-  width: 40px;
+  width: 80px;
   height: 40px;
-  padding: 0;
   background: none;
   border: none;
+  outline: 0;
 }
 
 .left-edge-nav__btn svg {
@@ -45,9 +47,22 @@
 }
 
 .left-edge-nav__btn--full {
+  border-left: 4px solid transparent;
+  padding-left: 16px;
   background-position: center;
   background-repeat: no-repeat;
   background-size: 40px 40px;
+  opacity: 0.5;
+}
+
+.left-edge-nav__btn--full:hover,
+.left-edge-nav__btn--full:focus {
+  opacity: 1;
+}
+
+.left-edge-nav__btn--full.selected {
+  border-color: var(--boxel-highlight);
+  opacity: 1;
 }
 
 

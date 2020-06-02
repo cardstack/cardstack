@@ -6,16 +6,23 @@ import { inject as service } from '@ember/service';
 export default class MediaCollectionComponent extends Component {
   @tracked format = this.args.format || 'grid';
   @service router;
-  @tracked collection = this.args.model.collection;
+  @tracked collection;
   @tracked tableCols = this.args?.field?.columns || this.args?.model?.columns;
   @tracked sortColumn = this.sortColumns ? this.sortColumns[0] : null;
   @tracked sortDirection = 'asc';
 
   constructor(...args) {
     super(...args);
-    let collection = this.collection;
-    set(collection, 'selectedItemCount', collection.filter(item => item.selected).length);
-    set(collection, 'selectedAll', collection.length === collection.selectedItemCount);
+    this.collection = this.args.model.collection;
+    set(this.collection, 'selectedItemCount', this.collection.filter(item => item.selected).length);
+    set(this.collection, 'selectedAll', this.collection.length === this.collection.selectedItemCount);
+  }
+
+  @action
+  updateCollections() {
+    this.collection = this.args.model.collection;
+    set(this.collection, 'selectedItemCount', this.collection.filter(item => item.selected).length);
+    set(this.collection, 'selectedAll', this.collection.length === this.collection.selectedItemCount);
   }
 
   @action
@@ -24,26 +31,25 @@ export default class MediaCollectionComponent extends Component {
       this.args.changeFormat(val);
     }
     this.format = val;
+    this.updateCollections();
   }
 
   @action
   toggleSelectAll() {
-    let collection = this.collection;
-    if (collection.selectedItemCount) {
-      set(collection, 'selectedAll', false);
+    if (this.collection.selectedItemCount) {
+      set(this.collection, 'selectedAll', false);
     } else {
-      set(collection, 'selectedAll', !collection.selectedAll);
+      set(this.collection, 'selectedAll', !this.collection.selectedAll);
     }
 
-    for (let item of collection) {
-      if (collection.selectedAll) {
+    for (let item of this.collection) {
+      if (this.collection.selectedAll) {
         set(item, "selected", true);
       } else {
         set(item, "selected", false);
       }
     }
-
-    set(collection, 'selectedItemCount', collection.filter(item => item.selected).length);
+    set(this.collection, 'selectedItemCount', this.collection.filter(item => item.selected).length);
   }
 
   @action
@@ -79,6 +85,12 @@ export default class MediaCollectionComponent extends Component {
     this.sortColumn = column;
 
     this.collection = (await this.args.sort(this.sortColumn, this.sortDirection)).slice();
+
+    if (this.format === 'table') {
+      return set(this.collection, 'selectedItemCount', this.collection.filter(item => item.selected).length);
+    }
+
+    this.updateCollections();
   }
 
   @action async search(event) {
@@ -91,7 +103,6 @@ export default class MediaCollectionComponent extends Component {
   }
 
   @action async removeItem(item) {
-    this.collection = (await this.args.removeItem(item)).slice()
+    this.collection = (await this.args.removeItem(item)).slice();
   }
-
 }

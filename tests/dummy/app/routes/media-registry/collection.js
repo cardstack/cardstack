@@ -4,7 +4,7 @@ import { fetchCollection } from 'dummy/media';
 
 export default class MediaRegistryCollectionRoute extends Route {
   async model({ collectionId }) {
-    const records = await fetchCollection('bunny_records_tracks');
+    const records = await fetchCollection('all_tracks_combined');
     let tracks = records.filter(item => {
       if (item.catalog) {
         return item.catalog.map(catalog => {

@@ -1,0 +1,21 @@
+<nav class="left-edge-nav">
+  <ul class="left-edge-nav__top-btn-group">
+    <li>
+      <LinkTo @route="media-registry" class="left-edge-nav__btn left-edge-nav__btn--cs-logo" aria-label="home">
+        {{svg-jar "cardstack-logo" width="33px" height="35px"}}
+      </LinkTo>
+    </li>
+  </ul>
+
+  <ul class="left-edge-nav__middle-btn-group">
+    {{#each @orgs as |org|}}
+      <li>
+        <button {{on "click" (fn this.transitionToCatalog org.id)}}
+          class="left-edge-nav__btn left-edge-nav__btn--full {{if (eq @current org.id) "selected"}}"
+          style={{css-url "background-image" org.iconURL}}
+          aria-label="View catalog for {{org.company}}"
+        />
+      </li>
+    {{/each}}
+  </ul>
+</nav>

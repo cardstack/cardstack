@@ -22,12 +22,8 @@ export default class MediaRegistryIndexController extends Controller {
 
   @action
   selectOrTransition(item) {
-    if (this.model.collection.selectedItemCount > 0) {
-      this.toggleSelect(item);
-    } else {
-      let itemId = dasherize(item.catalog_title.trim());
-      this.transitionToRoute('media-registry.collection', itemId);
-    }
+    let itemId = dasherize(item.catalog_title.trim());
+    this.transitionToRoute('media-registry.collection', itemId);
   }
 
   @action

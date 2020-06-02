@@ -1,6 +1,6 @@
-<section class="media-registry">
+<section class="media-registry media-registry--{{@model.id}}">
   <aside class="media-registry__left-edge">
-    <LeftEdgeNav />
+    <LeftEdgeNav @orgs={{@model.orgs}} @current={{@model.id}} />
   </aside>
   <header class="media-registry__header media-registry__header--sm">
     <h1 class="media-registry__title">
@@ -11,8 +11,6 @@
     <nav class="media-registry__nav">
       <ul>
         <li class="selected"><LinkTo @route="media-registry">Masters</LinkTo></li>
-        <li>Artists</li>
-        <li>Products</li>
         <li>Agreements</li>
       </ul>
     </nav>
