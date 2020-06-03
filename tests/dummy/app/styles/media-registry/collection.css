@@ -50,13 +50,8 @@
   height: 100%;
 }
 
-.collection__highlighter {
-  transition: box-shadow var(--boxel-transition);
-}
-
 .collection__boxel:hover .collection__highlighter,
 .collection__boxel:focus-within .collection__highlighter {
-  box-shadow: var(--boxel-box-shadow);
   outline: 0;
 }
 

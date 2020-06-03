@@ -6,7 +6,8 @@ export default class LeftEdgeNav extends Component {
   @service router;
 
   @action
-  transitionToCatalog(id) {
-    this.router.transitionTo('media-registry', id);
+  transitionToCatalog(route, id) {
+    if (route !== 'media-registry.agreements') { route = 'media-registry'; }
+    this.router.transitionTo(route, id);
   }
 }

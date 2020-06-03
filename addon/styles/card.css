@@ -26,27 +26,33 @@
   bottom: 3px;
   width: 60px;
   height: 50px;
+  border-bottom-right-radius: 10px;
   background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, #fff 40%);
 }
 
 .boxel-card {
-  display: grid;
-  align-items: center;
-  gap: 3px 15px;
-  padding: 15px 45px 15px 15px;
+  width: 100%;
   background-color: white;
-  border: 1px solid var(--boxel-border-color);
-  border-radius: 5px;
-  color: black;
-  font: var(--boxel-font);
-  letter-spacing: var(--boxel-lsp);
-  overflow: hidden;
+  border-radius: 10px;
+  border: var(--boxel-border);
   transition: box-shadow var(--boxel-transition);
 }
 
 .boxel-card__expand-btn:hover ~ .boxel-card,
 .boxel-card:hover {
   box-shadow: var(--boxel-box-shadow);
+  cursor: pointer;
+}
+
+.boxel-card--default {
+  display: grid;
+  align-items: center;
+  gap: 3px 15px;
+  padding: 15px 45px 15px 15px;
+  color: black;
+  font: var(--boxel-font);
+  letter-spacing: var(--boxel-lsp);
+  overflow: hidden;
 }
 
 .boxel-card ul {

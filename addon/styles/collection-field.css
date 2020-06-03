@@ -61,7 +61,7 @@
 .collection-field__item--grid.collection-field__item--belongs-to {
   grid-template-columns: 1fr;
   grid-template-rows: 1fr 45px;
-  padding-top: 10px;
+  padding: 10px;
 }
 
 .collection-field__item--list.collection-field__item--single {

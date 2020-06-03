@@ -1,7 +1,7 @@
 {{#if (eq @mode "edit")}}
   {{!-- Edit Mode --}}
   {{#if (or (eq @field.type "card") @field.value.id (is-array @field.value))}}
-    <div class="field-renderer {{@class}}">
+    <div class="field-renderer {{lowercase (dasherize (trim @field.title))}}-edit-field {{@class}}">
       <h4 class="field-renderer__title">{{humanize @field.title}}</h4>
       {{#if (or @field.component (eq @field.type "card"))}}
         <CollectionField

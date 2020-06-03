@@ -17,6 +17,7 @@ Router.map(function() {
       this.route('edit');
       this.route('musical-work');
     });
+    this.route('agreements');
   });
   this.route('movie-registry', function() {
     this.route('view', { path: '/:id' });

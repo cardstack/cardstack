@@ -1,6 +1,6 @@
 <div class="master-collection__wrapper">
   <MediaCollection @model={{@model}} @mode="view" @sort={{this.sort}} @transition={{this.selectOrTransition}} @removeItem={{this.removeItem}} as |item|>
-    <Boxel class="master-collection__boxel">
+    <Boxel @class="master-collection__boxel boxel-card">
       <BoxelHighlight {{on "click" (fn this.selectOrTransition item)}} @class="master-collection__highlighter" @on={{item.selected}} />
       <button {{on "click" (fn this.togglePin item)}} class="master-collection__pin-btn {{if item.pinned "pinned"}}" aria-label="pin">{{svg-jar "pin" width="22px" height="22px"}}</button>
       <SelectButton
