@@ -48,29 +48,33 @@
 .collection__boxel {
   width: 100%;
   height: 100%;
+  border-radius: 5px;
 }
 
+.media-collection__grid-item:hover .collection__boxel,
+.collection__boxel:hover,
+.collection__boxel:focus-within {
+  border-color: rgba(0, 0, 0, 0.05);
+}
+
+.media-collection__grid-item:hover .collection__highlighter,
 .collection__boxel:hover .collection__highlighter,
 .collection__boxel:focus-within .collection__highlighter {
+  box-shadow: var(--boxel-box-shadow);
   outline: 0;
 }
 
 .collection__select-btn {
-  display: none;
-  position: absolute;
-  top: 0;
-  left: 0;
+  visibility: collapse;
 }
 
-.collection__select-btn--selected {
-  display: block;
-}
-
+.media-collection__grid-item:hover .collection__select-btn,
+.collection__select-btn--selected,
 .collection__select-btn:hover,
 .collection__select-btn:focus,
-.collection__boxel:hover .collection__select-btn,
-.collection__boxel:focus-within .collection__select-btn {
-  display: block;
+.collection__boxel:hover + .collection__select-btn,
+.collection__boxel:focus-within + .collection__select-btn {
+  visibility: visible;
 }
 
 .collection__play-btn {
@@ -83,6 +87,7 @@
   z-index: 1;
 }
 
+.media-collection__grid-item:hover .collection__play-btn,
 .collection__boxel:hover .collection__play-btn,
 .collection__boxel:focus-within .collection__play-btn {
   display: inline-block;
@@ -97,7 +102,14 @@
   width: 100%;
   height: 100%;
   padding: 20px 20px 0;
-  border-radius: 10px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  min-height: 280px;
+}
+
+.collection--edit {
+  background-color: white;
+  border-color: var(--boxel-border-color);
 }
 
 .collection__title {

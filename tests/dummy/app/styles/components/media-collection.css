@@ -9,7 +9,7 @@
   position: sticky;
   top: 0;
   background-color: white;
-  z-index: 2;
+  z-index: 5;
   border-radius: 10px 10px 0 0;
 }
 
@@ -272,6 +272,12 @@
   background-color: #F0F0F0;
 }
 
+.media-collection__search-input {
+  height: 30px;
+  font: var(--boxel-font-sm);
+  padding: 5px 10px;
+}
+
 
 /* Dropdown */
 .media-collection-dropdown {
@@ -282,6 +288,10 @@
   font: var(--boxel-font-sm);
   font-weight: bold;
   letter-spacing: var(--boxel-lsp-sm);
+}
+
+.media-collection__search-dropdown {
+  padding: 15px 20px;
 }
 
 .media-collection-dropdown ul {

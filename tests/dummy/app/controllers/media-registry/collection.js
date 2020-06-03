@@ -7,12 +7,8 @@ import { isBlank } from '@ember/utils';
 export default class MediaRegistryCollectionController extends MediaRegistryIndexController {
   @action
   selectOrTransitionToDetail(item) {
-    if (this.model.collection.selectedItemCount > 0) {
-      this.toggleSelect(item);
-    } else {
-      let itemId = dasherize(item.song_title.trim());
-      this.transitionToRoute('media-registry.item', itemId);
-    }
+    let itemId = dasherize(item.song_title.trim());
+    this.transitionToRoute('media-registry.item', itemId);
   }
 
   @action

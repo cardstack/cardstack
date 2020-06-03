@@ -1,3 +1,25 @@
 <BoxelModal @onClose={{this.transitionToPrevious}} @class="collection-edit-modal">
-  <MediaCollection @model={{@model}} @mode="edit" @format="table" @sort={{this.sort}} @transition={{this.selectOrTransitionToDetail}} @removeItem={{this.removeItem}} />
+  <MediaCollection @model={{@model}} @mode="edit" @format="table" @sort={{this.sort}} @transition={{this.selectOrTransitionToDetail}} @removeItem={{this.removeItem}} as |item|>
+    <Boxel @class="collection__boxel">
+      <BoxelHighlight {{on "click" (fn this.selectOrTransitionToDetail item)}} @class="collection__highlighter" @on={{item.selected}} />
+      <BoxelActions @displayHighlightActions={{item.selected}} @btnRightAction={{action this.selectOrTransitionToDetail item}} />
+      <div class="collection collection--edit">
+        <div class="collection__img" style={{css-url "background-image" item.cover_art_medium}}>
+          <button class="collection__play-btn">{{svg-jar "play-btn" width="60px" height="60px"}}</button>
+        </div>
+        <h3 class="collection__title">{{item.song_title}}</h3>
+        <div class="collection__artist">{{item.artist}}</div>
+      </div>
+    </Boxel>
+    <div class="collection-editor__btn-group">
+      <button {{on "click" (fn this.toggleSelect item)}} class="collection-editor__select-btn" aria-label="select">
+        {{#if item.selected}}
+          {{svg-jar "icon-circle-selected" class="collection-editor__select--selected" width="16px" height="16px"}}
+        {{else}}
+          {{svg-jar "icon-circle" width="16px" height="16px"}}
+        {{/if}}
+      </button>
+      <button {{on "click" (fn this.removeItem item)}} class="collection-editor__select-btn" aria-label="remove">{{svg-jar "icon-minus-circle" width="16px" height="16px"}}</button>
+    </div>
+  </MediaCollection>
 </BoxelModal>

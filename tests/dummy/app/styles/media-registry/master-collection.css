@@ -10,27 +10,31 @@
   height: 100%;
 }
 
+.master-collection__highlighter {
+  border-radius: 10px;
+}
+
+.media-collection__grid-item:hover .master-collection__highlighter,
 .master-collection__highlighter:hover,
 .master-collection__highlighter:focus {
+  box-shadow: var(--boxel-box-shadow);
   outline: 0;
 }
 
 .master-collection__select-btn {
-  display: none;
-  position: absolute;
-  top: 0;
-  left: 0;
+  visibility: collapse;
 }
 
 .master-collection__select-btn--selected {
-  display: block;
+  visibility: visible;
 }
 
+.media-collection__grid-item:hover .master-collection__select-btn,
 .master-collection__select-btn:hover,
 .master-collection__select-btn:focus,
 .master-collection__boxel:hover .master-collection__select-btn,
 .master-collection__boxel:focus-within .master-collection__select-btn {
-  display: block;
+  visibility: visible;
 }
 
 .master-collection__pin-btn {

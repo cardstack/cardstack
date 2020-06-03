@@ -38,8 +38,8 @@
 }
 
 .media-registry__header--sm {
-  height: 132px;
-  padding-top: 24px;
+  height: 130px;
+  padding-top: 25px;
   gap: 20px;
 }
 
@@ -97,14 +97,13 @@
 }
 
 .media-registry__nav li > a {
-  padding: 0 20px 12px;
+  padding: 0 20px 10px;
   border-bottom: 4px solid transparent;
 }
 
-.media-registry__nav li > a.active {
+.media-registry__nav li > a.active:not(.unselected) {
   font-weight: bold;
   border-color: white;
-
 }
 
 .media-registry__search-bar {
