@@ -1,6 +1,6 @@
 <section class="media-registry media-registry--{{@model.id}}">
   <aside class="media-registry__left-edge">
-    <LeftEdgeNav @orgs={{@model.orgs}} @current={{@model.id}} />
+    <LeftEdgeNav @orgs={{@model.orgs}} @current={{@model.id}} @currentRouteName={{this.target.currentRouteName}} />
   </aside>
   <header class="media-registry__header media-registry__header--sm">
     <h1 class="media-registry__title">
@@ -10,8 +10,8 @@
     <input class="media-registry__search-bar" type="search" placeholder="Search" />
     <nav class="media-registry__nav">
       <ul>
-        <li class="selected"><LinkTo @route="media-registry">Masters</LinkTo></li>
-        <li>Agreements</li>
+        <li><LinkTo @route="media-registry.index" @model={{@model.id}}>Masters</LinkTo></li>
+        <li><LinkTo @route="media-registry.agreements" @model={{@model.id}}>Agreements</LinkTo></li>
       </ul>
     </nav>
   </header>

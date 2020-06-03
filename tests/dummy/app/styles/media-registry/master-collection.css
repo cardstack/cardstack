@@ -10,14 +10,8 @@
   height: 100%;
 }
 
-.master-collection__highlighter {
-  box-shadow: var(--boxel-box-shadow);
-  transition: box-shadow var(--boxel-transition);
-}
-
 .master-collection__highlighter:hover,
 .master-collection__highlighter:focus {
-  box-shadow: var(--boxel-box-shadow-hover);
   outline: 0;
 }
 

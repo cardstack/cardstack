@@ -1,0 +1,58 @@
+<div class="agreements">
+  <div class="detail-card agreements-card">
+    <header class="agreements-card__header">
+      {{#if (or (eq this.status "view") (eq this.status "complete"))}}
+        Catalog transfer agreement
+      {{else}}
+        Transfer a catalog
+      {{/if}}
+    </header>
+
+    <div class="detail-card__body agreements-card__body">
+      {{#if (eq this.status "complete")}}
+        <FieldRenderer
+          @mode="view"
+          @field={{hash title="Agreement ID" value="TA-38195847898"}}
+          @class="agreements-edit-field"
+        />
+        <FieldRenderer
+          @mode="view"
+          @field={{hash title="Date & Time" value=(moment-format (now) "MM/DD/YYYY HH:mm")}}
+          @class="agreements-edit-field"
+        />
+      {{/if}}
+
+      {{#each this.createCatalogFields as |field|}}
+        <FieldRenderer
+          @mode={{if (or (not this.status) (eq this.status "create")) "edit" "view"}}
+          @field={{field}}
+          @expandAction={{@expandAction}}
+          @class="agreements-edit-field"
+        />
+      {{/each}}
+
+      {{#if (eq this.status "complete")}}
+        <FieldRenderer
+          @mode="view"
+          @field={{hash title="Status" value=(capitalize this.status)}}
+          @class="agreements-edit-field"
+        />
+      {{/if}}
+    </div>
+
+    {{#if (not-eq this.status "complete")}}
+      <footer class="agreements-card__footer">
+        {{#if (and (eq this.status "view") (eq @model.id "crd_records"))}}
+          <button {{on "click" this.completeAgreement}} class="boxel-cta boxel-cta--primary">Accept Transfer</button>
+          <button {{on "click" this.createAgreement}} class="boxel-cta boxel-cta--primary">Reject Transfer</button>
+        {{else if (and (eq this.status "view") (eq @model.id "bunny_records"))}}
+          <div />
+          <button class="boxel-cta boxel-cta--disabled" disabled>Transfer request sent</button>
+        {{else}}
+          <div />
+          <button {{on "click" this.viewAgreement}} class="boxel-cta boxel-cta--primary">Initiate Transfer</button>
+        {{/if}}
+      </footer>
+    {{/if}}
+  </div>
+</div>

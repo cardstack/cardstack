@@ -1,0 +1,13 @@
+{{#let @model as |item|}}
+  <Boxel @class="master-collection__boxel boxel-card">
+    <div class="master-collection">
+      <h3 class="master-collection__title">{{item.catalog_title}}</h3>
+      <div class="master-collection__desc">{{item.catalog_description}}</div>
+      <div class="master-collection__covers" />
+      <div class="master-collection__count">
+        <div class="master-collection__num">{{item.number_of_songs}}</div>
+        <div>Songs</div>
+      </div>
+    </div>
+  </Boxel>
+{{/let}}

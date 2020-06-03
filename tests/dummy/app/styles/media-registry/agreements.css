@@ -1,0 +1,63 @@
+.agreements {
+  padding: 30px;
+}
+
+.agreements-card {
+  max-width: 945px;
+  min-height: 785px;
+  display: grid;
+  grid-template-rows: minmax(90px, auto) 1fr minmax(90px, auto);
+}
+
+.agreements-card__header {
+  padding: 30px 40px;
+  color: #393642;
+  font: var(--boxel-font-med);
+  font-weight: bold;
+  letter-spacing: 0;
+  border-bottom: var(--boxel-border);
+}
+
+.agreements-card__footer {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  justify-items: end;
+  gap: 10px;
+  padding: 30px;
+  border-top: var(--boxel-border);
+}
+
+.detail-card__body {
+  display: grid;
+  grid-auto-rows: max-content;
+  padding: 50px 0;
+  gap: 10px 0;
+}
+
+
+/* boxel cta styles */
+.boxel-cta {
+  display: inline-block;
+  min-height: 40px;
+  min-width: 180px;
+  padding: 10px 15px;
+  text-align: center;
+  background-color: transparent;
+  border: var(--boxel-border);
+  border-radius: 100px;
+  font: var(--boxel-font-sm);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-lg);
+  outline: 0;
+}
+
+.boxel-cta--primary {
+  background-color: var(--boxel-highlight);
+  border-color: var(--boxel-highlight);
+}
+
+.boxel-cta:hover {
+  cursor: pointer;
+  background-color: var(--boxel-highlight-hover);
+  border-color: var(--boxel-highlight-hover);
+}

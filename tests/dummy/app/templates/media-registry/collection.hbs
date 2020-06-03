@@ -6,8 +6,8 @@
   </div>
 
   <MediaCollection @model={{@model}} @sort={{this.sort}} @search={{this.search}} @transition={{this.selectOrTransitionToDetail}} @removeItem={{this.removeItem}} @mode="view" @format="table" as |item|>
-    <Boxel class="collection__boxel">
-      <BoxelHighlight {{on "click" (fn this.selectOrTransition item)}} @class="collection__highlighter" @on={{item.selected}} />
+    <Boxel @class="collection__boxel boxel-card">
+      <BoxelHighlight {{on "click" (fn this.selectOrTransitionToDetail item)}} @class="collection__highlighter" @on={{item.selected}} />
       <SelectButton
         {{on "click" (fn this.toggleSelect item)}}
         @isSelected={{item.selected}}

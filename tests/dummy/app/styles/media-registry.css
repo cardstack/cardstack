@@ -85,26 +85,26 @@
 .media-registry__nav {
   grid-area: nav;
   max-width: 450px;
-  padding-left: 15px;
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp-lg);
 }
 
 .media-registry__nav ul {
-  height: 40px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0 10px;
   max-width: 450px;
 }
 
-.media-registry__nav li {
-  padding-left: 15px;
+.media-registry__nav li > a {
+  padding: 0 20px 12px;
+  border-bottom: 4px solid transparent;
 }
 
-.media-registry__nav li.selected {
+.media-registry__nav li > a.active {
   font-weight: bold;
-  border-bottom: 4px solid white;
+  border-color: white;
+
 }
 
 .media-registry__search-bar {
