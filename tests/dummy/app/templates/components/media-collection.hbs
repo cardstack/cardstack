@@ -50,8 +50,8 @@
 
           {{#if @search}}
             <MediaCollection::Button @button="search" @icon="search">
-              <input
-              {{on "input" this.search}}
+              <Input @type="search" @class="field-renderer__input media-collection__search-input"
+                {{on "input" this.search}}
               />
             </MediaCollection::Button>
           {{/if}}
@@ -71,7 +71,7 @@
       <div class="media-collection__inner-container">
         <ul class="media-collection__grid media-collection__grid--{{@model.type}}-{{this.format}}">
           {{#each this.collection as |item|}}
-            <li>
+            <li class="media-collection__grid-item media-collection__grid-item--{{this.format}}">
               {{yield item}}
             </li>
           {{/each}}

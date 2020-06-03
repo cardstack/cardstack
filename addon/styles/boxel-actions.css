@@ -11,7 +11,7 @@
   font: var(--boxel-font-sm);
   font-weight: 600;
   letter-spacing: 0.035em;
-  z-index: 10;
+  z-index: 2;
 }
 
 .boxel-actions__btn {
@@ -23,7 +23,6 @@
   background-size: 16px 16px;
   background-repeat: no-repeat;
   background-position: center;
-  z-index: 2;
 }
 
 .boxel-actions__btn:hover {

@@ -27,10 +27,12 @@
   letter-spacing: 0.1em;
   text-align: left;
   text-transform: uppercase;
+  z-index: 4;
 }
 
 .media-collection-table__header th:first-of-type {
   border-right: 1px solid var(--table-border-color);
+  z-index: 5;
 }
 
 .media-collection-table__header-cell {
@@ -151,6 +153,12 @@
   border-left: none;
   border-radius: 0;
   outline: 0;
+}
+
+.media-collection-table__actions-btns {
+  border-top-right-radius: 0;
+  top: -2px;
+  right: -2px;
 }
 
 td:first-of-type .media-collection-table__boxel-cell {
