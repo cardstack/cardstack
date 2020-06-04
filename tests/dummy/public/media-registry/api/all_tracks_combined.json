@@ -12,6 +12,14 @@
       "Film Music",
       "Golden Girl"
     ],
+    "catalogSubtitles": [
+      "Themes & soundtracks",
+      "All songs recorded by GG"
+    ],
+    "catalogCounts": [
+      156,
+      42
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": "X",

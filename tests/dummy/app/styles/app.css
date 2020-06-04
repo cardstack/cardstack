@@ -19,6 +19,7 @@
 @import 'components/media-collection.css';
 @import 'components/media-collection-table.css';
 @import 'components/media-detail.css';
+@import 'components/sidebar-related-card.css';
 
 
 html, body {

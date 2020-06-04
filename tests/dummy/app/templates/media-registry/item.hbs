@@ -79,14 +79,16 @@
 
       {{!-- Related Cards Sidebar --}}
       <aside class="item__sidebar">
-        <h3 class="item__sidebar-title">In these catalogs</h3>
+        <h3 class="item__sidebar-title">In these collections</h3>
         <div>
-          {{#each @model.catalog as |catalog|}}
-            <div>
-              <LinkTo @route="media-registry.collection" @model={{dasherize (trim catalog)}}>
-                {{catalog}}
-              </LinkTo>
-            </div>
+          {{#each @model.catalog as |catalog i|}}
+            <SidebarRelatedCard
+              @type="catalog"
+              @title={{catalog}}
+              @route="media-registry.collection"
+              @routeModel={{dasherize (trim catalog)}}
+              @subtitle={{get @model.catalogSubtitles i}}
+              @count={{get @model.catalogCounts i}} />
           {{/each}}
         </div>
       </aside>

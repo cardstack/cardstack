@@ -1,0 +1,34 @@
+<div class="sidebar-related-card">
+  <div class="sidebar-related-card__header">
+    {{#if @type}}
+      {{@type}}
+    {{else}}
+      Collection
+    {{/if}}
+  </div>
+
+  <div class="sidebar-related-card__inner">
+    <div class="sidebar-related-card__left">
+      <div class="sidebar-related-card__thumb-{{@type}}" style={{css-url "background-image" (if (eq @title "Batch F") "/media-registry/batch-f.svg" "/media-registry/film-music.svg")}}></div>
+    </div>
+    <div class="sidebar-related-card__right">
+      <LinkTo @route={{@route}} @model={{@routeModel}}>
+        {{@title}}
+      </LinkTo>
+      <div class="sidebar-related-card__subtitle">
+        {{@subtitle}}
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-related-card__count">
+    <span class="sidebar-related-card__count__number">
+      {{#if @count}}
+        {{@count}}
+      {{else}}
+        {{if (eq @title "Batch F") "16" "156"}}
+      {{/if}}
+    </span> items
+  </div>
+
+</div>

@@ -1,0 +1,60 @@
+.item__sidebar {
+  min-width: 320px;
+}
+
+.sidebar-related-card {
+  border: 1px solid #dcdcdc;
+  border-radius: 10px;
+  background-color: white;
+  margin-top: 10px;
+  box-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+}
+
+.sidebar-related-card__inner {
+  padding: 20px;
+  padding-bottom: 0;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.sidebar-related-card__header {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  background-color: #F7F5F9;
+  text-transform: uppercase;
+  font-size: 0.6em;
+  font-weight: bold;
+  color: #929193;
+  padding: 3px 20px;
+}
+
+.sidebar-related-card__thumb-catalog {
+  width: 100px;
+  height: 80px;
+  margin-right: 10px;
+  background: url('/media-registry/master-covers.svg') center left/cover no-repeat;
+}
+
+
+.sidebar-related-card__right a {
+  display: block;
+  font-weight: bold;
+}
+
+.sidebar-related-card__subtitle {
+  color: #7A788E;
+  font-size: 0.75em;
+}
+
+.sidebar-related-card__count {
+  padding: 20px;
+  padding-top: 0;
+  text-align: right;
+  font-size: 0.6em;
+}
+
+.sidebar-related-card__count__number {
+  font-weight: bold;
+  font-size: 1.7em;
+}
