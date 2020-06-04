@@ -19,7 +19,7 @@ export default class MediaRegistryCollectionRoute extends Route {
       collection: tracks,
       columns: [
         {
-          name: 'Song Title',
+          name: 'Title',
           valuePath: 'song_title',
           isFixed: 'left',
           width: 350,

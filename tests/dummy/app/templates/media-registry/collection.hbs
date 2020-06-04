@@ -2,7 +2,7 @@
   <div class="breadcrumbs">
     <LinkTo @route="media-registry" @class="breadcrumbs__pill">Master Recordings</LinkTo>
     <span class="breadcrumbs__carot" />
-    <span class="breadcrumbs__pill breadcrumbs__pill--current">{{humanize @model.title}}</span>
+    <span class="breadcrumbs__pill breadcrumbs__pill--current">{{titleize (humanize @model.title)}}</span>
   </div>
 
   <MediaCollection @model={{@model}} @sort={{this.sort}} @search={{this.search}} @transition={{this.selectOrTransitionToDetail}} @removeItem={{this.removeItem}} @mode="view" @format="table" as |item|>

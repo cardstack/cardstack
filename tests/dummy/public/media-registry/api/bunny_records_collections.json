@@ -1,7 +1,7 @@
 [
   {
     "catalog_title": "Golden Girl",
-    "catalog_description": "All songs recorded by GG",
+    "catalog_description": "All recordings by GG",
     "number_of_songs": 42,
     "top_artists": ["Golden Girl"],
     "date_created": "Jan 14, 2020"

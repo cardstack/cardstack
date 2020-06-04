@@ -49,7 +49,7 @@ export default class MediaRegistryRoute extends Route {
           width: 250,
         },
         {
-          name: 'Songs',
+          name: 'Masters',
           valuePath: 'number_of_songs',
           width: 250,
         },
