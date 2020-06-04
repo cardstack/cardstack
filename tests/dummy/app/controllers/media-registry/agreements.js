@@ -11,6 +11,11 @@ export default class MediaRegistryAgreementsController extends Controller {
   }
 
   @action
+  rejectAgreement() {
+    this.transitionToRoute('media-registry.collection', 'batch-f');
+  }
+
+  @action
   createAgreement() {
     this.status = 'create';
   }
@@ -44,7 +49,8 @@ export default class MediaRegistryAgreementsController extends Controller {
         title: 'Batch F',
         catalog_title: 'Batch F',
         catalog_description: 'Transfer to CRD Records',
-        number_of_songs: 16
+        number_of_songs: 16,
+        catalog_covers: "/media-registry/batch-f.svg"
       }
     }
   ]

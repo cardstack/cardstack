@@ -10,7 +10,7 @@
     <input class="media-registry__search-bar" type="search" placeholder="Search" />
     <nav class="media-registry__nav">
       <ul>
-        <li><LinkTo @class={{if (eq this.target.currentRouteName "media-registry.agreements") "unselected"}} @route="media-registry" @model={{@model.id}}>Masters</LinkTo></li>
+        <li><LinkTo @class={{if (eq this.target.currentRouteName "media-registry.agreements") "unselected" "active"}} @route="media-registry" @model={{@model.id}}>Masters</LinkTo></li>
         <li><LinkTo @route="media-registry.agreements" @model={{@model.id}}>Agreements</LinkTo></li>
       </ul>
     </nav>
