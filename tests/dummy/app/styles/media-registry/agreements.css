@@ -22,7 +22,7 @@
   display: grid;
   grid-template-columns: 1fr auto;
   justify-items: end;
-  gap: 10px;
+  gap: 20px;
   padding: 30px;
   border-top: var(--boxel-border);
 }
@@ -56,8 +56,14 @@
   border-color: var(--boxel-highlight);
 }
 
-.boxel-cta:hover {
+.boxel-cta:not(:disabled):hover {
   cursor: pointer;
   background-color: var(--boxel-highlight-hover);
   border-color: var(--boxel-highlight-hover);
+}
+
+.boxel-cta--disabled {
+  border-color: #D9D9D9;
+  background-color: #D9D9D9;
+  color: rgba(0, 0, 0, 0.5);
 }

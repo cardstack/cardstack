@@ -10,19 +10,25 @@
   border: none;
   font: var(--boxel-font-sm);
   font-weight: 600;
-  letter-spacing: 0.035em;
+  letter-spacing: var(--boxel-lsp);
   z-index: 2;
 }
 
+.boxel-actions .boxel-actions__menu-btn,
 .boxel-actions__btn {
   border: none;
-  width: 35px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   padding: 7px 9px;
   background-color: transparent;
   background-size: 16px 16px;
   background-repeat: no-repeat;
   background-position: center;
+}
+
+.boxel-actions__btn > svg {
+  display: block;
+  margin: auto;
 }
 
 .boxel-actions__btn:hover {
@@ -65,4 +71,12 @@
   padding: 0;
   background-image: url('/assets/images/icons/plus.svg');
   background-size: 9px 9px;
+}
+
+.boxel-actions .ember-basic-dropdown-trigger {
+  outline: 0;
+}
+
+.boxel-actions .ember-basic-dropdown .actions-menu > li {
+  opacity: 1;
 }

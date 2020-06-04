@@ -43,7 +43,7 @@
     {{#if (not-eq this.status "complete")}}
       <footer class="agreements-card__footer">
         {{#if (and (eq this.status "view") (eq @model.id "crd_records"))}}
-          <button {{on "click" this.completeAgreement}} class="boxel-cta boxel-cta--primary">Accept Transfer</button>
+          <button {{on "click" this.completeAgreement}} class="boxel-cta boxel-cta--primary boxel-cta--disabled" disabled>Accept Transfer</button>
           <button {{on "click" this.createAgreement}} class="boxel-cta boxel-cta--primary">Reject Transfer</button>
         {{else if (and (eq this.status "view") (eq @model.id "bunny_records"))}}
           <div />

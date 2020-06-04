@@ -47,11 +47,11 @@
 }
 
 .media-collection__btn-overlay {
-  min-width: 124px;
+  min-width: 125px;
   border-top-right-radius: 10px;
   grid-template-columns: 1fr 40px;
-  overflow: hidden;
 }
+
 .mode-btn {
   width: auto;
   height: 40px;

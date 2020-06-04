@@ -5,8 +5,19 @@
       <div class="boxel-actions__btn boxel-actions__btn--revision-mode {{if @addedItems "boxel-actions__btn--add"}}">
         {{yield}}
       </div>
-    {{else}}
+    {{else if (eq @btnRight "version-history")}}
       <button class="boxel-actions__btn {{or @btnLeft "boxel-actions__btn--more-actions"}}" {{on "click" (or @btnLeftAction this.moreActions)}} aria-label="{{or @btnLeft "more actions"}}">{{@btnLeftContent}}</button>
+      <MediaCollection::Button @class="boxel-actions__btn" @button="gear" @icon="gear">
+        <ActionsMenu />
+      </MediaCollection::Button>
+    {{else}}
+      {{#if @btnLeft}}
+        <button class="boxel-actions__btn {{@btnLeft}}" {{on "click" @btnLeftAction}} aria-label="{{@btnLeft}}">{{@btnLeftContent}}</button>
+      {{else}}
+        <MediaCollection::Button @class="boxel-actions__menu-btn boxel-actions__btn--more-actions" @button="more-actions" @icon="more-actions">
+          <ActionsMenu />
+        </MediaCollection::Button>
+      {{/if}}
       <button class="boxel-actions__btn {{or @btnRight "boxel-actions__btn--expand"}}" {{on "click" (or @btnRightAction this.expand)}} aria-label="{{or @btnRight "expand"}}" />
     {{/if}}
   </div>

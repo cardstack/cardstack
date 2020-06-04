@@ -44,7 +44,7 @@ export default class MediaRegistryAgreementsController extends Controller {
         title: 'Batch F',
         catalog_title: 'Batch F',
         catalog_description: 'Transfer to CRD Records',
-        number_of_songs: 24
+        number_of_songs: 16
       }
     }
   ]
