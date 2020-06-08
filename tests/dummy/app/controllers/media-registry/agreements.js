@@ -50,7 +50,13 @@ export default class MediaRegistryAgreementsController extends Controller {
         catalog_title: 'Batch F',
         catalog_description: 'Transfer to CRD Records',
         number_of_songs: 16,
-        catalog_covers: "/media-registry/batch-f.svg"
+        selected_art: [
+          "media-registry/covers/thumb/Sunlight.jpg",
+          "media-registry/covers/thumb/Change-Is-Good.jpg",
+          "media-registry/covers/thumb/Full-Moon.jpg",
+          "media-registry/covers/thumb/Love-Never-Dies.jpg",
+          "media-registry/covers/thumb/Animals.jpg"
+        ]
       }
     }
   ]

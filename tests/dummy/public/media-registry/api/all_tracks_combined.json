@@ -38,7 +38,10 @@
     "type_of_album": "EP",
     "genre": "Alternative",
     "length": "3:11",
-    "catalog": [ "Film Music", "Batch F" ],
+    "catalog": [
+      "Film Music",
+      "Batch F"
+    ],
     "later_batch_f": true,
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
@@ -248,7 +251,10 @@
     "type_of_album": "Single",
     "genre": "Pop",
     "length": "2:45",
-    "catalog": [ "Film Music", "Batch F" ],
+    "catalog": [
+      "Film Music",
+      "Batch F"
+    ],
     "later_batch_f": true,
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
@@ -373,7 +379,10 @@
     "type_of_album": "Single",
     "genre": "Pop",
     "length": "3:55",
-    "catalog": [ "Film Music", "Batch F" ],
+    "catalog": [
+      "Film Music",
+      "Batch F"
+    ],
     "later_batch_f": true,
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
@@ -436,7 +445,8 @@
     "genre": "Rock",
     "length": "2:44",
     "catalog": [
-      "Super Successful"
+      "Super Successful",
+      "Bunny Hop 1"
     ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
@@ -456,7 +466,10 @@
     "type_of_album": "EP",
     "genre": "Pop",
     "length": "3:17",
-    "catalog": [ "Film Music", "Batch F" ],
+    "catalog": [
+      "Film Music",
+      "Batch F"
+    ],
     "later_batch_f": true,
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
@@ -476,7 +489,10 @@
     "type_of_album": "Album",
     "genre": "Rock",
     "length": "3:07",
-    "catalog": [ "Film Music", "Batch F" ],
+    "catalog": [
+      "Film Music",
+      "Batch F"
+    ],
     "later_batch_f": true,
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
@@ -496,7 +512,10 @@
     "type_of_album": "Single",
     "genre": "Pop",
     "length": "3:55",
-    "catalog": [ "Film Music", "Batch F" ],
+    "catalog": [
+      "Film Music",
+      "Batch F"
+    ],
     "later_batch_f": true,
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
@@ -517,7 +536,8 @@
     "genre": "Country",
     "length": "3:17",
     "catalog": [
-      "Super Successful"
+      "Super Successful",
+      "Bunny Hop 1"
     ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
@@ -532,16 +552,21 @@
     "song_title": "Like a washing machine",
     "artist": "Things",
     "album": "Gotta Be Silly",
-    "cover_art": null,
-    "type_of_album": null,
+    "cover_art": "media-registry/covers/Gotta-Be-Silly.jpg",
+    "type_of_album": "Album",
     "genre": "Pop",
     "length": "3:35",
-    "catalog": null,
+    "catalog": [
+      "Batch C"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Gotta-Be-Silly.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Gotta-Be-Silly.jpg",
+    "cover_art_large": "media-registry/covers/large/Gotta-Be-Silly.jpg"
   },
   {
     "song_title": "Living like the royals",
@@ -553,7 +578,8 @@
     "genre": "Alternative",
     "length": "4:01",
     "catalog": [
-      "Extra Long"
+      "Extra Long",
+      "Bunny Hop 2"
     ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
@@ -574,7 +600,8 @@
     "genre": "Pop",
     "length": "3:50",
     "catalog": [
-      "Super Successful"
+      "Super Successful",
+      "Bunny Hop 1"
     ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
@@ -589,16 +616,81 @@
     "song_title": "Madness",
     "artist": "UNIF",
     "album": "Call Me Crazy",
-    "cover_art": null,
-    "type_of_album": null,
+    "cover_art": "media-registry/covers/Call-Me-Crazy.jpg",
+    "type_of_album": "EP",
     "genre": "Rock",
     "length": "3:01",
-    "catalog": null,
+    "catalog": [
+      "Batch C"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Call-Me-Crazy.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Call-Me-Crazy.jpg",
+    "cover_art_large": "media-registry/covers/large/Call-Me-Crazy.jpg"
+  },
+  {
+    "song_title": "Main Street",
+    "artist": "Fingernails",
+    "album": "Hands On",
+    "cover_art": "media-registry/covers/Hands-On.jpg",
+    "type_of_album": "Album",
+    "genre": "Pop",
+    "length": "3:18",
+    "catalog": [
+      "Film Music"
+    ],
+    "owner": "Bunny Records",
+    "filtered_by_genre_pop": "X",
+    "filtered_by_length_less_than_3_min": null,
+    "search_for_artist_pia_midina": null,
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Hands-On.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Hands-On.jpg",
+    "cover_art_large": "media-registry/covers/large/Hands-On.jpg"
+  },
+  {
+    "song_title": "Max",
+    "artist": "UNIF",
+    "album": "Liars",
+    "cover_art": "media-registry/covers/Liars.jpg",
+    "type_of_album": "EP",
+    "genre": "Rock",
+    "length": "3:03",
+    "catalog": [
+      "Batch C"
+    ],
+    "owner": "Bunny Records",
+    "filtered_by_genre_pop": null,
+    "filtered_by_length_less_than_3_min": null,
+    "search_for_artist_pia_midina": null,
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Liars.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Liars.jpg",
+    "cover_art_large": "media-registry/covers/large/Liars.jpg"
+  },
+  {
+    "song_title": "Mighty Moon",
+    "artist": "Melodrama",
+    "album": "Mighty Moon",
+    "cover_art": "media-registry/covers/Mighty-Moon.jpg",
+    "type_of_album": "Single",
+    "genre": "Rock",
+    "length": "3:05",
+    "catalog": [
+      "Batch C"
+    ],
+    "owner": "Bunny Records",
+    "filtered_by_genre_pop": null,
+    "filtered_by_length_less_than_3_min": null,
+    "search_for_artist_pia_midina": null,
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Mighty-Moon.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Mighty-Moon.jpg",
+    "cover_art_large": "media-registry/covers/large/Mighty-Moon.jpg"
   },
   {
     "song_title": "Morning star",
@@ -649,7 +741,10 @@
     "type_of_album": "EP",
     "genre": "Pop",
     "length": "2:33",
-    "catalog": [ "Film Music", "Batch F" ],
+    "catalog": [
+      "Film Music",
+      "Batch F"
+    ],
     "later_batch_f": true,
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
@@ -691,7 +786,8 @@
     "genre": "Pop",
     "length": "3:21",
     "catalog": [
-      "Golden Girl"
+      "Golden Girl",
+      "Bunny Hop 2"
     ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
@@ -733,7 +829,8 @@
     "genre": "Alternative",
     "length": "4:15",
     "catalog": [
-      "Extra Long"
+      "Extra Long",
+      "Bunny Hop 2"
     ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
@@ -754,7 +851,8 @@
     "genre": "Pop",
     "length": "3:40",
     "catalog": [
-      "Golden Girl"
+      "Golden Girl",
+      "Bunny Hop 2"
     ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
@@ -764,6 +862,26 @@
     "cover_art_thumb": "media-registry/covers/thumb/On-the-Brink-of-Happiness.jpg",
     "cover_art_medium": "media-registry/covers/medium/On-the-Brink-of-Happiness.jpg",
     "cover_art_large": "media-registry/covers/large/On-the-Brink-of-Happiness.jpg"
+  },
+  {
+    "song_title": "On the day you were born",
+    "artist": "Super nova",
+    "album": "On the Day You Were Born",
+    "cover_art": "media-registry/covers/On-the-Day-You-Were-Born.jpg",
+    "type_of_album": "Single",
+    "genre": "Rock",
+    "length": "3:18",
+    "catalog": [
+      "Batch D"
+    ],
+    "owner": "Bunny Records",
+    "filtered_by_genre_pop": null,
+    "filtered_by_length_less_than_3_min": null,
+    "search_for_artist_pia_midina": null,
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/On-the-Day-You-Were-Born.jpg",
+    "cover_art_medium": "media-registry/covers/medium/On-the-Day-You-Were-Born.jpg",
+    "cover_art_large": "media-registry/covers/large/On-the-Day-You-Were-Born.jpg"
   },
   {
     "song_title": "Over you",
@@ -787,6 +905,26 @@
     "cover_art_large": "media-registry/covers/large/Love-the-Love.jpg"
   },
   {
+    "song_title": "Penny",
+    "artist": "Australians",
+    "album": "Magna Cum Love",
+    "cover_art": "media-registry/covers/Magna-Cum-Love.jpg",
+    "type_of_album": "EP",
+    "genre": "Alternative",
+    "length": "3:33",
+    "catalog": [
+      "Batch D"
+    ],
+    "owner": "Bunny Records",
+    "filtered_by_genre_pop": null,
+    "filtered_by_length_less_than_3_min": null,
+    "search_for_artist_pia_midina": null,
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Magna-Cum-Love.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Magna-Cum-Love.jpg",
+    "cover_art_large": "media-registry/covers/large/Magna-Cum-Love.jpg"
+  },
+  {
     "song_title": "Powder snow",
     "artist": "Ping Pong",
     "album": "Seven Seasons",
@@ -796,7 +934,8 @@
     "genre": "Pop",
     "length": "2:41",
     "catalog": [
-      "Super Successful"
+      "Super Successful",
+      "Bunny Hop 1"
     ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
@@ -811,16 +950,21 @@
     "song_title": "Pristine condition",
     "artist": "Melodrama",
     "album": "Drama Queen",
-    "cover_art": null,
-    "type_of_album": null,
+    "cover_art": "media-registry/covers/Drama-Queen.jpg",
+    "type_of_album": "EP",
     "genre": "Alternative",
     "length": "1:59",
-    "catalog": null,
+    "catalog": [
+      "Batch C"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Drama-Queen.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Drama-Queen.jpg",
+    "cover_art_large": "media-registry/covers/large/Drama-Queen.jpg"
   },
   {
     "song_title": "Roller coaster of emotions",
@@ -832,7 +976,8 @@
     "genre": "Techno",
     "length": "3:10",
     "catalog": [
-      "Super Successful"
+      "Super Successful",
+      "Bunny Hop 1"
     ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
@@ -892,12 +1037,17 @@
     "type_of_album": "Album",
     "genre": "Pop",
     "length": "3:24",
-    "catalog": null,
+    "catalog": [
+      "Bunny Hop 2"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Beauty-vs-Reality.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Beauty-vs-Reality.jpg",
+    "cover_art_large": "media-registry/covers/large/Beauty-vs-Reality.jpg"
   },
   {
     "song_title": "Silver linings",
@@ -921,6 +1071,46 @@
     "cover_art_large": "media-registry/covers/large/Happy-Ever-After.jpg"
   },
   {
+    "song_title": "Sold out",
+    "artist": "Gross guest",
+    "album": "Sold out",
+    "cover_art": "media-registry/covers/Sold-Out.jpg",
+    "type_of_album": "Single",
+    "genre": "Rock",
+    "length": "3:22",
+    "catalog": [
+      "Batch E"
+    ],
+    "owner": "Bunny Records",
+    "filtered_by_genre_pop": null,
+    "filtered_by_length_less_than_3_min": null,
+    "search_for_artist_pia_midina": null,
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Sold-Out.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Sold-Out.jpg",
+    "cover_art_large": "media-registry/covers/large/Sold-Out.jpg"
+  },
+  {
+    "song_title": "Sunny side up",
+    "artist": "Jason the boss",
+    "album": "Sunny side up",
+    "cover_art": "media-registry/covers/Sunny-Side-Up.jpg",
+    "type_of_album": "Single",
+    "genre": "Rock",
+    "length": "3:20",
+    "catalog": [
+      "Batch E"
+    ],
+    "owner": "Bunny Records",
+    "filtered_by_genre_pop": null,
+    "filtered_by_length_less_than_3_min": null,
+    "search_for_artist_pia_midina": null,
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Sunny-Side-Up.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Sunny-Side-Up.jpg",
+    "cover_art_large": "media-registry/covers/large/Sunny-Side-Up.jpg"
+  },
+  {
     "song_title": "Sunshine and moonlight",
     "artist": "Pia Midina",
     "album": "Sunlight",
@@ -929,7 +1119,10 @@
     "type_of_album": "EP",
     "genre": "Alternative",
     "length": "1:57",
-    "catalog": [ "Film Music", "Batch F" ],
+    "catalog": [
+      "Film Music",
+      "Batch F"
+    ],
     "later_batch_f": true,
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
@@ -965,16 +1158,21 @@
     "song_title": "The breadcrumbs in the forest",
     "artist": "Australians",
     "album": "Fairy Tales",
-    "cover_art": null,
-    "type_of_album": null,
+    "cover_art": "media-registry/covers/Fairy-Tales.jpg",
+    "type_of_album": "Album",
     "genre": "Alternative",
     "length": "2:11",
-    "catalog": null,
+    "catalog": [
+      "Batch D"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Fairy-Tales.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Fairy-Tales.jpg",
+    "cover_art_large": "media-registry/covers/large/Fairy-Tales.jpg"
   },
   {
     "song_title": "The holy mess",
@@ -1006,7 +1204,10 @@
     "type_of_album": "EP",
     "genre": "Alternative",
     "length": "3:23",
-    "catalog": [ "Film Music", "Batch F" ],
+    "catalog": [
+      "Film Music",
+      "Batch F"
+    ],
     "later_batch_f": true,
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
@@ -1026,7 +1227,10 @@
     "type_of_album": "EP",
     "genre": "Dance",
     "length": "3:02",
-    "catalog": [ "Film Music", "Batch F" ],
+    "catalog": [
+      "Film Music",
+      "Batch F"
+    ],
     "later_batch_f": true,
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
@@ -1046,7 +1250,10 @@
     "type_of_album": "EP",
     "genre": "Alternative",
     "length": "3:09",
-    "catalog": [ "Film Music", "Batch F" ],
+    "catalog": [
+      "Film Music",
+      "Batch F"
+    ],
     "later_batch_f": true,
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
@@ -1066,7 +1273,10 @@
     "type_of_album": "Album",
     "genre": "Rock",
     "length": "2:58",
-    "catalog": [ "Film Music", "Batch F" ],
+    "catalog": [
+      "Film Music",
+      "Batch F"
+    ],
     "later_batch_f": true,
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
@@ -1107,7 +1317,10 @@
     "type_of_album": "EP",
     "genre": "Alternative",
     "length": "3:40",
-    "catalog": [ "Film Music", "Batch F" ],
+    "catalog": [
+      "Film Music",
+      "Batch F"
+    ],
     "later_batch_f": true,
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
@@ -1140,19 +1353,104 @@
     "cover_art_large": "media-registry/covers/large/More-Than-We-Know.jpg"
   },
   {
-    "song_title": "When we were younger",
-    "artist": "Love monkeys",
-    "album": "Friends with Benefits",
-    "cover_art": null,
-    "type_of_album": null,
+    "song_title": "What the hell",
+    "artist": "Super nova",
+    "album": "Drunk",
+    "cover_art": "media-registry/covers/Drunk.jpg",
+    "type_of_album": "Album",
     "genre": "Rock",
-    "length": "2:50",
-    "catalog": null,
+    "length": "2:58",
+    "catalog": [
+      "Batch D"
+    ],
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
-    "search_for_artist_bb_clarke": null
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Drunk.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Drunk.jpg",
+    "cover_art_large": "media-registry/covers/large/Drunk.jpg"
+  },
+  {
+    "song_title": "When we were younger",
+    "artist": "Love monkeys",
+    "album": "Friends with Benefits",
+    "cover_art": "media-registry/covers/Friends-with-Benefits.jpg",
+    "type_of_album": "EP",
+    "genre": "Rock",
+    "length": "2:50",
+    "catalog": [
+      "Batch E"
+    ],
+    "owner": "Bunny Records",
+    "filtered_by_genre_pop": null,
+    "filtered_by_length_less_than_3_min": "X",
+    "search_for_artist_pia_midina": null,
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Friends-with-Benefits.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Friends-with-Benefits.jpg",
+    "cover_art_large": "media-registry/covers/large/Friends-with-Benefits.jpg"
+  },
+  {
+    "song_title": "When you hit me",
+    "artist": "Gross guest",
+    "album": "When you hit me",
+    "cover_art": "media-registry/covers/When-You-Hit-Me.jpg",
+    "type_of_album": "Single",
+    "genre": "Rock",
+    "length": "2:45",
+    "catalog": [
+      "Batch E"
+    ],
+    "owner": "Bunny Records",
+    "filtered_by_genre_pop": null,
+    "filtered_by_length_less_than_3_min": "X",
+    "search_for_artist_pia_midina": null,
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/When-You-Hit-Me.jpg",
+    "cover_art_medium": "media-registry/covers/medium/When-You-Hit-Me.jpg",
+    "cover_art_large": "media-registry/covers/large/When-You-Hit-Me.jpg"
+  },
+  {
+    "song_title": "Why do you like me?",
+    "artist": "Picture perfect",
+    "album": "Why do you like me?",
+    "cover_art": "media-registry/covers/Why-Do-You-Like-Me.jpg",
+    "type_of_album": "Single",
+    "genre": "Rock",
+    "length": "2:16",
+    "catalog": [
+      "Batch D"
+    ],
+    "owner": "Bunny Records",
+    "filtered_by_genre_pop": null,
+    "filtered_by_length_less_than_3_min": "X",
+    "search_for_artist_pia_midina": null,
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Why-Do-You-Like-Me.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Why-Do-You-Like-Me.jpg",
+    "cover_art_large": "media-registry/covers/large/Why-Do-You-Like-Me.jpg"
+  },
+  {
+    "song_title": "Why not",
+    "artist": "Jason the boss",
+    "album": "Why not",
+    "cover_art": "media-registry/covers/Why-Not.jpg",
+    "type_of_album": "Single",
+    "genre": "Rock",
+    "length": "2:57",
+    "catalog": [
+      "Batch E"
+    ],
+    "owner": "Bunny Records",
+    "filtered_by_genre_pop": null,
+    "filtered_by_length_less_than_3_min": "X",
+    "search_for_artist_pia_midina": null,
+    "search_for_artist_bb_clarke": null,
+    "cover_art_thumb": "media-registry/covers/thumb/Why-Not.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Why-Not.jpg",
+    "cover_art_large": "media-registry/covers/large/Why-Not.jpg"
   },
   {
     "song_title": "Yesterday was my favorite day",
@@ -1163,7 +1461,10 @@
     "type_of_album": "EP",
     "genre": "Alternative",
     "length": "2:46",
-    "catalog": [ "Film Music", "Batch F" ],
+    "catalog": [
+      "Film Music",
+      "Batch F"
+    ],
     "later_batch_f": true,
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
@@ -1183,7 +1484,10 @@
     "type_of_album": "EP",
     "genre": "Pop",
     "length": "3:24",
-    "catalog": [ "Film Music", "Batch F" ],
+    "catalog": [
+      "Film Music",
+      "Batch F"
+    ],
     "later_batch_f": true,
     "owner": "Bunny Records",
     "filtered_by_genre_pop": "X",
@@ -1224,7 +1528,10 @@
     "type_of_album": "Album",
     "genre": "Rock",
     "length": "3:33",
-    "catalog": [ "Film Music", "Batch F" ],
+    "catalog": [
+      "Film Music",
+      "Batch F"
+    ],
     "later_batch_f": true,
     "owner": "Bunny Records",
     "filtered_by_genre_pop": null,
@@ -1239,243 +1546,617 @@
     "song_title": "A very very old world",
     "artist": "The Sunshine Band",
     "album": "Cast me",
+    "type_of_album": "Album",
     "genre": "Musical",
     "length": "3:01",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Radio-friendly",
+      "Soundtracks"
+    ],
+    "cover_art": "media-registry/covers/Cast-Me.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Cast-Me.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Cast-Me.jpg",
+    "cover_art_large": "media-registry/covers/large/Cast-Me.jpg"
   },
   {
     "song_title": "Alike or not alike",
     "artist": "Gary and the Whales",
     "album": "Freedom",
+    "type_of_album": "Album",
     "genre": "Alternative",
     "length": "2:49",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Gary and the Whales",
+      "Love songs"
+    ],
+    "cover_art": "media-registry/covers/Freedom.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Freedom.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Freedom.jpg",
+    "cover_art_large": "media-registry/covers/large/Freedom.jpg"
   },
   {
     "song_title": "Aloof",
     "artist": "Light & Shadow",
     "album": "The Vamps of the World",
+    "type_of_album": "Album",
     "genre": "Metal",
     "length": "4:00",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Radio-friendly"
+    ],
+    "cover_art": "media-registry/covers/The-Vamps-of-the-World.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/The-Vamps-of-the-World.jpg",
+    "cover_art_medium": "media-registry/covers/medium/The-Vamps-of-the-World.jpg",
+    "cover_art_large": "media-registry/covers/large/The-Vamps-of-the-World.jpg"
+  },
+  {
+    "song_title": "Another time",
+    "artist": "No Lyrics",
+    "album": "What Musical Instruments Can Do",
+    "type_of_album": "Album",
+    "genre": "Instrumental",
+    "length": "3:10",
+    "owner": "CRD Records",
+    "catalog": [
+      "Instrumental"
+    ],
+    "cover_art": "media-registry/covers/What-Musical-Instruments-Can-Do.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/What-Musical-Instruments-Can-Do.jpg",
+    "cover_art_medium": "media-registry/covers/medium/What-Musical-Instruments-Can-Do.jpg",
+    "cover_art_large": "media-registry/covers/large/What-Musical-Instruments-Can-Do.jpg"
   },
   {
     "song_title": "Beauty versus strength",
     "artist": "Bambi Attack",
     "album": "Innocent Kittens",
+    "type_of_album": "Album",
     "genre": "Pop",
     "length": "2:33",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Hit Songs"
+    ],
+    "cover_art": "media-registry/covers/Innocent-Kittens.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Innocent-Kittens.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Innocent-Kittens.jpg",
+    "cover_art_large": "media-registry/covers/large/Innocent-Kittens.jpg"
+  },
+  {
+    "song_title": "Been there done that",
+    "artist": "Gary and the Whales",
+    "album": "Been There Done That",
+    "type_of_album": "Single",
+    "genre": "Alternative",
+    "length": "2:49",
+    "owner": "CRD Records",
+    "catalog": [
+      "Gary and the Whales",
+      "Hit Songs"
+    ],
+    "cover_art": "media-registry/covers/Been-There-Done-That.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Been-There-Done-That.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Been-There-Done-That.jpg",
+    "cover_art_large": "media-registry/covers/large/Been-There-Done-That.jpg"
   },
   {
     "song_title": "Drive-thru",
     "artist": "Mad Max",
     "album": "Roller Coaster",
+    "type_of_album": "Album",
     "genre": "Rock",
     "length": "3:15",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Hit Songs"
+    ],
+    "cover_art": "media-registry/covers/Roller-Coaster.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Roller-Coaster.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Roller-Coaster.jpg",
+    "cover_art_large": "media-registry/covers/large/Roller-Coaster.jpg"
+  },
+  {
+    "song_title": "Driving",
+    "artist": "No Lyrics",
+    "album": "Just Listen",
+    "type_of_album": "EP",
+    "genre": "Instrumental",
+    "length": "3:20",
+    "owner": "CRD Records",
+    "catalog": [
+      "Instrumental"
+    ],
+    "cover_art": "media-registry/covers/Just-Listen.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Just-Listen.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Just-Listen.jpg",
+    "cover_art_large": "media-registry/covers/large/Just-Listen.jpg"
   },
   {
     "song_title": "English breakfast",
     "artist": "The Sunshine Band",
     "album": "Cast me",
+    "type_of_album": "Album",
     "genre": "Musical",
     "length": "3:11",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Soundtracks"
+    ],
+    "cover_art": "media-registry/covers/Cast-Me.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Cast-Me.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Cast-Me.jpg",
+    "cover_art_large": "media-registry/covers/large/Cast-Me.jpg"
   },
   {
     "song_title": "Francis the shark",
     "artist": "Gary and the Whales",
     "album": "Freedom",
+    "type_of_album": "Album",
     "genre": "Alternative",
     "length": "3:35",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Gary and the Whales"
+    ],
+    "cover_art": "media-registry/covers/Freedom.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Freedom.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Freedom.jpg",
+    "cover_art_large": "media-registry/covers/large/Freedom.jpg"
+  },
+  {
+    "song_title": "Fried pork",
+    "artist": "Ears Open",
+    "album": "Fried pork",
+    "type_of_album": "Single",
+    "genre": "Instrumental",
+    "length": "4:01",
+    "owner": "CRD Records",
+    "catalog": [
+      "Instrumental"
+    ],
+    "cover_art": "media-registry/covers/Fried-Pork.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Fried-Pork.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Fried-Pork.jpg",
+    "cover_art_large": "media-registry/covers/large/Fried-Pork.jpg"
   },
   {
     "song_title": "Gray zone",
     "artist": "Light & Shadow",
     "album": "The Vamps of the World",
+    "type_of_album": "Album",
     "genre": "Metal",
     "length": "2:57",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Unplugged"
+    ],
+    "cover_art": "media-registry/covers/The-Vamps-of-the-World.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/The-Vamps-of-the-World.jpg",
+    "cover_art_medium": "media-registry/covers/medium/The-Vamps-of-the-World.jpg",
+    "cover_art_large": "media-registry/covers/large/The-Vamps-of-the-World.jpg"
   },
   {
     "song_title": "Home schooling",
     "artist": "Bambi Attack",
     "album": "Innocent Kittens",
+    "type_of_album": "Album",
     "genre": "Pop",
     "length": "2:48",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Radio-friendly"
+    ],
+    "cover_art": "media-registry/covers/Innocent-Kittens.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Innocent-Kittens.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Innocent-Kittens.jpg",
+    "cover_art_large": "media-registry/covers/large/Innocent-Kittens.jpg"
+  },
+  {
+    "song_title": "Home sweet home",
+    "artist": "Gary and the Whales",
+    "album": "Home Sweet Home",
+    "type_of_album": "Single",
+    "genre": "Alternative",
+    "length": "3:01",
+    "owner": "CRD Records",
+    "catalog": [
+      "Gary and the Whales"
+    ],
+    "cover_art": "media-registry/covers/Home-Sweet-Home.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Home-Sweet-Home.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Home-Sweet-Home.jpg",
+    "cover_art_large": "media-registry/covers/large/Home-Sweet-Home.jpg"
   },
   {
     "song_title": "Joking, just keep joking",
     "artist": "Mad Max",
     "album": "Roller Coaster",
+    "type_of_album": "Album",
     "genre": "Rock",
     "length": "3:29",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Radio-friendly"
+    ],
+    "cover_art": "media-registry/covers/Roller-Coaster.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Roller-Coaster.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Roller-Coaster.jpg",
+    "cover_art_large": "media-registry/covers/large/Roller-Coaster.jpg"
   },
   {
     "song_title": "Lagoon",
     "artist": "Gary and the Whales",
     "album": "Freedom",
+    "type_of_album": "Album",
     "genre": "Alternative",
     "length": "2:49",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Gary and the Whales",
+      "Hit Songs"
+    ],
+    "cover_art": "media-registry/covers/Freedom.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Freedom.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Freedom.jpg",
+    "cover_art_large": "media-registry/covers/large/Freedom.jpg"
+  },
+  {
+    "song_title": "Longing",
+    "artist": "Ears Open",
+    "album": "Longing",
+    "type_of_album": "Single",
+    "genre": "Instrumental",
+    "length": "4:20",
+    "owner": "CRD Records",
+    "catalog": [
+      "Instrumental"
+    ],
+    "cover_art": "media-registry/covers/Longing.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Longing.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Longing.jpg",
+    "cover_art_large": "media-registry/covers/large/Longing.jpg"
   },
   {
     "song_title": "Lucifer's lair",
     "artist": "Light & Shadow",
     "album": "The Vamps of the World",
+    "type_of_album": "Album",
     "genre": "Metal",
     "length": "3:23",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Hit Songs"
+    ],
+    "cover_art": "media-registry/covers/The-Vamps-of-the-World.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/The-Vamps-of-the-World.jpg",
+    "cover_art_medium": "media-registry/covers/medium/The-Vamps-of-the-World.jpg",
+    "cover_art_large": "media-registry/covers/large/The-Vamps-of-the-World.jpg"
   },
   {
     "song_title": "Mixed signals",
     "artist": "The Sunshine Band",
     "album": "Cast me",
+    "type_of_album": "Album",
     "genre": "Musical",
     "length": "1:43",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Soundtracks"
+    ],
+    "cover_art": "media-registry/covers/Cast-Me.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Cast-Me.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Cast-Me.jpg",
+    "cover_art_large": "media-registry/covers/large/Cast-Me.jpg"
   },
   {
     "song_title": "Never ever again",
     "artist": "Bambi Attack",
     "album": "Innocent Kittens",
+    "type_of_album": "Album",
     "genre": "Pop",
     "length": "2:23",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Love songs"
+    ],
+    "cover_art": "media-registry/covers/Innocent-Kittens.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Innocent-Kittens.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Innocent-Kittens.jpg",
+    "cover_art_large": "media-registry/covers/large/Innocent-Kittens.jpg"
+  },
+  {
+    "song_title": "Nobody's claims",
+    "artist": "The Musicians",
+    "album": "Nobody's claims",
+    "type_of_album": "Single",
+    "genre": "Instrumental",
+    "length": "3:50",
+    "owner": "CRD Records",
+    "catalog": [
+      "Instrumental"
+    ],
+    "cover_art": "media-registry/covers/Nobodys-Claims.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Nobodys-Claims.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Nobodys-Claims.jpg",
+    "cover_art_large": "media-registry/covers/large/Nobodys-Claims.jpg"
   },
   {
     "song_title": "On and on again",
     "artist": "Mad Max",
     "album": "Roller Coaster",
+    "type_of_album": "Album",
     "genre": "Rock",
     "length": "2:38",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Love songs"
+    ],
+    "cover_art": "media-registry/covers/Roller-Coaster.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Roller-Coaster.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Roller-Coaster.jpg",
+    "cover_art_large": "media-registry/covers/large/Roller-Coaster.jpg"
   },
   {
     "song_title": "Over you",
     "artist": "The Sunshine Band",
     "album": "Cast me",
+    "type_of_album": "Album",
     "genre": "Musical",
     "length": "1:49",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Love songs",
+      "Soundtracks"
+    ],
+    "cover_art": "media-registry/covers/Cast-Me.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Cast-Me.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Cast-Me.jpg",
+    "cover_art_large": "media-registry/covers/large/Cast-Me.jpg"
+  },
+  {
+    "song_title": "Pinnacles",
+    "artist": "Gary and the Whales",
+    "album": "Pinnacles",
+    "type_of_album": "Single",
+    "genre": "Alternative",
+    "length": "3:22",
+    "owner": "CRD Records",
+    "catalog": [
+      "Gary and the Whales"
+    ],
+    "cover_art": "media-registry/covers/Pinnacles.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Pinnacles.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Pinnacles.jpg",
+    "cover_art_large": "media-registry/covers/large/Pinnacles.jpg"
   },
   {
     "song_title": "Powerful",
     "artist": "Light & Shadow",
     "album": "The Vamps of the World",
+    "type_of_album": "Album",
     "genre": "Metal",
     "length": "4:01",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Soundtracks"
+    ],
+    "cover_art": "media-registry/covers/The-Vamps-of-the-World.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/The-Vamps-of-the-World.jpg",
+    "cover_art_medium": "media-registry/covers/medium/The-Vamps-of-the-World.jpg",
+    "cover_art_large": "media-registry/covers/large/The-Vamps-of-the-World.jpg"
   },
   {
     "song_title": "Silence",
     "artist": "Gary and the Whales",
     "album": "Freedom",
+    "type_of_album": "Album",
     "genre": "Alternative",
     "length": "1:59",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Gary and the Whales"
+    ],
+    "cover_art": "media-registry/covers/Freedom.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Freedom.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Freedom.jpg",
+    "cover_art_large": "media-registry/covers/large/Freedom.jpg"
   },
   {
     "song_title": "Skills are all you need",
     "artist": "Bambi Attack",
     "album": "Innocent Kittens",
+    "type_of_album": "Album",
     "genre": "Pop",
     "length": "2:19",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Radio-friendly"
+    ],
+    "cover_art": "media-registry/covers/Innocent-Kittens.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Innocent-Kittens.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Innocent-Kittens.jpg",
+    "cover_art_large": "media-registry/covers/large/Innocent-Kittens.jpg"
+  },
+  {
+    "song_title": "Sulking maids",
+    "artist": "Gary and the Whales",
+    "album": "Sulking Maids",
+    "type_of_album": "Single",
+    "genre": "Alternative",
+    "length": "3:18",
+    "owner": "CRD Records",
+    "catalog": [
+      "Gary and the Whales"
+    ],
+    "cover_art": "media-registry/covers/Sulking-Maids.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Sulking-Maids.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Sulking-Maids.jpg",
+    "cover_art_large": "media-registry/covers/large/Sulking-Maids.jpg"
   },
   {
     "song_title": "Terrible traffic",
     "artist": "Mad Max",
     "album": "Roller Coaster",
+    "type_of_album": "Album",
     "genre": "Rock",
     "length": "3:18",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Unplugged"
+    ],
+    "cover_art": "media-registry/covers/Roller-Coaster.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Roller-Coaster.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Roller-Coaster.jpg",
+    "cover_art_large": "media-registry/covers/large/Roller-Coaster.jpg"
   },
   {
     "song_title": "The greatest bathroom ever",
     "artist": "The Sunshine Band",
+    "type_of_album": "Album",
     "album": "Cast me",
     "genre": "Musical",
     "length": "5:09",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Soundtracks"
+    ],
+    "cover_art": "media-registry/covers/Cast-Me.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Cast-Me.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Cast-Me.jpg",
+    "cover_art_large": "media-registry/covers/large/Cast-Me.jpg"
   },
   {
     "song_title": "The mass-market effect",
     "artist": "Gary and the Whales",
     "album": "Freedom",
+    "type_of_album": "Album",
     "genre": "Alternative",
     "length": "3:07",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Gary and the Whales",
+      "Radio-friendly"
+    ],
+    "cover_art": "media-registry/covers/Freedom.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Freedom.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Freedom.jpg",
+    "cover_art_large": "media-registry/covers/large/Freedom.jpg"
   },
   {
     "song_title": "This is the end",
     "artist": "Light & Shadow",
     "album": "The Vamps of the World",
+    "type_of_album": "Album",
     "genre": "Metal",
     "length": "2:22",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Hit Songs",
+      "Love songs"
+    ],
+    "cover_art": "media-registry/covers/The-Vamps-of-the-World.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/The-Vamps-of-the-World.jpg",
+    "cover_art_medium": "media-registry/covers/medium/The-Vamps-of-the-World.jpg",
+    "cover_art_large": "media-registry/covers/large/The-Vamps-of-the-World.jpg"
   },
   {
     "song_title": "Trust yourself",
     "artist": "Bambi Attack",
     "album": "Innocent Kittens",
+    "type_of_album": "Album",
     "genre": "Pop",
     "length": "3:35",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Unplugged"
+    ],
+    "cover_art": "media-registry/covers/Innocent-Kittens.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Innocent-Kittens.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Innocent-Kittens.jpg",
+    "cover_art_large": "media-registry/covers/large/Innocent-Kittens.jpg"
   },
   {
     "song_title": "Under the living tree",
     "artist": "Mad Max",
     "album": "Roller Coaster",
+    "type_of_album": "Album",
     "genre": "Rock",
     "length": "2:50",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Soundtracks"
+    ],
+    "cover_art": "media-registry/covers/Roller-Coaster.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Roller-Coaster.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Roller-Coaster.jpg",
+    "cover_art_large": "media-registry/covers/large/Roller-Coaster.jpg"
   },
   {
     "song_title": "Veil or tiara",
     "artist": "Bambi Attack",
     "album": "Innocent Kittens",
+    "type_of_album": "Album",
     "genre": "Pop",
     "length": "2:30",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Soundtracks"
+    ],
+    "cover_art": "media-registry/covers/Innocent-Kittens.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Innocent-Kittens.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Innocent-Kittens.jpg",
+    "cover_art_large": "media-registry/covers/large/Innocent-Kittens.jpg"
   },
   {
     "song_title": "Zombie Apocalypse",
     "artist": "Gary and the Whales",
     "album": "Freedom",
+    "type_of_album": "Album",
     "genre": "Alternative",
     "length": "3:15",
     "owner": "CRD Records",
-    "catalog": [ "Hit Songs" ]
+    "catalog": [
+      "Gary and the Whales",
+      "Unplugged"
+    ],
+    "cover_art": "media-registry/covers/Freedom.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Freedom.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Freedom.jpg",
+    "cover_art_large": "media-registry/covers/large/Freedom.jpg"
+  },
+  {
+    "song_title": "Zombies all over",
+    "artist": "The Punk Band",
+    "album": "Zombies",
+    "type_of_album": "Album",
+    "genre": "Rock",
+    "length": "3:35",
+    "owner": "CRD Records",
+    "catalog": [
+      "Soundtracks"
+    ],
+    "cover_art": "media-registry/covers/Zombies.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Zombies.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Zombies.jpg",
+    "cover_art_large": "media-registry/covers/large/Zombies.jpg"
+  },
+  {
+    "song_title": "Zombies never die",
+    "artist": "The Punk Band",
+    "album": "Zombies",
+    "type_of_album": "Album",
+    "genre": "Rock",
+    "length": "3:33",
+    "owner": "CRD Records",
+    "catalog": [
+      "Soundtracks",
+      "Unplugged"
+    ],
+    "cover_art": "media-registry/covers/Zombies.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/Zombies.jpg",
+    "cover_art_medium": "media-registry/covers/medium/Zombies.jpg",
+    "cover_art_large": "media-registry/covers/large/Zombies.jpg"
   }
 ]
