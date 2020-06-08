@@ -5,7 +5,6 @@
     {{#if @model.fields}}
       <div class="card__gradient" />
       <IconButton {{on "click" this.expandAction}} @icon="expand" @class="boxel-card__expand-btn" />
-      <IconButton @icon="carot-thin-down" @class="boxel-card__carot-btn" />
     {{/if}}
     <div class="boxel-card boxel-card--default boxel-card--{{@variant}} boxel-card--{{@model.type}} boxel-card--{{or @format "list"}} {{if @model.imgURL "boxel-card--with-img"}}">
       {{#if @model.imgURL}}
