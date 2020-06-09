@@ -4,90 +4,166 @@
     "catalog_description": "All recordings by GG",
     "number_of_songs": 42,
     "top_artists": ["Golden Girl"],
-    "date_created": "Jan 14, 2020",
-    "catalog_covers": "/media-registry/golden-girl.svg"
+    "date_created": "2019-02-13",
+    "selected_art": [
+      "media-registry/covers/thumb/Love-the-Love.jpg",
+      "media-registry/covers/thumb/Home-Isnt-Sweet.jpg",
+      "media-registry/covers/thumb/Never-Lonely.jpg",
+      "media-registry/covers/thumb/On-the-Brink-of-Happiness.jpg",
+      "media-registry/covers/thumb/Zig-and-Zag.jpg"
+    ]
   },
   {
     "catalog_title": "Extra Long",
     "catalog_description": "Tracks over 4 min",
     "number_of_songs": 102,
-    "top_artists": ["Princess May", "Fly me to the moon", "The edge of nowhere"],
-    "date_created": "Jan 14, 2020",
-    "catalog_covers": "/media-registry/extra-long.svg"
+    "top_artists": ["Fly Me To The Moon", "Charlotte's Cats", "The Mash"],
+    "date_created": "2019-08-14",
+    "selected_art": [
+      "media-registry/covers/thumb/All-About-the-Quality-of-Life.jpg",
+      "media-registry/covers/thumb/Love-Conquers-All.jpg",
+      "media-registry/covers/thumb/Make-Magic.jpg",
+      "media-registry/covers/thumb/Good-Times.jpg",
+      "media-registry/covers/thumb/More-Than-We-Know.jpg"
+    ]
   },
   {
     "catalog_title": "Film Music",
     "catalog_description": "Themes & soundtracks",
     "number_of_songs": 156,
-    "top_artists": ["Pia Midina", "BB Clarke"],
-    "date_created": "Jan 14, 2020",
-    "catalog_covers": "/media-registry/film-music.svg"
+    "top_artists": ["Pia Midina", "BB Clarke", "Marcy Blues"],
+    "date_created": "2019-11-27",
+    "selected_art": [
+      "media-registry/covers/thumb/Love-the-Love.jpg",
+      "media-registry/covers/thumb/Sunlight.jpg",
+      "media-registry/covers/thumb/Moments.jpg",
+      "media-registry/covers/thumb/Escape.jpg",
+      "media-registry/covers/thumb/Just-Like-Birds.jpg"
+    ]
   },
   {
     "catalog_title": "Super Successful",
     "catalog_description": "Popular records across genres & artists",
     "number_of_songs": 89,
-    "top_artists": ["Love Monkeys", "Nancy Jay", "Boyband"],
-    "date_created": "Jan 14, 2020",
-    "catalog_covers": "/media-registry/super-successful.svg"
+    "top_artists": ["Make Me", "Nancy Jay", "Boyband"],
+    "date_created": "2020-01-21",
+    "selected_art": [
+      "media-registry/covers/thumb/Infatuated.jpg",
+      "media-registry/covers/thumb/Sailing.jpg",
+      "media-registry/covers/thumb/Superficial.jpg",
+      "media-registry/covers/thumb/Seven-Seasons.jpg",
+      "media-registry/covers/thumb/Rollercoaster-of-Emotions.jpg"
+    ]
   },
   {
     "catalog_title": "Batch A ",
     "catalog_description": "Sold to Maxime Records",
     "number_of_songs": 23,
-    "top_artists": ["The Francines"],
-    "date_created": "Jan 14, 2020",
-    "catalog_covers": "/media-registry/batch-a.svg"
+    "top_artists": ["The Clue", "Paula Sin", "The Francines"],
+    "date_created": "2020-07-14",
+    "selected_art": [
+      "media-registry/covers/thumb/Save-Humankind.jpg",
+      "media-registry/covers/thumb/All-About-Heaven.jpg",
+      "media-registry/covers/thumb/Little-Lies.jpg",
+      "media-registry/covers/thumb/Maximum-Mildness.jpg",
+      "media-registry/covers/thumb/Magnitude.jpg"
+    ]
   },
   {
     "catalog_title": "Batch B ",
     "catalog_description": "Sold to Philanthropic Music Group",
     "number_of_songs": 120,
     "top_artists": ["Mouthwash", "Patrick Moles", "Sun and Moon"],
-    "date_created": "Jan 14, 2020",
-    "catalog_covers": "/media-registry/batch-b.svg"
+    "date_created": "2020-07-29",
+    "selected_art": [
+      "media-registry/covers/thumb/The-Future-Is-Ours.jpg",
+      "media-registry/covers/thumb/Drive-Me-Crazy.jpg",
+      "media-registry/covers/thumb/Beauty-vs-Reality.jpg",
+      "media-registry/covers/thumb/Happy-Ever-After.jpg",
+      "media-registry/covers/thumb/All-About-the-Man.jpg"
+    ]
   },
   {
     "catalog_title": "Batch C",
-    "catalog_description": "Prepared for transfer to CL Records",
+    "catalog_description": "Prepared for transfer to Candle Lights Records",
     "number_of_songs": 211,
-    "top_artists": ["The Francines"],
-    "date_created": "Jan 14, 2020",
-    "catalog_covers": "/media-registry/extra-long.svg"
+    "top_artists": ["Things", "UNIF", "Melodrama"],
+    "date_created": "2020-08-05",
+    "selected_art": [
+      "media-registry/covers/thumb/Gotta-Be-Silly.jpg",
+      "media-registry/covers/thumb/Call-Me-Crazy.jpg",
+      "media-registry/covers/thumb/Liars.jpg",
+      "media-registry/covers/thumb/Mighty-Moon.jpg",
+      "media-registry/covers/thumb/Drama-Queen.jpg"
+    ]
   },
   {
     "catalog_title": "Batch D",
     "catalog_description": "In progress",
     "number_of_songs": 7,
-    "date_created": "Jan 14, 2020",
-    "catalog_covers": "/media-registry/golden-girl.svg"
+    "top_artists": ["Australians", "Super Nova", "Picture Perfect"],
+    "date_created": "2020-08-11",
+    "selected_art": [
+      "media-registry/covers/thumb/On-the-Day-You-Were-Born.jpg",
+      "media-registry/covers/thumb/Magna-Cum-Love.jpg",
+      "media-registry/covers/thumb/Fairy-Tales.jpg",
+      "media-registry/covers/thumb/Drunk.jpg",
+      "media-registry/covers/thumb/Why-Do-You-Like-Me.jpg"
+    ]
   },
   {
     "catalog_title": "Batch E",
     "catalog_description": "In progress",
     "number_of_songs": 12,
-    "date_created": "Jan 14, 2020",
-    "catalog_covers": "/media-registry/super-successful.svg"
+    "top_artists": ["Love Monkeys", "Gross Guest", "Jason The Boss"],
+    "date_created": "2020-08-13",
+    "selected_art": [
+      "media-registry/covers/thumb/Sold-Out.jpg",
+      "media-registry/covers/thumb/Sunny-Side-Up.jpg",
+      "media-registry/covers/thumb/Friends-with-Benefits.jpg",
+      "media-registry/covers/thumb/When-You-Hit-Me.jpg",
+      "media-registry/covers/thumb/Why-Not.jpg"
+    ]
   },
   {
     "catalog_title": "Batch F",
     "catalog_description": "Transfer to CRD Records",
     "number_of_songs": 16,
-    "date_created": "Jan 14, 2020",
-    "catalog_covers": "/media-registry/batch-f.svg"
+    "date_created": "2020-01-14",
+    "selected_art": [
+      "media-registry/covers/thumb/Sunlight.jpg",
+      "media-registry/covers/thumb/Change-Is-Good.jpg",
+      "media-registry/covers/thumb/Full-Moon.jpg",
+      "media-registry/covers/thumb/Love-Never-Dies.jpg",
+      "media-registry/covers/thumb/Animals.jpg"
+    ]
   },
   {
     "catalog_title": "Bunny Hop 1",
     "catalog_description": "—",
     "number_of_songs": 22,
-    "date_created": "Jan 14, 2020",
-    "catalog_covers": "/media-registry/batch-b.svg"
+    "top_artists": ["Ping Pong", "Boyband", "Nancy Jay"],
+    "date_created": "2018-05-04",
+    "selected_art": [
+      "media-registry/covers/thumb/Infatuated.jpg",
+      "media-registry/covers/thumb/Sailing.jpg",
+      "media-registry/covers/thumb/Superficial.jpg",
+      "media-registry/covers/thumb/Seven-Seasons.jpg",
+      "media-registry/covers/thumb/Rollercoaster-of-Emotions.jpg"
+    ]
   },
   {
     "catalog_title": "Bunny Hop 2",
     "catalog_description": "—",
     "number_of_songs": 22,
-    "date_created": "Jan 14, 2020",
-    "catalog_covers": "/media-registry/batch-a.svg"
+    "top_artists": ["Golden Girl", "The Edge Of Nowhere", "Princess May"],
+    "date_created": "2019-05-02",
+    "selected_art": [
+      "media-registry/covers/thumb/All-About-the-Quality-of-Life.jpg",
+      "media-registry/covers/thumb/Never-Lonely.jpg",
+      "media-registry/covers/thumb/Make-Magic.jpg",
+      "media-registry/covers/thumb/Good-Times.jpg",
+      "media-registry/covers/thumb/Beauty-vs-Reality.jpg"
+    ]
   }
 ]

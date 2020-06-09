@@ -11,7 +11,7 @@ const sizes = {
 
 const coverDir = "tests/dummy/public/media-registry/covers";
 
-const jsonToAddKeys = ["./tests/dummy/public/media-registry/api/custom_catalog_batch_f_table_1.json", "./tests/dummy/public/media-registry/api/bunny_records_tracks.json"];
+const jsonToAddKeys = ["./tests/dummy/public/media-registry/api/custom_catalog_batch_f_table_1.json", "./tests/dummy/public/media-registry/api/all_tracks_combined.json"];
 
 (async function() {
 
