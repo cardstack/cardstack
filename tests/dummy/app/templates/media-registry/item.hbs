@@ -1,102 +1,86 @@
-<div class="item__wrapper {{if (eq this.target.currentRouteName "media-registry.item.edit") "item__wrapper--no-scroll"}}">
+{{#if (eq this.target.currentRouteName "media-registry.item.versions")}}
+  {{outlet}}
+{{else}}
+  <div class="item__wrapper {{if (eq this.target.currentRouteName "media-registry.item.edit") "item__wrapper--no-scroll"}}">
 
-  {{!-- Breadcrumbs --}}
-  <div class="breadcrumbs">
-    <LinkTo @route="media-registry" @class="breadcrumbs__pill">Master Recordings</LinkTo>
-    {{#if @model.fromCollectionId}}
+    {{!-- Breadcrumbs --}}
+    <div class="breadcrumbs">
+      <LinkTo @route="media-registry" @class="breadcrumbs__pill">Master Recordings</LinkTo>
+      {{#if @model.fromCollectionId}}
+        <span class="breadcrumbs__carot" />
+        <LinkTo @route="media-registry.collection" @model={{@model.fromCollectionId}} @class="breadcrumbs__pill">
+          {{titleize (humanize @model.fromCollectionId)}}
+        </LinkTo>
+      {{/if}}
       <span class="breadcrumbs__carot" />
-      <LinkTo @route="media-registry.collection" @model={{@model.fromCollectionId}} @class="breadcrumbs__pill">
-        {{titleize (humanize @model.fromCollectionId)}}
-      </LinkTo>
-    {{/if}}
-    <span class="breadcrumbs__carot" />
-    <button {{on "click" this.transitionToView}} class="breadcrumbs__pill {{if (not-eq this.target.currentRouteName "media-registry.item.musical-work") "breadcrumbs__pill--current"}}">Music Detail</button>
+      <button {{on "click" this.transitionToView}} class="breadcrumbs__pill {{if (not-eq this.target.currentRouteName "media-registry.item.musical-work") "breadcrumbs__pill--current"}}">Music Detail</button>
+      {{#if (eq this.target.currentRouteName "media-registry.item.musical-work")}}
+        <span class="breadcrumbs__carot" />
+        <button {{on "click" this.transitionToMusicalWork}} class="breadcrumbs__pill breadcrumbs__pill--current">Musical Work</button>
+      {{/if}}
+    </div>
+
     {{#if (eq this.target.currentRouteName "media-registry.item.musical-work")}}
-      <span class="breadcrumbs__carot" />
-      <button {{on "click" this.transitionToMusicalWork}} class="breadcrumbs__pill breadcrumbs__pill--current">Musical Work</button>
+      <Boxel>
+        {{!-- Detail Card Layout --}}
+        <div class="detail-card__layout detail-card__layout--stacked">
+
+          {{!-- Detail Card --}}
+          <Boxel @class="detail-card detail-card--stacked">
+            <header class="detail-card__header">
+              <div>Music Detail - {{this.model.song_title}}</div>
+              <button {{on "click" this.transitionToView}} class="breadcrumbs__pill">Back to Music Detail</button>
+            </header>
+            <div class="detail-card__body" />
+          </Boxel>
+        </div>
+
+        {{!-- Nested Detail Card --}}
+        {{outlet}}
+      </Boxel>
+
+    {{else}}
+      {{!-- Detail Card Layout --}}
+      <section class="detail-card__layout">
+        <MusicDetailCard
+          @mode="view"
+          @model={{this.model}}
+          @itemId={{this.itemId}}
+          @displayFullHeader={{true}}
+          @expandAction={{this.transitionToMusicalWork}}
+        >
+          <BoxelActions
+            @class="media-collection__btn-overlay"
+            @displayHighlightActions={{true}}
+            @btnLeft="mode-btn"
+            @btnLeftContent="Edit"
+            @btnLeftAction={{this.transitionToEdit}}
+            @btnRight="version-history"
+            @routeModel={{@model}}
+          />
+        </MusicDetailCard>
+
+        {{!-- Related Cards Sidebar --}}
+        <aside class="item__sidebar">
+          <h3 class="item__sidebar-title">In these collections</h3>
+          <div>
+            {{#each @model.catalog as |catalog i|}}
+              <SidebarRelatedCard
+                @type="catalog"
+                @title={{catalog}}
+                @route="media-registry.collection"
+                @routeModel={{dasherize (trim catalog)}}
+                @subtitle={{get @model.catalogSubtitles i}}
+                @count={{get @model.catalogCounts i}} />
+            {{/each}}
+          </div>
+        </aside>
+      </section>
     {{/if}}
   </div>
 
-  {{#if (eq this.target.currentRouteName "media-registry.item.musical-work")}}
-    <Boxel>
-      {{!-- Detail Card Layout --}}
-      <div class="detail-card__layout detail-card__layout--stacked">
-
-        {{!-- Detail Card --}}
-        <Boxel @class="detail-card detail-card--stacked">
-          <header class="detail-card__header">
-            <div>Music Detail - {{this.model.song_title}}</div>
-            <button {{on "click" this.transitionToView}} class="breadcrumbs__pill">Back to Music Detail</button>
-          </header>
-          <div class="detail-card__body" />
-        </Boxel>
-      </div>
-
-      {{!-- Nested Detail Card --}}
-      {{outlet}}
-    </Boxel>
-
-  {{else}}
-    {{!-- Detail Card Layout --}}
-    <section class="detail-card__layout">
-
-      {{!-- Detail Card --}}
-      <Boxel @tag="section" @class="detail-card">
-        <BoxelActions
-          @class="media-collection__btn-overlay"
-          @displayHighlightActions={{true}}
-          @btnLeft="mode-btn"
-          @btnLeftContent="Edit"
-          @btnLeftAction={{this.transitionToEdit}}
-          @btnRight="version-history"
-        />
-
-        {{!-- Detail Card Special Header --}}
-        <header class="item__header" {{blurhash-decoder @model.blur_img 945 370}}>
-          <div class="item__header-content">
-            <div class="item__img" style={{css-url "background-image" @model.cover_art_medium}}>
-              <button class="item__play-btn">{{svg-jar "play-btn" width="60px" height="60px"}}</button>
-            </div>
-            <h1 class="item__title">{{@model.song_title}}</h1>
-            <h2 class="item__artist">{{@model.artist}}</h2>
-            <ul class="item__header-details">
-              {{#each this.headerDetailFields as |field|}}
-                <li>
-                  <FieldRenderer
-                    @class="item-header-field"
-                    @mode="view"
-                    @field={{field}}
-                  />
-                </li>
-              {{/each}}
-            </ul>
-          </div>
-        </header>
-
-        {{!-- Detail Card Section --}}
-        <MediaDetail @model={{@model}} @mode="view" @expandAction={{this.transitionToMusicalWork}} />
-      </Boxel>
-
-      {{!-- Related Cards Sidebar --}}
-      <aside class="item__sidebar">
-        <h3 class="item__sidebar-title">In these collections</h3>
-        <div>
-          {{#each @model.catalog as |catalog i|}}
-            <SidebarRelatedCard
-              @type="catalog"
-              @title={{catalog}}
-              @route="media-registry.collection"
-              @routeModel={{dasherize (trim catalog)}}
-              @subtitle={{get @model.catalogSubtitles i}}
-              @count={{get @model.catalogCounts i}} />
-          {{/each}}
-        </div>
-      </aside>
-    </section>
+  {{!-- Edit modal --}}
+  {{#if (not-eq this.target.currentRouteName "media-registry.item.musical-work")}}
+    {{outlet}}
   {{/if}}
-</div>
-
-{{!-- Edit modal --}}
-{{#if (not-eq this.target.currentRouteName "media-registry.item.musical-work")}}
-  {{outlet}}
 {{/if}}

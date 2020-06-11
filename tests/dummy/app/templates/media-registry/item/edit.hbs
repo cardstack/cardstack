@@ -11,7 +11,13 @@
 
   <div class="item-edit__scroll-container">
     <div class="item-edit__body-plate">
-      <MediaDetail @model={{@model}} @mode="edit" @expandAction={{this.transitionToMusicalWork}} />
+      <MusicDetailCard
+        @mode="edit"
+        @model={{@model}}
+        @itemId={{this.itemId}}
+        @expandAction={{this.transitionToMusicalWork}}
+      >
+      </MusicDetailCard>
     </div>
   </div>
 </BoxelModal>

@@ -8,6 +8,7 @@ export default class MediaRegistryItemRoute extends Route {
     const recordDetails = await fetchCollection('songs_by_pia_midina_bb_clarke_table_1');
     const profiles = await fetchCollection('profiles');
     const musicalWorks = await fetchCollection('musical-works');
+    const versionHistory = await fetchCollection('leaves-version-history');
 
     const record = records.filter(item => {
       if (item.catalog) {
@@ -25,6 +26,10 @@ export default class MediaRegistryItemRoute extends Route {
 
     if (artist) {
       record.artist_info = artist;
+    }
+
+    if (versionHistory) {
+      record.versions = versionHistory;
     }
 
     if (recordDetail) {

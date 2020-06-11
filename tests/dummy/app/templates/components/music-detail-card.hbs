@@ -1,0 +1,31 @@
+<DetailCard
+  @class={{@class}}
+  @detailSections={{this.detailSections}}
+  @expandAction={{@expandAction}}
+  @mode={{@mode}}
+>
+  {{#if @displayFullHeader}}
+    <header class="item__header" style={{css-url "background-image" @model.cover_art_large}} {{!--blurhash-decoder @model.blur_img 945 370--}}>
+      <div class="item__header-content">
+        <div class="item__img" style={{css-url "background-image" @model.cover_art_medium}}>
+          <button class="item__play-btn">{{svg-jar "play-btn" width="60px" height="60px"}}</button>
+        </div>
+        <h1 class="item__title">{{@model.song_title}}</h1>
+        <h2 class="item__artist">{{@model.artist}}</h2>
+        <ul class="item__header-details">
+          {{#each this.headerDetailFields as |field|}}
+            <li>
+              <FieldRenderer
+                @class="item-header-field"
+                @mode={{@mode}}
+                @field={{field}}
+              />
+            </li>
+          {{/each}}
+        </ul>
+      </div>
+    </header>
+  {{/if}}
+
+  {{yield}}
+</DetailCard>

@@ -1,28 +1,11 @@
 import Controller from '@ember/controller';
 import { action } from '@ember/object';
 import { dasherize } from '@ember/string';
-import { truncateVerifiId } from '@cardstack/boxel/utils/truncate-verifi-id';
 
 export default class MediaRegistryItemController extends Controller {
-  get headerDetailFields() {
-    return [
-      {
-        title: 'catalog no.',
-        value: this.model?.details?.catalog_no
-      },
-      {
-        title: 'verifi id',
-        value: truncateVerifiId(this.model?.details?.verifi_id)
-      },
-      {
-        title: 'label',
-        value: this.model.owner
-      },
-    ];
-  }
-
   get itemId() {
-    return dasherize(this.model?.song_title.trim());
+    if (!this.model || !this.model.song_title) { return null; }
+    return String(dasherize(this.model.song_title.trim()));
   }
 
   @action

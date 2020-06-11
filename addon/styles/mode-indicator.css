@@ -5,7 +5,8 @@
   --mode-icon-position: left 13px top 12px;
   --mode-icon-size: 1rem 1rem;
 
-  display: block;
+  display: grid;
+  align-items: center;
   width: var(--mode-container-width);
   max-width: 100%;
   height: var(--mode-container-height);
@@ -38,6 +39,9 @@
 }
 .mode-indicator--preview {
   --mode-icon: url('/assets/images/icons/eye.svg');
+}
+.mode-indicator--revision {
+  --mode-icon: url('/assets/images/icons/clock.svg');
 }
 
 .mode-indicator:hover,

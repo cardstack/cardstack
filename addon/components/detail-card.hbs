@@ -1,0 +1,12 @@
+<Boxel @tag="section" @class="detail-card {{@class}}">
+  {{yield}}
+
+  {{#each @detailSections as |s|}}
+    <MediaDetail
+      @title={{s.title}}
+      @fields={{s.content}}
+      @mode={{@mode}}
+      @expandAction={{@expandAction}}
+    />
+  {{/each}}
+</Boxel>

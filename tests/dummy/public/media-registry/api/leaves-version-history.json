@@ -1,0 +1,463 @@
+[
+  {
+    "id": 1,
+    "record_id": "the-leaves-are-changing-color",
+    "published": "2020-01-16T18:30:00Z",
+    "description": "Recorded",
+    "card_model": {
+      "song_title": "The leaves are changing color",
+      "artist": "Pia Midina",
+      "owner": "Bunny Records",
+      "genre": "Alternative",
+      "length": "3:23",
+      "details": {
+        "label": "Bunny Records",
+        "isrc": "US-S1Z-22-05001",
+        "iswc_id": "T-030248890-1",
+        "catalog_no": "BRN-19230-1239049",
+        "verifi_id": "0x9b2138a6c17e6da2d9cd3303fe7b26079231184ac2f1b6537a11e2301b74ca26",
+        "subgenre": "Dream Pop",
+        "language": ["English (en_US)"],
+        "parental_advisory": "No",
+        "copyright_notice": "℗ 2020 Bunny Records",
+        "recording_date": "2020-01-16"
+      },
+      "artist_info": {
+        "id": "pia-midina",
+        "type": "profile",
+        "title": "Pia Midina",
+        "description": "Recording artist & lyricist",
+        "imgURL": "media-registry/profiles/Pia-Midina.jpg",
+        "organization": "verifi",
+        "fields": [
+          {
+            "title": "ipi #",
+            "value": "618723194"
+          },
+          {
+            "title": "email",
+            "value": "pia.midina@gmail.com"
+          },
+          {
+            "title": "website",
+            "value": "www.piamidina.com"
+          }
+        ]
+      },
+      "musicalWork": {
+        "artist": "Pia Midina",
+        "artist_id": "pia-midina",
+        "composer": "Miles Ponia",
+        "composer_id": "miles-ponia",
+        "copyright_notice": "© 2020 RealTunes Publishing",
+        "iswc": "T-030248890-1",
+        "publisher": "RealTunes Publishing",
+        "title": "The leaves are changing color",
+        "type": "musical-work",
+        "verifi_id": "0x1b8932b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d8923ba",
+        "version_type": "Original work"
+      },
+      "agreementCard": "N/A"
+    }
+  },
+  {
+    "id": 2,
+    "published": "2020-02-17T10:15:00Z",
+    "record_id": "the-leaves-are-changing-color",
+    "description": "2020 release confirmed",
+    "addedFields": [ "year", "background_singer" ],
+    "card_model": {
+      "song_title": "The leaves are changing color",
+      "artist": "Pia Midina",
+      "owner": "Bunny Records",
+      "genre": "Alternative",
+      "length": "3:23",
+      "details": {
+        "label": "Bunny Records",
+        "isrc": "US-S1Z-22-05001",
+        "iswc_id": "T-030248890-1",
+        "catalog_no": "BRN-19230-1239049",
+        "verifi_id": "0x9b2138a6c17e6da2d9cd3303fe7b26079231184ac2f1b6537a11e2301b74ca26",
+        "subgenre": "Dream Pop",
+        "language": ["English (en_US)"],
+        "year": "2020",
+        "parental_advisory": "No",
+        "copyright_notice": "℗ 2020 Bunny Records",
+        "recording_date": "2020-01-16",
+        "background_singer": "Jenny Sparks"
+      },
+      "artist_info": {
+        "id": "pia-midina",
+        "type": "profile",
+        "title": "Pia Midina",
+        "description": "Recording artist & lyricist",
+        "imgURL": "media-registry/profiles/Pia-Midina.jpg",
+        "organization": "verifi",
+        "fields": [
+          {
+            "title": "ipi #",
+            "value": "618723194"
+          },
+          {
+            "title": "email",
+            "value": "pia.midina@gmail.com"
+          },
+          {
+            "title": "website",
+            "value": "www.piamidina.com"
+          }
+        ]
+      },
+      "musicalWork": {
+        "artist": "Pia Midina",
+        "artist_id": "pia-midina",
+        "composer": "Miles Ponia",
+        "composer_id": "miles-ponia",
+        "copyright_notice": "© 2020 RealTunes Publishing",
+        "iswc": "T-030248890-1",
+        "publisher": "RealTunes Publishing",
+        "title": "The leaves are changing color",
+        "type": "musical-work",
+        "verifi_id": "0x1b8932b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d8923ba",
+        "version_type": "Original work"
+      },
+      "agreementCard": "N/A"
+    }
+  },
+  {
+    "id": 3,
+    "published": "2020-02-21T16:14:00Z",
+    "record_id": "the-leaves-are-changing-color",
+    "description": "Updated based on credible rumor",
+    "addedFields": [ ],
+    "changedFields": [ ],
+    "card_model": {
+      "song_title": "Fall is back",
+      "artist": "Pia Midina",
+      "album": "Autumn Leaves",
+      "type_of_album": "EP",
+      "owner": "Bunny Records",
+      "genre": "Alternative",
+      "length": "3:23",
+      "cover_art": "media-registry/covers/Autumn-Leaves.jpg",
+      "cover_art_thumb": "media-registry/covers/thumb/Autumn-Leaves.jpg",
+      "cover_art_medium": "media-registry/covers/medium/Autumn-Leaves.jpg",
+      "cover_art_large": "media-registry/covers/large/Autumn-Leaves.jpg",
+      "details": {
+        "label": "Bunny Records",
+        "isrc": "US-S1Z-22-05001",
+        "iswc_id": "T-030248890-1",
+        "catalog_no": "BRN-19230-1239049",
+        "verifi_id": "0x9b2138a6c17e6da2d9cd3303fe7b26079231184ac2f1b6537a11e2301b74ca26",
+        "subgenre": "Dream Pop",
+        "language": ["English (en_US)"],
+        "year": "2020",
+        "parental_advisory": "No",
+        "copyright_notice": "℗ 2020 Bunny Records",
+        "recording_date": "2020-01-16",
+        "background_singer": "Jenny Sparks"
+      },
+      "artist_info": {
+        "id": "pia-midina",
+        "type": "profile",
+        "title": "Pia Midina",
+        "description": "Recording artist & lyricist",
+        "imgURL": "media-registry/profiles/Pia-Midina.jpg",
+        "organization": "verifi",
+        "fields": [
+          {
+            "title": "ipi #",
+            "value": "618723194"
+          },
+          {
+            "title": "email",
+            "value": "pia.midina@gmail.com"
+          },
+          {
+            "title": "website",
+            "value": "www.piamidina.com"
+          }
+        ]
+      },
+      "musicalWork": {
+        "artist": "Pia Midina",
+        "artist_id": "pia-midina",
+        "composer": "Miles Ponia",
+        "composer_id": "miles-ponia",
+        "copyright_notice": "© 2020 RealTunes Publishing",
+        "iswc": "T-030248890-1",
+        "publisher": "RealTunes Publishing",
+        "title": "The leaves are changing color",
+        "type": "musical-work",
+        "verifi_id": "0x1b8932b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d8923ba",
+        "version_type": "Original work"
+      },
+      "agreementCard": "N/A"
+    }
+  },
+  {
+    "id": 4,
+    "published": "2020-02-25T18:06:00Z",
+    "record_id": "the-leaves-are-changing-color",
+    "description": "Official announcement",
+    "addedFields": [ ],
+    "changedFields": [ ],
+    "card_model": {
+      "song_title": "The leaves are changing color",
+      "artist": "Pia Midina",
+      "album": "Autumn Leaves",
+      "type_of_album": "EP",
+      "owner": "Bunny Records",
+      "genre": "Alternative",
+      "length": "3:23",
+      "cover_art": "media-registry/covers/Autumn-Leaves.jpg",
+      "cover_art_thumb": "media-registry/covers/thumb/Autumn-Leaves.jpg",
+      "cover_art_medium": "media-registry/covers/medium/Autumn-Leaves.jpg",
+      "cover_art_large": "media-registry/covers/large/Autumn-Leaves.jpg",
+      "details": {
+        "label": "Bunny Records",
+        "isrc": "US-S1Z-22-05001",
+        "iswc_id": "T-030248890-1",
+        "catalog_no": "BRN-19230-1239049",
+        "verifi_id": "0x9b2138a6c17e6da2d9cd3303fe7b26079231184ac2f1b6537a11e2301b74ca26",
+        "subgenre": "Dream Pop",
+        "language": ["English (en_US)"],
+        "year": "2020",
+        "parental_advisory": "No",
+        "copyright_notice": "℗ 2020 Bunny Records",
+        "recording_date": "2020-01-16",
+        "background_singer": "Jenny Sparks"
+      },
+      "artist_info": {
+        "id": "pia-midina",
+        "type": "profile",
+        "title": "Pia Midina",
+        "description": "Recording artist & lyricist",
+        "imgURL": "media-registry/profiles/Pia-Midina.jpg",
+        "organization": "verifi",
+        "fields": [
+          {
+            "title": "ipi #",
+            "value": "618723194"
+          },
+          {
+            "title": "email",
+            "value": "pia.midina@gmail.com"
+          },
+          {
+            "title": "website",
+            "value": "www.piamidina.com"
+          }
+        ]
+      },
+      "musicalWork": {
+        "artist": "Pia Midina",
+        "artist_id": "pia-midina",
+        "composer": "Miles Ponia",
+        "composer_id": "miles-ponia",
+        "copyright_notice": "© 2020 RealTunes Publishing",
+        "iswc": "T-030248890-1",
+        "publisher": "RealTunes Publishing",
+        "title": "The leaves are changing color",
+        "type": "musical-work",
+        "verifi_id": "0x1b8932b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d8923ba",
+        "version_type": "Original work"
+      },
+      "agreementCard": "N/A"
+    }
+  },
+  {
+    "id": 5,
+    "published": "2020-04-16T14:22:00Z",
+    "record_id": "the-leaves-are-changing-color",
+    "description": "Retail stores’ sales figures released",
+    "addedFields": [ ],
+    "changedFields": [ ],
+    "card_model": {
+      "song_title": "The leaves are changing color",
+      "artist": "Pia Midina",
+      "album": "Autumn Leaves",
+      "type_of_album": "EP",
+      "owner": "Bunny Records",
+      "genre": "Alternative",
+      "length": "3:23",
+      "cover_art": "media-registry/covers/Autumn-Leaves.jpg",
+      "cover_art_thumb": "media-registry/covers/thumb/Autumn-Leaves.jpg",
+      "cover_art_medium": "media-registry/covers/medium/Autumn-Leaves.jpg",
+      "cover_art_large": "media-registry/covers/large/Autumn-Leaves.jpg",
+      "details": {
+        "label": "Bunny Records",
+        "isrc": "US-S1Z-22-05001",
+        "iswc_id": "T-030248890-1",
+        "catalog_no": "BRN-19230-1239049",
+        "verifi_id": "0x9b2138a6c17e6da2d9cd3303fe7b26079231184ac2f1b6537a11e2301b74ca26",
+        "subgenre": "Dream Pop",
+        "language": ["English (en_US)"],
+        "year": "2020",
+        "parental_advisory": "No",
+        "copyright_notice": "℗ 2020 Bunny Records",
+        "recording_date": "2020-01-16",
+        "original_release_date": "2020-03-02",
+        "background_singer": "Jenny Sparks, Sophia Lanagan, Helen Gellar",
+        "sales": [
+          {
+            "title": "United States",
+            "value": "$117M"
+          },
+          {
+            "title": "International",
+            "value": "$250M"
+          },
+          {
+            "title": "Total",
+            "value": "$367M"
+          }
+        ]
+      },
+      "artist_info": {
+        "id": "pia-midina",
+        "type": "profile",
+        "title": "Pia Midina",
+        "description": "Recording artist & lyricist",
+        "imgURL": "media-registry/profiles/Pia-Midina.jpg",
+        "organization": "verifi",
+        "fields": [
+          {
+            "title": "ipi #",
+            "value": "618723194"
+          },
+          {
+            "title": "email",
+            "value": "pia.midina@gmail.com"
+          },
+          {
+            "title": "website",
+            "value": "www.piamidina.com"
+          }
+        ]
+      },
+      "musicalWork": {
+        "artist": "Pia Midina",
+        "artist_id": "pia-midina",
+        "composer": "Miles Ponia",
+        "composer_id": "miles-ponia",
+        "copyright_notice": "© 2020 RealTunes Publishing",
+        "iswc": "T-030248890-1",
+        "publisher": "RealTunes Publishing",
+        "title": "The leaves are changing color",
+        "type": "musical-work",
+        "verifi_id": "0x1b8932b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d8923ba",
+        "version_type": "Original work"
+      },
+      "agreementCard": "N/A"
+    }
+  },
+  {
+    "id": 6,
+    "published": "2020-04-16T14:22:00Z",
+    "record_id": "the-leaves-are-changing-color",
+    "description": "Retail stores’ sales figures released",
+    "addedFields": [ ],
+    "changedFields": [ ],
+    "card_model": {
+      "song_title": "The leaves are changing color",
+      "artist": "Pia Midina",
+      "album": "Autumn Leaves",
+      "type_of_album": "EP",
+      "genre": "Alternative",
+      "length": "3:23",
+      "owner": "Bunny Records",
+      "cover_art": "media-registry/covers/Autumn-Leaves.jpg",
+      "cover_art_thumb": "media-registry/covers/thumb/Autumn-Leaves.jpg",
+      "cover_art_medium": "media-registry/covers/medium/Autumn-Leaves.jpg",
+      "cover_art_large": "media-registry/covers/large/Autumn-Leaves.jpg",
+      "details": {
+        "isrc": "US-S1Z-22-05001",
+        "producer": "Francesco Midina",
+        "producer_id": "francesco-midina",
+        "iswc_id": "T-030248890-1",
+        "catalog_no": "BRN-19230-1239049",
+        "verifi_id": "0x9b2138a6c17e6da2d9cd3303fe7b26079231184ac2f1b6537a11e2301b74ca26",
+        "subgenre": "Dream Pop",
+        "language": ["English (en_US)"],
+        "year": "2020",
+        "parental_advisory": "No",
+        "copyright_notice": "℗ 2020 Bunny Records",
+        "congress_id": "SR0000320716",
+        "recording_date": "2020-01-16",
+        "original_release_date": "2020-03-02",
+        "mastering_engineer": "Joel Kaplan",
+        "mixing_engineer": "Mariah Solis",
+        "recording_engineer": "Ian Adams",
+        "background_singer": "Jenny Sparks, Sophia Lanagan, Helen Gellar",
+        "sales": [
+          {
+            "title": "United States",
+            "value": "$118M"
+          },
+          {
+            "title": "International",
+            "value": "$251M"
+          },
+          {
+            "title": "Total",
+            "value": "$369M"
+          }
+        ]
+      },
+      "artist_info": {
+        "id": "pia-midina",
+        "type": "profile",
+        "title": "Pia Midina",
+        "description": "Recording artist & lyricist",
+        "imgURL": "media-registry/profiles/Pia-Midina.jpg",
+        "organization": "verifi",
+        "fields": [
+          {
+            "title": "ipi #",
+            "value": "618723194"
+          },
+          {
+            "title": "email",
+            "value": "pia.midina@gmail.com"
+          },
+          {
+            "title": "website",
+            "value": "www.piamidina.com"
+          }
+        ]
+      },
+      "producer": {
+        "id": "francesco-midina",
+        "type": "profile",
+        "title": "Francesco Midina",
+        "description": "Producer",
+        "imgURL": "media-registry/profiles/francesco-midina.jpg",
+        "organization": "verifi",
+        "fields": [
+          {
+            "title": "website",
+            "value": "www.francesco.rocks"
+          },
+          {
+            "title": "no. of recordings",
+            "value": 168
+          }
+        ]
+      },
+      "musicalWork": {
+        "artist": "Pia Midina",
+        "artist_id": "pia-midina",
+        "composer": "Miles Ponia",
+        "composer_id": "miles-ponia",
+        "copyright_notice": "© 2020 RealTunes Publishing",
+        "iswc": "T-030248890-1",
+        "publisher": "RealTunes Publishing",
+        "title": "The leaves are changing color",
+        "type": "musical-work",
+        "verifi_id": "0x1b8932b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d8923ba",
+        "version_type": "Original work"
+      }
+    }
+  }
+]

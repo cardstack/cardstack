@@ -1,20 +1,24 @@
-<section class="media-registry media-registry--{{@model.id}}">
-  <aside class="media-registry__left-edge">
-    <LeftEdgeNav @orgs={{@model.orgs}} @current={{@model.id}} @currentRouteName={{this.target.currentRouteName}} />
-  </aside>
-  <header class="media-registry__header media-registry__header--sm">
-    <h1 class="media-registry__title">
-      <span class="media-registry__logo" style={{css-url "background-image" @model.logoURL}} />
-      <span>{{@model.company}}</span>
-    </h1>
-    <input class="media-registry__search-bar" type="search" placeholder="Search" />
-    <nav class="media-registry__nav">
-      <ul>
-        <li><LinkTo @class={{if (eq this.target.currentRouteName "media-registry.agreements") "unselected" "active"}} @route="media-registry" @model={{@model.id}}>Masters</LinkTo></li>
-        <li><LinkTo @route="media-registry.agreements" @model={{@model.id}}>Agreements</LinkTo></li>
-      </ul>
-    </nav>
-  </header>
-
+{{#if (eq this.target.currentRouteName "media-registry.item.versions")}}
   {{outlet}}
-</section>
+{{else}}
+  <section class="media-registry media-registry--{{@model.id}}">
+    <aside class="media-registry__left-edge">
+      <LeftEdgeNav @orgs={{@model.orgs}} @current={{@model.id}} @currentRouteName={{this.target.currentRouteName}} />
+    </aside>
+    <header class="media-registry__header media-registry__header--sm">
+      <h1 class="media-registry__title">
+        <span class="media-registry__logo" style={{css-url "background-image" @model.logoURL}} />
+        <span>{{@model.company}}</span>
+      </h1>
+      <input class="media-registry__search-bar" type="search" placeholder="Search" />
+      <nav class="media-registry__nav">
+        <ul>
+          <li><LinkTo @class={{if (eq this.target.currentRouteName "media-registry.agreements") "unselected" "active"}} @route="media-registry" @model={{@model.id}}>Masters</LinkTo></li>
+          <li><LinkTo @route="media-registry.agreements" @model={{@model.id}}>Agreements</LinkTo></li>
+        </ul>
+      </nav>
+    </header>
+
+    {{outlet}}
+  </section>
+{{/if}}

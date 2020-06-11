@@ -37,7 +37,7 @@ export default class RegistrationEmbedded extends Component {
           },
           {
             title: 'created',
-            value: this.args.model.asset_type ? '2019-03-03' : '2020-02-17',
+            value: this.args.model.asset_type ? '2019-03-03' : '2020-01-16',
             type: 'date'
           },
         ]

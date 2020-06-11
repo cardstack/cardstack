@@ -29,9 +29,10 @@
 
 /* Header */
 .item__header {
-  padding: 60px 50px 50px;
+  background-color: #AFAFB7;
   background-image: var(--blurhash-image);
   background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
   border-radius: 10px 10px 0 0;
 }
@@ -39,12 +40,15 @@
 .item__header-content {
   max-width: 945px;
   max-height: 370px;
+  padding: 60px 50px 50px;
   display: grid;
   grid-template:
     "img title"   2fr
     "img artist"  1fr
     "img details" 1fr / minmax(160px, 260px) 1fr;
-  gap: 0 30px;
+  gap: 0 20px;
+  backdrop-filter: brightness(0.75) blur(50px) contrast(1.2);
+  border-radius: 10px 10px 0 0;
 }
 
 .item__img {
