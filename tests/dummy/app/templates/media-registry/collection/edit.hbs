@@ -7,8 +7,8 @@
         <div class="collection__img" style={{css-url "background-image" item.cover_art_medium}}>
           <button class="collection__play-btn">{{svg-jar "play-btn" width="60px" height="60px"}}</button>
         </div>
-        <h3 class="collection__title">{{item.song_title}}</h3>
-        <div class="collection__artist">{{item.artist}}</div>
+        <h3 class="collection__title">{{titleize item.song_title}}</h3>
+        <div class="collection__artist">{{titleize item.artist}}</div>
       </div>
     </Boxel>
     <div class="collection-editor__btn-group">

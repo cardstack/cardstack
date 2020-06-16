@@ -4,7 +4,9 @@
   <Boxel class="boxel-card__container">
     {{#if @model.fields}}
       <div class="card__gradient" />
-      <IconButton {{on "click" this.expandAction}} @icon="expand" @class="boxel-card__expand-btn" />
+    {{/if}}
+    {{#if @expandAction}}
+      <IconButton {{on "click" @expandAction}} @icon="expand" @class="boxel-card__expand-btn" />
     {{/if}}
     <div class="boxel-card boxel-card--default boxel-card--{{@variant}} boxel-card--{{@model.type}} boxel-card--{{or @format "list"}} {{if @model.imgURL "boxel-card--with-img"}}">
       {{#if @model.imgURL}}
@@ -13,7 +15,7 @@
         {{/if}}
         <div class="boxel-card__bg-img" style={{css-url "background-image" @model.imgURL}} />
       {{/if}}
-      <h3 class="boxel-card__title">{{@model.title}}</h3>
+      <h3 class="boxel-card__title">{{if (eq @type "musical-work") (titleize @model.title) @model.title}}</h3>
       {{#if @model.description}}
         <p class="boxel-card__description">{{@model.description}} {{#if @model.descriptionDate}}{{moment-format @model.descriptionDate "MMM DD, YYYY" "YYYY-MM-DD"}}{{/if}}</p>
       {{/if}}

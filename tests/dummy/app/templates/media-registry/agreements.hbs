@@ -26,7 +26,6 @@
         <FieldRenderer
           @mode={{if (or (not this.status) (eq this.status "create")) "edit" "view"}}
           @field={{field}}
-          @expandAction={{@expandAction}}
           @class="agreements-edit-field"
         />
       {{/each}}

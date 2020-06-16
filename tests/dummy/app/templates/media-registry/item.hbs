@@ -13,10 +13,10 @@
         </LinkTo>
       {{/if}}
       <span class="breadcrumbs__carot" />
-      <button {{on "click" this.transitionToView}} class="breadcrumbs__pill {{if (not-eq this.target.currentRouteName "media-registry.item.musical-work") "breadcrumbs__pill--current"}}">Music Detail</button>
+      <button {{on "click" this.transitionToView}} class="breadcrumbs__pill {{if (not-eq this.target.currentRouteName "media-registry.item.musical-work") "breadcrumbs__pill--current"}}">Master Detail</button>
       {{#if (eq this.target.currentRouteName "media-registry.item.musical-work")}}
         <span class="breadcrumbs__carot" />
-        <button {{on "click" this.transitionToMusicalWork}} class="breadcrumbs__pill breadcrumbs__pill--current">Musical Work</button>
+        <div class="breadcrumbs__pill breadcrumbs__pill--current">Musical Work</div>
       {{/if}}
     </div>
 
@@ -28,8 +28,8 @@
           {{!-- Detail Card --}}
           <Boxel @class="detail-card detail-card--stacked">
             <header class="detail-card__header">
-              <div>Music Detail - {{this.model.song_title}}</div>
-              <button {{on "click" this.transitionToView}} class="breadcrumbs__pill">Back to Music Detail</button>
+              <div>Master Detail - {{titleize this.model.song_title}}</div>
+              <button {{on "click" this.transitionToView}} class="breadcrumbs__pill">Back to Master Detail</button>
             </header>
             <div class="detail-card__body" />
           </Boxel>
@@ -47,7 +47,6 @@
           @model={{this.model}}
           @itemId={{this.itemId}}
           @displayFullHeader={{true}}
-          @expandAction={{this.transitionToMusicalWork}}
         >
           <BoxelActions
             @class="media-collection__btn-overlay"

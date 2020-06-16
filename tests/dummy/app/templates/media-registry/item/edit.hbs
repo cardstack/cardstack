@@ -1,7 +1,7 @@
 <BoxelModal @onClose={{this.transitionToView}}>
   <header class="item-edit__sticky-header">
     <div>
-      <h1 class="item-edit__title">{{humanize @model.song_title}}</h1>
+      <h1 class="item-edit__title">{{titleize (humanize @model.song_title)}}</h1>
       <h2 class="item-edit__description">Original Recording</h2>
     </div>
     <button {{on "click" this.transitionToView}} class="item-edit__mode-btn mode-indicator mode-indicator--edit">
@@ -15,7 +15,6 @@
         @mode="edit"
         @model={{@model}}
         @itemId={{this.itemId}}
-        @expandAction={{this.transitionToMusicalWork}}
       >
       </MusicDetailCard>
     </div>

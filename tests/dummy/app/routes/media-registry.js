@@ -52,6 +52,7 @@ export default class MediaRegistryRoute extends Route {
           name: 'Masters',
           valuePath: 'number_of_songs',
           width: 250,
+          isSortable: false
         },
         {
           name: 'Top Artists',

@@ -2,6 +2,9 @@ import Component from '@glimmer/component';
 import { action, set } from '@ember/object';
 
 export default class MediaCollectionTableComponent extends Component {
+  titleCaseFields = ["song_title", "album", "catalog_title"];
+  dateFields = ["date_created", "date_updated"];
+
   @action
   toggleSelect(item) {
     let collection = this.args.collection;
