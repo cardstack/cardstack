@@ -1,7 +1,6 @@
 <DetailCard
   @class={{@class}}
   @detailSections={{this.detailSections}}
-  @expandAction={{@expandAction}}
   @mode={{@mode}}
 >
   {{#if @displayFullHeader}}
@@ -10,7 +9,7 @@
         <div class="item__img" style={{css-url "background-image" @model.cover_art_medium}}>
           <button class="item__play-btn">{{svg-jar "play-btn" width="60px" height="60px"}}</button>
         </div>
-        <h1 class="item__title">{{@model.song_title}}</h1>
+        <h1 class="item__title">{{titleize @model.song_title}}</h1>
         <h2 class="item__artist">{{@model.artist}}</h2>
         <ul class="item__header-details">
           {{#each this.headerDetailFields as |field|}}

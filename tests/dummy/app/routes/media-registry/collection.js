@@ -30,18 +30,18 @@ export default class MediaRegistryCollectionRoute extends Route {
           width: 250,
         },
         {
-          name: 'Album',
+          name: 'Release Title',
           valuePath: 'album',
           width: 250,
         },
         {
           name: 'Artwork',
           valuePath: 'cover_art',
-          width: 250,
+          width: 175,
           isSortable: false,
         },
         {
-          name: 'Type of Album',
+          name: 'Release Type',
           valuePath: 'type_of_album',
           width: 250,
         },

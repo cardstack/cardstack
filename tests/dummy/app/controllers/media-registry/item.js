@@ -17,10 +17,4 @@ export default class MediaRegistryItemController extends Controller {
   transitionToView() {
     this.transitionToRoute('media-registry.item', this.itemId);
   }
-
-  // TODO: Fix this (currently all cards expand to musical work card)
-  @action
-  transitionToMusicalWork() {
-    this.transitionToRoute('media-registry.item.musical-work', this.itemId);
-  }
 }

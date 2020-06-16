@@ -32,6 +32,12 @@
   border-radius: 5px;
 }
 
+.cover-art-field img {
+  object-fit: cover;
+  object-position: center;
+}
+
+
 /* Taglist */
 .field-renderer__taglist-title {
   font: var(--boxel-font-sm);

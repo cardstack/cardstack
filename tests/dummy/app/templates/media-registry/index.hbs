@@ -2,7 +2,7 @@
   <MediaCollection @model={{@model}} @mode="view" @sort={{this.sort}} @transition={{this.selectOrTransition}} @removeItem={{this.removeItem}} as |item|>
     <Boxel @class="master-collection__boxel">
       <BoxelHighlight {{on "click" (fn this.selectOrTransition item)}} @class="master-collection__highlighter" @on={{item.selected}} />
-      <button {{on "click" (fn this.togglePin item)}} class="master-collection__pin-btn {{if item.pinned "pinned"}}" aria-label="pin">{{svg-jar "pin" width="22px" height="22px"}}</button>
+      {{!-- <button {{on "click" (fn this.togglePin item)}} class="master-collection__pin-btn {{if item.pinned "pinned"}}" aria-label="pin">{{svg-jar "pin" width="22px" height="22px"}}</button> --}}
       <div class="master-collection boxel-card">
         <h3 class="master-collection__title">{{item.catalog_title}}</h3>
         <div class="master-collection__desc">{{item.catalog_description}}</div>

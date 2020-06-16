@@ -5,14 +5,16 @@
         <h2 class="media-collection__title">{{humanize @model.title}}</h2>
         <button {{on "click" this.transitionToView}} class="mode-indicator mode-indicator--edit">{{@mode}} mode</button>
       {{else}}
-        <BoxelActions
-          @class="media-collection__btn-overlay"
-          @displayHighlightActions={{true}}
-          @btnLeft="mode-btn"
-          @btnLeftContent="Edit"
-          @btnLeftAction={{this.transitionToEdit}}
-          @btnRight="version-history"
-        />
+        {{#if (eq @model.type "collection")}}
+          <BoxelActions
+            @class="media-collection__btn-overlay"
+            @displayHighlightActions={{true}}
+            @btnLeft="mode-btn"
+            @btnLeftContent="Edit"
+            @btnLeftAction={{this.transitionToEdit}}
+            @btnRight="version-history"
+          />
+        {{/if}}
         <h2 class="media-collection__title">{{humanize @model.title}}</h2>
         <div class="media-collection__count">
           <span>{{this.collection.length}}</span> {{if (eq @model.type "collection") "Masters" "Collections"}}

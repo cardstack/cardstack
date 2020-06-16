@@ -10,8 +10,8 @@ export default class MusicDetailCardComponent extends Component {
   get headerDetailFields() {
     return [
       {
-        title: 'catalog no.',
-        value: this.model?.details?.catalog_no
+        title: 'isrc',
+        value: this.model?.details?.isrc
       },
       {
         title: 'verifi id',
@@ -27,7 +27,7 @@ export default class MusicDetailCardComponent extends Component {
   get detailSections() {
     return [
       {
-        title: "Recording Details",
+        title: "Master Details",
         content: this.recordingDetails
       },
       {
@@ -36,11 +36,7 @@ export default class MusicDetailCardComponent extends Component {
       },
       {
         title: "Registrations",
-        content: [ this.verifiRegistration, this.congressRegistration ]
-      },
-      {
-        title: "Key Dates",
-        content: this.keyDates
+        content: [ this.verifiRegistration ]
       },
       {
         title: "Files",
@@ -69,7 +65,7 @@ export default class MusicDetailCardComponent extends Component {
         value: this.model.song_title
       },
       {
-        title: 'writer',
+        title: 'main artist',
         value: [ this.model.artist_info || this.model.artist ]
       },
       {
@@ -96,6 +92,16 @@ export default class MusicDetailCardComponent extends Component {
           { value: 2019 },
           { value: 2020 }
         ]
+      },
+      {
+        title: 'release date',
+        value: this.model?.details?.original_release_date,
+        type: 'date'
+      },
+      {
+        title: 'recording session date',
+        value: this.model?.details?.recording_date,
+        type: 'date'
       },
       {
         title: 'parental advisory',
@@ -135,34 +141,6 @@ export default class MusicDetailCardComponent extends Component {
       title,
       value: { verifi_id }
     }
-  }
-
-  get congressRegistration() {
-    let title = 'Library of Congress';
-    let congress_id = this.model?.details?.congress_id;
-    if (!congress_id) { return { title, type: 'card' }; }
-    return {
-      id: congress_id,
-      type: 'card',
-      component: 'cards/registration-embedded',
-      title,
-      value: { congress_id, song_title: this.model.song_title }
-    }
-  }
-
-  get keyDates() {
-    return [
-      {
-        title: 'recording session date',
-        value: this.model?.details?.recording_date,
-        type: 'date'
-      },
-      {
-        title: 'original release date',
-        value: this.model?.details?.original_release_date,
-        type: 'date'
-      }
-    ];
   }
 
   get codes() {
@@ -235,33 +213,6 @@ export default class MusicDetailCardComponent extends Component {
     }
   }
 
-  get bookletCards() {
-    if (!this.model) { return null; }
-    let imgURL = this.model.cover_art_thumb || '/media-registry/album_art.svg';
-    return [
-      {
-        id: `${this.itemId}.pdf`,
-        type: 'file',
-        category: 'booklet',
-        fields: {
-          title: `${this.itemId}.pdf`,
-          imgURL,
-          date: '2020-02-16'
-        }
-      },
-      {
-        id: `${this.itemId}-translated.pdf`,
-        type: 'file',
-        category: 'booklet',
-        fields: {
-          title: `${this.itemId}-translated.pdf`,
-          imgURL,
-          date: '2020-02-16'
-        }
-      }
-    ];
-  }
-
   get audioFileCards() {
     if (!this.model) { return null; }
     return [
@@ -297,13 +248,7 @@ export default class MusicDetailCardComponent extends Component {
         value: this.coverArtCard
       },
       {
-        title: 'booklet',
-        format: 'grid',
-        type: 'collection',
-        value: this.bookletCards
-      },
-      {
-        title: 'files',
+        title: 'audio',
         type: 'collection',
         value: this.audioFileCards
       }
