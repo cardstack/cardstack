@@ -48,29 +48,50 @@
   background-image: url('/assets/images/icons/expand.svg');
 }
 
-.boxel-actions--revision-mode {
+.boxel-actions--offset {
   top: -10px;
   right: -10px;
-  background-color: #37EB77;
 }
 
-.boxel-actions__btn--revision-mode {
-  width: auto;
-  padding: 7px 15px;
-  color: black;
-  font-family: var(--boxel-font-family);
-  font-size: 11px;
-  font-weight: 600;
-  line-height: calc(15/11);
-  letter-spacing: 0.025em;
+.boxel-actions--offset.boxel-actions--deleted {
+  top: 0;
 }
 
-.boxel-actions__btn--add {
+.boxel-actions__label {
+  border-top-right-radius: 5px;
+  border-bottom-left-radius: 5px;
   width: 30px;
   height: 30px;
   padding: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.boxel-actions__label--added {
+  background-color: #37EB77;
   background-image: url('/assets/images/icons/plus.svg');
-  background-size: 9px 9px;
+}
+
+.boxel-actions__label--removed {
+  background-color: #FF5050;
+  background-image: url('/assets/images/icons/minus.svg');
+}
+
+.boxel-actions__label--changed {
+  background-color: #37EB77;
+  background-image: url('/assets/images/icons/checkmark-lg.svg');
+}
+
+.boxel-actions__label--deleted {
+  background-color: #E8E8E8;
+  background-image: url('/assets/images/icons/close.svg');
+}
+
+.boxel-actions__label--modified {
+  background-color: #FFD800;
+  background-image: url('/assets/images/icons/triangle.svg');
+  background-position: center right 9px;
+  width: auto;
 }
 
 .boxel-actions .ember-basic-dropdown-trigger {

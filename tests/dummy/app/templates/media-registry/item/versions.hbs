@@ -1,7 +1,7 @@
 <section class="versions">
   <div class="versions-grid {{if this.isCompView "versions-grid--comp-view"}}">
     <header class="versions__header">
-      <h1 class="versions__title">Master Recording - {{@model.song_title}}</h1>
+      <h1 class="versions__title">Master Recording - {{titleize @model.song_title}}</h1>
       {{#if this.isCompView}}
         <div class="versions__view">
           <div class="versions__view-selector">
@@ -52,8 +52,8 @@
               <div class="version__description">{{c.description}}</div>
               <div class="version__label">{{if (eq c.id this.latest.id) "Current"}}</div>
             </header>
-            <div class="version-card--comp-card__arrow" aria-hidden="true" />
           </div>
+          {{svg-jar "connect" class="version-card--comp-card__arrow" width="14px" height="14px"}}
         {{/let}}
         {{#let this.baseCardContent as |v|}}
           <div class="version-card version-card--base-card {{if (eq v.id this.latest.id) "current"}}">
@@ -68,6 +68,19 @@
                 @mode="view"
                 @model={{v.card_model}}
                 @itemId={{v.record_id}}
+                @noTemplate={{true}}
+                @fields={{v.card_model.fields}}
+                @displayFullHeader={{true}}
+                @comparisonMode={{true}}
+                @addedFields={{this.addedFields}}
+                @addedValues={{this.addedValues}}
+                @changedFields={{this.changedFields}}
+                @removedFields={{this.removedFields}}
+                @removedValues={{this.removedValues}}
+                @addedCards={{this.addedCards}}
+                @removedCards={{this.removedCards}}
+                @changedCards={{this.changedCards}}
+                @modifiedCard={{this.modifiedCard}}
               />
             </div>
           </div>
@@ -89,6 +102,8 @@
                 @mode="view"
                 @model={{v.card_model}}
                 @itemId={{v.record_id}}
+                @noTemplate={{true}}
+                @fields={{v.card_model.fields}}
               >
                 <AnimatedContainer class="version-card--item__header" style={{css-url "background-image" v.card_model.cover_art_large}} {{!--blurhash-decoder v.blur_img 800 370--}}>
                   {{#animated-value v watch="position" use=this.outerContent as |value|}}

@@ -32,9 +32,62 @@
   border-radius: 5px;
 }
 
+.field-renderer__value--img-field {
+  max-width: max-content;
+}
+
+.field-renderer ins {
+  text-decoration: none;
+}
+
+.field-renderer--removed {
+  opacity: 0.5;
+  text-decoration: none;
+}
+
+.field-renderer--deleted {
+  opacity: 0.5;
+  display: block;
+  padding-top: 10px;
+}
+
+.field-renderer--deleted-no-offset {
+  padding: 10px;
+}
+
+.field-renderer__placeholder.field-renderer__placeholder--album_art {
+  color: transparent;
+  width: 260px;
+  height: 260px;
+  background: url("/media-registry/album_art.svg") center/cover no-repeat;
+}
+
 .cover-art-field img {
   object-fit: cover;
   object-position: center;
+}
+
+.field-renderer__modified-count {
+  font: var(--boxel-font-xs);
+  font-weight: bold;
+  padding: 7px 28px 8px 10px;
+}
+
+.field-renderer__view-all {
+  position: relative;
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 20px 50px;
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+  text-align: right;
+  z-index: 1;
+}
+
+.field-renderer__view-all:hover {
+  cursor: pointer;
 }
 
 

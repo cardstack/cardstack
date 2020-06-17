@@ -2,6 +2,10 @@
   <Cards::File @model={{@model}} @variant={{@variant}} @format={{or @format "list"}} @mode={{@mode}} />
 {{else}}
   <Boxel class="boxel-card__container">
+    {{#if @status}}
+      <BoxelHighlight @status={{@status}} />
+      <BoxelActions @status={{@status}} />
+    {{/if}}
     {{#if @model.fields}}
       <div class="card__gradient" />
     {{/if}}

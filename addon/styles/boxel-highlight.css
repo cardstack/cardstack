@@ -22,7 +22,7 @@
   border-color: var(--boxel-highlight);
 }
 
-.boxel-highlight--revision-mode {
+.boxel-highlight--offset {
   height: auto;
   width: auto;
   top: -10px;
@@ -31,6 +31,32 @@
   bottom: -10px;
 }
 
-.boxel-highlight--revision-mode.boxel-highlight--on {
+.boxel-highlight--added,
+.boxel-highlight--changed {
   border-color: #37EB77;
+}
+
+.boxel-highlight--changed {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.boxel-highlight--removed {
+  border-color: #FF5050;
+}
+
+.boxel-highlight--deleted {
+  background-color: #E8E8E8;
+  top: 0;
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+  z-index: 0;
+}
+
+.boxel-highlight--modified {
+  border-color: #FFD800;
+}
+
+.boxel-highlight--removed ~ .boxel-card {
+  opacity: 0.5;
 }

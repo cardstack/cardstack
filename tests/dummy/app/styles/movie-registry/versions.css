@@ -35,7 +35,7 @@
 
 .versions__title {
   padding: 28px 20px 28px 35px;
-  background: url('/assets/images/icons/collection-highlighted.svg') center left/21px no-repeat;
+  background: url('/assets/images/icons/file-icon.svg') center left 5px/16px 20px no-repeat;
   color: white;
   font: var(--boxel-font);
   font-weight: 600;
@@ -324,6 +324,10 @@
   user-select: none;
 }
 
+.version-card__detail-card .item__header-content {
+  border-radius: 0;
+}
+
 
 /* Header */
 .version-card--item__header {
@@ -454,7 +458,11 @@
 /* Diff view */
 .versions__cards {
   grid-template-columns: 30px 1fr;
-  gap: 5px 15px;
+  gap: 0 15px;
+}
+
+.version-card--base-card {
+  top: -5px;
 }
 
 .version-card--base-card,
@@ -465,12 +473,15 @@
 }
 
 .version-card--comp-card .version-card__header {
-  border-radius: 10px;
+  height: 55px;
+  border-radius: 10px 10px 0 0;
 }
 
 .version-card--comp-card__arrow {
-  background: url('/assets/images/icons/connect.svg') center -7px/14px 14px no-repeat;
-  height: 7px;
+  position: relative;
+  left: 80px;
+  top: -12px;
+  z-index: 1;
 }
 
 .version-card--base-card .version-card__header {

@@ -1,11 +1,32 @@
 <section class="media-detail-section media-detail-section--{{@mode}}">
-  <h3 class="media-detail-section__title">{{@title}}</h3>
+  {{#if @title}}
+    <h3 class="media-detail-section__title">{{@title}}</h3>
+  {{/if}}
   <div class="media-detail-section__contents">
-    {{#each @fields as |field|}}
-      <FieldRenderer
-        @mode={{@mode}}
-        @field={{field}}
-      />
-    {{/each}}
+    {{#if (is-array @fields)}}
+      {{#each @fields as |field|}}
+        <FieldRenderer
+          @mode={{@mode}}
+          @field={{field}}
+        />
+      {{/each}}
+    {{else}}
+      {{#each-in @fields as |title value|}}
+        <FieldRenderer
+          @mode={{@mode}}
+          @field={{hash title=title value=value type=(if (eq title "album_art") "image" value.type) component=(if (eq value.type "musical-work") "cards/musical-work-embedded")}}
+          @comparisonMode={{@comparisonMode}}
+          @addedFields={{@addedFields}}
+          @addedValues={{@addedValues}}
+          @changedFields={{@changedFields}}
+          @removedFields={{@removedFields}}
+          @removedValues={{@removedValues}}
+          @addedCards={{@addedCards}}
+          @removedCards={{@removedCards}}
+          @changedCards={{@changedCards}}
+          @modifiedCard={{@modifiedCard}}
+        />
+      {{/each-in}}
+    {{/if}}
   </div>
 </section>

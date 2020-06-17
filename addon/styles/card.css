@@ -22,18 +22,18 @@
 .card__gradient {
   z-index: 1;
   position: absolute;
-  right: 1px;
+  right: 2px;
   bottom: 3px;
-  width: 60px;
+  width: 50px;
   height: 50px;
-  border-bottom-right-radius: 10px;
+  border-bottom-right-radius: 5px;
   background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, #fff 40%);
 }
 
 .boxel-card {
   width: 100%;
   background-color: white;
-  border-radius: 10px;
+  border-radius: 5px;
   border: var(--boxel-border);
   transition: box-shadow var(--boxel-transition);
 }

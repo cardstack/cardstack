@@ -75,12 +75,33 @@
   {{/if}}
 {{else}}
   {{!-- View Mode --}}
-  <div class="field-renderer {{lowercase (dasherize (trim @field.title))}}-field {{@class}}">
+  <Boxel @class="field-renderer {{lowercase (dasherize (trim @field.title))}}-field {{@class}}">
+    {{#if (contains @field.title @addedFields)}}
+      <BoxelHighlight @status="added" />
+      <BoxelActions @status="added" />
+    {{/if}}
     <div class="field-renderer__title">{{humanize @field.title}}</div>
-    <Boxel @class="field-renderer__value">
+    <Boxel @class="field-renderer__value {{if (eq @field.type "image") "field-renderer__value--img-field"}}">
       {{#if @field.value}}
         {{#if (or @field.component (eq @field.type "card"))}}
-          {{component (or @field.component "card") model=@field.value mode="view" variant="small"}}
+          {{#if (and @comparisonMode @field.value.id (eq @changedCards.0.value.id @field.value.id))}}
+            <div>
+              <ins>{{component (or @field.component "card") model=@field.value mode="view" variant="small" status="changed"}}</ins>
+              <Boxel>
+                <BoxelHighlight @status="deleted" />
+                <BoxelActions @status="deleted" />
+                <del class="field-renderer--deleted field-renderer--deleted-no-offset">{{@changedCards.0.oldValue}}</del>
+              </Boxel>
+            </div>
+          {{else if (and @comparisonMode @modifiedCard.value (is-equal @modifiedCard.value @field.value))}}
+            <Boxel>
+              <BoxelHighlight @status="modified" />
+              <BoxelActions @status="modified"><div class="field-renderer__modified-count">{{@modifiedCard.value.fields.length}}</div></BoxelActions>
+              {{component (or @field.component "card") model=@field.value mode="view" variant="small"}}
+            </Boxel>
+          {{else}}
+            {{component (or @field.component "card") model=@field.value mode="view" variant="small"}}
+          {{/if}}
         {{else if (eq @field.type "collection")}}
           {{#each @field.value as |val|}}
             {{component (or @field.component "card") model=val mode="view" variant="small"}}
@@ -88,9 +109,19 @@
         {{else if (is-array @field.value)}}
           {{#let (filter-by "id" @field.value) (filter-by "title" @field.value) as |collection multiTagList|}}
             {{#if collection.length}}
-              {{#each @field.value as |val|}}
-                <Card @model={{val}} @variant="small" @mode="view"}} />
-              {{/each}}
+              <EmbeddedCollection
+                @collection={{@field.value}}
+                @comparisonMode={{@comparisonMode}}
+                @addedFields={{@addedFields}}
+                @addedValues={{@addedValues}}
+                @changedFields={{@changedFields}}
+                @removedFields={{@removedFields}}
+                @removedValues={{@removedValues}}
+                @addedCards={{@addedCards}}
+                @removedCards={{@removedCards}}
+                @changedCards={{@changedCards}}
+                @modifiedCard={{@modifiedCard}}
+              />
             {{else if multiTagList.length}}
               {{#each @field.value as |val|}}
                 <div class="field-renderer__taglist-title">{{val.title}}</div>
@@ -111,17 +142,50 @@
             {{/if}}
           {{/let}}
         {{else}}
-          {{#if (eq @field.type "date")}}
-            {{moment-format @field.value "MMM DD, YYYY" "YYYY-MM-DD"}}
-          {{else if (eq @field.type "image")}}
-            <img src={{@field.value}} alt={{or @field.alt "cover art"}} width={{or @field.width "260"}} height={{or @field.height "260"}} />
+          {{#if (and @comparisonMode (find-by "title" @field.title @changedFields))}}
+            {{#with (find-by "title" @field.title @changedFields) as |changed|}}
+              {{#if (eq @field.type "image")}}
+                <Boxel>
+                  <BoxelHighlight @offsetHighlight={{true}} @status="changed" />
+                  <BoxelActions @offsetHighlight={{true}} @status="changed" />
+                  <ins><img src={{@field.value}} width="260" height="260" alt="cover" /></ins>
+                </Boxel>
+                <Boxel>
+                  <BoxelHighlight @offsetHighlight={{true}} @status="deleted" />
+                  <BoxelActions @offsetHighlight={{true}} @status="deleted" />
+                  <del class="field-renderer--deleted"><img src={{changed.oldValue}} width="260" height="260" alt="cover" /></del>
+                </Boxel>
+              {{else}}
+                <Boxel>
+                  <BoxelHighlight @offsetHighlight={{true}} @status="changed" />
+                  <BoxelActions @offsetHighlight={{true}} @status="changed" />
+                  <ins>{{if (eq @field.title "title") (titleize @field.value) @field.value}}</ins>
+                </Boxel>
+                <Boxel>
+                  <BoxelHighlight @offsetHighlight={{true}} @status="deleted" />
+                  <BoxelActions @offsetHighlight={{true}} @status="deleted" />
+                  <del class="field-renderer--deleted">{{changed.oldValue}}</del>
+                </Boxel>
+              {{/if}}
+            {{/with}}
           {{else}}
-            {{if (eq @field.title "title") (titleize @field.value) @field.value}}
+            {{#if (and @comparisonMode (contains @field.title @addedValues))}}
+              <BoxelHighlight @offsetHighlight={{true}} @status="added" />
+              <BoxelActions @offsetHighlight={{true}} @status="added" />
+            {{/if}}
+            {{#if (eq @field.type "date")}}
+              {{moment-format @field.value "MMM DD, YYYY" "YYYY-MM-DD"}}
+            {{else if (eq @field.type "image")}}
+              {{!-- Make this more generic --}}
+              <img src={{or @field.value "/media-registry/album_art.svg"}} alt="cover art" width="260" height="260" />
+            {{else}}
+              {{if (eq @field.title "title") (titleize @field.value) @field.value}}
+            {{/if}}
           {{/if}}
         {{/if}}
       {{else}}
-        N/A
+        <div class="field-renderer__placeholder field-renderer__placeholder--{{@field.title}}">N/A</div>
       {{/if}}
     </Boxel>
-  </div>
+  </Boxel>
 {{/if}}

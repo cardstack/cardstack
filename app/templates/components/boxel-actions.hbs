@@ -1,11 +1,13 @@
 {{!-- TODO: refactor --}}
-{{#if @displayHighlightActions}}
-  <div class="boxel-actions {{@class}} {{if @revisionMode "boxel-actions--revision-mode"}}" data-test-boxel-actions ...attributes>
-    {{#if @revisionMode}}
-      <div class="boxel-actions__btn boxel-actions__btn--revision-mode {{if @addedItems "boxel-actions__btn--add"}}">
-        {{yield}}
-      </div>
-    {{else if (eq @btnRight "version-history")}}
+{{#if @status}}
+  <div class="boxel-actions {{@class}} {{if @offsetHighlight "boxel-actions--offset"}} boxel-actions--{{@status}}" data-test-boxel-actions ...attributes>
+    <div class="boxel-actions__label boxel-actions__label--{{@status}}">
+      {{yield}}
+    </div>
+  </div>
+{{else if @displayHighlightActions}}
+  <div class="boxel-actions {{@class}}" data-test-boxel-actions ...attributes>
+    {{#if (eq @btnRight "version-history")}}
       <button class="boxel-actions__btn {{or @btnLeft "boxel-actions__btn--more-actions"}}" {{on "click" (or @btnLeftAction this.moreActions)}} aria-label="{{or @btnLeft "more actions"}}">{{@btnLeftContent}}</button>
       <MediaCollection::Button @class="boxel-actions__btn" @button="gear" @icon="gear">
         <ActionsMenu @routeModel={{@routeModel}} />
