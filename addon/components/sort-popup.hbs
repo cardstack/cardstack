@@ -1,5 +1,5 @@
 {{#if @sortColumns.length}}
-  <MediaCollection::Button @button="sort" @icon="sort">
+  <MediaCollection::Button @class="sort-popup {{@class}}" @button="sort" @icon="sort">
     <header>Sort by</header>
     <ul>
       {{#each @sortColumns as |column|}}

@@ -9,15 +9,15 @@
   <div class="boxel-actions {{@class}}" data-test-boxel-actions ...attributes>
     {{#if (eq @btnRight "version-history")}}
       <button class="boxel-actions__btn {{or @btnLeft "boxel-actions__btn--more-actions"}}" {{on "click" (or @btnLeftAction this.moreActions)}} aria-label="{{or @btnLeft "more actions"}}">{{@btnLeftContent}}</button>
-      <MediaCollection::Button @class="boxel-actions__btn" @button="gear" @icon="gear">
-        <ActionsMenu @routeModel={{@routeModel}} />
+      <MediaCollection::Button @class="boxel-actions__more-actions" @button="gear" @icon="gear">
+        <ActionsMenu @class="boxel-actions__more-actions-menu" @routeModel={{@routeModel}} />
       </MediaCollection::Button>
     {{else}}
       {{#if @btnLeft}}
         <button class="boxel-actions__btn {{@btnLeft}}" {{on "click" @btnLeftAction}} aria-label="{{@btnLeft}}">{{@btnLeftContent}}</button>
       {{else}}
-        <MediaCollection::Button @class="boxel-actions__menu-btn boxel-actions__btn--more-actions" @button="more-actions" @icon="more-actions">
-          <ActionsMenu />
+        <MediaCollection::Button @class="boxel-actions__more-actions" @button="more-actions" @icon="more-actions">
+          <ActionsMenu @class="boxel-actions__more-actions-menu" @actionItems={{array "Delete" "Duplicate"}} />
         </MediaCollection::Button>
       {{/if}}
       <button class="boxel-actions__btn {{or @btnRight "boxel-actions__btn--expand"}}" {{on "click" (or @btnRightAction this.expand)}} aria-label="{{or @btnRight "expand"}}" />

@@ -34,7 +34,9 @@
         {{#if this.collection.selectedItemCount}}
           {{svg-jar "check-mark" width="9px" height="7px"}}
           {{this.collection.selectedItemCount}} selected
-          <button class="media-collection__more-actions">{{svg-jar "more-actions" width="16px" height="16px"}}</button>
+          <MediaCollection::Button @class="media-collection__more-actions" @button="more-actions" @icon="more-actions">
+            <ActionsMenu @class="media-collection__more-actions-menu" @actionItems={{array "Delete" "Duplicate" (if (eq @model.type "collection") "Add to Collection")}} />
+          </MediaCollection::Button>
         {{else}}
           Select all
         {{/if}}
@@ -46,12 +48,12 @@
       {{/if}}
       <div class="media_collection__btn-group">
         <div class="media-collection__btn-trio media-collection__filters">
-          <SortPopup @sortColumns={{this.sortColumns}} @sortColumn={{this.sortColumn}} @sortDirection={{this.sortDirection}} @sort={{this.sort}}/>
-          <MediaCollection::Button @button="filter" @icon="filter">
+          <SortPopup @class="media-collection__sort" @sortColumns={{this.sortColumns}} @sortColumn={{this.sortColumn}} @sortDirection={{this.sortDirection}} @sort={{this.sort}}/>
+          <MediaCollection::Button @class="media-collection__filter" @button="filter" @icon="filter">
           </MediaCollection::Button>
 
           {{#if @search}}
-            <MediaCollection::Button @button="search" @icon="search">
+            <MediaCollection::Button @class="media-collection__search" @button="search" @icon="search">
               <Input @type="search" @class="field-renderer__input media-collection__search-input"
                 {{on "input" this.search}}
               />
