@@ -1,0 +1,96 @@
+.queue {
+  position: fixed;
+  width: 330px;
+  height: 100%;
+  left: 80px;
+  top: 0;
+  bottom: 0;
+  background-color: #413E4E;
+  color: white;
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+  overflow-y: auto;
+}
+
+.queue__header {
+  position: sticky;
+  top: 0;
+  padding: 20px;
+  background-color: inherit;
+  border-bottom: 1px solid #2E2B38;
+}
+
+.queue__header > * + * {
+  margin-top: 20px;
+}
+
+.queue__company {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: calc(27/20);
+  letter-spacing: 0.005em;
+}
+
+.queue__company-logo {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 10px;
+  width: 40px;
+  height: 40px;
+  background-position: left center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.queue__user {
+  padding: 10px 10px 15px 35px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+}
+
+.queue__user--active {
+  background-image: url('/assets/images/icons/active-circle.svg');
+  background-position: left 15px top 15px;
+  background-size: 10px 10px;
+  background-repeat: no-repeat;
+}
+
+.queue__user-name {
+  font-weight: 600;
+}
+
+.queue__user-title {
+  color: #B3B1B8;
+}
+
+.queue__filter {
+  width: 100%;
+  min-height: 35px;
+  padding: 5px 15px;
+  background-color: #2E2D38;
+  border-radius: 20px;
+  border: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+}
+.queue__filter:focus {
+  outline: 0;
+}
+
+.queue__section {
+  padding: 10px 25px 20px 20px;
+}
+
+.queue__section + .queue__section {
+  border-top: 1px solid #2E2B38;
+}
+
+.queue__section-header {
+  padding-bottom: 15px;
+  font-weight: 600;
+}
+
+.queue__section-content > * + * {
+  margin-top: 15px;
+}

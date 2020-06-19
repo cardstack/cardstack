@@ -1,0 +1,132 @@
+<div class="cardflow">
+  <header class="cardflow__header">
+    <div>
+      <div class="cardflow__project-title">{{@model.user.queueCards.0.projectTitle}}</div>
+      <div class="cardflow__title">Catalog transfer from Bunny Records to CRD Records for 16 masters</div>
+    </div>
+    <LinkTo @route="media-registry" @model={{@model.id}} @class="mode-indicator mode-indicator--workflow">
+      Workflow mode
+    </LinkTo>
+  </header>
+
+  <div class="cardflow__thread">
+    <div class="cardflow__message-divider">
+      <div class="cardflow__message-divider-border" />
+      <div class="cardflow__message-divider-date">August 31, 2020</div>
+    </div>
+
+    <div class="cardflow__message">
+      <div class="cardflow__message-row">
+        <div class="cardflow__message-icon" style={{css-url "background-image" "/media-registry/profiles/Lisa-Track.jpg"}}></div>
+        <div class="cardflow__message-sender">
+          <span class="cardflow__message-sender-name">Lisa Track</span> <time>2:49 PM</time>
+          <div>Administrator</div>
+        </div>
+      </div>
+      <div class="cardflow__message-row">
+        <div></div>
+        <div class="cardflow__message-content">
+          <div>
+            Hi Steve,
+            As discussed, we are transferring the rights to 13 of Pia Midina’s and 3 of BB Clarke’s recordings to CRD Records.
+            Best regards,
+            Lisa
+          </div>
+          <CardPlatter @class="flow-agreement-card">
+            <header>
+              <div class="flow-agreement-card__title">Transfer Proposal</div>
+              {{!-- <div>Aug 31, 2020</div> --}}
+            </header>
+            <div class="flow-agreement-card__people">
+              <div>
+                <div class="field-renderer__title agreement-card__field-title">From</div>
+                <div class="flow-agreement-card__participant">
+                  {{svg-jar "button-bunny-records" width="40px" height="40px"}}
+                  <div class="cardflow__participant-company">Bunny Records</div>
+                </div>
+              </div>
+              <div>
+                <div class="field-renderer__title agreement-card__field-title">To</div>
+                <div class="flow-agreement-card__participant">
+                  {{svg-jar "button-crd-records" width="40px" height="40px"}}
+                  <div>CRD Records</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="field-renderer__title agreement-card__field-title">Catalog</div>
+              {{component (or this.catalog.component "card") model=this.catalog.value mode="view" variant="small"}}
+              <div class="media-collection__pill flow-agreement-card__btn">Inspect Catalog</div>
+            </div>
+            <footer>
+              Effective Date: <strong>September 1, 2020</strong>
+            </footer>
+          </CardPlatter>
+        </div>
+      </div>
+    </div>
+
+    <div class="cardflow__message">
+      <div class="cardflow__message-row">
+        <div />
+        <CardPlatter @class="next-steps">
+          <div>
+            <div class="next-steps__title">Next Steps</div>
+            <div class="next-steps__text">Visible only to you</div>
+          </div>
+
+          <div class="breadcrumbs__pill breadcrumbs__pill--current">Send Email Reminder</div>
+        </CardPlatter>
+      </div>
+    </div>
+
+    <div class="cardflow__message"></div>
+  </div>
+
+  <aside class="cardflow__sidebar">
+    <section class="cardflow__sidebar-section">
+      <h3 class="cardflow__sidebar-title">Progress</h3>
+      <div class="cardflow__progress">
+        {{!-- {{svg-jar "progress-20pct-lg" width="125px" height="125px"}} --}}
+        <div class="cardflow__progress-icon" />
+        <span class="cardflow__progress-pct">20%</span>
+        <div class="cardflow__progress-status">Proposal Submitted</div>
+      </div>
+    </section>
+
+    <section class="cardflow__sidebar-section">
+      <h3 class="cardflow__sidebar-title">Checklist</h3>
+      <CardPlatter>
+        <div class="cardflow__checklist-time">2h ago</div>
+        <ul class="cardflow__checklist">
+          <li class="cardflow__checklist-item completed">{{svg-jar "checkmark-lg" width="16px" height="16px"}} Propose</li>
+          <li class="cardflow__checklist-item current">{{svg-jar "progress-circle" width="16px" height="16px"}} Review</li>
+          <li class="cardflow__checklist-item">{{svg-jar "progress-circle" width="16px" height="16px"}} Accept</li>
+          <li class="cardflow__checklist-item">{{svg-jar "progress-circle" width="16px" height="16px"}} Amend</li>
+          <li class="cardflow__checklist-item">{{svg-jar "progress-circle" width="16px" height="16px"}} Redeliver</li>
+        </ul>
+      </CardPlatter>
+    </section>
+
+    <section class="cardflow__sidebar-section">
+      <h3 class="cardflow__sidebar-title">Participants</h3>
+      <CardPlatter>
+        {{#each @model.orgs as |participant|}}
+          <div class="cardflow__participants">
+            <div class="cardflow__participant">
+              <div class="cardflow__participant-company-img" style={{css-url "background-image" participant.iconURL}} />
+              <div class="cardflow__participant-company">{{participant.company}}</div>
+            </div>
+            <div class="cardflow__participant">
+              <div class="cardflow__participant-user-img" style={{css-url "background-image" participant.user.imgURL}} />
+              <div class="cardflow__participant-user">
+                {{participant.user.name}}<br>
+                <span>{{participant.user.title}}</span>
+              </div>
+            </div>
+          </div>
+        {{/each}}
+      </CardPlatter>
+    </section>
+  </aside>
+</div>

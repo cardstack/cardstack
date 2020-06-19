@@ -1,0 +1,47 @@
+<div class="queue {{@class}}">
+  <header class="queue__header">
+    <div class="queue__company">
+      {{#if @model.alternateLogoURL}}
+        <span class="queue__company-logo" style={{css-url "background-image" @model.alternateLogoURL}} />
+      {{/if}}
+      {{@model.company}}
+    </div>
+    <div class="queue__user queue__user--active">
+      <div class="queue__user-name">{{@model.user.name}}</div>
+      <div class="queue__user-title">{{@model.user.title}}</div>
+    </div>
+    <Input @placeholder="Filter Notifications" @class="queue__filter">
+    </Input>
+  </header>
+
+  <section class="queue__section">
+    <header class="queue__section-header">Open</header>
+    <div class="queue__section-content">
+      {{#with (find-by "status" "open" (reverse @model.user.queueCards)) as |card|}}
+        <QueueCard @card={{card}} @openCards={{@model.user.queueCards}} />
+      {{/with}}
+    </div>
+  </section>
+
+  <section class="queue__section">
+    <header class="queue__section-header">Needs Response</header>
+    <div class="queue__section-content">
+      {{#let (filter-by "status" "needs-response" @model.user.queueCards) as |cards|}}
+        {{#each cards as |card|}}
+          <QueueCard @card={{card}} />
+        {{/each}}
+      {{/let}}
+    </div>
+  </section>
+
+  <section class="queue__section">
+    <header class="queue__section-header">Recent</header>
+    <div class="queue__section-content">
+      {{#let (filter-by "status" "recent" @model.user.queueCards) as |cards|}}
+        {{#each cards as |card|}}
+          <QueueCard @card={{card}} />
+        {{/each}}
+      {{/let}}
+    </div>
+  </section>
+</div>

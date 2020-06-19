@@ -18,6 +18,10 @@
   outline: 0;
 }
 
+.icon-btn:hover {
+  cursor: pointer;
+}
+
 .icon-btn > svg {
   display: block;
   margin: auto;

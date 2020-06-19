@@ -1,0 +1,315 @@
+.cardflow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto 1fr;
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+  overflow: hidden;
+}
+
+/* Header */
+.cardflow__header {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
+  min-height: 80px;
+  height: auto;
+  padding: 15px 20px 20px 30px;
+  background-color: white;
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.16);
+}
+
+.cardflow__project-title {
+  border-radius: 10px 0 5px 0;
+  color: rgba(0, 0, 0, 0.7);
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+}
+
+.cardflow__title {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: calc(27/20);
+  letter-spacing: 0.005em;
+}
+
+
+/* Thread */
+.cardflow__thread {
+  display: grid;
+  grid-auto-rows: max-content;
+  gap: 20px;
+  height: 100%;
+  padding: 20px 30px 50px;
+  overflow-y: auto;
+}
+
+.cardflow__message {
+  min-height: 50px;
+  color: black;
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+}
+
+.cardflow__message-row {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  gap: 20px;
+}
+
+.cardflow__message-icon {
+  justify-self: end;
+  width: 40px;
+  height: 40px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border-radius: 100px;
+}
+
+.cardflow__message-sender > time,
+.cardflow__message-sender > div {
+  color: #666;
+}
+
+.cardflow__message-sender-name {
+  margin-right: 10px;
+  font-weight: 600;
+}
+
+.cardflow__message-divider {
+  position: relative;
+  padding: 15px 0;
+}
+
+.cardflow__message-divider-border {
+  border-top: 1px solid #D6D6D6;
+}
+
+.cardflow__message-divider-date {
+  position: absolute;
+  top: 0;
+  left: 40%;
+  padding: 5px 10px;
+  background-color: #F6F6F6;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Agreement card */
+.flow-agreement-card {
+  position: relative;
+  padding: 40px;
+}
+.flow-agreement-card__title {
+  color: #393642;
+  font-size: 26px;
+  line-height: calc(36/26);
+  font-weight: bold;
+  letter-spacing: 0;
+}
+
+.flow-agreement-card .master-collection__count {
+  display: none;
+}
+
+.field-renderer__title.agreement-card__field-title {
+  text-align: left;
+}
+
+.media-collection__pill.flow-agreement-card__btn {
+  position: absolute;
+  width: 130px;
+  padding: 5px 12px;
+  height: 30px;
+  bottom: 100px;
+  right: 50px;
+}
+
+.flow-agreement-card__people {
+  display: flex;
+}
+
+.flow-agreement-card__people > div {
+  width: 50%;
+}
+
+.flow-agreement-card__participant {
+  text-align: center;
+}
+
+.next-steps {
+  padding: 30px;
+  background: #41404D;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  font: var(--boxel-font-sm);
+  font-weight: 600;
+}
+
+.next-steps__title {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.next-steps__text {
+  font-weight: normal;
+}
+
+
+.flow-agreement-card > * + *,
+.cardflow__message-content > * + * {
+  margin-top: 20px;
+}
+
+.flow-agreement-card footer {
+  font-size: 18px;
+  line-height: 24px;
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+
+
+/* Right Sidebar */
+.cardflow__sidebar {
+  width: 100%;
+  height: 100%;
+  max-width: 290px;
+  padding: 20px 30px;
+  border-left: 1px solid #D6D6D6;
+  overflow-y: auto;
+}
+
+.cardflow__sidebar-section + .cardflow__sidebar-section {
+  margin-top: 20px;
+}
+
+.cardflow__sidebar-title {
+  padding-bottom: 15px;
+  font: var(--boxel-font-sm);
+  font-weight: bold;
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+}
+
+.cardflow__progress {
+  position: relative;
+  text-align: center;
+}
+
+.cardflow__progress-status {
+  padding-top: 10px;
+  padding-bottom: 5px;
+  color: #666;
+}
+
+.cardflow__progress-icon {
+  margin: 0 auto;
+  background-image: url('/media-registry/progress-20pct-lg.svg');
+  width: 124px;
+  height: 124px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.cardflow__progress-pct {
+  position: absolute;
+  top: 45px;
+  left: 40%;
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.cardflow__checklist {
+  --icon-color: #D6D6D6;
+
+  margin: 0;
+  padding: 30px 15px;
+  color: #666;
+}
+
+.cardflow__checklist-item > svg {
+  margin-right: 18px;
+  vertical-align: top;
+}
+
+.cardflow__checklist-item + .cardflow__checklist-item::before {
+  display: block;
+  content: "";
+  width: 1px;
+  height: 15px;
+  margin: 2px 0 3px 6.5px;
+  background-color: #D6D6D6;
+}
+
+.cardflow__checklist-item.current {
+  color: black;
+  --icon-color: #FFD800;
+}
+
+.cardflow__checklist-item.completed {
+  color: black;
+  font-weight: 600;
+  --icon-color: #1CFF25;
+}
+
+.cardflow__checklist-time {
+  position: absolute;
+  top: 30px;
+  right: 20px;
+  color: #666;
+  font: var(--boxel-font-xs);
+}
+
+.cardflow__participants {
+  padding: 20px;
+}
+
+.cardflow__participants + .cardflow__participants {
+  border-top: 1px solid #EFEFEF;
+}
+
+.cardflow__participant {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 20px 10px;
+  align-items: center;
+  font: var(--boxel-font-sm);
+  font-weight: 600;
+  color: black;
+}
+
+.cardflow__participant + .cardflow__participant {
+  margin-top: 20px;
+}
+
+.cardflow__participant-company-img {
+  width: 40px;
+  height: 40px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.cardflow__participant-company {
+  font-size: 14px;
+}
+
+.cardflow__participant-user-img {
+  justify-self: center;
+  width: 30px;
+  height: 30px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border-radius: 100px;
+}
+
+.cardflow__participant-user > span {
+  font: var(--boxel-font-xs);
+  color: #666;
+  font-weight: normal;
+}

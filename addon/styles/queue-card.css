@@ -1,0 +1,86 @@
+.queue-card {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  width: 100%;
+  max-width: 290px;
+  min-height: 110px;
+  border-radius: 10px;
+  background-color: #5A586A;
+  color: white;
+  font: var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-lg);
+}
+
+.queue-card > * {
+  padding-bottom: 10px;
+}
+
+.queue-card__header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.queue-card__title {
+  padding: 2px 10px 4px;
+  border-radius: 10px 0 5px 0;
+  background-color: #6B6586;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+}
+
+.queue-card__notification {
+  padding: 2px 15px 4px;
+  border-radius: 0 10px 0 5px;
+  background-color: #FF5050;
+  color: white;
+  font-weight: bold;
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.queue-card__project-title {
+  padding-left: 20px;
+  padding-right: 10px;
+  font: var(--boxel-font-sm);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp);
+}
+
+.queue-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 20px;
+  padding-right: 10px;
+  color: #B3B1B8;
+}
+
+.queue-card__progress-pie {
+  display: inline-block;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
+.queue-card__progress-icon {
+  width: 24px;
+  height: 24px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+
+/* Status: open */
+.queue-card.queue-card--open {
+  background-color: #F8F8F8;
+  color: black;
+}
+
+.queue-card.queue-card--open .queue-card__title {
+  background-color: #E0DEEB;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.queue-card.queue-card--open .queue-card__footer {
+  color: #666666;
+}

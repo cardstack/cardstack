@@ -215,7 +215,7 @@
 }
 
 .version__label {
-  background: url('/assets/images/icons/clock-highlighted.svg') right 2px center/16px 16px no-repeat;
+  background: url('/assets/images/icons/clock-highlighted.svg') right 2px center/16px 15px no-repeat;
   padding-right: 25px;
   color: var(--boxel-highlight);
   font-size: 10px;

@@ -1,22 +1,8 @@
 import Route from '@ember/routing/route';
 import { fetchCollection } from 'dummy/media';
+import ORGS from 'dummy/data/organizations';
 
 const DEFAULT_LABEL = 'bunny_records';
-
-const ORGS = [
-  {
-    id: 'bunny_records',
-    company: 'Bunny Records',
-    iconURL: "/media-registry/button-bunny-records.svg",
-    logoURL: '/media-registry/bunny-logo.svg'
-  },
-  {
-    id: 'crd_records',
-    company: 'CRD Records',
-    iconURL: "/media-registry/button-crd-records.svg",
-    logoURL: '/media-registry/crd_records_logo.svg'
-  }
-];
 
 export default class MediaRegistryRoute extends Route {
   orgs = ORGS;
@@ -33,7 +19,9 @@ export default class MediaRegistryRoute extends Route {
       type: 'master-collection',
       id: masterData.id,
       logoURL: masterData.logoURL,
+      alternateLogoURL: masterData.iconURL,
       company: masterData.company,
+      user: masterData.user,
       collection,
       orgs: this.orgs,
       columns: [

@@ -65,8 +65,15 @@
   opacity: 1;
 }
 
-
 .left-edge-nav__btn--icon-only:hover {
   background-color: var(--boxel-highlight);
   border-radius: 100px;
+}
+
+.left-edge-nav__btn--static {
+  opacity: 1;
+  height: auto;
+}
+.left-edge-nav__btn--static:hover {
+  cursor: initial;
 }

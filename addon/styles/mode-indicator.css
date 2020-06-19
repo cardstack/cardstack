@@ -2,15 +2,15 @@
   --mode-container-width: 180px;
   --mode-container-height: 40px;
   --mode-icon: url('');
-  --mode-icon-position: left 13px top 12px;
-  --mode-icon-size: 1rem 1rem;
+  --mode-icon-position: left 15px top 13px;
+  --mode-icon-size: 15px 15px;
 
   display: grid;
   align-items: center;
   width: var(--mode-container-width);
   max-width: 100%;
   height: var(--mode-container-height);
-  padding: 11px 38px;
+  padding: 10px 40px;
   background-color: var(--boxel-highlight);
   background-image: var(--mode-icon), url('/assets/images/icons/close.svg');
   background-position: var(--mode-icon-position), center right 15px;
@@ -28,8 +28,6 @@
 
 .mode-indicator--edit {
   --mode-icon: url('/assets/images/icons/edit-box.svg');
-  --mode-icon-position: left 15px top 12px;
-  --mode-icon-size: 13px 13px;
 }
 .mode-indicator--schema {
   --mode-icon: url('/assets/images/icons/schema-2.svg');
@@ -46,6 +44,14 @@
 
 .mode-indicator:hover,
 .mode-indicator:focus {
-  background-color: var(--boxel-highlight-hover);
+  /* background-color: var(--boxel-highlight-hover); */
   outline: 0;
+}
+
+.mode-indicator--workflow {
+  --mode-icon: url('/assets/images/icons/edit-box.svg');
+
+  min-width: 200px;
+  background-color: white;
+  border: var(--boxel-border);
 }

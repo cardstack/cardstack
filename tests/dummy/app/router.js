@@ -19,6 +19,7 @@ Router.map(function() {
       this.route('versions');
     });
     this.route('agreements');
+    this.route('cardflow');
   });
 });
 

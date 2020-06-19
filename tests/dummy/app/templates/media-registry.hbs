@@ -2,22 +2,33 @@
   {{outlet}}
 {{else}}
   <section class="media-registry media-registry--{{@model.id}}">
-    <aside class="media-registry__left-edge">
+    <aside class="media-registry__left-edge {{if (or this.isQueueFixed (eq this.target.currentRouteName "media-registry.cardflow")) "with-queue"}}">
       <LeftEdgeNav @orgs={{@model.orgs}} @current={{@model.id}} @currentRouteName={{this.target.currentRouteName}} />
+      {{#if (not-eq this.target.currentRouteName "media-registry.cardflow")}}
+        <div class="media-registry__hover-zone media-registry__hover-zone--{{@model.id}}" />
+      {{/if}}
+      <div class="media-registry__left-edge-queue {{if (or this.isQueueFixed (eq this.target.currentRouteName "media-registry.cardflow")) "slide-in"}}">
+        {{#if (not-eq this.target.currentRouteName "media-registry.cardflow")}}
+          <IconButton @icon={{if this.isQueueFixed "arrow-left" "sidebar"}} @class="media-registry__queue-btn" {{on "click" (action (mut this.isQueueFixed) (not this.isQueueFixed))}} @aria-label="Toggle fix cardflow queue" />
+        {{/if}}
+        <CardflowQueue @class="media-registry__queue {{if (and (not this.isQueueFixed) (not-eq this.target.currentRouteName "media-registry.cardflow")) "with-box-shadow"}}" @model={{@model}} />
+      </div>
     </aside>
-    <header class="media-registry__header media-registry__header--sm">
-      <h1 class="media-registry__title">
-        <span class="media-registry__logo" style={{css-url "background-image" @model.logoURL}} />
-        <span>{{@model.company}}</span>
-      </h1>
-      <input class="media-registry__search-bar" type="search" placeholder="Search" />
-      <nav class="media-registry__nav">
-        <ul>
-          <li><LinkTo @class={{if (eq this.target.currentRouteName "media-registry.agreements") "unselected" "active"}} @route="media-registry" @model={{@model.id}}>Masters</LinkTo></li>
-          <li><LinkTo @route="media-registry.agreements" @model={{@model.id}}>Agreements</LinkTo></li>
-        </ul>
-      </nav>
-    </header>
+    {{#if (not-eq this.target.currentRouteName "media-registry.cardflow")}}
+      <header class="media-registry__header media-registry__header--sm">
+        <h1 class="media-registry__title">
+          <span class="media-registry__logo" style={{css-url "background-image" @model.logoURL}} />
+          <span>{{@model.company}}</span>
+        </h1>
+        <input class="media-registry__search-bar" type="search" placeholder="Search" />
+        <nav class="media-registry__nav">
+          <ul>
+            <li><LinkTo @class={{if (eq this.target.currentRouteName "media-registry.agreements") "unselected" "active"}} @route="media-registry" @model={{@model.id}}>Masters</LinkTo></li>
+            <li><LinkTo @route="media-registry.agreements" @model={{@model.id}}>Agreements</LinkTo></li>
+          </ul>
+        </nav>
+      </header>
+    {{/if}}
 
     {{outlet}}
   </section>
