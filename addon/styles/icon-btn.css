@@ -1,10 +1,11 @@
 .icon-btn {
-  width: 40px;
-  height: 40px;
+  width: var(--icon-btn-width, 40px);
+  height: var(--icon-btn-height, 40px);;
   padding: 0;
   background: none;
   border: none;
   z-index: 1;
+  outline: 0;
 }
 
 .icon-btn--sm {
@@ -12,10 +13,11 @@
   height: 30px;
 }
 
-.icon-btn:hover,
-.icon-btn:focus {
-  /* need styles */
-  outline: 0;
+.icon-btn--secondary {
+  --icon-color: var(--boxel-highlight);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 100px;
+  background-color: #2E2D38;
 }
 
 .icon-btn:hover {

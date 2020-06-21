@@ -42,8 +42,8 @@
       </ul>
     </aside>
 
-    <AnimatedContainer class="versions__cards {{if this.isCompView "comp-view"}}" {{did-insert this.setPositions}}>
-      {{#if this.isCompView}}
+    {{#if this.isCompView}}
+      <div class="versions__cards {{if this.isCompView "comp-view"}}" {{did-insert this.setPositions}}>
         <button class="comp-view__swap-btn" {{on "click" this.swap}} aria-label="Swap comparison" />
         {{#let this.compCardContent as |c|}}
           <div class="version-card version-card--comp-card {{if (eq c.id this.latest.id) "current"}}">
@@ -85,7 +85,9 @@
             </div>
           </div>
         {{/let}}
-      {{else}}
+      </div>
+    {{else}}
+      <AnimatedContainer class="versions__cards" {{did-insert this.setPositions}}>
         {{#animated-each this.versions watch="position" key="version" use=this.transition as |v|}}
           <div class="version-card version-card--{{v.position}} {{if (eq v.id this.latest.id) "current"}} {{if (eq v.id (sub this.latest.id 1)) "current-1"}} {{if (eq v.id (sub this.latest.id 2)) "current-2"}}">
             <header class="version-card__header">
@@ -125,7 +127,7 @@
             </div>
           </div>
         {{/animated-each}}
-      {{/if}}
-    </AnimatedContainer>
+      </AnimatedContainer>
+    {{/if}}
   </div>
 </section>

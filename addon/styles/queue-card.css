@@ -11,6 +11,10 @@
   letter-spacing: var(--boxel-lsp-lg);
 }
 
+.queue-card:hover {
+  cursor: pointer;
+}
+
 .queue-card > * {
   padding-bottom: 10px;
 }

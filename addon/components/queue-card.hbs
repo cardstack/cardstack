@@ -7,11 +7,10 @@
   </header>
   <div class="queue-card__project-title">{{@card.title}}</div>
   <footer class="queue-card__footer">
-    <div>{{moment-format @card.datetime "MMM DD, h:mm A"}}</div>
+    <div>{{moment-format @card.datetime "MMM D, h:mm A"}}</div>
     <div>
-      {{titleize (humanize @card.progress)}}
-      <span class="queue-card__progress-icon queue-card__progress-pie" style={{css-url "background-image" @card.progressIcon}} />
-      {{!-- {{svg-jar @card.progressIcon class="queue-card__progress-pie" width="24px" height="24px"}} --}}
+      {{titleize (humanize this.progress.status)}}
+      <span class="queue-card__progress-icon queue-card__progress-pie" style={{css-url "background-image" this.progress.icon}} />
     </div>
   </footer>
 </div>

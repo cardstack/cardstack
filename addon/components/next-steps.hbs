@@ -1,0 +1,16 @@
+<CardPlatter @class="next-steps next-steps--{{if @inlineBtnGroup "inline" "row"}}">
+  <div class="next-steps__desc">
+    <div class="next-steps__title">Next Steps</div>
+    <div class="next-steps__text">Visible only to you</div>
+  </div>
+  <div class="next-steps__btn-group">
+    {{#if @steps.length}}
+      {{#each @steps as |step|}}
+        <PillButton @variant="primary" @class="next-steps__pill-btn">{{step}}</PillButton>
+      {{/each}}
+    {{else}}
+      <PillButton @variant="primary" @class="next-steps__pill-btn">Send Email Reminder</PillButton>
+      <IconButton @class="next-steps__icon-btn" @variant="secondary" @icon="more-actions" @aria-label="Other actions" />
+    {{/if}}
+  </div>
+</CardPlatter>
