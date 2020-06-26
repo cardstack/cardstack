@@ -86,7 +86,7 @@ export default class MusicDetailCardComponent extends Component {
         value: this.model.length
       },
       {
-        title: 'language performance',
+        title: 'language',
         value: this.model?.details?.language
       },
       {
@@ -146,7 +146,7 @@ export default class MusicDetailCardComponent extends Component {
       type: 'card',
       component: 'cards/registration-embedded',
       title,
-      value: { verifi_id }
+      value: { verifi_id, verifi_reg_date: this.model?.details?.verifi_reg_date }
     }
   }
 
@@ -162,7 +162,7 @@ export default class MusicDetailCardComponent extends Component {
           },
           {
             title: 'Secondary',
-            value: []
+            value: this.model?.details?.isrc_secondary
           }
         ]
       },
@@ -204,9 +204,6 @@ export default class MusicDetailCardComponent extends Component {
     ];
   }
 
-
-  // Hardcoded sections (file names, dates, agreements section)
-
   get coverArtCard() {
     if (!this.model || !this.model.album || this.args.fields) { return null; }
     return {
@@ -216,11 +213,13 @@ export default class MusicDetailCardComponent extends Component {
       fields: {
         title: this.model.album,
         imgURL: this.model.cover_art_thumb,
-        date: '2020-02-25'
+        date: this.model.cover_art_date
       },
     }
   }
 
+
+  // Hardcoded sections (file names, dates, agreements section)
   get audioFileCards() {
     if (!this.model || this.args.fields) { return null; }
     return [
@@ -229,9 +228,9 @@ export default class MusicDetailCardComponent extends Component {
         type: 'file',
         category: 'audio-file',
         fields: {
-          title: `${this.itemId}.aiff`,
+          title: this.model?.details?.audio_files[0].title || `${this.itemId}.aiff`,
           imgURL: '/media-registry/file.svg',
-          date: '2020-02-16'
+          date: this.model?.details?.audio_files[0]?.date
         }
       },
       {
@@ -239,9 +238,9 @@ export default class MusicDetailCardComponent extends Component {
         type: 'file',
         category: 'audio-file',
         fields: {
-          title: `${this.itemId}-watermarked.aiff`,
+          title: this.model?.details?.audio_files[1].title || `${this.itemId}-watermarked.aiff`,
           imgURL: '/media-registry/file.svg',
-          date: '2020-02-16'
+          date: this.model?.details?.audio_files[1]?.date
         }
       }
     ];

@@ -28,7 +28,7 @@
           <li class="versions-nav-item {{if (eq v.id this.selected) "versions-nav-item--selected"}} {{if (eq this.baseCard v.id) "is-base-card"}} {{if (eq this.comparisonCard v.id) "is-comp-card"}} {{if (and this.baseCard this.comparisonCard) "versions-nav-item--comp-view"}}">
             <button {{on "click" (fn this.displayVersion v.id)}} class="versions-nav-item__btn versions-nav-item__selection-btn">
               <div class="version__description">{{v.description}}</div>
-              <div class="version__title">{{moment-format v.published "MMM DD, hh:mm A"}}</div>
+              <div class="version__title">{{moment-format v.published "MMM D, h:mm A"}}</div>
               <div class="version__label">{{if (eq v.id this.latest.id) "Current"}}</div>
             </button>
             <button {{on "click" (fn this.setComparison v.id)}} class="versions-nav-item__btn versions-nav-item__hover-btn checkbox">
@@ -48,7 +48,7 @@
         {{#let this.compCardContent as |c|}}
           <div class="version-card version-card--comp-card {{if (eq c.id this.latest.id) "current"}}">
             <header class="version-card__header">
-              <div class="version__title">{{moment-format c.published "MMM DD, hh:mm A"}}</div>
+              <div class="version__title">{{moment-format c.published "MMM D, h:mm A"}}</div>
               <div class="version__description">{{c.description}}</div>
               <div class="version__label">{{if (eq c.id this.latest.id) "Current"}}</div>
             </header>
@@ -58,7 +58,7 @@
         {{#let this.baseCardContent as |v|}}
           <div class="version-card version-card--base-card {{if (eq v.id this.latest.id) "current"}}">
             <header class="version-card__header">
-              <div class="version__title">{{moment-format v.published "MMM DD, hh:mm A"}}</div>
+              <div class="version__title">{{moment-format v.published "MMM D, h:mm A"}}</div>
               <div class="version__description">{{v.description}}</div>
               <div class="version__label">{{if (eq v.id this.latest.id) "Current"}}</div>
             </header>
@@ -91,7 +91,7 @@
         {{#animated-each this.versions watch="position" key="version" use=this.transition as |v|}}
           <div class="version-card version-card--{{v.position}} {{if (eq v.id this.latest.id) "current"}} {{if (eq v.id (sub this.latest.id 1)) "current-1"}} {{if (eq v.id (sub this.latest.id 2)) "current-2"}}">
             <header class="version-card__header">
-              <div class="version__title">{{moment-format v.published "MMM DD, hh:mm A"}}</div>
+              <div class="version__title">{{moment-format v.published "MMM D, h:mm A"}}</div>
               <div class="version__description">{{v.description}}</div>
               <div class="version__label">{{if (eq v.id this.latest.id) "Current"}}</div>
               {{#animated-value v watch="position" key="version" use=this.adjustOpacity as |value|}}

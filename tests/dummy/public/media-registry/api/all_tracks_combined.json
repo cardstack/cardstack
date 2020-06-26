@@ -50,7 +50,8 @@
     "search_for_artist_bb_clarke": null,
     "cover_art_thumb": "media-registry/covers/thumb/Sunlight.jpg",
     "cover_art_medium": "media-registry/covers/medium/Sunlight.jpg",
-    "cover_art_large": "media-registry/covers/large/Sunlight.jpg"
+    "cover_art_large": "media-registry/covers/large/Sunlight.jpg",
+    "cover_art_date": "2019-02-19"
   },
   {
     "song_title": "A future like this",
@@ -1216,7 +1217,8 @@
     "search_for_artist_bb_clarke": null,
     "cover_art_thumb": "media-registry/covers/thumb/Autumn-Leaves.jpg",
     "cover_art_medium": "media-registry/covers/medium/Autumn-Leaves.jpg",
-    "cover_art_large": "media-registry/covers/large/Autumn-Leaves.jpg"
+    "cover_art_large": "media-registry/covers/large/Autumn-Leaves.jpg",
+    "cover_art_date": "2020-02-25"
   },
   {
     "song_title": "The leaves are changing color (dance remix)",

@@ -1,7 +1,7 @@
-<div role="button" {{on "click" (fn this.openThread @card)}} class="queue-card queue-card--{{@card.status}}">
+<div role="button" {{on "click" this.openThread}} class="queue-card queue-card--{{@card.status}}">
   <header class="queue-card__header">
     <div class="queue-card__title">{{@card.projectTitle}}</div>
-    {{#if (not-eq @card.status "recent")}}
+    {{#if (or (eq @card.status "needs-response") (eq @card.status "open"))}}
       <div class="queue-card__notification">1</div>
     {{/if}}
   </header>
@@ -10,7 +10,7 @@
     <div>{{moment-format @card.datetime "MMM D, h:mm A"}}</div>
     <div>
       {{titleize (humanize this.progress.status)}}
-      <span class="queue-card__progress-icon queue-card__progress-pie" style={{css-url "background-image" this.progress.icon}} />
+      <span class="queue-card__progress-icon queue-card__progress-pie" style={{css-url "background-image" (if (eq @card.status "open") this.progress.iconOpen this.progress.icon)}} />
     </div>
   </footer>
 </div>

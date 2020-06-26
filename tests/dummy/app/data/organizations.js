@@ -36,19 +36,19 @@ export default [
           },
           {
             id: "4",
-            status: "recent",
+            status: "closed",
             title: "Agreements | BB Clarke",
             datetime: "2020-08-20T15:11",
             projectTitle: "Rights transfer, CRD Records",
-            progressPct: 40,
+            progressPct: 100,
           },
           {
             id: "5",
-            status: "recent",
+            status: "closed",
             title: "Agreements | Pia Midina",
             datetime: "2020-07-31T11:40",
             projectTitle: "Rights transfer, CRD Records",
-            progressPct: 40,
+            progressPct: 100,
           },
           {
             id: "6",
@@ -60,11 +60,11 @@ export default [
           },
           {
             id: "7",
-            status: "recent",
+            status: "closed",
             title: "Request | Pia Midina",
             datetime: "2020-07-16T13:38",
             projectTitle: "Rights transfer, CRD Records",
-            progressPct: 40,
+            progressPct: 100,
           },
           {
             id: "8",
@@ -92,7 +92,7 @@ export default [
             status: "open",
             title: "Catalog transfer",
             description: "Catalog transfer from Bunny Records to CRD Records for 16 masters",
-            datetime: "2020-09-01T08:18",
+            datetime: "2020-09-01T09:46",
             projectTitle: "Rights transfer, Bunny Records",
             progressPct: 80
           },
@@ -102,15 +102,15 @@ export default [
             title: "Radio interview | FM8",
             datetime: "2020-08-25T11:00",
             projectTitle: "Interviews, CEO",
-            progressPct: 40
+            progressPct: 20
           },
           {
             id: "3",
-            status: "recent",
+            status: "closed",
             title: "To Dos",
             datetime: "2020-08-13T10:10",
             projectTitle: "Rights transfer, Bunny Records",
-            progressPct: 40
+            progressPct: 100
           },
           {
             id: "4",

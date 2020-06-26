@@ -44,4 +44,15 @@
       {{/let}}
     </div>
   </section>
+
+  <section class="queue__section">
+    <header class="queue__section-header">Closed</header>
+    <div class="queue__section-content">
+      {{#let (filter-by "progressPct" 100 @model.user.queueCards) as |cards|}}
+        {{#each cards as |card|}}
+          <QueueCard @card={{card}} />
+        {{/each}}
+      {{/let}}
+    </div>
+  </section>
 </div>

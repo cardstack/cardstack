@@ -2,7 +2,7 @@
   {
     "id": 1,
     "record_id": "the-leaves-are-changing-color",
-    "published": "2020-01-16T18:30:00Z",
+    "published": "2020-01-16T13:30:00",
     "description": "Recorded",
     "card_model": {
       "id": "the-leaves-are-changing-color",
@@ -10,7 +10,7 @@
       "artist": "Pia Midina",
       "verifi_id": "0x9b2138a6c17e6da2d9cd3303fe7b26079231184ac2f1b6537a11e2301b74ca26",
       "fields": {
-        "song_title": "Leaves Are Changing Color",
+        "title": "Leaves Are Changing Color",
         "version_type": "Recording",
         "artists": [
           {
@@ -62,7 +62,7 @@
   },
   {
     "id": 2,
-    "published": "2020-02-17T10:15:00Z",
+    "published": "2020-02-17T05:15:00",
     "record_id": "the-leaves-are-changing-color",
     "description": "2020 release confirmed",
     "card_model": {
@@ -71,7 +71,7 @@
       "artist": "Pia Midina",
       "verifi_id": "0x9b2138a6c17e6da2d9cd3303fe7b26079231184ac2f1b6537a11e2301b74ca26",
       "fields": {
-        "song_title": "Leaves Are Changing Color",
+        "title": "Leaves Are Changing Color",
         "version_type": "Recording",
         "artists": [
           {
@@ -143,7 +143,7 @@
   },
   {
     "id": 3,
-    "published": "2020-02-21T16:14:00Z",
+    "published": "2020-02-21T11:14:00",
     "record_id": "the-leaves-are-changing-color",
     "description": "Updated based on credible rumor",
     "card_model": {
@@ -156,7 +156,7 @@
       "cover_art_medium": "media-registry/old-album-art.png",
       "cover_art_large": "media-registry/old-album-art.png",
       "fields": {
-        "song_title": "Fall Is Back",
+        "title": "Fall Is Back",
         "version_type": "Recording",
         "artists": [
           {
@@ -248,7 +248,7 @@
   },
   {
     "id": 4,
-    "published": "2020-02-25T18:06:00Z",
+    "published": "2020-02-25T13:06:00",
     "record_id": "the-leaves-are-changing-color",
     "description": "Official announcement",
     "card_model": {
@@ -261,7 +261,7 @@
       "cover_art_medium": "media-registry/covers/medium/Autumn-Leaves.jpg",
       "cover_art_large": "media-registry/covers/large/Autumn-Leaves.jpg",
       "fields": {
-        "song_title": "The Leaves Are Changing Color",
+        "title": "The Leaves Are Changing Color",
         "version_type": "Recording",
         "artists": [
           {
@@ -333,7 +333,7 @@
   },
   {
     "id": 5,
-    "published": "2020-04-16T14:22:00Z",
+    "published": "2020-04-16T10:22:00",
     "record_id": "the-leaves-are-changing-color",
     "description": "Retail stores’ sales figures released",
     "card_model": {
@@ -346,7 +346,7 @@
       "cover_art_medium": "media-registry/covers/medium/Autumn-Leaves.jpg",
       "cover_art_large": "media-registry/covers/large/Autumn-Leaves.jpg",
       "fields": {
-        "song_title": "The Leaves Are Changing Color",
+        "title": "The Leaves Are Changing Color",
         "version_type": "Recording",
         "artists": [
           {
@@ -478,7 +478,7 @@
   },
   {
     "id": 6,
-    "published": "2020-04-16T14:22:00Z",
+    "published": "2020-05-04T19:32:00",
     "record_id": "the-leaves-are-changing-color",
     "description": "Digital download available worldwide",
     "card_model": {
@@ -491,7 +491,7 @@
       "cover_art_medium": "media-registry/covers/medium/Autumn-Leaves.jpg",
       "cover_art_large": "media-registry/covers/large/Autumn-Leaves.jpg",
       "fields": {
-        "song_title": "The Leaves Are Changing Color",
+        "title": "The Leaves Are Changing Color",
         "alternate_title": "Colorful Leaves",
         "version_type": "Recording",
         "artists": [

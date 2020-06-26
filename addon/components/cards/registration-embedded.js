@@ -2,26 +2,7 @@ import Component from '@glimmer/component';
 
 export default class RegistrationEmbedded extends Component {
   get registrationEmbedded() {
-    let { congress_id, verifi_id } = this.args.model;
-
-    if (congress_id) {
-      return {
-        id: congress_id,
-        type: 'registration',
-        imgURL: '/media-registry/library-congress-logo.svg',
-        title: this.args.model?.song_title,
-        fields: [
-          {
-            title: 'type of work',
-            value: 'Sound Recording (Form SR)'
-          },
-          {
-            title: 'registration no.',
-            value: congress_id
-          },
-        ]
-      }
-    }
+    let verifi_id = this.args.model?.verifi_id;
 
     if (verifi_id) {
       return {
@@ -37,7 +18,7 @@ export default class RegistrationEmbedded extends Component {
           },
           {
             title: 'created',
-            value: this.args.model.asset_type ? '2019-03-03' : '2020-01-16',
+            value: this.args.model.verifi_reg_date,
             type: 'date'
           },
         ]

@@ -20,6 +20,7 @@ export default class MusicalWork extends Component {
         id: card?.verifi_id,
         component: 'cards/registration-embedded',
         verifi_id: card?.verifi_id,
+        verifi_reg_date: card?.verifi_reg_date,
         asset_type: card?.version_type
       },
       "version type": card?.version_type,

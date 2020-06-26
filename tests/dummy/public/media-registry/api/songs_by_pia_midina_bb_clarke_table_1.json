@@ -11,6 +11,7 @@
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc": "US-S1Z-22-04993",
     "isrc_after_transfer_steve_s_edits": null,
+    "isrc_secondary": ["US-S1Z-19-18292", "US-S1Z-19-39182", "US-S1Z-19-49182"],
     "related_products": [
       {
         "id": "sunlight"
@@ -28,24 +29,16 @@
     "producer_id": "francesco-midina",
     "iswc_id": "T-030247162-2",
     "verifi_id": "0x8c2238a6c17e6da2d9cd3303fe7b26079231184ac2f1b6537a11e2301b74ab13",
+    "verifi_reg_date": "2019-02-18",
+    "verifi_reg_updated_date": "2019-12-13",
     "subgenre": "Dream Pop",
     "catalog_no": "BRN-19230-1238192",
     "language": ["English (en_US)"],
-    "parental_advisory": "Yes",
+    "parental_advisory": "No",
     "copyright_notice": "℗ 2019 Bunny Records",
     "congress_id": "SR0000320217",
     "recording_date": "2019-01-10",
     "original_release_date": "2019-04-03",
-    "booklets" : [
-      {
-        "title": "booklet-a-day-to-sing.pdf",
-        "date": "2019-02-19"
-      },
-      {
-        "title": "booklet-a-day-to-sing-translated.pdf",
-        "date": "2019-02-19"
-      }
-    ],
     "audio_files" : [
       {
         "title": "a-day-to-sing.aiff",
@@ -258,6 +251,7 @@
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc": "US-S1Z-22-05001",
+    "isrc_secondary": ["US-S1Z-20-05018", "US-S1Z-20-05025", "US-S1Z-20-05038"],
     "isrc_after_transfer_steve_s_edits": "US-S1Z-89-10932",
     "related_products": null,
     "producer": "Francesco Midina",
@@ -265,6 +259,8 @@
     "iswc_id": "T-030248890-1",
     "catalog_no": "BRN-19230-1239049",
     "verifi_id": "0x9b2138a6c17e6da2d9cd3303fe7b26079231184ac2f1b6537a11e2301b74ca26",
+    "verifi_reg_date": "2020-02-17",
+    "verifi_reg_updated_date": "2020-07-13",
     "subgenre": "Dream Pop",
     "language": ["English (en_US)"],
     "parental_advisory": "No",
@@ -272,6 +268,20 @@
     "congress_id": "SR0000320716",
     "recording_date": "2020-01-16",
     "original_release_date": "2020-03-02",
+    "audio_files" : [
+      {
+        "title": "the-leaves-are-changing-color.aiff",
+        "date": "2020-05-04",
+        "bitrate": "24-bit / 96 kHz",
+        "duration": "3:23"
+      },
+      {
+        "title": "the-leaves-are-changing-color-watermarked.aiff",
+        "date": "2020-05-04",
+        "bitrate": "24-bit / 96 kHz",
+        "duration": "3:23"
+      }
+    ],
     "mastering_engineer": "Joel Kaplan",
     "mixing_engineer": "Mariah Solis",
     "recording_engineer": "Ian Adams",

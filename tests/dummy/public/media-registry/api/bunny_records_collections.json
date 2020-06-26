@@ -30,7 +30,7 @@
   {
     "catalog_title": "Film Music",
     "catalog_description": "Themes & soundtracks",
-    "number_of_songs": 156,
+    "number_of_songs": 29,
     "top_artists": ["Pia Midina", "BB Clarke", "Marcy Blues"],
     "date_created": "2019-11-27",
     "selected_art": [
@@ -85,7 +85,7 @@
   },
   {
     "catalog_title": "Batch C",
-    "catalog_description": "Prepared for transfer to Candle Lights Records",
+    "catalog_description": "Prepared for transfer to Candle Light Records",
     "number_of_songs": 211,
     "top_artists": ["Things", "UNIF", "Melodrama"],
     "date_created": "2020-08-05",
