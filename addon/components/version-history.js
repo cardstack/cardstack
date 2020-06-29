@@ -1,14 +1,15 @@
-import Controller from '@ember/controller';
+import Component from '@glimmer/component';
 import { action, set } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+
 import resize from 'ember-animated/motions/resize';
 import scale from 'ember-animated/motions/scale';
 import move from 'ember-animated/motions/move';
 import adjustCSS from 'ember-animated/motions/adjust-css';
 import { parallel } from 'ember-animated';
 
-export default class MediaRegistryItemVersionsController extends Controller {
-  @tracked versions = this.model.versions;
+export default class VersionHistory extends Component {
+  @tracked versions = this.args.model.versions;
   @tracked latest = this.versions[this.versions.length - 1];
   @tracked selected = this.latest.id;
   @tracked baseCard;
@@ -52,6 +53,7 @@ export default class MediaRegistryItemVersionsController extends Controller {
   reset() {
     this.baseCard = null;
     this.comparisonCard = null;
+    this.selected = this.latest.id;
     this.addedFields = [];
     this.changedFields = [];
     this.removedFields = [];
@@ -60,36 +62,31 @@ export default class MediaRegistryItemVersionsController extends Controller {
   @action
   displayVersion(v) {
     if (this.baseCard && this.baseCard === v) {
-      this.reset();
-      this.selected = v;
-    } else if (this.baseCard) {
-      this.comparisonCard = v;
-      this.compareCards();
+      return this.reset();
+    } else if (this.baseCard || this.comparisonCard) {
+      return this.setComparison(v);
     } else {
       this.selected = v;
-      this.setPositions();
+      return this.setPositions();
     }
   }
 
   @action
   setComparison(v) {
-    if (this.baseCard && this.baseCard === v) {
+    if (this.baseCard && this.baseCard === v || this.comparisonCard && this.comparisonCard === v) {
       this.reset();
     } else if (this.baseCard) {
-      this.comparisonCard = v;
+      if (this.baseCard < v) {
+        this.comparisonCard = this.baseCard;
+        this.baseCard = v;
+      } else {
+        this.comparisonCard = v;
+      }
       this.compareCards();
     } else {
       this.baseCard = v;
       this.selected = v;
     }
-  }
-
-  @action
-  swap() {
-    let comp = this.comparisonCard;
-    this.comparisonCard = this.baseCard;
-    this.baseCard = comp;
-    this.compareCards();
   }
 
   @action

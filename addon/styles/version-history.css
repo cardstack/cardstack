@@ -196,8 +196,8 @@
   z-index: 1;
 }
 
-.version-card__header:hover {
-  cursor: pointer;
+.version-card:not(.version-card--p0) .version-card__header:hover {
+  color: var(--boxel-highlight);
 }
 
 .version__title {
@@ -452,6 +452,10 @@
 
 .overlay--p0 {
   opacity: 0.11;
+}
+
+.version-card__btn-overlay:not(.overlay--p0):hover {
+  cursor: pointer;
 }
 
 

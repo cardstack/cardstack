@@ -16,8 +16,8 @@ Router.map(function() {
     this.route('item', { path: '/:itemId' }, function() {
       this.route('edit');
       this.route('musical-work');
-      this.route('versions');
     });
+    this.route('versions', { path: '/:itemId/versions' });
     this.route('agreements');
     this.route('cardflow');
   });
