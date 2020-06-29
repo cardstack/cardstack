@@ -204,6 +204,14 @@
   cursor: pointer;
 }
 
+.media-collection__more-actions-menu li.actions-menu__link-item {
+  padding: 0;
+}
+.media-collection__more-actions-menu li.actions-menu__link-item > a {
+  width: 100%;
+  padding: 10px 20px;
+}
+
 
 .media-collection__btn-trio {
   display: grid;

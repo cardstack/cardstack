@@ -7,10 +7,18 @@
     <li>Duplicate</li>
     <li>Share</li>
     <li>Configure</li>
-    {{#if @routeModel}}
-      <li><LinkTo @route="media-registry.item.versions" @model={{@routeModel}}>Version History</LinkTo></li>
-    {{else}}
-      <li><LinkTo @route="media-registry.agreements" @model="bunny_records">Transfer Catalog</LinkTo></li>
-    {{/if}}
+  {{/if}}
+  {{#if @addToCollection}}
+    <li>Add to Collection</li>
+  {{/if}}
+  {{#if @versionHistory}}
+    <li class="actions-menu__link-item">
+      <LinkTo @route="media-registry.versions" @model="the-leaves-are-changing-color">Version History</LinkTo>
+    </li>
+  {{/if}}
+  {{#if @transferAgreement}}
+    <li class="actions-menu__link-item">
+      <LinkTo @route="media-registry.agreements" @model="bunny_records">Transfer Catalog</LinkTo>
+    </li>
   {{/if}}
 </ul>

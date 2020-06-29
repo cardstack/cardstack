@@ -117,3 +117,11 @@
   background-color: #E9E9EE;
   cursor: pointer;
 }
+
+.boxel-actions__more-actions-menu li.actions-menu__link-item {
+  padding: 0;
+}
+.boxel-actions__more-actions-menu li.actions-menu__link-item > a {
+  width: 100%;
+  padding: 10px 20px;
+}

@@ -12,7 +12,8 @@
             @btnLeft="mode-btn"
             @btnLeftContent="Edit"
             @btnLeftAction={{this.transitionToEdit}}
-            @btnRight="version-history"
+            @btnRight="settings"
+            @transferAgreement={{true}}
           />
         {{/if}}
         <h2 class="media-collection__title">{{humanize @model.title}}</h2>
@@ -35,7 +36,7 @@
           {{svg-jar "check-mark" width="9px" height="7px"}}
           {{this.collection.selectedItemCount}} selected
           <MediaCollection::Button @class="media-collection__more-actions" @button="more-actions" @icon="more-actions">
-            <ActionsMenu @class="media-collection__more-actions-menu" @actionItems={{array "Delete" "Duplicate" (if (eq @model.type "collection") "Add to Collection")}} />
+            <ActionsMenu @class="media-collection__more-actions-menu" @actionItems={{array "Delete" "Duplicate"}} @addToCollection={{eq @model.type "collection"}} @transferAgreement={{eq @model.type "master-collection"}} />
           </MediaCollection::Button>
         {{else}}
           Select all

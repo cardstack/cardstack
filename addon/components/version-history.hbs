@@ -1,7 +1,7 @@
 <section class="versions">
   <div class="versions-grid {{if this.isCompView "versions-grid--comp-view"}}">
     <header class="versions__header">
-      <h1 class="versions__title">Master Recording - {{titleize @model.song_title}}</h1>
+      <h1 class="versions__title">Master Recording - {{@model.title}}</h1>
       {{#if this.isCompView}}
         <div class="versions__view">
           <div class="versions__view-selector">
@@ -16,7 +16,7 @@
       {{/if}}
     </header>
     <div class="versions__mode">
-      <LinkTo @route="media-registry.item" @model={{@model}} @class="mode-indicator mode-indicator--revision">
+      <LinkTo @route="media-registry.item" @model={{@model.id}} @class="mode-indicator mode-indicator--revision">
         Revision Mode
       </LinkTo>
     </div>
@@ -44,9 +44,8 @@
 
     {{#if this.isCompView}}
       <div class="versions__cards {{if this.isCompView "comp-view"}}" {{did-insert this.setPositions}}>
-        <button class="comp-view__swap-btn" {{on "click" this.swap}} aria-label="Swap comparison" />
         {{#let this.compCardContent as |c|}}
-          <div class="version-card version-card--comp-card {{if (eq c.id this.latest.id) "current"}}">
+          <div class="version-card version-card--comp-card">
             <header class="version-card__header">
               <div class="version__title">{{moment-format c.published "MMM D, h:mm A"}}</div>
               <div class="version__description">{{c.description}}</div>

@@ -29,7 +29,14 @@
         <Boxel class="media-collection-table__boxel-cell">
           <BoxelHighlight {{on "click" (fn this.selectOrTransition row)}} @on={{row.selected}} @class="media-collection-table__highlight" />
           {{#if (and (eq (add columnMeta.index 1) b.cells.length) (eq @mode "edit"))}}
-            <BoxelActions @displayHighlightActions={{row.selected}} @btnRightAction={{action this.selectOrTransition row}} @class="media-collection-table__actions-btns" />
+            <BoxelActions
+              @class="media-collection-table__actions-btns"
+              @displayHighlightActions={{row.selected}}
+              @btnLeft="more-actions"
+              @btnLeftIcon="more-actions"
+              @btnRightIcon="expand"
+              @btnRightAction={{fn this.selectOrTransition row}}
+            />
           {{/if}}
           <div class="media-collection-table__cell {{if (eq columnMeta.index 0) "media-collection-table__cell--first-col"}} {{if row.selected "row-group-selected"}} media-collection-table__cell--{{@mode}}">
             {{#if (eq columnMeta.index 0)}}
