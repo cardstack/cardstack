@@ -3,23 +3,23 @@
   {{#if (or (eq @field.type "card") @field.value.id (is-array @field.value))}}
     <div class="field-renderer {{lowercase (dasherize (trim @field.title))}}-edit-field {{@class}}">
       <h4 class="field-renderer__title">{{humanize @field.title}}</h4>
-      {{#if (or @field.component (eq @field.type "card"))}}
+      {{#if (eq @field.type "card")}}
         <CollectionField
           @belongsToField={{true}}
           @field={{@field}}
           @mode="edit"
         />
+      {{else if (eq @field.type "collection")}}
+        <CollectionField
+          @collection={{@field.value}}
+          @format={{@field.format}}
+          @title={{@field.title}}
+          @field={{@field}}
+          @mode="edit"
+        />
       {{else}}
-        {{#let (filter-by "id" @field.value) (filter-by "title" @field.value) as |collection multiTagList|}}
-          {{#if collection.length}}
-            <CollectionField
-              @collection={{collection}}
-              @format={{@field.format}}
-              @title={{@field.title}}
-              @field={{@field}}
-              @mode="edit"
-            />
-          {{else if multiTagList.length}}
+        {{#let (filter-by "title" @field.value) as |multiTagList|}}
+          {{#if multiTagList.length}}
             {{!-- Taglist with multiple sections --}}
             <div class="field-renderer__group">
               {{#each @field.value as |val|}}
@@ -83,7 +83,7 @@
     <div class="field-renderer__title">{{humanize @field.title}}</div>
     <Boxel @class="field-renderer__value {{if (eq @field.type "image") "field-renderer__value--img-field"}}">
       {{#if @field.value}}
-        {{#if (or @field.component (eq @field.type "card"))}}
+        {{#if (eq @field.type "card")}}
           {{#if (and @comparisonMode @field.value.id (eq @changedCards.0.value.id @field.value.id))}}
             <div>
               <ins>{{component (or @field.component "card") model=@field.value mode="view" variant="small" status="changed"}}</ins>
@@ -97,36 +97,33 @@
             <Boxel>
               <BoxelHighlight @status="modified" />
               <BoxelActions @status="modified"><div class="field-renderer__modified-count">{{@modifiedCard.value.fields.length}}</div></BoxelActions>
-              {{component (or @field.component "card") model=@field.value mode="view" variant="small"}}
+              {{component (or @field.component "card") model=@field.value mode="view"}}
             </Boxel>
           {{else}}
-            {{component (or @field.component "card") model=@field.value mode="view" variant="small"}}
+            {{component (or @field.component "card") model=@field.value mode="view"}}
           {{/if}}
         {{else if (eq @field.type "collection")}}
-          {{#each @field.value as |val|}}
-            {{component (or @field.component "card") model=val mode="view" variant="small"}}
-          {{/each}}
+          <EmbeddedCollection
+            @collection={{@field.value}}
+            @cardComponent={{@field.component}}
+            @comparisonMode={{@comparisonMode}}
+            @addedFields={{@addedFields}}
+            @addedValues={{@addedValues}}
+            @changedFields={{@changedFields}}
+            @removedFields={{@removedFields}}
+            @removedValues={{@removedValues}}
+            @addedCards={{@addedCards}}
+            @removedCards={{@removedCards}}
+            @changedCards={{@changedCards}}
+            @modifiedCard={{@modifiedCard}}
+          />
         {{else if (is-array @field.value)}}
-          {{#let (filter-by "id" @field.value) (filter-by "title" @field.value) as |collection multiTagList|}}
-            {{#if collection.length}}
-              <EmbeddedCollection
-                @collection={{@field.value}}
-                @comparisonMode={{@comparisonMode}}
-                @addedFields={{@addedFields}}
-                @addedValues={{@addedValues}}
-                @changedFields={{@changedFields}}
-                @removedFields={{@removedFields}}
-                @removedValues={{@removedValues}}
-                @addedCards={{@addedCards}}
-                @removedCards={{@removedCards}}
-                @changedCards={{@changedCards}}
-                @modifiedCard={{@modifiedCard}}
-              />
-            {{else if multiTagList.length}}
+          {{#let (filter-by "title" @field.value) as |multiTagList|}}
+            {{#if multiTagList.length}}
               {{#each @field.value as |val|}}
                 <div class="field-renderer__taglist-title">{{val.title}}</div>
-                {{#if val.value.id}}
-                  <Card @variant="small" @model={{val.value}} @mode="view"}} />
+                {{#if (eq val.type "card")}}
+                  {{component (or val.component "card") model=val.value mode="view"}}
                 {{else}}
                   {{#each val.value as |vv|}}
                     <div>{{vv}}</div>

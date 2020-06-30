@@ -11,10 +11,10 @@
         />
       {{/each}}
     {{else}}
-      {{#each-in @fields as |title value|}}
+      {{#each-in @fields as |title field|}}
         <FieldRenderer
           @mode={{@mode}}
-          @field={{hash title=title value=value type=(if (eq title "album_art") "image" value.type) component=(if (eq value.type "musical-work") "cards/musical-work-embedded")}}
+          @field={{hash title=title value=(or field.value field) type=(if (eq title "album_art") "image" field.type) component=field.component}}
           @comparisonMode={{@comparisonMode}}
           @addedFields={{@addedFields}}
           @addedValues={{@addedValues}}

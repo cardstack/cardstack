@@ -373,7 +373,7 @@
 .version-card--item__img {
   width: calc(260px * 0.75);
   height: calc(260px * 0.75);
-  background-image: url('/media-registry/album_art.svg');
+  background-image: url('/media-registry/placeholders/album_art.svg');
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
@@ -416,6 +416,10 @@
 
 .version-card__content .media-detail-section__contents > .field-renderer {
   grid-template-columns: auto 450px;
+}
+
+.version-card__content .media-detail-section__contents > .field-renderer:last-child {
+  margin-bottom: 30px;
 }
 
 

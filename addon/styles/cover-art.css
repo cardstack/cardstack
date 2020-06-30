@@ -5,6 +5,7 @@
   display: grid;
   align-items: center;
   grid-auto-flow: column;
+  z-index: 0;
 }
 
 .cover-art__container {

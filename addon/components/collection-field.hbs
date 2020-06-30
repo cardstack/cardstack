@@ -43,7 +43,7 @@
                 @mode={{@mode}}
               />
             {{/if}}
-            {{component (or item.component "card") model=item mode="view" class="collection-field__card" format=@format}}
+            {{component (or item.component @field.component "card") model=item mode="view" class="collection-field__card" format=@format}}
             <IconButton @icon="icon-minus-circle" @class="collection-field__remove-btn" @aria-label="remove" />
           </div>
         {{/each}}

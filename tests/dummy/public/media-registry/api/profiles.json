@@ -1,26 +1,73 @@
 [
   {
+    "id": "lisa-track",
+    "type": "profile",
+    "title": "Lisa Track",
+    "description": "Administrator",
+    "imgURL": "media-registry/profiles/Lisa-Track.jpg",
+    "organization": "bunny_records",
+    "ipi": "",
+    "pro": "",
+    "email": "lisa@bunnyrecords.com",
+    "website": "",
+    "number_of_recordings": "",
+    "phone": "+1 215 288 3032",
+    "date_of_birth": "1987-03-16",
+    "address": "347 Bloom Ave",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zipcode": "19124",
+    "country": "United States"
+  },
+  {
+    "id": "steve-rights",
+    "type": "profile",
+    "title": "Steve Rights",
+    "description": "Catalog Manager",
+    "imgURL": "media-registry/profiles/Steve-Rights.jpg",
+    "organization": "crd_records",
+    "ipi": "",
+    "pro": "",
+    "email": "steve.rights@crd-records.com",
+    "website": "",
+    "number_of_recordings": "",
+    "phone": "+1 323 911 4401",
+    "date_of_birth": "1992-05-09",
+    "address": "6370 Sunrise Ave",
+    "city": "Los Angeles",
+    "state": "CA",
+    "zipcode": "90028",
+    "country": "United States"
+  },
+  {
+    "id": "alex-sharp",
+    "type": "profile",
+    "title": "Alex Sharp",
+    "description": "Data Engineer",
+    "imgURL": "media-registry/profiles/Alex-Sharp.jpg",
+    "organization": "pulse",
+    "ipi": "",
+    "pro": "",
+    "email": "alex.sharp@pulse.com",
+    "website": "",
+    "number_of_recordings": "",
+    "phone": "+1 617 710 2005",
+    "date_of_birth": "1990-08-01",
+    "address": "112 Calum St",
+    "city": "Boston",
+    "state": "MA",
+    "zipcode": "02120",
+    "country": "United States"
+  },
+  {
     "id": "pia-midina",
     "type": "profile",
     "title": "Pia Midina",
     "description": "Recording artist & lyricist",
     "imgURL": "media-registry/profiles/Pia-Midina.jpg",
     "organization": "verifi",
-    "fields": [
-      {
-        "title": "ipi #",
-        "value": "618723194"
-      },
-      {
-        "title": "email",
-        "value": "pia.midina@gmail.com"
-      },
-      {
-        "title": "website",
-        "value": "www.piamidina.com"
-      }
-    ],
-    "ipi": "618723194",
+    "ipi": "00618723194",
+    "pro": "SOMOA",
     "email": "pia.midina@gmail.com",
     "website": "www.piamidina.com",
     "number_of_recordings": "17",
@@ -36,19 +83,21 @@
     "id": "francesco-midina",
     "type": "profile",
     "title": "Francesco Midina",
-    "description": "Producer",
+    "description": "Producer (Francesco Rocks)",
     "imgURL": "media-registry/profiles/francesco-midina.jpg",
     "organization": "verifi",
-    "fields": [
-      {
-        "title": "website",
-        "value": "www.francesco.rocks"
-      },
-      {
-        "title": "no. of recordings",
-        "value": 168
-      }
-    ]
+    "ipi": "",
+    "pro": "",
+    "email": "francesco.midina@rocks.com",
+    "website": "www.francesco.rocks",
+    "number_of_recordings": "168",
+    "phone": "+1 215 234 1198",
+    "date_of_birth": "1970-03-02",
+    "address": "234 Harbor Ave",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zipcode": "19111",
+    "country": "United States"
   },
   {
     "id": "miles-ponia",
@@ -56,33 +105,39 @@
     "title": "Miles Ponia",
     "description": "Composer",
     "imgURL": "media-registry/profiles/Miles_Ponia.jpg",
-    "fields": [
-      {
-        "title": "email",
-        "value": "miles@gmail.com"
-      },
-      {
-        "title": "phone",
-        "value": "+1 215 920 1167"
-      }
-    ]
+    "organization": "verifi",
+    "ipi": "00281928373",
+    "pro": "SOMOA",
+    "email": "miles@gmail.com",
+    "website": "",
+    "number_of_recordings": "",
+    "phone": "+1 215 920 1167",
+    "date_of_birth": "1994-11-18",
+    "address": "738 Play Rd",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zipcode": "19111",
+    "country": "United States"
   },
   {
     "id": "bb-clarke",
     "type": "profile",
     "title": "BB Clarke",
+    "description": "Recording artist & lyricist",
     "imgURL": "media-registry/profiles/BB-Clarke.jpg",
     "organization": "verifi",
-    "fields": [
-      {
-        "title": "website",
-        "value": "www.bbclarke.com"
-      },
-      {
-        "title": "no. of recordings",
-        "value": 7
-      }
-    ]
+    "ipi": "00618722178",
+    "pro": "SOMOA",
+    "email": "bb.clarke@gmail.com",
+    "website": "www.bbclarke.com",
+    "number_of_recordings": "7",
+    "phone": "+1 617 611 0053",
+    "date_of_birth": "1960-03-16",
+    "address": "11 Coin Pl",
+    "city": "Boston",
+    "state": "MA",
+    "zipcode": "02111",
+    "country": "United States"
   },
   {
     "id": "francine-stewart",
@@ -93,17 +148,160 @@
     "id": "michelle-harris",
     "type": "profile",
     "title": "Michelle Harris",
+    "description": "Producer (Music by Michelle)",
     "imgURL": "media-registry/profiles/Michelle-Harris.jpg",
+    "organization": "Music by Michelle",
+    "ipi": "",
+    "pro": "",
+    "email": "michelle@musicbymichelle.com",
+    "website": "www.musicbymichelle.com",
+    "number_of_recordings": "353",
+    "phone": "+1 617 050 1128",
+    "date_of_birth": "1975-01-02",
+    "address": "1821 Apple St",
+    "city": "Boston",
+    "state": "MA",
+    "zipcode": "02127",
+    "country": "United States"
+  },
+  {
+    "id": "joel-kaplan",
+    "type": "profile",
+    "title": "Joel Kaplan",
+    "description": "Mastering engineer",
+    "imgURL": "media-registry/profiles/Joel-Kaplan.jpg",
+    "organization": "",
+    "ipi": "",
+    "pro": "",
+    "email": "joel-kaplan@gmail.com",
+    "website": "",
+    "number_of_recordings": "58",
+    "phone": "+1 215 234 1190",
+    "date_of_birth": "1991-01-01",
+    "address": "23 Minion Ave",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zipcode": "19111",
+    "country": "United States"
+  },
+  {
+    "id": "mariah-solis",
+    "type": "profile",
+    "title": "Mariah Solis",
+    "description": "Mixing engineer",
+    "imgURL": "media-registry/profiles/Mariah-Solis.jpg",
+    "organization": "",
+    "ipi": "",
+    "pro": "",
+    "email": "m.solis@gmail.com",
+    "website": "",
+    "number_of_recordings": "213",
+    "phone": "+1 215 131 8830",
+    "date_of_birth": "1987-08-03",
+    "address": "1123 Clause Pl",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zipcode": "19111",
+    "country": "United States"
+  },
+  {
+    "id": "ian-adams",
+    "type": "profile",
+    "title": "Ian Adams",
+    "description": "Recording engineer",
+    "imgURL": "media-registry/profiles/Ian-Adams.jpg",
+    "organization": "",
+    "ipi": "",
+    "pro": "",
+    "email": "adams.ian@gmail.com",
+    "website": "",
+    "number_of_recordings": "508",
+    "phone": "+1 215 558 8220",
+    "date_of_birth": "1975-11-13",
+    "address": "207 Phantom Pl",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zipcode": "19124",
+    "country": "United States"
+  },
+  {
+    "id": "jenny-sparks",
+    "type": "profile",
+    "title": "Jenny Sparks",
+    "description": "Background singer",
+    "imgURL": "media-registry/profiles/Jenny-Sparks.jpg",
+    "organization": "",
+    "ipi": "00616551032",
+    "pro": "",
+    "email": "jennifer.sparks@gmail.com",
+    "website": "",
+    "number_of_recordings": "22",
+    "phone": "+1 215 110 2105",
+    "date_of_birth": "1998-03-18",
+    "address": "120 Parrot St",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zipcode": "19124",
+    "country": "United States"
+  },
+  {
+    "id": "sophia-lanagan",
+    "type": "profile",
+    "title": "Sophia Lanagan",
+    "description": "Background singer",
+    "imgURL": "media-registry/profiles/Sophia-Lanagan.jpg",
+    "organization": "",
+    "ipi": "00616554918",
+    "pro": "",
+    "email": "sophialanagan@gmail.com",
+    "website": "",
+    "number_of_recordings": "19",
+    "phone": "+1 215 101 3331",
+    "date_of_birth": "2000-03-28",
+    "address": "50 Harolds St",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zipcode": "19132",
+    "country": "United States"
+  },
+  {
+    "id": "helen-gellar",
+    "type": "profile",
+    "title": "Helen Gellar",
+    "description": "Background singer",
+    "imgURL": "media-registry/profiles/Helen-Gellar.jpg",
+    "organization": "",
+    "ipi": "00616550325",
+    "pro": "",
+    "email": "h.gellar@gmail.com",
+    "website": "",
+    "number_of_recordings": "25",
+    "phone": "+1 215 122 5718",
+    "date_of_birth": "2000-06-30",
+    "address": "7 N Grand St",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zipcode": "19122",
+    "country": "United States"
+  },
+  {
+    "id": "arthur-doyle",
+    "type": "profile",
+    "title": "Arthur Doyle",
+    "description": "Drummer",
+    "imgURL": "media-registry/profiles/Arthur-Doyle.jpg",
     "organization": "verifi",
-    "fields": [
-      {
-        "title": "website",
-        "value": "www.musicbymichelle.com"
-      },
-      {
-        "title": "no. of recordings",
-        "value": 353
-      }
-    ]
+    "ipi": "00512103044",
+    "pro": "",
+    "email": "arthur.doyle@gmail.com",
+    "website": "",
+    "number_of_recordings": "",
+    "phone": "",
+    "date_of_birth": "",
+    "address": "",
+    "city": "",
+    "state": "",
+    "zipcode": "",
+    "country": "United States"
   }
 ]

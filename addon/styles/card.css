@@ -13,12 +13,6 @@
   cursor: pointer;
 }
 
-.boxel-card__carot-btn {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-}
-
 .card__gradient {
   z-index: 1;
   position: absolute;
@@ -39,15 +33,17 @@
 }
 
 .boxel-card__expand-btn:hover ~ .boxel-card,
-.boxel-card:hover {
+.boxel-card__expand-overlay:hover {
   box-shadow: var(--boxel-box-shadow);
   cursor: pointer;
+  outline: 0;
 }
 
 .boxel-card--default {
   display: grid;
   align-items: center;
   gap: 3px 15px;
+  max-width: 450px;
   padding: 15px 45px 15px 15px;
   color: black;
   font: var(--boxel-font);
@@ -59,11 +55,6 @@
   list-style-type: none;
   margin: 0;
   padding-left: 0;
-}
-
-.boxel-card--small {
-  width: 100%;
-  max-width: 450px;
 }
 
 .boxel-card__title {
@@ -115,9 +106,6 @@
   padding-top: 25px;
   grid-column: 1 / -1;
   display: grid;
-}
-
-.boxel-card__fields--collapsed {
   grid-auto-flow: column;
   grid-auto-columns: max-content;
   gap: 30px;
@@ -139,9 +127,24 @@
   left: 10px;
 }
 
+.boxel-card--profile {
+  padding-right: 10px;
+}
+
 .boxel-card--profile .boxel-card__bg-img {
   border-radius: 100px;
+  background-image: url('/media-registry/placeholders/profile.svg');
 }
+
+.boxel-card--profile__fields {
+  grid-auto-flow: row;
+  grid-template-columns: auto auto auto;
+  align-items: end;
+  justify-items: start;
+  gap: 10px;
+  white-space: nowrap;
+}
+
 
 .boxel-card--audio-file .boxel-card__bg-img {
   height: 34px;
@@ -186,6 +189,7 @@
   font-weight: bold;
   letter-spacing: var(--boxel-lsp-xl);
   text-transform: uppercase;
+  text-align: left;
 }
 
 .boxel-card-field .field-renderer__value {

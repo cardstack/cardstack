@@ -131,7 +131,7 @@ export default class VersionHistory extends Component {
 
           else if (JSON.stringify(compCard[field]) !== JSON.stringify(baseCard[field])) {
             if (typeof compCard[field] === "object" || typeof baseCard[field] === "object") {
-              this.compareCollections(baseCard[field], compCard[field]);
+              this.compareCollections(baseCard[field].value || baseCard[field], compCard[field].value || compCard[field]);
             } else {
               this.changedFields.push({
                 title: field,

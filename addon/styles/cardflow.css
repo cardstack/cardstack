@@ -84,11 +84,11 @@
 }
 
 .cardflow__message-icon__profile--crd {
-  background-image: url("/media-registry/button-crd-records.svg"), url("/media-registry/crd-user.svg");
+  background-image: url("/media-registry/button-crd-records.svg"), url("/media-registry/crd-user.png");
 }
 
 .cardflow__message-icon__profile--bunny {
-  background-image: url("/media-registry/button-bunny-records.svg"), url("/media-registry/bunny-user.svg");
+  background-image: url("/media-registry/button-bunny-records.svg"), url("/media-registry/bunny-user.png");
 }
 
 .cardflow__message-info {

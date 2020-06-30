@@ -1,3 +1,35 @@
+
+
+import {
+  PIA_MIDINA,
+  FRANCESCO_MIDINA,
+  JOEL_KAPLAN,
+  MARIAH_SOLIS,
+  IAN_ADAMS,
+  JENNY_SPARKS,
+  SOPHIA_LANAGAN,
+  HELEN_GELLAR,
+  ARTHUR_DOYLE
+} from './profiles';
+
+const MUSICAL_WORK = {
+  "type": "card",
+  "component": "cards/musical-work-embedded",
+  "value": {
+    "artist": "Pia Midina",
+    "artist_id": "pia-midina",
+    "composer": "Miles Ponia",
+    "composer_id": "miles-ponia",
+    "copyright_notice": "© 2020 RealTunes Publishing",
+    "iswc": "T-030248890-1",
+    "publisher": "RealTunes Publishing",
+    "title": "The leaves are changing color",
+    "type": "musical-work",
+    "verifi_id": "0x1b8932b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d8923ba",
+    "version_type": "Original work"
+  }
+};
+
 export default [
   {
     "id": "the-leaves-are-changing-color",
@@ -16,48 +48,17 @@ export default [
           "fields": {
             "title": "Leaves Are Changing Color",
             "version_type": "Recording",
-            "artists": [
-              {
-                "id": "pia-midina",
-                "type": "profile",
-                "title": "Pia Midina",
-                "description": "Recording artist & lyricist",
-                "imgURL": "media-registry/profiles/Pia-Midina.jpg",
-                "organization": "verifi",
-                "fields": [
-                  {
-                    "title": "ipi #",
-                    "value": "618723194"
-                  },
-                  {
-                    "title": "email",
-                    "value": "pia.midina@gmail.com"
-                  },
-                  {
-                    "title": "website",
-                    "value": "www.piamidina.com"
-                  }
-                ]
-              }
-            ],
+            "artists": {
+              "type": "collection",
+              "component": "cards/artist",
+              "value": [ PIA_MIDINA ]
+            },
             "genre": ["Alternative", "Dream Pop"],
             "album_art": null,
             "label": "Bunny Records",
             "copyright_notice": "℗ 2020 Bunny Records",
             "parental_advisory": "No",
-            "musical_work": {
-              "artist": "Pia Midina",
-              "artist_id": "pia-midina",
-              "composer": "Miles Ponia",
-              "composer_id": "miles-ponia",
-              "copyright_notice": "© 2020 RealTunes Publishing",
-              "iswc": "T-030248890-1",
-              "publisher": "RealTunes Publishing",
-              "title": "The leaves are changing color",
-              "type": "musical-work",
-              "verifi_id": "0x1b8932b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d8923ba",
-              "version_type": "Original work"
-            },
+            "musical_work": MUSICAL_WORK,
             "isrc": "US-S1Z-22-05001",
             "year": "2020",
             "length": "3:23"
@@ -77,68 +78,21 @@ export default [
           "fields": {
             "title": "Leaves Are Changing Color",
             "version_type": "Recording",
-            "artists": [
-              {
-                "id": "pia-midina",
-                "type": "profile",
-                "title": "Pia Midina",
-                "description": "Recording artist & lyricist",
-                "imgURL": "media-registry/profiles/Pia-Midina.jpg",
-                "organization": "verifi",
-                "fields": [
-                  {
-                    "title": "ipi #",
-                    "value": "618723194"
-                  },
-                  {
-                    "title": "email",
-                    "value": "pia.midina@gmail.com"
-                  },
-                  {
-                    "title": "website",
-                    "value": "www.piamidina.com"
-                  }
-                ]
-              },
-              {
-                "id": "jenny-sparks",
-                "type": "profile",
-                "title": "Jenny Sparks",
-                "description": "Background singer",
-                "fields": [
-                  {
-                    "title": "ipi #",
-                    "value": "616551032"
-                  },
-                  {
-                    "title": "email",
-                    "value": "jennifer.sparks@gmail.com"
-                  },
-                  {
-                    "title": "website"
-                  }
-                ]
-              }
-            ],
+            "artists": {
+              "type": "collection",
+              "component": "cards/artist",
+              "value": [
+                PIA_MIDINA,
+                JENNY_SPARKS
+              ]
+            },
             "genre": ["Alternative", "Dream Pop"],
             "album_art": null,
             "release_date": "2020",
             "label": "Bunny Records",
             "copyright_notice": "℗ 2020 Bunny Records",
             "parental_advisory": "No",
-            "musical_work": {
-              "artist": "Pia Midina",
-              "artist_id": "pia-midina",
-              "composer": "Miles Ponia",
-              "composer_id": "miles-ponia",
-              "copyright_notice": "© 2020 RealTunes Publishing",
-              "iswc": "T-030248890-1",
-              "publisher": "RealTunes Publishing",
-              "title": "The leaves are changing color",
-              "type": "musical-work",
-              "verifi_id": "0x1b8932b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d8923ba",
-              "version_type": "Original work"
-            },
+            "musical_work": MUSICAL_WORK,
             "isrc": "US-S1Z-22-05001",
             "year": "2020",
             "length": "3:23"
@@ -162,88 +116,22 @@ export default [
           "fields": {
             "title": "Fall Is Back",
             "version_type": "Recording",
-            "artists": [
-              {
-                "id": "pia-midina",
-                "type": "profile",
-                "title": "Pia Midina",
-                "description": "Recording artist & lyricist",
-                "imgURL": "media-registry/profiles/Pia-Midina.jpg",
-                "organization": "verifi",
-                "fields": [
-                  {
-                    "title": "ipi #",
-                    "value": "618723194"
-                  },
-                  {
-                    "title": "email",
-                    "value": "pia.midina@gmail.com"
-                  },
-                  {
-                    "title": "website",
-                    "value": "www.piamidina.com"
-                  }
-                ]
-              },
-              {
-                "id": "jenny-sparks",
-                "type": "profile",
-                "title": "Jenny Sparks",
-                "description": "Background singer",
-                "fields": [
-                  {
-                    "title": "ipi #",
-                    "value": "616551032"
-                  },
-                  {
-                    "title": "email",
-                    "value": "jennifer.sparks@gmail.com"
-                  },
-                  {
-                    "title": "website"
-                  }
-                ]
-              },
-              {
-                "id": "arthur-doyle",
-                "type": "profile",
-                "title": "Arthur Doyle",
-                "description": "Drummer",
-                "organization": "verifi",
-                "fields": [
-                  {
-                    "title": "ipi #",
-                    "value": "512103044"
-                  },
-                  {
-                    "title": "email",
-                    "value": "arthur.doyle@gmail.com"
-                  },
-                  {
-                    "title": "website"
-                  }
-                ]
-              }
-            ],
+            "artists": {
+              "type": "collection",
+              "component": "cards/artist",
+              "value": [
+                PIA_MIDINA,
+                JENNY_SPARKS,
+                ARTHUR_DOYLE
+              ]
+            },
             "genre": ["Alternative", "Dream Pop"],
             "album_art": "media-registry/old-album-art.png",
             "release_date": "2020",
             "label": "Bunny Records",
             "copyright_notice": "℗ 2020 Bunny Records",
             "parental_advisory": "No",
-            "musical_work": {
-              "artist": "Pia Midina",
-              "artist_id": "pia-midina",
-              "composer": "Miles Ponia",
-              "composer_id": "miles-ponia",
-              "copyright_notice": "© 2020 RealTunes Publishing",
-              "iswc": "T-030248890-1",
-              "publisher": "RealTunes Publishing",
-              "title": "The leaves are changing color",
-              "type": "musical-work",
-              "verifi_id": "0x1b8932b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d8923ba",
-              "version_type": "Original work"
-            },
+            "musical_work": MUSICAL_WORK,
             "isrc": "US-S1Z-22-05001",
             "year": "2020",
             "length": "3:23"
@@ -267,68 +155,21 @@ export default [
           "fields": {
             "title": "The Leaves Are Changing Color",
             "version_type": "Recording",
-            "artists": [
-              {
-                "id": "pia-midina",
-                "type": "profile",
-                "title": "Pia Midina",
-                "description": "Recording artist & lyricist",
-                "imgURL": "media-registry/profiles/Pia-Midina.jpg",
-                "organization": "verifi",
-                "fields": [
-                  {
-                    "title": "ipi #",
-                    "value": "618723194"
-                  },
-                  {
-                    "title": "email",
-                    "value": "pia.midina@gmail.com"
-                  },
-                  {
-                    "title": "website",
-                    "value": "www.piamidina.com"
-                  }
-                ]
-              },
-              {
-                "id": "jenny-sparks",
-                "type": "profile",
-                "title": "Jenny Sparks",
-                "description": "Background singer",
-                "fields": [
-                  {
-                    "title": "ipi #",
-                    "value": "616551032"
-                  },
-                  {
-                    "title": "email",
-                    "value": "jennifer.sparks@gmail.com"
-                  },
-                  {
-                    "title": "website"
-                  }
-                ]
-              }
-            ],
+            "artists": {
+              "type": "collection",
+              "component": "cards/artist",
+              "value": [
+                PIA_MIDINA,
+                JENNY_SPARKS
+              ]
+            },
             "genre": ["Alternative", "Dream Pop"],
             "album_art": "media-registry/covers/medium/Autumn-Leaves.jpg",
             "release_date": "2020",
             "label": "Bunny Records",
             "copyright_notice": "℗ 2020 Bunny Records",
             "parental_advisory": "No",
-            "musical_work": {
-              "artist": "Pia Midina",
-              "artist_id": "pia-midina",
-              "composer": "Miles Ponia",
-              "composer_id": "miles-ponia",
-              "copyright_notice": "© 2020 RealTunes Publishing",
-              "iswc": "T-030248890-1",
-              "publisher": "RealTunes Publishing",
-              "title": "The leaves are changing color",
-              "type": "musical-work",
-              "verifi_id": "0x1b8932b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d8923ba",
-              "version_type": "Original work"
-            },
+            "musical_work": MUSICAL_WORK,
             "isrc": "US-S1Z-22-05001",
             "year": "2020",
             "length": "3:23"
@@ -352,87 +193,16 @@ export default [
           "fields": {
             "title": "The Leaves Are Changing Color",
             "version_type": "Recording",
-            "artists": [
-              {
-                "id": "pia-midina",
-                "type": "profile",
-                "title": "Pia Midina",
-                "description": "Recording artist & lyricist",
-                "imgURL": "media-registry/profiles/Pia-Midina.jpg",
-                "organization": "verifi",
-                "fields": [
-                  {
-                    "title": "ipi #",
-                    "value": "618723194"
-                  },
-                  {
-                    "title": "email",
-                    "value": "pia.midina@gmail.com"
-                  },
-                  {
-                    "title": "website",
-                    "value": "www.piamidina.com"
-                  }
-                ]
-              },
-              {
-                "id": "jenny-sparks",
-                "type": "profile",
-                "title": "Jenny Sparks",
-                "description": "Background singer",
-                "fields": [
-                  {
-                    "title": "ipi #",
-                    "value": "616551032"
-                  },
-                  {
-                    "title": "email",
-                    "value": "jennifer.sparks@gmail.com"
-                  },
-                  {
-                    "title": "website"
-                  }
-                ]
-              },
-              {
-                "id": "sophia-lanagan",
-                "type": "profile",
-                "title": "Sophia Lanagan",
-                "description": "Background singer",
-                "fields": [
-                  {
-                    "title": "ipi #",
-                    "value": "616554918"
-                  },
-                  {
-                    "title": "email",
-                    "value": "sophialanagan@gmail.com"
-                  },
-                  {
-                    "title": "website"
-                  }
-                ]
-              },
-              {
-                "id": "helen-gellar",
-                "type": "profile",
-                "title": "Helen Gellar",
-                "description": "Background singer",
-                "fields": [
-                  {
-                    "title": "ipi #",
-                    "value": "616550325"
-                  },
-                  {
-                    "title": "email",
-                    "value": "h.gellar@gmail.com"
-                  },
-                  {
-                    "title": "website"
-                  }
-                ]
-              }
-            ],
+            "artists": {
+              "type": "collection",
+              "component": "cards/artist",
+              "value": [
+                PIA_MIDINA,
+                JENNY_SPARKS,
+                SOPHIA_LANAGAN,
+                HELEN_GELLAR
+              ]
+            },
             "genre": ["Alternative", "Dream Pop"],
             "sales": {
               "type": "card",
@@ -452,28 +222,19 @@ export default [
               ]
             },
             "album_art": "media-registry/covers/medium/Autumn-Leaves.jpg",
-            "release_date": [{
-              "type": "schedule",
-              "id": "release_date",
-              "title": "Release Date",
-              "description": "March 2, 2020"
-            }],
+            "release_date": {
+              "type": "collection",
+              "value": [{
+                "type": "schedule",
+                "id": "release_date",
+                "title": "Release Date",
+                "description": "March 2, 2020"
+              }]
+            },
             "label": "Bunny Records",
             "copyright_notice": "℗ 2020 Bunny Records",
             "parental_advisory": "No",
-            "musical_work": {
-              "artist": "Pia Midina",
-              "artist_id": "pia-midina",
-              "composer": "Miles Ponia",
-              "composer_id": "miles-ponia",
-              "copyright_notice": "© 2020 RealTunes Publishing",
-              "iswc": "T-030248890-1",
-              "publisher": "RealTunes Publishing",
-              "title": "The leaves are changing color",
-              "type": "musical-work",
-              "verifi_id": "0x1b8932b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d8923ba",
-              "version_type": "Original work"
-            },
+            "musical_work": MUSICAL_WORK,
             "isrc": "US-S1Z-22-05001",
             "year": "2020",
             "length": "3:23"
@@ -498,169 +259,20 @@ export default [
             "title": "The Leaves Are Changing Color",
             "alternate_title": "Colorful Leaves",
             "version_type": "Recording",
-            "artists": [
-              {
-                "id": "pia-midina",
-                "type": "profile",
-                "title": "Pia Midina",
-                "description": "Recording artist & lyricist",
-                "imgURL": "media-registry/profiles/Pia-Midina.jpg",
-                "organization": "verifi",
-                "fields": [
-                  {
-                    "title": "ipi #",
-                    "value": "618723194"
-                  },
-                  {
-                    "title": "email",
-                    "value": "pia.midina@gmail.com"
-                  },
-                  {
-                    "title": "website",
-                    "value": "www.piamidina.com"
-                  }
-                ]
-              },
-              {
-                "id": "francesco-midina",
-                "type": "profile",
-                "title": "Francesco Midina",
-                "description": "Producer",
-                "imgURL": "media-registry/profiles/francesco-midina.jpg",
-                "organization": "verifi",
-                "fields": [
-                  {
-                    "title": "ipi #",
-                    "value": ""
-                  },
-                  {
-                    "title": "email",
-                    "value": "francesco.midina@rocks.com"
-                  },
-                  {
-                    "title": "website",
-                    "value": "www.francesco.rocks"
-                  }
-                ]
-              },
-              {
-                "id": "joel-kaplan",
-                "type": "profile",
-                "title": "Joel Kaplan",
-                "description": "Mastering engineer",
-                "imgURL": "",
-                "fields": [
-                  {
-                    "title": "ipi #",
-                    "value": ""
-                  },
-                  {
-                    "title": "email",
-                    "value": "joel-kaplan@gmail.com"
-                  },
-                  {
-                    "title": "website"
-                  }
-                ]
-              },
-              {
-                "id": "mariah-solis",
-                "type": "profile",
-                "title": "Mariah Solis",
-                "description": "Mixing engineer",
-                "imgURL": "",
-                "fields": [
-                  {
-                    "title": "ipi #",
-                    "value": ""
-                  },
-                  {
-                    "title": "email",
-                    "value": "m.solis@gmail.com"
-                  },
-                  {
-                    "title": "website"
-                  }
-                ]
-              },
-              {
-                "id": "ian-adams",
-                "type": "profile",
-                "title": "Ian Adams",
-                "description": "Recording engineer",
-                "imgURL": "",
-                "fields": [
-                  {
-                    "title": "ipi #",
-                    "value": ""
-                  },
-                  {
-                    "title": "email",
-                    "value": "adams.ian@gmail.com"
-                  },
-                  {
-                    "title": "website"
-                  }
-                ]
-              },
-              {
-                "id": "jenny-sparks",
-                "type": "profile",
-                "title": "Jenny Sparks",
-                "description": "Background singer",
-                "fields": [
-                  {
-                    "title": "ipi #",
-                    "value": "616551032"
-                  },
-                  {
-                    "title": "email",
-                    "value": "jennifer.sparks@gmail.com"
-                  },
-                  {
-                    "title": "website"
-                  }
-                ]
-              },
-              {
-                "id": "sophia-lanagan",
-                "type": "profile",
-                "title": "Sophia Lanagan",
-                "description": "Background singer",
-                "fields": [
-                  {
-                    "title": "ipi #",
-                    "value": "616554918"
-                  },
-                  {
-                    "title": "email",
-                    "value": "sophialanagan@gmail.com"
-                  },
-                  {
-                    "title": "website"
-                  }
-                ]
-              },
-              {
-                "id": "helen-gellar",
-                "type": "profile",
-                "title": "Helen Gellar",
-                "description": "Background singer",
-                "fields": [
-                  {
-                    "title": "ipi #",
-                    "value": "616550325"
-                  },
-                  {
-                    "title": "email",
-                    "value": "h.gellar@gmail.com"
-                  },
-                  {
-                    "title": "website"
-                  }
-                ]
-              }
-            ],
+            "artists": {
+              "type": "collection",
+              "component": "cards/artist",
+              "value": [
+                PIA_MIDINA,
+                FRANCESCO_MIDINA,
+                JOEL_KAPLAN,
+                MARIAH_SOLIS,
+                IAN_ADAMS,
+                JENNY_SPARKS,
+                SOPHIA_LANAGAN,
+                HELEN_GELLAR
+              ]
+            },
             "genre": ["Alternative", "Dream Pop"],
             "sales": {
               "type": "card",
@@ -680,36 +292,27 @@ export default [
               ]
             },
             "album_art": "media-registry/covers/medium/Autumn-Leaves.jpg",
-            "release_date": [
-              {
-                "type": "schedule",
-                "id": "release_date",
-                "title": "Release Date",
-                "description": "March 2, 2020"
-              },
-              {
-                "type": "schedule",
-                "id": "digital_download",
-                "title": "Digital Download",
-                "description": "May 4, 2020"
-              }
-            ],
+            "release_date": {
+              "type": "collection",
+              "value": [
+                {
+                  "type": "schedule",
+                  "id": "release_date",
+                  "title": "Release Date",
+                  "description": "March 2, 2020"
+                },
+                {
+                  "type": "schedule",
+                  "id": "digital_download",
+                  "title": "Digital Download",
+                  "description": "May 4, 2020"
+                }
+              ]
+            },
             "label": "Bunny Records",
             "copyright_notice": "℗ 2020 Bunny Records",
             "parental_advisory": "No",
-            "musical_work": {
-              "artist": "Pia Midina",
-              "artist_id": "pia-midina",
-              "composer": "Miles Ponia",
-              "composer_id": "miles-ponia",
-              "copyright_notice": "© 2020 RealTunes Publishing",
-              "iswc": "T-030248890-1",
-              "publisher": "RealTunes Publishing",
-              "title": "The leaves are changing color",
-              "type": "musical-work",
-              "verifi_id": "0x1b8932b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d8923ba",
-              "version_type": "Original work"
-            },
+            "musical_work": MUSICAL_WORK,
             "isrc": "US-S1Z-22-05001",
             "year": "2020",
             "length": "3:23"

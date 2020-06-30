@@ -3,7 +3,7 @@
     {{#let (find-by "id" val.id @addedCards) (find-by "id" val.id @changedCards) as |added changed|}}
       {{#if (lt i this.displayCount)}}
         <div>
-          <Card @model={{val}} @variant="small" @mode="view" @status={{if added "added" (if changed "changed")}} />
+          {{component (or @cardComponent "card") model=val mode="view" status=(if added "added" (if changed "changed"))}}
           {{#if changed}}
             <Boxel>
               <BoxelHighlight @status="deleted" />
@@ -19,13 +19,13 @@
     {{#if (eq i (sub @collection.length 1))}}
       {{#each @removedCards as |removed|}}
         {{#if (and (lt i this.displayCount) (not-eq val.id removed.id) (eq val.type removed.type))}}
-          <Card @model={{removed}} @variant="small" @mode="view" @status={{if removed "removed"}} />
+          {{component (or @cardComponent "card") model=removed mode="view" status=(if removed "removed")}}
         {{/if}}
       {{/each}}
     {{/if}}
   {{else}}
     {{#if (lt i this.displayCount)}}
-      <Card @model={{val}} @variant="small" @mode="view"}} />
+      {{component (or @cardComponent "card") model=val mode="view"}}
     {{/if}}
   {{/if}}
 

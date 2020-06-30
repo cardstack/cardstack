@@ -59,7 +59,7 @@
   color: transparent;
   width: 260px;
   height: 260px;
-  background: url("/media-registry/album_art.svg") center/cover no-repeat;
+  background: url("/media-registry/placeholders/album_art.svg") center/cover no-repeat;
 }
 
 .cover-art-field img {

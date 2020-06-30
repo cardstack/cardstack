@@ -12,10 +12,10 @@
   <section class="media-detail-section">
     <h3 class="media-detail-section__title">Musical Work</h3>
     <div class="detail-card__body">
-      {{#each-in this.musicalWorkIsolated as |field value|}}
+      {{#each-in this.musicalWorkIsolated as |title field|}}
         <FieldRenderer
           @mode={{@mode}}
-          @field={{hash title=field value=value component=value.component}}
+          @field={{hash title=title value=(or field.value field) type=field.type component=field.component}}
           @class="detail-card-field"
         />
       {{/each-in}}
