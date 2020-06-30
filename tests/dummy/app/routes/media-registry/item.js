@@ -39,6 +39,8 @@ export default class MediaRegistryItemRoute extends Route {
       record.fromCollectionId = transition.from.parent.params.collectionId;
     }
 
+    record.selectableArtists = profiles;
+
     return record;
   }
 }
