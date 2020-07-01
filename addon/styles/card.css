@@ -18,7 +18,7 @@
   position: absolute;
   right: 2px;
   bottom: 3px;
-  width: 50px;
+  width: 20px;
   height: 50px;
   border-bottom-right-radius: 5px;
   background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, #fff 40%);
@@ -43,18 +43,25 @@
   display: grid;
   align-items: center;
   gap: 3px 15px;
-  max-width: 450px;
-  padding: 15px 45px 15px 15px;
+  min-height: 90px;
+  padding: 15px;
   color: black;
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp);
   overflow: hidden;
 }
 
+.boxel-card--blank-card {
+  width: 100%;
+  height: 150px;
+  background: url('/media-registry/placeholders/blank-card.png') center/contain no-repeat;
+}
+
 .boxel-card ul {
   list-style-type: none;
   margin: 0;
   padding-left: 0;
+  overflow: hidden;
 }
 
 .boxel-card__title {
@@ -106,14 +113,14 @@
   padding-top: 25px;
   grid-column: 1 / -1;
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
+  grid-template-columns: repeat(4, auto);
+  justify-items: start;
   gap: 30px;
+  white-space: nowrap;
 }
 
 
 /* Card type adjustments */
-/* TODO: make separate card types */
 .boxel-card--musical-work .boxel-card__bg-img {
   background-size: contain;
 }
@@ -127,24 +134,10 @@
   left: 10px;
 }
 
-.boxel-card--profile {
-  padding-right: 10px;
-}
-
 .boxel-card--profile .boxel-card__bg-img {
   border-radius: 100px;
   background-image: url('/media-registry/placeholders/profile.svg');
 }
-
-.boxel-card--profile__fields {
-  grid-auto-flow: row;
-  grid-template-columns: auto auto auto;
-  align-items: end;
-  justify-items: start;
-  gap: 10px;
-  white-space: nowrap;
-}
-
 
 .boxel-card--audio-file .boxel-card__bg-img {
   height: 34px;

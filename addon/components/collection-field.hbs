@@ -6,7 +6,7 @@
           {{component (or @field.component "card") model=@field.value mode="view" format=@field.format}}
           <IconButton @icon="icon-minus-circle" @class="collection-field__remove-btn" @aria-label="remove" />
         {{else}}
-          <CollectionAddButton />
+          <CollectionAddButton @fieldName={{@field.title}} @component={{@field.component}} />
         {{/if}}
       </div>
     {{else}}
@@ -59,11 +59,12 @@
         <CollectionAddButton
           @searchFn={{@field.search}}
           @field={{@field}}
-          @fieldName={{@fieldName}}
+          @fieldName={{@field.title}}
           @addItem={{this.addItem}}
           @format={{@format}}
           @mode={{@mode}}
-          @newItemComponent={{component "card" variant="small" mode="view" format=@format class="collection-field__card"}}
+          @component={{@field.component}}
+          @newItemComponent={{component "card" mode="view" format=@format class="collection-field__card"}}
         />
       </footer>
     {{/if}}

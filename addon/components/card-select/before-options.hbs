@@ -1,5 +1,5 @@
 <div class="cs-card-select--before-options">
-  {{svg-jar "cardstack" width="16px" height="16px"}}
+  <IconButton @class="before-options__gear-btn" @button="gear" @icon="gear" />
 
   {{#if @dataSource}}
     <span class="cs-card-select--data-source">

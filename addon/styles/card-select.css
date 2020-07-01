@@ -1,8 +1,16 @@
 @import 'ember-power-select-typeahead';
 
-.cs-card-select--demo-container {
-  padding: 30px;
-  max-width: 600px;
+.cs-card-select__container {
+  width: 700px;
+  margin-left: -270px;
+  margin-top: 20px;
+}
+
+.cs-card-select {
+  height: auto;
+  border-radius: 10px;
+  background: none;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
 }
 
 .cs-card-select .ember-power-select-trigger {
@@ -10,120 +18,66 @@
   flex-flow: nowrap row;
   align-items: center;
   width: 100%;
-  height: var(--cs-field-height);
-  background-color: var(--cs-field-default);
-  font: var(--cs-font);
+  height: 80px;
+  padding: 30px 20px 25px 50px;
+  background: url('/assets/images/icons/search.svg') center left 15px/18px 20px no-repeat;
+  background-color: white;
+  border: var(--boxel-border);
+  border-radius: 10px;
+  font: var(--boxel-font);
+  font-size: 20px;
   letter-spacing: 0;
-  border: 1px solid var(--cs-field-border);
-  border-radius: var(--cs-field-radius);
-
-  transition: background-color var(--cs-transition-time),
-              box-shadow var(--cs-transition-time),
-              border-color var(--cs-transition-time);
-  padding-right: 0;
-}
-
-.cs-card-select .ember-power-select-trigger--active {
-  box-shadow: 8px 13px 16px 0px rgba(0,0,0,0.5);
+  outline: 0;
 }
 
 .cs-card-select .ember-power-select-typeahead-input {
-  padding: 0 15px;
-  height: 100%;
-  font: var(--cs-font);
-  letter-spacing: 0;
-
+  padding: 0;
+  font: inherit;
+  letter-spacing: inherit;
   border: none;
   outline: none;
 }
 
-.cs-card-select--dropdown .ember-power-select-options {
-  max-height: 30vh;
-}
-
 .cs-card-select--dropdown {
-  background-color: var(--cs-purple);
-  border: 1px solid var(--cs-purple);
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
-  box-shadow: 8px 13px 16px 0px rgba(0,0,0,0.5);
-}
-
-.cs-card-select--dropdown.ember-power-select-dropdown.ember-basic-dropdown-content--below {
-  border: 1px solid var(--cs-purple);
-}
-
-.cs-card-select--dropdown .cs-card-select--option {
-  font-family: var(--cs-font);
-  height: 50px;
-  color: white;
-  display: flex;
-  align-items: center;
-  font-size: 14px;
+  margin-top: -10px;
   padding: 10px;
-  border-radius: 5px;
-  background-color: transparent;
-  transition: background-color var(--cs-transition-time);
+  background: white;
+  border-top: none;
+  border-right: var(--boxel-border);
+  border-left: var(--boxel-border);
+  border-bottom: var(--boxel-border);
+  border-radius: 10px;
+  box-shadow: 0 15px 15px rgba(0, 0, 0, 0.5);
 }
 
-.cs-card-select--dropdown .ember-power-select-option[aria-current="true"] .cs-card-select--option {
-  background-color: var(--cs-purple-light);
+.cs-card-select--dropdown .ember-power-select-options {
+  max-height: 50vh;
+  margin: 10px -10px -10px;
+  background-color: #f0f0f0;
+  text-align: left;
+}
+
+.cs-card-select--dropdown .ember-power-select-options > * + * {
+  margin-top: 15px;
+}
+
+.cs-card-select--dropdown .ember-power-select-option--search-message {
+  display: none;
 }
 
 .cs-card-select--dropdown .ember-power-select-option {
-  padding: 10px;
+  padding: 0 15px;
+  background: none;
+  color: black;
 }
 
-.cs-card-select--dropdown .ember-power-select-option[aria-current="true"] {
-  background-color: transparent;
-}
-.cs-card-select--dropdown .ember-power-select-option[aria-selected="true"] {
-  background-color: var(--cs-purple-light);
+.cs-card-select--dropdown .ember-power-select-option:first-child {
+  padding-top: 15px;
 }
 
-.cs-card-select--thumb {
-  max-width: 50px;
-  max-height: 40px;
-  object-fit: contain;
+.cs-card-select--dropdown .ember-power-select-option:last-child {
+  padding-bottom: 15px;
 }
-
-.cs-card-select--label {
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-weight: bold;
-  margin-left: 10px;
-  margin-right: 10px;
-}
-
-.cs-card-select--subtitle {
-}
-
-.cs-card-select--before-options {
-  color: white;
-  display: flex;
-  height: 40px;
-  align-items: center;
-}
-
-.cs-card-select--before-options svg {
-  margin-left: 10px;
-}
-
-.cs-card-select--data-source {
-  flex: 1;
-  font: var(--cs-font);
-  text-transform: uppercase;
-  text-align: right;
-  margin-right: 10px;
-  font-size: 10px;
-  font-weight: bold;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 
 .cs-card-select--dropdown.ember-basic-dropdown-content--below.ember-basic-dropdown--transitioning-in {
   animation: drop-fade-below var(--cs-transition-time);
@@ -158,8 +112,4 @@
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.cs-card-select--dropdown .ember-power-select-option--search-message {
-  display: none;
 }

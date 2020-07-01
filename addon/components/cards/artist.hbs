@@ -1,4 +1,5 @@
 <Boxel class="boxel-card__container">
+  <div class="card__gradient" />
   {{#if @status}}
     <BoxelHighlight @status={{@status}} />
     <BoxelActions @status={{@status}} />
@@ -13,7 +14,7 @@
     <div class="boxel-card__bg-img" style={{css-url "background-image" @model.imgURL}} />
     <h3 class="boxel-card__title">{{@model.title}}</h3>
     <p class="boxel-card__description">{{@model.description}}</p>
-    <ul class="boxel-card__fields boxel-card--profile__fields">
+    <ul class="boxel-card__fields">
       <li>
         <FieldRenderer
           @class="boxel-card-field"
@@ -32,7 +33,7 @@
         <FieldRenderer
           @class="boxel-card-field"
           @mode={{@mode}}
-          @field={{hash title="# recordings" value=@model.number_of_recordings}}
+          @field={{hash title="No. of recordings" value=@model.number_of_recordings}}
         />
       </li>
     </ul>

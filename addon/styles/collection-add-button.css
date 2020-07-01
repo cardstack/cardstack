@@ -12,18 +12,23 @@
 }
 
 .collection-editor__cancel-btn {
-  --icon-bg: var(--boxel-highlight);
-  --icon-border: var(--boxel-highlight);
-  margin: 0 auto;
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: block;
+  width: 25px;
+  height: 25px;
+  margin: 0;
   padding: 0;
   border: none;
-  background: none;
+  border-radius: 0 10px;
+  background-color: var(--boxel-highlight);
   z-index: 2;
-  font-size: 0.8em;
-  position: absolute;
-  right: 1em;
-  top: 1em;
   cursor: pointer;
+}
+
+.collection-editor__cancel-btn > svg {
+  padding: 8px 8px 9px 9px;
 }
 
 .collection-editor__add-btn svg {
@@ -35,6 +40,10 @@
 .collection-editor__adding-new-item .collection-editor__item .boxel-card--small {
   border: 1px solid red;
   min-height: 80px;
+}
+
+.collection-editor__item {
+  text-align: left;
 }
 
 .collection-editor__adding-new-item {

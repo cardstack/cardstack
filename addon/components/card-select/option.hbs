@@ -1,17 +1,21 @@
-<div class="cs-card-select--option">
-  {{#if @labelPath}}
-    <img class="cs-card-select--thumb" src={{get @item @thumbPath}} alt="{{get @item @labelPath}}">
-  {{/if}}
+{{#if @component}}
+  {{component @component model=@item mode="view"}}
+{{else}}
+  <div class="cs-card-select--option">
+    {{#if @labelPath}}
+      <img class="cs-card-select--thumb" src={{get @item @thumbPath}} alt="{{get @item @labelPath}}">
+    {{/if}}
 
-  {{#let (get @item @labelPath) as |label|}}
-    <span class="cs-card-select--label" title={{label}}>
-      {{label}}
-    </span>
-  {{/let}}
+    {{#let (get @item @labelPath) as |label|}}
+      <span class="cs-card-select--label" title={{label}}>
+        {{label}}
+      </span>
+    {{/let}}
 
-  {{#if @subtitlePath}}
-    <span class="cs-card-select--subtitle">
-      {{get @item @subtitlePath}}
-    </span>
-  {{/if}}
-</div>
+    {{#if @subtitlePath}}
+      <span class="cs-card-select--subtitle">
+        {{get @item @subtitlePath}}
+      </span>
+    {{/if}}
+  </div>
+{{/if}}

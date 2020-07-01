@@ -7,13 +7,17 @@
     @beforeOptionsComponent={{component "card-select/before-options" dataSource=@dataSource}}
     @dropdownClass="cs-card-select--dropdown"
     @initiallyOpened={{true}}
+    @renderInPlace={{true}}
+    @verticalPosition="below"
+    @allowClear={{false}}
     @onChange={{@onChange}} as |item select|>
     <CardSelect::Option
       @item={{item}}
       @select={{select}}
+      @component={{@component}}
       @thumbPath={{@thumbPath}}
       @subtitlePath={{@subtitlePath}}
-      @labelPath={{@labelPath}}/>
+      @labelPath={{@labelPath}} />
   </PowerSelectTypeahead>
 </div>
 
