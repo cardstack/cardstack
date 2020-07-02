@@ -4,13 +4,14 @@
     <div class="field-renderer {{lowercase (dasherize (trim @field.title))}}-edit-field {{@class}}">
       <h4 class="field-renderer__title">{{humanize @field.title}}</h4>
       {{#if (eq @field.type "card")}}
-        <CollectionField
+        <EmbeddedCollectionEditor
           @belongsToField={{true}}
           @field={{@field}}
+          @format={{@field.format}}
           @mode="edit"
         />
       {{else if (eq @field.type "collection")}}
-        <CollectionField
+        <EmbeddedCollectionEditor
           @collection={{@field.value}}
           @format={{@field.format}}
           @title={{@field.title}}
@@ -86,7 +87,7 @@
         {{#if (eq @field.type "card")}}
           {{#if (and @comparisonMode @field.value.id (eq @changedCards.0.value.id @field.value.id))}}
             <div>
-              <ins>{{component (or @field.component "card") model=@field.value mode="view" variant="small" status="changed"}}</ins>
+              <ins>{{component (or @field.component "card") model=@field.value mode="view" status="changed"}}</ins>
               <Boxel>
                 <BoxelHighlight @status="deleted" />
                 <BoxelActions @status="deleted" />

@@ -1,5 +1,5 @@
 <button
-  class="select-btn {{@class}} select-btn--{{or @mode "view"}} select-btn--{{or @variant "default"}} {{if (and @isPartial (not @isSelected)) "select-btn--partial"}} {{if @isSelected "select-btn--selected"}}"
+  class="select-btn {{@class}} select-btn--{{@mode}} {{if (and @isPartial (not @isSelected)) "select-btn--partial"}} {{if @isSelected "select-btn--selected"}}"
   aria-label={{if @isSelected "selected" "select"}}
   ...attributes
 >

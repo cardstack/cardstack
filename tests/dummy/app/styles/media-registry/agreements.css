@@ -34,6 +34,10 @@
   gap: 10px 0;
 }
 
+.agreements .collection-field {
+  padding: 10px;
+}
+
 
 /* boxel cta styles */
 .boxel-cta {

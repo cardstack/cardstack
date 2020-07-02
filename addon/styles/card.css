@@ -2,6 +2,10 @@
   width: 100%;
 }
 
+.boxel-card__container--grid {
+  grid-column: 1 / -1;
+}
+
 .boxel-card__expand-btn {
   position: absolute;
   top: 0;
@@ -165,6 +169,10 @@
 
 .boxel-card--grid.boxel-card--with-img .boxel-card__title {
   text-align: center;
+}
+
+.boxel-card--grid .boxel-card__fields {
+  display: none;
 }
 
 
