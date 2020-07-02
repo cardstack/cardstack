@@ -8,12 +8,12 @@
   outline: 0;
 }
 
-.icon-btn--sm {
-  width: 30px;
-  height: 30px;
+.icon-btn__primary {
+  --icon-bg: var(--boxel-highlight);
+  --icon-border: var(--boxel-highlight);
 }
 
-.icon-btn--secondary {
+.icon-btn__secondary {
   --icon-color: var(--boxel-highlight);
   border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 100px;

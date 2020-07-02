@@ -1,49 +1,30 @@
-{{#if this.newItem}}
-  <div class="collection-editor__added-new-item">
-    <div class="collection-editor-grid collection-editor-grid--{{@format}}">
-      <div class="collection-editor__item collection-editor__item--new-item">
-        {{component @component item=this.newItem model=this.newItem}}
-      </div>
+{{#if this.isAdding}}
+  <div class="collection-add__blank-card-container">
+    <div class="collection-field__item collection-field__item--new">
+      <Boxel @class="collection-add__blank-card">
+        <BoxelHighlight @on={{true}} />
+        {{component @newItemComponent type="blank-card" format=@format}}
+      </Boxel>
     </div>
 
-
-    New card added to collection
-    {{svg-jar "check-mark" width="18px" height="18px"}}
+    <Boxel @class="cs-card-select__container" {{did-insert this.focusSearch}}>
+      <button class="collection-field__cancel-btn" {{on "click" (fn (mut this.isAdding) false)}}>
+        {{svg-jar "close-thick" width="25px" height="25px"}}
+      </button>
+      <CardSelect
+        @search={{@searchFn}}
+        @labelPath="title"
+        @thumbPath="imgURL"
+        @subtitlePath="subtitle"
+        @dataSource={{this.dataSource}}
+        @component={{@component}}
+        @onChange={{action this.addItem}} />
+    </Boxel>
   </div>
 {{else}}
-  {{#if this.isAdding}}
-    <div class="collection-editor__adding-new-item" {{did-insert this.focusSearch}}>
+  {{yield}}
 
-      <div class="collection-editor-grid collection-editor-grid--{{@format}}">
-        <div class="collection-editor__item">
-          <Boxel>
-            <BoxelHighlight @on={{true}} />
-            {{component @newItemComponent item=this.newItem type="blank-card"}}
-          </Boxel>
-        </div>
-      </div>
-
-
-      <Boxel @class="cs-card-select__container">
-        <button class="collection-editor__cancel-btn" {{on "click" (fn (mut this.isAdding) false)}}>
-          {{svg-jar "close-thick" width="25px" height="25px"}}
-        </button>
-        <CardSelect
-          @search={{@searchFn}}
-          @labelPath="title"
-          @thumbPath="imgURL"
-          @subtitlePath="subtitle"
-          @dataSource={{this.dataSource}}
-          @component={{@component}}
-          @onChange={{perform this.addItem}} />
-      </Boxel>
-
-
-    </div>
-  {{else}}
-    <button class="collection-editor__add-btn" {{on "click" (fn (mut this.isAdding) true)}}>
-      {{svg-jar "icon-plus-circle" width="30px" height="30px"}}
-      Add to this collection
-    </button>
-  {{/if}}
+  <div class="collection-field__add-btn-container">
+    <IconButton {{on "click" (fn (mut this.isAdding) true)}} @icon="icon-plus-circle" @variant="primary" />
+  </div>
 {{/if}}

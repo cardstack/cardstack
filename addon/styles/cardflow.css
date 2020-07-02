@@ -278,6 +278,10 @@
 
 
 /* Cardflow Card */
+.cardflow-card {
+  max-width: 615px;
+}
+
 .cardflow-card__header {
   position: relative;
   display: grid;
