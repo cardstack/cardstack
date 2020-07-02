@@ -59,7 +59,7 @@ export default [
             "copyright_notice": "℗ 2020 Bunny Records",
             "parental_advisory": "No",
             "musical_work": MUSICAL_WORK,
-            "isrc": "US-S1Z-22-05001",
+            "isrc": "US-S1Z-20-05001",
             "year": "2020",
             "length": "3:23"
           }
@@ -93,7 +93,7 @@ export default [
             "copyright_notice": "℗ 2020 Bunny Records",
             "parental_advisory": "No",
             "musical_work": MUSICAL_WORK,
-            "isrc": "US-S1Z-22-05001",
+            "isrc": "US-S1Z-20-05001",
             "year": "2020",
             "length": "3:23"
           }
@@ -132,7 +132,7 @@ export default [
             "copyright_notice": "℗ 2020 Bunny Records",
             "parental_advisory": "No",
             "musical_work": MUSICAL_WORK,
-            "isrc": "US-S1Z-22-05001",
+            "isrc": "US-S1Z-20-05001",
             "year": "2020",
             "length": "3:23"
           }
@@ -170,7 +170,7 @@ export default [
             "copyright_notice": "℗ 2020 Bunny Records",
             "parental_advisory": "No",
             "musical_work": MUSICAL_WORK,
-            "isrc": "US-S1Z-22-05001",
+            "isrc": "US-S1Z-20-05001",
             "year": "2020",
             "length": "3:23"
           }
@@ -235,7 +235,7 @@ export default [
             "copyright_notice": "℗ 2020 Bunny Records",
             "parental_advisory": "No",
             "musical_work": MUSICAL_WORK,
-            "isrc": "US-S1Z-22-05001",
+            "isrc": "US-S1Z-20-05001",
             "year": "2020",
             "length": "3:23"
           }
@@ -313,7 +313,7 @@ export default [
             "copyright_notice": "℗ 2020 Bunny Records",
             "parental_advisory": "No",
             "musical_work": MUSICAL_WORK,
-            "isrc": "US-S1Z-22-05001",
+            "isrc": "US-S1Z-20-05001",
             "year": "2020",
             "length": "3:23"
           }
