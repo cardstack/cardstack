@@ -1,9 +1,0 @@
-{{!-- TODO: Refactor tools header --}}
-<header class="tools-header">
-  <button {{action "edit"}} class="btn-edit" data-test-tools-button-edit>Edit</button>
-  <button {{action "preview"}} class="btn-preview" data-test-tools-button-preview>Preview</button>
-</header>
-
-<div class="articles">
-  <Article @name="{{this.model.constructor.modelName}}-{{this.model.id}}" @content={{this.model}} @format="isolated" />
-</div>

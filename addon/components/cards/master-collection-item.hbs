@@ -1,0 +1,23 @@
+{{#let @model as |item|}}
+  <Boxel @class="collection__boxel">
+    <BoxelHighlight {{on "click" (if @transition (fn @transition item))}} @class="collection__highlighter" @on={{item.selected}} />
+    {{#if (eq @mode "edit")}}
+      <BoxelActions
+        @displayHighlightActions={{item.selected}}
+        @btnLeft="more-actions"
+        @btnLeftIcon="more-actions"
+        @btnRightIcon="expand"
+        @btnRightAction={{if @transition (fn @transition item)}}
+      />
+    {{else}}
+      <IconButton {{on "click" (fn @transition item)}} @icon="expand" @class="boxel-card__expand-btn master-collection__select-btn" />
+    {{/if}}
+    <div class="collection {{if (eq @mode "edit") "collection--edit"}}">
+      <div class="collection__img" style={{css-url "background-image" item.cover_art_medium}}>
+        <button class="collection__play-btn">{{svg-jar "play-btn" width="60px" height="60px"}}</button>
+      </div>
+      <h3 class="collection__title">{{titleize item.song_title}}</h3>
+      <div class="collection__artist">{{titleize item.artist}}</div>
+    </div>
+  </Boxel>
+{{/let}}

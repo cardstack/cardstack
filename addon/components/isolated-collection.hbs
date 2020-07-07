@@ -1,0 +1,103 @@
+<Boxel class="media-collection media-collection--{{@model.type}} media-collection--{{@mode}} {{@class}}" {{did-update this.updateCollections @model}}>
+  <header class="media-collection__sticky-header">
+    <div class="media-collection__title-row media-collection__title-row--{{@mode}}">
+      <h2 class="media-collection__title">{{humanize @model.title}}</h2>
+      <div class="media-collection__count">
+        <span>{{this.collection.length}}</span> {{capitalize @model.itemType "items"}}
+      </div>
+      {{#if (eq @mode "edit")}}
+        <button {{on "click" @transitionToView}} class="mode-indicator mode-indicator--edit">{{@mode}} mode</button>
+      {{else}}
+        <BoxelActions
+          @class="media-collection__btn-overlay"
+          @displayHighlightActions={{@displayHighlightActions}}
+          @btnLeft="mode-btn"
+          @btnLeftContent="Edit"
+          @btnLeftAction={{@transitionToEdit}}
+          @btnRight="settings"
+          @transferAgreement={{true}}
+        />
+      {{/if}}
+    </div>
+
+    <div class="media-collection__actions-row">
+      <SelectButton
+        {{on "click" this.toggleSelectAll}}
+        @class="media-collection__select-btn"
+        @mode={{@mode}}
+        @isPartial={{this.collection.selectedItemCount}}
+        @isSelected={{this.collection.selectedAll}}
+      />
+      <div class="media-collection__pill media-collection__select-all {{if this.collection.selectedItemCount "media-collection__select-all--selected-items"}}">
+        {{#if this.collection.selectedItemCount}}
+          {{svg-jar "check-mark" width="9px" height="7px"}}
+          {{this.collection.selectedItemCount}} selected
+          <MediaCollection::Button @class="media-collection__more-actions" @button="more-actions" @icon="more-actions">
+            <ActionsMenu @class="media-collection__more-actions-menu" @actionItems={{array "Delete" "Duplicate"}} @addToCollection={{eq @model.type "collection"}} @transferAgreement={{eq @model.type "master-collection"}} />
+          </MediaCollection::Button>
+        {{else}}
+          Select all
+        {{/if}}
+      </div>
+      {{#if (and (eq @model.type "collection") this.collection.selectedItemCount)}}
+        <button class="media-collection__pill media-collection__pill--dropdown">
+          Add to Collection
+        </button>
+      {{/if}}
+      <div class="media-collection__btn-group">
+        <div class="media-collection__btn-trio media-collection__filters">
+          <SortPopup @class="media-collection__sort" @sortColumns={{this.sortColumns}} @sortColumn={{this.sortColumn}} @sortDirection={{this.sortDirection}} @sort={{this.sort}}/>
+          <MediaCollection::Button @class="media-collection__filter" @button="filter" @icon="filter">
+          </MediaCollection::Button>
+
+          {{#if @search}}
+            <MediaCollection::Button @class="media-collection__search" @button="search" @icon="search">
+              <Input @type="search" @class="field-renderer__input media-collection__search-input"
+                {{on "input" this.search}}
+              />
+            </MediaCollection::Button>
+          {{/if}}
+        </div>
+        <div class="media-collection__btn-trio media-collection__view-selectors">
+          <button {{on "click" (fn this.changeFormat "list")}} class="media-collection__btn list {{if (eq this.format "list") "selected"}}" aria-label="view as list"></button>
+          <button {{on "click" (fn this.changeFormat "grid")}} class="media-collection__btn grid {{if (eq this.format "grid") "selected"}}" aria-label="view as grid"></button>
+          <button {{on "click" (fn this.changeFormat "table")}} class="media-collection__btn table {{if (eq this.format "table") "selected"}}" aria-label="view as table"></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  {{#if (eq this.format "table")}}
+    <IsolatedCollectionTable @mode={{@mode}} @type={{@model.type}} @collection={{this.collection}} @columns={{@model.columns}} @removeItem={{this.removeItem}} @transition={{@transition}} @sortColumn={{this.sortColumn}} @sortDirection={{this.sortDirection}} @onUpdateSorts={{this.tableSort}}/>
+  {{else}}
+    <div class="media-collection__scroll-container">
+      <div class="media-collection__inner-container">
+        <ul class="media-collection__grid media-collection__grid--{{@model.type}}-{{this.format}}">
+          {{#each this.collection as |item|}}
+            <li class="media-collection__grid-item media-collection__grid-item--{{this.format}}">
+              {{#if @itemComponent}}
+                {{component @itemComponent model=item transition=@transition mode=@mode}}
+              {{else}}
+                {{yield item}}
+              {{/if}}
+
+              <div class="media-collection__grid-item-btn-group {{if (eq @mode "view") "master-collection__select-btn"}} {{if item.selected "master-collection__select-btn--selected"}}">
+                <button {{on "click" (fn this.toggleSelect item)}} class="media-collection__grid-item-select-btn" aria-label="select">
+                  {{#if item.selected}}
+                    {{svg-jar "icon-circle-selected" class="media-collection__grid-item-select--selected" width="16px" height="16px"}}
+                  {{else}}
+                    {{svg-jar "icon-circle" width="16px" height="16px"}}
+                  {{/if}}
+                </button>
+                {{#if (eq @mode "edit")}}
+                  <button {{on "click" (fn this.removeItem item)}} class="media-collection__grid-item-select-btn" aria-label="remove">{{svg-jar "icon-minus-circle" width="16px" height="16px"}}</button>
+                {{/if}}
+              </div>
+            </li>
+          {{/each}}
+          {{!-- Add new --}}
+        </ul>
+      </div>
+    </div>
+  {{/if}}
+</Boxel>

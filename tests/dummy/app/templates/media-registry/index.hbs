@@ -1,28 +1,15 @@
 <div class="master-collection__wrapper">
-  <MediaCollection @model={{@model}} @mode="view" @sort={{this.sort}} @transition={{this.selectOrTransition}} @removeItem={{this.removeItem}} as |item|>
-    <Boxel @class="master-collection__boxel">
-      <BoxelHighlight {{on "click" (fn this.selectOrTransition item)}} @class="master-collection__highlighter" @on={{item.selected}} />
-      {{!-- <button {{on "click" (fn this.togglePin item)}} class="master-collection__pin-btn {{if item.pinned "pinned"}}" aria-label="pin">{{svg-jar "pin" width="22px" height="22px"}}</button> --}}
-      <div class="master-collection boxel-card">
-        <h3 class="master-collection__title">{{item.catalog_title}}</h3>
-        <div class="master-collection__desc">{{item.catalog_description}}</div>
-        <CoverArt @covers={{item.selected_art}} />
-        <div class="master-collection__count">
-          <div class="master-collection__num">{{item.number_of_songs}}</div>
-          <div>Masters</div>
-        </div>
-      </div>
-    </Boxel>
-    <div class="collection-editor__btn-group master-collection__select-btn {{if item.selected "master-collection__select-btn--selected"}}">
-      <button {{on "click" (fn this.toggleSelect item)}} class="collection-editor__select-btn" aria-label="select">
-        {{#if item.selected}}
-          {{svg-jar "icon-circle-selected" class="collection-editor__select--selected" width="16px" height="16px"}}
-        {{else}}
-          {{svg-jar "icon-circle" width="16px" height="16px"}}
-        {{/if}}
-      </button>
-    </div>
-  </MediaCollection>
+  <IsolatedCollection
+    @mode="view"
+    @model={{@model}}
+    @transition={{this.transitionToIsolate}}
+    @transitionToEdit={{this.transitionToEdit}}
+    @transitionToView={{this.transitionToView}}
+    @sort={{this.sort}}
+    @search={{this.search}}
+    @removeItem={{this.removeItem}}
+    @itemComponent="cards/master-collection"
+  />
 </div>
 
 {{outlet}}

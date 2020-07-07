@@ -17,6 +17,7 @@ export default class MediaRegistryCollectionRoute extends Route {
       title: collectionId,
       type: 'collection',
       collection: tracks,
+      itemType: 'masters',
       columns: [
         {
           name: 'Title',

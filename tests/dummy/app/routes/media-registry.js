@@ -22,6 +22,7 @@ export default class MediaRegistryRoute extends Route {
       alternateLogoURL: masterData.iconURL,
       company: masterData.company,
       user: masterData.user,
+      itemType: 'collections',
       collection,
       orgs: this.orgs,
       columns: [

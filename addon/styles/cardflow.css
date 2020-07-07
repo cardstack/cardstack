@@ -359,22 +359,9 @@
   margin-top: 10px;
 }
 
-.cardflow-proposal-card .master-collection__count {
-  display: none;
-}
-
 .cardflow-proposal-card .field-renderer__title {
   padding-bottom: 10px;
   text-align: left;
-}
-
-.cardflow-proposal-card .media-collection__pill {
-  position: absolute;
-  width: 130px;
-  padding: 5px 12px;
-  height: 30px;
-  right: 55px;
-  bottom: 40px;
 }
 
 .cardflow-proposal-card__effective-date {
@@ -473,4 +460,88 @@
   background-position: right 55px center, right 15px center;
   background-repeat: no-repeat, no-repeat;
   background-size: 15px 15px, 20px 20px;
+}
+
+
+/* Cardflow overlay */
+.cardflow-overlay {
+  z-index: 15;
+  left: 80px;
+  backdrop-filter: brightness(0.5) blur(16px) opacity(0.5);
+}
+
+.cardflow__modal {
+  --modal-max-width: 1300px;
+}
+
+.cardflow__modal-header {
+  padding: 0 30px 30px;
+  background: url('/assets/images/icons/message.svg') left top/18px 18px no-repeat;
+  color: white;
+  font: var(--boxel-font);
+  font-weight: 600;
+}
+
+.cardflow__modal-close-btn {
+  --icon-btn-width: 30px;
+  --icon-btn-height: 30px;
+  --icon-color: white;
+  --icon-btn-border: 1px solid white;
+  --icon-btn-border-radius: 100px;
+  position: fixed;
+  right: 20px;
+  top: 25px;
+}
+
+.cardflow__modal-close-btn > svg {
+  width: 12px;
+  height: 12px;
+}
+
+.cardflow__nested-card {
+  max-width: 95%;
+  margin: 0 auto;
+}
+
+.cardflow__nested-card-header {
+  height: 50px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  padding: 10px 30px;
+}
+
+.cardflow__nested-card-title {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.cardflow__nested-card + .boxel {
+  top: -50px;
+}
+
+.cardflow__scroll-box {
+  height: calc(100% - 130px);
+  border-radius: 10px 10px 0 0;
+  overflow: scroll;
+}
+
+.cardflow__scroll-box-bg-platter {
+  margin-bottom: 30px;
+  background-color: white;
+  border-radius: 0 0 10px 10px;
+}
+
+.cardflow__isolated-collection.media-collection--collection {
+  height: calc(100% - 150px);
+}
+
+.cardflow__isolated-detail-card header {
+  position: sticky;
+  top: 0;
+  z-index: 16;
+}
+
+.cardflow__isolated-detail-card header > * {
+  max-width: 100%;
 }

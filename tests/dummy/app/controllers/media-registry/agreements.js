@@ -42,7 +42,7 @@ export default class MediaRegistryAgreementsController extends Controller {
       title: 'Catalog',
       type: 'card',
       format: 'grid',
-      component: 'cards/collection',
+      component: 'cards/master-collection',
       value: {
         id: 'catalog-card',
         type: 'catalog',

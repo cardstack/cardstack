@@ -2,7 +2,7 @@
   {{yield}}
 
   {{#each @detailSections as |s|}}
-    <MediaDetail
+    <DetailSection
       @title={{s.title}}
       @fields={{s.content}}
       @mode={{@mode}}
