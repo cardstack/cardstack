@@ -1,13 +1,15 @@
-import Controller from '@ember/controller';
+import MediaRegistryController from '../media-registry';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
+import { action, set } from '@ember/object';
 import { dasherize } from '@ember/string';
 import { fetchCollection } from 'dummy/media';
 
-export default class MediaRegistryCardflowController extends Controller {
+
+export default class MediaRegistryCardflowController extends MediaRegistryController {
   @tracked isolatedCollection = this.getIsolatedCollection(this.catalog.id);
   @tracked itemId = null;
   @tracked record = null;
+  @tracked currentMilestone = this.milestones.filter(el => el.pct === this.model.user.queueCards[0].progressPct)[0];
 
   catalog = {
     id: 'batch-f',
@@ -23,6 +25,48 @@ export default class MediaRegistryCardflowController extends Controller {
       "media-registry/covers/thumb/Love-Never-Dies.jpg",
       "media-registry/covers/thumb/Animals.jpg"
     ]
+  }
+
+  get projectTitle() {
+    return this.model.user.queueCards[0].projectTitle;
+  }
+
+  @action
+  updateProgress(val) {
+    if (!val) {
+      this.currentMilestone = this.milestones[0];
+    }
+    this.currentMilestone = this.milestones.filter(el => {
+      if (el.pct === val) {
+        set(el, 'current', true);
+        return el;
+      } else {
+        set(el, 'current', false);
+      }
+    })[0];
+  }
+
+  @action
+  mockStep(val) {
+    if (val.id === 'crd_records' && (!this.currentMilestone || this.currentMilestone.pct < 40)) {
+      this.updateProgress(40);
+    } else {
+      return;
+    }
+  }
+
+  @action
+  transition(val) {
+    let { currentRouteName } = this.target;
+    this.mockStep(val);
+
+    if (this.model.id !== val.id) {
+      if (currentRouteName === 'media-registry.agreements' || currentRouteName === 'media-registry.cardflow') {
+        return this.transitionToRoute(currentRouteName, val.id);
+      }
+    }
+
+    this.transitionToRoute('media-registry', val.id);
   }
 
   @action

@@ -17,6 +17,10 @@
   --icon-color: var(--boxel-highlight);
   border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 100px;
+  background-color: #41404D;
+}
+
+.icon-btn__secondary:hover {
   background-color: #2E2D38;
 }
 

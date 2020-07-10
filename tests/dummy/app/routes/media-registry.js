@@ -19,7 +19,7 @@ export default class MediaRegistryRoute extends Route {
       type: 'master-collection',
       id: masterData.id,
       logoURL: masterData.logoURL,
-      alternateLogoURL: masterData.iconURL,
+      iconURL: masterData.iconURL,
       company: masterData.company,
       user: masterData.user,
       itemType: 'collections',

@@ -5,6 +5,7 @@
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
   overflow: hidden;
+  height: 100%;
 }
 
 /* Header */
@@ -41,7 +42,7 @@
 .cardflow__thread {
   display: grid;
   grid-auto-rows: max-content;
-  gap: 20px;
+  gap: 30px;
   height: 100%;
   padding: 20px 30px 50px;
   overflow-y: auto;
@@ -57,7 +58,7 @@
 }
 
 .cardflow__message:last-child > *:last-child {
-  margin-bottom: 30px;
+  margin-bottom: 60px;
 }
 
 .cardflow__message-content > * + * {
@@ -300,14 +301,18 @@
 .cardflow-card__label {
   position: absolute;
   top: 0;
-  left: 35px;
+  left: 0;
   padding: 5px 15px;
-  border-radius: 0 0 5px 5px;
+  border-radius: 5px 0 5px 0;
   color: black;
   font: var(--boxel-font-xs);
   font-weight: bold;
   letter-spacing: var(--boxel-lsp-lg);
   text-transform: uppercase;
+}
+
+.cardflow-card__label--in-progress {
+  background-color: #FFD800;
 }
 
 .cardflow-card__label--completed {
@@ -385,7 +390,8 @@
   color: #666;
 }
 
-.cardflow-action-card__list-item--checkbox {
+.cardflow-action-card__list-item--checkbox,
+.cardflow-action-card__list-item--checkbox.icon-btn {
   width: 30px;
   height: 30px;
   background-image: url('/assets/images/icons/checkbox-primary.svg');
@@ -401,12 +407,20 @@
   letter-spacing: 0.02em;
 }
 
+.cardflow-action-card__list-item.current .cardflow-action-card__list-item--title,
 .cardflow-action-card__list-item.completed .cardflow-action-card__list-item--title {
   color: black;
 }
 
 .cardflow-action-card__list-item.completed .cardflow-action-card__list-item--checkbox {
   background-image: url('/assets/images/icons/checkbox-primary-checked.svg');
+}
+
+.cardflow-action-card__icon-btn.icon-btn {
+  --icon-btn-width: 30px;
+  --icon-btn-height: 30px;
+  border: 1px solid #B3B1B8;
+  border-radius: 100px;
 }
 
 

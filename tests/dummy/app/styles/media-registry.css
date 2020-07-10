@@ -48,9 +48,9 @@
 
 .media-registry__hover-zone {
   position: absolute;
-  top: 45%;
+  top: 47%;
   width: 80px;
-  height: 80px;
+  height: 55px;
   z-index: 16;
 }
 
@@ -59,10 +59,11 @@
 }
 
 .media-registry__hover-zone--crd_records {
-  transform: translateY(80px);
+  transform: translateY(55px);
+  height: 60px;
 }
 
-.media-registry__hover-zone:hover + .media-registry__left-edge-queue,
+.media-registry__hover-zone:hover ~ .media-registry__left-edge-queue,
 .media-registry__left-edge-queue:hover,
 .media-registry__left-edge-queue.slide-in {
   transform: translateX(0);
@@ -171,4 +172,8 @@
   border-radius: 100px;
   border: 1px solid white;
   outline: 0;
+}
+
+.media-registry__outlet {
+  overflow: hidden;
 }

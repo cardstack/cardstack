@@ -14,7 +14,7 @@ export default [
             status: "open",
             title: "Catalog transfer",
             description: "Catalog transfer from Bunny Records to CRD Records for 16 masters",
-            datetime: "2020-08-31T14:49",
+            datetime: "2020-08-31T14:46",
             projectTitle: "Rights transfer, CRD Records",
             progressPct: 20
           },
@@ -92,9 +92,9 @@ export default [
             status: "open",
             title: "Catalog transfer",
             description: "Catalog transfer from Bunny Records to CRD Records for 16 masters",
-            datetime: "2020-09-01T09:46",
+            datetime: "2020-08-31T14:56",
             projectTitle: "Rights transfer, Bunny Records",
-            progressPct: 80
+            progressPct: 40
           },
           {
             id: "2",

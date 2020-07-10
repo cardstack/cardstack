@@ -45,7 +45,7 @@
   {{else}}
     <header class="cardflow__header">
       <div>
-        <div class="cardflow__project-title">{{this.project.projectTitle}}</div>
+        <div class="cardflow__project-title">{{@projectTitle}}</div>
         <div class="cardflow__title">{{or this.project.description this.project.title}}</div>
       </div>
       <LinkTo @route="media-registry" @model={{@model.id}} @class="mode-indicator mode-indicator--workflow">
@@ -106,29 +106,29 @@
                 Effective Date: <strong>September 1, 2020</strong>
             </section>
 
-            {{#if (eq @model.id "crd_records")}}
-              {{!-- TODO:
-              Transfer Accepted
-              September 1, 8:11 AM 2020
-              --}}
+            {{#if (and (eq @currentMilestone.pct 40) (eq @model.id "crd_records"))}}
+              <NextSteps
+                @title="Available Actions"
+                @steps={{array (hash title="Accept Transfer" action=(fn this.setProgress 60)) "Deny Transfer"}}
+                @moreActions={{true}}
+              />
+            {{/if}}
+
+            {{#if (gte @currentMilestone.pct 60)}}
+              <div class="cardflow-action-card__list-item completed">
+                <div class="cardflow-action-card__list-item--checkbox" />
+                <div>
+                  <div class="cardflow-action-card__list-item--title">{{this.actionSteps.0.summary}}</div>
+                  <div>{{moment-format this.actionSteps.0.timestamp "MMMM D, h:mm A"}}</div>
+                </div>
+                <IconButton @class="cardflow-action-card__icon-btn" @icon="more-actions" @aria-label="Other actions" />
+              </div>
             {{/if}}
           </CardPlatter>
         </div>
       </div>
 
-      {{#if (eq @model.id "bunny_records")}}
-        <div class="cardflow__message">
-          <div class="cardflow__message-icon__profile cardflow__message-icon__profile--bunny" />
-          <Input @class="cardflow__reply-to field-renderer__input" @placeholder="Reply to Steve"></Input>
-        </div>
-
-        <div class="cardflow__message">
-          <div />
-          <NextSteps @inlineBtnGroup={{true}} />
-        </div>
-      {{/if}}
-
-      {{#if (eq @model.id "crd_records")}}
+      {{#if (gte @currentMilestone.pct 40)}}
         <div class="cardflow__message">
           <div class="cardflow__message-icon__profile cardflow__message-icon__profile--crd" />
           <div class="cardflow__message-info">
@@ -136,10 +136,12 @@
             <time>2:56 PM</time>
           </div>
         </div>
+      {{/if}}
 
+      {{#if (gte @currentMilestone.pct 60)}}
         <div class="cardflow__message-divider">
           <div class="cardflow__message-divider-border" />
-          <div class="cardflow__message-divider-date">September 1, 2020</div>
+          <div class="cardflow__message-divider-date">{{moment-format this.actionSteps.0.timestamp "MMMM D"}}</div>
         </div>
 
         {{!-- TODO: Jump to card --}}
@@ -147,104 +149,103 @@
           <div class="cardflow__message-icon__profile cardflow__message-icon__profile--crd" />
           <div class="cardflow__message-info">
             <div class="cardflow__message-info-title">Steve Rights accepted the transfer</div>
-            <time>8:11 AM</time>
+            <time>{{moment-format this.actionSteps.0.timestamp "h:mm A"}}</time>
           </div>
         </div>
+      {{/if}}
 
+      {{#if (gte @currentMilestone.pct 60)}}
         <div class="cardflow__message">
           <div />
-          {{!-- Amended Metadata CARD --}}
+          {{!-- Metadata CARD --}}
           <CardPlatter @class="cardflow-card cardflow-action-card">
             <header class="cardflow-card__header">
-              <div class="cardflow-card__label cardflow-card__label--completed">Completed</div>
-              <div class="cardflow-card__title">Amended Metadata</div>
+              <div class="cardflow-card__label cardflow-card__label--{{if (eq @currentMilestone.pct 60) "in-progress" "completed"}}">{{#if (eq @currentMilestone.pct 60)}}In Progress{{else}}Completed{{/if}}</div>
+              <div class="cardflow-card__title">{{#if (eq @currentMilestone.pct 60)}}Amending{{else}}Amended{{/if}} Metadata</div>
             </header>
             <ul class="cardflow-action-card__list">
-              <li class="cardflow-action-card__list-item completed">
-                <div class="cardflow-action-card__list-item--checkbox" />
-                <div>
-                  <div class="cardflow-action-card__list-item--title">Update ownership information</div>
-                  <div>16 items updated, 32 fields changed</div>
-                </div>
-                <div>Sep 1, 8:11 AM</div>
-              </li>
-              <li class="cardflow-action-card__list-item completed">
-                <div class="cardflow-action-card__list-item--checkbox" />
-                <div>
-                  <div class="cardflow-action-card__list-item--title">Add transfer details to Verifi registry</div>
-                  <div>Anchored on Ethereum blockchain at block 5289291238</div>
-                </div>
-                <div>Sep 1, 8:34 AM</div>
-              </li>
-              <li class="cardflow-action-card__list-item completed">
-                <div class="cardflow-action-card__list-item--checkbox" />
-                <div>
-                  <div class="cardflow-action-card__list-item--title">Retrieve and store media assets </div>
-                  <div>Move from Bunny Amazon S3 to CRD MediaNet account</div>
-                </div>
-                <div>Sep 1, 9:46 AM</div>
-              </li>
+              {{#each this.actionSteps as |step i|}}
+                <CardflowStep
+                  @model={{step}}
+                  @i={{i}}
+                  @actionSteps={{this.actionSteps}}
+                  @setProgress={{this.setProgress}}
+                />
+              {{/each}}
             </ul>
           </CardPlatter>
         </div>
 
-        <div class="cardflow__message">
-          <div class="cardflow__message-icon" style={{css-url "background-image" "/media-registry/button-verify.svg"}}></div>
-          <div class="cardflow__message-info">
-            <div class="cardflow__message-info-title">Published to <strong>Verifi Public Registry</strong></div>
-            <time>8:34 AM</time>
-          </div>
-          <div />
-          <CardPlatter @class="cardflow-card cardflow-proposal-card cardflow-proposal-announcement-card">
-            <header class="cardflow-card__header">
-              <div class="cardflow-card__title">Catalog Transfer Announcement</div>
-            </header>
-            <section class="cardflow-card__section cardflow-proposal-card__participants">
-              <div>
-                <div class="field-renderer__title">From</div>
-                <div class="cardflow-proposal-card__participant">
-                  {{svg-jar "button-bunny-records" width="40px" height="40px"}}
-                  <div class="cardflow__participant-company">Bunny Records</div>
-                </div>
-              </div>
-              {{svg-jar "arrow-right-lg" width="15px" height="15px"}}
-              <div>
-                <div class="field-renderer__title">To</div>
-                <div class="cardflow-proposal-card__participant">
-                  {{svg-jar "button-crd-records" width="40px" height="40px"}}
-                  <div>CRD Records</div>
-                </div>
-              </div>
-            </section>
-          </CardPlatter>
-        </div>
-
-        <div class="cardflow__message">
-          <div class="cardflow__message-icon" style={{css-url "background-image" "/media-registry/button-crd-records.svg"}}></div>
-          <div class="cardflow__message-info">
-            <div class="cardflow__message-info-title">Added to <strong>CRD Records Catalog</strong></div>
-            <time>9:46 AM</time>
-          </div>
-          <div />
-          {{!-- Catalog Summary Card --}}
-          <CardPlatter @class="cardflow-card catalog-summary-card">
-            <div class="catalog-summary-card__img" />
-            <div>
-              <div><strong>Pia Midina & BB Clarke</strong></div>
-              <div class="catalog-summary-card__desc">Transfer from Bunny Records</div>
+        {{#if this.actionSteps.1.completed}}
+          <div class="cardflow__message">
+            <div class="cardflow__message-icon" style={{css-url "background-image" "/media-registry/button-verify.svg"}}></div>
+            <div class="cardflow__message-info">
+              <div class="cardflow__message-info-title">Published to <strong>Verifi Public Registry</strong></div>
+              <time>{{moment-format this.actionSteps.1.timestamp "h:mm A"}}</time>
             </div>
-            <div class="catalog-summary-card__count"><strong>16</strong> Masters</div>
-          </CardPlatter>
-        </div>
+            <div />
+            <CardPlatter @class="cardflow-card cardflow-proposal-card cardflow-proposal-announcement-card">
+              <header class="cardflow-card__header">
+                <div class="cardflow-card__title">Catalog Transfer Announcement</div>
+              </header>
+              <section class="cardflow-card__section cardflow-proposal-card__participants">
+                <div>
+                  <div class="field-renderer__title">From</div>
+                  <div class="cardflow-proposal-card__participant">
+                    {{svg-jar "button-bunny-records" width="40px" height="40px"}}
+                    <div class="cardflow__participant-company">Bunny Records</div>
+                  </div>
+                </div>
+                {{svg-jar "arrow-right-lg" width="15px" height="15px"}}
+                <div>
+                  <div class="field-renderer__title">To</div>
+                  <div class="cardflow-proposal-card__participant">
+                    {{svg-jar "button-crd-records" width="40px" height="40px"}}
+                    <div>CRD Records</div>
+                  </div>
+                </div>
+              </section>
+            </CardPlatter>
+          </div>
+        {{/if}}
+        {{#if this.actionSteps.2.completed}}
+          <div class="cardflow__message">
+            <div class="cardflow__message-icon" style={{css-url "background-image" "/media-registry/button-crd-records.svg"}}></div>
+            <div class="cardflow__message-info">
+              <div class="cardflow__message-info-title">Added to <strong>CRD Records Catalog</strong></div>
+              <time>{{moment-format this.actionSteps.2.timestamp "h:mm A"}}</time>
+            </div>
+            <div />
+            {{!-- Catalog Summary Card --}}
+            <CardPlatter @class="cardflow-card catalog-summary-card">
+              <div class="catalog-summary-card__img" />
+              <div>
+                <div><strong>Pia Midina & BB Clarke</strong></div>
+                <div class="catalog-summary-card__desc">Transfer from Bunny Records</div>
+              </div>
+              <div class="catalog-summary-card__count"><strong>16</strong> Masters</div>
+            </CardPlatter>
+          </div>
+        {{/if}}
+      {{/if}}
 
-        <div class="cardflow__message">
-          <div class="cardflow__message-icon__profile cardflow__message-icon__profile--crd" />
-          <Input @class="cardflow__reply-to field-renderer__input" @placeholder="Reply to Lisa"></Input>
-        </div>
+      {{!-- Reply to message box --}}
+      <div class="cardflow__message">
+        <div class="cardflow__message-icon__profile cardflow__message-icon__profile--{{if (eq @model.id "crd_records") "crd" "bunny"}}" />
+        <Input @class="cardflow__reply-to field-renderer__input" @placeholder="Reply to {{if (eq @model.id "crd_records") "Lisa" "Steve"}}"></Input>
+      </div>
 
+      {{!-- Next steps --}}
+      {{#if (and (lt @currentMilestone.pct 80) (eq @model.id "bunny_records"))}}
         <div class="cardflow__message">
           <div />
-          <NextSteps @steps={{array "Redeliver to DSP" "Make Changes to Catalog"}} />
+          <NextSteps @inlineBtnGroup={{true}} @moreActions={{true}} />
+        </div>
+      {{/if}}
+      {{#if (and (eq @currentMilestone.pct 80) (eq @model.id "crd_records"))}}
+        <div class="cardflow__message">
+          <div />
+          <NextSteps @steps={{array (hash title="Redeliver to DSP" action=(fn this.setProgress 100)) "Make Changes to Catalog"}} />
         </div>
       {{/if}}
     </div>
@@ -255,10 +256,10 @@
       <section class="cardflow__sidebar-section">
         <h3 class="cardflow__sidebar-title">Progress</h3>
         <div class="cardflow__progress">
-          <div class="cardflow__progress-icon" style={{css-url "background-image" this.progress.iconLg}}>
-            <span class="cardflow__progress-pct">{{this.progress.pct}}%</span>
+          <div class="cardflow__progress-icon" style={{css-url "background-image" @currentMilestone.iconLg}}>
+            <span class="cardflow__progress-pct">{{@currentMilestone.pct}}%</span>
           </div>
-          <div class="cardflow__progress-status">{{this.progress.desc}}</div>
+          <div class="cardflow__progress-status">{{@currentMilestone.desc}}</div>
         </div>
       </section>
 
@@ -266,30 +267,28 @@
       <section class="cardflow__sidebar-section">
         <h3 class="cardflow__sidebar-title">Checklist</h3>
         <CardPlatter>
-          {{#let this.progress.pct as |progress|}}
-            <ul class="cardflow__checklist">
-              <li class="cardflow__checklist-item {{if (gt progress 0) "completed" (if (eq progress 0) "current")}}">
-                  {{svg-jar (if (gt progress 0) "checkmark-lg" "checklist-circle") width="16px" height="16px"}} Propose
-                  {{#if (gt progress 0)}}<span class="cardflow__checklist-time">{{if (eq @model.id "crd_records") "1d ago" "2h ago"}}</span>{{/if}}
-              </li>
-              <li class="cardflow__checklist-item {{if (gt progress 20) "completed" (if (eq progress 20) "current")}}">
-                {{svg-jar (if (gt progress 20) "checkmark-lg" "checklist-circle") width="16px" height="16px"}} Review
-                {{#if (gt progress 20)}}<span class="cardflow__checklist-time">1d ago</span>{{/if}}
-              </li>
-              <li class="cardflow__checklist-item {{if (gt progress 40) "completed" (if (eq progress 40) "current")}}">
-                {{svg-jar (if (gt progress 40) "checkmark-lg" "checklist-circle") width="16px" height="16px"}} Accept
-                {{#if (gt progress 40)}}<span class="cardflow__checklist-time">10m ago</span>{{/if}}
-              </li>
-              <li class="cardflow__checklist-item {{if (gt progress 60) "completed" (if (eq progress 60) "current")}}">
-                {{svg-jar (if (gt progress 60) "checkmark-lg" "checklist-circle") width="16px" height="16px"}} Amend
-                {{#if (gt progress 60)}}<span class="cardflow__checklist-time">5m ago</span>{{/if}}
-              </li>
-              <li class="cardflow__checklist-item {{if (gt progress 80) "completed" (if (eq progress 80) "current")}}">
-                {{svg-jar (if (gt progress 80) "checkmark-lg" "checklist-circle") width="16px" height="16px"}} Redeliver
-                {{#if (gt progress 80)}}<span class="cardflow__checklist-time">1m ago</span>{{/if}}
-              </li>
-            </ul>
-          {{/let}}
+          <ul class="cardflow__checklist">
+            <li class="cardflow__checklist-item {{if (gt @currentMilestone.pct 0) "completed" (if (eq @currentMilestone.pct 0) "current")}}">
+                {{svg-jar (if (gt @currentMilestone.pct 0) "checkmark-lg" "checklist-circle") width="16px" height="16px"}} Propose
+                {{#if (gt @currentMilestone.pct 0)}}<span class="cardflow__checklist-time">{{#if (lt @currentMilestone.pct 40)}}10m ago{{else}}1d ago{{/if}}</span>{{/if}}
+            </li>
+            <li class="cardflow__checklist-item {{if (gt @currentMilestone.pct 20) "completed" (if (eq @currentMilestone.pct 20) "current")}}">
+              {{svg-jar (if (gt @currentMilestone.pct 20) "checkmark-lg" "checklist-circle") width="16px" height="16px"}} Review
+              {{#if (gt @currentMilestone.pct 20)}}<span class="cardflow__checklist-time">1d ago</span>{{/if}}
+            </li>
+            <li class="cardflow__checklist-item {{if (gt @currentMilestone.pct 40) "completed" (if (eq @currentMilestone.pct 40) "current")}}">
+              {{svg-jar (if (gt @currentMilestone.pct 40) "checkmark-lg" "checklist-circle") width="16px" height="16px"}} Accept
+              {{#if (gt @currentMilestone.pct 40)}}<span class="cardflow__checklist-time">10m ago</span>{{/if}}
+            </li>
+            <li class="cardflow__checklist-item {{if (gt @currentMilestone.pct 60) "completed" (if (eq @currentMilestone.pct 60) "current")}}">
+              {{svg-jar (if (gt @currentMilestone.pct 60) "checkmark-lg" "checklist-circle") width="16px" height="16px"}} Amend
+              {{#if (gt @currentMilestone.pct 60)}}<span class="cardflow__checklist-time">5m ago</span>{{/if}}
+            </li>
+            <li class="cardflow__checklist-item {{if (gt @currentMilestone.pct 80) "completed" (if (eq @currentMilestone.pct 80) "current")}}">
+              {{svg-jar (if (gt @currentMilestone.pct 80) "checkmark-lg" "checklist-circle") width="16px" height="16px"}} Redeliver
+              {{#if (gt @currentMilestone.pct 80)}}<span class="cardflow__checklist-time">1m ago</span>{{/if}}
+            </li>
+          </ul>
         </CardPlatter>
       </section>
 

@@ -6,7 +6,7 @@ export default class QueueCardComponent extends Component {
   @service router;
 
   get progress() {
-    switch(this.args.card.progressPct) {
+    switch(this.args?.currentMilestone?.pct || this.args.card.progressPct) {
       case (20):
         return {
           status: 'proposal',
@@ -21,9 +21,9 @@ export default class QueueCardComponent extends Component {
         }
       case (60):
         return {
-          status: 'under-review',
-          icon: '/media-registry/progress-pie/progress-40pct-dark.svg',
-          iconOpen: '/media-registry/progress-pie/progress-40pct.svg'
+          status: 'transfer-accepted',
+          icon: '/media-registry/progress-pie/progress-60pct-dark.svg',
+          iconOpen: '/media-registry/progress-pie/progress-60pct.svg'
         }
       case (80):
         return {
@@ -48,6 +48,11 @@ export default class QueueCardComponent extends Component {
 
   @action
   openThread() {
-    this.router.transitionTo('media-registry.cardflow');
+    let pct = this.args?.currentMilestone?.pct || this.args.card.progressPct;
+    if (this.args.updateProgress && pct === 20 && this.args.orgId === 'crd_records') {
+      // when steve opens the thread for the first time, thread should get to 40% completion
+      this.args.updateProgress(40);
+    }
+    this.router.transitionTo('media-registry.cardflow', this.args.orgId);
   }
 }

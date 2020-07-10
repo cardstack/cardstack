@@ -39,7 +39,7 @@
 
 .next-steps__btn-group {
   display: grid;
-  grid-template-columns: repeat(2, max-content);
+  grid-template-columns: max-content max-content auto;
   align-items: center;
   gap: 15px 20px;
 }

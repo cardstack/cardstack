@@ -1,8 +1,8 @@
 <div class="queue {{@class}}">
   <header class="queue__header">
     <div class="queue__company">
-      {{#if @model.alternateLogoURL}}
-        <span class="queue__company-logo" style={{css-url "background-image" @model.alternateLogoURL}} />
+      {{#if @model.iconURL}}
+        <span class="queue__company-logo" style={{css-url "background-image" @model.iconURL}} />
       {{/if}}
       {{@model.company}}
     </div>
@@ -18,7 +18,12 @@
     <header class="queue__section-header">Open</header>
     <div class="queue__section-content">
       {{#with (find-by "status" "open" (reverse @model.user.queueCards)) as |card|}}
-        <QueueCard @card={{card}} @openCards={{@model.user.queueCards}} />
+        <QueueCard
+          @card={{card}}
+          @orgId={{@model.id}}
+          @currentMilestone={{@currentMilestone}}
+          @updateProgress={{@updateProgress}}
+        />
       {{/with}}
     </div>
   </section>
@@ -28,7 +33,7 @@
     <div class="queue__section-content">
       {{#let (filter-by "status" "needs-response" @model.user.queueCards) as |cards|}}
         {{#each cards as |card|}}
-          <QueueCard @card={{card}} />
+          <QueueCard @card={{card}} @orgId={{@model.id}} />
         {{/each}}
       {{/let}}
     </div>
@@ -39,7 +44,7 @@
     <div class="queue__section-content">
       {{#let (filter-by "status" "recent" @model.user.queueCards) as |cards|}}
         {{#each cards as |card|}}
-          <QueueCard @card={{card}} />
+          <QueueCard @card={{card}} @orgId={{@model.id}} />
         {{/each}}
       {{/let}}
     </div>
@@ -50,7 +55,7 @@
     <div class="queue__section-content">
       {{#let (filter-by "progressPct" 100 @model.user.queueCards) as |cards|}}
         {{#each cards as |card|}}
-          <QueueCard @card={{card}} />
+          <QueueCard @card={{card}} @orgId={{@model.id}} />
         {{/each}}
       {{/let}}
     </div>

@@ -5,7 +5,8 @@
   border-radius: 100px;
   background-color: white;
   color: black;
-  font: var(--boxel-font-sm);
+  font-size: 13px;
+  line-height: calc(18/13);
   letter-spacing: var(--boxel-lsp);
   outline: 0;
 }

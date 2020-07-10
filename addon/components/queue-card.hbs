@@ -7,7 +7,7 @@
   </header>
   <div class="queue-card__project-title">{{@card.title}}</div>
   <footer class="queue-card__footer">
-    <div>{{moment-format @card.datetime "MMM D, h:mm A"}}</div>
+    <div>{{moment-format (or @currentMilestone.timestamp @card.datetime) "MMM D, h:mm A"}}</div>
     <div>
       {{titleize (humanize this.progress.status)}}
       <span class="queue-card__progress-icon queue-card__progress-pie" style={{css-url "background-image" (if (eq @card.status "open") this.progress.iconOpen this.progress.icon)}} />

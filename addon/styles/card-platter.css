@@ -3,6 +3,13 @@
   min-width: 230px;
   min-height: 100px;
   background-color: white;
-  border-radius: 10px;
+  border-radius: var(--boxel-border-radius);
   box-shadow: var(--boxel-box-shadow);
+}
+
+/* card chin */
+.card-platter .next-steps {
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+  box-shadow: none;
 }
