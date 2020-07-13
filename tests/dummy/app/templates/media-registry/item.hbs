@@ -62,10 +62,10 @@
         {{!-- Related Cards Sidebar --}}
         <aside class="item__sidebar">
           <h3 class="item__sidebar-title">In these collections</h3>
-          <div>
+          <div class="item__sidebar-cards">
             {{#each @model.catalog as |catalog i|}}
               <SidebarRelatedCard
-                @type="catalog"
+                @type="collection"
                 @title={{catalog}}
                 @route="media-registry.collection"
                 @routeModel={{dasherize (trim catalog)}}

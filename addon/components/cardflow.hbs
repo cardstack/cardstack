@@ -3,44 +3,63 @@
     <BoxelModal @overlayClass="cardflow-overlay" @class="cardflow__modal">
       <header class="cardflow__modal-header">Workflow Thread - {{or this.project.description this.project.title}}</header>
       <IconButton @icon="close" @class="cardflow__modal-close-btn" {{on "click" this.closeModal}} />
-      <CardPlatter @class="cardflow__nested-card">
-        <header class="cardflow__nested-card-header">
-          <div class="cardflow__nested-card-title">{{this.catalog.value.title}}</div>
-          <PillButton {{on "click" this.closeItem}}>Back to catalog</PillButton>
-        </header>
-      </CardPlatter>
-      <Boxel @class="cardflow__scroll-box">
-        <div class="cardflow__scroll-box-bg-platter">
-          <MusicDetailCard
-            @class="cardflow__isolated-detail-card"
-            @mode="view"
-            @model={{@item}}
-            @itemId={{@itemId}}
-            @displayFullHeader={{true}}
-          />
-        </div>
-      </Boxel>
+      <div class="cardflow__nested-grid">
+        <CardPlatter @class="cardflow__nested-card">
+          <header class="cardflow__nested-card-header">
+            <div class="cardflow__nested-card-title">{{this.catalog.value.title}}</div>
+            <PillButton {{on "click" this.closeItem}}>Back to catalog</PillButton>
+          </header>
+        </CardPlatter>
+        <Boxel @class="cardflow__scroll-box cardflow__nested-detail-card">
+          <div class="cardflow__scroll-box-bg-platter">
+            <MusicDetailCard
+              @class="cardflow__isolated-detail-card"
+              @mode="view"
+              @model={{@item}}
+              @itemId={{@itemId}}
+              @displayFullHeader={{true}}
+            />
+          </div>
+        </Boxel>
+        <aside class="cardflow__nested-sidebar cardflow__scroll-box">
+          <div class="cardflow__scroll-box-platter">
+            <h3 class="cardflow__nested-sidebar-title">In these collections</h3>
+            <div class="cardflow__sidebar-cards">
+              {{#each @item.catalog as |catalog|}}
+                <SidebarRelatedCard
+                  @type="collection"
+                  @title={{catalog}}
+                  @route="media-registry.collection"
+                  @routeModel={{dasherize (trim catalog)}}
+                />
+              {{/each}}
+            </div>
+          </div>
+        </aside>
+      </div>
     </BoxelModal>
   {{else if (and this.catalogId @isolatedCatalog)}}
     <BoxelModal @overlayClass="cardflow-overlay" @class="cardflow__modal">
       <header class="cardflow__modal-header">Workflow Thread - {{or this.project.description this.project.title}}</header>
       <IconButton @icon="close" @class="cardflow__modal-close-btn" {{on "click" this.closeModal}} />
-      <CardPlatter @class="cardflow__nested-card">
-        <header class="cardflow__nested-card-header">
-          <div class="cardflow__nested-card-title">Transfer Proposal</div>
-        </header>
-      </CardPlatter>
-      <IsolatedCollection
-        @mode="view"
-        @format="table"
-        @class="cardflow__isolated-collection"
-        @model={{@isolatedCatalog}}
-        @transition={{action @setItemId}}
-        @sort={{this.sort}}
-        @search={{this.search}}
-        @removeItem={{this.removeItem}}
-        @itemComponent="cards/master-collection-item"
-      />
+      <div class="cardflow__nested-grid">
+        <CardPlatter @class="cardflow__nested-card">
+          <header class="cardflow__nested-card-header">
+            <div class="cardflow__nested-card-title">Transfer Proposal</div>
+          </header>
+        </CardPlatter>
+        <IsolatedCollection
+          @mode="view"
+          @format="table"
+          @class="cardflow__isolated-collection cardflow__nested-detail-card"
+          @model={{@isolatedCatalog}}
+          @transition={{action @setItemId}}
+          @sort={{this.sort}}
+          @search={{this.search}}
+          @removeItem={{this.removeItem}}
+          @itemComponent="cards/master-collection-item"
+        />
+      </div>
     </BoxelModal>
   {{else}}
     <header class="cardflow__header">

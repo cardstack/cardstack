@@ -3,7 +3,7 @@
   top: 0;
   display: grid;
   grid-template-columns: 945px auto;
-  gap: 0 25px;
+  gap: 0 35px;
   justify-items: center;
   padding-bottom: 30px;
 }

@@ -1,60 +1,78 @@
-.item__sidebar {
-  min-width: 320px;
+.sidebar-related-card__link {
+  display: block;
 }
 
 .sidebar-related-card {
-  border: 1px solid #dcdcdc;
-  border-radius: 10px;
+  min-width: 320px;
+  min-height: 160px;
+  border: var(--boxel-border);
+  border-radius: var(--boxel-border-radius);
   background-color: white;
-  margin-top: 10px;
-  box-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+  transition: box-shadow var(--boxel-transition);
+}
+
+.sidebar-related-card__link:hover .sidebar-related-card {
+  box-shadow: var(--boxel-box-shadow);
 }
 
 .sidebar-related-card__inner {
   padding: 20px;
-  padding-bottom: 0;
   display: flex;
   justify-content: flex-start;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .sidebar-related-card__header {
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  background-color: #F7F5F9;
+  height: 30px;
+  padding: 7px 15px;
+  border-radius: 10px 10px 0 0;
+  background-color: #F8F7FA;
+  color: #AFAFB7;
+  font: var(--boxel-font-xs);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-xl);
   text-transform: uppercase;
-  font-size: 0.6em;
-  font-weight: bold;
-  color: #929193;
-  padding: 3px 20px;
+  transition: background-image var(--boxel-transition), color var(--boxel-transition);
 }
 
-.sidebar-related-card__thumb-catalog {
-  width: 100px;
-  height: 80px;
-  margin-right: 10px;
+.sidebar-related-card__link:hover .sidebar-related-card__header {
+  background-image: url("/assets/images/icons/expand.svg");
+  background-position: top 7px right 7px;
+  background-size: 16px 16px;
+  background-repeat: no-repeat;
+  color: #6B6A80;
+}
+
+.sidebar-related-card__thumb-collection {
+  width: 60px;
+  height: 50px;
+  margin-right: 20px;
   background: url('/media-registry/master-covers.svg') center left/cover no-repeat;
 }
 
-
-.sidebar-related-card__right a {
-  display: block;
+.sidebar-related-card__title {
+  font: var(--boxel-font);
   font-weight: bold;
+  letter-spacing: var(--boxel-lsp-sm);
 }
 
 .sidebar-related-card__subtitle {
-  color: #7A788E;
-  font-size: 0.75em;
+  color: #6B6A80;
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
 }
 
 .sidebar-related-card__count {
-  padding: 20px;
-  padding-top: 0;
+  position: absolute;
+  bottom: 10px;
+  right: 15px;
+  font: var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp);
   text-align: right;
-  font-size: 0.6em;
 }
 
 .sidebar-related-card__count__number {
+  font: var(--boxel-font);
   font-weight: bold;
-  font-size: 1.7em;
+  letter-spacing: var(--boxel-lsp-lg);
 }

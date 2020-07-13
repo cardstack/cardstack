@@ -14,8 +14,24 @@
 .item__main {
   display: grid;
   grid-template-columns: auto auto;
-  gap: 0 25px;
+  gap: 0 35px;
   padding-bottom: 30px;
+}
+
+.item__sidebar {
+  min-width: 350px;
+  padding-right: 30px;
+}
+
+.item__sidebar-title {
+  padding-bottom: 25px;
+  font: var(--boxel-font);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp);
+}
+
+.item__sidebar-cards > * + * {
+  margin-top: 15px;
 }
 
 /* Header + sections */
