@@ -219,11 +219,11 @@ export default class MusicDetailCardComponent extends Component {
       {
         title: 'cover art',
         format: 'grid',
-        type: 'card',
+        type: 'card', // field type
         component: 'cards/file',
         value: {
           id: String(dasherize(this.model.album.trim())),
-          type: 'cover-art',
+          type: 'image', // card type
           title: this.model.album,
           imgURL: this.model.cover_art_thumb,
           date: this.model.cover_art_date
@@ -231,19 +231,19 @@ export default class MusicDetailCardComponent extends Component {
       },
       {
         title: 'audio',
-        type: 'collection',
+        type: 'collection', // field type
         component: 'cards/file',
         value: [
           {
             id: `${this.itemId}.aiff`,
-            type: 'audio-file',
+            type: 'audio', // card type
             imgURL: '/media-registry/file.svg',
             title: this.model?.details?.audio_files ? this.model?.details?.audio_files[0].title : `${this.itemId}.aiff`,
             date: this.model?.details?.audio_files ? this.model?.details?.audio_files[0]?.date : null
           },
           {
             id: `${this.itemId}-watermarked.aiff`,
-            type: 'audio-file',
+            type: 'audio',
             imgURL: '/media-registry/file.svg',
             title: this.model?.details?.audio_files ? this.model?.details?.audio_files[1].title : `${this.itemId}-watermarked.aiff`,
             date: this.model?.details?.audio_files ? this.model?.details?.audio_files[1]?.date : null

@@ -206,20 +206,23 @@ export default [
             "genre": ["Alternative", "Dream Pop"],
             "sales": {
               "type": "card",
-              "fields": [
-                {
-                  "title": "United States",
-                  "value": "$117M"
-                },
-                {
-                  "title": "International",
-                  "value": "$250M"
-                },
-                {
-                  "title": "Total",
-                  "value": "$367M"
-                }
-              ]
+              "value": {
+                "type": "revenue-data",
+                "fields": [
+                  {
+                    "title": "United States",
+                    "value": "$117M"
+                  },
+                  {
+                    "title": "International",
+                    "value": "$250M"
+                  },
+                  {
+                    "title": "Total",
+                    "value": "$367M"
+                  }
+                ]
+              }
             },
             "album_art": "media-registry/covers/medium/Autumn-Leaves.jpg",
             "release_date": {
@@ -276,20 +279,23 @@ export default [
             "genre": ["Alternative", "Dream Pop"],
             "sales": {
               "type": "card",
-              "fields": [
-                {
-                  "title": "United States",
-                  "value": "$118M"
-                },
-                {
-                  "title": "International",
-                  "value": "$251M"
-                },
-                {
-                  "title": "Total",
-                  "value": "$369M"
-                }
-              ]
+              "value": {
+                "type": "revenue-data",
+                "fields": [
+                  {
+                    "title": "United States",
+                    "value": "$118M"
+                  },
+                  {
+                    "title": "International",
+                    "value": "$251M"
+                  },
+                  {
+                    "title": "Total",
+                    "value": "$369M"
+                  }
+                ]
+              }
             },
             "album_art": "media-registry/covers/medium/Autumn-Leaves.jpg",
             "release_date": {

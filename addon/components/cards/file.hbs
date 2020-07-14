@@ -1,7 +1,12 @@
-<div class="boxel-card boxel-card--default boxel-card__file boxel-card--{{@model.type}} boxel-card--{{@mode}} boxel-card--{{@format}} boxel-card--with-img">
-  <div class="boxel-card__bg-img" style={{css-url "background-image" @model.imgURL}} />
-  <h3 class="boxel-card__title">{{@model.title}}</h3>
-  {{#if @model.date}}
-    <p class="boxel-card__description">Created {{moment-format @model.date "MMM D, YYYY" "YYYY-MM-DD"}}</p>
-  {{/if}}
+<div class="boxel-card boxel-card--default boxel-card__file boxel-card--{{@model.type}}">
+  <header class="boxel-card__header">
+    {{humanize @model.type}}
+  </header>
+  <div class="boxel-card__inner boxel-card__inner--with-img boxel-card__inner--{{@format}}">
+    <div class="boxel-card__bg-img" style={{css-url "background-image" @model.imgURL}} />
+    <h3 class="boxel-card__title">{{@model.title}}</h3>
+    {{#if @model.date}}
+      <p class="boxel-card__description">Created {{moment-format @model.date "MMM D, YYYY" "YYYY-MM-DD"}}</p>
+    {{/if}}
+  </div>
 </div>

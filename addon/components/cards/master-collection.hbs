@@ -11,7 +11,7 @@
           @btnRightAction={{fn @transition item}}
         />
       {{else}}
-        <IconButton {{on "click" (fn @transition item)}} @icon="expand" @class="boxel-card__expand-btn master-collection__select-btn" />
+        <IconButton {{on "click" (fn @transition item)}} @icon="expand" @class="master-collection__expand-btn master-collection__select-btn" />
       {{/if}}
     {{/if}}
     {{!-- <button {{on "click" (if @togglePin (fn @togglePin item))}} class="master-collection__pin-btn {{if item.pinned "pinned"}}" aria-label="pin">{{svg-jar "pin" width="22px" height="22px"}}</button> --}}

@@ -1,4 +1,4 @@
-<Boxel @tag="section" @class="detail-card {{@class}}">
+<Boxel @tag="section" @class="detail-card detail-card--{{@mode}} {{@class}}">
   {{yield}}
 
   {{#each @detailSections as |s|}}

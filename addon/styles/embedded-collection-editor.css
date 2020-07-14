@@ -51,6 +51,11 @@
   grid-template-rows: 1fr 45px;
 }
 
+.collection-field__item--grid > .boxel-card {
+  width: auto;
+  grid-column: -1 / 1;
+}
+
 .collection-field__item--grid.collection-field__item--multiple {
   grid-template: ". select remove .";
   grid-template-rows: 1fr 45px;
@@ -84,7 +89,7 @@
   color: black;
   font: var(--boxel-font-sm);
   border: var(--boxel-border);
-  border-radius: var(--boxel-border-radius-sm);
+  border-radius: var(--boxel-border-radius);
   letter-spacing: var(--boxel-lsp-sm);
   text-align: center;
 }

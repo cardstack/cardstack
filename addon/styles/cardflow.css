@@ -570,13 +570,13 @@
   height: calc(100vh - 150px);
 }
 
-.cardflow__isolated-detail-card header {
+.cardflow__isolated-detail-card > header {
   position: sticky;
   top: 0;
   z-index: 16;
 }
 
-.cardflow__isolated-detail-card header > * {
+.cardflow__isolated-detail-card > header > * {
   max-width: 100%;
 }
 
