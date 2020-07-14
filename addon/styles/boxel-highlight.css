@@ -8,7 +8,7 @@
   padding: 0;
   background: none;
   border: 2px solid transparent;
-  border-radius: 5px;
+  border-radius: var(--boxel-border-radius);
   z-index: 1;
   transition: border-color var(--boxel-transition);
 }

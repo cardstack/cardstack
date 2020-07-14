@@ -5,7 +5,7 @@
   display: grid;
   grid-auto-flow: column;
   background-color: var(--boxel-highlight);
-  border-top-right-radius: 5px;
+  border-top-right-radius: var(--boxel-border-radius);
   border-bottom-left-radius: 5px;
   border: none;
   font: var(--boxel-font-sm);
@@ -70,7 +70,7 @@
 }
 
 .boxel-actions__label {
-  border-top-right-radius: 5px;
+  border-top-right-radius: var(--boxel-border-radius);
   border-bottom-left-radius: 5px;
   width: 30px;
   height: 30px;

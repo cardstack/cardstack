@@ -1,7 +1,7 @@
 [
   {
     "id": "lisa-track",
-    "type": "profile",
+    "type": "participant",
     "title": "Lisa Track",
     "description": "Administrator",
     "imgURL": "media-registry/profiles/Lisa-Track.jpg",
@@ -21,7 +21,7 @@
   },
   {
     "id": "steve-rights",
-    "type": "profile",
+    "type": "participant",
     "title": "Steve Rights",
     "description": "Catalog Manager",
     "imgURL": "media-registry/profiles/Steve-Rights.jpg",
@@ -41,7 +41,7 @@
   },
   {
     "id": "alex-sharp",
-    "type": "profile",
+    "type": "participant",
     "title": "Alex Sharp",
     "description": "Data Engineer",
     "imgURL": "media-registry/profiles/Alex-Sharp.jpg",
@@ -61,7 +61,7 @@
   },
   {
     "id": "pia-midina",
-    "type": "profile",
+    "type": "participant",
     "title": "Pia Midina",
     "description": "Recording artist & lyricist",
     "imgURL": "media-registry/profiles/Pia-Midina.jpg",
@@ -81,7 +81,7 @@
   },
   {
     "id": "francesco-midina",
-    "type": "profile",
+    "type": "participant",
     "title": "Francesco Midina",
     "description": "Producer (Francesco Rocks)",
     "imgURL": "media-registry/profiles/francesco-midina.jpg",
@@ -101,7 +101,7 @@
   },
   {
     "id": "miles-ponia",
-    "type": "profile",
+    "type": "participant",
     "title": "Miles Ponia",
     "description": "Composer",
     "imgURL": "media-registry/profiles/Miles_Ponia.jpg",
@@ -121,7 +121,7 @@
   },
   {
     "id": "bb-clarke",
-    "type": "profile",
+    "type": "participant",
     "title": "BB Clarke",
     "description": "Recording artist & lyricist",
     "imgURL": "media-registry/profiles/BB-Clarke.jpg",
@@ -141,12 +141,12 @@
   },
   {
     "id": "francine-stewart",
-    "type": "profile",
+    "type": "participant",
     "title": "Francine Stewart"
   },
   {
     "id": "michelle-harris",
-    "type": "profile",
+    "type": "participant",
     "title": "Michelle Harris",
     "description": "Producer (Music by Michelle)",
     "imgURL": "media-registry/profiles/Michelle-Harris.jpg",
@@ -166,7 +166,7 @@
   },
   {
     "id": "joel-kaplan",
-    "type": "profile",
+    "type": "participant",
     "title": "Joel Kaplan",
     "description": "Mastering engineer",
     "imgURL": "media-registry/profiles/Joel-Kaplan.jpg",
@@ -186,7 +186,7 @@
   },
   {
     "id": "mariah-solis",
-    "type": "profile",
+    "type": "participant",
     "title": "Mariah Solis",
     "description": "Mixing engineer",
     "imgURL": "media-registry/profiles/Mariah-Solis.jpg",
@@ -206,7 +206,7 @@
   },
   {
     "id": "ian-adams",
-    "type": "profile",
+    "type": "participant",
     "title": "Ian Adams",
     "description": "Recording engineer",
     "imgURL": "media-registry/profiles/Ian-Adams.jpg",
@@ -226,7 +226,7 @@
   },
   {
     "id": "jenny-sparks",
-    "type": "profile",
+    "type": "participant",
     "title": "Jenny Sparks",
     "description": "Background singer",
     "imgURL": "media-registry/profiles/Jenny-Sparks.jpg",
@@ -246,7 +246,7 @@
   },
   {
     "id": "sophia-lanagan",
-    "type": "profile",
+    "type": "participant",
     "title": "Sophia Lanagan",
     "description": "Background singer",
     "imgURL": "media-registry/profiles/Sophia-Lanagan.jpg",
@@ -266,7 +266,7 @@
   },
   {
     "id": "helen-gellar",
-    "type": "profile",
+    "type": "participant",
     "title": "Helen Gellar",
     "description": "Background singer",
     "imgURL": "media-registry/profiles/Helen-Gellar.jpg",
@@ -286,7 +286,7 @@
   },
   {
     "id": "arthur-doyle",
-    "type": "profile",
+    "type": "participant",
     "title": "Arthur Doyle",
     "description": "Drummer",
     "imgURL": "media-registry/profiles/Arthur-Doyle.jpg",

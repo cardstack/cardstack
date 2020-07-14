@@ -47,7 +47,7 @@
 /* Collection Item Wrapper + Actions */
 .collection__boxel {
   width: 100%;
-  border-radius: 5px;
+  border-radius: var(--boxel-border-radius);
 }
 
 .media-collection__grid-item:hover .collection__boxel,
@@ -101,7 +101,7 @@
   width: 100%;
   height: 100%;
   padding: 20px 20px 0;
-  border-radius: 5px;
+  border-radius: var(--boxel-border-radius);
   border: 1px solid transparent;
   min-height: 280px;
 }

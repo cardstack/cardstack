@@ -1,6 +1,6 @@
 export const PIA_MIDINA = {
   "id": "pia-midina",
-  "type": "profile",
+  "type": "participant",
   "title": "Pia Midina",
   "description": "Recording artist & lyricist",
   "imgURL": "media-registry/profiles/Pia-Midina.jpg",
@@ -12,7 +12,7 @@ export const PIA_MIDINA = {
 
 export const JENNY_SPARKS = {
   "id": "jenny-sparks",
-  "type": "profile",
+  "type": "participant",
   "title": "Jenny Sparks",
   "description": "Background singer",
   "imgURL": "media-registry/profiles/Jenny-Sparks.jpg",
@@ -22,7 +22,7 @@ export const JENNY_SPARKS = {
 
 export const ARTHUR_DOYLE = {
   "id": "arthur-doyle",
-  "type": "profile",
+  "type": "participant",
   "title": "Arthur Doyle",
   "description": "Drummer",
   "imgURL": "media-registry/profiles/Arthur-Doyle.jpg",
@@ -31,7 +31,7 @@ export const ARTHUR_DOYLE = {
 
 export const SOPHIA_LANAGAN = {
   "id": "sophia-lanagan",
-  "type": "profile",
+  "type": "participant",
   "title": "Sophia Lanagan",
   "description": "Background singer",
   "imgURL": "media-registry/profiles/Sophia-Lanagan.jpg",
@@ -41,7 +41,7 @@ export const SOPHIA_LANAGAN = {
 
 export const HELEN_GELLAR = {
   "id": "helen-gellar",
-  "type": "profile",
+  "type": "participant",
   "title": "Helen Gellar",
   "description": "Background singer",
   "imgURL": "media-registry/profiles/Helen-Gellar.jpg",
@@ -51,7 +51,7 @@ export const HELEN_GELLAR = {
 
 export const FRANCESCO_MIDINA = {
   "id": "francesco-midina",
-  "type": "profile",
+  "type": "participant",
   "title": "Francesco Midina",
   "description": "Producer (Francesco Rocks)",
   "imgURL": "media-registry/profiles/francesco-midina.jpg",
@@ -63,7 +63,7 @@ export const FRANCESCO_MIDINA = {
 
 export const JOEL_KAPLAN = {
   "id": "joel-kaplan",
-  "type": "profile",
+  "type": "participant",
   "title": "Joel Kaplan",
   "description": "Mastering engineer",
   "imgURL": "media-registry/profiles/Joel-Kaplan.jpg",
@@ -73,7 +73,7 @@ export const JOEL_KAPLAN = {
 
 export const MARIAH_SOLIS = {
   "id": "mariah-solis",
-  "type": "profile",
+  "type": "participant",
   "title": "Mariah Solis",
   "description": "Mixing engineer",
   "imgURL": "media-registry/profiles/Mariah-Solis.jpg",
@@ -83,7 +83,7 @@ export const MARIAH_SOLIS = {
 
 export const IAN_ADAMS = {
   "id": "ian-adams",
-  "type": "profile",
+  "type": "participant",
   "title": "Ian Adams",
   "description": "Recording engineer",
   "imgURL": "media-registry/profiles/Ian-Adams.jpg",

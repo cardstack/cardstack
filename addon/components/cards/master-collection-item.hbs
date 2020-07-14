@@ -10,7 +10,7 @@
         @btnRightAction={{if @transition (fn @transition item)}}
       />
     {{else}}
-      <IconButton {{on "click" (fn @transition item)}} @icon="expand" @class="boxel-card__expand-btn master-collection__select-btn" />
+      <IconButton {{on "click" (fn @transition item)}} @icon="expand" @class="master-collection__expand-btn master-collection__select-btn" />
     {{/if}}
     <div class="collection {{if (eq @mode "edit") "collection--edit"}}">
       <div class="collection__img" style={{css-url "background-image" item.cover_art_medium}}>
