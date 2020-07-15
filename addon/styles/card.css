@@ -206,3 +206,51 @@
 .boxel-card-field .field-renderer__value {
   font: var(--boxel-font-sm);
 }
+
+
+/* Revenue Data card */
+.boxel-card--revenue-data .boxel-card__fields {
+  grid-template-columns: 1fr;
+  gap: 5px;
+  padding: 10px 0;
+}
+
+.boxel-card--revenue-data .boxel-card__fields > li {
+  width: 100%;
+}
+
+.boxel-card--revenue-data .boxel-card-field {
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 0 35px;
+}
+
+.boxel-card--revenue-data .boxel-card-field > .field-renderer__title {
+  width: 100%;
+  color: black;
+  text-align: right;
+}
+
+.boxel-card--revenue-data .boxel-card-field > .field-renderer__value {
+  font: var(--boxel-font-med);
+}
+
+
+/* Schedule card */
+.boxel-card--schedule .boxel-card__inner {
+  height: 155px;
+  padding-left: 40px;
+}
+
+.boxel-card--schedule .boxel-card__fields {
+  padding: 0;
+  grid-template-columns: 1fr;
+}
+
+.boxel-card--schedule .boxel-card-field > .field-renderer__title {
+  color: black;
+}
+
+.boxel-card--schedule .boxel-card-field > .field-renderer__value {
+  font: var(--boxel-font-med);
+}

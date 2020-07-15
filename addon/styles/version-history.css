@@ -328,6 +328,16 @@
   border-radius: 0;
 }
 
+.version-card__detail-card .media-detail-section__contents {
+  display: grid;
+  gap: 10px 0;
+  padding: 0 50px;
+}
+
+.version-card__detail-card .media-detail-section__contents > * {
+  width: 100%;
+}
+
 
 /* Header */
 .version-card--item__header {

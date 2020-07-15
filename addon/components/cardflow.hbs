@@ -6,7 +6,7 @@
       <div class="cardflow__nested-grid">
         <CardPlatter @class="cardflow__nested-card">
           <header class="cardflow__nested-card-header">
-            <div class="cardflow__nested-card-title">{{this.catalog.value.title}}</div>
+            <div class="cardflow__nested-card-title">{{@catalog.title}}</div>
             <PillButton {{on "click" this.closeItem}}>Back to catalog</PillButton>
           </header>
         </CardPlatter>

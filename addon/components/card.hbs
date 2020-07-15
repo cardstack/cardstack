@@ -17,7 +17,9 @@
       {{#if @model.imgURL}}
         <div class="boxel-card__bg-img" style={{css-url "background-image" @model.imgURL}} />
       {{/if}}
-      <h3 class="boxel-card__title">{{if (eq @model.type "musical-work") (titleize @model.title) @model.title}}</h3>
+      {{#if @model.title}}
+        <h3 class="boxel-card__title">{{if (eq @model.type "musical-work") (titleize @model.title) @model.title}}</h3>
+      {{/if}}
       {{#if @model.description}}
         <p class="boxel-card__description">{{@model.description}} {{#if @model.descriptionDate}}{{moment-format @model.descriptionDate "MMM DD, YYYY" "YYYY-MM-DD"}}{{/if}}</p>
       {{/if}}
