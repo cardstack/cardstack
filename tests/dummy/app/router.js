@@ -21,6 +21,8 @@ Router.map(function() {
     this.route('agreements');
     this.route('cardflow');
   });
+
+  this.route('wave-player');
 });
 
 export default Router;
