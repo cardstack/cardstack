@@ -15,7 +15,7 @@ module.exports = function(defaults) {
     'ember-faker': { enabled: true },
 
     fingerprint: {
-      extensions: ['js', 'css', 'map', 'png', 'jpg', 'gif', 'svg'],
+      extensions: ['js', 'css', 'map', 'png', 'jpg', 'gif', 'svg', 'flac'],
       generateAssetMap: true,
       fingerprintAssetMap: true,
       prepend: '/boxel/',

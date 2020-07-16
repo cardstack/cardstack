@@ -1,0 +1,20 @@
+.wave-player {
+  background-color: white;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  display: inline-flex;
+  align-items: center;
+  margin: 2em;
+}
+
+.wave-player__play {
+  border: 0;
+  background: transparent;
+  padding: 1em;
+  outline: none;
+}
+
+.wave-player__times {
+  padding: 1em;
+  color: #666;
+}
