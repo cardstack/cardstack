@@ -192,7 +192,7 @@ tr.is-selected + tr.is-selected .media-collection-table__highlight.boxel-highlig
   height: calc(100% - 115px);
 }
 
-.media-collection-table__select-btn--edit {
+.media-collection-table__select-btn.media-collection-table__select-btn--edit {
   visibility: visible;
   position: absolute;
   top: -2px;

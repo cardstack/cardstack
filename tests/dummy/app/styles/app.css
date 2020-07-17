@@ -5,6 +5,7 @@
 @import 'media-registry/item-edit.css';
 @import 'media-registry/agreements.css';
 @import 'media-registry/wave-player.css';
+@import 'media-registry/breadcrumbs.css';
 
 
 html, body {

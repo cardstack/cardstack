@@ -9,41 +9,6 @@
 }
 
 
-/* Breadcrumbs */
-.breadcrumbs {
-  padding: 20px 0;
-  display: inline-grid;
-  grid-auto-flow: column;
-}
-
-.breadcrumbs__pill {
-  height: 30px;
-  padding: 5px 20px;
-  font: var(--boxel-font-sm);
-  letter-spacing: var(--boxel-lsp);
-  border: var(--boxel-border);
-  border-radius: 100px;
-  background-color: white;
-  color: black;
-  outline: 0;
-}
-
-.breadcrumbs__pill:hover {
-  cursor: pointer;
-}
-
-.breadcrumbs__pill--current {
-  background-color: var(--boxel-highlight);
-  border-color: var(--boxel-highlight);
-}
-
-.breadcrumbs__carot {
-  width: 30px;
-  height: 30px;
-  background: url(/assets/images/icons/carot.svg) center/7px no-repeat;
-}
-
-
 /* Collection Item Wrapper + Actions */
 .collection__boxel {
   width: 100%;

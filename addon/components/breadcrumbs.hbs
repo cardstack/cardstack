@@ -1,0 +1,20 @@
+<div class="breadcrumbs">
+  {{#if @items}}
+    {{#each @items as |item i|}}
+      {{#if (eq i 0)}}
+        <LinkTo @route={{item.route}} @class="breadcrumbs__item">
+          <div class="breadcrumbs__item-label">{{item.type}}</div>
+          <div class="breadcrumbs__item-title">{{item.title}}</div>
+        </LinkTo>
+      {{else}}
+        <span class="breadcrumbs__carot" />
+        <LinkTo @route={{item.route}} @model={{item.routeModel}} @class="breadcrumbs__item">
+          <div class="breadcrumbs__item-label">{{item.type}}</div>
+          <div class="breadcrumbs__item-title">{{item.title}}</div>
+        </LinkTo>
+      {{/if}}
+    {{/each}}
+  {{else}}
+    {{yield}}
+  {{/if}}
+</div>

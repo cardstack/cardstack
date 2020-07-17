@@ -1,6 +1,6 @@
 {{#if (eq @mode "edit")}}
   {{!-- Edit Mode --}}
-  {{#if (or (eq @field.type "card") @field.value.id (is-array @field.value))}}
+  {{#if (or (eq @field.type "card") (eq @field.type "collection") @field.value.id (is-array @field.value))}}
     <div class="field-renderer {{lowercase (dasherize (trim @field.title))}}-edit-field {{@class}}">
       <h4 class="field-renderer__title">{{humanize @field.title}}</h4>
       {{#if (eq @field.type "card")}}
@@ -125,6 +125,21 @@
                 <div class="field-renderer__taglist-title">{{val.title}}</div>
                 {{#if (eq val.type "card")}}
                   {{component (or val.component "card") model=val.value mode="view"}}
+                {{else if (and (eq val.type "collection") val.value)}}
+                  <EmbeddedCollection
+                    @collection={{val.value}}
+                    @cardComponent={{val.component}}
+                    @comparisonMode={{@comparisonMode}}
+                    @addedFields={{@addedFields}}
+                    @addedValues={{@addedValues}}
+                    @changedFields={{@changedFields}}
+                    @removedFields={{@removedFields}}
+                    @removedValues={{@removedValues}}
+                    @addedCards={{@addedCards}}
+                    @removedCards={{@removedCards}}
+                    @changedCards={{@changedCards}}
+                    @modifiedCard={{@modifiedCard}}
+                  />
                 {{else}}
                   {{#each val.value as |vv|}}
                     <div>{{vv}}</div>

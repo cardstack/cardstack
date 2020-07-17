@@ -1,25 +1,31 @@
-{{!-- "Detail Card" related stuff in various places around the app
- can be refactored to be an isolated card renderer --}}
+{{!-- Detail Card --}}
+<DetailCard
+  @headerFields={{this.headerFields}}
+  @fields={{this.isolatedFields}}
+  @label="Musical Work"
+  @mode="view"
+>
+  <BoxelActions
+    @class="media-collection__btn-overlay"
+    @displayHighlightActions={{true}}
+    @btnLeft="mode-btn"
+    @btnLeftContent="Edit"
+    @btnRight="settings"
+  />
+</DetailCard>
 
-{{!-- Detail Card Layout --}}
-<div class="detail-card__layout">
-
-  {{!-- Detail Card --}}
-  <Cards::MusicalWork @model={{@model}} />
-
-  {{!-- Related Cards Sidebar --}}
-  <aside class="item__sidebar">
-    <h3 class="item__sidebar-title">In these collections</h3>
-    <div class="item__sidebar-cards">
-      {{#each (array "Film Music" "Batch F") as |catalog i|}}
-        <SidebarRelatedCard
-          @type="collection"
-          @title={{catalog}}
-          @route="media-registry.collection"
-          @routeModel={{dasherize (trim catalog)}}
-          @subtitle={{get @model.catalogSubtitles i}}
-          @count={{get @model.catalogCounts i}} />
-      {{/each}}
-    </div>
-  </aside>
-</div>
+{{!-- Related Cards Sidebar --}}
+<aside class="item__sidebar">
+  <h3 class="item__sidebar-title">In these collections</h3>
+  <div class="item__sidebar-cards">
+    {{#each (array "Film Music" "Batch F") as |catalog i|}}
+      <SidebarRelatedCard
+        @type="collection"
+        @title={{catalog}}
+        @route="media-registry.collection"
+        @routeModel={{dasherize (trim catalog)}}
+        @subtitle={{get @model.catalogSubtitles i}}
+        @count={{get @model.catalogCounts i}} />
+    {{/each}}
+  </div>
+</aside>

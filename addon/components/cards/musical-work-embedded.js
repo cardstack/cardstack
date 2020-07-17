@@ -1,8 +1,8 @@
 import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
-import { dasherize } from '@ember/string';
 import { truncateVerifiId } from '@cardstack/boxel/utils/truncate-verifi-id';
+import { formatId } from '@cardstack/boxel/utils/format-id';
 
 export default class MusicalWorkEmbedded extends Component {
   @service router;
@@ -36,7 +36,6 @@ export default class MusicalWorkEmbedded extends Component {
 
   @action
   transitionToMusicalWork() {
-    let itemId = String(dasherize(this.args.model.title.trim()));
-    this.router.transitionTo('media-registry.item.musical-work', itemId);
+    this.router.transitionTo('media-registry.item.musical-work', formatId(this.args.model.title));
   }
 }

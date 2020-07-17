@@ -64,8 +64,8 @@
 
 .sidebar-related-card__count {
   position: absolute;
-  bottom: 10px;
-  right: 15px;
+  bottom: 15px;
+  right: 20px;
   font: var(--boxel-font-xs);
   letter-spacing: var(--boxel-lsp);
   text-align: right;

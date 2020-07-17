@@ -1,7 +1,7 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { dasherize } from '@ember/string';
 import { truncateVerifiId } from '@cardstack/boxel/utils/truncate-verifi-id';
+import { formatId } from '@cardstack/boxel/utils/format-id';
 
 export default class MusicDetailCardComponent extends Component {
   @tracked model = this.args.model;
@@ -72,9 +72,9 @@ export default class MusicDetailCardComponent extends Component {
       },
       {
         title: 'main artist',
-        value: [ this.model.artist_info || this.model.artist ],
-        type: this.model.artist_info ? 'collection' : 'text',
-        component: this.model.artist_info ? 'cards/artist' : null,
+        value: this.model.artist_info || [{ type: 'participant', title: this.model.artist }],
+        type: 'collection',
+        component: 'cards/artist',
         search: (q) => (this.model.selectableArtists || []).filter(a => a.title.toLowerCase().includes(q.toLowerCase()))
       },
       {
@@ -136,7 +136,7 @@ export default class MusicDetailCardComponent extends Component {
       type: 'card',
       component: 'cards/musical-work-embedded',
       title: 'Musical Work',
-      value: this.model?.musicalWork
+      value: this.model.musicalWork
     }
   }
 
@@ -182,16 +182,16 @@ export default class MusicDetailCardComponent extends Component {
     return [
       {
         title: 'main artist',
-        value: [ this.model.artist_info || this.model.artist ],
-        type: this.model.artist_info ? 'collection' : 'text',
-        component: this.model.artist_info ? 'cards/artist' : null,
+        value: this.model.artist_info || [{ type: 'participant', title: this.model.artist }],
+        type: 'collection',
+        component: 'cards/artist',
         search: (q) => (this.model.selectableArtists || []).filter(a => a.title.toLowerCase().includes(q.toLowerCase()))
       },
       {
         title: 'producer',
-        value: [ this.model?.producer || 'N/A' ],
-        type: this.model.producer ? 'collection' : 'text',
-        component: this.model.producer ? 'cards/artist' : null,
+        value: this.model.producer,
+        type: 'collection',
+        component: 'cards/artist',
         search: (q) => (this.model.selectableArtists || []).filter(a => a.title.toLowerCase().includes(q.toLowerCase()))
       },
       {
@@ -222,7 +222,7 @@ export default class MusicDetailCardComponent extends Component {
         type: 'card', // field type
         component: 'cards/file',
         value: {
-          id: String(dasherize(this.model.album.trim())),
+          id: formatId(this.model.album),
           type: 'image', // card type
           title: this.model.album,
           imgURL: this.model.cover_art_thumb,

@@ -6,11 +6,15 @@ export default class MediaRegistryItemMusicalWorkRoute extends Route {
     const profiles = await fetchCollection('profiles');
     let model = this.modelFor('media-registry.item');
 
-    if (!model.musicalWork) { return; }
+    // if (!model.musicalWork) { return; }
 
     let { musicalWork } = model;
-    musicalWork.artistName = profiles.filter(profile => profile.id === musicalWork.artist_id)[0];
-    musicalWork.composerName = profiles.filter(profile => profile.id === musicalWork.composer_id)[0];
+    if (musicalWork) {
+      musicalWork.lyricists = profiles.filter(profile => profile.id === musicalWork.artist_id);
+      musicalWork.composers = profiles.filter(profile => profile.id === musicalWork.composer_id);
+    } else {
+      musicalWork = model;
+    }
 
     return musicalWork;
   }

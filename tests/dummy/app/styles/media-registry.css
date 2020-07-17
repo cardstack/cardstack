@@ -5,6 +5,7 @@
   height: 100%;
   display: grid;
   grid-template-columns: auto 1fr;
+  grid-template-rows: auto 1fr;
   background-color: #F5F5F5;
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp-lg);

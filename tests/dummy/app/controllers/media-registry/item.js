@@ -1,11 +1,11 @@
 import Controller from '@ember/controller';
 import { action } from '@ember/object';
-import { dasherize } from '@ember/string';
+import { formatId } from '@cardstack/boxel/utils/format-id';
 
 export default class MediaRegistryItemController extends Controller {
   get itemId() {
     if (!this.model || !this.model.song_title) { return null; }
-    return String(dasherize(this.model.song_title.trim()));
+    return formatId(this.model.song_title);
   }
 
   @action

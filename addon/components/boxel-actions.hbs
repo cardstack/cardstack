@@ -12,7 +12,7 @@
         <ActionsMenu @class="boxel-actions__more-actions-menu" @actionItems={{array "Delete" "Duplicate"}} />
       </MediaCollection::Button>
     {{else}}
-      <button {{on "click" (or @btnLeftAction this.noop)}} class="boxel-actions__btn {{@btnLeft}}">{{@btnLeftContent}}</button>
+      <button {{on "click" (optional @btnLeftAction)}} class="boxel-actions__btn {{@btnLeft}}">{{@btnLeftContent}}</button>
     {{/if}}
 
     {{#if (eq @btnRight "settings")}}
@@ -20,7 +20,7 @@
         <ActionsMenu @class="boxel-actions__more-actions-menu" @versionHistory={{@versionHistory}} @transferAgreement={{@transferAgreement}} />
       </MediaCollection::Button>
     {{else}}
-      <button {{on "click" (or @btnRightAction this.noop)}} class="boxel-actions__btn boxel-actions__btn--{{@btnRightIcon}}" aria-label="{{@btnRightIcon}}" />
+      <button {{on "click" (optional @btnRightAction)}} class="boxel-actions__btn boxel-actions__btn--{{@btnRightIcon}}" aria-label="{{@btnRightIcon}}" />
     {{/if}}
   </div>
 {{/if}}

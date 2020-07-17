@@ -1,12 +1,11 @@
 import MediaRegistryIndexController from './index';
 import { action } from '@ember/object';
-import { dasherize } from '@ember/string';
+import { formatId } from '@cardstack/boxel/utils/format-id';
 
 export default class MediaRegistryCollectionController extends MediaRegistryIndexController {
   @action
   transitionToIsolate(item) {
-    let itemId = dasherize(item.song_title.trim());
-    this.transitionToRoute('media-registry.item', itemId);
+    this.transitionToRoute('media-registry.item', formatId(item.song_title));
   }
 
   @action

@@ -1,1 +1,1 @@
-export { default } from '@cardstack/boxel/utils/truncate-verifi-id';
+export { default, truncateVerifiId } from '@cardstack/boxel/utils/truncate-verifi-id';
