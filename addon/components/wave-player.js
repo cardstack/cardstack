@@ -3,6 +3,8 @@ import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { dropTask } from 'ember-concurrency-decorators';
 
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+
 export default class WavePlayerComponent extends Component {
 
   url = '/assets/demo_flac.flac';
@@ -38,12 +40,12 @@ export default class WavePlayerComponent extends Component {
 
     let buffer = await response.arrayBuffer();
     let audioContext = new AudioContext();
-    let decodedData = await audioContext.decodeAudioData(buffer);
+    let decodedData = await decodeAudioData(audioContext, buffer);
 
     let data = decodedData.getChannelData(0);
     let barCount = Math.floor(this.canvas.width / (this.barWidth + this.barPadding));
 
-    let scaler = makeScaler(canvas.width, data.length);
+    let scaler = makeScaler(barCount, data.length);
 
     this.barValues = [];
 
@@ -60,7 +62,6 @@ export default class WavePlayerComponent extends Component {
       let rms = Math.sqrt(sum / samplesToTake);
       this.barValues.push(rms);
     }
-
 
     this.draw();
     this.setupAudio(this.url);
@@ -133,4 +134,8 @@ function range(n) {
 
 function makeScaler(domain, range) {
   return x => range / domain * x;
+}
+
+async function decodeAudioData(audioContext, buffer) {
+  return await new Promise(resolve => audioContext.decodeAudioData(buffer, resolve));
 }
