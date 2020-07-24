@@ -1,5 +1,5 @@
 {{#let @model as |item|}}
-  <Boxel @class="collection__boxel">
+  <Boxel @class="collection__boxel collection__boxel--{{@format}}">
     <BoxelHighlight {{on "click" (if @transition (fn @transition item))}} @class="collection__highlighter" @on={{item.selected}} />
     {{#if (eq @mode "edit")}}
       <BoxelActions
@@ -12,12 +12,27 @@
     {{else}}
       <IconButton {{on "click" (fn @transition item)}} @icon="expand" @class="master-collection__expand-btn master-collection__select-btn" />
     {{/if}}
-    <div class="collection {{if (eq @mode "edit") "collection--edit"}}">
-      <div class="collection__img" style={{css-url "background-image" item.cover_art_medium}}>
-        <button class="collection__play-btn">{{svg-jar "play-btn" width="60px" height="60px"}}</button>
+    <div class="collection collection--{{@format}} {{if (eq @mode "edit") "collection--edit"}}">
+      <div class="collection__main">
+        <div class="collection__img" style={{css-url "background-image" item.cover_art_medium}}>
+          <button class="collection__play-btn">{{svg-jar "play-btn" width="60px" height="60px"}}</button>
+        </div>
+        <div class="collection__title-desc">
+          <h3 class="collection__title">{{titleize item.song_title}}</h3>
+          <div class="collection__artist">{{titleize item.artist}}</div>
+        </div>
       </div>
-      <h3 class="collection__title">{{titleize item.song_title}}</h3>
-      <div class="collection__artist">{{titleize item.artist}}</div>
+
+      {{#if (eq @format "list")}}
+        <ul class="collection__list">
+          {{#each @listFields as |field i|}}
+            <li class="collection__list-field collection__list-field--{{i}}">
+              <div class="collection__list-field-label">{{field.name}}</div>
+              <div>{{get item field.valuePath}}</div>
+            </li>
+          {{/each}}
+        </ul>
+      {{/if}}
     </div>
   </Boxel>
 {{/let}}

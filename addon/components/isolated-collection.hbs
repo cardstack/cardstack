@@ -76,7 +76,7 @@
           {{#each this.collection as |item|}}
             <li class="media-collection__grid-item media-collection__grid-item--{{this.format}}">
               {{#if @itemComponent}}
-                {{component @itemComponent model=item transition=@transition mode=@mode}}
+                {{component @itemComponent model=item listFields=@model.listFields transition=@transition mode=@mode format=this.format}}
               {{else}}
                 {{yield item}}
               {{/if}}
@@ -90,7 +90,7 @@
                   {{/if}}
                 </button>
                 {{#if (eq @mode "edit")}}
-                  <button {{on "click" (fn this.removeItem item)}} class="media-collection__grid-item-select-btn" aria-label="remove">{{svg-jar "icon-minus-circle" width="16px" height="16px"}}</button>
+                  <button {{on "click" (fn this.removeItem item)}} class="media-collection__grid-item-select-btn remove-btn" aria-label="remove">{{svg-jar "icon-minus-circle" width="16px" height="16px"}}</button>
                 {{/if}}
               </div>
             </li>

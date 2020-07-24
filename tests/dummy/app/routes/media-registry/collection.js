@@ -18,6 +18,24 @@ export default class MediaRegistryCollectionRoute extends Route {
       type: 'collection',
       collection: tracks,
       itemType: 'masters',
+      listFields: [
+        {
+          name: 'Release Title',
+          valuePath: 'album'
+        },
+        {
+          name: 'Release Type',
+          valuePath: 'type_of_album'
+        },
+        {
+          name: 'Genre',
+          valuePath: 'genre'
+        },
+        {
+          name: 'Length',
+          valuePath: 'length'
+        },
+      ],
       columns: [
         {
           name: 'Title',

@@ -23,6 +23,9 @@
 
 /* Media collection */
 .media-collection {
+  --breadcrumbs-height: 90px;
+  --header-height: 170px;
+
   height: 100%;
   background-color: white;
   border-radius: 10px;
@@ -30,6 +33,7 @@
 }
 
 .media-collection__sticky-header {
+  height: var(--header-height);
   position: sticky;
   top: 0;
   background-color: white;
@@ -38,23 +42,21 @@
 }
 
 .media-collection__scroll-container {
-  height: calc(100vh - 345px);
-  padding-bottom: 30px;
+  height: 100%;
+  padding-bottom: var(--header-height);
   overflow: auto;
 }
 
 .media-collection__inner-container {
   min-height: 100%;
+  min-width: 100%;
+  width: max-content;
   background-color: white;
   border-radius: 0 0 10px 10px;
 }
 
 .media-collection--collection {
-  height: calc(100% - 70px);
-}
-
-.media-collection--collection.media-collection--view .media-collection__scroll-container {
-  height: calc(100% - 152px);
+  height: calc(100% - var(--breadcrumbs-height));
 }
 
 .media-collection--table {
@@ -338,6 +340,24 @@
   background-color: #E9E9EE;
 }
 
+/* List view */
+.media-collection__grid--master-collection-list,
+.media-collection__grid--collection-list {
+  padding-left: 0;
+  padding-right: 0;
+  gap: 20px;
+}
+
+.media-collection__grid-item--list {
+  display: grid;
+  grid-template-columns: 50px 1fr 50px;
+  align-items: center;
+  gap: 0 2px;
+}
+
+.media-collection__grid-item--list .master-collection__select-btn {
+  order: -1;
+}
 
 
 /* Edit mode */
@@ -379,6 +399,26 @@
   height: 30px;
   font: var(--boxel-font-sm);
   padding: 5px 10px;
+}
+
+.media-collection--edit .media-collection__grid-item--list > .media-collection__grid-item-btn-group {
+  display: contents;
+}
+
+.media-collection--edit .media-collection__grid-item--list .media-collection__grid-item-select-btn {
+  order: -1;
+  position: sticky;
+  left: 0;
+  background-color: #f0f0f0;
+  margin: 0;
+  width: 50px;
+  height: calc(100% + 10px);
+  z-index: 2;
+}
+
+.media-collection--edit .media-collection__grid-item--list .media-collection__grid-item-select-btn.remove-btn {
+  order: 1;
+  right: 0;
 }
 
 /* For sort btn */
