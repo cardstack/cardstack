@@ -102,17 +102,14 @@
 }
 
 .media-collection-table__play-btn {
-  width: 30px;
-  height: 30px;
-  border: none;
-  background: none;
-  padding: 0;
+  width: 100%;
   opacity: 0.25;
-  z-index: 2;
   transition: opacity var(--boxel-transition);
 }
 
+.media-collection-table__play-btn.is-playing,
 .media-collection-table tr:hover .media-collection-table__play-btn {
+  --icon-border: var(--boxel-highlight);
   opacity: 1;
 }
 

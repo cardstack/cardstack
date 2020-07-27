@@ -1,20 +1,29 @@
+.wave-player-template {
+  margin: 2em;
+  max-width: 450px;
+}
+
 .wave-player {
-  background-color: white;
-  border-radius: 5px;
-  border: 1px solid #ccc;
   display: inline-flex;
   align-items: center;
-  margin: 2em;
+  padding-top: 15px;
+}
+
+.wave-player > canvas {
+  max-width: calc(100% - 120px);
 }
 
 .wave-player__play {
-  border: 0;
-  background: transparent;
-  padding: 1em;
-  outline: none;
+  padding-right: 10px;
+}
+
+.wave-player__play.is-playing,
+.play-button.is-playing {
+  --icon-color: var(--boxel-highlight);
 }
 
 .wave-player__times {
-  padding: 1em;
-  color: #666;
+  color: #6B6A80;
+  font: var(--boxel-font-sm);
+  white-space: nowrap;
 }

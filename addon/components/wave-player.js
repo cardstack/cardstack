@@ -9,16 +9,16 @@ export default class WavePlayerComponent extends Component {
 
   url = '/assets/demo_flac.flac';
 
-  width = 1024;
-  height = 240;
-  barWidth = 6;
-  barPadding = 3;
+  width = 600;
+  height = 152;
+  barWidth = 5;
+  barPadding = 2;
 
   // how many samples to take per bar drawn as a ratio from 0 to 1. More samples is more accurate but much slower
   sampleRatio = 0.1;
 
   unplayedColor = "#D8D8D8";
-  playedColor = "#00EFE9";
+  playedColor = "#00EBE5";
 
 
   @tracked currentTime = 0;
@@ -30,6 +30,13 @@ export default class WavePlayerComponent extends Component {
     width: ${this.width / 2}px;
     height: ${this.height / 2}px;
     `
+  }
+
+  willDestroy() {
+    if (this.isPlaying) {
+      this.audio.pause();
+      this.isPlaying = false;
+    }
   }
 
   @action

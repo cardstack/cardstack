@@ -15,7 +15,11 @@
     <div class="collection collection--{{@format}} {{if (eq @mode "edit") "collection--edit"}}">
       <div class="collection__main">
         <div class="collection__img" style={{css-url "background-image" item.cover_art_medium}}>
-          <button class="collection__play-btn">{{svg-jar "play-btn" width="60px" height="60px"}}</button>
+          {{#if (eq @format "list")}}
+            <PlayButton @class="collection__play-btn" @width="30px" @height="30px" />
+          {{else}}
+            <PlayButton @class="collection__play-btn" @width="60px" @height="60px" />
+          {{/if}}
         </div>
         <div class="collection__title-desc">
           <h3 class="collection__title">{{titleize item.song_title}}</h3>

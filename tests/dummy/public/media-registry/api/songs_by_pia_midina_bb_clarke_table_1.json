@@ -39,22 +39,6 @@
     "congress_id": "SR0000320217",
     "recording_date": "2019-01-10",
     "original_release_date": "2019-04-03",
-    "audio_files" : [
-      {
-        "title": "a-day-to-sing.aiff",
-        "date": "2019-04-23",
-        "bitrate": "24-bit / 96 kHz",
-        "duration": "3:11",
-        "img": "media-registry/waveforms/a-day-to-sing-waveform.png"
-      },
-      {
-        "title": "a-day-to-sing-watermarked.aiff",
-        "date": "2019-04-23",
-        "bitrate": "24-bit / 96 kHz",
-        "duration": "3:11",
-        "img": "media-registry/waveforms/a-day-to-sing-waveform.png"
-      }
-    ],
     "mastering_engineer": "Joel Kaplan",
     "mixing_engineer": "Mariah Solis",
     "recording_engineer": "Ian Adams",

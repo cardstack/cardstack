@@ -1,12 +1,10 @@
 <div class="wave-player">
-  <button onclick={{perform this.playPause}} class="wave-player__play">
-    {{svg-jar "play-btn-black" width="50px" height="50px"}}
-  </button>
+  <IconButton onclick={{perform this.playPause}} @class="wave-player__play {{if this.isPlaying "is-playing"}}" @icon={{if this.isPlaying "pause-btn" "play-btn"}} @width="30px" @height="30px" />
   <canvas {{did-insert this.setupPlayer}}
     role="button"
     width={{this.width}} height={{this.height}} style={{this.style}}
     onclick={{this.canvasClick}}
-    >
+  >
   </canvas>
 
   <div class="wave-player__times">

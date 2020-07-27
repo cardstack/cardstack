@@ -47,9 +47,7 @@
                 @class="media-collection-table__select-btn media-collection-table__select-btn--{{@mode}} {{if row.selected "media-collection-table__select-btn--selected"}}"
               />
               {{#if (not-eq @type "master-collection")}}
-                <button class="media-collection-table__play-btn">
-                  {{svg-jar "play-btn-black" width="30px" height="30px"}}
-                </button>
+                <PlayButton @class="media-collection-table__play-btn" @width="30px" @height="30px" />
               {{/if}}
             {{/if}}
             <div class="media-collection-table__cell-value {{if (eq columnMeta.index 0) "media-collection-table__cell-value--first-col"}} {{if (eq column.valuePath "cover_art") "media-collection-table__cell-value--img"}}">

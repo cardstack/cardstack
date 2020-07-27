@@ -232,21 +232,17 @@ export default class MusicDetailCardComponent extends Component {
       {
         title: 'audio',
         type: 'collection', // field type
-        component: 'cards/file',
+        component: 'cards/audio',
         value: [
           {
-            id: `${this.itemId}.aiff`,
+            id: `${this.itemId}.flac`,
             type: 'audio', // card type
-            imgURL: '/media-registry/file.svg',
-            title: this.model?.details?.audio_files ? this.model?.details?.audio_files[0].title : `${this.itemId}.aiff`,
-            date: this.model?.details?.audio_files ? this.model?.details?.audio_files[0]?.date : null
+            title: `${this.itemId}.flac`
           },
           {
-            id: `${this.itemId}-watermarked.aiff`,
+            id: `${this.itemId}-watermarked.flac`,
             type: 'audio',
-            imgURL: '/media-registry/file.svg',
-            title: this.model?.details?.audio_files ? this.model?.details?.audio_files[1].title : `${this.itemId}-watermarked.aiff`,
-            date: this.model?.details?.audio_files ? this.model?.details?.audio_files[1]?.date : null
+            title: `${this.itemId}-watermarked.flac`
           }
         ]
       }

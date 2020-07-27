@@ -23,6 +23,9 @@
       {{#if @model.description}}
         <p class="boxel-card__description">{{@model.description}} {{#if @model.descriptionDate}}{{moment-format @model.descriptionDate "MMM DD, YYYY" "YYYY-MM-DD"}}{{/if}}</p>
       {{/if}}
+
+      {{yield}}
+
       {{#if (and @model.fields (is-array @model.fields))}}
         <ul class="boxel-card__fields">
           {{#each @model.fields as |field|}}

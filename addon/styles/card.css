@@ -153,10 +153,8 @@
   background-image: url('/media-registry/placeholders/profile.svg');
 }
 
-.boxel-card--audio .boxel-card__bg-img {
-  height: 34px;
-  background-size: 27px 34px;
-  background-position: top center;
+.boxel-card--audio .boxel-card__inner {
+  padding-bottom: 0;
 }
 
 
