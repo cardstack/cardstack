@@ -7,6 +7,17 @@
   margin: 0 auto;
 }
 
+.field-renderer.table-field {
+  grid-template-columns: 1fr;
+  gap: 10px;
+  max-width: 845px;
+  padding: 0;
+}
+
+.field-renderer.table-field .field-renderer__title {
+  text-align: left;
+}
+
 .field-renderer__title {
   font: var(--boxel-font-sm);
   font-weight: bold;

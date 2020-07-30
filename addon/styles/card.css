@@ -6,6 +6,10 @@
   grid-column: 1 / -1;
 }
 
+.boxel-card__container--table .boxel-card__inner {
+  padding: 0;
+}
+
 .card__gradient {
   z-index: 1;
   position: absolute;

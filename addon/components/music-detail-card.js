@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { truncateVerifiId } from '@cardstack/boxel/utils/truncate-verifi-id';
+import { titleize } from '@cardstack/boxel/utils/titleize';
 import { formatId } from '@cardstack/boxel/utils/format-id';
 
 export default class MusicDetailCardComponent extends Component {
@@ -68,7 +69,7 @@ export default class MusicDetailCardComponent extends Component {
     return [
       {
         title: 'title',
-        value: this.model.song_title
+        value: titleize(this.model.song_title)
       },
       {
         title: 'main artist',
@@ -224,7 +225,7 @@ export default class MusicDetailCardComponent extends Component {
         value: {
           id: formatId(this.model.album),
           type: 'image', // card type
-          title: this.model.album,
+          title: titleize(this.model.album),
           imgURL: this.model.cover_art_thumb,
           date: this.model.cover_art_date
         }

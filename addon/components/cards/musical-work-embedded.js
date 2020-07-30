@@ -2,6 +2,7 @@ import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 import { truncateVerifiId } from '@cardstack/boxel/utils/truncate-verifi-id';
+import { titleize } from '@cardstack/boxel/utils/titleize';
 import { formatId } from '@cardstack/boxel/utils/format-id';
 
 export default class MusicalWorkEmbedded extends Component {
@@ -15,7 +16,7 @@ export default class MusicalWorkEmbedded extends Component {
       id: card?.iswc,
       type: 'musical-work',
       imgURL: '/media-registry/musical-work.svg',
-      title: card?.title,
+      title: titleize(card?.title),
       description: card.composer ? `by ${card?.artist}, ${card?.composer}` : `by ${card?.artist}`,
       fields: [
         {

@@ -1,14 +1,13 @@
 import Controller from '@ember/controller';
 import { action, get } from '@ember/object';
 import { compare, isBlank } from '@ember/utils';
-import { formatId } from '@cardstack/boxel/utils/format-id';
 
 export default class MediaRegistryIndexController extends Controller {
   removed = [];
 
   @action
   transitionToIsolate(item) {
-    this.transitionToRoute('media-registry.collection', formatId(item.catalog_title));
+    this.transitionToRoute('media-registry.collection', item.id);
   }
 
   @action

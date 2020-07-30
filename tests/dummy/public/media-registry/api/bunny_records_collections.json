@@ -1,5 +1,6 @@
 [
   {
+    "id": "golden-girl",
     "catalog_title": "Golden Girl",
     "catalog_description": "All recordings by GG",
     "number_of_songs": 42,
@@ -14,6 +15,7 @@
     ]
   },
   {
+    "id": "extra-long",
     "catalog_title": "Extra Long",
     "catalog_description": "Tracks over 4 min",
     "number_of_songs": 102,
@@ -28,6 +30,7 @@
     ]
   },
   {
+    "id": "film-music",
     "catalog_title": "Film Music",
     "catalog_description": "Themes & soundtracks",
     "number_of_songs": 29,
@@ -42,6 +45,7 @@
     ]
   },
   {
+    "id": "super-successful",
     "catalog_title": "Super Successful",
     "catalog_description": "Popular records across genres & artists",
     "number_of_songs": 89,
@@ -56,6 +60,7 @@
     ]
   },
   {
+    "id": "batch-a",
     "catalog_title": "Batch A ",
     "catalog_description": "Sold to Maxime Records",
     "number_of_songs": 23,
@@ -70,6 +75,7 @@
     ]
   },
   {
+    "id": "batch-b",
     "catalog_title": "Batch B ",
     "catalog_description": "Sold to Philanthropic Music Group",
     "number_of_songs": 120,
@@ -84,6 +90,7 @@
     ]
   },
   {
+    "id": "batch-c",
     "catalog_title": "Batch C",
     "catalog_description": "Prepared for transfer to Candle Light Records",
     "number_of_songs": 211,
@@ -98,6 +105,7 @@
     ]
   },
   {
+    "id": "batch-d",
     "catalog_title": "Batch D",
     "catalog_description": "In progress",
     "number_of_songs": 7,
@@ -112,6 +120,7 @@
     ]
   },
   {
+    "id": "batch-e",
     "catalog_title": "Batch E",
     "catalog_description": "In progress",
     "number_of_songs": 12,
@@ -126,6 +135,7 @@
     ]
   },
   {
+    "id": "batch-f",
     "catalog_title": "Batch F",
     "catalog_description": "Transfer to CRD Records",
     "number_of_songs": 16,
@@ -139,6 +149,7 @@
     ]
   },
   {
+    "id": "bunny-hop-1",
     "catalog_title": "Bunny Hop 1",
     "catalog_description": "—",
     "number_of_songs": 22,
@@ -153,6 +164,7 @@
     ]
   },
   {
+    "id": "bunny-hop-2",
     "catalog_title": "Bunny Hop 2",
     "catalog_description": "—",
     "number_of_songs": 22,

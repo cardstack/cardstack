@@ -76,7 +76,7 @@
   {{/if}}
 {{else}}
   {{!-- View Mode --}}
-  <Boxel @class="field-renderer {{lowercase (dasherize (trim @field.title))}}-field {{@class}}">
+  <Boxel @class="field-renderer {{format-id @field.title}}-field {{if (eq @field.format "table") "table-field"}} {{@class}}">
     {{#if (contains @field.title @addedFields)}}
       <BoxelHighlight @status="added" />
       <BoxelActions @status="added" />
@@ -106,6 +106,7 @@
         {{else if (eq @field.type "collection")}}
           <EmbeddedCollection
             @collection={{@field.value}}
+            @format={{@field.format}}
             @cardComponent={{@field.component}}
             @comparisonMode={{@comparisonMode}}
             @addedFields={{@addedFields}}
@@ -117,6 +118,7 @@
             @removedCards={{@removedCards}}
             @changedCards={{@changedCards}}
             @modifiedCard={{@modifiedCard}}
+            @expandAction={{@expandAction}}
           />
         {{else if (is-array @field.value)}}
           {{#let (filter-by "title" @field.value) as |multiTagList|}}
@@ -192,7 +194,7 @@
               {{!-- Make this more generic --}}
               <img src={{or @field.value "/media-registry/album_art.svg"}} alt="cover art" width="260" height="260" />
             {{else}}
-              {{if (eq @field.title "title") (titleize @field.value) @field.value}}
+              {{@field.value}}
             {{/if}}
           {{/if}}
         {{/if}}

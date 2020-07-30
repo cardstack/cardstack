@@ -23,17 +23,43 @@
         </Boxel>
         <aside class="cardflow__nested-sidebar cardflow__scroll-box">
           <div class="cardflow__scroll-box-platter">
-            <h3 class="cardflow__nested-sidebar-title">In these collections</h3>
-            <div class="cardflow__sidebar-cards">
-              {{#each @item.catalog as |catalog|}}
-                <SidebarRelatedCard
-                  @type="collection"
-                  @title={{catalog}}
-                  @route="media-registry.collection"
-                  @routeModel={{dasherize (trim catalog)}}
+            {{#if @item.collections.length}}
+              <h3 class="cardflow__nested-sidebar-title">In These Collections</h3>
+              <div class="cardflow__sidebar-cards">
+                {{#each @item.collections as |collection|}}
+                  <Card
+                    @mode="view"
+                    @model={{hash type="collection" id=collection.id title=collection.catalog_title}}
+                    @hasImage={{true}}
+                    @expandAction={{fn @transitionToCatalog collection.id}}
+                  >
+                    <CoverArt @class="item__sidebar-covers" @size={{50}} @covers={{collection.selected_art}} />
+                    <div class="sidebar-related-card__count">
+                      <span class="sidebar-related-card__count__number">
+                        {{collection.number_of_songs}}
+                      </span>
+                      Masters
+                    </div>
+                  </Card>
+                {{/each}}
+              </div>
+            {{/if}}
+            {{#if @album}}
+              <h3 class="cardflow__nested-sidebar-title">Related Products</h3>
+              <div class="cardflow__sidebar-cards">
+                <Card
+                  @model={{@album}}
+                  @expandAction={{@transitionToProduct}}
+                  @mode="view"
                 />
-              {{/each}}
-            </div>
+              </div>
+            {{/if}}
+            {{#if @item.musicalWork}}
+              <h3 class="cardflow__nested-sidebar-title">Related Works</h3>
+              <div class="cardflow__sidebar-cards">
+                <Cards::MusicalWorkEmbedded @model={{@item.musicalWork}} @mode="view" />
+              </div>
+            {{/if}}
           </div>
         </aside>
       </div>

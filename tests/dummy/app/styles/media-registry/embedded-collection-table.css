@@ -1,0 +1,172 @@
+.embedded-collection-table {
+  --table-border-color: #dedede;
+  --cell-height: 60px;
+}
+
+.embedded-collection-table > table {
+  width: 100%;
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+}
+
+.embedded-collection-table__header th {
+  position: relative;
+  height: 45px;
+  padding: 0;
+  background-color: white;
+  border-top: 1px solid var(--table-border-color);
+  border-bottom: 1px solid var(--table-border-color);
+  border-left: 1px solid var(--table-border-color);
+  font: var(--boxel-font-xs);
+  font-weight: 700;
+  letter-spacing: var(--boxel-lsp-xxl);
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.embedded-collection-table__header th:first-of-type {
+  border-right: 1px solid var(--table-border-color);
+  border-left: 0;
+}
+
+.embedded-collection-table__header-cell {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  padding: 15px 20px;
+  text-align: left;
+}
+
+.embedded-collection-table__body tr:hover {
+  box-shadow: var(--boxel-box-shadow);
+}
+
+.embedded-collection-table__body tr:hover .embedded-collection-table__highlight {
+  cursor: pointer;
+}
+
+.embedded-collection-table__body td {
+  position: relative;
+  padding: 0;
+}
+
+.embedded-collection-table__body td.is-first-column .et-cell-content {
+  height: calc(var(--cell-height) - 2px);
+  margin-top: 2px;  /* space for first col td box-shadow */
+  background-color: white;
+}
+
+.embedded-collection-table__cell {
+  height: var(--cell-height);
+  position: relative;
+  display: grid;
+  align-items: center;
+  border-bottom: 1px solid var(--table-border-color);
+  border-left: 1px solid var(--table-border-color);
+}
+
+.embedded-collection-table__cell--first-col {
+  height: calc(var(--cell-height) - 1px);
+  /* grid-template-columns: 50px auto; */
+  border-right: 1px solid var(--table-border-color);
+  border-left: 0;
+}
+
+.embedded-collection-table__cell-value {
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.embedded-collection-table__body td.ember-table__text-align-right .embedded-collection-table__cell-value {
+  justify-self: flex-end;
+}
+
+.embedded-collection-table__play-btn {
+  width: 30px;
+  height: 30px;
+  margin-right: 15px;
+  opacity: 0.25;
+  transition: opacity var(--boxel-transition);
+}
+
+.embedded-collection-table__play-btn.is-playing,
+.embedded-collection-table tr:hover .embedded-collection-table__play-btn {
+  --icon-border: var(--boxel-highlight);
+  opacity: 1;
+}
+
+.embedded-collection-table__img-cell {
+  width: 40px;
+  height: 40px;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+
+/* Highlighter */
+.embedded-collection-table__boxel-cell {
+  height: var(--cell-height);
+}
+
+.embedded-collection-table__highlight {
+  border-right: none;
+  border-left: none;
+  border-radius: 0;
+  outline: 0;
+}
+
+td:first-of-type .embedded-collection-table__boxel-cell {
+  top: -1px;
+}
+
+td:first-of-type .embedded-collection-table__highlight {
+  border-left: 2px solid transparent;
+  top: -1px;
+}
+
+td:last-of-type .embedded-collection-table__highlight {
+  border-right: 2px solid transparent;
+}
+
+td:first-of-type  .embedded-collection-table__highlight.boxel-highlight--on,
+td:last-of-type .embedded-collection-table__highlight.boxel-highlight--on {
+  border-color: var(--boxel-highlight);
+}
+
+
+/* Footer */
+.embedded-collection-table__footer {
+  line-height: 60px;
+}
+
+.embedded-collection-table__footer td {
+  padding: 0 20px;
+}
+
+.embedded-collection-table__footer td.is-first-column {
+  background-color: white;
+  border-bottom-left-radius: 10px;
+}
+
+.embedded-collection-table__footer td.is-first-column .et-cell-content::before,
+.embedded-collection-table__footer td.ember-table__text-align-right:not(.is-first-column)::before {
+  content: 'Total';
+  display: inline-block;
+  margin-right: 10px;
+  font: var(--boxel-font-xs);
+  font-weight: 700;
+  letter-spacing: var(--boxel-lsp-xxl);
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: visible;
+}
+
+.embedded-collection-table__footer td.is-first-column .et-cell-content::before {
+  content: 'Count';
+}

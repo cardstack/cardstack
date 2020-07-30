@@ -1,6 +1,6 @@
-<div class="cover-art">
+<div class="cover-art {{@class}}">
   {{#each @covers as |art i|}}
-    {{#let (mult 80 (pow 0.8 i)) as |imgSize|}}
+    {{#let (mult (or @size 80) (pow 0.8 i)) as |imgSize|}}
       {{!-- template-lint-disable no-inline-styles --}}
       <div class="cover-art__container" style={{html-safe (concat "z-index:" (sub @covers.length i))}}>
         <img class="cover-art__cover cover-art__cover--{{i}}" src={{art}} alt="cover art" width={{imgSize}} height={{imgSize}}>

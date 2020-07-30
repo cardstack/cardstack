@@ -21,9 +21,8 @@
   border-top: 1px solid var(--table-border-color);
   border-bottom: 1px solid var(--table-border-color);
   border-left: 1px solid var(--table-border-color);
-  font-size: 11px;
-  font-weight: bold;
-  line-height: calc(15/11);
+  font: var(--boxel-font-xs);
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-align: left;
   text-transform: uppercase;

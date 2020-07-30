@@ -1,4 +1,5 @@
 import Controller from '@ember/controller';
+import { titleize } from '@cardstack/boxel/utils/titleize';
 
 export default class MediaRegistryItemMusicalWorkController extends Controller {
   get headerFields() {
@@ -16,7 +17,7 @@ export default class MediaRegistryItemMusicalWorkController extends Controller {
     return [
       {
         title: 'title',
-        value: this.model?.title
+        value: titleize(this.model?.title)
       },
       {
         title: 'writers',

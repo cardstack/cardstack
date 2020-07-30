@@ -8,6 +8,7 @@
         <FieldRenderer
           @mode={{@mode}}
           @field={{field}}
+          @expandAction={{@expandAction}}
         />
       {{/each}}
     {{else}}
@@ -25,6 +26,7 @@
           @removedCards={{@removedCards}}
           @changedCards={{@changedCards}}
           @modifiedCard={{@modifiedCard}}
+          @expandAction={{@expandAction}}
         />
       {{/each-in}}
     {{/if}}

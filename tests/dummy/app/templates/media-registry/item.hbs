@@ -43,23 +43,50 @@
           @versionHistory={{true}}
         />
       </MusicDetailCard>
+    {{/if}}
 
-      {{!-- Sidebar --}}
-      <aside class="item__sidebar">
-        <h3 class="item__sidebar-title">In these collections</h3>
+    {{!-- Sidebar --}}
+    <aside class="item__sidebar">
+      {{#if @model.collections.length}}
+        <h3 class="item__sidebar-title">In These Collections</h3>
         <div class="item__sidebar-cards">
-          {{#each @model.catalog as |catalog i|}}
-            <SidebarRelatedCard
-              @type="collection"
-              @title={{catalog}}
-              @route="media-registry.collection"
-              @routeModel={{dasherize (trim catalog)}}
-              @subtitle={{get @model.catalogSubtitles i}}
-              @count={{get @model.catalogCounts i}} />
+          {{#each @model.collections as |collection|}}
+            <Card
+              @mode="view"
+              @model={{hash type="collection" id=collection.id title=collection.catalog_title}}
+              @hasImage={{true}}
+              @expandAction={{fn this.transitionToCatalog collection.id}}
+            >
+              <CoverArt @class="item__sidebar-covers" @size={{50}} @covers={{collection.selected_art}} />
+              <div class="sidebar-related-card__count">
+                <span class="sidebar-related-card__count__number">
+                  {{collection.number_of_songs}}
+                </span>
+                Masters
+              </div>
+            </Card>
           {{/each}}
         </div>
-      </aside>
+      {{/if}}
+      {{#if @model.album}}
+        <h3 class="item__sidebar-title">Related Products</h3>
+        <div class="item__sidebar-cards">
+          <Card
+            @model={{this.album}}
+            @expandAction={{this.transitionToProduct}}
+            @mode="view"
+          />
+        </div>
+      {{/if}}
+      {{#if (and @model.musicalWork (not-eq this.target.currentRouteName "media-registry.item.musical-work"))}}
+        <h3 class="item__sidebar-title">Related Works</h3>
+        <div class="item__sidebar-cards">
+          <Cards::MusicalWorkEmbedded @model={{@model.musicalWork}} @mode="view" />
+        </div>
+      {{/if}}
+    </aside>
 
+    {{#if (not-eq this.target.currentRouteName "media-registry.item.musical-work")}}
       {{!-- Edit modal --}}
       {{outlet}}
     {{/if}}

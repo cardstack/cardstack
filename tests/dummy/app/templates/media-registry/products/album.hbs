@@ -1,0 +1,79 @@
+<DetailTemplate>
+  <Breadcrumbs>
+    <LinkTo @route="media-registry" @class="breadcrumbs__item">
+      <div class="breadcrumbs__item-label">Collection</div>
+      <div class="breadcrumbs__item-title">Master Recordings</div>
+    </LinkTo>
+  </Breadcrumbs>
+
+  <DetailCard
+    @mode="view"
+    @title="Track Listing"
+    @fields={{this.fields}}
+    @expandAction={{this.transitionToItem}}
+  >
+    <BoxelActions
+      @class="media-collection__btn-overlay"
+      @displayHighlightActions={{true}}
+      @btnLeft="mode-btn"
+      @btnLeftContent="Edit"
+      @btnRight="settings"
+    />
+    <header class="item__header" style={{css-url "background-image" @model.cover_art_large}}>
+      <div class="item__label">{{@model.type_of_album}} Detail</div>
+      <div class="item__header-content">
+        <div class="item__img" style={{css-url "background-image" @model.cover_art_medium}}>
+          <PlayButton @class="item__play-btn" @width="60px" @height="60px" />
+        </div>
+        <h1 class="item__title">{{titleize @model.album}}</h1>
+        <h2 class="item__artist">by {{@model.artist}}</h2>
+        <ul class="item__header-details">
+          {{#each this.headerDetailFields as |field|}}
+            <li>
+              <FieldRenderer
+                @class="item-header-field"
+                @mode={{@mode}}
+                @field={{field}}
+              />
+            </li>
+          {{/each}}
+        </ul>
+      </div>
+    </header>
+  </DetailCard>
+
+  {{!-- Sidebar --}}
+  <aside class="item__sidebar">
+    {{#if @model.collections.length}}
+      <h3 class="item__sidebar-title">In These Collections</h3>
+      <div class="item__sidebar-cards">
+        {{#each @model.collections as |collection|}}
+          <Card
+            @mode="view"
+            @model={{hash type="collection" id=collection.id title=collection.catalog_title}}
+            @hasImage={{true}}
+            @expandAction={{fn this.transitionToCatalog collection.id}}
+          >
+            <CoverArt @class="item__sidebar-covers" @size={{50}} @covers={{collection.selected_art}} />
+            <div class="sidebar-related-card__count">
+              <span class="sidebar-related-card__count__number">
+                {{collection.number_of_songs}}
+              </span>
+              Masters
+            </div>
+          </Card>
+        {{/each}}
+      </div>
+    {{/if}}
+    {{#if @model.tracks.0.musicalWork}}
+      <h3 class="item__sidebar-title">Related Works</h3>
+      <div class="item__sidebar-cards">
+        {{#each @model.tracks as |track i|}}
+          {{#if (and track.musicalWork (lt i 3))}}
+            <Cards::MusicalWorkEmbedded @model={{track.musicalWork}} @mode="view" />
+          {{/if}}
+        {{/each}}
+      </div>
+    {{/if}}
+  </aside>
+</DetailTemplate>
