@@ -1,0 +1,101 @@
+<section class="discrepancy" {{did-insert this.adjustCount}}>
+  <div class="discrepancy__container">
+    <header class="discrepancy__header">
+      <h1 class="discrepancy__title">Discrepancy Card: Additional Data</h1>
+      <div class="discrepancy__mode-btn">
+        <LinkTo @route="media-registry.item.musical-work" @model={{@model.baseCard}} @class="mode-indicator mode-indicator--revision">
+          Comparison Mode
+        </LinkTo>
+      </div>
+    </header>
+
+    <Breadcrumbs>
+      <LinkTo @route="media-registry" @class="breadcrumbs__item breadcrumbs__item--inverse">
+        <div class="breadcrumbs__item-label">Collection</div>
+        <div class="breadcrumbs__item-title">Master Recordings</div>
+      </LinkTo>
+      <span class="breadcrumbs__carot" />
+      <LinkTo @route="media-registry.item" @model={{@model.baseCard.itemId}} @class="breadcrumbs__item breadcrumbs__item--inverse">
+        <div class="breadcrumbs__item-label">Master Detail</div>
+        <div class="breadcrumbs__item-title">{{@model.baseCard.title}}</div>
+      </LinkTo>
+      <span class="breadcrumbs__carot" />
+      <LinkTo @route="media-registry.item.musical-work" @model={{@model.baseCard.itemId}} @class="breadcrumbs__item breadcrumbs__item--inverse">
+        <div class="breadcrumbs__item-label">Musical Work</div>
+        <div class="breadcrumbs__item-title">{{@model.baseCard.title}}</div>
+      </LinkTo>
+    </Breadcrumbs>
+
+    <div class="discrepancy__main">
+      <div class="discrepancy__reconcile-button">
+        Reconcile between these 2 versions
+      </div>
+      <div class="discrepancy__cards">
+        <div class="discrepancy-card__header">
+          <div class="discrepancy-card__title">{{@model.baseCard.owner}}</div>
+          <datetime>{{moment-format @model.baseCard.datetime "MMM D YYYY, h:mm A"}}</datetime>
+        </div>
+        <div class="discrepancy-card__header">
+          <div class="discrepancy-card__title">{{@model.compCard.owner}}</div>
+          <datetime>{{moment-format @model.compCard.datetime "MMM D YYYY, h:mm A"}}</datetime>
+        </div>
+        {{#each @model.baseCard.isolatedFields as |field|}}
+          <div class="discrepancy-field {{format-id field.title}}">
+            <FieldRenderer
+              @mode="view"
+              @class="base-card"
+              @field={{or field.new field}}
+              @comparisonMode={{field.new}}
+              @discrepancyView={{field.new}}
+              @selectChange={{this.selectChange}}
+            />
+            {{#if field.new}}
+              <IconButton @class="discrepancy-field__btn discrepancy-field__btn--noop" @icon="carot" />
+              <PillButton @class="discrepancy-field__btn--reset-btn" {{on "click" (fn this.revertField field)}}>Reset</PillButton>
+            {{/if}}
+          </div>
+          <div class="discrepancy-field">
+            {{#each @model.compCard.isolatedFields as |compField|}}
+              {{#if (eq compField.title field.title)}}
+                {{compute (fn this.compareFields field compField)}}
+                {{#if (and (not field.new) compField.status (not-eq field.title "verifi_id"))}}
+                  <IconButton @class="discrepancy-field__btn" @icon="carot" {{on "click" (fn this.reconciliateField field compField)}} />
+                {{/if}}
+                <Boxel>
+                  <BoxelHighlight @status={{if field.new '' compField.status}} />
+                  <BoxelActions @status={{if field.new '' compField.status}} />
+                  <FieldRenderer
+                    @mode="view"
+                    @class="comp-card"
+                    @field={{compField}}
+                    @comparisonMode={{not field.new}}
+                    @discrepancyView={{not field.new}}
+                    @displayId={{this.model.displayId}}
+                    @selectChange={{this.selectChange}}
+                    @revertChange={{this.revertChange}}
+                  />
+                </Boxel>
+              {{/if}}
+            {{/each}}
+          </div>
+        {{/each}}
+
+        <div class="discrepancy-card__footer">
+          <div class="discrepancy__count-btn-container {{if this.model.count "visible"}}">
+            {{#if this.model.count}}
+              <PillButton @class="discrepancy__count-btn" @variant="primary">
+                {{#if (eq this.model.count 1)}}
+                  Make 1 change to your version
+                {{else}}
+                  Make {{this.model.count}} changes to your version
+                {{/if}}
+              </PillButton>
+            {{/if}}
+          </div>
+        </div>
+
+        <div class="discrepancy-card__footer"></div>
+      </div>
+    </div>
+  </div>
+</section>

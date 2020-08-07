@@ -1,4 +1,4 @@
-{{#if (eq this.target.currentRouteName "media-registry.versions")}}
+{{#if (or (eq this.target.currentRouteName "media-registry.versions") (eq this.target.currentRouteName "media-registry.discrepancies.discrepancy"))}}
   {{outlet}}
 {{else}}
   <section class="media-registry media-registry--{{@model.id}}">

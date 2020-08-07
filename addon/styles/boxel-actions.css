@@ -104,6 +104,7 @@
   background-image: url('/assets/images/icons/triangle.svg');
   background-position: center right 9px;
   width: auto;
+  min-width: 30px;
 }
 
 

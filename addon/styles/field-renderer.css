@@ -18,6 +18,20 @@
   text-align: left;
 }
 
+.field-renderer--collection,
+.field-renderer--card {
+  padding: 0;
+}
+
+.field-renderer__meta-field {
+  width: 100%;
+  max-width: 450px;
+  grid-template-columns: 1fr;
+  justify-items: start;
+  gap: 10px;
+  padding: 10px 0;
+}
+
 .field-renderer__title {
   font: var(--boxel-font-sm);
   font-weight: bold;

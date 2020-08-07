@@ -10,7 +10,7 @@
   {{#if @expandAction}}
     <BoxelHighlight {{on "click" @expandAction}} @class="boxel-card__expand-overlay" />
   {{/if}}
-  <div class="boxel-card boxel-card--default boxel-card--{{if @model @model.type "blank-card"}}">
+  <div class="boxel-card boxel-card--default boxel-card--{{if @model @model.type "blank-card"}} {{@class}}">
     {{#if @model.type}}
       <header class="boxel-card__header">
         {{humanize @model.type}}
@@ -24,7 +24,13 @@
         <h3 class="boxel-card__title">{{@model.title}}</h3>
       {{/if}}
       {{#if @model.description}}
-        <p class="boxel-card__description">{{@model.description}} {{#if @model.descriptionDate}}{{moment-format @model.descriptionDate "MMM DD, YYYY" "YYYY-MM-DD"}}{{/if}}</p>
+        <p class="boxel-card__description">
+          {{#if @model.createdDate}}
+            Created {{moment-format @model.createdDate "MMM DD, YYYY" "YYYY-MM-DD"}}<br><br>
+          {{/if}}
+
+          {{@model.description}}
+        </p>
       {{/if}}
 
       {{yield}}

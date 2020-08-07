@@ -227,7 +227,7 @@ export default class MusicDetailCardComponent extends Component {
           type: 'image', // card type
           title: titleize(this.model.album),
           imgURL: this.model.cover_art_thumb,
-          date: this.model.cover_art_date
+          createdDate: this.model.cover_art_date
         }
       },
       {

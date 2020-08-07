@@ -38,3 +38,22 @@
   height: 50px;
   background: url(/assets/images/icons/carot-thin-right.svg) center/7px no-repeat;
 }
+
+
+/* Inverse-mode color scheme */
+.breadcrumbs__item--inverse {
+  background-color: #7C7B91;
+  border-color: transparent;
+}
+
+.breadcrumbs__item--inverse .breadcrumbs__item-label {
+  color: var(--boxel-border-color);
+}
+
+.breadcrumbs__item--inverse .breadcrumbs__item-title {
+  color: white;
+}
+
+.breadcrumbs__item--inverse + .breadcrumbs__carot {
+  filter: invert(1);
+}

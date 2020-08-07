@@ -1,0 +1,9 @@
+<ul>
+  {{#each this.model as |item|}}
+    <li>
+      <LinkTo @route="media-registry.discrepancies.discrepancy" @model={{item.id}}>
+        {{item.baseCard.owner}} - {{item.compCard.owner}}
+      </LinkTo>
+    </li>
+  {{/each}}
+</ul>

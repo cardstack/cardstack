@@ -21,6 +21,9 @@ Router.map(function() {
       this.route('album', { path: '/:albumId' });
     });
     this.route('versions', { path: '/:itemId/versions' });
+    this.route('discrepancies', function() {
+      this.route('discrepancy', { path: '/:compId' });
+    });
     this.route('agreements');
     this.route('cardflow');
   });

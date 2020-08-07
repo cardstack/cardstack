@@ -161,6 +161,14 @@
   padding-bottom: 0;
 }
 
+.file-card__icon .boxel-card__inner {
+  background-image: url('/media-registry/file.svg');
+  background-position: center left 15px;
+  background-repeat: no-repeat;
+  background-size: 40px 40px;
+  padding-left: 55px;
+}
+
 
 /* Grid format */
 .boxel-card__inner--grid.boxel-card__inner--with-img {
