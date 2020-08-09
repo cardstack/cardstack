@@ -2,7 +2,9 @@
   <Card
     @mode="view"
     @model={{this.registrationEmbedded}}
-    @status={{@status}}
+    @status={{if @status "no-change"}}
+    @statusText={{if @status "Specific to this version"}}
+    @comparisonType={{@comparisonType}}
   />
 {{else}}
   N/A

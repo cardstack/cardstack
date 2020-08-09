@@ -5,7 +5,7 @@ const VALENTINO_SOLANO_WRONG = {
   "type": "participant",
   "title": "Valentino Solano",
   "description": "Lyricist",
-  "imgURL": "",
+  "imgURL": "/media-registry/profiles/thumb/Valentino-Solano.jpg",
   "ipi": "00914256714",
   "pro": "Global Music Rights",
   "email": "valentino@valsolanomusic.com",
@@ -17,7 +17,9 @@ export default {
   baseCard: {
     type: 'musical-work',
     owner: 'Warner Chappell Music',
-    datetime: '2019-11-11T13:54',
+    ownerId: 'wcm',
+    iconURL: '/media-registry/wcm-logo.png',
+    datetime: '2020-05-18T15:31',
     id: 'wcm-the-sun-comes-out',
     itemId: 'wcm-the-sun-comes-out',
     title: 'The Sun Comes Out',
@@ -62,6 +64,7 @@ export default {
       },
       {
         title: 'ownership_splits',
+        type: 'manuscript-share',
         value: [
           {
             title: 'Valentino Solano (Lyricist)',
@@ -79,6 +82,7 @@ export default {
       },
       {
         title: 'publisher',
+        type: 'territory',
         value: [
           {
             title: 'Worldwide',
@@ -99,6 +103,8 @@ export default {
   compCard: {
     type: 'musical-work',
     owner: 'Global Music Rights',
+    ownerId: 'gmr',
+    iconURL: '/media-registry/gmr-logo.svg',
     datetime: '2020-06-09T16:18',
     id: 'gmr-the-sun-comes-out',
     itemId: 'gmr-the-sun-comes-out',
@@ -159,6 +165,7 @@ export default {
       },
       {
         title: 'ownership_splits',
+        type: 'manuscript-share',
         value: [
           {
             title: 'Valentino Solano (Lyricist)',
@@ -176,6 +183,7 @@ export default {
       },
       {
         title: 'publisher',
+        type: 'territory',
         value: [
           {
             title: 'Worldwide',

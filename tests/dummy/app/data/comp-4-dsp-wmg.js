@@ -5,17 +5,20 @@ export default {
   baseCard: {
     type: 'musical-work',
     owner: 'Deezer',
+    ownerId: 'dsp',
+    iconURL: '/media-registry/deezer-logo.png',
     datetime: '2020-07-10T14:24',
     id: 'dsp-the-sun-comes-out',
     itemId: 'dsp-the-sun-comes-out',
     title: 'The Sun Comes Out',
     isolatedFields: [
       {
-        title: "title",
+        title: 'title',
         value: null
       },
       {
-        title: "writers",
+        title: 'writers',
+        type: 'collection',
         value: null
       },
       {
@@ -47,6 +50,8 @@ export default {
   compCard: {
     type: 'musical-work',
     owner: 'Warner Music Group',
+    ownerId: 'wmg',
+    iconURL: '/media-registry/wmg-logo.svg',
     datetime: '2020-06-09T18:10',
     id: 'wmg-the-sun-comes-out',
     itemId: 'wmg-the-sun-comes-out',
@@ -92,6 +97,7 @@ export default {
       },
       {
         title: 'ownership_splits',
+        type: 'manuscript-share',
         value: [
           {
             title: 'Valentino Solano (Lyricist)',
@@ -109,6 +115,7 @@ export default {
       },
       {
         title: 'publisher',
+        type: 'territory',
         value: [
           {
             title: 'Worldwide',

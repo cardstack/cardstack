@@ -6,7 +6,7 @@
   grid-auto-flow: column;
   background-color: var(--boxel-highlight);
   border-top-right-radius: var(--boxel-border-radius);
-  border-bottom-left-radius: 5px;
+  border-bottom-left-radius: var(--boxel-border-radius);
   border: none;
   font: var(--boxel-font-sm);
   font-weight: 600;
@@ -71,7 +71,7 @@
 
 .boxel-actions__label {
   border-top-right-radius: var(--boxel-border-radius);
-  border-bottom-left-radius: 5px;
+  border-bottom-left-radius: var(--boxel-border-radius);
   width: 30px;
   height: 30px;
   padding: 0;
@@ -102,9 +102,21 @@
 .boxel-actions__label--modified {
   background-color: #FFD800;
   background-image: url('/assets/images/icons/triangle.svg');
-  background-position: center right 9px;
+  background-position: center right 10px;
   width: auto;
   min-width: 30px;
+}
+
+.boxel-actions--comparison-mode > .boxel-actions__label {
+  background-position: center right 10px;
+  font-weight: 400;
+  width: auto;
+  padding: 6px 30px 6px 15px;
+}
+
+.boxel-actions--comparison-mode > .boxel-actions__label--no-change {
+  background-color: #DBDBDB;
+  background-image: url('/assets/images/icons/check-mark.svg');
 }
 
 

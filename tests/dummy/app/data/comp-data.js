@@ -2,9 +2,13 @@
 export const AMP = {
   type: 'publisher',
   territory: 'worldwide',
-  id: 'allegro-music-publishing',
+  id: 'amp',
   title: 'Allegro Music Publishing',
   fields: [
+    {
+      title: 'IPI',
+      value: '00170191322'
+    },
     {
       title: 'website',
       value: 'www.allegromusic.com'
@@ -19,9 +23,14 @@ export const AMP = {
 export const WCM = {
   type: 'publisher',
   territory: 'worldwide',
-  id: 'warner-chappel-music',
-  title: 'Warner Chappel Music',
+  id: 'wcm',
+  imgURL: '/media-registry/wcm-logo.png',
+  title: 'Warner Chappell Music',
   fields: [
+    {
+      title: 'IPI',
+      value: '00160187388'
+    },
     {
       title: 'website',
       value: 'www.warnerchappell.com'
@@ -39,7 +48,7 @@ const VALENTINO_SOLANO = {
   "type": "participant",
   "title": "Valentino Solano",
   "description": "Lyricist",
-  "imgURL": "",
+  "imgURL": "/media-registry/profiles/thumb/Valentino-Solano.jpg",
   "ipi": "00815723492",
   "pro": "Global Music Rights",
   "email": "valentino@valsolanomusic.com",
@@ -51,7 +60,7 @@ const EMILIO_ROSSO = {
   "type": "participant",
   "title": "Emilio Rosso",
   "description": "Composer",
-  "imgURL": null,
+  "imgURL": "/media-registry/profiles/thumb/Emilio-Rosso.jpg",
   "ipi": "00231925374",
   "pro": "Global Music Rights",
   "email": "emilio@rosso.com",
@@ -63,7 +72,7 @@ const MARIA_BIANCHI = {
   "type": "participant",
   "title": "Maria Bianchi",
   "description": "Composer",
-  "imgURL": null,
+  "imgURL": "/media-registry/profiles/thumb/Maria-Bianchi.jpg",
   "ipi": "00181928972",
   "pro": "Global Music Rights",
   "email": "m.bianchi@gmail.com",

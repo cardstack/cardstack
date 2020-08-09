@@ -5,6 +5,8 @@ export default {
   baseCard: {
     type: 'musical-work',
     owner: 'Warner Chappell Music',
+    ownerId: 'wcm',
+    iconURL: '/media-registry/wcm-logo.png',
     datetime: '2019-11-11T13:54',
     id: 'wcm-the-sun-comes-out',
     itemId: 'wcm-the-sun-comes-out',
@@ -49,6 +51,7 @@ export default {
       },
       {
         title: 'ownership_splits',
+        type: 'manuscript-share',
         value: [
           {
             title: 'Valentino Solano (Lyricist)',
@@ -62,6 +65,7 @@ export default {
       },
       {
         title: 'publisher',
+        type: 'territory',
         value: [
           {
             title: 'Worldwide',
@@ -79,6 +83,7 @@ export default {
   compCard: {
     type: 'musical-work',
     owner: 'Allegro Music Publishing',
+    ownerId: 'amp',
     datetime: '2020-05-18T11:36',
     id: 'amp-the-sun-comes-out',
     itemId: 'amp-the-sun-comes-out',
@@ -124,6 +129,7 @@ export default {
       },
       {
         title: 'ownership_splits',
+        type: 'manuscript-share',
         value: [
           {
             title: 'Valentino Solano (Lyricist)',
@@ -141,6 +147,7 @@ export default {
       },
       {
         title: 'publisher',
+        type: 'territory',
         value: [
           {
             title: 'Worldwide',

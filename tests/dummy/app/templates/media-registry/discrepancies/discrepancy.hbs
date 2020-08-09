@@ -3,13 +3,13 @@
     <header class="discrepancy__header">
       <h1 class="discrepancy__title">Discrepancy Card: Additional Data</h1>
       <div class="discrepancy__mode-btn">
-        <LinkTo @route="media-registry.item.musical-work" @model={{@model.baseCard}} @class="mode-indicator mode-indicator--revision">
+        <LinkTo @route="media-registry.discrepancies" @model={{@model.baseCard}} @class="mode-indicator mode-indicator--revision">
           Comparison Mode
         </LinkTo>
       </div>
     </header>
 
-    <Breadcrumbs>
+    <Breadcrumbs @class="discrepancy__breadcrumbs">
       <LinkTo @route="media-registry" @class="breadcrumbs__item breadcrumbs__item--inverse">
         <div class="breadcrumbs__item-label">Collection</div>
         <div class="breadcrumbs__item-title">Master Recordings</div>
@@ -26,63 +26,120 @@
       </LinkTo>
     </Breadcrumbs>
 
-    <div class="discrepancy__main">
-      <div class="discrepancy__reconcile-button">
-        Reconcile between these 2 versions
-      </div>
-      <div class="discrepancy__cards">
-        <div class="discrepancy-card__header">
-          <div class="discrepancy-card__title">{{@model.baseCard.owner}}</div>
-          <datetime>{{moment-format @model.baseCard.datetime "MMM D YYYY, h:mm A"}}</datetime>
+    <div class="discrepancy__main {{if (eq this.mode "comparison") "discrepancy__main--comp-view"}}">
+      <div class="discrepancy__comparison-header {{if (eq this.mode "comparison") "discrepancy__comparison-header--comp-mode"}}">
+        <div class="discrepancy__comparison-header-title-group">
+          <div class="discrepancy__comparison-header-icons">
+            <div class="discrepancy__profile-icon discrepancy__profile-icon--{{@model.baseCard.ownerId}}" style={{css-url "background-image" @model.baseCard.iconURL}}>
+              {{#unless @model.baseCard.iconURL}}
+                {{truncate @model.baseCard.owner 1 false}}
+              {{/unless}}
+            </div>
+            <div class="discrepancy__comparison-header-icons-carot">
+              {{svg-jar "carot-left"}}
+            </div>
+            <div class="discrepancy__profile-icon discrepancy__profile-icon--{{@model.compCard.ownerId}}" style={{css-url "background-image" @model.compCard.iconURL}}>
+              {{#unless @model.compCard.iconURL}}
+                {{truncate @model.compCard.owner 1 false}}
+              {{/unless}}
+            </div>
+          </div>
+          <div>Comparison between these 2 versions</div>
         </div>
-        <div class="discrepancy-card__header">
-          <div class="discrepancy-card__title">{{@model.compCard.owner}}</div>
-          <datetime>{{moment-format @model.compCard.datetime "MMM D YYYY, h:mm A"}}</datetime>
+        <PillButton
+          {{on "click" this.toggleView}}
+          @class="discrepancy-card__header-btn {{if (eq this.mode "comparison") "checked"}}"
+        >
+          Resolve discrepancies
+        </PillButton>
+      </div>
+      <div class="discrepancy__cards {{if (eq this.mode "comparison") "discrepancy__cards--comp-view"}}">
+        <div class="discrepancy-card__header your-version {{if (eq this.mode "keep-current") "selected-version"}}">
+          <div class="discrepancy-card__header-label">Your version</div>
+          <div class="discrepancy-card__header-title-group">
+            <div class="discrepancy-card__header-icons">
+              <div class="discrepancy__profile-icon discrepancy__profile-icon--{{@model.baseCard.ownerId}}" style={{css-url "background-image" @model.baseCard.iconURL}}>
+                {{#unless @model.baseCard.iconURL}}
+                  {{truncate @model.baseCard.owner 1 false}}
+                {{/unless}}
+              </div>
+            </div>
+            <div>
+              <div class="discrepancy-card__title">{{@model.baseCard.owner}}</div>
+              <div class="discrepancy-card__datetime">{{moment-format @model.baseCard.datetime "MMM D, YYYY h:mm A"}}</div>
+            </div>
+          </div>
+          <PillButton
+            {{on "click" (fn this.selectView "keep-current")}}
+            @class="discrepancy-card__header-btn {{if (eq this.mode "keep-current") "checked"}}"
+          >
+            Keep current version
+            </PillButton>
+        </div>
+        <div class="discrepancy-card__header other-version {{if (eq this.mode "linked") "selected-version"}}">
+          <div class="discrepancy-card__header-label">Other version</div>
+          <div class="discrepancy-card__header-title-group">
+            <div class="discrepancy-card__header-icons">
+              <div class="discrepancy__profile-icon discrepancy__profile-icon--{{@model.compCard.ownerId}}" style={{css-url "background-image" @model.compCard.iconURL}}>
+                {{#unless @model.compCard.iconURL}}
+                  {{truncate @model.compCard.owner 1 false}}
+                {{/unless}}
+              </div>
+            </div>
+            <div>
+              <div class="discrepancy-card__title">{{@model.compCard.owner}}</div>
+              <div class="discrepancy-card__datetime">{{moment-format @model.compCard.datetime "MMM D, YYYY h:mm A"}}</div>
+            </div>
+          </div>
+          <PillButton
+            {{on "click" (fn this.selectView "linked")}}
+            @class="discrepancy-card__header-btn {{if (eq this.mode "linked") "checked"}}"
+          >
+            Link this version
+          </PillButton>
         </div>
         {{#each @model.baseCard.isolatedFields as |field|}}
-          <div class="discrepancy-field {{format-id field.title}}">
+          <div class="discrepancy-field discrepancy-field--base-field {{format-id field.title}} {{this.mode}}-view">
             <FieldRenderer
-              @mode="view"
-              @class="base-card"
-              @field={{or field.new field}}
-              @comparisonMode={{field.new}}
-              @discrepancyView={{field.new}}
-              @selectChange={{this.selectChange}}
+              @mode={{if (eq this.mode "comparison") "comparison" "view"}}
+              @class="discrepancy-field-renderer base-card-field {{if (eq this.mode "comparison") "comp-view"}}"
+              @field={{field}}
+              @showCompHighlights={{if field.tempField true false}}
+              @comparisonType="base"
             />
-            {{#if field.new}}
-              <IconButton @class="discrepancy-field__btn discrepancy-field__btn--noop" @icon="carot" />
-              <PillButton @class="discrepancy-field__btn--reset-btn" {{on "click" (fn this.revertField field)}}>Reset</PillButton>
-            {{/if}}
           </div>
-          <div class="discrepancy-field">
+          <div class="discrepancy-field discrepancy-field--comp-field {{this.mode}}-view">
             {{#each @model.compCard.isolatedFields as |compField|}}
               {{#if (eq compField.title field.title)}}
                 {{compute (fn this.compareFields field compField)}}
-                {{#if (and (not field.new) compField.status (not-eq field.title "verifi_id"))}}
-                  <IconButton @class="discrepancy-field__btn" @icon="carot" {{on "click" (fn this.reconciliateField field compField)}} />
+                {{#if (and compField.status (eq this.mode "comparison") (not-eq field.title "verifi_id"))}}
+                  {{#if field.tempField}}
+                    <div class="discrepancy-field__btn-container">
+                      <IconButton @class="discrepancy-field__btn discrepancy-field__toggle-btn" @icon="carot-thin-left" {{on "click" (fn this.revertField field)}} />
+                      {{!-- <PillButton @class="discrepancy-field__btn--reset-btn" {{on "click" (fn this.revertField field)}}>Reset</PillButton> --}}
+                    </div>
+                  {{else}}
+                    <IconButton @class="discrepancy-field__btn" @icon="carot-thin-left" {{on "click" (fn this.reconciliateField field compField)}} />
+                  {{/if}}
                 {{/if}}
-                <Boxel>
-                  <BoxelHighlight @status={{if field.new '' compField.status}} />
-                  <BoxelActions @status={{if field.new '' compField.status}} />
-                  <FieldRenderer
-                    @mode="view"
-                    @class="comp-card"
-                    @field={{compField}}
-                    @comparisonMode={{not field.new}}
-                    @discrepancyView={{not field.new}}
-                    @displayId={{this.model.displayId}}
-                    @selectChange={{this.selectChange}}
-                    @revertChange={{this.revertChange}}
-                  />
-                </Boxel>
+                <FieldRenderer
+                  @mode={{if (eq this.mode "linked") "view" "comparison"}}
+                  @class="discrepancy-field-renderer comp-card-field {{if (eq this.mode "comparison") "comp-view"}}"
+                  @field={{compField}}
+                  @showCompHighlights={{true}}
+                  @comparisonType="comp"
+                  @displayId={{this.model.displayId}}
+                  @selectChange={{if (eq this.mode "comparison") this.selectChange false}}
+                  @revertChange={{if (eq this.mode "comparison") this.revertChange false}}
+                />
               {{/if}}
             {{/each}}
           </div>
         {{/each}}
 
-        <div class="discrepancy-card__footer">
-          <div class="discrepancy__count-btn-container {{if this.model.count "visible"}}">
-            {{#if this.model.count}}
+        <div class="discrepancy-card__footer discrepancy-field--base-field {{this.mode}}-view">
+          <div class="discrepancy__count-btn-container discrepancy__count-btn-container--{{this.mode}} container-left {{if (or (and this.model.count (eq this.mode "comparison")) (eq this.mode "keep-current")) "visible"}}">
+            {{#if (and this.model.count (eq this.mode "comparison"))}}
               <PillButton @class="discrepancy__count-btn" @variant="primary">
                 {{#if (eq this.model.count 1)}}
                   Make 1 change to your version
@@ -90,11 +147,27 @@
                   Make {{this.model.count}} changes to your version
                 {{/if}}
               </PillButton>
+            {{else if (eq this.mode "keep-current")}}
+              <PillButton @class="discrepancy__count-btn" @variant="primary">
+                Keep current version
+              </PillButton>
             {{/if}}
           </div>
         </div>
 
-        <div class="discrepancy-card__footer"></div>
+        <div class="discrepancy-card__footer discrepancy-field--comp-field {{this.mode}}-view">
+          <div class="discrepancy__count-btn-container discrepancy__count-btn-container--{{this.mode}} container-right {{if (eq this.mode "linked") "visible"}}">
+            {{#if (eq this.mode "linked")}}
+              <PillButton @class="discrepancy__count-btn" @variant="primary">
+                Link this {{lowercase (humanize this.model.compCard.type)}} card
+              </PillButton>
+              <div class="discrepancy__count-btn__link-copy">
+                Your entry will always reflect the updated version of this
+                {{lowercase (humanize this.model.compCard.type)}} card.
+              </div>
+            {{/if}}
+          </div>
+        </div>
       </div>
     </div>
   </div>

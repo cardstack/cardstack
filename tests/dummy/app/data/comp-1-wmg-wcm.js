@@ -1,11 +1,36 @@
 
 import { WCM, AMP, VALENTINO_PR, EMILIO_PR } from "./comp-data";
 
+const VALENTINO_SOLANO_MISSING = {
+  "id": "valentino-solano",
+  "type": "participant",
+  "title": "Valentino Solano"
+};
+
+const VALENTINO_PR_MISSING = {
+  id: 'valentino-solano-pr',
+  type: 'publishing-representation',
+  writer: VALENTINO_SOLANO_MISSING,
+  role: 'Lyricist',
+  publisher: {
+    title: 'publisher',
+    value: [
+      {
+        title: 'Worldwide',
+        type: 'collection',
+        value: [ WCM ]
+      }
+    ]
+  }
+};
+
 export default {
   id: "mw-the-sun-comes-out-wmg-wcm",
   baseCard: {
     type: 'musical-work',
     owner: 'Warner Music Group',
+    ownerId: 'wmg',
+    iconURL: '/media-registry/wmg-logo.svg',
     datetime: '2020-04-08T10:45',
     id: 'wmg-the-sun-comes-out',
     itemId: 'wmg-the-sun-comes-out',
@@ -20,7 +45,7 @@ export default {
         type: "collection",
         component: "cards/publishing-representation",
         value: [
-          VALENTINO_PR
+          VALENTINO_PR_MISSING
         ]
       },
       {
@@ -59,6 +84,8 @@ export default {
   compCard: {
     type: 'musical-work',
     owner: 'Warner Chappell Music',
+    ownerId: 'wcm',
+    iconURL: '/media-registry/wcm-logo.png',
     datetime: '2019-11-11T13:54',
     id: 'wcm-the-sun-comes-out',
     itemId: 'wcm-the-sun-comes-out',
@@ -103,6 +130,7 @@ export default {
       },
       {
         title: 'ownership_splits',
+        type: 'manuscript-share',
         value: [
             {
               title: 'Valentino Solano (Lyricist)',
@@ -116,6 +144,7 @@ export default {
       },
       {
         title: 'publisher',
+        type: 'territory',
         value: [
           {
             title: 'Worldwide',

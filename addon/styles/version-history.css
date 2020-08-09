@@ -1,12 +1,10 @@
 .versions {
-  --boxel-revision-medium-purple: #5D5C6F;
-  --boxel-revision-dark-purple: #393642;
   --boxel-revision-light-purple: #84829B;
   --boxel-revision-lightest-purple: #AFAFB7;
   --boxel-revision-hover-purple: #4f4a5d;
 
   height: 100%;
-  background-color: var(--boxel-revision-medium-purple);
+  background-color: var(--boxel-medium-purple);
   overflow: auto;
 }
 
@@ -54,7 +52,7 @@
   grid-area: mode;
   padding: 20px;
   position: relative;
-  background-color: var(--boxel-revision-medium-purple);
+  background-color: var(--boxel-medium-purple);
   z-index: 1;
 }
 
@@ -110,10 +108,10 @@
 
 .versions-nav-item--selected:not(.versions-nav-item--comp-view) .versions-nav-item__selection-btn,
 .versions-nav-item.is-comp-card .versions-nav-item__selection-btn {
-  background-color: var(--boxel-revision-dark-purple);
+  background-color: var(--boxel-dark-purple);
   border-bottom-color: transparent;
   border-radius: 5px;
-  box-shadow: 0 -1px 0 1px var(--boxel-revision-dark-purple);
+  box-shadow: 0 -1px 0 1px var(--boxel-dark-purple);
   overflow: hidden;
 }
 
@@ -187,7 +185,7 @@
   display: grid;
   grid-template-columns: auto auto 1fr;
   align-items: center;
-  background-color: var(--boxel-revision-dark-purple);
+  background-color: var(--boxel-dark-purple);
   color: white;
   height: 50px;
   padding: 16px 20px;
@@ -434,7 +432,7 @@
 
 
 .version-card__btn-overlay {
-  background: var(--boxel-revision-medium-purple);
+  background: var(--boxel-medium-purple);
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
   border: none;
@@ -562,7 +560,7 @@
 }
 
 .versions__view-selector .versions__view-selector--mode-link.active {
-  background-color: var(--boxel-revision-dark-purple);
+  background-color: var(--boxel-dark-purple);
   color: var(--boxel-highlight);
 }
 

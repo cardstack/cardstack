@@ -5,26 +5,11 @@
 
 {{else}}
   {{#each @collection as |val i|}}
-    {{#if @discrepancyView}}
-      <Boxel>
-        {{#if (contains val.id @displayId)}}
-          {{#if @revertChange}}
-            <IconButton @class="discrepancy-field__btn embedded-collection__discrepancy-btn discrepancy-field__btn--noop" @icon="carot" disabled />
-            <PillButton @class="discrepancy-field__btn--reset-btn embedded-collection__discrepancy-btn" {{on "click" (fn @revertChange val @title)}}>Reset</PillButton>
-          {{/if}}
-          {{component (or @cardComponent "card") model=val mode="view"}}
-        {{else}}
-          {{#if (and @selectChange val.status)}}
-            <IconButton @class="discrepancy-field__btn embedded-collection__discrepancy-btn" @icon="carot" {{on "click" (fn @selectChange val @title @cardComponent)}} />
-          {{/if}}
-          {{component (or @cardComponent "card") model=val mode="view" status=val.status}}
-        {{/if}}
-      </Boxel>
-    {{else if @comparisonMode}}
+    {{#if @comparisonMode}}
       {{#let (find-by "id" val.id @addedCards) (find-by "id" val.id @changedCards) as |added changed|}}
         {{#if (lt i this.displayCount)}}
           <div>
-            {{component (or @cardComponent "card") model=val mode="view" status=(if added "added" (if changed "changed" val.status))}}
+            {{component (or @cardComponent "card") model=val mode="view" status=(if added "added" (if changed "changed"))}}
             {{#if changed}}
               <Boxel>
                 <BoxelHighlight @status="deleted" />
