@@ -109,7 +109,7 @@
 .discrepancy__profile-icon--wcm {
   background-size: auto 23px;
 }
-.discrepancy__profile-icon--dsp {
+.discrepancy__profile-icon--dzr {
   background-position: top center;
   background-size: auto 23px;
 }
@@ -328,6 +328,7 @@
   width: 100%;
   max-width: 500px;
   font-weight: 600;
+  line-height: 3;
 }
 
 .discrepancy__count-btn-container {

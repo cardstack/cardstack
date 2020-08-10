@@ -1,16 +1,18 @@
 import { WCM, AMP, VALENTINO_PR, EMILIO_PR, MARIA_PR } from "./comp-data";
 
 export default {
-  id: "the-sun-comes-out-dsp-wmg",
+  id: "the-sun-comes-out-dzr-wmg",
+  type: "Musical Work",
+  title: "The Sun Comes Out",
+  baseOwner: 'Deezer',
+  compOwner: 'Warner Music Group',
   baseCard: {
     type: 'musical-work',
     owner: 'Deezer',
-    ownerId: 'dsp',
+    ownerId: 'dzr',
     iconURL: '/media-registry/deezer-logo.png',
     datetime: '2020-07-10T14:24',
     id: 'dsp-the-sun-comes-out',
-    itemId: 'dsp-the-sun-comes-out',
-    title: 'The Sun Comes Out',
     isolatedFields: [
       {
         title: 'title',
@@ -54,8 +56,6 @@ export default {
     iconURL: '/media-registry/wmg-logo.svg',
     datetime: '2020-06-09T18:10',
     id: 'wmg-the-sun-comes-out',
-    itemId: 'wmg-the-sun-comes-out',
-    title: 'The Sun Comes Out',
     isolatedFields: [
       {
         title: "title",

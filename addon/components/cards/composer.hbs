@@ -27,20 +27,6 @@
           <FieldRenderer
             @class="boxel-card-field"
             @mode={{@mode}}
-            @field={{hash title="Email" value=@model.email}}
-          />
-        </li>
-        <li>
-          <FieldRenderer
-            @class="boxel-card-field"
-            @mode={{@mode}}
-            @field={{hash title="Website" value=@model.website}}
-          />
-        </li>
-        <li>
-          <FieldRenderer
-            @class="boxel-card-field"
-            @mode={{@mode}}
             @field={{hash title="CAE/IPI #" value=@model.ipi}}
           />
         </li>
@@ -49,6 +35,20 @@
             @class="boxel-card-field"
             @mode={{@mode}}
             @field={{hash title="PRO" value=@model.pro}}
+          />
+        </li>
+        <li>
+          <FieldRenderer
+            @class="boxel-card-field"
+            @mode={{@mode}}
+            @field={{hash title="Email" value=@model.email}}
+          />
+        </li>
+        <li>
+          <FieldRenderer
+            @class="boxel-card-field"
+            @mode={{@mode}}
+            @field={{hash title="Website" value=@model.website}}
           />
         </li>
       </ul>

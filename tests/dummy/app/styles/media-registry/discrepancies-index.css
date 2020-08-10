@@ -1,0 +1,74 @@
+.media-registry.media-registry--verifi-registry {
+  --header-background: #34019d;
+}
+
+.media-registry--verifi-registry .media-registry__title {
+  height: 50px;
+  padding-left: 20px;
+}
+
+.media-collection.discrepancies-list {
+  max-width: 1300px;
+}
+
+.isolated-collection-item {
+  --grid-item-min-height: 280px;
+  --list-row-height: 90px;
+  --list-col-width: 150px;
+
+  display: grid;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--boxel-border-radius);
+  border: 1px solid transparent;
+}
+
+.isolated-collection-item--grid {
+  grid-auto-rows: max-content;
+  min-height: var(--grid-item-min-height);
+  padding: 20px 20px 0;
+  text-align: center;
+}
+
+.isolated-collection-item--table-list {
+  height: var(--list-row-height);
+  padding: 20px;
+  border-color: var(--boxel-border-color);
+}
+
+.isolated-collection-item--table-list,
+.media-collection__grid--table-list .collection__boxel--table-list,
+.media-collection__grid--table-list .collection__highlighter {
+  border-radius: 0;
+}
+
+.media-collection__grid--table-list li:first-child,
+.media-collection__grid--table-list li:first-child .collection__boxel--table-list,
+.media-collection__grid--table-list li:first-child .collection__highlighter,
+.media-collection__grid--table-list li:first-child .isolated-collection-item--table-list {
+  border-radius: var(--boxel-border-radius) var(--boxel-border-radius) 0 0;
+}
+
+.media-collection__grid--table-list li:last-child,
+.media-collection__grid--table-list li:last-child .collection__boxel--table-list,
+.media-collection__grid--table-list li:last-child .collection__highlighter,
+.media-collection__grid--table-list li:last-child .isolated-collection-item--table-list {
+  border-radius: 0 0 var(--boxel-border-radius) var(--boxel-border-radius);
+}
+
+.isolated-collection-item__list {
+  display: grid;
+  grid-auto-columns: 1fr;
+  align-items: center;
+  gap: 0 50px;
+}
+
+.isolated-collection-item__list-field {
+  grid-row: 1;
+  font: var(--boxel-font-sm);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp);
+}
+
+
+.discrepancies-list isolated-collection-item__list-field--1 {}

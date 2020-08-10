@@ -3,14 +3,14 @@
     <header class="discrepancy__header">
       <h1 class="discrepancy__title">Discrepancy Card: Additional Data</h1>
       <div class="discrepancy__mode-btn">
-        <LinkTo @route="media-registry.discrepancies" @model={{@model.baseCard}} @class="mode-indicator mode-indicator--revision">
+        <LinkTo @route="media-registry.discrepancies.index" @model="verifi-registry" @class="mode-indicator mode-indicator--revision">
           Comparison Mode
         </LinkTo>
       </div>
     </header>
 
     <Breadcrumbs @class="discrepancy__breadcrumbs">
-      <LinkTo @route="media-registry" @class="breadcrumbs__item breadcrumbs__item--inverse">
+      {{!-- <LinkTo @route="media-registry" @class="breadcrumbs__item breadcrumbs__item--inverse">
         <div class="breadcrumbs__item-label">Collection</div>
         <div class="breadcrumbs__item-title">Master Recordings</div>
       </LinkTo>
@@ -23,7 +23,7 @@
       <LinkTo @route="media-registry.item.musical-work" @model={{@model.baseCard.itemId}} @class="breadcrumbs__item breadcrumbs__item--inverse">
         <div class="breadcrumbs__item-label">Musical Work</div>
         <div class="breadcrumbs__item-title">{{@model.baseCard.title}}</div>
-      </LinkTo>
+      </LinkTo> --}}
     </Breadcrumbs>
 
     <div class="discrepancy__main {{if (eq this.mode "comparison") "discrepancy__main--comp-view"}}">
@@ -148,7 +148,7 @@
                 {{/if}}
               </PillButton>
             {{else if (eq this.mode "keep-current")}}
-              <PillButton @class="discrepancy__count-btn" @variant="primary">
+              <PillButton @class="discrepancy__count-btn" @variant="primary" @isLink={{true}} @route="media-registry.discrepancies.index" @routeModel="verifi-registry">
                 Keep current version
               </PillButton>
             {{/if}}

@@ -3,7 +3,7 @@
     <div class="media-collection__title-row media-collection__title-row--{{@mode}}">
       <h2 class="media-collection__title">{{humanize @model.title}}</h2>
       <div class="media-collection__count">
-        <span>{{this.collection.length}}</span> {{capitalize @model.itemType "items"}}
+        <span>{{this.collection.length}}</span> {{capitalize (if @model.itemType @model.itemType "items")}}
       </div>
       {{#if (eq @mode "edit")}}
         <button {{on "click" @transitionToView}} class="mode-indicator mode-indicator--edit">{{@mode}} mode</button>
@@ -58,11 +58,13 @@
             </MediaCollection::Button>
           {{/if}}
         </div>
-        <div class="media-collection__btn-trio media-collection__view-selectors">
-          <button {{on "click" (fn this.changeFormat "list")}} class="media-collection__btn list {{if (eq this.format "list") "selected"}}" aria-label="view as list"></button>
-          <button {{on "click" (fn this.changeFormat "grid")}} class="media-collection__btn grid {{if (eq this.format "grid") "selected"}}" aria-label="view as grid"></button>
-          <button {{on "click" (fn this.changeFormat "table")}} class="media-collection__btn table {{if (eq this.format "table") "selected"}}" aria-label="view as table"></button>
-        </div>
+        {{#if (not-eq this.format "table-list")}}
+          <div class="media-collection__btn-trio media-collection__view-selectors">
+            <button {{on "click" (fn this.changeFormat "list")}} class="media-collection__btn list {{if (eq this.format "list") "selected"}}" aria-label="view as list"></button>
+            <button {{on "click" (fn this.changeFormat "grid")}} class="media-collection__btn grid {{if (eq this.format "grid") "selected"}}" aria-label="view as grid"></button>
+            <button {{on "click" (fn this.changeFormat "table")}} class="media-collection__btn table {{if (eq this.format "table") "selected"}}" aria-label="view as table"></button>
+          </div>
+        {{/if}}
       </div>
     </div>
   </header>
@@ -72,13 +74,26 @@
   {{else}}
     <div class="media-collection__scroll-container">
       <div class="media-collection__inner-container">
-        <ul class="media-collection__grid media-collection__grid--{{@model.type}}-{{this.format}}">
+        {{#if (eq this.format "table-list")}}
+          <div class="isolated-collection__table-list-header">
+            {{#each @model.listTitleFields as |title|}}
+              <div class="isolated-collection__table-list-header-field">{{title}}</div>
+            {{/each}}
+          </div>
+        {{/if}}
+        <ul class="media-collection__grid media-collection__grid--{{this.format}} media-collection__grid--{{@model.type}}-{{this.format}}">
           {{#each this.collection as |item|}}
             <li class="media-collection__grid-item media-collection__grid-item--{{this.format}}">
               {{#if @itemComponent}}
                 {{component @itemComponent model=item listFields=@model.listFields transition=@transition mode=@mode format=this.format}}
               {{else}}
-                {{yield item}}
+                <Cards::IsolatedCollectionItem
+                  @model={{item}}
+                  @format={{this.format}}
+                  @listFields={{@model.listFields}}
+                  @route={{@model.route}}
+                  @mode={{@mode}}
+                />
               {{/if}}
 
               <div class="media-collection__grid-item-btn-group {{if (eq @mode "view") "master-collection__select-btn"}} {{if item.selected "master-collection__select-btn--selected"}}">

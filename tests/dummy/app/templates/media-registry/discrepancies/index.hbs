@@ -1,9 +1,34 @@
-<ul>
-  {{#each this.model as |item|}}
-    <li>
-      <LinkTo @route="media-registry.discrepancies.discrepancy" @model={{item.id}}>
-        {{item.baseCard.owner}} - {{item.compCard.owner}}
-      </LinkTo>
-    </li>
-  {{/each}}
-</ul>
+<section class="media-registry media-registry--{{@model.id}}">
+  <aside class="media-registry__left-edge">
+    <LeftEdgeNav />
+  </aside>
+
+  <header class="media-registry__header media-registry__header--sm">
+    <h1 class="media-registry__title">
+      {{@model.company}}
+    </h1>
+    <input class="media-registry__search-bar" type="search" placeholder="Search" />
+    <nav class="media-registry__nav">
+      <ul>
+        <li><LinkTo @class="unselected" @route="media-registry" @model="media-registry">Masters</LinkTo></li>
+        <li><LinkTo @class="unselected" @route="media-registry.agreements" @model="media-registry">Agreements</LinkTo></li>
+        <li><LinkTo @route="media-registry.discrepancies.index" @model="verifi-registry">Discrepancies</LinkTo></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="media-registry__outlet">
+
+    <div class="master-collection__wrapper">
+      <IsolatedCollection
+        @class="discrepancies-list"
+        @model={{@model}}
+        @format="table-list"
+        @mode="view"
+        @sort={{this.sort}}
+        @search={{this.search}}
+        @removeItem={{this.removeItem}}
+      />
+    </div>
+  </div>
+</section>

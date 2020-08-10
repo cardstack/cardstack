@@ -1,3 +1,9 @@
-<button class="boxel-pill-btn boxel-pill-btn__{{@variant}} {{@class}}" ...attributes>
-  {{yield}}
-</button>
+{{#if @isLink}}
+  <LinkTo @route={{@route}} @model={{@routeModel}} @class="boxel-pill-btn boxel-pill-btn__{{@variant}} {{@class}}" ...attributes>
+    {{yield}}
+  </LinkTo>
+{{else}}
+  <button class="boxel-pill-btn boxel-pill-btn__{{@variant}} {{@class}}" ...attributes>
+    {{yield}}
+  </button>
+{{/if}}

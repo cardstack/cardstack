@@ -1,16 +1,19 @@
-import { WCM, AMP, VALENTINO_PR, EMILIO_PR, MARIA_PR } from "./comp-data";
+import { WCM, AMP, VALENTINO_PR_V1, EMILIO_PR, MARIA_PR, MUSICAL_WORK_WCM_V1, MUSICAL_WORK_AMP_V1 } from "./comp-data";
 
 export default {
   id: "the-sun-comes-out-wcm-amp",
+  type: "Musical Work",
+  title: "The Sun Comes Out",
+  baseOwner: 'Warner Chappell Music',
+  compOwner: 'Allegro Music Publishing',
   baseCard: {
+    card: MUSICAL_WORK_WCM_V1,
     type: 'musical-work',
     owner: 'Warner Chappell Music',
     ownerId: 'wcm',
     iconURL: '/media-registry/wcm-logo.png',
     datetime: '2019-11-11T13:54',
-    id: 'wcm-the-sun-comes-out',
-    itemId: 'wcm-the-sun-comes-out',
-    title: 'The Sun Comes Out',
+    id: MUSICAL_WORK_WCM_V1.id,
     isolatedFields: [
       {
         title: "title",
@@ -21,7 +24,7 @@ export default {
         type: "collection",
         component: "cards/publishing-representation",
         value: [
-          VALENTINO_PR,
+          VALENTINO_PR_V1,
           EMILIO_PR
         ]
       },
@@ -81,13 +84,12 @@ export default {
     ]
   },
   compCard: {
+    card: MUSICAL_WORK_AMP_V1,
     type: 'musical-work',
     owner: 'Allegro Music Publishing',
     ownerId: 'amp',
     datetime: '2020-05-18T11:36',
-    id: 'amp-the-sun-comes-out',
-    itemId: 'amp-the-sun-comes-out',
-    title: 'The Sun Comes Out',
+    id: MUSICAL_WORK_AMP_V1.id,
     isolatedFields: [
       {
         title: "title",
@@ -98,7 +100,7 @@ export default {
         type: "collection",
         component: "cards/publishing-representation",
         value: [
-          VALENTINO_PR,
+          VALENTINO_PR_V1,
           EMILIO_PR,
           MARIA_PR
         ]

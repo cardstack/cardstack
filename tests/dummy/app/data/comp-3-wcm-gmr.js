@@ -1,28 +1,19 @@
-import { WCM, AMP, VALENTINO_PR, EMILIO_PR, MARIA_PR } from "./comp-data";
-
-const VALENTINO_SOLANO_WRONG = {
-  "id": "valentino-solano",
-  "type": "participant",
-  "title": "Valentino Solano",
-  "description": "Lyricist",
-  "imgURL": "/media-registry/profiles/thumb/Valentino-Solano.jpg",
-  "ipi": "00914256714",
-  "pro": "Global Music Rights",
-  "email": "valentino@valsolanomusic.com",
-  "website": "www.valsolanomusic.com"
-};
+import { WCM, AMP, VALENTINO_PR_V1, VALENTINO_PR, EMILIO_PR, MARIA_PR, MUSICAL_WORK_WCM_V2, MUSICAL_WORK_GMR } from "./comp-data";
 
 export default {
   id: "the-sun-comes-out-wcm-gmr",
+  type: "Musical Work",
+  title: "The Sun Comes Out",
+  baseOwner: 'Warner Chappell Music',
+  compOwner: 'Global Music Rights',
   baseCard: {
+    card: MUSICAL_WORK_WCM_V2,
     type: 'musical-work',
     owner: 'Warner Chappell Music',
     ownerId: 'wcm',
     iconURL: '/media-registry/wcm-logo.png',
     datetime: '2020-05-18T15:31',
-    id: 'wcm-the-sun-comes-out',
-    itemId: 'wcm-the-sun-comes-out',
-    title: 'The Sun Comes Out',
+    id: MUSICAL_WORK_WCM_V2.id,
     isolatedFields: [
       {
         title: "title",
@@ -33,7 +24,7 @@ export default {
         type: "collection",
         component: "cards/publishing-representation",
         value: [
-          VALENTINO_PR,
+          VALENTINO_PR_V1,
           EMILIO_PR,
           MARIA_PR
         ]
@@ -101,14 +92,13 @@ export default {
     ]
   },
   compCard: {
+    card: MUSICAL_WORK_GMR,
     type: 'musical-work',
     owner: 'Global Music Rights',
     ownerId: 'gmr',
     iconURL: '/media-registry/gmr-logo.svg',
     datetime: '2020-06-09T16:18',
-    id: 'gmr-the-sun-comes-out',
-    itemId: 'gmr-the-sun-comes-out',
-    title: 'The Sun Comes Out',
+    id: MUSICAL_WORK_GMR.id,
     isolatedFields: [
       {
         title: "title",
@@ -119,22 +109,7 @@ export default {
         type: "collection",
         component: "cards/publishing-representation",
         value: [
-          {
-            id: 'valentino-solano-pr',
-            type: 'publishing-representation',
-            writer: VALENTINO_SOLANO_WRONG,
-            role: 'Lyricist',
-            publisher: {
-              title: 'publisher',
-              value: [
-                {
-                  title: 'Worldwide',
-                  type: 'collection',
-                  value: [ WCM ]
-                }
-              ]
-            }
-          },
+          VALENTINO_PR,
           EMILIO_PR,
           MARIA_PR
         ]

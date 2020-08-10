@@ -1,40 +1,20 @@
 
-import { WCM, AMP, VALENTINO_PR, EMILIO_PR } from "./comp-data";
-
-const VALENTINO_SOLANO_MISSING = {
-  "id": "valentino-solano",
-  "type": "participant",
-  "title": "Valentino Solano"
-};
-
-const VALENTINO_PR_MISSING = {
-  id: 'valentino-solano-pr',
-  type: 'publishing-representation',
-  writer: VALENTINO_SOLANO_MISSING,
-  role: 'Lyricist',
-  publisher: {
-    title: 'publisher',
-    value: [
-      {
-        title: 'Worldwide',
-        type: 'collection',
-        value: [ WCM ]
-      }
-    ]
-  }
-};
+import { WCM, AMP, VALENTINO_PR_V0, VALENTINO_PR_V1, EMILIO_PR, MUSICAL_WORK_WMG_V1, MUSICAL_WORK_WCM_V1 } from "./comp-data";
 
 export default {
-  id: "mw-the-sun-comes-out-wmg-wcm",
+  id: "the-sun-comes-out-wmg-wcm",
+  type: "Musical Work",
+  title: "The Sun Comes Out",
+  baseOwner: 'Warner Music Group',
+  compOwner: 'Warner Chappell Music',
   baseCard: {
+    card: MUSICAL_WORK_WMG_V1,
     type: 'musical-work',
     owner: 'Warner Music Group',
     ownerId: 'wmg',
     iconURL: '/media-registry/wmg-logo.svg',
     datetime: '2020-04-08T10:45',
-    id: 'wmg-the-sun-comes-out',
-    itemId: 'wmg-the-sun-comes-out',
-    title: 'The Sun Comes Out',
+    id: MUSICAL_WORK_WMG_V1.id,
     isolatedFields: [
       {
         title: "title",
@@ -45,7 +25,7 @@ export default {
         type: "collection",
         component: "cards/publishing-representation",
         value: [
-          VALENTINO_PR_MISSING
+          VALENTINO_PR_V0
         ]
       },
       {
@@ -82,14 +62,13 @@ export default {
     ]
   },
   compCard: {
+    card: MUSICAL_WORK_WCM_V1,
     type: 'musical-work',
     owner: 'Warner Chappell Music',
     ownerId: 'wcm',
     iconURL: '/media-registry/wcm-logo.png',
     datetime: '2019-11-11T13:54',
-    id: 'wcm-the-sun-comes-out',
-    itemId: 'wcm-the-sun-comes-out',
-    title: 'The Sun Comes Out',
+    id: MUSICAL_WORK_WCM_V1.id,
     isolatedFields: [
       {
         title: "title",
@@ -100,7 +79,7 @@ export default {
         type: "collection",
         component: "cards/publishing-representation",
         value: [
-          VALENTINO_PR,
+          VALENTINO_PR_V1,
           EMILIO_PR
         ]
       },
