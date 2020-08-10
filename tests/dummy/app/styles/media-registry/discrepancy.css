@@ -106,6 +106,7 @@
 .discrepancy__profile-icon--wmg {
   background-color: #0061aa;
 }
+.discrepancy__profile-icon--amp,
 .discrepancy__profile-icon--wcm {
   background-size: auto 23px;
 }
@@ -116,13 +117,13 @@
 .discrepancy__profile-icon--gmr {
   background-size: auto 20px;
 }
-.discrepancy__profile-icon--amp {
-  background-color: #0069F9;
-}
 
 .boxel-card__bg-img--wcm {
   background-size: auto 35px;
   background-color: black;
+  border-radius: 100px;
+}
+.boxel-card__bg-img--amp {
   border-radius: 100px;
 }
 
@@ -412,4 +413,8 @@
 
 .discrepancy-field-renderer.base-card-field.comp-view * {
   opacity: 1;
+}
+
+.discrepancy-field-renderer.base-card-field.comp-view .boxel-highlight {
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
 }

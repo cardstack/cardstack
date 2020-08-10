@@ -1,7 +1,7 @@
 <section class="discrepancy" {{did-insert this.adjustCount}}>
   <div class="discrepancy__container">
     <header class="discrepancy__header">
-      <h1 class="discrepancy__title">Discrepancy Card: Additional Data</h1>
+      <h1 class="discrepancy__title">Discrepancy Card: Different Data</h1>
       <div class="discrepancy__mode-btn">
         <LinkTo @route="media-registry.discrepancies.index" @model="verifi-registry" @class="mode-indicator mode-indicator--revision">
           Comparison Mode
@@ -106,13 +106,14 @@
               @field={{field}}
               @showCompHighlights={{if field.tempField true false}}
               @comparisonType="base"
+              @omittedFields={{this.omittedFields}}
             />
           </div>
           <div class="discrepancy-field discrepancy-field--comp-field {{this.mode}}-view">
             {{#each @model.compCard.isolatedFields as |compField|}}
               {{#if (eq compField.title field.title)}}
                 {{compute (fn this.compareFields field compField)}}
-                {{#if (and compField.status (eq this.mode "comparison") (not-eq field.title "verifi_id"))}}
+                {{#if (and compField.status (eq this.mode "comparison") (not (contains field.title this.omittedFields)))}}
                   {{#if field.tempField}}
                     <div class="discrepancy-field__btn-container">
                       <IconButton @class="discrepancy-field__btn discrepancy-field__toggle-btn" @icon="carot-thin-left" {{on "click" (fn this.revertField field)}} />
@@ -149,7 +150,7 @@
               </PillButton>
             {{else if (eq this.mode "keep-current")}}
               <PillButton @class="discrepancy__count-btn" @variant="primary" @isLink={{true}} @route="media-registry.discrepancies.index" @routeModel="verifi-registry">
-                Keep current version
+                Keep current version and exit comparison mode
               </PillButton>
             {{/if}}
           </div>

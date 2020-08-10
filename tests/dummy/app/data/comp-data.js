@@ -17,10 +17,11 @@ export const AMP = {
   id: 'amp',
   type: 'publisher',
   title: 'Allegro Music Publishing',
+  imgURL: '/media-registry/amp-logo.png',
   territory: 'worldwide',
   fields: [
     {
-      title: 'IPI #',
+      title: 'cae/ipi #',
       value: '00170191322'
     },
     {
@@ -42,7 +43,7 @@ export const WCM = {
   territory: 'worldwide',
   fields: [
     {
-      title: 'IPI #',
+      title: 'cae/ipi #',
       value: '00160187388'
     },
     {
@@ -118,16 +119,10 @@ export const VALENTINO_PR_V0 = {
   id: 'valentino-solano-pr',
   type: 'publishing-representation',
   writer: VALENTINO_SOLANO_V0,
-  role: 'Lyricist',
+  role: null,
   publisher: {
     title: 'publisher',
-    value: [
-      {
-        title: 'Worldwide',
-        type: 'collection',
-        value: [ WCM ]
-      }
-    ]
+    value: null
   }
 };
 

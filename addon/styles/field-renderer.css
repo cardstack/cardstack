@@ -48,7 +48,7 @@
 
 .field-renderer__value {
   display: grid;
-  gap: 10px 0;
+  gap: 20px 0;
   width: 100%;
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp-sm);
@@ -66,22 +66,28 @@
   max-width: max-content;
 }
 
-.field-renderer ins {
+.field-renderer--inserted {
+  display: block;
+  height: 100%;
+  padding: 10px;
   text-decoration: none;
 }
 
+.field-renderer--deleted {
+  display: block;
+  height: 100%;
+  padding: 10px;
+  opacity: 0.5;
+}
+
+/* for cards */
 .field-renderer--removed {
   opacity: 0.5;
   text-decoration: none;
 }
 
-.field-renderer--deleted {
-  opacity: 0.5;
-  display: block;
-  padding-top: 10px;
-}
-
-.field-renderer--deleted-no-offset {
+.boxel-highlight--added ~ .basic-field,
+.boxel-highlight--modified ~ .basic-field {
   padding: 10px;
 }
 

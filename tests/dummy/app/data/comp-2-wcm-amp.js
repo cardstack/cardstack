@@ -88,6 +88,7 @@ export default {
     type: 'musical-work',
     owner: 'Allegro Music Publishing',
     ownerId: 'amp',
+    iconURL: '/media-registry/amp-logo.png',
     datetime: '2020-05-18T11:36',
     id: MUSICAL_WORK_AMP_V1.id,
     isolatedFields: [

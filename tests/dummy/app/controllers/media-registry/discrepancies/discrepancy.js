@@ -8,6 +8,7 @@ export default class MediaRegistryDiscrepanciesDiscrepancyController extends Con
   @tracked removed = [];
   @tracked mode = 'comparison';
   @tracked lastSelection;
+  omittedFields = ['verifi_id'];
 
   @action
   adjustCount() {
