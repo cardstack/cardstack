@@ -133,10 +133,12 @@ export const VALENTINO_PR_V1 = {
   role: 'Lyricist',
   publisher: {
     title: 'publisher',
+    type: 'collection',
+    component: 'cards/territory',
     value: [
       {
         title: 'Worldwide',
-        type: 'collection',
+        type: 'territory',
         value: [ WCM ]
       }
     ]
@@ -151,10 +153,12 @@ export const VALENTINO_PR = {
   role: 'Lyricist',
   publisher: {
     title: 'publisher',
+    type: 'collection',
+    component: 'cards/territory',
     value: [
       {
         title: 'Worldwide',
-        type: 'collection',
+        type: 'territory',
         value: [ WCM ]
       }
     ]
@@ -168,10 +172,12 @@ export const EMILIO_PR = {
   role: 'Composer',
   publisher: {
     title: 'publisher',
+    type: 'collection',
+    component: 'cards/territory',
     value: [
       {
         title: 'Worldwide',
-        type: 'collection',
+        type: 'territory',
         value: [ AMP ]
       }
     ]
@@ -185,10 +191,12 @@ export const MARIA_PR = {
   role: 'Composer',
   publisher: {
     title: 'publisher',
+    type: 'collection',
+    component: 'cards/territory',
     value: [
       {
         title: 'Worldwide',
-        type: 'collection',
+        type: 'territory',
         value: [ AMP ]
       }
     ]

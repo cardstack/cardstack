@@ -123,11 +123,12 @@ export default {
       },
       {
         title: 'publisher',
-        type: 'territory',
+        type: 'collection',
+        component: 'cards/territory',
         value: [
           {
             title: 'Worldwide',
-            type: 'collection',
+            type: 'territory',
             value: [ WCM, AMP ]
           }
         ]

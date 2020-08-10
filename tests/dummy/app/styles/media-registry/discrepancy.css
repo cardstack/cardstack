@@ -415,6 +415,14 @@
   opacity: 1;
 }
 
+.discrepancy-field--base-field.linked-view .publishing-representation__writers .field-renderer__opacity-control,
+.discrepancy-field--base-field.linked-view .publishing-representation__publishers .field-renderer__opacity-control,
+.discrepancy-field--comp-field .publishing-representation__writers .field-renderer__opacity-control,
+.discrepancy-field--comp-field .publishing-representation__publishers .field-renderer__opacity-control,
+.discrepancy-field--comp-field .territory__wrapper .field-renderer__opacity-control {
+  opacity: initial;
+}
+
 .discrepancy-field-renderer.base-card-field.comp-view .boxel-highlight {
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
 }

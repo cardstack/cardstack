@@ -1,0 +1,20 @@
+<Boxel>
+  {{#if @status}}
+    <BoxelHighlight @status={{@status}} />
+    <BoxelActions @status={{@status}} @class={{if @comparisonType "boxel-actions--comparison-mode"}}>
+      {{#if @comparisonType}}
+        <ComparisonModeLabel @status={{@status}} @statusText={{@statusText}} @comparisonType={{@comparisonType}} />
+      {{/if}}
+    </BoxelActions>
+  {{/if}}
+  <div class={{if (and @status (not-eq @status "no-change")) "territory__wrapper"}}>
+    <Card @class="territory-card territory-card--{{format-id @model.title}}" @model={{@model}} @mode="view" />
+    <ul class="territory__publishers-list">
+      {{#each @model.value as |card|}}
+        <li>
+          <Card @model={{card}} @mode="view" />
+        </li>
+      {{/each}}
+    </ul>
+  </div>
+</Boxel>

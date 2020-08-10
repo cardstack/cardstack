@@ -75,7 +75,7 @@
   overflow: hidden;
 }
 
-.boxel-card ul {
+.boxel-card__fields {
   list-style-type: none;
   margin: 0;
   padding-left: 0;
@@ -263,4 +263,94 @@
 
 .boxel-card--schedule .boxel-card-field > .field-renderer__value {
   font: var(--boxel-font-med);
+}
+
+
+/* Publishing Representation card */
+.publishing-representation > .boxel-card__inner {
+  padding: 0;
+  gap: 0;
+}
+
+.publishing-representation__field.field-renderer {
+  width: 100%;
+  max-width: 450px;
+  grid-template-columns: 1fr;
+  justify-items: start;
+  gap: 15px 0;
+  padding: 0;
+}
+
+.publishing-representation__field > .field-renderer__title {
+  font: var(--boxel-font);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-sm);
+  text-transform: capitalize;
+}
+
+.publishing-representation__publishers {
+  padding: 15px;
+  border-top: var(--boxel-border);
+}
+
+.publishing-representation__writers {
+  padding: 15px 15px 20px;
+}
+
+.publishing-representation__additional-field {
+  padding: 15px;
+  border: var(--boxel-border);
+  border-bottom-right-radius: var(--boxel-border-radius);
+  border-bottom-left-radius: var(--boxel-border-radius);
+}
+
+.publishing-representation__field .boxel-card--profile {
+  border-bottom: none;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.publishing-representation__additional-field.publishing-representation__field {
+  padding: 15px;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 20px;
+}
+
+.publishing-representation__additional-field.publishing-representation__field .field-renderer__title {
+  font-size: 13px;
+  letter-spacing: var(--boxel-lsp);
+}
+
+
+/* territory card */
+.territory-card .boxel-card__inner {
+  min-height: auto;
+}
+
+.territory-card--worldwide .boxel-card__inner {
+  background-image: url('/assets/images/icons/world.svg');
+  background-position: left 18px center;
+  background-size: 15px 15px;
+  background-repeat: no-repeat;
+  padding-left: 45px;
+}
+
+.territory-card h3 {
+  font-weight: 400;
+}
+
+.territory__publishers-list {
+  list-style-type: none;
+  margin-top: 15px;
+  padding-left: 25px;
+  border-left: 3px solid #B3B1B8;
+}
+
+.territory__publishers-list > * + * {
+  margin-top: 15px;
+}
+
+.territory__wrapper {
+  padding: 10px;
 }
