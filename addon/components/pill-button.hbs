@@ -1,4 +1,4 @@
-{{#if @isLink}}
+{{#if @route}}
   <LinkTo @route={{@route}} @model={{@routeModel}} @class="boxel-pill-btn boxel-pill-btn__{{@variant}} {{@class}}" ...attributes>
     {{yield}}
   </LinkTo>

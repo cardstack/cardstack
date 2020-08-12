@@ -351,6 +351,9 @@
   margin-top: 15px;
 }
 
+/* Add padding and bg when territory card is highlighted in comparison mode */
 .territory__wrapper {
   padding: 10px;
+  background-color: white;
+  border-radius: var(--boxel-border-radius);
 }

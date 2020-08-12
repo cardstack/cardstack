@@ -2,11 +2,9 @@
   <div class="discrepancy__container">
     <header class="discrepancy__header">
       <h1 class="discrepancy__title">Discrepancy Card: Different Data</h1>
-      <div class="discrepancy__mode-btn">
-        <LinkTo @route="media-registry.discrepancies.index" @model="verifi-registry" @class="mode-indicator mode-indicator--revision">
-          Comparison Mode
-        </LinkTo>
-      </div>
+      <PillButton @variant="primary" @route="media-registry.discrepancies.index" @routeModel="verifi-registry" @class="discrepancy__mode-btn">
+        Comparison Mode
+      </PillButton>
     </header>
 
     <Breadcrumbs @class="discrepancy__breadcrumbs">
@@ -48,7 +46,7 @@
         </div>
         <PillButton
           {{on "click" this.toggleView}}
-          @class="discrepancy-card__header-btn {{if (eq this.mode "comparison") "checked"}}"
+          @class="discrepancy-card__header-btn discrepancy-card__header-btn--toggle {{if (eq this.mode "comparison") "checked"}}"
         >
           Resolve discrepancies
         </PillButton>
@@ -115,12 +113,14 @@
                 {{compute (fn this.compareFields field compField)}}
                 {{#if (and compField.status (eq this.mode "comparison") (not (contains field.title this.omittedFields)))}}
                   {{#if field.tempField}}
-                    <div class="discrepancy-field__btn-container">
-                      <IconButton @class="discrepancy-field__btn discrepancy-field__toggle-btn" @icon="carot-thin-left" {{on "click" (fn this.revertField field)}} />
+                    <div class="discrepancy-field__btn-container discrepancy-field__btn-container--toggled">
+                      <IconButton @class="discrepancy-field__btn discrepancy-field__btn--toggled" @icon="carot-thin-left" {{on "click" (fn this.revertField field)}} />
                       {{!-- <PillButton @class="discrepancy-field__btn--reset-btn" {{on "click" (fn this.revertField field)}}>Reset</PillButton> --}}
                     </div>
                   {{else}}
-                    <IconButton @class="discrepancy-field__btn" @icon="carot-thin-left" {{on "click" (fn this.reconciliateField field compField)}} />
+                    <div class="discrepancy-field__btn-container">
+                      <IconButton @class="discrepancy-field__btn" @icon="carot-thin-left" {{on "click" (fn this.reconciliateField field compField)}} />
+                    </div>
                   {{/if}}
                 {{/if}}
                 <FieldRenderer
@@ -149,7 +149,7 @@
                 {{/if}}
               </PillButton>
             {{else if (eq this.mode "keep-current")}}
-              <PillButton @class="discrepancy__count-btn" @variant="primary" @isLink={{true}} @route="media-registry.discrepancies.index" @routeModel="verifi-registry">
+              <PillButton @class="discrepancy__count-btn" @variant="primary" @route="media-registry.discrepancies.index" @routeModel="verifi-registry">
                 Keep current version and exit comparison mode
               </PillButton>
             {{/if}}

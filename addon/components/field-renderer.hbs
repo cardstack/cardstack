@@ -87,15 +87,16 @@
             <Boxel>
               {{#if (contains val.id @displayId)}}
                 {{#if @revertChange}}
-                  <div class="discrepancy-field__btn-container">
-                    <IconButton @class="field-renderer__btn field-renderer__toggle-btn" @icon="carot-thin-left" {{on "click" (fn @revertChange val field.title)}} />
-                    {{!-- <PillButton @class="discrepancy-field__btn--reset-btn embedded-collection__discrepancy-btn" {{on "click" (fn @revertChange val field.title)}}>Reset</PillButton> --}}
+                  <div class="field-renderer__btn-container discrepancy-field__btn-container discrepancy-field__btn-container--toggled">
+                    <IconButton @class="discrepancy-field__btn discrepancy-field__btn--toggled" @icon="carot-thin-left" {{on "click" (fn @revertChange val field.title)}} />
                   </div>
                 {{/if}}
                 {{component (or field.component "card") model=val mode="view" status=(if (or @showCompHighlights val.new) (if val.status val.status "no-change")) comparisonType=@comparisonType}}
               {{else}}
                 {{#if (and @selectChange val.status)}}
-                  <IconButton @class="field-renderer__btn" @icon="carot-thin-left" {{on "click" (fn @selectChange val field.title field.component)}} />
+                  <div class="field-renderer__btn-container discrepancy-field__btn-container">
+                    <IconButton @class="discrepancy-field__btn" @icon="carot-thin-left" {{on "click" (fn @selectChange val field.title field.component)}} />
+                  </div>
                 {{/if}}
                 {{component (or field.component "card") model=val mode="view" status=(if (or @showCompHighlights val.new) (if val.status val.status "no-change")) comparisonType=@comparisonType}}
               {{/if}}
