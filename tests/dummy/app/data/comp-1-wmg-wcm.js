@@ -52,7 +52,7 @@ export default {
         value: null
       },
       {
-        title: 'publisher',
+        title: 'publishers',
         value: null
       },
       {
@@ -122,7 +122,7 @@ export default {
           ]
       },
       {
-        title: 'publisher',
+        title: 'publishers',
         type: 'collection',
         component: 'cards/territory',
         value: [

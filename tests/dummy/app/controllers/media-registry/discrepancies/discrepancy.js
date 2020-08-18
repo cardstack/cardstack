@@ -8,7 +8,15 @@ export default class MediaRegistryDiscrepanciesDiscrepancyController extends Con
   @tracked removed = [];
   @tracked mode = 'comparison';
   @tracked lastSelection;
+  @tracked nestedView;
+  @tracked nestedField;
+  @tracked nestedCompField;
+  @tracked fieldTrail = [];
+  @tracked currentField = {};
+  @tracked currentItem = {}; // for collection fields
   omittedFields = ['verifi_id'];
+  fieldsNotRendered = ['id', 'type', 'status', 'new'];
+  cardTypes = ['participant', 'file', 'registration', 'publishing-representation', 'territory' ];
 
   @action
   adjustCount() {
@@ -28,6 +36,12 @@ export default class MediaRegistryDiscrepanciesDiscrepancyController extends Con
 
     this.mode = 'comparison';
     this.lastSelection = null;
+    this.nestedView = false;
+    this.nestedField = [];
+    this.nestedCompField = [];
+    this.fieldTrail = [];
+    this.currentField = {};
+    this.currentItem = {};
   }
 
   @action
@@ -56,7 +70,7 @@ export default class MediaRegistryDiscrepanciesDiscrepancyController extends Con
 
     let [ json1, json2 ] = [ field, compField ].map(data => JSON.stringify(data));
 
-    if (json1 === json2) {
+    if (json1 === json2 || (!field.value && !compField.value && !field.id && !compField.id)) {
       return;
     }
 
@@ -145,8 +159,11 @@ export default class MediaRegistryDiscrepanciesDiscrepancyController extends Con
   @action
   revertField(field) {
     set(field, 'tempField', null);
-    this.count--;
-    set(this.model, 'count', this.count);
+
+    if (this.count > 0) {
+      this.count--;
+      set(this.model, 'count', this.count);
+    }
   }
 
   @action selectChange(val, title, component) {
@@ -224,6 +241,170 @@ export default class MediaRegistryDiscrepanciesDiscrepancyController extends Con
     if (this.count > 0) {
       this.count--;
       set(this.model, 'count', this.count);
+    }
+  }
+
+  @action
+  backToTopLevel() {
+    this.nestedView = false;
+    this.fieldTrail = [];
+    this.currentField = {};
+    this.currentItem = {};
+  }
+
+  @action
+  drillDown(f, val, fieldData) {
+    this.nestedView = true;
+    this.nestedField = [];
+    this.nestedCompField = [];
+
+    this.fieldTrail = [...this.fieldTrail, fieldData];
+    this.currentField = fieldData;
+    this.currentItem = val;
+
+    let field = f.tempField ? f.tempField : f;
+    let value = field.tempCollection ? field.tempCollection : field.value;
+
+    // field (base field)
+    if (value) {
+      if (field.type === 'collection') {
+        let item = value.find(el => el.id === val.id);
+        if (item) {
+          for (let v in item) {
+            if (!item[v] || typeof item[v] !== 'object') {
+              this.nestedField.push({
+                title: v,
+                value: item[v]
+              });
+            } else {
+              if (!item[v].value && !item[v].type && !item[v].length) {
+                this.nestedField.push({
+                  title: v,
+                  value: null
+                });
+              }
+              else if (item[v].type === 'collection') {
+                this.nestedField.push({
+                  title: v,
+                  type: item[v].type,
+                  value: item[v].tempCollection || item[v].value,
+                  component: item[v].component
+                });
+              }
+              else if (item[v].length) {
+                let nestedCollection = [];
+                this.nestedField.push({
+                  title: v,
+                  type: 'collection',
+                  value: nestedCollection
+                });
+                for (let card of item[v]) {
+                  nestedCollection.push(card);
+                }
+              } else {
+                this.nestedField.push({
+                  title: v,
+                  type: 'card',
+                  value: item[v],
+                  component: item[v].type === 'participant' ? 'cards/composer' : null //TODO
+                });
+              }
+            }
+          }
+        }
+      } else if (typeof(field) === 'object') {
+        let item = value || field;
+
+        for (let v in item) {
+          if (!item[v] || typeof item[v] !== 'object') {
+            this.nestedField.push({
+              title: v,
+              value: item[v]
+            });
+          } else {
+            if (!item[v].value && !item[v].type) {
+              this.nestedField.push({
+                title: v,
+                value: null
+              });
+            }
+            else if (item[v].length) {
+              let nestedCollection = [];
+              this.nestedField.push({
+                title: v,
+                type: 'collection',
+                value: nestedCollection
+              });
+              for (let card of item[v]) {
+                nestedCollection.push(card);
+              }
+            } else {
+              this.nestedField.push({
+                title: v,
+                type: 'card',
+                value: item[v],
+                component: item[v].type === 'participant' ? 'cards/composer' : null //TODO
+              });
+            }
+          }
+        }
+      }
+    }
+
+    // val (comp field)
+    for (let v in val) {
+      if (!value || (!value.length && !value[v])) {
+        this.nestedField.push({
+          title: v,
+          value: null
+        });
+      }
+
+      if (value && value.length) {
+        let item = value.find(el => el.id === val.id);
+        if (!item) {
+          this.nestedField.push({
+            title: v,
+            value: null
+          });
+        }
+      }
+
+      if (val[v] && val[v].type === 'collection') {
+        this.nestedCompField.push({
+          title: v,
+          type: val[v].type,
+          value: val[v].tempCollection || val[v].value,
+          component: val[v].component
+        });
+      }
+      else if (val[v] && typeof(val[v]) === 'object') {
+        if (val[v].length) {
+          this.nestedField[this.nestedField.length - 1].type = 'collection';
+
+          let nestedCollection = [];
+          this.nestedCompField.push({
+            title: v,
+            type: 'collection',
+            value: nestedCollection
+          });
+          for (let card of val[v]) {
+            nestedCollection.push(card);
+          }
+        } else {
+          this.nestedCompField.push({
+            title: v,
+            type: 'card',
+            value: val[v],
+            component: val[v].type === 'participant' ? 'cards/composer' : null //TODO
+          });
+        }
+      } else {
+        this.nestedCompField.push({
+          title: v,
+          value: val[v]
+        });
+      }
     }
   }
 }

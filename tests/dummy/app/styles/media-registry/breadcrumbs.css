@@ -8,7 +8,7 @@
 .breadcrumbs__item {
   width: 170px;
   height: 50px;
-  padding: 10px 15px;
+  padding: 8px 15px;
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
   border: 1px solid #d1d1d1;
@@ -30,6 +30,7 @@
   font-size: 10px;
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-xl);
+  line-height: 14px;
   text-transform: uppercase;
 }
 
@@ -46,6 +47,14 @@
   border-color: transparent;
 }
 
+button.breadcrumbs__item--inverse {
+  text-align: left;
+}
+
+button.breadcrumbs__item--inverse:hover {
+  cursor: pointer;
+}
+
 .breadcrumbs__item--inverse .breadcrumbs__item-label {
   color: var(--boxel-border-color);
 }
@@ -56,4 +65,13 @@
 
 .breadcrumbs__item--inverse + .breadcrumbs__carot {
   filter: invert(1);
+}
+
+.breadcrumbs__item--inverse:last-child {
+  background-color: #C1C1D0;
+}
+
+.breadcrumbs__item--inverse:last-child .breadcrumbs__item-label,
+.breadcrumbs__item--inverse:last-child .breadcrumbs__item-title {
+  color: #393642;
 }

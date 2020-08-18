@@ -257,8 +257,10 @@
 }
 
 .field-renderer__card--blank {
+  min-height: 80px;
   height: 100%;
   border: 1.5px dashed var(--boxel-border-color);
+  background-color: transparent;
 }
 
 .field-renderer--collection .field-renderer__card--blank {

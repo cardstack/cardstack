@@ -2,11 +2,16 @@
   <div class="card__gradient" />
   {{#if @status}}
     <BoxelHighlight @status={{@status}} />
-    <BoxelActions @status={{@status}} @class={{if @comparisonType "boxel-actions--comparison-mode"}}>
+    <BoxelActions @status={{@status}} @class="{{if @comparisonType "boxel-actions--comparison-mode"}} {{if (and @drillDown (not-eq @status "no-change")) "with-expand"}}">
       {{#if @comparisonType}}
         <ComparisonModeLabel @status={{@status}} @statusText={{@statusText}} @comparisonType={{@comparisonType}} />
       {{/if}}
     </BoxelActions>
+    {{#if (and @drillDown (not-eq @status "no-change"))}}
+      <BoxelActions @status={{@status}} @class="boxel-actions__expand">
+        <IconButton @icon="expand" {{on "click" (fn @drillDown @model @fieldData)}} @class="boxel-actions__expand-btn" @aria-label="expand" />
+      </BoxelActions>
+    {{/if}}
   {{/if}}
   {{#if @expandAction}}
     <BoxelHighlight {{on "click" @expandAction}} @class="boxel-card__expand-overlay" />
