@@ -68,7 +68,6 @@ export const VALENTINO_SOLANO_V1 = {
   "id": "valentino-solano",
   "type": "participant",
   "title": "Valentino Solano",
-  "description": "Lyricist",
   "imgURL": "/media-registry/profiles/thumb/Valentino-Solano.jpg",
   "ipi": "00815723492",
   "pro": "Global Music Rights",
@@ -81,7 +80,6 @@ export const VALENTINO_SOLANO = {
   "id": "valentino-solano",
   "type": "participant",
   "title": "Valentino Solano",
-  "description": "Lyricist",
   "imgURL": "/media-registry/profiles/thumb/Valentino-Solano.jpg",
   "ipi": "00914256714",
   "pro": "Global Music Rights",
@@ -93,7 +91,6 @@ const EMILIO_ROSSO = {
   "id": "emilio-rosso",
   "type": "participant",
   "title": "Emilio Rosso",
-  "description": "Composer",
   "imgURL": "/media-registry/profiles/thumb/Emilio-Rosso.jpg",
   "ipi": "00231925374",
   "pro": "Global Music Rights",
@@ -105,7 +102,6 @@ const MARIA_BIANCHI = {
   "id": "maria-bianchi",
   "type": "participant",
   "title": "Maria Bianchi",
-  "description": "Composer",
   "imgURL": "/media-registry/profiles/thumb/Maria-Bianchi.jpg",
   "ipi": "00181928972",
   "pro": "Global Music Rights",
@@ -117,6 +113,7 @@ const MARIA_BIANCHI = {
 // WRITER PUBLISHER REP CARDS
 export const VALENTINO_PR_V0 = {
   id: 'valentino-solano-pr',
+  version: '0',
   type: 'publishing-representation',
   writer: VALENTINO_SOLANO_V0,
   role: null,
@@ -128,6 +125,7 @@ export const VALENTINO_PR_V0 = {
 
 export const VALENTINO_PR_V1 = {
   id: 'valentino-solano-pr',
+  version: '1',
   type: 'publishing-representation',
   writer: VALENTINO_SOLANO_V1,
   role: 'Lyricist',
@@ -137,9 +135,11 @@ export const VALENTINO_PR_V1 = {
     component: 'cards/territory',
     value: [
       {
+        id: 'worldwide',
         title: 'Worldwide',
         type: 'territory',
-        value: [ WCM ]
+        value: [ WCM ],
+        publishers: [ WCM ]
       }
     ]
   }
@@ -148,6 +148,7 @@ export const VALENTINO_PR_V1 = {
 // complete version
 export const VALENTINO_PR = {
   id: 'valentino-solano-pr',
+  version: '2',
   type: 'publishing-representation',
   writer: VALENTINO_SOLANO,
   role: 'Lyricist',
@@ -157,9 +158,11 @@ export const VALENTINO_PR = {
     component: 'cards/territory',
     value: [
       {
+        id: 'worldwide',
         title: 'Worldwide',
         type: 'territory',
-        value: [ WCM ]
+        value: [ WCM ],
+        publishers: [ WCM ]
       }
     ]
   }
@@ -176,9 +179,11 @@ export const EMILIO_PR = {
     component: 'cards/territory',
     value: [
       {
+        id: 'worldwide',
         title: 'Worldwide',
         type: 'territory',
-        value: [ AMP ]
+        value: [ AMP ],
+        publishers: [ AMP ]
       }
     ]
   }
@@ -195,9 +200,11 @@ export const MARIA_PR = {
     component: 'cards/territory',
     value: [
       {
+        id: 'worldwide',
         title: 'Worldwide',
         type: 'territory',
-        value: [ AMP ]
+        value: [ AMP ],
+        publishers: [ AMP ]
       }
     ]
   }

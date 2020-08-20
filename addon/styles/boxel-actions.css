@@ -108,10 +108,23 @@
 }
 
 .boxel-actions--comparison-mode > .boxel-actions__label {
+  display: flex;
+  align-items: center;
+  width: auto;
+  padding: 5px 30px 5px 15px;
   background-position: center right 10px;
   font-weight: 400;
-  width: auto;
-  padding: 6px 30px 6px 15px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.boxel-actions--comparison-mode > .boxel-actions__label.boxel-actions__label--modified {
+  padding-right: 27px;
+}
+
+.boxel-actions--comparison-mode > .boxel-actions__label.boxel-actions__label--modified span {
+  font-weight: 700;
+  margin-left: 5px;
 }
 
 .boxel-actions--comparison-mode > .boxel-actions__label--no-change {

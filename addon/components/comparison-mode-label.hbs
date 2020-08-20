@@ -3,7 +3,7 @@
     {{#if @statusText}}
       {{@statusText}}
     {{else if (eq @status "modified")}}
-      Different data
+      Different data <span>{{@modifiedCount}}</span>
     {{else if (eq @status "added")}}
       Additional data
     {{else if (eq @status "no-change")}}
@@ -17,7 +17,7 @@
 {{else}}
   {{#if @status}}
     {{#if (eq @status "modified")}}
-      Replaced data
+      Replaced data <span>{{@modifiedCount}}</span>
     {{else if (eq @status "added")}}
       Added data
     {{/if}}

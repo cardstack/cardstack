@@ -48,6 +48,7 @@ export default {
         type: 'card',
         component: 'cards/file',
         value: {
+          id: 'original-work',
           type: 'version-type',
           title: 'Original work'
         }
@@ -72,9 +73,11 @@ export default {
         component: 'cards/territory',
         value: [
           {
+            id: 'worldwide',
             title: 'Worldwide',
             type: 'territory',
-            value: [ WCM, AMP ]
+            value: [ WCM, AMP ],
+            publishers: [ WCM, AMP ]
           }
         ]
       },
@@ -127,6 +130,7 @@ export default {
         type: 'card',
         component: 'cards/file',
         value: {
+          id: 'original-work',
           type: 'version-type',
           title: 'Original work'
         }
@@ -155,9 +159,11 @@ export default {
         component: 'cards/territory',
         value: [
           {
+            id: 'worldwide',
             title: 'Worldwide',
             type: 'territory',
-            value: [ WCM, AMP ]
+            value: [ WCM, AMP ],
+            publishers: [ WCM, AMP ]
           }
         ]
       },

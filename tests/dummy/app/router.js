@@ -22,7 +22,13 @@ Router.map(function() {
     });
     this.route('versions', { path: '/:itemId/versions' });
     this.route('discrepancies', function() {
-      this.route('discrepancy', { path: '/:compId' });
+      this.route('discrepancy', { path: '/:compId' }, function() {
+        this.route('card', { path: '/:cardType/:cardId' }, function() {
+          this.route('card', { path: '/:innerCardType/:innerCardId' }, function() {
+            this.route('card', { path: '/:innerCardCardType/:innerCardCardId' });
+          });
+        });
+      });
     });
     this.route('agreements');
     this.route('cardflow');

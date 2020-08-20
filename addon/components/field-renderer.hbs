@@ -93,7 +93,7 @@
                     </div>
                   {{/if}}
                 {{/unless}}
-                {{component (or field.component "card") model=val mode="view" status=(if (or @showCompHighlights val.new) (if val.status val.status "no-change")) comparisonType=@comparisonType drillDown=@drillDown fieldData=field}}
+                {{component (or field.component "card") model=val mode=@mode status=(if (or @showCompHighlights val.new) (if val.status val.status "no-change")) comparisonType=@comparisonType drillDown=@drillDown fieldData=field}}
               {{else}}
                 {{#unless @nestedView}}
                   {{#if (and @selectChange val.status)}}
@@ -189,7 +189,7 @@
         <BoxelHighlight @status="modified" />
         <BoxelActions @status="modified" />
       {{/if}}
-      {{#if (or @field.value @field.tempCollection)}}
+      {{#if @field.value}}
         {{#if (eq @field.type "card")}}
           {{#if (and @comparisonMode @field.value.id (eq @changedCards.0.value.id @field.value.id))}}
             <div>
@@ -211,7 +211,7 @@
           {{/if}}
         {{else if (eq @field.type "collection")}}
           <EmbeddedCollection
-            @collection={{if @field.tempCollection @field.tempCollection @field.value}}
+            @collection={{@field.value}}
             @format={{@field.format}}
             @cardComponent={{@field.component}}
             @comparisonMode={{@comparisonMode}}

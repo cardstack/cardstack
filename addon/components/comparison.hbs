@@ -1,0 +1,224 @@
+<section class="discrepancy" {{did-insert (if this.nestedView this.getNestedFields this.adjustCount)}}>
+  <div class="discrepancy__container">
+    <header class="discrepancy__header">
+      <h1 class="discrepancy__title">Discrepancy Card: Different Data</h1>
+      <PillButton @variant="primary" @route={{@exitRoute}} @routeModel="verifi-registry" @class="discrepancy__mode-btn">
+        Comparison Mode
+      </PillButton>
+    </header>
+
+    <Breadcrumbs @class="discrepancy__breadcrumbs">
+      <LinkTo @route={{@topLevelRoute}} @model={{if @model.topLevelCard @model.topLevelCard.id @model.id}} @class="breadcrumbs__item breadcrumbs__item--inverse">
+        <div class="breadcrumbs__item-label">Field</div>
+        <div class="breadcrumbs__item-title">Musical Work</div>
+      </LinkTo>
+
+      {{#if @model.grandParentCard.cardType}}
+        <span class="breadcrumbs__carot" />
+        <LinkTo @route={{@model.grandParentCard.route}} @model={{@model.grandParentCard}} @class="breadcrumbs__item breadcrumbs__item--inverse">
+          <div class="breadcrumbs__item-label">Field</div>
+          <div class="breadcrumbs__item-title">{{humanize @model.grandParentCard.cardType}}</div>
+        </LinkTo>
+      {{/if}}
+
+      {{#if @model.parentCard.cardType}}
+        <span class="breadcrumbs__carot" />
+        <LinkTo @route={{@model.parentCard.route}} @model={{@model.parentCard}} @class="breadcrumbs__item breadcrumbs__item--inverse">
+          <div class="breadcrumbs__item-label">Field</div>
+          <div class="breadcrumbs__item-title">{{humanize @model.parentCard.cardType}}</div>
+        </LinkTo>
+      {{/if}}
+
+      {{#if @model.grandParentCard}}
+        <span class="breadcrumbs__carot" />
+        <div class="breadcrumbs__item breadcrumbs__item--inverse">
+          <div class="breadcrumbs__item-label">{{@model.nestedCompField.type}}</div>
+          <div class="breadcrumbs__item-title">{{@model.nestedCompField.title}}</div>
+        </div>
+      {{else if (and (not @model.grandParentCard) @model.parentCard)}}
+        <span class="breadcrumbs__carot" />
+        <div class="breadcrumbs__item breadcrumbs__item--inverse">
+          <div class="breadcrumbs__item-label">{{@model.nestedCompField.type}}</div>
+          <div class="breadcrumbs__item-title">{{@model.nestedCompField.title}}</div>
+        </div>
+      {{else if @model.cardType}}
+        <span class="breadcrumbs__carot" />
+        <div class="breadcrumbs__item breadcrumbs__item--inverse">
+          <div class="breadcrumbs__item-label">Field</div>
+          <div class="breadcrumbs__item-title">{{humanize @model.cardType}}</div>
+        </div>
+      {{/if}}
+    </Breadcrumbs>
+
+    <div class="discrepancy__main {{if (eq this.mode "comparison") "discrepancy__main--comp-view"}}">
+      <div class="discrepancy__comparison-header {{if (eq this.mode "comparison") "discrepancy__comparison-header--comp-mode"}}">
+        <div class="discrepancy__comparison-header-title-group">
+          {{#if this.nestedView}}
+            <LinkTo @route={{@topLevelRoute}} @model={{@model.topLevelCard.id}} @class="discrepancy__nested-level-back-btn">
+              Go back to {{@model.topLevelCard.type}}
+            </LinkTo>
+          {{else}}
+            <div class="discrepancy__comparison-header-icons">
+              <div class="discrepancy__profile-icon discrepancy__profile-icon--{{@model.baseCard.ownerId}}" style={{css-url "background-image" @model.baseCard.iconURL}}>
+                {{#unless @model.baseCard.iconURL}}
+                  {{truncate @model.baseCard.owner 1 false}}
+                {{/unless}}
+              </div>
+              <div class="discrepancy__comparison-header-icons-carot">
+                {{svg-jar "carot-left"}}
+              </div>
+              <div class="discrepancy__profile-icon discrepancy__profile-icon--{{@model.compCard.ownerId}}" style={{css-url "background-image" @model.compCard.iconURL}}>
+                {{#unless @model.compCard.iconURL}}
+                  {{truncate @model.compCard.owner 1 false}}
+                {{/unless}}
+              </div>
+            </div>
+            <div>Comparison between these 2 versions</div>
+          {{/if}}
+        </div>
+        {{#unless this.nestedView}}
+          <PillButton
+            {{on "click" this.toggleView}}
+            @class="discrepancy-card__header-btn discrepancy-card__header-btn--toggle {{if (eq this.mode "comparison") "checked"}}"
+          >
+            Resolve discrepancies
+          </PillButton>
+        {{/unless}}
+      </div>
+
+      <div class="discrepancy__cards {{if (eq this.mode "comparison") "discrepancy__cards--comp-view"}}">
+        {{#let (if @model.topLevelCard @model.topLevelCard @model) as |model|}}
+          <div class="discrepancy-card__header your-version {{if (eq this.mode "keep-current") "selected-version"}}">
+            <div class="discrepancy-card__header-label">Your version</div>
+            <div class="discrepancy-card__header-title-group">
+              <div class="discrepancy-card__header-icons">
+                <div class="discrepancy__profile-icon discrepancy__profile-icon--{{model.baseCard.ownerId}}" style={{css-url "background-image" model.baseCard.iconURL}}>
+                  {{#unless model.baseCard.iconURL}}
+                    {{truncate model.baseCard.owner 1 false}}
+                  {{/unless}}
+                </div>
+              </div>
+              <div>
+                <div class="discrepancy-card__title">{{model.baseCard.owner}}</div>
+                <div class="discrepancy-card__datetime">{{moment-format model.baseCard.datetime "MMM D, YYYY h:mm A"}}</div>
+              </div>
+            </div>
+            {{#unless this.nestedView}}
+              <PillButton
+                {{on "click" (fn this.selectView "keep-current")}}
+                @class="discrepancy-card__header-btn {{if (eq this.mode "keep-current") "checked"}}"
+              >
+                Keep current version
+              </PillButton>
+            {{/unless}}
+          </div>
+          <div class="discrepancy-card__header other-version {{if (eq this.mode "linked") "selected-version"}}">
+            <div class="discrepancy-card__header-label">Other version</div>
+            <div class="discrepancy-card__header-title-group">
+              <div class="discrepancy-card__header-icons">
+                <div class="discrepancy__profile-icon discrepancy__profile-icon--{{model.compCard.ownerId}}" style={{css-url "background-image" model.compCard.iconURL}}>
+                  {{#unless model.compCard.iconURL}}
+                    {{truncate model.compCard.owner 1 false}}
+                  {{/unless}}
+                </div>
+              </div>
+              <div>
+                <div class="discrepancy-card__title">{{model.compCard.owner}}</div>
+                <div class="discrepancy-card__datetime">{{moment-format model.compCard.datetime "MMM D, YYYY h:mm A"}}</div>
+              </div>
+            </div>
+            {{#unless this.nestedView}}
+              <PillButton
+                {{on "click" (fn this.selectView "linked")}}
+                @class="discrepancy-card__header-btn {{if (eq this.mode "linked") "checked"}}"
+              >
+                Link this version
+              </PillButton>
+            {{/unless}}
+          </div>
+        {{/let}}
+
+        {{#each (if (and this.nestedView this.nestedField.length) this.nestedField @model.baseCard.isolatedFields) as |field|}}
+          {{#if (not (contains field.title this.fieldsNotRendered))}}
+          <div class="discrepancy-field discrepancy-field--base-field {{format-id field.title}} {{this.mode}}-view">
+            <FieldRenderer
+              @mode={{if (eq this.mode "comparison") "comparison" "view"}}
+              @class="discrepancy-field-renderer base-card-field {{if (eq this.mode "comparison") "comp-view"}}"
+              @field={{field}}
+              @showCompHighlights={{if field.tempField true false}}
+              @comparisonType="base"
+              @displayId={{this.model.displayId}}
+              @drillDown={{if (eq this.mode "comparison") (fn @drillDown field)}}
+              @omittedFields={{this.omittedFields}}
+            />
+          </div>
+          <div class="discrepancy-field discrepancy-field--comp-field {{this.mode}}-view">
+            {{#each (if (and this.nestedView this.nestedCompField.length) this.nestedCompField @model.compCard.isolatedFields) as |compField|}}
+              {{#if (eq compField.title field.title)}}
+                {{compute (fn this.compareFields field compField)}}
+                {{#if (and compField.status (eq this.mode "comparison") (not (contains field.title this.omittedFields)))}}
+                  {{#if field.tempField}}
+                    <div class="discrepancy-field__btn-container discrepancy-field__btn-container--toggled">
+                      <IconButton @class="discrepancy-field__btn discrepancy-field__btn--toggled" @icon="carot-thin-left" {{on "click" (fn this.revertField field)}} />
+                    </div>
+                  {{else}}
+                    <div class="discrepancy-field__btn-container">
+                      <IconButton @class="discrepancy-field__btn" @icon="carot-thin-left" {{on "click" (fn this.reconciliateField field compField)}} />
+                    </div>
+                  {{/if}}
+                {{/if}}
+                <FieldRenderer
+                  @mode={{if (eq this.mode "linked") "view" "comparison"}}
+                  @class="discrepancy-field-renderer comp-card-field {{if (eq this.mode "comparison") "comp-view"}}"
+                  @field={{compField}}
+                  @showCompHighlights={{true}}
+                  @comparisonType="comp"
+                  @nestedView={{this.nestedView}}
+                  @displayId={{this.model.displayId}}
+                  @drillDown={{if (eq this.mode "comparison") (fn @drillDown field)}}
+                  @selectChange={{if (eq this.mode "comparison") this.selectChange false}}
+                  @revertChange={{if (eq this.mode "comparison") this.revertChange false}}
+                />
+              {{/if}}
+            {{/each}}
+          </div>
+        {{/if}}
+        {{/each}}
+
+        {{#unless this.nestedView}}
+          <div class="discrepancy-card__footer discrepancy-field--base-field {{this.mode}}-view">
+            <div class="discrepancy__count-btn-container discrepancy__count-btn-container--{{this.mode}} container-left {{if (or (and this.model.count (eq this.mode "comparison")) (eq this.mode "keep-current")) "visible"}}">
+              {{#if (and this.model.count (eq this.mode "comparison"))}}
+                <PillButton @class="discrepancy__count-btn" @variant="primary">
+                  {{#if (eq this.model.count 1)}}
+                    Make 1 change to your version
+                  {{else}}
+                    Make {{this.model.count}} changes to your version
+                  {{/if}}
+                </PillButton>
+              {{else if (eq this.mode "keep-current")}}
+                <PillButton @class="discrepancy__count-btn" @variant="primary" @route={{@exitRoute}} @routeModel="verifi-registry">
+                  Keep current version and exit comparison mode
+                </PillButton>
+              {{/if}}
+            </div>
+          </div>
+
+          <div class="discrepancy-card__footer discrepancy-field--comp-field {{this.mode}}-view">
+            <div class="discrepancy__count-btn-container discrepancy__count-btn-container--{{this.mode}} container-right {{if (eq this.mode "linked") "visible"}}">
+              {{#if (eq this.mode "linked")}}
+                <PillButton @class="discrepancy__count-btn" @variant="primary">
+                  Link this {{lowercase (humanize this.model.compCard.type)}} card
+                </PillButton>
+                <div class="discrepancy__count-btn__link-copy">
+                  Your entry will always reflect the updated version of this
+                  {{lowercase (humanize this.model.compCard.type)}} card.
+                </div>
+              {{/if}}
+            </div>
+          </div>
+        {{/unless}}
+      </div>
+    </div>
+  </div>
+</section>
