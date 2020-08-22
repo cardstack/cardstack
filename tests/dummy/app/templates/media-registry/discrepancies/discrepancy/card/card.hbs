@@ -1,1 +1,9 @@
-{{outlet}}
+<Comparison
+  @model={{this.model}}
+  @nestedView={{true}}
+  @drillDown={{this.drillDown}}
+  @omittedFields={{this.omittedFields}}
+  @fieldsNotRendered={{this.fieldsNotRendered}}
+  @topLevelRoute="media-registry.discrepancies.discrepancy"
+  @exitRoute="media-registry.discrepancies.index"
+/>

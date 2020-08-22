@@ -1,4 +1,32 @@
-import { WCM, AMP, VALENTINO_PR_V1, VALENTINO_PR, EMILIO_PR, MARIA_PR, MUSICAL_WORK_WCM_V2, MUSICAL_WORK_GMR } from "./comp-data";
+import { WCM, AMP, VALENTINO_PR, EMILIO_PR, MARIA_PR, MUSICAL_WORK_WCM_V2, MUSICAL_WORK_GMR } from "./comp-data";
+
+const VALENTINO_SOLANO_V1 = {
+  "id": "valentino-solano",
+  "type": "participant",
+  "title": "Valentino Solano",
+  "imgURL": "/media-registry/profiles/thumb/Valentino-Solano.jpg",
+  "ipi": "00815723492",
+  "pro": "Global Music Rights",
+  "email": "valentino@valsolanomusic.com",
+  "website": "www.valsolanomusic.com",
+  "expandable": true
+};
+
+const VALENTINO_PR_V1 = {
+  id: 'valentino-solano-pr',
+  version: '1',
+  type: 'publishing-representation',
+  writer: VALENTINO_SOLANO_V1,
+  role: 'Lyricist',
+  publisher: {
+    id: 'worldwide',
+    title: 'Worldwide',
+    type: 'territory',
+    value: [ WCM ],
+    publishers: [ WCM ]
+  },
+  "expandable": true
+};
 
 export default {
   id: "the-sun-comes-out-wcm-gmr",
@@ -21,6 +49,7 @@ export default {
       },
       {
         title: "writers",
+        displayTitle: "Writers",
         type: "collection",
         component: "cards/publishing-representation",
         value: [
@@ -74,17 +103,14 @@ export default {
       },
       {
         title: 'publisher',
-        type: 'collection',
+        type: 'card',
         component: 'cards/territory',
-        value: [
-          {
-            id: 'worldwide',
-            title: 'Worldwide',
-            type: 'territory',
-            value: [ WCM, AMP ],
-            publishers: [ WCM, AMP ]
-          }
-        ]
+        value: {
+          id: 'worldwide',
+          title: 'Worldwide',
+          type: 'territory',
+          value: [ WCM, AMP ]
+        }
       },
       {
         title: 'copyright_notice',
@@ -121,10 +147,10 @@ export default {
       },
       {
         title: 'verifi_id',
-        id: '0x7cf232e7c48d6ba5d8bd3101fc7a28071091165de2f1b4542c37e2812d89154be',
         type: 'card',
         component: 'cards/registration-embedded',
         value: {
+          id: '0x7cf232e7c48d6ba5d8bd3101fc7a28071091165de2f1b4542c37e2812d89154be',
           verifi_id: '0x7cf232e7c48d6ba5d8bd3101fc7a28071091165de2f1b4542c37e2812d89154be',
           verifi_reg_date: '2020-06-09',
           asset_type: 'Original work'
@@ -160,17 +186,14 @@ export default {
       },
       {
         title: 'publisher',
-        type: 'collection',
+        type: 'card',
         component: 'cards/territory',
-        value: [
-          {
-            id: 'worldwide',
-            title: 'Worldwide',
-            type: 'territory',
-            value: [ WCM, AMP ],
-            publishers: [ WCM, AMP ]
-          }
-        ]
+        value: {
+          id: 'worldwide',
+          title: 'Worldwide',
+          type: 'territory',
+          value: [ WCM, AMP ]
+        }
       },
       {
         title: 'copyright_notice',

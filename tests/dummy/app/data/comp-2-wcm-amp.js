@@ -1,4 +1,32 @@
-import { WCM, AMP, VALENTINO_PR_V1, EMILIO_PR, MARIA_PR, MUSICAL_WORK_WCM_V1, MUSICAL_WORK_AMP_V1 } from "./comp-data";
+import { WCM, AMP, EMILIO_PR, MARIA_PR, MUSICAL_WORK_WCM_V1, MUSICAL_WORK_AMP_V1 } from "./comp-data";
+
+const VALENTINO_SOLANO_V1 = {
+  "id": "valentino-solano",
+  "type": "participant",
+  "title": "Valentino Solano",
+  "imgURL": "/media-registry/profiles/thumb/Valentino-Solano.jpg",
+  "ipi": "00815723492",
+  "pro": "Global Music Rights",
+  "email": "valentino@valsolanomusic.com",
+  "website": "www.valsolanomusic.com",
+  "expandable": true
+};
+
+const VALENTINO_PR_V1 = {
+  id: 'valentino-solano-pr',
+  version: '1',
+  type: 'publishing-representation',
+  writer: VALENTINO_SOLANO_V1,
+  role: 'Lyricist',
+  publisher: {
+    id: 'worldwide',
+    title: 'Worldwide',
+    type: 'territory',
+    value: [ WCM ],
+    publishers: [ WCM ]
+  },
+  "expandable": true
+};
 
 export default {
   id: "the-sun-comes-out-wcm-amp",
@@ -25,7 +53,14 @@ export default {
         component: "cards/publishing-representation",
         value: [
           VALENTINO_PR_V1,
-          EMILIO_PR
+          EMILIO_PR,
+          {
+            id: 'maria-bianchi-pr',
+            type: null,
+            writer: null,
+            role: null,
+            publisher: null
+          }
         ]
       },
       {
@@ -69,17 +104,14 @@ export default {
       },
       {
         title: 'publisher',
-        type: 'collection',
+        type: 'card',
         component: 'cards/territory',
-        value: [
-          {
-            id: 'worldwide',
-            title: 'Worldwide',
-            type: 'territory',
-            value: [ WCM, AMP ],
-            publishers: [ WCM, AMP ]
-          }
-        ]
+        value: {
+          id: 'worldwide',
+          title: 'Worldwide',
+          type: 'territory',
+          value: [ WCM, AMP ]
+        }
       },
       {
         title: 'copyright_notice',
@@ -155,17 +187,14 @@ export default {
       },
       {
         title: 'publisher',
-        type: 'collection',
+        type: 'card',
         component: 'cards/territory',
-        value: [
-          {
-            id: 'worldwide',
-            title: 'Worldwide',
-            type: 'territory',
-            value: [ WCM, AMP ],
-            publishers: [ WCM, AMP ]
-          }
-        ]
+        value: {
+          id: 'worldwide',
+          title: 'Worldwide',
+          type: 'territory',
+          value: [ WCM, AMP ]
+        }
       },
       {
         title: 'copyright_notice',

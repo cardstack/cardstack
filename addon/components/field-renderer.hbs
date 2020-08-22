@@ -74,105 +74,72 @@
       </div>
     </label>
   {{/if}}
+
 {{else if (eq @mode "comparison")}}
-  {{#let (if @field.tempField @field.tempField @field) as |field|}}
-  {{!-- using temporary field as the field, if available --}}
-    <Boxel @class="field-renderer field-renderer--comparison-mode field-renderer--{{field.type}} {{format-id field.title}}-field {{@class}}">
-      <div class="field-renderer__title">{{humanize field.title}}</div>
-      <div class="field-renderer__value">
-        {{#if (and field.value (eq field.type "card"))}}
-          {{component (or field.component "card") model=field.value mode="view" status=(if @showCompHighlights (if field.status field.status "no-change")) comparisonType=@comparisonType drillDown=@drillDown fieldData=field}}
-        {{else if (eq field.type "collection")}}
-          {{#each (if field.tempCollection field.tempCollection field.value) as |val|}}
-            <Boxel>
-              {{#if (contains val.id @displayId)}}
-                {{#unless @nestedView}}
-                  {{#if @revertChange}}
-                    <div class="field-renderer__btn-container discrepancy-field__btn-container discrepancy-field__btn-container--toggled">
-                      <IconButton @class="discrepancy-field__btn discrepancy-field__btn--toggled" @icon="carot-thin-left" {{on "click" (fn @revertChange val field.title)}} />
-                    </div>
-                  {{/if}}
-                {{/unless}}
-                {{component (or field.component "card") model=val mode=@mode status=(if (or @showCompHighlights val.new) (if val.status val.status "no-change")) comparisonType=@comparisonType drillDown=@drillDown fieldData=field}}
-              {{else}}
-                {{#unless @nestedView}}
-                  {{#if (and @selectChange val.status)}}
-                    <div class="field-renderer__btn-container discrepancy-field__btn-container">
-                      <IconButton @class="discrepancy-field__btn" @icon="carot-thin-left" {{on "click" (fn @selectChange val field.title field.component)}} />
-                    </div>
-                  {{/if}}
-                {{/unless}}
-                {{component (or field.component "card") model=val mode="view" status=(if (or @showCompHighlights val.new) (if val.status val.status "no-change")) comparisonType=@comparisonType drillDown=@drillDown fieldData=field}}
-              {{/if}}
-            </Boxel>
-          {{else}}
-            {{#if (contains field.title @omittedFields)}}
-              N/A
-            {{else}}
-              <CardPlatter @class="field-renderer__card field-renderer__card--blank" />
-            {{/if}}
-          {{/each}}
-        {{else if (and field.value (is-array field.value))}}
+  <Boxel @class="field-renderer field-renderer--comparison-mode field-renderer--{{@field.type}} {{dasherize @field.title}}-field {{@class}}">
+    <div class="field-renderer__title">{{@title}}</div>
+    <div class="field-renderer__value">
+      {{#if (and @field.value (or @field.id (eq @field.type "card")))}}
+        {{component (or @field.component "card") model=@field.value mode="view" status=(if @showCompHighlights (if @field.status @field.status "no-change")) comparisonType=@comparisonType drillDown=@drillDown fieldData=@field}}
+      {{else if (and @field.value (is-array @field.value))}}
+        <Boxel>
+          {{#if @showCompHighlights}}
+            <BoxelHighlight @status={{@field.status}} />
+            <BoxelActions @class="boxel-actions--comparison-mode" @status={{if @field.status @field.status "no-change"}}>
+              <ComparisonModeLabel @status={{@field.status}} @comparisonType={{@comparisonType}} />
+            </BoxelActions>
+          {{/if}}
+          <CardPlatter @class="field-renderer__card">
+            <header class="boxel-card__header">{{if @field.type (humanize @field.type) "text"}}</header>
+            <div class="field-renderer__inner {{if @field.status "" "field-renderer__opacity-control"}}">
+              {{#let (filter-by "title" @field.value) as |multiTagList|}}
+                {{#if multiTagList.length}}
+                  {{#each @field.value as |val|}}
+                    <FieldRenderer
+                      @class="field-renderer__meta-field"
+                      @field={{val}}
+                      @mode="view"
+                    />
+                  {{/each}}
+                {{else}}
+                  <span>
+                    {{#each @field.value as |val|}}
+                      {{val}}{{#if (has-next val @field.value)}}, {{/if}}
+                    {{/each}}
+                  </span>
+                {{/if}}
+              {{/let}}
+            </div>
+          </CardPlatter>
+        </Boxel>
+      {{else}}
+        {{#if @field.value}}
           <Boxel>
             {{#if @showCompHighlights}}
-              <BoxelHighlight @status={{field.status}} />
-              <BoxelActions @class="boxel-actions--comparison-mode" @status={{if field.status field.status "no-change"}}>
-                <ComparisonModeLabel @status={{field.status}} @comparisonType={{@comparisonType}} />
+              <BoxelHighlight @status={{@field.status}} />
+              <BoxelActions @class="boxel-actions--comparison-mode" @status={{if @field.status @field.status "no-change"}}>
+                <ComparisonModeLabel @status={{@field.status}} @comparisonType={{@comparisonType}} />
               </BoxelActions>
             {{/if}}
             <CardPlatter @class="field-renderer__card">
-              <header class="boxel-card__header">{{if field.type (humanize field.type) "text"}}</header>
-              <div class="field-renderer__inner {{if field.status "" "field-renderer__opacity-control"}}">
-                {{#let (filter-by "title" field.value) as |multiTagList|}}
-                  {{#if multiTagList.length}}
-                    {{#each field.value as |val|}}
-                      <FieldRenderer
-                        @class="field-renderer__meta-field"
-                        @field={{val}}
-                        @mode="view"
-                      />
-                    {{/each}}
-                  {{else}}
-                    <span>
-                      {{#each field.value as |val|}}
-                        {{val}}{{#if (has-next val field.value)}}, {{/if}}
-                      {{/each}}
-                    </span>
-                  {{/if}}
-                {{/let}}
+              <header class="boxel-card__header">{{if @field.type (humanize @field.type) "text"}}</header>
+              <div class="field-renderer__inner {{if @field.status "" "field-renderer__opacity-control"}}">
+                {{@field.value}}
               </div>
             </CardPlatter>
           </Boxel>
         {{else}}
-          {{#if field.value}}
-            <Boxel>
-              {{#if @showCompHighlights}}
-                <BoxelHighlight @status={{field.status}} />
-                <BoxelActions @class="boxel-actions--comparison-mode" @status={{if field.status field.status "no-change"}}>
-                  <ComparisonModeLabel @status={{field.status}} @comparisonType={{@comparisonType}} />
-                </BoxelActions>
-              {{/if}}
-              <CardPlatter @class="field-renderer__card">
-                <header class="boxel-card__header">{{if field.type (humanize field.type) "text"}}</header>
-                <div class="field-renderer__inner {{if field.status "" "field-renderer__opacity-control"}}">
-                  {{field.value}}
-                </div>
-              </CardPlatter>
-            </Boxel>
+          {{#if (contains @field.title @omittedFields)}}
+            N/A
           {{else}}
-            {{#if (contains field.title @omittedFields)}}
-              N/A
-            {{else}}
-              <CardPlatter @class="field-renderer__card field-renderer__card--blank" />
-            {{/if}}
+            <CardPlatter @class="field-renderer__card field-renderer__card--blank" />
           {{/if}}
         {{/if}}
-      </div>
-    </Boxel>
-  {{/let}}
+      {{/if}}
+    </div>
+  </Boxel>
 
 {{else}}
-
   {{!-- View Mode --}}
   <Boxel @class="field-renderer field-renderer--{{@field.type}} {{format-id @field.title}}-field {{if (eq @field.format "table") "table-field"}} {{@class}}">
     {{#if (contains @field.title @addedFields)}}

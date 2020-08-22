@@ -1,7 +1,7 @@
-import MediaRegistryDiscrepanciesDiscrepancyCardController from '../../card';
+import MediaRegistryDiscrepanciesDiscrepancyCardController from '../card';
 import { action } from '@ember/object';
 
-export default class MediaRegistryDiscrepanciesDiscrepancyCardCardIndexController extends MediaRegistryDiscrepanciesDiscrepancyCardController {
+export default class MediaRegistryDiscrepanciesDiscrepancyCardCardController extends MediaRegistryDiscrepanciesDiscrepancyCardController {
   @action
   drillDown(field, value) {
     let innerCardCardType = field.title;

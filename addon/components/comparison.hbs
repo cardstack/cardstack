@@ -13,14 +13,6 @@
         <div class="breadcrumbs__item-title">Musical Work</div>
       </LinkTo>
 
-      {{#if @model.grandParentCard.cardType}}
-        <span class="breadcrumbs__carot" />
-        <LinkTo @route={{@model.grandParentCard.route}} @model={{@model.grandParentCard}} @class="breadcrumbs__item breadcrumbs__item--inverse">
-          <div class="breadcrumbs__item-label">Field</div>
-          <div class="breadcrumbs__item-title">{{humanize @model.grandParentCard.cardType}}</div>
-        </LinkTo>
-      {{/if}}
-
       {{#if @model.parentCard.cardType}}
         <span class="breadcrumbs__carot" />
         <LinkTo @route={{@model.parentCard.route}} @model={{@model.parentCard}} @class="breadcrumbs__item breadcrumbs__item--inverse">
@@ -29,13 +21,7 @@
         </LinkTo>
       {{/if}}
 
-      {{#if @model.grandParentCard}}
-        <span class="breadcrumbs__carot" />
-        <div class="breadcrumbs__item breadcrumbs__item--inverse">
-          <div class="breadcrumbs__item-label">{{@model.nestedCompField.type}}</div>
-          <div class="breadcrumbs__item-title">{{@model.nestedCompField.title}}</div>
-        </div>
-      {{else if (and (not @model.grandParentCard) @model.parentCard)}}
+      {{#if @model.parentCard}}
         <span class="breadcrumbs__carot" />
         <div class="breadcrumbs__item breadcrumbs__item--inverse">
           <div class="breadcrumbs__item-label">{{@model.nestedCompField.type}}</div>
@@ -78,7 +64,7 @@
         </div>
         {{#unless this.nestedView}}
           <PillButton
-            {{on "click" this.toggleView}}
+            {{on "click" (fn this.selectView "comparison")}}
             @class="discrepancy-card__header-btn discrepancy-card__header-btn--toggle {{if (eq this.mode "comparison") "checked"}}"
           >
             Resolve discrepancies
@@ -138,51 +124,123 @@
           </div>
         {{/let}}
 
-        {{#each (if (and this.nestedView this.nestedField.length) this.nestedField @model.baseCard.isolatedFields) as |field|}}
-          {{#if (not (contains field.title this.fieldsNotRendered))}}
-          <div class="discrepancy-field discrepancy-field--base-field {{format-id field.title}} {{this.mode}}-view">
-            <FieldRenderer
-              @mode={{if (eq this.mode "comparison") "comparison" "view"}}
-              @class="discrepancy-field-renderer base-card-field {{if (eq this.mode "comparison") "comp-view"}}"
-              @field={{field}}
-              @showCompHighlights={{if field.tempField true false}}
-              @comparisonType="base"
-              @displayId={{this.model.displayId}}
-              @drillDown={{if (eq this.mode "comparison") (fn @drillDown field)}}
-              @omittedFields={{this.omittedFields}}
-            />
-          </div>
-          <div class="discrepancy-field discrepancy-field--comp-field {{this.mode}}-view">
-            {{#each (if (and this.nestedView this.nestedCompField.length) this.nestedCompField @model.compCard.isolatedFields) as |compField|}}
-              {{#if (eq compField.title field.title)}}
-                {{compute (fn this.compareFields field compField)}}
-                {{#if (and compField.status (eq this.mode "comparison") (not (contains field.title this.omittedFields)))}}
-                  {{#if field.tempField}}
-                    <div class="discrepancy-field__btn-container discrepancy-field__btn-container--toggled">
-                      <IconButton @class="discrepancy-field__btn discrepancy-field__btn--toggled" @icon="carot-thin-left" {{on "click" (fn this.revertField field)}} />
-                    </div>
-                  {{else}}
-                    <div class="discrepancy-field__btn-container">
-                      <IconButton @class="discrepancy-field__btn" @icon="carot-thin-left" {{on "click" (fn this.reconciliateField field compField)}} />
-                    </div>
-                  {{/if}}
+        {{#each this.compFieldGroup as |compField|}}
+          {{#if (not (contains compField.title this.fieldsNotRendered))}}
+            {{#with (find-by 'title' compField.title this.baseFieldGroup) as |field|}}
+              <div class="discrepancy-field discrepancy-field--base-field {{compField.title}} {{this.mode}}-view">
+
+                {{#if (eq field.type "collection")}}
+                  {{#let (if (eq this.mode "comparison") "comparison" "view") as |mode|}}
+                    {{#if (or field.tempField.value field.value)}}
+                      {{#each (if field.tempField.value field.tempField.value field.value) as |f i|}}
+                        {{!-- {{compute (fn this.compareFields f (get compField.value i))}} --}}
+                        <Boxel @class="field-renderer field-renderer--{{mode}}-mode field-renderer--{{field.type}} {{dasherize field.title}}-field discrepancy-field-renderer base-card-field {{if (eq mode "comparison") "comp-view"}}" style={{html-safe (concat "height: calc(100%/" compField.value.length ")")}}>
+                          <div class="field-renderer__title">{{#if (eq i 0)}}{{compField.title}}{{/if}}</div>
+                          <div class="field-renderer__value">
+                            <Boxel>
+                            {{#if (or f.type (and (eq mode "comparison") f.tempField))}}
+                              {{component
+                                (or field.component "card")
+                                model=(if (and (eq mode "comparison") f.tempField) f.tempField f)
+                                mode="view"
+                                status=(if (and (eq mode "comparison") f.tempField) (if f.tempField.status f.tempField.status "no-change"))
+                                comparisonType="base"
+                                drillDown=(if (eq mode "comparison") (fn @drillDown field))
+                                fieldData=f}}
+                            {{else}}
+                              <CardPlatter @class="field-renderer__card field-renderer__card--blank" />
+                            {{/if}}
+                            </Boxel>
+                          </div>
+                        </Boxel>
+                      {{/each}}
+                    {{else}}
+                      {{#each compField.value as |f i|}}
+                        <Boxel @class="field-renderer field-renderer--{{mode}}-mode field-renderer--{{field.type}} {{dasherize field.title}}-field discrepancy-field-renderer base-card-field {{if (eq mode "comparison") "comp-view"}}" style={{html-safe (concat "height: calc(100%/" compField.value.length ")")}}>
+                          <div class="field-renderer__title">{{#if (eq i 0)}}{{compField.title}}{{/if}}</div>
+                          <div class="field-renderer__value">
+                            <CardPlatter @class="field-renderer__card field-renderer__card--blank" />
+                          </div>
+                        </Boxel>
+                      {{/each}}
+                    {{/if}}
+                  {{/let}}
+
+                {{else}}
+                  {{compute (fn this.compareFields field compField)}}
+
+                  <FieldRenderer
+                    @mode={{if (eq this.mode "comparison") "comparison" "view"}}
+                    @class="discrepancy-field-renderer base-card-field {{if (eq this.mode "comparison") "comp-view"}}"
+                    @title={{unless compField.collection (humanize compField.title)}}
+                    @field={{if (and field.tempField (eq this.mode "comparison")) field.tempField field}}
+                    @showCompHighlights={{if (or field.tempField field.status) true false}}
+                    @comparisonType="base"
+                    @drillDown={{if (eq this.mode "comparison") (fn @drillDown field)}}
+                    @omittedFields={{this.omittedFields}}
+                  />
                 {{/if}}
-                <FieldRenderer
-                  @mode={{if (eq this.mode "linked") "view" "comparison"}}
-                  @class="discrepancy-field-renderer comp-card-field {{if (eq this.mode "comparison") "comp-view"}}"
-                  @field={{compField}}
-                  @showCompHighlights={{true}}
-                  @comparisonType="comp"
-                  @nestedView={{this.nestedView}}
-                  @displayId={{this.model.displayId}}
-                  @drillDown={{if (eq this.mode "comparison") (fn @drillDown field)}}
-                  @selectChange={{if (eq this.mode "comparison") this.selectChange false}}
-                  @revertChange={{if (eq this.mode "comparison") this.revertChange false}}
-                />
-              {{/if}}
-            {{/each}}
-          </div>
-        {{/if}}
+              </div>
+              <div class="discrepancy-field discrepancy-field--comp-field {{this.mode}}-view">
+
+                {{#if (eq compField.type "collection")}}
+                  {{#let (if (eq this.mode "linked") "view" "comparison") as |mode|}}
+                    {{#each compField.value as |f i|}}
+                      {{compute (fn this.compareFields (get field.value i) f)}}
+
+                      <Boxel @class="field-renderer field-renderer--{{mode}}-mode field-renderer--{{compField.type}} {{dasherize compField.title}}-field discrepancy-field-renderer comp-card-field {{if (eq this.mode "comparison") "comp-view"}}">
+                        <div class="field-renderer__title">{{#if (eq i 0)}}{{compField.title}}{{/if}}</div>
+                        <div class="field-renderer__value">
+                          {{#if (and f.status (eq this.mode "comparison"))}}
+                            {{#if (get (get field.value i) "tempField")}}
+                              <div class="discrepancy-field__btn-container discrepancy-field__btn-container--toggled">
+                                <IconButton @class="discrepancy-field__btn discrepancy-field__btn--toggled" @icon="carot-thin-left" {{on "click" (fn this.revertField (get field.value i) f)}} />
+                              </div>
+                            {{else}}
+                              <div class="discrepancy-field__btn-container">
+                                <IconButton @class="discrepancy-field__btn" @icon="carot-thin-left" {{on "click" (fn this.reconciliateField (get field.value i) f)}} />
+                              </div>
+                            {{/if}}
+                          {{/if}}
+                          {{component
+                            (or compField.component "card")
+                            model=f
+                            mode="view"
+                            status=(if (eq mode "comparison") (if f.status f.status "no-change"))
+                            comparisonType="comp"
+                            drillDown=(if (eq this.mode "comparison") (fn @drillDown field))
+                            fieldData=f}}
+                        </div>
+                      </Boxel>
+                    {{/each}}
+                  {{/let}}
+                {{else}}
+
+                  {{#if (and compField.status (eq this.mode "comparison") (not (contains field.title this.omittedFields)))}}
+                    {{#if field.tempField}}
+                      <div class="discrepancy-field__btn-container discrepancy-field__btn-container--toggled">
+                        <IconButton @class="discrepancy-field__btn discrepancy-field__btn--toggled" @icon="carot-thin-left" {{on "click" (fn this.revertField field)}} />
+                      </div>
+                    {{else}}
+                      <div class="discrepancy-field__btn-container">
+                        <IconButton @class="discrepancy-field__btn" @icon="carot-thin-left" {{on "click" (fn this.reconciliateField field compField)}} />
+                      </div>
+                    {{/if}}
+                  {{/if}}
+                  <FieldRenderer
+                    @mode={{if (eq this.mode "linked") "view" "comparison"}}
+                    @class="discrepancy-field-renderer comp-card-field {{if (eq this.mode "comparison") "comp-view"}}"
+                    @title={{if compField.displayTitle compField.displayTitle (unless compField.collection (humanize compField.title))}}
+                    @field={{compField}}
+                    @showCompHighlights={{true}}
+                    @comparisonType="comp"
+                    @nestedView={{this.nestedView}}
+                    @drillDown={{if (eq this.mode "comparison") (fn @drillDown field)}}
+                  />
+                {{/if}}
+              </div>
+            {{/with}}
+          {{/if}}
         {{/each}}
 
         {{#unless this.nestedView}}

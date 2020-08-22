@@ -6,26 +6,23 @@ export default class MediaRegistryDiscrepanciesDiscrepancyCardRoute extends Rout
 
     let baseField = card.baseCard.isolatedFields.find(el => el.title === cardType);
     let compField = card.compCard.isolatedFields.find(el => el.title === cardType);
-    let baseCard;
-    let compCard;
+    let baseCard = {};
+    let compCard = {};
 
-    let value = baseField.tempField || baseField.tempCollection || baseField.value;
-    if (value) {
-      if (value.length) {
-        baseCard = value.find(el => el.id === cardId);
+    if (baseField.value) {
+      baseCard = baseField.value.length ? baseField.value.find(el => el.id === cardId) : baseField.value;
+    }
+
+    if (baseField.tempField) {
+      if (baseField.tempField.type === 'collection' && baseField.tempField.value) {
+        baseCard.tempField = baseField.tempField.value.length ? baseField.tempField.value.find(el => el.id === cardId) : baseField.tempField.value;
       } else {
-        baseCard = compField.value;
+        baseCard.tempField = baseField.tempField;
       }
-    } else {
-      baseCard = null;
     }
 
     if (compField.value) {
-      if (compField.value.length) {
-        compCard = compField.value.find(el => el.id === cardId);
-      } else {
-        compCard = compField.value;
-      }
+      compCard = compField.value.length ? compField.value.find(el => el.id === cardId) : compField.value;
     } else {
       compCard = null;
     }

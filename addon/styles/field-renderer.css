@@ -246,6 +246,10 @@
   height: auto;
 }
 
+.field-renderer--comparison-mode.field-renderer--collection + .field-renderer--comparison-mode.field-renderer--collection {
+  margin-top: 20px;
+}
+
 .field-renderer__card {
   min-height: auto;
   border: var(--boxel-border);

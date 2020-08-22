@@ -1,16 +1,11 @@
 <Boxel>
   {{#if @status}}
     <BoxelHighlight @status={{@status}} />
-    <BoxelActions @status={{@status}} @class="{{if @comparisonType "boxel-actions--comparison-mode"}} {{if (and @drillDown (not-eq @status "no-change")) "with-expand"}}">
+    <BoxelActions @status={{@status}} @class="{{if @comparisonType "boxel-actions--comparison-mode"}}">
       {{#if @comparisonType}}
-        <ComparisonModeLabel @status={{@status}} @statusText={{@statusText}} @comparisonType={{@comparisonType}} />
+        <ComparisonModeLabel @status={{@status}} @modifiedCount={{@fieldData.modifiedCount}} @statusText={{@statusText}} @comparisonType={{@comparisonType}} />
       {{/if}}
     </BoxelActions>
-    {{#if (and @drillDown (not-eq @status "no-change"))}}
-      <BoxelActions @status={{@status}} @class="boxel-actions__expand">
-        <IconButton @icon="expand" {{on "click" (fn @drillDown @model @fieldData)}} @class="boxel-actions__expand-btn" @aria-label="expand" />
-      </BoxelActions>
-    {{/if}}
   {{/if}}
   <div class={{if (and @status (not-eq @status "no-change")) "territory__wrapper"}}>
     <Card @class="territory-card territory-card--{{@model.id}}" @model={{@model}} @mode="view" />

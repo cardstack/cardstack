@@ -1,36 +1,33 @@
 import Route from '@ember/routing/route';
-import { typeOf } from '@ember/utils';
 
 export default class MediaRegistryDiscrepanciesDiscrepancyCardCardRoute extends Route {
   model({ innerCardType, innerCardId }) {
-    let topLevelCard = this.modelFor('media-registry.discrepancies.discrepancy');
+    let card = this.modelFor('media-registry.discrepancies.discrepancy');
     let parentCard = this.modelFor('media-registry.discrepancies.discrepancy.card');
 
-    let nestedField = parentCard.nestedField ? parentCard.nestedField[innerCardType] : null;
-    let nestedCard = nestedField && nestedField.id === innerCardId ? nestedField : null;
+    let topBaseField = parentCard.nestedField[innerCardType];
+    let topCompField = parentCard.nestedCompField[innerCardType];
 
-    let nestedCompField = parentCard.nestedCompField[innerCardType];
-    let nestedCompCard;
+    let baseCard = {};
+    let compCard = {};
 
-    if (nestedCompField) {
-      let value = nestedCompField.tempField || nestedCompField.tempCollection || nestedCompField.value;
+    if (topBaseField && topBaseField.id === innerCardId) {
+      baseCard = topBaseField;
+    }
 
-      if (nestedCompField.type === 'collection' && value && value.length) {
-        nestedCompCard = value.find(el => el.id === innerCardId);
-      } else if (typeOf(nestedCompField) === 'array' && nestedCompField.length) {
-        nestedCompCard = nestedCompField.find(el => el.id === innerCardId);
-      } else {
-        nestedCompCard = nestedCompField.id === innerCardId ? nestedCompField : null;
-      }
-    } else {
-      nestedCompCard = null;
+    if (parentCard.nestedField.tempField) {
+      baseCard.tempField = parentCard.nestedField.tempField[innerCardType];
+    }
+
+    if (topCompField && topCompField.id === innerCardId) {
+      compCard = topCompField;
     }
 
     return {
-      nestedField: nestedCard,
-      nestedCompField: nestedCompCard,
+      nestedField: baseCard,
+      nestedCompField: compCard,
       parentCard,
-      topLevelCard,
+      topLevelCard: card,
       cardType: innerCardType,
       cardId: innerCardId,
       route: 'media-registry.discrepancies.discrepancy.card.card'

@@ -58,13 +58,14 @@ export const WCM = {
 }
 
 // WRITERS
-export const VALENTINO_SOLANO_V0 = {
+const VALENTINO_SOLANO_V0 = {
   "id": "valentino-solano",
   "type": "participant",
-  "title": "Valentino Solano"
+  "title": "Valentino Solano",
+  "expandable": true
 };
 
-export const VALENTINO_SOLANO_V1 = {
+const VALENTINO_SOLANO_V1 = {
   "id": "valentino-solano",
   "type": "participant",
   "title": "Valentino Solano",
@@ -72,11 +73,12 @@ export const VALENTINO_SOLANO_V1 = {
   "ipi": "00815723492",
   "pro": "Global Music Rights",
   "email": "valentino@valsolanomusic.com",
-  "website": "www.valsolanomusic.com"
+  "website": "www.valsolanomusic.com",
+  "expandable": true
 };
 
-// complete info
-export const VALENTINO_SOLANO = {
+// complete data
+const VALENTINO_SOLANO = {
   "id": "valentino-solano",
   "type": "participant",
   "title": "Valentino Solano",
@@ -84,7 +86,8 @@ export const VALENTINO_SOLANO = {
   "ipi": "00914256714",
   "pro": "Global Music Rights",
   "email": "valentino@valsolanomusic.com",
-  "website": "www.valsolanomusic.com"
+  "website": "www.valsolanomusic.com",
+  "expandable": true
 };
 
 const EMILIO_ROSSO = {
@@ -95,7 +98,8 @@ const EMILIO_ROSSO = {
   "ipi": "00231925374",
   "pro": "Global Music Rights",
   "email": "emilio@rosso.com",
-  "website": null
+  "website": null,
+  "expandable": true
 };
 
 const MARIA_BIANCHI = {
@@ -106,46 +110,13 @@ const MARIA_BIANCHI = {
   "ipi": "00181928972",
   "pro": "Global Music Rights",
   "email": "m.bianchi@gmail.com",
-  "website": null
+  "website": null,
+  "expandable": true
 };
 
 
 // WRITER PUBLISHER REP CARDS
-export const VALENTINO_PR_V0 = {
-  id: 'valentino-solano-pr',
-  version: '0',
-  type: 'publishing-representation',
-  writer: VALENTINO_SOLANO_V0,
-  role: null,
-  publisher: {
-    title: 'publisher',
-    value: null
-  }
-};
-
-export const VALENTINO_PR_V1 = {
-  id: 'valentino-solano-pr',
-  version: '1',
-  type: 'publishing-representation',
-  writer: VALENTINO_SOLANO_V1,
-  role: 'Lyricist',
-  publisher: {
-    title: 'publisher',
-    type: 'collection',
-    component: 'cards/territory',
-    value: [
-      {
-        id: 'worldwide',
-        title: 'Worldwide',
-        type: 'territory',
-        value: [ WCM ],
-        publishers: [ WCM ]
-      }
-    ]
-  }
-};
-
-// complete version
+// complete data
 export const VALENTINO_PR = {
   id: 'valentino-solano-pr',
   version: '2',
@@ -153,19 +124,13 @@ export const VALENTINO_PR = {
   writer: VALENTINO_SOLANO,
   role: 'Lyricist',
   publisher: {
-    title: 'publisher',
-    type: 'collection',
-    component: 'cards/territory',
-    value: [
-      {
-        id: 'worldwide',
-        title: 'Worldwide',
-        type: 'territory',
-        value: [ WCM ],
-        publishers: [ WCM ]
-      }
-    ]
-  }
+    id: 'worldwide',
+    title: 'Worldwide',
+    type: 'territory',
+    value: [ WCM ],
+    publishers: [ WCM ]
+  },
+  "expandable": true
 };
 
 export const EMILIO_PR = {
@@ -174,19 +139,13 @@ export const EMILIO_PR = {
   writer: EMILIO_ROSSO,
   role: 'Composer',
   publisher: {
-    title: 'publisher',
-    type: 'collection',
-    component: 'cards/territory',
-    value: [
-      {
-        id: 'worldwide',
-        title: 'Worldwide',
-        type: 'territory',
-        value: [ AMP ],
-        publishers: [ AMP ]
-      }
-    ]
-  }
+    id: 'worldwide',
+    title: 'Worldwide',
+    type: 'territory',
+    value: [ AMP ],
+    publishers: [ AMP ]
+  },
+  "expandable": true
 }
 
 export const MARIA_PR = {
@@ -195,19 +154,13 @@ export const MARIA_PR = {
   writer: MARIA_BIANCHI,
   role: 'Composer',
   publisher: {
-    title: 'publisher',
-    type: 'collection',
-    component: 'cards/territory',
-    value: [
-      {
-        id: 'worldwide',
-        title: 'Worldwide',
-        type: 'territory',
-        value: [ AMP ],
-        publishers: [ AMP ]
-      }
-    ]
-  }
+    id: 'worldwide',
+    title: 'Worldwide',
+    type: 'territory',
+    value: [ AMP ],
+    publishers: [ AMP ]
+  },
+  "expandable": true
 };
 
 

@@ -3,8 +3,7 @@ import { action } from '@ember/object';
 
 export default class MediaRegistryDiscrepanciesDiscrepancyCardController extends Controller {
   omittedFields = ['verifi_id'];
-  fieldsNotRendered = ['id', 'type', 'status', 'new', 'version', 'fields', 'modifiedCount'];
-  cardTypes = ['participant', 'file', 'registration', 'publishing-representation', 'territory' ];
+  fieldsNotRendered = ['id', 'type', 'status', 'new', 'version', 'fields', 'modifiedCount', 'component', 'expandable'];
 
   @action
   drillDown(field, value) {

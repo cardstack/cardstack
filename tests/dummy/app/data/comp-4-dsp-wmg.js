@@ -19,8 +19,32 @@ export default {
         value: null
       },
       {
-        title: 'writers',
-        value: null
+        title: "writers",
+        type: "collection",
+        component: "cards/publishing-representation",
+        value: [
+          {
+            id: 'valentino-solano-pr',
+            type: null,
+            writer: null,
+            role: null,
+            publisher: null
+          },
+          {
+            id: 'emilio-rosso-pr',
+            type: null,
+            writer: null,
+            role: null,
+            publisher: null
+          },
+          {
+            id: 'maria-bianchi-pr',
+            type: null,
+            writer: null,
+            role: null,
+            publisher: null
+          }
+        ]
       },
       {
         title: 'iswc',
@@ -76,10 +100,10 @@ export default {
       },
       {
         title: 'verifi_id',
-        id: '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
         type: 'card',
         component: 'cards/registration-embedded',
         value: {
+          id: '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
           verifi_id: '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
           verifi_reg_date: '2019-11-11',
           asset_type: 'Original work'
@@ -115,17 +139,14 @@ export default {
       },
       {
         title: 'publisher',
-        type: 'collection',
+        type: 'card',
         component: 'cards/territory',
-        value: [
-          {
-            id: 'worldwide',
-            title: 'Worldwide',
-            type: 'territory',
-            value: [ WCM, AMP ],
-            publishers: [ WCM, AMP ]
-          }
-        ]
+        value: {
+          id: 'worldwide',
+          title: 'Worldwide',
+          type: 'territory',
+          value: [ WCM, AMP ]
+        }
       },
       {
         title: 'copyright_notice',

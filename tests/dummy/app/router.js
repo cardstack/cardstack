@@ -24,9 +24,7 @@ Router.map(function() {
     this.route('discrepancies', function() {
       this.route('discrepancy', { path: '/:compId' }, function() {
         this.route('card', { path: '/:cardType/:cardId' }, function() {
-          this.route('card', { path: '/:innerCardType/:innerCardId' }, function() {
-            this.route('card', { path: '/:innerCardCardType/:innerCardCardId' });
-          });
+          this.route('card', { path: '/:innerCardType/:innerCardId' });
         });
       });
     });
