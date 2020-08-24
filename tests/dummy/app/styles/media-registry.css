@@ -1,6 +1,6 @@
 .media-registry {
-  --header-background: #FF1D6C;
-  --header-logo-size-sm: 25px 34px;
+  --header-background: #000;
+  --header-logo-size-sm: 35px 35px;
 
   height: 100%;
   display: grid;
@@ -9,6 +9,11 @@
   background-color: #F5F5F5;
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp-lg);
+}
+
+.media-registry.media-registry--bunny_records {
+  --header-background: #FF1D6C;
+  --header-logo-size-sm: 25px 34px;
 }
 
 .media-registry.media-registry--crd_records {

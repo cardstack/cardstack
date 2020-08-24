@@ -114,12 +114,14 @@
               </div>
             </div>
             {{#unless this.nestedView}}
-              <PillButton
-                {{on "click" (fn this.selectView "linked")}}
-                @class="discrepancy-card__header-btn {{if (eq this.mode "linked") "checked"}}"
-              >
-                Link this version
-              </PillButton>
+              {{#unless this.model.baseCard.isPublisher}}
+                <PillButton
+                  {{on "click" (fn this.selectView "linked")}}
+                  @class="discrepancy-card__header-btn {{if (eq this.mode "linked") "checked"}}"
+                >
+                  Link this version
+                </PillButton>
+              {{/unless}}
             {{/unless}}
           </div>
         {{/let}}
@@ -247,7 +249,7 @@
           <div class="discrepancy-card__footer discrepancy-field--base-field {{this.mode}}-view">
             <div class="discrepancy__count-btn-container discrepancy__count-btn-container--{{this.mode}} container-left {{if (or (and this.model.count (eq this.mode "comparison")) (eq this.mode "keep-current")) "visible"}}">
               {{#if (and this.model.count (eq this.mode "comparison"))}}
-                <PillButton @class="discrepancy__count-btn" @variant="primary">
+                <PillButton @class="discrepancy__count-btn" @variant="primary" @route={{@workRoute}} @routeModel={{this.model.baseCard.nextId}}>
                   {{#if (eq this.model.count 1)}}
                     Make 1 change to your version
                   {{else}}
@@ -255,7 +257,7 @@
                   {{/if}}
                 </PillButton>
               {{else if (eq this.mode "keep-current")}}
-                <PillButton @class="discrepancy__count-btn" @variant="primary" @route={{@exitRoute}} @routeModel="verifi-registry">
+                <PillButton @class="discrepancy__count-btn" @variant="primary" @route={{@workRoute}} @routeModel={{this.model.baseCard.id}}>
                   Keep current version and exit comparison mode
                 </PillButton>
               {{/if}}
@@ -265,7 +267,7 @@
           <div class="discrepancy-card__footer discrepancy-field--comp-field {{this.mode}}-view">
             <div class="discrepancy__count-btn-container discrepancy__count-btn-container--{{this.mode}} container-right {{if (eq this.mode "linked") "visible"}}">
               {{#if (eq this.mode "linked")}}
-                <PillButton @class="discrepancy__count-btn" @variant="primary">
+                <PillButton @class="discrepancy__count-btn" @variant="primary" @route={{@workRoute}} @routeModel={{this.model.baseCard.nextId}}>
                   Link this {{lowercase (humanize this.model.compCard.type)}} card
                 </PillButton>
                 <div class="discrepancy__count-btn__link-copy">

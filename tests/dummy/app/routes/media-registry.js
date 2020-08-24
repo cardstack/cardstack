@@ -8,11 +8,21 @@ export default class MediaRegistryRoute extends Route {
   orgs = ORGS;
 
   async model({ id }) {
+    if (id === 'wmg' || id === 'verifi-registry') {
+      id = 'wmg';
+    }
+
+    if (id === 'media-registry') {
+      id = DEFAULT_LABEL;
+    }
+
+    let masterData = this.orgs.filter(el => el.id === id)[0];
+
     if (id !== DEFAULT_LABEL && id !== 'crd_records') {
       id = DEFAULT_LABEL;
     }
+
     let collection = await fetchCollection(`${id}_collections`);
-    let masterData = this.orgs.filter(el => el.id === id)[0];
 
     return {
       title: 'Master Recordings',

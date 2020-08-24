@@ -1,5 +1,5 @@
 
-import { WCM, AMP, EMILIO_PR, MUSICAL_WORK_WMG_V1, MUSICAL_WORK_WCM_V1 } from "./comp-data";
+import { WCM, AMP, EMILIO_PR } from "./comp-data";
 
 const VALENTINO_SOLANO_V0 = {
   "id": "valentino-solano",
@@ -52,13 +52,13 @@ export default {
   baseOwner: 'Warner Music Group',
   compOwner: 'Warner Chappell Music',
   baseCard: {
-    card: MUSICAL_WORK_WMG_V1,
     type: 'musical-work',
     owner: 'Warner Music Group',
     ownerId: 'wmg',
     iconURL: '/media-registry/wmg-logo.svg',
     datetime: '2020-04-08T10:45',
-    id: MUSICAL_WORK_WMG_V1.id,
+    id: "the-sun-comes-out-wmg-v1",
+    nextId: "the-sun-comes-out-wmg-v2",
     isolatedFields: [
       {
         title: "title",
@@ -113,13 +113,12 @@ export default {
     ]
   },
   compCard: {
-    card: MUSICAL_WORK_WCM_V1,
     type: 'musical-work',
     owner: 'Warner Chappell Music',
     ownerId: 'wcm',
     iconURL: '/media-registry/wcm-logo.png',
     datetime: '2019-11-11T13:54',
-    id: MUSICAL_WORK_WCM_V1.id,
+    id: "the-sun-comes-out-wcm-v1",
     isolatedFields: [
       {
         title: "title",

@@ -1,0 +1,46 @@
+<section class="media-registry media-registry--{{@model.ownerId}}">
+  <aside class="media-registry__left-edge">
+    <LeftEdgeNav />
+  </aside>
+
+  <header class="media-registry__header media-registry__header--sm">
+    <h1 class="media-registry__title">
+      <span class="media-registry__logo" style={{css-url "background-image" @model.iconURL}} />
+      <span>{{@model.owner}}</span>
+    </h1>
+    <input class="media-registry__search-bar" type="search" placeholder="Search" />
+    <nav class="media-registry__nav">
+      <ul>
+        <li><LinkTo @class="unselected" @route="media-registry" @model="media-registry">Masters</LinkTo></li>
+        <li><LinkTo @class="unselected" @route="media-registry.agreements" @model="media-registry">Agreements</LinkTo></li>
+        <li><LinkTo @route="media-registry.discrepancies.index" @model="verifi-registry">Discrepancies</LinkTo></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="media-registry__outlet">
+    <DetailTemplate>
+      <Breadcrumbs>
+        <LinkTo @route="media-registry.item" @model={{format-id @model.title}} @class="breadcrumbs__item">
+          <div class="breadcrumbs__item-label">Master Detail</div>
+          <div class="breadcrumbs__item-title">{{@model.title}}</div>
+        </LinkTo>
+      </Breadcrumbs>
+
+      <DetailCard
+        @headerFields={{this.headerFields}}
+        @fields={{@model.isolatedFields}}
+        @label="Musical Work"
+        @mode="view"
+      >
+        <BoxelActions
+          @class="media-collection__btn-overlay"
+          @displayHighlightActions={{true}}
+          @btnLeft="mode-btn"
+          @btnLeftContent="Edit"
+          @btnRight="settings"
+        />
+      </DetailCard>
+    </DetailTemplate>
+  </div>
+</section>

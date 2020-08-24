@@ -1,4 +1,4 @@
-import { WCM, AMP, EMILIO_PR, MARIA_PR, MUSICAL_WORK_WCM_V1, MUSICAL_WORK_AMP_V1 } from "./comp-data";
+import { WCM, AMP, EMILIO_PR, MARIA_PR } from "./comp-data";
 
 const VALENTINO_SOLANO_V1 = {
   "id": "valentino-solano",
@@ -35,13 +35,14 @@ export default {
   baseOwner: 'Warner Chappell Music',
   compOwner: 'Allegro Music Publishing',
   baseCard: {
-    card: MUSICAL_WORK_WCM_V1,
+    isPublisher: true,
+    id: 'the-sun-comes-out-wcm-v1',
+    nextId: 'the-sun-comes-out-wcm-v2',
     type: 'musical-work',
     owner: 'Warner Chappell Music',
     ownerId: 'wcm',
     iconURL: '/media-registry/wcm-logo.png',
     datetime: '2019-11-11T13:54',
-    id: MUSICAL_WORK_WCM_V1.id,
     isolatedFields: [
       {
         title: "title",
@@ -120,13 +121,12 @@ export default {
     ]
   },
   compCard: {
-    card: MUSICAL_WORK_AMP_V1,
+    id: 'the-sun-comes-out-amp',
     type: 'musical-work',
     owner: 'Allegro Music Publishing',
     ownerId: 'amp',
     iconURL: '/media-registry/amp-logo.png',
     datetime: '2020-05-18T11:36',
-    id: MUSICAL_WORK_AMP_V1.id,
     isolatedFields: [
       {
         title: "title",
@@ -148,10 +148,10 @@ export default {
       },
       {
         title: 'verifi_id',
-        id: '0x31ef32b4c27f6ca5d6bd6201fa7c14071228965dc2f1b4328c22e5609e8912ab4',
         type: 'card',
         component: 'cards/registration-embedded',
         value: {
+          id: '0x31ef32b4c27f6ca5d6bd6201fa7c14071228965dc2f1b4328c22e5609e8912ab4',
           verifi_id: '0x31ef32b4c27f6ca5d6bd6201fa7c14071228965dc2f1b4328c22e5609e8912ab4',
           verifi_reg_date: '2020-05-18',
           asset_type: 'Original work'

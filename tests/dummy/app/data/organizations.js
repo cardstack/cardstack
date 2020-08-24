@@ -130,5 +130,83 @@ export default [
           }
         ]
       }
-    }
+    },
+    {
+      id: 'wmg',
+      company: 'Warner Music Group',
+      iconURL: '/media-registry/wmg-logo.svg',
+      logoURL: '/media-registry/wmg-logo.svg',
+      user:  {
+        name: "Lisa Track",
+        title: "Administrator",
+        imgURL: "/media-registry/profiles/Lisa-Track.jpg",
+        queueCards: [
+          {
+            id: "1",
+            status: "open",
+            title: "Catalog transfer",
+            description: "Catalog transfer from Bunny Records to CRD Records for 16 masters",
+            datetime: "2020-08-31T14:46",
+            projectTitle: "Rights transfer, CRD Records",
+            progressPct: 20
+          },
+          {
+            id: "2",
+            status: "needs-response",
+            title: "Interesting band | Jelly Club",
+            datetime: "2020-08-31T13:26",
+            projectTitle: "Potential artist, Hard rock",
+            progressPct: 40,
+          },
+          {
+            id: "3",
+            status: "needs-response",
+            title: "Cover art | GG Greatest Hits",
+            datetime: "2020-08-25T17:02",
+            projectTitle: "New album, Golden Girl",
+            progressPct: 40,
+          },
+          {
+            id: "4",
+            status: "closed",
+            title: "Agreements | BB Clarke",
+            datetime: "2020-08-20T15:11",
+            projectTitle: "Rights transfer, CRD Records",
+            progressPct: 100,
+          },
+          {
+            id: "5",
+            status: "closed",
+            title: "Agreements | Pia Midina",
+            datetime: "2020-07-31T11:40",
+            projectTitle: "Rights transfer, CRD Records",
+            progressPct: 100,
+          },
+          {
+            id: "6",
+            status: "recent",
+            title: "Registration | GG Greatest Hits",
+            datetime: "2020-07-30T09:22",
+            projectTitle: " New album, Golden Girl",
+            progressPct: 40,
+          },
+          {
+            id: "7",
+            status: "closed",
+            title: "Request | Pia Midina",
+            datetime: "2020-07-16T13:38",
+            projectTitle: "Rights transfer, CRD Records",
+            progressPct: 100,
+          },
+          {
+            id: "8",
+            status: "recent",
+            title: "Tracks | GG Greatest Hits",
+            datetime: "2020-07-15T12:21",
+            projectTitle: " New album, Golden Girl",
+            progressPct: 40
+          }
+        ]
+      }
+    },
   ];

@@ -13,6 +13,7 @@ export default {
     iconURL: '/media-registry/deezer-logo.png',
     datetime: '2020-07-10T14:24',
     id: 'dsp-the-sun-comes-out',
+    nextId: 'dzr-the-sun-comes-out',
     isolatedFields: [
       {
         title: 'title',
@@ -103,9 +104,9 @@ export default {
         type: 'card',
         component: 'cards/registration-embedded',
         value: {
-          id: '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
-          verifi_id: '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
-          verifi_reg_date: '2019-11-11',
+          id: '0x2b4932f7c27d6ca5d8bd5601ba7c28071221165ac2f1b7928c22c2809d24183ca',
+          verifi_id: '0x2b4932f7c27d6ca5d8bd5601ba7c28071221165ac2f1b7928c22c2809d24183ca',
+          verifi_reg_date: '2020-04-08',
           asset_type: 'Original work'
         }
       },

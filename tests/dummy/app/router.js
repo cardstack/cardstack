@@ -20,6 +20,9 @@ Router.map(function() {
     this.route('products', function() {
       this.route('album', { path: '/:albumId' });
     });
+    this.route('musical-works', function() {
+      this.route('work', { path: '/:workId' });
+    });
     this.route('versions', { path: '/:itemId/versions' });
     this.route('discrepancies', function() {
       this.route('discrepancy', { path: '/:compId' }, function() {

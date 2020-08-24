@@ -37,6 +37,10 @@ export default class MusicalWorkEmbedded extends Component {
 
   @action
   transitionToMusicalWork() {
-    this.router.transitionTo('media-registry.item.musical-work', formatId(this.args.model.title));
+    if (formatId(this.args.model.title) === 'the-sun-comes-out') {
+      this.router.transitionTo('media-registry.musical-works.work', 'the-sun-comes-out-wmg-v1');
+    } else {
+      this.router.transitionTo('media-registry.item.musical-work', formatId(this.args.model.title));
+    }
   }
 }

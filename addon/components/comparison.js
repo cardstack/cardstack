@@ -181,8 +181,11 @@ export default class ComparisonComponent extends Component {
 
   @action
   compareFields(field, compField) {
+    this.setCompFieldDiffCount(field, compField);
+
     if (!field.type && compField.type) {
       set(compField, 'status', 'added');
+
       return;
     }
 
@@ -195,10 +198,14 @@ export default class ComparisonComponent extends Component {
     });
 
     if (json1 === json2 || (!field.value && !compField.value && !field.id && !compField.id)) {
+      set(compField, 'modifiedCount', 0);
+      set(compField, 'status', null);
       return;
     }
 
     if (!field.type && field.value === compField.value) {
+      set(compField, 'modifiedCount', 0);
+      set(compField, 'status', null);
       return;
     }
 
@@ -213,39 +220,49 @@ export default class ComparisonComponent extends Component {
     } // removed
 
     set(compField, 'status', 'modified');
-
-    // || compField.value.expandable
-    if (compField.expandable ) {
-      let numChanges;
-      if (!this.nestedView && field.tempField) {
-        numChanges = this.diffCounter(0, field.tempField, compField);
-      } else {
-        numChanges = this.diffCounter(0, field, compField);
-      }
-
-      set(compField, 'modifiedCount', numChanges);
-      if (numChanges === 0) {
-        set(compField, 'status', null);
-      }
+    if (compField.modifiedCount === 0) {
+      set(compField, 'status', null);
     }
 
     return;
   }
 
   @action
+  setCompFieldDiffCount(field, compField) {
+    if (compField.expandable) {
+      let numChanges;
+      // if (!this.nestedView && field.tempField) {
+      //   numChanges = this.diffCounter(0, field.tempField, compField);
+      // } else {
+        numChanges = this.diffCounter(0, field, compField);
+      // }
+
+      set(compField, 'modifiedCount', numChanges);
+      if (numChanges === 0) {
+        set(compField, 'status', null);
+      }
+    }
+  }
+
+  @action
   diffCounter(count, field, compField) {
     for (let f in compField) {
       if (!this.fieldsNotRendered.includes(f)) {
-        if (field[f] && compField[f] && compField[f].expandable) {
+        if (compField[f] && compField[f].expandable) {
           count += this.diffCounter(count, field[f], compField[f]);
         }
-        else if ((!field && compField) || field[f] !== compField[f]) {
-          if (field[f] && compField[f] && f === 'publisher') {
+        else if (!field && !compField || !field && !compField[f]) {
+          count;
+        }
+        else if (f === 'publisher') {
+          if ((!field && compField) || (!field[f] && compField[f])) {
+            count++;
+          } else {
             count;
           }
-          else {
-            count++;
-          }
+        }
+        else if ((!field && compField) || field[f] !== compField[f]) {
+          count++;
         }
       }
     }
@@ -370,18 +387,22 @@ export default class ComparisonComponent extends Component {
         set(this.model.topLevelCard, 'count', this.count);
       }
     } else {
-      if (field.expandable) {
+      if (field.expandable || compField.expandable) {
         let numDiff = this.diffCounter(0, field, compField);
+        let modCount = field.modifiedCount;
 
-        if (numDiff > 0) {
-          let modCount = field.modifiedCount;
-          modCount = modCount - numDiff;
-          if (modCount < -1) {
-            modCount = 0;
-          }
-          set(field, 'modifiedCount', modCount);
+        if (modCount && modCount >= numDiff) {
+          set(field, 'modifiedCount', modCount - numDiff);
+          this.count = this.count - modCount;
         }
-        this.count = this.count - numDiff;
+        else if (!modCount) {
+          set(field, 'modifiedCount', 0);
+          this.count = 0;
+        }
+        else {
+          set(field, 'modifiedCount', 0);
+          this.count = this.count - numDiff;
+        }
       } else {
         this.count--;
       }

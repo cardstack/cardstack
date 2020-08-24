@@ -1,5 +1,21 @@
 [
   {
+    "song_title": "The Sun Comes Out",
+    "artist": "Bella Swan",
+    "album": "The Sun Comes Out",
+    "cover_art": "media-registry/covers/The-Sun-Comes-Out.jpg",
+    "cover_art_thumb": "media-registry/covers/thumb/The-Sun-Comes-Out.jpg",
+    "cover_art_medium": "media-registry/covers/medium/The-Sun-Comes-Out.jpg",
+    "cover_art_large": "media-registry/covers/large/The-Sun-Comes-Out.jpg",
+    "type_of_album": "Single",
+    "genre": "Pop",
+    "length": "2:58",
+    "catalog": [],
+    "catalogSubtitles": [],
+    "catalogCounts": [],
+    "owner": "Warner Music Group"
+  },
+  {
     "song_title": "13 hours",
     "artist": "Golden Girl",
     "album": "Love the Love",

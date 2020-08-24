@@ -1,5 +1,20 @@
 [
   {
+    "id": "the-sun-comes-out",
+    "type": "musical-work",
+    "title": "The Sun Comes Out",
+    "artist": "Valentino Solano",
+    "artist_id": null,
+    "composer": null,
+    "composer_id": null,
+    "iswc": "T-070237182-9",
+    "verifi_id": "0x2b4932f7c27d6ca5d8bd5601ba7c28071221165ac2f1b7928c22c2809d24183ca",
+    "version_type": "Original work",
+    "publisher": null,
+    "copyright_notice": null
+  },
+  {
+    "id": "you-make-me-crazy",
     "type": "musical-work",
     "title": "You make me crazy",
     "artist": "Pia Midina",
@@ -13,6 +28,7 @@
     "copyright_notice": "© 2019 RealTunes Publishing"
   },
   {
+    "id": "you-do-it-all",
     "type": "musical-work",
     "title": "You do it all",
     "artist": "Pia Midina",
@@ -26,6 +42,7 @@
     "copyright_notice": "© 2019 RealTunes Publishing"
   },
   {
+    "id": "you-are-the-one",
     "type": "musical-work",
     "title": "You are the one",
     "artist": "Pia Midina",
@@ -39,6 +56,7 @@
     "copyright_notice": "© 2019 RealTunes Publishing"
   },
   {
+    "id": "yesterday-was-my-favorite-day",
     "type": "musical-work",
     "title": "Yesterday was my favorite day",
     "artist": "Pia Midina",
@@ -52,6 +70,7 @@
     "copyright_notice": "© 2019 RealTunes Publishing"
   },
   {
+    "id": "veto-power",
     "type": "musical-work",
     "title": "Veto power",
     "artist": "Pia Midina",
@@ -65,6 +84,7 @@
     "copyright_notice": "© 2019 RealTunes Publishing"
   },
   {
+    "id": "using-you",
     "type": "musical-work",
     "title": "Using you",
     "artist": "Pia Midina",
@@ -78,6 +98,7 @@
     "copyright_notice": "© 2019 RealTunes Publishing"
   },
   {
+    "id": "three-wishes",
     "type": "musical-work",
     "title": "Three wishes",
     "artist": "Pia Midina",
@@ -91,6 +112,7 @@
     "copyright_notice": "© 2019 RealTunes Publishing"
   },
   {
+    "id": "the-prom-dress",
     "type": "musical-work",
     "title": "The prom dress",
     "artist": "Pia Midina",
@@ -104,6 +126,7 @@
     "copyright_notice": "© 2019 RealTunes Publishing"
   },
   {
+    "id": "the-leaves-are-changing-color",
     "type": "musical-work",
     "title": "The leaves are changing color",
     "artist": "Pia Midina",
@@ -117,6 +140,7 @@
     "copyright_notice": "© 2020 RealTunes Publishing"
   },
   {
+    "id": "sunshine-and-moonlight",
     "type": "musical-work",
     "title": "Sunshine and moonlight",
     "artist": "Pia Midina",
@@ -130,6 +154,7 @@
     "copyright_notice": "© 2019 RealTunes Publishing"
   },
   {
+    "id": "my-heart-beats-for-you",
     "type": "musical-work",
     "title": "My heart beats for you",
     "artist": "Pia Midina",
@@ -143,6 +168,7 @@
     "copyright_notice": "© 2019 RealTunes Publishing"
   },
   {
+    "id": "leave-the-door-open",
     "type": "musical-work",
     "title": "Leave the door open",
     "artist": "Pia Midina",
@@ -156,6 +182,7 @@
     "copyright_notice": "© 2020 RealTunes Publishing"
   },
   {
+    "id": "keep-hope-alive",
     "type": "musical-work",
     "title": "Keep hope alive",
     "artist": "Pia Midina",
@@ -169,6 +196,7 @@
     "copyright_notice": "© 2019 RealTunes Publishing"
   },
   {
+    "id": "full-moon",
     "type": "musical-work",
     "title": "Full moon",
     "artist": "Pia Midina",
@@ -182,6 +210,7 @@
     "copyright_notice": "© 2019 RealTunes Publishing"
   },
   {
+    "id": "change-is-good",
     "type": "musical-work",
     "title": "Change is good",
     "artist": "Pia Midina",
@@ -195,6 +224,7 @@
     "copyright_notice": "© 2019 RealTunes Publishing"
   },
   {
+    "id": "a-day-to-sing",
     "type": "musical-work",
     "title": "A day to sing",
     "artist": "Pia Midina",
