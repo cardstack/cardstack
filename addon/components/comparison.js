@@ -8,7 +8,7 @@ export default class ComparisonComponent extends Component {
   @tracked compFieldGroup = [];
   @tracked count;
   @tracked removed = [];
-  @tracked mode = 'comparison';
+  @tracked mode = 'keep-current';
   @tracked nestedView = this.args.nestedView;
   fieldsNotRendered = this.args.fieldsNotRendered;
   omittedFields = this.args.omittedFields;
@@ -16,7 +16,7 @@ export default class ComparisonComponent extends Component {
   @action
   adjustCount() {
     this.model = Object.assign({}, this.args.model);
-    this.mode = 'comparison';
+    this.mode = 'keep-current';
     this.nestedView = false;
     this.baseFieldGroup = this.model.baseCard.isolatedFields;
     this.compFieldGroup = this.model.compCard.isolatedFields;
