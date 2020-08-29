@@ -1,6 +1,6 @@
 [
   {
-    "song_title": "The Sun Comes Out",
+    "title": "The Sun Comes Out",
     "artist": "Bella Swan",
     "album": "The Sun Comes Out",
     "type_of_album": "Single",
@@ -32,7 +32,7 @@
     "background_singer": ""
   },
   {
-    "song_title": "A day to sing",
+    "title": "A day to sing",
     "artist": "Pia Midina",
     "album": "Sunlight",
     "type_of_album": "EP",
@@ -77,7 +77,7 @@
     "background_singer": "Jenny Sparks, Sophia Lanagan, Helen Gellar"
   },
   {
-    "song_title": "Change is good",
+    "title": "Change is good",
     "artist": "Pia Midina",
     "album": "Change is good",
     "type_of_album": "Single",
@@ -107,7 +107,7 @@
     "background_singer": "Jenny Sparks, Sophia Lanagan, Helen Gellar"
   },
   {
-    "song_title": "Full moon",
+    "title": "Full moon",
     "artist": "Pia Midina",
     "album": "Full moon",
     "type_of_album": "Single",
@@ -137,7 +137,7 @@
     "background_singer": "Jenny Sparks, Sophia Lanagan, Helen Gellar"
   },
   {
-    "song_title": "Keep hope alive",
+    "title": "Keep hope alive",
     "artist": "Pia Midina",
     "album": "Love never dies",
     "type_of_album": "EP",
@@ -167,7 +167,7 @@
     "background_singer": "Jenny Sparks, Sophia Lanagan, Helen Gellar"
   },
   {
-    "song_title": "Leave the door open",
+    "title": "Leave the door open",
     "artist": "Pia Midina",
     "album": "Leave the door open",
     "type_of_album": "Single",
@@ -197,7 +197,7 @@
     "background_singer": "Jenny Sparks, Sophia Lanagan, Helen Gellar"
   },
   {
-    "song_title": "My heart beats for you",
+    "title": "My heart beats for you",
     "artist": "Pia Midina",
     "album": "Love never dies",
     "type_of_album": "EP",
@@ -227,7 +227,7 @@
     "background_singer": "Jenny Sparks, Sophia Lanagan, Helen Gellar"
   },
   {
-    "song_title": "Sunshine and moonlight",
+    "title": "Sunshine and moonlight",
     "artist": "Pia Midina",
     "album": "Sunlight",
     "type_of_album": "EP",
@@ -257,7 +257,7 @@
     "background_singer": "Jenny Sparks, Sophia Lanagan, Helen Gellar"
   },
   {
-    "song_title": "The leaves are changing color",
+    "title": "The leaves are changing color",
     "artist": "Pia Midina",
     "album": "Autumn Leaves",
     "type_of_album": "EP",
@@ -304,7 +304,7 @@
     "background_singer": "Jenny Sparks, Sophia Lanagan, Helen Gellar"
   },
   {
-    "song_title": "The leaves are changing color (dance remix)",
+    "title": "The leaves are changing color (dance remix)",
     "artist": "Pia Midina",
     "album": "Autumn Leaves",
     "type_of_album": "EP",
@@ -334,7 +334,7 @@
     "background_singer": "Jenny Sparks, Sophia Lanagan, Helen Gellar"
   },
   {
-    "song_title": "The prom dress",
+    "title": "The prom dress",
     "artist": "Pia Midina",
     "album": "Graduation day",
     "type_of_album": "EP",
@@ -364,7 +364,7 @@
     "background_singer": "Jenny Sparks, Sophia Lanagan, Helen Gellar"
   },
   {
-    "song_title": "Three wishes",
+    "title": "Three wishes",
     "artist": "Pia Midina",
     "album": "Graduation day",
     "type_of_album": "EP",
@@ -394,7 +394,7 @@
     "background_singer": "Jenny Sparks, Sophia Lanagan, Helen Gellar"
   },
   {
-    "song_title": "Yesterday was my favorite day",
+    "title": "Yesterday was my favorite day",
     "artist": "Pia Midina",
     "album": "Sunlight",
     "type_of_album": "EP",
@@ -424,7 +424,7 @@
     "background_singer": "Jenny Sparks, Sophia Lanagan, Helen Gellar"
   },
   {
-    "song_title": "You are the one",
+    "title": "You are the one",
     "artist": "Pia Midina",
     "album": "Love never dies",
     "type_of_album": "EP",
@@ -454,13 +454,13 @@
     "background_singer": "Jenny Sparks, Sophia Lanagan, Helen Gellar"
   },
   {
-    "song_title": "Baby boy",
+    "title": "Baby boy",
     "artist": "BB Clarke",
     "album": "Animals",
     "type_of_album": "Album",
     "genre": "Rock",
     "length": "3:03",
-    "year": 2019,
+    "year": "2019",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc": "US-S1Z-17-34980",
@@ -483,13 +483,13 @@
     "recording_engineer": "Faith Gellar"
   },
   {
-    "song_title": "Dawn to dusk",
+    "title": "Dawn to dusk",
     "artist": "BB Clarke",
     "album": "Animals",
     "type_of_album": "Album",
     "genre": "Rock",
     "length": "3:10",
-    "year": 2019,
+    "year": "2019",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc": "US-S1Z-17-34981",
@@ -512,13 +512,13 @@
     "recording_engineer": "Faith Gellar"
   },
   {
-    "song_title": "Kill the spider",
+    "title": "Kill the spider",
     "artist": "BB Clarke",
     "album": "Animals",
     "type_of_album": "Album",
     "genre": "Rock",
     "length": "3:07",
-    "year": 2019,
+    "year": "2019",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc": "US-S1Z-17-34982",
@@ -541,13 +541,13 @@
     "recording_engineer": "Faith Gellar"
   },
   {
-    "song_title": "Mutiny",
+    "title": "Mutiny",
     "artist": "BB Clarke",
     "album": "Animals",
     "type_of_album": "Album",
     "genre": "Rock",
     "length": "3:47",
-    "year": 2019,
+    "year": "2019",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc": "US-S1Z-17-34983",
@@ -570,13 +570,13 @@
     "recording_engineer": "Faith Gellar"
   },
   {
-    "song_title": "Ruby's world",
+    "title": "Ruby's world",
     "artist": "BB Clarke",
     "album": "Animals",
     "type_of_album": "Album",
     "genre": "Rock",
     "length": "3:01",
-    "year": 2019,
+    "year": "2019",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc": "US-S1Z-17-34984",
@@ -599,13 +599,13 @@
     "recording_engineer": "Faith Gellar"
   },
   {
-    "song_title": "The ridiculous nature of people",
+    "title": "The ridiculous nature of people",
     "artist": "BB Clarke",
     "album": "Animals",
     "type_of_album": "Album",
     "genre": "Rock",
     "length": "2:58",
-    "year": 2019,
+    "year": "2019",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc": "US-S1Z-17-34985",
@@ -628,13 +628,13 @@
     "recording_engineer": "Faith Gellar"
   },
   {
-    "song_title": "Zodiac lies",
+    "title": "Zodiac lies",
     "artist": "BB Clarke",
     "album": "Animals",
     "type_of_album": "Album",
     "genre": "Rock",
     "length": "3:33",
-    "year": 2019,
+    "year": "2019",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
     "isrc": "US-S1Z-17-34986",

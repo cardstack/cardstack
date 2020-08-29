@@ -1,21 +1,69 @@
 import Route from '@ember/routing/route';
 import { fetchCollection } from 'dummy/media';
 
-export default class MediaRegistryCollectionRoute extends Route {
-  async model({ collectionId }) {
+export default class MediaRegistryIndexRoute extends Route {
+  async model() {
     let { currentOrg, orgs } = this.modelFor('media-registry');
+    let { id } = currentOrg;
+
+    let allCollections = await fetchCollection('collections');
+    let collections = allCollections.filter(el => el.owner_id === id);
+
+    if (collections.length) {
+      return {
+        id,
+        currentOrg,
+        orgs,
+        title: 'Master Recordings',
+        type: 'master-collection',
+        itemComponent: 'cards/master-collection',
+        itemType: 'collection',
+        itemTypePlural: 'collections',
+        collection: collections,
+        columns: [
+          {
+            name: 'Name',
+            valuePath: 'title',
+            isFixed: 'left',
+            width: 250,
+          },
+          {
+            name: 'Description',
+            valuePath: 'description',
+            width: 250,
+          },
+          {
+            name: 'Masters',
+            valuePath: 'count',
+            width: 250,
+            isSortable: false
+          },
+          {
+            name: 'Top Artists',
+            valuePath: 'top_titles',
+            width: 250,
+          },
+          {
+            name: 'Date Created',
+            valuePath: 'date_created',
+            width: 250,
+          },
+          {
+            width: 0,
+            isFixed: 'right'
+          },
+        ],
+      };
+    }
+
     const records = await fetchCollection('all_tracks_combined');
-    let tracks = records.filter(item => {
-      if (item.collection_ids) {
-        return item.collection_ids.includes(collectionId);
-      }
-    });
+    let tracks = records.filter(item => item.owner_id === id);
 
     return {
-      id: collectionId,
       currentOrg,
       orgs,
-      title: collectionId,
+      id: 'master-recordings',
+      title: 'Master Recordings',
       type: 'collection',
       collection: tracks,
       itemType: 'master',

@@ -2,9 +2,11 @@
   <div class="discrepancy__container">
     <header class="discrepancy__header">
       <h1 class="discrepancy__title">Discrepancy Card: Different Data</h1>
-      <PillButton @variant="primary" @route={{@exitRoute}} @routeModel="verifi-registry" @class="discrepancy__mode-btn">
-        Comparison Mode
-      </PillButton>
+      {{#let (if @model.topLevelCard @model.topLevelCard @model) as |model|}}
+        <PillButton @variant="primary" @route={{@exitRoute}} @routeModel={{model.baseCard.ownerId}} @query={{hash version=model.baseCard.version}} @class="discrepancy__mode-btn">
+          Comparison Mode
+        </PillButton>
+      {{/let}}
     </header>
 
     <Breadcrumbs @class="discrepancy__breadcrumbs">
@@ -67,7 +69,7 @@
             {{on "click" (fn this.selectView "comparison")}}
             @class="discrepancy-card__header-btn discrepancy-card__header-btn--toggle {{if (eq this.mode "comparison") "checked"}}"
           >
-            Resolve discrepancies
+            Adjust current version
           </PillButton>
         {{/unless}}
       </div>
@@ -249,7 +251,7 @@
           <div class="discrepancy-card__footer discrepancy-field--base-field {{this.mode}}-view">
             <div class="discrepancy__count-btn-container discrepancy__count-btn-container--{{this.mode}} container-left {{if (or (and this.model.count (eq this.mode "comparison")) (eq this.mode "keep-current")) "visible"}}">
               {{#if (and this.model.count (eq this.mode "comparison"))}}
-                <PillButton @class="discrepancy__count-btn" @variant="primary" @route={{@workRoute}} @routeModel={{this.model.baseCard.nextId}}>
+                <PillButton @class="discrepancy__count-btn" @variant="primary" @route={{@exitRoute}} @routeModel={{this.model.baseCard.ownerId}} @query={{hash version=this.model.compCard.version}}>
                   {{#if (eq this.model.count 1)}}
                     Make 1 change to your version
                   {{else}}
@@ -257,7 +259,7 @@
                   {{/if}}
                 </PillButton>
               {{else if (eq this.mode "keep-current")}}
-                <PillButton @class="discrepancy__count-btn" @variant="primary" @route={{@workRoute}} @routeModel={{this.model.baseCard.id}}>
+                <PillButton @class="discrepancy__count-btn" @variant="primary" @route={{@exitRoute}} @routeModel={{this.model.baseCard.ownerId}} @query={{hash version=this.model.baseCard.version}}>
                   Keep current version and exit comparison mode
                 </PillButton>
               {{/if}}
@@ -267,7 +269,7 @@
           <div class="discrepancy-card__footer discrepancy-field--comp-field {{this.mode}}-view">
             <div class="discrepancy__count-btn-container discrepancy__count-btn-container--{{this.mode}} container-right {{if (eq this.mode "linked") "visible"}}">
               {{#if (eq this.mode "linked")}}
-                <PillButton @class="discrepancy__count-btn" @variant="primary" @route={{@workRoute}} @routeModel={{this.model.baseCard.nextId}}>
+                <PillButton @class="discrepancy__count-btn" @variant="primary" @route={{@exitRoute}} @routeModel={{this.model.baseCard.ownerId}} @query={{hash version=this.model.compCard.version}}>
                   Link this {{lowercase (humanize this.model.compCard.type)}} card
                 </PillButton>
                 <div class="discrepancy__count-btn__link-copy">

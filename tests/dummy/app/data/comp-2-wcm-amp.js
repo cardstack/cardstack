@@ -32,15 +32,16 @@ export default {
   id: "the-sun-comes-out-wcm-amp",
   type: "Musical Work",
   title: "The Sun Comes Out",
+  ownerId: 'warner-chappell-music',
   baseOwner: 'Warner Chappell Music',
   compOwner: 'Allegro Music Publishing',
   baseCard: {
     isPublisher: true,
+    version: "v2",
     id: 'the-sun-comes-out-wcm-v1',
-    nextId: 'the-sun-comes-out-wcm-v2',
     type: 'musical-work',
     owner: 'Warner Chappell Music',
-    ownerId: 'wcm',
+    ownerId: 'warner-chappell-music',
     iconURL: '/media-registry/wcm-logo.png',
     datetime: '2019-11-11T13:54',
     isolatedFields: [
@@ -123,8 +124,9 @@ export default {
   compCard: {
     id: 'the-sun-comes-out-amp',
     type: 'musical-work',
+    version: "v3",
     owner: 'Allegro Music Publishing',
-    ownerId: 'amp',
+    ownerId: 'allegro-music-publishing',
     iconURL: '/media-registry/amp-logo.png',
     datetime: '2020-05-18T11:36',
     isolatedFields: [

@@ -1,17 +1,150 @@
 [
   {
     "id": "the-sun-comes-out",
+    "version": "v1",
+    "owner_id": "warner-music-group",
     "type": "musical-work",
     "title": "The Sun Comes Out",
-    "artist": "Valentino Solano",
-    "artist_id": null,
-    "composer": null,
-    "composer_id": null,
+    "description": "Valentino Solano",
+    "writer_ids": ["valentino-solano-1"],
     "iswc": "T-070237182-9",
     "verifi_id": "0x2b4932f7c27d6ca5d8bd5601ba7c28071221165ac2f1b7928c22c2809d24183ca",
+    "verifi_reg_date": "2020-04-08",
+    "verifi_asset_type": "Original work"
+  },
+  {
+    "id": "the-sun-comes-out",
+    "version": "v2",
+    "owner_id": "warner-music-group",
+    "type": "musical-work",
+    "title": "The Sun Comes Out",
+    "description": "Valentino Solano, Emilio Rosso",
+    "writer_ids": ["valentino-solano-2", "emilio-rosso"],
+    "iswc": "T-070237182-9",
+    "verifi_id": "0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce",
+    "verifi_reg_date": "2019-11-11",
+    "verifi_asset_type": "Original work",
     "version_type": "Original work",
-    "publisher": null,
-    "copyright_notice": null
+    "copyright_notice": ["© 2019 Warner Chappell Music", "© 2019 Allegro Music Publishing"],
+    "source": "Warner Chappell Music"
+  },
+  {
+    "id": "the-sun-comes-out",
+    "version": "v3",
+    "owner_id": "warner-music-group",
+    "type": "musical-work",
+    "title": "The Sun Comes Out",
+    "description": "Valentino Solano, Emilio Rosso (1 more)",
+    "writer_ids": ["valentino-solano-2", "emilio-rosso", "maria-bianchi"],
+    "iswc": "T-070237182-9",
+    "verifi_id": "0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce",
+    "verifi_reg_date": "2019-11-11",
+    "verifi_asset_type": "Original work",
+    "version_type": "Original work",
+    "copyright_notice": ["© 2019 Warner Chappell Music", "© 2019 Allegro Music Publishing"],
+    "source": "Warner Chappell Music"
+  },
+  {
+    "id": "the-sun-comes-out",
+    "owner_id": "warner-music-group",
+    "type": "musical-work",
+    "title": "The Sun Comes Out",
+    "description": "Valentino Solano, Emilio Rosso (1 more)",
+    "writer_ids": ["valentino-solano", "emilio-rosso", "maria-bianchi"],
+    "iswc": "T-070237182-9",
+    "verifi_id": "0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce",
+    "verifi_reg_date": "2019-11-11",
+    "verifi_asset_type": "Original work",
+    "version_type": "Original work",
+    "copyright_notice": ["© 2019 Warner Chappell Music", "© 2019 Allegro Music Publishing"],
+    "source": "Warner Chappell Music"
+  },
+  {
+    "id": "the-sun-comes-out",
+    "owner_id": "allegro-music-publishing",
+    "type": "musical-work",
+    "title": "The Sun Comes Out",
+    "description": "Valentino Solano, Emilio Rosso (1 more)",
+    "writer_ids": ["valentino-solano-2", "emilio-rosso", "maria-bianchi"],
+    "iswc": "T-070237182-9",
+    "verifi_id": "0x31ef32b4c27f6ca5d6bd6201fa7c14071228965dc2f1b4328c22e5609e8912ab4",
+    "verifi_reg_date": "2020-05-18",
+    "verifi_asset_type": "Original work",
+    "version_type": "Original work",
+    "copyright_notice": ["© 2019 Warner Chappell Music", "© 2019 Allegro Music Publishing"]
+  },
+  {
+    "id": "the-sun-comes-out",
+    "version": "v2",
+    "owner_id": "warner-chappell-music",
+    "type": "musical-work",
+    "title": "The Sun Comes Out",
+    "description": "Valentino Solano, Emilio Rosso",
+    "writer_ids": ["valentino-solano-2", "emilio-rosso"],
+    "iswc": "T-070237182-9",
+    "verifi_id": "0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce",
+    "verifi_reg_date": "2019-11-11",
+    "verifi_asset_type": "Original work",
+    "version_type": "Original work",
+    "copyright_notice": ["© 2019 Warner Chappell Music", "© 2019 Allegro Music Publishing"]
+  },
+  {
+    "id": "the-sun-comes-out",
+    "version": "v3",
+    "owner_id": "warner-chappell-music",
+    "type": "musical-work",
+    "title": "The Sun Comes Out",
+    "description": "Valentino Solano, Emilio Rosso (1 more)",
+    "writer_ids": ["valentino-solano-2", "emilio-rosso", "maria-bianchi"],
+    "iswc": "T-070237182-9",
+    "verifi_id": "0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce",
+    "verifi_reg_date": "2019-11-11",
+    "verifi_asset_type": "Original work",
+    "version_type": "Original work",
+    "copyright_notice": ["© 2019 Warner Chappell Music", "© 2019 Allegro Music Publishing"]
+  },
+  {
+    "id": "the-sun-comes-out",
+    "owner_id": "warner-chappell-music",
+    "type": "musical-work",
+    "title": "The Sun Comes Out",
+    "description": "Valentino Solano, Emilio Rosso (1 more)",
+    "writer_ids": ["valentino-solano", "emilio-rosso", "maria-bianchi"],
+    "iswc": "T-070237182-9",
+    "verifi_id": "0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce",
+    "verifi_reg_date": "2019-11-11",
+    "verifi_asset_type": "Original work",
+    "version_type": "Original work",
+    "copyright_notice": ["© 2019 Warner Chappell Music", "© 2019 Allegro Music Publishing"]
+  },
+  {
+    "id": "the-sun-comes-out",
+    "owner_id": "global-music-rights",
+    "type": "musical-work",
+    "title": "The Sun Comes Out",
+    "description": "Valentino Solano, Emilio Rosso (1 more)",
+    "writer_ids": ["valentino-solano", "emilio-rosso", "maria-bianchi"],
+    "iswc": "T-070237182-9",
+    "verifi_id": "0x7cf232e7c48d6ba5d8bd3101fc7a28071091165de2f1b4542c37e2812d89154be",
+    "verifi_reg_date": "2020-06-09",
+    "verifi_asset_type": "Original work",
+    "version_type": "Original work",
+    "copyright_notice": ["© 2019 Warner Chappell Music", "© 2019 Allegro Music Publishing"]
+  },
+  {
+    "id": "the-sun-comes-out",
+    "owner_id": "deezer",
+    "type": "musical-work",
+    "title": "The Sun Comes Out",
+    "description": "Valentino Solano, Emilio Rosso (1 more)",
+    "writer_ids": ["valentino-solano", "emilio-rosso", "maria-bianchi"],
+    "iswc": "T-070237182-9",
+    "verifi_id": "0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce",
+    "verifi_reg_date": "2019-11-11",
+    "verifi_asset_type": "Original work",
+    "version_type": "Original work",
+    "copyright_notice": ["© 2019 Warner Chappell Music", "© 2019 Allegro Music Publishing"],
+    "source": "Warner Chappell Music"
   },
   {
     "id": "you-make-me-crazy",
@@ -25,7 +158,8 @@
     "verifi_id": "0x453d32b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d89c4a9",
     "version_type": "Original work",
     "publisher": "RealTunes Publishing",
-    "copyright_notice": "© 2019 RealTunes Publishing"
+    "copyright_notice": "© 2019 RealTunes Publishing",
+    "owner_id": "bunny_records"
   },
   {
     "id": "you-do-it-all",
@@ -39,7 +173,8 @@
     "verifi_id": "0x1a3d32b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d89c4b9",
     "version_type": "Original work",
     "publisher": "RealTunes Publishing",
-    "copyright_notice": "© 2019 RealTunes Publishing"
+    "copyright_notice": "© 2019 RealTunes Publishing",
+    "owner_id": "bunny_records"
   },
   {
     "id": "you-are-the-one",
@@ -53,7 +188,8 @@
     "verifi_id": "0x1e3e32b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d89c419",
     "version_type": "Original work",
     "publisher": "RealTunes Publishing",
-    "copyright_notice": "© 2019 RealTunes Publishing"
+    "copyright_notice": "© 2019 RealTunes Publishing",
+    "owner_id": "bunny_records"
   },
   {
     "id": "yesterday-was-my-favorite-day",
@@ -67,7 +203,8 @@
     "verifi_id": "0x51ba32b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d89a34c",
     "version_type": "Original work",
     "publisher": "RealTunes Publishing",
-    "copyright_notice": "© 2019 RealTunes Publishing"
+    "copyright_notice": "© 2019 RealTunes Publishing",
+    "owner_id": "bunny_records"
   },
   {
     "id": "veto-power",
@@ -81,7 +218,8 @@
     "verifi_id": "0x1c3c32b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d89c459",
     "version_type": "Original work",
     "publisher": "RealTunes Publishing",
-    "copyright_notice": "© 2019 RealTunes Publishing"
+    "copyright_notice": "© 2019 RealTunes Publishing",
+    "owner_id": "bunny_records"
   },
   {
     "id": "using-you",
@@ -95,7 +233,8 @@
     "verifi_id": "0x1b3c32b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d89c429",
     "version_type": "Original work",
     "publisher": "RealTunes Publishing",
-    "copyright_notice": "© 2019 RealTunes Publishing"
+    "copyright_notice": "© 2019 RealTunes Publishing",
+    "owner_id": "bunny_records"
   },
   {
     "id": "three-wishes",
@@ -109,7 +248,8 @@
     "verifi_id": "0x56fa32b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d8941ab",
     "version_type": "Original work",
     "publisher": "RealTunes Publishing",
-    "copyright_notice": "© 2019 RealTunes Publishing"
+    "copyright_notice": "© 2019 RealTunes Publishing",
+    "owner_id": "bunny_records"
   },
   {
     "id": "the-prom-dress",
@@ -123,7 +263,8 @@
     "verifi_id": "0x1ca232b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d8945ab",
     "version_type": "Original work",
     "publisher": "RealTunes Publishing",
-    "copyright_notice": "© 2019 RealTunes Publishing"
+    "copyright_notice": "© 2019 RealTunes Publishing",
+    "owner_id": "bunny_records"
   },
   {
     "id": "the-leaves-are-changing-color",
@@ -137,7 +278,8 @@
     "verifi_id": "0x8a4532b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d89ab18",
     "version_type": "Original work",
     "publisher": "RealTunes Publishing",
-    "copyright_notice": "© 2020 RealTunes Publishing"
+    "copyright_notice": "© 2020 RealTunes Publishing",
+    "owner_id": "bunny_records"
   },
   {
     "id": "sunshine-and-moonlight",
@@ -151,7 +293,8 @@
     "verifi_id": "0x1ef232b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d8947ab",
     "version_type": "Original work",
     "publisher": "RealTunes Publishing",
-    "copyright_notice": "© 2019 RealTunes Publishing"
+    "copyright_notice": "© 2019 RealTunes Publishing",
+    "owner_id": "bunny_records"
   },
   {
     "id": "my-heart-beats-for-you",
@@ -165,7 +308,8 @@
     "verifi_id": "0x2ef532b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d8947ca",
     "version_type": "Original work",
     "publisher": "RealTunes Publishing",
-    "copyright_notice": "© 2019 RealTunes Publishing"
+    "copyright_notice": "© 2019 RealTunes Publishing",
+    "owner_id": "bunny_records"
   },
   {
     "id": "leave-the-door-open",
@@ -179,7 +323,8 @@
     "verifi_id": "0x8a1432b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d89ab37",
     "version_type": "Original work",
     "publisher": "RealTunes Publishing",
-    "copyright_notice": "© 2020 RealTunes Publishing"
+    "copyright_notice": "© 2020 RealTunes Publishing",
+    "owner_id": "bunny_records"
   },
   {
     "id": "keep-hope-alive",
@@ -193,7 +338,8 @@
     "verifi_id": "0xb89f32b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d89ac16",
     "version_type": "Original work",
     "publisher": "RealTunes Publishing",
-    "copyright_notice": "© 2019 RealTunes Publishing"
+    "copyright_notice": "© 2019 RealTunes Publishing",
+    "owner_id": "bunny_records"
   },
   {
     "id": "full-moon",
@@ -207,7 +353,8 @@
     "verifi_id": "0xdc1232b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d89ef78",
     "version_type": "Original work",
     "publisher": "RealTunes Publishing",
-    "copyright_notice": "© 2019 RealTunes Publishing"
+    "copyright_notice": "© 2019 RealTunes Publishing",
+    "owner_id": "bunny_records"
   },
   {
     "id": "change-is-good",
@@ -221,7 +368,8 @@
     "verifi_id": "0x2ef332b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d8945ca",
     "version_type": "Original work",
     "publisher": "RealTunes Publishing",
-    "copyright_notice": "© 2019 RealTunes Publishing"
+    "copyright_notice": "© 2019 RealTunes Publishing",
+    "owner_id": "bunny_records"
   },
   {
     "id": "a-day-to-sing",
@@ -236,7 +384,8 @@
     "verifi_reg_date": "2019-02-18",
     "version_type": "Original work",
     "publisher": "RealTunes Publishing",
-    "copyright_notice": "© 2019 RealTunes Publishing"
+    "copyright_notice": "© 2019 RealTunes Publishing",
+    "owner_id": "bunny_records"
   },
   {
     "type": "musical-work",
@@ -248,7 +397,8 @@
     "verifi_id": "0x15e932b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d896d2c",
     "version_type": "Original work",
     "publisher": "Sandy Music Publishing",
-    "copyright_notice": "© 2019 Sandy Music Publishing"
+    "copyright_notice": "© 2019 Sandy Music Publishing",
+    "owner_id": "bunny_records"
   },
   {
     "type": "musical-work",
@@ -260,7 +410,8 @@
     "verifi_id": "0x20e932b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d89692c",
     "version_type": "Original work",
     "publisher": "Sandy Music Publishing",
-    "copyright_notice": "© 2019 Sandy Music Publishing"
+    "copyright_notice": "© 2019 Sandy Music Publishing",
+    "owner_id": "bunny_records"
   },
   {
     "type": "musical-work",
@@ -272,7 +423,8 @@
     "verifi_id": "0xef4532b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d89aba6",
     "version_type": "Original work",
     "publisher": "Sandy Music Publishing",
-    "copyright_notice": "© 2019 Sandy Music Publishing"
+    "copyright_notice": "© 2019 Sandy Music Publishing",
+    "owner_id": "bunny_records"
   },
   {
     "type": "musical-work",
@@ -284,7 +436,8 @@
     "verifi_id": "0xef1232b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d89aba5",
     "version_type": "Original work",
     "publisher": "Sandy Music Publishing",
-    "copyright_notice": "© 2019 Sandy Music Publishing"
+    "copyright_notice": "© 2019 Sandy Music Publishing",
+    "owner_id": "bunny_records"
   },
   {
     "type": "musical-work",
@@ -296,7 +449,8 @@
     "verifi_id": "0x10e932b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d89678c",
     "version_type": "Original work",
     "publisher": "Sandy Music Publishing",
-    "copyright_notice": "© 2019 Sandy Music Publishing"
+    "copyright_notice": "© 2019 Sandy Music Publishing",
+    "owner_id": "bunny_records"
   },
   {
     "type": "musical-work",
@@ -308,7 +462,8 @@
     "verifi_id": "0x231d32b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d89c5b9",
     "version_type": "Original work",
     "publisher": "Sandy Music Publishing",
-    "copyright_notice": "© 2019 Sandy Music Publishing"
+    "copyright_notice": "© 2019 Sandy Music Publishing",
+    "owner_id": "bunny_records"
   },
   {
     "type": "musical-work",
@@ -320,6 +475,7 @@
     "verifi_id": "0x287d32b7c27d6ca5d8bd3201fa7c28071221165dc2f1b4528c22e2809d89c5a9",
     "version_type": "Original work",
     "publisher": "Sandy Music Publishing",
-    "copyright_notice": "© 2019 Sandy Music Publishing"
+    "copyright_notice": "© 2019 Sandy Music Publishing",
+    "owner_id": "bunny_records"
   }
 ]

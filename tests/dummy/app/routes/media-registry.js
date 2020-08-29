@@ -1,73 +1,30 @@
 import Route from '@ember/routing/route';
-import { fetchCollection } from 'dummy/media';
 import ORGS from 'dummy/data/organizations';
 
-const DEFAULT_LABEL = 'bunny_records';
-
 export default class MediaRegistryRoute extends Route {
-  orgs = ORGS;
+  defaultGroup = [ 'bunny_records', 'crd_records' ];
+  verifiGroup = [ 'warner-music-group', 'allegro-music-publishing', 'warner-chappell-music', 'global-music-rights', 'deezer'];
 
-  async model({ id }) {
-    if (id === 'wmg' || id === 'verifi-registry') {
-      id = 'wmg';
+  model({ orgId }) {
+    let orgGroup;
+    let currentOrg;
+
+    if (this.verifiGroup.includes(orgId)) {
+      orgGroup = this.verifiGroup;
+    } else {
+      orgGroup = this.defaultGroup;
     }
 
-    if (id === 'media-registry') {
-      id = DEFAULT_LABEL;
-    }
-
-    let masterData = this.orgs.filter(el => el.id === id)[0];
-
-    if (id !== DEFAULT_LABEL && id !== 'crd_records') {
-      id = DEFAULT_LABEL;
-    }
-
-    let collection = await fetchCollection(`${id}_collections`);
+    let orgs = orgGroup.map(id => ORGS.find(el => {
+      if (el.id === orgId) {
+        currentOrg = el;
+      }
+      return el.id === id;
+    }));
 
     return {
-      title: 'Master Recordings',
-      type: 'master-collection',
-      id: masterData.id,
-      logoURL: masterData.logoURL,
-      iconURL: masterData.iconURL,
-      company: masterData.company,
-      user: masterData.user,
-      itemType: 'collections',
-      collection,
-      orgs: this.orgs,
-      columns: [
-        {
-          name: 'Name',
-          valuePath: 'catalog_title',
-          isFixed: 'left',
-          width: 250,
-        },
-        {
-          name: 'Description',
-          valuePath: 'catalog_description',
-          width: 250,
-        },
-        {
-          name: 'Masters',
-          valuePath: 'number_of_songs',
-          width: 250,
-          isSortable: false
-        },
-        {
-          name: 'Top Artists',
-          valuePath: 'top_artists',
-          width: 250,
-        },
-        {
-          name: 'Date Created',
-          valuePath: 'date_created',
-          width: 250,
-        },
-        {
-          width: 0,
-          isFixed: 'right'
-        },
-      ],
-    };
+      orgs,
+      currentOrg
+    }
   }
 }

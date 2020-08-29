@@ -6,22 +6,21 @@ import { formatId } from '@cardstack/boxel/utils/format-id';
 
 export default class MusicDetailCardComponent extends Component {
   @tracked model = this.args.model;
-  @tracked itemId = this.args.itemId;
 
   get headerDetailFields() {
     if (!this.model) { return null; }
     return [
       {
         title: 'isrc',
-        value: this.model?.details?.isrc || this.model?.fields?.isrc
+        value: this.model.isrc
       },
       {
         title: 'verifi id',
-        value: truncateVerifiId(this.model?.details?.verifi_id || this.model?.verifi_id)
+        value: truncateVerifiId(this.model.verifi_id)
       },
       {
         title: 'label',
-        value: this.model.owner || this.model?.fields?.label
+        value: this.model.label
       },
     ];
   }
@@ -65,26 +64,26 @@ export default class MusicDetailCardComponent extends Component {
   }
 
   get recordingDetails() {
-    if (!this.model || this.args.fields) { return null; }
+    if (!this.model) { return null; }
     return [
       {
         title: 'title',
-        value: titleize(this.model.song_title)
+        value: titleize(this.model.title)
       },
       {
         title: 'main artist',
-        value: this.model.artist_info || [{ type: 'participant', title: this.model.artist }],
+        value: this.model.artists || [{ type: 'participant', title: this.model.artist }],
         type: 'collection',
         component: 'cards/artist',
         search: (q) => (this.model.selectableArtists || []).filter(a => a.title.toLowerCase().includes(q.toLowerCase()))
       },
       {
         title: 'label',
-        value: [ this.model.owner ]
+        value: this.model.label
       },
       {
         title: 'genre',
-        value: [ this.model?.details?.genre || this.model.genre ]
+        value: [ this.model.genre ]
       },
       {
         title: 'duration',
@@ -92,130 +91,130 @@ export default class MusicDetailCardComponent extends Component {
       },
       {
         title: 'language',
-        value: this.model?.details?.language
+        value: this.model.language
       },
       {
         title: 'recording year',
-        value: this.model?.details?.year,
+        value: Number(this.model.year) || null,
         type: 'dropdown',
         options: [
+          { value: 2018 },
           { value: 2019 },
           { value: 2020 }
         ]
       },
       {
         title: 'release date',
-        value: this.model?.details?.original_release_date,
+        value: this.model.original_release_date,
         type: 'date'
       },
       {
         title: 'recording session date',
-        value: this.model?.details?.recording_date,
+        value: this.model.recording_date,
         type: 'date'
       },
       {
         title: 'parental advisory',
-        value: this.model?.details?.parental_advisory,
+        value: this.model.parental_advisory,
         type: 'dropdown',
         options: [
-          { value: "N/A" },
           { value: "Yes" },
           { value: "No" }
         ]
       },
       {
         title: 'copyright notice',
-        value: this.model?.details?.copyright_notice
+        value: this.model.copyright_notice
       }
     ];
   }
 
   get musicalWork() {
-    if (!this.model || this.args.fields) { return null; }
+    if (!this.model) { return null; }
     return {
-      id: this.model?.details?.iswc_id,
+      id: this.model.iswc_id,
       type: 'card',
       component: 'cards/musical-work-embedded',
       title: 'Musical Work',
-      value: this.model.musicalWork
+      value: this.model.musicalWork,
+      search: (q) => (this.model.selectableWorks || []).filter(a => a.title.toLowerCase().includes(q.toLowerCase()))
     }
   }
 
   get verifiRegistration() {
-    if (!this.model || this.args.fields) { return null; }
+    if (!this.model) { return null; }
     let title = 'Verifi Registry';
-    let verifi_id = this.model?.details?.verifi_id;
+    let verifi_id = this.model.verifi_id;
     if (!verifi_id) { return { title, type: 'card' }; }
     return {
-      id: verifi_id,
       type: 'card',
       component: 'cards/registration-embedded',
       title,
-      value: { verifi_id, verifi_reg_date: this.model?.details?.verifi_reg_date }
+      value: { id: verifi_id, verifi_id, verifi_reg_date: this.model.verifi_reg_date }
     }
   }
 
   get codes() {
-    if (!this.model || this.args.fields) { return null; }
+    if (!this.model) { return null; }
     return [
       {
         title: 'isrc',
         value: [
           {
             title: 'Primary',
-            value: this.model?.details?.isrc
+            value: this.model.isrc
           },
           {
             title: 'Secondary',
-            value: this.model?.details?.isrc_secondary
+            value: this.model.isrc_secondary
           }
         ]
       },
       {
         title: 'catalog number',
-        value: this.model?.details?.catalog_no
+        value: this.model.catalog_no
       },
     ];
   }
 
   get credits() {
-    if (!this.model || this.args.fields) { return null; }
+    if (!this.model) { return null; }
     return [
       {
         title: 'main artist',
-        value: this.model.artist_info || [{ type: 'participant', title: this.model.artist }],
+        value: this.model.artists || [{ type: 'participant', title: this.model.artist }],
         type: 'collection',
         component: 'cards/artist',
         search: (q) => (this.model.selectableArtists || []).filter(a => a.title.toLowerCase().includes(q.toLowerCase()))
       },
       {
         title: 'producer',
-        value: this.model.producer,
+        value: this.model.producers,
         type: 'collection',
         component: 'cards/artist',
         search: (q) => (this.model.selectableArtists || []).filter(a => a.title.toLowerCase().includes(q.toLowerCase()))
       },
       {
         title: 'mastering engineer',
-        value: this.model?.details?.mastering_engineer
+        value: this.model.mastering_engineer
       },
       {
         title: 'mixing engineer',
-        value: this.model?.details?.mixing_engineer
+        value: this.model.mixing_engineer
       },
       {
         title: 'recording engineer',
-        value: this.model?.details?.recording_engineer
+        value: this.model.recording_engineer
       },
       {
         title: 'background singer',
-        value: this.model?.details?.background_singer
+        value: this.model.background_singer
       },
     ];
   }
 
   get files() {
-    if (!this.model || this.args.fields) { return null; }
+    if (!this.model) { return null; }
     return [
       {
         title: 'cover art',
@@ -236,14 +235,14 @@ export default class MusicDetailCardComponent extends Component {
         component: 'cards/audio',
         value: [
           {
-            id: `${this.itemId}.flac`,
+            id: `${this.model.id}.flac`,
             type: 'audio', // card type
-            title: `${this.itemId}.flac`
+            title: `${this.model.id}.flac`
           },
           {
-            id: `${this.itemId}-watermarked.flac`,
+            id: `${this.model.id}-watermarked.flac`,
             type: 'audio',
-            title: `${this.itemId}-watermarked.flac`
+            title: `${this.model.id}-watermarked.flac`
           }
         ]
       }
@@ -251,55 +250,62 @@ export default class MusicDetailCardComponent extends Component {
   }
 
   get agreements() {
-    if (!this.model || this.args.fields) { return null; }
-    let searchResults = [{
-      id: 'exclusive-recording-agreement-2',
-      type: 'agreement',
-      imgURL: '/media-registry/bunny-records-logo.svg',
-      title: 'Second Recording Agreement',
-      fields: [
-        {
-          title: 'assigner',
-          value: `${this.model.artist}`
-        },
-        {
-          title: 'assignee',
-          value: `${this.model.owner}`
-        },
-        {
-          title: 'active through',
-          value: 'Dec 2024'
-        }
-      ],
-    }];
+    if (!this.model) { return null; }
+    let searchResults;
+    let cards = [];
+
+    if (this.model.label === 'Bunny Records' || this.model.agreementCard) {
+      searchResults = [{
+        id: 'exclusive-recording-agreement-2',
+        type: 'agreement',
+        imgURL: '/media-registry/bunny-records-logo.svg',
+        title: 'Second Recording Agreement',
+        fields: [
+          {
+            title: 'assigner',
+            value: `${this.model.artist}`
+          },
+          {
+            title: 'assignee',
+            value: `${this.model.label}`
+          },
+          {
+            title: 'active through',
+            value: 'Dec 2024'
+          }
+        ],
+      }];
+
+      cards = [...cards, this.model.agreementCard || {
+        id: 'exclusive-recording-agreement',
+        type: 'agreement',
+        imgURL: '/media-registry/bunny-records-logo.svg',
+        title: 'Exclusive Recording Agreement',
+        fields: [
+          {
+            title: 'assigner',
+            value: `${this.model.artist}`
+          },
+          {
+            title: 'assignee',
+            value: `${this.model.label}`
+          },
+          {
+            title: 'active through',
+            value: 'Dec 2023'
+          }
+        ],
+      }];
+    }
+
     return [
       {
         title: 'active',
         search: async function() {
           return searchResults;
         },
-        type: 'collection',
-        value: [ this.model.agreementCard || {
-          id: 'exclusive-recording-agreement',
-          type: 'agreement',
-          imgURL: '/media-registry/bunny-records-logo.svg',
-          title: 'Exclusive Recording Agreement',
-          fields: [
-            {
-              title: 'assigner',
-              value: `${this.model.artist}`
-            },
-            {
-              title: 'assignee',
-              value: `${this.model.owner}`
-            },
-            {
-              title: 'active through',
-              value: 'Dec 2023'
-            }
-          ],
-        }
-        ]
+        type: cards.length ? 'collection' : null,
+        value: cards.length ? cards : null
       },
     ];
   }

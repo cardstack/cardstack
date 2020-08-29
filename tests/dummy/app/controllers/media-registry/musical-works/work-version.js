@@ -1,11 +1,19 @@
 import Controller from '@ember/controller';
 import { tracked } from '@glimmer/tracking';
 
-export default class MediaRegistryMusicalWorksWorkController extends Controller {
-  @tracked work = this.model ? this.model.work : null;
+export default class MediaRegistryMusicalWorksWorkVersionController extends Controller {
+  queryParams = ['version'];
+  @tracked version = this.model ? this.model.work.version : null;
+
+  get work() {
+    let work = this.model.work;
+    if (work.version) { this.version = work.version; }
+    return work;
+  }
 
   get headerFields() {
-    if (!this.work) { return null; }
+    if (!this.model) { return null; }
+
     return {
       image: '/media-registry/musical-work.svg',
       title: this.work.title || 'N/A',
@@ -14,7 +22,7 @@ export default class MediaRegistryMusicalWorksWorkController extends Controller 
   }
 
   get isolatedFields() {
-    if (!this.work) { return null; }
+    if (!this.model || !this.work) { return null; }
 
     return [
       {

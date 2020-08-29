@@ -1,5 +1,7 @@
 {{#if @status}}
-  <div class="boxel-highlight {{if @offsetHighlight "boxel-highlight--offset"}} boxel-highlight--{{@status}}" aria-label="highlight item" ...attributes />
+  <div class="boxel-highlight boxel-highlight--{{@status}}" ...attributes />
+{{else if @expandAction}}
+  <button {{on "click" @expandAction}} class="boxel-highlight {{@class}} {{if @on "boxel-highlight--on"}}" ...attributes />
 {{else}}
-  <button class="boxel-highlight {{@class}} {{if @on "boxel-highlight--on"}}" aria-label="highlight item" ...attributes />
+  <div class="boxel-highlight {{@class}} {{if @on "boxel-highlight--on"}}" ...attributes />
 {{/if}}

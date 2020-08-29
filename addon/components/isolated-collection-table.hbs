@@ -27,7 +27,7 @@
     <b.row class={{if b.rowValue.selected "is-selected"}} as |r|>
       <r.cell as |cell column row cellMeta columnMeta|>
         <Boxel class="media-collection-table__boxel-cell">
-          <BoxelHighlight {{on "click" (fn this.selectOrTransition row)}} @on={{row.selected}} @class="media-collection-table__highlight" />
+          <BoxelHighlight @expandAction={{fn @expandAction row}} @on={{row.selected}} @class="media-collection-table__highlight" />
           {{#if (and (eq (add columnMeta.index 1) b.cells.length) (eq @mode "edit"))}}
             <BoxelActions
               @class="media-collection-table__actions-btns"
@@ -35,7 +35,7 @@
               @btnLeft="more-actions"
               @btnLeftIcon="more-actions"
               @btnRightIcon="expand"
-              @btnRightAction={{fn this.selectOrTransition row}}
+              @btnRightAction={{fn @expandAction row}}
             />
           {{/if}}
           <div class="media-collection-table__cell {{if (eq columnMeta.index 0) "media-collection-table__cell--first-col"}} {{if row.selected "row-group-selected"}} media-collection-table__cell--{{@mode}}">

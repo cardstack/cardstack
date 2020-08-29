@@ -1,0 +1,19 @@
+{{#if (eq this.target.currentRouteName "media-registry.item.versions")}}
+  {{outlet}}
+{{else}}
+  <DetailTemplate>
+    {{!-- Breadcrumbs --}}
+    <Breadcrumbs>
+      <LinkTo @route="media-registry" @model={{@model.owner_id}} @query={{hash version=@model.version}} @class="breadcrumbs__item">
+        <div class="breadcrumbs__item-label">Collection</div>
+        <div class="breadcrumbs__item-title">Master Recordings</div>
+      </LinkTo>
+    </Breadcrumbs>
+
+    <MusicDetailCard
+      @mode="view"
+      @model={{@model}}
+      @displayFullHeader={{true}}
+    />
+  </DetailTemplate>
+{{/if}}

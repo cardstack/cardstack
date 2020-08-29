@@ -1,8 +1,6 @@
 {{#let @model as |item|}}
-<LinkTo @route={{@route}} @model={{item.id}}>
-  <Boxel @class="collection__boxel collection__boxel--{{@format}}">
-    <BoxelHighlight @class="collection__highlighter" @on={{item.selected}} />
-
+  <Boxel @class="master-collection__boxel master-collection__boxel--{{@format}}">
+    <BoxelHighlight @expandAction={{@expandAction}} @class="master-collection__highlighter" @on={{item.selected}} />
     <div class="isolated-collection-item isolated-collection-item--{{@format}}">
       {{#if (eq @format "table-list")}}
         <ul class="isolated-collection-item__list">
@@ -22,5 +20,4 @@
       {{/if}}
     </div>
   </Boxel>
-</LinkTo>
 {{/let}}

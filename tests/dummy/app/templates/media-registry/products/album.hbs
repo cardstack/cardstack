@@ -1,6 +1,6 @@
 <DetailTemplate>
   <Breadcrumbs>
-    <LinkTo @route="media-registry" @class="breadcrumbs__item">
+    <LinkTo @route="media-registry" @model={{@model.owner_id}} @class="breadcrumbs__item">
       <div class="breadcrumbs__item-label">Collection</div>
       <div class="breadcrumbs__item-title">Master Recordings</div>
     </LinkTo>
@@ -50,7 +50,7 @@
         {{#each @model.collections as |collection|}}
           <Card
             @mode="view"
-            @model={{hash type="collection" id=collection.id title=collection.catalog_title}}
+            @model={{hash type="collection" id=collection.id title=collection.title}}
             @hasImage={{true}}
             @expandAction={{fn this.transitionToCatalog collection.id}}
           >

@@ -7,11 +7,17 @@
 /* Master Collection Item Wrapper + Actions */
 .master-collection__boxel {
   width: 100%;
-  transition: box-shadow var(--boxel-transition);
 }
 
-.master-collection__highlighter {
-  border-radius: 10px;
+.master-collection__expand-icon {
+  display: none;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 30px;
+  height: 30px;
+  background: url('/assets/images/icons/expand.svg') center/16px 16px no-repeat;
+  z-index: 5;
 }
 
 .media-collection__grid-item:hover .master-collection__highlighter,
@@ -22,30 +28,12 @@
   outline: 0;
 }
 
-.master-collection__expand-btn {
-  position: absolute;
-  top: 0;
-  right: 0;
-  outline: 0;
+.master-collection__highlighter:hover + .master-collection__expand-icon,
+.master-collection__highlighter:focus + .master-collection__expand-icon {
+  display: inline-block;
 }
 
-.master-collection__select-btn {
-  visibility: collapse;
-}
-
-.master-collection__select-btn--selected {
-  visibility: visible;
-}
-
-.media-collection__grid-item:hover .master-collection__select-btn,
-.master-collection__select-btn:hover,
-.master-collection__select-btn:focus,
-.master-collection__boxel:hover .master-collection__select-btn,
-.master-collection__boxel:focus-within .master-collection__select-btn {
-  visibility: visible;
-}
-
-.master-collection__pin-btn {
+/* .master-collection__pin-btn {
   --icon-color: #AFAFB7;
   position: absolute;
   top: 0;
@@ -66,7 +54,7 @@
 
 .master-collection__pin-btn.pinned {
   --icon-color: black;
-}
+} */
 
 
 /* Master Collection Item */

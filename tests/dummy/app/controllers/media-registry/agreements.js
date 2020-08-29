@@ -4,6 +4,30 @@ import { tracked } from '@glimmer/tracking';
 
 export default class MediaRegistryAgreementsController extends Controller {
   @tracked status;
+  @tracked org = this.model.org;
+  @tracked catalog = this.model.collection;
+  @tracked agreement = this.model.agreement;
+
+  get agreementFields() {
+    if (!this.model) { return null; }
+    return [
+      {
+        title: 'Assigner',
+        value: [ this.agreement.from ]
+      },
+      {
+        title: 'Assignee',
+        value: [ this.agreement.to ]
+      },
+      {
+        title: 'Catalog',
+        type: 'card',
+        format: 'grid',
+        component: 'cards/master-collection',
+        value: this.catalog
+      }
+    ];
+  }
 
   @action
   viewAgreement() {
@@ -12,7 +36,7 @@ export default class MediaRegistryAgreementsController extends Controller {
 
   @action
   rejectAgreement() {
-    this.transitionToRoute('media-registry.collection', 'batch-f');
+    this.transitionToRoute('media-registry.collection', this.org.id, this.catalog.id);
   }
 
   @action
@@ -25,38 +49,8 @@ export default class MediaRegistryAgreementsController extends Controller {
     this.status = 'complete';
   }
 
-  createCatalogFields = [
-    {
-      title: 'Assigner',
-      value: [
-        'Bunny Records'
-      ]
-    },
-    {
-      title: 'Assignee',
-      value: [
-        'CRD Records'
-      ]
-    },
-    {
-      title: 'Catalog',
-      type: 'card',
-      format: 'grid',
-      component: 'cards/master-collection',
-      value: {
-        id: 'batch-f',
-        type: 'catalog',
-        title: 'Batch F',
-        catalog_title: 'Batch F',
-        number_of_songs: 16,
-        selected_art: [
-          "media-registry/covers/thumb/Sunlight.jpg",
-          "media-registry/covers/thumb/Change-Is-Good.jpg",
-          "media-registry/covers/thumb/Full-Moon.jpg",
-          "media-registry/covers/thumb/Love-Never-Dies.jpg",
-          "media-registry/covers/thumb/Animals.jpg"
-        ]
-      }
-    }
-  ]
+  @action
+  expandAction() {
+    this.transitionToRoute('media-registry.collection', 'bunny_records', this.catalog.id);
+  }
 }

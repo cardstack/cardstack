@@ -1,7 +1,4 @@
 .media-registry {
-  --header-background: #000;
-  --header-logo-size-sm: 35px 35px;
-
   height: 100%;
   display: grid;
   grid-template-columns: auto 1fr;
@@ -9,16 +6,6 @@
   background-color: #F5F5F5;
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp-lg);
-}
-
-.media-registry.media-registry--bunny_records {
-  --header-background: #FF1D6C;
-  --header-logo-size-sm: 25px 34px;
-}
-
-.media-registry.media-registry--crd_records {
-  --header-background: #0069F9;
-  --header-logo-size-sm: 36px 35px;
 }
 
 .media-registry__left-edge {
@@ -81,7 +68,11 @@
   top: 0;
 }
 
+
+/* Org Header */
 .media-registry__header {
+  --header-background: #000;
+  --header-logo-size-sm: 35px 35px;
   position: sticky;
   top: 0;
   grid-column: 2;
@@ -95,6 +86,20 @@
   color: white;
   height: 250px;
   z-index: 2;
+}
+
+.media-registry__header.media-registry__header--bunny_records {
+  --header-background: #FF1D6C;
+  --header-logo-size-sm: 25px 34px;
+}
+
+.media-registry__header.media-registry__header--crd_records {
+  --header-background: #0069F9;
+  --header-logo-size-sm: 36px 35px;
+}
+
+.media-registry__header.media-registry__header--warner-music-group {
+  --header-background: #0061aa;
 }
 
 .media-registry__header--sm {
@@ -133,6 +138,15 @@
   width: 50px;
   height: 50px;
   background-size: var(--header-logo-size-sm);
+}
+
+.media-registry__header--sm .media-registry__logo--warner-music-group {
+  background-size: auto;
+  background-position: left center;
+}
+
+.media-registry__header--sm .media-registry__logo--deezer {
+  background-position: top center;
 }
 
 .media-registry__logo svg {

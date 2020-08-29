@@ -29,7 +29,7 @@
                 {{#each @item.collections as |collection|}}
                   <Card
                     @mode="view"
-                    @model={{hash type="collection" id=collection.id title=collection.catalog_title}}
+                    @model={{hash type="collection" id=collection.id title=collection.title}}
                     @hasImage={{true}}
                     @expandAction={{fn @transitionToCatalog collection.id}}
                   >
@@ -83,7 +83,6 @@
           @sort={{this.sort}}
           @search={{this.search}}
           @removeItem={{this.removeItem}}
-          @itemComponent="cards/master-collection-item"
         />
       </div>
     </BoxelModal>
@@ -345,7 +344,7 @@
             <div class="cardflow__participants">
               <div class="cardflow__participant">
                 <div class="cardflow__participant-company-img" style={{css-url "background-image" participant.iconURL}} />
-                <div class="cardflow__participant-company">{{participant.company}}</div>
+                <div class="cardflow__participant-company">{{participant.title}}</div>
               </div>
               <div class="cardflow__participant">
                 <div class="cardflow__participant-user-img" style={{css-url "background-image" participant.user.imgURL}} />

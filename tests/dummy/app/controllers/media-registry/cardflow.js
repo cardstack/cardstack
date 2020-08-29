@@ -8,14 +8,13 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
   @tracked isolatedCollection = this.getIsolatedCollection(this.catalog.id);
   @tracked itemId = null;
   @tracked record = null;
-  @tracked currentMilestone = this.milestones.filter(el => el.pct === this.model.user.queueCards[0].progressPct)[0];
+  @tracked currentMilestone = this.org.user ? this.milestones.filter(el => el.pct === this.org.user.queueCards[0].progressPct)[0] : null;
 
   catalog = {
     id: 'batch-f',
     type: 'catalog',
     title: 'Batch F',
-    catalog_title: 'Batch F',
-    number_of_songs: 16,
+    count: '16',
     selected_art: [
       "media-registry/covers/thumb/Sunlight.jpg",
       "media-registry/covers/thumb/Change-Is-Good.jpg",
@@ -26,7 +25,7 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
   }
 
   get projectTitle() {
-    return this.model.user.queueCards[0].projectTitle;
+    return this.org.user.queueCards[0].projectTitle;
   }
 
   @action
@@ -70,7 +69,7 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
   @action
   setItemId(item) {
     if (item) {
-      this.itemId = formatId(item.song_title);
+      this.itemId = formatId(item.title);
       this.getRecord();
     } else {
       this.itemId = null;
@@ -83,8 +82,8 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
     const data = await fetchCollection('all_tracks_combined');
 
     let items = data.filter(item => {
-      if (item.catalog) {
-        return item.catalog.map(catalog => {
+      if (item.collection_ids) {
+        return item.collection_ids.map(catalog => {
           let catalogId = formatId(catalog);
           return catalogId === id;
         }).includes(true);
@@ -95,11 +94,13 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
       title: id,
       type: 'collection',
       collection: items,
-      itemType: 'masters',
+      itemType: 'master',
+      itemTypePlural: 'masters',
+      itemComponent: 'cards/master-collection-item',
       columns: [
         {
           name: 'Title',
-          valuePath: 'song_title',
+          valuePath: 'title',
           isFixed: 'left',
           width: 350,
         },
@@ -156,7 +157,7 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
 
     const record = records.find(item => {
       if (item.catalog) {
-        return formatId(item.song_title) === itemId;
+        return formatId(item.title) === itemId;
       }
     });
 
@@ -165,7 +166,7 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
     const collections = allCollections.filter(el => catalogs.includes(el.id));
     record.collections = collections;
 
-    const recordDetail = recordDetails.find(item => formatId(item.song_title) === itemId);
+    const recordDetail = recordDetails.find(item => item.id === itemId);
     const artists = profiles.filter(profile => profile.id === formatId(record.artist));
 
     if (artists.length) {

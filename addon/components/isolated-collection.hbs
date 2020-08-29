@@ -3,7 +3,12 @@
     <div class="media-collection__title-row media-collection__title-row--{{@mode}}">
       <h2 class="media-collection__title">{{humanize @model.title}}</h2>
       <div class="media-collection__count">
-        <span>{{this.collection.length}}</span> {{capitalize (if @model.itemType @model.itemType "items")}}
+        <span>{{if this.collection.length this.collection.length 0}}</span>
+        {{#if (eq this.collection.length 1)}}
+          {{capitalize (if @model.itemType @model.itemType "item")}}
+        {{else}}
+          {{capitalize (if @model.itemTypePlural @model.itemTypePlural "items")}}
+        {{/if}}
       </div>
       {{#if (eq @mode "edit")}}
         <button {{on "click" @transitionToView}} class="mode-indicator mode-indicator--edit">{{@mode}} mode</button>
@@ -21,24 +26,27 @@
     </div>
 
     <div class="media-collection__actions-row">
-      <SelectButton
-        {{on "click" this.toggleSelectAll}}
-        @class="media-collection__select-btn"
-        @mode={{@mode}}
-        @isPartial={{this.collection.selectedItemCount}}
-        @isSelected={{this.collection.selectedAll}}
-      />
-      <div class="media-collection__pill media-collection__select-all {{if this.collection.selectedItemCount "media-collection__select-all--selected-items"}}">
-        {{#if this.collection.selectedItemCount}}
-          {{svg-jar "check-mark" width="9px" height="7px"}}
-          {{this.collection.selectedItemCount}} selected
-          <MediaCollection::Button @class="media-collection__more-actions" @button="more-actions" @icon="more-actions">
-            <ActionsMenu @class="media-collection__more-actions-menu" @actionItems={{array "Delete" "Duplicate"}} @addToCollection={{eq @model.type "collection"}} @transferAgreement={{eq @model.type "master-collection"}} />
-          </MediaCollection::Button>
-        {{else}}
-          Select all
-        {{/if}}
-      </div>
+      {{#if this.collection.length}}
+        <SelectButton
+          {{on "click" this.toggleSelectAll}}
+          @class="media-collection__select-btn"
+          @mode={{@mode}}
+          @isPartial={{this.collection.selectedItemCount}}
+          @isSelected={{this.collection.selectedAll}}
+        />
+
+        <div class="media-collection__pill media-collection__select-all {{if this.collection.selectedItemCount "media-collection__select-all--selected-items"}}">
+          {{#if this.collection.selectedItemCount}}
+            {{svg-jar "check-mark" width="9px" height="7px"}}
+            {{this.collection.selectedItemCount}} selected
+            <MediaCollection::Button @class="media-collection__more-actions" @button="more-actions" @icon="more-actions">
+              <ActionsMenu @class="media-collection__more-actions-menu" @actionItems={{array "Delete" "Duplicate"}} @addToCollection={{eq @model.type "collection"}} @transferAgreement={{eq @model.type "master-collection"}} />
+            </MediaCollection::Button>
+          {{else}}
+            Select all
+          {{/if}}
+        </div>
+      {{/if}}
       {{#if (and (eq @model.type "collection") this.collection.selectedItemCount)}}
         <button class="media-collection__pill media-collection__pill--dropdown">
           Add to Collection
@@ -70,7 +78,18 @@
   </header>
 
   {{#if (eq this.format "table")}}
-    <IsolatedCollectionTable @mode={{@mode}} @type={{@model.type}} @collection={{this.collection}} @columns={{@model.columns}} @removeItem={{this.removeItem}} @transition={{@transition}} @sortColumn={{this.sortColumn}} @sortDirection={{this.sortDirection}} @onUpdateSorts={{this.tableSort}}/>
+    <IsolatedCollectionTable
+      @mode={{@mode}}
+      @type={{@model.type}}
+      @expandAction={{@expandAction}}
+      @org={{@model.orgModel}}
+      @collection={{this.collection}}
+      @columns={{@model.columns}}
+      @removeItem={{this.removeItem}}
+      @sortColumn={{this.sortColumn}}
+      @sortDirection={{this.sortDirection}}
+      @onUpdateSorts={{this.tableSort}}
+    />
   {{else}}
     <div class="media-collection__scroll-container">
       <div class="media-collection__inner-container">
@@ -84,19 +103,25 @@
         <ul class="media-collection__grid media-collection__grid--{{this.format}} media-collection__grid--{{@model.type}}-{{this.format}}">
           {{#each this.collection as |item|}}
             <li class="media-collection__grid-item media-collection__grid-item--{{this.format}}">
-              {{#if @itemComponent}}
-                {{component @itemComponent model=item listFields=@model.listFields transition=@transition mode=@mode format=this.format}}
+              {{#if @model.itemComponent}}
+                {{component
+                  @model.itemComponent
+                  model=item
+                  format=this.format
+                  listFields=@model.listFields
+                  expandAction=(fn @expandAction item)
+                  mode=@mode}}
               {{else}}
                 <Cards::IsolatedCollectionItem
                   @model={{item}}
                   @format={{this.format}}
                   @listFields={{@model.listFields}}
-                  @route={{@model.route}}
+                  @expandAction={{fn @expandAction item}}
                   @mode={{@mode}}
                 />
               {{/if}}
 
-              <div class="media-collection__grid-item-btn-group {{if (eq @mode "view") "master-collection__select-btn"}} {{if item.selected "master-collection__select-btn--selected"}}">
+              <div class="media-collection__grid-item-btn-group {{if (eq @mode "view") "isolated-collection__select-btn"}} {{if item.selected "isolated-collection__select-btn--selected"}}">
                 <button {{on "click" (fn this.toggleSelect item)}} class="media-collection__grid-item-select-btn" aria-label="select">
                   {{#if item.selected}}
                     {{svg-jar "icon-circle-selected" class="media-collection__grid-item-select--selected" width="16px" height="16px"}}

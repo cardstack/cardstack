@@ -1,16 +1,17 @@
 import Route from '@ember/routing/route';
+
 import { fetchCollection } from 'dummy/media';
 
-export default class MediaRegistryMusicalWorksWorkRoute extends Route {
-  async model({ workId }) {
+export default class MediaRegistryMusicalWorksWorkVersionRoute extends Route {
+  async model({ workId, versionId }) {
     const works = await fetchCollection('musical-works');
     const masters = await fetchCollection('all_tracks_combined');
     const profiles = await fetchCollection('profiles');
 
     let { currentOrg, orgs } = this.modelFor('media-registry');
-    let work = works.find(el => el.owner_id === currentOrg.id && el.id === workId && !el.version);
+    let work = works.find(el => el.owner_id === currentOrg.id && el.id === workId && el.version === versionId);
 
-    let masterDetail = masters.find(el => el.owner_id === currentOrg.id && el.id === workId && !el.version);
+    let masterDetail = masters.find(el => el.owner_id === currentOrg.id && el.id === workId && el.version === versionId);
     work.masterDetail = masterDetail;
 
     if (work.writer_ids && work.writer_ids.length) {

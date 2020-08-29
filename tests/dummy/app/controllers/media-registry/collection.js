@@ -1,20 +1,19 @@
-import MediaRegistryIndexController from './index';
+import MediaRegistryIndexController from 'dummy/controllers/media-registry/index';
 import { action } from '@ember/object';
-import { formatId } from '@cardstack/boxel/utils/format-id';
 
 export default class MediaRegistryCollectionController extends MediaRegistryIndexController {
   @action
   transitionToIsolate(item) {
-    this.transitionToRoute('media-registry.item', formatId(item.song_title));
+    this.transitionToRoute('media-registry.item', item.id);
   }
 
   @action
   transitionToView() {
-    this.transitionToRoute('media-registry.collection', this.model.title);
+    this.transitionToRoute('media-registry.collection', this.model.id);
   }
 
   @action
   transitionToEdit() {
-    this.transitionToRoute('media-registry.collection.edit', this.model.title);
+    this.transitionToRoute('media-registry.collection.edit', this.model.id);
   }
 }

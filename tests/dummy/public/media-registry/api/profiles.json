@@ -1,5 +1,58 @@
 [
   {
+    "id": "valentino-solano-1",
+    "type": "participant",
+    "title": "Valentino Solano"
+  },
+  {
+    "id": "valentino-solano-2",
+    "type": "participant",
+    "title": "Valentino Solano",
+    "imgURL": "/media-registry/profiles/thumb/Valentino-Solano.jpg",
+    "ipi": "00815723492",
+    "pro": "Global Music Rights",
+    "email": "valentino@valsolanomusic.com",
+    "website": "www.valsolanomusic.com",
+    "role": "Lyricist",
+    "publisher_id": "warner-chappell-music"
+  },
+  {
+    "id": "valentino-solano",
+    "type": "participant",
+    "title": "Valentino Solano",
+    "imgURL": "/media-registry/profiles/thumb/Valentino-Solano.jpg",
+    "ipi": "00914256714",
+    "pro": "Global Music Rights",
+    "email": "valentino@valsolanomusic.com",
+    "website": "www.valsolanomusic.com",
+    "role": "Lyricist",
+    "publisher_id": "warner-chappell-music"
+  },
+  {
+    "id": "emilio-rosso",
+    "type": "participant",
+    "title": "Emilio Rosso",
+    "imgURL": "/media-registry/profiles/thumb/Emilio-Rosso.jpg",
+    "ipi": "00231925374",
+    "pro": "Global Music Rights",
+    "email": "emilio@rosso.com",
+    "website": null,
+    "role": "Composer",
+    "publisher_id": "allegro-music-publishing"
+  },
+  {
+    "id": "maria-bianchi",
+    "type": "participant",
+    "title": "Maria Bianchi",
+    "imgURL": "/media-registry/profiles/thumb/Maria-Bianchi.jpg",
+    "ipi": "00181928972",
+    "pro": "Global Music Rights",
+    "email": "m.bianchi@gmail.com",
+    "website": null,
+    "role": "Composer",
+    "publisher_id": "allegro-music-publishing"
+  },
+  {
     "id": "lisa-track",
     "type": "participant",
     "title": "Lisa Track",

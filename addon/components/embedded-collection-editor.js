@@ -18,11 +18,11 @@ export default class EmbeddedCollectionEditor extends Component {
   }
 
   @action addBelongsToItem(item) {
-    this.field = item;
+    set(this.field, 'value', item);
   }
 
   @action removeBelongsToItem() {
-    this.field = {};
+    set(this.field, 'value', null);
   }
 
   @action removeItem(item) {

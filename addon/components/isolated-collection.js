@@ -3,21 +3,46 @@ import { tracked } from '@glimmer/tracking';
 import { action, set } from '@ember/object';
 
 export default class IsolatedCollection extends Component {
+  queryParams = ['version'];
+
+  @tracked version = null;
   @tracked format = this.args.format || 'grid';
-  @tracked collection = this.args.model.collection || [];
+  @tracked collection;
   @tracked tableCols = this.args?.field?.columns || this.args?.model?.columns;
   @tracked sortColumn = this.sortColumns ? this.sortColumns[0] : null;
   @tracked sortDirection = 'asc';
 
   constructor(...args) {
     super(...args);
-    this.collection = this.args.model.collection;
-    this.updateSelectionCount();
+
+    let version = this.version;
+    let collection = this.args.model ? this.args.model.collection : [];
+
+    if (version) {
+      this.collection.filter(el => el.version === version);
+    }
+
+    this.collection = collection.filter(el => !el.version);
+
+    if (this.args.model && this.args.model.length) {
+      this.updateSelectionCount();
+    }
+  }
+
+  get sortColumns() {
+    return this.tableCols ? this.tableCols.filter(c => c.isSortable !== false && c.name) : [];
   }
 
   @action
   updateCollections() {
-    this.collection = this.args.model.collection;
+    let version = this.version;
+    let collection = this.args.model ? this.args.model.collection : [];
+
+    if (version) {
+      this.collection.filter(el => el.version === version);
+    }
+
+    this.collection = collection.filter(el => !el.version);
     this.updateSelectionCount();
   }
 
@@ -33,7 +58,9 @@ export default class IsolatedCollection extends Component {
       this.args.changeFormat(val);
     }
     this.format = val;
-    this.updateSelectionCount();
+    if (this.args.model && this.args.model.length) {
+      this.updateSelectionCount();
+    }
   }
 
   // @action
@@ -63,10 +90,6 @@ export default class IsolatedCollection extends Component {
   toggleSelect(item) {
     set(item, 'selected', !item.selected);
     this.updateSelectionCount();
-  }
-
-  get sortColumns() {
-    return this.tableCols.filter(c => c.isSortable !== false && c.name);
   }
 
   @action

@@ -7,7 +7,7 @@ export default class MediaRegistryItemMusicalWorkController extends Controller {
 
     return {
       image: '/media-registry/musical-work.svg',
-      title: this.model.title || this.model.song_title,
+      title: this.model.title,
       description: this.model.composer ? `by ${this.model.artist}, ${this.model.composer}` : `by ${this.model.artist}`
     }
   }

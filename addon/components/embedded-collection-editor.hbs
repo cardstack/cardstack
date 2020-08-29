@@ -3,7 +3,7 @@
     {{#if @belongsToField}}
       {{#if this.field.value}}
         <div class="collection-field__item collection-field__item--{{this.format}}">
-          {{component (or this.field.component "card") model=this.field.value mode="view" format=this.format}}
+          {{component (or this.field.component "card") model=this.field.value mode="view" format=this.format expandAction=@expandAction}}
           <IconButton {{on "click" this.removeBelongsToItem}} @icon="icon-minus-circle" @class="collection-field__remove-btn" @aria-label="remove" />
         </div>
       {{else}}
