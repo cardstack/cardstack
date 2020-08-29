@@ -16,6 +16,7 @@
 <div class="media-registry__outlet" role="button" {{on "mouseover" (fn this.setOrg @model)}}>
   <Cardflow
     @model={{@model}}
+    @org={{this.org}}
     @actionSteps={{this.actionSteps}}
     @milestones={{this.milestones}}
     @currentMilestone={{this.currentMilestone}}

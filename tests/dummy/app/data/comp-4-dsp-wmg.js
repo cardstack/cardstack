@@ -4,16 +4,17 @@ export default {
   id: "the-sun-comes-out-dzr-wmg",
   type: "Musical Work",
   title: "The Sun Comes Out",
+  ownerId: 'deezer',
   baseOwner: 'Deezer',
   compOwner: 'Warner Music Group',
   baseCard: {
     type: 'musical-work',
+    version: 'v0',
     owner: 'Deezer',
-    ownerId: 'dzr',
+    ownerId: 'deezer',
     iconURL: '/media-registry/deezer-logo.png',
     datetime: '2020-07-10T14:24',
     id: 'dsp-the-sun-comes-out',
-    nextId: 'dzr-the-sun-comes-out',
     isolatedFields: [
       {
         title: 'title',
@@ -76,7 +77,7 @@ export default {
   compCard: {
     type: 'musical-work',
     owner: 'Warner Music Group',
-    ownerId: 'wmg',
+    ownerId: 'warner-music-group',
     iconURL: '/media-registry/wmg-logo.svg',
     datetime: '2020-06-09T18:10',
     id: 'wmg-the-sun-comes-out',

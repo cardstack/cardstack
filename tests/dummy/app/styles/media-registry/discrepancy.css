@@ -131,27 +131,27 @@
   text-align: center;
 }
 
-.discrepancy__profile-icon--wmg {
+.discrepancy__profile-icon--warner-music-group {
   background-color: #0061aa;
 }
-.discrepancy__profile-icon--amp,
-.discrepancy__profile-icon--wcm {
+.discrepancy__profile-icon--allegro-music-publishing,
+.discrepancy__profile-icon--warner-chappell-music {
   background-size: auto 23px;
 }
-.discrepancy__profile-icon--dzr {
+.discrepancy__profile-icon--deezer {
   background-position: top center;
   background-size: auto 23px;
 }
-.discrepancy__profile-icon--gmr {
+.discrepancy__profile-icon--global-music-rights {
   background-size: auto 20px;
 }
 
-.boxel-card__bg-img--wcm {
+.boxel-card__bg-img--warner-chappell-music {
   background-size: auto 35px;
   background-color: black;
   border-radius: 100px;
 }
-.boxel-card__bg-img--amp {
+.boxel-card__bg-img--allegro-music-publishing {
   border-radius: 100px;
 }
 

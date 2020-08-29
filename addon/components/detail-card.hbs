@@ -52,4 +52,10 @@
       @expandAction={{@expandAction}}
     />
   {{/if}}
+
+  {{#if @source}}
+    <div class="detail-card__source">
+      <span class="field-renderer__title">Source:</span> {{@source}}
+    </div>
+  {{/if}}
 </Boxel>

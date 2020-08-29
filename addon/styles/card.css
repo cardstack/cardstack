@@ -169,6 +169,10 @@
   padding-left: 55px;
 }
 
+.boxel-card--image {
+  width: auto;
+}
+
 
 /* Grid format */
 .boxel-card__inner--grid.boxel-card__inner--with-img {
@@ -334,6 +338,7 @@
   background-size: 15px 15px;
   background-repeat: no-repeat;
   padding-left: 45px;
+  text-transform: capitalize;
 }
 
 .territory-card h3 {

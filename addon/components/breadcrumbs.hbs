@@ -2,7 +2,7 @@
   {{#if @items}}
     {{#each @items as |item i|}}
       {{#if (eq i 0)}}
-        <LinkTo @route={{item.route}} @class="breadcrumbs__item">
+        <LinkTo @route={{item.route}} @model={{item.routeModel}} @class="breadcrumbs__item">
           <div class="breadcrumbs__item-label">{{item.type}}</div>
           <div class="breadcrumbs__item-title">{{item.title}}</div>
         </LinkTo>

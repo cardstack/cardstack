@@ -13,7 +13,7 @@
     {{/if}}
   {{/if}}
   {{#if @expandAction}}
-    <BoxelHighlight {{on "click" @expandAction}} @class="boxel-card__expand-overlay" />
+    <BoxelHighlight @expandAction={{@expandAction}} @class="boxel-card__expand-overlay" />
   {{/if}}
   <div class="boxel-card boxel-card--default boxel-card--{{if @model @model.type "blank-card"}} {{@class}}">
     {{#if @model.type}}

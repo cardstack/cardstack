@@ -8,11 +8,11 @@ class Router extends EmberRouterScroll {
 }
 
 Router.map(function() {
-  this.route('media-registry', { path: '/:id' }, function() {
-    this.route('edit');
-    this.route('collection', { path: '/collection/:collectionId' }, function() {
+  this.route('media-registry', { path: 'media-registry/:orgId' }, function() {
+    this.route('collection', { path: '/collections/:collectionId' }, function() {
       this.route('edit');
     });
+
     this.route('item', { path: '/:itemId' }, function() {
       this.route('edit');
       this.route('musical-work');
@@ -22,8 +22,10 @@ Router.map(function() {
     });
     this.route('musical-works', function() {
       this.route('work', { path: '/:workId' });
+      this.route('work-version', { path: '/:workId/:versionId' });
     });
     this.route('versions', { path: '/:itemId/versions' });
+    this.route('version', { path: '/:itemId/:versionId' });
     this.route('discrepancies', function() {
       this.route('discrepancy', { path: '/:compId' }, function() {
         this.route('card', { path: '/:cardType/:cardId' }, function() {
@@ -31,7 +33,7 @@ Router.map(function() {
         });
       });
     });
-    this.route('agreements');
+    this.route('agreements', { path: '/agreements/:agreementId' });
     this.route('cardflow');
   });
 

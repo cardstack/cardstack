@@ -12,7 +12,7 @@
       {{#if (eq this.status "complete")}}
         <FieldRenderer
           @mode="view"
-          @field={{hash title="Agreement ID" value="TA-38195847898"}}
+          @field={{hash title="Agreement ID" value=this.agreement.reference_id}}
           @class="agreements-edit-field"
         />
         <FieldRenderer
@@ -22,12 +22,21 @@
         />
       {{/if}}
 
-      {{#each this.createCatalogFields as |field|}}
-        <FieldRenderer
-          @mode={{if (or (not this.status) (eq this.status "create")) "edit" "view"}}
-          @field={{field}}
-          @class="agreements-edit-field"
-        />
+      {{#each this.agreementFields as |field|}}
+        {{#if (eq field.title "Catalog")}}
+          <FieldRenderer
+            @mode={{if (or (not this.status) (eq this.status "create")) "edit" "view"}}
+            @field={{field}}
+            @class="agreements-edit-field"
+            @expandAction={{this.expandAction}}
+          />
+        {{else}}
+          <FieldRenderer
+            @mode={{if (or (not this.status) (eq this.status "create")) "edit" "view"}}
+            @field={{field}}
+            @class="agreements-edit-field"
+          />
+        {{/if}}
       {{/each}}
 
       {{#if (eq this.status "complete")}}

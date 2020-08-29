@@ -1,6 +1,6 @@
 {{!-- TODO: refactor --}}
 {{#if @status}}
-  <div class="boxel-actions {{@class}} {{if @offsetHighlight "boxel-actions--offset"}} boxel-actions--{{@status}}" data-test-boxel-actions ...attributes>
+  <div class="boxel-actions {{@class}} boxel-actions--{{@status}}" data-test-boxel-actions ...attributes>
     <div class="boxel-actions__label boxel-actions__label--{{@status}}">
       {{yield}}
     </div>

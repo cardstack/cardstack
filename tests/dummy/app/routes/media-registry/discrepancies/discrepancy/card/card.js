@@ -2,6 +2,7 @@ import Route from '@ember/routing/route';
 
 export default class MediaRegistryDiscrepanciesDiscrepancyCardCardRoute extends Route {
   model({ innerCardType, innerCardId }) {
+    let { currentOrg, orgs } = this.modelFor('media-registry');
     let card = this.modelFor('media-registry.discrepancies.discrepancy');
     let parentCard = this.modelFor('media-registry.discrepancies.discrepancy.card');
 
@@ -24,6 +25,8 @@ export default class MediaRegistryDiscrepanciesDiscrepancyCardCardRoute extends 
     }
 
     return {
+      currentOrg,
+      orgs,
       nestedField: baseCard,
       nestedCompField: compCard,
       parentCard,

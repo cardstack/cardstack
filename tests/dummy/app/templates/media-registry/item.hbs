@@ -4,22 +4,22 @@
   <DetailTemplate>
     {{!-- Breadcrumbs --}}
     <Breadcrumbs>
-      <LinkTo @route="media-registry" @class="breadcrumbs__item">
+      <LinkTo @route="media-registry" @model={{@model.owner_id}} @class="breadcrumbs__item">
         <div class="breadcrumbs__item-label">Collection</div>
         <div class="breadcrumbs__item-title">Master Recordings</div>
       </LinkTo>
       {{#if @model.fromCollectionId}}
         <span class="breadcrumbs__carot" />
-        <LinkTo @route="media-registry.collection" @model={{@model.fromCollectionId}} @class="breadcrumbs__item">
+        <LinkTo @route="media-registry.collection.index" @model={{@model.fromCollectionId}} @class="breadcrumbs__item">
           <div class="breadcrumbs__item-label">Collection</div>
           <div class="breadcrumbs__item-title">{{titleize (humanize @model.fromCollectionId)}}</div>
         </LinkTo>
       {{/if}}
       {{#if (eq this.target.currentRouteName "media-registry.item.musical-work")}}
         <span class="breadcrumbs__carot" />
-        <LinkTo @route="media-registry.item" @model={{format-id @model.song_title}} @class="breadcrumbs__item">
+        <LinkTo @route="media-registry.item" @model={{@model.id}} @class="breadcrumbs__item">
           <div class="breadcrumbs__item-label">Master Detail</div>
-          <div class="breadcrumbs__item-title">{{titleize @model.song_title}}</div>
+          <div class="breadcrumbs__item-title">{{titleize @model.title}}</div>
         </LinkTo>
       {{/if}}
     </Breadcrumbs>
@@ -29,8 +29,7 @@
     {{else}}
       <MusicDetailCard
         @mode="view"
-        @model={{this.model}}
-        @itemId={{this.itemId}}
+        @model={{@model}}
         @displayFullHeader={{true}}
       >
         <BoxelActions
@@ -53,14 +52,14 @@
           {{#each @model.collections as |collection|}}
             <Card
               @mode="view"
-              @model={{hash type="collection" id=collection.id title=collection.catalog_title}}
+              @model={{hash type="collection" id=collection.id title=collection.title}}
               @hasImage={{true}}
               @expandAction={{fn this.transitionToCatalog collection.id}}
             >
               <CoverArt @class="item__sidebar-covers" @size={{50}} @covers={{collection.selected_art}} />
               <div class="sidebar-related-card__count">
                 <span class="sidebar-related-card__count__number">
-                  {{collection.number_of_songs}}
+                  {{collection.count}}
                 </span>
                 Masters
               </div>

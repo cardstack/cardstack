@@ -1,5 +1,5 @@
 export const AMP = {
-  id: 'amp',
+  id: 'allegro-music-publishing',
   type: 'publisher',
   title: 'Allegro Music Publishing',
   imgURL: '/media-registry/amp-logo.png',
@@ -21,7 +21,7 @@ export const AMP = {
 };
 
 export const WCM = {
-  id: 'wcm',
+  id: 'warner-chappell-music',
   type: 'publisher',
   title: 'Warner Chappell Music',
   imgURL: '/media-registry/wcm-logo.png',
@@ -145,7 +145,7 @@ export const MUSICAL_WORK = {
 
 // MASTER DETAIL
 export const MASTER_DETAIL = {
-  "song_title": "The Sun Comes Out",
+  "title": "The Sun Comes Out",
   "artist": "Bella Swan",
   "album": "Love the Love",
   "cover_art": "media-registry/covers/The-Sun-Comes-Out.jpg",

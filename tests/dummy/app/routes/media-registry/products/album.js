@@ -6,49 +6,54 @@ export default class MediaRegistryProductsAlbumRoute extends Route {
   async model({ albumId }) {
     const tracks = await fetchCollection('all_tracks_combined');
     const musicalWorks = await fetchCollection('musical-works');
-    const allCollections = this.modelFor('media-registry')?.collection;
+    const allCollections = await fetchCollection('collections');
 
     const albumTracks = tracks.filter(el => formatId(el.album) === albumId);
 
+    let { currentOrg } = this.modelFor('media-registry');
     let model = {};
+    model.currentOrg = currentOrg;
 
     let {
       album,
       artist,
-      catalog,
+      collection_ids,
       cover_art,
       cover_art_date,
       cover_art_large,
       cover_art_medium,
       cover_art_thumb,
       genre,
+      label,
       owner,
+      owner_id,
       type_of_album
     } = albumTracks[0];
 
     model = {
       album,
       artist,
-      catalog,
+      collection_ids,
       cover_art,
       cover_art_date,
       cover_art_large,
       cover_art_medium,
       cover_art_thumb,
       genre,
+      label,
       owner,
+      owner_id,
       type_of_album
     };
 
     model.tracks = albumTracks;
 
     model.tracks.map((el, i) => {
-      el.musicalWork = musicalWorks.find(item => formatId(item.title) === formatId(el.song_title));
+      el.musicalWork = musicalWorks.find(item => item.id === el.id);
       el.track_no = String(i + 1);
     });
 
-    const catalogs = model.catalog.map(el => formatId(el));
-    model.collections = allCollections.filter(el => catalogs.includes(el.id));
+    model.collections = allCollections.filter(el => model.collection_ids.includes(el.id));
 
     return model;
   }

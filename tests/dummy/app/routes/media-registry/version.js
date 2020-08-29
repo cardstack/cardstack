@@ -1,8 +1,8 @@
 import Route from '@ember/routing/route';
 import { fetchCollection } from 'dummy/media';
 
-export default class MediaRegistryItemRoute extends Route {
-  async model({ itemId }, transition) {
+export default class MediaRegistryVersionRoute extends Route {
+  async model({ itemId, versionId }, transition) {
     const records = await fetchCollection('all_tracks_combined');
     const profiles = await fetchCollection('profiles');
     const musicalWorks = await fetchCollection('musical-works');
@@ -11,7 +11,7 @@ export default class MediaRegistryItemRoute extends Route {
     let { currentOrg } = this.modelFor('media-registry');
     let { id } = currentOrg;
 
-    let record = records.find(item => item.owner_id === id && item.id === itemId && !item.version);
+    let record = records.find(item => item.owner_id === id && item.id === itemId && item.version === versionId);
     if (!record) { return; }
 
     record.currentOrg = currentOrg;
@@ -27,7 +27,7 @@ export default class MediaRegistryItemRoute extends Route {
     }
 
     if (record.iswc_id) {
-      const work = musicalWorks.find(el => el.owner_id === id && el.iswc === record.iswc_id && !el.version);
+      const work = musicalWorks.find(el => el.owner_id === id && el.iswc === record.iswc_id && el.version === versionId);
       record.musicalWork = work;
     }
 

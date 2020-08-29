@@ -1,7 +1,8 @@
 export default [
     {
       id: 'bunny_records',
-      company: 'Bunny Records',
+      type: 'label',
+      title: 'Bunny Records',
       iconURL: "/media-registry/button-bunny-records.svg",
       logoURL: '/media-registry/bunny-logo.svg',
       user: {
@@ -79,7 +80,8 @@ export default [
     },
     {
       id: 'crd_records',
-      company: 'CRD Records',
+      type: 'label',
+      title: 'CRD Records',
       iconURL: "/media-registry/button-crd-records.svg",
       logoURL: '/media-registry/crd_records_logo.svg',
       user: {
@@ -132,81 +134,50 @@ export default [
       }
     },
     {
-      id: 'wmg',
-      company: 'Warner Music Group',
+      id: 'warner-music-group',
+      type: 'label',
+      title: 'Warner Music Group',
       iconURL: '/media-registry/wmg-logo.svg',
-      logoURL: '/media-registry/wmg-logo.svg',
-      user:  {
-        name: "Lisa Track",
-        title: "Administrator",
-        imgURL: "/media-registry/profiles/Lisa-Track.jpg",
-        queueCards: [
-          {
-            id: "1",
-            status: "open",
-            title: "Catalog transfer",
-            description: "Catalog transfer from Bunny Records to CRD Records for 16 masters",
-            datetime: "2020-08-31T14:46",
-            projectTitle: "Rights transfer, CRD Records",
-            progressPct: 20
-          },
-          {
-            id: "2",
-            status: "needs-response",
-            title: "Interesting band | Jelly Club",
-            datetime: "2020-08-31T13:26",
-            projectTitle: "Potential artist, Hard rock",
-            progressPct: 40,
-          },
-          {
-            id: "3",
-            status: "needs-response",
-            title: "Cover art | GG Greatest Hits",
-            datetime: "2020-08-25T17:02",
-            projectTitle: "New album, Golden Girl",
-            progressPct: 40,
-          },
-          {
-            id: "4",
-            status: "closed",
-            title: "Agreements | BB Clarke",
-            datetime: "2020-08-20T15:11",
-            projectTitle: "Rights transfer, CRD Records",
-            progressPct: 100,
-          },
-          {
-            id: "5",
-            status: "closed",
-            title: "Agreements | Pia Midina",
-            datetime: "2020-07-31T11:40",
-            projectTitle: "Rights transfer, CRD Records",
-            progressPct: 100,
-          },
-          {
-            id: "6",
-            status: "recent",
-            title: "Registration | GG Greatest Hits",
-            datetime: "2020-07-30T09:22",
-            projectTitle: " New album, Golden Girl",
-            progressPct: 40,
-          },
-          {
-            id: "7",
-            status: "closed",
-            title: "Request | Pia Midina",
-            datetime: "2020-07-16T13:38",
-            projectTitle: "Rights transfer, CRD Records",
-            progressPct: 100,
-          },
-          {
-            id: "8",
-            status: "recent",
-            title: "Tracks | GG Greatest Hits",
-            datetime: "2020-07-15T12:21",
-            projectTitle: " New album, Golden Girl",
-            progressPct: 40
-          }
-        ]
-      }
+      logoURL: '/media-registry/wmg-logo.svg'
+    },
+    {
+      id: 'allegro-music-publishing',
+      type: 'publisher',
+      title: 'Allegro Music Publishing',
+      iconURL: '/media-registry/amp-logo.png',
+      logoURL: '/media-registry/amp-logo.png',
+      territory: 'worldwide',
+      ipi: '00170191322',
+      website: 'www.allegromusic.com',
+      main_office: 'New York, USA',
+      home: 'media-registry.musical-works.work-version',
+      homeModel: 'the-sun-comes-out'
+    },
+    {
+      id: 'warner-chappell-music',
+      type: 'publisher',
+      title: 'Warner Chappell Music',
+      iconURL: '/media-registry/wcm-logo.png',
+      logoURL: '/media-registry/wcm-logo.png',
+      territory: 'worldwide',
+      ipi: '00160187388',
+      website: 'www.warnerchappell.com',
+      main_office: 'Los Angeles, USA',
+      home: 'media-registry.musical-works.work',
+      homeModel: 'the-sun-comes-out'
+    },
+    {
+      id: 'global-music-rights',
+      title: 'Global Music Rights',
+      iconURL: '/media-registry/gmr-logo.svg',
+      logoURL: '/media-registry/gmr-logo.svg',
+      home: 'media-registry.musical-works.work',
+      homeModel: 'the-sun-comes-out'
+    },
+    {
+      id: 'deezer',
+      title: 'Deezer',
+      iconURL: '/media-registry/deezer-logo.png',
+      logoURL: '/media-registry/deezer-logo.png'
     },
   ];

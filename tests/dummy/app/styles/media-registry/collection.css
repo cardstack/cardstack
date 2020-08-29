@@ -9,52 +9,27 @@
 }
 
 
-/* Collection Item Wrapper + Actions */
-.collection__boxel {
-  width: 100%;
-  border-radius: var(--boxel-border-radius);
-}
-
-.media-collection__grid-item:hover .collection__boxel,
-.collection__boxel:hover,
-.collection__boxel:focus-within {
-  border-color: rgba(0, 0, 0, 0.05);
-}
-
-.media-collection__grid-item:hover .collection__highlighter,
-.collection__boxel:hover .collection__highlighter,
-.collection__boxel:focus-within .collection__highlighter {
-  box-shadow: var(--boxel-box-shadow);
-  outline: 0;
-}
-
-.collection__select-btn {
-  visibility: collapse;
-}
-
-.media-collection__grid-item:hover .collection__select-btn,
-.collection__select-btn--selected,
-.collection__select-btn:hover,
-.collection__select-btn:focus,
-.collection__boxel:hover + .collection__select-btn,
-.collection__boxel:focus-within + .collection__select-btn {
-  visibility: visible;
-}
-
+/* Play btn */
 .collection__play-btn {
   --icon-color: rgba(0, 0, 0, 0.5);
   --icon-border: white;
   width: 60px;
   height: 60px;
   display: none;
-  position: relative;
-  top: 61px;
+  position: absolute;
+  top: 30%;
+  left: 37%;
+  z-index: 2;
+}
+
+.collection__play-btn--list {
+  top: 32px;
+  left: 32px;
 }
 
 .collection__play-btn.is-playing,
 .media-collection__grid-item:hover .collection__play-btn,
-.collection__boxel:hover .collection__play-btn,
-.collection__boxel:focus-within .collection__play-btn {
+.master-collection__boxel:hover .collection__play-btn {
   display: inline-block;
 }
 

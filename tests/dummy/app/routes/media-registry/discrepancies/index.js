@@ -1,23 +1,24 @@
 import Route from '@ember/routing/route';
-import DISCREPANCIES from '../../../data/discrepancies-list';
+import DISCREPANCIES from 'dummy/data/discrepancies-list';
 
 export default class MediaRegistryDiscrepanciesIndexRoute extends Route {
   model() {
+    let { currentOrg, orgs } = this.modelFor('media-registry');
+    let { id } = currentOrg;
+    let discrepancies = DISCREPANCIES.filter(el => el.ownerId === id);
+
     return {
+      id,
+      currentOrg,
+      orgs,
       title: 'All Discrepancies',
       type: 'list',
-      id: 'verifi-registry',
-      company: 'Verifi Registry',
-      typeField: 'type',
-      collection: DISCREPANCIES,
-      route: 'media-registry.discrepancies.discrepancy',
+      collection: discrepancies,
       listTitleFields: [
         'Title',
         'Type',
         'Version',
-        // 'Last Updated',
-        'Other Version',
-        // 'Last Updated'
+        'Other Version'
       ],
       listFields: [
         {
@@ -29,17 +30,9 @@ export default class MediaRegistryDiscrepanciesIndexRoute extends Route {
         {
           valuePath: 'baseOwner'
         },
-        // {
-        //   valuePath: 'baseCard.datetime',
-        //   type: 'date'
-        // },
         {
           valuePath: 'compOwner'
         },
-        // {
-        //   valuePath: 'compCard.datetime',
-        //   type: 'date'
-        // }
       ],
       columns: [
         {

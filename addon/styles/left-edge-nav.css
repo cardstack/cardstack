@@ -77,3 +77,39 @@
 .left-edge-nav__btn--static:hover {
   cursor: initial;
 }
+
+
+.left-edge-nav__btn-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--boxel-border-radius);
+  background-color: #000;
+  background-position: center;
+  background-size: 30px 30px;
+  background-repeat: no-repeat;
+}
+
+
+.left-edge-nav__btn-logo--bunny_records {
+  background-color: #FF1D6C;
+  background-size: 40px 40px;
+}
+
+.left-edge-nav__btn-logo--crd_records {
+  background-color: #0069F9;
+  background-size: 40px 40px;
+}
+
+.left-edge-nav__btn-logo--warner-music-group {
+  background-color: #0061aa;
+  background-size: auto;
+}
+
+.left-edge-nav__btn-logo--warner-chappell-music {
+  background-size: 25px 25px;
+}
+
+.left-edge-nav__btn-logo--deezer {
+  background-size: auto 25px;
+  background-position: top 5px center;
+}

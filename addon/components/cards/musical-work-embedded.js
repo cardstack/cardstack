@@ -17,12 +17,8 @@ export default class MusicalWorkEmbedded extends Component {
       type: 'musical-work',
       imgURL: '/media-registry/musical-work.svg',
       title: titleize(card?.title),
-      description: card.composer ? `by ${card?.artist}, ${card?.composer}` : `by ${card?.artist}`,
+      description: card.composer ? `by ${card?.artist}, ${card?.composer}` : `by ${card?.description}`,
       fields: [
-        {
-          title: 'version type',
-          value: card?.version_type
-        },
         {
           title: 'iswc',
           value: card?.iswc
@@ -37,8 +33,11 @@ export default class MusicalWorkEmbedded extends Component {
 
   @action
   transitionToMusicalWork() {
-    if (formatId(this.args.model.title) === 'the-sun-comes-out') {
-      this.router.transitionTo('media-registry.musical-works.work', 'the-sun-comes-out-wmg-v1');
+    if (this.args.model.id === 'the-sun-comes-out') {
+      if (this.args.model.version) {
+        return this.router.transitionTo('media-registry.musical-works.work-version', 'the-sun-comes-out', this.args.model.version);
+      }
+      this.router.transitionTo('media-registry.musical-works.work', 'the-sun-comes-out');
     } else {
       this.router.transitionTo('media-registry.item.musical-work', formatId(this.args.model.title));
     }

@@ -81,3 +81,8 @@
 .detail-card--edit {
   overflow-x: auto;
 }
+
+.detail-card__source {
+  padding: 0 50px 30px;
+  text-align: right;
+}

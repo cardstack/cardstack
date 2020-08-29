@@ -49,16 +49,17 @@ export default {
   id: "the-sun-comes-out-wmg-wcm",
   type: "Musical Work",
   title: "The Sun Comes Out",
+  ownerId: 'warner-music-group',
   baseOwner: 'Warner Music Group',
   compOwner: 'Warner Chappell Music',
   baseCard: {
     type: 'musical-work',
+    version: "v1",
     owner: 'Warner Music Group',
-    ownerId: 'wmg',
+    ownerId: 'warner-music-group',
     iconURL: '/media-registry/wmg-logo.svg',
     datetime: '2020-04-08T10:45',
-    id: "the-sun-comes-out-wmg-v1",
-    nextId: "the-sun-comes-out-wmg-v2",
+    id: "the-sun-comes-out",
     isolatedFields: [
       {
         title: "title",
@@ -114,8 +115,9 @@ export default {
   },
   compCard: {
     type: 'musical-work',
+    version: "v2",
     owner: 'Warner Chappell Music',
-    ownerId: 'wcm',
+    ownerId: 'warner-chappell-music',
     iconURL: '/media-registry/wcm-logo.png',
     datetime: '2019-11-11T13:54',
     id: "the-sun-comes-out-wcm-v1",

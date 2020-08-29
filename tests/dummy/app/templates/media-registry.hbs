@@ -1,41 +1,43 @@
-{{#if (or (eq this.target.currentRouteName "media-registry.versions") (eq this.target.currentRouteName "media-registry.musical-works.work") (eq (truncate this.target.currentRouteName 28 false) "media-registry.discrepancies"))}}
+{{#if (or (eq this.target.currentRouteName "media-registry.versions") (eq (truncate this.target.currentRouteName 40 false) "media-registry.discrepancies.discrepancy"))}}
   {{outlet}}
 {{else}}
-  <section class="media-registry media-registry--{{@model.id}}">
+  <section class="media-registry media-registry--{{@model.currentOrg.id}}">
     {{#if (eq this.target.currentRouteName "media-registry.cardflow")}}
       {{outlet}}
     {{else}}
       <aside class="media-registry__left-edge {{if this.isQueueFixed "with-queue"}}">
-        <LeftEdgeNav @orgs={{@model.orgs}} @current={{@model.id}} @currentRouteName={{this.target.currentRouteName}} />
+        <LeftEdgeNav @orgs={{@model.orgs}} @current={{@model.currentOrg.id}} @currentRouteName={{this.target.currentRouteName}} />
         {{#each @model.orgs as |org|}}
-          <IconButton {{on "mouseover" (fn this.setOrg org)}} {{on "click" (fn this.transition org.id)}} class="media-registry__hover-zone media-registry__hover-zone--{{org.id}}" />
+          {{#if org.user}}
+            <IconButton {{on "mouseover" (fn this.setOrg org)}} {{on "click" (fn this.transition org.id)}} class="media-registry__hover-zone media-registry__hover-zone--{{org.id}}" />
+          {{/if}}
         {{/each}}
-        <div class="media-registry__left-edge-queue {{if this.isQueueFixed "slide-in"}}">
-          <IconButton @icon={{if this.isQueueFixed "arrow-left" "sidebar"}} @class="media-registry__queue-btn" {{on "click" (action (mut this.isQueueFixed) (not this.isQueueFixed))}} @aria-label="Toggle fix cardflow queue" />
-          <CardflowQueue
-            @class="media-registry__queue {{if (and (not this.isQueueFixed) (not-eq this.target.currentRouteName "media-registry.cardflow")) "with-box-shadow"}}"
-            @model={{this.org}}
-            @currentMilestone={{this.latestMilestone}}
-          />
-        </div>
+        {{#if this.org.user}}
+          <div class="media-registry__left-edge-queue {{if this.isQueueFixed "slide-in"}}">
+            <IconButton @icon={{if this.isQueueFixed "arrow-left" "sidebar"}} @class="media-registry__queue-btn" {{on "click" (action (mut this.isQueueFixed) (not this.isQueueFixed))}} @aria-label="Toggle fix cardflow queue" />
+            <CardflowQueue
+              @class="media-registry__queue {{if (and (not this.isQueueFixed) (not-eq this.target.currentRouteName "media-registry.cardflow")) "with-box-shadow"}}"
+              @model={{@model.currentOrg}}
+              @currentMilestone={{this.latestMilestone}}
+            />
+          </div>
+        {{/if}}
       </aside>
-      <header class="media-registry__header media-registry__header--sm">
-        <h1 class="media-registry__title">
-          <span class="media-registry__logo" style={{css-url "background-image" @model.logoURL}} />
-          <span>{{@model.company}}</span>
-        </h1>
-        <input class="media-registry__search-bar" type="search" placeholder="Search" />
-        <nav class="media-registry__nav">
-          <ul>
-            <li><LinkTo @class={{if (eq this.target.currentRouteName "media-registry.agreements") "unselected" "active"}} @route="media-registry" @model={{@model.id}}>Masters</LinkTo></li>
-            <li><LinkTo @route="media-registry.agreements" @model={{@model.id}}>Agreements</LinkTo></li>
-          </ul>
-        </nav>
-      </header>
-
-      <div class="media-registry__outlet" role="button" {{on "mouseover" (fn this.setOrg @model)}}>
-        {{outlet}}
-      </div>
+      <OrgHeader
+        @org={{@model.currentOrg}}
+        @id={{@model.currentOrg.id}}
+        @title={{@model.currentOrg.title}}
+        @logoURL={{@model.currentOrg.logoURL}}
+      />
+      {{#if this.org.user}}
+        <div class="media-registry__outlet" role="button" {{on "mouseover" (fn this.setOrg @model.currentOrg)}}>
+          {{outlet}}
+        </div>
+      {{else}}
+        <div class="media-registry__outlet">
+          {{outlet}}
+        </div>
+      {{/if}}
     {{/if}}
   </section>
 {{/if}}

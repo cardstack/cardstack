@@ -42,7 +42,7 @@ export default [
         "description": "Recorded",
         "card_model": {
           "id": "the-leaves-are-changing-color",
-          "song_title": "Leaves Are Changing Color",
+          "title": "Leaves Are Changing Color",
           "artist": "Pia Midina",
           "verifi_id": "0x9b2138a6c17e6da2d9cd3303fe7b26079231184ac2f1b6537a11e2301b74ca26",
           "fields": {
@@ -72,7 +72,7 @@ export default [
         "description": "2020 release confirmed",
         "card_model": {
           "id": "the-leaves-are-changing-color",
-          "song_title": "Leaves Are Changing Color",
+          "title": "Leaves Are Changing Color",
           "artist": "Pia Midina",
           "verifi_id": "0x9b2138a6c17e6da2d9cd3303fe7b26079231184ac2f1b6537a11e2301b74ca26",
           "fields": {
@@ -106,7 +106,7 @@ export default [
         "description": "Updated based on credible rumor",
         "card_model": {
           "id": "the-leaves-are-changing-color",
-          "song_title": "Fall Is Back",
+          "title": "Fall Is Back",
           "artist": "Pia Midina",
           "verifi_id": "0x9b2138a6c17e6da2d9cd3303fe7b26079231184ac2f1b6537a11e2301b74ca26",
           "cover_art": "media-registry/old-album-art.png",
@@ -145,7 +145,7 @@ export default [
         "description": "Official announcement",
         "card_model": {
           "id": "the-leaves-are-changing-color",
-          "song_title": "The Leaves Are Changing Color",
+          "title": "The Leaves Are Changing Color",
           "artist": "Pia Midina",
           "verifi_id": "0x9b2138a6c17e6da2d9cd3303fe7b26079231184ac2f1b6537a11e2301b74ca26",
           "cover_art": "media-registry/covers/Autumn-Leaves.jpg",
@@ -183,7 +183,7 @@ export default [
         "description": "Retail stores’ sales figures released",
         "card_model": {
           "id": "the-leaves-are-changing-color",
-          "song_title": "The Leaves Are Changing Color",
+          "title": "The Leaves Are Changing Color",
           "artist": "Pia Midina",
           "verifi_id": "0x9b2138a6c17e6da2d9cd3303fe7b26079231184ac2f1b6537a11e2301b74ca26",
           "cover_art": "media-registry/covers/Autumn-Leaves.jpg",
@@ -255,7 +255,7 @@ export default [
         "description": "Digital download available worldwide",
         "card_model": {
           "id": "the-leaves-are-changing-color",
-          "song_title": "The Leaves Are Changing Color",
+          "title": "The Leaves Are Changing Color",
           "artist": "Pia Midina",
           "verifi_id": "0x9b2138a6c17e6da2d9cd3303fe7b26079231184ac2f1b6537a11e2301b74ca26",
           "cover_art": "media-registry/covers/Autumn-Leaves.jpg",

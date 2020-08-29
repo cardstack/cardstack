@@ -1,18 +1,17 @@
 <div class="collection__wrapper">
-  <Breadcrumbs @items={{array (hash route="media-registry" title="Master Recordings" type=@model.type)}} />
+  <Breadcrumbs @items={{array (hash route="media-registry.index" routeModel=@model.currentOrg.id title="Master Recordings" type=@model.type)}} />
 
   <IsolatedCollection
     @mode="view"
     @model={{@model}}
     @format="table"
     @displayHighlightActions={{true}}
-    @transition={{this.transitionToIsolate}}
+    @expandAction={{this.transitionToIsolate}}
     @transitionToEdit={{this.transitionToEdit}}
     @transitionToView={{this.transitionToView}}
     @sort={{this.sort}}
     @search={{this.search}}
     @removeItem={{this.removeItem}}
-    @itemComponent="cards/master-collection-item"
   />
 </div>
 

@@ -1,0 +1,17 @@
+<header class="media-registry__header media-registry__header--sm media-registry__header--{{@id}}">
+  <h1 class="media-registry__title">
+    <span class="media-registry__logo media-registry__logo--{{@id}}" style={{css-url "background-image" @logoURL}} />
+    <span>{{@title}}</span>
+  </h1>
+  <input class="media-registry__search-bar" type="search" placeholder="Search" />
+  <nav class="media-registry__nav">
+    <ul>
+      <li><LinkTo @route="media-registry.index" @model={{@id}}>Masters</LinkTo></li>
+      {{#if @org.user}}
+        <li><LinkTo @route="media-registry.agreements" @model="TA-38185847898">Agreements</LinkTo></li>
+      {{else}}
+        <li><LinkTo @route="media-registry.discrepancies.index">Discrepancies</LinkTo></li>
+      {{/if}}
+    </ul>
+  </nav>
+</header>

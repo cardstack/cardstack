@@ -1,6 +1,5 @@
 import Controller from '@ember/controller';
 import { action } from '@ember/object';
-import { formatId } from '@cardstack/boxel/utils/format-id';
 
 export default class MediaRegistryProductsAlbumController extends Controller {
   get headerDetailFields() {
@@ -8,7 +7,7 @@ export default class MediaRegistryProductsAlbumController extends Controller {
     return [
       {
         title: 'label',
-        value: this.model.owner
+        value: this.model.label
       },
       {
         title: 'Release Type',
@@ -49,7 +48,7 @@ export default class MediaRegistryProductsAlbumController extends Controller {
             },
             {
               name: 'Title',
-              valuePath: 'song_title',
+              valuePath: 'title',
               width: 290,
               titleCase: true,
               hasAudio: true
@@ -95,7 +94,7 @@ export default class MediaRegistryProductsAlbumController extends Controller {
 
   @action
   transitionToItem(item) {
-    if (!item || !item.song_title) { return; }
-    this.transitionToRoute('media-registry.item', formatId(item.song_title));
+    if (!item || !item.id) { return; }
+    this.transitionToRoute('media-registry.item', item.id);
   }
 }

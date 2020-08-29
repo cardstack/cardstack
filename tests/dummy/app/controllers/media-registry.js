@@ -5,7 +5,7 @@ import METADATASTEPS from 'dummy/data/amend-metadata-steps';
 import MILESTONES from 'dummy/data/catalog-transfer-workflow';
 
 export default class MediaRegistryController extends Controller {
-  @tracked org = this.model;
+  @tracked org = this.model.currentOrg;
   @tracked actionSteps = METADATASTEPS;
   @tracked milestones = MILESTONES;
 
@@ -28,9 +28,14 @@ export default class MediaRegistryController extends Controller {
     let { currentRouteName } = this.target;
 
     if (this.model.id !== id) {
-      if (currentRouteName === 'media-registry.agreements' || currentRouteName === 'media-registry.cardflow') {
-        return this.transitionToRoute(currentRouteName, id);
+      if (currentRouteName === 'media-registry.agreements') {
+        return this.transitionToRoute('media-registry.agreements', id, "TA-38185847898");
       }
+
+      if (currentRouteName === 'media-registry.cardflow') {
+        return this.transitionToRoute('media-registry.cardflow', id);
+      }
+
     }
 
     this.transitionToRoute('media-registry', id);
