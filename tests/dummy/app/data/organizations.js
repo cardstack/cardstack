@@ -150,8 +150,7 @@ export default [
       ipi: '00170191322',
       website: 'www.allegromusic.com',
       main_office: 'New York, USA',
-      home: 'media-registry.musical-works.work-version',
-      homeModel: 'the-sun-comes-out'
+      musicalWorkOnly: true
     },
     {
       id: 'warner-chappell-music',
@@ -163,16 +162,14 @@ export default [
       ipi: '00160187388',
       website: 'www.warnerchappell.com',
       main_office: 'Los Angeles, USA',
-      home: 'media-registry.musical-works.work',
-      homeModel: 'the-sun-comes-out'
+      musicalWorkOnly: true
     },
     {
       id: 'global-music-rights',
       title: 'Global Music Rights',
       iconURL: '/media-registry/gmr-logo.svg',
       logoURL: '/media-registry/gmr-logo.svg',
-      home: 'media-registry.musical-works.work',
-      homeModel: 'the-sun-comes-out'
+      musicalWorkOnly: true
     },
     {
       id: 'deezer',

@@ -49,10 +49,6 @@ export default class MusicDetailCardComponent extends Component {
         content: this.files
       },
       {
-        title: "Agreements",
-        content: this.agreements
-      },
-      {
         title: "Codes",
         content: this.codes
       },
@@ -246,67 +242,6 @@ export default class MusicDetailCardComponent extends Component {
           }
         ]
       }
-    ];
-  }
-
-  get agreements() {
-    if (!this.model) { return null; }
-    let searchResults;
-    let cards = [];
-
-    if (this.model.label === 'Bunny Records' || this.model.agreementCard) {
-      searchResults = [{
-        id: 'exclusive-recording-agreement-2',
-        type: 'agreement',
-        imgURL: '/media-registry/bunny-records-logo.svg',
-        title: 'Second Recording Agreement',
-        fields: [
-          {
-            title: 'assigner',
-            value: `${this.model.artist}`
-          },
-          {
-            title: 'assignee',
-            value: `${this.model.label}`
-          },
-          {
-            title: 'active through',
-            value: 'Dec 2024'
-          }
-        ],
-      }];
-
-      cards = [...cards, this.model.agreementCard || {
-        id: 'exclusive-recording-agreement',
-        type: 'agreement',
-        imgURL: '/media-registry/bunny-records-logo.svg',
-        title: 'Exclusive Recording Agreement',
-        fields: [
-          {
-            title: 'assigner',
-            value: `${this.model.artist}`
-          },
-          {
-            title: 'assignee',
-            value: `${this.model.label}`
-          },
-          {
-            title: 'active through',
-            value: 'Dec 2023'
-          }
-        ],
-      }];
-    }
-
-    return [
-      {
-        title: 'active',
-        search: async function() {
-          return searchResults;
-        },
-        type: cards.length ? 'collection' : null,
-        value: cards.length ? cards : null
-      },
     ];
   }
 }

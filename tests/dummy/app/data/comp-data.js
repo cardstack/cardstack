@@ -2,44 +2,22 @@ export const AMP = {
   id: 'allegro-music-publishing',
   type: 'publisher',
   title: 'Allegro Music Publishing',
-  imgURL: '/media-registry/amp-logo.png',
+  logoURL: '/media-registry/amp-logo.png',
   territory: 'worldwide',
-  fields: [
-    {
-      title: 'cae/ipi #',
-      value: '00170191322'
-    },
-    {
-      title: 'website',
-      value: 'www.allegromusic.com'
-    },
-    {
-      title: 'main office',
-      value: 'New York, USA'
-    }
-  ]
+  ipi: '00170191322',
+  website: 'www.allegromusic.com',
+  main_office: 'New York, USA'
 };
 
 export const WCM = {
   id: 'warner-chappell-music',
   type: 'publisher',
   title: 'Warner Chappell Music',
-  imgURL: '/media-registry/wcm-logo.png',
+  logoURL: '/media-registry/wcm-logo.png',
   territory: 'worldwide',
-  fields: [
-    {
-      title: 'cae/ipi #',
-      value: '00160187388'
-    },
-    {
-      title: 'website',
-      value: 'www.warnerchappell.com'
-    },
-    {
-      title: 'main office',
-      value: 'Los Angeles, USA'
-    }
-  ]
+  ipi: '00160187388',
+  website: 'www.warnerchappell.com',
+  main_office: 'Los Angeles, USA'
 }
 
 // WRITERS

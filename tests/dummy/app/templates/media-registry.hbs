@@ -28,6 +28,7 @@
         @id={{@model.currentOrg.id}}
         @title={{@model.currentOrg.title}}
         @logoURL={{@model.currentOrg.logoURL}}
+        @musicalWorkOnly={{@model.currentOrg.musicalWorkOnly}}
       />
       {{#if this.org.user}}
         <div class="media-registry__outlet" role="button" {{on "mouseover" (fn this.setOrg @model.currentOrg)}}>

@@ -167,12 +167,12 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0 10px;
-  max-width: 450px;
 }
 
 .media-registry__nav li > a {
   padding: 0 20px 10px;
   border-bottom: 4px solid transparent;
+  white-space: nowrap;
 }
 
 .media-registry__nav li > a.active:not(.unselected) {
