@@ -4,7 +4,7 @@ import { action, get } from '@ember/object';
 import { compare, isBlank } from '@ember/utils';
 
 export default class CardflowComponent extends Component {
-  @tracked project = this.args.org?.user?.queueCards[0];
+  @tracked project = this.args.org?.queueCards[0];
   @tracked actionSteps = this.args.actionSteps;
   @tracked lastUpdated = this.args.lastUpdated;
   @tracked isolatedCatalog = this.args.isolatedCatalog;

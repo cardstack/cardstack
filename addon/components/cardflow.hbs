@@ -79,7 +79,7 @@
           @format="table"
           @class="cardflow__isolated-collection cardflow__nested-detail-card"
           @model={{@isolatedCatalog}}
-          @transition={{action @setItemId}}
+          @expandAction={{action @setItemId}}
           @sort={{this.sort}}
           @search={{this.search}}
           @removeItem={{this.removeItem}}
@@ -144,7 +144,7 @@
             </section>
             <section class="cardflow-card__section">
               <div class="field-renderer__title">Catalog</div>
-              <Cards::MasterCollection @model={{@catalog}} @transition={{fn this.displayCatalog @catalog.id}} />
+              <Cards::MasterCollection @model={{@catalog}} @expandAction={{fn this.displayCatalog @catalog.id}} />
             </section>
             <section class="cardflow-card__section cardflow-proposal-card__effective-date">
                 Effective Date: <strong>September 1, 2020</strong>
@@ -349,8 +349,8 @@
               <div class="cardflow__participant">
                 <div class="cardflow__participant-user-img" style={{css-url "background-image" participant.user.imgURL}} />
                 <div class="cardflow__participant-user">
-                  {{participant.user.name}}<br>
-                  <span>{{participant.user.title}}</span>
+                  {{participant.user.title}}<br>
+                  <span>{{participant.user.role}}</span>
                 </div>
               </div>
             </div>

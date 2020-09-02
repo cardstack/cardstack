@@ -1,0 +1,24 @@
+[
+  {
+    "id": "customer-support",
+    "title": "Customer Support",
+    "milestones": [
+      {
+        "pct": "20",
+        "title": "Place Order"
+      },
+      {
+        "pct": "40",
+        "title": "Reserve products"
+      },
+      {
+        "pct": "60",
+        "title": "Submit payment"
+      },
+      {
+        "pct": "80",
+        "title": "Track Delivery"
+      }
+    ]
+  }
+]

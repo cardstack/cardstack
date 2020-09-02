@@ -1,16 +1,45 @@
-<div role="button" {{on "click" this.openThread}} class="queue-card queue-card--{{@card.status}}">
+<div role="button" {{on "click" this.openThread}} class="queue-card {{if (eq @card.status "unread") "queue-card--light-theme"}}">
   <header class="queue-card__header">
-    <div class="queue-card__title">{{@card.projectTitle}}</div>
-    {{#if (or (eq @card.status "needs-response") (eq @card.status "open"))}}
-      <div class="queue-card__notification">1</div>
-    {{/if}}
+    <h3 class="queue-card__label">{{@card.project}}</h3>
+    {{#let (if @currentMilestone.timestamp @currentMilestone.timestamp @card.datetime) as |datetime|}}
+      <time datetime={{datetime}} class="queue-card__datetime">{{moment-format datetime "MMM D, h:mm A"}}</time>
+      {{#if (eq @card.status "unread")}}
+        <div class="queue-card__notification">1</div>
+      {{/if}}
+    {{/let}}
   </header>
-  <div class="queue-card__project-title">{{@card.title}}</div>
-  <footer class="queue-card__footer">
-    <div>{{moment-format (or @currentMilestone.timestamp @card.datetime) "MMM D, h:mm A"}}</div>
-    <div>
-      {{titleize (humanize this.progress.status)}}
-      <span class="queue-card__progress-icon queue-card__progress-pie" style={{css-url "background-image" (if (eq @card.status "open") this.progress.iconOpen this.progress.icon)}} />
-    </div>
-  </footer>
+
+  <section class="queue-card__content">
+    <h4 class="queue-card__project-title">{{@card.title}}</h4>
+    {{#if (and @card.participants @card.participants.length)}}
+      <div class="queue-card__participants">
+        {{svg-jar "users" width="14px" height="12px"}}
+        <span class="queue-card__participant-names">{{this.participants}}</span>
+      </div>
+    {{/if}}
+  </section>
+
+  {{#if (or @card.tasks this.progress.status)}}
+    <footer class="queue-card__footer">
+      <div>
+        {{#if @card.awaitingResponse}}
+          <div class="queue-card__task-label queue-card__task-label--awaiting-reply">
+            Awaiting Response
+          </div>
+        {{/if}}
+        {{#if (and @card.tasks @card.tasks.length)}}
+          <div class="queue-card__task-label">
+            {{@card.tasks.length}} {{#if (eq @card.tasks.length 1)}}Task{{else}}Tasks{{/if}}
+          </div>
+        {{/if}}
+      </div>
+      <div class="queue-card__status">
+        {{titleize (humanize this.progress.status)}}
+        <span
+          class="queue-card__progress-icon queue-card__progress-pie"
+          style={{css-url "background-image" (if (eq @card.status "unread") this.progress.iconOpen this.progress.icon)}}
+        />
+      </div>
+    </footer>
+  {{/if}}
 </div>

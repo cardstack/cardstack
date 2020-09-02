@@ -1,0 +1,23 @@
+<section class="media-registry media-registry--{{@model.currentOrg.id}}">
+  <aside class="media-registry__left-edge">
+    <LeftEdgeNav
+      @orgs={{@model.orgs}}
+      @current={{@model.currentOrg.id}}
+      @user={{@model.user}}
+    />
+
+    <div class="media-registry__left-edge-queue slide-in">
+      <CardflowQueue
+        @class="media-registry__queue"
+        @model={{@model.currentOrg}}
+        @user={{@model.user}}
+        {{!-- @currentMilestone={{this.currentMilestone}}
+        @updateProgress={{this.updateProgress}} --}}
+      />
+    </div>
+  </aside>
+
+  <main class="media-registry__outlet">
+    {{outlet}}
+  </main>
+</section>

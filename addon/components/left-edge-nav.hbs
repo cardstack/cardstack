@@ -1,52 +1,75 @@
 <nav class="left-edge-nav">
   <ul class="left-edge-nav__top-btn-group">
-    <li>
-      {{!-- <LinkTo @route="media-registry" class="left-edge-nav__btn left-edge-nav__btn--cs-logo" aria-label="home">
-        {{svg-jar "cardstack-logo" width="33px" height="35px"}}
-      </LinkTo> --}}
-      <LinkTo @route="media-registry.discrepancies.index" @model={{@current}} @class="left-edge-nav__btn left-edge-nav__btn--static" @aria-label="home">
-        {{svg-jar "verifi-logo-dark-outline" width="45px" height="45px"}}
-      </LinkTo>
-    </li>
+    {{#if @mediaRegistry}}
+      <li>
+        <LinkTo @route="media-registry" @model="warner-music-group" @class="left-edge-nav__btn left-edge-nav__btn--static" @aria-label="home">
+          {{svg-jar "verifi-logo-dark-outline" width="45px" height="45px"}}
+        </LinkTo>
+      </li>
+    {{else}}
+      <li>
+        <LinkTo @route="workflow" @class="left-edge-nav__btn left-edge-nav__btn--cs-logo" @aria-label="home">
+          {{svg-jar "cardstack-logo" width="33px" height="35px"}}
+        </LinkTo>
+      </li>
+      <li>
+        <LinkTo @route="workflow" @class="left-edge-nav__btn" @aria-label="user profile">
+          <div class="left-edge-nav__btn-user" style={{css-url "background-image" @user.imgURL}} />
+        </LinkTo>
+      </li>
+    {{/if}}
   </ul>
 
   <ul class="left-edge-nav__middle-btn-group">
     {{#each @orgs as |org|}}
-      <li>
-        {{#if org.user}}
-          <button {{on "click" (fn this.transitionToCatalog @currentRouteName org.id)}}
-            class="left-edge-nav__btn left-edge-nav__btn--full {{if (eq @current org.id) "selected"}}"
-            aria-label="View catalog for {{org.company}}"
-          >
-            <div class="left-edge-nav__btn-logo left-edge-nav__btn-logo--{{org.id}}" style={{css-url "background-image" org.iconURL}} />
-          </button>
-        {{else}}
-          <LinkTo @route="media-registry.index" @model={{org.id}} @query={{hash version=this.router.currentRoute.queryParams.version}}
+      {{#if @mediaRegistry}}
+        <li>
+          {{#if org.user}}
+            <button {{on "click" (fn this.transitionToCatalog @currentRouteName org.id)}}
+              class="left-edge-nav__btn left-edge-nav__btn--full {{if (eq @current org.id) "selected"}}"
+              aria-label="View catalog for {{org.title}}"
+            >
+              <div class="left-edge-nav__btn-logo left-edge-nav__btn-logo--{{org.id}}" style={{css-url "background-image" org.iconURL}} />
+            </button>
+          {{else}}
+            <LinkTo @route="media-registry.index" @model={{org.id}} @query={{hash version=this.router.currentRoute.queryParams.version}}
+              @class="left-edge-nav__btn left-edge-nav__btn--full {{if (eq @current org.id) "selected"}}"
+              @aria-label="View catalog for {{org.title}}"
+            >
+              <div class="left-edge-nav__btn-logo left-edge-nav__btn-logo--{{org.id}}" style={{css-url "background-image" org.iconURL}} />
+            </LinkTo>
+          {{/if}}
+        </li>
+      {{else}}
+        <li>
+          <LinkTo @route="workflow"
             @class="left-edge-nav__btn left-edge-nav__btn--full {{if (eq @current org.id) "selected"}}"
-            @aria-label="View catalog for {{org.company}}"
+            @aria-label="Organization page for {{org.title}}"
           >
             <div class="left-edge-nav__btn-logo left-edge-nav__btn-logo--{{org.id}}" style={{css-url "background-image" org.iconURL}} />
           </LinkTo>
-        {{/if}}
-      </li>
+        </li>
+      {{/if}}
     {{/each}}
   </ul>
 
   <ul class="left-edge-nav__bottom-btn-group">
-    {{!-- <li>
-      <button class="left-edge-nav__btn left-edge-nav__btn--icon-only" aria-label="pin">
-        {{svg-jar "pin" width="20px" height="20px"}}
-      </button>
-    </li>
-    <li>
-      <button class="left-edge-nav__btn left-edge-nav__btn--icon-only" aria-label="catalog">
-        {{svg-jar "card-catalog" width="20px" height="20px"}}
-      </button>
-    </li>
-    <li>
-      <button class="left-edge-nav__btn left-edge-nav__btn--icon-only" aria-label="library">
-        {{svg-jar "library" width="21px" height="21px"}}
-      </button>
-    </li> --}}
+    {{#unless @mediaRegistry}}
+      <li>
+        <button class="left-edge-nav__btn left-edge-nav__btn--icon-only" aria-label="pin">
+          {{svg-jar "pin" width="20px" height="20px"}}
+        </button>
+      </li>
+      <li>
+        <button class="left-edge-nav__btn left-edge-nav__btn--icon-only" aria-label="catalog">
+          {{svg-jar "card-catalog" width="20px" height="20px"}}
+        </button>
+      </li>
+      <li>
+        <button class="left-edge-nav__btn left-edge-nav__btn--icon-only" aria-label="library">
+          {{svg-jar "library" width="21px" height="21px"}}
+        </button>
+      </li>
+    {{/unless}}
   </ul>
 </nav>

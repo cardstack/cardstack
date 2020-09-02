@@ -1,22 +1,22 @@
  <aside class="media-registry__left-edge with-queue">
-  <LeftEdgeNav @orgs={{@model.orgs}} @current={{@model.id}} />
+  <LeftEdgeNav @orgs={{@model.orgs}} @current={{@model.id}} @mediaRegistry={{true}} />
   {{#each @model.orgs as |org|}}
-    <IconButton {{on "mouseover" (fn this.setOrg org)}} {{on "click" (fn this.transition org)}} class="media-registry__hover-zone media-registry__hover-zone--{{org.id}}" />
+    <IconButton {{on "click" (fn this.transition org)}} class="media-registry__hover-zone media-registry__hover-zone--{{org.id}}" />
   {{/each}}
   <div class="media-registry__left-edge-queue slide-in">
     <CardflowQueue
       @class="media-registry__queue"
-      @model={{this.org}}
+      @model={{this.model.currentOrg}}
       @currentMilestone={{this.currentMilestone}}
       @updateProgress={{this.updateProgress}}
     />
   </div>
 </aside>
 
-<div class="media-registry__outlet" role="button" {{on "mouseover" (fn this.setOrg @model)}}>
+<div class="media-registry__outlet">
   <Cardflow
     @model={{@model}}
-    @org={{this.org}}
+    @org={{this.model.currentOrg}}
     @actionSteps={{this.actionSteps}}
     @milestones={{this.milestones}}
     @currentMilestone={{this.currentMilestone}}

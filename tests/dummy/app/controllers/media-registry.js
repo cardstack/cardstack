@@ -5,7 +5,6 @@ import METADATASTEPS from 'dummy/data/amend-metadata-steps';
 import MILESTONES from 'dummy/data/catalog-transfer-workflow';
 
 export default class MediaRegistryController extends Controller {
-  @tracked org = this.model.currentOrg;
   @tracked actionSteps = METADATASTEPS;
   @tracked milestones = MILESTONES;
 
@@ -15,12 +14,6 @@ export default class MediaRegistryController extends Controller {
       return this.milestones[1];
     }
     return milestone;
-  }
-
-  @action
-  setOrg(val) {
-    if (this.org.id === val.id) { return; }
-    this.org = val;
   }
 
   @action

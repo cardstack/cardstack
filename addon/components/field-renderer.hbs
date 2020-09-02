@@ -175,7 +175,7 @@
               {{component (or @field.component "card") model=@field.value mode="view"}}
             </Boxel>
           {{else}}
-            {{component (or @field.component "card") model=@field.value mode="view"}}
+            {{component (or @field.component "card") model=@field.value mode="view" expandAction=@expandAction}}
           {{/if}}
         {{else if (eq @field.type "collection")}}
           <EmbeddedCollection

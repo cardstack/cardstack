@@ -6,7 +6,7 @@
   justify-items: center;
   width: 80px;
   height: 100%;
-  padding: 0;
+  padding: 20px 0;
   background-color: var(--cs-dark-field-default);
 }
 
@@ -19,7 +19,6 @@
 
 .left-edge-nav__top-btn-group {
   align-self: start;
-  padding-top: 20px;
 }
 
 .left-edge-nav__bottom-btn-group {
@@ -29,6 +28,7 @@
 
 .left-edge-nav__btn {
   --icon-color: var(--boxel-highlight);
+  display: inline-block;
   width: 80px;
   height: 40px;
   background: none;
@@ -65,6 +65,11 @@
   opacity: 1;
 }
 
+.left-edge-nav__btn--icon-only {
+  width: 40px;
+  margin: auto;
+}
+
 .left-edge-nav__btn--icon-only:hover {
   background-color: var(--boxel-highlight);
   border-radius: 100px;
@@ -82,22 +87,33 @@
 .left-edge-nav__btn-logo {
   width: 40px;
   height: 40px;
+  border: 1px solid #000;
   border-radius: var(--boxel-border-radius);
   background-color: #000;
   background-position: center;
-  background-size: 30px 30px;
+  background-size: 40px 40px;
   background-repeat: no-repeat;
 }
 
+.left-edge-nav__btn-user {
+  width: 40px;
+  height: 40px;
+  margin: auto;
+  border-radius: 100px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
 
+
+
+/* Dummy */
 .left-edge-nav__btn-logo--bunny_records {
   background-color: #FF1D6C;
-  background-size: 40px 40px;
 }
 
 .left-edge-nav__btn-logo--crd_records {
   background-color: #0069F9;
-  background-size: 40px 40px;
 }
 
 .left-edge-nav__btn-logo--warner-music-group {
@@ -107,6 +123,11 @@
 
 .left-edge-nav__btn-logo--warner-chappell-music {
   background-size: 25px 25px;
+}
+
+.left-edge-nav__btn-logo--allegro-music-publishing,
+.left-edge-nav__btn-logo--global-music-rights {
+  background-size: 30px 30px;
 }
 
 .left-edge-nav__btn-logo--deezer {

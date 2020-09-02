@@ -1,63 +1,84 @@
 <div class="queue {{@class}}">
   <header class="queue__header">
-    <div class="queue__company">
-      {{#if @model.iconURL}}
-        <span class="queue__company-logo" style={{css-url "background-image" @model.iconURL}} />
-      {{/if}}
-      {{@model.title}}
+    <div class="queue__org">
+      <div class="queue__org-logo" style={{css-url "background-image" @model.iconURL}} />
+      <div>
+        <div class="queue__org-title">{{@model.title}}</div>
+        <div class="queue__user-title">{{this.user.title}}</div>
+      </div>
     </div>
-    <div class="queue__user queue__user--active">
-      <div class="queue__user-name">{{@model.user.name}}</div>
-      <div class="queue__user-title">{{@model.user.title}}</div>
+
+    <ul class="queue__nav">
+      <li class="queue__nav-item queue__nav-item--selected">Queue</li>
+      <li class="queue__nav-item">Workflows</li>
+      <li class="queue__nav-item">Tasks</li>
+    </ul>
+
+    <div class="queue__header-input-group">
+      <div class="queue__pill-btn-group pill-btn-group">
+        <button
+          {{on "click" (fn this.filterQueue null)}}
+          class="pill-btn-group__btn pill-btn-group__btn--left {{if (eq this.displayQueue "shared") "pill-btn-group__btn--selected"}}"
+        >
+          Shared Queue
+        </button>
+        <button
+          {{on "click" (fn this.filterQueue @user.id)}}
+          class="pill-btn-group__btn pill-btn-group__btn--right {{if (eq this.displayQueue "user") "pill-btn-group__btn--selected"}}"
+        >
+          My Queue
+        </button>
+      </div>
+      <Input @value="Search" @class="queue__filter" />
     </div>
-    <Input @placeholder="Filter Notifications" @class="queue__filter">
-    </Input>
+
+    <div class="queue__display-format">
+      <div>View as {{capitalize this.displayFormat}}</div>
+      <div class="queue__display-format-btns">
+        <IconButton @class="queue__display-format-btn {{if (eq this.displayFormat "list") "queue__display-format-btn--selected"}}" @icon="list-2" @width="14px" @height="14px" />
+        <IconButton @class="queue__display-format-btn {{if (eq this.displayFormat "grid") "queue__display-format-btn--selected"}}" @icon="grid-2" @width="14px" @height="14px" />
+      </div>
+    </div>
   </header>
 
   <section class="queue__section">
-    <header class="queue__section-header">Open</header>
+    <header class="queue__section-header">
+      <span>Unread</span>
+      <span class="queue__section-count">{{this.unreadCards.length}}</span>
+    </header>
     <div class="queue__section-content">
-      {{#with (find-by "status" "open" (reverse @model.user.queueCards)) as |card|}}
+      {{#each this.unreadCards as |card|}}
         <QueueCard
           @card={{card}}
           @orgId={{@model.id}}
           @currentMilestone={{@currentMilestone}}
           @updateProgress={{@updateProgress}}
         />
-      {{/with}}
+      {{/each}}
     </div>
   </section>
 
   <section class="queue__section">
-    <header class="queue__section-header">Needs Response</header>
+    <header class="queue__section-header">
+      <span>Needs Response</span>
+      <span class="queue__section-count">{{this.actionReqCards.length}}</span>
+    </header>
     <div class="queue__section-content">
-      {{#let (filter-by "status" "needs-response" @model.user.queueCards) as |cards|}}
-        {{#each cards as |card|}}
-          <QueueCard @card={{card}} @orgId={{@model.id}} />
-        {{/each}}
-      {{/let}}
+      {{#each this.actionReqCards as |card|}}
+        <QueueCard @card={{card}} @orgId={{@model.id}} />
+      {{/each}}
     </div>
   </section>
 
   <section class="queue__section">
-    <header class="queue__section-header">Recent</header>
+    <header class="queue__section-header">
+      <span>Recent Activity</span>
+      <span class="queue__section-count">{{this.recentCards.length}}</span>
+    </header>
     <div class="queue__section-content">
-      {{#let (filter-by "status" "recent" @model.user.queueCards) as |cards|}}
-        {{#each cards as |card|}}
-          <QueueCard @card={{card}} @orgId={{@model.id}} />
-        {{/each}}
-      {{/let}}
-    </div>
-  </section>
-
-  <section class="queue__section">
-    <header class="queue__section-header">Closed</header>
-    <div class="queue__section-content">
-      {{#let (filter-by "progressPct" 100 @model.user.queueCards) as |cards|}}
-        {{#each cards as |card|}}
-          <QueueCard @card={{card}} @orgId={{@model.id}} />
-        {{/each}}
-      {{/let}}
+      {{#each this.recentCards as |card|}}
+        <QueueCard @card={{card}} @orgId={{@model.id}} />
+      {{/each}}
     </div>
   </section>
 </div>

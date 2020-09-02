@@ -1,0 +1,155 @@
+[
+  {
+    "id": "hsh",
+    "type": "organization",
+    "title": "Home Sweet Home",
+    "iconURL": "/workflow/orgs/hsh-icon.png",
+    "logoURL": "/workflow/orgs/hsh-logo.png",
+    "website": "www.homesweethome.com",
+    "address": "112 Milford Ave, Hartford, CT 06106, United States",
+    "employees": [
+      {
+        "id": "ryan-saint-james",
+        "type": "employee",
+        "title": "Ryan Saint-James",
+        "role": "E-Commerce Manager"
+      },
+      {
+        "id": "haley-oconnell",
+        "type": "employee",
+        "title": "Haley O’Connell",
+        "role": "Store Manager"
+      },
+      {
+        "id": "rupert-grisham",
+        "type": "employee",
+        "title": "Rupert Grisham",
+        "role": "CEO"
+      },
+      {
+        "id": "lola-sampson",
+        "type": "employee",
+        "title": "Lola Sampson",
+        "role": "Marketing Manager"
+      }
+    ],
+    "queueCards": [
+      {
+        "id": "1",
+        "status": "unread",
+        "project": "customers",
+        "title": "Purchase Order, Julia Mason",
+        "participant_ids": ["julia-mason", "haley-oconnell"],
+        "participants": ["Julia Mason", "Haley O'Connell"],
+        "datetime": "2020-09-21T20:12",
+        "workflow_id": "customer-support",
+        "progressPct": "40",
+        "currentMilestone": "Reserve products",
+        "tasks": [
+          {
+            "assigned_to": "haley-oconnell",
+            "title": "Reserve products"
+          }
+        ]
+      },
+      {
+        "id": "2",
+        "status": "needs-response",
+        "project": "customers",
+        "title": "Personal Shopping Assistance, Miriam Jackson",
+        "participant_ids": ["miriam-jackson", "haley-oconnell"],
+        "participants": ["Miriam Jackson", "Haley O'Connell"],
+        "datetime": "2020-09-21T17:12",
+        "workflow_id": "customer-support",
+        "progressPct": "80",
+        "currentMilestone": "Track delivery",
+        "tasks": [
+          {
+            "assigned_to": "haley-oconnell",
+            "title": "Track delivery"
+          }
+        ]
+      },
+      {
+        "id": "3",
+        "status": "needs-response",
+        "project": "marketing",
+        "title": "Newspaper Ad, New Times",
+        "participant_ids": ["lucy-hatch", "lola-sampson"],
+        "participants": ["Lucy Hatch", "Lola Sampson"],
+        "datetime": "2020-09-18T12:57",
+        "progressPct": "60",
+        "currentMilestone": "Accept"
+      },
+      {
+        "id": "4",
+        "status": "needs-response",
+        "project": "marketing",
+        "title": "Radio Ad, FM8",
+        "participant_ids": ["martin-stiles", "lola-sampson"],
+        "participants": ["Martin Stiles", "Lola Sampson"],
+        "datetime": "2020-09-18T15:17",
+        "progressPct": "80",
+        "currentMilestone": "Submit files"
+      },
+      {
+        "id": "5",
+        "status": "recent-activity",
+        "project": "website",
+        "title": "Product Catalog, Question",
+        "participant_ids": ["ryan-saint-james", "haley-oconnell"],
+        "participants": ["Ryan Saint-James", "Haley O'Connell"],
+        "datetime": "2020-09-18T11:47"
+      },
+      {
+        "id": "6",
+        "status": "recent-activity",
+        "project": "hr",
+        "title": "Salesperson, Seth Johansson",
+        "participant_ids": ["seth-johansson", "rupert-grisham", "haley-oconnell"],
+        "participants": ["Seth Johansson", "Rupert Grisham", "Haley O'Connell"],
+        "datetime": "2020-09-16T15:23",
+        "progressPct": "60",
+        "currentMilestone": "Review",
+        "awaitingResponse": true
+      },
+      {
+        "id": "7",
+        "status": "recent-activity",
+        "project": "hr",
+        "title": "Salesperson, Alina McMillan",
+        "participant_ids": ["alina-mcmillan", "rupert-grisham", "haley-oconnell"],
+        "participants": ["Alina McMillan", "Rupert Grisham", "Haley O'Connell"],
+        "datetime": "2020-09-18T16:25",
+        "progressPct": "60",
+        "currentMilestone": "Review",
+        "awaitingResponse": true
+      },
+      {
+        "id": "8",
+        "status": "recent-activity",
+        "project": "marketing",
+        "title": "TV Ad, ZBZ",
+        "participant_ids": ["kevin-collins", "lola-sampson"],
+        "participants": ["Kevin Collins", "Lola Sampson"],
+        "datetime": "2020-09-17T12:17",
+        "progressPct": "20",
+        "currentMilestone": "Offer"
+      }
+    ]
+  },
+  {
+    "id": "hlc",
+    "type": "organization",
+    "title": "Haley's Love Couch",
+    "iconURL": "/workflow/orgs/hlc-icon.png",
+    "logoURL": "/workflow/orgs/hlc-logo.png"
+  },
+  {
+    "id": "spwb",
+    "type": "organization",
+    "title": "Self-Publishing Writers & Bloggers",
+    "iconURL": "/workflow/orgs/spwb-icon.png",
+    "logoURL": "/workflow/orgs/spwb-logo.png"
+  }
+]

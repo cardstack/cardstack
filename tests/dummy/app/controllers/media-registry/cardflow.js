@@ -8,7 +8,7 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
   @tracked isolatedCollection = this.getIsolatedCollection(this.catalog.id);
   @tracked itemId = null;
   @tracked record = null;
-  @tracked currentMilestone = this.org.user ? this.milestones.filter(el => el.pct === this.org.user.queueCards[0].progressPct)[0] : null;
+  @tracked currentMilestone = this.model.currentOrg.queueCards ? this.milestones.filter(el => el.pct === this.model.currentOrg.queueCards[0].progressPct)[0] : null;
 
   catalog = {
     id: 'batch-f',
@@ -25,7 +25,7 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
   }
 
   get projectTitle() {
-    return this.org.user.queueCards[0].projectTitle;
+    return this.model.currentOrg.queueCards[0].title;
   }
 
   @action
@@ -78,25 +78,40 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
   }
 
   @action
-  async getIsolatedCollection(id) {
-    const data = await fetchCollection('all_tracks_combined');
-
-    let items = data.filter(item => {
+  async getIsolatedCollection(collectionId) {
+    const records = await fetchCollection('all_tracks_combined');
+    let tracks = records.filter(item => {
       if (item.collection_ids) {
-        return item.collection_ids.map(catalog => {
-          let catalogId = formatId(catalog);
-          return catalogId === id;
-        }).includes(true);
+        return item.collection_ids.includes(collectionId);
       }
     });
 
     this.isolatedCollection = {
-      title: id,
+      id: collectionId,
+      title: collectionId,
       type: 'collection',
-      collection: items,
+      collection: tracks,
       itemType: 'master',
       itemTypePlural: 'masters',
       itemComponent: 'cards/master-collection-item',
+      listFields: [
+        {
+          name: 'Release Title',
+          valuePath: 'album'
+        },
+        {
+          name: 'Release Type',
+          valuePath: 'type_of_album'
+        },
+        {
+          name: 'Genre',
+          valuePath: 'genre'
+        },
+        {
+          name: 'Length',
+          valuePath: 'length'
+        },
+      ],
       columns: [
         {
           name: 'Title',
@@ -151,36 +166,31 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
     if (!itemId) { return; }
 
     const records = await fetchCollection('all_tracks_combined');
-    const recordDetails = await fetchCollection('songs_by_pia_midina_bb_clarke_table_1');
     const profiles = await fetchCollection('profiles');
     const musicalWorks = await fetchCollection('musical-works');
 
-    const record = records.find(item => {
-      if (item.catalog) {
-        return formatId(item.title) === itemId;
-      }
-    });
+    const record = records.find(item => item.id === itemId);
+    if (!record) { return; }
 
-    const allCollections = this.model.collection;
-    const catalogs = record.catalog.map(el => formatId(el));
-    const collections = allCollections.filter(el => catalogs.includes(el.id));
-    record.collections = collections;
-
-    const recordDetail = recordDetails.find(item => item.id === itemId);
-    const artists = profiles.filter(profile => profile.id === formatId(record.artist));
-
-    if (artists.length) {
-      record.artist_info = artists;
+    if (record.collection_ids) {
+      const collections = this.model.collection;
+      const catalogs = collections.filter(el => record.collection_ids.includes(el.id));
+      record.collections = catalogs;
     }
 
-    if (recordDetail) {
-      const producers = profiles.filter(profile => (profile.id === recordDetail.producer_id));
-      const musicalWork = musicalWorks.find(item => item.iswc === recordDetail.iswc_id);
-      if (producers.length) {
-        record.producer = producers;
-      }
-      record.details = recordDetail;
-      record.musicalWork = musicalWork;
+    if (record.artist_id) {
+      const artists = profiles.filter(el => el.id === record.artist_id);
+      record.artists = artists;
+    }
+
+    if (record.producer_id) {
+      const producers = profiles.filter(el => el.id === record.producer_id);
+      record.producers = producers;
+    }
+
+    if (record.iswc_id) {
+      const work = musicalWorks.find(el => el.iswc === record.iswc_id);
+      record.musicalWork = work;
     }
 
     this.record = record;

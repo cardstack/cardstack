@@ -36,7 +36,7 @@ export default class MediaRegistryAgreementsController extends Controller {
 
   @action
   rejectAgreement() {
-    this.transitionToRoute('media-registry.collection', this.org.id, this.catalog.id);
+    this.transitionToRoute('media-registry.collection', 'bunny_records', this.catalog.id);
   }
 
   @action
