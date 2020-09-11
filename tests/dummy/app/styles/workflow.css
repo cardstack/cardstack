@@ -1,0 +1,17 @@
+.workflow-org {
+  height: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  background-color: #F5F5F5;
+  font: var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-lg);
+}
+
+.workflow-org__left-edge {
+  width: 410px;
+}
+
+.workflow-org__main {
+  background-color: var(--boxel-medium-purple);
+  overflow: hidden;
+}

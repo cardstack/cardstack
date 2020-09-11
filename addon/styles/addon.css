@@ -12,6 +12,7 @@
   --boxel-lsp-lg: 0.035em;
   --boxel-lsp: 0.025em;
   --boxel-lsp-sm: 0.015em;
+  --boxel-lsp-xs: 0.005em;
 
   --boxel-spacing: 20px;
   --boxel-border-color: #dedede;
@@ -21,13 +22,13 @@
   --boxel-border-radius-sm: 5px;
   --boxel-border-radius: 10px;
   --boxel-highlight: #00ebe5;
-  --boxel-highlight-light-theme: #00b2ae;
   --boxel-highlight-hover: #00b0ad;
   --boxel-red: #ff5050;
-  --boxel-darkest-purple: #2e2b38;
+  --boxel-darkest-purple: #2e2d38;
   --boxel-dark-purple: #393642;
   --boxel-medium-dark-purple: #413e4e;
-  --boxel-medium-purple: #5d5c6f;
+  --boxel-medium-purple: #5a586a;
+  --boxel-medium-light-purple:#6b6a80;
   --boxel-light-purple: #afafb7;
 
   --boxel-transition: 0.2s ease;

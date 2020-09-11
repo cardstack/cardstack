@@ -7,7 +7,7 @@
   width: 80px;
   height: 100%;
   padding: 20px 0;
-  background-color: var(--cs-dark-field-default);
+  background-color: var(--boxel-darkest-purple);
 }
 
 .left-edge-nav ul {

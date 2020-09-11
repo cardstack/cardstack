@@ -205,36 +205,53 @@
 }
 
 /* Dropdown */
-.field-renderer__dropdown .cs-dropdown {
-  --cs-font-family: var(--boxel-font-family);
-  --cs-font: var(--boxel-font);
-}
-.field-renderer__dropdown .cs-dropdown .ember-power-select-trigger {
+.field-renderer__dropdown .ember-power-select-trigger,
+.field-renderer__dropdown .ember-power-select-dropdown {
   width: 100%;
-  padding: 15px;
+  min-height: 50px;
+  padding: 14px 50px 14px 15px;
+  background-color: #fff;
   border: var(--boxel-border);
-  transition: none;
+  border-radius: 5px;
+  color: #000;
+  font: var(--boxel-font);
+  letter-spacing: var(--boxel-lsp);
 }
-.field-renderer__dropdown .cs-dropdown .ember-power-select-trigger:hover {
-  --cs-field-border: #272330;
+
+.field-renderer__dropdown .ember-power-select-status-icon {
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50px;
+  height: 50px;
+  background: url('/assets/images/icons/dropdown-arrows.svg') center/15px 15px no-repeat;
+}
+
+.field-renderer__dropdown .ember-power-select-trigger:hover {
   border-color: #272330;
+  cursor: pointer;
 }
-.field-renderer__dropdown .cs-dropdown:focus-within .ember-power-select-trigger {
+
+.field-renderer__dropdown .ember-power-select-trigger:focus {
   border-color: var(--boxel-highlight);
   outline: 2px solid var(--boxel-highlight);
   outline-offset: -3px;
 }
-.field-renderer__dropdown .cs-dropdown .ember-power-select-selected-item {
-  color: #393642;
-  letter-spacing: var(--boxel-lsp);
+
+.field-renderer__dropdown .ember-power-select-dropdown {
+  padding: 0;
+  box-shadow: var(--boxel-box-shadow);
 }
-.field-renderer__dropdown .cs-dropdown .ember-power-select-option {
-  color: #393642;
-  letter-spacing: var(--boxel-lsp);
+
+.field-renderer__dropdown .ember-power-select-option {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding: 9px 15px;
+  cursor: pointer;
 }
-.field-renderer__dropdown .cs-dropdown .ember-power-select-status-icon {
-  background: url('/assets/images/icons/dropdown-arrows.svg') center/contain no-repeat;
-}
+
 
 /* comparison mode */
 .field-renderer--comparison-mode {

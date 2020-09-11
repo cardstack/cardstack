@@ -1,34 +1,115 @@
- <aside class="media-registry__left-edge with-queue">
+<aside class="media-registry__left-edge with-queue">
   <LeftEdgeNav @orgs={{@model.orgs}} @current={{@model.id}} @mediaRegistry={{true}} />
   {{#each @model.orgs as |org|}}
     <IconButton {{on "click" (fn this.transition org)}} class="media-registry__hover-zone media-registry__hover-zone--{{org.id}}" />
   {{/each}}
   <div class="media-registry__left-edge-queue slide-in">
-    <CardflowQueue
+    {{!-- <CardflowQueue
       @class="media-registry__queue"
       @model={{this.model.currentOrg}}
       @currentMilestone={{this.currentMilestone}}
       @updateProgress={{this.updateProgress}}
-    />
+    /> --}}
   </div>
 </aside>
 
 <div class="media-registry__outlet">
-  <Cardflow
+  {{#if (and this.displayItemModal this.record)}}
+    <BoxelModal @overlayClass="cardflow-overlay" @class="cardflow__modal">
+      <header class="cardflow__modal-header">Workflow Thread - {{this.projectTitle}}</header>
+      <IconButton @icon="close" @class="cardflow__modal-close-btn" {{on "click" this.closeModal}} />
+      <div class="cardflow__nested-grid">
+        <CardPlatter @class="cardflow__nested-card">
+          <header class="cardflow__nested-card-header">
+            <div class="cardflow__nested-card-title">{{this.catalog.title}}</div>
+            <PillButton {{on "click" this.closeItem}}>Back to catalog</PillButton>
+          </header>
+        </CardPlatter>
+        <Boxel @class="cardflow__scroll-box cardflow__nested-detail-card">
+          <div class="cardflow__scroll-box-bg-platter">
+            <MusicDetailCard
+              @class="cardflow__isolated-detail-card"
+              @mode="view"
+              @model={{this.record}}
+              @displayFullHeader={{true}}
+            />
+          </div>
+        </Boxel>
+        <aside class="cardflow__nested-sidebar cardflow__scroll-box">
+          <div class="cardflow__scroll-box-platter">
+            {{#if this.record.collections.length}}
+              <h3 class="cardflow__nested-sidebar-title">In These Collections</h3>
+              <div class="cardflow__sidebar-cards">
+                {{#each this.record.collections as |collection|}}
+                  <Card
+                    @mode="view"
+                    @model={{hash type="collection" id=collection.id title=collection.title}}
+                    @hasImage={{true}}
+                    @expandAction={{fn this.transitionToCatalog collection.id}}
+                  >
+                    <CoverArt @class="item__sidebar-covers" @size={{50}} @covers={{collection.selected_art}} />
+                    <div class="sidebar-related-card__count">
+                      <span class="sidebar-related-card__count__number">
+                        {{collection.count}}
+                      </span>
+                      Masters
+                    </div>
+                  </Card>
+                {{/each}}
+              </div>
+            {{/if}}
+            {{#if this.album}}
+              <h3 class="cardflow__nested-sidebar-title">Related Products</h3>
+              <div class="cardflow__sidebar-cards">
+                <Card
+                  @model={{this.album}}
+                  @expandAction={{this.transitionToProduct}}
+                  @mode="view"
+                />
+              </div>
+            {{/if}}
+            {{#if this.record.musicalWork}}
+              <h3 class="cardflow__nested-sidebar-title">Related Works</h3>
+              <div class="cardflow__sidebar-cards">
+                <Cards::MusicalWorkEmbedded @model={{this.record.musicalWork}} @mode="view" />
+              </div>
+            {{/if}}
+          </div>
+        </aside>
+      </div>
+    </BoxelModal>
+  {{else if (and this.displayCatalogModal this.isolatedCollection)}}
+    <BoxelModal @overlayClass="cardflow-overlay" @class="cardflow__modal">
+      <header class="cardflow__modal-header">Workflow Thread - {{this.projectTitle}}</header>
+      <IconButton @icon="close" @class="cardflow__modal-close-btn" {{on "click" this.closeModal}} />
+      <div class="cardflow__nested-grid">
+        <CardPlatter @class="cardflow__nested-card">
+          <header class="cardflow__nested-card-header">
+            <div class="cardflow__nested-card-title">Transfer Proposal</div>
+          </header>
+        </CardPlatter>
+        <IsolatedCollection
+          @mode="view"
+          @format="table"
+          @class="cardflow__isolated-collection cardflow__nested-detail-card"
+          @model={{this.isolatedCollection}}
+          @expandAction={{this.expandAction}}
+          @sort={{this.sort}}
+          @search={{this.search}}
+          @removeItem={{this.removeItem}}
+        />
+      </div>
+    </BoxelModal>
+  {{/if}}
+
+  {{!-- <Cardflow
     @model={{@model}}
     @org={{this.model.currentOrg}}
     @actionSteps={{this.actionSteps}}
     @milestones={{this.milestones}}
     @currentMilestone={{this.currentMilestone}}
     @updateProgress={{this.updateProgress}}
-    @projectTitle={{this.projectTitle}}
-    @isolatedCatalog={{this.isolatedCollection}}
     @catalog={{this.catalog}}
-    @setItemId={{this.setItemId}}
-    @itemId={{this.itemId}}
-    @item={{this.record}}
-    @album={{this.album}}
-    @transitionToProduct={{this.transitionToProduct}}
-    @transitionToCatalog={{this.transitionToCatalog}}
-  />
+    @expandAction={{action this.displayCatalog}}
+  /> --}}
 </div>

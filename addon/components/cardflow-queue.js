@@ -3,25 +3,33 @@ import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 
 export default class CardflowQueueComponent extends Component {
-  @tracked displayFormat = "list";
-  @tracked displayQueue = "shared";
+  viewOptions = [
+    { id: 'shared', name: 'Shared Queue' },
+    { id: 'my-queue', name: 'My Queue' }
+  ];
+  @tracked displayQueue = this.viewOptions[0];
   @tracked updatedCards;
 
-  getCards() {
-    return this.updatedCards ? this.updatedCards : this.args.model.queueCards;
+  _getCards() {
+    return this.updatedCards ? this.updatedCards : this.args.model.orgQueueCards;
   }
 
-  setCards(val) {
+  _setCards(val) {
     this.updatedCards = val;
-  }
-
-  get cards() {
-    return this.getCards();
   }
 
   get user() {
     if (!this.args.model) { return null; }
-    return this.args.user || this.args.model.user;
+    return this.args.model.user;
+  }
+
+  get org() {
+    if (!this.args.model) { return null; }
+    return this.args.model.currentOrg;
+  }
+
+  get cards() {
+    return this._getCards();
   }
 
   get unreadCards() {
@@ -49,16 +57,15 @@ export default class CardflowQueueComponent extends Component {
 
   @action
   filterQueue(val) {
-    if (!this.cards || this.args.model.user) { return; }
+    if (!this.cards || !this.args.model.user) { return; }
+    let cards = this.args.model.queueCards;
+    let userId = this.args.model.user.id;
 
-    if (val) {
-      let cards = this.cards.filter(el => el.participant_ids.includes(val));
-      this.setCards(cards);
-      this.displayQueue = "user";
-      return;
+    if (val.id === 'my-queue') {
+      cards = this.cards.filter(el => el.participant_ids.includes(userId));
     }
 
-    this.setCards(this.args.model.queueCards);
-    this.displayQueue = "shared";
+    this._setCards(cards);
+    this.displayQueue = val;
   }
 }

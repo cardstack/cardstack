@@ -1,25 +1,27 @@
-<div role="button" {{on "click" this.openThread}} class="queue-card {{if (eq @card.status "unread") "queue-card--light-theme"}}">
-  <header class="queue-card__header">
-    <h3 class="queue-card__label">{{@card.project}}</h3>
+<div role="button" {{on "click" @selectCard}} class="queue-card {{if (and (eq @card.id @currentCard.id) (eq @card.orgId @currentCard.orgId)) "queue-card--light-theme"}}">
+  <div class="queue-card__datetime-row">
     {{#let (if @currentMilestone.timestamp @currentMilestone.timestamp @card.datetime) as |datetime|}}
       <time datetime={{datetime}} class="queue-card__datetime">{{moment-format datetime "MMM D, h:mm A"}}</time>
       {{#if (eq @card.status "unread")}}
         <div class="queue-card__notification">1</div>
       {{/if}}
     {{/let}}
-  </header>
+  </div>
 
   <section class="queue-card__content">
-    <h4 class="queue-card__project-title">{{@card.title}}</h4>
+    {{#if @card.project}}
+      <h4 class="queue-card__label">{{@card.project}}</h4>
+    {{/if}}
+    <h3 class="queue-card__project-title">{{@card.title}}</h3>
     {{#if (and @card.participants @card.participants.length)}}
       <div class="queue-card__participants">
         {{svg-jar "users" width="14px" height="12px"}}
-        <span class="queue-card__participant-names">{{this.participants}}</span>
+        <span>{{this.participants}}</span>
       </div>
     {{/if}}
   </section>
 
-  {{#if (or @card.tasks this.progress.status)}}
+  {{#if (or @card.tasks this.progress)}}
     <footer class="queue-card__footer">
       <div>
         {{#if @card.awaitingResponse}}
@@ -34,11 +36,14 @@
         {{/if}}
       </div>
       <div class="queue-card__status">
-        {{titleize (humanize this.progress.status)}}
-        <span
-          class="queue-card__progress-icon queue-card__progress-pie"
-          style={{css-url "background-image" (if (eq @card.status "unread") this.progress.iconOpen this.progress.icon)}}
-        />
+        {{this.progress}}
+        <div class="queue-card__progress-icon {{if @card.isCancelled "cancelled"}} {{if @card.isComplete "complete"}}">
+          {{#if (not (or @card.isCancelled @card.isComplete))}}
+            <div class="queue-card__progress-pie" style={{html-safe (concat "stroke-dasharray:" (mult this.progressPct 60) " " 60)}}>
+              {{svg-jar "progress-circle" width="24px" height="24px"}}
+            </div>
+          {{/if}}
+        </div>
       </div>
     </footer>
   {{/if}}

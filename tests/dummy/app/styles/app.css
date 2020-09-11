@@ -10,6 +10,11 @@
 @import 'media-registry/discrepancies-index.css';
 @import 'media-registry/discrepancy.css';
 
+@import 'workflow.css';
+
+* {
+  box-sizing: border-box;
+}
 
 html, body {
   height: 100%;
@@ -76,23 +81,4 @@ ul {
 
 .animated-tools {
   z-index: 100;
-}
-
-
-/* overriding ui-components styles */
-:root {
-  --cs-font-family: Helvetica, Arial, sans-serif;
-  --cs-font: 400 16px/26px var(--cs-font-family);
-  --cs-field-hover: white;
-  --cs-field-height: 50px;
-  --cs-letter-spacing: 0.025em;
-  --cs-purple: #141428;
-  --cs-purple-light: #39384D;
-}
-.cs-input-group {
-  display: contents;
-}
-.cs-input-group--label,
-.cs-input-group--helper-text {
-  display: none;
 }

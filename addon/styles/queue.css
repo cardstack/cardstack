@@ -1,6 +1,6 @@
 .queue {
   position: fixed;
-  width: 330px;
+  width: 332px;
   height: 100%;
   left: 80px;
   top: 0;
@@ -29,6 +29,7 @@
 
 .queue__org {
   display: flex;
+  align-items: center;
 }
 
 .queue__org-logo {
@@ -41,30 +42,26 @@
 }
 
 .queue__org-title {
-  font-size: 18px;
+  font: var(--boxel-font);
   font-weight: 700;
-  line-height: calc(24/18);
   letter-spacing: 0.005em;
-}
-
-.queue__user-title {
-  color: var(--boxel-light-purple);
-  font: var(--boxel-font-xs);
-  font-weight: 600;
-  letter-spacing: var(--boxel-lsp-lg);
 }
 
 .queue__nav {
   display: flex;
   justify-content: space-between;
+  font: var(--boxel-font-xs);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-lg);
   border-top: var(--boxel-border-dark);
 }
 
 .queue__nav-item {
-  padding-top: 13px;
-  border-top: 4px solid transparent;
+  width: 80px;
+  padding-top: 10px;
+  border-top: 2px solid transparent;
+  color: var(--boxel-light-purple);
+  text-align: center;
 }
 
 .queue__nav-item--selected {
@@ -72,9 +69,100 @@
   border-color: var(--boxel-highlight);
 }
 
-.pill-btn-group {
+.queue__filter-group {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 5px;
+}
+
+.queue__filter-dropdown .ember-power-select-trigger,
+.queue__filter-dropdown .ember-power-select-dropdown {
+  width: 100%;
+  min-height: 40px;
+  padding: 10px 40px 10px 18px;
+  background-color: var(--boxel-medium-purple);
+  border: 1px solid #1C1C1C;
+  border-radius: 5px;
+  color: #fff;
+  font: var(--boxel-font-xs);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-xl);
+}
+
+.queue__filter-dropdown .ember-power-select-status-icon {
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  background: url('/assets/images/icons/dropdown-arrows-highlighted.svg') center/15px 15px no-repeat;
+}
+
+.queue__filter-dropdown .ember-power-select-trigger:focus {
+  border-color: var(--boxel-highlight);
+  outline: 0;
+}
+
+.queue__filter-dropdown .ember-power-select-dropdown {
+  padding: 0;
+  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.35);
+}
+
+.queue__filter-dropdown .ember-power-select-option[aria-selected="true"] {
+  color: #fff;
+  background: url('/assets/images/icons/checkmark-highlighted.svg') right 12px center/10px 10px no-repeat;
+}
+
+.queue__filter-dropdown .ember-power-select-option {
   display: flex;
-  flex: 1;
+  align-items: center;
+  height: 40px;
+  padding: 10px 40px 10px 18px;
+  color: var(--boxel-light-purple);
+}
+
+.queue__filter-dropdown .ember-power-select-trigger:hover,
+.queue__filter-dropdown .ember-power-select-option:hover {
+  color: #fff;
+  cursor: pointer;
+}
+
+.queue__filter-dropdown .ember-basic-dropdown-content--below.ember-basic-dropdown--transitioning-in {
+  animation: drop-fade-below var(--boxel-transition);
+}
+.queue__filter-dropdown .ember-basic-dropdown-content--below.ember-basic-dropdown--transitioning-out {
+  animation: drop-fade-below var(--boxel-transition) reverse;
+}
+
+@keyframes drop-fade-below {
+  0%   {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes drop-fade-above {
+  0%   {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.queue__search-btn {
+  --icon-color: #fff;
+}
+
+.pill-btn-group {
+
   background-color: var(--boxel-medium-dark-purple);
   border: var(--boxel-border-dark);
   border-radius: var(--boxel-border-radius);
@@ -142,43 +230,10 @@
   border-color: var(--boxel-highlight);
 }
 
-.queue__pill-btn-group + .queue__filter {
-  border-top-right-radius: 0;
-  border-top-left-radius: 0;
-}
-
 .queue__header-input-group > .queue__pill-btn-group {
   border-bottom: none;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
-}
-
-.queue__display-format {
-  position: relative;
-}
-
-.queue__display-format-btns {
-  position: absolute;
-  top: 0;
-  right: 0;
-}
-
-.queue__display-format-btn + .queue__display-format-btn {
-  margin-left: 4px;
-}
-
-.queue__display-format-btn {
-  --icon-color: #898989;
-  width: 30px;
-  height: 15px;
-}
-
-.queue__display-format-btn:hover {
-  --icon-color: #fff;
-}
-
-.queue__display-format-btn--selected {
-  --icon-color: var(--boxel-highlight);
 }
 
 

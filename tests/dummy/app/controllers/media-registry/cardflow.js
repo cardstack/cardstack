@@ -1,14 +1,16 @@
 import MediaRegistryController from '../media-registry';
 import { tracked } from '@glimmer/tracking';
-import { action, set } from '@ember/object';
+import { action, set, get } from '@ember/object';
+import { compare, isBlank } from '@ember/utils';
 import { fetchCollection } from 'dummy/media';
 import { formatId } from '@cardstack/boxel/utils/format-id';
 
 export default class MediaRegistryCardflowController extends MediaRegistryController {
   @tracked isolatedCollection = this.getIsolatedCollection(this.catalog.id);
-  @tracked itemId = null;
-  @tracked record = null;
   @tracked currentMilestone = this.model.currentOrg.queueCards ? this.milestones.filter(el => el.pct === this.model.currentOrg.queueCards[0].progressPct)[0] : null;
+  @tracked displayCatalogModal = false;
+  @tracked displayItemModal = false;
+  @tracked record = null;
 
   catalog = {
     id: 'batch-f',
@@ -64,17 +66,6 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
     }
 
     this.transitionToRoute('media-registry', val.id);
-  }
-
-  @action
-  setItemId(item) {
-    if (item) {
-      this.itemId = formatId(item.title);
-      this.getRecord();
-    } else {
-      this.itemId = null;
-      this.record = null;
-    }
   }
 
   @action
@@ -161,8 +152,7 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
   }
 
   @action
-  async getRecord() {
-    let itemId = this.itemId;
+  async getRecord(itemId) {
     if (!itemId) { return; }
 
     const records = await fetchCollection('all_tracks_combined');
@@ -223,5 +213,61 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
   @action
   transitionToCatalog(id) {
     this.transitionToRoute('media-registry.collection', id);
+  }
+
+  @action
+  expandAction(item) {
+    if (item && item.id) {
+      this.getRecord(item.id);
+      this.displayItemModal = true;
+      return;
+    }
+    this.displayItemModal = false;
+  }
+
+  @action
+  displayCatalog() {
+    this.displayCatalogModal = true;
+  }
+
+  @action
+  closeModal() {
+    this.displayCatalogModal = false;
+    this.closeItem();
+  }
+
+  @action
+  closeItem() {
+    this.displayItemModal= false;
+  }
+
+  @action
+  async search(query) {
+    let isolatedCollection = this.isolatedCollection;
+    if (!isolatedCollection || !isolatedCollection.collection || !isolatedCollection.columns) { return; }
+
+    let { collection, columns } = this.isolatedCollection;
+    if (isBlank(query)) {
+      return collection;
+    } else {
+      let lowerQuery = query.toLowerCase();
+      return collection.filter(i =>
+        columns.some(c =>
+            c.isSearchable !== false &&
+            c.valuePath &&
+            !isBlank(i[c.valuePath]) &&
+            String(i[c.valuePath]).toLowerCase().includes(lowerQuery)
+        )
+      );
+    }
+  }
+
+  @action
+  async sort(column, direction) {
+    let isolatedCollection = this.isolatedCollection;
+    if (!isolatedCollection || !isolatedCollection.collection || !isolatedCollection.columns) { return; }
+
+    let multiplier = (direction === 'asc') ? 1 : -1;
+    return this.isolatedCollection.collection.sort((a, b) => multiplier * compare(get(a, column.valuePath), get(b, column.valuePath)));
   }
 }

@@ -929,29 +929,6 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@cardstack/ui-components@cardstack/ui-components#44a38d3":
-  version "0.2.21"
-  resolved "https://codeload.github.com/cardstack/ui-components/tar.gz/44a38d34a72eeffb1e682b8aef91287528359bd8"
-  dependencies:
-    "@ember/render-modifiers" "^1.0.2"
-    broccoli-funnel "^3.0.2"
-    broccoli-merge-trees "^4.2.0"
-    ember-cli-babel "^7.19.0"
-    ember-cli-htmlbars "^4.2.3"
-    ember-concurrency "^1.1.7"
-    ember-concurrency-decorators "^1.0.0"
-    ember-inputmask "^0.9.3"
-    ember-moment "^8.0.0"
-    ember-multiselect-checkboxes "^0.11.1"
-    ember-phone-input "^5.0.0"
-    ember-place-autocomplete "^2.0.1"
-    ember-power-calendar "^0.14.5"
-    ember-power-calendar-moment "^0.1.7"
-    ember-power-datepicker alexspeller/ember-power-datepicker#b60b60d
-    ember-power-select "^4.0.0"
-    ember-radio-button "^2.0.1"
-    ember-truth-helpers "^2.1.0"
-
 "@cnakazawa/watch@^1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@cnakazawa/watch/-/watch-1.0.3.tgz#099139eaec7ebf07a27c1786a3ff64f39464d2ef"
@@ -3525,7 +3502,7 @@ broccoli-output-wrapper@^3.2.1:
     heimdalljs-logger "^0.1.10"
     symlink-or-copy "^1.2.0"
 
-broccoli-persistent-filter@^1.0.3, broccoli-persistent-filter@^1.1.5, broccoli-persistent-filter@^1.1.6, broccoli-persistent-filter@^1.4.3:
+broccoli-persistent-filter@^1.1.5, broccoli-persistent-filter@^1.1.6, broccoli-persistent-filter@^1.4.3:
   version "1.4.6"
   resolved "https://registry.yarnpkg.com/broccoli-persistent-filter/-/broccoli-persistent-filter-1.4.6.tgz#80762d19000880a77da33c34373299c0f6a3e615"
   integrity sha512-0RejLwoC95kv4kta8KAa+FmECJCK78Qgm8SRDEK7YyU0N9Cx6KpY3UCDy9WELl3mCXLN8TokNxc7/hp3lL4lfw==
@@ -4217,9 +4194,9 @@ caniuse-api@^3.0.0:
     lodash.uniq "^4.5.0"
 
 caniuse-lite@^1.0.0, caniuse-lite@^1.0.30000844, caniuse-lite@^1.0.30001038:
-  version "1.0.30001038"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001038.tgz#44da3cbca2ab6cb6aa83d1be5d324e17f141caff"
-  integrity sha512-zii9quPo96XfOiRD4TrfYGs+QsGZpb2cGiMAzPjtf/hpFgB6zCPZgJb7I1+EATeMw/o+lG8FyRAnI+CWStHcaQ==
+  version "1.0.30001125"
+  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001125.tgz"
+  integrity sha512-9f+r7BW8Qli917mU3j0fUaTweT3f3vnX/Lcs+1C73V+RADmFme+Ih0Br8vONQi3X0lseOe6ZHfsZLCA8MSjxUA==
 
 capture-exit@^2.0.0:
   version "2.0.0"
@@ -5374,10 +5351,6 @@ electron-to-chromium@^1.3.390, electron-to-chromium@^1.3.47:
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.395.tgz#2c531a0477bcc41deb440877d1f27509ed286aed"
   integrity sha512-kdn2cX6hZXDdz/O2Q8tZscITlsSv1a/7bOq/fQs7QAJ9iaRlnhZPccarNhxZv1tXgmgwCnKp/1lJNYLOG8Dxiw==
 
-element-closest@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/element-closest/-/element-closest-2.0.2.tgz#72a740a107453382e28df9ce5dbb5a8df0f966ec"
-
 elliptic@^6.0.0:
   version "6.5.0"
   resolved "https://registry.yarnpkg.com/elliptic/-/elliptic-6.5.0.tgz#2b8ed4c891b7de3200e14412a5b8248c7af505ca"
@@ -5524,7 +5497,7 @@ ember-cli-babel-plugin-helpers@^1.0.0, ember-cli-babel-plugin-helpers@^1.1.0:
   resolved "https://registry.yarnpkg.com/ember-cli-babel-plugin-helpers/-/ember-cli-babel-plugin-helpers-1.1.0.tgz#de3baedd093163b6c2461f95964888c1676325ac"
   integrity sha512-Zr4my8Xn+CzO0gIuFNXji0eTRml5AxZUTDQz/wsNJ5AJAtyFWCY4QtKdoELNNbiCVGt1lq5yLiwTm4scGKu6xA==
 
-ember-cli-babel@^6.0.0-beta.4, ember-cli-babel@^6.11.0, ember-cli-babel@^6.16.0, ember-cli-babel@^6.17.0, ember-cli-babel@^6.4.1, ember-cli-babel@^6.6.0, ember-cli-babel@^6.7.2, ember-cli-babel@^6.8.1, ember-cli-babel@^6.8.2, ember-cli-babel@^6.9.0, ember-cli-babel@^6.9.2:
+ember-cli-babel@^6.0.0-beta.4, ember-cli-babel@^6.11.0, ember-cli-babel@^6.16.0, ember-cli-babel@^6.17.0, ember-cli-babel@^6.4.1, ember-cli-babel@^6.6.0, ember-cli-babel@^6.7.2, ember-cli-babel@^6.8.1, ember-cli-babel@^6.8.2:
   version "6.18.0"
   resolved "https://registry.yarnpkg.com/ember-cli-babel/-/ember-cli-babel-6.18.0.tgz#3f6435fd275172edeff2b634ee7b29ce74318957"
   dependencies:
@@ -5690,16 +5663,6 @@ ember-cli-deploy@^1.0.2:
     rsvp "^3.3.3"
     silent-error "^1.0.0"
 
-ember-cli-element-closest-polyfill@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/ember-cli-element-closest-polyfill/-/ember-cli-element-closest-polyfill-0.0.1.tgz#cc4d09120acc8a655e77a288ce929d4691d2c80a"
-  dependencies:
-    broccoli-funnel "^2.0.1"
-    caniuse-api "^3.0.0"
-    element-closest "^2.0.2"
-    ember-cli-babel "^6.16.0"
-    fastboot-transform "^0.1.3"
-
 ember-cli-eslint@^5.1.0:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/ember-cli-eslint/-/ember-cli-eslint-5.1.0.tgz#acdb9b072911e04b07c313b610f514db4086d21a"
@@ -5723,17 +5686,7 @@ ember-cli-htmlbars-inline-precompile@^2.1.0:
     heimdalljs-logger "^0.1.9"
     silent-error "^1.1.0"
 
-ember-cli-htmlbars@^1.1.1:
-  version "1.3.5"
-  resolved "https://registry.yarnpkg.com/ember-cli-htmlbars/-/ember-cli-htmlbars-1.3.5.tgz#65be9678b274b5e7861d7f75c188780af7ef9d13"
-  dependencies:
-    broccoli-persistent-filter "^1.0.3"
-    ember-cli-version-checker "^1.0.2"
-    hash-for-dep "^1.0.2"
-    json-stable-stringify "^1.0.0"
-    strip-bom "^2.0.0"
-
-ember-cli-htmlbars@^2.0.2, ember-cli-htmlbars@^2.0.3:
+ember-cli-htmlbars@^2.0.2:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/ember-cli-htmlbars/-/ember-cli-htmlbars-2.0.5.tgz#b5a105429a6bce4f7c9c97b667e3b8926e31397f"
   dependencies:
@@ -6037,12 +5990,6 @@ ember-cli-update@^0.53.3:
     update-notifier "^4.0.0"
     yargs "^15.1.0"
 
-ember-cli-version-checker@^1.0.2:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/ember-cli-version-checker/-/ember-cli-version-checker-1.3.1.tgz#0bc2d134c830142da64bf9627a0eded10b61ae72"
-  dependencies:
-    semver "^5.3.0"
-
 ember-cli-version-checker@^2.0.0, ember-cli-version-checker@^2.1.0, ember-cli-version-checker@^2.1.1, ember-cli-version-checker@^2.1.2:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/ember-cli-version-checker/-/ember-cli-version-checker-2.2.0.tgz#47771b731fe0962705e27c8199a9e3825709f3b3"
@@ -6206,7 +6153,7 @@ ember-concurrency-decorators@^1.0.0:
     ember-cli-babel "^7.9.0"
     ember-cli-typescript "^2.0.2"
 
-"ember-concurrency@^0.8.27 || ^0.9.0 || ^0.10.0 || ^1.0.0 || ^1.1.0", ember-concurrency@^1.1.0, ember-concurrency@^1.1.7:
+ember-concurrency@^1.1.0:
   version "1.1.7"
   resolved "https://registry.yarnpkg.com/ember-concurrency/-/ember-concurrency-1.1.7.tgz#b3f0c0478db1096503499d39e1b263c575cd52ef"
   integrity sha512-PtEJvB4wG8e5CEHRC9ILl2BxF6U/xlMOhfCji/x7FxNFB9M230Du86LAy+4/yOozZHyoARVuazABPUj02P+DmQ==
@@ -6321,16 +6268,6 @@ ember-inflector@^3.0.0:
   dependencies:
     ember-cli-babel "^6.6.0"
 
-ember-inputmask@^0.9.3:
-  version "0.9.3"
-  resolved "https://registry.yarnpkg.com/ember-inputmask/-/ember-inputmask-0.9.3.tgz#e69d87f146ac9ee73f153b7e9947fb6bf262de1b"
-  integrity sha512-6rACmXhLJPsxDutD6GSkUZceY8EslxJvId0nKAa/x1k99Z+GRtPxIQr71hc0RW6wlsGAFsrVdY7EBBvJbtWKZg==
-  dependencies:
-    ember-cli-babel "^7.1.2"
-    ember-cli-node-assets "^0.2.2"
-    fastboot-transform "^0.1.1"
-    inputmask "^4.0.2"
-
 ember-load-initializers@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/ember-load-initializers/-/ember-load-initializers-2.1.1.tgz#d1a8bead00bc44222b0ab181840869992beb30f5"
@@ -6400,14 +6337,6 @@ ember-moment@^8.0.0:
     ember-getowner-polyfill "^2.2.0"
     ember-macro-helpers "^4.2.2"
 
-ember-multiselect-checkboxes@^0.11.1:
-  version "0.11.1"
-  resolved "https://registry.yarnpkg.com/ember-multiselect-checkboxes/-/ember-multiselect-checkboxes-0.11.1.tgz#cf560e40e431959c00b13b702aa5d15751349f6e"
-  dependencies:
-    ember-cli-babel "^6.6.0"
-    ember-cli-htmlbars "^2.0.3"
-    ember-runtime-enumerable-includes-polyfill "^2.1.0"
-
 ember-named-arguments-polyfill@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/ember-named-arguments-polyfill/-/ember-named-arguments-polyfill-1.0.0.tgz#0b81fb81a7cef2c89e9e1d0278b579e708bf4ded"
@@ -6423,24 +6352,6 @@ ember-native-dom-helpers@^0.6.3:
     broccoli-funnel "^1.1.0"
     ember-cli-babel "^6.6.0"
 
-ember-phone-input@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/ember-phone-input/-/ember-phone-input-5.0.0.tgz#3c5cd0ae1ef32dfc4cdcc385ba86924f8c1c6f7b"
-  integrity sha512-c4sz6CF35yGP5NBmSDINvPs/QXt2BEhH0utO01jfZsp77o+7Mk4a/CDHhq+FDOwoO/szDrQy5ZROhEI0iHEgbQ==
-  dependencies:
-    ember-auto-import "^1.5.3"
-    ember-cli-babel "^7.18.0"
-    ember-cli-htmlbars "^4.2.2"
-    intl-tel-input "^16.0.11"
-
-ember-place-autocomplete@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/ember-place-autocomplete/-/ember-place-autocomplete-2.0.1.tgz#9d797154c4197b373f85eb98a816517fda67ddd6"
-  integrity sha512-4MLgX5GF+xV1XummIEA0vMmPishyBIrgQBL+f6WUGZRd/gsm94QHMAze3qmlc9uzcOvNPMdmg6I5RSQgCLWtFw==
-  dependencies:
-    ember-cli-babel "^7.1.2"
-    ember-cli-htmlbars "^3.0.0"
-
 ember-power-calendar-moment@^0.1.7:
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/ember-power-calendar-moment/-/ember-power-calendar-moment-0.1.7.tgz#2e79125f449bdcc94e62afff4e5411012792ed43"
@@ -6449,30 +6360,6 @@ ember-power-calendar-moment@^0.1.7:
     broccoli-funnel "^2.0.2"
     ember-cli-babel "^7.7.3"
     ember-cli-moment-shim "^3.7.1"
-
-ember-power-calendar@^0.14.1, ember-power-calendar@^0.14.5:
-  version "0.14.5"
-  resolved "https://registry.yarnpkg.com/ember-power-calendar/-/ember-power-calendar-0.14.5.tgz#6d3ed1cafcbcb3c945ab70bbcebeb875059030bf"
-  integrity sha512-SbFp8mLpoqxiGphIidZR+q4Za7aqJhMAkuw0piU/qBksC/OtQZDL0i5V1bti4yD90aI2I6IlOuHFyod9LQ7Gkg==
-  dependencies:
-    "@ember-decorators/component" "^6.0.0"
-    ember-assign-helper "^0.2.0"
-    ember-cli-babel "^7.7.3"
-    ember-cli-element-closest-polyfill "^0.0.1"
-    ember-cli-htmlbars "^3.1.0"
-    ember-concurrency "^0.8.27 || ^0.9.0 || ^0.10.0 || ^1.0.0 || ^1.1.0"
-    ember-element-helper "^0.2.0"
-    ember-truth-helpers "^2.1.0"
-
-ember-power-datepicker@alexspeller/ember-power-datepicker#b60b60d:
-  version "0.7.1"
-  resolved "https://codeload.github.com/alexspeller/ember-power-datepicker/tar.gz/b60b60dbe0dcd681bd9660e3c8c795a355cb2115"
-  dependencies:
-    "@ember-decorators/component" "^6.0.0"
-    ember-basic-dropdown "^3.0.1"
-    ember-cli-babel "^7.8.0"
-    ember-cli-htmlbars "^3.1.0"
-    ember-power-calendar "^0.14.1"
 
 ember-power-select-typeahead@alexspeller/ember-power-select-typeahead#6d279fb:
   version "0.8.0"
@@ -6512,13 +6399,6 @@ ember-qunit@^4.6.0:
     ember-cli-babel "^7.12.0"
     ember-cli-test-loader "^2.2.0"
     qunit "^2.9.3"
-
-ember-radio-button@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/ember-radio-button/-/ember-radio-button-2.0.1.tgz#f081a44d581a4b1db88fef79ec5c47da712ab963"
-  dependencies:
-    ember-cli-babel "^6.9.2"
-    ember-cli-htmlbars "^1.1.1"
 
 ember-raf-scheduler@0.1.0, ember-raf-scheduler@^0.1.0:
   version "0.1.0"
@@ -6560,13 +6440,6 @@ ember-router-scroll@^3.3.2:
     ember-app-scheduler "^4.0.1"
     ember-cli-babel "^7.11.1"
     ember-compatibility-helpers "^1.1.2"
-
-ember-runtime-enumerable-includes-polyfill@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/ember-runtime-enumerable-includes-polyfill/-/ember-runtime-enumerable-includes-polyfill-2.1.0.tgz#dc6d4a028471e4acc350dfd2a149874fb20913f5"
-  dependencies:
-    ember-cli-babel "^6.9.0"
-    ember-cli-version-checker "^2.1.0"
 
 ember-source-channel-url@^1.0.1:
   version "1.2.0"
@@ -7385,7 +7258,7 @@ fast-sourcemap-concat@^2.1.0:
     source-map-url "^0.3.0"
     sourcemap-validator "^1.1.0"
 
-fastboot-transform@^0.1.1, fastboot-transform@^0.1.2, fastboot-transform@^0.1.3:
+fastboot-transform@^0.1.2:
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/fastboot-transform/-/fastboot-transform-0.1.3.tgz#7dea0b117594afd8772baa6c9b0919644e7f7dcd"
   dependencies:
@@ -8789,10 +8662,6 @@ inline-source-map-comment@^1.0.5:
     sum-up "^1.0.1"
     xtend "^4.0.0"
 
-inputmask@^4.0.2:
-  version "4.0.8"
-  resolved "https://registry.yarnpkg.com/inputmask/-/inputmask-4.0.8.tgz#876d3209782df079ab69d4c7379767a45ef5762a"
-
 inquirer@7.1.0, inquirer@^7.0.1:
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/inquirer/-/inquirer-7.1.0.tgz#1298a01859883e17c7264b82870ae1034f92dd29"
@@ -8852,11 +8721,6 @@ interpret@^1.0.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/interpret/-/interpret-1.2.0.tgz#d5061a6224be58e8083985f5014d844359576296"
   integrity sha512-mT34yGKMNceBQUoVn7iCDKDntA7SC6gycMAWzGx1z/CMCTV7b2AAtXlo3nRyHZ1FelRkQbQjprHSYGwzLtkVbw==
-
-intl-tel-input@^16.0.11:
-  version "16.1.0"
-  resolved "https://registry.yarnpkg.com/intl-tel-input/-/intl-tel-input-16.1.0.tgz#bfdac6ed8304198c63b4834cceeead7bc22fb0af"
-  integrity sha512-AsMOCDyvBqdVpKU/55AYzgycm0Wc3a55ErPVxjiek9EiuEC9CZmvtyADB6/7eE+iy814a5T43ThRh5kYMPOx7g==
 
 into-stream@^3.1.0:
   version "3.1.0"

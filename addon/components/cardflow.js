@@ -1,65 +1,75 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action, get } from '@ember/object';
-import { compare, isBlank } from '@ember/utils';
+import { action } from '@ember/object';
+
 
 export default class CardflowComponent extends Component {
-  @tracked project = this.args.org?.queueCards[0];
+  @tracked progress;
   @tracked actionSteps = this.args.actionSteps;
   @tracked lastUpdated = this.args.lastUpdated;
-  @tracked isolatedCatalog = this.args.isolatedCatalog;
-  @tracked catalogId = null;
 
-  removed = [];
+  get thread() {
+    return this.args.model.thread;
+  }
+
+  get user() {
+    return this.args.model.user;
+  }
+
+  get participants() {
+    return this.args.model.participants;
+  }
+
+  get org() {
+    return this.args.model.currentOrg;
+  }
+
+  get participatingOrgMembers() {
+    if (!this.participants || !this.participants.length) { return null; }
+    if (!this.org) { return null; }
+    return this.participants.filter(el => el.org_ids && el.org_ids.includes(this.org.id));
+  }
+
+  get otherParticipants() {
+    if (!this.participants) { return null; }
+    if (!this.participatingOrgMembers || !this.participatingOrgMembers.length) {
+      return this.participants;
+    }
+    return this.participants.filter(el => !el.org_ids || !el.org_ids.includes(this.org.id));
+  }
+
+  get milestone() {
+    return this._getProgress();
+  }
+
+  get milestoneId() {
+    if (!this.milestone || !this.milestone.id) { return null; }
+    return Number(this.milestone.id);
+  }
+
+  get progressPct() {
+    if (!this.milestone || !this.milestone.pct) { return 0; }
+    return Number(this.milestone.pct) / 100;
+  }
+
+  _getProgress() {
+    if (this.thread.isCancelled) {
+      return {
+        "description": "Cancelled"
+      };
+    }
+    if (this.thread.isCompleted || this.thread.progressPct === "100") {
+      return this.args.model.workflow.completion;
+    }
+    return this.progress ? this.progress : this.args.model.workflow.milestones.find(el => el.pct === this.thread.progressPct);
+  }
+
+  _setProgress(val) {
+    this.progress = val;
+  }
 
   @action
   setProgress(val) {
     this.args.updateProgress(val);
-  }
-
-  @action
-  displayCatalog(id) {
-    this.catalogId = id;
-  }
-
-  @action
-  closeItem() {
-    this.args.setItemId();
-  }
-
-  @action
-  closeModal() {
-    this.catalogId = null;
-    this.closeItem();
-  }
-
-  @action
-  async search(query) {
-    let { collection, columns } = this.isolatedCatalog;
-    if (isBlank(query)) {
-      return collection;
-    } else {
-      let lowerQuery = query.toLowerCase();
-      return collection.filter(i =>
-        columns.some(c =>
-            c.isSearchable !== false &&
-            c.valuePath &&
-            !isBlank(i[c.valuePath]) &&
-            String(i[c.valuePath]).toLowerCase().includes(lowerQuery)
-        )
-      );
-    }
-  }
-
-  @action
-  async sort(column, direction) {
-    let multiplier = (direction === 'asc') ? 1 : -1;
-    return this.isolatedCatalog.collection.sort((a, b) => multiplier * compare(get(a, column.valuePath), get(b, column.valuePath)))
-  }
-
-  @action
-  removeItem(item) {
-    this.removed.push(item);
-    return this.isolatedCatalog.collection.filter(i => !this.removed.includes(i));
   }
 }

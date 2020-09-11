@@ -1,0 +1,23 @@
+<section class="workflow-org workflow-org--{{@model.currentOrg.id}}">
+  <aside class="workflow-org__left-edge">
+    <LeftEdgeNav
+      @orgs={{@model.userOrgs}}
+      @current={{@model.currentOrg.id}}
+      @user={{@model.user}}
+    />
+
+    <div class="workflow-org__left-edge-queue">
+      <CardflowQueue
+        @model={{@model}}
+        @selectCard={{this.selectCard}}
+        @currentCard={{this.currentCard}}
+        {{!-- @currentMilestone={{this.currentMilestone}}
+        @updateProgress={{this.updateProgress}} --}}
+      />
+    </div>
+  </aside>
+
+  <main class="workflow-org__main">
+    {{outlet}}
+  </main>
+</section>

@@ -42,7 +42,8 @@
         </li>
       {{else}}
         <li>
-          <LinkTo @route="workflow"
+          <LinkTo @route="workflow.org"
+            @model={{org.id}}
             @class="left-edge-nav__btn left-edge-nav__btn--full {{if (eq @current org.id) "selected"}}"
             @aria-label="Organization page for {{org.title}}"
           >

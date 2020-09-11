@@ -21,9 +21,10 @@ module.exports = function(defaults) {
       prepend: '/boxel/',
       replaceExtensions: ['html', 'css', 'js', 'json'],
       enabled: (process.env.EMBER_ENV !== 'test')
-    }
+    },
 
     // Add options here
+    'ember-power-select': { theme: false }
   });
 
   /*

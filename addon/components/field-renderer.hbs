@@ -66,7 +66,17 @@
       <div class="field-renderer__title">{{humanize @field.title}}</div>
       <div class="field-renderer__value">
         {{#if (eq @field.type "dropdown")}}
-          <Dropdown @className="field-renderer__dropdown" @options={{@field.options}} @selected={{@field}} @searchField={{or @searchField "value"}} />
+          <div class="field-renderer__dropdown">
+            <PowerSelect
+              @options={{@field.options}}
+              @selected={{@field.value}}
+              @onChange={{fn (mut @field.value)}}
+              @renderInPlace={{true}}
+              @verticalPosition="below"
+            as |option|>
+              {{option}}
+            </PowerSelect>
+          </div>
         {{else if (eq @field.type "textarea")}}
           <Textarea @type={{@field.type}} @class="field-renderer__input field-renderer__textarea" @value={{@field.value}} />
         {{else}}

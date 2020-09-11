@@ -1,11 +1,8 @@
 <div class="queue {{@class}}">
   <header class="queue__header">
     <div class="queue__org">
-      <div class="queue__org-logo" style={{css-url "background-image" @model.iconURL}} />
-      <div>
-        <div class="queue__org-title">{{@model.title}}</div>
-        <div class="queue__user-title">{{this.user.title}}</div>
-      </div>
+      <div class="queue__org-logo" style={{css-url "background-image" this.org.iconURL}} />
+      <div class="queue__org-title">{{this.org.title}}</div>
     </div>
 
     <ul class="queue__nav">
@@ -14,30 +11,19 @@
       <li class="queue__nav-item">Tasks</li>
     </ul>
 
-    <div class="queue__header-input-group">
-      <div class="queue__pill-btn-group pill-btn-group">
-        <button
-          {{on "click" (fn this.filterQueue null)}}
-          class="pill-btn-group__btn pill-btn-group__btn--left {{if (eq this.displayQueue "shared") "pill-btn-group__btn--selected"}}"
-        >
-          Shared Queue
-        </button>
-        <button
-          {{on "click" (fn this.filterQueue @user.id)}}
-          class="pill-btn-group__btn pill-btn-group__btn--right {{if (eq this.displayQueue "user") "pill-btn-group__btn--selected"}}"
-        >
-          My Queue
-        </button>
+    <div class="queue__filter-group">
+      <div class="queue__filter-dropdown">
+        <PowerSelect
+          @options={{this.viewOptions}}
+          @selected={{this.displayQueue}}
+          @onChange={{this.filterQueue}}
+          @renderInPlace={{true}}
+          @verticalPosition="below"
+        as |option|>
+          {{option.name}}
+        </PowerSelect>
       </div>
-      <Input @value="Search" @class="queue__filter" />
-    </div>
-
-    <div class="queue__display-format">
-      <div>View as {{capitalize this.displayFormat}}</div>
-      <div class="queue__display-format-btns">
-        <IconButton @class="queue__display-format-btn {{if (eq this.displayFormat "list") "queue__display-format-btn--selected"}}" @icon="list-2" @width="14px" @height="14px" />
-        <IconButton @class="queue__display-format-btn {{if (eq this.displayFormat "grid") "queue__display-format-btn--selected"}}" @icon="grid-2" @width="14px" @height="14px" />
-      </div>
+      <IconButton @class="queue__search-btn" @icon="search" @aria-label="search the queue" />
     </div>
   </header>
 
@@ -50,7 +36,8 @@
       {{#each this.unreadCards as |card|}}
         <QueueCard
           @card={{card}}
-          @orgId={{@model.id}}
+          @selectCard={{fn @selectCard card}}
+          @currentCard={{@currentCard}}
           @currentMilestone={{@currentMilestone}}
           @updateProgress={{@updateProgress}}
         />
@@ -65,7 +52,11 @@
     </header>
     <div class="queue__section-content">
       {{#each this.actionReqCards as |card|}}
-        <QueueCard @card={{card}} @orgId={{@model.id}} />
+        <QueueCard
+          @card={{card}}
+          @selectCard={{fn @selectCard card}}
+          @currentCard={{@currentCard}}
+        />
       {{/each}}
     </div>
   </section>
@@ -77,7 +68,11 @@
     </header>
     <div class="queue__section-content">
       {{#each this.recentCards as |card|}}
-        <QueueCard @card={{card}} @orgId={{@model.id}} />
+        <QueueCard
+          @card={{card}}
+          @selectCard={{fn @selectCard card}}
+          @currentCard={{@currentCard}}
+        />
       {{/each}}
     </div>
   </section>

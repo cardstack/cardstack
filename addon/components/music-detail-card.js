@@ -91,13 +91,9 @@ export default class MusicDetailCardComponent extends Component {
       },
       {
         title: 'recording year',
-        value: Number(this.model.year) || null,
+        value: this.model.year || null,
         type: 'dropdown',
-        options: [
-          { value: 2018 },
-          { value: 2019 },
-          { value: 2020 }
-        ]
+        options: ['2017', '2018', '2019', '2020', '2021']
       },
       {
         title: 'release date',
@@ -113,10 +109,7 @@ export default class MusicDetailCardComponent extends Component {
         title: 'parental advisory',
         value: this.model.parental_advisory,
         type: 'dropdown',
-        options: [
-          { value: "Yes" },
-          { value: "No" }
-        ]
+        options: ['Yes', 'No']
       },
       {
         title: 'copyright notice',

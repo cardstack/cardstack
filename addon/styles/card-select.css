@@ -81,17 +81,17 @@
 }
 
 .cs-card-select--dropdown.ember-basic-dropdown-content--below.ember-basic-dropdown--transitioning-in {
-  animation: drop-fade-below var(--cs-transition-time);
+  animation: drop-fade-below var(--boxel-transition);
 }
 .cs-card-select--dropdown.ember-basic-dropdown-content--below.ember-basic-dropdown--transitioning-out {
-  animation: drop-fade-below var(--cs-transition-time) reverse;
+  animation: drop-fade-below var(--boxel-transition) reverse;
 }
 
 .cs-card-select--dropdown.ember-basic-dropdown-content--above.ember-basic-dropdown--transitioning-in {
-  animation: drop-fade-above var(--cs-transition-time);
+  animation: drop-fade-above var(--boxel-transition);
 }
 .cs-card-select--dropdown.ember-basic-dropdown-content--above.ember-basic-dropdown--transitioning-out {
-  animation: drop-fade-above var(--cs-transition-time) reverse;
+  animation: drop-fade-above var(--boxel-transition) reverse;
 }
 
 @keyframes drop-fade-below {

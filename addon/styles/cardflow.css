@@ -2,67 +2,123 @@
   display: grid;
   grid-template-columns: 1fr auto;
   grid-template-rows: auto 1fr;
+  gap: 0 var(--boxel-spacing);
+  height: 100%;
+  background-color: #EFEFEF;
+  border-radius: 0 var(--boxel-border-radius) 0 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
-  overflow: hidden;
-  height: 100%;
+}
+
+.cardflow-platter {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 /* Header */
 .cardflow__header {
   grid-column: 1 / -1;
-  position: relative;
-  z-index: 2;
+  position: sticky;
+  top: 0;
+  right: 0;
+  z-index: 1;
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 20px;
-  min-height: 80px;
-  height: auto;
-  padding: 15px 20px 20px 30px;
-  background-color: white;
-  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.16);
+  gap: var(--boxel-spacing);
+  padding: var(--boxel-spacing);
+  background-color: #fff;
+  border-top-right-radius: var(--boxel-border-radius);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
-.cardflow__project-title {
-  border-radius: 10px 0 5px 0;
-  color: rgba(0, 0, 0, 0.7);
+.cardflow__label {
+  color: var(--boxel-medium-light-purple);
+  font: var(--boxel-font-xs);
+  font-weight: 600;
   letter-spacing: var(--boxel-lsp-xl);
   text-transform: uppercase;
 }
 
 .cardflow__title {
-  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.cardflow__label + .cardflow__title {
+  margin-top: 5px;
+}
+
+.cardflow__header-participants {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0 30px;
+  color: #000;
   font-weight: 600;
-  line-height: calc(27/20);
-  letter-spacing: 0.005em;
+  letter-spacing: var(--boxel-lsp-xl);
+}
+
+.cardflow__header-participant-icons {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 15px;
+  direction: rtl; /* hack to revert item order */
+}
+
+.cardflow__header-participant-img {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  border: 1px solid white;
+  border-radius: 100px;
+  background-image: url('/media-registry/placeholders/profile.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.cardflow__notification {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 2px 13px 3px;
+  border-radius: 0 10px 0 5px;
+  background-color: var(--boxel-red);
+  color: #fff;
+  font-weight: bold;
+  letter-spacing: var(--boxel-lsp-sm);
+  text-align: center;
 }
 
 
 /* Main Thread */
 .cardflow__thread {
-  display: grid;
-  grid-auto-rows: max-content;
-  gap: 30px;
-  height: 100%;
-  padding: 20px 30px 50px;
+  max-width: 660px;
+  padding: var(--boxel-spacing);
   overflow-y: auto;
+}
+
+.cardflow__thread > * + * {
+  margin-top: var(--boxel-spacing);
 }
 
 .cardflow__message {
   display: grid;
-  grid-template-columns: 60px 1fr;
-  gap: 5px 20px;
+  grid-template-columns: 40px 1fr;
+  gap: 10px 20px;
   color: black;
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
 }
 
-.cardflow__message:last-child > *:last-child {
-  margin-bottom: 60px;
-}
-
 .cardflow__message-content > * + * {
   margin-top: 20px;
+}
+
+.cardflow__message-content {
+  font-size: 15px;
+  line-height: calc(23/15);
+  letter-spacing: var(--boxel-lsp-sm);
 }
 
 
@@ -77,19 +133,16 @@
 }
 
 .cardflow__message-icon__profile {
-  width: 60px;
+  width: 40px;
   height: 40px;
-  background-position: left top, left 20px center;
-  background-repeat: no-repeat, no-repeat;
-  background-size: 15px 15px, contain;
+  border-radius: 100px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
-.cardflow__message-icon__profile--crd {
-  background-image: url("/media-registry/button-crd-records.svg"), url("/media-registry/crd-user.png");
-}
-
-.cardflow__message-icon__profile--bunny {
-  background-image: url("/media-registry/button-bunny-records.svg"), url("/media-registry/bunny-user.png");
+.cardflow__message-icon__profile--bot {
+  border-radius: var(--boxel-border-radius);
 }
 
 .cardflow__message-info {
@@ -97,12 +150,24 @@
   grid-template-columns: auto 1fr;
   align-items: center;
   gap: 0 10px;
-  color: #666;
 }
 
-.cardflow__message-info-title {
-  color: black;
+.cardflow__message-sender {
   font-weight: 600;
+}
+
+.cardflow__message-time {
+  color: var(--boxel-medium-light-purple);
+  font: var(--boxel-font-xs);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-lg);
+}
+
+.cardflow__message-sender-role {
+  grid-column: 1 / -1;
+  color: #666;
+  font: var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-lg);
 }
 
 
@@ -121,7 +186,7 @@
   top: 0;
   left: 40%;
   padding: 5px 10px;
-  background-color: #F6F6F6;
+  background-color: #EFEFEF;
   font-weight: bold;
   text-align: center;
 }
@@ -129,22 +194,28 @@
 
 /* Right Sidebar */
 .cardflow__sidebar {
-  width: 100%;
-  height: 100%;
   max-width: 290px;
-  padding: 20px 30px;
-  border-left: 1px solid #D6D6D6;
+  padding: var(--boxel-spacing);
   overflow-y: auto;
 }
 
+.cardflow__sidebar > * + * {
+  margin-top: var(--boxel-spacing);
+}
+
+.cardflow__sidebar-section {
+  padding: 15px 20px;
+}
+
 .cardflow__sidebar-section + .cardflow__sidebar-section {
-  margin-top: 20px;
+  border-top: 1px solid #D6D6D6;
 }
 
 .cardflow__sidebar-title {
-  padding-bottom: 15px;
-  font: var(--boxel-font-sm);
-  font-weight: bold;
+  padding-bottom: var(--boxel-spacing);
+  color: var(--boxel-medium-light-purple);
+  font: var(--boxel-font-xs);
+  font-weight: 600;
   letter-spacing: var(--boxel-lsp-xl);
   text-transform: uppercase;
 }
@@ -157,35 +228,47 @@
 }
 
 .cardflow__progress-status {
-  padding-top: 10px;
+  padding-top: 15px;
   padding-bottom: 5px;
-  color: #666;
+  color: #000;
+  font-weight: 600;
 }
 
 .cardflow__progress-icon {
+  --icon-color: var(--boxel-highlight);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 124px;
-  height: 124px;
+  position: relative;
+  width: 120px;
+  height: 120px;
   margin: 0 auto;
+  background-image: url('/assets/images/icons/progress-circle-lg.svg');
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
 }
 
+.cardflow__progress-pie {
+  position: absolute;
+  top: 0;
+  transform: rotate(-90deg);
+  stroke-dasharray: 0 360;
+  transition: stroke-dasharray var(--boxel-transition);
+}
+
 .cardflow__progress-pct {
   font-size: 25px;
   font-weight: bold;
+  letter-spacing: 0;
 }
 
 
 /* Checklist */
 .cardflow__checklist {
-  --icon-color: #D6D6D6;
-
+  --icon-color: #666;
   margin: 0;
-  padding: 30px 15px;
+  padding-bottom: 15px;
   color: #666;
 }
 
@@ -208,79 +291,102 @@
 }
 
 .cardflow__checklist-item.current {
-  color: black;
-  --icon-color: #FFD800;
+  --icon-color: var(--boxel-highlight);
+  --icon-fill-color: #000;
+
+  color: #03C4BF;
+  font-weight: 600;
 }
 
 .cardflow__checklist-item.completed {
-  color: black;
+  --icon-color: #000;
+  color: #000;
   font-weight: 600;
-  --icon-color: #1CFF25;
+}
+
+.cardflow__checklist-item.completed > svg {
+  padding: 3px;
+  background-color: var(--boxel-highlight);
+  border-radius: 100px;
 }
 
 .cardflow__checklist-time {
   position: absolute;
-  right: 0;
-  color: #666;
-  font: var(--boxel-font-xs);
+  left: 38px;
+  color: var(--boxel-medium-light-purple);
+  font-size: 11px;
 }
 
 
 /* Participants Box */
+.cardflow__sidebar-section--participants {
+  padding: 15px 0 30px;
+}
+
+.cardflow__sidebar-section--participants .cardflow__sidebar-title {
+  padding-left: var(--boxel-spacing);
+}
+
 .cardflow__participants {
-  padding: 20px;
+  list-style-type: none;
+  padding: 0 var(--boxel-spacing);
 }
 
 .cardflow__participants + .cardflow__participants {
-  border-top: 1px solid #EFEFEF;
+  margin-top: var(--boxel-spacing);
+  padding-top: var(--boxel-spacing);
+  border-top: 1px solid #D6D6D6;
 }
 
 .cardflow__participant {
   display: grid;
-  grid-template-columns: 40px 1fr;
-  gap: 20px 10px;
+  grid-template-columns: 30px 1fr;
+  gap: 0 10px;
   align-items: center;
-  font: var(--boxel-font-sm);
-  font-weight: 600;
-  color: black;
 }
 
 .cardflow__participant + .cardflow__participant {
-  margin-top: 20px;
+  margin-top: 15px;
 }
 
-.cardflow__participant-company-img {
-  width: 40px;
-  height: 40px;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-}
-
-.cardflow__participant-company {
-  font-size: 14px;
-}
-
-.cardflow__participant-user-img {
-  justify-self: center;
+.cardflow__participant-org-img {
   width: 30px;
   height: 30px;
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
+}
+
+.cardflow__participant-img {
+  justify-self: center;
+  width: 30px;
+  height: 30px;
+  background-image: url('/media-registry/placeholders/profile.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   border-radius: 100px;
 }
 
-.cardflow__participant-user > span {
+.cardflow__participant-org-title {
+  font-weight: 600;
+}
+
+.cardflow__participant-title {
   font: var(--boxel-font-xs);
+  font-weight: 600;
+}
+
+.cardflow__participant-role {
   color: #666;
-  font-weight: normal;
+  font-weight: 400;
 }
 
 
 /* Cardflow Card */
 .cardflow-card {
   max-width: 615px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 .cardflow-card__header {
@@ -470,12 +576,21 @@
 
 .cardflow__reply-to.field-renderer__input {
   padding-right: 80px;
+  height: 45px;
   background-image: url("/assets/images/icons/plus.svg"), url("/assets/images/icons/emoji.svg");
   background-position: right 55px center, right 15px center;
   background-repeat: no-repeat, no-repeat;
   background-size: 15px 15px, 20px 20px;
+  font-size: 15px;
+  line-height: calc(23/15);
+  letter-spacing: var(--boxel-lsp-sm);
+  border: var(--boxel-border);
+  border-radius: var(--boxel-border-radius);
 }
 
+.cardflow__reply-to.field-renderer__input:focus {
+  outline: 0;
+}
 
 /* Cardflow overlay */
 .cardflow-overlay {
@@ -603,7 +718,6 @@
 }
 
 .cardflow__sidebar-cards .boxel-card--collection {
-  min-width: 360px;
   min-height: 160px;
 }
 
