@@ -140,4 +140,101 @@ describe('hub/computed-fields', function() {
       expect(await card.value('agePlusOne')).to.equal(41);
     });
   });
+
+  describe('queries', function() {
+    let env: TestEnv;
+    let thePost: AddressableCard;
+    this.timeout(10000);
+
+    before(async function() {
+      env = await createTestEnv();
+      let service = await (await env.container.lookup('cards')).as(Session.EVERYONE);
+      let reverseLookup = await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        cardDocument().withAttributes({
+          csFiles: {
+            'compute.js': `module.exports = async function({ field, card }) {
+              let foreignKey = await field.value('foreignKey');
+              let foreignType = await field.value('foreignType');
+              try {
+                debugger
+
+                let found = await card.reader.search({
+                  filter: {
+                    type: foreignType,
+                    eq: {
+                     [foreignKey + '.csId']:  card.csId,
+                     [foreignKey + '.csRealm']:  card.csRealm,
+                     [foreignKey + '.csOriginalRealm']:  card.csOriginalRealm
+                    },
+                  },
+                });
+
+                return { value: found.cards };
+              } catch (err) {
+                return { value: [] };
+              }
+            }`,
+            'query.js': `module.exports = async function(expression, fieldName) {
+              console.log('I can has query?')
+            }`,
+          },
+          csFeatures: {
+            compute: 'compute.js',
+            'field-buildQueryExpression': 'query.js',
+          },
+        }).jsonapi
+      );
+
+      let Post = await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        cardDocument()
+          .withField('comments', reverseLookup, 'plural', {
+            foreignKey: 'post',
+            foreignType: { csRealm: `${myOrigin}/api/realms/first-ephemeral-realm`, csId: 'comment' },
+          })
+          .withField('title', 'string-field').jsonapi
+      );
+
+      let Comment = await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        cardDocument()
+          .withAttributes({ csId: 'comment' })
+          .withField('post', Post)
+          .withField('message', 'string-field').jsonapi
+      );
+
+      thePost = await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        cardDocument()
+          .adoptingFrom(Post)
+          .withAttributes({ title: 'The Post' }).jsonapi
+      );
+
+      await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        cardDocument()
+          .adoptingFrom(Comment)
+          .withAttributes({ message: 'Hello' })
+          .withRelationships({ post: thePost }).jsonapi
+      );
+
+      await service.create(
+        `${myOrigin}/api/realms/first-ephemeral-realm`,
+        cardDocument()
+          .adoptingFrom(Comment)
+          .withAttributes({ message: 'Goodbye' })
+          .withRelationships({ post: thePost }).jsonapi
+      );
+    });
+
+    after(async function() {
+      await env.destroy();
+    });
+
+    it('exposes computed value', async function() {
+      let comments = await thePost.value('comments');
+      expect(comments).has.length(2);
+    });
+  });
 });
