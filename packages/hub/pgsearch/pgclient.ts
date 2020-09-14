@@ -431,7 +431,7 @@ export default class PgClient {
 
     let [response, totalResponse] = await Promise.all([
       this.queryCards(cards, query),
-      this.queryCards(cards, totalResponseQuery)
+      this.queryCards(cards, totalResponseQuery),
     ]);
 
     let result = await this.assembleResponse(response, totalResponse, size, sorts, cards);
