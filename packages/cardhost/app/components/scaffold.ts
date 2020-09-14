@@ -1,14 +1,21 @@
 import Component from '@glimmer/component';
+
 // @ts-ignore
 import { dasherize } from '@ember/string';
 // @ts-ignore
 import { tracked } from '@glimmer/tracking';
 import { Card } from '@cardstack/hub';
+import { inject as service } from '@ember/service';
+
+import IsComponentService from '../services/is-component';
+
+
 
 export default class ScaffoldComponent extends Component<{
   card: Card;
   feature: string;
 }> {
+  @service isComponent!: IsComponentService;
   @tracked componentName!: string | undefined;
   // Warning--async in the loading of feature components can lead to jank in the
   // card-renderer. If you are searching for the cause of jank, careful
@@ -26,6 +33,7 @@ export default class ScaffoldComponent extends Component<{
     if (this.args.card.csId && ['photo-card'].includes(this.args.card.csId)) {
       csId = this.args.card.csId;
     } else {
+      let componentName: string;
       switch (this.args.card.adoptsFromId?.csId) {
         case 'photo-card':
         case 'string-field':
@@ -41,6 +49,14 @@ export default class ScaffoldComponent extends Component<{
           break;
 
         default:
+          componentName = `cards/${dasherize(this.args.card.csId!)}/${dasherize(this.args.feature)}`;
+          console.log('looking for', componentName)
+          if (this.isComponent.test(componentName)) {
+            this.componentName = componentName;
+            return;
+          }
+
+
           csId = 'base';
       }
     }
