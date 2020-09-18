@@ -111,9 +111,9 @@ export default class PgClient {
 
   async queryCards(cards: ScopedCardService, query: CardExpression): Promise<QueryResult> {
     let client = await this.pool.connect();
-    let sql = await this.cardQueryToSQL(cards, query);
-    log.trace('search: %s trace: %j', sql.text, sql.values);
     try {
+      let sql = await this.cardQueryToSQL(cards, query);
+      log.trace('search: %s trace: %j', sql.text, sql.values);
       return await client.query(sql);
     } finally {
       client.release();
@@ -411,7 +411,7 @@ export default class PgClient {
       //conditions.push(this.queryCondition(queryString));
     }
 
-    let totalResponsePromise = this.queryCards(cards, [`select count(*) from cards where`, ...every(conditions)]);
+    let totalResponseQuery = [`select count(*) from cards where`, ...every(conditions)];
 
     let sorts = new Sorts(baseType(filter), sort);
     if (page && page.cursor) {
@@ -429,9 +429,13 @@ export default class PgClient {
     let size = Number(page?.size ?? 10);
     query = [...query, 'limit', param(size + 1)];
 
-    let response = await this.queryCards(cards, query);
-    let totalResponse = await totalResponsePromise;
-    return await this.assembleResponse(response, totalResponse, size, sorts, cards);
+    let [response, totalResponse] = await Promise.all([
+      this.queryCards(cards, query),
+      this.queryCards(cards, totalResponseQuery),
+    ]);
+
+    let result = await this.assembleResponse(response, totalResponse, size, sorts, cards);
+    return result;
   }
 
   private async assembleResponse(
