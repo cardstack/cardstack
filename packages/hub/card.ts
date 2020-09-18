@@ -352,9 +352,16 @@ export class Card {
     }
 
     let field = await this.field(fieldName);
-    let compute = await field.loadFeature('compute');
+    let compute;
+
+    try {
+      compute = await field.loadFeature('compute');
+    } catch (e) {
+      // couldn't load compute feature - perhaps because this code is running on the browser
+    }
+
     if (compute) {
-      return await compute({ field, card: this });
+        return await compute({ field, card: this });
     }
     if (this.attributes) {
       if (fieldName in this.attributes) {
