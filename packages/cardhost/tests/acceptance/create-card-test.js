@@ -32,18 +32,18 @@ const scenario = new Fixtures({
   },
 });
 
-module('Acceptance | card create', function (hooks) {
+module('Acceptance | card create', function(hooks) {
   setupApplicationTest(hooks);
   scenario.setupTest(hooks);
 
-  hooks.beforeEach(async function () {
+  hooks.beforeEach(async function() {
     await login();
   });
-  hooks.afterEach(async function () {
+  hooks.afterEach(async function() {
     await waitForTestsToEnd();
   });
 
-  test('right edge shows base card as adopted from card', async function (assert) {
+  test('right edge shows base card as adopted from card', async function(assert) {
     await visit('/cards/add');
     await setCardName(card1Name);
     await showCardId();
@@ -54,7 +54,7 @@ module('Acceptance | card create', function (hooks) {
     assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').doesNotExist();
   });
 
-  test('creating a card', async function (assert) {
+  test('creating a card', async function(assert) {
     await visit('/cards/add');
     assert.equal(currentURL(), '/cards/add');
 
@@ -117,7 +117,7 @@ module('Acceptance | card create', function (hooks) {
     );
   });
 
-  test('creating a card from the library', async function (assert) {
+  test('creating a card from the library', async function(assert) {
     await visit('/');
 
     assert.equal(currentURL(), '/cards');
@@ -161,7 +161,7 @@ module('Acceptance | card create', function (hooks) {
     );
   });
 
-  test(`selecting a field`, async function (assert) {
+  test(`selecting a field`, async function(assert) {
     await visit('/cards/add');
 
     await setCardName(card1Name);
@@ -214,7 +214,7 @@ module('Acceptance | card create', function (hooks) {
     await waitForAnimation(async () => await percySnapshot(assert));
   });
 
-  test(`renaming a card's field`, async function (assert) {
+  test(`renaming a card's field`, async function(assert) {
     await visit('/cards/add');
 
     await setCardName(card1Name);
@@ -258,7 +258,7 @@ module('Acceptance | card create', function (hooks) {
     assert.ok(card.data.attributes.csFields.subtitle);
   });
 
-  test(`entering invalid field name shows error`, async function (assert) {
+  test(`entering invalid field name shows error`, async function(assert) {
     await visit('/cards/add');
 
     await setCardName(card1Name);
@@ -278,7 +278,7 @@ module('Acceptance | card create', function (hooks) {
     await waitForAnimation(async () => await percySnapshot(assert));
   });
 
-  test(`removing a field from a card`, async function (assert) {
+  test(`removing a field from a card`, async function(assert) {
     await visit('/cards/add');
 
     await setCardName(card1Name);
@@ -294,7 +294,7 @@ module('Acceptance | card create', function (hooks) {
     assert.deepEqual(card.data.attributes.csFields, {});
   });
 
-  test(`removing a field from a card that has an empty name`, async function (assert) {
+  test(`removing a field from a card that has an empty name`, async function(assert) {
     await visit('/cards/add');
 
     await setCardName(card1Name);
@@ -312,7 +312,7 @@ module('Acceptance | card create', function (hooks) {
     assert.deepEqual(card.data.attributes.csFields, {});
   });
 
-  test('can add a field at a particular position', async function (assert) {
+  test('can add a field at a particular position', async function(assert) {
     await visit('/cards/add');
 
     await setCardName(card1Name);
@@ -332,7 +332,7 @@ module('Acceptance | card create', function (hooks) {
     assert.deepEqual(card.data.attributes.csFieldOrder, ['title', 'author', 'body']);
   });
 
-  test('autosave works', async function (assert) {
+  test('autosave works', async function(assert) {
     await visit('/cards/add');
     await setCardName(card1Name);
     let card1Id = getEncodedCardIdFromURL();

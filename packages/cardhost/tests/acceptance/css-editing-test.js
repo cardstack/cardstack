@@ -56,20 +56,20 @@ const scenario = new Fixtures({
 // then you'll get false test failures. I think there might be some kind of
 // monaco depedency on having the chrome browser have focus in order for the CSS
 // to bet set correctly.
-module('Acceptance | css editing (make sure browser window has focus!)', function (hooks) {
+module('Acceptance | css editing (make sure browser window has focus!)', function(hooks) {
   setupApplicationTest(hooks);
   scenario.setupTest(hooks);
-  hooks.beforeEach(async function () {
+  hooks.beforeEach(async function() {
     // any time you visit the editor page, you need to set resizable to
     // false, or tests will time out.
     this.owner.lookup('controller:cards.card.view').resizable = false;
     await login();
   });
-  hooks.afterEach(async function () {
+  hooks.afterEach(async function() {
     await waitForTestsToEnd();
   });
 
-  test('can view code editor', async function (assert) {
+  test('can view code editor', async function(assert) {
     await visit(`/cards/${cardPath}/edit/layout/themer`);
     await waitForThemerLoad();
 
@@ -79,7 +79,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     await percySnapshot(assert);
   });
 
-  test('can dock code editor to bottom', async function (assert) {
+  test('can dock code editor to bottom', async function(assert) {
     await visit(`/cards/${cardPath}/edit/layout/themer`);
     await waitForThemerLoad();
 
@@ -89,7 +89,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     await percySnapshot(assert);
   });
 
-  test('navigating to custom styles', async function (assert) {
+  test('navigating to custom styles', async function(assert) {
     await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
 
@@ -110,7 +110,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     assert.dom('[data-test-editor-pane]').exists();
   });
 
-  test('closing the editor', async function (assert) {
+  test('closing the editor', async function(assert) {
     await visit(`/cards/${cardPath}/edit/layout`);
     await waitForCardLoad();
 
@@ -126,7 +126,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     assert.dom('[data-test-card-custom-style-button]').exists();
   });
 
-  test('toggling editor docking', async function (assert) {
+  test('toggling editor docking', async function(assert) {
     await visit(`/cards/${cardPath}/edit/layout`);
     await waitForCardLoad();
 
@@ -145,7 +145,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     assert.dom('[data-test-dock-location="right"]');
   });
 
-  test('themer mode: toggling card width', async function (assert) {
+  test('themer mode: toggling card width', async function(assert) {
     await visit(`/cards/${cardPath}/edit/layout`);
     await waitForCardLoad();
 
@@ -178,7 +178,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     await waitForAnimation(async () => await percySnapshot('themer - small card width'));
   });
 
-  test('layout mode: toggling card width', async function (assert) {
+  test('layout mode: toggling card width', async function(assert) {
     await visit(`/cards/${cardPath}/edit/layout`);
     await waitForCardLoad();
 
@@ -207,7 +207,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     await waitForAnimation(async () => await percySnapshot('layout - large card width'));
   });
 
-  test('changing card size should change card size in both themer and preview modes', async function (assert) {
+  test('changing card size should change card size in both themer and preview modes', async function(assert) {
     await visit(`/cards/${cardPath}/edit/layout/themer`);
     await waitForThemerLoad();
     let cardId = getEncodedCardIdFromURL();
@@ -287,7 +287,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     await waitForAnimation(async () => await percySnapshot('preview - medium card width'));
   });
 
-  test('can save CSS edits', async function (assert) {
+  test('can save CSS edits', async function(assert) {
     await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
 
@@ -349,7 +349,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     );
   });
 
-  test('dropdown displays default theme for new cards', async function (assert) {
+  test('dropdown displays default theme for new cards', async function(assert) {
     await visit(`/cards/${cardPath}/edit/layout`);
     await waitForCardLoad();
 
@@ -359,7 +359,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     assert.dom('[data-test-cs-component="dropdown"]').doesNotContainText('Custom');
   });
 
-  test('dropdown displays custom theme for cards with custom CSS', async function (assert) {
+  test('dropdown displays custom theme for cards with custom CSS', async function(assert) {
     await visit(`/cards/${cardPath}/edit/layout`);
     await waitForCardLoad();
     await click('[data-test-card-custom-style-button]');
@@ -376,7 +376,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     assert.dom('[data-test-cs-component="dropdown"]').doesNotContainText('Template theme');
   });
 
-  test('selecting default theme resets css', async function (assert) {
+  test('selecting default theme resets css', async function(assert) {
     await visit(`/cards/${cardPath}/edit/layout`);
     await waitForCardLoad();
     await click('[data-test-card-custom-style-button]');
@@ -398,7 +398,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
       .containsText('base css');
   });
 
-  test('buttons and dropdowns reflect custom style state', async function (assert) {
+  test('buttons and dropdowns reflect custom style state', async function(assert) {
     await visit(`/cards/${cardPath}/edit/layout`);
     await waitForCardLoad();
 
@@ -420,7 +420,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     assert.dom('[data-test-style-dropdown]').doesNotIncludeText('Template theme');
   });
 
-  test('autosave works', async function (assert) {
+  test('autosave works', async function(assert) {
     await visit(`/cards/${cardPath}/edit/layout`);
     await waitForCardLoad();
 
