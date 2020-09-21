@@ -1,6 +1,61 @@
 /* Edit Mode */
-.card-renderer-isolated.edit .field + .field {
-  margin-top: 20px;
+.edit-field {
+  --field-primary-color: var(--ch-dark);
+  --field-background-color: var(--ch-light);
+  --field-border: 1px solid #DEDEDE;
+  --field-border-radius: 5px;
+  --field-font: 16px/calc(22/16) var(--ch-font-family);
+  --field-lsp: 0.015em;
+  --field-label-font: 700 13px/calc(22/13) var(--ch-font-family);
+  --field-label-lsp: 0.05em;
+  --field-input-height: 50px;
+  --field-max-width: 690px;
+
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 30px;
+  max-width: var(--field-max-width);
+  margin: 0 auto;
+  padding: 10px;
+  color: var(--field-primary-color);
+}
+
+.edit-field__title {
+  font: var(--field-label-font);
+  letter-spacing: var(--field-label-lsp);
+  text-transform: uppercase;
+  text-align: right;
+}
+
+.edit-field__input {
+  width: 100%;
+  height: var(--field-input-height);
+  padding: 10px;
+  border: var(--field-border);
+  border-radius: var(--field-border-radius);
+  background-color: var(--field-background-color);
+  color: var(--field-primary-color);
+  font: var(--field-font);
+  letter-spacing: var(--field-lsp);
+}
+
+.edit-field__input:focus {
+  border-color: var(--ch-highlight);
+  outline: 2px solid var(--ch-highlight);
+  outline-offset: -3px;
+}
+
+.edit-field__input:hover:not(:focus) {
+  border-color: var(--ch-hover);
+}
+
+.edit-field__radio-checkbox {
+  border: var(--field-border);
+  border-radius: var(--field-border-radius);
+  background-color: var(--field-background-color);
+  color: var(--field-primary-color);
+  font: var(--field-font);
+  letter-spacing: var(--field-lsp);
 }
 
 

@@ -31,7 +31,6 @@
   font-weight: 600;
   font-size: 13px;
   line-height: 1.385;
-  text-transform: capitalize;
   transition: background-color var(--ch-transition-time),
               border-color var(--ch-transition-time),
               border-radius var(--ch-transition-time);
@@ -75,7 +74,6 @@ header.schema-field-renderer--header.string {
   font-size: 11px;
   line-height: 1.364;
   letter-spacing: 0.035em;
-  text-transform: capitalize;
 }
 
 .schema-field-renderer--value {

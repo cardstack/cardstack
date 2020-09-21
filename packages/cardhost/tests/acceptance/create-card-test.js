@@ -242,7 +242,7 @@ module('Acceptance | card create', function(hooks) {
 
     await visit(`/cards/${card1Id}/edit/fields`);
     await animationsSettled();
-    assert.dom('[data-test-field="subtitle"] [data-test-cs-component-label="text-field"]').hasText('Subtitle');
+    assert.dom('[data-test-field="subtitle"] [data-test-edit-field-label]').hasText('Subtitle');
     assert.dom('[data-test-field="title"]').doesNotExist();
 
     await visit(`/cards/${card1Id}/edit/fields/schema`);

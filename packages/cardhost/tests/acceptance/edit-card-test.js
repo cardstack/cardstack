@@ -101,7 +101,7 @@ module('Acceptance | card edit', function(hooks) {
 
     await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
-    assert.dom('[data-test-field="birthday"] [data-test-date-field-viewer-value]').hasText(`November 19, 2016`);
+    assert.dom('[data-test-field="birthday"] [data-test-date-field-viewer-value]').hasText(`Nov 19, 2016`);
 
     let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
@@ -117,9 +117,7 @@ module('Acceptance | card edit', function(hooks) {
 
     await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
-    assert
-      .dom('[data-test-field="appointment"] [data-test-datetime-field-viewer-value]')
-      .hasText(`March 7, 2020 1:00pm`);
+    assert.dom('[data-test-field="appointment"] [data-test-datetime-field-viewer-value]').hasText(`Mar 7, 2020 1:00pm`);
 
     let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
@@ -135,7 +133,8 @@ module('Acceptance | card edit', function(hooks) {
 
     await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
-    assert.dom('[data-test-field="link"] [data-test-link-field-viewer-value]').hasText(`Awesome Link`);
+    assert.dom('[data-test-field="link"] [data-test-link-field-viewer-label]').hasText(`Awesome Link`);
+    assert.dom('[data-test-field="link"] [data-test-link-field-viewer-value]').hasText(`https://cardstack.com/`);
     assert
       .dom('[data-test-field="link"] [data-test-link-field-viewer-value]')
       .hasAttribute('href', 'https://cardstack.com/');

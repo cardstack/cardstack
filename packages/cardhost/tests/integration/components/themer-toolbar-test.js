@@ -12,7 +12,7 @@ module('Integration | Component | themer-toolbar', function(hooks) {
     assert.dom('[data-test-themer-toolbar]').exists();
     assert.dom('[data-test-preview-link-btn]').exists();
     assert.dom('[data-test-card-size-toggle]').exists();
-    assert.dom('[data-test-small-btn]').hasClass('selected');
+    assert.dom('[data-test-medium-btn]').hasClass('selected');
     assert.dom('[data-test-dock-bottom]').exists();
     assert.dom('[data-test-dock-right]').exists();
     assert.dom('[data-test-mode-indicator-link="edit"]').exists();

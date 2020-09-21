@@ -1,6 +1,7 @@
-<TextField
+<BoxelTextField
+  @mode="edit"
+  @cardId={{@card.name}}
   @label={{@card.csTitle}}
-  @helperText={{this.fieldInstructions}}
   @value={{this.fieldValue}}
-  @setValue={{perform this.updateFieldValue}}
-  data-test-edit-field={{@card.name}} />
+  @key-up={{perform this.updateFieldValue}}
+/>

@@ -8,7 +8,7 @@ type DockLocation = 'right' | 'bottom';
 export default class CssModeToggleService extends Service {
   @tracked visible = true;
   @tracked dockLocation: DockLocation = 'right';
-  @tracked width: Width = 'small';
+  @tracked width: Width = 'medium';
 
   @action
   dockRight() {

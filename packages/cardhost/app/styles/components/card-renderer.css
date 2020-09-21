@@ -1,6 +1,6 @@
 .card-renderer-isolated {
   --card-renderer-width: var(--ch-card-size);
-  --card-renderer-height: var(--ch-card-size);
+  --card-renderer-height: var(--ch-card-height);
   --card-renderer-header-height: 56px;
 
   position: relative;
@@ -14,8 +14,8 @@
   transition: width 0.3s ease;
 }
 
-.card-renderer-isolated.schema,
-.card-renderer-isolated.edit {
+.card-renderer-isolated.schema {
+  --card-renderer-width: var(--ch-card-size-small);
   min-height: var(--card-renderer-height);
   max-width: var(--card-renderer-width);
 }

@@ -45,7 +45,7 @@
 }
 
 .themer-card-width--small .card-renderer-isolated {
-  width: var(--ch-card-size);
+  width: var(--ch-card-size-small);
 }
 
 .themer-card-width--medium .card-renderer-isolated {

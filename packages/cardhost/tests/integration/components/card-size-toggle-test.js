@@ -20,13 +20,13 @@ module('Integration | Component | card-size-toggle', function(hooks) {
     this.set('model', {});
     await render(hbs`<CardSizeToggle />`);
     assert.dom('[data-test-card-size-toggle]').exists();
-    assert.dom('[data-test-small-btn]').hasClass('selected');
-    assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
-    assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
-
-    await click('[data-test-medium-btn]');
     assert.dom('[data-test-medium-btn]').hasClass('selected');
     assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
+    assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
+
+    await click('[data-test-small-btn]');
+    assert.dom('[data-test-small-btn]').hasClass('selected');
+    assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
 
     await click('[data-test-large-btn]');

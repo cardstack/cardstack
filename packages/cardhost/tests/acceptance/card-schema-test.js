@@ -140,8 +140,8 @@ module('Acceptance | card schema', function(hooks) {
 
     await visit(`/cards/${cardPath}/edit/fields`);
     await waitForCardLoad();
-    assert.dom('[data-test-isolated-card] [data-test-field="title"] .cs-input').hasValue('test title');
-    assert.dom('[data-test-isolated-card] [data-test-field="title"] .cs-input-group--label').hasText('TITLE');
+    assert.dom('[data-test-isolated-card] [data-test-field="title"] input').hasValue('test title');
+    assert.dom('[data-test-isolated-card] [data-test-field="title"] [data-test-edit-field-label]').hasText('TITLE');
   });
 
   test(`adding a new field after removing one`, async function(assert) {
