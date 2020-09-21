@@ -58,7 +58,7 @@ module.exports = function(defaults) {
       staticAddonTestSupportTrees: true,
       staticAddonTrees: true,
       staticHelpers: true,
-      staticComponents: true,
+      staticComponents: false,
       onOutputPath(outputPath) {
         writeFileSync(join(__dirname, '.embroider-app-path'), outputPath, 'utf8');
       },
