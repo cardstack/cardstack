@@ -68,8 +68,13 @@
 --ch-right-edge-width: calc(var(--ch-right-edge-panel-width) + var(--ch-spacing));
 --ch-bottom-edge-height: 80px;
 
---ch-card-size: 496px;   /* min-width and min-height for cards */
---ch-field-width: 384px; /* edit and schema view field-renderer max-width */
+--ch-card-size-small: 496px;    /* min-width and min-height for cards */
+--ch-card-size-medium: 945px;
+--ch-card-size-large: 100%;
+--ch-card-size: var(--ch-card-size-medium); /* default max-width for cards */
+--ch-card-height: 496px;  /* min-height for cards */
+--ch-field-width: 384px;
+
 --ch-spacing: 20px;
 --ch-left-edge-z-index: 30;
 --ch-right-edge-z-index: 20;
