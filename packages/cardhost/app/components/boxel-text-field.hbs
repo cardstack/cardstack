@@ -1,6 +1,6 @@
 {{#if (eq @mode "edit")}}
   <label class="edit-field" data-test-edit-field={{@cardId}}>
-    <div class="edit-field__title">{{@label}}</div>
+    <div class="edit-field__title" data-test-edit-field-label>{{@label}}</div>
     {{!-- Events supported by the built-in Input ember component --}}
     <Input
       @class="edit-field__input"

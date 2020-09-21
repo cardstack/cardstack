@@ -5,7 +5,7 @@
       <Input
         @id={{concat this.idPrefix "-true"}}
         @type="radio"
-        @class="edit-field__radio-checkbox"
+        @class="edit-field__radio-checkbox cardstack-core-types-field-value-true"
         @name={{concat "field" this.nonce "-boolean-field-value"}}
         @checked={{this.fieldValue}}
         @click={{perform this.updateFieldValue}}
@@ -17,7 +17,7 @@
       <Input
         @id={{concat this.idPrefix "-false"}}
         @type="radio"
-        @class="edit-field__radio-checkbox"
+        @class="edit-field__radio-checkbox cardstack-core-types-field-value-false"
         @name={{concat "field" this.nonce "-boolean-field-value"}}
         @checked={{not this.fieldValue}}
         @click={{perform this.updateFieldValue}}

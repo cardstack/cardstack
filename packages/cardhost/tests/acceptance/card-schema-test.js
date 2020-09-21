@@ -49,18 +49,18 @@ const scenario = new Fixtures({
   create: [testCard],
 });
 
-module('Acceptance | card schema', function(hooks) {
+module('Acceptance | card schema', function (hooks) {
   setupApplicationTest(hooks);
   scenario.setupTest(hooks);
 
-  hooks.beforeEach(async function() {
+  hooks.beforeEach(async function () {
     await login();
   });
-  hooks.afterEach(async function() {
+  hooks.afterEach(async function () {
     await waitForTestsToEnd();
   });
 
-  test(`adding a new field to a card`, async function(assert) {
+  test(`adding a new field to a card`, async function (assert) {
     await visit(`/cards/${cardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();
     assert.equal(currentURL(), `/cards/${cardPath}/edit/fields/schema`);
@@ -83,7 +83,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.ok(isolatedFields.includes('title-new'), 'isolated fields sets are correct');
   });
 
-  test(`Can change a card's name`, async function(assert) {
+  test(`Can change a card's name`, async function (assert) {
     await visit(`/cards/${cardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();
     await showCardId(true);
@@ -102,7 +102,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('.card-renderer-isolated--header-title').hasText('New Card Name');
   });
 
-  test(`can expand a right edge section`, async function(assert) {
+  test(`can expand a right edge section`, async function (assert) {
     await visit(`/cards/${cardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();
 
@@ -113,7 +113,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('.right-edge--item [data-test-internal-card-id]').hasText(decodeURIComponent(cardPath));
   });
 
-  test(`changing the label for a field`, async function(assert) {
+  test(`changing the label for a field`, async function (assert) {
     await visit(`/cards/${cardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();
 
@@ -140,11 +140,11 @@ module('Acceptance | card schema', function(hooks) {
 
     await visit(`/cards/${cardPath}/edit/fields`);
     await waitForCardLoad();
-    assert.dom('[data-test-isolated-card] [data-test-field="title"] .cs-input').hasValue('test title');
-    assert.dom('[data-test-isolated-card] [data-test-field="title"] .cs-input-group--label').hasText('TITLE');
+    assert.dom('[data-test-isolated-card] [data-test-field="title"] input').hasValue('test title');
+    assert.dom('[data-test-isolated-card] [data-test-field="title"] [data-test-edit-field-label]').hasText('TITLE');
   });
 
-  test(`adding a new field after removing one`, async function(assert) {
+  test(`adding a new field after removing one`, async function (assert) {
     await visit(`/cards/${cardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();
 
@@ -155,7 +155,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-field="field-1"]').exists();
   });
 
-  test(`move a field's position via drag & drop`, async function(assert) {
+  test(`move a field's position via drag & drop`, async function (assert) {
     await visit(`/cards/${cardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();
 
@@ -203,7 +203,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.deepEqual(card.data.attributes.csFieldOrder, ['body', 'author', 'title']);
   });
 
-  test(`change a field's needed-when-embedded value to true`, async function(assert) {
+  test(`change a field's needed-when-embedded value to true`, async function (assert) {
     await visit(`/cards/${cardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();
 
@@ -228,7 +228,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.ok(embeddedFields.includes('title'), 'embedded fields sets are correct');
   });
 
-  test(`change a field's needed-when-embedded value to false`, async function(assert) {
+  test(`change a field's needed-when-embedded value to false`, async function (assert) {
     await visit(`/cards/${cardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();
 
@@ -253,7 +253,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.notOk(embeddedFields.includes('author'), 'embedded fields sets are correct');
   });
 
-  test(`can navigate to base card schema`, async function(assert) {
+  test(`can navigate to base card schema`, async function (assert) {
     let baseCardPath = encodeURIComponent(canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }));
     await visit(`/cards/${baseCardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();
@@ -263,7 +263,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom(`[data-test-right-edge] [data-test-no-adoption]`).hasText('No Adoption');
   });
 
-  test(`can navigate from schema to edit via "return to editing" button`, async function(assert) {
+  test(`can navigate from schema to edit via "return to editing" button`, async function (assert) {
     await visit(`/cards/${cardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();
 
@@ -274,7 +274,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/fields`);
   });
 
-  test(`displays the top edge`, async function(assert) {
+  test(`displays the top edge`, async function (assert) {
     await visit(`/cards/${cardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();
 
@@ -286,7 +286,7 @@ module('Acceptance | card schema', function(hooks) {
     await waitForAnimation(async () => await percySnapshot(assert));
   });
 
-  test(`can navigate to edit mode using the top edge`, async function(assert) {
+  test(`can navigate to edit mode using the top edge`, async function (assert) {
     await visit(`/cards/${cardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();
 
@@ -300,7 +300,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-mode-indicator]').containsText('edit mode');
   });
 
-  test('autosave works', async function(assert) {
+  test('autosave works', async function (assert) {
     await visit(`/cards/${cardPath}/edit/fields/schema`);
     await waitForSchemaViewToLoad();
 
