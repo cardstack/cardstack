@@ -4,6 +4,7 @@
     {{!-- Events supported by the built-in Input ember component --}}
     <Input
       @class="edit-field__input"
+      @type={{@type}}
       @value={{@value}}
       @enter={{@enter}}
       @insert-newline={{@insert-newline}}
@@ -17,11 +18,9 @@
     />
   </label>
 {{else}}
-  {{#unless @hideLabel}}
-    <div class="label {{@cardId}}-label" data-test-string-field-viewer-label>
-      {{@label}}
-    </div>
-  {{/unless}}
+  <div class="label {{@cardId}}-label" data-test-string-field-viewer-label>
+    {{@label}}
+  </div>
   <div class="value {{@cardId}}-value" data-test-string-field-viewer-value>
     {{@value}}
   </div>
