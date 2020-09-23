@@ -1,7 +1,9 @@
+{{!-- use `label` for button text and `value` for button link url --}}
 <BoxelTextField
   @mode="edit"
   @cardId={{@card.name}}
   @label={{@card.csTitle}}
   @value={{this.fieldValue}}
   @key-up={{perform this.updateFieldValue}}
+  @focus-out={{perform this.updateFieldValue}}
 />

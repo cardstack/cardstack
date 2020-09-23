@@ -1,142 +1,45 @@
 /* This is the isolated base card template. All cards will inherit this CSS if
 no custom CSS is provided for the card.*/
 
-.card-boundary {
-  width: 100%;
+.isolated-card {
   margin: 0 auto;
-  background-color: white;
-  color: black;
-  font: 400 15px/1.467 'Open Sans';
-  letter-spacing: 0.03em;
-  text-align: left;
-  overflow: hidden;
-  overflow-wrap: break-word;
-  word-break: break-word;
+  background-color: #fff;
+  color: #000;
+  font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: calc(22/16);
+  letter-spacing: 0.015em;
 }
 
 .isolated-card--view-fields {
-  display: grid; /* Helpful for ordering fields */
-}
-.isolated-card--view-fields::before,
-.isolated-card--view-fields::after {
-  height: 0; /* for firefox */
+  display: grid;
+  gap: 10px;
+  padding: 30px;
 }
 
 .field {
   display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  grid-gap: 35px 50px;
-  max-width: 656px;
+  grid-template-columns: 2fr 4.5fr;
+  gap: 30px;
+  max-width: 700px;
   width: 100%;
   margin: 0 auto;
-  padding: 0 30px 35px;
-}
-.field:first-of-type {
-  padding-top: 35px;
+  padding: 10px;
 }
 
 .label {
-  padding-bottom: 4px;
-  color: var(--black);
-  font-size: 11px;
-  font-weight: bold;
-  letter-spacing: 0.1em;
-  line-height: 1.364;
-  text-transform: uppercase;
-}
-
-
-/**** SPECIAL CORE TYPES ****/
-
-/* type: link */
-/* use `label` for link text and `value` for link url */
-.link-viewer {
-  color: var(--cobalt-blue);
-  text-decoration: underline;
-  font-weight: 600;
-}
-
-/* type: cta */
-/* use `label` for button text and `value` for button link url */
-.cta-viewer {
-  min-height: 45px;
-  border-radius: 6px;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 700;
-  line-height: calc(22 / 15);
-  letter-spacing: 0.03em;
-  padding-top: 11px;
-  padding-bottom: 11px;
+  letter-spacing: 0.05em;
+  line-height: calc(22/13);
+  text-transform: uppercase;
+  text-align: right;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
-/* type: decorative-image */
-.decorative-image-viewer {
+.value {
   max-width: 100%;
-}
-
-
-/**** SPECIAL FIELD IDs ****/
-
-/* field-id: background-image */
-.background-image-field {
-  display: block;
-  max-width: 100%;
-  padding: 0;
-  order: -100; /* first item on page */
-}
-.background-image-field > .label {
-  display: none;
-}
-.background-image-field > .value {
-  width: 100%;
-  max-height: 300px;
-  object-fit: cover;
-  object-position: center;
-}
-
-/* field-id: title */
-.title-field {
-  display: block;
-}
-.title-field > .label {
-  display: none;
-}
-.title-field > .value {
-  color: var(--dark-gray);
-  font-size: 25px;
-  font-weight: bold;
-  letter-spacing: 0.015em;
-  line-height: 1.2;
-}
-
-/* field-id: highlight-title */
-.highlight-title-field {
-  display: block;
-}
-.highlight-title-field > .label {
-  display: none;
-}
-.highlight-title-field > .value {
-  color: var(--red);
-  font-size: 18px;
-  font-weight: bold;
-  letter-spacing: 0.035em;
-  text-transform: capitalize;
-}
-
-/* field-id: divider */
-.divider-field {
-  display: block;
-  width: calc(100% - 60px);
-  max-width: 596px; /* max-field-width - padding * 2 */
-  border-top: 1px solid var(--light-gray);
-}
-.divider-field .label,
-.divider-field .value {
-  display: none;
-}
-
-/* field-id: description */
-.description-field {
-  display: block;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }

@@ -1,4 +1,5 @@
 import Component from '@glimmer/component';
+import { inject as service } from '@ember/service';
 import scaleBy from '@cardstack/cardhost/motions/scale';
 import move from 'ember-animated/motions/move';
 import opacity from 'ember-animated/motions/opacity';
@@ -10,6 +11,8 @@ const { animationSpeed } = ENV;
 const duration = 250;
 
 export default class BaseIsolatedLayoutComponent extends Component {
+  @service cssModeToggle;
+
   duration = animationSpeed || duration;
 
   *transition({ insertedSprites, keptSprites, removedSprites }) {

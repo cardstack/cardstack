@@ -1,5 +1,8 @@
+{{!-- the "card-boundary" class in the div below is necessary for the card's custom CSS.
+      This is the top level selector that people should be specifying in the themer when they
+      style their cards. --}}
 <div
-  class="isolated-card"
+  class="isolated-card card-boundary isolated-card--{{this.cssModeToggle.width}}"
   data-test-isolated-card={{@card.canonicalURL}}
   data-test-isolated-card-mode={{@mode}}
 >

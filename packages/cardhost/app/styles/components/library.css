@@ -182,16 +182,24 @@
   outline: 0;
 }
 
-.library--card-renderer > .embedded-card,
+.library--card-renderer > .card-renderer-embedded--card-container,
 .library--card-renderer > .library--card-placeholder {
+  overflow: hidden;
   width: var(--library-card-min-size);
   height: var(--library-card-min-size);
   border-radius: 15px;
   transition: transform var(--ch-card-transition-duration) ease-in-out;
 }
 
-.library--card-link:hover > .library--card-renderer > .embedded-card,
-.library--card-link:focus > .library--card-renderer > .embedded-card,
+/* fallback styles */
+.library--card-renderer > .card-renderer-embedded--card-container {
+  background-color: var(--ch-light);
+  color: var(--ch-dark);
+}
+
+
+.library--card-link:hover > .library--card-renderer > .card-renderer-embedded--card-container,
+.library--card-link:focus > .library--card-renderer > .card-renderer-embedded--card-container,
 .library--card-link:hover > .library--card-renderer > .library--card-placeholder,
 .library--card-link:focus > .library--card-renderer > .library--card-placeholder {
   transform: scale(0.9);
@@ -218,7 +226,7 @@
   background-image: url(/assets/images/cards/started-page/icon-blank-card.svg);
 }
 
-.library--card-renderer .embedded-card-label,
+.library--card-renderer .card-renderer-embedded--card-label,
 .library--card-label {
   padding-top: 26px;
   color: var(--ch-light);

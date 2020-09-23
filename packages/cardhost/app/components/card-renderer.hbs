@@ -57,11 +57,8 @@
         "
       >
         {{#animated-value this watch=this.animatedWatchFields use=this.cardTransition group="body"}}
-          {{!-- the "card-boundary" class in the div below is necessary for the card's custom CSS.
-          This is the top level selector that people should be specifying in the themer when they
-          style their cards. --}}
           <div
-            class="card-renderer-isolated--card-container card-boundary
+            class="card-renderer-isolated--card-container
             {{if (and this.cardstackSession.isAuthenticated @cardSelected) "selected"}}
             "
           >
@@ -131,14 +128,16 @@
             @mode={{this.mode}} />
         </LinkTo>
       {{else}}
-        <Scaffold
-          @card={{@card}}
-          @fields={{this.fields}}
-          @feature="embedded-layout"
-          @loadedField={{perform this.loadedField}}
-          @mode={{this.mode}} />
+        <div class="card-renderer-embedded--card-container">
+          <Scaffold
+            @card={{@card}}
+            @fields={{this.fields}}
+            @feature="embedded-layout"
+            @loadedField={{perform this.loadedField}}
+            @mode={{this.mode}} />
+        </div>
         {{#if @showName}}
-          <div class="embedded-card-label">{{@card.csTitle}}</div>
+          <div class="card-renderer-embedded--card-label">{{@card.csTitle}}</div>
         {{/if}}
       {{/if}}
     </div>

@@ -111,9 +111,9 @@
 .card-renderer--embedded-card-link:focus {
   outline: 0;
 }
-.card-renderer--embedded-card-link:focus > .embedded-card {
+.card-renderer--embedded-card-link:focus > .card-renderer-embedded--card-container {
   border: 1px solid var(--ch-highlight);
 }
-.card-renderer--embedded-card-link:focus > .embedded-card-label {
+.card-renderer--embedded-card-link:focus > .card-renderer-embedded--card-label {
   color: var(--ch-highlight);
 }
