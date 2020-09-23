@@ -9,10 +9,10 @@
   --field-label-font: 700 13px/calc(22/13) var(--ch-font-family);
   --field-label-lsp: 0.05em;
   --field-input-height: 50px;
-  --field-max-width: 690px;
+  --field-max-width: 700px;
 
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: 2fr 4.5fr;
   gap: 30px;
   max-width: var(--field-max-width);
   margin: 0 auto;
@@ -25,6 +25,8 @@
   letter-spacing: var(--field-label-lsp);
   text-transform: uppercase;
   text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .edit-field__input {
