@@ -1,5 +1,8 @@
 import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
+import { tracked } from '@glimmer/tracking';
+import { task } from 'ember-concurrency';
+import { action } from '@ember/object';
 import scaleBy from '@cardstack/cardhost/motions/scale';
 import move from 'ember-animated/motions/move';
 import opacity from 'ember-animated/motions/opacity';
@@ -12,8 +15,40 @@ const duration = 250;
 
 export default class BaseIsolatedLayoutComponent extends Component {
   @service cssModeToggle;
+  @tracked heading;
+  @tracked subHeading;
+  @tracked headerImage;
 
   duration = animationSpeed || duration;
+
+  constructor(...args) {
+    super(...args);
+
+    this.loadSpecialHeader.perform();
+  }
+
+  get isViewMode() {
+    if (!this.args.mode) {
+      return null;
+    }
+    return this.args.mode === 'view' || this.args.mode === 'layout';
+  }
+
+  @task(function*() {
+    if (!this.args.card || !this.args.card.attributes || !this.args.card.attributes.heading) {
+      return;
+    }
+    this.heading = yield this.args.card.value('heading');
+    this.subHeading = yield this.args.card.value('sub-heading');
+    const image = yield this.args.card.value('header-image');
+    this.headerImage = image ? image.href : null;
+  })
+  loadSpecialHeader;
+
+  @action
+  loadHeader() {
+    this.loadSpecialHeader.perform();
+  }
 
   *transition({ insertedSprites, keptSprites, removedSprites }) {
     let scaleFrom = 0.1;

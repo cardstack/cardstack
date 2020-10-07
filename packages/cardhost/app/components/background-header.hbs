@@ -1,0 +1,18 @@
+<header class="isolated-card__header" style={{css-url "background-image" @headerImage}}>
+  <div class="isolated-card__header-content {{unless @headerImage "no-bg"}}">
+    <div class="isolated-card__img" style={{css-url "background-image" @headerImage}} />
+    <h1 class="isolated-card__title">{{@heading}}</h1>
+    <h2 class="isolated-card__description">{{@subHeading}}</h2>
+    <ul class="isolated-card__header-details">
+      {{#each @headerDetailFields as |field|}}
+        <li class="isolated-card__header-field">
+          <FieldRenderer
+            @field={{field}}
+            @mode={{@mode}}
+            @loadedField={{@loadedField}}
+          />
+        </li>
+      {{/each}}
+    </ul>
+  </div>
+</header>
