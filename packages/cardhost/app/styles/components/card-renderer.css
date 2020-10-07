@@ -98,6 +98,18 @@
 }
 
 
+/* Embedded */
+.card-renderer-embedded {
+  border-radius: var(--boxel-border-radius);
+  border: var(--boxel-border);
+  overflow: hidden;
+}
+
+.card-renderer-embedded:hover {
+  box-shadow: var(--boxel-box-shadow);
+}
+
+
 /* Focus state */
 .card-renderer-isolated:focus {
   outline: 0;

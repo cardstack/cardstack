@@ -11,10 +11,17 @@ export default class IsolatedCollection extends Component {
     constructor(owner, args) {
         super(owner, args);
         this.format = args.format || 'grid';
-        this.collection = args.collection || [];
+        this.selectedCards = args.selectedCards || [];
     }
     changeFormat(val) {
         this.format = val;
+    }
+    toggleSelect(id) {
+        if (this.selectedCards.includes(id)) {
+            this.selectedCards = this.selectedCards.filter(el => el !== id);
+            return;
+        }
+        return (this.selectedCards = [...this.selectedCards, id]);
     }
 }
 __decorate([
@@ -22,8 +29,11 @@ __decorate([
 ], IsolatedCollection.prototype, "format", void 0);
 __decorate([
     tracked
-], IsolatedCollection.prototype, "collection", void 0);
+], IsolatedCollection.prototype, "selectedCards", void 0);
 __decorate([
     action
 ], IsolatedCollection.prototype, "changeFormat", null);
+__decorate([
+    action
+], IsolatedCollection.prototype, "toggleSelect", null);
 //# sourceMappingURL=isolated-collection.js.map
