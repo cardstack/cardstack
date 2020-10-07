@@ -1,8 +1,13 @@
-.isolated-collection {
+.isolated-collection__wrapper {
   --breadcrumbs-height: 90px;
   --header-height: 170px;
 
   height: 100%;
+  padding: 0 30px;
+}
+
+.isolated-collection {
+  height: calc(100% - 110px);
   background-color: white;
   border-radius: 10px;
   box-shadow: var(--boxel-box-shadow);
@@ -69,7 +74,7 @@
   background: url('/assets/images/icons/gear.svg') center/17px 17px no-repeat;
 }
 
-.media-collection__title-row {
+.isolated-collection__title-row {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 20px;
@@ -77,25 +82,26 @@
   padding: 40px 50px 10px;
 }
 
-.media-collection__title {
+.isolated-collection__title {
+  margin: 0;
   font: var(--boxel-font-lg);
   font-weight: bold;
   letter-spacing: 0;
   text-transform: capitalize;
 }
 
-.media-collection__count {
+.isolated-collection__count {
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-sm);
 }
 
-.media-collection__count > span {
+.isolated-collection__count > span {
   margin-right: 5px;
   font: var(--boxel-font-lg);
   font-weight: bold;
 }
 
-.media-collection__actions-row {
+.isolated-collection__actions-row {
   position: relative;
   display: grid;
   grid-template-columns: repeat(auto-fit, 250px);
@@ -104,7 +110,7 @@
   padding: 20px 50px;
 }
 
-.media-collection__btn-group {
+/* .media-collection__btn-group {
   display: grid;
   grid-auto-flow: column;
   gap: 18px;
@@ -150,10 +156,10 @@
 
 .media-collection__select-all > svg {
   margin-right: 10px;
-}
+} */
 
 /* Media collection dropdown btn component */
-.media-collection__more-actions {
+/* .media-collection__more-actions {
   position: absolute;
   top: 0;
   right: 8px;
@@ -171,10 +177,10 @@
 .media-collection__more-actions .media-collection-dropdown-btn__trigger:focus {
   --icon-color: var(--boxel-highlight);
   outline: 0;
-}
+} */
 
 /* Actions menu component */
-.media-collection__more-actions-menu li {
+/* .media-collection__more-actions-menu li {
   padding: 10px 20px;
 }
 
@@ -262,7 +268,7 @@
   font: var(--boxel-font-xs);
   letter-spacing: var(--boxel-lsp-xl);
   text-transform: uppercase;
-}
+} */
 
 .isolated-collection__grid {
   display: grid;
@@ -290,7 +296,7 @@
   grid-template-rows: 1fr auto;
 }
 
-.isolated-collection__grid-item-btn-group {
+/* .isolated-collection__grid-item-btn-group {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: min-content;
@@ -332,11 +338,11 @@
 .media-collection-dropdown.media-collection__more-actions-menu li:hover,
 .media-collection-dropdown.media-collection__more-actions-menu li:focus {
   background-color: #E9E9EE;
-}
+} */
 
 
 /* Grid item */
-.isolated-collection__select-btn {
+/* .isolated-collection__select-btn {
   visibility: collapse;
 }
 
@@ -350,11 +356,11 @@
 .isolated-collection__boxel:hover .isolated-collection__select-btn,
 .isolated-collection__boxel:focus-within .isolated-collection__select-btn {
   visibility: visible;
-}
+} */
 
 
 /* List view */
-.isolated-collection__grid--list,
+/* .isolated-collection__grid--list,
 .isolated-collection__grid--table-list {
   padding-left: 0;
   padding-right: 0;
@@ -376,11 +382,11 @@
 .isolated-collection__grid-item--list .isolated-collection__select-btn,
 .isolated-collection__grid-item--table-list .isolated-collection__select-btn {
   order: -1;
-}
+} */
 
 
 /* Edit mode */
-.media-collection--edit {
+/* .media-collection--edit {
   height: calc(100% - 60px);
   background-color: #f0f0f0;
 }
@@ -393,7 +399,7 @@
   background-color: #f0f0f0;
 }
 
-.media-collection__title-row--edit {
+.isolated-collection__title-row--edit {
   padding: 25px 20px;
   grid-template-columns: 1fr auto auto;
 }
@@ -407,10 +413,10 @@
 
 .media-collection--edit .media-collection__actions-row {
   background-color: #F0F0F0;
-}
+} */
 
 /* For search btn */
-.media-collection__search .media-collection-dropdown-btn__dropdown {
+/* .media-collection__search .media-collection-dropdown-btn__dropdown {
   padding: 15px 20px;
 }
 
@@ -438,10 +444,10 @@
 .media-collection--edit .isolated-collection__grid-item--list .isolated-collection__grid-item-select-btn.remove-btn {
   order: 1;
   right: 0;
-}
+} */
 
 /* For sort btn */
-.media-collection__sort header {
+/* .media-collection__sort header {
   padding-left: 20px;
   padding-bottom: 15px;
   background-color: white;
@@ -494,4 +500,4 @@
 .media-collection__sort li svg {
   margin-left: 0.1em;
   margin-right: 0.1em;
-}
+} */

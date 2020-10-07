@@ -4,6 +4,7 @@ import LibraryService from '../../services/library';
 import { AddressableCard } from '@cardstack/hub';
 
 interface Model {
+  title: string;
   cards: AddressableCard[];
 }
 export default class CollectionRoute extends Route {
@@ -19,6 +20,9 @@ export default class CollectionRoute extends Route {
         card.csId === 'a270403f2a98ebb392c4f7ef7002db40b9ec21c4' ||
         card.csId === 'e9a4b33bc854a559f3c1579e54bdc19ebab1603b'
     );
-    return { cards };
+    return {
+      title: 'Master Recordings',
+      cards,
+    };
   }
 }

@@ -1,32 +1,31 @@
-<div class="isolated-collection isolated-collection--{{@mode}} {{@class}}">
-  <header class="isolated-collection__sticky-header">
-    <div class="isolated-collection__title-row media-collection__title-row--{{@mode}}">
-      <h2 class="media-collection__title">{{@title}}</h2>
-      <div class="media-collection__count">
-        <span>{{if @collection.length @collection.length 0}}</span>
-        {{#if (eq @collection.length 1)}}
-          {{if @itemType @itemType "item"}}
-        {{else}}
-          {{if @itemTypePlural @itemTypePlural "items"}}
-        {{/if}}
+<div class="isolated-collection__wrapper">
+  <div class="isolated-collection isolated-collection--{{@mode}}">
+    <header class="isolated-collection__sticky-header">
+      <div class="isolated-collection__title-row isolated-collection__title-row--{{@mode}}">
+        <h2 class="isolated-collection__title">{{@title}}</h2>
+        <div class="isolated-collection__count">
+          <span>{{if @collection.length @collection.length 0}}</span>
+          {{#if (eq @collection.length 1)}}Item{{else}}Items{{/if}}
+        </div>
       </div>
-    </div>
 
-    <div class="media-collection__actions-row">
-    </div>
-  </header>
+      <div class="isolated-collection__actions-row">
+      </div>
+    </header>
 
     <div class="isolated-collection__scroll-container">
       <div class="isolated-collection__inner-container">
-        <ul class="isolated-collection__grid isolated-collection__grid--{{this.format}} isolated-collection__grid--{{@model.type}}-{{this.format}}">
+        <ul class="isolated-collection__grid isolated-collection__grid--{{this.format}}">
           {{#each @collection as |card|}}
-            <li class="media-collection__grid-item media-collection__grid-item--{{this.format}}">
+            <li class="isolated-collection__grid-item isolated-collection__grid-item--{{this.format}}">
               <CardRenderer
                 @card={{card}}
-                @format="embedded" />
+                @format="embedded"
+              />
             </li>
           {{/each}}
         </ul>
       </div>
     </div>
   </div>
+</div>
