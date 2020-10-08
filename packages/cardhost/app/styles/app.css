@@ -26,6 +26,9 @@
 @import '/assets/components/card-renderer-header.css';
 @import '/assets/components/loading.css';
 
+/* Boxel components */
+@import '/assets/components/isolated-collection.css';
+
 /* Cardhost styling for core package templates */
 @import '/assets/components/card-renderer.css';
 @import '/assets/components/field-renderer.css';
@@ -64,6 +67,45 @@
   --ch-card-transition-duration: 300ms;
   --ch-card-background-color-animate: background-color 0.5s ease;
   --ch-card-padding-animate: padding-right 0.3s ease;
+
+
+  /* boxel vars */
+  --boxel-font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+
+  --boxel-font-lg: 32px/calc(43/32) var(--boxel-font-family);
+  --boxel-font-med: 22px/calc(30/22) var(--boxel-font-family);
+  --boxel-font: 16px/calc(22/16) var(--boxel-font-family);
+  --boxel-font-sm: 13px/calc(18/13) var(--boxel-font-family);
+  --boxel-font-xs: 11px/calc(15/11) var(--boxel-font-family);
+
+  --boxel-lsp-xxl: 0.1em;
+  --boxel-lsp-xl: 0.05em;
+  --boxel-lsp-lg: 0.035em;
+  --boxel-lsp: 0.025em;
+  --boxel-lsp-sm: 0.015em;
+  --boxel-lsp-xs: 0.005em;
+
+  --boxel-spacing: 20px;
+  --boxel-border-color: #dedede;
+  --boxel-border-color-dark: #000;
+  --boxel-border: 1px solid var(--boxel-border-color);
+  --boxel-border-dark: 1px solid var(--boxel-border-color-dark);
+  --boxel-border-radius-sm: 5px;
+  --boxel-border-radius: 10px;
+  --boxel-highlight: #00ebe5;
+  --boxel-highlight-hover: #00b0ad;
+  --boxel-red: #ff5050;
+  --boxel-darkest-purple: #2e2d38;
+  --boxel-dark-purple: #393642;
+  --boxel-medium-dark-purple: #413e4e;
+  --boxel-medium-purple: #5a586a;
+  --boxel-medium-light-purple:#6b6a80;
+  --boxel-light-purple: #afafb7;
+
+  --boxel-transition: 0.2s ease;
+
+  --boxel-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  --boxel-box-shadow-hover: 0 3px 10px rgba(0, 0, 0, 0.15);
 }
 
 * {

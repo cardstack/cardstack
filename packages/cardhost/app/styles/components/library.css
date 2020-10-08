@@ -182,6 +182,11 @@
   outline: 0;
 }
 
+.library--card-link > .library--card-renderer {
+  border: none;
+  overflow: initial;
+}
+
 .library--card-renderer > .card-renderer-embedded--card-container,
 .library--card-renderer > .library--card-placeholder {
   overflow: hidden;
