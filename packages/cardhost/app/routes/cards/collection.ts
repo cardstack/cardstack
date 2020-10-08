@@ -14,12 +14,7 @@ export default class CollectionRoute extends Route {
     await this.library.load.perform();
 
     // TODO: Load all cards of a given type (ie. 'master-recording')
-    let cards = this.library.recentCards.filter(
-      card =>
-        card.csId === 'master-recording' ||
-        card.csId === 'a270403f2a98ebb392c4f7ef7002db40b9ec21c4' ||
-        card.csId === 'e9a4b33bc854a559f3c1579e54bdc19ebab1603b'
-    );
+    let cards = this.library.collectionEntries;
 
     return {
       title: 'Master Recordings', // TODO: Need to fetch collection title here
