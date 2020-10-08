@@ -76,6 +76,9 @@ package-lock.json
 /packages/cardhost/app/components/card-size-toggle.d.ts
 /packages/cardhost/app/components/card-size-toggle.js
 /packages/cardhost/app/components/card-size-toggle.js.map
+/packages/cardhost/app/components/isolated-collection.d.ts
+/packages/cardhost/app/components/isolated-collection.js
+/packages/cardhost/app/components/isolated-collection.js.map
 /packages/cardhost/app/components/user-info-modal.d.ts
 /packages/cardhost/app/components/user-info-modal.js
 /packages/cardhost/app/components/user-info-modal.js.map
