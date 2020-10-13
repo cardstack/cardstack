@@ -10,7 +10,7 @@
       </div>
 
       <div class="isolated-collection__actions-row">
-        {{#if @collection.length}}
+        {{!-- {{#if @collection.length}}
           <button class="isolated-collection__select-all-btn {{if this.selectedCards.length "isolated-collection__select-all-btn--selected-items"}} {{if (eq this.selectedCards.length @collection.length) "selected-all"}}">
             {{svg-jar "icon-circle-checkmark" width="16px" height="16px"}}
           </button>
@@ -22,12 +22,12 @@
               Select all
             {{/if}}
           </div>
-        {{/if}}
-        {{#if this.selectedCards.length}}
+        {{/if}} --}}
+        {{!-- {{#if this.selectedCards.length}}
           <button class="isolated-collection__pill isolated-collection__pill--dropdown">
             Add to Collection
           </button>
-        {{/if}}
+        {{/if}} --}}
         <div class="isolated-collection__btn-group">
           <div class="isolated-collection__btn-trio isolated-collection__filters">
             {{!-- <SortPopup @class="isolated-collection__sort" @sortColumns={{this.sortColumns}} @sortColumn={{this.sortColumn}} @sortDirection={{this.sortDirection}} @sort={{this.sort}}/> --}}
@@ -63,9 +63,9 @@
                   @class="isolated-collection__card {{if selectedCard "isolated-collection__card--selected"}}"
                 />
                 <div class="isolated-collection__grid-item-btn-group {{if (eq @mode "view") "isolated-collection__select-btn"}} {{if selectedCard "isolated-collection__select-btn--selected"}}">
-                  <button {{on "click" (fn this.toggleSelect card.csId)}} class="isolated-collection__grid-item-select-btn" aria-label={{if selectedCard "unselect" "select"}}>
+                  {{!-- <button {{on "click" (fn this.toggleSelect card.csId)}} class="isolated-collection__grid-item-select-btn" aria-label={{if selectedCard "unselect" "select"}}>
                     {{svg-jar "icon-circle-checkmark" width="16px" height="16px"}}
-                  </button>
+                  </button> --}}
                   {{!-- {{#if (eq @mode "edit")}}
                     <button {{on "click" (fn this.removeItem item)}} class="isolated-collection__grid-item-select-btn remove-btn" aria-label="remove">
                       {{svg-jar "icon-minus-circle" width="16px" height="16px"}}
