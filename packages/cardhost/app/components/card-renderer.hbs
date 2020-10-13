@@ -12,28 +12,14 @@
       data-test-card-renderer-isolated={{@card.canonicalURL}}
       data-test-card-renderer={{@card.canonicalURL}}
       data-test-card-loaded={{stringify this.loadCard.isIdle}}
-      {{on "focus" (action this.cardIsFocused true)}}
+      {{!-- {{on "focus" (action this.cardIsFocused true)}}
       {{on "mouseenter" (action this.setIsSelected true)}} {{on "mouseleave" (action this.setIsSelected false)}}
-      {{did-insert this.focusCard true}}
+      {{did-insert this.focusCard true}} --}}
       {{did-update this.cardUpdated @card @suppressCss @mode}}
       {{will-destroy this.removeCardCss}}
     >
       {{#unless @suppressHeader}}
-        {{#if (eq @mode "view")}}
-          <AnimatedContainer class="card-renderer-isolated--animated-view-header">
-            {{#animated-value this watch=this.animatedWatchFields use=this.headerAnimation group="header"}}
-              <CardRendererHeader
-                @cardSelected={{if (and this.cardstackSession.isAuthenticated @cardSelected) true}}
-                @card={{@card}}
-                @buttonRoute="cards.card.edit.fields"
-                @buttonText="Edit"
-                @mode={{this.mode}}
-                @contextMenuOpen={{@contextMenuOpen}}
-                @setContextMenu={{@setContextMenu}}
-              />
-            {{/animated-value}}
-          </AnimatedContainer>
-        {{else}}
+        {{#unless this.isViewOrEditMode}}
           <AnimatedContainer class="card-renderer-isolated--animated-header">
             {{#animated-value this watch=this.animatedWatchFields use=this.headerAnimation group="header"}}
               <CardRendererHeader
@@ -47,7 +33,7 @@
               />
             {{/animated-value}}
           </AnimatedContainer>
-        {{/if}}
+        {{/unless}}
       {{/unless}}
       {{!-- This is the card boundary, please don't set any card specific classes any higher in the DOM than this. --}}
       {{!-- If we need card specific styling above this level, then let's chat about it.                           --}}
@@ -62,6 +48,31 @@
             {{if (and this.cardstackSession.isAuthenticated @cardSelected) "selected"}}
             "
           >
+            {{#if (or this.isViewMode (eq this.mode "preview"))}}
+              <div class="card-renderer-isolated__label">{{humanize @card.csTitle}}</div>
+            {{/if}}
+            {{#if (and this.isViewMode this.cardstackSession.isAuthenticated)}}
+              <div class="card-renderer__controls">
+                <LinkTo
+                  @route="cards.card.edit.fields"
+                  @model={{@card.canonicalURL}}
+                  @class="card-renderer__controls-btn"
+                >
+                  Edit
+                </LinkTo>
+              </div>
+            {{/if}}
+            {{#if (and this.isEditMode this.cardstackSession.isAuthenticated)}}
+              <div class="card-renderer__controls card-renderer__controls--edit">
+                <LinkTo
+                  @route="cards.card.view"
+                  @model={{@card.canonicalURL}}
+                  @class="card-renderer__controls-btn"
+                >
+                  Edit Mode {{svg-jar "x" width="10px" height="10px"}}
+                </LinkTo>
+              </div>
+            {{/if}}
             <div>
               <AnimatedContainer>
                 {{#animated-value this watch=this.animatedWatchFields use=@contentTransition group="content"}}

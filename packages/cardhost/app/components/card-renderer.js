@@ -28,6 +28,9 @@ export default class CardRenderer extends Component {
   @tracked previousFieldNames;
   @tracked fields;
   @tracked mode;
+  @tracked isEditMode = this.mode === 'edit';
+  @tracked isViewMode = this.mode === 'view' || this.mode === 'layout';
+  @tracked isViewOrEditMode = this.isViewMode || this.mode === 'edit';
   @tracked css;
   @tracked fieldsToRemove = new Map();
   @tracked cardFocused = () => {};

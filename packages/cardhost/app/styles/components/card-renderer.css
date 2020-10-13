@@ -4,13 +4,11 @@
   --card-renderer-header-height: 56px;
 
   position: relative;
-  margin: 0 auto;
-  padding: 0 var(--ch-spacing);
+  margin: 0;
+  padding: 0 30px 30px;
   width: var(--card-renderer-width);
   min-width: 415px;
   max-width: 100%;
-  font: 400 16px/22px var(--ch-font-family);
-  letter-spacing: 0.015em;
   transition: width 0.3s ease;
 }
 
@@ -20,28 +18,23 @@
   max-width: var(--card-renderer-width);
 }
 
-
-/* Card Renderer - Header wrapper */
-.card-renderer-isolated--animated-header {
-  position: sticky;
-  top: 0;
-  z-index: var(--ch-card-header-z-index); /* card scrolls under the header (except in view mode) */
-}
-
-.card-renderer-isolated.view:not(.themer) .card-renderer-isolated--animated-view-header {
-  top: 0;
-  height: var(--card-renderer-header-height);
+.card-renderer-isolated__label {
+  position: absolute;
+  top: 15px;
+  left: 20px;
+  color: #AFAFB7;
+  font: var(--boxel-font-xs);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+  z-index: 1;
 }
 
 
 /* Card Renderer - Content wrapper */
-.card-renderer-isolated--animated-content {
+/* .card-renderer-isolated--animated-content {
   padding-bottom: var(--scroll-bottom-padding);
-}
-
-.card-renderer-isolated.view .card-renderer-isolated--animated-content {
-  z-index: calc(var(--ch-card-header-z-index) + 1);
-}
+} */
 
 .card-renderer-isolated.schema .card-renderer-isolated--animated-content {
   color: var(--ch-light);
@@ -50,32 +43,33 @@
 /* Card Renderer - Inner Wrapper */
 .card-renderer-isolated .card-renderer-isolated--card-container {
   position: relative;
-  border: 3px solid transparent;
-  border-radius: 0 0 10px 10px;
+  border-radius: var(--boxel-border-radius);
+  /* border: 3px solid transparent; */
+  /* border-radius: 0 0 10px 10px; */
   overflow: hidden;
   min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
-  background-color: var(--ch-light);
+  /* background-color: var(--ch-light); */
   z-index: 5;
 
   transition: background-color var(--ch-transition-time),
               border-color var(--ch-transition-time);
 }
 
-.card-renderer-isolated.selected .card-renderer-isolated--card-container {
+/* .card-renderer-isolated.selected .card-renderer-isolated--card-container {
   z-index: 4;
-}
+} */
 
-.card-renderer-isolated:not(.view) {
+/* .card-renderer-isolated:not(.view) {
   margin-top: -3px;
-}
+} */
 
-.card-renderer-isolated.view .card-renderer-isolated--card-container {
+/* .card-renderer-isolated.view .card-renderer-isolated--card-container {
   border-radius: 10px;
 }
 
 .card-renderer-isolated.view .card-renderer-isolated--card-container.selected {
   border-radius: 0 0 10px 10px;
-}
+} */
 
 .card-renderer-isolated.schema .card-renderer-isolated--card-container {
   background-color: var(--ch-dark-background);
@@ -86,15 +80,40 @@
   padding: 30px;
 }
 
-.card-renderer-isolated.view.themer .card-renderer-isolated--card-container,
-.card-renderer-isolated.view.preview .card-renderer-isolated--card-container {
-  border: none;
-  border-radius: 10px;
-}
-
 .cards .card-renderer-isolated.view .card-renderer-isolated--card-container {
   border: none;
   border-radius: 30px;
+}
+
+
+
+.card-renderer__controls {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: grid;
+  grid-auto-flow: column;
+  background-color: var(--boxel-highlight);
+  border-bottom-left-radius: var(--boxel-border-radius);
+  z-index: 1;
+}
+
+.card-renderer__controls--edit {
+  border-radius: 100px;
+}
+
+.card-renderer__controls-btn {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 20px;
+  height: 40px;
+  padding: 10px 20px 10px 40px;
+  background: url('/assets/images/icons/edit-box.svg') left 14px center/14px 14px no-repeat;
+  font: var(--boxel-font-sm);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-lg);
+  text-align: left;
 }
 
 
@@ -131,7 +150,7 @@
 
 
 /* Focus state */
-.card-renderer-isolated:focus {
+/* .card-renderer-isolated:focus {
   outline: 0;
 }
 
@@ -148,4 +167,4 @@
 }
 .card-renderer--embedded-card-link:focus > .card-renderer-embedded--card-label {
   color: var(--ch-highlight);
-}
+} */
