@@ -99,14 +99,34 @@
 
 
 /* Embedded */
-.card-renderer-embedded {
+.card-renderer--embedded-card-link {
+  display: block;
   border-radius: var(--boxel-border-radius);
   border: var(--boxel-border);
   overflow: hidden;
 }
 
-.card-renderer-embedded:hover {
+.card-renderer--embedded-card-link:hover {
   box-shadow: var(--boxel-box-shadow);
+}
+
+.card-renderer-embedded__label {
+  height: 30px;
+  padding: 7px 15px;
+  background-color: #F8F7FA;
+  color: #AFAFB7;
+  font: var(--boxel-font-xs);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+}
+
+.card-renderer--embedded-card-link:hover > .card-renderer-embedded__label {
+  background-image: url("/assets/images/icons/expand.svg");
+  background-position: top 7px right 7px;
+  background-size: 16px 16px;
+  background-repeat: no-repeat;
+  color: #6B6A80;
 }
 
 

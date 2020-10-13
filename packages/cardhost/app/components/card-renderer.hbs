@@ -120,6 +120,9 @@
           @model={{@card.canonicalURL}}
           aria-label={{@card.csTitle}}
         >
+          <div class="card-renderer-embedded__label">
+            {{humanize @card.csTitle}}
+          </div>
           <Scaffold
             @card={{@card}}
             @fields={{this.fields}}
