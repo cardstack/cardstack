@@ -53,27 +53,29 @@
 
     <div class="isolated-collection__scroll-container">
       <div class="isolated-collection__inner-container">
-        <CatalogEntries @catalogEntries={{@collection}} class="isolated-collection__grid isolated-collection__grid--{{this.format}}" as |card|>
-          <div class="isolated-collection__grid-item isolated-collection__grid-item--{{this.format}}">
-            {{#let (contains card.csId this.selectedCards) as |selectedCard|}}
-              <CardRenderer
-                @card={{card}}
-                @format="embedded"
-                @class="isolated-collection__card {{if selectedCard "isolated-collection__card--selected"}}"
-              />
-              <div class="isolated-collection__grid-item-btn-group {{if (eq @mode "view") "isolated-collection__select-btn"}} {{if selectedCard "isolated-collection__select-btn--selected"}}">
-                <button {{on "click" (fn this.toggleSelect card.csId)}} class="isolated-collection__grid-item-select-btn" aria-label={{if selectedCard "unselect" "select"}}>
-                  {{svg-jar "icon-circle-checkmark" width="16px" height="16px"}}
-                </button>
-                {{!-- {{#if (eq @mode "edit")}}
-                  <button {{on "click" (fn this.removeItem item)}} class="isolated-collection__grid-item-select-btn remove-btn" aria-label="remove">
-                    {{svg-jar "icon-minus-circle" width="16px" height="16px"}}
+        <ul class="isolated-collection__grid isolated-collection__grid--{{this.format}}">
+          {{#each @collection as |card|}}
+            <li class="isolated-collection__grid-item isolated-collection__grid-item--{{this.format}}">
+              {{#let (contains card.csId this.selectedCards) as |selectedCard|}}
+                <CardRenderer
+                  @card={{card}}
+                  @format="embedded"
+                  @class="isolated-collection__card {{if selectedCard "isolated-collection__card--selected"}}"
+                />
+                <div class="isolated-collection__grid-item-btn-group {{if (eq @mode "view") "isolated-collection__select-btn"}} {{if selectedCard "isolated-collection__select-btn--selected"}}">
+                  <button {{on "click" (fn this.toggleSelect card.csId)}} class="isolated-collection__grid-item-select-btn" aria-label={{if selectedCard "unselect" "select"}}>
+                    {{svg-jar "icon-circle-checkmark" width="16px" height="16px"}}
                   </button>
-                {{/if}} --}}
-              </div>
-            {{/let}}
-          </div>
-        </CatalogEntries>
+                  {{!-- {{#if (eq @mode "edit")}}
+                    <button {{on "click" (fn this.removeItem item)}} class="isolated-collection__grid-item-select-btn remove-btn" aria-label="remove">
+                      {{svg-jar "icon-minus-circle" width="16px" height="16px"}}
+                    </button>
+                  {{/if}} --}}
+                </div>
+              {{/let}}
+            </li>
+          {{/each}}
+        </ul>
       </div>
     </div>
   </div>
