@@ -27,7 +27,6 @@ export default class LibraryService extends Service {
   @tracked recentCards: AddressableCard[] = [];
   @tracked templateEntries: AddressableCard[] = [];
   @tracked featuredEntries: AddressableCard[] = [];
-  @tracked collectionEntries: AddressableCard[] = [];
 
   constructor(...args: any[]) {
     super(...args);
@@ -70,7 +69,7 @@ export default class LibraryService extends Service {
   loadUserRealm: any; //TS and EC don't play nice;
 
   @task(function*(this: LibraryService) {
-    let [recentCards, templateEntries, featuredEntries, collectionEntries] = yield Promise.all([
+    let [recentCards, templateEntries, featuredEntries] = yield Promise.all([
       this.loadUserRealm.perform(),
       this.data.search(
         {
@@ -106,28 +105,10 @@ export default class LibraryService extends Service {
         },
         { includeFieldSet: 'isolated' }
       ),
-      this.data.search(
-        {
-          filter: {
-            type: catalogEntry,
-            eq: {
-              csRealm: cardCatalogRealm,
-              type: 'master',
-            },
-          },
-          // Note that we are sorting these items on the date the catalog entry
-          // was created, not on the date that the underlying card was created
-          // (which is simple to change if that's what we want).
-          sort: '-csCreated',
-          page: { size },
-        },
-        { includeFieldSet: 'everything' }
-      ),
     ]);
     this.recentCards = recentCards;
     this.templateEntries = templateEntries;
     this.featuredEntries = featuredEntries;
-    this.collectionEntries = collectionEntries;
   })
   load: any; // TS and EC don't play nice
 
