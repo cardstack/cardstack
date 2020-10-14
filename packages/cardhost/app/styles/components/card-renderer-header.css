@@ -1,17 +1,8 @@
 .card-renderer-isolated--header--wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   background-color: var(--bg-color);
-  /* We need the wrapper bg to mask the scrolling content that peeks through border-radius */
-}
-
-.card-renderer-isolated.view .card-renderer-isolated--header--wrapper {
-  position: absolute;
-  top: var(--card-renderer-header-height);
-  height: inherit;
-  width: 100%;
-  bottom: 100px;
-}
-.card-renderer-isolated.view .card-renderer-isolated--header--wrapper.selected {
-  top: 0px;
 }
 
 .card-renderer-isolated--header {
@@ -22,7 +13,6 @@
   height: var(--card-renderer-header-height);
   color: var(--ch-light);
   background-color: var(--ch-disabled);
-  border: 3px solid var(--ch-disabled);
   border-radius: 10px 10px 0 0;
   font-weight: 600;
   overflow: hidden;
@@ -73,23 +63,17 @@
 
 
 /* Focus/selected state */
-.card-renderer-isolated.selected .card-renderer-isolated--header,
-.card-renderer-isolated.layout .card-renderer-isolated--header,
-.card-renderer-isolated.view .card-renderer-isolated--header {
+.card-renderer-isolated.selected .card-renderer-isolated--header {
   background-color: var(--ch-highlight);
   border-color: var(--ch-highlight);
   color: var(--ch-dark);
 }
 
-.card-renderer-isolated.selected .card-renderer-isolated--header-title,
-.card-renderer-isolated.layout .card-renderer-isolated--header-title,
-.card-renderer-isolated.view .card-renderer-isolated--header-title {
+.card-renderer-isolated.selected .card-renderer-isolated--header-title {
   color: var(--ch-dark);
 }
 
-.card-renderer-isolated.selected .card-renderer-isolated--header svg,
-.card-renderer-isolated.layout .card-renderer-isolated--header svg,
-.card-renderer-isolated.view .card-renderer-isolated--header svg {
+.card-renderer-isolated.selected .card-renderer-isolated--header svg {
   --icon-color: var(--ch-dark);
 }
 

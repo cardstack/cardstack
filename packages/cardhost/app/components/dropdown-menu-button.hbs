@@ -1,0 +1,14 @@
+<div class="dropdown-menu-button-container {{@class}}">
+  <BasicDropdown @this.verticalPosition="below" @renderInPlace={{true}} as |dd|>
+    {{#dd.trigger}}
+      <button class="dropdown-menu-button__trigger {{@button}}" aria-label={{@button}}>
+        {{#if @icon}}
+          {{svg-jar @icon width="16px" height="16px"}}
+        {{/if}}
+      </button>
+    {{/dd.trigger}}
+    {{#dd.content class="dropdown-menu-button__dropdown"}}
+      {{yield}}
+    {{/dd.content}}
+  </BasicDropdown>
+</div>
