@@ -31,6 +31,10 @@
   display: none;
 }
 
+.card-renderer-isolated.edit {
+  margin: 0 auto;
+}
+
 .isolated-card-label {
   position: absolute;
   top: 15px;

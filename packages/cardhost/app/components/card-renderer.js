@@ -83,15 +83,12 @@ export default class CardRenderer extends Component {
     this.loadedFields = [];
 
     let tasks = [this.getFields.perform()];
-    if (!this.args.suppressCss && (this.mode === 'view' || this.mode === 'layout')) {
+    if (!this.args.suppressCss && (this.mode === 'view' || this.mode === 'layout' || this.mode === 'edit')) {
       tasks.push(this.args.card.loadFeature(`${this.args.format}-css`));
     }
 
     let [actualFields, css] = yield Promise.all(tasks);
-    if (
-      !this.args.suppressCss &&
-      !(this.args.format === 'isolated' && (this.mode === 'schema' || this.mode === 'edit'))
-    ) {
+    if (!this.args.suppressCss && !(this.args.format === 'isolated' && this.mode === 'schema')) {
       this.css = css;
       this.cssService.addCard(this.args.card, this.args.format, css);
     } else {

@@ -37,7 +37,7 @@
           {{#if (and this.isViewMode this.cardstackSession.isAuthenticated)}}
             <div class="card-renderer__controls">
               <LinkTo
-                @route="cards.card.edit.fields"
+                @route="cards.card.view.edit"
                 @model={{@card.canonicalURL}}
                 @class="card-renderer__controls-btn"
               >
@@ -77,7 +77,7 @@
               {{#animated-value this watch=this.animatedWatchFields use=@contentTransition group="content"}}
                 {{!-- This is the card boundary, please don't set any card specific classes any higher in the DOM than this. --}}
                 {{!-- If we need card specific styling above this level, then let's chat about it.                           --}}
-                <div class="isolated-card-boundary {{concat (safe-css-string (if @card.canonicalURL @card.canonicalURL @card.adoptsFromURL)) "--isolated" }}">
+                <div class="isolated-card-boundary {{if this.isViewMode (concat (safe-css-string (if @card.canonicalURL @card.canonicalURL @card.adoptsFromURL)) "--isolated") }}">
                   {{#unless @suppressHeader}}
                     {{#if this.isViewMode}}
                       <div class="isolated-card-label">{{humanize @card.csTitle}}</div>

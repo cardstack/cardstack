@@ -15,10 +15,6 @@
   transition: var(--ch-card-background-color-animate);
 }
 
-.cardhost-cards.edit {
-  --bg-color: var(--edit-bg);
-}
-
 .cardhost-cards.themer {
   --bg-color: var(--themer-bg);
 }
@@ -71,6 +67,11 @@
   overflow-y: initial;
 }
 
+.cardhost-cards.edit .card-renderer--container {
+  height: 100%;
+  margin-top: 0;
+}
+
 .card-renderer--inner-container {
   padding-right: var(--ch-right-edge-width);
   transition: padding var(--ch-transition-time);
@@ -81,6 +82,7 @@
 }
 
 .card-renderer--inner-container.view-container,
+.card-renderer--inner-container.edit-container,
 .card-renderer--inner-container.themer-container,
 .card-renderer--inner-container.preview-container {
   padding-right: 0;
