@@ -12,12 +12,13 @@
 }
 
 .dropdown-menu-button__dropdown {
+  min-height: 100px;
   min-width: 210px;
   padding: 15px 0;
-  box-shadow: 0 5px 15px 0px rgba(0, 0, 0, 0.25);
-  border-radius: 10px;
+  border-radius: var(--boxel-border-radius);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-sm);
+  box-shadow: 0 5px 15px 0px rgba(0, 0, 0, 0.25);
 }
 
 .dropdown-menu-button__dropdown.ember-basic-dropdown-content--below.ember-basic-dropdown--transitioning-in {

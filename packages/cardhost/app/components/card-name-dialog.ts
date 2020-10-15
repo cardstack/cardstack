@@ -79,9 +79,9 @@ export default class CardNameDialog extends Component<{
     let card = yield this.data.save(unsavedCard);
 
     if (this.args.adoptsFrom) {
-      this.router.transitionTo('cards.card.edit.fields', { card });
+      this.router.transitionTo('cards.card.view.edit', { card });
     } else {
-      this.router.transitionTo('cards.card.edit.fields.schema', { card });
+      this.router.transitionTo('cards.card.configure.fields', { card });
     }
   })
   createCardTask: any;

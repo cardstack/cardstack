@@ -9,6 +9,7 @@ export default class Router extends EmberRouter {
 
 Router.map(function() {
   this.route('cards', function() {
+    this.route('featured-cards');
     this.route('collection');
     this.route('add', { path: '/add' });
     this.route('card', { path: '/:id' }, function() {
@@ -16,15 +17,13 @@ Router.map(function() {
       this.route('view', { path: '' }, function() {
         this.route('edit');
       });
-      // this.route('edit', function() {
-      //   this.route('layout', function() {
-      //     this.route('themer');
-      //   });
-      //   this.route('fields', function() {
-      //     this.route('schema');
-      //   });
-      //   this.route('preview');
-      // });
+      this.route('configure', function() {
+        this.route('layout', function() {
+          this.route('themer');
+        });
+        this.route('fields');
+        this.route('preview');
+      });
     });
   });
   this.route('ui-components');

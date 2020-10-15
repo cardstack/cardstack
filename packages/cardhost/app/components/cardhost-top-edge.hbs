@@ -1,43 +1,54 @@
 <div class="cardhost-top-edge {{@mode}}" data-test-cardhost-top-edge>
-  {{#if (eq @mode "schema")}}
-    <div class="cardhost-top-edge--buttons schema-mode">
-      <ModeIndicator
-        @card={{@card}}
-        @route="cards.card.edit.fields"
-        @mode="schema"
-        @linkTo="edit" />
+  {{#unless (eq @mode "themer")}}
+    <div class="cardhost-top-edge__controls cardhost-top-edge__controls--left">
+      {{#unless (eq @mode "preview")}}
+        <PreviewLinkButton @model={{@card}} class="cardhost-top-edge--preview-button {{if (eq @mode "fields") "hidden"}}" data-test-top-edge-preview-link />
+      {{/unless}}
+    </div>
+
+    <div class="cardhost-top-edge__controls cardhost-top-edge__controls--center">
+      {{#unless (eq @mode "preview")}}
+        <div class="view-selector" data-test-view-selector>
+          <LinkTo
+            @route="cards.card.configure.layout"
+            @class="view-selector--mode-link {{if (eq @mode "layout") "active"}}"
+            @model={{@card.canonicalURL}}
+            data-test-view-selector="layout"
+          >
+            {{svg-jar "layout" width="18px" height="17px"}}
+            Layout
+          </LinkTo>
+          <LinkTo
+            @route="cards.card.configure.fields"
+            @class="view-selector--mode-link {{if (eq @mode "fields") "active"}}"
+            @model={{@card.canonicalURL}}
+            data-test-view-selector="fields"
+          >
+            {{svg-jar "form" width="19px" height="15px"}}
+            Field
+          </LinkTo>
+        </div>
+      {{/unless}}
+
+      <CardSizeToggle class="cardhost-top-edge--size-buttons {{if (eq @mode "fields") "hidden"}}" data-test-top-edge-size-buttons />
+    </div>
+
+    <div class="cardhost-top-edge__controls cardhost-top-edge__controls--right">
+      {{#if (eq @mode "preview")}}
+        <ModeIndicator
+          @card={{@card}}
+          @route={{if @previousRoute @previousRoute.name "cards.card.configure.layout"}}
+          @mode="preview"
+          @linkTo={{if @previousRoute "previous" "edit-layout"}} />
+      {{else}}
+        <ModeIndicator
+          @card={{@card}}
+          @route={{if @previousRoute @previousRoute.name "cards.card.view"}}
+          @mode="configure"
+          @linkTo={{if @previousRoute "previous" "view-layout"}} />
+      {{/if}}
+
       <EdgeActionsButton />
     </div>
-  {{else if (eq @mode "preview")}}
-    <ModeIndicator
-      @card={{@card}}
-      @route={{if @previousRoute @previousRoute.name "cards.card.edit.layout"}}
-      @mode="preview"
-      @linkTo={{if @previousRoute "previous" "edit-layout"}} />
-    <CardSizeToggle class="cardhost-top-edge--size-buttons" data-test-top-edge-size-buttons />
-    <EdgeActionsButton />
-  {{else if (or (eq @mode "layout") (eq @mode "fields"))}}
-    <PreviewLinkButton @model={{@card}} class="cardhost-top-edge--preview-button {{if (eq @mode "fields") "hidden"}}" data-test-top-edge-preview-link />
-    <div class="view-selector" data-test-view-selector>
-      <LinkTo
-        @route="cards.card.edit.layout"
-        @class="view-selector--mode-link {{if (eq @mode "layout") "active"}}"
-        @model={{@card.canonicalURL}}
-        data-test-view-selector="layout"
-      >
-        {{svg-jar "layout" width="18px" height="17px"}}
-        Layout
-      </LinkTo>
-      <LinkTo
-        @route="cards.card.edit.fields"
-        @class="view-selector--mode-link {{if (eq @mode "fields") "active"}}"
-        @model={{@card.canonicalURL}}
-        data-test-view-selector="fields"
-      >
-        {{svg-jar "form" width="19px" height="15px"}}
-        Field
-      </LinkTo>
-    </div>
-    <CardSizeToggle class="cardhost-top-edge--size-buttons {{if (eq @mode "fields") "hidden"}}" data-test-top-edge-size-buttons />
-  {{/if}}
+  {{/unless}}
 </div>

@@ -3,12 +3,12 @@
   right: var(--ch-spacing);
   top: var(--ch-top-edge-height);
   width: var(--ch-right-edge-panel-width);
-  max-height: calc(100% - var(--ch-top-edge-height) - var(--ch-bottom-edge-height));
-  border-radius: 10px;
+  min-height: 350px;
+  border-radius: var(--boxel-border-radius);
   background-color: var(--ch-dark-background);
   color: white;
-  font: 400 13px/18px var(--ch-font-family);
-  letter-spacing: 0.035em;
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-lg);
   z-index: var(--ch-right-edge-z-index);
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
   overflow-y: auto;
@@ -25,8 +25,8 @@
   height: 40px;
   background-color: var(--ch-default);
   color: white;
-  font: 400 13px/18px var(--ch-font-family);
-  letter-spacing: 0.035em;
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-lg);
   border: 1px solid var(--ch-default);
   border-radius: 20px;
 }

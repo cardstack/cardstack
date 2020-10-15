@@ -4,7 +4,7 @@
   --card-renderer-header-height: 56px;
 
   position: relative;
-  margin: 0;
+  margin: 0 auto;
   padding: 0 30px 30px;
   width: var(--card-renderer-width);
   min-width: 415px;
@@ -18,21 +18,23 @@
 
 .card-renderer-isolated.schema {
   --card-renderer-width: var(--ch-card-size-small);
-  margin: 0 auto;
   min-height: var(--card-renderer-height);
   max-width: var(--card-renderer-width);
 }
 
-.card-renderer-isolated.preview {
+.card-renderer-isolated.view,
+.card-renderer-isolated.themer {
+  margin: 0;
+}
+
+.card-renderer-isolated.view.preview {
   margin: 0 auto;
 }
 
-.card-renderer-isolated.preview .card-renderer__controls {
+.card-renderer-isolated.layout .card-renderer__controls,
+.card-renderer-isolated.preview .card-renderer__controls,
+.card-renderer-isolated.themer .card-renderer__controls {
   display: none;
-}
-
-.card-renderer-isolated.edit {
-  margin: 0 auto;
 }
 
 .isolated-card-label {
@@ -73,11 +75,36 @@
 
 .card-renderer-isolated.edit .card-renderer-isolated--card-container {
   padding: 30px;
+  border-radius: 0 0 10px 10px;
 }
 
 .cards .card-renderer-isolated.view .card-renderer-isolated--card-container {
   border: none;
   border-radius: 30px;
+}
+
+
+/* Edit mode header */
+.item-edit__sticky-header {
+  position: sticky;
+  top: 0;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 5px 20px;
+  padding: 20px 30px 20px 40px;
+  background-color: white;
+  border-bottom: 1px solid #D1D1D1;
+  border-radius: 10px 10px 0 0;
+  min-width: 415px;
+}
+
+.item-edit__title {
+  margin: 0;
+  color: #393642;
+  font: var(--boxel-font-med);
+  font-weight: bold;
+  letter-spacing: 0;
 }
 
 
@@ -95,6 +122,7 @@
 }
 
 .card-renderer__controls--edit {
+  position: initial;
   border-radius: 100px;
 }
 
@@ -108,6 +136,7 @@
   height: 40px;
   padding: 10px 20px 10px 40px;
   background: url('/assets/images/icons/edit-box.svg') left 14px center/14px 14px no-repeat;
+  color: #000;
   font: var(--boxel-font-sm);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-lg);
@@ -128,7 +157,7 @@
 
 .card-renderer__dropdown-menu-list > li > a:hover,
 .card-renderer__dropdown-menu-list > li > a:focus {
-  background-color: #E9E9EE;
+  background-color: var(--ch-light-background);
 }
 
 

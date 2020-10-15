@@ -4,7 +4,7 @@ import { inject as service } from '@ember/service';
 import { set } from '@ember/object';
 import RouteInfo from '@ember/routing/-private/route-info';
 import Transition from '@ember/routing/-private/transition';
-import LibraryService from '../services/library';
+import LibraryService from '../../services/library';
 import { AddressableCard } from '@cardstack/hub';
 
 interface Model {
@@ -15,7 +15,8 @@ export default class CardsRoute extends Route {
   @service library!: LibraryService;
 
   async model(): Promise<Model> {
-    return await this.library.load.perform();
+    await this.library.load.perform();
+    return { featuredEntries: this.library.featuredEntries };
   }
 
   @action

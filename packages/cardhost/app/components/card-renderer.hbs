@@ -18,23 +18,36 @@
       {{did-update this.cardUpdated @card @suppressCss @mode}}
       {{will-destroy this.removeCardCss}}
     >
-      {{#unless this.isViewOrEditMode}}
-        <CardRendererHeader
-          @cardSelected={{true}}
-          @card={{@card}}
-          @buttonRoute="cards.card.view"
-          @buttonText="Done Editing"
-          @mode={{this.mode}}
-          @contextMenuOpen={{@contextMenuOpen}}
-          @setContextMenu={{@setContextMenu}}
-        />
-      {{/unless}}
+      {{#if this.cardstackSession.isAuthenticated}}
+        {{#if (eq this.mode "schema")}}
+          <CardRendererHeader
+            @cardSelected={{true}}
+            @card={{@card}}
+            @mode={{this.mode}}
+            @contextMenuOpen={{@contextMenuOpen}}
+            @setContextMenu={{@setContextMenu}}
+          />
+        {{else if (eq this.mode "edit")}}
+          <header class="item-edit__sticky-header">
+            <h1 class="item-edit__title">{{@card.csTitle}}</h1>
+            <div class="card-renderer__controls card-renderer__controls--edit">
+              <LinkTo
+                @route="cards.card.view"
+                @model={{@card.canonicalURL}}
+                @class="card-renderer__controls-btn"
+              >
+                Edit Mode {{svg-jar "x" width="10px" height="10px"}}
+              </LinkTo>
+            </div>
+          </header>
+        {{/if}}
+      {{/if}}
 
       <AnimatedContainer
         class="card-renderer-isolated--animated-content"
       >
         {{#unless @suppressHeader}}
-          {{#if (and this.isViewMode this.cardstackSession.isAuthenticated)}}
+          {{#if this.isViewMode}}
             <div class="card-renderer__controls">
               <LinkTo
                 @route="cards.card.view.edit"
@@ -46,24 +59,10 @@
               <DropdownMenuButton @icon="gear">
                 <ul class="card-renderer__dropdown-menu-list">
                   <li>
-                    <LinkTo @route="cards.card.edit.layout" @model={{@card.canonicalURL}} data-test-context-layout>Layout</LinkTo>
-                  </li>
-                  <li>
-                    <LinkTo @route="cards.card.edit.fields.schema" @model={{@card.canonicalURL}} data-test-context-schema>Configure</LinkTo>
+                    <LinkTo @route="cards.card.configure.layout" @model={{@card.canonicalURL}} data-test-context-schema>Configure</LinkTo>
                   </li>
                 </ul>
               </DropdownMenuButton>
-            </div>
-          {{/if}}
-          {{#if (and this.isEditMode this.cardstackSession.isAuthenticated)}}
-            <div class="card-renderer__controls card-renderer__controls--edit">
-              <LinkTo
-                @route="cards.card.view"
-                @model={{@card.canonicalURL}}
-                @class="card-renderer__controls-btn"
-              >
-                Edit Mode {{svg-jar "x" width="10px" height="10px"}}
-              </LinkTo>
             </div>
           {{/if}}
         {{/unless}}

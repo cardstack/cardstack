@@ -2,7 +2,7 @@
   --mode-container-width: 240px;
   --mode-container-height: 40px;
   --mode-icon: url('');
-  --mode-icon-position: left 13px top 12px;
+  --mode-icon-position: left 15px top 11px;
   --mode-icon-size: 1rem 1rem;
 
   display: block;
@@ -10,7 +10,7 @@
   width: 100%;
   max-width: 100%;
   height: var(--mode-container-height);
-  padding: 11px 38px;
+  padding: 11px 40px;
   background-color: var(--ch-highlight);
   background-image: var(--mode-icon), url('/assets/images/icons/close.svg');
   background-position: var(--mode-icon-position), center right 15px;
@@ -18,10 +18,9 @@
   background-size: var(--mode-icon-size), 10px 10px;
   border-radius: 100px;
   color: var(--ch-dark);
-  font-size: 13px;
+  font: var(--boxel-font-sm);
   font-weight: 600;
-  line-height: calc(18 / 13);
-  letter-spacing: 0.035em;
+  letter-spacing: var(--boxel-lsp-lg);
   text-align: left;
   text-transform: capitalize;
 }
@@ -31,8 +30,8 @@
   --mode-icon-position: left 15px top 12px;
   --mode-icon-size: 13px 13px;
 }
-.mode-indicator--schema {
-  --mode-icon: url('/assets/images/icons/schema-2.svg');
+.mode-indicator--configure {
+  --mode-icon: url('/assets/images/icons/gear.svg');
 }
 .mode-indicator--themer {
   --mode-icon: url('/assets/images/icons/themer.svg');
