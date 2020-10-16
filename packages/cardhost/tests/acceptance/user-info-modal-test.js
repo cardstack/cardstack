@@ -53,7 +53,7 @@ module('Acceptance | user info modal', function(hooks) {
 
   test('it appears on page load', async function(assert) {
     await visit('/');
-    assert.equal(currentURL(), '/cards');
+    assert.equal(currentURL(), '/cards/collection');
     assert.dom('[data-test-user-info-modal]').exists();
     assert.dom('[data-test-dialog-title]').hasText('Important Notice');
     assert.dom('[data-test-dialog-content]').hasAnyText();
