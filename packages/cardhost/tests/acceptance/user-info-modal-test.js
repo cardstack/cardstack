@@ -63,20 +63,20 @@ module('Acceptance | user info modal', function(hooks) {
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
     assert.dom('[data-test-user-info-modal]').exists('modal exists in view mode');
 
-    await visit(`/cards/${cardPath}/edit/fields`);
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/fields`);
+    await visit(`/cards/${cardPath}/edit`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit`);
     assert.dom('[data-test-user-info-modal]').exists('modal exists in fields mode');
 
-    await visit(`/cards/${cardPath}/edit/fields/schema`);
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/fields/schema`);
+    await visit(`/cards/${cardPath}/configure/fields`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/fields`);
     assert.dom('[data-test-user-info-modal]').exists('modal exists in schema mode');
 
-    await visit(`/cards/${cardPath}/edit/layout`);
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/layout`);
+    await visit(`/cards/${cardPath}/configure/layout`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/layout`);
     assert.dom('[data-test-user-info-modal]').exists('modal exists in layout mode');
 
-    await visit(`/cards/${cardPath}/edit/layout/themer`);
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/layout/themer`);
+    await visit(`/cards/${cardPath}/configure/layout/themer`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/layout/themer`);
     assert.dom('[data-test-user-info-modal]').exists('modal exists in themer mode');
 
     await visit(`/cards/${cardPath}/edit/preview`);
@@ -113,23 +113,23 @@ module('Acceptance | user info modal', function(hooks) {
 
     await waitForCardLoad();
     await click(`[data-test-card-header-button]`);
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/fields?confirmed=true`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit?confirmed=true`);
     assert.dom('[data-test-user-info-modal]').doesNotExist('modal is hidden in fields mode');
 
     await click(`[data-test-configure-schema-btn]`);
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/fields/schema?confirmed=true`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/fields?confirmed=true`);
     assert.dom('[data-test-user-info-modal]').doesNotExist('modal is hidden in schema mode');
 
     await waitForSchemaViewToLoad();
     await click(`[data-test-mode-indicator-link="edit"]`);
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/fields?confirmed=true`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit?confirmed=true`);
     await click(`[data-test-view-selector="layout"]`);
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/layout?confirmed=true`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/layout?confirmed=true`);
     assert.dom('[data-test-user-info-modal]').doesNotExist('modal is hidden in layout mode');
 
     await waitForCardLoad();
     await click('[data-test-card-custom-style-button]');
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/layout/themer?confirmed=true`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/layout/themer?confirmed=true`);
     assert.dom('[data-test-user-info-modal]').doesNotExist('modal is hidden in themer mode');
 
     await waitForThemerLoad();

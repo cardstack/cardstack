@@ -70,17 +70,17 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
   });
 
   test('can view code editor', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/layout/themer`);
+    await visit(`/cards/${cardPath}/configure/layout/themer`);
     await waitForThemerLoad();
 
-    assert.equal(currentURL(), `/cards/${cardPath}/edit/layout/themer`);
+    assert.equal(currentURL(), `/cards/${cardPath}/configure/layout/themer`);
     assert.dom('[data-test-code-block]').exists();
 
     await percySnapshot(assert);
   });
 
   test('can dock code editor to bottom', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/layout/themer`);
+    await visit(`/cards/${cardPath}/configure/layout/themer`);
     await waitForThemerLoad();
 
     assert.dom('.cardhost-card-theme-editor').hasAttribute('data-test-dock-location', 'right');
@@ -96,12 +96,12 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     await click('[data-test-card-header-button]');
     await waitForCardLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/fields`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit`);
 
     await click('[data-test-view-selector="layout"]');
     await waitForCardLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/layout`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/layout`);
     assert.dom(`[data-test-card-view="${testCard.canonicalURL}"]`).exists();
 
     await click('[data-test-card-custom-style-button]');
@@ -111,7 +111,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
   });
 
   test('closing the editor', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/layout`);
+    await visit(`/cards/${cardPath}/configure/layout`);
     await waitForCardLoad();
 
     await click('[data-test-card-custom-style-button]');
@@ -121,13 +121,13 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     await click('[data-test-mode-indicator-link="edit"]');
     await waitForCardLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/layout`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/layout`);
     assert.dom('[data-test-editor-pane]').doesNotExist();
     assert.dom('[data-test-card-custom-style-button]').exists();
   });
 
   test('toggling editor docking', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/layout`);
+    await visit(`/cards/${cardPath}/configure/layout`);
     await waitForCardLoad();
 
     await click('[data-test-card-custom-style-button]');
@@ -146,7 +146,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
   });
 
   test('themer mode: toggling card width', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/layout`);
+    await visit(`/cards/${cardPath}/configure/layout`);
     await waitForCardLoad();
 
     await click('[data-test-card-custom-style-button]');
@@ -179,7 +179,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
   });
 
   test('layout mode: toggling card width', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/layout`);
+    await visit(`/cards/${cardPath}/configure/layout`);
     await waitForCardLoad();
 
     assert.dom('[data-test-small-btn]').exists();
@@ -208,7 +208,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
   });
 
   test('changing card size should change card size in both themer and preview modes', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/layout/themer`);
+    await visit(`/cards/${cardPath}/configure/layout/themer`);
     await waitForThemerLoad();
     let cardId = getEncodedCardIdFromURL();
 
@@ -246,7 +246,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     await click('[data-test-mode-indicator]');
     await waitForCardLoad();
 
-    assert.ok(encodeColons(currentURL()).includes(`/cards/${cardId}/edit/layout`));
+    assert.ok(encodeColons(currentURL()).includes(`/cards/${cardId}/configure/layout`));
     assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-large-btn]').hasClass('selected');
@@ -254,7 +254,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     await click('[data-test-card-custom-style-button]');
     await waitForThemerLoad();
 
-    assert.ok(encodeColons(currentURL()).includes(`/cards/${cardId}/edit/layout/themer`));
+    assert.ok(encodeColons(currentURL()).includes(`/cards/${cardId}/configure/layout/themer`));
     assert.dom('[data-test-small-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-large-btn]').hasClass('selected');
@@ -262,7 +262,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     await click('[data-test-mode-indicator-link="edit"]');
     await waitForCardLoad();
 
-    assert.ok(encodeColons(currentURL()).includes(`/cards/${cardId}/edit/layout`));
+    assert.ok(encodeColons(currentURL()).includes(`/cards/${cardId}/configure/layout`));
 
     await click('[data-test-small-btn]');
     assert.dom('[data-test-small-btn]').hasClass('selected');
@@ -272,7 +272,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     await click('[data-test-card-custom-style-button]');
     await waitForThemerLoad();
 
-    assert.ok(encodeColons(currentURL()).includes(`/cards/${cardId}/edit/layout/themer`));
+    assert.ok(encodeColons(currentURL()).includes(`/cards/${cardId}/configure/layout/themer`));
     assert.dom('[data-test-small-btn]').hasClass('selected');
     assert.dom('[data-test-medium-btn]').doesNotHaveClass('selected');
     assert.dom('[data-test-large-btn]').doesNotHaveClass('selected');
@@ -298,7 +298,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
       'base style is correct'
     );
 
-    await visit(`/cards/${cardPath}/edit/layout`);
+    await visit(`/cards/${cardPath}/configure/layout`);
     await waitForCardLoad();
 
     assert.dom(`[data-test-themer-css]`).doesNotExist();
@@ -350,7 +350,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
   });
 
   test('dropdown displays default theme for new cards', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/layout`);
+    await visit(`/cards/${cardPath}/configure/layout`);
     await waitForCardLoad();
 
     await waitFor('[data-test-cs-component="dropdown"]');
@@ -360,7 +360,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
   });
 
   test('dropdown displays custom theme for cards with custom CSS', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/layout`);
+    await visit(`/cards/${cardPath}/configure/layout`);
     await waitForCardLoad();
     await click('[data-test-card-custom-style-button]');
     await waitForThemerLoad();
@@ -377,7 +377,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
   });
 
   test('selecting default theme resets css', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/layout`);
+    await visit(`/cards/${cardPath}/configure/layout`);
     await waitForCardLoad();
     await click('[data-test-card-custom-style-button]');
     await waitForThemerLoad();
@@ -399,7 +399,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
   });
 
   test('buttons and dropdowns reflect custom style state', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/layout`);
+    await visit(`/cards/${cardPath}/configure/layout`);
     await waitForCardLoad();
 
     assert.dom('[data-test-card-custom-style-button]').includesText('New Custom Theme');
@@ -421,7 +421,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
   });
 
   test('autosave works', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/layout`);
+    await visit(`/cards/${cardPath}/configure/layout`);
     await waitForCardLoad();
 
     await click('[data-test-card-custom-style-button]');
@@ -433,7 +433,7 @@ module('Acceptance | css editing (make sure browser window has focus!)', functio
     await waitForCardAutosave();
     this.owner.lookup('service:autosave').autosaveDisabled = true;
 
-    await visit(`/cards/${cardPath}/edit/layout`);
+    await visit(`/cards/${cardPath}/configure/layout`);
     await waitForCardLoad();
     assert.ok(
       find(`[data-test-css-format="isolated"][data-test-css-cards="[${testCard.canonicalURL}]"]`).innerText.includes(

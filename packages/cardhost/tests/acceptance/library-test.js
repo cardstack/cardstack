@@ -314,14 +314,14 @@ module('Acceptance | library', function(hooks) {
   });
 
   test('visit library from card edit', async function(assert) {
-    await visit(`/cards/${encodeURIComponent(card1.canonicalURL)}/edit/fields`);
+    await visit(`/cards/${encodeURIComponent(card1.canonicalURL)}/edit`);
     await waitForCardLoad();
 
     assert.dom('[data-test-library-button]').exists();
     await click('[data-test-library-button]');
     await waitForLibraryLoad();
 
-    assert.equal(currentURL(), `/cards/${encodeURIComponent(card1.canonicalURL)}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${encodeURIComponent(card1.canonicalURL)}/edit`);
     assert.dom('[data-test-library]').exists();
     assert.deepEqual(
       [
@@ -332,14 +332,14 @@ module('Acceptance | library', function(hooks) {
   });
 
   test('visit library from card schema', async function(assert) {
-    await visit(`/cards/${encodeURIComponent(card1.canonicalURL)}/edit/fields/schema`);
+    await visit(`/cards/${encodeURIComponent(card1.canonicalURL)}/configure/fields`);
     await waitForSchemaViewToLoad();
 
     assert.dom('[data-test-library-button]').exists();
     await click('[data-test-library-button]');
     await waitForLibraryLoad();
 
-    assert.equal(currentURL(), `/cards/${encodeURIComponent(card1.canonicalURL)}/edit/fields/schema`);
+    assert.equal(currentURL(), `/cards/${encodeURIComponent(card1.canonicalURL)}/configure/fields`);
     assert.dom('[data-test-library]').exists();
     assert.deepEqual(
       [

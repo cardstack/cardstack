@@ -130,7 +130,7 @@ module('Acceptance | card adoption', function(hooks) {
     await click('[data-test-library-button]');
     await waitForLibraryServiceToIdle();
     await waitForCardLoad(decodeURIComponent(childId));
-    assert.ok(currentURL().includes(`/cards/${childId}/edit/fields`));
+    assert.ok(currentURL().includes(`/cards/${childId}/edit`));
 
     assert.equal(
       [...document.querySelectorAll(`[data-test-library-recent-card-link]`)].length,
@@ -193,7 +193,7 @@ module('Acceptance | card adoption', function(hooks) {
     assert.deepEqual(card.data.relationships.csAdoptsFrom.data, { type: 'cards', id: parentCard.canonicalURL });
     assert.ok(card.data.attributes.csFields['treats-available']);
 
-    await visit(`/cards/${cardId}/edit/fields/schema`);
+    await visit(`/cards/${cardId}/configure/fields`);
     await waitForSchemaViewToLoad();
 
     await removeField('treats-available');
@@ -235,7 +235,7 @@ module('Acceptance | card adoption', function(hooks) {
     await addField('treats-available', 'boolean-field', false);
     await saveCard();
 
-    await visit(`/cards/${cardId}/edit/fields`);
+    await visit(`/cards/${cardId}/edit`);
     await waitForCardLoad();
 
     assert.deepEqual(
@@ -252,7 +252,7 @@ module('Acceptance | card adoption', function(hooks) {
     await setFieldValue('zip', '01234');
 
     await saveCard();
-    assert.equal(currentURL(), `/cards/${cardId}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${cardId}/edit`);
 
     await click('[data-test-mode-indicator-link="view"]');
     await waitForCardLoad();
@@ -321,12 +321,12 @@ module('Acceptance | card adoption', function(hooks) {
     await setCardName(grandChildName);
     let grandChildId = getEncodedCardIdFromURL();
 
-    await visit(`/cards/${cardId}/edit/fields/schema`);
+    await visit(`/cards/${cardId}/configure/fields`);
     await waitForSchemaViewToLoad(decodeURIComponent(cardId));
     await addField('number-of-bones', 'integer-field', true);
     await saveCard();
 
-    await visit(`/cards/${grandChildId}/edit/fields/schema`);
+    await visit(`/cards/${grandChildId}/configure/fields`);
     await waitForSchemaViewToLoad(decodeURIComponent(grandChildId));
 
     assert.deepEqual(
@@ -341,10 +341,10 @@ module('Acceptance | card adoption', function(hooks) {
   });
 
   test('can use the context menu to adopt from a card', async function(assert) {
-    await visit(`/cards/${parentCardPath}/edit/fields`);
+    await visit(`/cards/${parentCardPath}/edit`);
     await waitForCardLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${parentCardPath}/edit/fields`);
+    assert.equal(encodeColons(currentURL()), `/cards/${parentCardPath}/edit`);
     await click('[data-test-context-menu-button]');
 
     await click('[data-test-context-adopt]');

@@ -75,7 +75,7 @@ module('Acceptance | card name dialog', function(hooks) {
     await waitForCardLoad();
     await showCardId();
     assert.dom('.card-renderer-isolated--header-title').hasText(cardName);
-    assert.ok(currentURL().includes('/edit/fields'));
+    assert.ok(currentURL().includes('/edit'));
     assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('User Card');
     assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').hasText('Base Card');
     assert.dom('[data-test-isolated-card] [data-test-field="name"]').exists();
@@ -94,7 +94,7 @@ module('Acceptance | card name dialog', function(hooks) {
     await waitForCardLoad();
     await showCardId();
     assert.dom('.card-renderer-isolated--header-title').hasText(cardName);
-    assert.ok(currentURL().includes('/edit/fields'));
+    assert.ok(currentURL().includes('/edit'));
     assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('Base Card');
     assert.dom('[data-test-isolated-card] [data-test-field]').doesNotExist();
   });

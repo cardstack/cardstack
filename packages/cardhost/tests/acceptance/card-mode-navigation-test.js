@@ -31,11 +31,11 @@ module('Acceptance | card mode navigation', function(hooks) {
   });
 
   test('can use the context menu to switch modes', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/fields`);
+    await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
     await animationsSettled();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/fields`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit`);
     await click('[data-test-context-menu-button]');
     assert.dom('[data-test-context-menu-items] .checked').hasText('Edit');
     await percySnapshot(assert);
@@ -43,21 +43,21 @@ module('Acceptance | card mode navigation', function(hooks) {
     // schema
     await click('[data-test-context-schema]');
     await waitForSchemaViewToLoad();
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/fields/schema`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/fields`);
     await click('[data-test-context-menu-button]');
     assert.dom('[data-test-context-menu-items] .checked').hasText('Schema');
 
     // layout
     await click('[data-test-context-layout]');
     await waitForCardLoad();
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/layout`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/layout`);
     await click('[data-test-context-menu-button]');
     assert.dom('[data-test-context-menu-items] .checked').hasText('Layout');
 
     // edit
     await click('[data-test-context-edit]');
     await waitForCardLoad();
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/fields`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit`);
     await click('[data-test-context-menu-button]');
     assert.dom('[data-test-context-menu-items] .checked').hasText('Edit');
 
@@ -72,7 +72,7 @@ module('Acceptance | card mode navigation', function(hooks) {
   });
 
   test('clicking outside the context menu closes it', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/fields`);
+    await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
 
     await click('[data-test-context-menu-button]');

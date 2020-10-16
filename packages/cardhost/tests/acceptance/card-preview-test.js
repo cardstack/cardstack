@@ -81,10 +81,10 @@ module('Acceptance | card preview', function(hooks) {
   });
 
   test('can navigate to the to previous page (layout) mode when closed', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/layout`);
+    await visit(`/cards/${cardPath}/configure/layout`);
     await waitForCardLoad();
 
-    assert.equal(currentURL(), `/cards/${cardPath}/edit/layout`);
+    assert.equal(currentURL(), `/cards/${cardPath}/configure/layout`);
     assert.dom('[data-test-card-renderer-isolated]').hasClass('layout');
     assert.dom('[data-test-isolated-card-mode="layout"]').exists();
 
@@ -99,16 +99,16 @@ module('Acceptance | card preview', function(hooks) {
     await click('[data-test-mode-indicator]');
     await waitForCardLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/layout`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/layout`);
     assert.dom('[data-test-card-renderer-isolated]').hasClass('layout');
     assert.dom('[data-test-isolated-card-mode="layout"]').exists();
   });
 
   test('can navigate to the to previous page (themer) when closed', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/layout/themer`);
+    await visit(`/cards/${cardPath}/configure/layout/themer`);
     await waitForCardLoad();
 
-    assert.equal(currentURL(), `/cards/${cardPath}/edit/layout/themer`);
+    assert.equal(currentURL(), `/cards/${cardPath}/configure/layout/themer`);
     assert.dom('[data-test-card-renderer-isolated]').hasClass('themer');
 
     await click('[data-test-preview-link-btn]');
@@ -121,7 +121,7 @@ module('Acceptance | card preview', function(hooks) {
     await click('[data-test-mode-indicator]');
     await waitForThemerLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/layout/themer`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/layout/themer`);
     assert.dom('[data-test-card-renderer-isolated]').hasClass('themer', 'can return to themer');
   });
 
@@ -134,7 +134,7 @@ module('Acceptance | card preview', function(hooks) {
     await click('[data-test-mode-indicator]');
     await waitForCardLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/layout`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/layout`);
     assert.dom('[data-test-card-renderer-isolated]').hasClass('layout');
     assert.dom('[data-test-isolated-card-mode="layout"]').exists();
   });

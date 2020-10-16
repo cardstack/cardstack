@@ -145,7 +145,7 @@ module('Acceptance | card create', function(hooks) {
     await click('[data-test-library-button]');
     await waitForLibraryServiceToIdle();
     await waitForCardLoad(decodeURIComponent(cardId));
-    assert.ok(currentURL().includes(`/cards/${cardId}/edit/fields/schema`));
+    assert.ok(currentURL().includes(`/cards/${cardId}/configure/fields`));
 
     assert.equal(
       [...document.querySelectorAll(`[data-test-library-recent-card-link]`)].length,
@@ -240,12 +240,12 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-field="subtitle"] [data-test-string-field-viewer-label]').hasText('Subtitle');
     assert.dom('[data-test-field="title"]').doesNotExist();
 
-    await visit(`/cards/${card1Id}/edit/fields`);
+    await visit(`/cards/${card1Id}/edit`);
     await animationsSettled();
     assert.dom('[data-test-field="subtitle"] [data-test-edit-field-label]').hasText('Subtitle');
     assert.dom('[data-test-field="title"]').doesNotExist();
 
-    await visit(`/cards/${card1Id}/edit/fields/schema`);
+    await visit(`/cards/${card1Id}/configure/fields`);
     await animationsSettled();
     assert.dom('[data-test-field="subtitle"] [data-test-field-renderer-label]').hasText('Subtitle');
 
