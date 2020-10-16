@@ -5,7 +5,7 @@
 
   position: relative;
   margin: 0 auto;
-  padding: 0 30px 30px;
+  padding: 0 var(--boxel-spacing) var(--boxel-spacing);
   width: var(--card-renderer-width);
   min-width: 415px;
   max-width: 100%;
@@ -29,6 +29,11 @@
 
 .card-renderer-isolated.view.preview {
   margin: 0 auto;
+}
+
+.card-renderer-isolated.layout {
+  height: calc(100% - var(--ch-top-edge-height));
+  overflow-y: auto;
 }
 
 .card-renderer-isolated.layout .card-renderer__controls,
@@ -55,6 +60,7 @@
   position: relative;
   background-color: var(--ch-light);
   border-radius: var(--boxel-border-radius);
+  box-shadow: var(--boxel-box-shadow);
   overflow: hidden;
   min-height: calc(var(--card-renderer-height) - var(--card-renderer-header-height));
   z-index: 0;
@@ -74,11 +80,12 @@
 }
 
 .card-renderer-isolated.edit .card-renderer-isolated--card-container {
+  min-height: 80vh;
   padding: 30px;
   border-radius: 0 0 10px 10px;
 }
 
-.cards .card-renderer-isolated.view .card-renderer-isolated--card-container {
+.featured-cards .card-renderer-isolated.view .card-renderer-isolated--card-container {
   border: none;
   border-radius: 30px;
 }

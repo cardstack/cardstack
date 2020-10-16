@@ -1,3 +1,16 @@
-<CardViewer @card={{this.model.card}} @mode="view" />
+<section class="card-renderer--container"
+  data-test-card-view={{this.model.card.canonicalURL}}
+>
+  <div class="card-renderer--inner-container view-container">
+    <Breadcrumbs>
+      <LinkTo @route="cards.collection" @class="breadcrumbs__item">
+        <div class="breadcrumbs__item-label">Collection</div>
+        <div class="breadcrumbs__item-title">Master Recordings</div>
+      </LinkTo>
+    </Breadcrumbs>
+
+    <CardViewer @card={{this.model.card}} @mode="view" />
+  </div>
+</section>
 
 {{outlet}}

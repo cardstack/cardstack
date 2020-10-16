@@ -1,18 +1,12 @@
-<section class="card-renderer--container"
-  data-test-card-view={{@card.canonicalURL}}
->
-  <div class="card-renderer--inner-container {{@mode}}-container">
-    <CardRenderer
-      @card={{@card}}
-      @mode={{@mode}}
-      @format="isolated"
-      @cardSelected={{this.isSelected}}
-      @contextMenuOpen={{this.contextMenuOpen}}
-      @setContextMenu={{this.setContextMenu}}
-      @setIsSelected={{action (mut this.isSelected)}}
-    />
-  </div>
-</section>
+<CardRenderer
+  @card={{@card}}
+  @mode={{@mode}}
+  @format="isolated"
+  @cardSelected={{this.isSelected}}
+  @contextMenuOpen={{this.contextMenuOpen}}
+  @setContextMenu={{this.setContextMenu}}
+  @setIsSelected={{action (mut this.isSelected)}}
+/>
 
 {{!-- This is hidden, used in tests --}}
 <section class="cardhost-card-document">

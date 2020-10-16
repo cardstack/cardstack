@@ -135,9 +135,11 @@
           @model={{@card.canonicalURL}}
           aria-label={{@card.csTitle}}
         >
-          <div class="card-renderer-embedded__label">
-            {{humanize @card.csTitle}}
-          </div>
+          {{#unless @suppressHeader}}
+            <div class="card-renderer-embedded__label">
+              {{humanize @card.csTitle}}
+            </div>
+          {{/unless}}
           <Scaffold
             @card={{@card}}
             @fields={{this.fields}}

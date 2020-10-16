@@ -60,6 +60,7 @@
                 <CardRenderer
                   @card={{card}}
                   @format="embedded"
+                  @suppressHeader={{true}}
                   @class="isolated-collection__card {{if selectedCard "isolated-collection__card--selected"}}"
                 />
                 <div class="isolated-collection__grid-item-btn-group {{if (eq @mode "view") "isolated-collection__select-btn"}} {{if selectedCard "isolated-collection__select-btn--selected"}}">

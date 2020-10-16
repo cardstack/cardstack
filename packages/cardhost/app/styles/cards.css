@@ -1,7 +1,7 @@
 .cardhost-cards {
+  --org-header-height: 130px;
   --bg-color: var(--view-bg);
-  --view-bg: var(--ch-light-background);
-  --edit-bg: var(--ch-default);
+  --view-bg: #F5F5F5;
   --schema-bg: var(--ch-deep-background);
   --themer-bg: var(--ch-foreground);
   --preview-bg: var(--ch-foreground);
@@ -12,6 +12,18 @@
   background-color: var(--bg-color);
   color: var(--ch-dark);
   transition: var(--ch-card-background-color-animate);
+}
+
+.cards__container {
+  height: 100%;
+}
+
+.cards__header {
+  height: var(--org-header-height);
+}
+
+.cards__header + .cards__container {
+  height: calc(100% - var(--org-header-height));
 }
 
 .cardhost-cards.dragging * {
@@ -84,10 +96,6 @@
 
 .cardhost-cards.layout.themer-card-width--small .card-renderer--inner-container {
   padding-left: var(--ch-left-edge-panel-width);
-}
-
-.card-renderer--inner-container.view-container {
-  padding-top: 80px;
 }
 
 .card-renderer--inner-container.edit-container {
