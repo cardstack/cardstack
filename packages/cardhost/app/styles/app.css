@@ -27,9 +27,9 @@
 @import '/assets/components/loading.css';
 
 /* Boxel components */
+@import '/assets/components/dropdown-menu-button.css';
 @import '/assets/components/org-header.css';
 @import '/assets/components/isolated-collection.css';
-@import '/assets/components/dropdown-menu-button.css';
 
 /* Cardhost styling for core package templates */
 @import '/assets/components/card-renderer.css';

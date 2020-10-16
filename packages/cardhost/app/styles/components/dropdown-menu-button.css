@@ -12,7 +12,6 @@
 }
 
 .dropdown-menu-button__dropdown {
-  min-height: 100px;
   min-width: 210px;
   padding: 15px 0;
   border-radius: var(--boxel-border-radius);
