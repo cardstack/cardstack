@@ -5,17 +5,16 @@ import { set } from '@ember/object';
 import RouteInfo from '@ember/routing/-private/route-info';
 import Transition from '@ember/routing/-private/transition';
 import LibraryService from '../services/library';
-import { AddressableCard } from '@cardstack/hub';
 
 interface Model {
-  featuredEntries: AddressableCard[];
   previousRoute?: RouteInfo;
 }
 export default class CardsRoute extends Route {
   @service library!: LibraryService;
 
   async model(): Promise<Model> {
-    return await this.library.load.perform();
+    await this.library.load.perform();
+    return {};
   }
 
   @action

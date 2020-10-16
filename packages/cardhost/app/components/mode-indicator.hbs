@@ -1,10 +1,9 @@
 <LinkTo
   @route={{@route}}
-  @model={{@card.canonicalURL}}
+  @model={{@model}}
   @class={{concat "mode-indicator mode-indicator--" @mode}}
-  title={{concat "Link to " @linkTo " mode"}}
-  aria-label={{concat @linkTo " mode"}}
-  data-test-mode-indicator-link={{@linkTo}}
+  aria-label={{if @ariaLabel @ariaLabel (concat "close " @mode " mode")}}
+  data-test-mode-indicator-link={{@mode}}
   data-test-mode-indicator
 >
   {{@mode}} mode

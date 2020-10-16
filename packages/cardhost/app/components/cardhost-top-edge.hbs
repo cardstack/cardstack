@@ -2,7 +2,11 @@
   {{#unless (eq @mode "themer")}}
     <div class="cardhost-top-edge__controls cardhost-top-edge__controls--left">
       {{#unless (eq @mode "preview")}}
-        <PreviewLinkButton @model={{@card}} class="cardhost-top-edge--preview-button {{if (eq @mode "fields") "hidden"}}" data-test-top-edge-preview-link />
+        <PreviewLinkButton
+          @route="cards.card.configure.preview"
+          @model={{@card.canonicalURL}}
+          @class="cardhost-top-edge--preview-button {{if (eq @mode "fields") "hidden"}}"
+          data-test-top-edge-preview-link />
       {{/unless}}
     </div>
 
@@ -34,18 +38,16 @@
     </div>
 
     <div class="cardhost-top-edge__controls cardhost-top-edge__controls--right">
-      {{#if (eq @mode "preview")}}
+      {{#if (or (eq @mode "fields") (eq @mode "layout"))}}
         <ModeIndicator
-          @card={{@card}}
-          @route={{if @previousRoute @previousRoute.name "cards.card.configure.layout"}}
-          @mode="preview"
-          @linkTo={{if @previousRoute "previous" "edit-layout"}} />
+          @model={{@card.canonicalURL}}
+          @route={{if @previousRoute @previousRoute.name "cards.card.view"}}
+          @mode="configure" />
       {{else}}
         <ModeIndicator
-          @card={{@card}}
-          @route={{if @previousRoute @previousRoute.name "cards.card.view"}}
-          @mode="configure"
-          @linkTo={{if @previousRoute "previous" "view-layout"}} />
+          @model={{@card.canonicalURL}}
+          @route={{if @previousRoute @previousRoute.name "cards.card.configure.layout"}}
+          @mode={{@mode}} />
       {{/if}}
 
       <EdgeActionsButton />
