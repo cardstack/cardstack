@@ -4,6 +4,6 @@ import Transition from '@ember/routing/-private/transition';
 export default class IndexRoute extends Route {
   async beforeModel(transition: Transition) {
     await super.beforeModel(transition);
-    this.transitionTo('cards.collection');
+    this.transitionTo('cards');
   }
 }
