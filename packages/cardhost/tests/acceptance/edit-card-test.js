@@ -268,68 +268,25 @@ module('Acceptance | card edit', function(hooks) {
   skip(`setting a card field as value with singular arity`, async function() {});
   skip(`setting a card field as value with plural arity`, async function() {});
 
-  test(`can navigate to view mode using the top edge`, async function(assert) {
+  test(`can navigate to view mode using the mode button`, async function(assert) {
     await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
 
-    assert.dom('[data-test-mode-indicator-link="view"]').exists();
+    assert.dom('[data-test-mode-indicator-link="edit"]').exists();
 
-    await click('[data-test-mode-indicator-link="view"]');
-    await waitForCardLoad();
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
-
-    await visit(`/cards/${cardPath}/configure/layout`);
-    await waitForCardLoad();
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/layout`);
-
-    await click('[data-test-mode-indicator-link="view"]');
+    await click('[data-test-mode-indicator-link="edit"]');
     await waitForCardLoad();
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
   });
 
-  test(`fields mode displays the top edge`, async function(assert) {
+  test(`does not display the top or right edge`, async function(assert) {
     await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
     await animationsSettled();
 
-    assert.dom('[data-test-cardhost-top-edge]').exists();
-    assert.dom('[data-test-top-edge-preview-link]').exists();
-    assert.dom('[data-test-top-edge-size-buttons]').exists();
-    assert.dom('[data-test-top-edge-preview-link]').hasClass('hidden');
-    assert.dom('[data-test-top-edge-size-buttons]').hasClass('hidden');
-    assert.dom('[data-test-view-selector]').exists();
-    assert.dom('[data-test-view-selector="fields"]').hasClass('active');
-    assert.dom('[data-test-mode-indicator-link="view"]').exists();
-    assert.dom('[data-test-mode-indicator]').containsText('edit mode');
-    assert.dom('[data-test-edge-actions-btn]').exists();
+    assert.dom('[data-test-cardhost-top-edge]').doesNotExist();
+    assert.dom('[data-test-right-edge]').doesNotExist();
     await percySnapshot(assert);
-  });
-
-  test(`layout mode displays the top edge with additional controls`, async function(assert) {
-    await visit(`/cards/${cardPath}/configure/layout`);
-    await waitForCardLoad();
-
-    assert.dom('[data-test-cardhost-top-edge]').exists();
-    assert.dom('[data-test-top-edge-preview-link]').exists();
-    assert.dom('[data-test-top-edge-size-buttons]').exists();
-    assert.dom('[data-test-top-edge-preview-link]').doesNotHaveClass('hidden');
-    assert.dom('[data-test-top-edge-size-buttons]').doesNotHaveClass('hidden');
-    assert.dom('[data-test-view-selector]').exists();
-    assert.dom('[data-test-view-selector="layout"]').hasClass('active');
-    assert.dom('[data-test-mode-indicator-link="view"]').exists();
-    assert.dom('[data-test-mode-indicator]').containsText('edit mode');
-    assert.dom('[data-test-edge-actions-btn]').exists();
-    await percySnapshot(assert);
-  });
-
-  test(`displays the right edge`, async function(assert) {
-    await visit(`/cards/${cardPath}/edit`);
-    await waitForCardLoad();
-
-    assert.dom('[data-test-right-edge]').exists();
-    assert.dom('[data-test-internal-card-id]').doesNotExist();
-    assert.dom('[data-test-appearance-section]').doesNotExist();
-    assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('Base Card');
   });
 
   test('autosave works', async function(assert) {

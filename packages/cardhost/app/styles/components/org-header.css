@@ -3,17 +3,11 @@
   --header-logo-size-sm: 35px 35px;
   position: sticky;
   top: 0;
-  grid-column: 2;
-  display: grid;
-  grid-template:
-    "title search" auto
-    "nav   nav"    40px / minmax(auto, 450px) 1fr;
-  gap: 50px;
   padding: 80px 20px 0 30px;
   background-color: var(--header-background);
   color: white;
   height: 250px;
-  z-index: 2;
+  z-index: 1;
 }
 
 .org-header.org-header--bunny-records {
@@ -36,8 +30,13 @@
   gap: 20px;
 }
 
+.org-header__title-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
 .org-header__title {
-  grid-area: title;
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 0 3px;
@@ -86,19 +85,16 @@
 }
 
 .org-header__nav {
-  grid-area: nav;
-  max-width: 450px;
-  font: var(--boxel-font);
-  letter-spacing: var(--boxel-lsp-lg);
-}
-
-.org-header__nav ul {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0 10px;
+  max-width: 450px;
   list-style-type: none;
   margin: 0;
   padding-left: 0;
+  padding-top: var(--boxel-spacing);
+  font: var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-lg);
 }
 
 .org-header__nav li > a {
@@ -113,8 +109,6 @@
 }
 
 .org-header__search-bar {
-  grid-area: search;
-  align-self: center;
   justify-self: end;
   width: 240px;
   height: 30px;

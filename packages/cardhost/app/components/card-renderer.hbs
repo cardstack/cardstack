@@ -29,12 +29,13 @@
           />
         {{else if (eq this.mode "edit")}}
           <header class="item-edit__sticky-header">
-            <h1 class="item-edit__title">{{@card.csTitle}}</h1>
+            <h1 class="item-edit__title" data-test-card-edit-title>{{@card.csTitle}}</h1>
             <div class="card-renderer__controls card-renderer__controls--edit">
               <LinkTo
                 @route="cards.card.view"
                 @model={{@card.canonicalURL}}
                 @class="card-renderer__controls-btn"
+                data-test-mode-indicator-link="edit"
               >
                 Edit Mode {{svg-jar "x" width="10px" height="10px"}}
               </LinkTo>
@@ -47,19 +48,20 @@
         class="card-renderer-isolated--animated-content"
       >
         {{#unless @suppressHeader}}
-          {{#if this.isViewMode}}
-            <div class="card-renderer__controls">
+          {{#if (and this.cardstackSession.isAuthenticated this.isViewMode)}}
+            <div class="card-renderer__controls" data-test-card-renderer-controls>
               <LinkTo
                 @route="cards.card.view.edit"
                 @model={{@card.canonicalURL}}
                 @class="card-renderer__controls-btn"
+                data-test-mode-indicator-link="view"
               >
                 Edit
               </LinkTo>
-              <DropdownMenuButton @icon="gear">
+              <DropdownMenuButton @icon="gear" data-test-card-renderer-dropdown-menu>
                 <ul class="card-renderer__dropdown-menu-list">
                   <li>
-                    <LinkTo @route="cards.card.configure.layout" @model={{@card.canonicalURL}} data-test-context-schema>Configure</LinkTo>
+                    <LinkTo @route="cards.card.configure.layout" @model={{@card.canonicalURL}} data-test-configure-option>Configure</LinkTo>
                   </li>
                 </ul>
               </DropdownMenuButton>

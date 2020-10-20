@@ -1,17 +1,17 @@
 <div class="cardhost-top-edge {{@mode}}" data-test-cardhost-top-edge>
-  {{#unless (eq @mode "themer")}}
+  {{#if (not-eq @mode "themer")}}
     <div class="cardhost-top-edge__controls cardhost-top-edge__controls--left">
-      {{#unless (eq @mode "preview")}}
+      {{#if (or (eq @mode "fields") (eq @mode "layout"))}}
         <PreviewLinkButton
           @route="cards.card.configure.preview"
           @model={{@card.canonicalURL}}
           @class="cardhost-top-edge--preview-button {{if (eq @mode "fields") "hidden"}}"
           data-test-top-edge-preview-link />
-      {{/unless}}
+      {{/if}}
     </div>
 
     <div class="cardhost-top-edge__controls cardhost-top-edge__controls--center">
-      {{#unless (eq @mode "preview")}}
+      {{#if (or (eq @mode "fields") (eq @mode "layout"))}}
         <div class="view-selector" data-test-view-selector>
           <LinkTo
             @route="cards.card.configure.layout"
@@ -32,7 +32,7 @@
             Field
           </LinkTo>
         </div>
-      {{/unless}}
+      {{/if}}
 
       <CardSizeToggle class="cardhost-top-edge--size-buttons {{if (eq @mode "fields") "hidden"}}" data-test-top-edge-size-buttons />
     </div>
@@ -41,7 +41,7 @@
       {{#if (or (eq @mode "fields") (eq @mode "layout"))}}
         <ModeIndicator
           @model={{@card.canonicalURL}}
-          @route={{if @previousRoute @previousRoute.name "cards.card.view"}}
+          @route="cards.card.view"
           @mode="configure" />
       {{else}}
         <ModeIndicator
@@ -52,5 +52,5 @@
 
       <EdgeActionsButton />
     </div>
-  {{/unless}}
+  {{/if}}
 </div>

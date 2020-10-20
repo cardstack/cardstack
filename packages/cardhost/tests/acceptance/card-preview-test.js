@@ -49,11 +49,11 @@ module('Acceptance | card preview', function(hooks) {
   });
 
   test(`previewing a card`, async function(assert) {
-    await visit(`/cards/${cardPath}/edit/preview`);
+    await visit(`/cards/${cardPath}/configure/preview`);
     await waitForCardLoad(testCard.canonicalURL);
     await waitForCardLoad(author.canonicalURL);
 
-    assert.equal(currentURL(), `/cards/${cardPath}/edit/preview`);
+    assert.equal(currentURL(), `/cards/${cardPath}/configure/preview`);
 
     // can render page contents
     assert.dom('[data-test-cardhost-cards]').hasClass('preview');
@@ -91,10 +91,10 @@ module('Acceptance | card preview', function(hooks) {
     await click('[data-test-preview-link-btn]');
     await waitForCardLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/preview`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/preview`);
     assert.dom('[data-test-card-renderer-isolated]').hasClass('preview');
     assert.dom('[data-test-isolated-card-mode="view"]').exists();
-    assert.dom('[data-test-mode-indicator-link="previous"]').exists();
+    assert.dom('[data-test-mode-indicator-link="preview"]').exists();
 
     await click('[data-test-mode-indicator]');
     await waitForCardLoad();
@@ -114,9 +114,9 @@ module('Acceptance | card preview', function(hooks) {
     await click('[data-test-preview-link-btn]');
     await waitForCardLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/preview`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/preview`);
     assert.dom('[data-test-card-renderer-isolated]').hasClass('preview');
-    assert.dom('[data-test-mode-indicator-link="previous"]').exists();
+    assert.dom('[data-test-mode-indicator-link="preview"]').exists();
 
     await click('[data-test-mode-indicator]');
     await waitForThemerLoad();
@@ -126,10 +126,10 @@ module('Acceptance | card preview', function(hooks) {
   });
 
   test('can navigate to the to layout page when closed if there is no previous page', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/preview`);
+    await visit(`/cards/${cardPath}/configure/preview`);
     await waitForCardLoad();
 
-    assert.dom('[data-test-mode-indicator-link="edit-layout"]').exists();
+    assert.dom('[data-test-mode-indicator-link="preview"]').exists();
 
     await click('[data-test-mode-indicator]');
     await waitForCardLoad();

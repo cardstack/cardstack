@@ -94,9 +94,9 @@ module('Acceptance | accessibility', function(hooks) {
     assert.ok(true, 'no a11y errors found for edit fields');
   });
 
-  test('basic a11y tests for edit fields', async function(assert) {
+  test('basic a11y tests for schema fields', async function(assert) {
     await visit(`/cards/${cardPath}/configure/fields`);
-    await waitForCardLoad();
+    await waitForSchemaViewToLoad();
     await waitForCssTransitions();
     await a11yAudit();
     assert.ok(true, 'no a11y errors found for schema fields');

@@ -1,4 +1,4 @@
-<li role="button" {{on "click" (fn @sort @column @direction)}} class="{{if (and (eq @column @sortColumn) (eq @direction @sortDirection)) "active"}}">
+<li role="button" {{on "click" (fn @sort @column @direction)}} class={{if (and (eq @column @sortColumn) (eq @direction @sortDirection)) "active"}}>
   {{@column.name}}
   <span>
     {{#if (eq @column.sortType "numeric")}}

@@ -274,13 +274,31 @@ module('Acceptance | card schema', function(hooks) {
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit`);
   });
 
-  test(`displays the top edge`, async function(assert) {
+  test(`fields mode displays the top edge`, async function(assert) {
     await visit(`/cards/${cardPath}/configure/fields`);
     await waitForSchemaViewToLoad();
 
     assert.dom('[data-test-cardhost-top-edge]').exists();
-    assert.dom('[data-test-mode-indicator-link="edit"]').exists();
-    assert.dom('[data-test-mode-indicator]').containsText('schema mode');
+    assert.dom('[data-test-mode-indicator-link="configure"]').exists();
+    assert.dom('[data-test-mode-indicator]').containsText('configure mode');
+    assert.dom('[data-test-edge-actions-btn]').exists();
+
+    await animationsSettled();
+    await waitForAnimation(async () => await percySnapshot(assert));
+  });
+
+  test(`layout mode displays the top edge with additional controls`, async function(assert) {
+    await visit(`/cards/${cardPath}/configure/layout`);
+    await waitForCardLoad();
+
+    assert.dom('[data-test-cardhost-top-edge]').exists();
+    assert.dom('[data-test-top-edge-preview-link]').exists();
+    assert.dom('[data-test-top-edge-size-buttons]').exists();
+    assert.dom('[data-test-top-edge-preview-link]').doesNotHaveClass('hidden');
+    assert.dom('[data-test-top-edge-size-buttons]').doesNotHaveClass('hidden');
+    assert.dom('[data-test-view-selector]').exists();
+    assert.dom('[data-test-view-selector="layout"]').hasClass('active');
+    assert.dom('[data-test-mode-indicator-link="configure"]').exists();
     assert.dom('[data-test-edge-actions-btn]').exists();
     await animationsSettled();
     await waitForAnimation(async () => await percySnapshot(assert));
@@ -290,14 +308,20 @@ module('Acceptance | card schema', function(hooks) {
     await visit(`/cards/${cardPath}/configure/fields`);
     await waitForSchemaViewToLoad();
 
-    assert.dom('[data-test-mode-indicator-link="edit"]').exists();
-    assert.dom('[data-test-mode-indicator]').containsText('schema mode');
-
-    await click('[data-test-mode-indicator-link="edit"]');
+    assert.dom('[data-test-mode-indicator-link="configure"]').exists();
+    await click('[data-test-mode-indicator-link="configure"]');
     await waitForCardLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit`);
-    assert.dom('[data-test-mode-indicator]').containsText('edit mode');
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
+    assert.dom('[data-test-mode-indicator-link="view"]').exists();
+
+    await visit(`/cards/${cardPath}/configure/layout`);
+    await waitForCardLoad();
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/layout`);
+
+    await click('[data-test-mode-indicator]');
+    await waitForCardLoad();
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
   });
 
   test('autosave works', async function(assert) {

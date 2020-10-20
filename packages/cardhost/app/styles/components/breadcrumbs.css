@@ -25,7 +25,7 @@
 }
 
 .breadcrumbs__item-label {
-  color: #AFAFB7;
+  color: var(--boxel-medium-light-purple);
   font-size: 10px;
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-xl);
