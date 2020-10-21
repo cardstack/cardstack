@@ -1,4 +1,4 @@
-<div class="isolated-collection">
+<div class="isolated-collection" data-test-isolated-collection>
   <header class="isolated-collection__sticky-header">
     <div class="isolated-collection__title-row">
       <h2 class="isolated-collection__title">{{@title}}</h2>
@@ -63,7 +63,7 @@
     <div class="isolated-collection__inner-container">
       <ul class="isolated-collection__grid isolated-collection__grid--{{this.format}}">
         {{#each @collection as |card|}}
-          <li class="isolated-collection__grid-item isolated-collection__grid-item--{{this.format}}">
+          <li class="isolated-collection__grid-item isolated-collection__grid-item--{{this.format}}" data-test-isolated-collection-card>
             {{#let (contains card.csId this.selectedCards) as |selectedCard|}}
               <CardRenderer
                 @card={{card}}

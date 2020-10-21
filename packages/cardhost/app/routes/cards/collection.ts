@@ -39,7 +39,7 @@ export default class CollectionRoute extends Route {
   @task(function*(this: CollectionRoute) {
     let collectionEntries;
 
-    if (environment === 'development') {
+    if (environment === 'development' || environment === 'test') {
       collectionEntries = yield this.data.search(
         {
           filter: {
