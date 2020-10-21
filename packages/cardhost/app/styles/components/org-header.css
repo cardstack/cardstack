@@ -25,7 +25,7 @@
 } */
 
 .org-header--sm {
-  height: 130px;
+  height: var(--boxel-org-header-height);
   padding-top: 25px;
   gap: 20px;
 }

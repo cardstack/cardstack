@@ -1,5 +1,21 @@
-<IsolatedCollection
-  @mode="view"
-  @title={{this.model.title}}
-  @collection={{this.model.cards}}
-/>
+{{!-- TODO: Do not hardcode header data --}}
+<OrgHeader
+  @id="bunny-records"
+  @title="Bunny Records"
+  @logoURL="/assets/images/orgs/bunny-logo.svg"
+  @displayNavbar={{true}}
+>
+  <li>
+    <LinkTo @route="cards.collection">
+      Masters
+    </LinkTo>
+  </li>
+</OrgHeader>
+
+<div class="collection__wrapper">
+  <IsolatedCollection
+    @mode="view"
+    @title={{this.model.title}}
+    @collection={{this.model.cards}}
+  />
+</div>

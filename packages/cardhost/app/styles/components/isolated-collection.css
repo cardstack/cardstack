@@ -1,13 +1,8 @@
-.isolated-collection__wrapper {
+.isolated-collection {
   --isolated-collection-header-height: 170px;
   height: 100%;
-  padding: 30px;
-}
-
-.isolated-collection {
-  height: 100%;
   background-color: #fff;
-  border-radius: 10px;
+  border-radius: var(--boxel-border-radius);
   box-shadow: var(--boxel-box-shadow);
 }
 

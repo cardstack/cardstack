@@ -1,7 +1,7 @@
 .breadcrumbs {
   display: flex;
   width: 100%;
-  padding: var(--boxel-spacing);
+  padding: 20px 30px;
 }
 
 .breadcrumbs__item {
@@ -25,7 +25,7 @@
 }
 
 .breadcrumbs__item-label {
-  color: var(--boxel-medium-light-purple);
+  color: var(--boxel-medium-purple);
   font-size: 10px;
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-xl);

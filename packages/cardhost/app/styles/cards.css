@@ -1,5 +1,4 @@
 .cardhost-cards {
-  --org-header-height: 130px;
   --bg-color: var(--view-bg);
   --view-bg: #F5F5F5;
   --schema-bg: var(--ch-deep-background);
@@ -12,18 +11,6 @@
   background-color: var(--bg-color);
   color: var(--ch-dark);
   transition: var(--ch-card-background-color-animate);
-}
-
-.cards__container {
-  height: 100%;
-}
-
-.cards__header {
-  height: var(--org-header-height);
-}
-
-.cards__header + .cards__container {
-  height: calc(100% - var(--org-header-height));
 }
 
 .cardhost-cards.dragging * {
@@ -78,6 +65,10 @@
   background-size: 55px;
 }
 
+.cardhost-cards.view .card-renderer--container {
+  height: calc(100% - var(--boxel-org-header-height));
+}
+
 .cardhost-cards.layout .card-renderer--container,
 .cardhost-cards.fields .card-renderer--container,
 .cardhost-cards.preview .card-renderer--container,
@@ -85,19 +76,31 @@
   height: calc(100% - var(--ch-top-edge-height));
 }
 
-.cardhost-cards.layout .card-renderer--inner-container,
+.cardhost-cards.view .card-renderer--container--without-breadcrumbs {
+  padding-top: 30px;
+}
+
 .cardhost-cards.fields .card-renderer--inner-container {
   padding-right: var(--ch-right-edge-width);
-}
-
-.cardhost-cards.fields .card-renderer--inner-container {
   padding-left: var(--ch-left-edge-panel-width);
 }
 
-.cardhost-cards.layout.themer-card-width--small .card-renderer--inner-container {
-  padding-left: var(--ch-left-edge-panel-width);
+.cardhost-cards.layout .card-renderer--inner-container {
+  padding-right: var(--ch-right-edge-width);
+  padding-left: 160px;
+}
+
+.cardhost-cards.layout.themer-card-width--large .card-renderer--inner-container {
+  padding-left: 0;
 }
 
 .card-renderer--inner-container.edit-container {
   padding-top: 30px;
+}
+
+
+@media (min-width: 1590px) {
+  .cardhost-cards.layout .card-renderer--inner-container {
+    padding-left: var(--ch-left-edge-panel-width);
+  }
 }

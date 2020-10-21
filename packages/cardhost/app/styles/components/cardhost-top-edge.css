@@ -101,13 +101,13 @@
   margin-right: 9px;
 }
 
-
-@media (max-width: 1036px) {
-  .cardhost-top-edge {
+@media (max-width: 1589px) {
+  .cardhost-top-edge.layout {
     grid-template-columns: auto 1fr var(--ch-right-edge-panel-width);
   }
+}
 
-  /* Theme-specific styles */
+@media (max-width: 1300px) {
   .cardhost-top-edge.fields .cardhost-top-edge--size-buttons,
   .cardhost-top-edge.layout .cardhost-top-edge--size-buttons {
     display: none;

@@ -38,6 +38,9 @@
 @import '/assets/components/schema-field-renderer.css';
 @import '/assets/components/drop-zone.css';
 
+/* Route template styles */
+@import '/assets/cards-route/collection.css';
+
 
 :root {
   --ch-font-family: 'Open Sans', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -89,6 +92,7 @@
   --boxel-lsp-xs: 0.005em;
 
   --boxel-spacing: 20px;
+  --boxel-org-header-height: 130px;
   --boxel-border-color: #dedede;
   --boxel-border-color-dark: #000;
   --boxel-border: 1px solid var(--boxel-border-color);
