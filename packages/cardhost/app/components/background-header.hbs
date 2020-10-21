@@ -1,7 +1,7 @@
 {{! template-lint-disable no-inline-styles }}
-<header class="isolated-card__header" style={{css-url "background-image" @headerImage}}>
+<header class="isolated-card__header" style={{if @headerImage (css-url "background-image" @headerImage)}}>
   <div class="isolated-card__header-content {{unless @headerImage "no-bg"}}">
-    <div class="isolated-card__img" style={{css-url "background-image" @headerImage}} />
+    <div class="isolated-card__img" style={{if @headerImage (css-url "background-image" @headerImage)}} />
     <h1 class="isolated-card__title">{{@heading}}</h1>
     <h2 class="isolated-card__description">{{@subHeading}}</h2>
     <ul class="isolated-card__header-details">

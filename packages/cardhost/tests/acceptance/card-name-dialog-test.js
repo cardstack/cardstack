@@ -9,6 +9,7 @@ import {
   showCardId,
   waitForSchemaViewToLoad,
   waitForTestsToEnd,
+  getEncodedCardIdFromURL,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -73,12 +74,18 @@ module('Acceptance | card name dialog', function(hooks) {
 
     await setCardName(cardName);
     await waitForCardLoad();
+    assert.ok(currentURL().includes('/edit'));
+    assert.dom('[data-test-isolated-card-mode="edit"] [data-test-field="name"]').exists();
+
+    let cardId = getEncodedCardIdFromURL();
+    await visit(`/cards/${cardId}/configure/layout`);
     await showCardId();
-    assert.dom('.card-renderer-isolated--header-title').hasText(cardName);
-    assert.ok(currentURL().includes('/edit/fields'));
+    assert.dom('[data-test-isolated-card-mode="layout"] [data-test-field="name"]').exists();
     assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('User Card');
     assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').hasText('Base Card');
-    assert.dom('[data-test-isolated-card] [data-test-field="name"]').exists();
+
+    await visit(`/cards/${cardId}/configure/fields`);
+    assert.dom('.card-renderer-isolated--header-title').hasText(cardName);
   });
 
   test('can create a new card that does not leverage a template from the catalog', async function(assert) {
@@ -94,7 +101,7 @@ module('Acceptance | card name dialog', function(hooks) {
     await waitForCardLoad();
     await showCardId();
     assert.dom('.card-renderer-isolated--header-title').hasText(cardName);
-    assert.ok(currentURL().includes('/edit/fields'));
+    assert.ok(currentURL().includes('/configure'));
     assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('Base Card');
     assert.dom('[data-test-isolated-card] [data-test-field]').doesNotExist();
   });

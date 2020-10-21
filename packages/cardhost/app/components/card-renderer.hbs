@@ -18,86 +18,103 @@
       {{did-update this.cardUpdated @card @suppressCss @mode}}
       {{will-destroy this.removeCardCss}}
     >
-      {{#unless @suppressHeader}}
-        {{#if (eq @mode "view")}}
-          <AnimatedContainer class="card-renderer-isolated--animated-view-header">
-            {{#animated-value this watch=this.animatedWatchFields use=this.headerAnimation group="header"}}
-              <CardRendererHeader
-                @cardSelected={{if (and this.cardstackSession.isAuthenticated @cardSelected) true}}
-                @card={{@card}}
-                @buttonRoute="cards.card.edit.fields"
-                @buttonText="Edit"
-                @mode={{this.mode}}
-                @contextMenuOpen={{@contextMenuOpen}}
-                @setContextMenu={{@setContextMenu}}
-              />
-            {{/animated-value}}
-          </AnimatedContainer>
-        {{else}}
-          <AnimatedContainer class="card-renderer-isolated--animated-header">
-            {{#animated-value this watch=this.animatedWatchFields use=this.headerAnimation group="header"}}
-              <CardRendererHeader
-                @cardSelected={{true}}
-                @card={{@card}}
-                @buttonRoute="cards.card.view"
-                @buttonText="Done Editing"
-                @mode={{this.mode}}
-                @contextMenuOpen={{@contextMenuOpen}}
-                @setContextMenu={{@setContextMenu}}
-              />
-            {{/animated-value}}
-          </AnimatedContainer>
-        {{/if}}
-      {{/unless}}
-      {{!-- This is the card boundary, please don't set any card specific classes any higher in the DOM than this. --}}
-      {{!-- If we need card specific styling above this level, then let's chat about it.                           --}}
-      <AnimatedContainer
-        class="card-renderer-isolated--animated-content
-          {{concat (safe-css-string (if @card.canonicalURL @card.canonicalURL @card.adoptsFromURL)) "--isolated" }}
-        "
-      >
-        {{#animated-value this watch=this.animatedWatchFields use=this.cardTransition group="body"}}
-          <div
-            class="card-renderer-isolated--card-container
-            {{if (and this.cardstackSession.isAuthenticated @cardSelected) "selected"}}
-            "
-          >
-            <div>
-              <AnimatedContainer>
-                {{#animated-value this watch=this.animatedWatchFields use=@contentTransition group="content"}}
-                  <div>
-                    {{#if @dropField}}
-                      <DropZone
-                        @card={{@card}}
-                        @dropField={{@dropField}}
-                        @position={{0}}
-                        @toggleStubField={{this.toggleStubField}}
-                      />
-                    {{/if}}
-                    <Scaffold
-                      @card={{@card}}
-                      @feature="isolated-layout"
-                      @fields={{this.fields}}
-                      @mode={{this.mode}}
-                      @setFieldName={{@setFieldName}}
-                      @setCardValue={{@setCardValue}}
-                      @setCardReference={{@setCardReference}}
-                      @removeField={{@removeField}}
-                      @toggleStubField={{this.toggleStubField}}
-                      @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
-                      @setPosition={{@setPosition}}
-                      @selectField={{@selectField}}
-                      @selectedField={{@selectedField}}
-                      @selectedFieldName={{@selectedFieldName}}
-                      @dropField={{@dropField}}
-                      @loadedField={{perform this.loadedField}}
-                    />
-                  </div>
-                {{/animated-value}}
-              </AnimatedContainer>
+      {{#if this.cardstackSession.isAuthenticated}}
+        {{#if (eq this.mode "schema")}}
+          <CardRendererHeader
+            @cardSelected={{true}}
+            @card={{@card}}
+            @mode={{this.mode}}
+            @contextMenuOpen={{@contextMenuOpen}}
+            @setContextMenu={{@setContextMenu}}
+          />
+        {{else if (eq this.mode "edit")}}
+          <header class="item-edit__sticky-header">
+            <h1 class="item-edit__title" data-test-card-edit-title>{{@card.csTitle}}</h1>
+            <div class="card-renderer__controls card-renderer__controls--edit">
+              <LinkTo
+                @route="cards.card.view"
+                @model={{@card.canonicalURL}}
+                @class="card-renderer__controls-btn"
+                data-test-mode-indicator-link="edit"
+              >
+                Edit Mode {{svg-jar "x" width="10px" height="10px"}}
+              </LinkTo>
             </div>
+          </header>
+        {{/if}}
+      {{/if}}
+
+      <AnimatedContainer
+        class="card-renderer-isolated--animated-content"
+      >
+        {{#unless @suppressHeader}}
+          {{#if (and this.cardstackSession.isAuthenticated this.isViewMode)}}
+            <div class="card-renderer__controls" data-test-card-renderer-controls>
+              <LinkTo
+                @route="cards.card.view.edit"
+                @model={{@card.canonicalURL}}
+                @class="card-renderer__controls-btn"
+                data-test-mode-indicator-link="view"
+              >
+                Edit
+              </LinkTo>
+              <DropdownMenuButton @icon="gear" data-test-card-renderer-dropdown-menu>
+                <ul class="card-renderer__dropdown-menu-list">
+                  <li>
+                    <LinkTo @route="cards.card.configure.layout" @model={{@card.canonicalURL}} data-test-configure-option>Configure</LinkTo>
+                  </li>
+                </ul>
+              </DropdownMenuButton>
+            </div>
+          {{/if}}
+        {{/unless}}
+        <div
+          class="card-renderer-isolated--card-container
+          {{if (and this.cardstackSession.isAuthenticated @cardSelected) "selected"}}
+          "
+        >
+          <div>
+            <AnimatedContainer>
+              {{#animated-value this watch=this.animatedWatchFields use=@contentTransition group="content"}}
+                {{!-- This is the card boundary, please don't set any card specific classes any higher in the DOM than this. --}}
+                {{!-- If we need card specific styling above this level, then let's chat about it.                           --}}
+                <div class="isolated-card-boundary {{if this.isViewMode (concat (safe-css-string (if @card.canonicalURL @card.canonicalURL @card.adoptsFromURL)) "--isolated") }}">
+                  {{#unless @suppressHeader}}
+                    {{#if this.isViewMode}}
+                      <div class="isolated-card-label">{{humanize @card.csTitle}}</div>
+                    {{/if}}
+                  {{/unless}}
+                  {{#if @dropField}}
+                    <DropZone
+                      @card={{@card}}
+                      @dropField={{@dropField}}
+                      @position={{0}}
+                      @toggleStubField={{this.toggleStubField}}
+                    />
+                  {{/if}}
+                  <Scaffold
+                    @card={{@card}}
+                    @feature="isolated-layout"
+                    @fields={{this.fields}}
+                    @mode={{this.mode}}
+                    @setFieldName={{@setFieldName}}
+                    @setCardValue={{@setCardValue}}
+                    @setCardReference={{@setCardReference}}
+                    @removeField={{@removeField}}
+                    @toggleStubField={{this.toggleStubField}}
+                    @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+                    @setPosition={{@setPosition}}
+                    @selectField={{@selectField}}
+                    @selectedField={{@selectedField}}
+                    @selectedFieldName={{@selectedFieldName}}
+                    @dropField={{@dropField}}
+                    @loadedField={{perform this.loadedField}}
+                  />
+                </div>
+              {{/animated-value}}
+            </AnimatedContainer>
           </div>
-        {{/animated-value}}
+        </div>
       </AnimatedContainer>
     </AnimatedContainer>
   {{else if (eq @format "embedded")}}
@@ -120,6 +137,11 @@
           @model={{@card.canonicalURL}}
           aria-label={{@card.csTitle}}
         >
+          {{#unless @suppressHeader}}
+            <div class="card-renderer-embedded__label">
+              {{humanize @card.csTitle}}
+            </div>
+          {{/unless}}
           <Scaffold
             @card={{@card}}
             @fields={{this.fields}}

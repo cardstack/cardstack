@@ -48,7 +48,7 @@ module('Acceptance | card create', function(hooks) {
     await setCardName(card1Name);
     await showCardId();
 
-    assert.ok(/^\/cards\/.*\/edit\/fields\/schema?$/.test(currentURL()), 'URL is correct');
+    assert.ok(/^\/cards\/.*\/configure\/fields?$/.test(currentURL()), 'URL is correct');
 
     assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('Base Card');
     assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').doesNotExist();
@@ -62,7 +62,7 @@ module('Acceptance | card create', function(hooks) {
     await setCardName(card1Name);
     let cardId = getEncodedCardIdFromURL();
 
-    assert.ok(/^\/cards\/.*\/edit\/fields\/schema?$/.test(currentURL()), 'URL is correct');
+    assert.ok(/^\/cards\/.*\/configure\/fields?$/.test(currentURL()), 'URL is correct');
 
     assert.dom('.card-renderer-isolated--header-title').hasText('Millenial Puppies');
 
@@ -124,13 +124,11 @@ module('Acceptance | card create', function(hooks) {
     await click('[data-test-library-button]');
     await waitForLibraryServiceToIdle();
 
-    let cardCount = [...document.querySelectorAll(`[data-test-library-recent-card-link]`)].length;
-
     await click('[data-test-library-new-blank-card-btn]');
     await setCardName(card1Name);
     let cardId = getEncodedCardIdFromURL();
 
-    assert.ok(/^\/cards\/.*\/edit\/fields\/schema?$/.test(currentURL()), 'URL is correct');
+    assert.ok(/^\/cards\/.*\/configure\/fields?$/.test(currentURL()), 'URL is correct');
     assert.dom('.card-renderer-isolated--header-title').hasText('Millenial Puppies');
 
     await addField('title', 'string-field', true);
@@ -142,23 +140,12 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('.card-renderer-isolated--header-title').hasText('Millenial Puppies');
     assert.dom('[data-test-internal-card-id]').hasText(decodeURIComponent(cardId));
 
-    await click('[data-test-library-button]');
-    await waitForLibraryServiceToIdle();
+    await click('[data-test-mode-indicator]');
     await waitForCardLoad(decodeURIComponent(cardId));
-    assert.ok(currentURL().includes(`/cards/${cardId}/edit/fields/schema`));
-
-    assert.equal(
-      [...document.querySelectorAll(`[data-test-library-recent-card-link]`)].length,
-      cardCount + 1,
-      'a card was added to the library'
-    );
-    assert.equal(
-      [...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`)]
-        .map(i => i.getAttribute('data-test-card-renderer-embedded'))
-        .includes(decodeURIComponent(cardId)),
-      true,
-      'the newly created card appears in the library'
-    );
+    assert.equal(currentURL(), `/cards/${cardId}`);
+    assert
+      .dom(`[data-test-isolated-card="${decodeURIComponent(cardId)}"][data-test-isolated-card-mode="view"]`)
+      .exists();
   });
 
   test(`selecting a field`, async function(assert) {
@@ -232,7 +219,7 @@ module('Acceptance | card create', function(hooks) {
 
     await saveCard();
 
-    assert.ok(/^\/cards\/.*\/edit\/fields\/schema?$/.test(currentURL()), 'URL is correct');
+    assert.ok(/^\/cards\/.*\/configure\/fields?$/.test(currentURL()), 'URL is correct');
     let card1Id = getEncodedCardIdFromURL();
 
     await visit(`/cards/${card1Id}`);
@@ -240,12 +227,12 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-field="subtitle"] [data-test-string-field-viewer-label]').hasText('Subtitle');
     assert.dom('[data-test-field="title"]').doesNotExist();
 
-    await visit(`/cards/${card1Id}/edit/fields`);
+    await visit(`/cards/${card1Id}/edit`);
     await animationsSettled();
     assert.dom('[data-test-field="subtitle"] [data-test-edit-field-label]').hasText('Subtitle');
     assert.dom('[data-test-field="title"]').doesNotExist();
 
-    await visit(`/cards/${card1Id}/edit/fields/schema`);
+    await visit(`/cards/${card1Id}/configure/fields`);
     await animationsSettled();
     assert.dom('[data-test-field="subtitle"] [data-test-field-renderer-label]').hasText('Subtitle');
 

@@ -5,7 +5,6 @@ import Fixtures from '../helpers/fixtures';
 import {
   waitForCardLoad,
   waitForCatalogEntriesToLoad,
-  encodeColons,
   waitForTestsToEnd,
   waitForSchemaViewToLoad,
   waitForLibraryServiceToIdle,
@@ -65,16 +64,6 @@ const card1 = cardDocument()
     csCreated: '2020-01-01T10:00:00Z',
     name: 'Hassan Abdel-Rahman',
     email: 'hassan@nowhere.dog',
-  })
-  .adoptingFrom(template1);
-const card2 = cardDocument()
-  .withAttributes({
-    csRealm,
-    csId: 'van-gogh',
-    csTitle: 'Van Gogh',
-    csCreated: '2020-01-01T09:00:00Z',
-    name: 'Van Gogh',
-    email: 'vangogh@nowhere.dog',
   })
   .adoptingFrom(template1);
 const catalogCard1 = cardDocument()
@@ -151,13 +140,12 @@ const entry4 = cardDocument()
   .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'catalog-entry' });
 
 const scenario = new Fixtures({
-  create: [entry1, entry2, entry3, entry4, card1, card2, catalogCard1, catalogCard2, template1, template2],
+  create: [entry1, entry2, entry3, entry4, card1, catalogCard1, catalogCard2, template1, template2],
 });
 
 async function waitForLibraryLoad() {
   await waitForLibraryServiceToIdle();
   await waitForCatalogEntriesToLoad('[data-test-templates]');
-  await Promise.all([card1, card2].map(card => waitForCardLoad(card.canonicalURL)));
 }
 async function waitForFeaturedCardsLoad() {
   await waitForCatalogEntriesToLoad('[data-test-featured-cards]');
@@ -186,23 +174,6 @@ module('Acceptance | library', function(hooks) {
     assert.dom('[data-test-library]').exists();
 
     assert.deepEqual(
-      [
-        ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
-      ].map(i => i.getAttribute('data-test-card-renderer-embedded')),
-      [card1, card2].map(c => c.canonicalURL)
-    );
-
-    for (let card of [entry1, entry2, entry3, entry4, catalogCard1, catalogCard2, template1, template2]) {
-      assert.equal(
-        [...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`)]
-          .map(i => i.getAttribute('data-test-card-renderer-embedded'))
-          .includes(card.canonicalURL),
-        false,
-        'catalog card does not appear in recent cards'
-      );
-    }
-
-    assert.deepEqual(
       [...document.querySelectorAll(`[data-test-templates] [data-test-library-adopt-card-btn]`)].map(i =>
         i.getAttribute('data-test-library-adopt-card-btn')
       ),
@@ -223,16 +194,6 @@ module('Acceptance | library', function(hooks) {
         `[data-test-templates] [data-test-card-renderer-embedded="${template1.canonicalURL}"] [data-test-field="email"]`
       )
       .doesNotExist();
-    assert
-      .dom(
-        `[data-test-library-recent-card-link] > [data-test-card-renderer-embedded="${card1.canonicalURL}"] [data-test-field="name"] [data-test-string-field-viewer-value]`
-      )
-      .hasText('Hassan Abdel-Rahman');
-    assert
-      .dom(
-        `[data-test-library-recent-card-link] > [data-test-card-renderer-embedded="${card1.canonicalURL}"] [data-test-field="email"]`
-      )
-      .doesNotExist();
   });
 
   test('card embedded css is rendered for the cards in the library', async function(assert) {
@@ -241,9 +202,9 @@ module('Acceptance | library', function(hooks) {
     await waitForLibraryLoad();
 
     assert.ok(
-      find(
-        `[data-test-css-format="embedded"][data-test-css-cards="[${card1.canonicalURL},${card2.canonicalURL},${template1.canonicalURL}]"]`
-      ).innerText.includes('template1 css'),
+      find(`[data-test-css-format="embedded"][data-test-css-cards="[${template1.canonicalURL}]"]`).innerText.includes(
+        'template1 css'
+      ),
       'embedded card style is correct'
     );
     assert.ok(
@@ -305,99 +266,29 @@ module('Acceptance | library', function(hooks) {
 
     assert.equal(currentURL(), `/cards/${encodeURIComponent(card1.canonicalURL)}`);
     assert.dom('[data-test-library]').exists();
-    assert.deepEqual(
-      [
-        ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
-      ].map(i => i.getAttribute('data-test-card-renderer-embedded')),
-      [card1, card2].map(c => c.canonicalURL)
-    );
   });
 
   test('visit library from card edit', async function(assert) {
-    await visit(`/cards/${encodeURIComponent(card1.canonicalURL)}/edit/fields`);
+    await visit(`/cards/${encodeURIComponent(card1.canonicalURL)}/edit`);
     await waitForCardLoad();
 
     assert.dom('[data-test-library-button]').exists();
     await click('[data-test-library-button]');
     await waitForLibraryLoad();
 
-    assert.equal(currentURL(), `/cards/${encodeURIComponent(card1.canonicalURL)}/edit/fields`);
+    assert.equal(currentURL(), `/cards/${encodeURIComponent(card1.canonicalURL)}/edit`);
     assert.dom('[data-test-library]').exists();
-    assert.deepEqual(
-      [
-        ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
-      ].map(i => i.getAttribute('data-test-card-renderer-embedded')),
-      [card1, card2].map(c => c.canonicalURL)
-    );
   });
 
   test('visit library from card schema', async function(assert) {
-    await visit(`/cards/${encodeURIComponent(card1.canonicalURL)}/edit/fields/schema`);
+    await visit(`/cards/${encodeURIComponent(card1.canonicalURL)}/configure/fields`);
     await waitForSchemaViewToLoad();
 
     assert.dom('[data-test-library-button]').exists();
     await click('[data-test-library-button]');
     await waitForLibraryLoad();
 
-    assert.equal(currentURL(), `/cards/${encodeURIComponent(card1.canonicalURL)}/edit/fields/schema`);
+    assert.equal(currentURL(), `/cards/${encodeURIComponent(card1.canonicalURL)}/configure/fields`);
     assert.dom('[data-test-library]').exists();
-    assert.deepEqual(
-      [
-        ...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`),
-      ].map(i => i.getAttribute('data-test-card-renderer-embedded')),
-      [card1, card2].map(c => c.canonicalURL)
-    );
-  });
-
-  test(`isolating a card`, async function(assert) {
-    await visit(`/cards`);
-    await click('[data-test-library-button]');
-    await waitForLibraryLoad();
-
-    await click(`[data-test-library-recent-card-link="${card2.canonicalURL}"]`);
-    await waitForCardLoad();
-    assert.equal(encodeColons(currentURL()), `/cards/${encodeURIComponent(card2.canonicalURL)}`);
-
-    await percySnapshot(assert);
-  });
-
-  test(`can use library to view card from /cards route`, async function(assert) {
-    await visit(`/cards`);
-    await click('[data-test-library-button]');
-    await waitForLibraryLoad();
-
-    await click(`[data-test-library-recent-card-link="${card1.canonicalURL}"]`);
-    assert.dom('[data-test-library]').doesNotExist();
-    await waitForCardLoad();
-    assert.equal(encodeColons(currentURL()), `/cards/${encodeURIComponent(card1.canonicalURL)}`);
-    assert.dom(`[data-test-isolated-card="${card1.canonicalURL}"]`).exists();
-  });
-
-  test(`can use library to view card from a specific card view route`, async function(assert) {
-    await visit(`/cards/${encodeURIComponent(card1.canonicalURL)}`);
-    await waitForCardLoad();
-
-    await click('[data-test-library-button]');
-    await waitForLibraryLoad();
-
-    await click(`[data-test-library-recent-card-link="${card2.canonicalURL}"]`);
-    assert.dom('[data-test-library]').doesNotExist();
-    await waitForCardLoad();
-    assert.equal(encodeColons(currentURL()), `/cards/${encodeURIComponent(card2.canonicalURL)}`);
-    assert.dom(`[data-test-isolated-card="${card2.canonicalURL}"]`).exists();
-  });
-
-  test(`can use library to view current card`, async function(assert) {
-    await visit(`/cards/${encodeURIComponent(card1.canonicalURL)}`);
-    await waitForCardLoad();
-
-    await click('[data-test-library-button]');
-    await waitForLibraryLoad();
-
-    await click(`[data-test-library-recent-card-link="${card1.canonicalURL}"]`);
-    assert.dom('[data-test-library]').doesNotExist();
-    await waitForCardLoad();
-    assert.equal(encodeColons(currentURL()), `/cards/${encodeURIComponent(card1.canonicalURL)}`);
-    assert.dom(`[data-test-isolated-card="${card1.canonicalURL}"]`).exists();
   });
 });

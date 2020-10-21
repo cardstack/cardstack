@@ -1,9 +1,9 @@
 .cardhost-top-edge {
   height: var(--ch-top-edge-height);
-  margin: 0 var(--ch-spacing);
+  margin: 0 20px 0 30px;
   display: grid;
-  grid-template-columns: 130px 1fr 130px var(--ch-right-edge-panel-width);
-  grid-gap: var(--ch-spacing);
+  grid-template-columns: minmax(max-content, 300px) 1fr var(--ch-right-edge-panel-width);
+  grid-gap: 30px;
   justify-items: center;
   align-items: center;
   text-align: right;
@@ -11,20 +11,14 @@
   z-index: var(--ch-top-edge-z-index);
 }
 
-.cardhost-top-edge.themer {
-  right: 0;
-  left: 0;
-}
-
-.cardhost-top-edge.preview {
-  grid-template-columns: auto 1fr 40px;
-  justify-items: end;
-}
-
 .cardhost-top-edge--preview-button,
 .cardhost-top-edge--size-buttons {
-  z-index: var(--ch-actions-z-index);
   transition: transform var(--ch-transition-time) ease-in-out;
+}
+
+.cardhost-top-edge--size-buttons {
+  position: absolute;
+  right: 0;
 }
 
 .cardhost-top-edge--preview-button.hidden,
@@ -32,17 +26,37 @@
   transform: translateY(-200%);
 }
 
-.cardhost-top-edge--buttons {
+.cardhost-top-edge__controls {
+  position: relative;
   display: grid;
-  grid-template-columns: 1fr 40px;
+  grid-auto-flow: column;
   grid-gap: 20px;
-  z-index: var(--ch-actions-z-index);
   width: 100%;
-  justify-items: flex-end;
+  z-index: var(--ch-actions-z-index);
 }
 
-.cardhost-top-edge--buttons.schema-mode {
-  grid-column-end: -1;
+.cardhost-top-edge__controls--left {
+  justify-items: start;
+}
+
+.cardhost-top-edge__controls--center {
+  justify-items: center;
+}
+
+.cardhost-top-edge__controls-right {
+  justify-items: end;
+}
+
+
+/* Theme-specific styles */
+.cardhost-top-edge.themer {
+  right: 0;
+  left: 0;
+}
+
+.cardhost-top-edge.preview .cardhost-top-edge--size-buttons {
+  position: initial;
+  justify-self: right;
 }
 
 
@@ -87,12 +101,13 @@
   margin-right: 9px;
 }
 
-
-@media (max-width: 1036px) {
-  .cardhost-top-edge {
+@media (max-width: 1589px) {
+  .cardhost-top-edge.layout {
     grid-template-columns: auto 1fr var(--ch-right-edge-panel-width);
   }
+}
 
+@media (max-width: 1300px) {
   .cardhost-top-edge.fields .cardhost-top-edge--size-buttons,
   .cardhost-top-edge.layout .cardhost-top-edge--size-buttons {
     display: none;

@@ -27,13 +27,19 @@
 @import '/assets/components/loading.css';
 
 /* Boxel components */
+@import '/assets/components/dropdown-menu-button.css';
+@import '/assets/components/org-header.css';
 @import '/assets/components/isolated-collection.css';
 
 /* Cardhost styling for core package templates */
 @import '/assets/components/card-renderer.css';
+@import '/assets/components/breadcrumbs.css';
 @import '/assets/components/field-renderer.css';
 @import '/assets/components/schema-field-renderer.css';
 @import '/assets/components/drop-zone.css';
+
+/* Route template styles */
+@import '/assets/cards-route/collection.css';
 
 
 :root {
@@ -86,6 +92,7 @@
   --boxel-lsp-xs: 0.005em;
 
   --boxel-spacing: 20px;
+  --boxel-org-header-height: 130px;
   --boxel-border-color: #dedede;
   --boxel-border-color-dark: #000;
   --boxel-border: 1px solid var(--boxel-border-color);
@@ -215,6 +222,15 @@ a:hover {
 }
 
 /* Other */
+.sr-only {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 .field-creator--field-btn-wrapper {
   text-align: right;
 }

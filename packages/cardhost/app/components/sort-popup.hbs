@@ -1,0 +1,9 @@
+<DropdownMenuButton @icon="sort" @class="sort-popup {{@class}}">
+  <header>Sort by</header>
+  <ul>
+    {{#each @sortColumns as |column|}}
+      <SortPopup::Item @sort={{@sort}} @column={{column}} @direction="asc" @sortColumn={{@sortColumn}} @sortDirection={{@sortDirection}}/>
+      <SortPopup::Item @sort={{@sort}} @column={{column}} @direction="desc" @sortColumn={{@sortColumn}} @sortDirection={{@sortDirection}}/>
+    {{/each}}
+  </ul>
+</DropdownMenuButton>

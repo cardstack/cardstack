@@ -1,6 +1,9 @@
 <header class="themer-toolbar" data-test-themer-toolbar>
   <div class="themer-toolbar--controls-left">
-    <PreviewLinkButton @model={{@model.card}} data-test-themer-preview-button />
+    <PreviewLinkButton
+      @model={{@model.card.canonicalURL}}
+      @route="cards.card.configure.preview"
+      data-test-themer-preview-button />
     <CardSizeToggle />
   </div>
   <div class="themer-toolbar--controls-right">
@@ -15,10 +18,9 @@
       aria-label="Dock the CSS editor to the right"
       data-test-dock-right />
     <ModeIndicator
-      @card={{@model.card}}
-      @route="cards.card.edit.layout"
-      @mode="themer"
-      @linkTo="edit" />
+      @model={{@model.card.canonicalURL}}
+      @route="cards.card.configure.layout"
+      @mode="themer" />
     <EdgeActionsButton />
   </div>
 </header>

@@ -87,31 +87,31 @@ module('Acceptance | accessibility', function(hooks) {
   });
 
   test('basic a11y tests for edit fields', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/fields`);
+    await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
     await waitForCssTransitions();
     await a11yAudit();
     assert.ok(true, 'no a11y errors found for edit fields');
   });
 
-  test('basic a11y tests for layout view', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/layout`);
-    await waitForCardLoad();
-    await waitForCssTransitions();
-    await a11yAudit();
-    assert.ok(true, 'no a11y errors found for edit layout');
-  });
-
-  test('basic a11y tests for schema view', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/fields/schema`);
+  test('basic a11y tests for schema fields', async function(assert) {
+    await visit(`/cards/${cardPath}/configure/fields`);
     await waitForSchemaViewToLoad();
     await waitForCssTransitions();
     await a11yAudit();
-    assert.ok(true, 'no a11y errors found for schema');
+    assert.ok(true, 'no a11y errors found for schema fields');
+  });
+
+  test('basic a11y tests for layout view', async function(assert) {
+    await visit(`/cards/${cardPath}/configure/layout`);
+    await waitForCardLoad();
+    await waitForCssTransitions();
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found for layout');
   });
 
   test('basic a11y tests for themer (FIXME: monaco line numbers failing contrast tests)', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/layout/themer`);
+    await visit(`/cards/${cardPath}/configure/layout/themer`);
     await waitForThemerLoad();
     await waitForCssTransitions();
     await a11yAudit();

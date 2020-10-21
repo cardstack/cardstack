@@ -219,7 +219,7 @@ export async function createCards(args) {
     }
     await saveCard();
 
-    await visit(`/cards/${id}/edit/fields`);
+    await visit(`/cards/${id}/edit`);
     for (let [name, , , value] of args[id]) {
       if (value == null) {
         continue;

@@ -7,11 +7,12 @@ export default class CardModelRoute extends Route {
   @service cardstackSession!: CardstackSession;
 
   afterModel(model: Card, transition: any) {
-    let editMode = transition.targetName.match(/cards.card.edit/);
+    let editMode = transition.targetName.match(/cards.card.view.edit/);
+    let viewMode = transition.targetName.match(/cards.card.view/);
 
     // If the user is not logged in, redirect to card index.
-    if (!this.cardstackSession.isAuthenticated && editMode) {
-      this.transitionTo('cards.card', model);
+    if ((!this.cardstackSession.isAuthenticated && editMode) || (!this.cardstackSession.isAuthenticated && !viewMode)) {
+      this.transitionTo('cards.card.view', model);
     }
   }
 }

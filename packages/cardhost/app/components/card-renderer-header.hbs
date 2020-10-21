@@ -6,14 +6,6 @@
     <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.csTitle "Blank Card"}}</span>
     {{#if this.cardstackSession.isAuthenticated}}
       <div class="card-renderer--header-btns">
-        <LinkTo
-          @route={{@buttonRoute}}
-          @model={{@card.canonicalURL}}
-          @class="card-renderer--header-link"
-          data-test-card-header-button
-        >
-          {{@buttonText}}
-        </LinkTo>
         <button
           {{on "click" this.toggleMenu}}
           {{did-insert this.autosave.kickoff @card}}
@@ -56,13 +48,13 @@
           <LinkTo @route="cards.card.view" @model={{@card.canonicalURL}} @class={{if (eq @mode "view") "checked"}} data-test-context-view>View</LinkTo>
         </li>
         <li>
-          <LinkTo @route="cards.card.edit.fields" @model={{@card.canonicalURL}} @class={{if (eq @mode "edit") "checked"}} data-test-context-edit>Edit</LinkTo>
+          <LinkTo @route="cards.card.view.edit" @model={{@card.canonicalURL}} @class={{if (eq @mode "edit") "checked"}} data-test-context-edit>Edit</LinkTo>
         </li>
         <li>
-          <LinkTo @route="cards.card.edit.fields.schema" @model={{@card.canonicalURL}} @class={{if (eq @mode "schema") "checked"}} data-test-context-schema>Schema</LinkTo>
+          <LinkTo @route="cards.card.configure.fields" @model={{@card.canonicalURL}} @class={{if (eq @mode "schema") "checked"}} data-test-context-schema>Schema</LinkTo>
         </li>
         <li>
-          <LinkTo @route="cards.card.edit.layout" @model={{@card.canonicalURL}} @class={{if (eq @mode "layout") "checked"}} data-test-context-layout>Layout</LinkTo>
+          <LinkTo @route="cards.card.configure.layout" @model={{@card.canonicalURL}} @class={{if (eq @mode "layout") "checked"}} data-test-context-layout>Layout</LinkTo>
         </li>
         <li class="divider">
           <hr>

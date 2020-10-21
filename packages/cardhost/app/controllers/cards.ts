@@ -52,12 +52,12 @@ export default class CardsController extends Controller {
     return this.routeInfo.mode === 'themer' || this.routeInfo.mode === 'layout' || this.routeInfo.mode === 'preview';
   }
 
-  get hideTopEdge() {
+  get displayTopEdge() {
     return (
-      this.routeInfo.mode === 'cards' ||
-      this.routeInfo.mode === 'view' ||
-      this.routeInfo.mode === 'add' ||
-      this.routeInfo.mode === 'adopt'
+      this.routeInfo.mode === 'themer' ||
+      this.routeInfo.mode === 'fields' ||
+      this.routeInfo.mode === 'layout' ||
+      this.routeInfo.mode === 'preview'
     );
   }
 

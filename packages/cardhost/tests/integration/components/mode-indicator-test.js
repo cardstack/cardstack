@@ -18,11 +18,10 @@ module('Integration | Component | mode-indicator', function(hooks) {
     <ModeIndicator
       @card={{model}}
       @route="cards.card.view"
-      @mode="edit"
-      @linkTo="view" />
+      @mode="edit" />
     `);
 
-    assert.dom('[data-test-mode-indicator-link="view"]').exists();
+    assert.dom('[data-test-mode-indicator-link="edit"]').exists();
     assert.dom('[data-test-mode-indicator]').containsText('edit mode');
   });
 });

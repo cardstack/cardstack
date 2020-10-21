@@ -40,7 +40,7 @@
                       <div class="right-edge--items-container">
                         <div class="right-edge--item">
                           <LinkTo
-                            @route="cards.card.edit.fields.schema"
+                            @route="cards.card.configure.fields"
                             @class="right-edge--configure-schema-link cs-component-cta secondary responsive cs-dark-cta"
                             @model={{@card.canonicalURL}}
                             data-test-configure-schema-btn
@@ -53,7 +53,7 @@
                       <div class="right-edge--items-container">
                         <div class="right-edge--item">
                           <LinkTo
-                            @route="cards.card.edit.fields"
+                            @route="cards.card.view.edit"
                             @class="right-edge--configure-schema-link cs-component-cta secondary responsive cs-dark-cta"
                             @model={{@card.canonicalURL}}
                             data-test-return-to-editing

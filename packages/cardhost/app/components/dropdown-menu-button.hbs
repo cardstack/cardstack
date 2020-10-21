@@ -1,0 +1,15 @@
+<div class="dropdown-menu-button-container {{@class}}" ...attributes>
+  <BasicDropdown @this.verticalPosition="below" @renderInPlace={{true}} as |dd|>
+    {{#dd.trigger}}
+      <button class="dropdown-menu-button__trigger {{if @class (concat @class "--trigger")}}" aria-label={{@ariaLabel}}>
+        {{#if @icon}}
+          {{svg-jar @icon width="16px" height="16px"}}
+        {{/if}}
+        <div class="sr-only">Open dropdown menu</div>
+      </button>
+    {{/dd.trigger}}
+    {{#dd.content class=(concat "dropdown-menu-button__dropdown" (if @class (concat " " @class "--dropdown")))}}
+      {{yield}}
+    {{/dd.content}}
+  </BasicDropdown>
+</div>

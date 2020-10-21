@@ -13,14 +13,14 @@ Router.map(function() {
     this.route('add', { path: '/add' });
     this.route('card', { path: '/:id' }, function() {
       this.route('adopt');
-      this.route('view', { path: '' });
-      this.route('edit', function() {
+      this.route('view', { path: '' }, function() {
+        this.route('edit');
+      });
+      this.route('configure', function() {
         this.route('layout', function() {
           this.route('themer');
         });
-        this.route('fields', function() {
-          this.route('schema');
-        });
+        this.route('fields');
         this.route('preview');
       });
     });

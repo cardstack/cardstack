@@ -282,7 +282,7 @@ export default class CardManipulator extends Component {
 
   @action
   preview() {
-    this.router.transitionTo('cards.card.edit.layout', this.args.card.canonicalURL);
+    this.router.transitionTo('cards.card.configure.layout', this.args.card.canonicalURL);
   }
 
   @action

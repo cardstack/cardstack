@@ -74,7 +74,7 @@ export default class EditorPane extends Component {
   }
 
   getCardMarkup() {
-    let cardMarkup = document.querySelector('.card-renderer-isolated--card-container');
+    let cardMarkup = document.querySelector('.isolated-card-boundary');
 
     if (cardMarkup) {
       return cardMarkup.innerHTML

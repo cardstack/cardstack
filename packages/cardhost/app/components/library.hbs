@@ -10,12 +10,6 @@
   <nav class="library--nav" data-test-library-nav>
     <ul>
       <li>
-        <button {{on "click" (fn this.scrollToSection "recent-cards")}} class="library--nav-button {{if (eq this.selectedSection "recent-cards") "active"}}">
-          {{svg-jar "clock" width="15px" height="15px" aria-hidden="true"}}
-          Recent Cards
-        </button>
-      </li>
-      <li>
         <button {{on "click" (fn this.scrollToSection "saved-templates")}} class="library--nav-button {{if (eq this.selectedSection "saved-templates") "active"}}">
           {{svg-jar "saved" width="15px" height="15px" aria-hidden="true"}}
           Saved Templates
@@ -36,28 +30,6 @@
     </ul>
   </nav>
   <div class="library--main">
-    <section class="library-section library-section--recent-cards">
-      <header class="library-section--header">
-        {{svg-jar "clock" width="28px" height="28px"}}
-        Recent Cards
-      </header>
-      <div class="library-section--grid">
-        {{#each this.library.recentCards as |card|}}
-          <Cta {{on "click" (fn this.visitCard card)}}
-            class="library--card-link"
-            data-test-library-recent-card-link={{card.canonicalURL}}
-          >
-            <CardRenderer
-              @class="library--card-renderer"
-              @card={{card}}
-              @format="embedded"
-              @preventIsolation={{true}}
-              @showName={{true}} />
-          </Cta>
-        {{/each}}
-      </div>
-    </section>
-
     <section class="library-section library-section--saved-templates">
       <header class="library-section--header">
         {{svg-jar "saved" width="28px" height="28px"}}

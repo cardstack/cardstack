@@ -2,16 +2,11 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
-import move from 'ember-animated/motions/move';
-import resize from 'ember-animated/motions/resize';
-import adjustCSS from 'ember-animated/motions/adjust-css';
 import { task, waitForProperty, timeout } from 'ember-concurrency';
 import { scheduleOnce } from '@ember/runloop';
 import difference from 'lodash/difference';
 import isEqual from 'lodash/isEqual';
 import { set } from '@ember/object';
-import { easeInAndOut } from 'ember-animated/easings/cosine';
-import { parallel } from 'ember-animated';
 import ENV from '@cardstack/cardhost/config/environment';
 import { reads } from '@ember/object/computed';
 
@@ -28,6 +23,8 @@ export default class CardRenderer extends Component {
   @tracked previousFieldNames;
   @tracked fields;
   @tracked mode;
+  @tracked isEditMode = this.mode === 'edit';
+  @tracked isViewMode = this.mode === 'view' || this.mode === 'layout';
   @tracked css;
   @tracked fieldsToRemove = new Map();
   @tracked cardFocused = () => {};
@@ -80,15 +77,12 @@ export default class CardRenderer extends Component {
     this.loadedFields = [];
 
     let tasks = [this.getFields.perform()];
-    if (!this.args.suppressCss && (this.mode === 'view' || this.mode === 'layout')) {
+    if (!this.args.suppressCss && (this.mode === 'view' || this.mode === 'layout' || this.mode === 'edit')) {
       tasks.push(this.args.card.loadFeature(`${this.args.format}-css`));
     }
 
     let [actualFields, css] = yield Promise.all(tasks);
-    if (
-      !this.args.suppressCss &&
-      !(this.args.format === 'isolated' && (this.mode === 'schema' || this.mode === 'edit'))
-    ) {
+    if (!this.args.suppressCss && !(this.args.format === 'isolated' && this.mode === 'schema')) {
       this.css = css;
       this.cssService.addCard(this.args.card, this.args.format, css);
     } else {
@@ -203,6 +197,9 @@ export default class CardRenderer extends Component {
 
   @action
   removeCardCss() {
+    if (!this.isViewMode) {
+      return;
+    }
     this.cssService.removeCard(this.args.card, this.args.format);
   }
 
@@ -231,36 +228,5 @@ export default class CardRenderer extends Component {
     if (this.args.setIsSelected) {
       this.args.setIsSelected(value);
     }
-  }
-
-  *headerAnimation({ keptSprites, receivedSprites }) {
-    keptSprites.forEach(sprite => {
-      parallel(move(sprite, { easing: easeInAndOut, duration }), resize(sprite, { easing: easeInAndOut, duration }));
-    });
-
-    if (receivedSprites.length) {
-      receivedSprites.forEach(sprite => {
-        sprite.applyStyles({ 'z-index': '1', 'background-color': 'transparent' });
-        parallel(move(sprite, { easing: easeInAndOut, duration }), resize(sprite, { easing: easeInAndOut, duration }));
-      });
-    }
-  }
-
-  *cardTransition({ keptSprites, receivedSprites }) {
-    if (receivedSprites.length) {
-      receivedSprites.forEach(sprite => {
-        sprite.applyStyles({ 'z-index': '16' });
-        parallel(move(sprite, { easing: easeInAndOut, duration }), resize(sprite, { easing: easeInAndOut, duration }));
-        adjustCSS('border-top-right-radius', sprite, { duration });
-        adjustCSS('border-top-left-radius', sprite, { duration });
-      });
-    }
-
-    keptSprites.forEach(sprite => {
-      sprite.applyStyles({ 'z-index': '16' });
-      parallel(move(sprite, { easing: easeInAndOut, duration }), resize(sprite, { easing: easeInAndOut, duration }));
-      adjustCSS('border-top-right-radius', sprite, { duration });
-      adjustCSS('border-top-left-radius', sprite, { duration });
-    });
   }
 }

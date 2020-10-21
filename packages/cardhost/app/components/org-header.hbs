@@ -1,0 +1,19 @@
+<header class="org-header org-header--sm org-header--{{@id}}" data-test-org-header>
+  <div class="org-header__title-row">
+    <h1 class="org-header__title">
+      {{! template-lint-disable no-inline-styles }}
+      <span class="org-header__logo org-header__logo--{{@id}}" style={{if @logoURL (css-url "background-image" @logoURL)}} />
+      <span>{{@title}}</span>
+    </h1>
+    <label>
+      <div class="sr-only">Search</div>
+      <input class="org-header__search-bar" type="search" placeholder="Search">
+    </label>
+  </div>
+
+  {{#if @displayNavbar}}
+    <ul class="org-header__nav">
+      {{yield}}
+    </ul>
+  {{/if}}
+</header>

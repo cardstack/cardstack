@@ -7,14 +7,14 @@ import RouterService from '@ember/routing/router-service';
 import { CardstackSession } from '../../../../../services/cardstack-session';
 import { isolatedCssFile } from '../../../../../utils/scaffolding';
 import { Model } from '../../../../../routes/cards/card';
-import EditCardController from '../../edit';
+import ConfigureCardController from '../../configure';
 import { Card } from '@cardstack/hub';
 
 export interface ThemeOption {
   name: string;
 }
 
-export default class CardLayoutIndexController extends EditCardController {
+export default class CardLayoutIndexController extends ConfigureCardController {
   @service autosave!: {
     saveCard: any; // this is actually a task which is really hard to describe in TS
     cardUpdated: (card: Card, isDirty: boolean) => void;
@@ -33,7 +33,7 @@ export default class CardLayoutIndexController extends EditCardController {
 
   @action
   createTheme() {
-    this.router.transitionTo('cards.card.edit.layout.themer', this.model);
+    this.router.transitionTo('cards.card.configure.layout.themer', this.model);
   }
 
   get selectedTheme(): ThemeOption {

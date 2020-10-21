@@ -1,1 +1,34 @@
-<CardViewer @card={{this.model.card}} @mode="view" />
+{{!-- TODO: Do not hardcode header data --}}
+{{#if this.isVerifiRealm}}
+  <OrgHeader
+    @id="bunny-records"
+    @title="Bunny Records"
+    @logoURL="/assets/images/orgs/bunny-logo.svg"
+    @displayNavbar={{true}}
+  >
+    <li>
+      <LinkTo @route="cards.collection">
+        Masters
+      </LinkTo>
+    </li>
+  </OrgHeader>
+{{/if}}
+
+<section class="card-renderer--container card-renderer--container--{{if this.isVerifiRealm "with-breadcrumbs" "without-breadcrumbs"}}"
+  data-test-card-view={{this.model.card.canonicalURL}}
+>
+  <div class="card-renderer--inner-container view-container">
+    {{#if this.isVerifiRealm}}
+      <Breadcrumbs>
+        <LinkTo @route="cards.collection" @class="breadcrumbs__item">
+          <div class="breadcrumbs__item-label">Collection</div>
+          <div class="breadcrumbs__item-title">Master Recordings</div>
+        </LinkTo>
+      </Breadcrumbs>
+    {{/if}}
+
+    <CardViewer @card={{this.model.card}} @mode="view" />
+  </div>
+</section>
+
+{{outlet}}

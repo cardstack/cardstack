@@ -14,4 +14,18 @@ export default class RouteInfoService extends Service {
 
     return routeSegements[routeSegements.length - 1];
   }
+
+  get currentCard() {
+    let card;
+    let route = this.router.currentRoute as any;
+    while (route) {
+      card = route.attributes && route.attributes.card;
+      if (!card) {
+        route = route.parent;
+      } else {
+        break;
+      }
+    }
+    return card;
+  }
 }

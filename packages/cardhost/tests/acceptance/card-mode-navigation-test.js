@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { visit, currentURL, click, triggerEvent, waitFor } from '@ember/test-helpers';
+import { visit, currentURL, click } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
 import { login } from '../helpers/login';
@@ -31,48 +31,44 @@ module('Acceptance | card mode navigation', function(hooks) {
   });
 
   test('can use the context menu to switch modes', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/fields`);
-    await waitForCardLoad();
+    await visit(`/cards/${cardPath}/configure/fields`);
+    await waitForSchemaViewToLoad();
     await animationsSettled();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/fields`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/fields`);
     await click('[data-test-context-menu-button]');
-    assert.dom('[data-test-context-menu-items] .checked').hasText('Edit');
+    assert.dom('[data-test-context-menu-items] .checked').hasText('Schema');
     await percySnapshot(assert);
 
     // schema
     await click('[data-test-context-schema]');
-    await waitForSchemaViewToLoad();
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/fields/schema`);
-    await click('[data-test-context-menu-button]');
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/fields`);
     assert.dom('[data-test-context-menu-items] .checked').hasText('Schema');
 
     // layout
     await click('[data-test-context-layout]');
     await waitForCardLoad();
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/layout`);
-    await click('[data-test-context-menu-button]');
-    assert.dom('[data-test-context-menu-items] .checked').hasText('Layout');
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/layout`);
+    // await click('[data-test-context-menu-button]');
+    // assert.dom('[data-test-context-menu-items] .checked').hasText('Layout');
 
     // edit
+    await visit(`/cards/${cardPath}/configure/fields`);
+    await click('[data-test-context-menu-button]');
     await click('[data-test-context-edit]');
     await waitForCardLoad();
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit/fields`);
-    await click('[data-test-context-menu-button]');
-    assert.dom('[data-test-context-menu-items] .checked').hasText('Edit');
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit`);
 
     // view
+    await visit(`/cards/${cardPath}/configure/fields`);
+    await click('[data-test-context-menu-button]');
     await click('[data-test-context-view]');
     await waitForCardLoad();
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
-    await triggerEvent('[data-test-card-renderer]', 'mouseenter');
-    await waitFor('[data-test-context-menu-button]');
-    await click('[data-test-context-menu-button]');
-    assert.dom('[data-test-context-menu-items] .checked').hasText('View');
   });
 
   test('clicking outside the context menu closes it', async function(assert) {
-    await visit(`/cards/${cardPath}/edit/fields`);
+    await visit(`/cards/${cardPath}/configure/fields`);
     await waitForCardLoad();
 
     await click('[data-test-context-menu-button]');
