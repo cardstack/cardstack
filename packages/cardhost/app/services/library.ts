@@ -4,15 +4,10 @@ import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 //@ts-ignore
 import { task } from 'ember-concurrency';
-import { getUserRealm } from '../utils/scaffolding';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 import DataService from './data';
 import CardLocalStorageService from './card-local-storage';
 import { AddressableCard } from '@cardstack/hub';
-//@ts-ignore
-import ENV from '@cardstack/cardhost/config/environment';
-
-const { deviceCardsOnly } = ENV;
 
 const catalogEntry = Object.freeze({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'catalog-entry' });
 const cardCatalogRealm = 'https://cardstack.com/api/realms/card-catalog';
@@ -28,49 +23,8 @@ export default class LibraryService extends Service {
   @tracked templateEntries: AddressableCard[] = [];
   @tracked featuredEntries: AddressableCard[] = [];
 
-  constructor(...args: any[]) {
-    super(...args);
-
-    this.load.perform();
-  }
-
   @task(function*(this: LibraryService) {
-    if (deviceCardsOnly) {
-      // only show recent cards from this device, as identified by a string in local storage
-      return yield this.data.search(
-        {
-          filter: {
-            type: { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' },
-            eq: {
-              csCreatedBy: this.cardLocalStorage.getDevice(),
-            },
-          },
-          sort: '-csCreated',
-          page: { size },
-        },
-        { includeFieldSet: 'embedded' }
-      );
-    } else {
-      return yield this.data.search(
-        {
-          filter: {
-            type: { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' },
-            eq: {
-              csRealm: getUserRealm(),
-            },
-          },
-          sort: '-csCreated',
-          page: { size },
-        },
-        { includeFieldSet: 'embedded' }
-      );
-    }
-  })
-  loadUserRealm: any; //TS and EC don't play nice;
-
-  @task(function*(this: LibraryService) {
-    let [recentCards, templateEntries, featuredEntries] = yield Promise.all([
-      this.loadUserRealm.perform(),
+    let [templateEntries, featuredEntries] = yield Promise.all([
       this.data.search(
         {
           filter: {
@@ -106,7 +60,6 @@ export default class LibraryService extends Service {
         { includeFieldSet: 'isolated' }
       ),
     ]);
-    this.recentCards = recentCards;
     this.templateEntries = templateEntries;
     this.featuredEntries = featuredEntries;
   })

@@ -123,30 +123,17 @@ module('Acceptance | card adoption', function(hooks) {
     await waitForLibraryServiceToIdle();
     await waitForCardLoad(parentCard.canonicalURL);
 
-    let cardCount = [...document.querySelectorAll(`[data-test-library-recent-card-link]`)].length;
-
     await click('[data-test-library-adopt-card-btn]');
     await setCardName(childName);
     let childId = getEncodedCardIdFromURL();
     assert.ok(/^\/cards\/.*\/edit?$/.test(currentURL()), 'URL is correct');
 
-    await click('[data-test-library-button]');
-    await waitForLibraryServiceToIdle();
+    await click('[data-test-mode-indicator-link="edit"]');
     await waitForCardLoad(decodeURIComponent(childId));
-    assert.ok(currentURL().includes(`/cards/${childId}/edit`));
-
-    assert.equal(
-      [...document.querySelectorAll(`[data-test-library-recent-card-link]`)].length,
-      cardCount + 1,
-      'a card was added to the library'
-    );
-    assert.equal(
-      [...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`)]
-        .map(i => i.getAttribute('data-test-card-renderer-embedded'))
-        .includes(decodeURIComponent(childId)),
-      true,
-      'the newly created card appears in the library'
-    );
+    assert.equal(currentURL(), `/cards/${childId}`);
+    assert
+      .dom(`[data-test-isolated-card="${decodeURIComponent(childId)}"][data-test-isolated-card-mode="view"]`)
+      .exists();
   });
 
   test('it displays the adopted card in the right edge', async function(assert) {

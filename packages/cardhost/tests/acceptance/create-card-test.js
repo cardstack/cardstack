@@ -124,8 +124,6 @@ module('Acceptance | card create', function(hooks) {
     await click('[data-test-library-button]');
     await waitForLibraryServiceToIdle();
 
-    let cardCount = [...document.querySelectorAll(`[data-test-library-recent-card-link]`)].length;
-
     await click('[data-test-library-new-blank-card-btn]');
     await setCardName(card1Name);
     let cardId = getEncodedCardIdFromURL();
@@ -142,23 +140,12 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('.card-renderer-isolated--header-title').hasText('Millenial Puppies');
     assert.dom('[data-test-internal-card-id]').hasText(decodeURIComponent(cardId));
 
-    await click('[data-test-library-button]');
-    await waitForLibraryServiceToIdle();
+    await click('[data-test-mode-indicator]');
     await waitForCardLoad(decodeURIComponent(cardId));
-    assert.ok(currentURL().includes(`/cards/${cardId}/configure/fields`));
-
-    assert.equal(
-      [...document.querySelectorAll(`[data-test-library-recent-card-link]`)].length,
-      cardCount + 1,
-      'a card was added to the library'
-    );
-    assert.equal(
-      [...document.querySelectorAll(`[data-test-library-recent-card-link] > [data-test-card-renderer-embedded]`)]
-        .map(i => i.getAttribute('data-test-card-renderer-embedded'))
-        .includes(decodeURIComponent(cardId)),
-      true,
-      'the newly created card appears in the library'
-    );
+    assert.equal(currentURL(), `/cards/${cardId}`);
+    assert
+      .dom(`[data-test-isolated-card="${decodeURIComponent(cardId)}"][data-test-isolated-card-mode="view"]`)
+      .exists();
   });
 
   test(`selecting a field`, async function(assert) {

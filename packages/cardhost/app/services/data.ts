@@ -25,7 +25,6 @@ const cache: Map<string, Promise<AddressableCard>> = new Map();
 
 export default class DataService extends Service implements CardInstantiator {
   @service cardstackSession!: CardstackSession;
-  @service library!: { loadUserRealm: any }; // This is actually an EC task which is really hard to type in TS
   private memoizeCache: { [functionName: string]: any } = {};
 
   get hubURL(): string {
@@ -72,7 +71,6 @@ export default class DataService extends Service implements CardInstantiator {
 
     // don't block on this as part of saving (but that means make sure to not
     // leak async in the tests)...
-    this.library.loadUserRealm.perform();
     return await this.instantiate(json);
   }
 
