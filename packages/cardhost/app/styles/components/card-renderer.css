@@ -36,12 +36,6 @@
   overflow-y: auto;
 }
 
-.card-renderer-isolated.layout .card-renderer__controls,
-.card-renderer-isolated.preview .card-renderer__controls,
-.card-renderer-isolated.themer .card-renderer__controls {
-  display: none;
-}
-
 .isolated-card-label {
   position: absolute;
   top: 15px;

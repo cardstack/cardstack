@@ -35,6 +35,10 @@
   overflow-y: auto;
 }
 
+.card-renderer--container--without-breadcrumbs {
+  padding-top: 30px;
+}
+
 .card-renderer--inner-container {
   transition: padding-right var(--ch-transition-time),
               padding-left var(--ch-transition-time);
@@ -74,10 +78,6 @@
 .cardhost-cards.preview .card-renderer--container,
 .cardhost-cards.themer .card-renderer--container {
   height: calc(100% - var(--ch-top-edge-height));
-}
-
-.cardhost-cards.view .card-renderer--container--without-breadcrumbs {
-  padding-top: 30px;
 }
 
 .cardhost-cards.fields .card-renderer--inner-container {
