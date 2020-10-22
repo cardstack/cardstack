@@ -136,7 +136,6 @@ body,
 }
 
 body {
-  position: fixed; /* This is needed to prevent background scroll when bottom-edge is open */
   width: 100%;
   margin: 0;
   background-color: var(--ch-default);

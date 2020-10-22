@@ -5,6 +5,7 @@
   --themer-bg: var(--ch-foreground);
   --preview-bg: var(--ch-foreground);
 
+  position: fixed; /* This is needed to prevent background scroll when a modal or bottom-edge is open */
   width: 100%;
   height: 100%;
   margin: 0;
