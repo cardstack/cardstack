@@ -86,6 +86,7 @@
 }
 
 .cardhost-cards.layout .card-renderer--inner-container {
+  height: 100%;
   padding-right: var(--ch-right-edge-width);
   padding-left: 160px;
 }
