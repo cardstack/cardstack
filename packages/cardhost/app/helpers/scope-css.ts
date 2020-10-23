@@ -11,7 +11,16 @@ function scopeCss(css: string, cardOrCards: AddressableCard | AddressableCard[],
   }
 
   if (Array.isArray(cardOrCards)) {
-    let prefixes = uniq(cardOrCards.map(card => `.${safeCssString(card.canonicalURL)}--${format}`));
+    let prefixes;
+    if (format === 'embedded') {
+      // increasing the specificity of the embedded card
+      // note: isolated card styles are leaking inside its embedded cards...
+      prefixes = uniq(
+        cardOrCards.map(card => `.card-renderer-embedded.${safeCssString(card.canonicalURL)}--${format}`)
+      );
+    } else {
+      prefixes = uniq(cardOrCards.map(card => `.${safeCssString(card.canonicalURL)}--${format}`));
+    }
     return scope.replace(css, `${prefixes.map(p => `${p} $1`).join(', ')}$2`);
   }
 
