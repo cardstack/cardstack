@@ -62,6 +62,11 @@
   --bg-color: var(--preview-bg);
 }
 
+.cardhost-cards.add,
+.cardhost-cards.adopt {
+  --bg-color: var(--schema-bg);
+}
+
 .cardhost-cards.layout,
 .cardhost-cards.fields {
   --bg-color: var(--schema-bg);

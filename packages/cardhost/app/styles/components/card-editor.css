@@ -1,1 +1,17 @@
+.card-editor__container {
+  position: fixed;
+  top: 30px;
+  height: calc(100% - 30px);
+  max-width: 945px;
+}
 
+.card-editor__container .card-renderer-isolated.edit {
+  height: 100%;
+  padding: 0;
+}
+
+.card-editor__container .card-renderer-isolated.edit .card-renderer-isolated--animated-content {
+  height: calc(100% - 80px);
+  padding-bottom: 30px;
+  overflow: auto;
+}

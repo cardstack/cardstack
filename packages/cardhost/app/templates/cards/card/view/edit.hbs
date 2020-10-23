@@ -1,7 +1,5 @@
 {{to-elsewhere
   named="cardhost-modal"
-  send=(component
-          "card-editor"
-          card=this.model.card
-        )
+  send=(component "card-editor" card=this.model.card)
+  outsideParams=(hash outsideClick=this.closeDialog)
 }}

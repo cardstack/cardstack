@@ -24,6 +24,7 @@
 @import '/assets/components/themer.css';
 @import '/assets/components/dialog.css';
 @import '/assets/components/card-renderer-header.css';
+@import '/assets/components/card-editor.css';
 @import '/assets/components/loading.css';
 
 /* Boxel components */

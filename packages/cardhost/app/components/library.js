@@ -14,12 +14,6 @@ export default class Library extends Component {
   @tracked dialogTitle;
   @tracked showDialog;
 
-  constructor(...args) {
-    super(...args);
-
-    this.library.load.perform();
-  }
-
   @action
   visitCard(card) {
     this.library.hide();

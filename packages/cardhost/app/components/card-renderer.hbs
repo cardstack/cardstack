@@ -21,20 +21,6 @@
             @contextMenuOpen={{@contextMenuOpen}}
             @setContextMenu={{@setContextMenu}}
           />
-        {{else if (eq this.mode "edit")}}
-          <header class="item-edit__sticky-header">
-            <h1 class="item-edit__title" data-test-card-edit-title>{{@card.csTitle}}</h1>
-            <div class="card-renderer__controls card-renderer__controls--edit">
-              <LinkTo
-                @route="cards.card.view"
-                @model={{@card.canonicalURL}}
-                @class="card-renderer__controls-btn"
-                data-test-mode-indicator-link="edit"
-              >
-                Edit Mode {{svg-jar "x" width="10px" height="10px"}}
-              </LinkTo>
-            </div>
-          </header>
         {{/if}}
       {{/if}}
 
