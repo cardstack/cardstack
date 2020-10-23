@@ -101,10 +101,6 @@
   padding-left: 0;
 }
 
-.card-renderer--inner-container.edit-container {
-  padding-top: 30px;
-}
-
 
 @media (min-width: 1590px) {
   .cardhost-cards.layout .card-renderer--inner-container {

@@ -12,31 +12,35 @@
   data-test-card-edit={{@card.canonicalURL}}
   data-test-card-patched={{stringify this.patchCard.isIdle}}
 >
-  <header class="item-edit__sticky-header">
-    <h1 class="item-edit__title" data-test-card-edit-title>{{@card.csTitle}}</h1>
-    <div class="card-renderer__controls card-renderer__controls--edit">
+  <header class="card-editor__sticky-header">
+    <h1 class="card-editor__title" data-test-card-edit-title>{{@card.csTitle}}</h1>
+    <div class="card-editor__controls">
       <LinkTo
         @route="cards.card.view"
         @model={{@card.canonicalURL}}
-        @class="card-renderer__controls-btn"
+        @class="card-editor__controls-btn"
         data-test-mode-indicator-link="edit"
       >
         Edit Mode {{svg-jar "x" width="10px" height="10px"}}
       </LinkTo>
     </div>
   </header>
-  <CardRenderer
-    @card={{this.originalCard}}
-    @mode="edit"
-    @setCardValue={{this.setCardValue}}
-    @setCardReference={{this.setCardReference}}
-    @format="isolated"
-    @selectField={{perform this.selectField}}
-    @selectedField={{this.selectedField}}
-    @selectedFieldName={{this.selectedFieldName}}
-    @cardSelected={{true}}
-    @contentTransition={{this.contentTransition}}
-  />
+  <div class="card-editor__scroll-container">
+    <div class="card-editor__inner-container">
+      <CardRenderer
+        @card={{this.originalCard}}
+        @mode="edit"
+        @setCardValue={{this.setCardValue}}
+        @setCardReference={{this.setCardReference}}
+        @format="isolated"
+        @selectField={{perform this.selectField}}
+        @selectedField={{this.selectedField}}
+        @selectedFieldName={{this.selectedFieldName}}
+        @cardSelected={{true}}
+        @contentTransition={{this.contentTransition}}
+      />
+    </div>
+  </div>
 
   {{!-- This is hidden, used in tests --}}
   <section class="cardhost-card-document">

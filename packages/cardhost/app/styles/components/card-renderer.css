@@ -22,6 +22,10 @@
   max-width: var(--card-renderer-width);
 }
 
+.card-renderer-isolated.edit {
+  padding: 0;
+}
+
 .card-renderer-isolated.view,
 .card-renderer-isolated.themer {
   margin: 0;
@@ -85,30 +89,6 @@
 }
 
 
-/* Edit mode header */
-.item-edit__sticky-header {
-  position: sticky;
-  top: 0;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 5px 20px;
-  padding: 20px 30px 20px 40px;
-  background-color: white;
-  border-bottom: 1px solid #D1D1D1;
-  border-radius: 10px 10px 0 0;
-  min-width: 415px;
-}
-
-.item-edit__title {
-  margin: 0;
-  color: #393642;
-  font: var(--boxel-font-med);
-  font-weight: bold;
-  letter-spacing: 0;
-}
-
-
 /* Control buttons */
 .card-renderer__controls {
   position: absolute;
@@ -120,15 +100,6 @@
   border-top-right-radius: var(--boxel-border-radius);
   border-bottom-left-radius: var(--boxel-border-radius);
   z-index: 1;
-}
-
-.card-renderer__controls--edit {
-  position: initial;
-  border-radius: 100px;
-}
-
-.card-renderer__controls--edit > .card-renderer__controls-btn > svg {
-  margin-left: 20px;
 }
 
 .card-renderer__controls-btn {
