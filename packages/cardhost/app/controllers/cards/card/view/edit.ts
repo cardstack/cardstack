@@ -1,2 +1,9 @@
 import ViewCardController from '../view';
-export default class EditCardController extends ViewCardController {}
+import { action } from '@ember/object';
+
+export default class EditCardController extends ViewCardController {
+  @action
+  closeDialog() {
+    this.transitionToRoute('cards.card.view', this.model.card.canonicalURL);
+  }
+}

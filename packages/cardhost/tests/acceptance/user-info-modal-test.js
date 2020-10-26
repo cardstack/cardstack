@@ -6,35 +6,23 @@ import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import {
   waitForTestsToEnd,
-  waitForCatalogEntriesToLoad,
   waitForCardLoad,
   encodeColons,
   waitForSchemaViewToLoad,
   waitForThemerLoad,
 } from '../helpers/card-ui-helpers';
-import { cardDocument, CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
+import { cardDocument } from '@cardstack/hub';
 
-const csRealm = 'https://cardstack.com/api/realms/card-catalog';
+const csRealm = 'http://localhost:3000/api/realms/default';
 const testCard = cardDocument().withAutoAttributes({
   csRealm,
-  csId: 'millenial-puppies',
+  csId: 'entry',
+  csTitle: 'Master Recording',
   title: 'The Millenial Puppy',
 });
-const entry = cardDocument()
-  .withAttributes({
-    csRealm,
-    csId: 'entry',
-    csTitle: 'The Millenial Puppy',
-    type: 'featured',
-  })
-  .withRelationships({ card: testCard })
-  .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'catalog-entry' });
 const cardPath = encodeURIComponent(testCard.canonicalURL);
 const scenario = new Fixtures({
-  create: [testCard, entry],
-  destroy: {
-    cardTypes: [{ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }],
-  },
+  create: [testCard],
 });
 
 module('Acceptance | user info modal', function(hooks) {
@@ -53,7 +41,7 @@ module('Acceptance | user info modal', function(hooks) {
 
   test('it appears on page load', async function(assert) {
     await visit('/');
-    assert.equal(currentURL(), '/cards');
+    assert.equal(currentURL(), '/cards/collection');
     assert.dom('[data-test-user-info-modal]').exists();
     assert.dom('[data-test-dialog-title]').hasText('Important Notice');
     assert.dom('[data-test-dialog-content]').hasAnyText();
@@ -121,16 +109,16 @@ module('Acceptance | user info modal', function(hooks) {
 
     await click('[data-test-mode-indicator]');
     await click('[data-test-home-link]');
-    assert.equal(encodeColons(currentURL()), `/cards?confirmed=true`);
+    assert.equal(encodeColons(currentURL()), `/cards/collection?confirmed=true`);
 
-    await waitForCatalogEntriesToLoad();
-    await click(`[data-test-featured-card]`);
+    await waitForCardLoad(testCard.canonicalURL);
+    await click(`[data-test-card-renderer="${testCard.canonicalURL}"] a`);
 
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}?confirmed=true`);
     assert.dom('[data-test-user-info-modal]').doesNotExist('modal is hidden in view mode');
 
-    await waitForCardLoad();
     await click(`[data-test-mode-indicator-link="view"]`);
+    await waitForCardLoad();
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit?confirmed=true`);
     assert.dom('[data-test-user-info-modal]').doesNotExist('modal is hidden in edit mode');
   });

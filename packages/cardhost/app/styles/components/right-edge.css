@@ -145,6 +145,8 @@
 
 .right-edge--item {
   padding-bottom: 16px;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .right-edge--item .field .cs-input-group {

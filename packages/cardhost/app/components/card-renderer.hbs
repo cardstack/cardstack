@@ -1,19 +1,13 @@
 {{#if @card}}
   {{#if (eq @format "isolated")}}
     <AnimatedContainer
-      class="card-renderer-isolated
-        {{this.mode}}
-        {{if (and this.cardstackSession.isAuthenticated @cardSelected) "selected"}}
-        {{concat "field-count-" this.fields.length}}
-        {{@class}}
-      "
+      class="card-renderer-isolated {{this.mode}} {{if @cardSelected " selected"}} {{concat " field-count-" this.fields.length}} {{@class}}"
       tabindex="0"
       data-test-card-renderer-mode={{this.mode}}
       data-test-card-renderer-isolated={{@card.canonicalURL}}
       data-test-card-renderer={{@card.canonicalURL}}
       data-test-card-loaded={{stringify this.loadCard.isIdle}}
       {{on "focus" (action this.cardIsFocused true)}}
-      {{on "mouseenter" (action this.setIsSelected true)}} {{on "mouseleave" (action this.setIsSelected false)}}
       {{did-insert this.focusCard true}}
       {{did-update this.cardUpdated @card @suppressCss @mode}}
       {{will-destroy this.removeCardCss}}
@@ -27,20 +21,6 @@
             @contextMenuOpen={{@contextMenuOpen}}
             @setContextMenu={{@setContextMenu}}
           />
-        {{else if (eq this.mode "edit")}}
-          <header class="item-edit__sticky-header">
-            <h1 class="item-edit__title" data-test-card-edit-title>{{@card.csTitle}}</h1>
-            <div class="card-renderer__controls card-renderer__controls--edit">
-              <LinkTo
-                @route="cards.card.view"
-                @model={{@card.canonicalURL}}
-                @class="card-renderer__controls-btn"
-                data-test-mode-indicator-link="edit"
-              >
-                Edit Mode {{svg-jar "x" width="10px" height="10px"}}
-              </LinkTo>
-            </div>
-          </header>
         {{/if}}
       {{/if}}
 
@@ -48,7 +28,7 @@
         class="card-renderer-isolated--animated-content"
       >
         {{#unless @suppressHeader}}
-          {{#if (and this.cardstackSession.isAuthenticated this.isViewMode)}}
+          {{#if (and this.cardstackSession.isAuthenticated (eq this.mode "view"))}}
             <div class="card-renderer__controls" data-test-card-renderer-controls>
               <LinkTo
                 @route="cards.card.view.edit"
@@ -69,21 +49,17 @@
           {{/if}}
         {{/unless}}
         <div
-          class="card-renderer-isolated--card-container
-          {{if (and this.cardstackSession.isAuthenticated @cardSelected) "selected"}}
-          "
+          class="card-renderer-isolated--card-container {{if (and this.cardstackSession.isAuthenticated @cardSelected) "selected"}}"
         >
           <div>
             <AnimatedContainer>
               {{#animated-value this watch=this.animatedWatchFields use=@contentTransition group="content"}}
                 {{!-- This is the card boundary, please don't set any card specific classes any higher in the DOM than this. --}}
                 {{!-- If we need card specific styling above this level, then let's chat about it.                           --}}
-                <div class="isolated-card-boundary {{if this.isViewMode (concat (safe-css-string (if @card.canonicalURL @card.canonicalURL @card.adoptsFromURL)) "--isolated") }}">
-                  {{#unless @suppressHeader}}
-                    {{#if this.isViewMode}}
-                      <div class="isolated-card-label">{{humanize @card.csTitle}}</div>
-                    {{/if}}
-                  {{/unless}}
+                <div class="isolated-card-boundary {{if this.isViewOrLayoutMode (concat (safe-css-string (if @card.canonicalURL @card.canonicalURL @card.adoptsFromURL)) "--isolated") }}">
+                  {{#if this.isViewOrLayoutMode}}
+                    <div class="isolated-card-label">{{humanize @card.csTitle}}</div>
+                  {{/if}}
                   {{#if @dropField}}
                     <DropZone
                       @card={{@card}}
@@ -119,12 +95,7 @@
     </AnimatedContainer>
   {{else if (eq @format "embedded")}}
     <div
-      class="card-renderer-embedded
-        {{concat (safe-css-string (if @card.canonicalURL @card.canonicalURL @card.adoptsFromURL)) "--embedded" }}
-        {{@class}}
-      "
-      {{on "mouseenter" (action this.setIsSelected true)}} {{on "mouseleave" (action this.setIsSelected false)}}
-      role="button"
+      class="card-renderer-embedded {{concat (safe-css-string (if @card.canonicalURL @card.canonicalURL @card.adoptsFromURL)) "--embedded" }} {{@class}}"
       data-test-card-renderer-embedded={{@card.canonicalURL}}
       data-test-card-renderer={{@card.canonicalURL}}
       data-test-card-loaded={{stringify this.loadCard.isIdle}}

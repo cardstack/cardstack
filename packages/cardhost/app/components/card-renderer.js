@@ -23,8 +23,7 @@ export default class CardRenderer extends Component {
   @tracked previousFieldNames;
   @tracked fields;
   @tracked mode;
-  @tracked isEditMode = this.mode === 'edit';
-  @tracked isViewMode = this.mode === 'view' || this.mode === 'layout';
+  @tracked isViewOrLayoutMode = this.mode === 'view' || this.mode === 'layout';
   @tracked css;
   @tracked fieldsToRemove = new Map();
   @tracked cardFocused = () => {};
@@ -77,7 +76,7 @@ export default class CardRenderer extends Component {
     this.loadedFields = [];
 
     let tasks = [this.getFields.perform()];
-    if (!this.args.suppressCss && (this.mode === 'view' || this.mode === 'layout' || this.mode === 'edit')) {
+    if (!this.args.suppressCss && (this.isViewOrLayoutMode || this.mode === 'edit')) {
       tasks.push(this.args.card.loadFeature(`${this.args.format}-css`));
     }
 

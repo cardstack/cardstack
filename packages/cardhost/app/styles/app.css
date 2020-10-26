@@ -24,6 +24,7 @@
 @import '/assets/components/themer.css';
 @import '/assets/components/dialog.css';
 @import '/assets/components/card-renderer-header.css';
+@import '/assets/components/card-editor.css';
 @import '/assets/components/loading.css';
 
 /* Boxel components */
@@ -136,7 +137,6 @@ body,
 }
 
 body {
-  position: fixed; /* This is needed to prevent background scroll when bottom-edge is open */
   width: 100%;
   margin: 0;
   background-color: var(--ch-default);

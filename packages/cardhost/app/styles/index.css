@@ -4,6 +4,7 @@
   --card-builder-featured-card-width: 375px;
 
   height: 100%;
+  overflow-y: auto;
 }
 
 .card-builder--header {

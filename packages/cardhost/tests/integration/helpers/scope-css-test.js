@@ -5,8 +5,8 @@ import hbs from 'htmlbars-inline-precompile';
 
 let scopedSingleCard = `.my-card--isolated .a {}
 .my-card--isolated .b {}`;
-let scopedMultipleCards = `.card1--embedded .a , .card2--embedded .a {}
-.card1--embedded .b , .card2--embedded .b {}`;
+let scopedMultipleCards = `.card-renderer-embedded.card1--embedded .a , .card-renderer-embedded.card2--embedded .a {}
+.card-renderer-embedded.card1--embedded .b , .card-renderer-embedded.card2--embedded .b {}`;
 
 module('Integration | Helper | scope-css', function(hooks) {
   setupRenderingTest(hooks);

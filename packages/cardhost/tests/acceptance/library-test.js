@@ -164,8 +164,8 @@ module('Acceptance | library', function(hooks) {
   });
 
   test(`viewing library`, async function(assert) {
-    await visit(`/`);
-    assert.equal(currentURL(), '/cards');
+    await visit(`/cards`);
+    assert.equal(currentURL(), '/cards/collection');
 
     assert.dom('[data-test-library-button]').exists();
     await click('[data-test-library-button]');
@@ -216,7 +216,7 @@ module('Acceptance | library', function(hooks) {
   });
 
   test('featured cards are displayed', async function(assert) {
-    await visit(`/`);
+    await visit(`/cards/featured-cards`);
     await waitForFeaturedCardsLoad();
 
     await percySnapshot(assert);

@@ -24,6 +24,7 @@ Router.map(function() {
         this.route('preview');
       });
     });
+    this.route('featured-cards');
   });
   this.route('ui-components');
 });

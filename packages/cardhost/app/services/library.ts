@@ -19,7 +19,6 @@ export default class LibraryService extends Service {
   @service cardLocalStorage!: CardLocalStorageService;
 
   @tracked visible = false;
-  @tracked recentCards: AddressableCard[] = [];
   @tracked templateEntries: AddressableCard[] = [];
   @tracked featuredEntries: AddressableCard[] = [];
 

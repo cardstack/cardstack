@@ -13,6 +13,7 @@ export default class CardsRoute extends Route {
   @service library!: LibraryService;
 
   async model(): Promise<Model> {
+    await this.library.load.perform();
     return {};
   }
 
