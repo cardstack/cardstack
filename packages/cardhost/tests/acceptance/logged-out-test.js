@@ -6,7 +6,6 @@ import {
   waitForCardLoad,
   waitForSchemaViewToLoad,
   encodeColons,
-  waitForCatalogEntriesToLoad,
   waitForTestsToEnd,
   waitForLibraryServiceToIdle,
 } from '../helpers/card-ui-helpers';
@@ -14,31 +13,28 @@ import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { cardDocument } from '@cardstack/hub';
 import { animationsSettled } from 'ember-animated/test-support';
-import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 
-const csRealm = 'https://cardstack.com/api/realms/card-catalog';
+const csRealm = 'http://localhost:3000/api/realms/default';
 const testCard = cardDocument().withAutoAttributes({
   csRealm,
-  csId: 'millenial-puppies',
+  csId: 'entry',
+  csTitle: 'Master Recording',
   title: 'The Millenial Puppy',
 });
-const entry = cardDocument()
-  .withAttributes({
-    csRealm,
-    csId: 'entry',
-    csTitle: 'The Millenial Puppy',
-    type: 'featured',
-  })
-  .withRelationships({ card: testCard })
-  .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'catalog-entry' });
+const testCard2 = cardDocument().withAutoAttributes({
+  csRealm,
+  csId: 'entry-2',
+  csTitle: 'Master Recording',
+  title: 'Jackie Wackie',
+});
 const cardPath = encodeURIComponent(testCard.canonicalURL);
 const scenario = new Fixtures({
-  create: [testCard, entry],
+  create: [testCard, testCard2],
 });
 
-async function waitForFeaturedCardsLoad() {
+async function waitForCollectionCardsLoad() {
   await waitForLibraryServiceToIdle();
-  await waitForCatalogEntriesToLoad('[data-test-featured-cards]');
+  await Promise.all([testCard, testCard2].map(card => waitForCardLoad(card.canonicalURL)));
 }
 
 module('Acceptance | logged-out', function(hooks) {
@@ -137,11 +133,11 @@ module('Acceptance | logged-out', function(hooks) {
     await login();
     await visit(`/`);
 
-    assert.equal(currentURL(), `/cards`);
-    await waitForFeaturedCardsLoad();
+    assert.equal(currentURL(), `/cards/collection`);
+    await waitForCollectionCardsLoad();
 
-    assert.dom('[data-test-card-builder]').exists();
-    assert.dom('[data-test-featured-card]').exists({ count: 1 });
+    assert.dom('[data-test-isolated-collection]').exists();
+    assert.dom('[data-test-isolated-collection-card]').exists({ count: 2 });
     assert.dom('[data-test-cardhost-left-edge]').exists();
     assert.dom('.cardhost-left-edge--nav-button').exists({ count: 4 });
     assert.dom('[data-test-library-button]').isNotDisabled();
@@ -150,9 +146,8 @@ module('Acceptance | logged-out', function(hooks) {
     await click('[data-test-logout-button]');
     await animationsSettled();
 
-    assert.equal(currentURL(), `/cards`);
-    assert.dom('[data-test-card-builder]').exists();
-    assert.dom('[data-test-featured-card]').exists({ count: 1 });
+    assert.equal(currentURL(), `/cards/collection`);
+    assert.dom('[data-test-isolated-collection-card]').exists({ count: 2 });
     assert.dom('[data-test-cardhost-left-edge]').exists();
     assert.dom('[data-test-library-button]').isDisabled();
   });
@@ -161,7 +156,7 @@ module('Acceptance | logged-out', function(hooks) {
     await login();
     await visit(`/`);
 
-    assert.equal(currentURL(), `/cards`);
+    assert.equal(currentURL(), `/cards/collection`);
     await click('[data-test-library-button]');
     await waitForLibraryServiceToIdle();
     await waitForCardLoad(testCard.canonicalURL);
@@ -170,9 +165,9 @@ module('Acceptance | logged-out', function(hooks) {
     await click('[data-test-logout-button]');
     await animationsSettled();
 
-    assert.equal(currentURL(), `/cards`);
+    assert.equal(currentURL(), `/cards/collection`);
     assert.dom('[data-test-library]').doesNotExist();
-    assert.dom('[data-test-featured-card]').exists({ count: 1 });
+    assert.dom('[data-test-isolated-collection-card]').exists({ count: 2 });
     assert.dom('[data-test-cardhost-left-edge]').exists();
     assert.dom('[data-test-library-button]').isDisabled();
   });
@@ -192,7 +187,7 @@ module('Acceptance | logged-out', function(hooks) {
     assert.dom('[data-test-home-link]').exists();
 
     await click('[data-test-home-link]');
-    assert.equal(currentURL(), `/cards`);
+    assert.equal(currentURL(), `/cards/collection`);
   });
 
   test('clicking outside the login panel closes it', async function(assert) {
@@ -202,7 +197,7 @@ module('Acceptance | logged-out', function(hooks) {
 
     await waitFor('[data-test-login-button]');
     assert.dom('[data-test-login-button]').exists();
-    await click('[data-test-card-builder]');
+    await click('[data-test-isolated-collection]');
     assert.dom('[data-test-login-button]').doesNotExist();
   });
 });
