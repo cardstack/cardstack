@@ -215,36 +215,37 @@ module('Acceptance | library', function(hooks) {
     );
   });
 
-  test('featured cards are displayed', async function(assert) {
-    await visit(`/cards/featured-cards`);
-    await waitForFeaturedCardsLoad();
+  // this UI is currently removed
+  // test('featured cards are displayed', async function(assert) {
+  //   await visit(`/featured-cards`);
+  //   await waitForFeaturedCardsLoad();
 
-    await percySnapshot(assert);
-    assert.deepEqual(
-      [...document.querySelectorAll(`[data-test-featured-card]`)].map(i => i.getAttribute('data-test-featured-card')),
-      [catalogCard2.canonicalURL, catalogCard1.canonicalURL]
-    );
-    assert.dom(`[data-test-featured-card="${catalogCard1.canonicalURL}"] [data-test-isolated-card]`).exists();
-    assert.dom(`[data-test-featured-card="${catalogCard2.canonicalURL}"] [data-test-isolated-card]`).exists();
-    assert
-      .dom(`[data-test-featured-card="${catalogCard1.canonicalURL}"] [data-test-featured-card-title]`)
-      .hasText('Featured: The Millenial Puppy');
-    assert
-      .dom(`[data-test-featured-card="${catalogCard2.canonicalURL}"] [data-test-featured-card-title]`)
-      .hasText('Featured: Why Doors?');
-    assert.ok(
-      find(`[data-test-css-format="isolated"][data-test-css-cards="[${catalogCard1.canonicalURL}]"`).innerText.includes(
-        'card3 isolated css'
-      ),
-      'featured card style is correct'
-    );
-    assert.ok(
-      find(`[data-test-css-format="isolated"][data-test-css-cards="[${catalogCard2.canonicalURL}]"`).innerText.includes(
-        'card4 isolated css'
-      ),
-      'featured card style is correct'
-    );
-  });
+  //   await percySnapshot(assert);
+  //   assert.deepEqual(
+  //     [...document.querySelectorAll(`[data-test-featured-card]`)].map(i => i.getAttribute('data-test-featured-card')),
+  //     [catalogCard2.canonicalURL, catalogCard1.canonicalURL]
+  //   );
+  //   assert.dom(`[data-test-featured-card="${catalogCard1.canonicalURL}"] [data-test-isolated-card]`).exists();
+  //   assert.dom(`[data-test-featured-card="${catalogCard2.canonicalURL}"] [data-test-isolated-card]`).exists();
+  //   assert
+  //     .dom(`[data-test-featured-card="${catalogCard1.canonicalURL}"] [data-test-featured-card-title]`)
+  //     .hasText('Featured: The Millenial Puppy');
+  //   assert
+  //     .dom(`[data-test-featured-card="${catalogCard2.canonicalURL}"] [data-test-featured-card-title]`)
+  //     .hasText('Featured: Why Doors?');
+  //   assert.ok(
+  //     find(`[data-test-css-format="isolated"][data-test-css-cards="[${catalogCard1.canonicalURL}]"`).innerText.includes(
+  //       'card3 isolated css'
+  //     ),
+  //     'featured card style is correct'
+  //   );
+  //   assert.ok(
+  //     find(`[data-test-css-format="isolated"][data-test-css-cards="[${catalogCard2.canonicalURL}]"`).innerText.includes(
+  //       'card4 isolated css'
+  //     ),
+  //     'featured card style is correct'
+  //   );
+  // });
 
   test(`closing library panel`, async function(assert) {
     await visit(`/`);

@@ -1,4 +1,4 @@
-<header class="org-header org-header--sm org-header--{{@id}}" data-test-org-header>
+<header class="org-header org-header--sm org-header--{{@id}}" style="background-color:{{@bgColor}}" data-test-org-header>
   <div class="org-header__title-row">
     <h1 class="org-header__title">
       {{! template-lint-disable no-inline-styles }}
@@ -11,9 +11,7 @@
     </label>
   </div>
 
-  {{#if @displayNavbar}}
-    <ul class="org-header__nav">
-      {{yield}}
-    </ul>
-  {{/if}}
+  <ul class="org-header__nav">
+    {{yield}}
+  </ul>
 </header>

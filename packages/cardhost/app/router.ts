@@ -8,8 +8,8 @@ export default class Router extends EmberRouter {
 }
 
 Router.map(function() {
-  this.route('cards', function() {
-    this.route('collection');
+  this.route('cards', { path: '/cards/:org' }, function() {
+    this.route('collection', { path: '/collection/:collection' });
     this.route('add', { path: '/add' });
     this.route('card', { path: '/:id' }, function() {
       this.route('adopt');
@@ -24,7 +24,6 @@ Router.map(function() {
         this.route('preview');
       });
     });
-    this.route('featured-cards');
   });
   this.route('ui-components');
 });

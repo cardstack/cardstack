@@ -1,7 +1,7 @@
 <div class="isolated-collection" data-test-isolated-collection>
   <header class="isolated-collection__sticky-header">
     <div class="isolated-collection__title-row">
-      <h2 class="isolated-collection__title">{{@title}}</h2>
+      <h2 class="isolated-collection__title">{{humanize @title}}</h2>
       <div class="isolated-collection__count">
         <span>{{if @collection.length @collection.length 0}}</span>
         {{#if (eq @collection.length 1)}}Item{{else}}Items{{/if}}

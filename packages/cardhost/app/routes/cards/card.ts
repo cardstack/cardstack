@@ -4,14 +4,20 @@ import DataService from '../../services/data';
 import { AddressableCard } from '@cardstack/hub';
 import { action } from '@ember/object';
 import { set } from '@ember/object';
+import { Org } from '../cards';
 
 export interface RouteParams {
   id: string;
 }
 
 export interface Model {
+  org: Org;
   card: AddressableCard;
   isDirty: boolean;
+}
+
+interface OrgModel {
+  org: Org;
 }
 
 export default class CardsCard extends Route {
@@ -24,7 +30,12 @@ export default class CardsCard extends Route {
 
   async model({ id }: RouteParams): Promise<Model> {
     await Promise.resolve(this.autosave.saveCard.last);
+
+    let orgModel = this.modelFor('cards') as OrgModel;
+    let org = orgModel.org as Org;
+
     return {
+      org,
       card: await this.data.load(id, 'everything'),
       isDirty: false, // This is a temporary place to track model dirtiness until we integrate OrbitJS
     };
