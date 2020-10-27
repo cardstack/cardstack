@@ -1,5 +1,5 @@
 .org-header {
-  --header-logo-size-sm: 35px 35px;
+  --header-logo-size-sm: auto 35px;
   position: sticky;
   top: 0;
   padding: 80px 20px 0 30px;
@@ -53,10 +53,10 @@
   background-size: var(--header-logo-size-sm);
 }
 
+/* TODO: remove org specific styles */
 .org-header--sm .org-header__logo--warner-music-group {
   background-size: auto;
 }
-
 .org-header--sm .org-header__logo--deezer {
   background-position: top center;
 }

@@ -81,21 +81,9 @@
   opacity: 0.5;
 }
 
-.cardhost-left-edge__org-link-logo--bunny-records {
-  background-color: #FF1D6C;
-}
-
-.cardhost-left-edge__org-link-logo--crd-records {
-  background-color: #0069F9;
-}
-
+/* TODO: remove org specific styles */
 .cardhost-left-edge__org-link-logo--warner-music-group {
-  background-color: #0061aa;
-  background-size: auto 30px;
-}
-
-.cardhost-left-edge__org-link-logo--warner-chappell-music {
-  background-size: 25px 25px;
+  background-size: contain;
 }
 
 .cardhost-left-edge__org-link:hover {

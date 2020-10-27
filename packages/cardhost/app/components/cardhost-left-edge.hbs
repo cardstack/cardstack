@@ -9,10 +9,10 @@
       <ul class="cardhost-left-edge__top-btn-group">
         <li>
           <LinkTo
-            @route="index"
-            class="cardhost-left-edge--nav-button cardstack-logo-button"
-            aria-label="homepage"
-            title="Homepage"
+            @route="cards.collection"
+            @models={{array @currentOrg @collection}}
+            @class="cardhost-left-edge--nav-button cardstack-logo-button"
+            @aria-label="homepage"
             data-test-home-link
           >
             {{svg-jar "cardstack-logo" width="27px" height="30px"}}
@@ -57,85 +57,21 @@
         </li>
       </ul>
       <ul class="cardhost-left-edge__middle-btn-group">
-        {{!-- TODO: make these dynamic --}}
-        <li>
-          <LinkTo
-            @route="cards.collection"
-            @models={{array "bunny-records" "master-recordings"}}
-            @class="cardhost-left-edge__org-link"
-            @aria-label="View catalog for Bunny Records"
-          >
-            <div
-              class="cardhost-left-edge__org-link-logo cardhost-left-edge__org-link-logo--bunny-records"
-              style={{css-url "background-image" "/assets/images/orgs/bunny-logo.svg"}}
-            />
-          </LinkTo>
-        </li>
-        <li>
-          <LinkTo
-            @route="cards.collection"
-            @models={{array "crd-records" "master-recordings"}}
-            @class="cardhost-left-edge__org-link"
-            @aria-label="View catalog for CRD Records"
-          >
-            <div
-              class="cardhost-left-edge__org-link-logo cardhost-left-edge__org-link-logo--crd-records"
-              style={{css-url "background-image" "/assets/images/orgs/crd-logo.svg"}}
-            />
-          </LinkTo>
-        </li>
-        <li>
-          <LinkTo
-            @route="cards.collection"
-            @models={{array "warner-music-group" "master-recordings"}}
-            @class="cardhost-left-edge__org-link"
-            @aria-label="View catalog for warner music group"
-          >
-            <div
-              class="cardhost-left-edge__org-link-logo cardhost-left-edge__org-link-logo--warner-music-group"
-              style={{css-url "background-image" "/assets/images/orgs/wmg-logo.svg"}}
-            />
-          </LinkTo>
-        </li>
-        <li>
-          <LinkTo
-            @route="cards.collection"
-            @models={{array "warner-chappell-music" "musical-works"}}
-            @class="cardhost-left-edge__org-link"
-            @aria-label="View catalog for warner chappell music"
-          >
-            <div
-              class="cardhost-left-edge__org-link-logo cardhost-left-edge__org-link-logo--warner-chappell-music"
-              style={{css-url "background-image" "/assets/images/orgs/wcm-logo.png"}}
-            />
-          </LinkTo>
-        </li>
-        <li>
-          <LinkTo
-            @route="cards.collection"
-            @models={{array "global-music-rights" "musical-works"}}
-            @class="cardhost-left-edge__org-link"
-            @aria-label="View catalog for global music rights"
-          >
-            <div
-              class="cardhost-left-edge__org-link-logo cardhost-left-edge__org-link-logo--global-music-rights"
-              style={{css-url "background-image" "/assets/images/orgs/gmr-logo.svg"}}
-            />
-          </LinkTo>
-        </li>
-        <li>
-          <LinkTo
-            @route="cards.collection"
-            @models={{array "deezer" "master-recordings"}}
-            @class="cardhost-left-edge__org-link"
-            @aria-label="View catalog for deezer"
-          >
-            <div
-              class="cardhost-left-edge__org-link-logo cardhost-left-edge__org-link-logo--deezer"
-              style={{css-url "background-image" "/assets/images/orgs/deezer-logo.png"}}
-            />
-          </LinkTo>
-        </li>
+        {{#each @orgs as |org|}}
+          <li>
+            <LinkTo
+              @route="cards.collection"
+              @models={{array org.id org.collection}}
+              @class="cardhost-left-edge__org-link"
+              @aria-label="View catalog for {{org.title}}"
+            >
+              <div
+                class="cardhost-left-edge__org-link-logo cardhost-left-edge__org-link-logo--{{org.id}}"
+                style={{concat (css-url "background-image" org.logoURL)(if org.bgColor (concat ";background-color:" org.bgColor))}}
+              />
+            </LinkTo>
+          </li>
+        {{/each}}
       </ul>
       <ul class="cardhost-left-edge__bottom-btn-group">
         <li>

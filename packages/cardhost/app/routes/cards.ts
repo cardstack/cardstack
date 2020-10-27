@@ -8,6 +8,7 @@ import Transition from '@ember/routing/-private/transition';
 import LibraryService from '../services/library';
 
 interface Model {
+  orgs: Org[];
   org: Org;
   previousRoute?: RouteInfo;
 }
@@ -17,69 +18,63 @@ export interface Org {
   title: string;
   logoURL: string;
   bgColor?: string;
+  collection: string;
 }
 
+const ORGS = [
+  {
+    id: 'bunny-records',
+    title: 'Bunny Records',
+    logoURL: '/assets/images/orgs/bunny-logo.svg',
+    bgColor: '#FF1D6C',
+    collection: 'master-recordings',
+  },
+  {
+    id: 'crd-records',
+    title: 'CRD Records',
+    logoURL: '/assets/images/orgs/crd-logo.svg',
+    bgColor: '#0069F9',
+    collection: 'master-recordings',
+  },
+  {
+    id: 'warner-music-group',
+    title: 'Warner Music Group',
+    logoURL: '/assets/images/orgs/wmg-logo.svg',
+    bgColor: '#0061aa',
+    collection: 'master-recordings',
+  },
+  {
+    id: 'warner-chappell-music',
+    title: 'Warner Chappell Music',
+    logoURL: '/assets/images/orgs/wcm-logo.png',
+    collection: 'musical-works',
+  },
+  {
+    id: 'global-music-rights',
+    title: 'Global Music Rights',
+    logoURL: '/assets/images/orgs/gmr-logo.svg',
+    collection: 'master-recordings',
+  },
+  {
+    id: 'deezer',
+    title: 'Deezer',
+    logoURL: '/assets/images/orgs/deezer-logo.png',
+    collection: 'musical-works',
+  },
+];
+
 export default class CardsRoute extends Route {
+  orgs: Org[] = ORGS;
   @service library!: LibraryService;
   @tracked currentOrg!: Org;
 
   async model(args: any): Promise<Model> {
     let { org } = args;
-    switch (org) {
-      // TODO: Dynamically fetch user's orgs
-      case 'crd-records':
-        this.currentOrg = {
-          id: org,
-          title: 'CRD Records',
-          logoURL: '/assets/images/orgs/crd-logo.svg',
-          bgColor: '#0069F9',
-        };
-        break;
-
-      case 'warner-music-group':
-        this.currentOrg = {
-          id: org,
-          title: 'Warner Music Group',
-          logoURL: '/assets/images/orgs/wmg-logo.svg',
-          bgColor: '#0061aa',
-        };
-        break;
-
-      case 'warner-chappell-music':
-        this.currentOrg = {
-          id: org,
-          title: 'Warner Chappell Music',
-          logoURL: '/assets/images/orgs/wcm-logo.png',
-        };
-        break;
-
-      case 'global-music-rights':
-        this.currentOrg = {
-          id: org,
-          title: 'Global Music Rights',
-          logoURL: '/assets/images/orgs/gmr-logo.svg',
-        };
-        break;
-
-      case 'deezer':
-        this.currentOrg = {
-          id: org,
-          title: 'Deezer',
-          logoURL: '/assets/images/orgs/deezer-logo.png',
-        };
-        break;
-
-      default:
-        this.currentOrg = {
-          id: 'bunny-records',
-          title: 'Bunny Records',
-          logoURL: '/assets/images/orgs/bunny-logo.svg',
-          bgColor: '#FF1D6C',
-        };
-    }
+    this.currentOrg = this.orgs.find(el => el.id === org) || this.orgs[0];
     await this.library.load.perform();
 
     return {
+      orgs: this.orgs,
       org: this.currentOrg,
     };
   }
