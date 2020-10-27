@@ -53,6 +53,14 @@
   background-size: var(--header-logo-size-sm);
 }
 
+.org-header--sm .org-header__logo--warner-music-group {
+  background-size: auto;
+}
+
+.org-header--sm .org-header__logo--deezer {
+  background-position: top center;
+}
+
 .org-header__logo svg {
   display: block;
   margin: auto;

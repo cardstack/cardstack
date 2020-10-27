@@ -26,13 +26,46 @@ export default class CardsRoute extends Route {
   async model(args: any): Promise<Model> {
     let { org } = args;
     switch (org) {
-      // Note: These are the user's orgs
+      // TODO: Dynamically fetch user's orgs
       case 'crd-records':
         this.currentOrg = {
           id: org,
           title: 'CRD Records',
           logoURL: '/assets/images/orgs/crd-logo.svg',
           bgColor: '#0069F9',
+        };
+        break;
+
+      case 'warner-music-group':
+        this.currentOrg = {
+          id: org,
+          title: 'Warner Music Group',
+          logoURL: '/assets/images/orgs/wmg-logo.svg',
+          bgColor: '#0061aa',
+        };
+        break;
+
+      case 'warner-chappell-music':
+        this.currentOrg = {
+          id: org,
+          title: 'Warner Chappell Music',
+          logoURL: '/assets/images/orgs/wcm-logo.png',
+        };
+        break;
+
+      case 'global-music-rights':
+        this.currentOrg = {
+          id: org,
+          title: 'Global Music Rights',
+          logoURL: '/assets/images/orgs/gmr-logo.svg',
+        };
+        break;
+
+      case 'deezer':
+        this.currentOrg = {
+          id: org,
+          title: 'Deezer',
+          logoURL: '/assets/images/orgs/deezer-logo.png',
         };
         break;
 

@@ -72,11 +72,12 @@
 .cardhost-left-edge__org-link-logo {
   width: 40px;
   height: 40px;
-  border-radius: var(--boxel-border-radius);
+  background-color: #000;
   background-position: center;
   background-repeat: no-repeat;
   background-size: auto 25px;
   border: 1px solid #000;
+  border-radius: var(--boxel-border-radius);
   opacity: 0.5;
 }
 
@@ -86,6 +87,15 @@
 
 .cardhost-left-edge__org-link-logo--crd-records {
   background-color: #0069F9;
+}
+
+.cardhost-left-edge__org-link-logo--warner-music-group {
+  background-color: #0061aa;
+  background-size: auto 30px;
+}
+
+.cardhost-left-edge__org-link-logo--warner-chappell-music {
+  background-size: 25px 25px;
 }
 
 .cardhost-left-edge__org-link:hover {

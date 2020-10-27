@@ -6,8 +6,8 @@
     @bgColor={{this.model.org.bgColor}}
   >
     <li>
-      <LinkTo @route="cards.collection" @models={{array this.model.org.id "master-recordings"}}>
-        Masters
+      <LinkTo @route="cards.collection" @models={{array this.model.org.id this.model.title}}>
+        {{if (eq this.model.title "musical-works") "Musical Works" "Masters"}}
       </LinkTo>
     </li>
   </OrgHeader>
