@@ -13,8 +13,6 @@ import { Org } from '../cards';
 import ENV from '@cardstack/cardhost/config/environment';
 
 const { environment } = ENV;
-
-const verifiRealm = 'https://builder-hub.stack.cards/api/realms/verifi';
 const size = 100;
 
 interface Model {
@@ -42,7 +40,7 @@ export default class CollectionRoute extends Route {
     this.currentOrg = orgModel.org as Org;
 
     // TODO: Dynamically fetch data for org
-    if (this.currentOrg.id === 'bunny-records') {
+    if (this.currentOrg.realm) {
       await this.load.perform();
     } else {
       this.collectionEntries = [];
@@ -78,7 +76,7 @@ export default class CollectionRoute extends Route {
         {
           filter: {
             eq: {
-              csRealm: verifiRealm,
+              csRealm: this.currentOrg.realm || null,
               csTitle: this.collectionType,
             },
           },

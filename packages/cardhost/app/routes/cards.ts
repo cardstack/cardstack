@@ -19,6 +19,7 @@ export interface Org {
   logoURL: string;
   bgColor?: string;
   collection: string;
+  realm?: string;
 }
 
 const ORGS = [
@@ -28,6 +29,7 @@ const ORGS = [
     logoURL: '/assets/images/orgs/bunny-logo.svg',
     bgColor: '#FF1D6C',
     collection: 'master-recordings',
+    realm: 'https://builder-hub.stack.cards/api/realms/verifi',
   },
   {
     id: 'crd-records',
@@ -42,6 +44,7 @@ const ORGS = [
     logoURL: '/assets/images/orgs/wmg-logo.svg',
     bgColor: '#0061aa',
     collection: 'master-recordings',
+    realm: 'https://builder-hub.stack.cards/api/realms/wmg',
   },
   {
     id: 'warner-chappell-music',
