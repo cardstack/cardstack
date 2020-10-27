@@ -6,7 +6,7 @@
     ...attributes
   >
     <nav class="cardhost-left-edge--nav {{@mode}} {{if this.isExpanded "expanded"}}">
-      <ul>
+      <ul class="cardhost-left-edge__top-btn-group">
         <li>
           <LinkTo
             @route="index"
@@ -55,6 +55,37 @@
             </div>
           {{/if}}
         </li>
+      </ul>
+      <ul class="cardhost-left-edge__middle-btn-group">
+        {{!-- TODO: make these dynamic --}}
+        <li>
+          <LinkTo
+            @route="cards.collection"
+            @models={{array "bunny-records" "master-recordings"}}
+            @class="cardhost-left-edge__org-link"
+            @aria-label="View catalog for Bunny Records"
+          >
+            <div
+              class="cardhost-left-edge__org-link-logo cardhost-left-edge__org-link-logo--bunny-records"
+              style={{css-url "background-image" "/assets/images/orgs/bunny-logo.svg"}}
+            />
+          </LinkTo>
+        </li>
+        <li>
+          <LinkTo
+            @route="cards.collection"
+            @models={{array "crd-records" "master-recordings"}}
+            @class="cardhost-left-edge__org-link"
+            @aria-label="View catalog for CRD Records"
+          >
+            <div
+              class="cardhost-left-edge__org-link-logo cardhost-left-edge__org-link-logo--crd-records"
+              style={{css-url "background-image" "/assets/images/orgs/crd-logo.svg"}}
+            />
+          </LinkTo>
+        </li>
+      </ul>
+      <ul class="cardhost-left-edge__bottom-btn-group">
         <li>
           <button
             disabled={{true}}

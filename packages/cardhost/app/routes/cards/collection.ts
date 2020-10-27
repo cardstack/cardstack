@@ -41,7 +41,12 @@ export default class CollectionRoute extends Route {
     let orgModel = this.modelFor('cards') as OrgModel;
     this.currentOrg = orgModel.org as Org;
 
-    await this.load.perform();
+    // TODO: Dynamically fetch data for org
+    if (this.currentOrg.id === 'bunny-records') {
+      await this.load.perform();
+    } else {
+      this.collectionEntries = [];
+    }
 
     return {
       org: this.currentOrg,
