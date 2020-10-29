@@ -17,6 +17,7 @@ const size = 100;
 
 interface Model {
   org: Org;
+  id: string;
   title: string;
   cards: AddressableCard[];
 }
@@ -30,16 +31,20 @@ export default class CollectionRoute extends Route {
   @service cardLocalStorage!: CardLocalStorageService;
   @tracked collectionEntries: AddressableCard[] = [];
   @tracked currentOrg!: Org;
+  @tracked collectionId!: string;
+  @tracked collectionTitle!: string;
   @tracked collectionType!: string;
 
-  async model(args: any): Promise<Model> {
-    let { collection } = args;
-    this.collectionType = singularize(collection);
-
+  async model(): Promise<Model> {
     let orgModel = this.modelFor('cards') as OrgModel;
     this.currentOrg = orgModel.org as Org;
+    this.collectionId = this.currentOrg.collectionId;
+    this.collectionType = singularize(this.collectionId);
 
-    // TODO: Dynamically fetch data for org
+    this.collectionTitle = this.currentOrg.collectionTitle
+      ? this.currentOrg.collectionTitle
+      : this.currentOrg.collectionId;
+
     if (this.currentOrg.realm) {
       await this.load.perform();
     } else {
@@ -47,8 +52,9 @@ export default class CollectionRoute extends Route {
     }
 
     return {
+      id: this.collectionId,
       org: this.currentOrg,
-      title: collection,
+      title: this.collectionTitle,
       cards: this.collectionEntries,
     };
   }

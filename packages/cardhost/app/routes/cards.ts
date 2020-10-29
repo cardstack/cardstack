@@ -15,54 +15,61 @@ interface Model {
 
 export interface Org {
   id: string;
-  title: string;
-  logoURL: string;
-  bgColor?: string;
-  collection: string;
-  realm?: string;
+  title: string; // org name
+  collectionId: string; // example: master-recordings, musical-works, etc.
+  collectionTitle?: string; // collection display title. default is `humanized` version of collectionId
+  logoURL?: string; // org logo URL
+  brandColor?: string; // org color to be used as header background and behind the org logo. default is black.
+  realm?: string; // this will become mandatory once we add a realm for each org
 }
 
+// TODO: These are the sample user's orgs. Each org will have its own realm. Move all this data elsewhere.
 const ORGS = [
   {
     id: 'bunny-records',
     title: 'Bunny Records',
     logoURL: '/assets/images/orgs/bunny-logo.svg',
-    bgColor: '#FF1D6C',
-    collection: 'master-recordings',
+    brandColor: '#FF1D6C',
+    collectionId: 'master-recordings',
+    collectionTitle: 'Master Recordings',
     realm: 'https://builder-hub.stack.cards/api/realms/verifi',
   },
   {
     id: 'crd-records',
     title: 'CRD Records',
     logoURL: '/assets/images/orgs/crd-logo.svg',
-    bgColor: '#0069F9',
-    collection: 'master-recordings',
+    brandColor: '#0069F9',
+    collectionId: 'master-recordings',
+    collectionTitle: 'Master Recordings',
   },
   {
     id: 'warner-music-group',
     title: 'Warner Music Group',
     logoURL: '/assets/images/orgs/wmg-logo.svg',
-    bgColor: '#0061aa',
-    collection: 'master-recordings',
-    realm: 'https://builder-hub.stack.cards/api/realms/wmg',
+    brandColor: '#0061aa',
+    collectionId: 'master-recordings',
+    collectionTitle: 'Master Recordings',
   },
   {
     id: 'warner-chappell-music',
     title: 'Warner Chappell Music',
     logoURL: '/assets/images/orgs/wcm-logo.png',
-    collection: 'musical-works',
+    collectionId: 'musical-works',
+    collectionTitle: 'Musical Works',
   },
   {
     id: 'global-music-rights',
     title: 'Global Music Rights',
     logoURL: '/assets/images/orgs/gmr-logo.svg',
-    collection: 'master-recordings',
+    collectionId: 'master-recordings',
+    collectionTitle: 'Master Recordings',
   },
   {
     id: 'deezer',
     title: 'Deezer',
     logoURL: '/assets/images/orgs/deezer-logo.png',
-    collection: 'musical-works',
+    collectionId: 'musical-works',
+    collectionTitle: 'Musical Works',
   },
 ];
 

@@ -3,11 +3,11 @@
     @id={{this.model.org.id}}
     @title={{this.model.org.title}}
     @logoURL={{this.model.org.logoURL}}
-    @bgColor={{this.model.org.bgColor}}
+    @bgColor={{this.model.org.brandColor}}
   >
     <li>
-      <LinkTo @route="cards.collection" @models={{array this.model.org.id this.model.title}}>
-        {{if (eq this.model.title "musical-works") "Musical Works" "Masters"}}
+      <LinkTo @route="cards.collection" @model={{this.model.org.id}}>
+        {{this.model.title}}
       </LinkTo>
     </li>
   </OrgHeader>

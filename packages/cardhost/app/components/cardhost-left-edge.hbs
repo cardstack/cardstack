@@ -10,7 +10,7 @@
         <li>
           <LinkTo
             @route="cards.collection"
-            @models={{array @currentOrg @collection}}
+            @model={{@currentOrg}}
             @class="cardhost-left-edge--nav-button cardstack-logo-button"
             @aria-label="homepage"
             data-test-home-link
@@ -61,13 +61,13 @@
           <li>
             <LinkTo
               @route="cards.collection"
-              @models={{array org.id org.collection}}
+              @model={{org.id}}
               @class="cardhost-left-edge__org-link"
               @aria-label="View catalog for {{org.title}}"
             >
               <div
                 class="cardhost-left-edge__org-link-logo cardhost-left-edge__org-link-logo--{{org.id}}"
-                style={{concat (css-url "background-image" org.logoURL)(if org.bgColor (concat ";background-color:" org.bgColor))}}
+                style={{concat (css-url "background-image" org.logoURL)(if org.brandColor (concat ";background-color:" org.brandColor))}}
               />
             </LinkTo>
           </li>
