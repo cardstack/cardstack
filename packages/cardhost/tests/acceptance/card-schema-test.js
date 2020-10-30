@@ -18,6 +18,7 @@ import {
   waitForCardAutosave,
   waitForTestsToEnd,
   waitForAnimation,
+  CARDS_URL,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { animationsSettled } from 'ember-animated/test-support';
@@ -61,14 +62,14 @@ module('Acceptance | card schema', function(hooks) {
   });
 
   test(`adding a new field to a card`, async function(assert) {
-    await visit(`/cards/${cardPath}/configure/fields`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/fields`);
     await waitForSchemaViewToLoad();
-    assert.equal(currentURL(), `/cards/${cardPath}/configure/fields`);
+    assert.equal(currentURL(), `${CARDS_URL}/${cardPath}/configure/fields`);
 
     await addField('title-new', 'string-field', true);
     await saveCard();
 
-    await visit(`/cards/${cardPath}/configure/fields`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/fields`);
     await waitForSchemaViewToLoad();
     await selectField('title-new');
 
@@ -84,7 +85,7 @@ module('Acceptance | card schema', function(hooks) {
   });
 
   test(`Can change a card's name`, async function(assert) {
-    await visit(`/cards/${cardPath}/configure/fields`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/fields`);
     await waitForSchemaViewToLoad();
     await showCardId(true);
 
@@ -95,7 +96,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('.card-renderer-isolated--header-title').hasText('New Card Name');
 
     await saveCard();
-    await visit(`/cards/${cardPath}/configure/fields`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/fields`);
     await waitForSchemaViewToLoad();
     await showCardId();
     assert.dom('#card_name').hasValue('New Card Name');
@@ -103,7 +104,7 @@ module('Acceptance | card schema', function(hooks) {
   });
 
   test(`can expand a right edge section`, async function(assert) {
-    await visit(`/cards/${cardPath}/configure/fields`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/fields`);
     await waitForSchemaViewToLoad();
 
     await showCardId();
@@ -114,7 +115,7 @@ module('Acceptance | card schema', function(hooks) {
   });
 
   test(`changing the label for a field`, async function(assert) {
-    await visit(`/cards/${cardPath}/configure/fields`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/fields`);
     await waitForSchemaViewToLoad();
 
     await selectField('title');
@@ -128,7 +129,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('TITLE');
 
     await saveCard();
-    await visit(`/cards/${cardPath}/configure/fields`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/fields`);
     await waitForSchemaViewToLoad();
 
     assert
@@ -138,14 +139,14 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('title');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('TITLE');
 
-    await visit(`/cards/${cardPath}/edit`);
+    await visit(`${CARDS_URL}/${cardPath}/edit`);
     await waitForCardLoad();
     assert.dom('[data-test-isolated-card] [data-test-field="title"] input').hasValue('test title');
     assert.dom('[data-test-isolated-card] [data-test-field="title"] [data-test-edit-field-label]').hasText('TITLE');
   });
 
   test(`adding a new field after removing one`, async function(assert) {
-    await visit(`/cards/${cardPath}/configure/fields`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/fields`);
     await waitForSchemaViewToLoad();
 
     await removeField('body');
@@ -156,7 +157,7 @@ module('Acceptance | card schema', function(hooks) {
   });
 
   test(`move a field's position via drag & drop`, async function(assert) {
-    await visit(`/cards/${cardPath}/configure/fields`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/fields`);
     await waitForSchemaViewToLoad();
 
     assert.deepEqual(
@@ -204,7 +205,7 @@ module('Acceptance | card schema', function(hooks) {
   });
 
   test(`change a field's needed-when-embedded value to true`, async function(assert) {
-    await visit(`/cards/${cardPath}/configure/fields`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/fields`);
     await waitForSchemaViewToLoad();
 
     await selectField('title');
@@ -215,7 +216,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-schema-attr="embedded"] input[type="checkbox"]').isChecked();
 
     await saveCard();
-    await visit(`/cards/${cardPath}/configure/fields`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/fields`);
     await waitForSchemaViewToLoad();
 
     await selectField('title');
@@ -229,7 +230,7 @@ module('Acceptance | card schema', function(hooks) {
   });
 
   test(`change a field's needed-when-embedded value to false`, async function(assert) {
-    await visit(`/cards/${cardPath}/configure/fields`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/fields`);
     await waitForSchemaViewToLoad();
 
     await selectField('author');
@@ -240,7 +241,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-schema-attr="embedded"] input[type="checkbox"]').isNotChecked();
 
     await saveCard();
-    await visit(`/cards/${cardPath}/configure/fields`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/fields`);
     await waitForSchemaViewToLoad();
 
     await selectField('author');
@@ -255,7 +256,7 @@ module('Acceptance | card schema', function(hooks) {
 
   test(`can navigate to base card schema`, async function(assert) {
     let baseCardPath = encodeURIComponent(canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }));
-    await visit(`/cards/${baseCardPath}/configure/fields`);
+    await visit(`${CARDS_URL}/${baseCardPath}/configure/fields`);
     await waitForSchemaViewToLoad();
 
     await focus(`.card-renderer-isolated`);
@@ -264,18 +265,18 @@ module('Acceptance | card schema', function(hooks) {
   });
 
   test(`can navigate from schema to edit via "return to editing" button`, async function(assert) {
-    await visit(`/cards/${cardPath}/configure/fields`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/fields`);
     await waitForSchemaViewToLoad();
 
     assert.dom('[data-test-return-to-editing]').hasText('Return to Editing');
     await click('[data-test-return-to-editing]');
     await waitForCardLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/edit`);
+    assert.equal(encodeColons(currentURL()), `${CARDS_URL}/${cardPath}/edit`);
   });
 
   test(`fields mode displays the top edge`, async function(assert) {
-    await visit(`/cards/${cardPath}/configure/fields`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/fields`);
     await waitForSchemaViewToLoad();
 
     assert.dom('[data-test-cardhost-top-edge]').exists();
@@ -288,7 +289,7 @@ module('Acceptance | card schema', function(hooks) {
   });
 
   test(`layout mode displays the top edge with additional controls`, async function(assert) {
-    await visit(`/cards/${cardPath}/configure/layout`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/layout`);
     await waitForCardLoad();
 
     assert.dom('[data-test-cardhost-top-edge]').exists();
@@ -305,27 +306,27 @@ module('Acceptance | card schema', function(hooks) {
   });
 
   test(`can navigate to edit mode using the top edge`, async function(assert) {
-    await visit(`/cards/${cardPath}/configure/fields`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/fields`);
     await waitForSchemaViewToLoad();
 
     assert.dom('[data-test-mode-indicator-link="configure"]').exists();
     await click('[data-test-mode-indicator-link="configure"]');
     await waitForCardLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
+    assert.equal(encodeColons(currentURL()), `${CARDS_URL}/${cardPath}`);
     assert.dom('[data-test-mode-indicator-link="view"]').exists();
 
-    await visit(`/cards/${cardPath}/configure/layout`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/layout`);
     await waitForCardLoad();
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/layout`);
+    assert.equal(encodeColons(currentURL()), `${CARDS_URL}/${cardPath}/configure/layout`);
 
     await click('[data-test-mode-indicator]');
     await waitForCardLoad();
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
+    assert.equal(encodeColons(currentURL()), `${CARDS_URL}/${cardPath}`);
   });
 
   test('autosave works', async function(assert) {
-    await visit(`/cards/${cardPath}/configure/fields`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/fields`);
     await waitForSchemaViewToLoad();
 
     this.owner.lookup('service:autosave').autosaveDisabled = false;
@@ -333,7 +334,7 @@ module('Acceptance | card schema', function(hooks) {
     await waitForCardAutosave();
     this.owner.lookup('service:autosave').autosaveDisabled = true;
 
-    await visit(`/cards/${cardPath}`);
+    await visit(`${CARDS_URL}/${cardPath}`);
     await waitForCardLoad();
 
     assert.dom('[data-test-field="new-title"]').exists();

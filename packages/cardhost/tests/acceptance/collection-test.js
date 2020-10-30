@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { click, visit, currentURL, find } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
-import { waitForCardLoad, encodeColons, waitForTestsToEnd } from '../helpers/card-ui-helpers';
+import { waitForCardLoad, encodeColons, waitForTestsToEnd, CARDS_URL } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { cardDocument } from '@cardstack/hub';
@@ -32,7 +32,7 @@ const card1 = cardDocument()
   .withAttributes({
     csRealm,
     csId: 'collection-hassan',
-    csTitle: 'Master Recording',
+    csTitle: 'master-recording',
     csCreated: '2020-01-01T10:00:00Z',
     name: 'Hassan Abdel-Rahman',
     email: 'hassan@nowhere.dog',
@@ -42,7 +42,7 @@ const card2 = cardDocument()
   .withAttributes({
     csRealm,
     csId: 'collection-van-gogh',
-    csTitle: 'Master Recording',
+    csTitle: 'master-recording',
     csCreated: '2020-01-01T09:00:00Z',
     name: 'Van Gogh',
     email: 'vangogh@nowhere.dog',
@@ -69,9 +69,9 @@ module('Acceptance | collection', function(hooks) {
   });
 
   test(`viewing collection`, async function(assert) {
-    await visit(`/cards/collection`);
+    await visit(`${CARDS_URL}/collection`);
     await waitForCollectionLoad();
-    assert.equal(currentURL(), '/cards/collection');
+    assert.equal(currentURL(), `${CARDS_URL}/collection`);
 
     assert.dom('[data-test-org-header]').exists();
     assert.dom('[data-test-cardhost-left-edge]').exists();
@@ -82,7 +82,7 @@ module('Acceptance | collection', function(hooks) {
   });
 
   test('card embedded css is rendered for the cards in the collection', async function(assert) {
-    await visit(`/cards/collection`);
+    await visit(`${CARDS_URL}/collection`);
     await waitForCollectionLoad();
 
     assert.ok(
@@ -92,12 +92,12 @@ module('Acceptance | collection', function(hooks) {
   });
 
   test(`isolating a card`, async function(assert) {
-    await visit(`/cards/collection`);
+    await visit(`${CARDS_URL}/collection`);
     await waitForCollectionLoad();
 
     await click(`[data-test-card-renderer="${card2.canonicalURL}"] a`);
     await waitForCardLoad();
-    assert.equal(encodeColons(currentURL()), `/cards/${encodeURIComponent(card2.canonicalURL)}`);
+    assert.equal(encodeColons(currentURL()), `${CARDS_URL}/${encodeURIComponent(card2.canonicalURL)}`);
     assert.dom(`[data-test-card-renderer-isolated="${card2.canonicalURL}"]`).exists();
 
     await percySnapshot(assert);

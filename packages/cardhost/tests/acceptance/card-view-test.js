@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { find, visit, currentURL } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
-import { waitForCardLoad, waitForTestsToEnd } from '../helpers/card-ui-helpers';
+import { waitForCardLoad, waitForTestsToEnd, CARDS_URL } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { cardDocument } from '@cardstack/hub';
@@ -51,11 +51,11 @@ module('Acceptance | card view', function(hooks) {
   });
 
   test(`viewing a card`, async function(assert) {
-    await visit(`/cards/${cardPath}`);
+    await visit(`${CARDS_URL}/${cardPath}`);
     await waitForCardLoad(testCard.canonicalURL);
     await waitForCardLoad(author.canonicalURL);
 
-    assert.equal(currentURL(), `/cards/${cardPath}`);
+    assert.equal(currentURL(), `${CARDS_URL}/${cardPath}`);
     assert.dom('[data-test-field="title"] [data-test-string-field-viewer-value]').hasText('The Millenial Puppy');
     assert
       .dom('[data-test-field="body"] [data-test-string-field-viewer-value]')
@@ -89,9 +89,9 @@ module('Acceptance | card view', function(hooks) {
   test('can navigate to the base-card', async function(assert) {
     let baseCardPath = encodeURIComponent(canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }));
 
-    await visit(`/cards/${baseCardPath}`);
+    await visit(`${CARDS_URL}/${baseCardPath}`);
     await waitForCardLoad();
-    assert.equal(currentURL(), `/cards/${baseCardPath}`);
+    assert.equal(currentURL(), `${CARDS_URL}/${baseCardPath}`);
 
     assert.dom('[data-test-field]').doesNotExist(); // base-card currenty has no fields
     await percySnapshot(assert);

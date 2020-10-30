@@ -1,7 +1,7 @@
-<header class="org-header org-header--sm org-header--{{@id}}" style="background-color:{{@bgColor}}" data-test-org-header>
+{{! template-lint-disable no-inline-styles }}
+<header class="org-header org-header--sm org-header--{{@id}}" style={{html-safe (concat "background-color:" @bgColor)}} data-test-org-header>
   <div class="org-header__title-row">
     <h1 class="org-header__title">
-      {{! template-lint-disable no-inline-styles }}
       <span class="org-header__logo org-header__logo--{{@id}}" style={{if @logoURL (css-url "background-image" @logoURL)}} />
       <span>{{@title}}</span>
     </h1>

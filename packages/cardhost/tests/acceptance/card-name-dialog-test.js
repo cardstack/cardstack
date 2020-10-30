@@ -10,6 +10,7 @@ import {
   waitForSchemaViewToLoad,
   waitForTestsToEnd,
   getEncodedCardIdFromURL,
+  CARDS_URL,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -17,7 +18,7 @@ import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 import { cardDocument } from '@cardstack/hub';
 import { animationsSettled } from 'ember-animated/test-support';
 
-const cardName = 'Millenial Puppies';
+const cardName = 'Millenial puppies';
 
 const csRealm = 'https://cardstack.com/api/realms/card-catalog';
 const parentCard = cardDocument()
@@ -63,7 +64,7 @@ module('Acceptance | card name dialog', function(hooks) {
   });
 
   test('can create a card that uses a template from the catalog', async function(assert) {
-    await visit('/cards');
+    await visit('/');
     await click('[data-test-library-button]');
     await waitForTemplatesToLoad();
 
@@ -78,18 +79,18 @@ module('Acceptance | card name dialog', function(hooks) {
     assert.dom('[data-test-isolated-card-mode="edit"] [data-test-field="name"]').exists();
 
     let cardId = getEncodedCardIdFromURL();
-    await visit(`/cards/${cardId}/configure/layout`);
+    await visit(`${CARDS_URL}/${cardId}/configure/layout`);
     await showCardId();
     assert.dom('[data-test-isolated-card-mode="layout"] [data-test-field="name"]').exists();
     assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('User Card');
     assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').hasText('Base Card');
 
-    await visit(`/cards/${cardId}/configure/fields`);
+    await visit(`${CARDS_URL}/${cardId}/configure/fields`);
     assert.dom('.card-renderer-isolated--header-title').hasText(cardName);
   });
 
   test('can create a new card that does not leverage a template from the catalog', async function(assert) {
-    await visit('/cards');
+    await visit('/');
     await click('[data-test-library-button]');
     await waitForTemplatesToLoad();
 
@@ -107,7 +108,7 @@ module('Acceptance | card name dialog', function(hooks) {
   });
 
   test('can use the enter key to confirm card name from dialog', async function(assert) {
-    await visit('/cards');
+    await visit('/');
     await click('[data-test-library-button]');
     await waitForTemplatesToLoad();
 
@@ -120,29 +121,29 @@ module('Acceptance | card name dialog', function(hooks) {
   });
 
   test('can cancel creation of a card by clicking outside the dialog', async function(assert) {
-    await visit('/cards');
+    await visit('/');
     await click('[data-test-library-button]');
     await waitForTemplatesToLoad();
 
     await click('[data-test-library-adopt-card-btn]');
     await click('[data-test-cardhost-modal-container]'); // close dialog by clicking modal container
     assert.dom('[data-test-dialog-box]').doesNotExist();
-    assert.equal(currentURL(), '/cards/collection');
+    assert.equal(currentURL(), `${CARDS_URL}/collection`);
   });
 
   test('can cancel creation of a card by clicking the cancel button', async function(assert) {
-    await visit('/cards');
+    await visit('/');
     await click('[data-test-library-button]');
     await waitForTemplatesToLoad();
 
     await click('[data-test-library-adopt-card-btn]');
     await click('[data-test-cancel-create-btn]'); // close dialog by clicking cancel button
     assert.dom('[data-test-dialog-box]').doesNotExist();
-    assert.equal(currentURL(), '/cards/collection');
+    assert.equal(currentURL(), `${CARDS_URL}/collection`);
   });
 
   skip('loading screen can appear over the dialog', async function(assert) {
-    await visit('/cards');
+    await visit('/');
     await click('[data-test-library-button]');
     await waitForTemplatesToLoad();
 

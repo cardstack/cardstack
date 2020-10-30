@@ -8,6 +8,7 @@ import {
   waitForTestsToEnd,
   waitForSchemaViewToLoad,
   waitForLibraryServiceToIdle,
+  CARDS_URL,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -147,10 +148,6 @@ async function waitForLibraryLoad() {
   await waitForLibraryServiceToIdle();
   await waitForCatalogEntriesToLoad('[data-test-templates]');
 }
-async function waitForFeaturedCardsLoad() {
-  await waitForCatalogEntriesToLoad('[data-test-featured-cards]');
-  await Promise.all([catalogCard1, catalogCard2].map(card => waitForCardLoad(card.canonicalURL)));
-}
 
 module('Acceptance | library', function(hooks) {
   setupApplicationTest(hooks);
@@ -164,8 +161,8 @@ module('Acceptance | library', function(hooks) {
   });
 
   test(`viewing library`, async function(assert) {
-    await visit(`/cards`);
-    assert.equal(currentURL(), '/cards/collection');
+    await visit(`/`);
+    assert.equal(currentURL(), `${CARDS_URL}/collection`);
 
     assert.dom('[data-test-library-button]').exists();
     await click('[data-test-library-button]');
@@ -258,38 +255,38 @@ module('Acceptance | library', function(hooks) {
   });
 
   test('visit library from card view', async function(assert) {
-    await visit(`/cards/${encodeURIComponent(card1.canonicalURL)}`);
+    await visit(`${CARDS_URL}/${encodeURIComponent(card1.canonicalURL)}`);
     await waitForCardLoad();
 
     assert.dom('[data-test-library-button]').exists();
     await click('[data-test-library-button]');
     await waitForLibraryLoad();
 
-    assert.equal(currentURL(), `/cards/${encodeURIComponent(card1.canonicalURL)}`);
+    assert.equal(currentURL(), `${CARDS_URL}/${encodeURIComponent(card1.canonicalURL)}`);
     assert.dom('[data-test-library]').exists();
   });
 
   test('visit library from card edit', async function(assert) {
-    await visit(`/cards/${encodeURIComponent(card1.canonicalURL)}/edit`);
+    await visit(`${CARDS_URL}/${encodeURIComponent(card1.canonicalURL)}/edit`);
     await waitForCardLoad();
 
     assert.dom('[data-test-library-button]').exists();
     await click('[data-test-library-button]');
     await waitForLibraryLoad();
 
-    assert.equal(currentURL(), `/cards/${encodeURIComponent(card1.canonicalURL)}/edit`);
+    assert.equal(currentURL(), `${CARDS_URL}/${encodeURIComponent(card1.canonicalURL)}/edit`);
     assert.dom('[data-test-library]').exists();
   });
 
   test('visit library from card schema', async function(assert) {
-    await visit(`/cards/${encodeURIComponent(card1.canonicalURL)}/configure/fields`);
+    await visit(`${CARDS_URL}/${encodeURIComponent(card1.canonicalURL)}/configure/fields`);
     await waitForSchemaViewToLoad();
 
     assert.dom('[data-test-library-button]').exists();
     await click('[data-test-library-button]');
     await waitForLibraryLoad();
 
-    assert.equal(currentURL(), `/cards/${encodeURIComponent(card1.canonicalURL)}/configure/fields`);
+    assert.equal(currentURL(), `${CARDS_URL}/${encodeURIComponent(card1.canonicalURL)}/configure/fields`);
     assert.dom('[data-test-library]').exists();
   });
 });

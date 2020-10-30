@@ -16,6 +16,9 @@ import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 
 const timeout = 5000;
 
+export const DEFAULT_ORG = 'bunny-records';
+export const CARDS_URL = `/cards/${DEFAULT_ORG}`;
+
 export async function waitForAnimation(promise) {
   await new Promise(res => setTimeout(() => res(), 1000));
   await promise();
@@ -295,7 +298,7 @@ export function encodeColons(string) {
 }
 
 export function getEncodedCardIdFromURL() {
-  let [, , cardId] = currentURL().split('/');
+  let [, , , cardId] = currentURL().split('/');
   return cardId;
 }
 export function getCardIdFromURL() {

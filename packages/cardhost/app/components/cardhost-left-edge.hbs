@@ -16,6 +16,7 @@
             data-test-home-link
           >
             {{svg-jar "cardstack-logo" width="27px" height="30px"}}
+            <div class="sr-only">Home</div>
           </LinkTo>
         </li>
         <li class="login-grid">
@@ -65,10 +66,13 @@
               @class="cardhost-left-edge__org-link {{if (eq org.id this.currentOrgId) "active"}}"
               @aria-label="View catalog for {{org.title}}"
             >
+              {{! template-lint-disable no-inline-styles }}
               <div
                 class="cardhost-left-edge__org-link-logo cardhost-left-edge__org-link-logo--{{org.id}}"
-                style={{concat (css-url "background-image" org.logoURL)(if org.brandColor (concat ";background-color:" org.brandColor))}}
-              />
+                style={{html-safe (concat (css-url "background-image" org.logoURL)(if org.brandColor (concat ";background-color:" org.brandColor)))}}
+              >
+                <div class="sr-only">{{org.title}}</div>
+              </div>
             </LinkTo>
           </li>
         {{/each}}

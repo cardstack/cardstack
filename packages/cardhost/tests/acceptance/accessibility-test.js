@@ -8,6 +8,7 @@ import {
   waitForCatalogEntriesToLoad,
   waitForThemerLoad,
   waitForTestsToEnd,
+  CARDS_URL,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { cardDocument } from '@cardstack/hub';
@@ -79,7 +80,7 @@ module('Acceptance | accessibility', function(hooks) {
   });
 
   test('basic a11y tests for card view', async function(assert) {
-    await visit(`/cards/${cardPath}`);
+    await visit(`${CARDS_URL}/${cardPath}`);
     await waitForCardLoad();
     await waitForCssTransitions();
     await a11yAudit();
@@ -87,7 +88,7 @@ module('Acceptance | accessibility', function(hooks) {
   });
 
   test('basic a11y tests for edit fields', async function(assert) {
-    await visit(`/cards/${cardPath}/edit`);
+    await visit(`${CARDS_URL}/${cardPath}/edit`);
     await waitForCardLoad();
     await waitForCssTransitions();
     await a11yAudit();
@@ -95,7 +96,7 @@ module('Acceptance | accessibility', function(hooks) {
   });
 
   test('basic a11y tests for schema fields', async function(assert) {
-    await visit(`/cards/${cardPath}/configure/fields`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/fields`);
     await waitForSchemaViewToLoad();
     await waitForCssTransitions();
     await a11yAudit();
@@ -103,7 +104,7 @@ module('Acceptance | accessibility', function(hooks) {
   });
 
   test('basic a11y tests for layout view', async function(assert) {
-    await visit(`/cards/${cardPath}/configure/layout`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/layout`);
     await waitForCardLoad();
     await waitForCssTransitions();
     await a11yAudit();
@@ -111,7 +112,7 @@ module('Acceptance | accessibility', function(hooks) {
   });
 
   test('basic a11y tests for themer (FIXME: monaco line numbers failing contrast tests)', async function(assert) {
-    await visit(`/cards/${cardPath}/configure/layout/themer`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/layout/themer`);
     await waitForThemerLoad();
     await waitForCssTransitions();
     await a11yAudit();

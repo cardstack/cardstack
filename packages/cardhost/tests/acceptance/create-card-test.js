@@ -18,6 +18,7 @@ import {
   waitForLibraryServiceToIdle,
   getEncodedCardIdFromURL,
   waitForAnimation,
+  CARDS_URL,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -44,7 +45,7 @@ module('Acceptance | card create', function(hooks) {
   });
 
   test('right edge shows base card as adopted from card', async function(assert) {
-    await visit('/cards/add');
+    await visit(`${CARDS_URL}/add`);
     await setCardName(card1Name);
     await showCardId();
 
@@ -55,8 +56,8 @@ module('Acceptance | card create', function(hooks) {
   });
 
   test('creating a card', async function(assert) {
-    await visit('/cards/add');
-    assert.equal(currentURL(), '/cards/add');
+    await visit(`${CARDS_URL}/add`);
+    assert.equal(currentURL(), `${CARDS_URL}/add`);
 
     await percySnapshot([assert.test.module.name, assert.test.testName, 'new'].join(' | '));
     await setCardName(card1Name);
@@ -120,7 +121,7 @@ module('Acceptance | card create', function(hooks) {
   test('creating a card from the library', async function(assert) {
     await visit('/');
 
-    assert.equal(currentURL(), '/cards/collection');
+    assert.equal(currentURL(), `${CARDS_URL}/collection`);
     await click('[data-test-library-button]');
     await waitForLibraryServiceToIdle();
 
@@ -142,14 +143,14 @@ module('Acceptance | card create', function(hooks) {
 
     await click('[data-test-mode-indicator]');
     await waitForCardLoad(decodeURIComponent(cardId));
-    assert.equal(currentURL(), `/cards/${cardId}`);
+    assert.equal(currentURL(), `${CARDS_URL}/${cardId}`);
     assert
       .dom(`[data-test-isolated-card="${decodeURIComponent(cardId)}"][data-test-isolated-card-mode="view"]`)
       .exists();
   });
 
   test(`selecting a field`, async function(assert) {
-    await visit('/cards/add');
+    await visit(`${CARDS_URL}/add`);
 
     await setCardName(card1Name);
     await addField('title', 'string-field', true);
@@ -202,7 +203,7 @@ module('Acceptance | card create', function(hooks) {
   });
 
   test(`renaming a card's field`, async function(assert) {
-    await visit('/cards/add');
+    await visit(`${CARDS_URL}/add`);
 
     await setCardName(card1Name);
     await addField('title', 'string-field', true);
@@ -222,17 +223,17 @@ module('Acceptance | card create', function(hooks) {
     assert.ok(/^\/cards\/.*\/configure\/fields?$/.test(currentURL()), 'URL is correct');
     let card1Id = getEncodedCardIdFromURL();
 
-    await visit(`/cards/${card1Id}`);
+    await visit(`${CARDS_URL}/${card1Id}`);
     await animationsSettled();
     assert.dom('[data-test-field="subtitle"] [data-test-string-field-viewer-label]').hasText('Subtitle');
     assert.dom('[data-test-field="title"]').doesNotExist();
 
-    await visit(`/cards/${card1Id}/edit`);
+    await visit(`${CARDS_URL}/${card1Id}/edit`);
     await animationsSettled();
     assert.dom('[data-test-field="subtitle"] [data-test-edit-field-label]').hasText('Subtitle');
     assert.dom('[data-test-field="title"]').doesNotExist();
 
-    await visit(`/cards/${card1Id}/configure/fields`);
+    await visit(`${CARDS_URL}/${card1Id}/configure/fields`);
     await animationsSettled();
     assert.dom('[data-test-field="subtitle"] [data-test-field-renderer-label]').hasText('Subtitle');
 
@@ -246,7 +247,7 @@ module('Acceptance | card create', function(hooks) {
   });
 
   test(`entering invalid field name shows error`, async function(assert) {
-    await visit('/cards/add');
+    await visit(`${CARDS_URL}/add`);
 
     await setCardName(card1Name);
     await addField('title', 'string-field', true);
@@ -266,7 +267,7 @@ module('Acceptance | card create', function(hooks) {
   });
 
   test(`removing a field from a card`, async function(assert) {
-    await visit('/cards/add');
+    await visit(`${CARDS_URL}/add`);
 
     await setCardName(card1Name);
     await addField('title', 'string-field', true);
@@ -282,7 +283,7 @@ module('Acceptance | card create', function(hooks) {
   });
 
   test(`removing a field from a card that has an empty name`, async function(assert) {
-    await visit('/cards/add');
+    await visit(`${CARDS_URL}/add`);
 
     await setCardName(card1Name);
     await addField('', 'string-field', true);
@@ -300,7 +301,7 @@ module('Acceptance | card create', function(hooks) {
   });
 
   test('can add a field at a particular position', async function(assert) {
-    await visit('/cards/add');
+    await visit(`${CARDS_URL}/add`);
 
     await setCardName(card1Name);
     await addField('title', 'string-field', true);
@@ -320,7 +321,7 @@ module('Acceptance | card create', function(hooks) {
   });
 
   test('autosave works', async function(assert) {
-    await visit('/cards/add');
+    await visit(`${CARDS_URL}/add`);
     await setCardName(card1Name);
     let card1Id = getEncodedCardIdFromURL();
     this.owner.lookup('service:autosave').autosaveDisabled = false;
@@ -328,7 +329,7 @@ module('Acceptance | card create', function(hooks) {
     await waitForCardAutosave();
     this.owner.lookup('service:autosave').autosaveDisabled = true;
 
-    await visit(`/cards/${card1Id}`);
+    await visit(`${CARDS_URL}/${card1Id}`);
     await waitForCardLoad();
 
     assert.dom('[data-test-field="title"]').exists();

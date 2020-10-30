@@ -2,7 +2,13 @@ import { module, test } from 'qunit';
 import { click, visit, currentURL } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
-import { waitForCardLoad, waitForTestsToEnd, encodeColons, waitForThemerLoad } from '../helpers/card-ui-helpers';
+import {
+  waitForCardLoad,
+  waitForTestsToEnd,
+  encodeColons,
+  waitForThemerLoad,
+  CARDS_URL,
+} from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { cardDocument } from '@cardstack/hub';
 import { percySnapshot } from 'ember-percy';
@@ -49,11 +55,11 @@ module('Acceptance | card preview', function(hooks) {
   });
 
   test(`previewing a card`, async function(assert) {
-    await visit(`/cards/${cardPath}/configure/preview`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/preview`);
     await waitForCardLoad(testCard.canonicalURL);
     await waitForCardLoad(author.canonicalURL);
 
-    assert.equal(currentURL(), `/cards/${cardPath}/configure/preview`);
+    assert.equal(currentURL(), `${CARDS_URL}/${cardPath}/configure/preview`);
 
     // can render page contents
     assert.dom('[data-test-cardhost-cards]').hasClass('preview');
@@ -81,17 +87,17 @@ module('Acceptance | card preview', function(hooks) {
   });
 
   test('can navigate to the to previous page (layout) mode when closed', async function(assert) {
-    await visit(`/cards/${cardPath}/configure/layout`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/layout`);
     await waitForCardLoad();
 
-    assert.equal(currentURL(), `/cards/${cardPath}/configure/layout`);
+    assert.equal(currentURL(), `${CARDS_URL}/${cardPath}/configure/layout`);
     assert.dom('[data-test-card-renderer-isolated]').hasClass('layout');
     assert.dom('[data-test-isolated-card-mode="layout"]').exists();
 
     await click('[data-test-preview-link-btn]');
     await waitForCardLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/preview`);
+    assert.equal(encodeColons(currentURL()), `${CARDS_URL}/${cardPath}/configure/preview`);
     assert.dom('[data-test-card-renderer-isolated]').hasClass('preview');
     assert.dom('[data-test-isolated-card-mode="view"]').exists();
     assert.dom('[data-test-mode-indicator-link="preview"]').exists();
@@ -99,34 +105,34 @@ module('Acceptance | card preview', function(hooks) {
     await click('[data-test-mode-indicator]');
     await waitForCardLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/layout`);
+    assert.equal(encodeColons(currentURL()), `${CARDS_URL}/${cardPath}/configure/layout`);
     assert.dom('[data-test-card-renderer-isolated]').hasClass('layout');
     assert.dom('[data-test-isolated-card-mode="layout"]').exists();
   });
 
   test('can navigate to the to previous page (themer) when closed', async function(assert) {
-    await visit(`/cards/${cardPath}/configure/layout/themer`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/layout/themer`);
     await waitForCardLoad();
 
-    assert.equal(currentURL(), `/cards/${cardPath}/configure/layout/themer`);
+    assert.equal(currentURL(), `${CARDS_URL}/${cardPath}/configure/layout/themer`);
     assert.dom('[data-test-card-renderer-isolated]').hasClass('themer');
 
     await click('[data-test-preview-link-btn]');
     await waitForCardLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/preview`);
+    assert.equal(encodeColons(currentURL()), `${CARDS_URL}/${cardPath}/configure/preview`);
     assert.dom('[data-test-card-renderer-isolated]').hasClass('preview');
     assert.dom('[data-test-mode-indicator-link="preview"]').exists();
 
     await click('[data-test-mode-indicator]');
     await waitForThemerLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/layout/themer`);
+    assert.equal(encodeColons(currentURL()), `${CARDS_URL}/${cardPath}/configure/layout/themer`);
     assert.dom('[data-test-card-renderer-isolated]').hasClass('themer', 'can return to themer');
   });
 
   test('can navigate to the to layout page when closed if there is no previous page', async function(assert) {
-    await visit(`/cards/${cardPath}/configure/preview`);
+    await visit(`${CARDS_URL}/${cardPath}/configure/preview`);
     await waitForCardLoad();
 
     assert.dom('[data-test-mode-indicator-link="preview"]').exists();
@@ -134,7 +140,7 @@ module('Acceptance | card preview', function(hooks) {
     await click('[data-test-mode-indicator]');
     await waitForCardLoad();
 
-    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/layout`);
+    assert.equal(encodeColons(currentURL()), `${CARDS_URL}/${cardPath}/configure/layout`);
     assert.dom('[data-test-card-renderer-isolated]').hasClass('layout');
     assert.dom('[data-test-isolated-card-mode="layout"]').exists();
   });
