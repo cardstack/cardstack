@@ -1,12 +1,12 @@
-{{#if this.model.currentOrg}}
+{{#if this.model.org}}
   <OrgHeader
-    @id={{this.model.currentOrg.id}}
-    @title={{this.model.currentOrg.title}}
-    @logoURL={{this.model.currentOrg.logoURL}}
-    @bgColor={{this.model.currentOrg.brandColor}}
+    @id={{this.model.org.id}}
+    @title={{this.model.org.title}}
+    @logoURL={{this.model.org.logoURL}}
+    @bgColor={{this.model.org.brandColor}}
   >
     <li>
-      <LinkTo @route="cards.collection" @model={{this.model.currentOrg.id}}>
+      <LinkTo @route="cards.collection" @models={{array this.model.org.id this.model.id}}>
         {{if (eq this.model.id "master-recordings") "Masters" (humanize this.model.id)}}
       </LinkTo>
     </li>

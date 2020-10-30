@@ -17,7 +17,7 @@ export interface Model {
 }
 
 interface OrgModel {
-  currentOrg: Org;
+  org: Org;
 }
 
 export default class CardsCard extends Route {
@@ -32,7 +32,8 @@ export default class CardsCard extends Route {
     await Promise.resolve(this.autosave.saveCard.last);
 
     let orgModel = this.modelFor('cards') as OrgModel;
-    let org = orgModel.currentOrg as Org;
+    let org = orgModel.org as Org;
+    // TODO: Confirm card exists within this realm
 
     return {
       card: await this.data.load(id, 'everything'),

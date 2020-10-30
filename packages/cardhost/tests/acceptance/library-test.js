@@ -162,7 +162,7 @@ module('Acceptance | library', function(hooks) {
 
   test(`viewing library`, async function(assert) {
     await visit(`/`);
-    assert.equal(currentURL(), `${CARDS_URL}/collection`);
+    assert.equal(currentURL(), `${CARDS_URL}`);
 
     assert.dom('[data-test-library-button]').exists();
     await click('[data-test-library-button]');

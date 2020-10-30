@@ -119,7 +119,6 @@ module('Acceptance | card adoption', function(hooks) {
   test('can create adopted card from the library', async function(assert) {
     await visit('/');
 
-    assert.equal(currentURL(), `${CARDS_URL}/collection`);
     await click('[data-test-library-button]');
     await waitForLibraryServiceToIdle();
     await waitForCardLoad(parentCard.canonicalURL);

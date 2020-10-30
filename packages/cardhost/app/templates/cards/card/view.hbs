@@ -1,22 +1,24 @@
-<OrgHeader
-  @id={{this.model.org.id}}
-  @title={{this.model.org.title}}
-  @logoURL={{this.model.org.logoURL}}
-  @bgColor={{this.model.org.brandColor}}
->
-  <li>
-    <LinkTo @route="cards.collection" @model={{this.model.org.id}} @class="active">
-      Masters
-    </LinkTo>
-  </li>
-</OrgHeader>
+{{#if this.model.org}}
+  <OrgHeader
+    @id={{this.model.org.id}}
+    @title={{this.model.org.title}}
+    @logoURL={{this.model.org.logoURL}}
+    @bgColor={{this.model.org.brandColor}}
+  >
+    <li>
+      <LinkTo @route="cards" @model={{this.model.org.id}} @class="active">
+        Masters
+      </LinkTo>
+    </li>
+  </OrgHeader>
+{{/if}}
 
 <section class="card-renderer--container card-renderer--container--{{if this.model.org "with-breadcrumbs" "without-breadcrumbs"}}"
   data-test-card-view={{this.model.card.canonicalURL}}
 >
   <div class="card-renderer--inner-container view-container">
     <Breadcrumbs>
-      <LinkTo @route="cards.collection" @model={{this.model.org.id}} @class="breadcrumbs__item">
+      <LinkTo @route="cards.collection" @models={{array this.model.org.id "master-recordings"}} @class="breadcrumbs__item">
         <div class="breadcrumbs__item-label">Collection</div>
         <div class="breadcrumbs__item-title">Master Recordings</div>
       </LinkTo>

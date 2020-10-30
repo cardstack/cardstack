@@ -9,6 +9,7 @@ import { cardDocument } from '@cardstack/hub';
 import { embeddedCssFile } from '@cardstack/cardhost/utils/scaffolding';
 
 const csRealm = `http://localhost:3000/api/realms/default`;
+const defaultCollection = 'master-recordings';
 const template = cardDocument()
   .withAttributes({
     csRealm,
@@ -27,25 +28,28 @@ const template = cardDocument()
     email: 'user@nowhere.dog',
   })
   .withField('name', 'string-field')
-  .withField('email', 'string-field');
+  .withField('email', 'string-field')
+  .withField('type', 'string-field');
 const card1 = cardDocument()
   .withAttributes({
     csRealm,
     csId: 'collection-hassan',
-    csTitle: 'master-recording',
+    csTitle: 'Master Recording',
     csCreated: '2020-01-01T10:00:00Z',
     name: 'Hassan Abdel-Rahman',
     email: 'hassan@nowhere.dog',
+    type: 'master-recording',
   })
   .adoptingFrom(template);
 const card2 = cardDocument()
   .withAttributes({
     csRealm,
     csId: 'collection-van-gogh',
-    csTitle: 'master-recording',
+    csTitle: 'Master Recording',
     csCreated: '2020-01-01T09:00:00Z',
     name: 'Van Gogh',
     email: 'vangogh@nowhere.dog',
+    type: 'master-recording',
   })
   .adoptingFrom(template);
 
@@ -69,9 +73,15 @@ module('Acceptance | collection', function(hooks) {
   });
 
   test(`viewing collection`, async function(assert) {
-    await visit(`${CARDS_URL}/collection`);
+    await visit('/');
+    assert.equal(currentURL(), `${CARDS_URL}/collection/${defaultCollection}`);
+
+    await visit(`${CARDS_URL}`);
+    assert.equal(currentURL(), `${CARDS_URL}/collection/${defaultCollection}`);
+
+    await visit(`${CARDS_URL}/collection/defaultCollection`);
     await waitForCollectionLoad();
-    assert.equal(currentURL(), `${CARDS_URL}/collection`);
+    assert.equal(currentURL(), `${CARDS_URL}/collection/${defaultCollection}`);
 
     assert.dom('[data-test-org-header]').exists();
     assert.dom('[data-test-cardhost-left-edge]').exists();
@@ -82,7 +92,7 @@ module('Acceptance | collection', function(hooks) {
   });
 
   test('card embedded css is rendered for the cards in the collection', async function(assert) {
-    await visit(`${CARDS_URL}/collection`);
+    await visit(`${CARDS_URL}`);
     await waitForCollectionLoad();
 
     assert.ok(
@@ -92,7 +102,7 @@ module('Acceptance | collection', function(hooks) {
   });
 
   test(`isolating a card`, async function(assert) {
-    await visit(`${CARDS_URL}/collection`);
+    await visit(`${CARDS_URL}`);
     await waitForCollectionLoad();
 
     await click(`[data-test-card-renderer="${card2.canonicalURL}"] a`);

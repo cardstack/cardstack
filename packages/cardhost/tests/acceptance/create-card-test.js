@@ -121,7 +121,7 @@ module('Acceptance | card create', function(hooks) {
   test('creating a card from the library', async function(assert) {
     await visit('/');
 
-    assert.equal(currentURL(), `${CARDS_URL}/collection`);
+    assert.equal(currentURL(), `${CARDS_URL}`);
     await click('[data-test-library-button]');
     await waitForLibraryServiceToIdle();
 

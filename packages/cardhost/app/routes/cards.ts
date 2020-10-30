@@ -10,26 +10,26 @@ import CardstackSessionService, { Org } from '../services/cardstack-session';
 
 interface Model {
   previousRoute?: RouteInfo;
-  currentOrg?: Org;
+  org: Org;
 }
 
 export default class CardsRoute extends Route {
   @service library!: LibraryService;
   @service cardstackSession!: CardstackSessionService;
-  @tracked currentOrg!: Org | undefined;
+  @tracked org!: Org;
 
   async model(args: any): Promise<Model> {
     let { org } = args;
     let userOrgs = this.cardstackSession.userOrgs;
 
     if (userOrgs.length) {
-      this.currentOrg = userOrgs.find(el => el.id === org) || userOrgs[0];
+      this.org = userOrgs.find(el => el.id === org) || userOrgs[0];
     }
 
     await this.library.load.perform();
 
     return {
-      currentOrg: this.currentOrg,
+      org: this.org,
     };
   }
 

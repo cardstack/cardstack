@@ -18,28 +18,33 @@ const size = 100;
 interface Model {
   id: string;
   cards: AddressableCard[];
-  currentOrg: Org;
+  org: Org;
 }
 
 interface OrgModel {
-  currentOrg: Org;
+  org: Org;
 }
 
 export default class CollectionRoute extends Route {
   @service data!: DataService;
   @service cardLocalStorage!: CardLocalStorageService;
   @tracked collectionEntries: AddressableCard[] = [];
-  @tracked currentOrg!: Org;
+  @tracked org!: Org;
   @tracked collectionId!: string;
   @tracked collectionType!: string;
 
-  async model(): Promise<Model> {
-    let orgModel = this.modelFor('cards') as OrgModel;
-    this.currentOrg = orgModel.currentOrg as Org;
-    this.collectionId = this.currentOrg.collectionId;
-    this.collectionType = singularize(this.collectionId);
+  async model(args: any): Promise<Model> {
+    let { collection } = args;
 
-    if (this.currentOrg.realm) {
+    let orgModel = this.modelFor('cards') as OrgModel;
+    this.org = orgModel.org as Org;
+
+    if (this.org.collections.includes(collection)) {
+      this.collectionId = collection;
+      this.collectionType = singularize(this.collectionId);
+    }
+
+    if (this.org.realm) {
       await this.load.perform();
     } else {
       this.collectionEntries = [];
@@ -48,21 +53,20 @@ export default class CollectionRoute extends Route {
     return {
       id: this.collectionId,
       cards: this.collectionEntries,
-      currentOrg: this.currentOrg,
+      org: this.org,
     };
   }
 
   @task(function*(this: CollectionRoute) {
-    let collectionEntries;
+    let realmCards;
 
     if (environment === 'development' || environment === 'test') {
-      collectionEntries = yield this.data.search(
+      realmCards = yield this.data.search(
         {
           filter: {
             type: { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' },
             eq: {
               csRealm: getUserRealm(),
-              csTitle: this.collectionType,
             },
           },
           sort: '-csCreated',
@@ -71,12 +75,11 @@ export default class CollectionRoute extends Route {
         { includeFieldSet: 'embedded' }
       );
     } else {
-      collectionEntries = yield this.data.search(
+      realmCards = yield this.data.search(
         {
           filter: {
             eq: {
-              csRealm: this.currentOrg.realm || null,
-              csTitle: this.collectionType,
+              csRealm: this.org.realm || CARDSTACK_PUBLIC_REALM,
             },
           },
           sort: '-csCreated',
@@ -86,7 +89,14 @@ export default class CollectionRoute extends Route {
       );
     }
 
-    this.collectionEntries = collectionEntries;
+    let collectionCards: any = realmCards.filter((el: any) => {
+      if (!el.attributes && !el.attributes.type) {
+        return;
+      }
+      return el.attributes.type === this.collectionType;
+    });
+
+    this.collectionEntries = collectionCards;
     return;
   })
   load: any; //TS and EC don't play nice;

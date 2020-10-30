@@ -18,10 +18,12 @@ const csRealm = 'http://localhost:3000/api/realms/default';
 const testCard = cardDocument().withAutoAttributes({
   csRealm,
   csId: 'entry',
-  csTitle: 'master-recording',
+  csTitle: 'The Millenial Puppy',
   title: 'The Millenial Puppy',
+  type: 'master-recording',
 });
 const cardPath = encodeURIComponent(testCard.canonicalURL);
+const defaultCollection = 'master-recordings';
 const scenario = new Fixtures({
   create: [testCard],
 });
@@ -42,7 +44,7 @@ module('Acceptance | user info modal', function(hooks) {
 
   test('it appears on page load', async function(assert) {
     await visit('/');
-    assert.equal(currentURL(), `${CARDS_URL}/collection`);
+
     assert.dom('[data-test-user-info-modal]').exists();
     assert.dom('[data-test-dialog-title]').hasText('Important Notice');
     assert.dom('[data-test-dialog-content]').hasAnyText();
@@ -110,7 +112,7 @@ module('Acceptance | user info modal', function(hooks) {
 
     await click('[data-test-mode-indicator]');
     await click('[data-test-home-link]');
-    assert.equal(encodeColons(currentURL()), `${CARDS_URL}/collection?confirmed=true`);
+    assert.equal(encodeColons(currentURL()), `${CARDS_URL}/collection/${defaultCollection}?confirmed=true`);
 
     await waitForCardLoad(testCard.canonicalURL);
     await click(`[data-test-card-renderer="${testCard.canonicalURL}"] a`);

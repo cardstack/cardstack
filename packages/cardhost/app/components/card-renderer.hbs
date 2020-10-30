@@ -58,7 +58,7 @@
                 {{!-- If we need card specific styling above this level, then let's chat about it.                           --}}
                 <div class="isolated-card-boundary {{if this.isViewOrLayoutMode (concat (safe-css-string (if @card.canonicalURL @card.canonicalURL @card.adoptsFromURL)) "--isolated") }}">
                   {{#if this.isViewOrLayoutMode}}
-                    <div class="isolated-card-label">{{humanize @card.csTitle}}</div>
+                    <div class="isolated-card-label">{{@card.csTitle}}</div>
                   {{/if}}
                   {{#if @dropField}}
                     <DropZone
@@ -110,7 +110,7 @@
         >
           {{#unless @suppressHeader}}
             <div class="card-renderer-embedded__label">
-              {{humanize @card.csTitle}}
+              {{@card.csTitle}}
             </div>
           {{/unless}}
           <Scaffold

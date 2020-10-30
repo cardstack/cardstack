@@ -9,7 +9,7 @@
       <ul class="cardhost-left-edge__top-btn-group">
         <li>
           <LinkTo
-            @route="cards.collection"
+            @route="cards"
             @model={{this.currentOrgId}}
             @class="cardhost-left-edge--nav-button cardstack-logo-button"
             @aria-label="homepage"
@@ -61,7 +61,7 @@
         {{#each @orgs as |org|}}
           <li>
             <LinkTo
-              @route="cards.collection"
+              @route="cards"
               @model={{org.id}}
               @class="cardhost-left-edge__org-link {{if (eq org.id this.currentOrgId) "active"}}"
               @aria-label="View catalog for {{org.title}}"
