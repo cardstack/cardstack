@@ -90,6 +90,7 @@
 .org-header__nav li > a.active:not(.unselected) {
   font-weight: bold;
   border-color: white;
+  text-transform: capitalize;
 }
 
 .org-header__search-bar {

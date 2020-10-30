@@ -27,6 +27,7 @@
   font: var(--boxel-font-med);
   font-weight: 700;
   letter-spacing: 0;
+  text-transform: capitalize;
 }
 
 .card-editor__controls {

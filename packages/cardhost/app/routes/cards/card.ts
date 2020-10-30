@@ -4,20 +4,20 @@ import DataService from '../../services/data';
 import { AddressableCard } from '@cardstack/hub';
 import { action } from '@ember/object';
 import { set } from '@ember/object';
-import { Org } from '../cards';
+import { Org } from '../../services/cardstack-session';
 
 export interface RouteParams {
   id: string;
 }
 
 export interface Model {
-  org: Org;
   card: AddressableCard;
   isDirty: boolean;
+  org: Org;
 }
 
 interface OrgModel {
-  org: Org;
+  currentOrg: Org;
 }
 
 export default class CardsCard extends Route {
@@ -32,12 +32,12 @@ export default class CardsCard extends Route {
     await Promise.resolve(this.autosave.saveCard.last);
 
     let orgModel = this.modelFor('cards') as OrgModel;
-    let org = orgModel.org as Org;
+    let org = orgModel.currentOrg as Org;
 
     return {
-      org,
       card: await this.data.load(id, 'everything'),
       isDirty: false, // This is a temporary place to track model dirtiness until we integrate OrbitJS
+      org,
     };
   }
 

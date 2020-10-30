@@ -25,9 +25,7 @@
     component "cardhost-left-edge"
     mode=this.routeInfo.mode
     card=this.currentCard
-    orgs=this.model.orgs
-    currentOrg=this.model.org.id
-    collection=this.model.org.collection
+    orgs=this.cardstackSession.userOrgs
   )}}
 {{/unless}}
 

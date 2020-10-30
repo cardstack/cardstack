@@ -3,7 +3,7 @@
   data-test-card-renderer-header
 >
   <header class="card-renderer-isolated--header">
-    <span class="card-renderer-isolated--header-title hide-in-percy">{{or @card.csTitle "Blank Card"}}</span>
+    <span class="card-renderer-isolated--header-title hide-in-percy">{{or (humanize @card.csTitle) "Blank Card"}}</span>
     {{#if this.cardstackSession.isAuthenticated}}
       <div class="card-renderer--header-btns">
         <button

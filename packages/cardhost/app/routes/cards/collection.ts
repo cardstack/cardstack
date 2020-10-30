@@ -8,7 +8,7 @@ import DataService from '../../services/data';
 import CardLocalStorageService from '../../services/card-local-storage';
 import { getUserRealm } from '../../utils/scaffolding';
 import { AddressableCard, CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
-import { Org } from '../cards';
+import { Org } from '../../services/cardstack-session';
 //@ts-ignore
 import ENV from '@cardstack/cardhost/config/environment';
 
@@ -16,14 +16,13 @@ const { environment } = ENV;
 const size = 100;
 
 interface Model {
-  org: Org;
   id: string;
-  title: string;
   cards: AddressableCard[];
+  currentOrg: Org;
 }
 
 interface OrgModel {
-  org: Org;
+  currentOrg: Org;
 }
 
 export default class CollectionRoute extends Route {
@@ -32,18 +31,13 @@ export default class CollectionRoute extends Route {
   @tracked collectionEntries: AddressableCard[] = [];
   @tracked currentOrg!: Org;
   @tracked collectionId!: string;
-  @tracked collectionTitle!: string;
   @tracked collectionType!: string;
 
   async model(): Promise<Model> {
     let orgModel = this.modelFor('cards') as OrgModel;
-    this.currentOrg = orgModel.org as Org;
+    this.currentOrg = orgModel.currentOrg as Org;
     this.collectionId = this.currentOrg.collectionId;
     this.collectionType = singularize(this.collectionId);
-
-    this.collectionTitle = this.currentOrg.collectionTitle
-      ? this.currentOrg.collectionTitle
-      : this.currentOrg.collectionId;
 
     if (this.currentOrg.realm) {
       await this.load.perform();
@@ -53,9 +47,8 @@ export default class CollectionRoute extends Route {
 
     return {
       id: this.collectionId,
-      org: this.currentOrg,
-      title: this.collectionTitle,
       cards: this.collectionEntries,
+      currentOrg: this.currentOrg,
     };
   }
 
