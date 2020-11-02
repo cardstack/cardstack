@@ -1,8 +1,14 @@
 import { module, test } from 'qunit';
-import { find, visit, currentURL } from '@ember/test-helpers';
+import { find, visit, currentURL, click } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
-import { waitForCardLoad, waitForTestsToEnd, CARDS_URL } from '../helpers/card-ui-helpers';
+import {
+  waitForCardLoad,
+  waitForTestsToEnd,
+  CARDS_URL,
+  DEFAULT_ORG,
+  DEFAULT_COLLECTION,
+} from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { cardDocument } from '@cardstack/hub';
@@ -95,5 +101,29 @@ module('Acceptance | card view', function(hooks) {
 
     assert.dom('[data-test-field]').doesNotExist(); // base-card currenty has no fields
     await percySnapshot(assert);
+  });
+
+  test('can navigate to collection view using the header', async function(assert) {
+    await visit(`${CARDS_URL}/${cardPath}`);
+    await waitForCardLoad();
+    assert.dom('[data-test-org-header]').exists();
+    assert.dom('[data-test-collection-link]').exists();
+    assert.dom('[data-test-isolated-collection]').doesNotExist();
+
+    await click('[data-test-collection-link]');
+    assert.equal(currentURL(), `${CARDS_URL}/collection/${DEFAULT_COLLECTION}`);
+    assert.dom('[data-test-org-header]').exists();
+    assert.dom('[data-test-isolated-collection]').exists();
+  });
+
+  test('can navigate to collection view using the left-edge', async function(assert) {
+    await visit(`${CARDS_URL}/${cardPath}`);
+    await waitForCardLoad();
+    assert.dom(`[data-test-org-switcher="${DEFAULT_ORG}"]`).exists();
+    assert.dom('[data-test-isolated-collection]').doesNotExist();
+
+    await click(`[data-test-org-switcher="${DEFAULT_ORG}"]`);
+    assert.equal(currentURL(), `${CARDS_URL}/collection/${DEFAULT_COLLECTION}`);
+    assert.dom('[data-test-isolated-collection]').exists();
   });
 });

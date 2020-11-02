@@ -11,6 +11,7 @@ import {
   waitForTestsToEnd,
   getEncodedCardIdFromURL,
   CARDS_URL,
+  DEFAULT_COLLECTION,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -19,7 +20,6 @@ import { cardDocument } from '@cardstack/hub';
 import { animationsSettled } from 'ember-animated/test-support';
 
 const cardName = 'Millenial puppies';
-const defaultCollection = 'master-recordings';
 const csRealm = 'https://cardstack.com/api/realms/card-catalog';
 const parentCard = cardDocument()
   .withAttributes({
@@ -128,7 +128,7 @@ module('Acceptance | card name dialog', function(hooks) {
     await click('[data-test-library-adopt-card-btn]');
     await click('[data-test-cardhost-modal-container]'); // close dialog by clicking modal container
     assert.dom('[data-test-dialog-box]').doesNotExist();
-    assert.equal(currentURL(), `${CARDS_URL}/collection/${defaultCollection}`);
+    assert.equal(currentURL(), `${CARDS_URL}/collection/${DEFAULT_COLLECTION}`);
   });
 
   test('can cancel creation of a card by clicking the cancel button', async function(assert) {
@@ -139,7 +139,7 @@ module('Acceptance | card name dialog', function(hooks) {
     await click('[data-test-library-adopt-card-btn]');
     await click('[data-test-cancel-create-btn]'); // close dialog by clicking cancel button
     assert.dom('[data-test-dialog-box]').doesNotExist();
-    assert.equal(currentURL(), `${CARDS_URL}/collection/${defaultCollection}`);
+    assert.equal(currentURL(), `${CARDS_URL}/collection/${DEFAULT_COLLECTION}`);
   });
 
   skip('loading screen can appear over the dialog', async function(assert) {

@@ -17,6 +17,7 @@ import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 const timeout = 5000;
 
 export const DEFAULT_ORG = 'bunny-records';
+export const DEFAULT_COLLECTION = 'master-recordings';
 export const CARDS_URL = `/cards/${DEFAULT_ORG}`;
 
 export async function waitForAnimation(promise) {

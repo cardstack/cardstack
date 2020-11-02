@@ -6,7 +6,7 @@
     @bgColor={{this.model.org.brandColor}}
   >
     <li>
-      <LinkTo @route="cards.collection" @models={{array this.model.org.id this.model.id}}>
+      <LinkTo @route="cards.collection" @models={{array this.model.org.id this.model.id}} data-test-org-header-link={{this.model.id}}>
         {{if (eq this.model.id "master-recordings") "Masters" (humanize this.model.id)}}
       </LinkTo>
     </li>

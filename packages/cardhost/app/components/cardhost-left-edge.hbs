@@ -65,6 +65,7 @@
               @model={{org.id}}
               @class="cardhost-left-edge__org-link {{if (eq org.id this.currentOrgId) "active"}}"
               @aria-label="View catalog for {{org.title}}"
+              data-test-org-switcher={{org.id}}
             >
               {{! template-lint-disable no-inline-styles }}
               <div

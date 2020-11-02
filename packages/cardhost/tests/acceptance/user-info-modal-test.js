@@ -11,6 +11,7 @@ import {
   waitForSchemaViewToLoad,
   waitForThemerLoad,
   CARDS_URL,
+  DEFAULT_COLLECTION,
 } from '../helpers/card-ui-helpers';
 import { cardDocument } from '@cardstack/hub';
 
@@ -23,7 +24,6 @@ const testCard = cardDocument().withAutoAttributes({
   type: 'master-recording',
 });
 const cardPath = encodeURIComponent(testCard.canonicalURL);
-const defaultCollection = 'master-recordings';
 const scenario = new Fixtures({
   create: [testCard],
 });
@@ -112,7 +112,7 @@ module('Acceptance | user info modal', function(hooks) {
 
     await click('[data-test-mode-indicator]');
     await click('[data-test-home-link]');
-    assert.equal(encodeColons(currentURL()), `${CARDS_URL}/collection/${defaultCollection}?confirmed=true`);
+    assert.equal(encodeColons(currentURL()), `${CARDS_URL}/collection/${DEFAULT_COLLECTION}?confirmed=true`);
 
     await waitForCardLoad(testCard.canonicalURL);
     await click(`[data-test-card-renderer="${testCard.canonicalURL}"] a`);

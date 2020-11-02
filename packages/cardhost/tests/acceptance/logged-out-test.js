@@ -9,6 +9,8 @@ import {
   waitForTestsToEnd,
   waitForLibraryServiceToIdle,
   CARDS_URL,
+  DEFAULT_ORG,
+  DEFAULT_COLLECTION,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -16,7 +18,6 @@ import { cardDocument } from '@cardstack/hub';
 import { animationsSettled } from 'ember-animated/test-support';
 
 const csRealm = 'http://localhost:3000/api/realms/default';
-const defaultCollection = 'master-recordings';
 const testCard = cardDocument().withAutoAttributes({
   csRealm,
   csId: 'entry',
@@ -137,7 +138,7 @@ module('Acceptance | logged-out', function(hooks) {
     await login();
     await visit(`/`);
 
-    assert.equal(currentURL(), `${CARDS_URL}/collection/${defaultCollection}`);
+    assert.equal(currentURL(), `${CARDS_URL}/collection/${DEFAULT_COLLECTION}`);
     await waitForCollectionCardsLoad();
 
     assert.dom('[data-test-isolated-collection]').exists();
@@ -150,7 +151,7 @@ module('Acceptance | logged-out', function(hooks) {
     await click('[data-test-logout-button]');
     await animationsSettled();
 
-    assert.equal(currentURL(), `${CARDS_URL}/collection/${defaultCollection}`);
+    assert.equal(currentURL(), `${CARDS_URL}/collection/${DEFAULT_COLLECTION}`);
     assert.dom('[data-test-isolated-collection-card]').exists({ count: 2 });
     assert.dom('[data-test-cardhost-left-edge]').exists();
     assert.dom('[data-test-library-button]').isDisabled();
@@ -160,7 +161,7 @@ module('Acceptance | logged-out', function(hooks) {
     await login();
     await visit(`/`);
 
-    assert.equal(currentURL(), `${CARDS_URL}/collection/${defaultCollection}`);
+    assert.equal(currentURL(), `${CARDS_URL}/collection/${DEFAULT_COLLECTION}`);
     await click('[data-test-library-button]');
     await waitForLibraryServiceToIdle();
     await waitForCardLoad(testCard.canonicalURL);
@@ -169,11 +170,27 @@ module('Acceptance | logged-out', function(hooks) {
     await click('[data-test-logout-button]');
     await animationsSettled();
 
-    assert.equal(currentURL(), `${CARDS_URL}/collection/${defaultCollection}`);
+    assert.equal(currentURL(), `${CARDS_URL}/collection/${DEFAULT_COLLECTION}`);
     assert.dom('[data-test-library]').doesNotExist();
     assert.dom('[data-test-isolated-collection-card]').exists({ count: 2 });
     assert.dom('[data-test-cardhost-left-edge]').exists();
     assert.dom('[data-test-library-button]').isDisabled();
+  });
+
+  test('can view the org switcher only while logged in', async function(assert) {
+    await login();
+    await visit(`/`);
+
+    assert.equal(currentURL(), `${CARDS_URL}/collection/${DEFAULT_COLLECTION}`);
+    assert.dom('[data-test-org-switcher]').exists({ count: 6 });
+    assert.dom(`[data-test-org-switcher="${DEFAULT_ORG}"]`).exists();
+
+    await click('[data-test-toggle-left-edge]');
+    await click('[data-test-logout-button]');
+    await animationsSettled();
+
+    assert.dom('[data-test-cardhost-left-edge]').exists();
+    assert.dom(`[data-test-org-switcher="${DEFAULT_ORG}"]`).doesNotExist();
   });
 
   test('can navigate to index page from view mode', async function(assert) {
@@ -191,7 +208,7 @@ module('Acceptance | logged-out', function(hooks) {
     assert.dom('[data-test-home-link]').exists();
 
     await click('[data-test-home-link]');
-    assert.equal(currentURL(), `${CARDS_URL}/collection/${defaultCollection}`);
+    assert.equal(currentURL(), `${CARDS_URL}/collection/${DEFAULT_COLLECTION}`);
   });
 
   test('clicking outside the login panel closes it', async function(assert) {

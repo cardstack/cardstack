@@ -19,6 +19,7 @@ import {
   getEncodedCardIdFromURL,
   waitForAnimation,
   CARDS_URL,
+  DEFAULT_COLLECTION,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -26,7 +27,6 @@ import { animationsSettled } from 'ember-animated/test-support';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 
 const card1Name = 'Millenial Puppies';
-const defaultCollection = 'master-recordings';
 
 const scenario = new Fixtures({
   destroy: {
@@ -122,7 +122,7 @@ module('Acceptance | card create', function(hooks) {
   test('creating a card from the library', async function(assert) {
     await visit('/');
 
-    assert.equal(currentURL(), `${CARDS_URL}/collection/${defaultCollection}`);
+    assert.equal(currentURL(), `${CARDS_URL}/collection/${DEFAULT_COLLECTION}`);
     await click('[data-test-library-button]');
     await waitForLibraryServiceToIdle();
 
