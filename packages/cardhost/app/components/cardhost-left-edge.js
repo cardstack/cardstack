@@ -38,7 +38,7 @@ export default class CardhostLeftEdgeComponent extends Component {
       this.router.transitionTo('cards.card.view', this.cardId);
     } else {
       if (this.currentOrgId) {
-        this.router.transitionTo('cards.collection', this.currentOrgId);
+        this.router.transitionTo('cards', this.currentOrgId);
       } else {
         this.router.transitionTo('index');
       }

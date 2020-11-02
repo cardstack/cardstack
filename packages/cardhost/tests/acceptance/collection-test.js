@@ -17,7 +17,7 @@ const template = cardDocument()
     csTitle: 'Template',
     csCreated: '2020-01-01T14:00:00Z',
     csFieldSets: {
-      embedded: ['name'],
+      embedded: ['name', 'type'],
       isolated: ['name', 'email'],
     },
     csFeatures: { 'embedded-css': embeddedCssFile },
@@ -79,7 +79,7 @@ module('Acceptance | collection', function(hooks) {
     await visit(`${CARDS_URL}`);
     assert.equal(currentURL(), `${CARDS_URL}/collection/${defaultCollection}`);
 
-    await visit(`${CARDS_URL}/collection/defaultCollection`);
+    await visit(`${CARDS_URL}/collection/${defaultCollection}`);
     await waitForCollectionLoad();
     assert.equal(currentURL(), `${CARDS_URL}/collection/${defaultCollection}`);
 

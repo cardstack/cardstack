@@ -16,17 +16,20 @@ import { cardDocument } from '@cardstack/hub';
 import { animationsSettled } from 'ember-animated/test-support';
 
 const csRealm = 'http://localhost:3000/api/realms/default';
+const defaultCollection = 'master-recordings';
 const testCard = cardDocument().withAutoAttributes({
   csRealm,
   csId: 'entry',
-  csTitle: 'master-recording',
+  csTitle: 'Millenial Puppies',
   title: 'The Millenial Puppy',
+  type: 'master-recording',
 });
 const testCard2 = cardDocument().withAutoAttributes({
   csRealm,
   csId: 'entry-2',
-  csTitle: 'master-recording',
+  csTitle: 'Jackie',
   title: 'Jackie Wackie',
+  type: 'master-recording',
 });
 const cardPath = encodeURIComponent(testCard.canonicalURL);
 const scenario = new Fixtures({
@@ -134,7 +137,7 @@ module('Acceptance | logged-out', function(hooks) {
     await login();
     await visit(`/`);
 
-    assert.equal(currentURL().includes('collection'));
+    assert.equal(currentURL(), `${CARDS_URL}/collection/${defaultCollection}`);
     await waitForCollectionCardsLoad();
 
     assert.dom('[data-test-isolated-collection]').exists();
@@ -147,7 +150,7 @@ module('Acceptance | logged-out', function(hooks) {
     await click('[data-test-logout-button]');
     await animationsSettled();
 
-    assert.equal(currentURL().includes('collection'));
+    assert.equal(currentURL(), `${CARDS_URL}/collection/${defaultCollection}`);
     assert.dom('[data-test-isolated-collection-card]').exists({ count: 2 });
     assert.dom('[data-test-cardhost-left-edge]').exists();
     assert.dom('[data-test-library-button]').isDisabled();
@@ -157,7 +160,7 @@ module('Acceptance | logged-out', function(hooks) {
     await login();
     await visit(`/`);
 
-    assert.equal(currentURL().includes('collection'));
+    assert.equal(currentURL(), `${CARDS_URL}/collection/${defaultCollection}`);
     await click('[data-test-library-button]');
     await waitForLibraryServiceToIdle();
     await waitForCardLoad(testCard.canonicalURL);
@@ -166,7 +169,7 @@ module('Acceptance | logged-out', function(hooks) {
     await click('[data-test-logout-button]');
     await animationsSettled();
 
-    assert.equal(currentURL().includes('collection'));
+    assert.equal(currentURL(), `${CARDS_URL}/collection/${defaultCollection}`);
     assert.dom('[data-test-library]').doesNotExist();
     assert.dom('[data-test-isolated-collection-card]').exists({ count: 2 });
     assert.dom('[data-test-cardhost-left-edge]').exists();
@@ -188,7 +191,7 @@ module('Acceptance | logged-out', function(hooks) {
     assert.dom('[data-test-home-link]').exists();
 
     await click('[data-test-home-link]');
-    assert.equal(currentURL().includes('collection'));
+    assert.equal(currentURL(), `${CARDS_URL}/collection/${defaultCollection}`);
   });
 
   test('clicking outside the login panel closes it', async function(assert) {

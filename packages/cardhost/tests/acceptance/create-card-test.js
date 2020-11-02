@@ -26,6 +26,7 @@ import { animationsSettled } from 'ember-animated/test-support';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 
 const card1Name = 'Millenial Puppies';
+const defaultCollection = 'master-recordings';
 
 const scenario = new Fixtures({
   destroy: {
@@ -121,7 +122,7 @@ module('Acceptance | card create', function(hooks) {
   test('creating a card from the library', async function(assert) {
     await visit('/');
 
-    assert.equal(currentURL(), `${CARDS_URL}`);
+    assert.equal(currentURL(), `${CARDS_URL}/collection/${defaultCollection}`);
     await click('[data-test-library-button]');
     await waitForLibraryServiceToIdle();
 

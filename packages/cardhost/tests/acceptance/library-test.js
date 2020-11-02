@@ -19,6 +19,7 @@ import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 
 const csRealm = `http://localhost:3000/api/realms/default`;
 const cardCatalogRealm = 'https://cardstack.com/api/realms/card-catalog';
+const defaultCollection = 'master-recordings';
 const template1 = cardDocument()
   .withAttributes({
     csRealm: cardCatalogRealm,
@@ -162,7 +163,7 @@ module('Acceptance | library', function(hooks) {
 
   test(`viewing library`, async function(assert) {
     await visit(`/`);
-    assert.equal(currentURL(), `${CARDS_URL}`);
+    assert.equal(currentURL(), `${CARDS_URL}/collection/${defaultCollection}`);
 
     assert.dom('[data-test-library-button]').exists();
     await click('[data-test-library-button]');
