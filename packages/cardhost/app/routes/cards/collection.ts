@@ -4,6 +4,7 @@ import { inject as service } from '@ember/service';
 //@ts-ignore
 import { task } from 'ember-concurrency';
 import { singularize } from 'ember-inflector';
+import { dasherize } from '@ember/string';
 import DataService from '../../services/data';
 import CardLocalStorageService from '../../services/card-local-storage';
 import { getUserRealm } from '../../utils/scaffolding';
@@ -41,6 +42,8 @@ export default class CollectionRoute extends Route {
 
     if (this.org.collections.includes(collection)) {
       this.collectionId = collection;
+      // here, the collection id is the plural version of card type
+      // reconsider this to enable making collections of different card types
       this.collectionType = singularize(this.collectionId);
     }
 
@@ -90,10 +93,10 @@ export default class CollectionRoute extends Route {
     }
 
     let collectionCards: any = realmCards.filter((el: any) => {
-      if (!el.attributes && !el.attributes.type) {
-        return;
+      // using the formatted csTitle field for the card type
+      if (el.csTitle) {
+        return dasherize(el.csTitle.toLowerCase()) === this.collectionType;
       }
-      return el.attributes.type === this.collectionType;
     });
 
     this.collectionEntries = collectionCards;

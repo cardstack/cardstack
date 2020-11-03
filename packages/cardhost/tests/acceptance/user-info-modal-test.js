@@ -19,9 +19,8 @@ const csRealm = 'http://localhost:3000/api/realms/default';
 const testCard = cardDocument().withAutoAttributes({
   csRealm,
   csId: 'entry',
-  csTitle: 'The Millenial Puppy',
+  csTitle: 'Master Recording',
   title: 'The Millenial Puppy',
-  type: 'master-recording',
 });
 const cardPath = encodeURIComponent(testCard.canonicalURL);
 const scenario = new Fixtures({

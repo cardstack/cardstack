@@ -21,16 +21,14 @@ const csRealm = 'http://localhost:3000/api/realms/default';
 const testCard = cardDocument().withAutoAttributes({
   csRealm,
   csId: 'entry',
-  csTitle: 'Millenial Puppies',
+  csTitle: 'Master Recording',
   title: 'The Millenial Puppy',
-  type: 'master-recording',
 });
 const testCard2 = cardDocument().withAutoAttributes({
   csRealm,
   csId: 'entry-2',
-  csTitle: 'Jackie',
+  csTitle: 'Master Recording',
   title: 'Jackie Wackie',
-  type: 'master-recording',
 });
 const cardPath = encodeURIComponent(testCard.canonicalURL);
 const scenario = new Fixtures({

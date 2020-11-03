@@ -23,7 +23,7 @@ const template = cardDocument()
     csTitle: 'Template',
     csCreated: '2020-01-01T14:00:00Z',
     csFieldSets: {
-      embedded: ['name', 'type'],
+      embedded: ['name'],
       isolated: ['name', 'email'],
     },
     csFeatures: { 'embedded-css': embeddedCssFile },
@@ -34,8 +34,7 @@ const template = cardDocument()
     email: 'user@nowhere.dog',
   })
   .withField('name', 'string-field')
-  .withField('email', 'string-field')
-  .withField('type', 'string-field');
+  .withField('email', 'string-field');
 const card1 = cardDocument()
   .withAttributes({
     csRealm,
@@ -44,7 +43,6 @@ const card1 = cardDocument()
     csCreated: '2020-01-01T10:00:00Z',
     name: 'Hassan Abdel-Rahman',
     email: 'hassan@nowhere.dog',
-    type: 'master-recording',
   })
   .adoptingFrom(template);
 const card2 = cardDocument()
@@ -55,7 +53,6 @@ const card2 = cardDocument()
     csCreated: '2020-01-01T09:00:00Z',
     name: 'Van Gogh',
     email: 'vangogh@nowhere.dog',
-    type: 'master-recording',
   })
   .adoptingFrom(template);
 
