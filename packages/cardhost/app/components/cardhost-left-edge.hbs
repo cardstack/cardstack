@@ -6,16 +6,17 @@
     ...attributes
   >
     <nav class="cardhost-left-edge--nav {{@mode}} {{if this.isExpanded "expanded"}}">
-      <ul>
+      <ul class="cardhost-left-edge__top-btn-group">
         <li>
           <LinkTo
-            @route="index"
-            class="cardhost-left-edge--nav-button cardstack-logo-button"
-            aria-label="homepage"
-            title="Homepage"
+            @route="cards"
+            @model={{this.currentOrgId}}
+            @class="cardhost-left-edge--nav-button cardstack-logo-button"
+            @aria-label="homepage"
             data-test-home-link
           >
             {{svg-jar "cardstack-logo" width="27px" height="30px"}}
+            <div class="sr-only">Home</div>
           </LinkTo>
         </li>
         <li class="login-grid">
@@ -55,6 +56,29 @@
             </div>
           {{/if}}
         </li>
+      </ul>
+      <ul class="cardhost-left-edge__middle-btn-group">
+        {{#each @orgs as |org|}}
+          <li>
+            <LinkTo
+              @route="cards"
+              @model={{org.id}}
+              @class="cardhost-left-edge__org-link {{if (eq org.id this.currentOrgId) "active"}}"
+              @aria-label="View catalog for {{org.title}}"
+              data-test-org-switcher={{org.id}}
+            >
+              {{! template-lint-disable no-inline-styles }}
+              <div
+                class="cardhost-left-edge__org-link-logo cardhost-left-edge__org-link-logo--{{org.id}}"
+                style={{html-safe (concat (css-url "background-image" org.logoURL)(if org.brandColor (concat ";background-color:" org.brandColor)))}}
+              >
+                <div class="sr-only">{{org.title}}</div>
+              </div>
+            </LinkTo>
+          </li>
+        {{/each}}
+      </ul>
+      <ul class="cardhost-left-edge__bottom-btn-group">
         <li>
           <button
             disabled={{true}}

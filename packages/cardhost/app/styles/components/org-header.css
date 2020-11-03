@@ -1,28 +1,13 @@
 .org-header {
-  --header-background: #000;
-  --header-logo-size-sm: 35px 35px;
+  --header-logo-size-sm: auto 35px;
   position: sticky;
   top: 0;
   padding: 80px 20px 0 30px;
-  background-color: var(--header-background);
+  background-color: #000;
   color: white;
   height: 250px;
   z-index: 1;
 }
-
-.org-header.org-header--bunny-records {
-  --header-background: #FF1D6C;
-  --header-logo-size-sm: 25px 34px;
-}
-
-/* .org-header.org-header--crd-records {
-  --header-background: #0069F9;
-  --header-logo-size-sm: 36px 35px;
-}
-
-.org-header.org-header--warner-music-group {
-  --header-background: #0061aa;
-} */
 
 .org-header--sm {
   height: var(--boxel-org-header-height);
@@ -68,14 +53,13 @@
   background-size: var(--header-logo-size-sm);
 }
 
-/* .org-header--sm .org-header__logo--warner-music-group {
+/* TODO: remove org specific styles */
+.org-header--sm .org-header__logo--warner-music-group {
   background-size: auto;
-  background-position: left center;
 }
-
 .org-header--sm .org-header__logo--deezer {
   background-position: top center;
-} */
+}
 
 .org-header__logo svg {
   display: block;
@@ -106,6 +90,7 @@
 .org-header__nav li > a.active:not(.unselected) {
   font-weight: bold;
   border-color: white;
+  text-transform: capitalize;
 }
 
 .org-header__search-bar {

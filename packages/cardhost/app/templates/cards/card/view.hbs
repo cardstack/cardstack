@@ -1,31 +1,28 @@
-{{!-- TODO: Do not hardcode header data --}}
-{{#if this.isVerifiRealm}}
+{{#if this.model.org}}
   <OrgHeader
-    @id="bunny-records"
-    @title="Bunny Records"
-    @logoURL="/assets/images/orgs/bunny-logo.svg"
-    @displayNavbar={{true}}
+    @id={{this.model.org.id}}
+    @title={{this.model.org.title}}
+    @logoURL={{this.model.org.logoURL}}
+    @bgColor={{this.model.org.brandColor}}
   >
     <li>
-      <LinkTo @route="cards.collection">
+      <LinkTo @route="cards" @model={{this.model.org.id}} @class="active" data-test-collection-link>
         Masters
       </LinkTo>
     </li>
   </OrgHeader>
 {{/if}}
 
-<section class="card-renderer--container card-renderer--container--{{if this.isVerifiRealm "with-breadcrumbs" "without-breadcrumbs"}}"
+<section class="card-renderer--container card-renderer--container--{{if this.model.org "with-breadcrumbs" "without-breadcrumbs"}}"
   data-test-card-view={{this.model.card.canonicalURL}}
 >
   <div class="card-renderer--inner-container view-container">
-    {{#if this.isVerifiRealm}}
-      <Breadcrumbs>
-        <LinkTo @route="cards.collection" @class="breadcrumbs__item">
-          <div class="breadcrumbs__item-label">Collection</div>
-          <div class="breadcrumbs__item-title">Master Recordings</div>
-        </LinkTo>
-      </Breadcrumbs>
-    {{/if}}
+    <Breadcrumbs>
+      <LinkTo @route="cards.collection" @models={{array this.model.org.id "master-recordings"}} @class="breadcrumbs__item">
+        <div class="breadcrumbs__item-label">Collection</div>
+        <div class="breadcrumbs__item-title">Master Recordings</div>
+      </LinkTo>
+    </Breadcrumbs>
 
     <CardViewer @card={{this.model.card}} @mode="view" />
   </div>

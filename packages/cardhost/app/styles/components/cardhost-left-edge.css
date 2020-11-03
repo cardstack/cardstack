@@ -1,11 +1,13 @@
 .cardhost-left-edge {
   height: 100%;
-  display: flex;
-  flex-flow: row nowrap;
   z-index: var(--ch-left-edge-z-index);
 }
 
 .cardhost-left-edge--nav {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  align-items: center;
+  height: 100%;
   background-color: var(--ch-default);
   width: var(--ch-left-edge-navbar-width);
   overflow: hidden;
@@ -23,14 +25,29 @@
   background-color: var(--themer-bg);
 }
 
-.cardhost-left-edge--nav > ul {
+.cardhost-left-edge__top-btn-group {
+  align-self: start;
+}
+
+.cardhost-left-edge__bottom-btn-group {
+  align-self: end;
+}
+
+.cardhost-left-edge__middle-btn-group {
   display: flex;
   flex-flow: column nowrap;
-  justify-content: flex-end;
+  justify-content: center;
+}
+
+.cardhost-left-edge--nav > ul {
   height: 100%;
   margin: 0;
   padding: 20px;
   list-style-type: none;
+}
+
+.cardhost-left-edge--nav > ul.cardhost-left-edge__middle-btn-group {
+  padding: 0;
 }
 
 .cardhost-left-edge--nav li + li {
@@ -42,7 +59,45 @@
 }
 
 .cardhost-left-edge--nav li .ch-button--icon-secondary.catalog {
-  border-radius: 10px;
+  border-radius: var(--boxel-border-radius);
+}
+
+.cardhost-left-edge__org-link {
+  display: block;
+  width: 80px;
+  padding-left: 16px;
+  border-left: 4px solid transparent;
+}
+
+.cardhost-left-edge__org-link-logo {
+  width: 40px;
+  height: 40px;
+  background-color: #000;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: auto 25px;
+  border: 1px solid #000;
+  border-radius: var(--boxel-border-radius);
+  opacity: 0.5;
+}
+
+/* TODO: remove org specific styles */
+.cardhost-left-edge__org-link-logo--warner-music-group {
+  background-size: contain;
+}
+
+.cardhost-left-edge__org-link:hover {
+  cursor: pointer;
+}
+
+.cardhost-left-edge__org-link:hover .cardhost-left-edge__org-link-logo,
+.cardhost-left-edge__org-link:focus .cardhost-left-edge__org-link-logo,
+.cardhost-left-edge__org-link.active .cardhost-left-edge__org-link-logo {
+  opacity: 1;
+}
+
+.cardhost-left-edge__org-link.active {
+  border-color: var(--boxel-highlight);
 }
 
 .cardhost-left-edge--nav-button {

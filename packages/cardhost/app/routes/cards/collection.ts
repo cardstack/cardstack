@@ -3,50 +3,73 @@ import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 //@ts-ignore
 import { task } from 'ember-concurrency';
+import { singularize } from 'ember-inflector';
+import { dasherize } from '@ember/string';
 import DataService from '../../services/data';
 import CardLocalStorageService from '../../services/card-local-storage';
 import { getUserRealm } from '../../utils/scaffolding';
 import { AddressableCard, CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
+import { Org } from '../../services/cardstack-session';
 //@ts-ignore
 import ENV from '@cardstack/cardhost/config/environment';
 
 const { environment } = ENV;
-
-const verifiRealm = 'https://builder-hub.stack.cards/api/realms/verifi';
 const size = 100;
-const collectionType = 'Master Recording';
-const collectionTitle = 'Master Recordings';
 
 interface Model {
-  title: string;
+  id: string;
   cards: AddressableCard[];
+  org: Org;
 }
+
+interface OrgModel {
+  org: Org;
+}
+
 export default class CollectionRoute extends Route {
   @service data!: DataService;
   @service cardLocalStorage!: CardLocalStorageService;
-
   @tracked collectionEntries: AddressableCard[] = [];
+  @tracked org!: Org;
+  @tracked collectionId!: string;
+  @tracked collectionType!: string;
 
-  async model(): Promise<Model> {
-    await this.load.perform();
+  async model(args: any): Promise<Model> {
+    let { collection } = args;
+
+    let orgModel = this.modelFor('cards') as OrgModel;
+    this.org = orgModel.org as Org;
+
+    if (this.org.collections.includes(collection)) {
+      this.collectionId = collection;
+      // here, the collection id is the plural version of card type
+      // reconsider this to enable making collections of different card types
+      this.collectionType = singularize(this.collectionId);
+    }
+
+    if (this.org.realm) {
+      await this.load.perform();
+    } else {
+      this.collectionEntries = [];
+    }
 
     return {
-      title: collectionTitle,
+      id: this.collectionId,
       cards: this.collectionEntries,
+      org: this.org,
     };
   }
 
   @task(function*(this: CollectionRoute) {
-    let collectionEntries;
+    let realmCards;
 
     if (environment === 'development' || environment === 'test') {
-      collectionEntries = yield this.data.search(
+      realmCards = yield this.data.search(
         {
           filter: {
             type: { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' },
             eq: {
               csRealm: getUserRealm(),
-              csTitle: collectionType,
             },
           },
           sort: '-csCreated',
@@ -55,12 +78,11 @@ export default class CollectionRoute extends Route {
         { includeFieldSet: 'embedded' }
       );
     } else {
-      collectionEntries = yield this.data.search(
+      realmCards = yield this.data.search(
         {
           filter: {
             eq: {
-              csRealm: verifiRealm,
-              csTitle: collectionType,
+              csRealm: this.org.realm || CARDSTACK_PUBLIC_REALM,
             },
           },
           sort: '-csCreated',
@@ -70,7 +92,14 @@ export default class CollectionRoute extends Route {
       );
     }
 
-    this.collectionEntries = collectionEntries;
+    let collectionCards: any = realmCards.filter((el: any) => {
+      // using the formatted csTitle field for the card type
+      if (el.csTitle) {
+        return dasherize(el.csTitle.toLowerCase()) === this.collectionType;
+      }
+    });
+
+    this.collectionEntries = collectionCards;
     return;
   })
   load: any; //TS and EC don't play nice;

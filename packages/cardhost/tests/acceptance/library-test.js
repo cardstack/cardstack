@@ -8,6 +8,8 @@ import {
   waitForTestsToEnd,
   waitForSchemaViewToLoad,
   waitForLibraryServiceToIdle,
+  CARDS_URL,
+  DEFAULT_COLLECTION,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -147,10 +149,6 @@ async function waitForLibraryLoad() {
   await waitForLibraryServiceToIdle();
   await waitForCatalogEntriesToLoad('[data-test-templates]');
 }
-async function waitForFeaturedCardsLoad() {
-  await waitForCatalogEntriesToLoad('[data-test-featured-cards]');
-  await Promise.all([catalogCard1, catalogCard2].map(card => waitForCardLoad(card.canonicalURL)));
-}
 
 module('Acceptance | library', function(hooks) {
   setupApplicationTest(hooks);
@@ -164,8 +162,8 @@ module('Acceptance | library', function(hooks) {
   });
 
   test(`viewing library`, async function(assert) {
-    await visit(`/cards`);
-    assert.equal(currentURL(), '/cards/collection');
+    await visit(`/`);
+    assert.equal(currentURL(), `${CARDS_URL}/collection/${DEFAULT_COLLECTION}`);
 
     assert.dom('[data-test-library-button]').exists();
     await click('[data-test-library-button]');
@@ -215,36 +213,37 @@ module('Acceptance | library', function(hooks) {
     );
   });
 
-  test('featured cards are displayed', async function(assert) {
-    await visit(`/cards/featured-cards`);
-    await waitForFeaturedCardsLoad();
+  // this UI is currently removed
+  // test('featured cards are displayed', async function(assert) {
+  //   await visit(`/featured-cards`);
+  //   await waitForFeaturedCardsLoad();
 
-    await percySnapshot(assert);
-    assert.deepEqual(
-      [...document.querySelectorAll(`[data-test-featured-card]`)].map(i => i.getAttribute('data-test-featured-card')),
-      [catalogCard2.canonicalURL, catalogCard1.canonicalURL]
-    );
-    assert.dom(`[data-test-featured-card="${catalogCard1.canonicalURL}"] [data-test-isolated-card]`).exists();
-    assert.dom(`[data-test-featured-card="${catalogCard2.canonicalURL}"] [data-test-isolated-card]`).exists();
-    assert
-      .dom(`[data-test-featured-card="${catalogCard1.canonicalURL}"] [data-test-featured-card-title]`)
-      .hasText('Featured: The Millenial Puppy');
-    assert
-      .dom(`[data-test-featured-card="${catalogCard2.canonicalURL}"] [data-test-featured-card-title]`)
-      .hasText('Featured: Why Doors?');
-    assert.ok(
-      find(`[data-test-css-format="isolated"][data-test-css-cards="[${catalogCard1.canonicalURL}]"`).innerText.includes(
-        'card3 isolated css'
-      ),
-      'featured card style is correct'
-    );
-    assert.ok(
-      find(`[data-test-css-format="isolated"][data-test-css-cards="[${catalogCard2.canonicalURL}]"`).innerText.includes(
-        'card4 isolated css'
-      ),
-      'featured card style is correct'
-    );
-  });
+  //   await percySnapshot(assert);
+  //   assert.deepEqual(
+  //     [...document.querySelectorAll(`[data-test-featured-card]`)].map(i => i.getAttribute('data-test-featured-card')),
+  //     [catalogCard2.canonicalURL, catalogCard1.canonicalURL]
+  //   );
+  //   assert.dom(`[data-test-featured-card="${catalogCard1.canonicalURL}"] [data-test-isolated-card]`).exists();
+  //   assert.dom(`[data-test-featured-card="${catalogCard2.canonicalURL}"] [data-test-isolated-card]`).exists();
+  //   assert
+  //     .dom(`[data-test-featured-card="${catalogCard1.canonicalURL}"] [data-test-featured-card-title]`)
+  //     .hasText('Featured: The Millenial Puppy');
+  //   assert
+  //     .dom(`[data-test-featured-card="${catalogCard2.canonicalURL}"] [data-test-featured-card-title]`)
+  //     .hasText('Featured: Why Doors?');
+  //   assert.ok(
+  //     find(`[data-test-css-format="isolated"][data-test-css-cards="[${catalogCard1.canonicalURL}]"`).innerText.includes(
+  //       'card3 isolated css'
+  //     ),
+  //     'featured card style is correct'
+  //   );
+  //   assert.ok(
+  //     find(`[data-test-css-format="isolated"][data-test-css-cards="[${catalogCard2.canonicalURL}]"`).innerText.includes(
+  //       'card4 isolated css'
+  //     ),
+  //     'featured card style is correct'
+  //   );
+  // });
 
   test(`closing library panel`, async function(assert) {
     await visit(`/`);
@@ -257,38 +256,38 @@ module('Acceptance | library', function(hooks) {
   });
 
   test('visit library from card view', async function(assert) {
-    await visit(`/cards/${encodeURIComponent(card1.canonicalURL)}`);
+    await visit(`${CARDS_URL}/${encodeURIComponent(card1.canonicalURL)}`);
     await waitForCardLoad();
 
     assert.dom('[data-test-library-button]').exists();
     await click('[data-test-library-button]');
     await waitForLibraryLoad();
 
-    assert.equal(currentURL(), `/cards/${encodeURIComponent(card1.canonicalURL)}`);
+    assert.equal(currentURL(), `${CARDS_URL}/${encodeURIComponent(card1.canonicalURL)}`);
     assert.dom('[data-test-library]').exists();
   });
 
   test('visit library from card edit', async function(assert) {
-    await visit(`/cards/${encodeURIComponent(card1.canonicalURL)}/edit`);
+    await visit(`${CARDS_URL}/${encodeURIComponent(card1.canonicalURL)}/edit`);
     await waitForCardLoad();
 
     assert.dom('[data-test-library-button]').exists();
     await click('[data-test-library-button]');
     await waitForLibraryLoad();
 
-    assert.equal(currentURL(), `/cards/${encodeURIComponent(card1.canonicalURL)}/edit`);
+    assert.equal(currentURL(), `${CARDS_URL}/${encodeURIComponent(card1.canonicalURL)}/edit`);
     assert.dom('[data-test-library]').exists();
   });
 
   test('visit library from card schema', async function(assert) {
-    await visit(`/cards/${encodeURIComponent(card1.canonicalURL)}/configure/fields`);
+    await visit(`${CARDS_URL}/${encodeURIComponent(card1.canonicalURL)}/configure/fields`);
     await waitForSchemaViewToLoad();
 
     assert.dom('[data-test-library-button]').exists();
     await click('[data-test-library-button]');
     await waitForLibraryLoad();
 
-    assert.equal(currentURL(), `/cards/${encodeURIComponent(card1.canonicalURL)}/configure/fields`);
+    assert.equal(currentURL(), `${CARDS_URL}/${encodeURIComponent(card1.canonicalURL)}/configure/fields`);
     assert.dom('[data-test-library]').exists();
   });
 });

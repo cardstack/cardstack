@@ -4,23 +4,24 @@ import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 
 export default class CardhostLeftEdgeComponent extends Component {
+  @service routeInfo;
   @service cardstackSession;
   @service library;
   @service router;
   @tracked isExpanded = false;
 
   get cardId() {
-    let cardId;
-    let route = this.router.currentRoute;
-    while (route) {
-      cardId = route.params.id;
-      if (!cardId) {
-        route = route.parent;
-      } else {
-        break;
-      }
+    if (!this.routeInfo.currentCard) {
+      return null;
     }
-    return cardId;
+    return this.routeInfo.currentCard.canonicalURL;
+  }
+
+  get currentOrgId() {
+    if (!this.routeInfo.currentOrg) {
+      return null;
+    }
+    return this.routeInfo.currentOrg.id;
   }
 
   @action
@@ -36,7 +37,11 @@ export default class CardhostLeftEdgeComponent extends Component {
     if (this.cardId) {
       this.router.transitionTo('cards.card.view', this.cardId);
     } else {
-      this.router.transitionTo('index');
+      if (this.currentOrgId) {
+        this.router.transitionTo('cards', this.currentOrgId);
+      } else {
+        this.router.transitionTo('index');
+      }
     }
   }
 
