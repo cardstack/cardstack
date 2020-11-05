@@ -13,7 +13,7 @@ import { Org } from '../../services/cardstack-session';
 //@ts-ignore
 import ENV from '@cardstack/cardhost/config/environment';
 
-const { environment } = ENV;
+const { environment, hubURL } = ENV;
 const size = 100;
 
 interface Model {
@@ -63,7 +63,7 @@ export default class CollectionRoute extends Route {
   @task(function*(this: CollectionRoute) {
     let realmCards;
 
-    if (environment === 'development' || environment === 'test') {
+    if (hubURL === 'http://localhost:3000' || environment === 'test') {
       realmCards = yield this.data.search(
         {
           filter: {
@@ -82,7 +82,7 @@ export default class CollectionRoute extends Route {
         {
           filter: {
             eq: {
-              csRealm: this.org.realm || CARDSTACK_PUBLIC_REALM,
+              csRealm: this.org.realm,
             },
           },
           sort: '-csCreated',
