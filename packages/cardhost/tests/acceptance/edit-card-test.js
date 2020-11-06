@@ -11,7 +11,6 @@ import {
   encodeColons,
   waitForCardAutosave,
   waitForTestsToEnd,
-  CARDS_URL,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { cardDocument } from '@cardstack/hub';
@@ -74,17 +73,17 @@ module('Acceptance | card edit', function(hooks) {
   });
 
   test(`setting a string field`, async function(assert) {
-    await visit(`${CARDS_URL}/${cardPath}/edit`);
+    await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
 
-    assert.equal(currentURL(), `${CARDS_URL}/${cardPath}/edit`);
+    assert.equal(currentURL(), `/cards/${cardPath}/edit`);
 
     await setFieldValue('body', 'updated body');
     await saveCard();
 
-    assert.equal(currentURL(), `${CARDS_URL}/${cardPath}/edit`);
+    assert.equal(currentURL(), `/cards/${cardPath}/edit`);
 
-    await visit(`${CARDS_URL}/${cardPath}`);
+    await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
     assert.dom('[data-test-field="body"] [data-test-string-field-viewer-value]').hasText(`updated body`);
 
@@ -94,13 +93,13 @@ module('Acceptance | card edit', function(hooks) {
   });
 
   test('setting a date field', async function(assert) {
-    await visit(`${CARDS_URL}/${cardPath}/edit`);
+    await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
 
     await setFieldValue('birthday', '2016-11-19');
     await saveCard();
 
-    await visit(`${CARDS_URL}/${cardPath}`);
+    await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
     assert.dom('[data-test-field="birthday"] [data-test-date-field-viewer-value]').hasText(`Nov 19, 2016`);
 
@@ -110,13 +109,13 @@ module('Acceptance | card edit', function(hooks) {
   });
 
   test('setting a datetime field', async function(assert) {
-    await visit(`${CARDS_URL}/${cardPath}/edit`);
+    await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
 
     await setFieldValue('appointment', '2020-03-07T13:00');
     await saveCard();
 
-    await visit(`${CARDS_URL}/${cardPath}`);
+    await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
     assert
       .dom('[data-test-field="appointment"] [data-test-datetime-field-viewer-value]')
@@ -128,13 +127,13 @@ module('Acceptance | card edit', function(hooks) {
   });
 
   test('setting a url field', async function(assert) {
-    await visit(`${CARDS_URL}/${cardPath}/edit`);
+    await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
 
     await setFieldValue('link', 'https://cardstack.com');
     await saveCard();
 
-    await visit(`${CARDS_URL}/${cardPath}`);
+    await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
     assert.dom('[data-test-field="link"] [data-test-link-field-viewer-label]').hasText(`Awesome Link`);
     assert.dom('[data-test-field="link"] [data-test-link-field-viewer-value]').hasText(`https://cardstack.com/`);
@@ -148,13 +147,13 @@ module('Acceptance | card edit', function(hooks) {
   });
 
   test('setting a call-to-action field', async function(assert) {
-    await visit(`${CARDS_URL}/${cardPath}/edit`);
+    await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
 
     await setFieldValue('cta', 'https://cardstack.com');
     await saveCard();
 
-    await visit(`${CARDS_URL}/${cardPath}`);
+    await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
     assert.dom('[data-test-field="cta"] [data-test-cta-field-viewer-value]').hasText(`Call to action`);
     assert
@@ -170,13 +169,13 @@ module('Acceptance | card edit', function(hooks) {
     const imageURL =
       'https://resources.cardstack.com/assets/images/contributors/jen-c80f27e85c9404453b8c65754694619e.jpg';
 
-    await visit(`${CARDS_URL}/${cardPath}/edit`);
+    await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
 
     await setFieldValue('image', imageURL);
     await saveCard();
 
-    await visit(`${CARDS_URL}/${cardPath}`);
+    await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
     assert.dom('[data-test-field="image"] [data-test-image-reference-field-viewer-label]').hasText(`Awesome Image`);
     assert
@@ -191,13 +190,13 @@ module('Acceptance | card edit', function(hooks) {
   test('setting a relative image reference field', async function(assert) {
     const imageURL = '/assets/images/contributors/jen-c80f27e85c9404453b8c65754694619e.jpg';
 
-    await visit(`${CARDS_URL}/${cardPath}/edit`);
+    await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
 
     await setFieldValue('relativeImage', imageURL);
     await saveCard();
 
-    await visit(`${CARDS_URL}/${cardPath}`);
+    await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
     assert
       .dom('[data-test-field="relativeImage"] [data-test-image-reference-field-viewer-label]')
@@ -212,13 +211,13 @@ module('Acceptance | card edit', function(hooks) {
   });
 
   test('setting an integer field', async function(assert) {
-    await visit(`${CARDS_URL}/${cardPath}/edit`);
+    await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
 
     await setFieldValue('likes', 110);
     await saveCard();
 
-    await visit(`${CARDS_URL}/${cardPath}`);
+    await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
     assert.dom('[data-test-field="likes"] [data-test-integer-field-viewer-value]').hasText(`110`);
 
@@ -228,13 +227,13 @@ module('Acceptance | card edit', function(hooks) {
   });
 
   test('setting a boolean field', async function(assert) {
-    await visit(`${CARDS_URL}/${cardPath}/edit`);
+    await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
 
     await setFieldValue('published', false);
     await saveCard();
 
-    await visit(`${CARDS_URL}/${cardPath}`);
+    await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
     assert.dom('[data-test-field="published"] [data-test-boolean-field-viewer-value]').hasText(`No`);
 
@@ -244,13 +243,13 @@ module('Acceptance | card edit', function(hooks) {
   });
 
   test(`setting a base card field as reference with singular arity`, async function(assert) {
-    await visit(`${CARDS_URL}/${cardPath}/edit`);
+    await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
 
     await setFieldValue('author', author.canonicalURL);
     await saveCard();
 
-    await visit(`${CARDS_URL}/${cardPath}`);
+    await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
     await waitForCardLoad(author.canonicalURL);
     assert
@@ -270,18 +269,18 @@ module('Acceptance | card edit', function(hooks) {
   skip(`setting a card field as value with plural arity`, async function() {});
 
   test(`can navigate to view mode using the mode button`, async function(assert) {
-    await visit(`${CARDS_URL}/${cardPath}/edit`);
+    await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
 
     assert.dom('[data-test-mode-indicator-link="edit"]').exists();
 
     await click('[data-test-mode-indicator-link="edit"]');
     await waitForCardLoad();
-    assert.equal(encodeColons(currentURL()), `${CARDS_URL}/${cardPath}`);
+    assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
   });
 
   test(`does not display the top or right edge`, async function(assert) {
-    await visit(`${CARDS_URL}/${cardPath}/edit`);
+    await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
     await animationsSettled();
 
@@ -291,7 +290,7 @@ module('Acceptance | card edit', function(hooks) {
   });
 
   test('autosave works', async function(assert) {
-    await visit(`${CARDS_URL}/${cardPath}/edit`);
+    await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
 
     this.owner.lookup('service:autosave').autosaveDisabled = false;
@@ -299,7 +298,7 @@ module('Acceptance | card edit', function(hooks) {
     await waitForCardAutosave();
     this.owner.lookup('service:autosave').autosaveDisabled = true;
 
-    await visit(`${CARDS_URL}/${cardPath}`);
+    await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
     assert.dom('[data-test-field="body"] [data-test-string-field-viewer-value]').hasText(`this will autosave`);
 
