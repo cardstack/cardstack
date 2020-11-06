@@ -3,18 +3,21 @@ import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 //@ts-ignore
 import { task } from 'ember-concurrency';
-import { singularize } from 'ember-inflector';
 import { dasherize } from '@ember/string';
 import DataService from '../../services/data';
 import CardLocalStorageService from '../../services/card-local-storage';
 import { getUserRealm } from '../../utils/scaffolding';
 import { AddressableCard, CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
-import { USER_ORGS, Org } from '../../services/cardstack-session';
+import { Org, USER_ORGS } from '../../services/cardstack-session';
 //@ts-ignore
 import ENV from '@cardstack/cardhost/config/environment';
 
 const { environment, hubURL } = ENV;
 const size = 100;
+
+interface RouteParams {
+  collection: string;
+}
 
 interface Model {
   id: string;
@@ -22,28 +25,21 @@ interface Model {
   org: Org | undefined;
 }
 
+const realmsRoot = 'https://builder-hub.stack.cards/api/realms';
+
 export default class CollectionRoute extends Route {
   @service data!: DataService;
   @service cardLocalStorage!: CardLocalStorageService;
   @tracked collectionEntries: AddressableCard[] = [];
-  @tracked orgRealm!: string;
+  @tracked realmId!: string;
   @tracked collectionId!: string;
-  @tracked collectionType!: string;
 
-  async model(args: any): Promise<Model> {
-    let { org, collection } = args;
+  async model({ collection }: RouteParams): Promise<Model> {
+    let currentOrg = USER_ORGS.find(el => el.id === collection);
+    this.realmId = `${realmsRoot}/${collection}`;
 
-    let currentOrg = USER_ORGS.find(el => el.id === org);
-
-    if (currentOrg && currentOrg.collections.includes(collection)) {
-      this.collectionId = collection;
-      // here, the collection id is the plural version of card type
-      // reconsider this to enable making collections of different card types
-      this.collectionType = singularize(this.collectionId);
-    }
-
-    if (currentOrg && currentOrg.realm) {
-      this.orgRealm = currentOrg.realm;
+    if (currentOrg) {
+      this.collectionId = currentOrg.collection;
       await this.load.perform();
     } else {
       this.collectionEntries = [];
@@ -78,7 +74,7 @@ export default class CollectionRoute extends Route {
         {
           filter: {
             eq: {
-              csRealm: this.orgRealm,
+              csRealm: this.realmId,
             },
           },
           sort: '-csCreated',
@@ -89,9 +85,10 @@ export default class CollectionRoute extends Route {
     }
 
     let collectionCards: any = realmCards.filter((el: any) => {
-      // using the formatted csTitle field for the card type
+      // using the formatted csTitle field for the collection card type
+      // TODO: better way to filter out collection cards
       if (el.csTitle) {
-        return dasherize(el.csTitle.toLowerCase()) === this.collectionType;
+        return dasherize(el.csTitle.toLowerCase()) === this.collectionId;
       }
     });
 

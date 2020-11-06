@@ -1,21 +1,15 @@
 import Controller from '@ember/controller';
 import { inject as service } from '@ember/service';
-import { CardstackSession } from '../../../services/cardstack-session';
-import RouterService from '@ember/routing/router-service';
+import RouteInfoService from '../../../services/route-info';
 
 export default class ViewCardController extends Controller {
-  @service router!: RouterService;
-  @service cardstackSession!: CardstackSession;
+  @service routeInfo!: RouteInfoService;
 
   get realmOrg() {
-    if (!this.model.card) {
+    if (!this.routeInfo.currentRealm) {
       return null;
     }
 
-    let realmUrl = this.model.card.csRealm.split('/');
-    let id = realmUrl[realmUrl.length - 1];
-    let org = this.cardstackSession.userOrgs.find(el => el.id === id);
-
-    return org;
+    return this.routeInfo.currentRealm;
   }
 }
