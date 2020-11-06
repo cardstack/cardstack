@@ -10,7 +10,6 @@
         <li>
           <LinkTo
             @route="cards"
-            @model={{this.currentOrgId}}
             @class="cardhost-left-edge--nav-button cardstack-logo-button"
             @aria-label="homepage"
             data-test-home-link
@@ -61,8 +60,8 @@
         {{#each @orgs as |org|}}
           <li>
             <LinkTo
-              @route="cards"
-              @model={{org.id}}
+              @route="cards.collection"
+              @models={{array org.id org.collections.[0]}}
               @class="cardhost-left-edge__org-link {{if (eq org.id this.currentOrgId) "active"}}"
               @aria-label="View catalog for {{org.title}}"
               data-test-org-switcher={{org.id}}

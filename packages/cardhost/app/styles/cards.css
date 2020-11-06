@@ -75,7 +75,7 @@
   background-size: 55px;
 }
 
-.cardhost-cards.view .card-renderer--container {
+.cardhost-cards.view .card-renderer--container--with-breadcrumbs {
   height: calc(100% - var(--boxel-org-header-height));
 }
 

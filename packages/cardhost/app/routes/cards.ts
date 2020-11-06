@@ -18,12 +18,11 @@ export default class CardsRoute extends Route {
   @service cardstackSession!: CardstackSessionService;
   @tracked org!: Org;
 
-  async model(args: any): Promise<Model> {
-    let { org } = args;
+  async model(): Promise<Model> {
     let userOrgs = this.cardstackSession.userOrgs;
 
     if (userOrgs.length) {
-      this.org = userOrgs.find(el => el.id === org) || userOrgs[0];
+      this.org = userOrgs[0];
     }
 
     await this.library.load.perform();

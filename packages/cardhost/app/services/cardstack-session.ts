@@ -2,7 +2,7 @@ import Service from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
 // TODO: These are mock user's orgs. This data should reside somewhere else...
-const USER_ORGS = [
+export const USER_ORGS = [
   {
     id: 'bunny-records',
     title: 'Bunny Records',

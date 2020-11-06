@@ -9,7 +9,7 @@ import DataService from '../../services/data';
 import CardLocalStorageService from '../../services/card-local-storage';
 import { getUserRealm } from '../../utils/scaffolding';
 import { AddressableCard, CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
-import { Org } from '../../services/cardstack-session';
+import { USER_ORGS, Org } from '../../services/cardstack-session';
 //@ts-ignore
 import ENV from '@cardstack/cardhost/config/environment';
 
@@ -19,35 +19,31 @@ const size = 100;
 interface Model {
   id: string;
   cards: AddressableCard[];
-  org: Org;
-}
-
-interface OrgModel {
-  org: Org;
+  org: Org | undefined;
 }
 
 export default class CollectionRoute extends Route {
   @service data!: DataService;
   @service cardLocalStorage!: CardLocalStorageService;
   @tracked collectionEntries: AddressableCard[] = [];
-  @tracked org!: Org;
+  @tracked orgRealm!: string;
   @tracked collectionId!: string;
   @tracked collectionType!: string;
 
   async model(args: any): Promise<Model> {
-    let { collection } = args;
+    let { org, collection } = args;
 
-    let orgModel = this.modelFor('cards') as OrgModel;
-    this.org = orgModel.org as Org;
+    let currentOrg = USER_ORGS.find(el => el.id === org);
 
-    if (this.org.collections.includes(collection)) {
+    if (currentOrg && currentOrg.collections.includes(collection)) {
       this.collectionId = collection;
       // here, the collection id is the plural version of card type
       // reconsider this to enable making collections of different card types
       this.collectionType = singularize(this.collectionId);
     }
 
-    if (this.org.realm) {
+    if (currentOrg && currentOrg.realm) {
+      this.orgRealm = currentOrg.realm;
       await this.load.perform();
     } else {
       this.collectionEntries = [];
@@ -56,7 +52,7 @@ export default class CollectionRoute extends Route {
     return {
       id: this.collectionId,
       cards: this.collectionEntries,
-      org: this.org,
+      org: currentOrg,
     };
   }
 
@@ -82,7 +78,7 @@ export default class CollectionRoute extends Route {
         {
           filter: {
             eq: {
-              csRealm: this.org.realm,
+              csRealm: this.orgRealm,
             },
           },
           sort: '-csCreated',
