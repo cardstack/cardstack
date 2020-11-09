@@ -10,8 +10,6 @@ import {
   waitForSchemaViewToLoad,
   waitForTestsToEnd,
   getEncodedCardIdFromURL,
-  CARDS_URL,
-  DEFAULT_COLLECTION,
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
@@ -79,13 +77,13 @@ module('Acceptance | card name dialog', function(hooks) {
     assert.dom('[data-test-isolated-card-mode="edit"] [data-test-field="name"]').exists();
 
     let cardId = getEncodedCardIdFromURL();
-    await visit(`${CARDS_URL}/${cardId}/configure/layout`);
+    await visit(`/cards/${cardId}/configure/layout`);
     await showCardId();
     assert.dom('[data-test-isolated-card-mode="layout"] [data-test-field="name"]').exists();
     assert.dom('[data-test-right-edge] [data-test-adopted-card-name]').hasText('User Card');
     assert.dom('[data-test-right-edge] [data-test-adopted-card-adopted-card-name]').hasText('Base Card');
 
-    await visit(`${CARDS_URL}/${cardId}/configure/fields`);
+    await visit(`/cards/${cardId}/configure/fields`);
     assert.dom('.card-renderer-isolated--header-title').hasText(cardName);
   });
 
@@ -121,6 +119,7 @@ module('Acceptance | card name dialog', function(hooks) {
   });
 
   test('can cancel creation of a card by clicking outside the dialog', async function(assert) {
+    const org = 'bunny-records';
     await visit('/');
     await click('[data-test-library-button]');
     await waitForTemplatesToLoad();
@@ -128,10 +127,11 @@ module('Acceptance | card name dialog', function(hooks) {
     await click('[data-test-library-adopt-card-btn]');
     await click('[data-test-cardhost-modal-container]'); // close dialog by clicking modal container
     assert.dom('[data-test-dialog-box]').doesNotExist();
-    assert.equal(currentURL(), `${CARDS_URL}/collection/${DEFAULT_COLLECTION}`);
+    assert.equal(currentURL(), `/cards/${org}/collection`);
   });
 
   test('can cancel creation of a card by clicking the cancel button', async function(assert) {
+    const org = 'bunny-records';
     await visit('/');
     await click('[data-test-library-button]');
     await waitForTemplatesToLoad();
@@ -139,7 +139,7 @@ module('Acceptance | card name dialog', function(hooks) {
     await click('[data-test-library-adopt-card-btn]');
     await click('[data-test-cancel-create-btn]'); // close dialog by clicking cancel button
     assert.dom('[data-test-dialog-box]').doesNotExist();
-    assert.equal(currentURL(), `${CARDS_URL}/collection/${DEFAULT_COLLECTION}`);
+    assert.equal(currentURL(), `/cards/${org}/collection`);
   });
 
   skip('loading screen can appear over the dialog', async function(assert) {

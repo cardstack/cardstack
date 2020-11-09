@@ -2,13 +2,7 @@ import { module, test } from 'qunit';
 import { find, visit, currentURL, click } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
-import {
-  waitForCardLoad,
-  waitForTestsToEnd,
-  CARDS_URL,
-  DEFAULT_ORG,
-  DEFAULT_COLLECTION,
-} from '../helpers/card-ui-helpers';
+import { waitForCardLoad, waitForTestsToEnd } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { cardDocument } from '@cardstack/hub';
@@ -57,11 +51,11 @@ module('Acceptance | card view', function(hooks) {
   });
 
   test(`viewing a card`, async function(assert) {
-    await visit(`${CARDS_URL}/${cardPath}`);
+    await visit(`/cards/${cardPath}`);
     await waitForCardLoad(testCard.canonicalURL);
     await waitForCardLoad(author.canonicalURL);
 
-    assert.equal(currentURL(), `${CARDS_URL}/${cardPath}`);
+    assert.equal(currentURL(), `/cards/${cardPath}`);
     assert.dom('[data-test-field="title"] [data-test-string-field-viewer-value]').hasText('The Millenial Puppy');
     assert
       .dom('[data-test-field="body"] [data-test-string-field-viewer-value]')
@@ -95,35 +89,37 @@ module('Acceptance | card view', function(hooks) {
   test('can navigate to the base-card', async function(assert) {
     let baseCardPath = encodeURIComponent(canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }));
 
-    await visit(`${CARDS_URL}/${baseCardPath}`);
+    await visit(`/cards/${baseCardPath}`);
     await waitForCardLoad();
-    assert.equal(currentURL(), `${CARDS_URL}/${baseCardPath}`);
+    assert.equal(currentURL(), `/cards/${baseCardPath}`);
 
     assert.dom('[data-test-field]').doesNotExist(); // base-card currenty has no fields
     await percySnapshot(assert);
   });
 
   test('can navigate to collection view using the header', async function(assert) {
-    await visit(`${CARDS_URL}/${cardPath}`);
+    const org = 'bunny-records';
+    await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
     assert.dom('[data-test-org-header]').exists();
     assert.dom('[data-test-collection-link]').exists();
     assert.dom('[data-test-isolated-collection]').doesNotExist();
 
     await click('[data-test-collection-link]');
-    assert.equal(currentURL(), `${CARDS_URL}/collection/${DEFAULT_COLLECTION}`);
+    assert.equal(currentURL(), `/cards/${org}/collection`);
     assert.dom('[data-test-org-header]').exists();
     assert.dom('[data-test-isolated-collection]').exists();
   });
 
   test('can navigate to collection view using the left-edge', async function(assert) {
-    await visit(`${CARDS_URL}/${cardPath}`);
+    const org = 'bunny-records';
+    await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
-    assert.dom(`[data-test-org-switcher="${DEFAULT_ORG}"]`).exists();
+    assert.dom(`[data-test-org-switcher="${org}"]`).exists();
     assert.dom('[data-test-isolated-collection]').doesNotExist();
 
-    await click(`[data-test-org-switcher="${DEFAULT_ORG}"]`);
-    assert.equal(currentURL(), `${CARDS_URL}/collection/${DEFAULT_COLLECTION}`);
+    await click(`[data-test-org-switcher="${org}"]`);
+    assert.equal(currentURL(), `/cards/${org}/collection`);
     assert.dom('[data-test-isolated-collection]').exists();
   });
 });

@@ -1,9 +1,15 @@
 import Controller from '@ember/controller';
 import { inject as service } from '@ember/service';
-import { CardstackSession } from '../../../services/cardstack-session';
-import RouterService from '@ember/routing/router-service';
+import RouteInfoService from '../../../services/route-info';
 
 export default class ViewCardController extends Controller {
-  @service router!: RouterService;
-  @service cardstackSession!: CardstackSession;
+  @service routeInfo!: RouteInfoService;
+
+  get realmOrg() {
+    if (!this.routeInfo.currentRealm) {
+      return null;
+    }
+
+    return this.routeInfo.currentRealm;
+  }
 }

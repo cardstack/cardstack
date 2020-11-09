@@ -9,8 +9,7 @@
       <ul class="cardhost-left-edge__top-btn-group">
         <li>
           <LinkTo
-            @route="cards"
-            @model={{this.currentOrgId}}
+            @route="index"
             @class="cardhost-left-edge--nav-button cardstack-logo-button"
             @aria-label="homepage"
             data-test-home-link
@@ -34,7 +33,7 @@
               class="login-grid-right-column"
               {{click-outside this.closeLeftEdge ignore=".cardhost-left-edge--nav"}}
             >
-              {{#if session.isAuthenticated }}
+              {{#if session.isAuthenticated}}
                 <Cta
                   {{on "click" (fn this.logout session.logout)}}
                   @variant="primary secondary"
@@ -58,25 +57,27 @@
         </li>
       </ul>
       <ul class="cardhost-left-edge__middle-btn-group">
-        {{#each @orgs as |org|}}
-          <li>
-            <LinkTo
-              @route="cards"
-              @model={{org.id}}
-              @class="cardhost-left-edge__org-link {{if (eq org.id this.currentOrgId) "active"}}"
-              @aria-label="View catalog for {{org.title}}"
-              data-test-org-switcher={{org.id}}
-            >
-              {{! template-lint-disable no-inline-styles }}
-              <div
-                class="cardhost-left-edge__org-link-logo cardhost-left-edge__org-link-logo--{{org.id}}"
-                style={{html-safe (concat (css-url "background-image" org.logoURL)(if org.brandColor (concat ";background-color:" org.brandColor)))}}
+        {{#if (and (not-eq this.routeInfo.mode "themer") (not-eq this.routeInfo.mode "preview"))}}
+          {{#each this.cardstackSession.userOrgs as |org|}}
+            <li>
+              <LinkTo
+                @route="cards.collection"
+                @model={{org.id}}
+                @class="cardhost-left-edge__org-link {{if (eq org.id this.currentRealmId) "active"}}"
+                @aria-label="View catalog for {{org.title}}"
+                data-test-org-switcher={{org.id}}
               >
-                <div class="sr-only">{{org.title}}</div>
-              </div>
-            </LinkTo>
-          </li>
-        {{/each}}
+                {{! template-lint-disable no-inline-styles }}
+                <div
+                  class="cardhost-left-edge__org-link-logo cardhost-left-edge__org-link-logo--{{org.id}}"
+                  style={{html-safe (concat (css-url "background-image" org.logoURL)(if org.brandColor (concat ";background-color:" org.brandColor)))}}
+                >
+                  <div class="sr-only">{{org.title}}</div>
+                </div>
+              </LinkTo>
+            </li>
+          {{/each}}
+        {{/if}}
       </ul>
       <ul class="cardhost-left-edge__bottom-btn-group">
         <li>

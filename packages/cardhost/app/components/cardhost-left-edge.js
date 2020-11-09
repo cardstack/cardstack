@@ -17,11 +17,11 @@ export default class CardhostLeftEdgeComponent extends Component {
     return this.routeInfo.currentCard.canonicalURL;
   }
 
-  get currentOrgId() {
-    if (!this.routeInfo.currentOrg) {
+  get currentRealmId() {
+    if (!this.routeInfo.currentRealm) {
       return null;
     }
-    return this.routeInfo.currentOrg.id;
+    return this.routeInfo.currentRealm.id;
   }
 
   @action
@@ -36,12 +36,6 @@ export default class CardhostLeftEdgeComponent extends Component {
 
     if (this.cardId) {
       this.router.transitionTo('cards.card.view', this.cardId);
-    } else {
-      if (this.currentOrgId) {
-        this.router.transitionTo('cards', this.currentOrgId);
-      } else {
-        this.router.transitionTo('index');
-      }
     }
   }
 
