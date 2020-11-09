@@ -8,7 +8,10 @@ import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 import DataService from './data';
 import CardLocalStorageService from './card-local-storage';
 import { AddressableCard } from '@cardstack/hub';
+//@ts-ignore
+import ENV from '@cardstack/cardhost/config/environment';
 
+const { environment } = ENV;
 const catalogEntry = Object.freeze({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'catalog-entry' });
 const cardCatalogRealm = 'https://cardstack.com/api/realms/card-catalog';
 // TODO need to think through pagination on the library page...
@@ -24,13 +27,14 @@ export default class LibraryService extends Service {
 
   @task(function*(this: LibraryService) {
     let [templateEntries, featuredEntries] = yield Promise.all([
+      // TODO: fix 'template' types in card-catalog and use it for fetching template cards
       this.data.search(
         {
           filter: {
             type: catalogEntry,
             eq: {
               csRealm: cardCatalogRealm,
-              type: 'template',
+              type: environment === 'test' ? 'template' : 'featured',
             },
           },
           // Note that we are sorting these items on the date the catalog entry
