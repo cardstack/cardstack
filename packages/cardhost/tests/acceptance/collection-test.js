@@ -13,9 +13,7 @@ const org = 'bunny-records';
 const template = cardDocument()
   .withAttributes({
     csRealm,
-    csId: 'collection-template',
-    csTitle: 'Template',
-    csCreated: '2020-01-01T14:00:00Z',
+    csId: 'template',
     csFieldSets: {
       embedded: ['name'],
       isolated: ['name', 'email'],
@@ -32,9 +30,7 @@ const template = cardDocument()
 const card1 = cardDocument()
   .withAttributes({
     csRealm,
-    csId: 'collection-hassan',
-    csTitle: 'Master Recording',
-    csCreated: '2020-01-01T10:00:00Z',
+    csId: 'hassan',
     name: 'Hassan Abdel-Rahman',
     email: 'hassan@nowhere.dog',
   })
@@ -42,9 +38,7 @@ const card1 = cardDocument()
 const card2 = cardDocument()
   .withAttributes({
     csRealm,
-    csId: 'collection-van-gogh',
-    csTitle: 'Master Recording',
-    csCreated: '2020-01-01T09:00:00Z',
+    csId: 'van-gogh',
     name: 'Van Gogh',
     email: 'vangogh@nowhere.dog',
   })
@@ -70,27 +64,46 @@ module('Acceptance | collection', function(hooks) {
   });
 
   test(`viewing collection`, async function(assert) {
-    await visit('/');
-    assert.equal(currentURL(), `/cards/${org}/collection`);
-
-    await visit(`/cards`);
-    assert.equal(currentURL(), `/cards/${org}/collection`);
-
-    await visit(`/cards/${org}/collection`);
+    await visit(`/cards/default/collection`);
     await waitForCollectionLoad();
-    assert.equal(currentURL(), `/cards/${org}/collection`);
+    assert.equal(currentURL(), `/cards/default/collection`);
+
+    assert.dom('[data-test-org-header]').doesNotExist();
+    assert.dom('[data-test-cardhost-left-edge]').exists();
+    assert.dom(`[data-test-org-switcher="${org}"]`).exists();
+    assert.dom('[data-test-isolated-collection]').exists();
+    assert.dom('[data-test-isolated-collection-card]').exists({ count: 3 });
+
+    await percySnapshot(assert);
+  });
+
+  test(`viewing org collection`, async function(assert) {
+    await visit('/');
+    assert.equal(currentURL(), `/cards/${org}/collection/master-recording`);
 
     assert.dom('[data-test-org-header]').exists();
     assert.dom('[data-test-cardhost-left-edge]').exists();
     assert.dom(`[data-test-org-switcher="${org}"]`).exists();
     assert.dom('[data-test-isolated-collection]').exists();
-    assert.dom('[data-test-isolated-collection-card]').exists({ count: 2 });
+    assert.dom('[data-test-isolated-collection-card]').doesNotExist();
 
     await percySnapshot(assert);
   });
 
-  test('card embedded css is rendered for the cards in the collection', async function(assert) {
+  test(`navigating to user's default cards collection`, async function(assert) {
     await visit(`/cards`);
+    assert.equal(currentURL(), `/cards/${org}/collection/master-recording`);
+
+    await click('[data-test-toggle-left-edge]');
+    await waitForCollectionLoad();
+    assert.equal(currentURL(), `/cards/default/collection`);
+
+    assert.dom('[data-test-org-header]').doesNotExist();
+    assert.dom('[data-test-isolated-collection-card]').exists({ count: 3 });
+  });
+
+  test('card embedded css is rendered for the cards in the collection', async function(assert) {
+    await visit(`/cards/default/collection`);
     await waitForCollectionLoad();
 
     assert.ok(
@@ -100,7 +113,7 @@ module('Acceptance | collection', function(hooks) {
   });
 
   test(`isolating a card`, async function(assert) {
-    await visit(`/cards`);
+    await visit(`/cards/default/collection`);
     await waitForCollectionLoad();
 
     await click(`[data-test-card-renderer="${card2.canonicalURL}"] a`);
@@ -111,7 +124,7 @@ module('Acceptance | collection', function(hooks) {
     await percySnapshot(assert);
   });
 
-  test(`can switch collection view using the left edge`, async function(assert) {
+  test(`can switch collection view using the left edge and header tabs`, async function(assert) {
     const org1 = 'bunny-records';
     const title1 = 'Bunny Records';
     const collection1 = 'master-recording';
@@ -122,17 +135,26 @@ module('Acceptance | collection', function(hooks) {
     const collectionTitle2 = 'Musical Works';
 
     await visit(`/cards/${org1}/collection`);
-    await waitForCollectionLoad();
     assert.equal(currentURL(), `/cards/${org1}/collection`);
 
     assert.dom(`[data-test-org-switcher=${org1}]`).exists();
     assert.dom(`[data-test-org-switcher=${org1}]`).hasClass('active');
     assert.dom('[data-test-org-header] h1').hasText(title1);
+
     assert.dom(`[data-test-org-header-link=${collection1}]`).exists();
-    assert.dom(`[data-test-org-header-link=${collection1}]`).hasClass('active');
-    assert.dom(`[data-test-org-header-link=${collection1}]`).hasAttribute('href', `/cards/${org1}/collection`);
+    assert.dom(`[data-test-org-header-link=${collection1}]`).doesNotHaveClass('active');
+    assert
+      .dom(`[data-test-org-header-link=${collection1}]`)
+      .hasAttribute('href', `/cards/${org1}/collection/${collection1}`);
+    assert.dom('[data-test-isolated-collection] h2').hasText('');
+    assert.dom('[data-test-isolated-collection-count]').hasText('0');
+
+    await click(`[data-test-org-header-link=${collection1}]`);
+    assert.equal(currentURL(), `/cards/${org1}/collection/${collection1}`);
+
     assert.dom('[data-test-isolated-collection] h2').hasText(collectionTitle1);
-    assert.dom('[data-test-isolated-collection-count]').hasText('2');
+    assert.dom(`[data-test-org-switcher=${org1}]`).hasClass('active');
+    assert.dom(`[data-test-org-header-link=${collection1}]`).hasClass('active');
 
     assert.dom(`[data-test-org-switcher=${org2}]`).exists();
     assert.dom(`[data-test-org-switcher=${org2}]`).doesNotHaveClass('active');
@@ -144,20 +166,27 @@ module('Acceptance | collection', function(hooks) {
     assert.dom(`[data-test-org-switcher=${org2}]`).hasClass('active');
     assert.dom('[data-test-org-header] h1').hasText(title2);
     assert.dom(`[data-test-org-header-link=${collection2}]`).exists();
-    assert.dom(`[data-test-org-header-link=${collection2}]`).hasClass('active');
-    assert.dom(`[data-test-org-header-link=${collection2}]`).hasAttribute('href', `/cards/${org2}/collection`);
-    assert.dom('[data-test-isolated-collection] h2').hasText(collectionTitle2);
-    assert.dom('[data-test-isolated-collection-count]').hasText('0');
+    assert
+      .dom(`[data-test-org-header-link=${collection2}]`)
+      .hasAttribute('href', `/cards/${org2}/collection/${collection2}`);
 
     assert.dom(`[data-test-org-switcher=${org1}]`).exists();
     assert.dom(`[data-test-org-switcher=${org1}]`).doesNotHaveClass('active');
     assert.dom(`[data-test-org-header-link=${collection1}]`).doesNotExist();
+
+    await click(`[data-test-org-header-link=${collection2}]`);
+    assert.equal(currentURL(), `/cards/${org2}/collection/${collection2}`);
+
+    assert.dom('[data-test-isolated-collection] h2').hasText(collectionTitle2);
+    assert.dom(`[data-test-org-switcher=${org2}]`).hasClass('active');
+    assert.dom(`[data-test-org-header-link=${collection2}]`).hasClass('active');
+    assert.dom('[data-test-isolated-collection-count]').hasText('0');
 
     await percySnapshot(assert);
 
     await click(`[data-test-org-switcher="${org1}"]`);
     assert.equal(currentURL(), `/cards/${org1}/collection`);
     assert.dom('[data-test-org-header] h1').hasText(title1);
-    assert.dom('[data-test-isolated-collection] h2').hasText(collectionTitle1);
+    assert.dom('[data-test-isolated-collection] h2').hasText('');
   });
 });
