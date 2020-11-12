@@ -20,23 +20,58 @@ const author = cardDocument().withAutoAttributes({
   name: 'Van Gogh',
   email: 'vangogh@nowhere.dog',
 });
+const author2 = cardDocument()
+  .withAttributes({
+    csRealm,
+    csId: 'mango',
+    name: 'Mango',
+  })
+  .adoptingFrom(author);
 const testCard = cardDocument()
   .withAutoAttributes({
     csRealm,
     csId: 'millenial-puppies',
     csFieldSets: {
       embedded: ['title', 'author', 'likes'],
-      isolated: ['title', 'author', 'likes', 'body', 'published'],
+      isolated: ['title', 'author', 'likes', 'body', 'published', 'contributors', 'publishers'],
     },
     title: 'The Millenial Puppy',
     body: 'It can be difficult these days to deal with the discerning tastes of the millenial puppy.',
     likes: 100,
     published: true,
   })
-  .withAutoRelationships({ author });
+  .withAttributes({
+    publishers: [
+      cardDocument()
+        .withAttributes({
+          csRealm,
+          csId: 'jackie',
+          csFieldSets: {
+            embedded: ['name'],
+          },
+          name: 'Jackie',
+        })
+        .withField('name', 'string-field').asCardValue,
+      cardDocument()
+        .withAttributes({
+          csRealm,
+          csId: 'wackie',
+          csFieldSets: {
+            embedded: ['name'],
+          },
+          name: 'Wackie',
+        })
+        .withField('name', 'string-field').asCardValue,
+    ],
+  })
+  .withField('contributors', 'base', 'plural')
+  .withField('publishers', 'base', 'plural')
+  .withAutoRelationships({ author })
+  .withRelationships({ contributors: [author2, author] });
+
 const cardPath = encodeURIComponent(testCard.canonicalURL);
 const scenario = new Fixtures({
-  create: [testCard, author],
+  create: [testCard, author, author2],
 });
 
 module('Acceptance | card view', function(hooks) {
@@ -54,6 +89,7 @@ module('Acceptance | card view', function(hooks) {
     await visit(`/cards/${cardPath}`);
     await waitForCardLoad(testCard.canonicalURL);
     await waitForCardLoad(author.canonicalURL);
+    await waitForCardLoad(author2.canonicalURL);
 
     assert.equal(currentURL(), `/cards/${cardPath}`);
     assert.dom('[data-test-field="title"] [data-test-string-field-viewer-value]').hasText('The Millenial Puppy');
@@ -68,6 +104,17 @@ module('Acceptance | card view', function(hooks) {
     assert
       .dom(`[data-test-field="author"] [data-test-embedded-card="${author.canonicalURL}"] [data-test-field="email"]`)
       .doesNotExist();
+    assert.dom(`[data-test-field="contributors"] [data-test-embedded-card]`).exists({ count: 2 });
+    assert
+      .dom(
+        `[data-test-field="contributors"] [data-test-embedded-card="${author2.canonicalURL}"] [data-test-string-field-viewer-value]`
+      )
+      .hasText('Mango');
+    assert.dom(`[data-test-field="publishers"]`).exists();
+    assert.dom(`[data-test-field="publishers"] [data-test-embedded-card]`).exists({ count: 2 });
+    assert
+      .dom(`[data-test-field="publishers"] [data-test-embedded-card] [data-test-string-field-viewer-value]`)
+      .hasText('Jackie');
 
     assert.dom('[data-test-right-edge]').doesNotExist();
     assert.dom('[data-test-internal-card-id]').doesNotExist();

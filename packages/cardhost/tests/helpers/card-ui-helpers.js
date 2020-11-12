@@ -125,6 +125,7 @@ export async function waitForCardLoad(cardId) {
       });
     }
   }
+  await animationsSettled();
 }
 
 export async function waitForFieldNameChange(name) {

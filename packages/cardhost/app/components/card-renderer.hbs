@@ -57,7 +57,7 @@
                 {{!-- This is the card boundary, please don't set any card specific classes any higher in the DOM than this. --}}
                 {{!-- If we need card specific styling above this level, then let's chat about it.                           --}}
                 <div class="isolated-card-boundary {{if this.isViewOrLayoutMode (concat (safe-css-string (if @card.canonicalURL @card.canonicalURL @card.adoptsFromURL)) "--isolated") }}">
-                  {{#if this.isViewOrLayoutMode}}
+                  {{#if (and @card.csTitle this.isViewOrLayoutMode)}}
                     <div class="isolated-card-label">{{@card.csTitle}}</div>
                   {{/if}}
                   {{#if @dropField}}
@@ -108,11 +108,11 @@
           @model={{@card.canonicalURL}}
           aria-label={{@card.csTitle}}
         >
-          {{#unless @suppressHeader}}
+          {{#if (and @card.csTitle (not @suppressHeader))}}
             <div class="card-renderer-embedded__label">
               {{@card.csTitle}}
             </div>
-          {{/unless}}
+          {{/if}}
           <Scaffold
             @card={{@card}}
             @fields={{this.fields}}
