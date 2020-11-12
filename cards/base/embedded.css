@@ -2,8 +2,9 @@
 no custom CSS is provided for the card.*/
 
 .card-boundary {
-  width: 225px;
-  height: 225px;
+  width: 450px;
+  max-width: 100%;
+  min-height: 90px;
   margin: 0;
   border-radius: 10px;
   background-color: white;
