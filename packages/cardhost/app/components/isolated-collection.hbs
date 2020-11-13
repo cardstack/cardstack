@@ -1,4 +1,4 @@
-<div class="isolated-collection" data-test-isolated-collection>
+<div class="isolated-collection isolated-collection--{{@type}}" data-test-isolated-collection>
   <header class="isolated-collection__sticky-header">
     <div class="isolated-collection__title-row">
       <h2 class="isolated-collection__title">{{@title}}</h2>
@@ -68,7 +68,7 @@
               <CardRenderer
                 @card={{card}}
                 @format="embedded"
-                @suppressHeader={{true}}
+                @suppressHeader={{@suppressHeader}}
                 @class="isolated-collection__card {{if selectedCard "isolated-collection__card--selected"}}"
               />
               <div class="isolated-collection__grid-item-btn-group {{if (eq @mode "view") "isolated-collection__select-btn"}} {{if selectedCard "isolated-collection__select-btn--selected"}}">

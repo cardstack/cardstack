@@ -1,17 +1,13 @@
 {{#if this.model.org}}
   <OrgHeader @org={{this.model.org}}>
     <li>
-      <LinkTo @route="cards.collection" @model={{this.model.org.id}} data-test-org-header-link={{this.model.id}}>
-        {{if (eq this.model.id "master-recording") "Masters" (or this.model.org.collectionTitle (humanize this.model.id))}}
+      <LinkTo @route="cards.collection.view" @model={{this.model.org.collection}} data-test-org-header-link={{this.model.org.collection}}>
+        {{if (eq this.model.org.collection "master-recording") "Masters" (or this.model.org.collectionTitle (humanize this.model.org.collection))}}
       </LinkTo>
     </li>
   </OrgHeader>
 {{/if}}
 
 <div class="collection__wrapper">
-  <IsolatedCollection
-    @mode="view"
-    @title={{or this.model.org.collectionTitle (humanize this.model.id)}}
-    @collection={{this.model.cards}}
-  />
+  {{outlet}}
 </div>

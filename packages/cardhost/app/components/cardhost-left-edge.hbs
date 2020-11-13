@@ -18,13 +18,14 @@
             <div class="sr-only">Home</div>
           </LinkTo>
         </li>
-        <li class="login-grid">
+        {{! template-lint-disable no-invalid-interactive }}
+        <li class="login-grid" {{on "mouseenter" this.toggleMenuExpand}} {{on "mouseleave" this.toggleMenuClose}} data-test-toggle-left-edge>
           <button
             class="cardhost-left-edge--nav-button icon-button {{if this.isExpanded "selected"}}"
             aria-label="expandable menu with login controls"
             aria-expanded={{if this.isExpanded "true" "false"}}
-            {{on "click" this.toggleMenuExpand}}
-            data-test-toggle-left-edge
+            {{on "click" this.transitionToUserCards}}
+            data-test-user-cards-button
           >
             {{svg-jar "user" width="18px" height="20px"}}
           </button>

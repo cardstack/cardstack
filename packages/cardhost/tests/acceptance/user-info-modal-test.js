@@ -14,11 +14,9 @@ import {
 import { cardDocument } from '@cardstack/hub';
 
 const csRealm = 'http://localhost:3000/api/realms/default';
-const org = 'bunny-records';
 const testCard = cardDocument().withAutoAttributes({
   csRealm,
   csId: 'entry',
-  csTitle: 'Master Recording',
   title: 'The Millenial Puppy',
 });
 const cardPath = encodeURIComponent(testCard.canonicalURL);
@@ -109,8 +107,8 @@ module('Acceptance | user info modal', function(hooks) {
     assert.dom('[data-test-user-info-modal]').doesNotExist('modal is hidden in preview mode');
 
     await click('[data-test-mode-indicator]');
-    await click('[data-test-home-link]');
-    assert.equal(encodeColons(currentURL()), `/cards/${org}/collection?confirmed=true`);
+    await click('[data-test-user-cards-button]');
+    assert.equal(encodeColons(currentURL()), `/cards/default/collection?confirmed=true`);
 
     await waitForCardLoad(testCard.canonicalURL);
     await click(`[data-test-card-renderer="${testCard.canonicalURL}"] a`);

@@ -160,9 +160,8 @@ module('Acceptance | library', function(hooks) {
   });
 
   test(`viewing library`, async function(assert) {
-    const org = 'bunny-records';
-    await visit(`/`);
-    assert.equal(currentURL(), `/cards/${org}/collection`);
+    await visit('/cards/default/collection');
+    assert.equal(currentURL(), '/cards/default/collection');
 
     assert.dom('[data-test-library-button]').exists();
     await click('[data-test-library-button]');

@@ -1,0 +1,7 @@
+<IsolatedCollection
+  @mode="view"
+  @type={{this.model.id}}
+  @title={{or this.model.org.collectionTitle (humanize this.model.id)}}
+  @collection={{this.model.cards}}
+  @suppressHeader={{true}}
+/>
