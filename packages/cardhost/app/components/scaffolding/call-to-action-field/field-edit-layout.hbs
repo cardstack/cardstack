@@ -2,7 +2,7 @@
 <BoxelTextField
   @mode="edit"
   @cardId={{@card.name}}
-  @label={{@card.csTitle}}
+  @label={{or @card.csTitle @card.name}}
   @value={{this.fieldValue}}
   @key-up={{perform this.updateFieldValue}}
   @focus-out={{perform this.updateFieldValue}}

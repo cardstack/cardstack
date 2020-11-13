@@ -1,6 +1,7 @@
 import BaseEditor from '../base-editor';
 import { task } from 'ember-concurrency';
 import { canonicalURLToCardId } from '@cardstack/hub';
+import { isArray } from '@ember/array';
 
 export default class BaseCardFieldEditLayout extends BaseEditor {
   constructor(...args) {
@@ -12,7 +13,11 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
   @(task(function*() {
     let relatedCard = yield this.args.card.enclosingCard.value(this.args.card.name);
     if (relatedCard) {
-      this.fieldValue = relatedCard.canonicalURL;
+      if (isArray(relatedCard)) {
+        this.fieldValue = relatedCard.map(card => card.canonicalURL);
+      } else {
+        this.fieldValue = relatedCard.canonicalURL;
+      }
     } else {
       this.fieldValue = null;
     }

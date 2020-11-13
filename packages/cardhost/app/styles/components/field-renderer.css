@@ -29,6 +29,16 @@
   text-overflow: ellipsis;
 }
 
+.edit-field__collection {
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-radius: var(--boxel-border-radius);
+}
+
+.edit-field__collection > .edit-field__input + .edit-field__input {
+  margin-top: 10px;
+}
+
 .edit-field__input {
   width: 100%;
   height: var(--field-input-height);

@@ -1,5 +1,5 @@
 <div class="edit-field boolean-editor" {{did-insert (action this.setChecked)}} data-test-edit-field={{@card.name}}>
-  <legend class="edit-field__title">{{@card.csTitle}}</legend>
+  <legend class="edit-field__title">{{or @card.csTitle @card.name}}</legend>
   <div>
     <label>
       <Input
