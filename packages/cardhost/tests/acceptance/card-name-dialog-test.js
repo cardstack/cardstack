@@ -119,27 +119,25 @@ module('Acceptance | card name dialog', function(hooks) {
   });
 
   test('can cancel creation of a card by clicking outside the dialog', async function(assert) {
-    const org = 'bunny-records';
-    await visit('/');
+    await visit('/cards/default/collection');
     await click('[data-test-library-button]');
     await waitForTemplatesToLoad();
 
     await click('[data-test-library-adopt-card-btn]');
     await click('[data-test-cardhost-modal-container]'); // close dialog by clicking modal container
     assert.dom('[data-test-dialog-box]').doesNotExist();
-    assert.equal(currentURL(), `/cards/${org}/collection`);
+    assert.equal(currentURL(), '/cards/default/collection');
   });
 
   test('can cancel creation of a card by clicking the cancel button', async function(assert) {
-    const org = 'bunny-records';
-    await visit('/');
+    await visit('/cards/default/collection');
     await click('[data-test-library-button]');
     await waitForTemplatesToLoad();
 
     await click('[data-test-library-adopt-card-btn]');
     await click('[data-test-cancel-create-btn]'); // close dialog by clicking cancel button
     assert.dom('[data-test-dialog-box]').doesNotExist();
-    assert.equal(currentURL(), `/cards/${org}/collection`);
+    assert.equal(currentURL(), '/cards/default/collection');
   });
 
   skip('loading screen can appear over the dialog', async function(assert) {

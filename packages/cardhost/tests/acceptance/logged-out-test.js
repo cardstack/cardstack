@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { visit, currentURL, waitFor, click } from '@ember/test-helpers';
+import { visit, currentURL, waitFor, click, triggerEvent } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
 import {
@@ -16,16 +16,17 @@ import { animationsSettled } from 'ember-animated/test-support';
 
 const csRealm = 'http://localhost:3000/api/realms/default';
 const org = 'bunny-records';
+const collection = 'master-recording';
 const testCard = cardDocument().withAutoAttributes({
   csRealm,
   csId: 'entry',
-  csTitle: 'Master Recording',
+  csTitle: 'Puppy',
   title: 'The Millenial Puppy',
 });
 const testCard2 = cardDocument().withAutoAttributes({
   csRealm,
   csId: 'entry-2',
-  csTitle: 'Master Recording',
+  csTitle: 'Puppy',
   title: 'Jackie Wackie',
 });
 const cardPath = encodeURIComponent(testCard.canonicalURL);
@@ -51,11 +52,11 @@ module('Acceptance | logged-out', function(hooks) {
     await waitForCardLoad();
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
 
-    await click('[data-test-toggle-left-edge]');
+    await triggerEvent('[data-test-toggle-left-edge]', 'mouseenter');
     await click('[data-test-logout-button]');
     await animationsSettled();
 
-    await click('[data-test-toggle-left-edge]');
+    await triggerEvent('[data-test-toggle-left-edge]', 'mouseenter');
     await animationsSettled();
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
     assert.dom('[data-test-library-button]').isDisabled();
@@ -63,7 +64,7 @@ module('Acceptance | logged-out', function(hooks) {
     assert.dom('[data-test-card-renderer-controls]').doesNotExist();
     await percySnapshot(assert);
 
-    await click('[data-test-toggle-left-edge]');
+    await triggerEvent('[data-test-toggle-left-edge]', 'mouseenter');
     await click('[data-test-login-button]');
     await waitFor('[data-test-card-renderer-controls]');
     await animationsSettled();
@@ -77,7 +78,7 @@ module('Acceptance | logged-out', function(hooks) {
     await waitForCardLoad();
 
     assert.equal(currentURL(), `/cards/${cardPath}/edit`);
-    await click('[data-test-toggle-left-edge]');
+    await triggerEvent('[data-test-toggle-left-edge]', 'mouseenter');
     await click('[data-test-logout-button]');
     await animationsSettled();
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
@@ -93,7 +94,7 @@ module('Acceptance | logged-out', function(hooks) {
     await waitForSchemaViewToLoad();
 
     assert.equal(currentURL(), `/cards/${cardPath}/configure/fields`);
-    await click('[data-test-toggle-left-edge]');
+    await triggerEvent('[data-test-toggle-left-edge]', 'mouseenter');
     await click('[data-test-logout-button]');
     await animationsSettled();
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
@@ -108,7 +109,7 @@ module('Acceptance | logged-out', function(hooks) {
     await waitForCardLoad();
 
     assert.equal(currentURL(), `/cards/${cardPath}/configure/layout`);
-    await click('[data-test-toggle-left-edge]');
+    await triggerEvent('[data-test-toggle-left-edge]', 'mouseenter');
     await click('[data-test-logout-button]');
     await animationsSettled();
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
@@ -122,7 +123,7 @@ module('Acceptance | logged-out', function(hooks) {
     await visit(`/cards/${cardPath}/configure/layout`);
     await waitForCardLoad();
 
-    await click('[data-test-toggle-left-edge]');
+    await triggerEvent('[data-test-toggle-left-edge]', 'mouseenter');
     await click('[data-test-logout-button]');
     await animationsSettled();
 
@@ -134,39 +135,36 @@ module('Acceptance | logged-out', function(hooks) {
     await login();
     await visit(`/`);
 
-    assert.equal(currentURL(), `/cards/${org}/collection`);
-    await waitForCollectionCardsLoad();
-
+    assert.equal(currentURL(), `/cards/${org}/collection/${collection}`);
     assert.dom('[data-test-isolated-collection]').exists();
-    assert.dom('[data-test-isolated-collection-card]').exists({ count: 2 });
     assert.dom('[data-test-cardhost-left-edge]').exists();
     assert.dom('.cardhost-left-edge--nav-button').exists({ count: 4 });
     assert.dom('[data-test-library-button]').isNotDisabled();
 
-    await click('[data-test-toggle-left-edge]');
+    await triggerEvent('[data-test-toggle-left-edge]', 'mouseenter');
     await click('[data-test-logout-button]');
     await animationsSettled();
 
-    assert.equal(currentURL(), `/cards/${org}/collection`);
-    assert.dom('[data-test-isolated-collection-card]').exists({ count: 2 });
+    assert.equal(currentURL(), `/cards/${org}/collection/${collection}`);
     assert.dom('[data-test-cardhost-left-edge]').exists();
     assert.dom('[data-test-library-button]').isDisabled();
   });
 
   test('viewing library', async function(assert) {
     await login();
-    await visit(`/`);
+    await visit('/cards/default/collection');
+    await waitForCollectionCardsLoad();
 
-    assert.equal(currentURL(), `/cards/${org}/collection`);
+    assert.equal(currentURL(), '/cards/default/collection');
     await click('[data-test-library-button]');
     await waitForLibraryServiceToIdle();
     await waitForCardLoad(testCard.canonicalURL);
 
-    await click('[data-test-toggle-left-edge]');
+    await triggerEvent('[data-test-toggle-left-edge]', 'mouseenter');
     await click('[data-test-logout-button]');
     await animationsSettled();
 
-    assert.equal(currentURL(), `/cards/${org}/collection`);
+    assert.equal(currentURL(), '/cards/default/collection');
     assert.dom('[data-test-library]').doesNotExist();
     assert.dom('[data-test-isolated-collection-card]').exists({ count: 2 });
     assert.dom('[data-test-cardhost-left-edge]').exists();
@@ -175,13 +173,13 @@ module('Acceptance | logged-out', function(hooks) {
 
   test('can view the org switcher only while logged in', async function(assert) {
     await login();
-    await visit(`/`);
+    await visit('/cards/default/collection');
 
-    assert.equal(currentURL(), `/cards/${org}/collection`);
+    assert.equal(currentURL(), `/cards/default/collection`);
     assert.dom('[data-test-org-switcher]').exists({ count: 6 });
     assert.dom(`[data-test-org-switcher="${org}"]`).exists();
 
-    await click('[data-test-toggle-left-edge]');
+    await triggerEvent('[data-test-toggle-left-edge]', 'mouseenter');
     await click('[data-test-logout-button]');
     await animationsSettled();
 
@@ -195,21 +193,21 @@ module('Acceptance | logged-out', function(hooks) {
     await waitForCardLoad();
     assert.equal(currentURL(), `/cards/${cardPath}`);
 
-    await click('[data-test-toggle-left-edge]');
+    await triggerEvent('[data-test-toggle-left-edge]', 'mouseenter');
     await click('[data-test-logout-button]');
     await animationsSettled();
 
-    await click('[data-test-toggle-left-edge]');
+    await triggerEvent('[data-test-toggle-left-edge]', 'mouseenter');
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}`);
     assert.dom('[data-test-home-link]').exists();
 
     await click('[data-test-home-link]');
-    assert.equal(currentURL(), `/cards/${org}/collection`);
+    assert.equal(currentURL(), `/cards/${org}/collection/${collection}`);
   });
 
   test('clicking outside the login panel closes it', async function(assert) {
     await visit(`/`);
-    await click('[data-test-toggle-left-edge]');
+    await triggerEvent('[data-test-toggle-left-edge]', 'mouseenter');
     await click('[data-test-logout-button]');
 
     await waitFor('[data-test-login-button]');

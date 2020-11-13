@@ -94,7 +94,7 @@ module('Acceptance | collection', function(hooks) {
     await visit(`/cards`);
     assert.equal(currentURL(), `/cards/${org}/collection/master-recording`);
 
-    await click('[data-test-toggle-left-edge]');
+    await click('[data-test-user-cards-button]');
     await waitForCollectionLoad();
     assert.equal(currentURL(), `/cards/default/collection`);
 

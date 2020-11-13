@@ -377,12 +377,13 @@
   transition: border-color var(--boxel-transition);
 }
 
-.isolated-collection__grid-item--grid > .isolated-collection__card > a {
-  height: 100%;
+.isolated-collection--default .isolated-collection__grid-item--grid > .isolated-collection__card > a {
+  max-height: 360px;
 }
 
 .isolated-collection--master-recording .isolated-collection__grid-item--grid > .isolated-collection__card > a,
 .isolated-collection--musical-work .isolated-collection__grid-item--grid > .isolated-collection__card > a {
+  height: 100%;
   border: none;
   box-shadow: none;
 }

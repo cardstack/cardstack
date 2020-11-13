@@ -26,7 +26,16 @@ export default class CardhostLeftEdgeComponent extends Component {
 
   @action
   toggleMenuExpand() {
-    this.isExpanded = !this.isExpanded;
+    this.isExpanded = true;
+  }
+
+  @action
+  toggleMenuClose() {
+    this.isExpanded = false;
+  }
+
+  @action
+  transitionToUserCards() {
     this.router.transitionTo('cards.collection', 'default');
   }
 
