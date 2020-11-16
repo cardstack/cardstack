@@ -1,30 +1,32 @@
 {{#if (eq @mode "edit")}}
   {{#if @hasPluralArity}}
+  {{!-- for edit mode plural arity fields --}}
     <div class="edit-field" data-test-edit-field={{@cardId}}>
-      <div id={{@cardId}} class="edit-field__title {{i}}" data-test-edit-field-label>{{@label}}</div>
+      <div id={{@cardId}} class="edit-field__title" data-test-edit-field-label>{{@label}}</div>
       <div class="edit-field__collection" role="group" aria-labelledby={{@cardId}}>
         {{#each @value as |value i|}}
+          <div class="item__pill">
+            <span class="item__pill-value">{{value}}</span>
+            {{#if @removeAction}}
+              <button {{on "click" (fn @removeAction i)}} class="item__remove-btn" aria-label="remove" />
+            {{/if}}
+          </div>
+        {{/each}}
+        <button {{on "click" this.toggleInputField}} class="item__add-btn" aria-label="add" />
+        {{#if (and @addAction this.displayInputField)}}
           <Input
             @class="edit-field__input"
-            @type={{@type}}
             @value={{value}}
-            @enter={{@enter}}
-            @insert-newline={{@insert-newline}}
-            @escape-press={{@escape-press}}
-            @focus-in={{@focus-in}}
-            @focus-out={{@focus-out}}
-            @key-up={{@key-up}}
-            @key-down={{@key-down}}
-            @key-press={{@key-press}}
-            ...attributes
+            @enter={{fn @addAction value}}
           />
-        {{/each}}
+        {{/if}}
       </div>
     </div>
   {{else}}
+  {{!-- edit mode for singular arity field --}}
     <label class="edit-field" data-test-edit-field={{@cardId}}>
       <div class="edit-field__title" data-test-edit-field-label>{{@label}}</div>
-      <div class={{if @isCollection "edit-field__collection"}}>
+      <div class={{if @belongsTo "edit-field__collection"}}>
         {{!-- Events supported by the built-in Input ember component --}}
         <Input
           @class="edit-field__input"

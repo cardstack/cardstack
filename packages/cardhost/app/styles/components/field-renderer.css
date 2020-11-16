@@ -30,9 +30,56 @@
 }
 
 .edit-field__collection {
-  padding: 10px;
+  /* padding: 10px;
   background-color: #f0f0f0;
-  border-radius: var(--boxel-border-radius);
+  border-radius: var(--boxel-border-radius); */
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(40%, max-content));
+  gap: 5px;
+  min-height: 50px;
+  padding: 10px 30px 10px 15px;
+  background-color: #F0F0F0;
+  border: none;
+  border-radius: 5px;
+  text-align: left;
+}
+
+.edit-field__collection--vertical {
+  grid-template-columns: max-content;
+}
+
+.item__pill {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 3px 5px 20px;
+  background-color: var(--boxel-highlight);
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+.item__pill-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item__add-btn,
+.item__remove-btn {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  background: url('/assets/images/icons/icon-minus-circle.svg') center/16px 16px no-repeat;
+}
+
+.item__add-btn {
+  background-image: url('/assets/images/icons/icon-plus-circle-highlight-bg.svg');
+  position: absolute;
+  top: 15px;
+  right: 0;
 }
 
 .edit-field__collection > .edit-field__input + .edit-field__input {
