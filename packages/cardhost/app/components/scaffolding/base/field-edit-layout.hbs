@@ -1,4 +1,51 @@
-<BoxelTextField
+<div class="edit-field" data-test-edit-field={{@card.name}}>
+  <div class="edit-field__title" data-test-edit-field-label>{{or @card.csTitle @card.name}}</div>
+  <div class="collection-field">
+    {{#if (eq @card.csFieldArity "plural")}}
+      {{#each this.fieldValue as |card i|}}
+        <div class="collection-field__item collection-field__item--list">
+          <CardRenderer
+            @card={{card}}
+            @mode="view"
+            @format="embedded"
+            @preventIsolation={{true}}
+          />
+          <button {{on "click" (perform this.remove i)}} class="item__remove-btn" aria-label="remove" />
+        </div>
+      {{/each}}
+      {{#if this.displayInputField}}
+        <Input
+          @class="edit-field__input"
+          @value={{value}}
+          @enter={{perform this.add value}}
+        />
+      {{/if}}
+      <button {{on "click" (action (mut this.displayInputField) (not this.displayInputField))}} class="collection-field__item-add-btn" aria-label="add" />
+    {{else if this.fieldValue}}
+      <div class="collection-field__item collection-field__item--list">
+        <CardRenderer
+          @card={{this.fieldValue}}
+          @mode="view"
+          @format="embedded"
+          @preventIsolation={{true}}
+        />
+        <button {{on "click" (perform this.remove)}} class="item__remove-btn" aria-label="remove" />
+      </div>
+    {{else}}
+      {{#if this.displayInputField}}
+        <Input
+          @class="edit-field__input"
+          @value={{value}}
+          @enter={{perform this.add value}}
+        />
+      {{/if}}
+      <button {{on "click" (action (mut this.displayInputField) (not this.displayInputField))}} class="collection-field__item-add-btn" aria-label="add" />
+    {{/if}}
+  </div>
+</div>
+
+
+{{!-- <BoxelTextField
   @mode="edit"
   @cardId={{@card.name}}
   @label={{or @card.csTitle @card.name}}
@@ -6,4 +53,6 @@
   @key-up={{perform this.updateFieldValue}}
   @hasPluralArity={{eq @card.csFieldArity "plural"}}
   @belongsTo={{true}}
-/>
+  @addAction={{perform this.add}}
+  @removeAction={{perform this.remove}}
+/> --}}

@@ -2,8 +2,8 @@
   {{#if @hasPluralArity}}
   {{!-- for edit mode plural arity fields --}}
     <div class="edit-field" data-test-edit-field={{@cardId}}>
-      <div id={{@cardId}} class="edit-field__title" data-test-edit-field-label>{{@label}}</div>
-      <div class="edit-field__collection" role="group" aria-labelledby={{@cardId}}>
+      <div class="edit-field__title" data-test-edit-field-label>{{@label}}</div>
+      <div class="collection-field collection-field--taglist">
         {{#each @value as |value i|}}
           <div class="item__pill">
             <span class="item__pill-value">{{value}}</span>
@@ -26,23 +26,21 @@
   {{!-- edit mode for singular arity field --}}
     <label class="edit-field" data-test-edit-field={{@cardId}}>
       <div class="edit-field__title" data-test-edit-field-label>{{@label}}</div>
-      <div class={{if @belongsTo "edit-field__collection"}}>
-        {{!-- Events supported by the built-in Input ember component --}}
-        <Input
-          @class="edit-field__input"
-          @type={{@type}}
-          @value={{@value}}
-          @enter={{@enter}}
-          @insert-newline={{@insert-newline}}
-          @escape-press={{@escape-press}}
-          @focus-in={{@focus-in}}
-          @focus-out={{@focus-out}}
-          @key-up={{@key-up}}
-          @key-down={{@key-down}}
-          @key-press={{@key-press}}
-          ...attributes
-        />
-      </div>
+      {{!-- Events supported by the built-in Input ember component --}}
+      <Input
+        @class="edit-field__input"
+        @type={{@type}}
+        @value={{@value}}
+        @enter={{@enter}}
+        @insert-newline={{@insert-newline}}
+        @escape-press={{@escape-press}}
+        @focus-in={{@focus-in}}
+        @focus-out={{@focus-out}}
+        @key-up={{@key-up}}
+        @key-down={{@key-down}}
+        @key-press={{@key-press}}
+        ...attributes
+      />
     </label>
   {{/if}}
 {{else}}

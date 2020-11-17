@@ -29,24 +29,44 @@
   text-overflow: ellipsis;
 }
 
-.edit-field__collection {
-  /* padding: 10px;
-  background-color: #f0f0f0;
-  border-radius: var(--boxel-border-radius); */
+.collection-field {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(40%, max-content));
-  gap: 5px;
+  gap: 10px;
   min-height: 50px;
-  padding: 10px 30px 10px 15px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   background-color: #F0F0F0;
   border: none;
-  border-radius: 5px;
+  border-radius: var(--boxel-border-radius);
+}
+
+.collection-field--taglist {
+  grid-template-columns: repeat(auto-fill, minmax(40%, max-content));
+  gap: 5px;
+  padding-right: 30px;
+  padding-left: 15px;
   text-align: left;
 }
 
-.edit-field__collection--vertical {
-  grid-template-columns: max-content;
+.collection-field__item {
+  display: grid;
+  align-items: center;
+  justify-items: center;
+}
+
+.collection-field__item--list {
+  grid-template-columns: 1fr 45px;
+  padding-left: 10px;
+}
+
+.collection-field__item-add-btn {
+  justify-self: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  background: url('/assets/images/icons/icon-plus-circle-highlight-bg.svg') center/16px 16px no-repeat;
 }
 
 .item__pill {

@@ -1,7 +1,7 @@
 import BaseEditor from '../base-editor';
 import { task } from 'ember-concurrency';
 import { canonicalURLToCardId } from '@cardstack/hub';
-import { isArray } from '@ember/array';
+// import { isArray } from '@ember/array';
 
 export default class BaseCardFieldEditLayout extends BaseEditor {
   constructor(...args) {
@@ -13,11 +13,12 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
   @(task(function*() {
     let relatedCard = yield this.args.card.enclosingCard.value(this.args.card.name);
     if (relatedCard) {
-      if (isArray(relatedCard)) {
-        this.fieldValue = relatedCard.map(card => card.canonicalURL);
-      } else {
-        this.fieldValue = relatedCard.canonicalURL;
-      }
+      this.fieldValue = relatedCard;
+      // if (this.args.card.csFieldArity === 'plural') {
+      //   this.fieldValue = relatedCard.map(card => card.canonicalURL);
+      // } else {
+      //   this.fieldValue = relatedCard;
+      // }
     } else {
       this.fieldValue = null;
     }
@@ -30,4 +31,15 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
     yield this.args.setCardReference.perform(this.args.card.name, value ? canonicalURLToCardId(value) : null);
   }).restartable())
   updateFieldValue;
+
+  @task(function*(index) {
+    if (this.args.card.csFieldArity === 'plural') {
+      this.fieldValue = this.fieldValue.filter((el, i) => i !== index);
+    } else {
+      this.fieldValue = null;
+    }
+
+    yield this.args.setCardReference.perform(this.args.card.name, this.fieldValue);
+  })
+  remove;
 }
