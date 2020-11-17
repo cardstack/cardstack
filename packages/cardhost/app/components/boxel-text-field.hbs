@@ -1,6 +1,5 @@
 {{#if (eq @mode "edit")}}
   {{#if @hasPluralArity}}
-  {{!-- for edit mode plural arity fields --}}
     <div class="edit-field" data-test-edit-field={{@cardId}}>
       <div class="edit-field__title" data-test-edit-field-label>{{@label}}</div>
       <div class="collection-field collection-field--taglist">
@@ -16,14 +15,13 @@
         {{#if (and @addAction this.displayInputField)}}
           <Input
             @class="edit-field__input"
-            @value={{value}}
-            @enter={{fn @addAction value}}
+            @value={{this.value}}
+            @enter={{fn @addAction this.value}}
           />
         {{/if}}
       </div>
     </div>
   {{else}}
-  {{!-- edit mode for singular arity field --}}
     <label class="edit-field" data-test-edit-field={{@cardId}}>
       <div class="edit-field__title" data-test-edit-field-label>{{@label}}</div>
       {{!-- Events supported by the built-in Input ember component --}}

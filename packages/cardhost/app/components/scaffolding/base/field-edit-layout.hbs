@@ -16,8 +16,8 @@
       {{#if this.displayInputField}}
         <Input
           @class="edit-field__input"
-          @value={{value}}
-          @enter={{perform this.add value}}
+          @value={{this.value}}
+          @enter={{perform this.add this.value}}
         />
       {{/if}}
       <button {{on "click" (action (mut this.displayInputField) (not this.displayInputField))}} class="collection-field__item-add-btn" aria-label="add" />
@@ -35,8 +35,8 @@
       {{#if this.displayInputField}}
         <Input
           @class="edit-field__input"
-          @value={{value}}
-          @enter={{perform this.add value}}
+          @value={{this.value}}
+          @enter={{perform this.add this.value}}
         />
       {{/if}}
       <button {{on "click" (action (mut this.displayInputField) (not this.displayInputField))}} class="collection-field__item-add-btn" aria-label="add" />
