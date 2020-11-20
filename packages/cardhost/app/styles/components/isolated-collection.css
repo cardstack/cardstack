@@ -378,6 +378,7 @@
 }
 
 .isolated-collection--default .isolated-collection__grid-item--grid > .isolated-collection__card > a {
+  min-height: 90px;
   max-height: 360px;
 }
 
