@@ -10,7 +10,8 @@ import { Org, USER_ORGS } from '../../services/cardstack-session';
 //@ts-ignore
 import ENV from '@cardstack/cardhost/config/environment';
 
-const { hubURL } = ENV;
+const { environment, hubURL } = ENV;
+const realmOrigin = 'https://builder-hub.stack.cards';
 const size = 100;
 
 interface RouteParams {
@@ -33,7 +34,12 @@ export default class CollectionRoute extends Route {
     let realm = collection ? collection : 'default';
     let currentOrg = USER_ORGS.find(el => el.id === collection);
 
-    this.realmURL = `${hubURL}/api/realms/${realm}`;
+    if (environment === 'test') {
+      this.realmURL = `${hubURL}/api/realms/${realm}`;
+    } else {
+      this.realmURL = `${realmOrigin}/api/realms/${realm}`;
+    }
+
     await this.load.perform();
 
     return {
