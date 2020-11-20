@@ -24,6 +24,7 @@ const template = cardDocument()
     },
     name: 'Sample User',
     email: 'user@nowhere.dog',
+    csTitle: 'Master Recording',
   })
   .withField('name', 'string-field')
   .withField('email', 'string-field');
@@ -33,6 +34,7 @@ const card1 = cardDocument()
     csId: 'hassan',
     name: 'Hassan Abdel-Rahman',
     email: 'hassan@nowhere.dog',
+    csTitle: 'Master Recording',
   })
   .adoptingFrom(template);
 const card2 = cardDocument()
@@ -41,6 +43,7 @@ const card2 = cardDocument()
     csId: 'van-gogh',
     name: 'Van Gogh',
     email: 'vangogh@nowhere.dog',
+    csTitle: 'Musical Work',
   })
   .adoptingFrom(template);
 
@@ -85,7 +88,7 @@ module('Acceptance | collection', function(hooks) {
     assert.dom('[data-test-cardhost-left-edge]').exists();
     assert.dom(`[data-test-org-switcher="${org}"]`).exists();
     assert.dom('[data-test-isolated-collection]').exists();
-    assert.dom('[data-test-isolated-collection-card]').doesNotExist();
+    assert.dom('[data-test-isolated-collection-card]').exists({ count: 2 });
 
     await percySnapshot(assert);
   });
@@ -147,7 +150,7 @@ module('Acceptance | collection', function(hooks) {
       .dom(`[data-test-org-header-link=${collection1}]`)
       .hasAttribute('href', `/cards/${org1}/collection/${collection1}`);
     assert.dom('[data-test-isolated-collection] h2').hasText('');
-    assert.dom('[data-test-isolated-collection-count]').hasText('0');
+    assert.dom('[data-test-isolated-collection-count]').hasText('3');
 
     await click(`[data-test-org-header-link=${collection1}]`);
     assert.equal(currentURL(), `/cards/${org1}/collection/${collection1}`);
@@ -155,6 +158,7 @@ module('Acceptance | collection', function(hooks) {
     assert.dom('[data-test-isolated-collection] h2').hasText(collectionTitle1);
     assert.dom(`[data-test-org-switcher=${org1}]`).hasClass('active');
     assert.dom(`[data-test-org-header-link=${collection1}]`).hasClass('active');
+    assert.dom('[data-test-isolated-collection-count]').hasText('2');
 
     assert.dom(`[data-test-org-switcher=${org2}]`).exists();
     assert.dom(`[data-test-org-switcher=${org2}]`).doesNotHaveClass('active');
@@ -180,7 +184,7 @@ module('Acceptance | collection', function(hooks) {
     assert.dom('[data-test-isolated-collection] h2').hasText(collectionTitle2);
     assert.dom(`[data-test-org-switcher=${org2}]`).hasClass('active');
     assert.dom(`[data-test-org-header-link=${collection2}]`).hasClass('active');
-    assert.dom('[data-test-isolated-collection-count]').hasText('0');
+    assert.dom('[data-test-isolated-collection-count]').hasText('1');
 
     await percySnapshot(assert);
 

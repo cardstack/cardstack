@@ -43,6 +43,7 @@ module.exports = function(environment) {
     // ENV.APP.LOG_VIEW_LOOKUPS = true;
 
     ENV.hideDialog = true;
+    ENV.devDir = process.env.DEV_DIR;
   }
 
   if (environment === 'test') {
