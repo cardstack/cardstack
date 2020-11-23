@@ -29,8 +29,14 @@ export async function loadModule(card: Card, localModulePath: string, exportedNa
   if (typeof code !== 'string') {
     throw new Error(`the card with id ${card.canonicalURL} could not load ${localModulePath}`);
   }
-  // @ts-ignore
-  let module = await import(/* webpackIgnore: true */ `data:application/javascript,${encodeURIComponent(code)}`);
+  let module;
+  try {
+    // @ts-ignore
+    module = await import(`@cardstack/${card.csId}-card/${localModulePath}`);
+  } catch (err) {
+    // @ts-ignore
+    module = await import(/* webpackIgnore: true */ `data:application/javascript,${encodeURIComponent(code)}`);
+  }
   return module[exportedName];
 }
 
