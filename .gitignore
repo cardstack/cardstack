@@ -79,6 +79,9 @@ package-lock.json
 /packages/cardhost/app/components/isolated-collection.d.ts
 /packages/cardhost/app/components/isolated-collection.js
 /packages/cardhost/app/components/isolated-collection.js.map
+/packages/cardhost/app/components/related-cards.d.ts
+/packages/cardhost/app/components/related-cards.js
+/packages/cardhost/app/components/related-cards.js.map
 /packages/cardhost/app/components/user-info-modal.d.ts
 /packages/cardhost/app/components/user-info-modal.js
 /packages/cardhost/app/components/user-info-modal.js.map

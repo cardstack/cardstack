@@ -22,6 +22,10 @@
     {{/if}}
 
     <CardViewer @card={{this.model.card}} @mode="view" />
+
+    {{#if (eq this.model.card.csTitle "Musical Work")}}
+      <RelatedCards @card={{this.model.card}} />
+    {{/if}}
   </div>
 </section>
 
