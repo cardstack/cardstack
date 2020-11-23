@@ -194,9 +194,9 @@ a:hover {
 
 /* JSON card document -- hidden from view */
 .cardhost-card-document {
-  visibility: hidden;
+  /* visibility: hidden;
   height: 0;
-  overflow: hidden;
+  overflow: hidden; */
 }
 
 /* Cardhost Modal */

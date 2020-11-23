@@ -208,6 +208,10 @@ class Reader implements CardReader {
     // card--let's harness any over fetching efficiently.
     return await this.dataService.load(idOrURL, 'everything');
   }
+
+  async search(query: Query, rules: OcclusionRules | 'everything'): Promise<AddressableCard[]> {
+    return await this.dataService.search(query, rules);
+  }
 }
 
 class Loader implements ModuleLoader {
