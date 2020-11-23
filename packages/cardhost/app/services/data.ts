@@ -17,6 +17,7 @@ import { OcclusionRules } from '@cardstack/hub';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 //@ts-ignore
 import ENV from '@cardstack/cardhost/config/environment';
+import { ResponseMeta } from '@cardstack/hub/document';
 
 const { hubURL } = ENV;
 // Caching at the module scope to help speed up the tests. Since this is a
@@ -209,8 +210,19 @@ class Reader implements CardReader {
     return await this.dataService.load(idOrURL, 'everything');
   }
 
-  async search(query: Query, rules: OcclusionRules | 'everything'): Promise<AddressableCard[]> {
-    return await this.dataService.search(query, rules);
+  async search(
+    query: Query,
+    rules: OcclusionRules | 'everything'
+  ): Promise<{ cards: AddressableCard[]; meta: ResponseMeta }> {
+    let cards = await this.dataService.search(query, rules);
+    return {
+      cards,
+      meta: {
+        page: {
+          total: cards.length,
+        },
+      },
+    };
   }
 }
 
