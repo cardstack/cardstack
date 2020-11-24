@@ -6,9 +6,10 @@ import { task } from 'ember-concurrency';
 
 export default class RelatedCards extends Component<{
   card: AddressableCard;
+  key: string;
   loadRelatedCards: () => void;
 }> {
-  @tracked relatedCards!: AddressableCard[] | [];
+  @tracked relatedCards!: AddressableCard[] | [] | AddressableCard | {};
 
   constructor(owner: unknown, args: any) {
     super(owner, args);
@@ -17,7 +18,8 @@ export default class RelatedCards extends Component<{
   }
 
   @task(function*(this: RelatedCards) {
-    this.relatedCards = yield this.args.card.value('related-recordings');
+    let key = this.args.key;
+    this.relatedCards = yield this.args.card.value(key);
   })
   loadRelatedCards: any;
 }

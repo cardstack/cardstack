@@ -5,7 +5,6 @@
 
   position: relative;
   margin: 0 auto;
-  padding: 0 30px 30px;
   width: var(--card-renderer-width);
   min-width: 415px;
   max-width: 100%;
@@ -20,10 +19,7 @@
   --card-renderer-width: var(--ch-card-size-small);
   min-height: var(--card-renderer-height);
   max-width: var(--card-renderer-width);
-}
-
-.card-renderer-isolated.edit {
-  padding: 0;
+  padding: 0 30px 30px;
 }
 
 .card-renderer-isolated.view,
@@ -31,12 +27,18 @@
   margin: 0;
 }
 
+.card-renderer-isolated.view.themer {
+  padding: 0 30px 30px;
+}
+
 .card-renderer-isolated.view.preview {
   margin: 0 auto;
+  padding: 0 30px 30px;
 }
 
 .card-renderer-isolated.layout {
   height: calc(100% - var(--ch-top-edge-height));
+  padding: 0 30px 30px;
   overflow-y: auto;
 }
 

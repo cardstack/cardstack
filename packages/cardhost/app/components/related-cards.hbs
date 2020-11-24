@@ -1,14 +1,22 @@
 {{#if this.relatedCards}}
-  <aside class="item__sidebar">
-    <h3 class="item__sidebar-title">Related Recordings</h3>
-    <div class="item__sidebar-cards">
-      {{#each this.relatedCards as |card|}}
+  <aside class="related-cards">
+    <h3 class="related-cards__title">{{@title}}</h3>
+    <div class="related-cards__cards">
+      {{#if (is-array this.relatedCards)}}
+        {{#each this.relatedCards as |card|}}
+          <CardRenderer
+            @card={{card}}
+            @mode="view"
+            @format="embedded"
+          />
+        {{/each}}
+      {{else}}
         <CardRenderer
-          @card={{card}}
+          @card={{this.relatedCards}}
           @mode="view"
           @format="embedded"
         />
-      {{/each}}
+      {{/if}}
     </div>
   </aside>
 {{/if}}
