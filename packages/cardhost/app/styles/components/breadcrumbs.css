@@ -1,7 +1,9 @@
 .breadcrumbs {
+  grid-column: 1 / -1;
   display: flex;
   width: 100%;
-  padding: 20px 30px;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 .breadcrumbs__item {

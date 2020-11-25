@@ -1,6 +1,6 @@
 {{#if this.relatedCards}}
-  <aside class="related-cards">
-    <h3 class="related-cards__title">{{@title}}</h3>
+  <aside class="related-cards" data-test-related-cards>
+    <h3 class="related-cards__title" data-test-related-cards-title>{{@title}}</h3>
     <div class="related-cards__cards">
       {{#if (is-array this.relatedCards)}}
         {{#each this.relatedCards as |card|}}
