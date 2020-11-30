@@ -25,8 +25,18 @@ export function getUserRealm() {
 }
 
 export async function loadModule(card: Card, localModulePath: string, exportedName = 'default') {
-  // @ts-ignore
-  let module = await import(`@cardstack/${card.csId}-card/${localModulePath}`); // we are using ESM for module loading
+  let code = card.csFiles?.[localModulePath];
+  if (typeof code !== 'string') {
+    throw new Error(`the card with id ${card.canonicalURL} could not load ${localModulePath}`);
+  }
+  let module;
+  try {
+    // @ts-ignore
+    module = await import(`@cardstack/${card.csId}-card/${localModulePath}`);
+  } catch (err) {
+    // @ts-ignore
+    module = await import(/* webpackIgnore: true */ `data:application/javascript,${encodeURIComponent(code)}`);
+  }
   return module[exportedName];
 }
 

@@ -26,8 +26,8 @@ const template = cardDocument()
     email: 'user@nowhere.dog',
     csTitle: 'Master Recording',
   })
-  .withField('name', 'string-field')
-  .withField('email', 'string-field');
+  .withField('name', 'string-field', 'singular', { csTitle: 'Name' })
+  .withField('email', 'string-field', 'singular', { csTitle: 'Email' });
 const card1 = cardDocument()
   .withAttributes({
     csRealm,
@@ -121,6 +121,7 @@ module('Acceptance | collection', function(hooks) {
 
     await click(`[data-test-card-renderer="${card2.canonicalURL}"] a`);
     await waitForCardLoad();
+
     assert.equal(encodeColons(currentURL()), `/cards/${encodeURIComponent(card2.canonicalURL)}`);
     assert.dom(`[data-test-card-renderer-isolated="${card2.canonicalURL}"]`).exists();
 

@@ -26,6 +26,8 @@
 @import '/assets/components/card-renderer-header.css';
 @import '/assets/components/card-editor.css';
 @import '/assets/components/loading.css';
+@import '/assets/components/card-viewer.css';
+@import '/assets/components/related-cards.css';
 
 /* Boxel components */
 @import '/assets/components/dropdown-menu-button.css';

@@ -1,0 +1,24 @@
+.related-cards {
+  width: 100%;
+}
+
+.related-cards__title {
+  margin: 0;
+  padding-bottom: 25px;
+  font: var(--boxel-font);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp);
+}
+
+* + .related-cards__title {
+  margin-top: 25px;
+}
+
+.related-cards__cards .card-renderer-embedded {
+  min-width: 360px;
+  min-height: 160px;
+}
+
+.related-cards__cards > * + * {
+  margin-top: 20px;
+}

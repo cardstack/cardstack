@@ -1,18 +1,20 @@
-<CardRenderer
-  @card={{@card}}
-  @mode={{@mode}}
-  @format="isolated"
-  @cardSelected={{this.isSelected}}
-  @contextMenuOpen={{this.contextMenuOpen}}
-  @setContextMenu={{this.setContextMenu}}
-  @setIsSelected={{action (mut this.isSelected)}}
-/>
+<div class="card-viewer">
+  <CardRenderer
+    @card={{@card}}
+    @mode={{@mode}}
+    @format="isolated"
+    @cardSelected={{this.isSelected}}
+    @contextMenuOpen={{this.contextMenuOpen}}
+    @setContextMenu={{this.setContextMenu}}
+    @setIsSelected={{action (mut this.isSelected)}}
+  />
 
-{{!-- This is hidden, used in tests --}}
-<section class="cardhost-card-document">
-  <h3>Card Document</h3>
-  <pre data-test-card-json>{{this.cardJson}}</pre>
-</section>
+  {{!-- This is hidden, used in tests --}}
+  <section class="cardhost-card-document">
+    <h3>Card Document</h3>
+    <pre data-test-card-json>{{this.cardJson}}</pre>
+  </section>
+</div>
 
 {{yield @card
   (hash
