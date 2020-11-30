@@ -19,6 +19,10 @@ export default class RelatedCards extends Component<{
 
   @task(function*(this: RelatedCards) {
     let key = this.args.key;
+    let hasField = yield this.args.card.hasField(key);
+    if (!hasField) {
+      return;
+    }
     this.relatedCards = yield this.args.card.value(key);
   })
   loadRelatedCards: any;

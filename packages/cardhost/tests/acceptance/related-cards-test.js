@@ -23,19 +23,18 @@ const masterRecordingTemplate = cardDocument()
     },
     csTitle: 'Master Recording Template',
   })
-  .withField('title', 'string-field')
-  .withField('label', 'string-field')
-  .withField('musical-work', 'base');
+  .withField('title', 'string-field', 'singular', { csTitle: 'Title' })
+  .withField('label', 'string-field', 'singular', { csTitle: 'Label' })
+  .withField('musical-work', 'base', 'singular', { csTitle: 'Musical Work' });
 const hasMany = cardDocument()
   .withAttributes({
     csRealm,
     csId: 'has-many',
+    csFeatures: { compute: 'compute.js' },
     csFiles: {
-      'compute.js': `// eslint-disable-next-line
-      export default async function({ field, card }) {
+      'compute.js': `export default async function({ field, card }) {
         let foreignKey = await field.value('foreignKey');
         let foreignType = await field.value('foreignType');
-        console.log(foreignKey, foreignType);
         try {
           let found = await card.reader.search({
             filter: {
@@ -53,7 +52,6 @@ const hasMany = cardDocument()
         }
       }`,
     },
-    csFeatures: { compute: 'compute.js' },
   })
   .withField('foreignKey', 'string-field')
   .withField('foreignType', 'base');
@@ -77,10 +75,9 @@ const musicalWorkTemplate = cardDocument()
     csFiles: { [embeddedCssFile]: 'musical work css' },
     csTitle: 'Musical Work Template',
   })
-  .withField('title', 'string-field')
-  .withField('iswc', 'string-field')
+  .withField('title', 'string-field', 'singular', { csTitle: 'Title' })
+  .withField('iswc', 'string-field', 'singular', { csTitle: 'ISWC' })
   .withField('related-recordings', relatedRecordings, 'plural', { foreignKey: 'musical-work' });
-
 const work = cardDocument()
   .withAttributes({
     csRealm,
@@ -100,10 +97,13 @@ const recording = cardDocument()
   })
   .withRelationships({ 'musical-work': work })
   .adoptingFrom(masterRecordingTemplate);
-
 const scenario = new Fixtures({
   create: [musicalWorkTemplate, masterRecordingTemplate, hasMany, relatedRecordings, work, recording],
 });
+
+async function waitForCardsLoad() {
+  await Promise.all([recording, work].map(card => waitForCardLoad(card.canonicalURL)));
+}
 
 module('Acceptance | related cards', function(hooks) {
   setupApplicationTest(hooks);
@@ -118,22 +118,26 @@ module('Acceptance | related cards', function(hooks) {
 
   test(`viewing related-works sidebar`, async function(assert) {
     await visit(`/cards/${encodeURIComponent(recording.canonicalURL)}`);
-    await waitForCardLoad();
+    await waitForCardsLoad();
 
     assert.dom('[data-test-related-cards]').exists();
     assert.dom('[data-test-related-cards-title]').hasText('Related Works');
-    assert.dom('[data-test-related-cards] [data-test-card-renderer-embedded]').exists({ count: 1 });
+    assert
+      .dom(`[data-test-related-cards] [data-test-card-renderer-embedded="${work.canonicalURL}"]`)
+      .exists({ count: 1 });
 
     await percySnapshot(assert);
   });
 
   test(`viewing related-recordings sidebar`, async function(assert) {
     await visit(`/cards/${encodeURIComponent(work.canonicalURL)}`);
-    await waitForCardLoad();
+    await waitForCardsLoad();
 
     assert.dom('[data-test-related-cards]').exists();
     assert.dom('[data-test-related-cards-title]').hasText('Related Recordings');
-    assert.dom('[data-test-related-cards] [data-test-card-renderer-embedded]').exists({ count: 1 });
+    assert
+      .dom(`[data-test-related-cards] [data-test-card-renderer-embedded="${recording.canonicalURL}"]`)
+      .exists({ count: 1 });
 
     await percySnapshot(assert);
   });
