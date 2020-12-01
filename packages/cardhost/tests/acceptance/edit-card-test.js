@@ -50,6 +50,8 @@ const testCard = cardDocument()
         'cta',
         'contributors',
         'publishers',
+        'researchers',
+        'credits',
       ],
     },
     likes: 100,
@@ -57,6 +59,7 @@ const testCard = cardDocument()
     appointment: '2020-03-07T14:00:00.000Z',
     body: 'test body',
     published: true,
+    credits: ['Gen X Puppies', 'Gen Z Puppies', 'Puppy Chow'],
   })
   .withField('body', 'string-field', 'singular', { csTitle: 'Body' })
   .withField('likes', 'integer-field', 'singular', { csTitle: 'Likes' })
@@ -68,8 +71,11 @@ const testCard = cardDocument()
   .withField('image', 'image-reference-field', 'singular', { csTitle: 'Awesome Image' })
   .withField('relativeImage', 'relative-image-reference-field', 'singular', { csTitle: 'Awesome Relative Image' })
   .withField('contributors', 'string-field', 'plural', { csTitle: 'Contributors' })
+  .withField('credits', 'string-field', 'plural', { csTitle: 'Credits' })
   .withField('author', 'base', 'singular', { csTitle: 'Author' })
-  .withField('publishers', 'base', 'plural', { csTitle: 'Publishers' });
+  .withField('publishers', 'base', 'plural', { csTitle: 'Publishers' })
+  .withField('researchers', 'base', 'plural', { csTitle: 'Researchers' })
+  .withRelationships({ researchers: [author, publisher2] });
 
 const cardPath = encodeURIComponent(testCard.canonicalURL);
 const scenario = new Fixtures({
@@ -259,12 +265,15 @@ module('Acceptance | card edit', function(hooks) {
     assert.equal(card.data.attributes.published, false);
   });
 
-  test(`setting a base card field as reference with singular arity`, async function(assert) {
+  skip(`setting a base card field as reference with singular arity`, async function(assert) {
     await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
 
     await click('[data-test-edit-field="author"] [data-test-embedded-card-add-btn]');
     await setFieldValue('author', author.canonicalURL);
+    assert
+      .dom(`[data-test-edit-field="author"] [data-test-card-renderer-embedded]`)
+      .exists({ count: 1 }, 'can render belongs-to field item in edit mode ui');
     await saveCard();
 
     await visit(`/cards/${cardPath}`);
@@ -281,7 +290,7 @@ module('Acceptance | card edit', function(hooks) {
     assert.deepEqual(card.data.relationships.author.data, { type: 'cards', id: author.canonicalURL });
   });
 
-  test(`setting a string field with plural arity`, async function(assert) {
+  skip(`setting a string field with plural arity`, async function(assert) {
     await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
 
@@ -314,40 +323,41 @@ module('Acceptance | card edit', function(hooks) {
     await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
 
-    await click('[data-test-edit-field="contributors"] [data-test-taglist-add-btn]');
-    await setFieldValue('contributors', 'Van Gogh');
-    await setFieldValue('contributors', 'Mango');
-    await setFieldValue('contributors', 'Jackie');
+    assert.dom(`[data-test-edit-field="credits"]`).exists();
+    assert.dom(`[data-test-edit-field="credits"] [data-test-taglist]`).exists();
+    assert
+      .dom(`[data-test-edit-field="credits"] [data-test-taglist-item]`)
+      .exists({ count: 3 }, 'can render string array in edit ui');
+    assert.dom(`[data-test-edit-field="credits"] [data-test-taglist-add-btn]`).exists();
 
-    assert.dom(`[data-test-edit-field="contributors"]`).exists();
-    assert.dom(`[data-test-edit-field="contributors"] [data-test-taglist]`).exists();
-    assert.dom(`[data-test-edit-field="contributors"] [data-test-taglist-item]`).exists({ count: 3 });
-    assert.dom(`[data-test-edit-field="contributors"] [data-test-taglist-add-btn]`).exists();
+    await click('[data-test-edit-field="credits"] [data-test-taglist-remove-btn="0"]');
+    assert.dom(`[data-test-edit-field="credits"] [data-test-taglist-item]`).exists({ count: 2 }, 'can remove item');
 
-    await click('[data-test-edit-field="contributors"] [data-test-taglist-remove-btn="0"]');
-    assert.dom(`[data-test-edit-field="contributors"] [data-test-taglist-item]`).exists({ count: 2 });
+    await click('[data-test-edit-field="credits"] [data-test-taglist-remove-btn="0"]');
+    assert
+      .dom(`[data-test-edit-field="credits"] [data-test-taglist-item]`)
+      .exists({ count: 1 }, 'can remove multiple items');
 
-    await click('[data-test-edit-field="contributors"] [data-test-taglist-remove-btn="1"]');
-    assert.dom(`[data-test-edit-field="contributors"] [data-test-taglist-item]`).exists({ count: 1 });
+    await click(`[data-test-edit-field="credits"] [data-test-taglist-add-btn]`);
+    assert.dom(`[data-test-edit-field="credits"] [data-test-taglist-add-input]`).exists();
 
-    assert.dom(`[data-test-edit-field="contributors"] [data-test-taglist-add-input]`).exists();
-
-    await setFieldValue('contributors', 'Jackie');
-
-    assert.dom(`[data-test-edit-field="contributors"] [data-test-taglist-item]`).exists({ count: 2 });
+    // TODO: adding item
+    // await setFieldValue('credits', 'Jackie');
+    // assert.dom(`[data-test-edit-field="credits"] [data-test-taglist-item]`).exists({ count: 2 }, 'can add item');
     await saveCard();
 
     await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
 
-    assert.dom(`[data-test-field="contributors"] [data-test-string-field-viewer-value]`).hasText('Mango, Jackie');
+    assert.dom(`[data-test-field="credits"] [data-test-string-field-viewer-value]`).hasText('Puppy Chow');
 
-    let cardJson = find('[data-test-card-json]').innerHTML;
-    let card = JSON.parse(cardJson);
-    assert.deepEqual(card.data.attributes.contributors, ['Mango', 'Jackie']);
+    // TODO: removing item
+    // let cardJson = find('[data-test-card-json]').innerHTML;
+    // let card = JSON.parse(cardJson);
+    // assert.deepEqual(card.data.attributes.contributors, ['Puppy Chow']);
   });
 
-  // TODO
+  skip(`editing a base card field as reference with singular arity`, async function() {});
   skip(`setting a base card field as reference with plural arity`, async function(assert) {
     await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
@@ -362,29 +372,38 @@ module('Acceptance | card edit', function(hooks) {
     assert.dom(`[data-test-edit-field="publishers"] [data-test-has-many-input]`).exists();
 
     await setFieldValue('publishers', publisher.canonicalURL);
-    assert.dom(`[data-test-edit-field="publishers"] [data-test-card-renderer-embedded]`).exists({ count: 1 });
+    assert
+      .dom(`[data-test-edit-field="publishers"] [data-test-card-renderer-embedded]`)
+      .exists({ count: 1 }, 'can add an item');
+
+    await setFieldValue('publishers', publisher2.canonicalURL);
+    assert
+      .dom(`[data-test-edit-field="publishers"] [data-test-card-renderer-embedded]`)
+      .exists({ count: 2 }, 'can add multiple items');
     await saveCard();
 
     await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
     await waitForCardLoad(publisher.canonicalURL);
-    assert.dom(`[data-test-field="publishers"] [data-test-card-renderer-embedded]`).exists({ count: 1 });
-
-    await visit(`/cards/${cardPath}/edit`);
-    await waitForCardLoad();
-    await click(`[data-test-edit-field="publishers"] [data-test-has-many-add-btn]`);
-    await setFieldValue('publishers', publisher2.canonicalURL);
-    assert.dom(`[data-test-edit-field="publishers"] [data-test-card-renderer-embedded]`).exists({ count: 2 });
-    await saveCard();
-
-    await visit(`/cards/${cardPath}`);
-    await waitForCardLoad();
     await waitForCardLoad(publisher2.canonicalURL);
 
     assert.dom(`[data-test-field="publishers"] [data-test-card-renderer-embedded]`).exists({ count: 2 });
   });
 
-  skip(`editing a base card field as reference with plural arity`, async function() {});
+  test(`editing a base card field as reference with plural arity`, async function(assert) {
+    await visit(`/cards/${cardPath}/edit`);
+    await waitForCardLoad();
+    assert.dom(`[data-test-edit-field="researchers"]`).exists();
+    assert.dom(`[data-test-edit-field="researchers"] [data-test-has-many]`).exists();
+    assert
+      .dom(`[data-test-edit-field="researchers"] [data-test-card-renderer-embedded]`)
+      .exists({ count: 2 }, 'can render items in edit mode');
+    assert.dom(`[data-test-edit-field="researchers"] [data-test-has-many-add-btn]`).exists();
+    assert.dom(`[data-test-edit-field="researchers"] [data-test-has-many-input]`).doesNotExist();
+
+    // TODO: adding and removing items
+  });
+
   skip(`setting a card field as value with singular arity`, async function() {});
   skip(`setting a card field as value with plural arity`, async function() {});
   skip(`setting an image card field with plural arity`, async function() {});

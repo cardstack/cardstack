@@ -27,14 +27,17 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
   updateFieldValue;
 
   @task(function*(value) {
+    // TODO: fix
     if (!value) {
       return;
     }
-    yield this.args.setCardReference.perform(this.args.card.name, [...this.fieldValue, canonicalURLToCardId(value)]);
+    let val = canonicalURLToCardId(value);
+    yield this.args.setCardReference.perform(this.args.card.name, [...this.fieldValue, val]);
   })
   add;
 
   @task(function*(index) {
+    // TODO: fix
     if (this.args.card.csFieldArity === 'plural') {
       this.fieldValue = this.fieldValue.filter((el, i) => i !== index);
     } else {

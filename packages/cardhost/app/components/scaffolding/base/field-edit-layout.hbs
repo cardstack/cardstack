@@ -23,7 +23,6 @@
           @class="edit-field__input"
           @value={{this.value}}
           @enter={{perform this.add this.value}}
-          @key-up={{perform this.updateFieldValue this.value}}
           data-test-has-many-input
         />
       {{/if}}
@@ -54,7 +53,6 @@
           @class="edit-field__input"
           @value={{this.value}}
           @enter={{perform this.updateFieldValue this.value}}
-          @key-up={{perform this.updateFieldValue this.value}}
           data-test-embedded-card-input
         />
       {{/if}}
