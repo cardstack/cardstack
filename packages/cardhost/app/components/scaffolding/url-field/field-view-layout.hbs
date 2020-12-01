@@ -1,6 +1,6 @@
 
 <div class="label {{@card.name}}-label" data-test-link-field-viewer-label>
-  {{@card.csTitle}}
+  {{or @card.csTitle @card.name}}
 </div>
 {{#if this.fieldValue}}
   <a

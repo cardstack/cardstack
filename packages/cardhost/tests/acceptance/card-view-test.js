@@ -1,4 +1,4 @@
-import { module, test } from 'qunit';
+import { module, test, skip } from 'qunit';
 import { find, visit, currentURL, click } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
@@ -132,6 +132,12 @@ module('Acceptance | card view', function(hooks) {
 
     await percySnapshot(assert);
   });
+
+  skip(`can render base-card with BackgroundHeader component`, async function() {});
+  skip(`can render card with audio file card field`, async function() {});
+  skip(`can render card with file card field`, async function() {});
+  skip(`does not add link on owned cards`, async function() {});
+  skip(`breadcrumbs can render multiple levels of nesting`, async function() {});
 
   test('can navigate to the base-card', async function(assert) {
     let baseCardPath = encodeURIComponent(canonicalURL({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' }));

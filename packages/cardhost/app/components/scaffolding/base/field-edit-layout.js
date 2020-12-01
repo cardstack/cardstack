@@ -12,7 +12,7 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
   @(task(function*() {
     let relatedCard = yield this.args.card.enclosingCard.value(this.args.card.name);
     if (relatedCard) {
-      this.fieldValue = relatedCard.canonicalURL;
+      this.fieldValue = relatedCard;
     } else {
       this.fieldValue = null;
     }
@@ -21,8 +21,29 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
 
   // This is super temporary--this will only fashion card as reference with arity of 1 for now..
   @(task(function*(value) {
-    this.fieldValue = value;
-    yield this.args.setCardReference.perform(this.args.card.name, value ? canonicalURLToCardId(value) : null);
+    let val = value ? canonicalURLToCardId(value) : null;
+    yield this.args.setCardReference.perform(this.args.card.name, val);
   }).restartable())
   updateFieldValue;
+
+  @task(function*(value) {
+    // TODO: fix
+    if (!value) {
+      return;
+    }
+    let val = canonicalURLToCardId(value);
+    yield this.args.setCardReference.perform(this.args.card.name, [...this.fieldValue, val]);
+  })
+  add;
+
+  @task(function*(index) {
+    // TODO: fix
+    if (this.args.card.csFieldArity === 'plural') {
+      this.fieldValue = this.fieldValue.filter((el, i) => i !== index);
+    } else {
+      this.fieldValue = null;
+    }
+    yield this.args.setCardReference.perform(this.args.card.name, this.fieldValue);
+  })
+  remove;
 }

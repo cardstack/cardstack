@@ -136,10 +136,15 @@
 
 
 /* Embedded */
+.card-renderer-embedded {
+  width: 100%;
+}
+
 .card-renderer-embedded + .card-renderer-embedded {
   padding-top: var(--ch-spacing);
 }
 
+.card-renderer-embedded--card-container,
 .card-renderer--embedded-card-link {
   display: block;
   border-radius: var(--boxel-border-radius);
