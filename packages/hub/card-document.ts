@@ -229,10 +229,6 @@ export class CardDocument {
         relationships[key] = {
           data: value == null ? null : { type: 'cards', id },
         };
-      } else {
-        relationships[key] = {
-          data: null,
-        };
       }
     }
 

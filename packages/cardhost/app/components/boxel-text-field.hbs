@@ -2,21 +2,23 @@
   {{#if @hasPluralArity}}
     <div class="edit-field" data-test-edit-field={{@cardId}}>
       <div class="edit-field__title" data-test-edit-field-label>{{@label}}</div>
-      <div class="collection-field collection-field--taglist">
+      <div class="collection-field collection-field--taglist" data-test-taglist>
         {{#each @value as |value i|}}
-          <div class="item__pill">
+          <div class="item__pill" data-test-taglist-item>
             <span class="item__pill-value">{{value}}</span>
             {{#if @removeAction}}
-              <button {{on "click" (fn @removeAction i)}} class="item__remove-btn" aria-label="remove" />
+              <button {{on "click" (fn @removeAction i)}} class="item__remove-btn" aria-label="remove" data-test-taglist-remove-btn={{i}} />
             {{/if}}
           </div>
         {{/each}}
-        <button {{on "click" this.toggleInputField}} class="item__add-btn" aria-label="add" />
+        <button {{on "click" this.toggleInputField}} class="item__add-btn" aria-label="add" data-test-taglist-add-btn />
         {{#if (and @addAction this.displayInputField)}}
           <Input
             @class="edit-field__input"
             @value={{this.value}}
             @enter={{fn @addAction this.value}}
+            @key-up={{fn @addAction this.value}}
+            data-test-taglist-add-input
           />
         {{/if}}
       </div>

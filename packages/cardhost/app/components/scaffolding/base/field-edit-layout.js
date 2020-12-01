@@ -1,7 +1,6 @@
 import BaseEditor from '../base-editor';
 import { task } from 'ember-concurrency';
 import { canonicalURLToCardId } from '@cardstack/hub';
-// import { isArray } from '@ember/array';
 
 export default class BaseCardFieldEditLayout extends BaseEditor {
   constructor(...args) {
@@ -14,11 +13,6 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
     let relatedCard = yield this.args.card.enclosingCard.value(this.args.card.name);
     if (relatedCard) {
       this.fieldValue = relatedCard;
-      // if (this.args.card.csFieldArity === 'plural') {
-      //   this.fieldValue = relatedCard.map(card => card.canonicalURL);
-      // } else {
-      //   this.fieldValue = relatedCard;
-      // }
     } else {
       this.fieldValue = null;
     }
@@ -27,10 +21,18 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
 
   // This is super temporary--this will only fashion card as reference with arity of 1 for now..
   @(task(function*(value) {
-    this.fieldValue = value;
-    yield this.args.setCardReference.perform(this.args.card.name, value ? canonicalURLToCardId(value) : null);
+    let val = value ? canonicalURLToCardId(value) : null;
+    yield this.args.setCardReference.perform(this.args.card.name, val);
   }).restartable())
   updateFieldValue;
+
+  @task(function*(value) {
+    if (!value) {
+      return;
+    }
+    yield this.args.setCardReference.perform(this.args.card.name, [...this.fieldValue, canonicalURLToCardId(value)]);
+  })
+  add;
 
   @task(function*(index) {
     if (this.args.card.csFieldArity === 'plural') {
@@ -38,7 +40,6 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
     } else {
       this.fieldValue = null;
     }
-
     yield this.args.setCardReference.perform(this.args.card.name, this.fieldValue);
   })
   remove;

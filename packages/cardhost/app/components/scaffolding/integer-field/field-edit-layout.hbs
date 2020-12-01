@@ -6,4 +6,7 @@
   @value={{this.fieldValue}}
   @key-up={{perform this.updateFieldValue}}
   @focus-out={{perform this.updateFieldValue}}
+  @addAction={{perform this.add}}
+  @removeAction={{perform this.remove}}
+  @hasPluralArity={{eq @card.csFieldArity "plural"}}
 />
