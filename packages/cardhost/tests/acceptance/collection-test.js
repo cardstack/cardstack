@@ -1,4 +1,4 @@
-import { module, test } from 'qunit';
+import { module, test, skip } from 'qunit';
 import { click, visit, currentURL, find } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '../helpers/fixtures';
@@ -194,4 +194,10 @@ module('Acceptance | collection', function(hooks) {
     assert.dom('[data-test-org-header] h1').hasText(title1);
     assert.dom('[data-test-isolated-collection] h2').hasText('');
   });
+
+  skip(`can render table view`, async function() {});
+  skip(`can render list view`, async function() {});
+  skip(`can search collection`, async function() {});
+  skip(`can sort collection`, async function() {});
+  skip(`can filter collection`, async function() {});
 });

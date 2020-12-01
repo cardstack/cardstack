@@ -347,7 +347,8 @@ module('Acceptance | card edit', function(hooks) {
     assert.deepEqual(card.data.attributes.contributors, ['Mango', 'Jackie']);
   });
 
-  test(`setting a base card field as reference with plural arity`, async function(assert) {
+  // TODO
+  skip(`setting a base card field as reference with plural arity`, async function(assert) {
     await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
 
@@ -361,20 +362,19 @@ module('Acceptance | card edit', function(hooks) {
     assert.dom(`[data-test-edit-field="publishers"] [data-test-has-many-input]`).exists();
 
     await setFieldValue('publishers', publisher.canonicalURL);
-    // TODO:
-    // assert.dom(`[data-test-edit-field="publishers"] [data-test-card-renderer-embedded]`).exists({ count: 1 });
+    assert.dom(`[data-test-edit-field="publishers"] [data-test-card-renderer-embedded]`).exists({ count: 1 });
     await saveCard();
 
     await visit(`/cards/${cardPath}`);
     await waitForCardLoad();
     await waitForCardLoad(publisher.canonicalURL);
+    assert.dom(`[data-test-field="publishers"] [data-test-card-renderer-embedded]`).exists({ count: 1 });
 
     await visit(`/cards/${cardPath}/edit`);
     await waitForCardLoad();
     await click(`[data-test-edit-field="publishers"] [data-test-has-many-add-btn]`);
     await setFieldValue('publishers', publisher2.canonicalURL);
-    // TODO:
-    // assert.dom(`[data-test-edit-field="publishers"] [data-test-card-renderer-embedded]`).exists({ count: 2 });
+    assert.dom(`[data-test-edit-field="publishers"] [data-test-card-renderer-embedded]`).exists({ count: 2 });
     await saveCard();
 
     await visit(`/cards/${cardPath}`);
@@ -387,6 +387,11 @@ module('Acceptance | card edit', function(hooks) {
   skip(`editing a base card field as reference with plural arity`, async function() {});
   skip(`setting a card field as value with singular arity`, async function() {});
   skip(`setting a card field as value with plural arity`, async function() {});
+  skip(`setting an image card field with plural arity`, async function() {});
+  skip(`setting a dropdown field`, async function() {});
+  skip(`setting an audio card field with singular arity`, async function() {});
+  skip(`setting an audio card field with plural arity`, async function() {});
+  skip(`edit cards with sections are displayed correctly`, async function() {});
 
   test(`can navigate to view mode using the mode button`, async function(assert) {
     await visit(`/cards/${cardPath}/edit`);
