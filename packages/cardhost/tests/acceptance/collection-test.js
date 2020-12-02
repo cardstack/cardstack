@@ -75,7 +75,11 @@ module('Acceptance | collection', function(hooks) {
     assert.dom('[data-test-cardhost-left-edge]').exists();
     assert.dom(`[data-test-org-switcher="${org}"]`).exists();
     assert.dom('[data-test-isolated-collection]').exists();
-    assert.dom('[data-test-isolated-collection-card]').exists({ count: 3 });
+    assert.dom('[data-test-isolated-collection-card="grid"]').exists({ count: 3 }, 'grid view renders');
+
+    await click('[data-test-isolated-collection-list-view-btn]');
+    await waitForCollectionLoad();
+    assert.dom('[data-test-isolated-collection-card="list"]').exists({ count: 3 }, 'list view renders');
 
     await percySnapshot(assert);
   });

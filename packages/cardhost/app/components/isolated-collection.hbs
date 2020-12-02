@@ -51,9 +51,9 @@
           </DropdownMenuButton>
         </div> --}}
         <div class="isolated-collection__btn-trio isolated-collection__view-selectors">
-          <button {{on "click" (fn this.changeFormat "list")}} class="isolated-collection__btn list {{if (eq this.format "list") "selected"}}" aria-label="view as list"></button>
-          <button {{on "click" (fn this.changeFormat "grid")}} class="isolated-collection__btn grid {{if (eq this.format "grid") "selected"}}" aria-label="view as grid"></button>
-          <button {{on "click" (fn this.changeFormat "table")}} class="isolated-collection__btn table {{if (eq this.format "table") "selected"}}" aria-label="view as table"></button>
+          <button {{on "click" (fn this.changeFormat "list")}} class="isolated-collection__btn list {{if (eq this.format "list") "selected"}}" aria-label="view as list" data-test-isolated-collection-list-view-btn></button>
+          <button {{on "click" (fn this.changeFormat "grid")}} class="isolated-collection__btn grid {{if (eq this.format "grid") "selected"}}" aria-label="view as grid" data-test-isolated-collection-grid-view-btn></button>
+          <button {{on "click" (fn this.changeFormat "table")}} class="isolated-collection__btn table {{if (eq this.format "table") "selected"}}" aria-label="view as table" data-test-isolated-collection-table-view-btn></button>
         </div>
       </div>
     </div>
@@ -63,13 +63,13 @@
     <div class="isolated-collection__inner-container">
       <ul class="isolated-collection__grid isolated-collection__grid--{{this.format}}">
         {{#each @collection as |card|}}
-          <li class="isolated-collection__grid-item isolated-collection__grid-item--{{this.format}}" data-test-isolated-collection-card>
+          <li class="isolated-collection__grid-item isolated-collection__grid-item--{{this.format}}" data-test-isolated-collection-card={{this.format}}>
             {{#let (contains card.csId this.selectedCards) as |selectedCard|}}
               <CardRenderer
                 @card={{card}}
                 @format="embedded"
                 @suppressHeader={{@suppressHeader}}
-                @class="isolated-collection__card {{if selectedCard "isolated-collection__card--selected"}}"
+                @class="isolated-collection__card isolated-collection__card--{{this.format}} {{if selectedCard "isolated-collection__card--selected"}}"
               />
               <div class="isolated-collection__grid-item-btn-group {{if (eq @mode "view") "isolated-collection__select-btn"}} {{if selectedCard "isolated-collection__select-btn--selected"}}">
                 {{!-- <button {{on "click" (fn this.toggleSelect card.csId)}} class="isolated-collection__grid-item-select-btn" aria-label={{if selectedCard "unselect" "select"}}>
