@@ -69,7 +69,7 @@
                 @card={{card}}
                 @format="embedded"
                 @suppressHeader={{@suppressHeader}}
-                @class="isolated-collection__card {{if selectedCard "isolated-collection__card--selected"}}"
+                @class="isolated-collection__card isolated-collection__card--{{this.format}} {{if selectedCard "isolated-collection__card--selected"}}"
               />
               <div class="isolated-collection__grid-item-btn-group {{if (eq @mode "view") "isolated-collection__select-btn"}} {{if selectedCard "isolated-collection__select-btn--selected"}}">
                 {{!-- <button {{on "click" (fn this.toggleSelect card.csId)}} class="isolated-collection__grid-item-select-btn" aria-label={{if selectedCard "unselect" "select"}}>
