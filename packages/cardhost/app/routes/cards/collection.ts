@@ -16,6 +16,15 @@ const { environment, hubURL, devDir } = ENV;
 const realmOrigin = 'https://builder-hub.stack.cards';
 const size = 100;
 
+const tableCols = [
+  {
+    name: 'Title',
+    valuePath: 'title',
+    isFixed: 'left',
+    width: 350,
+  },
+];
+
 interface RouteParams {
   collection: string;
 }
@@ -24,6 +33,7 @@ export interface Model {
   id: string;
   cards: AddressableCard[];
   org: Org | undefined;
+  columns: object[];
 }
 
 export default class CollectionRoute extends Route {
@@ -49,6 +59,7 @@ export default class CollectionRoute extends Route {
       id: collection,
       cards: this.collectionEntries,
       org: currentOrg,
+      columns: tableCols,
     };
   }
 

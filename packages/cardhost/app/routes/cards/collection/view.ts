@@ -13,7 +13,7 @@ export default class CollectionViewRoute extends Route {
   @tracked collectionId!: string;
 
   async model({ id }: RouteParams): Promise<Model> {
-    let { org, cards } = (await this.modelFor('cards.collection')) as Model;
+    let { org, cards, columns } = (await this.modelFor('cards.collection')) as Model;
 
     if (org && cards.length && org.collection === id) {
       this.collectionId = org.collection;
@@ -30,6 +30,7 @@ export default class CollectionViewRoute extends Route {
       id,
       org,
       cards: this.collectionEntries,
+      columns,
     };
   }
 }

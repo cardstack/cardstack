@@ -59,27 +59,34 @@
     </div>
   </header>
 
-  <div class="isolated-collection__scroll-container">
-    <div class="isolated-collection__inner-container">
-      <ul class="isolated-collection__grid isolated-collection__grid--{{this.format}}">
-        {{#each @collection as |card|}}
-          <li class="isolated-collection__grid-item isolated-collection__grid-item--{{this.format}}" data-test-isolated-collection-card>
-            {{#let (contains card.csId this.selectedCards) as |selectedCard|}}
-              <CardRenderer
-                @card={{card}}
-                @format="embedded"
-                @suppressHeader={{@suppressHeader}}
-                @class="isolated-collection__card isolated-collection__card--{{this.format}} {{if selectedCard "isolated-collection__card--selected"}}"
-              />
-              <div class="isolated-collection__grid-item-btn-group {{if (eq @mode "view") "isolated-collection__select-btn"}} {{if selectedCard "isolated-collection__select-btn--selected"}}">
-                {{!-- <button {{on "click" (fn this.toggleSelect card.csId)}} class="isolated-collection__grid-item-select-btn" aria-label={{if selectedCard "unselect" "select"}}>
-                  {{svg-jar "icon-circle-checkmark" width="16px" height="16px"}}
-                </button> --}}
-              </div>
-            {{/let}}
-          </li>
-        {{/each}}
-      </ul>
+  {{#if (eq this.format "table")}}
+    <EmberTable as |t|>
+      <t.head @columns={{this.tableCols}} />
+      <t.body @rows={{this.tableVals}} />
+    </EmberTable>
+  {{else}}
+    <div class="isolated-collection__scroll-container">
+      <div class="isolated-collection__inner-container">
+        <ul class="isolated-collection__grid isolated-collection__grid--{{this.format}}">
+          {{#each @collection as |card|}}
+            <li class="isolated-collection__grid-item isolated-collection__grid-item--{{this.format}}" data-test-isolated-collection-card>
+              {{#let (contains card.csId this.selectedCards) as |selectedCard|}}
+                <CardRenderer
+                  @card={{card}}
+                  @format="embedded"
+                  @suppressHeader={{@suppressHeader}}
+                  @class="isolated-collection__card isolated-collection__card--{{this.format}} {{if selectedCard "isolated-collection__card--selected"}}"
+                />
+                <div class="isolated-collection__grid-item-btn-group {{if (eq @mode "view") "isolated-collection__select-btn"}} {{if selectedCard "isolated-collection__select-btn--selected"}}">
+                  {{!-- <button {{on "click" (fn this.toggleSelect card.csId)}} class="isolated-collection__grid-item-select-btn" aria-label={{if selectedCard "unselect" "select"}}>
+                    {{svg-jar "icon-circle-checkmark" width="16px" height="16px"}}
+                  </button> --}}
+                </div>
+              {{/let}}
+            </li>
+          {{/each}}
+        </ul>
+      </div>
     </div>
-  </div>
+  {{/if}}
 </div>
