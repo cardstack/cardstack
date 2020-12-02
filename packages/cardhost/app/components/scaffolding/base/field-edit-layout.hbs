@@ -52,7 +52,7 @@
         <Input
           @class="edit-field__input"
           @value={{this.value}}
-          @enter={{perform this.updateFieldValue this.value}}
+          @key-up={{perform this.search this.value}}
           data-test-embedded-card-input
         />
       {{/if}}

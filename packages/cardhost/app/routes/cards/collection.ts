@@ -5,7 +5,7 @@ import { inject as service } from '@ember/service';
 import { task } from 'ember-concurrency';
 import DataService from '../../services/data';
 import CardLocalStorageService from '../../services/card-local-storage';
-import { AddressableCard } from '@cardstack/hub';
+import { AddressableCard, CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
 import { getUserRealm } from '../../utils/scaffolding';
 import { Org, USER_ORGS } from '../../services/cardstack-session';
 //@ts-ignore
@@ -56,6 +56,7 @@ export default class CollectionRoute extends Route {
     return (this.collectionEntries = yield this.data.search(
       {
         filter: {
+          type: { csRealm: CARDSTACK_PUBLIC_REALM, csId: 'base' },
           eq: {
             csRealm: this.realmURL,
           },
