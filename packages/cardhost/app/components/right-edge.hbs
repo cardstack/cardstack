@@ -76,15 +76,15 @@
                     {{#animated-if (includes this.expandedSections "details") use=this.fade duration=this.duration}}
                       <div class="right-edge--items-container">
                         <div class="right-edge--item">
-                          <TextField
+                          <BoxelTextField
                             @theme="cs-dark"
                             @class="hide-in-percy"
-                            @id="card_name"
+                            @cardId="card_name"
                             @label="Card Name"
-                            @placeholder="e.g. millenial-puppies"
                             @value={{this.cardName}}
-                            @setValue={{perform this.updateCardName}}
-                            @disabled={{not @setCardValue}} />
+                            @key-up={{perform this.updateCardName}}
+                            @disabled={{not @setCardValue}}
+                            placeholder="e.g. millenial-puppies" />
                         </div>
                         <div class="right-edge--item">
                           <div class="right-edge--label">Card ID</div>

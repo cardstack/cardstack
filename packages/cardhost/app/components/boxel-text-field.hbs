@@ -27,7 +27,7 @@
       <div class="edit-field__title" data-test-edit-field-label>{{@label}}</div>
       {{!-- Events supported by the built-in Input ember component --}}
       <Input
-        @class="edit-field__input"
+        @class="edit-field__input {{@class}} {{@theme}}"
         @type={{@type}}
         @value={{@value}}
         @enter={{@enter}}
@@ -38,6 +38,7 @@
         @key-up={{@key-up}}
         @key-down={{@key-down}}
         @key-press={{@key-press}}
+        @disabled={{@disabled}}
         ...attributes
       />
     </label>

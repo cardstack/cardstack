@@ -35,23 +35,23 @@
               {{click-outside this.closeLeftEdge ignore=".cardhost-left-edge--nav"}}
             >
               {{#if session.isAuthenticated}}
-                <Cta
+                <BoxelButton
                   {{on "click" (fn this.logout session.logout)}}
                   @variant="primary secondary"
                   class="cardhost-left-edge-login-buttons"
                   data-test-logout-button
                 >
                   Log out
-                </Cta>
+                </BoxelButton>
               {{else}}
-                <Cta
+                <BoxelButton
                   {{on "click" (fn this.login session.login "user1")}}
                   @variant="primary"
                   class="cardhost-left-edge-login-buttons"
                   data-test-login-button
                 >
                   Log in
-                </Cta>
+                </BoxelButton>
               {{/if}}
             </div>
           {{/if}}
