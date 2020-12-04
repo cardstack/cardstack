@@ -49,7 +49,7 @@
     {{/if}}
   </div>
   {{#if this.displayInputField}}
-    <div class="cs-card-select__container">
+    <div class="cs-card-select__container" {{did-insert this.focusSearch}}>
       <button class="collection-field__cancel-btn" {{on "click" this.closeCardSelector}}>
         {{svg-jar "close-thick" width="25px" height="25px"}}
       </button>
@@ -57,7 +57,7 @@
         <CardSelect
           @search={{perform this.search}}
           @onChange={{perform this.updateFieldValue}}
-          @beforeOptionsComponent={{component "card-select/before-options"}}
+          @beforeOptionsComponent={{component "card-select/before-options" dataSource=this.dataSource}}
           @dropdownClass="cs-card-select--dropdown"
         />
       </div>

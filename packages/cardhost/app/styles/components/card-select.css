@@ -71,6 +71,10 @@
   color: black;
 }
 
+.cs-card-select--dropdown .ember-power-select-option .card-renderer-embedded--card-container {
+  background-color: #fff;
+}
+
 .cs-card-select--dropdown .ember-power-select-option:first-child {
   padding-top: 15px;
 }

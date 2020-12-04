@@ -1,7 +1,6 @@
 import BaseEditor from '../base-editor';
 import { task } from 'ember-concurrency';
-import { canonicalURLToCardId } from '@cardstack/hub';
-
+import { htmlSafe } from '@ember/template';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
@@ -12,15 +11,28 @@ const size = 100;
 export default class BaseCardFieldEditLayout extends BaseEditor {
   @service data;
   @tracked realmURL;
+  @tracked realmName;
+  @tracked template;
   @tracked displayInputField;
+
+  get dataSource() {
+    return htmlSafe(`Searching for <span>${this.args.card.csTitle}</span> within <span>${this.realmName}</span>`);
+  }
 
   constructor(...args) {
     super(...args);
 
-    this.realmURL = 'https://builder-hub.stack.cards/api/realms/crd-records';
-    // this.realmURL = getUserRealm();
     this.displayInputField = false;
-    this.fieldInstructions = this.args.card.csDescription || 'Please enter card ID';
+    this.fieldInstructions = this.args.card.csDescription;
+    this.realmURL = this.args.card.csRealm;
+
+    if (this.realmURL) {
+      let segments = this.realmURL.split('/');
+      this.realmName = segments[segments.length - 1];
+      if (this.realmName === 'default') {
+        this.realmName = 'library';
+      }
+    }
   }
 
   @action
@@ -31,6 +43,11 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
   @action
   closeCardSelector() {
     this.displayInputField = false;
+  }
+
+  @action
+  focusSearch(container) {
+    container.querySelector('input').focus();
   }
 
   @(task(function*() {
@@ -59,10 +76,16 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
       return;
     }
 
+    let hasKeyField = yield this.args.card.hasField('key');
+    if (!hasKeyField) {
+      return;
+    }
+    let key = yield this.args.card.value('key');
+
     let foundCards = yield this.data.search(
       {
         filter: {
-          type: { csRealm: this.realmURL, csId: 'participant-template' },
+          type: { csRealm: this.realmURL, csId: key },
         },
         sort: '-csCreated',
         page: { size },
