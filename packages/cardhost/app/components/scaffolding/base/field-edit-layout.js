@@ -4,19 +4,33 @@ import { canonicalURLToCardId } from '@cardstack/hub';
 
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
-import { getUserRealm } from '../../../utils/scaffolding';
+import { action } from '@ember/object';
+// import { getUserRealm } from '../../../utils/scaffolding';
 
 const size = 100;
 
 export default class BaseCardFieldEditLayout extends BaseEditor {
   @service data;
   @tracked realmURL;
+  @tracked displayInputField;
 
   constructor(...args) {
     super(...args);
 
-    this.realmURL = getUserRealm();
+    this.realmURL = 'https://builder-hub.stack.cards/api/realms/crd-records';
+    // this.realmURL = getUserRealm();
+    this.displayInputField = false;
     this.fieldInstructions = this.args.card.csDescription || 'Please enter card ID';
+  }
+
+  @action
+  openCardSelector() {
+    this.displayInputField = true;
+  }
+
+  @action
+  closeCardSelector() {
+    this.displayInputField = false;
   }
 
   @(task(function*() {
@@ -29,21 +43,16 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
   }).drop())
   load;
 
-  // This is super temporary--this will only fashion card as reference with arity of 1 for now..
-  @(task(function*(value) {
-    yield this.args.setCardReference.linked().perform(this.args.card.name, value ? canonicalURLToCardId(value) : null);
+  @(task(function*(card) {
+    if (this.args.card.csFieldArity === 'plural') {
+      this.fieldValue = [...this.fieldValue, card];
+    } else {
+      this.fieldValue = card;
+      this.displayInputField = false;
+    }
+    yield this.args.setCardReference.perform(this.args.card.name, this.fieldValue);
   }).restartable())
   updateFieldValue;
-
-  @task(function*(value) {
-    // TODO: fix
-    if (!value) {
-      return;
-    }
-    let val = canonicalURLToCardId(value);
-    yield this.args.setCardReference.perform(this.args.card.name, [...this.fieldValue, val]);
-  })
-  add;
 
   @task(function*(value) {
     if (!value) {
@@ -65,14 +74,13 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
   })
   search;
 
-  @task(function*(index) {
-    // TODO: fix
+  @task(function*(card) {
     if (this.args.card.csFieldArity === 'plural') {
-      this.fieldValue = this.fieldValue.filter((el, i) => i !== index);
+      this.fieldValue = this.fieldValue.filter(el => card.csId !== el.csId);
     } else {
       this.fieldValue = null;
     }
-    // yield this.args.setCardReference.perform(this.args.card.name, this.fieldValue);
+    yield this.args.setCardReference.perform(this.args.card.name, this.fieldValue);
   })
   remove;
 }

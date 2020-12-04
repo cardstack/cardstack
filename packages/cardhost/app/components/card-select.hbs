@@ -1,0 +1,19 @@
+<PowerSelectTypeahead
+  @placeholder={{or @placeholder "Search"}}
+  @selected={{@selected}}
+  @search={{@search}}
+  @beforeOptionsComponent={{@beforeOptionsComponent}}
+  @dropdownClass={{@dropdownClass}}
+  @initiallyOpened={{true}}
+  @renderInPlace={{true}}
+  @verticalPosition="below"
+  @allowClear={{false}}
+  @onChange={{@onChange}} as |card|
+>
+  <CardRenderer
+    @card={{card}}
+    @mode="view"
+    @format="embedded"
+    @preventIsolation={{true}}
+  />
+</PowerSelectTypeahead>
