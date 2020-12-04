@@ -27,4 +27,5 @@ Router.map(function() {
       });
     });
   });
+  this.route('ui-components');
 });

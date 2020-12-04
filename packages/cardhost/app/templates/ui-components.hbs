@@ -226,13 +226,16 @@
     <h4>On light background</h4>
     <div class="ui-components--light-background">
       <BoxelTextField
+        @mode="edit"
         @label="Field label"
         @placeholder="Default field" />
       <BoxelTextField
+        @mode="edit"
         @label="Field label"
         @placeholder="Disabled field"
         @disabled={{true}} />
       <BoxelTextField
+        @mode="edit"
         @label="Field label"
         @placeholder="Required field"
         @required={{true}}
@@ -262,34 +265,37 @@
     <h4>On dark background</h4>
     <div>
       <BoxelTextField
-        @theme="cs-dark"
+        @mode="schema"
         @label="Field label"
         @placeholder="Default field" />
       <BoxelTextField
-        @theme="cs-dark"
+        @mode="schema"
         @label="Field label"
         @placeholder="Disabled field"
         @disabled={{true}} />
       <BoxelTextField
-        @theme="cs-dark"
+        @mode="schema"
         @label="Field label"
         @placeholder="Required field"
         @required={{true}}
         @helperText="Helper text goes here (optional)" />
     </div>
-    <CodeEditor @code='<BoxelTextField @theme="cs-dark" />' @language="html" />
+    <CodeEditor @code='<BoxelTextField @mode="schema" />' @language="html" />
 
     <h3 id="textarea">TextArea</h3>
     <h4>On light background</h4>
     <div class="ui-components--light-background">
       <BoxelTextField
+        @mode="edit"
         @label="Textarea label"
         @placeholder="Default textarea" />
       <BoxelTextField
+        @mode="edit"
         @disabled={{true}}
         @label="Textarea label"
         @placeholder="Disabled textarea" />
       <BoxelTextField
+        @mode="edit"
         @required={{true}}
         @label="Textarea label"
         @helperText="Helper text goes here (optional)"
@@ -315,22 +321,22 @@
     <h4>On dark background</h4>
     <div>
       <BoxelTextField
-        @theme="cs-dark"
+        @mode="schema"
         @label="Textarea label"
         @placeholder="Default textarea" />
       <BoxelTextField
-        @theme="cs-dark"
+        @mode="schema"
         @disabled={{true}}
         @label="Textarea label"
         @placeholder="Disabled textarea" />
       <BoxelTextField
-        @theme="cs-dark"
+        @mode="schema"
         @required={{true}}
         @label="Textarea label"
         @helperText="Helper text goes here (optional)"
         @placeholder="Required textarea" />
       </div>
-    <CodeEditor @code='<BoxelTextField theme="cs-dark" />' @language="html" />
+    <CodeEditor @code='<BoxelTextField @mode="schema" />' @language="html" />
 
     <h3 id="dropdown">Dropdown</h3>
     <div>
@@ -356,7 +362,7 @@
 
     <h3 id="checkbox">Checkbox</h3>
     <div>
-      <BoxelCheckbox
+      {{!-- <BoxelCheckbox
         @theme="cs-dark"
         @label={{if this.isChecked "Selected" "Not Selected"}}
         @checked={{this.isChecked}}
@@ -373,7 +379,7 @@
         @label="Selected (Disabled State)"
         @disabled={{true}}
         @checked={{true}}
-        @setChecked={{fn this.setChecked "isChecked"}} />
+        @setChecked={{fn this.setChecked "isChecked"}} /> --}}
     </div>
     <CodeEditor
       @code='<BoxelCheckbox
@@ -601,6 +607,7 @@
       <div class="ch-catalog--content">
         <div class="ch-catalog--fields">
           <div class="ch-catalog-field" role="button" draggable="true">
+            {{! template-lint-disable no-inline-styles }}
             <div class="ch-catalog-field--icon" style={{css-url "background-image" "/assets/images/field-types/text-field-icon.svg"}}></div>
             <div>
               <h4 class="ch-catalog-field--title">Text</h4>

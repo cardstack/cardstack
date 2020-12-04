@@ -27,7 +27,7 @@
       <div class="edit-field__title" data-test-edit-field-label>{{@label}}</div>
       {{!-- Events supported by the built-in Input ember component --}}
       <Input
-        @class="edit-field__input {{@class}} {{@theme}}"
+        @class="edit-field__input {{@class}}"
         @type={{@type}}
         @value={{@value}}
         @enter={{@enter}}
@@ -43,6 +43,26 @@
       />
     </label>
   {{/if}}
+{{else if (eq @mode "schema")}}
+  <label class="cs-input-group cs-dark-input-group" data-test-edit-field={{@cardId}}>
+    <div class="cs-input-group--label" data-test-edit-field-label>{{@label}}</div>
+    {{!-- Events supported by the built-in Input ember component --}}
+    <Input
+      @class="cs-input cs-dark-input {{@class}}"
+      @type={{@type}}
+      @value={{@value}}
+      @enter={{@enter}}
+      @insert-newline={{@insert-newline}}
+      @escape-press={{@escape-press}}
+      @focus-in={{@focus-in}}
+      @focus-out={{@focus-out}}
+      @key-up={{@key-up}}
+      @key-down={{@key-down}}
+      @key-press={{@key-press}}
+      @disabled={{@disabled}}
+      ...attributes
+    />
+  </label>
 {{else}}
   <div class="label {{@cardId}}-label" data-test-string-field-viewer-label>
     {{@label}}

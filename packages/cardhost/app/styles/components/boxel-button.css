@@ -1,0 +1,158 @@
+.cs-component-cta {
+  /* Buttons */
+  --cs-button-radius: 100px;
+  --cs-button-width: 125px;
+  --cs-button-height: 32px;
+  --cs-button-primary-width: 140px;
+  --cs-button-primary-height: 40px;
+
+  /* Button Component on Light Background */
+  --cs-button-default: var(--cs-dark-field-default);
+  --cs-button-text: var(--cs-dark-field-text);
+  --cs-button-border: transparent;
+  --cs-button-hover: #000;
+  --cs-button-disabled: var(--cs-dark-field-disabled);
+  --cs-button-disabled-text: var(--cs-dark-field-disabled-text);
+  /* Secondary Button */
+  --cs-secondary-button-default: transparent;
+  --cs-secondary-button-text: #000;
+  --cs-secondary-button-border: var(--cs-field-border);
+  --cs-secondary-button-hover: #000;
+  --cs-secondary-button-disabled-text: var(--cs-field-disabled-text);
+  --cs-secondary-button-disabled-border: var(--cs-field-disabled-border);
+
+  /* Dark Background */
+  --cs-dark-secondary-button-text: #fff;
+  --cs-dark-secondary-button-hover: #fff;
+  --cs-dark-secondary-button-border: rgba(255, 255, 255, 0.25);
+
+  /* Primary Button */
+  --cs-primary-button-default: var(--cs-cyan);
+  --cs-primary-button-text: #000;
+  --cs-primary-button-hover: var(--cs-darker-cyan);
+
+  /* Secondary Primary Button */
+  --cs-secondary-primary-default: var(--cs-button-default);
+  --cs-secondary-primary-text: var(--cs-cyan);
+  --cs-secondary-primary-border: #5b596e;
+  --cs-secondary-primary-hover: var(--cs-dark-field-hover);
+}
+
+/* Cta */
+/* Same on dark background */
+.cs-component-cta {
+  display: inline-block;
+  min-width: var(--cs-button-width);
+  max-width: 100%;
+  min-height: var(--cs-button-height);
+  padding: 5px 10px;
+  background-color: var(--cs-button-default);
+  color: var(--cs-button-text);
+  border: 1px solid var(--cs-button-border);
+  border-radius: var(--cs-button-radius);
+  font: var(--cs-font-semibold);
+  letter-spacing: var(--cs-small-spacing);
+  text-align: center;
+}
+.cs-component-cta:not(.disabled):focus,
+.cs-component-cta:not(:disabled):focus {
+  background-color: var(--cs-button-hover);
+  outline: 0;
+}
+.cs-component-cta:not(.disabled):hover,
+.cs-component-cta:not(:disabled):hover {
+  background-color: var(--cs-button-hover);
+  color: var(--cs-button-text);
+  cursor: pointer;
+}
+.cs-component-cta.disabled,
+.cs-component-cta:disabled {
+  cursor: not-allowed;
+  background-color: var(--cs-button-disabled);
+  color: var(--cs-button-disabled-text);
+}
+
+
+/* Full-width button */
+.cs-component-cta.responsive {
+  width: 100%;
+}
+
+
+/* Secondary button (Outline button) */
+.cs-component-cta.secondary {
+  background-color: var(--cs-secondary-button-default);
+  color: var(--cs-secondary-button-text);
+  border-color: var(--cs-secondary-button-border);
+}
+.cs-component-cta.secondary:not(.disabled):focus,
+.cs-component-cta.secondary:not(:disabled):focus,
+.cs-component-cta.secondary:not(.disabled):hover,
+.cs-component-cta.secondary:not(:disabled):hover {
+  background-color: var(--cs-secondary-button-default);
+  border-color: var(--cs-secondary-button-hover);
+  color: var(--cs-secondary-button-text);
+  outline: 0;
+}
+.cs-component-cta.secondary.disabled,
+.cs-component-cta.secondary:disabled {
+  color: var(--cs-secondary-button-disabled-text);
+  border-color: var(--cs-secondary-button-disabled-border);
+}
+
+
+/* Secondary button on dark background */
+.cs-component-cta.secondary.cs-dark-cta {
+  --cs-secondary-button-text: var(--cs-dark-secondary-button-text);
+  --cs-secondary-button-hover: var(--cs-dark-secondary-button-hover);
+  --cs-secondary-button-border: var(--cs-dark-secondary-button-border);
+}
+.cs-component-cta.secondary.cs-dark-cta.disabled,
+.cs-component-cta.secondary.cs-dark-cta:disabled {
+  --cs-secondary-button-disabled-text: var(--cs-button-disabled-text);
+  --cs-secondary-button-disabled-border: var(--cs-secondary-primary-border);
+}
+
+
+/* Primary button */
+.cs-component-cta.primary {
+  min-height: var(--cs-button-primary-height);
+  min-width: var(--cs-button-primary-width);
+  padding: 10px 15px;
+  background-color: var(--cs-primary-button-default);
+  color: var(--cs-primary-button-text);
+  letter-spacing: var(--cs-letter-spacing);
+}
+.cs-component-cta.primary:not(.disabled):focus,
+.cs-component-cta.primary:not(:disabled):focus,
+.cs-component-cta.primary:not(.disabled):hover,
+.cs-component-cta.primary:not(:disabled):hover {
+  background-color: var(--cs-primary-button-hover);
+  color: var(--cs-primary-button-text);
+}
+.cs-component-cta.primary.disabled,
+.cs-component-cta.primary:disabled {
+  background-color: var(--cs-primary-button-hover);
+  color: rgba(0, 0, 0, 0.5);
+}
+
+
+/* Secondary Primary button (Secondary outline button) */
+.cs-component-cta.primary.secondary {
+  background-color: var(--cs-secondary-primary-default);
+  color: var(--cs-secondary-primary-text);
+  border-color: var(--cs-secondary-primary-border);
+}
+.cs-component-cta.primary.secondary:not(.disabled):focus,
+.cs-component-cta.primary.secondary:not(:disabled):focus,
+.cs-component-cta.primary.secondary:not(.disabled):hover,
+.cs-component-cta.primary.secondary:not(:disabled):hover {
+  background-color: var(--cs-secondary-primary-hover);
+  color: var(--cs-secondary-primary-text);
+  border-color: var(--cs-secondary-primary-border);
+}
+.cs-component-cta.primary.secondary.disabled,
+.cs-component-cta.primary.secondary:disabled {
+  background-color: var(--cs-button-disabled);
+  color: var(--cs-button-disabled-text);
+}

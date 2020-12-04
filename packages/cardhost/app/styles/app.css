@@ -27,11 +27,13 @@
 @import '/assets/components/card-editor.css';
 @import '/assets/components/loading.css';
 @import '/assets/components/card-viewer.css';
-@import '/assets/components/related-cards.css';
-@import '/assets/components/card-select.css';
 
 /* Boxel components */
+@import '/assets/components/boxel-text-field.css';
+@import '/assets/components/boxel-button.css';
 @import '/assets/components/dropdown-menu-button.css';
+@import '/assets/components/related-cards.css';
+@import '/assets/components/card-select.css';
 @import '/assets/components/org-header.css';
 @import '/assets/components/isolated-collection.css';
 
@@ -47,7 +49,7 @@
 
 
 :root {
-  --ch-font-family: 'Open Sans', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --ch-font-family: var(--boxel-font-family);
   --ch-left-edge-navbar-width: 80px;
   --ch-left-edge-panel-width: 330px;
   --ch-right-edge-panel-width: 300px;
@@ -80,7 +82,7 @@
 
 
   /* boxel vars */
-  --boxel-font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+  --boxel-font-family: 'Open Sans', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
   --boxel-font-lg: 32px/calc(43/32) var(--boxel-font-family);
   --boxel-font-med: 22px/calc(30/22) var(--boxel-font-family);
@@ -97,26 +99,25 @@
 
   --boxel-spacing: 20px;
   --boxel-org-header-height: 130px;
-  --boxel-border-color: #dedede;
-  --boxel-border-color-dark: #000;
   --boxel-border: 1px solid var(--boxel-border-color);
-  --boxel-border-dark: 1px solid var(--boxel-border-color-dark);
   --boxel-border-radius-sm: 5px;
   --boxel-border-radius: 10px;
-  --boxel-highlight: #00ebe5;
-  --boxel-highlight-hover: #00b0ad;
-  --boxel-red: #ff5050;
-  --boxel-darkest-purple: #2e2d38;
-  --boxel-dark-purple: #393642;
-  --boxel-medium-dark-purple: #413e4e;
-  --boxel-medium-purple: #5a586a;
-  --boxel-medium-light-purple:#6b6a80;
-  --boxel-light-purple: #afafb7;
-
   --boxel-transition: 0.2s ease;
 
   --boxel-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
   --boxel-box-shadow-hover: 0 3px 10px rgba(0, 0, 0, 0.15);
+
+  /* ui-components vars */
+  --cs-font-family:  var(--boxel-font-family);
+  --cs-font: var(--boxel-font-sm);
+  --cs-font-semibold: 600 13px/18px var(--cs-font-family);
+  --cs-small-font: var(--boxel-font-sm);
+  --cs-letter-spacing: var(--boxel-lsp-lg);
+  --cs-small-spacing: var(--boxel-lsp-sm);
+  --cs-transition-time: var(--ch-transition-time);
+  --cs-field-radius: 5px;
+  --cs-field-height: 40px;
+  --cs-textarea-height: 80px;
 }
 
 * {
@@ -236,16 +237,4 @@ a:hover {
 
 .field-creator--field-btn-wrapper {
   text-align: right;
-}
-
-/* TODO: Move to ui-components repo */
-.cs-dark-input.cs-input:disabled,
-.cs-dark-input.cs-input.disabled {
-  -webkit-text-fill-color: var(--cs-dark-field-disabled-text); /* For strangeness in safari */
-  -webkit-text-stroke-color: var(--cs-dark-field-disabled-text);
-}
-.cs-input-group--helper-text {
-  height: auto;
-  padding-top: 5px;
-  padding-left: 10px;
 }
