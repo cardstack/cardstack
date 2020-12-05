@@ -7,6 +7,7 @@ import { action } from '@ember/object';
 // import { getUserRealm } from '../../../utils/scaffolding';
 
 const size = 100;
+const defaultRegistry = 'library';
 
 export default class BaseCardFieldEditLayout extends BaseEditor {
   @service data;
@@ -14,6 +15,8 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
   @tracked realmName;
   @tracked template;
   @tracked displayInputField;
+  @tracked searchKey;
+  @tracked cardSet = [];
 
   get dataSource() {
     return htmlSafe(`Searching for <span>${this.args.card.csTitle}</span> within <span>${this.realmName}</span>`);
@@ -30,7 +33,7 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
       let segments = this.realmURL.split('/');
       this.realmName = segments[segments.length - 1];
       if (this.realmName === 'default') {
-        this.realmName = 'library';
+        this.realmName = defaultRegistry;
       }
     }
   }
@@ -82,18 +85,25 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
     }
     let key = yield this.args.card.value('key');
 
-    let foundCards = yield this.data.search(
-      {
-        filter: {
-          type: { csRealm: this.realmURL, csId: key },
+    if (!this.searchKey || key !== this.searchKey || !this.cardSet.length) {
+      this.searchKey = key;
+      this.cardSet = yield this.data.search(
+        {
+          filter: {
+            type: { csRealm: this.realmURL, csId: key },
+          },
+          sort: '-csCreated',
+          page: { size },
         },
-        sort: '-csCreated',
-        page: { size },
-      },
-      { includeFieldSet: 'embedded' }
-    );
+        { includeFieldSet: 'embedded' }
+      );
+    }
 
-    return foundCards.filter(a => a.attributes.title.toLowerCase().includes(value.toLowerCase()));
+    let results = this.cardSet.filter(a => a.attributes.title.toLowerCase().includes(value.toLowerCase()));
+    if (!results.length) {
+      return;
+    }
+    return results;
   })
   search;
 

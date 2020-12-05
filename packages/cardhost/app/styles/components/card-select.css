@@ -1,12 +1,15 @@
 .cs-card-select__container {
+  --container-width: 700px;
+  --container-height: 500px;
+
   position: relative;
   grid-column: 1 / -1;
-  width: 700px;
+  width: var(--container-width);
+  height: var(--container-height);
   margin:0 auto;
 }
 
 .cs-card-select {
-  height: auto;
   border-radius: 10px;
   background: none;
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
@@ -51,7 +54,8 @@
 }
 
 .cs-card-select--dropdown .ember-power-select-options {
-  max-height: 50vh;
+  height: calc(var(--container-height) - 120px);
+  max-height: initial;
   margin: 10px -10px -10px;
   background-color: #f0f0f0;
   text-align: left;
