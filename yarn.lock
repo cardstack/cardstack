@@ -3030,44 +3030,12 @@
   resolved "https://registry.yarnpkg.com/@ember-data/rfc395-data/-/rfc395-data-0.0.4.tgz#ecb86efdf5d7733a76ff14ea651a1b0ed1f8a843"
   integrity sha512-tGRdvgC9/QMQSuSuJV45xoyhI0Pzjm7A9o/MVVA3HakXIImJbbzx/k/6dO9CUEQXIyS2y0fW6C1XaYOG7rY0FQ==
 
-"@ember-decorators/component@^3.1.5":
-  version "3.1.5"
-  resolved "https://registry.yarnpkg.com/@ember-decorators/component/-/component-3.1.5.tgz#65c0f62a3dcf3434178d454031aabea33792ccbb"
-  integrity sha512-Ovm1NU/gE0ld3XGuF7PI56Hk+AqIdeI/Xqp/NTTlCgNTSxSjgrvCyMqnBtvkZELHmcRPNzPygJiyPLR0zn9gbQ==
-  dependencies:
-    "@ember-decorators/utils" "^3.1.5"
-    ember-cli-babel "^7.1.3"
-
 "@ember-decorators/component@^6.0.0", "@ember-decorators/component@^6.1.1":
   version "6.1.1"
   resolved "https://registry.yarnpkg.com/@ember-decorators/component/-/component-6.1.1.tgz#b360dc4fa8e576ee1c840879399ef1745fd96e06"
   integrity sha512-Cj8tY/c0MC/rsipqsiWLh3YVN72DK92edPYamD/HzvftwzC6oDwawWk8RmStiBnG9PG/vntAt41l3S7HSSA+1Q==
   dependencies:
     "@ember-decorators/utils" "^6.1.1"
-    ember-cli-babel "^7.1.3"
-
-"@ember-decorators/controller@^3.1.5":
-  version "3.1.5"
-  resolved "https://registry.yarnpkg.com/@ember-decorators/controller/-/controller-3.1.5.tgz#300c40b98aae0dfb21b6f9a882278ec47f919e4d"
-  integrity sha512-WaAJUHgHWhJ+g4bsVWnLpl0sMn/jNEEQd5/cVx6ixVkvqri9QMGz2lCShDEztw5gEkkd16uiyfaU3KkhEW8hGA==
-  dependencies:
-    "@ember-decorators/utils" "^3.1.5"
-    ember-cli-babel "^7.1.3"
-
-"@ember-decorators/data@^3.1.5":
-  version "3.1.5"
-  resolved "https://registry.yarnpkg.com/@ember-decorators/data/-/data-3.1.5.tgz#84494a8b5d55e9328789f37d84dd52e2f4d51cd3"
-  integrity sha512-R7QlEU9MxqPiQRpL+fdECdyCwMbPp8+XK+zo3gieJyCjhjP1p9Ssn+HZcSIdv4EMfdD3XL5FwePcZ+j/X4HU+Q==
-  dependencies:
-    "@ember-decorators/utils" "^3.1.5"
-    ember-cli-babel "^7.1.3"
-
-"@ember-decorators/object@^3.1.5":
-  version "3.1.5"
-  resolved "https://registry.yarnpkg.com/@ember-decorators/object/-/object-3.1.5.tgz#51de623b99edf4ee116b62f775fa57a270af5b52"
-  integrity sha512-3CiFwwhEi0KWdIIjLMOO03sSC4JajVIJYtgHMrDwU1GcJ4lPtS6SSxmGNTcuXCZ853cmEbfaRUg9NEadqxyV/g==
-  dependencies:
-    "@ember-decorators/utils" "^3.1.5"
     ember-cli-babel "^7.1.3"
 
 "@ember-decorators/object@^6.1.1":
@@ -3077,25 +3045,6 @@
   dependencies:
     "@ember-decorators/utils" "^6.1.1"
     ember-cli-babel "^7.1.3"
-
-"@ember-decorators/service@^3.1.5":
-  version "3.1.5"
-  resolved "https://registry.yarnpkg.com/@ember-decorators/service/-/service-3.1.5.tgz#ed5ab1fdb3d59659b3c4911797761f79958550f9"
-  integrity sha512-JYZr1IzliJfeo7DRoQRxwI5KmAWnjGffRx4ToFQDjH2/HXE0ofRUd3/cREX7bK9OjmEVH4snmgeG0QTKyn3XPQ==
-  dependencies:
-    "@ember-decorators/utils" "^3.1.5"
-    ember-cli-babel "^7.1.3"
-
-"@ember-decorators/utils@^3.1.5":
-  version "3.1.5"
-  resolved "https://registry.yarnpkg.com/@ember-decorators/utils/-/utils-3.1.5.tgz#8f692582329a88553192e998012c7ca59e547c37"
-  integrity sha512-SqckJdUgnsZGZw6XHdRMeOk7YEdXHOZjJNOeJgNzjUdhS9jWSNu3OQrXcwYjJZBW8ICdqV87lpJB/rozTCezoQ==
-  dependencies:
-    babel-plugin-debug-macros "^0.1.11"
-    ember-cli-babel "^7.1.3"
-    ember-cli-version-checker "^2.1.2"
-    ember-compatibility-helpers "^1.1.2"
-    semver "^5.6.0"
 
 "@ember-decorators/utils@^6.1.0", "@ember-decorators/utils@^6.1.1":
   version "6.1.1"
@@ -10850,19 +10799,6 @@ ember-css-url@0.2.0:
   integrity sha512-cJIjutYn+x9+LH++gvQwIUFDtH5scb2fSTpkiTytT7YX564uEaStJWIvKXXFT+q7184LakLMsQJ6EVrAQx9VsQ==
   dependencies:
     ember-cli-babel "^6.6.0"
-
-ember-decorators@^3.1.0:
-  version "3.1.5"
-  resolved "https://registry.yarnpkg.com/ember-decorators/-/ember-decorators-3.1.5.tgz#4920982ac5546d5e72af3d8dcb66dd96e48c01a6"
-  integrity sha512-F+EEhkWPv72he8PMBEEQrkEvd0ZkJ25hxQIkWVu/v5Opt7k2sMKRyP6Q+akv/az8Slz8sREgTSnOE6EYMwgfXA==
-  dependencies:
-    "@ember-decorators/component" "^3.1.5"
-    "@ember-decorators/controller" "^3.1.5"
-    "@ember-decorators/data" "^3.1.5"
-    "@ember-decorators/object" "^3.1.5"
-    "@ember-decorators/service" "^3.1.5"
-    ember-cli-babel "^7.1.3"
-    semver "^5.5.0"
 
 ember-decorators@^6.1.1:
   version "6.1.1"
