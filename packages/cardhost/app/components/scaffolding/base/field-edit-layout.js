@@ -4,7 +4,6 @@ import { htmlSafe } from '@ember/template';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
-// import { getUserRealm } from '../../../utils/scaffolding';
 
 const size = 100;
 const defaultRegistry = 'library';
@@ -46,11 +45,6 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
   @action
   closeCardSelector() {
     this.displayInputField = false;
-  }
-
-  @action
-  focusSearch(container) {
-    container.querySelector('input').focus();
   }
 
   @(task(function*() {
