@@ -6,10 +6,11 @@
   data-test-card-name-dialog-is-adopted-card={{if @adoptsFrom "true" "false"}}
 >
   <BoxelTextField
+    @mode="schema"
     @label="Give your card a name"
     @theme="cs-dark"
     placeholder="i.e. My New Card"
-    @key-up={{this.updateCardName}}
+    @key-up={{action this.updateCardName}}
     {{on "keydown" this.keyDown}}
     {{autofocus}}
     data-test-card-name
