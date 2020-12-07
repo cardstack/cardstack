@@ -132,12 +132,13 @@
       {{else if (eq schemaAttr "embedded")}}
         <div data-test-schema-attr={{schemaAttr}}>
           {{#if @setNeededWhenEmbedded}}
-            {{!-- <BoxelCheckbox
+            <BoxelCheckbox
+              @id={{concat "edit-field-embedded-" @field.nonce "-" this.renderNonce}}
               @theme="cs-dark"
               @label="Available When Embedded"
               @checked={{this.neededWhenEmbedded}}
               {{on "input" (perform @setNeededWhenEmbedded this.currentFieldName)}}
-              @disabled={{@field.isAdopted}} /> --}}
+              @disabled={{@field.isAdopted}} />
           {{else}}
             <div class="field-renderer--display">
               <span class="field-renderer--display-label">Available When Embedded</span>
@@ -148,11 +149,12 @@
           {{/if}}
         </div>
       {{else if (eq schemaAttr "required")}}
-        {{!-- <BoxelCheckbox
+        <BoxelCheckbox
+          @id={{concat "edit-field-required-" @field.nonce "-" this.renderNonce}}
           @theme="cs-dark"
           @label="Required"
           @checked={{@field.required}}
-          data-test-schema-attr={{schemaAttr}} /> --}}
+          data-test-schema-attr={{schemaAttr}} />
       {{/if}}
     {{/each}}
   {{/if}}

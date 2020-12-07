@@ -82,4 +82,9 @@
   --cs-dark-field-placeholder: #97969c;               /* Placeholder text */
   --cs-dark-field-disabled-text: var(--ch-light-op40);  /* Disabled text */
   --cs-dark-field-error: #ff5757;                     /* Error text */
+
+   /* Checkbox Component on Dark Background */
+   --cs-dark-checkbox: var(--boxel-medium-purple);                 /* Dark mode checkbox background */
+   --cs-dark-checkbox-hover: var(--ch-foreground-hover);           /* Dark mode checkbox hover background */
+   --cs-dark-checkbox-border: var(--cs-dark-field-default);
 }

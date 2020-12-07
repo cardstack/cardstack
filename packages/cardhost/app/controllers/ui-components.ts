@@ -14,9 +14,4 @@ export default class UIComponentsController extends Controller {
 
   @action
   noop() {}
-
-  @action
-  setChecked(field: string, val: any) {
-    (this as any)[field] = val;
-  }
 }

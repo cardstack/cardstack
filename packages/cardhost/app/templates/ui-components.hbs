@@ -362,33 +362,33 @@
 
     <h3 id="checkbox">Checkbox</h3>
     <div>
-      {{!-- <BoxelCheckbox
-        @theme="cs-dark"
-        @label={{if this.isChecked "Selected" "Not Selected"}}
-        @checked={{this.isChecked}}
-        @setChecked={{fn this.setChecked "isChecked"}} />
-
       <BoxelCheckbox
+        @id="checkbox-1"
         @theme="cs-dark"
-        @label="Not Selected (Disabled State)"
-        @disabled={{true}}
-        @setChecked={{fn this.setChecked "isChecked"}} />
-
+        @label={{if this.isChecked "Checked" "Unchecked"}}
+        @checked={{this.isChecked}} />
+      <br>
       <BoxelCheckbox
+        @id="checkbox-2"
         @theme="cs-dark"
-        @label="Selected (Disabled State)"
+        @label="Unchecked (Disabled State)"
+        @disabled={{true}} />
+      <br>
+      <BoxelCheckbox
+        @id="checkbox-3"
+        @theme="cs-dark"
+        @label="Checked (Disabled State)"
         @disabled={{true}}
-        @checked={{true}}
-        @setChecked={{fn this.setChecked "isChecked"}} /> --}}
+        @checked={{true}} />
     </div>
     <CodeEditor
       @code='<BoxelCheckbox
+  @id=\{{id}}
   @theme="cs-dark"
   @label=\{{label}}
   @checked=\{{checked}}
   @disabled=\{{disabled}}
-  @required=\{{required}}
-  @setChecked=\{{fn setCheckedAction}} />' @language="html" />
+  @required=\{{required}} />' @language="html" />
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col" id="right-edge">
