@@ -15,14 +15,14 @@
           </div>
           <div class="right-edge--items-container">
             <div class="right-edge--item" data-test-style-dropdown>
-              {{!-- <Dropdown
+              <BoxelDropdown
                 @theme="cs-dark"
-                @searchEnabled={{false}}
                 @label="Choose a theme:"
                 @options={{this.themerOptions}}
                 @selected={{this.selectedTheme}}
-                @setValue={{perform this.handleThemeChange}}
-              /> --}}
+                @onChange={{perform this.handleThemeChange}}
+                @searchField="name"
+              />
             </div>
             <div class="right-edge--item">
               <BoxelButton

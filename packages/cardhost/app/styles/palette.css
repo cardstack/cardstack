@@ -83,6 +83,11 @@
   --cs-dark-field-disabled-text: var(--ch-light-op40);  /* Disabled text */
   --cs-dark-field-error: #ff5757;                     /* Error text */
 
+  /* Dropdown Component on Dark Background */
+  --cs-dark-dropdown:var(--boxel-medium-purple);                 /* Dark mode dropdown background */
+  --cs-dark-dropdown-hover: var(--ch-foreground-hover);           /* Dark mode dropdown hover background */
+  --cs-dark-dropdown-border: var(--cs-dark-field-default);
+
    /* Checkbox Component on Dark Background */
    --cs-dark-checkbox: var(--boxel-medium-purple);                 /* Dark mode checkbox background */
    --cs-dark-checkbox-hover: var(--ch-foreground-hover);           /* Dark mode checkbox hover background */

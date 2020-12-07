@@ -76,6 +76,9 @@ package-lock.json
 /packages/cardhost/app/components/card-size-toggle.d.ts
 /packages/cardhost/app/components/card-size-toggle.js
 /packages/cardhost/app/components/card-size-toggle.js.map
+/packages/cardhost/app/components/boxel-dropdown.d.ts
+/packages/cardhost/app/components/boxel-dropdown.js
+/packages/cardhost/app/components/boxel-dropdown.js.map
 /packages/cardhost/app/components/boxel-text-field.d.ts
 /packages/cardhost/app/components/boxel-text-field.js
 /packages/cardhost/app/components/boxel-text-field.js.map

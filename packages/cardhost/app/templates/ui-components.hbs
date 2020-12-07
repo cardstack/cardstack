@@ -268,11 +268,13 @@
         @mode="schema"
         @label="Field label"
         @placeholder="Default field" />
+      <br>
       <BoxelTextField
         @mode="schema"
         @label="Field label"
         @placeholder="Disabled field"
         @disabled={{true}} />
+      <br>
       <BoxelTextField
         @mode="schema"
         @label="Field label"
@@ -289,11 +291,13 @@
         @mode="edit"
         @label="Textarea label"
         @placeholder="Default textarea" />
+      <br>
       <BoxelTextField
         @mode="edit"
         @disabled={{true}}
         @label="Textarea label"
         @placeholder="Disabled textarea" />
+      <br>
       <BoxelTextField
         @mode="edit"
         @required={{true}}
@@ -324,11 +328,13 @@
         @mode="schema"
         @label="Textarea label"
         @placeholder="Default textarea" />
+      <br>
       <BoxelTextField
         @mode="schema"
         @disabled={{true}}
         @label="Textarea label"
         @placeholder="Disabled textarea" />
+      <br>
       <BoxelTextField
         @mode="schema"
         @required={{true}}
@@ -340,21 +346,24 @@
 
     <h3 id="dropdown">Dropdown</h3>
     <div>
-      {{!-- <Dropdown @theme="cs-dark" @options={{this.model.countries}} @searchEnabled={{false}} @label="Dropdown label" /> --}}
-      {{!-- <Dropdown @theme="cs-dark" @options={{this.model.countries}} @searchEnabled={{false}} @label="Dropdown label" @placeholder="Disabled dropdown" @disabled={{true}} /> --}}
-      {{!-- <Dropdown @theme="cs-dark" @options={{this.model.countries}} @searchEnabled={{false}} @label="Dropdown label" @required={{true}} /> --}}
+      <BoxelDropdown @theme="cs-dark" @placeholder="Please select" @options={{this.model.countries}} @searchField="name" @searchEnabled={{false}} @label="Dropdown label" />
+      <br>
+      <BoxelDropdown @theme="cs-dark" @options={{this.model.countries}} @searchField="name" @searchEnabled={{false}} @label="Dropdown label" @placeholder="Disabled dropdown" @disabled={{true}} />
+      <br>
+      <BoxelDropdown @theme="cs-dark" @placeholder="Please select" @options={{this.model.countries}} @searchField="name" @searchEnabled={{false}} @label="Dropdown label" @required={{true}} />
     </div>
-    <CodeEditor @code='<Dropdown
+    <CodeEditor @code='<BoxelDropdown
   @theme="cs-dark"
   @options=\{{options}}
-  @searchEnabled={{false}}
+  @searchField="name"
   @label=\{{label}} />
 
 // Additional Attributes
-<Dropdown
+<BoxelDropdown
   @theme="cs-dark"
   @options=\{{options}}
-  @searchEnabled={{false}}
+  @searchField="name"
+  @searchEnabled=\{{searchEnabled}}
   @label=\{{label}}
   @placeholder=\{{placeholder}}
   @required=\{{required}}

@@ -30,6 +30,7 @@
 
 /* Boxel components */
 @import '/assets/components/boxel-text-field.css';
+@import '/assets/components/boxel-dropdown.css';
 @import '/assets/components/boxel-checkbox.css';
 @import '/assets/components/boxel-button.css';
 @import '/assets/components/dropdown-menu-button.css';
