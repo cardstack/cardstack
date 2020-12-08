@@ -48,9 +48,10 @@
     <div class="cs-input-group--label" data-test-edit-field-label>{{@label}}</div>
     {{!-- Events supported by the built-in Input ember component --}}
     <Input
+      @id={{@cardId}}
       @class="cs-input cs-dark-input {{@class}}"
       @type={{@type}}
-      @value={{@value}}
+      @value={{this.value}}
       @enter={{@enter}}
       @insert-newline={{@insert-newline}}
       @escape-press={{@escape-press}}
@@ -60,6 +61,7 @@
       @key-down={{@key-down}}
       @key-press={{@key-press}}
       @disabled={{@disabled}}
+      {{on "input" this.handleInput}}
       ...attributes
     />
   </label>

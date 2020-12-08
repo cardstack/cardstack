@@ -9,10 +9,10 @@
     @mode="schema"
     @label="Give your card a name"
     @theme="cs-dark"
-    placeholder="i.e. My New Card"
-    @key-up={{action this.updateCardName}}
+    @setValue={{this.updateCardName}}
     {{on "keydown" this.keyDown}}
     {{autofocus}}
+    placeholder="i.e. My New Card"
     data-test-card-name
   />
   <div class="dialog--button-group">

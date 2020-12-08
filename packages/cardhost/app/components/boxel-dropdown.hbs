@@ -7,7 +7,7 @@
     {{@className}}
     {{@mode}}
 "
-  data-test-cs-component={{this.dataTestName}}
+  data-test-cs-component="dropdown"
   {{did-update this.updateSelected @selected}}
 >
   {{#if (eq @mode "view")}}
@@ -26,7 +26,7 @@
     <label
       for={{@id}}
       class="cs-input-group--label"
-      data-test-cs-component-label={{this.dataTestName}}
+      data-test-cs-component-label="dropdown"
     >
       {{@label}}
     </label>
@@ -42,7 +42,7 @@
         {{if @required "required"}}
         {{if @disabled "disabled"}}
       "
-      data-test-cs-component-input={{this.dataTestName}}
+      data-test-cs-component-input="dropdown"
       ...attributes
     >
       {{!-- {{#if @searchAction}}
@@ -139,7 +139,7 @@
 
     {{!-- <div
       class="cs-input-group--helper-text {{if this.invalid "invalid"}}"
-      data-test-cs-component-validation={{this.dataTestName}}
+      data-test-cs-component-validation="dropdown"
     >
       {{or this.validationMessage @helperText}}
     </div> --}}
