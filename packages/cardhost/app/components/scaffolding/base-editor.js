@@ -23,9 +23,12 @@ export default class BaseEditor extends Component {
   }).restartable())
   updateFieldValue;
 
-  @task(function*(value) {
-    this.fieldValue = [...this.fieldValue, value];
-    yield this.args.setCardValue.perform(this.args.card.name, this.fieldValue);
+  @task(function*(evt) {
+    if (this.args.card.csFieldArity === 'plural' && evt.which === 13) {
+      let values = [...this.fieldValue, evt.target.value];
+      this.fieldValue = values;
+      yield this.args.setCardValue.perform(this.args.card.name, values);
+    }
   })
   add;
 

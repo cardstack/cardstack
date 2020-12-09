@@ -1,6 +1,6 @@
 {{#if (eq @mode "edit")}}
   {{#if @hasPluralArity}}
-    <div class="edit-field" data-test-edit-field={{@cardId}}>
+    <div class="edit-field" data-test-edit-field={{@id}}>
       <div class="edit-field__title" data-test-edit-field-label>{{@label}}</div>
       <div class="collection-field collection-field--taglist" data-test-taglist>
         {{#each @value as |value i|}}
@@ -14,62 +14,61 @@
         <button {{on "click" this.toggleInputField}} class="item__add-btn" aria-label="add" data-test-taglist-add-btn />
         {{#if (and @addAction this.displayInputField)}}
           <Input
-            @class="edit-field__input"
+            @id={{@id}}
+            @class="edit-field__input {{if this.invalid "invalid"}} {{@class}}"
+            @type={{@type}}
             @value={{this.value}}
-            @enter={{fn @addAction this.value}}
+            @required={{@required}}
+            @disabled={{@disabled}}
+            @enter={{action this.resetField}}
+            {{on "keydown" @addAction}}
             data-test-taglist-add-input
+            ...attributes
           />
         {{/if}}
       </div>
     </div>
   {{else}}
-    <label class="edit-field" data-test-edit-field={{@cardId}}>
+    <label class="edit-field" data-test-edit-field={{@id}}>
       <div class="edit-field__title" data-test-edit-field-label>{{@label}}</div>
-      {{!-- Events supported by the built-in Input ember component --}}
       <Input
-        @class="edit-field__input {{@class}}"
+        @id={{@id}}
+        @class="edit-field__input {{if this.invalid "invalid"}} {{@class}}"
         @type={{@type}}
         @value={{@value}}
-        @enter={{@enter}}
-        @insert-newline={{@insert-newline}}
-        @escape-press={{@escape-press}}
-        @focus-in={{@focus-in}}
-        @focus-out={{@focus-out}}
-        @key-up={{@key-up}}
-        @key-down={{@key-down}}
-        @key-press={{@key-press}}
+        @required={{@required}}
         @disabled={{@disabled}}
+        {{on "input" this.inputEvent}}
         ...attributes
       />
     </label>
   {{/if}}
 {{else if (eq @mode "schema")}}
-  <label class="cs-input-group cs-dark-input-group" data-test-edit-field={{@cardId}}>
+  <label class="cs-input-group cs-dark-input-group" data-test-edit-field={{@id}}>
     <div class="cs-input-group--label" data-test-edit-field-label>{{@label}}</div>
-    {{!-- Events supported by the built-in Input ember component --}}
     <Input
-      @id={{@cardId}}
-      @class="cs-input cs-dark-input {{@class}}"
+      @id={{@id}}
+      @class="cs-input cs-dark-input {{if this.invalid "invalid"}} {{@class}}"
       @type={{@type}}
       @value={{this.value}}
-      @enter={{@enter}}
-      @insert-newline={{@insert-newline}}
-      @escape-press={{@escape-press}}
-      @focus-in={{@focus-in}}
-      @focus-out={{@focus-out}}
-      @key-up={{@key-up}}
-      @key-down={{@key-down}}
-      @key-press={{@key-press}}
+      @required={{this.required}}
       @disabled={{@disabled}}
-      {{on "input" this.handleInput}}
+      @placeholder={{@placeholder}}
+      {{on "input" this.inputEvent}}
       ...attributes
     />
+    <div
+      class="cs-input-group--helper-text {{if this.invalid "invalid"}}"
+      data-test-cs-component-validation="text-field"
+    >
+      {{or this.validationMessage @helperText}}
+    </div>
   </label>
 {{else}}
-  <div class="label {{@cardId}}-label" data-test-string-field-viewer-label>
+  <div class="label {{@id}}-label" data-test-string-field-viewer-label>
     {{@label}}
   </div>
-  <div class="value {{@cardId}}-value" data-test-string-field-viewer-value>
+  <div class="value {{@id}}-value" data-test-string-field-viewer-value>
     {{#if @hasPluralArity}}
       {{#each @value as |value|}}
         {{value}}{{if (has-next value @value) ", "}}

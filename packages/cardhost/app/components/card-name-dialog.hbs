@@ -5,14 +5,13 @@
   @icon={{@icon}}
   data-test-card-name-dialog-is-adopted-card={{if @adoptsFrom "true" "false"}}
 >
-  <BoxelTextField
+  <Form::BoxelTextField
     @mode="schema"
     @label="Give your card a name"
-    @theme="cs-dark"
+    @placeholder="i.e. My New Card"
     @setValue={{this.updateCardName}}
     {{on "keydown" this.keyDown}}
     {{autofocus}}
-    placeholder="i.e. My New Card"
     data-test-card-name
   />
   <div class="dialog--button-group">

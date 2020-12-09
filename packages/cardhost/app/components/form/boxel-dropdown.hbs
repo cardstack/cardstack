@@ -105,36 +105,36 @@
             {{get option this.searchField}}
           </PowerSelectMultiple>
         {{else}} --}}
-          <PowerSelect
-            @selected={{this.selected}}
-            @options={{@options}}
-            @searchField={{@searchField}}
-            @class={{@class}}
-            @dropdownClass={{@dropdownClass}}
-            @onChange={{action this.handleChange}}
-            @onFocus={{@onFocus}}
-            @onBlur={{@onBlur}}
-            @onOpen={{@onOpen}}
-            @onClose={{@onClose}}
-            @searchEnabled={{@searchEnabled}}
-            @disabled={{@disabled}}
-            @placeholder={{@placeholder}}
-            @renderInPlace={{true}}
-            @verticalPosition="below"
-            @ariaLabel={{@label}} as |option|
-          >
-            {{#if @optionComponent}}
-              {{component @optionComponent option=option}}
-            {{else if (has-block)}}
-              {{yield option}}
-            {{else if @searchField}}
-              {{get option @searchField}}
-            {{else}}
-              {{option}}
-            {{/if}}
-          </PowerSelect>
-        {{!-- {{/if}}
-      {{/if}} --}}
+      <PowerSelect
+        @selected={{this.selected}}
+        @options={{@options}}
+        @searchField={{@searchField}}
+        @class={{@class}}
+        @dropdownClass={{@dropdownClass}}
+        @onChange={{action this.handleChange}}
+        @onFocus={{@onFocus}}
+        @onBlur={{@onBlur}}
+        @onOpen={{@onOpen}}
+        @onClose={{@onClose}}
+        @searchEnabled={{@searchEnabled}}
+        @disabled={{@disabled}}
+        @placeholder={{@placeholder}}
+        @renderInPlace={{true}}
+        @verticalPosition="below"
+        @ariaLabel={{@label}} as |option|
+      >
+        {{#if @optionComponent}}
+          {{component @optionComponent option=option}}
+        {{else if (has-block)}}
+          {{yield option}}
+        {{else if @searchField}}
+          {{get option @searchField}}
+        {{else}}
+          {{option}}
+        {{/if}}
+      </PowerSelect>
+      {{!-- {{/if}}
+    {{/if}} --}}
     </div>
 
     {{!-- <div

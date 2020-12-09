@@ -13,6 +13,7 @@
       {{if @disabled "disabled"}}
       {{if this.validationMessage "invalid"}}
       {{@mode}}"
+    @click={{action "handleInput"}}
     @checked={{@checked}}
     @required={{@required}}
     @disabled={{@disabled}}
@@ -24,9 +25,9 @@
     {{@label}}
   </label>
 
-  {{!-- <div
+  <div
     class="cs-checkbox-group--helper-text {{if this.validationMessage "invalid"}}"
     data-test-cs-component-validation="checkbox">
     {{or this.validationMessage @helperText}}
-  </div> --}}
+  </div>
 </div>

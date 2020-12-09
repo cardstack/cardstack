@@ -97,17 +97,6 @@ input.cs-input.disabled::placeholder {
   color: var(--cs-field-disabled-text);
 }
 
-/* Error State */
-.cs-input-group--helper-text.invalid {
-  color: var(--cs-error);
-  font-weight: 600;
-}
-
-.cs-input.invalid,
-.cs-input.invalid:focus {
-  border-color: var(--cs-error);
-}
-
 
 /* Dark theme */
 .cs-dark-input-group.cs-input-group > .cs-input-group--label {
@@ -158,4 +147,16 @@ input.cs-dark-input.cs-input::placeholder {
 input.cs-dark-input.cs-input:disabled::placeholder,
 input.cs-dark-input.cs-input.disabled::placeholder {
   color: var(--cs-dark-field-disabled-text);
+}
+
+
+/* Error State */
+.cs-input-group--helper-text.invalid {
+  color: var(--cs-error);
+  font-weight: 600;
+}
+
+.cs-input.invalid,
+.cs-input.invalid:focus {
+  border-color: var(--cs-error);
 }

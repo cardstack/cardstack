@@ -29,9 +29,9 @@
 @import '/assets/components/card-viewer.css';
 
 /* Boxel components */
-@import '/assets/components/boxel-text-field.css';
-@import '/assets/components/boxel-dropdown.css';
-@import '/assets/components/boxel-checkbox.css';
+@import '/assets/components/form/boxel-text-field.css';
+@import '/assets/components/form/boxel-dropdown.css';
+@import '/assets/components/form/boxel-checkbox.css';
 @import '/assets/components/boxel-button.css';
 @import '/assets/components/dropdown-menu-button.css';
 @import '/assets/components/related-cards.css';

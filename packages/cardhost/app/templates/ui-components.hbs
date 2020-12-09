@@ -225,26 +225,26 @@
     <h3 id="textfield">TextField</h3>
     <h4>On light background</h4>
     <div class="ui-components--light-background">
-      <BoxelTextField
+      <Form::BoxelTextField
         @mode="edit"
         @label="Field label"
         @placeholder="Default field" />
-      <BoxelTextField
+      <Form::BoxelTextField
         @mode="edit"
         @label="Field label"
         @placeholder="Disabled field"
         @disabled={{true}} />
-      <BoxelTextField
+      <Form::BoxelTextField
         @mode="edit"
         @label="Field label"
         @placeholder="Required field"
         @required={{true}}
         @helperText="Helper text goes here (optional)" />
     </div>
-     <CodeEditor @code='<BoxelTextField />
+     <CodeEditor @code='<Form::BoxelTextField />
 
 // Additional Attributes
-<BoxelTextField
+<Form::BoxelTextField
   @id=\{{id}}
   @type=\{{type}}
   @label=\{{label}}
@@ -264,18 +264,18 @@
   ...attributes />' @language="html" />
     <h4>On dark background</h4>
     <div>
-      <BoxelTextField
+      <Form::BoxelTextField
         @mode="schema"
         @label="Field label"
         @placeholder="Default field" />
       <br>
-      <BoxelTextField
+      <Form::BoxelTextField
         @mode="schema"
         @label="Field label"
         @placeholder="Disabled field"
         @disabled={{true}} />
       <br>
-      <BoxelTextField
+      <Form::BoxelTextField
         @mode="schema"
         @label="Field label"
         @placeholder="Required field"
@@ -287,79 +287,70 @@
     <h3 id="textarea">TextArea</h3>
     <h4>On light background</h4>
     <div class="ui-components--light-background">
-      <BoxelTextField
-        @mode="edit"
+      <Form::BoxelTextArea
         @label="Textarea label"
         @placeholder="Default textarea" />
       <br>
-      <BoxelTextField
-        @mode="edit"
+      <Form::BoxelTextArea
         @disabled={{true}}
         @label="Textarea label"
         @placeholder="Disabled textarea" />
       <br>
-      <BoxelTextField
-        @mode="edit"
+      <Form::BoxelTextArea
         @required={{true}}
         @label="Textarea label"
         @helperText="Helper text goes here (optional)"
         @placeholder="Required textarea" />
       </div>
-    <CodeEditor @code='<BoxelTextField />
+    <CodeEditor @code='<Form::BoxelTextArea />
 
 // Additional Attributes
-<BoxelTextField
+<Form::BoxelTextArea
   @id=\{{id}}
   @label=\{{label}}
+  @class=\{{class}}
   @placeholder=\{{placeholder}}
   @required=\{{required}}
   @disabled=\{{disabled}}
-  @title=\{{title}}
-  @helperText=\{{helperText}}
-  @name=\{{name}}
-  @rows=\{{rows}}
-  @autofocus=\{{autofocus}}
-  @maxlength=\{{characterLimit}}
-  @readonly=\{{readonly}}
   ...attributes />' @language="html" />
     <h4>On dark background</h4>
     <div>
-      <BoxelTextField
-        @mode="schema"
+      <Form::BoxelTextArea
+        @theme="cs-dark"
         @label="Textarea label"
         @placeholder="Default textarea" />
       <br>
-      <BoxelTextField
-        @mode="schema"
+      <Form::BoxelTextArea
+        @theme="cs-dark"
         @disabled={{true}}
         @label="Textarea label"
         @placeholder="Disabled textarea" />
       <br>
-      <BoxelTextField
-        @mode="schema"
+      <Form::BoxelTextArea
+        @theme="cs-dark"
         @required={{true}}
         @label="Textarea label"
         @helperText="Helper text goes here (optional)"
         @placeholder="Required textarea" />
       </div>
-    <CodeEditor @code='<BoxelTextField @mode="schema" />' @language="html" />
+    <CodeEditor @code='<Form::BoxelTextArea @theme="cs-dark" />' @language="html" />
 
     <h3 id="dropdown">Dropdown</h3>
     <div>
-      <BoxelDropdown @theme="cs-dark" @placeholder="Please select" @options={{this.model.countries}} @searchField="name" @searchEnabled={{false}} @label="Dropdown label" />
+      <Form::BoxelDropdown @theme="cs-dark" @placeholder="Please select" @options={{this.model.countries}} @searchField="name" @searchEnabled={{false}} @label="Dropdown label" />
       <br>
-      <BoxelDropdown @theme="cs-dark" @options={{this.model.countries}} @searchField="name" @searchEnabled={{false}} @label="Dropdown label" @placeholder="Disabled dropdown" @disabled={{true}} />
+      <Form::BoxelDropdown @theme="cs-dark" @options={{this.model.countries}} @searchField="name" @searchEnabled={{false}} @label="Dropdown label" @placeholder="Disabled dropdown" @disabled={{true}} />
       <br>
-      <BoxelDropdown @theme="cs-dark" @placeholder="Please select" @options={{this.model.countries}} @searchField="name" @searchEnabled={{false}} @label="Dropdown label" @required={{true}} />
+      <Form::BoxelDropdown @theme="cs-dark" @placeholder="Please select" @options={{this.model.countries}} @searchField="name" @searchEnabled={{false}} @label="Dropdown label" @required={{true}} />
     </div>
-    <CodeEditor @code='<BoxelDropdown
+    <CodeEditor @code='<Form::BoxelDropdown
   @theme="cs-dark"
   @options=\{{options}}
   @searchField="name"
   @label=\{{label}} />
 
 // Additional Attributes
-<BoxelDropdown
+<Form::BoxelDropdown
   @theme="cs-dark"
   @options=\{{options}}
   @searchField="name"
@@ -371,19 +362,19 @@
 
     <h3 id="checkbox">Checkbox</h3>
     <div>
-      <BoxelCheckbox
+      <Form::BoxelCheckbox
         @id="checkbox-1"
         @theme="cs-dark"
         @label={{if this.isChecked "Checked" "Unchecked"}}
         @checked={{this.isChecked}} />
       <br>
-      <BoxelCheckbox
+      <Form::BoxelCheckbox
         @id="checkbox-2"
         @theme="cs-dark"
         @label="Unchecked (Disabled State)"
         @disabled={{true}} />
       <br>
-      <BoxelCheckbox
+      <Form::BoxelCheckbox
         @id="checkbox-3"
         @theme="cs-dark"
         @label="Checked (Disabled State)"
@@ -391,7 +382,7 @@
         @checked={{true}} />
     </div>
     <CodeEditor
-      @code='<BoxelCheckbox
+      @code='<Form::BoxelCheckbox
   @id=\{{id}}
   @theme="cs-dark"
   @label=\{{label}}
@@ -500,11 +491,11 @@
     <div class="ui-components--notes">
       <p>Note: We can not currently use a <code>FieldRenderer</code> component to render a <code>BoxelTextField</code> component.</p>
     </div>
-    <BoxelTextField
+    <Form::BoxelTextArea
       @id="textarea-editor"
       @label="Textarea"
       @value="Entered long text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero." />
-    <CodeEditor @code='<BoxelTextField
+    <CodeEditor @code='<Form::BoxelTextArea
   @id=\{{@field.id}}
   @label=\{{@field.label}}
   @value="Entered long text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero." />' @language="html" />
@@ -584,8 +575,8 @@
   <section class="ui-components--section ui-components--grid-2-col" id="search-bar">
     <h2>Search Bar</h2>
     {{!-- TODO: Make this a SearchBar component --}}
-    <BoxelTextField @type="search" @theme="search-bar" @placeholder="Search Library" />
-    <CodeEditor @code='<BoxelTextField
+    <Form::BoxelTextField @type="search" @theme="search-bar" @placeholder="Search Library" />
+    <CodeEditor @code='<Form::BoxelTextField
   @type="search"
   @theme="search-bar"
   @placeholder="Search Library" />' @language="html" />
@@ -594,8 +585,8 @@
   <section class="ui-components--section ui-components--grid-2-col" id="filter-bar">
     <h2>Filter Bar</h2>
     {{!-- TODO: Make this a FilterBar component --}}
-    <BoxelTextField @theme="filter-bar" @placeholder="Filter Results" />
-    <CodeEditor @code='<BoxelTextField
+    <Form::BoxelTextField @theme="filter-bar" @placeholder="Filter Results" />
+    <CodeEditor @code='<Form::BoxelTextField
   @theme="filter-bar"
   @placeholder="Filter Results" />' @language="html" />
   </section>
@@ -610,7 +601,7 @@
           <button class="ch-catalog--header-btn grid" aria-label="View as grid"></button>
         </div>
         <div class="ch-catalog--header-filter">
-          <BoxelTextField @theme="filter-bar" @placeholder="Filter Results" />
+          <Form::BoxelTextField @mode="schema" @class="filter-bar" @placeholder="Filter Results" />
         </div>
       </header>
       <div class="ch-catalog--content">
@@ -633,7 +624,7 @@
       <button class="ch-catalog--header-btn sidebar active" aria-label="View as sidebar"></button>
       <button class="ch-catalog--header-btn grid" aria-label="View as grid"></button>
     </div>
-    <BoxelTextField @theme="filter-bar" @placeholder="Filter Results" />
+    <Form::BoxelTextField @mode="schema" @class="filter-bar" @placeholder="Filter Results" />
   </header>
   <div class="ch-catalog--content">
     <div class="ch-catalog--fields">

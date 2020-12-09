@@ -17,10 +17,6 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
   @tracked searchKey;
   @tracked cardSet = [];
 
-  get dataSource() {
-    return htmlSafe(`Searching for <span>${this.args.card.csTitle}</span> within <span>${this.realmName}</span>`);
-  }
-
   constructor(...args) {
     super(...args);
 
@@ -35,6 +31,10 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
         this.realmName = defaultRegistry;
       }
     }
+  }
+
+  get dataSource() {
+    return htmlSafe(`Searching for <span>${this.args.card.csTitle}</span> within <span>${this.realmName}</span>`);
   }
 
   @action
@@ -62,8 +62,8 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
       this.fieldValue = [...this.fieldValue, card];
     } else {
       this.fieldValue = card;
-      this.displayInputField = false;
     }
+    this.displayInputField = false;
     yield this.args.setCardReference.perform(this.args.card.name, this.fieldValue);
   }).restartable())
   updateFieldValue;

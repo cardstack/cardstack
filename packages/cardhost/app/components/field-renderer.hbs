@@ -80,12 +80,11 @@
       {{else if (eq schemaAttr "label")}}
         <div data-test-schema-attr={{schemaAttr}}>
           {{#if @setFieldCardValue}}
-            <BoxelTextField
+            <Form::BoxelTextField
               @mode={{@mode}}
-              @theme="cs-dark"
               @label="Field Label"
               @value={{this.newFieldLabel}}
-              @key-up={{perform this.updateFieldLabel}}
+              @setValue={{perform this.updateFieldLabel}}
               @disabled={{@field.isAdopted}} />
           {{else}}
             <div class="field-renderer--display">
@@ -99,12 +98,13 @@
       {{else if (eq schemaAttr "instructions")}}
         <div data-test-schema-attr={{schemaAttr}}>
           {{#if @setFieldCardValue}}
-            <BoxelTextField
+            <Form::BoxelTextArea
               @mode={{@mode}}
               @theme="cs-dark"
               @label="Helper Text"
               @value={{this.newFieldInstructions}}
-              @key-up={{perform this.updateFieldInstructions}} />
+              @setValue={{perform this.updateFieldInstructions}}
+              @disabled={{@field.isAdopted}} />
           {{else}}
             <div class="field-renderer--display">
               <span class="field-renderer--display-label">Helper Text</span>
@@ -116,14 +116,13 @@
         </div>
       {{else if (and (eq schemaAttr "name") @setFieldName)}}
         <div class="ch-input-group" data-test-schema-attr={{schemaAttr}}>
-          <BoxelTextField
+          <Form::BoxelTextField
             @mode={{@mode}}
-            @cardId={{concat "edit-field-name-" @field.nonce "-" this.renderNonce}}
+            @id={{concat "edit-field-name-" @field.nonce "-" this.renderNonce}}
             @value={{this.newFieldName}}
-            @theme="cs-dark"
             @label="Field ID"
             @class="ch-input"
-            @key-up={{perform this.updateFieldName}}
+            @setValue={{perform this.updateFieldName}}
             @disabled={{@field.isAdopted}}
             pattern={{this.fieldNameRegex.source}}
             title="Can only contain letters, numbers, dashes, and underscores."
@@ -132,12 +131,12 @@
       {{else if (eq schemaAttr "embedded")}}
         <div data-test-schema-attr={{schemaAttr}}>
           {{#if @setNeededWhenEmbedded}}
-            <BoxelCheckbox
+            <Form::BoxelCheckbox
               @id={{concat "edit-field-embedded-" @field.nonce "-" this.renderNonce}}
               @theme="cs-dark"
               @label="Available When Embedded"
               @checked={{this.neededWhenEmbedded}}
-              {{on "input" (perform @setNeededWhenEmbedded this.currentFieldName)}}
+              @setValue={{perform @setNeededWhenEmbedded this.currentFieldName}}
               @disabled={{@field.isAdopted}} />
           {{else}}
             <div class="field-renderer--display">
@@ -149,7 +148,7 @@
           {{/if}}
         </div>
       {{else if (eq schemaAttr "required")}}
-        <BoxelCheckbox
+        <Form::BoxelCheckbox
           @id={{concat "edit-field-required-" @field.nonce "-" this.renderNonce}}
           @theme="cs-dark"
           @label="Required"

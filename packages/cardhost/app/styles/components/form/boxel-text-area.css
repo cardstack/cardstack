@@ -1,0 +1,13 @@
+.cs-textarea-group textarea.cs-input {
+  height: var(--cs-textarea-height);
+  resize: none;
+}
+
+.cs-textarea-group--char-counter {
+  position: absolute;
+  bottom: 0;
+  right: 6px;
+  color: var(--cs-field-label);
+  font: var(--cs-small-font);
+  letter-spacing: var(--cs-letter-spacing);
+}

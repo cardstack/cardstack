@@ -76,12 +76,6 @@ package-lock.json
 /packages/cardhost/app/components/card-size-toggle.d.ts
 /packages/cardhost/app/components/card-size-toggle.js
 /packages/cardhost/app/components/card-size-toggle.js.map
-/packages/cardhost/app/components/boxel-dropdown.d.ts
-/packages/cardhost/app/components/boxel-dropdown.js
-/packages/cardhost/app/components/boxel-dropdown.js.map
-/packages/cardhost/app/components/boxel-text-field.d.ts
-/packages/cardhost/app/components/boxel-text-field.js
-/packages/cardhost/app/components/boxel-text-field.js.map
 /packages/cardhost/app/components/isolated-collection.d.ts
 /packages/cardhost/app/components/isolated-collection.js
 /packages/cardhost/app/components/isolated-collection.js.map
@@ -91,6 +85,9 @@ package-lock.json
 /packages/cardhost/app/components/user-info-modal.d.ts
 /packages/cardhost/app/components/user-info-modal.js
 /packages/cardhost/app/components/user-info-modal.js.map
+/packages/cardhost/app/components/form/*.d.ts
+/packages/cardhost/app/components/form/*.js
+/packages/cardhost/app/components/form/*.js.map
 /packages/cardhost/app/controllers/cards/card/**/*.d.ts
 /packages/cardhost/app/controllers/cards/card/**/*.js
 /packages/cardhost/app/controllers/cards/card/**/*.js.map
