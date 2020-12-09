@@ -1,10 +1,13 @@
 import BaseEditor from '../base-editor';
-import { task } from 'ember-concurrency';
+import { task, timeout } from 'ember-concurrency';
 import { htmlSafe } from '@ember/template';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
+// @ts-ignore
+import ENV from '@cardstack/cardhost/config/environment';
 
+const debounceMs = ENV.debounceMs ? ENV.debounceMs : 1500;
 const size = 100;
 const defaultRegistry = 'library';
 
@@ -16,6 +19,7 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
   @tracked displayInputField;
   @tracked searchKey;
   @tracked cardSet = [];
+  @tracked debounceMs = this.args.debounceMs || debounceMs;
 
   constructor(...args) {
     super(...args);
@@ -64,11 +68,13 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
       this.fieldValue = card;
     }
     this.displayInputField = false;
-    yield this.args.setCardReference.perform(this.args.card.name, this.fieldValue);
+    yield this.args.setCardReference.linked().perform(this.args.card.name, this.fieldValue);
   }).restartable())
   updateFieldValue;
 
   @task(function*(value) {
+    yield timeout(this.debounceMs);
+
     if (!value) {
       return;
     }
@@ -94,9 +100,6 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
     }
 
     let results = this.cardSet.filter(a => a.attributes.title.toLowerCase().includes(value.toLowerCase()));
-    if (!results.length) {
-      return;
-    }
     return results;
   })
   search;

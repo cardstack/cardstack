@@ -87,7 +87,7 @@
     "ember-modifier": "^1.0.2",
     "ember-moment": "^8.0.0",
     "ember-percy": "^1.6.0",
-    "ember-power-select": "^4.0.0",
+    "ember-power-select": "^4.1.0",
     "ember-power-select-typeahead": "alexspeller/ember-power-select-typeahead#6d279fb",
     "ember-qunit": "^4.6.0",
     "ember-resolver": "^7.0.0",
