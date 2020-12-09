@@ -1,0 +1,54 @@
+<div
+  class="
+    cs-input-group cs-textarea-group
+    {{if @theme (concat @theme "-input-group")}}
+    {{if @required "required"}}
+    {{@class}}
+    {{@mode}}
+  "
+  data-test-cs-component="text-area"
+>
+  <label
+    for={{@id}}
+    class="cs-input-group--label"
+    data-test-cs-component-label="text-area"
+  >
+    {{@label}}
+  </label>
+  {{#if @required}}
+    <span class="cs-input-group--required">required</span>
+  {{/if}}
+
+  <Textarea
+    @id={{@id}}
+    @rows={{this.rows}}
+    @name={{@name}}
+    @value={{this.value}}
+    @class="cs-input
+      {{if @theme (concat @theme "-input")}}
+      {{if this.invalid "invalid"}}
+      {{@mode}}
+    "
+    @change={{action "handleInput"}}
+    @required={{@required}}
+    @disabled={{@disabled}}
+    data-test-cs-component-input="text-area"
+    ...attributes
+  />
+
+  {{#if @characterLimit}}
+    <span
+      class="cs-textarea-group--char-counter {{if this.validationMessage "with-validation"}}"
+      data-test-cs-textarea-char-counter
+    >
+      {{this.value.length}}/{{@characterLimit}}
+    </span>
+  {{/if}}
+
+  <div
+    class="cs-input-group--helper-text {{if this.invalid "invalid"}}"
+    data-test-cs-component-validation="text-area"
+  >
+    {{or this.validationMessage @helperText}}
+  </div>
+</div>

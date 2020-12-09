@@ -1,9 +1,8 @@
-<BoxelTextField
+<Form::BoxelTextField
   @mode="edit"
   @type="date"
-  @cardId={{@card.name}}
+  @id={{@card.name}}
   @label={{or @card.csTitle @card.name}}
   @value={{this.fieldValue}}
-  @key-up={{perform this.updateFieldValue}}
-  @focus-out={{perform this.updateFieldValue}}
+  @setValue={{perform this.updateFieldValue}}
 />

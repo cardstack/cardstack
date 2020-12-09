@@ -80,8 +80,8 @@
       {{else if (eq schemaAttr "label")}}
         <div data-test-schema-attr={{schemaAttr}}>
           {{#if @setFieldCardValue}}
-            <TextField
-              @theme="cs-dark"
+            <Form::BoxelTextField
+              @mode={{@mode}}
               @label="Field Label"
               @value={{this.newFieldLabel}}
               @setValue={{perform this.updateFieldLabel}}
@@ -98,11 +98,13 @@
       {{else if (eq schemaAttr "instructions")}}
         <div data-test-schema-attr={{schemaAttr}}>
           {{#if @setFieldCardValue}}
-            <TextArea
+            <Form::BoxelTextArea
+              @mode={{@mode}}
               @theme="cs-dark"
               @label="Helper Text"
               @value={{this.newFieldInstructions}}
-              @setValue={{perform this.updateFieldInstructions}} />
+              @setValue={{perform this.updateFieldInstructions}}
+              @disabled={{@field.isAdopted}} />
           {{else}}
             <div class="field-renderer--display">
               <span class="field-renderer--display-label">Helper Text</span>
@@ -114,26 +116,27 @@
         </div>
       {{else if (and (eq schemaAttr "name") @setFieldName)}}
         <div class="ch-input-group" data-test-schema-attr={{schemaAttr}}>
-          <TextField
+          <Form::BoxelTextField
+            @mode={{@mode}}
             @id={{concat "edit-field-name-" @field.nonce "-" this.renderNonce}}
             @value={{this.newFieldName}}
-            @theme="cs-dark"
             @label="Field ID"
             @class="ch-input"
             @setValue={{perform this.updateFieldName}}
             @disabled={{@field.isAdopted}}
-            @pattern={{this.fieldNameRegex.source}}
-            @title="Can only contain letters, numbers, dashes, and underscores."
+            pattern={{this.fieldNameRegex.source}}
+            title="Can only contain letters, numbers, dashes, and underscores."
           />
         </div>
       {{else if (eq schemaAttr "embedded")}}
         <div data-test-schema-attr={{schemaAttr}}>
           {{#if @setNeededWhenEmbedded}}
-            <Checkbox
+            <Form::BoxelCheckbox
+              @id={{concat "edit-field-embedded-" @field.nonce "-" this.renderNonce}}
               @theme="cs-dark"
               @label="Available When Embedded"
               @checked={{this.neededWhenEmbedded}}
-              @setChecked={{perform @setNeededWhenEmbedded this.currentFieldName}}
+              @setValue={{perform @setNeededWhenEmbedded this.currentFieldName}}
               @disabled={{@field.isAdopted}} />
           {{else}}
             <div class="field-renderer--display">
@@ -145,7 +148,8 @@
           {{/if}}
         </div>
       {{else if (eq schemaAttr "required")}}
-        <Checkbox
+        <Form::BoxelCheckbox
+          @id={{concat "edit-field-required-" @field.nonce "-" this.renderNonce}}
           @theme="cs-dark"
           @label="Required"
           @checked={{@field.required}}

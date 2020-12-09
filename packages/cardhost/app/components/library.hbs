@@ -41,7 +41,7 @@
         data-test-templates
         as |template|
       >
-        <Cta {{on "click" (fn this.openCardNameDialog "Adopt a Card" template)}}
+        <BoxelButton {{on "click" (fn this.openCardNameDialog "Adopt a Card" template)}}
           class="library--card-link"
           data-test-embedded-card={{template.canonicalURL}}
           data-test-library-adopt-card-btn={{template.canonicalURL}}
@@ -53,7 +53,7 @@
             @preventIsolation={{true}}
             @showName={{true}}
           />
-        </Cta>
+        </BoxelButton>
       </CatalogEntries>
     </section>
 
@@ -63,24 +63,24 @@
         Common Cards
       </header>
       <div class="library-section--grid">
-        <Cta {{on "click" (fn this.openCardNameDialog "Create a New Card")}} class="library--card-link" data-test-library-common-card-button>
+        <BoxelButton {{on "click" (fn this.openCardNameDialog "Create a New Card")}} class="library--card-link" data-test-library-common-card-button>
           <div class="library--card-renderer">
             <div class="library--card-placeholder icon-common-form"></div>
             <div class="library--card-label">Form</div>
           </div>
-        </Cta>
-        <Cta {{on "click" (fn this.openCardNameDialog "Create a New Card")}} class="library--card-link" data-test-library-common-card-button>
+        </BoxelButton>
+        <BoxelButton {{on "click" (fn this.openCardNameDialog "Create a New Card")}} class="library--card-link" data-test-library-common-card-button>
           <div class="library--card-renderer">
             <div class="library--card-placeholder icon-common-layout"></div>
             <div class="library--card-label">Layout</div>
           </div>
-        </Cta>
-        <Cta {{on "click" (fn this.openCardNameDialog "Create a New Card")}} class="library--card-link" data-test-library-common-card-button>
+        </BoxelButton>
+        <BoxelButton {{on "click" (fn this.openCardNameDialog "Create a New Card")}} class="library--card-link" data-test-library-common-card-button>
           <div class="library--card-renderer">
             <div class="library--card-placeholder icon-common-collection"></div>
             <div class="library--card-label">Collection</div>
           </div>
-        </Cta>
+        </BoxelButton>
       </div>
     </section>
 
@@ -90,7 +90,7 @@
         New Blank Card
       </header>
       <div class="library-section--grid">
-        <Cta {{on "click" (fn this.openCardNameDialog "Create a New Card")}}
+        <BoxelButton {{on "click" (fn this.openCardNameDialog "Create a New Card")}}
           class="library--card-link"
           data-test-library-new-blank-card-btn
         >
@@ -98,7 +98,7 @@
             <div class="library--card-placeholder icon-add-card"></div>
             <div class="library--card-label">Blank Card</div>
           </div>
-        </Cta>
+        </BoxelButton>
       </div>
     </section>
   </div>

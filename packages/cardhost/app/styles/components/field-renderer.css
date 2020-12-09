@@ -12,12 +12,16 @@
   --field-max-width: 700px;
 
   display: grid;
-  grid-template-columns: 2fr 4.5fr;
+  grid-template-columns: 200px 1fr;
   gap: 5px 30px;
   max-width: var(--field-max-width);
   margin: 0 auto;
   padding: 10px;
   color: var(--field-primary-color);
+}
+
+.edit-field img {
+  max-width: 100%;
 }
 
 .edit-field__title {

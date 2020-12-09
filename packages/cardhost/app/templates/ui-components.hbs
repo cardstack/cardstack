@@ -97,35 +97,35 @@
     <h2>Buttons</h2>
 
     <h3>Default Buttons</h3>
-    <Cta>Default</Cta>
-    <Cta @variant="secondary" @theme="cs-dark">Secondary default</Cta>
-    <CodeEditor @code='<Cta>Default</Cta>' @language="html" />
-    <CodeEditor @code='<Cta @variant="secondary" @theme="cs-dark">Secondary</Cta>' @language="html" />
+    <BoxelButton>Default</BoxelButton>
+    <BoxelButton @variant="secondary" @theme="cs-dark">Secondary default</BoxelButton>
+    <CodeEditor @code='<BoxelButton>Default</BoxelButton>' @language="html" />
+    <CodeEditor @code='<BoxelButton @variant="secondary" @theme="cs-dark">Secondary</BoxelButton>' @language="html" />
 
     <h3>Primary Buttons</h3>
-    <Cta @variant="primary">Primary</Cta>
-    <Cta @variant="secondary primary">Secondary primary</Cta>
-    <CodeEditor @code='<Cta @variant="primary">Primary</Cta>' @language="html" />
-    <CodeEditor @code='<Cta @variant="secondary primary">Secondary primary</Cta>' @language="html" />
+    <BoxelButton @variant="primary">Primary</BoxelButton>
+    <BoxelButton @variant="secondary primary">Secondary primary</BoxelButton>
+    <CodeEditor @code='<BoxelButton @variant="primary">Primary</BoxelButton>' @language="html" />
+    <CodeEditor @code='<BoxelButton @variant="secondary primary">Secondary primary</BoxelButton>' @language="html" />
 
     <h3>Responsive Width (100%) CTA</h3>
-    <Cta @variant="responsive">Create a new theme</Cta>
-    <CodeEditor @code='<Cta @variant="responsive">Create a new theme</Cta>' @language="html" />
-    <Cta @variant="responsive primary">Create a new theme</Cta>
-    <CodeEditor @code='<Cta @variant="responsive primary">Create a new theme</Cta>' @language="html" />
+    <BoxelButton @variant="responsive">Create a new theme</BoxelButton>
+    <CodeEditor @code='<BoxelButton @variant="responsive">Create a new theme</BoxelButton>' @language="html" />
+    <BoxelButton @variant="responsive primary">Create a new theme</BoxelButton>
+    <CodeEditor @code='<BoxelButton @variant="responsive primary">Create a new theme</BoxelButton>' @language="html" />
 
     <h3>Disabled Button</h3>
-    <Cta @disabled={{true}}>Default</Cta>
-    <Cta @variant="secondary" @theme="cs-dark" @disabled={{true}}>Secondary</Cta>
-    <Cta @variant="primary" @disabled={{true}}>Primary</Cta>
-    <Cta @variant="primary secondary" @disabled={{true}}>Secondary Primary</Cta><br><br>
-    <Cta @variant="responsive primary secondary" @disabled={{true}}>Responsive Secondary Primary</Cta>
+    <BoxelButton @disabled={{true}}>Default</BoxelButton>
+    <BoxelButton @variant="secondary" @theme="cs-dark" @disabled={{true}}>Secondary</BoxelButton>
+    <BoxelButton @variant="primary" @disabled={{true}}>Primary</BoxelButton>
+    <BoxelButton @variant="primary secondary" @disabled={{true}}>Secondary Primary</BoxelButton><br><br>
+    <BoxelButton @variant="responsive primary secondary" @disabled={{true}}>Responsive Secondary Primary</BoxelButton>
 
-    <CodeEditor @code='<Cta @disabled=\{{true}}>Default</Cta>
-<Cta @variant="secondary" @theme="cs-dark" @disabled=\{{true}}>Secondary</Cta>
-<Cta @variant="primary" @disabled=\{{true}}>Primary</Cta>
-<Cta @variant="primary secondary" @disabled=\{{true}}>Secondary Primary</Cta>
-<Cta @variant="responsive primary secondary" @disabled=\{{true}}>Responsive Secondary Primary</Cta>' @language="html" />
+    <CodeEditor @code='<BoxelButton @disabled=\{{true}}>Default</BoxelButton>
+<BoxelButton @variant="secondary" @theme="cs-dark" @disabled=\{{true}}>Secondary</BoxelButton>
+<BoxelButton @variant="primary" @disabled=\{{true}}>Primary</BoxelButton>
+<BoxelButton @variant="primary secondary" @disabled=\{{true}}>Secondary Primary</BoxelButton>
+<BoxelButton @variant="responsive primary secondary" @disabled=\{{true}}>Responsive Secondary Primary</BoxelButton>' @language="html" />
 
     <h3>Preview Link Button</h3>
     <PreviewLinkButton @model={{this.model.card}} />
@@ -225,23 +225,26 @@
     <h3 id="textfield">TextField</h3>
     <h4>On light background</h4>
     <div class="ui-components--light-background">
-      <TextField
+      <Form::BoxelTextField
+        @mode="edit"
         @label="Field label"
         @placeholder="Default field" />
-      <TextField
+      <Form::BoxelTextField
+        @mode="edit"
         @label="Field label"
         @placeholder="Disabled field"
         @disabled={{true}} />
-      <TextField
+      <Form::BoxelTextField
+        @mode="edit"
         @label="Field label"
         @placeholder="Required field"
         @required={{true}}
         @helperText="Helper text goes here (optional)" />
     </div>
-     <CodeEditor @code='<TextField />
+     <CodeEditor @code='<Form::BoxelTextField />
 
 // Additional Attributes
-<TextField
+<Form::BoxelTextField
   @id=\{{id}}
   @type=\{{type}}
   @label=\{{label}}
@@ -261,94 +264,97 @@
   ...attributes />' @language="html" />
     <h4>On dark background</h4>
     <div>
-      <TextField
-        @theme="cs-dark"
+      <Form::BoxelTextField
+        @mode="schema"
         @label="Field label"
         @placeholder="Default field" />
-      <TextField
-        @theme="cs-dark"
+      <br>
+      <Form::BoxelTextField
+        @mode="schema"
         @label="Field label"
         @placeholder="Disabled field"
         @disabled={{true}} />
-      <TextField
-        @theme="cs-dark"
+      <br>
+      <Form::BoxelTextField
+        @mode="schema"
         @label="Field label"
         @placeholder="Required field"
         @required={{true}}
         @helperText="Helper text goes here (optional)" />
     </div>
-    <CodeEditor @code='<TextField @theme="cs-dark" />' @language="html" />
+    <CodeEditor @code='<BoxelTextField @mode="schema" />' @language="html" />
 
     <h3 id="textarea">TextArea</h3>
     <h4>On light background</h4>
     <div class="ui-components--light-background">
-      <TextArea
+      <Form::BoxelTextArea
         @label="Textarea label"
         @placeholder="Default textarea" />
-      <TextArea
+      <br>
+      <Form::BoxelTextArea
         @disabled={{true}}
         @label="Textarea label"
         @placeholder="Disabled textarea" />
-      <TextArea
+      <br>
+      <Form::BoxelTextArea
         @required={{true}}
         @label="Textarea label"
         @helperText="Helper text goes here (optional)"
         @placeholder="Required textarea" />
       </div>
-    <CodeEditor @code='<TextArea />
+    <CodeEditor @code='<Form::BoxelTextArea />
 
 // Additional Attributes
-<TextArea
+<Form::BoxelTextArea
   @id=\{{id}}
   @label=\{{label}}
+  @class=\{{class}}
   @placeholder=\{{placeholder}}
   @required=\{{required}}
   @disabled=\{{disabled}}
-  @title=\{{title}}
-  @helperText=\{{helperText}}
-  @name=\{{name}}
-  @rows=\{{rows}}
-  @autofocus=\{{autofocus}}
-  @maxlength=\{{characterLimit}}
-  @readonly=\{{readonly}}
   ...attributes />' @language="html" />
     <h4>On dark background</h4>
     <div>
-      <TextArea
+      <Form::BoxelTextArea
         @theme="cs-dark"
         @label="Textarea label"
         @placeholder="Default textarea" />
-      <TextArea
+      <br>
+      <Form::BoxelTextArea
         @theme="cs-dark"
         @disabled={{true}}
         @label="Textarea label"
         @placeholder="Disabled textarea" />
-      <TextArea
+      <br>
+      <Form::BoxelTextArea
         @theme="cs-dark"
         @required={{true}}
         @label="Textarea label"
         @helperText="Helper text goes here (optional)"
         @placeholder="Required textarea" />
       </div>
-    <CodeEditor @code='<TextArea theme="cs-dark" />' @language="html" />
+    <CodeEditor @code='<Form::BoxelTextArea @theme="cs-dark" />' @language="html" />
 
     <h3 id="dropdown">Dropdown</h3>
     <div>
-      <Dropdown @theme="cs-dark" @options={{this.model.countries}} @searchEnabled={{false}} @label="Dropdown label" />
-      <Dropdown @theme="cs-dark" @options={{this.model.countries}} @searchEnabled={{false}} @label="Dropdown label" @placeholder="Disabled dropdown" @disabled={{true}} />
-      <Dropdown @theme="cs-dark" @options={{this.model.countries}} @searchEnabled={{false}} @label="Dropdown label" @required={{true}} />
+      <Form::BoxelDropdown @theme="cs-dark" @placeholder="Please select" @options={{this.model.countries}} @searchField="name" @searchEnabled={{false}} @label="Dropdown label" />
+      <br>
+      <Form::BoxelDropdown @theme="cs-dark" @options={{this.model.countries}} @searchField="name" @searchEnabled={{false}} @label="Dropdown label" @placeholder="Disabled dropdown" @disabled={{true}} />
+      <br>
+      <Form::BoxelDropdown @theme="cs-dark" @placeholder="Please select" @options={{this.model.countries}} @searchField="name" @searchEnabled={{false}} @label="Dropdown label" @required={{true}} />
     </div>
-    <CodeEditor @code='<Dropdown
+    <CodeEditor @code='<Form::BoxelDropdown
   @theme="cs-dark"
   @options=\{{options}}
-  @searchEnabled={{false}}
+  @searchField="name"
   @label=\{{label}} />
 
 // Additional Attributes
-<Dropdown
+<Form::BoxelDropdown
   @theme="cs-dark"
   @options=\{{options}}
-  @searchEnabled={{false}}
+  @searchField="name"
+  @searchEnabled=\{{searchEnabled}}
   @label=\{{label}}
   @placeholder=\{{placeholder}}
   @required=\{{required}}
@@ -356,33 +362,33 @@
 
     <h3 id="checkbox">Checkbox</h3>
     <div>
-      <Checkbox
+      <Form::BoxelCheckbox
+        @id="checkbox-1"
         @theme="cs-dark"
-        @label={{if this.isChecked "Selected" "Not Selected"}}
-        @checked={{this.isChecked}}
-        @setChecked={{fn this.setChecked "isChecked"}} />
-
-      <Checkbox
+        @label={{if this.isChecked "Checked" "Unchecked"}}
+        @checked={{this.isChecked}} />
+      <br>
+      <Form::BoxelCheckbox
+        @id="checkbox-2"
         @theme="cs-dark"
-        @label="Not Selected (Disabled State)"
+        @label="Unchecked (Disabled State)"
+        @disabled={{true}} />
+      <br>
+      <Form::BoxelCheckbox
+        @id="checkbox-3"
+        @theme="cs-dark"
+        @label="Checked (Disabled State)"
         @disabled={{true}}
-        @setChecked={{fn this.setChecked "isChecked"}} />
-
-      <Checkbox
-        @theme="cs-dark"
-        @label="Selected (Disabled State)"
-        @disabled={{true}}
-        @checked={{true}}
-        @setChecked={{fn this.setChecked "isChecked"}} />
+        @checked={{true}} />
     </div>
     <CodeEditor
-      @code='<Checkbox
+      @code='<Form::BoxelCheckbox
+  @id=\{{id}}
   @theme="cs-dark"
   @label=\{{label}}
   @checked=\{{checked}}
   @disabled=\{{disabled}}
-  @required=\{{required}}
-  @setChecked=\{{fn setCheckedAction}} />' @language="html" />
+  @required=\{{required}} />' @language="html" />
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col" id="right-edge">
@@ -483,13 +489,13 @@
 
     <h4>Textarea</h4>
     <div class="ui-components--notes">
-      <p>Note: We can not currently use a <code>FieldRenderer</code> component to render a <code>TextArea</code> component.</p>
+      <p>Note: We can not currently use a <code>FieldRenderer</code> component to render a <code>BoxelTextField</code> component.</p>
     </div>
-    <TextArea
+    <Form::BoxelTextArea
       @id="textarea-editor"
       @label="Textarea"
       @value="Entered long text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero." />
-    <CodeEditor @code='<TextArea
+    <CodeEditor @code='<Form::BoxelTextArea
   @id=\{{@field.id}}
   @label=\{{@field.label}}
   @value="Entered long text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem. Phasellus sit amet ipsum in tellus vestibulum tincidunt. Etiam rhoncus, orci quis elementum pulvinar, leo lectus feugiat ligula, vel tincidunt massa elit eu augue. Nulla eget tortor non est ullamcorper egestas eu sit amet justo. Cras consectetur tempor dui, eget finibus orci vestibulum vitae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec faucibus mi sed turpis posuere euismod. Sed leo erat, ultricies non ligula eu, ornare consectetur justo. Donec non orci tellus. Aenean ac nibh imperdiet, sollicitudin risus eu, malesuada ante. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam commodo sed lorem posuere lobortis. Nam a condimentum nulla, nec tempor dolor. Fusce tincidunt, mi at viverra cursus, tellus metus consequat massa, nec interdum urna ante non libero." />' @language="html" />
@@ -511,7 +517,7 @@
 
     <h4>Image</h4>
     <div class="ui-components--notes">
-      <p>Currently this is just rendering a <code>TextField</code> component.</p>
+      <p>Currently this is just rendering a <code>BoxelTextField</code> component.</p>
     </div>
     <FieldRenderer
       @field={{this.model.sampleImage}}
@@ -569,8 +575,8 @@
   <section class="ui-components--section ui-components--grid-2-col" id="search-bar">
     <h2>Search Bar</h2>
     {{!-- TODO: Make this a SearchBar component --}}
-    <TextField @type="search" @theme="search-bar" @placeholder="Search Library" />
-    <CodeEditor @code='<TextField
+    <Form::BoxelTextField @type="search" @theme="search-bar" @placeholder="Search Library" />
+    <CodeEditor @code='<Form::BoxelTextField
   @type="search"
   @theme="search-bar"
   @placeholder="Search Library" />' @language="html" />
@@ -579,8 +585,8 @@
   <section class="ui-components--section ui-components--grid-2-col" id="filter-bar">
     <h2>Filter Bar</h2>
     {{!-- TODO: Make this a FilterBar component --}}
-    <TextField @theme="filter-bar" @placeholder="Filter Results" />
-    <CodeEditor @code='<TextField
+    <Form::BoxelTextField @theme="filter-bar" @placeholder="Filter Results" />
+    <CodeEditor @code='<Form::BoxelTextField
   @theme="filter-bar"
   @placeholder="Filter Results" />' @language="html" />
   </section>
@@ -595,12 +601,13 @@
           <button class="ch-catalog--header-btn grid" aria-label="View as grid"></button>
         </div>
         <div class="ch-catalog--header-filter">
-          <TextField @theme="filter-bar" @placeholder="Filter Results" />
+          <Form::BoxelTextField @mode="schema" @class="filter-bar" @placeholder="Filter Results" />
         </div>
       </header>
       <div class="ch-catalog--content">
         <div class="ch-catalog--fields">
           <div class="ch-catalog-field" role="button" draggable="true">
+            {{! template-lint-disable no-inline-styles }}
             <div class="ch-catalog-field--icon" style={{css-url "background-image" "/assets/images/field-types/text-field-icon.svg"}}></div>
             <div>
               <h4 class="ch-catalog-field--title">Text</h4>
@@ -617,7 +624,7 @@
       <button class="ch-catalog--header-btn sidebar active" aria-label="View as sidebar"></button>
       <button class="ch-catalog--header-btn grid" aria-label="View as grid"></button>
     </div>
-    <TextField @theme="filter-bar" @placeholder="Filter Results" />
+    <Form::BoxelTextField @mode="schema" @class="filter-bar" @placeholder="Filter Results" />
   </header>
   <div class="ch-catalog--content">
     <div class="ch-catalog--fields">
@@ -687,14 +694,14 @@
       <Dialog open={{true}} @title="Welcome">
         Hello, world!
         <div class="dialog--button-group">
-          <Cta @variant="secondary">Dismiss</Cta>
+          <BoxelButton @variant="secondary">Dismiss</BoxelButton>
         </div>
       </Dialog>
     </div>
     <CodeEditor @code='<Dialog open=\{{true}} @title="Welcome">
   Hello, world!
   <div class="dialog--button-group">
-    <Cta @variant="secondary">Dismiss</Cta>
+    <BoxelButton @variant="secondary">Dismiss</BoxelButton>
   </div>
 </Dialog>' @language="html" />
 
@@ -705,7 +712,7 @@
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem.
         </p>
         <div class="dialog--button-group">
-          <Cta @variant="secondary">Dismiss</Cta>
+          <BoxelButton @variant="secondary">Dismiss</BoxelButton>
         </div>
       </Dialog>
     </div>
@@ -717,7 +724,7 @@
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sed scelerisque ex, sed elementum lorem.
         </p>
         <div class="dialog--button-group">
-          <Cta @variant="secondary">Dismiss</Cta>
+          <BoxelButton @variant="secondary">Dismiss</BoxelButton>
         </div>
       </Dialog>
     </div>
@@ -731,8 +738,8 @@
           view and save them. Do you want to proceed, or stay?
         </p>
         <div class="dialog--button-group">
-          <Cta @variant="secondary">Proceed</Cta>
-          <Cta>Stay</Cta>
+          <BoxelButton @variant="secondary">Proceed</BoxelButton>
+          <BoxelButton>Stay</BoxelButton>
         </div>
       </Dialog>
     </div>
@@ -744,8 +751,8 @@
     view and save them. Do you want to proceed, or stay?
   </p>
   <div class="dialog--button-group">
-    <Cta @variant="secondary">Proceed</Cta>
-    <Cta>Stay</Cta>
+    <BoxelButton @variant="secondary">Proceed</BoxelButton>
+    <BoxelButton>Stay</BoxelButton>
   </div>
 </Dialog>' @language="html" />
   </section>

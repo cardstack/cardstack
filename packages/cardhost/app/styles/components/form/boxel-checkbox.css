@@ -1,0 +1,138 @@
+.cs-checkbox-group {
+  position: relative;
+  display: block;
+  width: 100%;
+  color: var(--cs-field-text);
+  font: var(--cs-font);
+  letter-spacing: var(--cs-letter-spacing);
+
+  transition: color var(--cs-transition-time);
+}
+
+.cs-checkbox {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+.cs-checkbox-group--checkmark {
+  display: inline-block;
+  vertical-align: text-bottom;
+  height: 18px;
+  width: 18px;
+  margin-right: 7px;
+  background-color: var(--cs-field-default);
+  border: 1px solid var(--cs-field-border);
+  border-radius: 3px;
+  text-align: center;
+
+  transition: background-color var(--cs-transition-time),
+              border-color var(--cs-transition-time);
+}
+
+.cs-checkbox-group--helper-text {
+  display: block;
+  height: 18px;
+  padding-top: 5px;
+  color: var(--cs-field-label);
+  font: var(--cs-small-font);
+  letter-spacing: var(--cs-letter-spacing);
+  text-transform: initial;
+
+  transition: color var(--cs-transition-time);
+}
+
+/* hover */
+.cs-checkbox:hover + label {
+  cursor: pointer;
+}
+.cs-checkbox:hover + label > .cs-checkbox-group--checkmark {
+  background-color: var(--cs-field-hover);
+}
+
+/* focus */
+.cs-checkbox:focus + label > .cs-checkbox-group--checkmark {
+  background-color: var(--cs-field-hover);
+  border-color: var(--cs-highlight);
+}
+
+/* checked */
+.cs-checkbox.checked + label > .cs-checkbox-group--checkmark {
+  background: url('/assets/images/icons/check-mark.svg') center/12px no-repeat;
+}
+
+/* checked hover, focus */
+.cs-checkbox.checked:hover + label > .cs-checkbox-group--checkmark {
+  background-color: var(--cs-field-hover);
+}
+.cs-checkbox.checked:focus + label > .cs-checkbox-group--checkmark {
+  background-color: var(--cs-field-hover);
+  border-color: var(--cs-highlight);
+}
+
+/* error */
+.cs-checkbox.invalid + label > .cs-checkbox-group--checkmark,
+.cs-checkbox.invalid:hover + label > .cs-checkbox-group--checkmark,
+.cs-checkbox.invalid:focus + label > .cs-checkbox-group--checkmark {
+  border-color: var(--cs-error);
+}
+.cs-checkbox-group--helper-text.invalid {
+  color: var(--cs-error);
+  font-weight: 600;
+}
+
+/* disabled */
+.cs-checkbox.disabled + label {
+  color: var(--cs-field-disabled-text);
+  pointer-events: none;
+}
+.cs-checkbox.disabled + label > .cs-checkbox-group--checkmark {
+  background-color: var(--cs-field-default);
+  border-color: var(--cs-field-disabled-border);
+}
+
+
+/* cs-dark */
+.cs-dark-checkbox-group.cs-checkbox-group {
+  color: var(--cs-dark-field-text);
+}
+.cs-dark-checkbox-group .cs-checkbox-group--checkmark {
+  background-color: var(--cs-dark-checkbox);
+  border: 1px solid var(--cs-dark-checkbox-border);
+}
+.cs-dark-checkbox-group .cs-checkbox-group--helper-text {
+  color: var(--cs-dark-field-label);
+}
+.cs-dark-checkbox-group .cs-checkbox-group--helper-text.invalid {
+  color: var(--cs-dark-field-error);
+}
+
+/* focus & hover */
+.cs-dark-checkbox:hover + label > .cs-checkbox-group--checkmark,
+.cs-dark-checkbox:focus + label > .cs-checkbox-group--checkmark {
+  background-color: var(--cs-dark-checkbox-hover);
+}
+
+/* checked */
+.cs-dark-checkbox.checked + label > .cs-checkbox-group--checkmark {
+  background-color: var(--cs-highlight);
+}
+
+/* checked hover & focus */
+.cs-dark-checkbox.checked:hover + label > .cs-checkbox-group--checkmark,
+.cs-dark-checkbox.checked:focus + label > .cs-checkbox-group--checkmark {
+  background-color: var(--cs-highlight-hover);
+}
+
+/* disabled */
+.cs-dark-checkbox.disabled + label {
+  color: var(--cs-dark-field-disabled-text);
+}
+.cs-dark-checkbox.disabled + label > .cs-checkbox-group--checkmark {
+  background-color: var(--cs-dark-field-disabled);
+  border-color: var(--cs-dark-field-disabled);
+}

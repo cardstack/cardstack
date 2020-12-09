@@ -62,9 +62,7 @@ module.exports = function(environment) {
     ENV.animationSpeed = 20;
     ENV.autosaveDebounce = 10;
     ENV.autosaveDisabled = true;
-    ENV['@cardstack/ui-components'] = {
-      debounceSpeed: 10,
-    };
+    ENV.debounceSpeed = 10;
 
     ENV.percy = {
       breakpointsConfig: {

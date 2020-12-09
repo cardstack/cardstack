@@ -1,0 +1,231 @@
+/* Dropdown trigger */
+.cs-dropdown .ember-power-select-trigger {
+  display: flex;
+  flex-flow: nowrap row;
+  align-items: center;
+  width: 100%;
+  height: var(--cs-field-height);
+  padding: 0 45px 0 15px;
+  background-color: var(--cs-field-default);
+  font: var(--cs-font);
+  letter-spacing: 0;
+  border: 1px solid var(--cs-field-border);
+  border-radius: var(--cs-field-radius);
+  overflow-y: hidden;
+
+  transition: background-color var(--cs-transition-time),
+              border-color var(--cs-transition-time);
+}
+.cs-dropdown .ember-power-select-selected-item,
+.cs-dropdown .ember-power-select-placeholder {
+  display: block;
+  margin-left: 0;
+  font: var(--cs-font);
+  letter-spacing: 0;
+}
+.cs-dropdown .ember-power-select-selected-item {
+  color: var(--cs-field-text);
+}
+.cs-dropdown .ember-power-select-placeholder {
+  color: var(--cs-field-placeholder);
+}
+.cs-dropdown .ember-power-select-status-icon {
+  right: 15px;
+  width: 10px;
+  height: var(--cs-field-height);
+  background: url('/assets/images/icons/dropdown-arrows-ht.svg') center/10px no-repeat;
+  border: none;
+}
+.cs-dropdown .ember-basic-dropdown-trigger[aria-expanded="true"] .ember-power-select-status-icon {
+  transform: none;
+}
+.cs-dropdown .ember-power-select-trigger .ember-power-select-clear-btn {
+  display: none;
+}
+.cs-dropdown .ember-power-select-selected-item .ember-power-select-clear-btn {
+  right: 5px;
+}
+.cs-dropdown:not(.disabled) .ember-power-select-trigger:focus,
+.cs-dropdown:not(.disabled) .ember-power-select-trigger--active {
+  border: 1px solid var(--cs-field-border);
+  outline: 0;
+}
+.cs-dropdown:not(.disabled) .ember-power-select-trigger:hover {
+  background-color: var(--cs-field-hover);
+  cursor: pointer;
+}
+
+
+/* Disabled state */
+.cs-dropdown.disabled .ember-power-select-status-icon {
+  background-image: none;
+}
+.cs-dropdown.disabled .ember-power-select-trigger {
+  border-color: var(--cs-field-disabled-border);
+  pointer-events: none;
+}
+.cs-dropdown.disabled .ember-power-select-selected-item,
+.cs-dropdown.disabled .ember-power-select-placeholder {
+  color: var(--cs-field-disabled-text);
+}
+
+
+/* Dropdown menu and options */
+.cs-dropdown .ember-power-select-trigger[aria-expanded="true"],
+.cs-dropdown .ember-basic-dropdown-trigger--below.ember-power-select-trigger[aria-expanded="true"],
+.cs-dropdown .ember-basic-dropdown-trigger--in-place.ember-power-select-trigger[aria-expanded="true"],
+.cs-dropdown .ember-power-select-dropdown,
+.cs-dropdown .ember-power-select-dropdown.ember-basic-dropdown-content--below,
+.cs-dropdown .ember-power-select-dropdown.ember-basic-dropdown-content--in-place {
+  background-color: var(--cs-field-default);
+  border: 1px solid var(--cs-field-border);
+  border-radius: var(--cs-field-radius);
+}
+.cs-dropdown .ember-power-select-option {
+  padding: 10px 15px 10px 30px;
+  color: var(--cs-field-label);
+  font: var(--cs-font);
+  letter-spacing: 0;
+}
+.cs-dropdown .ember-power-select-option[aria-current="true"] {
+  background-color: var(--cs-field-hover);
+}
+.cs-dropdown .ember-power-select-option[aria-selected="true"] {
+  background: url('/assets/images/icons/checkmark-ht.svg') 10px center/10px no-repeat;
+  background-color: var(--cs-field-hover);
+  color: var(--cs-field-text);
+}
+
+
+/* Search */
+.cs-dropdown .ember-power-select-search {
+  padding: 10px 15px;
+}
+.cs-dropdown .ember-power-select-search .ember-power-select-search-input:focus {
+  border-bottom: 1px solid var(--cs-field-border);
+  outline: 0;
+}
+.cs-dropdown .ember-power-select-search .ember-power-select-option--search-message {
+  display: none;
+}
+.cs-dropdown .ember-power-select-search .ember-power-select-search-input {
+  min-height: 30px;
+  padding: 0;
+  border: none;
+  background: inherit;
+  color: inherit;
+  font: var(--cs-font);
+  letter-spacing: 0;
+}
+
+
+/* Multi-select Dropdown */
+.cs-dropdown.multiple .ember-power-select-dropdown,
+.cs-dropdown.multiple .ember-power-select-dropdown.ember-basic-dropdown-content--below,
+.cs-dropdown.multiple .ember-power-select-dropdown.ember-basic-dropdown-content--in-place {
+  top: auto;
+  background-color: var(--cs-field-default);
+  color: var(--cs-field-label);
+  border: 1px solid var(--cs-field-border);
+  border-radius: var(--cs-field-radius);
+}
+.cs-dropdown.multiple .ember-power-select-trigger-multiple-input {
+  visibility: collapse;
+  height: 0;
+}
+.cs-dropdown .ember-power-select-multiple-trigger {
+  height: 85px;
+  padding: 5px 35px 5px 5px;
+}
+.cs-dropdown .ember-power-select-multiple-options {
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.cs-dropdown .ember-power-select-multiple-option {
+  padding: 6px 10px 7px;
+  color: var(--cs-field-text);
+  background-color: var(--cs-field-default);
+  border: 1px solid var(--cs-field-border);
+  border-radius: 3px;
+  font: 400 10px/14px var(--cs-font-family);
+  letter-spacing: var(--cs-letter-spacing);
+}
+.cs-dropdown .ember-power-select-multiple-option:hover {
+  background-color: var(--cs-field-hover);
+}
+.cs-dropdown .ember-power-select-multiple-remove-btn {
+  opacity: 1;
+  float: right;
+  margin-left: 5px;
+}
+
+
+/* Custom Options */
+.cs-dropdown.with-customized-options .ember-power-select-selected-item,
+.cs-dropdown.with-customized-options .ember-power-select-option {
+  width: 100%;
+  display: flex;
+  flex-flow: nowrap row;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+
+/* cs-dark */
+/* Dropdown trigger */
+.cs-dark-dropdown.cs-dropdown .ember-power-select-trigger {
+  background-color: var(--cs-dark-dropdown);
+  border: 1px solid var(--cs-dark-dropdown-border);
+}
+.cs-dark-dropdown.cs-dropdown .ember-power-select-selected-item,
+.cs-dark-dropdown.cs-dropdown .ember-power-select-placeholder {
+  color: var(--cs-dark-field-text);
+}
+.cs-dark-dropdown.cs-dropdown:not(.disabled) .ember-power-select-trigger:focus,
+.cs-dark-dropdown.cs-dropdown:not(.disabled) .ember-power-select-trigger--active {
+  border: 1px solid var(--cs-dark-dropdown-border);
+}
+.cs-dark-dropdown.cs-dropdown:not(.disabled) .ember-power-select-trigger:hover {
+  background-color: var(--cs-dark-dropdown-hover);
+}
+.cs-dark-dropdown.cs-dropdown.disabled .ember-power-select-trigger {
+  background-color: var(--cs-dark-field-disabled);
+  border-color: var(--cs-dark-field-disabled);
+}
+.cs-dark-dropdown.cs-dropdown.disabled .ember-power-select-selected-item,
+.cs-dark-dropdown.cs-dropdown.disabled .ember-power-select-placeholder {
+  color: var(--cs-dark-field-disabled-text);
+}
+
+/* Dropdown menu and options */
+.cs-dark-dropdown.cs-dropdown .ember-power-select-trigger[aria-expanded="true"],
+.cs-dark-dropdown.cs-dropdown .ember-basic-dropdown-trigger--below.ember-power-select-trigger[aria-expanded="true"],
+.cs-dark-dropdown.cs-dropdown .ember-basic-dropdown-trigger--in-place.ember-power-select-trigger[aria-expanded="true"],
+.cs-dark-dropdown.cs-dropdown .ember-power-select-dropdown,
+.cs-dark-dropdown.cs-dropdown .ember-power-select-dropdown.ember-basic-dropdown-content--below,
+.cs-dark-dropdown.cs-dropdown .ember-power-select-dropdown.ember-basic-dropdown-content--in-place {
+  background-color: var(--cs-dark-dropdown-hover);
+  border: 1px solid var(--cs-dark-dropdown-border);
+}
+.cs-dark-dropdown.cs-dropdown .ember-power-select-option {
+  color: var(--cs-dark-field-text);
+}
+.cs-dark-dropdown.cs-dropdown .ember-power-select-option[aria-current="true"] {
+  background-color: var(--cs-dark-dropdown);
+}
+.cs-dark-dropdown.cs-dropdown .ember-power-select-option[aria-selected="true"] {
+  background-color: var(--cs-dark-dropdown);
+  color: var(--cs-dark-field-text);
+}
+
+/* Search */
+.cs-dark-dropdown.cs-dropdown .ember-power-select-search .ember-power-select-search-input:focus {
+  border-bottom: 1px solid var(--cs-dark-dropdown-border);
+}
