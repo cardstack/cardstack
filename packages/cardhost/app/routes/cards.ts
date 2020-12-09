@@ -16,7 +16,6 @@ export default class CardsRoute extends Route {
   @service cardstackSession!: CardstackSessionService;
 
   async model(): Promise<Model> {
-    await this.library.load.perform();
     return {};
   }
 

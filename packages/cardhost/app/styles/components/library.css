@@ -167,12 +167,12 @@
   width: 100%;
   margin: 0;
   padding: 20px;
-  background: none;
   border: none;
   border-radius: 0;
 }
 
 .library--card-link.cs-component-cta {
+  background: none;
   border-radius: 0;
 }
 
