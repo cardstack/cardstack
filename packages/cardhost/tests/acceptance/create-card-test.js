@@ -16,6 +16,7 @@ import {
   waitForCardAutosave,
   waitForTestsToEnd,
   waitForLibraryServiceToIdle,
+  waitForCatalogEntriesToLoad,
   getEncodedCardIdFromURL,
   waitForAnimation,
 } from '../helpers/card-ui-helpers';
@@ -121,6 +122,7 @@ module('Acceptance | card create', function(hooks) {
     await visit('/');
     await click('[data-test-library-button]');
     await waitForLibraryServiceToIdle();
+    await waitForCatalogEntriesToLoad('[data-test-templates]');
 
     await click('[data-test-library-new-blank-card-btn]');
     await setCardName(card1Name);
