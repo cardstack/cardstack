@@ -10971,7 +10971,7 @@ ember-power-select-typeahead@alexspeller/ember-power-select-typeahead#6d279fb:
     ember-cli-htmlbars "^3.1.0"
     ember-power-select "^4.0.0"
 
-ember-power-select@^4.0.0:
+ember-power-select@^4.0.0, ember-power-select@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/ember-power-select/-/ember-power-select-4.1.0.tgz#0897ae56ed96835b2393452b3303126407d468b7"
   integrity sha512-HJQDQq8riUUtrfrN69yRIOCx8hsLPGmA6/pAn8BOnmL+N+86It8d/xRpXrZBQw/Dw9cnj9EQp2Vqi0PhPBBhGg==

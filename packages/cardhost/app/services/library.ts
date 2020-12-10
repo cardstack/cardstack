@@ -69,7 +69,8 @@ export default class LibraryService extends Service {
   load: any; // TS and EC don't play nice
 
   @action
-  show() {
+  async show() {
+    await this.load.perform();
     this.visible = true;
   }
 

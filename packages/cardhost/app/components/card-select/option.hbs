@@ -1,0 +1,10 @@
+{{#if @component}}
+  {{component card=@card mode="view"}}
+{{else}}
+  <CardRenderer
+    @card={{@card}}
+    @mode="view"
+    @format="embedded"
+    @preventIsolation={{true}}
+  />
+{{/if}}

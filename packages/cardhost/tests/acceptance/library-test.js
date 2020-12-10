@@ -11,7 +11,6 @@ import {
 } from '../helpers/card-ui-helpers';
 import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
-import { animationsSettled } from 'ember-animated/test-support';
 import { cardDocument } from '@cardstack/hub';
 import { embeddedCssFile, isolatedCssFile } from '@cardstack/cardhost/utils/scaffolding';
 import { CARDSTACK_PUBLIC_REALM } from '@cardstack/hub';
@@ -211,42 +210,10 @@ module('Acceptance | library', function(hooks) {
     );
   });
 
-  // this UI is currently removed
-  // test('featured cards are displayed', async function(assert) {
-  //   await visit(`/featured-cards`);
-  //   await waitForFeaturedCardsLoad();
-
-  //   await percySnapshot(assert);
-  //   assert.deepEqual(
-  //     [...document.querySelectorAll(`[data-test-featured-card]`)].map(i => i.getAttribute('data-test-featured-card')),
-  //     [catalogCard2.canonicalURL, catalogCard1.canonicalURL]
-  //   );
-  //   assert.dom(`[data-test-featured-card="${catalogCard1.canonicalURL}"] [data-test-isolated-card]`).exists();
-  //   assert.dom(`[data-test-featured-card="${catalogCard2.canonicalURL}"] [data-test-isolated-card]`).exists();
-  //   assert
-  //     .dom(`[data-test-featured-card="${catalogCard1.canonicalURL}"] [data-test-featured-card-title]`)
-  //     .hasText('Featured: The Millenial Puppy');
-  //   assert
-  //     .dom(`[data-test-featured-card="${catalogCard2.canonicalURL}"] [data-test-featured-card-title]`)
-  //     .hasText('Featured: Why Doors?');
-  //   assert.ok(
-  //     find(`[data-test-css-format="isolated"][data-test-css-cards="[${catalogCard1.canonicalURL}]"`).innerText.includes(
-  //       'card3 isolated css'
-  //     ),
-  //     'featured card style is correct'
-  //   );
-  //   assert.ok(
-  //     find(`[data-test-css-format="isolated"][data-test-css-cards="[${catalogCard2.canonicalURL}]"`).innerText.includes(
-  //       'card4 isolated css'
-  //     ),
-  //     'featured card style is correct'
-  //   );
-  // });
-
   test(`closing library panel`, async function(assert) {
     await visit(`/`);
     await click('[data-test-library-button]');
-    await animationsSettled();
+    await waitForLibraryLoad();
 
     assert.dom('[data-test-library]').exists();
     await click('[data-test-library-close-button]');

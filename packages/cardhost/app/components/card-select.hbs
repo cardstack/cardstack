@@ -5,15 +5,13 @@
   @beforeOptionsComponent={{@beforeOptionsComponent}}
   @dropdownClass={{@dropdownClass}}
   @initiallyOpened={{true}}
-  @renderInPlace={{true}}
-  @verticalPosition="below"
-  @allowClear={{false}}
+  @renderInPlace={{or @renderInPlace true}}
+  @verticalPosition={{or @verticalPosition "below"}}
+  @allowClear={{or @allowClear false}}
   @onChange={{@onChange}} as |card|
 >
-  <CardRenderer
+  <CardSelect::Option
+    @component={{@component}}
     @card={{card}}
-    @mode="view"
-    @format="embedded"
-    @preventIsolation={{true}}
   />
 </PowerSelectTypeahead>
