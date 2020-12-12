@@ -97,12 +97,18 @@
   padding: 0;
   border: none;
   background: url('/assets/images/icons/icon-minus-circle.svg') center/16px 16px no-repeat;
+  outline: 0;
 }
 
 .item__add-btn {
   background-image: url('/assets/images/icons/icon-plus-circle-highlight-bg.svg');
   position: absolute;
-  top: 15px;
+  top: 25%;
+  right: 47%;
+  transition: right var(--boxel-transition);
+}
+
+* + .item__add-btn {
   right: 0;
 }
 

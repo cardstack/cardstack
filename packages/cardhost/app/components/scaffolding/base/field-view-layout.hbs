@@ -5,8 +5,12 @@
   {{#if (eq @card.csFieldArity "plural")}}
     {{#each this.fieldValue as |card|}}
       <CardRenderer @card={{card}} @mode="view" @format="embedded"/>
+    {{else}}
+      <div class="{{@card.name}}-placeholder-value">N/A</div>
     {{/each}}
   {{else if this.fieldValue}}
     <CardRenderer @card={{this.fieldValue}} @mode="view" @format="embedded"/>
+  {{else}}
+    <div class="{{@card.name}}-placeholder-value">N/A</div>
   {{/if}}
 </div>

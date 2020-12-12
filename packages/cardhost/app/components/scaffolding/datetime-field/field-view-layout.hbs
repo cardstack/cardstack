@@ -4,5 +4,7 @@
 <div class="value {{@card.name}}-value" data-test-datetime-field-viewer-value>
   {{#if this.fieldValue}}
     {{moment-format this.fieldValue "MMM D, YYYY h:mm a"}}
+  {{else}}
+    <span class="{{@card.name}}-placeholder-value">N/A</span>
   {{/if}}
 </div>

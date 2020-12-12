@@ -11,7 +11,6 @@
             {{/if}}
           </div>
         {{/each}}
-        <button {{on "click" this.toggleInputField}} class="item__add-btn" aria-label="add" data-test-taglist-add-btn />
         {{#if (and @addAction this.displayInputField)}}
           <Input
             @id={{@id}}
@@ -26,6 +25,7 @@
             ...attributes
           />
         {{/if}}
+        <button {{on "click" this.toggleInputField}} class="item__add-btn" aria-label="add" data-test-taglist-add-btn />
       </div>
     </div>
   {{else}}
@@ -72,9 +72,13 @@
     {{#if @hasPluralArity}}
       {{#each @value as |value|}}
         {{value}}{{if (has-next value @value) ", "}}
+      {{else}}
+        <span class="{{@id}}-placeholder-value">N/A</span>
       {{/each}}
-    {{else}}
+    {{else if @value}}
       {{@value}}
+    {{else}}
+      <span class="{{@id}}-placeholder-value">N/A</span>
     {{/if}}
   </div>
 {{/if}}
