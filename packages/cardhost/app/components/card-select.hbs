@@ -8,7 +8,9 @@
   @renderInPlace={{or @renderInPlace true}}
   @verticalPosition={{or @verticalPosition "below"}}
   @allowClear={{or @allowClear false}}
-  @onChange={{@onChange}} as |card|
+  @onChange={{@onChange}}
+  data-test-card-select
+  as |card|
 >
   <CardSelect::Option
     @component={{@component}}
