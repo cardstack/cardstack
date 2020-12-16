@@ -110,7 +110,7 @@ export default class BaseCardFieldEditLayout extends BaseEditor {
     } else {
       this.fieldValue = null;
     }
-    yield this.args.setCardReference.perform(this.args.card.name, this.fieldValue);
+    yield this.args.setCardReference.linked().perform(this.args.card.name, this.fieldValue);
   })
   remove;
 }

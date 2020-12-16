@@ -1,5 +1,5 @@
 import { module, test, skip } from 'qunit';
-import { find, visit, currentURL, click, triggerKeyEvent } from '@ember/test-helpers';
+import { find, visit, currentURL, click, triggerKeyEvent, getContext, waitFor, waitUntil } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import { percySnapshot } from 'ember-percy';
 import { animationsSettled } from 'ember-animated/test-support';
@@ -367,5 +367,20 @@ module('Acceptance | card edit', function(hooks) {
     let cardJson = find('[data-test-card-json]').innerHTML;
     let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.body, `this will autosave`);
+  });
+
+  test('autosave indicator displays status', async function(assert) {
+    const timeout = 5000;
+    await visit(`/cards/${cardPath}/edit`);
+    await waitForCardLoad();
+
+    this.owner.lookup('service:autosave').autosaveDisabled = false;
+    await setFieldValue('body', 'this will autosave');
+
+    assert.dom('[data-test-card-edit-autosave-indicator]').hasTextContaining('Saving');
+
+    await waitUntil(() => getContext().owner.lookup('service:autosave').debounceAndSave.isIdle, { timeout });
+    await waitFor(`[data-test-card-patched="true"]`, { timeout });
+    assert.dom('[data-test-card-edit-autosave-indicator]').hasTextContaining('Saved');
   });
 });

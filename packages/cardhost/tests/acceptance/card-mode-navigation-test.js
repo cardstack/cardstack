@@ -6,7 +6,13 @@ import { login } from '../helpers/login';
 import { percySnapshot } from 'ember-percy';
 import { animationsSettled } from 'ember-animated/test-support';
 import { cardDocument } from '@cardstack/hub';
-import { waitForCardLoad, waitForSchemaViewToLoad, encodeColons, waitForTestsToEnd } from '../helpers/card-ui-helpers';
+import {
+  waitForCardLoad,
+  waitForSchemaViewToLoad,
+  encodeColons,
+  waitForTestsToEnd,
+  waitForAnimation,
+} from '../helpers/card-ui-helpers';
 
 const csRealm = `http://localhost:3000/api/realms/default`;
 const testCard = cardDocument().withAutoAttributes({
@@ -33,12 +39,12 @@ module('Acceptance | card mode navigation', function(hooks) {
   test('can use the context menu to switch modes', async function(assert) {
     await visit(`/cards/${cardPath}/configure/fields`);
     await waitForSchemaViewToLoad();
-    await animationsSettled();
 
     assert.equal(encodeColons(currentURL()), `/cards/${cardPath}/configure/fields`);
     await click('[data-test-context-menu-button]');
     assert.dom('[data-test-context-menu-items] .checked').hasText('Schema');
-    await percySnapshot(assert);
+    await animationsSettled();
+    await waitForAnimation(async () => await percySnapshot(assert));
 
     // schema
     await click('[data-test-context-schema]');

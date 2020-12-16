@@ -19,7 +19,7 @@ export default class BaseEditor extends Component {
 
   @(task(function*(value) {
     this.fieldValue = value;
-    yield this.args.setCardValue.perform(this.args.card.name, value);
+    yield this.args.setCardValue.linked().perform(this.args.card.name, value);
   }).restartable())
   updateFieldValue;
 
@@ -27,14 +27,14 @@ export default class BaseEditor extends Component {
     if (this.args.card.csFieldArity === 'plural' && evt.which === 13) {
       let values = [...this.fieldValue, evt.target.value];
       this.fieldValue = values;
-      yield this.args.setCardValue.perform(this.args.card.name, values);
+      yield this.args.setCardValue.linked().perform(this.args.card.name, values);
     }
   })
   add;
 
   @task(function*(index) {
     this.fieldValue = this.fieldValue.filter((el, i) => i !== index);
-    yield this.args.setCardValue.perform(this.args.card.name, this.fieldValue);
+    yield this.args.setCardValue.linked().perform(this.args.card.name, this.fieldValue);
   })
   remove;
 }

@@ -32,7 +32,7 @@
           {{#if this.autosave.hasError}}
             {{svg-jar "error" width="10px" height="10px"}}
             Failed to save
-          {{else if @this.autosave.saveCard.isRunning}}
+          {{else if this.autosave.saveCard.isRunning}}
             {{svg-jar "warning" width="10px" height="10px"}}
             Saving...
           {{else}}

@@ -11,6 +11,8 @@
   class="card-editor__container"
   data-test-card-edit={{@card.canonicalURL}}
   data-test-card-patched={{stringify this.patchCard.isIdle}}
+  {{did-insert this.autosave.kickoff @card}}
+  {{did-update this.autosave.kickoff @card }}
 >
   <header class="card-editor__sticky-header">
     <h1 class="card-editor__title" data-test-card-edit-title>{{@card.csTitle}}</h1>
@@ -25,11 +27,11 @@
           Edit Mode {{svg-jar "x" width="10px" height="10px"}}
         </LinkTo>
       </div>
-      <div class="card-editor__autosave-indicator">
+      <div class="card-editor__autosave-indicator" data-test-card-edit-autosave-indicator>
         {{#if this.autosave.hasError}}
           {{svg-jar "error" width="10px" height="10px"}}
           <span>Failed to save</span>
-        {{else if @this.autosave.saveCard.isRunning}}
+        {{else if this.autosave.saveCard.isRunning}}
           {{svg-jar "warning" width="10px" height="10px"}}
           <span>Saving...</span>
         {{else}}
