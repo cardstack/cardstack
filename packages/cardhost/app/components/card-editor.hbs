@@ -14,15 +14,29 @@
 >
   <header class="card-editor__sticky-header">
     <h1 class="card-editor__title" data-test-card-edit-title>{{@card.csTitle}}</h1>
-    <div class="card-editor__controls">
-      <LinkTo
-        @route="cards.card.view"
-        @model={{@card.canonicalURL}}
-        @class="card-editor__controls-btn"
-        data-test-mode-indicator-link="edit"
-      >
-        Edit Mode {{svg-jar "x" width="10px" height="10px"}}
-      </LinkTo>
+    <div>
+      <div class="card-editor__controls">
+        <LinkTo
+          @route="cards.card.view"
+          @model={{@card.canonicalURL}}
+          @class="card-editor__controls-btn"
+          data-test-mode-indicator-link="edit"
+        >
+          Edit Mode {{svg-jar "x" width="10px" height="10px"}}
+        </LinkTo>
+      </div>
+      <div class="card-editor__autosave-indicator">
+        {{#if this.autosave.hasError}}
+          {{svg-jar "error" width="10px" height="10px"}}
+          <span>Failed to save</span>
+        {{else if @this.autosave.saveCard.isRunning}}
+          {{svg-jar "warning" width="10px" height="10px"}}
+          <span>Saving...</span>
+        {{else}}
+          {{svg-jar "success" width="10px" height="10px"}}
+          <span>Saved {{moment-from-now this.updated interval=30000}}</span>
+        {{/if}}
+      </div>
     </div>
   </header>
   <div class="card-editor__scroll-container">
