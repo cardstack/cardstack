@@ -1,5 +1,5 @@
 .card-editor__container {
-  --card-editor-header-height: 80px;
+  --card-editor-header-height: 90px;
   position: fixed;
   top: 30px;
   height: calc(100% - 30px);
@@ -28,6 +28,25 @@
   font-weight: 700;
   letter-spacing: 0;
   text-transform: capitalize;
+}
+
+.card-editor__autosave-indicator {
+  display: flex;
+  align-items: center;
+  color: var(--boxel-dark-purple);
+  font: var(--boxel-font-xs);
+  font-weight: 400;
+  letter-spacing: var(--boxel-lsp);
+}
+
+.card-editor__autosave-indicator svg {
+  margin-right: 5px;
+  width: 12px;
+  height: 12px;
+}
+
+.card-editor__controls + .card-editor__autosave-indicator {
+  margin-top: 5px;
 }
 
 .card-editor__controls {
