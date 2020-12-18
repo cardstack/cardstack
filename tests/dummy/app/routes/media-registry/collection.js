@@ -1,7 +1,12 @@
 import Route from '@ember/routing/route';
 import { fetchCollection } from 'dummy/media';
+import { titleize } from '@cardstack/boxel/utils/titleize';
 
 export default class MediaRegistryCollectionRoute extends Route {
+  titleToken(model) {
+    return `${titleize(model.title)} - Master Recordings`;
+  }
+
   async model({ collectionId }) {
     let { currentOrg, orgs } = this.modelFor('media-registry');
     const records = await fetchCollection('all_tracks_combined');

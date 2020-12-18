@@ -3,5 +3,6 @@ import { capitalize } from '@ember/string';
 
 export function titleize(val) {
   if (!val || typeOf(val) !== 'string' ) { return; }
-  return val.split(' ').map(el => capitalize(el)).join(' ');
+  let value = val.includes('-') ? val.split('-') : val.split(' ');
+  return value.map(el => capitalize(el)).join(' ');
 }

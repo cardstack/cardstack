@@ -2,6 +2,13 @@ import Route from '@ember/routing/route';
 import { set } from '@ember/object';
 
 export default class WorkflowOrgThreadRoute extends Route {
+  titleToken(model) {
+    if (!model.thread.title) {
+      return `Workflow - ${model.currentOrg.title}`;
+    }
+    return `${model.thread.title} - ${model.currentOrg.title}`;
+  }
+
   async model({ threadId }) {
     const { user, currentOrg, userOrgs, orgQueueCards } = this.modelFor('workflow.org');
     const { users, messages, workflows } = this.modelFor('workflow');

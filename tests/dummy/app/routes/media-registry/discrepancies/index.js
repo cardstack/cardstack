@@ -2,6 +2,10 @@ import Route from '@ember/routing/route';
 import DISCREPANCIES from 'dummy/data/discrepancies-list';
 
 export default class MediaRegistryDiscrepanciesIndexRoute extends Route {
+  titleToken() {
+    return 'Discrepancies';
+  }
+
   model() {
     let { currentOrg, orgs } = this.modelFor('media-registry');
     let { id } = currentOrg;

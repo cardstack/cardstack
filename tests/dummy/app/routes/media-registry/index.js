@@ -2,6 +2,10 @@ import Route from '@ember/routing/route';
 import { fetchCollection } from 'dummy/media';
 
 export default class MediaRegistryIndexRoute extends Route {
+  titleToken(model) {
+    return `${model.title}`;
+  }
+
   async model() {
     let { currentOrg, orgs } = this.modelFor('media-registry');
     let { id } = currentOrg;

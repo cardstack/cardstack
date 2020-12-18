@@ -1,7 +1,12 @@
 import Route from '@ember/routing/route';
 import { fetchCollection } from 'dummy/media';
+import { titleize } from '@cardstack/boxel/utils/titleize';
 
 export default class MediaRegistryMusicalWorksWorkRoute extends Route {
+  titleToken(model) {
+    return `${titleize(model.work.title)} (Musical Work)`;
+  }
+
   async model({ workId }) {
     const works = await fetchCollection('musical-works');
     const masters = await fetchCollection('all_tracks_combined');
