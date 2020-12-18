@@ -1,1 +1,4 @@
-export { default } from '@cardstack/boxel/components/field-modes/view';
+import Component from '@glimmer/component';
+
+export default class FieldViewModeComponent extends Component {
+}

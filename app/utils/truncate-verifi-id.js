@@ -1,1 +1,4 @@
-export { default, truncateVerifiId } from '@cardstack/boxel/utils/truncate-verifi-id';
+export function truncateVerifiId(id) {
+  if (!id) { return 'N/A'; }
+  return `${id.slice(0, 6)}...${id.slice(-4)}`;
+}

@@ -1,10 +1,7 @@
 {
   "name": "@cardstack/boxel",
   "version": "0.2.0",
-  "description": "The default blueprint for ember-cli addons.",
-  "keywords": [
-    "ember-addon"
-  ],
+  "description": "Cardstack Boxel Design System development app.",
   "repository": "https://github.com/cardstack/boxel",
   "license": "MIT",
   "author": "",
@@ -89,10 +86,6 @@
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
-  },
-  "ember-addon": {
-    "configPath": "tests/dummy/config",
-    "demoURL": "https://cardstack.github.io/boxel"
   },
   "release-it": {
     "plugins": {

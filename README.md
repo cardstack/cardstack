@@ -5,7 +5,7 @@ boxel
 
 
 Generating multiple image sizes / thumbs from
-`tests/dummy/public/media-registry/covers/`:
+`/public/media-registry/covers/`:
 
 Kill your ember server if it's running otherwise it'll try to rebuild for every
 size generated.

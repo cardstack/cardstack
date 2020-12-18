@@ -9,9 +9,9 @@ const sizes = {
   large: "1280x1024",
 }
 
-const coverDir = "tests/dummy/public/media-registry/covers";
+const coverDir = "public/media-registry/covers";
 
-const jsonToAddKeys = ["./tests/dummy/public/media-registry/api/custom_catalog_batch_f_table_1.json", "./tests/dummy/public/media-registry/api/all_tracks_combined.json"];
+const jsonToAddKeys = ["./public/media-registry/api/custom_catalog_batch_f_table_1.json", "./public/media-registry/api/all_tracks_combined.json"];
 
 (async function() {
 

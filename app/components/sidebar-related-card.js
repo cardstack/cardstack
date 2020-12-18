@@ -1,1 +1,0 @@
-export { default } from '@cardstack/boxel/components/sidebar-related-card';

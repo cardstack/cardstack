@@ -1,9 +1,9 @@
 'use strict';
 
-const EmberAddon = require('ember-cli/lib/broccoli/ember-addon');
+const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 
 module.exports = function(defaults) {
-  let app = new EmberAddon(defaults, {
+  let app = new EmberApp(defaults, {
     /*
       Leave jQuery out of this addon's own test suite & dummy app by default,
       so that the addon can be used in apps without jQuery. If you really need
@@ -11,7 +11,7 @@ module.exports = function(defaults) {
     */
     vendorFiles: { 'jquery.js': null, 'app-shims.js': null },
 
-    // our dummy app always uses faker, even in production
+    // our app always uses faker, even in production
     'ember-faker': { enabled: true },
 
     fingerprint: {
@@ -26,13 +26,6 @@ module.exports = function(defaults) {
     // Add options here
     'ember-power-select': { theme: false }
   });
-
-  /*
-    This build file specifies the options for the dummy test app of this
-    addon, located in `/tests/dummy`
-    This build file does *not* influence how the addon or the app using it
-    behave. You most likely want to be modifying `./index.js` or app's build file
-  */
 
   return app.toTree();
 };

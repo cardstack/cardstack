@@ -1,1 +1,4 @@
-export { default } from '@cardstack/boxel/components/field-modes/schema';
+import Component from '@glimmer/component';
+
+export default class FieldSchemaModeComponent extends Component {
+}

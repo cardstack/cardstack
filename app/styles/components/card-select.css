@@ -1,0 +1,114 @@
+.cs-card-select__container {
+  grid-column: 1 / -1;
+  width: 700px;
+  margin-left: -270px;
+}
+
+.cs-card-select {
+  height: auto;
+  border-radius: 10px;
+  background: none;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+}
+
+.cs-card-select .ember-power-select-trigger {
+  display: flex;
+  flex-flow: nowrap row;
+  align-items: center;
+  width: 100%;
+  height: 80px;
+  padding: 30px 20px 25px 50px;
+  background: url('/assets/images/icons/search.svg') center left 15px/18px 20px no-repeat;
+  background-color: white;
+  border: var(--boxel-border);
+  border-radius: 10px;
+  font: var(--boxel-font);
+  font-size: 20px;
+  letter-spacing: 0;
+  overflow: hidden;
+  outline: 0;
+}
+
+.cs-card-select .ember-power-select-typeahead-input {
+  padding: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  border: none;
+  outline: none;
+}
+
+.cs-card-select--dropdown {
+  margin-top: -10px;
+  padding: 10px;
+  background: white;
+  border-top: none;
+  border-right: var(--boxel-border);
+  border-left: var(--boxel-border);
+  border-bottom: var(--boxel-border);
+  border-radius: 10px;
+  box-shadow: 0 15px 15px rgba(0, 0, 0, 0.5);
+}
+
+.cs-card-select--dropdown .ember-power-select-options {
+  max-height: 50vh;
+  margin: 10px -10px -10px;
+  background-color: #f0f0f0;
+  text-align: left;
+}
+
+.cs-card-select--dropdown .ember-power-select-options > * + * {
+  margin-top: 15px;
+}
+
+.cs-card-select--dropdown .ember-power-select-option--search-message {
+  display: none;
+}
+
+.cs-card-select--dropdown .ember-power-select-option {
+  padding: 0 15px;
+  background: none;
+  color: black;
+}
+
+.cs-card-select--dropdown .ember-power-select-option:first-child {
+  padding-top: 15px;
+}
+
+.cs-card-select--dropdown .ember-power-select-option:last-child {
+  padding-bottom: 15px;
+}
+
+.cs-card-select--dropdown.ember-basic-dropdown-content--below.ember-basic-dropdown--transitioning-in {
+  animation: drop-fade-below var(--boxel-transition);
+}
+.cs-card-select--dropdown.ember-basic-dropdown-content--below.ember-basic-dropdown--transitioning-out {
+  animation: drop-fade-below var(--boxel-transition) reverse;
+}
+
+.cs-card-select--dropdown.ember-basic-dropdown-content--above.ember-basic-dropdown--transitioning-in {
+  animation: drop-fade-above var(--boxel-transition);
+}
+.cs-card-select--dropdown.ember-basic-dropdown-content--above.ember-basic-dropdown--transitioning-out {
+  animation: drop-fade-above var(--boxel-transition) reverse;
+}
+
+@keyframes drop-fade-below {
+  0%   {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes drop-fade-above {
+  0%   {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
