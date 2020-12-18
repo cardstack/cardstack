@@ -17,30 +17,48 @@
     </div>
   </header>
 
-  {{!-- Main Thread --}}
-  <div class="cardflow__thread">
-    {{#each @model.posts as |post|}}
-      <div class="cardflow__message">
-        <div class="cardflow__message-icon__profile cardflow__message-icon__profile--{{post.participantType}}" style={{css-url "background-image" post.sender.imgURL}} />
-        <div class="cardflow__message-info">
-          <div class="cardflow__message-sender">{{post.sender.title}}</div>
-          <time class="cardflow__message-time">{{moment-format post.datetime "MMM D, h:m A"}}</time>
-          <div class="cardflow__message-sender-role">{{if (eq post.participantType "bot") "Bot" post.sender.role}}</div>
-        </div>
-        <div />
-        <div class="cardflow__message-content">
-          {{post.content}}
-        </div>
-      </div>
-    {{/each}}
-
-    {{!-- Reply to message box --}}
-    {{#if (contains @model.user.id @model.thread.participant_ids)}}
-      <div class="cardflow__message">
-        <div class="cardflow__message-icon__profile" style={{css-url "background-image" @model.user.imgURL}} />
-        <Input @class="cardflow__reply-to field-renderer__input" @placeholder="Post a message to this thread"></Input>
-      </div>
+  {{!-- Main Area --}}
+  <div>
+    {{#if (and @activeTasks @tasksRoute)}}
+      <LinkTo @route={{@tasksRoute}} @class="cardflow__taskbar">
+        <div class="cardflow__taskbar-count">{{@activeTasks.length}} {{#if (eq this.activeTasks.length 1)}}task{{else}}tasks{{/if}} for this workflow</div>
+        {{#if @userTasks}}
+          <div class="cardflow__taskbar-label">
+            {{@userTasks.length}} assigned to me
+          </div>
+        {{/if}}
+        {{#if @assignedTasks}}
+          <div class="cardflow__taskbar-label cardflow__taskbar-label--assigned">
+            {{@assignedTasks.length}} pending action
+          </div>
+        {{/if}}
+      </LinkTo>
     {{/if}}
+
+    <div class="cardflow__thread">
+      {{#each @model.posts as |post|}}
+        <div class="cardflow__message">
+          <div class="cardflow__message-icon__profile cardflow__message-icon__profile--{{post.participantType}}" style={{css-url "background-image" post.sender.imgURL}} />
+          <div class="cardflow__message-info">
+            <div class="cardflow__message-sender">{{post.sender.title}}</div>
+            <time class="cardflow__message-time">{{moment-format post.datetime "MMM D, h:m A"}}</time>
+            <div class="cardflow__message-sender-role">{{if (eq post.participantType "bot") "Bot" post.sender.role}}</div>
+          </div>
+          <div />
+          <div class="cardflow__message-content">
+            {{post.content}}
+          </div>
+        </div>
+      {{/each}}
+
+      {{!-- Reply to message box --}}
+      {{#if (contains @model.user.id @model.thread.participant_ids)}}
+        <div class="cardflow__message">
+          <div class="cardflow__message-icon__profile" style={{css-url "background-image" @model.user.imgURL}} />
+          <Input @class="cardflow__reply-to field-renderer__input" @placeholder="Post a message to this thread"></Input>
+        </div>
+      {{/if}}
+    </div>
   </div>
 
   {{!-- Right Sidebar --}}

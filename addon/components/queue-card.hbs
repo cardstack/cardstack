@@ -23,15 +23,15 @@
 
   {{#if (or @card.tasks this.progress)}}
     <footer class="queue-card__footer">
-      <div>
-        {{#if @card.awaitingResponse}}
-          <div class="queue-card__task-label queue-card__task-label--awaiting-reply">
-            Awaiting Response
+      <div class="queue-card__task-labels">
+        {{#if this.userTasks}}
+          <div class="queue-card__task-label">
+            {{this.userTasks.length}} {{#if (eq this.userTasks.length 1)}}Task{{else}}Tasks{{/if}}
           </div>
         {{/if}}
-        {{#if (and @card.tasks @card.tasks.length)}}
-          <div class="queue-card__task-label">
-            {{@card.tasks.length}} {{#if (eq @card.tasks.length 1)}}Task{{else}}Tasks{{/if}}
+        {{#if this.assignedTasks}}
+          <div class="queue-card__task-label queue-card__task-label--awaiting-reply">
+            {{this.assignedTasks.length}} pending
           </div>
         {{/if}}
       </div>

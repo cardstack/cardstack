@@ -11,6 +11,9 @@
 @import 'media-registry/discrepancy.css';
 
 @import 'workflow.css';
+@import 'workflow-components/cardflow.css';
+@import 'workflow-components/tasklist.css';
+@import 'workflow-components/tasklist-table.css';
 
 * {
   box-sizing: border-box;

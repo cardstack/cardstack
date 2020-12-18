@@ -8,12 +8,12 @@ export default class CardflowComponent extends Component {
   @tracked actionSteps = this.args.actionSteps;
   @tracked lastUpdated = this.args.lastUpdated;
 
-  get thread() {
-    return this.args.model.thread;
-  }
-
   get user() {
     return this.args.model.user;
+  }
+
+  get thread() {
+    return this.args.model.thread;
   }
 
   get participants() {

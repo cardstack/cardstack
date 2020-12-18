@@ -36,6 +36,7 @@
       {{#each this.unreadCards as |card|}}
         <QueueCard
           @card={{card}}
+          @user={{@model.user}}
           @selectCard={{fn @selectCard card}}
           @currentCard={{@currentCard}}
           @currentMilestone={{@currentMilestone}}
@@ -54,6 +55,7 @@
       {{#each this.actionReqCards as |card|}}
         <QueueCard
           @card={{card}}
+          @user={{@model.user}}
           @selectCard={{fn @selectCard card}}
           @currentCard={{@currentCard}}
         />
@@ -70,6 +72,7 @@
       {{#each this.recentCards as |card|}}
         <QueueCard
           @card={{card}}
+          @user={{@model.user}}
           @selectCard={{fn @selectCard card}}
           @currentCard={{@currentCard}}
         />

@@ -10,7 +10,9 @@ class Router extends EmberRouterScroll {
 Router.map(function() {
   this.route('workflow', function() {
     this.route('org', { path: '/:orgId' }, function() {
-      this.route('thread', { path: '/:threadId' });
+      this.route('thread', { path: '/:threadId' }, function() {
+        this.route('tasks');
+      });
     });
   });
   this.route('home', { path: 'media-registry' });

@@ -1,0 +1,50 @@
+<EmberTable @class="tasklist-table" as |t|>
+  <t.head
+    @columns={{@columns}}
+    @class="tasklist-table__header" as |h|
+  >
+    <h.row as |r|>
+      <r.cell as |column|>
+        <span class="tasklist-table__header-cell">
+          {{column.name}}
+        </span>
+      </r.cell>
+    </h.row>
+  </t.head>
+
+  <t.body
+    @rows={{@rows}}
+    @estimateRowHeight={{50}}
+    @class="tasklist-table__body" as |b|
+  >
+    <b.row as |r|>
+      <r.cell as |cell column|>
+        <div class="tasklist-table__cell">
+          <div class="tasklist-table__cell-value">
+            {{#if cell}}
+              {{#if (eq column.type "date")}}
+                {{#if @isCompleted}}
+                  {{moment-from cell @now}}
+                {{else}}
+                  {{#let (moment-diff (moment-format @now "YYYY-MM-DD") cell precision="days") as |diff|}}
+                    {{#if (eq diff 0)}}
+                      <span class="tasklist-table__cell-important">Today</span>
+                    {{else if (eq diff 1)}}
+                      <span class="tasklist-table__cell-important">Tomorrow</span>
+                    {{else}}
+                      {{moment-format cell "ddd, MMM D"}}
+                    {{/if}}
+                  {{/let}}
+                {{/if}}
+              {{else}}
+                {{cell}}
+              {{/if}}
+            {{else}}
+              --
+            {{/if}}
+          </div>
+        </div>
+      </r.cell>
+    </b.row>
+  </t.body>
+</EmberTable>
