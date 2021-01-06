@@ -1,8 +1,3 @@
-.wave-player-template {
-  margin: 2em;
-  max-width: 450px;
-}
-
 .wave-player {
   display: inline-flex;
   align-items: center;

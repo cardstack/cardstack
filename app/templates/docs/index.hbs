@@ -1,0 +1,12 @@
+<FreestyleGuide
+  @title='Boxel Components'
+  @subtitle='Living Component Documentation'
+>
+  <FreestyleSection @name="Components" as |Section|>
+    {{#each this.usageComponents as |componentName|}}
+      <Section.subsection @name={{componentName}}>
+        {{component (concat componentName '/usage')}}
+      </Section.subsection>
+    {{/each}}
+  </FreestyleSection>
+</FreestyleGuide>

@@ -6,9 +6,6 @@ import { dropTask } from 'ember-concurrency-decorators';
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 
 export default class WavePlayerComponent extends Component {
-
-  url = '/assets/demo_flac.flac';
-
   width = 600;
   height = 152;
   barWidth = 5;
@@ -42,8 +39,9 @@ export default class WavePlayerComponent extends Component {
   @action
   async setupPlayer(canvas) {
     this.canvas = canvas;
+    let { url } = this.args;
 
-    let response = await fetch(this.url);
+    let response = await fetch(url);
 
     let buffer = await response.arrayBuffer();
     let audioContext = new AudioContext();
@@ -71,7 +69,7 @@ export default class WavePlayerComponent extends Component {
     }
 
     this.draw();
-    this.setupAudio(this.url);
+    this.setupAudio(url);
   }
 
   draw() {
