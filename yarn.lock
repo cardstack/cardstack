@@ -7593,9 +7593,10 @@ ember-basic-dropdown@^3.0.1:
     ember-maybe-in-element "^0.4.0"
     ember-truth-helpers "2.1.0"
 
-ember-blurhash@lukemelia/ember-blurhash#3345bc2d:
-  version "0.0.3"
-  resolved "https://codeload.github.com/lukemelia/ember-blurhash/tar.gz/3345bc2d68411ec214122a6720f1b84fa4242664"
+ember-blurhash@~0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/ember-blurhash/-/ember-blurhash-0.0.5.tgz#bec5c54f84b9be3c17a3c264889ed957cdcba2f0"
+  integrity sha512-VeEykIcLnOPo8HtwWQBesqzItFz+K503SOGQW44piAzUBlE1os5cTYWxwbSYrF6qH5JWp+yZFe5dix50484Dsg==
   dependencies:
     blurhash "^1.1.3"
     ember-auto-import "^1.10.1"
