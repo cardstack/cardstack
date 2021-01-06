@@ -100,5 +100,9 @@
     "github": {
       "release": true
     }
+  },
+  "volta": {
+    "node": "12.20.1",
+    "yarn": "1.22.10"
   }
 }
