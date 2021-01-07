@@ -1,0 +1,8 @@
+.toc {
+  margin: 2em;
+}
+
+.toc__list {
+  padding-left: 2em;
+  list-style-type: circle;
+}
