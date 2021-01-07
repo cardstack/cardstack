@@ -3,12 +3,12 @@ export default [
       id: 'bunny_records',
       type: 'label',
       title: 'Bunny Records',
-      iconURL: "/media-registry/button-bunny-records.svg",
-      logoURL: '/media-registry/bunny-logo.svg',
+      iconURL: "/boxel/media-registry/button-bunny-records.svg",
+      logoURL: '/boxel/media-registry/bunny-logo.svg',
       user: {
         title: "Lisa Track",
         role: "Administrator",
-        imgURL: "/media-registry/profiles/Lisa-Track.jpg",
+        imgURL: "/boxel/media-registry/profiles/Lisa-Track.jpg",
       },
       queueCards: [
         {
@@ -82,12 +82,12 @@ export default [
       id: 'crd_records',
       type: 'label',
       title: 'CRD Records',
-      iconURL: "/media-registry/button-crd-records.svg",
-      logoURL: '/media-registry/crd_records_logo.svg',
+      iconURL: "/boxel/media-registry/button-crd-records.svg",
+      logoURL: '/boxel/media-registry/crd_records_logo.svg',
       user: {
         title: "Steve Rights",
         role: "Catalog Manager",
-        imgURL: "/media-registry/profiles/Steve-Rights.jpg"
+        imgURL: "/boxel/media-registry/profiles/Steve-Rights.jpg"
       },
       queueCards: [
         {
@@ -137,15 +137,15 @@ export default [
       id: 'warner-music-group',
       type: 'label',
       title: 'Warner Music Group',
-      iconURL: '/media-registry/wmg-logo.svg',
-      logoURL: '/media-registry/wmg-logo.svg'
+      iconURL: '/boxel/media-registry/wmg-logo.svg',
+      logoURL: '/boxel/media-registry/wmg-logo.svg'
     },
     {
       id: 'allegro-music-publishing',
       type: 'publisher',
       title: 'Allegro Music Publishing',
-      iconURL: '/media-registry/amp-logo.png',
-      logoURL: '/media-registry/amp-logo.png',
+      iconURL: '/boxel/media-registry/amp-logo.png',
+      logoURL: '/boxel/media-registry/amp-logo.png',
       territory: 'worldwide',
       ipi: '00170191322',
       website: 'www.allegromusic.com',
@@ -156,8 +156,8 @@ export default [
       id: 'warner-chappell-music',
       type: 'publisher',
       title: 'Warner Chappell Music',
-      iconURL: '/media-registry/wcm-logo.png',
-      logoURL: '/media-registry/wcm-logo.png',
+      iconURL: '/boxel/media-registry/wcm-logo.png',
+      logoURL: '/boxel/media-registry/wcm-logo.png',
       territory: 'worldwide',
       ipi: '00160187388',
       website: 'www.warnerchappell.com',
@@ -167,14 +167,14 @@ export default [
     {
       id: 'global-music-rights',
       title: 'Global Music Rights',
-      iconURL: '/media-registry/gmr-logo.svg',
-      logoURL: '/media-registry/gmr-logo.svg',
+      iconURL: '/boxel/media-registry/gmr-logo.svg',
+      logoURL: '/boxel/media-registry/gmr-logo.svg',
       musicalWorkOnly: true
     },
     {
       id: 'deezer',
       title: 'Deezer',
-      iconURL: '/media-registry/deezer-logo.png',
-      logoURL: '/media-registry/deezer-logo.png'
+      iconURL: '/boxel/media-registry/deezer-logo.png',
+      logoURL: '/boxel/media-registry/deezer-logo.png'
     },
   ];

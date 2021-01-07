@@ -32,7 +32,7 @@
 .boxel-card--blank-card {
   width: 100%;
   height: 150px;
-  background: url('/media-registry/placeholders/blank-card.png') center/contain no-repeat;
+  background: url('/boxel/media-registry/placeholders/blank-card.png') center/contain no-repeat;
 }
 
 .boxel-card__header {
@@ -55,7 +55,7 @@
 }
 
 .boxel-card__expand-overlay:hover + .boxel-card > .boxel-card__header {
-  background-image: url("/assets/images/icons/expand.svg");
+  background-image: url("/boxel/assets/images/icons/expand.svg");
   background-position: top 7px right 7px;
   background-size: 16px 16px;
   background-repeat: no-repeat;
@@ -145,7 +145,7 @@
 .boxel-card__profile-org {
   width: 26px;
   height: 26px;
-  background: url('/media-registry/verifi-logo.svg') center/26px 26px no-repeat;
+  background: url('/boxel/media-registry/verifi-logo.svg') center/26px 26px no-repeat;
   position: absolute;
   top: 10px;
   left: 10px;
@@ -153,7 +153,7 @@
 
 .boxel-card--profile .boxel-card__bg-img {
   border-radius: 100px;
-  background-image: url('/media-registry/placeholders/profile.svg');
+  background-image: url('/boxel/media-registry/placeholders/profile.svg');
 }
 
 .boxel-card--audio .boxel-card__inner {
@@ -161,7 +161,7 @@
 }
 
 .file-card__icon .boxel-card__inner {
-  background-image: url('/media-registry/file.svg');
+  background-image: url('/boxel/media-registry/file.svg');
   background-position: center left 15px;
   background-repeat: no-repeat;
   background-size: 40px 40px;
@@ -332,7 +332,7 @@
 }
 
 .territory-card--worldwide .boxel-card__inner {
-  background-image: url('/assets/images/icons/world.svg');
+  background-image: url('/boxel/assets/images/icons/world.svg');
   background-position: left 18px center;
   background-size: 15px 15px;
   background-repeat: no-repeat;

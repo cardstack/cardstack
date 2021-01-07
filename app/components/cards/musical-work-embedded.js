@@ -15,7 +15,7 @@ export default class MusicalWorkEmbedded extends Component {
     return {
       id: card?.iswc,
       type: 'musical-work',
-      imgURL: '/media-registry/musical-work.svg',
+      imgURL: '/boxel/media-registry/musical-work.svg',
       title: titleize(card?.title),
       description: card.composer ? `by ${card?.artist}, ${card?.composer}` : `by ${card?.description}`,
       fields: [

@@ -109,10 +109,10 @@ export default [
           "title": "Fall Is Back",
           "artist": "Pia Midina",
           "verifi_id": "0x9b2138a6c17e6da2d9cd3303fe7b26079231184ac2f1b6537a11e2301b74ca26",
-          "cover_art": "media-registry/old-album-art.png",
-          "cover_art_thumb": "media-registry/old-album-art.png",
-          "cover_art_medium": "media-registry/old-album-art.png",
-          "cover_art_large": "media-registry/old-album-art.png",
+          "cover_art": "/boxel/media-registry/old-album-art.png",
+          "cover_art_thumb": "/boxel/media-registry/old-album-art.png",
+          "cover_art_medium": "/boxel/media-registry/old-album-art.png",
+          "cover_art_large": "/boxel/media-registry/old-album-art.png",
           "fields": {
             "title": "Fall Is Back",
             "version_type": "Recording",
@@ -126,7 +126,7 @@ export default [
               ]
             },
             "genre": ["Alternative", "Dream Pop"],
-            "album_art": "media-registry/old-album-art.png",
+            "album_art": "/boxel/media-registry/old-album-art.png",
             "release_date": "2020",
             "label": "Bunny Records",
             "copyright_notice": "℗ 2020 Bunny Records",
@@ -148,10 +148,10 @@ export default [
           "title": "The Leaves Are Changing Color",
           "artist": "Pia Midina",
           "verifi_id": "0x9b2138a6c17e6da2d9cd3303fe7b26079231184ac2f1b6537a11e2301b74ca26",
-          "cover_art": "media-registry/covers/Autumn-Leaves.jpg",
-          "cover_art_thumb": "media-registry/covers/thumb/Autumn-Leaves.jpg",
-          "cover_art_medium": "media-registry/covers/medium/Autumn-Leaves.jpg",
-          "cover_art_large": "media-registry/covers/large/Autumn-Leaves.jpg",
+          "cover_art": "/boxel/media-registry/covers/Autumn-Leaves.jpg",
+          "cover_art_thumb": "/boxel/media-registry/covers/thumb/Autumn-Leaves.jpg",
+          "cover_art_medium": "/boxel/media-registry/covers/medium/Autumn-Leaves.jpg",
+          "cover_art_large": "/boxel/media-registry/covers/large/Autumn-Leaves.jpg",
           "fields": {
             "title": "The Leaves Are Changing Color",
             "version_type": "Recording",
@@ -164,7 +164,7 @@ export default [
               ]
             },
             "genre": ["Alternative", "Dream Pop"],
-            "album_art": "media-registry/covers/medium/Autumn-Leaves.jpg",
+            "album_art": "/boxel/media-registry/covers/medium/Autumn-Leaves.jpg",
             "release_date": "2020",
             "label": "Bunny Records",
             "copyright_notice": "℗ 2020 Bunny Records",
@@ -186,10 +186,10 @@ export default [
           "title": "The Leaves Are Changing Color",
           "artist": "Pia Midina",
           "verifi_id": "0x9b2138a6c17e6da2d9cd3303fe7b26079231184ac2f1b6537a11e2301b74ca26",
-          "cover_art": "media-registry/covers/Autumn-Leaves.jpg",
-          "cover_art_thumb": "media-registry/covers/thumb/Autumn-Leaves.jpg",
-          "cover_art_medium": "media-registry/covers/medium/Autumn-Leaves.jpg",
-          "cover_art_large": "media-registry/covers/large/Autumn-Leaves.jpg",
+          "cover_art": "/boxel/media-registry/covers/Autumn-Leaves.jpg",
+          "cover_art_thumb": "/boxel/media-registry/covers/thumb/Autumn-Leaves.jpg",
+          "cover_art_medium": "/boxel/media-registry/covers/medium/Autumn-Leaves.jpg",
+          "cover_art_large": "/boxel/media-registry/covers/large/Autumn-Leaves.jpg",
           "fields": {
             "title": "The Leaves Are Changing Color",
             "version_type": "Recording",
@@ -224,7 +224,7 @@ export default [
                 ]
               }
             },
-            "album_art": "media-registry/covers/medium/Autumn-Leaves.jpg",
+            "album_art": "/boxel/media-registry/covers/medium/Autumn-Leaves.jpg",
             "release_date": {
               "type": "collection",
               "value": [
@@ -258,10 +258,10 @@ export default [
           "title": "The Leaves Are Changing Color",
           "artist": "Pia Midina",
           "verifi_id": "0x9b2138a6c17e6da2d9cd3303fe7b26079231184ac2f1b6537a11e2301b74ca26",
-          "cover_art": "media-registry/covers/Autumn-Leaves.jpg",
-          "cover_art_thumb": "media-registry/covers/thumb/Autumn-Leaves.jpg",
-          "cover_art_medium": "media-registry/covers/medium/Autumn-Leaves.jpg",
-          "cover_art_large": "media-registry/covers/large/Autumn-Leaves.jpg",
+          "cover_art": "/boxel/media-registry/covers/Autumn-Leaves.jpg",
+          "cover_art_thumb": "/boxel/media-registry/covers/thumb/Autumn-Leaves.jpg",
+          "cover_art_medium": "/boxel/media-registry/covers/medium/Autumn-Leaves.jpg",
+          "cover_art_large": "/boxel/media-registry/covers/large/Autumn-Leaves.jpg",
           "fields": {
             "title": "The Leaves Are Changing Color",
             "alternate_title": "Colorful Leaves",
@@ -301,7 +301,7 @@ export default [
                 ]
               }
             },
-            "album_art": "media-registry/covers/medium/Autumn-Leaves.jpg",
+            "album_art": "/boxel/media-registry/covers/medium/Autumn-Leaves.jpg",
             "release_date": {
               "type": "collection",
               "value": [

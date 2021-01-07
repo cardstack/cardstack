@@ -15,7 +15,7 @@ export default class MediaRegistryMusicalWorksWorkVersionController extends Cont
     if (!this.model) { return null; }
 
     return {
-      image: '/media-registry/musical-work.svg',
+      image: '/boxel/media-registry/musical-work.svg',
       title: this.work.title || 'N/A',
       description: this.work.description ? `by ${this.work.description}` : null
     }

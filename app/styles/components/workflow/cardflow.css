@@ -102,7 +102,7 @@
   height: 30px;
   border: 1px solid white;
   border-radius: 100px;
-  background-image: url('/media-registry/placeholders/profile.svg');
+  background-image: url('/boxel/media-registry/placeholders/profile.svg');
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -145,7 +145,7 @@
 
 .cardflow__taskbar-count {
   padding-left: 22px;
-  background: url('/assets/images/icons/task.svg') left center/15px 15px no-repeat;
+  background: url('/boxel/assets/images/icons/task.svg') left center/15px 15px no-repeat;
 }
 
 .cardflow__taskbar-label {
@@ -250,7 +250,7 @@
 .cardflow__reply-to.field-renderer__input {
   padding-right: 80px;
   height: 45px;
-  background-image: url("/assets/images/icons/plus.svg"), url("/assets/images/icons/emoji.svg");
+  background-image: url("/boxel/assets/images/icons/plus.svg"), url("/boxel/assets/images/icons/emoji.svg");
   background-position: right 55px center, right 15px center;
   background-repeat: no-repeat, no-repeat;
   background-size: 15px 15px, 20px 20px;
@@ -405,7 +405,7 @@
   justify-self: center;
   width: 30px;
   height: 30px;
-  background-image: url('/media-registry/placeholders/profile.svg');
+  background-image: url('/boxel/media-registry/placeholders/profile.svg');
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;

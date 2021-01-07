@@ -4,7 +4,7 @@ const VALENTINO_SOLANO_V1 = {
   "id": "valentino-solano",
   "type": "participant",
   "title": "Valentino Solano",
-  "imgURL": "/media-registry/profiles/thumb/Valentino-Solano.jpg",
+  "imgURL": "/boxel/media-registry/profiles/thumb/Valentino-Solano.jpg",
   "ipi": "00815723492",
   "pro": "Global Music Rights",
   "email": "valentino@valsolanomusic.com",
@@ -42,7 +42,7 @@ export default {
     type: 'musical-work',
     owner: 'Warner Chappell Music',
     ownerId: 'warner-chappell-music',
-    iconURL: '/media-registry/wcm-logo.png',
+    iconURL: '/boxel/media-registry/wcm-logo.png',
     datetime: '2019-11-11T13:54',
     isolatedFields: [
       {
@@ -127,7 +127,7 @@ export default {
     version: "v3",
     owner: 'Allegro Music Publishing',
     ownerId: 'allegro-music-publishing',
-    iconURL: '/media-registry/amp-logo.png',
+    iconURL: '/boxel/media-registry/amp-logo.png',
     datetime: '2020-05-18T11:36',
     isolatedFields: [
       {

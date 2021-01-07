@@ -262,7 +262,7 @@
                 {{moment-format @field.value "MMM DD, YYYY" "YYYY-MM-DD"}}
               {{else if (eq @field.type "image")}}
                 {{!-- Make this more generic --}}
-                <img src={{or @field.value "/media-registry/album_art.svg"}} alt="cover art" width="260" height="260" />
+                <img src={{or @field.value "/boxel/media-registry/album_art.svg"}} alt="cover art" width="260" height="260" />
               {{else}}
                 {{@field.value}}
               {{/if}}

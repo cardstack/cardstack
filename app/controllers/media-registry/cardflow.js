@@ -18,11 +18,11 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
     title: 'Batch F',
     count: '16',
     selected_art: [
-      "media-registry/covers/thumb/Sunlight.jpg",
-      "media-registry/covers/thumb/Change-Is-Good.jpg",
-      "media-registry/covers/thumb/Full-Moon.jpg",
-      "media-registry/covers/thumb/Love-Never-Dies.jpg",
-      "media-registry/covers/thumb/Animals.jpg"
+      "/boxel/media-registry/covers/thumb/Sunlight.jpg",
+      "/boxel/media-registry/covers/thumb/Change-Is-Good.jpg",
+      "/boxel/media-registry/covers/thumb/Full-Moon.jpg",
+      "/boxel/media-registry/covers/thumb/Love-Never-Dies.jpg",
+      "/boxel/media-registry/covers/thumb/Animals.jpg"
     ]
   }
 

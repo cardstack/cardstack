@@ -136,7 +136,7 @@
 .cardflow-action-card__list-item--checkbox.icon-btn {
   width: 30px;
   height: 30px;
-  background-image: url('/assets/images/icons/checkbox-primary.svg');
+  background-image: url('/boxel/assets/images/icons/checkbox-primary.svg');
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -155,7 +155,7 @@
 }
 
 .cardflow-action-card__list-item.completed .cardflow-action-card__list-item--checkbox {
-  background-image: url('/assets/images/icons/checkbox-primary-checked.svg');
+  background-image: url('/boxel/assets/images/icons/checkbox-primary-checked.svg');
 }
 
 .cardflow-action-card__icon-btn.icon-btn {
@@ -169,7 +169,7 @@
 /* Proposal announcement card */
 .cardflow-proposal-announcement-card > .cardflow-card__header {
   padding: 30px 30px 15px 90px;
-  background: url('/media-registry/catalog-transfer.svg') left 25px top 21px/50px 40px no-repeat;
+  background: url('/boxel/media-registry/catalog-transfer.svg') left 25px top 21px/50px 40px no-repeat;
 }
 
 .cardflow-proposal-announcement-card > .cardflow-card__section {
@@ -193,7 +193,7 @@
 .catalog-summary-card__img {
   width: 60px;
   height: 50px;
-  background: url("/media-registry/batch-f.png") center/contain no-repeat;
+  background: url("/boxel/media-registry/batch-f.png") center/contain no-repeat;
 }
 
 .catalog-summary-card__desc {
@@ -226,7 +226,7 @@
 
 .cardflow__modal-header {
   padding: 30px 30px 30px 60px;
-  background: url('/assets/images/icons/message.svg') left 30px center/18px 18px no-repeat;
+  background: url('/boxel/assets/images/icons/message.svg') left 30px center/18px 18px no-repeat;
   color: var(--boxel-light);
   font: var(--boxel-font);
   font-weight: 600;

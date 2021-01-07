@@ -8,7 +8,7 @@ export default class RegistrationEmbedded extends Component {
       return {
         id: verifi_id,
         type: 'registration',
-        imgURL: '/media-registry/verifi-logo.svg',
+        imgURL: '/boxel/media-registry/verifi-logo.svg',
         title: 'Verifi Registry',
         description: verifi_id,
         fields: [

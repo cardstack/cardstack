@@ -13,7 +13,7 @@ const VALENTINO_SOLANO_V1 = {
   "id": "valentino-solano",
   "type": "participant",
   "title": "Valentino Solano",
-  "imgURL": "/media-registry/profiles/thumb/Valentino-Solano.jpg",
+  "imgURL": "/boxel/media-registry/profiles/thumb/Valentino-Solano.jpg",
   "ipi": "00815723492",
   "pro": "Global Music Rights",
   "email": "valentino@valsolanomusic.com",
@@ -55,7 +55,7 @@ export default [
     "type": "musical-work",
     "owner": "Warner Music Group",
     "ownerId": "wmg",
-    "iconURL": "/media-registry/wmg-logo.svg",
+    "iconURL": "/boxel/media-registry/wmg-logo.svg",
     "datetime": "2020-04-08T10:45",
     "isolatedFields": [
       {
@@ -108,7 +108,7 @@ export default [
     "type": "musical-work",
     "owner": "Warner Music Group",
     "ownerId": "wmg",
-    "iconURL": "/media-registry/wmg-logo.svg",
+    "iconURL": "/boxel/media-registry/wmg-logo.svg",
     "datetime": "2019-11-11T13:54",
     "isolatedFields": [
       {
@@ -187,7 +187,7 @@ export default [
     "type": "musical-work",
     "owner": "Warner Music Group",
     "ownerId": "wmg",
-    "iconURL": "/media-registry/wmg-logo.svg",
+    "iconURL": "/boxel/media-registry/wmg-logo.svg",
     "datetime": "2020-06-09T18:10",
     "isolatedFields": [
       {
@@ -273,7 +273,7 @@ export default [
     "type": "musical-work",
     "owner": "Allegro Music Publishing",
     "ownerId": "amp",
-    "iconURL": "/media-registry/amp-logo.png",
+    "iconURL": "/boxel/media-registry/amp-logo.png",
     "datetime": "2020-05-18T11:36",
     "isolatedFields": [
       {
@@ -359,7 +359,7 @@ export default [
     "type": "musical-work",
     "owner": "Warner Chappell Music",
     "ownerId": "wcm",
-    "iconURL": "/media-registry/wcm-logo.png",
+    "iconURL": "/boxel/media-registry/wcm-logo.png",
     "datetime": "2019-11-11T13:54",
     "isolatedFields": [
       {
@@ -438,7 +438,7 @@ export default [
     "type": "musical-work",
     "owner": "Warner Chappell Music",
     "ownerId": "wcm",
-    "iconURL": "/media-registry/wcm-logo.png",
+    "iconURL": "/boxel/media-registry/wcm-logo.png",
     "datetime": "2020-05-18T15:31",
     "isolatedFields": [
       {
@@ -522,7 +522,7 @@ export default [
     "type": "musical-work",
     "owner": "Warner Chappell Music",
     "ownerId": "wcm",
-    "iconURL": "/media-registry/wcm-logo.png",
+    "iconURL": "/boxel/media-registry/wcm-logo.png",
     "datetime": "2020-06-09T18:10",
     "isolatedFields": [
       {
@@ -608,7 +608,7 @@ export default [
     "type": "musical-work",
     "owner": "Global Music Rights",
     "ownerId": "gmr",
-    "iconURL": "/media-registry/gmr-logo.svg",
+    "iconURL": "/boxel/media-registry/gmr-logo.svg",
     "datetime": "2020-06-09T16:18",
     "isolatedFields": [
       {
@@ -694,7 +694,7 @@ export default [
     "type": "musical-work",
     "owner": "Deezer",
     "ownerId": "dzr",
-    "iconURL": "/media-registry/deezer-logo.png",
+    "iconURL": "/boxel/media-registry/deezer-logo.png",
     "datetime": "2020-07-10T14:24",
     "isolatedFields": [
       {
@@ -740,7 +740,7 @@ export default [
     "type": "musical-work",
     "owner": "Deezer",
     "ownerId": "dzr",
-    "iconURL": "/media-registry/deezer-logo.png",
+    "iconURL": "/boxel/media-registry/deezer-logo.png",
     "datetime": "2020-06-09T18:10",
     "isolatedFields": [
       {

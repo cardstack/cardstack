@@ -61,13 +61,13 @@
   width: auto;
   height: 40px;
   padding-left: 38px;
-  background: url('/assets/images/icons/edit-box.svg') left 14px center/14px 14px no-repeat;
+  background: url('/boxel/assets/images/icons/edit-box.svg') left 14px center/14px 14px no-repeat;
   text-align: left;
 }
 .version-history {
   width: 40px;
   height: 40px;
-  background: url('/assets/images/icons/gear.svg') center/17px 17px no-repeat;
+  background: url('/boxel/assets/images/icons/gear.svg') center/17px 17px no-repeat;
 }
 
 .media-collection__title-row {
@@ -172,15 +172,15 @@
 }
 
 .media-collection__btn.list {
-  background-image: url('/assets/images/icons/list.svg');
+  background-image: url('/boxel/assets/images/icons/list.svg');
 }
 
 .media-collection__btn.grid {
-  background-image: url('/assets/images/icons/grid.svg');
+  background-image: url('/boxel/assets/images/icons/grid.svg');
 }
 
 .media-collection__btn.table {
-  background-image: url('/assets/images/icons/table.svg');
+  background-image: url('/boxel/assets/images/icons/table.svg');
 }
 
 .isolated-collection__table-list-header {
@@ -395,7 +395,7 @@
 }
 
 .media-collection__sort .media-collection__sort-dropdown__active::before {
-  content: url('/assets/images/icons/checkmark-highlighted.svg');
+  content: url('/boxel/assets/images/icons/checkmark-highlighted.svg');
   position: absolute;
   left: -10px;
 }

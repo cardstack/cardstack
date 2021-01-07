@@ -7,7 +7,7 @@ export default class MediaRegistryMusicalWorksWorkController extends Controller 
   get headerFields() {
     if (!this.work) { return null; }
     return {
-      image: '/media-registry/musical-work.svg',
+      image: '/boxel/media-registry/musical-work.svg',
       title: this.work.title || 'N/A',
       description: this.work.description ? `by ${this.work.description}` : null
     }
