@@ -1,5 +1,6 @@
 'use strict';
 
+const { Webpack } = require('@embroider/webpack');
 const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 
 module.exports = function(defaults) {
@@ -27,5 +28,14 @@ module.exports = function(defaults) {
     'ember-power-select': { theme: false }
   });
 
-  return app.toTree();
+  return require('@embroider/compat').compatBuild(app, Webpack, {
+    // extraPublicTrees: [extraTreeHere]
+    staticAddonTestSupportTrees: true,
+    staticAddonTrees: true,
+    // staticHelpers: true,
+    // staticComponents: true,
+    // packagerOptions: {
+    //    webpackConfig: { }
+    // }
+  });
 };
