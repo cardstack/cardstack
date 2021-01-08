@@ -11,6 +11,8 @@ jobs:
     - uses: rwjblue/setup-volta@v1
       with:
         node-version: '14'
+    - name: "Global yarn"
+      run: volta install yarn
     - name: Find yarn cache
       id: yarn-cache-path
       run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -36,6 +38,8 @@ jobs:
     - uses: rwjblue/setup-volta@v1
       with:
         node-version: '14'
+    - name: "Global yarn"
+      run: volta install yarn
     - name: Find yarn cache
       id: yarn-cache-path
       run: echo "::set-output name=dir::$(yarn cache dir)"
