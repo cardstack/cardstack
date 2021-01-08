@@ -1,0 +1,19 @@
+{
+  "name": "@cardstack/server",
+  "version": "0.0.0",
+  "keywords": [],
+  "author": "Edward Faulkner <edward@eaf4.com>",
+  "repository": "https://github.com/cardstack/cardstack",
+  "description": "Stock API server for the Cardstack tech stack.",
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": ">= 14"
+  },
+  "scripts": {
+    "start": ""
+  },
+  "volta": {
+    "node": "14.15.4"
+  }
+}

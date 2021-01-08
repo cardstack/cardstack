@@ -1,0 +1,15 @@
+{
+  "name": "cardstack",
+  "version": "0.0.0",
+  "description": "Cardstack suite for ambitious applications.",
+  "repository": "https://github.com/cardstack/cardstack",
+  "author": "Edward Faulkner <edward@eaf4.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">= 14"
+  },
+  "private": true,
+  "volta": {
+    "node": "14.15.4"
+  }
+}
