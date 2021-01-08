@@ -9,7 +9,21 @@
     "node": ">= 14"
   },
   "private": true,
+  "scripts": {
+    "rm_node_modules": "rm -rf node_modules cardhost/node_modules server/node_modules cards/*/node_modules"
+  },
+  "workspaces": {
+    "packages": [
+      "cardhost",
+      "server",
+      "cards/*"
+    ],
+    "nohoist": [
+      "**/@ember/string"
+    ]
+  },
   "volta": {
-    "node": "14.15.4"
+    "node": "14.15.4",
+    "yarn": "1.22.5"
   }
 }
