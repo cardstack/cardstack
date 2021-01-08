@@ -14,9 +14,7 @@ You will need the following things properly installed on your computer.
 
 ## Installation
 
-* `git clone <repository-url>` this repository
-* `cd cardhost`
-* `npm install`
+See the README.md in the parent directory, because this ember app is embedded in a pnpm monorepo.
 
 ## Running / Development
 
