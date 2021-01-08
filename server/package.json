@@ -12,14 +12,17 @@
   "description": "Stock API server for the Cardstack tech stack.",
   "dependencies": {},
   "devDependencies": {
+    "qunit": "^2.13.0",
     "ts-node": "^9.1.1"
   },
   "engines": {
     "node": ">= 14"
   },
   "scripts": {
-    "start": "ts-node src/index.ts"
+    "start": "ts-node src/index.ts",
+    "test": "node --loader ts-node/esm ../node_modules/.bin/qunit 'tests/**/*-test.ts'"
   },
+  "type": "module",
   "volta": {
     "extends": "../package.json"
   }
