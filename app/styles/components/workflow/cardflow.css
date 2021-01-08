@@ -6,7 +6,7 @@
   grid-template-columns: 1fr auto;
   grid-template-rows: auto 1fr;
   height: 100%;
-  background-color: #EFEFEF;
+  background-color: var(--boxel-light-300);
   border-radius: 0 var(--boxel-border-radius) 0 0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   font: var(--boxel-font-sm);
@@ -56,13 +56,13 @@
   grid-template-columns: 1fr auto;
   gap: var(--boxel-spacing);
   padding: var(--boxel-spacing);
-  background-color: #fff;
+  background-color: var(--boxel-light);
   border-top-right-radius: var(--boxel-border-radius);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 .cardflow__label {
-  color: var(--boxel-medium-light-purple);
+  color: var(--boxel-purple-400);
   font: var(--boxel-font-xs);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-xl);
@@ -71,6 +71,7 @@
 
 .cardflow__title {
   font-weight: 700;
+  font-size: 1.25rem; /* 20px */
   letter-spacing: var(--boxel-lsp-xs);
 }
 
@@ -83,7 +84,7 @@
   grid-template-columns: auto 1fr;
   align-items: center;
   gap: 0 30px;
-  color: #000;
+  color: var(--boxel-dark);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-xl);
 }
@@ -114,8 +115,8 @@
   padding: 2px 13px 3px;
   border-radius: 0 10px 0 5px;
   background-color: var(--boxel-red);
-  color: #fff;
-  font-weight: bold;
+  color: var(--boxel-light);
+  font-weight: 700;
   letter-spacing: var(--boxel-lsp-sm);
   text-align: center;
 }
@@ -130,11 +131,11 @@
   min-height: 40px;
   margin-left: var(--boxel-spacing);
   padding: 5px 10px 5px 15px;
-  background-color: #fff;
+  background-color: var(--boxel-light);
   border: 1px solid #D3D3D3;
   border-bottom-left-radius: var(--boxel-border-radius);
   border-bottom-right-radius: var(--boxel-border-radius);
-  color: #000;
+  color: var(--boxel-dark);
   font: var(--boxel-font-xs);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-xl);
@@ -155,7 +156,7 @@
 
 .cardflow__taskbar-label--assigned {
   background-color: var(--cardflow-assigned-tasks);
-  color: #fff;
+  color: var(--boxel-light);
 }
 
 
@@ -180,7 +181,7 @@
   display: grid;
   grid-template-columns: 40px 1fr;
   gap: 10px 20px;
-  color: black;
+  color: var(--boxel-dark);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
 }
@@ -231,7 +232,7 @@
 }
 
 .cardflow__message-time {
-  color: var(--boxel-medium-light-purple);
+  color: var(--boxel-purple-400);
   font: var(--boxel-font-xs);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-lg);
@@ -239,7 +240,7 @@
 
 .cardflow__message-sender-role {
   grid-column: 1 / -1;
-  color: #666;
+  color: var(--boxel-purple-400);
   font: var(--boxel-font-xs);
   letter-spacing: var(--boxel-lsp-lg);
 }
@@ -286,7 +287,7 @@
 
 .cardflow__sidebar-title {
   padding-bottom: var(--boxel-spacing);
-  color: var(--boxel-medium-light-purple);
+  color: var(--boxel-purple-400);
   font: var(--boxel-font-xs);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-xl);
@@ -303,7 +304,7 @@
 .cardflow__progress-status {
   padding-top: 15px;
   padding-bottom: 5px;
-  color: #000;
+  color: var(--boxel-dark);
   font-weight: 600;
 }
 
@@ -332,17 +333,17 @@
 
 .cardflow__progress-pct {
   font-size: 25px;
-  font-weight: bold;
+  font-weight: 700;
   letter-spacing: 0;
 }
 
 
 /* Checklist */
 .cardflow__checklist {
-  --icon-color: #666;
+  --icon-color: var(--boxel-purple-400);
   margin: 0;
   padding-bottom: 15px;
-  color: #666;
+  color: var(--boxel-purple-400);
 }
 
 .cardflow__checklist-item {
@@ -365,15 +366,15 @@
 
 .cardflow__checklist-item.current {
   --icon-color: var(--boxel-highlight);
-  --icon-fill-color: #000;
+  --icon-fill-color: var(--boxel-dark);
 
-  color: #03C4BF;
+  color: var(--boxel-success-200);
   font-weight: 600;
 }
 
 .cardflow__checklist-item.completed {
-  --icon-color: #000;
-  color: #000;
+  --icon-color: var(--boxel-dark);
+  color: var(--boxel-dark);
   font-weight: 600;
 }
 
@@ -386,7 +387,7 @@
 .cardflow__checklist-time {
   position: absolute;
   left: 38px;
-  color: var(--boxel-medium-light-purple);
+  color: var(--boxel-purple-400);
   font-size: 11px;
 }
 
@@ -451,6 +452,6 @@
 }
 
 .cardflow__participant-role {
-  color: #666;
+  color: var(--boxel-purple-400);
   font-weight: 400;
 }

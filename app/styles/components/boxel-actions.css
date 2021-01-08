@@ -49,7 +49,6 @@
 .boxel-actions__more-actions .media-collection-dropdown-btn__trigger:focus,
 .boxel-actions__btn:focus {
   outline: 0;
-  background-color: var(--boxel-highlight-hover);
 }
 
 .boxel-actions__btn--more-actions {
@@ -80,27 +79,27 @@
 }
 
 .boxel-actions__label--added {
-  background-color: #37EB77;
+  background-color: var(--boxel-success-100);
   background-image: url('/assets/images/icons/plus.svg');
 }
 
 .boxel-actions__label--removed {
-  background-color: #FF5050;
+  background-color: var(--boxel-error-100);
   background-image: url('/assets/images/icons/minus.svg');
 }
 
 .boxel-actions__label--changed {
-  background-color: #37EB77;
+  background-color: var(--boxel-success-100);
   background-image: url('/assets/images/icons/checkmark-lg.svg');
 }
 
 .boxel-actions__label--deleted {
-  background-color: #E8E8E8;
+  background-color: var(--boxel-light-400);
   background-image: url('/assets/images/icons/close.svg');
 }
 
 .boxel-actions__label--modified {
-  background-color: #FFD800;
+  background-color: var(--boxel-warning-100);
   background-image: url('/assets/images/icons/triangle.svg');
   background-position: center right 10px;
   width: auto;

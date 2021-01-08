@@ -18,7 +18,7 @@
 }
 
 .media-detail-section--edit {
-  background-color: white;
+  background-color: var(--boxel-light);
 }
 
 .media-detail-section__contents {

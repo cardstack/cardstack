@@ -17,7 +17,7 @@
 .detail-card {
   width: 100%;
   min-height: 100px;
-  background-color: white;
+  background-color: var(--boxel-light);
   border-radius: var(--boxel-border-radius);
   box-shadow: var(--boxel-box-shadow);
 }
@@ -30,7 +30,7 @@
   position: absolute;
   top: 15px;
   left: 20px;
-  color: #AFAFB7;
+  color: var(--boxel-purple-400);
   font: var(--boxel-font-xs);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-xl);
@@ -60,14 +60,14 @@
 }
 
 .detail-card__header-title {
-  font-size: 32px;
-  font-weight: bold;
+  font: var(--boxel-font-xl);
+  font-weight: 700;
   letter-spacing: 0;
 }
 
 .detail-card__header-desc {
-  color: #666;
-  font-size: 16px;
+  color: var(--boxel-purple-400);
+  font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp);
 }
 

@@ -4,7 +4,7 @@
   min-height: 60px;
   padding-top: 10px;
   padding-bottom: 10px;
-  background-color: #F0F0F0;
+  background-color: var(--boxel-light-200);
   border: none;
   border-radius: var(--boxel-border-radius-sm);
 }
@@ -86,7 +86,7 @@
   margin: 0 auto;
   padding: 10px 0;
   background: none;
-  color: black;
+  color: var(--boxel-dark);
   font: var(--boxel-font-sm);
   border: var(--boxel-border);
   border-radius: var(--boxel-border-radius);

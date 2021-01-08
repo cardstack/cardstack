@@ -33,7 +33,7 @@
 
 .boxel-highlight--added,
 .boxel-highlight--changed {
-  border-color: #37EB77;
+  border-color: var(--boxel-success-100);
 }
 
 .boxel-highlight--changed {
@@ -42,11 +42,11 @@
 }
 
 .boxel-highlight--removed {
-  border-color: #FF5050;
+  border-color: var(--boxel-error-100);
 }
 
 .boxel-highlight--deleted {
-  background-color: #E8E8E8;
+  background-color: var(--boxel-light-400);
   top: 0;
   border-top-right-radius: 0;
   border-top-left-radius: 0;
@@ -54,7 +54,7 @@
 }
 
 .boxel-highlight--modified {
-  border-color: #FFD800;
+  border-color: var(--boxel-warning-100);
 }
 
 .boxel-highlight--removed ~ .boxel-card {

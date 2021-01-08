@@ -11,9 +11,9 @@
 
 .agreements-card__header {
   padding: 30px 40px;
-  color: #393642;
-  font: var(--boxel-font-med);
-  font-weight: bold;
+  color: var(--boxel-purple-700);
+  font: var(--boxel-font-lg);
+  font-weight: 700;
   letter-spacing: 0;
   border-bottom: var(--boxel-border);
 }
@@ -62,8 +62,6 @@
 
 .boxel-cta:not(:disabled):hover {
   cursor: pointer;
-  background-color: var(--boxel-highlight-hover);
-  border-color: var(--boxel-highlight-hover);
 }
 
 .boxel-cta--disabled {

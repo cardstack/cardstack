@@ -1,7 +1,7 @@
 .next-steps {
   padding: 30px;
   background-color: #41404D;
-  color: white;
+  color: var(--boxel-light);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
 }
@@ -16,14 +16,14 @@
 }
 
 .next-steps__title {
-  font-weight: bold;
+  font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
 .next-steps__text {
-  color: #B3B1B8;
-  font-weight: normal;
+  color: var(--boxel-purple-200);
+  font-weight: 400;
 }
 
 .next-steps__pill-btn {

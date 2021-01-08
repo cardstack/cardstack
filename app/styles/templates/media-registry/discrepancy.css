@@ -1,6 +1,6 @@
 .discrepancy {
   --boxel-revision-light-purple: #84829B;
-  --boxel-revision-lightest-purple: #AFAFB7;
+  --boxel-revision-lightest-purple: var(--boxel-purple-300);
   --boxel-revision-hover-purple: #4f4a5d;
   --disc-container-max-width: 1440px;
   --disc-header-height: 80px;
@@ -8,7 +8,7 @@
   --disc-footer-cta-height-lg: 150px;
 
   height: 100%;
-  background-color: var(--boxel-medium-purple);
+  background-color: var(--boxel-purple-500);
   overflow: auto;
 }
 
@@ -29,7 +29,7 @@
   padding-left: 35px;
   padding-right: 20px;
   background: url('/assets/images/icons/file-icon.svg') center left 5px/16px 20px no-repeat;
-  color: white;
+  color: var(--boxel-light);
   font: var(--boxel-font);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-sm);
@@ -63,11 +63,11 @@
 }
 
 .discrepancy__main {
-  --icon-color: white;
+  --icon-color: var(--boxel-light);
 }
 
 .discrepancy__main--comp-view {
-  --icon-color: black;
+  --icon-color: var(--boxel-dark);
   background-color: var(--boxel-highlight);
   padding: 0 25px 25px;
   border-radius: 10px;
@@ -84,8 +84,8 @@
   margin: 0 auto;
   padding: 20px 20px 20px 30px;
   border-radius: 10px;
-  background-color: var(--boxel-dark-purple);
-  color: white;
+  background-color: var(--boxel-purple-700);
+  color: var(--boxel-light);
   font: var(--boxel-font-sm);
   font-weight: 700;
   letter-spacing: var(--boxel-lsp-lg);
@@ -118,11 +118,11 @@
   display: inline-block;
   width: 30px;
   height: 30px;
-  background-color: black;
+  background-color: var(--boxel-dark);
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
-  color: white;
+  color: var(--boxel-light);
   border-radius: 7px;
   font: var(--boxel-font-sm);
   font-weight: 700;
@@ -148,7 +148,7 @@
 
 .boxel-card__bg-img--warner-chappell-music {
   background-size: auto 35px;
-  background-color: black;
+  background-color: var(--boxel-dark);
   border-radius: 100px;
 }
 .boxel-card__bg-img--allegro-music-publishing {
@@ -169,7 +169,7 @@
   padding-right: 0;
   padding-left: 0;
   background-color: transparent;
-  color: black;
+  color: var(--boxel-dark);
 }
 
 .discrepancy__cards {
@@ -192,7 +192,7 @@
 
 .discrepancy__cards.discrepancy__cards--comp-view .discrepancy-card__header.other-version {
   border-radius: 0 10px 0 0;
-  border-left: 1px solid var(--boxel-medium-purple);
+  border-left: 1px solid var(--boxel-purple-500);
 }
 
 .discrepancy-card__header {
@@ -202,8 +202,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 15px;
-  background-color: var(--boxel-dark-purple);
-  color: white;
+  background-color: var(--boxel-purple-700);
+  color: var(--boxel-light);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
   border-radius: 10px 10px 0 0;
@@ -211,11 +211,11 @@
 
 .discrepancy-card__header.selected-version {
   background-color: var(--boxel-highlight);
-  color: black;
+  color: var(--boxel-dark);
 }
 
 .discrepancy-card__header.selected-version .discrepancy-card__header-label {
-  color: #00605E;
+  color: var(--boxel-purple-700);
 }
 
 .discrepancy-card__header-label {
@@ -240,7 +240,7 @@
 }
 
 .discrepancy-card__title {
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .discrepancy-card__datetime {
@@ -255,7 +255,7 @@
   font-weight: 400;
   background: url('/assets/images/icons/select-empty.svg') left 12px top 10px/16px 16px no-repeat;
   background-color: transparent;
-  border-color: #666;
+  border-color: var(--boxel-purple-400);
   color: inherit;
   text-align: left;
   white-space: nowrap;
@@ -263,22 +263,22 @@
 }
 
 .discrepancy-card__header-btn:hover {
-  border-color: #fff;
+  border-color: var(--boxel-light);
 }
 
 .discrepancy-card__header-btn.checked {
   background-image: url('/assets/images/icons/select-checked.svg');
-  border-color: black;
+  border-color: var(--boxel-dark);
   font-weight: 600;
   cursor: initial;
 }
 
 .discrepancy-card__header-btn--toggle.checked {
-  border-color: #03C4BF;
+  border-color: var(--boxel-success-200);
 }
 
 .discrepancy-card__header-btn--toggle.checked:hover {
-  border-color: black;
+  border-color: var(--boxel-dark);
   cursor: pointer;
 }
 
@@ -286,7 +286,7 @@
   position: relative;
   height: 100%;
   padding: 30px 25px 30px 0;
-  background-color: white;
+  background-color: var(--boxel-light);
   border-bottom: var(--boxel-border);
 }
 
@@ -337,7 +337,7 @@
 .discrepancy-field__btn {
   width: 60px;
   height: 60px;
-  background-color: white;
+  background-color: var(--boxel-light);
   border: 1px solid #D6D6D6;
   border-radius: 100px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
@@ -351,7 +351,7 @@
 
 .discrepancy-field__btn--toggled {
   background-color: var(--boxel-highlight);
-  border-color: #03C4BF;
+  border-color: var(--boxel-success-200);
   box-shadow: none;
 }
 
@@ -361,13 +361,13 @@
 
 .discrepancy-card__footer {
   height: var(--disc-footer-cta-height-lg);
-  background-color: white;
+  background-color: var(--boxel-light);
 }
 
 .discrepancy__count-btn__link-copy {
   display: inline-block;
   background: url('/assets/images/icons/warning.svg') bottom left/25px 20px no-repeat;
-  color: white;
+  color: var(--boxel-light);
   font: var(--boxel-font-sm);
   padding-top: 25px;
   padding-left: 35px;
@@ -390,7 +390,7 @@
   justify-content: center;
   align-items: center;
   padding: 30px;
-  background-color: var(--boxel-dark-purple);
+  background-color: var(--boxel-purple-700);
   text-align: center;
   transform: translateY(110%);
   transition: all 0.2s ease-in;

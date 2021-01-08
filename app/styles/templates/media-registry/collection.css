@@ -48,7 +48,7 @@
 }
 
 .collection--edit {
-  background-color: white;
+  background-color: var(--boxel-light);
   border-color: var(--boxel-border-color);
 }
 
@@ -61,7 +61,7 @@
 }
 
 .collection__artist {
-  color: #6B6A80;
+  color: var(--boxel-purple-400);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
 }
@@ -118,7 +118,7 @@
 }
 
 .collection__list-field-label {
-  font-weight: bold;
+  font-weight: 700;
   text-transform: uppercase;
 }
 
@@ -133,7 +133,7 @@
 .collection--list .collection__title {
   padding-top: 0;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .collection--list .collection__title + .collection__artist {
@@ -141,7 +141,7 @@
 }
 
 .collection--list .collection__artist {
-  color: black;
+  color: var(--boxel-dark);
 }
 
 .collection--list .collection__play-btn {

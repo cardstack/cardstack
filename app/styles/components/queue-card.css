@@ -1,14 +1,14 @@
 .queue-card {
   --queue-card-user-tasks: var(--boxel-lime);
   --queue-card-assigned-tasks: var(--boxel-lilac);
-  --queue-card-primary-color: #fff;
-  --queue-card-secondary-color: var(--boxel-light-purple);
+  --queue-card-primary-color: var(--boxel-light);
+  --queue-card-secondary-color: var(--boxel-purple-300);
 
   position: relative;
   width: 100%;
   padding: 0;
   border-radius: var(--boxel-border-radius);
-  background-color: var(--boxel-medium-purple);
+  background-color: var(--boxel-purple-500);
   color: var(--queue-card-primary-color);
   font: var(--boxel-font-xs);
   letter-spacing: var(--boxel-lsp-lg);
@@ -55,9 +55,9 @@
   align-self: start;
   padding: 2px 13px 3px;
   border-radius: 0 10px 0 5px;
-  background-color: var(--boxel-red);
-  color: #fff;
-  font-weight: bold;
+  background-color: var(--boxel-error-100);
+  color: var(--boxel-light);
+  font-weight: 700;
   letter-spacing: var(--boxel-lsp-sm);
   text-align: center;
 }
@@ -101,7 +101,7 @@
   align-items: center;
   margin: 0 10px;
   padding: 10px 0;
-  border-top: 1px solid var(--boxel-dark-purple);
+  border-top: 1px solid var(--boxel-purple-700);
 }
 
 .queue-card__task-labels {
@@ -116,7 +116,7 @@
   padding: 5px 10px;
   background-color: var(--queue-card-user-tasks);
   border-radius: 5px;
-  color: #000;
+  color: var(--boxel-dark);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-xl);
   text-transform: uppercase;
@@ -124,7 +124,7 @@
 
 .queue-card__task-label--awaiting-reply {
   background-color: var(--queue-card-assigned-tasks);
-  color: #fff;
+  color: var(--boxel-light);
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -133,11 +133,11 @@
 
 /* Light Theme */
 .queue-card--light-theme {
-  --queue-card-primary-color: #000;
-  --queue-card-secondary-color: var(--boxel-medium-light-purple);
+  --queue-card-primary-color: var(--boxel-dark);
+  --queue-card-secondary-color: var(--boxel-purple-400);
   --boxel-highlight: #00B2AE;
 
-  background-color: #fff;
+  background-color: var(--boxel-light);
 }
 
 .queue-card--light-theme .queue-card__footer {

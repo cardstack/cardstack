@@ -18,7 +18,7 @@
   background-size: var(--mode-icon-size), 10px 10px;
   border: none;
   border-radius: 100px;
-  color: black;
+  color: var(--boxel-dark);
   font: var(--boxel-font-sm);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-lg);
@@ -44,7 +44,6 @@
 
 .mode-indicator:hover,
 .mode-indicator:focus {
-  /* background-color: var(--boxel-highlight-hover); */
   outline: 0;
 }
 
@@ -52,6 +51,6 @@
   --mode-icon: url('/assets/images/icons/edit-box.svg');
 
   min-width: 200px;
-  background-color: white;
+  background-color: var(--boxel-light);
   border: var(--boxel-border);
 }

@@ -18,7 +18,7 @@
 }
 
 .wave-player__times {
-  color: #6B6A80;
+  color: var(--boxel-purple-400);
   font: var(--boxel-font-sm);
   white-space: nowrap;
 }

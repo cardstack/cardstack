@@ -19,7 +19,7 @@
   height: 80px;
   padding: 30px 20px 25px 50px;
   background: url('/assets/images/icons/search.svg') center left 15px/18px 20px no-repeat;
-  background-color: white;
+  background-color: var(--boxel-light);
   border: var(--boxel-border);
   border-radius: 10px;
   font: var(--boxel-font);
@@ -52,7 +52,7 @@
 .cs-card-select--dropdown .ember-power-select-options {
   max-height: 50vh;
   margin: 10px -10px -10px;
-  background-color: #f0f0f0;
+  background-color: var(--boxel-light-200);
   text-align: left;
 }
 
@@ -67,7 +67,7 @@
 .cs-card-select--dropdown .ember-power-select-option {
   padding: 0 15px;
   background: none;
-  color: black;
+  color: var(--boxel-dark);
 }
 
 .cs-card-select--dropdown .ember-power-select-option:first-child {

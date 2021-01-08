@@ -23,7 +23,7 @@
 
 .boxel-card {
   width: 100%;
-  background-color: white;
+  background-color: var(--boxel-light);
   border-radius: var(--boxel-border-radius);
   border: var(--boxel-border);
   transition: box-shadow var(--boxel-transition);
@@ -39,8 +39,8 @@
   height: 30px;
   padding: 7px 15px;
   border-radius: 10px 10px 0 0;
-  background-color: #F8F7FA;
-  color: #AFAFB7;
+  background-color: var(--boxel-purple-100);
+  color: var(--boxel-purple-400);
   font: var(--boxel-font-xs);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-xl);
@@ -59,7 +59,6 @@
   background-position: top 7px right 7px;
   background-size: 16px 16px;
   background-repeat: no-repeat;
-  color: #6B6A80;
 }
 
 .boxel-card__inner {
@@ -69,7 +68,7 @@
   gap: 3px 15px;
   min-height: 90px;
   padding: 15px;
-  color: black;
+  color: var(--boxel-dark);
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp);
   overflow: hidden;
@@ -85,13 +84,13 @@
 .boxel-card__title {
   margin: 0;
   font: inherit;
-  font-weight: bold;
+  font-weight: 700;
   letter-spacing: inherit;
 }
 
 .boxel-card__description {
   margin: 0;
-  color: #6B6A80;
+  color: var(--boxel-purple-400);
   font: var(--boxel-font-sm);
   overflow-wrap: break-word;
   word-break: break-word;
@@ -209,9 +208,9 @@
 }
 
 .boxel-card-field .field-renderer__title {
-  color: #AFAFB7;
+  color: var(--boxel-purple-400);
   font: var(--boxel-font-xs);
-  font-weight: bold;
+  font-weight: 700;
   letter-spacing: var(--boxel-lsp-xl);
   text-transform: uppercase;
   text-align: left;
@@ -241,12 +240,12 @@
 
 .boxel-card--revenue-data .boxel-card-field > .field-renderer__title {
   width: 100%;
-  color: black;
+  color: var(--boxel-dark);
   text-align: right;
 }
 
 .boxel-card--revenue-data .boxel-card-field > .field-renderer__value {
-  font: var(--boxel-font-med);
+  font: var(--boxel-font-lg);
 }
 
 
@@ -262,11 +261,11 @@
 }
 
 .boxel-card--schedule .boxel-card-field > .field-renderer__title {
-  color: black;
+  color: var(--boxel-dark);
 }
 
 .boxel-card--schedule .boxel-card-field > .field-renderer__value {
-  font: var(--boxel-font-med);
+  font: var(--boxel-font-lg);
 }
 
 
@@ -349,7 +348,7 @@
   list-style-type: none;
   margin-top: 15px;
   padding-left: 25px;
-  border-left: 3px solid #B3B1B8;
+  border-left: 3px solid var(--boxel-purple-200);
 }
 
 .territory__publishers-list > * + * {
@@ -359,6 +358,6 @@
 /* Add padding and bg when territory card is highlighted in comparison mode */
 .territory__wrapper {
   padding: 10px;
-  background-color: white;
+  background-color: var(--boxel-light);
   border-radius: var(--boxel-border-radius);
 }

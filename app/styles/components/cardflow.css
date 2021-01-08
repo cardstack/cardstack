@@ -14,8 +14,8 @@
   top: 0;
   left: 40%;
   padding: 5px 10px;
-  background-color: #EFEFEF;
-  font-weight: bold;
+  background-color: var(--boxel-light-300);
+  font-weight: 700;
   text-align: center;
 }
 
@@ -34,7 +34,7 @@
 }
 
 .cardflow-card__date {
-  color: #6B6A80;
+  color: var(--boxel-purple-400);
   font-size: 18px;
   line-height: 1.3;
   letter-spacing: var(--boxel-lsp-sm);
@@ -46,26 +46,26 @@
   left: 0;
   padding: 5px 15px;
   border-radius: 5px 0 5px 0;
-  color: black;
+  color: var(--boxel-dark);
   font: var(--boxel-font-xs);
-  font-weight: bold;
+  font-weight: 700;
   letter-spacing: var(--boxel-lsp-lg);
   text-transform: uppercase;
 }
 
 .cardflow-card__label--in-progress {
-  background-color: #FFD800;
+  background-color: var(--boxel-warning-100);
 }
 
 .cardflow-card__label--completed {
-  background-color: #37EB77;
+  background-color: var(--boxel-success-100);
 }
 
 .cardflow-card__title {
-  color: black;
+  color: var(--boxel-dark);
   font-size: 26px;
   line-height: calc(36/26);
-  font-weight: bold;
+  font-weight: 700;
   letter-spacing: 0;
 }
 
@@ -114,7 +114,7 @@
 .cardflow-proposal-card__effective-date {
   padding-top: 15px;
   padding-bottom: 40px;
-  color: black;
+  color: var(--boxel-dark);
   font-size: 18px;
   line-height: 1.3;
   letter-spacing: var(--boxel-lsp-sm);
@@ -129,7 +129,7 @@
   gap: 0 20px;
   padding: 25px 35px;
   border-top: var(--boxel-border);
-  color: #666;
+  color: var(--boxel-purple-400);
 }
 
 .cardflow-action-card__list-item--checkbox,
@@ -145,13 +145,13 @@
 .cardflow-action-card__list-item--title {
   padding-bottom: 5px;
   font: var(--boxel-font);
-  font-weight: bold;
+  font-weight: 700;
   letter-spacing: 0.02em;
 }
 
 .cardflow-action-card__list-item.current .cardflow-action-card__list-item--title,
 .cardflow-action-card__list-item.completed .cardflow-action-card__list-item--title {
-  color: black;
+  color: var(--boxel-dark);
 }
 
 .cardflow-action-card__list-item.completed .cardflow-action-card__list-item--checkbox {
@@ -161,7 +161,7 @@
 .cardflow-action-card__icon-btn.icon-btn {
   --icon-btn-width: 30px;
   --icon-btn-height: 30px;
-  border: 1px solid #B3B1B8;
+  border: 1px solid var(--boxel-purple-200);
   border-radius: 100px;
 }
 
@@ -197,7 +197,7 @@
 }
 
 .catalog-summary-card__desc {
-  color: #6B6A80;
+  color: var(--boxel-purple-400);
 }
 
 .catalog-summary-card__count {
@@ -227,7 +227,7 @@
 .cardflow__modal-header {
   padding: 30px 30px 30px 60px;
   background: url('/assets/images/icons/message.svg') left 30px center/18px 18px no-repeat;
-  color: white;
+  color: var(--boxel-light);
   font: var(--boxel-font);
   font-weight: 600;
 }
@@ -235,7 +235,7 @@
 .cardflow__modal-close-btn {
   --icon-btn-width: 30px;
   --icon-btn-height: 30px;
-  --icon-color: white;
+  --icon-color: var(--boxel-light);
   --icon-btn-border: 1px solid white;
   --icon-btn-border-radius: 100px;
   position: fixed;
@@ -276,7 +276,7 @@
 
 .cardflow__nested-card-title {
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .cardflow__nested-detail-card {
@@ -295,7 +295,7 @@
 
 .cardflow__scroll-box-bg-platter {
   margin-bottom: 30px;
-  background-color: white;
+  background-color: var(--boxel-light);
   border-radius: 0 0 10px 10px;
 }
 
@@ -321,7 +321,7 @@
 
 .cardflow__nested-sidebar-title {
   padding-bottom: 25px;
-  color: white;
+  color: var(--boxel-light);
   font: var(--boxel-font);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp);

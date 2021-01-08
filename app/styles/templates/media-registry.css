@@ -3,7 +3,7 @@
   display: grid;
   grid-template-columns: auto 1fr;
   grid-template-rows: auto 1fr;
-  background-color: #F5F5F5;
+  background-color: var(--boxel-light-100);
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp-lg);
 }
@@ -71,7 +71,7 @@
 
 /* Org Header */
 .media-registry__header {
-  --header-background: #000;
+  --header-background: var(--boxel-dark);
   --header-logo-size-sm: 35px 35px;
   position: sticky;
   top: 0;
@@ -83,7 +83,7 @@
   gap: 50px;
   padding: 80px 20px 0 30px;
   background-color: var(--header-background);
-  color: white;
+  color: var(--boxel-light);
   height: 250px;
   z-index: 2;
 }
@@ -114,16 +114,16 @@
   grid-template-columns: auto 1fr;
   gap: 0 3px;
   align-items: center;
-  font-size: 19px;
-  font-weight: bold;
+  font-size: 1.1875rem; /* 19px */
+  font-weight: 700;
   letter-spacing: 0.1em;
-  line-height: 26px;
+  line-height: calc(26/19);
   text-transform: uppercase;
 }
 
 .media-registry__header--sm .media-registry__title {
   font: var(--boxel-font-sm);
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .media-registry__logo {
@@ -176,8 +176,8 @@
 }
 
 .media-registry__nav li > a.active:not(.unselected) {
-  font-weight: bold;
-  border-color: white;
+  font-weight: 700;
+  border-color: var(--boxel-light);
 }
 
 .media-registry__search-bar {

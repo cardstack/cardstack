@@ -38,7 +38,7 @@
 /* Header + sections */
 .item {
   max-width: 940px;
-  background-color: white;
+  background-color: var(--boxel-light);
   border-radius: 10px;
   box-shadow: var(--boxel-box-shadow);
 }
@@ -47,7 +47,7 @@
   position: absolute;
   top: 15px;
   left: 20px;
-  color: white;
+  color: var(--boxel-light);
   font: var(--boxel-font-xs);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-xl);
@@ -57,7 +57,7 @@
 
 /* Header */
 .item__header {
-  background-color: #AFAFB7;
+  background-color: var(--boxel-purple-300);
   background-image: var(--blurhash-image);
   background-size: cover;
   background-position: center;
@@ -94,7 +94,7 @@
 
 .item__play-btn {
   --icon-color: rgba(0, 0, 0, 0.5);
-  --icon-border: white;
+  --icon-border: var(--boxel-light);
   position: absolute;
   top: 0;
   bottom: 0;
@@ -114,17 +114,17 @@
 .item__title {
   grid-area: title;
   align-self: end;
-  color: white;
-  font: var(--boxel-font-lg);
+  color: var(--boxel-light);
+  font: var(--boxel-font-xl);
   font-weight: 600;
   letter-spacing: 0;
 }
 
 .item__artist {
   grid-area: artist;
-  color: white;
+  color: var(--boxel-light);
   font: var(--boxel-font);
-  font-weight: normal;
+  font-weight: 400;
   letter-spacing: var(--boxel-lsp);
 }
 
@@ -139,15 +139,15 @@
 }
 
 .item-header-field .field-renderer__title {
-  color: white;
+  color: var(--boxel-light);
   font: var(--boxel-font-xs);
-  font-weight: bold;
+  font-weight: 700;
   letter-spacing: var(--boxel-lsp-xl);
   text-transform: uppercase;
 }
 
 .item-header-field .field-renderer__value {
-  color: white;
+  color: var(--boxel-light);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
 }

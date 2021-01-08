@@ -1,7 +1,7 @@
 .tasklist {
   --tasklist-user-tasks: var(--boxel-lime);
   --tasklist-assigned-tasks: var(--boxel-lilac);
-  color: #000;
+  color: var(--boxel-dark);
   border-radius: var(--boxel-border-radius);
   font: var(--boxel-font-xs);
   font-weight: 600;
@@ -22,13 +22,13 @@
   gap: 10px;
   height: 45px;
   padding: 10px 15px;
-  background-color: #F5F5F5;
+  background-color: var(--boxel-light-100);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 .tasklist__add-item-svg {
-  --icon-bg: #000;
-  --icon-color: #fff;
+  --icon-bg: var(--boxel-dark);
+  --icon-color: var(--boxel-light);
 }
 
 .tasklist__label {
@@ -36,7 +36,7 @@
   padding: 5px 10px;
   border-radius: 5px;
   background-color: var(--tasklist-user-tasks);
-  color: #000;
+  color: var(--boxel-dark);
   font: var(--boxel-font-xs);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-xl);
@@ -45,9 +45,9 @@
 
 .tasklist__label--assigned {
   background-color: var(--tasklist-assigned-tasks);
-  color: #fff;
+  color: var(--boxel-light);
 }
 
 .tasklist__label--completed {
-  background-color: #D1D1D1;
+  background-color: var(--boxel-light-600);
 }

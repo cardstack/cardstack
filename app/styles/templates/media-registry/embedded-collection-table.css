@@ -1,5 +1,5 @@
 .embedded-collection-table {
-  --table-border-color: #dedede;
+  --table-border-color: var(--boxel-light-500);
   --cell-height: 60px;
 }
 
@@ -13,7 +13,7 @@
   position: relative;
   height: 45px;
   padding: 0;
-  background-color: white;
+  background-color: var(--boxel-light);
   border-top: 1px solid var(--table-border-color);
   border-bottom: 1px solid var(--table-border-color);
   border-left: 1px solid var(--table-border-color);
@@ -53,7 +53,7 @@
 .embedded-collection-table__body td.is-first-column .et-cell-content {
   height: calc(var(--cell-height) - 2px);
   margin-top: 2px;  /* space for first col td box-shadow */
-  background-color: white;
+  background-color: var(--boxel-light);
 }
 
 .embedded-collection-table__cell {
@@ -149,7 +149,7 @@ td:last-of-type .embedded-collection-table__highlight.boxel-highlight--on {
 }
 
 .embedded-collection-table__footer td.is-first-column {
-  background-color: white;
+  background-color: var(--boxel-light);
   border-bottom-left-radius: 10px;
 }
 

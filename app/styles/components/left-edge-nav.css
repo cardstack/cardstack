@@ -7,7 +7,7 @@
   width: 80px;
   height: 100%;
   padding: 20px 0;
-  background-color: var(--boxel-darkest-purple);
+  background-color: var(--boxel-purple-800);
 }
 
 .left-edge-nav ul {
@@ -42,7 +42,7 @@
 }
 
 .left-edge-nav__btn:hover {
-  --icon-color: black;
+  --icon-color: var(--boxel-dark);
   cursor: pointer;
 }
 
@@ -87,9 +87,9 @@
 .left-edge-nav__btn-logo {
   width: 40px;
   height: 40px;
-  border: 1px solid #000;
+  border: 1px solid var(--boxel-dark);
   border-radius: var(--boxel-border-radius);
-  background-color: #000;
+  background-color: var(--boxel-dark);
   background-position: center;
   background-size: 40px 40px;
   background-repeat: no-repeat;

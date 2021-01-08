@@ -11,22 +11,22 @@
   padding: 8px 15px;
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
-  border: 1px solid #d1d1d1;
+  border: 1px solid var(--boxel-light-600);
   border-radius: var(--boxel-border-radius);
-  background-color: #E8E8E8;
-  color: black;
+  background-color: var(--boxel-light-400);
+  color: var(--boxel-dark);
   outline: 0;
 }
 
 .breadcrumbs__item-title {
-  font-weight: bold;
+  font-weight: 700;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
 .breadcrumbs__item-label {
-  color: #AFAFB7;
+  color: var(--boxel-purple-400);
   font-size: 10px;
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-xl);
@@ -60,7 +60,7 @@ button.breadcrumbs__item--inverse:hover {
 }
 
 .breadcrumbs__item--inverse .breadcrumbs__item-title {
-  color: white;
+  color: var(--boxel-light);
 }
 
 .breadcrumbs__item--inverse + .breadcrumbs__carot {
@@ -73,5 +73,5 @@ button.breadcrumbs__item--inverse:hover {
 
 .breadcrumbs__item--inverse:last-child .breadcrumbs__item-label,
 .breadcrumbs__item--inverse:last-child .breadcrumbs__item-title {
-  color: #393642;
+  color: var(--boxel-purple-700);
 }

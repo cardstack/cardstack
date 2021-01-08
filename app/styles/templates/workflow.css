@@ -2,7 +2,7 @@
   height: 100%;
   display: grid;
   grid-template-columns: auto 1fr;
-  background-color: #F5F5F5;
+  background-color: var(--boxel-light-100);
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp-lg);
 }
@@ -12,6 +12,6 @@
 }
 
 .workflow-org__main {
-  background-color: var(--boxel-medium-purple);
+  background-color: var(--boxel-purple-500);
   overflow: hidden;
 }

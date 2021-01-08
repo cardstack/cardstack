@@ -21,7 +21,7 @@
 }
 
 .icon-btn__secondary:hover {
-  background-color: #2E2D38;
+  background-color: var(--boxel-purple-800);
 }
 
 .icon-btn:hover {

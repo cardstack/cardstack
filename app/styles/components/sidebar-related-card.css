@@ -7,7 +7,7 @@
   min-height: 160px;
   border: var(--boxel-border);
   border-radius: var(--boxel-border-radius);
-  background-color: white;
+  background-color: var(--boxel-light);
   transition: box-shadow var(--boxel-transition);
 }
 
@@ -26,8 +26,8 @@
   height: 30px;
   padding: 7px 15px;
   border-radius: 10px 10px 0 0;
-  background-color: #F8F7FA;
-  color: #AFAFB7;
+  background-color: var(--boxel-purple-100);
+  color: var(--boxel-purple-400);
   font: var(--boxel-font-xs);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-xl);
@@ -40,7 +40,6 @@
   background-position: top 7px right 7px;
   background-size: 16px 16px;
   background-repeat: no-repeat;
-  color: #6B6A80;
 }
 
 .sidebar-related-card__thumb-collection {
@@ -52,12 +51,12 @@
 
 .sidebar-related-card__title {
   font: var(--boxel-font);
-  font-weight: bold;
+  font-weight: 700;
   letter-spacing: var(--boxel-lsp-sm);
 }
 
 .sidebar-related-card__subtitle {
-  color: #6B6A80;
+  color: var(--boxel-purple-400);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
 }
@@ -73,6 +72,6 @@
 
 .sidebar-related-card__count__number {
   font: var(--boxel-font);
-  font-weight: bold;
+  font-weight: 700;
   letter-spacing: var(--boxel-lsp-lg);
 }

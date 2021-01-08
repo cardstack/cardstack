@@ -29,7 +29,7 @@
 .select-btn--selected {
   --icon-bg: var(--boxel-highlight);
   --icon-border: var(--boxel-highlight);
-  --icon-color: black;
+  --icon-color: var(--boxel-dark);
 }
 
 .select-btn > svg {

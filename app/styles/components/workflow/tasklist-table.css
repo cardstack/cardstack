@@ -10,7 +10,7 @@
 .tasklist-table__header th {
   height: 40px;
   padding: 0;
-  background-color: #fff;
+  background-color: var(--boxel-light);
   border-bottom: 1px solid var(--table-border-color);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-xl);

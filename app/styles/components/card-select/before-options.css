@@ -4,11 +4,11 @@
   align-items: center;
   border-radius: 6px;
   background-color: #1B154E;
-  color: white;
+  color: var(--boxel-light);
 }
 
 .before-options__gear-btn {
-  --icon-color: white;
+  --icon-color: var(--boxel-light);
 }
 
 .cs-card-select--data-source {
@@ -22,6 +22,6 @@
 
 .cs-card-select--data-source > span {
   color: var(--boxel-highlight);
-  font-weight: bold;
+  font-weight: 700;
   text-transform: capitalize;
 }

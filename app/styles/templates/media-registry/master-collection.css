@@ -34,7 +34,7 @@
 }
 
 /* .master-collection__pin-btn {
-  --icon-color: #AFAFB7;
+  --icon-color: var(--boxel-purple-300);
   position: absolute;
   top: 0;
   right: 0;
@@ -53,7 +53,7 @@
 }
 
 .master-collection__pin-btn.pinned {
-  --icon-color: black;
+  --icon-color: var(--boxel-dark);
 } */
 
 
@@ -69,7 +69,7 @@
   padding: 60px 20px 15px;
   border-radius: var(--boxel-border-radius);
   border: var(--boxel-border);
-  background-color: white;
+  background-color: var(--boxel-light);
 }
 
 .master-collection__title,
@@ -78,8 +78,8 @@
 }
 
 .master-collection__title {
-  font-size: 20px;
-  font-weight: bold;
+  font-size: 1.25rem; /* 20px */
+  font-weight: 700;
   line-height: calc(30/20);
   letter-spacing: var(--boxel-lsp-sm);
 }
@@ -98,7 +98,7 @@
 }
 
 .master-collection__num {
-  font: var(--boxel-font-lg);
-  font-size: 30px;
-  font-weight: bold;
+  font: var(--boxel-font-xl);
+  font-size: 1.875rem; /* 30px */
+  font-weight: 700;
 }

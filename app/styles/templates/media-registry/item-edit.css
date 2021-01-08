@@ -7,8 +7,8 @@
   align-items: center;
   gap: 5px 20px;
   padding: 20px 30px 20px 40px;
-  background-color: white;
-  border-bottom: 1px solid #D1D1D1;
+  background-color: var(--boxel-light);
+  border-bottom: 1px solid var(--boxel-light-600);
   border-radius: 10px 10px 0 0;
   min-width: 415px;
 }
@@ -22,23 +22,23 @@
 
 /* Body container with bg */
 .item-edit__body-plate {
-  background-color: white;
+  background-color: var(--boxel-light);
   border-radius: 0 0 10px 10px;
   overflow: hidden;
 }
 
 
 .item-edit__title {
-  color: #393642;
-  font: var(--boxel-font-med);
-  font-weight: bold;
+  color: var(--boxel-purple-700);
+  font: var(--boxel-font-lg);
+  font-weight: 700;
   letter-spacing: 0;
 }
 
 .item-edit__description {
-  color: #393642;
+  color: var(--boxel-purple-700);
   font: var(--boxel-font-sm);
-  font-weight: normal;
+  font-weight: 400;
   letter-spacing: var(--boxel-lsp);
 }
 

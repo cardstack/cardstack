@@ -2,7 +2,7 @@
   width: 100%;
   min-width: 230px;
   min-height: 100px;
-  background-color: white;
+  background-color: var(--boxel-light);
   border-radius: var(--boxel-border-radius);
   box-shadow: var(--boxel-box-shadow);
 }
