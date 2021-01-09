@@ -2,13 +2,25 @@
 
 ## Installing
 
-1. Install pnpm globally (either `npm install -g pnpm` or `volta install pnpm`).
-2. Clone this repo and cd into it.
-3. Run `pnpm install`.
+1. Install [volta](https://volta.sh/) and `volta install yarn`.
+2. Clone the repo and run `yarn install`.
+3. Install docker (we use it to launch supporting services like postgres).
+
+## Orientation
+
+`cardhost`: the Ember app
+`server`: the server ("the hub")
+`base-cards`: the collection of framework-provided default cards that serve as the foundation for user-created cards
+`demo-cards`: a collection of demo & test cards
+
+## Architecture
+
+By default, the server will use both the `base-cards` and `demo-cards` directories as read/write realms. Any change you make in the app will appear as (uncommitted) changes to these directories.
+
+The server maintains its own search index over all the realms it knows about. The search index is stored in postgres.
 
 ## TODO
 
-1. github actions
-2. qunit for server
+1. Add eslint and CI typecheck for server.
 3. first card
 4. add a test to first card
