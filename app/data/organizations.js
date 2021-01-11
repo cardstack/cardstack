@@ -1,10 +1,12 @@
+import bunnyLogo from '@cardstack/boxel/media-registry/bunny-logo.svg'
+
 export default [
     {
       id: 'bunny_records',
       type: 'label',
       title: 'Bunny Records',
       iconURL: "/boxel/media-registry/button-bunny-records.svg",
-      logoURL: '/boxel/media-registry/bunny-logo.svg',
+      logoURL: bunnyLogo,
       user: {
         title: "Lisa Track",
         role: "Administrator",

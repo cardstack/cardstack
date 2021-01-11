@@ -82,6 +82,7 @@
     "ember-try": "^1.4.0",
     "eslint-plugin-ember": "^8.1.1",
     "eslint-plugin-node": "^11.1.0",
+    "file-loader": "^6.2.0",
     "loader.js": "^4.7.0",
     "qunit-dom": "^1.1.0",
     "release-it": "^13.5.1",

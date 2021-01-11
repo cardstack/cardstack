@@ -35,7 +35,19 @@ module.exports = function(defaults) {
     // staticHelpers: true,
     // staticComponents: true,
     packagerOptions: {
-    //    webpackConfig: { }
+      webpackConfig: {
+        module: {
+          rules: [
+            {
+              test: /\.(png|jpg|gif|svg)$/i,
+              loader: "file-loader",
+              options: {
+                name: "[path][name]-[contenthash].[ext]",
+              },
+            },
+          ],
+        },
+      },
       publicAssetURL: '/boxel/'
     }
   });
