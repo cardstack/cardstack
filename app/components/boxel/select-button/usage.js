@@ -5,6 +5,7 @@ import { action } from '@ember/object';
 export default class extends Component {
   @tracked isPartial = false;
   @tracked isSelected = false;
+  @tracked mode = 'view';
 
   @action onClick() {
     if (this.isSelected) {

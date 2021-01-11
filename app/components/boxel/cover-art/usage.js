@@ -11,7 +11,6 @@ import MakeMagicThumb from '@cardstack/boxel/images/media-registry/covers/thumb/
 import GoodTimesThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Good-Times.jpg';
 import MoreThanWeKnowThumb from '@cardstack/boxel/images/media-registry/covers/thumb/More-Than-We-Know.jpg';
 export default class extends Component {
-  @tracked numToShow = 5;
   @tracked size = 80;
   @tracked maxWidth = 190;
   coverThumbs = [
@@ -26,7 +25,8 @@ export default class extends Component {
     GoodTimesThumb,
     MoreThanWeKnowThumb,
   ];
-  get coverThumbsToShow() {
-    return this.coverThumbs.slice(0, this.numToShow);
+
+  @action updateCoverThumbs(covers) {
+    this.coverThumbs = covers;
   }
 }

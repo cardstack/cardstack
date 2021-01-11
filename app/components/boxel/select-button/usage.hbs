@@ -1,30 +1,36 @@
-<FreestyleAnnotation @slug="select-button">
-  <div>
-    @isPartial (Boolean) partially selected state
-    <input
-      type="checkbox"
-      checked={{this.isPartial}}
-      {{on 'input' (pick 'target.checked' (fn (mut this.isPartial)))}}
-    /> ({{this.isPartial}})
-  </div>
-  <div>
-    @isSelected (Boolean) fully selected state
-    <input
-      type="checkbox"
-      checked={{this.isSelected}}
-      {{on 'input' (pick 'target.checked' (fn (mut this.isSelected)))}}
-    /> ({{this.isSelected}})
-  </div>
-  <div>
-    @mode (String) which card mode are we in
-  </div>
-</FreestyleAnnotation>
+<Freestyle::Usage @name="SelectButton">
+  <:example>
+    <Doc::DarkThemeAndLightTheme>
+      <Boxel::SelectButton
+        @isPartial={{this.isPartial}}
+        @isSelected={{this.isSelected}}
+        @mode={{this.mode}}
+        {{on 'click' (fn this.onClick)}}
+      />
+    </Doc::DarkThemeAndLightTheme>
+  </:example>
 
-<FreestyleUsage @slug="select-button">
-  <Boxel::SelectButton
-    @isPartial={{this.isPartial}}
-    @isSelected={{this.isSelected}}
-    @mode="view"
-    {{on 'click' (fn this.onClick)}}
-  />
-</FreestyleUsage>
+  <:api as |Args|>
+    <Args.Bool
+      @name="isPartial"
+      @value={{this.isPartial}}
+      @description="when true, renders in its partially selected state"
+      @defaultValue={{false}}
+      @onInput={{fn (mut this.isPartial)}}
+    />
+    <Args.Bool
+      @name="isSelected"
+      @value={{this.isSelected}}
+      @description="when true, renders in its fully selected state, takes precedence over isPartial if both are true"
+      @defaultValue={{false}}
+      @onInput={{fn (mut this.isSelected)}}
+    />
+    <Args.String
+      @name="mode"
+      @value={{this.mode}}
+      @description="which card mode are we in"
+      @options={{w 'view edit configure'}}
+      @onInput={{fn (mut this.mode)}}
+    />
+  </:api>
+</Freestyle::Usage>

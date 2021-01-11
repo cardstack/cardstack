@@ -1,46 +1,42 @@
-<FreestyleAnnotation @slug="boxel-button">
-  <div>
-    @primary (Boolean) render with primary style
-    <input
-      type="checkbox"
-      checked={{this.primary}}
-      {{on 'input' (pick 'target.checked' (fn (mut this.primary)))}}
-    /> ({{this.primary}})
-  </div>
-  <div>
-    @disabled (Boolean) when the button cannot be clicked.
-    <input
-      type="checkbox"
-      checked={{this.disabled}}
-      {{on 'input' (pick 'target.checked' (fn (mut this.disabled)))}}
-    /> ({{this.disabled}})
-  </div>
-  <div>
-    @dropdownIcon (Boolean) show a dropdown icon on the right side of the button
-    <input
-      type="checkbox"
-      checked={{this.dropdownIcon}}
-      {{on 'input' (pick 'target.checked' (fn (mut this.dropdownIcon)))}}
-    /> ({{this.dropdownIcon}})
-  </div>
-  <div>
-    @collectionStyle (Boolean) apply the style variation used in the collection header
-    <input
-      type="checkbox"
-      checked={{this.collectionStyle}}
-      {{on 'input' (pick 'target.checked' (fn (mut this.collectionStyle)))}}
-    /> ({{this.collectionStyle}})
-  </div>
-</FreestyleAnnotation>
+<Freestyle::Usage @name="Boxel::Button">
+    <:example>
+    <Boxel::Button
+      @primary={{this.primary}}
+      @disabled={{this.disabled}}
+      @dropdownIcon={{this.dropdownIcon}}
+      @collectionStyle={{this.collectionStyle}}
+      {{on 'click' (fn this.log 'Button clicked')}}
+    >
+      Hello World
+    </Boxel::Button>
+  </:example>
 
-<FreestyleUsage @slug="boxel-button">
-  <Boxel::Button
-    @primary={{this.primary}}
-    @disabled={{this.disabled}}
-    @dropdownIcon={{this.dropdownIcon}}
-    @collectionStyle={{this.collectionStyle}}
-    {{on 'click' (fn this.log 'Button clicked')}}
-  >
-    Hello World
-  </Boxel::Button>
-</FreestyleUsage>
+  <:api as |Args|>
+    <Args.Bool @name="primary"
+      @description='render with primary style'
+      @defaultValue={{false}}
+      @value={{this.primary}}
+      @onInput={{fn (mut this.primary)}}
+    />
+    <Args.Bool @name="disabled"
+      @description='for use when the button cannot be clicked, renders disabled attribute and style'
+      @defaultValue={{false}}
+      @value={{this.disabled}}
+      @onInput={{fn (mut this.disabled)}}
+    />
+    <Args.Bool @name="dropdownIcon"
+      @description='when true, shows a dropdown icon on the right side of the button'
+      @defaultValue={{false}}
+      @value={{this.dropdownIcon}}
+      @onInput={{fn (mut this.dropdownIcon)}}
+    />
+    <Args.Bool @name="collectionStyle"
+      @description='apply the style variation used in the collection header'
+      @defaultValue={{false}}
+      @value={{this.collectionStyle}}
+      @onInput={{fn (mut this.collectionStyle)}}
+    />
+    <Args.Yield @optional={{true}} @description="The content of the button." />
+  </:api>
+</Freestyle::Usage>
+

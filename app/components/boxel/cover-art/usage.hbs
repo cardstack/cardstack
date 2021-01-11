@@ -1,45 +1,39 @@
-<FreestyleAnnotation @slug="cover-art">
-  <div>
-    @size (Number) the size of the largest art, in px.
-    <input
-      type="range"
-      min={{20}}
-      max={{200}}
-      step={{1}}
-      value={{this.size}}
-      {{on 'input' (pick 'target.value' (fn (mut this.size)))}}
-    /> ({{this.size}})
-  </div>
-  <div>
-    @maxWidth (Number) the maximum width of the layout, default 190.
-    <input
-      type="range"
-      min={{100}}
-      max={{500}}
-      step={{5}}
-      value={{this.maxWidth}}
-      {{on 'input' (pick 'target.value' (fn (mut this.maxWidth)))}}
-    /> ({{this.maxWidth}})
-  </div>
-  <div>
-    @covers (String[]) a collection of thumbnails to lay out. There is no reason to pass more than 5 as they are barely rendered.
-    <br>
-    Use the slider to adjust how many are shown below.
-    <input
-      type="range"
-      min={{1}}
-      max={{this.coverThumbs.length}}
-      step={{1}}
-      value={{this.numToShow}}
-      {{on 'input' (pick 'target.value' (fn (mut this.numToShow)))}}
-    /> ({{this.numToShow}})
-  </div>
-</FreestyleAnnotation>
+<Freestyle::Usage @name="CoverArt">
+  <:example>
+    <Boxel::CoverArt
+      @size={{this.size}}
+      @maxWidth={{this.maxWidth}}
+      @covers={{this.coverThumbs}}
+    />
+  </:example>
 
-<FreestyleUsage @slug="cover-art">
-  <Boxel::CoverArt
-    @size={{this.size}}
-    @maxWidth={{this.maxWidth}}
-    @covers={{this.coverThumbsToShow}}
-  />
-</FreestyleUsage>
+  <:api as |Args|>
+    <Args.Number
+      @name="size"
+      @defaultValue={{80}}
+      @min={{20}}
+      @max={{200}}
+      @description="the size of the largest art, in px. Defaults to 80"
+      @value={{this.size}}
+      @onInput={{fn (mut this.size)}}
+    />
+    <Args.Number
+      @name="maxWidth"
+      @defaultValue={{190}}
+      @min={{100}}
+      @max={{500}}
+      @step={{5}}
+      @description="the maximum width of the layout"
+      @value={{this.maxWidth}}
+      @onInput={{fn (mut this.maxWidth)}}
+    />
+    <Args.String
+      @name="covers"
+      @array={{true}}
+      @required={{true}}
+      @description="a collection of thumbnails to lay out. There is no reason to pass more than 5 as they are barely rendered"
+      @value={{this.coverThumbs}}
+      @onInput={{this.updateCoverThumbs}}
+    />
+  </:api>
+</Freestyle::Usage>
