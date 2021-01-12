@@ -3,7 +3,7 @@
 </FreestyleAnnotation>
 
 <FreestyleUsage @slug="breadcrumbs-items-arg">
-  <Breadcrumbs @items={{array
+  <Boxel::Breadcrumbs @items={{array
     (hash route="media-registry.index" routeModel="bunny_records" title="Master Recordings" type="Collection")
     (hash route="media-registry.collection.index" routeModel=(array "bunny_records" "golden_girl") title="Golden Girl" type="Collection")
   }} />
@@ -14,7 +14,7 @@
 </FreestyleAnnotation>
 
 <FreestyleUsage @slug="breadcrumbs-yielding">
-  <Breadcrumbs>
+  <Boxel::Breadcrumbs>
     <LinkTo @route="media-registry" @model="bunny_records" @class="breadcrumbs__item">
       <div class="breadcrumbs__item-label">Collection</div>
       <div class="breadcrumbs__item-title">Master Recordings</div>
@@ -24,5 +24,5 @@
       <div class="breadcrumbs__item-label">Collection</div>
       <div class="breadcrumbs__item-title">Golden Girl</div>
     </LinkTo>
-  </Breadcrumbs>
+  </Boxel::Breadcrumbs>
 </FreestyleUsage>
