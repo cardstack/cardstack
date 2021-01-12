@@ -69,10 +69,10 @@
         <section class="cardflow__sidebar-section">
           <h3 class="cardflow__sidebar-title">Workflow Progress</h3>
           <div class="cardflow__progress">
-            <div class="cardflow__progress-icon">
-              <div class="cardflow__progress-pie" style={{html-safe (concat "stroke-dasharray:" (mult this.progressPct 339) " " 339)}}>{{svg-jar "progress-circle-lg" width="120px" height="120px"}}</div>
-              <div class="cardflow__progress-pct">{{this.milestone.pct}}%</div>
-            </div>
+            <Boxel::ProgressCircle
+              @size={{120}}
+              @fractionComplete={{div this.milestone.pct 100}}
+            />
             <div class="cardflow__progress-status">{{this.milestone.description}}</div>
           </div>
         </section>

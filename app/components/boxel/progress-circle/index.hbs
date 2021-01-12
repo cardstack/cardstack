@@ -1,0 +1,18 @@
+<div
+  class="progress-circle"
+  style={{html-safe (concat "width:" @size "px;height:" @size "px;")}}
+  ...attributes
+>
+  <div
+    class="progress-circle__pie"
+    style={{html-safe (concat "stroke-dasharray:" (mult @fractionComplete 339) " " 339)}}
+  >
+    {{svg-jar "progress-circle-lg" width=@size height=@size}}
+  </div>
+  <div
+    class="progress-circle__pct-label"
+    style={{html-safe (concat "font-size:" this.fontSize "px")}}
+  >
+    {{this.humanPercentComplete}}%
+  </div>
+</div>
