@@ -1,4 +1,22 @@
-[
+import {
+  CastMeThumb,
+  InnocentKittensThumb,
+  BeenThereDoneThatThumb,
+  RollerCoasterThumb,
+  FreedomThumb,
+  TheVampsoftheWorldThumb,
+  HomeSweetHomeThumb,
+  PinnaclesThumb,
+  SulkingMaidsThumb,
+  WhatMusicalInstrumentsCanDoThumb,
+  JustListenThumb,
+  FriedPorkThumb,
+  LongingThumb,
+  NobodysClaimsThumb,
+  ZombiesThumb
+} from './all_tracks_combined';
+
+export default [
   {
     "id": "hit-songs",
     "catalog_title": "Hit Songs",
@@ -9,11 +27,11 @@
     "date_created": "2019-05-02",
     "date_updated": "2020-01-08",
     "selected_art": [
-      "/boxel/media-registry/covers/thumb/Innocent-Kittens.jpg",
-      "/boxel/media-registry/covers/thumb/Been-There-Done-That.jpg",
-      "/boxel/media-registry/covers/thumb/Roller-Coaster.jpg",
-      "/boxel/media-registry/covers/thumb/Freedom.jpg",
-      "/boxel/media-registry/covers/thumb/The-Vamps-of-the-World.jpg"
+      InnocentKittensThumb,
+      BeenThereDoneThatThumb,
+      RollerCoasterThumb,
+      FreedomThumb,
+      TheVampsoftheWorldThumb
     ]
   },
   {
@@ -26,11 +44,11 @@
     "date_created": "2019-08-16",
     "date_updated": "2020-02-18",
     "selected_art": [
-      "/boxel/media-registry/covers/thumb/Cast-Me.jpg",
-      "/boxel/media-registry/covers/thumb/The-Vamps-of-the-World.jpg",
-      "/boxel/media-registry/covers/thumb/Innocent-Kittens.jpg",
-      "/boxel/media-registry/covers/thumb/Roller-Coaster.jpg",
-      "/boxel/media-registry/covers/thumb/Freedom.jpg"
+      CastMeThumb,
+      TheVampsoftheWorldThumb,
+      InnocentKittensThumb,
+      RollerCoasterThumb,
+      FreedomThumb
     ]
   },
   {
@@ -43,11 +61,11 @@
     "date_created": "2019-01-22",
     "date_updated": "2019-06-25",
     "selected_art": [
-      "/boxel/media-registry/covers/thumb/Freedom.jpg",
-      "/boxel/media-registry/covers/thumb/Innocent-Kittens.jpg",
-      "/boxel/media-registry/covers/thumb/Roller-Coaster.jpg",
-      "/boxel/media-registry/covers/thumb/Cast-Me.jpg",
-      "/boxel/media-registry/covers/thumb/The-Vamps-of-the-World.jpg"
+      FreedomThumb,
+      InnocentKittensThumb,
+      RollerCoasterThumb,
+      CastMeThumb,
+      TheVampsoftheWorldThumb
     ]
   },
   {
@@ -60,11 +78,11 @@
     "date_created": "2018-12-19",
     "date_updated": "2020-02-07",
     "selected_art": [
-      "/boxel/media-registry/covers/thumb/Freedom.jpg",
-      "/boxel/media-registry/covers/thumb/Been-There-Done-That.jpg",
-      "/boxel/media-registry/covers/thumb/Home-Sweet-Home.jpg",
-      "/boxel/media-registry/covers/thumb/Pinnacles.jpg",
-      "/boxel/media-registry/covers/thumb/Sulking-Maids.jpg"
+      FreedomThumb,
+      BeenThereDoneThatThumb,
+      HomeSweetHomeThumb,
+      PinnaclesThumb,
+      SulkingMaidsThumb
     ]
   },
   {
@@ -77,11 +95,11 @@
     "date_created": "2020-02-07",
     "date_updated": "2020-06-03",
     "selected_art": [
-      "/boxel/media-registry/covers/thumb/What-Musical-Instruments-Can-Do.jpg",
-      "/boxel/media-registry/covers/thumb/Just-Listen.jpg",
-      "/boxel/media-registry/covers/thumb/Fried-Pork.jpg",
-      "/boxel/media-registry/covers/thumb/Longing.jpg",
-      "/boxel/media-registry/covers/thumb/Nobodys-Claims.jpg"
+      WhatMusicalInstrumentsCanDoThumb,
+      JustListenThumb,
+      FriedPorkThumb,
+      LongingThumb,
+      NobodysClaimsThumb
     ]
   },
   {
@@ -94,11 +112,11 @@
     "date_created": "2020-03-18",
     "date_updated": "2020-03-31",
     "selected_art": [
-      "/boxel/media-registry/covers/thumb/Cast-Me.jpg",
-      "/boxel/media-registry/covers/thumb/The-Vamps-of-the-World.jpg",
-      "/boxel/media-registry/covers/thumb/Innocent-Kittens.jpg",
-      "/boxel/media-registry/covers/thumb/Roller-Coaster.jpg",
-      "/boxel/media-registry/covers/thumb/Zombies.jpg"
+      CastMeThumb,
+      TheVampsoftheWorldThumb,
+      InnocentKittensThumb,
+      RollerCoasterThumb,
+      ZombiesThumb
     ]
   },
   {
@@ -111,11 +129,11 @@
     "date_created": "2020-06-01",
     "date_updated": "2020-07-23",
     "selected_art": [
-      "/boxel/media-registry/covers/thumb/The-Vamps-of-the-World.jpg",
-      "/boxel/media-registry/covers/thumb/Roller-Coaster.jpg",
-      "/boxel/media-registry/covers/thumb/Innocent-Kittens.jpg",
-      "/boxel/media-registry/covers/thumb/Freedom.jpg",
-      "/boxel/media-registry/covers/thumb/Zombies.jpg"
+      TheVampsoftheWorldThumb,
+      RollerCoasterThumb,
+      InnocentKittensThumb,
+      FreedomThumb,
+      ZombiesThumb
     ]
   }
 ]

@@ -36,7 +36,7 @@
 }
 
 .sidebar-related-card__link:hover .sidebar-related-card__header {
-  background-image: url("/boxel/assets/images/icons/expand.svg");
+  background-image: url("/images/assets/expand.svg");
   background-position: top 7px right 7px;
   background-size: 16px 16px;
   background-repeat: no-repeat;

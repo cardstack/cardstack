@@ -1,4 +1,4 @@
-[
+export default [
   {
     "id": "the-sun-comes-out",
     "version": "v1",

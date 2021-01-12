@@ -4,7 +4,11 @@ import { action, set, get } from '@ember/object';
 import { compare, isBlank } from '@ember/utils';
 import { fetchCollection } from '@cardstack/boxel/media';
 import { formatId } from '@cardstack/boxel/utils/format-id';
-
+import sunlightCoverThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Sunlight.jpg';
+import changeIsGoodCoverThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Change-Is-Good.jpg';
+import fullMoonCoverThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Full-Moon.jpg';
+import loveNeverDiesCoverThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Love-Never-Dies.jpg';
+import animalsCoverThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Animals.jpg';
 export default class MediaRegistryCardflowController extends MediaRegistryController {
   @tracked isolatedCollection = this.getIsolatedCollection(this.catalog.id);
   @tracked currentMilestone = this.model.currentOrg.queueCards ? this.milestones.filter(el => el.pct === this.model.currentOrg.queueCards[0].progressPct)[0] : null;
@@ -18,11 +22,11 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
     title: 'Batch F',
     count: '16',
     selected_art: [
-      "/boxel/media-registry/covers/thumb/Sunlight.jpg",
-      "/boxel/media-registry/covers/thumb/Change-Is-Good.jpg",
-      "/boxel/media-registry/covers/thumb/Full-Moon.jpg",
-      "/boxel/media-registry/covers/thumb/Love-Never-Dies.jpg",
-      "/boxel/media-registry/covers/thumb/Animals.jpg"
+      sunlightCoverThumb,
+      changeIsGoodCoverThumb,
+      fullMoonCoverThumb,
+      loveNeverDiesCoverThumb,
+      animalsCoverThumb
     ]
   }
 

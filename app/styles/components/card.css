@@ -55,7 +55,7 @@
 }
 
 .boxel-card__expand-overlay:hover + .boxel-card > .boxel-card__header {
-  background-image: url("/boxel/assets/images/icons/expand.svg");
+  background-image: url("/images/assets/expand.svg");
   background-position: top 7px right 7px;
   background-size: 16px 16px;
   background-repeat: no-repeat;
@@ -332,7 +332,7 @@
 }
 
 .territory-card--worldwide .boxel-card__inner {
-  background-image: url('/boxel/assets/images/icons/world.svg');
+  background-image: url('/images/icons/world.svg');
   background-position: left 18px center;
   background-size: 15px 15px;
   background-repeat: no-repeat;

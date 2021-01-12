@@ -1,12 +1,28 @@
-{
+import ElizaFarringtonThumb from '../images/workflow/participants/thumb/Eliza-Farrington.jpg';
+import HaleyOConnellThumb from '../images/workflow/participants/thumb/Haley-OConnell.jpg';
+import JuliaMasonThumb from '../images/workflow/participants/thumb/Julia-Mason.jpg';
+import KirstenSchoberThumb from '../images/workflow/participants/thumb/Kirsten-Schober.jpg';
+import LolaSampsonThumb from '../images/workflow/participants/thumb/Lola-Sampson.jpg';
+import LucasFarrowThumb from '../images/workflow/participants/thumb/Lucas-Farrow.jpg';
+import RupertGrishamThumb from '../images/workflow/participants/thumb/Rupert-Grisham.jpg';
+import RyanSaintJamesThumb from '../images/workflow/participants/thumb/Ryan-Saint-James.jpg';
+import HLCIcon from '../images/workflow/orgs/hlc-icon.png';
+import HLCLogo from '../images/workflow/orgs/hlc-logo.png';
+import HSHIcon from '../images/workflow/orgs/hsh-icon.png';
+import HSHLogo from '../images/workflow/orgs/hsh-logo.png';
+import SPWBIcon from '../images/workflow/orgs/spwb-icon.png';
+import SPWBLogo from '../images/workflow/orgs/spwb-logo.png';
+
+
+export default {
   "orgs": [
     {
       "id": "hsh",
       "type": "organization",
       "title": "Home Sweet Home",
-      "imgURL": "/workflow/orgs/hsh-icon.png",
-      "iconURL": "/workflow/orgs/hsh-icon.png",
-      "logoURL": "/workflow/orgs/hsh-logo.png",
+      "imgURL": HSHIcon,
+      "iconURL": HSHIcon,
+      "logoURL": HSHLogo,
       "website": "www.homesweethome.com",
       "address": "112 Milford Ave, Hartford, CT 06106, United States",
       "members": [
@@ -32,9 +48,9 @@
       "id": "spw",
       "type": "organization",
       "title": "Self-Publishing Writers",
-      "imgURL": "/workflow/orgs/spwb-icon.png",
-      "iconURL": "/workflow/orgs/spwb-icon.png",
-      "logoURL": "/workflow/orgs/spwb-logo.png",
+      "imgURL": SPWBIcon,
+      "iconURL": SPWBIcon,
+      "logoURL": SPWBLogo,
       "members": [
         {
           "id": "lucas-farrow",
@@ -58,9 +74,9 @@
       "id": "hlc",
       "type": "organization",
       "title": "Haley's Love Couch",
-      "imgURL": "/workflow/orgs/hlc-icon.png",
-      "iconURL": "/workflow/orgs/hlc-icon.png",
-      "logoURL": "/workflow/orgs/hlc-logo.png"
+      "imgURL": HLCIcon,
+      "iconURL": HLCIcon,
+      "logoURL": HLCLogo
     }
   ],
   "users": [
@@ -68,7 +84,7 @@
       "id": "ryan-saint-james",
       "type": "participant",
       "title": "Ryan Saint-James",
-      "imgURL": "/workflow/participants/thumb/Ryan-Saint-James.jpg",
+      "imgURL": RyanSaintJamesThumb,
       "date_of_birth": "1986-02-12",
       "email": "ryan.saintjames@hsh.com",
       "phone": "+1 860 206 3345",
@@ -79,7 +95,7 @@
       "id": "haley-oconnell",
       "type": "participant",
       "title": "Haley O’Connell",
-      "imgURL": "/workflow/participants/thumb/Haley-OConnell.jpg",
+      "imgURL": HaleyOConnellThumb,
       "description": "Writer",
       "date_of_birth": "1980-12-24",
       "email": "haley.oconnell@hsh.com",
@@ -91,7 +107,7 @@
       "id": "rupert-grisham",
       "type": "participant",
       "title": "Rupert Grisham",
-      "imgURL": "/workflow/participants/thumb/Rupert-Grisham.jpg",
+      "imgURL": RupertGrishamThumb,
       "date_of_birth": "1970-12-18",
       "email": "rupert.grisham@hsh.com",
       "phone": "+1 860 206 3819",
@@ -102,7 +118,7 @@
       "id": "lola-sampson",
       "type": "participant",
       "title": "Lola Sampson",
-      "imgURL": "/workflow/participants/thumb/Lola-Sampson.jpg",
+      "imgURL": LolaSampsonThumb,
       "date_of_birth": "1988-04-10",
       "email": "lola.sampson@hsh.com",
       "phone": "+1 404 526 9665",
@@ -113,7 +129,7 @@
       "id": "julia-mason",
       "type": "participant",
       "title": "Julia Mason",
-      "imgURL": "/workflow/participants/thumb/Julia-Mason.jpg",
+      "imgURL": JuliaMasonThumb,
       "date_of_birth": "1987-04-03",
       "email": "julia-mason@gmail.com",
       "phone": "+1 412 672 0608",
@@ -155,21 +171,21 @@
       "id": "lucas-farrow",
       "type": "participant",
       "title": "Lucas Farrow",
-      "imgURL": "/workflow/participants/thumb/Lucas-Farrow.jpg",
+      "imgURL": LucasFarrowThumb,
       "org_ids": ["spw"]
     },
     {
       "id": "kirsten-schober",
       "type": "participant",
       "title": "Kirsten Schober",
-      "imgURL": "/workflow/participants/thumb/Kirsten-Schober.jpg",
+      "imgURL": KirstenSchoberThumb,
       "org_ids": ["spw"]
     },
     {
       "id": "eliza-farrington",
       "type": "participant",
       "title": "Eliza Farrington",
-      "imgURL": "/workflow/participants/thumb/Eliza-Farrington.jpg",
+      "imgURL": ElizaFarringtonThumb,
       "org_ids": ["spw"]
     }
   ],

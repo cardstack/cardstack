@@ -28,7 +28,8 @@ module.exports = {
         'testem.js',
         'blueprints/*/index.js',
         'config/**/*.js',
-        'generate-thumbs.js'
+        'generate-thumbs.js',
+        'postcss.config.js'
       ],
       excludedFiles: [
         'app/**'

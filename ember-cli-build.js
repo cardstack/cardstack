@@ -15,13 +15,11 @@ module.exports = function(defaults) {
     // our app always uses faker, even in production
     'ember-faker': { enabled: true },
 
-    fingerprint: {
-      extensions: ['js', 'css', 'map', 'png', 'jpg', 'gif', 'svg', 'flac'],
-      generateAssetMap: true,
-      fingerprintAssetMap: true,
-      prepend: '/boxel/',
-      replaceExtensions: ['html', 'css', 'js', 'json'],
-      enabled: (process.env.EMBER_ENV !== 'test')
+    svgJar: {
+      sourceDirs: [
+        'app/images/icons',
+        'app/images/media-registry',
+      ],
     },
 
     // Add options here
@@ -34,6 +32,7 @@ module.exports = function(defaults) {
     staticAddonTrees: true,
     // staticHelpers: true,
     // staticComponents: true,
+    staticAppPaths: ['data'],
     packagerOptions: {
       webpackConfig: {
         module: {
@@ -45,10 +44,29 @@ module.exports = function(defaults) {
                 name: "[path][name]-[contenthash].[ext]",
               },
             },
+            {
+              test: /\.css$/,
+              exclude: /node_modules/,
+              use: [
+                { loader: 'style-loader', },
+                { loader: 'css-loader', options: { importLoaders: 1, } },
+                { loader: 'postcss-loader', options: {
+                  postcssOptions: {
+                    plugins: [
+                      [
+                        ['postcss-import', {
+                            path: [`${__dirname}/node_modules`]
+                        }]
+                      ],
+                    ]
+                  }
+                }}
+              ]
+            }
           ],
         },
       },
-      publicAssetURL: '/boxel/'
+      // publicAssetURL: '/boxel/'
     }
   });
 };

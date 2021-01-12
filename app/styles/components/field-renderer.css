@@ -168,11 +168,11 @@
   height: 30px;
   padding: 0;
   border: none;
-  background: url('/boxel/assets/images/icons/icon-minus-circle.svg') center/16px 16px no-repeat;
+  background: url('/images/icons/icon-minus-circle.svg') center/16px 16px no-repeat;
 }
 
 .item__add-btn {
-  background-image: url('/boxel/assets/images/icons/icon-plus-circle-highlight-bg.svg');
+  background-image: url('/images/icons/icon-plus-circle-highlight-bg.svg');
   position: absolute;
   top: 15px;
   right: 0;
@@ -225,7 +225,7 @@
   right: 0;
   width: 50px;
   height: 50px;
-  background: url('/boxel/assets/images/icons/dropdown-arrows.svg') center/15px 15px no-repeat;
+  background: url('/images/icons/dropdown-arrows.svg') center/15px 15px no-repeat;
 }
 
 .field-renderer__dropdown .ember-power-select-trigger:hover {

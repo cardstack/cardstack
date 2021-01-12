@@ -145,7 +145,7 @@
 
 .cardflow__taskbar-count {
   padding-left: 22px;
-  background: url('/boxel/assets/images/icons/task.svg') left center/15px 15px no-repeat;
+  background: url('/images/icons/task.svg') left center/15px 15px no-repeat;
 }
 
 .cardflow__taskbar-label {
@@ -250,7 +250,7 @@
 .cardflow__reply-to.field-renderer__input {
   padding-right: 80px;
   height: 45px;
-  background-image: url("/boxel/assets/images/icons/plus.svg"), url("/boxel/assets/images/icons/emoji.svg");
+  background-image: url("/images/assets/plus.svg"), url("/images/assets/emoji.svg");
   background-position: right 55px center, right 15px center;
   background-repeat: no-repeat, no-repeat;
   background-size: 15px 15px, 20px 20px;

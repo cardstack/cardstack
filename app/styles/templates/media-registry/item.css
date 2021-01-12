@@ -58,7 +58,7 @@
 /* Header */
 .item__header {
   background-color: var(--boxel-purple-300);
-  background-image: var(--blurhash-image);
+  /* background-image: var(--blurhash-image); */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

@@ -34,7 +34,7 @@
 .versions__title {
   padding: 28px 20px 28px 35px;
   color: var(--boxel-light);
-  background: url('/boxel/assets/images/icons/file-icon.svg') center left 5px/16px 20px no-repeat;
+  background: url('/images/icons/file-icon.svg') center left 5px/16px 20px no-repeat;
   font: var(--boxel-font);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-sm);
@@ -157,7 +157,7 @@
   color: var(--boxel-dark);
 }
 .versions-nav-item.is-base-card .version__label {
-  background-image: url('/boxel/assets/images/icons/clock.svg');
+  background-image: url('/images/icons/clock.svg');
 }
 
 .versions-nav-item.is-base-card .versions-nav-item__hover-btn.checkbox {
@@ -221,7 +221,7 @@
 }
 
 .version__label {
-  background: url('/boxel/assets/images/icons/clock-highlighted.svg') right 2px center/16px 15px no-repeat;
+  background: url('/images/icons/clock-highlighted.svg') right 2px center/16px 15px no-repeat;
   padding-right: 25px;
   color: var(--boxel-highlight);
   font-size: 10px;
@@ -349,7 +349,7 @@
 .version-card--item__header {
   width: 100%;
   background-color: var(--boxel-purple-300);
-  background-image: var(--blurhash-image);
+  /* background-image: var(--blurhash-image); */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -519,7 +519,7 @@
 
 .version-card--base-card .version__label {
   color: var(--boxel-dark);
-  background-image: url('/boxel/assets/images/icons/clock.svg');
+  background-image: url('/images/icons/clock.svg');
 }
 
 .version-card--base-card .version-card__content {
@@ -533,13 +533,13 @@
   border: none;
   position: absolute;
   top: 45px;
-  background: url('/boxel/assets/images/icons/swap.svg') center/18px 17px no-repeat;
+  background: url('/images/icons/swap.svg') center/18px 17px no-repeat;
   z-index: 10;
   outline: 0;
 }
 
 .comp-view__swap-btn:hover {
-  background-image: url('/boxel/assets/images/icons/swap-white.svg');
+  background-image: url('/images/icons/swap-white.svg');
   cursor: pointer;
 }
 

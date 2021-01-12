@@ -29,7 +29,7 @@
   padding-left: 35px;
   padding-right: 20px;
   color: var(--boxel-light);
-  background: url('/boxel/assets/images/icons/file-icon.svg') center left 5px/16px 20px no-repeat;
+  background: url('/images/icons/file-icon.svg') center left 5px/16px 20px no-repeat;
   font: var(--boxel-font);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-sm);
@@ -44,7 +44,7 @@
   width: 300px;
   height: 40px;
   padding: 10px 40px;
-  background-image: url('/boxel/assets/images/icons/clock.svg'), url('/boxel/assets/images/icons/close.svg');
+  background-image: url('/images/icons/clock.svg'), url('/images/icons/close.svg');
   background-position: left 15px top 11px, center right 15px;
   background-repeat: no-repeat, no-repeat;
   background-size: 15px 15px, 10px 10px;
@@ -100,7 +100,7 @@
 .discrepancy__nested-level-back-btn {
   padding: 10px 20px;
   border: none;
-  background: url('/boxel/assets/images/icons/curved-arrow.svg') left center/12px 12px no-repeat;
+  background: url('/images/icons/curved-arrow.svg') left center/12px 12px no-repeat;
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-lg);
 }
@@ -253,7 +253,7 @@
   height: 40px;
   padding: 10px 40px;
   font-weight: 400;
-  background: url('/boxel/assets/images/icons/select-empty.svg') left 12px top 10px/16px 16px no-repeat;
+  background: url('/images/icons/select-empty.svg') left 12px top 10px/16px 16px no-repeat;
   background-color: transparent;
   border-color: var(--boxel-purple-400);
   color: inherit;
@@ -267,7 +267,7 @@
 }
 
 .discrepancy-card__header-btn.checked {
-  background-image: url('/boxel/assets/images/icons/select-checked.svg');
+  background-image: url('/images/icons/select-checked.svg');
   border-color: var(--boxel-dark);
   font-weight: 600;
   cursor: initial;
@@ -328,7 +328,7 @@
 }
 
 .discrepancy-field__btn-container--toggled {
-  background-image: url('/boxel/assets/images/icons/arrows.svg'), url('/boxel/assets/images/icons/arrows.svg');
+  background-image: url('/images/icons/arrows.svg'), url('/images/icons/arrows.svg');
   background-position: left center, right center;
   background-size: 70px 20px, 70px 20px;
   background-repeat: no-repeat, no-repeat;
@@ -367,7 +367,7 @@
 .discrepancy__count-btn__link-copy {
   display: inline-block;
   color: var(--boxel-light);
-  background: url('/boxel/assets/images/icons/warning.svg') bottom left/25px 20px no-repeat;
+  background: url('/images/icons/warning.svg') bottom left/25px 20px no-repeat;
   font: var(--boxel-font-sm);
   padding-top: 25px;
   padding-left: 35px;

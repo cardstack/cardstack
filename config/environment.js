@@ -4,7 +4,7 @@ module.exports = function(environment) {
   let ENV = {
     modulePrefix: '@cardstack/boxel',
     environment,
-    rootURL: '/boxel/',
+    rootURL: "/",
     locationType: 'auto',
     EmberENV: {
       FEATURES: {
@@ -50,6 +50,7 @@ module.exports = function(environment) {
 
   if (environment === 'production') {
     // here you can enable a production-specific feature
+    ENV.rootURL =  '/boxel/';
     ENV.locationType = 'hash';
   }
 

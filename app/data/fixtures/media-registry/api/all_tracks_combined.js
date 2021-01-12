@@ -1,4 +1,370 @@
-[
+import AccidentsCover from '@cardstack/boxel/images/media-registry/covers/Accidents.jpg';
+import AccidentsThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Accidents.jpg';
+import AccidentsMedium from '@cardstack/boxel/images/media-registry/covers/medium/Accidents.jpg';
+import AccidentsLarge from '@cardstack/boxel/images/media-registry/covers/large/Accidents.jpg';
+
+import AllAboutHeavenCover from '@cardstack/boxel/images/media-registry/covers/All-About-Heaven.jpg';
+import AllAboutHeavenThumb from '@cardstack/boxel/images/media-registry/covers/thumb/All-About-Heaven.jpg';
+import AllAboutHeavenMedium from '@cardstack/boxel/images/media-registry/covers/medium/All-About-Heaven.jpg';
+import AllAboutHeavenLarge from '@cardstack/boxel/images/media-registry/covers/large/All-About-Heaven.jpg';
+
+import AllAbouttheManCover from '@cardstack/boxel/images/media-registry/covers/All-About-the-Man.jpg';
+import AllAbouttheManThumb from '@cardstack/boxel/images/media-registry/covers/thumb/All-About-the-Man.jpg';
+import AllAbouttheManMedium from '@cardstack/boxel/images/media-registry/covers/medium/All-About-the-Man.jpg';
+import AllAbouttheManLarge from '@cardstack/boxel/images/media-registry/covers/large/All-About-the-Man.jpg';
+
+import AllAbouttheQualityofLifeCover from '@cardstack/boxel/images/media-registry/covers/All-About-the-Quality-of-Life.jpg';
+import AllAbouttheQualityofLifeThumb from '@cardstack/boxel/images/media-registry/covers/thumb/All-About-the-Quality-of-Life.jpg';
+import AllAbouttheQualityofLifeMedium from '@cardstack/boxel/images/media-registry/covers/medium/All-About-the-Quality-of-Life.jpg';
+import AllAbouttheQualityofLifeLarge from '@cardstack/boxel/images/media-registry/covers/large/All-About-the-Quality-of-Life.jpg';
+
+import AlwaysInLoveCover from '@cardstack/boxel/images/media-registry/covers/Always-In-Love.jpg';
+import AlwaysInLoveThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Always-In-Love.jpg';
+import AlwaysInLoveMedium from '@cardstack/boxel/images/media-registry/covers/medium/Always-In-Love.jpg';
+import AlwaysInLoveLarge from '@cardstack/boxel/images/media-registry/covers/large/Always-In-Love.jpg';
+
+import AnimalsCover from '@cardstack/boxel/images/media-registry/covers/Animals.jpg';
+import AnimalsThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Animals.jpg';
+import AnimalsMedium from '@cardstack/boxel/images/media-registry/covers/medium/Animals.jpg';
+import AnimalsLarge from '@cardstack/boxel/images/media-registry/covers/large/Animals.jpg';
+
+import AroundtheWorldCover from '@cardstack/boxel/images/media-registry/covers/Around-the-World.jpg';
+import AroundtheWorldThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Around-the-World.jpg';
+import AroundtheWorldMedium from '@cardstack/boxel/images/media-registry/covers/medium/Around-the-World.jpg';
+import AroundtheWorldLarge from '@cardstack/boxel/images/media-registry/covers/large/Around-the-World.jpg';
+
+import AutumnLeavesCover from '@cardstack/boxel/images/media-registry/covers/Autumn-Leaves.jpg';
+import AutumnLeavesThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Autumn-Leaves.jpg';
+import AutumnLeavesMedium from '@cardstack/boxel/images/media-registry/covers/medium/Autumn-Leaves.jpg';
+import AutumnLeavesLarge from '@cardstack/boxel/images/media-registry/covers/large/Autumn-Leaves.jpg';
+
+import BeautyvsRealityCover from '@cardstack/boxel/images/media-registry/covers/Beauty-vs-Reality.jpg';
+import BeautyvsRealityThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Beauty-vs-Reality.jpg';
+import BeautyvsRealityMedium from '@cardstack/boxel/images/media-registry/covers/medium/Beauty-vs-Reality.jpg';
+import BeautyvsRealityLarge from '@cardstack/boxel/images/media-registry/covers/large/Beauty-vs-Reality.jpg';
+
+import BeenThereDoneThatCover from '@cardstack/boxel/images/media-registry/covers/Been-There-Done-That.jpg';
+import BeenThereDoneThatThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Been-There-Done-That.jpg';
+import BeenThereDoneThatMedium from '@cardstack/boxel/images/media-registry/covers/medium/Been-There-Done-That.jpg';
+import BeenThereDoneThatLarge from '@cardstack/boxel/images/media-registry/covers/large/Been-There-Done-That.jpg';
+
+import CallMeCrazyCover from '@cardstack/boxel/images/media-registry/covers/Call-Me-Crazy.jpg';
+import CallMeCrazyThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Call-Me-Crazy.jpg';
+import CallMeCrazyMedium from '@cardstack/boxel/images/media-registry/covers/medium/Call-Me-Crazy.jpg';
+import CallMeCrazyLarge from '@cardstack/boxel/images/media-registry/covers/large/Call-Me-Crazy.jpg';
+
+import CastMeCover from '@cardstack/boxel/images/media-registry/covers/Cast-Me.jpg';
+import CastMeThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Cast-Me.jpg';
+import CastMeMedium from '@cardstack/boxel/images/media-registry/covers/medium/Cast-Me.jpg';
+import CastMeLarge from '@cardstack/boxel/images/media-registry/covers/large/Cast-Me.jpg';
+
+import ChangeIsGoodCover from '@cardstack/boxel/images/media-registry/covers/Change-Is-Good.jpg';
+import ChangeIsGoodThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Change-Is-Good.jpg';
+import ChangeIsGoodMedium from '@cardstack/boxel/images/media-registry/covers/medium/Change-Is-Good.jpg';
+import ChangeIsGoodLarge from '@cardstack/boxel/images/media-registry/covers/large/Change-Is-Good.jpg';
+
+import DramaQueenCover from '@cardstack/boxel/images/media-registry/covers/Drama-Queen.jpg';
+import DramaQueenThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Drama-Queen.jpg';
+import DramaQueenMedium from '@cardstack/boxel/images/media-registry/covers/medium/Drama-Queen.jpg';
+import DramaQueenLarge from '@cardstack/boxel/images/media-registry/covers/large/Drama-Queen.jpg';
+
+import DriveMeCrazyCover from '@cardstack/boxel/images/media-registry/covers/Drive-Me-Crazy.jpg';
+import DriveMeCrazyThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Drive-Me-Crazy.jpg';
+import DriveMeCrazyMedium from '@cardstack/boxel/images/media-registry/covers/medium/Drive-Me-Crazy.jpg';
+import DriveMeCrazyLarge from '@cardstack/boxel/images/media-registry/covers/large/Drive-Me-Crazy.jpg';
+
+import DrunkCover from '@cardstack/boxel/images/media-registry/covers/Drunk.jpg';
+import DrunkThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Drunk.jpg';
+import DrunkMedium from '@cardstack/boxel/images/media-registry/covers/medium/Drunk.jpg';
+import DrunkLarge from '@cardstack/boxel/images/media-registry/covers/large/Drunk.jpg';
+
+import EscapeCover from '@cardstack/boxel/images/media-registry/covers/Escape.jpg';
+import EscapeThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Escape.jpg';
+import EscapeMedium from '@cardstack/boxel/images/media-registry/covers/medium/Escape.jpg';
+import EscapeLarge from '@cardstack/boxel/images/media-registry/covers/large/Escape.jpg';
+
+import FairyTalesCover from '@cardstack/boxel/images/media-registry/covers/Fairy-Tales.jpg';
+import FairyTalesThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Fairy-Tales.jpg';
+import FairyTalesMedium from '@cardstack/boxel/images/media-registry/covers/medium/Fairy-Tales.jpg';
+import FairyTalesLarge from '@cardstack/boxel/images/media-registry/covers/large/Fairy-Tales.jpg';
+
+import FreedomCover from '@cardstack/boxel/images/media-registry/covers/Freedom.jpg';
+import FreedomThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Freedom.jpg';
+import FreedomMedium from '@cardstack/boxel/images/media-registry/covers/medium/Freedom.jpg';
+import FreedomLarge from '@cardstack/boxel/images/media-registry/covers/large/Freedom.jpg';
+
+import FriedPorkCover from '@cardstack/boxel/images/media-registry/covers/Fried-Pork.jpg';
+import FriedPorkThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Fried-Pork.jpg';
+import FriedPorkMedium from '@cardstack/boxel/images/media-registry/covers/medium/Fried-Pork.jpg';
+import FriedPorkLarge from '@cardstack/boxel/images/media-registry/covers/large/Fried-Pork.jpg';
+
+import FriendswithBenefitsCover from '@cardstack/boxel/images/media-registry/covers/Friends-with-Benefits.jpg';
+import FriendswithBenefitsThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Friends-with-Benefits.jpg';
+import FriendswithBenefitsMedium from '@cardstack/boxel/images/media-registry/covers/medium/Friends-with-Benefits.jpg';
+import FriendswithBenefitsLarge from '@cardstack/boxel/images/media-registry/covers/large/Friends-with-Benefits.jpg';
+
+import FullMoonCover from '@cardstack/boxel/images/media-registry/covers/Full-Moon.jpg';
+import FullMoonThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Full-Moon.jpg';
+import FullMoonMedium from '@cardstack/boxel/images/media-registry/covers/medium/Full-Moon.jpg';
+import FullMoonLarge from '@cardstack/boxel/images/media-registry/covers/large/Full-Moon.jpg';
+
+import GoodTimesCover from '@cardstack/boxel/images/media-registry/covers/Good-Times.jpg';
+import GoodTimesThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Good-Times.jpg';
+import GoodTimesMedium from '@cardstack/boxel/images/media-registry/covers/medium/Good-Times.jpg';
+import GoodTimesLarge from '@cardstack/boxel/images/media-registry/covers/large/Good-Times.jpg';
+
+import GottaBeSillyCover from '@cardstack/boxel/images/media-registry/covers/Gotta-Be-Silly.jpg';
+import GottaBeSillyThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Gotta-Be-Silly.jpg';
+import GottaBeSillyMedium from '@cardstack/boxel/images/media-registry/covers/medium/Gotta-Be-Silly.jpg';
+import GottaBeSillyLarge from '@cardstack/boxel/images/media-registry/covers/large/Gotta-Be-Silly.jpg';
+
+import GraduationDayCover from '@cardstack/boxel/images/media-registry/covers/Graduation-Day.jpg';
+import GraduationDayThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Graduation-Day.jpg';
+import GraduationDayMedium from '@cardstack/boxel/images/media-registry/covers/medium/Graduation-Day.jpg';
+import GraduationDayLarge from '@cardstack/boxel/images/media-registry/covers/large/Graduation-Day.jpg';
+
+import HandsOnCover from '@cardstack/boxel/images/media-registry/covers/Hands-On.jpg';
+import HandsOnThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Hands-On.jpg';
+import HandsOnMedium from '@cardstack/boxel/images/media-registry/covers/medium/Hands-On.jpg';
+import HandsOnLarge from '@cardstack/boxel/images/media-registry/covers/large/Hands-On.jpg';
+
+import HappyEverAfterCover from '@cardstack/boxel/images/media-registry/covers/Happy-Ever-After.jpg';
+import HappyEverAfterThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Happy-Ever-After.jpg';
+import HappyEverAfterMedium from '@cardstack/boxel/images/media-registry/covers/medium/Happy-Ever-After.jpg';
+import HappyEverAfterLarge from '@cardstack/boxel/images/media-registry/covers/large/Happy-Ever-After.jpg';
+
+import HaveFunCover from '@cardstack/boxel/images/media-registry/covers/Have-Fun.jpg';
+import HaveFunThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Have-Fun.jpg';
+import HaveFunMedium from '@cardstack/boxel/images/media-registry/covers/medium/Have-Fun.jpg';
+import HaveFunLarge from '@cardstack/boxel/images/media-registry/covers/large/Have-Fun.jpg';
+
+import HomeIsntSweetCover from '@cardstack/boxel/images/media-registry/covers/Home-Isnt-Sweet.jpg';
+import HomeIsntSweetThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Home-Isnt-Sweet.jpg';
+import HomeIsntSweetMedium from '@cardstack/boxel/images/media-registry/covers/medium/Home-Isnt-Sweet.jpg';
+import HomeIsntSweetLarge from '@cardstack/boxel/images/media-registry/covers/large/Home-Isnt-Sweet.jpg';
+
+import HomeSweetHomeCover from '@cardstack/boxel/images/media-registry/covers/Home-Sweet-Home.jpg';
+import HomeSweetHomeThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Home-Sweet-Home.jpg';
+import HomeSweetHomeMedium from '@cardstack/boxel/images/media-registry/covers/medium/Home-Sweet-Home.jpg';
+import HomeSweetHomeLarge from '@cardstack/boxel/images/media-registry/covers/large/Home-Sweet-Home.jpg';
+
+import InfatuatedCover from '@cardstack/boxel/images/media-registry/covers/Infatuated.jpg';
+import InfatuatedThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Infatuated.jpg';
+import InfatuatedMedium from '@cardstack/boxel/images/media-registry/covers/medium/Infatuated.jpg';
+import InfatuatedLarge from '@cardstack/boxel/images/media-registry/covers/large/Infatuated.jpg';
+
+import InnocentKittensCover from '@cardstack/boxel/images/media-registry/covers/Innocent-Kittens.jpg';
+import InnocentKittensThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Innocent-Kittens.jpg';
+import InnocentKittensMedium from '@cardstack/boxel/images/media-registry/covers/medium/Innocent-Kittens.jpg';
+import InnocentKittensLarge from '@cardstack/boxel/images/media-registry/covers/large/Innocent-Kittens.jpg';
+
+import JustLikeBirdsCover from '@cardstack/boxel/images/media-registry/covers/Just-Like-Birds.jpg';
+import JustLikeBirdsThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Just-Like-Birds.jpg';
+import JustLikeBirdsMedium from '@cardstack/boxel/images/media-registry/covers/medium/Just-Like-Birds.jpg';
+import JustLikeBirdsLarge from '@cardstack/boxel/images/media-registry/covers/large/Just-Like-Birds.jpg';
+
+import JustListenCover from '@cardstack/boxel/images/media-registry/covers/Just-Listen.jpg';
+import JustListenThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Just-Listen.jpg';
+import JustListenMedium from '@cardstack/boxel/images/media-registry/covers/medium/Just-Listen.jpg';
+import JustListenLarge from '@cardstack/boxel/images/media-registry/covers/large/Just-Listen.jpg';
+
+import LeavetheDoorOpenCover from '@cardstack/boxel/images/media-registry/covers/Leave-the-Door-Open.jpg';
+import LeavetheDoorOpenThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Leave-the-Door-Open.jpg';
+import LeavetheDoorOpenMedium from '@cardstack/boxel/images/media-registry/covers/medium/Leave-the-Door-Open.jpg';
+import LeavetheDoorOpenLarge from '@cardstack/boxel/images/media-registry/covers/large/Leave-the-Door-Open.jpg';
+
+import LiarsCover from '@cardstack/boxel/images/media-registry/covers/Liars.jpg';
+import LiarsThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Liars.jpg';
+import LiarsMedium from '@cardstack/boxel/images/media-registry/covers/medium/Liars.jpg';
+import LiarsLarge from '@cardstack/boxel/images/media-registry/covers/large/Liars.jpg';
+
+import LittleLiesCover from '@cardstack/boxel/images/media-registry/covers/Little-Lies.jpg';
+import LittleLiesThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Little-Lies.jpg';
+import LittleLiesMedium from '@cardstack/boxel/images/media-registry/covers/medium/Little-Lies.jpg';
+import LittleLiesLarge from '@cardstack/boxel/images/media-registry/covers/large/Little-Lies.jpg';
+
+import LongingCover from '@cardstack/boxel/images/media-registry/covers/Longing.jpg';
+import LongingThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Longing.jpg';
+import LongingMedium from '@cardstack/boxel/images/media-registry/covers/medium/Longing.jpg';
+import LongingLarge from '@cardstack/boxel/images/media-registry/covers/large/Longing.jpg';
+
+import LoveConquersAllCover from '@cardstack/boxel/images/media-registry/covers/Love-Conquers-All.jpg';
+import LoveConquersAllThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Love-Conquers-All.jpg';
+import LoveConquersAllMedium from '@cardstack/boxel/images/media-registry/covers/medium/Love-Conquers-All.jpg';
+import LoveConquersAllLarge from '@cardstack/boxel/images/media-registry/covers/large/Love-Conquers-All.jpg';
+
+import LoveNeverDiesCover from '@cardstack/boxel/images/media-registry/covers/Love-Never-Dies.jpg';
+import LoveNeverDiesThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Love-Never-Dies.jpg';
+import LoveNeverDiesMedium from '@cardstack/boxel/images/media-registry/covers/medium/Love-Never-Dies.jpg';
+import LoveNeverDiesLarge from '@cardstack/boxel/images/media-registry/covers/large/Love-Never-Dies.jpg';
+
+import LovetheLoveCover from '@cardstack/boxel/images/media-registry/covers/Love-the-Love.jpg';
+import LovetheLoveThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Love-the-Love.jpg';
+import LovetheLoveMedium from '@cardstack/boxel/images/media-registry/covers/medium/Love-the-Love.jpg';
+import LovetheLoveLarge from '@cardstack/boxel/images/media-registry/covers/large/Love-the-Love.jpg';
+
+import MagnaCumLoveCover from '@cardstack/boxel/images/media-registry/covers/Magna-Cum-Love.jpg';
+import MagnaCumLoveThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Magna-Cum-Love.jpg';
+import MagnaCumLoveMedium from '@cardstack/boxel/images/media-registry/covers/medium/Magna-Cum-Love.jpg';
+import MagnaCumLoveLarge from '@cardstack/boxel/images/media-registry/covers/large/Magna-Cum-Love.jpg';
+
+import MagnitudeCover from '@cardstack/boxel/images/media-registry/covers/Magnitude.jpg';
+import MagnitudeThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Magnitude.jpg';
+import MagnitudeMedium from '@cardstack/boxel/images/media-registry/covers/medium/Magnitude.jpg';
+import MagnitudeLarge from '@cardstack/boxel/images/media-registry/covers/large/Magnitude.jpg';
+
+import MakeMagicCover from '@cardstack/boxel/images/media-registry/covers/Make-Magic.jpg';
+import MakeMagicThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Make-Magic.jpg';
+import MakeMagicMedium from '@cardstack/boxel/images/media-registry/covers/medium/Make-Magic.jpg';
+import MakeMagicLarge from '@cardstack/boxel/images/media-registry/covers/large/Make-Magic.jpg';
+
+import MaximumMildnessCover from '@cardstack/boxel/images/media-registry/covers/Maximum-Mildness.jpg';
+import MaximumMildnessThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Maximum-Mildness.jpg';
+import MaximumMildnessMedium from '@cardstack/boxel/images/media-registry/covers/medium/Maximum-Mildness.jpg';
+import MaximumMildnessLarge from '@cardstack/boxel/images/media-registry/covers/large/Maximum-Mildness.jpg';
+
+import MightyMoonCover from '@cardstack/boxel/images/media-registry/covers/Mighty-Moon.jpg';
+import MightyMoonThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Mighty-Moon.jpg';
+import MightyMoonMedium from '@cardstack/boxel/images/media-registry/covers/medium/Mighty-Moon.jpg';
+import MightyMoonLarge from '@cardstack/boxel/images/media-registry/covers/large/Mighty-Moon.jpg';
+
+import MomentsCover from '@cardstack/boxel/images/media-registry/covers/Moments.jpg';
+import MomentsThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Moments.jpg';
+import MomentsMedium from '@cardstack/boxel/images/media-registry/covers/medium/Moments.jpg';
+import MomentsLarge from '@cardstack/boxel/images/media-registry/covers/large/Moments.jpg';
+
+import MoreThanWeKnowCover from '@cardstack/boxel/images/media-registry/covers/More-Than-We-Know.jpg';
+import MoreThanWeKnowThumb from '@cardstack/boxel/images/media-registry/covers/thumb/More-Than-We-Know.jpg';
+import MoreThanWeKnowMedium from '@cardstack/boxel/images/media-registry/covers/medium/More-Than-We-Know.jpg';
+import MoreThanWeKnowLarge from '@cardstack/boxel/images/media-registry/covers/large/More-Than-We-Know.jpg';
+
+import NeverLonelyCover from '@cardstack/boxel/images/media-registry/covers/Never-Lonely.jpg';
+import NeverLonelyThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Never-Lonely.jpg';
+import NeverLonelyMedium from '@cardstack/boxel/images/media-registry/covers/medium/Never-Lonely.jpg';
+import NeverLonelyLarge from '@cardstack/boxel/images/media-registry/covers/large/Never-Lonely.jpg';
+
+import NobodysClaimsCover from '@cardstack/boxel/images/media-registry/covers/Nobodys-Claims.jpg';
+import NobodysClaimsThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Nobodys-Claims.jpg';
+import NobodysClaimsMedium from '@cardstack/boxel/images/media-registry/covers/medium/Nobodys-Claims.jpg';
+import NobodysClaimsLarge from '@cardstack/boxel/images/media-registry/covers/large/Nobodys-Claims.jpg';
+
+import OntheBrinkofHappinessCover from '@cardstack/boxel/images/media-registry/covers/On-the-Brink-of-Happiness.jpg';
+import OntheBrinkofHappinessThumb from '@cardstack/boxel/images/media-registry/covers/thumb/On-the-Brink-of-Happiness.jpg';
+import OntheBrinkofHappinessMedium from '@cardstack/boxel/images/media-registry/covers/medium/On-the-Brink-of-Happiness.jpg';
+import OntheBrinkofHappinessLarge from '@cardstack/boxel/images/media-registry/covers/large/On-the-Brink-of-Happiness.jpg';
+
+import OntheDayYouWereBornCover from '@cardstack/boxel/images/media-registry/covers/On-the-Day-You-Were-Born.jpg';
+import OntheDayYouWereBornThumb from '@cardstack/boxel/images/media-registry/covers/thumb/On-the-Day-You-Were-Born.jpg';
+import OntheDayYouWereBornMedium from '@cardstack/boxel/images/media-registry/covers/medium/On-the-Day-You-Were-Born.jpg';
+import OntheDayYouWereBornLarge from '@cardstack/boxel/images/media-registry/covers/large/On-the-Day-You-Were-Born.jpg';
+
+import PinnaclesCover from '@cardstack/boxel/images/media-registry/covers/Pinnacles.jpg';
+import PinnaclesThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Pinnacles.jpg';
+import PinnaclesMedium from '@cardstack/boxel/images/media-registry/covers/medium/Pinnacles.jpg';
+import PinnaclesLarge from '@cardstack/boxel/images/media-registry/covers/large/Pinnacles.jpg';
+
+import RollerCoasterCover from '@cardstack/boxel/images/media-registry/covers/Roller-Coaster.jpg';
+import RollerCoasterThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Roller-Coaster.jpg';
+import RollerCoasterMedium from '@cardstack/boxel/images/media-registry/covers/medium/Roller-Coaster.jpg';
+import RollerCoasterLarge from '@cardstack/boxel/images/media-registry/covers/large/Roller-Coaster.jpg';
+
+import RollercoasterofEmotionsCover from '@cardstack/boxel/images/media-registry/covers/Rollercoaster-of-Emotions.jpg';
+import RollercoasterofEmotionsThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Rollercoaster-of-Emotions.jpg';
+import RollercoasterofEmotionsMedium from '@cardstack/boxel/images/media-registry/covers/medium/Rollercoaster-of-Emotions.jpg';
+import RollercoasterofEmotionsLarge from '@cardstack/boxel/images/media-registry/covers/large/Rollercoaster-of-Emotions.jpg';
+
+import SailingCover from '@cardstack/boxel/images/media-registry/covers/Sailing.jpg';
+import SailingThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Sailing.jpg';
+import SailingMedium from '@cardstack/boxel/images/media-registry/covers/medium/Sailing.jpg';
+import SailingLarge from '@cardstack/boxel/images/media-registry/covers/large/Sailing.jpg';
+
+import SaveHumankindCover from '@cardstack/boxel/images/media-registry/covers/Save-Humankind.jpg';
+import SaveHumankindThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Save-Humankind.jpg';
+import SaveHumankindMedium from '@cardstack/boxel/images/media-registry/covers/medium/Save-Humankind.jpg';
+import SaveHumankindLarge from '@cardstack/boxel/images/media-registry/covers/large/Save-Humankind.jpg';
+
+import SevenSeasonsCover from '@cardstack/boxel/images/media-registry/covers/Seven-Seasons.jpg';
+import SevenSeasonsThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Seven-Seasons.jpg';
+import SevenSeasonsMedium from '@cardstack/boxel/images/media-registry/covers/medium/Seven-Seasons.jpg';
+import SevenSeasonsLarge from '@cardstack/boxel/images/media-registry/covers/large/Seven-Seasons.jpg';
+
+import SevenSinsCover from '@cardstack/boxel/images/media-registry/covers/Seven-Sins.jpg';
+import SevenSinsThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Seven-Sins.jpg';
+import SevenSinsMedium from '@cardstack/boxel/images/media-registry/covers/medium/Seven-Sins.jpg';
+import SevenSinsLarge from '@cardstack/boxel/images/media-registry/covers/large/Seven-Sins.jpg';
+
+import SoldOutCover from '@cardstack/boxel/images/media-registry/covers/Sold-Out.jpg';
+import SoldOutThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Sold-Out.jpg';
+import SoldOutMedium from '@cardstack/boxel/images/media-registry/covers/medium/Sold-Out.jpg';
+import SoldOutLarge from '@cardstack/boxel/images/media-registry/covers/large/Sold-Out.jpg';
+
+import SulkingMaidsCover from '@cardstack/boxel/images/media-registry/covers/Sulking-Maids.jpg';
+import SulkingMaidsThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Sulking-Maids.jpg';
+import SulkingMaidsMedium from '@cardstack/boxel/images/media-registry/covers/medium/Sulking-Maids.jpg';
+import SulkingMaidsLarge from '@cardstack/boxel/images/media-registry/covers/large/Sulking-Maids.jpg';
+
+import SunlightCover from '@cardstack/boxel/images/media-registry/covers/Sunlight.jpg';
+import SunlightThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Sunlight.jpg';
+import SunlightMedium from '@cardstack/boxel/images/media-registry/covers/medium/Sunlight.jpg';
+import SunlightLarge from '@cardstack/boxel/images/media-registry/covers/large/Sunlight.jpg';
+
+import SunnySideUpCover from '@cardstack/boxel/images/media-registry/covers/Sunny-Side-Up.jpg';
+import SunnySideUpThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Sunny-Side-Up.jpg';
+import SunnySideUpMedium from '@cardstack/boxel/images/media-registry/covers/medium/Sunny-Side-Up.jpg';
+import SunnySideUpLarge from '@cardstack/boxel/images/media-registry/covers/large/Sunny-Side-Up.jpg';
+
+import SuperficialCover from '@cardstack/boxel/images/media-registry/covers/Superficial.jpg';
+import SuperficialThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Superficial.jpg';
+import SuperficialMedium from '@cardstack/boxel/images/media-registry/covers/medium/Superficial.jpg';
+import SuperficialLarge from '@cardstack/boxel/images/media-registry/covers/large/Superficial.jpg';
+
+import TheFutureIsOursCover from '@cardstack/boxel/images/media-registry/covers/The-Future-Is-Ours.jpg';
+import TheFutureIsOursThumb from '@cardstack/boxel/images/media-registry/covers/thumb/The-Future-Is-Ours.jpg';
+import TheFutureIsOursMedium from '@cardstack/boxel/images/media-registry/covers/medium/The-Future-Is-Ours.jpg';
+import TheFutureIsOursLarge from '@cardstack/boxel/images/media-registry/covers/large/The-Future-Is-Ours.jpg';
+
+import TheSunComesOutCover from '@cardstack/boxel/images/media-registry/covers/The-Sun-Comes-Out.jpg';
+import TheSunComesOutThumb from '@cardstack/boxel/images/media-registry/covers/thumb/The-Sun-Comes-Out.jpg';
+import TheSunComesOutMedium from '@cardstack/boxel/images/media-registry/covers/medium/The-Sun-Comes-Out.jpg';
+import TheSunComesOutLarge from '@cardstack/boxel/images/media-registry/covers/large/The-Sun-Comes-Out.jpg';
+
+import TheVampsoftheWorldCover from '@cardstack/boxel/images/media-registry/covers/The-Vamps-of-the-World.jpg';
+import TheVampsoftheWorldThumb from '@cardstack/boxel/images/media-registry/covers/thumb/The-Vamps-of-the-World.jpg';
+import TheVampsoftheWorldMedium from '@cardstack/boxel/images/media-registry/covers/medium/The-Vamps-of-the-World.jpg';
+import TheVampsoftheWorldLarge from '@cardstack/boxel/images/media-registry/covers/large/The-Vamps-of-the-World.jpg';
+
+import WhatMusicalInstrumentsCanDoCover from '@cardstack/boxel/images/media-registry/covers/What-Musical-Instruments-Can-Do.jpg';
+import WhatMusicalInstrumentsCanDoThumb from '@cardstack/boxel/images/media-registry/covers/thumb/What-Musical-Instruments-Can-Do.jpg';
+import WhatMusicalInstrumentsCanDoMedium from '@cardstack/boxel/images/media-registry/covers/medium/What-Musical-Instruments-Can-Do.jpg';
+import WhatMusicalInstrumentsCanDoLarge from '@cardstack/boxel/images/media-registry/covers/large/What-Musical-Instruments-Can-Do.jpg';
+
+import WhenYouHitMeCover from '@cardstack/boxel/images/media-registry/covers/When-You-Hit-Me.jpg';
+import WhenYouHitMeThumb from '@cardstack/boxel/images/media-registry/covers/thumb/When-You-Hit-Me.jpg';
+import WhenYouHitMeMedium from '@cardstack/boxel/images/media-registry/covers/medium/When-You-Hit-Me.jpg';
+import WhenYouHitMeLarge from '@cardstack/boxel/images/media-registry/covers/large/When-You-Hit-Me.jpg';
+
+import WhyDoYouLikeMeCover from '@cardstack/boxel/images/media-registry/covers/Why-Do-You-Like-Me.jpg';
+import WhyDoYouLikeMeThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Why-Do-You-Like-Me.jpg';
+import WhyDoYouLikeMeMedium from '@cardstack/boxel/images/media-registry/covers/medium/Why-Do-You-Like-Me.jpg';
+import WhyDoYouLikeMeLarge from '@cardstack/boxel/images/media-registry/covers/large/Why-Do-You-Like-Me.jpg';
+
+import WhyNotCover from '@cardstack/boxel/images/media-registry/covers/Why-Not.jpg';
+import WhyNotThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Why-Not.jpg';
+import WhyNotMedium from '@cardstack/boxel/images/media-registry/covers/medium/Why-Not.jpg';
+import WhyNotLarge from '@cardstack/boxel/images/media-registry/covers/large/Why-Not.jpg';
+
+import ZigandZagCover from '@cardstack/boxel/images/media-registry/covers/Zig-and-Zag.jpg';
+import ZigandZagThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Zig-and-Zag.jpg';
+import ZigandZagMedium from '@cardstack/boxel/images/media-registry/covers/medium/Zig-and-Zag.jpg';
+import ZigandZagLarge from '@cardstack/boxel/images/media-registry/covers/large/Zig-and-Zag.jpg';
+
+import ZombiesCover from '@cardstack/boxel/images/media-registry/covers/Zombies.jpg';
+import ZombiesThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Zombies.jpg';
+import ZombiesMedium from '@cardstack/boxel/images/media-registry/covers/medium/Zombies.jpg';
+import ZombiesLarge from '@cardstack/boxel/images/media-registry/covers/large/Zombies.jpg';
+
+// All covers reexpored at bottom of file
+export default [
   {
     "id": "the-sun-comes-out",
     "version": "v0",
@@ -6,10 +372,10 @@
     "artist": "Bella Swan",
     "artist_id": "bella-swan",
     "album": "The Sun Comes Out",
-    "cover_art": "/boxel/media-registry/covers/The-Sun-Comes-Out.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/The-Sun-Comes-Out.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/The-Sun-Comes-Out.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/The-Sun-Comes-Out.jpg",
+    "cover_art": TheSunComesOutCover,
+    "cover_art_thumb": TheSunComesOutThumb,
+    "cover_art_medium": TheSunComesOutMedium,
+    "cover_art_large": TheSunComesOutLarge,
     "type_of_album": "Single",
     "genre": "Pop",
     "length": "2:58",
@@ -47,10 +413,10 @@
     "artist": "Bella Swan",
     "artist_id": "bella-swan",
     "album": "The Sun Comes Out",
-    "cover_art": "/boxel/media-registry/covers/The-Sun-Comes-Out.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/The-Sun-Comes-Out.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/The-Sun-Comes-Out.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/The-Sun-Comes-Out.jpg",
+    "cover_art": TheSunComesOutCover,
+    "cover_art_thumb": TheSunComesOutThumb,
+    "cover_art_medium": TheSunComesOutMedium,
+    "cover_art_large": TheSunComesOutLarge,
     "type_of_album": "Single",
     "genre": "Pop",
     "length": "2:58",
@@ -89,10 +455,10 @@
     "artist": "Bella Swan",
     "artist_id": "bella-swan",
     "album": "The Sun Comes Out",
-    "cover_art": "/boxel/media-registry/covers/The-Sun-Comes-Out.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/The-Sun-Comes-Out.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/The-Sun-Comes-Out.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/The-Sun-Comes-Out.jpg",
+    "cover_art": TheSunComesOutCover,
+    "cover_art_thumb": TheSunComesOutThumb,
+    "cover_art_medium": TheSunComesOutMedium,
+    "cover_art_large": TheSunComesOutLarge,
     "type_of_album": "Single",
     "genre": "Pop",
     "length": "2:58",
@@ -131,10 +497,10 @@
     "artist": "Bella Swan",
     "artist_id": "bella-swan",
     "album": "The Sun Comes Out",
-    "cover_art": "/boxel/media-registry/covers/The-Sun-Comes-Out.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/The-Sun-Comes-Out.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/The-Sun-Comes-Out.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/The-Sun-Comes-Out.jpg",
+    "cover_art": TheSunComesOutCover,
+    "cover_art_thumb": TheSunComesOutThumb,
+    "cover_art_medium": TheSunComesOutMedium,
+    "cover_art_large": TheSunComesOutLarge,
     "type_of_album": "Single",
     "genre": "Pop",
     "length": "2:58",
@@ -172,10 +538,10 @@
     "artist": "Bella Swan",
     "artist_id": "bella-swan",
     "album": "The Sun Comes Out",
-    "cover_art": "/boxel/media-registry/covers/The-Sun-Comes-Out.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/The-Sun-Comes-Out.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/The-Sun-Comes-Out.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/The-Sun-Comes-Out.jpg",
+    "cover_art": TheSunComesOutCover,
+    "cover_art_thumb": TheSunComesOutThumb,
+    "cover_art_medium": TheSunComesOutMedium,
+    "cover_art_large": TheSunComesOutLarge,
     "type_of_album": "Single",
     "genre": "Pop",
     "length": "2:58",
@@ -214,10 +580,10 @@
     "artist": "Bella Swan",
     "artist_id": "bella-swan",
     "album": "The Sun Comes Out",
-    "cover_art": "/boxel/media-registry/covers/The-Sun-Comes-Out.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/The-Sun-Comes-Out.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/The-Sun-Comes-Out.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/The-Sun-Comes-Out.jpg",
+    "cover_art": TheSunComesOutCover,
+    "cover_art_thumb": TheSunComesOutThumb,
+    "cover_art_medium": TheSunComesOutMedium,
+    "cover_art_large": TheSunComesOutLarge,
     "type_of_album": "Single",
     "genre": "Pop",
     "length": "2:58",
@@ -253,10 +619,10 @@
     "artist": "Bella Swan",
     "artist_id": "bella-swan",
     "album": "The Sun Comes Out",
-    "cover_art": "/boxel/media-registry/covers/The-Sun-Comes-Out.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/The-Sun-Comes-Out.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/The-Sun-Comes-Out.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/The-Sun-Comes-Out.jpg",
+    "cover_art": TheSunComesOutCover,
+    "cover_art_thumb": TheSunComesOutThumb,
+    "cover_art_medium": TheSunComesOutMedium,
+    "cover_art_large": TheSunComesOutLarge,
     "type_of_album": "Single",
     "genre": "Pop",
     "length": "2:58",
@@ -292,7 +658,7 @@
     "title": "13 hours",
     "artist": "Golden Girl",
     "album": "Love the Love",
-    "cover_art": "/boxel/media-registry/covers/Love-the-Love.jpg",
+    "cover_art": LovetheLoveCover,
     "blur_img": "W2D9F$$w00NzMexG08ov=|fmFsNI0NMyIox]E0JA.9Ip%2~BI9Fs",
     "type_of_album": "Album",
     "genre": "Pop",
@@ -308,9 +674,9 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Love-the-Love.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Love-the-Love.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Love-the-Love.jpg"
+    "cover_art_thumb": LovetheLoveThumb,
+    "cover_art_medium": LovetheLoveMedium,
+    "cover_art_large": LovetheLoveLarge
   },
   {
     "id": "a-day-to-sing",
@@ -318,7 +684,7 @@
     "artist": "Pia Midina",
     "artist_id": "pia-midina",
     "album": "Sunlight",
-    "cover_art": "/boxel/media-registry/covers/Sunlight.jpg",
+    "cover_art": SunlightCover,
     "blur_img": "WeHlY3xE5nNbX7oe}VsnR-azWWj@AEay$$s.njafNwS3WVa{s.oL",
     "type_of_album": "EP",
     "genre": "Alternative",
@@ -334,9 +700,9 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": "X",
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Sunlight.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Sunlight.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Sunlight.jpg",
+    "cover_art_thumb": SunlightThumb,
+    "cover_art_medium": SunlightMedium,
+    "cover_art_large": SunlightLarge,
     "cover_art_date": "2019-02-19",
     "year": "2019",
     "label": "Bunny Records",
@@ -381,7 +747,7 @@
     "title": "A future like this",
     "artist": "Melinda Cooper",
     "album": "Moments",
-    "cover_art": "/boxel/media-registry/covers/Moments.jpg",
+    "cover_art": MomentsCover,
     "blur_img": "WPCPk$EMIoxDs8NI%ja#Ris-adWX5UxZjER-bIxZM|oIxWR-bcs,",
     "type_of_album": "EP",
     "genre": "Pop",
@@ -396,16 +762,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Moments.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Moments.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Moments.jpg"
+    "cover_art_thumb": MomentsThumb,
+    "cover_art_medium": MomentsMedium,
+    "cover_art_large": MomentsLarge
   },
   {
     "id": "addictions",
     "title": "Addictions",
     "artist": "The Kissers",
     "album": "Escape",
-    "cover_art": "/boxel/media-registry/covers/Escape.jpg",
+    "cover_art": EscapeCover,
     "blur_img": "W09,wU00UoQ8m68J00}gTK#goYT1_LS%r9PAXrzq7jibvvKmkIvy",
     "type_of_album": "Album",
     "genre": "Alternative",
@@ -419,16 +785,16 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Escape.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Escape.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Escape.jpg"
+    "cover_art_thumb": EscapeThumb,
+    "cover_art_medium": EscapeMedium,
+    "cover_art_large": EscapeLarge
   },
   {
     "id": "airplanes-go-south",
     "title": "Airplanes go south",
     "artist": "Freddy K",
     "album": "Just Like Birds",
-    "cover_art": "/boxel/media-registry/covers/Just-Like-Birds.jpg",
+    "cover_art": JustLikeBirdsCover,
     "blur_img": "W7JSCb03xI4@-ir:0F^*Dj0M?ZxtThIUtmSjs+NMHX#iRO${t6D*",
     "type_of_album": "Album",
     "genre": "Rock",
@@ -443,16 +809,16 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Just-Like-Birds.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Just-Like-Birds.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Just-Like-Birds.jpg"
+    "cover_art_thumb": JustLikeBirdsThumb,
+    "cover_art_medium": JustLikeBirdsMedium,
+    "cover_art_large": JustLikeBirdsLarge
   },
   {
     "id": "always-in-love",
     "title": "Always in love",
     "artist": "Xio",
     "album": "Always In Love",
-    "cover_art": "/boxel/media-registry/covers/Always-In-Love.jpg",
+    "cover_art": AlwaysInLoveCover,
     "blur_img": "W8RAgIM$tROaI^t7~nniS6t6kDayv~M{IpaJjEWAnNV?jDRPaei^",
     "type_of_album": "Single",
     "genre": "Country",
@@ -467,16 +833,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Always-In-Love.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Always-In-Love.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Always-In-Love.jpg"
+    "cover_art_thumb": AlwaysInLoveThumb,
+    "cover_art_medium": AlwaysInLoveMedium,
+    "cover_art_large": AlwaysInLoveLarge
   },
   {
     "id": "angry",
     "title": "Angry",
     "artist": "Golden Girl",
     "album": "Love the Love",
-    "cover_art": "/boxel/media-registry/covers/Love-the-Love.jpg",
+    "cover_art": LovetheLoveCover,
     "blur_img": "W2D9F$$w00NzMexG08ov=|fmFsNI0NMyIox]E0JA.9Ip%2~BI9Fs",
     "type_of_album": "Album",
     "genre": "Pop",
@@ -492,9 +858,9 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Love-the-Love.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Love-the-Love.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Love-the-Love.jpg"
+    "cover_art_thumb": LovetheLoveThumb,
+    "cover_art_medium": LovetheLoveMedium,
+    "cover_art_large": LovetheLoveLarge
   },
   {
     "id": "baby-boy",
@@ -502,7 +868,7 @@
     "artist": "BB Clarke",
     "artist_id": "bb-clarke",
     "album": "Animals",
-    "cover_art": "/boxel/media-registry/covers/Animals.jpg",
+    "cover_art": AnimalsCover,
     "blur_img": "WNO;0swdt8nO.mo}0;s9ofkWMdni17t7ogWVVYV@4TRjt6i_%hkW",
     "type_of_album": "Album",
     "genre": "Rock",
@@ -516,9 +882,9 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": "X",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Animals.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Animals.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Animals.jpg",
+    "cover_art_thumb": AnimalsThumb,
+    "cover_art_medium": AnimalsMedium,
+    "cover_art_large": AnimalsLarge,
     "year": "2019",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
@@ -546,7 +912,7 @@
     "title": "Booby trap",
     "artist": "Kids will be kids",
     "album": "Have Fun",
-    "cover_art": "/boxel/media-registry/covers/Have-Fun.jpg",
+    "cover_art": HaveFunCover,
     "blur_img": "WBEE=S9_5?}PWAKkYRxVxBOFaxs70M-6=YA0s:wH};I[Em-4oJOZ",
     "type_of_album": "Album",
     "genre": "Dance",
@@ -561,16 +927,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Have-Fun.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Have-Fun.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Have-Fun.jpg"
+    "cover_art_thumb": HaveFunThumb,
+    "cover_art_medium": HaveFunMedium,
+    "cover_art_large": HaveFunLarge
   },
   {
     "id": "car-troubles",
     "title": "Car troubles",
     "artist": "Madmax",
     "album": "Accidents",
-    "cover_art": "/boxel/media-registry/covers/Accidents.jpg",
+    "cover_art": AccidentsCover,
     "blur_img": "WFL;EY00.SoxoM?vr@~qM{ox-;ozGX%#n4VskDRP4:Sd-pVsRkoz",
     "type_of_album": "EP",
     "genre": "Techno",
@@ -585,16 +951,16 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Accidents.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Accidents.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Accidents.jpg"
+    "cover_art_thumb": AccidentsThumb,
+    "cover_art_medium": AccidentsMedium,
+    "cover_art_large": AccidentsLarge
   },
   {
     "id": "care-for-him",
     "title": "Care for him",
     "artist": "Marcy Blues",
     "album": "Seven Sins",
-    "cover_art": "/boxel/media-registry/covers/Seven-Sins.jpg",
+    "cover_art": SevenSinsCover,
     "blur_img": "W49jQ0.900OsTcvLI|0gz.SiOF#jpfY5=Cah%NouJYEj,,a0NH9u",
     "type_of_album": "EP",
     "genre": "Alternative",
@@ -609,9 +975,9 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Seven-Sins.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Seven-Sins.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Seven-Sins.jpg"
+    "cover_art_thumb": SevenSinsThumb,
+    "cover_art_medium": SevenSinsMedium,
+    "cover_art_large": SevenSinsLarge
   },
   {
     "id": "change-is-good",
@@ -619,7 +985,7 @@
     "artist": "Pia Midina",
     "artist_id": "pia-midina",
     "album": "Change is good",
-    "cover_art": "/boxel/media-registry/covers/Change-Is-Good.jpg",
+    "cover_art": ChangeIsGoodCover,
     "blur_img": "WCHW3cw7ySM^KWE000D$%NtR$oj2VPRlNXXLxus;?=xus;t7Xdb.",
     "type_of_album": "Single",
     "genre": "Pop",
@@ -635,9 +1001,9 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": "X",
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Change-Is-Good.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Change-Is-Good.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Change-Is-Good.jpg",
+    "cover_art_thumb": ChangeIsGoodThumb,
+    "cover_art_medium": ChangeIsGoodMedium,
+    "cover_art_large": ChangeIsGoodLarge,
     "year": "2019",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
@@ -666,7 +1032,7 @@
     "title": "Come closer",
     "artist": "Clarissa",
     "album": "Around the World",
-    "cover_art": "/boxel/media-registry/covers/Around-the-World.jpg",
+    "cover_art": AroundtheWorldCover,
     "blur_img": "W5OcW?K%ni:,D+t72=S|,@=_O=$%04wdRR-6XRNxx@?F}EEM62a2",
     "type_of_album": "Album",
     "genre": "Country",
@@ -681,9 +1047,9 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Around-the-World.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Around-the-World.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Around-the-World.jpg"
+    "cover_art_thumb": AroundtheWorldThumb,
+    "cover_art_medium": AroundtheWorldMedium,
+    "cover_art_large": AroundtheWorldLarge
   },
   {
     "id": "dawn-to-dusk",
@@ -691,7 +1057,7 @@
     "artist": "BB Clarke",
     "artist_id": "bb-clarke",
     "album": "Animals",
-    "cover_art": "/boxel/media-registry/covers/Animals.jpg",
+    "cover_art": AnimalsCover,
     "blur_img": "WNO;0swdt8nO.mo}0;s9ofkWMdni17t7ogWVVYV@4TRjt6i_%hkW",
     "type_of_album": "Album",
     "genre": "Rock",
@@ -705,9 +1071,9 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": "X",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Animals.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Animals.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Animals.jpg",
+    "cover_art_thumb": AnimalsThumb,
+    "cover_art_medium": AnimalsMedium,
+    "cover_art_large": AnimalsLarge,
     "year": "2019",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
@@ -735,7 +1101,7 @@
     "title": "Everyone matters",
     "artist": "The Clue",
     "album": "Save Humankind",
-    "cover_art": "/boxel/media-registry/covers/Save-Humankind.jpg",
+    "cover_art": SaveHumankindCover,
     "blur_img": "WE0dRWeif:e,f,f4b$e*f-f4fRf5e,fiflflf4fkf5fkfkflfPfl",
     "type_of_album": "Album",
     "genre": "Rock",
@@ -750,16 +1116,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Save-Humankind.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Save-Humankind.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Save-Humankind.jpg"
+    "cover_art_thumb": SaveHumankindThumb,
+    "cover_art_medium": SaveHumankindMedium,
+    "cover_art_large": SaveHumankindLarge
   },
   {
     "id": "every-step-you-take",
     "title": "Every step you take",
     "artist": "Mouthwash",
     "album": "The Future Is Ours",
-    "cover_art": "/boxel/media-registry/covers/The-Future-Is-Ours.jpg",
+    "cover_art": TheFutureIsOursCover,
     "blur_img": "WBGt[|}:01-;R+t74n^+ozIU-pWB9a4:-:S5E1a#I=t6V@-oWBRj",
     "type_of_album": "EP",
     "genre": "Pop",
@@ -774,16 +1140,16 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/The-Future-Is-Ours.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/The-Future-Is-Ours.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/The-Future-Is-Ours.jpg"
+    "cover_art_thumb": TheFutureIsOursThumb,
+    "cover_art_medium": TheFutureIsOursMedium,
+    "cover_art_large": TheFutureIsOursLarge
   },
   {
     "id": "forty-miles-an-hour",
     "title": "Forty miles an hour",
     "artist": "Patrick Moles",
     "album": "Drive me crazy",
-    "cover_art": "/boxel/media-registry/covers/Drive-Me-Crazy.jpg",
+    "cover_art": DriveMeCrazyCover,
     "blur_img": "WKC%8J%MWBofWBof~qxuofofj[ayt7ofxuofofWBRjWBj[M{ayof",
     "type_of_album": "EP",
     "genre": "Pop",
@@ -798,9 +1164,9 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Drive-Me-Crazy.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Drive-Me-Crazy.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Drive-Me-Crazy.jpg"
+    "cover_art_thumb": DriveMeCrazyThumb,
+    "cover_art_medium": DriveMeCrazyMedium,
+    "cover_art_large": DriveMeCrazyLarge
   },
   {
     "id": "full-moon",
@@ -808,7 +1174,7 @@
     "artist": "Pia Midina",
     "artist_id": "pia-midina",
     "album": "Full moon",
-    "cover_art": "/boxel/media-registry/covers/Full-Moon.jpg",
+    "cover_art": FullMoonCover,
     "blur_img": "L78|@Y9G00~VIUt6%2M|4n%L%ME1",
     "type_of_album": "Single",
     "genre": "Pop",
@@ -824,9 +1190,9 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": "X",
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Full-Moon.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Full-Moon.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Full-Moon.jpg",
+    "cover_art_thumb": FullMoonThumb,
+    "cover_art_medium": FullMoonMedium,
+    "cover_art_large": FullMoonLarge,
     "year": "2019",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
@@ -855,7 +1221,7 @@
     "title": "Hell hell hell",
     "artist": "Paula Sin",
     "album": "All About Heaven",
-    "cover_art": "/boxel/media-registry/covers/All-About-Heaven.jpg",
+    "cover_art": AllAboutHeavenCover,
     "blur_img": "W7HCf-~U%hD+NKxa0pR-E2-oIWoLI^9aITofofNG?cWYs.j[t6Rk",
     "type_of_album": "Album",
     "genre": "Rock",
@@ -870,16 +1236,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/All-About-Heaven.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/All-About-Heaven.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/All-About-Heaven.jpg"
+    "cover_art_thumb": AllAboutHeavenThumb,
+    "cover_art_medium": AllAboutHeavenMedium,
+    "cover_art_large": AllAboutHeavenLarge
   },
   {
     "id": "home-isnt-sweet",
     "title": "Home isn't sweet",
     "artist": "Golden Girl",
     "album": "Home Isn't Sweet",
-    "cover_art": "/boxel/media-registry/covers/Home-Isnt-Sweet.jpg",
+    "cover_art": HomeIsntSweetCover,
     "blur_img": "WxNT%Ng2W=bbV?j=KUWrkCbIjYjYXUjGj]bHofn$NGWAWXjuj[j[",
     "type_of_album": "Single",
     "genre": "Pop",
@@ -894,16 +1260,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Home-Isnt-Sweet.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Home-Isnt-Sweet.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Home-Isnt-Sweet.jpg"
+    "cover_art_thumb": HomeIsntSweetThumb,
+    "cover_art_medium": HomeIsntSweetMedium,
+    "cover_art_large": HomeIsntSweetLarge
   },
   {
     "id": "infatuated",
     "title": "Infatuated",
     "artist": "Love monkeys",
     "album": "Infatuated",
-    "cover_art": "/boxel/media-registry/covers/Infatuated.jpg",
+    "cover_art": InfatuatedCover,
     "blur_img": "W7R31k4T9ry;tQ#?-Xr^tMX2M{M|pFo{RQVuoMt7%yXOV[nSs:ae",
     "type_of_album": "Single",
     "genre": "Rock",
@@ -919,9 +1285,9 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Infatuated.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Infatuated.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Infatuated.jpg"
+    "cover_art_thumb": InfatuatedThumb,
+    "cover_art_medium": InfatuatedMedium,
+    "cover_art_large": InfatuatedLarge
   },
   {
     "id": "keep-hope-alive",
@@ -929,7 +1295,7 @@
     "artist": "Pia Midina",
     "artist_id": "pia-midina",
     "album": "Love never dies",
-    "cover_art": "/boxel/media-registry/covers/Love-Never-Dies.jpg",
+    "cover_art": LoveNeverDiesCover,
     "blur_img": "LTKuc,NG9aaL}Fs.aeWB8xs:o}X8",
     "type_of_album": "EP",
     "genre": "Pop",
@@ -945,9 +1311,9 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": "X",
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Love-Never-Dies.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Love-Never-Dies.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Love-Never-Dies.jpg",
+    "cover_art_thumb": LoveNeverDiesThumb,
+    "cover_art_medium": LoveNeverDiesMedium,
+    "cover_art_large": LoveNeverDiesLarge,
     "year": "2018",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
@@ -977,7 +1343,7 @@
     "artist": "BB Clarke",
     "artist_id": "bb-clarke",
     "album": "Animals",
-    "cover_art": "/boxel/media-registry/covers/Animals.jpg",
+    "cover_art": AnimalsCover,
     "blur_img": "WNO;0swdt8nO.mo}0;s9ofkWMdni17t7ogWVVYV@4TRjt6i_%hkW",
     "type_of_album": "Album",
     "genre": "Rock",
@@ -993,9 +1359,9 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": "X",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Animals.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Animals.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Animals.jpg",
+    "cover_art_thumb": AnimalsThumb,
+    "cover_art_medium": AnimalsMedium,
+    "cover_art_large": AnimalsLarge,
     "year": "2019",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
@@ -1024,7 +1390,7 @@
     "artist": "Pia Midina",
     "artist_id": "pia-midina",
     "album": "Leave the door open",
-    "cover_art": "/boxel/media-registry/covers/Leave-the-Door-Open.jpg",
+    "cover_art": LeavetheDoorOpenCover,
     "blur_img": "L2Dl7-00*w_2%io}O?9t~p5?MxVX",
     "type_of_album": "Single",
     "genre": "Pop",
@@ -1040,9 +1406,9 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": "X",
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Leave-the-Door-Open.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Leave-the-Door-Open.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Leave-the-Door-Open.jpg",
+    "cover_art_thumb": LeavetheDoorOpenThumb,
+    "cover_art_medium": LeavetheDoorOpenMedium,
+    "cover_art_large": LeavetheDoorOpenLarge,
     "year": "2020",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
@@ -1071,7 +1437,7 @@
     "title": "Light at the end of the tunnel",
     "artist": "Nancy Jay",
     "album": "Sailing",
-    "cover_art": "/boxel/media-registry/covers/Sailing.jpg",
+    "cover_art": SailingCover,
     "blur_img": "WjJ?A#R-E3WCIrkA~8R+V[j@RloeKhoLV[WVoJWDt6s.Rkn%SMaz",
     "type_of_album": "EP",
     "genre": "Country",
@@ -1087,16 +1453,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Sailing.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Sailing.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Sailing.jpg"
+    "cover_art_thumb": SailingThumb,
+    "cover_art_medium": SailingMedium,
+    "cover_art_large": SailingLarge
   },
   {
     "id": "like-a-washing-machine",
     "title": "Like a washing machine",
     "artist": "Things",
     "album": "Gotta Be Silly",
-    "cover_art": "/boxel/media-registry/covers/Gotta-Be-Silly.jpg",
+    "cover_art": GottaBeSillyCover,
     "type_of_album": "Album",
     "genre": "Pop",
     "length": "3:35",
@@ -1110,16 +1476,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Gotta-Be-Silly.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Gotta-Be-Silly.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Gotta-Be-Silly.jpg"
+    "cover_art_thumb": GottaBeSillyThumb,
+    "cover_art_medium": GottaBeSillyMedium,
+    "cover_art_large": GottaBeSillyLarge
   },
   {
     "id": "living-like-the-royals",
     "title": "Living like the royals",
     "artist": "Princess May",
     "album": "All About the Quality of Life",
-    "cover_art": "/boxel/media-registry/covers/All-About-the-Quality-of-Life.jpg",
+    "cover_art": AllAbouttheQualityofLifeCover,
     "blur_img": "W9O|a_E15=D+DPu6JCN1DQR+tn4mEME69FD$Mx8_VqS%T08{Mw%M",
     "type_of_album": "Album",
     "genre": "Alternative",
@@ -1135,16 +1501,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/All-About-the-Quality-of-Life.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/All-About-the-Quality-of-Life.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/All-About-the-Quality-of-Life.jpg"
+    "cover_art_thumb": AllAbouttheQualityofLifeThumb,
+    "cover_art_medium": AllAbouttheQualityofLifeMedium,
+    "cover_art_large": AllAbouttheQualityofLifeLarge
   },
   {
     "id": "looks-like-heaven-feels-like-hell",
     "title": "Looks like heaven, feels like hell",
     "artist": "Boyband",
     "album": "Superficial",
-    "cover_art": "/boxel/media-registry/covers/Superficial.jpg",
+    "cover_art": SuperficialCover,
     "blur_img": "WIF4.q4;5k~V0yR$OFxZw|E2%KELTt9t-BxZRnxbxaWBOANv$*nj",
     "type_of_album": "Album",
     "genre": "Pop",
@@ -1160,16 +1526,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Superficial.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Superficial.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Superficial.jpg"
+    "cover_art_thumb": SuperficialThumb,
+    "cover_art_medium": SuperficialMedium,
+    "cover_art_large": SuperficialLarge
   },
   {
     "id": "madness",
     "title": "Madness",
     "artist": "UNIF",
     "album": "Call Me Crazy",
-    "cover_art": "/boxel/media-registry/covers/Call-Me-Crazy.jpg",
+    "cover_art": CallMeCrazyCover,
     "type_of_album": "EP",
     "genre": "Rock",
     "length": "3:01",
@@ -1183,16 +1549,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Call-Me-Crazy.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Call-Me-Crazy.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Call-Me-Crazy.jpg"
+    "cover_art_thumb": CallMeCrazyThumb,
+    "cover_art_medium": CallMeCrazyMedium,
+    "cover_art_large": CallMeCrazyLarge
   },
   {
     "id": "main-street",
     "title": "Main Street",
     "artist": "Fingernails",
     "album": "Hands On",
-    "cover_art": "/boxel/media-registry/covers/Hands-On.jpg",
+    "cover_art": HandsOnCover,
     "type_of_album": "Album",
     "genre": "Pop",
     "length": "3:18",
@@ -1206,16 +1572,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Hands-On.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Hands-On.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Hands-On.jpg"
+    "cover_art_thumb": HandsOnThumb,
+    "cover_art_medium": HandsOnMedium,
+    "cover_art_large": HandsOnLarge
   },
   {
     "id": "max",
     "title": "Max",
     "artist": "UNIF",
     "album": "Liars",
-    "cover_art": "/boxel/media-registry/covers/Liars.jpg",
+    "cover_art": LiarsCover,
     "type_of_album": "EP",
     "genre": "Rock",
     "length": "3:03",
@@ -1229,16 +1595,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Liars.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Liars.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Liars.jpg"
+    "cover_art_thumb": LiarsThumb,
+    "cover_art_medium": LiarsMedium,
+    "cover_art_large": LiarsLarge
   },
   {
     "id": "mighty-moon",
     "title": "Mighty Moon",
     "artist": "Melodrama",
     "album": "Mighty Moon",
-    "cover_art": "/boxel/media-registry/covers/Mighty-Moon.jpg",
+    "cover_art": MightyMoonCover,
     "type_of_album": "Single",
     "genre": "Rock",
     "length": "3:05",
@@ -1252,16 +1618,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Mighty-Moon.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Mighty-Moon.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Mighty-Moon.jpg"
+    "cover_art_thumb": MightyMoonThumb,
+    "cover_art_medium": MightyMoonMedium,
+    "cover_art_large": MightyMoonLarge
   },
   {
     "id": "morning-star",
     "title": "Morning star",
     "artist": "Fly me to the moon",
     "album": "Love Conquers All",
-    "cover_art": "/boxel/media-registry/covers/Love-Conquers-All.jpg",
+    "cover_art": LoveConquersAllCover,
     "blur_img": "WWRCPhMw*Jtmo#nj%~oeQ-oMjZkClTo|Q-VYaykCZNoft,WAX7ay",
     "type_of_album": "Album",
     "genre": "Alternative",
@@ -1276,9 +1642,9 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Love-Conquers-All.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Love-Conquers-All.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Love-Conquers-All.jpg"
+    "cover_art_thumb": LoveConquersAllThumb,
+    "cover_art_medium": LoveConquersAllMedium,
+    "cover_art_large": LoveConquersAllLarge
   },
   {
     "id": "mutiny",
@@ -1286,7 +1652,7 @@
     "artist": "BB Clarke",
     "artist_id": "bb-clarke",
     "album": "Animals",
-    "cover_art": "/boxel/media-registry/covers/Animals.jpg",
+    "cover_art": AnimalsCover,
     "blur_img": "WNO;0swdt8nO.mo}0;s9ofkWMdni17t7ogWVVYV@4TRjt6i_%hkW",
     "type_of_album": "Album",
     "genre": "Rock",
@@ -1298,9 +1664,9 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": "X",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Animals.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Animals.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Animals.jpg",
+    "cover_art_thumb": AnimalsThumb,
+    "cover_art_medium": AnimalsMedium,
+    "cover_art_large": AnimalsLarge,
     "year": "2019",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
@@ -1329,7 +1695,7 @@
     "artist": "Pia Midina",
     "artist_id": "pia-midina",
     "album": "Love Never Dies",
-    "cover_art": "/boxel/media-registry/covers/Love-Never-Dies.jpg",
+    "cover_art": LoveNeverDiesCover,
     "blur_img": "WTKuc,NG9aaLQnX,}Fs.aeWBsobb8xs:o}X8yCV@r?WBs:S}n%R*",
     "type_of_album": "EP",
     "genre": "Pop",
@@ -1345,9 +1711,9 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": "X",
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Love-Never-Dies.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Love-Never-Dies.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Love-Never-Dies.jpg",
+    "cover_art_thumb": LoveNeverDiesThumb,
+    "cover_art_medium": LoveNeverDiesMedium,
+    "cover_art_large": LoveNeverDiesLarge,
     "year": "2019",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
@@ -1376,7 +1742,7 @@
     "title": "Natural disaster",
     "artist": "Sun and Moon",
     "album": "Beauty vs Reality",
-    "cover_art": "/boxel/media-registry/covers/Beauty-vs-Reality.jpg",
+    "cover_art": BeautyvsRealityCover,
     "blur_img": "W5GmZM00IV8{^axA~U~P^d9bIqM}=?I]M|s+WBNI%M-S0PIXxat5",
     "type_of_album": "Album",
     "genre": "Pop",
@@ -1391,16 +1757,16 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Beauty-vs-Reality.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Beauty-vs-Reality.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Beauty-vs-Reality.jpg"
+    "cover_art_thumb": BeautyvsRealityThumb,
+    "cover_art_medium": BeautyvsRealityMedium,
+    "cover_art_large": BeautyvsRealityLarge
   },
   {
     "id": "never-lonely",
     "title": "Never lonely",
     "artist": "Golden Girl",
     "album": "Never Lonely",
-    "cover_art": "/boxel/media-registry/covers/Never-Lonely.jpg",
+    "cover_art": NeverLonelyCover,
     "blur_img": "WcK^=^M~?YtQIVkD~Xt7RoofWTkC?ua#M|ofRkj]S%WCs:jZoyj]",
     "type_of_album": "Single",
     "genre": "Pop",
@@ -1416,16 +1782,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Never-Lonely.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Never-Lonely.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Never-Lonely.jpg"
+    "cover_art_thumb": NeverLonelyThumb,
+    "cover_art_medium": NeverLonelyMedium,
+    "cover_art_large": NeverLonelyLarge
   },
   {
     "id": "nobody",
     "title": "Nobody",
     "artist": "The Francines",
     "album": "Little Lies",
-    "cover_art": "/boxel/media-registry/covers/Little-Lies.jpg",
+    "cover_art": LittleLiesCover,
     "blur_img": "WADvl=4nM_M|M{xu~qkBt6D*RjxuRixuM{IUxut7WAj[Rjt7%2M{",
     "type_of_album": "EP",
     "genre": "Rock",
@@ -1440,16 +1806,16 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Little-Lies.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Little-Lies.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Little-Lies.jpg"
+    "cover_art_thumb": LittleLiesThumb,
+    "cover_art_medium": LittleLiesMedium,
+    "cover_art_large": LittleLiesLarge
   },
   {
     "id": "nothing-to-worry-about",
     "title": "Nothing to worry about",
     "artist": "The edge of nowhere",
     "album": "Make Magic",
-    "cover_art": "/boxel/media-registry/covers/Make-Magic.jpg",
+    "cover_art": MakeMagicCover,
     "blur_img": "W9M5%~Na+@BWIwU]*wVbTLvKz:O@IlRPW8rVvelVJXW@F~sVX-R5",
     "type_of_album": "Album",
     "genre": "Alternative",
@@ -1465,16 +1831,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Make-Magic.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Make-Magic.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Make-Magic.jpg"
+    "cover_art_thumb": MakeMagicThumb,
+    "cover_art_medium": MakeMagicMedium,
+    "cover_art_large": MakeMagicLarge
   },
   {
     "id": "on-the-brink-of-happiness",
     "title": "On the brink of happiness",
     "artist": "Golden Girl",
     "album": "On the Brink of Happiness",
-    "cover_art": "/boxel/media-registry/covers/On-the-Brink-of-Happiness.jpg",
+    "cover_art": OntheBrinkofHappinessCover,
     "blur_img": "WKBDNVI=tQi_Shaz_4R*ofaeW;fRI[sladW;n%fQ58xZV@f,n$j@",
     "type_of_album": "Single",
     "genre": "Pop",
@@ -1490,16 +1856,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/On-the-Brink-of-Happiness.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/On-the-Brink-of-Happiness.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/On-the-Brink-of-Happiness.jpg"
+    "cover_art_thumb": OntheBrinkofHappinessThumb,
+    "cover_art_medium": OntheBrinkofHappinessMedium,
+    "cover_art_large": OntheBrinkofHappinessLarge
   },
   {
     "id": "on-the-day-you-were-born",
     "title": "On the day you were born",
     "artist": "Super nova",
     "album": "On the Day You Were Born",
-    "cover_art": "/boxel/media-registry/covers/On-the-Day-You-Were-Born.jpg",
+    "cover_art": OntheDayYouWereBornCover,
     "type_of_album": "Single",
     "genre": "Rock",
     "length": "3:18",
@@ -1513,16 +1879,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/On-the-Day-You-Were-Born.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/On-the-Day-You-Were-Born.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/On-the-Day-You-Were-Born.jpg"
+    "cover_art_thumb": OntheDayYouWereBornThumb,
+    "cover_art_medium": OntheDayYouWereBornMedium,
+    "cover_art_large": OntheDayYouWereBornLarge
   },
   {
     "id": "over-you",
     "title": "Over you",
     "artist": "Golden Girl",
     "album": "Love the Love",
-    "cover_art": "/boxel/media-registry/covers/Love-the-Love.jpg",
+    "cover_art": LovetheLoveCover,
     "blur_img": "W2D9F$$w00NzMexG08ov=|fmFsNI0NMyIox]E0JA.9Ip%2~BI9Fs",
     "type_of_album": "Album",
     "genre": "Pop",
@@ -1537,16 +1903,16 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Love-the-Love.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Love-the-Love.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Love-the-Love.jpg"
+    "cover_art_thumb": LovetheLoveThumb,
+    "cover_art_medium": LovetheLoveMedium,
+    "cover_art_large": LovetheLoveLarge
   },
   {
     "id": "penny",
     "title": "Penny",
     "artist": "Australians",
     "album": "Magna Cum Love",
-    "cover_art": "/boxel/media-registry/covers/Magna-Cum-Love.jpg",
+    "cover_art": MagnaCumLoveCover,
     "type_of_album": "EP",
     "genre": "Alternative",
     "length": "3:33",
@@ -1560,16 +1926,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Magna-Cum-Love.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Magna-Cum-Love.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Magna-Cum-Love.jpg"
+    "cover_art_thumb": MagnaCumLoveThumb,
+    "cover_art_medium": MagnaCumLoveMedium,
+    "cover_art_large": MagnaCumLoveLarge
   },
   {
     "id": "powder-snow",
     "title": "Powder snow",
     "artist": "Ping Pong",
     "album": "Seven Seasons",
-    "cover_art": "/boxel/media-registry/covers/Seven-Seasons.jpg",
+    "cover_art": SevenSeasonsCover,
     "blur_img": "WuI#[nt8oeofbIf6bxs-aykCf6a#.AxXWDj?oJWVV?ayj[ayWCay",
     "type_of_album": "EP",
     "genre": "Pop",
@@ -1585,16 +1951,16 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Seven-Seasons.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Seven-Seasons.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Seven-Seasons.jpg"
+    "cover_art_thumb": SevenSeasonsThumb,
+    "cover_art_medium": SevenSeasonsMedium,
+    "cover_art_large": SevenSeasonsLarge
   },
   {
     "id": "pristine-condition",
     "title": "Pristine condition",
     "artist": "Melodrama",
     "album": "Drama Queen",
-    "cover_art": "/boxel/media-registry/covers/Drama-Queen.jpg",
+    "cover_art": DramaQueenCover,
     "type_of_album": "EP",
     "genre": "Alternative",
     "length": "1:59",
@@ -1608,16 +1974,16 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Drama-Queen.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Drama-Queen.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Drama-Queen.jpg"
+    "cover_art_thumb": DramaQueenThumb,
+    "cover_art_medium": DramaQueenMedium,
+    "cover_art_large": DramaQueenLarge
   },
   {
     "id": "roller-coaster-of-emotions",
     "title": "Roller coaster of emotions",
     "artist": "Make Me",
     "album": "Roller Coaster of Emotions",
-    "cover_art": "/boxel/media-registry/covers/Rollercoaster-of-Emotions.jpg",
+    "cover_art": RollercoasterofEmotionsCover,
     "blur_img": "WiMj{#NF4TMy9FIU~qD%t7j]agaxjYj[xuRjogWBt7xuaxofayRj",
     "type_of_album": "Single",
     "genre": "Techno",
@@ -1633,9 +1999,9 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Rollercoaster-of-Emotions.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Rollercoaster-of-Emotions.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Rollercoaster-of-Emotions.jpg"
+    "cover_art_thumb": RollercoasterofEmotionsThumb,
+    "cover_art_medium": RollercoasterofEmotionsMedium,
+    "cover_art_large": RollercoasterofEmotionsLarge
   },
   {
     "id": "rubys-world",
@@ -1643,7 +2009,7 @@
     "artist": "BB Clarke",
     "artist_id": "bb-clarke",
     "album": "Animals",
-    "cover_art": "/boxel/media-registry/covers/Animals.jpg",
+    "cover_art": AnimalsCover,
     "blur_img": "WNO;0swdt8nO.mo}0;s9ofkWMdni17t7ogWVVYV@4TRjt6i_%hkW",
     "type_of_album": "Album",
     "genre": "Rock",
@@ -1655,9 +2021,9 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": "X",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Animals.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Animals.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Animals.jpg",
+    "cover_art_thumb": AnimalsThumb,
+    "cover_art_medium": AnimalsMedium,
+    "cover_art_large": AnimalsLarge,
     "year": "2019",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
@@ -1685,7 +2051,7 @@
     "title": "Shrink the cakes",
     "artist": "The Francines",
     "album": "Maximum Mildness",
-    "cover_art": "/boxel/media-registry/covers/Maximum-Mildness.jpg",
+    "cover_art": MaximumMildnessCover,
     "blur_img": "WlM7Gd?b_MIUs;IU?bRjM|V@Rjt7o_RiRQt7bEoz%2V@M{t7oLf*",
     "type_of_album": "EP",
     "genre": "Rock",
@@ -1700,16 +2066,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Maximum-Mildness.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Maximum-Mildness.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Maximum-Mildness.jpg"
+    "cover_art_thumb": MaximumMildnessThumb,
+    "cover_art_medium": MaximumMildnessMedium,
+    "cover_art_large": MaximumMildnessLarge
   },
   {
     "id": "silicone",
     "title": "Silicone",
     "artist": "Sun and Moon",
     "album": "Beauty vs Reality",
-    "cover_art": "/boxel/media-registry/covers/Beauty-vs-Reality.jpg",
+    "cover_art": BeautyvsRealityCover,
     "blur_img": "W5GmZM00IV8{^axA~U~P^d9bIqM}=?I]M|s+WBNI%M-S0PIXxat5",
     "type_of_album": "Album",
     "genre": "Pop",
@@ -1724,16 +2090,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Beauty-vs-Reality.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Beauty-vs-Reality.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Beauty-vs-Reality.jpg"
+    "cover_art_thumb": BeautyvsRealityThumb,
+    "cover_art_medium": BeautyvsRealityMedium,
+    "cover_art_large": BeautyvsRealityLarge
   },
   {
     "id": "silver-linings",
     "title": "Silver linings",
     "artist": "Constituents",
     "album": "Happy Ever After",
-    "cover_art": "/boxel/media-registry/covers/Happy-Ever-After.jpg",
+    "cover_art": HappyEverAfterCover,
     "blur_img": "WyI53@NIW=n$M{W;?wRkkCWBWAj[S%WAaeWXoej@Iof5Rjofj]WB",
     "type_of_album": "EP",
     "genre": "Pop",
@@ -1748,16 +2114,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Happy-Ever-After.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Happy-Ever-After.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Happy-Ever-After.jpg"
+    "cover_art_thumb": HappyEverAfterThumb,
+    "cover_art_medium": HappyEverAfterMedium,
+    "cover_art_large": HappyEverAfterLarge
   },
   {
     "id": "sold-out",
     "title": "Sold out",
     "artist": "Gross guest",
     "album": "Sold out",
-    "cover_art": "/boxel/media-registry/covers/Sold-Out.jpg",
+    "cover_art": SoldOutCover,
     "type_of_album": "Single",
     "genre": "Rock",
     "length": "3:22",
@@ -1771,16 +2137,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Sold-Out.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Sold-Out.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Sold-Out.jpg"
+    "cover_art_thumb": SoldOutThumb,
+    "cover_art_medium": SoldOutMedium,
+    "cover_art_large": SoldOutLarge
   },
   {
     "id": "sunny-side-up",
     "title": "Sunny side up",
     "artist": "Jason the boss",
     "album": "Sunny side up",
-    "cover_art": "/boxel/media-registry/covers/Sunny-Side-Up.jpg",
+    "cover_art": SunnySideUpCover,
     "type_of_album": "Single",
     "genre": "Rock",
     "length": "3:20",
@@ -1794,9 +2160,9 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Sunny-Side-Up.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Sunny-Side-Up.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Sunny-Side-Up.jpg"
+    "cover_art_thumb": SunnySideUpThumb,
+    "cover_art_medium": SunnySideUpMedium,
+    "cover_art_large": SunnySideUpLarge
   },
   {
     "id": "sunshine-and-moonlight",
@@ -1804,7 +2170,7 @@
     "artist": "Pia Midina",
     "artist_id": "pia-midina",
     "album": "Sunlight",
-    "cover_art": "/boxel/media-registry/covers/Sunlight.jpg",
+    "cover_art": SunlightCover,
     "blur_img": "WeHlY3xE5nNbX7oe}VsnR-azWWj@AEay$$s.njafNwS3WVa{s.oL",
     "type_of_album": "EP",
     "genre": "Alternative",
@@ -1820,9 +2186,9 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": "X",
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Sunlight.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Sunlight.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Sunlight.jpg",
+    "cover_art_thumb": SunlightThumb,
+    "cover_art_medium": SunlightMedium,
+    "cover_art_large": SunlightLarge,
     "year": "2018",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
@@ -1851,7 +2217,7 @@
     "title": "The air is thin",
     "artist": "Mango lovers",
     "album": "All About the Man",
-    "cover_art": "/boxel/media-registry/covers/All-About-the-Man.jpg",
+    "cover_art": AllAbouttheManCover,
     "blur_img": "W79Z4NX80$59Nb}qa0I;%2R+R*sTNfNG-8ba%1NI=xs.NbEMs:xa",
     "type_of_album": "Album",
     "genre": "Pop",
@@ -1866,16 +2232,16 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/All-About-the-Man.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/All-About-the-Man.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/All-About-the-Man.jpg"
+    "cover_art_thumb": AllAbouttheManThumb,
+    "cover_art_medium": AllAbouttheManMedium,
+    "cover_art_large": AllAbouttheManLarge
   },
   {
     "id": "the-breadcrumbs-in-the-forest",
     "title": "The breadcrumbs in the forest",
     "artist": "Australians",
     "album": "Fairy Tales",
-    "cover_art": "/boxel/media-registry/covers/Fairy-Tales.jpg",
+    "cover_art": FairyTalesCover,
     "type_of_album": "Album",
     "genre": "Alternative",
     "length": "2:11",
@@ -1889,16 +2255,16 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Fairy-Tales.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Fairy-Tales.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Fairy-Tales.jpg"
+    "cover_art_thumb": FairyTalesThumb,
+    "cover_art_medium": FairyTalesMedium,
+    "cover_art_large": FairyTalesLarge
   },
   {
     "id": "the-holy-mess",
     "title": "The holy mess",
     "artist": "Music Cafe",
     "album": "Magnitude",
-    "cover_art": "/boxel/media-registry/covers/Magnitude.jpg",
+    "cover_art": MagnitudeCover,
     "blur_img": "W5CFz.0Mx[E1Irxt03xtx?W;M}t74;IpD,?FNHoJ~nD*?FV@bHW=",
     "type_of_album": "Album",
     "genre": "Rock",
@@ -1913,9 +2279,9 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Magnitude.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Magnitude.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Magnitude.jpg"
+    "cover_art_thumb": MagnitudeThumb,
+    "cover_art_medium": MagnitudeMedium,
+    "cover_art_large": MagnitudeLarge
   },
   {
     "id": "the-leaves-are-changing-color",
@@ -1923,7 +2289,7 @@
     "artist": "Pia Midina",
     "artist_id": "pia-midina",
     "album": "Autumn Leaves",
-    "cover_art": "/boxel/media-registry/covers/Autumn-Leaves.jpg",
+    "cover_art": AutumnLeavesCover,
     "blur_img": "WHJjer8_01~BNZ-T%hnjM{=_VsEO00-;-oIoIpWB-:V@wJr=xaWY",
     "type_of_album": "EP",
     "genre": "Alternative",
@@ -1939,9 +2305,9 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": "X",
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Autumn-Leaves.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Autumn-Leaves.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Autumn-Leaves.jpg",
+    "cover_art_thumb": AutumnLeavesThumb,
+    "cover_art_medium": AutumnLeavesMedium,
+    "cover_art_large": AutumnLeavesLarge,
     "cover_art_date": "2020-02-25",
     "year": "2020",
     "label": "Bunny Records",
@@ -1989,7 +2355,7 @@
     "artist": "Pia Midina",
     "artist_id": "pia-midina",
     "album": "Autumn Leaves",
-    "cover_art": "/boxel/media-registry/covers/Autumn-Leaves.jpg",
+    "cover_art": AutumnLeavesCover,
     "blur_img": "WHJjer8_01~BNZ-T%hnjM{=_VsEO00-;-oIoIpWB-:V@wJr=xaWY",
     "type_of_album": "EP",
     "genre": "Dance",
@@ -2005,9 +2371,9 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": "X",
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Autumn-Leaves.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Autumn-Leaves.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Autumn-Leaves.jpg",
+    "cover_art_thumb": AutumnLeavesThumb,
+    "cover_art_medium": AutumnLeavesMedium,
+    "cover_art_large": AutumnLeavesLarge,
     "year": "2020",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
@@ -2037,7 +2403,7 @@
     "artist": "Pia Midina",
     "artist_id": "pia-midina",
     "album": "Graduation day",
-    "cover_art": "/boxel/media-registry/covers/Graduation-Day.jpg",
+    "cover_art": GraduationDayCover,
     "blur_img": "WHD+-@RjK4oM#-ozF$ofS}ofnOofPqoLn*bHS1jZ*0RjnOWCX8WB",
     "type_of_album": "EP",
     "genre": "Alternative",
@@ -2053,9 +2419,9 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": "X",
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Graduation-Day.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Graduation-Day.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Graduation-Day.jpg",
+    "cover_art_thumb": GraduationDayThumb,
+    "cover_art_medium": GraduationDayMedium,
+    "cover_art_large": GraduationDayLarge,
     "year": "2019",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
@@ -2085,7 +2451,7 @@
     "artist": "BB Clarke",
     "artist_id": "bb-clarke",
     "album": "Animals",
-    "cover_art": "/boxel/media-registry/covers/Animals.jpg",
+    "cover_art": AnimalsCover,
     "blur_img": "WNO;0swdt8nO.mo}0;s9ofkWMdni17t7ogWVVYV@4TRjt6i_%hkW",
     "type_of_album": "Album",
     "genre": "Rock",
@@ -2101,9 +2467,9 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": "X",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Animals.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Animals.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Animals.jpg",
+    "cover_art_thumb": AnimalsThumb,
+    "cover_art_medium": AnimalsMedium,
+    "cover_art_large": AnimalsLarge,
     "year": "2019",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
@@ -2131,7 +2497,7 @@
     "title": "The sophomores",
     "artist": "Charlotte's Cats",
     "album": "Good Times",
-    "cover_art": "/boxel/media-registry/covers/Good-Times.jpg",
+    "cover_art": GoodTimesCover,
     "blur_img": "WNOob0yB;G#s=oi^?bfloHofWVR*|AjIFhX4JDWWxmW;R:aen+t6",
     "type_of_album": "Album",
     "genre": "Alternative",
@@ -2146,9 +2512,9 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Good-Times.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Good-Times.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Good-Times.jpg"
+    "cover_art_thumb": GoodTimesThumb,
+    "cover_art_medium": GoodTimesMedium,
+    "cover_art_large": GoodTimesLarge
   },
   {
     "id": "three-wishes",
@@ -2156,7 +2522,7 @@
     "artist": "Pia Midina",
     "artist_id": "pia-midina",
     "album": "Graduation day",
-    "cover_art": "/boxel/media-registry/covers/Graduation-Day.jpg",
+    "cover_art": GraduationDayCover,
     "blur_img": "WHD+-@RjK4oM#-ozF$ofS}ofnOofPqoLn*bHS1jZ*0RjnOWCX8WB",
     "type_of_album": "EP",
     "genre": "Alternative",
@@ -2172,9 +2538,9 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": "X",
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Graduation-Day.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Graduation-Day.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Graduation-Day.jpg",
+    "cover_art_thumb": GraduationDayThumb,
+    "cover_art_medium": GraduationDayMedium,
+    "cover_art_large": GraduationDayLarge,
     "year": "2018",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
@@ -2203,7 +2569,7 @@
     "title": "We used to be good",
     "artist": "The Mash",
     "album": "More Than We Know",
-    "cover_art": "/boxel/media-registry/covers/More-Than-We-Know.jpg",
+    "cover_art": MoreThanWeKnowCover,
     "blur_img": "W2Eo=D0000M{4ooc_3M{M{RjRi%2~qIU-pRjIUt7t7fit7R*t7Rj",
     "type_of_album": "Album",
     "genre": "Alternative",
@@ -2218,16 +2584,16 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/More-Than-We-Know.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/More-Than-We-Know.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/More-Than-We-Know.jpg"
+    "cover_art_thumb": MoreThanWeKnowThumb,
+    "cover_art_medium": MoreThanWeKnowMedium,
+    "cover_art_large": MoreThanWeKnowLarge
   },
   {
     "id": "what-the-hell",
     "title": "What the hell",
     "artist": "Super nova",
     "album": "Drunk",
-    "cover_art": "/boxel/media-registry/covers/Drunk.jpg",
+    "cover_art": DrunkCover,
     "type_of_album": "Album",
     "genre": "Rock",
     "length": "2:58",
@@ -2241,16 +2607,16 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Drunk.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Drunk.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Drunk.jpg"
+    "cover_art_thumb": DrunkThumb,
+    "cover_art_medium": DrunkMedium,
+    "cover_art_large": DrunkLarge
   },
   {
     "id": "when-we-were-younger",
     "title": "When we were younger",
     "artist": "Love monkeys",
     "album": "Friends with Benefits",
-    "cover_art": "/boxel/media-registry/covers/Friends-with-Benefits.jpg",
+    "cover_art": FriendswithBenefitsCover,
     "type_of_album": "EP",
     "genre": "Rock",
     "length": "2:50",
@@ -2264,16 +2630,16 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Friends-with-Benefits.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Friends-with-Benefits.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Friends-with-Benefits.jpg"
+    "cover_art_thumb": FriendswithBenefitsThumb,
+    "cover_art_medium": FriendswithBenefitsMedium,
+    "cover_art_large": FriendswithBenefitsLarge
   },
   {
     "id": "when-you-hit-me",
     "title": "When you hit me",
     "artist": "Gross guest",
     "album": "When you hit me",
-    "cover_art": "/boxel/media-registry/covers/When-You-Hit-Me.jpg",
+    "cover_art": WhenYouHitMeCover,
     "type_of_album": "Single",
     "genre": "Rock",
     "length": "2:45",
@@ -2287,16 +2653,16 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/When-You-Hit-Me.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/When-You-Hit-Me.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/When-You-Hit-Me.jpg"
+    "cover_art_thumb": WhenYouHitMeThumb,
+    "cover_art_medium": WhenYouHitMeMedium,
+    "cover_art_large": WhenYouHitMeLarge
   },
   {
     "id": "why-do-you-like-me",
     "title": "Why do you like me?",
     "artist": "Picture perfect",
     "album": "Why do you like me?",
-    "cover_art": "/boxel/media-registry/covers/Why-Do-You-Like-Me.jpg",
+    "cover_art": WhyDoYouLikeMeCover,
     "type_of_album": "Single",
     "genre": "Rock",
     "length": "2:16",
@@ -2310,16 +2676,16 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Why-Do-You-Like-Me.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Why-Do-You-Like-Me.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Why-Do-You-Like-Me.jpg"
+    "cover_art_thumb": WhyDoYouLikeMeThumb,
+    "cover_art_medium": WhyDoYouLikeMeMedium,
+    "cover_art_large": WhyDoYouLikeMeLarge
   },
   {
     "id": "why-not",
     "title": "Why not",
     "artist": "Jason the boss",
     "album": "Why not",
-    "cover_art": "/boxel/media-registry/covers/Why-Not.jpg",
+    "cover_art": WhyNotCover,
     "type_of_album": "Single",
     "genre": "Rock",
     "length": "2:57",
@@ -2333,9 +2699,9 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Why-Not.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Why-Not.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Why-Not.jpg"
+    "cover_art_thumb": WhyNotThumb,
+    "cover_art_medium": WhyNotMedium,
+    "cover_art_large": WhyNotLarge
   },
   {
     "id": "yesterday-was-my-favorite-day",
@@ -2343,7 +2709,7 @@
     "artist": "Pia Midina",
     "artist_id": "pia-midina",
     "album": "Sunlight",
-    "cover_art": "/boxel/media-registry/covers/Sunlight.jpg",
+    "cover_art": SunlightCover,
     "blur_img": "WeHlY3xE5nNbX7oe}VsnR-azWWj@AEay$$s.njafNwS3WVa{s.oL",
     "type_of_album": "EP",
     "genre": "Alternative",
@@ -2359,9 +2725,9 @@
     "filtered_by_length_less_than_3_min": "X",
     "search_for_artist_pia_midina": "X",
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Sunlight.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Sunlight.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Sunlight.jpg",
+    "cover_art_thumb": SunlightThumb,
+    "cover_art_medium": SunlightMedium,
+    "cover_art_large": SunlightLarge,
     "year": "2019",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
@@ -2391,7 +2757,7 @@
     "artist": "Pia Midina",
     "artist_id": "pia-midina",
     "album": "Love never dies",
-    "cover_art": "/boxel/media-registry/covers/Love-Never-Dies.jpg",
+    "cover_art": LoveNeverDiesCover,
     "blur_img": "LTKuc,NG9aaL}Fs.aeWB8xs:o}X8",
     "type_of_album": "EP",
     "genre": "Pop",
@@ -2407,9 +2773,9 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": "X",
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Love-Never-Dies.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Love-Never-Dies.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Love-Never-Dies.jpg",
+    "cover_art_thumb": LoveNeverDiesThumb,
+    "cover_art_medium": LoveNeverDiesMedium,
+    "cover_art_large": LoveNeverDiesLarge,
     "year": "2018",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
@@ -2438,7 +2804,7 @@
     "title": "Zig and zag",
     "artist": "Golden Girl",
     "album": "Zig and Zag",
-    "cover_art": "/boxel/media-registry/covers/Zig-and-Zag.jpg",
+    "cover_art": ZigandZagCover,
     "blur_img": "WYJ9AA%1t8fiWXof.T9FM{s:WXoJ?H?aM{M{RjoLIpx]%MsmoLoK",
     "type_of_album": "Single",
     "genre": "Pop",
@@ -2453,9 +2819,9 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": null,
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Zig-and-Zag.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Zig-and-Zag.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Zig-and-Zag.jpg"
+    "cover_art_thumb": ZigandZagThumb,
+    "cover_art_medium": ZigandZagMedium,
+    "cover_art_large": ZigandZagLarge
   },
   {
     "id": "zodiac-lies",
@@ -2463,7 +2829,7 @@
     "artist": "BB Clarke",
     "artist_id": "bb-clarke",
     "album": "Animals",
-    "cover_art": "/boxel/media-registry/covers/Animals.jpg",
+    "cover_art": AnimalsCover,
     "blur_img": "WNO;0swdt8nO.mo}0;s9ofkWMdni17t7ogWVVYV@4TRjt6i_%hkW",
     "type_of_album": "Album",
     "genre": "Rock",
@@ -2479,9 +2845,9 @@
     "filtered_by_length_less_than_3_min": null,
     "search_for_artist_pia_midina": null,
     "search_for_artist_bb_clarke": "X",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Animals.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Animals.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Animals.jpg",
+    "cover_art_thumb": AnimalsThumb,
+    "cover_art_medium": AnimalsMedium,
+    "cover_art_large": AnimalsLarge,
     "year": "2019",
     "label": "Bunny Records",
     "owner_after_transfer_is_accepted": "CRD Records",
@@ -2519,10 +2885,10 @@
       "radio-friendly",
       "soundtracks"
     ],
-    "cover_art": "/boxel/media-registry/covers/Cast-Me.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Cast-Me.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Cast-Me.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Cast-Me.jpg"
+    "cover_art": CastMeCover,
+    "cover_art_thumb": CastMeThumb,
+    "cover_art_medium": CastMeMedium,
+    "cover_art_large": CastMeLarge
   },
   {
     "id": "alike-or-not-alike",
@@ -2539,10 +2905,10 @@
       "gary-and-the-whales",
       "love-songs"
     ],
-    "cover_art": "/boxel/media-registry/covers/Freedom.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Freedom.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Freedom.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Freedom.jpg"
+    "cover_art": FreedomCover,
+    "cover_art_thumb": FreedomThumb,
+    "cover_art_medium": FreedomMedium,
+    "cover_art_large": FreedomLarge
   },
   {
     "id": "aloof",
@@ -2558,10 +2924,10 @@
     "collection_ids": [
       "radio-friendly"
     ],
-    "cover_art": "/boxel/media-registry/covers/The-Vamps-of-the-World.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/The-Vamps-of-the-World.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/The-Vamps-of-the-World.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/The-Vamps-of-the-World.jpg"
+    "cover_art": TheVampsoftheWorldCover,
+    "cover_art_thumb": TheVampsoftheWorldThumb,
+    "cover_art_medium": TheVampsoftheWorldMedium,
+    "cover_art_large": TheVampsoftheWorldLarge
   },
   {
     "id": "another-time",
@@ -2577,10 +2943,10 @@
     "collection_ids": [
       "instrumental"
     ],
-    "cover_art": "/boxel/media-registry/covers/What-Musical-Instruments-Can-Do.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/What-Musical-Instruments-Can-Do.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/What-Musical-Instruments-Can-Do.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/What-Musical-Instruments-Can-Do.jpg"
+    "cover_art": WhatMusicalInstrumentsCanDoCover,
+    "cover_art_thumb": WhatMusicalInstrumentsCanDoThumb,
+    "cover_art_medium": WhatMusicalInstrumentsCanDoMedium,
+    "cover_art_large": WhatMusicalInstrumentsCanDoLarge
   },
   {
     "id": "beauty-versus-strength",
@@ -2596,10 +2962,10 @@
     "collection_ids": [
       "Hit Songs"
     ],
-    "cover_art": "/boxel/media-registry/covers/Innocent-Kittens.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Innocent-Kittens.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Innocent-Kittens.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Innocent-Kittens.jpg"
+    "cover_art": InnocentKittensCover,
+    "cover_art_thumb": InnocentKittensThumb,
+    "cover_art_medium": InnocentKittensMedium,
+    "cover_art_large": InnocentKittensLarge
   },
   {
     "id": "been-there-done-that",
@@ -2616,10 +2982,10 @@
       "gary-and-the-whales",
       "Hit Songs"
     ],
-    "cover_art": "/boxel/media-registry/covers/Been-There-Done-That.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Been-There-Done-That.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Been-There-Done-That.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Been-There-Done-That.jpg"
+    "cover_art": BeenThereDoneThatCover,
+    "cover_art_thumb": BeenThereDoneThatThumb,
+    "cover_art_medium": BeenThereDoneThatMedium,
+    "cover_art_large": BeenThereDoneThatLarge
   },
   {
     "id": "drive-thru",
@@ -2635,10 +3001,10 @@
     "collection_ids": [
       "Hit Songs"
     ],
-    "cover_art": "/boxel/media-registry/covers/Roller-Coaster.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Roller-Coaster.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Roller-Coaster.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Roller-Coaster.jpg"
+    "cover_art": RollerCoasterCover,
+    "cover_art_thumb": RollerCoasterThumb,
+    "cover_art_medium": RollerCoasterMedium,
+    "cover_art_large": RollerCoasterLarge
   },
   {
     "id": "driving",
@@ -2654,10 +3020,10 @@
     "collection_ids": [
       "instrumental"
     ],
-    "cover_art": "/boxel/media-registry/covers/Just-Listen.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Just-Listen.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Just-Listen.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Just-Listen.jpg"
+    "cover_art": JustListenCover,
+    "cover_art_thumb": JustListenThumb,
+    "cover_art_medium": JustListenMedium,
+    "cover_art_large": JustListenLarge
   },
   {
     "id": "english-breakfast",
@@ -2673,10 +3039,10 @@
     "collection_ids": [
       "soundtracks"
     ],
-    "cover_art": "/boxel/media-registry/covers/Cast-Me.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Cast-Me.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Cast-Me.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Cast-Me.jpg"
+    "cover_art": CastMeCover,
+    "cover_art_thumb": CastMeThumb,
+    "cover_art_medium": CastMeMedium,
+    "cover_art_large": CastMeLarge
   },
   {
     "id": "francis-the-shark",
@@ -2692,10 +3058,10 @@
     "collection_ids": [
       "gary-and-the-whales"
     ],
-    "cover_art": "/boxel/media-registry/covers/Freedom.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Freedom.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Freedom.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Freedom.jpg"
+    "cover_art": FreedomCover,
+    "cover_art_thumb": FreedomThumb,
+    "cover_art_medium": FreedomMedium,
+    "cover_art_large": FreedomLarge
   },
   {
     "id": "fried-pork",
@@ -2711,10 +3077,10 @@
     "collection_ids": [
       "instrumental"
     ],
-    "cover_art": "/boxel/media-registry/covers/Fried-Pork.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Fried-Pork.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Fried-Pork.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Fried-Pork.jpg"
+    "cover_art": FriedPorkCover,
+    "cover_art_thumb": FriedPorkThumb,
+    "cover_art_medium": FriedPorkMedium,
+    "cover_art_large": FriedPorkLarge
   },
   {
     "id": "gray-zone",
@@ -2730,10 +3096,10 @@
     "collection_ids": [
       "unplugged"
     ],
-    "cover_art": "/boxel/media-registry/covers/The-Vamps-of-the-World.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/The-Vamps-of-the-World.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/The-Vamps-of-the-World.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/The-Vamps-of-the-World.jpg"
+    "cover_art": TheVampsoftheWorldCover,
+    "cover_art_thumb": TheVampsoftheWorldThumb,
+    "cover_art_medium": TheVampsoftheWorldMedium,
+    "cover_art_large": TheVampsoftheWorldLarge
   },
   {
     "id": "home-schooling",
@@ -2749,10 +3115,10 @@
     "collection_ids": [
       "radio-friendly"
     ],
-    "cover_art": "/boxel/media-registry/covers/Innocent-Kittens.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Innocent-Kittens.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Innocent-Kittens.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Innocent-Kittens.jpg"
+    "cover_art": InnocentKittensCover,
+    "cover_art_thumb": InnocentKittensThumb,
+    "cover_art_medium": InnocentKittensMedium,
+    "cover_art_large": InnocentKittensLarge
   },
   {
     "id": "home-sweet-home",
@@ -2768,10 +3134,10 @@
     "collection_ids": [
       "gary-and-the-whales"
     ],
-    "cover_art": "/boxel/media-registry/covers/Home-Sweet-Home.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Home-Sweet-Home.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Home-Sweet-Home.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Home-Sweet-Home.jpg"
+    "cover_art": HomeSweetHomeCover,
+    "cover_art_thumb": HomeSweetHomeThumb,
+    "cover_art_medium": HomeSweetHomeMedium,
+    "cover_art_large": HomeSweetHomeLarge
   },
   {
     "id": "joking-just-keep-joking",
@@ -2787,10 +3153,10 @@
     "collection_ids": [
       "radio-friendly"
     ],
-    "cover_art": "/boxel/media-registry/covers/Roller-Coaster.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Roller-Coaster.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Roller-Coaster.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Roller-Coaster.jpg"
+    "cover_art": RollerCoasterCover,
+    "cover_art_thumb": RollerCoasterThumb,
+    "cover_art_medium": RollerCoasterMedium,
+    "cover_art_large": RollerCoasterLarge
   },
   {
     "id": "lagoon",
@@ -2807,10 +3173,10 @@
       "gary-and-the-whales",
       "Hit Songs"
     ],
-    "cover_art": "/boxel/media-registry/covers/Freedom.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Freedom.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Freedom.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Freedom.jpg"
+    "cover_art": FreedomCover,
+    "cover_art_thumb": FreedomThumb,
+    "cover_art_medium": FreedomMedium,
+    "cover_art_large": FreedomLarge
   },
   {
     "id": "longing",
@@ -2826,10 +3192,10 @@
     "collection_ids": [
       "instrumental"
     ],
-    "cover_art": "/boxel/media-registry/covers/Longing.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Longing.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Longing.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Longing.jpg"
+    "cover_art": LongingCover,
+    "cover_art_thumb": LongingThumb,
+    "cover_art_medium": LongingMedium,
+    "cover_art_large": LongingLarge
   },
   {
     "id": "lucifers-lair",
@@ -2845,10 +3211,10 @@
     "collection_ids": [
       "Hit Songs"
     ],
-    "cover_art": "/boxel/media-registry/covers/The-Vamps-of-the-World.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/The-Vamps-of-the-World.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/The-Vamps-of-the-World.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/The-Vamps-of-the-World.jpg"
+    "cover_art": TheVampsoftheWorldCover,
+    "cover_art_thumb": TheVampsoftheWorldThumb,
+    "cover_art_medium": TheVampsoftheWorldMedium,
+    "cover_art_large": TheVampsoftheWorldLarge
   },
   {
     "id": "mixed-signals",
@@ -2864,10 +3230,10 @@
     "collection_ids": [
       "soundtracks"
     ],
-    "cover_art": "/boxel/media-registry/covers/Cast-Me.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Cast-Me.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Cast-Me.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Cast-Me.jpg"
+    "cover_art": CastMeCover,
+    "cover_art_thumb": CastMeThumb,
+    "cover_art_medium": CastMeMedium,
+    "cover_art_large": CastMeLarge
   },
   {
     "id": "never-ever-again",
@@ -2883,10 +3249,10 @@
     "collection_ids": [
       "love-songs"
     ],
-    "cover_art": "/boxel/media-registry/covers/Innocent-Kittens.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Innocent-Kittens.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Innocent-Kittens.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Innocent-Kittens.jpg"
+    "cover_art": InnocentKittensCover,
+    "cover_art_thumb": InnocentKittensThumb,
+    "cover_art_medium": InnocentKittensMedium,
+    "cover_art_large": InnocentKittensLarge
   },
   {
     "id": "nobodys-claims",
@@ -2902,10 +3268,10 @@
     "collection_ids": [
       "instrumental"
     ],
-    "cover_art": "/boxel/media-registry/covers/Nobodys-Claims.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Nobodys-Claims.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Nobodys-Claims.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Nobodys-Claims.jpg"
+    "cover_art": NobodysClaimsCover,
+    "cover_art_thumb": NobodysClaimsThumb,
+    "cover_art_medium": NobodysClaimsMedium,
+    "cover_art_large": NobodysClaimsLarge
   },
   {
     "id": "on-and-on-again",
@@ -2921,10 +3287,10 @@
     "collection_ids": [
       "love-songs"
     ],
-    "cover_art": "/boxel/media-registry/covers/Roller-Coaster.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Roller-Coaster.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Roller-Coaster.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Roller-Coaster.jpg"
+    "cover_art": RollerCoasterCover,
+    "cover_art_thumb": RollerCoasterThumb,
+    "cover_art_medium": RollerCoasterMedium,
+    "cover_art_large": RollerCoasterLarge
   },
   {
     "id": "over-you",
@@ -2941,10 +3307,10 @@
       "love-songs",
       "soundtracks"
     ],
-    "cover_art": "/boxel/media-registry/covers/Cast-Me.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Cast-Me.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Cast-Me.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Cast-Me.jpg"
+    "cover_art": CastMeCover,
+    "cover_art_thumb": CastMeThumb,
+    "cover_art_medium": CastMeMedium,
+    "cover_art_large": CastMeLarge
   },
   {
     "id": "pinnacles",
@@ -2960,10 +3326,10 @@
     "collection_ids": [
       "gary-and-the-whales"
     ],
-    "cover_art": "/boxel/media-registry/covers/Pinnacles.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Pinnacles.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Pinnacles.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Pinnacles.jpg"
+    "cover_art": PinnaclesCover,
+    "cover_art_thumb": PinnaclesThumb,
+    "cover_art_medium": PinnaclesMedium,
+    "cover_art_large": PinnaclesLarge
   },
   {
     "id": "powerful",
@@ -2979,10 +3345,10 @@
     "collection_ids": [
       "soundtracks"
     ],
-    "cover_art": "/boxel/media-registry/covers/The-Vamps-of-the-World.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/The-Vamps-of-the-World.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/The-Vamps-of-the-World.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/The-Vamps-of-the-World.jpg"
+    "cover_art": TheVampsoftheWorldCover,
+    "cover_art_thumb": TheVampsoftheWorldThumb,
+    "cover_art_medium": TheVampsoftheWorldMedium,
+    "cover_art_large": TheVampsoftheWorldLarge
   },
   {
     "id": "silence",
@@ -2998,10 +3364,10 @@
     "collection_ids": [
       "gary-and-the-whales"
     ],
-    "cover_art": "/boxel/media-registry/covers/Freedom.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Freedom.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Freedom.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Freedom.jpg"
+    "cover_art": FreedomCover,
+    "cover_art_thumb": FreedomThumb,
+    "cover_art_medium": FreedomMedium,
+    "cover_art_large": FreedomLarge
   },
   {
     "id": "skills-are-all-you-need",
@@ -3017,10 +3383,10 @@
     "collection_ids": [
       "radio-friendly"
     ],
-    "cover_art": "/boxel/media-registry/covers/Innocent-Kittens.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Innocent-Kittens.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Innocent-Kittens.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Innocent-Kittens.jpg"
+    "cover_art": InnocentKittensCover,
+    "cover_art_thumb": InnocentKittensThumb,
+    "cover_art_medium": InnocentKittensMedium,
+    "cover_art_large": InnocentKittensLarge
   },
   {
     "id": "sulking-maids",
@@ -3036,10 +3402,10 @@
     "collection_ids": [
       "gary-and-the-whales"
     ],
-    "cover_art": "/boxel/media-registry/covers/Sulking-Maids.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Sulking-Maids.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Sulking-Maids.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Sulking-Maids.jpg"
+    "cover_art": SulkingMaidsCover,
+    "cover_art_thumb": SulkingMaidsThumb,
+    "cover_art_medium": SulkingMaidsMedium,
+    "cover_art_large": SulkingMaidsLarge
   },
   {
     "id": "terrible-traffic",
@@ -3055,10 +3421,10 @@
     "collection_ids": [
       "unplugged"
     ],
-    "cover_art": "/boxel/media-registry/covers/Roller-Coaster.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Roller-Coaster.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Roller-Coaster.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Roller-Coaster.jpg"
+    "cover_art": RollerCoasterCover,
+    "cover_art_thumb": RollerCoasterThumb,
+    "cover_art_medium": RollerCoasterMedium,
+    "cover_art_large": RollerCoasterLarge
   },
   {
     "id": "the-greatest-bathroom-ever",
@@ -3074,10 +3440,10 @@
     "collection_ids": [
       "soundtracks"
     ],
-    "cover_art": "/boxel/media-registry/covers/Cast-Me.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Cast-Me.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Cast-Me.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Cast-Me.jpg"
+    "cover_art": CastMeCover,
+    "cover_art_thumb": CastMeThumb,
+    "cover_art_medium": CastMeMedium,
+    "cover_art_large": CastMeLarge
   },
   {
     "id": "the-mass-market-effect",
@@ -3094,10 +3460,10 @@
       "gary-and-the-whales",
       "radio-friendly"
     ],
-    "cover_art": "/boxel/media-registry/covers/Freedom.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Freedom.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Freedom.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Freedom.jpg"
+    "cover_art": FreedomCover,
+    "cover_art_thumb": FreedomThumb,
+    "cover_art_medium": FreedomMedium,
+    "cover_art_large": FreedomLarge
   },
   {
     "id": "this-is-the-end",
@@ -3114,10 +3480,10 @@
       "Hit Songs",
       "love-songs"
     ],
-    "cover_art": "/boxel/media-registry/covers/The-Vamps-of-the-World.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/The-Vamps-of-the-World.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/The-Vamps-of-the-World.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/The-Vamps-of-the-World.jpg"
+    "cover_art": TheVampsoftheWorldCover,
+    "cover_art_thumb": TheVampsoftheWorldThumb,
+    "cover_art_medium": TheVampsoftheWorldMedium,
+    "cover_art_large": TheVampsoftheWorldLarge
   },
   {
     "id": "trust-yourself",
@@ -3133,10 +3499,10 @@
     "collection_ids": [
       "unplugged"
     ],
-    "cover_art": "/boxel/media-registry/covers/Innocent-Kittens.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Innocent-Kittens.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Innocent-Kittens.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Innocent-Kittens.jpg"
+    "cover_art": InnocentKittensCover,
+    "cover_art_thumb": InnocentKittensThumb,
+    "cover_art_medium": InnocentKittensMedium,
+    "cover_art_large": InnocentKittensLarge
   },
   {
     "id": "under-the-living-tree",
@@ -3152,10 +3518,10 @@
     "collection_ids": [
       "soundtracks"
     ],
-    "cover_art": "/boxel/media-registry/covers/Roller-Coaster.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Roller-Coaster.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Roller-Coaster.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Roller-Coaster.jpg"
+    "cover_art": RollerCoasterCover,
+    "cover_art_thumb": RollerCoasterThumb,
+    "cover_art_medium": RollerCoasterMedium,
+    "cover_art_large": RollerCoasterLarge
   },
   {
     "id": "veil-or-tiara",
@@ -3171,10 +3537,10 @@
     "collection_ids": [
       "soundtracks"
     ],
-    "cover_art": "/boxel/media-registry/covers/Innocent-Kittens.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Innocent-Kittens.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Innocent-Kittens.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Innocent-Kittens.jpg"
+    "cover_art": InnocentKittensCover,
+    "cover_art_thumb": InnocentKittensThumb,
+    "cover_art_medium": InnocentKittensMedium,
+    "cover_art_large": InnocentKittensLarge
   },
   {
     "id": "zombie-apocalypse",
@@ -3191,10 +3557,10 @@
       "gary-and-the-whales",
       "unplugged"
     ],
-    "cover_art": "/boxel/media-registry/covers/Freedom.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Freedom.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Freedom.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Freedom.jpg"
+    "cover_art": FreedomCover,
+    "cover_art_thumb": FreedomThumb,
+    "cover_art_medium": FreedomMedium,
+    "cover_art_large": FreedomLarge
   },
   {
     "id": "zombies-all-over",
@@ -3210,10 +3576,10 @@
     "collection_ids": [
       "soundtracks"
     ],
-    "cover_art": "/boxel/media-registry/covers/Zombies.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Zombies.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Zombies.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Zombies.jpg"
+    "cover_art": ZombiesCover,
+    "cover_art_thumb": ZombiesThumb,
+    "cover_art_medium": ZombiesMedium,
+    "cover_art_large": ZombiesLarge
   },
   {
     "id": "zombies-never-die",
@@ -3230,9 +3596,12 @@
       "soundtracks",
       "unplugged"
     ],
-    "cover_art": "/boxel/media-registry/covers/Zombies.jpg",
-    "cover_art_thumb": "/boxel/media-registry/covers/thumb/Zombies.jpg",
-    "cover_art_medium": "/boxel/media-registry/covers/medium/Zombies.jpg",
-    "cover_art_large": "/boxel/media-registry/covers/large/Zombies.jpg"
+    "cover_art": ZombiesCover,
+    "cover_art_thumb": ZombiesThumb,
+    "cover_art_medium": ZombiesMedium,
+    "cover_art_large": ZombiesLarge
   }
-]
+];
+
+
+export { AccidentsCover, AccidentsThumb, AccidentsMedium, AccidentsLarge, AllAboutHeavenCover, AllAboutHeavenThumb, AllAboutHeavenMedium, AllAboutHeavenLarge, AllAbouttheManCover, AllAbouttheManThumb, AllAbouttheManMedium, AllAbouttheManLarge, AllAbouttheQualityofLifeCover, AllAbouttheQualityofLifeThumb, AllAbouttheQualityofLifeMedium, AllAbouttheQualityofLifeLarge, AlwaysInLoveCover, AlwaysInLoveThumb, AlwaysInLoveMedium, AlwaysInLoveLarge, AnimalsCover, AnimalsThumb, AnimalsMedium, AnimalsLarge, AroundtheWorldCover, AroundtheWorldThumb, AroundtheWorldMedium, AroundtheWorldLarge, AutumnLeavesCover, AutumnLeavesThumb, AutumnLeavesMedium, AutumnLeavesLarge, BeautyvsRealityCover, BeautyvsRealityThumb, BeautyvsRealityMedium, BeautyvsRealityLarge, BeenThereDoneThatCover, BeenThereDoneThatThumb, BeenThereDoneThatMedium, BeenThereDoneThatLarge, CallMeCrazyCover, CallMeCrazyThumb, CallMeCrazyMedium, CallMeCrazyLarge, CastMeCover, CastMeThumb, CastMeMedium, CastMeLarge, ChangeIsGoodCover, ChangeIsGoodThumb, ChangeIsGoodMedium, ChangeIsGoodLarge, DramaQueenCover, DramaQueenThumb, DramaQueenMedium, DramaQueenLarge, DriveMeCrazyCover, DriveMeCrazyThumb, DriveMeCrazyMedium, DriveMeCrazyLarge, DrunkCover, DrunkThumb, DrunkMedium, DrunkLarge, EscapeCover, EscapeThumb, EscapeMedium, EscapeLarge, FairyTalesCover, FairyTalesThumb, FairyTalesMedium, FairyTalesLarge, FreedomCover, FreedomThumb, FreedomMedium, FreedomLarge, FriedPorkCover, FriedPorkThumb, FriedPorkMedium, FriedPorkLarge, FriendswithBenefitsCover, FriendswithBenefitsThumb, FriendswithBenefitsMedium, FriendswithBenefitsLarge, FullMoonCover, FullMoonThumb, FullMoonMedium, FullMoonLarge, GoodTimesCover, GoodTimesThumb, GoodTimesMedium, GoodTimesLarge, GottaBeSillyCover, GottaBeSillyThumb, GottaBeSillyMedium, GottaBeSillyLarge, GraduationDayCover, GraduationDayThumb, GraduationDayMedium, GraduationDayLarge, HandsOnCover, HandsOnThumb, HandsOnMedium, HandsOnLarge, HappyEverAfterCover, HappyEverAfterThumb, HappyEverAfterMedium, HappyEverAfterLarge, HaveFunCover, HaveFunThumb, HaveFunMedium, HaveFunLarge, HomeIsntSweetCover, HomeIsntSweetThumb, HomeIsntSweetMedium, HomeIsntSweetLarge, HomeSweetHomeCover, HomeSweetHomeThumb, HomeSweetHomeMedium, HomeSweetHomeLarge, InfatuatedCover, InfatuatedThumb, InfatuatedMedium, InfatuatedLarge, InnocentKittensCover, InnocentKittensThumb, InnocentKittensMedium, InnocentKittensLarge, JustLikeBirdsCover, JustLikeBirdsThumb, JustLikeBirdsMedium, JustLikeBirdsLarge, JustListenCover, JustListenThumb, JustListenMedium, JustListenLarge, LeavetheDoorOpenCover, LeavetheDoorOpenThumb, LeavetheDoorOpenMedium, LeavetheDoorOpenLarge, LiarsCover, LiarsThumb, LiarsMedium, LiarsLarge, LittleLiesCover, LittleLiesThumb, LittleLiesMedium, LittleLiesLarge, LongingCover, LongingThumb, LongingMedium, LongingLarge, LoveConquersAllCover, LoveConquersAllThumb, LoveConquersAllMedium, LoveConquersAllLarge, LoveNeverDiesCover, LoveNeverDiesThumb, LoveNeverDiesMedium, LoveNeverDiesLarge, LovetheLoveCover, LovetheLoveThumb, LovetheLoveMedium, LovetheLoveLarge, MagnaCumLoveCover, MagnaCumLoveThumb, MagnaCumLoveMedium, MagnaCumLoveLarge, MagnitudeCover, MagnitudeThumb, MagnitudeMedium, MagnitudeLarge, MakeMagicCover, MakeMagicThumb, MakeMagicMedium, MakeMagicLarge, MaximumMildnessCover, MaximumMildnessThumb, MaximumMildnessMedium, MaximumMildnessLarge, MightyMoonCover, MightyMoonThumb, MightyMoonMedium, MightyMoonLarge, MomentsCover, MomentsThumb, MomentsMedium, MomentsLarge, MoreThanWeKnowCover, MoreThanWeKnowThumb, MoreThanWeKnowMedium, MoreThanWeKnowLarge, NeverLonelyCover, NeverLonelyThumb, NeverLonelyMedium, NeverLonelyLarge, NobodysClaimsCover, NobodysClaimsThumb, NobodysClaimsMedium, NobodysClaimsLarge, OntheBrinkofHappinessCover, OntheBrinkofHappinessThumb, OntheBrinkofHappinessMedium, OntheBrinkofHappinessLarge, OntheDayYouWereBornCover, OntheDayYouWereBornThumb, OntheDayYouWereBornMedium, OntheDayYouWereBornLarge, PinnaclesCover, PinnaclesThumb, PinnaclesMedium, PinnaclesLarge, RollerCoasterCover, RollerCoasterThumb, RollerCoasterMedium, RollerCoasterLarge, RollercoasterofEmotionsCover, RollercoasterofEmotionsThumb, RollercoasterofEmotionsMedium, RollercoasterofEmotionsLarge, SailingCover, SailingThumb, SailingMedium, SailingLarge, SaveHumankindCover, SaveHumankindThumb, SaveHumankindMedium, SaveHumankindLarge, SevenSeasonsCover, SevenSeasonsThumb, SevenSeasonsMedium, SevenSeasonsLarge, SevenSinsCover, SevenSinsThumb, SevenSinsMedium, SevenSinsLarge, SoldOutCover, SoldOutThumb, SoldOutMedium, SoldOutLarge, SulkingMaidsCover, SulkingMaidsThumb, SulkingMaidsMedium, SulkingMaidsLarge, SunlightCover, SunlightThumb, SunlightMedium, SunlightLarge, SunnySideUpCover, SunnySideUpThumb, SunnySideUpMedium, SunnySideUpLarge, SuperficialCover, SuperficialThumb, SuperficialMedium, SuperficialLarge, TheFutureIsOursCover, TheFutureIsOursThumb, TheFutureIsOursMedium, TheFutureIsOursLarge, TheSunComesOutCover, TheSunComesOutThumb, TheSunComesOutMedium, TheSunComesOutLarge, TheVampsoftheWorldCover, TheVampsoftheWorldThumb, TheVampsoftheWorldMedium, TheVampsoftheWorldLarge, WhatMusicalInstrumentsCanDoCover, WhatMusicalInstrumentsCanDoThumb, WhatMusicalInstrumentsCanDoMedium, WhatMusicalInstrumentsCanDoLarge, WhenYouHitMeCover, WhenYouHitMeThumb, WhenYouHitMeMedium, WhenYouHitMeLarge, WhyDoYouLikeMeCover, WhyDoYouLikeMeThumb, WhyDoYouLikeMeMedium, WhyDoYouLikeMeLarge, WhyNotCover, WhyNotThumb, WhyNotMedium, WhyNotLarge, ZigandZagCover, ZigandZagThumb, ZigandZagMedium, ZigandZagLarge, ZombiesCover, ZombiesThumb, ZombiesMedium, ZombiesLarge };

@@ -1,4 +1,4 @@
-[
+export default [
   {
     "title": "The Sun Comes Out",
     "artist": "Bella Swan",

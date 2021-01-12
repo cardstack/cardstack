@@ -12,7 +12,7 @@
   height: var(--mode-container-height);
   padding: 10px 40px;
   background-color: var(--boxel-highlight);
-  background-image: var(--mode-icon), url('/boxel/assets/images/icons/close.svg');
+  background-image: var(--mode-icon), url('/images/icons/close.svg');
   background-position: var(--mode-icon-position), center right 15px;
   background-repeat: no-repeat, no-repeat;
   background-size: var(--mode-icon-size), 10px 10px;
@@ -27,19 +27,19 @@
 }
 
 .mode-indicator--edit {
-  --mode-icon: url('/boxel/assets/images/icons/edit-box.svg');
+  --mode-icon: url('/images/icons/edit-box.svg');
 }
 .mode-indicator--schema {
-  --mode-icon: url('/boxel/assets/images/icons/schema-2.svg');
+  --mode-icon: url('/images/icons/schema-2.svg');
 }
 .mode-indicator--themer {
-  --mode-icon: url('/boxel/assets/images/icons/themer.svg');
+  --mode-icon: url('/images/icons/themer.svg');
 }
 .mode-indicator--preview {
-  --mode-icon: url('/boxel/assets/images/icons/eye.svg');
+  --mode-icon: url('/images/icons/eye.svg');
 }
 .mode-indicator--revision {
-  --mode-icon: url('/boxel/assets/images/icons/clock.svg');
+  --mode-icon: url('/images/icons/clock.svg');
 }
 
 .mode-indicator:hover,
@@ -48,7 +48,7 @@
 }
 
 .mode-indicator--workflow {
-  --mode-icon: url('/boxel/assets/images/icons/edit-box.svg');
+  --mode-icon: url('/images/icons/edit-box.svg');
 
   min-width: 200px;
   background-color: var(--boxel-light);

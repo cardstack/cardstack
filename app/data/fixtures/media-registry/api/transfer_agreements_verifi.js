@@ -1,4 +1,4 @@
-[
+export default [
   {
     "initiated_on": "Sept 1, 2020 5:34 PM",
     "from": "CRD Records",

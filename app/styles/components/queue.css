@@ -9,7 +9,6 @@
   border-left: var(--boxel-border-dark);
   background-color: var(--boxel-purple-600);
   color: var(--boxel-light);
-  background-color: var(--boxel-medium-dark-purple);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-lg);
   overflow-y: auto;
@@ -98,7 +97,7 @@
   right: 0;
   width: 40px;
   height: 40px;
-  background: url('/boxel/assets/images/icons/dropdown-arrows-highlighted.svg') center/15px 15px no-repeat;
+  background: url('/images/icons/dropdown-arrows-highlighted.svg') center/15px 15px no-repeat;
 }
 
 .queue__filter-dropdown .ember-power-select-trigger:focus {
@@ -112,7 +111,7 @@
 }
 
 .queue__filter-dropdown .ember-power-select-option[aria-selected="true"] {
-  background: url('/boxel/assets/images/icons/checkmark-highlighted.svg') right 12px center/10px 10px no-repeat;
+  background: url('/images/icons/checkmark-highlighted.svg') right 12px center/10px 10px no-repeat;
   color: var(--boxel-light);
 }
 

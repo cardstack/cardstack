@@ -1,4 +1,4 @@
-[
+export default [
   {
     "song_title": "A day to sing",
     "artist": "Pia Midina",
