@@ -35,6 +35,7 @@
 /* Templates */
 @import '/assets/templates/index.css';
 @import '/assets/templates/about.css';
+@import '/assets/templates/docs.css';
 @import '/assets/templates/media-registry.css';
 @import '/assets/templates/media-registry/master-collection.css';
 @import '/assets/templates/media-registry/collection.css';
