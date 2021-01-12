@@ -1,0 +1,51 @@
+<FreestyleAnnotation @slug="progress-icon">
+  <div>
+    @size (Number) the size of the circle, in px.
+    <input
+      type="range"
+      min={{10}}
+      max={{60}}
+      step={{1}}
+      value={{this.size}}
+      {{on 'input' (pick 'target.value' (fn (mut this.size)))}}
+    /> ({{this.size}})
+  </div>
+  <div>
+    @isCancelled (Boolean) when true shows an "x" icon.
+    <input
+      type="checkbox"
+      checked={{this.isCancelled}}
+      {{on 'input' (pick 'target.checked' (fn (mut this.isCancelled)))}}
+    /> ({{this.isCancelled}})
+  </div>
+  <div>
+    @isComplete (Boolean) when true shows an "x" icon.
+    <input
+      type="checkbox"
+      checked={{this.isComplete}}
+      {{on 'input' (pick 'target.checked' (fn (mut this.isComplete)))}}
+    /> ({{this.isComplete}})
+  </div>
+  <div>
+    @fractionComplete (Number) completeness from 0 to 1.
+    <input
+      type="range"
+      min={{0}}
+      max={{1}}
+      step={{0.001}}
+      value={{this.fractionComplete}}
+      {{on 'input' (pick 'target.value' (fn (mut this.fractionComplete)))}}
+    /> ({{this.fractionComplete}})
+  </div>
+</FreestyleAnnotation>
+
+<FreestyleUsage @slug="progress-icon">
+  <Doc::DarkThemeAndLightTheme>
+    <Boxel::ProgressIcon
+      @size={{this.size}}
+      @isCancelled={{this.isCancelled}}
+      @isComplete={{this.isComplete}}
+      @fractionComplete={{this.fractionComplete}}
+    />
+  </Doc::DarkThemeAndLightTheme>
+</FreestyleUsage>
