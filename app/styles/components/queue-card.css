@@ -132,7 +132,7 @@
 
 
 /* Light Theme */
-.queue-card--light-theme {
+.boxel--light-theme {
   --queue-card-primary-color: var(--boxel-dark);
   --queue-card-secondary-color: var(--boxel-purple-400);
   --boxel-highlight: #00B2AE;
@@ -140,14 +140,9 @@
   background-color: var(--boxel-light);
 }
 
-.queue-card--light-theme .queue-card__footer {
+.boxel--light-theme .queue-card__footer {
   border-color: rgba(55, 53, 67, 0.15);
 }
-
-.queue-card--light-theme .queue-card__progress-icon {
-  background-image: url('/assets/images/icons/progress-circle.svg');
-}
-
 
 /* Status */
 .queue-card__status {
@@ -158,36 +153,4 @@
   color: var(--boxel-highlight);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp);
-}
-
-.queue-card__progress-icon {
-  --icon-color: var(--boxel-highlight);
-  position: relative;
-  width: 24px;
-  height: 24px;
-  background-image: url('/media-registry/progress-pie/progress-circle-dark.svg');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-}
-
-.queue-card__progress-icon.cancelled {
-  width: 16px;
-  height: 16px;
-  background-image: url('/assets/images/icons/icon-x-circle-ht.svg');
-}
-
-.queue-card__progress-icon.complete {
-  width: 16px;
-  height: 16px;
-  background-image: url('/assets/images/icons/icon-check-circle-ht.svg');
-}
-
-.queue-card__progress-pie {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  transform: rotate(-90deg);
-  stroke-dasharray: 0 60;
-  transition: stroke-dasharray var(--boxel-transition);
 }

@@ -1,4 +1,4 @@
-<div role="button" {{on "click" @selectCard}} class="queue-card {{if (and (eq @card.id @currentCard.id) (eq @card.orgId @currentCard.orgId)) "queue-card--light-theme"}}">
+<div role="button" {{on "click" @selectCard}} class="queue-card {{if (and (eq @card.id @currentCard.id) (eq @card.orgId @currentCard.orgId)) "boxel--light-theme" "boxel--dark-theme"}}">
   <div class="queue-card__datetime-row">
     {{#let (if @currentMilestone.timestamp @currentMilestone.timestamp @card.datetime) as |datetime|}}
       <time datetime={{datetime}} class="queue-card__datetime">{{moment-format datetime "MMM D, h:mm A"}}</time>
@@ -37,13 +37,12 @@
       </div>
       <div class="queue-card__status">
         {{this.progress}}
-        <div class="queue-card__progress-icon {{if @card.isCancelled "cancelled"}} {{if @card.isComplete "complete"}}">
-          {{#if (not (or @card.isCancelled @card.isComplete))}}
-            <div class="queue-card__progress-pie" style={{html-safe (concat "stroke-dasharray:" (mult this.progressPct 60) " " 60)}}>
-              {{svg-jar "progress-circle" width="24px" height="24px"}}
-            </div>
-          {{/if}}
-        </div>
+        <Boxel::ProgressIcon
+          @isCancelled={{@card.isCancelled}}
+          @isComplete={{@card.isComplete}}
+          @fractionComplete={{div @card.progressPct 100}}
+          @size={{24}}
+        />
       </div>
     </footer>
   {{/if}}
