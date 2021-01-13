@@ -3,7 +3,7 @@
 {{else}}
   <DetailTemplate>
     {{!-- Breadcrumbs --}}
-    <Breadcrumbs>
+    <Boxel::Breadcrumbs>
       <LinkTo @route="media-registry" @model={{@model.owner_id}} @class="breadcrumbs__item">
         <div class="breadcrumbs__item-label">Collection</div>
         <div class="breadcrumbs__item-title">Master Recordings</div>
@@ -22,7 +22,7 @@
           <div class="breadcrumbs__item-title">{{titleize @model.title}}</div>
         </LinkTo>
       {{/if}}
-    </Breadcrumbs>
+    </Boxel::Breadcrumbs>
 
     {{#if (eq this.target.currentRouteName "media-registry.item.musical-work")}}
       {{outlet}}

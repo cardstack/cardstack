@@ -9,7 +9,7 @@
       {{/let}}
     </header>
 
-    <Breadcrumbs @class="discrepancy__breadcrumbs">
+    <Boxel::Breadcrumbs @class="discrepancy__breadcrumbs">
       <LinkTo @route={{@topLevelRoute}} @model={{if @model.topLevelCard @model.topLevelCard.id @model.id}} @class="breadcrumbs__item breadcrumbs__item--inverse">
         <div class="breadcrumbs__item-label">Field</div>
         <div class="breadcrumbs__item-title">Musical Work</div>
@@ -36,7 +36,7 @@
           <div class="breadcrumbs__item-title">{{humanize @model.cardType}}</div>
         </div>
       {{/if}}
-    </Breadcrumbs>
+    </Boxel::Breadcrumbs>
 
     <div class="discrepancy__main {{if (eq this.mode "comparison") "discrepancy__main--comp-view"}}">
       <div class="discrepancy__comparison-header {{if (eq this.mode "comparison") "discrepancy__comparison-header--comp-mode"}}">
