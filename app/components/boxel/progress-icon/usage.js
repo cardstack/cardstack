@@ -1,8 +1,8 @@
 import Component from '@glimmer/component';
-
+import { tracked } from '@glimmer/tracking';
 export default class extends Component {
-  fractionComplete = 0.4;
-  size = 24;
-  isCancelled = false;
-  isComplete = false;
+  @tracked fractionComplete = 0.4;
+  @tracked size = 24;
+  @tracked isCancelled = false;
+  @tracked isComplete = false;
 }
