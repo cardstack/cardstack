@@ -4,7 +4,7 @@
 >
   <FreestyleSection @name="Components" as |Section|>
     {{#each this.usageComponents as |componentName|}}
-      <Section.subsection @name={{componentName}}>
+      <Section.subsection @name={{format-component-name componentName}}>
         {{component (concat componentName '/usage')}}
       </Section.subsection>
     {{/each}}

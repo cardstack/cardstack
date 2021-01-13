@@ -1,0 +1,5 @@
+.FreestyleMenu-item,
+.FreestyleMenu-submenuItem,
+.FreestyleSubsection-name {
+  text-transform: none;
+}
