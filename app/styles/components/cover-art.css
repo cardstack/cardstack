@@ -1,17 +1,32 @@
 .cover-art {
+  --cover-art-size: 80;
+  --cover-art-width: 190;
+  --cover-art-count: 1;
+
   position: relative;
   display: grid;
   align-items: center;
   grid-auto-flow: column;
   z-index: 0;
+
+  width: calc(var(--cover-art-width) * 1px);
+  height: calc(var(--cover-art-size) * 1px);
 }
 
 .cover-art__container {
+  --cover-art-index: 0;
+  --cover-art-left: 0;
+  --cover-art-cover-size: 100;
+
   position: absolute;
+  z-index: calc(var(--cover-art-count) - var(--cover-art-index));
+  left: calc(var(--cover-art-left) * 1px);
 }
 
 .cover-art__cover {
   object-fit: cover;
   object-position: center;
   border: 1px solid rgba(0, 0, 0, 0.15);
+  height: calc(var(--cover-art-cover-size) * 1px);
+  width: calc(var(--cover-art-cover-size) * 1px);
 }
