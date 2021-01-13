@@ -3,12 +3,12 @@
 {{else}}
   <DetailTemplate>
     {{!-- Breadcrumbs --}}
-    <Breadcrumbs>
+    <Boxel::Breadcrumbs>
       <LinkTo @route="media-registry" @model={{@model.owner_id}} @query={{hash version=@model.version}} @class="breadcrumbs__item">
         <div class="breadcrumbs__item-label">Collection</div>
         <div class="breadcrumbs__item-title">Master Recordings</div>
       </LinkTo>
-    </Breadcrumbs>
+    </Boxel::Breadcrumbs>
 
     <MusicDetailCard
       @mode="view"

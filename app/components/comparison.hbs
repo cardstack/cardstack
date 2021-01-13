@@ -9,7 +9,7 @@
       {{/let}}
     </header>
 
-    <Breadcrumbs @class="discrepancy__breadcrumbs">
+    <Boxel::Breadcrumbs @class="discrepancy__breadcrumbs">
       <LinkTo @route={{@topLevelRoute}} @model={{if @model.topLevelCard @model.topLevelCard.id @model.id}} @class="breadcrumbs__item breadcrumbs__item--inverse">
         <div class="breadcrumbs__item-label">Field</div>
         <div class="breadcrumbs__item-title">Musical Work</div>
@@ -36,7 +36,7 @@
           <div class="breadcrumbs__item-title">{{humanize @model.cardType}}</div>
         </div>
       {{/if}}
-    </Breadcrumbs>
+    </Boxel::Breadcrumbs>
 
     <div class="discrepancy__main {{if (eq this.mode "comparison") "discrepancy__main--comp-view"}}">
       <div class="discrepancy__comparison-header {{if (eq this.mode "comparison") "discrepancy__comparison-header--comp-mode"}}">
@@ -129,7 +129,7 @@
         {{/let}}
 
         {{#each this.compFieldGroup as |compField|}}
-          {{#if (not (contains compField.title this.fieldsNotRendered))}}
+          {{#if (not (includes compField.title this.fieldsNotRendered))}}
             {{#with (find-by 'title' compField.title this.baseFieldGroup) as |field|}}
               <div class="discrepancy-field discrepancy-field--base-field {{compField.title}} {{this.mode}}-view">
 
@@ -220,7 +220,7 @@
                   {{/let}}
                 {{else}}
 
-                  {{#if (and compField.status (eq this.mode "comparison") (not (contains field.title this.omittedFields)))}}
+                  {{#if (and compField.status (eq this.mode "comparison") (not (includes field.title this.omittedFields)))}}
                     {{#if field.tempField}}
                       <div class="discrepancy-field__btn-container discrepancy-field__btn-container--toggled">
                         <IconButton @class="discrepancy-field__btn discrepancy-field__btn--toggled" @icon="carot-thin-left" {{on "click" (fn this.revertField field)}} />
