@@ -1,0 +1,9 @@
+.doc-dark-theme-and-light-theme {
+  display: flex;
+  flex-direction: row;
+}
+.doc-dark-theme-and-light-theme__container {
+  padding: 20px;
+  border-radius: var(--boxel-border-radius);
+  background-color: var(--boxel-purple-500);
+}

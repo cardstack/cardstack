@@ -1,0 +1,11 @@
+<div
+  class="progress-icon {{if @isCancelled "cancelled"}} {{if @isComplete "complete"}}"
+  style={{this.elementStyle}}
+  ...attributes
+>
+  {{#if (not (or @isCancelled @isComplete))}}
+    <div class="progress-icon__progress-pie" style={{html-safe (concat "stroke-dasharray:" (mult @fractionComplete 60) " " 60)}}>
+      {{svg-jar "progress-circle" width=@size height=@size}}
+    </div>
+  {{/if}}
+</div>
