@@ -308,36 +308,6 @@
   font-weight: 600;
 }
 
-.cardflow__progress-icon {
-  --icon-color: var(--boxel-highlight);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  width: 120px;
-  height: 120px;
-  margin: 0 auto;
-  background-image: url('/assets/images/icons/progress-circle-lg.svg');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-}
-
-.cardflow__progress-pie {
-  position: absolute;
-  top: 0;
-  transform: rotate(-90deg);
-  stroke-dasharray: 0 360;
-  transition: stroke-dasharray var(--boxel-transition);
-}
-
-.cardflow__progress-pct {
-  font-size: 25px;
-  font-weight: 700;
-  letter-spacing: 0;
-}
-
-
 /* Checklist */
 .cardflow__checklist {
   --icon-color: var(--boxel-purple-400);
