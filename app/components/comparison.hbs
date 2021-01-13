@@ -173,7 +173,7 @@
                 {{else}}
                   {{compute (fn this.compareFields field compField)}}
 
-                  <FieldRenderer
+                  <Boxel::FieldRenderer
                     @mode={{if (eq this.mode "comparison") "comparison" "view"}}
                     @class="discrepancy-field-renderer base-card-field {{if (eq this.mode "comparison") "comp-view"}}"
                     @title={{unless compField.collection (humanize compField.title)}}
@@ -231,7 +231,7 @@
                       </div>
                     {{/if}}
                   {{/if}}
-                  <FieldRenderer
+                  <Boxel::FieldRenderer
                     @mode={{if (eq this.mode "linked") "view" "comparison"}}
                     @class="discrepancy-field-renderer comp-card-field {{if (eq this.mode "comparison") "comp-view"}}"
                     @title={{if compField.displayTitle compField.displayTitle (unless compField.collection (humanize compField.title))}}

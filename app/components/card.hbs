@@ -44,7 +44,7 @@
         <ul class="boxel-card__fields">
           {{#each @model.fields as |field|}}
             <li>
-              <FieldRenderer
+              <Boxel::FieldRenderer
                 @class="boxel-card-field"
                 @mode={{@mode}}
                 @field={{field}}

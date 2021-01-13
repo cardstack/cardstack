@@ -1,5 +1,6 @@
 import Controller from '@ember/controller';
 import { tracked } from '@glimmer/tracking';
+import MusicalWorkSvg from '@cardstack/boxel/images/media-registry/musical-work.svg'
 
 export default class MediaRegistryMusicalWorksWorkController extends Controller {
   @tracked work = this.model ? this.model.work : null;
@@ -7,7 +8,7 @@ export default class MediaRegistryMusicalWorksWorkController extends Controller 
   get headerFields() {
     if (!this.work) { return null; }
     return {
-      image: '/boxel/media-registry/musical-work.svg',
+      image: MusicalWorkSvg,
       title: this.work.title || 'N/A',
       description: this.work.description ? `by ${this.work.description}` : null
     }

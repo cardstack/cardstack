@@ -1,0 +1,29 @@
+.progress-icon {
+  --icon-color: var(--boxel-highlight);
+  position: relative;
+  background-image: url('../../../images/media-registry/progress-pie/progress-circle-dark.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.boxel--light-theme .progress-icon {
+  background-image: url('../../../images/icons/progress-circle.svg');
+}
+
+.progress-icon.cancelled {
+  background-image: url('../../../images/icons/icon-x-circle-ht.svg');
+}
+
+.progress-icon.complete {
+  background-image: url('../../../images/icons/icon-check-circle-ht.svg');
+}
+
+.progress-icon__progress-pie {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  stroke-dasharray: 0 60;
+  transition: stroke-dasharray var(--boxel-transition);
+}

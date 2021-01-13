@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
+import "./style.css";
 import { action } from '@ember/object';
-
 export default class extends Component {
   get size() {
     return this.args.size || 80;

@@ -1,12 +1,13 @@
 import Controller from '@ember/controller';
 import { titleize } from '@cardstack/boxel/utils/titleize';
+import MusicalWorkSvg from '@cardstack/boxel/images/media-registry/musical-work.svg'
 
 export default class MediaRegistryItemMusicalWorkController extends Controller {
   get headerFields() {
     if (!this.model) { return null; }
 
     return {
-      image: '/boxel/media-registry/musical-work.svg',
+      image: MusicalWorkSvg,
       title: this.model.title,
       description: this.model.composer ? `by ${this.model.artist}, ${this.model.composer}` : `by ${this.model.artist}`
     }

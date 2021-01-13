@@ -1,0 +1,105 @@
+.master-collection__wrapper {
+  height: calc(100vh - 132px);
+  padding: 30px;
+  overflow: hidden;
+}
+
+/* Master Collection Item Wrapper + Actions */
+.master-collection__boxel {
+  width: 100%;
+}
+
+.master-collection__expand-icon {
+  display: none;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 30px;
+  height: 30px;
+  background: url('../../../images/icons/expand.svg') center/16px 16px no-repeat;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.media-collection__grid-item:hover .master-collection__highlighter,
+.master-collection__highlighter:hover,
+.master-collection__highlighter:focus {
+  box-shadow: var(--boxel-box-shadow);
+  cursor: pointer;
+  outline: 0;
+}
+
+.master-collection__highlighter:hover + .master-collection__expand-icon,
+.master-collection__highlighter:focus + .master-collection__expand-icon {
+  display: inline-block;
+}
+
+/* .master-collection__pin-btn {
+  --icon-color: var(--boxel-purple-300);
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: none;
+  border: none;
+  z-index: 1;
+}
+
+.master-collection__pin-btn:hover,
+.master-collection__pin-btn:focus {
+  --icon-color: var(--boxel-highlight);
+  outline: 0;
+}
+
+.master-collection__pin-btn.pinned {
+  --icon-color: var(--boxel-dark);
+} */
+
+
+/* Master Collection Item */
+.master-collection {
+  width: 100%;
+  height: 100%;
+  min-height: 250px;
+  display: grid;
+  grid-template-columns: 1fr 100px;
+  grid-template-rows: auto auto 1fr;
+  align-items: end;
+  padding: 60px 20px 15px;
+  border-radius: var(--boxel-border-radius);
+  border: var(--boxel-border);
+  background-color: var(--boxel-light);
+}
+
+.master-collection__title,
+.master-collection__desc {
+  grid-column: 1 / -1;
+}
+
+.master-collection__title {
+  font-size: 1.25rem; /* 20px */
+  font-weight: 700;
+  line-height: calc(30/20);
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.master-collection__desc {
+  align-self: start;
+  font: var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.master-collection__count {
+  align-self: end;
+  text-align: right;
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+}
+
+.master-collection__num {
+  font: var(--boxel-font-xl);
+  font-size: 1.875rem; /* 30px */
+  font-weight: 700;
+}

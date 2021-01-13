@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { htmlSafe } from '@ember/template';
-
+import "./style.css";
 export default class extends Component {
   get elementStyle() {
     let { size } = this.args;

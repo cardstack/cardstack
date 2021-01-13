@@ -4,6 +4,7 @@ import { action } from '@ember/object';
 import { truncateVerifiId } from '@cardstack/boxel/utils/truncate-verifi-id';
 import { titleize } from '@cardstack/boxel/utils/titleize';
 import { formatId } from '@cardstack/boxel/utils/format-id';
+import MusicalWorkSvg from '@cardstack/boxel/images/media-registry/musical-work.svg'
 
 export default class MusicalWorkEmbedded extends Component {
   @service router;
@@ -15,7 +16,7 @@ export default class MusicalWorkEmbedded extends Component {
     return {
       id: card?.iswc,
       type: 'musical-work',
-      imgURL: '/boxel/media-registry/musical-work.svg',
+      imgURL: MusicalWorkSvg,
       title: titleize(card?.title),
       description: card.composer ? `by ${card?.artist}, ${card?.composer}` : `by ${card?.description}`,
       fields: [

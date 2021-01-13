@@ -1,4 +1,5 @@
 import Component from '@glimmer/component';
+import VerifiLogoSvg from '@cardstack/boxel/images/media-registry/verifi-logo.svg';
 
 export default class RegistrationEmbedded extends Component {
   get registrationEmbedded() {
@@ -8,7 +9,7 @@ export default class RegistrationEmbedded extends Component {
       return {
         id: verifi_id,
         type: 'registration',
-        imgURL: '/boxel/media-registry/verifi-logo.svg',
+        imgURL: VerifiLogoSvg,
         title: 'Verifi Registry',
         description: verifi_id,
         fields: [

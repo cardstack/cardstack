@@ -1,6 +1,6 @@
 
 import { WCM, AMP, EMILIO_PR, valentinoSolanoThumb } from "./comp-data";
-import { wmgLogo } from './organizations'
+import { wcmLogo, wmgLogo } from './organizations'
 
 const VALENTINO_SOLANO_V0 = {
   "id": "valentino-solano",
@@ -119,7 +119,7 @@ export default {
     version: "v2",
     owner: 'Warner Chappell Music',
     ownerId: 'warner-chappell-music',
-    iconURL: '/boxel/media-registry/wcm-logo.png',
+    iconURL: wcmLogo,
     datetime: '2019-11-11T13:54',
     id: "the-sun-comes-out-wcm-v1",
     isolatedFields: [
