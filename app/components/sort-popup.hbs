@@ -1,5 +1,5 @@
 {{#if @sortColumns.length}}
-  <MediaCollection::Button @class="sort-popup {{@class}}" @button="sort" @icon="sort">
+  <Boxel::DropdownButton class="sort-popup {{@class}}" @button="sort" @icon="sort" @size={{30}}>
     <header>Sort by</header>
     <ul>
       {{#each @sortColumns as |column|}}
@@ -7,5 +7,5 @@
         <SortPopup::Item @sort={{@sort}} @column={{column}} @direction="desc" @sortColumn={{@sortColumn}} @sortDirection={{@sortDirection}}/>
       {{/each}}
     </ul>
-  </MediaCollection::Button>
+  </Boxel::DropdownButton>
 {{/if}}

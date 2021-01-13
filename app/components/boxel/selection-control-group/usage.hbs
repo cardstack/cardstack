@@ -1,0 +1,40 @@
+<FreestyleAnnotation @slug="selection-control-group">
+  <div>
+    @selectedItemCount (Number) the number of items selected.
+    <input
+      type="range"
+      min={{0}}
+      max={{50}}
+      step={{1}}
+      value={{this.selectedItemCount}}
+      {{on 'input' (pick 'target.value' this.setSelectedItemCount)}}
+    /> ({{this.selectedItemCount}})
+  </div>
+  <div>
+    @isSelected (Boolean) fully selected state
+    <input
+      type="checkbox"
+      checked={{this.isSelected}}
+      {{on 'input' (pick 'target.checked' this.setIsSelected)}}
+    /> ({{this.isSelected}})
+  </div>
+  <div>
+    @mode (String) which card mode are we in
+  </div>
+  <div>
+    @toggleSelectAll (Action) action to run when user indicates she wants to toggle the select-all state
+  </div>
+  <div>
+    @menuComponent (Component) component to show when more actions menu icon is clicked
+  </div>
+</FreestyleAnnotation>
+
+<FreestyleUsage @slug="selection-control-group">
+  <Boxel::SelectionControlGroup
+    @toggleSelectAll={{this.toggleSelectAll}}
+    @mode="view"
+    @selectedItemCount={{this.selectedItemCount}}
+    @isSelected={{this.isSelected}}
+    @menuComponent={{component 'actions-menu' class="media-collection__more-actions-menu" actionItems=(array "Delete" "Duplicate")}}
+  />
+</FreestyleUsage>

@@ -1,0 +1,24 @@
+.selection-control {
+  display: flex;
+}
+
+.selection-control-group__select-button {
+  margin-right: 1px;
+}
+
+.selection-control-group__select-all {
+  position: relative;
+  width: 116px;
+  padding: 11px 27px 10px;
+  transition: all var(--boxel-transition);
+}
+
+.selection-control-group__select-all > svg {
+  margin-right: 10px;
+}
+
+.selection-control-group__select-all--selected-items {
+  width: 246px;
+  padding-left: 17px;
+  padding-right: 50px;
+}

@@ -18,6 +18,7 @@
   height: 30px;
   background: url('/assets/images/icons/expand.svg') center/16px 16px no-repeat;
   z-index: 5;
+  pointer-events: none;
 }
 
 .media-collection__grid-item:hover .master-collection__highlighter,

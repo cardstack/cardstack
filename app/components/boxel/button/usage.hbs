@@ -1,0 +1,46 @@
+<FreestyleAnnotation @slug="boxel-button">
+  <div>
+    @primary (Boolean) render with primary style
+    <input
+      type="checkbox"
+      checked={{this.primary}}
+      {{on 'input' (pick 'target.checked' (fn (mut this.primary)))}}
+    /> ({{this.primary}})
+  </div>
+  <div>
+    @disabled (Boolean) when the button cannot be clicked.
+    <input
+      type="checkbox"
+      checked={{this.disabled}}
+      {{on 'input' (pick 'target.checked' (fn (mut this.disabled)))}}
+    /> ({{this.disabled}})
+  </div>
+  <div>
+    @dropdownIcon (Boolean) show a dropdown icon on the right side of the button
+    <input
+      type="checkbox"
+      checked={{this.dropdownIcon}}
+      {{on 'input' (pick 'target.checked' (fn (mut this.dropdownIcon)))}}
+    /> ({{this.dropdownIcon}})
+  </div>
+  <div>
+    @collectionStyle (Boolean) apply the style variation used in the collection header
+    <input
+      type="checkbox"
+      checked={{this.collectionStyle}}
+      {{on 'input' (pick 'target.checked' (fn (mut this.collectionStyle)))}}
+    /> ({{this.collectionStyle}})
+  </div>
+</FreestyleAnnotation>
+
+<FreestyleUsage @slug="boxel-button">
+  <Boxel::Button
+    @primary={{this.primary}}
+    @disabled={{this.disabled}}
+    @dropdownIcon={{this.dropdownIcon}}
+    @collectionStyle={{this.collectionStyle}}
+    {{on 'click' (fn this.log 'Button clicked')}}
+  >
+    Hello World
+  </Boxel::Button>
+</FreestyleUsage>

@@ -8,17 +8,17 @@
 {{else if @displayHighlightActions}}
   <div class="boxel-actions {{@class}}" data-test-boxel-actions ...attributes>
     {{#if (eq @btnLeft "more-actions")}}
-      <MediaCollection::Button @class="boxel-actions__more-actions" @button={{@btnLeft}} @icon={{@btnLeftIcon}}>
+      <Boxel::DropdownButton @button={{@btnLeft}} @icon={{@btnLeftIcon}} @noHoverStyle={{true}}>
         <ActionsMenu @class="boxel-actions__more-actions-menu" @actionItems={{array "Delete" "Duplicate"}} />
-      </MediaCollection::Button>
+      </Boxel::DropdownButton>
     {{else}}
       <button {{on "click" (optional @btnLeftAction)}} class="boxel-actions__btn {{@btnLeft}}">{{@btnLeftContent}}</button>
     {{/if}}
 
     {{#if (eq @btnRight "settings")}}
-      <MediaCollection::Button @class="boxel-actions__more-actions" @button="gear" @icon="gear">
+      <Boxel::DropdownButton @button="gear" @icon="gear" @noHoverStyle={{true}}>
         <ActionsMenu @class="boxel-actions__more-actions-menu" @versionHistory={{@versionHistory}} @transferAgreement={{@transferAgreement}} />
-      </MediaCollection::Button>
+      </Boxel::DropdownButton>
     {{else}}
       <button {{on "click" (optional @btnRightAction)}} class="boxel-actions__btn boxel-actions__btn--{{@btnRightIcon}}" aria-label="{{@btnRightIcon}}" />
     {{/if}}
