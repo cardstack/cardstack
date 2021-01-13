@@ -59,9 +59,9 @@
                 {{#each cell as |c|}}
                   {{c}}<br>
                 {{/each}}
-              {{else if (contains column.valuePath this.dateFields)}}
+              {{else if (includes column.valuePath this.dateFields)}}
                 {{moment-format cell "MMM DD, YYYY" "YYYY-MM-DD"}}
-              {{else if (contains column.valuePath this.titleCaseFields)}}
+              {{else if (includes column.valuePath this.titleCaseFields)}}
                 {{titleize cell}}
               {{else}}
                 {{cell}}

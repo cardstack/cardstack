@@ -129,7 +129,7 @@
         {{/let}}
 
         {{#each this.compFieldGroup as |compField|}}
-          {{#if (not (contains compField.title this.fieldsNotRendered))}}
+          {{#if (not (includes compField.title this.fieldsNotRendered))}}
             {{#with (find-by 'title' compField.title this.baseFieldGroup) as |field|}}
               <div class="discrepancy-field discrepancy-field--base-field {{compField.title}} {{this.mode}}-view">
 
@@ -220,7 +220,7 @@
                   {{/let}}
                 {{else}}
 
-                  {{#if (and compField.status (eq this.mode "comparison") (not (contains field.title this.omittedFields)))}}
+                  {{#if (and compField.status (eq this.mode "comparison") (not (includes field.title this.omittedFields)))}}
                     {{#if field.tempField}}
                       <div class="discrepancy-field__btn-container discrepancy-field__btn-container--toggled">
                         <IconButton @class="discrepancy-field__btn discrepancy-field__btn--toggled" @icon="carot-thin-left" {{on "click" (fn this.revertField field)}} />

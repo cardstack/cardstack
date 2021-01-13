@@ -140,7 +140,7 @@
             </CardPlatter>
           </Boxel>
         {{else}}
-          {{#if (contains @field.title @omittedFields)}}
+          {{#if (includes @field.title @omittedFields)}}
             N/A
           {{else}}
             <CardPlatter @class="field-renderer__card field-renderer__card--blank" />
@@ -153,17 +153,17 @@
 {{else}}
   {{!-- View Mode --}}
   <Boxel @class="field-renderer field-renderer--{{@field.type}} {{format-id @field.title}}-field {{if (eq @field.format "table") "table-field"}} {{@class}}">
-    {{#if (contains @field.title @addedFields)}}
+    {{#if (includes @field.title @addedFields)}}
       <BoxelHighlight @status="added" />
       <BoxelActions @status="added" />
     {{/if}}
     <div class="field-renderer__title">{{humanize @field.title}}</div>
     <Boxel @class="field-renderer__value {{if (eq @field.type "image") "field-renderer__value--img-field"}}">
-      {{#if (and @comparisonMode (contains @field.title @addedValues))}}
+      {{#if (and @comparisonMode (includes @field.title @addedValues))}}
         <BoxelHighlight @status="added" />
         <BoxelActions @status="added" />
       {{/if}}
-      {{#if (and @comparisonMode (contains @field.title @modifiedValues))}}
+      {{#if (and @comparisonMode (includes @field.title @modifiedValues))}}
         <BoxelHighlight @status="modified" />
         <BoxelActions @status="modified" />
       {{/if}}
