@@ -54,7 +54,7 @@
             @hasImage={{true}}
             @expandAction={{fn this.transitionToCatalog collection.id}}
           >
-            <CoverArt @class="item__sidebar-covers" @size={{50}} @covers={{collection.selected_art}} />
+            <Boxel::CoverArt class="item__sidebar-covers" @size={{50}} @covers={{collection.selected_art}} />
             <div class="sidebar-related-card__count">
               <span class="sidebar-related-card__count__number">
                 {{collection.number_of_songs}}

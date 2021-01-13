@@ -1,0 +1,27 @@
+{{!-- template-lint-disable no-inline-styles --}}
+<div
+  class="cover-art"
+  style={{html-safe (concat "width:" this.maxWidth "px;height:" this.size "px")}}
+  ...attributes
+>
+  {{#let (cover-art-spacing this.size this.numCovers this.maxWidth) as |spacingRatio|}}
+    {{#each @covers as |art i|}}
+      {{#let (cover-art-layout this.size this.numCovers spacingRatio i) as |artLayout|}}
+        <div
+          class="cover-art__container"
+          style={{html-safe
+            (concat "z-index:" artLayout.zindex "; left:" artLayout.left "px")
+          }}
+        >
+          <img
+            class="cover-art__cover cover-art__cover--{{i}}"
+            src={{art}}
+            alt="cover art"
+            width={{artLayout.size}}
+            height={{artLayout.size}}
+          >
+        </div>
+      {{/let}}
+    {{/each}}
+  {{/let}}
+</div>

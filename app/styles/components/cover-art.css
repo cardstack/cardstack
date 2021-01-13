@@ -1,6 +1,4 @@
 .cover-art {
-  width: 190px;
-  height: 80px;
   position: relative;
   display: grid;
   align-items: center;
@@ -16,26 +14,4 @@
   object-fit: cover;
   object-position: center;
   border: 1px solid rgba(0, 0, 0, 0.15);
-}
-
-
-/* Need a better way to do these */
-.cover-art__container:first-of-type {
-  left: 0;
-}
-
-.cover-art__container:nth-of-type(2) {
-  left: 32%;
-}
-
-.cover-art__container:nth-of-type(3) {
-  left: 55%;
-}
-
-.cover-art__container:nth-last-of-type(2) {
-  right: 7%;
-}
-
-.cover-art__container:last-of-type {
-  right: 0;
 }

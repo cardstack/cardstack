@@ -1,0 +1,45 @@
+<FreestyleAnnotation @slug="cover-art">
+  <div>
+    @size (Number) the size of the largest art, in px.
+    <input
+      type="range"
+      min={{20}}
+      max={{200}}
+      step={{1}}
+      value={{this.size}}
+      {{on 'input' (pick 'target.value' (fn (mut this.size)))}}
+    /> ({{this.size}})
+  </div>
+  <div>
+    @maxWidth (Number) the maximum width of the layout, default 190.
+    <input
+      type="range"
+      min={{100}}
+      max={{500}}
+      step={{5}}
+      value={{this.maxWidth}}
+      {{on 'input' (pick 'target.value' (fn (mut this.maxWidth)))}}
+    /> ({{this.maxWidth}})
+  </div>
+  <div>
+    @covers (String[]) a collection of thumbnails to lay out. There is no reason to pass more than 5 as they are barely rendered.
+    <br>
+    Use the slider to adjust how many are shown below.
+    <input
+      type="range"
+      min={{1}}
+      max={{this.coverThumbs.length}}
+      step={{1}}
+      value={{this.numToShow}}
+      {{on 'input' (pick 'target.value' (fn (mut this.numToShow)))}}
+    /> ({{this.numToShow}})
+  </div>
+</FreestyleAnnotation>
+
+<FreestyleUsage @slug="progress-icon">
+  <Boxel::CoverArt
+    @size={{this.size}}
+    @maxWidth={{this.maxWidth}}
+    @covers={{this.coverThumbsToShow}}
+  />
+</FreestyleUsage>
