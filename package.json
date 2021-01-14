@@ -62,7 +62,6 @@
     "ember-load-initializers": "^2.1.1",
     "ember-math-helpers": "^2.14.0",
     "ember-maybe-import-regenerator": "^0.1.6",
-    "ember-modifier": "^2.1.1",
     "ember-moment": "^8.0.0",
     "ember-power-calendar-moment": "^0.1.7",
     "ember-power-select": "^4.0.0",
