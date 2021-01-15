@@ -10,6 +10,7 @@
 
 `cardhost`: the Ember app
 `server`: the server ("the hub")
+`core`: shared code that is used by both cardhost and server
 `base-cards`: the collection of framework-provided default cards that serve as the foundation for user-created cards
 `demo-cards`: a collection of demo & test cards
 

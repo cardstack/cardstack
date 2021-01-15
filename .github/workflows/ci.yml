@@ -30,6 +30,9 @@ jobs:
     - name: Lint cardhost
       run: yarn lint
       working-directory: cardhost
+    - name: Lint core
+      run: yarn lint
+      working-directory: core
 
   cardhost_tests:
     name: "Cardhost tests"
@@ -57,6 +60,60 @@ jobs:
     - name: Cardhost test suite
       run: yarn test:ember
       working-directory: cardhost
+
+  core_node_tests:
+    name: "Core node tests"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: rwjblue/setup-volta@v1
+      with:
+        node-version: '14'
+    - name: "Global yarn"
+      run: volta install yarn
+    - name: Find yarn cache
+      id: yarn-cache-path
+      run: echo "::set-output name=dir::$(yarn cache dir)"
+    - name: Set up yarn cache
+      uses: actions/cache@v2
+      with:
+          path: ${{ steps.yarn-cache-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Install dependencies
+      run: yarn install
+    - name: Core test suite
+      run: yarn test:node
+      working-directory: core
+
+  core_browser_tests:
+    name: "Core browser tests"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: rwjblue/setup-volta@v1
+      with:
+        node-version: '14'
+    - name: "Global yarn"
+      run: volta install yarn
+    - name: Find yarn cache
+      id: yarn-cache-path
+      run: echo "::set-output name=dir::$(yarn cache dir)"
+    - name: Set up yarn cache
+      uses: actions/cache@v2
+      with:
+          path: ${{ steps.yarn-cache-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Install dependencies
+      run: yarn install
+    - name: Core test suite
+      run: yarn test:browser
+      working-directory: core
 
   server_tests:
     name: "Server tests"
