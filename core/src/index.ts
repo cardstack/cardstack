@@ -1,3 +1,3 @@
-export function add(a: number, b: number): number {
-  return a + b;
+export async function compile(): Promise<number> {
+  return 42;
 }
