@@ -22,5 +22,3 @@ The server maintains its own search index over all the realms it knows about. Th
 ## TODO
 
 1. Add eslint and CI typecheck for server.
-3. first card
-4. add a test to first card
