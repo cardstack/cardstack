@@ -20,7 +20,7 @@ export default class MediaRegistryController extends Controller {
   transition(id) {
     let { currentRouteName } = this.target;
 
-    if (this.model.id !== id) {
+    if (this.model.currentOrg.id !== id) {
       if (currentRouteName === 'media-registry.agreements') {
         return this.transitionToRoute('media-registry.agreements', id, "TA-38185847898");
       }

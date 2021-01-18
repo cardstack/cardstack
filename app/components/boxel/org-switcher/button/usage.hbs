@@ -1,0 +1,25 @@
+<FreestyleAnnotation @slug="org-switcher-button">
+  <div>
+    @isSelected (Boolean) Shows button in selected state
+    <input
+      type="checkbox"
+      checked={{this.isSelected}}
+      {{on 'input' (pick 'target.checked' (fn (mut this.isSelected)))}}
+    /> ({{this.isSelected}})
+  </div>
+  <div>
+    @org (Object) The organization model
+  </div>
+</FreestyleAnnotation>
+
+<FreestyleUsage @slug="org-switcher-button">
+  <div style="width:80px;padding:10px 0;background-color:var(--boxel-purple-800);">
+    <Boxel::OrgSwitcher::Button
+      @org={{hash
+        id="foo"
+        iconURL="/media-registry/wmg-logo.svg"
+      }}
+      @isSelected={{this.isSelected}}
+    />
+  </div>
+</FreestyleUsage>

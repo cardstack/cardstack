@@ -1,0 +1,38 @@
+.boxel-org-switcher-button__logo {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--boxel-dark);
+  border-radius: var(--boxel-border-radius);
+  background-color: var(--boxel-dark);
+  background-position: center;
+  background-size: 40px 40px;
+  background-repeat: no-repeat;
+}
+
+/* Dummy */
+.boxel-org-switcher-button__logo--bunny_records {
+  background-color: #FF1D6C;
+}
+
+.boxel-org-switcher-button__logo--crd_records {
+  background-color: #0069F9;
+}
+
+.boxel-org-switcher-button__logo--warner-music-group {
+  background-color: #0061aa;
+  background-size: auto;
+}
+
+.boxel-org-switcher-button__logo--warner-chappell-music {
+  background-size: 25px 25px;
+}
+
+.boxel-org-switcher-button__logo--allegro-music-publishing,
+.boxel-org-switcher-button__logo--global-music-rights {
+  background-size: 30px 30px;
+}
+
+.boxel-org-switcher-button__logo--deezer {
+  background-size: auto 25px;
+  background-position: top 5px center;
+}

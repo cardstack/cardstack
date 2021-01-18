@@ -1,4 +1,4 @@
-.left-edge-nav {
+.boxel-left-edge-nav {
   position: fixed;
   display: grid;
   grid-template-rows: auto 1fr;
@@ -10,127 +10,27 @@
   background-color: var(--boxel-purple-800);
 }
 
-.left-edge-nav ul {
+.boxel-left-edge-nav ul {
   display: grid;
   grid-auto-rows: 40px;
   gap: 20px;
   justify-items: center;
 }
 
-.left-edge-nav__top-btn-group {
+.boxel-left-edge-nav__top-btn-group {
   align-self: start;
 }
 
-.left-edge-nav__bottom-btn-group {
+.boxel-left-edge-nav__bottom-btn-group {
   align-self: end;
 }
 
-
-.left-edge-nav__btn {
-  --icon-color: var(--boxel-highlight);
-  display: inline-block;
-  width: 80px;
-  height: 40px;
-  background: none;
-  border: none;
-  outline: 0;
-}
-
-.left-edge-nav__btn svg {
-  display: block;
-  margin: auto;
-}
-
-.left-edge-nav__btn:hover {
-  --icon-color: var(--boxel-dark);
-  cursor: pointer;
-}
-
-.left-edge-nav__btn--full {
-  border-left: 4px solid transparent;
-  padding-left: 16px;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 40px 40px;
-  opacity: 0.5;
-}
-
-.left-edge-nav__btn--full:hover,
-.left-edge-nav__btn--full:focus {
-  opacity: 1;
-}
-
-.left-edge-nav__btn--full.selected {
-  border-color: var(--boxel-highlight);
-  opacity: 1;
-}
-
-.left-edge-nav__btn--icon-only {
-  width: 40px;
-  margin: auto;
-}
-
-.left-edge-nav__btn--icon-only:hover {
-  background-color: var(--boxel-highlight);
-  border-radius: 100px;
-}
-
-.left-edge-nav__btn--static {
-  opacity: 1;
-  height: auto;
-}
-.left-edge-nav__btn--static:hover {
-  cursor: initial;
-}
-
-
-.left-edge-nav__btn-logo {
+.boxel-left-edge-nav__user-icon {
   width: 40px;
   height: 40px;
-  border: 1px solid var(--boxel-dark);
-  border-radius: var(--boxel-border-radius);
-  background-color: var(--boxel-dark);
-  background-position: center;
-  background-size: 40px 40px;
-  background-repeat: no-repeat;
-}
-
-.left-edge-nav__btn-user {
-  width: 40px;
-  height: 40px;
-  margin: auto;
-  border-radius: 100px;
-  background-position: center;
-  background-repeat: no-repeat;
   background-size: cover;
-}
-
-
-
-/* Dummy */
-.left-edge-nav__btn-logo--bunny_records {
-  background-color: #FF1D6C;
-}
-
-.left-edge-nav__btn-logo--crd_records {
-  background-color: #0069F9;
-}
-
-.left-edge-nav__btn-logo--warner-music-group {
-  background-color: #0061aa;
-  background-size: auto;
-}
-
-.left-edge-nav__btn-logo--warner-chappell-music {
-  background-size: 25px 25px;
-}
-
-.left-edge-nav__btn-logo--allegro-music-publishing,
-.left-edge-nav__btn-logo--global-music-rights {
-  background-size: 30px 30px;
-}
-
-.left-edge-nav__btn-logo--deezer {
-  background-size: auto 25px;
-  background-position: top 5px center;
+  background-repeat: no-repeat;
+  background-position: center center;
+  border-radius: 100px;
+  margin: 0 auto;
 }

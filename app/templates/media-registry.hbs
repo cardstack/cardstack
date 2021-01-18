@@ -6,11 +6,12 @@
       {{outlet}}
     {{else}}
       <aside class="media-registry__left-edge {{if this.isQueueFixed "with-queue"}}">
-        <LeftEdgeNav
+        <Boxel::LeftEdgeNav
+          @home={{hash icon="verifi-logo-dark-outline" action=(fn this.transition "warner-music-group") height="45px"}}
           @orgs={{@model.orgs}}
-          @current={{@model.currentOrg.id}}
-          @currentRouteName={{this.target.currentRouteName}}
-          @mediaRegistry={{true}}
+          @currentOrg={{@model.currentOrg}}
+          @ariaLabel="View catalog for "
+          @onChooseOrg={{fn this.transition}}
         />
 
         {{#each @model.orgs as |org|}}

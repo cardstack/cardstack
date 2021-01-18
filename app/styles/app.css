@@ -21,6 +21,10 @@
 @import '/assets/components/isolated-collection-table.css';
 @import '/assets/components/isolated-collection.css';
 @import '/assets/components/left-edge-nav.css';
+@import '/assets/components/left-edge-nav/basic-button.css';
+@import '/assets/components/left-edge-nav/card-management-button.css';
+@import '/assets/components/left-edge-nav/selectable-button.css';
+@import '/assets/components/org-switcher/button.css';
 @import '/assets/components/mode-indicator.css';
 @import '/assets/components/next-steps.css';
 @import '/assets/components/pill-button.css';

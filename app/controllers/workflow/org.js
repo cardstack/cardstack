@@ -10,4 +10,12 @@ export default class WorkflowOrgController extends Controller {
     this.currentCard = card;
     this.transitionToRoute('workflow.org.thread', card.id);
   }
+
+  @action goHome() {
+    this.transitionToRoute('workflow');
+  }
+
+  @action transitionTo(orgId) {
+    this.transitionToRoute('workflow.org', orgId);
+  }
 }
