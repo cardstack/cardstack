@@ -1,0 +1,29 @@
+<div class="selection-control-group">
+  <Boxel::SelectButton
+    {{on "click" @toggleSelectAll}}
+    @class="selection-control-group__select-button"
+    @mode={{@mode}}
+    @isPartial={{@selectedItemCount}}
+    @isSelected={{@isSelected}}
+  />
+  <Boxel::Button
+    class={{cn
+      "selection-control-group__select-all"
+      selection-control-group__select-all--selected-items=@selectedItemCount
+    }}
+    @collectionStyle={{true}}
+  as |b|>
+    {{#if @selectedItemCount}}
+      {{svg-jar "check-mark" width="9px" height="7px"}}
+      {{@selectedItemCount}} selected
+      {{#if @menuComponent}}
+        <b.MoreButton>
+          {{component @menuComponent}}
+        </b.MoreButton>
+      {{/if}}
+    {{else}}
+      Select all
+    {{/if}}
+  </Boxel::Button>
+</div>
+

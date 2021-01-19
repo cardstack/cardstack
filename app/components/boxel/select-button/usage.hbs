@@ -1,0 +1,30 @@
+<FreestyleAnnotation @slug="select-button">
+  <div>
+    @isPartial (Boolean) partially selected state
+    <input
+      type="checkbox"
+      checked={{this.isPartial}}
+      {{on 'input' (pick 'target.checked' (fn (mut this.isPartial)))}}
+    /> ({{this.isPartial}})
+  </div>
+  <div>
+    @isSelected (Boolean) fully selected state
+    <input
+      type="checkbox"
+      checked={{this.isSelected}}
+      {{on 'input' (pick 'target.checked' (fn (mut this.isSelected)))}}
+    /> ({{this.isSelected}})
+  </div>
+  <div>
+    @mode (String) which card mode are we in
+  </div>
+</FreestyleAnnotation>
+
+<FreestyleUsage @slug="select-button">
+  <Boxel::SelectButton
+    @isPartial={{this.isPartial}}
+    @isSelected={{this.isSelected}}
+    @mode="view"
+    {{on 'click' (fn this.onClick)}}
+  />
+</FreestyleUsage>

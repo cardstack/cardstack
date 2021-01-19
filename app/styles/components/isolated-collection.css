@@ -1,26 +1,3 @@
-/* Dropdown btn common styles */
-.media-collection-dropdown-btn .ember-basic-dropdown-trigger {
-  outline: 0;
-}
-
-.media-collection-dropdown-btn__dropdown {
-  min-width: 210px;
-  padding: 15px 0;
-  box-shadow: 0 5px 15px 0px rgba(0, 0, 0, 0.25);
-  border-radius: 10px;
-  font: var(--boxel-font-sm);
-  letter-spacing: var(--boxel-lsp-sm);
-}
-
-.media-collection-dropdown-btn__dropdown.ember-basic-dropdown-content--below.ember-basic-dropdown--transitioning-in {
-  animation: drop-fade-below var(--boxel-transition);
-}
-
-.media-collection-dropdown-btn__dropdown.ember-basic-dropdown-content--below.ember-basic-dropdown--transitioning-out {
-  animation: drop-fade-below var(--boxel-transition) reverse;
-}
-
-
 /* Media collection */
 .media-collection {
   --breadcrumbs-height: 90px;
@@ -63,11 +40,11 @@
   overflow: hidden;
 }
 
-.media-collection button:hover {
+.media-collection__btn:hover {
   cursor: pointer;
 }
 
-.media-collection button > svg {
+.media-collection__btn > svg {
   display: block;
   margin: auto;
 }
@@ -122,10 +99,10 @@
 .media-collection__actions-row {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(auto-fit, 250px);
+  grid-template-columns: 292px repeat(auto-fit, 250px);
   gap: 20px;
   align-items: center;
-  padding: 20px 50px;
+  padding: 20px 50px 20px 8px;
 }
 
 .media-collection__btn-group {
@@ -134,67 +111,6 @@
   gap: 18px;
   grid-column: -1 / span 1;
   justify-content: end;
-}
-
-.media-collection__select-btn {
-  position: absolute;
-  left: 8px;
-}
-
-.media-collection__pill {
-  width: 250px;
-  height: 40px;
-  padding: 11px 25px;
-  border: 1px solid var(--boxel-purple-300);
-  border-radius: 100px;
-  color: var(--boxel-dark);
-  font: var(--boxel-font-sm);
-  font-weight: 600;
-  letter-spacing: var(--boxel-lsp);
-  text-align: left;
-  white-space: nowrap;
-}
-
-.media-collection__pill--dropdown {
-  background: url('/assets/images/icons/carot-down.svg') center right 17px/8px auto no-repeat;
-}
-
-.media-collection__select-all {
-  position: relative;
-  width: 116px;
-  padding: 11px 27px;
-  transition: all var(--boxel-transition);
-}
-
-.media-collection__select-all--selected-items {
-  width: 250px;
-  padding-left: 17px;
-  padding-right: 48px;
-}
-
-.media-collection__select-all > svg {
-  margin-right: 10px;
-}
-
-/* Media collection dropdown btn component */
-.media-collection__more-actions {
-  position: absolute;
-  top: 0;
-  right: 8px;
-}
-
-.media-collection__more-actions .media-collection-dropdown-btn__trigger {
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  border: none;
-  background: none;
-}
-
-.media-collection__more-actions .media-collection-dropdown-btn__trigger:hover,
-.media-collection__more-actions .media-collection-dropdown-btn__trigger:focus {
-  --icon-color: var(--boxel-highlight);
-  outline: 0;
 }
 
 /* Actions menu component */
@@ -234,7 +150,6 @@
   border-left: 1px solid #707070;
 }
 
-.media-collection__filters .media-collection-dropdown-btn__trigger,
 .media-collection__btn {
   width: 30px;
   height: 30px;
@@ -245,12 +160,6 @@
   background-color: transparent;
   border: none;
   outline: 0;
-}
-
-.media-collection__filters .media-collection-dropdown-btn__trigger:hover,
-.media-collection__filters .ember-basic-dropdown-trigger[aria-expanded=true] .media-collection-dropdown-btn__trigger {
-  --icon-color: var(--boxel-highlight);
-  transition: stroke var(--boxel-transition);
 }
 
 .media-collection__view-selectors > .media-collection__btn {
@@ -321,7 +230,7 @@
   padding: 8px 8px 0;
 }
 
-.media-collection__grid-item-select-btn {
+.media-collection__grid-item-select-button {
   display: block;
   width: 30px;
   height: 30px;
@@ -331,16 +240,6 @@
   background: none;
   z-index: 1;
   outline: 0;
-}
-
-.media-collection__grid-item-select--selected {
-  --icon-bg: var(--boxel-highlight);
-  --icon-border: var(--boxel-highlight);
-}
-
-.media-collection__grid-item-select-btn > svg {
-  display: block;
-  margin: auto;
 }
 
 .media-collection-dropdown.media-collection__more-actions-dropdown .media-collection__more-actions-menu {
@@ -358,19 +257,19 @@
 
 
 /* Grid item */
-.isolated-collection__select-btn {
+.isolated-collection__select-button {
   visibility: collapse;
 }
 
-.isolated-collection__select-btn--selected {
+.isolated-collection__select-button--selected {
   visibility: visible;
 }
 
-.media-collection__grid-item:hover .isolated-collection__select-btn,
-.isolated-collection__select-btn:hover,
-.isolated-collection__select-btn:focus,
-.isolated-collection__boxel:hover .isolated-collection__select-btn,
-.isolated-collection__boxel:focus-within .isolated-collection__select-btn {
+.media-collection__grid-item:hover .isolated-collection__select-button,
+.isolated-collection__select-button:hover,
+.isolated-collection__select-button:focus,
+.isolated-collection__boxel:hover .isolated-collection__select-button,
+.isolated-collection__boxel:focus-within .isolated-collection__select-button {
   visibility: visible;
 }
 
@@ -395,8 +294,8 @@
   gap: 0 2px;
 }
 
-.media-collection__grid-item--list .isolated-collection__select-btn,
-.media-collection__grid-item--table-list .isolated-collection__select-btn {
+.media-collection__grid-item--list .isolated-collection__select-button,
+.media-collection__grid-item--table-list .isolated-collection__select-button {
   order: -1;
 }
 
@@ -432,21 +331,19 @@
 }
 
 /* For search btn */
-.media-collection__search .media-collection-dropdown-btn__dropdown {
-  padding: 15px 20px;
-}
-
 .media-collection__search-input {
   height: 30px;
   font: var(--boxel-font-sm);
   padding: 5px 10px;
+  margin: 0px 12px;
+  width: 200px;
 }
 
 .media-collection--edit .media-collection__grid-item--list > .media-collection__grid-item-btn-group {
   display: contents;
 }
 
-.media-collection--edit .media-collection__grid-item--list .media-collection__grid-item-select-btn {
+.media-collection--edit .media-collection__grid-item--list .media-collection__grid-item-select-button {
   order: -1;
   position: sticky;
   left: 0;
@@ -457,7 +354,7 @@
   z-index: 2;
 }
 
-.media-collection--edit .media-collection__grid-item--list .media-collection__grid-item-select-btn.remove-btn {
+.media-collection--edit .media-collection__grid-item--list .media-collection__grid-item-select-button.remove-btn {
   order: 1;
   right: 0;
 }

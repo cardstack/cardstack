@@ -3,6 +3,8 @@
 
 /* Components */
 @import '/assets/components/card-select/before-options.css';
+@import '/assets/components/boxel/button.css';
+@import '/assets/components/boxel/dropdown-button.css';
 @import '/assets/components/boxel-actions.css';
 @import '/assets/components/boxel-highlight.css';
 @import '/assets/components/boxel-modal.css';
@@ -28,7 +30,8 @@
 @import '/assets/components/progress-icon.css';
 @import '/assets/components/queue-card.css';
 @import '/assets/components/queue.css';
-@import '/assets/components/select-btn.css';
+@import '/assets/components/select-button.css';
+@import '/assets/components/selection-control-group.css';
 @import '/assets/components/sidebar-related-card.css';
 @import '/assets/components/version-history.css';
 @import '/assets/components/workflow/cardflow.css';

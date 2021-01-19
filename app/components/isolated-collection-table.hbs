@@ -1,4 +1,4 @@
-<EmberTable @class="media-collection-table media-collection-table--{{@type}} media-collection-table--{{@mode}}" as |t|>
+<EmberTable @class={{cn "media-collection-table" (concat "media-collection-table--" @type) (concat "media-collection-table--" @mode)}} as |t|>
   <t.head
     @columns={{@columns}}
     @onUpdateSorts={{@onUpdateSorts}}
@@ -6,10 +6,10 @@
 
     <h.row as |r|>
       <r.cell as |column|>
-        <span class="media-collection-table__header-cell {{if (eq @sortColumn.valuePath column.valuePath) "is-sorting"}}">
+        <span class={{cn "media-collection-table__header-cell" is-sorting=(eq @sortColumn.valuePath column.valuePath)}}>
           {{column.name}}
           {{#if (eq @sortColumn.valuePath column.valuePath)}}
-            <div class="media-collection-table__sort-arrow {{if (eq @sortDirection "asc") "ascending"}}">
+            <div class={{cn "media-collection-table__sort-arrow" ascending=(eq @sortDirection "asc")}}>
               {{svg-jar "arrow-down" width="10px" height="10px"}}
             </div>
           {{/if}}
@@ -24,7 +24,7 @@
     @class="media-collection-table__body" as |b|
   >
 
-    <b.row class={{if b.rowValue.selected "is-selected"}} as |r|>
+    <b.row class={{cn is-selected=b.rowValue.selected}} as |r|>
       <r.cell as |cell column row cellMeta columnMeta|>
         <Boxel class="media-collection-table__boxel-cell">
           <BoxelHighlight @expandAction={{fn @expandAction row}} @on={{row.selected}} @class="media-collection-table__highlight" />
@@ -38,19 +38,32 @@
               @btnRightAction={{fn @expandAction row}}
             />
           {{/if}}
-          <div class="media-collection-table__cell {{if (eq columnMeta.index 0) "media-collection-table__cell--first-col"}} {{if row.selected "row-group-selected"}} media-collection-table__cell--{{@mode}}">
+          <div class={{cn
+            "media-collection-table__cell"
+            (concat "media-collection-table__cell--" @mode)
+            row-group-selected=row.selected
+            media-collection-table__cell--first-col=(eq columnMeta.index 0)
+          }}>
             {{#if (eq columnMeta.index 0)}}
-              <SelectButton
+              <Boxel::SelectButton
                 {{on "click" (fn this.toggleSelect row)}}
                 @mode={{@mode}}
                 @isSelected={{row.selected}}
-                @class="media-collection-table__select-btn media-collection-table__select-btn--{{@mode}} {{if row.selected "media-collection-table__select-btn--selected"}}"
+                class={{cn
+                  "media-collection-table__select-button"
+                  (concat "media-collection-table__select-button--" @mode)
+                  media-collection-table__select-button--selected=row.selected
+                }}
               />
               {{#if (not-eq @type "master-collection")}}
                 <PlayButton @class="media-collection-table__play-btn" @width="30px" @height="30px" />
               {{/if}}
             {{/if}}
-            <div class="media-collection-table__cell-value {{if (eq columnMeta.index 0) "media-collection-table__cell-value--first-col"}} {{if (eq column.valuePath "cover_art") "media-collection-table__cell-value--img"}}">
+            <div class={{cn
+              "media-collection-table__cell-value"
+              media-collection-table__cell-value--first-col=(eq columnMeta.index 0)
+              media-collection-table__cell-value--img=(eq column.valuePath "cover_art")
+            }}>
               {{#if (and (eq (add columnMeta.index 1) b.cells.length) (eq @mode "edit"))}}
                 <button {{on "click" (fn @removeItem row)}} class="media-collection-editor__remove-btn" aria-label="remove">{{svg-jar "icon-minus-circle" width="16px" height="16px"}}</button>
               {{else if (eq column.valuePath "cover_art")}}

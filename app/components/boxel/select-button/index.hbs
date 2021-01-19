@@ -1,0 +1,13 @@
+<button
+  class={{cn
+    "select-button"
+    @class
+    (concat "select-button--" @mode)
+    select-button--partial=(and @isPartial (not @isSelected))
+    select-button--selected=@isSelected
+  }}
+  aria-label={{if @isSelected "selected" "select"}}
+  ...attributes
+>
+  {{svg-jar "icon-circle-selected" width="16px" height="16px"}}
+</button>

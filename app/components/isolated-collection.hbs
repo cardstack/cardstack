@@ -11,7 +11,7 @@
         {{/if}}
       </div>
       {{#if (eq @mode "edit")}}
-        <button {{on "click" @transitionToView}} class="mode-indicator mode-indicator--edit">{{@mode}} mode</button>
+        <button {{on "click" @transitionToView}} class="media-collection__btn mode-indicator mode-indicator--edit">{{@mode}} mode</button>
       {{else}}
         <BoxelActions
           @class="media-collection__btn-overlay"
@@ -27,43 +27,31 @@
 
     <div class="media-collection__actions-row">
       {{#if this.collection.length}}
-        <SelectButton
-          {{on "click" this.toggleSelectAll}}
-          @class="media-collection__select-btn"
+        <Boxel::SelectionControlGroup
+          @toggleSelectAll={{this.toggleSelectAll}}
           @mode={{@mode}}
-          @isPartial={{this.collection.selectedItemCount}}
+          @selectedItemCount={{this.collection.selectedItemCount}}
           @isSelected={{this.collection.selectedAll}}
+          @menuComponent={{component 'actions-menu' class="media-collection__more-actions-menu" actionItems=(array "Delete" "Duplicate") addToCollection=(eq @model.type "collection") transferAgreement=(eq @model.type "master-collection")}}
         />
-
-        <div class="media-collection__pill media-collection__select-all {{if this.collection.selectedItemCount "media-collection__select-all--selected-items"}}">
-          {{#if this.collection.selectedItemCount}}
-            {{svg-jar "check-mark" width="9px" height="7px"}}
-            {{this.collection.selectedItemCount}} selected
-            <MediaCollection::Button @class="media-collection__more-actions" @button="more-actions" @icon="more-actions">
-              <ActionsMenu @class="media-collection__more-actions-menu" @actionItems={{array "Delete" "Duplicate"}} @addToCollection={{eq @model.type "collection"}} @transferAgreement={{eq @model.type "master-collection"}} />
-            </MediaCollection::Button>
-          {{else}}
-            Select all
-          {{/if}}
-        </div>
       {{/if}}
       {{#if (and (eq @model.type "collection") this.collection.selectedItemCount)}}
-        <button class="media-collection__pill media-collection__pill--dropdown">
+        <Boxel::Button @dropdownIcon={{true}} @collectionStyle={{true}}>
           Add to Collection
-        </button>
+        </Boxel::Button>
       {{/if}}
       <div class="media-collection__btn-group">
         <div class="media-collection__btn-trio media-collection__filters">
           <SortPopup @class="media-collection__sort" @sortColumns={{this.sortColumns}} @sortColumn={{this.sortColumn}} @sortDirection={{this.sortDirection}} @sort={{this.sort}}/>
-          <MediaCollection::Button @class="media-collection__filter" @button="filter" @icon="filter">
-          </MediaCollection::Button>
+          <Boxel::DropdownButton class="media-collection__btn media-collection__filter" @button="filter" @icon="filter" @size={{30}}>
+          </Boxel::DropdownButton>
 
           {{#if @search}}
-            <MediaCollection::Button @class="media-collection__search" @button="search" @icon="search">
+            <Boxel::DropdownButton class="media-collection__btn media-collection__search" @button="search" @icon="search" @size={{30}}>
               <Input @type="search" @class="field-renderer__input media-collection__search-input"
                 {{on "input" this.search}}
               />
-            </MediaCollection::Button>
+            </Boxel::DropdownButton>
           {{/if}}
         </div>
         {{#if (not-eq this.format "table-list")}}
@@ -121,16 +109,15 @@
                 />
               {{/if}}
 
-              <div class="media-collection__grid-item-btn-group {{if (eq @mode "view") "isolated-collection__select-btn"}} {{if item.selected "isolated-collection__select-btn--selected"}}">
-                <button {{on "click" (fn this.toggleSelect item)}} class="media-collection__grid-item-select-btn" aria-label="select">
-                  {{#if item.selected}}
-                    {{svg-jar "icon-circle-selected" class="media-collection__grid-item-select--selected" width="16px" height="16px"}}
-                  {{else}}
-                    {{svg-jar "icon-circle" width="16px" height="16px"}}
-                  {{/if}}
-                </button>
+              <div class="media-collection__grid-item-btn-group {{if (eq @mode "view") "isolated-collection__select-button"}} {{if item.selected "isolated-collection__select-button--selected"}}">
+                <Boxel::SelectButton
+                  class="media-collection__grid-item-select-button"
+                  aria-label="select"
+                  @isSelected={{item.selected}}
+                  {{on 'click' (fn this.toggleSelect item)}}
+                />
                 {{#if (eq @mode "edit")}}
-                  <button {{on "click" (fn this.removeItem item)}} class="media-collection__grid-item-select-btn remove-btn" aria-label="remove">{{svg-jar "icon-minus-circle" width="16px" height="16px"}}</button>
+                  <button {{on "click" (fn this.removeItem item)}} class="media-collection__grid-item-select-button remove-btn" aria-label="remove">{{svg-jar "icon-minus-circle" width="16px" height="16px"}}</button>
                 {{/if}}
               </div>
             </li>

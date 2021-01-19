@@ -1,0 +1,22 @@
+<div
+  class={{cn
+    "boxel-dropdown-button"
+    @class
+    boxel-dropdown-button--no-hover=@noHoverStyle
+  }}
+  style={{css-var dropdown-button-size=(or @size 40)}}
+  ...attributes
+>
+  <BasicDropdown @verticalPosition="below" @renderInPlace={{true}} as |dd|>
+    <dd.Trigger>
+      <button class="boxel-dropdown-button__trigger {{@button}}" aria-label={{@button}}>
+        {{#if @icon}}
+          {{svg-jar @icon width="16px" height="16px"}}
+        {{/if}}
+      </button
+    ></dd.Trigger>
+    <dd.Content class="boxel-dropdown-button__dropdown">
+      {{yield}}
+    </dd.Content>
+  </BasicDropdown>
+</div>

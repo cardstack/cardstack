@@ -37,35 +37,3 @@
 .agreements .collection-field {
   padding: 10px;
 }
-
-
-/* boxel cta styles */
-.boxel-cta {
-  display: inline-block;
-  min-height: 40px;
-  min-width: 180px;
-  padding: 10px 15px;
-  text-align: center;
-  background-color: transparent;
-  border: var(--boxel-border);
-  border-radius: 100px;
-  font: var(--boxel-font-sm);
-  font-weight: 600;
-  letter-spacing: var(--boxel-lsp-lg);
-  outline: 0;
-}
-
-.boxel-cta--primary {
-  background-color: var(--boxel-highlight);
-  border-color: var(--boxel-highlight);
-}
-
-.boxel-cta:not(:disabled):hover {
-  cursor: pointer;
-}
-
-.boxel-cta--disabled {
-  border-color: #D9D9D9;
-  background-color: #D9D9D9;
-  color: rgba(0, 0, 0, 0.5);
-}

@@ -62,7 +62,7 @@
   gap: 0 30px;
 }
 
-.collection-field__item--grid.collection-field__item--multiple .collection-field__select-btn {
+.collection-field__item--grid.collection-field__item--multiple .collection-field__select-button {
   grid-area: select;
   grid-row: 2;
 }

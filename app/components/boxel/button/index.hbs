@@ -1,0 +1,15 @@
+<button
+  class={{cn
+    "boxel-button"
+    boxel-button--primary=@primary
+    boxel-button--dropdown=@dropdownIcon
+    boxel-button--disabled=@disabled
+    boxel-button--collection-style=@collectionStyle
+  }}
+  disabled={{@disabled}}
+  ...attributes
+>
+  {{yield (hash
+    MoreButton=(component 'boxel/dropdown-button' class="boxel-button__more-button" button="more-actions" icon="more-actions")
+  )}}
+</button>

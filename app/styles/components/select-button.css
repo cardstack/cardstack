@@ -1,4 +1,4 @@
-.select-btn {
+.select-button {
   --icon-bg: white;
   --icon-border: black;
   --icon-color: transparent;
@@ -7,32 +7,33 @@
   padding: 0;
   background: none;
   border: none;
+  vertical-align: bottom;
   z-index: 1;
 }
 
-.select-btn--edit {
+.select-button--edit {
   --icon-bg: transparent;
 }
 
-.select-btn:hover,
-.select-btn:focus {
+.select-button:hover,
+.select-button:focus {
   --icon-border: black;
   outline: 0;
 }
 
-.select-btn--partial {
+.select-button--partial {
   --icon-bg: var(--boxel-highlight);
   --icon-border: black;
   --icon-color: transparent;
 }
 
-.select-btn--selected {
+.select-button--selected {
   --icon-bg: var(--boxel-highlight);
   --icon-border: var(--boxel-highlight);
   --icon-color: var(--boxel-dark);
 }
 
-.select-btn > svg {
+.select-button > svg {
   display: block;
   margin: auto;
 }

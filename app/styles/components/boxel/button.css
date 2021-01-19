@@ -1,0 +1,51 @@
+.boxel-button {
+  background-color: transparent;
+  border-radius: 100px;
+  border: var(--boxel-border);
+  color: var(--boxel-dark);
+  display: inline-block;
+  font: var(--boxel-font-sm);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-lg);
+  min-height: 40px;
+  min-width: 120px;
+  outline: 0;
+  padding: 10px 15px;
+  text-align: center;
+  white-space: nowrap;
+  position: relative;
+}
+
+.boxel-button--dropdown {
+  background: url('/assets/images/icons/carot-down.svg') center right 17px/8px auto no-repeat;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+.boxel-button--primary {
+  background-color: var(--boxel-highlight);
+  border-color: var(--boxel-highlight);
+}
+
+.boxel-button:not(:disabled):hover {
+  cursor: pointer;
+}
+
+.boxel-button--disabled {
+  border-color: #D9D9D9;
+  background-color: #D9D9D9;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.boxel-button--collection-style {
+  border: 1px solid var(--boxel-purple-300);
+  letter-spacing: var(--boxel-lsp);
+  padding: 11px 25px 10px;
+  text-align: left;
+}
+
+.boxel-button__more-button {
+  position: absolute;
+  top: 0;
+  right: 8px;
+}
