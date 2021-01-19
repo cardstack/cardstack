@@ -1,0 +1,36 @@
+<nav class="boxel-left-edge-nav">
+  <ul class="boxel-left-edge-nav__top-btn-group">
+    {{#if @home}}
+      <li>
+        <Boxel::LeftEdgeNav::BasicButton aria-label="home" {{on 'click' @home.action}}>
+          {{svg-jar @home.icon width=@home.width height=@home.height}}
+        </Boxel::LeftEdgeNav::BasicButton>
+      </li>
+    {{/if}}
+    {{#if @user}}
+      <Boxel::LeftEdgeNav::BasicButton aria-label="user profile" {{on 'click' @user.action}}>
+        <div class="boxel-left-edge-nav__user-icon" style={{css-url "background-image" @user.imgURL}}></div>
+      </Boxel::LeftEdgeNav::BasicButton>
+    {{/if}}
+  </ul>
+
+  <Boxel::OrgSwitcher
+    class="boxel-left-edge-nav__middle-btn-group"
+    @orgs={{@orgs}}
+    @currentOrg={{@currentOrg}}
+    @ariaLabel={{@ariaLabel}}
+    @onChooseOrg={{@onChooseOrg}}
+  />
+
+  <ul class="boxel-left-edge-nav__bottom-btn-group">
+    {{#if @bottomActions}}
+      {{#each @bottomActions as |bottomAction|}}
+        <li>
+          <Boxel::LeftEdgeNav::CardManagementButton aria-label={{@icon}} @iconOnly={{true}} {{on 'click' bottomAction.action}}>
+            {{svg-jar bottomAction.icon width="20px" height="20px"}}
+          </Boxel::LeftEdgeNav::CardManagementButton>
+        </li>
+      {{/each}}
+    {{/if}}
+  </ul>
+</nav>

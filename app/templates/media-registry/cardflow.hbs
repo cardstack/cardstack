@@ -1,5 +1,16 @@
 <aside class="media-registry__left-edge with-queue">
-  <LeftEdgeNav @orgs={{@model.orgs}} @current={{@model.id}} @mediaRegistry={{true}} />
+  <Boxel::LeftEdgeNav
+    @homeIcon="verifi-logo-dark-outline"
+    @onClickedHome={{fn this.transitionTo "warner-music-group"}}
+    @orgs={{@model.orgs}}
+    @currentOrg={{@model}}
+    @onChooseOrg={{this.transitionTo}}
+    @bottomActions={{array
+      (hash icon="pin" action=(noop))
+      (hash icon="card-catalog" action=(noop))
+      (hash icon="library" action=(noop))
+    }}
+  />
   {{#each @model.orgs as |org|}}
     <IconButton {{on "click" (fn this.transition org)}} class="media-registry__hover-zone media-registry__hover-zone--{{org.id}}" />
   {{/each}}
