@@ -22,7 +22,16 @@ export default class extends Component {
     return this.size * (0.8**index);
   }
 
+  @action coverArtSizePx(index) {
+    return `${this.coverArtSize(index)}px`;
+  }
+
   @action coverArtLeft(index, spacing) {
     return this.size * 0.8 * index * (0.85**index) * spacing;
   }
+
+  @action coverArtLeftPx(index, spacing) {
+    return `${this.coverArtLeft(index, spacing)}px`;
+  }
+
 }

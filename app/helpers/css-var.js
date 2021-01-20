@@ -5,9 +5,6 @@ function formatValue(value) {
   if (typeof value === 'function') {
     value = value();
   }
-  if (typeof value === 'string') {
-    value = `'${value}'`
-  }
 
   return value;
 }
