@@ -1,14 +1,28 @@
+import bunnyLogo from '@cardstack/boxel/images/media-registry/bunny-logo.svg'
+import crdRecordsLogo from '@cardstack/boxel/images/media-registry/crd_records_logo.svg'
+import bunnyLogoIcon from '@cardstack/boxel/images/media-registry/button-bunny-records.svg'
+import crdRecordsIcon from '@cardstack/boxel/images/media-registry/button-crd-records.svg';
+import lisaTrackProfile  from "@cardstack/boxel/images/media-registry/profiles/Lisa-Track.jpg";
+import steveRightsProfile  from "@cardstack/boxel/images/media-registry/profiles/Steve-Rights.jpg";
+import deezerLogo from '@cardstack/boxel/images/media-registry/deezer-logo.png';
+import ampLogo from '@cardstack/boxel/images/media-registry/amp-logo.png';
+import gmrLogo from '@cardstack/boxel/images/media-registry/gmr-logo.svg';
+import wcmLogo from '@cardstack/boxel/images/media-registry/wcm-logo.png';
+import wmgLogo from '@cardstack/boxel/images/media-registry/wmg-logo.svg';
+
+export { ampLogo, deezerLogo, gmrLogo, wcmLogo, wmgLogo, lisaTrackProfile, steveRightsProfile }
+
 export default [
     {
       id: 'bunny_records',
       type: 'label',
       title: 'Bunny Records',
-      iconURL: "/media-registry/button-bunny-records.svg",
-      logoURL: '/media-registry/bunny-logo.svg',
+      iconURL: bunnyLogoIcon,
+      logoURL: bunnyLogo,
       user: {
         title: "Lisa Track",
         role: "Administrator",
-        imgURL: "/media-registry/profiles/Lisa-Track.jpg",
+        imgURL: lisaTrackProfile
       },
       queueCards: [
         {
@@ -82,12 +96,12 @@ export default [
       id: 'crd_records',
       type: 'label',
       title: 'CRD Records',
-      iconURL: "/media-registry/button-crd-records.svg",
-      logoURL: '/media-registry/crd_records_logo.svg',
+      iconURL: crdRecordsIcon,
+      logoURL: crdRecordsLogo,
       user: {
         title: "Steve Rights",
         role: "Catalog Manager",
-        imgURL: "/media-registry/profiles/Steve-Rights.jpg"
+        imgURL: steveRightsProfile
       },
       queueCards: [
         {
@@ -137,15 +151,15 @@ export default [
       id: 'warner-music-group',
       type: 'label',
       title: 'Warner Music Group',
-      iconURL: '/media-registry/wmg-logo.svg',
-      logoURL: '/media-registry/wmg-logo.svg'
+      iconURL: wmgLogo,
+      logoURL: wmgLogo
     },
     {
       id: 'allegro-music-publishing',
       type: 'publisher',
       title: 'Allegro Music Publishing',
-      iconURL: '/media-registry/amp-logo.png',
-      logoURL: '/media-registry/amp-logo.png',
+      iconURL: ampLogo,
+      logoURL: ampLogo,
       territory: 'worldwide',
       ipi: '00170191322',
       website: 'www.allegromusic.com',
@@ -156,8 +170,8 @@ export default [
       id: 'warner-chappell-music',
       type: 'publisher',
       title: 'Warner Chappell Music',
-      iconURL: '/media-registry/wcm-logo.png',
-      logoURL: '/media-registry/wcm-logo.png',
+      iconURL: wcmLogo,
+      logoURL: wcmLogo,
       territory: 'worldwide',
       ipi: '00160187388',
       website: 'www.warnerchappell.com',
@@ -167,14 +181,14 @@ export default [
     {
       id: 'global-music-rights',
       title: 'Global Music Rights',
-      iconURL: '/media-registry/gmr-logo.svg',
-      logoURL: '/media-registry/gmr-logo.svg',
+      iconURL: gmrLogo,
+      logoURL: gmrLogo,
       musicalWorkOnly: true
     },
     {
       id: 'deezer',
       title: 'Deezer',
-      iconURL: '/media-registry/deezer-logo.png',
-      logoURL: '/media-registry/deezer-logo.png'
+      iconURL: deezerLogo,
+      logoURL: deezerLogo
     },
   ];

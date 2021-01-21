@@ -1,5 +1,6 @@
 
-import { WCM, AMP, EMILIO_PR } from "./comp-data";
+import { WCM, AMP, EMILIO_PR, valentinoSolanoThumb } from "./comp-data";
+import { wcmLogo, wmgLogo } from './organizations'
 
 const VALENTINO_SOLANO_V0 = {
   "id": "valentino-solano",
@@ -22,7 +23,7 @@ const VALENTINO_SOLANO_V1 = {
   "id": "valentino-solano",
   "type": "participant",
   "title": "Valentino Solano",
-  "imgURL": "/media-registry/profiles/thumb/Valentino-Solano.jpg",
+  imgURL: valentinoSolanoThumb,
   "ipi": "00815723492",
   "pro": "Global Music Rights",
   "email": "valentino@valsolanomusic.com",
@@ -57,7 +58,7 @@ export default {
     version: "v1",
     owner: 'Warner Music Group',
     ownerId: 'warner-music-group',
-    iconURL: '/media-registry/wmg-logo.svg',
+    iconUrl: wmgLogo,
     datetime: '2020-04-08T10:45',
     id: "the-sun-comes-out",
     isolatedFields: [
@@ -118,7 +119,7 @@ export default {
     version: "v2",
     owner: 'Warner Chappell Music',
     ownerId: 'warner-chappell-music',
-    iconURL: '/media-registry/wcm-logo.png',
+    iconURL: wcmLogo,
     datetime: '2019-11-11T13:54',
     id: "the-sun-comes-out-wcm-v1",
     isolatedFields: [

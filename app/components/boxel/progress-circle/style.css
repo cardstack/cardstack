@@ -1,0 +1,25 @@
+.progress-circle {
+  --icon-color: var(--boxel-highlight);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin: 0 auto;
+  background-image: url('../../../images/icons/progress-circle-lg.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.progress-circle__pie {
+  position: absolute;
+  top: 0;
+  transform: rotate(-90deg);
+  stroke-dasharray: 0 360;
+  transition: stroke-dasharray var(--boxel-transition);
+}
+
+.progress-circle__pct-label {
+  font-weight: 700;
+  letter-spacing: 0;
+}

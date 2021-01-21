@@ -10,12 +10,12 @@
 
     <div class="detail-card__body agreements-card__body">
       {{#if (eq this.status "complete")}}
-        <FieldRenderer
+        <Boxel::FieldRenderer
           @mode="view"
           @field={{hash title="Agreement ID" value=this.agreement.reference_id}}
           @class="agreements-edit-field"
         />
-        <FieldRenderer
+        <Boxel::FieldRenderer
           @mode="view"
           @field={{hash title="Date & Time" value=(moment-format (now) "MM/DD/YYYY HH:mm")}}
           @class="agreements-edit-field"
@@ -24,14 +24,14 @@
 
       {{#each this.agreementFields as |field|}}
         {{#if (eq field.title "Catalog")}}
-          <FieldRenderer
+          <Boxel::FieldRenderer
             @mode={{if (or (not this.status) (eq this.status "create")) "edit" "view"}}
             @field={{field}}
             @class="agreements-edit-field"
             @expandAction={{this.expandAction}}
           />
         {{else}}
-          <FieldRenderer
+          <Boxel::FieldRenderer
             @mode={{if (or (not this.status) (eq this.status "create")) "edit" "view"}}
             @field={{field}}
             @class="agreements-edit-field"
@@ -40,7 +40,7 @@
       {{/each}}
 
       {{#if (eq this.status "complete")}}
-        <FieldRenderer
+        <Boxel::FieldRenderer
           @mode="view"
           @field={{hash title="Status" value=(capitalize this.status)}}
           @class="agreements-edit-field"

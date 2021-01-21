@@ -1,0 +1,56 @@
+.mode-indicator {
+  --mode-container-width: 180px;
+  --mode-container-height: 40px;
+  --mode-icon: url('');
+  --mode-icon-position: left 15px top 13px;
+  --mode-icon-size: 15px 15px;
+
+  display: grid;
+  align-items: center;
+  width: var(--mode-container-width);
+  max-width: 100%;
+  height: var(--mode-container-height);
+  padding: 10px 40px;
+  background-color: var(--boxel-highlight);
+  background-image: var(--mode-icon), url('../../images/icons/close.svg');
+  background-position: var(--mode-icon-position), center right 15px;
+  background-repeat: no-repeat, no-repeat;
+  background-size: var(--mode-icon-size), 10px 10px;
+  border: none;
+  border-radius: 100px;
+  color: var(--boxel-dark);
+  font: var(--boxel-font-sm);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-lg);
+  text-align: left;
+  text-transform: capitalize;
+}
+
+.mode-indicator--edit {
+  --mode-icon: url('../../images/icons/edit-box.svg');
+}
+.mode-indicator--schema {
+  --mode-icon: url('../../images/icons/schema-2.svg');
+}
+.mode-indicator--themer {
+  --mode-icon: url('../../images/icons/themer.svg');
+}
+.mode-indicator--preview {
+  --mode-icon: url('../../images/icons/eye.svg');
+}
+.mode-indicator--revision {
+  --mode-icon: url('../../images/icons/clock.svg');
+}
+
+.mode-indicator:hover,
+.mode-indicator:focus {
+  outline: 0;
+}
+
+.mode-indicator--workflow {
+  --mode-icon: url('../../images/icons/edit-box.svg');
+
+  min-width: 200px;
+  background-color: var(--boxel-light);
+  border: var(--boxel-border);
+}

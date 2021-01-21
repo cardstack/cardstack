@@ -1,8 +1,19 @@
+import { ampLogo, wcmLogo } from './organizations';
+import valentinoSolanoThumb from '@cardstack/boxel/images/media-registry/profiles/thumb/Valentino-Solano.jpg';
+import emilioRossoThumb from '@cardstack/boxel/images/media-registry/profiles/thumb/Emilio-Rosso.jpg';
+import mariaBianchiThumb from '@cardstack/boxel/images/media-registry/profiles/thumb/Maria-Bianchi.jpg';
+import theSunComesOutCover from "@cardstack/boxel/images/media-registry/covers/The-Sun-Comes-Out.jpg";
+import theSunComesOutThumb from "@cardstack/boxel/images/media-registry/covers/thumb/The-Sun-Comes-Out.jpg";
+import theSunComesOutMedium from "@cardstack/boxel/images/media-registry/covers/medium/The-Sun-Comes-Out.jpg";
+import theSunComesOutLarge from "@cardstack/boxel/images/media-registry/covers/large/The-Sun-Comes-Out.jpg";
+
+export { emilioRossoThumb, mariaBianchiThumb, valentinoSolanoThumb };
+
 export const AMP = {
   id: 'allegro-music-publishing',
   type: 'publisher',
   title: 'Allegro Music Publishing',
-  logoURL: '/media-registry/amp-logo.png',
+  logoURL: ampLogo,
   territory: 'worldwide',
   ipi: '00170191322',
   website: 'www.allegromusic.com',
@@ -13,7 +24,7 @@ export const WCM = {
   id: 'warner-chappell-music',
   type: 'publisher',
   title: 'Warner Chappell Music',
-  logoURL: '/media-registry/wcm-logo.png',
+  logoURL: wcmLogo,
   territory: 'worldwide',
   ipi: '00160187388',
   website: 'www.warnerchappell.com',
@@ -26,7 +37,7 @@ const VALENTINO_SOLANO = {
   "id": "valentino-solano",
   "type": "participant",
   "title": "Valentino Solano",
-  "imgURL": "/media-registry/profiles/thumb/Valentino-Solano.jpg",
+  "imgURL": valentinoSolanoThumb,
   "ipi": "00914256714",
   "pro": "Global Music Rights",
   "email": "valentino@valsolanomusic.com",
@@ -38,7 +49,7 @@ const EMILIO_ROSSO = {
   "id": "emilio-rosso",
   "type": "participant",
   "title": "Emilio Rosso",
-  "imgURL": "/media-registry/profiles/thumb/Emilio-Rosso.jpg",
+  "imgURL": emilioRossoThumb,
   "ipi": "00231925374",
   "pro": "Global Music Rights",
   "email": "emilio@rosso.com",
@@ -50,7 +61,7 @@ const MARIA_BIANCHI = {
   "id": "maria-bianchi",
   "type": "participant",
   "title": "Maria Bianchi",
-  "imgURL": "/media-registry/profiles/thumb/Maria-Bianchi.jpg",
+  "imgURL": mariaBianchiThumb,
   "ipi": "00181928972",
   "pro": "Global Music Rights",
   "email": "m.bianchi@gmail.com",
@@ -126,10 +137,10 @@ export const MASTER_DETAIL = {
   "title": "The Sun Comes Out",
   "artist": "Bella Swan",
   "album": "Love the Love",
-  "cover_art": "media-registry/covers/The-Sun-Comes-Out.jpg",
-  "cover_art_thumb": "media-registry/covers/thumb/The-Sun-Comes-Out.jpg",
-  "cover_art_medium": "media-registry/covers/medium/The-Sun-Comes-Out.jpg",
-  "cover_art_large": "media-registry/covers/large/The-Sun-Comes-Out.jpg",
+  "cover_art": theSunComesOutCover,
+  "cover_art_thumb": theSunComesOutThumb,
+  "cover_art_medium": theSunComesOutMedium,
+  "cover_art_large": theSunComesOutLarge,
   "type_of_album": "",
   "owner": "Warner Music Group",
   "label": ["Warner Music Group"],

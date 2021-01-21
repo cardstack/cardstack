@@ -29,28 +29,28 @@
       <p class="boxel-card__description">{{@model.description}}</p>
       <ul class="boxel-card__fields">
         <li>
-          <FieldRenderer
+          <Boxel::FieldRenderer
             @class="boxel-card-field"
             @mode={{@mode}}
             @field={{hash title="CAE/IPI #" value=@model.ipi}}
           />
         </li>
         <li>
-          <FieldRenderer
+          <Boxel::FieldRenderer
             @class="boxel-card-field"
             @mode={{@mode}}
             @field={{hash title="PRO" value=@model.pro}}
           />
         </li>
         <li>
-          <FieldRenderer
+          <Boxel::FieldRenderer
             @class="boxel-card-field"
             @mode={{@mode}}
             @field={{hash title="Email" value=@model.email}}
           />
         </li>
         <li>
-          <FieldRenderer
+          <Boxel::FieldRenderer
             @class="boxel-card-field"
             @mode={{@mode}}
             @field={{hash title="Website" value=@model.website}}

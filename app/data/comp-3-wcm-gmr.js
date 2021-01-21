@@ -1,10 +1,11 @@
 import { WCM, AMP, VALENTINO_PR, EMILIO_PR, MARIA_PR } from "./comp-data";
+import { gmrLogo } from './organizations'
 
 const VALENTINO_SOLANO_V1 = {
   "id": "valentino-solano",
   "type": "participant",
   "title": "Valentino Solano",
-  "imgURL": "/media-registry/profiles/thumb/Valentino-Solano.jpg",
+  "imgURL": VALENTINO_PR.writer.imgURL,
   "ipi": "00815723492",
   "pro": "Global Music Rights",
   "email": "valentino@valsolanomusic.com",
@@ -41,7 +42,7 @@ export default {
     version: "v3",
     owner: 'Warner Chappell Music',
     ownerId: 'warner-chappell-music',
-    iconURL: '/media-registry/wcm-logo.png',
+    iconURL: WCM.logoURL,
     datetime: '2020-05-18T15:31',
     id: "the-sun-comes-out-wcm-v2",
     nextId: "wcm-the-sun-comes-out",
@@ -125,7 +126,7 @@ export default {
     type: 'musical-work',
     owner: 'Global Music Rights',
     ownerId: 'global-music-rights',
-    iconURL: '/media-registry/gmr-logo.svg',
+    iconURL: gmrLogo,
     datetime: '2020-06-09T16:18',
     id: "the-sun-comes-out-gmr",
     isolatedFields: [

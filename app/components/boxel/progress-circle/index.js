@@ -1,4 +1,5 @@
 import Component from '@glimmer/component';
+import "./style.css";
 
 const FONT_SIZE_RATIO = 25/120;
 

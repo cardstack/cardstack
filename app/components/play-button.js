@@ -4,7 +4,7 @@ import { tracked } from '@glimmer/tracking';
 import { dropTask } from 'ember-concurrency-decorators';
 
 export default class PlayButtonComponent extends Component {
-  url = '/assets/demo_flac.flac';
+  url = '/boxel/assets/demo_flac.flac';
   @tracked isPlaying = false;
 
   willDestroy() {

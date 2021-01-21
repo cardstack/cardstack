@@ -5,7 +5,7 @@
   <div class="media-detail-section__contents">
     {{#if (is-array @fields)}}
       {{#each @fields as |field|}}
-        <FieldRenderer
+        <Boxel::FieldRenderer
           @mode={{@mode}}
           @field={{field}}
           @expandAction={{@expandAction}}
@@ -13,7 +13,7 @@
       {{/each}}
     {{else}}
       {{#each-in @fields as |title field|}}
-        <FieldRenderer
+        <Boxel::FieldRenderer
           @mode={{@mode}}
           @field={{hash title=title value=(or field.value field) type=(if (eq title "album_art") "image" field.type) component=field.component}}
           @comparisonMode={{@comparisonMode}}

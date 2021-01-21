@@ -1,9 +1,19 @@
+import PiaMidinaProfile from '@cardstack/boxel/images/media-registry/profiles/Pia-Midina.jpg'
+import JennySparksProfile from '@cardstack/boxel/images/media-registry/profiles/Jenny-Sparks.jpg'
+import ArthurDoyleProfile from '@cardstack/boxel/images/media-registry/profiles/Arthur-Doyle.jpg'
+import SophiaLanaganProfile from '@cardstack/boxel/images/media-registry/profiles/Sophia-Lanagan.jpg'
+import HelenGellarProfile from '@cardstack/boxel/images/media-registry/profiles/Helen-Gellar.jpg'
+import FrancescoMidinaProfile from '@cardstack/boxel/images/media-registry/profiles/francesco-midina.jpg'
+import JoelKaplanProfile from '@cardstack/boxel/images/media-registry/profiles/Joel-Kaplan.jpg'
+import MariahSolisProfile from '@cardstack/boxel/images/media-registry/profiles/Mariah-Solis.jpg'
+import IanAdamsProfile from '@cardstack/boxel/images/media-registry/profiles/Ian-Adams.jpg'
+
 export const PIA_MIDINA = {
   "id": "pia-midina",
   "type": "participant",
   "title": "Pia Midina",
   "description": "Recording artist & lyricist",
-  "imgURL": "media-registry/profiles/Pia-Midina.jpg",
+  "imgURL": PiaMidinaProfile,
   "organization": "verifi",
   "email": "pia.midina@gmail.com",
   "website": "www.piamidina.com",
@@ -15,7 +25,7 @@ export const JENNY_SPARKS = {
   "type": "participant",
   "title": "Jenny Sparks",
   "description": "Background singer",
-  "imgURL": "media-registry/profiles/Jenny-Sparks.jpg",
+  "imgURL": JennySparksProfile,
   "email": "jennifer.sparks@gmail.com",
   "number_of_recordings": "22"
 };
@@ -25,7 +35,7 @@ export const ARTHUR_DOYLE = {
   "type": "participant",
   "title": "Arthur Doyle",
   "description": "Drummer",
-  "imgURL": "media-registry/profiles/Arthur-Doyle.jpg",
+  "imgURL": ArthurDoyleProfile,
   "email": "arthur.doyle@gmail.com"
 };
 
@@ -34,7 +44,7 @@ export const SOPHIA_LANAGAN = {
   "type": "participant",
   "title": "Sophia Lanagan",
   "description": "Background singer",
-  "imgURL": "media-registry/profiles/Sophia-Lanagan.jpg",
+  "imgURL": SophiaLanaganProfile,
   "email": "sophialanagan@gmail.com",
   "number_of_recordings": "19"
 };
@@ -44,7 +54,7 @@ export const HELEN_GELLAR = {
   "type": "participant",
   "title": "Helen Gellar",
   "description": "Background singer",
-  "imgURL": "media-registry/profiles/Helen-Gellar.jpg",
+  "imgURL": HelenGellarProfile,
   "email": "h.gellar@gmail.com",
   "number_of_recordings": "25"
 };
@@ -54,7 +64,7 @@ export const FRANCESCO_MIDINA = {
   "type": "participant",
   "title": "Francesco Midina",
   "description": "Producer (Francesco Rocks)",
-  "imgURL": "media-registry/profiles/francesco-midina.jpg",
+  "imgURL": FrancescoMidinaProfile,
   "organization": "verifi",
   "email": "francesco.midina@rocks.com",
   "website": "www.francesco.rocks",
@@ -66,7 +76,7 @@ export const JOEL_KAPLAN = {
   "type": "participant",
   "title": "Joel Kaplan",
   "description": "Mastering engineer",
-  "imgURL": "media-registry/profiles/Joel-Kaplan.jpg",
+  "imgURL": JoelKaplanProfile,
   "email": "joel-kaplan@gmail.com",
   "number_of_recordings": "58"
 };
@@ -76,7 +86,7 @@ export const MARIAH_SOLIS = {
   "type": "participant",
   "title": "Mariah Solis",
   "description": "Mixing engineer",
-  "imgURL": "media-registry/profiles/Mariah-Solis.jpg",
+  "imgURL": MariahSolisProfile,
   "email": "m.solis@gmail.com",
   "number_of_recordings": "213"
 };
@@ -86,7 +96,7 @@ export const IAN_ADAMS = {
   "type": "participant",
   "title": "Ian Adams",
   "description": "Recording engineer",
-  "imgURL": "media-registry/profiles/Ian-Adams.jpg",
+  "imgURL": IanAdamsProfile,
   "email": "adams.ian@gmail.com",
   "number_of_recordings": "508"
 };

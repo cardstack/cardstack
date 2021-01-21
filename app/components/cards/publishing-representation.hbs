@@ -8,10 +8,10 @@
   @comparisonType={{@comparisonType}}
 >
   <div class="publishing-representation__writers">
-    <FieldRenderer @class="publishing-representation__field" @field={{hash title="writer" value=@model.writer type="card" component="cards/composer"}} @mode="view" />
-    <FieldRenderer @class="publishing-representation__field publishing-representation__additional-field" @field={{hash title="role" value=@model.role}} @mode="view" />
+    <Boxel::FieldRenderer @class="publishing-representation__field" @field={{hash title="writer" value=@model.writer type="card" component="cards/composer"}} @mode="view" />
+    <Boxel::FieldRenderer @class="publishing-representation__field publishing-representation__additional-field" @field={{hash title="role" value=@model.role}} @mode="view" />
   </div>
   <div class="publishing-representation__publishers">
-    <FieldRenderer @class="publishing-representation__field" @field={{hash title="publisher" value=@model.publisher type="card" component="cards/territory"}} @mode="view" />
+    <Boxel::FieldRenderer @class="publishing-representation__field" @field={{hash title="publisher" value=@model.publisher type="card" component="cards/territory"}} @mode="view" />
   </div>
 </Card>

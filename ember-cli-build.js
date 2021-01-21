@@ -1,5 +1,6 @@
 'use strict';
 
+const { Webpack } = require('@embroider/webpack');
 const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 
 module.exports = function(defaults) {
@@ -14,18 +15,39 @@ module.exports = function(defaults) {
     // our app always uses faker, even in production
     'ember-faker': { enabled: true },
 
-    fingerprint: {
-      extensions: ['js', 'css', 'map', 'png', 'jpg', 'gif', 'svg', 'flac'],
-      generateAssetMap: true,
-      fingerprintAssetMap: true,
-      prepend: '/boxel/',
-      replaceExtensions: ['html', 'css', 'js', 'json'],
-      enabled: (process.env.EMBER_ENV !== 'test')
+    svgJar: {
+      sourceDirs: [
+        'app/images/icons',
+        'app/images/media-registry',
+      ],
     },
 
     // Add options here
     'ember-power-select': { theme: false }
   });
 
-  return app.toTree();
+  return require('@embroider/compat').compatBuild(app, Webpack, {
+    // extraPublicTrees: [extraTreeHere]
+    staticAddonTestSupportTrees: true,
+    staticAddonTrees: true,
+    // staticHelpers: true,
+    // staticComponents: true,
+    staticAppPaths: ['data'],
+    packagerOptions: {
+      webpackConfig: {
+        module: {
+          rules: [
+            {
+              test: /\.(png|jpg|gif|svg|woff|woff2|eot|ttf|otf)$/i,
+              loader: "file-loader",
+              options: {
+                name: "[path][name]-[contenthash].[ext]",
+              },
+            }
+          ],
+        },
+      },
+      // publicAssetURL: '/boxel/'
+    }
+  });
 };

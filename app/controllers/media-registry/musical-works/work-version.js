@@ -1,5 +1,6 @@
 import Controller from '@ember/controller';
 import { tracked } from '@glimmer/tracking';
+import MusicalWorkSvg from '@cardstack/boxel/images/media-registry/musical-work.svg'
 
 export default class MediaRegistryMusicalWorksWorkVersionController extends Controller {
   queryParams = ['version'];
@@ -15,7 +16,7 @@ export default class MediaRegistryMusicalWorksWorkVersionController extends Cont
     if (!this.model) { return null; }
 
     return {
-      image: '/media-registry/musical-work.svg',
+      image: MusicalWorkSvg,
       title: this.work.title || 'N/A',
       description: this.work.description ? `by ${this.work.description}` : null
     }
