@@ -1,10 +1,10 @@
 .boxel-dropdown-button {
-  --dropdown-button-size: 40;
+  --dropdown-button-size: 40px;
 }
 
 .boxel-dropdown-button__trigger {
-  width: calc(var(--dropdown-button-size) * 1px);
-  height: calc(var(--dropdown-button-size) * 1px);
+  width: var(--dropdown-button-size);
+  height: var(--dropdown-button-size);
   padding: 0;
   border: none;
   background: none;

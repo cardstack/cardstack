@@ -1,8 +1,8 @@
 <div
   class="cover-art"
   style={{css-var
-    cover-art-width=this.maxWidth
-    cover-art-size=this.size
+    cover-art-width=(concat this.maxWidth 'px')
+    cover-art-size=(concat this.size 'px')
     cover-art-count=(get @covers 'length')
   }}
   ...attributes
@@ -12,8 +12,8 @@
         class="cover-art__container cover-art__container--{{i}}"
         style={{css-var
           cover-art-index=i
-          cover-art-left=(fn this.coverArtLeft i this.coverArtSpacing)
-          cover-art-cover-size=(fn this.coverArtSize i)
+          cover-art-left=(fn this.coverArtLeftPx i this.coverArtSpacing)
+          cover-art-cover-size=(fn this.coverArtSizePx i)
         }}
       >
         <img class="cover-art__cover" src={{art}} alt="cover art" />

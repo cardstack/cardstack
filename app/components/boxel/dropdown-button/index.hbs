@@ -4,7 +4,7 @@
     @class
     boxel-dropdown-button--no-hover=@noHoverStyle
   }}
-  style={{css-var dropdown-button-size=(or @size 40)}}
+  style={{css-var dropdown-button-size=(concat (or @size 40) 'px')}}
   ...attributes
 >
   <BasicDropdown @verticalPosition="below" @renderInPlace={{true}} as |dd|>
