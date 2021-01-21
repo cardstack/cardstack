@@ -7,7 +7,6 @@ import move from 'ember-animated/motions/move';
 import scale from 'ember-animated/motions/scale';
 import { parallel, wait } from 'ember-animated';
 
-
 export default class BoxelComponent extends Component {
   @service boxel;
 
@@ -43,25 +42,23 @@ export default class BoxelComponent extends Component {
 
   clickAction() {}
 
-  transition = function*({ sentSprites, receivedSprites }) {
+  transition = function* ({ sentSprites, receivedSprites }) {
     try {
-      receivedSprites.concat(sentSprites).forEach(sprite => {
+      receivedSprites.concat(sentSprites).forEach((sprite) => {
         sprite.applyStyles({
-          'z-index': '1'
+          'z-index': '1',
         });
       });
 
       receivedSprites.forEach(parallel(scale, move));
       sentSprites.forEach(parallel(scale, move));
-    }
-
-    catch (err) {
+    } catch (err) {
       yield wait();
       throw new Error(err);
     }
-  }
+  };
 
-  resize = function*({ insertedSprites, removedSprites, keptSprites }) {
+  resize = function* ({ insertedSprites, removedSprites, keptSprites }) {
     try {
       let insertedSprite = insertedSprites[0];
       let removedSprite = removedSprites[0];
@@ -75,13 +72,11 @@ export default class BoxelComponent extends Component {
       resize(removedSprite);
 
       keptSprites.forEach(move);
-    }
-
-    catch (err) {
+    } catch (err) {
       yield wait();
       throw new Error(err);
     }
-  }
+  };
 
   @action
   moveToPlane(planeId) {

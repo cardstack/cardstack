@@ -4,7 +4,7 @@ export default class BoxelizedRoute extends Route {
   renderTemplate(/*controller, model*/) {
     this.render(this.routeName, {
       into: 'application',
-      outlet: this.boxelPlane
+      outlet: this.boxelPlane,
     });
   }
 }

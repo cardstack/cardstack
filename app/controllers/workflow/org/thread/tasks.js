@@ -6,29 +6,29 @@ export default class WorkflowOrgThreadTasksController extends WorkflowOrgThreadC
       name: 'Assigned By',
       valuePath: 'assigned_by',
       width: 150,
-      type: 'participant'
+      type: 'participant',
     },
     {
       name: 'Task',
       valuePath: 'title',
       width: 300,
-      type: 'task'
+      type: 'task',
     },
     {
       name: 'Due Date',
       valuePath: 'due_date',
       width: 150,
-      type: 'date'
+      type: 'date',
     },
     {
       name: 'Assignee',
       valuePath: 'assigned_to',
       width: 150,
-      type: 'participant'
+      type: 'participant',
     },
     {
       name: 'Shortcut',
-      valuePath: 'shortcut_link'
-    }
+      valuePath: 'shortcut_link',
+    },
   ];
 }

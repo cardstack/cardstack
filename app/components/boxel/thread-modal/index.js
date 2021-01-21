@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import "./style.css";
+import './style.css';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import move from 'ember-animated/motions/move';
@@ -33,7 +33,8 @@ export default class ThreadModalComponent extends Component {
       return 'Workflow started';
     }
 
-    return this.args.model.workflow.milestones[this.progress - 1].statusOnCompletion;
+    return this.args.model.workflow.milestones[this.progress - 1]
+      .statusOnCompletion;
   }
 
   @action
@@ -44,13 +45,16 @@ export default class ThreadModalComponent extends Component {
     this.progress++;
   }
 
-  * revealCard({ insertedSprites, duration }) {
+  *revealCard({ insertedSprites, duration }) {
     // printSprites(arguments[0]);
 
     for (let sprite of insertedSprites) {
       yield wait(duration);
       sprite.startTranslatedBy(0, 30);
-      parallel(fadeIn(sprite, { easing: easeOut, duration: 400 }), move(sprite, { easing: easeOut, duration: 400 }));
+      parallel(
+        fadeIn(sprite, { easing: easeOut, duration: 400 }),
+        move(sprite, { easing: easeOut, duration: 400 })
+      );
     }
   }
 }

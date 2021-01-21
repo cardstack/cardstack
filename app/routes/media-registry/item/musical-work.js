@@ -13,8 +13,12 @@ export default class MediaRegistryItemMusicalWorkRoute extends Route {
 
     let { musicalWork } = model;
     if (musicalWork) {
-      musicalWork.lyricists = profiles.filter(profile => profile.id === musicalWork.artist_id);
-      musicalWork.composers = profiles.filter(profile => profile.id === musicalWork.composer_id);
+      musicalWork.lyricists = profiles.filter(
+        (profile) => profile.id === musicalWork.artist_id
+      );
+      musicalWork.composers = profiles.filter(
+        (profile) => profile.id === musicalWork.composer_id
+      );
     } else {
       musicalWork = model;
     }

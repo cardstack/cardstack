@@ -1,4 +1,4 @@
-import { Motion, wait } from "ember-animated";
+import { Motion, wait } from 'ember-animated';
 
 /**
   @function wait

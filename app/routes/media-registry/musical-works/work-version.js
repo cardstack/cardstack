@@ -9,37 +9,47 @@ export default class MediaRegistryMusicalWorksWorkVersionRoute extends Route {
     const profiles = await fetchCollection('profiles');
 
     let { currentOrg, orgs } = this.modelFor('media-registry');
-    let work = works.find(el => el.owner_id === currentOrg.id && el.id === workId && el.version === versionId);
+    let work = works.find(
+      (el) =>
+        el.owner_id === currentOrg.id &&
+        el.id === workId &&
+        el.version === versionId
+    );
 
-    let masterDetail = masters.find(el => el.owner_id === currentOrg.id && el.id === workId && el.version === versionId);
+    let masterDetail = masters.find(
+      (el) =>
+        el.owner_id === currentOrg.id &&
+        el.id === workId &&
+        el.version === versionId
+    );
     work.masterDetail = masterDetail;
 
     if (work.writer_ids && work.writer_ids.length) {
-      let writers = profiles.filter(el => work.writer_ids.includes(el.id));
+      let writers = profiles.filter((el) => work.writer_ids.includes(el.id));
       work.writers = writers;
-      work.publisher_ids = work.writers.map(el => el.publisher_id);
+      work.publisher_ids = work.writers.map((el) => el.publisher_id);
 
-      let publishers = orgs.filter(el => work.publisher_ids.includes(el.id));
-      publishers.filter(el => el.territory === 'worldwide');
+      let publishers = orgs.filter((el) => work.publisher_ids.includes(el.id));
+      publishers.filter((el) => el.territory === 'worldwide');
       if (publishers.length) {
         work.publishers = {
           id: 'worldwide',
           title: 'Worldwide',
           type: 'territory',
-          value: publishers
+          value: publishers,
         };
       }
 
       work.composers = [];
 
-      work.publishing_representatives = work.writers.map(writer => {
+      work.publishing_representatives = work.writers.map((writer) => {
         if (writer.role && writer.role.toLowerCase() === 'lyricist') {
           work.lyricist = writer.title;
         } else if (writer.role && writer.role.toLowerCase() === 'composer') {
           work.composers = [...work.composers, writer.title];
         }
 
-        let publisher = orgs.find(el => el.id === writer.publisher_id);
+        let publisher = orgs.find((el) => el.id === writer.publisher_id);
 
         return {
           id: `${writer.id}-publishing-representation`,
@@ -47,20 +57,22 @@ export default class MediaRegistryMusicalWorksWorkVersionRoute extends Route {
           type: 'publishing-representation',
           writer,
           role: writer.role,
-          publisher: writer.publisher_id ? {
-            id: 'worldwide',
-            title: 'Worldwide',
-            type: 'territory',
-            value: [ publisher ]
-          } : null
-        }
+          publisher: writer.publisher_id
+            ? {
+                id: 'worldwide',
+                title: 'Worldwide',
+                type: 'territory',
+                value: [publisher],
+              }
+            : null,
+        };
       });
     }
 
     return {
       currentOrg,
       orgs,
-      work
-    }
+      work,
+    };
   }
 }

@@ -9,7 +9,7 @@ export default class MediaRegistryController extends Controller {
   @tracked milestones = MILESTONES;
 
   get latestMilestone() {
-    let milestone =  this.milestones.filter(el => el.current)[0];
+    let milestone = this.milestones.filter((el) => el.current)[0];
     if (!milestone) {
       return this.milestones[1];
     }
@@ -22,13 +22,16 @@ export default class MediaRegistryController extends Controller {
 
     if (this.model.currentOrg.id !== id) {
       if (currentRouteName === 'media-registry.agreements') {
-        return this.transitionToRoute('media-registry.agreements', id, "TA-38185847898");
+        return this.transitionToRoute(
+          'media-registry.agreements',
+          id,
+          'TA-38185847898'
+        );
       }
 
       if (currentRouteName === 'media-registry.cardflow') {
         return this.transitionToRoute('media-registry.cardflow', id);
       }
-
     }
 
     this.transitionToRoute('media-registry', id);

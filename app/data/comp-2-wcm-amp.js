@@ -1,16 +1,22 @@
-import { WCM, AMP, EMILIO_PR, MARIA_PR, valentinoSolanoThumb } from "./comp-data";
-import { wcmLogo, ampLogo } from './organizations'
+import {
+  WCM,
+  AMP,
+  EMILIO_PR,
+  MARIA_PR,
+  valentinoSolanoThumb,
+} from './comp-data';
+import { wcmLogo, ampLogo } from './organizations';
 
 const VALENTINO_SOLANO_V1 = {
-  "id": "valentino-solano",
-  "type": "participant",
-  "title": "Valentino Solano",
-  "imgURL": valentinoSolanoThumb,
-  "ipi": "00815723492",
-  "pro": "Global Music Rights",
-  "email": "valentino@valsolanomusic.com",
-  "website": "www.valsolanomusic.com",
-  "expandable": true
+  id: 'valentino-solano',
+  type: 'participant',
+  title: 'Valentino Solano',
+  imgURL: valentinoSolanoThumb,
+  ipi: '00815723492',
+  pro: 'Global Music Rights',
+  email: 'valentino@valsolanomusic.com',
+  website: 'www.valsolanomusic.com',
+  expandable: true,
 };
 
 const VALENTINO_PR_V1 = {
@@ -23,22 +29,22 @@ const VALENTINO_PR_V1 = {
     id: 'worldwide',
     title: 'Worldwide',
     type: 'territory',
-    value: [ WCM ],
-    publishers: [ WCM ]
+    value: [WCM],
+    publishers: [WCM],
   },
-  "expandable": true
+  expandable: true,
 };
 
 export default {
-  id: "the-sun-comes-out-wcm-amp",
-  type: "Musical Work",
-  title: "The Sun Comes Out",
+  id: 'the-sun-comes-out-wcm-amp',
+  type: 'Musical Work',
+  title: 'The Sun Comes Out',
   ownerId: 'warner-chappell-music',
   baseOwner: 'Warner Chappell Music',
   compOwner: 'Allegro Music Publishing',
   baseCard: {
     isPublisher: true,
-    version: "v2",
+    version: 'v2',
     id: 'the-sun-comes-out-wcm-v1',
     type: 'musical-work',
     owner: 'Warner Chappell Music',
@@ -47,13 +53,13 @@ export default {
     datetime: '2019-11-11T13:54',
     isolatedFields: [
       {
-        title: "title",
-        value: "The Sun Comes Out"
+        title: 'title',
+        value: 'The Sun Comes Out',
       },
       {
-        title: "writers",
-        type: "collection",
-        component: "cards/publishing-representation",
+        title: 'writers',
+        type: 'collection',
+        component: 'cards/publishing-representation',
         value: [
           VALENTINO_PR_V1,
           EMILIO_PR,
@@ -62,24 +68,26 @@ export default {
             type: null,
             writer: null,
             role: null,
-            publisher: null
-          }
-        ]
+            publisher: null,
+          },
+        ],
       },
       {
         title: 'iswc',
-        value: "T-070237182-9"
+        value: 'T-070237182-9',
       },
       {
         title: 'verifi_id',
-        id: '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
+        id:
+          '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
         type: 'card',
         component: 'cards/registration-embedded',
         value: {
-          verifi_id: '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
+          verifi_id:
+            '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
           verifi_reg_date: '2019-11-11',
-          asset_type: 'Original work'
-        }
+          asset_type: 'Original work',
+        },
       },
       {
         title: 'version_type',
@@ -88,8 +96,8 @@ export default {
         value: {
           id: 'original-work',
           type: 'version-type',
-          title: 'Original work'
-        }
+          title: 'Original work',
+        },
       },
       {
         title: 'ownership_splits',
@@ -97,13 +105,13 @@ export default {
         value: [
           {
             title: 'Valentino Solano (Lyricist)',
-            value: '50%'
+            value: '50%',
           },
           {
             title: 'Emilio Rosso (Composer)',
-            value: '50%'
-          }
-        ]
+            value: '50%',
+          },
+        ],
       },
       {
         title: 'publisher',
@@ -113,52 +121,53 @@ export default {
           id: 'worldwide',
           title: 'Worldwide',
           type: 'territory',
-          value: [ WCM, AMP ]
-        }
+          value: [WCM, AMP],
+        },
       },
       {
         title: 'copyright_notice',
-        value: ['© 2019 Warner Chappell Music', '© 2019 Allegro Music Publishing']
-      }
-    ]
+        value: [
+          '© 2019 Warner Chappell Music',
+          '© 2019 Allegro Music Publishing',
+        ],
+      },
+    ],
   },
   compCard: {
     id: 'the-sun-comes-out-amp',
     type: 'musical-work',
-    version: "v3",
+    version: 'v3',
     owner: 'Allegro Music Publishing',
     ownerId: 'allegro-music-publishing',
     iconURL: ampLogo,
     datetime: '2020-05-18T11:36',
     isolatedFields: [
       {
-        title: "title",
-        value: "The Sun Comes Out"
+        title: 'title',
+        value: 'The Sun Comes Out',
       },
       {
-        title: "writers",
-        type: "collection",
-        component: "cards/publishing-representation",
-        value: [
-          VALENTINO_PR_V1,
-          EMILIO_PR,
-          MARIA_PR
-        ]
+        title: 'writers',
+        type: 'collection',
+        component: 'cards/publishing-representation',
+        value: [VALENTINO_PR_V1, EMILIO_PR, MARIA_PR],
       },
       {
         title: 'iswc',
-        value: "T-070237182-9"
+        value: 'T-070237182-9',
       },
       {
         title: 'verifi_id',
         type: 'card',
         component: 'cards/registration-embedded',
         value: {
-          id: '0x31ef32b4c27f6ca5d6bd6201fa7c14071228965dc2f1b4328c22e5609e8912ab4',
-          verifi_id: '0x31ef32b4c27f6ca5d6bd6201fa7c14071228965dc2f1b4328c22e5609e8912ab4',
+          id:
+            '0x31ef32b4c27f6ca5d6bd6201fa7c14071228965dc2f1b4328c22e5609e8912ab4',
+          verifi_id:
+            '0x31ef32b4c27f6ca5d6bd6201fa7c14071228965dc2f1b4328c22e5609e8912ab4',
           verifi_reg_date: '2020-05-18',
-          asset_type: 'Original work'
-        }
+          asset_type: 'Original work',
+        },
       },
       {
         title: 'version_type',
@@ -167,8 +176,8 @@ export default {
         value: {
           id: 'original-work',
           type: 'version-type',
-          title: 'Original work'
-        }
+          title: 'Original work',
+        },
       },
       {
         title: 'ownership_splits',
@@ -176,17 +185,17 @@ export default {
         value: [
           {
             title: 'Valentino Solano (Lyricist)',
-            value: '50%'
+            value: '50%',
           },
           {
             title: 'Emilio Rosso (Composer)',
-            value: '25%'
+            value: '25%',
           },
           {
             title: 'Maria Bianchi (Composer)',
-            value: '25%'
-          }
-        ]
+            value: '25%',
+          },
+        ],
       },
       {
         title: 'publisher',
@@ -196,13 +205,16 @@ export default {
           id: 'worldwide',
           title: 'Worldwide',
           type: 'territory',
-          value: [ WCM, AMP ]
-        }
+          value: [WCM, AMP],
+        },
       },
       {
         title: 'copyright_notice',
-        value: ['© 2019 Warner Chappell Music', '© 2019 Allegro Music Publishing']
-      }
-    ]
-  }
-}
+        value: [
+          '© 2019 Warner Chappell Music',
+          '© 2019 Allegro Music Publishing',
+        ],
+      },
+    ],
+  },
+};

@@ -8,6 +8,7 @@ export default class PlayButtonComponent extends Component {
   @tracked isPlaying = false;
 
   willDestroy() {
+    super.willDestroy(...arguments);
     if (this.isPlaying) {
       this.audio.pause();
       this.isPlaying = false;
@@ -17,11 +18,11 @@ export default class PlayButtonComponent extends Component {
   @action
   setupAudio() {
     this.audio = new Audio(this.url);
-    this.audio.addEventListener('play', () => this.isPlaying = true);
-    this.audio.addEventListener('pause', () => this.isPlaying = false);
+    this.audio.addEventListener('play', () => (this.isPlaying = true));
+    this.audio.addEventListener('pause', () => (this.isPlaying = false));
   }
 
-  @dropTask * playPause() {
+  @dropTask *playPause() {
     if (this.isPlaying) {
       yield this.audio.pause();
     } else {

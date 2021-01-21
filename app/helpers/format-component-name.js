@@ -3,7 +3,9 @@ import { typeOf } from '@ember/utils';
 import { titleize } from '@cardstack/boxel/utils/titleize';
 
 export default helper(function formatComponentName([componentPath]) {
-  if (!componentPath || typeOf(componentPath) !== 'string' ) { return componentPath; }
+  if (!componentPath || typeOf(componentPath) !== 'string') {
+    return componentPath;
+  }
   let result = titleize(componentPath);
   result = result.replace(/\//g, '::');
   result = result.replace(/ /g, '');

@@ -1,4 +1,4 @@
-import { Motion, rAF, Tween } from "ember-animated";
+import { Motion, rAF, Tween } from 'ember-animated';
 
 /**
   Smoothly scales _sprite_ from its the initial size to its final size.

@@ -14,7 +14,11 @@ export default class EmbeddedCollectionEditor extends Component {
     if (this.expanded) {
       this.displayCount = this.collection.length;
     }
-    set(this.collection, 'selectedItemCount', this.collection.filter(item => item.selected).length);
+    set(
+      this.collection,
+      'selectedItemCount',
+      this.collection.filter((item) => item.selected).length
+    );
   }
 
   @action addBelongsToItem(item) {
@@ -26,15 +30,27 @@ export default class EmbeddedCollectionEditor extends Component {
   }
 
   @action removeItem(item) {
-    this.collection = this.collection.filter(el => el.id !== item.id);
-    set(this.collection, 'selectedItemCount', this.collection.filter(item => item.selected).length);
+    this.collection = this.collection.filter((el) => el.id !== item.id);
+    set(
+      this.collection,
+      'selectedItemCount',
+      this.collection.filter((item) => item.selected).length
+    );
   }
 
   @action
   toggleSelect(item) {
     set(item, 'selected', !item.selected);
-    set(this.collection, 'selectedItemCount', this.collection.filter(item => item.selected).length);
-    set(this.collection, 'selectedAll', this.collection.length === this.collection.selectedItemCount);
+    set(
+      this.collection,
+      'selectedItemCount',
+      this.collection.filter((item) => item.selected).length
+    );
+    set(
+      this.collection,
+      'selectedAll',
+      this.collection.length === this.collection.selectedItemCount
+    );
   }
 
   @action
@@ -47,12 +63,16 @@ export default class EmbeddedCollectionEditor extends Component {
 
     for (let item of this.collection) {
       if (this.collection.selectedAll) {
-        set(item, "selected", true);
+        set(item, 'selected', true);
       } else {
-        set(item, "selected", false);
+        set(item, 'selected', false);
       }
     }
-    set(this.collection, 'selectedItemCount', this.collection.filter(item => item.selected).length);
+    set(
+      this.collection,
+      'selectedItemCount',
+      this.collection.filter((item) => item.selected).length
+    );
   }
 
   @action

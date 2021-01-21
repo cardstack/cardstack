@@ -10,7 +10,7 @@ export default class MediaRegistryCollectionRoute extends Route {
   async model({ collectionId }) {
     let { currentOrg, orgs } = this.modelFor('media-registry');
     const records = await fetchCollection('all_tracks_combined');
-    let tracks = records.filter(item => {
+    let tracks = records.filter((item) => {
       if (item.collection_ids) {
         return item.collection_ids.includes(collectionId);
       }
@@ -30,19 +30,19 @@ export default class MediaRegistryCollectionRoute extends Route {
       listFields: [
         {
           name: 'Release Title',
-          valuePath: 'album'
+          valuePath: 'album',
         },
         {
           name: 'Release Type',
-          valuePath: 'type_of_album'
+          valuePath: 'type_of_album',
         },
         {
           name: 'Genre',
-          valuePath: 'genre'
+          valuePath: 'genre',
         },
         {
           name: 'Length',
-          valuePath: 'length'
+          valuePath: 'length',
         },
       ],
       columns: [
@@ -50,7 +50,7 @@ export default class MediaRegistryCollectionRoute extends Route {
           name: 'Title',
           valuePath: 'title',
           isFixed: 'left',
-          width: 350
+          width: 350,
         },
         {
           name: 'Artist',
@@ -82,11 +82,11 @@ export default class MediaRegistryCollectionRoute extends Route {
           name: 'Length',
           valuePath: 'length',
           width: 250,
-          sortType: 'numeric'
+          sortType: 'numeric',
         },
         {
           width: 0,
-          isFixed: 'right'
+          isFixed: 'right',
         },
       ],
     };

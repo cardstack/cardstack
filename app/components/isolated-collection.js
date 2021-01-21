@@ -19,10 +19,10 @@ export default class IsolatedCollection extends Component {
     let collection = this.args.model ? this.args.model.collection : [];
 
     if (version) {
-      this.collection.filter(el => el.version === version);
+      this.collection.filter((el) => el.version === version);
     }
 
-    this.collection = collection.filter(el => !el.version);
+    this.collection = collection.filter((el) => !el.version);
 
     if (this.args.model && this.args.model.length) {
       this.updateSelectionCount();
@@ -30,7 +30,9 @@ export default class IsolatedCollection extends Component {
   }
 
   get sortColumns() {
-    return this.tableCols ? this.tableCols.filter(c => c.isSortable !== false && c.name) : [];
+    return this.tableCols
+      ? this.tableCols.filter((c) => c.isSortable !== false && c.name)
+      : [];
   }
 
   @action
@@ -39,17 +41,25 @@ export default class IsolatedCollection extends Component {
     let collection = this.args.model ? this.args.model.collection : [];
 
     if (version) {
-      this.collection.filter(el => el.version === version);
+      this.collection.filter((el) => el.version === version);
     }
 
-    this.collection = collection.filter(el => !el.version);
+    this.collection = collection.filter((el) => !el.version);
     this.updateSelectionCount();
   }
 
   @action
   updateSelectionCount() {
-    set(this.collection, 'selectedItemCount', this.collection.filter(item => item.selected).length);
-    set(this.collection, 'selectedAll', this.collection.length === this.collection.selectedItemCount);
+    set(
+      this.collection,
+      'selectedItemCount',
+      this.collection.filter((item) => item.selected).length
+    );
+    set(
+      this.collection,
+      'selectedAll',
+      this.collection.length === this.collection.selectedItemCount
+    );
   }
 
   @action
@@ -78,12 +88,16 @@ export default class IsolatedCollection extends Component {
 
     for (let item of this.collection) {
       if (this.collection.selectedAll) {
-        set(item, "selected", true);
+        set(item, 'selected', true);
       } else {
-        set(item, "selected", false);
+        set(item, 'selected', false);
       }
     }
-    set(this.collection, 'selectedItemCount', this.collection.filter(item => item.selected).length);
+    set(
+      this.collection,
+      'selectedItemCount',
+      this.collection.filter((item) => item.selected).length
+    );
   }
 
   @action
@@ -93,9 +107,9 @@ export default class IsolatedCollection extends Component {
   }
 
   @action
-  async sort(column, direction=null) {
+  async sort(column, direction = null) {
     if (direction) {
-      this.sortDirection = direction
+      this.sortDirection = direction;
     } else if (column == this.sortColumn) {
       this.sortDirection = { asc: 'desc', desc: 'asc' }[this.sortDirection];
     } else {
@@ -103,7 +117,9 @@ export default class IsolatedCollection extends Component {
     }
     this.sortColumn = column;
 
-    this.collection = (await this.args.sort(this.sortColumn, this.sortDirection)).slice();
+    this.collection = (
+      await this.args.sort(this.sortColumn, this.sortDirection)
+    ).slice();
 
     this.updateSelectionCount();
   }
@@ -114,7 +130,7 @@ export default class IsolatedCollection extends Component {
   }
 
   @action async tableSort(sorts) {
-    let column = this.tableCols.find(c => c.valuePath === sorts[0].valuePath);
+    let column = this.tableCols.find((c) => c.valuePath === sorts[0].valuePath);
     await this.sort(column);
   }
 

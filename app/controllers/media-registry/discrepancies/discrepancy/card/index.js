@@ -1,4 +1,3 @@
 import MediaRegistryDiscrepanciesDiscrepancyCardController from '../card';
 
-export default class MediaRegistryDiscrepanciesDiscrepancyCardIndexController extends MediaRegistryDiscrepanciesDiscrepancyCardController {
-}
+export default class MediaRegistryDiscrepanciesDiscrepancyCardIndexController extends MediaRegistryDiscrepanciesDiscrepancyCardController {}

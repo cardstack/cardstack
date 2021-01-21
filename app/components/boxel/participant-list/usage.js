@@ -7,27 +7,27 @@ import HSHIcon from '../../../images/workflow/orgs/hsh-icon.png';
 
 const sampleParticipants = [
   {
-    "type": "organization",
-    "title": "Home Sweet Home",
-    "imgURL": HSHIcon,
+    type: 'organization',
+    title: 'Home Sweet Home',
+    imgURL: HSHIcon,
   },
   {
-    "title": "Lola Sampson",
-      "imgURL": LolaSampsonThumb,
+    title: 'Lola Sampson',
+    imgURL: LolaSampsonThumb,
   },
   {
-    "title": "Haley O’Connell",
-    "imgURL": HaleyOConnellThumb,
-    "role": "Writer"
+    title: 'Haley O’Connell',
+    imgURL: HaleyOConnellThumb,
+    role: 'Writer',
   },
   {
-    "title": "Rupert Grisham",
-    "imgURL": RupertGrishamThumb,
+    title: 'Rupert Grisham',
+    imgURL: RupertGrishamThumb,
   },
   {
-    "title": "Julia Mason",
-    "imgURL": JuliaMasonThumb,
-  }
+    title: 'Julia Mason',
+    imgURL: JuliaMasonThumb,
+  },
 ];
 
 export default class ParticipantListUsageComponent extends Component {

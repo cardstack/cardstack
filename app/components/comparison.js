@@ -54,7 +54,10 @@ export default class ComparisonComponent extends Component {
     //   }
     // }
 
-    this.baseFieldGroup = this.getFieldArray(this.model.nestedField, this.model.nestedCompField);
+    this.baseFieldGroup = this.getFieldArray(
+      this.model.nestedField,
+      this.model.nestedCompField
+    );
     this.compFieldGroup = this.getFieldArray(this.model.nestedCompField);
 
     // if (this.baseFieldGroup.length && this.compFieldGroup.length) {
@@ -82,9 +85,7 @@ export default class ComparisonComponent extends Component {
           // left-side card only
           // status + modified count NOT set during compareFields fn
           if (allFields && !this.model.parentCard) {
-            let tempField,
-                modifiedCount,
-                status;
+            let tempField, modifiedCount, status;
 
             if (field.modifiedCount && f !== 'publisher') {
               modifiedCount = field.modifiedCount;
@@ -96,7 +97,7 @@ export default class ComparisonComponent extends Component {
                   title: f,
                   type: 'card',
                   component: cardComponent || null,
-                  value: field.tempField[f]
+                  value: field.tempField[f],
                 };
               }
 
@@ -105,28 +106,34 @@ export default class ComparisonComponent extends Component {
               }
             }
 
-            array = [...array, {
-              title: f,
-              type: 'card',
-              component: cardComponent || null,
-              value: field[f] || null,
-              tempField,
-              expandable: cardComponent === 'cards/composer' ? true : false,
-              status,
-              modifiedCount
-            }];
+            array = [
+              ...array,
+              {
+                title: f,
+                type: 'card',
+                component: cardComponent || null,
+                value: field[f] || null,
+                tempField,
+                expandable: cardComponent === 'cards/composer' ? true : false,
+                status,
+                modifiedCount,
+              },
+            ];
           }
 
           // right-side card
           // status + modified count for this one will be set during compareFields fn
           else {
-            array = [...array, {
-              title: f,
-              type: 'card',
-              component: cardComponent || null,
-              value: field[f] || null,
-              expandable: cardComponent === 'cards/composer' ? true : false
-            }];
+            array = [
+              ...array,
+              {
+                title: f,
+                type: 'card',
+                component: cardComponent || null,
+                value: field[f] || null,
+                expandable: cardComponent === 'cards/composer' ? true : false,
+              },
+            ];
           }
         } else {
           // left-side field
@@ -162,12 +169,14 @@ export default class ComparisonComponent extends Component {
           // }
 
           // else {
-            array = [...array, {
+          array = [
+            ...array,
+            {
               title: f,
-              value: field[f] || null
-            }];
+              value: field[f] || null,
+            },
+          ];
           // }
-
         }
       }
     }
@@ -189,15 +198,18 @@ export default class ComparisonComponent extends Component {
       return;
     }
 
-    let [ json1, json2 ] = [ field, compField ].map(data => {
+    let [json1, json2] = [field, compField].map((data) => {
       try {
         return JSON.stringify(data);
-      } catch(err) {
+      } catch (err) {
         return;
       }
     });
 
-    if (json1 === json2 || (!field.value && !compField.value && !field.id && !compField.id)) {
+    if (
+      json1 === json2 ||
+      (!field.value && !compField.value && !field.id && !compField.id)
+    ) {
       set(compField, 'modifiedCount', 0);
       set(compField, 'status', null);
       return;
@@ -234,7 +246,7 @@ export default class ComparisonComponent extends Component {
       // if (!this.nestedView && field.tempField) {
       //   numChanges = this.diffCounter(0, field.tempField, compField);
       // } else {
-        numChanges = this.diffCounter(0, field, compField);
+      numChanges = this.diffCounter(0, field, compField);
       // }
 
       set(compField, 'modifiedCount', numChanges);
@@ -250,25 +262,21 @@ export default class ComparisonComponent extends Component {
       if (!this.fieldsNotRendered.includes(f)) {
         if (compField[f] && compField[f].expandable) {
           count += this.diffCounter(count, field[f], compField[f]);
-        }
-        else if (!field && !compField || !field && !compField[f]) {
+        } else if ((!field && !compField) || (!field && !compField[f])) {
           count;
-        }
-        else if (f === 'publisher') {
+        } else if (f === 'publisher') {
           if ((!field && compField) || (!field[f] && compField[f])) {
             count++;
           } else {
             count;
           }
-        }
-        else if ((!field && compField) || field[f] !== compField[f]) {
+        } else if ((!field && compField) || field[f] !== compField[f]) {
           count++;
         }
       }
     }
     return count;
   }
-
 
   @action
   reconciliateField(field, compField) {
@@ -297,7 +305,10 @@ export default class ComparisonComponent extends Component {
 
       let newTempField;
       if (this.model.parentCard.nestedField.tempField) {
-        newTempField = Object.assign({}, this.model.parentCard.nestedField.tempField);
+        newTempField = Object.assign(
+          {},
+          this.model.parentCard.nestedField.tempField
+        );
       } else {
         newTempField = Object.assign({}, this.model.parentCard.nestedField);
       }
@@ -309,7 +320,10 @@ export default class ComparisonComponent extends Component {
       set(newTempField[this.model.cardType], field.title, compField.value);
       newTempField.changedFieldTitle = field.title;
 
-      if (this.model.parentCard.nestedField.id && !this.model.parentCard.nestedField.type) {
+      if (
+        this.model.parentCard.nestedField.id &&
+        !this.model.parentCard.nestedField.type
+      ) {
         newTempField.status = 'added';
       } else {
         newTempField.status = 'modified';
@@ -325,14 +339,18 @@ export default class ComparisonComponent extends Component {
       this.count = this.model.topLevelCard.count;
       this.count++;
       set(this.model.topLevelCard, 'count', this.count);
-    }
+    } else if (!this.model.parentCard && this.model.topLevelCard) {
+      let topField = this.model.topLevelCard.baseCard.isolatedFields.find(
+        (el) => el.title === this.model.cardType
+      );
+      let topCard = topField.value.find((el) => el.id === this.model.cardId);
 
-    else if (!this.model.parentCard && this.model.topLevelCard) {
-      let topField = this.model.topLevelCard.baseCard.isolatedFields.find(el => el.title === this.model.cardType);
-      let topCard = topField.value.find(el => el.id === this.model.cardId);
-
-      let topCompField = this.model.topLevelCard.compCard.isolatedFields.find(el => el.title === this.model.cardType);
-      let topCompCard = topCompField.value.find(el => el.id === this.model.cardId);
+      let topCompField = this.model.topLevelCard.compCard.isolatedFields.find(
+        (el) => el.title === this.model.cardType
+      );
+      let topCompCard = topCompField.value.find(
+        (el) => el.id === this.model.cardId
+      );
 
       let tempField = Object.assign({}, topCard);
       tempField[field.title] = compField.value;
@@ -356,9 +374,7 @@ export default class ComparisonComponent extends Component {
       set(topCard, 'modifiedCount', modCount);
       this.count = modCount;
       set(this.model.topLevelCard, 'count', this.count);
-    }
-
-    else {
+    } else {
       if (compField.expandable) {
         if (!this.count) {
           this.count = compField.modifiedCount;
@@ -394,12 +410,10 @@ export default class ComparisonComponent extends Component {
         if (modCount && modCount >= numDiff) {
           set(field, 'modifiedCount', modCount - numDiff);
           this.count = this.count - modCount;
-        }
-        else if (!modCount) {
+        } else if (!modCount) {
           set(field, 'modifiedCount', 0);
           this.count = 0;
-        }
-        else {
+        } else {
           set(field, 'modifiedCount', 0);
           this.count = this.count - numDiff;
         }

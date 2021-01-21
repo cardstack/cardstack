@@ -26,16 +26,22 @@ export default class CardflowComponent extends Component {
   }
 
   get participatingOrgMembers() {
-    let [...members] = this.participants.filter(el => el.org_ids && el.org_ids.includes(this.org.id));
+    let [...members] = this.participants.filter(
+      (el) => el.org_ids && el.org_ids.includes(this.org.id)
+    );
     return [this.org, ...members];
   }
 
   get otherParticipants() {
-    if (!this.participants) { return null; }
+    if (!this.participants) {
+      return null;
+    }
     if (!this.participatingOrgMembers || !this.participatingOrgMembers.length) {
       return this.participants;
     }
-    return this.participants.filter(el => !el.org_ids || !el.org_ids.includes(this.org.id));
+    return this.participants.filter(
+      (el) => !el.org_ids || !el.org_ids.includes(this.org.id)
+    );
   }
 
   get milestone() {
@@ -43,7 +49,9 @@ export default class CardflowComponent extends Component {
       return null;
     }
 
-    return this.milestones.find(el => el.title === this.thread.currentMilestone);
+    return this.milestones.find(
+      (el) => el.title === this.thread.currentMilestone
+    );
   }
 
   get progress() {
@@ -55,7 +63,7 @@ export default class CardflowComponent extends Component {
       return null;
     }
 
-    let index = this.milestones.findIndex(el => el.id === this.milestone.id);
+    let index = this.milestones.findIndex((el) => el.id === this.milestone.id);
     if (index < 0) {
       return null;
     }
@@ -65,20 +73,20 @@ export default class CardflowComponent extends Component {
 
   get progressStatus() {
     if (this.thread && this.thread.isCancelled) {
-      return "Cancelled";
+      return 'Cancelled';
     }
 
     if (this.thread && this.thread.isComplete) {
       if (this.milestone) {
-        return this.milestone.statusOnCompletion || "Completed";
+        return this.milestone.statusOnCompletion || 'Completed';
       }
 
       if (this.milestones && this.milestones.length) {
         let lastMilestone = this.milestones[this.milestones.length - 1];
-        return lastMilestone.statusOnCompletion || "Completed";
+        return lastMilestone.statusOnCompletion || 'Completed';
       }
 
-      return "Completed";
+      return 'Completed';
     }
 
     if (!this.milestone || !this.milestones || !this.thread) {
@@ -89,7 +97,9 @@ export default class CardflowComponent extends Component {
       return 'Workflow started';
     }
 
-    let previousMilestone = this.args.model.workflow.milestones[this.progress - 1];
+    let previousMilestone = this.args.model.workflow.milestones[
+      this.progress - 1
+    ];
     return previousMilestone ? previousMilestone.statusOnCompletion : null;
   }
 }

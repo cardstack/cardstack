@@ -1,4 +1,3 @@
 import MediaRegistryIndexRoute from './index';
 
-export default class MediaRegistryCardflowRoute extends MediaRegistryIndexRoute {
-}
+export default class MediaRegistryCardflowRoute extends MediaRegistryIndexRoute {}

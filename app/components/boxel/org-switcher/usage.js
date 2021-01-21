@@ -7,39 +7,39 @@ const ORGS = [
     id: 'bunny_records',
     type: 'label',
     title: 'Bunny Records',
-    iconURL: "/media-registry/button-bunny-records.svg",
+    iconURL: '/media-registry/button-bunny-records.svg',
     logoURL: '/media-registry/bunny-logo.svg',
     user: {
-      title: "Lisa Track",
-      role: "Administrator",
-      imgURL: "/media-registry/profiles/Lisa-Track.jpg",
-    }
+      title: 'Lisa Track',
+      role: 'Administrator',
+      imgURL: '/media-registry/profiles/Lisa-Track.jpg',
+    },
   },
   {
     id: 'crd_records',
     type: 'label',
     title: 'CRD Records',
-    iconURL: "/media-registry/button-crd-records.svg",
+    iconURL: '/media-registry/button-crd-records.svg',
     logoURL: '/media-registry/crd_records_logo.svg',
     user: {
-      title: "Steve Rights",
-      role: "Catalog Manager",
-      imgURL: "/media-registry/profiles/Steve-Rights.jpg"
-    }
+      title: 'Steve Rights',
+      role: 'Catalog Manager',
+      imgURL: '/media-registry/profiles/Steve-Rights.jpg',
+    },
   },
   {
     id: 'warner-music-group',
     type: 'label',
     title: 'Warner Music Group',
     iconURL: '/media-registry/wmg-logo.svg',
-    logoURL: '/media-registry/wmg-logo.svg'
-  }
-]
+    logoURL: '/media-registry/wmg-logo.svg',
+  },
+];
 
 export default class extends Component {
   orgs = ORGS;
   @tracked currentOrg = ORGS[0];
   @action onChooseOrg(orgId) {
-    this.currentOrg = ORGS.find(o => o.id === orgId);
+    this.currentOrg = ORGS.find((o) => o.id === orgId);
   }
 }

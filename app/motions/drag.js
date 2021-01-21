@@ -24,9 +24,8 @@ class Drag extends Motion {
   }
 
   interrupted(motions) {
-    this.prior = motions.find(m => m instanceof this.constructor);
+    this.prior = motions.find((m) => m instanceof this.constructor);
   }
-
 
   *animate() {
     let sprite = this.sprite;
@@ -37,8 +36,14 @@ class Drag extends Motion {
       this.dragStartY = this.prior.dragStartY;
       this.xStep = this.prior.xStep;
       this.yStep = this.prior.yStep;
-      initialTx = sprite.transform.tx - sprite.absoluteInitialBounds.left + this.dragStartX;
-      initialTy = sprite.transform.ty - sprite.absoluteInitialBounds.top + this.dragStartY;
+      initialTx =
+        sprite.transform.tx -
+        sprite.absoluteInitialBounds.left +
+        this.dragStartX;
+      initialTy =
+        sprite.transform.ty -
+        sprite.absoluteInitialBounds.top +
+        this.dragStartY;
     } else {
       this.dragStartX = sprite.absoluteInitialBounds.left;
       this.dragStartY = sprite.absoluteInitialBounds.top;
@@ -49,7 +54,9 @@ class Drag extends Motion {
     }
 
     // targets are all in absolute screen coordinates
-    let targets = this.opts.others.map(s => makeTarget(s.absoluteFinalBounds, s));
+    let targets = this.opts.others.map((s) =>
+      makeTarget(s.absoluteFinalBounds, s)
+    );
     let ownTarget = makeTarget(sprite.absoluteFinalBounds, sprite);
 
     let dragState = sprite.owner.value.dragState;
@@ -62,7 +69,7 @@ class Drag extends Motion {
 
     sprite.applyStyles({
       'z-index': '1',
-      outline
+      outline,
     });
 
     // when we first start a new "keyboard" drag, adjust the active
@@ -95,7 +102,6 @@ class Drag extends Motion {
         if (chosenTarget !== ownTarget) {
           this.opts.onCollision(chosenTarget.payload);
         }
-
       } else {
         // these track relative motion since the drag started
         let dx = dragState.latestPointerX - dragState.initialPointerX;
@@ -111,8 +117,10 @@ class Drag extends Motion {
         let x = dx + this.dragStartX + sprite.absoluteFinalBounds.width / 2;
         let y = dy + this.dragStartY + sprite.absoluteFinalBounds.height / 2;
 
-        let ownDistance = (x - ownTarget.x) * (x - ownTarget.x) + (y - ownTarget.y) * (y - ownTarget.y);
-        let closerTarget = targets.find(target => {
+        let ownDistance =
+          (x - ownTarget.x) * (x - ownTarget.x) +
+          (y - ownTarget.y) * (y - ownTarget.y);
+        let closerTarget = targets.find((target) => {
           let partialX = target.x - x;
           let partialY = target.y - y;
           let distance = partialX * partialX + partialY * partialY;
@@ -125,78 +133,80 @@ class Drag extends Motion {
       }
       yield rAF();
     }
-
   }
-
 }
 
 export function makeTarget(bounds, payload) {
   return {
     x: bounds.left + bounds.width / 2,
     y: bounds.top + bounds.height / 2,
-    payload
+    payload,
   };
 }
 
 export function chooseNextToLeft(chosenTarget, targets) {
-  let candidates = targets.filter(target => {
+  let candidates = targets.filter((target) => {
     if (target.x >= chosenTarget.x) {
       return false;
     }
     let limit = (chosenTarget.x - target.x) / 2;
-    return target.y <= chosenTarget.y + limit &&
-      target.y >= chosenTarget.y - limit;
+    return (
+      target.y <= chosenTarget.y + limit && target.y >= chosenTarget.y - limit
+    );
   });
   return closest(chosenTarget, candidates) || chosenTarget;
 }
 
 export function chooseNextToRight(chosenTarget, targets) {
-  let candidates = targets.filter(target => {
+  let candidates = targets.filter((target) => {
     if (target.x < chosenTarget.x) {
       return false;
     }
     let limit = (chosenTarget.x - target.x) / -2;
-    return target.y <= chosenTarget.y + limit &&
-      target.y >= chosenTarget.y - limit;
+    return (
+      target.y <= chosenTarget.y + limit && target.y >= chosenTarget.y - limit
+    );
   });
   return closest(chosenTarget, candidates) || chosenTarget;
 }
 
 export function chooseNextToUp(chosenTarget, targets) {
-  let candidates = targets.filter(target => {
+  let candidates = targets.filter((target) => {
     if (target.y >= chosenTarget.y) {
       return false;
     }
     let limit = (chosenTarget.y - target.y) / 2;
-    return target.x <= chosenTarget.x + limit &&
-      target.x >= chosenTarget.x - limit;
+    return (
+      target.x <= chosenTarget.x + limit && target.x >= chosenTarget.x - limit
+    );
   });
   return closest(chosenTarget, candidates) || chosenTarget;
 }
 
 export function chooseNextToDown(chosenTarget, targets) {
-  let candidates = targets.filter(target => {
+  let candidates = targets.filter((target) => {
     if (target.y < chosenTarget.y) {
       return false;
     }
     let limit = (chosenTarget.y - target.y) / -2;
-    return target.x <= chosenTarget.x + limit &&
-      target.x >= chosenTarget.x - limit;
+    return (
+      target.x <= chosenTarget.x + limit && target.x >= chosenTarget.x - limit
+    );
   });
   return closest(chosenTarget, candidates) || chosenTarget;
 }
-
 
 function closest(chosenTarget, candidates) {
   let closest;
   let closestDistance;
   for (let candidate of candidates) {
-    let distance = (candidate.x - chosenTarget.x) * (candidate.x - chosenTarget.x) + (candidate.y - chosenTarget.y) * (candidate.y - chosenTarget.y);
-    if (closestDistance == null || distance < closestDistance ) {
+    let distance =
+      (candidate.x - chosenTarget.x) * (candidate.x - chosenTarget.x) +
+      (candidate.y - chosenTarget.y) * (candidate.y - chosenTarget.y);
+    if (closestDistance == null || distance < closestDistance) {
       closestDistance = distance;
       closest = candidate;
     }
   }
   return closest;
-
 }

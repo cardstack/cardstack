@@ -4,7 +4,9 @@ export default class MediaRegistryDiscrepanciesDiscrepancyCardCardRoute extends 
   model({ innerCardType, innerCardId }) {
     let { currentOrg, orgs } = this.modelFor('media-registry');
     let card = this.modelFor('media-registry.discrepancies.discrepancy');
-    let parentCard = this.modelFor('media-registry.discrepancies.discrepancy.card');
+    let parentCard = this.modelFor(
+      'media-registry.discrepancies.discrepancy.card'
+    );
 
     let topBaseField = parentCard.nestedField[innerCardType];
     let topCompField = parentCard.nestedCompField[innerCardType];
@@ -33,7 +35,7 @@ export default class MediaRegistryDiscrepanciesDiscrepancyCardCardRoute extends 
       topLevelCard: card,
       cardType: innerCardType,
       cardId: innerCardId,
-      route: 'media-registry.discrepancies.discrepancy.card.card'
-    }
+      route: 'media-registry.discrepancies.discrepancy.card.card',
+    };
   }
 }

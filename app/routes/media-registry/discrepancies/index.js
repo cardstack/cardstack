@@ -9,7 +9,7 @@ export default class MediaRegistryDiscrepanciesIndexRoute extends Route {
   model() {
     let { currentOrg, orgs } = this.modelFor('media-registry');
     let { id } = currentOrg;
-    let discrepancies = DISCREPANCIES.filter(el => el.ownerId === id);
+    let discrepancies = DISCREPANCIES.filter((el) => el.ownerId === id);
 
     return {
       id,
@@ -18,42 +18,37 @@ export default class MediaRegistryDiscrepanciesIndexRoute extends Route {
       title: 'All Discrepancies',
       type: 'list',
       collection: discrepancies,
-      listTitleFields: [
-        'Title',
-        'Type',
-        'Version',
-        'Other Version'
-      ],
+      listTitleFields: ['Title', 'Type', 'Version', 'Other Version'],
       listFields: [
         {
-          valuePath: 'title'
+          valuePath: 'title',
         },
         {
-          valuePath: 'type'
+          valuePath: 'type',
         },
         {
-          valuePath: 'baseOwner'
+          valuePath: 'baseOwner',
         },
         {
-          valuePath: 'compOwner'
+          valuePath: 'compOwner',
         },
       ],
       columns: [
         {
           name: 'Title',
-          valuePath: 'title'
+          valuePath: 'title',
         },
         {
           name: 'Type',
-          valuePath: 'type'
+          valuePath: 'type',
         },
         {
           name: 'Version',
-          valuePath: 'baseOwner'
+          valuePath: 'baseOwner',
         },
         {
           name: 'Other Version',
-          valuePath: 'compOwner'
+          valuePath: 'compOwner',
         },
       ],
     };

@@ -13,7 +13,7 @@ export default class MediaRegistryProductsAlbumRoute extends Route {
     const musicalWorks = await fetchCollection('musical-works');
     const allCollections = await fetchCollection('collections');
 
-    const albumTracks = tracks.filter(el => formatId(el.album) === albumId);
+    const albumTracks = tracks.filter((el) => formatId(el.album) === albumId);
 
     let { currentOrg } = this.modelFor('media-registry');
     let model = {};
@@ -32,7 +32,7 @@ export default class MediaRegistryProductsAlbumRoute extends Route {
       label,
       owner,
       owner_id,
-      type_of_album
+      type_of_album,
     } = albumTracks[0];
 
     model = {
@@ -48,17 +48,19 @@ export default class MediaRegistryProductsAlbumRoute extends Route {
       label,
       owner,
       owner_id,
-      type_of_album
+      type_of_album,
     };
 
     model.tracks = albumTracks;
 
     model.tracks.map((el, i) => {
-      el.musicalWork = musicalWorks.find(item => item.id === el.id);
+      el.musicalWork = musicalWorks.find((item) => item.id === el.id);
       el.track_no = String(i + 1);
     });
 
-    model.collections = allCollections.filter(el => model.collection_ids.includes(el.id));
+    model.collections = allCollections.filter((el) =>
+      model.collection_ids.includes(el.id)
+    );
 
     return model;
   }

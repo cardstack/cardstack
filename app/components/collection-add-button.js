@@ -6,7 +6,9 @@ import { htmlSafe } from '@ember/template';
 export default class CollectionAddButtonComponent extends Component {
   @tracked newItem;
   @tracked isAdding;
-  @tracked dataSource = htmlSafe(`Searching for <span>${this.args.fieldName}</span> within <span>Verifi Registry</span>`);
+  @tracked dataSource = htmlSafe(
+    `Searching for <span>${this.args.fieldName}</span> within <span>Verifi Registry</span>`
+  );
 
   @action
   addItem(newItemWrapper) {

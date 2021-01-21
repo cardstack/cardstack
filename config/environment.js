@@ -1,10 +1,10 @@
 'use strict';
 
-module.exports = function(environment) {
+module.exports = function (environment) {
   let ENV = {
     modulePrefix: '@cardstack/boxel',
     environment,
-    rootURL: "/",
+    rootURL: '/',
     locationType: 'auto',
     EmberENV: {
       FEATURES: {
@@ -14,18 +14,18 @@ module.exports = function(environment) {
         EMBER_GLIMMER_ANGLE_BRACKET_NESTED_LOOKUP: true,
         EMBER_GLIMMER_ANGLE_BRACKET_BUILT_INS: true,
         EMBER_GLIMMER_FN_HELPER: true,
-        EMBER_GLIMMER_ON_MODIFIER: true
+        EMBER_GLIMMER_ON_MODIFIER: true,
       },
       EXTEND_PROTOTYPES: {
         // Prevent Ember Data from overriding Date.parse.
-        Date: false
-      }
+        Date: false,
+      },
     },
 
     APP: {
       // Here you can pass flags/options to your application instance
       // when it is created
-    }
+    },
   };
 
   if (environment === 'development') {
@@ -50,7 +50,7 @@ module.exports = function(environment) {
 
   if (environment === 'production') {
     // here you can enable a production-specific feature
-    ENV.rootURL =  '/boxel/';
+    ENV.rootURL = '/boxel/';
     ENV.locationType = 'hash';
   }
 

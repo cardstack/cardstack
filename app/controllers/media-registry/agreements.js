@@ -9,23 +9,25 @@ export default class MediaRegistryAgreementsController extends Controller {
   @tracked agreement = this.model.agreement;
 
   get agreementFields() {
-    if (!this.model) { return null; }
+    if (!this.model) {
+      return null;
+    }
     return [
       {
         title: 'Assigner',
-        value: [ this.agreement.from ]
+        value: [this.agreement.from],
       },
       {
         title: 'Assignee',
-        value: [ this.agreement.to ]
+        value: [this.agreement.to],
       },
       {
         title: 'Catalog',
         type: 'card',
         format: 'grid',
         component: 'cards/master-collection',
-        value: this.catalog
-      }
+        value: this.catalog,
+      },
     ];
   }
 
@@ -36,7 +38,11 @@ export default class MediaRegistryAgreementsController extends Controller {
 
   @action
   rejectAgreement() {
-    this.transitionToRoute('media-registry.collection', 'bunny_records', this.catalog.id);
+    this.transitionToRoute(
+      'media-registry.collection',
+      'bunny_records',
+      this.catalog.id
+    );
   }
 
   @action
@@ -51,6 +57,10 @@ export default class MediaRegistryAgreementsController extends Controller {
 
   @action
   expandAction() {
-    this.transitionToRoute('media-registry.collection', 'bunny_records', this.catalog.id);
+    this.transitionToRoute(
+      'media-registry.collection',
+      'bunny_records',
+      this.catalog.id
+    );
   }
 }
