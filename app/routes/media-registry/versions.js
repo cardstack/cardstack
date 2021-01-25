@@ -8,12 +8,12 @@ export default class MediaRegistryItemRoute extends Route {
   }
 
   async model({ itemId }) {
-    const versionHistory = VERSION_HISTORY.filter(el => el.id === itemId)[0];
+    const versionHistory = VERSION_HISTORY.filter((el) => el.id === itemId)[0];
     const { id, title, versions } = versionHistory;
     return {
       id,
       title,
-      versions
-    }
+      versions,
+    };
   }
 }

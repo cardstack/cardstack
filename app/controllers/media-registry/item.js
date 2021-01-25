@@ -5,7 +5,9 @@ import { formatId } from '@cardstack/boxel/utils/format-id';
 
 export default class MediaRegistryItemController extends Controller {
   get album() {
-    if (!this.model.album) { return null; }
+    if (!this.model.album) {
+      return null;
+    }
     return {
       type: this.model.type_of_album,
       title: titleize(this.model.album),
@@ -13,14 +15,14 @@ export default class MediaRegistryItemController extends Controller {
       fields: [
         {
           title: 'primary artist',
-          value: this.model.artist
+          value: this.model.artist,
         },
         {
           title: 'label',
-          value: this.model.label
-        }
-      ]
-    }
+          value: this.model.label,
+        },
+      ],
+    };
   }
 
   @action
@@ -35,7 +37,10 @@ export default class MediaRegistryItemController extends Controller {
 
   @action
   transitionToProduct() {
-    this.transitionToRoute('media-registry.products.album', formatId(this.model.album));
+    this.transitionToRoute(
+      'media-registry.products.album',
+      formatId(this.model.album)
+    );
   }
 
   @action

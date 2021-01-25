@@ -6,26 +6,26 @@ import RupertGrishamThumb from '../../../images/workflow/participants/thumb/Rupe
 
 const sampleParticipantGroup2 = [
   {
-    "title": "Haley O’Connell",
-    "imgURL": HaleyOConnellThumb,
-    "role": "Writer"
+    title: 'Haley O’Connell',
+    imgURL: HaleyOConnellThumb,
+    role: 'Writer',
   },
   {
-    "title": "Rupert Grisham",
-    "imgURL": RupertGrishamThumb,
-    "role": "CEO"
-  }
+    title: 'Rupert Grisham',
+    imgURL: RupertGrishamThumb,
+    role: 'CEO',
+  },
 ];
 
 const sampleParticipantGroup = [
   {
-    "title": "Julia Mason",
-    "imgURL": JuliaMasonThumb,
+    title: 'Julia Mason',
+    imgURL: JuliaMasonThumb,
   },
   {
-    "title": "Lola Sampson",
-    "imgURL": LolaSampsonThumb
-  }
+    title: 'Lola Sampson',
+    imgURL: LolaSampsonThumb,
+  },
 ];
 
 export default class ParticipantsBoxUsageComponent extends Component {

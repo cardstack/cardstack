@@ -17,11 +17,15 @@ export default class extends Component {
       properties['text-align'] = this.args.textAlign;
     }
 
-    properties['padding-left'] = this.args.paddingX || "10px;";
-    properties['padding-right'] = this.args.paddingX || "10px;";
-    properties['padding-top'] = this.args.paddingY || "10px;";
-    properties['padding-bottom'] = this.args.paddingY || "10px;";
+    properties['padding-left'] = this.args.paddingX || '10px;';
+    properties['padding-right'] = this.args.paddingX || '10px;';
+    properties['padding-top'] = this.args.paddingY || '10px;';
+    properties['padding-bottom'] = this.args.paddingY || '10px;';
 
-    return htmlSafe(Object.entries(properties).map(([key, value]) => `${key}:${value}`).join(';'));
+    return htmlSafe(
+      Object.entries(properties)
+        .map(([key, value]) => `${key}:${value}`)
+        .join(';')
+    );
   }
 }

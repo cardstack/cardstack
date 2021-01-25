@@ -1,3 +1,5 @@
+/* eslint-disable ember/no-computed-properties-in-native-classes */
+
 import Component from '@glimmer/component';
 import { computed } from '@ember/object';
 import fade from 'ember-animated/transitions/fade';
@@ -8,7 +10,7 @@ export default class BoxelFieldComponent extends Component {
   toUp = toUp;
   toDown = toDown;
 
-  @computed('transition')
+  @computed('args.transition', 'fade', 'transition')
   get defaultTransition() {
     if (this.args.transition) {
       return this.args.transition;

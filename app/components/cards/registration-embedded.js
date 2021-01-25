@@ -15,15 +15,15 @@ export default class RegistrationEmbedded extends Component {
         fields: [
           {
             title: 'asset type',
-            value: this.args.model.asset_type || 'Master Recording'
+            value: this.args.model.asset_type || 'Master Recording',
           },
           {
             title: 'created',
             value: this.args.model.verifi_reg_date,
-            type: 'date'
+            type: 'date',
           },
-        ]
-      }
+        ],
+      };
     }
 
     return null;

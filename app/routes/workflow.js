@@ -1,7 +1,7 @@
 import Route from '@ember/routing/route';
 // NOTE: This import should eventually be replaced by fetch to
 // mirage data
-import dbWorkflow from '@cardstack/boxel/data/db-workflow'
+import dbWorkflow from '@cardstack/boxel/data/db-workflow';
 import '@cardstack/boxel/css/templates/workflow.css';
 
 const USER_ID = 'haley-oconnell';
@@ -12,8 +12,8 @@ export default class WorkflowRoute extends Route {
   async model() {
     let { users, orgs, queueCards, messages, workflows } = dbWorkflow;
 
-    let user = users.find(el => el.id === this.userId);
-    let userOrgs = orgs.filter(el => user.org_ids.includes(el.id));
+    let user = users.find((el) => el.id === this.userId);
+    let userOrgs = orgs.filter((el) => user.org_ids.includes(el.id));
 
     return {
       user,
@@ -21,7 +21,7 @@ export default class WorkflowRoute extends Route {
       userOrgs,
       queueCards,
       messages,
-      workflows
+      workflows,
     };
   }
 }

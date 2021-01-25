@@ -1,4 +1,3 @@
 import MediaRegistryItemController from '../item';
 
-export default class MediaRegistryItemEditController extends MediaRegistryItemController {
-}
+export default class MediaRegistryItemEditController extends MediaRegistryItemController {}

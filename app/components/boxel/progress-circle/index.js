@@ -1,8 +1,8 @@
 import Component from '@glimmer/component';
-import "./style.css";
+import './style.css';
 import { reads } from 'macro-decorators';
 
-const FONT_SIZE_RATIO = 25/120;
+const FONT_SIZE_RATIO = 25 / 120;
 
 export default class extends Component {
   @reads('args.size', 120) size;

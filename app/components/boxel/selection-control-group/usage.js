@@ -9,7 +9,7 @@ export default class extends Component {
   @action setSelectedItemCount(val) {
     val = Number(val);
     this.selectedItemCount = val;
-    this.isSelected = (val === 50);
+    this.isSelected = val === 50;
   }
 
   @action setIsSelected(val) {
@@ -18,7 +18,7 @@ export default class extends Component {
   }
 
   @action toggleSelectAll() {
-      if (this.isSelected) {
+    if (this.isSelected) {
       this.isSelected = false;
       this.selectedItemCount = 0;
     } else {

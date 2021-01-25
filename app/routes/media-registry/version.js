@@ -11,28 +11,40 @@ export default class MediaRegistryVersionRoute extends Route {
     let { currentOrg } = this.modelFor('media-registry');
     let { id } = currentOrg;
 
-    let record = records.find(item => item.owner_id === id && item.id === itemId && item.version === versionId);
-    if (!record) { return; }
+    let record = records.find(
+      (item) =>
+        item.owner_id === id && item.id === itemId && item.version === versionId
+    );
+    if (!record) {
+      return;
+    }
 
     record.currentOrg = currentOrg;
 
     if (record.artist_id) {
-      const artists = profiles.filter(el => el.id === record.artist_id);
+      const artists = profiles.filter((el) => el.id === record.artist_id);
       record.artists = artists;
     }
 
     if (record.producer_id) {
-      const producers = profiles.filter(el => el.id === record.producer_id);
+      const producers = profiles.filter((el) => el.id === record.producer_id);
       record.producers = producers;
     }
 
     if (record.iswc_id) {
-      const work = musicalWorks.find(el => el.owner_id === id && el.iswc === record.iswc_id && el.version === versionId);
+      const work = musicalWorks.find(
+        (el) =>
+          el.owner_id === id &&
+          el.iswc === record.iswc_id &&
+          el.version === versionId
+      );
       record.musicalWork = work;
     }
 
     if (record.collection_ids) {
-      const catalogs = collections.filter(el => record.collection_ids.includes(el.id));
+      const catalogs = collections.filter((el) =>
+        record.collection_ids.includes(el.id)
+      );
       record.collections = catalogs;
     }
 

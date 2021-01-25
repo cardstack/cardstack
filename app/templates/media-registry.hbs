@@ -21,7 +21,7 @@
         {{/each}}
         {{#if @model.currentOrg.user}}
           <div class="media-registry__left-edge-queue {{if this.isQueueFixed "slide-in"}}">
-            <IconButton @icon={{if this.isQueueFixed "arrow-left" "sidebar"}} @class="media-registry__queue-btn" {{on "click" (action (mut this.isQueueFixed) (not this.isQueueFixed))}} @aria-label="Toggle fix cardflow queue" />
+            <IconButton @icon={{if this.isQueueFixed "arrow-left" "sidebar"}} @class="media-registry__queue-btn" {{on "click" (fn (mut this.isQueueFixed) (not this.isQueueFixed))}} @aria-label="Toggle fix cardflow queue" />
             <CardflowQueue
               @class="media-registry__queue {{if (and (not this.isQueueFixed) (not-eq this.target.currentRouteName "media-registry.cardflow")) "with-box-shadow"}}"
               @model={{@model.currentOrg}}

@@ -14,20 +14,24 @@ export default class MediaRegistryIndexController extends Controller {
     let collection = this.model.collection;
 
     if (version) {
-      return collection.filter(el => el.version === version);
+      return collection.filter((el) => el.version === version);
     }
 
-    return collection.filter(el => !el.version);
+    return collection.filter((el) => !el.version);
   }
 
   @action
   transitionToIsolate(item) {
-    if (this.model.type === "master-collection") {
+    if (this.model.type === 'master-collection') {
       return this.transitionToRoute('media-registry.collection', item.id);
     }
 
     if (this.version) {
-      return this.transitionToRoute('media-registry.version', item.id, this.version);
+      return this.transitionToRoute(
+        'media-registry.version',
+        item.id,
+        this.version
+      );
     }
     this.transitionToRoute('media-registry.item', item.id);
   }
@@ -39,8 +43,9 @@ export default class MediaRegistryIndexController extends Controller {
       return collection;
     } else {
       let lowerQuery = query.toLowerCase();
-      return collection.filter(i =>
-        this.model.columns.some(c =>
+      return collection.filter((i) =>
+        this.model.columns.some(
+          (c) =>
             c.isSearchable !== false &&
             c.valuePath &&
             !isBlank(i[c.valuePath]) &&
@@ -52,13 +57,16 @@ export default class MediaRegistryIndexController extends Controller {
 
   @action
   async sort(column, direction) {
-    let multiplier = (direction === 'asc') ? 1 : -1;
-    return this.collection.sort((a, b) => multiplier * compare(get(a, column.valuePath), get(b, column.valuePath)))
+    let multiplier = direction === 'asc' ? 1 : -1;
+    return this.collection.sort(
+      (a, b) =>
+        multiplier * compare(get(a, column.valuePath), get(b, column.valuePath))
+    );
   }
 
   @action
   removeItem(item) {
     this.removed.push(item);
-    return this.collection.filter(i => !this.removed.includes(i));
+    return this.collection.filter((i) => !this.removed.includes(i));
   }
 }

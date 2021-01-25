@@ -7,6 +7,10 @@ export default class MediaRegistryDiscrepanciesDiscrepancyCardCardController ext
     let innerCardCardType = field.title;
     let innerCardCardId = value.id || value.value[0].id;
 
-    this.transitionToRoute('media-registry.discrepancies.discrepancy.card.card.card', innerCardCardType, innerCardCardId);
+    this.transitionToRoute(
+      'media-registry.discrepancies.discrepancy.card.card.card',
+      innerCardCardType,
+      innerCardCardId
+    );
   }
 }

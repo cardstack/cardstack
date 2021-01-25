@@ -1,5 +1,4 @@
 // import ENV from './config/environment';
-// import fetch from 'fetch';
 import RSVP from 'rsvp';
 import allTracksCombined from './data/fixtures/media-registry/api/all_tracks_combined';
 import bunnyRecordsCollection from './data/fixtures/media-registry/api/bunny_records_collections';
@@ -12,15 +11,15 @@ import songsByPiaMidinaBbClarkeTable1 from './data/fixtures/media-registry/api/s
 import transferAgreementsVerifi from './data/fixtures/media-registry/api/transfer_agreements_verifi';
 
 const MAP = {
-  'all_tracks_combined': allTracksCombined,
-  'bunny_records_collection': bunnyRecordsCollection,
-  'collections': collections,
-  'crd_records_collections': crdRecordsCollections,
-  'custom_catalog_batch_f_table_1': customCatalogBatchFTable1,
+  all_tracks_combined: allTracksCombined,
+  bunny_records_collection: bunnyRecordsCollection,
+  collections: collections,
+  crd_records_collections: crdRecordsCollections,
+  custom_catalog_batch_f_table_1: customCatalogBatchFTable1,
   'musical-works': musicalWorks,
-  'profiles': profiles,
-  'songs_by_pia_midina_bb_clarke_table_1': songsByPiaMidinaBbClarkeTable1,
-  'transfer_agreements_verifi': transferAgreementsVerifi,
+  profiles: profiles,
+  songs_by_pia_midina_bb_clarke_table_1: songsByPiaMidinaBbClarkeTable1,
+  transfer_agreements_verifi: transferAgreementsVerifi,
 };
 
 export async function fetchCollection(collection) {

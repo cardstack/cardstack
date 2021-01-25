@@ -11,7 +11,7 @@ export default class MediaRegistryIndexRoute extends Route {
     let { id } = currentOrg;
 
     let allCollections = await fetchCollection('collections');
-    let collections = allCollections.filter(el => el.owner_id === id);
+    let collections = allCollections.filter((el) => el.owner_id === id);
 
     if (collections.length) {
       return {
@@ -40,7 +40,7 @@ export default class MediaRegistryIndexRoute extends Route {
             name: 'Masters',
             valuePath: 'count',
             width: 250,
-            isSortable: false
+            isSortable: false,
           },
           {
             name: 'Top Artists',
@@ -54,14 +54,14 @@ export default class MediaRegistryIndexRoute extends Route {
           },
           {
             width: 0,
-            isFixed: 'right'
+            isFixed: 'right',
           },
         ],
       };
     }
 
     const records = await fetchCollection('all_tracks_combined');
-    let tracks = records.filter(item => item.owner_id === id);
+    let tracks = records.filter((item) => item.owner_id === id);
 
     return {
       currentOrg,
@@ -77,19 +77,19 @@ export default class MediaRegistryIndexRoute extends Route {
       listFields: [
         {
           name: 'Release Title',
-          valuePath: 'album'
+          valuePath: 'album',
         },
         {
           name: 'Release Type',
-          valuePath: 'type_of_album'
+          valuePath: 'type_of_album',
         },
         {
           name: 'Genre',
-          valuePath: 'genre'
+          valuePath: 'genre',
         },
         {
           name: 'Length',
-          valuePath: 'length'
+          valuePath: 'length',
         },
       ],
       columns: [
@@ -97,7 +97,7 @@ export default class MediaRegistryIndexRoute extends Route {
           name: 'Title',
           valuePath: 'title',
           isFixed: 'left',
-          width: 350
+          width: 350,
         },
         {
           name: 'Artist',
@@ -129,11 +129,11 @@ export default class MediaRegistryIndexRoute extends Route {
           name: 'Length',
           valuePath: 'length',
           width: 250,
-          sortType: 'numeric'
+          sortType: 'numeric',
         },
         {
           width: 0,
-          isFixed: 'right'
+          isFixed: 'right',
         },
       ],
     };

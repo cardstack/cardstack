@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import "./style.css";
+import './style.css';
 import { reads } from 'macro-decorators';
 import move from 'ember-animated/motions/move';
 import { fadeIn } from 'ember-animated/motions/opacity';
@@ -10,7 +10,7 @@ import { easeOut } from 'ember-animated/easings/cosine';
 export default class ThreadMessageComponent extends Component {
   @reads('args.iconSize', 40) iconSize;
 
-  * transition({ insertedSprites }) {
+  *transition({ insertedSprites }) {
     // printSprites(arguments[0]);
 
     for (let [i, sprite] of [...insertedSprites].entries()) {
@@ -19,7 +19,10 @@ export default class ThreadMessageComponent extends Component {
       } else {
         yield wait(800);
         sprite.startTranslatedBy(0, 30);
-        parallel(fadeIn(sprite, { easing: easeOut, duration: 200 }), move(sprite, { easing: easeOut, duration: 200 }));
+        parallel(
+          fadeIn(sprite, { easing: easeOut, duration: 200 }),
+          move(sprite, { easing: easeOut, duration: 200 })
+        );
       }
     }
   }

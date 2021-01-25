@@ -11,13 +11,13 @@ function formatValue(value) {
 
 export function cssVar(values) {
   let vars = [];
-  Object.keys(values).forEach(name => {
+  Object.keys(values).forEach((name) => {
     vars.push(`--${name}: ${formatValue(values[name])}`);
   });
 
-  return vars.join('; ')
+  return vars.join('; ');
 }
 
-export default helper(function(params, hash) {
+export default helper(function (params, hash) {
   return htmlSafe(cssVar(hash));
 });

@@ -3,15 +3,24 @@ import { tracked } from '@glimmer/tracking';
 import { action, set } from '@ember/object';
 
 export default class CollectionComponent extends Component {
-  @tracked collection = this.args?.field?.value || this.args?.model?.value || this.args?.collection;
+  @tracked collection =
+    this.args?.field?.value || this.args?.model?.value || this.args?.collection;
   @tracked tableCols = this.args?.field?.columns || this.args?.model?.columns;
   @tracked displayItemActions;
 
   constructor(...args) {
     super(...args);
     let collection = this.collection;
-    set(collection, 'pickedItems', collection.filter(item => item.picked).length);
-    set(collection, 'selectedAll', collection.length === collection.pickedItems);
+    set(
+      collection,
+      'pickedItems',
+      collection.filter((item) => item.picked).length
+    );
+    set(
+      collection,
+      'selectedAll',
+      collection.length === collection.pickedItems
+    );
   }
 
   get embeddedCollection() {
@@ -41,10 +50,9 @@ export default class CollectionComponent extends Component {
       // else highlight individual items
       for (let item of collection) {
         if (item.id === id) {
-          set(item, "selected", true);
-        }
-        else {
-          set(item, "selected", false);
+          set(item, 'selected', true);
+        } else {
+          set(item, 'selected', false);
         }
       }
       this.collectionUnselect();
@@ -56,7 +64,7 @@ export default class CollectionComponent extends Component {
   itemUnselect() {
     let collection = this.collection;
     for (let item of collection) {
-      set(item, "selected", false);
+      set(item, 'selected', false);
     }
   }
 
@@ -71,16 +79,24 @@ export default class CollectionComponent extends Component {
     let collection = this.collection;
     for (let item of collection) {
       if (item.id === id) {
-        set(item, "picked", !item.picked);
+        set(item, 'picked', !item.picked);
       }
     }
-    set(collection, 'pickedItems', collection.filter(item => item.picked).length);
+    set(
+      collection,
+      'pickedItems',
+      collection.filter((item) => item.picked).length
+    );
 
     if (collection.pickedItems) {
       this.collectionSelect();
     }
 
-    set(collection, 'selectedAll', collection.length === collection.pickedItems);
+    set(
+      collection,
+      'selectedAll',
+      collection.length === collection.pickedItems
+    );
   }
 
   @action
@@ -90,7 +106,7 @@ export default class CollectionComponent extends Component {
       this.unselectAll();
     } else {
       for (let item of collection) {
-        set(item, "picked", true);
+        set(item, 'picked', true);
       }
       this.collectionSelect();
       set(collection, 'pickedItems', collection.length);
@@ -102,7 +118,7 @@ export default class CollectionComponent extends Component {
   unselectAll() {
     let collection = this.collection;
     for (let item of collection) {
-      set(item, "picked", false);
+      set(item, 'picked', false);
     }
     set(collection, 'pickedItems', 0);
     set(collection, 'selectedAll', false);
@@ -110,15 +126,22 @@ export default class CollectionComponent extends Component {
 
   @action
   removeItem(id) {
-    this.collection = this.collection.filter(item => item.id !== id);
+    this.collection = this.collection.filter((item) => item.id !== id);
     let collection = this.collection;
-    set(collection, 'pickedItems', collection.filter(item => item.picked).length);
-    set(collection, 'selectedAll', collection.length === collection.pickedItems);
+    set(
+      collection,
+      'pickedItems',
+      collection.filter((item) => item.picked).length
+    );
+    set(
+      collection,
+      'selectedAll',
+      collection.length === collection.pickedItems
+    );
   }
 
   @action
   addItem(item) {
     this.collection.push(item);
   }
-
 }

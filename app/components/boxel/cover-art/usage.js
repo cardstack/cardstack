@@ -24,7 +24,7 @@ export default class extends Component {
     LoveConquersAllThumb,
     MakeMagicThumb,
     GoodTimesThumb,
-    MoreThanWeKnowThumb
+    MoreThanWeKnowThumb,
   ];
   get coverThumbsToShow() {
     return this.coverThumbs.slice(0, this.numToShow);

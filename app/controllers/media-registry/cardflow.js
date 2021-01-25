@@ -11,7 +11,11 @@ import loveNeverDiesCoverThumb from '@cardstack/boxel/images/media-registry/cove
 import animalsCoverThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Animals.jpg';
 export default class MediaRegistryCardflowController extends MediaRegistryController {
   @tracked isolatedCollection = this.getIsolatedCollection(this.catalog.id);
-  @tracked currentMilestone = this.model.currentOrg.queueCards ? this.milestones.filter(el => el.pct === this.model.currentOrg.queueCards[0].progressPct)[0] : null;
+  @tracked currentMilestone = this.model.currentOrg.queueCards
+    ? this.milestones.filter(
+        (el) => el.pct === this.model.currentOrg.queueCards[0].progressPct
+      )[0]
+    : null;
   @tracked displayCatalogModal = false;
   @tracked displayItemModal = false;
   @tracked record = null;
@@ -26,9 +30,9 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
       changeIsGoodCoverThumb,
       fullMoonCoverThumb,
       loveNeverDiesCoverThumb,
-      animalsCoverThumb
-    ]
-  }
+      animalsCoverThumb,
+    ],
+  };
 
   get projectTitle() {
     return this.model.currentOrg.queueCards[0].title;
@@ -39,7 +43,7 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
     if (!val) {
       this.currentMilestone = this.milestones[0];
     }
-    this.currentMilestone = this.milestones.filter(el => {
+    this.currentMilestone = this.milestones.filter((el) => {
       if (el.pct === val) {
         set(el, 'current', true);
         return el;
@@ -51,7 +55,10 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
 
   @action
   mockStep(val) {
-    if (val.id === 'crd_records' && (!this.currentMilestone || this.currentMilestone.pct < 40)) {
+    if (
+      val.id === 'crd_records' &&
+      (!this.currentMilestone || this.currentMilestone.pct < 40)
+    ) {
       this.updateProgress(40);
     } else {
       return;
@@ -64,7 +71,10 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
     this.mockStep(val);
 
     if (this.model.id !== val.id) {
-      if (currentRouteName === 'media-registry.agreements' || currentRouteName === 'media-registry.cardflow') {
+      if (
+        currentRouteName === 'media-registry.agreements' ||
+        currentRouteName === 'media-registry.cardflow'
+      ) {
         return this.transitionToRoute(currentRouteName, val.id);
       }
     }
@@ -75,7 +85,7 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
   @action
   async getIsolatedCollection(collectionId) {
     const records = await fetchCollection('all_tracks_combined');
-    let tracks = records.filter(item => {
+    let tracks = records.filter((item) => {
       if (item.collection_ids) {
         return item.collection_ids.includes(collectionId);
       }
@@ -92,19 +102,19 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
       listFields: [
         {
           name: 'Release Title',
-          valuePath: 'album'
+          valuePath: 'album',
         },
         {
           name: 'Release Type',
-          valuePath: 'type_of_album'
+          valuePath: 'type_of_album',
         },
         {
           name: 'Genre',
-          valuePath: 'genre'
+          valuePath: 'genre',
         },
         {
           name: 'Length',
-          valuePath: 'length'
+          valuePath: 'length',
         },
       ],
       columns: [
@@ -144,12 +154,12 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
           name: 'Length',
           valuePath: 'length',
           width: 250,
-          sortType: 'numeric'
+          sortType: 'numeric',
         },
         {
           width: 0,
           isFixed: 'right',
-          isSortable: false
+          isSortable: false,
         },
       ],
     };
@@ -157,33 +167,39 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
 
   @action
   async getRecord(itemId) {
-    if (!itemId) { return; }
+    if (!itemId) {
+      return;
+    }
 
     const records = await fetchCollection('all_tracks_combined');
     const profiles = await fetchCollection('profiles');
     const musicalWorks = await fetchCollection('musical-works');
 
-    const record = records.find(item => item.id === itemId);
-    if (!record) { return; }
+    const record = records.find((item) => item.id === itemId);
+    if (!record) {
+      return;
+    }
 
     if (record.collection_ids) {
       const collections = this.model.collection;
-      const catalogs = collections.filter(el => record.collection_ids.includes(el.id));
+      const catalogs = collections.filter((el) =>
+        record.collection_ids.includes(el.id)
+      );
       record.collections = catalogs;
     }
 
     if (record.artist_id) {
-      const artists = profiles.filter(el => el.id === record.artist_id);
+      const artists = profiles.filter((el) => el.id === record.artist_id);
       record.artists = artists;
     }
 
     if (record.producer_id) {
-      const producers = profiles.filter(el => el.id === record.producer_id);
+      const producers = profiles.filter((el) => el.id === record.producer_id);
       record.producers = producers;
     }
 
     if (record.iswc_id) {
-      const work = musicalWorks.find(el => el.iswc === record.iswc_id);
+      const work = musicalWorks.find((el) => el.iswc === record.iswc_id);
       record.musicalWork = work;
     }
 
@@ -191,7 +207,9 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
   }
 
   get album() {
-    if (!this.record || !this.record.album) { return null; }
+    if (!this.record || !this.record.album) {
+      return null;
+    }
     return {
       type: this.record.type_of_album,
       title: this.record.album,
@@ -199,19 +217,22 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
       fields: [
         {
           title: 'primary artist',
-          value: this.record.artist
+          value: this.record.artist,
         },
         {
           title: 'label',
-          value: this.record.owner
-        }
-      ]
-    }
+          value: this.record.owner,
+        },
+      ],
+    };
   }
 
   @action
   transitionToProduct() {
-    this.transitionToRoute('media-registry.products.album', formatId(this.record.album));
+    this.transitionToRoute(
+      'media-registry.products.album',
+      formatId(this.record.album)
+    );
   }
 
   @action
@@ -242,21 +263,28 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
 
   @action
   closeItem() {
-    this.displayItemModal= false;
+    this.displayItemModal = false;
   }
 
   @action
   async search(query) {
     let isolatedCollection = this.isolatedCollection;
-    if (!isolatedCollection || !isolatedCollection.collection || !isolatedCollection.columns) { return; }
+    if (
+      !isolatedCollection ||
+      !isolatedCollection.collection ||
+      !isolatedCollection.columns
+    ) {
+      return;
+    }
 
     let { collection, columns } = this.isolatedCollection;
     if (isBlank(query)) {
       return collection;
     } else {
       let lowerQuery = query.toLowerCase();
-      return collection.filter(i =>
-        columns.some(c =>
+      return collection.filter((i) =>
+        columns.some(
+          (c) =>
             c.isSearchable !== false &&
             c.valuePath &&
             !isBlank(i[c.valuePath]) &&
@@ -269,9 +297,18 @@ export default class MediaRegistryCardflowController extends MediaRegistryContro
   @action
   async sort(column, direction) {
     let isolatedCollection = this.isolatedCollection;
-    if (!isolatedCollection || !isolatedCollection.collection || !isolatedCollection.columns) { return; }
+    if (
+      !isolatedCollection ||
+      !isolatedCollection.collection ||
+      !isolatedCollection.columns
+    ) {
+      return;
+    }
 
-    let multiplier = (direction === 'asc') ? 1 : -1;
-    return this.isolatedCollection.collection.sort((a, b) => multiplier * compare(get(a, column.valuePath), get(b, column.valuePath)));
+    let multiplier = direction === 'asc' ? 1 : -1;
+    return this.isolatedCollection.collection.sort(
+      (a, b) =>
+        multiplier * compare(get(a, column.valuePath), get(b, column.valuePath))
+    );
   }
 }

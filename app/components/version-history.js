@@ -30,18 +30,18 @@ export default class VersionHistory extends Component {
   }
 
   get baseCardContent() {
-    return this.versions.filter(item => item.id === this.baseCard)[0];
+    return this.versions.filter((item) => item.id === this.baseCard)[0];
   }
 
   get compCardContent() {
-    return this.versions.filter(item => item.id === this.comparisonCard)[0];
+    return this.versions.filter((item) => item.id === this.comparisonCard)[0];
   }
 
   @action
   setPositions() {
     for (let v of this.versions) {
       set(v, 'position', `p${this.selected - v.id}`);
-      if ((this.selected - v.id) < 0 ) {
+      if (this.selected - v.id < 0) {
         set(v, 'stackedFront', true);
       } else {
         set(v, 'stackedFront', false);
@@ -73,7 +73,10 @@ export default class VersionHistory extends Component {
 
   @action
   setComparison(v) {
-    if (this.baseCard && this.baseCard === v || this.comparisonCard && this.comparisonCard === v) {
+    if (
+      (this.baseCard && this.baseCard === v) ||
+      (this.comparisonCard && this.comparisonCard === v)
+    ) {
       this.reset();
     } else if (this.baseCard) {
       if (this.baseCard < v) {
@@ -101,14 +104,21 @@ export default class VersionHistory extends Component {
     this.removedCards = [];
     this.modifiedCard = {};
 
-    let baseCard = this.versions.filter(v => v.id === this.baseCard)[0];
-    let comparisonCard = this.versions.filter(v => v.id === this.comparisonCard)[0];
-    this.comparison(baseCard.card_model.fields, comparisonCard.card_model.fields);
+    let baseCard = this.versions.filter((v) => v.id === this.baseCard)[0];
+    let comparisonCard = this.versions.filter(
+      (v) => v.id === this.comparisonCard
+    )[0];
+    this.comparison(
+      baseCard.card_model.fields,
+      comparisonCard.card_model.fields
+    );
   }
 
   @action
   comparison(baseCard, compCard) {
-    let [ json1, json2 ] = [ baseCard, compCard ].map(data => JSON.stringify(data));
+    let [json1, json2] = [baseCard, compCard].map((data) =>
+      JSON.stringify(data)
+    );
 
     if (json1 === json2) {
       return;
@@ -123,20 +133,24 @@ export default class VersionHistory extends Component {
         if (field === f) {
           if (baseCard[field] === null && compCard[field] !== null) {
             this.removedValues.push(field);
-          }
-
-          else if (compCard[field] === null && baseCard[field] !== null) {
+          } else if (compCard[field] === null && baseCard[field] !== null) {
             this.addedValues.push(field);
-          }
-
-          else if (JSON.stringify(compCard[field]) !== JSON.stringify(baseCard[field])) {
-            if (typeof compCard[field] === "object" || typeof baseCard[field] === "object") {
-              this.compareCollections(baseCard[field].value || baseCard[field], compCard[field].value || compCard[field]);
+          } else if (
+            JSON.stringify(compCard[field]) !== JSON.stringify(baseCard[field])
+          ) {
+            if (
+              typeof compCard[field] === 'object' ||
+              typeof baseCard[field] === 'object'
+            ) {
+              this.compareCollections(
+                baseCard[field].value || baseCard[field],
+                compCard[field].value || compCard[field]
+              );
             } else {
               this.changedFields.push({
                 title: field,
                 oldValue: compCard[field],
-                value: baseCard[field]
+                value: baseCard[field],
               });
             }
           }
@@ -155,13 +169,16 @@ export default class VersionHistory extends Component {
   compareCollections(baseCollection, compCollection) {
     if (typeof baseCollection !== 'object') {
       if (!compCollection.length) {
-        return this.changedCards.push({ value: baseCollection, oldValue: compCollection });
+        return this.changedCards.push({
+          value: baseCollection,
+          oldValue: compCollection,
+        });
       } else {
-        for(const card of compCollection) {
+        for (const card of compCollection) {
           return this.changedCards.push({
             id: card.id,
             oldValue: card,
-            value: baseCollection
+            value: baseCollection,
           });
         }
       }
@@ -169,13 +186,16 @@ export default class VersionHistory extends Component {
 
     if (typeof compCollection !== 'object') {
       if (!baseCollection.length) {
-        return this.changedCards.push({ value: baseCollection, oldValue: compCollection });
+        return this.changedCards.push({
+          value: baseCollection,
+          oldValue: compCollection,
+        });
       } else {
-        for(const card of baseCollection) {
+        for (const card of baseCollection) {
           return this.changedCards.push({
             id: card.id,
             oldValue: compCollection,
-            value: card
+            value: card,
           });
         }
       }
@@ -191,21 +211,25 @@ export default class VersionHistory extends Component {
             return this.changedCards.push({
               id: card.id,
               oldCard: compCollection[i],
-              value: card
+              value: card,
             });
           }
         });
       }
 
       for (let card of baseCollection) {
-        let isPresent = compCollection.find(el => el.id === card.id) ? true : false;
+        let isPresent = compCollection.find((el) => el.id === card.id)
+          ? true
+          : false;
         if (!isPresent) {
           this.addedCards.push(card);
         }
       }
 
       for (let card of compCollection) {
-        let isPresent = baseCollection.find(el => el.id === card.id) ? true : false;
+        let isPresent = baseCollection.find((el) => el.id === card.id)
+          ? true
+          : false;
         if (!isPresent) {
           this.removedCards.push(card);
         }
@@ -214,7 +238,7 @@ export default class VersionHistory extends Component {
       if (JSON.stringify(baseCollection) !== JSON.stringify(compCollection)) {
         this.modifiedCard = {
           value: baseCollection,
-          oldValue: compCollection
+          oldValue: compCollection,
         };
       } else {
         return;
@@ -223,28 +247,28 @@ export default class VersionHistory extends Component {
   }
 
   @action
-  * transition({ keptSprites }) {
+  *transition({ keptSprites }) {
     for (let sprite of keptSprites) {
       parallel(move(sprite), resize(sprite));
     }
   }
 
   @action
-  * adjustOpacity({ keptSprites }) {
+  *adjustOpacity({ keptSprites }) {
     for (let sprite of keptSprites) {
       parallel(move(sprite), scale(sprite), adjustCSS('opacity', sprite));
     }
   }
 
   @action
-  * outerContent({ keptSprites }) {
+  *outerContent({ keptSprites }) {
     for (let sprite of keptSprites) {
       parallel(move(sprite), resize(sprite), adjustCSS('font-size', sprite));
     }
   }
 
   @action
-  * innerContent({ keptSprites }) {
+  *innerContent({ keptSprites }) {
     for (let sprite of keptSprites) {
       parallel(move(sprite), scale(sprite));
     }

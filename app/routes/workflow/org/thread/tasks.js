@@ -7,7 +7,7 @@ export default class WorkflowOrgThreadTasksRoute extends Route {
     return {
       user,
       thread,
-      participants
-    }
+      participants,
+    };
   }
 }

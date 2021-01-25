@@ -1,3 +1,5 @@
+/* eslint-disable ember/no-side-effects */
+
 import Controller from '@ember/controller';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
@@ -8,7 +10,9 @@ export default class MediaRegistryVersionController extends Controller {
 
   get item() {
     let masterDetail = this.model;
-    if (masterDetail.version) { this.version = masterDetail.version; }
+    if (masterDetail.version) {
+      this.version = masterDetail.version;
+    }
     return masterDetail;
   }
 
@@ -19,6 +23,8 @@ export default class MediaRegistryVersionController extends Controller {
 
   @action
   transitionToCatalog(id) {
-    this.transitionToRoute('media-registry.collection', id, { queryParams: { version: this.model.version } });
+    this.transitionToRoute('media-registry.collection', id, {
+      queryParams: { version: this.model.version },
+    });
   }
 }

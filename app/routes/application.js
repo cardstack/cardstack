@@ -4,10 +4,9 @@ import '@cardstack/boxel/css/boxel.js';
 export default class ApplicationRoute extends Route {
   title(tokens) {
     if (tokens) {
-      return tokens.reverse().join(" - ");
+      return tokens.reverse().join(' - ');
     } else {
-      return "Boxel";
+      return 'Boxel';
     }
   }
-
 }
