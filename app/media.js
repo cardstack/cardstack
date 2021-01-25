@@ -1,5 +1,4 @@
 // import ENV from './config/environment';
-// import fetch from 'fetch';
 import RSVP from 'rsvp';
 import allTracksCombined from './data/fixtures/media-registry/api/all_tracks_combined';
 import bunnyRecordsCollection from './data/fixtures/media-registry/api/bunny_records_collections';

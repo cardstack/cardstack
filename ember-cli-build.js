@@ -5,6 +5,9 @@ const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 
 module.exports = function (defaults) {
   let app = new EmberApp(defaults, {
+    'ember-fetch': {
+      preferNative: true,
+    },
     /*
       Leave jQuery out of this addon's own test suite & dummy app by default,
       so that the addon can be used in apps without jQuery. If you really need
