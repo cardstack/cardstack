@@ -1,14 +1,10 @@
 import Component from '@glimmer/component';
 import "./style.css";
 import { action } from '@ember/object';
+import { reads } from 'macro-decorators';
 export default class extends Component {
-  get size() {
-    return this.args.size || 80;
-  }
-
-  get maxWidth() {
-    return this.args.maxWidth || 190;
-  }
+  @reads('args.size', 80) size;
+  @reads('args.maxWidth', 190) maxWidth;
 
   get coverArtSpacing() {
     let { maxWidth, args: { covers }} = this;

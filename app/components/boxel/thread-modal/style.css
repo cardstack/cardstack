@@ -1,0 +1,12 @@
+.thread-modal {
+  --modal-max-width: 1030px;
+  --modal-offset-left: 30px;
+}
+
+.thread-modal--full-width {
+  --modal-max-width: 100%;
+}
+
+.thread-modal > .thread-modal__inner {
+  height: calc(100% - 60px);
+}

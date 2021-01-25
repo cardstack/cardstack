@@ -1,131 +1,68 @@
-<CardPlatter @class="cardflow">
-  <header class="cardflow__header">
-    {{#if (eq this.project.status "unread")}}
-      <div class="cardflow__notification">1</div>
-    {{/if}}
-    <div>
-      <div class="cardflow__label">{{this.thread.project}}</div>
-      <h2 class="cardflow__title">{{or this.thread.description this.thread.title}}</h2>
-    </div>
-    <div class="cardflow__header-participants">
-      <span>{{this.participants.length}} {{svg-jar "users" width="15px" height="13px"}}</span>
-      <div class="cardflow__header-participant-icons">
-        {{#each this.participants as |user|}}
-          <div class="cardflow__header-participant-img" style={{css-url "background-image" user.imgURL}} />
-        {{/each}}
+<Boxel::Thread class="cardflow">
+  <:header>
+    <Boxel::ThreadHeader
+      class="cardflow__header"
+      @title={{or this.thread.description this.thread.title}}
+      @label={{this.thread.project}}
+      @notifications={{if (eq this.thread.status "unread") (array "notif") null}}
+      @participants={{this.participants}}
+    />
+  </:header>
+
+  <:taskbar>
+    <Taskbar
+      @tasksRoute={{@tasksRoute}}
+      @activeTasks={{@activeTasks}}
+      @userTasks={{@userTasks}}
+      @assignedTasks={{@assignedTasks}}
+    />
+  </:taskbar>
+
+  <:content>
+    {{#each @model.posts as |post|}}
+      <Boxel::ThreadMessage
+        @senderName={{post.sender.title}}
+        @senderImage={{post.sender.imgURL}}
+        @content={{post.content}}
+        @datetime={{post.datetime}}
+        @hasLogo={{eq post.participantType "bot"}}
+      >
+      </Boxel::ThreadMessage>
+    {{/each}}
+
+    {{!-- TODO: Extract component - Reply to message box --}}
+    {{#if (includes @model.user.id @model.thread.participant_ids)}}
+      <div class="cardflow__message">
+        <div class="cardflow__message-icon__profile" style={{css-url "background-image" @model.user.imgURL}} />
+        <Input @class="cardflow__reply-to field-renderer__input" @placeholder="Post a message to this thread"></Input>
       </div>
-    </div>
-  </header>
-
-  {{!-- Main Area --}}
-  <div>
-    {{#if (and @activeTasks @tasksRoute)}}
-      <LinkTo @route={{@tasksRoute}} @class="cardflow__taskbar">
-        <div class="cardflow__taskbar-count">{{@activeTasks.length}} {{#if (eq this.activeTasks.length 1)}}task{{else}}tasks{{/if}} for this workflow</div>
-        {{#if @userTasks}}
-          <div class="cardflow__taskbar-label">
-            {{@userTasks.length}} assigned to me
-          </div>
-        {{/if}}
-        {{#if @assignedTasks}}
-          <div class="cardflow__taskbar-label cardflow__taskbar-label--assigned">
-            {{@assignedTasks.length}} pending action
-          </div>
-        {{/if}}
-      </LinkTo>
     {{/if}}
+  </:content>
 
-    <div class="cardflow__thread">
-      {{#each @model.posts as |post|}}
-        <div class="cardflow__message">
-          <div class="cardflow__message-icon__profile cardflow__message-icon__profile--{{post.participantType}}" style={{css-url "background-image" post.sender.imgURL}} />
-          <div class="cardflow__message-info">
-            <div class="cardflow__message-sender">{{post.sender.title}}</div>
-            <time class="cardflow__message-time">{{moment-format post.datetime "MMM D, h:m A"}}</time>
-            <div class="cardflow__message-sender-role">{{if (eq post.participantType "bot") "Bot" post.sender.role}}</div>
-          </div>
-          <div />
-          <div class="cardflow__message-content">
-            {{post.content}}
-          </div>
-        </div>
-      {{/each}}
-
-      {{!-- Reply to message box --}}
-      {{#if (includes @model.user.id @model.thread.participant_ids)}}
-        <div class="cardflow__message">
-          <div class="cardflow__message-icon__profile" style={{css-url "background-image" @model.user.imgURL}} />
-          <Input @class="cardflow__reply-to field-renderer__input" @placeholder="Post a message to this thread"></Input>
-        </div>
-      {{/if}}
-    </div>
-  </div>
-
-  {{!-- Right Sidebar --}}
-  <aside class="cardflow__sidebar">
+  <:sidebar>
     {{#if @model.workflow}}
-      {{!-- Progress Pie --}}
-      <CardPlatter @class="cardflow-platter">
-        <section class="cardflow__sidebar-section">
-          <h3 class="cardflow__sidebar-title">Workflow Progress</h3>
-          <div class="cardflow__progress">
-            <Boxel::ProgressCircle
-              @size={{120}}
-              @fractionComplete={{div this.milestone.pct 100}}
-            />
-            <div class="cardflow__progress-status">{{this.milestone.description}}</div>
-          </div>
-        </section>
-
-        {{!-- Milestones --}}
-        <section class="cardflow__sidebar-section">
-          <h3 class="cardflow__sidebar-title">{{@model.workflow.title}}</h3>
-          <ul class="cardflow__checklist">
-            {{#each @model.workflow.milestones as |milestone i|}}
-              <li class="cardflow__checklist-item {{if (gt this.milestoneId (add i 1)) "completed"}} {{if (eq this.milestoneId (add i 1)) "current"}}">
-                {{svg-jar (if (gt this.milestoneId (add i 1)) "check-mark" "checklist-circle") width="16px" height="16px"}}
-                {{milestone.title}}
-                {{!-- <br><span class="cardflow__checklist-time">12h ago</span> --}}
-              </li>
-            {{/each}}
-          </ul>
-        </section>
-      </CardPlatter>
+      <Boxel::ProgressBox
+        @title={{@model.workflow.title}}
+        @status={{this.progressStatus}}
+        @milestones={{@model.workflow.milestones}}
+        @completedCount={{this.progress}}
+      />
     {{/if}}
 
-    {{!-- Participants Box --}}
-    <CardPlatter @class="cardflow-platter">
-      <section class="cardflow__sidebar-section cardflow__sidebar-section--participants">
-        <h3 class="cardflow__sidebar-title">Participants</h3>
+    <Boxel::ParticipantsBox>
+      <:list>
         {{#if this.otherParticipants}}
-          <ul class="cardflow__participants">
-            {{#each this.otherParticipants as |participant|}}
-              <li class="cardflow__participant">
-                <div class="cardflow__participant-img" style={{css-url "background-image" participant.imgURL}} />
-                <div class="cardflow__participant-title">
-                  {{participant.title}}
-                  <div class="cardflow__participant-role">{{participant.role}}</div>
-                </div>
-              </li>
-            {{/each}}
-          </ul>
+          <Boxel::ParticipantList
+            @participants={{this.otherParticipants}}
+          />
         {{/if}}
-        <ul class="cardflow__participants">
-          <li class="cardflow__participant cardflow__participant-org">
-            <div class="cardflow__participant-org-img" style={{css-url "background-image" this.org.imgURL}} />
-            <div class="cardflow__participant-org-title">{{this.org.title}}</div>
-          </li>
-          {{#each this.participatingOrgMembers as |participant|}}
-            <li class="cardflow__participant">
-              <div class="cardflow__participant-img" style={{css-url "background-image" participant.imgURL}} />
-              <div class="cardflow__participant-title">
-                {{participant.title}}
-                <div class="cardflow__participant-role">{{participant.role}}</div>
-              </div>
-            </li>
-          {{/each}}
-        </ul>
-      </section>
-    </CardPlatter>
-  </aside>
-</CardPlatter>
+        {{#if this.participatingOrgMembers}}
+          <Boxel::ParticipantList
+            @participants={{this.participatingOrgMembers}}
+          />
+        {{/if}}
+      </:list>
+    </Boxel::ParticipantsBox>
+  </:sidebar>
+
+</Boxel::Thread>

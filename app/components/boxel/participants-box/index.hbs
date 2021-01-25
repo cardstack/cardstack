@@ -1,0 +1,18 @@
+<section class="participants-box" ...attributes>
+  <h3 class="participants-box__title">
+    Participants
+  </h3>
+
+  <section class="participants-box__participants">
+    {{yield to="list"}}
+  </section>
+
+  {{#if @addAction}}
+    <button {{on "click" (optional @addAction)}} class="participant-list__add-button">
+      <span class="participant-list__add-button-icon">
+        {{svg-jar "plus" width="11px" height="11px"}}
+      </span>
+      <span>Add participant</span>
+    </button>
+  {{/if}}
+</section>

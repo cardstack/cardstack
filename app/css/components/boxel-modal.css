@@ -33,4 +33,5 @@
   height: 100vh;
   max-width: var(--modal-max-width);
   margin: 0 auto;
+  transition: max-width var(--boxel-transition);
 }

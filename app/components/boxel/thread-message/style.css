@@ -1,0 +1,35 @@
+.thread-message {
+  --icon-size: 40px;
+}
+
+.thread-message > .thread-message__participant {
+  display: grid;
+  grid-template-columns: var(--icon-size) auto 1fr;
+  gap: var(--boxel-spacing);
+  align-items: start;
+  height: 20px;
+}
+
+.thread-message > .thread-message__participant h4 {
+  font-size: var(--boxel-font-size-sm);
+  letter-spacing: var(--boxel-lsp);
+}
+
+.thread-message__time {
+  color: var(--boxel-purple-400);
+  font: var(--boxel-font-xs);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-lg);
+}
+
+.thread-message__content {
+  margin-left: calc(var(--icon-size) + var(--boxel-spacing));
+  font-size: 0.9375rem; /* 15px */
+  line-height: calc(23/15);
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.thread-message__content > p {
+  margin-top: 1px;
+  margin-bottom: 30px;
+}

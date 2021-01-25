@@ -1,0 +1,63 @@
+<FreestyleAnnotation @slug="thread-message">
+  <ul>
+    <li><code>@senderName</code> (string)</li>
+    <li><code>@senderImage</code> (string) — Defaults to profile placeholder icon. If <code>@hasLogo</code> is true, defaults to Cardbot icon.</li>
+    <li><code>@contents</code> (string array)</li>
+    <li><code>@content</code> (string)</li>
+    <li><code>@iconSize</code> (integer) — Size of the icon. Default is 40px.</li>
+    <li><code>@hasLogo</code> (boolean) — Logo has different styling.</li>
+    <li><code>@datetime</code> (datetime) — Message timestamp. Defaults to <code>now</code>.</li>
+  </ul>
+  {{!-- TODOs / Improvements: Use user initials instead of placeholder icon. --}}
+  <p>
+    Using with <code>@contents</code> will display messages in the array in an animated way.
+  </p>
+</FreestyleAnnotation>
+
+<FreestyleUsage @slug="thread-message">
+  <Boxel::ThreadMessage
+    @contents={{array
+      "Hello, it’s nice to see you!"
+      "Let’s issue a Prepaid Card."
+      "First, you can choose the look and feel of your card, so that your customers and other users recognize that this Prepaid Card came from you."
+    }}
+    @hasLogo={{true}}
+    @datetime="2020-03-07T10:11"
+  />
+</FreestyleUsage>
+
+<FreestyleAnnotation @slug="thread-message-with-logo">
+  Using with uploaded <code>@logo</code>:
+</FreestyleAnnotation>
+
+<FreestyleUsage @slug="thread-message-with-logo">
+  <Boxel::ThreadMessage
+    @senderName="Home Sweet Home"
+    @senderImage={{this.HSHIcon}}
+    @content="You have placed an order for an item that requires a manual inventory check. Your credit card has not been charged. If the products are in stock, we will reserve them for you and proceed to the payment process. You will receive status updates via email and in this thread."
+    @hasLogo={{true}}
+  />
+</FreestyleUsage>
+
+<FreestyleAnnotation @slug="thread-message-with-content">
+  Using with <code>@content</code>:
+</FreestyleAnnotation>
+
+<FreestyleUsage @slug="thread-message-with-content">
+  <Boxel::ThreadMessage
+    @senderName="Lola Sampson"
+    @senderImage={{this.LolaSampsonThumb}}
+    @content="Hi Haley, Here’s your manuscript with all the edits I would recommend. Please review and let me know if you have any questions. I also added a couple tasks for you about things you should think about, as you figure out the rest of your story."
+  />
+</FreestyleUsage>
+
+<FreestyleAnnotation @slug="thread-message-no-image">
+  Without sender image:
+</FreestyleAnnotation>
+
+<FreestyleUsage @slug="thread-message-with-content">
+  <Boxel::ThreadMessage
+    @senderName="Lola Sampson"
+    @content="Hi Haley, Here’s your manuscript with all the edits I would recommend. Please review and let me know if you have any questions. I also added a couple tasks for you about things you should think about, as you figure out the rest of your story."
+  />
+</FreestyleUsage>

@@ -1,0 +1,25 @@
+{{#let (or @iconOnly (not @title)) as |iconOnly|}}
+  <div
+    class={{cn
+      "participant"
+      participant__icon-only=iconOnly
+      participant__has-logo=@hasLogo
+    }}
+    style={{css-var icon-size=(concat this.iconSize "px")}}
+    ...attributes
+  >
+    <div class="participant__image" style={{css-url "background-image" @image}} />
+    {{#unless iconOnly}}
+      <div>
+        <h4 class="participant__title">
+          {{@title}}
+        </h4>
+        <p class="participant__description">
+          {{@description}}
+        </p>
+      </div>
+    {{/unless}}
+
+    {{yield}}
+  </div>
+{{/let}}

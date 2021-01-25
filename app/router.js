@@ -47,6 +47,9 @@ Router.map(function() {
         });
       });
     });
+    this.route('card-pay', { resetNamespace: true }, function() {
+      this.route('workflow', { path: '/:workflowId' });
+    });
   });
 });
 

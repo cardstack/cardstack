@@ -1,19 +1,20 @@
 import Component from '@glimmer/component';
-import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
-
 
 export default class CardflowComponent extends Component {
-  @tracked progress;
-  @tracked actionSteps = this.args.actionSteps;
-  @tracked lastUpdated = this.args.lastUpdated;
-
   get user() {
     return this.args.model.user;
   }
 
   get thread() {
     return this.args.model.thread;
+  }
+
+  get milestones() {
+    if (!this.args.model.workflow || !this.args.model.workflow.milestones) {
+      return null;
+    }
+
+    return this.args.model.workflow.milestones;
   }
 
   get participants() {
@@ -25,9 +26,8 @@ export default class CardflowComponent extends Component {
   }
 
   get participatingOrgMembers() {
-    if (!this.participants || !this.participants.length) { return null; }
-    if (!this.org) { return null; }
-    return this.participants.filter(el => el.org_ids && el.org_ids.includes(this.org.id));
+    let [...members] = this.participants.filter(el => el.org_ids && el.org_ids.includes(this.org.id));
+    return [this.org, ...members];
   }
 
   get otherParticipants() {
@@ -39,37 +39,57 @@ export default class CardflowComponent extends Component {
   }
 
   get milestone() {
-    return this._getProgress();
-  }
-
-  get milestoneId() {
-    if (!this.milestone || !this.milestone.id) { return null; }
-    return Number(this.milestone.id);
-  }
-
-  get progressPct() {
-    if (!this.milestone || !this.milestone.pct) { return 0; }
-    return Number(this.milestone.pct) / 100;
-  }
-
-  _getProgress() {
-    if (this.thread.isCancelled) {
-      return {
-        "description": "Cancelled"
-      };
+    if (!this.milestones || !this.thread || !this.thread.currentMilestone) {
+      return null;
     }
-    if (this.thread.isCompleted || this.thread.progressPct === "100") {
-      return this.args.model.workflow.completion;
+
+    return this.milestones.find(el => el.title === this.thread.currentMilestone);
+  }
+
+  get progress() {
+    if (this.thread.isComplete) {
+      return this.milestones.length;
     }
-    return this.progress ? this.progress : this.args.model.workflow.milestones.find(el => el.pct === this.thread.progressPct);
+
+    if (!this.milestone) {
+      return null;
+    }
+
+    let index = this.milestones.findIndex(el => el.id === this.milestone.id);
+    if (index < 0) {
+      return null;
+    }
+
+    return index;
   }
 
-  _setProgress(val) {
-    this.progress = val;
-  }
+  get progressStatus() {
+    if (this.thread && this.thread.isCancelled) {
+      return "Cancelled";
+    }
 
-  @action
-  setProgress(val) {
-    this.args.updateProgress(val);
+    if (this.thread && this.thread.isComplete) {
+      if (this.milestone) {
+        return this.milestone.statusOnCompletion || "Completed";
+      }
+
+      if (this.milestones && this.milestones.length) {
+        let lastMilestone = this.milestones[this.milestones.length - 1];
+        return lastMilestone.statusOnCompletion || "Completed";
+      }
+
+      return "Completed";
+    }
+
+    if (!this.milestone || !this.milestones || !this.thread) {
+      return null;
+    }
+
+    if (this.progress === 0) {
+      return 'Workflow started';
+    }
+
+    let previousMilestone = this.args.model.workflow.milestones[this.progress - 1];
+    return previousMilestone ? previousMilestone.statusOnCompletion : null;
   }
 }

@@ -1,0 +1,45 @@
+.participant {
+  --icon-size: 30px;
+
+  display: grid;
+  grid-template-columns: var(--icon-size) 1fr;
+  gap: 0 12px;
+  align-items: center;
+  font: var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-lg);
+}
+
+.participant__icon-only {
+  display: inline-block;
+}
+
+.participant__image {
+  justify-self: center;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  background-image: url('../../../images/media-registry/placeholders/profile.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 100px;
+}
+
+.participant__has-logo .participant__image {
+  border-radius: initial;
+  background-image: url('../../../images/icons/cardbot-lg.svg');
+}
+
+.participant__title {
+  font-weight: 600;
+}
+
+.participant__has-logo .participant__title {
+  margin: 0;
+  font: var(--boxel-font-sm);
+  font-weight: 600;
+}
+
+.participant__description {
+  margin: 0;
+  color: var(--boxel-purple-400);
+}

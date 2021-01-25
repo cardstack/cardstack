@@ -11,21 +11,21 @@
     /> ({{this.size}})
   </div>
   <div>
-    @fractionComplete (Number) completeness from 0 to 1.
+    @percentComplete (Number) completeness from 0 to 100.
     <input
       type="range"
       min={{0}}
-      max={{1}}
-      step={{0.001}}
-      value={{this.fractionComplete}}
-      {{on 'input' (pick 'target.value' (fn (mut this.fractionComplete)))}}
-    /> ({{this.fractionComplete}})
+      max={{100}}
+      step={{1}}
+      value={{this.percentComplete}}
+      {{on 'input' (pick 'target.value' (fn (mut this.percentComplete)))}}
+    /> ({{this.percentComplete}})
   </div>
 </FreestyleAnnotation>
 
 <FreestyleUsage @slug="progress-circle">
   <Boxel::ProgressCircle
     @size={{this.size}}
-    @fractionComplete={{this.fractionComplete}}
+    @percentComplete={{this.percentComplete}}
   />
 </FreestyleUsage>

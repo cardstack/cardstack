@@ -1,0 +1,96 @@
+<FreestyleAnnotation @slug="participant">
+  <ul>
+    <li><code>@title</code> (string)</li>
+    <li><code>@description</code> (string)</li>
+    <li><code>@image</code> (url string) — Defaults to generic profile icon.</li>
+    <li><code>@iconSize</code> (integer) — Height and width of the image. Default is 30px.</li>
+    <li><code>@iconOnly</code> (boolean) — If true, displays the icon only. Defaults to false.</li>
+    <li><code>@hasLogo</code> (boolean) — If true, alternative styling is applied. Defaults to false.</li>
+  </ul>
+
+  <div>
+    @iconSize
+    <input
+      type="range"
+      min={{25}}
+      max={{80}}
+      step={{1}}
+      value={{this.iconSize}}
+      {{on 'input' (pick 'target.value' (fn (mut this.iconSize)))}}
+    /> ({{this.iconSize}}px)
+  </div>
+</FreestyleAnnotation>
+
+<FreestyleUsage @slug="participant">
+  <Boxel::Participant
+    @title="Haley O’Connell"
+    @description="Writer"
+    @image={{this.HaileyImage}}
+    @iconSize={{this.iconSize}}
+  />
+</FreestyleUsage>
+
+<FreestyleAnnotation @slug="participant-no-attr">
+  Placeholder usage without any attributes.
+</FreestyleAnnotation>
+
+<FreestyleUsage @slug="participant-no-attr">
+  <Boxel::Participant />
+</FreestyleUsage>
+
+<FreestyleAnnotation @slug="participant-no-image">
+  Participant does not have an <code>@image</code>.
+</FreestyleAnnotation>
+
+<FreestyleUsage @slug="participant-no-image">
+  <Boxel::Participant
+    @title="Carl Stack"
+    @description="Accountant"
+  />
+</FreestyleUsage>
+
+<FreestyleAnnotation @slug="participant-no-description">
+  Usage without <code>@description</code> attribute.
+</FreestyleAnnotation>
+
+<FreestyleUsage @slug="participant-no-description">
+  <Boxel::Participant
+    @title="Haley O’Connell"
+    @image={{this.HaileyImage}}
+  />
+</FreestyleUsage>
+
+<FreestyleAnnotation @slug="participant-icon-only">
+  Usage with <code>@iconOnly</code> attribute.
+</FreestyleAnnotation>
+
+<FreestyleUsage @slug="participant-icon-only">
+  <Boxel::Participant
+    @iconOnly={{true}}
+    @title="Haley O’Connell"
+    @description="Writer"
+    @image={{this.HaileyImage}}
+  />
+</FreestyleUsage>
+
+<FreestyleAnnotation @slug="participant-has-logo">
+  Usage with <code>@hasLogo</code> attribute.
+</FreestyleAnnotation>
+
+<FreestyleUsage @slug="participant-has-logo">
+  <Boxel::Participant
+    @title="Haley's Love Couch"
+    @description="Home store"
+    @image={{this.HLCLogo}}
+    @hasLogo={{true}}
+  />
+
+  <br>
+
+  <Boxel::Participant
+    @title="Home Sweet Home"
+    @image={{this.HSHLogo}}
+    @hasLogo={{true}}
+  />
+</FreestyleUsage>
+

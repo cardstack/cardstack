@@ -25,6 +25,5 @@ import './components/queue-card.css';
 import './components/queue.css';
 import './components/sidebar-related-card.css';
 import './components/version-history.css';
-import './components/workflow/cardflow.css';
-import './components/workflow/tasklist.css';
-import './components/workflow/tasklist-table.css';
+import './components/tasklist.css';
+import './components/tasklist-table.css';

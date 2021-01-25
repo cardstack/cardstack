@@ -1,0 +1,22 @@
+.participant-list {
+  --icon-size: 30px;
+  --column-size: calc(var(--icon-size, 30px) / 2);
+
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: inline-grid;
+  gap: 15px;
+}
+
+.participant-list__fanned {
+  grid-auto-flow: column;
+  grid-auto-columns: var(--column-size);
+  gap: 0;
+  direction: rtl;
+  padding-left: var(--column-size);
+}
+
+.participant-list__fanned .participant-list__participant > div {
+  border: 1px solid var(--boxel-light);
+}

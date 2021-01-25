@@ -1,0 +1,22 @@
+<FreestyleAnnotation @slug="progress-box">
+  <ul>
+    <li><code>@title</code> (string) — Title of the workflow. Defaults to "Workflow Progress".</li>
+    <li><code>@status</code> (string) — Latest milestone achieved or progress status description. Appears under the ProgressCircle.</li>
+    <li><code>@size</code> (integer) — Size of <code>Boxel::ProgressCircle</code>. Defaults to 120.</li>
+    <li><code>@milestones</code> (array) — Array of milestones.</li>
+    <li><code>@completedCount</code> (integer)</li>
+  </ul>
+  <p>
+    Combines <code>Boxel::Milestones</code> and <code>Boxel::ProgressCircle</code> components in a sidebar card format.
+  </p>
+</FreestyleAnnotation>
+
+<FreestyleUsage @slug="progress-box">
+  <Boxel::ProgressBox
+    @title="Customer Support"
+    @status="Products reserved"
+    @size={{@size}}
+    @milestones={{this.sampleMilestones}}
+    @completedCount={{2}}
+  />
+</FreestyleUsage>

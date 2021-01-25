@@ -1,0 +1,16 @@
+<ul class="milestones" ...attributes>
+  {{#each @milestones as |milestone i|}}
+    {{#let (gt @completedCount i) (eq @completedCount i) as |isCompleted isCurrent|}}
+      <li class={{cn "milestones__item" completed=isCompleted current=isCurrent}}>
+        <span class="milestones__item-grid">
+          <span class="milestones__item-bullet">
+            {{#if isCompleted}}
+              {{svg-jar "check-mark" width="10px" height="10px"}}
+            {{/if}}
+          </span>
+          <span>{{milestone.title}}</span>
+        </span>
+      </li>
+    {{/let}}
+  {{/each}}
+</ul>

@@ -1,0 +1,27 @@
+.date-divider {
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  height: var(--boxel-spacing);
+  margin-bottom: var(--boxel-spacing);
+}
+
+.date-divider__hr {
+  grid-row: 1;
+  grid-column: 1;
+  width: 100%;
+  border: none;
+  border-top: 1px solid var(--boxel-light-600);
+}
+
+.date-divider__date {
+  grid-row: 1;
+  grid-column: 1;
+  padding: 0 10px;
+  background-color: var(--boxel-light-300);
+  color: var(--boxel-purple-400);
+  font: var(--boxel-font-xs);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-lg);
+  text-align: center;
+}

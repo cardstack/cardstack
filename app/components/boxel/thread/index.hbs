@@ -1,0 +1,22 @@
+<section class="thread" ...attributes>
+  <div class="thread__sticky-container">
+    {{yield to="header"}}
+  </div>
+
+  <section class="thread__content-wrapper">
+    <div class="thread__scroll-wrapper">
+      <div class="thread__sticky-container">
+        {{yield to="taskbar"}}
+      </div>
+      <section class="thread__content">
+        {{yield to="content"}}
+      </section>
+    </div>
+
+    <div class="thread__scroll-wrapper">
+      <aside class="thread__sidebar">
+        {{yield to="sidebar"}}
+      </aside>
+    </div>
+  </section>
+</section>

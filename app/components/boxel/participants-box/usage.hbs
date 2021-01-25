@@ -1,0 +1,46 @@
+<FreestyleAnnotation @slug="progress-box">
+  <ul>
+    <li><code>@addAction</code> (boolean) — Defaults to <code>false</code>. <code>true</code> if an action is provided.</li>
+  </ul>
+  <p>
+    Uses <code>Boxel::ParticipantList</code> component.
+  </p>
+</FreestyleAnnotation>
+
+<FreestyleUsage @slug="progress-box">
+  <Boxel::ParticipantsBox @addAction={{true}}>
+    <:list>
+      <Boxel::ParticipantList
+        @participants={{this.sampleParticipantGroup}}
+      />
+    </:list>
+  </Boxel::ParticipantsBox>
+</FreestyleUsage>
+
+<FreestyleAnnotation @slug="progress-box-multi">
+  <p>Displaying multiple participant groups:</p>
+</FreestyleAnnotation>
+
+<FreestyleUsage @slug="progress-box-multi">
+  <Boxel::ParticipantsBox @addAction={{true}}>
+    <Boxel::ParticipantList
+      @participants={{this.sampleParticipantGroup}}
+    />
+    <Boxel::ParticipantList
+      @participants={{this.sampleParticipantGroup2}}
+    />
+  </Boxel::ParticipantsBox>
+</FreestyleUsage>
+
+<FreestyleAnnotation @slug="progress-box-multi">
+  <p>Without <code>@addAction</code>:</p>
+</FreestyleAnnotation>
+
+<FreestyleUsage @slug="progress-box-group-2">
+  <Boxel::ParticipantsBox>
+    <Boxel::ParticipantList
+      @participants={{this.sampleParticipantGroup2}}
+    />
+  </Boxel::ParticipantsBox>
+</FreestyleUsage>
+

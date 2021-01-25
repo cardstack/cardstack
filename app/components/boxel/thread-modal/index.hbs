@@ -1,0 +1,46 @@
+<BoxelModal @onClose={{@onClose}} @class="thread-modal {{if this.expanded "thread-modal--full-width"}}">
+  {{!-- OnClick action is temporarily added for demo's sake. --}}
+  <Boxel::Thread class="thread-modal__inner" {{on "click" this.updateProgress}}>
+    <:header>
+      <Boxel::ThreadHeader
+        @title={{@model.workflow.title}}
+        @toggleExpand={{this.toggleExpand}}
+        @expanded={{this.expanded}}
+      />
+    </:header>
+
+    <:content>
+      <Boxel::DateDivider @date={{this.startTimestamp}} />
+      {{#each @model.workflow.milestones as |milestone i|}}
+        {{#if (and (lte i this.progress) milestone.message)}}
+          <Boxel::ThreadMessage
+            @contents={{milestone.message}}
+            @datetime={{milestone.datetime}}
+            @senderImage={{milestone.sender}}
+            @hasLogo={{true}}
+          />
+        {{/if}}
+      {{/each}}
+    </:content>
+
+    <:sidebar>
+      <Boxel::ProgressBox
+        @title={{@model.workflow.title}}
+        @status={{this.progressStatus}}
+        @milestones={{@model.workflow.milestones}}
+        @completedCount={{this.progress}}
+      />
+
+      <Boxel::ParticipantsBox @addAction={{true}}>
+        <:list>
+          <Boxel::ParticipantList
+            @participants={{@model.participants}}
+          />
+          <Boxel::ParticipantList
+            @participants={{@model.orgRepresentatives}}
+          />
+        </:list>
+      </Boxel::ParticipantsBox>
+    </:sidebar>
+  </Boxel::Thread>
+</BoxelModal>

@@ -24,8 +24,8 @@
   z-index: calc(var(--cover-art-count) - var(--cover-art-index));
   left: var(--cover-art-left);
 }
-.cover-art__cover {
 
+.cover-art__cover {
   object-fit: cover;
   object-position: center;
   border: 1px solid rgba(0, 0, 0, 0.15);

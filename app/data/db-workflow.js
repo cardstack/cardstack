@@ -317,7 +317,7 @@ export default {
       "datetime": "2020-09-17T12:17",
       "workflow_id": "advertisement",
       "progressPct": "0",
-      "currentMilestone": "Make offer"
+      "currentMilestone": "Offer"
     },
     {
       "id": "1",
@@ -537,33 +537,25 @@ export default {
       "milestones": [
         {
           "id": "1",
-          "pct": "0",
-          "title": "Place order"
+          "title": "Place order",
+          "statusOnCompletion": "Order placed"
         },
         {
           "id": "2",
-          "pct": "25",
           "title": "Reserve products",
-          "description": "Order placed"
+          "statusOnCompletion": "Products reserved"
         },
         {
           "id": "3",
-          "pct": "50",
           "title": "Submit payment",
-          "description": "Products reserved"
+          "statusOnCompletion": "Payment submitted"
         },
         {
           "id": "4",
-          "pct": "75",
           "title": "Track delivery",
-          "description": "Payment submitted"
+          "statusOnCompletion": "Delivery tracked"
         }
-      ],
-      "completion": {
-        "id": "5",
-        "pct": "100",
-        "description": "Delivery tracked"
-      }
+      ]
     },
     {
       "id": "advertisement",
@@ -571,39 +563,30 @@ export default {
       "milestones": [
         {
           "id": "1",
-          "pct": "0",
-          "title": "Offer"
+          "title": "Offer",
+          "statusOnCompletion": "Offer made"
         },
         {
           "id": "2",
-          "pct": "20",
           "title": "Review",
-          "description": "Offer made"
+          "statusOnCompletion": "Offer reviewed"
         },
         {
           "id": "3",
-          "pct": "40",
           "title": "Accept",
-          "description": "Offer reviewed"
+          "statusOnCompletion": "Offer accepted"
         },
         {
           "id": "4",
-          "pct": "60",
           "title": "Submit payment",
-          "description": "Offer accepted"
+          "statusOnCompletion": "Payment submitted"
         },
         {
           "id": "5",
-          "pct": "80",
           "title": "Submit files",
-          "description": "Payment submitted"
+          "statusOnCompletion": "Files submitted"
         }
-      ],
-      "completion": {
-        "id": "6",
-        "pct": "100",
-        "description": "Files submitted"
-      }
+      ]
     },
     {
       "id": "job-application",
@@ -611,26 +594,20 @@ export default {
       "milestones": [
         {
           "id": "1",
-          "pct": "0",
-          "title": "Submit"
+          "title": "Submit",
+          "statusOnCompletion": "Application submitted"
         },
         {
           "id": "2",
-          "pct": "33",
           "title": "Review",
-          "description": "Application submitted"
+          "statusOnCompletion": "Application reviewed"
         },
         {
           "id": "3",
-          "pct": "66",
           "title": "Accept / Deny",
-          "description": "Application reviewed"
+          "statusOnCompletion": "Application accepted / denied"
         }
-      ],
-      "completion": {
-        "id": "4",
-        "pct": "100"
-      }
+      ]
     },
     {
       "id": "ebook-editing",
@@ -638,39 +615,30 @@ export default {
       "milestones": [
         {
           "id": "1",
-          "pct": "0",
-          "title": "Share"
+          "title": "Share",
+          "statusOnCompletion": "Manuscript shared"
         },
         {
           "id": "2",
-          "pct": "20",
           "title": "Edit",
-          "description": "Manuscript shared"
+          "statusOnCompletion": "Manuscript edited"
         },
         {
           "id": "3",
-          "pct": "40",
           "title": "Proofread",
-          "description": "Manuscript edited"
+          "statusOnCompletion": "Manuscript proofread"
         },
         {
           "id": "4",
-          "pct": "60",
           "title": "Translate",
-          "description": "Manuscript proofread"
+          "statusOnCompletion": "Manuscript translated"
         },
         {
           "id": "5",
-          "pct": "80",
           "title": "Submit",
-          "description": "Manuscript translated"
+          "statusOnCompletion": "Manuscript submitted"
         }
-      ],
-      "completion": {
-        "id": "6",
-        "pct": "100",
-        "description": "Manuscript submitted"
-      }
+      ]
     },
     {
       "id": "article-submission",
@@ -678,39 +646,30 @@ export default {
       "milestones": [
         {
           "id": "1",
-          "pct": "0",
-          "title": "Accept terms"
+          "title": "Accept terms",
+          "statusOnCompletion": "Terms accepted"
         },
         {
           "id": "2",
-          "pct": "20",
           "title": "Submit content",
-          "description": "Terms accepted"
+          "statusOnCompletion": "Content submitted"
         },
         {
           "id": "3",
-          "pct": "40",
           "title": "Select category",
-          "description": "Content submitted"
+          "statusOnCompletion": "Category selected"
         },
         {
           "id": "4",
-          "pct": "60",
           "title": "Review content",
-          "description": "Category selected"
+          "statusOnCompletion": "Content reviewed"
         },
         {
           "id": "5",
-          "pct": "80",
           "title": "Approve & publish",
-          "description": "Content reviewed"
+          "statusOnCompletion": "Approved & published"
         }
-      ],
-      "completion": {
-        "id": "6",
-        "pct": "100",
-        "description": "Approved & published"
-      }
+      ]
     }
   ]
 }

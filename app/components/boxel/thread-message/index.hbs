@@ -1,0 +1,29 @@
+<AnimatedContainer onInitialRender={{true}}>
+  {{#animated-value @datetime initialInsertion=true use=this.transition}}
+    <div
+      class="thread-message"
+      style={{css-var icon-size=(concat this.iconSize "px")}}
+      ...attributes
+    >
+      <Boxel::Participant
+        class="thread-message__participant"
+        @iconSize={{this.iconSize}}
+        @hasLogo={{@hasLogo}}
+        @title={{@senderName}}
+        @image={{@senderImage}}
+      >
+        <time class="thread-message__time">{{moment-format (or @datetime (now)) "MMM D, h:mm A"}}</time>
+      </Boxel::Participant>
+
+      <AnimatedContainer onInitialRender={{true}} class="thread-message__content">
+        {{#if @contents}}
+          {{#animated-each @contents initialInsertion=true use=this.transition as |content|}}
+            <p>{{content}}</p>
+          {{/animated-each}}
+        {{else}}
+          {{@content}}
+        {{/if}}
+      </AnimatedContainer>
+    </div>
+  {{/animated-value}}
+</AnimatedContainer>
