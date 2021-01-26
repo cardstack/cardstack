@@ -1,0 +1,21 @@
+<FreestyleAnnotation @slug="participants-summary">
+  <div>
+    <li><code>@participants</code> (array of <code>Participant</code>s)</li>
+    <input
+      type="range"
+      min={{0}}
+      max={{5}}
+      step={{1}}
+      value={{this.numParticipants}}
+      {{on 'input' (pick 'target.value' (fn (mut this.numParticipants)))}}
+    /> ({{this.numParticipants}})
+  </div>
+</FreestyleAnnotation>
+
+<FreestyleUsage @slug="participants-summary">
+  <Doc::DarkThemeAndLightTheme>
+    <Boxel::ParticipantsSummary
+      @participants={{this.participants}}
+    />
+  </Doc::DarkThemeAndLightTheme>
+</FreestyleUsage>

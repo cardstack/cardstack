@@ -1,0 +1,18 @@
+.participants-summary {
+  display: grid;
+  font: var(--boxel-font-xs);
+  grid-template-columns: auto 1fr;
+  gap: 0 10px;
+  align-items: center;
+  padding-top: 12px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  transition: color var(--boxel-transition);
+  color: inherit;
+}
+
+.boxel--dark-theme > .participants-summary {
+  --icon-color: var(--boxel-light);
+  color: var(--boxel-purple-300);
+}
