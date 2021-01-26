@@ -56,7 +56,7 @@
     "ember-cli-document-title-northm": "^1.0.3",
     "ember-cli-eslint": "^5.1.0",
     "ember-cli-inject-live-reload": "^2.0.2",
-    "ember-cli-moment-shim": "^3.7.1",
+    "ember-cli-moment-shim": "^3.8.0",
     "ember-cli-sri": "^2.1.1",
     "ember-cli-string-helpers": "^5.0.0",
     "ember-cli-template-lint": "^2.0.2",
@@ -101,6 +101,9 @@
     "qunit-dom": "^1.6.0",
     "release-it": "^14.2.2",
     "release-it-lerna-changelog": "^3.1.0"
+  },
+  "resolutions": {
+    "ember-cli-moment-shim": "3.8.0"
   },
   "engines": {
     "node": "12.* || >= 14.*"
