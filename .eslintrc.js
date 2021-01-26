@@ -32,7 +32,7 @@ module.exports = {
         'blueprints/*/index.js',
         'config/**/*.js',
         'generate-thumbs.js',
-        'lib/*/index.js',
+        'lib/**/*.js',
         'server/**/*.js',
       ],
       excludedFiles: ['app/**'],
