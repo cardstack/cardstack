@@ -1,5 +1,7 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
+import { action } from '@ember/object';
+
 import LovetheLoveThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Love-the-Love.jpg';
 import HomeIsntSweetThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Home-Isnt-Sweet.jpg';
 import NeverLonelyThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Never-Lonely.jpg';

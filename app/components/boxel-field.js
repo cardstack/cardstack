@@ -3,7 +3,7 @@
 import Component from '@glimmer/component';
 import fade from 'ember-animated/transitions/fade';
 import { toUp, toDown } from 'ember-animated/transitions/move-over';
-
+import { computed } from '@ember/object';
 export default class BoxelFieldComponent extends Component {
   fade = fade;
   toUp = toUp;
