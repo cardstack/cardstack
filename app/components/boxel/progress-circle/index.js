@@ -1,5 +1,4 @@
 import Component from '@glimmer/component';
-import './style.css';
 import { reads } from 'macro-decorators';
 
 const FONT_SIZE_RATIO = 25 / 120;

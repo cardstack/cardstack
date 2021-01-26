@@ -1,7 +1,7 @@
 import Component from '@glimmer/component';
-import './style.css';
 import { action } from '@ember/object';
 import { reads } from 'macro-decorators';
+
 export default class extends Component {
   @reads('args.size', 80) size;
   @reads('args.maxWidth', 190) maxWidth;

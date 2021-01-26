@@ -11,7 +11,6 @@ import './components/card-select.css';
 import './components/card.css';
 import './components/cardflow.css';
 import './components/collection-add-button.css';
-import './components/doc/dark-theme-and-light-theme.css';
 import './components/detail-card.css';
 import './components/detail-section.css';
 import './components/embedded-collection-editor.css';

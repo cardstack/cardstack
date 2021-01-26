@@ -1,9 +1,15 @@
 .doc-dark-theme-and-light-theme {
   display: flex;
   flex-direction: row;
+  gap: 20px;
 }
+
 .doc-dark-theme-and-light-theme__container {
   padding: 20px;
   border-radius: var(--boxel-border-radius);
-  background-color: var(--boxel-purple-500);
+  border: 1px solid var(--boxel-border-color);
+}
+
+.doc-dark-theme-and-light-theme__container.boxel--dark-theme {
+  background-color: var(--boxel-dark);
 }
