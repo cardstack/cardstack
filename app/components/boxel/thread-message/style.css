@@ -2,10 +2,16 @@
   --icon-size: 40px;
 }
 
+@media only screen and (min-width: 1440px) {
+  .thread-message {
+    padding-right: 40px;
+  }
+}
+
 .thread-message > .thread-message__participant {
   display: grid;
   grid-template-columns: var(--icon-size) auto 1fr;
-  gap: var(--boxel-spacing);
+  gap: 10px var(--boxel-spacing);
   align-items: start;
   height: 20px;
 }
@@ -30,6 +36,9 @@
 }
 
 .thread-message__content > p {
-  margin-top: 1px;
-  margin-bottom: 30px;
+  margin: 0;
+}
+
+.thread-message__content > p + p {
+  margin-top: 30px;
 }

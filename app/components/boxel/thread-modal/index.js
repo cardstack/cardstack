@@ -57,4 +57,17 @@ export default class ThreadModalComponent extends Component {
       );
     }
   }
+
+  *bannerTransition({ insertedSprites }) {
+    // printSprites(arguments[0]);
+
+    for (let sprite of insertedSprites) {
+      yield wait(200);
+      sprite.startTranslatedBy(0, 30);
+      parallel(
+        fadeIn(sprite, { easing: easeOut, duration: 1000 }),
+        move(sprite, { easing: easeOut, duration: 1000 })
+      );
+    }
+  }
 }

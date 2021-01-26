@@ -1,6 +1,6 @@
 <BoxelModal @onClose={{@onClose}} @class="thread-modal {{if this.expanded "thread-modal--full-width"}}">
-  {{!-- OnClick action is temporarily added for demo's sake. --}}
-  <Boxel::Thread class="thread-modal__inner" {{on "click" this.updateProgress}}>
+  {{!-- OnClick actions on ThreadMessage and MilestoneBanner are temporarily added for demo's sake. --}}
+  <Boxel::Thread class="thread-modal__inner">
     <:header>
       <Boxel::ThreadHeader
         @title={{@model.workflow.title}}
@@ -18,7 +18,14 @@
             @datetime={{milestone.datetime}}
             @senderImage={{milestone.sender}}
             @hasLogo={{true}}
+            {{on "click" (fn (mut milestone.complete) true)}}
           />
+
+          <AnimatedContainer onInitialRender={{true}}>
+            {{#animated-if milestone.complete initialInsertion=true use=this.bannerTransition}}
+              <Boxel::MilestoneBanner @title={{milestone.statusOnCompletion}} {{on "click" this.updateProgress}} />
+            {{/animated-if}}
+          </AnimatedContainer>
         {{/if}}
       {{/each}}
     </:content>

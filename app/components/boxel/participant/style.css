@@ -14,19 +14,17 @@
 }
 
 .participant__image {
-  justify-self: center;
   width: var(--icon-size);
   height: var(--icon-size);
   background-image: url('../../../images/media-registry/placeholders/profile.svg');
   background-position: center;
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: contain;
   border-radius: 100px;
 }
 
 .participant__has-logo .participant__image {
   border-radius: initial;
-  background-image: url('../../../images/icons/cardbot-lg.svg');
 }
 
 .participant__title {

@@ -13,17 +13,14 @@ export default class ThreadMessageComponent extends Component {
   *transition({ insertedSprites }) {
     // printSprites(arguments[0]);
 
-    for (let [i, sprite] of [...insertedSprites].entries()) {
-      if (i === 0) {
-        fadeIn(sprite, { easing: easeOut, duration: 200 });
-      } else {
-        yield wait(800);
-        sprite.startTranslatedBy(0, 30);
-        parallel(
-          fadeIn(sprite, { easing: easeOut, duration: 200 }),
-          move(sprite, { easing: easeOut, duration: 200 })
-        );
-      }
+    for (let sprite of insertedSprites) {
+      sprite.startTranslatedBy(0, 30);
+      parallel(
+        fadeIn(sprite, { easing: easeOut, duration: 200 }),
+        move(sprite, { easing: easeOut, duration: 200 })
+      );
+      // stagger
+      yield wait(800);
     }
   }
 }

@@ -3,7 +3,6 @@
   align-items: center;
   justify-items: center;
   height: var(--boxel-spacing);
-  margin-bottom: var(--boxel-spacing);
 }
 
 .date-divider__hr {
