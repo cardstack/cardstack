@@ -6,7 +6,7 @@ export default class extends Component {
   @tracked isSelected = false;
   wmgLogo = wmgLogo;
   org = {
-    id: "foo",
-    iconURL: this.wmgLogo
-  }
+    id: 'foo',
+    iconURL: this.wmgLogo,
+  };
 }

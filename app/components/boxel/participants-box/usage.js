@@ -3,6 +3,7 @@ import HaleyOConnellThumb from '../../../images/workflow/participants/thumb/Hale
 import JuliaMasonThumb from '../../../images/workflow/participants/thumb/Julia-Mason.jpg';
 import LolaSampsonThumb from '../../../images/workflow/participants/thumb/Lola-Sampson.jpg';
 import RupertGrishamThumb from '../../../images/workflow/participants/thumb/Rupert-Grisham.jpg';
+import { action } from '@ember/object';
 
 const sampleParticipantGroup2 = [
   {
@@ -31,4 +32,8 @@ const sampleParticipantGroup = [
 export default class ParticipantsBoxUsageComponent extends Component {
   sampleParticipantGroup = sampleParticipantGroup;
   sampleParticipantGroup2 = sampleParticipantGroup2;
+  @action addAction() {
+    // eslint-disable-next-line no-console
+    console.log('addAction triggered');
+  }
 }
