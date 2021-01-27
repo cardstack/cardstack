@@ -1,39 +1,27 @@
-<FreestyleAnnotation @slug="milestones">
-  <p>
-    <ul>
-      <li><code>@milestones</code> (object array) — Each object should have a <code>title</code> property with title of the milestone.</li>
-      <li><code>@completedCount</code> (integer) — Number of milestones completed.</li>
-    </ul>
-  </p>
-</FreestyleAnnotation>
-
-<FreestyleUsage @slug="milestones">
-  <Boxel::Milestones @milestones={{this.sampleMilestones}} />
-
-  {{!--
-    const sampleMilestones = [
-      {
-        "title": "Place order"
-      },
-      {
-        "title": "Reserve products",
-      },
-      {
-        "title": "Submit payment",
-      },
-      {
-        "title": "Track delivery",
-      }
-    ]; --}}
-</FreestyleUsage>
-
-<FreestyleAnnotation @slug="milestones-completion">
-  The current step will appear in bold, while the completed steps get a checkmark.
-</FreestyleAnnotation>
-
-<FreestyleUsage @slug="milestones-completion">
-  <Boxel::Milestones
-    @milestones={{this.sampleMilestones}}
-    @completedCount={{1}}
-  />
-</FreestyleUsage>
+<Freestyle::Usage
+  @slug="milestones"
+  @description="The current step will appear in bold, while the completed steps get a checkmark."
+>
+  <:example>
+    <Boxel::Milestones
+      @milestones={{this.milestones}}
+      @completedCount={{this.completedCount}}
+    />
+  </:example>
+  <:api as |Args|>
+    <Args.Object
+      @name="milestones"
+      @value={{this.milestones}}
+      @description="(object array) — Each object should have a `title` property with title of the milestone."
+    />
+    <Args.Number
+      @name="completedCount"
+      @value={{this.completedCount}}
+      @defaultValue={{0}}
+      @min={{0}}
+      @max={{4}}
+      @description="(integer) — Number of milestones completed."
+      @onInput={{fn (mut this.completedCount)}}
+    />
+  </:api>
+</Freestyle::Usage>

@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
+import { tracked } from '@glimmer/tracking';
 
-const sampleMilestones = [
+const SAMPLE_MILESTONES = [
   {
     title: 'Place order',
     statusOnCompletion: 'Order placed',
@@ -20,5 +21,6 @@ const sampleMilestones = [
 ];
 
 export default class MilestonesUsageComponent extends Component {
-  sampleMilestones = sampleMilestones;
+  milestones = SAMPLE_MILESTONES;
+  @tracked completedCount = 1;
 }
