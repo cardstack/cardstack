@@ -1,40 +1,44 @@
-<FreestyleAnnotation @slug="selection-control-group">
-  <div>
-    @selectedItemCount (Number) the number of items selected.
-    <input
-      type="range"
-      min={{0}}
-      max={{50}}
-      step={{1}}
-      value={{this.selectedItemCount}}
-      {{on 'input' (pick 'target.value' this.setSelectedItemCount)}}
-    /> ({{this.selectedItemCount}})
-  </div>
-  <div>
-    @isSelected (Boolean) fully selected state
-    <input
-      type="checkbox"
-      checked={{this.isSelected}}
-      {{on 'input' (pick 'target.checked' this.setIsSelected)}}
-    /> ({{this.isSelected}})
-  </div>
-  <div>
-    @mode (String) which card mode are we in
-  </div>
-  <div>
-    @toggleSelectAll (Action) action to run when user indicates she wants to toggle the select-all state
-  </div>
-  <div>
-    @menuComponent (Component) component to show when more actions menu icon is clicked
-  </div>
-</FreestyleAnnotation>
-
-<FreestyleUsage @slug="selection-control-group">
-  <Boxel::SelectionControlGroup
-    @toggleSelectAll={{this.toggleSelectAll}}
-    @mode="view"
-    @selectedItemCount={{this.selectedItemCount}}
-    @isSelected={{this.isSelected}}
-    @menuComponent={{component 'actions-menu' class="media-collection__more-actions-menu" actionItems=(array "Delete" "Duplicate")}}
-  />
-</FreestyleUsage>
+<Freestyle::Usage @slug="selection-control-group">
+  <:example>
+    <Boxel::SelectionControlGroup
+      @toggleSelectAll={{this.toggleSelectAll}}
+      @mode={{this.mode}}
+      @selectedItemCount={{this.selectedItemCount}}
+      @isSelected={{this.isSelected}}
+      @menuComponent={{component 'actions-menu' class="media-collection__more-actions-menu" actionItems=(array "Delete" "Duplicate")}}
+    />
+  </:example>
+  <:api as |Args|>
+    <Args.Action
+      @name="toggleSelectAll"
+      @description="Invoked when user indicates she wants to toggle the select-all state"
+      @value={{this.toggleSelectAll}}
+    />
+    <Args.String
+      @name="mode"
+      @description="which card mode are we in"
+      @value={{this.mode}}
+      @onInput={{fn (mut this.mode)}}
+    />
+    <Args.Number
+      @name="selectedItemCount"
+      @description="(integer) — the number of items selected"
+      @value={{this.selectedItemCount}}
+      @defaultValue={{0}}
+      @min={{0}}
+      @max={{50}}
+      @onInput={{this.setSelectedItemCount}}
+    />
+    <Args.Bool
+      @name="isSelected"
+      @value={{this.isSelected}}
+      @description="fully selected state"
+      @defaultValue={{false}}
+      @onInput={{this.setIsSelected}}
+    />
+    <Args.Object
+      @name="menuComponent"
+      @description="(Component) component to show when more actions menu icon is clicked"
+    />
+  </:api>
+</Freestyle::Usage>
