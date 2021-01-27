@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
+import { tracked } from '@glimmer/tracking';
 
-const sampleMilestones = [
+const SAMPLE_MILESTONS = [
   {
     title: 'Place order',
     statusOnCompletion: 'Order placed',
@@ -20,5 +21,9 @@ const sampleMilestones = [
 ];
 
 export default class ProgressBoxUsageComponent extends Component {
-  sampleMilestones = sampleMilestones;
+  milestones = SAMPLE_MILESTONS;
+  @tracked title = "Customer Support";
+  @tracked status = "Products reserved";
+  @tracked size = 120;
+  @tracked completedCount = 2;
 }
