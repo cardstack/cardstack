@@ -1,5 +1,4 @@
 import Component from '@glimmer/component';
-import './style.css';
 import { reads } from 'macro-decorators';
 import move from 'ember-animated/motions/move';
 import { fadeIn } from 'ember-animated/motions/opacity';

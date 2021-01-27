@@ -1,5 +1,4 @@
 import Component from '@glimmer/component';
-import './style.css';
 
 export default class ProgressBoxComponent extends Component {
   get percentComplete() {

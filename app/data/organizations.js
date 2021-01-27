@@ -12,6 +12,10 @@ import wmgLogo from '@cardstack/boxel/images/media-registry/wmg-logo.svg';
 
 export {
   ampLogo,
+  bunnyLogo,
+  bunnyLogoIcon,
+  crdRecordsIcon,
+  crdRecordsLogo,
   deezerLogo,
   gmrLogo,
   wcmLogo,

@@ -1,38 +1,47 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
+import {
+  bunnyLogo,
+  bunnyLogoIcon,
+  crdRecordsIcon,
+  crdRecordsLogo,
+  lisaTrackProfile,
+  steveRightsProfile,
+  wmgLogo,
+} from '../../../data/organizations';
 
 const ORGS = [
   {
     id: 'bunny_records',
     type: 'label',
     title: 'Bunny Records',
-    iconURL: '/media-registry/button-bunny-records.svg',
-    logoURL: '/media-registry/bunny-logo.svg',
+    iconURL: bunnyLogoIcon,
+    logoURL: bunnyLogo,
     user: {
       title: 'Lisa Track',
       role: 'Administrator',
-      imgURL: '/media-registry/profiles/Lisa-Track.jpg',
+      imgURL: lisaTrackProfile,
     },
   },
   {
     id: 'crd_records',
     type: 'label',
     title: 'CRD Records',
-    iconURL: '/media-registry/button-crd-records.svg',
-    logoURL: '/media-registry/crd_records_logo.svg',
+    iconURL: crdRecordsIcon,
+    logoURL: crdRecordsLogo,
     user: {
       title: 'Steve Rights',
       role: 'Catalog Manager',
-      imgURL: '/media-registry/profiles/Steve-Rights.jpg',
+      imgURL: steveRightsProfile,
     },
   },
   {
     id: 'warner-music-group',
     type: 'label',
     title: 'Warner Music Group',
-    iconURL: '/media-registry/wmg-logo.svg',
-    logoURL: '/media-registry/wmg-logo.svg',
+    iconURL: wmgLogo,
+    logoURL: wmgLogo,
   },
 ];
 
