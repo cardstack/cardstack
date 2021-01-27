@@ -36,12 +36,14 @@
 <Freestyle::Usage @slug="participants-box-multi" @description="Displaying multiple participant groups">
   <:example>
     <Boxel::ParticipantsBox @addAction={{this.addAction}}>
-      <Boxel::ParticipantList
-        @participants={{this.sampleParticipantGroup}}
-      />
-      <Boxel::ParticipantList
-        @participants={{this.sampleParticipantGroup2}}
-      />
+      <:list>
+        <Boxel::ParticipantList
+          @participants={{this.sampleParticipantGroup}}
+        />
+        <Boxel::ParticipantList
+          @participants={{this.sampleParticipantGroup2}}
+        />
+      </:list>
     </Boxel::ParticipantsBox>
   </:example>
 </Freestyle::Usage>
