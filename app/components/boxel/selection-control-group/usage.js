@@ -5,7 +5,7 @@ import { action } from '@ember/object';
 export default class extends Component {
   @tracked selectedItemCount = 0;
   @tracked isSelected = false;
-  @tracked mode = "view";
+  @tracked mode = 'view';
 
   @action setSelectedItemCount(val) {
     val = Number(val);

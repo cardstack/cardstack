@@ -8089,13 +8089,14 @@ ember-fetch@^6.5.0:
     node-fetch "^2.6.0"
     whatwg-fetch "^3.0.0"
 
-ember-freestyle@yapplabs/ember-freestyle#98c9626:
+ember-freestyle@yapplabs/ember-freestyle#e92887b2:
   version "0.12.1"
-  resolved "https://codeload.github.com/yapplabs/ember-freestyle/tar.gz/98c9626ff653d693e5a99ac3ee7e763d10f07e38"
+  resolved "https://codeload.github.com/yapplabs/ember-freestyle/tar.gz/e92887b21dd300e140ce080b615e343e6005177d"
   dependencies:
     ember-cli-babel "^7.23.0"
     ember-cli-htmlbars "^5.3.1"
     ember-cli-sass "^10.0.0"
+    ember-json-viewer "^0.5.0"
     ember-modifier "^2.1.0"
     ember-named-blocks-polyfill "^0.2.4"
     ember-runtime-enumerable-includes-polyfill "^2.0.0"
@@ -8134,6 +8135,15 @@ ember-inflector@^3.0.0:
   resolved "https://registry.yarnpkg.com/ember-inflector/-/ember-inflector-3.0.1.tgz#04be6df4d7e4000f6d6bd70787cdc995f77be4ab"
   dependencies:
     ember-cli-babel "^6.6.0"
+
+ember-json-viewer@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/ember-json-viewer/-/ember-json-viewer-0.5.0.tgz#87b27b38db6d0e829e4fafda6e52fb66b03e26f7"
+  integrity sha512-26eXJj8qxRsvdU7rpwQyMkEz67ArbQY/VUeMH5NRqr56AgQQlhQg4oUhp77FLaUJIKd7HB8xVofUIY+/jR1eXg==
+  dependencies:
+    ember-cli-babel "^7.22.1"
+    ember-cli-htmlbars "^5.3.1"
+    ember-test-selectors "^5.0.0"
 
 ember-load-initializers@^2.1.2:
   version "2.1.2"
@@ -8491,6 +8501,15 @@ ember-test-selectors@^2.1.0:
   dependencies:
     ember-cli-babel "^6.8.2"
     ember-cli-version-checker "^3.1.2"
+
+ember-test-selectors@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/ember-test-selectors/-/ember-test-selectors-5.0.0.tgz#36c30f64498039cb88797cdda682275a460ee624"
+  integrity sha512-hqAPqyJLEGBYcQ9phOKvHhSCyvcSbUL8Yj2si8OASsQWxwRqbxrtk5YlkN2aZiZdp9PAd2wErS8uClG0U7tNpA==
+  dependencies:
+    calculate-cache-key-for-tree "^2.0.0"
+    ember-cli-babel "^7.22.1"
+    ember-cli-version-checker "^5.1.1"
 
 ember-text-measurer@^0.5.0:
   version "0.5.0"

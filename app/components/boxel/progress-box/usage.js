@@ -22,8 +22,8 @@ const SAMPLE_MILESTONS = [
 
 export default class ProgressBoxUsageComponent extends Component {
   milestones = SAMPLE_MILESTONS;
-  @tracked title = "Customer Support";
-  @tracked status = "Products reserved";
+  @tracked title = 'Customer Support';
+  @tracked status = 'Products reserved';
   @tracked size = 120;
   @tracked completedCount = 2;
 }

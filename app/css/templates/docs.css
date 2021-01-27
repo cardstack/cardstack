@@ -3,3 +3,7 @@
 .FreestyleSubsection-name {
   text-transform: none;
 }
+
+.freestyle-components-section .FreestyleSubsection-name {
+  display: none;
+}

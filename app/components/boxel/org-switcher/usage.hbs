@@ -1,4 +1,4 @@
-<Freestyle::Usage @slug="org-switcher">
+<Freestyle::Usage @name="OrgSwitcher">
   <:example>
     <Doc::DemoStage @width="80px" @paddingX="0px" @bg="boxel-purple-800">
       <Boxel::OrgSwitcher
@@ -14,6 +14,7 @@
       @name="currentOrg"
       @value={{this.currentOrg}}
       @description="(object array) The organization to show as selected."
+      @jsonCollapseDepth={{0}}
     />
     <Args.String
       @name="ariaLabel"
@@ -30,6 +31,7 @@
       @name="orgs"
       @value={{this.orgs}}
       @description="(object array) The organizations to show."
+      @jsonCollapseDepth={{0}}
     />
   </:api>
 </Freestyle::Usage>

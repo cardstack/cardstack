@@ -2,7 +2,7 @@
   @title='Boxel Components'
   @subtitle='Living Component Documentation'
 >
-  <FreestyleSection @name="Components" as |Section|>
+  <FreestyleSection @name="Components" class="freestyle-components-section" as |Section|>
     {{#each this.usageComponents as |componentName|}}
       <Section.subsection @name={{format-component-name componentName}}>
         {{component (concat componentName '/usage')}}
