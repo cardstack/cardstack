@@ -23,3 +23,22 @@ The server maintains its own search index over all the realms it knows about. Th
 ## TODO
 
 1. Add eslint and CI typecheck for server.
+
+## Open Questions
+
+1. Are types really agnostic to value vs reference of their fields? If you could bake one or the other into the type, it makes it easier to write code in the card that touches (particularly for edit) all value data no matter how deep.
+
+  Setting this at instance-creation time seems too late. It really seems like policy at a higher level.
+
+  Multiple levels possible:
+    - singular value (body)
+    - plural value (string tags could be this)
+    - singular hand-picked reference (author)
+    - singular query-driven reference (spotlight on the homepage)
+    - plural hand-picked references (tags as actual entities)
+    - plural query-driven references (comments)
+
+  Are these six the six implementations, or are they also the actual types in the schema, or are some of these actually interchangeable types?
+    - singular vs plural must be part of type
+    - probably value vs reference must be part of type
+    - hand-picked vs query may *not* need to be part of type
