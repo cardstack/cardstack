@@ -1,43 +1,33 @@
-<style>
-  .left-edge-nav-usage-container {
-    height:600px;
-    padding:10px 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 80px);
-    column-gap: 20px;
-  }
-  .left-edge-nav-usage-container .boxel-left-edge-nav {
-    position: relative; /* override default fixed position for display in docs */
-  }
-</style>
-<FreestyleUsage>
-  <div class="left-edge-nav-usage-container">
+<Freestyle::Usage>
+  <:example>
+    <div class="left-edge-nav-usage-container">
 
-    <Boxel::LeftEdgeNav
-      @home={{hash icon="verifi-logo-dark-outline" action=this.clickedHome height="45px"}}
-      @orgs={{this.orgs}}
-      @currentOrg={{this.currentOrg}}
-      @onChooseOrg={{this.onChooseOrg}}
-      @bottomActions={{array
-        (hash icon="pin" action=(noop))
-        (hash icon="card-catalog" action=(noop))
-        (hash icon="library" action=(noop))
-      }}
-    />
+      <Boxel::LeftEdgeNav
+        @home={{hash icon="verifi-logo-dark-outline" action=this.clickedHome height="45px"}}
+        @orgs={{this.orgs}}
+        @currentOrg={{this.currentOrg}}
+        @onChooseOrg={{this.onChooseOrg}}
+        @bottomActions={{array
+          (hash icon="pin" action=(noop))
+          (hash icon="card-catalog" action=(noop))
+          (hash icon="library" action=(noop))
+        }}
+      />
 
-    <Boxel::LeftEdgeNav
-      @orgs={{this.orgs}}
-      @currentOrg={{this.currentOrg}}
-      @onChooseOrg={{this.onChooseOrg}}
-    />
+      <Boxel::LeftEdgeNav
+        @orgs={{this.orgs}}
+        @currentOrg={{this.currentOrg}}
+        @onChooseOrg={{this.onChooseOrg}}
+      />
 
-    <Boxel::LeftEdgeNav
-      @home={{hash icon="cardstack-logo" action=this.clickedHome width="33px" height="35px"}}
-      @user={{hash imgURL=this.user.imgURL action=this.clickedUser}}
-      @orgs={{this.orgs}}
-      @currentOrg={{this.currentOrg}}
-      @onChooseOrg={{this.onChooseOrg}}
-    />
+      <Boxel::LeftEdgeNav
+        @home={{hash icon="cardstack-logo" action=this.clickedHome width="33px" height="35px"}}
+        @user={{hash imgURL=this.user.imgURL action=this.clickedUser}}
+        @orgs={{this.orgs}}
+        @currentOrg={{this.currentOrg}}
+        @onChooseOrg={{this.onChooseOrg}}
+      />
 
-  </div>
-</FreestyleUsage>
+    </div>
+  </:example>
+</Freestyle::Usage>

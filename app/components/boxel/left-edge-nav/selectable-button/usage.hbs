@@ -1,24 +1,26 @@
-<FreestyleAnnotation @slug="left-edge-nav-selectable-button">
-  <div>
-    @isSelected (Boolean) Shows button in selected state
-    <input
-      type="checkbox"
-      checked={{this.isSelected}}
-      {{on 'input' (pick 'target.checked' (fn (mut this.isSelected)))}}
-    /> ({{this.isSelected}})
-  </div>
-  <div>yields for the contents of the button</div>
-</FreestyleAnnotation>
-
-<FreestyleUsage @slug="left-edge-nav-selectable-button">
-  <Doc::DemoStage @width="80px" @paddingX="0px" @bg="boxel-purple-800">
-    <Boxel::LeftEdgeNav::SelectableButton
-      @isSelected={{this.isSelected}}
-    >
-      <div
-        class={{cn "boxel-org-switcher-button__logo" (concat "boxel-org-switcher-button__logo--" @org.id)}}
-        style={{css-url "background-image" this.wmgLogo}}
-      />
-    </Boxel::LeftEdgeNav::SelectableButton>
-  </Doc::DemoStage>
-</FreestyleUsage>
+<Freestyle::Usage
+  @slug="left-edge-nav-selectable-button"
+>
+  <:example>
+    <Doc::DemoStage @width="80px" @paddingX="0px" @textAlign="center" @bg="boxel-purple-800">
+      <Boxel::LeftEdgeNav::SelectableButton
+        @isSelected={{this.isSelected}}
+      >
+        <div
+          class={{cn "boxel-org-switcher-button__logo boxel-org-switcher-button__logo--warner-music-group"}}
+          style={{html-safe (concat (css-url "background-image" this.wmgLogo) "; background-repeat:no-repeat;width: 100%; height: 100%")}}
+        />
+      </Boxel::LeftEdgeNav::SelectableButton>
+    </Doc::DemoStage>
+  </:example>
+  <:api as |Args|>
+    <Args.Bool
+      @name="isSelected"
+      @value={{this.isSelected}}
+      @description="when true, renders in selected state"
+      @defaultValue={{false}}
+      @onInput={{fn (mut this.isSelected)}}
+    />
+    <Args.Yield @optional={{true}} @description="The content of the button." />
+  </:api>
+</Freestyle::Usage>
