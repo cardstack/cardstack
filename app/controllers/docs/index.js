@@ -3,8 +3,12 @@ import config from '../../config/environment';
 
 function findUsageComponents() {
   let usageRegExp = new RegExp(`${config.modulePrefix}/components/.+/usage`);
-  return Object.keys(window.require.entries)
-    .filter((path) => usageRegExp.test(path))
+  let allEntries = Object.keys(window.require.entries);
+  let usageEntries = allEntries.filter((path) => usageRegExp.test(path));
+  usageEntries = usageEntries.filter(
+    (path) => !path.startsWith(`${config.modulePrefix}/components/freestyle`)
+  );
+  return usageEntries
     .map((path) =>
       path
         .replace(`${config.modulePrefix}/components/`, '')
