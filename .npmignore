@@ -14,7 +14,6 @@
 /.eslintrc.js
 /.gitignore
 /.template-lintrc.js
-/.travis.yml
 /.watchmanconfig
 /bower.json
 /config/ember-try.js
@@ -28,7 +27,6 @@
 .eslintrc.js
 .gitignore
 .watchmanconfig
-.travis.yml
 bower.json
 ember-cli-build.js
 testem.js
