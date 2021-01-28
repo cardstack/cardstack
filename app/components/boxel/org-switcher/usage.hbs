@@ -1,10 +1,37 @@
-<FreestyleUsage>
-  <Doc::DemoStage @width="80px" @bg="boxel-purple-800" @paddingX="0">
-    <Boxel::OrgSwitcher
-      @orgs={{this.orgs}}
-      @currentOrg={{this.currentOrg}}
-      @ariaLabel={{"View catalog for "}}
-      @onChooseOrg={{this.onChooseOrg}}
+<Freestyle::Usage @name="OrgSwitcher">
+  <:example>
+    <Doc::DemoStage @width="80px" @paddingX="0px" @bg="boxel-purple-800">
+      <Boxel::OrgSwitcher
+        @orgs={{this.orgs}}
+        @currentOrg={{this.currentOrg}}
+        @ariaLabel={{this.ariaLabel}}
+        @onChooseOrg={{this.onChooseOrg}}
+      />
+    </Doc::DemoStage>
+  </:example>
+  <:api as |Args|>
+    <Args.Object
+      @name="currentOrg"
+      @value={{this.currentOrg}}
+      @description="(object array) The organization to show as selected."
+      @jsonCollapseDepth={{0}}
     />
-  </Doc::DemoStage>
-</FreestyleUsage>
+    <Args.String
+      @name="ariaLabel"
+      @value={{this.ariaLabel}}
+      @description="which card mode are we in"
+      @onInput={{fn (mut this.ariaLabel)}}
+    />
+    <Args.Action
+      @name="onChooseOrg"
+      @value={{this.onChooseOrg}}
+      @description="fires when an org icon is clicked, sending the org ID"
+    />
+    <Args.Object
+      @name="orgs"
+      @value={{this.orgs}}
+      @description="(object array) The organizations to show."
+      @jsonCollapseDepth={{0}}
+    />
+  </:api>
+</Freestyle::Usage>

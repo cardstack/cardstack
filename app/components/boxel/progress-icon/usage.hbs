@@ -1,51 +1,48 @@
-<FreestyleAnnotation @slug="progress-icon">
-  <div>
-    @size (Number) the size of the circle, in px.
-    <input
-      type="range"
-      min={{10}}
-      max={{60}}
-      step={{1}}
-      value={{this.size}}
-      {{on 'input' (pick 'target.value' (fn (mut this.size)))}}
-    /> ({{this.size}})
-  </div>
-  <div>
-    @isCancelled (Boolean) when true shows an "x" icon.
-    <input
-      type="checkbox"
-      checked={{this.isCancelled}}
-      {{on 'input' (pick 'target.checked' (fn (mut this.isCancelled)))}}
-    /> ({{this.isCancelled}})
-  </div>
-  <div>
-    @isComplete (Boolean) when true shows an "x" icon.
-    <input
-      type="checkbox"
-      checked={{this.isComplete}}
-      {{on 'input' (pick 'target.checked' (fn (mut this.isComplete)))}}
-    /> ({{this.isComplete}})
-  </div>
-  <div>
-    @fractionComplete (Number) completeness from 0 to 1.
-    <input
-      type="range"
-      min={{0}}
-      max={{1}}
-      step={{0.001}}
-      value={{this.fractionComplete}}
-      {{on 'input' (pick 'target.value' (fn (mut this.fractionComplete)))}}
-    /> ({{this.fractionComplete}})
-  </div>
-</FreestyleAnnotation>
+<Freestyle::Usage @name="ProgressIcon">
+  <:example>
+    <Doc::DarkThemeAndLightTheme>
+      <Boxel::ProgressIcon
+        @size={{this.size}}
+        @isCancelled={{this.isCancelled}}
+        @isComplete={{this.isComplete}}
+        @fractionComplete={{this.fractionComplete}}
+      />
+    </Doc::DarkThemeAndLightTheme>
+  </:example>
 
-<FreestyleUsage @slug="progress-icon">
-  <Doc::DarkThemeAndLightTheme>
-    <Boxel::ProgressIcon
-      @size={{this.size}}
-      @isCancelled={{this.isCancelled}}
-      @isComplete={{this.isComplete}}
-      @fractionComplete={{this.fractionComplete}}
+  <:api as |Args|>
+    <Args.Number
+      @name="size"
+      @required={{true}}
+      @min={{10}}
+      @max={{60}}
+      @description="the size of the circle, in px"
+      @value={{this.size}}
+      @onInput={{fn (mut this.size)}}
     />
-  </Doc::DarkThemeAndLightTheme>
-</FreestyleUsage>
+    <Args.Number
+      @name="fractionComplete"
+      @defaultValue={{0}}
+      @min={{0}}
+      @max={{1}}
+      @step={{0.1}}
+      @description="completeness from 0 to 1"
+      @value={{this.fractionComplete}}
+      @onInput={{fn (mut this.fractionComplete)}}
+    />
+    <Args.Bool
+      @name="isCancelled"
+      @defaults={{false}}
+      @description='when true shows an "x" icon'
+      @value={{this.isCancelled}}
+      @onInput={{fn (mut this.isCancelled)}}
+    />
+    <Args.Bool
+      @name="isComplete"
+      @defaults={{false}}
+      @description='when true shows a checkmark icon'
+      @value={{this.isComplete}}
+      @onInput={{fn (mut this.isComplete)}}
+    />
+  </:api>
+</Freestyle::Usage>

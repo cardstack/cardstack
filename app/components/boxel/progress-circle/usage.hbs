@@ -1,31 +1,29 @@
-<FreestyleAnnotation @slug="progress-circle">
-  <div>
-    @size (Number) the size of the circle, in px.
-    <input
-      type="range"
-      min={{40}}
-      max={{200}}
-      step={{1}}
-      value={{this.size}}
-      {{on 'input' (pick 'target.value' (fn (mut this.size)))}}
-    /> ({{this.size}})
-  </div>
-  <div>
-    @percentComplete (Number) completeness from 0 to 100.
-    <input
-      type="range"
-      min={{0}}
-      max={{100}}
-      step={{1}}
-      value={{this.percentComplete}}
-      {{on 'input' (pick 'target.value' (fn (mut this.percentComplete)))}}
-    /> ({{this.percentComplete}})
-  </div>
-</FreestyleAnnotation>
+<Freestyle::Usage @name="ProgressCircle">
+  <:example>
+    <Boxel::ProgressCircle
+      @size={{this.size}}
+      @percentComplete={{this.percentComplete}}
+    />
+  </:example>
 
-<FreestyleUsage @slug="progress-circle">
-  <Boxel::ProgressCircle
-    @size={{this.size}}
-    @percentComplete={{this.percentComplete}}
-  />
-</FreestyleUsage>
+  <:api as |Args|>
+    <Args.Number
+      @name="size"
+      @required={{true}}
+      @min={{40}}
+      @max={{200}}
+      @description="the size of the circle, in px"
+      @value={{this.size}}
+      @onInput={{fn (mut this.size)}}
+    />
+    <Args.Number
+      @name="percentComplete"
+      @defaultValue={{0}}
+      @min={{0}}
+      @max={{100}}
+      @description="completeness from 0 to 100"
+      @value={{this.percentComplete}}
+      @onInput={{fn (mut this.percentComplete)}}
+    />
+  </:api>
+</Freestyle::Usage>

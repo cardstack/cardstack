@@ -1,25 +1,24 @@
-<FreestyleAnnotation @slug="org-switcher-button">
-  <div>
-    @isSelected (Boolean) Shows button in selected state
-    <input
-      type="checkbox"
-      checked={{this.isSelected}}
-      {{on 'input' (pick 'target.checked' (fn (mut this.isSelected)))}}
-    /> ({{this.isSelected}})
-  </div>
-  <div>
-    @org (Object) The organization model
-  </div>
-</FreestyleAnnotation>
-
-<FreestyleUsage @slug="org-switcher-button">
-  <Doc::DemoStage @width="80px" @paddingX="0px" @bg="boxel-purple-800">
-    <Boxel::OrgSwitcher::Button
-      @org={{hash
-        id="foo"
-        iconURL=this.wmgLogo
-      }}
-      @isSelected={{this.isSelected}}
+<Freestyle::Usage @name="OrgSwitcher::Button">
+  <:example>
+    <Doc::DemoStage @width="80px" @paddingX="0px" @bg="boxel-purple-800">
+      <Boxel::OrgSwitcher::Button
+        @org={{this.org}}
+        @isSelected={{this.isSelected}}
+      />
+    </Doc::DemoStage>
+  </:example>
+  <:api as |Args|>
+    <Args.Object
+      @name="org"
+      @value={{this.org}}
+      @description="The organization model."
     />
-  </Doc::DemoStage>
-</FreestyleUsage>
+    <Args.Bool
+      @name="isSelected"
+      @value={{this.isSelected}}
+      @description="when true, renders in selected state"
+      @defaultValue={{false}}
+      @onInput={{fn (mut this.isSelected)}}
+    />
+  </:api>
+</Freestyle::Usage>

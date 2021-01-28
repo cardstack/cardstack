@@ -1,5 +1,7 @@
 import Component from '@glimmer/component';
 
-export default class extends Component {
-  demoFlac = '/assets/demo_flac.flac';
+import { tracked } from '@glimmer/tracking';
+
+export default class BoxelWaveplayerUsageComponent extends Component {
+  @tracked url = '/boxel/assets/demo_flac.flac';
 }

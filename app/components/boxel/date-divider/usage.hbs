@@ -1,15 +1,21 @@
-<FreestyleAnnotation @slug="date-divider">
-  <p>
-    <ul>
-      <li><code>@date</code> (date) — Defaults to <code>now</code>.</li>
-    </ul>
-  </p>
-</FreestyleAnnotation>
+<Freestyle::Usage @name="DateDivider">
+  <:example>
+    <Boxel::DateDivider @date={{this.date}} />
+  </:example>
+  <:api as |Args|>
+    <Args.String
+      @name="date"
+      @required={{false}}
+      @defaultValue="now"
+      @description="Date to show"
+      @value={{this.date}}
+      @onInput={{fn (mut this.date)}}
+    />
+  </:api>
+</Freestyle::Usage>
 
-<FreestyleUsage @slug="date-divider">
-  <Boxel::DateDivider />
-</FreestyleUsage>
-
-<FreestyleUsage @slug="date-divider-arg">
-  <Boxel::DateDivider @date="2020-01-07T15:00" />
-</FreestyleUsage>
+<Freestyle::Usage @slug="DateDivider-default" @description="With default value">
+  <:example>
+    <Boxel::DateDivider />
+  </:example>
+</Freestyle::Usage>

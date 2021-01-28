@@ -1,28 +1,43 @@
-<FreestyleAnnotation @slug="breadcrumbs-items-arg">
-  The Breadcrumbs component can be passed an @items argument, which must be an array consisting of objects, each with a route, routeModel, title, and type.
-</FreestyleAnnotation>
+<Freestyle::Usage @name="Breadcrumbs">
+  <:description>
+    The Breadcrumbs component can be passed an @items argument, which must be an array consisting of objects, each with a route, routeModel, title, and type.
+  </:description>
 
-<FreestyleUsage @slug="breadcrumbs-items-arg">
-  <Boxel::Breadcrumbs @items={{array
-    (hash route="media-registry.index" routeModel="bunny_records" title="Master Recordings" type="Collection")
-    (hash route="media-registry.collection.index" routeModel=(array "bunny_records" "golden_girl") title="Golden Girl" type="Collection")
-  }} />
-</FreestyleUsage>
+  <:example>
+    <Boxel::Breadcrumbs @items={{array
+        (hash route="media-registry.index" routeModel="bunny_records" title="Master Recordings" type="Collection")
+        (hash route="media-registry.collection.index" routeModel=(array "bunny_records" "golden_girl") title="Golden Girl" type="Collection")
+      }} />
+  </:example>
 
-<FreestyleAnnotation @slug="breadcrumbs-yielding">
-  Alternately, without an @items argument, the component will yield to the block you pass it. This allows manually providing HTML for each breadcrumb.
-</FreestyleAnnotation>
+  <:api as |Args|>
+    <Args.Object
+      @name="items"
+      @description="an array of items, each with a route (String route name), routeModel (passed as the model or param to the router), title (String), and type (String)"
+    />
+    <Args.Yield
+      @optional={{true}}
+      @description="Alternately, without an @items argument, the component will yield to the block you pass it. This allows manually providing HTML for each breadcrumb."
+    />
+  </:api>
+</Freestyle::Usage>
 
-<FreestyleUsage @slug="breadcrumbs-yielding">
-  <Boxel::Breadcrumbs>
-    <LinkTo @route="media-registry" @model="bunny_records" @class="breadcrumbs__item">
-      <div class="breadcrumbs__item-label">Collection</div>
-      <div class="breadcrumbs__item-title">Master Recordings</div>
-    </LinkTo>
-    <span class="breadcrumbs__carot" />
-    <LinkTo @route="media-registry.collection.index" @models={{array "bunny_records" "golden_girl"}} class="breadcrumbs__item">
-      <div class="breadcrumbs__item-label">Collection</div>
-      <div class="breadcrumbs__item-title">Golden Girl</div>
-    </LinkTo>
-  </Boxel::Breadcrumbs>
-</FreestyleUsage>
+<Freestyle::Usage @slug="Breadcrumbs-manual">
+  <:description>
+    Breadcrumbs can also be manually contructed. Here is an example.
+  </:description>
+
+  <:example>
+    <Boxel::Breadcrumbs>
+      <LinkTo @route="media-registry" @model="bunny_records" @class="breadcrumbs__item">
+        <div class="breadcrumbs__item-label">Collection</div>
+        <div class="breadcrumbs__item-title">Master Recordings</div>
+      </LinkTo>
+      <span class="breadcrumbs__carot" />
+      <LinkTo @route="media-registry.collection.index" @models={{array "bunny_records" "golden_girl"}} class="breadcrumbs__item">
+        <div class="breadcrumbs__item-label">Collection</div>
+        <div class="breadcrumbs__item-title">Golden Girl</div>
+      </LinkTo>
+    </Boxel::Breadcrumbs>
+  </:example>
+</Freestyle::Usage>
