@@ -7,7 +7,7 @@ export default class WorkflowOrgRoute extends Route {
     let currentOrg = userOrgs.find((el) => el.id === orgId);
     let orgQueueCards = queueCards.filter((el) => el.orgId === orgId);
     for (let card of orgQueueCards) {
-      card.participants = card.participant_ids.map((pid) =>
+      card.participants = (card.participant_ids ?? []).map((pid) =>
         dbWorkflow.users.find((u) => u.id === pid)
       );
     }
