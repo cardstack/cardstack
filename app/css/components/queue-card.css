@@ -12,7 +12,8 @@
   color: var(--queue-card-primary-color);
   font: var(--boxel-font-xs);
   letter-spacing: var(--boxel-lsp-lg);
-  transition: color var(--boxel-transition), background-color var(--boxel-transition);
+  transition: color var(--boxel-transition),
+    background-color var(--boxel-transition);
 }
 
 .queue-card:hover {
@@ -82,17 +83,7 @@
 
 .queue-card__participants {
   --icon-color: var(--queue-card-primary-color);
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0 10px;
-  align-items: center;
-  padding-top: 12px;
   color: var(--queue-card-secondary-color);
-  font: var(--boxel-font-xs);
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  transition: color var(--boxel-transition);
 }
 
 .queue-card__footer {
@@ -130,12 +121,11 @@
   white-space: nowrap;
 }
 
-
 /* Light Theme */
 .boxel--light-theme {
   --queue-card-primary-color: var(--boxel-dark);
   --queue-card-secondary-color: var(--boxel-purple-400);
-  --boxel-highlight: #00B2AE;
+  --boxel-highlight: #00b2ae;
 
   background-color: var(--boxel-light);
 }

@@ -1,49 +1,44 @@
-<div role="button" {{on "click" @selectCard}} class="queue-card {{if (and (eq @card.id @currentCard.id) (eq @card.orgId @currentCard.orgId)) "boxel--light-theme" "boxel--dark-theme"}}">
+<div role="button" {{on "click" @selectCard}}
+  class="queue-card {{if (and (eq @card.id @currentCard.id) (eq @card.orgId @currentCard.orgId)) "
+  boxel--light-theme" "boxel--dark-theme" }}">
   <div class="queue-card__datetime-row">
     {{#let (if @currentMilestone.timestamp @currentMilestone.timestamp @card.datetime) as |datetime|}}
-      <time datetime={{datetime}} class="queue-card__datetime">{{moment-format datetime "MMM D, h:mm A"}}</time>
-      {{#if (eq @card.status "unread")}}
-        <div class="queue-card__notification">1</div>
-      {{/if}}
+    <time datetime={{datetime}} class="queue-card__datetime">{{moment-format datetime "MMM D, h:mm A"}}</time>
+    {{#if (eq @card.status "unread")}}
+    <div class="queue-card__notification">1</div>
+    {{/if}}
     {{/let}}
   </div>
 
   <section class="queue-card__content">
     {{#if @card.project}}
-      <h4 class="queue-card__label">{{@card.project}}</h4>
+    <h4 class="queue-card__label">{{@card.project}}</h4>
     {{/if}}
     <h3 class="queue-card__project-title">{{@card.title}}</h3>
     {{#if (and @card.participants @card.participants.length)}}
-      <div class="queue-card__participants">
-        {{svg-jar "users" width="14px" height="12px"}}
-        <span>{{this.participants}}</span>
-      </div>
+      <Boxel::ParticipantsSummary @participants={{@card.participants}} class="queue-card__participants" />
     {{/if}}
   </section>
 
   {{#if (or @card.tasks this.progress)}}
-    <footer class="queue-card__footer">
-      <div class="queue-card__task-labels">
-        {{#if this.userTasks}}
-          <div class="queue-card__task-label">
-            {{this.userTasks.length}} {{#if (eq this.userTasks.length 1)}}Task{{else}}Tasks{{/if}}
-          </div>
-        {{/if}}
-        {{#if this.assignedTasks}}
-          <div class="queue-card__task-label queue-card__task-label--awaiting-reply">
-            {{this.assignedTasks.length}} pending
-          </div>
-        {{/if}}
+  <footer class="queue-card__footer">
+    <div class="queue-card__task-labels">
+      {{#if this.userTasks}}
+      <div class="queue-card__task-label">
+        {{this.userTasks.length}} {{#if (eq this.userTasks.length 1)}}Task{{else}}Tasks{{/if}}
       </div>
-      <div class="queue-card__status">
-        {{this.progress}}
-        <Boxel::ProgressIcon
-          @isCancelled={{@card.isCancelled}}
-          @isComplete={{@card.isComplete}}
-          @fractionComplete={{div @card.progressPct 100}}
-          @size={{24}}
-        />
+      {{/if}}
+      {{#if this.assignedTasks}}
+      <div class="queue-card__task-label queue-card__task-label--awaiting-reply">
+        {{this.assignedTasks.length}} pending
       </div>
-    </footer>
+      {{/if}}
+    </div>
+    <div class="queue-card__status">
+      {{this.progress}}
+      <Boxel::ProgressIcon @isCancelled={{@card.isCancelled}} @isComplete={{@card.isComplete}} @fractionComplete={{div
+        @card.progressPct 100}} @size={{24}} />
+    </div>
+  </footer>
   {{/if}}
 </div>
