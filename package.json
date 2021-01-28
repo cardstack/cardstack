@@ -80,7 +80,7 @@
     "ember-named-blocks-polyfill": "^0.2.4",
     "ember-page-title": "^6.0.3",
     "ember-power-calendar-moment": "^0.1.7",
-    "ember-power-select": "^4.1.0",
+    "ember-power-select": "^4.0.0",
     "ember-power-select-typeahead": "alexspeller/ember-power-select-typeahead#6d279fb",
     "ember-qunit": "^5.1.1",
     "ember-resolver": "^8.0.2",
