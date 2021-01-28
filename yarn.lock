@@ -8072,9 +8072,9 @@ ember-fetch@^6.5.0:
     node-fetch "^2.6.0"
     whatwg-fetch "^3.0.0"
 
-ember-freestyle@yapplabs/ember-freestyle#21df7f48:
+ember-freestyle@yapplabs/ember-freestyle#e1e0fbf4:
   version "0.12.1"
-  resolved "https://codeload.github.com/yapplabs/ember-freestyle/tar.gz/21df7f487ea251dfa43a2d26e438ee884af8f5d1"
+  resolved "https://codeload.github.com/yapplabs/ember-freestyle/tar.gz/e1e0fbf46e3b85754b2fa81863b790ea550b4784"
   dependencies:
     ember-cli-babel "^7.23.0"
     ember-cli-htmlbars "^5.3.1"
