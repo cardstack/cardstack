@@ -20,9 +20,10 @@ By default, the server will use both the `base-cards` and `demo-cards` directori
 
 The server maintains its own search index over all the realms it knows about. The search index is stored in postgres.
 
-## TODO
+## NEXT
 
-1. Add eslint and CI typecheck for server.
+1. Hand-roll compiled output for our six demo cards plus the three implied base cards they use. It should actually be runnable. The compiler output implies what we would into the search index, and we can put that into mirage, etc.
+2. Get one card compile working, against the other hand-compiled cards.
 
 ## Open Questions
 
