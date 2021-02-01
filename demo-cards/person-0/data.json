@@ -1,9 +1,9 @@
 {
-  "adoptsFrom": "post",
+  "adopts": "../person",
   "model": {
     "attributes": {
-      "title": "Second Post",
-      "body": {
+      "name": "Arthur Faulkner",
+      "bio": {
         "version": "0.3.2",
         "atoms": [],
         "cards": [],
@@ -29,30 +29,19 @@
                   0
                 ],
                 1,
-                "blog"
+                "person"
               ],
               [
                 0,
                 [],
                 0,
-                " post."
+                " bio."
               ]
             ],
             []
           ]
         ]
-      },
-      "published": "2021-01-26T16:56:57.834Z",
-      "author": {
-        "attributes": {
-          "firstName": "Ed",
-          "lastName": "F"
-        }
       }
     }
-  },
-  "dependencies": {
-    "post": "local:post",
-    "person": "local:person"
   }
 }

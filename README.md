@@ -42,3 +42,14 @@ The server maintains its own search index over all the realms it knows about. Th
     - singular vs plural must be part of type
     - probably value vs reference must be part of type
     - hand-picked vs query may *not* need to be part of type
+
+
+# field API naming
+
+ - `contains`: singular, value
+ - `containsMany`: plural, value
+ - `belongsTo`: singular, reference
+   - can hold either query or explicit list of ids
+ - `hasMany`: plural, reference
+   - can hold either query or explicit list of ids
+

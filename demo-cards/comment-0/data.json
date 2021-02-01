@@ -1,0 +1,56 @@
+{
+  "adopts": "../comment",
+  "model": {
+    "attributes": {
+      "body": {
+        "version": "0.3.2",
+        "atoms": [],
+        "cards": [],
+        "markups": [
+          [
+            "strong"
+          ]
+        ],
+        "sections": [
+          [
+            1,
+            "p",
+            [
+              [
+                0,
+                [],
+                0,
+                "This is a "
+              ],
+              [
+                0,
+                [
+                  0
+                ],
+                1,
+                "nice"
+              ],
+              [
+                0,
+                [],
+                0,
+                " comment."
+              ]
+            ],
+            []
+          ]
+        ]
+      },
+      "published": "2021-01-26T16:56:57.834Z",
+      "approvedAt": "2021-01-26T16:56:57.834Z"
+    },
+    "relationships": {
+      "author": {
+        "ref": "../person-0"
+      },
+      "post": {
+        "ref": "../post-0"
+      }
+    }
+  }
+}

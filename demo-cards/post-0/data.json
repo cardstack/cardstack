@@ -1,5 +1,5 @@
 {
-  "adoptsFrom": "post",
+  "adopts": "../post",
   "model": {
     "attributes": {
       "title": "Hello World",
@@ -46,15 +46,8 @@
     },
     "relationships": {
       "author": {
-        "data": {
-          "type": "cards",
-          "id": "local:person-0"
-        }
+        "ref": "../person-0"
       }
     }
-  },
-  "dependencies": {
-    "post": "local:post",
-    "person": "local:person"
   }
 }
