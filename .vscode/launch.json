@@ -19,6 +19,18 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Serve cardhost",
+      "program": "${workspaceFolder}/node_modules/.bin/ember",
+      "cwd": "${workspaceRoot}/cardhost",
+      "args": ["s"],
+      "env": {
+        "JOBS": "1"
+      },
+      "outputCapture": "std"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Run server",
       "runtimeArgs": ["-r", "ts-node/register"],
       "cwd": "${workspaceRoot}/server",

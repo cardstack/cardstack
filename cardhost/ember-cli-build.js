@@ -4,7 +4,27 @@ const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 
 module.exports = function (defaults) {
   let app = new EmberApp(defaults, {
-    // Add options here
+    autoImport: {
+      // this is an unreleased feature on the branch we're pointing at
+      watchDependencies: ['@cardstack/core'],
+      webpack: {
+        module: {
+          rules: [
+            {
+              test(filename) {
+                return /\/core\/src\/.*\.ts/.test(filename);
+              },
+              use: {
+                loader: 'babel-loader',
+                options: {
+                  plugins: ['@babel/plugin-transform-typescript'],
+                },
+              },
+            },
+          ],
+        },
+      },
+    },
   });
 
   // Use `app.import` to add additional libraries to the generated
