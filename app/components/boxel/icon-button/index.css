@@ -1,6 +1,6 @@
-.icon-btn {
-  width: var(--icon-btn-width, 40px);
-  height: var(--icon-btn-height, 40px);;
+.icon-button {
+  width: var(--icon-button-width, 40px);
+  height: var(--icon-button-height, 40px);;
   padding: 0;
   background: none;
   border: none;
@@ -8,27 +8,27 @@
   outline: 0;
 }
 
-.icon-btn__primary {
+.icon-button__primary {
   --icon-bg: var(--boxel-highlight);
   --icon-border: var(--boxel-highlight);
 }
 
-.icon-btn__secondary {
+.icon-button__secondary {
   --icon-color: var(--boxel-highlight);
   border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 100px;
   background-color: #41404D;
 }
 
-.icon-btn__secondary:hover {
+.icon-button__secondary:hover {
   background-color: var(--boxel-purple-800);
 }
 
-.icon-btn:hover {
+.icon-button:hover {
   cursor: pointer;
 }
 
-.icon-btn > svg {
+.icon-button > svg {
   display: block;
   margin: auto;
 }

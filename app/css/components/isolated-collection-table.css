@@ -101,7 +101,7 @@
 }
 
 .media-collection-table__play-btn {
-  width: 100%;
+  --icon-button-width: 100%;
   opacity: 0.25;
   transition: opacity var(--boxel-transition);
 }

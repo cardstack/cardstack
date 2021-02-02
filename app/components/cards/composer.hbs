@@ -9,7 +9,12 @@
     </BoxelActions>
     {{#if (and @drillDown (not-eq @status "no-change"))}}
       <BoxelActions @status={{@status}} @class="boxel-actions__expand">
-        <IconButton @icon="expand" {{on "click" (fn @drillDown @model @fieldData)}} @class="boxel-actions__expand-btn" @aria-label="expand" />
+        <Boxel::IconButton
+          @icon="expand"
+          class="boxel-actions__expand-btn"
+          aria-label="expand"
+          {{on "click" (fn @drillDown @model @fieldData)}}
+        />
       </BoxelActions>
     {{/if}}
   {{/if}}

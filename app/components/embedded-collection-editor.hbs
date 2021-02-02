@@ -4,7 +4,12 @@
       {{#if this.field.value}}
         <div class="collection-field__item collection-field__item--{{this.format}}">
           {{component (or this.field.component "card") model=this.field.value mode="view" format=this.format expandAction=@expandAction}}
-          <IconButton {{on "click" this.removeBelongsToItem}} @icon="icon-minus-circle" @class="collection-field__remove-btn" @aria-label="remove" />
+          <Boxel::IconButton
+            @icon="icon-minus-circle"
+            class="collection-field__remove-btn"
+            aria-label="remove"
+            {{on "click" this.removeBelongsToItem}}
+          />
         </div>
       {{else}}
         <CollectionAddButton
@@ -42,7 +47,12 @@
                 />
               {{/if}}
               {{component (or item.component @field.component "card") model=item format=this.format}}
-              <IconButton {{on "click" (fn this.removeItem item)}} @icon="icon-minus-circle" @class="collection-field__remove-btn" @aria-label="remove" />
+              <Boxel::IconButton
+                @icon="icon-minus-circle"
+                class="collection-field__remove-btn"
+                aria-label="remove"
+                {{on "click" (fn this.removeItem item)}}
+              />
             </div>
           {{/if}}
         {{/each}}

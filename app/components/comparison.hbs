@@ -198,11 +198,11 @@
                           {{#if (and f.status (eq this.mode "comparison"))}}
                             {{#if (get (get field.value i) "tempField")}}
                               <div class="discrepancy-field__btn-container discrepancy-field__btn-container--toggled">
-                                <IconButton @class="discrepancy-field__btn discrepancy-field__btn--toggled" @icon="carot-thin-left" {{on "click" (fn this.revertField (get field.value i) f)}} />
+                                <Boxel::IconButton @class="discrepancy-field__btn discrepancy-field__btn--toggled" @icon="carot-thin-left" {{on "click" (fn this.revertField (get field.value i) f)}} />
                               </div>
                             {{else}}
                               <div class="discrepancy-field__btn-container">
-                                <IconButton @class="discrepancy-field__btn" @icon="carot-thin-left" {{on "click" (fn this.reconciliateField (get field.value i) f)}} />
+                                <Boxel::IconButton @class="discrepancy-field__btn" @icon="carot-thin-left" {{on "click" (fn this.reconciliateField (get field.value i) f)}} />
                               </div>
                             {{/if}}
                           {{/if}}
@@ -223,11 +223,11 @@
                   {{#if (and compField.status (eq this.mode "comparison") (not (includes field.title this.omittedFields)))}}
                     {{#if field.tempField}}
                       <div class="discrepancy-field__btn-container discrepancy-field__btn-container--toggled">
-                        <IconButton @class="discrepancy-field__btn discrepancy-field__btn--toggled" @icon="carot-thin-left" {{on "click" (fn this.revertField field)}} />
+                        <Boxel::IconButton @class="discrepancy-field__btn discrepancy-field__btn--toggled" @icon="carot-thin-left" {{on "click" (fn this.revertField field)}} />
                       </div>
                     {{else}}
                       <div class="discrepancy-field__btn-container">
-                        <IconButton @class="discrepancy-field__btn" @icon="carot-thin-left" {{on "click" (fn this.reconciliateField field compField)}} />
+                        <Boxel::IconButton @class="discrepancy-field__btn" @icon="carot-thin-left" {{on "click" (fn this.reconciliateField field compField)}} />
                       </div>
                     {{/if}}
                   {{/if}}

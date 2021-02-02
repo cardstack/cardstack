@@ -12,7 +12,7 @@
     }}
   />
   {{#each @model.orgs as |org|}}
-    <IconButton {{on "click" (fn this.transition org)}} class="media-registry__hover-zone media-registry__hover-zone--{{org.id}}" />
+    <Boxel::IconButton {{on "click" (fn this.transition org)}} class="media-registry__hover-zone media-registry__hover-zone--{{org.id}}" />
   {{/each}}
   <div class="media-registry__left-edge-queue slide-in">
     {{!-- <CardflowQueue
@@ -28,7 +28,7 @@
   {{#if (and this.displayItemModal this.record)}}
     <BoxelModal @overlayClass="cardflow-overlay" @class="cardflow__modal">
       <header class="cardflow__modal-header">Workflow Thread - {{this.projectTitle}}</header>
-      <IconButton @icon="close" @class="cardflow__modal-close-btn" {{on "click" this.closeModal}} />
+      <Boxel::IconButton @icon="close" @class="cardflow__modal-close-btn" {{on "click" this.closeModal}} />
       <div class="cardflow__nested-grid">
         <CardPlatter @class="cardflow__nested-card">
           <header class="cardflow__nested-card-header">
@@ -92,7 +92,7 @@
   {{else if (and this.displayCatalogModal this.isolatedCollection)}}
     <BoxelModal @overlayClass="cardflow-overlay" @class="cardflow__modal">
       <header class="cardflow__modal-header">Workflow Thread - {{this.projectTitle}}</header>
-      <IconButton @icon="close" @class="cardflow__modal-close-btn" {{on "click" this.closeModal}} />
+      <Boxel::IconButton @icon="close" @class="cardflow__modal-close-btn" {{on "click" this.closeModal}} />
       <div class="cardflow__nested-grid">
         <CardPlatter @class="cardflow__nested-card">
           <header class="cardflow__nested-card-header">
