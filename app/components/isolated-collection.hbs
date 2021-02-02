@@ -48,7 +48,16 @@
       {{/if}}
       <div class="media-collection__btn-group">
         <div class="media-collection__btn-trio media-collection__filters">
-          <SortPopup @class="media-collection__sort" @sortColumns={{this.sortColumns}} @sortColumn={{this.sortColumn}} @sortDirection={{this.sortDirection}} @sort={{this.sort}}/>
+          {{#if this.sortColumns.length}}
+            <Boxel::DropdownButton class="media-collection__btn" @button="sort" @icon="sort" @size={{30}}>
+              <Boxel::SortMenu
+                @sortableColumns={{this.sortColumns}}
+                @sortedColumn={{this.sortColumn}}
+                @sortedDirection={{this.sortDirection}}
+                @onSort={{this.sort}}
+              />
+            </Boxel::DropdownButton>
+          {{/if}}
           <Boxel::DropdownButton class="media-collection__btn media-collection__filter" @button="filter" @icon="filter" @size={{30}}>
           </Boxel::DropdownButton>
 
