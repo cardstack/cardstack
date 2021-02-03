@@ -32,7 +32,13 @@
           @mode={{@mode}}
           @selectedItemCount={{this.collection.selectedItemCount}}
           @isSelected={{this.collection.selectedAll}}
-          @menuComponent={{component 'actions-menu' class="media-collection__more-actions-menu" actionItems=(array "Delete" "Duplicate") addToCollection=(eq @model.type "collection") transferAgreement=(eq @model.type "master-collection")}}
+          @menuComponent={{component 'boxel/menu' items=(array
+            (menu-item "Delete" (noop))
+            (menu-item "Duplicate" (noop))
+            (menu-item "---")
+            (if (eq @model.type "collection") (menu-item "Add To Collection" (noop)))
+            (if (eq @model.type "master-collection") (menu-item "Transfer Catalog" (link route="media-registry.agreements" model="TA-38185847898")))
+          )}}
         />
       {{/if}}
       {{#if (and (eq @model.type "collection") this.collection.selectedItemCount)}}

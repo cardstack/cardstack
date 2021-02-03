@@ -5,7 +5,10 @@
       @mode={{this.mode}}
       @selectedItemCount={{this.selectedItemCount}}
       @isSelected={{this.isSelected}}
-      @menuComponent={{component 'actions-menu' class="media-collection__more-actions-menu" actionItems=(array "Delete" "Duplicate")}}
+      @menuComponent={{component 'boxel/menu' items=(array
+        (menu-item "Delete" (noop))
+        (menu-item "Duplicate" (noop))
+      )}}
     />
   </:example>
   <:api as |Args|>

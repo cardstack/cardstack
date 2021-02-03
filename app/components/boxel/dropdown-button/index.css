@@ -14,6 +14,7 @@
 .boxel-dropdown-button__trigger:focus {
   --icon-color: var(--boxel-highlight);
   outline: 0;
+  cursor: pointer;
 }
 
 .boxel-dropdown-button__trigger > svg {
@@ -26,12 +27,12 @@
 }
 
 .boxel-dropdown-button__dropdown {
-  min-width: 210px;
-  padding: 15px 0;
+  border-radius: var(--boxel-border-radius);
   box-shadow: 0 5px 15px 0px rgba(0, 0, 0, 0.25);
-  border-radius: 10px;
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-sm);
+  min-width: 210px;
+  overflow: hidden;
 }
 
 .boxel-dropdown-button__dropdown.ember-basic-dropdown-content--below.ember-basic-dropdown--transitioning-in {

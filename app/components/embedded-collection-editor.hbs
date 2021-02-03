@@ -30,7 +30,10 @@
             @mode={{@mode}}
             @selectedItemCount={{this.collection.selectedItemCount}}
             @isSelected={{this.collection.selectedAll}}
-            @menuComponent={{component 'actions-menu' class="media-collection__more-actions-menu" actionItems=(array "Delete" "Duplicate")}}
+            @menuComponent={{component 'boxel/menu' items=(array
+              (menu-item "Delete" (noop))
+              (menu-item "Duplicate" (noop))
+            )}}
           />
         </header>
       {{/if}}
