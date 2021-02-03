@@ -10,8 +10,6 @@
 }
 
 .collection-field__header {
-  display: grid;
-  grid-template-columns: 45px 1fr;
   padding-top: 10px;
   padding-bottom: 20px;
 }
