@@ -1,0 +1,51 @@
+.mode-indicator {
+  --mode-container-width: 240px;
+  --mode-container-height: 40px;
+  --mode-icon: url('');
+  --mode-icon-position: left 15px top 11px;
+  --mode-icon-size: 1rem 1rem;
+
+  cursor: pointer;
+  display: block;
+  min-width: var(--mode-container-width);
+  width: auto;
+  max-width: 100%;
+  height: var(--mode-container-height);
+  padding: 11px 40px;
+  background-color: var(--boxel-highlight);
+  background-image: var(--mode-icon), url('../../../images/icons/close.svg');
+  background-position: var(--mode-icon-position), center right 15px;
+  background-repeat: no-repeat, no-repeat;
+  background-size: var(--mode-icon-size), 10px 10px;
+  border-radius: 100px;
+  color: var(--boxel-dark);
+  font: var(--boxel-font-sm);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-lg);
+  text-align: left;
+  text-transform: capitalize;
+}
+
+.mode-indicator--edit {
+  --mode-icon: url('../../../images/icons/edit-box.svg');
+  --mode-icon-position: left 15px top 12px;
+  --mode-icon-size: 13px 13px;
+}
+.mode-indicator--configure {
+  --mode-icon: url('../../../images/icons/gear.svg');
+}
+.mode-indicator--comparison {
+  --mode-icon: url('../../../images/icons/clock.svg');
+}
+.mode-indicator--themer {
+  --mode-icon: url('../../../images/icons/themer.svg');
+}
+.mode-indicator--preview {
+  --mode-icon: url('../../../images/icons/eye.svg');
+}
+
+.mode-indicator:hover,
+.mode-indicator:focus {
+  /* background-color: var(--boxel-highlight-hover); */
+  outline: 0;
+}

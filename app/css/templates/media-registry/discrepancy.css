@@ -38,25 +38,6 @@
   overflow: hidden;
 }
 
-.discrepancy__mode-btn {
-  display: flex;
-  align-items: center;
-  width: 300px;
-  height: 40px;
-  padding: 10px 40px;
-  background-image: url('../../../images/icons/clock.svg'), url('../../../images/icons/close.svg');
-  background-position: left 15px top 11px, center right 15px;
-  background-repeat: no-repeat, no-repeat;
-  background-size: 15px 15px, 10px 10px;
-  font-weight: 600;
-  text-transform: capitalize;
-  transition: filter var(--boxel-transition);
-}
-
-.discrepancy__mode-btn:hover {
-  filter: brightness(1.025);
-}
-
 .discrepancy__breadcrumbs {
   border-bottom: 1px solid #7D7C93;
   margin-bottom: 20px;

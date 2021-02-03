@@ -4,9 +4,7 @@
       <h1 class="item-edit__title">{{titleize @model.title}}</h1>
       <h2 class="item-edit__description">Original Recording</h2>
     </div>
-    <button {{on "click" this.transitionToView}} class="item-edit__mode-btn mode-indicator mode-indicator--edit">
-      Edit mode
-    </button>
+    <Boxel::ModeIndicator @mode="edit" {{on 'click' this.transitionToView}} />
   </header>
 
   <div class="item-edit__scroll-container">
