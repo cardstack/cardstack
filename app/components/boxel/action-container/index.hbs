@@ -1,0 +1,32 @@
+<article class={{cn "action-container" action-container--is-complete=@isComplete}}
+  ...attributes
+>
+  <header class="action-container__header">
+    {{@header}}
+  </header>
+
+  {{#if @prompt}}
+    <p class="action-container__prompt">
+      {{@prompt}}
+    </p>
+  {{/if}}
+
+  {{yield}}
+
+  <footer class="action-container__footer">
+    <Boxel::Button
+      {{on "click" (optional @onClickButton)}}
+      @primary={{not @isComplete}}
+    >
+      {{#if @isComplete}}
+        {{@completeActionLabel}}
+      {{else}}
+        {{@incompleteActionLabel}}
+      {{/if}}
+    </Boxel::Button>
+    <span class="action-container__footer-text">
+      Actions only visible to you
+      {{svg-jar "lock" width="12px" height="12px"}}
+    </span>
+  </footer>
+</article>

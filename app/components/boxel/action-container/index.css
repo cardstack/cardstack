@@ -1,0 +1,83 @@
+.action-container {
+  width: 100%;
+  max-width: 700px;
+  background-color: var(--boxel-light);
+  border-radius: var(--boxel-border-radius);
+  color: var(--boxel-dark);
+  font: var(--boxel-font);
+  letter-spacing: var(--boxel-lsp);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+  transition:
+    max-width var(--boxel-transition),
+    box-shadow var(--boxel-transition);
+}
+
+.action-container--is-complete {
+  max-width: 585px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+
+/* Card Header */
+.action-container__header {
+  height: 30px;
+  padding: 7px 15px;
+  border-top-right-radius: var(--boxel-border-radius);
+  border-top-left-radius: var(--boxel-border-radius);
+  background-color: var(--boxel-purple-100);
+  color: var(--boxel-purple-400);
+  font: var(--boxel-font-xs);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+}
+
+
+/* Optional prompt */
+.action-container__prompt {
+  margin: 0;
+  padding: 40px 30px;
+  font-size: 1.125rem; /* 18px */
+  font-weight: 700;
+  line-height: 1.33;
+  letter-spacing: 0;
+}
+
+
+/* Card Chin */
+.action-container__footer {
+  --icon-color: var(--boxel-purple-300);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px;
+  background-color: var(--boxel-purple-700);
+  color: var(--boxel-purple-300);
+  font: var(--boxel-font-xs);
+  border-bottom-right-radius: var(--boxel-border-radius);
+  border-bottom-left-radius: var(--boxel-border-radius);
+}
+
+.action-container__footer > button {
+  min-height: initial;
+  height: 32px;
+  padding: 7px 40px;
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.action-container__footer-text {
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.action-container--is-complete .action-container__footer {
+  --icon-color: var(--boxel-purple-400);
+  background-color: var(--boxel-purple-100);
+  color: var(--boxel-purple-400);
+}
+
+.action-container--is-complete .action-container__footer > button {
+  border-color: var(--boxel-purple-300);
+}

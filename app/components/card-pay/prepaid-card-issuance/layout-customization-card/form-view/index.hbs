@@ -1,0 +1,75 @@
+<ul class="layout-form-view" ...attributes>
+  <li class="layout-form-view__preview-field">
+    <CardPay::PrepaidCard
+      @issuerName={{or @issuerName "Enter name"}}
+      @issuerIcon={{@issuerIcon}}
+      @headerColor={{@headerColor.value}}
+      @darkTheme={{eq @headerColor.theme 'dark'}}
+      @headerPattern={{@headerPattern.value}}
+      @balance={{1234}}
+      @accountAddress="0x1234...5678"
+      @accountNetwork="xDai Chain"
+    />
+    <span class="layout-form-view__label">
+      Card Preview
+    </span>
+  </li>
+  <li>
+    {{!-- TODO: Extract input component --}}
+    <label class="layout-form-view__field">
+      <span class="layout-form-view__label">Name of Issuer</span>
+      <Input
+        class="layout-form-view__input"
+        @value={{@issuerName}}
+        {{on "input" @updateIssuerName}}
+      />
+    </label>
+  </li>
+  <li>
+    {{!-- TODO: Extract dropdown component --}}
+    <label class="layout-form-view__field">
+      <span class="layout-form-view__label">Background Color</span>
+      <PowerSelect
+        class="layout-form-view__dropdown"
+        @options={{@colorOptions}}
+        @selected={{@headerColor}}
+        @onChange={{@updateHeaderColor}}
+        @renderInPlace={{true}}
+        @verticalPosition="below"
+      as |option|>
+        <div class="layout-form-view__dropdown-option">
+          <span
+            class="layout-form-view__dropdown-option-icon"
+            style={{css-var header-color=option.value}}
+          />
+          <span class="layout-form-view__dropdown-option-title">
+            {{option.title}}
+          </span>
+        </div>
+      </PowerSelect>
+    </label>
+  </li>
+  <li>
+    <label class="layout-form-view__field">
+      <span class="layout-form-view__label">Pattern</span>
+      <PowerSelect
+        class="layout-form-view__dropdown"
+        @options={{@patternOptions}}
+        @selected={{@headerPattern}}
+        @onChange={{@updateHeaderPattern}}
+        @renderInPlace={{true}}
+        @verticalPosition="below"
+      as |option|>
+        <div class="layout-form-view__dropdown-option">
+          <span
+            class="layout-form-view__dropdown-option-icon layout-form-view__pattern-icon"
+            style={{css-var header-pattern=option.value}}
+          />
+          <span class="layout-form-view__dropdown-option-title">
+            {{option.title}}
+          </span>
+        </div>
+      </PowerSelect>
+    </label>
+  </li>
+</ul>

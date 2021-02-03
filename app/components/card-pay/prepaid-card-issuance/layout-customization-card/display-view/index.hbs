@@ -1,0 +1,37 @@
+<section class="layout-display-view" ...attributes>
+  <section class="layout-display-view__preview">
+    <div class="layout-display-view__scaled-card">
+      <CardPay::PrepaidCard
+        @issuerName={{@issuerName}}
+        @issuerIcon={{@issuerIcon}}
+        @headerColor={{@headerColor.value}}
+        @darkTheme={{eq @headerColor.theme 'dark'}}
+        @headerPattern={{@headerPattern}}
+        @balance={{1234}}
+        @accountAddress="0x123499999995678"
+        @accountNetwork="xDai Chain"
+      />
+    </div>
+    <span class="layout-display-view__label layout-display-view__preview-text">
+      Card Preview
+    </span>
+  </section>
+  <section>
+    <div class="layout-display-view__label">
+      Name of Issuer
+    </div>
+    <div class="layout-display-view__value">
+      {{@issuerName}}
+    </div>
+    <div class="layout-display-view__swatch-group">
+      <div
+        class="layout-display-view__swatch"
+        style={{css-var header-color=@headerColor.value}}
+      />
+      <div
+        class="layout-display-view__swatch layout-display-view__pattern-swatch"
+        style={{css-var header-pattern=@headerPattern.value}}
+      />
+    </div>
+  </section>
+</section>

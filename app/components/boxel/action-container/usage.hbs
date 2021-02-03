@@ -1,0 +1,78 @@
+<Freestyle::Usage @name="ActionContainer">
+  <:description>
+    Container for an action card.
+  </:description>
+
+  <:api as |Args|>
+    <Args.String
+      @name="header"
+      @description="action card header/label (String)"
+      @onInput={{fn (mut this.header)}}
+      @value={{this.header}}
+    />
+    <Args.String
+      @name="prompt"
+      @optional={{true}}
+      @description="Optional main prompt with styling"
+      @onInput={{fn (mut this.prompt)}}
+      @value={{this.prompt}}
+    />
+    <Args.String
+      @name="incompleteActionLabel"
+      @description="CTA button label for blocking action. It means the action is incomplete"
+      @onInput={{fn (mut this.incompleteActionLabel)}}
+      @value={{this.incompleteActionLabel}}
+    />
+    <Args.String
+      @name="completeActionLabel"
+      @description="CTA button label for non-blocking action"
+      @onInput={{fn (mut this.completeActionLabel)}}
+      @value={{this.completeActionLabel}}
+    />
+    <Args.Object
+      @name="onClickButton"
+      @description="Function for the CTA button action"
+    />
+    <Args.Bool
+      @name="isComplete"
+      @description="Condition for action's completeness (Boolean)"
+      @defaultValue={{false}}
+      @onInput={{fn (mut this.isComplete)}}
+    />
+    <Args.Yield
+      @optional={{true}}
+      @description="Unstyled area for custom card content and fields"
+    />
+  </:api>
+
+  <:example>
+    <Boxel::ActionContainer
+      @header={{this.header}}
+      @prompt={{this.prompt}}
+      @incompleteActionLabel={{this.incompleteActionLabel}}
+      @completeActionLabel={{this.completeActionLabel}}
+      @isComplete={{this.isComplete}}
+      @onClickButton={{fn (mut this.isComplete) (not this.isComplete)}}
+    >
+      {{!-- Sample block yield --}}
+        <ul class="action-container-usage">
+          <li>
+            {{#if this.isComplete}}
+              <div class="action-container-usage__label">Face Value of Prepaid Card</div>
+              {{this.faceValue}}
+            {{else}}
+              <label for="face-value">
+                <span class="action-container-usage__label">Face Value of Prepaid Card</span>
+                <Input
+                  class="action-container-usage__input"
+                  @value={{this.faceValue}}
+                  {{on "input" (pick 'target.value' (fn (mut this.faceValue)))}}
+                />
+              </label>
+            {{/if}}
+          </li>
+        </ul>
+      {{!-- End of sample block yield --}}
+    </Boxel::ActionContainer>
+  </:example>
+</Freestyle::Usage>

@@ -1,0 +1,31 @@
+<article
+  class={{cn "prepaid-card" boxel--dark-theme=@darkTheme}}
+  style={{css-var header-color=this.headerColor}}
+>
+  <header class="prepaid-card__header">
+    <div class="prepaid-card__issuer">
+      <div class="prepaid-card__issuer-image" style={{css-url "background-image" @issuerIcon}} />
+      <div class="prepaid-card__issuer-name">
+        Issued by<br> <span>{{@issuerName}}</span>
+      </div>
+    </div>
+    <div class="prepaid-card__account-info">
+      <div class="prepaid-card__account-address">{{this.shortAddress}}</div>
+      <div class="prepaid-card__account-network">on {{@accountNetwork}}</div>
+    </div>
+  </header>
+  <section class="prepaid-card__content">
+    <div>
+      <div class="prepaid-card__balance-label">Spendable Balance</div>
+      <div class="prepaid-card__balance"><span>§{{@balance}}</span> SPEND</div>
+      <div class="prepaid-card__usd-balance">${{this.usdBalance}} USD</div>
+    </div>
+    <div class="prepaid-card__content-rs">
+      <div class="prepaid-card__logo" />
+      <div class="prepaid-card__attributes">
+        <div>Reloadable</div>
+        <div>Transferable</div>
+      </div>
+    </div>
+  </section>
+</article>
