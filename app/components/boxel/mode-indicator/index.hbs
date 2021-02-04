@@ -1,0 +1,10 @@
+<button
+  class={{cn
+    "mode-indicator"
+    (concat "mode-indicator--" @mode)
+  }}
+  aria-label={{concat "close " @mode " mode"}}
+  ...attributes
+>
+  {{@mode}} mode
+</button>
