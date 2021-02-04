@@ -1,8 +1,8 @@
 .next-steps {
   padding: 30px;
   background-color: #41404D;
-  color: var(--boxel-utloight);
-  font: var(--boxel-utfoont-sm);
+  color: var(--boxel-light);
+  font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
 }
 
