@@ -8,24 +8,24 @@
   outline: 0;
 }
 
-.icon-button__primary {
+.icon-button:hover {
+  cursor: pointer;
+}
+
+.icon-button--primary {
   --icon-bg: var(--boxel-highlight);
   --icon-border: var(--boxel-highlight);
 }
 
-.icon-button__secondary {
+.icon-button--secondary {
   --icon-color: var(--boxel-highlight);
   border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 100px;
   background-color: #41404D;
 }
 
-.icon-button__secondary:hover {
+.icon-button--secondary:hover {
   background-color: var(--boxel-purple-800);
-}
-
-.icon-button:hover {
-  cursor: pointer;
 }
 
 .icon-button > svg {
