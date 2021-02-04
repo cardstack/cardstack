@@ -196,15 +196,15 @@
                         <div class="field-renderer__title">{{#if (eq i 0)}}{{compField.title}}{{/if}}</div>
                         <div class="field-renderer__value">
                           {{#if (and f.status (eq this.mode "comparison"))}}
-                            {{#if (get (get field.value i) "tempField")}}
-                              <div class="discrepancy-field__btn-container discrepancy-field__btn-container--toggled">
-                                <Boxel::IconButton @class="discrepancy-field__btn discrepancy-field__btn--toggled" @icon="carot-thin-left" {{on "click" (fn this.revertField (get field.value i) f)}} />
-                              </div>
-                            {{else}}
-                              <div class="discrepancy-field__btn-container">
-                                <Boxel::IconButton @class="discrepancy-field__btn" @icon="carot-thin-left" {{on "click" (fn this.reconciliateField (get field.value i) f)}} />
-                              </div>
-                            {{/if}}
+                            {{#let (get (get field.value i) "tempField") as |isActive|}}
+                              <Boxel::ApplyChangesToggle
+                                @isActive={{isActive}}
+                                {{on "click" (if isActive
+                                  (fn this.revertField (get field.value i) f)
+                                  (fn this.reconciliateField (get field.value i) f)
+                                )}}
+                              />
+                            {{/let}}                              
                           {{/if}}
                           {{component
                             (or compField.component "card")
@@ -221,15 +221,15 @@
                 {{else}}
 
                   {{#if (and compField.status (eq this.mode "comparison") (not (includes field.title this.omittedFields)))}}
-                    {{#if field.tempField}}
-                      <div class="discrepancy-field__btn-container discrepancy-field__btn-container--toggled">
-                        <Boxel::IconButton @class="discrepancy-field__btn discrepancy-field__btn--toggled" @icon="carot-thin-left" {{on "click" (fn this.revertField field)}} />
-                      </div>
-                    {{else}}
-                      <div class="discrepancy-field__btn-container">
-                        <Boxel::IconButton @class="discrepancy-field__btn" @icon="carot-thin-left" {{on "click" (fn this.reconciliateField field compField)}} />
-                      </div>
-                    {{/if}}
+                    {{#let field.tempField as |isActive|}}
+                      <Boxel::ApplyChangesToggle
+                        @isActive={{isActive}}
+                        {{on "click" (if isActive
+                          (fn this.revertField field)
+                          (fn this.reconciliateField field compField)
+                        )}}
+                      />
+                    {{/let}}
                   {{/if}}
                   <Boxel::FieldRenderer
                     @mode={{if (eq this.mode "linked") "view" "comparison"}}
