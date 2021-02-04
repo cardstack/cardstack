@@ -8,6 +8,11 @@ module.exports = function (defaults) {
       // this is an unreleased feature on the branch we're pointing at
       watchDependencies: ['@cardstack/core'],
       webpack: {
+        node: {
+          fs: 'empty',
+          path: true,
+          process: true,
+        },
         module: {
           rules: [
             {
