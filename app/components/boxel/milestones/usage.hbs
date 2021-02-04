@@ -9,10 +9,12 @@
     />
   </:example>
   <:api as |Args|>
-    <Args.Object
+    <Args.Array
       @name="milestones"
-      @value={{this.milestones}}
-      @description="(object array) — Each object should have a `title` property with title of the milestone."
+      @type="Object"
+      @items={{this.milestones}}
+      @description="Each object should have a `title` property with title of the milestone."
+      @onChange={{fn (mut this.milestones)}}
     />
     <Args.Number
       @name="completedCount"

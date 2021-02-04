@@ -1,10 +1,11 @@
 import Component from '@glimmer/component';
-import { tracked } from '@glimmer/tracking';
 import HaleyOConnellThumb from '../../../images/workflow/participants/thumb/Haley-OConnell.jpg';
 import JuliaMasonThumb from '../../../images/workflow/participants/thumb/Julia-Mason.jpg';
 import LolaSampsonThumb from '../../../images/workflow/participants/thumb/Lola-Sampson.jpg';
 import RupertGrishamThumb from '../../../images/workflow/participants/thumb/Rupert-Grisham.jpg';
 import HSHIcon from '../../../images/workflow/orgs/hsh-icon.png';
+import { A } from '@ember/array';
+import { tracked } from '@glimmer/tracking';
 
 const SAMPLE_PARTICIPANTS = [
   {
@@ -31,8 +32,5 @@ const SAMPLE_PARTICIPANTS = [
   },
 ];
 export default class extends Component {
-  @tracked numParticipants = 2;
-  get participants() {
-    return SAMPLE_PARTICIPANTS.slice(0, this.numParticipants);
-  }
+  @tracked participants = A(SAMPLE_PARTICIPANTS);
 }

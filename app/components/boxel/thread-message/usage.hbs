@@ -29,12 +29,12 @@
       @value={{this.senderImage}}
       @onInput={{fn (mut this.senderImage)}}
     />
-    <Args.String
+    <Args.Array
       @name="contents"
+      @type="String"
       @description="(string array) string messages, revealed in an animated way, takes precedence over @content (singular) if both are defined"
-      @value={{this.contents}}
-      @array={{true}}
-      @onInput={{fn (mut this.contents)}}
+      @items={{this.contents}}
+      @onChange={{fn (mut this.contents)}}
     />
     <Args.String
       @name="content"

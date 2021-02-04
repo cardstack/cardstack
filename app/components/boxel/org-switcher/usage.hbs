@@ -13,7 +13,7 @@
     <Args.Object
       @name="currentOrg"
       @value={{this.currentOrg}}
-      @description="(object array) The organization to show as selected."
+      @description="The organization to show as selected."
       @jsonCollapseDepth={{0}}
     />
     <Args.String
@@ -27,11 +27,13 @@
       @value={{this.onChooseOrg}}
       @description="fires when an org icon is clicked, sending the org ID"
     />
-    <Args.Object
+    <Args.Array
       @name="orgs"
-      @value={{this.orgs}}
-      @description="(object array) The organizations to show."
+      @type="Object"
+      @items={{this.orgs}}
+      @description="The organizations to show."
       @jsonCollapseDepth={{0}}
+      @onChange={{fn (mut this.orgs)}}
     />
   </:api>
 </Freestyle::Usage>

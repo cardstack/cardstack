@@ -1,21 +1,18 @@
-<FreestyleAnnotation @slug="participants-summary">
-  <div>
-    <li><code>@participants</code> (array of <code>Participant</code>s)</li>
-    <input
-      type="range"
-      min={{0}}
-      max={{5}}
-      step={{1}}
-      value={{this.numParticipants}}
-      {{on 'input' (pick 'target.value' (fn (mut this.numParticipants)))}}
-    /> ({{this.numParticipants}})
-  </div>
-</FreestyleAnnotation>
-
-<FreestyleUsage @slug="participants-summary">
-  <Doc::DarkThemeAndLightTheme>
-    <Boxel::ParticipantsSummary
-      @participants={{this.participants}}
+<Freestyle::Usage @name="ParticipantsSummary">
+  <:example>
+    <Doc::DarkThemeAndLightTheme>
+      <Boxel::ParticipantsSummary
+        @participants={{this.participants}}
+      />
+    </Doc::DarkThemeAndLightTheme>
+  </:example>
+  <:api as |Args|>
+    <Args.Array
+      @name="participants"
+      @type="Object"
+      @items={{this.participants}}
+      @description="Each Participant object may have `title`, `role`, `imgURL`, and `type` fields."
+      @onChange={{fn (mut this.participants)}}
     />
-  </Doc::DarkThemeAndLightTheme>
-</FreestyleUsage>
+  </:api>
+</Freestyle::Usage>

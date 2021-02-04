@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
+import { A } from '@ember/array';
 import {
   bunnyLogo,
   bunnyLogoIcon,
@@ -46,7 +47,7 @@ const ORGS = [
 ];
 
 export default class extends Component {
-  orgs = ORGS;
+  @tracked orgs = A(ORGS);
   @tracked currentOrg = ORGS[0];
   @tracked ariaLabel = 'View catalog for ';
   @action onChooseOrg(orgId) {

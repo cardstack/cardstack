@@ -1,5 +1,6 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
+import { A } from '@ember/array';
 
 const SAMPLE_MILESTONS = [
   {
@@ -21,7 +22,7 @@ const SAMPLE_MILESTONS = [
 ];
 
 export default class ProgressBoxUsageComponent extends Component {
-  milestones = SAMPLE_MILESTONS;
+  @tracked milestones = A(SAMPLE_MILESTONS);
   @tracked title = 'Customer Support';
   @tracked status = 'Products reserved';
   @tracked size = 120;
