@@ -33,8 +33,8 @@
 }
 
 .next-steps__icon-btn {
-  --icon-btn-width: 30px;
-  --icon-btn-height: 30px;
+  --icon-button-width: 30px;
+  --icon-button-height: 30px;
 }
 
 .next-steps__btn-group {

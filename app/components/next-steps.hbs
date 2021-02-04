@@ -12,7 +12,12 @@
       <PillButton @variant="primary" @class="next-steps__pill-btn">Send Email Reminder</PillButton>
     {{/if}}
     {{#if @moreActions}}
-      <IconButton @variant="secondary" @class="next-steps__icon-btn" @icon="more-actions" @aria-label="Other actions" />
+      <Boxel::IconButton
+        @icon="more-actions"
+        @variant="secondary"
+        class="next-steps__icon-btn"
+        aria-label="Other actions"
+      />
     {{/if}}
   </div>
 </CardPlatter>

@@ -1,5 +1,5 @@
 <div class="wave-player">
-  <IconButton onclick={{perform this.playPause}} @class="wave-player__play {{if this.isPlaying "is-playing"}}" @icon={{if this.isPlaying "pause-btn" "play-btn"}} @width="30px" @height="30px" />
+  <Boxel::IconButton onclick={{perform this.playPause}} @class="wave-player__play {{if this.isPlaying "is-playing"}}" @icon={{if this.isPlaying "pause-btn" "play-btn"}} @width="30px" @height="30px" />
   <canvas {{did-insert this.setupPlayer}}
     role="button"
     width={{this.width}} height={{this.height}} style={{html-safe this.style}}

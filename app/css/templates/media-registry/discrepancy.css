@@ -293,53 +293,6 @@
   opacity: initial;
 }
 
-.discrepancy-field__btn-container {
-  position: absolute;
-  top: 25%;
-  left: -108px;
-  width: 216px;
-  height: 90px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.discrepancy-field__btn-container.field-renderer__btn-container {
-  left: -228px; /* additional 90px (title field width) + 30px (gap width) */
-}
-
-.discrepancy-field__btn-container--toggled {
-  background-image: url('../../../images/icons/arrows.svg'), url('../../../images/icons/arrows.svg');
-  background-position: left center, right center;
-  background-size: 70px 20px, 70px 20px;
-  background-repeat: no-repeat, no-repeat;
-}
-
-.discrepancy-field__btn {
-  width: 60px;
-  height: 60px;
-  background-color: var(--boxel-light);
-  border: 1px solid #D6D6D6;
-  border-radius: 100px;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
-  z-index: 1;
-  transition: filter var(--boxel-transition);
-}
-
-.discrepancy-field__btn:hover {
-  filter: brightness(0.97);
-}
-
-.discrepancy-field__btn--toggled {
-  background-color: var(--boxel-highlight);
-  border-color: var(--boxel-success-200);
-  box-shadow: none;
-}
-
-.discrepancy-field__btn--toggled:hover {
-  filter: brightness(1.025);
-}
-
 .discrepancy-card__footer {
   height: var(--disc-footer-cta-height-lg);
   background-color: var(--boxel-light);

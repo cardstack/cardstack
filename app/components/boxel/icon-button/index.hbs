@@ -1,0 +1,9 @@
+<button class={{cn
+  "icon-button"
+  (if @variant (concat "icon-button--" @variant))
+  @class
+}} ...attributes>
+  {{#if @icon}}
+    {{svg-jar @icon width=(or @width "16px") height=(or @height "16px")}}
+  {{/if}}
+</button>

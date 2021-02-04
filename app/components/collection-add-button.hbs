@@ -25,6 +25,6 @@
   {{yield}}
 
   <div class="collection-field__add-btn-container">
-    <IconButton {{on "click" (fn (mut this.isAdding) true)}} @icon="icon-plus-circle" @variant="primary" />
+    <Boxel::IconButton {{on "click" (fn (mut this.isAdding) true)}} @icon="icon-plus-circle" @variant="primary" />
   </div>
 {{/if}}
