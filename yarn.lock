@@ -8088,10 +8088,12 @@ ember-fetch@^6.5.0:
     node-fetch "^2.6.0"
     whatwg-fetch "^3.0.0"
 
-ember-freestyle@yapplabs/ember-freestyle#4ca78694:
-  version "0.12.1"
-  resolved "https://codeload.github.com/yapplabs/ember-freestyle/tar.gz/4ca78694938fae2eb40353a6c1f4f5987f45ff86"
+ember-freestyle@^0.12.3:
+  version "0.12.3"
+  resolved "https://registry.yarnpkg.com/ember-freestyle/-/ember-freestyle-0.12.3.tgz#1bfe2c54b2062cc4304ba931a3c7450d93283b7b"
+  integrity sha512-aRVsyho+0C05PjiFdZ1k+NqsrIxiE8tJnGf/CwngpgEzRpJA90ddCbli2DkcaXu35i75VGkROmFJ0u7ikMEYkw==
   dependencies:
+    ember-auto-import "^1.10.1"
     ember-cli-babel "^7.23.0"
     ember-cli-htmlbars "^5.3.1"
     ember-cli-sass "^10.0.0"
@@ -8099,7 +8101,9 @@ ember-freestyle@yapplabs/ember-freestyle#4ca78694:
     ember-modifier "^2.1.0"
     ember-named-blocks-polyfill "^0.2.4"
     ember-runtime-enumerable-includes-polyfill "^2.0.0"
+    ember-truth-helpers "^3.0.0"
     glob "^7.1.3"
+    macro-decorators "^0.1.2"
     sass "^1.17.0"
     strip-indent "^3.0.0"
 
