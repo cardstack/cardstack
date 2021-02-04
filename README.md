@@ -54,3 +54,12 @@ The server maintains its own search index over all the realms it knows about. Th
  - `hasMany`: plural, reference
    - can hold either query or explicit list of ids
 
+
+# Naming things in our Compiler API
+
+`schema.js`: the card's Schema Definition
+```ts
+async compile(schemaDefinition, templates): Promise<Model, Component[]>
+```
+
+`Model`: is the runtime module that you can interrogate about the card's schema and data requirements.
