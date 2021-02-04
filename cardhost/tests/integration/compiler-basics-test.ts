@@ -23,7 +23,7 @@ module('Integration | compiler-basics', function (hooks) {
     let card = {
       'schema.js': `
         import { field } from "@cardstack/types";
-        import string from "hub:https://cardstack.com/base/string";
+        import string from "https://cardstack.com/base/models/string";
 
         export default class Post {
           @field(string)
@@ -34,8 +34,8 @@ module('Integration | compiler-basics', function (hooks) {
 
     let compiler = new Compiler();
     let compiled = await compiler.compile(card);
-
-    let Model = await evalModule(compiled.modelSource);
-    assert.equal(Model.fields, ['title']);
+    console.log(compiled.modelSource);
+    let Model = (await evalModule(compiled.modelSource)).default;
+    assert.deepEqual(new Model().fields, ['title']);
   });
 });
