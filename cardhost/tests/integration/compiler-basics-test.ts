@@ -34,8 +34,6 @@ module('Integration | compiler-basics', function (hooks) {
 
     let compiler = new Compiler();
     let compiled = await compiler.compile(card);
-    console.log(compiled.modelSource);
-    let Model = (await evalModule(compiled.modelSource)).default;
-    assert.deepEqual(new Model().fields, ['title']);
+    assert.deepEqual(Object.keys(compiled.fields), ['title']);
   });
 });

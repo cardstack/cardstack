@@ -3,7 +3,6 @@ import { transformSync } from '@babel/core';
 import decoratorsPlugin from '@babel/plugin-proposal-decorators';
 // @ts-ignore
 import classPropertiesPlugin from '@babel/plugin-proposal-class-properties';
-import classPropertiesSyntax from '@babel/plugin-syntax-class-properties';
 
 import cardPlugin from './card-babel-plugin';
 
@@ -13,6 +12,21 @@ interface RawCard {
 
 interface CompiledCard {
   modelSource: string;
+  fields: {
+    [key: string]:
+      | {
+          hasMany: CompiledCard;
+        }
+      | {
+          belongsTo: CompiledCard;
+        }
+      | {
+          contains: CompiledCard;
+        }
+      | {
+          containsMany: CompiledCard;
+        };
+  };
 }
 
 export class Compiler {
@@ -31,23 +45,17 @@ export class Compiler {
     });
     return {
       modelSource: out!.code!,
+      fields: {},
     };
   }
 }
 
-const fieldMap = new WeakMap();
-
-export function field(card) {
-  return function (desc) {
-    let { key } = desc;
-    function initializer(value) {
-      let fieldList = fieldMap.get(this);
-      if (!fieldList) {
-        fieldList = [];
-        fieldMap.set(this, fieldList);
-        this.fields = fieldList;
-      }
-      fieldList.push(key);
+export function field(/*card: CompiledCard*/) {
+  return function (desc: {
+    key: string;
+    initializer: ((initialValue: any) => any) | undefined;
+  }) {
+    function initializer(value: any) {
       return value;
     }
     desc.initializer = initializer;
