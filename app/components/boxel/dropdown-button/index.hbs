@@ -7,7 +7,7 @@
   style={{css-var dropdown-button-size=(concat (or @size 40) 'px')}}
   ...attributes
 >
-  <BasicDropdown @verticalPosition="below" @renderInPlace={{true}} as |dd|>
+  <BasicDropdown as |dd|>
     <dd.Trigger>
       <button class="boxel-dropdown-button__trigger {{@button}}" aria-label={{@button}}>
         {{#if (or @icon @button)}}
