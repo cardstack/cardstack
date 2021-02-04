@@ -40,10 +40,12 @@
       @max={{this.milestones.length}}
       @onInput={{fn (mut this.completedCount)}}
     />
-    <Args.Object
+    <Args.Array
       @name="milestones"
-      @value={{this.milestones}}
-      @description="(object array) Array of milestones, each with a title property."
+      @type="Object"
+      @items={{this.milestones}}
+      @description="Array of milestones, each with a `title` property."
+      @onChange={{fn (mut this.milestones)}}
     />
   </:api>
 </Freestyle::Usage>

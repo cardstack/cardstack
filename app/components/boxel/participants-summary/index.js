@@ -20,4 +20,9 @@ export default class ParticipantsSummary extends Component {
     }
     return parts.join(', ');
   }
+
+  get iconName() {
+    let { participants } = this.args;
+    return participants.length > 1 ? 'users' : 'user';
+  }
 }

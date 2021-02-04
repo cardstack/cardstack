@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-
+import { A } from '@ember/array';
 const SAMPLE_MILESTONES = [
   {
     title: 'Place order',
@@ -21,6 +21,6 @@ const SAMPLE_MILESTONES = [
 ];
 
 export default class MilestonesUsageComponent extends Component {
-  milestones = SAMPLE_MILESTONES;
+  @tracked milestones = A(SAMPLE_MILESTONES);
   @tracked completedCount = 1;
 }

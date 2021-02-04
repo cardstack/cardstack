@@ -5,6 +5,7 @@ import LolaSampsonThumb from '../../../images/workflow/participants/thumb/Lola-S
 import RupertGrishamThumb from '../../../images/workflow/participants/thumb/Rupert-Grisham.jpg';
 import HSHIcon from '../../../images/workflow/orgs/hsh-icon.png';
 import { tracked } from '@glimmer/tracking';
+import { A } from '@ember/array';
 
 const SAMPLE_PARTICIPANTS = [
   {
@@ -32,7 +33,7 @@ const SAMPLE_PARTICIPANTS = [
 ];
 
 export default class ParticipantListUsageComponent extends Component {
-  participants = SAMPLE_PARTICIPANTS;
+  @tracked participants = A(SAMPLE_PARTICIPANTS);
   @tracked iconSize = 30;
   @tracked maxCount = 5;
   @tracked fanned = false;

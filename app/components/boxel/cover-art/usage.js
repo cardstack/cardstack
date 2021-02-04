@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
+import { A } from '@ember/array';
 
 import LovetheLoveThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Love-the-Love.jpg';
 import HomeIsntSweetThumb from '@cardstack/boxel/images/media-registry/covers/thumb/Home-Isnt-Sweet.jpg';
@@ -15,7 +16,7 @@ import MoreThanWeKnowThumb from '@cardstack/boxel/images/media-registry/covers/t
 export default class extends Component {
   @tracked size = 80;
   @tracked maxWidth = 190;
-  coverThumbs = [
+  @tracked coverThumbs = A([
     LovetheLoveThumb,
     HomeIsntSweetThumb,
     NeverLonelyThumb,
@@ -26,7 +27,7 @@ export default class extends Component {
     MakeMagicThumb,
     GoodTimesThumb,
     MoreThanWeKnowThumb,
-  ];
+  ]);
 
   @action updateCoverThumbs(covers) {
     this.coverThumbs = covers;

@@ -49,10 +49,12 @@
       @defaultValue={{false}}
       @onInput={{fn (mut this.hasLogo)}}
     />
-    <Args.Object
+    <Args.Array
       @name="participants"
-      @value={{this.participants}}
-      @description="(array of Participant models) Each Participant object may have `title`, `role`, `imgURL`, and `type` fields."
+      @type="Object"
+      @items={{this.participants}}
+      @description="Each Participant object may have `title`, `role`, `imgURL`, and `type` fields."
+      @onChange={{fn (mut this.participants)}}
     />
   </:api>
 </Freestyle::Usage>

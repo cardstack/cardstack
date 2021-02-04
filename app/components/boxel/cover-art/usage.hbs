@@ -27,13 +27,13 @@
       @value={{this.maxWidth}}
       @onInput={{fn (mut this.maxWidth)}}
     />
-    <Args.String
+    <Args.Array
       @name="covers"
-      @array={{true}}
+      @type="String"
       @required={{true}}
       @description="a collection of thumbnails to lay out. There is no reason to pass more than 5 as they are barely rendered"
-      @value={{this.coverThumbs}}
-      @onInput={{this.updateCoverThumbs}}
+      @items={{this.coverThumbs}}
+      @onChange={{this.updateCoverThumbs}}
     />
   </:api>
 </Freestyle::Usage>
