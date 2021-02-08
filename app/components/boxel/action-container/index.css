@@ -46,38 +46,7 @@
 
 /* Card Chin */
 .action-container__footer {
-  --icon-color: var(--boxel-purple-300);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 30px;
-  background-color: var(--boxel-purple-700);
-  color: var(--boxel-purple-300);
-  font: var(--boxel-font-xs);
   border-bottom-right-radius: var(--boxel-border-radius);
   border-bottom-left-radius: var(--boxel-border-radius);
 }
 
-.action-container__footer > button {
-  min-height: initial;
-  height: 32px;
-  padding: 7px 40px;
-  letter-spacing: var(--boxel-lsp-sm);
-}
-
-.action-container__footer-text {
-  display: grid;
-  grid-auto-flow: column;
-  align-items: center;
-  gap: 10px;
-}
-
-.action-container--is-complete .action-container__footer {
-  --icon-color: var(--boxel-purple-400);
-  background-color: var(--boxel-purple-100);
-  color: var(--boxel-purple-400);
-}
-
-.action-container--is-complete .action-container__footer > button {
-  border-color: var(--boxel-purple-300);
-}

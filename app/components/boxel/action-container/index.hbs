@@ -13,20 +13,10 @@
 
   {{yield}}
 
-  <footer class="action-container__footer">
-    <Boxel::Button
-      {{on "click" (optional @onClickButton)}}
-      @primary={{not @isComplete}}
-    >
-      {{#if @isComplete}}
-        {{@completeActionLabel}}
-      {{else}}
-        {{@incompleteActionLabel}}
-      {{/if}}
-    </Boxel::Button>
-    <span class="action-container__footer-text">
-      Actions only visible to you
-      {{svg-jar "lock" width="12px" height="12px"}}
-    </span>
-  </footer>
+  <Boxel::ActionChin
+    @mode={{if @isComplete 'memorialized' 'data-entry'}}
+    @buttonText={{if @isComplete @completeActionLabel @incompleteActionLabel}}
+    @onClickButton={{@onClickButton}}
+    class="action-container__footer"
+  />
 </article>

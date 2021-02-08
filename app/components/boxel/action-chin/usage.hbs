@@ -1,0 +1,35 @@
+<Freestyle::Usage @name="ActionChin">
+  <:description>
+    Bottom action area for an action card, a.k.a the "Chin".
+  </:description>
+
+  <:example>
+    <Boxel::ActionChin
+      @mode={{this.mode}}
+      @buttonText={{this.buttonText}}
+      @onClickButton={{this.toggleMode}}
+    />
+  </:example>
+
+  <:api as |Args|>
+    <Args.String
+      @name="mode"
+      @options={{array 'data-entry' 'memorialized'}}
+      @defaultValue="data-entry"
+      @description="data-entry mode (dark, when immediate action is necessary), or memorialized mode (light, reflecting data-entry that has already been performed and is potentially revisable)"
+      @onInput={{fn (mut this.mode)}}
+      @value={{this.mode}}
+    />
+    <Args.String
+      @name="buttonText"
+      @description="Text for the button"
+      @required={{true}}
+      @onInput={{fn (mut this.buttonText)}}
+      @value={{this.buttonText}}
+    />
+    <Args.Action
+      @name="onClickButton"
+      @description="Action to trigger when the button is clicked"
+    />
+  </:api>
+</Freestyle::Usage>
