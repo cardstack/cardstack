@@ -1,7 +1,6 @@
 import {
   ImportDeclaration,
   ImportSpecifier,
-  Class,
   variableDeclaration,
   variableDeclarator,
   identifier,
@@ -12,28 +11,18 @@ import {
   callExpression,
   isDecorator,
   stringLiteral,
-  ClassProperty,
   isClassProperty,
   isStringLiteral,
   isIdentifier,
-  Decorator,
+  CallExpression,
   isCallExpression,
 } from '@babel/types';
 import { NodePath } from '@babel/traverse';
 
-export type FieldMeta =
-  | {
-      hasMany: string;
-    }
-  | {
-      belongsTo: string;
-    }
-  | {
-      contains: string;
-    }
-  | {
-      containsMany: string;
-    };
+export type FieldMeta = {
+  cardURL: string;
+  type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
+};
 
 export function getMeta(
   obj: Object
@@ -56,7 +45,7 @@ const metas = new WeakMap<
   }
 >();
 
-function error(path: NodePath, message: string) {
+function error(path: NodePath<any>, message: string) {
   return path.buildCodeFrameError(message, CompilerError);
 }
 
@@ -84,7 +73,7 @@ export default function main() {
             (specifier) => specifier.type === 'ImportSpecifier'
           ) as ImportSpecifier[];
 
-          storeMeta(state.opts, specifiers, path as NodePath);
+          storeMeta(state.opts, specifiers, path);
 
           path.replaceWith(
             variableDeclaration('const', [
@@ -177,8 +166,34 @@ function storeMeta(
       }
 
       let fieldName = name(fieldIdentifier.parentPath.parentPath.parent.key);
-      fields[fieldName] = { contains: 'whatever' };
+      let { cardURL } = extractFieldArguments(
+        fieldIdentifier.parentPath as NodePath<CallExpression>
+      );
+      fields[fieldName] = { cardURL, type: 'contains' };
     }
     metas.set(opts, { fields });
   }
+}
+
+function extractFieldArguments(callExpression: NodePath<CallExpression>) {
+  if (callExpression.node.arguments.length !== 1) {
+    throw error(callExpression, `field decorator accepts exactly one argument`);
+  }
+
+  let cardTypePath = callExpression.get('arguments')[0];
+  let cardType = cardTypePath.node;
+  if (!isIdentifier(cardType)) {
+    throw error(cardTypePath, 'card type must be an identifier');
+  }
+
+  let definition = cardTypePath.scope.getBinding(cardType.name)?.path;
+  if (!definition) {
+    throw error(cardTypePath, 'card type is not defined');
+  }
+  if (!definition.isImportDefaultSpecifier()) {
+    throw error(definition, 'card type must come from a module default export');
+  }
+  return {
+    cardURL: (definition.parent as ImportDeclaration).source.value,
+  };
 }

@@ -7,25 +7,18 @@ import classPropertiesPlugin from '@babel/plugin-proposal-class-properties';
 import cardPlugin, { getMeta } from './card-babel-plugin';
 
 interface RawCard {
+  url?: string;
   'schema.js': string;
 }
 
 interface CompiledCard {
+  url: string | undefined;
   modelSource: string;
   fields: {
-    [key: string]:
-      | {
-          hasMany: CompiledCard;
-        }
-      | {
-          belongsTo: CompiledCard;
-        }
-      | {
-          contains: CompiledCard;
-        }
-      | {
-          containsMany: CompiledCard;
-        };
+    [key: string]: {
+      type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
+      card: CompiledCard;
+    };
   };
 }
 
@@ -48,10 +41,32 @@ export class Compiler {
 
     let meta = getMeta(options);
 
+    let fields: CompiledCard['fields'] = {};
+    for (let [name, { cardURL, type }] of Object.entries(meta.fields)) {
+      fields[name] = {
+        card: await this.lookup(cardURL),
+        type,
+      };
+    }
+
     return {
+      url: cardSource.url,
       modelSource: out!.code!,
-      fields: meta.fields as any,
+      fields,
     };
+  }
+
+  async lookup(cardURL: string): Promise<CompiledCard> {
+    switch (cardURL) {
+      case 'https://cardstack.com/base/models/string':
+        return {
+          url: cardURL,
+          modelSource: '',
+          fields: {},
+        };
+      default:
+        throw new Error(`unknown card ${cardURL}`);
+    }
   }
 }
 
