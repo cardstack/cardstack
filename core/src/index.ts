@@ -9,6 +9,7 @@ import cardPlugin, { getMeta } from './card-babel-plugin';
 interface RawCard {
   url?: string;
   'schema.js': string;
+  'isolated.hbs'?: string;
 }
 
 interface CompiledCard {
@@ -19,6 +20,9 @@ interface CompiledCard {
       type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
       card: CompiledCard;
     };
+  };
+  templateSources: {
+    [key: string]: string;
   };
 }
 
@@ -53,6 +57,7 @@ export class Compiler {
       url: cardSource.url,
       modelSource: out!.code!,
       fields,
+      templateSources: {},
     };
   }
 
@@ -63,6 +68,9 @@ export class Compiler {
           url: cardURL,
           modelSource: '',
           fields: {},
+          templateSources: {
+            embedded: `{{this}}`,
+          },
         };
       default:
         throw new Error(`unknown card ${cardURL}`);

@@ -116,7 +116,7 @@ function name(node: StringLiteral | Identifier): string {
 function storeMeta(
   opts: object,
   specifiers: ImportSpecifier[],
-  path: NodePath
+  path: NodePath<any>
 ) {
   let fieldHelper = specifiers.find((s) => name(s.imported) === 'field');
   if (fieldHelper) {

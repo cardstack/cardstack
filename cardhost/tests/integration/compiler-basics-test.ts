@@ -284,4 +284,25 @@ module('Integration | compiler-basics', function (hooks) {
       );
     }
   });
+
+  test('it inlines a field template', async function (assert) {
+    let card = {
+      'schema.js': `
+        import { field } from "@cardstack/types";
+        import string from "https://cardstack.com/base/models/string";
+
+        export default class Post {
+          @field(string)
+          title;
+        }
+    `,
+      'isolated.hbs': `
+      <h1><this.title /></h1>
+    `,
+    };
+
+    let compiler = new Compiler();
+    let compiled = await compiler.compile(card);
+    assert.equal(compiled.templateSources.isolated, `<h1>{{this.title}}</h1>`);
+  });
 });
