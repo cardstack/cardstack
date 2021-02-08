@@ -1,6 +1,9 @@
 .sort-menu {
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-sm);
+  padding: 15px 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .sort-menu header {
@@ -14,6 +17,5 @@
 
 .sort-menu ul {
   padding-left: 20px;
-  max-height: 60vh;
   overflow: auto;
 }

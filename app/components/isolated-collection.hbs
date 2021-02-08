@@ -49,12 +49,13 @@
       <div class="media-collection__btn-group">
         <div class="media-collection__btn-trio media-collection__filters">
           {{#if this.sortColumns.length}}
-            <Boxel::DropdownButton class="media-collection__btn" @button="sort" @icon="sort" @size={{30}}>
+            <Boxel::DropdownButton class="media-collection__btn" @button="sort" @icon="sort" @size={{30}} as |Menu dd|>
               <Boxel::SortMenu
                 @sortableColumns={{this.sortColumns}}
                 @sortedColumn={{this.sortColumn}}
                 @sortedDirection={{this.sortDirection}}
                 @onSort={{this.sort}}
+                @maxHeight={{available-height-for-menu dd}}
               />
             </Boxel::DropdownButton>
           {{/if}}
