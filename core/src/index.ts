@@ -4,7 +4,7 @@ import decoratorsPlugin from '@babel/plugin-proposal-decorators';
 // @ts-ignore
 import classPropertiesPlugin from '@babel/plugin-proposal-class-properties';
 
-import cardPlugin from './card-babel-plugin';
+import cardPlugin, { getMeta } from './card-babel-plugin';
 
 interface RawCard {
   'schema.js': string;
@@ -31,9 +31,11 @@ interface CompiledCard {
 
 export class Compiler {
   async compile(cardSource: RawCard): Promise<CompiledCard> {
+    let options = {};
+
     let out = transformSync(cardSource['schema.js'], {
       plugins: [
-        cardPlugin,
+        [cardPlugin, options],
         [
           decoratorsPlugin,
           {
@@ -43,9 +45,12 @@ export class Compiler {
         classPropertiesPlugin,
       ],
     });
+
+    let meta = getMeta(options);
+
     return {
       modelSource: out!.code!,
-      fields: {},
+      fields: meta.fields as any,
     };
   }
 }

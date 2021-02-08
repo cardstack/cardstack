@@ -25,6 +25,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': 'error',
     'prefer-const': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/ban-types': 'off',
   },
   overrides: [
     // node files

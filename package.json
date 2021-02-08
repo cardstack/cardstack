@@ -22,6 +22,9 @@
       "**/@ember/string"
     ]
   },
+  "resolutions": {
+    "**/@babel/types": "^7.12.13"
+  },
   "volta": {
     "node": "14.15.4",
     "yarn": "1.22.5"

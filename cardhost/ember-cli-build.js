@@ -22,7 +22,12 @@ module.exports = function (defaults) {
               use: {
                 loader: 'babel-loader',
                 options: {
-                  plugins: ['@babel/plugin-transform-typescript'],
+                  plugins: [
+                    '@babel/plugin-transform-typescript',
+                    '@babel/plugin-proposal-optional-chaining',
+                    '@babel/plugin-proposal-nullish-coalescing-operator',
+                    '@babel/plugin-proposal-class-properties',
+                  ],
                 },
               },
             },
