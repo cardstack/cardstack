@@ -80,8 +80,10 @@ module('Integration | compiler-basics', function (hooks) {
     let card = {
       'schema.js': `
       import { field } from "@cardstack/types";
+      import string from "https://cardstack.com/base/models/string";
+
       function hi() {
-        return field('xxx');
+        return field(string);
       }
       `,
     };
@@ -101,7 +103,9 @@ module('Integration | compiler-basics', function (hooks) {
     let card = {
       'schema.js': `
       import { field } from "@cardstack/types";
-      @field('hi')
+      import string from "https://cardstack.com/base/models/string";
+
+      @field(string)
       class X {}
       `,
     };
@@ -121,10 +125,12 @@ module('Integration | compiler-basics', function (hooks) {
     let card = {
       'schema.js': `
       import { field } from "@cardstack/types";
+      import string from "https://cardstack.com/base/models/string";
+
       let myFieldName = 'title';
       class X {
 
-        @field(1)
+        @field(string)
         [myFieldName];
       }
       `,
@@ -145,10 +151,12 @@ module('Integration | compiler-basics', function (hooks) {
     let card = {
       'schema.js': `
       import { field } from "@cardstack/types";
+      import string from "https://cardstack.com/base/models/string";
+
       let myFieldName = 'title';
       class X {
 
-        @field(1)
+        @field(string)
         123;
       }
       `,
