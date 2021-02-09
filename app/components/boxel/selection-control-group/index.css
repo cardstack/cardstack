@@ -22,3 +22,7 @@
   padding-left: 17px;
   padding-right: 50px;
 }
+
+.selection-control-group__more-menu {
+  margin: 15px 0;
+}

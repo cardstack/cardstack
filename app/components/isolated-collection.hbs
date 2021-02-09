@@ -32,7 +32,13 @@
           @mode={{@mode}}
           @selectedItemCount={{this.collection.selectedItemCount}}
           @isSelected={{this.collection.selectedAll}}
-          @menuComponent={{component 'actions-menu' class="media-collection__more-actions-menu" actionItems=(array "Delete" "Duplicate") addToCollection=(eq @model.type "collection") transferAgreement=(eq @model.type "master-collection")}}
+          @menuComponent={{component 'boxel/menu' items=(array
+            (menu-item "Delete" (noop))
+            (menu-item "Duplicate" (noop))
+            (menu-item "---")
+            (if (eq @model.type "collection") (menu-item "Add To Collection" (noop)))
+            (if (eq @model.type "master-collection") (menu-item "Transfer Catalog" (link route="media-registry.agreements" model="TA-38185847898")))
+          )}}
         />
       {{/if}}
       {{#if (and (eq @model.type "collection") this.collection.selectedItemCount)}}
@@ -42,7 +48,17 @@
       {{/if}}
       <div class="media-collection__btn-group">
         <div class="media-collection__btn-trio media-collection__filters">
-          <SortPopup @class="media-collection__sort" @sortColumns={{this.sortColumns}} @sortColumn={{this.sortColumn}} @sortDirection={{this.sortDirection}} @sort={{this.sort}}/>
+          {{#if this.sortColumns.length}}
+            <Boxel::DropdownButton class="media-collection__btn" @button="sort" @icon="sort" @size={{30}} as |Menu dd|>
+              <Boxel::SortMenu
+                @sortableColumns={{this.sortColumns}}
+                @sortedColumn={{this.sortColumn}}
+                @sortedDirection={{this.sortDirection}}
+                @onSort={{this.sort}}
+                @maxHeight={{available-height-for-menu dd}}
+              />
+            </Boxel::DropdownButton>
+          {{/if}}
           <Boxel::DropdownButton class="media-collection__btn media-collection__filter" @button="filter" @icon="filter" @size={{30}}>
           </Boxel::DropdownButton>
 

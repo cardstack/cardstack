@@ -1,0 +1,26 @@
+<ul class={{cn 'menu' @class}} ...attributes>
+  {{#if @items}}
+    {{#each (compact @items) as |menuItem|}}
+      {{#if (eq menuItem.type 'divider')}}
+        <hr class="menu__separator">
+      {{else}}
+        <li class={{cn
+          "menu__item"
+          menu__item--dangerous=menuItem.dangerous
+          menu__item--has-icon=menuItem.icon
+        }}>
+          <a
+            href="#"
+            data-test-menu-item={{menuItem.text}}
+            {{on 'click' (fn this.invokeMenuItemAction menuItem.action)}}
+          >
+            {{#if menuItem.icon}}
+              {{svg-jar menuItem.icon width=18 height=18}}
+            {{/if}}
+            {{menuItem.text}}
+          </a>
+        </li>
+      {{/if}}
+    {{/each}}
+  {{/if}}
+</ul>

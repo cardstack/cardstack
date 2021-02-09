@@ -1,0 +1,37 @@
+.menu .menu__item {
+  padding: 10px 20px;
+}
+
+.menu .menu__item:hover,
+.menu .menu__item:focus {
+  background-color: var(--boxel-light-500);
+  cursor: pointer;
+}
+
+.menu .menu__item {
+  padding: 0;
+}
+
+.menu .menu__item:first-child {
+  border-radius: var(--boxel-border-radius) var(--boxel-border-radius) 0 0;
+}
+
+.menu .menu__item:last-child {
+  border-radius: 0 0 var(--boxel-border-radius) var(--boxel-border-radius);
+}
+
+.menu .menu__item > a {
+  width: 100%;
+  padding: 10px 20px;
+}
+
+.menu .menu__item--dangerous {
+  color: var(--boxel-red);
+}
+
+.menu .menu__separator {
+  margin: 0;
+  border: 0;
+  height: 0;
+  border-bottom: 1px solid var( --boxel-purple-300);
+}

@@ -120,26 +120,6 @@
 }
 
 
-/* Actions menu */
-.boxel-actions__more-actions-menu li {
-  padding: 10px 20px;
-}
-
-.boxel-actions__more-actions-menu li:hover,
-.boxel-actions__more-actions-menu li:focus {
-  background-color: #E9E9EE;
-  cursor: pointer;
-}
-
-.boxel-actions__more-actions-menu li.actions-menu__link-item {
-  padding: 0;
-}
-.boxel-actions__more-actions-menu li.actions-menu__link-item > a {
-  width: 100%;
-  padding: 10px 20px;
-}
-
-
 /* Multiple actions */
 .boxel-actions--comparison-mode.with-expand {
   right: 30px;

@@ -11,7 +11,7 @@
   </:example>
 
   <:api as |Args|>
-    {{!-- <Args.Bool
+    <Args.Bool
       @name="isPartial"
       @value={{this.isPartial}}
       @description="when true, renders in its partially selected state"
@@ -24,7 +24,7 @@
       @description="when true, renders in its fully selected state, takes precedence over isPartial if both are true"
       @defaultValue={{false}}
       @onInput={{fn (mut this.isSelected)}}
-    /> --}}
+    />
     <Args.String
       @name="mode"
       @value={{this.mode}}

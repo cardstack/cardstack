@@ -1,0 +1,39 @@
+.sort-menu-item {
+  cursor: pointer;
+  font-weight: 400;
+  opacity: 0.5;
+  padding-left: 10px;
+  padding-right: 10px;
+  position: relative;
+  user-select: none;
+}
+
+.sort-menu-item + .sort-menu-item {
+  padding-top: 15px;
+}
+
+.sort-menu-item:hover,
+.sort-menu-item:focus {
+  opacity: 1;
+}
+
+.sort-menu-item__active {
+  opacity: 1;
+  font-weight: 700;
+  transition: opacity var(--boxel-transition), font-weight var(--boxel-transition);
+}
+
+.sort-menu-item__active::before {
+  content: url('../../../../images/icons/checkmark-highlighted.svg');
+  position: absolute;
+  left: -10px;
+}
+
+.sort-menu-item__active > span {
+  padding-left: 0.4em;
+}
+
+.sort-menu-item__active > span > svg {
+  margin-left: 0.1em;
+  margin-right: 0.1em;
+}

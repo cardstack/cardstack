@@ -1,4 +1,8 @@
-<li role="button" {{on "click" (fn @sort @column @direction)}} class="{{if (and (eq @column @sortColumn) (eq @direction @sortDirection)) "media-collection__sort-dropdown__active"}}">
+<li
+  class={{cn 'sort-menu-item' sort-menu-item__active=@isSelected}}
+  role="button"
+  ...attributes
+>
   {{@column.name}}
   <span>
     {{#if (eq @column.sortType 'numeric')}}
@@ -16,4 +20,3 @@
     {{/if}}
   </span>
 </li>
-

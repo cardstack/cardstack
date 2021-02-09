@@ -1,0 +1,23 @@
+<Freestyle::Usage @name="Menu">
+  <:example>
+    <Boxel::Menu
+      @closeMenu={{this.closeMenu}}
+      @items={{array 
+        (menu-item 'Duplicate' (fn this.log 'Duplicate menu item clicked'))
+        (menu-item 'Share' (fn this.log 'Share menu item clicked'))
+        (menu-item '---')
+        (menu-item 'Remove' (fn this.log 'Remove menu item clicked') dangerous=true)
+      }}
+    />
+  </:example>
+  <:api as |Args|>
+    <Args.Object
+      @name="items"
+      @description="An array of MenuItems, created using the `menu-item` helper. The menu-item helper accepts the menu item text as its first argument, and an action or link (as created using ember-link) as the second argument."
+    />
+    <Args.Action
+      @name="closeMenu"
+      @description="Invoke this action to close the menu (e.g. when it is displayed as part of a dropdown"
+    />
+  </:api>
+</Freestyle::Usage>

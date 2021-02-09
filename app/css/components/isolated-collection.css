@@ -113,26 +113,6 @@
   justify-content: end;
 }
 
-/* Actions menu component */
-.media-collection__more-actions-menu li {
-  padding: 10px 20px;
-}
-
-.media-collection__more-actions-menu li:hover,
-.media-collection__more-actions-menu li:focus {
-  background-color: #E9E9EE;
-  cursor: pointer;
-}
-
-.media-collection__more-actions-menu li.actions-menu__link-item {
-  padding: 0;
-}
-.media-collection__more-actions-menu li.actions-menu__link-item > a {
-  width: 100%;
-  padding: 10px 20px;
-}
-
-
 .media-collection__btn-trio {
   display: grid;
   grid-template-columns: 30px 30px 30px;
@@ -242,20 +222,6 @@
   outline: 0;
 }
 
-.media-collection-dropdown.media-collection__more-actions-dropdown .media-collection__more-actions-menu {
-  padding-left: 0;
-}
-
-.media-collection-dropdown.media-collection__more-actions-menu li {
-  padding: 10px 20px;
-}
-
-.media-collection-dropdown.media-collection__more-actions-menu li:hover,
-.media-collection-dropdown.media-collection__more-actions-menu li:focus {
-  background-color: #E9E9EE;
-}
-
-
 /* Grid item */
 .isolated-collection__select-button {
   visibility: collapse;
@@ -335,7 +301,7 @@
   height: 30px;
   font: var(--boxel-font-sm);
   padding: 5px 10px;
-  margin: 0px 12px;
+  margin: 15px 12px;
   width: 200px;
 }
 
@@ -357,60 +323,4 @@
 .media-collection--edit .media-collection__grid-item--list .media-collection__grid-item-select-button.remove-btn {
   order: 1;
   right: 0;
-}
-
-/* For sort btn */
-.media-collection__sort header {
-  padding-left: 20px;
-  padding-bottom: 15px;
-  background-color: var(--boxel-light);
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.media-collection__sort ul {
-  padding-left: 20px;
-  max-height: 175px;
-  overflow: auto;
-}
-
-.media-collection__sort li {
-  position: relative;
-  padding-left: 10px;
-  padding-right: 10px;
-  opacity: 0.5;
-  font-weight: 400;
-  cursor: pointer;
-  user-select: none;
-}
-
-.media-collection__sort li + li {
-  padding-top: 15px;
-}
-
-.media-collection__sort li:hover,
-.media-collection__sort li:focus {
-  opacity: 1;
-}
-
-.media-collection__sort .media-collection__sort-dropdown__active::before {
-  content: url('../../images/icons/checkmark-highlighted.svg');
-  position: absolute;
-  left: -10px;
-}
-
-.media-collection__sort li.media-collection__sort-dropdown__active {
-  opacity: 1;
-  font-weight: 700;
-  transition: opacity var(--boxel-transition), font-weight var(--boxel-transition);
-}
-
-.media-collection__sort li span {
-  padding-left: 0.4em;
-}
-
-.media-collection__sort li svg {
-  margin-left: 0.1em;
-  margin-right: 0.1em;
 }
