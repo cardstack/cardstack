@@ -1320,6 +1320,13 @@
   dependencies:
     "@simple-dom/interface" "^1.4.0"
 
+"@glimmer/interfaces@0.74.2":
+  version "0.74.2"
+  resolved "https://registry.yarnpkg.com/@glimmer/interfaces/-/interfaces-0.74.2.tgz#0a6571b67153d6c31b248ab8ddf59b4f16a4fec5"
+  integrity sha512-iemaya221twVsOEUD7McNWjHRQ7hij7rosgQI6hHQQyi8/R50f8ZevXo3MVWhni6Gkb9HKReP4Fkru7TpBjySw==
+  dependencies:
+    "@simple-dom/interface" "^1.4.0"
+
 "@glimmer/interfaces@^0.42.2":
   version "0.42.2"
   resolved "https://registry.yarnpkg.com/@glimmer/interfaces/-/interfaces-0.42.2.tgz#9cf8d6f8f5eee6bfcfa36919ca68ae716e1f78db"
@@ -1390,6 +1397,16 @@
     "@handlebars/parser" "^1.1.0"
     simple-html-tokenizer "^0.5.10"
 
+"@glimmer/syntax@^0.74.2":
+  version "0.74.2"
+  resolved "https://registry.yarnpkg.com/@glimmer/syntax/-/syntax-0.74.2.tgz#84efc2555356118a4a275bb8310e261afcf9b048"
+  integrity sha512-G+E2eL0xeo81zBMSkrfobejL/V4YjlAv6Uu8qubwYu/QIHj/UiyxHEMZzN1H88rWcu8iPLzTC4GzFr9Chiu2Jw==
+  dependencies:
+    "@glimmer/interfaces" "0.74.2"
+    "@glimmer/util" "0.74.2"
+    "@handlebars/parser" "^2.0.0"
+    simple-html-tokenizer "^0.5.10"
+
 "@glimmer/tracking@^1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@glimmer/tracking/-/tracking-1.0.3.tgz#8b9b42aff6c206edeaaea178a95acc1eff62e61e"
@@ -1405,6 +1422,15 @@
   dependencies:
     "@glimmer/env" "0.1.7"
     "@glimmer/interfaces" "0.65.1"
+    "@simple-dom/interface" "^1.4.0"
+
+"@glimmer/util@0.74.2":
+  version "0.74.2"
+  resolved "https://registry.yarnpkg.com/@glimmer/util/-/util-0.74.2.tgz#11781773f17e7dfbc15b9e28966563557dd8630e"
+  integrity sha512-miWIwAPJ3i3/7qq4ycI/yJw3mKeN4woUn1ev3/ESTMmELKUNBeIXAnVjlANDTseoTCetgHVw6PFqy/WS6qdtVw==
+  dependencies:
+    "@glimmer/env" "0.1.7"
+    "@glimmer/interfaces" "0.74.2"
     "@simple-dom/interface" "^1.4.0"
 
 "@glimmer/util@^0.42.2":
@@ -1450,6 +1476,11 @@
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@handlebars/parser/-/parser-1.1.0.tgz#d6dbc7574774b238114582410e8fee0dc3532bdf"
   integrity sha512-rR7tJoSwJ2eooOpYGxGGW95sLq6GXUaS1UtWvN7pei6n2/okYvCGld9vsUTvkl2migxbkszsycwtMf/GEc1k1A==
+
+"@handlebars/parser@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@handlebars/parser/-/parser-2.0.0.tgz#5e8b7298f31ff8f7b260e6b7363c7e9ceed7d9c5"
+  integrity sha512-EP9uEDZv/L5Qh9IWuMUGJRfwhXJ4h1dqKTT4/3+tY0eu7sPis7xh23j61SYUnNF4vqCQvvUXpDo9Bh/+q1zASA==
 
 "@nodelib/fs.scandir@2.1.4":
   version "2.1.4"

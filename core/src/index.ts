@@ -1,3 +1,4 @@
+import * as syntax from '@glimmer/syntax';
 import { transformSync } from '@babel/core';
 // @ts-ignore
 import decoratorsPlugin from '@babel/plugin-proposal-decorators';
@@ -5,6 +6,7 @@ import decoratorsPlugin from '@babel/plugin-proposal-decorators';
 import classPropertiesPlugin from '@babel/plugin-proposal-class-properties';
 
 import cardPlugin, { getMeta } from './card-babel-plugin';
+import cardGlimmerPlugin from './card-glimmer-plugin';
 
 interface RawCard {
   url?: string;
@@ -53,11 +55,24 @@ export class Compiler {
       };
     }
 
+    let templateSources: CompiledCard['templateSources'] = {};
+
+    if (cardSource['isolated.hbs']) {
+      templateSources.isolated = syntax.print(
+        syntax.preprocess(cardSource['isolated.hbs'], {
+          mode: 'codemod',
+          plugins: {
+            ast: [cardGlimmerPlugin],
+          },
+        })
+      );
+    }
+
     return {
       url: cardSource.url,
       modelSource: out!.code!,
       fields,
-      templateSources: {},
+      templateSources,
     };
   }
 

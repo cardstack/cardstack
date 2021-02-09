@@ -340,9 +340,7 @@ module('Integration | compiler-basics', function (hooks) {
           title;
         }
     `,
-      'isolated.hbs': `
-      <h1><this.title /></h1>
-    `,
+      'isolated.hbs': `<h1><this.title /></h1>`,
     };
 
     let compiler = new Compiler();
