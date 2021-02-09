@@ -19,32 +19,51 @@ module('Integration | compiler-basics', function (hooks) {
     assert.equal(mod.default(), 'hello world');
   });
 
-  test('it discovers an identifier field', async function (assert) {
+  test('it discovers an identifier contains', async function (assert) {
     let card = {
       'schema.js': `
-        import { field } from "@cardstack/types";
+        import { contains, belongsTo, containsMany, hasMany } from "@cardstack/types";
         import string from "https://cardstack.com/base/models/string";
+        import person from "https://localhost/base/models/person";
+        import comment from "https://localhost/base/models/comment";
+        import tag from "https://localhost/base/models/tag";
 
         export default class Post {
-          @field(string)
+          @contains(string)
           title;
+
+          @containsMany(tag)
+          tags;
+
+          @belongsTo(person)
+          author;
+
+          @hasMany(comment)
+          comments;
+
+          foo = 'bar'
         }
     `,
     };
 
     let compiler = new Compiler();
     let compiled = await compiler.compile(card);
-    assert.deepEqual(Object.keys(compiled.fields), ['title']);
+    assert.deepEqual(Object.keys(compiled.fields), [
+      'title',
+      'author',
+      'tags',
+      'comments',
+    ]);
   });
 
-  test('it discovers a string literal field', async function (assert) {
+  test('it discovers a string literal field for contains', async function (assert) {
     let card = {
       'schema.js': `
-        import { field } from "@cardstack/types";
+        import { contains } from "@cardstack/types";
         import string from "https://cardstack.com/base/models/string";
 
         export default class Post {
-          @field(string)
+          @contains(string)
           "title";
         }
     `,
@@ -55,14 +74,14 @@ module('Integration | compiler-basics', function (hooks) {
     assert.deepEqual(Object.keys(compiled.fields), ['title']);
   });
 
-  test('it discovers the field type', async function (assert) {
+  test('it discovers the field type of contains', async function (assert) {
     let card = {
       'schema.js': `
-        import { field } from "@cardstack/types";
+        import { contains } from "@cardstack/types";
         import string from "https://cardstack.com/base/models/string";
 
         export default class Post {
-          @field(string)
+          @contains(string)
           title;
         }
     `,
@@ -78,9 +97,9 @@ module('Integration | compiler-basics', function (hooks) {
   test('field must be called', async function (assert) {
     let card = {
       'schema.js': `
-      import { field } from "@cardstack/types";
+      import { contains } from "@cardstack/types";
       function hi() {
-        return field;
+        return contains;
       }
       `,
     };
@@ -90,7 +109,7 @@ module('Integration | compiler-basics', function (hooks) {
       await compiler.compile(card);
     } catch (err) {
       assert.ok(
-        /the field decorator must be called/.test(err.message),
+        /the @contains decorator must be called/.test(err.message),
         err.message
       );
     }
@@ -99,11 +118,11 @@ module('Integration | compiler-basics', function (hooks) {
   test('field must be a decorator', async function (assert) {
     let card = {
       'schema.js': `
-      import { field } from "@cardstack/types";
+      import { contains } from "@cardstack/types";
       import string from "https://cardstack.com/base/models/string";
 
       function hi() {
-        return field(string);
+        return contains(string);
       }
       `,
     };
@@ -113,7 +132,7 @@ module('Integration | compiler-basics', function (hooks) {
       await compiler.compile(card);
     } catch (err) {
       assert.ok(
-        /the field decorator must be used as a decorator/.test(err.message),
+        /the @contains decorator must be used as a decorator/.test(err.message),
         err.message
       );
     }
@@ -122,10 +141,10 @@ module('Integration | compiler-basics', function (hooks) {
   test('field must be on a class property', async function (assert) {
     let card = {
       'schema.js': `
-      import { field } from "@cardstack/types";
+      import { contains } from "@cardstack/types";
       import string from "https://cardstack.com/base/models/string";
 
-      @field(string)
+      @contains(string)
       class X {}
       `,
     };
@@ -135,7 +154,9 @@ module('Integration | compiler-basics', function (hooks) {
       await compiler.compile(card);
     } catch (err) {
       assert.ok(
-        /the field decorator can only go on class properties/.test(err.message),
+        /the @contains decorator can only go on class properties/.test(
+          err.message
+        ),
         err.message
       );
     }
@@ -144,13 +165,13 @@ module('Integration | compiler-basics', function (hooks) {
   test('field must have static name', async function (assert) {
     let card = {
       'schema.js': `
-      import { field } from "@cardstack/types";
+      import { contains } from "@cardstack/types";
       import string from "https://cardstack.com/base/models/string";
 
       let myFieldName = 'title';
       class X {
 
-        @field(string)
+        @contains(string)
         [myFieldName];
       }
       `,
@@ -170,13 +191,13 @@ module('Integration | compiler-basics', function (hooks) {
   test('field cannot be weird type', async function (assert) {
     let card = {
       'schema.js': `
-      import { field } from "@cardstack/types";
+      import { contains } from "@cardstack/types";
       import string from "https://cardstack.com/base/models/string";
 
       let myFieldName = 'title';
       class X {
 
-        @field(string)
+        @contains(string)
         123;
       }
       `,
@@ -196,12 +217,11 @@ module('Integration | compiler-basics', function (hooks) {
   test('field with wrong number of arguments', async function (assert) {
     let card = {
       'schema.js': `
-      import { field } from "@cardstack/types";
+      import { contains } from "@cardstack/types";
       import string from "https://cardstack.com/base/models/string";
 
       class X {
-
-        @field(string, 1)
+        @contains(string, 1)
         title;
       }
       `,
@@ -212,7 +232,31 @@ module('Integration | compiler-basics', function (hooks) {
       await compiler.compile(card);
     } catch (err) {
       assert.ok(
-        /field decorator accepts exactly one argument/.test(err.message),
+        /contains decorator accepts exactly one argument/.test(err.message),
+        err.message
+      );
+    }
+  });
+
+  test('hasMany with wrong number of arguments', async function (assert) {
+    let card = {
+      'schema.js': `
+      import { hasMany } from "@cardstack/types";
+      import string from "https://cardstack.com/base/models/string";
+
+      class X {
+        @hasMany(string, 1)
+        title;
+      }
+      `,
+    };
+    let compiler = new Compiler();
+    assert.expect(1);
+    try {
+      await compiler.compile(card);
+    } catch (err) {
+      assert.ok(
+        /@hasMany decorator accepts exactly one argument/.test(err.message),
         err.message
       );
     }
@@ -221,11 +265,11 @@ module('Integration | compiler-basics', function (hooks) {
   test('field with wrong argument syntax', async function (assert) {
     let card = {
       'schema.js': `
-      import { field } from "@cardstack/types";
+      import { contains } from "@cardstack/types";
 
       class X {
 
-        @field("string")
+        @contains("string")
         title;
       }
       `,
@@ -245,10 +289,10 @@ module('Integration | compiler-basics', function (hooks) {
   test('field with undefined type', async function (assert) {
     let card = {
       'schema.js': `
-      import { field } from "@cardstack/types";
+      import { contains } from "@cardstack/types";
 
       class X {
-        @field(string)
+        @contains(string)
         title;
       }
       `,
@@ -265,10 +309,10 @@ module('Integration | compiler-basics', function (hooks) {
   test('field with card type that was not imported', async function (assert) {
     let card = {
       'schema.js': `
-      import { field } from "@cardstack/types";
+      import { contains } from "@cardstack/types";
       let string = 'string';
       class X {
-        @field(string)
+        @contains(string)
         title;
       }
       `,

@@ -19,9 +19,17 @@ import {
 } from '@babel/types';
 import { NodePath } from '@babel/traverse';
 
+const VALID_DECORATORS = {
+  hasMany: true,
+  belongsTo: true,
+  contains: true,
+  containsMany: true,
+};
+type FieldType = keyof typeof VALID_DECORATORS;
+
 export type FieldMeta = {
   cardURL: string;
-  type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
+  type: FieldType;
 };
 
 export function getMeta(
@@ -118,66 +126,83 @@ function storeMeta(
   specifiers: ImportSpecifier[],
   path: NodePath<any>
 ) {
-  let fieldHelper = specifiers.find((s) => name(s.imported) === 'field');
-  if (fieldHelper) {
-    let fields: { [name: string]: FieldMeta } = {};
+  let fields: { [name: string]: FieldMeta } = {};
 
-    for (let fieldIdentifier of path.scope.bindings[fieldHelper.local.name]
-      .referencePaths) {
-      if (
-        !isCallExpression(fieldIdentifier.parent) ||
-        fieldIdentifier.parent.callee !== fieldIdentifier.node
-      ) {
-        throw error(fieldIdentifier, 'the field decorator must be called');
-      }
+  specifiers
+    .filter((s) => (VALID_DECORATORS as any)[name(s.imported)])
+    .forEach((fieldHelper) => {
+      let {
+        local: { name: localName },
+      } = fieldHelper;
 
-      if (
-        !isDecorator(fieldIdentifier.parentPath.parent) ||
-        fieldIdentifier.parentPath.parent.expression !== fieldIdentifier.parent
-      ) {
-        throw error(
-          fieldIdentifier,
-          'the field decorator must be used as a decorator'
+      for (let fieldIdentifier of path.scope.bindings[localName]
+        .referencePaths) {
+        if (
+          !isCallExpression(fieldIdentifier.parent) ||
+          fieldIdentifier.parent.callee !== fieldIdentifier.node
+        ) {
+          throw error(
+            fieldIdentifier,
+            `the @${localName} decorator must be called`
+          );
+        }
+
+        if (
+          !isDecorator(fieldIdentifier.parentPath.parent) ||
+          fieldIdentifier.parentPath.parent.expression !==
+            fieldIdentifier.parent
+        ) {
+          throw error(
+            fieldIdentifier,
+            `the @${localName} decorator must be used as a decorator`
+          );
+        }
+
+        if (!isClassProperty(fieldIdentifier.parentPath.parentPath.parent)) {
+          throw error(
+            fieldIdentifier,
+            `the @${localName} decorator can only go on class properties`
+          );
+        }
+
+        if (fieldIdentifier.parentPath.parentPath.parent.computed) {
+          throw error(
+            fieldIdentifier,
+            'field names must not be dynamically computed'
+          );
+        }
+
+        if (
+          !isIdentifier(fieldIdentifier.parentPath.parentPath.parent.key) &&
+          !isStringLiteral(fieldIdentifier.parentPath.parentPath.parent.key)
+        ) {
+          throw error(
+            fieldIdentifier,
+            'field names must be identifiers or string literals'
+          );
+        }
+
+        let fieldName = name(fieldIdentifier.parentPath.parentPath.parent.key);
+        let { cardURL } = extractFieldArguments(
+          fieldIdentifier.parentPath as NodePath<CallExpression>,
+          localName
         );
-      }
 
-      if (!isClassProperty(fieldIdentifier.parentPath.parentPath.parent)) {
-        throw error(
-          fieldIdentifier,
-          'the field decorator can only go on class properties'
-        );
+        fields[fieldName] = { cardURL, type: 'contains' };
       }
-
-      if (fieldIdentifier.parentPath.parentPath.parent.computed) {
-        throw error(
-          fieldIdentifier,
-          'field names must not be dynamically computed'
-        );
-      }
-
-      if (
-        !isIdentifier(fieldIdentifier.parentPath.parentPath.parent.key) &&
-        !isStringLiteral(fieldIdentifier.parentPath.parentPath.parent.key)
-      ) {
-        throw error(
-          fieldIdentifier,
-          'field names must be identifiers or string literals'
-        );
-      }
-
-      let fieldName = name(fieldIdentifier.parentPath.parentPath.parent.key);
-      let { cardURL } = extractFieldArguments(
-        fieldIdentifier.parentPath as NodePath<CallExpression>
-      );
-      fields[fieldName] = { cardURL, type: 'contains' };
-    }
-    metas.set(opts, { fields });
-  }
+    });
+  metas.set(opts, { fields });
 }
 
-function extractFieldArguments(callExpression: NodePath<CallExpression>) {
+function extractFieldArguments(
+  callExpression: NodePath<CallExpression>,
+  localName: string
+) {
   if (callExpression.node.arguments.length !== 1) {
-    throw error(callExpression, `field decorator accepts exactly one argument`);
+    throw error(
+      callExpression,
+      `@${localName} decorator accepts exactly one argument`
+    );
   }
 
   let cardTypePath = callExpression.get('arguments')[0];

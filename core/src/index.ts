@@ -72,6 +72,33 @@ export class Compiler {
             embedded: `{{this}}`,
           },
         };
+      case 'https://localhost/base/models/person':
+        return {
+          url: cardURL,
+          modelSource: '',
+          fields: {},
+          templateSources: {
+            embedded: `{{this}}`,
+          },
+        };
+      case 'https://localhost/base/models/comment':
+        return {
+          url: cardURL,
+          modelSource: '',
+          fields: {},
+          templateSources: {
+            embedded: `{{this}}`,
+          },
+        };
+      case 'https://localhost/base/models/tag':
+        return {
+          url: cardURL,
+          modelSource: '',
+          fields: {},
+          templateSources: {
+            embedded: `{{this}}`,
+          },
+        };
       default:
         throw new Error(`unknown card ${cardURL}`);
     }
