@@ -329,7 +329,7 @@ module('Integration | compiler-basics', function (hooks) {
     }
   });
 
-  test('it inlines a field template', async function (assert) {
+  test('it inlines a simple field template', async function (assert) {
     let card = {
       'schema.js': `
         import { contains } from "@cardstack/types";
@@ -346,5 +346,27 @@ module('Integration | compiler-basics', function (hooks) {
     let compiler = new Compiler();
     let compiled = await compiler.compile(card);
     assert.equal(compiled.templateSources.isolated, `<h1>{{this.title}}</h1>`);
+  });
+
+  test('it inlines a compound field template', async function (assert) {
+    let card = {
+      'schema.js': `
+        import { contains } from "@cardstack/types";
+        import person from "https://localhost/base/models/person";
+
+        export default class Post {
+          @contains(person)
+          author;
+        }
+    `,
+      'isolated.hbs': `<h1><this.author /></h1>`,
+    };
+
+    let compiler = new Compiler();
+    let compiled = await compiler.compile(card);
+    assert.equal(
+      compiled.templateSources.isolated,
+      `<h1>{{this.author.name}} was born on <FormatDate @date={{this.author.birthdate}} /></h1>`
+    );
   });
 });

@@ -74,13 +74,34 @@ export class Compiler {
             isolated: '',
           },
         };
-      case 'https://localhost/base/models/person':
+      case 'https://cardstack.com/base/models/date':
         return {
           url: cardURL,
           modelSource: '',
           fields: {},
           templateSources: {
-            embedded: `{{this.firstName}} {{this.lastName}}`,
+            embedded: `<FormatDate @date={{this}} />`,
+            isolated: '',
+          },
+        };
+      case 'https://localhost/base/models/person':
+        return {
+          url: cardURL,
+          modelSource: '',
+          fields: {
+            name: {
+              type: 'contains',
+              card: await this.lookup(
+                'https://cardstack.com/base/models/string'
+              ),
+            },
+            birthdate: {
+              type: 'contains',
+              card: await this.lookup('https://cardstack.com/base/models/date'),
+            },
+          },
+          templateSources: {
+            embedded: `{{this.name}} was born on <FormatDate @date={{this.birthdate}}/>`,
             isolated: '',
           },
         };

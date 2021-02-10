@@ -21,7 +21,7 @@ export default function cardTransform(options: {
               let embeddedTemplate = field.card.templateSources.embedded;
               let ast = parse(embeddedTemplate, {
                 plugins: {
-                  ast: [rewriteLocals({ this: node.tag })],
+                  ast: [rewriteLocals({ this: fieldName })],
                 },
               });
               return ast.body;
@@ -34,17 +34,19 @@ export default function cardTransform(options: {
   };
 }
 
-function rewriteLocals(remapping: {
-  [oldpath: string]: string;
-}): ASTPluginBuilder {
+function rewriteLocals(remapping: { this: string }): ASTPluginBuilder {
+  let rewritten = new Set<unknown>();
   return function transform(env: ASTPluginEnvironment): ASTPlugin {
     return {
       name: 'card-glimmer-plugin-rewrite-locals',
       visitor: {
         PathExpression(node) {
-          let newPath = remapping[node.original];
-          if (newPath) {
-            return env.syntax.builders.path(newPath);
+          if (node.head.type === 'ThisHead' && !rewritten.has(node)) {
+            let result = env.syntax.builders.path(
+              `this.${[remapping.this, ...node.tail].join('.')}`
+            );
+            rewritten.add(result);
+            return result;
           }
           return undefined;
         },
