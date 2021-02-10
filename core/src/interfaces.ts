@@ -1,8 +1,24 @@
-export interface RawCard {
+const templateTypeNames = {
+  isolated: '',
+  embedded: '',
+};
+
+export type TemplateType = keyof typeof templateTypeNames;
+
+export const templateTypes = Object.keys(templateTypeNames) as TemplateType[];
+
+type TemplateFiles = {
+  [K in `${string & keyof typeof templateTypeNames}.hbs`]: string;
+};
+
+export function templateFileName(templateType: TemplateType) {
+  return `${templateType}.hbs` as `${TemplateType}.hbs`;
+}
+
+export type RawCard = {
   url?: string;
   'schema.js': string;
-  'isolated.hbs'?: string;
-}
+} & TemplateFiles;
 
 export interface CompiledCard {
   url: string | undefined;
@@ -13,8 +29,5 @@ export interface CompiledCard {
       card: CompiledCard;
     };
   };
-  templateSources: {
-    isolated: string;
-    embedded: string;
-  };
+  templateSources: typeof templateTypeNames;
 }

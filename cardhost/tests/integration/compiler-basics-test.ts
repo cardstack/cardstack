@@ -74,6 +74,24 @@ module('Integration | compiler-basics', function (hooks) {
     assert.deepEqual(Object.keys(compiled.fields), ['title']);
   });
 
+  test('it discovers a field whose import comes before the field decorator', async function (assert) {
+    let card = {
+      'schema.js': `
+        import string from "https://cardstack.com/base/models/string";
+        import { contains } from "@cardstack/types";
+
+        export default class Post {
+          @contains(string)
+          "title";
+        }
+    `,
+    };
+
+    let compiler = new Compiler();
+    let compiled = await compiler.compile(card);
+    assert.deepEqual(Object.keys(compiled.fields), ['title']);
+  });
+
   test('it discovers the field type of contains', async function (assert) {
     let card = {
       'schema.js': `

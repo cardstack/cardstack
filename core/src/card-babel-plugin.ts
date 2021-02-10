@@ -99,15 +99,6 @@ export default function main() {
           );
           return;
         }
-
-        let prefix = 'https://cardstack.com/base/';
-        if (path.node.source.value.startsWith(prefix)) {
-          path.node.source.value =
-            path.node.source.value.replace(
-              prefix,
-              'http://localhost:4200/base/'
-            ) + '.js';
-        }
       },
     },
   };

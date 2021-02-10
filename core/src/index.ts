@@ -7,7 +7,12 @@ import classPropertiesPlugin from '@babel/plugin-proposal-class-properties';
 
 import cardPlugin, { getMeta } from './card-babel-plugin';
 import cardGlimmerPlugin from './card-glimmer-plugin';
-import { CompiledCard, RawCard } from './interfaces';
+import {
+  CompiledCard,
+  RawCard,
+  templateFileName,
+  templateTypes,
+} from './interfaces';
 
 export class Compiler {
   async compile(cardSource: RawCard): Promise<CompiledCard> {
@@ -37,28 +42,31 @@ export class Compiler {
     }
 
     // TODO: inherit all the way up to base, so these are never undefined
-    let isolated = '';
-    let embedded = '';
+    let templateSources: CompiledCard['templateSources'] = {
+      isolated: '',
+      embedded: '',
+    };
 
-    if (cardSource['isolated.hbs']) {
-      isolated = syntax.print(
-        syntax.preprocess(cardSource['isolated.hbs'], {
-          mode: 'codemod',
-          plugins: {
-            ast: [cardGlimmerPlugin({ fields })],
-          },
-        })
-      );
+    for (let templateType of templateTypes) {
+      let source = cardSource[templateFileName(templateType)];
+
+      if (source) {
+        templateSources[templateType] = syntax.print(
+          syntax.preprocess(source, {
+            mode: 'codemod',
+            plugins: {
+              ast: [cardGlimmerPlugin({ fields })],
+            },
+          })
+        );
+      }
     }
 
     return {
       url: cardSource.url,
       modelSource: out!.code!,
       fields,
-      templateSources: {
-        isolated,
-        embedded,
-      },
+      templateSources,
     };
   }
 
@@ -85,26 +93,23 @@ export class Compiler {
           },
         };
       case 'https://localhost/base/models/person':
-        return {
+        return await this.compile({
           url: cardURL,
-          modelSource: '',
-          fields: {
-            name: {
-              type: 'contains',
-              card: await this.lookup(
-                'https://cardstack.com/base/models/string'
-              ),
-            },
-            birthdate: {
-              type: 'contains',
-              card: await this.lookup('https://cardstack.com/base/models/date'),
-            },
-          },
-          templateSources: {
-            embedded: `{{this.name}} was born on <FormatDate @date={{this.birthdate}}/>`,
-            isolated: '',
-          },
-        };
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import date from "https://cardstack.com/base/models/date";
+            import string from "https://cardstack.com/base/models/string";
+            export default class Person {
+              @contains(string)
+              name;
+
+              @contains(date)
+              birthdate;
+            }
+          `,
+          'embedded.hbs': `<this.name/> was born on <this.birthdate/>`,
+          'isolated.hbs': '',
+        });
       case 'https://localhost/base/models/comment':
         return {
           url: cardURL,
