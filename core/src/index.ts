@@ -108,7 +108,6 @@ export class Compiler {
             }
           `,
           'embedded.hbs': `<this.name/> was born on <this.birthdate/>`,
-          'isolated.hbs': '',
         });
       case 'https://localhost/base/models/comment':
         return {

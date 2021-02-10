@@ -18,7 +18,7 @@ export function templateFileName(templateType: TemplateType) {
 export type RawCard = {
   url?: string;
   'schema.js': string;
-} & TemplateFiles;
+} & Partial<TemplateFiles>;
 
 export interface CompiledCard {
   url: string | undefined;
