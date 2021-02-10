@@ -19,7 +19,7 @@ module('Integration | compiler-basics', function (hooks) {
     assert.equal(mod.default(), 'hello world');
   });
 
-  test('it discovers an identifier contains', async function (assert) {
+  test('it discovers the four kinds of fields', async function (assert) {
     let card = {
       'schema.js': `
         import { contains, belongsTo, containsMany, hasMany } from "@cardstack/types";
@@ -56,7 +56,7 @@ module('Integration | compiler-basics', function (hooks) {
     ]);
   });
 
-  test('it discovers a string literal field for contains', async function (assert) {
+  test('it discovers a string literal field', async function (assert) {
     let card = {
       'schema.js': `
         import { contains } from "@cardstack/types";
