@@ -19,7 +19,11 @@
       "core"
     ],
     "nohoist": [
-      "**/@ember/string"
+      "**/@ember/string",
+      "**/@glimmer/util",
+      "wrap-legacy-hbs-plugin-if-needed/@glimmer/reference",
+      "ember-template-recast/@glimmer/reference",
+      "**/@glimmer/runtime"
     ]
   },
   "resolutions": {
