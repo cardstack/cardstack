@@ -1,0 +1,51 @@
+{{#if (or (eq this.target.currentRouteName "media-registry.versions") (eq (truncate this.target.currentRouteName 40 false) "media-registry.discrepancies.discrepancy"))}}
+  {{outlet}}
+{{else}}
+  <section class="media-registry media-registry--{{@model.currentOrg.id}}">
+    {{#if (eq this.target.currentRouteName "media-registry.cardflow")}}
+      {{outlet}}
+    {{else}}
+      <aside class="media-registry__left-edge {{if this.isQueueFixed "with-queue"}}">
+        <CardHost::LeftEdgeNav
+          @home={{hash icon="verifi-logo-dark-outline" action=(fn this.transition "warner-music-group") height="45px"}}
+          @orgs={{@model.orgs}}
+          @currentOrg={{@model.currentOrg}}
+          @ariaLabel="View catalog for "
+          @onChooseOrg={{fn this.transition}}
+        />
+
+        {{#each @model.orgs as |org|}}
+          {{#if org.user}}
+            <Boxel::IconButton {{on "click" (fn this.transition org.id)}} class="media-registry__hover-zone media-registry__hover-zone--{{org.id}}" />
+          {{/if}}
+        {{/each}}
+        {{#if @model.currentOrg.user}}
+          <div class="media-registry__left-edge-queue {{if this.isQueueFixed "slide-in"}}">
+            <Boxel::IconButton
+              @icon={{if this.isQueueFixed "arrow-left" "sidebar"}}
+              class="media-registry__queue-btn"
+              aria-label="Toggle fix cardflow queue"
+              {{on "click" (fn (mut this.isQueueFixed) (not this.isQueueFixed))}}
+            />
+            <CardflowQueue
+              @class="media-registry__queue {{if (and (not this.isQueueFixed) (not-eq this.target.currentRouteName "media-registry.cardflow")) "with-box-shadow"}}"
+              @model={{@model.currentOrg}}
+              @currentMilestone={{this.latestMilestone}}
+            />
+          </div>
+        {{/if}}
+      </aside>
+      <OrgHeader
+        @org={{@model.currentOrg}}
+        @id={{@model.currentOrg.id}}
+        @title={{@model.currentOrg.title}}
+        @logoURL={{@model.currentOrg.logoURL}}
+        @musicalWorkOnly={{@model.currentOrg.musicalWorkOnly}}
+      />
+
+      <div class="media-registry__outlet">
+        {{outlet}}
+      </div>
+    {{/if}}
+  </section>
+{{/if}}

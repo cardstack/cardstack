@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = {
   root: true,
   parser: 'babel-eslint',
@@ -28,14 +30,20 @@ module.exports = {
         '.prettierrc.js',
         '.template-lintrc.js',
         'ember-cli-build.js',
+        'generate-thumbs.js',
+        'index.js',
         'testem.js',
         'blueprints/*/index.js',
         'config/**/*.js',
-        'generate-thumbs.js',
         'lib/**/*.js',
-        'server/**/*.js',
+        'tests/dummy/config/**/*.js',
       ],
-      excludedFiles: ['app/**'],
+      excludedFiles: [
+        'addon/**',
+        'addon-test-support/**',
+        'app/**',
+        'tests/dummy/app/**',
+      ],
       parserOptions: {
         sourceType: 'script',
       },
@@ -44,6 +52,7 @@ module.exports = {
         node: true,
       },
       plugins: ['node'],
+      // extends: ['plugin:node/recommended'], Errors?
       rules: Object.assign(
         {},
         require('eslint-plugin-node').configs.recommended.rules,

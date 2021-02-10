@@ -73,16 +73,20 @@ jobs:
         path: |
           ${{ steps.global-cache-dir-path.outputs.dir }}
           node_modules
-        key: v1-${{ runner.os }}-${{ matrix.node-version }}-${{
+        key: v4-${{ runner.os }}-${{ matrix.node-version }}-${{
           hashFiles('**/yarn.lock'
           ) }}
         restore-keys: |
-          v1-${{ runner.os }}-${{ matrix.node-version }}-
+          v4-${{ runner.os }}-${{ matrix.node-version }}-
 
     - name: Install Dependencies
       run: yarn install --frozen-lockfile
       if: |
         steps.cache-dependencies.outputs.cache-hit != 'true'
+
+    # - name: Setup tmate session
+    #   uses: mxschmitt/action-tmate@v4
+    #   timeout-minutes: 90
 
     - name: Test
       run: yarn test:ember --launch ${{ matrix.browser }}
@@ -117,9 +121,9 @@ jobs:
         path: |
           ${{ steps.global-cache-dir-path.outputs.dir }}
           node_modules
-        key: v1-${{ runner.os }}-${{ matrix.node-version }}-floating-deps
+        key: v4-${{ runner.os }}-${{ matrix.node-version }}-floating-deps
         restore-keys: |
-          v1-${{ runner.os }}-${{ matrix.node-version }}-
+          v4-${{ runner.os }}-${{ matrix.node-version }}-
 
     - name: Install Dependencies
       run: yarn install --no-lockfile --non-interactive
@@ -167,11 +171,11 @@ jobs:
         path: |
           ${{ steps.global-cache-dir-path.outputs.dir }}
           node_modules
-        key: v1-${{ runner.os }}-${{ matrix.node-version }}-${{
+        key: v4-${{ runner.os }}-${{ matrix.node-version }}-${{
           hashFiles('**/yarn.lock'
           ) }}
         restore-keys: |
-          v1-${{ runner.os }}-${{ matrix.node-version }}-
+          v4-${{ runner.os }}-${{ matrix.node-version }}-
 
     - name: Install Dependencies
       run: yarn install --frozen-lockfile
