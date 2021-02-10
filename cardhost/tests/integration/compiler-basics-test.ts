@@ -332,11 +332,11 @@ module('Integration | compiler-basics', function (hooks) {
   test('it inlines a field template', async function (assert) {
     let card = {
       'schema.js': `
-        import { field } from "@cardstack/types";
+        import { contains } from "@cardstack/types";
         import string from "https://cardstack.com/base/models/string";
 
         export default class Post {
-          @field(string)
+          @contains(string)
           title;
         }
     `,

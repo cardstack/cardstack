@@ -7,26 +7,7 @@ import classPropertiesPlugin from '@babel/plugin-proposal-class-properties';
 
 import cardPlugin, { getMeta } from './card-babel-plugin';
 import cardGlimmerPlugin from './card-glimmer-plugin';
-
-interface RawCard {
-  url?: string;
-  'schema.js': string;
-  'isolated.hbs'?: string;
-}
-
-interface CompiledCard {
-  url: string | undefined;
-  modelSource: string;
-  fields: {
-    [key: string]: {
-      type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
-      card: CompiledCard;
-    };
-  };
-  templateSources: {
-    [key: string]: string;
-  };
-}
+import { CompiledCard, RawCard } from './interfaces';
 
 export class Compiler {
   async compile(cardSource: RawCard): Promise<CompiledCard> {
@@ -55,14 +36,16 @@ export class Compiler {
       };
     }
 
-    let templateSources: CompiledCard['templateSources'] = {};
+    // TODO: inherit all the way up to base, so these are never undefined
+    let isolated = '';
+    let embedded = '';
 
     if (cardSource['isolated.hbs']) {
-      templateSources.isolated = syntax.print(
+      isolated = syntax.print(
         syntax.preprocess(cardSource['isolated.hbs'], {
           mode: 'codemod',
           plugins: {
-            ast: [cardGlimmerPlugin],
+            ast: [cardGlimmerPlugin({ fields })],
           },
         })
       );
@@ -72,7 +55,10 @@ export class Compiler {
       url: cardSource.url,
       modelSource: out!.code!,
       fields,
-      templateSources,
+      templateSources: {
+        isolated,
+        embedded,
+      },
     };
   }
 
@@ -85,6 +71,7 @@ export class Compiler {
           fields: {},
           templateSources: {
             embedded: `{{this}}`,
+            isolated: '',
           },
         };
       case 'https://localhost/base/models/person':
@@ -93,7 +80,8 @@ export class Compiler {
           modelSource: '',
           fields: {},
           templateSources: {
-            embedded: `{{this}}`,
+            embedded: `{{this.firstName}} {{this.lastName}}`,
+            isolated: '',
           },
         };
       case 'https://localhost/base/models/comment':
@@ -103,6 +91,7 @@ export class Compiler {
           fields: {},
           templateSources: {
             embedded: `{{this}}`,
+            isolated: '',
           },
         };
       case 'https://localhost/base/models/tag':
@@ -112,6 +101,7 @@ export class Compiler {
           fields: {},
           templateSources: {
             embedded: `{{this}}`,
+            isolated: '',
           },
         };
       default:
