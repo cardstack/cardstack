@@ -5,13 +5,28 @@
 >
   <div
     class="progress-circle__pie"
-    style={{html-safe (concat "stroke-dasharray:" (mult (div @percentComplete 100) 339) " " 339)}}
   >
-    {{svg-jar "progress-circle-lg" width=this.size height=this.size}}
+    <svg xmlns="http://www.w3.org/2000/svg" width={{this.size}} height={{this.size}} viewBox="0 0 {{this.outerCircleDiameter}} {{this.outerCircleDiameter}}">
+      <g stroke-width="{{this.progressArcThickness}}">
+        <circle 
+          cx={{this.outerCircleRadius}} 
+          cy={{this.outerCircleRadius}}  
+          r={{this.strokeCircleRadius}} 
+          class="progress-circle__background-circle"
+        />
+        <circle 
+          cx={{this.outerCircleRadius}} 
+          cy={{this.outerCircleRadius}}  
+          r={{this.strokeCircleRadius}} 
+          class="progress-circle__indicator-circle"
+          style={{this.pieStyle}}
+        />
+      </g>
+    </svg>
   </div>
   <div
     class="progress-circle__pct-label"
-    style={{html-safe (concat "font-size:" this.fontSize "px;width:" this.innerCircleSize "px; height:" this.innerCircleSize "px;")}}
+    style={{html-safe (concat "font-size:" this.fontSize "px;width:" this.percentLabelDiameter "px; height:" this.percentLabelDiameter "px;")}}
   >
     {{this.humanPercentComplete}}%
   </div>
