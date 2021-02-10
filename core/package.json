@@ -18,7 +18,7 @@
     "@babel/core": "^7.12.13",
     "@babel/plugin-proposal-class-properties": "^7.12.13",
     "@babel/plugin-proposal-decorators": "^7.12.13",
-    "@glimmer/syntax": "^0.74.2",
+    "@glimmer/syntax": "0.75.0",
     "@types/babel__core": "^7.1.12"
   },
   "devDependencies": {
