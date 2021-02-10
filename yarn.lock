@@ -1268,6 +1268,17 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@glimmer/compiler@0.75.0":
+  version "0.75.0"
+  resolved "https://registry.yarnpkg.com/@glimmer/compiler/-/compiler-0.75.0.tgz#6b4c91274221641aaaae21f3e1a60fc349a398e3"
+  integrity sha512-gWpcmLc5nE8UYgOE7NHyE5x4lUzg6Xm1aJJn7aConewtqA6LgvLTGlN3LwDL8ga2gN17oG1+NzGgS5SUpliZLA==
+  dependencies:
+    "@glimmer/interfaces" "0.75.0"
+    "@glimmer/syntax" "0.75.0"
+    "@glimmer/util" "0.75.0"
+    "@glimmer/wire-format" "0.75.0"
+    "@simple-dom/interface" "^1.4.0"
+
 "@glimmer/component@^1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@glimmer/component/-/component-1.0.3.tgz#38c26fc4855fd7ad0e0816d18d80d32c578e5140"

@@ -1,6 +1,8 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { Compiler } from '@cardstack/core';
+import { render } from '@ember/test-helpers';
+import { compileTemplate } from '../helpers/template-compiler';
 
 function evalModule(src: string): Promise<any> {
   return import(`data:application/javascript;base64,${btoa(src)}`);
@@ -17,6 +19,12 @@ module('Integration | compiler-basics', function (hooks) {
     `;
     let mod = await evalModule(schema);
     assert.equal(mod.default(), 'hello world');
+  });
+
+  test('we have a working in-browser template compiler for tests', async function (assert) {
+    let compiled = compileTemplate(`<div class="it-works"></div>`);
+    await render(compiled);
+    assert.ok(document.querySelector('.it-works'));
   });
 
   test('it discovers the four kinds of fields', async function (assert) {
