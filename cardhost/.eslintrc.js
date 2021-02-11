@@ -26,6 +26,7 @@ module.exports = {
     'prefer-const': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/ban-types': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
   },
   overrides: [
     // node files

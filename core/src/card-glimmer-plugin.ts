@@ -9,7 +9,7 @@ import { CompiledCard } from './interfaces';
 export default function cardTransform(options: {
   fields: CompiledCard['fields'];
 }): ASTPluginBuilder {
-  return function transform(env: ASTPluginEnvironment): ASTPlugin {
+  return function transform(/* env: ASTPluginEnvironment */): ASTPlugin {
     return {
       name: 'card-glimmer-plugin',
       visitor: {
