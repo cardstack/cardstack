@@ -1,5 +1,9 @@
 # Cardstack
 
+## Warning
+
+Currently all embroider packages must be linked to the native-v2-addon branch of embroider.
+
 ## Installing
 
 1. Install [volta](https://volta.sh/) and `volta install yarn`.
@@ -19,11 +23,6 @@
 By default, the server will use both the `base-cards` and `demo-cards` directories as read/write realms. Any change you make in the app will appear as (uncommitted) changes to these directories.
 
 The server maintains its own search index over all the realms it knows about. The search index is stored in postgres.
-
-## NEXT
-
-1. Hand-roll compiled output for our six demo cards plus the three implied base cards they use. It should actually be runnable. The compiler output implies what we would into the search index, and we can put that into mirage, etc.
-2. Get one card compile working, against the other hand-compiled cards.
 
 ## Open Questions
 
