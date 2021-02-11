@@ -32,6 +32,7 @@
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.12.13",
     "@babel/plugin-proposal-optional-chaining": "^7.12.13",
     "@babel/plugin-transform-typescript": "^7.12.13",
+    "@cardstack/compiled": "0.0.0",
     "@cardstack/core": "0.0.0",
     "@ember/optional-features": "^2.0.0",
     "@ember/test-helpers": "^2.1.4",
@@ -98,6 +99,7 @@
     "@babel/types": "^7.12.13",
     "@embroider/compat": "^0.36.0",
     "@embroider/core": "^0.36.0",
+    "@embroider/util": "^0.36.0",
     "@embroider/webpack": "^0.36.0",
     "@types/babel__traverse": "^7.11.0",
     "ember-cli-typescript": "^4.0.0"

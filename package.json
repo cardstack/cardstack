@@ -16,7 +16,8 @@
     "packages": [
       "cardhost",
       "server",
-      "core"
+      "core",
+      "compiled"
     ],
     "nohoist": [
       "**/@ember/string",

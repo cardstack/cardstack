@@ -1,0 +1,13 @@
+{
+  "name": "@cardstack/compiled",
+  "version": "0.0.0",
+  "keywords": ["ember-addon"],
+  "dependencies": {
+    "@embroider/util": "0.36.0"
+  },
+  "ember-addon": {
+    "version": 2,
+    "type": "addon",
+    "main": "addon-main.js"
+  }
+}

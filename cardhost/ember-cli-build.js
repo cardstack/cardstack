@@ -5,6 +5,13 @@ const { Webpack } = require('@embroider/webpack');
 const { compatBuild } = require('@embroider/compat');
 const withSideWatch = require('./lib/with-side-watch');
 
+process.env.EMBROIDER_REBUILD_ADDONS = [
+  process.env.EMBROIDER_REBUILD_ADDONS,
+  '@cardstack/compiled',
+]
+  .filter(Boolean)
+  .join(',');
+
 module.exports = function (defaults) {
   let app = new EmberApp(defaults, {
     trees: {

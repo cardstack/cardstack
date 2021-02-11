@@ -1844,6 +1844,14 @@
     resolve "^1.8.1"
     semver "^7.3.2"
 
+"@embroider/util@0.36.0":
+  version "0.36.0"
+  resolved "https://registry.yarnpkg.com/@embroider/util/-/util-0.36.0.tgz#b2ffb2b06ac491f157a771392191ce91ef2216a6"
+  integrity sha512-gMIGL9UQ6Pl5WvpcIqIiE+QkK5GW49VLp+IEl+v4w9ZBkH7Z9boiwWariW4y/FtNU1iU8ELFbol1+IJ8I8VN4Q==
+  dependencies:
+    "@embroider/macros" "0.36.0"
+    ember-cli-babel "^7.22.1"
+
 "@embroider/webpack@^0.36.0":
   version "0.36.0"
   resolved "https://registry.yarnpkg.com/@embroider/webpack/-/webpack-0.36.0.tgz#5c5e7475d5ec1a6f3f08ca76fe14d1e1a6b95adb"
