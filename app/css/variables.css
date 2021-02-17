@@ -22,7 +22,19 @@
   --boxel-lsp-sm: 0.015em;
   --boxel-lsp-xs: 0.005em;
 
-  --boxel-spacing: 20px;
+  /* Modular scale for spacing */
+  --boxel-spacing: 1.25rem; /* base size (20px) */
+  --boxel-ratio: 1.333;     /* scale (based on "Perfect Fourth" scale) */
+  --boxel-sp-xxxs: calc(var(--boxel-sp-xxs) / var(--boxel-ratio)); /* 6.33px */
+  --boxel-sp-xxs: calc(var(--boxel-sp-xs) / var(--boxel-ratio));   /* 8.44px */
+  --boxel-sp-xs: calc(var(--boxel-sp-sm) / var(--boxel-ratio));    /* 11.26px */
+  --boxel-sp-sm: calc(var(--boxel-sp) / var(--boxel-ratio));       /* 15px */
+  --boxel-sp: var(--boxel-spacing);                                /* 20px */
+  --boxel-sp-lg: calc(var(--boxel-sp) * var(--boxel-ratio));       /* 26.66px */
+  --boxel-sp-xl: calc(var(--boxel-sp-lg) * var(--boxel-ratio));    /* 35.54px */
+  --boxel-sp-xxl: calc(var(--boxel-sp-xl) * var(--boxel-ratio));   /* 47.37px */
+  --boxel-sp-xxxl: calc(var(--boxel-sp-xxl) * var(--boxel-ratio)); /* 63.15px */
+
   --boxel-border-color: var(--boxel-light-500);
   --boxel-border: 1px solid var(--boxel-border-color);
   --boxel-border-dark: 1px solid var(--boxel-dark);
