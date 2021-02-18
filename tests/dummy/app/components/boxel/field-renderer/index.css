@@ -96,7 +96,7 @@
   color: transparent;
   width: 260px;
   height: 260px;
-  background: url('/@cardstack/boxel/images/placeholders/album_art.svg') center/cover
+  background: url('../@cardstack/boxel/images/placeholders/album_art.svg') center/cover
     no-repeat;
 }
 
@@ -169,12 +169,12 @@
   height: 30px;
   padding: 0;
   border: none;
-  background: url('/@cardstack/boxel/images/icons/icon-minus-circle.svg') center/16px
+  background: url('../@cardstack/boxel/images/icons/icon-minus-circle.svg') center/16px
     16px no-repeat;
 }
 
 .item__add-btn {
-  background-image: url('/@cardstack/boxel/images/icons/icon-plus-circle-highlight-bg.svg');
+  background-image: url('../@cardstack/boxel/images/icons/icon-plus-circle-highlight-bg.svg');
   position: absolute;
   top: 15px;
   right: 0;
@@ -227,7 +227,7 @@
   right: 0;
   width: 50px;
   height: 50px;
-  background: url('/@cardstack/boxel/images/icons/dropdown-arrows.svg') center/15px 15px
+  background: url('../@cardstack/boxel/images/icons/dropdown-arrows.svg') center/15px 15px
     no-repeat;
 }
 

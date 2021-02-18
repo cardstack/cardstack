@@ -37,7 +37,7 @@
 .breadcrumbs__carot {
   width: 30px;
   height: 50px;
-  background: url('/@cardstack/boxel/images/icons/carot-thin-right.svg') center/7px
+  background: url('../@cardstack/boxel/images/icons/carot-thin-right.svg') center/7px
     no-repeat;
 }
 
