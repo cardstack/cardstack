@@ -1,0 +1,144 @@
+/* Header + sections */
+.item {
+  max-width: 940px;
+  background-color: var(--boxel-light);
+  border-radius: 10px;
+  box-shadow: var(--boxel-box-shadow);
+}
+
+.item__label {
+  position: absolute;
+  top: 15px;
+  left: 20px;
+  color: var(--boxel-light);
+  font: var(--boxel-font-xs);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+  z-index: 1;
+}
+
+/* Header */
+.item__header {
+  background-color: var(--boxel-purple-300);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 10px 10px 0 0;
+}
+
+.item__header-content {
+  max-width: 945px;
+  max-height: 370px;
+  padding: 60px 30px 50px 70px;
+  display: grid;
+  grid-template:
+    'img title' 2fr
+    'img artist' 1fr
+    'img details' 1fr / minmax(160px, 260px) 1fr;
+  gap: 0 30px;
+  backdrop-filter: brightness(0.75) blur(50px) contrast(1.2);
+  border-radius: 10px 10px 0 0;
+}
+
+.item__img {
+  grid-area: img;
+  align-self: center;
+  position: relative;
+  height: 0;
+  padding-top: 100%;
+  background-image: url('/@cardstack/boxel/images/placeholders/album_art.svg');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  box-shadow: var(--boxel-box-shadow);
+}
+
+.item__play-btn {
+  --icon-color: rgba(0, 0, 0, 0.5);
+  --icon-border: var(--boxel-light);
+  --icon-button-height: 100%;
+  --icon-button-width: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.item__header-details {
+  grid-area: details;
+  align-self: end;
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  gap: 30px;
+}
+
+.item__title {
+  grid-area: title;
+  align-self: end;
+  color: var(--boxel-light);
+  font: var(--boxel-font-xl);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.item__artist {
+  grid-area: artist;
+  color: var(--boxel-light);
+  font: var(--boxel-font);
+  font-weight: 400;
+  letter-spacing: var(--boxel-lsp);
+}
+
+/* Sent to field renderer */
+.item-header-field.field-renderer {
+  grid-template-columns: auto;
+  gap: 3px;
+  padding: 0;
+  justify-items: start;
+  white-space: nowrap;
+}
+
+.item-header-field .field-renderer__title {
+  color: var(--boxel-light);
+  font: var(--boxel-font-xs);
+  font-weight: 700;
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+}
+
+.item-header-field .field-renderer__value {
+  color: var(--boxel-light);
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+}
+
+
+/* Item Sidebar */
+.item__sidebar-card-container {
+  min-width: 22.5rem;
+  min-height: 10rem;
+}
+
+
+/* These belong to sidebar collection card */
+.sidebar-related-card__covers {
+  grid-column: 1;
+  grid-area: img;
+  width: 50px;
+  height: 50px;
+}
+
+.sidebar-related-card__count {
+  grid-column: 1 / -1;
+  padding-top: 25px;
+  font: var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp);
+  text-align: right;
+}
+
+.sidebar-related-card__count__number {
+  font: var(--boxel-font);
+  font-weight: 700;
+  letter-spacing: var(--boxel-lsp-lg);
+}

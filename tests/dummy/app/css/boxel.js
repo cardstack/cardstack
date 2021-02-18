@@ -1,0 +1,25 @@
+import './fonts.css';
+import './global.css';
+
+import './components/card-select/before-options.css';
+import './components/boxel-actions.css';
+import './components/boxel-highlight.css';
+import './components/boxel-modal.css';
+import './components/card-platter.css';
+import './components/card-select.css';
+import './components/card.css';
+import './components/cardflow.css';
+import './components/collection-add-button.css';
+import './components/detail-card.css';
+import './components/detail-section.css';
+import './components/embedded-collection-editor.css';
+import './components/isolated-collection-table.css';
+import './components/isolated-collection.css';
+import './components/mode-indicator.css';
+import './components/next-steps.css';
+import './components/pill-button.css';
+import './components/queue-card.css';
+import './components/queue.css';
+import './components/version-history.css';
+import './components/tasklist.css';
+import './components/tasklist-table.css';

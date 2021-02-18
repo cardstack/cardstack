@@ -2,7 +2,7 @@
 
 module.exports = function (environment) {
   let ENV = {
-    modulePrefix: '@cardstack/boxel',
+    modulePrefix: 'dummy',
     environment,
     rootURL: '/',
     locationType: 'auto',

@@ -1,0 +1,9 @@
+<CardHost::LeftEdgeNav::SelectableButton
+  @isSelected={{@isSelected}}
+  ...attributes
+>
+  <div
+    class={{cn "boxel-org-switcher-button__logo" (concat "boxel-org-switcher-button__logo--" @org.id)}}
+    style={{css-url "background-image" @org.iconURL}}
+  />
+</CardHost::LeftEdgeNav::SelectableButton>

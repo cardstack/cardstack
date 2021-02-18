@@ -1,4 +1,4 @@
-import { isPresent } from '@cardstack/boxel/helpers/is-present';
+import { isPresent } from 'dummy/helpers/is-present';
 import { module, test } from 'qunit';
 import { setupTest } from 'ember-qunit';
 
