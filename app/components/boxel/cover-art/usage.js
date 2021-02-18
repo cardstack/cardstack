@@ -16,6 +16,7 @@ import MoreThanWeKnowThumb from '@cardstack/boxel/images/media-registry/covers/t
 export default class extends Component {
   @tracked size = 80;
   @tracked maxWidth = 190;
+  @tracked spacingMultiplier = 1;
   @tracked coverThumbs = A([
     LovetheLoveThumb,
     HomeIsntSweetThumb,

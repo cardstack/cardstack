@@ -1,6 +1,5 @@
 .cover-art {
   --cover-art-size: 80px;
-  --cover-art-max-width: 190px;
   --cover-art-count: 1;
 
   position: relative;
@@ -9,27 +8,31 @@
   grid-auto-flow: column;
   z-index: 0;
 
-  width: var(--cover-art-max-width);
+  width: var(--cover-art-width);
   height: var(--cover-art-size);
+  overflow: hidden;
 }
 
 .cover-art__container {
   --cover-art-index: 0;
   --cover-art-left: 0px;
-  --cover-art-cover-size: 100px;
+  --cover-art-spacing-multiplier: 1;
 
   transition: left 250ms ease-in-out;
 
   position: absolute;
   z-index: calc(var(--cover-art-count) - var(--cover-art-index));
-  left: var(--cover-art-left);
+  left: calc(var(--cover-art-left) * var(--cover-art-spacing-multiplier));
 }
 
 .cover-art__cover {
+  display: block;
   object-fit: cover;
   object-position: center;
   border: 1px solid rgba(0, 0, 0, 0.15);
   height: var(--cover-art-cover-size);
   width: var(--cover-art-cover-size);
-  transition: height width 150ms ease-in-out;
+  transition:
+    height 150ms ease-in-out,
+    width 150ms ease-in-out;
 }

@@ -1,0 +1,16 @@
+<div class={{cn
+    "sidebar-card-container"
+    sidebar-card-container--attach-next=@attachNext
+  }}
+  ...attributes
+>
+  {{#if @header}}
+    <header class="sidebar-card-container__header">
+      {{@header}}
+    </header>
+  {{/if}}
+
+  <div class="sidebar-card-container__content">
+    {{yield}}
+  </div>
+</div>

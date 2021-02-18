@@ -22,9 +22,9 @@
     <BoxelHighlight {{on "click" @expandAction}} @class="boxel-card__expand-overlay" />
   {{/if}}
   <div class="boxel-card boxel-card--default boxel-card--profile">
-    <header class="boxel-card__header">
+    <Boxel::Header>
       {{humanize @model.type}}
-    </header>
+    </Boxel::Header>
     <div class="boxel-card__inner boxel-card__inner--with-img boxel-card__inner--{{or @format "list"}} {{if (and @status (not-eq @status "no-change")) "" "field-renderer__opacity-control"}}">
       {{#if (eq @model.organization "verifi")}}
         <div class="boxel-card__profile-org" />

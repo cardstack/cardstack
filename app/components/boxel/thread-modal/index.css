@@ -10,3 +10,11 @@
 .thread-modal > .thread-modal__inner {
   height: calc(100% - 60px);
 }
+
+.thread-modal__milestone-progress-status {
+  color: var(--boxel-dark);
+  font: var(--boxel-font-sm);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp);
+  text-align: center;
+}

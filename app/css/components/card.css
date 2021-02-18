@@ -1,5 +1,9 @@
 .boxel-card__container {
+  position: relative;
   width: 100%;
+  background-color: var(--boxel-light);
+  border-radius: var(--boxel-border-radius);
+  border: var(--boxel-border);
 }
 
 .boxel-card__container--grid {
@@ -21,44 +25,20 @@
   background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, #fff 40%);
 }
 
-.boxel-card {
-  width: 100%;
-  background-color: var(--boxel-light);
-  border-radius: var(--boxel-border-radius);
-  border: var(--boxel-border);
-  transition: box-shadow var(--boxel-transition);
-}
-
 .boxel-card--blank-card {
   width: 100%;
   height: 150px;
   background: url('../../images/media-registry/placeholders/blank-card.png') center/contain no-repeat;
 }
 
-.boxel-card__header {
-  height: 30px;
-  padding: 7px 15px;
-  border-radius: 10px 10px 0 0;
-  background-color: var(--boxel-purple-100);
-  color: var(--boxel-purple-400);
-  font: var(--boxel-font-xs);
-  font-weight: 600;
-  letter-spacing: var(--boxel-lsp-xl);
-  text-transform: uppercase;
-  transition: background-image var(--boxel-transition), color var(--boxel-transition);
-}
-
 .boxel-card__expand-overlay:hover {
+  background-image: url("../../images/icons/expand.svg");
+  background-position: top var(--boxel-sp-xxxs) right var(--boxel-sp-xxxs);
+  background-size: 1rem 1rem;
+  background-repeat: no-repeat;
   box-shadow: var(--boxel-box-shadow);
   cursor: pointer;
   outline: 0;
-}
-
-.boxel-card__expand-overlay:hover + .boxel-card > .boxel-card__header {
-  background-image: url("../../images/icons/expand.svg");
-  background-position: top 7px right 7px;
-  background-size: 16px 16px;
-  background-repeat: no-repeat;
 }
 
 .boxel-card__inner {

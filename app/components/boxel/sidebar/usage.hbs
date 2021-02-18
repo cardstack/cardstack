@@ -1,0 +1,62 @@
+<Freestyle::Usage @name="Sidebar">
+  <:example>
+  <div>Three examples:</div>
+    <div class="sidebar-usage-container">
+
+      <Boxel::Sidebar as |SidebarSection|>
+        <SidebarSection @title="Section Title">
+          <div>Content goes here!</div>
+          <div>Some more goes here!</div>
+        </SidebarSection>
+        <SidebarSection @title="Another Title">
+          <div>Content goes here!</div>
+          <div>Some more goes here!</div>
+        </SidebarSection>
+      </Boxel::Sidebar>
+
+      <Boxel::Sidebar as |SidebarSection|>
+        <SidebarSection @title="Section Title">
+          <Boxel::Sidebar::CardContainer @header="Title">
+            Content goes here
+          </Boxel::Sidebar::CardContainer>
+        </SidebarSection>
+        <SidebarSection>
+          <Boxel::Sidebar::CardContainer>
+            <div>This one has no title</div>
+          </Boxel::Sidebar::CardContainer>
+        </SidebarSection>
+      </Boxel::Sidebar>
+
+      <Boxel::Sidebar as |SidebarSection|>
+        <SidebarSection>
+          <Boxel::Sidebar::CardContainer
+            @header="Sidebar Card Container Title"
+            @attachNext={{true}}
+          >
+            <div>Content goes here!</div>
+            <div>Some more goes here!</div>
+          </Boxel::Sidebar::CardContainer>
+
+          <Boxel::Sidebar::CardContainer
+            @header="Another Sidebar Card Container Title"
+            @attachNext={{true}}
+          >
+            <div>Notice how this one is attached to the one above!</div>
+            <div>Some more goes here!</div>
+          </Boxel::Sidebar::CardContainer>
+
+          <Boxel::Sidebar::CardContainer>
+            <div>This one has no title</div>
+          </Boxel::Sidebar::CardContainer>
+        </SidebarSection>
+
+
+        <SidebarSection @title="A Different Section">
+          <Boxel::Sidebar::CardContainer @header="Another Title">
+            <div>More Content</div>
+          </Boxel::Sidebar::CardContainer>
+        </SidebarSection>
+      </Boxel::Sidebar>
+    </div>
+  </:example>
+</Freestyle::Usage>

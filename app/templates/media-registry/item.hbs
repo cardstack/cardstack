@@ -44,19 +44,24 @@
       </MusicDetailCard>
     {{/if}}
 
-    {{!-- Sidebar --}}
-    <aside class="item__sidebar">
+    <Boxel::Sidebar as |SidebarSection|>
       {{#if @model.collections.length}}
-        <h3 class="item__sidebar-title">In These Collections</h3>
-        <div class="item__sidebar-cards">
+        <SidebarSection @title="In These Collections">
           {{#each @model.collections as |collection|}}
             <Card
+              class="item__sidebar-card-container"
               @mode="view"
               @model={{hash type="collection" id=collection.id title=collection.title}}
               @hasImage={{true}}
               @expandAction={{fn this.transitionToCatalog collection.id}}
             >
-              <Boxel::CoverArt class="item__sidebar-covers" @size={{50}} @covers={{collection.selected_art}} />
+              <Boxel::CoverArt
+                class="sidebar-related-card__covers"
+                @size={{50}}
+                @maxWidth={{60}}
+                @covers={{take 3 collection.selected_art}}
+                @spacingMultiplier={{0.85}}
+              />
               <div class="sidebar-related-card__count">
                 <span class="sidebar-related-card__count__number">
                   {{collection.count}}
@@ -65,25 +70,24 @@
               </div>
             </Card>
           {{/each}}
-        </div>
+        </SidebarSection>
       {{/if}}
       {{#if @model.album}}
-        <h3 class="item__sidebar-title">Related Products</h3>
-        <div class="item__sidebar-cards">
+        <SidebarSection @title="Related Products">
           <Card
+            class="item__sidebar-card-container"
             @model={{this.album}}
             @expandAction={{this.transitionToProduct}}
             @mode="view"
           />
-        </div>
+        </SidebarSection>
       {{/if}}
       {{#if (and @model.musicalWork (not-eq this.target.currentRouteName "media-registry.item.musical-work"))}}
-        <h3 class="item__sidebar-title">Related Works</h3>
-        <div class="item__sidebar-cards">
+        <SidebarSection @title="Related Works">
           <Cards::MusicalWorkEmbedded @model={{@model.musicalWork}} @mode="view" />
-        </div>
+        </SidebarSection>
       {{/if}}
-    </aside>
+    </Boxel::Sidebar>
 
     {{#if (not-eq this.target.currentRouteName "media-registry.item.musical-work")}}
       {{!-- Edit modal --}}

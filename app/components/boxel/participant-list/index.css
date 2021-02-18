@@ -3,10 +3,13 @@
   --column-size: calc(var(--icon-size, 30px) / 2);
 
   list-style-type: none;
-  margin: 0;
   padding: 0;
   display: inline-grid;
   gap: 15px;
+}
+
+.participant-list--full-width {
+  width: 100%;
 }
 
 .participant-list__fanned {

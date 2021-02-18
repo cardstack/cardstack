@@ -21,7 +21,6 @@ import './components/next-steps.css';
 import './components/pill-button.css';
 import './components/queue-card.css';
 import './components/queue.css';
-import './components/sidebar-related-card.css';
 import './components/version-history.css';
 import './components/tasklist.css';
 import './components/tasklist-table.css';

@@ -1,7 +1,6 @@
 .milestones {
   --bullet-fill-color: var(--boxel-light-600);
 
-  margin: 0;
   color: var(--boxel-purple-400);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);

@@ -30,24 +30,51 @@
       {{/each}}
     </:content>
 
-    <:sidebar>
-      <Boxel::ProgressBox
-        @title={{@model.workflow.title}}
-        @status={{this.progressStatus}}
-        @milestones={{@model.workflow.milestones}}
-        @completedCount={{this.progress}}
-      />
+    <:sidebar as |SidebarSection|>
+      <SidebarSection>
+        <Boxel::Sidebar::CardContainer
+          @header={{if @model.workflow.title (html-safe (concat "Workflow:<br>" @model.workflow.title)) "Workflow Progress"}}
+          @attachNext={{true}}
+        >
+          <div>
+            <Boxel::ProgressCircle
+              @percentComplete={{percent-complete total=@model.workflow.milestones.length completed=this.progress}}
+            />
+          </div>
+          <div class="thread-modal__milestone-progress-status">
+            {{this.progressStatus}}
+          </div>
+        </Boxel::Sidebar::CardContainer>
 
-      <Boxel::ParticipantsBox @addAction={{true}}>
-        <:list>
+        <Boxel::Sidebar::CardContainer @header="Milestones">
+          <Boxel::Milestones
+            @milestones={{@model.workflow.milestones}}
+            @completedCount={{this.progress}}
+          />
+        </Boxel::Sidebar::CardContainer>
+      </SidebarSection>
+
+      <SidebarSection>
+        <Boxel::Sidebar::CardContainer
+          @header="Participants"
+          @attachNext={{true}}
+        >
           <Boxel::ParticipantList
+            @fullWidth={{true}}
             @participants={{@model.participants}}
           />
+        </Boxel::Sidebar::CardContainer>
+
+        <Boxel::Sidebar::CardContainer>
           <Boxel::ParticipantList
+            @fullWidth={{true}}
             @participants={{@model.orgRepresentatives}}
           />
-        </:list>
-      </Boxel::ParticipantsBox>
+          <Boxel::AddParticipantButton
+            {{on "click" (optional this.addParticipant)}}
+          />
+        </Boxel::Sidebar::CardContainer>
+      </SidebarSection>
     </:sidebar>
   </Boxel::Thread>
 </BoxelModal>

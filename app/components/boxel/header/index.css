@@ -1,0 +1,21 @@
+.boxel-header {
+  /* container styling */
+  display: flex;
+  align-items: center;
+  min-height: var(--header-min-height, 1.875rem);
+  padding: var(--header-padding, var(--boxel-sp-xxxs) var(--boxel-sp-sm));
+  background-color: var(--header-background-color, var(--boxel-purple-100));
+  border-top-left-radius: var(--boxel-border-radius);
+  border-top-right-radius: var(--boxel-border-radius);
+
+  /* text styling */
+  color: var(--boxel-purple-400);
+  font: var(--boxel-font-xs);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+}
+
+.boxel-header--no-background {
+  background-color: transparent;
+}

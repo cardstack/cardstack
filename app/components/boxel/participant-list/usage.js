@@ -39,4 +39,5 @@ export default class ParticipantListUsageComponent extends Component {
   @tracked fanned = false;
   @tracked iconOnly = false;
   @tracked hasLogo = false;
+  @tracked fullWidth = false;
 }

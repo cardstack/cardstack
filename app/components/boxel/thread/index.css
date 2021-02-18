@@ -30,13 +30,9 @@
   margin-top: 30px;
 }
 
-.thread__sidebar > * + * {
-  margin-top: var(--boxel-spacing);
-}
-
 .thread__sidebar {
-  padding: var(--boxel-spacing);
-  padding-bottom: 40px;
+  margin: var(--boxel-spacing);
+  width: 230px;
 }
 
 .thread__sticky-container {

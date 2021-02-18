@@ -26,6 +26,13 @@
       @defaultValue={{false}}
       @onInput={{fn (mut this.fanned)}}
     />
+    <Args.Bool
+      @name="fullWidth"
+      @value={{this.fullWidth}}
+      @description="If true, the list's width is 100%."
+      @defaultValue={{false}}
+      @onInput={{fn (mut this.fullWidth)}}
+    />
     <Args.Number
       @name="iconSize"
       @description="(integer) — Height and width of each item's icon."

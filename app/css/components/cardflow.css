@@ -123,3 +123,11 @@
 .cardflow__reply-to.field-renderer__input:focus {
   outline: 0;
 }
+
+.cardflow__milestone-progress-status {
+  color: var(--boxel-dark);
+  font: var(--boxel-font-sm);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp);
+  text-align: center;
+}

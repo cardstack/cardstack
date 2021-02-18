@@ -14,9 +14,9 @@
     </div>
 
     <div class="thread__scroll-wrapper">
-      <aside class="thread__sidebar">
-        {{yield to="sidebar"}}
-      </aside>
+      <Boxel::Sidebar class="thread__sidebar" as |SidebarSection|>
+        {{yield SidebarSection to="sidebar"}}
+      </Boxel::Sidebar>
     </div>
   </section>
 </section>

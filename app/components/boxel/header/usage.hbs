@@ -1,0 +1,50 @@
+<Freestyle::Usage @name="BoxelHeader">
+  <:description>
+    Usually shown at the top of card containers
+  </:description>
+  <:example>
+    <Boxel::Header
+      @noBackground={{this.hasBackground}}
+      style={{css-var
+        header-padding=this.headerPadding
+        header-background-color=this.headerBackgroundColor
+        header-min-height=this.headerMinHeight
+      }}
+    >
+      Some Header Text
+    </Boxel::Header>
+  </:example>
+  <:api as |Args|>
+    <Args.Bool
+      @name="noBackground"
+      @description="if true, container has no background-color"
+      @defaultValue={{false}}
+      @value={{this.hasBackground}}
+      @onInput={{fn (mut this.hasBackground)}}
+    />
+    <Args.String
+      @name="--header-padding"
+      @description="padding CSS style"
+      @defaultValue="var(--boxel-sp-xxxs) var(--boxel-sp-sm)"
+      @value={{this.headerPadding}}
+      @onInput={{fn (mut this.headerPadding)}}
+    />
+    <Args.String
+      @name="--header-background-color"
+      @description="background-color CSS style"
+      @defaultValue="var(--boxel-purple-100)"
+      @value={{this.headerBackgroundColor}}
+      @onInput={{fn (mut this.headerBackgroundColor)}}
+    />
+    <Args.String
+      @name="--header-min-height"
+      @description="min-height CSS style"
+      @defaultValue="1.875rem"
+      @value={{this.headerMinHeight}}
+      @onInput={{fn (mut this.headerMinHeight)}}
+    />
+    <Args.Yield
+      @description="Header text to show"
+    />
+  </:api>
+</Freestyle::Usage>
