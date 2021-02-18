@@ -135,7 +135,7 @@
 .cardflow-action-card__list-item--checkbox {
   width: 30px;
   height: 30px;
-  background-image: url('/@cardstack/boxel/images/icons/checkbox-primary.svg');
+  background-image: url('../../../../public/@cardstack/boxel/images/icons/checkbox-primary.svg');
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -154,7 +154,7 @@
 }
 
 .cardflow-action-card__list-item.completed .cardflow-action-card__list-item--checkbox {
-  background-image: url('/@cardstack/boxel/images/icons/checkbox-primary-checked.svg');
+  background-image: url('../../../../public/@cardstack/boxel/images/icons/checkbox-primary-checked.svg');
 }
 
 /* Proposal announcement card */
@@ -217,7 +217,7 @@
 
 .cardflow__modal-header {
   padding: 30px 30px 30px 60px;
-  background: url('/@cardstack/boxel/images/icons/message.svg') left 30px center/18px 18px no-repeat;
+  background: url('../../../../public/@cardstack/boxel/images/icons/message.svg') left 30px center/18px 18px no-repeat;
   color: var(--boxel-light);
   font: var(--boxel-font);
   font-weight: 600;
