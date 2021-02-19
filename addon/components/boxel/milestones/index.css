@@ -14,7 +14,7 @@
   display: block;
   content: "";
   width: 1px;
-  height: var(--boxel-spacing);
+  height: var(--boxel-sp);
   margin: 2px 0 3px 7px;
   background-color: var(--boxel-light-600);
 }

@@ -2,7 +2,7 @@
   display: grid;
   align-items: center;
   justify-items: center;
-  height: var(--boxel-spacing);
+  height: var(--boxel-sp);
 }
 
 .date-divider__hr {

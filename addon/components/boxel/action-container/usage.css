@@ -13,7 +13,7 @@
 }
 
 .action-container-usage__input {
-  padding: 8px var(--boxel-spacing);
+  padding: 8px var(--boxel-sp);
   border: 1px solid var(--boxel-purple-300);
   border-radius: 6px;
   font: var(--boxel-font);

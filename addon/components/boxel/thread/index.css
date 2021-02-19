@@ -22,7 +22,7 @@
 }
 
 .thread__content {
-  padding: var(--boxel-spacing);
+  padding: var(--boxel-sp);
   padding-left: 40px;
 }
 
@@ -31,7 +31,7 @@
 }
 
 .thread__sidebar {
-  margin: var(--boxel-spacing);
+  margin: var(--boxel-sp);
   width: 230px;
 }
 

@@ -11,7 +11,7 @@
 .thread-message > .thread-message__participant {
   display: grid;
   grid-template-columns: var(--icon-size) auto 1fr;
-  gap: 10px var(--boxel-spacing);
+  gap: 10px var(--boxel-sp);
   align-items: start;
   height: 20px;
 }
@@ -29,7 +29,7 @@
 }
 
 .thread-message__content {
-  margin-left: calc(var(--icon-size) + var(--boxel-spacing));
+  margin-left: calc(var(--icon-size) + var(--boxel-sp));
   font-size: 0.9375rem; /* 15px */
   line-height: calc(23/15);
   letter-spacing: var(--boxel-lsp-sm);

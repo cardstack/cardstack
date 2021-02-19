@@ -3,7 +3,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 30px;
+  padding: var(--boxel-sp-lg);
   background-color: var(--boxel-purple-700);
   color: var(--boxel-purple-300);
   font: var(--boxel-font-xs);
@@ -13,7 +13,7 @@
 .action-chin > button {
   min-height: initial;
   height: 32px;
-  padding: 7px 40px;
+  padding: var(--boxel-sp-xxxs) var(--boxel-sp-xl);
   letter-spacing: var(--boxel-lsp-sm);
 }
 
@@ -21,7 +21,7 @@
   display: grid;
   grid-auto-flow: column;
   align-items: center;
-  gap: 10px;
+  gap: var(--boxel-sp-xs);
 }
 
 .action-chin--light {

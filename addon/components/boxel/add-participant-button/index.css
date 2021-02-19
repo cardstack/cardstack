@@ -1,7 +1,7 @@
 .boxel-add-participant-button {
   display: grid;
   grid-template-columns: 30px 1fr;
-  gap: 0 12px;
+  gap: 0 var(--boxel-sp-xs);
   width: 100%;
   align-items: center;
   height: 40px;

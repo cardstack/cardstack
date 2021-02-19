@@ -2,8 +2,8 @@
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
-  gap: var(--boxel-spacing);
-  padding: var(--boxel-spacing);
+  gap: var(--boxel-sp);
+  padding: var(--boxel-sp);
   background-color: var(--boxel-light);
   border-top-right-radius: var(--boxel-border-radius);
   border-top-left-radius: var(--boxel-border-radius);

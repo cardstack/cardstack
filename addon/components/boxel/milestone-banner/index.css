@@ -2,7 +2,7 @@
   display: flex;
   justify-content: space-between;
   min-height: 50px;
-  padding: 15px var(--boxel-spacing);
+  padding: 15px var(--boxel-sp);
   background-image: linear-gradient(
     to right,
     var(--boxel-cyan),
