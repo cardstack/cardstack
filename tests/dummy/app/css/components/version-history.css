@@ -34,7 +34,7 @@
 .versions__title {
   padding: 28px 20px 28px 35px;
   color: var(--boxel-light);
-  background: url('/@cardstack/boxel/images/icons/file-icon.svg') center left 5px/16px 20px
+  background: url('../../../../public/@cardstack/boxel/images/icons/file-icon.svg') center left 5px/16px 20px
     no-repeat;
   font: var(--boxel-font);
   font-weight: 600;
@@ -159,7 +159,7 @@
   color: var(--boxel-dark);
 }
 .versions-nav-item.is-base-card .version__label {
-  background-image: url('/@cardstack/boxel/images/icons/clock.svg');
+  background-image: url('../../../../public/@cardstack/boxel/images/icons/clock.svg');
 }
 
 .versions-nav-item.is-base-card .versions-nav-item__hover-btn.checkbox {
@@ -222,7 +222,7 @@
 }
 
 .version__label {
-  background: url('/@cardstack/boxel/images/icons/clock-highlighted.svg') right 2px
+  background: url('../../../../public/@cardstack/boxel/images/icons/clock-highlighted.svg') right 2px
     center/16px 15px no-repeat;
   padding-right: 25px;
   color: var(--boxel-highlight);
@@ -389,7 +389,7 @@
 .version-card--item__img {
   width: calc(260px * 0.75);
   height: calc(260px * 0.75);
-  background-image: url('/@cardstack/boxel/images/placeholders/album_art.svg');
+  background-image: url('../../../../public/@cardstack/boxel/images/placeholders/album_art.svg');
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
@@ -519,7 +519,7 @@
 
 .version-card--base-card .version__label {
   color: var(--boxel-dark);
-  background-image: url('/@cardstack/boxel/images/icons/clock.svg');
+  background-image: url('../../../../public/@cardstack/boxel/images/icons/clock.svg');
 }
 
 .version-card--base-card .version-card__content {
@@ -533,13 +533,13 @@
   border: none;
   position: absolute;
   top: 45px;
-  background: url('/@cardstack/boxel/images/icons/swap.svg') center/18px 17px no-repeat;
+  background: url('../../../../public/@cardstack/boxel/images/icons/swap.svg') center/18px 17px no-repeat;
   z-index: 10;
   outline: 0;
 }
 
 .comp-view__swap-btn:hover {
-  background-image: url('/@cardstack/boxel/images/icons/swap-white.svg');
+  background-image: url('../../../../public/@cardstack/boxel/images/icons/swap-white.svg');
   cursor: pointer;
 }
 

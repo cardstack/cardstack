@@ -13,7 +13,7 @@
   height: var(--mode-container-height);
   padding: 11px 40px;
   background-color: var(--boxel-highlight);
-  background-image: var(--mode-icon), url('/@cardstack/boxel/images/icons/close.svg');
+  background-image: var(--mode-icon), url('../@cardstack/boxel/images/icons/close.svg');
   background-position: var(--mode-icon-position), center right 15px;
   background-repeat: no-repeat, no-repeat;
   background-size: var(--mode-icon-size), 10px 10px;
@@ -27,21 +27,21 @@
 }
 
 .mode-indicator--edit {
-  --mode-icon: url('/@cardstack/boxel/images/icons/edit-box.svg');
+  --mode-icon: url('../@cardstack/boxel/images/icons/edit-box.svg');
   --mode-icon-position: left 15px top 12px;
   --mode-icon-size: 13px 13px;
 }
 .mode-indicator--configure {
-  --mode-icon: url('/@cardstack/boxel/images/icons/gear.svg');
+  --mode-icon: url('../@cardstack/boxel/images/icons/gear.svg');
 }
 .mode-indicator--comparison {
-  --mode-icon: url('/@cardstack/boxel/images/icons/clock.svg');
+  --mode-icon: url('../@cardstack/boxel/images/icons/clock.svg');
 }
 .mode-indicator--themer {
-  --mode-icon: url('/@cardstack/boxel/images/icons/themer.svg');
+  --mode-icon: url('../@cardstack/boxel/images/icons/themer.svg');
 }
 .mode-indicator--preview {
-  --mode-icon: url('/@cardstack/boxel/images/icons/eye.svg');
+  --mode-icon: url('../@cardstack/boxel/images/icons/eye.svg');
 }
 
 .mode-indicator:hover,

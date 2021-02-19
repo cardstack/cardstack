@@ -40,7 +40,7 @@
 .prepaid-card__issuer-image {
   width: 40px;
   height: 40px;
-  background-image: url('/@cardstack/boxel/images/placeholders/profile-inverted.svg');
+  background-image: url('../@cardstack/boxel/images/placeholders/profile-inverted.svg');
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
@@ -73,7 +73,7 @@
   justify-content: space-between;
   align-items: flex-start;
   padding: 35px var(--boxel-spacing) 15px;
-  background-image: url('/@cardstack/boxel/images/icons/curved-platter.svg');
+  background-image: url('../@cardstack/boxel/images/icons/curved-platter.svg');
   background-repeat: no-repeat;
   background-size: cover;
   border-radius: 0 0 var(--boxel-border-radius) var(--boxel-border-radius);
@@ -113,7 +113,7 @@
 .prepaid-card__logo {
   width: 45px;
   height: 45px;
-  background-image: url('/@cardstack/boxel/images/icons/cardpay-logo.svg');
+  background-image: url('../@cardstack/boxel/images/icons/cardpay-logo.svg');
   background-repeat: no-repeat;
 }
 

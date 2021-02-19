@@ -69,7 +69,7 @@
 
 .cardflow__taskbar-count {
   padding-left: 22px;
-  background: url('/@cardstack/boxel/images/icons/task.svg') left center/15px 15px no-repeat;
+  background: url('../../../../public/@cardstack/boxel/images/icons/task.svg') left center/15px 15px no-repeat;
 }
 
 .cardflow__taskbar-label {
@@ -98,7 +98,7 @@
   width: 40px;
   height: 40px;
   border-radius: 100px;
-  background-image: url('/@cardstack/boxel/images/icons/cardbot-lg.svg');
+  /* background-image: url('../../../../public/@cardstack/boxel/images/icons/cardbot-lg.svg'); */
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -108,7 +108,7 @@
   padding-right: 80px;
   padding-left: 15px;
   height: 45px;
-  background-image: url("/boxe/images/icons/plus.svg"), url("/boxe/images/icons/emoji.svg");
+  background-image: url("/@cardstack/boxel/images/icons/plus.svg"), url("/@cardstack/boxel/images/icons/emoji.svg");
   background-position: right 55px center, right 15px center;
   background-repeat: no-repeat, no-repeat;
   background-size: 15px 15px, 20px 20px;

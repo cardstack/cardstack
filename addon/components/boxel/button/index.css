@@ -17,7 +17,7 @@
 }
 
 .boxel-button--dropdown {
-  background: url('/@cardstack/boxel/images/icons/carot-down.svg') center right 17px/8px
+  background: url('../@cardstack/boxel/images/icons/carot-down.svg') center right 17px/8px
     auto no-repeat;
   padding-left: var(--boxel-sp-xl);
   padding-right: var(--boxel-sp-xl);
