@@ -1,7 +1,10 @@
-<ul class="layout-form-view" ...attributes>
-  <li class="layout-form-view__preview-field">
+<div class="layout-form-view__field layout-form-view__preview-field">
+  <span class="layout-form-view__label">
+    Card Preview
+  </span>
+  <div class="layout-form-view__value">
     <CardPay::PrepaidCard
-      @issuerName={{or @issuerName "Enter name"}}
+      @issuerName={{@issuerName}}
       @issuerIcon={{@issuerIcon}}
       @headerColor={{@headerColor.value}}
       @darkTheme={{eq @headerColor.theme 'dark'}}
@@ -10,16 +13,15 @@
       @accountAddress="0x1234...5678"
       @accountNetwork="xDai Chain"
     />
-    <span class="layout-form-view__label">
-      Card Preview
-    </span>
-  </li>
+  </div>
+</div>
+<ul class="layout-form-view__fields">
   <li>
     {{!-- TODO: Extract input component --}}
     <label class="layout-form-view__field">
       <span class="layout-form-view__label">Name of Issuer</span>
       <Input
-        class="layout-form-view__input"
+        class="layout-form-view__value layout-form-view__input"
         @value={{@issuerName}}
         {{on "input" @updateIssuerName}}
       />
@@ -30,7 +32,7 @@
     <label class="layout-form-view__field">
       <span class="layout-form-view__label">Background Color</span>
       <PowerSelect
-        class="layout-form-view__dropdown"
+        class="layout-form-view__value layout-form-view__dropdown"
         @options={{@colorOptions}}
         @selected={{@headerColor}}
         @onChange={{@updateHeaderColor}}
@@ -53,7 +55,7 @@
     <label class="layout-form-view__field">
       <span class="layout-form-view__label">Pattern</span>
       <PowerSelect
-        class="layout-form-view__dropdown"
+        class="layout-form-view__value layout-form-view__dropdown"
         @options={{@patternOptions}}
         @selected={{@headerPattern}}
         @onChange={{@updateHeaderPattern}}

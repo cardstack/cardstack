@@ -8,6 +8,7 @@
       style={{css-var
         header-padding=this.headerPadding
         header-background-color=this.headerBackgroundColor
+        header-text-color=this.headerColor
         header-min-height=this.headerMinHeight
       }}
     >
@@ -35,6 +36,13 @@
       @defaultValue="var(--boxel-purple-100)"
       @value={{this.headerBackgroundColor}}
       @onInput={{fn (mut this.headerBackgroundColor)}}
+    />
+    <Args.String
+      @name="--header-text-color"
+      @description="color CSS style"
+      @defaultValue="var(--boxel-purple-400)"
+      @value={{this.headerColor}}
+      @onInput={{fn (mut this.headerColor)}}
     />
     <Args.String
       @name="--header-min-height"

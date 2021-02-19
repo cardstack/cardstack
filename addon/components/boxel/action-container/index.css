@@ -1,6 +1,8 @@
 .action-container {
+  position: relative;
   width: 100%;
-  max-width: 700px;
+  max-width: 43.75rem; /* 700px;*/
+  min-width: 26.56rem;
   background-color: var(--boxel-light);
   border-radius: var(--boxel-border-radius);
   color: var(--boxel-dark);
@@ -13,30 +15,64 @@
 }
 
 .action-container--is-complete {
-  max-width: 585px;
+  max-width: 36.6rem; /* 585px; */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.action-container__content {
+  padding: var(--boxel-sp) var(--boxel-sp-lg) var(--boxel-sp-xxl);
+}
+
+.action-container__content > * + * {
+  margin-top: var(--boxel-sp-xxl);
 }
 
 
 /* Card Header */
 .action-container__header {
-  height: 30px;
-  padding: 7px 15px;
-  border-top-right-radius: var(--boxel-border-radius);
-  border-top-left-radius: var(--boxel-border-radius);
-  background-color: var(--boxel-purple-100);
-  color: var(--boxel-purple-400);
-  font: var(--boxel-font-xs);
-  font-weight: 600;
-  letter-spacing: var(--boxel-lsp-xl);
-  text-transform: uppercase;
+  --header-background-color: transparent;
+  --header-text-color: var(--boxel-purple-300);
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.action-container__expand-button {
+  --icon-button-width: 1.875rem;
+  --icon-button-height: 1.875rem;
+
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  color: transparent;
+  --icon-color: currentColor;
+  transition: color var(--boxel-transition);
+  /* this is so that the icon color change transition is in sync with
+  the header background-color change transition. */
+}
+
+.action-container__expand-button:focus {
+  color: initial;
+  /* the button is only stylistically hidden. it's accessible via keyboard shortcut. */
+}
+
+
+/* Container and Header interaction */
+.action-container:hover .action-container__header {
+  --header-background-color: var(--boxel-purple-100);
+  --header-text-color: var(--boxel-dark);
+}
+
+.action-container:hover .action-container__expand-button {
+  color: initial;
 }
 
 
 /* Optional prompt */
 .action-container__prompt {
   margin: 0;
-  padding: 40px 30px;
   font-size: 1.125rem; /* 18px */
   font-weight: 700;
   line-height: 1.33;
@@ -49,4 +85,3 @@
   border-bottom-right-radius: var(--boxel-border-radius);
   border-bottom-left-radius: var(--boxel-border-radius);
 }
-

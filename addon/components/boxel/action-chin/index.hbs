@@ -8,6 +8,7 @@
   <Boxel::Button
     {{on "click" (optional @onClickButton)}}
     @primary={{this.isDataEntryMode}}
+    @disabled={{@disabled}}
   >
     {{@buttonText}}
   </Boxel::Button>

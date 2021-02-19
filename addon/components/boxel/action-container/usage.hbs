@@ -47,6 +47,20 @@
 
   <:example>
     <Boxel::ActionContainer
+      @header="Card Header"
+      @incompleteActionLabel={{this.incompleteActionLabel}}
+      @completeActionLabel={{this.completeActionLabel}}
+      @isComplete={{this.isComplete}}
+      @onClickButton={{fn (mut this.isComplete) (not this.isComplete)}}
+    >
+      {{!-- Sample block yield --}}
+        <div>Content goes here</div>
+      {{!-- End of sample block yield --}}
+    </Boxel::ActionContainer>
+
+    <br>
+
+    <Boxel::ActionContainer
       @header={{this.header}}
       @prompt={{this.prompt}}
       @incompleteActionLabel={{this.incompleteActionLabel}}
@@ -55,23 +69,7 @@
       @onClickButton={{fn (mut this.isComplete) (not this.isComplete)}}
     >
       {{!-- Sample block yield --}}
-        <ul class="action-container-usage">
-          <li>
-            {{#if this.isComplete}}
-              <div class="action-container-usage__label">Face Value of Prepaid Card</div>
-              {{this.faceValue}}
-            {{else}}
-              <label for="face-value">
-                <span class="action-container-usage__label">Face Value of Prepaid Card</span>
-                <Input
-                  class="action-container-usage__input"
-                  @value={{this.faceValue}}
-                  {{on "input" (pick 'target.value' (fn (mut this.faceValue)))}}
-                />
-              </label>
-            {{/if}}
-          </li>
-        </ul>
+        <div>Content goes here</div>
       {{!-- End of sample block yield --}}
     </Boxel::ActionContainer>
   </:example>

@@ -1,5 +1,8 @@
-<section class="layout-display-view" ...attributes>
-  <section class="layout-display-view__preview">
+<section class="layout-display-view__field">
+  <div class="layout-display-view__label layout-display-view__preview-label">
+    Card Preview
+  </div>
+  <div class="layout-display-view__value layout-display-view__preview-value">
     <div class="layout-display-view__scaled-card">
       <CardPay::PrepaidCard
         @issuerName={{@issuerName}}
@@ -12,17 +15,6 @@
         @accountNetwork="xDai Chain"
       />
     </div>
-    <span class="layout-display-view__label layout-display-view__preview-text">
-      Card Preview
-    </span>
-  </section>
-  <section>
-    <div class="layout-display-view__label">
-      Name of Issuer
-    </div>
-    <div class="layout-display-view__value">
-      {{@issuerName}}
-    </div>
     <div class="layout-display-view__swatch-group">
       <div
         class="layout-display-view__swatch"
@@ -33,5 +25,13 @@
         style={{css-var header-pattern=@headerPattern.value}}
       />
     </div>
-  </section>
+  </div>
 </section>
+<div class="layout-display-view__field">
+  <div class="layout-display-view__label">
+    Name of Issuer
+  </div>
+  <div class="layout-display-view__value">
+    {{@issuerName}}
+  </div>
+</div>

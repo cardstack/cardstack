@@ -3,9 +3,8 @@ import { tracked } from '@glimmer/tracking';
 
 export default class extends Component {
   @tracked isComplete = false;
-  @tracked header = 'Prepaid Card Funding';
-  @tracked prompt = 'Choose the face value of your Prepaid Card';
+  @tracked header = 'Card Header';
+  @tracked prompt = 'With optional prompt';
   @tracked incompleteActionLabel = 'Save';
   @tracked completeActionLabel = 'Edit value';
-  @tracked faceValue;
 }

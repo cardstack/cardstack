@@ -9,11 +9,15 @@
   border-top-right-radius: var(--boxel-border-radius);
 
   /* text styling */
-  color: var(--boxel-purple-400);
+  color: var(--header-text-color, var(--boxel-purple-400));
   font: var(--boxel-font-xs);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-xl);
   text-transform: uppercase;
+
+  transition:
+    background-color var(--boxel-transition),
+    color var(--boxel-transition);
 }
 
 .boxel-header--no-background {
