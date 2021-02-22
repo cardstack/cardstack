@@ -19,23 +19,30 @@ import {
 } from '@babel/types';
 import { NodePath } from '@babel/traverse';
 
-const VALID_DECORATORS = {
+const VALID_FIELD_DECORATORS = {
   hasMany: true,
   belongsTo: true,
   contains: true,
   containsMany: true,
 };
-type FieldType = keyof typeof VALID_DECORATORS;
+type FieldType = keyof typeof VALID_FIELD_DECORATORS;
 
 export type FieldMeta = {
   cardURL: string;
   type: FieldType;
 };
+interface FieldsMeta {
+  [name: string]: FieldMeta;
+}
+export type ParentMeta = {
+  cardURL: string;
+};
 
 export function getMeta(
   obj: Object
 ): {
-  fields: { [name: string]: FieldMeta };
+  fields: FieldsMeta;
+  parent?: ParentMeta;
 } {
   let meta = metas.get(obj);
   if (!meta) {
@@ -49,7 +56,8 @@ export function getMeta(
 const metas = new WeakMap<
   object,
   {
-    fields: { [name: string]: FieldMeta };
+    parent?: ParentMeta;
+    fields: FieldsMeta;
   }
 >();
 
@@ -117,72 +125,102 @@ function storeMeta(
   specifiers: ImportSpecifier[],
   path: NodePath<any>
 ) {
-  let fields: { [name: string]: FieldMeta } = {};
+  let fields: FieldsMeta = {};
+  let parent: ParentMeta | undefined;
 
-  specifiers
-    .filter((s) => (VALID_DECORATORS as any)[name(s.imported)])
-    .forEach((fieldHelper) => {
-      let {
-        local: { name: localName },
-      } = fieldHelper;
+  specifiers.forEach((specifier) => {
+    let {
+      local: { name: localName },
+    } = specifier;
+    let specifierName = name(specifier.imported);
 
-      for (let fieldIdentifier of path.scope.bindings[localName]
-        .referencePaths) {
-        if (
-          !isCallExpression(fieldIdentifier.parent) ||
-          fieldIdentifier.parent.callee !== fieldIdentifier.node
-        ) {
-          throw error(
-            fieldIdentifier,
-            `the @${localName} decorator must be called`
-          );
-        }
+    if ((VALID_FIELD_DECORATORS as any)[specifierName]) {
+      validateUsageAndGetFieldMeta(
+        path,
+        fields,
+        localName,
+        specifierName as FieldType
+      );
+    }
 
-        if (
-          !isDecorator(fieldIdentifier.parentPath.parent) ||
-          fieldIdentifier.parentPath.parent.expression !==
-            fieldIdentifier.parent
-        ) {
-          throw error(
-            fieldIdentifier,
-            `the @${localName} decorator must be used as a decorator`
-          );
-        }
+    if (specifierName === 'adopts') {
+      parent = validateUsageAndGetParentMeta(path, localName);
+    }
+  });
 
-        if (!isClassProperty(fieldIdentifier.parentPath.parentPath.parent)) {
-          throw error(
-            fieldIdentifier,
-            `the @${localName} decorator can only go on class properties`
-          );
-        }
+  metas.set(opts, { fields, parent });
+}
 
-        if (fieldIdentifier.parentPath.parentPath.parent.computed) {
-          throw error(
-            fieldIdentifier,
-            'field names must not be dynamically computed'
-          );
-        }
+function validateUsageAndGetFieldMeta(
+  path: NodePath,
+  fields: FieldsMeta,
+  localName: string,
+  actualName: FieldType
+) {
+  for (let fieldIdentifier of path.scope.bindings[localName].referencePaths) {
+    if (
+      !isCallExpression(fieldIdentifier.parent) ||
+      fieldIdentifier.parent.callee !== fieldIdentifier.node
+    ) {
+      throw error(
+        fieldIdentifier,
+        `the @${localName} decorator must be called`
+      );
+    }
 
-        if (
-          !isIdentifier(fieldIdentifier.parentPath.parentPath.parent.key) &&
-          !isStringLiteral(fieldIdentifier.parentPath.parentPath.parent.key)
-        ) {
-          throw error(
-            fieldIdentifier,
-            'field names must be identifiers or string literals'
-          );
-        }
+    if (
+      !isDecorator(fieldIdentifier.parentPath.parent) ||
+      fieldIdentifier.parentPath.parent.expression !== fieldIdentifier.parent
+    ) {
+      throw error(
+        fieldIdentifier,
+        `the @${localName} decorator must be used as a decorator`
+      );
+    }
 
-        let fieldName = name(fieldIdentifier.parentPath.parentPath.parent.key);
-        let { cardURL } = extractFieldArguments(
-          fieldIdentifier.parentPath as NodePath<CallExpression>,
-          localName
-        );
+    if (!isClassProperty(fieldIdentifier.parentPath.parentPath.parent)) {
+      throw error(
+        fieldIdentifier,
+        `the @${localName} decorator can only go on class properties`
+      );
+    }
 
-        fields[fieldName] = { cardURL, type: 'contains' };
-      }
-    });
-  metas.set(opts, { fields });
+    if (fieldIdentifier.parentPath.parentPath.parent.computed) {
+      throw error(
+        fieldIdentifier,
+        'field names must not be dynamically computed'
+      );
+    }
+
+    if (
+      !isIdentifier(fieldIdentifier.parentPath.parentPath.parent.key) &&
+      !isStringLiteral(fieldIdentifier.parentPath.parentPath.parent.key)
+    ) {
+      throw error(
+        fieldIdentifier,
+        'field names must be identifiers or string literals'
+      );
+    }
+
+    let fieldName = name(fieldIdentifier.parentPath.parentPath.parent.key);
+    let { cardURL } = extractFieldArguments(
+      fieldIdentifier.parentPath as NodePath<CallExpression>,
+      localName
+    );
+
+    fields[fieldName] = { cardURL, type: actualName };
+  }
+}
+
+function validateUsageAndGetParentMeta(
+  path: NodePath,
+  localName: string
+): ParentMeta {
+  let fieldIdentifier = path.scope.bindings[localName].referencePaths[0];
+  return extractFieldArguments(
+    fieldIdentifier.parentPath as NodePath<CallExpression>,
+    localName
+  );
 }
 
 function extractFieldArguments(

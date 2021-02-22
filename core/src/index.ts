@@ -41,6 +41,11 @@ export class Compiler {
       };
     }
 
+    if (meta.parent) {
+      let parentCard = await this.lookup(meta.parent.cardURL);
+      Object.assign(fields, parentCard.fields);
+    }
+
     // TODO: inherit all the way up to base, so these are never undefined
     let templateSources: CompiledCard['templateSources'] = {
       isolated: '',
