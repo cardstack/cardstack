@@ -3,6 +3,7 @@ import { setupRenderingTest } from 'ember-qunit';
 import { Compiler } from '@cardstack/core';
 import { render } from '@ember/test-helpers';
 import { compileTemplate } from '../helpers/template-compiler';
+import { compilerTestSetup, addRawCard } from '@cardstack/core/tests/helpers';
 
 async function evalModule(src: string): Promise<any> {
   //   return import(`data:application/javascript;base64,${btoa(src)}`);
@@ -11,6 +12,26 @@ async function evalModule(src: string): Promise<any> {
 
 module('Integration | compiler-basics', function (hooks) {
   setupRenderingTest(hooks);
+  compilerTestSetup(hooks);
+
+  hooks.beforeEach(async function () {
+    await addRawCard({
+      url: 'https://localhost/base/models/person',
+      'schema.js': `
+        import { contains } from "@cardstack/types";
+        import date from "https://cardstack.com/base/models/date";
+        import string from "https://cardstack.com/base/models/string";
+        export default class Person {
+          @contains(string)
+          name;
+
+          @contains(date)
+          birthdate;
+        }
+      `,
+      'embedded.hbs': `<this.name/> was born on <this.birthdate/>`,
+    });
+  });
 
   skip('it has a working evalModule', async function (assert) {
     let schema = `

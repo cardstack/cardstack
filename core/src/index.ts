@@ -14,6 +14,58 @@ import {
   templateTypes,
 } from './interfaces';
 
+import { FIXTURES } from '../tests/helpers';
+
+const BASE_CARDS: Map<string, CompiledCard> = new Map([
+  [
+    'https://cardstack.com/base/models/string',
+    {
+      url: 'https://cardstack.com/base/models/string',
+      modelSource: '',
+      fields: {},
+      templateSources: {
+        embedded: `{{this}}`,
+        isolated: '',
+      },
+    },
+  ],
+  [
+    'https://cardstack.com/base/models/date',
+    {
+      url: 'https://cardstack.com/base/models/date',
+      modelSource: '',
+      fields: {},
+      templateSources: {
+        embedded: `<FormatDate @date={{this}} />`,
+        isolated: '',
+      },
+    },
+  ],
+  [
+    'https://localhost/base/models/comment',
+    {
+      url: 'https://localhost/base/models/comment',
+      modelSource: '',
+      fields: {},
+      templateSources: {
+        embedded: `{{this}}`,
+        isolated: '',
+      },
+    },
+  ],
+  [
+    'https://localhost/base/models/tag',
+    {
+      url: 'https://localhost/base/models/tag',
+      modelSource: '',
+      fields: {},
+      templateSources: {
+        embedded: `{{this}}`,
+        isolated: '',
+      },
+    },
+  ],
+]);
 export class Compiler {
   async compile(cardSource: RawCard): Promise<CompiledCard> {
     let options = {};
@@ -76,67 +128,13 @@ export class Compiler {
   }
 
   async lookup(cardURL: string): Promise<CompiledCard> {
-    switch (cardURL) {
-      case 'https://cardstack.com/base/models/string':
-        return {
-          url: cardURL,
-          modelSource: '',
-          fields: {},
-          templateSources: {
-            embedded: `{{this}}`,
-            isolated: '',
-          },
-        };
-      case 'https://cardstack.com/base/models/date':
-        return {
-          url: cardURL,
-          modelSource: '',
-          fields: {},
-          templateSources: {
-            embedded: `<FormatDate @date={{this}} />`,
-            isolated: '',
-          },
-        };
-      case 'https://localhost/base/models/person':
-        return await this.compile({
-          url: cardURL,
-          'schema.js': `
-            import { contains } from "@cardstack/types";
-            import date from "https://cardstack.com/base/models/date";
-            import string from "https://cardstack.com/base/models/string";
-            export default class Person {
-              @contains(string)
-              name;
+    let card = BASE_CARDS.get(cardURL) ?? FIXTURES.get(cardURL);
 
-              @contains(date)
-              birthdate;
-            }
-          `,
-          'embedded.hbs': `<this.name/> was born on <this.birthdate/>`,
-        });
-      case 'https://localhost/base/models/comment':
-        return {
-          url: cardURL,
-          modelSource: '',
-          fields: {},
-          templateSources: {
-            embedded: `{{this}}`,
-            isolated: '',
-          },
-        };
-      case 'https://localhost/base/models/tag':
-        return {
-          url: cardURL,
-          modelSource: '',
-          fields: {},
-          templateSources: {
-            embedded: `{{this}}`,
-            isolated: '',
-          },
-        };
-      default:
-        throw new Error(`unknown card ${cardURL}`);
+    if (!card) {
+      throw new Error(`unknown card ${cardURL}`);
     }
+
+    return card;
   }
 }
 
