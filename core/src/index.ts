@@ -5,12 +5,13 @@ import decoratorsPlugin from '@babel/plugin-proposal-decorators';
 // @ts-ignore
 import classPropertiesPlugin from '@babel/plugin-proposal-class-properties';
 
-import cardPlugin, { getMeta } from './card-babel-plugin';
+import cardPlugin, { FieldsMeta, getMeta } from './card-babel-plugin';
 import cardGlimmerPlugin from './card-glimmer-plugin';
 import {
   CompiledCard,
   RawCard,
   templateFileName,
+  TemplateType,
   templateTypes,
 } from './interfaces';
 
@@ -72,7 +73,44 @@ export class Compiler {
     let options = {};
     let parentCard;
 
-    let out = transformSync(cardSource['schema.js'], {
+    let code = this.transformSchema(cardSource['schema.js'], options);
+    let meta = getMeta(options);
+
+    if (meta.parent) {
+      parentCard = await this.lookup(meta.parent.cardURL);
+    }
+
+    let fields = await this.lookupFieldsForCard(meta.fields);
+
+    if (parentCard) {
+      fields = this.adoptFields(fields, parentCard);
+    }
+
+    // TODO: inherit all the way up to base, so these are never undefined
+    let templateSources: CompiledCard['templateSources'] = {
+      isolated: '',
+      embedded: '',
+    };
+
+    for (let templateType of templateTypes) {
+      templateSources[templateType] = this.compileOrAdoptTemplate(
+        cardSource,
+        templateType,
+        fields,
+        parentCard
+      );
+    }
+
+    return {
+      url: cardSource.url,
+      modelSource: code,
+      fields,
+      templateSources,
+    };
+  }
+
+  transformSchema(schema: string, options: Object): string {
+    let out = transformSync(schema, {
       plugins: [
         [cardPlugin, options],
         [
@@ -85,68 +123,71 @@ export class Compiler {
       ],
     });
 
-    let meta = getMeta(options);
+    return out!.code!;
+  }
 
-    if (meta.parent) {
-      parentCard = await this.lookup(meta.parent.cardURL);
-    }
-
+  async lookupFieldsForCard(
+    metaFields: FieldsMeta
+  ): Promise<CompiledCard['fields']> {
     let fields: CompiledCard['fields'] = {};
-    for (let [name, { cardURL, type }] of Object.entries(meta.fields)) {
+    for (let [name, { cardURL, type }] of Object.entries(metaFields)) {
       fields[name] = {
         card: await this.lookup(cardURL),
         type,
       };
     }
 
-    if (parentCard) {
-      let cardFieldNames = Object.keys(fields);
-      let parentFieldNames = Object.keys(parentCard.fields);
+    return fields;
+  }
 
-      let fieldNameCollisions = intersection(cardFieldNames, parentFieldNames);
+  adoptFields(
+    fields: CompiledCard['fields'],
+    parentCard: CompiledCard
+  ): CompiledCard['fields'] {
+    let cardFieldNames = Object.keys(fields);
+    let parentFieldNames = Object.keys(parentCard.fields);
 
-      if (fieldNameCollisions.length) {
-        throw Error(
-          `Field collision on ${fieldNameCollisions.join()} with parent card ${
-            parentCard.url
-          }`
-        );
-      }
+    let fieldNameCollisions = intersection(cardFieldNames, parentFieldNames);
 
-      Object.assign(fields, parentCard.fields);
+    if (fieldNameCollisions.length) {
+      throw Error(
+        `Field collision on ${fieldNameCollisions.join()} with parent card ${
+          parentCard.url
+        }`
+      );
     }
 
-    // TODO: inherit all the way up to base, so these are never undefined
-    let templateSources: CompiledCard['templateSources'] = {
-      isolated: '',
-      embedded: '',
-    };
+    return Object.assign(fields, parentCard.fields);
+  }
 
-    for (let templateType of templateTypes) {
-      let filename = templateFileName(templateType);
-      let source = cardSource[filename];
+  compileOrAdoptTemplate(
+    cardSource: RawCard,
+    templateType: TemplateType,
+    fields: CompiledCard['fields'],
+    parentCard?: CompiledCard
+  ): string {
+    let template = '';
+    let source = cardSource[templateFileName(templateType)];
 
-      if (source) {
-        templateSources[templateType] = syntax.print(
-          syntax.preprocess(source, {
-            mode: 'codemod',
-            plugins: {
-              ast: [cardGlimmerPlugin({ fields })],
-            },
-          })
-        );
-      } else if (parentCard) {
-        templateSources[templateType] =
-          parentCard.templateSources[templateType];
-      }
+    if (source) {
+      template = this.compileTemplate(source, fields);
+    } else if (parentCard) {
+      template = parentCard.templateSources[templateType];
     }
+    // TODO: there should always be a template
 
-    return {
-      url: cardSource.url,
-      modelSource: out!.code!,
-      fields,
-      templateSources,
-    };
+    return template;
+  }
+
+  compileTemplate(source: string, fields: CompiledCard['fields']): string {
+    return syntax.print(
+      syntax.preprocess(source, {
+        mode: 'codemod',
+        plugins: {
+          ast: [cardGlimmerPlugin({ fields })],
+        },
+      })
+    );
   }
 
   async lookup(cardURL: string): Promise<CompiledCard> {

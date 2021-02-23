@@ -32,9 +32,9 @@ export type FieldMeta = {
   cardURL: string;
   type: FieldType;
 };
-interface FieldsMeta {
+export type FieldsMeta = {
   [name: string]: FieldMeta;
-}
+};
 export type ParentMeta = {
   cardURL: string;
 };
