@@ -2,15 +2,17 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { Compiler } from '@cardstack/core';
 import { compilerTestSetup, addRawCard } from '@cardstack/core/tests/helpers';
+import { CompiledCard } from '@cardstack/core/src/interfaces';
 
 module('Integration | compiler-adoption', function (hooks) {
   setupRenderingTest(hooks);
   compilerTestSetup(hooks);
 
   let compiler = new Compiler();
+  let parentCard: CompiledCard;
 
   hooks.beforeEach(async function () {
-    await addRawCard({
+    parentCard = await addRawCard({
       url: 'https://localhost/base/models/person',
       'schema.js': `
         import { contains } from "@cardstack/types";
@@ -40,6 +42,7 @@ module('Integration | compiler-adoption', function (hooks) {
       };
       let compiled = await compiler.compile(card);
       assert.deepEqual(Object.keys(compiled.fields), ['name', 'birthdate']);
+      assert.deepEqual(compiled.adoptsFrom, parentCard);
     });
 
     test('A child card can add a field', async function (assert) {

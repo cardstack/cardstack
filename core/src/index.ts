@@ -101,12 +101,16 @@ export class Compiler {
       );
     }
 
-    return {
+    let card: CompiledCard = {
       url: cardSource.url,
       modelSource: code,
       fields,
       templateSources,
     };
+    if (parentCard) {
+      card['adoptsFrom'] = parentCard;
+    }
+    return card;
   }
 
   transformSchema(schema: string, options: Object): string {
