@@ -22,6 +22,7 @@ export type RawCard = {
 
 export interface CompiledCard {
   url: string | undefined;
+  adoptsFrom?: CompiledCard;
   modelSource: string;
   fields: {
     [key: string]: {

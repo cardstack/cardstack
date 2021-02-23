@@ -14,6 +14,7 @@ import {
   templateTypes,
 } from './interfaces';
 
+import intersection from 'lodash/intersection';
 import { FIXTURES } from '../tests/helpers';
 
 const BASE_CARDS: Map<string, CompiledCard> = new Map([
@@ -69,6 +70,7 @@ const BASE_CARDS: Map<string, CompiledCard> = new Map([
 export class Compiler {
   async compile(cardSource: RawCard): Promise<CompiledCard> {
     let options = {};
+    let parentCard;
 
     let out = transformSync(cardSource['schema.js'], {
       plugins: [
@@ -85,6 +87,10 @@ export class Compiler {
 
     let meta = getMeta(options);
 
+    if (meta.parent) {
+      parentCard = await this.lookup(meta.parent.cardURL);
+    }
+
     let fields: CompiledCard['fields'] = {};
     for (let [name, { cardURL, type }] of Object.entries(meta.fields)) {
       fields[name] = {
@@ -93,8 +99,20 @@ export class Compiler {
       };
     }
 
-    if (meta.parent) {
-      let parentCard = await this.lookup(meta.parent.cardURL);
+    if (parentCard) {
+      let cardFieldNames = Object.keys(fields);
+      let parentFieldNames = Object.keys(parentCard.fields);
+
+      let fieldNameCollisions = intersection(cardFieldNames, parentFieldNames);
+
+      if (fieldNameCollisions.length) {
+        throw Error(
+          `Field collision on ${fieldNameCollisions.join()} with parent card ${
+            parentCard.url
+          }`
+        );
+      }
+
       Object.assign(fields, parentCard.fields);
     }
 
@@ -105,7 +123,8 @@ export class Compiler {
     };
 
     for (let templateType of templateTypes) {
-      let source = cardSource[templateFileName(templateType)];
+      let filename = templateFileName(templateType);
+      let source = cardSource[filename];
 
       if (source) {
         templateSources[templateType] = syntax.print(
@@ -116,6 +135,9 @@ export class Compiler {
             },
           })
         );
+      } else if (parentCard) {
+        templateSources[templateType] =
+          parentCard.templateSources[templateType];
       }
     }
 
