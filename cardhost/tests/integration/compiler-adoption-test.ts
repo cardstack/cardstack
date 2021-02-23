@@ -1,4 +1,4 @@
-import { module, test, todo } from 'qunit';
+import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { Compiler } from '@cardstack/core';
 import { compilerTestSetup, addRawCard } from '@cardstack/core/tests/helpers';
@@ -88,7 +88,7 @@ module('Integration | compiler-adoption', function (hooks) {
       }
     });
 
-    test('A child card can NOT overwrite an existing field from a grandparent', async function (assert) {
+    test('A child card can NOT overwrite an existing field, even from a grandparent', async function (assert) {
       await addRawCard({
         url: 'https://localhost/base/models/user',
         'schema.js': `
@@ -144,7 +144,7 @@ module('Integration | compiler-adoption', function (hooks) {
       );
     });
 
-    test('a child card inherits a grandparent card template', async function (assert) {
+    test('a child card inherits a grandparent card template, when it and parent do not have templates', async function (assert) {
       await addRawCard({
         url: 'https://localhost/base/models/user',
         'schema.js': `
@@ -170,6 +170,116 @@ module('Integration | compiler-adoption', function (hooks) {
         compiled.templateSources.embedded,
         `{{this.name}} was born on <FormatDate @date={{this.birthdate}} />`
       );
+    });
+  });
+
+  module('errors', function () {
+    test('@adopts cannot be used on a class property', async function (assert) {
+      assert.expect(1);
+      let card = {
+        'schema.js': `
+            import { adopts } from "@cardstack/types";
+            import Person from "https://localhost/base/models/person";
+
+            export default class Admin {
+              @adopts(Person)
+              user
+            }
+        `,
+      };
+
+      try {
+        await compiler.compile(card);
+      } catch (err) {
+        assert.ok(
+          /@adopts decorator can only be used on a class/.test(err.message),
+          err.message
+        );
+      }
+    });
+
+    test('@adopts only accepts 1 argument', async function (assert) {
+      assert.expect(1);
+      let card = {
+        'schema.js': `
+            import { adopts } from "@cardstack/types";
+            import Person from "https://localhost/base/models/person";
+
+            export default @adopts(Person, true) class Admin {}
+        `,
+      };
+
+      try {
+        await compiler.compile(card);
+      } catch (err) {
+        assert.ok(
+          /@adopts decorator accepts exactly one argument/.test(err.message),
+          err.message
+        );
+      }
+    });
+
+    test('@adopts with wrong argument syntax', async function (assert) {
+      assert.expect(1);
+      let card = {
+        'schema.js': `
+            import { adopts } from "@cardstack/types";
+
+            export default @adopts('Person') class Admin {}
+        `,
+      };
+
+      try {
+        await compiler.compile(card);
+      } catch (err) {
+        assert.ok(
+          /@adopts argument must be an identifier/.test(err.message),
+          err.message
+        );
+      }
+    });
+
+    test('@adopts doesnt accept undefined arguments', async function (assert) {
+      assert.expect(1);
+      let card = {
+        'schema.js': `
+            import { adopts } from "@cardstack/types";
+
+            export default @adopts(Person) class Admin {}
+        `,
+      };
+
+      try {
+        await compiler.compile(card);
+      } catch (err) {
+        assert.ok(
+          /@adopts argument is not defined/.test(err.message),
+          err.message
+        );
+      }
+    });
+
+    test('@adopts argument must be imported', async function (assert) {
+      assert.expect(1);
+      let card = {
+        'schema.js': `
+            import { adopts } from "@cardstack/types";
+            const Person = 'person'
+
+            export default @adopts(Person) class Admin {}
+        `,
+      };
+
+      try {
+        await compiler.compile(card);
+      } catch (err) {
+        assert.ok(
+          /@adopts argument must come from a module default export/.test(
+            err.message
+          ),
+          err.message
+        );
+      }
     });
   });
 });

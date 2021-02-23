@@ -328,7 +328,7 @@ module('Integration | compiler-basics', function (hooks) {
       await compiler.compile(card);
     } catch (err) {
       assert.ok(
-        /card type must be an identifier/.test(err.message),
+        /@contains argument must be an identifier/.test(err.message),
         err.message
       );
     }
@@ -350,7 +350,10 @@ module('Integration | compiler-basics', function (hooks) {
     try {
       await compiler.compile(card);
     } catch (err) {
-      assert.ok(/card type is not defined/.test(err.message), err.message);
+      assert.ok(
+        /@contains argument is not defined/.test(err.message),
+        err.message
+      );
     }
   });
 
@@ -371,7 +374,9 @@ module('Integration | compiler-basics', function (hooks) {
       await compiler.compile(card);
     } catch (err) {
       assert.ok(
-        /card type must come from a module default export/.test(err.message),
+        /@contains argument must come from a module default export/.test(
+          err.message
+        ),
         err.message
       );
     }

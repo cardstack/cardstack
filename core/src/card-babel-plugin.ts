@@ -16,6 +16,7 @@ import {
   isIdentifier,
   CallExpression,
   isCallExpression,
+  isClassDeclaration,
 } from '@babel/types';
 import { NodePath } from '@babel/traverse';
 
@@ -203,7 +204,7 @@ function validateUsageAndGetFieldMeta(
     }
 
     let fieldName = name(fieldIdentifier.parentPath.parentPath.parent.key);
-    let { cardURL } = extractFieldArguments(
+    let { cardURL } = extractDecoratorArguments(
       fieldIdentifier.parentPath as NodePath<CallExpression>,
       localName
     );
@@ -216,14 +217,22 @@ function validateUsageAndGetParentMeta(
   path: NodePath,
   localName: string
 ): ParentMeta {
-  let fieldIdentifier = path.scope.bindings[localName].referencePaths[0];
-  return extractFieldArguments(
-    fieldIdentifier.parentPath as NodePath<CallExpression>,
+  let adoptsIdentifer = path.scope.bindings[localName].referencePaths[0];
+
+  if (!isClassDeclaration(adoptsIdentifer.parentPath.parentPath.parent)) {
+    throw error(
+      adoptsIdentifer,
+      '@adopts decorator can only be used on a class'
+    );
+  }
+
+  return extractDecoratorArguments(
+    adoptsIdentifer.parentPath as NodePath<CallExpression>,
     localName
   );
 }
 
-function extractFieldArguments(
+function extractDecoratorArguments(
   callExpression: NodePath<CallExpression>,
   localName: string
 ) {
@@ -237,16 +246,20 @@ function extractFieldArguments(
   let cardTypePath = callExpression.get('arguments')[0];
   let cardType = cardTypePath.node;
   if (!isIdentifier(cardType)) {
-    throw error(cardTypePath, 'card type must be an identifier');
+    throw error(cardTypePath, `@${localName} argument must be an identifier`);
   }
 
   let definition = cardTypePath.scope.getBinding(cardType.name)?.path;
   if (!definition) {
-    throw error(cardTypePath, 'card type is not defined');
+    throw error(cardTypePath, `@${localName} argument is not defined`);
   }
   if (!definition.isImportDefaultSpecifier()) {
-    throw error(definition, 'card type must come from a module default export');
+    throw error(
+      definition,
+      `@${localName} argument must come from a module default export`
+    );
   }
+
   return {
     cardURL: (definition.parent as ImportDeclaration).source.value,
   };
