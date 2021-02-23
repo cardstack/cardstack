@@ -1,4 +1,4 @@
-import { ampLogo, wcmLogo } from './organizations';
+import { ampLogo, realtunesLogo } from './organizations';
 import valentinoSolanoThumb from 'dummy/images/media-registry/profiles/thumb/Valentino-Solano.jpg';
 import emilioRossoThumb from 'dummy/images/media-registry/profiles/thumb/Emilio-Rosso.jpg';
 import mariaBianchiThumb from 'dummy/images/media-registry/profiles/thumb/Maria-Bianchi.jpg';
@@ -21,13 +21,12 @@ export const AMP = {
 };
 
 export const WCM = {
-  id: 'warner-chappell-music',
+  id: 'realtunes-publishing',
   type: 'publisher',
-  title: 'Warner Chappell Music',
-  logoURL: wcmLogo,
+  title: 'RealTunes Publishing',
+  logoURL: realtunesLogo,
   territory: 'worldwide',
-  ipi: '00160187388',
-  website: 'www.warnerchappell.com',
+  website: 'www.realtunes.com',
   main_office: 'Los Angeles, USA',
 };
 
@@ -39,7 +38,7 @@ const VALENTINO_SOLANO = {
   title: 'Valentino Solano',
   imgURL: valentinoSolanoThumb,
   ipi: '00914256714',
-  pro: 'Global Music Rights',
+  pro: 'SOMOA',
   email: 'valentino@valsolanomusic.com',
   website: 'www.valsolanomusic.com',
   expandable: true,
@@ -51,7 +50,7 @@ const EMILIO_ROSSO = {
   title: 'Emilio Rosso',
   imgURL: emilioRossoThumb,
   ipi: '00231925374',
-  pro: 'Global Music Rights',
+  pro: 'SOMOA',
   email: 'emilio@rosso.com',
   website: null,
   expandable: true,
@@ -63,7 +62,7 @@ const MARIA_BIANCHI = {
   title: 'Maria Bianchi',
   imgURL: mariaBianchiThumb,
   ipi: '00181928972',
-  pro: 'Global Music Rights',
+  pro: 'SOMOA',
   email: 'm.bianchi@gmail.com',
   website: null,
   expandable: true,
@@ -127,7 +126,7 @@ export const MUSICAL_WORK = {
   version_type: 'Original work',
   publishers: [WCM, AMP],
   copyright_notice:
-    '© 2019 Warner Chappell Music, © 2019 Allegro Music Publishing',
+    '© 2019 RealTunes Publishing, © 2019 Allegro Music Publishing',
 };
 
 // MASTER DETAIL
@@ -140,8 +139,8 @@ export const MASTER_DETAIL = {
   cover_art_medium: theSunComesOutMedium,
   cover_art_large: theSunComesOutLarge,
   type_of_album: '',
-  owner: 'Warner Music Group',
-  label: ['Warner Music Group'],
+  owner: 'Warbler Music',
+  label: ['Warbler Music'],
   genre: 'Pop',
   length: '2:58',
   language: ['English (en_US)'],
@@ -161,7 +160,7 @@ export const MASTER_DETAIL = {
     },
   ],
   isrc: 'US-S1Z-18-04923',
-  copyright_notice: '(P) 2020 Warner Music Group',
+  copyright_notice: '(P) 2020 Warbler Music',
   producer: 'Anton Merano',
   producer_id: 'anton-merano',
   mastering_engineer: 'Lena Bosh',

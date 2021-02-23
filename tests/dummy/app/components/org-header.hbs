@@ -1,7 +1,9 @@
 <header class="media-registry__header media-registry__header--sm media-registry__header--{{@id}}">
-  <h1 class="media-registry__title">
-    <span class="media-registry__logo media-registry__logo--{{@id}}" style={{css-url "background-image" @logoURL}} />
-    <span>{{@title}}</span>
+  <h1 class={{cn "media-registry__title" media-registry__title--has-logo=@logoURL}}>
+    {{#if @logoURL}}
+      <span class="media-registry__logo media-registry__logo--{{@id}}" style={{css-url "background-image" @logoURL}} />
+    {{/if}}
+    {{@title}}
   </h1>
   <input class="media-registry__search-bar" type="search" placeholder="Search" />
   <nav class="media-registry__nav">

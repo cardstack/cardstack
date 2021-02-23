@@ -104,36 +104,13 @@
   background-size: contain;
   background-repeat: no-repeat;
   color: var(--boxel-light);
+  border: 1px solid var(--boxel-dark);
   border-radius: 7px;
   font: var(--boxel-font-sm);
   font-weight: 700;
   letter-spacing: 0;
   line-height: 30px;
   text-align: center;
-}
-
-.discrepancy__profile-icon--warner-music-group {
-  background-color: #0061aa;
-}
-.discrepancy__profile-icon--allegro-music-publishing,
-.discrepancy__profile-icon--warner-chappell-music {
-  background-size: auto 23px;
-}
-.discrepancy__profile-icon--deezer {
-  background-position: top center;
-  background-size: auto 23px;
-}
-.discrepancy__profile-icon--global-music-rights {
-  background-size: auto 20px;
-}
-
-.boxel-card__bg-img--warner-chappell-music {
-  background-size: auto 35px;
-  background-color: var(--boxel-dark);
-  border-radius: 100px;
-}
-.boxel-card__bg-img--allegro-music-publishing {
-  border-radius: 100px;
 }
 
 .discrepancy__comparison-header-icons-carot {
@@ -408,4 +385,26 @@
 
 .discrepancy-field-renderer.base-card-field.comp-view .boxel-highlight {
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
+}
+
+
+
+/* Dummy */
+.discrepancy__profile-icon--allegro-music-publishing {
+  background-size: auto 23px;
+}
+.boxel-card__bg-img--allegro-music-publishing {
+  border-radius: 100px;
+}
+
+.discrepancy__profile-icon--warbler-music {
+  background-color: var(--boxel-navy);
+}
+
+.discrepancy__profile-icon--realtunes-publishing {
+  background-color: #3F356F;
+}
+
+.discrepancy__profile-icon--somoa {
+  background-color: var(--boxel-lilac);
 }

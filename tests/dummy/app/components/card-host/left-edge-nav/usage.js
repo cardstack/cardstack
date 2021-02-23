@@ -9,7 +9,7 @@ import {
   crdRecordsLogo,
   lisaTrackProfile,
   steveRightsProfile,
-  wmgLogo,
+  ampLogo,
 } from '../../../data/organizations';
 
 const ORGS = [
@@ -38,11 +38,11 @@ const ORGS = [
     },
   },
   {
-    id: 'warner-music-group',
-    type: 'label',
-    title: 'Warner Music Group',
-    iconURL: wmgLogo,
-    logoURL: wmgLogo,
+    id: 'allegro-music-publishing',
+    type: 'publisher',
+    title: 'Allegro Music Publishing',
+    iconURL: ampLogo,
+    logoURL: ampLogo,
   },
 ];
 

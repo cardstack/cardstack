@@ -5,7 +5,7 @@ import {
   MARIA_PR,
   valentinoSolanoThumb,
 } from './comp-data';
-import { wcmLogo, ampLogo } from './organizations';
+import { ampLogo, realtunesLogo } from './organizations';
 
 const VALENTINO_SOLANO_V1 = {
   id: 'valentino-solano',
@@ -13,7 +13,7 @@ const VALENTINO_SOLANO_V1 = {
   title: 'Valentino Solano',
   imgURL: valentinoSolanoThumb,
   ipi: '00815723492',
-  pro: 'Global Music Rights',
+  pro: 'SOMOA',
   email: 'valentino@valsolanomusic.com',
   website: 'www.valsolanomusic.com',
   expandable: true,
@@ -39,17 +39,17 @@ export default {
   id: 'the-sun-comes-out-wcm-amp',
   type: 'Musical Work',
   title: 'The Sun Comes Out',
-  ownerId: 'warner-chappell-music',
-  baseOwner: 'Warner Chappell Music',
+  ownerId: 'realtunes-publishing',
+  baseOwner: 'RealTunes Publishing',
   compOwner: 'Allegro Music Publishing',
   baseCard: {
     isPublisher: true,
     version: 'v2',
     id: 'the-sun-comes-out-wcm-v1',
     type: 'musical-work',
-    owner: 'Warner Chappell Music',
-    ownerId: 'warner-chappell-music',
-    iconURL: wcmLogo,
+    owner: 'RealTunes Publishing',
+    ownerId: 'realtunes-publishing',
+    iconURL: realtunesLogo,
     datetime: '2019-11-11T13:54',
     isolatedFields: [
       {
@@ -127,7 +127,7 @@ export default {
       {
         title: 'copyright_notice',
         value: [
-          '© 2019 Warner Chappell Music',
+          '© 2019 RealTunes Publishing',
           '© 2019 Allegro Music Publishing',
         ],
       },
@@ -211,7 +211,7 @@ export default {
       {
         title: 'copyright_notice',
         value: [
-          '© 2019 Warner Chappell Music',
+          '© 2019 RealTunes Publishing',
           '© 2019 Allegro Music Publishing',
         ],
       },

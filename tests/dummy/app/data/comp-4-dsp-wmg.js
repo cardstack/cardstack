@@ -1,19 +1,17 @@
 import { WCM, AMP, VALENTINO_PR, EMILIO_PR, MARIA_PR } from './comp-data';
-import { wmgLogo, deezerLogo } from './organizations';
 
 export default {
   id: 'the-sun-comes-out-dzr-wmg',
   type: 'Musical Work',
   title: 'The Sun Comes Out',
-  ownerId: 'deezer',
-  baseOwner: 'Deezer',
-  compOwner: 'Warner Music Group',
+  ownerId: 'dsp',
+  baseOwner: 'DSP',
+  compOwner: 'Warbler Music',
   baseCard: {
     type: 'musical-work',
     version: 'v0',
-    owner: 'Deezer',
-    ownerId: 'deezer',
-    iconURL: deezerLogo,
+    owner: 'DSP',
+    ownerId: 'dsp',
     datetime: '2020-07-10T14:24',
     id: 'dsp-the-sun-comes-out',
     isolatedFields: [
@@ -77,9 +75,8 @@ export default {
   },
   compCard: {
     type: 'musical-work',
-    owner: 'Warner Music Group',
-    ownerId: 'warner-music-group',
-    iconUrl: wmgLogo,
+    owner: 'Warbler Music',
+    ownerId: 'warbler-music',
     datetime: '2020-06-09T18:10',
     id: 'wmg-the-sun-comes-out',
     isolatedFields: [
@@ -152,7 +149,7 @@ export default {
       {
         title: 'copyright_notice',
         value: [
-          '© 2019 Warner Chappell Music',
+          '© 2019 RealTunes Publishing',
           '© 2019 Allegro Music Publishing',
         ],
       },

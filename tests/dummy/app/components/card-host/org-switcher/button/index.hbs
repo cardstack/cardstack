@@ -5,5 +5,9 @@
   <div
     class={{cn "boxel-org-switcher-button__logo" (concat "boxel-org-switcher-button__logo--" @org.id)}}
     style={{css-url "background-image" @org.iconURL}}
-  />
+  >
+    {{#unless @org.iconURL}}
+      {{truncate @org.title 1 false}}
+    {{/unless}}
+  </div>
 </CardHost::LeftEdgeNav::SelectableButton>

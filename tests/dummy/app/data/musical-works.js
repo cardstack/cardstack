@@ -1,5 +1,4 @@
 import { WCM, AMP, VALENTINO_PR, EMILIO_PR, MARIA_PR } from './comp-data';
-import { deezerLogo, gmrLogo, wmgLogo } from './organizations';
 
 // Profiles
 const VALENTINO_SOLANO_V0 = {
@@ -15,7 +14,7 @@ const VALENTINO_SOLANO_V1 = {
   title: 'Valentino Solano',
   imgURL: VALENTINO_PR.writer.imgURL,
   ipi: '00815723492',
-  pro: 'Global Music Rights',
+  pro: 'SOMOA',
   email: 'valentino@valsolanomusic.com',
   website: 'www.valsolanomusic.com',
   expandable: true,
@@ -53,9 +52,8 @@ export default [
     id: 'the-sun-comes-out-wmg-v1',
     title: 'The Sun Comes Out',
     type: 'musical-work',
-    owner: 'Warner Music Group',
-    ownerId: 'wmg',
-    iconURL: wmgLogo,
+    owner: 'Warbler Music',
+    ownerId: 'warbler-music',
     datetime: '2020-04-08T10:45',
     isolatedFields: [
       {
@@ -108,9 +106,8 @@ export default [
     id: 'the-sun-comes-out-wmg-v2',
     title: 'The Sun Comes Out',
     type: 'musical-work',
-    owner: 'Warner Music Group',
-    ownerId: 'wmg',
-    iconURL: wmgLogo,
+    owner: 'Warbler Music',
+    ownerId: 'warbler-music',
     datetime: '2019-11-11T13:54',
     isolatedFields: [
       {
@@ -178,7 +175,7 @@ export default [
       {
         title: 'copyright_notice',
         value: [
-          '© 2019 Warner Chappell Music',
+          '© 2019 RealTunes Publishing',
           '© 2019 Allegro Music Publishing',
         ],
       },
@@ -189,9 +186,8 @@ export default [
     id: 'wmg-the-sun-comes-out',
     title: 'The Sun Comes Out',
     type: 'musical-work',
-    owner: 'Warner Music Group',
-    ownerId: 'wmg',
-    iconURL: wmgLogo,
+    owner: 'Warbler Music',
+    ownerId: 'warbler-music',
     datetime: '2020-06-09T18:10',
     isolatedFields: [
       {
@@ -263,7 +259,7 @@ export default [
       {
         title: 'copyright_notice',
         value: [
-          '© 2019 Warner Chappell Music',
+          '© 2019 RealTunes Publishing',
           '© 2019 Allegro Music Publishing',
         ],
       },
@@ -276,7 +272,7 @@ export default [
     title: 'The Sun Comes Out',
     type: 'musical-work',
     owner: 'Allegro Music Publishing',
-    ownerId: 'amp',
+    ownerId: 'allegro-music-publishing',
     iconURL: AMP.logoURL,
     datetime: '2020-05-18T11:36',
     isolatedFields: [
@@ -349,7 +345,7 @@ export default [
       {
         title: 'copyright_notice',
         value: [
-          '© 2019 Warner Chappell Music',
+          '© 2019 RealTunes Publishing',
           '© 2019 Allegro Music Publishing',
         ],
       },
@@ -361,8 +357,8 @@ export default [
     id: 'the-sun-comes-out-wcm-v1',
     title: 'The Sun Comes Out',
     type: 'musical-work',
-    owner: 'Warner Chappell Music',
-    ownerId: 'wcm',
+    owner: 'RealTunes Publishing',
+    ownerId: 'realtunes-publishing',
     iconURL: WCM.logoURL,
     datetime: '2019-11-11T13:54',
     isolatedFields: [
@@ -431,7 +427,7 @@ export default [
       {
         title: 'copyright_notice',
         value: [
-          '© 2019 Warner Chappell Music',
+          '© 2019 RealTunes Publishing',
           '© 2019 Allegro Music Publishing',
         ],
       },
@@ -442,8 +438,8 @@ export default [
     id: 'the-sun-comes-out-wcm-v2',
     title: 'The Sun Comes Out',
     type: 'musical-work',
-    owner: 'Warner Chappell Music',
-    ownerId: 'wcm',
+    owner: 'RealTunes Publishing',
+    ownerId: 'realtunes-publishing',
     iconURL: WCM.logoURL,
     datetime: '2020-05-18T15:31',
     isolatedFields: [
@@ -516,7 +512,7 @@ export default [
       {
         title: 'copyright_notice',
         value: [
-          '© 2019 Warner Chappell Music',
+          '© 2019 RealTunes Publishing',
           '© 2019 Allegro Music Publishing',
         ],
       },
@@ -527,8 +523,8 @@ export default [
     id: 'wcm-the-sun-comes-out',
     title: 'The Sun Comes Out',
     type: 'musical-work',
-    owner: 'Warner Chappell Music',
-    ownerId: 'wcm',
+    owner: 'RealTunes Publishing',
+    ownerId: 'realtunes-publishing',
     iconURL: WCM.logoURL,
     datetime: '2020-06-09T18:10',
     isolatedFields: [
@@ -601,7 +597,7 @@ export default [
       {
         title: 'copyright_notice',
         value: [
-          '© 2019 Warner Chappell Music',
+          '© 2019 RealTunes Publishing',
           '© 2019 Allegro Music Publishing',
         ],
       },
@@ -613,9 +609,8 @@ export default [
     id: 'the-sun-comes-out-gmr',
     title: 'The Sun Comes Out',
     type: 'musical-work',
-    owner: 'Global Music Rights',
-    ownerId: 'gmr',
-    iconURL: gmrLogo,
+    owner: 'SOMOA Music Rights',
+    ownerId: 'somoa',
     datetime: '2020-06-09T16:18',
     isolatedFields: [
       {
@@ -687,21 +682,20 @@ export default [
       {
         title: 'copyright_notice',
         value: [
-          '© 2019 Warner Chappell Music',
+          '© 2019 RealTunes Publishing',
           '© 2019 Allegro Music Publishing',
         ],
       },
     ],
   },
 
-  // Deezer 1
+  // DSP 1
   {
     id: 'dsp-the-sun-comes-out',
     title: 'The Sun Comes Out',
     type: 'musical-work',
-    owner: 'Deezer',
-    ownerId: 'dzr',
-    iconURL: deezerLogo,
+    owner: 'DSP',
+    ownerId: 'dsp',
     datetime: '2020-07-10T14:24',
     isolatedFields: [
       {
@@ -740,14 +734,13 @@ export default [
       },
     ],
   },
-  // Deezer 2
+  // DSP 2
   {
     id: 'dzr-the-sun-comes-out',
     title: 'The Sun Comes Out',
     type: 'musical-work',
-    owner: 'Deezer',
-    ownerId: 'dzr',
-    iconURL: deezerLogo,
+    owner: 'DSP',
+    ownerId: 'dsp',
     datetime: '2020-06-09T18:10',
     isolatedFields: [
       {
@@ -819,7 +812,7 @@ export default [
       {
         title: 'copyright_notice',
         value: [
-          '© 2019 Warner Chappell Music',
+          '© 2019 RealTunes Publishing',
           '© 2019 Allegro Music Publishing',
         ],
       },

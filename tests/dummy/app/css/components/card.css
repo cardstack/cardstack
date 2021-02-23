@@ -33,7 +33,7 @@
 }
 
 .boxel-card__expand-overlay:hover {
-  background-image: url("/@cardstack/boxel/images/icons/expand.svg");
+  background-image: url('../../../../public/@cardstack/boxel/images/icons/expand.svg');
   background-position: top var(--boxel-sp-xxxs) right var(--boxel-sp-xxxs);
   background-size: 1rem 1rem;
   background-repeat: no-repeat;
