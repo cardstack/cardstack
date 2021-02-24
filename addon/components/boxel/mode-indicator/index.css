@@ -21,8 +21,7 @@
   border: none;
   border-radius: 100px;
   color: var(--boxel-dark);
-  font: var(--boxel-font-sm);
-  font-weight: 600;
+  font: 600 var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-lg);
   text-align: left;
   text-transform: capitalize;
