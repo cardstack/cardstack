@@ -15,7 +15,7 @@
   content: "";
   width: 1px;
   height: var(--boxel-sp);
-  /* TODO: discuss exceptions for extra small things */
+  /* Not using variables because the focus of this is primarily aesthetic effect */
   margin: 2px 0 3px 7px;
   background-color: var(--boxel-light-600);
 }

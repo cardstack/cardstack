@@ -38,7 +38,7 @@
 }
 
 .dashboard__body {
-  /* TODO: discuss exceptions to padding variables */
+  /* Not making this change now. Waiting on @burieberry's new version of dashboard css */
   padding: 85px 40px 140px 30px;
   background-color: var(--boxel-purple-600);
 }

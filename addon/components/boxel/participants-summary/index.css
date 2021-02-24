@@ -2,9 +2,9 @@
   display: grid;
   font: var(--boxel-font-xs);
   grid-template-columns: auto 1fr;
-  gap: 0 10px;
+  gap: 0 var(--boxel-sp-xs);
   align-items: center;
-  padding-top: 12px;
+  padding-top: var(--boxel-sp-xs);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

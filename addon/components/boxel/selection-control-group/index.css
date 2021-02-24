@@ -2,27 +2,23 @@
   display: flex;
 }
 
-.selection-control-group__select-button {
-  margin-right: 1px;
-}
-
 .selection-control-group__select-all {
   position: relative;
   width: 116px;
-  padding: 11px 27px 10px;
+  padding: var(--boxel-sp-xs) var(--boxel-sp-lg) var(--boxel-sp-xs);
   transition: all var(--boxel-transition);
 }
 
 .selection-control-group__select-all > svg {
-  margin-right: 10px;
+  margin-right: var(--boxel-sp-xs);
 }
 
 .selection-control-group__select-all--selected-items {
   width: 246px;
-  padding-left: 17px;
-  padding-right: 50px;
+  padding-left: var(--boxel-sp-sm);
+  padding-right: var(--boxel-sp-xxl);
 }
 
 .selection-control-group__more-menu {
-  margin: 15px 0;
+  margin: var(--boxel-sp-sm) 0;
 }

@@ -1,7 +1,7 @@
 .wave-player {
   display: inline-flex;
   align-items: center;
-  padding-top: 15px;
+  padding-top: var(--boxel-sp-sm);
 }
 
 .wave-player > canvas {
@@ -9,7 +9,7 @@
 }
 
 .wave-player__play {
-  padding-right: 10px;
+  padding-right: var(--boxel-sp-xs);
 }
 
 .wave-player__play.is-playing,

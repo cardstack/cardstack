@@ -5,7 +5,7 @@
   list-style-type: none;
   padding: 0;
   display: inline-grid;
-  gap: 15px;
+  gap: var(--boxel-sp-sm);
 }
 
 .participant-list--full-width {

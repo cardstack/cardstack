@@ -4,14 +4,14 @@
 
 @media only screen and (min-width: 1440px) {
   .thread-message {
-    padding-right: 40px;
+    padding-right: var(--boxel-sp-xl);
   }
 }
 
 .thread-message > .thread-message__participant {
   display: grid;
   grid-template-columns: var(--icon-size) auto 1fr;
-  gap: 10px var(--boxel-sp);
+  gap: var(--boxel-sp-xs) var(--boxel-sp);
   align-items: start;
   height: 20px;
 }
@@ -40,5 +40,5 @@
 }
 
 .thread-message__content > p + p {
-  margin-top: 30px;
+  margin-top: var(--boxel-sp-lg);
 }

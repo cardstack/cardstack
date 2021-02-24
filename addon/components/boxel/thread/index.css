@@ -10,7 +10,7 @@
 
 .thread__scroll-wrapper {
   overflow-y: auto;
-  padding-bottom: 30px;
+  padding-bottom: var(--boxel-sp-lg);
 }
 
 .thread__content-wrapper {
@@ -23,11 +23,11 @@
 
 .thread__content {
   padding: var(--boxel-sp);
-  padding-left: 40px;
+  padding-left: var(--boxel-sp-xl);
 }
 
 .thread__content > * + * {
-  margin-top: 30px;
+  margin-top: var(--boxel-sp-lg);
 }
 
 .thread__sidebar {

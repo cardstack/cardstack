@@ -1,14 +1,14 @@
 .sort-menu {
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-sm);
-  padding: 15px 0;
+  padding: var(--boxel-sp-sm) 0;
   display: flex;
   flex-direction: column;
 }
 
 .sort-menu header {
-  padding-left: 20px;
-  padding-bottom: 15px;
+  padding-left: var(--boxel-sp);
+  padding-bottom: var(--boxel-sp-sm);
   background-color: var(--boxel-light);
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -16,6 +16,6 @@
 }
 
 .sort-menu ul {
-  padding-left: 20px;
+  padding-left: var(--boxel-sp);
   overflow: auto;
 }

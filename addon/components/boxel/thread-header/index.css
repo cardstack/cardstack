@@ -8,33 +8,33 @@
   border-top-right-radius: var(--boxel-border-radius);
   border-top-left-radius: var(--boxel-border-radius);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  position: relative;
 }
 
 .thread-header__label {
   color: var(--boxel-purple-400);
-  font: var(--boxel-font-xs);
-  font-weight: 600;
+  font: 600 var(--boxel-font-xs);
+  margin-left: var(--boxel-sp);
   letter-spacing: var(--boxel-lsp-xl);
   text-transform: uppercase;
 }
 
 .thread-header__title {
+  /* Not using variables for margin-top because it seems to make a significant difference to typography (@Aierie's judgement) */
   margin-top: 4px;
-  margin-bottom: 6px;
-  margin-left: 20px;
-  font: var(--boxel-font-lg);
-  font-weight: 700;
+  margin-bottom: var(--boxel-sp-xxxs);
+  margin-left: var(--boxel-sp);
+  font: 700 var(--boxel-font-lg);
   letter-spacing: var(--boxel-lsp-xs);
 }
 
 .thread-header__expand-button {
   display: flex;
   align-items: center;
-  padding: 10px;
+  padding: var(--boxel-sp-xs);
   border: none;
   background: none;
-  font: var(--boxel-font-xs);
-  font-weight: 600;
+  font: 600 var(--boxel-font-xs);
   letter-spacing: var(--boxel-lsp);
 }
 
@@ -43,7 +43,7 @@
 }
 
 .thread-header__expand-button > svg {
-  margin-left: 15px;
+  margin-left: var(--boxel-sp-sm);
 }
 
 @media only screen and (max-width: 1149px) {
@@ -56,7 +56,7 @@
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
-  gap: 0 15px;
+  gap: 0 var(--boxel-sp-sm);
   color: var(--boxel-dark);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-xl);
@@ -66,6 +66,7 @@
   position: absolute;
   top: 0;
   right: 0;
+  /* Not using variables because this might overlap with things below */
   padding: 2px 13px 3px;
   border-radius: 0 10px 0 5px;
   background-color: var(--boxel-error-100);

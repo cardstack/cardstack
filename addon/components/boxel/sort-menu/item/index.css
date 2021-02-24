@@ -2,14 +2,14 @@
   cursor: pointer;
   font-weight: 400;
   opacity: 0.5;
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-left: var(--boxel-sp-xs);
+  padding-right: var(--boxel-sp-xs);
   position: relative;
   user-select: none;
 }
 
 .sort-menu-item + .sort-menu-item {
-  padding-top: 15px;
+  padding-top: var(--boxel-sp-sm);
 }
 
 .sort-menu-item:hover,
@@ -31,6 +31,7 @@
 }
 
 .sort-menu-item__active > span {
+  /* Not using variables so that the spacing between column and order is proportional to font-size */
   padding-left: 0.4em;
 }
 
