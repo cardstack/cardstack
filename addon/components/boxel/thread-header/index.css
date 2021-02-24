@@ -14,7 +14,6 @@
 .thread-header__label {
   color: var(--boxel-purple-400);
   font: 600 var(--boxel-font-xs);
-  margin-left: var(--boxel-sp);
   letter-spacing: var(--boxel-lsp-xl);
   text-transform: uppercase;
 }
@@ -23,7 +22,6 @@
   /* Not using variables for margin-top because it seems to make a significant difference to typography (@Aierie's judgement) */
   margin-top: 4px;
   margin-bottom: var(--boxel-sp-xxxs);
-  margin-left: var(--boxel-sp);
   font: 700 var(--boxel-font-lg);
   letter-spacing: var(--boxel-lsp-xs);
 }
