@@ -1,22 +1,24 @@
 .mode-indicator {
-  --mode-container-width: 240px;
+  --mode-container-width: 180px;
   --mode-container-height: 40px;
   --mode-icon: url('');
-  --mode-icon-position: left 15px top 11px;
-  --mode-icon-size: 1rem 1rem;
+  --mode-icon-position: center left var(--boxel-sp-sm);
+  --mode-icon-width: 15px;
+  --mode-icon-height: 15px;
+  --mode-icon-size: var(--mode-icon-width) var(--mode-icon-height);
 
-  cursor: pointer;
   display: block;
   min-width: var(--mode-container-width);
   width: auto;
   max-width: 100%;
   height: var(--mode-container-height);
-  padding: 11px 40px;
+  padding: var(--boxel-sp-xs) calc(var(--boxel-sp-sm) + var(--mode-icon-width) + var(--boxel-sp-xxs));
   background-color: var(--boxel-highlight);
   background-image: var(--mode-icon), url('../@cardstack/boxel/images/icons/close.svg');
-  background-position: var(--mode-icon-position), center right 15px;
+  background-position: var(--mode-icon-position), center right var(--boxel-sp-sm);
   background-repeat: no-repeat, no-repeat;
   background-size: var(--mode-icon-size), 10px 10px;
+  border: none;
   border-radius: 100px;
   color: var(--boxel-dark);
   font: var(--boxel-font-sm);
@@ -28,14 +30,9 @@
 
 .mode-indicator--edit {
   --mode-icon: url('../@cardstack/boxel/images/icons/edit-box.svg');
-  --mode-icon-position: left 15px top 12px;
-  --mode-icon-size: 13px 13px;
 }
 .mode-indicator--configure {
   --mode-icon: url('../@cardstack/boxel/images/icons/gear.svg');
-}
-.mode-indicator--comparison {
-  --mode-icon: url('../@cardstack/boxel/images/icons/clock.svg');
 }
 .mode-indicator--themer {
   --mode-icon: url('../@cardstack/boxel/images/icons/themer.svg');
@@ -46,6 +43,5 @@
 
 .mode-indicator:hover,
 .mode-indicator:focus {
-  /* background-color: var(--boxel-highlight-hover); */
   outline: 0;
 }

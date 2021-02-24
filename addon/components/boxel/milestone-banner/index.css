@@ -2,7 +2,7 @@
   display: flex;
   justify-content: space-between;
   min-height: 50px;
-  padding: 15px var(--boxel-sp);
+  padding: var(--boxel-sp-sm) var(--boxel-sp);
   background-image: linear-gradient(
     to right,
     var(--boxel-cyan),
@@ -15,7 +15,7 @@
 }
 
 .milestone-banner__title {
-  padding-left: 25px;
+  padding-left: var(--boxel-sp-lg);
   background: url('../@cardstack/boxel/images/icons/check-mark.svg') left center/10px 10px no-repeat;
   font-weight: 600;
 }

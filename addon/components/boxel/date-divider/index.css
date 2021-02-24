@@ -16,7 +16,7 @@
 .date-divider__date {
   grid-row: 1;
   grid-column: 1;
-  padding: 0 10px;
+  padding: 0 var(--boxel-sp-xs);
   background-color: var(--boxel-light-300);
   color: var(--boxel-purple-400);
   font: var(--boxel-font-xs);

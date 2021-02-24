@@ -15,7 +15,6 @@ import './components/detail-section.css';
 import './components/embedded-collection-editor.css';
 import './components/isolated-collection-table.css';
 import './components/isolated-collection.css';
-import './components/mode-indicator.css';
 import './components/next-steps.css';
 import './components/pill-button.css';
 import './components/queue-card.css';

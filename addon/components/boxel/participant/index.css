@@ -3,7 +3,7 @@
 
   display: grid;
   grid-template-columns: var(--icon-size) 1fr;
-  gap: 0 12px;
+  gap: 0 var(--boxel-sp-xs);
   align-items: center;
   font: var(--boxel-font-xs);
   letter-spacing: var(--boxel-lsp-lg);
