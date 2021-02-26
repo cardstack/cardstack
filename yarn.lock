@@ -6652,16 +6652,16 @@ ember-fetch@^8.0.4:
     node-fetch "^2.6.1"
     whatwg-fetch "^3.4.0"
 
-ember-freestyle@^0.12.4:
-  version "0.12.4"
-  resolved "https://registry.yarnpkg.com/ember-freestyle/-/ember-freestyle-0.12.4.tgz#28652b13b49fe206a6ecc602649feb945f7ffb51"
-  integrity sha512-kcAU51ZSVkX0vOyenvENq4rUscNQftxLx8OaC1zXefC/ftVOKFAiP+rPAFYEc27W9ZjZVUveP83CS/jpeHocsQ==
+ember-freestyle@^0.12.7:
+  version "0.12.7"
+  resolved "https://registry.yarnpkg.com/ember-freestyle/-/ember-freestyle-0.12.7.tgz#86021e320abfa84d3d442c3cdcdc71e234dd2a2c"
+  integrity sha512-dnMZ9aSBSMhKd4u9Tp9E0/g1Bz7ttMiQj0dQquCu1c6leHWTX4FAnu08vqdT4b8uj+ykD4UMWamw20Q7dAUaVA==
   dependencies:
     ember-auto-import "^1.10.1"
     ember-cli-babel "^7.23.0"
     ember-cli-htmlbars "^5.3.1"
     ember-cli-sass "^10.0.0"
-    ember-json-viewer "^0.5.0"
+    ember-json-viewer "^0.6.0"
     ember-modifier "^2.1.0"
     ember-named-blocks-polyfill "^0.2.4"
     ember-runtime-enumerable-includes-polyfill "^2.0.0"
@@ -6704,10 +6704,10 @@ ember-inflector@^3.0.0:
   dependencies:
     ember-cli-babel "^6.6.0"
 
-ember-json-viewer@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/ember-json-viewer/-/ember-json-viewer-0.5.0.tgz#87b27b38db6d0e829e4fafda6e52fb66b03e26f7"
-  integrity sha512-26eXJj8qxRsvdU7rpwQyMkEz67ArbQY/VUeMH5NRqr56AgQQlhQg4oUhp77FLaUJIKd7HB8xVofUIY+/jR1eXg==
+ember-json-viewer@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/ember-json-viewer/-/ember-json-viewer-0.6.0.tgz#26d89f8cedf9ae6aedd77c86449a39aec30ab8e6"
+  integrity sha512-b3epmYEvu92BTRZAuC0uD0tJSoXCuG9eVkgco7CBCgA1hGyvcmYwE39/jlQuUVUmx4za2ferqAZn8dZZ8Cbaww==
   dependencies:
     ember-cli-babel "^7.22.1"
     ember-cli-htmlbars "^5.3.1"
