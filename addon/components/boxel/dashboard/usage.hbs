@@ -1,5 +1,66 @@
 <Freestyle::Usage @name="Dashboard">
   <:example>
-  TODO
+    <Boxel::Dashboard
+      @displayLeftEdge={{this.displayLeftEdge}}
+      style={{css-var
+        boxel-dashboard-background-color=this.backgroundColor
+        boxel-dashboard-color=this.color
+        boxel-dashboard-header-background-color=this.headerBackgroundColor
+        boxel-dashboard-header-color=this.headerColor
+      }}
+    >
+      <:left-edge>
+        <CardHost::LeftEdgeNav
+          @home={{hash icon="cardstack" height="2rem"}}
+          class="dashboard-usage-left-edge-nav"
+        >
+        </CardHost::LeftEdgeNav>
+      </:left-edge>
+
+      <:header>
+        <Boxel::OrgHeader @title="Cardstack" />
+      </:header>
+
+      <:body>
+        Content
+      </:body>
+    </Boxel::Dashboard>
   </:example>
+  <:api as |Args|>
+    <Args.Bool
+      @name="displayLeftEdge"
+      @description="allows space for the left-edge"
+      @defaultValue="false"
+      @value={{this.displayLeftEdge}}
+      @onInput={{fn (mut this.displayLeftEdge)}}
+    />
+    <Args.String
+      @name="--boxel-dashboard-background-color"
+      @description="background-color CSS style"
+      @defaultValue="var(--boxel-light-100);"
+      @value={{this.backgroundColor}}
+      @onInput={{fn (mut this.backgroundColor)}}
+    />
+    <Args.String
+      @name="--boxel-dashboard-color"
+      @description="color CSS style"
+      @defaultValue="var(--boxel-dark)"
+      @value={{this.color}}
+      @onInput={{fn (mut this.color)}}
+    />
+    <Args.String
+      @name="--boxel-dashboard-header-background-color"
+      @description="background-color CSS style for the header container"
+      @defaultValue="var(--boxel-dark);"
+      @value={{this.headerBackgroundColor}}
+      @onInput={{fn (mut this.headerBackgroundColor)}}
+    />
+    <Args.String
+      @name="--boxel-dashboard-header-color"
+      @description="color CSS style for the header container"
+      @defaultValue="var(--boxel-light)"
+      @value={{this.headerColor}}
+      @onInput={{fn (mut this.headerColor)}}
+    />
+  </:api>
 </Freestyle::Usage>

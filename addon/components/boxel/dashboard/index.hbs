@@ -1,14 +1,18 @@
-<div class="dashboard">
-  <header class="dashboard__header">
-    {{#if @logo}}
-      <span class="dashboard__logo" style={{css-url "background-image" @logo}}></span>
-    {{/if}}
-    <h1 class="dashboard__title">
-      {{@title}}
-    </h1>
-  </header>
+<div
+  class={{cn "boxel-dashboard" boxel-dashboard--with-left-edge=@displayLeftEdge}}
+  ...attributes
+>
+  {{#if @displayLeftEdge}}
+    <div class="boxel-dashboard__left-edge-container">
+      {{yield to="left-edge"}}
+    </div>
+  {{/if}}
 
-  <div class="dashboard__body">
-    {{yield}}
+  <div class="boxel-dashboard__sticky-header-container">
+    {{yield to="header"}}
+  </div>
+
+  <div class="boxel-dashboard__body-container">
+    {{yield to="body"}}
   </div>
 </div>

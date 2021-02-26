@@ -1,7 +1,6 @@
 import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
-import 'dummy/images/media-registry/verifi-logo-dark-outline.svg';
 
 export default class LeftEdgeNav extends Component {
   @service router;

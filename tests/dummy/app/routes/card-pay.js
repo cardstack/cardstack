@@ -2,7 +2,7 @@ import Route from '@ember/routing/route';
 // NOTE: This import should eventually be replaced by fetch to
 // mirage data
 import dbCardPay from 'dummy/data/db-card-pay';
-const cardstackLogo = '/boxel/images/icons/cardstack-logo.svg';
+import CardstackLogo from '../../../public/@cardstack/boxel/images/icons/cardstack-logo.svg';
 
 // assuming this user has started a session
 const USER_ID = 'gary-walker';
@@ -16,8 +16,8 @@ export default class CardPayRoute extends Route {
     let user = users.find((el) => el.id === this.userId);
 
     return {
-      title: 'CardPay',
-      logo: cardstackLogo,
+      title: 'Card Pay',
+      logo: CardstackLogo,
       user,
       users,
       bots,

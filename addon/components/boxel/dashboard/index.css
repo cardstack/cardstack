@@ -1,56 +1,36 @@
-.dashboard {
-  height: 100vh;
-  min-height: 100%;
-  background-color: var(--boxel-purple-600);
-  color: var(--boxel-light);
-  font: var(--boxel-font-sm);
-  letter-spacing: var(--boxel-lsp-sm);
+.boxel-dashboard {
+  --boxel-dashboard-background-color: var(--boxel-light-100);
+  --boxel-dashboard-color: var(--boxel-dark);
+  --boxel-dashboard-header-background-color: var(--boxel-dark);
+  --boxel-dashboard-header-color: var(--boxel-light);
+
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+  background-color: var(--boxel-dashboard-background-color);
+  color: var(--boxel-dashboard-color);
+  font: var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-lg);
 }
 
-.dashboard__header {
-  display: flex;
-  align-items: center;
-  min-height: 115px;
-  padding-left: var(--boxel-sp-xl);
-  padding-right: var(--boxel-sp-xl);
-  background-color: var(--boxel-dark);
+.boxel-dashboard__sticky-header-container {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: var(--boxel-dashboard-header-background-color);
+  color: var(--boxel-dashboard-header-color);
 }
 
-.dashboard__logo {
-  height: 35px;
-  width: 33px;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 33px 35px;
+.boxel-dashboard__body-container {
+  overflow: auto;
+  min-height: 50vh;
 }
 
-.dashboard__title {
-  font-family: var(--boxel-font-family);
-  font-size: 1.125rem; /* 18px */
-  font-weight: 900;
-  letter-spacing: 0.2em;
-  line-height: 1.333;
-  text-transform: uppercase;
+.boxel-dashboard--with-left-edge {
+  grid-template-columns: auto 1fr;
 }
 
-.dashboard__logo + .dashboard__title {
-  margin-left: var(--boxel-sp-sm);
-}
-
-.dashboard__body {
-  /* Not making this change now. Waiting on @burieberry's new version of dashboard css */
-  padding: 85px 40px 140px 30px;
-  background-color: var(--boxel-purple-600);
-}
-
-
-/* Remove these. Temporary styling */
-.dashboard__body a {
-  padding: 5px 25px;
-  border: 1px solid #797979;
-  border-radius: 100px;
-  text-align: center;
-}
-.dashboard__body li + li {
-  margin-top: 15px;
+.boxel-dashboard__left-edge-container {
+  grid-row: 1 / -1;
+  grid-column: 1;
 }

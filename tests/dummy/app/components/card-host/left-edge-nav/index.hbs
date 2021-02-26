@@ -1,8 +1,8 @@
-<nav class="boxel-left-edge-nav">
+<nav class="boxel-left-edge-nav" ...attributes>
   <ul class="boxel-left-edge-nav__top-btn-group">
     {{#if @home}}
       <li>
-        <CardHost::LeftEdgeNav::BasicButton aria-label="home" {{on 'click' @home.action}}>
+        <CardHost::LeftEdgeNav::BasicButton aria-label="home" {{on 'click' (optional @home.action)}}>
           {{svg-jar @home.icon width=@home.width height=@home.height}}
         </CardHost::LeftEdgeNav::BasicButton>
       </li>

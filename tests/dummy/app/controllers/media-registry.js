@@ -39,6 +39,6 @@ export default class MediaRegistryController extends Controller {
 
   @action
   goHome() {
-    this.transitionToRoute('media-registry', 'bunny_records');
+    this.transitionToRoute('media-registry.index', this.model.orgs[0].id);
   }
 }

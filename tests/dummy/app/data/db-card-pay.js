@@ -1,4 +1,4 @@
-const Cardbot = '/boxel/images/icons/cardbot-lg.svg';
+import Cardbot from '../../../public/@cardstack/boxel/images/icons/cardbot-lg.svg';
 import GaryWalkerThumb from '../images/workflow/participants/thumb/Gary-Walker.jpg';
 
 export default {

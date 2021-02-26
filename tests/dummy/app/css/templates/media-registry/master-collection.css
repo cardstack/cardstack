@@ -1,5 +1,5 @@
 .master-collection__wrapper {
-  height: calc(100vh - 132px);
+  height: 100%;
   padding: 30px;
   overflow: hidden;
 }

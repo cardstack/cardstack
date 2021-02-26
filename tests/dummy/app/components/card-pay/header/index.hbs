@@ -1,0 +1,38 @@
+<Boxel::OrgHeader
+  @title={{@title}}
+  @logoURL={{@logoURL}}
+  class="card-pay-header"
+>
+  {{!-- TODO: extract component --}}
+  <ul class="card-pay-header__item-list">
+    <li class="card-pay-header__item">
+      <div>
+        <div class="card-pay-header__item-label">
+          Layer 1
+        </div>
+        <div class="card-pay-header__item-title">
+          Mainnet
+        </div>
+      </div>
+      <Boxel::Button
+        class="card-pay-header__item-button"
+        @primary={{true}}
+      >
+        Connect Wallet
+      </Boxel::Button>
+    </li>
+    <li class="card-pay-header__item">
+      <div>
+        <div class="card-pay-header__item-label">
+          Layer 2
+        </div>
+        <div class="card-pay-header__item-title">
+          xDai
+        </div>
+      </div>
+      <Boxel::Button class="card-pay-header__item-button card-pay-header__item-button-monospace">
+        0xcd98...1a4B
+      </Boxel::Button>
+    </li>
+  </ul>
+</Boxel::OrgHeader>

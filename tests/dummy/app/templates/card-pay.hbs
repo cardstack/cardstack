@@ -1,15 +1,6 @@
-<Boxel::Dashboard @title={{@model.title}} @logo={{@model.logo}}>
-  <ul>
-    <li>
-      <LinkTo @route="card-pay.workflow" @model="prepaid-card-issuance">Issue new Prepaid Card</LinkTo>
-    </li>
-    <li>
-      <LinkTo @route="card-pay.workflow" @model="reserve-pool-deposit">Deposit Into Reserve Pool</LinkTo>
-    </li>
-    <li>
-      <LinkTo @route="card-pay.workflow" @model="prepaid-card-transfer">Transfer Prepaid Card</LinkTo>
-    </li>
-  </ul>
-</Boxel::Dashboard>
+<CardPay::DashboardCard
+  @title={{@model.title}}
+  @logo={{@model.logo}}
+/>
 
 {{outlet}}
