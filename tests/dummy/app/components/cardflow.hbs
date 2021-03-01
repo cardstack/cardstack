@@ -63,6 +63,10 @@
     {{/if}}
 
     <SidebarSection>
+      <Boxel::HelpBox />
+    </SidebarSection>
+
+    <SidebarSection>
       {{#if this.otherParticipants}}
         <Boxel::Sidebar::CardContainer @header="Participants" @attachNext={{true}}>
           <Boxel::ParticipantList

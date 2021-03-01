@@ -34,7 +34,7 @@
   margin-top: var(--boxel-sp-sm);
 }
 
-.sidebar-card-container:last-of-type::after {
+.sidebar-card-container + .sidebar-card-container:last-of-type::after {
   /* This adds additional padding on the last container of the group.
      Using the Sidebar Section component can help with the grouping. */
   display: block;

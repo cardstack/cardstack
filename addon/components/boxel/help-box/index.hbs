@@ -1,0 +1,14 @@
+<Boxel::Sidebar::CardContainer class="boxel-help-box">
+  <header class="boxel-help-box__title">
+    {{svg-jar "help-circle" width="1.25rem" height="1.25rem" aria-hidden="true"}}
+    {{or @prompt "Need help?"}}
+  </header>
+  {{#if (has-block)}}
+    <div>
+      {{yield}}
+    </div>
+  {{/if}}
+  <Boxel::Button {{on "click" (optional @onClickButton)}} class="boxel-help-box__button">
+    {{or @buttonText "Request live support"}}
+  </Boxel::Button>
+</Boxel::Sidebar::CardContainer>
