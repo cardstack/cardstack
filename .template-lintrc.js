@@ -7,7 +7,7 @@ module.exports = {
     'no-curly-component-invocation': {
       allow: ['animated-orphans', 'percent-complete'],
     },
-    'no-implicit-this': { allow: ['animated-orphans'] },
+    'no-implicit-this': { allow: ['animated-orphans', 'noop'] },
     'require-button-type': false,
   },
 };

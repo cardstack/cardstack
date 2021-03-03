@@ -1,21 +1,29 @@
-<ul class={{cn 'menu' @class}} ...attributes>
+<ul class={{cn "menu" @class}} ...attributes>
   {{#if @items}}
     {{#each (compact @items) as |menuItem|}}
-      {{#if (eq menuItem.type 'divider')}}
-        <hr class="menu__separator">
+      {{#if (eq menuItem.type "divider")}}
+        <hr class="menu__separator" data-test-boxel-menu-separator />
       {{else}}
-        <li class={{cn
-          "menu__item"
-          menu__item--dangerous=menuItem.dangerous
-          menu__item--has-icon=menuItem.icon
-        }}>
+        <li
+          class={{cn
+            "menu__item"
+            menu__item--dangerous=menuItem.dangerous
+            menu__item--has-icon=menuItem.icon
+          }}
+          data-test-boxel-menu-item
+        >
           <a
             href="#"
-            data-test-menu-item={{menuItem.text}}
-            {{on 'click' (fn this.invokeMenuItemAction menuItem.action)}}
+            data-test-boxel-menu-item-text={{menuItem.text}}
+            {{on "click" (fn this.invokeMenuItemAction menuItem.action)}}
           >
             {{#if menuItem.icon}}
-              {{svg-jar menuItem.icon width=18 height=18}}
+              {{svg-jar
+                menuItem.icon
+                width=18
+                height=18
+                data-test-boxel-menu-item-icon=true
+              }}
             {{/if}}
             {{menuItem.text}}
           </a>

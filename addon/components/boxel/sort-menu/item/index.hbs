@@ -1,6 +1,8 @@
 <li
   class={{cn 'sort-menu-item' sort-menu-item__active=@isSelected}}
   role="button"
+  data-test-boxel-sort-menu-item-column={{@column.name}}
+  data-test-boxel-sort-menu-item-direction={{@direction}}
   ...attributes
 >
   {{@column.name}}
