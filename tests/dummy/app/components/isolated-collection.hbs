@@ -32,7 +32,7 @@
           @mode={{@mode}}
           @selectedItemCount={{this.collection.selectedItemCount}}
           @isSelected={{this.collection.selectedAll}}
-          @menuComponent={{component 'boxel/menu' items=(array
+          @menuComponent={{component "boxel/menu" items=(array
             (menu-item "Delete" (noop))
             (menu-item "Duplicate" (noop))
             (menu-item "---")
@@ -44,7 +44,7 @@
       {{#if (and (eq @model.type "collection") this.collection.selectedItemCount)}}
         <button class="media-collection__actions-row-pill-button">
           Add to Collection
-          {{svg-jar 'carot-down' width=8 height=8}}
+          {{svg-jar "carot-down" width=8 height=8}}
         </button>
       {{/if}}
       <div class="media-collection__btn-group">
@@ -131,7 +131,7 @@
                   class="media-collection__grid-item-select-button"
                   aria-label="select"
                   @isSelected={{item.selected}}
-                  {{on 'click' (fn this.toggleSelect item)}}
+                  {{on "click" (fn this.toggleSelect item)}}
                 />
                 {{#if (eq @mode "edit")}}
                   <button {{on "click" (fn this.removeItem item)}} class="media-collection__grid-item-select-button remove-btn" aria-label="remove">{{svg-jar "icon-minus-circle" width="16px" height="16px"}}</button>

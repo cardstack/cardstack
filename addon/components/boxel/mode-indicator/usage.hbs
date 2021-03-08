@@ -2,16 +2,16 @@
   <:example>
     <Boxel::ModeIndicator
       @mode={{this.mode}}
-      {{on 'click' (fn this.log 'ModeIndicator clicked')}}
+      {{on "click" (fn this.log "ModeIndicator clicked")}}
     />
   </:example>
 
   <:api as |Args|>
     <Args.String @name="mode"
-      @description='the current mode to reflect'
+      @description="the current mode to reflect"
       @value={{this.mode}}
       @required={{true}}
-      @options={{array 'edit' 'configure' 'themer' 'preview'}}
+      @options={{array "edit" "configure" "themer" "preview"}}
       @onInput={{fn (mut this.mode)}}
     />
   </:api>

@@ -5,14 +5,14 @@
       <Boxel::SortMenu::Item
         @column={{column}}
         @direction="asc"
-        @isSelected={{and (eq column @sortedColumn) (eq 'asc' @sortedDirection)}}
-        {{on "click" (fn @onSort column 'asc')}}
+        @isSelected={{and (eq column @sortedColumn) (eq "asc" @sortedDirection)}}
+        {{on "click" (fn @onSort column "asc")}}
       />
       <Boxel::SortMenu::Item
         @column={{column}}
         @direction="desc"
-        @isSelected={{and (eq column @sortedColumn) (eq 'desc' @sortedDirection)}}
-        {{on "click" (fn @onSort column 'desc')}}
+        @isSelected={{and (eq column @sortedColumn) (eq "desc" @sortedDirection)}}
+        {{on "click" (fn @onSort column "desc")}}
       />
     {{/each}}
   </ul>

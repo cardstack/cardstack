@@ -4,7 +4,7 @@
       <h1 class="discrepancy__title">Discrepancy Card: Different Data</h1>
       {{#let (if @model.topLevelCard @model.topLevelCard @model) as |model|}}
         <Link @route={{@exitRoute}} @model={{model.baseCard.ownerId}} @query={{hash version=model.baseCard.version}} as |link|>
-          <Boxel::ModeIndicator @mode="comparison" {{on 'click' link.transitionTo}} />
+          <Boxel::ModeIndicator @mode="comparison" {{on "click" link.transitionTo}} />
         </Link>
       {{/let}}
     </header>
@@ -130,7 +130,7 @@
 
         {{#each this.compFieldGroup as |compField|}}
           {{#if (not (includes compField.title this.fieldsNotRendered))}}
-            {{#with (find-by 'title' compField.title this.baseFieldGroup) as |field|}}
+            {{#with (find-by "title" compField.title this.baseFieldGroup) as |field|}}
               <div class="discrepancy-field discrepancy-field--base-field {{compField.title}} {{this.mode}}-view">
 
                 {{#if (eq field.type "collection")}}
@@ -204,7 +204,7 @@
                                   (fn this.reconciliateField (get field.value i) f)
                                 )}}
                               />
-                            {{/let}}                              
+                            {{/let}}
                           {{/if}}
                           {{component
                             (or compField.component "card")

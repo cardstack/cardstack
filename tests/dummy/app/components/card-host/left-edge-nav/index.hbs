@@ -2,13 +2,13 @@
   <ul class="boxel-left-edge-nav__top-btn-group">
     {{#if @home}}
       <li>
-        <CardHost::LeftEdgeNav::BasicButton aria-label="home" {{on 'click' (optional @home.action)}}>
+        <CardHost::LeftEdgeNav::BasicButton aria-label="home" {{on "click" (optional @home.action)}}>
           {{svg-jar @home.icon width=@home.width height=@home.height}}
         </CardHost::LeftEdgeNav::BasicButton>
       </li>
     {{/if}}
     {{#if @user}}
-      <CardHost::LeftEdgeNav::BasicButton aria-label="user profile" {{on 'click' @user.action}}>
+      <CardHost::LeftEdgeNav::BasicButton aria-label="user profile" {{on "click" @user.action}}>
         <div class="boxel-left-edge-nav__user-icon" style={{css-url "background-image" @user.imgURL}}></div>
       </CardHost::LeftEdgeNav::BasicButton>
     {{/if}}
@@ -26,7 +26,7 @@
     {{#if @bottomActions}}
       {{#each @bottomActions as |bottomAction|}}
         <li>
-          <CardHost::LeftEdgeNav::CardManagementButton aria-label={{@icon}} @iconOnly={{true}} {{on 'click' bottomAction.action}}>
+          <CardHost::LeftEdgeNav::CardManagementButton aria-label={{@icon}} @iconOnly={{true}} {{on "click" bottomAction.action}}>
             {{svg-jar bottomAction.icon width="20px" height="20px"}}
           </CardHost::LeftEdgeNav::CardManagementButton>
         </li>
