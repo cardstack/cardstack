@@ -1,0 +1,63 @@
+/** 
+ * Kind variants - variants that control the colors on a button
+ * 
+ * The @kind argument on the button component should create a corresponding class with format
+ * boxel-button--kind-@kind 
+ * 
+ * Classes for the @kind argument can control the following properties:
+ * 
+ * --boxel-button-color
+ * --boxel-button-border
+ * --boxel-button-text-color
+ * 
+ */
+
+.boxel-button--kind-primary:not(:disabled) {
+  --boxel-button-color: var(--boxel-highlight);
+  --boxel-button-border: 1px solid var(--boxel-highlight);
+  --boxel-button-text-color: var(--boxel-dark);
+}
+
+.boxel-button--kind-primary:not(:disabled):hover,
+.boxel-button--kind-primary:not(:disabled):active {
+  /* result from putting a 10% opacity black overlay over */
+  --boxel-button-border: 1px solid var(--boxel-highlight-hover);
+  --boxel-button-color: var(--boxel-highlight-hover); 
+}
+
+.boxel-button--kind-secondary-dark:not(:disabled) {
+  /* transparent on dark background */
+  --boxel-button-color: transparent;
+  --boxel-button-border: 1px solid var(--boxel-purple-400);
+  --boxel-button-text-color: var(--boxel-light);
+}
+
+.boxel-button--kind-secondary-dark:not(:disabled):hover,
+.boxel-button--kind-secondary-dark:not(:disabled):active {
+  --boxel-button-border: 1px solid var(--boxel-light);
+}
+
+.boxel-button--kind-secondary-light:not(:disabled) {
+  /* transparent on light background */
+  --boxel-button-color: transparent;
+  --boxel-button-border: 1px solid var(--boxel-light-600);
+  --boxel-button-text-color: var(--boxel-dark);
+}
+
+.boxel-button--kind-secondary-light:not(:disabled):hover,
+.boxel-button--kind-secondary-light:not(:disabled):active {
+  --boxel-button-border: 1px solid var(--boxel-dark);
+}
+
+/* We only use this in one/two places right now, but putting it here just in case */
+/* TODO: decide what to do with collection style */
+.boxel-button--kind-collection-style {
+  --boxel-button-color: transparent;
+  --boxel-button-border: 1px solid var(--boxel-purple-300);
+  --boxel-button-text-color: var(--boxel-dark);
+}
+
+.boxel-button--kind-collection-style:not(:disabled):hover,
+.boxel-button--kind-collection-style:not(:disabled):active {
+  --boxel-button-border: 1px solid var(--boxel-dark);
+}

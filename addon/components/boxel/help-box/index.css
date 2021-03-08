@@ -10,15 +10,6 @@
 
 .boxel-help-box__button {
   width: 100%;
-  min-height: 1.5rem;
-  padding: var(--boxel-sp-xxxs) var(--boxel-sp-lg);
-  border-color: var(--boxel-purple-300);
   font: 600 var(--boxel-font-xs);
   letter-spacing: var(--boxel-lsp);
-  transition: border-color var(--boxel-transition);
-}
-
-.boxel-help-box__button:hover,
-.boxel-help-box__button:focus {
-  border-color: var(--boxel-dark);
 }

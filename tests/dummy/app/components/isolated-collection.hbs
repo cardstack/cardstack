@@ -42,9 +42,10 @@
         />
       {{/if}}
       {{#if (and (eq @model.type "collection") this.collection.selectedItemCount)}}
-        <Boxel::Button @dropdownIcon={{true}} @collectionStyle={{true}}>
+        <button class="media-collection__actions-row-pill-button">
           Add to Collection
-        </Boxel::Button>
+          {{svg-jar 'carot-down' width=8 height=8}}
+        </button>
       {{/if}}
       <div class="media-collection__btn-group">
         <div class="media-collection__btn-trio media-collection__filters">

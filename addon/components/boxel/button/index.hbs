@@ -1,22 +1,12 @@
 <button
   class={{cn
     "boxel-button"
-    boxel-button--primary=@primary
-    boxel-button--dropdown=@dropdownIcon
-    boxel-button--collection-style=@collectionStyle
+    (concat "boxel-button--size-" (or @size this.defaultSize))
+    (concat "boxel-button--kind-" (or @kind this.defaultKind))
   }}
   disabled={{@disabled}}
   data-test-boxel-button
   ...attributes
 >
-  {{yield
-    (hash
-      MoreButton=(component
-        "boxel/dropdown-button"
-        class="boxel-button__more-button"
-        button="more-actions"
-        icon="more-actions"
-      )
-    )
-  }}
+  {{yield}}
 </button>

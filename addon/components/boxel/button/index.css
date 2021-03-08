@@ -1,31 +1,36 @@
+/**
+ * This file provides base styles for a button, and an interface to accept variables defined in 
+ * size-variants.css and kind-variants.css
+ */
+
 .boxel-button {
-  background-color: transparent;
+  display: inline-flex;
+  justify-content: center;
+  height: min-content;
+  align-items: center;
+
   border-radius: 100px;
-  border: var(--boxel-border);
-  color: var(--boxel-dark);
-  display: inline-block;
-  font: var(--boxel-font-sm);
-  font-weight: 600;
-  letter-spacing: var(--boxel-lsp-lg);
-  min-height: 40px;
-  min-width: 120px;
-  outline: 0;
-  padding: var(--boxel-sp-xs) var(--boxel-sp-sm);
-  text-align: center;
+  outline-offset: 1px;
   white-space: nowrap;
-  position: relative;
+
+  transition: background-color var(--boxel-transition),
+    border var(--boxel-transition);
+
+  /* kind variants + disabled state */
+  border: var(--boxel-button-border, var(--boxel-border));
+  color: var(--boxel-button-text-color, black);
+  background-color: var(--boxel-button-color, transparent);
+
+  /* size variants */
+  font: var(--boxel-button-font, var(--boxel-font-sm));
+  min-height: var(--boxel-button-min-height);
+  min-width: var(--boxel-button-min-width, 120px);
+  padding: var(--boxel-button-padding, var(--boxel-sp-xs) var(--boxel-sp-sm));
+  letter-spacing: var(--boxel-button-letter-spacing, var(--boxel-lsp-lg));
 }
 
-.boxel-button--dropdown {
-  background: url('../@cardstack/boxel/images/icons/carot-down.svg') center right 17px/8px
-    auto no-repeat;
-  padding-left: var(--boxel-sp-xl);
-  padding-right: var(--boxel-sp-xl);
-}
-
-.boxel-button--primary {
-  background-color: var(--boxel-highlight);
-  border-color: var(--boxel-highlight);
+.boxel-button:focus:not(:focus-visible) {
+  outline: 0;
 }
 
 .boxel-button:not(:disabled):hover {
@@ -33,20 +38,7 @@
 }
 
 .boxel-button:disabled {
-  border-color: #d9d9d9;
-  background-color: #d9d9d9;
-  color: rgba(0, 0, 0, 0.5);
-}
-
-.boxel-button--collection-style {
-  border: 1px solid var(--boxel-purple-300);
-  letter-spacing: var(--boxel-lsp);
-  padding: var(--boxel-sp-xs) var(--boxel-sp-lg) var(--boxel-sp-xs);
-  text-align: left;
-}
-
-.boxel-button__more-button {
-  position: absolute;
-  top: 0;
-  right: 8px;
+  --boxel-button-color: var(--boxel-purple-300);
+  --boxel-button-border: 1px solid var(--boxel-purple-300);
+  --boxel-button-text-color: var(--boxel-purple-400);
 }

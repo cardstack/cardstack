@@ -23,7 +23,7 @@
   margin-top: 4px;
   margin-bottom: var(--boxel-sp-xxxs);
   font: 700 var(--boxel-font-lg);
-  letter-spacing: var(--boxel-lsp-xs);
+  letter-spacing: var(--boxel-lsp-xxs);
 }
 
 .thread-header__expand-button {

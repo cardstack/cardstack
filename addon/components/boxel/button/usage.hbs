@@ -1,42 +1,96 @@
 <Freestyle::Usage @name="Button">
   <:example>
-    <Boxel::Button
-      @primary={{this.primary}}
-      @disabled={{this.disabled}}
-      @dropdownIcon={{this.dropdownIcon}}
-      @collectionStyle={{this.collectionStyle}}
-      {{on 'click' (fn this.log 'Button clicked')}}
-    >
-      Hello World
-    </Boxel::Button>
+    <div class={{cn usage-button-dark-mode-background=(eq this.kind "secondary-dark")}}>
+      <Boxel::Button
+        @kind={{this.kind}}
+        @size={{this.size}}
+        @disabled={{this.disabled}}
+        {{on "click" this.alert}}
+      >
+        Button Text
+      </Boxel::Button>
+    </div>
   </:example>
-
   <:api as |Args|>
-    <Args.Bool @name="primary"
-      @description='render with primary style'
-      @defaultValue={{false}}
-      @value={{this.primary}}
-      @onInput={{fn (mut this.primary)}}
+    <Args.String
+      @name="kind"
+      @optional={{true}}
+      @description="Controls the colors of the button"
+      @defaultValue={{"secondary-light"}}
+      @options={{this.kindVariants.all}}
+      @onInput={{fn (mut this.kind)}}
+      @value={{this.kind}}
     />
-    <Args.Bool @name="disabled"
-      @description='for use when the button cannot be clicked, renders disabled attribute and style'
-      @defaultValue={{false}}
-      @value={{this.disabled}}
+    <Args.String
+      @name="size"
+      @optional={{true}}
+      @description="Controls the size of the button"
+      @defaultValue={{"base"}}
+      @options={{this.sizeVariants}}
+      @onInput={{fn (mut this.size)}}
+      @value={{this.size}}
+    />
+    <Args.Bool
+      @name="disabled"
+      @optional={{true}}
+      @description="Controls whether the button is disabled"
       @onInput={{fn (mut this.disabled)}}
+      @value={{this.disabled}}
     />
-    <Args.Bool @name="dropdownIcon"
-      @description='when true, shows a dropdown icon on the right side of the button'
-      @defaultValue={{false}}
-      @value={{this.dropdownIcon}}
-      @onInput={{fn (mut this.dropdownIcon)}}
-    />
-    <Args.Bool @name="collectionStyle"
-      @description='apply the style variation used in the collection header'
-      @defaultValue={{false}}
-      @value={{this.collectionStyle}}
-      @onInput={{fn (mut this.collectionStyle)}}
-    />
-    <Args.Yield @optional={{true}} @description="The content of the button." />
+    <Args.Yield @description="Contents of the button" />
   </:api>
 </Freestyle::Usage>
-
+<Freestyle::Usage @name="Button" @description="Light mode">
+  <:example>
+    <table>
+      <tbody>
+        {{#each this.sizeVariants as |size|}}
+          <tr>
+            {{#each this.kindVariants.light as |kind|}}
+              <td>
+                <Boxel::Button @kind={{kind}} @size={{size}}>
+                  {{kind}}
+                </Boxel::Button>
+              </td>
+            {{/each}}
+            <td>
+              <Boxel::Button
+                @size={{size}}
+                @disabled={{true}}
+              >
+                disabled
+              </Boxel::Button>
+            </td>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </:example>
+</Freestyle::Usage>
+<Freestyle::Usage @name="Button" @description="Dark mode">
+  <:example>
+    <table class="usage-button-dark-mode-background">
+      <tbody>
+        {{#each this.sizeVariants as |size|}}
+          <tr>
+            {{#each this.kindVariants.dark as |kind|}}
+              <td>
+                <Boxel::Button @kind={{kind}} @size={{size}}>
+                  {{kind}}
+                </Boxel::Button>
+              </td>
+            {{/each}}
+            <td>
+              <Boxel::Button
+                @size={{size}}
+                @disabled={{true}}
+              >
+                disabled
+              </Boxel::Button>
+            </td>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </:example>
+</Freestyle::Usage>

@@ -51,19 +51,6 @@
   letter-spacing: var(--boxel-lsp-sm);
 }
 
-.card-pay-header__item-button {
-  min-height: 2rem;
-  min-width: 10rem;
-  padding: 0;
-}
-.card-pay-header__item-button.card-pay-header__item-button-monospace {
-  background-color: var(--boxel-light);
-  font-family: var(--boxel-font-monospace);
-  font-weight: 400;
-}
-
-
-
 /* Navbar component */
 .card-pay-header__nav {
   background-color: var(--boxel-dark);
@@ -98,4 +85,8 @@
 .card-pay-header__nav-tab.selected {
   background-color: var(--boxel-purple-800);
   color: var(--boxel-highlight);
+}
+
+.card-pay-header__item-button {
+  min-width: 10rem;
 }

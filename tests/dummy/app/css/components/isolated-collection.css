@@ -105,6 +105,26 @@
   padding: 20px 50px 20px 8px;
 }
 
+.media-collection__actions-row-pill-button {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  text-align: left;
+
+  border-radius: 100px;
+  outline: 0;
+  white-space: nowrap;
+
+  width: 100%;
+  height: min-content;
+  padding: var(--boxel-sp-xs) var(--boxel-sp-sm) var(--boxel-sp-xs) var(--boxel-sp-lg);
+  font: 600 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+
+  background-color: transparent;
+  border: 1px solid var(--boxel-purple-300);
+}
+
 .media-collection__btn-group {
   display: grid;
   grid-auto-flow: column;

@@ -20,7 +20,8 @@
   --boxel-lsp-lg: 0.035em;
   --boxel-lsp: 0.025em;
   --boxel-lsp-sm: 0.015em;
-  --boxel-lsp-xs: 0.005em;
+  --boxel-lsp-xs: 0.010em;
+  --boxel-lsp-xxs: 0.005em;
 
   /* Modular scale for spacing */
   --boxel-spacing: 1.25rem; /* base size (20px) */
@@ -49,6 +50,7 @@
   --boxel-light: #fff;
   --boxel-dark: #000;
   --boxel-highlight: var(--boxel-cyan);
+  --boxel-highlight-hover: #00D3CE;
 
   /* Boxel purples */
   --boxel-purple-100: #f8f7fa;

@@ -3,10 +3,27 @@
 }
 
 .selection-control-group__select-all {
+  display: inline-flex;
+  align-items: center;
   position: relative;
   width: 116px;
   padding: var(--boxel-sp-xs) var(--boxel-sp-lg) var(--boxel-sp-xs);
   transition: all var(--boxel-transition);
+  border-radius: 100px;
+  outline: 0;
+  white-space: nowrap;
+  font: 600 var(--boxel-font-sm);
+  min-height: 41px;
+  height: min-content;
+  background-color: transparent;
+  border: 1px solid var(--boxel-purple-300);
+  color: black;
+}
+
+.selection-control-group__menu-trigger {
+  position: absolute;
+  top: 0;
+  right: 8px;
 }
 
 .selection-control-group__select-all > svg {
