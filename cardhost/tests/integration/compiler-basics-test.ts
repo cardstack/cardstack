@@ -3,6 +3,7 @@ import { setupRenderingTest } from 'ember-qunit';
 import { Compiler } from '@cardstack/core';
 import { render } from '@ember/test-helpers';
 import { compileTemplate } from '../helpers/template-compiler';
+import { compilerTestSetup, addRawCard } from '@cardstack/core/tests/helpers';
 
 async function evalModule(src: string): Promise<any> {
   //   return import(`data:application/javascript;base64,${btoa(src)}`);
@@ -11,6 +12,26 @@ async function evalModule(src: string): Promise<any> {
 
 module('Integration | compiler-basics', function (hooks) {
   setupRenderingTest(hooks);
+  compilerTestSetup(hooks);
+
+  hooks.beforeEach(async function () {
+    await addRawCard({
+      url: 'https://localhost/base/models/person',
+      'schema.js': `
+        import { contains } from "@cardstack/types";
+        import date from "https://cardstack.com/base/models/date";
+        import string from "https://cardstack.com/base/models/string";
+        export default class Person {
+          @contains(string)
+          name;
+
+          @contains(date)
+          birthdate;
+        }
+      `,
+      'embedded.hbs': `<this.name/> was born on <this.birthdate/>`,
+    });
+  });
 
   skip('it has a working evalModule', async function (assert) {
     let schema = `
@@ -307,7 +328,7 @@ module('Integration | compiler-basics', function (hooks) {
       await compiler.compile(card);
     } catch (err) {
       assert.ok(
-        /card type must be an identifier/.test(err.message),
+        /@contains argument must be an identifier/.test(err.message),
         err.message
       );
     }
@@ -329,7 +350,10 @@ module('Integration | compiler-basics', function (hooks) {
     try {
       await compiler.compile(card);
     } catch (err) {
-      assert.ok(/card type is not defined/.test(err.message), err.message);
+      assert.ok(
+        /@contains argument is not defined/.test(err.message),
+        err.message
+      );
     }
   });
 
@@ -350,7 +374,9 @@ module('Integration | compiler-basics', function (hooks) {
       await compiler.compile(card);
     } catch (err) {
       assert.ok(
-        /card type must come from a module default export/.test(err.message),
+        /@contains argument must come from a module default export/.test(
+          err.message
+        ),
         err.message
       );
     }

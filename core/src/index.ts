@@ -5,20 +5,116 @@ import decoratorsPlugin from '@babel/plugin-proposal-decorators';
 // @ts-ignore
 import classPropertiesPlugin from '@babel/plugin-proposal-class-properties';
 
-import cardPlugin, { getMeta } from './card-babel-plugin';
+import cardPlugin, { FieldsMeta, getMeta } from './card-babel-plugin';
 import cardGlimmerPlugin from './card-glimmer-plugin';
 import {
   CompiledCard,
   RawCard,
   templateFileName,
+  TemplateType,
   templateTypes,
 } from './interfaces';
 
+import intersection from 'lodash/intersection';
+import { FIXTURES } from '../tests/helpers';
+
+const BASE_CARDS: Map<string, CompiledCard> = new Map([
+  [
+    'https://cardstack.com/base/models/string',
+    {
+      url: 'https://cardstack.com/base/models/string',
+      modelSource: '',
+      fields: {},
+      templateSources: {
+        embedded: `{{this}}`,
+        isolated: '',
+      },
+    },
+  ],
+  [
+    'https://cardstack.com/base/models/date',
+    {
+      url: 'https://cardstack.com/base/models/date',
+      modelSource: '',
+      fields: {},
+      templateSources: {
+        embedded: `<FormatDate @date={{this}} />`,
+        isolated: '',
+      },
+    },
+  ],
+  [
+    'https://localhost/base/models/comment',
+    {
+      url: 'https://localhost/base/models/comment',
+      modelSource: '',
+      fields: {},
+      templateSources: {
+        embedded: `{{this}}`,
+        isolated: '',
+      },
+    },
+  ],
+  [
+    'https://localhost/base/models/tag',
+    {
+      url: 'https://localhost/base/models/tag',
+      modelSource: '',
+      fields: {},
+      templateSources: {
+        embedded: `{{this}}`,
+        isolated: '',
+      },
+    },
+  ],
+]);
 export class Compiler {
   async compile(cardSource: RawCard): Promise<CompiledCard> {
     let options = {};
+    let parentCard;
 
-    let out = transformSync(cardSource['schema.js'], {
+    let code = this.transformSchema(cardSource['schema.js'], options);
+    let meta = getMeta(options);
+
+    if (meta.parent) {
+      parentCard = await this.lookup(meta.parent.cardURL);
+    }
+
+    let fields = await this.lookupFieldsForCard(meta.fields);
+
+    if (parentCard) {
+      fields = this.adoptFields(fields, parentCard);
+    }
+
+    // TODO: inherit all the way up to base, so these are never undefined
+    let templateSources: CompiledCard['templateSources'] = {
+      isolated: '',
+      embedded: '',
+    };
+
+    for (let templateType of templateTypes) {
+      templateSources[templateType] = this.compileOrAdoptTemplate(
+        cardSource,
+        templateType,
+        fields,
+        parentCard
+      );
+    }
+
+    let card: CompiledCard = {
+      url: cardSource.url,
+      modelSource: code,
+      fields,
+      templateSources,
+    };
+    if (parentCard) {
+      card['adoptsFrom'] = parentCard;
+    }
+    return card;
+  }
+
+  transformSchema(schema: string, options: Object): string {
+    let out = transformSync(schema, {
       plugins: [
         [cardPlugin, options],
         [
@@ -31,107 +127,81 @@ export class Compiler {
       ],
     });
 
-    let meta = getMeta(options);
+    return out!.code!;
+  }
 
+  async lookupFieldsForCard(
+    metaFields: FieldsMeta
+  ): Promise<CompiledCard['fields']> {
     let fields: CompiledCard['fields'] = {};
-    for (let [name, { cardURL, type }] of Object.entries(meta.fields)) {
+    for (let [name, { cardURL, type }] of Object.entries(metaFields)) {
       fields[name] = {
         card: await this.lookup(cardURL),
         type,
       };
     }
 
-    // TODO: inherit all the way up to base, so these are never undefined
-    let templateSources: CompiledCard['templateSources'] = {
-      isolated: '',
-      embedded: '',
-    };
+    return fields;
+  }
 
-    for (let templateType of templateTypes) {
-      let source = cardSource[templateFileName(templateType)];
+  adoptFields(
+    fields: CompiledCard['fields'],
+    parentCard: CompiledCard
+  ): CompiledCard['fields'] {
+    let cardFieldNames = Object.keys(fields);
+    let parentFieldNames = Object.keys(parentCard.fields);
 
-      if (source) {
-        templateSources[templateType] = syntax.print(
-          syntax.preprocess(source, {
-            mode: 'codemod',
-            plugins: {
-              ast: [cardGlimmerPlugin({ fields })],
-            },
-          })
-        );
-      }
+    let fieldNameCollisions = intersection(cardFieldNames, parentFieldNames);
+
+    if (fieldNameCollisions.length) {
+      throw Error(
+        `Field collision on ${fieldNameCollisions.join()} with parent card ${
+          parentCard.url
+        }`
+      );
     }
 
-    return {
-      url: cardSource.url,
-      modelSource: out!.code!,
-      fields,
-      templateSources,
-    };
+    return Object.assign(fields, parentCard.fields);
+  }
+
+  compileOrAdoptTemplate(
+    cardSource: RawCard,
+    templateType: TemplateType,
+    fields: CompiledCard['fields'],
+    parentCard?: CompiledCard
+  ): string {
+    let template = '';
+    let source = cardSource[templateFileName(templateType)];
+
+    if (source) {
+      template = this.compileTemplate(source, fields);
+    } else if (parentCard) {
+      template = parentCard.templateSources[templateType];
+    }
+    // TODO: there should always be a template
+
+    return template;
+  }
+
+  compileTemplate(source: string, fields: CompiledCard['fields']): string {
+    return syntax.print(
+      syntax.preprocess(source, {
+        mode: 'codemod',
+        plugins: {
+          ast: [cardGlimmerPlugin({ fields })],
+        },
+      })
+    );
   }
 
   async lookup(cardURL: string): Promise<CompiledCard> {
-    switch (cardURL) {
-      case 'https://cardstack.com/base/models/string':
-        return {
-          url: cardURL,
-          modelSource: '',
-          fields: {},
-          templateSources: {
-            embedded: `{{this}}`,
-            isolated: '',
-          },
-        };
-      case 'https://cardstack.com/base/models/date':
-        return {
-          url: cardURL,
-          modelSource: '',
-          fields: {},
-          templateSources: {
-            embedded: `<FormatDate @date={{this}} />`,
-            isolated: '',
-          },
-        };
-      case 'https://localhost/base/models/person':
-        return await this.compile({
-          url: cardURL,
-          'schema.js': `
-            import { contains } from "@cardstack/types";
-            import date from "https://cardstack.com/base/models/date";
-            import string from "https://cardstack.com/base/models/string";
-            export default class Person {
-              @contains(string)
-              name;
+    let card = BASE_CARDS.get(cardURL) ?? FIXTURES.get(cardURL);
 
-              @contains(date)
-              birthdate;
-            }
-          `,
-          'embedded.hbs': `<this.name/> was born on <this.birthdate/>`,
-        });
-      case 'https://localhost/base/models/comment':
-        return {
-          url: cardURL,
-          modelSource: '',
-          fields: {},
-          templateSources: {
-            embedded: `{{this}}`,
-            isolated: '',
-          },
-        };
-      case 'https://localhost/base/models/tag':
-        return {
-          url: cardURL,
-          modelSource: '',
-          fields: {},
-          templateSources: {
-            embedded: `{{this}}`,
-            isolated: '',
-          },
-        };
-      default:
-        throw new Error(`unknown card ${cardURL}`);
+    if (!card) {
+      throw new Error(`unknown card ${cardURL}`);
     }
+
+    return card;
   }
 }
 
