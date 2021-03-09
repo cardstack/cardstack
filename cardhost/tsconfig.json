@@ -24,6 +24,9 @@
       "cardhost/tests/*": [
         "tests/*"
       ],
+      "cardhost/mirage/*": [
+        "mirage/*"
+      ],
       "cardhost/*": [
         "app/*"
       ],
@@ -35,6 +38,7 @@
   "include": [
     "app/**/*",
     "tests/**/*",
-    "types/**/*"
+    "types/**/*",
+    "mirage/**/*"
   ]
 }
