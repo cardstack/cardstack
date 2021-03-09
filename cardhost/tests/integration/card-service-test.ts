@@ -3,14 +3,13 @@ import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 
-// @ts-ignore
-import hello from '@cardstack/compiled/hello';
-
 module('Integration | card-service', function (hooks) {
   setupRenderingTest(hooks);
 
   test('temp', async function (assert) {
-    this.set('hello', hello);
+    let target = 'hello';
+    this.set('hello', (await import(`@cardstack/compiled/${target}`)).default);
+
     await render(
       hbs`{{#let (ensure-safe-component this.hello) as |Hello|}} <Hello /> {{/let}}`
     );
