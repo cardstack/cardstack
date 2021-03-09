@@ -9,5 +9,6 @@ module.exports = {
     },
     'no-implicit-this': { allow: ['animated-orphans', 'noop'] },
     'require-button-type': false,
+    quotes: 'double',
   },
 };

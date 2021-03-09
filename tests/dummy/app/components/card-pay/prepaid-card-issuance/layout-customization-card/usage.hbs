@@ -3,13 +3,13 @@
     <CardPay::PrepaidCardIssuance::LayoutCustomizationCard
       @isComplete={{this.isComplete}}
       @issuerName={{this.issuerName}}
-      @updateIssuerName={{pick 'target.value' (fn (mut this.issuerName))}}
+      @updateIssuerName={{pick "target.value" (fn (mut this.issuerName))}}
       @colorOptions={{this.colorOptions}}
       @headerColor={{this.headerColor}}
       @updateHeaderColor={{fn this.updateHeaderColor}}
       @patternOptions={{this.patternOptions}}
       @headerPattern={{this.headerPattern}}
-      @updateHeaderPattern={{pick 'target.value' (fn (mut this.headerPattern))}}
+      @updateHeaderPattern={{pick "target.value" (fn (mut this.headerPattern))}}
       @onClickButton={{fn (mut this.isComplete) (not this.isComplete)}}
     />
   </:example>

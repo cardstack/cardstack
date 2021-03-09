@@ -2,11 +2,11 @@
   <:example>
     <Boxel::Menu
       @closeMenu={{this.closeMenu}}
-      @items={{array 
-        (menu-item 'Duplicate' (fn this.log 'Duplicate menu item clicked'))
-        (menu-item 'Share' (fn this.log 'Share menu item clicked'))
-        (menu-item '---')
-        (menu-item 'Remove' (fn this.log 'Remove menu item clicked') dangerous=true)
+      @items={{array
+        (menu-item "Duplicate" (fn this.log "Duplicate menu item clicked"))
+        (menu-item "Share" (fn this.log "Share menu item clicked"))
+        (menu-item "---")
+        (menu-item "Remove" (fn this.log "Remove menu item clicked") dangerous=true)
       }}
     />
   </:example>

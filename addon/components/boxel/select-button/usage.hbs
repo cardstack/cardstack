@@ -5,7 +5,7 @@
         @isPartial={{this.isPartial}}
         @isSelected={{this.isSelected}}
         @mode={{this.mode}}
-        {{on 'click' this.onClick}}
+        {{on "click" this.onClick}}
       />
     </Doc::DarkThemeAndLightTheme>
   </:example>
@@ -29,7 +29,7 @@
       @name="mode"
       @value={{this.mode}}
       @description="which card mode are we in"
-      @options={{w 'view edit configure'}}
+      @options={{w "view edit configure"}}
       @onInput={{fn (mut this.mode)}}
     />
   </:api>

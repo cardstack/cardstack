@@ -1,6 +1,6 @@
 <footer
   class={{cn
-    'action-chin'
+    "action-chin"
     action-chin--light=this.isMemorializedMode
     action-chin--dark=this.isDataEntryMode
   }}
@@ -9,12 +9,12 @@
   <Boxel::Button
     @kind={{if this.isDataEntryMode "primary"}}
     @disabled={{@disabled}}
-    {{on 'click' (optional @onClickButton)}}
+    {{on "click" (optional @onClickButton)}}
   >
     {{@buttonText}}
   </Boxel::Button>
   <span class="action-chin__lock-text">
     Actions only visible to you
-    {{svg-jar 'lock' width='12px' height='12px'}}
+    {{svg-jar "lock" width="12px" height="12px"}}
   </span>
 </footer>

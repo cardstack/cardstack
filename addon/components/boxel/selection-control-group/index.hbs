@@ -16,12 +16,12 @@
   />
   <div
     class={{cn
-      'selection-control-group__select-all'
+      "selection-control-group__select-all"
       selection-control-group__select-all--selected-items=@selectedItemCount
     }}
   >
     {{#if @selectedItemCount}}
-      {{svg-jar 'check-mark' width='9px' height='7px'}}
+      {{svg-jar "check-mark" width="9px" height="7px"}}
       {{@selectedItemCount}}
       selected
       {{#if @menuComponent}}
@@ -33,7 +33,7 @@
           {{component
             @menuComponent
             closeMenu=dd.actions.close
-            class='selection-control-group__more-menu'
+            class="selection-control-group__more-menu"
           }}
         </Boxel::DropdownButton>
       {{/if}}

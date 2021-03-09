@@ -14,7 +14,7 @@
   <:api as |Args|>
     <Args.String
       @name="mode"
-      @options={{array 'data-entry' 'memorialized'}}
+      @options={{array "data-entry" "memorialized"}}
       @defaultValue="data-entry"
       @description="data-entry mode (dark, when immediate action is necessary), or memorialized mode (light, reflecting data-entry that has already been performed and is potentially revisable)"
       @onInput={{fn (mut this.mode)}}

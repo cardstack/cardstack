@@ -27,8 +27,8 @@
             (menu-item "Duplicate" (noop))
             (menu-item "Share" (noop))
             (menu-item "Configure" (noop))
-            (if @versionHistory (menu-item 'Version History' (link route="media-registry.versions" model="the-leaves-are-changing-color")))
-            (if @transferAgreement (menu-item 'Transfer Catalog' (link route="media-registry.agreements" model="TA-38185847898")))
+            (if @versionHistory (menu-item "Version History" (link route="media-registry.versions" model="the-leaves-are-changing-color")))
+            (if @transferAgreement (menu-item "Transfer Catalog" (link route="media-registry.agreements" model="TA-38185847898")))
           }}
         />
       </Boxel::DropdownButton>
