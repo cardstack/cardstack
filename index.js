@@ -59,21 +59,6 @@ module.exports = {
     return tree;
   },
 
-  treeForStyles(tree) {
-    let trees = tree ? [tree] : [];
-    let dummyComponentStyles = concat(
-      path.join(__dirname, 'tests/dummy/app/components'),
-      {
-        inputFiles: ['**/*.css'],
-        outputFile: '/dummy-components.css',
-        sourceMapConfig: { enabled: true },
-      }
-    );
-    trees.push(dummyComponentStyles);
-    let mergedTrees = new mergeTrees(trees);
-    return this._super.treeForStyles(mergedTrees);
-  },
-
   treeForApp() {
     let tree = this._super.treeForApp.apply(this, arguments);
 
