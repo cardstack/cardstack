@@ -1,0 +1,37 @@
+<Freestyle::Usage @name="Input">
+  <:example>
+    <Boxel::Input
+      @id={{this.id}}
+      @value={{this.value}}
+      @onInput={{@onInput}}
+      @disabled={{this.disabled}}
+      @required={{this.required}}
+    />
+  </:example>
+  <:api as |Args|>
+    <Args.String
+      @name="id"
+      @value={{this.id}}
+      @onInput={{fn (mut this.id)}}
+    />
+    <Args.String
+      @name="value"
+      @value={{this.value}}
+      @onInput={{fn (mut this.value)}}
+    />
+    <Args.Bool
+      @name="disabled"
+      @value={{this.disabled}}
+      @onInput={{fn (mut this.disabled)}}
+    />
+    <Args.Bool
+      @name="required"
+      @value={{this.required}}
+      @onInput={{fn (mut this.required)}}
+    />
+    <Args.Action
+      @name="onInput"
+      @description="Function to update the passed in value"
+    />
+  </:api>
+</Freestyle::Usage>

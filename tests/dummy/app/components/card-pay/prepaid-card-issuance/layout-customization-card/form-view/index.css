@@ -1,51 +1,26 @@
+.layout-form-view__content {
+  --header-color: var(--boxel-lime);
+
+  padding: var(--boxel-sp-lg) var(--boxel-sp-lg) var(--boxel-sp-xxl);
+}
+
+.layout-form-view__content > * + * {
+  margin-top: var(--boxel-sp-xxl);
+}
+
 .layout-form-view__fields {
-  --field-height: 2.5rem;
   display: grid;
   gap: var(--boxel-spacing);
 }
 
-.layout-form-view__field {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
-  align-items: center;
-  gap: var(--boxel-sp-xs) var(--boxel-sp-lg);
-}
-
 .layout-form-view__preview-field {
-  --header-color: var(--boxel-lime);
   align-items: start;
 }
 
-.layout-form-view__label {
-  color: var(--boxel-purple-400);
-  font: var(--boxel-font-xs);
-  font-weight: 600;
-  letter-spacing: var(--boxel-lsp-xl);
-  text-transform: uppercase;
-}
 
-.layout-form-view__value {
-  grid-column: span 3;
-}
-
-.layout-form-view__input {
-  width: 100%;
-  height: var(--field-height);
-  padding: var(--boxel-sp-xxs) var(--boxel-sp);
-  border: 1px solid var(--boxel-purple-300);
-  border-radius: 5px;
-  font: var(--boxel-font);
-  letter-spacing: var(--boxel-lsp-sm);
-  transition: border-color var(--boxel-transition);
-}
-.layout-form-view__input:hover {
-  border-color: var(--boxel-dark);
-}
-.layout-form-view__input:focus {
-  outline-color: var(--boxel-highlight);
-}
-
+/* Dropdown */
 .layout-form-view__dropdown {
+  --field-height: 2.5rem;
   height: var(--field-height);
 }
 .layout-form-view__dropdown > .ember-power-select-trigger {

@@ -2,7 +2,7 @@
   position: relative;
   width: 100%;
   max-width: 43.75rem; /* 700px;*/
-  min-width: 26.56rem;
+  min-width: 20rem;
   background-color: var(--boxel-light);
   border-radius: var(--boxel-border-radius);
   color: var(--boxel-dark);
@@ -19,12 +19,8 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
-.action-container__content {
-  padding: var(--boxel-sp) var(--boxel-sp-lg) var(--boxel-sp-xxl);
-}
-
-.action-container__content > * + * {
-  margin-top: var(--boxel-sp-xxl);
+.action-container__prompt {
+  padding: var(--boxel-sp) var(--boxel-sp-lg);
 }
 
 

@@ -1,0 +1,28 @@
+.boxel-input {
+  --boxel-input-height: 2.5rem; /* 40px */
+
+  width: 100%;
+  min-height: var(--boxel-input-height);
+  padding: var(--boxel-sp-xxs) 0 var(--boxel-sp-xxs) var(--boxel-sp);
+  border: 1px solid var(--boxel-purple-300);
+  border-radius: var(--boxel-border-radius-sm);
+  font: var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-sm);
+  transition: border-color var(--boxel-transition);
+}
+
+.boxel-input:hover {
+  border-color: var(--boxel-dark);
+}
+
+.boxel-input:focus {
+  outline-color: var(--boxel-highlight);
+}
+
+.boxel-input:disabled {
+  background-color: var(--boxel-light-100);
+  border-color: var(--boxel-purple-300);
+  color: var(--boxel-purple-300);
+}
+
+/* TODO: required and disabled styles */

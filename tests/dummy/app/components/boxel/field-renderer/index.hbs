@@ -1,8 +1,11 @@
 {{#if (eq @mode "edit")}}
   {{!-- Edit Mode --}}
   {{#if (or (eq @field.type "card") (eq @field.type "collection") @field.value.id (is-array @field.value))}}
-    <div class="field-renderer {{lowercase (dasherize (trim @field.title))}}-edit-field {{@class}}">
-      <h4 class="field-renderer__title">{{humanize @field.title}}</h4>
+    <Boxel::Field
+      class="field-renderer {{lowercase (dasherize (trim @field.title))}}-edit-field {{@class}}"
+      @label={{humanize @field.title}}
+      @labelClass="field-renderer__title"
+    >
       {{#if (eq @field.type "card")}}
         <EmbeddedCollectionEditor
           @belongsToField={{true}}
@@ -60,35 +63,44 @@
           {{/if}}
         {{/let}}
       {{/if}}
-    </div>
+    </Boxel::Field>
   {{else}}
-    <label class="field-renderer">
-      <div class="field-renderer__title">{{humanize @field.title}}</div>
-      <div class="field-renderer__value">
-        {{#if (eq @field.type "dropdown")}}
-          <div class="field-renderer__dropdown">
-            <PowerSelect
-              @options={{@field.options}}
-              @selected={{@field.value}}
-              @onChange={{fn (mut @field.value)}}
-              @renderInPlace={{true}}
-              @verticalPosition="below"
-            as |option|>
-              {{option}}
-            </PowerSelect>
-          </div>
-        {{else if (eq @field.type "textarea")}}
-          <Textarea @type={{@field.type}} @class="field-renderer__input field-renderer__textarea" @value={{@field.value}} />
-        {{else}}
-          <Input @type={{@field.type}} @class="field-renderer__input" @value={{if (eq @field.title "title") (titleize @field.value) @field.value}} />
-        {{/if}}
-      </div>
-    </label>
+    <Boxel::Field
+      class="field-renderer"
+      @fieldMode="edit"
+      @label={{humanize @field.title}}
+      @labelClass="field-renderer__title"
+    >
+      {{#if (eq @field.type "dropdown")}}
+        <div class="field-renderer__dropdown">
+          <PowerSelect
+            @options={{@field.options}}
+            @selected={{@field.value}}
+            @onChange={{fn (mut @field.value)}}
+            @renderInPlace={{true}}
+            @verticalPosition="below"
+          as |option|>
+            {{option}}
+          </PowerSelect>
+        </div>
+      {{else if (eq @field.type "textarea")}}
+        <Textarea @type={{@field.type}} @class="field-renderer__input field-renderer__textarea" @value={{@field.value}} />
+      {{else}}
+        <Boxel::Input
+          type={{@field.type}}
+          class="field-renderer__input"
+          @value={{if (eq @field.title "title") (titleize @field.value) @field.value}}
+        />
+      {{/if}}
+    </Boxel::Field>
   {{/if}}
 
 {{else if (eq @mode "comparison")}}
-  <Boxel @class="field-renderer field-renderer--comparison-mode field-renderer--{{@field.type}} {{dasherize @field.title}}-field {{@class}}">
-    <div class="field-renderer__title">{{@title}}</div>
+  <Boxel::Field
+    class="field-renderer field-renderer--comparison-mode field-renderer--{{@field.type}} {{dasherize @field.title}}-field {{@class}}"
+    @label={{@title}}
+    @labelClass="field-renderer__title"
+  >
     <div class="field-renderer__value">
       {{#if (and @field.value (or @field.id (eq @field.type "card")))}}
         {{component (or @field.component "card") model=@field.value mode="view" status=(if @showCompHighlights (if @field.status @field.status "no-change")) comparisonType=@comparisonType drillDown=@drillDown fieldData=@field}}
@@ -152,16 +164,19 @@
         {{/if}}
       {{/if}}
     </div>
-  </Boxel>
+  </Boxel::Field>
 
 {{else}}
   {{!-- View Mode --}}
-  <Boxel @class="field-renderer field-renderer--{{@field.type}} {{format-id @field.title}}-field {{if (eq @field.format "table") "table-field"}} {{@class}}">
+  <Boxel::Field
+    class="field-renderer field-renderer--{{@field.type}} {{format-id @field.title}}-field {{if (eq @field.format "table") "table-field"}} {{@class}}"
+    @label={{humanize @field.title}}
+    @labelClass="field-renderer__title"
+  >
     {{#if (includes @field.title @addedFields)}}
       <BoxelHighlight @status="added" />
       <BoxelActions @status="added" />
     {{/if}}
-    <div class="field-renderer__title">{{humanize @field.title}}</div>
     <Boxel @class="field-renderer__value {{if (eq @field.type "image") "field-renderer__value--img-field"}}">
       {{#if (and @comparisonMode (includes @field.title @addedValues))}}
         <BoxelHighlight @status="added" />
@@ -277,5 +292,5 @@
         <div class="field-renderer__placeholder field-renderer__placeholder--{{@field.title}} field-renderer__opacity-control">N/A</div>
       {{/if}}
     </Boxel>
-  </Boxel>
+  </Boxel::Field>
 {{/if}}

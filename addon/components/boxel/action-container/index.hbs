@@ -11,15 +11,13 @@
     />
   </Boxel::Header>
 
-  <section class="action-container__content">
-    {{#if @prompt}}
-      <p class="action-container__prompt">
-        {{@prompt}}
-      </p>
-    {{/if}}
+  {{#if @prompt}}
+    <p class="action-container__prompt">
+      {{@prompt}}
+    </p>
+  {{/if}}
 
-    {{yield}}
-  </section>
+  {{yield}}
 
   <Boxel::ActionChin
     class="action-container__footer"

@@ -1,0 +1,20 @@
+<Boxel::Field
+  @id={{@id}}
+  @label={{@label}}
+  @labelClass={{@labelClass}}
+  @fieldMode={{@fieldMode}}
+>
+  {{#if (eq @fieldMode "edit")}}
+    <Boxel::Input
+      @type="text"
+      @id={{@id}}
+      @value={{@value}}
+      @onInput={{@onInput}}
+      @disabled={{@disabled}}
+      @required={{@required}}
+      ...attributes
+    />
+  {{else}}
+    {{@value}}
+  {{/if}}
+</Boxel::Field>

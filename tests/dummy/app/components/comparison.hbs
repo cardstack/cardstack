@@ -138,8 +138,12 @@
                     {{#if (or field.tempField.value field.value)}}
                       {{#each (if field.tempField.value field.tempField.value field.value) as |f i|}}
                         {{!-- {{compute (fn this.compareFields f (get compField.value i))}} --}}
-                        <Boxel @class="field-renderer field-renderer--{{mode}}-mode field-renderer--{{field.type}} {{dasherize field.title}}-field discrepancy-field-renderer base-card-field {{if (eq mode "comparison") "comp-view"}}" style={{html-safe (concat "height: calc(100%/" compField.value.length ")")}}>
-                          <div class="field-renderer__title">{{#if (eq i 0)}}{{compField.title}}{{/if}}</div>
+                        <Boxel::Field
+                          class="field-renderer field-renderer--{{mode}}-mode field-renderer--{{field.type}} {{dasherize field.title}}-field discrepancy-field-renderer base-card-field {{if (eq mode "comparison") "comp-view"}}"
+                          style={{html-safe (concat "height: calc(100%/" compField.value.length ")")}}
+                          @label={{if (eq i 0) compField.title}}
+                          @labelClass="field-renderer__title"
+                        >
                           <div class="field-renderer__value">
                             <Boxel>
                             {{#if (or f.type (and (eq mode "comparison") f.tempField))}}
@@ -156,16 +160,20 @@
                             {{/if}}
                             </Boxel>
                           </div>
-                        </Boxel>
+                        </Boxel::Field>
                       {{/each}}
                     {{else}}
                       {{#each compField.value as |f i|}}
-                        <Boxel @class="field-renderer field-renderer--{{mode}}-mode field-renderer--{{field.type}} {{dasherize field.title}}-field discrepancy-field-renderer base-card-field {{if (eq mode "comparison") "comp-view"}}" style={{html-safe (concat "height: calc(100%/" compField.value.length ")")}}>
-                          <div class="field-renderer__title">{{#if (eq i 0)}}{{compField.title}}{{/if}}</div>
+                        <Boxel::Field
+                          class="field-renderer field-renderer--{{mode}}-mode field-renderer--{{field.type}} {{dasherize field.title}}-field discrepancy-field-renderer base-card-field {{if (eq mode "comparison") "comp-view"}}"
+                          style={{html-safe (concat "height: calc(100%/" compField.value.length ")")}}
+                          @label={{if (eq i 0) compField.title}}
+                          @labelClass="field-renderer__title"
+                        >
                           <div class="field-renderer__value">
                             <CardPlatter @class="field-renderer__card field-renderer__card--blank" />
                           </div>
-                        </Boxel>
+                        </Boxel::Field>
                       {{/each}}
                     {{/if}}
                   {{/let}}
@@ -192,8 +200,11 @@
                     {{#each compField.value as |f i|}}
                       {{compute (fn this.compareFields (get field.value i) f)}}
 
-                      <Boxel @class="field-renderer field-renderer--{{mode}}-mode field-renderer--{{compField.type}} {{dasherize compField.title}}-field discrepancy-field-renderer comp-card-field {{if (eq this.mode "comparison") "comp-view"}}">
-                        <div class="field-renderer__title">{{#if (eq i 0)}}{{compField.title}}{{/if}}</div>
+                      <Boxel::Field
+                        class="field-renderer field-renderer--{{mode}}-mode field-renderer--{{compField.type}} {{dasherize compField.title}}-field discrepancy-field-renderer comp-card-field {{if (eq this.mode "comparison") "comp-view"}}"
+                        @label={{if (eq i 0) compField.title}}
+                        @labelClass="field-renderer__title"
+                      >
                         <div class="field-renderer__value">
                           {{#if (and f.status (eq this.mode "comparison"))}}
                             {{#let (get (get field.value i) "tempField") as |isActive|}}
@@ -215,7 +226,7 @@
                             drillDown=(if (eq this.mode "comparison") (fn @drillDown field))
                             fieldData=f}}
                         </div>
-                      </Boxel>
+                      </Boxel::Field>
                     {{/each}}
                   {{/let}}
                 {{else}}

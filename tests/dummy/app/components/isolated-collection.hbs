@@ -65,7 +65,7 @@
 
           {{#if @search}}
             <Boxel::DropdownButton class="media-collection__btn media-collection__search" @button="search" @icon="search" @size={{30}}>
-              <Input @type="search" @class="field-renderer__input media-collection__search-input"
+              <Boxel::Input type="search" class="field-renderer__input media-collection__search-input"
                 {{on "input" this.search}}
               />
             </Boxel::DropdownButton>

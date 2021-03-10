@@ -17,6 +17,7 @@
   align-items: center;
   justify-content: end;
   gap: var(--boxel-sp-xs);
+  text-align: right;
 }
 
 .action-chin--light {
