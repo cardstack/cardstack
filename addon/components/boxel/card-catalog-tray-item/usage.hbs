@@ -1,0 +1,107 @@
+<Freestyle::Usage @name="CardCatalogTrayItem">
+  <:example>
+    <Boxel::CardCatalogTrayItem
+      @title={{this.title}}
+      @description={{this.description}}
+      @icon={{this.icon}}
+      @state={{this.state}}
+    />
+  </:example>
+  <:api as |Args|>
+    <Args.String
+      @name="state"
+      @description="State of the tray item, controls its visual styles."
+      @value={{this.state}}
+      @options={{array null "dragged-item" "dragged-in-tray" "used"}}
+      @onInput={{fn (mut this.state)}}
+    />
+    <Args.String
+      @name="title"
+      @value={{this.title}}
+      @onInput={{fn (mut this.title)}}
+    />
+    <Args.String
+      @name="description"
+      @value={{this.description}}
+      @onInput={{fn (mut this.description)}}
+    />
+    <Args.String
+      @name="icon"
+      @description="Icon on the left of the item. Argument is passed to svg-jar"
+      @value={{this.icon}}
+      @onInput={{fn (mut this.icon)}}
+    />
+  </:api>
+</Freestyle::Usage>
+
+<Freestyle::Usage @description="dragging example">
+    {{!-- 
+      note - drop shadow does not actually follow this in the example. 
+      right now the browser has control over styles of the drag image
+     --}}
+  <:example>
+    <Boxel::CardCatalogTrayItem
+      draggable="true"
+      @title="Drag me"
+      @description="Some content"
+      @icon="gear"
+      @state={{this.dragExampleState}}
+      {{on "dragstart" this.onDragStart}}
+      {{on "dragend" this.onDragEnd}}
+    />
+    <Boxel::CardCatalogTrayItem
+      class="very-far-away"
+      @title="Drag me"
+      @description="Some content"
+      @icon="gear"
+      @state="dragged-item"
+    />
+  </:example>
+</Freestyle::Usage>
+
+<Freestyle::Usage @description="Usage in tray">
+  <:example>
+    <div class="boxel-card-catalog-tray-example">
+      <header class="boxel-card-catalog-tray-example__header-container">
+        <h4 class="boxel-card-catalog-tray-example__header-title">
+          {{svg-jar
+            "card-catalog"
+            class="boxel-card-catalog-tray-example__header-icon"
+          }}
+          Card Catalog
+        </h4>
+        <Boxel::Searchbox
+          @placeholder="Search"
+          @label="Search for cards to use"
+          @id="card-catalog-tray-search"
+          @value={{this.filter}}
+          @onInput={{this.onSearchboxInput}}
+          @onClear={{this.onClearFilter}}
+          class="boxel-card-catalog-tray-example__header-search"
+        />
+        {{! https://www.htmhell.dev/20-close-buttons/#solution-4-a-button-with-hidden-text-and-only-visually-accessible-icon }}
+        <button
+          class="boxel-card-catalog-tray-example__close-button"
+          type="button"
+          aria-label="Close"
+        >
+          {{svg-jar "close" width="100%" height="100%" aria-hidden=true}}
+        </button>
+      </header>
+      <div class="boxel-card-catalog-tray-example__list-container">
+        <ul class="boxel-card-catalog-tray-example__list">
+          {{#each this.filteredItems as |item|}}
+          <li>
+            <Boxel::CardCatalogTrayItem
+              @state={{item.state}}
+              @icon={{item.icon}}
+              @title={{item.title}}
+              @description={{item.description}}
+            />
+            </li>
+          {{/each}}
+        </ul>
+      </div>
+    </div>
+  </:example>
+</Freestyle::Usage>

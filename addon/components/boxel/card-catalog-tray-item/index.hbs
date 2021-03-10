@@ -1,0 +1,24 @@
+<div
+  class={{cn
+    "boxel-card-catalog-tray-item"
+    (concat "boxel-card-catalog-tray-item--" @state)
+  }}
+  ...attributes
+>
+{{!-- (concat "boxel-card-catalog-tray-item__container--" @state) --}}
+  {{svg-jar @icon class="boxel-card-catalog-tray-item__icon"}}
+  <h4 class="boxel-card-catalog-tray-item__title">
+    {{@title}}
+  </h4>
+  <p class="boxel-card-catalog-tray-item__description">
+    {{@description}}
+  </p>
+  {{#if (eq @state "used")}}
+    {{svg-jar
+      "icon-check-circle-ht"
+      class="boxel-card-catalog-tray-item__used-icon"
+    }}
+  {{else if (not (eq @state "dragged-in-tray"))}}
+    {{svg-jar "gripper" class="boxel-card-catalog-tray-item__drag-handle"}}
+  {{/if}}
+</div>

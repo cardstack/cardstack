@@ -1,0 +1,20 @@
+<svg width="9" height="24" viewBox="0 0 9 24">
+  <g fill="var(--icon-color, black)" opacity=".25">
+    <g transform="translate(-265 -28)">
+      <circle cx="1.5" cy="1.5" r="1.5" transform="translate(265 28)" />
+      <circle cx="1.5" cy="1.5" r="1.5" transform="translate(271 28)" />
+    </g>
+    <g data-name="Gripper" transform="translate(-265 -21)">
+      <circle cx="1.5" cy="1.5" r="1.5" transform="translate(265 28)" />
+      <circle cx="1.5" cy="1.5" r="1.5" transform="translate(271 28)" />
+    </g>
+    <g data-name="Gripper" transform="translate(-265 -14)">
+      <circle cx="1.5" cy="1.5" r="1.5" transform="translate(265 28)" />
+      <circle cx="1.5" cy="1.5" r="1.5" transform="translate(271 28)" />
+    </g>
+    <g data-name="Gripper" transform="translate(-265 -7)">
+      <circle cx="1.5" cy="1.5" r="1.5" transform="translate(265 28)" />
+      <circle cx="1.5" cy="1.5" r="1.5" transform="translate(271 28)" />
+    </g>
+  </g>
+</svg>

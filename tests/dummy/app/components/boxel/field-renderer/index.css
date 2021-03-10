@@ -199,7 +199,7 @@
 }
 
 .field-renderer__input:hover:not(:focus) {
-  border-color: #272330;
+  border-color: var(--boxel-purple-900);
 }
 
 .field-renderer__input.field-renderer__textarea {
@@ -232,7 +232,7 @@
 }
 
 .field-renderer__dropdown .ember-power-select-trigger:hover {
-  border-color: #272330;
+  border-color: var(--boxel-purple-900);
   cursor: pointer;
 }
 
