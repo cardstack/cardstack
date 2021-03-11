@@ -1,10 +1,10 @@
 <button
   class={{cn
-    "select-button"
+    "boxel-select-button"
     @class
-    (concat "select-button--" @mode)
-    select-button--partial=(and @isPartial (not @isSelected))
-    select-button--selected=@isSelected
+    (concat "boxel-select-button--" @mode)
+    boxel-select-button--partial=(and @isPartial (not @isSelected))
+    boxel-select-button--selected=@isSelected
   }}
   aria-label={{if @isSelected "selected" "select"}}
   data-test-boxel-select-button

@@ -1,4 +1,4 @@
-.select-button {
+.boxel-select-button {
   --icon-bg: white;
   --icon-border: black;
   --icon-color: transparent;
@@ -11,29 +11,29 @@
   z-index: 1;
 }
 
-.select-button--edit {
+.boxel-select-button--edit {
   --icon-bg: transparent;
 }
 
-.select-button:hover,
-.select-button:focus {
+.boxel-select-button:hover,
+.boxel-select-button:focus {
   --icon-border: black;
   outline: 0;
 }
 
-.select-button--partial {
+.boxel-select-button--partial {
   --icon-bg: var(--boxel-highlight);
   --icon-border: black;
   --icon-color: transparent;
 }
 
-.select-button--selected {
+.boxel-select-button--selected {
   --icon-bg: var(--boxel-highlight);
   --icon-border: var(--boxel-highlight);
   --icon-color: var(--boxel-dark);
 }
 
-.select-button > svg {
+.boxel-select-button > svg {
   display: block;
   margin: auto;
 }

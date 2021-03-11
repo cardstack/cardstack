@@ -1,18 +1,22 @@
-<article class={{cn "action-container" action-container--is-complete=@isComplete}}
+<article
+  class={{cn
+    "boxel-action-container"
+    boxel-action-container--is-complete=@isComplete
+  }}
   ...attributes
 >
-  <Boxel::Header class="action-container__header">
+  <Boxel::Header class="boxel-action-container__header">
     {{@header}}
 
     <Boxel::IconButton
-      class="action-container__expand-button"
+      class="boxel-action-container__expand-button"
       @icon="expand"
       aria-label="Expand card"
     />
   </Boxel::Header>
 
   {{#if @prompt}}
-    <p class="action-container__prompt">
+    <p class="boxel-action-container__prompt">
       {{@prompt}}
     </p>
   {{/if}}
@@ -20,7 +24,7 @@
   {{yield}}
 
   <Boxel::ActionChin
-    class="action-container__footer"
+    class="boxel-action-container__footer"
     @mode={{if @isComplete "memorialized" "data-entry"}}
     @buttonText={{if @isComplete @completeActionLabel @incompleteActionLabel}}
     @onClickButton={{@onClickButton}}

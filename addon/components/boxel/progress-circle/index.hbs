@@ -1,10 +1,10 @@
 <div
-  class="progress-circle"
+  class="boxel-progress-circle"
   style={{html-safe (concat "width:" this.size "px;height:" this.size "px;")}}
   ...attributes
 >
   <div
-    class="progress-circle__pie"
+    class="boxel-progress-circle__pie"
   >
     <svg xmlns="http://www.w3.org/2000/svg" width={{this.size}} height={{this.size}} viewBox="0 0 {{this.outerCircleDiameter}} {{this.outerCircleDiameter}}">
       <g stroke-width="{{this.progressArcThickness}}">
@@ -12,20 +12,20 @@
           cx={{this.outerCircleRadius}} 
           cy={{this.outerCircleRadius}}  
           r={{this.strokeCircleRadius}} 
-          class="progress-circle__background-circle"
+          class="boxel-progress-circle__background-circle"
         />
         <circle 
           cx={{this.outerCircleRadius}} 
           cy={{this.outerCircleRadius}}  
           r={{this.strokeCircleRadius}} 
-          class="progress-circle__indicator-circle"
+          class="boxel-progress-circle__indicator-circle"
           style={{this.pieStyle}}
         />
       </g>
     </svg>
   </div>
   <div
-    class="progress-circle__pct-label"
+    class="boxel-progress-circle__pct-label"
     style={{html-safe (concat "font-size:" this.fontSize "px;width:" this.percentLabelDiameter "px; height:" this.percentLabelDiameter "px;")}}
   >
     {{this.humanPercentComplete}}%

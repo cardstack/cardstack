@@ -1,4 +1,4 @@
-.milestone-banner {
+.boxel-milestone-banner {
   display: flex;
   justify-content: space-between;
   min-height: 50px;
@@ -14,13 +14,13 @@
   letter-spacing: var(--boxel-lsp);
 }
 
-.milestone-banner__title {
+.boxel-milestone-banner__title {
   padding-left: var(--boxel-sp-lg);
   background: url('../@cardstack/boxel/images/icons/check-mark.svg') left center/10px 10px no-repeat;
   font-weight: 600;
 }
 
-.milestone-banner__status {
+.boxel-milestone-banner__status {
   font-weight: 700;
   letter-spacing: var(--boxel-lsp-xl);
   text-transform: uppercase;

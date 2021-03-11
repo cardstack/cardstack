@@ -29,14 +29,14 @@
 
   <:example>
     <Boxel::Breadcrumbs>
-      <LinkTo @route="media-registry" @model="bunny_records" @class="breadcrumbs__item">
-        <div class="breadcrumbs__item-label">Collection</div>
-        <div class="breadcrumbs__item-title">Master Recordings</div>
+      <LinkTo @route="media-registry" @model="bunny_records" @class="boxel-breadcrumbs__item">
+        <div class="boxel-breadcrumbs__item-label">Collection</div>
+        <div class="boxel-breadcrumbs__item-title">Master Recordings</div>
       </LinkTo>
-      <span class="breadcrumbs__carot" />
-      <LinkTo @route="media-registry.collection.index" @models={{array "bunny_records" "golden_girl"}} class="breadcrumbs__item">
-        <div class="breadcrumbs__item-label">Collection</div>
-        <div class="breadcrumbs__item-title">Golden Girl</div>
+      <span class="boxel-breadcrumbs__caret" />
+      <LinkTo @route="media-registry.collection.index" @models={{array "bunny_records" "golden_girl"}} class="boxel-breadcrumbs__item">
+        <div class="boxel-breadcrumbs__item-label">Collection</div>
+        <div class="boxel-breadcrumbs__item-title">Golden Girl</div>
       </LinkTo>
     </Boxel::Breadcrumbs>
   </:example>

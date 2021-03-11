@@ -1,16 +1,16 @@
-<div class="breadcrumbs {{@class}}">
+<div class="boxel-breadcrumbs {{@class}}">
   {{#if @items}}
     {{#each @items as |item i|}}
       {{#if (eq i 0)}}
-        <LinkTo @route={{item.route}} @models={{force-array item.routeModel}} @class="breadcrumbs__item">
-          <div class="breadcrumbs__item-label">{{item.type}}</div>
-          <div class="breadcrumbs__item-title">{{item.title}}</div>
+        <LinkTo @route={{item.route}} @models={{force-array item.routeModel}} @class="boxel-breadcrumbs__item">
+          <div class="boxel-breadcrumbs__item-label">{{item.type}}</div>
+          <div class="boxel-breadcrumbs__item-title">{{item.title}}</div>
         </LinkTo>
       {{else}}
-        <span class="breadcrumbs__carot" />
-        <LinkTo @route={{item.route}} @models={{force-array item.routeModel}} @class="breadcrumbs__item">
-          <div class="breadcrumbs__item-label">{{item.type}}</div>
-          <div class="breadcrumbs__item-title">{{item.title}}</div>
+        <span class="boxel-breadcrumbs__caret" />
+        <LinkTo @route={{item.route}} @models={{force-array item.routeModel}} @class="boxel-breadcrumbs__item">
+          <div class="boxel-breadcrumbs__item-label">{{item.type}}</div>
+          <div class="boxel-breadcrumbs__item-title">{{item.title}}</div>
         </LinkTo>
       {{/if}}
     {{/each}}

@@ -1,4 +1,4 @@
-.sidebar-card-container {
+.boxel-sidebar-card-container {
   background-color: var(--boxel-light);
   border-radius: var(--boxel-border-radius);
   padding: var(--boxel-sp);
@@ -6,7 +6,7 @@
   z-index: 0;
 }
 
-.sidebar-card-container:before {
+.boxel-sidebar-card-container:before {
   content: "";
   border-radius: var(--boxel-border-radius);
   position: absolute;
@@ -18,11 +18,11 @@
   box-shadow: var(--boxel-box-shadow);
 }
 
-.sidebar-card-container > * + * {
+.boxel-sidebar-card-container > * + * {
   margin-top: var(--boxel-sp);
 }
 
-.sidebar-card-container__header {
+.boxel-sidebar-card-container__header {
   color: var(--boxel-purple-400);
   font: var(--boxel-font-xs);
   font-weight: 600;
@@ -30,11 +30,11 @@
   text-transform: uppercase;
 }
 
-.sidebar-card-container__content > * + * {
+.boxel-sidebar-card-container__content > * + * {
   margin-top: var(--boxel-sp-sm);
 }
 
-.sidebar-card-container + .sidebar-card-container:last-of-type::after {
+.boxel-sidebar-card-container + .boxel-sidebar-card-container:last-of-type::after {
   /* This adds additional padding on the last container of the group.
      Using the Sidebar Section component can help with the grouping. */
   display: block;
@@ -43,25 +43,25 @@
 }
 
 /* Combining multiple card containers */
-.sidebar-card-container--attach-next {
+.boxel-sidebar-card-container--attach-next {
   border-bottom: none;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
 
-.sidebar-card-container--attach-next:before {
+.boxel-sidebar-card-container--attach-next:before {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
 
-.sidebar-card-container--attach-next + .sidebar-card-container {
+.boxel-sidebar-card-container--attach-next + .boxel-sidebar-card-container {
   border-top: 1px solid var(--boxel-light-400);
   border-top-left-radius: 0;
   border-top-right-radius: 0;
   margin-top: 0;
 }
 
-.sidebar-card-container--attach-next + .sidebar-card-container:before {
+.boxel-sidebar-card-container--attach-next + .boxel-sidebar-card-container:before {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
  }

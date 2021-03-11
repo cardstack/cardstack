@@ -1,4 +1,4 @@
-.cover-art {
+.boxel-cover-art {
   --cover-art-size: 80px;
   --cover-art-count: 1;
 
@@ -13,7 +13,7 @@
   overflow: hidden;
 }
 
-.cover-art__container {
+.boxel-cover-art__container {
   --cover-art-index: 0;
   --cover-art-left: 0px;
   --cover-art-spacing-multiplier: 1;
@@ -25,7 +25,7 @@
   left: calc(var(--cover-art-left) * var(--cover-art-spacing-multiplier));
 }
 
-.cover-art__cover {
+.boxel-cover-art__cover {
   display: block;
   object-fit: cover;
   object-position: center;

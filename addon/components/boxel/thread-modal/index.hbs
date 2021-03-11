@@ -1,6 +1,6 @@
-<BoxelModal @onClose={{@onClose}} @class="thread-modal {{if this.expanded "thread-modal--full-width"}}">
+<BoxelModal @onClose={{@onClose}} @class="boxel-thread-modal {{if this.expanded "boxel-thread-modal--full-width"}}">
   {{!-- OnClick actions on ThreadMessage and MilestoneBanner are temporarily added for demo's sake. --}}
-  <Boxel::Thread class="thread-modal__inner">
+  <Boxel::Thread class="boxel-thread-modal__inner">
     <:header>
       <Boxel::ThreadHeader
         @title={{@model.workflow.title}}
@@ -41,7 +41,7 @@
               @percentComplete={{percent-complete total=@model.workflow.milestones.length completed=this.progress}}
             />
           </div>
-          <div class="thread-modal__milestone-progress-status">
+          <div class="boxel-thread-modal__milestone-progress-status">
             {{this.progressStatus}}
           </div>
         </Boxel::Sidebar::CardContainer>

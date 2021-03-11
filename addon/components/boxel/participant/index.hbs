@@ -1,20 +1,20 @@
 {{#let (or @iconOnly (not @title)) as |iconOnly|}}
   <div
     class={{cn
-      "participant"
-      participant__icon-only=iconOnly
-      participant__has-logo=@hasLogo
+      "boxel-participant"
+      boxel-participant__icon-only=iconOnly
+      boxel-participant__has-logo=@hasLogo
     }}
     style={{css-var icon-size=(concat this.iconSize "px")}}
     ...attributes
   >
-    <div class="participant__image" style={{css-url "background-image" @image}} />
+    <div class="boxel-participant__image" style={{css-url "background-image" @image}} />
     {{#unless iconOnly}}
       <div>
-        <h4 class="participant__title">
+        <h4 class="boxel-participant__title">
           {{@title}}
         </h4>
-        <p class="participant__description">
+        <p class="boxel-participant__description">
           {{@description}}
         </p>
       </div>

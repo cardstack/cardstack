@@ -1,8 +1,8 @@
-.selection-control {
+.boxel-selection-control {
   display: flex;
 }
 
-.selection-control-group__select-all {
+.boxel-selection-control-group__select-all {
   display: inline-flex;
   align-items: center;
   position: relative;
@@ -20,22 +20,22 @@
   color: black;
 }
 
-.selection-control-group__menu-trigger {
+.boxel-selection-control-group__menu-trigger {
   position: absolute;
   top: 0;
   right: 8px;
 }
 
-.selection-control-group__select-all > svg {
+.boxel-selection-control-group__select-all > svg {
   margin-right: var(--boxel-sp-xs);
 }
 
-.selection-control-group__select-all--selected-items {
+.boxel-selection-control-group__select-all--selected-items {
   width: 246px;
   padding-left: var(--boxel-sp-sm);
   padding-right: var(--boxel-sp-xxl);
 }
 
-.selection-control-group__more-menu {
+.boxel-selection-control-group__more-menu {
   margin: var(--boxel-sp-sm) 0;
 }

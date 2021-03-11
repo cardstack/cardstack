@@ -1,11 +1,11 @@
-.breadcrumbs {
+.boxel-breadcrumbs {
   grid-column: 1 / -1;
   display: flex;
   width: 100%;
   padding: var(--boxel-sp) 0;
 }
 
-.breadcrumbs__item {
+.boxel-breadcrumbs__item {
   width: 170px;
   height: 50px;
   padding: var(--boxel-sp-xxs) var(--boxel-sp-sm);
@@ -18,14 +18,14 @@
   outline: 0;
 }
 
-.breadcrumbs__item-title {
+.boxel-breadcrumbs__item-title {
   font-weight: 700;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-.breadcrumbs__item-label {
+.boxel-breadcrumbs__item-label {
   color: var(--boxel-purple-400);
   font-size: 10px;
   font-weight: 600;
@@ -34,44 +34,44 @@
   text-transform: uppercase;
 }
 
-.breadcrumbs__carot {
+.boxel-breadcrumbs__caret {
   width: 30px;
   height: 50px;
-  background: url('../@cardstack/boxel/images/icons/carot-thin-right.svg') center/7px
+  background: url('../@cardstack/boxel/images/icons/caret-thin-right.svg') center/7px
     no-repeat;
 }
 
 /* Inverse-mode color scheme */
-.breadcrumbs__item--inverse {
+.boxel-breadcrumbs__item--inverse {
   background-color: #7c7b91;
   border-color: transparent;
 }
 
-button.breadcrumbs__item--inverse {
+button.boxel-breadcrumbs__item--inverse {
   text-align: left;
 }
 
-button.breadcrumbs__item--inverse:hover {
+button.boxel-breadcrumbs__item--inverse:hover {
   cursor: pointer;
 }
 
-.breadcrumbs__item--inverse .breadcrumbs__item-label {
+.boxel-breadcrumbs__item--inverse .boxel-breadcrumbs__item-label {
   color: var(--boxel-border-color);
 }
 
-.breadcrumbs__item--inverse .breadcrumbs__item-title {
+.boxel-breadcrumbs__item--inverse .boxel-breadcrumbs__item-title {
   color: var(--boxel-light);
 }
 
-.breadcrumbs__item--inverse + .breadcrumbs__carot {
+.boxel-breadcrumbs__item--inverse + .boxel-breadcrumbs__caret {
   filter: invert(1);
 }
 
-.breadcrumbs__item--inverse:last-child {
+.boxel-breadcrumbs__item--inverse:last-child {
   background-color: #c1c1d0;
 }
 
-.breadcrumbs__item--inverse:last-child .breadcrumbs__item-label,
-.breadcrumbs__item--inverse:last-child .breadcrumbs__item-title {
+.boxel-breadcrumbs__item--inverse:last-child .boxel-breadcrumbs__item-label,
+.boxel-breadcrumbs__item--inverse:last-child .boxel-breadcrumbs__item-title {
   color: var(--boxel-purple-700);
 }

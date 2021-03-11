@@ -1,11 +1,11 @@
-.date-divider {
+.boxel-date-divider {
   display: grid;
   align-items: center;
   justify-items: center;
   height: var(--boxel-sp);
 }
 
-.date-divider__hr {
+.boxel-date-divider__hr {
   grid-row: 1;
   grid-column: 1;
   width: 100%;
@@ -13,7 +13,7 @@
   border-top: 1px solid var(--boxel-light-600);
 }
 
-.date-divider__date {
+.boxel-date-divider__date {
   grid-row: 1;
   grid-column: 1;
   padding: 0 var(--boxel-sp-xs);

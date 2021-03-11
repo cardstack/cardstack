@@ -1,5 +1,5 @@
 <div
-  class="cover-art"
+  class="boxel-cover-art"
   style={{css-var
     cover-art-width=(concat this.maxWidth "px")
     cover-art-size=(concat this.size "px")
@@ -9,7 +9,7 @@
 >
   {{#each @covers as |art i|}}
     <div
-      class="cover-art__container cover-art__container--{{i}}"
+      class="boxel-cover-art__container boxel-cover-art__container--{{i}}"
       style={{css-var
         cover-art-index=i
         cover-art-left=(fn this.coverArtLeftPx i this.coverArtSpacing)
@@ -17,7 +17,7 @@
         cover-art-spacing-multiplier=this.spacingMultiplier
       }}
     >
-      <img class="cover-art__cover" src={{art}} alt="cover art" />
+      <img class="boxel-cover-art__cover" src={{art}} alt="cover art" />
     </div>
   {{/each}}
 </div>

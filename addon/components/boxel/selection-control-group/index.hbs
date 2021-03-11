@@ -1,5 +1,5 @@
 <div
-  class="selection-control-group"
+  class="boxel-selection-control-group"
   data-test-boxel-selection-control-group={{if
     @isSelected
     "selected"
@@ -7,7 +7,7 @@
   }}
 >
   <Boxel::SelectButton
-    @class="selection-control-group__select-button"
+    @class="boxel-selection-control-group__select-button"
     @mode={{@mode}}
     @isPartial={{@selectedItemCount}}
     @isSelected={{@isSelected}}
@@ -16,8 +16,8 @@
   />
   <div
     class={{cn
-      "selection-control-group__select-all"
-      selection-control-group__select-all--selected-items=@selectedItemCount
+      "boxel-selection-control-group__select-all"
+      boxel-selection-control-group__select-all--selected-items=@selectedItemCount
     }}
   >
     {{#if @selectedItemCount}}
@@ -28,12 +28,12 @@
         <Boxel::DropdownButton
           @button="more-actions"
           @icon="more-actions"
-          class="selection-control-group__menu-trigger" as |Menu dd|
+          class="boxel-selection-control-group__menu-trigger" as |Menu dd|
         >
           {{component
             @menuComponent
             closeMenu=dd.actions.close
-            class="selection-control-group__more-menu"
+            class="boxel-selection-control-group__more-menu"
           }}
         </Boxel::DropdownButton>
       {{/if}}

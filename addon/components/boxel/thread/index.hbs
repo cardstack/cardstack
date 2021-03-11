@@ -1,20 +1,20 @@
-<section class="thread" ...attributes>
-  <div class="thread__sticky-container">
+<section class="boxel-thread" ...attributes>
+  <div class="boxel-thread__sticky-container">
     {{yield to="header"}}
   </div>
 
-  <section class="thread__content-wrapper">
-    <div class="thread__scroll-wrapper">
-      <div class="thread__sticky-container">
+  <section class="boxel-thread__content-wrapper">
+    <div class="boxel-thread__scroll-wrapper">
+      <div class="boxel-thread__sticky-container">
         {{yield to="taskbar"}}
       </div>
-      <section class="thread__content">
+      <section class="boxel-thread__content">
         {{yield to="content"}}
       </section>
     </div>
 
-    <div class="thread__scroll-wrapper">
-      <Boxel::Sidebar class="thread__sidebar" as |SidebarSection|>
+    <div class="boxel-thread__scroll-wrapper">
+      <Boxel::Sidebar class="boxel-thread__sidebar" as |SidebarSection|>
         {{yield SidebarSection to="sidebar"}}
       </Boxel::Sidebar>
     </div>
