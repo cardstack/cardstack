@@ -3,11 +3,12 @@ import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import type Cards from 'cardhost/services/cards';
-import setupCardMocking, { createCard } from '../helpers/card-mocking';
-import { Compiler } from '@cardstack/core';
+import setupCardMocking from '../helpers/card-mocking';
+import { setupMirage } from 'ember-cli-mirage/test-support';
 
 module('Integration | card-service', function (hooks) {
   setupRenderingTest(hooks);
+  setupMirage(hooks);
   setupCardMocking(hooks);
 
   let cards: Cards;
@@ -27,8 +28,13 @@ module('Integration | card-service', function (hooks) {
 
   module('hello world', function (hooks) {
     hooks.beforeEach(function () {
-      createCard({
+      this.createCard({
         url: 'http://mirage/cards/hello',
+        'data.json': {
+          attributes: {
+            greeting: 'Hello World',
+          },
+        },
         'schema.js': `
           import { contains } from "@cardstack/types";
           import string from "https://cardstack.com/base/models/string";
@@ -42,21 +48,20 @@ module('Integration | card-service', function (hooks) {
     });
 
     test(`load an isolated card's component`, async function (assert) {
-      this.server.get('cards/hello?format=isolated', (schema, request) => {
-        debugger;
-      });
       let { component } = await cards.load(
         'http://mirage/cards/hello',
         'isolated'
       );
       this.set('component', component);
-      await render(hbs`<this.component/>`);
-      assert.dom(this.element).containsText('Hello world');
+      await render(
+        hbs`{{#let (ensure-safe-component this.component) as |Component|}} <Component /> {{/let}}`
+      );
+      assert.dom('h1').containsText('Hello World');
     });
 
     test(`load an isolated card's model`, async function (assert) {
       let { model } = await cards.load('http://mirage/cards/hello', 'isolated');
-      assert.deepEqual(model, { title: 'Hello world' });
+      assert.deepEqual(model, { greeting: 'Hello World' });
     });
   });
 });
