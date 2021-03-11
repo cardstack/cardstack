@@ -15,10 +15,6 @@ export async function addRawCard(card: RawCard): Promise<CompiledCard> {
 }
 
 export function compilerTestSetup(hooks: NestedHooks) {
-  hooks.beforeEach(function () {
-    // FIXTURES.clear(); Maybe we'll need this?
-  });
-
   hooks.afterEach(function () {
     FIXTURES.clear();
   });
