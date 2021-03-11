@@ -1,4 +1,4 @@
-.thread {
+.boxel-thread {
   position: relative;
   height: 100%;
   background-color: var(--boxel-light-300);
@@ -8,12 +8,12 @@
   letter-spacing: var(--boxel-lsp);
 }
 
-.thread__scroll-wrapper {
+.boxel-thread__scroll-wrapper {
   overflow-y: auto;
   padding-bottom: var(--boxel-sp-lg);
 }
 
-.thread__content-wrapper {
+.boxel-thread__content-wrapper {
   height: calc(100% - 90px);
   display: grid;
   grid-template-columns: 1fr auto;
@@ -21,21 +21,21 @@
   border-radius: var(--boxel-border-radius);
 }
 
-.thread__content {
+.boxel-thread__content {
   padding: var(--boxel-sp);
   padding-left: var(--boxel-sp-xl);
 }
 
-.thread__content > * + * {
+.boxel-thread__content > * + * {
   margin-top: var(--boxel-sp-lg);
 }
 
-.thread__sidebar {
+.boxel-thread__sidebar {
   margin: var(--boxel-sp);
   width: 230px;
 }
 
-.thread__sticky-container {
+.boxel-thread__sticky-container {
   position: sticky;
   top: 0;
   z-index: 1;

@@ -1,14 +1,14 @@
-.thread-message {
+.boxel-thread-message {
   --icon-size: 40px;
 }
 
 @media only screen and (min-width: 1440px) {
-  .thread-message {
+  .boxel-thread-message {
     padding-right: var(--boxel-sp-xl);
   }
 }
 
-.thread-message > .thread-message__participant {
+.boxel-thread-message > .boxel-thread-message__participant {
   display: grid;
   grid-template-columns: var(--icon-size) auto 1fr;
   gap: var(--boxel-sp-xs) var(--boxel-sp);
@@ -16,29 +16,29 @@
   height: 20px;
 }
 
-.thread-message > .thread-message__participant h4 {
+.boxel-thread-message > .boxel-thread-message__participant h4 {
   font-size: var(--boxel-font-size-sm);
   letter-spacing: var(--boxel-lsp);
 }
 
-.thread-message__time {
+.boxel-thread-message__time {
   color: var(--boxel-purple-400);
   font: var(--boxel-font-xs);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-lg);
 }
 
-.thread-message__content {
+.boxel-thread-message__content {
   margin-left: calc(var(--icon-size) + var(--boxel-sp));
   font-size: 0.9375rem; /* 15px */
   line-height: calc(23/15);
   letter-spacing: var(--boxel-lsp-sm);
 }
 
-.thread-message__content > p {
+.boxel-thread-message__content > p {
   margin: 0;
 }
 
-.thread-message__content > p + p {
+.boxel-thread-message__content > p + p {
   margin-top: var(--boxel-sp-lg);
 }

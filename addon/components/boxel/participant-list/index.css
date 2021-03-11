@@ -1,4 +1,4 @@
-.participant-list {
+.boxel-participant-list {
   --icon-size: 30px;
   --column-size: calc(var(--icon-size, 30px) / 2);
 
@@ -8,11 +8,11 @@
   gap: var(--boxel-sp-sm);
 }
 
-.participant-list--full-width {
+.boxel-participant-list--full-width {
   width: 100%;
 }
 
-.participant-list__fanned {
+.boxel-participant-list__fanned {
   grid-auto-flow: column;
   grid-auto-columns: var(--column-size);
   gap: 0;
@@ -20,6 +20,6 @@
   padding-left: var(--column-size);
 }
 
-.participant-list__fanned .participant-list__participant > div {
+.boxel-participant-list__fanned .boxel-participant-list__participant > div {
   border: 1px solid var(--boxel-light);
 }

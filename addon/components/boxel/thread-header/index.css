@@ -1,4 +1,4 @@
-.thread-header {
+.boxel-thread-header {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
@@ -11,14 +11,14 @@
   position: relative;
 }
 
-.thread-header__label {
+.boxel-thread-header__label {
   color: var(--boxel-purple-400);
   font: 600 var(--boxel-font-xs);
   letter-spacing: var(--boxel-lsp-xl);
   text-transform: uppercase;
 }
 
-.thread-header__title {
+.boxel-thread-header__title {
   /* Not using variables for margin-top because it seems to make a significant difference to typography (@Aierie's judgement) */
   margin-top: 4px;
   margin-bottom: var(--boxel-sp-xxxs);
@@ -26,7 +26,7 @@
   letter-spacing: var(--boxel-lsp-xxs);
 }
 
-.thread-header__expand-button {
+.boxel-thread-header__expand-button {
   display: flex;
   align-items: center;
   padding: var(--boxel-sp-xs);
@@ -36,21 +36,21 @@
   letter-spacing: var(--boxel-lsp);
 }
 
-.thread-header__expand-button:hover {
+.boxel-thread-header__expand-button:hover {
   cursor: pointer;
 }
 
-.thread-header__expand-button > svg {
+.boxel-thread-header__expand-button > svg {
   margin-left: var(--boxel-sp-sm);
 }
 
 @media only screen and (max-width: 1149px) {
-  .thread-header__expand-button {
+  .boxel-thread-header__expand-button {
     display: none;
   }
 }
 
-.thread-header__participants {
+.boxel-thread-header__participants {
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
@@ -60,7 +60,7 @@
   letter-spacing: var(--boxel-lsp-xl);
 }
 
-.thread-header__notification {
+.boxel-thread-header__notification {
   position: absolute;
   top: 0;
   right: 0;

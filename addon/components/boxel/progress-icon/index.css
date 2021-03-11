@@ -1,4 +1,4 @@
-.progress-icon {
+.boxel-progress-icon {
   --icon-color: var(--boxel-highlight);
   position: relative;
   background-image: url('../@cardstack/boxel/images/icons/progress-circle-dark.svg');
@@ -7,19 +7,19 @@
   background-size: contain;
 }
 
-.boxel--light-theme .progress-icon {
+.boxel--light-theme .boxel-progress-icon {
   background-image: url('../@cardstack/boxel/images/icons/progress-circle.svg');
 }
 
-.progress-icon.cancelled {
+.boxel-progress-icon.boxel-progress-icon--cancelled {
   background-image: url('../@cardstack/boxel/images/icons/icon-x-circle-ht.svg');
 }
 
-.progress-icon.complete {
+.boxel-progress-icon.boxel-progress-icon--complete {
   background-image: url('../@cardstack/boxel/images/icons/icon-check-circle-ht.svg');
 }
 
-.progress-icon__progress-pie {
+.boxel-progress-icon__progress-pie {
   position: absolute;
   width: 100%;
   height: 100%;

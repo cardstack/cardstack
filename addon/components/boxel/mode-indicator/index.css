@@ -1,4 +1,4 @@
-.mode-indicator {
+.boxel-mode-indicator {
   --mode-container-width: 180px;
   --mode-container-height: 40px;
   --mode-icon: url('');
@@ -27,20 +27,20 @@
   text-transform: capitalize;
 }
 
-.mode-indicator--edit {
+.boxel-mode-indicator--edit {
   --mode-icon: url('../@cardstack/boxel/images/icons/edit-box.svg');
 }
-.mode-indicator--configure {
+.boxel-mode-indicator--configure {
   --mode-icon: url('../@cardstack/boxel/images/icons/gear.svg');
 }
-.mode-indicator--themer {
+.boxel-mode-indicator--themer {
   --mode-icon: url('../@cardstack/boxel/images/icons/themer.svg');
 }
-.mode-indicator--preview {
+.boxel-mode-indicator--preview {
   --mode-icon: url('../@cardstack/boxel/images/icons/eye.svg');
 }
 
-.mode-indicator:hover,
-.mode-indicator:focus {
+.boxel-mode-indicator:hover,
+.boxel-mode-indicator:focus {
   outline: 0;
 }

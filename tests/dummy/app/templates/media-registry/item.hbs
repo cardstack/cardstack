@@ -9,14 +9,14 @@
         <div class="breadcrumbs__item-title">Master Recordings</div>
       </LinkTo>
       {{#if @model.fromCollectionId}}
-        <span class="breadcrumbs__carot" />
+        <span class="breadcrumbs__caret" />
         <LinkTo @route="media-registry.collection.index" @model={{@model.fromCollectionId}} @class="breadcrumbs__item">
           <div class="breadcrumbs__item-label">Collection</div>
           <div class="breadcrumbs__item-title">{{titleize (humanize @model.fromCollectionId)}}</div>
         </LinkTo>
       {{/if}}
       {{#if (eq this.target.currentRouteName "media-registry.item.musical-work")}}
-        <span class="breadcrumbs__carot" />
+        <span class="breadcrumbs__caret" />
         <LinkTo @route="media-registry.item" @model={{@model.id}} @class="breadcrumbs__item">
           <div class="breadcrumbs__item-label">Master Detail</div>
           <div class="breadcrumbs__item-title">{{titleize @model.title}}</div>

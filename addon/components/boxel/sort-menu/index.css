@@ -1,4 +1,4 @@
-.sort-menu {
+.boxel-sort-menu {
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-sm);
   padding: var(--boxel-sp-sm) 0;
@@ -6,7 +6,7 @@
   flex-direction: column;
 }
 
-.sort-menu header {
+.boxel-sort-menu > header {
   padding-left: var(--boxel-sp);
   padding-bottom: var(--boxel-sp-sm);
   background-color: var(--boxel-light);
@@ -15,7 +15,7 @@
   text-transform: uppercase;
 }
 
-.sort-menu ul {
+.boxel-sort-menu > ul {
   padding-left: var(--boxel-sp);
   overflow: auto;
 }

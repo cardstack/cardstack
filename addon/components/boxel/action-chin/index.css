@@ -1,4 +1,4 @@
-.action-chin {
+.boxel-action-chin {
   --icon-color: var(--boxel-purple-300);
   display: grid;
   grid-template-columns: auto 1fr;
@@ -11,7 +11,7 @@
   transition: background-color var(--boxel-transition);
 }
 
-.action-chin__lock-text {
+.boxel-action-chin__lock-text {
   display: grid;
   grid-auto-flow: column;
   align-items: center;
@@ -20,23 +20,23 @@
   text-align: right;
 }
 
-.action-chin--light {
+.boxel-action-chin--light {
   --icon-color: var(--boxel-purple-400);
   background-color: var(--boxel-purple-100);
   color: var(--boxel-purple-400);
 }
 
-.action-chin--light > button {
+.boxel-action-chin--light > button {
   border-color: var(--boxel-purple-300);
   transition: border-color var(--boxel-transition);
 }
 
-.action-chin--light > button:hover,
-.action-chin--light > button:focus {
+.boxel-action-chin--light > button:hover,
+.boxel-action-chin--light > button:focus {
   border-color: var(--boxel-dark);
 }
 
-.action-chin > button:disabled {
+.boxel-action-chin > button:disabled {
   background-color: var(--boxel-purple-300);
   border-color: var(--boxel-purple-300);
   color: var(--boxel-purple-500);

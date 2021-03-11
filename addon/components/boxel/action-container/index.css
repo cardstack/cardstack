@@ -1,4 +1,4 @@
-.action-container {
+.boxel-action-container {
   position: relative;
   width: 100%;
   max-width: 43.75rem; /* 700px;*/
@@ -14,18 +14,18 @@
     box-shadow var(--boxel-transition);
 }
 
-.action-container--is-complete {
+.boxel-action-container--is-complete {
   max-width: 36.6rem; /* 585px; */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
-.action-container__prompt {
+.boxel-action-container__prompt {
   padding: var(--boxel-sp) var(--boxel-sp-lg);
 }
 
 
 /* Card Header */
-.action-container__header {
+.boxel-action-container__header {
   --header-background-color: transparent;
   --header-text-color: var(--boxel-purple-300);
 
@@ -34,7 +34,7 @@
   overflow: hidden;
 }
 
-.action-container__expand-button {
+.boxel-action-container__expand-button {
   --icon-button-width: 1.875rem;
   --icon-button-height: 1.875rem;
 
@@ -49,25 +49,25 @@
   the header background-color change transition. */
 }
 
-.action-container__expand-button:focus {
+.boxel-action-container__expand-button:focus {
   color: initial;
   /* the button is only stylistically hidden. it's accessible via keyboard shortcut. */
 }
 
 
 /* Container and Header interaction */
-.action-container:hover .action-container__header {
+.boxel-action-container:hover .boxel-action-container__header {
   --header-background-color: var(--boxel-purple-100);
   --header-text-color: var(--boxel-dark);
 }
 
-.action-container:hover .action-container__expand-button {
+.boxel-action-container:hover .boxel-action-container__expand-button {
   color: initial;
 }
 
 
 /* Optional prompt */
-.action-container__prompt {
+.boxel-action-container__prompt {
   margin: 0;
   font-size: 1.125rem; /* 18px */
   font-weight: 700;
@@ -77,7 +77,7 @@
 
 
 /* Card Chin */
-.action-container__footer {
+.boxel-action-container__footer {
   border-bottom-right-radius: var(--boxel-border-radius);
   border-bottom-left-radius: var(--boxel-border-radius);
 }

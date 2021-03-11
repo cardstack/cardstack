@@ -1,4 +1,4 @@
-.participants-summary {
+.boxel-participants-summary {
   display: grid;
   font: var(--boxel-font-xs);
   grid-template-columns: auto 1fr;
@@ -12,7 +12,7 @@
   color: inherit;
 }
 
-.boxel--dark-theme > .participants-summary {
+.boxel--dark-theme > .boxel-participants-summary {
   --icon-color: var(--boxel-light);
   color: var(--boxel-purple-300);
 }

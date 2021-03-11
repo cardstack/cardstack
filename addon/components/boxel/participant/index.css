@@ -1,4 +1,4 @@
-.participant {
+.boxel-participant {
   --icon-size: 30px;
 
   display: grid;
@@ -9,11 +9,11 @@
   letter-spacing: var(--boxel-lsp-lg);
 }
 
-.participant__icon-only {
+.boxel-participant__icon-only {
   display: inline-block;
 }
 
-.participant__image {
+.boxel-participant__image {
   width: var(--icon-size);
   height: var(--icon-size);
   background-image: url('../@cardstack/boxel/images/placeholders/profile.svg');
@@ -23,21 +23,21 @@
   border-radius: 100px;
 }
 
-.participant__has-logo .participant__image {
+.boxel-participant__has-logo .boxel-participant__image {
   border-radius: initial;
 }
 
-.participant__title {
+.boxel-participant__title {
   font-weight: 600;
 }
 
-.participant__has-logo .participant__title {
+.boxel-participant__has-logo .boxel-participant__title {
   margin: 0;
   font: var(--boxel-font-sm);
   font-weight: 600;
 }
 
-.participant__description {
+.boxel-participant__description {
   margin: 0;
   color: var(--boxel-purple-400);
 }

@@ -1,31 +1,31 @@
-.menu .menu__item:hover,
-.menu .menu__item:focus {
+.boxel-menu .boxel-menu__item:hover,
+.boxel-menu .boxel-menu__item:focus {
   background-color: var(--boxel-light-500);
   cursor: pointer;
 }
 
-.menu .menu__item {
+.boxel-menu .boxel-menu__item {
   padding: 0;
 }
 
-.menu .menu__item:first-child {
+.boxel-menu .boxel-menu__item:first-child {
   border-radius: var(--boxel-border-radius) var(--boxel-border-radius) 0 0;
 }
 
-.menu .menu__item:last-child {
+.boxel-menu .boxel-menu__item:last-child {
   border-radius: 0 0 var(--boxel-border-radius) var(--boxel-border-radius);
 }
 
-.menu .menu__item > a {
+.boxel-menu .boxel-menu__item > a {
   width: 100%;
   padding: var(--boxel-sp-xs) var(--boxel-sp);
 }
 
-.menu .menu__item--dangerous {
+.boxel-menu .boxel-menu__item--dangerous {
   color: var(--boxel-red);
 }
 
-.menu .menu__separator {
+.boxel-menu .boxel-menu__separator {
   margin: 0;
   border: 0;
   height: 0;

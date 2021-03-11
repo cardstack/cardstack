@@ -24,7 +24,7 @@
   height: var(--field-height);
 }
 .layout-form-view__dropdown > .ember-power-select-trigger {
-  background: url('../@cardstack/boxel/images/icons/carot-down.svg') right 18px center/auto 8px no-repeat;
+  background: url('../@cardstack/boxel/images/icons/caret-down.svg') right 18px center/auto 8px no-repeat;
   background-color: var(--boxel-light);
   border: 1px solid var(--boxel-purple-300);
   border-radius: 5px;

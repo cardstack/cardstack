@@ -16,7 +16,7 @@
       </LinkTo>
 
       {{#if @model.parentCard.cardType}}
-        <span class="breadcrumbs__carot" />
+        <span class="breadcrumbs__caret" />
         <LinkTo @route={{@model.parentCard.route}} @model={{@model.parentCard}} @class="breadcrumbs__item breadcrumbs__item--inverse">
           <div class="breadcrumbs__item-label">Field</div>
           <div class="breadcrumbs__item-title">{{humanize @model.parentCard.cardType}}</div>
@@ -24,13 +24,13 @@
       {{/if}}
 
       {{#if @model.parentCard}}
-        <span class="breadcrumbs__carot" />
+        <span class="breadcrumbs__caret" />
         <div class="breadcrumbs__item breadcrumbs__item--inverse">
           <div class="breadcrumbs__item-label">{{@model.nestedCompField.type}}</div>
           <div class="breadcrumbs__item-title">{{@model.nestedCompField.title}}</div>
         </div>
       {{else if @model.cardType}}
-        <span class="breadcrumbs__carot" />
+        <span class="breadcrumbs__caret" />
         <div class="breadcrumbs__item breadcrumbs__item--inverse">
           <div class="breadcrumbs__item-label">Field</div>
           <div class="breadcrumbs__item-title">{{humanize @model.cardType}}</div>
@@ -52,8 +52,8 @@
                   {{truncate @model.baseCard.owner 1 false}}
                 {{/unless}}
               </div>
-              <div class="discrepancy__comparison-header-icons-carot">
-                {{svg-jar "carot-left"}}
+              <div class="discrepancy__comparison-header-icons-caret">
+                {{svg-jar "caret-left"}}
               </div>
               <div class="discrepancy__profile-icon discrepancy__profile-icon--{{@model.compCard.ownerId}}" style={{css-url "background-image" @model.compCard.iconURL}}>
                 {{#unless @model.compCard.iconURL}}

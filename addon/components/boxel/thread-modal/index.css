@@ -1,17 +1,17 @@
-.thread-modal {
+.boxel-thread-modal {
   --modal-max-width: 1030px;
   --modal-offset-left: 30px;
 }
 
-.thread-modal--full-width {
+.boxel-thread-modal--full-width {
   --modal-max-width: 100%;
 }
 
-.thread-modal > .thread-modal__inner {
+.boxel-thread-modal > .boxel-thread-modal__inner {
   height: calc(100% - 60px);
 }
 
-.thread-modal__milestone-progress-status {
+.boxel-thread-modal__milestone-progress-status {
   color: var(--boxel-dark);
   font: var(--boxel-font-sm);
   font-weight: 600;

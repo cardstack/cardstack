@@ -1,4 +1,4 @@
-.progress-circle {
+.boxel-progress-circle {
   --progress-arc-color: var(--boxel-highlight);
   --progress-arc-background-color: var(--boxel-light-400);
   display: flex;
@@ -8,7 +8,7 @@
   margin: 0 auto;
 }
 
-.progress-circle__pie {
+.boxel-progress-circle__pie {
   position: absolute;
   top: 0;
   width: 100%;
@@ -16,19 +16,19 @@
   transform: rotate(-90deg);
 }
 
-.progress-circle__background-circle { 
+.boxel-progress-circle__background-circle { 
   stroke: var(--progress-arc-background-color);
   fill: none;
 }
 
-.progress-circle__indicator-circle {
+.boxel-progress-circle__indicator-circle {
   stroke: var(--progress-arc-color);
   fill: none;
   stroke-dasharray: 0 360; /* Note: this is overridden by an inline style to show a progress arc of the right length */
   transition: stroke-dasharray var(--boxel-transition); 
 }
 
-.progress-circle__pct-label {
+.boxel-progress-circle__pct-label {
   display: flex;
   align-items: center;
   justify-content: center;
