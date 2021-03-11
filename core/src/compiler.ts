@@ -17,63 +17,48 @@ import {
 } from './interfaces';
 
 import intersection from 'lodash/intersection';
-import { FIXTURES } from '../tests/helpers';
 
-const BASE_CARDS: Map<string, CompiledCard> = new Map([
+export const BASE_CARDS: Map<string, RawCard> = new Map([
   [
     'https://cardstack.com/base/models/string',
     {
       url: 'https://cardstack.com/base/models/string',
-      modelSource: '',
-      fields: {},
-      data: {},
-      templateSources: {
-        embedded: `{{this}}`,
-        isolated: '',
-      },
+      'schema.js': `export default class String {}`,
+      'embedded.hbs': '{{this}}',
     },
   ],
   [
     'https://cardstack.com/base/models/date',
     {
       url: 'https://cardstack.com/base/models/date',
-      modelSource: '',
-      fields: {},
-      data: {},
-      templateSources: {
-        embedded: `<FormatDate @date={{this}} />`,
-        isolated: '',
-      },
+      'schema.js': `export default class Date {}`,
+      // 'embedded.hbs': '<FormatDate @date={{this}}',
+      'embedded.hbs': 'Date: {{this}}',
     },
   ],
   [
-    'https://localhost/base/models/comment',
+    'https://cardstack.com/base/models/comment',
     {
-      url: 'https://localhost/base/models/comment',
-      modelSource: '',
-      fields: {},
-      data: {},
-      templateSources: {
-        embedded: `{{this}}`,
-        isolated: '',
-      },
+      url: 'https://cardstack.com/base/models/comment',
+      'schema.js': `export default class Comment {}`,
+      'embedded.hbs': '{{this}}',
     },
   ],
   [
-    'https://localhost/base/models/tag',
+    'https://cardstack.com/base/models/tag',
     {
-      url: 'https://localhost/base/models/tag',
-      modelSource: '',
-      fields: {},
-      data: {},
-      templateSources: {
-        embedded: `{{this}}`,
-        isolated: '',
-      },
+      url: 'https://cardstack.com/base/models/tag',
+      'schema.js': `export default class Tag {}`,
+      'embedded.hbs': '{{this}}',
     },
   ],
 ]);
 export class Compiler {
+  lookup: (cardURL: string) => Promise<CompiledCard>;
+
+  constructor(params: { lookup: (url: string) => Promise<CompiledCard> }) {
+    this.lookup = params.lookup;
+  }
   async compile(cardSource: RawCard): Promise<CompiledCard> {
     let options = {};
     let parentCard;
@@ -204,27 +189,4 @@ export class Compiler {
       })
     );
   }
-
-  async lookup(cardURL: string): Promise<CompiledCard> {
-    let card = BASE_CARDS.get(cardURL) ?? FIXTURES.get(cardURL);
-
-    if (!card) {
-      throw new Error(`unknown card ${cardURL}`);
-    }
-
-    return card;
-  }
-}
-
-export function field(/*card: CompiledCard*/) {
-  return function (desc: {
-    key: string;
-    initializer: ((initialValue: any) => any) | undefined;
-  }) {
-    function initializer(value: any) {
-      return value;
-    }
-    desc.initializer = initializer;
-    return desc;
-  };
 }

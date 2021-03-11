@@ -1,19 +1,23 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { Compiler } from '@cardstack/core';
-import { compilerTestSetup, addRawCard } from '@cardstack/core/tests/helpers';
+import { setupMirage } from 'ember-cli-mirage/test-support';
+import setupCardMocking from '../helpers/card-mocking';
+import Builder from 'cardhost/lib/builder';
 import { CompiledCard } from '@cardstack/core/src/interfaces';
 
 module('Integration | compiler-adoption', function (hooks) {
   setupRenderingTest(hooks);
-  compilerTestSetup(hooks);
+  setupMirage(hooks);
+  setupCardMocking(hooks);
 
-  let compiler = new Compiler();
+  let builder: Builder;
   let parentCard: CompiledCard;
 
   hooks.beforeEach(async function () {
-    parentCard = await addRawCard({
-      url: 'https://localhost/base/models/person',
+    builder = new Builder();
+
+    this.createCard({
+      url: 'http://mirage/cards/person',
       'schema.js': `
         import { contains } from "@cardstack/types";
         import date from "https://cardstack.com/base/models/date";
@@ -28,28 +32,34 @@ module('Integration | compiler-adoption', function (hooks) {
       `,
       'embedded.hbs': `<this.name/> was born on <this.birthdate/>`,
     });
+
+    parentCard = await builder.getCompiledCard('http://mirage/cards/person');
   });
 
   module('fields', async function (/*hooks*/) {
     test('a blank card can adopt fields from a card', async function (assert) {
       let card = {
+        url: 'http://mirage/cards/user',
         'schema.js': `
           import { adopts } from "@cardstack/types";
-          import Person from "https://localhost/base/models/person";
+          import Person from "http://mirage/cards/person";
 
           export default @adopts(Person) class User {}
       `,
       };
-      let compiled = await compiler.compile(card);
+      this.createCard(card);
+
+      let compiled = await builder.getCompiledCard(card.url);
       assert.deepEqual(Object.keys(compiled.fields), ['name', 'birthdate']);
       assert.deepEqual(compiled.adoptsFrom, parentCard);
     });
 
     test('A child card can add a field', async function (assert) {
       let card = {
+        url: 'http://mirage/cards/user',
         'schema.js': `
           import { adopts, contains } from "@cardstack/types";
-          import Person from "https://localhost/base/models/person";
+          import Person from "http://mirage/cards/person";
           import string from "https://cardstack.com/base/models/string";
 
           export default @adopts(Person) class User {
@@ -58,7 +68,9 @@ module('Integration | compiler-adoption', function (hooks) {
           }
       `,
       };
-      let compiled = await compiler.compile(card);
+      this.createCard(card);
+
+      let compiled = await builder.getCompiledCard(card.url);
       assert.deepEqual(Object.keys(compiled.fields), [
         'username',
         'name',
@@ -68,9 +80,10 @@ module('Integration | compiler-adoption', function (hooks) {
 
     test('A child card can NOT overwrite an existing field', async function (assert) {
       let card = {
+        url: 'http://mirage/cards/user',
         'schema.js': `
           import { adopts, contains } from "@cardstack/types";
-          import Person from "https://localhost/base/models/person";
+          import Person from "http://mirage/cards/person";
           import string from "https://cardstack.com/base/models/string";
 
           export default @adopts(Person) class User {
@@ -80,23 +93,24 @@ module('Integration | compiler-adoption', function (hooks) {
       `,
       };
 
+      this.createCard(card);
       assert.expect(1);
       try {
-        await compiler.compile(card);
+        await builder.getCompiledCard(card.url);
       } catch (err) {
         assert.equal(
-          'Field collision on birthdate with parent card https://localhost/base/models/person',
+          'Field collision on birthdate with parent card http://mirage/cards/person',
           err.message
         );
       }
     });
 
     test('A child card can NOT overwrite an existing field, even from a grandparent', async function (assert) {
-      await addRawCard({
-        url: 'https://localhost/base/models/user',
+      this.createCard({
+        url: 'http://mirage/cards/user',
         'schema.js': `
           import { adopts, contains } from "@cardstack/types";
-          import Person from "https://localhost/base/models/person";
+          import Person from "http://mirage/cards/person";
           import string from "https://cardstack.com/base/models/string";
 
           export default @adopts(Person) class User {
@@ -106,9 +120,10 @@ module('Integration | compiler-adoption', function (hooks) {
       });
 
       let card = {
+        url: 'http://mirage/cards/admin',
         'schema.js': `
           import { adopts, contains } from "@cardstack/types";
-          import User from "https://localhost/base/models/user";
+          import User from "http://mirage/cards/user";
           import string from "https://cardstack.com/base/models/string";
 
           export default @adopts(User) class Admin {
@@ -118,12 +133,13 @@ module('Integration | compiler-adoption', function (hooks) {
       `,
       };
 
+      this.createCard(card);
       assert.expect(1);
       try {
-        await compiler.compile(card);
+        await builder.getCompiledCard(card.url);
       } catch (err) {
         assert.equal(
-          'Field collision on name with parent card https://localhost/base/models/user',
+          'Field collision on name with parent card http://mirage/cards/user',
           err.message
         );
       }
@@ -133,26 +149,30 @@ module('Integration | compiler-adoption', function (hooks) {
   module('templates', async function (/*hooks*/) {
     test('a child card inherits a parent card template', async function (assert) {
       let card = {
+        url: 'http://mirage/cards/user',
         'schema.js': `
             import { adopts } from "@cardstack/types";
-            import Person from "https://localhost/base/models/person";
+            import Person from "http://mirage/cards/person";
 
             export default @adopts(Person) class User {}
         `,
       };
-      let compiled = await compiler.compile(card);
+      this.createCard(card);
+
+      let compiled = await builder.getCompiledCard(card.url);
       assert.equal(
         compiled.templateSources.embedded,
-        `{{this.name}} was born on <FormatDate @date={{this.birthdate}} />`
+        // `{{this.name}} was born on <FormatDate @date={{this.birthdate}} />`
+        `{{this.name}} was born on Date: {{this.birthdate}}`
       );
     });
 
     test('a child card inherits a grandparent card template, when it and parent do not have templates', async function (assert) {
-      await addRawCard({
-        url: 'https://localhost/base/models/user',
+      this.createCard({
+        url: 'http://mirage/cards/user',
         'schema.js': `
           import { adopts, contains } from "@cardstack/types";
-          import Person from "https://localhost/base/models/person";
+          import Person from "http://mirage/cards/person";
           import string from "https://cardstack.com/base/models/string";
 
           export default @adopts(Person) class User {
@@ -161,17 +181,21 @@ module('Integration | compiler-adoption', function (hooks) {
           }`,
       });
       let card = {
+        url: 'http://mirage/cards/admin',
         'schema.js': `
             import { adopts } from "@cardstack/types";
-            import User from "https://localhost/base/models/user";
+            import User from "http://mirage/cards/user";
 
             export default @adopts(User) class Admin {}
         `,
       };
-      let compiled = await compiler.compile(card);
+      this.createCard(card);
+
+      let compiled = await builder.getCompiledCard(card.url);
       assert.equal(
         compiled.templateSources.embedded,
-        `{{this.name}} was born on <FormatDate @date={{this.birthdate}} />`
+        // `{{this.name}} was born on <FormatDate @date={{this.birthdate}} />`
+        `{{this.name}} was born on Date: {{this.birthdate}}`
       );
     });
   });
@@ -180,9 +204,10 @@ module('Integration | compiler-adoption', function (hooks) {
     test('@adopts cannot be used on a class property', async function (assert) {
       assert.expect(1);
       let card = {
+        url: 'http://mirage/cards/admin',
         'schema.js': `
             import { adopts } from "@cardstack/types";
-            import Person from "https://localhost/base/models/person";
+            import Person from "http://mirage/cards/person";
 
             export default class Admin {
               @adopts(Person)
@@ -191,8 +216,9 @@ module('Integration | compiler-adoption', function (hooks) {
         `,
       };
 
+      this.createCard(card);
       try {
-        await compiler.compile(card);
+        await builder.getCompiledCard(card.url);
       } catch (err) {
         assert.ok(
           /@adopts decorator can only be used on a class/.test(err.message),
@@ -204,16 +230,18 @@ module('Integration | compiler-adoption', function (hooks) {
     test('@adopts only accepts 1 argument', async function (assert) {
       assert.expect(1);
       let card = {
+        url: 'http://mirage/cards/admin',
         'schema.js': `
             import { adopts } from "@cardstack/types";
-            import Person from "https://localhost/base/models/person";
+            import Person from "http://mirage/cards/person";
 
             export default @adopts(Person, true) class Admin {}
         `,
       };
+      this.createCard(card);
 
       try {
-        await compiler.compile(card);
+        await builder.getCompiledCard(card.url);
       } catch (err) {
         assert.ok(
           /@adopts decorator accepts exactly one argument/.test(err.message),
@@ -225,15 +253,17 @@ module('Integration | compiler-adoption', function (hooks) {
     test('@adopts with wrong argument syntax', async function (assert) {
       assert.expect(1);
       let card = {
+        url: 'http://mirage/cards/admin',
         'schema.js': `
             import { adopts } from "@cardstack/types";
 
             export default @adopts('Person') class Admin {}
         `,
       };
+      this.createCard(card);
 
       try {
-        await compiler.compile(card);
+        await builder.getCompiledCard(card.url);
       } catch (err) {
         assert.ok(
           /@adopts argument must be an identifier/.test(err.message),
@@ -245,15 +275,17 @@ module('Integration | compiler-adoption', function (hooks) {
     test('@adopts doesnt accept undefined arguments', async function (assert) {
       assert.expect(1);
       let card = {
+        url: 'http://mirage/cards/admin',
         'schema.js': `
             import { adopts } from "@cardstack/types";
 
             export default @adopts(Person) class Admin {}
         `,
       };
+      this.createCard(card);
 
       try {
-        await compiler.compile(card);
+        await builder.getCompiledCard(card.url);
       } catch (err) {
         assert.ok(
           /@adopts argument is not defined/.test(err.message),
@@ -265,6 +297,7 @@ module('Integration | compiler-adoption', function (hooks) {
     test('@adopts argument must be imported', async function (assert) {
       assert.expect(1);
       let card = {
+        url: 'http://mirage/cards/admin',
         'schema.js': `
             import { adopts } from "@cardstack/types";
             const Person = 'person'
@@ -272,9 +305,10 @@ module('Integration | compiler-adoption', function (hooks) {
             export default @adopts(Person) class Admin {}
         `,
       };
+      this.createCard(card);
 
       try {
-        await compiler.compile(card);
+        await builder.getCompiledCard(card.url);
       } catch (err) {
         assert.ok(
           /@adopts argument must come from a module default export/.test(

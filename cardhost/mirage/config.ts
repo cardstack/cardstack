@@ -1,26 +1,68 @@
-import { Server } from 'miragejs/server';
-import { Compiler } from '@cardstack/core';
+import type { Request } from 'miragejs';
+import { Response } from 'miragejs';
+import type { Server } from 'miragejs/server';
+import type { Schema } from 'miragejs/orm/schema';
+
+import Builder from 'cardhost/lib/builder';
+import { RawCard } from '@cardstack/core/src/interfaces';
+import { compileTemplate } from 'cardhost/tests/helpers/template-compiler';
+import templateOnlyComponent from '@ember/component/template-only';
+import { setComponentTemplate } from '@ember/component';
 
 export default function (this: Server): void {
-  // These comments are here to help you get started. Feel free to delete them.
+  interface CardRequest extends Request {
+    queryParams: {
+      format?: 'isolated' | 'embedded';
+      type?: 'raw' | 'comiled';
+    };
+  }
 
-  /*
-    Config (with defaults).
+  function returnRawCard(schema: Schema, url: string): RawCard | Response {
+    let rawCard = schema.cards.find(url);
+    if (!rawCard) {
+      return new Response(404, {}, { error: `Not Found: No card for '${url}` });
+    }
+    return rawCard;
+  }
 
-    Note: these only affect routes defined *after* them!
-  */
+  this.get(
+    'http://mirage/cards/:id',
+    async function (schema, request: CardRequest) {
+      let { format, type } = request.queryParams;
+      let [url] = request.url.split('?');
 
-  // this.urlPrefix = 'http://mirage'; // make this `http://localhost:8080`, for example, if your API is on a different server
-  this.namespace = ''; // make this `/api`, for example, if your API is namespaced
-  // this.timing = 400;      // delay for each request, automatically set to 0 during testing
+      if (type == 'raw') {
+        return returnRawCard(schema, url);
+      }
 
-  this.get('http://mirage/cards/:id', async function (schema, request) {
-    let { id } = request.params;
-    let rawCard = schema.cards.find(`http://mirage/cards/${id}`);
-    let compiler = new Compiler();
-    let compiledCard = await compiler.compile(rawCard.attrs.raw);
-    return compiledCard;
-  });
+      let builder = new Builder();
+      let compiledCard = await builder.getCompiledCard(url);
+
+      if (!format) {
+        throw new Error(`format is required at the moment`);
+      }
+
+      let templateSource = compiledCard.templateSources[format];
+      let moduleId = `mirage/module${moduleCounter++}`;
+
+      (window as any).define(`@cardstack/compiled/${moduleId}`, function () {
+        return setComponentTemplate(
+          compileTemplate(templateSource),
+          templateOnlyComponent()
+        );
+      });
+
+      return {
+        data: {
+          id: url,
+          attributes: compiledCard.data,
+          meta: {
+            componentModule: moduleId,
+          },
+        },
+      };
+    }
+  );
 
   /*
     Shorthand cheatsheet:
@@ -34,3 +76,5 @@ export default function (this: Server): void {
     https://www.ember-cli-mirage.com/docs/route-handlers/shorthands
   */
 }
+
+let moduleCounter = 0;

@@ -41,3 +41,8 @@ export interface CompiledCard {
   };
   templateSources: typeof templateTypeNames;
 }
+
+export interface Builder {
+  getRawCard(url: string): Promise<RawCard>;
+  getCompiledCard(url: string): Promise<CompiledCard>;
+}

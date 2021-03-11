@@ -47,9 +47,11 @@ export function getMeta(
 } {
   let meta = metas.get(obj);
   if (!meta) {
-    throw new Error(
-      `tried to getMeta for something that was not passed as card-babel-plugin's options`
-    );
+    // throw new Error(
+    //   `tried to getMeta for something that was not passed as card-babel-plugin's options`
+    // );
+    // NOTE: Base cards, like string, don't have fields. Feels like it should not error
+    return { fields: {} };
   }
   return meta;
 }
