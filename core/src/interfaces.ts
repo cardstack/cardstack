@@ -15,21 +15,24 @@ export function templateFileName(templateType: TemplateType) {
   return `${templateType}.hbs` as `${TemplateType}.hbs`;
 }
 
+export type RawCardData = {
+  attributes?: { [name: string]: any };
+  relationships?: unknown;
+};
+
 export type RawCard = {
   url?: string;
   'schema.js': string;
 
   // TODO: unimplemented
-  'data.json'?: {
-    attributes: { [name: string]: any };
-    relationships: unknown;
-  };
+  'data.json'?: RawCardData;
 } & Partial<TemplateFiles>;
 
 export interface CompiledCard {
   url: string | undefined;
   adoptsFrom?: CompiledCard;
   modelSource: string;
+  data: any;
   fields: {
     [key: string]: {
       type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';

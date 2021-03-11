@@ -10,6 +10,7 @@ import cardGlimmerPlugin from './card-glimmer-plugin';
 import {
   CompiledCard,
   RawCard,
+  RawCardData,
   templateFileName,
   TemplateType,
   templateTypes,
@@ -25,6 +26,7 @@ const BASE_CARDS: Map<string, CompiledCard> = new Map([
       url: 'https://cardstack.com/base/models/string',
       modelSource: '',
       fields: {},
+      data: {},
       templateSources: {
         embedded: `{{this}}`,
         isolated: '',
@@ -37,6 +39,7 @@ const BASE_CARDS: Map<string, CompiledCard> = new Map([
       url: 'https://cardstack.com/base/models/date',
       modelSource: '',
       fields: {},
+      data: {},
       templateSources: {
         embedded: `<FormatDate @date={{this}} />`,
         isolated: '',
@@ -49,6 +52,7 @@ const BASE_CARDS: Map<string, CompiledCard> = new Map([
       url: 'https://localhost/base/models/comment',
       modelSource: '',
       fields: {},
+      data: {},
       templateSources: {
         embedded: `{{this}}`,
         isolated: '',
@@ -61,6 +65,7 @@ const BASE_CARDS: Map<string, CompiledCard> = new Map([
       url: 'https://localhost/base/models/tag',
       modelSource: '',
       fields: {},
+      data: {},
       templateSources: {
         embedded: `{{this}}`,
         isolated: '',
@@ -74,6 +79,7 @@ export class Compiler {
     let parentCard;
 
     let code = this.transformSchema(cardSource['schema.js'], options);
+    let data = this.getData(cardSource['data.json']);
     let meta = getMeta(options);
 
     if (meta.parent) {
@@ -105,6 +111,7 @@ export class Compiler {
       url: cardSource.url,
       modelSource: code,
       fields,
+      data,
       templateSources,
     };
     if (parentCard) {
@@ -128,6 +135,10 @@ export class Compiler {
     });
 
     return out!.code!;
+  }
+
+  getData(data: RawCardData | undefined): any {
+    return data?.attributes ?? {};
   }
 
   async lookupFieldsForCard(

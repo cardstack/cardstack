@@ -142,6 +142,31 @@ module('Integration | compiler-basics', function (hooks) {
     assert.equal(title.card.url, 'https://cardstack.com/base/models/string');
   });
 
+  module('data', function () {
+    test('it accepts data.json and returns the values', async function (assert) {
+      let card = {
+        'data.json': {
+          attributes: {
+            title: 'Hello World',
+          },
+        },
+        'schema.js': `
+          import { contains } from "@cardstack/types";
+          import string from "https://cardstack.com/base/models/string";
+
+          export default class Post {
+            @contains(string)
+            title;
+          }
+      `,
+      };
+
+      let compiler = new Compiler();
+      let compiled = await compiler.compile(card);
+      assert.deepEqual(compiled.data, { title: 'Hello World' });
+    });
+  });
+
   module('templates', function () {
     test('it inlines a simple field template', async function (assert) {
       let card = {
