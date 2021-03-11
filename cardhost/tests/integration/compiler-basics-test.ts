@@ -142,249 +142,10 @@ module('Integration | compiler-basics', function (hooks) {
     assert.equal(title.card.url, 'https://cardstack.com/base/models/string');
   });
 
-  test('field must be called', async function (assert) {
-    let card = {
-      'schema.js': `
-      import { contains } from "@cardstack/types";
-      function hi() {
-        return contains;
-      }
-      `,
-    };
-    let compiler = new Compiler();
-    assert.expect(1);
-    try {
-      await compiler.compile(card);
-    } catch (err) {
-      assert.ok(
-        /the @contains decorator must be called/.test(err.message),
-        err.message
-      );
-    }
-  });
-
-  test('field must be a decorator', async function (assert) {
-    let card = {
-      'schema.js': `
-      import { contains } from "@cardstack/types";
-      import string from "https://cardstack.com/base/models/string";
-
-      function hi() {
-        return contains(string);
-      }
-      `,
-    };
-    let compiler = new Compiler();
-    assert.expect(1);
-    try {
-      await compiler.compile(card);
-    } catch (err) {
-      assert.ok(
-        /the @contains decorator must be used as a decorator/.test(err.message),
-        err.message
-      );
-    }
-  });
-
-  test('field must be on a class property', async function (assert) {
-    let card = {
-      'schema.js': `
-      import { contains } from "@cardstack/types";
-      import string from "https://cardstack.com/base/models/string";
-
-      @contains(string)
-      class X {}
-      `,
-    };
-    let compiler = new Compiler();
-    assert.expect(1);
-    try {
-      await compiler.compile(card);
-    } catch (err) {
-      assert.ok(
-        /the @contains decorator can only go on class properties/.test(
-          err.message
-        ),
-        err.message
-      );
-    }
-  });
-
-  test('field must have static name', async function (assert) {
-    let card = {
-      'schema.js': `
-      import { contains } from "@cardstack/types";
-      import string from "https://cardstack.com/base/models/string";
-
-      let myFieldName = 'title';
-      class X {
-
-        @contains(string)
-        [myFieldName];
-      }
-      `,
-    };
-    let compiler = new Compiler();
-    assert.expect(1);
-    try {
-      await compiler.compile(card);
-    } catch (err) {
-      assert.ok(
-        /field names must not be dynamically computed/.test(err.message),
-        err.message
-      );
-    }
-  });
-
-  test('field cannot be weird type', async function (assert) {
-    let card = {
-      'schema.js': `
-      import { contains } from "@cardstack/types";
-      import string from "https://cardstack.com/base/models/string";
-
-      let myFieldName = 'title';
-      class X {
-
-        @contains(string)
-        123;
-      }
-      `,
-    };
-    let compiler = new Compiler();
-    assert.expect(1);
-    try {
-      await compiler.compile(card);
-    } catch (err) {
-      assert.ok(
-        /field names must be identifiers or string literals/.test(err.message),
-        err.message
-      );
-    }
-  });
-
-  test('field with wrong number of arguments', async function (assert) {
-    let card = {
-      'schema.js': `
-      import { contains } from "@cardstack/types";
-      import string from "https://cardstack.com/base/models/string";
-
-      class X {
-        @contains(string, 1)
-        title;
-      }
-      `,
-    };
-    let compiler = new Compiler();
-    assert.expect(1);
-    try {
-      await compiler.compile(card);
-    } catch (err) {
-      assert.ok(
-        /contains decorator accepts exactly one argument/.test(err.message),
-        err.message
-      );
-    }
-  });
-
-  test('hasMany with wrong number of arguments', async function (assert) {
-    let card = {
-      'schema.js': `
-      import { hasMany } from "@cardstack/types";
-      import string from "https://cardstack.com/base/models/string";
-
-      class X {
-        @hasMany(string, 1)
-        title;
-      }
-      `,
-    };
-    let compiler = new Compiler();
-    assert.expect(1);
-    try {
-      await compiler.compile(card);
-    } catch (err) {
-      assert.ok(
-        /@hasMany decorator accepts exactly one argument/.test(err.message),
-        err.message
-      );
-    }
-  });
-
-  test('field with wrong argument syntax', async function (assert) {
-    let card = {
-      'schema.js': `
-      import { contains } from "@cardstack/types";
-
-      class X {
-
-        @contains("string")
-        title;
-      }
-      `,
-    };
-    let compiler = new Compiler();
-    assert.expect(1);
-    try {
-      await compiler.compile(card);
-    } catch (err) {
-      assert.ok(
-        /@contains argument must be an identifier/.test(err.message),
-        err.message
-      );
-    }
-  });
-
-  test('field with undefined type', async function (assert) {
-    let card = {
-      'schema.js': `
-      import { contains } from "@cardstack/types";
-
-      class X {
-        @contains(string)
-        title;
-      }
-      `,
-    };
-    let compiler = new Compiler();
-    assert.expect(1);
-    try {
-      await compiler.compile(card);
-    } catch (err) {
-      assert.ok(
-        /@contains argument is not defined/.test(err.message),
-        err.message
-      );
-    }
-  });
-
-  test('field with card type that was not imported', async function (assert) {
-    let card = {
-      'schema.js': `
-      import { contains } from "@cardstack/types";
-      let string = 'string';
-      class X {
-        @contains(string)
-        title;
-      }
-      `,
-    };
-    let compiler = new Compiler();
-    assert.expect(1);
-    try {
-      await compiler.compile(card);
-    } catch (err) {
-      assert.ok(
-        /@contains argument must come from a module default export/.test(
-          err.message
-        ),
-        err.message
-      );
-    }
-  });
-
-  test('it inlines a simple field template', async function (assert) {
-    let card = {
-      'schema.js': `
+  module('templates', function () {
+    test('it inlines a simple field template', async function (assert) {
+      let card = {
+        'schema.js': `
         import { contains } from "@cardstack/types";
         import string from "https://cardstack.com/base/models/string";
 
@@ -393,17 +154,20 @@ module('Integration | compiler-basics', function (hooks) {
           title;
         }
     `,
-      'isolated.hbs': `<h1><this.title /></h1>`,
-    };
+        'isolated.hbs': `<h1><this.title /></h1>`,
+      };
 
-    let compiler = new Compiler();
-    let compiled = await compiler.compile(card);
-    assert.equal(compiled.templateSources.isolated, `<h1>{{this.title}}</h1>`);
-  });
+      let compiler = new Compiler();
+      let compiled = await compiler.compile(card);
+      assert.equal(
+        compiled.templateSources.isolated,
+        `<h1>{{this.title}}</h1>`
+      );
+    });
 
-  test('it inlines a compound field template', async function (assert) {
-    let card = {
-      'schema.js': `
+    test('it inlines a compound field template', async function (assert) {
+      let card = {
+        'schema.js': `
         import { contains } from "@cardstack/types";
         import person from "https://localhost/base/models/person";
 
@@ -412,14 +176,261 @@ module('Integration | compiler-basics', function (hooks) {
           author;
         }
     `,
-      'isolated.hbs': `<h1><this.author /></h1>`,
-    };
+        'isolated.hbs': `<h1><this.author /></h1>`,
+      };
 
-    let compiler = new Compiler();
-    let compiled = await compiler.compile(card);
-    assert.equal(
-      compiled.templateSources.isolated,
-      `<h1>{{this.author.name}} was born on <FormatDate @date={{this.author.birthdate}} /></h1>`
-    );
+      let compiler = new Compiler();
+      let compiled = await compiler.compile(card);
+      assert.equal(
+        compiled.templateSources.isolated,
+        `<h1>{{this.author.name}} was born on <FormatDate @date={{this.author.birthdate}} /></h1>`
+      );
+    });
+  });
+
+  module('errors', function () {
+    test('field must be called', async function (assert) {
+      let card = {
+        'schema.js': `
+    import { contains } from "@cardstack/types";
+    function hi() {
+      return contains;
+    }
+    `,
+      };
+      let compiler = new Compiler();
+      assert.expect(1);
+      try {
+        await compiler.compile(card);
+      } catch (err) {
+        assert.ok(
+          /the @contains decorator must be called/.test(err.message),
+          err.message
+        );
+      }
+    });
+
+    test('field must be a decorator', async function (assert) {
+      let card = {
+        'schema.js': `
+    import { contains } from "@cardstack/types";
+    import string from "https://cardstack.com/base/models/string";
+
+    function hi() {
+      return contains(string);
+    }
+    `,
+      };
+      let compiler = new Compiler();
+      assert.expect(1);
+      try {
+        await compiler.compile(card);
+      } catch (err) {
+        assert.ok(
+          /the @contains decorator must be used as a decorator/.test(
+            err.message
+          ),
+          err.message
+        );
+      }
+    });
+
+    test('field must be on a class property', async function (assert) {
+      let card = {
+        'schema.js': `
+    import { contains } from "@cardstack/types";
+    import string from "https://cardstack.com/base/models/string";
+
+    @contains(string)
+    class X {}
+    `,
+      };
+      let compiler = new Compiler();
+      assert.expect(1);
+      try {
+        await compiler.compile(card);
+      } catch (err) {
+        assert.ok(
+          /the @contains decorator can only go on class properties/.test(
+            err.message
+          ),
+          err.message
+        );
+      }
+    });
+
+    test('field must have static name', async function (assert) {
+      let card = {
+        'schema.js': `
+    import { contains } from "@cardstack/types";
+    import string from "https://cardstack.com/base/models/string";
+
+    let myFieldName = 'title';
+    class X {
+
+      @contains(string)
+      [myFieldName];
+    }
+    `,
+      };
+      let compiler = new Compiler();
+      assert.expect(1);
+      try {
+        await compiler.compile(card);
+      } catch (err) {
+        assert.ok(
+          /field names must not be dynamically computed/.test(err.message),
+          err.message
+        );
+      }
+    });
+
+    test('field cannot be weird type', async function (assert) {
+      let card = {
+        'schema.js': `
+    import { contains } from "@cardstack/types";
+    import string from "https://cardstack.com/base/models/string";
+
+    let myFieldName = 'title';
+    class X {
+
+      @contains(string)
+      123;
+    }
+    `,
+      };
+      let compiler = new Compiler();
+      assert.expect(1);
+      try {
+        await compiler.compile(card);
+      } catch (err) {
+        assert.ok(
+          /field names must be identifiers or string literals/.test(
+            err.message
+          ),
+          err.message
+        );
+      }
+    });
+
+    test('field with wrong number of arguments', async function (assert) {
+      let card = {
+        'schema.js': `
+    import { contains } from "@cardstack/types";
+    import string from "https://cardstack.com/base/models/string";
+
+    class X {
+      @contains(string, 1)
+      title;
+    }
+    `,
+      };
+      let compiler = new Compiler();
+      assert.expect(1);
+      try {
+        await compiler.compile(card);
+      } catch (err) {
+        assert.ok(
+          /contains decorator accepts exactly one argument/.test(err.message),
+          err.message
+        );
+      }
+    });
+
+    test('hasMany with wrong number of arguments', async function (assert) {
+      let card = {
+        'schema.js': `
+    import { hasMany } from "@cardstack/types";
+    import string from "https://cardstack.com/base/models/string";
+
+    class X {
+      @hasMany(string, 1)
+      title;
+    }
+    `,
+      };
+      let compiler = new Compiler();
+      assert.expect(1);
+      try {
+        await compiler.compile(card);
+      } catch (err) {
+        assert.ok(
+          /@hasMany decorator accepts exactly one argument/.test(err.message),
+          err.message
+        );
+      }
+    });
+
+    test('field with wrong argument syntax', async function (assert) {
+      let card = {
+        'schema.js': `
+    import { contains } from "@cardstack/types";
+
+    class X {
+
+      @contains("string")
+      title;
+    }
+    `,
+      };
+      let compiler = new Compiler();
+      assert.expect(1);
+      try {
+        await compiler.compile(card);
+      } catch (err) {
+        assert.ok(
+          /@contains argument must be an identifier/.test(err.message),
+          err.message
+        );
+      }
+    });
+
+    test('field with undefined type', async function (assert) {
+      let card = {
+        'schema.js': `
+    import { contains } from "@cardstack/types";
+
+    class X {
+      @contains(string)
+      title;
+    }
+    `,
+      };
+      let compiler = new Compiler();
+      assert.expect(1);
+      try {
+        await compiler.compile(card);
+      } catch (err) {
+        assert.ok(
+          /@contains argument is not defined/.test(err.message),
+          err.message
+        );
+      }
+    });
+
+    test('field with card type that was not imported', async function (assert) {
+      let card = {
+        'schema.js': `
+    import { contains } from "@cardstack/types";
+    let string = 'string';
+    class X {
+      @contains(string)
+      title;
+    }
+    `,
+      };
+      let compiler = new Compiler();
+      assert.expect(1);
+      try {
+        await compiler.compile(card);
+      } catch (err) {
+        assert.ok(
+          /@contains argument must come from a module default export/.test(
+            err.message
+          ),
+          err.message
+        );
+      }
+    });
   });
 });
