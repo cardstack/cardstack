@@ -117,6 +117,7 @@
     "@babel/types": "^7.12.13",
     "@embroider/compat": "^0.37.0",
     "@embroider/core": "^0.37.0",
+    "@embroider/macros": "^0.37.0",
     "@embroider/util": "^0.37.0",
     "@embroider/webpack": "^0.37.0",
     "@types/babel__traverse": "^7.11.0",

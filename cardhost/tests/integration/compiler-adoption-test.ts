@@ -30,7 +30,7 @@ module('Integration | compiler-adoption', function (hooks) {
           birthdate;
         }
       `,
-      'embedded.hbs': `<this.name/> was born on <this.birthdate/>`,
+      'embedded.hbs': `<@model.name/> was born on <@model.birthdate/>`,
     });
 
     parentCard = await builder.getCompiledCard('http://mirage/cards/person');
@@ -162,8 +162,8 @@ module('Integration | compiler-adoption', function (hooks) {
       let compiled = await builder.getCompiledCard(card.url);
       assert.equal(
         compiled.templateSources.embedded,
-        // `{{this.name}} was born on <FormatDate @date={{this.birthdate}} />`
-        `{{this.name}} was born on Date: {{this.birthdate}}`
+        // `{{@model.name}} was born on <FormatDate @date={{@model.birthdate}} />`
+        `{{@model.name}} was born on Date: {{@model.birthdate}}`
       );
     });
 
@@ -194,8 +194,8 @@ module('Integration | compiler-adoption', function (hooks) {
       let compiled = await builder.getCompiledCard(card.url);
       assert.equal(
         compiled.templateSources.embedded,
-        // `{{this.name}} was born on <FormatDate @date={{this.birthdate}} />`
-        `{{this.name}} was born on Date: {{this.birthdate}}`
+        // `{{@model.name}} was born on <FormatDate @date={{@model.birthdate}} />`
+        `{{@model.name}} was born on Date: {{@model.birthdate}}`
       );
     });
   });

@@ -24,7 +24,7 @@ export const BASE_CARDS: Map<string, RawCard> = new Map([
     {
       url: 'https://cardstack.com/base/models/string',
       'schema.js': `export default class String {}`,
-      'embedded.hbs': '{{this}}',
+      'embedded.hbs': '{{@model}}',
     },
   ],
   [
@@ -33,7 +33,7 @@ export const BASE_CARDS: Map<string, RawCard> = new Map([
       url: 'https://cardstack.com/base/models/date',
       'schema.js': `export default class Date {}`,
       // 'embedded.hbs': '<FormatDate @date={{this}}',
-      'embedded.hbs': 'Date: {{this}}',
+      'embedded.hbs': 'Date: {{@model}}',
     },
   ],
   [
@@ -41,7 +41,7 @@ export const BASE_CARDS: Map<string, RawCard> = new Map([
     {
       url: 'https://cardstack.com/base/models/comment',
       'schema.js': `export default class Comment {}`,
-      'embedded.hbs': '{{this}}',
+      'embedded.hbs': '{{@model}}',
     },
   ],
   [
@@ -49,7 +49,7 @@ export const BASE_CARDS: Map<string, RawCard> = new Map([
     {
       url: 'https://cardstack.com/base/models/tag',
       'schema.js': `export default class Tag {}`,
-      'embedded.hbs': '{{this}}',
+      'embedded.hbs': '{{@model}}',
     },
   ],
 ]);

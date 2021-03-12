@@ -35,7 +35,7 @@ module('Integration | compiler-basics', function (hooks) {
           birthdate;
         }
       `,
-      'embedded.hbs': `<this.name/> was born on <this.birthdate/>`,
+      'embedded.hbs': `<@model.name/> was born on <@model.birthdate/>`,
     });
   });
 
@@ -195,7 +195,7 @@ module('Integration | compiler-basics', function (hooks) {
           title;
         }
     `,
-        'isolated.hbs': `<h1><this.title /></h1>`,
+        'isolated.hbs': `<h1><@model.title /></h1>`,
       };
 
       this.createCard(card);
@@ -203,7 +203,7 @@ module('Integration | compiler-basics', function (hooks) {
       let compiled = await builder.getCompiledCard(card.url);
       assert.equal(
         compiled.templateSources.isolated,
-        `<h1>{{this.title}}</h1>`
+        `<h1>{{@model.title}}</h1>`
       );
     });
 
@@ -219,7 +219,7 @@ module('Integration | compiler-basics', function (hooks) {
           author;
         }
     `,
-        'isolated.hbs': `<h1><this.author /></h1>`,
+        'isolated.hbs': `<h1><@model.author /></h1>`,
       };
 
       this.createCard(card);
@@ -228,8 +228,8 @@ module('Integration | compiler-basics', function (hooks) {
       assert.equal(
         compiled.templateSources.isolated,
         // TODO: Have this base card include a unrelated component
-        // `<h1>{{this.author.name}} was born on <FormatDate @date={{this.author.birthdate}} /></h1>`
-        `<h1>{{this.author.name}} was born on Date: {{this.author.birthdate}}</h1>`
+        // `<h1>{{@model.author.name}} was born on <FormatDate @date={{@model.author.birthdate}} /></h1>`
+        `<h1>{{@model.author.name}} was born on Date: {{@model.author.birthdate}}</h1>`
       );
     });
   });
