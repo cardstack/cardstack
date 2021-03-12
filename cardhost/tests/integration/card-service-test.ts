@@ -27,41 +27,55 @@ module('Integration | card-service', function (hooks) {
   });
 
   module('hello world', function (hooks) {
+    let helloId = 'http://mirage/cards/hello';
+    let greenId = 'http://mirage/cards/green';
     hooks.beforeEach(function () {
       this.createCard({
-        url: 'http://mirage/cards/hello',
+        url: greenId,
+        'schema.js': `export default class Green {}`,
+        'embedded.hbs': `<span class="green">{{@model}}</span>`,
+      });
+
+      this.createCard({
+        url: helloId,
         'data.json': {
           attributes: {
             greeting: 'Hello World',
+            greenGreeting: 'it works',
           },
         },
         'schema.js': `
           import { contains } from "@cardstack/types";
           import string from "https://cardstack.com/base/models/string";
+          import green from "${greenId}"
+
           export default class Hello {
             @contains(string)
             greeting;
+
+            @contains(green)
+            greenGreeting;
           }
         `,
-        'isolated.hbs': `<h1>{{this.greeting}}</h1>`,
+        'isolated.hbs': `<h1><@model.greeting /></h1><h2><@model.greenGreeting /></h2>`,
       });
     });
 
     test(`load an isolated card's component`, async function (assert) {
-      let { component } = await cards.load(
-        'http://mirage/cards/hello',
-        'isolated'
-      );
+      let { component } = await cards.load(helloId, 'isolated');
       this.set('component', component);
-      await render(
-        hbs`{{#let (ensure-safe-component this.component) as |Component|}} <Component /> {{/let}}`
-      );
+      await render(hbs`<this.component />`);
       assert.dom('h1').containsText('Hello World');
+      assert.dom('h2 .green').containsText('it works');
     });
 
     test(`load an isolated card's model`, async function (assert) {
-      let { model } = await cards.load('http://mirage/cards/hello', 'isolated');
-      assert.deepEqual(model, { greeting: 'Hello World' });
+      let { model } = await cards.load(helloId, 'isolated');
+      assert.deepEqual(model, {
+        greeting: 'Hello World',
+        greenGreeting: 'it works',
+        id: helloId,
+      });
     });
   });
 });
