@@ -2,6 +2,8 @@
 
 const { Webpack } = require('@embroider/webpack');
 const EmberAddon = require('ember-cli/lib/broccoli/ember-addon');
+const concat = require('broccoli-concat');
+const path = require('path');
 
 // const { maybeEmbroider } = require('@embroider/test-setup');
 // return maybeEmbroider(app);
@@ -26,8 +28,17 @@ module.exports = function (defaults) {
     'ember-power-select': { theme: false },
   });
 
+  let dummyComponentStylesTree = concat(
+    path.join(__dirname, 'tests/dummy/app/components'),
+    {
+      inputFiles: ['**/*.css'],
+      outputFile: '/assets/dummy-components.css',
+      sourceMapConfig: { enabled: true },
+    }
+  );
+
   return require('@embroider/compat').compatBuild(app, Webpack, {
-    // extraPublicTrees: [extraTreeHere]
+    extraPublicTrees: [dummyComponentStylesTree],
     staticAddonTestSupportTrees: true,
     staticAddonTrees: true,
     // staticHelpers: true,
