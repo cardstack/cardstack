@@ -55,7 +55,7 @@
   color: var(--boxel-searchbox-text-color);
 }
 
-.boxel-searchbox__search-icon, .boxel-searchbox__clear-button {
+.boxel-searchbox__search-icon {
   /* absolutely position and vertically center these things, give them the same size */
   width: var(--boxel-searchbox-icon-size);
   height: var(--boxel-searchbox-icon-size);
@@ -67,16 +67,4 @@
 .boxel-searchbox__search-icon {
   --icon-color: var(--boxel-highlight);
   left: var(--boxel-sp-xs);
-}
-
-.boxel-searchbox__clear-button {
-  --icon-color: var(--boxel-light);
-  right: var(--boxel-sp-xs);
-
-  /* override button styles */
-  line-height: 0;
-  padding: 2px;
-  background: none;
-  border: none;
-  cursor: pointer;
 }

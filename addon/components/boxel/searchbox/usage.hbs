@@ -1,6 +1,6 @@
 <Freestyle::Usage @name="Searchbox">
   <:example>
-    <Boxel::Searchbox @id={{this.id}} @label={{this.label}} @placeholder={{this.placeholder}} @value={{this.value}} @onInput={{fn this.onInput}} @onChange={{fn this.onChange}} @onClear={{this.onClear}}/>
+    <Boxel::Searchbox @id={{this.id}} @label={{this.label}} @placeholder={{this.placeholder}} @value={{this.value}} @onInput={{fn this.onInput}} @onChange={{fn this.onChange}}/>
   </:example>
   <:api as |Args|>
     <Args.String
@@ -34,10 +34,6 @@
     <Args.Action 
       @name="onChange"
       @description="The action called when a user presses enter in the searchbox." 
-    />
-    <Args.Action
-      @name="onClear"
-      @description="The action called when a user presses the x button in the searchbox."
     />
   </:api>
 </Freestyle::Usage>

@@ -14,10 +14,4 @@
       disabled={{@disabled}}
       placeholder={{@placeholder}}
     />
-    {{!-- TODO: additionally, effect of disappearing and reappearing clear button on accessibility --}}
-    {{#if @value}}
-      <button class="boxel-searchbox__clear-button" {{on "click" (optional @onClear)}}>
-        {{svg-jar "close" width="100%" height="100%"}}
-      </button>
-    {{/if}}
 </div>

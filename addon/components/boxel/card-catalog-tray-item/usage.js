@@ -68,9 +68,5 @@ export default class CardCatalogTrayItemUsage extends Component {
   @action onSearchboxInput(e) {
     this.filter = e.target.value;
   }
-
-  @action onClearFilter() {
-    this.filter = '';
-  }
   /* tray example end */
 }

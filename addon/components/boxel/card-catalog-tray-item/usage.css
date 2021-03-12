@@ -1,7 +1,7 @@
 /* a dummy item to do drag and drop */
 .very-far-away {
   position: absolute;
-  top: -1000px;
+  left: -9999px;
 }
 
 /* card catalog tray usage */
