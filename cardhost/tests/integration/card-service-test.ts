@@ -2,11 +2,21 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
+import type Cards from 'cardhost/services/cards';
+import setupCardMocking from '../helpers/card-mocking';
+import { setupMirage } from 'ember-cli-mirage/test-support';
 
 module('Integration | card-service', function (hooks) {
   setupRenderingTest(hooks);
+  setupMirage(hooks);
+  setupCardMocking(hooks);
 
-  test('temp', async function (assert) {
+  let cards: Cards;
+  hooks.beforeEach(function () {
+    cards = this.owner.lookup('service:cards');
+  });
+
+  test('compiled-cards dynamic import example', async function (assert) {
     let target = 'hello';
     this.set('hello', (await import(`@cardstack/compiled/${target}`)).default);
 
@@ -14,9 +24,58 @@ module('Integration | card-service', function (hooks) {
       hbs`{{#let (ensure-safe-component this.hello) as |Hello|}} <Hello /> {{/let}}`
     );
     assert.dom(this.element).containsText('Hello world');
-    assert.ok(
-      false,
-      'replace this with a test that asserts about cards that came from the base-cards directory'
-    );
+  });
+
+  module('hello world', function (hooks) {
+    let helloId = 'http://mirage/cards/hello';
+    let greenId = 'http://mirage/cards/green';
+    hooks.beforeEach(function () {
+      this.createCard({
+        url: greenId,
+        'schema.js': `export default class Green {}`,
+        'embedded.hbs': `<span class="green">{{@model}}</span>`,
+      });
+
+      this.createCard({
+        url: helloId,
+        'data.json': {
+          attributes: {
+            greeting: 'Hello World',
+            greenGreeting: 'it works',
+          },
+        },
+        'schema.js': `
+          import { contains } from "@cardstack/types";
+          import string from "https://cardstack.com/base/models/string";
+          import green from "${greenId}"
+
+          export default class Hello {
+            @contains(string)
+            greeting;
+
+            @contains(green)
+            greenGreeting;
+          }
+        `,
+        'isolated.hbs': `<h1><@model.greeting /></h1><h2><@model.greenGreeting /></h2>`,
+      });
+    });
+
+    test(`load an isolated card's component`, async function (assert) {
+      let { component } = await cards.load(helloId, 'isolated');
+      this.set('component', component);
+      await render(hbs`<this.component />`);
+      assert.dom('h1').containsText('Hello World');
+      assert.dom('h2 .green').containsText('it works');
+    });
+
+    test(`load an isolated card's model`, async function (assert) {
+      let { model } = await cards.load(helloId, 'isolated');
+      assert.deepEqual(model, {
+        greeting: 'Hello World',
+        greenGreeting: 'it works',
+        id: helloId,
+      });
+    });
   });
 });

@@ -6,6 +6,8 @@ import {
 } from '@glimmer/syntax';
 import { CompiledCard } from './interfaces';
 
+const PREFIX = '@model.';
+
 export default function cardTransform(options: {
   fields: CompiledCard['fields'];
 }): ASTPluginBuilder {
@@ -14,8 +16,8 @@ export default function cardTransform(options: {
       name: 'card-glimmer-plugin',
       visitor: {
         ElementNode(node) {
-          if (node.tag.startsWith('this.')) {
-            let fieldName = node.tag.slice('this.'.length);
+          if (node.tag.startsWith(PREFIX)) {
+            let fieldName = node.tag.slice(PREFIX.length);
             let field = options.fields[fieldName];
             if (field) {
               let embeddedTemplate = field.card.templateSources.embedded;
@@ -41,9 +43,9 @@ function rewriteLocals(remapping: { this: string }): ASTPluginBuilder {
       name: 'card-glimmer-plugin-rewrite-locals',
       visitor: {
         PathExpression(node) {
-          if (node.head.type === 'ThisHead' && !rewritten.has(node)) {
+          if (node.head.type === 'AtHead' && !rewritten.has(node)) {
             let result = env.syntax.builders.path(
-              `this.${[remapping.this, ...node.tail].join('.')}`
+              `${PREFIX}${[remapping.this, ...node.tail].join('.')}`
             );
             rewritten.add(result);
             return result;

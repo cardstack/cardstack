@@ -15,15 +15,22 @@ export function templateFileName(templateType: TemplateType) {
   return `${templateType}.hbs` as `${TemplateType}.hbs`;
 }
 
+export type RawCardData = {
+  attributes?: { [name: string]: any };
+  relationships?: unknown;
+};
+
 export type RawCard = {
   url?: string;
   'schema.js': string;
+  'data.json'?: RawCardData;
 } & Partial<TemplateFiles>;
 
 export interface CompiledCard {
   url: string | undefined;
   adoptsFrom?: CompiledCard;
   modelSource: string;
+  data: any;
   fields: {
     [key: string]: {
       type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
@@ -31,4 +38,9 @@ export interface CompiledCard {
     };
   };
   templateSources: typeof templateTypeNames;
+}
+
+export interface Builder {
+  getRawCard(url: string): Promise<RawCard>;
+  getCompiledCard(url: string): Promise<CompiledCard>;
 }
