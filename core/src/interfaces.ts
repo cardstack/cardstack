@@ -15,17 +15,18 @@ export function templateFileName(templateType: TemplateType) {
   return `${templateType}.hbs` as `${TemplateType}.hbs`;
 }
 
+export type RawCard = {
+  url?: string;
+  files: {
+    'schema.js': string;
+    'data.json'?: RawCardData;
+  } & Partial<TemplateFiles>;
+};
+
 export type RawCardData = {
   attributes?: { [name: string]: any };
   relationships?: unknown;
 };
-
-export type RawCard = {
-  url?: string;
-  'schema.js': string;
-  'data.json'?: RawCardData;
-} & Partial<TemplateFiles>;
-
 export interface CompiledCard {
   url: string | undefined;
   adoptsFrom?: CompiledCard;

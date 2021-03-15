@@ -18,7 +18,8 @@ module('Integration | compiler-adoption', function (hooks) {
 
     this.createCard({
       url: 'http://mirage/cards/person',
-      'schema.js': `
+      files: {
+        'schema.js': `
         import { contains } from "@cardstack/types";
         import date from "https://cardstack.com/base/models/date";
         import string from "https://cardstack.com/base/models/string";
@@ -30,7 +31,8 @@ module('Integration | compiler-adoption', function (hooks) {
           birthdate;
         }
       `,
-      'embedded.hbs': `<@model.name/> was born on <@model.birthdate/>`,
+        'embedded.hbs': `<@model.name/> was born on <@model.birthdate/>`,
+      },
     });
 
     parentCard = await builder.getCompiledCard('http://mirage/cards/person');
@@ -40,12 +42,14 @@ module('Integration | compiler-adoption', function (hooks) {
     test('a blank card can adopt fields from a card', async function (assert) {
       let card = {
         url: 'http://mirage/cards/user',
-        'schema.js': `
+        files: {
+          'schema.js': `
           import { adopts } from "@cardstack/types";
           import Person from "http://mirage/cards/person";
 
           export default @adopts(Person) class User {}
       `,
+        },
       };
       this.createCard(card);
 
@@ -57,7 +61,8 @@ module('Integration | compiler-adoption', function (hooks) {
     test('A child card can add a field', async function (assert) {
       let card = {
         url: 'http://mirage/cards/user',
-        'schema.js': `
+        files: {
+          'schema.js': `
           import { adopts, contains } from "@cardstack/types";
           import Person from "http://mirage/cards/person";
           import string from "https://cardstack.com/base/models/string";
@@ -67,6 +72,7 @@ module('Integration | compiler-adoption', function (hooks) {
             username
           }
       `,
+        },
       };
       this.createCard(card);
 
@@ -81,7 +87,8 @@ module('Integration | compiler-adoption', function (hooks) {
     test('A child card can NOT overwrite an existing field', async function (assert) {
       let card = {
         url: 'http://mirage/cards/user',
-        'schema.js': `
+        files: {
+          'schema.js': `
           import { adopts, contains } from "@cardstack/types";
           import Person from "http://mirage/cards/person";
           import string from "https://cardstack.com/base/models/string";
@@ -91,6 +98,7 @@ module('Integration | compiler-adoption', function (hooks) {
             birthdate
           }
       `,
+        },
       };
 
       this.createCard(card);
@@ -108,7 +116,8 @@ module('Integration | compiler-adoption', function (hooks) {
     test('A child card can NOT overwrite an existing field, even from a grandparent', async function (assert) {
       this.createCard({
         url: 'http://mirage/cards/user',
-        'schema.js': `
+        files: {
+          'schema.js': `
           import { adopts, contains } from "@cardstack/types";
           import Person from "http://mirage/cards/person";
           import string from "https://cardstack.com/base/models/string";
@@ -117,11 +126,13 @@ module('Integration | compiler-adoption', function (hooks) {
             @contains(string)
             username
           }`,
+        },
       });
 
       let card = {
         url: 'http://mirage/cards/admin',
-        'schema.js': `
+        files: {
+          'schema.js': `
           import { adopts, contains } from "@cardstack/types";
           import User from "http://mirage/cards/user";
           import string from "https://cardstack.com/base/models/string";
@@ -131,6 +142,7 @@ module('Integration | compiler-adoption', function (hooks) {
             name
           }
       `,
+        },
       };
 
       this.createCard(card);
@@ -150,12 +162,14 @@ module('Integration | compiler-adoption', function (hooks) {
     test('a child card inherits a parent card template', async function (assert) {
       let card = {
         url: 'http://mirage/cards/user',
-        'schema.js': `
+        files: {
+          'schema.js': `
             import { adopts } from "@cardstack/types";
             import Person from "http://mirage/cards/person";
 
             export default @adopts(Person) class User {}
         `,
+        },
       };
       this.createCard(card);
 
@@ -170,7 +184,8 @@ module('Integration | compiler-adoption', function (hooks) {
     test('a child card inherits a grandparent card template, when it and parent do not have templates', async function (assert) {
       this.createCard({
         url: 'http://mirage/cards/user',
-        'schema.js': `
+        files: {
+          'schema.js': `
           import { adopts, contains } from "@cardstack/types";
           import Person from "http://mirage/cards/person";
           import string from "https://cardstack.com/base/models/string";
@@ -179,15 +194,18 @@ module('Integration | compiler-adoption', function (hooks) {
             @contains(string)
             username
           }`,
+        },
       });
       let card = {
         url: 'http://mirage/cards/admin',
-        'schema.js': `
+        files: {
+          'schema.js': `
             import { adopts } from "@cardstack/types";
             import User from "http://mirage/cards/user";
 
             export default @adopts(User) class Admin {}
         `,
+        },
       };
       this.createCard(card);
 
@@ -205,7 +223,8 @@ module('Integration | compiler-adoption', function (hooks) {
       assert.expect(1);
       let card = {
         url: 'http://mirage/cards/admin',
-        'schema.js': `
+        files: {
+          'schema.js': `
             import { adopts } from "@cardstack/types";
             import Person from "http://mirage/cards/person";
 
@@ -214,6 +233,7 @@ module('Integration | compiler-adoption', function (hooks) {
               user
             }
         `,
+        },
       };
 
       this.createCard(card);
@@ -231,12 +251,14 @@ module('Integration | compiler-adoption', function (hooks) {
       assert.expect(1);
       let card = {
         url: 'http://mirage/cards/admin',
-        'schema.js': `
+        files: {
+          'schema.js': `
             import { adopts } from "@cardstack/types";
             import Person from "http://mirage/cards/person";
 
             export default @adopts(Person, true) class Admin {}
         `,
+        },
       };
       this.createCard(card);
 
@@ -254,11 +276,13 @@ module('Integration | compiler-adoption', function (hooks) {
       assert.expect(1);
       let card = {
         url: 'http://mirage/cards/admin',
-        'schema.js': `
+        files: {
+          'schema.js': `
             import { adopts } from "@cardstack/types";
 
             export default @adopts('Person') class Admin {}
         `,
+        },
       };
       this.createCard(card);
 
@@ -276,11 +300,13 @@ module('Integration | compiler-adoption', function (hooks) {
       assert.expect(1);
       let card = {
         url: 'http://mirage/cards/admin',
-        'schema.js': `
+        files: {
+          'schema.js': `
             import { adopts } from "@cardstack/types";
 
             export default @adopts(Person) class Admin {}
         `,
+        },
       };
       this.createCard(card);
 
@@ -298,12 +324,14 @@ module('Integration | compiler-adoption', function (hooks) {
       assert.expect(1);
       let card = {
         url: 'http://mirage/cards/admin',
-        'schema.js': `
+        files: {
+          'schema.js': `
             import { adopts } from "@cardstack/types";
             const Person = 'person'
 
             export default @adopts(Person) class Admin {}
         `,
+        },
       };
       this.createCard(card);
 

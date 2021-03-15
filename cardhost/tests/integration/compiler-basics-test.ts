@@ -23,7 +23,8 @@ module('Integration | compiler-basics', function (hooks) {
 
     await this.createCard({
       url: 'https://mirage/cards/person',
-      'schema.js': `
+      files: {
+        'schema.js': `
         import { contains } from "@cardstack/types";
         import date from "https://cardstack.com/base/models/date";
         import string from "https://cardstack.com/base/models/string";
@@ -35,7 +36,8 @@ module('Integration | compiler-basics', function (hooks) {
           birthdate;
         }
       `,
-      'embedded.hbs': `<@model.name/> was born on <@model.birthdate/>`,
+        'embedded.hbs': `<@model.name/> was born on <@model.birthdate/>`,
+      },
     });
   });
 
@@ -58,7 +60,8 @@ module('Integration | compiler-basics', function (hooks) {
   test('it discovers the four kinds of fields', async function (assert) {
     let card = {
       url: 'http://mirage/cards/post',
-      'schema.js': `
+      files: {
+        'schema.js': `
         import { contains, belongsTo, containsMany, hasMany } from "@cardstack/types";
         import string from "https://cardstack.com/base/models/string";
         import comment from "https://cardstack.com/base/models/comment";
@@ -81,6 +84,7 @@ module('Integration | compiler-basics', function (hooks) {
           foo = 'bar'
         }
     `,
+      },
     };
     this.createCard(card);
 
@@ -96,7 +100,8 @@ module('Integration | compiler-basics', function (hooks) {
   test('it discovers a string literal field', async function (assert) {
     let card = {
       url: 'http://mirage/cards/post',
-      'schema.js': `
+      files: {
+        'schema.js': `
         import { contains } from "@cardstack/types";
         import string from "https://cardstack.com/base/models/string";
 
@@ -105,6 +110,7 @@ module('Integration | compiler-basics', function (hooks) {
           "title";
         }
     `,
+      },
     };
 
     this.createCard(card);
@@ -116,7 +122,8 @@ module('Integration | compiler-basics', function (hooks) {
   test('it discovers a field whose import comes before the field decorator', async function (assert) {
     let card = {
       url: 'http://mirage/cards/post',
-      'schema.js': `
+      files: {
+        'schema.js': `
         import string from "https://cardstack.com/base/models/string";
         import { contains } from "@cardstack/types";
 
@@ -125,6 +132,7 @@ module('Integration | compiler-basics', function (hooks) {
           "title";
         }
     `,
+      },
     };
 
     this.createCard(card);
@@ -136,7 +144,8 @@ module('Integration | compiler-basics', function (hooks) {
   test('it discovers the field type of contains', async function (assert) {
     let card = {
       url: 'http://mirage/cards/post',
-      'schema.js': `
+      files: {
+        'schema.js': `
         import { contains } from "@cardstack/types";
         import string from "https://cardstack.com/base/models/string";
 
@@ -145,6 +154,7 @@ module('Integration | compiler-basics', function (hooks) {
           title;
         }
     `,
+      },
     };
 
     this.createCard(card);
@@ -159,12 +169,13 @@ module('Integration | compiler-basics', function (hooks) {
     test('it accepts data.json and returns the values', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
-        'data.json': {
-          attributes: {
-            title: 'Hello World',
+        files: {
+          'data.json': {
+            attributes: {
+              title: 'Hello World',
+            },
           },
-        },
-        'schema.js': `
+          'schema.js': `
           import { contains } from "@cardstack/types";
           import string from "https://cardstack.com/base/models/string";
 
@@ -173,6 +184,7 @@ module('Integration | compiler-basics', function (hooks) {
             title;
           }
       `,
+        },
       };
 
       this.createCard(card);
@@ -186,7 +198,8 @@ module('Integration | compiler-basics', function (hooks) {
     test('it inlines a simple field template', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
-        'schema.js': `
+        files: {
+          'schema.js': `
         import { contains } from "@cardstack/types";
         import string from "https://cardstack.com/base/models/string";
 
@@ -195,7 +208,8 @@ module('Integration | compiler-basics', function (hooks) {
           title;
         }
     `,
-        'isolated.hbs': `<h1><@model.title /></h1>`,
+          'isolated.hbs': `<h1><@model.title /></h1>`,
+        },
       };
 
       this.createCard(card);
@@ -210,7 +224,8 @@ module('Integration | compiler-basics', function (hooks) {
     test('it inlines a compound field template', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
-        'schema.js': `
+        files: {
+          'schema.js': `
         import { contains } from "@cardstack/types";
         import person from "https://mirage/cards/person";
 
@@ -219,7 +234,8 @@ module('Integration | compiler-basics', function (hooks) {
           author;
         }
     `,
-        'isolated.hbs': `<h1><@model.author /></h1>`,
+          'isolated.hbs': `<h1><@model.author /></h1>`,
+        },
       };
 
       this.createCard(card);
@@ -238,12 +254,14 @@ module('Integration | compiler-basics', function (hooks) {
     test('field must be called', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
-        'schema.js': `
+        files: {
+          'schema.js': `
     import { contains } from "@cardstack/types";
     function hi() {
       return contains;
     }
     `,
+        },
       };
       this.createCard(card);
       assert.expect(1);
@@ -260,7 +278,8 @@ module('Integration | compiler-basics', function (hooks) {
     test('field must be a decorator', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
-        'schema.js': `
+        files: {
+          'schema.js': `
     import { contains } from "@cardstack/types";
     import string from "https://cardstack.com/base/models/string";
 
@@ -268,6 +287,7 @@ module('Integration | compiler-basics', function (hooks) {
       return contains(string);
     }
     `,
+        },
       };
       assert.expect(1);
       this.createCard(card);
@@ -286,13 +306,15 @@ module('Integration | compiler-basics', function (hooks) {
     test('field must be on a class property', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
-        'schema.js': `
+        files: {
+          'schema.js': `
     import { contains } from "@cardstack/types";
     import string from "https://cardstack.com/base/models/string";
 
     @contains(string)
     class X {}
     `,
+        },
       };
       assert.expect(1);
       try {
@@ -312,7 +334,8 @@ module('Integration | compiler-basics', function (hooks) {
     test('field must have static name', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
-        'schema.js': `
+        files: {
+          'schema.js': `
     import { contains } from "@cardstack/types";
     import string from "https://cardstack.com/base/models/string";
 
@@ -323,6 +346,7 @@ module('Integration | compiler-basics', function (hooks) {
       [myFieldName];
     }
     `,
+        },
       };
       assert.expect(1);
       try {
@@ -340,7 +364,8 @@ module('Integration | compiler-basics', function (hooks) {
     test('field cannot be weird type', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
-        'schema.js': `
+        files: {
+          'schema.js': `
     import { contains } from "@cardstack/types";
     import string from "https://cardstack.com/base/models/string";
 
@@ -351,6 +376,7 @@ module('Integration | compiler-basics', function (hooks) {
       123;
     }
     `,
+        },
       };
       assert.expect(1);
       try {
@@ -370,7 +396,8 @@ module('Integration | compiler-basics', function (hooks) {
     test('field with wrong number of arguments', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
-        'schema.js': `
+        files: {
+          'schema.js': `
     import { contains } from "@cardstack/types";
     import string from "https://cardstack.com/base/models/string";
 
@@ -379,6 +406,7 @@ module('Integration | compiler-basics', function (hooks) {
       title;
     }
     `,
+        },
       };
       assert.expect(1);
       try {
@@ -396,7 +424,8 @@ module('Integration | compiler-basics', function (hooks) {
     test('hasMany with wrong number of arguments', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
-        'schema.js': `
+        files: {
+          'schema.js': `
     import { hasMany } from "@cardstack/types";
     import string from "https://cardstack.com/base/models/string";
 
@@ -405,6 +434,7 @@ module('Integration | compiler-basics', function (hooks) {
       title;
     }
     `,
+        },
       };
       assert.expect(1);
       try {
@@ -422,7 +452,8 @@ module('Integration | compiler-basics', function (hooks) {
     test('field with wrong argument syntax', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
-        'schema.js': `
+        files: {
+          'schema.js': `
     import { contains } from "@cardstack/types";
 
     class X {
@@ -431,6 +462,7 @@ module('Integration | compiler-basics', function (hooks) {
       title;
     }
     `,
+        },
       };
       assert.expect(1);
       try {
@@ -448,7 +480,8 @@ module('Integration | compiler-basics', function (hooks) {
     test('field with undefined type', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
-        'schema.js': `
+        files: {
+          'schema.js': `
     import { contains } from "@cardstack/types";
 
     class X {
@@ -456,6 +489,7 @@ module('Integration | compiler-basics', function (hooks) {
       title;
     }
     `,
+        },
       };
       assert.expect(1);
       try {
@@ -473,14 +507,17 @@ module('Integration | compiler-basics', function (hooks) {
     test('field with card type that was not imported', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
-        'schema.js': `
+        files: {
+          'schema.js': `
     import { contains } from "@cardstack/types";
     let string = 'string';
     class X {
       @contains(string)
       title;
     }
+
     `,
+        },
       };
       assert.expect(1);
       try {
