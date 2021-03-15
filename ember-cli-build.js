@@ -45,6 +45,10 @@ module.exports = function (defaults) {
     // staticComponents: true,
     staticAppPaths: ['data'],
     packagerOptions: {
+      publicAssetURL:
+        process.env.DEPLOY_TARGET === 's3-preview'
+          ? process.env.S3_PREVIEW_ASSET_BUCKET_ENDPOINT + '/'
+          : undefined,
       webpackConfig: {
         module: {
           rules: [

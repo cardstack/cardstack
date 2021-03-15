@@ -1,0 +1,16 @@
+name: 'Branch PR comment'
+description: 'Send comment to PR with base master that is associated with branch'
+# vendored from Janealter/branch-pr-comment
+branding:
+  icon: 'message-circle'
+  color: 'purple'
+inputs:
+  message:
+    description: 'Comment message text'
+    required: true
+  branch:
+    description: 'Branch associated with PR'
+    required: true
+runs:
+  using: 'node12'
+  main: 'index.js'

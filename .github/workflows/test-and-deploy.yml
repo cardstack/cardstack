@@ -1,6 +1,10 @@
 name: Node CI/CD
 
-on: [push]
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
 
 env:
   NODE_VERSION: '12.x'
@@ -221,3 +225,47 @@ jobs:
         git config --global user.email "deploy@cardstack.com"
         git config --global user.name "Cardstack Deploy User"
         ./node_modules/.bin/ember deploy production --verbose
+  
+  deploy-preview:
+    name: Deploy a preview to S3
+    runs-on: ubuntu-latest
+    if: github.head_ref
+    needs: [try-scenarios, floating-dependencies]
+    env:
+      S3_PREVIEW_INDEX_BUCKET_NAME: boxel-preview.cardstack.com
+      S3_PREVIEW_ASSET_BUCKET_NAME: boxel-preview-assets.cardstack.com
+      S3_PREVIEW_WEBSITE_URL: http://boxel-preview.cardstack.com.s3-website-us-east-1.amazonaws.com
+      S3_PREVIEW_ASSET_BUCKET_ENDPOINT: https://s3.us-east-1.amazonaws.com/boxel-preview-assets.cardstack.com
+      S3_PREVIEW_REGION: us-east-1
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+    - name: Set up build cache (yarn)
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/yarn
+        key: ${{ runner.os }}-${{ hashFiles('/**/yarn.lock') }}-1
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: yarn install
+      run: yarn install
+    - name: Set PR branch name
+      shell: bash
+      run: echo "PR_BRANCH_NAME=${{github.head_ref}}" >> $GITHUB_ENV
+    - name: Deploy preview
+      run: ./node_modules/.bin/ember deploy s3-preview
+      env:
+        PREVIEW_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.PREVIEW_DEPLOY_AWS_ACCESS_KEY }}
+        PREVIEW_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.PREVIEW_DEPLOY_AWS_ACCESS_SECRET }}
+    - name: Comment on PR
+      if: always() && (github.event.action == 'opened' || github.event.action == 'reopened')
+      uses: ./.github/actions/pr-comment
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        message: "[Link to preview](${{ env.S3_PREVIEW_WEBSITE_URL }}/${{ env.PR_BRANCH_NAME }})"
+        branch: ${{ env.PR_BRANCH_NAME }}
+
