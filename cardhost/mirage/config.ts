@@ -13,7 +13,7 @@ export default function (this: Server): void {
   interface CardRequest extends Request {
     queryParams: {
       format?: 'isolated' | 'embedded';
-      type?: 'raw' | 'comiled';
+      type?: 'raw' | 'compiled';
     };
   }
 

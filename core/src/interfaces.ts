@@ -23,8 +23,6 @@ export type RawCardData = {
 export type RawCard = {
   url?: string;
   'schema.js': string;
-
-  // TODO: unimplemented
   'data.json'?: RawCardData;
 } & Partial<TemplateFiles>;
 
