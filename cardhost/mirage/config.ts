@@ -3,63 +3,44 @@ import type { Server } from 'miragejs/server';
 
 import Builder from 'cardhost/lib/builder';
 import { RawCard } from '@cardstack/core/src/interfaces';
-import { compileTemplate } from 'cardhost/tests/helpers/template-compiler';
-import templateOnlyComponent from '@ember/component/template-only';
-import { setComponentTemplate } from '@ember/component';
+import { getContext } from '@ember/test-helpers';
+import { Memoize } from 'typescript-memoize';
 
-export default function (this: Server): void {
-  function returnRawCard(schema: any, url: string): RawCard | Response {
-    let rawCard = schema.cards.find(url);
-    if (!rawCard) {
-      return new Response(404, {}, { error: `Not Found: No card for '${url}` });
+class FakeCardServer {
+  static cardServers = new WeakMap<object, FakeCardServer>();
+
+  static current(): FakeCardServer {
+    let testContext = getContext();
+    if (!testContext) {
+      throw new Error(`FakeCardServer only works in tests`);
     }
-    return rawCard;
+    let server = this.cardServers.get(testContext);
+    if (!server) {
+      server = new this();
+      this.cardServers.set(testContext, server);
+    }
+    return server;
   }
 
-  interface CardParams {
-    format?: 'isolated' | 'embedded';
-    type?: 'raw' | 'compiled';
+  @Memoize()
+  get builder(): Builder {
+    return new Builder();
   }
 
-  function cardParams(queryParams: Request['queryParams']): CardParams {
-    let { type, format } = queryParams;
-    if (type && !['raw', 'compiled'].includes(type)) {
-      throw new Error(`unsupported ?type=${type}`);
-    }
-    if (format && !['isolated', 'embedded'].includes(format)) {
-      throw new Error(`unsupported ?format=${format}`);
-    }
-    return queryParams;
-  }
-
-  async function returnCompiledCard(schema: any, request: Request) {
-    let { format, type } = cardParams(request.queryParams);
-    let [url] = request.url.split('?');
-    if (type == 'raw') {
-      return returnRawCard(schema, url);
-    }
-
-    let builder = new Builder();
-    let compiledCard = await builder.getCompiledCard(url);
-
-    if (!format) {
-      throw new Error(`format is required at the moment`);
-    }
-
-    let templateSource = compiledCard.templateSources[format];
+  async respondWithCard(url: string, format: 'embedded' | 'isolated') {
+    let {
+      model,
+      componentImplementation,
+    } = await FakeCardServer.current().builder.getBuiltCard(url, format);
     let moduleId = `mirage/module${moduleCounter++}`;
-
     (window as any).define(`@cardstack/compiled/${moduleId}`, function () {
-      return setComponentTemplate(
-        compileTemplate(templateSource),
-        templateOnlyComponent()
-      );
+      return componentImplementation;
     });
 
     return {
       data: {
         id: url,
-        attributes: compiledCard.data,
+        attributes: model,
         meta: {
           componentModule: moduleId,
         },
@@ -67,8 +48,87 @@ export default function (this: Server): void {
     };
   }
 
+  respondWithRawCard(schema: any, url: string): RawCard | Response {
+    let rawCard = schema.cards.find(url);
+    if (!rawCard) {
+      return new Response(404, {}, { error: `Not Found: No card for '${url}` });
+    }
+    return rawCard;
+  }
+}
+
+type CardParams =
+  | {
+      type: 'raw';
+    }
+  | {
+      format: 'isolated' | 'embedded';
+      type?: 'compiled';
+    };
+
+function cardParams(queryParams: Request['queryParams']): CardParams {
+  let { type, format } = queryParams;
+  if (type && !['raw', 'compiled'].includes(type)) {
+    throw new Error(`unsupported ?type=${type}`);
+  }
+  if (format && !['isolated', 'embedded'].includes(format)) {
+    throw new Error(`unsupported ?format=${format}`);
+  }
+  if (type === 'compiled' && !format) {
+    throw new Error(`format is required at the moment`);
+  }
+  return (queryParams as unknown) as CardParams;
+}
+
+async function returnCompiledCard(schema: any, request: Request) {
+  let cardServer = FakeCardServer.current();
+  let params = cardParams(request.queryParams);
+  let [url] = request.url.split('?');
+
+  if (params.type === 'raw') {
+    return cardServer.respondWithRawCard(schema, url);
+  }
+  return cardServer.respondWithCard(url, params.format);
+}
+
+export default function (this: Server): void {
   this.get('http://mirage/cards/:id', returnCompiledCard);
   this.get('http://cardstack.com/base/models/:id', returnCompiledCard);
+
+  this.post('/spaces');
+  this.patch('/spaces');
+
+  this.get('/spaces/home/:pathname', async function (schema: any, request) {
+    let { routingCard } = schema.spaces.find('home');
+    let cardServer = FakeCardServer.current();
+    if (!routingCard) {
+      return new Response(
+        404,
+        {},
+        { error: `Not Found: no routing card has been defined for this space` }
+      );
+    }
+    let compiled = await cardServer.builder.getCompiledCard(routingCard);
+    let output: any[] = [];
+    new Function(
+      'output',
+      compiled.modelSource.replace('export default', 'let def =') +
+        '\noutput.push(def)'
+    )(output);
+    let Klass = output[0];
+    let instance = new Klass();
+    let cardURL = instance.routeTo('/' + request.params.pathname);
+    if (!cardURL) {
+      return new Response(
+        404,
+        {},
+        {
+          error: `Not Found: routing card ${routingCard} returned 404 for ${request.params.pathname}`,
+        }
+      );
+    }
+    return cardServer.respondWithCard(cardURL, 'isolated');
+  });
 
   /*
     Shorthand cheatsheet:
