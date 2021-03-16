@@ -17,50 +17,6 @@ import {
 } from './interfaces';
 
 import intersection from 'lodash/intersection';
-
-export const BASE_CARDS: Map<string, RawCard> = new Map([
-  [
-    'https://cardstack.com/base/models/string',
-    {
-      url: 'https://cardstack.com/base/models/string',
-      files: {
-        'schema.js': `export default class String {}`,
-        'embedded.hbs': '{{@model}}',
-      },
-    },
-  ],
-  [
-    'https://cardstack.com/base/models/date',
-    {
-      url: 'https://cardstack.com/base/models/date',
-      files: {
-        'schema.js': `export default class Date {}`,
-        // 'embedded.hbs': '<FormatDate @date={{this}}',
-        'embedded.hbs': 'Date: {{@model}}',
-      },
-    },
-  ],
-  [
-    'https://cardstack.com/base/models/comment',
-    {
-      url: 'https://cardstack.com/base/models/comment',
-      files: {
-        'schema.js': `export default class Comment {}`,
-        'embedded.hbs': '{{@model}}',
-      },
-    },
-  ],
-  [
-    'https://cardstack.com/base/models/tag',
-    {
-      url: 'https://cardstack.com/base/models/tag',
-      files: {
-        'schema.js': `export default class Tag {}`,
-        'embedded.hbs': '{{@model}}',
-      },
-    },
-  ],
-]);
 export class Compiler {
   lookup: (cardURL: string) => Promise<CompiledCard>;
 

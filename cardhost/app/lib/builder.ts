@@ -3,7 +3,7 @@ import type {
   RawCard,
   CompiledCard,
 } from '@cardstack/core/src/interfaces';
-import { Compiler, BASE_CARDS } from '@cardstack/core/src/compiler';
+import { Compiler } from '@cardstack/core/src/compiler';
 
 export default class Builder implements BuilderInterface {
   private compiler = new Compiler({
@@ -17,11 +17,6 @@ export default class Builder implements BuilderInterface {
   }
 
   async getRawCard(url: string): Promise<RawCard> {
-    let rawCard = BASE_CARDS.get(url);
-    if (rawCard) {
-      return rawCard;
-    }
-
     let response = await fetch(`${url}?type=raw`);
     if (!response || response.status === 404) {
       throw Error(`Card Builder: No raw card found for ${url}`);

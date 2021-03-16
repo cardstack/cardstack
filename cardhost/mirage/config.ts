@@ -32,7 +32,7 @@ export default function (this: Server): void {
     return queryParams;
   }
 
-  this.get('http://mirage/cards/:id', async function (schema, request) {
+  async function returnCompiledCard(schema: any, request: Request) {
     let { format, type } = cardParams(request.queryParams);
     let [url] = request.url.split('?');
     if (type == 'raw') {
@@ -65,7 +65,10 @@ export default function (this: Server): void {
         },
       },
     };
-  });
+  }
+
+  this.get('http://mirage/cards/:id', returnCompiledCard);
+  this.get('http://cardstack.com/base/models/:id', returnCompiledCard);
 
   /*
     Shorthand cheatsheet:

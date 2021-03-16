@@ -25,17 +25,16 @@ module('Integration | compiler-basics', function (hooks) {
       url: 'https://mirage/cards/person',
       files: {
         'schema.js': `
-        import { contains } from "@cardstack/types";
-        import date from "https://cardstack.com/base/models/date";
-        import string from "https://cardstack.com/base/models/string";
-        export default class Person {
-          @contains(string)
-          name;
+          import { contains } from "@cardstack/types";
+          import date from "https://cardstack.com/base/models/date";
+          import string from "https://cardstack.com/base/models/string";
+          export default class Person {
+            @contains(string)
+            name;
 
-          @contains(date)
-          birthdate;
-        }
-      `,
+            @contains(date)
+            birthdate;
+          }`,
         'embedded.hbs': `<@model.name/> was born on <@model.birthdate/>`,
       },
     });
@@ -62,28 +61,27 @@ module('Integration | compiler-basics', function (hooks) {
       url: 'http://mirage/cards/post',
       files: {
         'schema.js': `
-        import { contains, belongsTo, containsMany, hasMany } from "@cardstack/types";
-        import string from "https://cardstack.com/base/models/string";
-        import comment from "https://cardstack.com/base/models/comment";
-        import tag from "https://cardstack.com/base/models/tag";
-        import person from "https://mirage/cards/person";
+          import { contains, belongsTo, containsMany, hasMany } from "@cardstack/types";
+          import string from "https://cardstack.com/base/models/string";
+          import comment from "https://cardstack.com/base/models/comment";
+          import tag from "https://cardstack.com/base/models/tag";
+          import person from "https://mirage/cards/person";
 
-        export default class Post {
-          @contains(string)
-          title;
+          export default class Post {
+            @contains(string)
+            title;
 
-          @containsMany(tag)
-          tags;
+            @containsMany(tag)
+            tags;
 
-          @belongsTo(person)
-          author;
+            @belongsTo(person)
+            author;
 
-          @hasMany(comment)
-          comments;
+            @hasMany(comment)
+            comments;
 
-          foo = 'bar'
-        }
-    `,
+            foo = 'bar'
+          }`,
       },
     };
     this.createCard(card);
@@ -108,8 +106,7 @@ module('Integration | compiler-basics', function (hooks) {
         export default class Post {
           @contains(string)
           "title";
-        }
-    `,
+        }`,
       },
     };
 
@@ -130,8 +127,7 @@ module('Integration | compiler-basics', function (hooks) {
         export default class Post {
           @contains(string)
           "title";
-        }
-    `,
+        }`,
       },
     };
 
@@ -152,8 +148,7 @@ module('Integration | compiler-basics', function (hooks) {
         export default class Post {
           @contains(string)
           title;
-        }
-    `,
+        }`,
       },
     };
 
@@ -182,8 +177,7 @@ module('Integration | compiler-basics', function (hooks) {
           export default class Post {
             @contains(string)
             title;
-          }
-      `,
+          }`,
         },
       };
 
