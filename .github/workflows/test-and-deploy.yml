@@ -234,7 +234,6 @@ jobs:
     env:
       S3_PREVIEW_INDEX_BUCKET_NAME: boxel-preview.cardstack.com
       S3_PREVIEW_ASSET_BUCKET_NAME: boxel-preview-assets.cardstack.com
-      S3_PREVIEW_WEBSITE_URL: http://boxel-preview.cardstack.com.s3-website-us-east-1.amazonaws.com
       S3_PREVIEW_ASSET_BUCKET_ENDPOINT: https://s3.us-east-1.amazonaws.com/boxel-preview-assets.cardstack.com
       S3_PREVIEW_REGION: us-east-1
     steps:
@@ -260,12 +259,27 @@ jobs:
       env:
         PREVIEW_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.PREVIEW_DEPLOY_AWS_ACCESS_KEY }}
         PREVIEW_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.PREVIEW_DEPLOY_AWS_ACCESS_SECRET }}
-    - name: Comment on PR
-      if: always() && (github.event.action == 'opened' || github.event.action == 'reopened')
-      uses: ./.github/actions/pr-comment
+
+  comment-on-pr:
+    name: Comment on PR
+    runs-on: ubuntu-latest
+    if: always() && github.head_ref && (github.event.action == 'opened' || github.event.action == 'reopened')
+    needs: [deploy-preview]
+    env:
+      S3_PREVIEW_WEBSITE_URL: http://boxel-preview.cardstack.com.s3-website-us-east-1.amazonaws.com
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+    - uses: actions/setup-node@v2-beta
+      with:
+        node-version: '${{ env.NODE_VERSION }}'
+    - name: Install dependencies
+      run: yarn install
+    - uses: ./.github/actions/pr-comment
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        message: "[Link to preview](${{ env.S3_PREVIEW_WEBSITE_URL }}/${{ env.PR_BRANCH_NAME }})"
-        branch: ${{ env.PR_BRANCH_NAME }}
+        message: "[Link to preview](${{ env.S3_PREVIEW_WEBSITE_URL }}/${{ github.head_ref }})"
+        branch: ${{ github.head_ref }}
 
