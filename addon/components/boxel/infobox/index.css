@@ -1,0 +1,61 @@
+.boxel-infobox {
+  --boxel-infobox-text-width: calc(21.25rem + var(--boxel-sp-xxl) + var(--boxel-sp-xxl));
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+
+  max-height: 100%;
+  height: 12.5rem;
+  min-width: var(--boxel-infobox-text-width);
+
+  border-radius: var(--boxel-border-radius);
+  background: var(--boxel-navy);
+  background-image: var(--boxel-infobox-image);
+  background-repeat: no-repeat;
+  background-position: var(--boxel-infobox-image-position);
+  background-size: var(--boxel-infobox-image-size);
+}
+
+.boxel-infobox__text-container {
+  width: var(--boxel-infobox-text-width);;
+  min-width: var(--boxel-infobox-text-width);;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: var(--boxel-sp-xl) var(--boxel-sp-xxl);
+  border-radius: var(--boxel-border-radius);
+  background: linear-gradient(90deg, rgba(40,30,120,1) 0%, rgba(40,30,120,0.9) 75%, rgba(40,30,120,0.8) 86%, rgba(40,30,120,0) 100%);
+}
+
+.boxel-infobox__title {
+  flex-shrink: 0;
+  font: 600 var(--boxel-font-lg);
+  letter-spacing: var(--boxel-lsp-sm);
+  color: var(--boxel-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.boxel-infobox__description {
+  margin-top: var(--boxel-sp-sm);
+  margin-bottom: 0;
+  font: var(--boxel-font);
+  letter-spacing: var(--boxel-lsp);
+  color: var(--boxel-light-600);
+}
+
+.boxel-infobox__close-button {
+  --close-button-size: 0.5rem;
+  position: absolute;
+  padding: 0;
+  background: transparent;
+  border: none;
+  height: var(--close-button-size);
+  width: var(--close-button-size);
+  line-height: 0;
+  top: var(--boxel-sp);
+  right: var(--boxel-sp);
+  cursor: pointer;
+  --icon-color: var(--boxel-light);
+}
