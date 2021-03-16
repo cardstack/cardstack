@@ -1,5 +1,4 @@
 .boxel-left-edge-nav {
-  position: fixed;
   display: grid;
   grid-template-rows: auto 1fr;
   align-items: center;

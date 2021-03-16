@@ -1,0 +1,18 @@
+<Boxel::Dashboard
+  {{did-insert (fn this.updateEdges)}}
+  @darkTheme={{true}}
+  data-test-card-space-dashboard
+>
+  <:header>
+    <Boxel::OrgHeader @title="Card Space" />
+  </:header>
+  <:body>
+    <Boxel::Button
+      @kind="primary"
+      {{on "click" this.transitionToSpace}}
+      data-test-card-space-create-button
+    >
+      Create Space
+    </Boxel::Button>
+  </:body>
+</Boxel::Dashboard>

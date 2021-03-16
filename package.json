@@ -108,6 +108,7 @@
     "ember-source": "3.24.1",
     "ember-source-channel-url": "^3.0.0",
     "ember-template-lint": "^2.15.0",
+    "ember-toolbars": "^0.6.0",
     "ember-try": "^1.4.0",
     "eslint": "^7.20.0",
     "eslint-config-prettier": "^7.1.0",

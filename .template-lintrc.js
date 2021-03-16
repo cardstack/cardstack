@@ -5,7 +5,7 @@ module.exports = {
 
   rules: {
     'no-curly-component-invocation': {
-      allow: ['animated-orphans', 'percent-complete'],
+      allow: ['animated-orphans', 'percent-complete', 'in-left-toolbar'],
     },
     'no-implicit-this': { allow: ['animated-orphans', 'noop'] },
     'require-button-type': false,

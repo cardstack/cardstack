@@ -1,0 +1,26 @@
+<ToolbarManager
+  @topLeftCornerBelongsTo="left"
+  @bottomLeftCornerBelongsTo="left"
+>
+  {{outlet}}
+</ToolbarManager>
+
+{{#unless this.edges.disableEdges}}
+  {{#unless this.cardstackSession.isAuthenticated}}
+    <Boxel::Button
+      class="cardstack__login-button"
+      @kind={{if this.edges.darkTheme "secondary-dark" "secondary-light"}}
+      {{on "click" this.cardstackSession.login}}
+      data-test-cardstack-login-button
+    >
+      Connect Account
+    </Boxel::Button>
+  {{/unless}}
+
+  {{#if (or this.edges.displayLeftEdge this.cardstackSession.isAuthenticated)}}
+    {{in-left-toolbar show=(
+      component "card-host/left-edge-nav"
+      home=(hash icon="cardstack-logo" action=this.transitionHome width="33px" height="35px")
+    )}}
+  {{/if}}
+{{/unless}}

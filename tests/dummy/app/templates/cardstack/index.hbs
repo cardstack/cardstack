@@ -1,0 +1,30 @@
+<Boxel::Dashboard
+  {{did-insert (fn this.updateEdges)}}
+  @darkTheme={{true}}
+  data-test-cardstack-dashboard
+>
+  <:header>
+    <Boxel::OrgHeader @title="Cardstack" data-test-cardstack-dashboard-header />
+  </:header>
+  <:body>
+    <section>
+      <h2>Join an Org</h2>
+      <ul>
+        {{#each @model.orgs as |org|}}
+          <li>
+            {{#if org.url}}
+              <LinkTo
+                @route={{org.url}}
+                data-test-cardstack-dashboard-link={{org.id}}
+              >
+                {{org.title}}
+              </LinkTo>
+            {{else}}
+              {{org.title}}
+            {{/if}}
+          </li>
+        {{/each}}
+      </ul>
+    </section>
+  </:body>
+</Boxel::Dashboard>

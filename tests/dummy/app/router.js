@@ -12,6 +12,14 @@ Router.map(function () {
   this.route('docs', function () {});
   this.route('wave-player');
   this.route('scenarios', function () {
+    this.route('cardstack', { resetNamespace: true }, function () {
+      this.route('card-space', function () {
+        this.route('new');
+      });
+      this.route('card-pay', function () {
+        this.route('workflow', { path: '/:workflowId' });
+      });
+    });
     this.route(
       'media-registry',
       { path: '/media-registry/:orgId', resetNamespace: true },
@@ -54,9 +62,6 @@ Router.map(function () {
           this.route('tasks');
         });
       });
-    });
-    this.route('card-pay', { resetNamespace: true }, function () {
-      this.route('workflow', { path: '/:workflowId' });
     });
   });
 });

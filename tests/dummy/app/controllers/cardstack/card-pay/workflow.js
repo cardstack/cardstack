@@ -4,6 +4,6 @@ import { action } from '@ember/object';
 export default class CardPayWorkflowController extends Controller {
   @action
   transitionToDashboard() {
-    this.transitionToRoute('card-pay');
+    this.transitionToRoute('cardstack.card-pay');
   }
 }

@@ -1,0 +1,11 @@
+<div class={{cn
+    "card-space-new"
+    card-space-new--logged-in=this.cardstackSession.isAuthenticated
+  }}
+  {{did-insert (fn this.updateEdges)}}
+  data-test-card-space-new
+  ...attributes
+>
+  <Boxel::LayoutContainer data-test-card-space-layout-container>
+  </Boxel::LayoutContainer>
+</div>

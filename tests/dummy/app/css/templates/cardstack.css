@@ -1,0 +1,5 @@
+.cardstack__login-button {
+  position: fixed;
+  top: var(--boxel-sp);
+  right: var(--boxel-sp);
+}

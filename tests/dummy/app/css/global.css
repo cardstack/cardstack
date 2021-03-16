@@ -94,3 +94,9 @@ ul {
   padding-left: 2em;
   list-style-type: circle;
 }
+
+
+/* for ember-toolbars */
+.ember-toolbars {
+  height: 100%;
+}

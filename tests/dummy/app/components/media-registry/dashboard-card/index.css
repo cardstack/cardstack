@@ -1,9 +1,18 @@
+.media-registry {
+  --boxel-dashboard-header-background-color: var(--boxel-dark);
+  --boxel-dashboard-header-color: var(--boxel-light);
+}
+
 /* Left-edge and queue */
 .media-registry__left-edge {
-  grid-row: 1 / 3;
+  position: fixed;
+  top: 0;
+  left: 0;
+  grid-row: 1 / -1;
   grid-column: 1;
   z-index: 15;
   width: 80px;
+  height: 100%;
   transition: width var(--boxel-transition);
 }
 

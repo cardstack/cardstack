@@ -1,7 +1,6 @@
 import Route from '@ember/routing/route';
 import ORGS from 'dummy/data/organizations';
 
-import 'dummy/css/templates/media-registry.css';
 import 'dummy/css/templates/media-registry/master-collection.css';
 import 'dummy/css/templates/media-registry/collection.css';
 import 'dummy/css/templates/media-registry/item.css';

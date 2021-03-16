@@ -1,4 +1,4 @@
 .card-pay-dashboard {
-  --boxel-dashboard-background-color: var(--boxel-purple-600);
-  --boxel-dashboard-color: var(--boxel-light);
+  --boxel-dashboard-header-background-color: var(--boxel-dark);
+  --boxel-dashboard-header-color: var(--boxel-light);
 }

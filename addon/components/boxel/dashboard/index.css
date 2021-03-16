@@ -1,9 +1,11 @@
 .boxel-dashboard {
-  --boxel-dashboard-background-color: var(--boxel-light-100);
-  --boxel-dashboard-color: var(--boxel-dark);
-  --boxel-dashboard-header-background-color: var(--boxel-dark);
-  --boxel-dashboard-header-color: var(--boxel-light);
+  --boxel-dashboard-background-color: inherit;
+  --boxel-dashboard-color: inherit;
+  --boxel-dashboard-header-background-color: inherit;
+  --boxel-dashboard-header-color: inherit;
+  --boxel-dashboard-left-edge-width: 5rem; /* 80px */
 
+  position: relative;
   display: grid;
   grid-template-rows: auto 1fr;
   height: 100%;
@@ -11,6 +13,7 @@
   color: var(--boxel-dashboard-color);
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp-lg);
+  z-index: 0;
 }
 
 .boxel-dashboard__sticky-header-container {
@@ -33,4 +36,12 @@
 .boxel-dashboard__left-edge-container {
   grid-row: 1 / -1;
   grid-column: 1;
+  min-width: var(--boxel-dashboard-left-edge-width);
+}
+
+
+/* Dark Theme */
+.boxel-dashboard--dark-theme {
+  --boxel-dashboard-background-color: var(--boxel-purple-600);
+  --boxel-dashboard-color: var(--boxel-light);
 }

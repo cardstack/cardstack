@@ -25,6 +25,27 @@
         Content
       </:body>
     </Boxel::Dashboard>
+    <br>
+    <Boxel::Dashboard
+      @displayLeftEdge={{this.displayLeftEdge}}
+      @darkTheme={{true}}
+    >
+      <:left-edge>
+        <CardHost::LeftEdgeNav
+          @home={{hash icon="cardstack" height="2rem"}}
+          class="dashboard-usage-left-edge-nav"
+        >
+        </CardHost::LeftEdgeNav>
+      </:left-edge>
+
+      <:header>
+        <Boxel::OrgHeader @title="Cardstack" />
+      </:header>
+
+      <:body>
+        Content
+      </:body>
+    </Boxel::Dashboard>
   </:example>
   <:api as |Args|>
     <Args.Bool
@@ -34,31 +55,36 @@
       @value={{this.displayLeftEdge}}
       @onInput={{fn (mut this.displayLeftEdge)}}
     />
+    <Args.Bool
+      @name="darkTheme"
+      @description="dark-themed version"
+      @defaultValue="false"
+    />
     <Args.String
       @name="--boxel-dashboard-background-color"
       @description="background-color CSS style"
-      @defaultValue="var(--boxel-light-100);"
+      @defaultValue="inherit"
       @value={{this.backgroundColor}}
       @onInput={{fn (mut this.backgroundColor)}}
     />
     <Args.String
       @name="--boxel-dashboard-color"
       @description="color CSS style"
-      @defaultValue="var(--boxel-dark)"
+      @defaultValue="inherit"
       @value={{this.color}}
       @onInput={{fn (mut this.color)}}
     />
     <Args.String
       @name="--boxel-dashboard-header-background-color"
       @description="background-color CSS style for the header container"
-      @defaultValue="var(--boxel-dark);"
+      @defaultValue="inherit"
       @value={{this.headerBackgroundColor}}
       @onInput={{fn (mut this.headerBackgroundColor)}}
     />
     <Args.String
       @name="--boxel-dashboard-header-color"
       @description="color CSS style for the header container"
-      @defaultValue="var(--boxel-light)"
+      @defaultValue="inherit"
       @value={{this.headerColor}}
       @onInput={{fn (mut this.headerColor)}}
     />
