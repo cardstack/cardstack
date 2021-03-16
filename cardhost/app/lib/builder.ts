@@ -4,6 +4,9 @@ import type {
   CompiledCard,
 } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
+import { compileTemplate } from 'cardhost/tests/helpers/template-compiler';
+import templateOnlyComponent from '@ember/component/template-only';
+import { setComponentTemplate } from '@ember/component';
 
 export default class Builder implements BuilderInterface {
   private compiler = new Compiler({
@@ -37,5 +40,22 @@ export default class Builder implements BuilderInterface {
     compiledCard = await this.compiler.compile(rawCard);
     this.cache.set(url, compiledCard);
     return compiledCard;
+  }
+
+  // the component that comes out of here is the actual card-author-provided
+  // component, ready to run in the browser. That is different from what gets
+  // returned by the cards service, which encapsulates both the component
+  // implementation and the data to give you a single thing you can render.
+  async getBuiltCard(
+    url: string,
+    format: 'isolated' | 'embedded'
+  ): Promise<{ model: any; componentImplementation: unknown }> {
+    let compiledCard = await this.getCompiledCard(url);
+    let templateSource = compiledCard.templateSources[format];
+    let componentImplementation = setComponentTemplate(
+      compileTemplate(templateSource),
+      templateOnlyComponent()
+    );
+    return { model: compiledCard.data, componentImplementation };
   }
 }

@@ -2650,13 +2650,6 @@
   dependencies:
     "@types/node" "*"
 
-"@types/fs-extra@^9.0.8":
-  version "9.0.8"
-  resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-9.0.8.tgz#32c3c07ddf8caa5020f84b5f65a48470519f78ba"
-  integrity sha512-bnlTVTwq03Na7DpWxFJ1dvnORob+Otb8xHyUqUWhqvz/Ksg8+JXPlR52oeMSZ37YEOa5PyccbgUNutiQdi13TA==
-  dependencies:
-    "@types/node" "*"
-
 "@types/glob@*", "@types/glob@^7.1.1":
   version "7.1.3"
   resolved "https://registry.yarnpkg.com/@types/glob/-/glob-7.1.3.tgz#e6ba80f36b7daad2c685acd9266382e68985c183"
@@ -8137,16 +8130,6 @@ fs-extra@^9.0.1:
     jsonfile "^6.0.1"
     universalify "^1.0.0"
 
-fs-extra@^9.1.0:
-  version "9.1.0"
-  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-9.1.0.tgz#5954460c764a8da2094ba3554bf839e6b9a7c86d"
-  integrity sha512-hcg3ZmepS30/7BSFqRvoo3DOMQu7IjqxO5nCDt+zM9XWjb33Wg7ziNT+Qvqbuc3+gWpzO02JubVyk2G4Zvo1OQ==
-  dependencies:
-    at-least-node "^1.0.0"
-    graceful-fs "^4.2.0"
-    jsonfile "^6.0.1"
-    universalify "^2.0.0"
-
 fs-merger@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/fs-merger/-/fs-merger-3.1.0.tgz#f30f74f6c70b2ff7333ec074f3d2f22298152f3b"
@@ -13369,6 +13352,11 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
+
+typescript-memoize@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/typescript-memoize/-/typescript-memoize-1.0.0.tgz#ad3b0e7e5a411ca234be123f913a2a31302b7eb6"
+  integrity sha512-B1eufjs/mGzHqoGeI1VT/dnSBoZr2v3i3/Wm8NmdxlZflyVdleE8wO0QwUuj4NfundD7T5nU3I7HSKp/5BD9og==
 
 typescript-memoize@^1.0.0-alpha.3:
   version "1.0.0-alpha.4"

@@ -7,9 +7,21 @@ import { setComponentTemplate } from '@ember/component';
 export default class Cards extends Service {
   async load(
     url: string,
-    format: 'isolated'
+    format: 'isolated' | 'embedded'
   ): Promise<{ model: any; component: unknown }> {
-    let response = await fetch(`${url}?format=${format}`);
+    return this.internalLoad(`${url}?format=${format}`);
+  }
+
+  async loadForRoute(
+    pathname: string
+  ): Promise<{ model: any; component: unknown }> {
+    return this.internalLoad(`/spaces/home/${pathname}`);
+  }
+
+  private async internalLoad(
+    url: string
+  ): Promise<{ model: any; component: unknown }> {
+    let response = await fetch(url);
 
     if (response.status !== 200) {
       throw new Error(`unable to fetch card ${url}: status ${response.status}`);
