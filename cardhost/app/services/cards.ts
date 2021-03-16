@@ -1,3 +1,4 @@
+import { CardServerResponse } from '@cardstack/core/src/interfaces';
 import Service from '@ember/service';
 import { macroCondition, isTesting } from '@embroider/macros';
 import Component from '@glimmer/component';
@@ -27,28 +28,18 @@ export default class Cards extends Service {
       throw new Error(`unable to fetch card ${url}: status ${response.status}`);
     }
 
-    let card = (await response.json()) as {
-      data: {
-        id: string;
-        type: string;
-        attributes?: { [name: string]: any };
-        meta: {
-          componentModule: string;
-        };
-      };
-    };
+    let card = (await response.json()) as CardServerResponse;
 
     let model = Object.assign({ id: card.data.id }, card.data.attributes);
 
     let cardComponent: unknown;
+    let moduleLocation = `@cardstack/compiled/${card.data.meta.componentModule}`;
     if (macroCondition(isTesting())) {
       // in tests, our fake server inside mirage just defines these modules
       // dynamically
       cardComponent = window.require(card.data.meta.componentModule)['default'];
     } else {
-      cardComponent = await import(
-        `@cardstack/compiled/${card.data.meta.componentModule}`
-      );
+      cardComponent = await import(moduleLocation);
     }
 
     let CallerComponent = setComponentTemplate(
