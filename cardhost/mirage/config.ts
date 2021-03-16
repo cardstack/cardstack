@@ -1,7 +1,5 @@
-import type { Request } from 'miragejs';
-import { Response } from 'miragejs';
+import { Response, Request } from 'miragejs';
 import type { Server } from 'miragejs/server';
-import type { Schema } from 'miragejs/orm/schema';
 
 import Builder from 'cardhost/lib/builder';
 import { RawCard } from '@cardstack/core/src/interfaces';
@@ -10,14 +8,7 @@ import templateOnlyComponent from '@ember/component/template-only';
 import { setComponentTemplate } from '@ember/component';
 
 export default function (this: Server): void {
-  interface CardRequest extends Request {
-    queryParams: {
-      format?: 'isolated' | 'embedded';
-      type?: 'raw' | 'compiled';
-    };
-  }
-
-  function returnRawCard(schema: Schema, url: string): RawCard | Response {
+  function returnRawCard(schema: any, url: string): RawCard | Response {
     let rawCard = schema.cards.find(url);
     if (!rawCard) {
       return new Response(404, {}, { error: `Not Found: No card for '${url}` });
@@ -25,44 +16,56 @@ export default function (this: Server): void {
     return rawCard;
   }
 
-  this.get(
-    'http://mirage/cards/:id',
-    async function (schema, request: CardRequest) {
-      let { format, type } = request.queryParams;
-      let [url] = request.url.split('?');
+  interface CardParams {
+    format?: 'isolated' | 'embedded';
+    type?: 'raw' | 'compiled';
+  }
 
-      if (type == 'raw') {
-        return returnRawCard(schema, url);
-      }
-
-      let builder = new Builder();
-      let compiledCard = await builder.getCompiledCard(url);
-
-      if (!format) {
-        throw new Error(`format is required at the moment`);
-      }
-
-      let templateSource = compiledCard.templateSources[format];
-      let moduleId = `mirage/module${moduleCounter++}`;
-
-      (window as any).define(`@cardstack/compiled/${moduleId}`, function () {
-        return setComponentTemplate(
-          compileTemplate(templateSource),
-          templateOnlyComponent()
-        );
-      });
-
-      return {
-        data: {
-          id: url,
-          attributes: compiledCard.data,
-          meta: {
-            componentModule: moduleId,
-          },
-        },
-      };
+  function cardParams(queryParams: Request['queryParams']): CardParams {
+    let { type, format } = queryParams;
+    if (type && !['raw', 'compiled'].includes(type)) {
+      throw new Error(`unsupported ?type=${type}`);
     }
-  );
+    if (format && !['isolated', 'embedded'].includes(format)) {
+      throw new Error(`unsupported ?format=${format}`);
+    }
+    return queryParams;
+  }
+
+  this.get('http://mirage/cards/:id', async function (schema, request) {
+    let { format, type } = cardParams(request.queryParams);
+    let [url] = request.url.split('?');
+    if (type == 'raw') {
+      return returnRawCard(schema, url);
+    }
+
+    let builder = new Builder();
+    let compiledCard = await builder.getCompiledCard(url);
+
+    if (!format) {
+      throw new Error(`format is required at the moment`);
+    }
+
+    let templateSource = compiledCard.templateSources[format];
+    let moduleId = `mirage/module${moduleCounter++}`;
+
+    (window as any).define(`@cardstack/compiled/${moduleId}`, function () {
+      return setComponentTemplate(
+        compileTemplate(templateSource),
+        templateOnlyComponent()
+      );
+    });
+
+    return {
+      data: {
+        id: url,
+        attributes: compiledCard.data,
+        meta: {
+          componentModule: moduleId,
+        },
+      },
+    };
+  });
 
   /*
     Shorthand cheatsheet:

@@ -4,3 +4,7 @@ declare module 'cardhost/templates/*' {
   const tmpl: TemplateFactory;
   export default tmpl;
 }
+
+declare module '@ember/component' {
+  export function setComponentTemplate<T, C>(template: T, component: C): C;
+}
