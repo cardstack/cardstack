@@ -14,6 +14,7 @@
   },
   "workspaces": {
     "packages": [
+      "base-cards",
       "cardhost",
       "server",
       "core",

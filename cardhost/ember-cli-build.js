@@ -3,6 +3,7 @@
 process.env.EMBROIDER_REBUILD_ADDONS = [
   process.env.EMBROIDER_REBUILD_ADDONS,
   '@cardstack/compiled',
+  '@cardstack/base-cards',
   'ember-cli-mirage',
 ]
   .filter(Boolean)

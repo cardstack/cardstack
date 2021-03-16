@@ -32,19 +32,22 @@ module('Integration | card-service', function (hooks) {
     hooks.beforeEach(function () {
       this.createCard({
         url: greenId,
-        'schema.js': `export default class Green {}`,
-        'embedded.hbs': `<span class="green">{{@model}}</span>`,
+        files: {
+          'schema.js': `export default class Green {}`,
+          'embedded.hbs': `<span class="green">{{@model}}</span>`,
+        },
       });
 
       this.createCard({
         url: helloId,
-        'data.json': {
-          attributes: {
-            greeting: 'Hello World',
-            greenGreeting: 'it works',
+        files: {
+          'data.json': {
+            attributes: {
+              greeting: 'Hello World',
+              greenGreeting: 'it works',
+            },
           },
-        },
-        'schema.js': `
+          'schema.js': `
           import { contains } from "@cardstack/types";
           import string from "https://cardstack.com/base/models/string";
           import green from "${greenId}"
@@ -57,7 +60,8 @@ module('Integration | card-service', function (hooks) {
             greenGreeting;
           }
         `,
-        'isolated.hbs': `<h1><@model.greeting /></h1><h2><@model.greenGreeting /></h2>`,
+          'isolated.hbs': `<h1><@model.greeting /></h1><h2><@model.greenGreeting /></h2>`,
+        },
       });
     });
 

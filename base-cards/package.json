@@ -1,0 +1,15 @@
+{
+  "name": "@cardstack/base-cards",
+  "version": "0.0.0",
+  "keywords": [
+    "ember-addon"
+  ],
+  "dependencies": {
+    "@cardstack/core": "0.0.0"
+  },
+  "ember-addon": {
+    "version": 2,
+    "type": "addon",
+    "main": "addon-main.js"
+  }
+}

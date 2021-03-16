@@ -1,7 +1,7 @@
 import { Server } from 'miragejs/server';
-import { CompiledCard, RawCard } from './../../../core/src/interfaces';
-// import { TestContext } from 'ember-test-helpers';
-
+import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
+import type { TestContext } from 'ember-test-helpers';
+import { RAW_BASE_CARDS } from '@cardstack/core/src/raw-base-cards';
 declare module 'ember-test-helpers' {
   interface TestContext {
     server: Server;
@@ -10,10 +10,15 @@ declare module 'ember-test-helpers' {
   }
 }
 
+// NOTE: Mirage must be setup before this. ie:
+//    setupMirage(hooks);
+//    setupCardMocking(hooks);
 export default function setupCardMocking(hooks: NestedHooks): void {
   hooks.beforeEach(function () {
     this.createCard = createCard.bind(this);
     this.lookupCard = lookupCard.bind(this);
+
+    RAW_BASE_CARDS.forEach((card) => this.createCard(card));
   });
 
   hooks.afterEach(function () {});
