@@ -17,7 +17,7 @@ const withSideWatch = require('./lib/with-side-watch');
 module.exports = function (defaults) {
   let app = new EmberApp(defaults, {
     trees: {
-      app: withSideWatch('app', { watching: ['../core'] }),
+      app: withSideWatch('app', { watching: ['../core', '../card-loader'] }),
     },
   });
 
@@ -29,6 +29,17 @@ module.exports = function (defaults) {
           path: true,
           process: true,
         },
+      },
+      module: {
+        rules: [
+          {
+            test: /\card.json$/i,
+            loader: '@cardstack/card-loader',
+            options: {
+              realm: 'https://cardstack.com/base/models',
+            },
+          },
+        ],
       },
     },
   });

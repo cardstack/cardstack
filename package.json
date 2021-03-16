@@ -18,7 +18,8 @@
       "cardhost",
       "server",
       "core",
-      "compiled"
+      "compiled",
+      "card-loader"
     ],
     "nohoist": [
       "**/@ember/string",
