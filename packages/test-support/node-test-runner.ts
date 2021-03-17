@@ -3,7 +3,7 @@ import glob from 'glob';
 import requireUncached from 'require-uncached';
 import prepare from './prepare-node-tests';
 
-export default function() {
+export default function () {
   let patterns = ['packages/*/node-tests/**/*-test.js', 'node-tests/**/*-test.js'];
 
   for (let pattern of patterns) {

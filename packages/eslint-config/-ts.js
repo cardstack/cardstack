@@ -2,7 +2,7 @@ module.exports = {
   rules: {
     // this needs to be off because things like import and export statements are
     // "unsupported", even though we're transpiling them first.
-    'node/no-unsupported-features': 'off',
+    'node/no-unsupported-features/es-syntax': 'off',
 
     // Type overloads cause false positives. typescript errors on duplicates, so
     // this doesn't need to be replaced.
@@ -13,9 +13,7 @@ module.exports = {
     '@typescript-eslint/adjacent-overload-signatures': 'error',
     '@typescript-eslint/array-type': 'error',
     '@typescript-eslint/ban-types': 'error',
-    camelcase: 'off',
-    '@typescript-eslint/camelcase': 'error',
-    '@typescript-eslint/class-name-casing': 'error',
+    '@typescript-eslint/naming-convention': 'error',
     indent: 'off',
     '@typescript-eslint/indent': 'off',
     '@typescript-eslint/member-delimiter-style': 'error',
@@ -26,6 +24,8 @@ module.exports = {
     '@typescript-eslint/no-inferrable-types': 'error',
     '@typescript-eslint/no-misused-new': 'error',
     '@typescript-eslint/no-namespace': 'error',
+    'no-redeclare': 'off',
+    '@typescript-eslint/no-redeclare': ['error'],
     '@typescript-eslint/triple-slash-reference': 'error',
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],

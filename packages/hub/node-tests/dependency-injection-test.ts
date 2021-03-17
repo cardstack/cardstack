@@ -1,10 +1,10 @@
 import { Registry, Container, inject, getOwner, injectionReady } from '../dependency-injection';
 
-describe('hub/dependency-injection', function() {
+describe('hub/dependency-injection', function () {
   let registry: Registry;
   let container: Container;
 
-  before(function() {
+  before(function () {
     registry = new Registry();
     registry.register('testExample', ExampleService);
     registry.register('testConsumer', ConsumingService);
@@ -16,21 +16,21 @@ describe('hub/dependency-injection', function() {
     registry.register('testCircleFour', CircleFourService);
   });
 
-  beforeEach(function() {
+  beforeEach(function () {
     container = new Container(registry);
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await container.teardown();
   });
 
-  it('it can inject a service', async function() {
+  it('it can inject a service', async function () {
     let consumer = await container.lookup('testConsumer');
     expect(consumer.useIt()).equals('Quint');
     expect(consumer.theAnswer()).equals('Quint');
   });
 
-  it('errors if you mis-assign an injection', async function() {
+  it('errors if you mis-assign an injection', async function () {
     try {
       await container.lookup('testBadService');
       throw new Error('should not get here');
@@ -39,19 +39,19 @@ describe('hub/dependency-injection', function() {
     }
   });
 
-  it('returns the same singleton', async function() {
+  it('returns the same singleton', async function () {
     let instance = await container.lookup('testConsumer');
     let second = await container.lookup('testConsumer');
     expect(instance).equals(second);
   });
 
-  it('supports getOwner', async function() {
+  it('supports getOwner', async function () {
     let instance = await container.lookup('testConsumer');
     let owner = getOwner(instance);
     expect(owner).equals(container);
   });
 
-  it('supports instantiating your own class', async function() {
+  it('supports instantiating your own class', async function () {
     let thing = await container.instantiate(
       class {
         testExample = inject('testExample');
@@ -60,7 +60,7 @@ describe('hub/dependency-injection', function() {
     expect(thing.testExample.whoAreYou()).to.equal('Quint');
   });
 
-  it('supports instantiating your own class with an arg', async function() {
+  it('supports instantiating your own class with an arg', async function () {
     class X {
       testExample = inject('testExample');
       constructor(public options: { quiet: boolean }) {}
@@ -70,7 +70,7 @@ describe('hub/dependency-injection', function() {
     expect(thing.options).to.deep.equal({ quiet: true });
   });
 
-  it('container teardown call teardown on container.lookup instance', async function() {
+  it('container teardown call teardown on container.lookup instance', async function () {
     exampleServiceTornDown = false;
 
     await container.lookup('testExample');
@@ -78,13 +78,13 @@ describe('hub/dependency-injection', function() {
     expect(exampleServiceTornDown).to.equal(true);
   });
 
-  it('allows circular injection when not accessing eachother within ready()', async function() {
+  it('allows circular injection when not accessing eachother within ready()', async function () {
     let one = await container.lookup('testCircleOne');
     expect(one.testCircleTwo?.iAmTwo).equals(true);
     expect(one.testCircleTwo?.testCircleOne).equals(one);
   });
 
-  it('throws when a circle would have deadlocked', async function() {
+  it('throws when a circle would have deadlocked', async function () {
     try {
       await container.lookup('testCircleThree');
       throw new Error(`shouldn't get here`);

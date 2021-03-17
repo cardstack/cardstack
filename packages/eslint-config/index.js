@@ -1,5 +1,5 @@
 let node = require('./-node');
-let test = require('./test');
+let test = require('./-test');
 let ts = require('./-ts');
 
 module.exports = Object.assign({}, node, {
@@ -9,6 +9,9 @@ module.exports = Object.assign({}, node, {
     }),
     Object.assign({}, ts, {
       files: ['**/*.ts'],
+      parserOptions: {
+        project: ['./tsconfig.json'], // Specify it only for TypeScript files
+      },
     }),
   ],
 });

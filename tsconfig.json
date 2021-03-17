@@ -1,5 +1,5 @@
 {
-  "include": ["./packages/**/*.ts", "./packages/**/*.js", "./scripts/**/*.js", "./cards/**/*.ts", "packages/cardhost/app/router.s" ],
+  "include": [ "./packages/**/*.ts", "./packages/**/*.js", "./scripts/**/*.js", "./cards/**/*.ts", "**/.eslintrc.ts" ],
   "compilerOptions": {
     "target": "es2017",
     "module": "es6",

@@ -1,4 +1,5 @@
-export default function(chai: any, utils: any) {
+export default function (chai: any, utils: any) {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const { Assertion } = chai;
 
   function detail(response: any) {
@@ -11,7 +12,7 @@ export default function(chai: any, utils: any) {
     return utils.inspect(response);
   }
 
-  Assertion.addMethod('hasStatus', function(this: any, code: number) {
+  Assertion.addMethod('hasStatus', function (this: any, code: number) {
     let response = this._obj;
     this.assert(
       response.status === code,

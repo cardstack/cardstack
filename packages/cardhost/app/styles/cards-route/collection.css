@@ -1,4 +1,0 @@
-.collection__wrapper {
-  height: calc(100% - var(--boxel-org-header-height));
-  padding: 30px;
-}

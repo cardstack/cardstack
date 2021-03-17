@@ -5,16 +5,6 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch Hub",
-      "cwd": "${workspaceRoot}/packages/hub",
-      "console": "integratedTerminal",
-      "env": {
-      },
-      "args": ["${workspaceFolder}/packages/hub/bin/cardstack-hub.js"]
-    },
-    {
       "name": "Ember test browser",
       "type": "chrome",
       "request": "launch",
@@ -27,32 +17,19 @@
       "name": "Launch Test Suite",
       "program": "${workspaceRoot}/node_modules/.bin/_mocha",
       "cwd": "${workspaceRoot}",
-      "env": {
-        "HUB_ENVIRONMENT": "test"
-        // "LOG_LEVELS": "cardstack/card-utils=debug"
-      },
       "args": ["-r", "esm", "packages/test-support/bin/run.js", "--timeout", "600000", "--grep", "can find built-in cards from the index"],
     },
     {
       "type": "node",
       "request": "launch",
-      "name": "Build cardhost",
+      "name": "Build web-client",
       "program": "${workspaceFolder}/node_modules/.bin/ember",
-      "cwd": "${workspaceRoot}/packages/cardhost",
+      "cwd": "${workspaceRoot}/packages/web-client",
       "args": ["b"],
       "env": {
         "JOBS": "1"
       },
       "outputCapture": "std"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Build docker container",
-      "program": "${workspaceFolder}/packages/cardhost/deploy/build.js",
-      "cwd": "${workspaceRoot}/packages/cardhost/deploy",
-      "env": {
-      },
     }
   ]
 }
