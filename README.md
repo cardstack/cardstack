@@ -31,9 +31,32 @@ ember serve
 Then browse to http://localhost:4200/
 ## Running tests
 
+To run tests interactively:
+```sh
+ember test --s
+```
+
+(To prevent the interactive tests from launching new windows, use command `ember test --s --launch=false` , and then visit `http://localhost:7357/` on your browser.)
+
+
+To run tests in the console:
 ```sh
 ember test
 ```
+
+To run the linter:
+```sh
+yarn lint:hbs
+
+yarn lint:js
+```
+
+To run the linter, along with ember tests in the console:
+```sh
+yarn test
+```
+
+Check `package.json` file for other testing and linting scripts.
 
 #### Thumbnails
 
