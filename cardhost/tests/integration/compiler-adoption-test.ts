@@ -4,6 +4,7 @@ import { setupMirage } from 'ember-cli-mirage/test-support';
 import setupCardMocking from '../helpers/card-mocking';
 import Builder from 'cardhost/lib/builder';
 import { CompiledCard } from '@cardstack/core/src/interfaces';
+import { templateOnlyComponentTemplate } from '../helpers/template-compiler';
 
 module('Integration | compiler-adoption', function (hooks) {
   setupRenderingTest(hooks);
@@ -12,26 +13,36 @@ module('Integration | compiler-adoption', function (hooks) {
 
   let builder: Builder;
   let parentCard: CompiledCard;
+  let defineModuleCallback: (url: string, source: unknown) => void;
 
   hooks.beforeEach(async function () {
-    builder = new Builder();
+    defineModuleCallback = function (url, source) {
+      console.log('defineModuleCallback', url, source);
+    };
+
+    builder = new Builder({
+      defineModule: (url, source) => {
+        defineModuleCallback(url, source);
+      },
+    });
 
     this.createCard({
       url: 'http://mirage/cards/person',
       files: {
         'schema.js': `
-        import { contains } from "@cardstack/types";
-        import date from "https://cardstack.com/base/models/date";
-        import string from "https://cardstack.com/base/models/string";
-        export default class Person {
-          @contains(string)
-          name;
+          import { contains } from "@cardstack/types";
+          import date from "https://cardstack.com/base/models/date";
+          import string from "https://cardstack.com/base/models/string";
+          export default class Person {
+            @contains(string)
+            name;
 
-          @contains(date)
-          birthdate;
-        }
-      `,
-        'embedded.hbs': `<@model.name/> was born on <@model.birthdate/>`,
+            @contains(date)
+            birthdate;
+          }`,
+        'embedded.js': templateOnlyComponentTemplate(
+          `<@model.name/> was born on <@model.birthdate/>`
+        ),
       },
     });
 
@@ -160,6 +171,8 @@ module('Integration | compiler-adoption', function (hooks) {
 
   module('templates', async function (/*hooks*/) {
     test('a child card inherits a parent card template', async function (assert) {
+      assert.expect(2);
+
       let card = {
         url: 'http://mirage/cards/user',
         files: {
@@ -173,15 +186,24 @@ module('Integration | compiler-adoption', function (hooks) {
       };
       this.createCard(card);
 
-      let compiled = await builder.getCompiledCard(card.url);
-      assert.equal(
-        compiled.templateSources.embedded,
-        // `{{@model.name}} was born on <FormatDate @date={{@model.birthdate}} />`
-        `{{@model.name}} was born on Date: {{@model.birthdate}}`
-      );
+      await builder.getCompiledCard(card.url);
+
+      defineModuleCallback = function (fullModuleURL, source) {
+        assert.equal(
+          fullModuleURL,
+          `${card.url}/isolated`,
+          'Module url is correct'
+        );
+        assert.equal(
+          source,
+          '{{@model.name}} was born on <DateField @model={{@model.birthdate}} />',
+          'Source code includes the right template'
+        );
+      };
     });
 
     test('a child card inherits a grandparent card template, when it and parent do not have templates', async function (assert) {
+      assert.expect(2);
       this.createCard({
         url: 'http://mirage/cards/user',
         files: {
@@ -209,12 +231,19 @@ module('Integration | compiler-adoption', function (hooks) {
       };
       this.createCard(card);
 
-      let compiled = await builder.getCompiledCard(card.url);
-      assert.equal(
-        compiled.templateSources.embedded,
-        // `{{@model.name}} was born on <FormatDate @date={{@model.birthdate}} />`
-        `{{@model.name}} was born on Date: {{@model.birthdate}}`
-      );
+      await builder.getCompiledCard(card.url);
+      defineModuleCallback = function (fullModuleURL, source) {
+        assert.equal(
+          fullModuleURL,
+          `${card.url}/isolated`,
+          'Module url is correct'
+        );
+        assert.equal(
+          source,
+          '{{@model.name}} was born on <DateField @model={{@model.birthdate}} />',
+          'Source code includes the right template'
+        );
+      };
     });
   });
 

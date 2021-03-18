@@ -5,6 +5,7 @@ import { hbs } from 'ember-cli-htmlbars';
 import type Cards from 'cardhost/services/cards';
 import setupCardMocking from '../helpers/card-mocking';
 import { setupMirage } from 'ember-cli-mirage/test-support';
+import { templateOnlyComponentTemplate } from '../helpers/template-compiler';
 
 module('Integration | card-service', function (hooks) {
   setupRenderingTest(hooks);
@@ -34,7 +35,9 @@ module('Integration | card-service', function (hooks) {
         url: greenId,
         files: {
           'schema.js': `export default class Green {}`,
-          'embedded.hbs': `<span class="green">{{@model}}</span>`,
+          'embedded.js': templateOnlyComponentTemplate(
+            `<span class="green">{{@model}}</span>`
+          ),
         },
       });
 
@@ -60,7 +63,9 @@ module('Integration | card-service', function (hooks) {
             greenGreeting;
           }
         `,
-          'isolated.hbs': `<h1><@model.greeting /></h1><h2><@model.greenGreeting /></h2>`,
+          'isolated.js': templateOnlyComponentTemplate(
+            `<h1><@model.greeting /></h1><h2><@model.greenGreeting /></h2>`
+          ),
         },
       });
     });

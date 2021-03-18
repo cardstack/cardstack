@@ -2,6 +2,7 @@ import type {
   Builder as BuilderInterface,
   RawCard,
   CompiledCard,
+  defineModuleCallback,
 } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
 import { compileTemplate } from 'cardhost/tests/helpers/template-compiler';
@@ -11,12 +12,35 @@ import { setComponentTemplate } from '@ember/component';
 export default class Builder implements BuilderInterface {
   private compiler = new Compiler({
     lookup: (url: string) => this.getCompiledCard(url),
+    define: (cardURL, module, source) =>
+      this.defineModule(cardURL, module, source),
   });
 
   private cache: Map<string, CompiledCard>;
+  private modulePrefix: string;
+  customDefine: (fullModulePath: string, source: unknown) => void;
 
-  constructor() {
+  constructor(params: {
+    modulePrefix?: string;
+    defineModule: (fullModulePath: string, source: unknown) => void;
+  }) {
     this.cache = new Map();
+    this.customDefine = params.defineModule;
+    this.modulePrefix = params.modulePrefix ?? '';
+  }
+
+  // TODO: is there a way to reuse the arguments of the defineModuleCallback type?
+  async defineModule(
+    cardURL: string,
+    moduleName: string,
+    source: unknown
+  ): Promise<void> {
+    let modulePath = this.getFullModuleURL(cardURL, moduleName);
+    this.customDefine(modulePath, source);
+  }
+
+  getFullModuleURL(cardURL: string, moduleName: string): string {
+    return `${this.modulePrefix}${cardURL}/${moduleName}`;
   }
 
   async getRawCard(url: string): Promise<RawCard> {
@@ -49,13 +73,23 @@ export default class Builder implements BuilderInterface {
   async getBuiltCard(
     url: string,
     format: 'isolated' | 'embedded'
-  ): Promise<{ model: any; componentImplementation: unknown }> {
+  ): Promise<{ model: any; moduleName: string }> {
     let compiledCard = await this.getCompiledCard(url);
-    let templateSource = compiledCard.templateSources[format];
+    let templateSource = await window.require(
+      this.getFullModuleURL(
+        compiledCard.url,
+        compiledCard.templateModules[format].moduleName
+      )
+    );
     let componentImplementation = setComponentTemplate(
       compileTemplate(templateSource),
       templateOnlyComponent()
     );
-    return { model: compiledCard.data, componentImplementation };
+    this.defineModule(
+      compiledCard.url,
+      compiledCard.modelModule,
+      componentImplementation
+    );
+    return { model: compiledCard.data, moduleName: compiledCard.modelModule };
   }
 }

@@ -14,20 +14,33 @@ import {
   templateFileName,
   TemplateType,
   templateTypes,
+  defineModuleCallback,
 } from './interfaces';
 
 import intersection from 'lodash/intersection';
+
+// Eventually this will be dynamically configured
+const MODEL_MODULE_NAME = 'model';
 export class Compiler {
   lookup: (cardURL: string) => Promise<CompiledCard>;
+  define: defineModuleCallback;
 
-  constructor(params: { lookup: (url: string) => Promise<CompiledCard> }) {
+  constructor(params: {
+    lookup: (url: string) => Promise<CompiledCard>;
+    define: defineModuleCallback;
+  }) {
     this.lookup = params.lookup;
+    this.define = params.define;
   }
   async compile(cardSource: RawCard): Promise<CompiledCard> {
     let options = {};
     let parentCard;
 
-    let code = this.transformSchema(cardSource.files['schema.js'], options);
+    let modelModuleName = this.transformAndDefineSchema(
+      cardSource.url,
+      cardSource.files['schema.js'],
+      options
+    );
     let data = this.getData(cardSource.files['data.json']);
     let meta = getMeta(options);
 
@@ -41,27 +54,14 @@ export class Compiler {
       fields = this.adoptFields(fields, parentCard);
     }
 
-    // TODO: inherit all the way up to base, so these are never undefined
-    let templateSources: CompiledCard['templateSources'] = {
-      isolated: '',
-      embedded: '',
-    };
-
-    for (let templateType of templateTypes) {
-      templateSources[templateType] = this.compileOrAdoptTemplate(
-        cardSource,
-        templateType,
-        fields,
-        parentCard
-      );
-    }
+    let templateModules = this.prepareTemplates(cardSource, fields, parentCard);
 
     let card: CompiledCard = {
       url: cardSource.url,
-      modelSource: code,
+      modelModule: modelModuleName,
       fields,
       data,
-      templateSources,
+      templateModules: templateModules,
     };
     if (parentCard) {
       card['adoptsFrom'] = parentCard;
@@ -69,7 +69,11 @@ export class Compiler {
     return card;
   }
 
-  transformSchema(schema: string, options: Object): string {
+  transformAndDefineSchema(
+    url: string,
+    schema: string,
+    options: Object
+  ): string {
     let out = transformSync(schema, {
       plugins: [
         [cardPlugin, options],
@@ -83,7 +87,28 @@ export class Compiler {
       ],
     });
 
-    return out!.code!;
+    let code = out!.code!;
+
+    this.define(url, MODEL_MODULE_NAME, code);
+    return MODEL_MODULE_NAME;
+  }
+
+  prepareTemplates(
+    cardSource: RawCard,
+    fields: CompiledCard['fields'],
+    parentCard?: CompiledCard
+  ): CompiledCard['templateModules'] {
+    // TODO: inherit all the way up to base, so these are never undefined
+    let templateModules: CompiledCard['templateModules'] = {
+      isolated: { moduleName: 'isolated' },
+      embedded: { moduleName: 'embedded' },
+    };
+
+    for (let templateType of templateTypes) {
+      this.compileOrAdoptTemplate(cardSource, templateType, fields, parentCard);
+    }
+
+    return templateModules;
   }
 
   getData(data: RawCardData | undefined): any {
@@ -129,18 +154,17 @@ export class Compiler {
     templateType: TemplateType,
     fields: CompiledCard['fields'],
     parentCard?: CompiledCard
-  ): string {
+  ): void {
     let template = '';
     let source = cardSource.files[templateFileName(templateType)];
 
     if (source) {
       template = this.compileTemplate(source, fields);
+      this.define(cardSource.url, templateType, template);
     } else if (parentCard) {
-      template = parentCard.templateSources[templateType];
+      // TODO: return the parent cards module?
+      // template = parentCard.templateModules[templateType];
     }
-    // TODO: there should always be a template
-
-    return template;
   }
 
   compileTemplate(source: string, fields: CompiledCard['fields']): string {

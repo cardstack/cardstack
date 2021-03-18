@@ -6,6 +6,8 @@ import { RawCard } from '@cardstack/core/src/interfaces';
 import { getContext } from '@ember/test-helpers';
 import { Memoize } from 'typescript-memoize';
 
+const MODULE_PREFIX = '@cardstack/compiled/mirage';
+
 class FakeCardServer {
   static cardServers = new WeakMap<object, FakeCardServer>();
 
@@ -24,25 +26,30 @@ class FakeCardServer {
 
   @Memoize()
   get builder(): Builder {
-    return new Builder();
+    return new Builder({
+      modulePrefix: MODULE_PREFIX,
+      defineModule: this.defineModule,
+    });
+  }
+
+  async defineModule(moduleURL: string, source: string): Promise<void> {
+    (window as any).define(moduleURL, function () {
+      return source;
+    });
   }
 
   async respondWithCard(url: string, format: 'embedded' | 'isolated') {
     let {
       model,
-      componentImplementation,
+      moduleName,
     } = await FakeCardServer.current().builder.getBuiltCard(url, format);
-    let moduleId = `mirage/module${moduleCounter++}`;
-    (window as any).define(`@cardstack/compiled/${moduleId}`, function () {
-      return componentImplementation;
-    });
 
     return {
       data: {
         id: url,
         attributes: model,
         meta: {
-          componentModule: moduleId,
+          componentModule: moduleName,
         },
       },
     };
@@ -109,11 +116,15 @@ export default function (this: Server): void {
       );
     }
     let compiled = await cardServer.builder.getCompiledCard(routingCard);
+    let path = cardServer.builder.getFullModuleURL(
+      compiled.url,
+      compiled.modelModule
+    );
+    let source = window.require(path);
     let output: any[] = [];
     new Function(
       'output',
-      compiled.modelSource.replace('export default', 'let def =') +
-        '\noutput.push(def)'
+      source.replace('export default', 'let def =') + '\noutput.push(def)'
     )(output);
     let Klass = output[0];
     let instance = new Klass();
@@ -142,5 +153,3 @@ export default function (this: Server): void {
     https://www.ember-cli-mirage.com/docs/route-handlers/shorthands
   */
 }
-
-let moduleCounter = 0;

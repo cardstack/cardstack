@@ -20,13 +20,17 @@ export default function cardTransform(options: {
             let fieldName = node.tag.slice(PREFIX.length);
             let field = options.fields[fieldName];
             if (field) {
-              let embeddedTemplate = field.card.templateSources.embedded;
-              let ast = parse(embeddedTemplate, {
-                plugins: {
-                  ast: [rewriteLocals({ this: fieldName })],
-                },
-              });
-              return ast.body;
+              // TODO:
+              // - Load template module source
+              // - Determine module needed for import
+              // - Rewrite local to fields Card invocation
+              // let embeddedTemplate = field.card.templateSources.embedded;
+              // let ast = parse(embeddedTemplate, {
+              //   plugins: {
+              //     ast: [rewriteLocals({ this: fieldName })],
+              //   },
+              // });
+              // return ast.body;
             }
           }
           return undefined;
