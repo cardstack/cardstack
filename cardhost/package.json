@@ -120,6 +120,7 @@
     "@babel/preset-env": "^7.12.13",
     "@babel/traverse": "^7.12.13",
     "@babel/types": "^7.12.13",
+    "@cardstack/card-loader": "0.0.0",
     "@embroider/compat": "^0.37.0",
     "@embroider/core": "^0.37.0",
     "@embroider/macros": "^0.37.0",
@@ -131,6 +132,6 @@
     "babel-plugin-htmlbars-inline-precompile": "^5.2.1",
     "ember-cli-typescript": "^4.1.0",
     "ember-cli-typescript-blueprints": "^3.0.0",
-    "@cardstack/card-loader": "0.0.0"
+    "walk-sync": "^2.2.0"
   }
 }
