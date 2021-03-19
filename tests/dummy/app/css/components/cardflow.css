@@ -120,10 +120,6 @@
   border-radius: var(--boxel-border-radius);
 }
 
-.cardflow__reply-to.field-renderer__input:focus {
-  outline: 0;
-}
-
 .cardflow__milestone-progress-status {
   color: var(--boxel-dark);
   font: var(--boxel-font-sm);

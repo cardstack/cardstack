@@ -18,7 +18,6 @@
 .boxel-select-button:hover,
 .boxel-select-button:focus {
   --icon-border: black;
-  outline: 0;
 }
 
 .boxel-select-button--partial {

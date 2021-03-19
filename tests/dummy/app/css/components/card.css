@@ -39,7 +39,6 @@
   background-repeat: no-repeat;
   box-shadow: var(--boxel-box-shadow);
   cursor: pointer;
-  outline: 0;
 }
 
 .boxel-card__inner {

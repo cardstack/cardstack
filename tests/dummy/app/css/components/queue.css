@@ -102,7 +102,6 @@
 
 .queue__filter-dropdown .ember-power-select-trigger:focus {
   border-color: var(--boxel-highlight);
-  outline: 0;
 }
 
 .queue__filter-dropdown .ember-power-select-dropdown {

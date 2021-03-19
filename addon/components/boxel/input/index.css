@@ -15,10 +15,6 @@
   border-color: var(--boxel-dark);
 }
 
-.boxel-input:focus {
-  outline-color: var(--boxel-highlight);
-}
-
 .boxel-input:disabled {
   background-color: var(--boxel-light-100);
   border-color: var(--boxel-purple-300);

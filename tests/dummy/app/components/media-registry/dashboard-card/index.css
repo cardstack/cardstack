@@ -106,7 +106,6 @@
   letter-spacing: var(--boxel-lsp-lg);
   border-radius: 100px;
   border: 1px solid white;
-  outline: 0;
 }
 
 /* Body */

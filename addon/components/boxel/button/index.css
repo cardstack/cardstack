@@ -10,7 +10,6 @@
   align-items: center;
 
   border-radius: 100px;
-  outline-offset: 1px;
   white-space: nowrap;
 
   transition: background-color var(--boxel-transition),
@@ -27,10 +26,6 @@
   min-width: var(--boxel-button-min-width, 120px);
   padding: var(--boxel-button-padding, var(--boxel-sp-xs) var(--boxel-sp-sm));
   letter-spacing: var(--boxel-button-letter-spacing, var(--boxel-lsp-lg));
-}
-
-.boxel-button:focus:not(:focus-visible) {
-  outline: 0;
 }
 
 .boxel-button:not(:disabled):hover {

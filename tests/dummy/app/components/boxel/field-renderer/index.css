@@ -192,8 +192,6 @@
 
 .field-renderer__input:focus {
   border-color: var(--boxel-highlight);
-  outline: 2px solid var(--boxel-highlight);
-  outline-offset: -3px;
 }
 
 .field-renderer__input:hover:not(:focus) {
@@ -236,8 +234,6 @@
 
 .field-renderer__dropdown .ember-power-select-trigger:focus {
   border-color: var(--boxel-highlight);
-  outline: 2px solid var(--boxel-highlight);
-  outline-offset: -3px;
 }
 
 .field-renderer__dropdown .ember-power-select-dropdown {

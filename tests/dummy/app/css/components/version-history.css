@@ -89,7 +89,6 @@
   background: none;
   border: none;
   text-align: left;
-  outline: none;
   transition: all 0.2s ease;
 }
 .versions-nav-item__btn:hover {
@@ -453,7 +452,6 @@
   bottom: 0;
   height: 100%;
   width: 100%;
-  outline: 0;
   opacity: 0.55;
 }
 
@@ -535,7 +533,6 @@
   top: 45px;
   background: url('../../../../public/@cardstack/boxel/images/icons/swap.svg') center/18px 17px no-repeat;
   z-index: 10;
-  outline: 0;
 }
 
 .comp-view__swap-btn:hover {

@@ -26,7 +26,6 @@
   font-size: 20px;
   letter-spacing: 0;
   overflow: hidden;
-  outline: 0;
 }
 
 .cs-card-select .ember-power-select-typeahead-input {
@@ -34,7 +33,6 @@
   font: inherit;
   letter-spacing: inherit;
   border: none;
-  outline: none;
 }
 
 .cs-card-select--dropdown {

@@ -39,10 +39,6 @@
   cursor: pointer;
 }
 
-.boxel-actions__btn:focus {
-  outline: 0;
-}
-
 .boxel-actions__btn--expand {
   background-image: url('../../../../public/@cardstack/boxel/images/icons/expand.svg');
 }

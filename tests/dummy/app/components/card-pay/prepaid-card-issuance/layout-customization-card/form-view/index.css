@@ -36,9 +36,7 @@
   border-color: var(--boxel-dark);
   cursor: pointer;
 }
-.layout-form-view__dropdown > .ember-power-select-trigger:focus {
-  outline-color: var(--boxel-highlight);
-}
+
 .layout-form-view__dropdown .ember-basic-dropdown-content {
   min-width: 15.625rem;
   max-height: 15.625rem;

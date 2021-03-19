@@ -15,7 +15,6 @@
   border-radius: var(--boxel-border-radius);
   background-color: var(--boxel-light-400);
   color: var(--boxel-dark);
-  outline: 0;
 }
 
 .boxel-breadcrumbs__item-title {

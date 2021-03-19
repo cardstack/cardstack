@@ -8,7 +8,6 @@
   font-size: 13px;
   line-height: calc(18/13);
   letter-spacing: var(--boxel-lsp);
-  outline: 0;
 }
 
 .boxel-pill-btn__primary {

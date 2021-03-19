@@ -112,7 +112,6 @@
   text-align: left;
 
   border-radius: 100px;
-  outline: 0;
   white-space: nowrap;
 
   width: 100%;
@@ -159,7 +158,6 @@
   background-size: 18px 18px;
   background-color: transparent;
   border: none;
-  outline: 0;
 }
 
 .media-collection__view-selectors > .media-collection__btn {
@@ -239,7 +237,6 @@
   border: none;
   background: none;
   z-index: 1;
-  outline: 0;
 }
 
 /* Grid item */

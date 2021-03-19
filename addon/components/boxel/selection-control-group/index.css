@@ -10,7 +10,6 @@
   padding: var(--boxel-sp-xs) var(--boxel-sp-lg) var(--boxel-sp-xs);
   transition: all var(--boxel-transition);
   border-radius: 100px;
-  outline: 0;
   white-space: nowrap;
   font: 600 var(--boxel-font-sm);
   min-height: 41px;

@@ -39,8 +39,3 @@
 .boxel-mode-indicator--preview {
   --mode-icon: url('../@cardstack/boxel/images/icons/eye.svg');
 }
-
-.boxel-mode-indicator:hover,
-.boxel-mode-indicator:focus {
-  outline: 0;
-}

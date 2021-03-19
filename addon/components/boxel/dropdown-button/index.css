@@ -13,17 +13,12 @@
 .boxel-dropdown-button__trigger:hover,
 .boxel-dropdown-button__trigger:focus {
   --icon-color: var(--boxel-highlight);
-  outline: 0;
   cursor: pointer;
 }
 
 .boxel-dropdown-button__trigger > svg {
   display: block;
   margin: auto;
-}
-
-.boxel-dropdown-button .ember-basic-dropdown-trigger {
-  outline: 0;
 }
 
 .boxel-dropdown-button__dropdown {

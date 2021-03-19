@@ -15,12 +15,7 @@
     box-shadow var(--boxel-transition);
 }
 
-.boxel-highlight:focus {
-  outline-color: var(--boxel-highlight);
-}
-
 .boxel-highlight--on {
-  outline: 0;
   border-color: var(--boxel-highlight);
 }
 

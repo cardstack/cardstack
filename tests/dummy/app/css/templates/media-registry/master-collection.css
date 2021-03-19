@@ -22,11 +22,9 @@
 }
 
 .media-collection__grid-item:hover .master-collection__highlighter,
-.master-collection__highlighter:hover,
-.master-collection__highlighter:focus {
+.master-collection__highlighter:hover {
   box-shadow: var(--boxel-box-shadow);
   cursor: pointer;
-  outline: 0;
 }
 
 .master-collection__highlighter:hover + .master-collection__expand-icon,
@@ -47,11 +45,6 @@
   z-index: 1;
 }
 
-.master-collection__pin-btn:hover,
-.master-collection__pin-btn:focus {
-  --icon-color: var(--boxel-highlight);
-  outline: 0;
-}
 
 .master-collection__pin-btn.pinned {
   --icon-color: var(--boxel-dark);
