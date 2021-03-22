@@ -11,7 +11,7 @@
         {{/if}}
       </div>
       {{#if (eq @mode "edit")}}
-        <button {{on "click" @transitionToView}} class="media-collection__btn mode-indicator mode-indicator--edit">{{@mode}} mode</button>
+        <Boxel::ModeIndicator @mode="edit" {{on "click" @transitionToView}} />
       {{else}}
         <BoxelActions
           @class="media-collection__btn-overlay"
@@ -33,11 +33,10 @@
           @selectedItemCount={{this.collection.selectedItemCount}}
           @isSelected={{this.collection.selectedAll}}
           @menuComponent={{component "boxel/menu" items=(array
-            (menu-item "Delete" (noop))
             (menu-item "Duplicate" (noop))
-            (menu-item "---")
             (if (eq @model.type "collection") (menu-item "Add To Collection" (noop)))
             (if (eq @model.type "master-collection") (menu-item "Transfer Catalog" (link route="media-registry.agreements" model="TA-38185847898")))
+            (menu-item "Delete" (noop))
           )}}
         />
       {{/if}}

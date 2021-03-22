@@ -14,10 +14,10 @@
   border: 1px solid var(--boxel-light-600);
   border-radius: var(--boxel-border-radius);
   background-color: var(--boxel-light-400);
-  color: var(--boxel-dark);
 }
 
 .boxel-breadcrumbs__item-title {
+  color: var(--boxel-dark);
   font-weight: 700;
   overflow: hidden;
   white-space: nowrap;

@@ -87,7 +87,7 @@
 }
 
 .discrepancy__nested-level-back-btn:hover {
-  cursor: pointer;
+  color: var(--boxel-dark);
 }
 
 .discrepancy__comparison-header-icons {

@@ -1,23 +1,21 @@
-.wave-player {
-  display: inline-flex;
+.boxel-wave-player {
+  display: inline-grid;
+  grid-auto-flow: column;
   align-items: center;
+  gap: var(--boxel-sp-xs);
   padding-top: var(--boxel-sp-sm);
 }
 
-.wave-player > canvas {
-  max-width: calc(100% - 120px);
+.boxel-wave-player > canvas {
+  max-width: 100%;
 }
 
-.wave-player__play {
-  padding-right: var(--boxel-sp-xs);
-}
-
-.wave-player__play.is-playing,
+.boxel-wave-player__play.is-playing,
 .play-button.is-playing {
   --icon-color: var(--boxel-highlight);
 }
 
-.wave-player__times {
+.boxel-wave-player__times {
   color: var(--boxel-purple-400);
   font: var(--boxel-font-sm);
   white-space: nowrap;

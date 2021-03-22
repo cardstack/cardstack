@@ -86,6 +86,7 @@
 .media-registry__nav li > a {
   padding: 0 20px 10px;
   border-bottom: 4px solid transparent;
+  color: var(--boxel-light);
   white-space: nowrap;
 }
 

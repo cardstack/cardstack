@@ -16,5 +16,5 @@
 }
 
 .boxel-pill-btn:hover {
-  cursor: pointer;
+  color: var(--boxel-dark);
 }

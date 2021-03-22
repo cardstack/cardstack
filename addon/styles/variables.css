@@ -51,6 +51,7 @@
   --boxel-dark: #000;
   --boxel-highlight: var(--boxel-cyan);
   --boxel-highlight-hover: #00D3CE;
+  --boxel-text-highlight: var(--boxel-highlight-hover);
 
   /* Boxel purples */
   --boxel-purple-100: #f8f7fa;

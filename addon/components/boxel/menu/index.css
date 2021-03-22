@@ -1,31 +1,34 @@
-.boxel-menu .boxel-menu__item:hover,
-.boxel-menu .boxel-menu__item:focus {
-  background-color: var(--boxel-light-500);
+.boxel-menu__item:hover {
+  background-color: var(--boxel-light-300);
   cursor: pointer;
 }
 
-.boxel-menu .boxel-menu__item {
+.boxel-menu__item {
   padding: 0;
 }
 
-.boxel-menu .boxel-menu__item:first-child {
+.boxel-menu__item:first-child {
   border-radius: var(--boxel-border-radius) var(--boxel-border-radius) 0 0;
 }
 
-.boxel-menu .boxel-menu__item:last-child {
+.boxel-menu__item:last-child {
   border-radius: 0 0 var(--boxel-border-radius) var(--boxel-border-radius);
 }
 
-.boxel-menu .boxel-menu__item > a {
+.boxel-menu__item > a {
   width: 100%;
   padding: var(--boxel-sp-xs) var(--boxel-sp);
 }
 
-.boxel-menu .boxel-menu__item--dangerous {
-  color: var(--boxel-red);
+.boxel-menu__item > a:hover {
+  color: inherit;
 }
 
-.boxel-menu .boxel-menu__separator {
+.boxel-menu__item--dangerous {
+  color: var(--boxel-error-100);
+}
+
+.boxel-menu__separator {
   margin: 0;
   border: 0;
   height: 0;

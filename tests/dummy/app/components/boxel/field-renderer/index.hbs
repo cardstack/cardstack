@@ -112,7 +112,7 @@
               <ComparisonModeLabel @status={{@field.status}} @comparisonType={{@comparisonType}} />
             </BoxelActions>
           {{/if}}
-          <CardPlatter @class="field-renderer__card">
+          <div class="field-renderer__card">
             <Boxel::Header>
               {{if @field.type (humanize @field.type) "text"}}
             </Boxel::Header>
@@ -135,7 +135,7 @@
                 {{/if}}
               {{/let}}
             </div>
-          </CardPlatter>
+          </div>
         </Boxel>
       {{else}}
         {{#if @field.value}}
@@ -146,20 +146,20 @@
                 <ComparisonModeLabel @status={{@field.status}} @comparisonType={{@comparisonType}} />
               </BoxelActions>
             {{/if}}
-            <CardPlatter @class="field-renderer__card">
+            <div class="field-renderer__card">
               <Boxel::Header>
                 {{if @field.type (humanize @field.type) "text"}}
               </Boxel::Header>
               <div class="field-renderer__inner {{if @field.status "" "field-renderer__opacity-control"}}">
                 {{@field.value}}
               </div>
-            </CardPlatter>
+            </div>
           </Boxel>
         {{else}}
           {{#if (includes @field.title @omittedFields)}}
             N/A
           {{else}}
-            <CardPlatter @class="field-renderer__card field-renderer__card--blank" />
+            <div class="field-renderer__card field-renderer__card--blank" />
           {{/if}}
         {{/if}}
       {{/if}}

@@ -23,6 +23,11 @@ a {
   display: inline-block;
 }
 
+a:hover {
+  color: var(--boxel-text-highlight);
+  cursor: pointer;
+}
+
 a:focus {
   outline: 2px solid var(--boxel-blue);
 }
@@ -63,11 +68,18 @@ button {
   font: inherit;
 }
 
-button:focus {
+button:not(:disabled):hover,
+*[role="button"]:not(:disabled):hover {
+  cursor: pointer;
+}
+
+button:focus,
+*[role="button"]:focus {
   outline: 2px solid var(--boxel-blue);
 }
 
-button:focus:not(:focus-visible) {
+button:focus:not(:focus-visible),
+*[role="button"]:focus:not(:focus-visible) {
   outline-color: transparent;
 }
 

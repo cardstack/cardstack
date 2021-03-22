@@ -44,4 +44,5 @@
 .boxel-dashboard--dark-theme {
   --boxel-dashboard-background-color: var(--boxel-purple-600);
   --boxel-dashboard-color: var(--boxel-light);
+  --boxel-text-highlight: var(--boxel-highlight);
 }

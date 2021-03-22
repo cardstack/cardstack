@@ -1,23 +1,24 @@
 .boxel-dropdown-button {
   --dropdown-button-size: 40px;
+  width: var(--dropdown-button-size);
+  height: var(--dropdown-button-size);
 }
 
 .boxel-dropdown-button__trigger {
-  width: var(--dropdown-button-size);
-  height: var(--dropdown-button-size);
-  padding: 0;
-  border: none;
-  background: none;
+  height: 100%;
 }
 
-.boxel-dropdown-button__trigger:hover,
-.boxel-dropdown-button__trigger:focus {
+.boxel-dropdown-button__trigger:hover {
   --icon-color: var(--boxel-highlight);
-  cursor: pointer;
+}
+
+.boxel-dropdown-button--no-hover .boxel-dropdown-button__trigger:hover {
+  --icon-color: inherit;
 }
 
 .boxel-dropdown-button__trigger > svg {
   display: block;
+  height: 100%;
   margin: auto;
 }
 
@@ -36,10 +37,4 @@
 
 .boxel-dropdown-button__dropdown.ember-basic-dropdown-content--below.ember-basic-dropdown--transitioning-out {
   animation: drop-fade-below var(--boxel-transition) reverse;
-}
-
-.boxel-dropdown-button--no-hover .boxel-dropdown-button__trigger:hover,
-.boxel-dropdown-button--no-hover .boxel-dropdown-button__trigger:focus {
-  --icon-color: inherit;
-  cursor: pointer;
 }

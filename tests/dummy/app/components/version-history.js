@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
 import { action, set } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import { inject as service } from '@ember/service';
 
 import resize from 'ember-animated/motions/resize';
 import scale from 'ember-animated/motions/scale';
@@ -9,6 +10,7 @@ import adjustCSS from 'ember-animated/motions/adjust-css';
 import { parallel } from 'ember-animated';
 
 export default class VersionHistory extends Component {
+  @service router;
   @tracked versions = this.args.model.versions;
   @tracked latest = this.versions[this.versions.length - 1];
   @tracked selected = this.latest.id;
@@ -35,6 +37,11 @@ export default class VersionHistory extends Component {
 
   get compCardContent() {
     return this.versions.filter((item) => item.id === this.comparisonCard)[0];
+  }
+
+  @action
+  returnToItem() {
+    this.router.transitionTo('media-registry.item', this.args.model.id);
   }
 
   @action

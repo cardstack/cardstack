@@ -1,12 +1,12 @@
 .boxel-mode-indicator {
   --mode-container-width: 180px;
   --mode-container-height: 40px;
-  --mode-icon: url('');
   --mode-icon-position: center left var(--boxel-sp-sm);
   --mode-icon-width: 15px;
   --mode-icon-height: 15px;
   --mode-icon-size: var(--mode-icon-width) var(--mode-icon-height);
 
+  position: relative;
   display: block;
   min-width: var(--mode-container-width);
   width: auto;
@@ -14,10 +14,9 @@
   height: var(--mode-container-height);
   padding: var(--boxel-sp-xs) calc(var(--boxel-sp-sm) + var(--mode-icon-width) + var(--boxel-sp-xxs));
   background-color: var(--boxel-highlight);
-  background-image: var(--mode-icon), url('../@cardstack/boxel/images/icons/close.svg');
-  background-position: var(--mode-icon-position), center right var(--boxel-sp-sm);
+  background-position: var(--mode-icon-position);
   background-repeat: no-repeat, no-repeat;
-  background-size: var(--mode-icon-size), 10px 10px;
+  background-size: var(--mode-icon-size);
   border: none;
   border-radius: 100px;
   color: var(--boxel-dark);
@@ -27,15 +26,26 @@
   text-transform: capitalize;
 }
 
+.boxel-mode-indicator > svg {
+  position: absolute;
+  top: var(--boxel-sp-sm);
+  right: var(--boxel-sp-sm);
+}
+
 .boxel-mode-indicator--edit {
-  --mode-icon: url('../@cardstack/boxel/images/icons/edit-box.svg');
+  background-image: url('../@cardstack/boxel/images/icons/edit-box.svg');
 }
 .boxel-mode-indicator--configure {
-  --mode-icon: url('../@cardstack/boxel/images/icons/gear.svg');
+  background-image: url('../@cardstack/boxel/images/icons/gear.svg');
 }
 .boxel-mode-indicator--themer {
-  --mode-icon: url('../@cardstack/boxel/images/icons/themer.svg');
+  background-image: url('../@cardstack/boxel/images/icons/themer.svg');
 }
 .boxel-mode-indicator--preview {
-  --mode-icon: url('../@cardstack/boxel/images/icons/eye.svg');
+  background-image: url('../@cardstack/boxel/images/icons/eye.svg');
+}
+.boxel-mode-indicator--revision,
+.boxel-mode-indicator--comparison {
+  min-width: 285px;
+  background-image: url('../@cardstack/boxel/images/icons/clock.svg');
 }

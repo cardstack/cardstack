@@ -1,5 +1,5 @@
 /**
- * This file provides base styles for a button, and an interface to accept variables defined in 
+ * This file provides base styles for a button, and an interface to accept variables defined in
  * size-variants.css and kind-variants.css
  */
 
@@ -26,10 +26,6 @@
   min-width: var(--boxel-button-min-width, 120px);
   padding: var(--boxel-button-padding, var(--boxel-sp-xs) var(--boxel-sp-sm));
   letter-spacing: var(--boxel-button-letter-spacing, var(--boxel-lsp-lg));
-}
-
-.boxel-button:not(:disabled):hover {
-  cursor: pointer;
 }
 
 .boxel-button:disabled {

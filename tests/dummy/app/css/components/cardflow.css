@@ -76,6 +76,7 @@
   padding: 5px 10px;
   background-color: var(--cardflow-user-tasks);
   border-radius: 5px;
+  color: var(--boxel-dark);
 }
 
 .cardflow__taskbar-label--assigned {

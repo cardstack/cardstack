@@ -11,6 +11,12 @@
   width: 410px;
 }
 
+.workflow-org__left-edge > * {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
 .workflow-org__main {
   background-color: var(--boxel-purple-500);
   overflow: hidden;

@@ -16,9 +16,11 @@
       {{/if}}
     </header>
     <div class="versions__mode">
-      <LinkTo @route="media-registry.item" @model={{@model.id}} @class="mode-indicator mode-indicator--revision">
-        Revision Mode
-      </LinkTo>
+      <Boxel::ModeIndicator
+        {{on "click" this.returnToItem}}
+        @mode="revision"
+        class="mode-indicator mode-indicator--revision"
+      />
     </div>
 
     <aside class="versions__nav">

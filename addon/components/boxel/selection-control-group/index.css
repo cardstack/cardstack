@@ -34,7 +34,3 @@
   padding-left: var(--boxel-sp-sm);
   padding-right: var(--boxel-sp-xxl);
 }
-
-.boxel-selection-control-group__more-menu {
-  margin: var(--boxel-sp-sm) 0;
-}

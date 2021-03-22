@@ -122,15 +122,15 @@
 }
 
 /* Light Theme */
-.boxel--light-theme {
+.queue-card.boxel--light-theme {
   --queue-card-primary-color: var(--boxel-dark);
   --queue-card-secondary-color: var(--boxel-purple-400);
-  --boxel-highlight: #00b2ae;
+  --boxel-highlight: var(--boxel-highlight-hover);
 
   background-color: var(--boxel-light);
 }
 
-.boxel--light-theme .queue-card__footer {
+.queue-card.boxel--light-theme .queue-card__footer {
   border-color: rgba(55, 53, 67, 0.15);
 }
 

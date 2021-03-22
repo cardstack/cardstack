@@ -10,30 +10,30 @@
     </header>
 
     <Boxel::Breadcrumbs @class="discrepancy__breadcrumbs">
-      <LinkTo @route={{@topLevelRoute}} @model={{if @model.topLevelCard @model.topLevelCard.id @model.id}} @class="breadcrumbs__item breadcrumbs__item--inverse">
-        <div class="breadcrumbs__item-label">Field</div>
-        <div class="breadcrumbs__item-title">Musical Work</div>
+      <LinkTo @route={{@topLevelRoute}} @model={{if @model.topLevelCard @model.topLevelCard.id @model.id}} @class="boxel-breadcrumbs__item boxel-breadcrumbs__item--inverse">
+        <div class="boxel-breadcrumbs__item-label">Field</div>
+        <div class="boxel-breadcrumbs__item-title">Musical Work</div>
       </LinkTo>
 
       {{#if @model.parentCard.cardType}}
-        <span class="breadcrumbs__caret" />
-        <LinkTo @route={{@model.parentCard.route}} @model={{@model.parentCard}} @class="breadcrumbs__item breadcrumbs__item--inverse">
-          <div class="breadcrumbs__item-label">Field</div>
-          <div class="breadcrumbs__item-title">{{humanize @model.parentCard.cardType}}</div>
+        <span class="boxel-breadcrumbs__caret" />
+        <LinkTo @route={{@model.parentCard.route}} @model={{@model.parentCard}} @class="boxel-breadcrumbs__item boxel-breadcrumbs__item--inverse">
+          <div class="boxel-breadcrumbs__item-label">Field</div>
+          <div class="boxel-breadcrumbs__item-title">{{humanize @model.parentCard.cardType}}</div>
         </LinkTo>
       {{/if}}
 
       {{#if @model.parentCard}}
-        <span class="breadcrumbs__caret" />
-        <div class="breadcrumbs__item breadcrumbs__item--inverse">
-          <div class="breadcrumbs__item-label">{{@model.nestedCompField.type}}</div>
-          <div class="breadcrumbs__item-title">{{@model.nestedCompField.title}}</div>
+        <span class="boxel-breadcrumbs__caret" />
+        <div class="boxel-breadcrumbs__item boxel-breadcrumbs__item--inverse">
+          <div class="boxel-breadcrumbs__item-label">{{@model.nestedCompField.type}}</div>
+          <div class="boxel-breadcrumbs__item-title">{{@model.nestedCompField.title}}</div>
         </div>
       {{else if @model.cardType}}
-        <span class="breadcrumbs__caret" />
-        <div class="breadcrumbs__item breadcrumbs__item--inverse">
-          <div class="breadcrumbs__item-label">Field</div>
-          <div class="breadcrumbs__item-title">{{humanize @model.cardType}}</div>
+        <span class="boxel-breadcrumbs__caret" />
+        <div class="boxel-breadcrumbs__item boxel-breadcrumbs__item--inverse">
+          <div class="boxel-breadcrumbs__item-label">Field</div>
+          <div class="boxel-breadcrumbs__item-title">{{humanize @model.cardType}}</div>
         </div>
       {{/if}}
     </Boxel::Breadcrumbs>
@@ -156,7 +156,7 @@
                                 drillDown=(if (eq mode "comparison") (fn @drillDown field))
                                 fieldData=f}}
                             {{else}}
-                              <CardPlatter @class="field-renderer__card field-renderer__card--blank" />
+                              <div class="field-renderer__card field-renderer__card--blank" />
                             {{/if}}
                             </Boxel>
                           </div>
@@ -171,7 +171,7 @@
                           @labelClass="field-renderer__title"
                         >
                           <div class="field-renderer__value">
-                            <CardPlatter @class="field-renderer__card field-renderer__card--blank" />
+                            <div class="field-renderer__card field-renderer__card--blank" />
                           </div>
                         </Boxel::Field>
                       {{/each}}
