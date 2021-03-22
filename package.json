@@ -21,6 +21,7 @@
     "lint:js": "eslint . --cache",
     "lint:js:fix": "eslint . --fix",
     "start": "ember serve",
+    "release": "release-it",
     "test": "npm-run-all lint test:*",
     "test:ember": "ember test",
     "test:ember-compatibility": "ember try:each"
