@@ -30,36 +30,19 @@ When reviewing merged PR's the labels to be used are:
 
 Once the prep work is completed, the actual release is straight forward:
 
-* First ensure that you have `release-it` installed globally, generally done by
-  using one of the following commands:
+* Ensure that you have installed your project's dependencies:
 
 ```
-# using https://volta.sh
-volta install release-it
-
-# using Yarn
-yarn global add release-it
-
-# using npm
-npm install --global release-it
-```
-
-* Second, ensure that you have installed your projects dependencies:
-
-```
-# using yarn
 yarn install
-
-# using npm
-npm install
 ```
 
 * And last (but not least 😁) do your release:
 
 ```
-release-it
+yarn release
 ```
 
 [release-it](https://github.com/release-it/release-it/) manages the actual
 release process. It will prompt you through the process of choosing the version
-number, tagging, pushing the tag and commits, etc.
+number, tagging, updating the changelog, publishing to npm (npm account required),
+pushing the tag and commits, and adding a release to github.
