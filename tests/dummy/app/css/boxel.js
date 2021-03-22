@@ -4,7 +4,6 @@ import './global.css';
 import './components/card-select/before-options.css';
 import './components/boxel-actions.css';
 import './components/boxel-highlight.css';
-import './components/boxel-modal.css';
 import './components/card-platter.css';
 import './components/card-select.css';
 import './components/card.css';

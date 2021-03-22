@@ -209,10 +209,10 @@
 }
 
 .cardflow__modal {
-  --modal-max-width: 1300px;
-  --modal-offset-top: 0;
-  --modal-offset-right: 0;
-  --modal-offset-left: 80px;
+  --boxel-modal-max-width: 1300px;
+  --boxel-modal-offset-top: 0;
+  --boxel-modal-offset-right: 0;
+  --boxel-modal-offset-left: 80px;
 }
 
 .cardflow__modal-header {

@@ -1,0 +1,7 @@
+<button {{on "click" (optional @onClose)}} class="boxel-modal-overlay {{@overlayClass}}" />
+
+<div class="boxel-modal" ...attributes>
+  <div class="boxel-modal__inner">
+    {{yield}}
+  </div>
+</div>

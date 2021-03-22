@@ -1,0 +1,44 @@
+.boxel-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background-color: rgba(0, 0, 0, 0.75);
+  text-align: left;
+  z-index: 10;
+}
+
+.boxel-modal {
+  --boxel-modal-offset-top: 30px;
+  --boxel-modal-offset-right: 0px;
+  --boxel-modal-offset-left: 0px;
+  --boxel-modal-max-width: 1000px;
+
+  position: fixed;
+  height: calc(100vh - var(--boxel-modal-offset-top));
+  top: var(--boxel-modal-offset-top);
+  left: var(--boxel-modal-offset-left);
+  right: var(--boxel-modal-offset-right);
+  margin: 0 auto;
+  border: none;
+  overflow: hidden;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.boxel-modal__inner {
+  width: 100%;
+  height: 100%;
+  max-width: var(--boxel-modal-max-width);
+  margin: 0 auto;
+  transition: max-width var(--boxel-transition);
+}
+
+
+.boxel-modal__inner > * {
+  pointer-events: auto;
+}

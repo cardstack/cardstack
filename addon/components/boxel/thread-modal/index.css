@@ -1,10 +1,10 @@
 .boxel-thread-modal {
-  --modal-max-width: 1030px;
-  --modal-offset-left: 30px;
+  --boxel-modal-max-width: 1030px;
+  --boxel-modal-offset-left: 30px;
 }
 
 .boxel-thread-modal--full-width {
-  --modal-max-width: 100%;
+  --boxel-modal-max-width: 100%;
 }
 
 .boxel-thread-modal > .boxel-thread-modal__inner {

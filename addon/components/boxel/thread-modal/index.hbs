@@ -1,4 +1,4 @@
-<BoxelModal @onClose={{@onClose}} @class="boxel-thread-modal {{if this.expanded "boxel-thread-modal--full-width"}}">
+<Boxel::Modal @onClose={{@onClose}} class="boxel-thread-modal {{if this.expanded "boxel-thread-modal--full-width"}}">
   {{!-- OnClick actions on ThreadMessage and MilestoneBanner are temporarily added for demo's sake. --}}
   <Boxel::Thread class="boxel-thread-modal__inner">
     <:header>
@@ -81,4 +81,4 @@
       </SidebarSection>
     </:sidebar>
   </Boxel::Thread>
-</BoxelModal>
+</Boxel::Modal>
