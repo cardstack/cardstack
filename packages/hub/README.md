@@ -2,7 +2,7 @@
 
 The Cardstack Hub is the API server for the Cardstack project.
 For more information, see the
-[project-wide README](https://github.com/cardstack/cardstack/blob/master/README.md).
+[project-wide README](https://github.com/cardstack/cardstack/blob/main/README.md).
 
 ## Architecture
 
@@ -29,5 +29,5 @@ Also search the mono-repo for `process.env` to see these variables in use.
 
 Note that this package is written in TypeScript, so be sure to run a TypesScript
 compiler as you work.
-See the [project-wide README](https://github.com/cardstack/cardstack/blob/master/README.md)
+See the [project-wide README](https://github.com/cardstack/cardstack/blob/main/README.md)
 for information about running the Hub and its tests locally.
