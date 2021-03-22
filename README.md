@@ -1,6 +1,6 @@
-# Cardstack Application Framework
+# Cardstack App Suite
 
-This is the main repo for [Cardstack](https://www.cardstack.com/), an open source application architecture for building cohesive experiences on open, decentralized infrastructure.
+This is the main repo for [Cardstack](https://www.cardstack.com/), an open source application architecture for building cohesive experiences, including payments, on open, decentralized infrastructure.
 
 Join the discussion around developing on the Cardstack framework on [Discord](https://discord.gg/apepFje), and read our documentation on [docs.cardstack.com](https://docs.cardstack.com).
 
@@ -10,23 +10,22 @@ This is a monorepo. Each directory under `packages` and `cards` is distributed a
 More information is available in the `README.md` within each `package`.
 
 ## Developing and Testing within this Repo
+
+### Local host names
+
+Set up `app.cardstack.test` and `app-assets.cardstack.test` to resolve to localhost (127.0.0.1). There are a variety of ways to accomplish this, with the most direct being to [edit your /etc/hosts file](https://linuxize.com/post/how-to-edit-your-hosts-file/).
+
+### Javascript dependencies & Typescript compilation
+
 We use `volta` to manage our global javascript dependencies. In this case, specifically, we use it to manage node and yarn. To use it simply install it following the instructions here: https://docs.volta.sh/guide/getting-started
 
 In development, we use `lerna` to manage the inter-dependencies of all the packages. To get started:
 
- 1. Install node >= 12.
- 2. Install yarn >= 0.28 (earlier versions work but will not benefit from [Workspaces](https://yarnpkg.com/blog/2017/08/02/introducing-workspaces/)).
- 3. `yarn global add lerna` (use >= 2.0.0 for yarn workspaces integration)
- 4. `lerna bootstrap`
- 5. Launch the typescript compiler with `yarn compile --watch`
-
-
-### Test Suite Dependencies
-
-There is work-in-progress to make Cardstack Hub automatically manage docker-based microservices, but for the present you need to start these things up manually to run the full test suite:
-
-    docker run -d -p 5432:5432 --rm cardstack/pg-test
-    docker run -d -p 8838:80 --rm cardstack/git-http-server
+ 1. Install node and yarn via volta.
+ 2. `yarn global add lerna` (use >= 2.0.0 for yarn workspaces integration)
+ 3. `lerna bootstrap`
+ 4. Launch the typescript compiler with `yarn compile --watch`
+ 5. Start ember-cli and the hub node server with `yarn start` and/or run tests with `yarn test`
 
 ## Project-wide Policy and Community Governance
 

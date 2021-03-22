@@ -129,7 +129,7 @@ class CacheEntry {
 
   private async prepareSubgraph(): Promise<void> {
     let subgraph = this.subgraph();
-    await Promise.all([...subgraph].map(entry => entry.partial));
+    await Promise.all([...subgraph].map((entry) => entry.partial));
     for (let entry of subgraph) {
       for (let [name, pending] of entry.injections) {
         entry.installInjection(name, pending);

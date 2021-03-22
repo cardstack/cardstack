@@ -1,151 +1,29 @@
-name: Node CI/CD
+name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: Install Node.js
-      uses: actions/setup-node@v1
+    - uses: actions/checkout@v2
       with:
-        node-version: 12.x
+        fetch-depth: 1
+    - uses: volta-cli/action@v1
     - name: Set up build cache (yarn)
-      uses: actions/cache@v1
+      uses: actions/cache@v2
       with:
         path: ~/.cache/yarn
-        key: ${{ runner.os }}-${{ hashFiles('/**/yarn.lock') }}
-    - name: Checkout
-      uses: actions/checkout@v1
-    - name: Start prereqs
-      run: |
-        docker network create cardstack
-        docker run -d --rm --network cardstack -p 5444:5432 --name postgres cardstack/pg-test
-        docker run -d --rm --network cardstack -p 8838:80 --name git-http cardstack/git-http-server;
-    - name: yarn install
-      run: yarn install
-    - name: Linting
-      run: |
-        yarn lint:deps
-        yarn lint:js
-    - name: Node tests
-      run: yarn node-tests
-      env:
-        PGHOST: localhost
-        PGPORT: 5444
-        PGUSER: postgres
-    - name: Ember tests with percy
-      if: github.event_name == 'pull_request' || github.ref == 'refs/heads/master'
-      run: yarn ember-tests
-      env:
-        PGHOST: localhost
-        PGPORT: 5444
-        PGUSER: postgres
-        PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
-    - name: Ember tests without percy
-      if: github.event_name != 'pull_request' && github.ref != 'refs/heads/master'
-      run: yarn ember-tests
-      env:
-        PGHOST: localhost
-        PGPORT: 5444
-        PGUSER: postgres
-  deploy:
-    runs-on: ubuntu-latest
-    needs: test
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/production' || github.ref == 'refs/heads/updated-docker-build'
-    steps:
-    - uses: actions/checkout@v1
-    - name: Install Node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12.x
-    - name: Set up build cache (yarn)
-      uses: actions/cache@v1
-      with:
-        path: ~/.cache/yarn
-        key: ${{ runner.os }}-${{ hashFiles('/**/yarn.lock') }}
-    - name: Checkout
-      uses: actions/checkout@v1
-    - name: Extract branch name
-      shell: bash
-      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-      id: extract_branch
-    - name: Deploy Demo
-      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/updated-docker-build'
-      env:
-        PGHOST: localhost
-        PGPORT: 5444
-        AWS_ACCESS_KEY_ID: AKIAZ444BSFYHW3OKFOD
-        demo_EMBER_DEPLOY_AWS_ACCESS_KEY_ID: AKIAZ444BSFYA3J2FWMZ
-        demo_LOG_LEVELS: '*=info'
-        demo_PGHOST: builder-hub20200312050415491100000001.cbuq0sp3cf76.us-east-1.rds.amazonaws.com
-        demo_PGPORT: 5432
-        demo_PGUSER: cardstack
-        demo_HUB_URL: https://builder-hub.stack.cards
-        demo_SWARM_CONTROLLER: sc.builder.stack.cards
-        ECR_ENDPOINT: 680542703984.dkr.ecr.us-east-1.amazonaws.com/builder
-        demo_META_REALM_URL: ${{ secrets.demo_META_REALM_URL }}
-        demo_DEFAULT_REALM_URL: ${{ secrets.demo_DEFAULT_REALM_URL }}
-        demo_PGPASSWORD: ${{ secrets.demo_PGPASSWORD }}
-        demo_CARDSTACK_SESSIONS_KEY: ${{ secrets.demo_CARDSTACK_SESSIONS_KEY }}
-        demo_EMBER_DEPLOY_AWS_SECRET_ACCESS_KEY: ${{ secrets.demo_EMBER_DEPLOY_AWS_SECRET_ACCESS_KEY }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        GITHUB_BRANCH: ${{ steps.extract_branch.outputs.branch }}
-
-      # Run id is not available yet so use datetime string instead
-      # https://github.community/t5/GitHub-Actions/Getting-the-run-id-of-a-run-in-Github-Actions/td-p/36567
-      run: |
-        export GITHUB_BUILD_ID=$(date +%Y%m%d%H%M%S)
-        mkdir -p ~/.ssh/
-        docker network create cardstack
-        docker run -d --rm --network cardstack -p 5444:5432 --name postgres cardstack/pg-test
-        docker run -d --rm --network cardstack -p 8838:80 --name git-http cardstack/git-http-server
-        echo "$SSH_PRIVATE_KEY" > $HOME/.ssh/id_rsa && chmod 400 $HOME/.ssh/id_rsa
-        sudo apt-get install socat
-        pip install --user awscli
-        aws ecr --region us-east-1 get-login --no-include-email | bash
-        yarn --cwd ./packages/cardhost/deploy install
-        cd ./packages/cardhost
-        node ./deploy/build.js
-        TARGET_NAME="builder.stack.cards" ./deploy/deploy.sh demo github-deploy
-    - name: Deploy to production
-      if: github.ref == 'refs/heads/production'
-      env:
-        PGHOST: localhost
-        PGPORT: 5444
-        AWS_ACCESS_KEY_ID: AKIAZ444BSFYHW3OKFOD
-        production_EMBER_DEPLOY_AWS_ACCESS_KEY_ID: AKIAZ444BSFYAYFFMG7E
-        production_LOG_LEVELS: '*=info'
-        production_PGHOST: builder-prod-hub20191219222942603100000008.cbuq0sp3cf76.us-east-1.rds.amazonaws.com
-        production_PGPORT: 5432
-        production_PGUSER: cardstack
-        production_HUB_URL: https://builder-prod-hub.card.space
-        production_SWARM_CONTROLLER: sc.builder.card.space
-        ECR_ENDPOINT: 680542703984.dkr.ecr.us-east-1.amazonaws.com/builder
-        production_META_REALM_URL: ${{ secrets.production_META_REALM_URL }}
-        production_DEFAULT_REALM_URL: ${{ secrets.production_DEFAULT_REALM_URL }}
-        production_PGPASSWORD: ${{ secrets.production_PGPASSWORD }}
-        production_CARDSTACK_SESSIONS_KEY: ${{ secrets.production_CARDSTACK_SESSIONS_KEY }}
-        production_EMBER_DEPLOY_AWS_SECRET_ACCESS_KEY: ${{ secrets.production_EMBER_DEPLOY_AWS_SECRET_ACCESS_KEY }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        GITHUB_BRANCH: ${{ steps.extract_branch.outputs.branch }}
-
-      # Run id is not available yet so use datetime string instead
-      # https://github.community/t5/GitHub-Actions/Getting-the-run-id-of-a-run-in-Github-Actions/td-p/36567
-      run: |
-        export GITHUB_BUILD_ID=$(date +%Y%m%d%H%M%S)
-        mkdir -p ~/.ssh/
-        docker network create cardstack
-        docker run -d --rm --network cardstack -p 5444:5432 --name postgres cardstack/pg-test
-        docker run -d --rm --network cardstack -p 8838:80 --name git-http cardstack/git-http-server
-        echo "$SSH_PRIVATE_KEY" > $HOME/.ssh/id_rsa && chmod 400 $HOME/.ssh/id_rsa
-        sudo apt-get install socat
-        pip install --user awscli
-        aws ecr --region us-east-1 get-login --no-include-email | bash
-        yarn --cwd ./packages/cardhost/deploy install
-        cd ./packages/cardhost
-        node ./deploy/build.js
-        TARGET_NAME="builder.card.space" ./deploy/deploy.sh production github-deploy
+        key: ${{ runner.os }}-yarn-${{ hashFiles('/**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+    - run: yarn install
+    # - name: Setup tmate session
+    #   uses: mxschmitt/action-tmate@v3
+    #   timeout-minutes: 90
+    - run: yarn lint
+    - run: yarn test

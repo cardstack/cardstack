@@ -3,55 +3,22 @@
 import Koa from 'koa';
 import logger from '@cardstack/logger';
 import { Registry, Container } from './dependency-injection';
-import { homedir } from 'os';
 import { join } from 'path';
-import { mkdirp } from 'fs-extra';
-import glob from 'glob';
 
-import JSONAPIMiddleware from './jsonapi-middleware';
-import CardsService from './cards-service';
-import { ModuleService } from './module-service';
 import AuthenticationMiddleware from './authentication-middleware';
+import DevelopmentConfig from './development-config';
+import DevelopmentProxyMiddleware from './development-proxy-middleware';
 
-// TODO: we need to let cards register services in a safely namespaced way,
-// instead of this hack
-import { EphemeralStorage } from '@cardstack/ephemeral-realm-card/storage';
-import { FilesTracker } from '@cardstack/files-realm-card/tracker';
-
-import PgClient from './pgsearch/pgclient';
-import IndexingService from './indexing';
-import Queue from './queue/queue';
-import { myOrigin } from './origin';
-import { Session } from './session';
-import { cardDocument } from './card-document';
-import { CARDSTACK_PUBLIC_REALM } from './realm';
-import Change from '@cardstack/git-realm-card/lib/change';
-import { Repository, RepoNotFound } from '@cardstack/git-realm-card/lib/git';
-import { SingleResourceDoc } from 'jsonapi-typescript';
-
-const INDEXING_INTERVAL = 10 * 60 * 1000;
-const log = logger('cardstack/server');
-const metaRealm = `${myOrigin}/api/realms/meta`;
-const cardCatalogRealm = 'https://cardstack.com/api/realms/card-catalog';
-const cardCatalogRepo = 'https://github.com/cardstack/card-catalog.git';
-const localDefaultRealmRepo = 'default-realm';
-const localMetaRealmRepo = 'meta-realm';
-const localCardCatalogRepo = 'card-catalog-realm';
+const log = logger('cardstack/hub');
 
 // Careful: this assumes that you are running the hub from a mono repo context.
 export const builtInCardsDir = join(__dirname, '..', '..', 'cards');
 
 export async function wireItUp() {
   let registry = new Registry();
+  registry.register('development-config', DevelopmentConfig);
   registry.register('authentication-middleware', AuthenticationMiddleware);
-  registry.register('jsonapi-middleware', JSONAPIMiddleware);
-  registry.register('ephemeralStorage', EphemeralStorage);
-  registry.register('filesTracker', FilesTracker);
-  registry.register('cards', CardsService);
-  registry.register('modules', ModuleService);
-  registry.register('pgclient', PgClient);
-  registry.register('indexing', IndexingService);
-  registry.register('queue', Queue);
+  registry.register('development-proxy-middleware', DevelopmentProxyMiddleware);
   return new Container(registry);
 }
 
@@ -60,23 +27,19 @@ export async function makeServer(container?: Container) {
     container = await wireItUp();
   }
 
-  await setupRealms(container);
-  await indexBuiltInCards(container);
-
-  if (process.env.EMBER_ENV !== 'test') {
-    await startQueueRunners(container);
-
-    // Intentionally not awaiting this promise to prevent indexing from blocking
-    // the hub booting process. Since we skip this in tests, we shouldn't have
-    // to worry about leaking async.
-    synchronizeIndex(container);
-  }
-
   let app = new Koa();
+  app.use(async (ctx: Koa.Context, next: Koa.Next) => {
+    ctx.environment = process.env.NODE_ENV || 'development';
+    return next();
+  });
   app.use(cors);
   app.use(httpLogging);
   app.use((await container.lookup('authentication-middleware')).middleware());
-  app.use((await container.lookup('jsonapi-middleware')).middleware());
+  app.use((await container.lookup('development-proxy-middleware')).middleware());
+  app.use(async (ctx: Koa.Context, _next: Koa.Next) => {
+    ctx.body = 'Hello World ' + ctx.environment + ' ' + ctx.host.split(':')[0];
+  });
+
   return app;
 }
 
@@ -127,111 +90,6 @@ async function runServer(config: StartupConfig) {
   }
 }
 
-async function startQueueRunners(container: Container) {
-  let queue = await container.lookup('queue');
-  await queue.launchJobRunner();
-}
-
-async function synchronizeIndex(container: Container) {
-  let indexing = await container.lookup('indexing');
-  while (true) {
-    try {
-      await indexing.update();
-    } catch (e) {
-      // Logging this error since we are not intentionally awaiting this
-      // function which means that this exception would otherwise be hidden
-      // behind a rejected promise that we are ignoring.
-      log.error(`Encountered an unexpected error while indexing: ${e.message || e.detail}\n${JSON.stringify(e.stack)}`);
-      throw e;
-    }
-    await new Promise(res => setTimeout(() => res(), INDEXING_INTERVAL));
-  }
-}
-
-async function setupRealms(container: Container) {
-  let metaRealmDoc = cardDocument().withAttributes({
-    csRealm: metaRealm,
-    csId: metaRealm,
-    csTitle: 'Meta Realm',
-    csDescription: `This card controls the configuration of the meta realm which is the realm that holds all of your realm cards.`,
-  });
-
-  let baseRealmDoc = cardDocument()
-    .withAttributes({
-      csRealm: metaRealm,
-      csId: CARDSTACK_PUBLIC_REALM,
-      csTitle: 'Base Realm',
-      csDescription: `This card controls the configuration of the base realm which contains all the built-in cards.`,
-      directory: builtInCardsDir,
-    })
-    .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'files-realm' });
-
-  let defaultRealmDoc = cardDocument().withAttributes({
-    csRealm: metaRealm,
-    csId: `${myOrigin}/api/realms/default`,
-    csTitle: `Default Realm`,
-    csDescription: `This card controls the configuration of your hub's default realm. This is the realm that cards are written to by default.`,
-  });
-
-  let cardCatalogRealmDoc = cardDocument().withAttributes({
-    csRealm: metaRealm,
-    csId: cardCatalogRealm,
-    csTitle: 'Card Catalog',
-    csDescription: `The Cardstack curated catalog of cards.`,
-  });
-
-  if (process.env.EMBER_ENV === 'test') {
-    // in order to prevent test leakage, we'll use ephemeral-based realms when it
-    // looks like you are running tests.
-    metaRealmDoc.adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi;
-    defaultRealmDoc.adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi;
-    cardCatalogRealmDoc.adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'ephemeral-realm' }).jsonapi;
-  } else {
-    metaRealmDoc.adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'git-realm' });
-    cardCatalogRealmDoc.adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'git-realm' });
-
-    if (process.env.META_REALM_URL) {
-      metaRealmDoc.withAttributes({
-        remoteUrl: process.env.META_REALM_URL,
-        remoteCacheDir: localMetaRealmRepo,
-      });
-    } else {
-      metaRealmDoc.withAttributes({
-        repo: localMetaRealmRepo,
-      });
-    }
-    if (process.env.DEFAULT_REALM_URL) {
-      defaultRealmDoc.withAttributes({
-        remoteUrl: process.env.DEFAULT_REALM_URL,
-        remoteCacheDir: localDefaultRealmRepo,
-      });
-      defaultRealmDoc.adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'git-realm' });
-    } else if (process.env.DEV_DIR) {
-      // this is temporary until we get the real UI working to facilitate this
-      defaultRealmDoc
-        .withAttributes({
-          directory: process.env.DEV_DIR,
-        })
-        .adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'files-realm' });
-    } else {
-      defaultRealmDoc.withAttributes({
-        repo: localDefaultRealmRepo,
-      });
-      defaultRealmDoc.adoptingFrom({ csRealm: CARDSTACK_PUBLIC_REALM, csId: 'git-realm' });
-    }
-
-    cardCatalogRealmDoc.withAttributes({
-      remoteUrl: cardCatalogRepo,
-      remoteCacheDir: localCardCatalogRepo,
-    });
-  }
-
-  await assertRealmExists(container, metaRealmDoc.jsonapi);
-  await assertRealmExists(container, baseRealmDoc.jsonapi);
-  await assertRealmExists(container, defaultRealmDoc.jsonapi);
-  await assertRealmExists(container, cardCatalogRealmDoc.jsonapi);
-}
-
 interface StartupConfig {
   port: number;
 }
@@ -261,111 +119,4 @@ export async function cors(ctxt: Koa.Context, next: Koa.Next) {
     return;
   }
   await next();
-}
-
-export async function indexBuiltInCards(container: Container) {
-  let indexing = await container.lookup('indexing');
-  await indexing.indexRealm({
-    realmCardId: {
-      csRealm: metaRealm,
-      csId: CARDSTACK_PUBLIC_REALM,
-    },
-  });
-  await waitForBuiltInCardsToIndex(container);
-}
-
-async function waitForBuiltInCardsToIndex(container: Container) {
-  let maxAttempts = 100;
-  let cards = await (await container.lookup('cards')).as(Session.INTERNAL_PRIVILEGED);
-  let ids = glob
-    .sync(`${builtInCardsDir}/*`)
-    .map(cardDir => cardDir.split('/').pop())
-    .filter(Boolean) as string[];
-  let attempts = 0;
-  while (attempts++ < maxAttempts) {
-    let results = await Promise.all(
-      ids.map(csId =>
-        cards.search({
-          filter: {
-            eq: {
-              csRealm: CARDSTACK_PUBLIC_REALM,
-              csId,
-            },
-          },
-        })
-      )
-    );
-
-    let cardCount = results.filter(r => Boolean(r.cards.length)).length;
-    if (cardCount === ids.length) {
-      return;
-    }
-
-    log.debug(`waiting for builtin indexing attempt=${attempts}, found=${cardCount}, goal=${ids.length}`);
-  }
-  throw new Error(`Timeout waiting for builtin cards to be indexed.`);
-}
-
-async function assertRealmExists(container: Container, realmCardDoc: SingleResourceDoc): Promise<void> {
-  let { csRealm, csId, repo } = realmCardDoc.data.attributes as any;
-
-  let cards = (await container.lookup('cards')).as(Session.INTERNAL_PRIVILEGED);
-  let hasRealm = false;
-  try {
-    // We always start with a fresh meta realm, otherwise we'll create the realm
-    // card if we don't see it in the index. In the case the meta realm already
-    // has realm cards (it's a remote git realm), the first index of the meta
-    // realm will clear any of these asserted realms with the real realms it
-    // should be using.
-    if (csId !== metaRealm) {
-      await cards.get({ csRealm, csId });
-      hasRealm = true;
-    }
-  } catch (e) {
-    if (e.status !== 404) {
-      throw e;
-    }
-  }
-
-  if (!hasRealm) {
-    log.info(`Creating realm ${csId}.`);
-    if (repo) {
-      await assertRepoExists(repo);
-    }
-
-    try {
-      await cards.create(metaRealm, realmCardDoc);
-    } catch (e) {
-      if (csRealm === metaRealm && csId === metaRealm && e.status === 409 && e.detail.includes('is already in use')) {
-        log.info('Indexing meta realm to discover all the realms for this hub');
-        await indexMetaRealm(container, realmCardDoc);
-      } else {
-        throw e;
-      }
-    }
-  }
-}
-
-async function indexMetaRealm(container: Container, metaRealmDoc: SingleResourceDoc): Promise<void> {
-  let indexing = await container.lookup('indexing');
-  await indexing.indexMetaRealm(metaRealmDoc);
-}
-
-// TODO probably we should move this into the realm card
-async function assertRepoExists(repoDirName: string) {
-  let path = join(process.env.REPO_ROOT_DIR || join(homedir(), '.cardstack'), repoDirName);
-  await mkdirp(path);
-  try {
-    await Repository.open(path);
-  } catch (err) {
-    if (!(err instanceof RepoNotFound)) {
-      throw err;
-    }
-    let change = await Change.createInitial(path, 'master');
-    await change.finalize({
-      authorName: 'hub',
-      authorEmail: 'hub@cardstack',
-      message: 'Created realm',
-    });
-  }
 }

@@ -12,9 +12,10 @@
   },
   "dependencies": {
     "@cardstack/logger": "^0.2.1",
-    "chai": "^4.2.0",
+    "@types/chai": "^4.2.15",
+    "chai": "^4.3.4",
     "esm": "^3.2.25",
-    "glob": "^7.1.1",
+    "glob": "^7.1.6",
     "require-uncached": "^1.0.3"
   },
   "devDependencies": {

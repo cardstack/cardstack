@@ -1,8 +1,7 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: './tsconfig.json',
-    ecmaVersion: 2017,
+    ecmaVersion: 2020,
     sourceType: 'module',
   },
   env: {
@@ -30,6 +29,7 @@ module.exports = {
         'error',
         {
           allowModules: [],
+          resolvePaths: ['..'],
         },
       ],
       'node/no-missing-require': ['error'],

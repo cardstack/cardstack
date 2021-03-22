@@ -1,4 +1,5 @@
 module.exports = {
   root: true,
-  "extends": require.resolve('@cardstack/eslint-config')
+  // eslint-disable-next-line node/no-extraneous-require
+  extends: require.resolve('@cardstack/eslint-config'),
 };

@@ -6,7 +6,7 @@ let path = require('path');
 let packages = glob
   .sync('./packages/*/package.json')
   .concat(glob.sync('./cards/*/package.json'))
-  .map(p => {
+  .map((p) => {
     return require(path.join(process.cwd(), p));
   });
 
@@ -31,5 +31,6 @@ for (let pkg of packages) {
 }
 
 if (hasMismatches) {
+  // eslint-disable-next-line no-process-exit
   process.exit(1);
 }

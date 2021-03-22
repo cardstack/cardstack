@@ -21,22 +21,21 @@
   },
   "homepage": "https://github.com/cardstack/cardstack#readme",
   "peerDependencies": {
-    "@typescript-eslint/eslint-plugin": "^2.5.0",
-    "@typescript-eslint/parser": "^2.5.0",
-    "eslint": "^5.8.0",
-    "eslint-config-prettier": "^6.7.0",
-    "eslint-plugin-ember": "^5.0.0",
-    "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-mocha": "^5.2.0",
-    "eslint-plugin-node": "^5.2.1",
-    "eslint-plugin-prettier": "^3.1.1",
-    "prettier": "^1.19.1"
+    "@typescript-eslint/eslint-plugin": "^4.18.0",
+    "@typescript-eslint/parser": "^4.18.0",
+    "eslint": "^7.22.0",
+    "eslint-plugin-ember": "^10.2.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-mocha": "^8.1.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "prettier": "^2.2.1"
   },
   "engines": {
-    "node": ">= 8"
+    "node": ">= 12"
   },
   "volta": {
-    "node": "12.13.1",
-    "yarn": "1.22.0"
+    "extends": "../../package.json"
   }
 }
