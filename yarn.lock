@@ -9910,16 +9910,6 @@ ember-cli-deploy-display-revisions@^2.1.2:
     luxon "^1.25.0"
     rsvp "^4.8.5"
 
-ember-cli-deploy-manifest@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/ember-cli-deploy-manifest/-/ember-cli-deploy-manifest-2.0.0.tgz#f35a5f909e33b04eb81af5a7c368b551133e06bc"
-  integrity sha512-V7zm9tHXoFTr4Onz05Ki7XCyAeEIyh8NsM+DZ5MO9PIv0thaixfz0snT9MIkDhtj973w9fQuY6m/sQ/YK99nnQ==
-  dependencies:
-    chalk "^4.1.0"
-    core-object "^3.1.5"
-    minimatch "^3.0.4"
-    rsvp "^4.8.5"
-
 ember-cli-deploy-plugin@^0.2.1, ember-cli-deploy-plugin@^0.2.2, ember-cli-deploy-plugin@^0.2.3, ember-cli-deploy-plugin@^0.2.6, ember-cli-deploy-plugin@^0.2.9, ember-cli-deploy-plugin@~0.2.9:
   version "0.2.9"
   resolved "https://registry.yarnpkg.com/ember-cli-deploy-plugin/-/ember-cli-deploy-plugin-0.2.9.tgz#a3d395b8adad7ef68d8bacdd0b0f4a61bcf9e651"

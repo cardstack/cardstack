@@ -36,10 +36,8 @@ module.exports = function(deployTarget) {
         '/*',
         '/*/*',
         '/index.html',
-        '/vendor.css',
-        '/assets/vendor.css',
-        '/@cardstack/web-client.css',
-        '/assets/@cardstack/web-client.css',
+        '/assets/*',
+        '/assets/@cardstack/*',
       ],
     },
   };
