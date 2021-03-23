@@ -32,8 +32,6 @@ jobs:
   deploy-web-client-staging:
     name: Deploy web-client to S3 staging bucket
     runs-on: ubuntu-latest
-    # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
-    # github.head_ref: the branch that the pull request is from. only appears on pull_request events
     if: github.ref == 'refs/heads/main'
     needs: [test]
     steps:
@@ -50,4 +48,4 @@ jobs:
           ${{ runner.os }}-yarn-
     - run: yarn install
     - name: Run ember-cli-deploy
-      run: yarn run ember deploy staging
+      run: yarn deploy:web-client:staging

@@ -43,6 +43,7 @@
   "scripts": {
     "clean": "git clean -x -f",
     "compile": "tsc --build ./tsconfig.json",
+    "deploy:web-client:staging": "cd packages/web-client && ember deploy staging --activate",
     "prepare": "npm run compile",
     "lint": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
     "lint:deps": "node scripts/find-bad-deps.js",
