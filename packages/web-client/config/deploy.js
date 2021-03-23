@@ -48,17 +48,17 @@ module.exports = function(deployTarget) {
 
   if (deployTarget === 'staging') {
     ENV.build.environment = 'production';
-    ENV.s3Assets.bucket = ENV.s3Pages.bucket = 'web-client-staging';
+    ENV.s3Assets.bucket = ENV.s3Pages.bucket = 'app-staging-assets-cardstack';
     ENV.s3Assets.region = ENV.s3Pages.region = 'us-east-1';
-    ENV.cloudfront.distribution = 'TBD';
+    ENV.cloudfront.distribution = 'E1K1BK7GX2XSBV';
   }
 
-  if (deployTarget === 'production') {
-    ENV.build.environment = 'production';
-    ENV.s3Assets.bucket = ENV.s3Pages.bucket = 'web-client-prod';
-    ENV.s3Assets.region = ENV.s3Pages.region = 'us-east-1';
-    ENV.cloudfront.distribution = 'TBD';
-  }
+  // if (deployTarget === 'production') {
+  //   ENV.build.environment = 'production';
+  //   ENV.s3Assets.bucket = ENV.s3Pages.bucket = 'web-client-prod';
+  //   ENV.s3Assets.region = ENV.s3Pages.region = 'us-east-1';
+  //   ENV.cloudfront.distribution = 'TBD';
+  // }
 
   // Note: if you need to build some configuration asynchronously, you can return
   // a promise that resolves with the ENV object instead of returning the
