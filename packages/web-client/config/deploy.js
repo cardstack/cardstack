@@ -50,7 +50,7 @@ module.exports = function(deployTarget) {
     ENV.cloudfront.region = ENV.s3Assets.region = ENV.s3Pages.region = 'us-east-1';
     ENV.cloudfront.accessKeyId = ENV.s3Assets.accessKeyId = ENV.s3Pages.accessKeyId = process.env.EMBER_DEPLOY_AWS_ACCESS_KEY;
     ENV.cloudfront.secretAccessKey = ENV.s3Assets.secretAccessKey = ENV.s3Pages.secretAccessKey = process.env.EMBER_DEPLOY_AWS_ACCESS_SECRET;
-    ENV.cloudfront.distribution = 'E1K1BK7GX2XSBV';
+    ENV.cloudfront.distribution = 'E34FNDP9WBZSC7';
   }
 
   // if (deployTarget === 'production') {
