@@ -49,7 +49,7 @@ module.exports = function(deployTarget) {
   if (deployTarget === 'staging') {
     ENV.build.environment = 'production';
     ENV.s3Assets.bucket = ENV.s3Pages.bucket = 'app-staging-assets-cardstack';
-    ENV.s3Assets.region = ENV.s3Pages.region = 'us-east-1';
+    ENV.cloudfront.region = ENV.s3Assets.region = ENV.s3Pages.region = 'us-east-1';
     ENV.cloudfront.accessKeyId = ENV.s3Assets.accessKeyId = ENV.s3Pages.accessKeyId = process.env.STAGING_EMBER_DEPLOY_AWS_ACCESS_KEY;
     ENV.cloudfront.secretAccessKey = ENV.s3Assets.secretAccessKey = ENV.s3Pages.secretAccessKey = process.env.STAGING_EMBER_DEPLOY_AWS_ACCESS_SECRET;
     ENV.cloudfront.distribution = 'E1K1BK7GX2XSBV';
