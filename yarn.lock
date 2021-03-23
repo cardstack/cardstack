@@ -11037,6 +11037,14 @@ ember-cli-preprocess-registry@^3.3.0:
     debug "^3.0.1"
     process-relative-require "^1.0.0"
 
+ember-cli-qrcode@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/ember-cli-qrcode/-/ember-cli-qrcode-1.0.0.tgz#d83ce36493624f961aee2952198c2fa586afa540"
+  integrity sha512-VBLJu9ep74mAH0cZXMS7r/bDol9BFp+rCzdrDevK3AmE5gv/tHYinDHLwFJCb0gitnL6vAK6Uf4SzgININg1WQ==
+  dependencies:
+    ember-cli-babel "^7.1.2"
+    ember-cli-htmlbars "^3.0.0"
+
 ember-cli-sass@^7.0.0:
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/ember-cli-sass/-/ember-cli-sass-7.2.0.tgz#293d1a94c43c1fdbb3835378e43d255e8ad5c961"
