@@ -39,12 +39,14 @@ export interface CompiledCard {
   };
   modelModule: string;
   templateModules: {
-    [K in keyof typeof templateTypeNames]: {
-      moduleName: string;
-      // usedFields: string[]; // ["title", "author.firstName"]
-      inlineHBS?: string;
-    };
+    [K in keyof typeof templateTypeNames]: TemplateModule;
   };
+}
+
+export interface TemplateModule {
+  moduleName: string;
+  // usedFields: string[]; // ["title", "author.firstName"]
+  inlineHBS?: string;
 }
 
 export interface Builder {
@@ -53,7 +55,6 @@ export interface Builder {
 }
 
 export type defineModuleCallback = (
-  cardURL: string,
-  moduleName: string,
+  fullModuleURL: string,
   source: unknown
 ) => Promise<void>;

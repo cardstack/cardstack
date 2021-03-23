@@ -9,4 +9,21 @@ setApplication(Application.create(config.APP));
 
 setup(QUnit.assert);
 
+declare global {
+  interface Assert {
+    includes(source: string | null, match: string, message?: string): void;
+  }
+}
+QUnit.assert.includes = function (source, test, message = '') {
+  let result = source?.includes(test) ?? false;
+  let actual = source;
+  let expected = test;
+  this.pushResult({
+    result,
+    actual,
+    expected,
+    message,
+  });
+};
+
 start();

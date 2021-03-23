@@ -4,7 +4,7 @@ import {
   ASTPluginEnvironment,
   preprocess as parse,
 } from '@glimmer/syntax';
-import { CompiledCard } from './interfaces';
+import { CompiledCard, RawCard, TemplateModule } from './interfaces';
 
 const PREFIX = '@model.';
 
@@ -19,18 +19,15 @@ export default function cardTransform(options: {
           if (node.tag.startsWith(PREFIX)) {
             let fieldName = node.tag.slice(PREFIX.length);
             let field = options.fields[fieldName];
-            if (field) {
-              // TODO:
-              // - Load template module source
-              // - Determine module needed for import
-              // - Rewrite local to fields Card invocation
-              // let embeddedTemplate = field.card.templateSources.embedded;
-              // let ast = parse(embeddedTemplate, {
-              //   plugins: {
-              //     ast: [rewriteLocals({ this: fieldName })],
-              //   },
-              // });
-              // return ast.body;
+            let embeddedTemplate =
+              field?.card.templateModules.embedded.inlineHBS;
+            if (embeddedTemplate) {
+              let ast = parse(embeddedTemplate, {
+                plugins: {
+                  ast: [rewriteLocals({ this: fieldName })],
+                },
+              });
+              return ast.body;
             }
           }
           return undefined;
@@ -39,7 +36,7 @@ export default function cardTransform(options: {
     };
   };
 }
-
+// TODO: Rewrite imported Fields as their component expression
 function rewriteLocals(remapping: { this: string }): ASTPluginBuilder {
   let rewritten = new Set<unknown>();
   return function transform(env: ASTPluginEnvironment): ASTPlugin {

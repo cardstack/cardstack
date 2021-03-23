@@ -12,8 +12,8 @@ import { setComponentTemplate } from '@ember/component';
 export default class Builder implements BuilderInterface {
   private compiler = new Compiler({
     lookup: (url: string) => this.getCompiledCard(url),
-    define: (cardURL, module, source) =>
-      this.defineModule(cardURL, module, source),
+    define: (...args: Parameters<defineModuleCallback>) =>
+      this.defineModule(...args),
   });
 
   private cache: Map<string, CompiledCard>;
@@ -29,14 +29,12 @@ export default class Builder implements BuilderInterface {
     this.modulePrefix = params.modulePrefix ?? '';
   }
 
-  // TODO: is there a way to reuse the arguments of the defineModuleCallback type?
-  async defineModule(
-    cardURL: string,
-    moduleName: string,
-    source: unknown
-  ): Promise<void> {
-    let modulePath = this.getFullModuleURL(cardURL, moduleName);
-    this.customDefine(modulePath, source);
+  async defineModule(...args: Parameters<defineModuleCallback>): Promise<void> {
+    let [fullModuleURL, source] = args;
+
+    // TODO: Handle prefixing/rewriting
+    // let modulePath = this.getFullModuleURL(cardURL, moduleName);
+    this.customDefine(fullModuleURL, source);
   }
 
   getFullModuleURL(cardURL: string, moduleName: string): string {
@@ -85,11 +83,7 @@ export default class Builder implements BuilderInterface {
       compileTemplate(templateSource),
       templateOnlyComponent()
     );
-    this.defineModule(
-      compiledCard.url,
-      compiledCard.modelModule,
-      componentImplementation
-    );
+    this.defineModule(compiledCard.modelModule, componentImplementation);
     return { model: compiledCard.data, moduleName: compiledCard.modelModule };
   }
 }

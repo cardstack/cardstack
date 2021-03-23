@@ -13,7 +13,7 @@ export function templateOnlyComponentTemplate(template: string): string {
   import { precompileTemplate } from '@ember/template-compilation';
   import templateOnlyComponent from '@ember/component/template-only';
   export default setComponentTemplate(
-    precompileTemplate(${template}, {
+    precompileTemplate('${template}', {
       strictMode: true,
     }),
     templateOnlyComponent()

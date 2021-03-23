@@ -67,6 +67,11 @@ module('Integration | compiler-adoption', function (hooks) {
       let compiled = await builder.getCompiledCard(card.url);
       assert.deepEqual(Object.keys(compiled.fields), ['name', 'birthdate']);
       assert.deepEqual(compiled.adoptsFrom, parentCard);
+      assert.equal(
+        compiled.templateModules.embedded.moduleName,
+        parentCard.templateModules.embedded.moduleName,
+        'It reports the module name for the template that it adopts'
+      );
     });
 
     test('A child card can add a field', async function (assert) {

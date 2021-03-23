@@ -1,20 +1,22 @@
-import * as syntax from '@glimmer/syntax';
 import { transformSync } from '@babel/core';
 // @ts-ignore
 import decoratorsPlugin from '@babel/plugin-proposal-decorators';
 // @ts-ignore
 import classPropertiesPlugin from '@babel/plugin-proposal-class-properties';
 
-import cardPlugin, { FieldsMeta, getMeta } from './card-babel-plugin';
-import cardGlimmerPlugin from './card-glimmer-plugin';
+import cardSchemaPlugin, {
+  FieldsMeta,
+  getMeta,
+} from './card-schema-babel-plugin';
+import cardTemplatePlugin from './card-template-babel-plugin';
 import {
   CompiledCard,
   RawCard,
   RawCardData,
   templateFileName,
-  TemplateType,
   templateTypes,
   defineModuleCallback,
+  TemplateModule,
 } from './interfaces';
 
 import intersection from 'lodash/intersection';
@@ -32,11 +34,12 @@ export class Compiler {
     this.lookup = params.lookup;
     this.define = params.define;
   }
+
   async compile(cardSource: RawCard): Promise<CompiledCard> {
     let options = {};
     let parentCard;
 
-    let modelModuleName = this.transformAndDefineSchema(
+    let modelModuleName = this.prepareSchema(
       cardSource.url,
       cardSource.files['schema.js'],
       options
@@ -69,46 +72,30 @@ export class Compiler {
     return card;
   }
 
-  transformAndDefineSchema(
-    url: string,
-    schema: string,
-    options: Object
-  ): string {
+  /**
+   * For the compiled module paths, we generate predictable urls based off
+   * the provided cardUrl and module name. This will later be modified by
+   * the builder to handle various contexts
+   */
+  getFullModulePath(cardURL: string, moduleName: string): string {
+    return `${cardURL}/${moduleName}`;
+  }
+
+  prepareSchema(url: string, schema: string, options: Object): string {
     let out = transformSync(schema, {
       plugins: [
-        [cardPlugin, options],
-        [
-          decoratorsPlugin,
-          {
-            decoratorsBeforeExport: false,
-          },
-        ],
+        [cardSchemaPlugin, options],
+        [decoratorsPlugin, { decoratorsBeforeExport: false }],
         classPropertiesPlugin,
       ],
     });
 
     let code = out!.code!;
 
-    this.define(url, MODEL_MODULE_NAME, code);
-    return MODEL_MODULE_NAME;
-  }
+    let fullModulePath = this.getFullModulePath(url, MODEL_MODULE_NAME);
+    this.define(fullModulePath, code);
 
-  prepareTemplates(
-    cardSource: RawCard,
-    fields: CompiledCard['fields'],
-    parentCard?: CompiledCard
-  ): CompiledCard['templateModules'] {
-    // TODO: inherit all the way up to base, so these are never undefined
-    let templateModules: CompiledCard['templateModules'] = {
-      isolated: { moduleName: 'isolated' },
-      embedded: { moduleName: 'embedded' },
-    };
-
-    for (let templateType of templateTypes) {
-      this.compileOrAdoptTemplate(cardSource, templateType, fields, parentCard);
-    }
-
-    return templateModules;
+    return fullModulePath;
   }
 
   getData(data: RawCardData | undefined): any {
@@ -149,32 +136,54 @@ export class Compiler {
     return Object.assign(fields, parentCard.fields);
   }
 
-  compileOrAdoptTemplate(
+  prepareTemplates(
     cardSource: RawCard,
-    templateType: TemplateType,
     fields: CompiledCard['fields'],
     parentCard?: CompiledCard
-  ): void {
-    let template = '';
-    let source = cardSource.files[templateFileName(templateType)];
+  ): CompiledCard['templateModules'] {
+    let templateModules: CompiledCard['templateModules'] = {
+      isolated: { moduleName: 'isolated' },
+      embedded: { moduleName: 'embedded' },
+    };
 
-    if (source) {
-      template = this.compileTemplate(source, fields);
-      this.define(cardSource.url, templateType, template);
-    } else if (parentCard) {
-      // TODO: return the parent cards module?
-      // template = parentCard.templateModules[templateType];
+    for (let templateType of templateTypes) {
+      let template;
+      let templateSource = cardSource.files[templateFileName(templateType)];
+      let templateModule = templateModules[templateType];
+
+      if (templateSource) {
+        template = this.compileTemplate(templateSource, fields, templateModule);
+
+        let fullModulePath = this.getFullModulePath(
+          cardSource.url,
+          templateType
+        );
+        templateModule.moduleName = fullModulePath;
+        this.define(fullModulePath, template);
+      } else if (parentCard) {
+        templateModule.moduleName =
+          parentCard.templateModules[templateType].moduleName;
+      } else {
+        // TODO: Likely this should error, but not all of our test scenarios have full
+        // fallback set up. Not sure how to handle that just yet
+        // throw Error(
+        //   `Card:${cardSource.url} has no template for type ${templateType}. This should not happen`
+        // );
+      }
     }
+
+    return templateModules;
   }
 
-  compileTemplate(source: string, fields: CompiledCard['fields']): string {
-    return syntax.print(
-      syntax.preprocess(source, {
-        mode: 'codemod',
-        plugins: {
-          ast: [cardGlimmerPlugin({ fields })],
-        },
-      })
-    );
+  compileTemplate(
+    templateSource: string,
+    fields: CompiledCard['fields'],
+    templateModule: TemplateModule
+  ): string {
+    let out = transformSync(templateSource, {
+      plugins: [[cardTemplatePlugin, { fields, templateModule }]],
+    });
+
+    return out!.code!;
   }
 }

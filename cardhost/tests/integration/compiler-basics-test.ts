@@ -14,6 +14,26 @@ async function evalModule(src: string): Promise<any> {
   return src;
 }
 
+const PERSON_CARD = {
+  url: 'https://mirage/cards/person',
+  files: {
+    'schema.js': `
+      import { contains } from "@cardstack/types";
+      import date from "https://cardstack.com/base/models/date";
+      import string from "https://cardstack.com/base/models/string";
+      export default class Person {
+        @contains(string)
+        name;
+
+        @contains(date)
+        birthdate;
+      }`,
+    'embedded.js': templateOnlyComponentTemplate(
+      '<@model.name/> was born on <@model.birthdate/>'
+    ),
+  },
+};
+
 module('Integration | compiler-basics', function (hooks) {
   let builder: Builder;
   let defineModuleCallback: (url: string, source: unknown) => void;
@@ -30,26 +50,6 @@ module('Integration | compiler-basics', function (hooks) {
     builder = new Builder({
       defineModule: (url, source) => {
         defineModuleCallback(url, source);
-      },
-    });
-
-    await this.createCard({
-      url: 'https://mirage/cards/person',
-      files: {
-        'schema.js': `
-          import { contains } from "@cardstack/types";
-          import date from "https://cardstack.com/base/models/date";
-          import string from "https://cardstack.com/base/models/string";
-          export default class Person {
-            @contains(string)
-            name;
-
-            @contains(date)
-            birthdate;
-          }`,
-        'embedded.js': templateOnlyComponentTemplate(
-          '<@model.name/> was born on <@model.birthdate/>'
-        ),
       },
     });
   });
@@ -88,12 +88,31 @@ module('Integration | compiler-basics', function (hooks) {
     let compiled = await builder.getCompiledCard(card.url);
     assert.equal(
       compiled.modelModule,
-      'model',
+      `${card.url}/model`,
       'CompiledCard moduleName is set correctly'
     );
   });
 
+  test('Generates inlineHBS for templates without', async function (assert) {
+    let card = {
+      url: 'http://mirage/cards/string',
+      files: {
+        'schema.js': `export default class String {}`,
+        'embedded.js': templateOnlyComponentTemplate('{{@model}}'),
+      },
+    };
+    this.createCard(card);
+
+    let compiled = await builder.getCompiledCard(card.url);
+    assert.equal(
+      compiled.templateModules.embedded.inlineHBS,
+      `{{@model}}`,
+      'templateModules includes inlineHBS for simple cards'
+    );
+  });
+
   test('it discovers the four kinds of fields', async function (assert) {
+    await this.createCard(PERSON_CARD);
     let card = {
       url: 'http://mirage/cards/post',
       files: {
@@ -227,7 +246,7 @@ module('Integration | compiler-basics', function (hooks) {
 
   module('templates', function () {
     test('it inlines a simple field template', async function (assert) {
-      assert.expect(3);
+      assert.expect(2);
 
       let card = {
         url: 'http://mirage/cards/post',
@@ -249,36 +268,44 @@ module('Integration | compiler-basics', function (hooks) {
 
       this.createCard(card);
 
-      let compiled = await builder.getCompiledCard(card.url);
-      assert.equal(compiled.templateModules['isolated'].moduleName, 'isolated');
-      defineModuleCallback = function (fullModuleURL, source) {
-        assert.equal(
-          fullModuleURL,
-          `${card.url}/isolated`,
-          'Module url is correct'
-        );
-        assert.equal(
-          source,
-          '<h1>{{@model.title}}</h1>',
-          'Source code includes the right template'
-        );
+      defineModuleCallback = function (fullModuleURL: string, source: string) {
+        if (fullModuleURL === `${card.url}/isolated`) {
+          assert.includes(
+            source,
+            '<h1>{{@model.title}}</h1>',
+            'Source code includes the right template'
+          );
+          // console.log({ equal: (source as string).includes('<h1>{{@model.title}}</h1>'), url: card.url, source });
+        } else {
+          console.log(`defineModule called for ${fullModuleURL}`);
+        }
       };
+
+      let compiled = await builder.getCompiledCard(card.url);
+      assert.equal(
+        compiled.templateModules['isolated'].moduleName,
+        `${card.url}/isolated`,
+        'templateModule for "isolated" is full url'
+      );
     });
 
     test('it inlines a compound field template', async function (assert) {
-      assert.expect(3);
+      assert.expect(4);
+
+      this.createCard(PERSON_CARD);
+
       let card = {
         url: 'http://mirage/cards/post',
         files: {
           'schema.js': `
-        import { contains } from "@cardstack/types";
-        import person from "https://mirage/cards/person";
+            import { contains } from "@cardstack/types";
+            import person from "https://mirage/cards/person";
 
-        export default class Post {
-          @contains(person)
-          author;
-        }
-    `,
+            export default class Post {
+              @contains(person)
+              author;
+            }
+          `,
           'isolated.js': templateOnlyComponentTemplate(
             `<h1><@model.author /></h1>`
           ),
@@ -287,24 +314,31 @@ module('Integration | compiler-basics', function (hooks) {
 
       this.createCard(card);
 
-      let compiled = await builder.getCompiledCard(card.url);
-      assert.equal(compiled.templateModules['isolated'].moduleName, 'isolated');
-
       // TODO: Have this base card include a unrelated component
       // `<h1>{{@model.author.name}} was born on <DateField @model={{@model.author.birthdate}} /></h1>`
       // Should include DateField import: https://discord.com/channels/@me/798223273497460796/822142409973563432
-      defineModuleCallback = function (fullModuleURL, source) {
-        assert.equal(
-          fullModuleURL,
-          `${card.url}/isolated`,
-          'Module url is correct'
-        );
-        assert.equal(
-          source,
-          '<h1>{{@model.author.name}} was born on <DateField @model={{@model.author.birthdate}} /></h1>',
-          'Source code includes the right template'
-        );
+      defineModuleCallback = function (fullModuleURL, source: string) {
+        console.log(`defineModule called for ${fullModuleURL}`, { source });
+        if (fullModuleURL === `${card.url}/isolated`) {
+          assert.includes(source, 'scope: {', 'scope is added to the options');
+          assert.includes(
+            source,
+            'import DateField from "http://cardhost.com/base/model/date',
+            'The import statement for DateField is added'
+          );
+          assert.equal(
+            source,
+            '<h1>{{@model.author.name}} was born on <DateField @model={{@model.author.birthdate}} /></h1>',
+            'Source code includes the right template'
+          );
+        }
       };
+
+      let compiled = await builder.getCompiledCard(card.url);
+      assert.equal(
+        compiled.templateModules['isolated'].moduleName,
+        `${card.url}/isolated`
+      );
     });
   });
 
