@@ -19,7 +19,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ~/.cache/yarn
-        key: ${{ runner.os }}-yarn-${{ hashFiles('/**/yarn.lock') }}
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
         restore-keys: |
           ${{ runner.os }}-yarn-
     - run: yarn install
@@ -43,7 +43,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ~/.cache/yarn
-        key: ${{ runner.os }}-yarn-${{ hashFiles('/**/yarn.lock') }}
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
         restore-keys: |
           ${{ runner.os }}-yarn-
     - run: yarn install
