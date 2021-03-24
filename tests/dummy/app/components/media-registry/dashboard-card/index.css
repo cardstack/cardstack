@@ -1,6 +1,11 @@
 .media-registry {
-  --boxel-dashboard-header-background-color: var(--boxel-dark);
-  --boxel-dashboard-header-color: var(--boxel-light);
+  --media-registry-header-background-color: var(--boxel-dark);
+  --media-registry-header-text-color: var(--boxel-light);
+}
+
+.media-registry__header-container {
+  background-color: var(--media-registry-header-background-color);
+  color: var(--media-registry-header-text-color);
 }
 
 /* Left-edge and queue */
@@ -116,26 +121,16 @@
 
 
 /* Dummy */
-.media-registry.media-registry--bunny_records {
-  --boxel-dashboard-header-background-color: #FF1D6C;
+.boxel-org-switcher-button__logo--bunny_records,
+.boxel-org-switcher-button__logo--crd_records {
+  background-size: 1.7rem 1.7rem;
 }
 
-.media-registry.media-registry--crd_records {
-  --boxel-dashboard-header-background-color: var(--boxel-blue);
+.boxel-org-switcher-button__logo--realtunes-publishing {
+  --boxel-org-switcher-button-background-size: auto 3rem;
 }
 
-.media-registry.media-registry--warbler-music {
-  --boxel-dashboard-header-background-color: var(--boxel-navy);
-}
-
-.media-registry.media-registry--somoa {
-  --boxel-dashboard-header-background-color: var(--boxel-lilac);
-}
-
-.media-registry.media-registry--realtunes-publishing {
-  --boxel-dashboard-header-background-color: #3F356F;
-}
-.media-registry__header.media-registry__header--realtunes-publishing {
+.media-registry__header--realtunes-publishing {
   --boxel-org-header-logo-position: bottom 0.5rem center;
   --boxel-org-header-logo-size: auto 3rem;
 }

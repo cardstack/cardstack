@@ -1,0 +1,14 @@
+<Boxel::LeftEdgeNav::SelectableButton
+  @isSelected={{@isSelected}}
+  style={{css-var boxel-org-switcher-button-background-color=(or @org.brandColor "var(--boxel-dark)")}}
+  ...attributes
+>
+  <div
+    class={{cn "boxel-org-switcher-button__logo" (concat "boxel-org-switcher-button__logo--" @org.id)}}
+    style={{css-url "background-image" @org.iconURL}}
+  >
+    {{#unless @org.iconURL}}
+      {{truncate @org.title 1 false}}
+    {{/unless}}
+  </div>
+</Boxel::LeftEdgeNav::SelectableButton>

@@ -1,11 +1,12 @@
 import Component from '@glimmer/component';
-import HaleyOConnellThumb from '@cardstack/boxel/usage-support/images/workflow/participants/thumb/Haley-OConnell.jpg';
-import JuliaMasonThumb from '@cardstack/boxel/usage-support/images/workflow/participants/thumb/Julia-Mason.jpg';
-import LolaSampsonThumb from '@cardstack/boxel/usage-support/images/workflow/participants/thumb/Lola-Sampson.jpg';
-import RupertGrishamThumb from '@cardstack/boxel/usage-support/images/workflow/participants/thumb/Rupert-Grisham.jpg';
-import HSHIcon from '@cardstack/boxel/usage-support/images/workflow/orgs/hsh-icon.png';
 import { A } from '@ember/array';
 import { tracked } from '@glimmer/tracking';
+
+import HaleyOConnellThumb from '@cardstack/boxel/usage-support/images/users/Haley-OConnell.jpg';
+import JuliaMasonThumb from '@cardstack/boxel/usage-support/images/users/Julia-Mason.jpg';
+import LolaSampsonThumb from '@cardstack/boxel/usage-support/images/users/Lola-Sampson.jpg';
+import RupertGrishamThumb from '@cardstack/boxel/usage-support/images/users/Rupert-Grisham.jpg';
+import HSHIcon from '@cardstack/boxel/usage-support/images/orgs/hsh-icon.png';
 
 const SAMPLE_PARTICIPANTS = [
   {
@@ -31,6 +32,7 @@ const SAMPLE_PARTICIPANTS = [
     imgURL: JuliaMasonThumb,
   },
 ];
+
 export default class extends Component {
   @tracked participants = A(SAMPLE_PARTICIPANTS);
 }

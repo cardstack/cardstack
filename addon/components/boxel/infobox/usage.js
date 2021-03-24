@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import rightInfoboxImage from '@cardstack/boxel/usage-support/images/cardspace/infobox/right-infobox-image.svg';
+import rightInfoboxImage from '@cardstack/boxel/usage-support/images/infobox-image.svg';
 
 export default class InfoboxUsage extends Component {
   @tracked image = rightInfoboxImage;

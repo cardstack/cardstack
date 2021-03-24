@@ -1,7 +1,5 @@
 import bunnyLogo from 'dummy/images/media-registry/bunny-logo.svg';
 import crdRecordsLogo from 'dummy/images/media-registry/crd_records_logo.svg';
-import bunnyLogoIcon from 'dummy/images/media-registry/button-bunny-records.svg';
-import crdRecordsIcon from 'dummy/images/media-registry/button-crd-records.svg';
 import lisaTrackProfile from 'dummy/images/media-registry/profiles/Lisa-Track.jpg';
 import steveRightsProfile from 'dummy/images/media-registry/profiles/Steve-Rights.jpg';
 import ampLogo from 'dummy/images/media-registry/amp-logo.png';
@@ -10,8 +8,6 @@ import realtunesLogo from 'dummy/images/media-registry/realtunes-logo.png';
 export {
   ampLogo,
   bunnyLogo,
-  bunnyLogoIcon,
-  crdRecordsIcon,
   crdRecordsLogo,
   realtunesLogo,
   lisaTrackProfile,
@@ -23,8 +19,8 @@ export default [
     id: 'bunny_records',
     type: 'label',
     title: 'Bunny Records',
-    iconURL: bunnyLogoIcon,
-    logoURL: bunnyLogo,
+    iconURL: bunnyLogo,
+    brandColor: '#FF1D6C',
     user: {
       title: 'Lisa Track',
       role: 'Administrator',
@@ -103,8 +99,8 @@ export default [
     id: 'crd_records',
     type: 'label',
     title: 'CRD Records',
-    iconURL: crdRecordsIcon,
-    logoURL: crdRecordsLogo,
+    iconURL: crdRecordsLogo,
+    brandColor: 'var(--boxel-blue)',
     user: {
       title: 'Steve Rights',
       role: 'Catalog Manager',
@@ -159,13 +155,13 @@ export default [
     id: 'warbler-music',
     type: 'label',
     title: 'Warbler Music',
+    brandColor: 'var(--boxel-navy)',
   },
   {
     id: 'allegro-music-publishing',
     type: 'publisher',
     title: 'Allegro Music Publishing',
     iconURL: ampLogo,
-    logoURL: ampLogo,
     territory: 'worldwide',
     ipi: '00170191322',
     website: 'www.allegromusic.com',
@@ -177,7 +173,7 @@ export default [
     type: 'publisher',
     title: 'RealTunes Publishing',
     iconURL: realtunesLogo,
-    logoURL: realtunesLogo,
+    brandColor: '#3F356F',
     territory: 'worldwide',
     website: 'www.realtunes.com',
     main_office: 'Los Angeles, USA',
@@ -186,6 +182,7 @@ export default [
   {
     id: 'somoa',
     title: 'SOMOA Music Rights',
+    brandColor: 'var(--boxel-lilac)',
     musicalWorkOnly: true,
   },
   {
