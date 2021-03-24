@@ -44,9 +44,7 @@ export default class Cards extends Service {
     if (macroCondition(isTesting())) {
       // in tests, our fake server inside mirage just defines these modules
       // dynamically
-      cardComponent = window.require(
-        `@cardstack/compiled/${card.data.meta.componentModule}`
-      );
+      cardComponent = window.require(card.data.meta.componentModule);
     } else {
       cardComponent = await import(
         `@cardstack/compiled/${card.data.meta.componentModule}`

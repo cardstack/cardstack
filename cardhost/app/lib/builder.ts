@@ -5,9 +5,18 @@ import type {
   defineModuleCallback,
 } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
-import { compileTemplate } from 'cardhost/tests/helpers/template-compiler';
-import templateOnlyComponent from '@ember/component/template-only';
-import { setComponentTemplate } from '@ember/component';
+// import { compileTemplate } from 'cardhost/tests/helpers/template-compiler';
+// import templateOnlyComponent from '@ember/component/template-only';
+// import { setComponentTemplate } from '@ember/component';
+
+// import { precompile } from '@glimmer/compiler';
+// import type { TemplateFactory } from 'htmlbars-inline-precompile';
+
+// // @ts-ignore
+// import { createTemplateFactory } from '@ember/template-factory';
+// function compileTemplate(source: string): TemplateFactory {
+//   return createTemplateFactory(JSON.parse(precompile(source)));
+// }
 
 export default class Builder implements BuilderInterface {
   private compiler = new Compiler({
@@ -17,28 +26,30 @@ export default class Builder implements BuilderInterface {
   });
 
   private cache: Map<string, CompiledCard>;
-  private modulePrefix: string;
+  private realm: string;
   customDefine: (fullModulePath: string, source: unknown) => void;
 
   constructor(params: {
-    modulePrefix?: string;
+    realm?: string;
     defineModule: (fullModulePath: string, source: unknown) => void;
   }) {
     this.cache = new Map();
     this.customDefine = params.defineModule;
-    this.modulePrefix = params.modulePrefix ?? '';
+    this.realm = params.realm ?? '';
   }
 
   async defineModule(...args: Parameters<defineModuleCallback>): Promise<void> {
     let [fullModuleURL, source] = args;
 
-    // TODO: Handle prefixing/rewriting
+    // TODO: Handle prefixing/rewriting based on Realm
+    //
     // let modulePath = this.getFullModuleURL(cardURL, moduleName);
+    // fullModuleURL = fullModuleURL.replace('http://mirage/cards', this.realm);
     this.customDefine(fullModuleURL, source);
   }
 
   getFullModuleURL(cardURL: string, moduleName: string): string {
-    return `${this.modulePrefix}${cardURL}/${moduleName}`;
+    return `${this.realm}${cardURL}/${moduleName}`;
   }
 
   async getRawCard(url: string): Promise<RawCard> {
@@ -73,17 +84,25 @@ export default class Builder implements BuilderInterface {
     format: 'isolated' | 'embedded'
   ): Promise<{ model: any; moduleName: string }> {
     let compiledCard = await this.getCompiledCard(url);
-    let templateSource = await window.require(
-      this.getFullModuleURL(
-        compiledCard.url,
-        compiledCard.templateModules[format].moduleName
-      )
-    );
-    let componentImplementation = setComponentTemplate(
-      compileTemplate(templateSource),
-      templateOnlyComponent()
-    );
-    this.defineModule(compiledCard.modelModule, componentImplementation);
-    return { model: compiledCard.data, moduleName: compiledCard.modelModule };
+    // let templateSource = await window.require(
+    //   compiledCard.templateModules[format].moduleName
+    // );
+    // let componentImplementation = setComponentTemplate(
+    //   compileTemplate(templateSource),
+    //   templateOnlyComponent()
+    // );
+    // this.defineModule(compiledCard.modelModule, templateSource);
+
+    /*
+      TODO Build stage:
+        1. Require template module from it's path, eg: "http://mirage/cards/hello/isolated"
+        2. Babel transpile it
+        3. Do the createTemplateFactory song and dance?
+        4. Redefine the module? Make a new definintion?
+    */
+    return {
+      model: compiledCard.data,
+      moduleName: compiledCard.templateModules[format].moduleName,
+    };
   }
 }

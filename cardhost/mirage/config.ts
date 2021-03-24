@@ -6,7 +6,16 @@ import { RawCard } from '@cardstack/core/src/interfaces';
 import { getContext } from '@ember/test-helpers';
 import { Memoize } from 'typescript-memoize';
 
-const MODULE_PREFIX = '@cardstack/compiled/mirage';
+const REALM = '@cardstack/compiled/mirage';
+
+type CardParams =
+  | {
+      type: 'raw';
+    }
+  | {
+      format: 'isolated' | 'embedded';
+      type?: 'compiled';
+    };
 
 class FakeCardServer {
   static cardServers = new WeakMap<object, FakeCardServer>();
@@ -27,12 +36,14 @@ class FakeCardServer {
   @Memoize()
   get builder(): Builder {
     return new Builder({
-      modulePrefix: MODULE_PREFIX,
+      realm: REALM,
       defineModule: this.defineModule,
     });
   }
 
   async defineModule(moduleURL: string, source: string): Promise<void> {
+    console.debug('DEFINE', moduleURL, source);
+
     (window as any).define(moduleURL, function () {
       return source;
     });
@@ -63,15 +74,6 @@ class FakeCardServer {
     return rawCard;
   }
 }
-
-type CardParams =
-  | {
-      type: 'raw';
-    }
-  | {
-      format: 'isolated' | 'embedded';
-      type?: 'compiled';
-    };
 
 function cardParams(queryParams: Request['queryParams']): CardParams {
   let { type, format } = queryParams;
