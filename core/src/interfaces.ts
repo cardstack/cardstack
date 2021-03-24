@@ -32,15 +32,16 @@ export interface CompiledCard {
   adoptsFrom?: CompiledCard;
   data: any;
   fields: {
-    [key: string]: {
-      type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
-      card: CompiledCard;
-    };
+    [key: string]: Field;
   };
   modelModule: string;
   templateModules: {
     [K in keyof typeof templateTypeNames]: TemplateModule;
   };
+}
+export interface Field {
+  type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
+  card: CompiledCard;
 }
 
 export interface TemplateModule {

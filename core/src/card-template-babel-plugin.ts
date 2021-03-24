@@ -56,7 +56,7 @@ export default function main() {
             );
             return;
           }
-          let importNames: Set<string> = new Set();
+          let importNames: Map<string, string> = new Map();
           let template = (path.node.arguments[0] as StringLiteral).value;
           let options = path.node.arguments[1] as ObjectExpression;
 
@@ -65,16 +65,11 @@ export default function main() {
             template
           );
 
-          if (fieldsToInline) {
-            template = transformTemplate(template, fieldsToInline);
-            path.node.arguments[0] = stringLiteral(template);
-          }
-
           if (fieldsToImport) {
             for (const key in fieldsToImport) {
               const field = fieldsToImport[key];
               let importName = unusedNameForCard(field.card.url, path);
-              importNames.add(importName);
+              importNames.set(key, importName);
               let fieldModuleName =
                 field.card.templateModules.embedded.moduleName;
 
@@ -87,6 +82,9 @@ export default function main() {
               path.parentPath.parentPath.parentPath.node.body.push(fieldImport);
             }
           }
+
+          template = transformTemplate(template, fields, importNames);
+          path.node.arguments[0] = stringLiteral(template);
 
           let scope = buildScopeForOptions(options, importNames);
           if (scope) {
@@ -140,6 +138,7 @@ function separateFields(
   }
   return { fieldsToInline, fieldsToImport };
 }
+
 /**
  * We should inline the hbs of cards that have no additional scope, ie component deps
  */
@@ -153,13 +152,14 @@ function shouldInlineHBS(scope: ObjectProperty): boolean {
 
 function transformTemplate(
   source: string,
-  fields: CompiledCard['fields']
+  fields: CompiledCard['fields'],
+  importNames: Map<string, string>
 ): string {
   return syntax.print(
     syntax.preprocess(source, {
       mode: 'codemod',
       plugins: {
-        ast: [cardGlimmerPlugin({ fields })],
+        ast: [cardGlimmerPlugin({ fields, importNames })],
       },
     })
   );
@@ -172,7 +172,7 @@ function transformTemplate(
  */
 function buildScopeForOptions(
   options: ObjectExpression,
-  usedNames: Set<string>
+  usedNames: Map<string, string>
 ): ObjectProperty {
   let scopeVars: ObjectProperty[] = [];
   usedNames.forEach((name) =>

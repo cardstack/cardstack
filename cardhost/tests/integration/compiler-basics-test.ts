@@ -294,50 +294,27 @@ module('Integration | compiler-basics', function (hooks) {
 
       this.createCard(PERSON_CARD);
 
-      let card = {
-        url: 'http://mirage/cards/post',
-        files: {
-          'schema.js': `
-            import { contains } from "@cardstack/types";
-            import person from "https://mirage/cards/person";
-
-            export default class Post {
-              @contains(person)
-              author;
-            }
-          `,
-          'isolated.js': templateOnlyComponentTemplate(
-            `<h1><@model.author /></h1>`
-          ),
-        },
-      };
-
-      this.createCard(card);
-
-      // TODO: Have this base card include a unrelated component
-      // `<h1>{{@model.author.name}} was born on <DateField @model={{@model.author.birthdate}} /></h1>`
-      // Should include DateField import: https://discord.com/channels/@me/798223273497460796/822142409973563432
       defineModuleCallback = function (fullModuleURL, source: string) {
         console.log(`defineModule called for ${fullModuleURL}`, { source });
-        if (fullModuleURL === `${card.url}/isolated`) {
+        if (fullModuleURL === `${PERSON_CARD.url}/embedded`) {
           assert.includes(source, 'scope: {', 'scope is added to the options');
           assert.includes(
             source,
-            'import DateField from "http://cardhost.com/base/model/date',
+            'import DateField from "https://cardstack.com/base/models/date/embedded"',
             'The import statement for DateField is added'
           );
-          assert.equal(
+          assert.includes(
             source,
-            '<h1>{{@model.author.name}} was born on <DateField @model={{@model.author.birthdate}} /></h1>',
+            '{{@model.name}} was born on <DateField @model={{@model.birthdate}} />',
             'Source code includes the right template'
           );
         }
       };
 
-      let compiled = await builder.getCompiledCard(card.url);
+      let compiled = await builder.getCompiledCard(PERSON_CARD.url);
       assert.equal(
-        compiled.templateModules['isolated'].moduleName,
-        `${card.url}/isolated`
+        compiled.templateModules['embedded'].moduleName,
+        `${PERSON_CARD.url}/embedded`
       );
     });
   });
