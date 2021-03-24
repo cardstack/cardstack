@@ -23,7 +23,7 @@ async function run() {
   });
 
   const prAssociatedWithBranch = pullRequests.find(
-    ({ head, base }) => base.ref === 'master' && head.ref === branch
+    ({ head, base }) => base.ref === 'main' && head.ref === branch
   );
 
   if (prAssociatedWithBranch) {
