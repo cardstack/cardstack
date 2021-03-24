@@ -7,8 +7,8 @@ import classPropertiesPlugin from '@babel/plugin-proposal-class-properties';
 import cardSchemaPlugin, {
   FieldsMeta,
   getMeta,
-} from './card-schema-babel-plugin';
-import cardTemplatePlugin from './card-template-babel-plugin';
+} from './babel/card-schema-plugin';
+import cardTemplatePlugin from './babel/card-template-plugin';
 import {
   CompiledCard,
   RawCard,

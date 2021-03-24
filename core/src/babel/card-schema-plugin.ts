@@ -4,8 +4,6 @@ import {
   variableDeclaration,
   variableDeclarator,
   identifier,
-  Identifier,
-  StringLiteral,
   objectPattern,
   objectProperty,
   callExpression,
@@ -19,6 +17,7 @@ import {
   isClassDeclaration,
 } from '@babel/types';
 import { NodePath } from '@babel/traverse';
+import { name } from './utils';
 
 const VALID_FIELD_DECORATORS = {
   hasMany: true,
@@ -115,14 +114,6 @@ export default function main() {
   };
 }
 
-function name(node: StringLiteral | Identifier): string {
-  if (isIdentifier(node)) {
-    return node.name;
-  } else {
-    return node.value;
-  }
-}
-
 function storeMeta(
   opts: object,
   specifiers: ImportSpecifier[],
@@ -135,7 +126,7 @@ function storeMeta(
     let {
       local: { name: localName },
     } = specifier;
-    let specifierName = name(specifier.imported);
+    let specifierName = name(specifier.imported)!;
 
     if ((VALID_FIELD_DECORATORS as any)[specifierName]) {
       validateUsageAndGetFieldMeta(

@@ -4,7 +4,7 @@ import {
   ASTPluginEnvironment,
   preprocess as parse,
 } from '@glimmer/syntax';
-import { CompiledCard } from './interfaces';
+import { CompiledCard } from '../interfaces';
 
 const PREFIX = '@model.';
 

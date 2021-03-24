@@ -4,27 +4,24 @@ import {
   CallExpression,
   ObjectExpression,
   ObjectProperty,
-  Expression,
   isExportDefaultDeclaration,
   importDefaultSpecifier,
+  ImportDeclaration,
   importDeclaration,
-  isStringLiteral,
-  isV8IntrinsicIdentifier,
-  V8IntrinsicIdentifier,
   stringLiteral,
   StringLiteral,
   objectProperty,
   objectExpression,
   identifier,
-  Identifier,
-  isIdentifier,
+  assertProgram,
+  BooleanLiteral,
 } from '@babel/types';
-import { CompiledCard, TemplateModule } from './interfaces';
-import cardGlimmerPlugin from './card-template-glimmer-plugin';
+import { CompiledCard, Field, TemplateModule } from '../interfaces';
+import cardGlimmerPlugin from '../glimmer/card-template-plugin';
+
+import { getObjectKey, name } from './utils';
 
 const SCOPE = 'scope';
-const FIELD_PREFIX = '@model.';
-const FIELD_REGEX = new RegExp(`(?<=${FIELD_PREFIX})([A-Za-z]+)`, 'g');
 type TransformOptions = {
   fields: CompiledCard['fields'];
   templateModule: TemplateModule;
@@ -32,16 +29,6 @@ type TransformOptions = {
 const PRECOMPILE_CALLEE = 'precompileTemplate';
 
 export default function main() {
-  /*
-    TODO: 
-    1. Add imports for used fields
-       - Make sure it's uniq
-       - Don't duplicate imports
-    2. Add used fields into precompileTemplate scope
-    3. Figure out existing ember/glimmer babel plugins
-    4. Run them
-  */
-  // TODO: Error if component found without strict: true
   return {
     visitor: {
       CallExpression(
@@ -51,37 +38,17 @@ export default function main() {
         let { fields, templateModule } = state.opts;
         if (name(path.node.callee) === PRECOMPILE_CALLEE) {
           if (!isExportDefaultDeclaration(path.parentPath.parentPath.node)) {
-            console.log(
+            console.debug(
               'Skipping over component that is not part of the default export'
             );
             return;
           }
-          let importNames: Map<string, string> = new Map();
-          let template = (path.node.arguments[0] as StringLiteral).value;
           let options = path.node.arguments[1] as ObjectExpression;
+          assertStrictMode(options);
 
-          let { fieldsToInline, fieldsToImport } = separateFields(
-            fields,
-            template
-          );
+          let template = (path.node.arguments[0] as StringLiteral).value;
 
-          if (fieldsToImport) {
-            for (const key in fieldsToImport) {
-              const field = fieldsToImport[key];
-              let importName = unusedNameForCard(field.card.url, path);
-              importNames.set(key, importName);
-              let fieldModuleName =
-                field.card.templateModules.embedded.moduleName;
-
-              let fieldImport = importDeclaration(
-                [importDefaultSpecifier(identifier(importName))],
-                stringLiteral(fieldModuleName)
-              );
-
-              // Errrr?
-              path.parentPath.parentPath.parentPath.node.body.push(fieldImport);
-            }
-          }
+          let importNames = addImportsForFields(path, fields);
 
           template = transformTemplate(template, fields, importNames);
           path.node.arguments[0] = stringLiteral(template);
@@ -99,10 +66,52 @@ export default function main() {
     },
   };
 }
+
+function assertStrictMode(options: ObjectExpression) {
+  let strictMode = getObjectKey(options, 'strictMode');
+  if (!strictMode || (strictMode.value as BooleanLiteral).value === false) {
+    throw new Error(
+      'Card Template precompileOptions requires strictMode to be true'
+    );
+  }
+}
+
+function addImportsForFields(
+  path: NodePath<CallExpression>,
+  fields: CompiledCard['fields']
+): Map<string, string> {
+  let importNames: Map<string, string> = new Map();
+  for (const key in fields) {
+    const field = fields[key];
+
+    // We can skip fields that are inlinable
+    if (canInline(field)) {
+      continue;
+    }
+
+    let importName = unusedNameForCard(field.card.url, path);
+    importNames.set(key, importName);
+    let fieldEmbeddedModuleName =
+      field.card.templateModules.embedded.moduleName;
+
+    let fieldImport = importDeclaration(
+      [importDefaultSpecifier(identifier(importName))],
+      stringLiteral(fieldEmbeddedModuleName)
+    );
+
+    appendImport(path, fieldImport);
+  }
+  return importNames;
+}
+
 function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+/**
+ * Take a card URL and turn it into a unique import name
+ * ie: http://cardstack.com/base/models/date -> DateField
+ */
 function unusedNameForCard(
   cardURL: string,
   path: NodePath<CallExpression>
@@ -117,30 +126,22 @@ function unusedNameForCard(
   return candidate;
 }
 
-function separateFields(
-  fields: CompiledCard['fields'],
-  template: string
-): { [K in 'fieldsToInline' | 'fieldsToImport']: CompiledCard['fields'] } {
-  let fieldsToInline: CompiledCard['fields'] = {};
-  let fieldsToImport: CompiledCard['fields'] = {};
+function appendImport(
+  path: NodePath<CallExpression>,
+  fieldImport: ImportDeclaration
+) {
+  let program = path.parentPath.parentPath.parentPath.node;
+  assertProgram(program);
+  program.body.push(fieldImport);
+}
 
-  let usedFields: Set<string> = new Set(template.match(FIELD_REGEX));
-
-  for (const key in fields) {
-    let field = fields[key];
-    const inlineHBS = fields[key].card.templateModules.embedded.inlineHBS;
-
-    if (inlineHBS) {
-      fieldsToInline[key] = field;
-    } else if (usedFields.has(key)) {
-      fieldsToImport[key] = field;
-    }
-  }
-  return { fieldsToInline, fieldsToImport };
+function canInline(field: Field) {
+  return !!field.card.templateModules.embedded.inlineHBS;
 }
 
 /**
- * We should inline the hbs of cards that have no additional scope, ie component deps
+ * We should inline the hbs of cards that have no additional scope,
+ * ie component scope deps
  */
 function shouldInlineHBS(scope: ObjectProperty): boolean {
   if (!scope) {
@@ -181,9 +182,7 @@ function buildScopeForOptions(
     )
   );
 
-  let scope = (options.properties.filter(
-    (p: ObjectProperty) => name(p.key) === SCOPE
-  ) as ObjectProperty[])[0];
+  let scope = getObjectKey(options, SCOPE);
 
   if (scope) {
     (scope.value as ObjectExpression).properties.forEach((p: ObjectProperty) =>
@@ -192,16 +191,4 @@ function buildScopeForOptions(
   }
 
   return objectProperty(identifier(SCOPE), objectExpression(scopeVars));
-}
-
-function name(
-  node: StringLiteral | Identifier | Expression | V8IntrinsicIdentifier
-): string | undefined {
-  if (isIdentifier(node) || isV8IntrinsicIdentifier(node)) {
-    return node.name;
-  } else if (isStringLiteral(node)) {
-    return node.value;
-  } else {
-    return;
-  }
 }
