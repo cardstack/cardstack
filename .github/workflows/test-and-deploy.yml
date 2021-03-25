@@ -94,6 +94,7 @@ jobs:
 
     - name: Test
       run: yarn test:ember --launch ${{ matrix.browser }}
+      timeout-minutes: 5
 
   floating-dependencies:
     name: Floating Dependencies
@@ -134,6 +135,7 @@ jobs:
 
     - name: Test
       run: yarn test:ember --launch ${{ matrix.browser }}
+      timeout-minutes: 5
 
 
   try-scenarios:
@@ -147,11 +149,12 @@ jobs:
       matrix:
         ember-try-scenario: [
           ember-release,
-          ember-beta,
           ember-default-with-jquery,
         ]
         allow-failure: [false]
         include:
+          - ember-try-scenario: ember-beta
+            allow-failure: true
           - ember-try-scenario: ember-canary
             allow-failure: true
 
@@ -190,6 +193,7 @@ jobs:
       env:
         EMBER_TRY_SCENARIO: ${{ matrix.ember-try-scenario }}
       run: node_modules/.bin/ember try:one $EMBER_TRY_SCENARIO
+      timeout-minutes: 10
 
   deploy:
     runs-on: ubuntu-latest
