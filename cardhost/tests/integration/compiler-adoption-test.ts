@@ -13,7 +13,6 @@ module('Integration | compiler-adoption', function (hooks) {
 
   let builder: Builder;
   let parentCard: CompiledCard;
-  let defineModuleCallback: (url: string, source: unknown) => void;
 
   let PERSON_CARD: RawCard = {
     url: 'http://mirage/cards/person',
@@ -36,15 +35,7 @@ module('Integration | compiler-adoption', function (hooks) {
   };
 
   hooks.beforeEach(async function () {
-    defineModuleCallback = function (url, source) {
-      console.log('defineModuleCallback', url, source);
-    };
-
-    builder = new Builder({
-      defineModule: (url, source) => {
-        defineModuleCallback(url, source);
-      },
-    });
+    builder = new Builder({});
 
     this.createCard(PERSON_CARD);
 

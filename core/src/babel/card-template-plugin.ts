@@ -3,7 +3,6 @@ import { NodePath } from '@babel/core';
 import {
   CallExpression,
   ObjectExpression,
-  ObjectProperty,
   Program,
   importDefaultSpecifier,
   importSpecifier,
@@ -39,27 +38,9 @@ export default function main() {
           state.insideExportDefault = false;
           state.neededImports = new Map();
         },
-        exit(path: NodePath<Program>, state: State) {
-          for (let [
-            localName,
-            { moduleSpecifier, exportedName },
-          ] of state.neededImports) {
-            path.node.body.push(
-              importDeclaration(
-                [
-                  exportedName === 'default'
-                    ? importDefaultSpecifier(identifier(localName))
-                    : importSpecifier(
-                        identifier(localName),
-                        identifier(exportedName)
-                      ),
-                ],
-                stringLiteral(moduleSpecifier)
-              )
-            );
-          }
-        },
+        exit: programExit,
       },
+
       ExportDefaultDeclaration: {
         enter(_path: NodePath, state: State) {
           state.insideExportDefault = true;
@@ -68,37 +49,62 @@ export default function main() {
           state.insideExportDefault = false;
         },
       },
-      CallExpression(path: NodePath<CallExpression>, state: State) {
-        if (
-          !state.insideExportDefault ||
-          !path
-            .get('callee')
-            .referencesImport(
-              '@ember/template-compilation',
-              'precompileTemplate'
-            )
-        ) {
-          return;
-        }
 
-        let { options, template: inputTemplate } = handleArguments(path);
-
-        let { template, neededScope } = transformTemplate(
-          inputTemplate,
-          path,
-          state.opts.fields,
-          state.neededImports
-        );
-        path.node.arguments[0] = stringLiteral(template);
-
-        if (shouldInlineHBS(options, neededScope)) {
-          state.opts.templateModule.inlineHBS = template;
-        }
-
-        addScope(options, neededScope);
-      },
+      CallExpression: callExpressionEnter,
     },
   };
+}
+
+function programExit(path: NodePath<Program>, state: State) {
+  for (let [
+    localName,
+    { moduleSpecifier, exportedName },
+  ] of state.neededImports) {
+    path.node.body.push(
+      importDeclaration(
+        [
+          exportedName === 'default'
+            ? importDefaultSpecifier(identifier(localName))
+            : importSpecifier(identifier(localName), identifier(exportedName)),
+        ],
+        stringLiteral(moduleSpecifier)
+      )
+    );
+  }
+}
+
+function callExpressionEnter(path: NodePath<CallExpression>, state: State) {
+  if (shouldSkipExpression(path, state)) {
+    return;
+  }
+
+  let { options, template: inputTemplate } = handleArguments(path);
+
+  let { template, neededScope } = transformTemplate(
+    inputTemplate,
+    path,
+    state.opts.fields,
+    state.neededImports
+  );
+  path.node.arguments[0] = stringLiteral(template);
+
+  if (shouldInlineHBS(options, neededScope)) {
+    state.opts.templateModule.inlineHBS = template;
+  }
+
+  updateScope(options, neededScope);
+}
+
+function shouldSkipExpression(
+  path: NodePath<CallExpression>,
+  state: State
+): boolean {
+  return (
+    !state.insideExportDefault ||
+    !path
+      .get('callee')
+      .referencesImport('@ember/template-compilation', 'precompileTemplate')
+  );
 }
 
 function shouldInlineHBS(
@@ -150,7 +156,7 @@ function transformTemplate(
     moduleSpecifier: string,
     importedName: string
   ): string {
-    let candidate = desiredName;
+    let candidate = `${desiredName}Field`;
     let counter = 0;
     while (path.scope.getBinding(candidate) || importNames.has(candidate)) {
       candidate = `${desiredName}${counter++}`;
@@ -171,11 +177,12 @@ function transformTemplate(
   return { template, neededScope };
 }
 
-function addScope(
+function updateScope(
   options: NodePath<ObjectExpression>,
   names: Set<string>
-): ObjectProperty {
+): void {
   let scopeVars: ObjectExpression['properties'] = [];
+
   for (let name of names) {
     scopeVars.push(
       objectProperty(identifier(name), identifier(name), undefined, true)
@@ -185,8 +192,10 @@ function addScope(
   let scope = getObjectKey(options, 'scope');
 
   if (scope?.isObjectExpression()) {
-    scope.node.properties.forEach((p) => scopeVars.push(p));
+    scope.node.properties.concat(scopeVars);
+  } else {
+    options.node.properties.push(
+      objectProperty(identifier('scope'), objectExpression(scopeVars))
+    );
   }
-
-  return objectProperty(identifier('scope'), objectExpression(scopeVars));
 }

@@ -1,8 +1,8 @@
 import { NodePath } from '@babel/core';
 import {
   StringLiteral,
-  Identifier,
   Expression,
+  Identifier,
   isIdentifier,
   ObjectExpression,
   ObjectProperty,

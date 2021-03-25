@@ -36,22 +36,13 @@ const PERSON_CARD = {
 
 module('Integration | compiler-basics', function (hooks) {
   let builder: Builder;
-  let defineModuleCallback: (url: string, source: unknown) => void;
 
   setupRenderingTest(hooks);
   setupMirage(hooks);
   setupCardMocking(hooks);
 
   hooks.beforeEach(async function () {
-    defineModuleCallback = function (url, source) {
-      console.log('defineModuleCallback', url, source);
-    };
-
-    builder = new Builder({
-      defineModule: (url, source) => {
-        defineModuleCallback(url, source);
-      },
-    });
+    builder = new Builder({});
   });
 
   skip('it has a working evalModule', async function (assert) {
@@ -71,7 +62,6 @@ module('Integration | compiler-basics', function (hooks) {
   });
 
   test('Names and defines a module for the model', async function (assert) {
-    assert.expect(3);
     let card = {
       url: 'http://mirage/cards/post',
       files: {
@@ -80,17 +70,14 @@ module('Integration | compiler-basics', function (hooks) {
     };
     this.createCard(card);
 
-    defineModuleCallback = function (fullModuleURL, source) {
-      assert.equal(fullModuleURL, `${card.url}/model`, 'Module url is correct');
-      assert.equal(source, card.files['schema.js'], 'Source code is correct');
-    };
-
     let compiled = await builder.getCompiledCard(card.url);
     assert.equal(
       compiled.modelModule,
       `${card.url}/model`,
       'CompiledCard moduleName is set correctly'
     );
+    let source = window.require(`${card.url}/model`);
+    assert.equal(source, card.files['schema.js'], 'Source code is correct');
   });
 
   test('Generates inlineHBS for templates without', async function (assert) {
@@ -246,8 +233,6 @@ module('Integration | compiler-basics', function (hooks) {
 
   module('templates', function () {
     test('it inlines a simple field template', async function (assert) {
-      assert.expect(2);
-
       let card = {
         url: 'http://mirage/cards/post',
         files: {
@@ -268,53 +253,40 @@ module('Integration | compiler-basics', function (hooks) {
 
       this.createCard(card);
 
-      defineModuleCallback = function (fullModuleURL: string, source: string) {
-        if (fullModuleURL === `${card.url}/isolated`) {
-          assert.includes(
-            source,
-            '<h1>{{@model.title}}</h1>',
-            'Source code includes the right template'
-          );
-          // console.log({ equal: (source as string).includes('<h1>{{@model.title}}</h1>'), url: card.url, source });
-        } else {
-          console.log(`defineModule called for ${fullModuleURL}`);
-        }
-      };
-
       let compiled = await builder.getCompiledCard(card.url);
       assert.equal(
         compiled.templateModules['isolated'].moduleName,
         `${card.url}/isolated`,
         'templateModule for "isolated" is full url'
       );
+      let source = window.require(`${card.url}/isolated`);
+      assert.includes(
+        source,
+        '<h1>{{@model.title}}</h1>',
+        'Source code includes the right template'
+      );
     });
 
     test('it inlines a compound field template', async function (assert) {
-      assert.expect(4);
-
       this.createCard(PERSON_CARD);
-
-      defineModuleCallback = function (fullModuleURL, source: string) {
-        console.log(`defineModule called for ${fullModuleURL}`, { source });
-        if (fullModuleURL === `${PERSON_CARD.url}/embedded`) {
-          assert.includes(source, 'scope: {', 'scope is added to the options');
-          assert.includes(
-            source,
-            'import DateField from "https://cardstack.com/base/models/date/embedded"',
-            'The import statement for DateField is added'
-          );
-          assert.includes(
-            source,
-            '{{@model.name}} was born on <DateField @model={{@model.birthdate}} />',
-            'Source code includes the right template'
-          );
-        }
-      };
 
       let compiled = await builder.getCompiledCard(PERSON_CARD.url);
       assert.equal(
         compiled.templateModules['embedded'].moduleName,
         `${PERSON_CARD.url}/embedded`
+      );
+
+      let source = window.require(`${PERSON_CARD.url}/embedded`);
+      assert.includes(source, 'scope: {', 'scope is added to the options');
+      assert.includes(
+        source,
+        'import DateField from "https://cardstack.com/base/models/date/embedded"',
+        'The import statement for DateField is added'
+      );
+      assert.includes(
+        source,
+        '{{@model.name}} was born on <DateField @model={{@model.birthdate}} />',
+        'Source code includes the right template'
       );
     });
   });
