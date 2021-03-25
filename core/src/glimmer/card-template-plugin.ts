@@ -8,12 +8,18 @@ import { CompiledCard } from '../interfaces';
 
 const PREFIX = '@model.';
 
-export default function cardTransform(options: {
+export interface Options {
   fields: CompiledCard['fields'];
-  importNames: Map<string, string>;
-}): ASTPluginBuilder {
+  importAndChooseName: (
+    desiredName: string,
+    moduleSpecifier: string,
+    importedName: string
+  ) => string;
+}
+
+export default function cardTransform(options: Options): ASTPluginBuilder {
   return function transform(/* env: ASTPluginEnvironment */): ASTPlugin {
-    let { fields, importNames } = options;
+    let { fields, importAndChooseName } = options;
     return {
       name: 'card-glimmer-plugin',
       visitor: {
@@ -34,7 +40,11 @@ export default function cardTransform(options: {
               });
               return ast.body;
             } else {
-              let componentName = importNames.get(fieldName);
+              let componentName = importAndChooseName(
+                capitalize(field.localName),
+                field.card.templateModules.embedded.moduleName,
+                'default'
+              );
               let template = `<${componentName} @model={{${node.tag}}} />`;
               return parse(template).body;
             }
@@ -68,4 +78,8 @@ function rewriteLocals(remapping: { this: string }): ASTPluginBuilder {
       },
     };
   };
+}
+
+function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }

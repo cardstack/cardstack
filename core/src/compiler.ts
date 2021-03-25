@@ -8,14 +8,15 @@ import cardSchemaPlugin, {
   FieldsMeta,
   getMeta,
 } from './babel/card-schema-plugin';
-import cardTemplatePlugin from './babel/card-template-plugin';
+import cardTemplatePlugin, {
+  Options as CardTemplateOptions,
+} from './babel/card-template-plugin';
 import {
   CompiledCard,
   RawCard,
   RawCardData,
   templateFileName,
   templateTypes,
-  defineModuleCallback,
   TemplateModule,
 } from './interfaces';
 
@@ -25,11 +26,11 @@ import intersection from 'lodash/intersection';
 const MODEL_MODULE_NAME = 'model';
 export class Compiler {
   lookup: (cardURL: string) => Promise<CompiledCard>;
-  define: defineModuleCallback;
+  define: (fullModuleURL: string, source: string) => Promise<void>;
 
   constructor(params: {
     lookup: (url: string) => Promise<CompiledCard>;
-    define: defineModuleCallback;
+    define: Compiler['define'];
   }) {
     this.lookup = params.lookup;
     this.define = params.define;
@@ -106,10 +107,13 @@ export class Compiler {
     metaFields: FieldsMeta
   ): Promise<CompiledCard['fields']> {
     let fields: CompiledCard['fields'] = {};
-    for (let [name, { cardURL, type }] of Object.entries(metaFields)) {
+    for (let [name, { cardURL, type, localName }] of Object.entries(
+      metaFields
+    )) {
       fields[name] = {
         card: await this.lookup(cardURL),
         type,
+        localName,
       };
     }
 
@@ -180,8 +184,9 @@ export class Compiler {
     fields: CompiledCard['fields'],
     templateModule: TemplateModule
   ): string {
+    let options: CardTemplateOptions = { fields, templateModule };
     let out = transformSync(templateSource, {
-      plugins: [[cardTemplatePlugin, { fields, templateModule }]],
+      plugins: [[cardTemplatePlugin, options]],
     });
 
     return out!.code!;

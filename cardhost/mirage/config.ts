@@ -6,7 +6,7 @@ import { RawCard } from '@cardstack/core/src/interfaces';
 import { getContext } from '@ember/test-helpers';
 import { Memoize } from 'typescript-memoize';
 
-const REALM = '@cardstack/compiled/mirage';
+const REALM = 'https://cardstack.com/mirage';
 
 type CardParams =
   | {
@@ -37,15 +37,6 @@ class FakeCardServer {
   get builder(): Builder {
     return new Builder({
       realm: REALM,
-      defineModule: this.defineModule,
-    });
-  }
-
-  async defineModule(moduleURL: string, source: string): Promise<void> {
-    console.debug('DEFINE', moduleURL, source);
-
-    (window as any).define(moduleURL, function () {
-      return source;
     });
   }
 

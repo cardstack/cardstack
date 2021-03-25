@@ -4,191 +4,189 @@ import {
   CallExpression,
   ObjectExpression,
   ObjectProperty,
-  isExportDefaultDeclaration,
+  Program,
   importDefaultSpecifier,
-  ImportDeclaration,
+  importSpecifier,
   importDeclaration,
   stringLiteral,
-  StringLiteral,
   objectProperty,
   objectExpression,
   identifier,
-  assertProgram,
-  BooleanLiteral,
 } from '@babel/types';
-import { CompiledCard, Field, TemplateModule } from '../interfaces';
+import { CompiledCard, TemplateModule } from '../interfaces';
 import cardGlimmerPlugin from '../glimmer/card-template-plugin';
 
-import { getObjectKey, name } from './utils';
+import { getObjectKey, error } from './utils';
 
-const SCOPE = 'scope';
-type TransformOptions = {
+export interface Options {
   fields: CompiledCard['fields'];
   templateModule: TemplateModule;
-};
-const PRECOMPILE_CALLEE = 'precompileTemplate';
+}
+
+interface State {
+  opts: Options;
+  insideExportDefault: boolean;
+
+  // keys are local names in this module that we have chosen.
+  neededImports: Map<string, { moduleSpecifier: string; exportedName: string }>;
+}
 
 export default function main() {
   return {
     visitor: {
-      CallExpression(
-        path: NodePath<CallExpression>,
-        state: { opts: TransformOptions }
-      ) {
-        let { fields, templateModule } = state.opts;
-        if (name(path.node.callee) === PRECOMPILE_CALLEE) {
-          if (!isExportDefaultDeclaration(path.parentPath.parentPath.node)) {
-            console.debug(
-              'Skipping over component that is not part of the default export'
+      Program: {
+        enter(_path: NodePath, state: State) {
+          state.insideExportDefault = false;
+          state.neededImports = new Map();
+        },
+        exit(path: NodePath<Program>, state: State) {
+          for (let [
+            localName,
+            { moduleSpecifier, exportedName },
+          ] of state.neededImports) {
+            path.node.body.push(
+              importDeclaration(
+                [
+                  exportedName === 'default'
+                    ? importDefaultSpecifier(identifier(localName))
+                    : importSpecifier(
+                        identifier(localName),
+                        identifier(exportedName)
+                      ),
+                ],
+                stringLiteral(moduleSpecifier)
+              )
             );
-            return;
           }
-          let options = path.node.arguments[1] as ObjectExpression;
-          assertStrictMode(options);
-
-          let template = (path.node.arguments[0] as StringLiteral).value;
-
-          let importNames = addImportsForFields(path, fields);
-
-          template = transformTemplate(template, fields, importNames);
-          path.node.arguments[0] = stringLiteral(template);
-
-          let scope = buildScopeForOptions(options, importNames);
-          if (scope) {
-            options.properties.push(scope);
-          }
-
-          if (shouldInlineHBS(scope)) {
-            templateModule.inlineHBS = template;
-          }
+        },
+      },
+      ExportDefaultDeclaration: {
+        enter(_path: NodePath, state: State) {
+          state.insideExportDefault = true;
+        },
+        exit(_path: NodePath, state: State) {
+          state.insideExportDefault = false;
+        },
+      },
+      CallExpression(path: NodePath<CallExpression>, state: State) {
+        if (
+          !state.insideExportDefault ||
+          !path
+            .get('callee')
+            .referencesImport(
+              '@ember/template-compilation',
+              'precompileTemplate'
+            )
+        ) {
+          return;
         }
+
+        let { options, template: inputTemplate } = handleArguments(path);
+
+        let { template, neededScope } = transformTemplate(
+          inputTemplate,
+          path,
+          state.opts.fields,
+          state.neededImports
+        );
+        path.node.arguments[0] = stringLiteral(template);
+
+        if (shouldInlineHBS(options, neededScope)) {
+          state.opts.templateModule.inlineHBS = template;
+        }
+
+        addScope(options, neededScope);
       },
     },
   };
 }
 
-function assertStrictMode(options: ObjectExpression) {
+function shouldInlineHBS(
+  options: NodePath<ObjectExpression>,
+  neededScope: Set<string>
+) {
+  // TODO: this also needs to depend on whether they have a backing class other than templateOnlyComponent
+  return !getObjectKey(options, 'scope') && neededScope.size == 0;
+}
+
+function handleArguments(
+  path: NodePath<CallExpression>
+): { options: NodePath<ObjectExpression>; template: string } {
+  let args = path.get('arguments');
+  if (args.length < 2) {
+    throw error(path, 'precompileTemplate needs two arguments');
+  }
+  let template = args[0];
+  if (!template.isStringLiteral()) {
+    throw error(template, 'must be a string literal');
+  }
+
+  let options = args[1];
+  if (!options.isObjectExpression()) {
+    throw error(options, 'must be an object expression');
+  }
+
   let strictMode = getObjectKey(options, 'strictMode');
-  if (!strictMode || (strictMode.value as BooleanLiteral).value === false) {
-    throw new Error(
+
+  if (!strictMode?.isBooleanLiteral() || !strictMode.node.value) {
+    throw error(
+      options as NodePath<any>,
       'Card Template precompileOptions requires strictMode to be true'
     );
   }
-}
-
-function addImportsForFields(
-  path: NodePath<CallExpression>,
-  fields: CompiledCard['fields']
-): Map<string, string> {
-  let importNames: Map<string, string> = new Map();
-  for (const key in fields) {
-    const field = fields[key];
-
-    // We can skip fields that are inlinable
-    if (canInline(field)) {
-      continue;
-    }
-
-    let importName = unusedNameForCard(field.card.url, path);
-    importNames.set(key, importName);
-    let fieldEmbeddedModuleName =
-      field.card.templateModules.embedded.moduleName;
-
-    let fieldImport = importDeclaration(
-      [importDefaultSpecifier(identifier(importName))],
-      stringLiteral(fieldEmbeddedModuleName)
-    );
-
-    appendImport(path, fieldImport);
-  }
-  return importNames;
-}
-
-function capitalize(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-/**
- * Take a card URL and turn it into a unique import name
- * ie: http://cardstack.com/base/models/date -> DateField
- */
-function unusedNameForCard(
-  cardURL: string,
-  path: NodePath<CallExpression>
-): string {
-  let name = cardURL.substring(cardURL.lastIndexOf('/') + 1);
-  let properName = `${capitalize(name)}Field`;
-  let candidate = properName;
-  let counter = 0;
-  while (path.scope.getBinding(candidate)) {
-    candidate = `${name}${counter++}`;
-  }
-  return candidate;
-}
-
-function appendImport(
-  path: NodePath<CallExpression>,
-  fieldImport: ImportDeclaration
-) {
-  let program = path.parentPath.parentPath.parentPath.node;
-  assertProgram(program);
-  program.body.push(fieldImport);
-}
-
-function canInline(field: Field) {
-  return !!field.card.templateModules.embedded.inlineHBS;
-}
-
-/**
- * We should inline the hbs of cards that have no additional scope,
- * ie component scope deps
- */
-function shouldInlineHBS(scope: ObjectProperty): boolean {
-  if (!scope) {
-    return true;
-  }
-
-  return (scope.value as ObjectExpression).properties.length === 0;
+  return { options, template: template.node.value };
 }
 
 function transformTemplate(
   source: string,
+  path: NodePath<CallExpression>,
   fields: CompiledCard['fields'],
-  importNames: Map<string, string>
-): string {
-  return syntax.print(
+  importNames: State['neededImports']
+): { template: string; neededScope: Set<string> } {
+  let neededScope = new Set<string>();
+
+  function importAndChooseName(
+    desiredName: string,
+    moduleSpecifier: string,
+    importedName: string
+  ): string {
+    let candidate = desiredName;
+    let counter = 0;
+    while (path.scope.getBinding(candidate) || importNames.has(candidate)) {
+      candidate = `${desiredName}${counter++}`;
+    }
+    importNames.set(candidate, { moduleSpecifier, exportedName: importedName });
+    neededScope.add(candidate);
+    return candidate;
+  }
+
+  let template = syntax.print(
     syntax.preprocess(source, {
       mode: 'codemod',
       plugins: {
-        ast: [cardGlimmerPlugin({ fields, importNames })],
+        ast: [cardGlimmerPlugin({ fields, importAndChooseName })],
       },
     })
   );
+  return { template, neededScope };
 }
 
-/**
- * TODO: This is kind of a nightmare.
- * Should I try and reuse the existing scope?
- * Why are the types so bad
- */
-function buildScopeForOptions(
-  options: ObjectExpression,
-  usedNames: Map<string, string>
+function addScope(
+  options: NodePath<ObjectExpression>,
+  names: Set<string>
 ): ObjectProperty {
-  let scopeVars: ObjectProperty[] = [];
-  usedNames.forEach((name) =>
+  let scopeVars: ObjectExpression['properties'] = [];
+  for (let name of names) {
     scopeVars.push(
       objectProperty(identifier(name), identifier(name), undefined, true)
-    )
-  );
-
-  let scope = getObjectKey(options, SCOPE);
-
-  if (scope) {
-    (scope.value as ObjectExpression).properties.forEach((p: ObjectProperty) =>
-      scopeVars.push(p)
     );
   }
 
-  return objectProperty(identifier(SCOPE), objectExpression(scopeVars));
+  let scope = getObjectKey(options, 'scope');
+
+  if (scope?.isObjectExpression()) {
+    scope.node.properties.forEach((p) => scopeVars.push(p));
+  }
+
+  return objectProperty(identifier('scope'), objectExpression(scopeVars));
 }

@@ -2,7 +2,6 @@ import type {
   Builder as BuilderInterface,
   RawCard,
   CompiledCard,
-  defineModuleCallback,
 } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
 // import { compileTemplate } from 'cardhost/tests/helpers/template-compiler';
@@ -20,36 +19,26 @@ import { Compiler } from '@cardstack/core/src/compiler';
 
 export default class Builder implements BuilderInterface {
   private compiler = new Compiler({
-    lookup: (url: string) => this.getCompiledCard(url),
-    define: (...args: Parameters<defineModuleCallback>) =>
-      this.defineModule(...args),
+    lookup: (url) => this.getCompiledCard(url),
+    define: (...args) => this.defineModule(...args),
   });
 
   private cache: Map<string, CompiledCard>;
   private realm: string;
-  customDefine: (fullModulePath: string, source: unknown) => void;
 
-  constructor(params: {
-    realm?: string;
-    defineModule: (fullModulePath: string, source: unknown) => void;
-  }) {
+  constructor(params: { realm?: string }) {
     this.cache = new Map();
-    this.customDefine = params.defineModule;
     this.realm = params.realm ?? '';
   }
 
-  async defineModule(...args: Parameters<defineModuleCallback>): Promise<void> {
-    let [fullModuleURL, source] = args;
+  private async defineModule(moduleURL: string, source: string): Promise<void> {
+    console.debug('DEFINE', moduleURL, source);
 
-    // TODO: Handle prefixing/rewriting based on Realm
-    //
-    // let modulePath = this.getFullModuleURL(cardURL, moduleName);
-    // fullModuleURL = fullModuleURL.replace('http://mirage/cards', this.realm);
-    this.customDefine(fullModuleURL, source);
-  }
+    // TODO: here is where we transpile the module for browser use
 
-  getFullModuleURL(cardURL: string, moduleName: string): string {
-    return `${this.realm}${cardURL}/${moduleName}`;
+    (window as any).define(moduleURL, function () {
+      return source;
+    });
   }
 
   async getRawCard(url: string): Promise<RawCard> {

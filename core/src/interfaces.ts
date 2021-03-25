@@ -42,6 +42,7 @@ export interface CompiledCard {
 export interface Field {
   type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
   card: CompiledCard;
+  localName: string;
 }
 
 export interface TemplateModule {
@@ -54,8 +55,3 @@ export interface Builder {
   getRawCard(url: string): Promise<RawCard>;
   getCompiledCard(url: string): Promise<CompiledCard>;
 }
-
-export type defineModuleCallback = (
-  fullModuleURL: string,
-  source: unknown
-) => Promise<void>;

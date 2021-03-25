@@ -1,32 +1,51 @@
+import { NodePath } from '@babel/core';
 import {
-  Expression,
-  isStringLiteral,
-  isV8IntrinsicIdentifier,
-  V8IntrinsicIdentifier,
   StringLiteral,
   Identifier,
+  Expression,
   isIdentifier,
   ObjectExpression,
   ObjectProperty,
 } from '@babel/types';
 
-export function name(
-  node: StringLiteral | Identifier | Expression | V8IntrinsicIdentifier
-): string {
-  if (isIdentifier(node) || isV8IntrinsicIdentifier(node)) {
+export function name(node: StringLiteral | Identifier): string {
+  if (isIdentifier(node)) {
     return node.name;
-  } else if (isStringLiteral(node)) {
-    return node.value;
   } else {
-    return node.toString();
+    return node.value;
   }
 }
 
 export function getObjectKey(
-  obj: ObjectExpression,
+  obj: NodePath<ObjectExpression>,
   key: string
-): ObjectProperty | undefined {
-  return (obj.properties.filter(
-    (p: ObjectProperty) => name(p.key) === key
-  ) as ObjectProperty[])[0];
+): NodePath<Expression> | undefined {
+  for (let prop of obj.get('properties')) {
+    if (prop.isObjectProperty() && !prop.node.computed) {
+      let propKey = (prop as NodePath<ObjectProperty>).get('key');
+      if (
+        (propKey.isStringLiteral() || propKey.isIdentifier()) &&
+        name(propKey.node) === key
+      ) {
+        return prop.get('value') as NodePath<Expression>;
+      }
+    }
+  }
+  return undefined;
+}
+
+export function error(path: NodePath<any>, message: string) {
+  return path.buildCodeFrameError(message, CompilerError);
+}
+
+class CompilerError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'CompilerError';
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, this.constructor);
+    } else if (!this.stack) {
+      this.stack = new Error(message).stack;
+    }
+  }
 }
