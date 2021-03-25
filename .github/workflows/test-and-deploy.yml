@@ -7,46 +7,90 @@ on:
     branches: [main]
 
 jobs:
-  test:
-    name: Build, lint and run tests
+  lint:
+    name: Build & Lint
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 1
     - uses: volta-cli/action@v1
-    - name: Set up build cache (yarn)
+    - name: Set up yarn cache
       uses: actions/cache@v2
       with:
         path: ~/.cache/yarn
         key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
         restore-keys: |
           ${{ runner.os }}-yarn-
-    - run: yarn install
+    - run: yarn global add lerna
+    - run: lerna bootstrap
+    - run: yarn lint
+
+  hub-test:
+    name: Hub node tests
+    runs-on: ubuntu-latest
+    needs: [lint]
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+    - uses: volta-cli/action@v1
+    - name: Set up yarn cache
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/yarn
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+    - run: yarn global add lerna
+    - run: lerna bootstrap
     # - name: Setup tmate session
     #   uses: mxschmitt/action-tmate@v3
     #   timeout-minutes: 90
-    - run: yarn lint
-    - run: yarn test
+    - run: yarn test:hub
+
+  web-client-test:
+    name: web-client Ember tests
+    runs-on: ubuntu-latest
+    needs: [lint]
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+    - uses: volta-cli/action@v1
+    - name: Set up yarn cache
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/yarn
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+    - run: yarn global add lerna
+    - run: lerna bootstrap
+    # - name: Setup tmate session
+    #   uses: mxschmitt/action-tmate@v3
+    #   timeout-minutes: 90
+    - run: yarn test:web-client
 
   deploy-web-client-staging:
     name: Deploy web-client to S3 staging bucket
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    needs: [test]
+    needs: [web-client-test, hub-test]
     steps:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 1
     - uses: volta-cli/action@v1
-    - name: Set up build cache (yarn)
+    - name: Set up yarn cache
       uses: actions/cache@v2
       with:
         path: ~/.cache/yarn
         key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
         restore-keys: |
           ${{ runner.os }}-yarn-
-    - run: yarn install
+    - run: yarn global add lerna
+    - run: lerna bootstrap
     - name: Run ember-cli-deploy
       run: yarn deploy:web-client:staging
       env:
