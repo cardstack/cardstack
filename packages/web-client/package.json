@@ -31,6 +31,29 @@
     "@embroider/webpack": "^0.37.0",
     "@glimmer/component": "^1.0.3",
     "@glimmer/tracking": "^1.0.3",
+    "@types/ember-data": "^3.16.12",
+    "@types/ember-qunit": "^3.4.13",
+    "@types/ember-resolver": "^5.0.10",
+    "@types/ember__application": "^3.16.2",
+    "@types/ember__array": "^3.16.4",
+    "@types/ember__component": "^3.16.4",
+    "@types/ember__controller": "^3.16.4",
+    "@types/ember__debug": "^3.16.3",
+    "@types/ember__engine": "^3.16.2",
+    "@types/ember__error": "^3.16.1",
+    "@types/ember__object": "^3.12.5",
+    "@types/ember__polyfills": "^3.12.1",
+    "@types/ember__routing": "^3.16.11",
+    "@types/ember__runloop": "^3.16.3",
+    "@types/ember__service": "^3.16.1",
+    "@types/ember__string": "^3.16.3",
+    "@types/ember__template": "^3.16.1",
+    "@types/ember__test": "^3.16.1",
+    "@types/ember__test-helpers": "^1.7.3",
+    "@types/ember__utils": "^3.16.2",
+    "@types/htmlbars-inline-precompile": "^1.0.1",
+    "@types/qunit": "^2.11.1",
+    "@types/rsvp": "^4.0.3",
     "babel-eslint": "^10.1.0",
     "broccoli-asset-rev": "^3.0.0",
     "ember-auto-import": "^1.10.1",
@@ -49,6 +72,8 @@
     "ember-cli-inject-live-reload": "^2.0.2",
     "ember-cli-sri": "^2.1.1",
     "ember-cli-terser": "^4.0.1",
+    "ember-cli-typescript": "^4.1.0",
+    "ember-cli-typescript-blueprints": "^3.0.0",
     "ember-data": "~3.25.0",
     "ember-export-application-global": "^2.0.1",
     "ember-fetch": "^8.0.4",
@@ -79,5 +104,8 @@
   },
   "volta": {
     "extends": "../../package.json"
+  },
+  "dependencies": {
+    "typescript": "^4.2.3"
   }
 }

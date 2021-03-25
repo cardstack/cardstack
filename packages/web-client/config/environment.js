@@ -1,5 +1,12 @@
 'use strict';
 
+interface AppOptions {
+  LOG_ACTIVE_GENERATION: boolean | undefined;
+  LOG_VIEW_LOOKUPS: boolean | undefined;
+  rootElement: string | undefined;
+  autoboot: boolean | undefined;
+}
+// eslint-disable-next-line no-undef
 module.exports = function (environment) {
   let ENV = {
     modulePrefix: '@cardstack/web-client',
@@ -20,7 +27,7 @@ module.exports = function (environment) {
     APP: {
       // Here you can pass flags/options to your application instance
       // when it is created
-    },
+    } as AppOptions,
   };
 
   if (environment === 'development') {
