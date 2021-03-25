@@ -3,20 +3,13 @@ import type {
   RawCard,
   CompiledCard,
 } from '@cardstack/core/src/interfaces';
+import { transformSync } from '@babel/core';
 import { Compiler } from '@cardstack/core/src/compiler';
-// import { compileTemplate } from 'cardhost/tests/helpers/template-compiler';
-// import templateOnlyComponent from '@ember/component/template-only';
-// import { setComponentTemplate } from '@ember/component';
 
-// import { precompile } from '@glimmer/compiler';
-// import type { TemplateFactory } from 'htmlbars-inline-precompile';
-
-// // @ts-ignore
-// import { createTemplateFactory } from '@ember/template-factory';
-// function compileTemplate(source: string): TemplateFactory {
-//   return createTemplateFactory(JSON.parse(precompile(source)));
-// }
-
+// @ts-ignore
+import HTMLBarsCompiler from 'ember-template-compiler/vender/ember-template-compiler';
+// @ts-ignore
+import HTMLBarsInlinePrecompile from 'babel-plugin-htmlbars-inline-precompile';
 export default class Builder implements BuilderInterface {
   private compiler = new Compiler({
     lookup: (url) => this.getCompiledCard(url),
@@ -24,17 +17,23 @@ export default class Builder implements BuilderInterface {
   });
 
   private cache: Map<string, CompiledCard>;
-  private realm: string;
+  private realm?: string;
 
   constructor(params: { realm?: string }) {
     this.cache = new Map();
-    this.realm = params.realm ?? '';
+    this.realm = params.realm;
   }
 
   private async defineModule(moduleURL: string, source: string): Promise<void> {
     console.debug('DEFINE', moduleURL, source);
 
-    // TODO: here is where we transpile the module for browser use
+    let out = transformSync(source, {
+      plugins: [
+        [HTMLBarsInlinePrecompile, { precompile: HTMLBarsCompiler.precompile }],
+      ],
+    });
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    source = out!.code!;
 
     (window as any).define(moduleURL, function () {
       return source;
@@ -73,22 +72,7 @@ export default class Builder implements BuilderInterface {
     format: 'isolated' | 'embedded'
   ): Promise<{ model: any; moduleName: string }> {
     let compiledCard = await this.getCompiledCard(url);
-    // let templateSource = await window.require(
-    //   compiledCard.templateModules[format].moduleName
-    // );
-    // let componentImplementation = setComponentTemplate(
-    //   compileTemplate(templateSource),
-    //   templateOnlyComponent()
-    // );
-    // this.defineModule(compiledCard.modelModule, templateSource);
 
-    /*
-      TODO Build stage:
-        1. Require template module from it's path, eg: "http://mirage/cards/hello/isolated"
-        2. Babel transpile it
-        3. Do the createTemplateFactory song and dance?
-        4. Redefine the module? Make a new definintion?
-    */
     return {
       model: compiledCard.data,
       moduleName: compiledCard.templateModules[format].moduleName,
