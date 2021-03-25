@@ -113,9 +113,8 @@
             </BoxelActions>
           {{/if}}
           <div class="field-renderer__card">
-            <Boxel::Header>
-              {{if @field.type (humanize @field.type) "text"}}
-            </Boxel::Header>
+            <Boxel::Header class="boxel-card__header" @header={{if @field.type (humanize @field.type) "text"}} />
+
             <div class="field-renderer__inner {{if @field.status "" "field-renderer__opacity-control"}}">
               {{#let (filter-by "title" @field.value) as |multiTagList|}}
                 {{#if multiTagList.length}}
@@ -147,9 +146,8 @@
               </BoxelActions>
             {{/if}}
             <div class="field-renderer__card">
-              <Boxel::Header>
-                {{if @field.type (humanize @field.type) "text"}}
-              </Boxel::Header>
+              <Boxel::Header class="boxel-card__header" @header={{if @field.type (humanize @field.type) "text"}} />
+
               <div class="field-renderer__inner {{if @field.status "" "field-renderer__opacity-control"}}">
                 {{@field.value}}
               </div>

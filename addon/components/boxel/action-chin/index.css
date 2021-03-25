@@ -31,8 +31,7 @@
   transition: border-color var(--boxel-transition);
 }
 
-.boxel-action-chin--light > button:hover,
-.boxel-action-chin--light > button:focus {
+.boxel-action-chin--light > button:hover {
   border-color: var(--boxel-dark);
 }
 

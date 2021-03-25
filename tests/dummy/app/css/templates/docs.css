@@ -7,3 +7,7 @@
 .freestyle-components-section .FreestyleSubsection-name {
   display: none;
 }
+
+.FreestyleGuide-content ul {
+  padding: 0 1em;
+}

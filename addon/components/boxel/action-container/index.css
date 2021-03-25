@@ -1,17 +1,10 @@
 .boxel-action-container {
-  position: relative;
-  width: 100%;
   max-width: 43.75rem; /* 700px;*/
   min-width: 20rem;
-  background-color: var(--boxel-light);
-  border-radius: var(--boxel-border-radius);
   color: var(--boxel-dark);
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp);
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-  transition:
-    max-width var(--boxel-transition),
-    box-shadow var(--boxel-transition);
 }
 
 .boxel-action-container--is-complete {
@@ -26,43 +19,19 @@
 
 /* Card Header */
 .boxel-action-container__header {
-  --header-background-color: transparent;
-  --header-text-color: var(--boxel-purple-300);
+  --boxel-header-text-color: var(--boxel-purple-300);
+  --boxel-header-background-color: transparent;
 
+  border-top-right-radius: inherit;
+  border-top-left-radius: inherit;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
 }
 
-.boxel-action-container__expand-button {
-  --icon-button-width: 1.875rem;
-  --icon-button-height: 1.875rem;
-
-  position: absolute;
-  top: 0;
-  right: 0;
-
-  color: transparent;
-  --icon-color: currentColor;
-  transition: color var(--boxel-transition);
-  /* this is so that the icon color change transition is in sync with
-  the header background-color change transition. */
-}
-
-.boxel-action-container__expand-button:focus {
-  color: initial;
-  /* the button is only stylistically hidden. it's accessible via keyboard shortcut. */
-}
-
-
-/* Container and Header interaction */
 .boxel-action-container:hover .boxel-action-container__header {
-  --header-background-color: var(--boxel-purple-100);
-  --header-text-color: var(--boxel-dark);
-}
-
-.boxel-action-container:hover .boxel-action-container__expand-button {
-  color: initial;
+  background-color: var(--boxel-purple-100);
+  color: var(--boxel-dark);
 }
 
 
@@ -78,6 +47,6 @@
 
 /* Card Chin */
 .boxel-action-container__footer {
-  border-bottom-right-radius: var(--boxel-border-radius);
-  border-bottom-left-radius: var(--boxel-border-radius);
+  border-bottom-right-radius: inherit;
+  border-bottom-left-radius: inherit;
 }

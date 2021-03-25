@@ -1,58 +1,77 @@
-<Freestyle::Usage @name="BoxelHeader">
+<Freestyle::Usage @name="Header">
   <:description>
     Usually shown at the top of card containers
   </:description>
   <:example>
     <Boxel::Header
-      @noBackground={{this.hasBackground}}
-      style={{css-var
-        header-padding=this.headerPadding
-        header-background-color=this.headerBackgroundColor
-        header-text-color=this.headerColor
-        header-min-height=this.headerMinHeight
-      }}
-    >
-      Some Header Text
-    </Boxel::Header>
+      @header={{this.header}}
+      @selectionHeader={{this.selectionHeader}}
+      @isSelected={{this.isSelected}}
+      @editable={{this.editable}}
+      @editAction={{@editAction}}
+      @hasContextMenu={{this.hasContextMenu}}
+      @expandable={{this.expandable}}
+      @expandAction={{@expandAction}}
+      @noBackground={{this.noBackground}}
+    />
   </:example>
   <:api as |Args|>
+    <Args.String
+      @name="header"
+      @description="header label text"
+      @required={{true}}
+      @value={{this.header}}
+      @onInput={{fn (mut this.header)}}
+    />
     <Args.Bool
       @name="noBackground"
-      @description="if true, container has no background-color"
+      @description="(styling) header does not have background color"
       @defaultValue={{false}}
-      @value={{this.hasBackground}}
-      @onInput={{fn (mut this.hasBackground)}}
+      @value={{this.noBackground}}
+      @onInput={{fn (mut this.noBackground)}}
     />
-    <Args.String
-      @name="--header-padding"
-      @description="padding CSS style"
-      @defaultValue="var(--boxel-sp-xxxs) var(--boxel-sp-sm)"
-      @value={{this.headerPadding}}
-      @onInput={{fn (mut this.headerPadding)}}
+    <Args.Bool
+      @name="selectionHeader"
+      @description="header label is a button"
+      @defaultValue={{false}}
+      @value={{this.selectionHeader}}
+      @onInput={{fn (mut this.selectionHeader)}}
     />
-    <Args.String
-      @name="--header-background-color"
-      @description="background-color CSS style"
-      @defaultValue="var(--boxel-purple-100)"
-      @value={{this.headerBackgroundColor}}
-      @onInput={{fn (mut this.headerBackgroundColor)}}
+    <Args.Bool
+      @name="isSelected"
+      @description="header is selected (use with `selectionHeader` arg for semantic ui)"
+      @defaultValue={{false}}
+      @value={{this.isSelected}}
+      @onInput={{fn (mut this.isSelected)}}
     />
-    <Args.String
-      @name="--header-text-color"
-      @description="color CSS style"
-      @defaultValue="var(--boxel-purple-400)"
-      @value={{this.headerColor}}
-      @onInput={{fn (mut this.headerColor)}}
+    <Args.Bool
+      @name="editable"
+      @description="display 'edit' button on the header"
+      @defaultValue={{false}}
+      @value={{this.editable}}
+      @onInput={{fn (mut this.editable)}}
     />
-    <Args.String
-      @name="--header-min-height"
-      @description="min-height CSS style"
-      @defaultValue="1.875rem"
-      @value={{this.headerMinHeight}}
-      @onInput={{fn (mut this.headerMinHeight)}}
+    <Args.Action
+      @name="editAction"
+      @description="action for the `edit` button"
     />
-    <Args.Yield
-      @description="Header text to show"
+    <Args.Bool
+      @name="hasContextMenu"
+      @description="header has 'more actions' dropdown menu"
+      @defaultValue={{false}}
+      @value={{this.hasContextMenu}}
+      @onInput={{fn (mut this.hasContextMenu)}}
+    />
+    <Args.Bool
+      @name="expandable"
+      @description="display expand button on the header"
+      @defaultValue={{false}}
+      @value={{this.expandable}}
+      @onInput={{fn (mut this.expandable)}}
+    />
+    <Args.Action
+      @name="expandAction"
+      @description="action for the `expand` button"
     />
   </:api>
 </Freestyle::Usage>

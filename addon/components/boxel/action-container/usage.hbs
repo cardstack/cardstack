@@ -1,12 +1,27 @@
 <Freestyle::Usage @name="ActionContainer">
   <:description>
-    Container for an action card.
+    Preconfigured CardContainer for an action card
   </:description>
-
+  <:example>
+    <Boxel::ActionContainer
+      @header={{this.header}}
+      @prompt={{this.prompt}}
+      @incompleteActionLabel={{this.incompleteActionLabel}}
+      @completeActionLabel={{this.completeActionLabel}}
+      @isComplete={{this.isComplete}}
+      @onClickButton={{fn (mut this.isComplete) (not this.isComplete)}}
+      @expandAction={{@expandAction}}
+    >
+      {{!-- Sample block yield --}}
+        <div>Action Card here</div>
+      {{!-- End of sample block yield --}}
+    </Boxel::ActionContainer>
+  </:example>
   <:api as |Args|>
     <Args.String
       @name="header"
-      @description="action card header/label (String)"
+      @description="action card header/label"
+      @required={{true}}
       @onInput={{fn (mut this.header)}}
       @value={{this.header}}
     />
@@ -20,22 +35,31 @@
     <Args.String
       @name="incompleteActionLabel"
       @description="CTA button label for blocking action. It means the action is incomplete"
+      @required={{true}}
       @onInput={{fn (mut this.incompleteActionLabel)}}
       @value={{this.incompleteActionLabel}}
     />
     <Args.String
       @name="completeActionLabel"
       @description="CTA button label for non-blocking action"
+      @required={{true}}
       @onInput={{fn (mut this.completeActionLabel)}}
       @value={{this.completeActionLabel}}
     />
-    <Args.Object
+    <Args.Action
       @name="onClickButton"
       @description="Function for the CTA button action"
+      @required={{true}}
+    />
+    <Args.Action
+      @name="expandAction"
+      @description="action for expand button"
+      @required={{true}}
     />
     <Args.Bool
       @name="isComplete"
       @description="Condition for action's completeness (Boolean)"
+      @required={{true}}
       @defaultValue={{false}}
       @onInput={{fn (mut this.isComplete)}}
     />
@@ -44,33 +68,4 @@
       @description="Unstyled area for custom card content and fields"
     />
   </:api>
-
-  <:example>
-    <Boxel::ActionContainer
-      @header="Card Header"
-      @incompleteActionLabel={{this.incompleteActionLabel}}
-      @completeActionLabel={{this.completeActionLabel}}
-      @isComplete={{this.isComplete}}
-      @onClickButton={{fn (mut this.isComplete) (not this.isComplete)}}
-    >
-      {{!-- Sample block yield --}}
-        <div>Content goes here</div>
-      {{!-- End of sample block yield --}}
-    </Boxel::ActionContainer>
-
-    <br>
-
-    <Boxel::ActionContainer
-      @header={{this.header}}
-      @prompt={{this.prompt}}
-      @incompleteActionLabel={{this.incompleteActionLabel}}
-      @completeActionLabel={{this.completeActionLabel}}
-      @isComplete={{this.isComplete}}
-      @onClickButton={{fn (mut this.isComplete) (not this.isComplete)}}
-    >
-      {{!-- Sample block yield --}}
-        <div>Content goes here</div>
-      {{!-- End of sample block yield --}}
-    </Boxel::ActionContainer>
-  </:example>
 </Freestyle::Usage>

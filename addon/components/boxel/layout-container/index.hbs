@@ -1,4 +1,29 @@
-{{!-- TODO --}}
-<div class="boxel-layout-container" data-test-boxel-layout-container ...attributes>
-  {{yield}}
-</div>
+<Boxel::CardContainer
+  @hasHeader={{@displayTools}}
+  @displayBoundaries={{@displayTools}}
+  @isSelected={{@isSelected}}
+  class={{cn
+    "boxel-layout-container"
+    boxel-layout-container--boundaries=@displayTools
+  }}
+  data-test-boxel-layout-container
+  ...attributes
+>
+  {{#if @displayTools}}
+    <Boxel::Header
+      class="boxel-layout-container__header"
+      @header="Layout"
+      @selectionHeader={{true}}
+      @isSelected={{@isSelected}}
+      @selectAction={{@selectAction}}
+      @editable={{true}}
+      @editAction={{@editAction}}
+      @hasContextMenu={{true}}
+      @expandable={{true}}
+      @expandAction={{@expandAction}}
+      data-test-boxel-layout-header
+    />
+  {{/if}}
+
+    {{yield}}
+</Boxel::CardContainer>

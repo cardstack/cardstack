@@ -1,6 +1,15 @@
 .boxel-layout-container {
-  display: grid;
-  width: 100%;
-  height: 100%;
-  background-color: var(--boxel-light);
+  border-radius: 0;
+}
+
+.boxel-layout-container--boundaries {
+  border-radius: var(--boxel-border-radius);
+}
+
+.boxel-layout-container__header {
+  --boxel-header-text-color: var(--boxel-purple-300);
+}
+
+.boxel-layout-container:hover .boxel-layout-container__header {
+  color: var(--boxel-dark);
 }

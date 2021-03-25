@@ -41,6 +41,11 @@
   cursor: pointer;
 }
 
+.boxel-card__header {
+  border-top-left-radius: var(--boxel-border-radius);
+  border-top-right-radius: var(--boxel-border-radius);
+}
+
 .boxel-card__inner {
   position: relative;
   display: grid;

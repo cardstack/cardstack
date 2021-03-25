@@ -21,9 +21,7 @@
     <BoxelHighlight @expandAction={{@expandAction}} @class="boxel-card__expand-overlay" />
   {{/if}}
   {{#if @model.type}}
-    <Boxel::Header>
-      {{humanize @model.type}}
-    </Boxel::Header>
+    <Boxel::Header class="boxel-card__header" @header={{humanize @model.type}} />
   {{/if}}
 
   {{!-- Template and the styling of the area below (the card itself) is up to the card author. --}}

@@ -1,0 +1,49 @@
+<Freestyle::Usage @name="CardContainer">
+  <:description>
+    A wrapper container for a card
+  </:description>
+  <:example>
+    <Boxel::CardContainer
+      @hasHeader={{this.hasHeader}}
+      @displayBoundaries={{this.displayBoundaries}}
+      @isSelected={{this.isSelected}}
+    >
+      {{!-- Sample block yield --}}
+        {{#if this.hasHeader}}
+          <Boxel::Header
+            @header="Card"
+            @isSelected={{this.isSelected}}
+            @selectionHeader={{true}}
+          />
+        {{/if}}
+        <div>Card Here</div>
+      {{!-- End of sample block yield --}}
+    </Boxel::CardContainer>
+  </:example>
+  <:api as |Args|>
+    <Args.Bool
+      @name="hasHeader"
+      @description="Container grid will accommodate space for a header. Boxel::Header component use is recommended."
+      @defaultValue={{false}}
+      @value={{this.hasHeader}}
+      @onInput={{fn (mut this.hasHeader)}}
+    />
+    <Args.Bool
+      @name="displayBoundaries"
+      @description="Displays card borders"
+      @defaultValue={{false}}
+      @value={{this.displayBoundaries}}
+      @onInput={{fn (mut this.displayBoundaries)}}
+    />
+    <Args.Bool
+      @name="isSelected"
+      @description="Highlights card borders"
+      @defaultValue={{false}}
+      @value={{this.isSelected}}
+      @onInput={{fn (mut this.isSelected)}}
+    />
+    <Args.Yield
+      @description="Unstyled area for custom card content and fields"
+    />
+  </:api>
+</Freestyle::Usage>

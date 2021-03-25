@@ -1,17 +1,14 @@
 .boxel-header {
   /* container styling */
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto;
   align-items: center;
-  min-height: var(--header-min-height, 1.875rem);
-  padding: var(--header-padding, var(--boxel-sp-xxxs) var(--boxel-sp-sm));
-  background-color: var(--header-background-color, var(--boxel-purple-100));
-  border-top-left-radius: var(--boxel-border-radius);
-  border-top-right-radius: var(--boxel-border-radius);
+  min-height: var(--boxel-header-min-height, 1.875rem); /* 30px */
+  background-color: var(--boxel-header-background-color, var(--boxel-purple-100));
 
   /* text styling */
-  color: var(--header-text-color, var(--boxel-purple-400));
-  font: var(--boxel-font-xs);
-  font-weight: 600;
+  color: var(--boxel-header-text-color, var(--boxel-dark));
+  font: 600 var(--boxel-font-xs);
   letter-spacing: var(--boxel-lsp-xl);
   text-transform: uppercase;
 
@@ -22,4 +19,57 @@
 
 .boxel-header--no-background {
   background-color: transparent;
+}
+
+.boxel-header--selected {
+  background-color: var(--boxel-highlight);
+  color: var(--boxel-dark);
+}
+
+.boxel-header__label {
+  padding: var(--boxel-sp-xxxs) var(--boxel-sp-sm);
+}
+
+
+/* button group  */
+.boxel-header__button-group {
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding-right: var(--boxel-sp-xxxs);
+}
+
+
+/* for all buttons */
+.boxel-header__button {
+  --icon-button-width: var(--boxel-header-min-height, 1.875rem);
+  --icon-button-height: var(--boxel-header-min-height, 1.875rem);
+
+  min-height: var(--icon-button-height);
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--boxel-dark);
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+.boxel-header__button:focus {
+  outline-offset: -2px;
+}
+
+
+/* header label button */
+.boxel-header__label-text-button {
+  padding: var(--boxel-sp-xxxs) var(--boxel-sp-sm);
+  color: inherit;
+  text-align: left;
+}
+
+
+/* edit button */
+.boxel-header__text-button {
+  padding: var(--boxel-sp-xxxs);
 }
