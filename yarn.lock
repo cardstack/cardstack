@@ -1237,27 +1237,7 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@glimmer/component@^1.0.1", "@glimmer/component@^1.0.2":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@glimmer/component/-/component-1.0.3.tgz#38c26fc4855fd7ad0e0816d18d80d32c578e5140"
-  integrity sha512-GD3gcN+Pr2flmxkt2lm5K86jwX+KRD9QQpNH+wiEQGjBXOzd46+XD5npH1sRByqLYml9rW4klflcrEfNb7dnQw==
-  dependencies:
-    "@glimmer/di" "^0.1.9"
-    "@glimmer/env" "^0.1.7"
-    "@glimmer/util" "^0.44.0"
-    broccoli-file-creator "^2.1.1"
-    broccoli-merge-trees "^3.0.2"
-    ember-cli-babel "^7.7.3"
-    ember-cli-get-component-path-option "^1.0.0"
-    ember-cli-is-package-missing "^1.0.0"
-    ember-cli-normalize-entity-name "^1.0.0"
-    ember-cli-path-utils "^1.0.0"
-    ember-cli-string-utils "^1.1.0"
-    ember-cli-typescript "3.0.0"
-    ember-cli-version-checker "^3.1.3"
-    ember-compatibility-helpers "^1.1.2"
-
-"@glimmer/component@^1.0.4":
+"@glimmer/component@^1.0.1", "@glimmer/component@^1.0.2", "@glimmer/component@^1.0.3":
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/@glimmer/component/-/component-1.0.4.tgz#1c85a5181615a6647f6acfaaed68e28ad7e9626e"
   integrity sha512-sS4N8wtcKfYdUJ6O3m8nbTut6NjErdz94Ap8VB1ekcg4WSD+7sI7Nmv6kt2rdPoe363nUdjUbRBzHNWhLzraBw==
@@ -1379,15 +1359,7 @@
     "@handlebars/parser" "^1.1.0"
     simple-html-tokenizer "^0.5.10"
 
-"@glimmer/tracking@^1.0.1", "@glimmer/tracking@^1.0.2", "@glimmer/tracking@~1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@glimmer/tracking/-/tracking-1.0.3.tgz#8b9b42aff6c206edeaaea178a95acc1eff62e61e"
-  integrity sha512-21WR13vPdzt1IQ6JmPPAu4szjV9yKdmLHV3nD0MLDj6/EoYv1c2PqpFBBlp++6xW8OnyDa++cQ8OFoQDP+MRpA==
-  dependencies:
-    "@glimmer/env" "^0.1.7"
-    "@glimmer/validator" "^0.44.0"
-
-"@glimmer/tracking@^1.0.4":
+"@glimmer/tracking@^1.0.1", "@glimmer/tracking@^1.0.2", "@glimmer/tracking@^1.0.3", "@glimmer/tracking@~1.0.3":
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/@glimmer/tracking/-/tracking-1.0.4.tgz#f1bc1412fe5e2236d0f8d502994a8f88af1bbb21"
   integrity sha512-F+oT8I55ba2puSGIzInmVrv/8QA2PcK1VD+GWgFMhF6WC97D+uZX7BFg+a3s/2N4FVBq5KHE+QxZzgazM151Yw==
@@ -2953,7 +2925,7 @@ babel-plugin-debug-macros@^0.2.0, babel-plugin-debug-macros@^0.2.0-beta.6:
   dependencies:
     semver "^5.3.0"
 
-babel-plugin-debug-macros@^0.3.3:
+babel-plugin-debug-macros@^0.3.3, babel-plugin-debug-macros@^0.3.4:
   version "0.3.4"
   resolved "https://registry.yarnpkg.com/babel-plugin-debug-macros/-/babel-plugin-debug-macros-0.3.4.tgz#22961d0cb851a80654cece807a8b4b73d85c6075"
   integrity sha512-wfel/vb3pXfwIDZUrkoDrn5FHmlWI96PCJ3UCDv2a86poJ3EQrnArNW5KfHSVJ9IOgxHbo748cQt7sDU+0KCEw==
@@ -2987,6 +2959,13 @@ babel-plugin-ember-modules-api-polyfill@^3.2.1:
   integrity sha512-ZHeadIPB6prIs6TzAItQl7VO0/Lcy74n47fl4oev4DOgB4iuRfL/CEpGZqm0B/9zODYn4GsE0taCC0HSDWqMYQ==
   dependencies:
     ember-rfc176-data "^0.3.16"
+
+babel-plugin-ember-modules-api-polyfill@^3.3.0:
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-ember-modules-api-polyfill/-/babel-plugin-ember-modules-api-polyfill-3.5.0.tgz#27b6087fac75661f779f32e60f94b14d0e9f6965"
+  integrity sha512-pJajN/DkQUnStw0Az8c6khVcMQHgzqWr61lLNtVeu0g61LRW0k9jyK7vaedrHDWGe/Qe8sxG5wpiyW9NsMqFzA==
+  dependencies:
+    ember-rfc176-data "^0.3.17"
 
 babel-plugin-ember-modules-api-polyfill@^3.4.0:
   version "3.4.0"
@@ -3038,7 +3017,7 @@ babel-plugin-htmlbars-inline-precompile@^4.4.1:
   dependencies:
     babel-plugin-ember-modules-api-polyfill "^3.4.0"
 
-babel-plugin-module-resolver@^3.1.1:
+babel-plugin-module-resolver@^3.1.1, babel-plugin-module-resolver@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/babel-plugin-module-resolver/-/babel-plugin-module-resolver-3.2.0.tgz#ddfa5e301e3b9aa12d852a9979f18b37881ff5a7"
   integrity sha512-tjR0GvSndzPew/Iayf4uICWZqjBwnlMWjSx6brryfQ81F9rxBVqwDJtFCV8oOs0+vJeefK9TmdZtkIFdFe1UnA==
@@ -4223,6 +4202,11 @@ broccoli-source@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/broccoli-source/-/broccoli-source-1.1.0.tgz#54f0e82c8b73f46580cbbc4f578f0b32fca8f809"
   integrity sha1-VPDoLItz9GWAy7xPV48LMvyo+Ak=
+
+broccoli-source@^2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/broccoli-source/-/broccoli-source-2.1.2.tgz#e9ae834f143b607e9ec114ade66731500c38b90b"
+  integrity sha512-1lLayO4wfS0c0Sj50VfHJXNWf94FYY0WUhxj0R77thbs6uWI7USiOWFqQV5dRmhAJnoKaGN4WyLGQbgjgiYFwQ==
 
 broccoli-source@^3.0.0:
   version "3.0.0"
@@ -6164,6 +6148,39 @@ ember-cli-babel@^7.0.0, ember-cli-babel@^7.1.2, ember-cli-babel@^7.1.3, ember-cl
     rimraf "^3.0.1"
     semver "^5.5.0"
 
+ember-cli-babel@~7.24.0:
+  version "7.24.0"
+  resolved "https://registry.yarnpkg.com/ember-cli-babel/-/ember-cli-babel-7.24.0.tgz#d58670d0f214c63a46f44f86e7c407799d77fc45"
+  integrity sha512-IpqMqOS1VI2wVLIREdEXG9WG05YBulg20t0K27yl2aBjmShvLMRIodcNiKataTgf/dDiU0EWQBGl7VLBLBkFgQ==
+  dependencies:
+    "@babel/core" "^7.12.0"
+    "@babel/helper-compilation-targets" "^7.12.0"
+    "@babel/plugin-proposal-class-properties" "^7.10.4"
+    "@babel/plugin-proposal-decorators" "^7.10.5"
+    "@babel/plugin-transform-modules-amd" "^7.10.5"
+    "@babel/plugin-transform-runtime" "^7.12.0"
+    "@babel/plugin-transform-typescript" "^7.12.0"
+    "@babel/polyfill" "^7.11.5"
+    "@babel/preset-env" "^7.12.0"
+    "@babel/runtime" "^7.12.0"
+    amd-name-resolver "^1.3.1"
+    babel-plugin-debug-macros "^0.3.4"
+    babel-plugin-ember-data-packages-polyfill "^0.1.2"
+    babel-plugin-ember-modules-api-polyfill "^3.3.0"
+    babel-plugin-module-resolver "^3.2.0"
+    broccoli-babel-transpiler "^7.8.0"
+    broccoli-debug "^0.6.4"
+    broccoli-funnel "^2.0.2"
+    broccoli-source "^2.1.2"
+    clone "^2.1.2"
+    ember-cli-babel-plugin-helpers "^1.1.1"
+    ember-cli-version-checker "^4.1.0"
+    ensure-posix-path "^1.0.2"
+    fixturify-project "^1.10.0"
+    resolve-package-path "^3.1.0"
+    rimraf "^3.0.1"
+    semver "^5.5.0"
+
 ember-cli-dependency-checker@^3.1.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/ember-cli-dependency-checker/-/ember-cli-dependency-checker-3.2.0.tgz#9202ad9e14d6fda33cffc22a11c343c2a8885330"
@@ -7192,6 +7209,11 @@ ember-rfc176-data@^0.3.13, ember-rfc176-data@^0.3.15, ember-rfc176-data@^0.3.16:
   version "0.3.16"
   resolved "https://registry.yarnpkg.com/ember-rfc176-data/-/ember-rfc176-data-0.3.16.tgz#2ace0ac9cf9016d493a74a1d931643a308679803"
   integrity sha512-IYAzffS90r2ybAcx8c2qprYfkxa70G+/UPkxMN1hw55DU5S2aLOX6v3umKDZItoRhrvZMCnzwsdfKSrKdC9Wbg==
+
+ember-rfc176-data@^0.3.17:
+  version "0.3.17"
+  resolved "https://registry.yarnpkg.com/ember-rfc176-data/-/ember-rfc176-data-0.3.17.tgz#d4fc6c33abd6ef7b3440c107a28e04417b49860a"
+  integrity sha512-EVzTTKqxv9FZbEh6Ktw56YyWRAA0MijKvl7H8C06wVF+8f/cRRz3dXxa4nkwjzyVwx4rzKGuIGq77hxJAQhWWw==
 
 ember-router-generator@^2.0.0:
   version "2.0.0"
