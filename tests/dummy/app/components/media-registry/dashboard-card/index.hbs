@@ -1,7 +1,7 @@
 <Boxel::Dashboard @displayLeftEdge={{true}} class="media-registry media-registry--{{@currentOrg.id}}">
   <:left-edge>
     <aside class="media-registry__left-edge {{if this.isQueueFixed "with-queue"}}">
-      <CardHost::LeftEdgeNav
+      <Boxel::LeftEdgeNav
         @home={{@home}}
         @orgs={{@orgs}}
         @currentOrg={{@currentOrg}}
@@ -34,32 +34,34 @@
   </:left-edge>
 
   <:header>
-    <Boxel::OrgHeader
-      @title={{@currentOrg.title}}
-      @logoURL={{@currentOrg.logoURL}}
-      class="media-registry__header media-registry__header--{{@currentOrg.id}}"
-    >
-      <Boxel::Input class="media-registry__search-bar" type="search" placeholder="Search" />
-    </Boxel::OrgHeader>
-    {{!-- TODO: navbar component (also see CardPay::DashboardCard) --}}
-    <nav class="media-registry__nav">
-      <ul>
-        <li>
-          <LinkTo @route="media-registry.index" @model={{@currentOrg.id}}>
-            {{#if @currentOrg.musicalWorkOnly}}
-              Musical Works
-            {{else}}
-              Masters
-            {{/if}}
-          </LinkTo>
-        </li>
-        {{#if @currentOrg.user}}
-          <li><LinkTo @route="media-registry.agreements" @model="TA-38185847898">Agreements</LinkTo></li>
-        {{else}}
-          <li><LinkTo @route="media-registry.discrepancies.index">Discrepancies</LinkTo></li>
-        {{/if}}
-      </ul>
-    </nav>
+    <div class="media-registry__header-container" style={{css-var media-registry-header-background-color=(or @currentOrg.brandColor "var(--boxel-dark)")}}>
+      <Boxel::OrgHeader
+        @title={{@currentOrg.title}}
+        @iconURL={{@currentOrg.iconURL}}
+        class="media-registry__header media-registry__header--{{@currentOrg.id}}"
+      >
+        <Boxel::Input class="media-registry__search-bar" type="search" placeholder="Search" />
+      </Boxel::OrgHeader>
+      {{!-- TODO: navbar component (also see CardPay::DashboardCard) --}}
+      <nav class="media-registry__nav">
+        <ul>
+          <li>
+            <LinkTo @route="media-registry.index" @model={{@currentOrg.id}}>
+              {{#if @currentOrg.musicalWorkOnly}}
+                Musical Works
+              {{else}}
+                Masters
+              {{/if}}
+            </LinkTo>
+          </li>
+          {{#if @currentOrg.user}}
+            <li><LinkTo @route="media-registry.agreements" @model="TA-38185847898">Agreements</LinkTo></li>
+          {{else}}
+            <li><LinkTo @route="media-registry.discrepancies.index">Discrepancies</LinkTo></li>
+          {{/if}}
+        </ul>
+      </nav>
+    </div>
   </:header>
 
 

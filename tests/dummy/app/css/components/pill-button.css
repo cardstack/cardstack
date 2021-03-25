@@ -14,7 +14,3 @@
   background-color: var(--boxel-highlight);
   border-color: var(--boxel-highlight);
 }
-
-.boxel-pill-btn:hover {
-  color: var(--boxel-dark);
-}

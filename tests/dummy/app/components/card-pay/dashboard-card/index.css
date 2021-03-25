@@ -1,4 +1,9 @@
 .card-pay-dashboard {
-  --boxel-dashboard-header-background-color: var(--boxel-dark);
-  --boxel-dashboard-header-color: var(--boxel-light);
+  --card-pay-dashboard-header-background-color: var(--boxel-dark);
+  --card-pay-dashboard-header-text-color: var(--boxel-light);
+}
+
+.card-pay-dashboard__header-container {
+  background-color: var(--card-pay-dashboard-header-background-color);
+  color: var(--card-pay-dashboard-header-text-color);
 }

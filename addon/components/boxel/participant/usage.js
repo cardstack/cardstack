@@ -1,8 +1,9 @@
 import Component from '@glimmer/component';
-import HaileyImage from '@cardstack/boxel/usage-support/images/workflow/participants/thumb/Haley-OConnell.jpg';
-import HSHLogo from '@cardstack/boxel/usage-support/images/workflow/orgs/hsh-icon.png';
-import HLCLogo from '@cardstack/boxel/usage-support/images/workflow/orgs/hlc-icon.png';
 import { tracked } from '@glimmer/tracking';
+
+import HaileyImage from '@cardstack/boxel/usage-support/images/users/Haley-OConnell.jpg';
+import HSHLogo from '@cardstack/boxel/usage-support/images/orgs/hsh-icon.png';
+import HLCLogo from '@cardstack/boxel/usage-support/images/orgs/hlc-icon.png';
 
 export default class ParticipantUsageComponent extends Component {
   HaileyImage = HaileyImage;

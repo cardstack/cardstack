@@ -87,7 +87,7 @@
 }
 
 .discrepancy__nested-level-back-btn:hover {
-  color: var(--boxel-dark);
+  color: initial;
 }
 
 .discrepancy__comparison-header-icons {
@@ -290,6 +290,10 @@
   max-width: 500px;
   font-weight: 600;
   line-height: 3;
+}
+
+.discrepancy__count-btn:hover {
+  color: initial;
 }
 
 .discrepancy__count-btn-container {

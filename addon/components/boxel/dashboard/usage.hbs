@@ -2,46 +2,18 @@
   <:example>
     <Boxel::Dashboard
       @displayLeftEdge={{this.displayLeftEdge}}
-      style={{css-var
-        boxel-dashboard-background-color=this.backgroundColor
-        boxel-dashboard-color=this.color
-        boxel-dashboard-header-background-color=this.headerBackgroundColor
-        boxel-dashboard-header-color=this.headerColor
-      }}
+      @darkTheme={{this.darkTheme}}
     >
       <:left-edge>
-        <CardHost::LeftEdgeNav
+        <Boxel::LeftEdgeNav
           @home={{hash icon="cardstack" height="2rem"}}
           class="dashboard-usage-left-edge-nav"
         >
-        </CardHost::LeftEdgeNav>
+        </Boxel::LeftEdgeNav>
       </:left-edge>
-
       <:header>
         <Boxel::OrgHeader @title="Cardstack" />
       </:header>
-
-      <:body>
-        Content
-      </:body>
-    </Boxel::Dashboard>
-    <br>
-    <Boxel::Dashboard
-      @displayLeftEdge={{this.displayLeftEdge}}
-      @darkTheme={{true}}
-    >
-      <:left-edge>
-        <CardHost::LeftEdgeNav
-          @home={{hash icon="cardstack" height="2rem"}}
-          class="dashboard-usage-left-edge-nav"
-        >
-        </CardHost::LeftEdgeNav>
-      </:left-edge>
-
-      <:header>
-        <Boxel::OrgHeader @title="Cardstack" />
-      </:header>
-
       <:body>
         Content
       </:body>
@@ -59,34 +31,8 @@
       @name="darkTheme"
       @description="dark-themed version"
       @defaultValue="false"
-    />
-    <Args.String
-      @name="--boxel-dashboard-background-color"
-      @description="background-color CSS style"
-      @defaultValue="inherit"
-      @value={{this.backgroundColor}}
-      @onInput={{fn (mut this.backgroundColor)}}
-    />
-    <Args.String
-      @name="--boxel-dashboard-color"
-      @description="color CSS style"
-      @defaultValue="inherit"
-      @value={{this.color}}
-      @onInput={{fn (mut this.color)}}
-    />
-    <Args.String
-      @name="--boxel-dashboard-header-background-color"
-      @description="background-color CSS style for the header container"
-      @defaultValue="inherit"
-      @value={{this.headerBackgroundColor}}
-      @onInput={{fn (mut this.headerBackgroundColor)}}
-    />
-    <Args.String
-      @name="--boxel-dashboard-header-color"
-      @description="color CSS style for the header container"
-      @defaultValue="inherit"
-      @value={{this.headerColor}}
-      @onInput={{fn (mut this.headerColor)}}
+      @value={{this.darkTheme}}
+      @onInput={{fn (mut this.darkTheme)}}
     />
   </:api>
 </Freestyle::Usage>

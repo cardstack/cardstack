@@ -1,0 +1,6 @@
+.boxel-org-switcher {
+  display: grid;
+  grid-auto-rows: 2.5rem;
+  gap: var(--boxel-sp);
+  justify-items: center;
+}
