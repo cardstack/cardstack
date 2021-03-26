@@ -3,9 +3,9 @@
   --horizontal-card-gap: var(--boxel-sp-lg);
 
   width: 100%;
-  max-width: calc(var(--card-width) * 2 + var(--horizontal-card-gap));
+  max-width: calc(var(--card-width) * 2 + var(--horizontal-card-gap) + var(--boxel-sp-sm) * 2);
   margin: auto;
-  padding-bottom: var(--boxel-sp-lg);
+  padding: 0 var(--boxel-sp-sm) var(--boxel-sp-lg) var(--boxel-sp-sm);
 }
 
 .cardstack-container > * {
@@ -76,9 +76,17 @@
 .cardstack-org-grid {
   display: grid;
   justify-items: center;
-  grid-template-columns: repeat(auto-fill, var(--card-width));
+  grid-template-columns: repeat(auto-fill, minmax(var(--card-width), 1fr));
   grid-template-rows: auto auto;
   gap: var(--boxel-sp-xl) var(--horizontal-card-gap);
+}
+
+.cardstack-org-grid > * {
+  justify-self: start;
+}
+
+.cardstack-org-grid > *:nth-child(2n) {
+  justify-self: end;
 }
 
 .cardstack-org-grid .org-card {
