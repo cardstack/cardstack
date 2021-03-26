@@ -1,5 +1,4 @@
 {
-  "include": [ "./packages/**/*.ts", "./packages/**/*.js", "./scripts/**/*.js", "./cards/**/*.ts", "**/.eslintrc.ts" ],
   "compilerOptions": {
     "target": "es2017",
     "module": "es6",
@@ -14,13 +13,21 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
   },
+  "include": [
+    "./packages/eslint-config/**/*.ts",
+    "./packages/hub/**/*.ts",
+    "./packages/test-support/**/*.ts",
+    "./scripts/**/*.js",
+    "./cards/**/*.ts",
+    "**/.eslintrc.ts"
+  ],
   "exclude": [
+    "./cards/*/tmp",
+    "./cards/*/dist",
+    "./packages/*/dist",
+    "./packages/*/tmp",
+    "./packages/*/node_modules",
     "node_modules",
-    "packages/*/tmp",
-    "packages/*/dist",
-    "packages/*/node_modules",
-    "cards/*/tmp",
-    "cards/*/dist",
     "tmp",
   ]
 }

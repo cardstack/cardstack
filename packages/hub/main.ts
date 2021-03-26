@@ -34,8 +34,8 @@ export async function makeServer(container?: Container) {
   });
   app.use(cors);
   app.use(httpLogging);
-  app.use((await container.lookup('authentication-middleware')).middleware());
-  app.use((await container.lookup('development-proxy-middleware')).middleware());
+  app.use(((await container.lookup('authentication-middleware')) as AuthenticationMiddleware).middleware());
+  app.use(((await container.lookup('development-proxy-middleware')) as DevelopmentProxyMiddleware).middleware());
   app.use(async (ctx: Koa.Context, _next: Koa.Next) => {
     ctx.body = 'Hello World ' + ctx.environment + ' ' + ctx.host.split(':')[0];
   });
