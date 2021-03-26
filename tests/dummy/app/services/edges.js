@@ -7,7 +7,6 @@ import { reads, equal } from 'macro-decorators';
 export default class EdgesService extends Service {
   @service('router') routerService;
   @tracked displayLeftEdge = false;
-  @tracked darkTheme = true;
 
   // hides the edges from cardstack.card-pay routes
   @reads('routerService.currentRoute.parent.name') routeName;
@@ -20,15 +19,5 @@ export default class EdgesService extends Service {
     } else {
       this.displayLeftEdge = false;
     }
-  }
-
-  @action
-  hasLightTheme() {
-    this.darkTheme = false;
-  }
-
-  @action
-  hasDarkTheme() {
-    this.darkTheme = true;
   }
 }

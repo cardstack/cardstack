@@ -13,8 +13,12 @@ module('Acceptance | cardstack dashboard', function (hooks) {
     assert.dom('[data-test-cardstack-dashboard-header]').hasText('Cardstack');
     assert.dom('[data-test-cardstack-login-button]').exists();
     assert.dom('[data-test-left-edge-nav]').exists();
-    assert.dom('[data-test-cardstack-dashboard-link="card-space"]').exists();
-    assert.dom('[data-test-cardstack-dashboard-link="card-pay"]').exists();
+    assert
+      .dom('[data-test-cardstack-dashboard-link="cardstack.card-space"]')
+      .exists();
+    assert
+      .dom('[data-test-cardstack-dashboard-link="cardstack.card-pay"]')
+      .exists();
   });
 
   test('can navigate to /card-space', async function (assert) {
@@ -22,7 +26,7 @@ module('Acceptance | cardstack dashboard', function (hooks) {
     assert.equal(currentURL(), '/scenarios/cardstack');
     assert.dom('[data-test-cardstack-dashboard]').exists();
 
-    await click('[data-test-cardstack-dashboard-link="card-space"]');
+    await click('[data-test-cardstack-dashboard-link="cardstack.card-space"]');
     assert.equal(currentURL(), '/scenarios/cardstack/card-space');
     assert.dom('[data-test-card-space-dashboard]').exists();
   });
@@ -40,7 +44,7 @@ module('Acceptance | cardstack dashboard', function (hooks) {
     assert.dom('[data-test-left-edge-nav]').exists();
     assert.dom('[data-test-cardstack-login-button]').doesNotExist();
 
-    await click('[data-test-cardstack-dashboard-link="card-space"]');
+    await click('[data-test-cardstack-dashboard-link="cardstack.card-space"]');
     assert.equal(currentURL(), '/scenarios/cardstack/card-space');
     assert.equal(service.isAuthenticated, true);
     assert.dom('[data-test-left-edge-nav]').exists();
@@ -51,7 +55,7 @@ module('Acceptance | cardstack dashboard', function (hooks) {
     await visit('/scenarios/cardstack');
     assert.equal(currentURL(), '/scenarios/cardstack');
 
-    await click('[data-test-cardstack-dashboard-link="card-pay"]');
+    await click('[data-test-cardstack-dashboard-link="cardstack.card-pay"]');
     assert.equal(currentURL(), '/scenarios/cardstack/card-pay');
 
     assert.dom('[data-test-card-pay-dashboard]').exists();

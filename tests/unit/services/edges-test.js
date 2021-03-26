@@ -14,11 +14,6 @@ module('Unit | Service | edges', function (hooks) {
     assert.equal(service.displayLeftEdge, false);
   });
 
-  test('dark-theme is set to be true by default', function (assert) {
-    let service = this.owner.lookup('service:edges');
-    assert.equal(service.darkTheme, true);
-  });
-
   test('can change left-edge display state', async function (assert) {
     let service = this.owner.lookup('service:edges');
 
@@ -30,15 +25,5 @@ module('Unit | Service | edges', function (hooks) {
 
     await service.updateDisplayLeftEdge(false);
     assert.equal(service.displayLeftEdge, false);
-  });
-
-  test('can change displayed theme state', async function (assert) {
-    let service = this.owner.lookup('service:edges');
-
-    await service.hasLightTheme();
-    assert.equal(service.darkTheme, false);
-
-    await service.hasDarkTheme();
-    assert.equal(service.darkTheme, true);
   });
 });

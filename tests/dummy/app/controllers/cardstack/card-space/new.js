@@ -8,9 +8,13 @@ export default class CardSpaceNewController extends Controller {
   @service('cardstack-session') cardstackSession;
   @tracked isSelected = false;
 
+  @action login() {
+    this.cardstackSession.login();
+    this.updateEdges();
+  }
+
   @action updateEdges() {
     this.edges.updateDisplayLeftEdge(this.cardstackSession.isAuthenticated);
-    this.edges.hasLightTheme();
   }
 
   @action toggleSelect() {

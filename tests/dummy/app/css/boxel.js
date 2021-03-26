@@ -21,3 +21,4 @@ import './components/queue.css';
 import './components/version-history.css';
 import './components/tasklist.css';
 import './components/tasklist-table.css';
+import './components/org-card.css';
