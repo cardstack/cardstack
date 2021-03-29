@@ -49,3 +49,5 @@ class CompilerError extends Error {
     }
   }
 }
+
+export { default as ColocatedBabelPlugin } from 'ember-cli-htmlbars/lib/colocated-babel-plugin';

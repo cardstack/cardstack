@@ -53,6 +53,6 @@ module('Acceptance | card routing', function (hooks) {
   test('visiting /card-routing', async function (assert) {
     await visit('/welcome');
     assert.equal(currentURL(), '/welcome');
-    assert.dom('[data-test-person]').containsText('Hi I am Arthur');
+    assert.dom('[data-test-person]').containsText('Hi! I am Arthur');
   });
 });

@@ -3,13 +3,24 @@ import type {
   RawCard,
   CompiledCard,
 } from '@cardstack/core/src/interfaces';
-import { transformSync } from '@babel/core';
 import { Compiler } from '@cardstack/core/src/compiler';
 
-// @ts-ignore
-import HTMLBarsCompiler from 'ember-template-compiler/vender/ember-template-compiler';
+import { transformSync } from '@babel/core';
+import type { TransformOptions } from '@babel/core';
+import { ColocatedBabelPlugin } from '@cardstack/core/src/babel/utils';
+
+// TODO can't find import targets, so the preset arent working
+// import targets from 'cardhost/config/targets';
+// import PresetEnv from '@babel/preset-env';
+
+import { precompile } from '@glimmer/compiler';
 // @ts-ignore
 import HTMLBarsInlinePrecompile from 'babel-plugin-htmlbars-inline-precompile';
+// @ts-ignore
+import EmberModulesApiPolyfill from 'babel-plugin-ember-modules-api-polyfill';
+// @ts-ignore
+import TransformModulesAmd from '@babel/plugin-transform-modules-amd';
+
 export default class Builder implements BuilderInterface {
   private compiler = new Compiler({
     lookup: (url) => this.getCompiledCard(url),
@@ -24,20 +35,71 @@ export default class Builder implements BuilderInterface {
     this.realm = params.realm;
   }
 
-  private async defineModule(moduleURL: string, source: string): Promise<void> {
-    console.debug('DEFINE', moduleURL, source);
-
-    let out = transformSync(source, {
-      plugins: [
-        [HTMLBarsInlinePrecompile, { precompile: HTMLBarsCompiler.precompile }],
-      ],
-    });
+  private async defineModule(
+    moduleURL: string,
+    source: string,
+    type: 'Schema' | 'Template'
+  ): Promise<void> {
+    let out = transformSync(source, this.babelConfig(type));
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     source = out!.code!;
 
-    (window as any).define(moduleURL, function () {
-      return source;
-    });
+    if (type === 'Template') {
+      // TODO: This can't be right. This requires adding ['default] after the imports.
+      // I imagine there is a babel plugin that may clear that up as well...
+      eval(source.replace('([', `("${moduleURL}", [`));
+    } else {
+      (window as any).define(moduleURL, function () {
+        return source;
+      });
+    }
+  }
+
+  private babelConfig(type: 'Schema' | 'Template'): TransformOptions {
+    let ensureModuleApiPolyfill = true; // For now?Not sure we need this...
+
+    let plugins = [
+      [
+        HTMLBarsInlinePrecompile,
+        {
+          ensureModuleApiPolyfill,
+          precompile,
+          modules: {
+            'ember-cli-htmlbars': 'hbs',
+            '@ember/template-compilation': {
+              export: 'precompileTemplate',
+              disableTemplateLiteral: true,
+              shouldParseScope: true,
+              isProduction: process.env.EMBER_ENV === 'production',
+            },
+          },
+        },
+      ],
+    ];
+
+    if (ensureModuleApiPolyfill) {
+      plugins.push([EmberModulesApiPolyfill]);
+    }
+    plugins.push([ColocatedBabelPlugin]);
+
+    if (type === 'Template') {
+      plugins.push([TransformModulesAmd, { noInterop: true }]);
+    }
+
+    return {
+      configFile: false,
+      babelrc: false,
+      plugins,
+      // presets: [
+      //   [
+      //     PresetEnv,
+      //     {
+      //       modules: false,
+      //       targets,
+      //     },
+      //   ],
+      // ],
+    };
   }
 
   async getRawCard(url: string): Promise<RawCard> {

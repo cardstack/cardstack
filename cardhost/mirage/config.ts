@@ -109,11 +109,7 @@ export default function (this: Server): void {
       );
     }
     let compiled = await cardServer.builder.getCompiledCard(routingCard);
-    let path = cardServer.builder.getFullModuleURL(
-      compiled.url,
-      compiled.modelModule
-    );
-    let source = window.require(path);
+    let source = window.require(compiled.modelModule);
     let output: any[] = [];
     new Function(
       'output',
