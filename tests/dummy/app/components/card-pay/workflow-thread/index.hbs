@@ -1,0 +1,116 @@
+<Boxel::Thread ...attributes>
+  <:header>
+    <Boxel::ThreadHeader
+      @title={{@title}}
+      @expanded={{@expanded}}
+      @toggleExpand={{@toggleExpand}}
+    />
+  </:header>
+
+  <:content>
+    <Boxel::DateDivider @date={{this.startTimestamp}} />
+    {{#each @milestones as |milestone i|}}
+      {{#let (or milestone.complete (lte i this.progress)) as |displayMilestone|}}
+        <AnimatedContainer>
+          {{#animated-if (and displayMilestone milestone.message) use=this.transition}}
+            <Boxel::ThreadMessage
+              @content={{if (is-array milestone.message) null milestone.message}}
+              @datetime={{milestone.datetime}}
+              @imgURL={{@workflowBot.imgURL}}
+            >
+              <AnimatedContainer onInitialRender={{not milestone.complete}}>
+                {{#animated-each milestone.message initialInsertion=(not milestone.complete) use=this.transition as |content|}}
+                  {{#if content.component}}
+                    <div class="card-pay-workflow-thread__message">
+                      {{!-- Sample component --}}
+                      <Boxel::ActionContainer
+                        @header={{milestone.title}}
+                        @prompt="Milestone Action"
+                        @incompleteActionLabel="Complete"
+                        @completeActionLabel="Edit"
+                        @isComplete={{milestone.complete}}
+                        @onClickButton={{fn this.toggleComplete milestone}}
+                      />
+                    </div>
+                  {{else}}
+                    <p class="card-pay-workflow-thread__message">{{content}}</p>
+                  {{/if}}
+                {{/animated-each}}
+              </AnimatedContainer>
+            </Boxel::ThreadMessage>
+          {{/animated-if}}
+        </AnimatedContainer>
+
+        <AnimatedContainer>
+          {{#animated-if milestone.complete use=this.bannerTransition}}
+            <Boxel::MilestoneBanner
+              @title={{milestone.statusOnCompletion}}
+              {{on "click" this.updateProgress}}
+            />
+          {{/animated-if}}
+        </AnimatedContainer>
+
+        <AnimatedContainer>
+          {{#animated-if (and milestone.messageOnCompletion this.displayCompletionMessage) use=this.transition}}
+            <Boxel::ThreadMessage
+              @content={{milestone.messageOnCompletion}}
+              @datetime={{milestone.datetimeOnCompletion}}
+              @imgURL={{@workflowBot.imgURL}}
+            />
+          {{/animated-if}}
+        </AnimatedContainer>
+      {{/let}}
+    {{/each}}
+  </:content>
+
+  <:sidebar as |SidebarSection|>
+    <SidebarSection>
+      <Boxel::Sidebar::CardContainer
+        @header={{html-safe (concat "Workflow:<br>" @title)}}
+        @attachNext={{true}}
+      >
+        <div>
+          <Boxel::ProgressCircle
+            @percentComplete={{percent-complete total=@milestones.length completed=this.progress}}
+          />
+        </div>
+        <div class="card-pay-workflow-thread__status">
+          {{this.progressStatus}}
+        </div>
+      </Boxel::Sidebar::CardContainer>
+
+      <Boxel::Sidebar::CardContainer @header="Milestones">
+        <Boxel::Milestones
+          @milestones={{@milestones}}
+          @completedCount={{this.progress}}
+        />
+      </Boxel::Sidebar::CardContainer>
+    </SidebarSection>
+
+    <SidebarSection>
+      <Boxel::HelpBox />
+    </SidebarSection>
+
+    <SidebarSection>
+      <Boxel::Sidebar::CardContainer
+        @header="Participants"
+        @attachNext={{true}}
+      >
+        <Boxel::ParticipantList
+          @fullWidth={{true}}
+          @participants={{@participants}}
+        />
+      </Boxel::Sidebar::CardContainer>
+
+      <Boxel::Sidebar::CardContainer>
+        <Boxel::ParticipantList
+          @fullWidth={{true}}
+          @participants={{@orgParticipants}}
+        />
+        <Boxel::AddParticipantButton
+          {{on "click" (optional @addParticipant)}}
+        />
+      </Boxel::Sidebar::CardContainer>
+    </SidebarSection>
+  </:sidebar>
+</Boxel::Thread>

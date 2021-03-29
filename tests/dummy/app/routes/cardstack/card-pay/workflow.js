@@ -13,6 +13,7 @@ export default class CardPayWorkflowRoute extends Route {
       id: workflowId,
       participants: [user],
       orgRepresentatives: [workflowBot],
+      workflowBot,
       workflow,
     };
 

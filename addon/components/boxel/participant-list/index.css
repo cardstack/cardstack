@@ -1,6 +1,6 @@
 .boxel-participant-list {
-  --icon-size: 30px;
-  --column-size: calc(var(--icon-size, 30px) / 2);
+  --icon-size: 2rem;
+  --column-size: calc(var(--icon-size) / 2);
 
   list-style-type: none;
   padding: 0;

@@ -1,14 +1,13 @@
 .boxel-thread-header {
   display: grid;
   grid-template-columns: 1fr auto;
+  position: relative;
   align-items: center;
-  gap: var(--boxel-sp);
   padding: var(--boxel-sp);
   background-color: var(--boxel-light);
-  border-top-right-radius: var(--boxel-border-radius);
-  border-top-left-radius: var(--boxel-border-radius);
+  border-radius: inherit;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
-  position: relative;
+  overflow: hidden;
 }
 
 .boxel-thread-header__label {
@@ -19,9 +18,7 @@
 }
 
 .boxel-thread-header__title {
-  /* Not using variables for margin-top because it seems to make a significant difference to typography (@Aierie's judgement) */
   margin-top: 4px;
-  margin-bottom: var(--boxel-sp-xxxs);
   font: 700 var(--boxel-font-lg);
   letter-spacing: var(--boxel-lsp-xxs);
 }
@@ -52,11 +49,12 @@
 
 .boxel-thread-header__participants {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: max-content max-content;
   align-items: center;
+  justify-content: end;
   gap: 0 var(--boxel-sp-sm);
   color: var(--boxel-dark);
-  font-weight: 600;
+  font: 600 var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-xl);
 }
 
@@ -64,11 +62,11 @@
   position: absolute;
   top: 0;
   right: 0;
-  /* Not using variables because this might overlap with things below */
   padding: 2px 13px 3px;
-  border-radius: 0 10px 0 5px;
+  border-bottom-left-radius: var(--boxel-border-radius-sm);
   background-color: var(--boxel-error-100);
   color: var(--boxel-light);
+  font-size: var(--boxel-font-size-xs);
   font-weight: 700;
   letter-spacing: var(--boxel-lsp-sm);
   text-align: center;

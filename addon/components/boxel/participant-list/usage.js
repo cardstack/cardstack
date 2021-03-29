@@ -34,7 +34,8 @@ const SAMPLE_PARTICIPANTS = [
 
 export default class ParticipantListUsageComponent extends Component {
   @tracked participants = A(SAMPLE_PARTICIPANTS);
-  @tracked iconSize = 30;
+  @tracked participantsNoOrg = SAMPLE_PARTICIPANTS.slice(1);
+  @tracked iconSize = '2rem';
   @tracked maxCount = 5;
   @tracked fanned = false;
   @tracked iconOnly = false;

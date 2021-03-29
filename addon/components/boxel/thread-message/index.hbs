@@ -1,29 +1,31 @@
-<AnimatedContainer onInitialRender={{true}}>
-  {{#animated-value @datetime initialInsertion=true use=this.transition}}
-    <div
-      class="boxel-thread-message"
-      style={{css-var icon-size=(concat this.iconSize "px")}}
-      ...attributes
-    >
-      <Boxel::Participant
-        class="boxel-thread-message__participant"
-        @iconSize={{this.iconSize}}
-        @hasLogo={{@hasLogo}}
-        @title={{@senderName}}
-        @image={{@senderImage}}
-      >
-        <time class="boxel-thread-message__time">{{moment-format (or @datetime (now)) "MMM D, h:mm A"}}</time>
-      </Boxel::Participant>
+<div class="boxel-thread-message" ...attributes>
+  <Boxel::Participant
+    class="boxel-thread-message__participant"
+    @iconOnly={{true}}
+    @iconSize={{this.iconSize}}
+    @hasLogo={{this.hasLogo}}
+    @image={{@imgURL}}
+  />
 
-      <AnimatedContainer onInitialRender={{true}} class="boxel-thread-message__content">
-        {{#if @contents}}
-          {{#animated-each @contents initialInsertion=true use=this.transition as |content|}}
-            <p>{{content}}</p>
-          {{/animated-each}}
-        {{else}}
-          {{@content}}
-        {{/if}}
-      </AnimatedContainer>
+  <div>
+    <div class="boxel-thread-message__info">
+      {{#if @name}}
+        <h4 class="boxel-thread-message__sender-name">
+          {{@name}}
+        </h4>
+      {{/if}}
+      <time class="boxel-thread-message__time">{{moment-format (or @datetime (now)) "MMM D, h:mm A"}}</time>
     </div>
-  {{/animated-value}}
-</AnimatedContainer>
+    <div class="boxel-thread-message__content">
+      {{#if (is-array @content)}}
+        {{#each @content as |message|}}
+          <p>{{message}}</p>
+        {{/each}}
+      {{else}}
+        {{@content}}
+      {{/if}}
+
+      {{yield}}
+    </div>
+  </div>
+</div>

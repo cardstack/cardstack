@@ -1,5 +1,70 @@
 <Freestyle::Usage @name="ThreadHeader">
   <:example>
-  TODO
+    <Boxel::ThreadHeader
+      @label={{this.label}}
+      @title={{this.title}}
+      @notificationCount={{this.notificationCount}}
+      @participants={{this.participants}}
+    >
+    </Boxel::ThreadHeader>
   </:example>
+  <:api as |Args|>
+    <Args.String
+      @name="title"
+      @description="Thread title"
+      @required={{true}}
+      @value={{this.title}}
+      @onInput={{fn (mut this.title)}}
+    />
+    <Args.String
+      @name="label"
+      @description="Thread label"
+      @value={{this.label}}
+      @onInput={{fn (mut this.label)}}
+    />
+    <Args.Number
+      @name="notificationCount"
+      @description="Notification count for the thread (unread messages, etc.)"
+      @value={{this.notificationCount}}
+      @onInput={{fn (mut this.notificationCount)}}
+    />
+    <Args.Array
+      @name="participants"
+      @description="Participants in this thread"
+      @type="Object"
+      @items={{this.participants}}
+      @onChange={{fn (mut this.participants)}}
+    />
+  </:api>
+</Freestyle::Usage>
+
+<Freestyle::Usage @slug="ThreadHeader-card-pay">
+  <:example>
+    <Boxel::ThreadHeader
+      @title={{this.workflowTitle}}
+      @toggleExpand={{this.toggleExpand}}
+      @expanded={{this.expanded}}
+    >
+    </Boxel::ThreadHeader>
+  </:example>
+  <:api as |Args|>
+    <Args.String
+      @name="title"
+      @description="Thread title"
+      @required={{true}}
+      @value={{this.workflowTitle}}
+      @onInput={{fn (mut this.workflowTitle)}}
+    />
+    <Args.Action
+      @name="toggleExpand"
+      @description="Optional expand action"
+      @value={{this.toggleExpand}}
+    />
+    <Args.Bool
+      @name="expanded"
+      @description="Result of the expand action"
+      @value={{this.expanded}}
+      @onInput={{fn (mut this.expanded)}}
+    />
+  </:api>
 </Freestyle::Usage>

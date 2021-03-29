@@ -1,7 +1,10 @@
 .boxel-sidebar-card-container {
+  --boxel-sidebar-card-container-max-width: 15rem; /* 240px */
+
   background-color: var(--boxel-light);
   border-radius: var(--boxel-border-radius);
   padding: var(--boxel-sp);
+  max-width: var(--boxel-sidebar-card-container-max-width);
   position: relative;
   z-index: 0;
 }

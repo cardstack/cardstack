@@ -4,7 +4,7 @@
       class="cardflow__header"
       @title={{or this.thread.description this.thread.title}}
       @label={{this.thread.project}}
-      @notifications={{if (eq this.thread.status "unread") (array "notif") null}}
+      @notificationCount={{if (eq this.thread.status "unread") 1 null}}
       @participants={{this.participants}}
     />
   </:header>
@@ -21,11 +21,11 @@
   <:content>
     {{#each @model.posts as |post|}}
       <Boxel::ThreadMessage
-        @senderName={{post.sender.title}}
-        @senderImage={{post.sender.imgURL}}
+        @name={{post.sender.title}}
+        @imgURL={{post.sender.imgURL}}
         @content={{post.content}}
         @datetime={{post.datetime}}
-        @hasLogo={{eq post.participantType "bot"}}
+        @isRound={{unless post.participantType "bot"}}
       >
       </Boxel::ThreadMessage>
     {{/each}}

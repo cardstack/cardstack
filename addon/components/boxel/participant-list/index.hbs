@@ -4,7 +4,7 @@
     boxel-participant-list__fanned=@fanned
     boxel-participant-list--full-width=@fullWidth
   }}
-  style={{css-var icon-size=(concat this.iconSize "px")}}
+  style={{css-var icon-size=this.iconSize}}
   ...attributes
 >
   {{#each @participants as |participant i|}}

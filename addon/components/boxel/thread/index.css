@@ -1,5 +1,7 @@
 .boxel-thread {
   position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr;;
   height: 100%;
   background-color: var(--boxel-light-300);
   border-radius: var(--boxel-border-radius);
@@ -8,17 +10,18 @@
   letter-spacing: var(--boxel-lsp);
 }
 
-.boxel-thread__scroll-wrapper {
-  overflow-y: auto;
-  padding-bottom: var(--boxel-sp-lg);
-}
-
 .boxel-thread__content-wrapper {
-  height: calc(100% - 90px);
+  height: 100%;
   display: grid;
   grid-template-columns: 1fr auto;
   background-color: var(--boxel-light-300);
   border-radius: var(--boxel-border-radius);
+  overflow: hidden;
+}
+
+.boxel-thread__scroll-wrapper {
+  padding-bottom: var(--boxel-sp-lg);
+  overflow-y: auto;
 }
 
 .boxel-thread__content {
@@ -32,11 +35,12 @@
 
 .boxel-thread__sidebar {
   margin: var(--boxel-sp);
-  width: 230px;
 }
 
 .boxel-thread__sticky-container {
   position: sticky;
   top: 0;
   z-index: 1;
+  border-top-right-radius: inherit;
+  border-top-left-radius: inherit;
 }

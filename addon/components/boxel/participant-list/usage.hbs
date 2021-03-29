@@ -33,13 +33,11 @@
       @defaultValue={{false}}
       @onInput={{fn (mut this.fullWidth)}}
     />
-    <Args.Number
+    <Args.String
       @name="iconSize"
-      @description="(integer) — Height and width of each item's icon."
+      @description="Height and width of each item's icon in any unit"
       @value={{this.iconSize}}
-      @defaultValue={{30}}
-      @min={{25}}
-      @max={{80}}
+      @defaultValue="2rem"
       @onInput={{fn (mut this.iconSize)}}
     />
     <Args.Bool
@@ -70,9 +68,8 @@
 <Freestyle::Usage @slug="ParticipantKist-fanned" @description="In `fanned` style">
   <:example>
     <Boxel::ParticipantList
-      @participants={{this.participants}}
-      @maxCount={{5}}
-      @iconSize={{30}}
+      @participants={{this.participantsNoOrg}}
+      @maxCount={{4}}
       @fanned={{true}}
     />
   </:example>

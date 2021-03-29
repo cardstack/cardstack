@@ -7,14 +7,18 @@
   --boxel-modal-max-width: 100%;
 }
 
-.boxel-thread-modal > .boxel-thread-modal__inner {
-  height: calc(100% - 60px);
-}
-
-.boxel-thread-modal__milestone-progress-status {
+.card-pay-workflow-thread__status {
   color: var(--boxel-dark);
   font: var(--boxel-font-sm);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp);
   text-align: center;
+}
+
+.card-pay-workflow-thread__message {
+  margin: 0;
+}
+
+.card-pay-workflow-thread__message + .card-pay-workflow-thread__message {
+  margin-top: var(--boxel-sp-lg);
 }

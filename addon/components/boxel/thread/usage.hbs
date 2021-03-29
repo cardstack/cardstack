@@ -1,5 +1,86 @@
 <Freestyle::Usage @name="Thread">
   <:example>
-  TODO
+    <Boxel::Thread>
+      <:header>
+        <Boxel::ThreadHeader @title="Project Title" />
+      </:header>
+
+      <:content>
+        <Boxel::DateDivider @date={{moment-format (now)}} />
+        <Boxel::ThreadMessage
+          @content="Hello, it's good to see you!"
+          @imgURL={{this.cardBotIcon}}
+        />
+      </:content>
+    </Boxel::Thread>
+  </:example>
+</Freestyle::Usage>
+
+<Freestyle::Usage @slug="Thread-with-workflow">
+  <:example>
+    <Boxel::Thread>
+      <:header>
+        <Boxel::ThreadHeader @title="Project Title" />
+      </:header>
+
+      <:content>
+        <Boxel::DateDivider @date={{moment-format (now)}} />
+        <Boxel::ThreadMessage
+          @content={{this.milestones.0.message}}
+          @imgURL={{this.milestones.0.senderIcon}}
+        />
+      </:content>
+
+      <:sidebar as |SidebarSection|>
+        <SidebarSection>
+          <Boxel::Sidebar::CardContainer
+            @header="Workflow: Project Title"
+            @attachNext={{true}}
+          >
+            <div>
+              <Boxel::ProgressCircle
+                @percentComplete={{percent-complete total=this.milestones.length completed=0}}
+              />
+            </div>
+            <div class="boxel-thread-modal__milestone-progress-status">
+              Workflow started
+            </div>
+          </Boxel::Sidebar::CardContainer>
+
+          <Boxel::Sidebar::CardContainer @header="Milestones">
+            <Boxel::Milestones
+              @milestones={{this.milestones}}
+              @completedCount={{0}}
+            />
+          </Boxel::Sidebar::CardContainer>
+        </SidebarSection>
+
+        <SidebarSection>
+          <Boxel::HelpBox />
+        </SidebarSection>
+
+        <SidebarSection>
+          <Boxel::Sidebar::CardContainer
+            @header="Participants"
+            @attachNext={{true}}
+          >
+            <Boxel::ParticipantList
+              @fullWidth={{true}}
+              @participants={{this.userGroup}}
+            />
+          </Boxel::Sidebar::CardContainer>
+
+          <Boxel::Sidebar::CardContainer>
+            <Boxel::ParticipantList
+              @fullWidth={{true}}
+              @participants={{this.orgGroup}}
+            />
+            <Boxel::AddParticipantButton
+              {{on "click" (optional @addParticipant)}}
+            />
+          </Boxel::Sidebar::CardContainer>
+        </SidebarSection>
+      </:sidebar>
+    </Boxel::Thread>
   </:example>
 </Freestyle::Usage>

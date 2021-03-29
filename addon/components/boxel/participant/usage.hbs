@@ -12,58 +12,42 @@
   <:api as |Args|>
     <Args.String
       @name="title"
+      @description="Display name"
       @value={{this.title}}
       @onInput={{fn (mut this.title)}}
     />
     <Args.String
       @name="description"
+      @description="Text that appears under the name"
       @value={{this.description}}
       @onInput={{fn (mut this.description)}}
     />
     <Args.String
       @name="image"
-      @description="(url string) — Defaults to generic profile icon."
+      @description="Defaults to generic profile icon"
       @value={{this.image}}
       @onInput={{fn (mut this.image)}}
     />
-    <Args.Number
+    <Args.String
       @name="iconSize"
-      @description="(integer) — Height and width of the image."
+      @description="Height and width of the image in any unit"
       @value={{this.iconSize}}
-      @defaultValue={{30}}
-      @min={{25}}
-      @max={{80}}
+      @defaultValue="2rem"
       @onInput={{fn (mut this.iconSize)}}
     />
     <Args.Bool
       @name="iconOnly"
       @value={{this.iconOnly}}
-      @description="If true, displays the icon only."
+      @description="If true, displays the icon only"
       @defaultValue={{false}}
       @onInput={{fn (mut this.iconOnly)}}
     />
     <Args.Bool
       @name="hasLogo"
       @value={{this.hasLogo}}
-      @description="If true, alternative styling is applied."
+      @description="If true, alternative styling is applied"
       @defaultValue={{false}}
       @onInput={{fn (mut this.hasLogo)}}
     />
   </:api>
 </Freestyle::Usage>
-
-<Freestyle::Usage @slug="participant-no-image" @description="Participant has no image.">
-  <:example>
-    <Boxel::Participant
-      @title="Carl Stack"
-      @description="Accountant"
-    />
-  </:example>
-</Freestyle::Usage>
-
-<Freestyle::Usage @slug="participant-no-attr" @description="Placeholder usage without any attributes.">
-  <:example>
-    <Boxel::Participant />
-  </:example>
-</Freestyle::Usage>
-
