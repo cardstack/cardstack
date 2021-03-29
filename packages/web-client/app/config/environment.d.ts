@@ -1,5 +1,8 @@
 export default config;
 
+interface ChainsOptions {
+  layer2: string;
+}
 /**
  * Type declarations for
  *    import config from 'my-app/config/environment'
@@ -10,5 +13,6 @@ declare const config: {
   podModulePrefix: string;
   locationType: string;
   rootURL: string;
+  chains: ChainsOptions;
   APP: Record<string, unknown>;
 };

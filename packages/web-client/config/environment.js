@@ -1,11 +1,5 @@
 'use strict';
 
-interface AppOptions {
-  LOG_ACTIVE_GENERATION: boolean | undefined;
-  LOG_VIEW_LOOKUPS: boolean | undefined;
-  rootElement: string | undefined;
-  autoboot: boolean | undefined;
-}
 // eslint-disable-next-line no-undef
 module.exports = function (environment) {
   let ENV = {
@@ -27,7 +21,10 @@ module.exports = function (environment) {
     APP: {
       // Here you can pass flags/options to your application instance
       // when it is created
-    } as AppOptions,
+    },
+    chains: {
+      layer2: 'xdai',
+    },
   };
 
   if (environment === 'development') {
@@ -41,6 +38,7 @@ module.exports = function (environment) {
   if (environment === 'test') {
     // Testem prefers this...
     ENV.locationType = 'none';
+    ENV.chains.layer2 = 'test';
 
     // keep test console output quieter
     ENV.APP.LOG_ACTIVE_GENERATION = false;
