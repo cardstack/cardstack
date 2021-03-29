@@ -1,0 +1,17 @@
+<details class="boxel-expandable-banner__details">
+    <summary class="boxel-expandable-banner__summary">
+        {{svg-jar @icon class="boxel-expandable-banner__summary-icon"}}
+        <span class="boxel-expandable-banner__summary-text">
+          {{@summary}}
+        </span>
+        <div class="boxel-expandable-banner__summary-close-marker" aria-hidden="true">
+            Hide {{svg-jar "caret-up"}}
+        </div>
+        <div class="boxel-expandable-banner__summary-open-marker" aria-hidden="true">
+            Show {{svg-jar "caret-down"}}
+        </div>
+    </summary>
+    <div class="boxel-expandable-banner__details-content">
+      {{yield}}
+    </div>
+</details>

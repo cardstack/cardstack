@@ -1,0 +1,107 @@
+/* The details element that contains everything */
+.boxel-expandable-banner__details {
+  --boxel-expandable-banner-text-color: var(--boxel-light);
+  --boxel-expandable-banner-background-color: var(--boxel-purple-400);
+  --boxel-expandable-banner-vertical-gap: var(--boxel-sp);
+  --boxel-expandable-banner-horizontal-gap: var(--boxel-sp-lg);
+
+  color: var(--boxel-expandable-banner-text-color);
+  background: var(--boxel-expandable-banner-background-color);
+  border-radius: var(--boxel-border-radius);
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.15));
+}
+
+/* Content within the details element, shown when it's expanded */
+.boxel-expandable-banner__details-content {
+  padding: 0 var(--boxel-expandable-banner-horizontal-gap) var(--boxel-expandable-banner-vertical-gap) var(--boxel-expandable-banner-horizontal-gap);
+}
+
+.boxel-expandable-banner__summary {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  border-radius: inherit;
+  padding: var(--boxel-expandable-banner-vertical-gap) calc(var(--boxel-sp-xs) + 3.375rem + var(--boxel-expandable-banner-horizontal-gap))
+    var(--boxel-expandable-banner-vertical-gap) var(--boxel-expandable-banner-horizontal-gap);
+}
+
+.boxel-expandable-banner__summary-text {
+  font: 600 var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.boxel-expandable-banner__summary-icon {
+  --icon-color: var(--boxel-cyan);
+
+  width: 2.125rem;
+  height: 2.125rem;
+  margin-right: var(--boxel-sp-xs);
+  flex-shrink: 0;
+}
+
+.boxel-expandable-banner__summary:focus:not(:focus-visible) {
+  outline: 2px solid transparent;
+}
+
+.boxel-expandable-banner__summary:focus {
+  outline: 2px solid var(--boxel-blue);
+}
+
+/* marker styling */
+/* 
+  remove the summary disclosure widget (the default triangle)
+  support is currently pretty decent: https://caniuse.com/?search=%3A%3Amarker
+  and certainly on our main browsers - Chrome, Safari, Firefox
+*/
+.boxel-expandable-banner__summary::marker,
+.boxel-expandable-banner__summary::-webkit-details-marker {
+  display: none;
+  content: '';
+}
+
+/* style our custom markers */
+.boxel-expandable-banner__summary-close-marker,
+.boxel-expandable-banner__summary-open-marker {
+  --icon-color: var(--boxel-expandable-banner-text-color);
+
+  position: absolute;
+  right: var(--boxel-expandable-banner-horizontal-gap);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 3.375rem;
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.boxel-expandable-banner__summary-close-marker svg,
+.boxel-expandable-banner__summary-open-marker svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+/* Only show the close marker when the details are expanded */
+.boxel-expandable-banner__details:not([open])
+  .boxel-expandable-banner__summary-close-marker {
+  visibility: hidden;
+}
+
+.boxel-expandable-banner__details[open]
+  .boxel-expandable-banner__summary-close-marker {
+  visibility: visible;
+}
+
+
+/* Only show the open marker when the details are not expanded */
+.boxel-expandable-banner__details[open]
+  .boxel-expandable-banner__summary-open-marker {
+  visibility: hidden;
+}
+
+.boxel-expandable-banner__details:not([open])
+  .boxel-expandable-banner__summary-open-marker {
+  visibility: visible;
+}

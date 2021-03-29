@@ -1,0 +1,31 @@
+<Freestyle::Usage>
+    <:example>
+        <Boxel::ExpandableBanner
+          @icon={{this.icon}}
+          @summary={{this.summary}}
+        >
+          <p class="expandable-banner-usage-paragraph">
+              As a Supplier, you deposit funds from your Ethereum Mainnet wallet into the CARD Protocol’s Reserve Pool and receive the corresponding amount of CPXD tokens in your xDai Chain wallet.
+          </p>
+          <p class="expandable-banner-usage-paragraph">
+              We currently support two types of asset you can deposit into the Reserve Pool:
+              <ul class="expandable-banner-usage-list">
+                  <li>Dai stablecoins (DAI)</li>
+                  <li>Cardstack ERC-20 tokens (CARD)</li>
+              </ul>
+          </p>
+          <p class="expandable-banner-usage-paragraph">
+              The CARD Protocol’s Reserve Pool facilitates payments between customers and merchants on the Cardstack Network. 
+          </p>
+          <p class="expandable-banner-usage-paragraph expandable-banner-usage-fine-print">
+              Fees: Suppliers earn transaction fees of 0.5% for all transactions across the CARD Protocol. Those fees will be distributed to Suppliers based on their proportional share of supplied tokens in the Reserve Pool, averaged over the 30-day period in which the transactions occurred. <a class="expandable-banner-usage-link" href="#">More details here.</a>
+          </p>
+        </Boxel::ExpandableBanner>
+    </:example>
+
+    <:api as |Args|>
+        <Args.String @name="icon" @value={{this.icon}} @onInput={{fn (mut this.icon)}} @description="Name of the icon on the left of the summary text, passed to svg-jar."/>
+        <Args.String @name="summary" @value={{this.summary}} @onInput={{fn (mut this.summary)}} @description="The text of the summary element"/>
+        <Args.Yield @description="The content in the details element"/>
+    </:api>
+</Freestyle::Usage>

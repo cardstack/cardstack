@@ -1,0 +1,26 @@
+.expandable-banner-usage-paragraph {
+    font: var(--boxel-font-sm);
+}
+
+.expandable-banner-usage-paragraph:first-child {
+  margin-top: 0;
+}
+
+.expandable-banner-usage-list > li {
+  padding-left: 0.5rem;
+}
+
+.expandable-banner-usage-list > li:before {
+  content: "–"; /* en dash */
+  position: absolute;
+  margin-left: -0.5rem; 
+}
+
+.expandable-banner-usage-fine-print {
+  font: var(--boxel-font-xs);
+  color: var(--boxel-light-600);
+}
+
+.expandable-banner-usage-link {
+  text-decoration: underline;
+}
