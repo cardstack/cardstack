@@ -3,7 +3,8 @@ import { setupRenderingTest } from 'ember-qunit';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import setupCardMocking from '../helpers/card-mocking';
 import Builder from 'cardhost/lib/builder';
-import { CompiledCard } from '@cardstack/core/src/interfaces';
+import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
+import { templateOnlyComponentTemplate } from '../helpers/template-compiler';
 
 module('Integration | compiler-adoption', function (hooks) {
   setupRenderingTest(hooks);
@@ -13,13 +14,10 @@ module('Integration | compiler-adoption', function (hooks) {
   let builder: Builder;
   let parentCard: CompiledCard;
 
-  hooks.beforeEach(async function () {
-    builder = new Builder();
-
-    this.createCard({
-      url: 'http://mirage/cards/person',
-      files: {
-        'schema.js': `
+  let PERSON_CARD: RawCard = {
+    url: 'http://mirage/cards/person',
+    files: {
+      'schema.js': `
         import { contains } from "@cardstack/types";
         import date from "https://cardstack.com/base/models/date";
         import string from "https://cardstack.com/base/models/string";
@@ -29,11 +27,17 @@ module('Integration | compiler-adoption', function (hooks) {
 
           @contains(date)
           birthdate;
-        }
-      `,
-        'embedded.hbs': `<@model.name/> was born on <@model.birthdate/>`,
-      },
-    });
+        }`,
+      'embedded.js': templateOnlyComponentTemplate(
+        `<@model.name/> was born on <@model.birthdate/>`
+      ),
+    },
+  };
+
+  hooks.beforeEach(async function () {
+    builder = new Builder({});
+
+    this.createCard(PERSON_CARD);
 
     parentCard = await builder.getCompiledCard('http://mirage/cards/person');
   });
@@ -56,6 +60,11 @@ module('Integration | compiler-adoption', function (hooks) {
       let compiled = await builder.getCompiledCard(card.url);
       assert.deepEqual(Object.keys(compiled.fields), ['name', 'birthdate']);
       assert.deepEqual(compiled.adoptsFrom, parentCard);
+      assert.equal(
+        compiled.templateModules.embedded.moduleName,
+        parentCard.templateModules.embedded.moduleName,
+        'It reports the module name for the template that it adopts'
+      );
     });
 
     test('A child card can add a field', async function (assert) {
@@ -173,11 +182,10 @@ module('Integration | compiler-adoption', function (hooks) {
       };
       this.createCard(card);
 
-      let compiled = await builder.getCompiledCard(card.url);
+      let compiledCard = await builder.getCompiledCard(card.url);
       assert.equal(
-        compiled.templateSources.embedded,
-        // `{{@model.name}} was born on <FormatDate @date={{@model.birthdate}} />`
-        `{{@model.name}} was born on Date: {{@model.birthdate}}`
+        compiledCard.templateModules.embedded.moduleName,
+        `${PERSON_CARD.url}/embedded`
       );
     });
 
@@ -209,11 +217,10 @@ module('Integration | compiler-adoption', function (hooks) {
       };
       this.createCard(card);
 
-      let compiled = await builder.getCompiledCard(card.url);
+      let compiledCard = await builder.getCompiledCard(card.url);
       assert.equal(
-        compiled.templateSources.embedded,
-        // `{{@model.name}} was born on <FormatDate @date={{@model.birthdate}} />`
-        `{{@model.name}} was born on Date: {{@model.birthdate}}`
+        compiledCard.templateModules.embedded.moduleName,
+        `${PERSON_CARD.url}/embedded`
       );
     });
   });

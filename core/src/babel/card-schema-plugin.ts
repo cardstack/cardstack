@@ -1,17 +1,16 @@
 import {
   ImportDeclaration,
-  ImportSpecifier,
+  isImportSpecifier,
   variableDeclaration,
   variableDeclarator,
   identifier,
-  Identifier,
-  StringLiteral,
   objectPattern,
   objectProperty,
   callExpression,
   isDecorator,
   stringLiteral,
   isClassProperty,
+  ImportSpecifier,
   isStringLiteral,
   isIdentifier,
   CallExpression,
@@ -19,6 +18,7 @@ import {
   isClassDeclaration,
 } from '@babel/types';
 import { NodePath } from '@babel/traverse';
+import { name, error } from './utils';
 
 const VALID_FIELD_DECORATORS = {
   hasMany: true,
@@ -31,6 +31,7 @@ type FieldType = keyof typeof VALID_FIELD_DECORATORS;
 export type FieldMeta = {
   cardURL: string;
   type: FieldType;
+  localName: string;
 };
 export type FieldsMeta = {
   [name: string]: FieldMeta;
@@ -64,22 +65,6 @@ const metas = new WeakMap<
   }
 >();
 
-function error(path: NodePath<any>, message: string) {
-  return path.buildCodeFrameError(message, CompilerError);
-}
-
-class CompilerError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'CompilerError';
-    if (typeof Error.captureStackTrace === 'function') {
-      Error.captureStackTrace(this, this.constructor);
-    } else if (!this.stack) {
-      this.stack = new Error(message).stack;
-    }
-  }
-}
-
 export default function main() {
   return {
     visitor: {
@@ -88,11 +73,10 @@ export default function main() {
         state: { opts: object }
       ) {
         if (path.node.source.value === '@cardstack/types') {
+          storeMeta(state.opts, path);
           let specifiers = path.node.specifiers.filter(
             (specifier) => specifier.type === 'ImportSpecifier'
           ) as ImportSpecifier[];
-
-          storeMeta(state.opts, specifiers, path);
 
           path.replaceWith(
             variableDeclaration('const', [
@@ -115,23 +99,14 @@ export default function main() {
   };
 }
 
-function name(node: StringLiteral | Identifier): string {
-  if (isIdentifier(node)) {
-    return node.name;
-  } else {
-    return node.value;
-  }
-}
-
-function storeMeta(
-  opts: object,
-  specifiers: ImportSpecifier[],
-  path: NodePath<any>
-) {
+function storeMeta(key: object, path: NodePath<ImportDeclaration>) {
   let fields: FieldsMeta = {};
   let parent: ParentMeta | undefined;
-
-  specifiers.forEach((specifier) => {
+  for (let specifier of path.node.specifiers) {
+    // all our field-defining decorators are named exports
+    if (!isImportSpecifier(specifier)) {
+      return;
+    }
     let {
       local: { name: localName },
     } = specifier;
@@ -149,13 +124,13 @@ function storeMeta(
     if (specifierName === 'adopts') {
       parent = validateUsageAndGetParentMeta(path, localName);
     }
-  });
+  }
 
-  metas.set(opts, { fields, parent });
+  metas.set(key, { fields, parent });
 }
 
 function validateUsageAndGetFieldMeta(
-  path: NodePath,
+  path: NodePath<ImportDeclaration>,
   fields: FieldsMeta,
   localName: string,
   actualName: FieldType
@@ -206,17 +181,18 @@ function validateUsageAndGetFieldMeta(
     }
 
     let fieldName = name(fieldIdentifier.parentPath.parentPath.parent.key);
-    let { cardURL } = extractDecoratorArguments(
-      fieldIdentifier.parentPath as NodePath<CallExpression>,
-      localName
-    );
-
-    fields[fieldName] = { cardURL, type: actualName };
+    fields[fieldName] = {
+      ...extractDecoratorArguments(
+        fieldIdentifier.parentPath as NodePath<CallExpression>,
+        localName
+      ),
+      type: actualName,
+    };
   }
 }
 
 function validateUsageAndGetParentMeta(
-  path: NodePath,
+  path: NodePath<ImportDeclaration>,
   localName: string
 ): ParentMeta {
   let adoptsIdentifer = path.scope.bindings[localName].referencePaths[0];
@@ -264,5 +240,6 @@ function extractDecoratorArguments(
 
   return {
     cardURL: (definition.parent as ImportDeclaration).source.value,
+    localName: definition.node.local.name,
   };
 }

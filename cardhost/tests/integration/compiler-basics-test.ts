@@ -1,7 +1,10 @@
 import { module, test, skip } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
-import { compileTemplate } from '../helpers/template-compiler';
+import {
+  compileTemplate,
+  templateOnlyComponentTemplate,
+} from '../helpers/template-compiler';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import setupCardMocking from '../helpers/card-mocking';
 import Builder from 'cardhost/lib/builder';
@@ -11,6 +14,26 @@ async function evalModule(src: string): Promise<any> {
   return src;
 }
 
+const PERSON_CARD = {
+  url: 'https://mirage/cards/person',
+  files: {
+    'schema.js': `
+      import { contains } from "@cardstack/types";
+      import date from "https://cardstack.com/base/models/date";
+      import string from "https://cardstack.com/base/models/string";
+      export default class Person {
+        @contains(string)
+        name;
+
+        @contains(date)
+        birthdate;
+      }`,
+    'embedded.js': templateOnlyComponentTemplate(
+      '<@model.name/> was born on <@model.birthdate/>'
+    ),
+  },
+};
+
 module('Integration | compiler-basics', function (hooks) {
   let builder: Builder;
 
@@ -19,25 +42,7 @@ module('Integration | compiler-basics', function (hooks) {
   setupCardMocking(hooks);
 
   hooks.beforeEach(async function () {
-    builder = new Builder();
-
-    await this.createCard({
-      url: 'https://mirage/cards/person',
-      files: {
-        'schema.js': `
-          import { contains } from "@cardstack/types";
-          import date from "https://cardstack.com/base/models/date";
-          import string from "https://cardstack.com/base/models/string";
-          export default class Person {
-            @contains(string)
-            name;
-
-            @contains(date)
-            birthdate;
-          }`,
-        'embedded.hbs': `<@model.name/> was born on <@model.birthdate/>`,
-      },
-    });
+    builder = new Builder({});
   });
 
   skip('it has a working evalModule', async function (assert) {
@@ -56,7 +61,45 @@ module('Integration | compiler-basics', function (hooks) {
     assert.ok(document.querySelector('.it-works'));
   });
 
+  test('Names and defines a module for the model', async function (assert) {
+    let card = {
+      url: 'http://mirage/cards/post',
+      files: {
+        'schema.js': `export default class Post {}`,
+      },
+    };
+    this.createCard(card);
+
+    let compiled = await builder.getCompiledCard(card.url);
+    assert.equal(
+      compiled.modelModule,
+      `${card.url}/model`,
+      'CompiledCard moduleName is set correctly'
+    );
+    let source = window.require(`${card.url}/model`).default;
+    assert.equal(source.toString(), 'class Post {}', 'Source code is correct');
+  });
+
+  test('Generates inlineHBS for templates without', async function (assert) {
+    let card = {
+      url: 'http://mirage/cards/string',
+      files: {
+        'schema.js': `export default class String {}`,
+        'embedded.js': templateOnlyComponentTemplate('{{@model}}'),
+      },
+    };
+    this.createCard(card);
+
+    let compiled = await builder.getCompiledCard(card.url);
+    assert.equal(
+      compiled.templateModules.embedded.inlineHBS,
+      `{{@model}}`,
+      'templateModules includes inlineHBS for simple cards'
+    );
+  });
+
   test('it discovers the four kinds of fields', async function (assert) {
+    await this.createCard(PERSON_CARD);
     let card = {
       url: 'http://mirage/cards/post',
       files: {
@@ -202,7 +245,9 @@ module('Integration | compiler-basics', function (hooks) {
           title;
         }
     `,
-          'isolated.hbs': `<h1><@model.title /></h1>`,
+          'isolated.js': templateOnlyComponentTemplate(
+            '<h1><@model.title /></h1>'
+          ),
         },
       };
 
@@ -210,36 +255,19 @@ module('Integration | compiler-basics', function (hooks) {
 
       let compiled = await builder.getCompiledCard(card.url);
       assert.equal(
-        compiled.templateSources.isolated,
-        `<h1>{{@model.title}}</h1>`
+        compiled.templateModules['isolated'].moduleName,
+        `${card.url}/isolated`,
+        'templateModule for "isolated" is full url'
       );
     });
 
     test('it inlines a compound field template', async function (assert) {
-      let card = {
-        url: 'http://mirage/cards/post',
-        files: {
-          'schema.js': `
-        import { contains } from "@cardstack/types";
-        import person from "https://mirage/cards/person";
+      this.createCard(PERSON_CARD);
 
-        export default class Post {
-          @contains(person)
-          author;
-        }
-    `,
-          'isolated.hbs': `<h1><@model.author /></h1>`,
-        },
-      };
-
-      this.createCard(card);
-
-      let compiled = await builder.getCompiledCard(card.url);
+      let compiled = await builder.getCompiledCard(PERSON_CARD.url);
       assert.equal(
-        compiled.templateSources.isolated,
-        // TODO: Have this base card include a unrelated component
-        // `<h1>{{@model.author.name}} was born on <FormatDate @date={{@model.author.birthdate}} /></h1>`
-        `<h1>{{@model.author.name}} was born on Date: {{@model.author.birthdate}}</h1>`
+        compiled.templateModules['embedded'].moduleName,
+        `${PERSON_CARD.url}/embedded`
       );
     });
   });

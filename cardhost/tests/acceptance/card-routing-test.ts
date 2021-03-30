@@ -3,6 +3,7 @@ import { visit, currentURL } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import setupCardMocking from '../helpers/card-mocking';
 import { setupMirage } from 'ember-cli-mirage/test-support';
+import { templateOnlyComponentTemplate } from '../helpers/template-compiler';
 
 module('Acceptance | card routing', function (hooks) {
   setupApplicationTest(hooks);
@@ -42,18 +43,9 @@ module('Acceptance | card routing', function (hooks) {
             name: 'Arthur',
           },
         },
-        'isolated.hbs': `<div data-test-person>Hi! I am <@model.name/></div>`,
-      },
-    });
-    this.createCard({
-      url: 'https://mirage/cards/welcome',
-      files: {
-        'schema.js': `export default class Welcome { }`,
-        'isolated.hbs': `
-          <h1>Welcome to the world wide web!</h1>
-          <img src="https://media.giphy.com/media/ypqHf6pQ5kQEg/source.gif" />
-          <p>Internet!</p>
-        `,
+        'isolated.js': templateOnlyComponentTemplate(
+          `<div data-test-person>Hi! I am <@model.name/></div>`
+        ),
       },
     });
   });
@@ -61,7 +53,6 @@ module('Acceptance | card routing', function (hooks) {
   test('visiting /card-routing', async function (assert) {
     await visit('/welcome');
     assert.equal(currentURL(), '/welcome');
-    await this.pauseTest();
-    assert.dom('[data-test-person]').containsText('Hi I am Arthur');
+    assert.dom('[data-test-person]').containsText('Hi! I am Arthur');
   });
 });

@@ -4,19 +4,26 @@ import type {
   CompiledCard,
 } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
-import { compileTemplate } from 'cardhost/tests/helpers/template-compiler';
-import templateOnlyComponent from '@ember/component/template-only';
-import { setComponentTemplate } from '@ember/component';
+
+import dynamicCardTransform from './dynamic-card-transform';
 
 export default class Builder implements BuilderInterface {
   private compiler = new Compiler({
-    lookup: (url: string) => this.getCompiledCard(url),
+    lookup: (url) => this.getCompiledCard(url),
+    define: (...args) => this.defineModule(...args),
   });
 
   private cache: Map<string, CompiledCard>;
+  private realm?: string;
 
-  constructor() {
+  constructor(params: { realm?: string }) {
     this.cache = new Map();
+    this.realm = params.realm;
+  }
+
+  private async defineModule(moduleURL: string, source: string): Promise<void> {
+    source = dynamicCardTransform(moduleURL, source);
+    eval(source);
   }
 
   async getRawCard(url: string): Promise<RawCard> {
@@ -49,13 +56,12 @@ export default class Builder implements BuilderInterface {
   async getBuiltCard(
     url: string,
     format: 'isolated' | 'embedded'
-  ): Promise<{ model: any; componentImplementation: unknown }> {
+  ): Promise<{ model: any; moduleName: string }> {
     let compiledCard = await this.getCompiledCard(url);
-    let templateSource = compiledCard.templateSources[format];
-    let componentImplementation = setComponentTemplate(
-      compileTemplate(templateSource),
-      templateOnlyComponent()
-    );
-    return { model: compiledCard.data, componentImplementation };
+
+    return {
+      model: compiledCard.data,
+      moduleName: compiledCard.templateModules[format].moduleName,
+    };
   }
 }

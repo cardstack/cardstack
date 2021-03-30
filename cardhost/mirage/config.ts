@@ -6,6 +6,17 @@ import { RawCard } from '@cardstack/core/src/interfaces';
 import { getContext } from '@ember/test-helpers';
 import { Memoize } from 'typescript-memoize';
 
+const REALM = 'https://cardstack.com/mirage';
+
+type CardParams =
+  | {
+      type: 'raw';
+    }
+  | {
+      format: 'isolated' | 'embedded';
+      type?: 'compiled';
+    };
+
 class FakeCardServer {
   static cardServers = new WeakMap<object, FakeCardServer>();
 
@@ -24,25 +35,23 @@ class FakeCardServer {
 
   @Memoize()
   get builder(): Builder {
-    return new Builder();
+    return new Builder({
+      realm: REALM,
+    });
   }
 
   async respondWithCard(url: string, format: 'embedded' | 'isolated') {
     let {
       model,
-      componentImplementation,
+      moduleName,
     } = await FakeCardServer.current().builder.getBuiltCard(url, format);
-    let moduleId = `mirage/module${moduleCounter++}`;
-    (window as any).define(`@cardstack/compiled/${moduleId}`, function () {
-      return componentImplementation;
-    });
 
     return {
       data: {
         id: url,
         attributes: model,
         meta: {
-          componentModule: moduleId,
+          componentModule: moduleName,
         },
       },
     };
@@ -56,15 +65,6 @@ class FakeCardServer {
     return rawCard;
   }
 }
-
-type CardParams =
-  | {
-      type: 'raw';
-    }
-  | {
-      format: 'isolated' | 'embedded';
-      type?: 'compiled';
-    };
 
 function cardParams(queryParams: Request['queryParams']): CardParams {
   let { type, format } = queryParams;
@@ -109,13 +109,7 @@ export default function (this: Server): void {
       );
     }
     let compiled = await cardServer.builder.getCompiledCard(routingCard);
-    let output: any[] = [];
-    new Function(
-      'output',
-      compiled.modelSource.replace('export default', 'let def =') +
-        '\noutput.push(def)'
-    )(output);
-    let Klass = output[0];
+    let Klass = window.require(compiled.modelModule).default;
     let instance = new Klass();
     let cardURL = instance.routeTo('/' + request.params.pathname);
     if (!cardURL) {
@@ -142,5 +136,3 @@ export default function (this: Server): void {
     https://www.ember-cli-mirage.com/docs/route-handlers/shorthands
   */
 }
-
-let moduleCounter = 0;

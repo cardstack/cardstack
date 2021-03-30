@@ -8,15 +8,15 @@ export type TemplateType = keyof typeof templateTypeNames;
 export const templateTypes = Object.keys(templateTypeNames) as TemplateType[];
 
 type TemplateFiles = {
-  [K in `${string & keyof typeof templateTypeNames}.hbs`]: string;
+  [K in `${string & keyof typeof templateTypeNames}.js`]: string;
 };
 
 export function templateFileName(templateType: TemplateType) {
-  return `${templateType}.hbs` as `${TemplateType}.hbs`;
+  return `${templateType}.js` as `${TemplateType}.js`;
 }
 
 export type RawCard = {
-  url?: string;
+  url: string;
   files: {
     'schema.js': string;
     'data.json'?: RawCardData;
@@ -28,17 +28,27 @@ export type RawCardData = {
   relationships?: unknown;
 };
 export interface CompiledCard {
-  url: string | undefined;
+  url: string;
   adoptsFrom?: CompiledCard;
-  modelSource: string;
   data: any;
   fields: {
-    [key: string]: {
-      type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
-      card: CompiledCard;
-    };
+    [key: string]: Field;
   };
-  templateSources: typeof templateTypeNames;
+  modelModule: string;
+  templateModules: {
+    [K in keyof typeof templateTypeNames]: TemplateModule;
+  };
+}
+export interface Field {
+  type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
+  card: CompiledCard;
+  localName: string;
+}
+
+export interface TemplateModule {
+  moduleName: string;
+  // usedFields: string[]; // ["title", "author.firstName"]
+  inlineHBS?: string;
 }
 
 export interface Builder {

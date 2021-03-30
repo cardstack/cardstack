@@ -21,7 +21,8 @@
     "@glimmer/syntax": "0.75.0",
     "@types/babel__core": "^7.1.12",
     "@types/lodash": "^4.14.168",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "ember-cli-htmlbars": "^5.7.1"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.12.7",
