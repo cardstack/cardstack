@@ -5,10 +5,10 @@ import CardPayLogo from '../../../public/@cardstack/boxel/images/icons/card-pay-
 import CardMembershipLogo from '../../../public/@cardstack/boxel/images/icons/card-membership-logo.svg';
 import CardCatalogLogo from '../../../public/@cardstack/boxel/images/icons/card-catalog-logo.svg';
 
-import CardSpaceImage from '../../../public/@cardstack/boxel/images/illustrations/card-space.svg';
-import CardPayImage from '../../../public/@cardstack/boxel/images/illustrations/card-pay.svg';
-import CardCatalogImage from '../../../public/@cardstack/boxel/images/illustrations/card-catalog.svg';
-import CardMembershipImage from '../../../public/@cardstack/boxel/images/illustrations/card-membership.svg';
+import CardSpaceImage from '../../../public/@cardstack/boxel/images/illustrations/card-space-illustration.svg';
+import CardPayImage from '../../../public/@cardstack/boxel/images/illustrations/card-pay-illustration.svg';
+import CardCatalogImage from '../../../public/@cardstack/boxel/images/illustrations/card-catalog-illustration.svg';
+import CardMembershipImage from '../../../public/@cardstack/boxel/images/illustrations/card-membership-illustration.svg';
 
 import 'dummy/css/templates/cardstack.css';
 import 'dummy/css/templates/card-space/index.css';

@@ -34,7 +34,7 @@
   align-items: center;
   border-radius: var(--boxel-border-radius);
   background-color: var(--boxel-navy);
-  background-image: url('../../../../public/@cardstack/boxel/images/illustrations/landing-hero.svg');
+  background-image: url('../../../../public/@cardstack/boxel/images/illustrations/landing-hero-illustration.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: auto 18.75rem;
