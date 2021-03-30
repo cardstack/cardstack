@@ -2,16 +2,14 @@
   Balances
 </h2>
 {{#if this.layer2Network.isConnected}}
-  {{#if this.layer2Network.hasAccount}}
-    Connected to wallet:
-    {{#each this.layer2Network.accounts as |accountId|}}
-      <div data-test-layer2-account-id>{{accountId}}</div>
-    {{/each}}
-  {{else if this.layer2Network.walletConnectUri}}
-    <div data-test-wallet-connect-qr-code>
-      <QrCode @text={{this.layer2Network.walletConnectUri}} @size={{300}} @darkColor="#009966" />
-    </div>
-  {{/if}}
+  Connected to wallet:
+  {{#each this.layer2Network.walletInfo.accounts as |account|}}
+    <div data-test-layer2-account-id>{{account.address}}</div>
+  {{/each}}
+{{else if this.layer2Network.walletConnectUri}}
+  <div data-test-wallet-connect-qr-code>
+    <QrCode @text={{this.layer2Network.walletConnectUri}} @size={{300}} @darkColor="#009966" />
+  </div>
 {{else}}
   Loading Spinner here
 {{/if}}

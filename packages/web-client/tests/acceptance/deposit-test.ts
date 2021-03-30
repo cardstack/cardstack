@@ -13,7 +13,7 @@ module('Acceptance | deposit', function (hooks) {
     await click('[data-test-token-supplier-button]');
     // // assert Cards & Balances tab is active
     let layer2Service = this.owner.lookup('service:layer2-network');
-    layer2Service.test__simulateConnected();
+    layer2Service.test__simulateWalletConnectUri();
     await waitFor('[data-test-wallet-connect-qr-code]');
     assert.dom('[data-test-wallet-connect-qr-code]').exists();
 
