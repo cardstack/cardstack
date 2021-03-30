@@ -1,0 +1,12 @@
+<nav class="card-pay-header-nav">
+  <ul class="card-pay-header-nav__list">
+    {{#each @tabs as |tab i|}}
+      <li>
+        <LinkTo @route={{tab.route}} class="card-pay-header-nav__tab" data-test-card-pay-header-tab={{i}}>
+          <span class="card-pay-header-nav__tab-icon" />
+          {{tab.title}}
+        </LinkTo>
+      </li>
+    {{/each}}
+  </ul>
+</nav>

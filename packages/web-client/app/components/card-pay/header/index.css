@@ -1,0 +1,63 @@
+.card-pay-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.card-pay-header > *:last-child {
+  flex-grow: 1;
+}
+
+.card-pay-header h1 {
+  font-family: var(--boxel-font-family);
+  font-size: 1.125rem; /* 18px */
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  line-height: 1.333;
+  gap: 0 var(--boxel-sp-xs);
+  white-space: nowrap;
+}
+
+
+/* Connect wallet component */
+.card-pay-header__item-list {
+  grid-column-end: -1;
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--boxel-sp);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.card-pay-header__item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--boxel-sp);
+}
+
+.card-pay-header__item-label {
+  color: var(--boxel-purple-300);
+  font: var(--boxel-font-xs);
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+}
+
+.card-pay-header__item-title {
+  font: var(--boxel-font-sm);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.card-pay-header__item-button {
+  min-width: 10rem;
+}
+
+.card-pay-header__item-button--address {
+  background-color: var(--boxel-light);
+  color: var(--boxel-dark);
+  font: 400 var(--boxel-font-size-sm)/calc(18/13) var(--boxel-monospace-font-family);
+  letter-spacing: var(--boxel-lsp-sm);
+}

@@ -1,0 +1,30 @@
+.card-pay-header-nav {
+  background-color: var(--boxel-dark);
+}
+
+.card-pay-header-nav__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  justify-items: center;
+  white-space: nowrap;
+}
+
+.card-pay-header-nav__list > li {
+  width: 100%;
+}
+
+.card-pay-header-nav__tab {
+  width: 100%;
+  padding: var(--boxel-sp);
+  font: var(--boxel-font-sm);
+  font-weight: 700;
+  letter-spacing: var(--boxel-lsp-xxl);
+  text-align: center;
+  text-transform: uppercase;
+  transition: color var(--boxel-transition);
+}
+
+.card-pay-header-nav__tab.active {
+  background-color: var(--boxel-purple-800);
+  color: var(--boxel-highlight);
+}
