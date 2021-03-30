@@ -76,8 +76,8 @@ module('Integration | compiler-basics', function (hooks) {
       `${card.url}/model`,
       'CompiledCard moduleName is set correctly'
     );
-    let source = window.require(`${card.url}/model`);
-    assert.equal(source, card.files['schema.js'], 'Source code is correct');
+    let source = window.require(`${card.url}/model`).default;
+    assert.equal(source.toString(), 'class Post {}', 'Source code is correct');
   });
 
   test('Generates inlineHBS for templates without', async function (assert) {
@@ -259,12 +259,6 @@ module('Integration | compiler-basics', function (hooks) {
         `${card.url}/isolated`,
         'templateModule for "isolated" is full url'
       );
-      let source = window.require(`${card.url}/isolated`);
-      assert.includes(
-        source,
-        '<h1>{{@model.title}}</h1>',
-        'Source code includes the right template'
-      );
     });
 
     test('it inlines a compound field template', async function (assert) {
@@ -274,19 +268,6 @@ module('Integration | compiler-basics', function (hooks) {
       assert.equal(
         compiled.templateModules['embedded'].moduleName,
         `${PERSON_CARD.url}/embedded`
-      );
-
-      let source = window.require(`${PERSON_CARD.url}/embedded`);
-      assert.includes(source, 'scope: {', 'scope is added to the options');
-      assert.includes(
-        source,
-        'import DateField from "https://cardstack.com/base/models/date/embedded"',
-        'The import statement for DateField is added'
-      );
-      assert.includes(
-        source,
-        '{{@model.name}} was born on <DateField @model={{@model.birthdate}} />',
-        'Source code includes the right template'
       );
     });
   });

@@ -26,11 +26,7 @@ import intersection from 'lodash/intersection';
 const MODEL_MODULE_NAME = 'model';
 export class Compiler {
   lookup: (cardURL: string) => Promise<CompiledCard>;
-  define: (
-    fullModuleURL: string,
-    source: string,
-    type: 'Schema' | 'Template'
-  ) => Promise<void>;
+  define: (fullModuleURL: string, source: string) => Promise<void>;
 
   constructor(params: {
     lookup: (url: string) => Promise<CompiledCard>;
@@ -98,7 +94,7 @@ export class Compiler {
     let code = out!.code!;
 
     let fullModulePath = this.getFullModulePath(url, MODEL_MODULE_NAME);
-    this.define(fullModulePath, code, 'Schema');
+    this.define(fullModulePath, code);
 
     return fullModulePath;
   }
@@ -167,7 +163,7 @@ export class Compiler {
           templateType
         );
         templateModule.moduleName = fullModulePath;
-        this.define(fullModulePath, template, 'Template');
+        this.define(fullModulePath, template);
       } else if (parentCard) {
         templateModule.moduleName =
           parentCard.templateModules[templateType].moduleName;

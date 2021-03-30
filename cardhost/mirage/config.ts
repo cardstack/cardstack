@@ -109,13 +109,7 @@ export default function (this: Server): void {
       );
     }
     let compiled = await cardServer.builder.getCompiledCard(routingCard);
-    let source = window.require(compiled.modelModule);
-    let output: any[] = [];
-    new Function(
-      'output',
-      source.replace('export default', 'let def =') + '\noutput.push(def)'
-    )(output);
-    let Klass = output[0];
+    let Klass = window.require(compiled.modelModule).default;
     let instance = new Klass();
     let cardURL = instance.routeTo('/' + request.params.pathname);
     if (!cardURL) {

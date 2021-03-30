@@ -90,7 +90,7 @@
     "ember-page-title": "^6.0.3",
     "ember-qunit": "^5.1.1",
     "ember-resolver": "^8.0.2",
-    "ember-source": "https://s3.amazonaws.com/builds.emberjs.com/canary/shas/b945e5c963fc75950186bd2c4213614ea253e8b0.tgz",
+    "ember-source": "https://s3.amazonaws.com/builds.emberjs.com/canary/shas/2b83eab8ed1a77ef8463d11dc105703c58dced86.tgz",
     "ember-template-lint": "^2.15.0",
     "eslint": "^7.17.0",
     "eslint-config-prettier": "^7.1.0",
