@@ -259,7 +259,7 @@ jobs:
       run: yarn install
     - name: Set PR branch name
       shell: bash
-      run: echo "PR_BRANCH_NAME=${{github.head_ref}}" >> $GITHUB_ENV
+      run: echo "PR_BRANCH_NAME=${{ github.head_ref }}" >> $GITHUB_ENV
     - name: Deploy preview
       run: ./node_modules/.bin/ember deploy s3-preview
       env:
@@ -269,10 +269,9 @@ jobs:
   comment-on-pr:
     name: Comment on PR
     runs-on: ubuntu-latest
-    # always(): run regardless of success of previous (including needed) steps
     # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
     # github.head_ref: the branch that the pull request is from. only appears on pull_request events
-    if: always() && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref && (github.event.action == 'opened' || github.event.action == 'reopened')
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref && (github.event.action == 'opened' || github.event.action == 'reopened')
     needs: [deploy-preview]
     env:
       S3_PREVIEW_WEBSITE_URL: http://boxel-preview.cardstack.com.s3-website-us-east-1.amazonaws.com
@@ -285,10 +284,33 @@ jobs:
         node-version: '${{ env.NODE_VERSION }}'
     - name: Install dependencies
       run: yarn install
-    - uses: ./.github/actions/pr-comment
+
+    - name: Find pull request number for branch
+      uses: ./.github/actions/find-pr-number
+      id: fpr
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        message: "[Link to preview](${{ env.S3_PREVIEW_WEBSITE_URL }}/${{ github.head_ref }})"
+      with: 
         branch: ${{ github.head_ref }}
+
+    - name: Set env var for message
+      shell: bash
+      run: |
+        echo "COMMENT_TEXT=### :sparkles: Preview this change [here](${{ env.S3_PREVIEW_WEBSITE_URL }}/${{ github.head_ref }})" >> $GITHUB_ENV
+
+    # finding a comment in given PR that contains the identifier string
+    - name: Find comment that contains identifier
+      uses: peter-evans/find-comment@v1
+      id: fc
+      with:
+        body-includes: ${{ env.COMMENT_TEXT }}
+        issue-number: ${{ steps.fpr.outputs.pr-number }}
+    
+    - name: Create new comment if none exists
+      uses: peter-evans/create-or-update-comment@v1
+      if: steps.fc.outputs.comment-id == ''
+      with: 
+        issue-number: ${{ steps.fpr.outputs.pr-number }}
+        body: |
+          ${{ env.COMMENT_TEXT }}
 
