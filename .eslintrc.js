@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 'use strict';
 
 module.exports = {
   root: true,
-  parser: 'babel-eslint',
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2018,
     sourceType: 'module',
@@ -10,17 +11,20 @@ module.exports = {
       legacyDecorators: true,
     },
   },
-  plugins: ['ember'],
+  plugins: ['ember', '@typescript-eslint'],
   extends: [
     'eslint:recommended',
-    'plugin:ember/recommended',
+    'plugin:@typescript-eslint/eslint-recommended',
+    'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
+    'plugin:ember/recommended',
   ],
   env: {
     browser: true,
   },
   rules: {
     'require-yield': 0,
+    'prefer-const': 'off',
   },
   overrides: [
     // node files
@@ -60,6 +64,12 @@ module.exports = {
           // add your custom rules and overrides for node files here
         }
       ),
+    },
+    {
+      files: ['app/**/*.js', 'tests/dummy/**/*.js'],
+      rules: {
+        '@typescript-eslint/explicit-module-boundary-types': 'off',
+      },
     },
   ],
 };

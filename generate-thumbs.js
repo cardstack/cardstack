@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const { basename, dirname, join } = require('path');
