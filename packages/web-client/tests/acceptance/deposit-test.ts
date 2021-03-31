@@ -11,7 +11,6 @@ module('Acceptance | deposit', function (hooks) {
     await click('[data-test-cardstack-org-link="card-pay"]');
     assert.equal(currentURL(), '/card-pay');
     await click('[data-test-card-pay-layer-2-connect-button]');
-    // // assert Cards & Balances tab is active
     let layer2Service = this.owner.lookup('service:layer2-network');
     layer2Service.test__simulateWalletConnectUri();
     await waitFor('[data-test-wallet-connect-qr-code]');
@@ -23,8 +22,10 @@ module('Acceptance | deposit', function (hooks) {
     await waitFor('[data-test-layer2-account-id]');
     assert.dom('[data-test-layer2-account-id]').hasText(accountAddress);
     assert.dom('[data-test-wallet-connect-qr-code]').doesNotExist();
-    // await settled();
-    // // assert account info shown
+
+    // TODO: how does dapp get account names and imageBase64s from Cardstack Mobile?
+
+    // assert account info shown
     // Account 1:
     // name: Gary’s Account 1
     // address: 0x59ab3A4056F211c249ca2D7AbC03A7164f5914Bc3
@@ -33,11 +34,10 @@ module('Acceptance | deposit', function (hooks) {
     // name: Gary’s Account 2
     // address: 0xbEF4a7745A275f907da4B4ADAF75C4354ef2235Ac3
     // avatar:
-    // // assert wallet connect QR code not shown
-    // await click('[data-test-tab="deposit"]');
+    await click('[data-test-tab="deposit"]');
 
-    // // assert instructional panel shown "Deposit funds"
-    // await click('[data-test-hide-button]')
+    assert.dom('[data-test-deposit-instructions]').exists();
+    await click('[data-test-hide-button]');
     // // assert cardBot says "you need to connect two wallets"
     // await click "Wallet Connect" (Q: is this necessary if already wallet connected?)
     // assert MILESTONE REACHED "Mainnet Wallet connected"

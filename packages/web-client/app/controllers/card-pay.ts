@@ -9,4 +9,7 @@ export default class CardPayController extends Controller {
   @action transitionToConnect() {
     this.transitionToRoute('card-pay.connect');
   }
+  @action transitionTo(routeName: string) {
+    this.transitionToRoute(routeName);
+  }
 }
