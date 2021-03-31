@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const core = require('@actions/core'); // eslint-disable-line node/no-unpublished-require
 const github = require('@actions/github'); // eslint-disable-line node/no-unpublished-require
 

@@ -4,6 +4,7 @@ import { tracked } from '@glimmer/tracking';
 
 export default class TrayComponent extends Component {
   @tracked expanded = false;
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   trayAction() {}
 
   @action

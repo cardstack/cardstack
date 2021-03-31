@@ -1,4 +1,5 @@
 'use strict';
+/* eslint-disable @typescript-eslint/no-var-requires */
 const mergeTrees = require('broccoli-merge-trees');
 const stew = require('broccoli-stew');
 const path = require('path');

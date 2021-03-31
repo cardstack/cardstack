@@ -1,4 +1,5 @@
 'use strict';
+/* eslint-disable @typescript-eslint/no-var-requires */
 
 const { Webpack } = require('@embroider/webpack');
 const EmberAddon = require('ember-cli/lib/broccoli/ember-addon');

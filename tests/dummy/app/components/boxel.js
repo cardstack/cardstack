@@ -39,7 +39,7 @@ export default class BoxelComponent extends Component {
 
     return 'boxel-default';
   }
-
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   clickAction() {}
 
   transition = function* ({ sentSprites, receivedSprites }) {
