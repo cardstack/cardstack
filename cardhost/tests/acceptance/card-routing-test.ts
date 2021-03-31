@@ -34,6 +34,7 @@ module('Acceptance | card routing', function (hooks) {
         'schema.js': `
           import { contains } from "@cardstack/types";
           import string from "https://cardstack.com/base/models/string";
+
           export default class Person {
             @contains(string)
             name;
