@@ -10,7 +10,8 @@
   },
   "main": "src/index.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./src/compiler": "./src/compiler.ts"
   },
   "license": "MIT",
   "description": "Core library for Cardstack, portable to both browser and server environments",
@@ -62,7 +63,6 @@
     "test:node": "node --loader ts-node/esm ../node_modules/.bin/qunit 'tests/**/*-test.ts'",
     "test:browser": "webpack && testem ci"
   },
-  "type": "module",
   "volta": {
     "extends": "../package.json"
   }

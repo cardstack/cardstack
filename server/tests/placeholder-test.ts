@@ -1,7 +1,8 @@
-import QUnit from "qunit";
+import type Koa from "koa";
 import { Project } from "scenario-tester";
-import { createServer } from "../src/server.js";
+import { createServer } from "../src/server";
 import supertest from "supertest";
+import QUnit from "qunit";
 
 // TODO: share this in core
 export function templateOnlyComponentTemplate(template: string): string {
@@ -16,9 +17,12 @@ export function templateOnlyComponentTemplate(template: string): string {
   );`;
 }
 
-QUnit.module("Card Data", function () {
-  QUnit.test("can load a simple isolated card's data", async function (assert) {
-    let realm = new Project("my-realm");
+QUnit.module("Card Data", function (hooks) {
+  let realm: Project;
+  let server: Koa;
+
+  hooks.beforeEach(async function () {
+    realm = new Project("my-realm");
 
     realm.addDependency("post", {
       files: {
@@ -39,6 +43,12 @@ QUnit.module("Card Data", function () {
 
     realm.addDependency("post0", {
       files: {
+        "schema.js": `
+          import { adopts } from "@cardstack/types";
+          import post from "https://my-realm/post";
+          
+          export default @adopts(post) class Post {}
+        `,
         "data.json": JSON.stringify(
           {
             data: {
@@ -61,10 +71,15 @@ QUnit.module("Card Data", function () {
 
     realm.writeSync();
 
-    let server = await createServer({ "my-realm": realm.baseDir });
-    let response = await supertest(server.callback())
-      .get("/realms/my-realm/post0")
-      .expect(200);
+    server = await createServer({ "my-realm": realm.baseDir });
+  });
+  QUnit.test("404s when you try to load a card outside of it's realm", async function (assert) {
+    let response = await supertest(server.callback()).get("/realms/other-realm/post0").expect(404);
+    assert.ok(response);
+  });
+
+  QUnit.test("can load a simple isolated card's data", async function (assert) {
+    let response = await supertest(server.callback()).get("/realms/my-realm/post0").expect(200);
     assert.equal(response.body, {
       data: {
         attributes: {
@@ -72,7 +87,7 @@ QUnit.module("Card Data", function () {
           body: "First post.",
         },
         meta: {
-          componentModule: "@cardstack/compiled/???",
+          isolatedComponentModule: "@cardstack/compiled/my-realm/post0/isolated",
         },
       },
     });

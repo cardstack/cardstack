@@ -11,10 +11,14 @@
   "license": "MIT",
   "description": "Stock API server for the Cardstack tech stack.",
   "dependencies": {
+    "@cardstack/core": "*",
     "@koa/router": "^10.0.0",
+    "@types/jsonapi-serializer": "^3.6.3",
     "@types/koa": "^2.13.1",
     "@types/koa__router": "^8.0.4",
-    "koa": "^2.13.1"
+    "jsonapi-serializer": "^3.6.7",
+    "koa": "^2.13.1",
+    "walk-sync": "^2.2.0"
   },
   "devDependencies": {
     "@types/supertest": "^2.0.11",
@@ -31,7 +35,6 @@
     "start": "node --loader ts-node/esm src/index.ts",
     "test": "node --loader ts-node/esm ./node_modules/.bin/qunit 'tests/**/*-test.ts'"
   },
-  "type": "module",
   "volta": {
     "extends": "../package.json"
   }
