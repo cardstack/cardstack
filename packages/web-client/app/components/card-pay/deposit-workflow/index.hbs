@@ -1,0 +1,27 @@
+  <h3>{{this.workflow.name}}</h3>
+  {{#each this.workflow.milestones as |milestone i|}}
+    {{#let (or milestone.complete (lte i this.workflow.activeMilestoneIndex)) as |displayMilestone|}}
+      {{#if displayMilestone}}
+        {{#each milestone.postables as |postable j|}}
+          <div class="thread-message" data-test-thread-message={{j}} data-test-milestone={{i}}>
+            <div data-test-author>
+              {{postable.author.name}}
+            </div>
+            {{#if postable.message}}
+              {{format-workflow-message postable.message}}
+            {{else}}
+              {{component postable.componentName}}
+            {{/if}}
+          </div>
+        {{/each}}
+      {{/if}}
+
+      {{#if milestone.complete}}
+        <p data-test-milestone-completed>Milestone completed: {{milestone.statusOnCompletion}}</p>
+      {{/if}}
+
+      {{#if (and milestone.messageOnCompletion this.workflow.displayCompletionMessage)}}
+        <p>{{milestone.messageOnCompletion}}</p>
+      {{/if}}
+    {{/let}}
+  {{/each}}

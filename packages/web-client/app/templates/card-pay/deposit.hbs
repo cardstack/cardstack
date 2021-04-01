@@ -10,28 +10,5 @@
     <button type="button" data-test-hide-button {{on 'click' this.hideInstructions}}>Hide</button>
   </div>
 {{else}}
-  <h3>Workflow</h3>
-  {{#each this.thread.milestones as |milestone i|}}
-    {{#let (or milestone.complete (lte i this.thread.progress)) as |displayMilestone|}}
-      {{#if (and displayMilestone milestone.message)}}
-        {{#each milestone.message as |content|}}
-          {{#if content.component}}
-            <div class="thread-message">
-              {{component content.component}}
-            </div>
-          {{else}}
-            <p class="thread-message">{{content}}</p>
-          {{/if}}
-        {{/each}}
-      {{/if}}
-
-      {{#if milestone.complete}}
-        <p>Milestone completed: {{milestone.statusOnCompletion}}</p>
-      {{/if}}
-
-      {{#if (and milestone.messageOnCompletion this.thread.displayCompletionMessage)}}
-        <p>{{milestone.messageOnCompletion}}</p>
-      {{/if}}
-    {{/let}}
-  {{/each}}
+  <CardPay::DepositWorkflow />
 {{/if}}

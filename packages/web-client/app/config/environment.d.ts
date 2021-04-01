@@ -1,6 +1,7 @@
 export default config;
 
 interface ChainsOptions {
+  layer1: string;
   layer2: string;
 }
 /**
