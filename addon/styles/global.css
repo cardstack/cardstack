@@ -1,0 +1,78 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--boxel-dark, #000);
+  font-family: var(--boxel-font-family, 'Open Sans', Helvetica, Arial, sans-serif);
+  background-color: var(--boxel-light-100, #f5f5f5);
+  font-size: 1rem;
+  letter-spacing: 0.025em;
+  line-height: calc(22/16);
+  overscroll-behavior: none;
+}
+
+a {
+  display: inline-block;
+  color: currentColor;
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--boxel-link-highlight);
+  cursor: pointer;
+}
+
+button {
+  display: inline-block;
+  color: currentColor;
+  font: inherit;
+}
+
+button:hover,
+[role="button"]:hover {
+  cursor: pointer;
+}
+/* TODO: convert any `role="button"` boxel component to use `button` */
+
+a:focus,
+button:focus,
+[role="button"]:focus {
+  outline: var(--boxel-outline);
+}
+
+a:focus:not(:focus-visible),
+button:focus:not(:focus-visible),
+[role="button"]:focus:not(:focus-visible) {
+  outline: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+}
+
+input:focus,
+select:focus {
+  outline-color: var(--boxel-highlight);
+}
+
+svg {
+  display: inline-block;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding-left: 0;
+}

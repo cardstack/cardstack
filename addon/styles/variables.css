@@ -1,5 +1,6 @@
 :root {
   --boxel-font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+  --boxel-monospace-font-family: 'Roboto Mono','Courier New', Courier, monospace;
 
   --boxel-font-xl: var(--boxel-font-size-xl)/calc(43/32) var(--boxel-font-family);
   --boxel-font-lg: var(--boxel-font-size-lg)/calc(30/22) var(--boxel-font-family);
@@ -44,6 +45,9 @@
   --boxel-transition: 0.2s ease;
   --boxel-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
   --boxel-box-shadow-hover: 0 3px 10px rgba(0, 0, 0, 0.15);
+  --boxel-outline-color: var(--boxel-blue);
+  --boxel-outline: 2px solid var(--boxel-outline-color);
+
 
   /* COLOR PALETTE */
   /* Primary colors */
@@ -51,7 +55,7 @@
   --boxel-dark: #000;
   --boxel-highlight: var(--boxel-cyan);
   --boxel-highlight-hover: #00D3CE;
-  --boxel-text-highlight: var(--boxel-highlight-hover);
+  --boxel-link-highlight: var(--boxel-highlight-hover);
 
   /* Boxel purples */
   --boxel-purple-100: #f8f7fa;

@@ -7,13 +7,13 @@
   @onClickButton={{@onClickButton}}
 >
   {{#if @isComplete}}
-    <CardPay::PrepaidCardIssuance::LayoutCustomizationCard::DisplayView
+    <CardPay::LayoutCustomizationCard::DisplayView
       @issuerName={{@issuerName}}
       @headerColor={{@headerColor}}
       @headerPattern={{@headerPattern}}
     />
   {{else}}
-    <CardPay::PrepaidCardIssuance::LayoutCustomizationCard::FormView
+    <CardPay::LayoutCustomizationCard::FormView
       @issuerName={{@issuerName}}
       @updateIssuerName={{@updateIssuerName}}
       @colorOptions={{@colorOptions}}
