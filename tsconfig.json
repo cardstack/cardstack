@@ -21,6 +21,9 @@
     "module": "es6",
     "experimentalDecorators": true,
     "paths": {
+      "fetch": [
+        "node_modules/ember-fetch"
+      ],
       "dummy/tests/*": [
         "tests/*"
       ],
