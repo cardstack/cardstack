@@ -32,10 +32,20 @@
       "type": "node",
       "request": "launch",
       "name": "Run server",
-      "runtimeArgs": ["-r", "ts-node/register"],
+      "runtimeArgs": ["--loader",  "ts-node/esm"],
       "cwd": "${workspaceRoot}/server",
       "args": [
         "src/index.ts"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Run server tests",
+      "runtimeArgs": ["--loader",  "ts-node/esm"],
+      "cwd": "${workspaceRoot}/server",
+      "args": [
+        "./node_modules/.bin/qunit", "tests/**/*-test.ts"
       ]
     }
   ]

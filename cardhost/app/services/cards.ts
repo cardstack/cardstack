@@ -15,7 +15,7 @@ export default class Cards extends Service {
   async loadForRoute(
     pathname: string
   ): Promise<{ model: any; component: unknown }> {
-    return this.internalLoad(`/spaces/home/${pathname}`);
+    return this.internalLoad(`/spaces/home${pathname}`);
   }
 
   private async internalLoad(
@@ -47,7 +47,7 @@ export default class Cards extends Service {
       cardComponent = window.require(card.data.meta.componentModule)['default'];
     } else {
       cardComponent = await import(
-        `@cardstack/compiled/${card.data.meta.componentModule}`
+        `@cardstack/base-cards/${card.data.meta.componentModule}`
       );
     }
 

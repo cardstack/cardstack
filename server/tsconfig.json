@@ -18,12 +18,15 @@
     "inlineSourceMap": true,
     "inlineSources": true,
     "baseUrl": ".",
-    "module": "es2015",
+    "module": "esnext",
     "experimentalDecorators": true,
     "paths": {}
   },
   "include": [
     "src/**/*",
     "tests/**/*"
-  ]
+  ],
+  "ts-node": {
+    "transpileOnly": true
+  }
 }

@@ -10,9 +10,17 @@
   },
   "license": "MIT",
   "description": "Stock API server for the Cardstack tech stack.",
-  "dependencies": {},
+  "dependencies": {
+    "@koa/router": "^10.0.0",
+    "@types/koa": "^2.13.1",
+    "@types/koa__router": "^8.0.4",
+    "koa": "^2.13.1"
+  },
   "devDependencies": {
+    "@types/supertest": "^2.0.11",
     "qunit": "^2.13.0",
+    "scenario-tester": "^0.4.0",
+    "supertest": "^6.1.3",
     "ts-node": "^9.1.1",
     "typescript": "^4.1.3"
   },
@@ -20,8 +28,8 @@
     "node": ">= 14"
   },
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "test": "node --loader ts-node/esm ../node_modules/.bin/qunit 'tests/**/*-test.ts'"
+    "start": "node --loader ts-node/esm src/index.ts",
+    "test": "node --loader ts-node/esm ./node_modules/.bin/qunit 'tests/**/*-test.ts'"
   },
   "type": "module",
   "volta": {
