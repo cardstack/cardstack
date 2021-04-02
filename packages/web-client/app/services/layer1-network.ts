@@ -10,7 +10,8 @@ export default class Layer1Network extends Service {
   strategy!: Web3Strategy;
   @reads('strategy.isConnected', false) isConnected!: boolean;
   @reads('strategy.walletConnectUri') walletConnectUri: string | undefined;
-  @reads('strategy.walletInfo', []) walletInfo!: WalletInfo;
+  @reads('strategy.walletInfo', new WalletInfo([], -1)) walletInfo!: WalletInfo;
+  @reads('strategy.waitForAccount') waitForAccount!: Promise<void>;
 
   constructor(props: object | undefined) {
     super(props);

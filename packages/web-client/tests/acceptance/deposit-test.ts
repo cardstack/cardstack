@@ -44,6 +44,7 @@ module('Acceptance | deposit', function (hooks) {
       );
 
     message = '[data-test-milestone="0"][data-test-thread-message="3"]';
+
     await click(`${message} [data-test-wallet-option="metamask"]`);
     await click(
       `${message} [data-test-mainnnet-connection-action-container] [data-test-boxel-button]`
@@ -59,6 +60,7 @@ module('Acceptance | deposit', function (hooks) {
     let layer1Service = this.owner.lookup('service:layer1-network');
     layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
 
+    await waitFor('[data-test-milestone-completed]');
     assert
       .dom('[data-test-milestone-completed]')
       .containsText('Mainnet Wallet connected');
