@@ -1,5 +1,3 @@
-export default config;
-
 /**
  * Type declarations for
  *    import config from 'my-app/config/environment'

@@ -163,7 +163,7 @@ function makeScaler(domain: number, range: number) {
 
 async function decodeAudioData(
   audioContext: AudioContext,
-  buffer: Buffer
+  buffer: ArrayBuffer
 ): Promise<AudioBuffer> {
   return await new Promise((resolve) =>
     audioContext.decodeAudioData(buffer, resolve)
