@@ -22,7 +22,9 @@ module('Acceptance | deposit', function (hooks) {
     await waitFor('[data-test-layer2-account-id]');
     assert.dom('[data-test-layer2-account-id]').hasText(accountAddress);
     assert.dom('[data-test-wallet-connect-qr-code]').doesNotExist();
-    await click('[data-test-tab="deposit"]');
+    await click(
+      '[data-test-card-pay-header-tab][href="/card-pay/token-suppliers"]'
+    );
 
     assert.dom('[data-test-deposit-instructions]').exists();
     await click('[data-test-hide-button]');

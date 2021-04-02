@@ -4,7 +4,7 @@
       <CardPay::Header
         @title="Card Pay"
         @logoURL={{@logo}}
-        @layer2Connect={{this.transitionToConnect}}
+        @layer2Connect={{set this 'isShowingLayer2ConnectModal' true}}
         @isLayer2Connected={{this.layer2Network.isConnected}}
         @address={{this.layer2Network.walletInfo.accounts.0.address}}
       />
@@ -25,3 +25,9 @@
 </Boxel::Dashboard>
 
 {{outlet}}
+
+{{#if this.isShowingLayer2ConnectModal}}
+  <CardPay::LayerTwoConnectModal
+    @onClose={{set this 'isShowingLayer2ConnectModal' false}}
+  />
+{{/if}}
