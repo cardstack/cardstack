@@ -31,7 +31,7 @@ module('Acceptance | deposit', function (hooks) {
 
     let message = '[data-test-milestone="0"][data-test-thread-message="0"]';
     assert.dom(`${message} [data-test-author]`).containsText('cardbot');
-    assert.dom(message).containsText("Hi there, we're happy to see you");
+    assert.dom(message).containsText('Hi there, we’re happy to see you');
 
     message = '[data-test-milestone="0"][data-test-thread-message="1"]';
     assert.dom(message).containsText('you need to connect two wallets');
