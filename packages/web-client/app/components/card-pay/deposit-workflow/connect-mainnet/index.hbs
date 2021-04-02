@@ -1,0 +1,20 @@
+<Boxel::ActionContainer
+  @header="Wallet Connection - Ethereum Mainnet"
+  @prompt="Connect your Ethereum Mainnet wallet"
+  @incompleteActionLabel="Connect Wallet"
+  @completeActionLabel="Disconnect Mainnet Wallet"
+  @onClickButton={{this.onClickActionContainerButton}}
+  data-test-mainnnet-connection-action-container
+>
+  {{#if this.isWaitingForConnection}}
+    <p>
+      TODO: spinner
+      Waiting for you to connect the Cardstack dApp with your mainnet wallet
+    </p>
+  {{else if this.isConnected}}
+    TODO: show wallet details and balances
+  {{else}}
+    <button data-test-wallet-option="metamask" type="button">MetaMask</button>
+    <button data-test-wallet-option="walletconnect" type="button">WalletConnect</button>
+  {{/if}}
+</Boxel::ActionContainer>

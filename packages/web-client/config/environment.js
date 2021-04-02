@@ -23,6 +23,7 @@ module.exports = function (environment) {
       // when it is created
     },
     chains: {
+      layer1: 'eth',
       layer2: 'xdai',
     },
   };
@@ -38,6 +39,7 @@ module.exports = function (environment) {
   if (environment === 'test') {
     // Testem prefers this...
     ENV.locationType = 'none';
+    ENV.chains.layer1 = 'test';
     ENV.chains.layer2 = 'test';
 
     // keep test console output quieter

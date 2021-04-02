@@ -22,6 +22,23 @@
       >
         Connect Wallet
       </Boxel::Button>
+      <Boxel::Button
+        @kind={{if @isLayer1Connected "secondary-dark" "primary"}}
+        class={{cn
+          "card-pay-header__item-button"
+          card-pay-header__item-button--address=@isLayer1Connected
+        }}
+        {{on "click" @layer1Connect}}
+        data-test-card-pay-layer-1-connect-button
+      >
+        {{#if @isLayer1Connected}}
+          {{!-- Display short address --}}
+          {{@layer1Address}}
+        {{else}}
+          Connect Wallet
+        {{/if}}
+      </Boxel::Button>
+
     </li>
     <li class="card-pay-header__item">
       <div>
@@ -44,7 +61,7 @@
       >
         {{#if @isLayer2Connected}}
           {{!-- Display short address --}}
-          {{@address}}
+          {{@layer2Address}}
         {{else}}
           Connect Wallet
         {{/if}}

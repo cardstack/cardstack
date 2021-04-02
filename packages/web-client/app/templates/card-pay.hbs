@@ -4,9 +4,12 @@
       <CardPay::Header
         @title="Card Pay"
         @logoURL={{@logo}}
-        @layer2Connect={{this.transitionToConnect}}
+        @layer1Connect={{set this 'isShowingLayer1ConnectModal' true}}
+        @layer2Connect={{set this 'isShowingLayer2ConnectModal' true}}
+        @isLayer1Connected={{this.layer1Network.isConnected}}
         @isLayer2Connected={{this.layer2Network.isConnected}}
-        @address={{this.layer2Network.walletInfo.accounts.0.address}}
+        @layer1Address={{this.layer1Network.walletInfo.accounts.0.address}}
+        @layer2Address={{this.layer2Network.walletInfo.accounts.0.address}}
       />
       <CardPay::HeaderNav
         @tabs={{array
@@ -23,3 +26,13 @@
     {{outlet}}
   </:body>
 </Boxel::Dashboard>
+
+{{#if this.isShowingLayer1ConnectModal}}
+TODO
+{{/if}}
+
+{{#if this.isShowingLayer2ConnectModal}}
+  <CardPay::LayerTwoConnectModal
+    @onClose={{set this 'isShowingLayer2ConnectModal' false}}
+  />
+{{/if}}

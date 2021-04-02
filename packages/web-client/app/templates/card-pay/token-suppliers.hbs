@@ -1,0 +1,14 @@
+<h2>
+  Deposit
+</h2>
+
+{{#if this.isShowingInstructions}}
+  <div data-test-deposit-instructions>
+    
+    <h3>Instructions</h3>
+
+    <button type="button" data-test-hide-button {{on 'click' this.hideInstructions}}>Hide</button>
+  </div>
+{{else}}
+  <CardPay::DepositWorkflow />
+{{/if}}
