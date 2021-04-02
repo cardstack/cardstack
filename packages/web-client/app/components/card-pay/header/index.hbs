@@ -1,0 +1,54 @@
+<Boxel::OrgHeader
+  @title={{@title}}
+  @logoURL={{@logoURL}}
+  class="card-pay-header"
+  data-test-card-pay-header
+>
+  <ul class="card-pay-header__item-list">
+    <li class="card-pay-header__item">
+      <div>
+        <div class="card-pay-header__item-label">
+          Layer 1
+        </div>
+        <div class="card-pay-header__item-title">
+          Mainnet
+        </div>
+      </div>
+      <Boxel::Button
+        class="card-pay-header__item-button"
+        @kind="primary"
+        @disabled={{true}}
+        data-test-card-pay-layer-1-connect-button
+      >
+        Connect Wallet
+      </Boxel::Button>
+    </li>
+    <li class="card-pay-header__item">
+      <div>
+        <div class="card-pay-header__item-label">
+          Layer 2
+        </div>
+        <div class="card-pay-header__item-title">
+          xDai
+        </div>
+      </div>
+
+      <Boxel::Button
+        @kind={{if @isLayer2Connected "secondary-dark" "primary"}}
+        class={{cn
+          "card-pay-header__item-button"
+          card-pay-header__item-button--address=@isLayer2Connected
+        }}
+        {{on "click" @layer2Connect}}
+        data-test-card-pay-layer-2-connect-button
+      >
+        {{#if @isLayer2Connected}}
+          {{!-- Display short address --}}
+          {{@address}}
+        {{else}}
+          Connect Wallet
+        {{/if}}
+      </Boxel::Button>
+    </li>
+  </ul>
+</Boxel::OrgHeader>

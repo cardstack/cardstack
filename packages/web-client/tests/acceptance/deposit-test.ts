@@ -8,9 +8,9 @@ module('Acceptance | deposit', function (hooks) {
   test('Making a deposit', async function (assert) {
     await visit('/');
     assert.equal(currentURL(), '/');
-    await click('[data-test-card-pay]');
+    await click('[data-test-cardstack-org-link="card-pay"]');
     assert.equal(currentURL(), '/card-pay');
-    await click('[data-test-token-supplier-button]');
+    await click('[data-test-card-pay-layer-2-connect-button]');
     // // assert Cards & Balances tab is active
     let layer2Service = this.owner.lookup('service:layer2-network');
     layer2Service.test__simulateWalletConnectUri();

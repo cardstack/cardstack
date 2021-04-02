@@ -1,0 +1,25 @@
+<Boxel::Dashboard @darkTheme={{true}} class="card-pay" data-test-card-pay>
+  <:header>
+    <div class="card-pay__header-container">
+      <CardPay::Header
+        @title="Card Pay"
+        @logoURL={{@logo}}
+        @layer2Connect={{this.transitionToConnect}}
+        @isLayer2Connected={{this.layer2Network.isConnected}}
+        @address={{this.layer2Network.walletInfo.accounts.0.address}}
+      />
+      <CardPay::HeaderNav
+        @tabs={{array
+          (hash title="Card Balances" route="card-pay.balances")
+          (hash title="Merchant Services" route="card-pay.merchant-services")
+          (hash title="Reward Programs" route="card-pay.reward-programs")
+          (hash title="Token Suppliers" route="card-pay.token-suppliers")
+        }}
+      />
+    </div>
+  </:header>
+
+  <:body>
+    {{outlet}}
+  </:body>
+</Boxel::Dashboard>
