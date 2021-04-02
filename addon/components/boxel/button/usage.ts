@@ -10,9 +10,18 @@ export default class extends Component {
     dark: ['primary', 'secondary-dark'],
   };
 
+  // base button arguments
+  @tracked as = 'button';
   @tracked size = 'base';
   @tracked kind = 'primary';
   @tracked disabled = false;
+
+  // for @as === 'anchor'
+  @tracked href = '#';
+
+  // for @as === 'link-to'
+  @tracked route = 'docs.index';
+  // @model and @query seem hard to use here so leaving them aside for now
 
   @action
   alert(): void {

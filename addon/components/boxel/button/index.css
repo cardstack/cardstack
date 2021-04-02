@@ -28,8 +28,24 @@
   letter-spacing: var(--boxel-button-letter-spacing, var(--boxel-lsp-lg));
 }
 
-.boxel-button:disabled {
+/* select disabled buttons and links that don't have href */
+/* 
+  a.boxel-button--disabled-link is a special case for an automatically appended class by the LinkTo component 
+  the LinkTo component appends the href regardless, so we have to select it in other ways.
+  Removing the chained classes will make kind-variants overwrite the disabled style on the LinkTo (specificity issues)
+*/
+.boxel-button:disabled, a.boxel-button:not([href]),a.boxel-button[href=""], a.boxel-button.boxel-button--disabled-link {
   --boxel-button-color: var(--boxel-purple-300);
   --boxel-button-border: 1px solid var(--boxel-purple-300);
   --boxel-button-text-color: var(--boxel-purple-400);
+}
+
+/* the a element does not have a disabled attribute. Clicking will still trigger event listeners */
+a.boxel-button:not([href]),a.boxel-button[href=""], a.boxel-button.boxel-button--disabled-link {
+  pointer-events: none;
+}
+
+/* overwrite the global style for links in global.css */
+a.boxel-button:hover {
+  color: var(--boxel-button-text-color);
 }

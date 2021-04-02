@@ -26,7 +26,7 @@ module('Integration | Component | Button', function (hooks) {
       clicked = true;
     });
     await render(
-      hbs`<Boxel::Button {{ on 'click' this.onClick}}>A button</Boxel::Button>`
+      hbs`<Boxel::Button {{ on "click" this.onClick }}>A button</Boxel::Button>`
     );
     await click(BUTTON_SELECTOR);
     assert.equal(clicked, true);
@@ -39,7 +39,7 @@ module('Integration | Component | Button', function (hooks) {
 
   test('It can be disabled via argument', async function (assert) {
     await render(
-      hbs`<Boxel::Button @disabled={{true}}>A button</Boxel::Button>`
+      hbs`<Boxel::Button @disabled={{ true }}>A button</Boxel::Button>`
     );
     assert.dom(BUTTON_SELECTOR).isDisabled();
   });
@@ -53,7 +53,7 @@ module('Integration | Component | Button', function (hooks) {
     });
 
     await render(
-      hbs`<Boxel::Button @kind={{this.kind}}>
+      hbs`<Boxel::Button @kind={{ this.kind }}>
           A button
           </Boxel::Button>`
     );
@@ -82,7 +82,7 @@ module('Integration | Component | Button', function (hooks) {
     });
 
     await render(
-      hbs`<Boxel::Button @size={{this.size}}>
+      hbs`<Boxel::Button @size={{ this.size }}>
           A button
           </Boxel::Button>`
     );
@@ -101,4 +101,39 @@ module('Integration | Component | Button', function (hooks) {
     this.set('size', '');
     assert.dom(BUTTON_SELECTOR).hasClass(/--size-base/);
   });
+
+  test('It can render as both anchor and link-to depending on @as', async function (assert) {
+    this.set('as', 'anchor');
+    this.set('href', '#');
+    await render(
+      hbs`<Boxel::Button @as={{ this.as }} @href={{ this.href }}>
+          This should be an anchor
+          </Boxel::Button>`
+    );
+    assert.dom(`a${BUTTON_SELECTOR}`).hasAttribute('href', '#');
+    assert.dom(`button${BUTTON_SELECTOR}`).doesNotExist();
+    this.set('as', '');
+    assert.dom(`a${BUTTON_SELECTOR}`).doesNotExist();
+    assert.dom(`button${BUTTON_SELECTOR}`).doesNotHaveAttribute('href');
+    this.set('as', 'link-to');
+    assert.dom(`a${BUTTON_SELECTOR}`).exists();
+    assert.dom(`button${BUTTON_SELECTOR}`).doesNotExist();
+  });
+
+  test('An anchor element button should be able to receive event listeners', async function (assert) {
+    this.set('href', '#');
+    let clicked = false;
+    this.set('onClick', () => {
+      clicked = true;
+    });
+    await render(hbs`
+      <Boxel::Button @href={{ this.href }} {{ on "click" this.onClick }}>      
+        An anchor
+      </Boxel::Button>
+    `);
+    await click(BUTTON_SELECTOR);
+    assert.equal(clicked, true);
+  });
+
+  // we can't test for disabled links because programmatic clicks bypass pointer-events:none
 });

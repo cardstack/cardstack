@@ -1,4 +1,30 @@
+.usage-button-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .usage-button-dark-mode-background {
   background-color: #413e4e;
   padding: 4px;
+}
+
+.usage-button-explanation {
+  border: 1px solid black;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.usage-button-explanation td {
+  border: 1px solid black;
+  padding: .25rem;
+}
+
+.usage-button-centers-component {
+  flex-basis: 0;
+  flex-grow: 99;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
+  padding: 2rem;
 }

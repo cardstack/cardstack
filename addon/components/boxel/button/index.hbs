@@ -1,12 +1,39 @@
-<button
-  class={{cn
+{{#let (cn
     "boxel-button"
     (concat "boxel-button--size-" (or @size this.defaultSize))
     (concat "boxel-button--kind-" (or @kind this.defaultKind))
-  }}
-  disabled={{@disabled}}
-  data-test-boxel-button
-  ...attributes
->
-  {{yield}}
-</button>
+ ) as |classes|}}
+{{#if (or (not @as) (eq @as "button"))}}
+  <button
+    class={{classes}}
+    disabled={{@disabled}}
+    data-test-boxel-button
+    ...attributes
+  >
+    {{yield}}
+  </button>
+{{else if (eq @as "anchor")}}
+  <a
+    class={{classes}}
+    href={{unless @disabled @href}}
+    data-test-boxel-button 
+    ...attributes
+  >
+    {{yield}}
+  </a>
+{{else if (eq @as "link-to")}}
+  <LinkTo
+    class={{classes}}
+    @route={{@route}}
+    @models={{if @models @models (array)}}
+    @query={{@query}}
+    @disabled={{@disabled}}
+    @disabledClass="boxel-button--disabled-link"
+    data-test-boxel-button 
+    tabindex={{if @disabled -1 0}}
+    ...attributes
+  >
+    {{yield}}
+  </LinkTo>
+{{/if}}
+{{/let}}
