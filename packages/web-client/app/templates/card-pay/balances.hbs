@@ -1,9 +1,3 @@
 <h2>
   Cards &amp; Balances
 </h2>
-{{#if this.layer2Network.isConnected}}
-  Connected to wallet:
-  {{#each this.layer2Network.walletInfo.accounts as |account|}}
-    <div data-test-card-pay-balances-layer2-account-id>{{account.address}}</div>
-  {{/each}}
-{{/if}}
