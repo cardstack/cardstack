@@ -10,14 +10,13 @@
             {{#if postable.message}}
               {{format-workflow-message postable.message}}
             {{else}}
-              {{component postable.componentName}}
+              {{component postable.componentName onComplete=(optional postable.onComplete)}}
             {{/if}}
           </div>
         {{/each}}
-      {{/if}}
-
-      {{#if milestone.complete}}
-        <p data-test-milestone-completed>Milestone completed: {{milestone.statusOnCompletion}}</p>
+        {{#if milestone.isComplete}}
+          <p data-test-milestone-completed>Milestone completed: {{milestone.completedDetail}}</p>
+        {{/if}}
       {{/if}}
 
       {{#if (and milestone.messageOnCompletion this.workflow.displayCompletionMessage)}}

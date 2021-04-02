@@ -17,10 +17,10 @@ module('Acceptance | deposit', function (hooks) {
     assert.dom('[data-test-wallet-connect-qr-code]').exists();
 
     // Simulate the user scanning the QR code and connecting their mobile wallet
-    let accountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-    layer2Service.test__simulateAccountsChanged([accountAddress]);
+    let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await waitFor('[data-test-layer2-account-id]');
-    assert.dom('[data-test-layer2-account-id]').hasText(accountAddress);
+    assert.dom('[data-test-layer2-account-id]').hasText(layer2AccountAddress);
     assert.dom('[data-test-wallet-connect-qr-code]').doesNotExist();
     await click(
       '[data-test-card-pay-header-tab][href="/card-pay/token-suppliers"]'
@@ -55,12 +55,13 @@ module('Acceptance | deposit', function (hooks) {
         'Waiting for you to connect the Cardstack dApp with your mainnet wallet'
       );
 
-    // let layer1Service = this.owner.lookup('service:layer1-network');
-    // layer1Service.test__simulateWalletConnected();
+    let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+    let layer1Service = this.owner.lookup('service:layer1-network');
+    layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
 
-    // assert
-    //   .dom('[data-test-milestone-completed]')
-    //   .containsText('Mainnet Wallet connected');
+    assert
+      .dom('[data-test-milestone-completed]')
+      .containsText('Mainnet Wallet connected');
 
     // message = '[data-test-milestone="1"][data-test-thread-message="0"]';
     // assert.dom(`${message} [data-test-author]`).containsText('cardbot');

@@ -1,3 +1,5 @@
+import { tracked } from '@glimmer/tracking';
+import { action } from '@ember/object';
 export interface Participant {
   name: string;
 }
@@ -9,6 +11,7 @@ interface WorkflowMessageOptions {
 
 class WorkflowPostable {
   author: Participant;
+  @tracked isComplete: boolean = false;
   constructor(author: Participant) {
     this.author = author;
   }
@@ -19,6 +22,7 @@ export class WorkflowMessage extends WorkflowPostable {
   constructor(options: WorkflowMessageOptions) {
     super(options.author);
     this.message = options.message;
+    this.isComplete = true;
   }
 }
 
@@ -33,18 +37,28 @@ export class WorkflowCard extends WorkflowPostable {
     super(options.author);
     this.componentName = options.componentName;
   }
+  @action onComplete() {
+    this.isComplete = true;
+  }
 }
 
+interface MilestoneOptions {
+  name: string;
+  postables: WorkflowPostable[];
+  completedDetail: string;
+}
 export class Milestone {
   name: string;
   postables: WorkflowPostable[] = [];
-  complete = false;
-  statusOnCompletion = 'TBD';
-  completionMessage = 'TBD';
+  get isComplete() {
+    return this.postables.isEvery('isComplete', true);
+  }
+  completedDetail;
 
-  constructor(name: string, postables: WorkflowPostable[]) {
-    this.name = name;
-    this.postables = postables;
+  constructor(opts: MilestoneOptions) {
+    this.name = opts.name;
+    this.postables = opts.postables;
+    this.completedDetail = opts.completedDetail;
   }
 }
 

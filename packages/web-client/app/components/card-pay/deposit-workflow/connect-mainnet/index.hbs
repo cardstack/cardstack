@@ -11,6 +11,8 @@
       TODO: spinner
       Waiting for you to connect the Cardstack dApp with your mainnet wallet
     </p>
+  {{else if this.isConnected}}
+    TODO: show wallet details and balances
   {{else}}
     <button data-test-wallet-option="metamask" type="button">MetaMask</button>
     <button data-test-wallet-option="walletconnect" type="button">WalletConnect</button>
