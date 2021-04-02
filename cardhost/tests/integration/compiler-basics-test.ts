@@ -237,14 +237,14 @@ module('Integration | compiler-basics', function (hooks) {
         url: 'http://mirage/cards/post',
         files: {
           'schema.js': `
-        import { contains } from "@cardstack/types";
-        import string from "https://cardstack.com/base/models/string";
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/models/string";
 
-        export default class Post {
-          @contains(string)
-          title;
-        }
-    `,
+            export default class Post {
+              @contains(string)
+              title;
+            }
+          `,
           'isolated.js': templateOnlyComponentTemplate(
             '<h1><@model.title /></h1>'
           ),

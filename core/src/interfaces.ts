@@ -55,3 +55,14 @@ export interface Builder {
   getRawCard(url: string): Promise<RawCard>;
   getCompiledCard(url: string): Promise<CompiledCard>;
 }
+
+export interface CardServerResponse {
+  data: {
+    id: string;
+    type: string;
+    attributes?: { [name: string]: any };
+    meta: {
+      componentModule: string;
+    };
+  };
+}
