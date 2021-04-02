@@ -271,7 +271,7 @@ jobs:
     runs-on: ubuntu-latest
     # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
     # github.head_ref: the branch that the pull request is from. only appears on pull_request events
-    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref && (github.event.action == 'opened' || github.event.action == 'reopened')
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref
     needs: [deploy-preview]
     env:
       S3_PREVIEW_WEBSITE_URL: http://boxel-preview.cardstack.com.s3-website-us-east-1.amazonaws.com
