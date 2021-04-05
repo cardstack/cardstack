@@ -15,7 +15,7 @@
           </div>
         {{/each}}
         {{#if milestone.isComplete}}
-          <p data-test-milestone-completed>Milestone completed: {{milestone.completedDetail}}</p>
+          <p data-test-milestone-completed data-test-milestone={{i}}>Milestone completed: {{milestone.completedDetail}}</p>
         {{/if}}
       {{/if}}
 
