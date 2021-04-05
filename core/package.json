@@ -9,10 +9,6 @@
     "directory": "core"
   },
   "main": "src/index.ts",
-  "exports": {
-    ".": "./src/index.ts",
-    "./src/compiler": "./src/compiler.ts"
-  },
   "license": "MIT",
   "description": "Core library for Cardstack, portable to both browser and server environments",
   "dependencies": {

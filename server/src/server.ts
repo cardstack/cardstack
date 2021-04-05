@@ -1,28 +1,51 @@
 import Koa from "koa";
 import Router from "@koa/router";
 import Builder from "./builder";
-import { RealmsConfig } from "./interfaces";
+import { RealmConfig } from "./interfaces";
 import { Serializer } from "jsonapi-serializer";
 
-export async function createServer(realms: RealmsConfig): Promise<Koa> {
+export async function createServer(realms: RealmConfig[]): Promise<Koa> {
   let app = new Koa();
   let router = new Router();
   let builder = new Builder({ realms });
 
   // The card data layer
-  router.get("/realms/:local_realm_name/:local_id", async (ctx) => {
-    let cardSerializer = new Serializer(ctx.params.local_id, {
-      attributes: [],
-    });
-    let { local_realm_name, local_id } = ctx.params;
-    let url = builder.buildCardURL(local_realm_name, local_id);
-    if (!url) {
-      ctx.throw(404);
-    }
-    let card = await builder.getCompiledCard(url);
+  router.get(`/cards/:encodedCardURL`, async (ctx) => {
+    let format: "isolated" | "embedded" = "isolated"; // todo: query param
+    let url = decodeURIComponent(ctx.params.encodedCardURL);
+    try {
+      let card = await builder.getCompiledCard(url);
+      card[format];
+      ctx.set("content-type", "application/json");
+      let cardSerializer = new Serializer("card", {
+        attributes: card[format].usedFields,
+      });
 
-    ctx.set("content-type", "application/json");
-    ctx.body = cardSerializer.serialize(card.data);
+      ctx.body = cardSerializer.serialize(card.data);
+    } catch (err) {
+      if (err.status != null) {
+        ctx.response.status = err.status;
+        ctx.body = {
+          errors: [
+            {
+              status: err.status,
+              detail: err.message,
+            },
+          ],
+        };
+      } else {
+        ctx.response.status = 500;
+        ctx.body = {
+          errors: [
+            {
+              status: 500,
+              detail: "An unexpected exception occured",
+            },
+          ],
+        };
+        console.error(err);
+      }
+    }
   });
 
   app.use(router.routes());

@@ -12,14 +12,16 @@ import {
   objectExpression,
   identifier,
 } from '@babel/types';
-import { CompiledCard, TemplateModule } from '../interfaces';
+import { CompiledCard, ComponentInfo } from '../interfaces';
 import cardGlimmerPlugin from '../glimmer/card-template-plugin';
 
 import { getObjectKey, error } from './utils';
 
 export interface Options {
   fields: CompiledCard['fields'];
-  templateModule: TemplateModule;
+
+  // this is an output from the transform
+  componentInfo: ComponentInfo;
 }
 
 interface State {
@@ -89,7 +91,7 @@ function callExpressionEnter(path: NodePath<CallExpression>, state: State) {
   path.node.arguments[0] = stringLiteral(template);
 
   if (shouldInlineHBS(options, neededScope)) {
-    state.opts.templateModule.inlineHBS = template;
+    state.opts.componentInfo.inlineHBS = template;
   }
 
   updateScope(options, neededScope);

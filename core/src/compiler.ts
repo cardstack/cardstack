@@ -11,19 +11,10 @@ import cardSchemaPlugin, {
 import cardTemplatePlugin, {
   Options as CardTemplateOptions,
 } from './babel/card-template-plugin';
-import {
-  CompiledCard,
-  RawCard,
-  RawCardData,
-  templateFileName,
-  templateTypes,
-  TemplateModule,
-} from './interfaces';
+import { CompiledCard, ComponentInfo, Format, RawCard } from './interfaces';
 
 import intersection from 'lodash/intersection';
 
-// Eventually this will be dynamically configured
-const MODEL_MODULE_NAME = 'model';
 export class Compiler {
   lookup: (cardURL: string) => Promise<CompiledCard>;
   define: (fullModuleURL: string, source: string) => Promise<void>;
@@ -37,19 +28,21 @@ export class Compiler {
   }
 
   async compile(cardSource: RawCard): Promise<CompiledCard> {
+    if (cardSource.url === compiledBaseCard.url) {
+      return compiledBaseCard;
+    }
+
     let options = {};
     let parentCard;
 
-    let modelModuleName = this.prepareSchema(
-      cardSource.url,
-      cardSource.files['schema.js'],
-      options
-    );
-    let data = this.getData(cardSource.files['data.json']);
+    let modelModuleName = this.prepareSchema(cardSource, options);
     let meta = getMeta(options);
 
     if (meta.parent) {
       parentCard = await this.lookup(meta.parent.cardURL);
+    } else {
+      // the base card from which all other cards derive
+      parentCard = compiledBaseCard;
     }
 
     let fields = await this.lookupFieldsForCard(meta.fields);
@@ -58,14 +51,23 @@ export class Compiler {
       fields = this.adoptFields(fields, parentCard);
     }
 
-    let templateModules = this.prepareTemplates(cardSource, fields, parentCard);
-
     let card: CompiledCard = {
       url: cardSource.url,
-      modelModule: modelModuleName,
+      modelModule: modelModuleName ?? parentCard.modelModule,
       fields,
-      data,
-      templateModules: templateModules,
+      data: cardSource.data,
+      isolated: this.prepareComponent(
+        cardSource,
+        fields,
+        parentCard,
+        'isolated'
+      ),
+      embedded: this.prepareComponent(
+        cardSource,
+        fields,
+        parentCard,
+        'embedded'
+      ),
     };
     if (parentCard) {
       card['adoptsFrom'] = parentCard;
@@ -82,8 +84,24 @@ export class Compiler {
     return `${cardURL}/${moduleName}`;
   }
 
-  prepareSchema(url: string, schema: string, options: Object): string {
-    let out = transformSync(schema, {
+  // returns the module name of our own compiled schema, if we have one. Does
+  // not recurse into parent, because we don't necessarily know our parent until
+  // after we've tried to compile our own
+  private prepareSchema(
+    cardSource: RawCard,
+    options: Object
+  ): string | undefined {
+    let localFile = cardSource.schema;
+    if (!localFile) {
+      return undefined;
+    }
+    let src = cardSource.files[localFile];
+    if (!src) {
+      throw new Error(
+        `${cardSource.url} refers to ${localFile} in its card.json but that file does not exist`
+      );
+    }
+    let out = transformSync(src, {
       plugins: [
         [cardSchemaPlugin, options],
         [decoratorsPlugin, { decoratorsBeforeExport: false }],
@@ -92,15 +110,9 @@ export class Compiler {
     });
 
     let code = out!.code!;
-
-    let fullModulePath = this.getFullModulePath(url, MODEL_MODULE_NAME);
+    let fullModulePath = this.getFullModulePath(cardSource.url, localFile);
     this.define(fullModulePath, code);
-
     return fullModulePath;
-  }
-
-  getData(data: RawCardData | undefined): any {
-    return data?.attributes ?? {};
   }
 
   async lookupFieldsForCard(
@@ -140,55 +152,59 @@ export class Compiler {
     return Object.assign(fields, parentCard.fields);
   }
 
-  prepareTemplates(
+  prepareComponent(
     cardSource: RawCard,
     fields: CompiledCard['fields'],
-    parentCard?: CompiledCard
-  ): CompiledCard['templateModules'] {
-    let templateModules: CompiledCard['templateModules'] = {
-      isolated: { moduleName: 'isolated' },
-      embedded: { moduleName: 'embedded' },
-    };
-
-    for (let templateType of templateTypes) {
-      let template;
-      let templateSource = cardSource.files[templateFileName(templateType)];
-      let templateModule = templateModules[templateType];
-
-      if (templateSource) {
-        template = this.compileTemplate(templateSource, fields, templateModule);
-
-        let fullModulePath = this.getFullModulePath(
-          cardSource.url,
-          templateType
+    parentCard: CompiledCard,
+    which: Format
+  ): ComponentInfo {
+    let localFile = cardSource[which];
+    if (localFile) {
+      if (!cardSource.files[localFile]) {
+        throw new Error(
+          `${cardSource.url} referred to ${localFile} in its card.json but that file does not exist`
         );
-        templateModule.moduleName = fullModulePath;
-        this.define(fullModulePath, template);
-      } else if (parentCard) {
-        templateModule.moduleName =
-          parentCard.templateModules[templateType].moduleName;
-      } else {
-        // TODO: Likely this should error, but not all of our test scenarios have full
-        // fallback set up. Not sure how to handle that just yet
-        // throw Error(
-        //   `Card:${cardSource.url} has no template for type ${templateType}. This should not happen`
-        // );
       }
+      let moduleName = this.getFullModulePath(cardSource.url, localFile);
+      return this.compileComponent(
+        cardSource.files[localFile],
+        fields,
+        moduleName
+      );
+    } else {
+      return parentCard[which];
     }
-
-    return templateModules;
   }
 
-  compileTemplate(
+  compileComponent(
     templateSource: string,
     fields: CompiledCard['fields'],
-    templateModule: TemplateModule
-  ): string {
-    let options: CardTemplateOptions = { fields, templateModule };
+    moduleName: string
+  ): ComponentInfo {
+    let componentInfo: ComponentInfo = {
+      moduleName,
+    };
+    let options: CardTemplateOptions = { fields, componentInfo };
     let out = transformSync(templateSource, {
       plugins: [[cardTemplatePlugin, options]],
     });
-
-    return out!.code!;
+    this.define(moduleName, out!.code!);
+    return componentInfo;
   }
 }
+
+// it's easier to hand-compile and hard-code the base card rather than make the
+// card compiler always support the case of an undefined parentCard. This is the
+// only card with no parentCard.
+const compiledBaseCard = {
+  url: 'https://cardstack.com/base/base',
+  fields: {},
+  data: undefined,
+  modelModule: 'todo',
+  isolated: {
+    moduleName: 'todo',
+  },
+  embedded: {
+    moduleName: 'todo',
+  },
+};

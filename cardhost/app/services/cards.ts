@@ -3,11 +3,12 @@ import { macroCondition, isTesting } from '@embroider/macros';
 import Component from '@glimmer/component';
 import { hbs } from 'ember-cli-htmlbars';
 import { setComponentTemplate } from '@ember/component';
+import { Format } from '@cardstack/core/src/interfaces';
 
 export default class Cards extends Service {
   async load(
     url: string,
-    format: 'isolated' | 'embedded'
+    format: Format
   ): Promise<{ model: any; component: unknown }> {
     return this.internalLoad(`${url}?format=${format}`);
   }

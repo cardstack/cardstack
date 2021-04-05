@@ -1,1 +1,4 @@
-export type RealmsConfig = Map<string, string>;
+export interface RealmConfig {
+  url: string;
+  directory: string;
+}

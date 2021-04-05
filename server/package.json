@@ -29,7 +29,7 @@
     "typescript": "^4.1.3"
   },
   "engines": {
-    "node": ">= 14"
+    "node": ">= 15"
   },
   "scripts": {
     "start": "node --loader ts-node/esm src/index.ts",

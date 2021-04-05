@@ -1,12 +1,15 @@
 import walkSync from "walk-sync";
-import type {
+import {
   Builder as BuilderInterface,
   RawCard,
   CompiledCard,
+  assertValidRawCard,
 } from "@cardstack/core/src/interfaces";
-import { RealmsConfig } from "./interfaces";
+import { RealmConfig } from "./interfaces";
 import { Compiler } from "@cardstack/core/src/compiler";
 import fs from "fs";
+import { join } from "path";
+import { NotFound } from "./error";
 
 export default class Builder implements BuilderInterface {
   private compiler = new Compiler({
@@ -15,11 +18,10 @@ export default class Builder implements BuilderInterface {
   });
 
   // private cache: Map<string, CompiledCard>;
-  private realms: RealmsConfig;
+  private realms: RealmConfig[];
 
-  constructor(params: { realms: RealmsConfig }) {
-    // this.cache = new Map();
-    this.realms = new Map(Object.entries(params.realms));
+  constructor(params: { realms: RealmConfig[] }) {
+    this.realms = params.realms;
   }
 
   private async defineModule(moduleURL: string, source: string): Promise<void> {
@@ -29,27 +31,33 @@ export default class Builder implements BuilderInterface {
     // eval(source);
   }
 
-  buildCardURL(realmName: string, id: string): string | undefined {
-    let realm = this.realms.get(realmName);
-    if (!realm) {
-      return;
+  private locateURL(url: string): string {
+    for (let realm of this.realms) {
+      if (url.startsWith(realm.url)) {
+        return join(realm.directory, url.replace(realm.url, ""));
+      }
     }
-    // TODO: We should resolve this
-    return `${realm}/node_modules/${id}`;
+    throw new NotFound(`${url} is not in a realm we know about`);
   }
 
   async getRawCard(url: string): Promise<RawCard> {
-    let filePaths = walkSync(url, {
-      directories: false,
-    });
+    let dir = this.locateURL(url);
     let files: any = {};
-
-    for (const p in filePaths) {
-      let fullPath = url + "/" + filePaths[p];
-      files[filePaths[p]] = fs.readFileSync(fullPath, "utf8");
+    for (let file of walkSync(dir, {
+      directories: false,
+    })) {
+      let fullPath = join(dir, file);
+      files[file] = fs.readFileSync(fullPath, "utf8");
     }
-
-    return { url, files };
+    let cardJSON = files["card.json"];
+    if (!cardJSON) {
+      throw new Error(`${url} is missing card.json`);
+    }
+    delete files["card.json"];
+    let card = JSON.parse(cardJSON);
+    Object.assign(card, { files, url });
+    assertValidRawCard(card);
+    return card;
   }
   async getCompiledCard(url: string): Promise<CompiledCard> {
     // TODO: Check the compiled cards

@@ -3,6 +3,7 @@ import { Project } from "scenario-tester";
 import { createServer } from "../src/server";
 import supertest from "supertest";
 import QUnit from "qunit";
+import { join } from "path";
 
 // TODO: share this in core
 export function templateOnlyComponentTemplate(template: string): string {
@@ -21,65 +22,67 @@ QUnit.module("Card Data", function (hooks) {
   let realm: Project;
   let server: Koa;
 
-  hooks.beforeEach(async function () {
-    realm = new Project("my-realm");
+  function getCard(cardURL: string) {
+    return supertest(server.callback()).get(
+      `/cards/${encodeURIComponent(cardURL)}`
+    );
+  }
 
-    realm.addDependency("post", {
+  hooks.beforeEach(async function () {
+    realm = new Project("my-realm", {
       files: {
-        "schema.js": `
+        post: {
+          "card.json": JSON.stringify({
+            schema: "./schema.js",
+            isolated: "./isolated.js",
+          }),
+          "schema.js": `
       import { contains } from "@cardstack/types";
-      import string from "https://cardstack.com/base/models/string";
+      import string from "https://cardstack.com/base/string";
       export default class Post {
         @contains(string)
         title;
         @contains(string)
         body;
       }`,
-        "isolated.js": templateOnlyComponentTemplate(
-          "<h1><@model.title/></h1><article><@model.body/></article>"
-        ),
-      },
-    });
+          "isolated.js": templateOnlyComponentTemplate(
+            "<h1><@model.title/></h1><article><@model.body/></article>"
+          ),
+        },
 
-    realm.addDependency("post0", {
-      files: {
-        "schema.js": `
-          import { adopts } from "@cardstack/types";
-          import post from "https://my-realm/post";
-          
-          export default @adopts(post) class Post {}
-        `,
-        "data.json": JSON.stringify(
-          {
+        post0: {
+          "card.json": JSON.stringify({
+            adoptsFrom: "../post",
             data: {
-              attributes: {
-                title: "Hello World",
-                body: "First post.",
-              },
+              title: "Hello World",
+              body: "First post.",
             },
-            meta: {
-              // this is a URL. When relative, it's interpreted relative to this
-              // card's URL.
-              adoptsFrom: "../post",
-            },
-          },
-          null,
-          2
-        ),
+          }),
+        },
       },
     });
 
     realm.writeSync();
 
-    server = await createServer({ "my-realm": realm.baseDir });
-  });
-  QUnit.test("404s when you try to load a card outside of it's realm", async function (assert) {
-    let response = await supertest(server.callback()).get("/realms/other-realm/post0").expect(404);
-    assert.ok(response);
+    server = await createServer([
+      { url: "https://my-realm", directory: realm.baseDir },
+      {
+        url: "https://cardstack.com/base",
+        directory: join(__dirname, "..", "..", "base-cards"),
+      },
+    ]);
   });
 
+  QUnit.test(
+    "404s when you try to load a card outside of it's realm",
+    async function (assert) {
+      assert.expect(0);
+      await getCard("https://some-other-origin/thing").expect(404);
+    }
+  );
+
   QUnit.test("can load a simple isolated card's data", async function (assert) {
-    let response = await supertest(server.callback()).get("/realms/my-realm/post0").expect(200);
+    let response = await getCard("https://my-realm/post0").expect(200);
     assert.equal(response.body, {
       data: {
         attributes: {
@@ -87,7 +90,8 @@ QUnit.module("Card Data", function (hooks) {
           body: "First post.",
         },
         meta: {
-          isolatedComponentModule: "@cardstack/compiled/my-realm/post0/isolated",
+          isolatedComponentModule:
+            "@cardstack/compiled/my-realm/post0/isolated",
         },
       },
     });

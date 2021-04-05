@@ -2,6 +2,7 @@ import type {
   Builder as BuilderInterface,
   RawCard,
   CompiledCard,
+  Format,
 } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
 
@@ -55,7 +56,7 @@ export default class Builder implements BuilderInterface {
   // implementation and the data to give you a single thing you can render.
   async getBuiltCard(
     url: string,
-    format: 'isolated' | 'embedded'
+    format: Format
   ): Promise<{ model: any; moduleName: string }> {
     let compiledCard = await this.getCompiledCard(url);
 

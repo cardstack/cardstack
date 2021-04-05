@@ -2,7 +2,7 @@ import { Response, Request } from 'miragejs';
 import type { Server } from 'miragejs/server';
 
 import Builder from 'cardhost/lib/builder';
-import { RawCard } from '@cardstack/core/src/interfaces';
+import { Format, RawCard } from '@cardstack/core/src/interfaces';
 import { getContext } from '@ember/test-helpers';
 import { Memoize } from 'typescript-memoize';
 
@@ -13,7 +13,7 @@ type CardParams =
       type: 'raw';
     }
   | {
-      format: 'isolated' | 'embedded';
+      format: Format;
       type?: 'compiled';
     };
 
@@ -40,7 +40,7 @@ class FakeCardServer {
     });
   }
 
-  async respondWithCard(url: string, format: 'embedded' | 'isolated') {
+  async respondWithCard(url: string, format: Format) {
     let {
       model,
       moduleName,
