@@ -1,6 +1,8 @@
 'use strict';
 
 const EmberApp = require('ember-cli/lib/broccoli/ember-app');
+const path = require('path');
+const concat = require('broccoli-concat');
 
 module.exports = function (defaults) {
   let app = new EmberApp(defaults, {});
@@ -19,7 +21,15 @@ module.exports = function (defaults) {
   // along with the exports of each module as its value.
 
   const { Webpack } = require('@embroider/webpack');
+
+  let appComponentsStylesTree = concat(path.join(__dirname, 'app/components'), {
+    inputFiles: ['**/*.css'],
+    outputFile: '/assets/app-components.css',
+    sourceMapConfig: { enabled: true },
+  });
+
   return require('@embroider/compat').compatBuild(app, Webpack, {
+    extraPublicTrees: [appComponentsStylesTree],
     packagerOptions: {
       webpackConfig: {
         node: {
