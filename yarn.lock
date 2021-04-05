@@ -5005,7 +5005,7 @@ class-utils@^0.3.5:
     isobject "^3.0.0"
     static-extend "^0.1.1"
 
-classnames@^2.2.6:
+classnames@<=2.2.6, classnames@^2.2.6:
   version "2.2.6"
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.6.tgz#43935bffdd291f326dad0a205309b38d00f650ce"
   integrity sha512-JR/iSQOSt+LQIWwrwEzJ9uk0xfN3mTVYMwt1Ir5mUcSN6pU+V4zQFFaJsclJbPuAUQH+yfWef6tm7l1quW3C8Q==
@@ -6201,15 +6201,15 @@ ember-basic-dropdown@^3.0.12:
     ember-style-modifier "^0.6.0"
     ember-truth-helpers "^2.1.0 || ^3.0.0"
 
-ember-class-names-helper@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/ember-class-names-helper/-/ember-class-names-helper-0.1.0.tgz#38e5adb57e84833c0f135bc5938ee4c56cca1850"
-  integrity sha512-8Rb5wv6Sepd5c4Cm42YR0w2DibwwAtzowukO0gAhu4GLVcwWwVJltjtAlkmOVbSSRUuE8PUnhEWHHNgMEAMDgw==
+ember-class-names-helper@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/ember-class-names-helper/-/ember-class-names-helper-0.2.1.tgz#b71257fefafb1206360841ba7fc8c8ba600cb98e"
+  integrity sha512-So/b/9UZxdm8GFetng0k2Li92s+RRLwa6+R5UnZa9pSgamU2lTbmxtqijsejd2AgBkTKgT22WW4mjvEo/LgAcw==
   dependencies:
     classnames "^2.2.6"
     ember-auto-import "^1.5.3"
-    ember-cli-babel "^7.19.0"
-    ember-cli-htmlbars "^4.3.1"
+    ember-cli-babel "^7.20.5"
+    ember-cli-htmlbars "^5.1.2"
 
 ember-classy-page-object@^0.6.1:
   version "0.6.1"
