@@ -9,16 +9,25 @@
       {{#let (or milestone.complete (lte i this.workflow.completedMilestoneCount)) as |displayMilestone|}}
         {{#if displayMilestone}}
           {{#each milestone.postables as |postable j|}}
-            <div class="thread-message" data-test-thread-message={{j}} data-test-milestone={{i}}>
-              <div data-test-author>
-                {{postable.author.name}}
-              </div>
+
               {{#if postable.message}}
-                {{format-workflow-message postable.message}}
+                <Boxel::ThreadMessage
+                  @content={{format-workflow-message postable.message}}
+                  data-test-thread-message={{j}} data-test-milestone={{i}}
+                />
               {{else}}
-                {{component postable.componentName onComplete=(optional postable.onComplete)}}
+                <Boxel::ThreadMessage
+                data-test-thread-message={{j}} data-test-milestone={{i}}
+                >
+                  {{component postable.componentName onComplete=(optional postable.onComplete)}}
+                </Boxel::ThreadMessage>
               {{/if}}
-            </div>
+            {{!-- <div class="thread-message" >
+              <div data-test-author>
+
+              </div>
+
+            </div> --}}
           {{/each}}
           {{#if milestone.isComplete}}
             <p data-test-milestone-completed data-test-milestone={{i}}>Milestone completed: {{milestone.completedDetail}}</p>
