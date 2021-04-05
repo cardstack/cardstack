@@ -1,0 +1,26 @@
+<Boxel::CardContainer>
+  <label>Deposit funds from Ethereum Mainnet wallet</label>
+  <button data-test-layer-1-source-trigger type="button" {{on 'click' (set this 'isShowingLayer1SourceOptions' true)}}>
+    Layer 1
+  </button>
+  {{#if this.isShowingLayer1SourceOptions}}
+    <div data-test-ethereum-option>
+      Ethereum
+    </div>
+    <div data-test-dai-option>
+      DAI
+    </div>
+  {{/if}}
+  <label>Receive balance in xDai Chain wallet</label>
+  <button data-test-layer-2-target-trigger type="button" {{on 'click' (set this 'isShowingLayer2TargetOptions' true)}}>
+    Layer 2
+  </button>
+  {{#if this.isShowingLayer2TargetOptions}}
+    <div data-test-new-depot-option>
+      New Depot
+    </div>
+  {{/if}}
+  <Boxel::Button {{on 'click' @onComplete}} data-test-continue-button>
+    Continue
+  </Boxel::Button>
+</Boxel::CardContainer>

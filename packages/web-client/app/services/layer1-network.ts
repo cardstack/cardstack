@@ -5,6 +5,7 @@ import TestWeb3Strategy from '../utils/web3-strategies/test';
 import EthWeb3Strategy from '../utils/web3-strategies/ethereum';
 import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
+import { task } from 'ember-concurrency-decorators';
 
 export default class Layer1Network extends Service {
   strategy!: Web3Strategy;
@@ -29,6 +30,14 @@ export default class Layer1Network extends Service {
     return this.walletInfo.accounts.length > 0;
   }
 
+  @task *unlock() {
+    yield this.strategy.unlock();
+  }
+
+  @task *deposit() {
+    yield this.strategy.deposit();
+  }
+
   test__simulateWalletConnectUri() {
     let strategy = this.strategy as TestWeb3Strategy;
     strategy.test__simulateWalletConnectUri();
@@ -37,6 +46,16 @@ export default class Layer1Network extends Service {
   test__simulateAccountsChanged(accounts: string[]) {
     let strategy = this.strategy as TestWeb3Strategy;
     strategy.test__simulateAccountsChanged(accounts);
+  }
+
+  test__simulateUnlock() {
+    let strategy = this.strategy as TestWeb3Strategy;
+    strategy.test__simulateUnlock();
+  }
+
+  test__simulateDeposit() {
+    let strategy = this.strategy as TestWeb3Strategy;
+    strategy.test__simulateDeposit();
   }
 }
 

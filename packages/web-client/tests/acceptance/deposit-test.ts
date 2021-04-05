@@ -1,5 +1,12 @@
 import { module, test } from 'qunit';
-import { click, currentURL, visit, waitFor } from '@ember/test-helpers';
+import {
+  click,
+  currentURL,
+  fillIn,
+  settled,
+  visit,
+  waitFor,
+} from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 
 module('Acceptance | deposit', function (hooks) {
@@ -62,58 +69,76 @@ module('Acceptance | deposit', function (hooks) {
 
     await waitFor('[data-test-milestone-completed]');
     assert
-      .dom('[data-test-milestone-completed]')
+      .dom('[data-test-milestone-completed][data-test-milestone="0"]')
       .containsText('Mainnet Wallet connected');
 
-    // message = '[data-test-milestone="1"][data-test-thread-message="0"]';
-    // assert.dom(`${message} [data-test-author]`).containsText('cardbot');
-    // assert
-    //   .dom(message)
-    //   .containsText(
-    //     "Please choose the asset you would like to deposit into the CARD Protocol's Reserve Pool"
-    //   );
-    // // TODO: assert ETH balance showing
-    // // TODO: assert DAI balance showing
-    // await click(`${message} [data-test-layer-1-source-trigger]`);
-    // await click(`${message} [data-test-dai-option]`);
-    // await click(`${message} [data-test-layer-2-target-trigger]`);
-    // await click(`${message} [data-test-new-depot-option]`);
-    // await click(`${message} [data-test-continue-button]`);
+    message = '[data-test-milestone="1"][data-test-thread-message="0"]';
+    assert.dom(`${message} [data-test-author]`).containsText('cardbot');
+    assert
+      .dom(message)
+      .containsText(
+        'Please choose the asset you would like to deposit into the CARD Protocol’s Reserve Pool'
+      );
+    message = '[data-test-milestone="1"][data-test-thread-message="1"]';
+    // TODO: assert ETH balance showing
+    // TODO: assert DAI balance showing
+    await click(`${message} [data-test-layer-1-source-trigger]`);
+    await click(`${message} [data-test-dai-option]`);
+    await click(`${message} [data-test-layer-2-target-trigger]`);
+    await click(`${message} [data-test-new-depot-option]`);
+    await click(`${message} [data-test-continue-button]`);
 
-    // message = '[data-test-milestone="1"][data-test-thread-message="1"]';
-    // assert.dom(`${message} [data-test-author]`).containsText('cardbot');
-    // assert
-    //   .dom(message)
-    //   .containsText('How many tokens would you like to deposit?');
+    message = '[data-test-milestone="1"][data-test-thread-message="2"]';
+    assert.dom(`${message} [data-test-author]`).containsText('cardbot');
+    assert
+      .dom(message)
+      .containsText('How many tokens would you like to deposit?');
 
-    // assert.dom(`${message} [data-test-button-unlock]`).isDisabled();
-    // assert.dom(`${message} [data-test-button-deposit]`).isDisabled();
-    // await fillIn('[data-test-deposit-amount-input]', '2500');
-    // assert.dom(`${message} [data-test-button-unlock]`).isEnabled();
-    // await click(`${message} [data-test-button-unlock]`);
+    message = '[data-test-milestone="1"][data-test-thread-message="3"]';
+    assert.dom(`${message} [data-test-unlock-button]`).isDisabled();
+    assert.dom(`${message} [data-test-deposit-button]`).isDisabled();
+    await fillIn('[data-test-deposit-amount-input]', '2500');
+    assert
+      .dom(`${message} [data-test-unlock-button]`)
+      .isEnabled('Unlock button is enabled once amount has been entered');
+    await click(`${message} [data-test-unlock-button]`);
 
     // // MetaMask pops up and user approves the transaction. There is a spinner
-    // // on the "Unlock" button until the Ethereum transaction is mined. When the mining is complete,
-    // // the "Deposit" button becomes clickable.
+    // // on the "Unlock" button until the Ethereum transaction is mined.
+    // // When the mining is complete, the "Deposit" button becomes clickable.
 
-    // // layer1Service.test__simulateTBD_what_IS_this_txn()?
+    // TODO assert spinner on Unlock button
 
-    // assert.dom(`${message} [data-test-button-deposit]`).isEnabled();
-    // await click(`${message} [data-test-button-deposit]`);
+    layer1Service.test__simulateUnlock();
+    await settled();
 
-    // // layer1Service.test__simulateTBD_what_IS_this_txn()?
-    // // // simulate confirming via mobile wallet
-    // // assert MILESTONE REACHED "Deposited into Reserve Pool"
-    // assert
-    //   .dom('[data-test-milestone-completed]')
-    //   .containsText('Deposited into Reserve Pool');
+    // TODO assert no spinner on Unlock button
 
-    // message = '[data-test-milestone="2"][data-test-thread-message="0"]';
+    assert
+      .dom(`${message} [data-test-unlock-button]`)
+      .isDisabled('Unlock is disabled once unlocked');
+    assert
+      .dom(`${message} [data-test-deposit-button]`)
+      .isEnabled('Deposit is enabled once unlocked');
+    await click(`${message} [data-test-deposit-button]`);
 
-    // assert.dom(`${message} [data-test-author]`).containsText('cardbot');
-    // assert
-    //   .dom(message)
-    //   .containsText('your token will be bridged to the xDai blockchain');
+    // TODO assert spinner on Deposit button
+
+    layer1Service.test__simulateDeposit();
+    await settled();
+
+    assert
+      .dom('[data-test-milestone-completed][data-test-milestone="1"]')
+      .containsText('Deposited into Reserve Pool');
+
+    message = '[data-test-milestone="2"][data-test-thread-message="0"]';
+
+    assert.dom(`${message} [data-test-author]`).containsText('cardbot');
+    assert
+      .dom(message)
+      .containsText('your token will be bridged to the xDai blockchain');
+
+    message = '[data-test-milestone="2"][data-test-thread-message="1"]';
     // assert.dom(`${message} [data-test-step-1="complete"]`);
     // assert.dom(`${message} [data-test-step-2="in-progress"]`);
 

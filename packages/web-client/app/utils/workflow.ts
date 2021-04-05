@@ -65,5 +65,7 @@ export class Milestone {
 export abstract class Workflow {
   name!: string;
   milestones: Milestone[] = [];
-  activeMilestoneIndex = 0;
+  get activeMilestoneIndex() {
+    return this.milestones.filterBy('isComplete').length;
+  }
 }

@@ -41,22 +41,40 @@ class DepositWorkflow extends Workflow {
     new Milestone({
       name: 'Deposit into Reserve Pool',
       postables: [
+        new WorkflowMessage({
+          author: cardbot,
+          message:
+            "Let's get down to business. Please choose the asset you would like to deposit into the CARD Protocol's Reserve Pool.",
+        }),
         new WorkflowCard({
           author: cardbot,
-          componentName: 'placeholder',
+          componentName: 'card-pay/deposit-workflow/transaction-setup',
+        }),
+        new WorkflowMessage({
+          author: cardbot,
+          message: 'How many tokens would you like to deposit?',
+        }),
+        new WorkflowCard({
+          author: cardbot,
+          componentName: 'card-pay/deposit-workflow/transaction-amount',
         }),
       ],
-      completedDetail: 'bar',
+      completedDetail: 'Deposited into Reserve Pool',
     }),
     new Milestone({
       name: 'Receive tokens on xDai',
       postables: [
+        new WorkflowMessage({
+          author: cardbot,
+          message:
+            "Congrats! Now that you have deposited funds into the CARD Protocol's Reserve Pool, your token will be bridged to the xDai blockchain. You can check the status below.",
+        }),
         new WorkflowCard({
           author: cardbot,
-          componentName: 'placeholder',
+          componentName: 'card-pay/deposit-workflow/transaction-status',
         }),
       ],
-      completedDetail: 'baz',
+      completedDetail: 'Tokens received on xDai',
     }),
   ];
 }
