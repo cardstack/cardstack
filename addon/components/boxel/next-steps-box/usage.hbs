@@ -1,0 +1,65 @@
+<Freestyle::Usage @name="NextStepsBox">
+  <:example>
+    <Boxel::NextStepsBox @items={{this.items}}>
+      <:item as |item|>
+        {{!-- Sample item content --}}
+          <Boxel::Button @kind="primary">
+            {{item}}
+          </Boxel::Button>
+        {{!-- Sample item content end --}}
+      </:item>
+      <:footer>
+        {{!-- Sample footer content --}}
+          <Boxel::Button @kind="secondary-dark">
+            Return to dashboard
+          </Boxel::Button>
+        {{!-- Sample footer content end --}}
+      </:footer>
+    </Boxel::NextStepsBox>
+  </:example>
+
+  <:api as |Args|>
+    <Args.Array
+      @name="items"
+      @description="Array of list items of any type"
+      @items={{this.items}}
+      @onChange={{fn (mut this.items)}}
+    />
+    <Args.Yield
+      @name="item"
+      @description="Yields a list item block. The provided argument is a single item from the @items array."
+    />
+    <Args.Yield
+      @name="footer"
+      @description="Yields footer block"
+    />
+    <Args.Yield
+      @name="default"
+      @description="Optional yield for any other content. Generally for use when the item named block is not used."
+    />
+  </:api>
+</Freestyle::Usage>
+
+<Freestyle::Usage @slug="no-footer-block">
+  <:example>
+    <Boxel::NextStepsBox @items={{array "Visit Space"}}>
+      <:item as |item|>
+        {{!-- Sample item content --}}
+          <Boxel::Button @kind="primary">
+            {{item}}
+          </Boxel::Button>
+        {{!-- Sample item content end --}}
+      </:item>
+    </Boxel::NextStepsBox>
+  </:example>
+</Freestyle::Usage>
+
+<Freestyle::Usage @slug="default-block">
+  <:example>
+    <Boxel::NextStepsBox @items={{this.items}}>
+      <:default>
+        Any content here.
+      </:default>
+    </Boxel::NextStepsBox>
+  </:example>
+</Freestyle::Usage>

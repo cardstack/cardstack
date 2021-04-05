@@ -1,0 +1,61 @@
+.boxel-next-steps-box {
+  background-color: var(--boxel-purple-700);
+  color: var(--boxel-light);
+  min-width: min-content;
+}
+
+.boxel-next-steps-box__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--boxel-sp-sm) var(--boxel-sp-lg);
+  min-width: max-content;
+}
+
+.boxel-next-steps-box__header-title {
+  color: inherit;
+  font: 700 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+}
+
+.boxel-next-steps-box__header-notice {
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-content: end;
+  gap: var(--boxel-sp-xs);
+  text-align: right;
+  margin-left: var(--boxel-sp-sm);
+
+  font: var(--boxel-font-xs);
+  color: var(--boxel-purple-300);
+  letter-spacing: var(--boxel-lsp-lg);
+  --icon-color: var(--boxel-purple-300);
+}
+
+.boxel-next-steps-box__content {
+  --cluster-horizontal-space: var(--boxel-sp-lg);
+  --cluster-vertical-space: var(--boxel-sp);
+
+  padding: var(--boxel-sp-xxs) var(--boxel-sp-lg) var(--boxel-sp-xl);
+  /* ↓ Suppress horizontal scrolling caused by
+  the negative margin in some circumstances */
+  overflow: hidden;
+}
+
+.boxel-next-steps-box__list {
+  display: flex;
+  flex-wrap: wrap;
+  /* ↓ multiply by -1 to negate the halved value */
+  margin: calc(var(--cluster-vertical-space) / 2 * -1) calc(var(--cluster-horizontal-space) / 2 * -1);
+}
+
+.boxel-next-steps-box__list-item {
+  /* ↓ half the value, because of the 'doubling up' */
+  margin: calc(var(--cluster-vertical-space) / 2) calc(var(--cluster-horizontal-space) / 2);
+}
+
+.boxel-next-steps-box__footer {
+  margin-top: var(--boxel-sp-xl);
+}
