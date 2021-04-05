@@ -1,26 +1,58 @@
-  <h3>{{this.workflow.name}}</h3>
-  {{#each this.workflow.milestones as |milestone i|}}
-    {{#let (or milestone.complete (lte i this.workflow.activeMilestoneIndex)) as |displayMilestone|}}
-      {{#if displayMilestone}}
-        {{#each milestone.postables as |postable j|}}
-          <div class="thread-message" data-test-thread-message={{j}} data-test-milestone={{i}}>
-            <div data-test-author-name>
-              {{postable.author.name}}
+<Boxel::Thread class="deposit-workflow">
+  <:header>
+    <Boxel::ThreadHeader
+      @title={{this.workflow.name}}
+    />
+  </:header>
+  <:content>
+    {{#each this.workflow.milestones as |milestone i|}}
+      {{#let (or milestone.complete (lte i this.workflow.completedMilestoneCount)) as |displayMilestone|}}
+        {{#if displayMilestone}}
+          {{#each milestone.postables as |postable j|}}
+            <div class="thread-message" data-test-thread-message={{j}} data-test-milestone={{i}}>
+              <div data-test-author>
+                {{postable.author.name}}
+              </div>
+              {{#if postable.message}}
+                {{format-workflow-message postable.message}}
+              {{else}}
+                {{component postable.componentName onComplete=(optional postable.onComplete)}}
+              {{/if}}
             </div>
-            {{#if postable.message}}
-              {{format-workflow-message postable.message}}
-            {{else}}
-              {{component postable.componentName onComplete=(optional postable.onComplete)}}
-            {{/if}}
-          </div>
-        {{/each}}
-        {{#if milestone.isComplete}}
-          <p data-test-milestone-completed data-test-milestone={{i}}>Milestone completed: {{milestone.completedDetail}}</p>
+          {{/each}}
+          {{#if milestone.isComplete}}
+            <p data-test-milestone-completed data-test-milestone={{i}}>Milestone completed: {{milestone.completedDetail}}</p>
+          {{/if}}
         {{/if}}
-      {{/if}}
 
-      {{#if (and milestone.messageOnCompletion this.workflow.displayCompletionMessage)}}
-        <p>{{milestone.messageOnCompletion}}</p>
-      {{/if}}
-    {{/let}}
-  {{/each}}
+        {{#if (and milestone.messageOnCompletion this.workflow.displayCompletionMessage)}}
+          <p>{{milestone.messageOnCompletion}}</p>
+        {{/if}}
+      {{/let}}
+    {{/each}}
+  </:content>
+  <:sidebar as |SidebarSection|>
+    <SidebarSection>
+      <Boxel::Sidebar::CardContainer
+        @header={{html-safe (concat "Workflow:<br>" this.workflow.name)}}
+        @attachNext={{true}}
+      >
+        <div>
+          <Boxel::ProgressCircle
+            @percentComplete={{percent-complete total=this.workflow.milestones.length completed=this.workflow.completedMilestoneCount}}
+          />
+        </div>
+        <div class="deposit-workflow__status">
+          {{this.workflow.progressStatus}}
+        </div>
+      </Boxel::Sidebar::CardContainer>
+
+      <Boxel::Sidebar::CardContainer @header="Milestones">
+        <Boxel::Milestones
+          @milestones={{this.workflow.milestones}}
+          @completedCount={{this.workflow.completedMilestoneCount}}
+        />
+      </Boxel::Sidebar::CardContainer>
+    </SidebarSection>
+  </:sidebar>
+</Boxel::Thread>

@@ -11,7 +11,7 @@ class DepositWorkflow extends Workflow {
   name = 'Reserve Pool Deposit';
   milestones = [
     new Milestone({
-      name: 'Connect Mainnet Wallet',
+      title: 'Connect Mainnet Wallet',
       postables: [
         new WorkflowMessage({
           author: cardbot,
@@ -39,7 +39,7 @@ class DepositWorkflow extends Workflow {
       completedDetail: 'Mainnet Wallet connected',
     }),
     new Milestone({
-      name: 'Deposit into Reserve Pool',
+      title: 'Deposit into Reserve Pool',
       postables: [
         new WorkflowMessage({
           author: cardbot,
@@ -62,7 +62,7 @@ class DepositWorkflow extends Workflow {
       completedDetail: 'Deposited into Reserve Pool',
     }),
     new Milestone({
-      name: 'Receive tokens on xDai',
+      title: 'Receive tokens on xDai',
       postables: [
         new WorkflowMessage({
           author: cardbot,

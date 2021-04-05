@@ -1,0 +1,10 @@
+.deposit-workflow {
+  color: var(--boxel-dark);
+}
+
+.deposit-workflow__status {
+  color: var(--boxel-dark);
+  font: 600 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+  text-align: center;
+}

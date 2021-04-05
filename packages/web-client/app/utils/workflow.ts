@@ -43,12 +43,12 @@ export class WorkflowCard extends WorkflowPostable {
 }
 
 interface MilestoneOptions {
-  name: string;
+  title: string;
   postables: WorkflowPostable[];
   completedDetail: string;
 }
 export class Milestone {
-  name: string;
+  title: string;
   postables: WorkflowPostable[] = [];
   get isComplete() {
     return this.postables.isEvery('isComplete', true);
@@ -56,7 +56,7 @@ export class Milestone {
   completedDetail;
 
   constructor(opts: MilestoneOptions) {
-    this.name = opts.name;
+    this.title = opts.title;
     this.postables = opts.postables;
     this.completedDetail = opts.completedDetail;
   }
@@ -65,7 +65,12 @@ export class Milestone {
 export abstract class Workflow {
   name!: string;
   milestones: Milestone[] = [];
-  get activeMilestoneIndex() {
+  get completedMilestoneCount() {
     return this.milestones.filterBy('isComplete').length;
+  }
+  get progressStatus() {
+    let completedMilestones = this.milestones.filterBy('isComplete');
+    let lastMilestone = completedMilestones[completedMilestones.length - 1];
+    return lastMilestone?.completedDetail ?? 'Workflow Started';
   }
 }
