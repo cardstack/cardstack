@@ -1,25 +1,23 @@
 <Boxel::Dashboard @darkTheme={{true}} class="card-pay" data-test-card-pay>
   <:header>
-    <div class="card-pay__header-container">
-      <CardPay::Header
-        @title="Card Pay"
-        @logoURL={{@logo}}
-        @layer1Connect={{set this 'isShowingLayer1ConnectModal' true}}
-        @layer2Connect={{set this 'isShowingLayer2ConnectModal' true}}
-        @isLayer1Connected={{this.layer1Network.isConnected}}
-        @isLayer2Connected={{this.layer2Network.isConnected}}
-        @layer1Address={{this.layer1Network.walletInfo.accounts.0.address}}
-        @layer2Address={{this.layer2Network.walletInfo.accounts.0.address}}
-      />
-      <CardPay::HeaderNav
-        @tabs={{array
-          (hash title="Card Balances" route="card-pay.balances")
-          (hash title="Merchant Services" route="card-pay.merchant-services")
-          (hash title="Reward Programs" route="card-pay.reward-programs")
-          (hash title="Token Suppliers" route="card-pay.token-suppliers")
-        }}
-      />
-    </div>
+    <CardPay::Header
+      @title="Card Pay"
+      @logoURL={{@logo}}
+      @layer1Connect={{set this 'isShowingLayer1ConnectModal' true}}
+      @layer2Connect={{set this 'isShowingLayer2ConnectModal' true}}
+      @isLayer1Connected={{this.layer1Network.isConnected}}
+      @isLayer2Connected={{this.layer2Network.isConnected}}
+      @layer1Address={{this.layer1Network.walletInfo.accounts.0.address}}
+      @layer2Address={{this.layer2Network.walletInfo.accounts.0.address}}
+    />
+    <CardPay::HeaderNav
+      @tabs={{array
+        (hash title="Card Balances" route="card-pay.balances")
+        (hash title="Merchant Services" route="card-pay.merchant-services")
+        (hash title="Reward Programs" route="card-pay.reward-programs")
+        (hash title="Token Suppliers" route="card-pay.token-suppliers")
+      }}
+    />
   </:header>
 
   <:body>

@@ -1,8 +1,12 @@
 .card-pay-header-nav {
   background-color: var(--boxel-dark);
+  color: var(--boxel-light);
 }
 
 .card-pay-header-nav__list {
+  list-style-type: none;
+  margin: 0;
+  padding-left: 0;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
   justify-items: center;

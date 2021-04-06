@@ -15,15 +15,7 @@
         </div>
       </div>
       <Boxel::Button
-        class="card-pay-header__item-button"
         @kind="primary"
-        @disabled={{true}}
-        data-test-card-pay-layer-1-connect-button
-      >
-        Connect Wallet
-      </Boxel::Button>
-      <Boxel::Button
-        @kind={{if @isLayer1Connected "secondary-dark" "primary"}}
         class={{cn
           "card-pay-header__item-button"
           card-pay-header__item-button--address=@isLayer1Connected
@@ -38,7 +30,6 @@
           Connect Wallet
         {{/if}}
       </Boxel::Button>
-
     </li>
     <li class="card-pay-header__item">
       <div>
