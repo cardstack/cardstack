@@ -9,16 +9,16 @@
     <h2 class="cardstack-section-header__title" data-test-cardstack-dashboard-header>
       Cardstack
     </h2>
-    {{!-- {{#unless this.cardstackSession.isAuthenticated}} --}}
+    {{#unless this.layer2Network.isConnected}}
     <Boxel::Button
       @kind="secondary-dark"
       @size="tall"
-      {{!-- {{on "click" this.cardstackSession.login}} --}}
+      {{on "click" (fn this.connectToWallet)}}
       data-test-cardstack-login-button
     >
       Connect Account
     </Boxel::Button>
-    {{!-- {{/unless}} --}}
+    {{/unless}}
     </div>
    <div class="cardstack-landing-hero">
      <div class="cardstack-landing-hero__content-container">
