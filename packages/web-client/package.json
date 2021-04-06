@@ -116,6 +116,7 @@
     "extends": "../../package.json"
   },
   "dependencies": {
+    "macro-decorators": "^0.1.2",
     "typescript": "^4.2.3"
   }
 }
