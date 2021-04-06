@@ -19,7 +19,7 @@
   min-height: 1.25rem; /* 20px */
 }
 
-.boxel-thread-message__sender-name {
+.boxel-thread-message__author-name {
   font: 600 var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
 }
