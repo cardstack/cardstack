@@ -1,7 +1,6 @@
 {
   "name": "@cardstack/web-client",
   "version": "0.0.1",
-  "private": true,
   "description": "The cardstack web front-end app",
   "repository": "",
   "license": "MIT",
