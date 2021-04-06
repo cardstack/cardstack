@@ -3,12 +3,10 @@ import { inject as service } from '@ember/service';
 import { Registry as Services } from '@ember/service';
 import { action } from '@ember/object';
 
-import EdgesService from '../services/edges';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
 class IndexController extends Controller {
   @service router!: Services['router'];
-  @service declare edges: EdgesService;
   @service declare layer2Network: Layer2Network;
 
   @action transitionTo(routeName: string) {
@@ -17,10 +15,6 @@ class IndexController extends Controller {
 
   @action connectToWallet() {
     console.log('Connect to wallet here');
-  }
-
-  @action updateEdges() {
-    this.edges.updateDisplayLeftEdge(true);
   }
 }
 

@@ -1,17 +1,3 @@
 {{page-title "@cardstack/web-client"}}
-<ToolbarManager
-  @topLeftCornerBelongsTo="left"
-  @bottomLeftCornerBelongsTo="left"
-  class="full-screen-toolbar-manager"
->
-  {{outlet}}
-</ToolbarManager>
 
-{{#unless this.edges.disableEdges}}
-  {{#if (or this.edges.displayLeftEdge)}}
-    {{in-left-toolbar show=(
-      component "boxel/left-edge-nav"
-      home=(hash icon="cardstack-logo" action=(fn this.transitionTo "index") width="33px" height="35px")
-    )}}
-  {{/if}}
-{{/unless}}
+{{outlet}}
