@@ -1,7 +1,9 @@
 import { helper } from '@ember/component/helper';
 import { htmlSafe } from '@ember/template';
 
-function formatValue(value) {
+type StringOrFuncReturningString = string | (() => string);
+
+function formatValue(value: StringOrFuncReturningString) {
   if (typeof value === 'function') {
     value = value();
   }
@@ -9,8 +11,10 @@ function formatValue(value) {
   return value;
 }
 
-export function cssVar(values) {
-  let vars = [];
+export function cssVar(
+  values: Record<string, StringOrFuncReturningString>
+): string {
+  let vars: string[] = [];
   Object.keys(values).forEach((name) => {
     vars.push(`--${name}: ${formatValue(values[name])}`);
   });
@@ -18,6 +22,6 @@ export function cssVar(values) {
   return vars.join('; ');
 }
 
-export default helper(function (params, hash) {
+export default helper(function (_params, hash) {
   return htmlSafe(cssVar(hash));
 });
