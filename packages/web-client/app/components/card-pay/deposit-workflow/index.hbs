@@ -4,7 +4,7 @@
       {{#if displayMilestone}}
         {{#each milestone.postables as |postable j|}}
           <div class="thread-message" data-test-thread-message={{j}} data-test-milestone={{i}}>
-            <div data-test-author>
+            <div data-test-author-name>
               {{postable.author.name}}
             </div>
             {{#if postable.message}}
