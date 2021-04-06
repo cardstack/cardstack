@@ -1,13 +1,31 @@
 import Helper from '@ember/component/helper';
 
 class MenuDivider {
+  type: string;
   constructor() {
     this.type = 'divider';
   }
 }
 
+interface MenuItemOptions {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  action: Function;
+  url: string;
+  dangerous: boolean;
+  header: boolean;
+  icon: string;
+}
 class MenuItem {
-  constructor(text, type, options) {
+  text: string;
+  type: string;
+  dangerous: boolean;
+  header: boolean;
+  icon: string | undefined;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  action: Function | undefined;
+  url: string | undefined;
+
+  constructor(text: string, type: string, options: MenuItemOptions) {
     this.text = text;
     this.type = type;
     if (type === 'action') {
@@ -21,7 +39,7 @@ class MenuItem {
   }
 }
 
-export default Helper.helper(function (params, hash) {
+export default Helper.helper(function (params, hash: MenuItemOptions) {
   let text = params[0];
   let opts = Object.assign({}, hash);
   if (params.length === 1 && /^-+$/.test(text)) {
