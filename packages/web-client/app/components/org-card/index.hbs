@@ -16,6 +16,6 @@
         {{/each}}
       </ul>
     {{/if}}
-  <Boxel::Button class="org-card__cta" @as="link-to" @kind="primary" @disabled={{not @org.launched}} @route={{@route}}>{{@org.cta}}</Boxel::Button>
+  <Boxel::Button class="org-card__cta" @as="link-to" @kind="primary" @disabled={{not @org.launched}} @route={{@route}} data-test-cardstack-org-link={{@org.id}}>{{@org.cta}}</Boxel::Button>
   </div>
 </div>
