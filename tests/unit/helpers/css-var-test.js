@@ -1,4 +1,4 @@
-import { cssVar } from 'dummy/helpers/css-var';
+import { cssVar } from '@cardstack/boxel/helpers/css-var';
 import { module, test } from 'qunit';
 import { setupTest } from 'ember-qunit';
 
