@@ -1,19 +1,17 @@
 import Route from '@ember/routing/route';
 
-// dummy assets for now
-const CardstackLogo = '';
-const CardSpaceLogo = '';
-const CardPayLogo = '';
-const CardMembershipLogo = '';
-const CardCatalogLogo = '';
-const CardSpaceImage = '';
-const CardPayImage = '';
-const CardCatalogImage = '';
-const CardMembershipImage = '';
+import CardstackLogo from '../images/icons/cardstack-logo-white-text.svg';
+import CardSpaceLogo from '../images/icons/card-space-logo.svg';
+import CardPayLogo from '../images/icons/card-pay-logo.svg';
+import CardMembershipLogo from '../images/icons/card-membership-logo.svg';
+import CardCatalogLogo from '../images/icons/card-catalog-logo.svg';
 
-// import 'dummy/css/templates/cardstack.css';
-// import 'dummy/css/templates/card-space/index.css';
-// import 'dummy/css/templates/card-space/new.css';
+import CardSpaceImage from '../images/illustrations/card-space-illustration.svg';
+import CardPayImage from '../images/illustrations/card-pay-illustration.svg';
+import CardCatalogImage from '../images/illustrations/card-catalog-illustration.svg';
+import CardMembershipImage from '../images/illustrations/card-membership-illustration.svg';
+
+import '../css/cardstack-landing-page.css';
 
 const ORGS = [
   {
