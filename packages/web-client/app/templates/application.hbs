@@ -1,3 +1,17 @@
 {{page-title "@cardstack/web-client"}}
+<ToolbarManager
+  @topLeftCornerBelongsTo="left"
+  @bottomLeftCornerBelongsTo="left"
+>
+  {{outlet}}
+</ToolbarManager>
 
-{{outlet}}
+{{#unless this.edges.disableEdges}}
+  {{#if (or this.edges.displayLeftEdge)}}
+    <InLeftToolbar show={{component 
+      "boxel/left-edge-nav"
+      home=(hash icon="cardstack-logo" action=(fn this.transitionTo "index") width="33px" height="35px")
+    }}
+    />
+  {{/if}}
+{{/unless}}
