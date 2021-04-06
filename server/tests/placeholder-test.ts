@@ -33,8 +33,8 @@ QUnit.module("Card Data", function (hooks) {
       files: {
         post: {
           "card.json": JSON.stringify({
-            schema: "./schema.js",
-            isolated: "./isolated.js",
+            schema: "schema.js",
+            isolated: "isolated.js",
           }),
           "schema.js": `
       import { contains } from "@cardstack/types";

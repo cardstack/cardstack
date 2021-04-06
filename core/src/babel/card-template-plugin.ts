@@ -86,6 +86,7 @@ function callExpressionEnter(path: NodePath<CallExpression>, state: State) {
     inputTemplate,
     path,
     state.opts.fields,
+    state.opts.componentInfo,
     state.neededImports
   );
   path.node.arguments[0] = stringLiteral(template);
@@ -149,6 +150,7 @@ function transformTemplate(
   source: string,
   path: NodePath<CallExpression>,
   fields: CompiledCard['fields'],
+  componentInfo: ComponentInfo,
   importNames: State['neededImports']
 ): { template: string; neededScope: Set<string> } {
   let neededScope = new Set<string>();
@@ -172,7 +174,9 @@ function transformTemplate(
     syntax.preprocess(source, {
       mode: 'codemod',
       plugins: {
-        ast: [cardGlimmerPlugin({ fields, importAndChooseName })],
+        ast: [
+          cardGlimmerPlugin({ fields, componentInfo, importAndChooseName }),
+        ],
       },
     })
   );

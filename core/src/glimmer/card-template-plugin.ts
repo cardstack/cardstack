@@ -4,12 +4,13 @@ import {
   ASTPluginEnvironment,
   preprocess as parse,
 } from '@glimmer/syntax';
-import { CompiledCard } from '../interfaces';
+import { CompiledCard, ComponentInfo } from '../interfaces';
 
 const PREFIX = '@model.';
 
 export interface Options {
   fields: CompiledCard['fields'];
+  componentInfo: ComponentInfo;
   importAndChooseName: (
     desiredName: string,
     moduleSpecifier: string,
@@ -19,7 +20,7 @@ export interface Options {
 
 export default function cardTransform(options: Options): ASTPluginBuilder {
   return function transform(/* env: ASTPluginEnvironment */): ASTPlugin {
-    let { fields, importAndChooseName } = options;
+    let { fields, importAndChooseName, componentInfo } = options;
     return {
       name: 'card-glimmer-plugin',
       visitor: {
@@ -31,7 +32,9 @@ export default function cardTransform(options: Options): ASTPluginBuilder {
               return;
             }
 
-            let { inlineHBS } = field.card.templateModules.embedded;
+            componentInfo.usedFields.push(fieldName);
+
+            let { inlineHBS } = field.card.embedded;
             if (inlineHBS) {
               let ast = parse(inlineHBS, {
                 plugins: {
@@ -42,7 +45,7 @@ export default function cardTransform(options: Options): ASTPluginBuilder {
             } else {
               let componentName = importAndChooseName(
                 capitalize(field.localName),
-                field.card.templateModules.embedded.moduleName,
+                field.card.embedded.moduleName,
                 'default'
               );
               let template = `<${componentName} @model={{${node.tag}}} />`;

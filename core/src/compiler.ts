@@ -12,7 +12,6 @@ import cardTemplatePlugin, {
   Options as CardTemplateOptions,
 } from './babel/card-template-plugin';
 import { CompiledCard, ComponentInfo, Format, RawCard } from './interfaces';
-
 import intersection from 'lodash/intersection';
 
 export class Compiler {
@@ -38,8 +37,9 @@ export class Compiler {
     let modelModuleName = this.prepareSchema(cardSource, options);
     let meta = getMeta(options);
 
-    if (meta.parent) {
-      parentCard = await this.lookup(meta.parent.cardURL);
+    if (cardSource.adoptsFrom) {
+      let url = new URL(cardSource.adoptsFrom, cardSource.url).href;
+      parentCard = await this.lookup(url);
     } else {
       // the base card from which all other cards derive
       parentCard = compiledBaseCard;
@@ -183,6 +183,7 @@ export class Compiler {
   ): ComponentInfo {
     let componentInfo: ComponentInfo = {
       moduleName,
+      usedFields: [],
     };
     let options: CardTemplateOptions = { fields, componentInfo };
     let out = transformSync(templateSource, {
@@ -195,16 +196,18 @@ export class Compiler {
 
 // it's easier to hand-compile and hard-code the base card rather than make the
 // card compiler always support the case of an undefined parentCard. This is the
-// only card with no parentCard.
-const compiledBaseCard = {
+// only card with no parentCard
+const compiledBaseCard: CompiledCard = {
   url: 'https://cardstack.com/base/base',
   fields: {},
   data: undefined,
   modelModule: 'todo',
   isolated: {
     moduleName: 'todo',
+    usedFields: [],
   },
   embedded: {
     moduleName: 'todo',
+    usedFields: [],
   },
 };

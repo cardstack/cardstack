@@ -32,6 +32,7 @@ export function assertValidRawCard(obj: any): asserts obj is RawCard {
           `card.json in ${obj.url} has an invalid value for "${fileFeature}"`
         );
       }
+      // TODO: This should resolve paths, so that isolated.js and ./isolated.js are the same
       if (!obj.files?.[obj[fileFeature]]) {
         throw new Error(
           `card.json in ${obj.url} refers to non-existent module ${obj[fileFeature]}`
