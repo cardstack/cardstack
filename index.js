@@ -62,8 +62,11 @@ module.exports = {
 
   treeForApp() {
     let tree = this._super.treeForApp.apply(this, arguments);
-
-    return mergeTrees([this.automaticReexports(), tree], {
+    let trees = [this.automaticReexports()];
+    if (tree) {
+      trees.push(tree);
+    }
+    return mergeTrees(trees, {
       overwrite: true,
     });
   },
