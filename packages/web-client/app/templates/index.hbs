@@ -38,12 +38,10 @@
       <ul class="cardstack-landing-page-org-grid">
         {{#each @model.orgs as |org|}}
         <li>
-          {{#let (link org.route) as |l|}}
-            <OrgCard
-              @org={{org}}
-              @onClickCta={{if org.route l.transitionTo (noop)}}
-            />
-          {{/let}}
+          <OrgCard
+            @org={{org}}
+            @route={{org.route}}
+          />
         </li>
         {{/each}}
       </ul>
