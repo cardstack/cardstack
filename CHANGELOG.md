@@ -1,3 +1,26 @@
+## v0.3.2 (2021-04-06)
+
+#### :rocket: Enhancement
+* [#333](https://github.com/cardstack/boxel/pull/333) Add data-test-selector for thread message author name ([@lukemelia](https://github.com/lukemelia))
+* [#325](https://github.com/cardstack/boxel/pull/325) Enhancement/linkto support ([@Aierie](https://github.com/Aierie))
+
+#### :bug: Bug Fix
+* [#334](https://github.com/cardstack/boxel/pull/334) Convert helpers to typescript ([@lukemelia](https://github.com/lukemelia))
+* [#332](https://github.com/cardstack/boxel/pull/332) All helpers used by Boxel components need to be part of addon ([@lukemelia](https://github.com/lukemelia))
+* [#329](https://github.com/cardstack/boxel/pull/329) fix some typescript declaration error messages ([@Aierie](https://github.com/Aierie))
+
+#### :house: Internal
+* [#331](https://github.com/cardstack/boxel/pull/331) Disable two CI scenarios to reduce build minute usage ([@lukemelia](https://github.com/lukemelia))
+* [#330](https://github.com/cardstack/boxel/pull/330) update ember-class-names-helper ([@Aierie](https://github.com/Aierie))
+* [#328](https://github.com/cardstack/boxel/pull/328) run comment job on default pull request events ([@Aierie](https://github.com/Aierie))
+* [#327](https://github.com/cardstack/boxel/pull/327) Avoid typescript error on fetch import ([@lukemelia](https://github.com/lukemelia))
+* [#326](https://github.com/cardstack/boxel/pull/326) lock classnames version to 2.2.6 to prevent tests breaking from 2.3.0 ([@Aierie](https://github.com/Aierie))
+
+#### Committers: 3
+- Burcu Noyan ([@burieberry](https://github.com/burieberry))
+- Luke Melia ([@lukemelia](https://github.com/lukemelia))
+- [@Aierie](https://github.com/Aierie)
+
 ## v0.3.1 (2021-03-30)
 
 ## v0.3.0 (2021-03-22)
