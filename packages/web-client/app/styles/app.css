@@ -63,3 +63,8 @@ input:focus {
 input:focus:not(:focus-visible) {
   outline-color: transparent;
 }
+
+/* for ember-toolbars */
+.full-screen-toolbar-manager {
+  height: 100%;
+}
