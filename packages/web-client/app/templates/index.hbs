@@ -4,33 +4,36 @@
 >
   <:body>
   <div class="cardstack-landing-page-container">
-    <div class="cardstack-landing-page-section-header">
-    <h1 class="cardstack-landing-page-section-header__title" data-test-cardstack-dashboard-header>
-      Cardstack
-    </h1>
-    {{!-- {{#unless this.layer2Network.isConnected}}
-    <Boxel::Button
-      @kind="secondary-dark"
-      @size="tall"
-      {{on "click" (fn this.connectToWallet)}}
-      data-test-cardstack-login-button
-    >
-      Connect Account
-    </Boxel::Button>
-    {{/unless}} --}}
-    </div>
-   <div class="cardstack-landing-page-hero">
-     <div class="cardstack-landing-page-hero__content-container">
-       <img src={{@model.logo}} alt="" role="presentation" class="cardstack-landing-page-hero__logo">
-       <span class="cardstack-landing-page-hero__description">The world’s first cooperative SaaS platform. </span>
-       <span class="cardstack-landing-page-hero__description">Own the platform. Choose the tools. Work your way.</span>
-       <a href="#" class="cardstack-landing-page-hero__cta">
-         Learn more {{svg-jar "caret-thin-right" class="cardstack-landing-page-hero__cta-icon"}}
-       </a>
-     </div>
-   </div>
+    <header class="cardstack-landing-page-section">
       <div class="cardstack-landing-page-section-header">
-        <h1 class="cardstack-landing-page-section-header__title">Join an Org</h1>
+        <h1 class="cardstack-landing-page-section-header__title" data-test-cardstack-dashboard-header>
+          Cardstack
+        </h1>
+        {{!-- {{#unless this.layer2Network.isConnected}}
+        <Boxel::Button
+          @kind="secondary-dark"
+          @size="tall"
+          {{on "click" (fn this.connectToWallet)}}
+          data-test-cardstack-login-button
+        >
+          Connect Account
+        </Boxel::Button>
+        {{/unless}} --}}
+      </div>
+       <div class="cardstack-landing-page-hero">
+       <div class="cardstack-landing-page-hero__content-container">
+         <img src={{@model.logo}} alt="" role="presentation" class="cardstack-landing-page-hero__logo">
+         <span class="cardstack-landing-page-hero__description">The world’s first cooperative SaaS platform. </span>
+         <span class="cardstack-landing-page-hero__description">Own the platform. Choose the tools. Work your way.</span>
+         <a href="#" class="cardstack-landing-page-hero__cta">
+           Learn more {{svg-jar "caret-thin-right" class="cardstack-landing-page-hero__cta-icon"}}
+         </a>
+       </div>
+     </div>
+   </header>
+   <section class="cardstack-landing-page-section">
+     <div class="cardstack-landing-page-section-header">
+        <h1 class="cardstack-landing-page-section-header">Join an Org</h1>
       </div>
       <ul class="cardstack-landing-page-org-grid">
         {{#each @model.orgs as |org|}}
@@ -44,6 +47,7 @@
         </li>
         {{/each}}
       </ul>
+    </section>
     </div>
   </:body>
 </Boxel::Dashboard>

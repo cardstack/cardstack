@@ -11,14 +11,12 @@
   padding: 0 var(--boxel-sp-sm) var(--boxel-sp-lg) var(--boxel-sp-sm);
 }
 
-.cardstack-landing-page-container > * {
-  margin-top: var(--boxel-sp-lg);
-}
-
 .cardstack-landing-page-section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: var(--boxel-sp-lg);
+  margin-bottom: var(--boxel-sp-lg);
   /* quick hack to prevent layout shift when connect account button is pressed */
   max-height: 1.875rem;
   overflow: visible;
