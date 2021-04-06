@@ -3331,10 +3331,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@cardstack/boxel@^0.3.1":
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/@cardstack/boxel/-/boxel-0.3.1.tgz#138572c0767d5a3fe996962c4660a500e5ce7883"
-  integrity sha512-bnqwbsV2A+rDOyeaGZS2oAiwL5F5SVTKmbb+yop7bxSZeNE8xRfZQy8YO0xlHcMsVcN1SCsA6ojUVibfwU53Ow==
+"@cardstack/boxel@^0.3.3":
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/@cardstack/boxel/-/boxel-0.3.3.tgz#22fcd7603df8635dce1a39b802cd05f7d98daaf7"
+  integrity sha512-ZckfuMBd2gCJwcH6H85XbhxWGqb0iF12R0g4P/jLDpTI0qWeQ5ow888ZjyvwWlq/aaPxOzJFmTVja/XSybIr5g==
   dependencies:
     broccoli-concat "^4.2.4"
     broccoli-funnel "^3.0.3"
@@ -3343,11 +3343,12 @@
     broccoli-stew "^3.0.0"
     ember-animated "^0.10.1"
     ember-auto-import "^1.10.1"
-    ember-class-names-helper "^0.1.0"
+    ember-class-names-helper "^0.2.1"
     ember-cli-babel "~7.24.0"
     ember-cli-htmlbars "^5.3.1"
     ember-cli-is-component "^0.5.0"
     ember-cli-string-helpers "^5.0.0"
+    ember-cli-typescript "^4.1.0"
     ember-composable-helpers "^4.4.1"
     ember-concurrency-decorators "^2.0.3"
     ember-css-url "^0.2.1"
@@ -8354,7 +8355,7 @@ broccoli-funnel@^3.0.1, broccoli-funnel@^3.0.3:
     path-posix "^1.0.0"
     walk-sync "^2.0.2"
 
-"broccoli-funnel@github:ef4/broccoli-funnel#c70d060076e14793e8495571f304a976afc754ac":
+broccoli-funnel@ef4/broccoli-funnel#c70d060076e14793e8495571f304a976afc754ac:
   version "2.0.2-ef4.0"
   resolved "https://codeload.github.com/ef4/broccoli-funnel/tar.gz/c70d060076e14793e8495571f304a976afc754ac"
   dependencies:
@@ -11179,15 +11180,15 @@ ember-basic-dropdown@^3.0.16:
     ember-style-modifier "^0.6.0"
     ember-truth-helpers "^2.1.0 || ^3.0.0"
 
-ember-class-names-helper@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/ember-class-names-helper/-/ember-class-names-helper-0.1.0.tgz#38e5adb57e84833c0f135bc5938ee4c56cca1850"
-  integrity sha512-8Rb5wv6Sepd5c4Cm42YR0w2DibwwAtzowukO0gAhu4GLVcwWwVJltjtAlkmOVbSSRUuE8PUnhEWHHNgMEAMDgw==
+ember-class-names-helper@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/ember-class-names-helper/-/ember-class-names-helper-0.2.1.tgz#b71257fefafb1206360841ba7fc8c8ba600cb98e"
+  integrity sha512-So/b/9UZxdm8GFetng0k2Li92s+RRLwa6+R5UnZa9pSgamU2lTbmxtqijsejd2AgBkTKgT22WW4mjvEo/LgAcw==
   dependencies:
     classnames "^2.2.6"
     ember-auto-import "^1.5.3"
-    ember-cli-babel "^7.19.0"
-    ember-cli-htmlbars "^4.3.1"
+    ember-cli-babel "^7.20.5"
+    ember-cli-htmlbars "^5.1.2"
 
 ember-classy-page-object@^0.6.1:
   version "0.6.1"
@@ -12402,7 +12403,7 @@ ember-power-calendar-moment@^0.1.7:
     ember-cli-babel "^7.7.3"
     ember-cli-moment-shim "^3.7.1"
 
-ember-power-select-typeahead@alexspeller/ember-power-select-typeahead#6d279fb:
+"ember-power-select-typeahead@github:alexspeller/ember-power-select-typeahead#6d279fb":
   version "0.8.0"
   resolved "https://codeload.github.com/alexspeller/ember-power-select-typeahead/tar.gz/6d279fb9e6a640282a2dc887fe06f1d09a062148"
   dependencies:
