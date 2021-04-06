@@ -18,30 +18,6 @@ import '../css/cardstack-landing-page.css';
 const ORGS = [
   {
     sideImage: {
-      url: CardSpaceImage,
-      alt: '',
-    },
-    icon: {
-      url: CardSpaceLogo,
-      alt: 'Logo for Card Space',
-    },
-    id: 'card-space',
-    name: 'Card Space',
-    subtitle: 'For creators & businesses',
-    description: 'Set up a private or public space for your',
-    descriptionList: [
-      'blog',
-      'videos',
-      'online store',
-      'personal profile',
-      'etc.',
-    ],
-    cta: 'Open',
-    launched: true,
-    route: 'index',
-  },
-  {
-    sideImage: {
       url: CardPayImage,
       alt: '',
     },
@@ -63,6 +39,30 @@ const ORGS = [
     cta: 'Open',
     launched: true,
     route: 'card-pay',
+  },
+  {
+    sideImage: {
+      url: CardSpaceImage,
+      alt: '',
+    },
+    icon: {
+      url: CardSpaceLogo,
+      alt: 'Logo for Card Space',
+    },
+    id: 'card-space',
+    name: 'Card Space',
+    subtitle: 'For creators & businesses',
+    description: 'Set up a private or public space for your',
+    descriptionList: [
+      'blog',
+      'videos',
+      'online store',
+      'personal profile',
+      'etc.',
+    ],
+    cta: 'Launching soon',
+    launched: false,
+    route: 'index',
   },
   {
     sideImage: {
