@@ -146,17 +146,17 @@ jobs:
 
     strategy:
       fail-fast: true
-      matrix:
+      matrix: # Some scenarios disabled to save Github Actions minutes
         ember-try-scenario: [
+          # ember-default-with-jquery,
           ember-release,
-          ember-default-with-jquery,
         ]
         allow-failure: [false]
         include:
           - ember-try-scenario: ember-beta
             allow-failure: true
-          - ember-try-scenario: ember-canary
-            allow-failure: true
+        #   - ember-try-scenario: ember-canary
+        #     allow-failure: true
 
     steps:
     - uses: actions/checkout@v2
