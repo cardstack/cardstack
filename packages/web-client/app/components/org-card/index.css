@@ -56,13 +56,3 @@
   margin-top: auto;
   align-self: flex-end;
 }
-
-/* 
-  Temporary overwrite for boxel button's link-to, which is not applying  
-  the specified @disabledClass
-*/
-.org-card__cta.boxel-button.disabled {
-  --boxel-button-color: var(--boxel-purple-300);
-  --boxel-button-border: 1px solid var(--boxel-purple-300);
-  --boxel-button-text-color: var(--boxel-purple-400);
-}
