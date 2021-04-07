@@ -21,9 +21,6 @@ module('Integration | Component | LayoutContainer', function (hooks) {
       .doesNotHaveClass('boxel-layout-container--boundaries');
     assert
       .dom('[data-test-boxel-layout-container]')
-      .doesNotHaveClass('boxel-card-container--with-header');
-    assert
-      .dom('[data-test-boxel-layout-container]')
       .doesNotHaveClass('boxel-card-container--selected');
   });
 
