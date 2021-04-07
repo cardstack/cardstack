@@ -19,6 +19,7 @@
 
 .boxel-thread-header__title {
   margin-top: 4px;
+  margin-bottom: 0;
   font: 700 var(--boxel-font-lg);
   letter-spacing: var(--boxel-lsp-xxs);
 }

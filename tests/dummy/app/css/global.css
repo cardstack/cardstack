@@ -1,36 +1,5 @@
-h1 {
-  font: var(--boxel-font-xl);
-}
-
-h2 {
-  font: var(--boxel-font-lg);
-}
-
-h3 {
-  font: var(--boxel-font);
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-weight: 700;
-}
-
-
 .boxel {
   position: relative;
-}
-
-.toc {
-  margin: 2em;
-}
-
-.toc__list {
-  padding-left: 2em;
-  list-style-type: circle;
 }
 
 
@@ -48,4 +17,17 @@ h6 {
 /* for ember-toolbars */
 .ember-toolbars {
   height: 100%;
+}
+
+
+.media-registry h1,
+.media-registry h2,
+.media-registry h3,
+.media-registry h4 {
+  margin: 0;
+}
+
+.media-registry ul {
+  list-style-type: none;
+  margin: 0;
 }

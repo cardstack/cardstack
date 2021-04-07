@@ -132,7 +132,7 @@
     "ember-fetch": "^8.0.4",
     "ember-freestyle": "^0.12.7",
     "ember-maybe-import-regenerator": "^0.1.6",
-    "ember-page-title": "^6.0.3",
+    "ember-page-title": "^6.2.1",
     "ember-power-select": "^4.1.2",
     "ember-resolver": "^8.0.2",
     "ember-router-scroll": "^4.0.1",

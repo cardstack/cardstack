@@ -23,10 +23,10 @@
       <Boxel::ThreadMessage
         @name={{post.sender.title}}
         @imgURL={{post.sender.imgURL}}
-        @content={{post.content}}
         @datetime={{post.datetime}}
-        @isRound={{unless post.participantType "bot"}}
+        @notRound={{eq post.participantType "bot"}}
       >
+        {{post.content}}
       </Boxel::ThreadMessage>
     {{/each}}
 

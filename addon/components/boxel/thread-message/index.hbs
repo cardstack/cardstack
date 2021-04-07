@@ -1,31 +1,34 @@
 <div class="boxel-thread-message" ...attributes>
-  <Boxel::Participant
-    class="boxel-thread-message__participant"
-    @iconOnly={{true}}
-    @iconSize={{this.iconSize}}
-    @hasLogo={{this.hasLogo}}
-    @image={{@imgURL}}
-  />
-
-  <div>
-    <div class="boxel-thread-message__info">
-      {{#if @name}}
-        <h4 class="boxel-thread-message__author-name" data-test-author-name>
-          {{@name}}
-        </h4>
-      {{/if}}
-      <time class="boxel-thread-message__time">{{moment-format (or @datetime (now)) "MMM D, h:mm A"}}</time>
-    </div>
-    <div class="boxel-thread-message__content">
-      {{#if (is-array @content)}}
-        {{#each @content as |message|}}
-          <p>{{message}}</p>
-        {{/each}}
+  <span class="boxel-thread-message__avatar">
+    {{#unless @hideMeta}}
+      {{#if @imgURL}}
+        <img
+          src={{@imgURL}}
+          role="presentation"
+          aria-hidden="true"
+          alt=""
+          width="40px"
+          height="40px"
+          class={{cn "boxel-thread-message__avatar-img" boxel-thread-message__avatar-img--not-round=@notRound}}
+        />
       {{else}}
-        {{@content}}
+        {{svg-jar "profile" width="40px" height="40px" aria-hidden="true"}}
       {{/if}}
-
+    {{/unless}}
+  </span>
+  <span>
+    <h3 class={{cn "boxel-thread-message__info" boxel-sr-only=@hideMeta}}>
+      {{#if @name}}
+        <span class="boxel-thread-message__name" data-test-author-name>
+          {{@name}}
+        </span>
+      {{/if}}
+      <time datetime={{or @datetime (now)}} class="boxel-thread-message__time">
+        {{moment-format (or @datetime (now)) "MMM D, h:mm A"}}
+      </time>
+    </h3>
+    <p class="boxel-thread-message__content">
       {{yield}}
-    </div>
-  </div>
+    </p>
+  </span>
 </div>

@@ -20,6 +20,7 @@
   align-items: center;
   gap: 0 3px;
   min-height: 3.125rem; /* 50px */
+  margin: 0;
   font: var(--boxel-font-sm);
   font-weight: 700;
   letter-spacing: var(--boxel-lsp-xxl);

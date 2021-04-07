@@ -20,46 +20,43 @@ body {
 
 a {
   display: inline-block;
-  color: currentColor;
+  color: inherit;
   text-decoration: none;
+}
+
+button {
+  display: inline-block;
+  font: inherit;
+}
+
+img,
+svg {
+  display: inline-block;
 }
 
 a:hover {
   color: var(--boxel-link-highlight);
   cursor: pointer;
 }
-
-button {
-  display: inline-block;
-  color: currentColor;
-  font: inherit;
+a:focus {
+  outline: var(--boxel-outline);
+}
+a:focus:not(:focus-visible) {
+  outline-color: transparent;
 }
 
+/* TODO: convert any `role="button"` boxel component to use `button` */
 button:hover,
 [role="button"]:hover {
   cursor: pointer;
 }
-/* TODO: convert any `role="button"` boxel component to use `button` */
-
-a:focus,
 button:focus,
 [role="button"]:focus {
   outline: var(--boxel-outline);
 }
-
-a:focus:not(:focus-visible),
 button:focus:not(:focus-visible),
 [role="button"]:focus:not(:focus-visible) {
-  outline: none;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  margin: 0;
+  outline-color: transparent;
 }
 
 input:focus,
@@ -67,12 +64,18 @@ select:focus {
   outline-color: var(--boxel-highlight);
 }
 
-svg {
-  display: inline-block;
-}
 
-ul {
-  list-style-type: none;
-  margin: 0;
-  padding-left: 0;
+/* Hides content visually only
+  (accessible via screen readers) */
+.boxel-sr-only:not(:focus):not(:active) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  border: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
 }

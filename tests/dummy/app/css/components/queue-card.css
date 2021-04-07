@@ -39,6 +39,7 @@
 
 .queue-card__label,
 .queue-card__datetime {
+  margin: 0;
   color: var(--queue-card-secondary-color);
   font-weight: 600;
   transition: color var(--boxel-transition);
@@ -72,6 +73,7 @@
 }
 
 .queue-card__project-title {
+  margin: 0;
   font: var(--boxel-font-sm);
   font-weight: 700;
   letter-spacing: var(--boxel-lsp);

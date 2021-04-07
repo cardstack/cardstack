@@ -14,11 +14,3 @@
   letter-spacing: var(--boxel-lsp);
   text-align: center;
 }
-
-.card-pay-workflow-thread__message {
-  margin: 0;
-}
-
-.card-pay-workflow-thread__message + .card-pay-workflow-thread__message {
-  margin-top: var(--boxel-sp-lg);
-}

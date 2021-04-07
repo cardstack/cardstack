@@ -16,6 +16,8 @@
 }
 
 .boxel-sort-menu > ul {
-  padding-left: var(--boxel-sp);
+  list-style-type: none;
+  margin: 0;
+  padding: 0 0 0 var(--boxel-sp);
   overflow: auto;
 }

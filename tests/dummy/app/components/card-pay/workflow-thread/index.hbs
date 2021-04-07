@@ -13,15 +13,15 @@
       {{#let (or milestone.complete (lte i this.progress)) as |displayMilestone|}}
         <AnimatedContainer>
           {{#animated-if (and displayMilestone milestone.message) use=this.transition}}
-            <Boxel::ThreadMessage
-              @content={{if (is-array milestone.message) null milestone.message}}
-              @datetime={{milestone.datetime}}
-              @imgURL={{@workflowBot.imgURL}}
-            >
+            <div>
               <AnimatedContainer onInitialRender={{not milestone.complete}}>
-                {{#animated-each milestone.message initialInsertion=(not milestone.complete) use=this.transition as |content|}}
-                  {{#if content.component}}
-                    <div class="card-pay-workflow-thread__message">
+                {{#animated-each milestone.message initialInsertion=(not milestone.complete) use=this.transition as |content i|}}
+                  <Boxel::ThreadMessage
+                    @imgURL={{@workflowBot.imgURL}}
+                    @datetime={{milestone.datetime}}
+                    @hideMeta={{gt i 0}}
+                  >
+                    {{#if content.component}}
                       {{!-- Sample component --}}
                       <Boxel::ActionContainer
                         @header={{milestone.title}}
@@ -31,13 +31,13 @@
                         @isComplete={{milestone.complete}}
                         @onClickButton={{fn this.toggleComplete milestone}}
                       />
-                    </div>
-                  {{else}}
-                    <p class="card-pay-workflow-thread__message">{{content}}</p>
-                  {{/if}}
+                    {{else}}
+                      {{content}}
+                    {{/if}}
+                  </Boxel::ThreadMessage>
                 {{/animated-each}}
               </AnimatedContainer>
-            </Boxel::ThreadMessage>
+            </div>
           {{/animated-if}}
         </AnimatedContainer>
 
@@ -53,10 +53,11 @@
         <AnimatedContainer>
           {{#animated-if (and milestone.messageOnCompletion this.displayCompletionMessage) use=this.transition}}
             <Boxel::ThreadMessage
-              @content={{milestone.messageOnCompletion}}
-              @datetime={{milestone.datetimeOnCompletion}}
               @imgURL={{@workflowBot.imgURL}}
-            />
+              @datetime={{milestone.datetimeOnCompletion}}
+            >
+              {{milestone.messageOnCompletion}}
+            </Boxel::ThreadMessage>
           {{/animated-if}}
         </AnimatedContainer>
       {{/let}}

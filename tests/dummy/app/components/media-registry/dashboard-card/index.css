@@ -86,6 +86,7 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0 10px;
+  padding: 0;
 }
 
 .media-registry__nav li > a {

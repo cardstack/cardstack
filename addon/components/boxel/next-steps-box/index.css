@@ -45,6 +45,8 @@
 }
 
 .boxel-next-steps-box__list {
+  list-style-type: none;
+  padding: 0;
   display: flex;
   flex-wrap: wrap;
   /* ↓ multiply by -1 to negate the halved value */

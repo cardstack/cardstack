@@ -7133,7 +7133,7 @@ ember-native-dom-helpers@^0.7.0:
     broccoli-funnel "^1.1.0"
     ember-cli-babel "^6.6.0"
 
-ember-page-title@^6.0.3:
+ember-page-title@^6.2.1:
   version "6.2.1"
   resolved "https://registry.yarnpkg.com/ember-page-title/-/ember-page-title-6.2.1.tgz#aa2d539fab8eddb618289cdba91adf699debf7da"
   integrity sha512-cfBDuP14KBJCdz/AeBQJFGnJbUHd2gmenG+i0ilR2kYX0G0zHAsseFZFuTNVZDNiQ8BnMdrdjRnfjx9Vdi/dag==

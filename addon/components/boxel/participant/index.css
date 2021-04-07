@@ -26,11 +26,11 @@
 }
 
 .boxel-participant__title {
+  margin: 0;
   font: 600 var(--boxel-font-xs);
 }
 
 .boxel-participant__has-logo .boxel-participant__title {
-  margin: 0;
   font: 600 var(--boxel-font-sm);
 }
 

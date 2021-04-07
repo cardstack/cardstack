@@ -1,89 +1,31 @@
-<Freestyle::Usage
-  @name="ThreadMessage"
->
+<Freestyle::Usage @name="ThreadMessage">
   <:example>
     <Boxel::ThreadMessage
       @name={{this.name}}
       @imgURL={{this.imgURL}}
-      @content={{this.content}}
-      @iconSize={{this.iconSize}}
-      @isRound={{this.isRound}}
       @datetime={{this.datetime}}
-    />
+      @notRound={{this.notRound}}
+      @hideMeta={{this.hideMeta}}
+    >
+      Hi Haley, Here’s your manuscript with all the edits I would recommend. Please review and let me know if you have any questions. I also added a couple tasks for you about things you should think about, as you figure out the rest of your story.
+    </Boxel::ThreadMessage>
   </:example>
   <:api as |Args|>
-    <Args.String
-      @name="content"
-      @description="Message content. Can be a string or an array of strings"
+    <Args.Yield
+      @description="Message content"
       @required={{true}}
-      @value={{this.content}}
-      @onInput={{fn (mut this.content)}}
-    />
-    <Args.String
-      @name="imgURL"
-      @description="URL for the user image icon"
-      @defaultValue="Placeholder icon"
-      @value={{this.imgURL}}
-      @onInput={{fn (mut this.imgURL)}}
-    />
-    <Args.String
-      @name="datetime"
-      @description="Message timestamp"
-      @defaultValue="(now)"
-      @value="(now)"
     />
     <Args.String
       @name="name"
-      @description="Optional username display above the message"
+      @description="The name displayed above the message"
       @value={{this.name}}
       @onInput={{fn (mut this.name)}}
     />
     <Args.String
-      @name="iconSize"
-      @description="Optional icon size in any unit"
-      @value={{this.iconSize}}
-      @defaultValue="2.5rem"
-      @onInput={{fn (mut this.iconSize)}}
-    />
-    <Args.Bool
-      @name="isRound"
-      @value={{this.isRound}}
-      @description="Makes the icon circular"
-      @defaultValue={{false}}
-      @onInput={{fn (mut this.isRound)}}
-    />
-  </:api>
-</Freestyle::Usage>
-
-<Freestyle::Usage
-  @slug="ThreadMessage-array"
->
-  <:example>
-    <Boxel::ThreadMessage
-      @content={{this.messageArray}}
-      @imgURL={{this.botImg}}
-      @datetime={{this.datetime}}
-    >
-      <Boxel::CardContainer @displayBoundaries={{true}}>
-        <Boxel::Header @header="Card" />
-        <p>Sample yield.</p>
-      </Boxel::CardContainer>
-    </Boxel::ThreadMessage>
-  </:example>
-  <:api as |Args|>
-    <Args.Array
-      @name="content"
-      @type="String"
-      @description="Message content. Can be a string or an array of strings"
-      @items={{this.messageArray}}
-      @onChange={{fn (mut this.messageArray)}}
-    />
-    <Args.String
       @name="imgURL"
-      @description="URL for the image icon"
-      @defaultValue="Placeholder icon"
-      @value={{this.botImg}}
-      @onInput={{fn (mut this.botImg)}}
+      @description="URL for the user avatar"
+      @value={{this.imgURL}}
+      @onInput={{fn (mut this.imgURL)}}
     />
     <Args.String
       @name="datetime"
@@ -92,8 +34,37 @@
       @value={{this.datetime}}
       @onInput={{fn (mut this.datetime)}}
     />
-    <Args.Yield
-      @description="Optional yield"
+    <Args.Bool
+      @name="notRound"
+      @value={{this.notRound}}
+      @description="Avatar is not circle-shaped. This will only work if an `imgURL` arg is provided"
+      @defaultValue={{false}}
+      @onInput={{fn (mut this.notRound)}}
+    />
+    <Args.Bool
+      @name="hideMeta"
+      @value={{this.hideMeta}}
+      @description="Visually hides the user avatar, name, and message timestamp"
+      @defaultValue={{false}}
+      @onInput={{fn (mut this.hideMeta)}}
     />
   </:api>
+</Freestyle::Usage>
+
+<Freestyle::Usage
+  @slug="ThreadMessage-array"
+>
+  <:example>
+    <div role="list">
+      {{#each this.messageArray as |message i|}}
+        <Boxel::ThreadMessage
+          role="listitem"
+          @imgURL={{this.cardbotIcon}}
+          @hideMeta={{gt i 0}}
+        >
+          {{message}}
+        </Boxel::ThreadMessage>
+      {{/each}}
+    </div>
+  </:example>
 </Freestyle::Usage>

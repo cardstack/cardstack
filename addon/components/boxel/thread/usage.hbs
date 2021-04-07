@@ -8,9 +8,10 @@
       <:content>
         <Boxel::DateDivider @date={{moment-format (now)}} />
         <Boxel::ThreadMessage
-          @content="Hello, it's good to see you!"
           @imgURL={{this.cardBotIcon}}
-        />
+        >
+          Hello, it's nice to see you!
+        </Boxel::ThreadMessage>
       </:content>
     </Boxel::Thread>
   </:example>
@@ -26,9 +27,10 @@
       <:content>
         <Boxel::DateDivider @date={{moment-format (now)}} />
         <Boxel::ThreadMessage
-          @content={{this.milestones.0.message}}
           @imgURL={{this.milestones.0.senderIcon}}
-        />
+        >
+          {{this.milestones.0.message}}
+        </Boxel::ThreadMessage>
       </:content>
 
       <:sidebar as |SidebarSection|>
@@ -42,7 +44,7 @@
                 @percentComplete={{percent-complete total=this.milestones.length completed=0}}
               />
             </div>
-            <div class="boxel-thread-modal__milestone-progress-status">
+            <div>
               Workflow started
             </div>
           </Boxel::Sidebar::CardContainer>

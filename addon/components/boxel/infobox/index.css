@@ -28,6 +28,7 @@
 }
 
 .boxel-infobox__title {
+  margin: 0;
   flex-shrink: 0;
   font: 600 var(--boxel-font-lg);
   letter-spacing: var(--boxel-lsp-sm);

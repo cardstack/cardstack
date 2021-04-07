@@ -11,6 +11,9 @@
 .layout-form-view__fields {
   display: grid;
   gap: var(--boxel-spacing);
+  list-style-type: none;
+  margin-bottom: 0;
+  padding: 0;
 }
 
 .layout-form-view__preview-field {

@@ -4,7 +4,7 @@ import { action } from '@ember/object';
 
 export default class ModalUsage extends Component {
   @tracked open = false;
-  @tracked overlayClass = 'red';
+  @tracked overlayClass = '';
   @tracked offsetRight = '0px';
   @tracked offsetLeft = '0px';
   @tracked offsetTop = '30px';
