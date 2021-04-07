@@ -92,7 +92,6 @@
     "ember-set-helper": "^2.0.0",
     "ember-source": "~3.25.1",
     "ember-template-lint": "^2.18.1",
-    "ember-toolbars": "^0.6.0",
     "ember-welcome-page": "^4.0.0",
     "eslint": "^7.23.0",
     "eslint-config-prettier": "^8.1.0",
@@ -118,7 +117,6 @@
     "extends": "../../package.json"
   },
   "dependencies": {
-    "@ember/jquery": "^1.1.0",
     "macro-decorators": "^0.1.2",
     "typescript": "^4.2.3"
   }
