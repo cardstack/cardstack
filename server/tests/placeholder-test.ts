@@ -4,6 +4,7 @@ import { createServer } from "../src/server";
 import supertest from "supertest";
 import QUnit from "qunit";
 import { join } from "path";
+import { existsSync } from "fs";
 
 // TODO: share this in core
 export function templateOnlyComponentTemplate(template: string): string {
@@ -83,17 +84,15 @@ QUnit.module("Card Data", function (hooks) {
 
   QUnit.test("can load a simple isolated card's data", async function (assert) {
     let response = await getCard("https://my-realm/post0").expect(200);
-    assert.equal(response.body, {
-      data: {
-        attributes: {
-          title: "Hello World",
-          body: "First post.",
-        },
-        meta: {
-          isolatedComponentModule:
-            "@cardstack/compiled/my-realm/post0/isolated",
-        },
-      },
+    assert.deepEqual(response.body.data?.attributes, {
+      title: "Hello World",
+      body: "First post.",
     });
+    let componentModule = response.body.data?.meta.componentModule;
+    assert.ok(componentModule, "should have componentModule");
+    assert.ok(
+      require.resolve(componentModule),
+      "component module is resolvable"
+    );
   });
 });

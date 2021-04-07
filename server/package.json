@@ -11,6 +11,7 @@
   "license": "MIT",
   "description": "Stock API server for the Cardstack tech stack.",
   "dependencies": {
+    "@cardstack/compiled": "*",
     "@cardstack/core": "*",
     "@koa/router": "^10.0.0",
     "@types/jsonapi-serializer": "^3.6.3",

@@ -16,7 +16,11 @@ import intersection from 'lodash/intersection';
 
 export class Compiler {
   lookup: (cardURL: string) => Promise<CompiledCard>;
-  define: (fullModuleURL: string, source: string) => Promise<void>;
+
+  // returns the module identifier that can be used to get this module back.
+  // It's exactly meaning depends on the environment. In node it's a path you
+  // can actually `require`.
+  define: (fullModuleURL: string, source: string) => Promise<string>;
 
   constructor(params: {
     lookup: (url: string) => Promise<CompiledCard>;
@@ -34,7 +38,7 @@ export class Compiler {
     let options = {};
     let parentCard;
 
-    let modelModuleName = this.prepareSchema(cardSource, options);
+    let modelModuleName = await this.prepareSchema(cardSource, options);
     let meta = getMeta(options);
 
     if (cardSource.adoptsFrom) {
@@ -80,17 +84,18 @@ export class Compiler {
    * the provided cardUrl and module name. This will later be modified by
    * the builder to handle various contexts
    */
-  getFullModulePath(cardURL: string, moduleName: string): string {
-    return `${cardURL}/${moduleName}`;
+  private getFullModulePath(cardURL: string, moduleName: string): string {
+    let complete = new URL(moduleName, cardURL).href;
+    return `@cardstack/compiled/${encodeURIComponent(complete)}`;
   }
 
   // returns the module name of our own compiled schema, if we have one. Does
   // not recurse into parent, because we don't necessarily know our parent until
   // after we've tried to compile our own
-  private prepareSchema(
+  private async prepareSchema(
     cardSource: RawCard,
     options: Object
-  ): string | undefined {
+  ): Promise<string | undefined> {
     let localFile = cardSource.schema;
     if (!localFile) {
       return undefined;
@@ -110,9 +115,7 @@ export class Compiler {
     });
 
     let code = out!.code!;
-    let fullModulePath = this.getFullModulePath(cardSource.url, localFile);
-    this.define(fullModulePath, code);
-    return fullModulePath;
+    return await this.define(new URL(localFile, cardSource.url).href, code);
   }
 
   async lookupFieldsForCard(
@@ -165,11 +168,10 @@ export class Compiler {
           `${cardSource.url} referred to ${localFile} in its card.json but that file does not exist`
         );
       }
-      let moduleName = this.getFullModulePath(cardSource.url, localFile);
       return this.compileComponent(
         cardSource.files[localFile],
         fields,
-        moduleName
+        new URL(localFile, cardSource.url).href
       );
     } else {
       return parentCard[which];
@@ -179,18 +181,17 @@ export class Compiler {
   compileComponent(
     templateSource: string,
     fields: CompiledCard['fields'],
-    moduleName: string
+    moduleURL: string
   ): ComponentInfo {
-    let componentInfo: ComponentInfo = {
-      moduleName,
-      usedFields: [],
-    };
     let options: CardTemplateOptions = { fields, componentInfo };
     let out = transformSync(templateSource, {
       plugins: [[cardTemplatePlugin, options]],
     });
-    this.define(moduleName, out!.code!);
-    return componentInfo;
+    return {
+      moduleName: await this.define(moduleURL, out!.code!),
+      usedFields,
+      inlineHBS,
+    };
   }
 }
 

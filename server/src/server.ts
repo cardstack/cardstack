@@ -15,10 +15,12 @@ export async function createServer(realms: RealmConfig[]): Promise<Koa> {
     let url = decodeURIComponent(ctx.params.encodedCardURL);
     try {
       let card = await builder.getCompiledCard(url);
-      card[format];
       ctx.set("content-type", "application/json");
       let cardSerializer = new Serializer("card", {
         attributes: card[format].usedFields,
+        dataMeta: {
+          componentModule: card[format].moduleName,
+        },
       });
 
       ctx.body = cardSerializer.serialize(card.data);

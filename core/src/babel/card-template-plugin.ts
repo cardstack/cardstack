@@ -20,8 +20,9 @@ import { getObjectKey, error } from './utils';
 export interface Options {
   fields: CompiledCard['fields'];
 
-  // this is an output from the transform
-  componentInfo: ComponentInfo;
+  // these are for gathering output
+  usedFields: string[];
+  inlineHBS: string | undefined;
 }
 
 interface State {
