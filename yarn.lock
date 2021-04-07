@@ -3331,10 +3331,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@cardstack/boxel@^0.3.4":
-  version "0.3.4"
-  resolved "https://registry.yarnpkg.com/@cardstack/boxel/-/boxel-0.3.4.tgz#158b57e90235af9ade2c7539d3a93ab3227edf99"
-  integrity sha512-cpa6hFS0HWwqrLQER0WUUVkjJtS/b1r096nw6jrEB8N9kjTAFl+Vxi+iFNfVG7MKXNdFNfH84d9IvVNksE4/CQ==
+"@cardstack/boxel@^0.3.6":
+  version "0.3.6"
+  resolved "https://registry.yarnpkg.com/@cardstack/boxel/-/boxel-0.3.6.tgz#b5d8f6eb43a79aa33189293b4a637d9bc8652e70"
+  integrity sha512-X7XDjExN7p0oW8QHurhK9/Tc+j9rGGOJ4MAnc/nU5qGAqkuDtADOWj/DEpddtrx6x1IbJJZvDG36lthQ9NJQdA==
   dependencies:
     broccoli-concat "^4.2.4"
     broccoli-funnel "^3.0.3"
