@@ -21,9 +21,6 @@ module('Integration | Component | CardContainer', function (hooks) {
     assert
       .dom('[data-test-boxel-card-container]')
       .doesNotHaveClass('boxel-card-container--selected');
-    assert
-      .dom('[data-test-boxel-card-container]')
-      .doesNotHaveClass('boxel-card-container--with-header');
   });
 
   test('it can render with boundaries', async function (assert) {
@@ -39,29 +36,12 @@ module('Integration | Component | CardContainer', function (hooks) {
       .hasClass('boxel-card-container--boundaries');
   });
 
-  test('it can render with header', async function (assert) {
-    await render(hbs`
-      <Boxel::CardContainer @hasHeader={{true}}>
-        <Boxel::Header @header="Card Header" />
-        <div>Card</div>
-      </Boxel::CardContainer>
-    `);
-
-    assert
-      .dom('[data-test-boxel-card-container] [data-test-boxel-header]')
-      .exists();
-    assert
-      .dom('[data-test-boxel-card-container]')
-      .hasClass('boxel-card-container--with-header');
-  });
-
   test('it can be selected', async function (assert) {
     this.selected = false;
     this.toggleSelect = () => this.set('selected', !this.selected);
 
     await render(hbs`
       <Boxel::CardContainer
-        @hasHeader={{true}}
         @displayBoundaries={{true}}
         @isSelected={{this.selected}}
       >

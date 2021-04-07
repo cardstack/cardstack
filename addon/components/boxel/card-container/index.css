@@ -2,7 +2,6 @@
   --boxel-card-container-min-height: 5rem;
 
   position: relative;
-  display: grid;
   min-height: var(--boxel-card-container-min-height);
   width: 100%;
   height: 100%;
@@ -10,9 +9,9 @@
   border-radius: var(--boxel-border-radius);
   overflow: hidden;
   transition:
-    max-width var(--boxel-transition),
-    border-radius var(--boxel-transition),
-    box-shadow var(--boxel-transition);
+  max-width var(--boxel-transition),
+  border-radius var(--boxel-transition),
+  box-shadow var(--boxel-transition);
 }
 
 .boxel-card-container--boundaries {
@@ -21,8 +20,4 @@
 
 .boxel-card-container--selected {
   box-shadow: 0 0 0 2px var(--boxel-highlight);
-}
-
-.boxel-card-container--with-header {
-  grid-template-rows: auto 1fr;
 }
