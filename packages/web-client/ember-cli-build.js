@@ -32,6 +32,17 @@ module.exports = function (defaults) {
     extraPublicTrees: [appComponentsStylesTree],
     packagerOptions: {
       webpackConfig: {
+        module: {
+          rules: [
+            {
+              test: /\.(png|jpg|gif|svg|woff|woff2|eot|ttf|otf|flac)$/i,
+              loader: 'file-loader',
+              options: {
+                name: '[path][name]-[contenthash].[ext]',
+              },
+            },
+          ],
+        },
         node: {
           crypto: true,
           global: true,

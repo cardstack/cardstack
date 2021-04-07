@@ -26,6 +26,10 @@ module.exports = function (environment) {
       layer1: 'eth',
       layer2: 'xdai',
     },
+    urls: {
+      appStoreLink: undefined,
+      googlePlayStoreLink: undefined,
+    },
   };
 
   if (environment === 'development') {
