@@ -5,24 +5,23 @@
 
   width: 100%;
   max-width: calc(
-    var(--card-width) * 2 + var(--horizontal-card-gap) + var(--boxel-sp-sm) * 2
+    var(--card-width) * 2 + var(--horizontal-card-gap) + var(--boxel-sp-lg) * 2
   );
   margin: auto;
-  padding: 0 var(--boxel-sp-sm) var(--boxel-sp-lg) var(--boxel-sp-sm);
+  padding: var(--boxel-sp-lg);
 }
 
 .cardstack-landing-page-section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: var(--boxel-sp-lg);
-  margin-bottom: var(--boxel-sp-lg);
+  margin: 0;
   /* quick hack to prevent layout shift when connect account button is pressed */
   max-height: 1.875rem;
-  overflow: visible;
 }
 
 .cardstack-landing-page-section-header__title {
+  margin: 0;
   font: 600 var(--boxel-font-lg);
   letter-spacing: 0;
 }
@@ -57,6 +56,7 @@
 }
 
 .cardstack-landing-page-hero__description {
+  margin: 0;
   font-size: 1.25rem;
   font-family: var(--boxel-font-family);
   letter-spacing: var(--boxel-lsp-sm);
@@ -75,6 +75,8 @@
 }
 
 .cardstack-landing-page-org-grid {
+  list-style-type: none;
+  padding: 0;
   display: grid;
   justify-items: center;
   grid-template-columns: repeat(auto-fill, minmax(var(--card-width), 1fr));
@@ -82,14 +84,6 @@
   gap: var(--boxel-sp-xl) var(--horizontal-card-gap);
 }
 
-.cardstack-landing-page-org-grid > * {
-  justify-self: start;
-}
-
-.cardstack-landing-page-org-grid > *:nth-child(2n) {
-  justify-self: end;
-}
-
-.cardstack-landing-page-org-grid .org-card {
-  height: 100%;
+.cardstack-landing-page-container > * + * {
+  margin-top: var(--boxel-sp-lg);
 }
