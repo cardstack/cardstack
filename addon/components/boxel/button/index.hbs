@@ -27,8 +27,8 @@
     @route={{@route}}
     @models={{if @models @models (array)}}
     @query={{@query}}
-    @disabled={{@disabled}}
     @disabledClass="boxel-button--disabled-link"
+    @disabled={{@disabled}}
     data-test-boxel-button 
     tabindex={{if @disabled -1 0}}
     ...attributes
