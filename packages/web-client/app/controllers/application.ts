@@ -5,17 +5,13 @@ import { action } from '@ember/object';
 
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
-class IndexController extends Controller {
+class ApplicationController extends Controller {
   @service router!: Services['router'];
   @service declare layer2Network: Layer2Network;
 
   @action transitionTo(routeName: string) {
     this.router.transitionTo(routeName);
   }
-
-  @action connectToWallet() {
-    console.log('Connect to wallet here');
-  }
 }
 
-export default IndexController;
+export default ApplicationController;
