@@ -4,7 +4,6 @@ import { createServer } from "../src/server";
 import supertest from "supertest";
 import QUnit from "qunit";
 import { join } from "path";
-import { existsSync } from "fs";
 
 // TODO: share this in core
 export function templateOnlyComponentTemplate(template: string): string {

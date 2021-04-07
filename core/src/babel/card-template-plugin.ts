@@ -21,7 +21,7 @@ export interface Options {
   fields: CompiledCard['fields'];
 
   // these are for gathering output
-  usedFields: string[];
+  usedFields: ComponentInfo['usedFields'];
   inlineHBS: string | undefined;
 }
 
@@ -87,13 +87,13 @@ function callExpressionEnter(path: NodePath<CallExpression>, state: State) {
     inputTemplate,
     path,
     state.opts.fields,
-    state.opts.componentInfo,
+    state.opts.usedFields,
     state.neededImports
   );
   path.node.arguments[0] = stringLiteral(template);
 
   if (shouldInlineHBS(options, neededScope)) {
-    state.opts.componentInfo.inlineHBS = template;
+    state.opts.inlineHBS = template;
   }
 
   updateScope(options, neededScope);
@@ -151,7 +151,7 @@ function transformTemplate(
   source: string,
   path: NodePath<CallExpression>,
   fields: CompiledCard['fields'],
-  componentInfo: ComponentInfo,
+  usedFields: ComponentInfo['usedFields'],
   importNames: State['neededImports']
 ): { template: string; neededScope: Set<string> } {
   let neededScope = new Set<string>();
@@ -175,9 +175,7 @@ function transformTemplate(
     syntax.preprocess(source, {
       mode: 'codemod',
       plugins: {
-        ast: [
-          cardGlimmerPlugin({ fields, componentInfo, importAndChooseName }),
-        ],
+        ast: [cardGlimmerPlugin({ fields, usedFields, importAndChooseName })],
       },
     })
   );

@@ -11,6 +11,33 @@ import fs from "fs";
 import { join } from "path";
 import { NotFound } from "./error";
 
+class CardCache {
+  private getLocation(cardURL: string): string {
+    let filename = encodeURIComponent(cardURL);
+    let compiledCardsPath = join(__dirname, "..", "..", "compiled");
+    return join(compiledCardsPath, filename);
+  }
+
+  setModule(moduleURL: string, source: string) {
+    fs.writeFileSync(this.getLocation(moduleURL), source);
+  }
+
+  setCard(cardURL: string, source: CompiledCard) {
+    fs.writeFileSync(
+      this.getLocation(`${cardURL}/compiled.json`),
+      JSON.stringify(source)
+    );
+  }
+
+  getCard(cardURL: string): CompiledCard | undefined {
+    let loc = this.getLocation(`${cardURL}/compiled.json`);
+    if (fs.existsSync(loc)) {
+      return require(loc);
+    }
+    return;
+  }
+}
+
 export default class Builder implements BuilderInterface {
   private compiler = new Compiler({
     lookup: (url) => this.getCompiledCard(url),
@@ -19,19 +46,25 @@ export default class Builder implements BuilderInterface {
 
   // private cache: Map<string, CompiledCard>;
   private realms: RealmConfig[];
+  private cache: CardCache;
 
   constructor(params: { realms: RealmConfig[] }) {
     this.realms = params.realms;
+    this.cache = new CardCache();
   }
 
-  private async defineModule(moduleURL: string, source: string): Promise<void> {
-    console.log(moduleURL);
-
-    // source = dynamicCardTransform(moduleURL, source);
-    // eval(source);
+  private async defineModule(
+    moduleURL: string,
+    source: string
+  ): Promise<string> {
+    // TODO: This will not be runable by the app until the work done
+    // in cardhost/lib/dynamic-card-transform. But that is ember-specific
+    // so we have some thinking to do
+    this.cache.setModule(moduleURL, source);
+    return `@cardstack/compiled/${encodeURIComponent(moduleURL)}`;
   }
 
-  private locateURL(url: string): string {
+  private locateRealmDir(url: string): string {
     for (let realm of this.realms) {
       if (url.startsWith(realm.url)) {
         return join(realm.directory, url.replace(realm.url, ""));
@@ -41,7 +74,7 @@ export default class Builder implements BuilderInterface {
   }
 
   async getRawCard(url: string): Promise<RawCard> {
-    let dir = this.locateURL(url);
+    let dir = this.locateRealmDir(url);
     let files: any = {};
     for (let file of walkSync(dir, {
       directories: false,
@@ -59,18 +92,19 @@ export default class Builder implements BuilderInterface {
     assertValidRawCard(card);
     return card;
   }
-  async getCompiledCard(url: string): Promise<CompiledCard> {
-    // TODO: Check the compiled cards
-    // let compiledCard = this.cache.get(url);
 
-    // // Typescript didn't seem to trust this.cache.has(...) as a sufficient null guarentee
+  async getCompiledCard(url: string): Promise<CompiledCard> {
+    // TODO: We need a way to clear the cache for things like tests before
+    // this should be used without causing problems.
+    // let compiledCard = this.cache.getCard(url);
+
     // if (compiledCard) {
     //   return compiledCard;
     // }
 
     let rawCard = await this.getRawCard(url);
     let compiledCard = await this.compiler.compile(rawCard);
-    // this.cache.set(url, compiledCard);
+    this.cache.setCard(url, compiledCard);
 
     return compiledCard;
   }

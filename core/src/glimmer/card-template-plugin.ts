@@ -10,7 +10,7 @@ const PREFIX = '@model.';
 
 export interface Options {
   fields: CompiledCard['fields'];
-  componentInfo: ComponentInfo;
+  usedFields: ComponentInfo['usedFields'];
   importAndChooseName: (
     desiredName: string,
     moduleSpecifier: string,
@@ -20,7 +20,7 @@ export interface Options {
 
 export default function cardTransform(options: Options): ASTPluginBuilder {
   return function transform(/* env: ASTPluginEnvironment */): ASTPlugin {
-    let { fields, importAndChooseName, componentInfo } = options;
+    let { fields, importAndChooseName, usedFields } = options;
     return {
       name: 'card-glimmer-plugin',
       visitor: {
@@ -32,7 +32,7 @@ export default function cardTransform(options: Options): ASTPluginBuilder {
               return;
             }
 
-            componentInfo.usedFields.push(fieldName);
+            usedFields.push(fieldName);
 
             let { inlineHBS } = field.card.embedded;
             if (inlineHBS) {

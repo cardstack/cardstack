@@ -60,13 +60,13 @@ export class Compiler {
       modelModule: modelModuleName ?? parentCard.modelModule,
       fields,
       data: cardSource.data,
-      isolated: this.prepareComponent(
+      isolated: await this.prepareComponent(
         cardSource,
         fields,
         parentCard,
         'isolated'
       ),
-      embedded: this.prepareComponent(
+      embedded: await this.prepareComponent(
         cardSource,
         fields,
         parentCard,
@@ -77,16 +77,6 @@ export class Compiler {
       card['adoptsFrom'] = parentCard;
     }
     return card;
-  }
-
-  /**
-   * For the compiled module paths, we generate predictable urls based off
-   * the provided cardUrl and module name. This will later be modified by
-   * the builder to handle various contexts
-   */
-  private getFullModulePath(cardURL: string, moduleName: string): string {
-    let complete = new URL(moduleName, cardURL).href;
-    return `@cardstack/compiled/${encodeURIComponent(complete)}`;
   }
 
   // returns the module name of our own compiled schema, if we have one. Does
@@ -155,12 +145,12 @@ export class Compiler {
     return Object.assign(fields, parentCard.fields);
   }
 
-  prepareComponent(
+  private async prepareComponent(
     cardSource: RawCard,
     fields: CompiledCard['fields'],
     parentCard: CompiledCard,
     which: Format
-  ): ComponentInfo {
+  ): Promise<ComponentInfo> {
     let localFile = cardSource[which];
     if (localFile) {
       if (!cardSource.files[localFile]) {
@@ -168,7 +158,7 @@ export class Compiler {
           `${cardSource.url} referred to ${localFile} in its card.json but that file does not exist`
         );
       }
-      return this.compileComponent(
+      return await this.compileComponent(
         cardSource.files[localFile],
         fields,
         new URL(localFile, cardSource.url).href
@@ -178,12 +168,19 @@ export class Compiler {
     }
   }
 
-  compileComponent(
+  private async compileComponent(
     templateSource: string,
     fields: CompiledCard['fields'],
     moduleURL: string
-  ): ComponentInfo {
-    let options: CardTemplateOptions = { fields, componentInfo };
+  ): Promise<ComponentInfo> {
+    let inlineHBS;
+    let usedFields = [] as ComponentInfo['usedFields'];
+
+    let options: CardTemplateOptions = {
+      fields,
+      inlineHBS,
+      usedFields,
+    };
     let out = transformSync(templateSource, {
       plugins: [[cardTemplatePlugin, options]],
     });
