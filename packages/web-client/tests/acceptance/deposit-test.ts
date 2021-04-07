@@ -14,14 +14,6 @@ module('Acceptance | deposit', function (hooks) {
   setupApplicationTest(hooks);
   // TODO: Scenario where the user has already connected Layer 1 before starting this workflow
   test('Making a deposit', async function (assert) {
-    /*
-    TODO before merging:
-      1- Use [data-test-author] instead of h4
-      2- ThreadMessage boxel component needs updating to hide username and
-         timestamp when the timestamp is the same
-      3- Expose `css-var` helper in boxel repo and remove from here
-      4- Move css to colocated files
-    */
     await visit('/');
     assert.equal(currentURL(), '/');
     await click('[data-test-cardstack-org-link="card-pay"]');

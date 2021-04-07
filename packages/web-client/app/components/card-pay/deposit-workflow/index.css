@@ -8,3 +8,20 @@
   letter-spacing: var(--boxel-lsp);
   text-align: center;
 }
+
+.deposit-workflow__thread-message p {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: calc(23/15);
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.deposit-workflow__thread-message ul {
+  margin: 0;
+  padding: 0;
+  list-style-position: inside;
+}
+
+.deposit-workflow__thread-message li::marker {
+  content: '- ';
+}
