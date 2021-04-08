@@ -1,21 +1,23 @@
-import walkSync from "walk-sync";
+import walkSync from 'walk-sync';
 import {
   Builder as BuilderInterface,
   RawCard,
   CompiledCard,
   assertValidRawCard,
-} from "@cardstack/core/src/interfaces";
-import { RealmConfig } from "./interfaces";
-import { Compiler } from "@cardstack/core/src/compiler";
-import fs from "fs";
-import { join } from "path";
-import { NotFound } from "./error";
+} from '@cardstack/core/src/interfaces';
+import { RealmConfig } from './interfaces';
+import { Compiler } from '@cardstack/core/src/compiler';
+import fs from 'fs';
+import { join } from 'path';
+import { NotFound } from './error';
 
 class CardCache {
+  constructor(private dir: string) {}
+
   private getLocation(cardURL: string): string {
     let filename = encodeURIComponent(cardURL);
-    let compiledCardsPath = join(__dirname, "..", "..", "compiled");
-    return join(compiledCardsPath, filename);
+
+    return join(this.dir, filename);
   }
 
   setModule(moduleURL: string, source: string) {
@@ -48,9 +50,9 @@ export default class Builder implements BuilderInterface {
   private realms: RealmConfig[];
   private cache: CardCache;
 
-  constructor(params: { realms: RealmConfig[] }) {
+  constructor(params: { realms: RealmConfig[]; cardCacheDir: string }) {
     this.realms = params.realms;
-    this.cache = new CardCache();
+    this.cache = new CardCache(params.cardCacheDir);
   }
 
   private async defineModule(
@@ -67,7 +69,7 @@ export default class Builder implements BuilderInterface {
   private locateRealmDir(url: string): string {
     for (let realm of this.realms) {
       if (url.startsWith(realm.url)) {
-        return join(realm.directory, url.replace(realm.url, ""));
+        return join(realm.directory, url.replace(realm.url, ''));
       }
     }
     throw new NotFound(`${url} is not in a realm we know about`);
@@ -80,13 +82,13 @@ export default class Builder implements BuilderInterface {
       directories: false,
     })) {
       let fullPath = join(dir, file);
-      files[file] = fs.readFileSync(fullPath, "utf8");
+      files[file] = fs.readFileSync(fullPath, 'utf8');
     }
-    let cardJSON = files["card.json"];
+    let cardJSON = files['card.json'];
     if (!cardJSON) {
       throw new Error(`${url} is missing card.json`);
     }
-    delete files["card.json"];
+    delete files['card.json'];
     let card = JSON.parse(cardJSON);
     Object.assign(card, { files, url });
     assertValidRawCard(card);
