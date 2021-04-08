@@ -47,17 +47,6 @@ module.exports = function (defaults) {
           crypto: true,
           global: true,
         },
-        module: {
-          rules: [
-            {
-              test: /\.(png|jpg|gif|svg|woff|woff2|eot|ttf|otf|flac)$/i,
-              loader: 'file-loader',
-              options: {
-                name: '[path][name]-[contenthash].[ext]',
-              },
-            },
-          ],
-        },
       },
     },
   });
