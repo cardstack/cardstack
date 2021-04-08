@@ -6,6 +6,7 @@ import {
   settled,
   visit,
   waitFor,
+  waitUntil,
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 
@@ -26,9 +27,14 @@ module('Acceptance | deposit', function (hooks) {
     // Simulate the user scanning the QR code and connecting their mobile wallet
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    await waitFor('[data-test-layer2-account-id]');
-    assert.dom('[data-test-layer2-account-id]').hasText(layer2AccountAddress);
+    await waitUntil(
+      () => !document.querySelector('[data-test-layer-two-connect-modal]')
+    );
+    assert
+      .dom('[data-test-card-pay-layer-2-connect-button]')
+      .hasText(layer2AccountAddress);
     assert.dom('[data-test-wallet-connect-qr-code]').doesNotExist();
+    assert.dom('[data-test-layer-two-connect-modal]').doesNotExist();
     await click(
       '[data-test-card-pay-header-tab][href="/card-pay/token-suppliers"]'
     );

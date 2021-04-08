@@ -32,10 +32,6 @@ module.exports = function (defaults) {
     extraPublicTrees: [appComponentsStylesTree],
     packagerOptions: {
       webpackConfig: {
-        node: {
-          crypto: true,
-          global: true,
-        },
         module: {
           rules: [
             {
@@ -46,6 +42,10 @@ module.exports = function (defaults) {
               },
             },
           ],
+        },
+        node: {
+          crypto: true,
+          global: true,
         },
       },
     },

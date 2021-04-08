@@ -1,0 +1,7 @@
+.styled-qr-code {
+  display: inline-block;
+}
+
+.styled-qr-code > canvas {
+  border-radius: var(--boxel-border-radius);
+}

@@ -1,4 +1,80 @@
-.layer-2-connect-modal {
-  display: block;
-  background-color: var(--boxel-light);
+.layer-two-connect-modal__card {
+  max-height: 48rem;
+}
+
+.layer-two-connect-modal__wrapper {
+  display: grid;
+  height: 100%;
+}
+
+.layer-two-connect-modal__header {
+  font: var(--boxel-font-lg);
+  margin-top: var(--boxel-sp-xxxl);
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.layer-two-connect-modal__subheader {
+  font: var(--boxel-font);
+  color:  var(--boxel-purple-500);
+  margin-top: var(--boxel-sp-xs);
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.layer-two-connect-modal__app-store-links {
+  align-items: center;
+  border: 1px solid var(--boxel-light-300);
+  border-left-width: 0;
+  border-right-width: 0;
+  display: flex;
+  padding-left: var(--boxel-sp-xxl);
+  padding-right: var(--boxel-sp-xxl);
+}
+
+.layer-two-connect-modal__app-icon {
+  margin-right: var(--boxel-sp-sm);
+}
+
+.layer-two-connect-modal__org-details {
+  flex-grow: 1;
+}
+
+.layer-two-connect-modal__org-name {
+  font: var(--boxel-font);
+  font-weight: 500;
+}
+
+.layer-two-connect-modal__org-tag-line {
+  font: var(--boxel-font-sm);
+  color: var(--boxel-purple-500);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.layer-two-connect-modal__alternate-wallet {
+  align-items: center;
+  background-color: var(--boxel-light-400);
+  border: 0;
+  color: var(--boxel-purple-400);
+  display: flex;
+  justify-content: space-between;
+  padding-left: var(--boxel-sp-xxl);
+  padding-right: var(--boxel-sp-xxl);
+  text-align: left;
+
+  display: none; /* hide this until we add the destination UI */
+}
+
+.layer-two-connect-modal__alternate-wallet-caret {
+  height: 1.3rem;
+  width: auto;
+  --icon-color: var(--boxel-purple-400);
+}
+
+.layer-two-connect-modal__alternate-wallet:hover {
+  filter: brightness(102%);
+}
+
+.layer-two-connect-modal__qr-container {
+  text-align: center;
 }

@@ -1,16 +1,69 @@
-<Boxel::Modal @onClose={{@onClose}}>
-  <dialog class="layer-2-connect-modal">
+<Boxel::Modal
+  @onClose={{@onClose}}
+  style={{css-var boxel-modal-max-width="45rem"}}
+  class="layer-two-connect-modal"
+  data-test-layer-two-connect-modal
+>
+  <Boxel::CardContainer class="layer-two-connect-modal__card">
     {{#if this.layer2Network.isConnected}}
       Connected to wallet:
       {{#each this.layer2Network.walletInfo.accounts as |account|}}
         <div data-test-layer2-account-id>{{account.address}}</div>
       {{/each}}
     {{else if this.layer2Network.walletConnectUri}}
-      <div data-test-wallet-connect-qr-code>
-        <QrCode @text={{this.layer2Network.walletConnectUri}} @size={{300}} @darkColor="var(--boxel-dark)" />
+      <div class="layer-two-connect-modal__wrapper">
+        <div>
+          <h1 class="layer-two-connect-modal__header">
+            Please install the Cardstack app on<br>
+            your mobile phone.
+          </h1>
+          <h2 class="layer-two-connect-modal__subheader">
+            Scan this QR code to connect the app with your Card Pay dashboard.
+          </h2>
+        </div>
+        <div data-test-wallet-connect-qr-code class="layer-two-connect-modal__qr-container">
+          <StyledQrCode
+            @data={{this.layer2Network.walletConnectUri}}
+            @image={{this.cardstackLogo}}
+            @size={{340}}
+            @backgroundColor="#efefef"
+            @dotType="dots"
+            @dotColor="#272330"
+            @cornerDotType="dot"
+            @cornerSquareType="extra-rounded"
+            @imageMargin={{5}}
+          />
+        </div>
+        <div class="layer-two-connect-modal__app-store-links">
+          <img src={{this.cardstackMobileAppIcon}} width="40" height="40" alt="Cardstack Mobile App Icon" class="layer-two-connect-modal__app-icon" />
+          <div class="layer-two-connect-modal__org-details">
+            <div class="layer-two-connect-modal__org-name">
+              Cardstack
+            </div>
+            <div class="layer-two-connect-modal__org-tag-line">
+              The world’s first cooperative SaaS platform
+            </div>
+          </div>
+          {{#if this.appStoreUrl}}
+            <a href={{this.appStoreUrl}} class="layer-two-connect-modal__app-store-badge">
+              <img src={{this.appStoreBadge}} width="120" height="40" alt="Download on the App Store" />
+            </a>
+          {{/if}}
+          {{#if this.googlePlayUrl}}
+            <a href="#" class="layer-two-connect-modal__google-play-badge">
+              <img src={{this.googlePlayUrl}} width="144" height="56" alt="Get it on Google Play" />
+            </a>
+          {{/if}}
+        </div>
+        <button class="layer-two-connect-modal__alternate-wallet" type="button">
+          <span>
+            Use a different wallet with xDai Chain support
+          </span>
+          {{svg-jar "caret-thin-right" class="layer-two-connect-modal__alternate-wallet-caret"}}
+        </button>
       </div>
     {{else}}
       Loading Spinner here
     {{/if}}
-  </dialog>
+  </Boxel::CardContainer>
 </Boxel::Modal>
