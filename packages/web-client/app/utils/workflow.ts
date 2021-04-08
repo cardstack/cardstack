@@ -11,6 +11,7 @@ interface WorkflowMessageOptions {
 
 class WorkflowPostable {
   author: Participant;
+  timestamp: Date | null = null;
   @tracked isComplete: boolean = false;
   constructor(author: Participant) {
     this.author = author;
@@ -59,6 +60,25 @@ export class Milestone {
     this.title = opts.title;
     this.postables = opts.postables;
     this.completedDetail = opts.completedDetail;
+  }
+
+  get visiblePostables() {
+    let postablesArr = [];
+
+    for (let i = 0; i < this.postables.length; i++) {
+      let post = this.postables[i];
+      if (!post.timestamp) {
+        post.timestamp = new Date();
+      }
+
+      postablesArr.push(post);
+
+      if (!post.isComplete) {
+        break;
+      }
+    }
+
+    return postablesArr;
   }
 }
 

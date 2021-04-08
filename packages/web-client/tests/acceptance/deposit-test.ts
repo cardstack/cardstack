@@ -47,7 +47,7 @@ module('Acceptance | deposit', function (hooks) {
     await click('[data-test-deposit-button]');
 
     let message = '[data-test-milestone="0"][data-test-thread-message="0"]';
-    assert.dom(`${message} [data-test-author-name]`).containsText('cardbot');
+    assert.dom(`${message} img`).exists();
     assert.dom(message).containsText('Hi there, we’re happy to see you');
 
     message = '[data-test-milestone="0"][data-test-thread-message="1"]';
@@ -81,9 +81,8 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom('[data-test-milestone-completed][data-test-milestone="0"]')
       .containsText('Mainnet Wallet connected');
-    await this.pauseTest();
+
     message = '[data-test-milestone="1"][data-test-thread-message="0"]';
-    assert.dom(`${message} [data-test-author-name]`).containsText('cardbot');
     assert
       .dom(message)
       .containsText(
@@ -99,12 +98,12 @@ module('Acceptance | deposit', function (hooks) {
     await click(`${message} [data-test-continue-button]`);
 
     message = '[data-test-milestone="1"][data-test-thread-message="2"]';
-    assert.dom(`${message} [data-test-author-name]`).containsText('cardbot');
     assert
       .dom(message)
       .containsText('How many tokens would you like to deposit?');
 
     message = '[data-test-milestone="1"][data-test-thread-message="3"]';
+    await this.pauseTest();
     assert.dom(`${message} [data-test-unlock-button]`).isDisabled();
     assert.dom(`${message} [data-test-deposit-button]`).isDisabled();
     await fillIn('[data-test-deposit-amount-input]', '2500');
@@ -143,7 +142,6 @@ module('Acceptance | deposit', function (hooks) {
 
     message = '[data-test-milestone="2"][data-test-thread-message="0"]';
 
-    assert.dom(`${message} [data-test-author-name]`).containsText('cardbot');
     assert
       .dom(message)
       .containsText('your token will be bridged to the xDai blockchain');
@@ -163,7 +161,6 @@ module('Acceptance | deposit', function (hooks) {
 
     // message = '[data-test-after-workflow][data-test-thread-message="0"]';
 
-    // assert.dom(`${message} [data-test-author-name]`).containsText('cardbot');
     // assert.dom(`${message}`).containsText('Thank you for your contribution!');
     // assert
     //   .dom(`${message}`)
@@ -172,7 +169,6 @@ module('Acceptance | deposit', function (hooks) {
     //   );
 
     // message = '[data-test-after-workflow][data-test-thread-message="1"]';
-    // assert.dom(`${message} [data-test-author-name]`).containsText('cardbot');
     // assert
     //   .dom(`${message}`)
     //   .containsText(
