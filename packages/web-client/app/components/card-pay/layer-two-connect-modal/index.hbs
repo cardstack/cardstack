@@ -1,5 +1,10 @@
-<Boxel::Modal @onClose={{@onClose}} style={{css-var boxel-modal-max-width="45rem"}}>
-  <Boxel::CardContainer class="layer-two-connect-modal">
+<Boxel::Modal
+  @onClose={{@onClose}}
+  style={{css-var boxel-modal-max-width="45rem"}}
+  class="layer-two-connect-modal"
+  data-test-layer-two-connect-modal
+>
+  <Boxel::CardContainer class="layer-two-connect-modal__card">
     {{#if this.layer2Network.isConnected}}
       Connected to wallet:
       {{#each this.layer2Network.walletInfo.accounts as |account|}}
