@@ -44,8 +44,7 @@ module('Acceptance | deposit', function (hooks) {
       '[data-test-card-pay-header-tab][href="/card-pay/token-suppliers"]'
     );
 
-    assert.dom('[data-test-deposit-instructions]').exists();
-    await click('[data-test-hide-button]');
+    await click('[data-test-deposit-button]');
 
     let message = '[data-test-milestone="0"][data-test-thread-message="0"]';
     assert.dom(`${message} [data-test-author-name]`).containsText('cardbot');

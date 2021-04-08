@@ -3,14 +3,14 @@
     Deposit
   </h2>
 
-  {{#if this.isShowingInstructions}}
-    <div data-test-deposit-instructions>
-
-      <h3>Instructions</h3>
-
-      <button type="button" data-test-hide-button {{on 'click' this.hideInstructions}}>Hide</button>
-    </div>
-  {{else}}
-    <CardPay::DepositWorkflow />
-  {{/if}}
+  <Boxel::Button {{on "click" (set this "isShowingDepositWorkflow" true)}} data-test-deposit-button>
+    Deposit
+  </Boxel::Button>
 </section>
+
+{{#if this.isShowingDepositWorkflow}}
+  <Boxel::Modal @onClose={{set this "isShowingDepositWorkflow" false}}>
+    <CardPay::DepositWorkflow />
+  </Boxel::Modal>
+
+{{/if}}
