@@ -1,4 +1,6 @@
 import * as syntax from '@glimmer/syntax';
+// import ETC from 'ember-source/dist/ember-template-compiler';
+// const { preprocess, print } = ETC._GlimmerSyntax;
 import { NodePath } from '@babel/core';
 import {
   CallExpression,

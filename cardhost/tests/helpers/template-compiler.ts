@@ -1,4 +1,6 @@
 import { precompile } from '@glimmer/compiler';
+//@ts-ignore
+// import { precompile } from 'ember-source/dist/ember-template-compiler';
 import type { TemplateFactory } from 'htmlbars-inline-precompile';
 
 // @ts-ignore

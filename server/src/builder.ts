@@ -26,13 +26,13 @@ class CardCache {
 
   setCard(cardURL: string, source: CompiledCard) {
     fs.writeFileSync(
-      this.getLocation(`${cardURL}/compiled.json`),
+      this.getLocation(`${cardURL}compiled.json`),
       JSON.stringify(source)
     );
   }
 
   getCard(cardURL: string): CompiledCard | undefined {
-    let loc = this.getLocation(`${cardURL}/compiled.json`);
+    let loc = this.getLocation(`${cardURL}compiled.json`);
     if (fs.existsSync(loc)) {
       return require(loc);
     }
@@ -96,16 +96,14 @@ export default class Builder implements BuilderInterface {
   }
 
   async getCompiledCard(url: string): Promise<CompiledCard> {
-    // TODO: We need a way to clear the cache for things like tests before
-    // this should be used without causing problems.
-    // let compiledCard = this.cache.getCard(url);
+    let compiledCard = this.cache.getCard(url);
 
-    // if (compiledCard) {
-    //   return compiledCard;
-    // }
+    if (compiledCard) {
+      return compiledCard;
+    }
 
     let rawCard = await this.getRawCard(url);
-    let compiledCard = await this.compiler.compile(rawCard);
+    compiledCard = await this.compiler.compile(rawCard);
     this.cache.setCard(url, compiledCard);
 
     return compiledCard;

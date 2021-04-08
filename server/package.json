@@ -13,12 +13,15 @@
   "dependencies": {
     "@cardstack/compiled": "*",
     "@cardstack/core": "*",
+    "@koa/cors": "^3.1.0",
     "@koa/router": "^10.0.0",
     "@types/jsonapi-serializer": "^3.6.3",
     "@types/koa": "^2.13.1",
+    "@types/koa-logger": "^3.1.1",
     "@types/koa__router": "^8.0.4",
     "jsonapi-serializer": "^3.6.7",
     "koa": "^2.13.1",
+    "koa-logger": "^3.2.1",
     "tmp": "^0.2.1",
     "walk-sync": "^2.2.0"
   },

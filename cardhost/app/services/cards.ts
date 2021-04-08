@@ -10,7 +10,7 @@ export default class Cards extends Service {
     url: string,
     format: Format
   ): Promise<{ model: any; component: unknown }> {
-    return this.internalLoad(`${url}?format=${format}`);
+    return this.internalLoad(url, { format });
   }
 
   async loadForRoute(
@@ -20,9 +20,15 @@ export default class Cards extends Service {
   }
 
   private async internalLoad(
-    url: string
+    url: string,
+    query?: Record<string, string>
   ): Promise<{ model: any; component: unknown }> {
-    let response = await fetch(url);
+    let fullURL = ['http://localhost:3000/cards/', encodeURIComponent(url)];
+    let params = new URLSearchParams(query).toString();
+    if (params) {
+      fullURL.push(`?${params}`);
+    }
+    let response = await fetch(fullURL.join(''));
 
     if (response.status !== 200) {
       throw new Error(`unable to fetch card ${url}: status ${response.status}`);
@@ -41,15 +47,20 @@ export default class Cards extends Service {
 
     let model = Object.assign({ id: card.data.id }, card.data.attributes);
 
+    let { componentModule } = card.data.meta;
     let cardComponent: unknown;
     if (macroCondition(isTesting())) {
       // in tests, our fake server inside mirage just defines these modules
       // dynamically
-      cardComponent = window.require(card.data.meta.componentModule)['default'];
+      cardComponent = window.require(componentModule)['default'];
     } else {
-      cardComponent = await import(
-        `@cardstack/base-cards/${card.data.meta.componentModule}`
-      );
+      if (!componentModule.startsWith('@cardstack/compiled/')) {
+        throw new Error(
+          `${url}'s meta.componentModule does not start with '@cardstack/compiled/`
+        );
+      }
+      componentModule = componentModule.replace('@cardstack/compiled/', '');
+      cardComponent = await import(`@cardstack/compiled/${componentModule}`);
     }
 
     let CallerComponent = setComponentTemplate(

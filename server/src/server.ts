@@ -1,8 +1,11 @@
 import Koa from 'koa';
 import Router from '@koa/router';
+import logger from 'koa-logger';
+import cors from '@koa/cors';
 import Builder from './builder';
 import { RealmConfig } from './interfaces';
 import { Serializer } from 'jsonapi-serializer';
+import walkSync from 'walk-sync';
 
 interface ServerOptions {
   realms: RealmConfig[];
@@ -13,14 +16,22 @@ export class Server {
   static async create(options: ServerOptions): Promise<Server> {
     let { realms, cardCacheDir } = options;
 
+    // Make sure there is always a line ending on the realm.directory
+    realms = realms.map((realm) => ({
+      url: realm.url,
+      directory: realm.directory.replace(/\/$/, '') + '/',
+    }));
+
     let router = new Router();
     let app = new Koa();
     let builder = new Builder({ realms, cardCacheDir });
 
     // The card data layer
     router.get(`/cards/:encodedCardURL`, async (ctx) => {
+      // TODO: get query param
       let format: 'isolated' | 'embedded' = 'isolated'; // todo: query param
-      let url = decodeURIComponent(ctx.params.encodedCardURL);
+      let url = ctx.params.encodedCardURL;
+
       try {
         let card = await builder.getCompiledCard(url);
         ctx.set('content-type', 'application/json');
@@ -57,12 +68,38 @@ export class Server {
         }
       }
     });
+    app.use(logger());
+    app.use(cors({ origin: '*' }));
     app.use(router.routes());
     app.use(router.allowedMethods());
 
-    return new this(app, builder);
+    return new this(app, builder, options);
   }
 
-  private constructor(public app: Koa, private builder: Builder) {}
+  private constructor(
+    public app: Koa,
+    private builder: Builder,
+    private options: ServerOptions
+  ) {}
 
+  async start(port: number) {
+    let promises = [];
+
+    for (let realm of this.options.realms) {
+      let cards = walkSync(realm.directory, { globs: ['**/card.json'] });
+      for (let cardPath of cards) {
+        let fullCardUrl = new URL(cardPath.replace('card.json', ''), realm.url)
+          .href;
+        promises.push(this.builder.getCompiledCard(fullCardUrl));
+      }
+    }
+
+    await Promise.all(promises);
+    // glob on card.json
+    // for each card, call builder.getCompiledCard
+
+    this.app.listen(port);
+  }
+
+  stopWatching() {}
 }

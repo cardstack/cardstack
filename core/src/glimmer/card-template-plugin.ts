@@ -4,6 +4,9 @@ import {
   ASTPluginEnvironment,
   preprocess as parse,
 } from '@glimmer/syntax';
+// @ts-ignore
+// import ETC from 'ember-source/dist/ember-template-compiler';
+// const { preprocess: parse } = ETC._GlimmerSyntax
 import { CompiledCard, ComponentInfo } from '../interfaces';
 
 const PREFIX = '@model.';

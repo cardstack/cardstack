@@ -51,7 +51,14 @@
     },
     {
       "command": "yarn test",
-      "name": "yarn test",
+      "name": "Server: yarn test",
+      "request": "launch",
+      "type": "node-terminal",
+      "cwd": "${workspaceRoot}/server",
+    },
+    {
+      "command": "yarn start",
+      "name": "Server: yarn start",
       "request": "launch",
       "type": "node-terminal",
       "cwd": "${workspaceRoot}/server",
