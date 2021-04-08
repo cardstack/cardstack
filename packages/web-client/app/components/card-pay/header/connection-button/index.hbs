@@ -1,0 +1,23 @@
+<div>
+  <div class="card-pay-header-connection-button__label">
+    {{@label}}
+  </div>
+  <div class="card-pay-header-connection-button__title">
+    {{@chainName}}
+  </div>
+</div>
+<Boxel::Button
+  @kind="primary"
+  class={{cn
+    "card-pay-header-connection-button__button"
+    card-pay-header-connection-button__button--address=@isConnected
+  }}
+  {{on "click" @onConnect}}
+  data-test-card-pay-connect-button
+>
+  {{#if @isConnected}}
+    {{truncate-middle @address 7 4}}
+  {{else}}
+    Connect Wallet
+  {{/if}}
+</Boxel::Button>

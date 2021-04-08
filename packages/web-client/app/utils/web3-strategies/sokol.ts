@@ -8,14 +8,14 @@ import { IConnector } from '@walletconnect/types';
 import WalletInfo from '../wallet-info';
 import { defer } from 'rsvp';
 
-export default class XDaiWeb3Strategy implements Web3Strategy {
-  chainName = 'xDai';
-  chainId = 100;
+export default class SokolWeb3Strategy implements Web3Strategy {
+  chainName = 'Sokol';
+  chainId = 77;
   provider = new WalletConnectProvider({
     bridge: BRIDGE,
     chainId: this.chainId,
     rpc: {
-      100: 'https://dai.poa.network',
+      77: 'https://sokol.poa.network',
     },
     qrcode: false,
   });
@@ -79,12 +79,12 @@ export default class XDaiWeb3Strategy implements Web3Strategy {
   }
 
   updateWalletInfo(accounts: string[], chainId: number) {
-    this.walletInfo = new WalletInfo(accounts, chainId);
-    if (accounts.length > 0) {
+    if (accounts.length) {
       this.waitForAccountDeferred.resolve();
     } else {
       this.waitForAccountDeferred = defer();
     }
+    this.walletInfo = new WalletInfo(accounts, chainId);
   }
 
   clearWalletInfo() {
