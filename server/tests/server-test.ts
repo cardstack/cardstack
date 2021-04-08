@@ -1,6 +1,6 @@
 import type Koa from 'koa';
 import { Project } from 'scenario-tester';
-import { createServer } from '../src/server';
+import { Server } from '../src/server';
 import supertest from 'supertest';
 import QUnit from 'qunit';
 import { join } from 'path';
@@ -74,16 +74,18 @@ QUnit.module('Card Data', function (hooks) {
 
     cardCacheDir = tmp.dirSync().name;
 
-    server = await createServer({
-      cardCacheDir,
-      realms: [
-        { url: 'https://my-realm', directory: realm.baseDir },
-        {
-          url: 'https://cardstack.com/base',
-          directory: join(__dirname, '..', '..', 'base-cards'),
-        },
-      ],
-    });
+    server = (
+      await Server.create({
+        cardCacheDir,
+        realms: [
+          { url: 'https://my-realm', directory: realm.baseDir },
+          {
+            url: 'https://cardstack.com/base',
+            directory: join(__dirname, '..', '..', 'base-cards'),
+          },
+        ],
+      })
+    ).app;
   });
 
   QUnit.test(
