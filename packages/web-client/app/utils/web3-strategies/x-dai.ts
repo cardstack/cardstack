@@ -26,6 +26,12 @@ export default class XDaiWeb3Strategy implements Web3Strategy {
     // super(...arguments);
     this.initialize();
   }
+  unlock(): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  deposit(): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
 
   async initialize() {
     this.connector.on('display_uri', (err, payload) => {
