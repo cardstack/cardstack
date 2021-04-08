@@ -1,6 +1,15 @@
 <section role="tabpanel" aria-labelledby="card-pay.balances">
   <h2>
-    Cards &amp; Balances
+    Card Balances
   </h2>
+
+  <Boxel::Button @kind="primary" {{on "click" (set this "isShowingDepositWorkflow" true)}} data-test-deposit-button>
+    Deposit
+  </Boxel::Button>
 </section>
 
+{{#if this.isShowingDepositWorkflow}}
+  <Boxel::Modal @onClose={{set this "isShowingDepositWorkflow" false}}>
+    <CardPay::DepositWorkflow />
+  </Boxel::Modal>
+{{/if}}

@@ -8,32 +8,33 @@
   margin: 0;
   padding: 0 var(--boxel-sp-lg);
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
   gap: var(--boxel-sp);
   justify-items: center;
   white-space: nowrap;
 }
 
-.card-pay-header-nav__list > li {
-  width: 100%;
-}
-
 .card-pay-header-nav__tab {
   --icon-color: currentColor;
+  display: flex;
+  align-items: center;
   width: 100%;
-  padding: var(--boxel-sp);
+  padding: var(--boxel-sp) 0;
   border-bottom: 4px solid transparent;
   color: var(--boxel-purple-300);
-  font: var(--boxel-font);
+  font: 600 var(--boxel-font);
   letter-spacing: var(--boxel-lsp-xxs);
   text-align: center;
-  transition:
-    color var(--boxel-transition),
-    font var(--boxel-transition);
+  transition: color var(--boxel-transition);
 }
 
 .card-pay-header-nav__tab.active {
+  --icon-color: var(--boxel-highlight);
   border-color: var(--boxel-highlight);
   color: var(--boxel-light);
-  font: 600 var(--boxel-font);
+}
+
+.card-pay-header-nav__tab svg {
+  margin-right: var(--boxel-sp-xs);
+  flex-shrink: 0;
 }

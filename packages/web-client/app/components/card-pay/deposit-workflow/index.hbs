@@ -6,30 +6,31 @@
     <Boxel::ExpandableBanner
       class="deposit-workflow__banner"
       @icon="deposit"
-      @summary="Deposit Funds">
-        <p class="deposit-workflow__banner-paragraph">
-          As a Supplier, you deposit funds from your Ethereum mainnet wallet into the
-          CARD Protocol's reserve pool and receive the corresponding amount of CPXD
-          tokens in your xDai chain wallet.
-        </p>
-        <p class="deposit-workflow__banner-paragraph">
-          We currently support two types of asset you can deposit into the reserve pool:
-          <ul class="deposit-workflow__banner-list">
-            <li>Dai stablecoins (DAI)</li>
-            <li>Cardstack ERC-20 tokens (CARD)</li>
-          </ul>
-        </p>
-        <p class="deposit-workflow__banner-paragraph">
-          The CARD Protocol's reserve pool facilitates payments between customers
-          and merchants on the Cardstack network.
-        </p>
-        <p class="deposit-workflow__banner-small-text">
-          Fees: Suppliers earn transaction fees of 0.5% for all transactions across
-          the CARD Protocol. Those fees will be distributed to Suppliers based on
-          their proportional share of supplied tokens in the reserve pool, averaged
-          over the 30-day period in which the transactions occurred. {{!-- <a href="#">More details here.</a> --}}
-          {{!-- TODO: add link --}}
-        </p>
+      @summary="Deposit Funds"
+    >
+      <p class="deposit-workflow__banner-paragraph">
+        As a Supplier, you deposit funds from your Ethereum mainnet wallet into the
+        CARD Protocol's reserve pool and receive the corresponding amount of CPXD
+        tokens in your xDai chain wallet.
+      </p>
+      <p class="deposit-workflow__banner-paragraph">
+        We currently support two types of asset you can deposit into the reserve pool:
+        <ul class="deposit-workflow__banner-list">
+          <li>Dai stablecoins (DAI)</li>
+          <li>Cardstack ERC-20 tokens (CARD)</li>
+        </ul>
+      </p>
+      <p class="deposit-workflow__banner-paragraph">
+        The CARD Protocol's reserve pool facilitates payments between customers
+        and merchants on the Cardstack network.
+      </p>
+      <p class="deposit-workflow__banner-small-text">
+        Fees: Suppliers earn transaction fees of 0.5% for all transactions across
+        the CARD Protocol. Those fees will be distributed to Suppliers based on
+        their proportional share of supplied tokens in the reserve pool, averaged
+        over the 30-day period in which the transactions occurred. {{!-- <a href="#">More details here.</a> --}}
+        {{!-- TODO: add link --}}
+      </p>
     </Boxel::ExpandableBanner>
     {{#each this.workflow.milestones as |milestone i|}}
       {{#let (or milestone.complete (lte i this.workflow.completedMilestoneCount)) as |displayMilestone|}}

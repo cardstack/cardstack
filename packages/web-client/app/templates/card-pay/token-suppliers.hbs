@@ -1,16 +1,5 @@
 <section role="tabpanel" aria-labelledby="card-pay.token-suppliers">
   <h2>
-    Deposit
+    Token Suppliers
   </h2>
-
-  <Boxel::Button {{on "click" (set this "isShowingDepositWorkflow" true)}} data-test-deposit-button>
-    Deposit
-  </Boxel::Button>
 </section>
-
-{{#if this.isShowingDepositWorkflow}}
-  <Boxel::Modal @onClose={{set this "isShowingDepositWorkflow" false}}>
-    <CardPay::DepositWorkflow />
-  </Boxel::Modal>
-
-{{/if}}

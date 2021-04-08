@@ -40,9 +40,7 @@ module('Acceptance | deposit', function (hooks) {
       .hasText('0x18261…6E44');
     assert.dom('[data-test-wallet-connect-qr-code]').doesNotExist();
     assert.dom('[data-test-layer-two-connect-modal]').doesNotExist();
-    await click(
-      '[data-test-card-pay-header-tab][href="/card-pay/token-suppliers"]'
-    );
+    await click('[data-test-card-pay-header-tab][href="/card-pay/balances"]');
 
     await click('[data-test-deposit-button]');
 
