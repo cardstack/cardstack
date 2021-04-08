@@ -7,7 +7,7 @@
   </div>
 </div>
 <Boxel::Button
-  @kind="primary"
+  @kind={{if @isConnected "secondary-dark" "primary"}}
   class={{cn
     "card-pay-header-connection-button__button"
     card-pay-header-connection-button__button--address=@isConnected

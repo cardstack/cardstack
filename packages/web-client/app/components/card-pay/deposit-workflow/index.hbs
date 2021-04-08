@@ -10,6 +10,7 @@
             {{#if postable.message}}
               <Boxel::ThreadMessage
                 class="deposit-workflow__thread-message"
+                @imgURL={{postable.author.imgURL}}
                 @hideMeta={{gt j 0}}
                 data-test-thread-message={{j}} data-test-milestone={{i}}
               >
@@ -18,6 +19,7 @@
             {{else}}
               <Boxel::ThreadMessage
                 class="deposit-workflow__thread-message"
+                @imgURL={{postable.author.imgURL}}
                 @hideMeta={{gt j 0}}
                 data-test-thread-message={{j}} data-test-milestone={{i}}
               >

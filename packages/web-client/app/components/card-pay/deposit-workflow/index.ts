@@ -6,7 +6,7 @@ import {
 } from '@cardstack/web-client/utils/workflow';
 import Component from '@glimmer/component';
 
-let cardbot = { name: 'cardbot' };
+let cardbot = { name: 'Cardbot', imgURL: '/images/icons/cardbot.svg' };
 class DepositWorkflow extends Workflow {
   name = 'Reserve Pool Deposit';
   milestones = [

@@ -2,7 +2,7 @@
   <:header>
     <CardPay::Header
       @title="Card Pay"
-      @logoURL={{@logo}}
+      @logoURL={{this.cardPayLogo}}
       @layer1ChainName={{this.layer1Network.chainName}}
       @layer1Connect={{set this 'isShowingLayer1ConnectModal' true}}
       @layer2ChainName={{this.layer2Network.chainName}}
@@ -14,10 +14,11 @@
     />
     <CardPay::HeaderNav
       @tabs={{array
-        (hash title="Card Balances" route="card-pay.balances")
-        (hash title="Merchant Services" route="card-pay.merchant-services")
-        (hash title="Reward Programs" route="card-pay.reward-programs")
-        (hash title="Token Suppliers" route="card-pay.token-suppliers")
+        (hash title="About Card Pay" route="card-pay.index" icon="home")
+        (hash title="Card Balances" route="card-pay.balances" icon="wallet")
+        (hash title="Merchant Services" route="card-pay.merchant-services" icon="merchant")
+        (hash title="Reward Programs" route="card-pay.reward-programs" icon="reward")
+        (hash title="Token Suppliers" route="card-pay.token-suppliers" icon="token")
       }}
     />
   </:header>
