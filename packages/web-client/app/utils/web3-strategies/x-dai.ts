@@ -6,6 +6,7 @@ import { tracked } from '@glimmer/tracking';
 import { Web3Strategy } from './types';
 import { IConnector } from '@walletconnect/types';
 import WalletInfo from '../wallet-info';
+import { defer } from 'rsvp';
 
 export default class XDaiWeb3Strategy implements Web3Strategy {
   provider = new WalletConnectProvider({
@@ -20,6 +21,7 @@ export default class XDaiWeb3Strategy implements Web3Strategy {
   @tracked isConnected = false;
   @tracked walletConnectUri: string | undefined;
   @tracked walletInfo = { accounts: [], chainId: -1 } as WalletInfo;
+  waitForAccountDeferred = defer();
   web3!: Web3;
 
   constructor() {
@@ -70,9 +72,18 @@ export default class XDaiWeb3Strategy implements Web3Strategy {
 
   updateWalletInfo(accounts: string[], chainId: number) {
     this.walletInfo = new WalletInfo(accounts, chainId);
+    if (accounts.length > 0) {
+      this.waitForAccountDeferred.resolve();
+    } else {
+      this.waitForAccountDeferred = defer();
+    }
   }
 
   clearWalletInfo() {
     this.updateWalletInfo([], -1);
+  }
+
+  get waitForAccount() {
+    return this.waitForAccountDeferred.promise;
   }
 }
