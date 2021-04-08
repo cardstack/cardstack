@@ -5,7 +5,6 @@ import CardstackLogo from '../../../images/icons/cardstack-logo-opaque-efefef-bg
 import CardstackMobileAppIcon from '../../../images/icons/cardstack-mobile-app-icon.svg';
 import AppStoreBadge from '../../../images/icons/download-on-the-app-store-badge.svg';
 import GooglePlayBadge from '../../../images/icons/google-play-badge.png';
-import CaretRightIcon from '../../../@cardstack/boxel/images/icons/caret-thin-right.svg';
 import config from '@cardstack/web-client/config/environment';
 class CardPayLayerTwoConnectModalComponent extends Component {
   @service declare layer2Network: Layer2Network;
@@ -13,7 +12,6 @@ class CardPayLayerTwoConnectModalComponent extends Component {
   cardstackMobileAppIcon = CardstackMobileAppIcon;
   appStoreBadge = AppStoreBadge;
   googlePlayBadge = GooglePlayBadge;
-  caretRightIcon = CaretRightIcon;
   appStoreUrl = config.urls.appStoreLink;
   googlePlayUrl = config.urls.googlePlayLink;
 }
