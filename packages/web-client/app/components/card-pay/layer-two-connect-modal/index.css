@@ -10,6 +10,7 @@
 .layer-two-connect-modal__header {
   font: var(--boxel-font-lg);
   margin-top: var(--boxel-sp-xxxl);
+  margin-bottom: 0;
   text-align: center;
 }
 
@@ -17,6 +18,7 @@
   font: var(--boxel-font);
   color:  var(--boxel-purple-500);
   margin-top: var(--boxel-sp-xs);
+  margin-bottom: 0;
   text-align: center;
 }
 
@@ -59,7 +61,7 @@
   padding-left: var(--boxel-sp-xxl);
   padding-right: var(--boxel-sp-xxl);
   text-align: left;
-  
+
   display: none; /* hide this until we add the destination UI */
 }
 
