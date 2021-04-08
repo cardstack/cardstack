@@ -29,9 +29,9 @@ In development, we use `lerna` to manage the inter-dependencies of all the packa
 
 ## Understanding the respositories under the Cardstack organization
 
-The following summary offers an overview of where development is currently ongoing at Cardstack:
+The following summary offers an overview of where development is currently ongoing at Cardstack. (Note: any projects linked below that are not currently public will become public soon.)
 
-https://github.com/cardstack/card-protocol-xdai
+[cardstack/card-protocol-xdai](https://github.com/cardstack/card-protocol-xdai)
 - The Layer 2 contracts for the card protocol live here including
   - PrepaidCardManager contract
   - RevenuePool contract
@@ -39,36 +39,43 @@ https://github.com/cardstack/card-protocol-xdai
   - SPEND token contract
   - BridgeUtilities contract (facilitates token bridge contract)
 
-https://github.com/cardstack/tokenbridge-contracts
+[cardstack/tokenbridge-contracts](https://github.com/cardstack/tokenbridge-contracts)
   - The home bridge and foreign bridge token contracts
 
 https://github.com/cardstack/card-protocol-relay-service
   - our gnosis relay service, forked to provide additional prepaid card manager
     API's that support gasless interactions with our PrepaidCardManager contract
 
-https://github.com/cardstack/safe-transaction-service
+[cardstack/safe-transaction-service](https://github.com/cardstack/safe-transaction-service)
   - our gnosis transaction service, this was forked to provide transaction
     service for Sokol (xDai uses the gnosis hosted transaction service)
 
-https://github.com/cardstack/cardstack
-  - our monorepo that contains our CardPay Dapp (as well as eventually
+[cardstack/cardstack](https://github.com/cardstack/cardstack)
+  - this one! It is our monorepo that contains our CardPay Dapp (as well as eventually
     cardstack hub runtime). Work on the "card compiler" is also occurring in PRs
     of this repository. A proof-of-concept for the dapp was developed
     here: https://github.com/cardstack/card-pay/tree/update-UI-depot 
 
-https://github.com/cardstack/cardwallet
+[cardstack/cardwallet](https://github.com/cardstack/cardwallet)
   - our rainbow wallet fork that supplies our mobile client experience.
     Currently it is focused around interacting with Layer 1 contracts,
     eventually we see it as interacting with the Layer2 protocol as well.
     A proof-of-concept was developed here: https://github.com/cardstack/rainbow/branches
 
-https://github.com/cardstack/infra
+[cardstack/infra](https://github.com/cardstack/infra)
   - Holds our terraform scripts to provision AWS and cloudflare (and
     eventually GCP) services for our infrastructure.
 
-https://github.com/cardstack/boxel
+[cardstack/boxel](https://github.com/cardstack/boxel)
   - our web UI component library
 
+[cardstack/catalog-experiment](https://github.com/cardstack/catalog-experiment)
+  - our planned Javascript build tooling and CDN that eliminates the need for running
+    npm/yarn and eliminates the need to maintain a node_modules folder in your web projects
+
+[cardstack/animations-experiment](https://github.com/cardstack/animations-experiment)
+  - proof of concept for an animation library that works well with Ember and meets Boxel's
+    motion needs 
 
 ## Project-wide Policy and Community Governance
 
