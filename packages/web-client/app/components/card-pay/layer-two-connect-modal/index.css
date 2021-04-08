@@ -59,6 +59,8 @@
   padding-left: var(--boxel-sp-xxl);
   padding-right: var(--boxel-sp-xxl);
   text-align: left;
+  
+  display: none; /* hide this until we add the destination UI */
 }
 
 .layer-two-connect-modal__alternate-wallet-caret {
