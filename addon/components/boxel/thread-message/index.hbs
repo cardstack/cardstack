@@ -1,15 +1,14 @@
-<div class="boxel-thread-message" ...attributes>
+<div class="boxel-thread-message" data-test-boxel-thread-message ...attributes>
   <span class="boxel-thread-message__avatar">
     {{#unless @hideMeta}}
       {{#if @imgURL}}
         <img
           src={{@imgURL}}
-          role="presentation"
-          aria-hidden="true"
-          alt=""
+          alt={{@name}}
           width="40px"
           height="40px"
           class={{cn "boxel-thread-message__avatar-img" boxel-thread-message__avatar-img--not-round=@notRound}}
+          data-test-boxel-thread-message-avatar
         />
       {{else}}
         {{svg-jar "profile" width="40px" height="40px" aria-hidden="true"}}
@@ -19,7 +18,7 @@
   <span>
     <h3 class={{cn "boxel-thread-message__info" boxel-sr-only=@hideMeta}}>
       {{#if @name}}
-        <span class="boxel-thread-message__name" data-test-author-name>
+        <span class="boxel-thread-message__name" data-test-boxel-thread-message-name>
           {{@name}}
         </span>
       {{/if}}
@@ -27,8 +26,7 @@
         {{moment-format (or @datetime (now)) "MMM D, h:mm A"}}
       </time>
     </h3>
-    <p class="boxel-thread-message__content">
-      {{yield}}
-    </p>
+
+    {{yield}}
   </span>
 </div>

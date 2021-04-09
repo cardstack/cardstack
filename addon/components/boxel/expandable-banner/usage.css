@@ -1,19 +1,20 @@
 .expandable-banner-usage-paragraph {
-    font: var(--boxel-font-sm);
+  margin-bottom: 0;
+  font: var(--boxel-font-sm);
 }
 
 .expandable-banner-usage-paragraph:first-child {
   margin-top: 0;
 }
 
-.expandable-banner-usage-list > li {
-  padding-left: 0.5rem;
+.expandable-banner-usage-list {
+  margin: 0;
+  padding: 0;
+  list-style-position: inside;
 }
 
-.expandable-banner-usage-list > li:before {
-  content: "–"; /* en dash */
-  position: absolute;
-  margin-left: -0.5rem; 
+.expandable-banner-usage-list > li::marker {
+  content: "– "; /* en dash */
 }
 
 .expandable-banner-usage-fine-print {

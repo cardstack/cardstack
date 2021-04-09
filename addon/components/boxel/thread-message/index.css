@@ -60,10 +60,3 @@
   font-size: var(--boxel-font-size-xs);
   letter-spacing: var(--boxel-lsp-lg);
 }
-
-.boxel-thread-message__content {
-  margin: 0;
-  font-size: 0.9375rem; /* 15px */
-  line-height: calc(23/15);
-  letter-spacing: var(--boxel-lsp-sm);
-}
