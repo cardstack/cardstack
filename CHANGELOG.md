@@ -1,3 +1,11 @@
+## v0.3.7 (2021-04-09)
+
+#### :rocket: Enhancement
+* [#340](https://github.com/cardstack/boxel/pull/340) Add css transitions to expandable banner, update thread message ([@burieberry](https://github.com/burieberry))
+
+#### Committers: 1
+- Burcu Noyan ([@burieberry](https://github.com/burieberry))
+
 ## v0.3.6 (2021-04-07)
 
 ## v0.3.5 (2021-04-07)
