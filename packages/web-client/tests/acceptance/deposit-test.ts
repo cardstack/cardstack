@@ -101,7 +101,6 @@ module('Acceptance | deposit', function (hooks) {
       .containsText('How many tokens would you like to deposit?');
 
     message = '[data-test-milestone="1"][data-test-thread-message="3"]';
-    await this.pauseTest();
     assert.dom(`${message} [data-test-unlock-button]`).isDisabled();
     assert.dom(`${message} [data-test-deposit-button]`).isDisabled();
     await fillIn('[data-test-deposit-amount-input]', '2500');
