@@ -9,7 +9,7 @@ interface WorkflowMessageOptions {
   message: string;
 }
 
-class WorkflowPostable {
+export class WorkflowPostable {
   author: Participant;
   timestamp: Date | null = null;
   @tracked isComplete: boolean = false;
