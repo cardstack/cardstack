@@ -23,8 +23,8 @@ module.exports = function (environment) {
       // when it is created
     },
     chains: {
-      layer1: 'eth',
-      layer2: 'xdai',
+      layer1: process.env.LAYER_1_CHAIN || 'keth', // set to "eth" for production
+      layer2: process.env.LAYER_2_CHAIN || 'sokol', // set to "xdai" for production,
     },
     urls: {
       appStoreLink: undefined,

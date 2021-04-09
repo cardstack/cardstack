@@ -5,58 +5,23 @@
   data-test-card-pay-header
 >
   <ul class="card-pay-header__item-list">
-    <li class="card-pay-header__item">
-      <div>
-        <div class="card-pay-header__item-label">
-          Layer 1
-        </div>
-        <div class="card-pay-header__item-title">
-          Mainnet
-        </div>
-      </div>
-      <Boxel::Button
-        @kind="primary"
-        class={{cn
-          "card-pay-header__item-button"
-          card-pay-header__item-button--address=@isLayer1Connected
-        }}
-        {{on "click" @layer1Connect}}
-        data-test-card-pay-layer-1-connect-button
-      >
-        {{#if @isLayer1Connected}}
-          {{!-- Display short address --}}
-          {{@layer1Address}}
-        {{else}}
-          Connect Wallet
-        {{/if}}
-      </Boxel::Button>
+    <li class="card-pay-header__item" data-test-card-pay-layer-1-connect>
+      <CardPay::Header::ConnectionButton
+        @label="Layer 1"
+        @chainName={{@layer1ChainName}}
+        @address={{@layer1Address}}
+        @isConnected={{@isLayer1Connected}}
+        @onConnect={{@layer1Connect}}
+      />
     </li>
-    <li class="card-pay-header__item">
-      <div>
-        <div class="card-pay-header__item-label">
-          Layer 2
-        </div>
-        <div class="card-pay-header__item-title">
-          xDai
-        </div>
-      </div>
-
-      <Boxel::Button
-        @kind={{if @isLayer2Connected "secondary-dark" "primary"}}
-        class={{cn
-          "card-pay-header__item-button"
-          card-pay-header__item-button--address=@isLayer2Connected
-        }}
-        {{on "click" @layer2Connect}}
-        data-test-card-pay-layer-2-connect-button
-      >
-        {{#if @isLayer2Connected}}
-          {{!-- Display short address --}}
-          {{@layer2Address}}
-        {{else}}
-          Connect Wallet
-        {{/if}}
-      </Boxel::Button>
+    <li class="card-pay-header__item" data-test-card-pay-layer-2-connect>
+      <CardPay::Header::ConnectionButton
+        @label="Layer 2"
+        @chainName={{@layer2ChainName}}
+        @address={{@layer2Address}}
+        @isConnected={{@isLayer2Connected}}
+        @onConnect={{@layer2Connect}}
+      />
     </li>
   </ul>
 </Boxel::OrgHeader>

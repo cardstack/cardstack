@@ -3,6 +3,7 @@ import config from '../config/environment';
 import { Web3Strategy } from '../utils/web3-strategies/types';
 import TestWeb3Strategy from '../utils/web3-strategies/test';
 import EthWeb3Strategy from '../utils/web3-strategies/ethereum';
+import KovanWeb3Strategy from '../utils/web3-strategies/kovan';
 import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
 import { task } from 'ember-concurrency-decorators';
@@ -13,10 +14,14 @@ export default class Layer1Network extends Service {
   @reads('strategy.walletConnectUri') walletConnectUri: string | undefined;
   @reads('strategy.walletInfo', new WalletInfo([], -1)) walletInfo!: WalletInfo;
   @reads('strategy.waitForAccount') waitForAccount!: Promise<void>;
+  @reads('strategy.chainName') chainName!: string;
 
   constructor(props: object | undefined) {
     super(props);
     switch (config.chains.layer1) {
+      case 'keth':
+        this.strategy = new KovanWeb3Strategy();
+        break;
       case 'eth':
         this.strategy = new EthWeb3Strategy();
         break;

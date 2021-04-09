@@ -40,26 +40,3 @@
   gap: var(--boxel-sp);
 }
 
-.card-pay-header__item-label {
-  color: var(--boxel-purple-300);
-  font: var(--boxel-font-xs);
-  letter-spacing: 0.075em;
-  text-transform: uppercase;
-}
-
-.card-pay-header__item-title {
-  font: var(--boxel-font-sm);
-  font-weight: 600;
-  letter-spacing: var(--boxel-lsp-sm);
-}
-
-.card-pay-header__item-button {
-  min-width: 10rem;
-}
-
-.card-pay-header__item-button--address {
-  background-color: var(--boxel-light);
-  color: var(--boxel-dark);
-  font: 400 var(--boxel-font-size-sm)/calc(18/13) var(--boxel-monospace-font-family);
-  letter-spacing: var(--boxel-lsp-sm);
-}

@@ -18,7 +18,10 @@ module('Acceptance | deposit', function (hooks) {
     assert.equal(currentURL(), '/');
     await click('[data-test-cardstack-org-link="card-pay"]');
     assert.equal(currentURL(), '/card-pay');
-    await click('[data-test-card-pay-layer-2-connect-button]');
+
+    await click(
+      '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
+    );
     let layer2Service = this.owner.lookup('service:layer2-network');
     layer2Service.test__simulateWalletConnectUri();
     await waitFor('[data-test-wallet-connect-qr-code]');
@@ -31,8 +34,10 @@ module('Acceptance | deposit', function (hooks) {
       () => !document.querySelector('[data-test-layer-two-connect-modal]')
     );
     assert
-      .dom('[data-test-card-pay-layer-2-connect-button]')
-      .hasText(layer2AccountAddress);
+      .dom(
+        '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
+      )
+      .hasText('0x18261…6E44');
     assert.dom('[data-test-wallet-connect-qr-code]').doesNotExist();
     assert.dom('[data-test-layer-two-connect-modal]').doesNotExist();
     await click(

@@ -5,6 +5,8 @@ import { defer } from 'rsvp';
 import RSVP from 'rsvp';
 
 export default class TestWeb3Strategy implements Web3Strategy {
+  chainName = 'Test';
+  chainId = '-1';
   @tracked walletConnectUri: string | undefined;
   @tracked isConnected = false;
   @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
@@ -28,7 +30,7 @@ export default class TestWeb3Strategy implements Web3Strategy {
 
   test__simulateAccountsChanged(accounts: string[]) {
     this.isConnected = true;
-    this.walletInfo = new WalletInfo(accounts, 0);
+    this.walletInfo = new WalletInfo(accounts, parseInt(this.chainId, 10));
     this.waitForAccountDeferred.resolve();
   }
 

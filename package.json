@@ -49,7 +49,7 @@
     "lint:deps": "node scripts/find-bad-deps.js",
     "lint:js": "eslint . --cache --ignore-path .gitignore --ext=js,ts",
     "lint:hbs": "cd packages/web-client && ember-template-lint .",
-    "start": "start-server-and-test 'yarn start:web-client' http://localhost:4200 'yarn start:hub'",
+    "start": "WAIT_ON_TIMEOUT=600000 start-server-and-test 'yarn start:web-client' http://localhost:4200 'yarn start:hub'",
     "start:hub": "./packages/hub/bin/cardstack-hub.ts",
     "start:web-client": "cd packages/web-client && ember serve",
     "test": "npm-run-all --aggregate-output --continue-on-error --parallel test:*",

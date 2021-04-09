@@ -3,7 +3,9 @@
     <CardPay::Header
       @title="Card Pay"
       @logoURL={{@logo}}
+      @layer1ChainName={{this.layer1Network.chainName}}
       @layer1Connect={{set this 'isShowingLayer1ConnectModal' true}}
+      @layer2ChainName={{this.layer2Network.chainName}}
       @layer2Connect={{set this 'isShowingLayer2ConnectModal' true}}
       @isLayer1Connected={{this.layer1Network.isConnected}}
       @isLayer2Connected={{this.layer2Network.isConnected}}
@@ -26,7 +28,13 @@
 </Boxel::Dashboard>
 
 {{#if this.isShowingLayer1ConnectModal}}
-TODO
+  <Boxel::Modal>
+    <Boxel::CardContainer
+      @onClose={{set this 'isShowingLayer1ConnectModal' false}}
+    >
+      TODO
+    </Boxel::CardContainer>
+  </Boxel::Modal>
 {{/if}}
 
 {{#if this.isShowingLayer2ConnectModal}}
