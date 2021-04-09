@@ -66,7 +66,7 @@ export default class XDaiWeb3Strategy implements Web3Strategy {
 
     this.connector.on('disconnect', (error) => {
       if (error) {
-        console.log('error disconnecting', error);
+        console.error('error disconnecting', error);
         throw error;
       }
       this.isConnected = false;

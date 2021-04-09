@@ -38,7 +38,6 @@
 {{/if}}
 
 {{#if this.isShowingLayer2ConnectModal}}
-{{log 'show layer two connect modal'}}
   <CardPay::LayerTwoConnectModal
     @onClose={{set this 'isShowingLayer2ConnectModal' false}}
   />
