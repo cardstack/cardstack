@@ -10,6 +10,14 @@ import {
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 
+function postableSel(milestoneIndex: number, postableIndex: number): string {
+  return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
+}
+
+function milestoneCompletedSel(milestoneIndex: number): string {
+  return `[data-test-milestone-completed][data-test-milestone="${milestoneIndex}"]`;
+}
+
 module('Acceptance | deposit', function (hooks) {
   setupApplicationTest(hooks);
 
@@ -23,28 +31,30 @@ module('Acceptance | deposit', function (hooks) {
 
     await click('[data-test-deposit-button]');
 
-    let message = '[data-test-milestone="0"][data-test-thread-message="0"]';
-    assert.dom(`${message} img`).exists();
-    assert.dom(message).containsText('Hi there, we’re happy to see you');
+    let post = postableSel(0, 0);
+    assert.dom(`${post} img`).exists();
+    assert.dom(post).containsText('Hi there, we’re happy to see you');
 
-    message = '[data-test-milestone="0"][data-test-thread-message="1"]';
-    assert.dom(message).containsText('you need to connect two wallets');
-
-    message = '[data-test-milestone="0"][data-test-thread-message="2"]';
     assert
-      .dom(message)
+      .dom(postableSel(0, 1))
+      .containsText('you need to connect two wallets');
+
+    assert
+      .dom(postableSel(0, 2))
       .containsText(
         'The funds you wish to deposit must be available in your Mainnet Wallet'
       );
 
-    message = '[data-test-milestone="0"][data-test-thread-message="3"]';
-    await click(`${message} [data-test-wallet-option="metamask"]`);
+    await click(`${postableSel(0, 3)} [data-test-wallet-option="metamask"]`);
     await click(
-      `${message} [data-test-mainnnet-connection-action-container] [data-test-boxel-button]`
+      `${postableSel(
+        0,
+        3
+      )} [data-test-mainnnet-connection-action-container] [data-test-boxel-button]`
     );
 
     assert
-      .dom(message)
+      .dom(postableSel(0, 3))
       .containsText(
         'Waiting for you to connect the Cardstack dApp with your mainnet wallet'
       );
@@ -53,28 +63,25 @@ module('Acceptance | deposit', function (hooks) {
     let layer1Service = this.owner.lookup('service:layer1-network');
     layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
 
-    await waitFor('[data-test-milestone-completed]');
+    await waitFor(milestoneCompletedSel(0));
     assert
-      .dom('[data-test-milestone-completed][data-test-milestone="0"]')
+      .dom(milestoneCompletedSel(0))
       .containsText('Mainnet Wallet connected');
 
-    message = '[data-test-milestone="1"][data-test-thread-message="0"]';
     assert
-      .dom(message)
+      .dom(postableSel(1, 0))
       .containsText(
         'Now it’s time to connect your xDai chain wallet via your Cardstack mobile app'
       );
 
-    message = '[data-test-milestone="1"][data-test-thread-message="1"]';
     assert
-      .dom(message)
+      .dom(postableSel(1, 1))
       .containsText(
         'Once you have installed the app, open the app and add an existing wallet/account'
       );
 
-    message = '[data-test-milestone="1"][data-test-thread-message="2"]';
     assert
-      .dom(message)
+      .dom(postableSel(1, 2))
       .containsText('Loading QR Code for Cardstack Mobile wallet connection');
 
     let layer2Service = this.owner.lookup('service:layer2-network');
@@ -93,38 +100,36 @@ module('Acceptance | deposit', function (hooks) {
         '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
       )
       .hasText('0x18261…6E44');
-    await waitFor('[data-test-milestone-completed]');
+    await waitFor(milestoneCompletedSel(1));
     assert
-      .dom('[data-test-milestone-completed][data-test-milestone="1"]')
+      .dom(milestoneCompletedSel(1))
       .containsText('xDai Chain wallet connected');
 
-    message = '[data-test-milestone="2"][data-test-thread-message="0"]';
     assert
-      .dom(message)
+      .dom(postableSel(2, 0))
       .containsText('choose the asset you would like to deposit');
 
-    message = '[data-test-milestone="2"][data-test-thread-message="1"]';
+    post = postableSel(2, 1);
     // TODO: assert ETH balance showing
     // TODO: assert DAI balance showing
-    await click(`${message} [data-test-layer-1-source-trigger]`);
-    await click(`${message} [data-test-dai-option]`);
-    await click(`${message} [data-test-layer-2-target-trigger]`);
-    await click(`${message} [data-test-new-depot-option]`);
-    await click(`${message} [data-test-continue-button]`);
+    await click(`${post} [data-test-layer-1-source-trigger]`);
+    await click(`${post} [data-test-dai-option]`);
+    await click(`${post} [data-test-layer-2-target-trigger]`);
+    await click(`${post} [data-test-new-depot-option]`);
+    await click(`${post} [data-test-continue-button]`);
 
-    message = '[data-test-milestone="2"][data-test-thread-message="2"]';
     assert
-      .dom(message)
+      .dom(postableSel(2, 2))
       .containsText('How many tokens would you like to deposit?');
 
-    message = '[data-test-milestone="2"][data-test-thread-message="3"]';
-    assert.dom(`${message} [data-test-unlock-button]`).isDisabled();
-    assert.dom(`${message} [data-test-deposit-button]`).isDisabled();
+    post = postableSel(2, 3);
+    assert.dom(`${post} [data-test-unlock-button]`).isDisabled();
+    assert.dom(`${post} [data-test-deposit-button]`).isDisabled();
     await fillIn('[data-test-deposit-amount-input]', '2500');
     assert
-      .dom(`${message} [data-test-unlock-button]`)
+      .dom(`${post} [data-test-unlock-button]`)
       .isEnabled('Unlock button is enabled once amount has been entered');
-    await click(`${message} [data-test-unlock-button]`);
+    await click(`${post} [data-test-unlock-button]`);
 
     // // MetaMask pops up and user approves the transaction. There is a spinner
     // // on the "Unlock" button until the Ethereum transaction is mined.
@@ -138,12 +143,12 @@ module('Acceptance | deposit', function (hooks) {
     // TODO assert no spinner on Unlock button
 
     assert
-      .dom(`${message} [data-test-unlock-button]`)
+      .dom(`${post} [data-test-unlock-button]`)
       .isDisabled('Unlock is disabled once unlocked');
     assert
-      .dom(`${message} [data-test-deposit-button]`)
+      .dom(`${post} [data-test-deposit-button]`)
       .isEnabled('Deposit is enabled once unlocked');
-    await click(`${message} [data-test-deposit-button]`);
+    await click(`${post} [data-test-deposit-button]`);
 
     // TODO assert spinner on Deposit button
 
@@ -151,16 +156,14 @@ module('Acceptance | deposit', function (hooks) {
     await settled();
 
     assert
-      .dom('[data-test-milestone-completed][data-test-milestone="2"]')
+      .dom(milestoneCompletedSel(2))
       .containsText('Deposited into Reserve Pool');
 
-    message = '[data-test-milestone="3"][data-test-thread-message="0"]';
-
     assert
-      .dom(message)
+      .dom(postableSel(3, 0))
       .containsText('your token will be bridged to the xDai blockchain');
 
-    message = '[data-test-milestone="3"][data-test-thread-message="1"]';
+    post = postableSel(3, 1);
     // assert.dom(`${message} [data-test-step-1="complete"]`);
     // assert.dom(`${message} [data-test-step-2="in-progress"]`);
 
@@ -170,10 +173,10 @@ module('Acceptance | deposit', function (hooks) {
     // layer1Service.test__simulateCPXDMinted();
 
     // assert
-    //   .dom('[data-test-milestone-completed]')
+    //   .dom('milestoneCompletedSel(3)')
     //   .containsText('Tokens received on xDai');
 
-    // message = '[data-test-after-workflow][data-test-thread-message="0"]';
+    // message = '[data-test-after-workflow][data-test-postable="0"]';
 
     // assert.dom(`${message}`).containsText('Thank you for your contribution!');
     // assert
@@ -182,7 +185,7 @@ module('Acceptance | deposit', function (hooks) {
     //     "You have deposited 2,500 DAI into the CARD Protocol's Reserve Pool."
     //   );
 
-    // message = '[data-test-after-workflow][data-test-thread-message="1"]';
+    // message = '[data-test-after-workflow][data-test-postable="1"]';
     // assert
     //   .dom(`${message}`)
     //   .containsText(

@@ -42,7 +42,7 @@
                 @datetime={{postable.timestamp}}
                 @imgURL={{postable.author.imgURL}}
                 @hideMeta={{postable-meta-identical postable (object-at milestone.visiblePostables (dec j))}}
-                data-test-thread-message={{j}} data-test-milestone={{i}}
+                data-test-postable={{j}} data-test-milestone={{i}}
               >
                 {{format-workflow-message postable.message}}
               </Boxel::ThreadMessage>
@@ -52,7 +52,7 @@
                 @datetime={{postable.timestamp}}
                 @imgURL={{postable.author.imgURL}}
                 @hideMeta={{postable-meta-identical postable (object-at milestone.visiblePostables (dec j))}}
-                data-test-thread-message={{j}} data-test-milestone={{i}}
+                data-test-postable={{j}} data-test-milestone={{i}}
               >
                 {{component postable.componentName onComplete=(optional postable.onComplete)}}
               </Boxel::ThreadMessage>
