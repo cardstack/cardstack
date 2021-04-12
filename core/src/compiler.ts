@@ -7,6 +7,7 @@ import classPropertiesPlugin from '@babel/plugin-proposal-class-properties';
 import cardSchemaPlugin, {
   FieldsMeta,
   getMeta,
+  PluginMeta,
 } from './babel/card-schema-plugin';
 import cardTemplatePlugin, {
   Options as CardTemplateOptions,
@@ -36,13 +37,16 @@ export class Compiler {
     }
 
     let options = {};
-    let parentCard;
 
     let modelModuleName = await this.prepareSchema(cardSource, options);
     let meta = getMeta(options);
 
-    if (cardSource.adoptsFrom) {
-      let url = new URL(cardSource.adoptsFrom, cardSource.url).href;
+    let parentCard: CompiledCard;
+    let parentCardPath = this.getCardParentPath(cardSource, meta);
+
+    if (parentCardPath) {
+      // TODO: Confirm the path correctly depthed
+      let url = new URL(parentCardPath, cardSource.url).href;
       parentCard = await this.lookup(url);
     } else {
       // the base card from which all other cards derive
@@ -77,6 +81,30 @@ export class Compiler {
       card['adoptsFrom'] = parentCard;
     }
     return card;
+  }
+
+  private getCardParentPath(
+    cardSource: RawCard,
+    meta: PluginMeta
+  ): string | undefined {
+    // TODO: Does data.json exist inside of card.json
+    let parent;
+
+    if (cardSource.adoptsFrom) {
+      parent = cardSource.adoptsFrom;
+    }
+
+    if (meta.parent?.cardURL) {
+      let url = meta.parent?.cardURL;
+      if (parent && parent !== url) {
+        throw new Error(
+          `${cardSource.url} provides conflicting parent URLs in card.json and schema.js`
+        );
+      }
+      parent = url;
+    }
+
+    return parent;
   }
 
   // returns the module name of our own compiled schema, if we have one. Does
