@@ -1,0 +1,66 @@
+<Freestyle::Usage>
+    <:example>
+        <Boxel::CtaBlock
+          @stepNumber={{this.stepNumber}}
+          @canCancel={{this.canCancel}}
+          @canEdit={{this.canEdit}}
+          @state={{this.state}}
+          @atRestArgs={{this.atRestArgs}}
+          @disabledArgs={{this.disabledArgs}}
+          @inProgressArgs={{this.inProgressArgs}}
+          @doneArgs={{this.doneArgs}}
+        >
+            {{!-- this block passes to the "done" state only --}}
+        </Boxel::CtaBlock>
+    </:example>
+
+    <:api as |Args|>
+    <Args.Bool
+      @name="canCancel"
+      @description="Whether this action can be cancelled or not. This determines how inProgressArgs is handled."
+      @value={{this.canCancel}}
+      @onInput={{fn (mut this.canCancel)}}
+    />
+    <Args.Bool
+      @name="canEdit"
+      @description="Whether this action allows edits after completion. This determines how doneArgs is handled."
+      @value={{this.canEdit}}
+      @onInput={{fn (mut this.canEdit)}}
+    />
+    <Args.String
+      @name="state"
+      @description="Whether the action is at at rest, disabled, in progress, or done."
+      @options={{array "atRest" "disabled" "inProgress" "done"}}
+      @defaultValue="atRest"
+      @value={{this.state}}
+      @onInput={{fn (mut this.state)}}
+    />
+    <Args.Object
+      @name="atRestArgs"
+      @description="The CTA's UI at rest - text and action"
+      @value={{this.atRestArgs}}
+    />
+    <Args.Object
+      @name="disabledArgs"
+      @description="The CTA's disabled UI - text"
+      @value={{this.disabledArgs}}
+    />
+    <Args.Object
+      @name="inProgressArgs"
+      @description="The CTA's UI when the action is proceeding - text, cancel button text, and cancel action"
+      @value={{this.inProgressArgs}}
+    />
+    <Args.Object
+      @name="doneArgs"
+      @description="The CTA's UI after the action is completed - text +- action"
+      @value={{this.doneArgs}}
+    />
+    <Args.Number
+      @name="stepNumber"
+      @description="If passed, will add the step number to the left of the block"
+      @optional={{true}}
+      @value={{this.stepNumber}}
+      @onInput={{fn (mut this.stepNumber)}}
+    />
+    </:api>
+</Freestyle::Usage>

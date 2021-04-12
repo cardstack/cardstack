@@ -1,0 +1,27 @@
+<div>
+  {{#if this.layout.step}}
+    <div>
+      Step: {{@stepNumber}}
+    </div>
+  {{/if}}
+
+  {{#if this.layout.mainAction}}
+    <div>
+      mainAction: {{this.mainActionText}}
+    </div>
+  {{/if}}
+
+  {{#if this.layout.cancelAction}}
+    <div>
+      cancelAction: {{this.cancelActionText}}
+    </div>
+  {{/if}}
+
+  {{#if this.layout.locked}}
+    <div>locked</div>
+  {{/if}}
+
+  {{#if this.layout.statusView}}
+    <div>Status view</div>
+  {{/if}}
+</div>
