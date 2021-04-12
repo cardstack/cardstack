@@ -27,9 +27,7 @@
 
   {{#if this.layout.locked}}
     <div>locked</div>
-  {{/if}}
-
-  {{#if this.layout.statusView}}
+  {{else if this.layout.statusView}}
     <div>Status view</div>
   {{/if}}
 </div>
