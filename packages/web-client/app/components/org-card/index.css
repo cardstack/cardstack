@@ -17,6 +17,9 @@
 .org-card__icon {
   width: 4.375rem;
   height: 4.375rem;
+  padding: 1rem;
+  background-color: var(--boxel-dark);
+  border-radius: 1rem;
 }
 
 .org-card__name {

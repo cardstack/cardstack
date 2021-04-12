@@ -6,6 +6,7 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { tracked } from '@glimmer/tracking';
 
 export default class CardPayController extends Controller {
+  cardPayLogo = '/images/icons/card-pay-logo.svg';
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
   @tracked isShowingLayer1ConnectModal = false;

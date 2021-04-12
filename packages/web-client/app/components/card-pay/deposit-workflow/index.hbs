@@ -1,26 +1,96 @@
-  <h3>{{this.workflow.name}}</h3>
-  {{#each this.workflow.milestones as |milestone i|}}
-    {{#let (or milestone.complete (lte i this.workflow.activeMilestoneIndex)) as |displayMilestone|}}
-      {{#if displayMilestone}}
-        {{#each milestone.postables as |postable j|}}
-          <div class="thread-message" data-test-thread-message={{j}} data-test-milestone={{i}}>
-            <div data-test-author-name>
-              {{postable.author.name}}
-            </div>
+<Boxel::Thread class="deposit-workflow">
+  <:header>
+    <Boxel::ThreadHeader @title={{this.workflow.name}} />
+  </:header>
+  <:content>
+    <Boxel::ExpandableBanner
+      class="deposit-workflow__banner"
+      @icon="deposit"
+      @summary="Deposit Funds"
+    >
+      <div class="prose prose-dark-mode">
+        <p>
+          As a Supplier, you deposit funds from your Ethereum mainnet wallet into the
+          CARD Protocol's reserve pool and receive the corresponding amount of CPXD
+          tokens in your xDai chain wallet.
+        </p>
+        <p>
+          We currently support two types of asset you can deposit into the reserve pool:
+          <ul>
+            <li>Dai stablecoins (DAI)</li>
+            <li>Cardstack ERC-20 tokens (CARD)</li>
+          </ul>
+        </p>
+        <p>
+          The CARD Protocol's reserve pool facilitates payments between customers
+          and merchants on the Cardstack network.
+        </p>
+        <p class="deposit-workflow__banner-small-text">
+          Fees: Suppliers earn transaction fees of 0.5% for all transactions across
+          the CARD Protocol. Those fees will be distributed to Suppliers based on
+          their proportional share of supplied tokens in the reserve pool, averaged
+          over the 30-day period in which the transactions occurred. {{!-- <a href="#">More details here.</a> --}}
+          {{!-- TODO: add link --}}
+        </p>
+      </div>
+    </Boxel::ExpandableBanner>
+    {{#each this.workflow.milestones as |milestone i|}}
+      {{#let (or milestone.complete (lte i this.workflow.completedMilestoneCount)) as |displayMilestone|}}
+        {{#if displayMilestone}}
+          {{#each milestone.visiblePostables as |postable j|}}
             {{#if postable.message}}
-              {{format-workflow-message postable.message}}
+              <Boxel::ThreadMessage
+                class="deposit-workflow__thread-message"
+                @datetime={{postable.timestamp}}
+                @imgURL={{postable.author.imgURL}}
+                @hideMeta={{postable-meta-identical postable (object-at milestone.visiblePostables (dec j))}}
+                data-test-postable={{j}} data-test-milestone={{i}}
+              >
+                <div class="prose">
+                  {{format-workflow-message postable.message}}
+                </div>
+              </Boxel::ThreadMessage>
             {{else}}
-              {{component postable.componentName onComplete=(optional postable.onComplete)}}
+              <Boxel::ThreadMessage
+                class="deposit-workflow__thread-message"
+                @datetime={{postable.timestamp}}
+                @imgURL={{postable.author.imgURL}}
+                @hideMeta={{postable-meta-identical postable (object-at milestone.visiblePostables (dec j))}}
+                data-test-postable={{j}} data-test-milestone={{i}}
+              >
+                {{component postable.componentName onComplete=(optional postable.onComplete)}}
+              </Boxel::ThreadMessage>
             {{/if}}
-          </div>
-        {{/each}}
-        {{#if milestone.isComplete}}
-          <p data-test-milestone-completed data-test-milestone={{i}}>Milestone completed: {{milestone.completedDetail}}</p>
+          {{/each}}
+          {{#if milestone.isComplete}}
+            <Boxel::MilestoneBanner @title={{milestone.completedDetail}} data-test-milestone-completed data-test-milestone={{i}} />
+          {{/if}}
         {{/if}}
-      {{/if}}
+      {{/let}}
+    {{/each}}
+  </:content>
+  <:sidebar as |SidebarSection|>
+    <SidebarSection>
+      <Boxel::Sidebar::CardContainer
+        @header={{html-safe (concat "Workflow:<br>" this.workflow.name)}}
+        @attachNext={{true}}
+      >
+        <div>
+          <Boxel::ProgressCircle
+            @percentComplete={{percent-complete total=this.workflow.milestones.length completed=this.workflow.completedMilestoneCount}}
+          />
+        </div>
+        <div class="deposit-workflow__status">
+          {{this.workflow.progressStatus}}
+        </div>
+      </Boxel::Sidebar::CardContainer>
 
-      {{#if (and milestone.messageOnCompletion this.workflow.displayCompletionMessage)}}
-        <p>{{milestone.messageOnCompletion}}</p>
-      {{/if}}
-    {{/let}}
-  {{/each}}
+      <Boxel::Sidebar::CardContainer @header="Milestones">
+        <Boxel::Milestones
+          @milestones={{this.workflow.milestones}}
+          @completedCount={{this.workflow.completedMilestoneCount}}
+        />
+      </Boxel::Sidebar::CardContainer>
+    </SidebarSection>
+  </:sidebar>
+</Boxel::Thread>

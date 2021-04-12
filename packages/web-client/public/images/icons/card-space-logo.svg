@@ -1,11 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 70">
-  <g transform="translate(5351 -14652)">
-    <rect width="70" height="70" rx="18" transform="translate(-5351 14652)" fill="#281e78"/>
-    <path fill="none" d="M-5336 14667h40v40h-40z"/>
-    <g fill="none" stroke="#00ebe5" stroke-linecap="round" stroke-width="4">
-      <path d="M-5306.917 14701.891v-2.21a4.471 4.471 0 00-4.521-4.42h-9.041a4.471 4.471 0 00-4.521 4.42v2.21" stroke-linejoin="round"/>
-      <path d="M-5315.944 14683.634a4.5 4.5 0 11-4.5 4.5 4.5 4.5 0 014.5-4.5z"/>
-    </g>
-    <path d="M-5334.26 14702.148v-19.565l18.29-12.44 18.252 12.44v19.565" fill="none" stroke="#37eb77" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
-  </g>
-</svg>
+<svg height="36.006" viewBox="0 0 40.542 36.006" width="40.542" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke-linecap="round"><path d="m22.083 21.63v-2.21a4.471 4.471 0 0 0 -4.521-4.42h-9.041a4.471 4.471 0 0 0 -4.521 4.42v2.21" stroke="#00ebe5" stroke-linejoin="round" stroke-width="3" transform="translate(7.261 12.791)"/><path d="m4.056.634a4.5 4.5 0 1 1 -4.5 4.5 4.5 4.5 0 0 1 4.5-4.5z" stroke="#00ebe5" stroke-width="3" transform="translate(16.261 15.53)"/><path d="m-5337.658 14693.319v-19.565l18.29-12.44 18.252 12.44v19.565" stroke="#37eb77" stroke-linejoin="round" stroke-width="4" transform="translate(5339.659 -14659.313)"/></g></svg>

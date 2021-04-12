@@ -6,8 +6,7 @@
 }
 
 .card-pay-header-connection-button__title {
-  font: var(--boxel-font-sm);
-  font-weight: 600;
+  font: 600 var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-sm);
 }
 

@@ -5,13 +5,14 @@ import {
   WorkflowMessage,
 } from '@cardstack/web-client/utils/workflow';
 import Component from '@glimmer/component';
+import '../../../css/prose.css';
 
-let cardbot = { name: 'cardbot' };
+let cardbot = { name: 'Cardbot', imgURL: '/images/icons/cardbot.svg' };
 class DepositWorkflow extends Workflow {
   name = 'Reserve Pool Deposit';
   milestones = [
     new Milestone({
-      name: 'Connect Mainnet Wallet',
+      title: 'Connect Mainnet wallet',
       postables: [
         new WorkflowMessage({
           author: cardbot,
@@ -33,13 +34,34 @@ class DepositWorkflow extends Workflow {
         }),
         new WorkflowCard({
           author: cardbot,
-          componentName: 'card-pay/deposit-workflow/connect-mainnet',
+          componentName: 'card-pay/deposit-workflow/connect-layer-one',
         }),
       ],
       completedDetail: 'Mainnet Wallet connected',
     }),
     new Milestone({
-      name: 'Deposit into Reserve Pool',
+      title: 'Connect xDai chain wallet',
+      postables: [
+        new WorkflowMessage({
+          author: cardbot,
+          message: `You have connected your Ethereum mainnet wallet. Now it's time to connect your xDai chain
+          wallet via your Cardstack mobile app. If you don't have the app installed, please do so now.`,
+        }),
+        new WorkflowMessage({
+          author: cardbot,
+          message: `Once you have installed the app, open the app and add an existing wallet/account or create a
+          new wallet/account. Use your account to scan this QR code, which will connect your account
+          with Card Pay.`,
+        }),
+        new WorkflowCard({
+          author: cardbot,
+          componentName: 'card-pay/deposit-workflow/connect-layer-two',
+        }),
+      ],
+      completedDetail: 'xDai Chain wallet connected',
+    }),
+    new Milestone({
+      title: 'Deposit into reserve pool',
       postables: [
         new WorkflowMessage({
           author: cardbot,
@@ -62,7 +84,7 @@ class DepositWorkflow extends Workflow {
       completedDetail: 'Deposited into Reserve Pool',
     }),
     new Milestone({
-      name: 'Receive tokens on xDai',
+      title: 'Receive tokens on xDai',
       postables: [
         new WorkflowMessage({
           author: cardbot,
@@ -75,6 +97,37 @@ class DepositWorkflow extends Workflow {
         }),
       ],
       completedDetail: 'Tokens received on xDai',
+    }),
+  ];
+  epiloguePostables = [
+    new WorkflowMessage({
+      author: cardbot,
+      message: 'Thank you for your contribution!',
+    }),
+    new WorkflowCard({
+      author: cardbot,
+      componentName: 'card-pay/deposit-workflow/confirmation',
+    }),
+    new WorkflowMessage({
+      author: cardbot,
+      message: 'This is the remaining balance in your Ethereum mainnet wallet:',
+    }),
+    new WorkflowCard({
+      author: cardbot,
+      componentName: 'card-pay/deposit-workflow/connect-layer1',
+    }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You have earned a Supplier badge. It has been sent to your xDai chain address.',
+    }),
+    new WorkflowCard({
+      author: cardbot,
+      componentName: 'card-pay/deposit-workflow/supplier-badge',
+    }),
+    new WorkflowCard({
+      author: cardbot,
+      componentName: 'card-pay/deposit-workflow/next-steps',
     }),
   ];
 }
