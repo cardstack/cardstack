@@ -7,10 +7,10 @@ import { inject as service } from '@ember/service';
 import { taskFor } from 'ember-concurrency-ts';
 import { reads } from 'macro-decorators';
 
-interface CardPayDepositWorkflowConnectMainnetComponentArgs {
+interface CardPayDepositWorkflowConnectLayer1ComponentArgs {
   onComplete: (() => void) | undefined;
 }
-class CardPayDepositWorkflowConnectMainnetComponent extends Component<CardPayDepositWorkflowConnectMainnetComponentArgs> {
+class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepositWorkflowConnectLayer1ComponentArgs> {
   @service declare layer1Network: Layer1Network;
   @reads('layer1Network.hasAccount') declare hasAccount: boolean;
   @tracked isWaitingForConnection = false;
@@ -27,4 +27,4 @@ class CardPayDepositWorkflowConnectMainnetComponent extends Component<CardPayDep
   }
 }
 
-export default CardPayDepositWorkflowConnectMainnetComponent;
+export default CardPayDepositWorkflowConnectLayer1Component;

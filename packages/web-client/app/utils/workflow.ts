@@ -85,6 +85,7 @@ export class Milestone {
 export abstract class Workflow {
   name!: string;
   milestones: Milestone[] = [];
+  epiloguePostables: WorkflowPostable[] = [];
   get completedMilestoneCount() {
     return this.milestones.filterBy('isComplete').length;
   }

@@ -12,34 +12,13 @@ import { setupApplicationTest } from 'ember-qunit';
 
 module('Acceptance | deposit', function (hooks) {
   setupApplicationTest(hooks);
-  // TODO: Scenario where the user has already connected Layer 1 before starting this workflow
-  test('Making a deposit', async function (assert) {
+
+  test('Initiating workflow without wallet connections', async function (assert) {
     await visit('/');
     assert.equal(currentURL(), '/');
     await click('[data-test-cardstack-org-link="card-pay"]');
     assert.equal(currentURL(), '/card-pay');
 
-    await click(
-      '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
-    );
-    let layer2Service = this.owner.lookup('service:layer2-network');
-    layer2Service.test__simulateWalletConnectUri();
-    await waitFor('[data-test-wallet-connect-qr-code]');
-    assert.dom('[data-test-wallet-connect-qr-code]').exists();
-
-    // Simulate the user scanning the QR code and connecting their mobile wallet
-    let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    await waitUntil(
-      () => !document.querySelector('[data-test-layer-two-connect-modal]')
-    );
-    assert
-      .dom(
-        '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
-      )
-      .hasText('0x18261…6E44');
-    assert.dom('[data-test-wallet-connect-qr-code]').doesNotExist();
-    assert.dom('[data-test-layer-two-connect-modal]').doesNotExist();
     await click('[data-test-card-pay-header-tab][href="/card-pay/balances"]');
 
     await click('[data-test-deposit-button]');
@@ -59,7 +38,6 @@ module('Acceptance | deposit', function (hooks) {
       );
 
     message = '[data-test-milestone="0"][data-test-thread-message="3"]';
-
     await click(`${message} [data-test-wallet-option="metamask"]`);
     await click(
       `${message} [data-test-mainnnet-connection-action-container] [data-test-boxel-button]`
@@ -84,9 +62,48 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(message)
       .containsText(
-        'Please choose the asset you would like to deposit into the CARD Protocol’s Reserve Pool'
+        'Now it’s time to connect your xDai chain wallet via your Cardstack mobile app'
       );
+
     message = '[data-test-milestone="1"][data-test-thread-message="1"]';
+    assert
+      .dom(message)
+      .containsText(
+        'Once you have installed the app, open the app and add an existing wallet/account'
+      );
+
+    message = '[data-test-milestone="1"][data-test-thread-message="2"]';
+    assert
+      .dom(message)
+      .containsText('Loading QR Code for Cardstack Mobile wallet connection');
+
+    let layer2Service = this.owner.lookup('service:layer2-network');
+    layer2Service.test__simulateWalletConnectUri();
+    await waitFor('[data-test-wallet-connect-qr-code]');
+    assert.dom('[data-test-wallet-connect-qr-code]').exists();
+
+    // Simulate the user scanning the QR code and connecting their mobile wallet
+    let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await waitUntil(
+      () => !document.querySelector('[data-test-wallet-connect-qr-code]')
+    );
+    assert
+      .dom(
+        '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
+      )
+      .hasText('0x18261…6E44');
+    await waitFor('[data-test-milestone-completed]');
+    assert
+      .dom('[data-test-milestone-completed][data-test-milestone="1"]')
+      .containsText('xDai Chain wallet connected');
+
+    message = '[data-test-milestone="2"][data-test-thread-message="0"]';
+    assert
+      .dom(message)
+      .containsText('choose the asset you would like to deposit');
+
+    message = '[data-test-milestone="2"][data-test-thread-message="1"]';
     // TODO: assert ETH balance showing
     // TODO: assert DAI balance showing
     await click(`${message} [data-test-layer-1-source-trigger]`);
@@ -95,12 +112,12 @@ module('Acceptance | deposit', function (hooks) {
     await click(`${message} [data-test-new-depot-option]`);
     await click(`${message} [data-test-continue-button]`);
 
-    message = '[data-test-milestone="1"][data-test-thread-message="2"]';
+    message = '[data-test-milestone="2"][data-test-thread-message="2"]';
     assert
       .dom(message)
       .containsText('How many tokens would you like to deposit?');
 
-    message = '[data-test-milestone="1"][data-test-thread-message="3"]';
+    message = '[data-test-milestone="2"][data-test-thread-message="3"]';
     assert.dom(`${message} [data-test-unlock-button]`).isDisabled();
     assert.dom(`${message} [data-test-deposit-button]`).isDisabled();
     await fillIn('[data-test-deposit-amount-input]', '2500');
@@ -134,16 +151,16 @@ module('Acceptance | deposit', function (hooks) {
     await settled();
 
     assert
-      .dom('[data-test-milestone-completed][data-test-milestone="1"]')
+      .dom('[data-test-milestone-completed][data-test-milestone="2"]')
       .containsText('Deposited into Reserve Pool');
 
-    message = '[data-test-milestone="2"][data-test-thread-message="0"]';
+    message = '[data-test-milestone="3"][data-test-thread-message="0"]';
 
     assert
       .dom(message)
       .containsText('your token will be bridged to the xDai blockchain');
 
-    message = '[data-test-milestone="2"][data-test-thread-message="1"]';
+    message = '[data-test-milestone="3"][data-test-thread-message="1"]';
     // assert.dom(`${message} [data-test-step-1="complete"]`);
     // assert.dom(`${message} [data-test-step-2="in-progress"]`);
 
