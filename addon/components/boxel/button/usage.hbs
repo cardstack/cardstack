@@ -25,6 +25,7 @@
             <li><code>@size</code></li>
             <li><code>@kind</code></li>
             <li><code>@disabled</code></li>
+            <li><code>@loading</code></li>
           </ul>
         </td>
         <td>
@@ -77,8 +78,10 @@
         @kind={{this.kind}}
         @size={{this.size}}
         @disabled={{this.disabled}}
+        @loading={{this.loading}}
         @href={{this.href}}
         @route={{this.route}}
+        {{on "click" this.alert}}
       >
         Button Text
       </Boxel::Button>
@@ -142,6 +145,13 @@
       @description="Controls whether the button is disabled"
       @onInput={{fn (mut this.disabled)}}
       @value={{this.disabled}}
+    />
+    <Args.Bool
+      @name="loading"
+      @optional={{true}}
+      @description="Controls whether the button is loading."
+      @onInput={{fn (mut this.loading)}}
+      @value={{this.loading}}
     />
     <Args.Yield @description="Contents of the button" />
   </:api>

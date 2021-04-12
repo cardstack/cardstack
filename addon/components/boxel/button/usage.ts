@@ -15,6 +15,7 @@ export default class extends Component {
   @tracked size = 'base';
   @tracked kind = 'primary';
   @tracked disabled = false;
+  @tracked loading = false;
 
   // for @as === 'anchor'
   @tracked href = '#';

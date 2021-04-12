@@ -5,11 +5,15 @@
  ) as |classes|}}
 {{#if (or (not @as) (eq @as "button"))}}
   <button
-    class={{classes}}
+    class={{cn classes (if @loading "boxel-button--loading")}}
+    tabindex={{if @loading -1 0}}
     disabled={{@disabled}}
     data-test-boxel-button
     ...attributes
   >
+  {{#if @loading}}
+    {{svg-jar "loading-indicator" class="boxel-button__loading-indicator"}}
+  {{/if}}
     {{yield}}
   </button>
 {{else if (eq @as "anchor")}}
