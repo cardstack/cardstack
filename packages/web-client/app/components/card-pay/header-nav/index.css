@@ -37,4 +37,6 @@
 .card-pay-header-nav__tab svg {
   margin-right: var(--boxel-sp-xs);
   flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
 }

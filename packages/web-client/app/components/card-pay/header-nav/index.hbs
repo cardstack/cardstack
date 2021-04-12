@@ -3,7 +3,7 @@
     {{#each @tabs as |tab i|}}
       <li>
         <LinkTo role="tab" id={{tab.route}} @route={{tab.route}} class="card-pay-header-nav__tab" data-test-card-pay-header-tab={{i}}>
-          {{svg-jar tab.icon width="1rem" height="1rem" aria-hidden="true"}}
+          {{svg-jar tab.icon aria-hidden="true"}}
           {{tab.title}}
         </LinkTo>
       </li>
