@@ -77,6 +77,10 @@ export default class CtaBlock extends Component<CtaBlockArguments> {
     }
   }
 
+  get mainActionIsButton(): boolean {
+    return this.args.state !== CtaBlockState.done || this.args.canEdit;
+  }
+
   // Text of the primary action button of this CTA
   // Or text of the done state message
   get mainActionText(): string {
@@ -110,7 +114,7 @@ export default class CtaBlock extends Component<CtaBlockArguments> {
     }
   }
 
-  cancelActionButtonkind = 'secondary-dark';
+  cancelActionButtonKind = 'secondary-dark';
 
   get cancelActionText(): string {
     return this.args.inProgressArgs.cancelText || '';

@@ -1,20 +1,28 @@
 <div>
   {{#if this.layout.step}}
     <div>
-      Step: {{@stepNumber}}
+      {{@stepNumber}}
     </div>
   {{/if}}
 
   {{#if this.layout.mainAction}}
+  {{#if this.mainActionIsButton}}
+    <button {{on "click" this.mainAction}}>
+      {{this.mainActionButtonKind}}
+      mainAction: {{this.mainActionText}}
+    </button>
+    {{else}}
     <div>
       mainAction: {{this.mainActionText}}
     </div>
   {{/if}}
+  {{/if}}
 
   {{#if this.layout.cancelAction}}
-    <div>
+    <button {{on "click" this.cancelAction}}>
+      {{this.cancelActionButtonKind}}
       cancelAction: {{this.cancelActionText}}
-    </div>
+    </button>
   {{/if}}
 
   {{#if this.layout.locked}}
