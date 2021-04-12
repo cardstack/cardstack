@@ -19,8 +19,8 @@ module('Integration | compiler-adoption', function (hooks) {
     files: {
       'schema.js': `
         import { contains } from "@cardstack/types";
-        import date from "https://cardstack.com/base/models/date";
-        import string from "https://cardstack.com/base/models/string";
+        import date from "https://cardstack.com/base/date";
+        import string from "https://cardstack.com/base/string";
         export default class Person {
           @contains(string)
           name;
@@ -74,7 +74,7 @@ module('Integration | compiler-adoption', function (hooks) {
           'schema.js': `
           import { adopts, contains } from "@cardstack/types";
           import Person from "http://mirage/cards/person";
-          import string from "https://cardstack.com/base/models/string";
+          import string from "https://cardstack.com/base/string";
 
           export default @adopts(Person) class User {
             @contains(string)
@@ -100,7 +100,7 @@ module('Integration | compiler-adoption', function (hooks) {
           'schema.js': `
           import { adopts, contains } from "@cardstack/types";
           import Person from "http://mirage/cards/person";
-          import string from "https://cardstack.com/base/models/string";
+          import string from "https://cardstack.com/base/string";
 
           export default @adopts(Person) class User {
             @contains(string)
@@ -129,7 +129,7 @@ module('Integration | compiler-adoption', function (hooks) {
           'schema.js': `
           import { adopts, contains } from "@cardstack/types";
           import Person from "http://mirage/cards/person";
-          import string from "https://cardstack.com/base/models/string";
+          import string from "https://cardstack.com/base/string";
 
           export default @adopts(Person) class User {
             @contains(string)
@@ -144,7 +144,7 @@ module('Integration | compiler-adoption', function (hooks) {
           'schema.js': `
           import { adopts, contains } from "@cardstack/types";
           import User from "http://mirage/cards/user";
-          import string from "https://cardstack.com/base/models/string";
+          import string from "https://cardstack.com/base/string";
 
           export default @adopts(User) class Admin {
             @contains(string)
@@ -196,7 +196,7 @@ module('Integration | compiler-adoption', function (hooks) {
           'schema.js': `
           import { adopts, contains } from "@cardstack/types";
           import Person from "http://mirage/cards/person";
-          import string from "https://cardstack.com/base/models/string";
+          import string from "https://cardstack.com/base/string";
 
           export default @adopts(Person) class User {
             @contains(string)

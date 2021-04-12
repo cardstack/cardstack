@@ -99,7 +99,7 @@ async function returnCompiledCard(schema: any, request: RequestType) {
 
 export default function (this: Server): void {
   this.get('http://mirage/cards/:id', returnCompiledCard);
-  this.get('http://cardstack.com/base/models/:id', returnCompiledCard);
+  this.get('https://cardstack.com/base/:id', returnCompiledCard);
 
   this.post('/spaces');
   this.patch('/spaces');

@@ -133,7 +133,8 @@ export class Compiler {
     });
 
     let code = out!.code!;
-    return await this.define(new URL(localFile, cardSource.url).href, code);
+    let url = cardSource.url.replace(/\/$/, '') + '/';
+    return await this.define(new URL(localFile, url).href, code);
   }
 
   async lookupFieldsForCard(
@@ -186,10 +187,11 @@ export class Compiler {
           `${cardSource.url} referred to ${localFile} in its card.json but that file does not exist`
         );
       }
+      let url = cardSource.url.replace(/\/$/, '') + '/';
       return await this.compileComponent(
         cardSource.files[localFile],
         fields,
-        new URL(localFile, cardSource.url).href
+        new URL(localFile, url).href
       );
     } else {
       return parentCard[which];

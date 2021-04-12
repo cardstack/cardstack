@@ -19,8 +19,8 @@ const PERSON_CARD = {
   files: {
     'schema.js': `
       import { contains } from "@cardstack/types";
-      import date from "https://cardstack.com/base/models/date";
-      import string from "https://cardstack.com/base/models/string";
+      import date from "https://cardstack.com/base/date";
+      import string from "https://cardstack.com/base/string";
       export default class Person {
         @contains(string)
         name;
@@ -105,9 +105,9 @@ module('Integration | compiler-basics', function (hooks) {
       files: {
         'schema.js': `
           import { contains, belongsTo, containsMany, hasMany } from "@cardstack/types";
-          import string from "https://cardstack.com/base/models/string";
-          import comment from "https://cardstack.com/base/models/comment";
-          import tag from "https://cardstack.com/base/models/tag";
+          import string from "https://cardstack.com/base/string";
+          import comment from "https://cardstack.com/base/comment";
+          import tag from "https://cardstack.com/base/tag";
           import person from "https://mirage/cards/person";
 
           export default class Post {
@@ -144,7 +144,7 @@ module('Integration | compiler-basics', function (hooks) {
       files: {
         'schema.js': `
         import { contains } from "@cardstack/types";
-        import string from "https://cardstack.com/base/models/string";
+        import string from "https://cardstack.com/base/string";
 
         export default class Post {
           @contains(string)
@@ -164,7 +164,7 @@ module('Integration | compiler-basics', function (hooks) {
       url: 'http://mirage/cards/post',
       files: {
         'schema.js': `
-        import string from "https://cardstack.com/base/models/string";
+        import string from "https://cardstack.com/base/string";
         import { contains } from "@cardstack/types";
 
         export default class Post {
@@ -186,7 +186,7 @@ module('Integration | compiler-basics', function (hooks) {
       files: {
         'schema.js': `
         import { contains } from "@cardstack/types";
-        import string from "https://cardstack.com/base/models/string";
+        import string from "https://cardstack.com/base/string";
 
         export default class Post {
           @contains(string)
@@ -200,7 +200,7 @@ module('Integration | compiler-basics', function (hooks) {
     let compiled = await builder.getCompiledCard(card.url);
     let title = compiled.fields.title;
     assert.equal(title.type, 'contains');
-    assert.equal(title.card.url, 'https://cardstack.com/base/models/string');
+    assert.equal(title.card.url, 'https://cardstack.com/base/string');
   });
 
   module('data', function () {
@@ -215,7 +215,7 @@ module('Integration | compiler-basics', function (hooks) {
           },
           'schema.js': `
           import { contains } from "@cardstack/types";
-          import string from "https://cardstack.com/base/models/string";
+          import string from "https://cardstack.com/base/string";
 
           export default class Post {
             @contains(string)
@@ -238,7 +238,7 @@ module('Integration | compiler-basics', function (hooks) {
         files: {
           'schema.js': `
         import { contains } from "@cardstack/types";
-        import string from "https://cardstack.com/base/models/string";
+        import string from "https://cardstack.com/base/string";
 
         export default class Post {
           @contains(string)
@@ -303,7 +303,7 @@ module('Integration | compiler-basics', function (hooks) {
         files: {
           'schema.js': `
     import { contains } from "@cardstack/types";
-    import string from "https://cardstack.com/base/models/string";
+    import string from "https://cardstack.com/base/string";
 
     function hi() {
       return contains(string);
@@ -331,7 +331,7 @@ module('Integration | compiler-basics', function (hooks) {
         files: {
           'schema.js': `
     import { contains } from "@cardstack/types";
-    import string from "https://cardstack.com/base/models/string";
+    import string from "https://cardstack.com/base/string";
 
     @contains(string)
     class X {}
@@ -359,7 +359,7 @@ module('Integration | compiler-basics', function (hooks) {
         files: {
           'schema.js': `
     import { contains } from "@cardstack/types";
-    import string from "https://cardstack.com/base/models/string";
+    import string from "https://cardstack.com/base/string";
 
     let myFieldName = 'title';
     class X {
@@ -389,7 +389,7 @@ module('Integration | compiler-basics', function (hooks) {
         files: {
           'schema.js': `
     import { contains } from "@cardstack/types";
-    import string from "https://cardstack.com/base/models/string";
+    import string from "https://cardstack.com/base/string";
 
     let myFieldName = 'title';
     class X {
@@ -421,7 +421,7 @@ module('Integration | compiler-basics', function (hooks) {
         files: {
           'schema.js': `
     import { contains } from "@cardstack/types";
-    import string from "https://cardstack.com/base/models/string";
+    import string from "https://cardstack.com/base/string";
 
     class X {
       @contains(string, 1)
@@ -449,7 +449,7 @@ module('Integration | compiler-basics', function (hooks) {
         files: {
           'schema.js': `
     import { hasMany } from "@cardstack/types";
-    import string from "https://cardstack.com/base/models/string";
+    import string from "https://cardstack.com/base/string";
 
     class X {
       @hasMany(string, 1)

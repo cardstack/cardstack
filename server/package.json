@@ -23,7 +23,8 @@
     "koa": "^2.13.1",
     "koa-logger": "^3.2.1",
     "tmp": "^0.2.1",
-    "walk-sync": "^2.2.0"
+    "walk-sync": "^2.2.0",
+    "glob": "7.1.6"
   },
   "devDependencies": {
     "@types/supertest": "^2.0.11",

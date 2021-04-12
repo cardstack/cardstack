@@ -52,7 +52,7 @@ module('Integration | card-service', function (hooks) {
           },
           'schema.js': `
           import { contains } from "@cardstack/types";
-          import string from "https://cardstack.com/base/models/string";
+          import string from "https://cardstack.com/base/string";
           import green from "${greenId}"
 
           export default class Hello {

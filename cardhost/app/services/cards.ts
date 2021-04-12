@@ -60,7 +60,8 @@ export default class Cards extends Service {
         );
       }
       componentModule = componentModule.replace('@cardstack/compiled/', '');
-      cardComponent = await import(`@cardstack/compiled/${componentModule}`);
+      cardComponent = (await import(`@cardstack/compiled/${componentModule}`))
+        .default;
     }
 
     let CallerComponent = setComponentTemplate(

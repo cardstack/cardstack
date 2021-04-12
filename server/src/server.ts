@@ -90,11 +90,13 @@ export class Server {
       for (let cardPath of cards) {
         let fullCardUrl = new URL(cardPath.replace('card.json', ''), realm.url)
           .href;
+        console.debug(`--> Priming cache for ${fullCardUrl}`);
         promises.push(this.builder.getCompiledCard(fullCardUrl));
       }
     }
 
     await Promise.all(promises);
+    console.debug(`--> Cache primed`);
     // glob on card.json
     // for each card, call builder.getCompiledCard
 
