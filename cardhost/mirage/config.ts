@@ -1,5 +1,11 @@
-import { Response, Request } from 'miragejs';
+import type {
+  Response as ResponseType,
+  Request as RequestType,
+} from 'miragejs';
 import type { Server } from 'miragejs/server';
+
+// @ts-ignore
+import { Response } from 'ember-cli-mirage';
 
 import Builder from 'cardhost/lib/builder';
 import { Format, RawCard } from '@cardstack/core/src/interfaces';
@@ -57,7 +63,7 @@ class FakeCardServer {
     };
   }
 
-  respondWithRawCard(schema: any, url: string): RawCard | Response {
+  respondWithRawCard(schema: any, url: string): RawCard | ResponseType {
     let rawCard = schema.cards.find(url);
     if (!rawCard) {
       return new Response(404, {}, { error: `Not Found: No card for '${url}` });
@@ -66,7 +72,7 @@ class FakeCardServer {
   }
 }
 
-function cardParams(queryParams: Request['queryParams']): CardParams {
+function cardParams(queryParams: RequestType['queryParams']): CardParams {
   let { type, format } = queryParams;
   if (type && !['raw', 'compiled'].includes(type)) {
     throw new Error(`unsupported ?type=${type}`);
@@ -80,7 +86,7 @@ function cardParams(queryParams: Request['queryParams']): CardParams {
   return (queryParams as unknown) as CardParams;
 }
 
-async function returnCompiledCard(schema: any, request: Request) {
+async function returnCompiledCard(schema: any, request: RequestType) {
   let cardServer = FakeCardServer.current();
   let params = cardParams(request.queryParams);
   let [url] = request.url.split('?');

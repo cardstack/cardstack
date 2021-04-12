@@ -13,6 +13,7 @@ const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 const { Webpack } = require('@embroider/webpack');
 const { compatBuild } = require('@embroider/compat');
 const withSideWatch = require('./lib/with-side-watch');
+const Funnel = require('broccoli-funnel');
 
 module.exports = function (defaults) {
   let app = new EmberApp(defaults, {
@@ -20,6 +21,15 @@ module.exports = function (defaults) {
       app: withSideWatch('app', { watching: ['../core'] }),
     },
   });
+
+  // Workaround to support mirage under embroider 0.39.1
+  let trees = [];
+  if (app.env !== 'production') {
+    let mirage = new Funnel('mirage', {
+      destDir: 'mirage',
+    });
+    trees.push(mirage);
+  }
 
   return compatBuild(app, Webpack, {
     packagerOptions: {
@@ -31,5 +41,6 @@ module.exports = function (defaults) {
         },
       },
     },
+    extraPublicTrees: trees,
   });
 };
