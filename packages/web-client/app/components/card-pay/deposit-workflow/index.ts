@@ -5,6 +5,7 @@ import {
   WorkflowMessage,
 } from '@cardstack/web-client/utils/workflow';
 import Component from '@glimmer/component';
+import '../../../css/prose.css';
 
 let cardbot = { name: 'Cardbot', imgURL: '/images/icons/cardbot.svg' };
 class DepositWorkflow extends Workflow {

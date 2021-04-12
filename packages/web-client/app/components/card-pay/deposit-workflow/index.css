@@ -9,38 +9,6 @@
   text-align: center;
 }
 
-.deposit-workflow__thread-message p {
-  margin: 0;
-  font-size: 0.9375rem;
-  line-height: calc(23/15);
-  letter-spacing: var(--boxel-lsp-sm);
-}
-
-.deposit-workflow__banner-list,
-.deposit-workflow__thread-message ul {
-  margin: 0;
-  padding: 0;
-  list-style-position: inside;
-}
-
-.deposit-workflow__banner-list li::marker,
-.deposit-workflow__thread-message li::marker {
-  content: '- ';
-}
-
-.deposit-workflow__banner-paragraph {
-  margin: 0;
-  font: var(--boxel-font-sm);
-}
-
-.deposit-workflow__banner-paragraph + .deposit-workflow__banner-paragraph {
-  margin-top: var(--boxel-sp-sm);
-}
-
-.deposit-workflow__banner-paragraph + .deposit-workflow__banner-small-text {
-  margin-top: var(--boxel-sp-lg);
-}
-
 .deposit-workflow__banner-small-text {
   margin-bottom: 0;
   color: var(--boxel-light-600);
