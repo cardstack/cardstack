@@ -6,6 +6,7 @@ import Layer1Network from '../../../../services/layer1-network';
 import { inject as service } from '@ember/service';
 import { taskFor } from 'ember-concurrency-ts';
 import { reads } from 'macro-decorators';
+import { next } from '@ember/runloop';
 
 interface CardPayDepositWorkflowConnectLayer1ComponentArgs {
   onComplete: (() => void) | undefined;
@@ -14,6 +15,17 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
   @service declare layer1Network: Layer1Network;
   @reads('layer1Network.hasAccount') declare hasAccount: boolean;
   @tracked isWaitingForConnection = false;
+  constructor(
+    owner: unknown,
+    args: CardPayDepositWorkflowConnectLayer1ComponentArgs
+  ) {
+    super(owner, args);
+    if (this.hasAccount) {
+      next(this, () => {
+        this.args.onComplete?.();
+      });
+    }
+  }
   @action onClickActionContainerButton() {
     if (!this.hasAccount) {
       taskFor(this.connectWalletTask).perform();

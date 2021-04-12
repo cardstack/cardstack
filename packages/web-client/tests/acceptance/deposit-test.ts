@@ -199,4 +199,96 @@ module('Acceptance | deposit', function (hooks) {
     // // assert only Dai CPXD balance shown
     // // assert no Prepaid Cards yet
   });
+
+  test('Initiating workflow with layer 1 wallet already connected', async function (assert) {
+    await visit('/');
+    await click('[data-test-cardstack-org-link="card-pay"]');
+
+    await click(
+      '[data-test-card-pay-layer-1-connect] [data-test-card-pay-connect-button]'
+    );
+    assert.dom('[data-test-layer-one-connect-modal]').exists();
+    let layer1Service = this.owner.lookup('service:layer1-network');
+
+    let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+    layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
+    await waitUntil(
+      () => !document.querySelector('[data-test-layer-one-connect-modal]')
+    );
+    assert
+      .dom(
+        '[data-test-card-pay-layer-1-connect] [data-test-card-pay-connect-button]'
+      )
+      .hasText('0xaCD5f…4Fb6');
+    assert.dom('[data-test-layer-one-connect-modal]').doesNotExist();
+
+    await click('[data-test-card-pay-header-tab][href="/card-pay/balances"]');
+    await click('[data-test-deposit-button]');
+
+    let post = postableSel(0, 0);
+    assert.dom(`${post} img`).exists();
+    assert.dom(post).containsText('Hi there, we’re happy to see you');
+
+    assert
+      .dom(postableSel(0, 1))
+      .containsText('you need to connect two wallets');
+
+    assert
+      .dom(postableSel(0, 2))
+      .containsText(
+        'The funds you wish to deposit must be available in your Mainnet Wallet'
+      );
+
+    assert
+      .dom(postableSel(0, 3))
+      .containsText(
+        'Looks like you’ve already connected your Ethereum mainnet wallet'
+      );
+
+    await waitFor(milestoneCompletedSel(0));
+    assert
+      .dom(milestoneCompletedSel(0))
+      .containsText('Mainnet Wallet connected');
+
+    assert
+      .dom(postableSel(1, 0))
+      .containsText(
+        'Now it’s time to connect your xDai chain wallet via your Cardstack mobile app'
+      );
+
+    assert
+      .dom(postableSel(1, 1))
+      .containsText(
+        'Once you have installed the app, open the app and add an existing wallet/account'
+      );
+
+    assert
+      .dom(postableSel(1, 2))
+      .containsText('Loading QR Code for Cardstack Mobile wallet connection');
+
+    let layer2Service = this.owner.lookup('service:layer2-network');
+    layer2Service.test__simulateWalletConnectUri();
+    await waitFor('[data-test-wallet-connect-qr-code]');
+    assert.dom('[data-test-wallet-connect-qr-code]').exists();
+
+    // Simulate the user scanning the QR code and connecting their mobile wallet
+    let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await waitUntil(
+      () => !document.querySelector('[data-test-wallet-connect-qr-code]')
+    );
+    assert
+      .dom(
+        '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
+      )
+      .hasText('0x18261…6E44');
+    await waitFor(milestoneCompletedSel(1));
+    assert
+      .dom(milestoneCompletedSel(1))
+      .containsText('xDai Chain wallet connected');
+
+    assert
+      .dom(postableSel(2, 0))
+      .containsText('choose the asset you would like to deposit');
+  });
 });
