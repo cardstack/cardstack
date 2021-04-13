@@ -8,7 +8,7 @@
       {{yield}}
     </div>
   {{/if}}
-  <Boxel::Button {{on "click" (optional @onClickButton)}} @kind="collection-style" class="boxel-help-box__button">
+  <Boxel::Button {{on "click" (optional @onClickButton)}} @kind="secondary-light" class="boxel-help-box__button">
     {{or @buttonText "Request live support"}}
   </Boxel::Button>
 </Boxel::Sidebar::CardContainer>

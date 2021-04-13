@@ -45,7 +45,7 @@ module('Integration | Component | Button', function (hooks) {
   });
 
   test('It can apply appropriate classes depending on the kind argument', async function (assert) {
-    const kinds = ['primary', 'dropdown', 'collection-style'];
+    const kinds = ['primary', 'dropdown'];
     const kindClassRegexes = kinds.map((v) => new RegExp('--kind-' + v));
 
     this.setProperties({

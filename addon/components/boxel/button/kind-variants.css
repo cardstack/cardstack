@@ -40,24 +40,11 @@
 .boxel-button--kind-secondary-light:not(:disabled) {
   /* transparent on light background */
   --boxel-button-color: transparent;
-  --boxel-button-border: 1px solid var(--boxel-light-600);
+  --boxel-button-border: 1px solid var(--boxel-light-300);
   --boxel-button-text-color: var(--boxel-dark);
 }
 
 .boxel-button--kind-secondary-light:not(:disabled):hover,
 .boxel-button--kind-secondary-light:not(:disabled):active {
-  --boxel-button-border: 1px solid var(--boxel-dark);
-}
-
-/* We only use this in one/two places right now, but putting it here just in case */
-/* TODO: decide what to do with collection style */
-.boxel-button--kind-collection-style {
-  --boxel-button-color: transparent;
-  --boxel-button-border: 1px solid var(--boxel-purple-300);
-  --boxel-button-text-color: var(--boxel-dark);
-}
-
-.boxel-button--kind-collection-style:not(:disabled):hover,
-.boxel-button--kind-collection-style:not(:disabled):active {
   --boxel-button-border: 1px solid var(--boxel-dark);
 }
