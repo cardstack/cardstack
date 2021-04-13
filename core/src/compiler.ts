@@ -91,7 +91,6 @@ export class Compiler {
     cardSource: RawCard,
     meta: PluginMeta
   ): string | undefined {
-    // TODO: Does data.json exist inside of card.json
     let parent;
 
     if (cardSource.adoptsFrom) {
@@ -111,6 +110,16 @@ export class Compiler {
     return parent;
   }
 
+  getSource(cardSource: RawCard, path: string): string {
+    let schemaSrc = cardSource.files[path];
+    if (!schemaSrc) {
+      throw new Error(
+        `${cardSource.url} refers to ${path} in its card.json but that file does not exist`
+      );
+    }
+    return schemaSrc;
+  }
+
   // returns the module name of our own compiled schema, if we have one. Does
   // not recurse into parent, because we don't necessarily know our parent until
   // after we've tried to compile our own
@@ -118,17 +127,12 @@ export class Compiler {
     cardSource: RawCard,
     options: Object
   ): Promise<string | undefined> {
-    let localFile = cardSource.schema;
-    if (!localFile) {
+    let schemaLocalFilePath = cardSource.schema;
+    if (!schemaLocalFilePath) {
       return undefined;
     }
-    let src = cardSource.files[localFile];
-    if (!src) {
-      throw new Error(
-        `${cardSource.url} refers to ${localFile} in its card.json but that file does not exist`
-      );
-    }
-    let out = transformSync(src, {
+    let schemaSrc = this.getSource(cardSource, schemaLocalFilePath);
+    let out = transformSync(schemaSrc, {
       plugins: [
         [cardSchemaPlugin, options],
         [decoratorsPlugin, { decoratorsBeforeExport: false }],
@@ -137,7 +141,7 @@ export class Compiler {
     });
 
     let code = out!.code!;
-    return await this.define(cardSource.url, localFile, code);
+    return await this.define(cardSource.url, schemaLocalFilePath, code);
   }
 
   async lookupFieldsForCard(
@@ -163,7 +167,6 @@ export class Compiler {
   ): CompiledCard['fields'] {
     let cardFieldNames = Object.keys(fields);
     let parentFieldNames = Object.keys(parentCard.fields);
-
     let fieldNameCollisions = intersection(cardFieldNames, parentFieldNames);
 
     if (fieldNameCollisions.length) {
@@ -183,22 +186,18 @@ export class Compiler {
     parentCard: CompiledCard,
     which: Format
   ): Promise<ComponentInfo> {
-    let localFile = cardSource[which];
-    if (localFile) {
-      if (!cardSource.files[localFile]) {
-        throw new Error(
-          `${cardSource.url} referred to ${localFile} in its card.json but that file does not exist`
-        );
-      }
-      return await this.compileComponent(
-        cardSource.files[localFile],
-        fields,
-        cardSource.url,
-        localFile
-      );
-    } else {
+    let localFilePath = cardSource[which];
+    if (!localFilePath) {
       return parentCard[which];
     }
+
+    let src = this.getSource(cardSource, localFilePath);
+    return await this.compileComponent(
+      src,
+      fields,
+      cardSource.url,
+      localFilePath
+    );
   }
 
   private async compileComponent(
@@ -220,6 +219,7 @@ export class Compiler {
     let out = transformSync(templateSource, {
       plugins: [[cardTemplatePlugin, options]],
     });
+
     return {
       moduleName: await this.define(cardURL, localFile, out!.code!),
       usedFields,
