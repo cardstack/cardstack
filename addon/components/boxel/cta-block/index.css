@@ -13,6 +13,10 @@
   transition: background-color var(--boxel-transition);
 }
 
+.boxel-cta-block--done-uneditable {
+  padding: var(--boxel-sp) var(--boxel-sp-lg);
+}
+
 .boxel-cta-block--light {
   --icon-color: var(--boxel-purple-400);
   background-color: var(--boxel-purple-100);
@@ -20,17 +24,23 @@
 }
 
 .boxel-cta-block__step {
+  width: var(--boxel-sp-lg);
   position: absolute;
-  left: var(--boxel-sp-xs);
+  left: 0;
+  text-align: center;
 }
 
 .boxel-cta-block__action {
   display: flex;
+  align-items: center;
+  font: 600 var(--boxel-font-sm);
 }
 
 .boxel-cta-block__done-icon {
   --icon-color: var(--boxel-dark);
   margin-right: var(--boxel-sp-xxs);
+  width: var(--boxel-sp);
+  height: var(--boxel-sp);
 }
 
 .boxel-cta-block__cancel-button {

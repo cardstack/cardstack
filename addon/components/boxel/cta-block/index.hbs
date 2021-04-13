@@ -2,6 +2,7 @@
   class={{cn
     "boxel-cta-block"
     (concat "boxel-cta-block--" this.theme)  
+    (if (and this.isDone (not @canEdit)) "boxel-cta-block--done-uneditable")
   }}>
   {{!-- note that with the current implementation, 2 digit & up numbers will not fit nicely. --}}
   {{#if this.layout.step}}
@@ -21,11 +22,9 @@
          {{this.mainActionText}}
        </Boxel::Button>
 
-       {{else if this.layout.mainActionDone}}
-        <div class="boxel-cta-block__action-done">
-         {{svg-jar "checkbox-primary-checked" class="boxel-cta-block__done-icon"}}
-         {{this.mainActionText}}
-       </div>
+     {{else if this.layout.mainActionDone}}
+       {{svg-jar "checkbox-primary-checked" class="boxel-cta-block__done-icon"}}
+       {{this.mainActionText}}
      {{/if}}
      {{#if this.layout.cancelAction}}
        <Boxel::Button class="boxel-cta-block__cancel-button" @kind={{this.cancelActionButtonKind}} {{on "click" this.cancelAction}}>
