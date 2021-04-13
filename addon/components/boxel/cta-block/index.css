@@ -28,6 +28,14 @@
   display: flex;
 }
 
+.boxel-cta-block__done-icon {
+  margin-right: var(--boxel-sp-xxs);
+}
+
+.boxel-cta-block__cancel-button {
+  margin-left: var(--boxel-sp);
+}
+
 .boxel-cta-block__lock-text {
   display: grid;
   grid-auto-flow: column;

@@ -12,22 +12,23 @@
 
    <div class="boxel-cta-block__action">
      {{#if this.layout.mainAction}}
-     {{#if this.mainActionIsButton}}
        <Boxel::Button 
          @kind={{this.mainActionButtonKind}} 
          @disabled={{this.isDisabled}}
+         @loading={{this.isInProgress}}
          {{on "click" this.mainAction}}
        >
          {{this.mainActionText}}
        </Boxel::Button>
-       {{else}}
-       <div>
+
+       {{else if this.layout.mainActionDone}}
+        <div>
+         {{svg-jar "checkbox-primary-checked" class="boxel-cta-block__done-icon"}}
          {{this.mainActionText}}
        </div>
      {{/if}}
-     {{/if}}
      {{#if this.layout.cancelAction}}
-       <Boxel::Button @kind={{this.cancelActionButtonKind}} {{on "click" this.cancelAction}}>
+       <Boxel::Button class="boxel-cta-block__cancel-button" @kind={{this.cancelActionButtonKind}} {{on "click" this.cancelAction}}>
          {{this.cancelActionText}}
        </Boxel::Button>
      {{/if}}

@@ -12,6 +12,7 @@ enum CtaBlockState {
 enum SectionNames {
   step = 'step',
   mainAction = 'mainAction',
+  mainActionDone = 'mainActionDone',
   cancelAction = 'cancelAction',
   locked = 'locked',
   statusView = 'statusView',
@@ -66,10 +67,11 @@ export default class CtaBlock extends Component<CtaBlockArguments> {
     } else if (this.isDisabled) {
       addSections([SectionNames.mainAction]);
     } else if (this.isDone) {
-      addSections([
-        SectionNames.mainAction,
-        this.args.canEdit ? SectionNames.locked : SectionNames.statusView,
-      ]);
+      addSections(
+        this.args.canEdit
+          ? [SectionNames.mainAction, SectionNames.locked]
+          : [SectionNames.mainActionDone, SectionNames.statusView]
+      );
     } else if (this.isInProgress) {
       addSections([SectionNames.mainAction, SectionNames.locked]);
       if (this.args.canCancel) addSections([SectionNames.cancelAction]);
@@ -84,10 +86,6 @@ export default class CtaBlock extends Component<CtaBlockArguments> {
     } else {
       return 'dark';
     }
-  }
-
-  get mainActionIsButton(): boolean {
-    return !this.isDone || this.args.canEdit;
   }
 
   // Text of the primary action button of this CTA
