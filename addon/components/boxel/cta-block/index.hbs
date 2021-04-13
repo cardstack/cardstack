@@ -3,6 +3,8 @@
     "boxel-cta-block"
     (concat "boxel-cta-block--" this.theme)  
     (if (and this.isDone (not @canEdit)) "boxel-cta-block--done-uneditable")
+    (if this.isDisabled "boxel-cta-block--disabled")
+    (if this.layout.step "boxel-cta-block--has-step")
   }}>
   {{!-- note that with the current implementation, 2 digit & up numbers will not fit nicely. --}}
    <div class="boxel-cta-block__action" data-step={{if this.layout.step @stepNumber}}>
@@ -27,6 +29,7 @@
      {{/if}}
    </div>
 
+  {{!-- might be better to make these 2 the same layout property and yield if it has a block. --}}
   {{#if this.layout.locked}}
     <span class="boxel-cta-block__lock-text">
       Actions only visible to you

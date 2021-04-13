@@ -17,6 +17,14 @@
   padding: var(--boxel-sp) var(--boxel-sp-lg);
 }
 
+.boxel-cta-block--disabled {
+  background-color: rgba(57, 54, 66, 0.9);
+}
+
+.boxel-cta-block--disabled.boxel-cta-block--has-step {
+  padding: var(--boxel-sp-xs) var(--boxel-sp-lg);
+}
+
 .boxel-cta-block--light {
   --icon-color: var(--boxel-purple-400);
   background-color: var(--boxel-purple-100);
