@@ -40,7 +40,7 @@
 .boxel-button--kind-secondary-light:not(:disabled) {
   /* transparent on light background */
   --boxel-button-color: transparent;
-  --boxel-button-border: 1px solid var(--boxel-light-300);
+  --boxel-button-border: 1px solid var(--boxel-purple-300);
   --boxel-button-text-color: var(--boxel-dark);
 }
 
