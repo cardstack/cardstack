@@ -68,6 +68,7 @@ export default class Builder implements BuilderInterface {
     source: string
   ): Promise<string> {
     let url = this.cache.setModule(cardURL, localModule, source);
+
     return `@cardstack/compiled/${encodeURIComponent(url)}`;
   }
 
@@ -77,6 +78,7 @@ export default class Builder implements BuilderInterface {
         return join(realm.directory, url.replace(realm.url, ''));
       }
     }
+
     throw new NotFound(`${url} is not in a realm we know about`);
   }
 
