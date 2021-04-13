@@ -2,7 +2,6 @@
   class={{cn
     "boxel-cta-block"
     (concat "boxel-cta-block--" this.theme)  
-    (if (and this.isDone (not @canEdit)) "boxel-cta-block--done-uneditable")
     (if this.isDisabled "boxel-cta-block--disabled")
     (if this.layout.step "boxel-cta-block--has-step")
   }}>

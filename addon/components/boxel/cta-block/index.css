@@ -1,34 +1,44 @@
-/* default colors are dark theme */
 .boxel-cta-block {
-  --icon-color: var(--boxel-purple-300);
+  --cta-block-padding-horizontal: var(--boxel-sp-lg);
+  --cta-block-padding-vertical: var(--boxel-sp-lg);
+  --icon-color: var(--cta-block-text-color);
+
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--boxel-sp-lg);
-  position: relative;
+  padding: var(--cta-block-padding-vertical) var(--cta-block-padding-horizontal);
 
-  background-color: var(--boxel-purple-700);
-  color: var(--boxel-purple-300);
+  background-color: var(--cta-block-background-color);
+  color: var(--cta-block-text-color);
   font: var(--boxel-font-xs);
+
   transition: background-color var(--boxel-transition), padding var(--boxel-transition);
 }
 
-.boxel-cta-block--done-uneditable {
-  padding: var(--boxel-sp) var(--boxel-sp-lg);
+.boxel-cta-block--dark {
+  --cta-block-background-color: var(--boxel-purple-700);
+  --cta-block-emphasis-text-color: var(--boxel-light);
+  --cta-block-text-color: var(--boxel-purple-300);
 }
 
-.boxel-cta-block--disabled {
-  background-color: rgba(57, 54, 66, 0.9);
-}
-
-.boxel-cta-block--disabled.boxel-cta-block--has-step {
-  padding: var(--boxel-sp-xs) var(--boxel-sp-lg);
+.boxel-cta-block--dark.boxel-cta-block--disabled {
+  --cta-block-background-color: rgba(57, 54, 66, 0.9);
 }
 
 .boxel-cta-block--light {
-  --icon-color: var(--boxel-purple-400);
-  background-color: var(--boxel-purple-100);
-  color: var(--boxel-purple-400);
+  --cta-block-background-color: var(--boxel-purple-100);
+  --cta-block-emphasis-text-color: var(--boxel-dark);
+  --cta-block-text-color: var(--boxel-purple-400);
+}
+
+.boxel-cta-block--done.boxel-cta-block--has-step {
+  --cta-block-padding-horizontal: var(--boxel-sp-lg);
+  --cta-block-padding-vertical: var(--boxel-sp);
+}
+
+.boxel-cta-block--disabled.boxel-cta-block--has-step {
+  --cta-block-padding-horizontal: var(--boxel-sp-lg);
+  --cta-block-padding-vertical: var(--boxel-sp-xs);
 }
 
 .boxel-cta-block__action {
@@ -36,11 +46,7 @@
   display: flex;
   align-items: center;
   font: 600 var(--boxel-font-sm);
-  color: var(--boxel-light);
-}
-
-.boxel-cta-block--done-uneditable .boxel-cta-block__action {
-  color: var(--boxel-dark);
+  color: var(--cta-block-emphasis-text-color);
 }
 
 .boxel-cta-block__action::before {
@@ -52,7 +58,7 @@
 }
 
 .boxel-cta-block__done-icon {
-  --icon-color: var(--boxel-dark);
+  --icon-color: var(--cta-block-emphasis-text-color);
   margin-right: var(--boxel-sp-xxs);
   width: var(--boxel-sp);
   height: var(--boxel-sp);
