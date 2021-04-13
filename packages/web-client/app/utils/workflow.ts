@@ -7,22 +7,29 @@ export interface Participant {
 interface WorkflowMessageOptions {
   author: Participant;
   message: string;
+  includeIf: () => boolean;
 }
 
 export class WorkflowPostable {
   author: Participant;
   timestamp: Date | null = null;
-  @tracked isComplete: boolean = false;
-  constructor(author: Participant) {
-    this.author = author;
+  workflow: Workflow | undefined;
+  setWorkflow(wf: Workflow) {
+    this.workflow = wf;
   }
+  @tracked isComplete: boolean = false;
+  constructor(author: Participant, includeIf: (() => boolean) | undefined) {
+    this.author = author;
+    this.includeIf = includeIf;
+  }
+  includeIf: (() => boolean) | undefined;
 }
 
 export class WorkflowMessage extends WorkflowPostable {
   message: string;
-  constructor(options: WorkflowMessageOptions) {
-    super(options.author);
-    this.message = options.message;
+  constructor(options: Partial<WorkflowMessageOptions>) {
+    super(options.author!, options.includeIf);
+    this.message = options.message!;
     this.isComplete = true;
   }
 }
@@ -30,13 +37,14 @@ export class WorkflowMessage extends WorkflowPostable {
 interface WorkflowCardOptions {
   author: Participant;
   componentName: string; // this should eventually become a card reference
+  includeIf: () => boolean;
 }
 
 export class WorkflowCard extends WorkflowPostable {
   componentName: string;
-  constructor(options: WorkflowCardOptions) {
-    super(options.author);
-    this.componentName = options.componentName;
+  constructor(options: Partial<WorkflowCardOptions>) {
+    super(options.author!, options.includeIf);
+    this.componentName = options.componentName!;
   }
   @action onComplete() {
     this.isComplete = true;
@@ -51,6 +59,12 @@ interface MilestoneOptions {
 export class Milestone {
   title: string;
   postables: WorkflowPostable[] = [];
+  excludedPostables: WorkflowPostable[] = [];
+  workflow: Workflow | undefined;
+  setWorkflow(wf: Workflow) {
+    this.workflow = wf;
+    this.postables.invoke('setWorkflow', wf);
+  }
   get isComplete() {
     return this.postables.isEvery('isComplete', true);
   }
@@ -70,8 +84,14 @@ export class Milestone {
       if (!post.timestamp) {
         post.timestamp = new Date();
       }
-
-      postablesArr.push(post);
+      if (this.excludedPostables.includes(post)) {
+        continue;
+      }
+      if (post.includeIf && post.includeIf() == false) {
+        this.excludedPostables.push(post);
+      } else {
+        postablesArr.push(post);
+      }
 
       if (!post.isComplete) {
         break;
@@ -86,6 +106,14 @@ export abstract class Workflow {
   name!: string;
   milestones: Milestone[] = [];
   epiloguePostables: WorkflowPostable[] = [];
+  owner: any;
+  constructor(owner: any) {
+    this.owner = owner;
+  }
+  attachWorkflow() {
+    this.milestones.invoke('setWorkflow', this);
+    this.epiloguePostables.invoke('setWorkflow', this);
+  }
   get completedMilestoneCount() {
     return this.milestones.filterBy('isComplete').length;
   }

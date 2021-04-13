@@ -1,3 +1,4 @@
+import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import {
   Milestone,
   Workflow,
@@ -5,6 +6,8 @@ import {
   WorkflowMessage,
 } from '@cardstack/web-client/utils/workflow';
 import Component from '@glimmer/component';
+import { WorkflowPostable } from '../../../utils/workflow';
+import { getOwner } from '@ember/application';
 import '../../../css/prose.css';
 
 let cardbot = { name: 'Cardbot', imgURL: '/images/icons/cardbot.svg' };
@@ -32,6 +35,18 @@ class DepositWorkflow extends Workflow {
         them to the Reserve Pool on mainnet. Once you have made your deposit, an equivalent amount of
         tokens will be minted and added to your xDai Chain Wallet.`,
         }),
+        new WorkflowMessage({
+          author: cardbot,
+          message: `Looks like you've already connected your Ethereum mainnet wallet, which you can see below.
+          Please continue with the next step of this workflow.`,
+          includeIf() {
+            let postable = this as WorkflowPostable;
+            let layer1Network = postable.workflow?.owner.lookup(
+              'service:layer1-network'
+            ) as Layer1Network;
+            return layer1Network.hasAccount;
+          },
+        }),
         new WorkflowCard({
           author: cardbot,
           componentName: 'card-pay/deposit-workflow/connect-layer-one',
@@ -55,7 +70,7 @@ class DepositWorkflow extends Workflow {
         }),
         new WorkflowCard({
           author: cardbot,
-          componentName: 'card-pay/deposit-workflow/connect-layer-two',
+          componentName: 'card-pay/layer-two-connect-card',
         }),
       ],
       completedDetail: 'xDai Chain wallet connected',
@@ -130,10 +145,18 @@ class DepositWorkflow extends Workflow {
       componentName: 'card-pay/deposit-workflow/next-steps',
     }),
   ];
+  constructor(owner: unknown) {
+    super(owner);
+    this.attachWorkflow();
+  }
 }
 
 class DepositWorkFlowComponent extends Component {
-  workflow = new DepositWorkflow();
+  workflow!: DepositWorkflow;
+  constructor(owner: unknown, args: {}) {
+    super(owner, args);
+    this.workflow = new DepositWorkflow(getOwner(this));
+  }
 }
 
 export default DepositWorkFlowComponent;

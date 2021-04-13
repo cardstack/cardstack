@@ -29,13 +29,9 @@
 </Boxel::Dashboard>
 
 {{#if this.isShowingLayer1ConnectModal}}
-  <Boxel::Modal>
-    <Boxel::CardContainer
-      @onClose={{set this 'isShowingLayer1ConnectModal' false}}
-    >
-      TODO
-    </Boxel::CardContainer>
-  </Boxel::Modal>
+  <CardPay::LayerOneConnectModal
+    @onClose={{set this 'isShowingLayer1ConnectModal' false}}
+  />
 {{/if}}
 
 {{#if this.isShowingLayer2ConnectModal}}
