@@ -1,21 +1,32 @@
-<div class="org-card__container">
-  <img class="org-card__side-image" src={{@org.sideImage.url}} alt={{@org.sideImage.alt}}>
+<article class="org-card__container">
+  <img class="org-card__side-image org-card__side-image--{{@org.id}}" src={{@org.sideImage.url}} alt={{@org.sideImage.alt}}>
   <div class="org-card__content">
     <img class="org-card__icon" src={{@org.icon.url}} alt="" role="presentation">
     <h2 class="org-card__name">{{@org.name}}</h2>
-    <span>{{@org.subtitle}}</span>
+    <p class="org-card__subtitle">{{@org.subtitle}}</p>
+
     {{#if @org.description}}
-      <span class="org-card__description">
+      <p class="org-card__description">
         {{@org.description}}
-      </span>
+        {{#if (and @org.descriptionList @org.descriptionList.length)}}
+          <ul class="org-card__description-list">
+            {{#each @org.descriptionList as |descriptionListItem|}}
+              <li>{{descriptionListItem}}</li>
+            {{/each}}
+          </ul>
+        {{/if}}
+      </p>
     {{/if}}
-    {{#if (and @org.descriptionList @org.descriptionList.length)}}
-      <ul class="org-card__description-list">
-        {{#each @org.descriptionList as |descriptionListItem|}}
-        <li>{{descriptionListItem}}</li>
-        {{/each}}
-      </ul>
-    {{/if}}
-  <Boxel::Button class="org-card__cta" @as="link-to" @kind="primary" @disabled={{not @org.launched}} @route={{@route}} data-test-cardstack-org-link={{@org.id}}>{{@org.cta}}</Boxel::Button>
+
+    <Boxel::Button
+      class="org-card__cta"
+      @as="link-to"
+      @kind="primary"
+      @disabled={{not @org.launched}}
+      @route={{@route}}
+      data-test-cardstack-org-link={{@org.id}}
+    >
+      {{@org.cta}}
+    </Boxel::Button>
   </div>
-</div>
+</article>

@@ -1,61 +1,77 @@
 .org-card__container {
-  width: 33.125rem;
+  display: grid;
+  grid-template-columns: 11rem 1fr;
   min-height: 18.75rem;
-  display: flex;
   border-radius: var(--boxel-border-radius);
-  overflow: hidden;
-  background: var(--boxel-light);
+  background-color: var(--boxel-light);
   color: var(--boxel-dark);
+  overflow: hidden;
 }
 
 .org-card__side-image {
-  width: 11.25rem;
-  flex-shrink: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   background: var(--boxel-navy);
 }
 
 .org-card__icon {
   width: 4.375rem;
   height: 4.375rem;
+  margin-bottom: var(--boxel-sp-sm);
   padding: 1rem;
   background-color: var(--boxel-dark);
   border-radius: 1rem;
 }
 
 .org-card__name {
+  margin: 0;
   font: 600 var(--boxel-font-lg);
   letter-spacing: 0;
-  margin-bottom: 0;
-  margin-top: var(--boxel-sp-sm);
 }
 
 .org-card__subtitle {
+  margin: 0;
+  padding-bottom: var(--boxel-sp);
   font: var(--boxel-font);
-  letter-spacing: 0.01em;
+  letter-spacing: var(--boxel-lsp-xs);
 }
 
 .org-card__description {
+  margin: 0;
+  padding-bottom: var(--boxel-sp);
+  color: var(--boxel-purple-500);
   font: 600 var(--boxel-font-sm);
-  letter-spacing: var(--boxel-lsp);
-  margin-bottom: 0;
-  margin-top: var(--boxel-sp);
+  letter-spacing: var(--boxel-lsp-sm);
 }
 
 .org-card__description-list {
-  list-style: disc inside;
-  font: var(--boxel-font-sm);
-  margin-bottom: 0;
+  list-style: disc;
   margin-top: var(--boxel-sp-xxxs);
+  padding-left: var(--boxel-sp-sm);
+  font: var(--boxel-font-sm);
+}
+
+.org-card__description-list li::marker {
+  margin-left: calc(-1 * var(--boxel-sp-sm));
+  color: var(--boxel-dark);
 }
 
 .org-card__content {
-  padding: 1.875rem;
-  width: 100%;
   display: flex;
   flex-direction: column;
+  padding: var(--boxel-sp-lg);
 }
 
 .org-card__cta {
   margin-top: auto;
   align-self: flex-end;
+}
+
+
+@media screen and (max-width: 33rem) {
+  .org-card__container {
+    grid-template-columns: 1fr;
+    grid-template-rows: 11rem 1fr;
+  }
 }
