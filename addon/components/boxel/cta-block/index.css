@@ -29,6 +29,7 @@
 }
 
 .boxel-cta-block__done-icon {
+  --icon-color: var(--boxel-dark);
   margin-right: var(--boxel-sp-xxs);
 }
 
