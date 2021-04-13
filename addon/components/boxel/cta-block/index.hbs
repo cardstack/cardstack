@@ -3,6 +3,7 @@
     "boxel-cta-block"
     (concat "boxel-cta-block--" this.theme)  
   }}>
+  {{!-- note that with the current implementation, 2 digit & up numbers will not fit nicely. --}}
   {{#if this.layout.step}}
     <div class="boxel-cta-block__step">
       {{@stepNumber}}
