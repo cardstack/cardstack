@@ -1,33 +1,46 @@
-<div>
+<div
+  class={{cn
+    "boxel-cta-block"
+    (concat "boxel-cta-block--" this.theme)  
+  }}>
   {{#if this.layout.step}}
-    <div>
+    <div class="boxel-cta-block__step">
       {{@stepNumber}}
     </div>
   {{/if}}
 
-  {{#if this.layout.mainAction}}
-  {{#if this.mainActionIsButton}}
-    <button {{on "click" this.mainAction}}>
-      {{this.mainActionButtonKind}}
-      mainAction: {{this.mainActionText}}
-    </button>
-    {{else}}
-    <div>
-      mainAction: {{this.mainActionText}}
-    </div>
-  {{/if}}
-  {{/if}}
-
-  {{#if this.layout.cancelAction}}
-    <button {{on "click" this.cancelAction}}>
-      {{this.cancelActionButtonKind}}
-      cancelAction: {{this.cancelActionText}}
-    </button>
-  {{/if}}
+   <div class="boxel-cta-block__action">
+     {{#if this.layout.mainAction}}
+     {{#if this.mainActionIsButton}}
+       <Boxel::Button 
+         @kind={{this.mainActionButtonKind}} 
+         @disabled={{this.isDisabled}}
+         {{on "click" this.mainAction}}
+       >
+         {{this.mainActionText}}
+       </Boxel::Button>
+       {{else}}
+       <div>
+         {{this.mainActionText}}
+       </div>
+     {{/if}}
+     {{/if}}
+     {{#if this.layout.cancelAction}}
+       <Boxel::Button @kind={{this.cancelActionButtonKind}} {{on "click" this.cancelAction}}>
+         {{this.cancelActionText}}
+       </Boxel::Button>
+     {{/if}}
+   </div>
 
   {{#if this.layout.locked}}
-    <div>locked</div>
+    <span class="boxel-cta-block__lock-text">
+      Actions only visible to you
+      {{svg-jar "lock" width="12px" height="12px"}}
+    </span>
   {{else if this.layout.statusView}}
-    <div>Status view</div>
+    <span class="boxel-cta-block__lock-text">
+      {{yield}}
+      {{svg-jar "lock" width="12px" height="12px"}}
+    </span>
   {{/if}}
 </div>

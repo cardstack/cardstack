@@ -1,0 +1,38 @@
+/* default colors are dark theme */
+.boxel-cta-block {
+  --icon-color: var(--boxel-purple-300);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--boxel-sp-lg);
+  position: relative;
+
+  background-color: var(--boxel-purple-700);
+  color: var(--boxel-purple-300);
+  font: var(--boxel-font-xs);
+  transition: background-color var(--boxel-transition);
+}
+
+.boxel-cta-block--light {
+  --icon-color: var(--boxel-purple-400);
+  background-color: var(--boxel-purple-100);
+  color: var(--boxel-purple-400);
+}
+
+.boxel-cta-block__step {
+  position: absolute;
+  left: var(--boxel-sp-xs);
+}
+
+.boxel-cta-block__action {
+  display: flex;
+}
+
+.boxel-cta-block__lock-text {
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-content: end;
+  gap: var(--boxel-sp-xs);
+  text-align: right;
+}
