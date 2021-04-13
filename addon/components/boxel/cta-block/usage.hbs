@@ -48,18 +48,32 @@
     <Args.Object
       @name="atRestArgs"
       @description="The CTA's UI at rest - text and action"
+      @value={{hash 
+        text="Do it"
+        action=(fn this.changeState "inProgress")
+      }}
     />
     <Args.Object
       @name="disabledArgs"
       @description="The CTA's disabled UI - text"
+      @value={{hash text="Disabled"}}
     />
     <Args.Object
       @name="inProgressArgs"
       @description="The CTA's UI when the action is proceeding - text, cancel button text, and cancel action"
+      @value={{hash 
+        text="Doing it!"
+        cancelText="Cancel"
+        cancelAction=(fn this.changeState "atRest")
+      }}
     />
     <Args.Object
       @name="memorializedArgs"
       @description="The CTA's UI after the CTA's requirement has been met/action performed - text +- action"
+      @value={{hash
+        text="Done"
+        action=(fn this.changeState "inProgress")
+      }}
     />
     <Args.Number
       @name="stepNumber"
