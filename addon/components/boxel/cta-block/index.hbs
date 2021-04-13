@@ -3,6 +3,7 @@
     "boxel-cta-block"
     (concat "boxel-cta-block--" this.theme)  
     (if this.isDisabled "boxel-cta-block--disabled")
+    (if this.isMemorialized "boxel-cta-block--memorialized")
     (if this.layout.step "boxel-cta-block--has-step")
   }}>
   {{!-- note that with the current implementation, 2 digit & up numbers will not fit nicely. --}}
@@ -17,7 +18,7 @@
          {{this.mainActionText}}
        </Boxel::Button>
 
-     {{else if this.layout.mainActionDone}}
+     {{else if this.layout.mainActionStatus}}
        {{svg-jar "checkbox-primary-checked" class="boxel-cta-block__done-icon"}}
        {{this.mainActionText}}
      {{/if}}

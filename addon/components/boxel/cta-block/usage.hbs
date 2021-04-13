@@ -15,7 +15,7 @@
             cancelText="Cancel"
             cancelAction=(fn this.changeState "atRest")
           }}
-          @doneArgs={{hash
+          @memorializedArgs={{hash
             text="Done"
             action=(fn this.changeState "inProgress")
           }}
@@ -33,14 +33,14 @@
     />
     <Args.Bool
       @name="canEdit"
-      @description="Whether this action allows edits after completion. This determines how doneArgs is handled."
+      @description="Whether this action allows edits after completion. This determines how memorializedArgs is handled."
       @value={{this.canEdit}}
       @onInput={{fn (mut this.canEdit)}}
     />
     <Args.String
       @name="state"
-      @description="Whether the action is at at rest, disabled, in progress, or done."
-      @options={{array "atRest" "disabled" "inProgress" "done"}}
+      @description="Whether the action is at at rest, disabled, in progress, or memorialized."
+      @options={{array "atRest" "disabled" "inProgress" "memorialized"}}
       @defaultValue="atRest"
       @value={{this.state}}
       @onInput={{fn (mut this.state)}}
@@ -58,8 +58,8 @@
       @description="The CTA's UI when the action is proceeding - text, cancel button text, and cancel action"
     />
     <Args.Object
-      @name="doneArgs"
-      @description="The CTA's UI after the action is completed - text +- action"
+      @name="memorializedArgs"
+      @description="The CTA's UI after the CTA's requirement has been met/action performed - text +- action"
     />
     <Args.Number
       @name="stepNumber"

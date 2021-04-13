@@ -6,13 +6,13 @@ export default class CtaBlockUsage extends Component {
   @tracked stepNumber = 1;
   @tracked canCancel = true;
   @tracked canEdit = false;
-  @tracked state = 'done';
+  @tracked state = 'memorialized';
   @action changeState(str: string): void {
     console.log(str);
     this.state = str;
     if (str === 'inProgress') {
       setTimeout(() => {
-        this.changeState('done');
+        this.changeState('memorialized');
       }, 1500);
     }
   }

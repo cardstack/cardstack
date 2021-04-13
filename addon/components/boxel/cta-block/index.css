@@ -31,7 +31,7 @@
   --cta-block-text-color: var(--boxel-purple-400);
 }
 
-.boxel-cta-block--done.boxel-cta-block--has-step {
+.boxel-cta-block--memorialized.boxel-cta-block--has-step {
   --cta-block-padding-horizontal: var(--boxel-sp-lg);
   --cta-block-padding-vertical: var(--boxel-sp);
 }

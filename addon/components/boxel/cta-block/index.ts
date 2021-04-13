@@ -6,16 +6,16 @@ enum CtaBlockState {
   // state before the cta has been activated/the action done
   atRest = 'atRest',
   // disabled state - currently visually corresponds to the atRest state.
-  // might need to make one for the editable done state which has a light them
+  // might need to make one for the editable memorialized state which has a light theme
   // or change the way this is abstracted
   disabled = 'disabled',
   // in progress state - action has been taken, but not completed
   // you don't always have to go to this state.
   inProgress = 'inProgress',
-  // done state - action has been done
+  // memorialized state - requirement for CTA has been met
   // if editable, there will be a button shown
   // if not, there will be a checkmark and text
-  done = 'done',
+  memorialized = 'memorialized',
 }
 
 // sections correspond to visual elements in the cta block
@@ -25,8 +25,8 @@ enum SectionNames {
   step = 'step',
   // main action button
   mainAction = 'mainAction',
-  // main action done status - not button
-  mainActionDone = 'mainActionDone',
+  // main action status (not button) when the cta is memorialized
+  mainActionStatus = 'mainActionStatus',
   // cancel action button
   cancelAction = 'cancelAction',
   // the locked message
@@ -54,7 +54,7 @@ interface CtaBlockArguments {
   atRestArgs: CtaBlockStateDescription;
   disabledArgs: CtaBlockStateDescription;
   inProgressArgs: CtaBlockStateDescription;
-  doneArgs: CtaBlockStateDescription;
+  memorializedArgs: CtaBlockStateDescription;
 }
 
 interface LayoutConfig {
@@ -67,7 +67,8 @@ export default class CtaBlock extends Component<CtaBlockArguments> {
   @equal('args.state', CtaBlockState.atRest) declare isAtRest: boolean;
   @equal('args.state', CtaBlockState.disabled) declare isDisabled: boolean;
   @equal('args.state', CtaBlockState.inProgress) declare isInProgress: boolean;
-  @equal('args.state', CtaBlockState.done) declare isDone: boolean;
+  @equal('args.state', CtaBlockState.memorialized)
+  declare isMemorialized: boolean;
   @reads('args.stepNumber', null) declare stepNumber: number;
 
   get layout(): LayoutConfig {
@@ -86,11 +87,11 @@ export default class CtaBlock extends Component<CtaBlockArguments> {
       addSections([SectionNames.mainAction, SectionNames.locked]);
     } else if (this.isDisabled) {
       addSections([SectionNames.mainAction]);
-    } else if (this.isDone) {
+    } else if (this.isMemorialized) {
       addSections(
         this.args.canEdit
           ? [SectionNames.mainAction, SectionNames.locked]
-          : [SectionNames.mainActionDone, SectionNames.statusView]
+          : [SectionNames.mainActionStatus, SectionNames.statusView]
       );
     } else if (this.isInProgress) {
       addSections([SectionNames.mainAction, SectionNames.locked]);
@@ -101,7 +102,7 @@ export default class CtaBlock extends Component<CtaBlockArguments> {
   }
 
   get theme(): string {
-    if (this.isDone) {
+    if (this.isMemorialized) {
       return 'light';
     } else {
       return 'dark';
@@ -117,8 +118,8 @@ export default class CtaBlock extends Component<CtaBlockArguments> {
       return this.args.disabledArgs.text;
     } else if (this.isInProgress) {
       return this.args.inProgressArgs.text;
-    } else if (this.isDone) {
-      return this.args.doneArgs.text;
+    } else if (this.isMemorialized) {
+      return this.args.memorializedArgs.text;
     } else {
       return '';
     }
@@ -136,8 +137,9 @@ export default class CtaBlock extends Component<CtaBlockArguments> {
   mainAction(): void {
     if (this.isAtRest) {
       if (this.args.atRestArgs.action) return this.args.atRestArgs.action();
-    } else if (this.isDone && this.args.canEdit) {
-      if (this.args.doneArgs.action) return this.args.doneArgs.action();
+    } else if (this.isMemorialized && this.args.canEdit) {
+      if (this.args.memorializedArgs.action)
+        return this.args.memorializedArgs.action();
     }
   }
 
