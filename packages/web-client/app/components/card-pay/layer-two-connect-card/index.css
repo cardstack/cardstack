@@ -1,0 +1,110 @@
+
+.layer-two-connect-card__wrapper {
+  display: grid;
+  height: 100%;
+}
+
+.layer-two-connect-card__section-one {
+  border-bottom: 1px solid var(--boxel-light-300);
+  padding-bottom: var(--boxel-sp-xl);
+  padding-top: var(--boxel-sp-lg);
+}
+
+.layer-two-connect-card--with-explanations  .layer-two-connect-card__section-one {
+  padding-bottom: 0;
+}
+
+.layer-two-connect-card__header {
+  font: 600 var(--boxel-font);
+  margin: 0;
+  padding-bottom: var(--boxel-sp-xl);
+  padding-left: var(--boxel-sp-lg);
+  padding-right: var(--boxel-sp-lg);
+}
+
+.layer-two-connect-card--with-explanations .layer-two-connect-card__header {
+  font: 600 var(--boxel-font-lg);
+  padding-bottom: var(--boxel-sp-xxs);
+}
+
+.layer-two-connect-card__explanation {
+  color: var(--boxel-purple-600);
+  padding-bottom: var(--boxel-sp-xs);
+  padding-left: var(--boxel-sp-lg);
+  padding-right: var(--boxel-sp-lg);
+  margin-top: 0;
+}
+
+.layer-two-connect-card__app-store-links {
+  align-items: center;
+  background-color: var(--boxel-light-300);
+  border-radius: var(--boxel-border-radius);
+  display: flex;
+  margin-left: var(--boxel-sp-xxxl);
+  margin-right: var(--boxel-sp-xxxl);
+  padding: var(--boxel-sp);
+}
+
+.layer-two-connect-card__app-icon {
+  margin-right: var(--boxel-sp-sm);
+}
+
+.layer-two-connect-card__mobile-coming-soon {
+  font: 600 var(--boxel-font-sm);
+  text-align: center;
+  width: 6rem;
+  margin-left: 2.5rem;
+}
+
+.layer-two-connect-card__app-details {
+  flex-grow: 1;
+}
+
+.layer-two-connect-card__app-name {
+  font: 600 var(--boxel-font);
+  font-size: var(--boxel-font-size-sm);
+}
+
+.layer-two-connect-card__section-two {
+  padding-top: var(--boxel-sp-lg);
+}
+
+
+.layer-two-connect-card__alternate-wallet {
+  align-items: center;
+  background-color: var(--boxel-light-400);
+  border: 0;
+  color: var(--boxel-purple-400);
+  display: flex;
+  justify-content: space-between;
+  padding-left: var(--boxel-sp-xxl);
+  padding-right: var(--boxel-sp-xxl);
+  text-align: left;
+
+  display: none; /* hide this until we add the destination UI */
+}
+
+.layer-two-connect-card__alternate-wallet-caret {
+  height: 1.3rem;
+  width: auto;
+  --icon-color: var(--boxel-purple-400);
+}
+
+.layer-two-connect-card__alternate-wallet:hover {
+  filter: brightness(102%);
+}
+
+.layer-two-connect-card__loading-qr,
+  .layer-two-connect-card__qr-container {
+  text-align: center;
+  padding-bottom: var(--boxel-sp);
+}
+
+.layer-two-connect-card__loading-qr {
+  display: flex;
+  min-height: 300px;
+}
+
+.layer-two-connect-card__loading-qr > span {
+  margin: auto;
+}

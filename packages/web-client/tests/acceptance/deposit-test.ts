@@ -81,8 +81,8 @@ module('Acceptance | deposit', function (hooks) {
       );
 
     assert
-      .dom(postableSel(1, 2))
-      .containsText('Loading QR Code for Cardstack Mobile wallet connection');
+      .dom(`${postableSel(1, 2)} [data-test-wallet-connect-loading-qr-code]`)
+      .exists();
 
     let layer2Service = this.owner.lookup('service:layer2-network');
     layer2Service.test__simulateWalletConnectUri();

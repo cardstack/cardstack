@@ -1,0 +1,88 @@
+<Boxel::CardContainer class={{if @includeExplanations 'layer-two-connect-card--with-explanations'}} ...attributes>
+  {{#unless @suppressHeader}}
+    <Boxel::Header @header="Wallet - xDai Chain"></Boxel::Header>
+  {{/unless}}
+
+  {{#if this.layer2Network.hasAccount}}
+    Connected to wallet:
+    {{#each this.layer2Network.walletInfo.accounts as |account|}}
+      <div data-test-layer2-account-id>{{account.address}}</div>
+    {{/each}}
+  {{else}}
+    <div class="layer-two-connect-card__wrapper">
+      <div class="layer-two-connect-card__section-one">
+        <h2 class="layer-two-connect-card__header">
+          1. Install the Cardstack app on your mobile phone
+        </h2>
+        {{#if @includeExplanations}}
+          <p class="layer-two-connect-card__explanation">
+            Please install the Cardstack app on your mobile phone and create/add an account.
+          </p>
+        {{/if}}
+        <div class="layer-two-connect-card__app-store-links">
+          <img src={{this.cardstackMobileAppIcon}} width="40" height="40" alt="Cardstack Mobile App Icon" class="layer-two-connect-card__app-icon" />
+          <div class="layer-two-connect-card__app-details">
+            <div class="layer-two-connect-card__app-name">
+              Cardstack
+            </div>
+          </div>
+          {{#if this.appStoreUrl}}
+            <a href={{this.appStoreUrl}} class="layer-two-connect-card__app-store-badge">
+              <img src={{this.appStoreBadge}} width="120" height="40" alt="Download on the App Store" />
+            </a>
+          {{else}}
+            <div class="layer-two-connect-card__mobile-coming-soon">
+              Coming soon for iOS
+            </div>
+          {{/if}}
+          {{#if this.googlePlayUrl}}
+            <a href="#" class="layer-two-connect-card__google-play-badge">
+              <img src={{this.googlePlayUrl}} width="144" height="56" alt="Get it on Google Play" />
+            </a>
+          {{else}}
+            <div class="layer-two-connect-card__mobile-coming-soon">
+              Coming soon for Android
+            </div>
+          {{/if}}
+        </div>
+      </div>
+      <div class="layer-two-connect-card__section-two">
+        <h2 class="layer-two-connect-card__header">
+          2. Scan this QR code with your Cardstack app
+        </h2>
+        {{#if @includeExplanations}}
+          <p class="layer-two-connect-card__explanation">
+              Scan this QR code with your account in the mobile app to connect it with Card Pay.
+          </p>
+        {{/if}}
+        {{#if this.layer2Network.walletConnectUri}}
+          <div data-test-wallet-connect-qr-code class="layer-two-connect-card__qr-container">
+            <StyledQrCode
+              @data={{this.layer2Network.walletConnectUri}}
+              @image={{this.cardstackLogo}}
+              @size={{340}}
+              @backgroundColor="#efefef"
+              @dotType="dots"
+              @dotColor="#272330"
+              @cornerDotType="dot"
+              @cornerSquareType="extra-rounded"
+              @imageMargin={{5}}
+            />
+          </div>
+        {{else}}
+          <div class="layer-two-connect-card__loading-qr" data-test-wallet-connect-loading-qr-code>
+            <span>
+              Loading QR Code for Cardstack Mobile wallet connection...
+            </span>
+          </div>
+        {{/if}}
+      </div>
+      <button class="layer-two-connect-card__alternate-wallet" type="button">
+        <span>
+          Use a different wallet with xDai Chain support
+        </span>
+        {{svg-jar "caret-thin-right" class="layer-two-connect-card__alternate-wallet-caret"}}
+      </button>
+    </div>
+  {{/if}}
+</Boxel::CardContainer>

@@ -70,7 +70,7 @@ class DepositWorkflow extends Workflow {
         }),
         new WorkflowCard({
           author: cardbot,
-          componentName: 'card-pay/deposit-workflow/connect-layer-two',
+          componentName: 'card-pay/layer-two-connect-card',
         }),
       ],
       completedDetail: 'xDai Chain wallet connected',
