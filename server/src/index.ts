@@ -20,7 +20,8 @@ async function run() {
   ];
   let server = await Server.create({ realms, cardCacheDir });
 
-  server.start(3000);
+  await server.startWatching();
+  server.app.listen(3000);
 }
 
 function cleanCache(dir: string) {

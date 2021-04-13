@@ -15,16 +15,20 @@
     "@cardstack/core": "*",
     "@koa/cors": "^3.1.0",
     "@koa/router": "^10.0.0",
+    "@types/fs-extra": "^9.0.11",
     "@types/jsonapi-serializer": "^3.6.3",
     "@types/koa": "^2.13.1",
     "@types/koa-logger": "^3.1.1",
     "@types/koa__router": "^8.0.4",
+    "@types/sane": "^2.0.0",
+    "fs-extra": "^9.1.0",
+    "glob": "7.1.6",
     "jsonapi-serializer": "^3.6.7",
     "koa": "^2.13.1",
     "koa-logger": "^3.2.1",
+    "sane": "^4.1.0",
     "tmp": "^0.2.1",
-    "walk-sync": "^2.2.0",
-    "glob": "7.1.6"
+    "walk-sync": "^2.2.0"
   },
   "devDependencies": {
     "@types/supertest": "^2.0.11",

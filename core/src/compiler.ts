@@ -21,7 +21,11 @@ export class Compiler {
   // returns the module identifier that can be used to get this module back.
   // It's exactly meaning depends on the environment. In node it's a path you
   // can actually `require`.
-  define: (fullModuleURL: string, source: string) => Promise<string>;
+  define: (
+    cardURL: string,
+    localModule: string,
+    source: string
+  ) => Promise<string>;
 
   constructor(params: {
     lookup: (url: string) => Promise<CompiledCard>;
@@ -133,8 +137,7 @@ export class Compiler {
     });
 
     let code = out!.code!;
-    let url = cardSource.url.replace(/\/$/, '') + '/';
-    return await this.define(new URL(localFile, url).href, code);
+    return await this.define(cardSource.url, localFile, code);
   }
 
   async lookupFieldsForCard(
@@ -187,11 +190,11 @@ export class Compiler {
           `${cardSource.url} referred to ${localFile} in its card.json but that file does not exist`
         );
       }
-      let url = cardSource.url.replace(/\/$/, '') + '/';
       return await this.compileComponent(
         cardSource.files[localFile],
         fields,
-        new URL(localFile, url).href
+        cardSource.url,
+        localFile
       );
     } else {
       return parentCard[which];
@@ -201,13 +204,16 @@ export class Compiler {
   private async compileComponent(
     templateSource: string,
     fields: CompiledCard['fields'],
-    moduleURL: string
+    cardURL: string,
+    localFile: string
   ): Promise<ComponentInfo> {
     let inlineHBS;
     let usedFields = [] as ComponentInfo['usedFields'];
 
     let options: CardTemplateOptions = {
       fields,
+      cardURL,
+      localFile,
       inlineHBS,
       usedFields,
     };
@@ -215,7 +221,7 @@ export class Compiler {
       plugins: [[cardTemplatePlugin, options]],
     });
     return {
-      moduleName: await this.define(moduleURL, out!.code!),
+      moduleName: await this.define(cardURL, localFile, out!.code!),
       usedFields,
       inlineHBS,
     };

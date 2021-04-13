@@ -7,34 +7,41 @@ import {
 } from '@cardstack/core/src/interfaces';
 import { RealmConfig } from './interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
-import fs from 'fs';
+import {
+  readFileSync,
+  writeFileSync,
+  readJSONSync,
+  existsSync,
+} from 'fs-extra';
 import { join } from 'path';
 import { NotFound } from './error';
 
 class CardCache {
   constructor(private dir: string) {}
 
-  private getLocation(cardURL: string): string {
-    let filename = encodeURIComponent(cardURL);
-
+  private getLocation(moduleURL: string): string {
+    let filename = encodeURIComponent(moduleURL);
     return join(this.dir, filename);
   }
 
-  setModule(moduleURL: string, source: string) {
-    fs.writeFileSync(this.getLocation(moduleURL), source);
+  private moduleURL(cardURL: string, localFile: string): string {
+    return new URL(localFile, cardURL.replace(/\/$/, '') + '/').href;
+  }
+
+  setModule(cardURL: string, localFile: string, source: string) {
+    let url = this.moduleURL(cardURL, localFile);
+    writeFileSync(this.getLocation(url), source);
+    return url;
   }
 
   setCard(cardURL: string, source: CompiledCard) {
-    fs.writeFileSync(
-      this.getLocation(`${cardURL}compiled.json`),
-      JSON.stringify(source)
-    );
+    this.setModule(cardURL, 'compiled.json', JSON.stringify(source, null, 2));
   }
 
   getCard(cardURL: string): CompiledCard | undefined {
-    let loc = this.getLocation(`${cardURL}compiled.json`);
-    if (fs.existsSync(loc)) {
-      return require(loc);
+    let loc = this.getLocation(this.moduleURL(cardURL, 'compiled.json'));
+    if (existsSync(loc)) {
+      return readJSONSync(loc);
     }
     return;
   }
@@ -56,14 +63,12 @@ export default class Builder implements BuilderInterface {
   }
 
   private async defineModule(
-    moduleURL: string,
+    cardURL: string,
+    localModule: string,
     source: string
   ): Promise<string> {
-    // TODO: This will not be runable by the app until the work done
-    // in cardhost/lib/dynamic-card-transform. But that is ember-specific
-    // so we have some thinking to do
-    this.cache.setModule(moduleURL, source);
-    return `@cardstack/compiled/${encodeURIComponent(moduleURL)}`;
+    let url = this.cache.setModule(cardURL, localModule, source);
+    return `@cardstack/compiled/${encodeURIComponent(url)}`;
   }
 
   private locateRealmDir(url: string): string {
@@ -82,7 +87,7 @@ export default class Builder implements BuilderInterface {
       directories: false,
     })) {
       let fullPath = join(dir, file);
-      files[file] = fs.readFileSync(fullPath, 'utf8');
+      files[file] = readFileSync(fullPath, 'utf8');
     }
     let cardJSON = files['card.json'];
     if (!cardJSON) {
@@ -107,5 +112,11 @@ export default class Builder implements BuilderInterface {
     this.cache.setCard(url, compiledCard);
 
     return compiledCard;
+  }
+
+  async buildCard(url: string): Promise<void> {
+    let rawCard = await this.getRawCard(url);
+    let compiledCard = await this.compiler.compile(rawCard);
+    this.cache.setCard(url, compiledCard);
   }
 }

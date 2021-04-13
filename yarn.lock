@@ -2024,6 +2024,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/fs-extra@^9.0.11":
+  version "9.0.11"
+  resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-9.0.11.tgz#8cc99e103499eab9f347dbc6ca4e99fb8d2c2b87"
+  integrity sha512-mZsifGG4QeQ7hlkhO56u7zt/ycBgGxSVsFI/6lGTU34VtwkiqrrSDgw0+ygs8kFGWcXnFQWMrzF2h7TtDFNixA==
+  dependencies:
+    "@types/node" "*"
+
 "@types/fs-extra@^9.0.7":
   version "9.0.9"
   resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-9.0.9.tgz#11ed43b3f3c6b3490f1ef9bd17f58da896e2d861"
@@ -2163,6 +2170,13 @@
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/@types/rsvp/-/rsvp-4.0.3.tgz#4a1223158453257bce09d42b9eef7cfa6d257482"
   integrity sha512-OpRwxbgx16nL/0/7ol0WoLLyLaMXBvtPOHjqLljnzAB/E7Qk1wtjytxgBhOTBMZvuLXnJUqfnjb4W/QclNFvSA==
+
+"@types/sane@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@types/sane/-/sane-2.0.0.tgz#891c272b10d1a6f735e915c731756104b5d21374"
+  integrity sha512-6o/YMfcKcWIK5IAxeo/1DEoVnGKBkPSPj9odxczz2i1gFY78GvguqgtNo28nyKgJUiKEWuFj11acpgdRmRFz7A==
+  dependencies:
+    "@types/node" "*"
 
 "@types/serve-static@*":
   version "1.13.9"

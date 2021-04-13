@@ -6,6 +6,8 @@ import Builder from './builder';
 import { RealmConfig } from './interfaces';
 import { Serializer } from 'jsonapi-serializer';
 import walkSync from 'walk-sync';
+import sane from 'sane';
+import { sep } from 'path';
 
 interface ServerOptions {
   realms: RealmConfig[];
@@ -76,13 +78,15 @@ export class Server {
     return new this(app, builder, options);
   }
 
+  private watchers: sane.Watcher[] | undefined;
+
   private constructor(
     public app: Koa,
     private builder: Builder,
     private options: ServerOptions
   ) {}
 
-  async start(port: number) {
+  async startWatching() {
     let promises = [];
 
     for (let realm of this.options.realms) {
@@ -91,17 +95,47 @@ export class Server {
         let fullCardUrl = new URL(cardPath.replace('card.json', ''), realm.url)
           .href;
         console.debug(`--> Priming cache for ${fullCardUrl}`);
-        promises.push(this.builder.getCompiledCard(fullCardUrl));
+        promises.push(this.builder.buildCard(fullCardUrl));
       }
     }
 
     await Promise.all(promises);
     console.debug(`--> Cache primed`);
+
+    this.watchers = this.options.realms.map((realm) => {
+      let watcher = sane(realm.directory);
+      const handler = (filepath: string /* root: string, stat?: Stats */) => {
+        let segments = filepath.split(sep);
+        if (segments.length < 2) {
+          // top-level files in the realm are not cards, we're assuming all
+          // cards are directories under the realm.
+          return;
+        }
+        let url = new URL(segments[0] + '/', realm.url).href;
+        console.log(`rebuilding card ${url}`);
+        (async () => {
+          try {
+            await this.builder.buildCard(url);
+          } catch (err) {
+            console.log(err);
+          }
+        })();
+      };
+      watcher.on('add', handler);
+      watcher.on('change', handler);
+      watcher.on('delete', handler);
+      return watcher;
+    });
+
     // glob on card.json
     // for each card, call builder.getCompiledCard
-
-    this.app.listen(port);
   }
 
-  stopWatching() {}
+  stopWatching() {
+    if (this.watchers) {
+      for (let watcher of this.watchers) {
+        watcher.close();
+      }
+    }
+  }
 }

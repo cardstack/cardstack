@@ -19,7 +19,15 @@ module('Integration | card-service', function (hooks) {
 
   test('compiled-cards dynamic import example', async function (assert) {
     let target = 'hello';
-    this.set('hello', (await import(`@cardstack/compiled/${target}`)).default);
+    this.set(
+      'hello',
+      (
+        await import(
+          /* webpackExclude: /schema\.js$/ */
+          `@cardstack/compiled/${target}`
+        )
+      ).default
+    );
 
     await render(
       hbs`{{#let (ensure-safe-component this.hello) as |Hello|}} <Hello /> {{/let}}`

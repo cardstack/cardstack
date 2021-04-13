@@ -21,6 +21,8 @@ import { getObjectKey, error } from './utils';
 
 export interface Options {
   fields: CompiledCard['fields'];
+  cardURL: string;
+  localFile: string;
 
   // these are for gathering output
   usedFields: ComponentInfo['usedFields'];
@@ -88,8 +90,7 @@ function callExpressionEnter(path: NodePath<CallExpression>, state: State) {
   let { template, neededScope } = transformTemplate(
     inputTemplate,
     path,
-    state.opts.fields,
-    state.opts.usedFields,
+    state.opts,
     state.neededImports
   );
   path.node.arguments[0] = stringLiteral(template);
@@ -152,8 +153,7 @@ function handleArguments(
 function transformTemplate(
   source: string,
   path: NodePath<CallExpression>,
-  fields: CompiledCard['fields'],
-  usedFields: ComponentInfo['usedFields'],
+  opts: Options,
   importNames: State['neededImports']
 ): { template: string; neededScope: Set<string> } {
   let neededScope = new Set<string>();
@@ -168,7 +168,10 @@ function transformTemplate(
     while (path.scope.getBinding(candidate) || importNames.has(candidate)) {
       candidate = `${desiredName}${counter++}`;
     }
-    importNames.set(candidate, { moduleSpecifier, exportedName: importedName });
+    importNames.set(candidate, {
+      moduleSpecifier,
+      exportedName: importedName,
+    });
     neededScope.add(candidate);
     return candidate;
   }
@@ -177,7 +180,13 @@ function transformTemplate(
     syntax.preprocess(source, {
       mode: 'codemod',
       plugins: {
-        ast: [cardGlimmerPlugin({ fields, usedFields, importAndChooseName })],
+        ast: [
+          cardGlimmerPlugin({
+            fields: opts.fields,
+            usedFields: opts.usedFields,
+            importAndChooseName,
+          }),
+        ],
       },
     })
   );
@@ -199,7 +208,7 @@ function updateScope(
   let scope = getObjectKey(options, 'scope');
 
   if (scope?.isObjectExpression()) {
-    scope.node.properties.concat(scopeVars);
+    scope.node.properties = scope.node.properties.concat(scopeVars);
   } else {
     options.node.properties.push(
       objectProperty(identifier('scope'), objectExpression(scopeVars))

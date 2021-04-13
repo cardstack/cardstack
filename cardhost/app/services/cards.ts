@@ -60,8 +60,12 @@ export default class Cards extends Service {
         );
       }
       componentModule = componentModule.replace('@cardstack/compiled/', '');
-      cardComponent = (await import(`@cardstack/compiled/${componentModule}`))
-        .default;
+      cardComponent = (
+        await import(
+          /* webpackExclude: /schema\.js$/ */
+          `@cardstack/compiled/${componentModule}`
+        )
+      ).default;
     }
 
     let CallerComponent = setComponentTemplate(
