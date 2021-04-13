@@ -5,9 +5,9 @@ import { action } from '@ember/object';
 export default class CtaBlockUsage extends Component {
   @tracked stepNumber = 1;
   @tracked canCancel = true;
-  @tracked canEdit = true;
-  @tracked state = 'atRest';
-  @action changeState(str: string) {
+  @tracked canEdit = false;
+  @tracked state = 'done';
+  @action changeState(str: string): void {
     console.log(str);
     this.state = str;
     if (str === 'inProgress') {

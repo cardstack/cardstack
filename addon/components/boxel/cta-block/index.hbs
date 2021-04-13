@@ -5,13 +5,7 @@
     (if (and this.isDone (not @canEdit)) "boxel-cta-block--done-uneditable")
   }}>
   {{!-- note that with the current implementation, 2 digit & up numbers will not fit nicely. --}}
-  {{#if this.layout.step}}
-    <div class="boxel-cta-block__step">
-      {{@stepNumber}}
-    </div>
-  {{/if}}
-
-   <div class="boxel-cta-block__action">
+   <div class="boxel-cta-block__action" data-step={{if this.layout.step @stepNumber}}>
      {{#if this.layout.mainAction}}
        <Boxel::Button 
          @kind={{this.mainActionButtonKind}} 
