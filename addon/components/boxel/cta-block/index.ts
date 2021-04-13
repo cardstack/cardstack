@@ -3,26 +3,46 @@ import { action } from '@ember/object';
 import { equal, reads } from 'macro-decorators';
 
 enum CtaBlockState {
+  // state before the cta has been activated/the action done
   atRest = 'atRest',
+  // disabled state - currently visually corresponds to the atRest state.
+  // might need to make one for the editable done state which has a light them
+  // or change the way this is abstracted
   disabled = 'disabled',
+  // in progress state - action has been taken, but not completed
+  // you don't always have to go to this state.
   inProgress = 'inProgress',
+  // done state - action has been done
+  // if editable, there will be a button shown
+  // if not, there will be a checkmark and text
   done = 'done',
 }
 
+// sections correspond to visual elements in the cta block
+// not necessarily classes
 enum SectionNames {
+  // 'step' number before the action/its status
   step = 'step',
+  // main action button
   mainAction = 'mainAction',
+  // main action done status - not button
   mainActionDone = 'mainActionDone',
+  // cancel action button
   cancelAction = 'cancelAction',
+  // the locked message
   locked = 'locked',
+  // shows the block passed to the CtaBlock component
   statusView = 'statusView',
 }
 
 interface CtaBlockStateDescription {
+  // text on the main action button/the done status text
   text: string;
+  // action that is called when the main action button is pressed
   action?: () => void;
-  // only used by the inProgressArgs
+  // text on the cancel button
   cancelText?: string;
+  // action that is called when the cancel button is pressed
   cancelAction?: () => void;
 }
 
