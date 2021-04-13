@@ -28,12 +28,15 @@
 }
 
 .boxel-expandable-banner__summary {
+  cursor: pointer;
+  border-radius: inherit;
+}
+
+.boxel-expandable-banner__summary-layout {
   position: relative;
   display: flex;
   align-items: center;
   min-height: var(--boxel-expandable-banner-min-height);
-  cursor: pointer;
-  border-radius: inherit;
   padding: var(--boxel-expandable-banner-vertical-gap) calc(var(--boxel-sp-xs) + 3.375rem + var(--boxel-expandable-banner-horizontal-gap))
     var(--boxel-expandable-banner-vertical-gap) var(--boxel-expandable-banner-horizontal-gap);
 }
