@@ -12,6 +12,7 @@ export type RawCard = {
   isolated?: string;
   embedded?: string;
   schema?: string;
+  containsRoutes?: boolean;
 
   // url to the card we adopted from
   adoptsFrom?: string;

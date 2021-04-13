@@ -6,7 +6,7 @@ import sane from 'sane';
 
 import Builder from './builder';
 import { RealmConfig } from './interfaces';
-import { cardRoute } from './routes/card';
+import { respondWithCardForPath, respondWithCard } from './routes/card';
 import { cleanCache, primeCache, setupWatchers } from './watcher';
 
 interface ServerOptions {
@@ -30,7 +30,11 @@ export class Server {
 
     // The card data layer
     router.get(`/cards/:encodedCardURL`, async (ctx) => {
-      cardRoute(ctx, builder);
+      respondWithCard(ctx, builder);
+    });
+
+    router.get('/cardFor/:pathname', (ctx) => {
+      respondWithCardForPath(ctx, builder);
     });
 
     app.use(logger());

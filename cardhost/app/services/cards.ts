@@ -4,31 +4,33 @@ import Component from '@glimmer/component';
 import { hbs } from 'ember-cli-htmlbars';
 import { setComponentTemplate } from '@ember/component';
 import { Format } from '@cardstack/core/src/interfaces';
+import config from 'cardhost/config/environment';
 
 export default class Cards extends Service {
   async load(
     url: string,
     format: Format
   ): Promise<{ model: any; component: unknown }> {
-    return this.internalLoad(url, { format });
+    let params = new URLSearchParams({ format }).toString();
+    let fullURL = [
+      'http://localhost:3000/',
+      'cards/',
+      encodeURIComponent(url),
+      `?${params}`,
+    ];
+    return this.internalLoad(fullURL.join(''));
   }
 
   async loadForRoute(
     pathname: string
   ): Promise<{ model: any; component: unknown }> {
-    return this.internalLoad(`/spaces/home${pathname}`);
+    return this.internalLoad(`http://localhost:3000/cardFor${pathname}`);
   }
 
   private async internalLoad(
-    url: string,
-    query?: Record<string, string>
+    url: string
   ): Promise<{ model: any; component: unknown }> {
-    let fullURL = ['http://localhost:3000/cards/', encodeURIComponent(url)];
-    let params = new URLSearchParams(query).toString();
-    if (params) {
-      fullURL.push(`?${params}`);
-    }
-    let response = await fetch(fullURL.join(''));
+    let response = await fetch(url);
 
     if (response.status !== 200) {
       throw new Error(`unable to fetch card ${url}: status ${response.status}`);
