@@ -5,10 +5,20 @@
           @canCancel={{this.canCancel}}
           @canEdit={{this.canEdit}}
           @state={{this.state}}
-          @atRestArgs={{this.atRestArgs}}
-          @disabledArgs={{this.disabledArgs}}
-          @inProgressArgs={{this.inProgressArgs}}
-          @doneArgs={{this.doneArgs}}
+          @atRestArgs={{hash 
+            text="Do it"
+            action=(fn this.changeState "inProgress")
+          }}
+          @disabledArgs={{hash text="Disabled"}}
+          @inProgressArgs={{hash 
+            text="Doing it!"
+            cancelText="Cancel"
+            cancelAction=(fn this.changeState "atRest")
+          }}
+          @doneArgs={{hash
+            text="Done"
+            action=(fn this.changeState "inProgress")
+          }}
         >
             Hello!
         </Boxel::CtaBlock>
@@ -38,22 +48,18 @@
     <Args.Object
       @name="atRestArgs"
       @description="The CTA's UI at rest - text and action"
-      @value={{this.atRestArgs}}
     />
     <Args.Object
       @name="disabledArgs"
       @description="The CTA's disabled UI - text"
-      @value={{this.disabledArgs}}
     />
     <Args.Object
       @name="inProgressArgs"
       @description="The CTA's UI when the action is proceeding - text, cancel button text, and cancel action"
-      @value={{this.inProgressArgs}}
     />
     <Args.Object
       @name="doneArgs"
       @description="The CTA's UI after the action is completed - text +- action"
-      @value={{this.doneArgs}}
     />
     <Args.Number
       @name="stepNumber"
