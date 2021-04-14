@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import { WorkflowMessage } from '@cardstack/web-client/utils/workflow';
+import { WorkflowMessage } from '@cardstack/web-client/models/workflow/workflow-message';
 
 module('Integration | Helper | postable-meta-identical', function (hooks) {
   setupRenderingTest(hooks);
