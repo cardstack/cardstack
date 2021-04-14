@@ -6,17 +6,17 @@
 
 .layer-two-connect-card__section-one {
   border-bottom: 1px solid var(--boxel-light-300);
-  padding: var(--boxel-sp-xl);
-  padding-top: var(--boxel-sp-lg);
+  padding-bottom: var(--boxel-sp-xl);
+}
+
+.layer-two-connect-card--with-explanations  .layer-two-connect-card__section-one {
   padding-bottom: 0;
 }
 
 .layer-two-connect-card__header {
   font: 600 var(--boxel-font);
   margin: 0;
-  padding-bottom: var(--boxel-sp-xl);
-  padding-left: 0;
-  padding-right: 0;
+  padding: var(--boxel-sp-lg);
 }
 
 .layer-two-connect-card--with-explanations .layer-two-connect-card__header {
@@ -35,8 +35,10 @@
 .layer-two-connect-card__app-store-links {
   align-items: center;
   display: flex;
-  justify-content: space-around;
-  padding-top: var(--boxel-sp);
+  flex-wrap: wrap;
+  margin-left: var(--boxel-sp-xxxl);
+  margin-right: var(--boxel-sp-xxxl);
+  padding: var(--boxel-sp);
 }
 
 .layer-two-connect-card__app-phone {
@@ -53,9 +55,13 @@
   margin-left: 2.5rem;
 }
 
-.layer-two-connect-card__section-two {
-  padding: var(--boxel-sp-xl);
-  padding-top: var(--boxel-sp-lg);
+.layer-two-connect-card__app-details {
+  flex-grow: 1;
+}
+
+.layer-two-connect-card__app-name {
+  font: 600 var(--boxel-font);
+  font-size: var(--boxel-font-size-sm);
 }
 
 
@@ -86,7 +92,7 @@
 .layer-two-connect-card__loading-qr,
   .layer-two-connect-card__qr-container {
   text-align: center;
-  padding-bottom: var(--boxel-sp);
+  padding: var(--boxel-sp-lg);
 }
 
 .layer-two-connect-card__loading-qr {

@@ -1,67 +1,42 @@
-/* Inspired by tailwind-typography */
-.prose {
-  color: var(--boxel-purple-700);
-  font-size: .875rem;
-  max-width: 65ch;
+/* Default styles inherit from body */
+
+/* Card pay workflow thread message markdown styles */
+.card-pay-thread-md {
+  font-size: 0.9375rem;
+  line-height: calc(23/15);
+  letter-spacing: var(--boxel-lsp-sm);
+  text-align: start;
 }
 
-.prose.prose-dark-mode {
-  color: var(--boxel-light);
+.card-pay-thread-md ul,
+.card-pay-thread-md ol {
+  margin: 0;
+  padding-left: var(--boxel-sp-xxs);
 }
 
-.prose a {
-  color: var(--boxel-purple-900);
+.card-pay-thread-md li::marker {
+  content: '- ';
+}
+
+.card-pay-thread-md p {
+  margin: 0;
+  word-break: break-word; /* to prevent overflow of long words, etc. */
+  hyphens: auto; /* if browser supports it */
+}
+
+.card-pay-thread-md a {
+  color: currentColor;
+  hyphens: none;
   text-decoration: underline;
-  font-weight: 500
 }
 
-.prose strong {
-  color: var(--boxel-purple-900);
-  font-weight: 600
+.card-pay-thread-md p + p {
+  margin-top: var(--boxel-sp-sm);
 }
 
-.prose ol>li {
-  position: relative;
-  padding-inline-start: 1rem;
-  padding-left: 1.75em;
-}
 
-.prose ol>li:before {
-  content: counter(list-item,var(--list-counter-style,decimal)) ".";
-  position: absolute;
-  font-weight: 400;
-  color: var(--boxel-purple-400);
-  left: 0
-}
-
-.prose ol, .prose ul  {
-  padding-inline-start: 1rem;
-}
-
-.prose ul>li {
-  position: relative;
-  padding-left: 1.75em
-}
-
-.prose ul>li:before {
-  content: "";
-  position: absolute;
-  background-color: var(--boxel-purple-200);
-  border-radius: 50%;
-  width: .375em;
-  height: .375em;
-  top: calc(.875em - .1875em);
-  left: .25em
-}
-
-.prose.prose-dark-mode ul>li:before {
-  background-color: var(--boxel-light-200);
-}
-
-.prose ul>li::marker,
-.prose ol>li::marker {
-  content: '';
-}
+/*
+Below is TBD. We don't have these styles yet.
 
 .prose hr {
   border-color: var(--boxel-purple-100);
@@ -318,4 +293,4 @@
 
 .prose>:last-child {
   margin-bottom: 0
-}
+} */

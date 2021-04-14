@@ -8,31 +8,29 @@
       @icon="deposit"
       @summary="Deposit Funds"
     >
-      <div class="prose prose-dark-mode">
-        <p>
-          As a Supplier, you deposit funds from your Ethereum mainnet wallet into the
-          CARD Protocol's reserve pool and receive the corresponding amount of CPXD
-          tokens in your xDai chain wallet.
-        </p>
-        <p>
-          We currently support two types of asset you can deposit into the reserve pool:
-          <ul>
-            <li>Dai stablecoins (DAI)</li>
-            <li>Cardstack ERC-20 tokens (CARD)</li>
-          </ul>
-        </p>
-        <p>
-          The CARD Protocol's reserve pool facilitates payments between customers
-          and merchants on the Cardstack network.
-        </p>
-        <p class="deposit-workflow__banner-small-text">
-          Fees: Suppliers earn transaction fees of 0.5% for all transactions across
-          the CARD Protocol. Those fees will be distributed to Suppliers based on
-          their proportional share of supplied tokens in the reserve pool, averaged
-          over the 30-day period in which the transactions occurred. {{!-- <a href="#">More details here.</a> --}}
-          {{!-- TODO: add link --}}
-        </p>
-      </div>
+      <p class="deposit-workflow__banner-p">
+        As a Supplier, you deposit funds from your Ethereum mainnet wallet into the
+        CARD Protocol's reserve pool and receive the corresponding amount of CPXD
+        tokens in your xDai chain wallet.
+      </p>
+      <p class="deposit-workflow__banner-p">
+        We currently support two types of asset you can deposit into the reserve pool:
+        <ul class="deposit-workflow__banner-list">
+          <li>Dai stablecoins (DAI)</li>
+          <li>Cardstack ERC-20 tokens (CARD)</li>
+        </ul>
+      </p>
+      <p class="deposit-workflow__banner-p">
+        The CARD Protocol's reserve pool facilitates payments between customers
+        and merchants on the Cardstack network.
+      </p>
+      <small class="deposit-workflow__banner-small-text">
+        Fees: Suppliers earn transaction fees of 0.5% for all transactions across
+        the CARD Protocol. Those fees will be distributed to Suppliers based on
+        their proportional share of supplied tokens in the reserve pool, averaged
+        over the 30-day period in which the transactions occurred. {{!-- <a href="#">More details here.</a> --}}
+        {{!-- TODO: add link --}}
+      </small>
     </Boxel::ExpandableBanner>
     {{#each this.workflow.milestones as |milestone i|}}
       {{#let (or milestone.complete (lte i this.workflow.completedMilestoneCount)) as |displayMilestone|}}
@@ -40,15 +38,13 @@
           {{#each milestone.visiblePostables as |postable j|}}
             {{#if postable.message}}
               <Boxel::ThreadMessage
-                class="deposit-workflow__thread-message"
+                class="deposit-workflow__thread-message card-pay-thread-md"
                 @datetime={{postable.timestamp}}
                 @imgURL={{postable.author.imgURL}}
                 @hideMeta={{postable-meta-identical postable (object-at milestone.visiblePostables (dec j))}}
                 data-test-postable={{j}} data-test-milestone={{i}}
               >
-                <div class="prose">
-                  {{format-workflow-message postable.message}}
-                </div>
+                {{format-workflow-message postable.message}}
               </Boxel::ThreadMessage>
             {{else}}
               <Boxel::ThreadMessage
