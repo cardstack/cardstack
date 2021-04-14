@@ -107,27 +107,10 @@
   height: var(--boxel-sp);
 }
 
-/* 
-  Only visually show the "Actions only visible to you" message if someone hasn't added an info area 
-  Since the lock seems to be a visual cue that actions are only visible to the user
-  We keep the text around and visible to screenreaders (tested only on VoiceOver)
-  width: 0px appears to remove it
-*/
-.boxel-cta-block__info-area ~ .boxel-cta-block__private-notice > .boxel-cta-block__private-notice-message {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  border: 0;
-  clip: rect(0 0 0 0);
-  clip-path: inset(50%);
-  overflow: hidden;
-  white-space: nowrap;
-}
-
 /* The lock icon is not shown when the cta is disabled */
 .boxel-cta-block__private-notice {
+  --boxel-cta-block-lock-icon-size: .75rem;
+
   grid-area: private-notice;
   display: grid;
   grid-auto-flow: column;
@@ -139,4 +122,44 @@
 }
 .boxel-cta-block--disabled .boxel-cta-block__private-notice {
   display: none;
+}
+
+.boxel-cta-block__lock-icon {
+  width: var(--boxel-cta-block-lock-icon-size);
+  height: var(--boxel-cta-block-lock-icon-size);
+}
+
+/* 
+  Only visually show the "Actions only visible to you" message if someone hasn't added an info area 
+  Since the lock seems to be a visual cue that actions are only visible to the user
+  We keep the text around and visible to screenreaders (tested only on VoiceOver)
+*/
+.boxel-cta-block__info-area ~ .boxel-cta-block__private-notice > .boxel-cta-block__private-notice-message {
+  position: absolute;
+  display: block;
+  width: 1px;
+  height: 1px;
+  min-width: 1px;
+  min-height: 1px;
+  padding: 0;
+  margin: -1px;
+  border: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* 
+  this is here because safari has issues with our layout when changing states.
+  it seems to allocate space for the "screenreader-only" message:
+  "Actions only visible to you"
+  when changing state from a state without a custom info-area to one with a custom info-area
+  and vice versa
+
+  to test this out, remove this line, and try changing states in Safari. 
+  Chrome and Firefox do not have this bug.
+*/
+.boxel-cta-block__info-area ~ .boxel-cta-block__private-notice {
+  max-width: var(--boxel-cta-block-lock-icon-size);
 }
