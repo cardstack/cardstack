@@ -6,11 +6,8 @@
 
 .layer-two-connect-card__section-one {
   border-bottom: 1px solid var(--boxel-light-300);
-  padding-bottom: var(--boxel-sp-xl);
+  padding: var(--boxel-sp-xl);
   padding-top: var(--boxel-sp-lg);
-}
-
-.layer-two-connect-card--with-explanations  .layer-two-connect-card__section-one {
   padding-bottom: 0;
 }
 
@@ -18,8 +15,8 @@
   font: 600 var(--boxel-font);
   margin: 0;
   padding-bottom: var(--boxel-sp-xl);
-  padding-left: var(--boxel-sp-lg);
-  padding-right: var(--boxel-sp-lg);
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .layer-two-connect-card--with-explanations .layer-two-connect-card__header {
@@ -30,23 +27,23 @@
 .layer-two-connect-card__explanation {
   color: var(--boxel-purple-600);
   padding-bottom: var(--boxel-sp-xs);
-  padding-left: var(--boxel-sp-lg);
-  padding-right: var(--boxel-sp-lg);
+  padding-left: 0;
+  padding-right: 0;
   margin-top: 0;
 }
 
 .layer-two-connect-card__app-store-links {
   align-items: center;
-  background-color: var(--boxel-light-300);
-  border-radius: var(--boxel-border-radius);
   display: flex;
-  margin-left: var(--boxel-sp-xxxl);
-  margin-right: var(--boxel-sp-xxxl);
-  padding: var(--boxel-sp);
+  justify-content: space-around;
+  padding-top: var(--boxel-sp);
 }
 
-.layer-two-connect-card__app-icon {
-  margin-right: var(--boxel-sp-sm);
+.layer-two-connect-card__app-phone {
+  width: 138px;
+  height: 149px;
+  margin-left: 16px;
+  margin-right: 29px;
 }
 
 .layer-two-connect-card__mobile-coming-soon {
@@ -56,16 +53,8 @@
   margin-left: 2.5rem;
 }
 
-.layer-two-connect-card__app-details {
-  flex-grow: 1;
-}
-
-.layer-two-connect-card__app-name {
-  font: 600 var(--boxel-font);
-  font-size: var(--boxel-font-size-sm);
-}
-
 .layer-two-connect-card__section-two {
+  padding: var(--boxel-sp-xl);
   padding-top: var(--boxel-sp-lg);
 }
 

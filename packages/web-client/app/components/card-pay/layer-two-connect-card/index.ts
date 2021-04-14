@@ -1,7 +1,8 @@
 import Component from '@glimmer/component';
 import Layer2Network from '../../../services/layer2-network';
 import CardstackLogo from '../../../images/icons/cardstack-logo-opaque-efefef-bg.svg';
-import CardstackMobileAppIcon from '../../../images/icons/cardstack-mobile-app-icon.svg';
+import CardstackMobileAppPhone from '../../../images/cardstack-mobile-app-phone.png';
+import CardstackMobileAppPhone2x from '../../../images/cardstack-mobile-app-phone@2x.png';
 import AppStoreBadge from '../../../images/icons/download-on-the-app-store-badge.svg';
 import GooglePlayBadge from '../../../images/icons/google-play-badge.png';
 import config from '@cardstack/web-client/config/environment';
@@ -10,6 +11,7 @@ import { tracked } from '@glimmer/tracking';
 import { reads } from 'macro-decorators';
 import { task } from 'ember-concurrency-decorators';
 import { taskFor } from 'ember-concurrency-ts';
+import { next } from '@ember/runloop';
 
 interface CardPayLayerTwoConnectCardComponentArgs {
   onComplete: (() => void) | undefined;
@@ -18,7 +20,8 @@ interface CardPayLayerTwoConnectCardComponentArgs {
 class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConnectCardComponentArgs> {
   @service declare layer2Network: Layer2Network;
   cardstackLogo = CardstackLogo;
-  cardstackMobileAppIcon = CardstackMobileAppIcon;
+  cardstackMobileAppPhone = CardstackMobileAppPhone;
+  cardstackMobileAppPhone2x = CardstackMobileAppPhone2x;
   appStoreBadge = AppStoreBadge;
   googlePlayBadge = GooglePlayBadge;
   appStoreUrl = config.urls.appStoreLink;
@@ -28,6 +31,11 @@ class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConne
   @tracked isWaitingForConnection = false;
   constructor(owner: unknown, args: CardPayLayerTwoConnectCardComponentArgs) {
     super(owner, args);
+    if (this.hasAccount) {
+      next(this, () => {
+        this.args.onComplete?.();
+      });
+    }
     if (!this.hasAccount) {
       taskFor(this.connectWalletTask).perform();
     }
