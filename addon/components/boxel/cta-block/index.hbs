@@ -7,7 +7,12 @@
     (if @stepNumber "boxel-cta-block--has-step")
   }}
   >
-  <span class="boxel-cta-block__step">{{@stepNumber}}</span>
+  {{!-- Not accounting for 0 as a step number --}}
+  {{#if @stepNumber}}
+    <div class="boxel-cta-block__step" data-step={{@stepNumber}}>
+      <span class="boxel-sr-only">Step {{@stepNumber}}</span> 
+    </div>
+  {{/if}}
   {{!-- 
     We cannot pass splattribute classes to components in the component helper: 
     https://github.com/emberjs/ember.js/issues/18402 
@@ -92,10 +97,10 @@
     {{svg-jar "checkbox-primary-checked" class="boxel-cta-block__done-icon" role="presentation"}}
   {{/if}}
 
-  {{#if (not this.isDisabled) }}
-    <div class="boxel-cta-block__lock-icon">
-      <span class="boxel-cta-block__lock-icon-message">Actions only visible to you</span>
-      {{svg-jar "lock"}}
+  {{#unless this.isDisabled}}
+    <div class="boxel-cta-block__private-notice">
+      <span class="boxel-cta-block__private-notice-message">Actions only visible to you</span>
+      {{svg-jar "lock" class="boxel-cta-block__lock-icon" role="presentation"}}
     </div>
-  {{/if}}
+  {{/unless}}
 </div>

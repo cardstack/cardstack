@@ -8,7 +8,7 @@
   display: grid;
   grid-template-columns: auto auto auto minmax(var(--boxel-sp-sm), 1fr) auto auto;
   grid-template-rows: auto;
-  grid-template-areas: "done-icon main-action cancel-action _ info lock-icon";
+  grid-template-areas: "done-icon main-action cancel-action _ info private-notice";
 
   padding: var(--cta-block-padding-vertical) var(--cta-block-padding-horizontal);
 
@@ -55,6 +55,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.boxel-cta-block__step::before {
+  content: attr(data-step);
   font: 700 var(--boxel-font-sm);
   color: var(--cta-block-emphasis-text-color);
 }
@@ -112,18 +115,22 @@
 
   As a side effect, the grid-gap remains.
 */
-.boxel-cta-block__info-area ~ .boxel-cta-block__lock-icon > .boxel-cta-block__lock-icon-message {
-  min-width: 1px;
-  min-height: 1px;
-  max-width: 1px;
-  max-height: 1px;
+.boxel-cta-block__info-area ~ .boxel-cta-block__private-notice > .boxel-cta-block__private-notice-message {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  border: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
   overflow: hidden;
   white-space: nowrap;
 }
 
 /* The lock icon is not shown when the cta is disabled */
-.boxel-cta-block__lock-icon {
-  grid-area: lock-icon;
+.boxel-cta-block__private-notice {
+  grid-area: private-notice;
   display: grid;
   grid-auto-flow: column;
   align-items: center;
@@ -131,6 +138,6 @@
   gap: var(--boxel-sp-xs);
   text-align: right;
 }
-.boxel-cta-block--disabled .boxel-cta-block__lock-icon {
+.boxel-cta-block--disabled .boxel-cta-block__private-notice {
   display: none;
 }
