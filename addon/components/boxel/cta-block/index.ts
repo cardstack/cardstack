@@ -8,7 +8,7 @@ enum CtaBlockState {
   // design has no immediate plans to make a disabled state for the memorialized cta
   disabled = 'disabled',
   // in progress state - action has been taken, but not completed
-  inProgress = 'inProgress',
+  inProgress = 'in-progress',
   // memorialized state - requirement for CTA has been met
   memorialized = 'memorialized',
 }
