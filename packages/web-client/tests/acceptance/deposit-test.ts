@@ -291,4 +291,66 @@ module('Acceptance | deposit', function (hooks) {
       .dom(postableSel(2, 0))
       .containsText('choose the asset you would like to deposit');
   });
+
+  test('Initiating workflow with layer 2 wallet already connected', async function (assert) {
+    await visit('/');
+    await click('[data-test-cardstack-org-link="card-pay"]');
+
+    await click(
+      '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
+    );
+    assert.dom('[data-test-layer-two-connect-modal]').exists();
+    let layer2Service = this.owner.lookup('service:layer2-network');
+
+    layer2Service.test__simulateWalletConnectUri();
+    await waitFor('[data-test-wallet-connect-qr-code]');
+    assert.dom('[data-test-wallet-connect-qr-code]').exists();
+
+    // Simulate the user scanning the QR code and connecting their mobile wallet
+    let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await waitUntil(
+      () => !document.querySelector('[data-test-layer-two-connect-modal]')
+    );
+    assert
+      .dom(
+        '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
+      )
+      .hasText('0x18261…6E44');
+    assert.dom('[data-test-layer-two-connect-modal]').doesNotExist();
+
+    await click('[data-test-card-pay-header-tab][href="/card-pay/balances"]');
+    await click('[data-test-deposit-button]');
+    await click(`${postableSel(0, 3)} [data-test-wallet-option="metamask"]`);
+    await click(
+      `${postableSel(
+        0,
+        3
+      )} [data-test-mainnnet-connection-action-container] [data-test-boxel-button]`
+    );
+
+    let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+    let layer1Service = this.owner.lookup('service:layer1-network');
+    layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
+
+    await waitFor(milestoneCompletedSel(0));
+    assert
+      .dom(milestoneCompletedSel(0))
+      .containsText('Mainnet Wallet connected');
+
+    assert
+      .dom(postableSel(1, 0))
+      .containsText(
+        'Looks like you’ve already connected your xDai chain wallet'
+      );
+
+    await waitFor(milestoneCompletedSel(1));
+    assert
+      .dom(milestoneCompletedSel(1))
+      .containsText('xDai Chain wallet connected');
+
+    assert
+      .dom(postableSel(2, 0))
+      .containsText('choose the asset you would like to deposit');
+  });
 });

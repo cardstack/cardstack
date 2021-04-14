@@ -11,6 +11,7 @@ import { tracked } from '@glimmer/tracking';
 import { reads } from 'macro-decorators';
 import { task } from 'ember-concurrency-decorators';
 import { taskFor } from 'ember-concurrency-ts';
+import { next } from '@ember/runloop';
 
 interface CardPayLayerTwoConnectCardComponentArgs {
   onComplete: (() => void) | undefined;
@@ -30,6 +31,11 @@ class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConne
   @tracked isWaitingForConnection = false;
   constructor(owner: unknown, args: CardPayLayerTwoConnectCardComponentArgs) {
     super(owner, args);
+    if (this.hasAccount) {
+      next(this, () => {
+        this.args.onComplete?.();
+      });
+    }
     if (!this.hasAccount) {
       taskFor(this.connectWalletTask).perform();
     }
