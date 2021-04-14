@@ -99,6 +99,7 @@
 .boxel-cta-block__main-action-area ~ .boxel-cta-block__done-icon {
   display: block;
   grid-area: done-icon;
+  align-self: center;
 
   --icon-color: var(--cta-block-emphasis-text-color);
   margin-right: var(--boxel-sp-xxs);
