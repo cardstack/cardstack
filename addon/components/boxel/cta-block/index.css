@@ -3,9 +3,13 @@
   --cta-block-padding-vertical: var(--boxel-sp-lg);
   --icon-color: var(--cta-block-text-color);
 
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  position: relative;
+
+  display: grid;
+  grid-template-columns: auto auto auto minmax(var(--boxel-sp-sm), 1fr) auto auto;
+  grid-template-rows: auto;
+  grid-template-areas: "done-icon main-action cancel-action _ info lock-icon";
+
   padding: var(--cta-block-padding-vertical) var(--cta-block-padding-horizontal);
 
   background-color: var(--cta-block-background-color);
@@ -15,6 +19,7 @@
   transition: background-color var(--boxel-transition), padding var(--boxel-transition);
 }
 
+/* basic dark + light theme with a twist for disabled */
 .boxel-cta-block--dark {
   --cta-block-background-color: var(--boxel-purple-700);
   --cta-block-emphasis-text-color: var(--boxel-light);
@@ -31,6 +36,7 @@
   --cta-block-text-color: var(--boxel-purple-400);
 }
 
+/* paddings are different if there is a step */
 .boxel-cta-block--memorialized.boxel-cta-block--has-step {
   --cta-block-padding-horizontal: var(--boxel-sp-lg);
   --cta-block-padding-vertical: var(--boxel-sp);
@@ -41,38 +47,90 @@
   --cta-block-padding-vertical: var(--boxel-sp-xs);
 }
 
-.boxel-cta-block__action {
-  position: relative;
+/* add the step using a pseudoelement */
+.boxel-cta-block__step {
+  position: absolute;
+  width: var(--cta-block-padding-horizontal);
+  height: 100%;
   display: flex;
   align-items: center;
+  justify-content: center;
+  font: 700 var(--boxel-font-sm);
+  color: var(--cta-block-emphasis-text-color);
+}
+
+/* grid elements */
+.boxel-cta-block__main-action-button {
+  grid-area: main-action;
+}
+
+.boxel-cta-block__cancel-action-button {
+  grid-area: cancel-action;
+  margin-left: var(--boxel-sp);
+}
+
+.boxel-cta-block__info-area {
+  grid-area: info;
+
+  /* some defaults so that people can simply enter text */
+  /* if they want to supply more complex content they should be able to overwrite it */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* main action area + conditionally shown done icon */
+.boxel-cta-block__main-action-area {
+  grid-area: main-action;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font: 600 var(--boxel-font-sm);
   color: var(--cta-block-emphasis-text-color);
 }
 
-.boxel-cta-block__action::before {
-  position: absolute;
-  content: attr(data-step);
-  left: calc(-1 * var(--boxel-sp-xs));
-  font: 700 var(--boxel-font-sm);
-  transform: translateX(calc(-50%));
+.boxel-cta-block__done-icon {
+  display: none;
 }
 
-.boxel-cta-block__done-icon {
+.boxel-cta-block__main-action-area ~ .boxel-cta-block__done-icon {
+  display: block;
+  grid-area: done-icon;
+
   --icon-color: var(--cta-block-emphasis-text-color);
   margin-right: var(--boxel-sp-xxs);
   width: var(--boxel-sp);
   height: var(--boxel-sp);
 }
 
-.boxel-cta-block__cancel-button {
-  margin-left: var(--boxel-sp);
+/* 
+  Only visually show the "Actions only visible to you" message if someone hasn't added an info area 
+  Since the lock seems to be a visual cue that actions are only visible to the user
+  We keep the text around and visible to screenreaders (tested only on VoiceOver)
+  width: 0px appears to remove it
+  Need design confirmation on whether this is good
+
+  As a side effect, the grid-gap remains.
+*/
+.boxel-cta-block__info-area ~ .boxel-cta-block__lock-icon > .boxel-cta-block__lock-icon-message {
+  min-width: 1px;
+  min-height: 1px;
+  max-width: 1px;
+  max-height: 1px;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
-.boxel-cta-block__lock-text {
+/* The lock icon is not shown when the cta is disabled */
+.boxel-cta-block__lock-icon {
+  grid-area: lock-icon;
   display: grid;
   grid-auto-flow: column;
   align-items: center;
   justify-content: end;
   gap: var(--boxel-sp-xs);
   text-align: right;
+}
+.boxel-cta-block--disabled .boxel-cta-block__lock-icon {
+  display: none;
 }

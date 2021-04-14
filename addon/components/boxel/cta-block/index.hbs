@@ -4,41 +4,97 @@
     (concat "boxel-cta-block--" this.theme)  
     (if this.isDisabled "boxel-cta-block--disabled")
     (if this.isMemorialized "boxel-cta-block--memorialized")
-    (if this.layout.step "boxel-cta-block--has-step")
-  }}>
-  {{!-- note that with the current implementation, 2 digit & up numbers will not fit nicely. --}}
-   <div class="boxel-cta-block__action" data-step={{if this.layout.step @stepNumber}}>
-     {{#if this.layout.mainAction}}
-       <Boxel::Button 
-         @kind={{this.mainActionButtonKind}} 
-         @disabled={{this.isDisabled}}
-         @loading={{this.isInProgress}}
-         {{on "click" this.mainAction}}
-       >
-         {{this.mainActionText}}
-       </Boxel::Button>
+    (if @stepNumber "boxel-cta-block--has-step")
+  }}
+  >
+  <span class="boxel-cta-block__step">{{@stepNumber}}</span>
+  {{!-- 
+    We cannot pass splattribute classes to components in the component helper: 
+    https://github.com/emberjs/ember.js/issues/18402 
+  --}}
+  {{#if (and (has-block "default") (eq @state "default"))}}
+    {{yield 
+      (hash 
+        MainActionButton=(component 
+          "boxel/cta-block/button" 
+          kind="primary" 
+          ctaClass="boxel-cta-block__main-action-button"
+        )
+        InfoArea=(component 
+          "boxel/cta-block/area" 
+          ctaClass="boxel-cta-block__info-area"
+        )
+      )
+      to="default"
+    }}
+  {{else if (and (has-block "disabled") (eq @state "disabled"))}}
+    {{yield
+      (hash 
+        MainActionButton=(component 
+          "boxel/cta-block/button" 
+          kind="primary" 
+          disabled=true 
+          ctaClass="boxel-cta-block__main-action-button"
+        )
+        InfoArea=(component 
+          "boxel/cta-block/area" 
+          ctaClass="boxel-cta-block__info-area"
+        )
+      )
+      to="disabled"
+    }}
+  {{else if (and (has-block "in-progress") (eq @state "in-progress"))}}
+    {{yield
+      (hash 
+        MainActionButton=(component 
+          "boxel/cta-block/button" 
+          kind="primary" 
+          loading=true 
+          ctaClass="boxel-cta-block__main-action-button"
+        )
+        CancelActionButton=(component 
+          "boxel/cta-block/button" 
+          kind="secondary-dark" 
+          ctaClass="boxel-cta-block__cancel-action-button"
+        )
+        InfoArea=(component 
+          "boxel/cta-block/area" 
+          ctaClass="boxel-cta-block__info-area"
+        )
+      )
+      to="in-progress"
+    }}
+  {{else if (and (has-block "memorialized") (eq @state "memorialized"))}}
+    {{!-- 
+      if using MainActionButton and MainActionArea together, the grid layout will put them at the exact same spot,
+      causing a visual bug.
+    --}}
+    {{yield
+      (hash 
+        MainActionButton=(component 
+          "boxel/cta-block/button" 
+          kind="secondary-light" 
+          ctaClass="boxel-cta-block__main-action-button"
+        )
+        MainActionArea=(component 
+          "boxel/cta-block/area" 
+          ctaClass="boxel-cta-block__main-action-area"
+        )
+        InfoArea=(component 
+          "boxel/cta-block/area" 
+          ctaClass="boxel-cta-block__info-area"
+        )
+      )
+      to="memorialized"
+    }}
+    {{!-- this icon is only shown if there is a main-action-area (not the button) --}}
+    {{svg-jar "checkbox-primary-checked" class="boxel-cta-block__done-icon" role="presentation"}}
+  {{/if}}
 
-     {{else if this.layout.mainActionStatus}}
-       {{svg-jar "checkbox-primary-checked" class="boxel-cta-block__done-icon"}}
-       {{this.mainActionText}}
-     {{/if}}
-     {{#if this.layout.cancelAction}}
-       <Boxel::Button class="boxel-cta-block__cancel-button" @kind={{this.cancelActionButtonKind}} {{on "click" this.cancelAction}}>
-         {{this.cancelActionText}}
-       </Boxel::Button>
-     {{/if}}
-   </div>
-
-  {{!-- might be better to make these 2 the same layout property and yield if it has a block. --}}
-  {{#if this.layout.locked}}
-    <span class="boxel-cta-block__lock-text">
-      Actions only visible to you
-      {{svg-jar "lock" width="12px" height="12px"}}
-    </span>
-  {{else if this.layout.statusView}}
-    <span class="boxel-cta-block__lock-text">
-      {{yield}}
-      {{svg-jar "lock" width="12px" height="12px"}}
-    </span>
+  {{#if (not (eq @state "disabled")) }}
+    <div class="boxel-cta-block__lock-icon">
+      <span class="boxel-cta-block__lock-icon-message">Actions only visible to you</span>
+      {{svg-jar "lock"}}
+    </div>
   {{/if}}
 </div>
