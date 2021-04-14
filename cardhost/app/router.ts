@@ -7,6 +7,6 @@ export default class Router extends EmberRouter {
 }
 
 Router.map(function () {
+  this.route('post-0');
   this.route('delegate', { path: '/*pathname' });
-  this.route('post-0', { path: '/post-0' });
 });

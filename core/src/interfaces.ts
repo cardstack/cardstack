@@ -1,4 +1,9 @@
-export type Format = 'isolated' | 'embedded';
+const componentFormats = {
+  isolated: '',
+  embedded: '',
+};
+export type Format = keyof typeof componentFormats;
+export const formats = Object.keys(componentFormats) as Format[];
 
 export type RawCard = {
   url: string;
@@ -7,6 +12,7 @@ export type RawCard = {
   isolated?: string;
   embedded?: string;
   schema?: string;
+  containsRoutes?: boolean;
 
   // url to the card we adopted from
   adoptsFrom?: string;
