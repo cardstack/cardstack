@@ -87,7 +87,12 @@
       )
       to="memorialized"
     }}
-    {{!-- this icon is only shown if there is a main-action-area (not the button) --}}
+    {{!-- 
+      this icon is only shown if there is a main-action-area (not the button) 
+      the html seems out of order compared to the visual order 
+      but this is necessary for its display to be controlled
+      via the css general sibling selector
+    --}}
     {{svg-jar "checkbox-primary-checked" class="boxel-cta-block__done-icon" role="presentation"}}
   {{/if}}
 
