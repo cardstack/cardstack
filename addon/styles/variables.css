@@ -1,17 +1,16 @@
 :root {
-  --boxel-font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-  --boxel-monospace-font-family: 'Roboto Mono','Courier New', Courier, monospace;
-
-  --boxel-font-xl: var(--boxel-font-size-xl)/calc(43/32) var(--boxel-font-family);
-  --boxel-font-lg: var(--boxel-font-size-lg)/calc(30/22) var(--boxel-font-family);
-  --boxel-font:    var(--boxel-font-size)/calc(22/16) var(--boxel-font-family);        /* default */
-  --boxel-font-sm: var(--boxel-font-size-sm)/calc(18/13) var(--boxel-font-family);
-  --boxel-font-xs: var(--boxel-font-size-xs)/calc(15/11) var(--boxel-font-family);
+  --boxel-font-family: 'Open Sans', helvetica, arial, sans-serif;
+  --boxel-monospace-font-family: 'Roboto Mono', 'Courier New', courier, monospace;
+  --boxel-font-xl: var(--boxel-font-size-xl)/calc(43 / 32) var(--boxel-font-family);
+  --boxel-font-lg: var(--boxel-font-size-lg)/calc(30 / 22) var(--boxel-font-family);
+  --boxel-font: var(--boxel-font-size)/calc(22 / 16) var(--boxel-font-family);        /* default */
+  --boxel-font-sm: var(--boxel-font-size-sm)/calc(18 / 13) var(--boxel-font-family);
+  --boxel-font-xs: var(--boxel-font-size-xs)/calc(15 / 11) var(--boxel-font-family);
 
   /* font-sizes */
   --boxel-font-size-xl: 2rem;
   --boxel-font-size-lg: 1.375rem;
-  --boxel-font-size:    1rem;      /* default - 16px */
+  --boxel-font-size: 1rem;      /* default - 16px */
   --boxel-font-size-sm: 0.8125rem;
   --boxel-font-size-xs: 0.6875rem;
 
@@ -21,7 +20,7 @@
   --boxel-lsp-lg: 0.035em;
   --boxel-lsp: 0.025em;
   --boxel-lsp-sm: 0.015em;
-  --boxel-lsp-xs: 0.010em;
+  --boxel-lsp-xs: 0.01em;
   --boxel-lsp-xxs: 0.005em;
 
   /* Modular scale for spacing */
@@ -36,7 +35,6 @@
   --boxel-sp-xl: calc(var(--boxel-sp-lg) * var(--boxel-ratio));    /* 35.54px */
   --boxel-sp-xxl: calc(var(--boxel-sp-xl) * var(--boxel-ratio));   /* 47.37px */
   --boxel-sp-xxxl: calc(var(--boxel-sp-xxl) * var(--boxel-ratio)); /* 63.15px */
-
   --boxel-border-color: var(--boxel-light-500);
   --boxel-border: 1px solid var(--boxel-border-color);
   --boxel-border-dark: 1px solid var(--boxel-dark);
@@ -48,13 +46,13 @@
   --boxel-outline-color: var(--boxel-blue);
   --boxel-outline: 2px solid var(--boxel-outline-color);
 
-
   /* COLOR PALETTE */
+
   /* Primary colors */
   --boxel-light: #fff;
   --boxel-dark: #000;
   --boxel-highlight: var(--boxel-cyan);
-  --boxel-highlight-hover: #00D3CE;
+  --boxel-highlight-hover: #00d3ce;
   --boxel-link-highlight: var(--boxel-highlight-hover);
 
   /* Boxel purples */
@@ -92,12 +90,13 @@
   --boxel-pink: #ff009d;
 
   /* Status colors */
-  --boxel-error-100:   var(--boxel-red);    /* alert - attention - error */
+  --boxel-error-100: var(--boxel-red);    /* alert - attention - error */
   --boxel-warning-100: var(--boxel-yellow); /* warning - notification */
   --boxel-success-100: var(--boxel-green);
   --boxel-success-200: var(--boxel-teal);
 
   /* Fix: Other colors used in app, potentially not in color palette: */
+
   /*
     #A5A5A5
     #C1C1D0

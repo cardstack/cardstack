@@ -1,3 +1,5 @@
+/* stylelint-disable */
+
 /* Media collection */
 .media-collection {
   --breadcrumbs-height: 90px;
@@ -64,6 +66,7 @@
   background: url('../../../../public/@cardstack/boxel/images/icons/edit-box.svg') left 14px center/14px 14px no-repeat;
   text-align: left;
 }
+
 .version-history {
   width: 40px;
   height: 40px;
@@ -110,16 +113,13 @@
   grid-template-columns: 1fr auto;
   align-items: center;
   text-align: left;
-
   border-radius: 100px;
   white-space: nowrap;
-
   width: 100%;
   height: min-content;
   padding: var(--boxel-sp-xs) var(--boxel-sp-sm) var(--boxel-sp-xs) var(--boxel-sp-lg);
   font: 600 var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
-
   background-color: transparent;
   border: 1px solid var(--boxel-purple-300);
 }
@@ -163,6 +163,7 @@
 .media-collection__view-selectors > .media-collection__btn {
   opacity: 0.25;
 }
+
 .media-collection__view-selectors > .media-collection__btn:focus,
 .media-collection__view-selectors > .media-collection__btn:hover,
 .media-collection__view-selectors > .media-collection__btn.selected {

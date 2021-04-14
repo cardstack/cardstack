@@ -12,7 +12,8 @@
   color: var(--queue-card-primary-color);
   font: var(--boxel-font-xs);
   letter-spacing: var(--boxel-lsp-lg);
-  transition: color var(--boxel-transition),
+  transition:
+    color var(--boxel-transition),
     background-color var(--boxel-transition);
 }
 
@@ -68,10 +69,6 @@
   padding: 10px 20px 17px;
 }
 
-.queue-card__label + .queue-card__project-title {
-  padding-top: 5px;
-}
-
 .queue-card__project-title {
   margin: 0;
   font: var(--boxel-font-sm);
@@ -83,8 +80,13 @@
   overflow: hidden;
 }
 
+.queue-card__label + .queue-card__project-title {
+  padding-top: 5px;
+}
+
 .queue-card__participants {
   --icon-color: var(--queue-card-primary-color);
+
   color: var(--queue-card-secondary-color);
 }
 

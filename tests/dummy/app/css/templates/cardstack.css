@@ -16,6 +16,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   /* quick hack to prevent layout shift when connect account button is pressed */
   max-height: 1.875rem;
   overflow: visible;
@@ -66,6 +67,7 @@
   align-items: center;
   margin-top: var(--boxel-sp-xs);
   font: 400 var(--boxel-font);
+
   --icon-color: var(--boxel-teal);
 }
 

@@ -35,7 +35,6 @@
   min-width: var(--boxel-dashboard-left-edge-width);
 }
 
-
 /* Dark Theme */
 .boxel-dashboard--dark-theme {
   --boxel-dashboard-background-color: var(--boxel-purple-600);

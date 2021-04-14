@@ -17,6 +17,12 @@
   padding: 0;
 }
 
+.field-renderer__title {
+  color: var(--boxel-dark);
+  font: 700 var(--boxel-font-sm);
+  text-align: right;
+}
+
 .field-renderer.table-field .field-renderer__title {
   text-align: left;
 }
@@ -34,17 +40,10 @@
   padding: 0;
 }
 
-.field-renderer__meta-field.field-renderer--collection
-  > .field-renderer__title {
+.field-renderer__meta-field.field-renderer--collection > .field-renderer__title {
   font-weight: 600;
   letter-spacing: var(--boxel-lsp);
   text-transform: capitalize;
-}
-
-.field-renderer__title {
-  color: var(--boxel-dark);
-  font: 700 var(--boxel-font-sm);
-  text-align: right;
 }
 
 .field-renderer__value {
@@ -96,7 +95,8 @@
   color: transparent;
   width: 260px;
   height: 260px;
-  background: url('../@cardstack/boxel/images/placeholders/album_art.svg') center/cover
+  background:
+    url('../@cardstack/boxel/images/placeholders/album_art.svg') center/cover
     no-repeat;
 }
 
@@ -169,7 +169,8 @@
   height: 30px;
   padding: 0;
   border: none;
-  background: url('../@cardstack/boxel/images/icons/icon-minus-circle.svg') center/16px
+  background:
+    url('../@cardstack/boxel/images/icons/icon-minus-circle.svg') center/16px
     16px no-repeat;
 }
 
@@ -225,7 +226,8 @@
   right: 0;
   width: 50px;
   height: 50px;
-  background: url('../@cardstack/boxel/images/icons/dropdown-arrows.svg') center/15px 15px
+  background:
+    url('../@cardstack/boxel/images/icons/dropdown-arrows.svg') center/15px 15px
     no-repeat;
 }
 
@@ -261,8 +263,7 @@
   height: auto;
 }
 
-.field-renderer--comparison-mode.field-renderer--collection
-  + .field-renderer--comparison-mode.field-renderer--collection {
+.field-renderer--comparison-mode.field-renderer--collection + .field-renderer--comparison-mode.field-renderer--collection {
   margin-top: 20px;
 }
 

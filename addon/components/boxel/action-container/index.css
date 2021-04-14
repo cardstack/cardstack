@@ -1,5 +1,5 @@
 .boxel-action-container {
-  max-width: 43.75rem; /* 700px;*/
+  max-width: 43.75rem; /* 700px; */
   min-width: 20rem;
   color: var(--boxel-dark);
   font: var(--boxel-font);
@@ -11,11 +11,6 @@
   max-width: 36.6rem; /* 585px; */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
-
-.boxel-action-container__prompt {
-  padding: var(--boxel-sp) var(--boxel-sp-lg);
-}
-
 
 /* Card Header */
 .boxel-action-container__header {
@@ -34,7 +29,6 @@
   color: var(--boxel-dark);
 }
 
-
 /* Optional prompt */
 .boxel-action-container__prompt {
   margin: 0;
@@ -42,8 +36,8 @@
   font-weight: 700;
   line-height: 1.33;
   letter-spacing: 0;
+  padding: var(--boxel-sp) var(--boxel-sp-lg);
 }
-
 
 /* Card Chin */
 .boxel-action-container__footer {

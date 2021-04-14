@@ -85,7 +85,7 @@
   min-height: 40px;
   padding: 10px 40px 10px 18px;
   background-color: var(--boxel-purple-500);
-  border: 1px solid #1C1C1C;
+  border: 1px solid #1c1c1c;
   border-radius: 5px;
   color: var(--boxel-light);
   font: var(--boxel-font-xs);
@@ -134,25 +134,29 @@
 .queue__filter-dropdown .ember-basic-dropdown-content--below.ember-basic-dropdown--transitioning-in {
   animation: drop-fade-below var(--boxel-transition);
 }
+
 .queue__filter-dropdown .ember-basic-dropdown-content--below.ember-basic-dropdown--transitioning-out {
   animation: drop-fade-below var(--boxel-transition) reverse;
 }
 
 @keyframes drop-fade-below {
-  0%   {
+  0% {
     opacity: 0;
     transform: translateY(-20px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
   }
 }
+
 @keyframes drop-fade-above {
-  0%   {
+  0% {
     opacity: 0;
     transform: translateY(20px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -162,7 +166,6 @@
 .queue__search-btn {
   --icon-color: var(--boxel-light);
 }
-
 
 /* Sections */
 .queue__section + .queue__section {

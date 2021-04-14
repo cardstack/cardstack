@@ -1,3 +1,5 @@
+/* stylelint-disable */
+
 .versions {
   --boxel-revision-light-purple: #84829b;
   --boxel-revision-lightest-purple: var(--boxel-purple-300);
@@ -34,7 +36,8 @@
 .versions__title {
   padding: 28px 20px 28px 35px;
   color: var(--boxel-light);
-  background: url('../../../../public/@cardstack/boxel/images/icons/file-icon.svg') center left 5px/16px 20px
+  background:
+    url('../../../../public/@cardstack/boxel/images/icons/file-icon.svg') center left 5px/16px 20px
     no-repeat;
   font: var(--boxel-font);
   font-weight: 600;
@@ -74,12 +77,14 @@
 
 .versions-nav-item {
   --btn-color: var(--boxel-light);
+
   position: relative;
   display: grid;
   color: var(--boxel-light);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
 }
+
 .versions-nav-item:hover,
 .versions-nav-item:hover .version__description {
   color: var(--boxel-highlight);
@@ -91,6 +96,7 @@
   text-align: left;
   transition: all 0.2s ease;
 }
+
 .versions-nav-item__btn:hover {
   cursor: pointer;
 }
@@ -99,6 +105,7 @@
   padding: 13px 10px 16px 40px;
   box-shadow: 0 1px 0 0 var(--boxel-revision-light-purple);
 }
+
 .versions-nav-item:hover .versions-nav-item__selection-btn {
   background-color: var(--boxel-revision-hover-purple);
   border-bottom-color: transparent;
@@ -106,8 +113,7 @@
   box-shadow: 0 -1px 0 1px var(--boxel-revision-hover-purple);
 }
 
-.versions-nav-item--selected:not(.versions-nav-item--comp-view)
-  .versions-nav-item__selection-btn,
+.versions-nav-item--selected:not(.versions-nav-item--comp-view) .versions-nav-item__selection-btn,
 .versions-nav-item.is-comp-card .versions-nav-item__selection-btn {
   background-color: var(--boxel-purple-700);
   border-bottom-color: transparent;
@@ -123,14 +129,18 @@
   height: 100%;
   padding: 0;
 }
+
 .versions-nav-item__hover-btn.checkbox {
   --icon-border: white;
   --icon-bg: transparent;
   --icon-color: transparent;
+
   left: 0;
 }
+
 .versions-nav-item__hover-btn.more {
   --icon-color: var(--boxel-light);
+
   right: 0;
 }
 
@@ -138,9 +148,11 @@
   display: block;
   margin: auto;
 }
+
 .versions-nav-item__hover-btn {
   z-index: -1;
 }
+
 .versions-nav-item.is-base-card .versions-nav-item__hover-btn,
 .versions-nav-item.is-comp-card .versions-nav-item__hover-btn,
 .versions-nav-item--selected .versions-nav-item__hover-btn,
@@ -155,8 +167,10 @@
   --icon-border: black;
   --icon-color: var(--boxel-dark);
   --icon-bg: black;
+
   color: var(--boxel-dark);
 }
+
 .versions-nav-item.is-base-card .version__label {
   background-image: url('../../../../public/@cardstack/boxel/images/icons/clock.svg');
 }
@@ -221,7 +235,8 @@
 }
 
 .version__label {
-  background: url('../../../../public/@cardstack/boxel/images/icons/clock-highlighted.svg') right 2px
+  background:
+    url('../../../../public/@cardstack/boxel/images/icons/clock-highlighted.svg') right 2px
     center/16px 15px no-repeat;
   padding-right: 25px;
   color: var(--boxel-highlight);
@@ -257,6 +272,7 @@
 
 .version-card {
   --translate-unit: 45px;
+
   justify-self: center;
   position: absolute;
   transform: translateY(0);
@@ -348,6 +364,7 @@
 .version-card--item__header {
   width: 100%;
   background-color: var(--boxel-purple-300);
+
   /* background-image: var(--blurhash-image); */
   background-size: cover;
   background-position: center;
@@ -433,9 +450,7 @@
   grid-template-columns: auto 450px;
 }
 
-.version-card__content
-  .media-detail-section__contents
-  > .field-renderer:last-child {
+.version-card__content .media-detail-section__contents > .field-renderer:last-child {
   margin-bottom: 30px;
 }
 

@@ -10,7 +10,7 @@
   z-index: 0;
 }
 
-.boxel-sidebar-section--bordered:before {
+.boxel-sidebar-section--bordered::before {
   content: "";
   border-radius: var(--boxel-border-radius);
   position: absolute;

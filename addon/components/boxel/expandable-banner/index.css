@@ -37,7 +37,8 @@
   display: flex;
   align-items: center;
   min-height: var(--boxel-expandable-banner-min-height);
-  padding: var(--boxel-expandable-banner-vertical-gap) calc(var(--boxel-sp-xs) + 3.375rem + var(--boxel-expandable-banner-horizontal-gap))
+  padding:
+    var(--boxel-expandable-banner-vertical-gap) calc(var(--boxel-sp-xs) + 3.375rem + var(--boxel-expandable-banner-horizontal-gap))
     var(--boxel-expandable-banner-vertical-gap) var(--boxel-expandable-banner-horizontal-gap);
 }
 
@@ -55,15 +56,8 @@
   flex-shrink: 0;
 }
 
-.boxel-expandable-banner__summary:focus {
-  outline: var(--boxel-outline);
-  outline-offset: -4px;
-}
-.boxel-expandable-banner__summary:focus:not(:focus-visible) {
-  outline: transparent;
-}
-
 /* marker styling */
+
 /*
   remove the summary disclosure widget (the default triangle)
   support is currently pretty decent: https://caniuse.com/?search=%3A%3Amarker
@@ -73,6 +67,15 @@
 .boxel-expandable-banner__summary::-webkit-details-marker {
   display: none;
   content: '';
+}
+
+.boxel-expandable-banner__summary:focus {
+  outline: var(--boxel-outline);
+  outline-offset: -4px;
+}
+
+.boxel-expandable-banner__summary:focus:not(:focus-visible) {
+  outline: transparent;
 }
 
 /* style our custom markers */
@@ -102,6 +105,7 @@
 .boxel-expandable-banner__summary-marker-icon {
   margin-left: var(--boxel-sp-xs);
   transform: rotate(180deg);
+
   /* transition: transform var(--boxel-transition); */
 }
 

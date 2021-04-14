@@ -1,5 +1,6 @@
 .boxel-left-edge-nav-selectable-button {
   --icon-color: var(--boxel-highlight);
+
   border: none;
   border-left: 4px solid transparent;
   display: inline-block;
@@ -17,6 +18,7 @@
 
 .boxel-left-edge-nav-selectable-button:hover {
   --icon-color: var(--boxel-dark);
+
   cursor: pointer;
   opacity: 1;
 }

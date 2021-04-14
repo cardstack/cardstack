@@ -14,8 +14,8 @@
 
 .boxel-modal {
   --boxel-modal-offset-top: 30px;
-  --boxel-modal-offset-right: 0px;
-  --boxel-modal-offset-left: 0px;
+  --boxel-modal-offset-right: 0;
+  --boxel-modal-offset-left: 0;
   --boxel-modal-max-width: 1000px;
 
   position: fixed;
@@ -37,7 +37,6 @@
   margin: 0 auto;
   transition: max-width var(--boxel-transition);
 }
-
 
 .boxel-modal__inner > * {
   pointer-events: auto;

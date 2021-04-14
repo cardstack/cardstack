@@ -3,11 +3,12 @@
   justify-content: space-between;
   min-height: 50px;
   padding: var(--boxel-sp-sm) var(--boxel-sp);
-  background-image: linear-gradient(
-    to right,
-    var(--boxel-cyan),
-    var(--boxel-green)
-  );
+  background-image:
+    linear-gradient(
+      to right,
+      var(--boxel-cyan),
+      var(--boxel-green)
+    );
   border: 1px solid var(--boxel-teal);
   border-radius: 100px;
   font: var(--boxel-font-sm);

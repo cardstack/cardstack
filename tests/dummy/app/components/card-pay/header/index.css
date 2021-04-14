@@ -18,7 +18,6 @@
   white-space: nowrap;
 }
 
-
 /* Connect wallet component */
 .card-pay-header__item-list {
   grid-column-end: -1;
@@ -80,6 +79,7 @@
   text-transform: uppercase;
   transition: color var(--boxel-transition);
 }
+
 .card-pay-header__nav-tab:hover,
 .card-pay-header__nav-tab:focus {
   color: var(--boxel-highlight);

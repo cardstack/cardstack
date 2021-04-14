@@ -1,5 +1,6 @@
 .boxel-progress-icon {
   --icon-color: var(--boxel-highlight);
+
   position: relative;
   background-image: url('../@cardstack/boxel/images/icons/progress-circle-dark.svg');
   background-position: center;

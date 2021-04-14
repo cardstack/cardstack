@@ -11,7 +11,7 @@
 .media-detail-section__title {
   font-size: 18px;
   font-weight: 600;
-  line-height: calc(24/18);
+  line-height: calc(24 / 18);
   letter-spacing: 0;
   padding-left: 45px;
   padding-bottom: 5px;

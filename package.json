@@ -18,6 +18,8 @@
     "lint:fix": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*:fix",
     "lint:hbs": "ember-template-lint .",
     "lint:hbs:fix": "ember-template-lint . --fix",
+    "lint:css": "stylelint **/*.css --cache",
+    "lint:css:fix": "stylelint **/*.css --fix",
     "lint:js": "eslint . --cache",
     "lint:js:fix": "eslint . --fix",
     "start": "ember serve",
@@ -123,6 +125,7 @@
     "ember-cli-inject-live-reload": "^2.0.2",
     "ember-cli-moment-shim": "^3.8.0",
     "ember-cli-sri": "^2.1.1",
+    "ember-cli-stylelint": "^4.0.0",
     "ember-cli-terser": "^4.0.1",
     "ember-cli-typescript-blueprints": "^3.0.0",
     "ember-data": "github:emberjs/data#1df833396855d956b817540923dd89338463fec2",
@@ -152,6 +155,7 @@
     "qunit-dom": "^1.6.0",
     "release-it": "^14.2.2",
     "release-it-lerna-changelog": "^3.1.0",
+    "stylelint-config-standard": "^21.0.0",
     "typescript": "^4.2.3"
   },
   "resolutions": {

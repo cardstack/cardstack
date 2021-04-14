@@ -70,13 +70,13 @@
   grid-row: 2;
 }
 
-.collection-field__items--grid .collection-field__view-all-btn-container {
-  padding: 0;
-}
-
 .collection-field__view-all-btn-container {
   grid-column: 1 / -1;
   padding: 0 45px;
+}
+
+.collection-field__items--grid .collection-field__view-all-btn-container {
+  padding: 0;
 }
 
 .collection-field__view-all-btn {

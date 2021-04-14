@@ -8,11 +8,11 @@
   --boxel-modal-max-width: 1300px;
 }
 
-
 /* Play btn */
 .collection__play-btn {
   --icon-color: rgba(0, 0, 0, 0.5);
   --icon-border: white;
+
   width: 60px;
   height: 60px;
   display: none;
@@ -26,13 +26,6 @@
   top: 32px;
   left: 32px;
 }
-
-.collection__play-btn.is-playing,
-.media-collection__grid-item:hover .collection__play-btn,
-.master-collection__boxel:hover .collection__play-btn {
-  display: inline-block;
-}
-
 
 /* Collection Item */
 .collection {
@@ -73,7 +66,6 @@
   background-position: center;
   background-repeat: no-repeat;
 }
-
 
 /* List item view */
 .collection--list {
@@ -130,16 +122,6 @@
   white-space: nowrap;
 }
 
-.collection--list .collection__title {
-  padding-top: 0;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.collection--list .collection__title + .collection__artist {
-  margin-top: 5px;
-}
-
 .collection--list .collection__artist {
   color: var(--boxel-dark);
 }
@@ -151,9 +133,25 @@
   top: 0;
 }
 
+.collection--list .collection__title {
+  padding-top: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.collection--list .collection__title + .collection__artist {
+  margin-top: 5px;
+}
+
 .collection__list {
   grid-row: 1;
   display: grid;
   grid-auto-flow: column;
   align-items: center;
+}
+
+.collection__play-btn.is-playing,
+.media-collection__grid-item:hover .collection__play-btn,
+.master-collection__boxel:hover .collection__play-btn {
+  display: inline-block;
 }
