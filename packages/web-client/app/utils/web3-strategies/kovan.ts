@@ -1,7 +1,7 @@
 import { Web3Strategy } from './types';
 
 export default class EthereumWeb3Strategy implements Web3Strategy {
-  chainName = 'Kovan';
+  chainName = 'Kovan Testnet';
   chainId = 42;
   isConnected: boolean = false;
   walletConnectUri: string | undefined;

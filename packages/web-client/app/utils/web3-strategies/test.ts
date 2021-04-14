@@ -5,7 +5,7 @@ import { defer } from 'rsvp';
 import RSVP from 'rsvp';
 
 export default class TestWeb3Strategy implements Web3Strategy {
-  chainName = 'Test';
+  chainName = 'Test Chain';
   chainId = '-1';
   @tracked walletConnectUri: string | undefined;
   @tracked isConnected = false;
