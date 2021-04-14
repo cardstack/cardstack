@@ -111,9 +111,6 @@
   Since the lock seems to be a visual cue that actions are only visible to the user
   We keep the text around and visible to screenreaders (tested only on VoiceOver)
   width: 0px appears to remove it
-  Need design confirmation on whether this is good
-
-  As a side effect, the grid-gap remains.
 */
 .boxel-cta-block__info-area ~ .boxel-cta-block__private-notice > .boxel-cta-block__private-notice-message {
   position: absolute;
@@ -137,6 +134,7 @@
   justify-content: end;
   gap: var(--boxel-sp-xs);
   text-align: right;
+  margin-left: var(--boxel-sp-xs);
 }
 .boxel-cta-block--disabled .boxel-cta-block__private-notice {
   display: none;
