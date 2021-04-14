@@ -1,5 +1,5 @@
 import { helper } from '@ember/component/helper';
-import { WorkflowPostable } from '../utils/workflow';
+import { WorkflowPostable } from '../models/workflow/workflow-postable';
 
 function postableMetaIdentical([postA, postB]: [
   WorkflowPostable,

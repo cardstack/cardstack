@@ -1,15 +1,13 @@
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer1-network';
-import {
-  Milestone,
-  Workflow,
-  WorkflowCard,
-  WorkflowMessage,
-} from '@cardstack/web-client/utils/workflow';
 import Component from '@glimmer/component';
-import { WorkflowPostable } from '../../../utils/workflow';
 import { getOwner } from '@ember/application';
 import '../../../css/prose.css';
+import { WorkflowMessage } from '@cardstack/web-client/models/workflow/workflow-message';
+import { WorkflowPostable } from '@cardstack/web-client/models/workflow/workflow-postable';
+import { Workflow } from '@cardstack/web-client/models/workflow';
+import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
+import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-card';
 
 let cardbot = { name: 'Cardbot', imgURL: '/images/icons/cardbot.svg' };
 
