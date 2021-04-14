@@ -1,4 +1,4 @@
-<Freestyle::Usage @name="CtaBlock" @description="A cta block, mainly used in the footer of a card.">
+<Freestyle::Usage @name="CtaBlock">
     <:example>
         <Boxel::CtaBlock
           @stepNumber={{this.stepNumber}}
@@ -47,13 +47,26 @@
       />
       <Args.Number
         @name="stepNumber"
-        @description="If passed, will add the step number to the left of the block"
+        @description="If passed, will add the step number to the left of the block. Having a step number affects the padding of the block in the memorialized and disabled states."
         @optional={{true}}
         @value={{this.stepNumber}}
         @onInput={{fn (mut this.stepNumber)}}
       />
       <Args.Yield
-        @description="This block is shown when the action is done, and is uneditable. Kind of a 'status check'"
+        @name="default"
+        @description="The block shown when @state is 'default'. Yields { MainActionButton, InfoArea }"
+      />
+      <Args.Yield
+        @name="disabled"
+        @description="The block shown when @state is 'disabled'. Yields { MainActionButton }"
+      />
+      <Args.Yield
+        @name="in-progress"
+        @description="The block shown when @state is 'in-progress'. Yields { MainActionButton, CancelActionButton, InfoArea }"
+      />
+      <Args.Yield
+        @name="memorialized"
+        @description="The block shown when @state is 'memorialized'. Yields { MainActionButton, MainActionArea, InfoArea }"
       />
     </:api>
 </Freestyle::Usage>
