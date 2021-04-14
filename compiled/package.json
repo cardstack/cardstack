@@ -4,12 +4,23 @@
   "keywords": [
     "ember-addon"
   ],
+  "exports": {
+    ".": {
+      "browser": "./browser",
+      "default": "./node"
+    },
+    "./*": {
+      "browser": "./browser/*",
+      "default": "./node/*"
+    }
+  },
+  "engines": {
+    "node": ">= 15"
+  },
   "dependencies": {},
   "ember-addon": {
     "version": 2,
     "type": "addon",
-    "main": "addon-main.js",
-    "__comment__": "auto-upgraded is normally for internal use by embroider. we're using it as a hack to get more lenient behavior. We need to support self-import of our package name.",
-    "auto-upgraded": true
+    "main": "addon-main.js"
   }
 }
