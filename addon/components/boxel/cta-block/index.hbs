@@ -12,7 +12,7 @@
     We cannot pass splattribute classes to components in the component helper: 
     https://github.com/emberjs/ember.js/issues/18402 
   --}}
-  {{#if (and (has-block "default") (eq @state "default"))}}
+  {{#if (and (has-block "default") this.isDefault)}}
     {{yield 
       (hash 
         MainActionButton=(component 
@@ -27,7 +27,7 @@
       )
       to="default"
     }}
-  {{else if (and (has-block "disabled") (eq @state "disabled"))}}
+  {{else if (and (has-block "disabled") this.isDisabled)}}
     {{yield
       (hash 
         MainActionButton=(component 
@@ -43,7 +43,7 @@
       )
       to="disabled"
     }}
-  {{else if (and (has-block "in-progress") (eq @state "in-progress"))}}
+  {{else if (and (has-block "in-progress") this.isInProgress)}}
     {{yield
       (hash 
         MainActionButton=(component 
@@ -64,7 +64,7 @@
       )
       to="in-progress"
     }}
-  {{else if (and (has-block "memorialized") (eq @state "memorialized"))}}
+  {{else if (and (has-block "memorialized") this.isMemorialized)}}
     {{!-- 
       if using MainActionButton and MainActionArea together, the grid layout will put them at the exact same spot,
       causing a visual bug.
@@ -96,7 +96,7 @@
     {{svg-jar "checkbox-primary-checked" class="boxel-cta-block__done-icon" role="presentation"}}
   {{/if}}
 
-  {{#if (not (eq @state "disabled")) }}
+  {{#if (not this.isDisabled) }}
     <div class="boxel-cta-block__lock-icon">
       <span class="boxel-cta-block__lock-icon-message">Actions only visible to you</span>
       {{svg-jar "lock"}}
