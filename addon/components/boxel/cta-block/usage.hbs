@@ -2,88 +2,58 @@
     <:example>
         <Boxel::CtaBlock
           @stepNumber={{this.stepNumber}}
-          @canCancel={{this.canCancel}}
-          @canEdit={{this.canEdit}}
           @state={{this.state}}
-          @atRestArgs={{hash 
-            text="Do it"
-            action=(fn this.changeState "inProgress")
-          }}
-          @disabledArgs={{hash text="Disabled"}}
-          @inProgressArgs={{hash 
-            text="Doing it!"
-            cancelText="Cancel"
-            cancelAction=(fn this.changeState "atRest")
-          }}
-          @memorializedArgs={{hash
-            text="Done"
-            action=(fn this.changeState "inProgress")
-          }}
         >
-            Hello!
+            <:default as |a|>
+              <a.MainActionButton {{on "click" (fn this.changeState "in-progress")}}>
+                Do this
+              </a.MainActionButton>
+              <a.InfoArea>
+                Boop
+              </a.InfoArea>
+            </:default>
+
+            <:disabled as |d|>
+              <d.MainActionButton {{on "click" (fn this.changeState "in-progress")}}>
+                Disabled
+              </d.MainActionButton>
+            </:disabled>
+
+            <:in-progress as |i|>
+              <i.MainActionButton>
+                Loading
+              </i.MainActionButton>
+              <i.CancelActionButton {{on "click" (fn this.changeState "default")}}>
+                Cancel
+              </i.CancelActionButton>
+            </:in-progress>
+
+            <:memorialized as |m|>
+              <m.MainActionButton>
+                Area!
+              </m.MainActionButton>
+            </:memorialized>
         </Boxel::CtaBlock>
     </:example>
 
     <:api as |Args|>
-    <Args.Bool
-      @name="canCancel"
-      @description="Whether this action can be cancelled or not. This determines how inProgressArgs is handled."
-      @value={{this.canCancel}}
-      @onInput={{fn (mut this.canCancel)}}
-    />
-    <Args.Bool
-      @name="canEdit"
-      @description="Whether this action allows edits after completion. This determines how memorializedArgs is handled."
-      @value={{this.canEdit}}
-      @onInput={{fn (mut this.canEdit)}}
-    />
-    <Args.String
-      @name="state"
-      @description="Whether the action is at at rest, disabled, in progress, or memorialized."
-      @options={{array "atRest" "disabled" "inProgress" "memorialized"}}
-      @defaultValue="atRest"
-      @value={{this.state}}
-      @onInput={{fn (mut this.state)}}
-    />
-    <Args.Object
-      @name="atRestArgs"
-      @description="The CTA's UI at rest - text and action"
-      @value={{hash 
-        text="Do it"
-        action=(fn this.changeState "inProgress")
-      }}
-    />
-    <Args.Object
-      @name="disabledArgs"
-      @description="The CTA's disabled UI - text"
-      @value={{hash text="Disabled"}}
-    />
-    <Args.Object
-      @name="inProgressArgs"
-      @description="The CTA's UI when the action is proceeding - text, cancel button text, and cancel action"
-      @value={{hash 
-        text="Doing it!"
-        cancelText="Cancel"
-        cancelAction=(fn this.changeState "atRest")
-      }}
-    />
-    <Args.Object
-      @name="memorializedArgs"
-      @description="The CTA's UI after the CTA's requirement has been met/action performed - text +- action"
-      @value={{hash
-        text="Done"
-        action=(fn this.changeState "inProgress")
-      }}
-    />
-    <Args.Number
-      @name="stepNumber"
-      @description="If passed, will add the step number to the left of the block"
-      @optional={{true}}
-      @value={{this.stepNumber}}
-      @onInput={{fn (mut this.stepNumber)}}
-    />
-    <Args.Yield
-      @description="This block is shown when the action is done, and is uneditable. Kind of a 'status check'"
-    />
+      <Args.String
+        @name="state"
+        @description="Whether the action is at at rest, disabled, in progress, or memorialized."
+        @options={{array "default" "disabled" "in-progress" "memorialized"}}
+        @defaultValue="default"
+        @value={{this.state}}
+        @onInput={{fn (mut this.state)}}
+      />
+      <Args.Number
+        @name="stepNumber"
+        @description="If passed, will add the step number to the left of the block"
+        @optional={{true}}
+        @value={{this.stepNumber}}
+        @onInput={{fn (mut this.stepNumber)}}
+      />
+      <Args.Yield
+        @description="This block is shown when the action is done, and is uneditable. Kind of a 'status check'"
+      />
     </:api>
 </Freestyle::Usage>

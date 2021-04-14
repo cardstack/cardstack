@@ -12,13 +12,13 @@ export default class CtaBlockUsage extends Component {
   @action changeState(str: string): void {
     console.log(str);
     this.state = str;
-    if (str === 'inProgress') {
+    if (str === 'in-progress') {
       inProgressTimeout = window.setTimeout(() => {
         this.changeState('memorialized');
       }, 1500);
     }
 
-    if (str === 'memorialized' || str === 'atRest') {
+    if (str === 'memorialized' || str === 'default') {
       window.clearTimeout(inProgressTimeout);
     }
   }
