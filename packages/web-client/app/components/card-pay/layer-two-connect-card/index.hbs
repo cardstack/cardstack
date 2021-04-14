@@ -20,12 +20,11 @@
           </p>
         {{/if}}
         <div class="layer-two-connect-card__app-store-links">
-          <img src={{this.cardstackMobileAppIcon}} width="40" height="40" alt="Cardstack Mobile App Icon" class="layer-two-connect-card__app-icon" />
-          <div class="layer-two-connect-card__app-details">
-            <div class="layer-two-connect-card__app-name">
-              Cardstack
-            </div>
-          </div>
+          <img srcset="{{this.cardstackMobileAppPhone}},
+                       {{this.cardstackMobileAppPhone2x}} 2x"
+               src={{this.cardstackMobileAppPhone}}
+               alt="Cardstack Mobile App on a smartphone"
+               class="layer-two-connect-card__app-phone">
           {{#if this.appStoreUrl}}
             <a href={{this.appStoreUrl}} class="layer-two-connect-card__app-store-badge">
               <img src={{this.appStoreBadge}} width="120" height="40" alt="Download on the App Store" />
