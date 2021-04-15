@@ -10,33 +10,12 @@
       {{#let (or milestone.complete (lte i @workflow.completedMilestoneCount)) as |displayMilestone|}}
         {{#if displayMilestone}}
           {{#each milestone.visiblePostables as |postable j|}}
-            {{#if (is-postable-on-new-day postable)}}
-              <Boxel::DateDivider
-                @date={{postable.timestamp}}
-                data-test-date-divider
-              />
-            {{/if}}
-            {{#if postable.message}}
-              <Boxel::ThreadMessage
-                @datetime={{postable.timestamp}}
-                @imgURL={{postable.author.imgURL}}
-                @hideMeta={{postable-meta-identical postable (object-at milestone.visiblePostables (dec j))}}
-                data-test-postable={{j}} data-test-milestone={{i}}
-              >
-                <div class="prose">
-                  {{format-workflow-message postable.message}}
-                </div>
-              </Boxel::ThreadMessage>
-            {{else}}
-              <Boxel::ThreadMessage
-                @datetime={{postable.timestamp}}
-                @imgURL={{postable.author.imgURL}}
-                @hideMeta={{postable-meta-identical postable (object-at milestone.visiblePostables (dec j))}}
-                data-test-postable={{j}} data-test-milestone={{i}}
-              >
-                {{component postable.componentName onComplete=(optional postable.onComplete)}}
-              </Boxel::ThreadMessage>
-            {{/if}}
+            <WorkflowThread::Postable
+              @postable={{postable}}
+              @postables={{milestone.visiblePostables}}
+              @index={{j}}
+              data-test-milestone={{i}}
+            />
           {{/each}}
           {{#if milestone.isComplete}}
             <Boxel::MilestoneBanner
@@ -48,6 +27,16 @@
         {{/if}}
       {{/let}}
     {{/each}}
+    {{#if @workflow.isComplete}}
+      {{#each @workflow.epilogue.visiblePostables as |postable j|}}
+        <WorkflowThread::Postable
+          @postable={{postable}}
+          @postables={{@workflow.epilogue.visiblePostables}}
+          @index={{j}}
+          data-test-epilogue
+        />
+      {{/each}}
+    {{/if}}
   </:content>
   <:sidebar as |SidebarSection|>
     <SidebarSection>
