@@ -17,11 +17,7 @@ export class Milestone {
     this.postables.invoke('setWorkflow', wf);
   }
   get isComplete() {
-    return this.postables
-      .filter((p) => {
-        return !this.#excludedPostables.has(p);
-      })
-      .isEvery('isComplete', true);
+    return this.visiblePostables.isEvery('isComplete', true);
   }
   completedDetail;
 
