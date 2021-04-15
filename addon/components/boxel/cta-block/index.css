@@ -6,9 +6,9 @@
   position: relative;
 
   display: grid;
-  grid-template-columns: auto auto auto minmax(var(--boxel-sp-sm), 1fr) auto auto;
+  grid-template-columns: auto auto minmax(var(--boxel-sp-sm), 1fr) auto auto;
   grid-template-rows: auto;
-  grid-template-areas: "done-icon main-action cancel-action _ info lock-icon";
+  grid-template-areas: "main-action cancel-action _ info lock-icon";
   align-items: center;
 
   padding: var(--cta-block-padding-vertical) var(--cta-block-padding-horizontal);
@@ -91,21 +91,6 @@
   justify-content: center;
   font: 600 var(--boxel-font-sm);
   color: var(--cta-block-emphasis-text-color);
-}
-
-.boxel-cta-block__done-icon {
-  display: none;
-}
-
-.boxel-cta-block__main-action-area ~ .boxel-cta-block__done-icon {
-  display: block;
-  grid-area: done-icon;
-  align-self: center;
-
-  --icon-color: var(--cta-block-emphasis-text-color);
-  margin-right: var(--boxel-sp-xxs);
-  width: var(--boxel-sp);
-  height: var(--boxel-sp);
 }
 
 /* The lock icon and notice is not shown when the cta is disabled */

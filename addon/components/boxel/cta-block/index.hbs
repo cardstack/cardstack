@@ -78,8 +78,8 @@
           ctaClass="boxel-cta-block__main-action-button"
         )
         MainActionArea=(component 
-          "boxel/cta-block/area" 
-          ctaClass="boxel-cta-block__main-action-area"
+          "boxel/cta-block/main-action-area"
+          icon="checkbox-primary-checked"
         )
         InfoArea=(component 
           "boxel/cta-block/area" 
@@ -88,13 +88,6 @@
       )
       to="memorialized"
     }}
-    {{!-- 
-      this icon is only shown if there is a main-action-area (not the button) 
-      the html seems out of order compared to the visual order 
-      but this is necessary for its display to be controlled
-      via the css general sibling selector
-    --}}
-    {{svg-jar "checkbox-primary-checked" class="boxel-cta-block__done-icon" role="presentation"}}
   {{/if}}
 
   <span class="boxel-cta-block__private-notice">Actions only visible to you</span>

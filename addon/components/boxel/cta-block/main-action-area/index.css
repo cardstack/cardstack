@@ -1,0 +1,7 @@
+.boxel-cta-block__main-action-area-icon {
+  --icon-color: var(--cta-block-emphasis-text-color);
+  display: block;
+  width: var(--boxel-sp);
+  height: var(--boxel-sp);
+  margin-right: var(--boxel-sp-xxs);
+}
