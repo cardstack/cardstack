@@ -5,6 +5,7 @@ import supertest from 'supertest';
 import QUnit from 'qunit';
 import { join } from 'path';
 import tmp from 'tmp';
+import { encodeCardURL } from '@cardstack/core/src/utils';
 
 // TODO: share this in core
 export function templateOnlyComponentTemplate(template: string): string {
@@ -25,9 +26,7 @@ QUnit.module('Card Data', function (hooks) {
   let cardCacheDir: string;
 
   function getCard(cardURL: string) {
-    return supertest(server.callback()).get(
-      `/cards/${encodeURIComponent(cardURL)}`
-    );
+    return supertest(server.callback()).get(`/cards/${encodeCardURL(cardURL)}`);
   }
 
   function resolveCard(modulePath: string): string {

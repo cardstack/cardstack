@@ -7,6 +7,7 @@ import {
 } from '@cardstack/core/src/interfaces';
 import { RealmConfig } from './interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
+import { encodeCardURL } from '@cardstack/core/src/utils';
 import {
   readFileSync,
   writeFileSync,
@@ -20,8 +21,8 @@ class CardCache {
   constructor(private dir: string) {}
 
   private getLocation(moduleURL: string): string {
-    let filename = encodeURIComponent(moduleURL);
     return join(this.dir, filename);
+    let filename = encodeCardURL(moduleURL);
   }
 
   private moduleURL(cardURL: string, localFile: string): string {
@@ -68,8 +69,8 @@ export default class Builder implements BuilderInterface {
     source: string
   ): Promise<string> {
     let url = this.cache.setModule(cardURL, localModule, source);
+    return `@cardstack/compiled/${encodeCardURL(url)}`;
 
-    return `@cardstack/compiled/${encodeURIComponent(url)}`;
   }
 
   private locateRealmDir(url: string): string {

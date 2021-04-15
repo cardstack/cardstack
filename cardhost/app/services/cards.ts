@@ -3,8 +3,9 @@ import { macroCondition, isTesting } from '@embroider/macros';
 import Component from '@glimmer/component';
 import { hbs } from 'ember-cli-htmlbars';
 import { setComponentTemplate } from '@ember/component';
+
+import { encodeCardURL } from '@cardstack/core/src/utils';
 import { Format } from '@cardstack/core/src/interfaces';
-import config from 'cardhost/config/environment';
 
 export default class Cards extends Service {
   async load(
@@ -15,7 +16,7 @@ export default class Cards extends Service {
     let fullURL = [
       'http://localhost:3000/',
       'cards/',
-      encodeURIComponent(url),
+      encodeCardURL(url),
       `?${params}`,
     ];
     return this.internalLoad(fullURL.join(''));
