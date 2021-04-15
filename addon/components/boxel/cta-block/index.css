@@ -7,7 +7,7 @@
   display: grid;
   grid-template-columns: auto auto minmax(var(--boxel-sp-sm), 1fr) auto auto;
   grid-template-rows: auto;
-  grid-template-areas: "main-action cancel-action _ info lock-icon";
+  grid-template-areas: "main cancel _ info lock-icon";
   align-items: center;
   padding: var(--cta-block-padding-vertical) var(--cta-block-padding-horizontal);
   background-color: var(--cta-block-background-color);
@@ -62,11 +62,11 @@
 
 /* grid elements */
 .boxel-cta-block__action-button {
-  grid-area: main-action;
+  grid-area: main;
 }
 
 .boxel-cta-block__cancel-button {
-  grid-area: cancel-action;
+  grid-area: cancel;
   margin-left: var(--boxel-sp);
 }
 
@@ -84,7 +84,7 @@
 
 /* action status area */
 .boxel-cta-block__action-status-area {
-  grid-area: main-action;
+  grid-area: main;
   display: flex;
   align-items: center;
   justify-content: center;
