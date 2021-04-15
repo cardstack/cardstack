@@ -68,7 +68,7 @@
     }}
   {{else if (and (has-block "memorialized") this.isMemorialized)}}
     {{!-- 
-      if using ActionButton and MainActionArea together, the grid layout will put them at the exact same spot,
+      if using ActionButton and ActionStatusArea together, the grid layout will put them at the exact same spot,
       causing a visual bug.
     --}}
     {{yield
@@ -78,8 +78,8 @@
           kind="secondary-light" 
           ctaClass="boxel-cta-block__action-button"
         )
-        MainActionArea=(component 
-          "boxel/cta-block/main-action-area"
+        ActionStatusArea=(component 
+          "boxel/cta-block/action-status-area"
           icon="checkbox-primary-checked"
         )
         InfoArea=(component 

@@ -29,9 +29,9 @@
             </:in-progress>
 
             <:memorialized as |m|>
-              <m.MainActionArea>
+              <m.ActionStatusArea>
                 Using an area instead of the action button
-              </m.MainActionArea>
+              </m.ActionStatusArea>
             </:memorialized>
         </Boxel::CtaBlock>
     </:example>
@@ -66,7 +66,7 @@
       />
       <Args.Yield
         @name="memorialized"
-        @description="The block shown when @state is 'memorialized'. Yields { ActionButton, MainActionArea, InfoArea }"
+        @description="The block shown when @state is 'memorialized'. Yields { ActionButton, ActionStatusArea, InfoArea }"
       />
     </:api>
 </Freestyle::Usage>
@@ -88,7 +88,7 @@
       </table>
       CtaBlock provides components to use within it - these components have appropriate classes to place them in the correct spots in the layout, and have correct states.
       The ActionButton and CancelButton components use the Button component and should accept all arguments it does.
-      The InfoArea and MainActionArea components are essentially divs, which you can put your custom contents in.
+      The InfoArea and ActionStatusArea components are essentially divs, which you can put your custom contents in.
       <table class="usage-cta-block-explanation-table">
         <tbody>
           <tr>
@@ -120,7 +120,7 @@
           </tr>
           <tr>
             <td>
-              MainActionArea
+              ActionStatusArea
             </td>
             <td>
               Memorialized state status update area for the main action, that is built to accept a small descriptive statement - eg. "Unlocked".

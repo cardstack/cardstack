@@ -82,8 +82,8 @@
   justify-content: center;
 }
 
-/* main action area + conditionally shown done icon */
-.boxel-cta-block__main-action-area {
+/* action status area */
+.boxel-cta-block__action-status-area {
   grid-area: main-action;
   display: flex;
   align-items: center;

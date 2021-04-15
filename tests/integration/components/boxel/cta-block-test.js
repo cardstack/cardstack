@@ -9,9 +9,9 @@ const MAIN_ACTION_BUTTON_SELECTOR =
 const CANCEL_ACTION_BUTTON_SELECTOR =
   '[data-test-boxel-cta-block-button].boxel-cta-block__cancel-button';
 const MAIN_ACTION_AREA_SELECTOR =
-  '[data-test-boxel-cta-block-main-action-area]';
+  '[data-test-boxel-cta-block-action-status-area]';
 const MAIN_ACTION_AREA_ICON_SELECTOR =
-  '[data-test-boxel-cta-block-main-action-area] .boxel-cta-block__main-action-area-icon';
+  '[data-test-boxel-cta-block-action-status-area] .boxel-cta-block__action-status-area-icon';
 const INFO_AREA_SELECTOR = '[data-test-boxel-cta-block-area]';
 const DEFAULT_PRIVATE_NOTICE_SELECTOR =
   '[data-test-boxel-cta-block-private-notice]';
@@ -103,7 +103,7 @@ module('Integration | Component | CtaBlock', function (hooks) {
     assert.dom(INFO_AREA_SELECTOR).containsText(infoAreaText);
   });
 
-  test('it accepts and renders the memorialized named block with the ActionButton, MainActionArea, and InfoArea components', async function (assert) {
+  test('it accepts and renders the memorialized named block with the ActionButton, ActionStatusArea, and InfoArea components', async function (assert) {
     this.setProperties({
       state: 'memorialized',
       mainActionButtonText,
@@ -119,9 +119,9 @@ module('Integration | Component | CtaBlock', function (hooks) {
           {{this.mainActionButtonText}}
         </m.ActionButton>
 
-        <m.MainActionArea>
+        <m.ActionStatusArea>
           {{this.mainActionAreaText}}
-        </m.MainActionArea>
+        </m.ActionStatusArea>
 
         <m.InfoArea>
           {{this.infoAreaText}}
@@ -137,9 +137,9 @@ module('Integration | Component | CtaBlock', function (hooks) {
         @state={{this.state}}
       >
       <:memorialized as |m|>
-        <m.MainActionArea>
+        <m.ActionStatusArea>
           {{this.mainActionAreaText}}
-        </m.MainActionArea>
+        </m.ActionStatusArea>
       </:memorialized>
       </Boxel::CtaBlock>
     `);
@@ -204,16 +204,16 @@ module('Integration | Component | CtaBlock', function (hooks) {
     assert.dom(`[${STEP_DATA_TEST_ATTRIBUTE}="2"]`).containsText('Step 2');
   });
 
-  test('In the memorialized state, the MainActionArea icon can be configured', async function (assert) {
+  test('In the memorialized state, the ActionStatusArea icon can be configured', async function (assert) {
     this.set('state', 'memorialized');
     await render(hbs`
       <Boxel::CtaBlock
         @state={{this.state}}
       >
       <:memorialized as |m|>
-        <m.MainActionArea>
+        <m.ActionStatusArea>
           {{this.mainActionAreaText}}
-        </m.MainActionArea>
+        </m.ActionStatusArea>
       </:memorialized>
       </Boxel::CtaBlock>
     `);
@@ -223,9 +223,9 @@ module('Integration | Component | CtaBlock', function (hooks) {
         @state={{this.state}}
       >
       <:memorialized as |m|>
-        <m.MainActionArea @icon={{null}}>
+        <m.ActionStatusArea @icon={{null}}>
           {{this.mainActionAreaText}}
-        </m.MainActionArea>
+        </m.ActionStatusArea>
       </:memorialized>
       </Boxel::CtaBlock>
     `);
