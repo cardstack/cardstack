@@ -82,7 +82,6 @@
   justify-content: center;
 }
 
-/* action status area */
 .boxel-cta-block__action-status-area {
   grid-area: main;
   display: flex;
