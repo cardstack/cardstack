@@ -1,0 +1,6 @@
+.workflow-thread__status {
+  color: var(--boxel-dark);
+  font: 600 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+  text-align: center;
+}

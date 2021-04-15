@@ -2,13 +2,6 @@
   color: var(--boxel-dark);
 }
 
-.deposit-workflow__status {
-  color: var(--boxel-dark);
-  font: 600 var(--boxel-font-sm);
-  letter-spacing: var(--boxel-lsp);
-  text-align: center;
-}
-
 .deposit-workflow__banner-small-text {
   margin-bottom: 0;
   color: var(--boxel-light-600);
