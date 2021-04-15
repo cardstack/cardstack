@@ -1,15 +1,15 @@
-/** 
+/**
  * Kind variants - variants that control the colors on a button
- * 
+ *
  * The @kind argument on the button component should create a corresponding class with format
- * boxel-button--kind-@kind 
- * 
+ * boxel-button--kind-@kind
+ *
  * Classes for the @kind argument can control the following properties:
- * 
+ *
  * --boxel-button-color
  * --boxel-button-border
  * --boxel-button-text-color
- * 
+ *
  */
 
 .boxel-button--kind-primary:not(:disabled) {
@@ -22,7 +22,7 @@
 .boxel-button--kind-primary:not(:disabled):active {
   /* result from putting a 10% opacity black overlay over */
   --boxel-button-border: 1px solid var(--boxel-highlight-hover);
-  --boxel-button-color: var(--boxel-highlight-hover); 
+  --boxel-button-color: var(--boxel-highlight-hover);
 }
 
 .boxel-button--kind-secondary-dark:not(:disabled) {

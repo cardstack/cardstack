@@ -7,7 +7,6 @@
   align-items: center;
   grid-auto-flow: column;
   z-index: 0;
-
   width: var(--cover-art-width);
   height: var(--cover-art-size);
   overflow: hidden;
@@ -15,11 +14,10 @@
 
 .boxel-cover-art__container {
   --cover-art-index: 0;
-  --cover-art-left: 0px;
+  --cover-art-left: 0;
   --cover-art-spacing-multiplier: 1;
 
   transition: left 250ms ease-in-out;
-
   position: absolute;
   z-index: calc(var(--cover-art-count) - var(--cover-art-index));
   left: calc(var(--cover-art-left) * var(--cover-art-spacing-multiplier));

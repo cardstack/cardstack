@@ -1,6 +1,6 @@
 .boxel-icon-button {
   width: var(--icon-button-width, 40px);
-  height: var(--icon-button-height, 40px);;
+  height: var(--icon-button-height, 40px);
   padding: 0;
   background: none;
   border: none;
@@ -18,9 +18,10 @@
 
 .boxel-icon-button--secondary {
   --icon-color: var(--boxel-highlight);
+
   border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 100px;
-  background-color: #41404D;
+  background-color: #41404d;
 }
 
 .boxel-icon-button--secondary:hover {

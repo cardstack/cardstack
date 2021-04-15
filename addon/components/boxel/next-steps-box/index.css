@@ -27,10 +27,10 @@
   gap: var(--boxel-sp-xs);
   text-align: right;
   margin-left: var(--boxel-sp-sm);
-
   font: var(--boxel-font-xs);
   color: var(--boxel-purple-300);
   letter-spacing: var(--boxel-lsp-lg);
+
   --icon-color: var(--boxel-purple-300);
 }
 
@@ -39,6 +39,7 @@
   --cluster-vertical-space: var(--boxel-sp);
 
   padding: var(--boxel-sp-xxs) var(--boxel-sp-lg) var(--boxel-sp-xl);
+
   /* ↓ Suppress horizontal scrolling caused by
   the negative margin in some circumstances */
   overflow: hidden;
@@ -49,6 +50,7 @@
   padding: 0;
   display: flex;
   flex-wrap: wrap;
+
   /* ↓ multiply by -1 to negate the halved value */
   margin: calc(var(--cluster-vertical-space) / 2 * -1) calc(var(--cluster-horizontal-space) / 2 * -1);
 }

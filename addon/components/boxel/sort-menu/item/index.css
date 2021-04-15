@@ -20,7 +20,8 @@
 .sort-menu-item__active {
   opacity: 1;
   font-weight: 700;
-  transition: opacity var(--boxel-transition),
+  transition:
+    opacity var(--boxel-transition),
     font-weight var(--boxel-transition);
 }
 

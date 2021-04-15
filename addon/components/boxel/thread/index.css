@@ -1,7 +1,7 @@
 .boxel-thread {
   position: relative;
   display: grid;
-  grid-template-rows: auto 1fr;;
+  grid-template-rows: auto 1fr;
   height: 100%;
   background-color: var(--boxel-light-300);
   border-radius: var(--boxel-border-radius);

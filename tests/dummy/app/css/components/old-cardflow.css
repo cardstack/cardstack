@@ -1,4 +1,5 @@
 /*** OLD STYLES ***/
+
 /* Divider date line */
 .cardflow__message-divider {
   position: relative;
@@ -6,7 +7,7 @@
 }
 
 .cardflow__message-divider-border {
-  border-top: 1px solid #D6D6D6;
+  border-top: 1px solid #d6d6d6;
 }
 
 .cardflow__message-divider-date {
@@ -64,7 +65,7 @@
 .cardflow-card__title {
   color: var(--boxel-dark);
   font-size: 26px;
-  line-height: calc(36/26);
+  line-height: calc(36 / 26);
   font-weight: 700;
   letter-spacing: 0;
 }
@@ -73,7 +74,6 @@
   position: relative;
   padding: 20px 35px;
 }
-
 
 /* Transfer Proposal Card */
 .cardflow-proposal-card__participants {
@@ -119,7 +119,6 @@
   line-height: 1.3;
   letter-spacing: var(--boxel-lsp-sm);
 }
-
 
 /* Action Card */
 .cardflow-action-card__list-item {
@@ -171,7 +170,6 @@
   font-size: 16px;
 }
 
-
 /* Catalog summary card */
 .catalog-summary-card {
   display: grid;
@@ -199,7 +197,6 @@
   margin-right: 5px;
   font-size: 30px;
 }
-
 
 /* Cardflow overlay */
 .cardflow-overlay {
@@ -229,6 +226,7 @@
   --icon-color: var(--boxel-light);
   --icon-button-border: 1px solid white;
   --icon-button-border-radius: 100px;
+
   position: fixed;
   right: 20px;
   top: 25px;
@@ -300,6 +298,10 @@
   z-index: 16;
 }
 
+.cardflow__sidebar-cards > * + * {
+  margin-top: 15px;
+}
+
 .cardflow__isolated-detail-card > header > * {
   max-width: 100%;
 }
@@ -320,10 +322,6 @@
 
 * + .cardflow__nested-sidebar-title {
   margin-top: 25px;
-}
-
-.cardflow__sidebar-cards > * + * {
-  margin-top: 15px;
 }
 
 .cardflow__sidebar-cards .boxel-card--collection {

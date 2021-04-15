@@ -1,6 +1,6 @@
 .sidebar-usage-container {
   background-color: var(--boxel-light-300);
-  padding:10px var(--boxel-sp-xl);
+  padding: 10px var(--boxel-sp-xl);
   display: grid;
   grid-template-columns: repeat(auto-fill, 230px);
   gap: 50px;

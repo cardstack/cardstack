@@ -1,5 +1,6 @@
 .boxel-left-edge-nav-card-management-button {
   --icon-color: var(--boxel-highlight);
+
   display: inline-block;
   width: 40px;
   height: 40px;
@@ -15,6 +16,7 @@
 
 .boxel-left-edge-nav-card-management-button:hover {
   --icon-color: var(--boxel-dark);
+
   cursor: pointer;
   background-color: var(--boxel-highlight);
   border-radius: 100px;

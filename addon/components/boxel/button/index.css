@@ -8,11 +8,10 @@
   justify-content: center;
   height: min-content;
   align-items: center;
-
   border-radius: 100px;
   white-space: nowrap;
-
-  transition: background-color var(--boxel-transition),
+  transition:
+    background-color var(--boxel-transition),
     border var(--boxel-transition);
 
   /* kind variants + disabled state */
@@ -30,20 +29,22 @@
 
 .boxel-button__loading-indicator {
   --icon-color: var(--boxel-button-text-color);
+
   width: var(--boxel-button-loading-icon-size);
   height: var(--boxel-button-loading-icon-size);
   margin-right: var(--boxel-sp-xxxs);
 }
 
 /* select disabled buttons and links that don't have href */
-/* 
-  a.boxel-button--disabled-link is a special case for an automatically appended class by the LinkTo component 
+
+/*
+  a.boxel-button--disabled-link is a special case for an automatically appended class by the LinkTo component
   the LinkTo component appends the href regardless, so we have to select it in other ways.
   Removing the chained classes will make kind-variants overwrite the disabled style on the LinkTo (specificity issues)
 */
-.boxel-button:disabled, 
+.boxel-button:disabled,
 a.boxel-button:not([href]),
-a.boxel-button[href=""], 
+a.boxel-button[href=""],
 a.boxel-button.boxel-button--disabled-link {
   --boxel-button-color: var(--boxel-purple-300);
   --boxel-button-border: 1px solid var(--boxel-purple-300);
@@ -52,14 +53,14 @@ a.boxel-button.boxel-button--disabled-link {
 
 /* the a element does not have a disabled attribute. Clicking will still trigger event listeners */
 a.boxel-button:not([href]),
-a.boxel-button[href=""], 
+a.boxel-button[href=""],
 a.boxel-button.boxel-button--disabled-link {
   pointer-events: none;
 }
 
-/* 
-  loading state. 
-  this should only be relevant for buttons - links shouldn't need it. 
+/*
+  loading state.
+  this should only be relevant for buttons - links shouldn't need it.
   We want to preserve the "normal" styling of the button but not allow interaction
 */
 .boxel-button--loading {

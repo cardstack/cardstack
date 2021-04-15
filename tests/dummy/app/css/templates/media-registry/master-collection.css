@@ -21,8 +21,8 @@
   pointer-events: none;
 }
 
-.media-collection__grid-item:hover .master-collection__highlighter,
-.master-collection__highlighter:hover {
+.master-collection__highlighter:hover,
+.media-collection__grid-item:hover .master-collection__highlighter {
   box-shadow: var(--boxel-box-shadow);
   cursor: pointer;
 }
@@ -45,11 +45,9 @@
   z-index: 1;
 }
 
-
 .master-collection__pin-btn.pinned {
   --icon-color: var(--boxel-dark);
 } */
-
 
 /* Master Collection Item */
 .master-collection {
@@ -74,7 +72,7 @@
 .master-collection__title {
   font-size: 1.25rem; /* 20px */
   font-weight: 700;
-  line-height: calc(30/20);
+  line-height: calc(30 / 20);
   letter-spacing: var(--boxel-lsp-sm);
 }
 

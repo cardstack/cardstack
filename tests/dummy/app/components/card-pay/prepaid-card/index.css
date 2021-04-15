@@ -1,5 +1,6 @@
 .prepaid-card {
   --header-color: var(--boxel-lime);
+
   position: relative;
   width: 22.75rem; /* 364px */
   min-height: 14.375rem; /* 230px */
@@ -11,10 +12,6 @@
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-.prepaid-card.boxel--dark-theme .prepaid-card__header {
-  color: var(--boxel-light);
 }
 
 .prepaid-card__header {
@@ -29,6 +26,10 @@
   color: inherit;
   font: var(--boxel-font-xs);
   letter-spacing: var(--boxel-lsp);
+}
+
+.prepaid-card.boxel--dark-theme .prepaid-card__header {
+  color: var(--boxel-light);
 }
 
 .prepaid-card__header > * {

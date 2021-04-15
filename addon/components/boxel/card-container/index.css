@@ -9,9 +9,9 @@
   border-radius: var(--boxel-border-radius);
   overflow: hidden;
   transition:
-  max-width var(--boxel-transition),
-  border-radius var(--boxel-transition),
-  box-shadow var(--boxel-transition);
+    max-width var(--boxel-transition),
+    border-radius var(--boxel-transition),
+    box-shadow var(--boxel-transition);
 }
 
 .boxel-card-container--boundaries {

@@ -61,8 +61,8 @@
   height: 60px;
 }
 
-.media-registry__hover-zone:hover ~ .media-registry__left-edge-queue,
 .media-registry__left-edge-queue:hover,
+.media-registry__hover-zone:hover ~ .media-registry__left-edge-queue,
 .media-registry__left-edge-queue.slide-in {
   transform: translateX(0);
 }
@@ -119,7 +119,6 @@
 .media-registry__outlet {
   overflow: auto;
 }
-
 
 /* Dummy */
 .boxel-org-switcher-button__logo--bunny_records,

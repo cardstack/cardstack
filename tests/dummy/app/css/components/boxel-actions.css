@@ -90,6 +90,18 @@
   min-width: 30px;
 }
 
+/* Multiple actions */
+.boxel-actions--comparison-mode.with-expand {
+  right: 30px;
+}
+
+.boxel-actions__expand > .boxel-actions__label {
+  border-left: 1px solid rgba(0, 0, 0, 0.15);
+  border-bottom-left-radius: 0;
+  background-image: none;
+  padding: 0;
+}
+
 .boxel-actions--comparison-mode > .boxel-actions__label {
   display: flex;
   align-items: center;
@@ -99,6 +111,15 @@
   font-weight: 400;
   line-height: 1;
   white-space: nowrap;
+}
+
+.boxel-actions--comparison-mode.with-expand > .boxel-actions__label {
+  border-top-right-radius: 0;
+}
+
+.boxel-actions__expand .boxel-actions__expand-btn {
+  width: 30px;
+  height: 30px;
 }
 
 .boxel-actions--comparison-mode > .boxel-actions__label.boxel-actions__label--modified {
@@ -111,32 +132,6 @@
 }
 
 .boxel-actions--comparison-mode > .boxel-actions__label--no-change {
-  background-color: #DBDBDB;
+  background-color: #dbdbdb;
   background-image: url('../../../../public/@cardstack/boxel/images/icons/check-mark.svg');
-}
-
-
-/* Multiple actions */
-.boxel-actions--comparison-mode.with-expand {
-  right: 30px;
-}
-
-.boxel-actions--comparison-mode.with-expand > .boxel-actions__label {
-  border-top-right-radius: 0;
-}
-
-.boxel-actions__expand {
-
-}
-
-.boxel-actions__expand > .boxel-actions__label {
-  border-left: 1px solid rgba(0,0,0,0.15);
-  border-bottom-left-radius: 0;
-  background-image: none;
-  padding: 0;
-}
-
-.boxel-actions__expand .boxel-actions__expand-btn {
-  width: 30px;
-  height: 30px;
 }

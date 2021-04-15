@@ -1,6 +1,7 @@
 .tasklist {
   --tasklist-user-tasks: var(--boxel-lime);
   --tasklist-assigned-tasks: var(--boxel-lilac);
+
   color: var(--boxel-dark);
   border-radius: var(--boxel-border-radius);
   font: var(--boxel-font-xs);

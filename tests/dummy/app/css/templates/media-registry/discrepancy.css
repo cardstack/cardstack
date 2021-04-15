@@ -1,5 +1,5 @@
 .discrepancy {
-  --boxel-revision-light-purple: #84829B;
+  --boxel-revision-light-purple: #84829b;
   --boxel-revision-lightest-purple: var(--boxel-purple-300);
   --boxel-revision-hover-purple: #4f4a5d;
   --disc-container-max-width: 1440px;
@@ -39,7 +39,7 @@
 }
 
 .discrepancy__breadcrumbs {
-  border-bottom: 1px solid #7D7C93;
+  border-bottom: 1px solid #7d7c93;
   margin-bottom: 20px;
 }
 
@@ -49,6 +49,7 @@
 
 .discrepancy__main--comp-view {
   --icon-color: var(--boxel-dark);
+
   background-color: var(--boxel-highlight);
   padding: 0 25px 25px;
   border-radius: 10px;
@@ -121,7 +122,6 @@
   text-align: center;
 }
 
-
 .discrepancy__comparison-header--comp-mode {
   max-width: 100%;
   padding-right: 0;
@@ -172,19 +172,19 @@
   color: var(--boxel-dark);
 }
 
-.discrepancy-card__header.selected-version .discrepancy-card__header-label {
-  color: var(--boxel-purple-700);
-}
-
 .discrepancy-card__header-label {
   position: absolute;
   top: 8px;
   left: 15px;
-  color: #A5A5A5;
+  color: #a5a5a5;
   font: var(--boxel-font-xs);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-xl);
   text-transform: uppercase;
+}
+
+.discrepancy-card__header.selected-version .discrepancy-card__header-label {
+  color: var(--boxel-purple-700);
 }
 
 .discrepancy-card__header-title-group {
@@ -255,7 +255,7 @@
 .discrepancy-field--base-field.linked-view,
 .discrepancy-field--comp-field.keep-current-view,
 .discrepancy-field--comp-field.comparison-view {
-  background-color: #EDEDEF;
+  background-color: #ededef;
 }
 
 .discrepancy-field--base-field.linked-view .field-renderer__opacity-control,
@@ -352,7 +352,6 @@
   }
 }
 
-
 /* field renderer */
 .discrepancy-field-renderer {
   grid-template-columns: auto 1fr;
@@ -379,11 +378,11 @@
   opacity: 1;
 }
 
-.discrepancy-field--base-field.linked-view .publishing-representation__writers .field-renderer__opacity-control,
-.discrepancy-field--base-field.linked-view .publishing-representation__publishers .field-renderer__opacity-control,
 .discrepancy-field--comp-field .publishing-representation__writers .field-renderer__opacity-control,
 .discrepancy-field--comp-field .publishing-representation__publishers .field-renderer__opacity-control,
-.discrepancy-field--comp-field .territory__wrapper .field-renderer__opacity-control {
+.discrepancy-field--comp-field .territory__wrapper .field-renderer__opacity-control,
+.discrepancy-field--base-field.linked-view .publishing-representation__writers .field-renderer__opacity-control,
+.discrepancy-field--base-field.linked-view .publishing-representation__publishers .field-renderer__opacity-control {
   opacity: initial;
 }
 
@@ -391,12 +390,11 @@
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
 }
 
-
-
 /* Dummy */
 .discrepancy__profile-icon--allegro-music-publishing {
   background-size: auto 23px;
 }
+
 .boxel-card__bg-img--allegro-music-publishing {
   border-radius: 100px;
 }
@@ -406,7 +404,7 @@
 }
 
 .discrepancy__profile-icon--realtunes-publishing {
-  background-color: #3F356F;
+  background-color: #3f356f;
 }
 
 .discrepancy__profile-icon--somoa {

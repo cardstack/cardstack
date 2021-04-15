@@ -1,5 +1,6 @@
 .boxel-action-chin {
   --icon-color: var(--boxel-purple-300);
+
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
@@ -22,6 +23,7 @@
 
 .boxel-action-chin--light {
   --icon-color: var(--boxel-purple-400);
+
   background-color: var(--boxel-purple-100);
   color: var(--boxel-purple-400);
 }

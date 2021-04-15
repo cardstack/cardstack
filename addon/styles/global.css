@@ -14,7 +14,7 @@ body {
   background-color: var(--boxel-light-100, #f5f5f5);
   font-size: 1rem;
   letter-spacing: 0.025em;
-  line-height: calc(22/16);
+  line-height: calc(22 / 16);
   overscroll-behavior: none;
 }
 
@@ -38,9 +38,11 @@ a:hover {
   color: var(--boxel-link-highlight);
   cursor: pointer;
 }
+
 a:focus {
   outline: var(--boxel-outline);
 }
+
 a:focus:not(:focus-visible) {
   outline-color: transparent;
 }
@@ -50,10 +52,12 @@ button:hover,
 [role="button"]:hover {
   cursor: pointer;
 }
+
 button:focus,
 [role="button"]:focus {
   outline: var(--boxel-outline);
 }
+
 button:focus:not(:focus-visible),
 [role="button"]:focus:not(:focus-visible) {
   outline-color: transparent;
@@ -63,7 +67,6 @@ input:focus,
 select:focus {
   outline-color: var(--boxel-highlight);
 }
-
 
 /* Hides content visually only
   (accessible via screen readers) */

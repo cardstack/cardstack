@@ -10,10 +10,6 @@
   grid-column: 1 / -1;
 }
 
-.boxel-card__container--table .boxel-card__inner {
-  padding: 0;
-}
-
 .card__gradient {
   z-index: 1;
   position: absolute;
@@ -28,7 +24,8 @@
 .boxel-card--blank-card {
   width: 100%;
   height: 150px;
-  background: url('../../../../public/@cardstack/boxel/images/placeholders/blank-card.png') center/contain
+  background:
+    url('../../../../public/@cardstack/boxel/images/placeholders/blank-card.png') center/contain
     no-repeat;
 }
 
@@ -59,11 +56,22 @@
   overflow: hidden;
 }
 
+.boxel-card__container--table .boxel-card__inner {
+  padding: 0;
+}
+
 .boxel-card__fields {
+  display: grid;
+  gap: 30px;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(4, auto);
+  justify-items: start;
   list-style-type: none;
   margin: 0;
-  padding-left: 0;
   overflow: hidden;
+  padding-left: 0;
+  padding-top: 25px;
+  white-space: nowrap;
 }
 
 .boxel-card__title {
@@ -111,16 +119,6 @@
   background-size: cover;
 }
 
-.boxel-card__fields {
-  padding-top: 25px;
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: repeat(4, auto);
-  justify-items: start;
-  gap: 30px;
-  white-space: nowrap;
-}
-
 /* Card type adjustments */
 .boxel-card--musical-work .boxel-card__bg-img {
   background-size: contain;
@@ -129,7 +127,8 @@
 .boxel-card__profile-org {
   width: 26px;
   height: 26px;
-  background: url('../../images/media-registry/verifi-logo.svg') center/26px
+  background:
+    url('../../images/media-registry/verifi-logo.svg') center/26px
     26px no-repeat;
   position: absolute;
   top: 10px;
@@ -203,52 +202,6 @@
   font: var(--boxel-font-sm);
 }
 
-/* Revenue Data card */
-.boxel-card--revenue-data .boxel-card__fields {
-  grid-template-columns: 1fr;
-  gap: 5px;
-  padding: 10px 0;
-}
-
-.boxel-card--revenue-data .boxel-card__fields > li {
-  width: 100%;
-}
-
-.boxel-card--revenue-data .boxel-card-field {
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  gap: 0 35px;
-}
-
-.boxel-card--revenue-data .boxel-card-field > .field-renderer__title {
-  width: 100%;
-  color: var(--boxel-dark);
-  text-align: right;
-}
-
-.boxel-card--revenue-data .boxel-card-field > .field-renderer__value {
-  font: var(--boxel-font-lg);
-}
-
-/* Schedule card */
-.boxel-card--schedule .boxel-card__inner {
-  height: 155px;
-  padding-left: 40px;
-}
-
-.boxel-card--schedule .boxel-card__fields {
-  padding: 0;
-  grid-template-columns: 1fr;
-}
-
-.boxel-card--schedule .boxel-card-field > .field-renderer__title {
-  color: var(--boxel-dark);
-}
-
-.boxel-card--schedule .boxel-card-field > .field-renderer__value {
-  font: var(--boxel-font-lg);
-}
-
 /* Publishing Representation card */
 .publishing-representation > .boxel-card__inner {
   padding: 0;
@@ -300,10 +253,55 @@
   gap: 20px;
 }
 
-.publishing-representation__additional-field.publishing-representation__field
-  .field-renderer__title {
+.publishing-representation__additional-field.publishing-representation__field .field-renderer__title {
   font-size: 13px;
   letter-spacing: var(--boxel-lsp);
+}
+
+/* Schedule card */
+.boxel-card--schedule .boxel-card__inner {
+  height: 155px;
+  padding-left: 40px;
+}
+
+.boxel-card--schedule .boxel-card__fields {
+  padding: 0;
+  grid-template-columns: 1fr;
+}
+
+.boxel-card--schedule .boxel-card-field > .field-renderer__title {
+  color: var(--boxel-dark);
+}
+
+.boxel-card--schedule .boxel-card-field > .field-renderer__value {
+  font: var(--boxel-font-lg);
+}
+
+/* Revenue Data card */
+.boxel-card--revenue-data .boxel-card__fields {
+  grid-template-columns: 1fr;
+  gap: 5px;
+  padding: 10px 0;
+}
+
+.boxel-card--revenue-data .boxel-card__fields > li {
+  width: 100%;
+}
+
+.boxel-card--revenue-data .boxel-card-field {
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 0 35px;
+}
+
+.boxel-card--revenue-data .boxel-card-field > .field-renderer__title {
+  width: 100%;
+  color: var(--boxel-dark);
+  text-align: right;
+}
+
+.boxel-card--revenue-data .boxel-card-field > .field-renderer__value {
+  font: var(--boxel-font-lg);
 }
 
 /* territory card */

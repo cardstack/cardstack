@@ -1,20 +1,21 @@
-/** 
+/**
  * Size variants - variants that control the size and spacing of a button
- * 
+ *
  * The @size argument on the button component should create a corresponding class with format
- * boxel-button--size-@size 
- * 
+ * boxel-button--size-@size
+ *
  * Classes for the @size argument can control the following properties:
- * 
+ *
  * --boxel-button-padding
  * --boxel-button-min-width
  * --boxel-button-min-height
  * --boxel-button-font
  * --boxel-button-letter-spacing
  * --boxel-button-loading-icon-size
- * 
+ *
  */
- /* thinner base button */
+
+/* thinner base button */
 .boxel-button--size-small {
   --boxel-button-padding: var(--boxel-sp-xxxs) var(--boxel-sp);
   --boxel-button-font: 600 var(--boxel-font-sm);
@@ -40,8 +41,8 @@
   --boxel-button-min-height: 2.5rem;
 }
 
-/* 
-  extra tall button mainly used in mobile screens 
+/*
+  extra tall button mainly used in mobile screens
   touchable as it's bigger
   */
 .boxel-button--size-touch {

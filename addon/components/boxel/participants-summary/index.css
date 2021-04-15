@@ -14,5 +14,6 @@
 
 .boxel--dark-theme > .boxel-participants-summary {
   --icon-color: var(--boxel-light);
+
   color: var(--boxel-purple-300);
 }

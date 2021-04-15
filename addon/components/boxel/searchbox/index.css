@@ -1,6 +1,7 @@
 .boxel-searchbox {
   /* todo set up search stuff properly */
-  --boxel-searchbox-icon-size: .875rem;
+  --boxel-searchbox-icon-size: 0.875rem;
+
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-lg);
   border: 1px solid var(--boxel-dark);
@@ -10,6 +11,7 @@
 
 .boxel-searchbox__input {
   --boxel-searchbox-text-color: rgba(255, 255, 255, 0.6);
+
   height: 2rem;
   border: none;
   width: 100%;
@@ -30,7 +32,6 @@
   color: transparent;
   background: transparent;
 }
-
 
 .boxel-searchbox__input::placeholder {
   color: var(--boxel-searchbox-text-color);
@@ -53,15 +54,12 @@
 }
 
 .boxel-searchbox__search-icon {
-  /* absolutely position and vertically center these things, give them the same size */
-  width: var(--boxel-searchbox-icon-size);
+  --icon-color: var(--boxel-highlight);
+
+  left: var(--boxel-sp-xs);
+  width: var(--boxel-searchbox-icon-size); /* absolutely position and vertically center these things, give them the same size */
   height: var(--boxel-searchbox-icon-size);
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-}
-
-.boxel-searchbox__search-icon {
-  --icon-color: var(--boxel-highlight);
-  left: var(--boxel-sp-xs);
 }

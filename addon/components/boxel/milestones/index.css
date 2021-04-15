@@ -18,6 +18,7 @@
   content: "";
   width: 1px;
   height: var(--boxel-sp);
+
   /* Not using variables because the focus of this is primarily aesthetic effect */
   margin: 2px 0 3px 7px;
   background-color: var(--boxel-light-600);
@@ -46,6 +47,7 @@
 
 .boxel-milestones__item.current .boxel-milestones__item-bullet {
   --bullet-fill-color: var(--boxel-dark);
+
   border: 6px solid var(--boxel-highlight);
 }
 

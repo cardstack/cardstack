@@ -7,6 +7,7 @@
 /* card catalog tray usage */
 .boxel-card-catalog-tray-example {
   --close-button-size: 0.5rem;
+
   border: 1px solid var(--boxel-dark);
   padding: var(--boxel-sp-sm) 0;
   border-radius: var(--boxel-border-radius);
@@ -20,7 +21,8 @@
   position: relative;
   display: flex;
   justify-content: space-between;
-  padding: 0
+  padding:
+    0
     calc(var(--boxel-sp-sm) + var(--boxel-sp) + var(--close-button-size)) 0
     var(--boxel-sp);
 }
@@ -36,6 +38,7 @@
   top: var(--boxel-sp-xs);
   right: var(--boxel-sp);
   cursor: pointer;
+
   --icon-color: var(--boxel-light);
 }
 
@@ -53,6 +56,7 @@
 
 .boxel-card-catalog-tray-example__header-title svg {
   margin-right: var(--boxel-sp-xs);
+
   --icon-color: var(--boxel-cyan);
 }
 
