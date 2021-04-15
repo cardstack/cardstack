@@ -1,6 +1,7 @@
 .boxel-cta-block {
   --cta-block-padding-horizontal: var(--boxel-sp-lg);
   --cta-block-padding-vertical: var(--boxel-sp-lg);
+  --button-base-height: 2rem; /* The height of the boxel button, used for calculating the min-height to reduce layout shift */
   --icon-color: var(--cta-block-text-color);
 
   position: relative;
@@ -14,6 +15,11 @@
   color: var(--cta-block-text-color);
   font: var(--boxel-font-xs);
   transition: background-color var(--boxel-transition), padding var(--boxel-transition);
+}
+
+/* minimize layout shift by calculating a min-height for those cta blocks without steps */
+.boxel-cta-block:not(.boxel-cta-block--has-step) {
+  min-height: calc(var(--button-base-height) + var(--cta-block-padding-vertical) * 2);
 }
 
 /* basic dark + light theme with a twist for disabled */
