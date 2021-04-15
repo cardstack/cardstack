@@ -6,7 +6,7 @@
     (if this.isMemorialized "boxel-cta-block--memorialized")
     (if @stepNumber "boxel-cta-block--has-step")
   }}
-  >
+>
   {{!-- Not accounting for 0 as a step number --}}
   {{#if @stepNumber}}
     <div class="boxel-cta-block__step" data-step={{@stepNumber}}>
@@ -97,10 +97,6 @@
     {{svg-jar "checkbox-primary-checked" class="boxel-cta-block__done-icon" role="presentation"}}
   {{/if}}
 
-  {{#unless this.isDisabled}}
-    <div class="boxel-cta-block__private-notice">
-      <span class="boxel-cta-block__private-notice-message">Actions only visible to you</span>
-      {{svg-jar "lock" class="boxel-cta-block__lock-icon" role="presentation"}}
-    </div>
-  {{/unless}}
+  <span class="boxel-cta-block__private-notice">Actions only visible to you</span>
+  {{svg-jar "lock" class="boxel-cta-block__lock-icon" role="presentation"}}
 </div>
