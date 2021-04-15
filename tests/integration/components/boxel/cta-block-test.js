@@ -5,7 +5,7 @@ import { hbs } from 'ember-cli-htmlbars';
 
 const CTA_BLOCK_SELECTOR = '[data-test-boxel-cta-block]';
 const MAIN_ACTION_BUTTON_SELECTOR =
-  '[data-test-boxel-cta-block-button].boxel-cta-block__main-action-button';
+  '[data-test-boxel-cta-block-button].boxel-cta-block__action-button';
 const CANCEL_ACTION_BUTTON_SELECTOR =
   '[data-test-boxel-cta-block-button].boxel-cta-block__cancel-action-button';
 const MAIN_ACTION_AREA_SELECTOR =
@@ -26,7 +26,7 @@ module('Integration | Component | CtaBlock', function (hooks) {
   const infoAreaText = 'infoAreaText';
   const mainActionAreaText = 'mainActionAreaText';
 
-  test('it accepts and renders the default block with the MainActionButton and InfoArea components', async function (assert) {
+  test('it accepts and renders the default block with the ActionButton and InfoArea components', async function (assert) {
     this.setProperties({
       state: 'default',
       mainActionButtonText,
@@ -37,9 +37,9 @@ module('Integration | Component | CtaBlock', function (hooks) {
         @state={{this.state}}
         as |a|
       >
-        <a.MainActionButton>
+        <a.ActionButton>
           {{this.mainActionButtonText}}
-        </a.MainActionButton>
+        </a.ActionButton>
         <a.InfoArea>
           {{this.infoAreaText}}
         </a.InfoArea>
@@ -49,7 +49,7 @@ module('Integration | Component | CtaBlock', function (hooks) {
     assert.dom(INFO_AREA_SELECTOR).containsText(infoAreaText);
   });
 
-  test('it accepts and renders the disabled named block with the MainActionButton component', async function (assert) {
+  test('it accepts and renders the disabled named block with the ActionButton component', async function (assert) {
     this.setProperties({
       state: 'disabled',
       mainActionButtonText,
@@ -59,9 +59,9 @@ module('Integration | Component | CtaBlock', function (hooks) {
         @state={{this.state}}
       >
       <:disabled as |d|>
-        <d.MainActionButton>
+        <d.ActionButton>
           {{this.mainActionButtonText}}
-        </d.MainActionButton>
+        </d.ActionButton>
       </:disabled>
       </Boxel::CtaBlock>
     `);
@@ -70,7 +70,7 @@ module('Integration | Component | CtaBlock', function (hooks) {
     assert.dom(DEFAULT_PRIVATE_NOTICE_SELECTOR).isNotVisible();
   });
 
-  test('it accepts and renders the in-progress named block with the MainActionButton, CancelActionButton, and InfoArea components', async function (assert) {
+  test('it accepts and renders the in-progress named block with the ActionButton, CancelActionButton, and InfoArea components', async function (assert) {
     this.setProperties({
       state: 'in-progress',
       mainActionButtonText,
@@ -82,9 +82,9 @@ module('Integration | Component | CtaBlock', function (hooks) {
         @state={{this.state}}
       >
       <:in-progress as |i|>
-        <i.MainActionButton>
+        <i.ActionButton>
           {{this.mainActionButtonText}}
-        </i.MainActionButton>
+        </i.ActionButton>
 
         <i.CancelActionButton>
           {{this.cancelActionButtonText}}
@@ -103,7 +103,7 @@ module('Integration | Component | CtaBlock', function (hooks) {
     assert.dom(INFO_AREA_SELECTOR).containsText(infoAreaText);
   });
 
-  test('it accepts and renders the memorialized named block with the MainActionButton, MainActionArea, and InfoArea components', async function (assert) {
+  test('it accepts and renders the memorialized named block with the ActionButton, MainActionArea, and InfoArea components', async function (assert) {
     this.setProperties({
       state: 'memorialized',
       mainActionButtonText,
@@ -115,9 +115,9 @@ module('Integration | Component | CtaBlock', function (hooks) {
         @state={{this.state}}
       >
       <:memorialized as |m|>
-      <m.MainActionButton>
+      <m.ActionButton>
           {{this.mainActionButtonText}}
-        </m.MainActionButton>
+        </m.ActionButton>
 
         <m.MainActionArea>
           {{this.mainActionAreaText}}

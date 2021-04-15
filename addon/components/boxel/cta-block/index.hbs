@@ -21,10 +21,10 @@
   {{#if (and (has-block "default") this.isDefault)}}
     {{yield 
       (hash 
-        MainActionButton=(component 
+        ActionButton=(component 
           "boxel/cta-block/button" 
           kind="primary" 
-          ctaClass="boxel-cta-block__main-action-button"
+          ctaClass="boxel-cta-block__action-button"
         )
         InfoArea=(component 
           "boxel/cta-block/area" 
@@ -36,11 +36,11 @@
   {{else if (and (has-block "disabled") this.isDisabled)}}
     {{yield
       (hash 
-        MainActionButton=(component 
+        ActionButton=(component 
           "boxel/cta-block/button" 
           kind="primary" 
           disabled=true 
-          ctaClass="boxel-cta-block__main-action-button"
+          ctaClass="boxel-cta-block__action-button"
         )
       )
       to="disabled"
@@ -48,11 +48,11 @@
   {{else if (and (has-block "in-progress") this.isInProgress)}}
     {{yield
       (hash 
-        MainActionButton=(component 
+        ActionButton=(component 
           "boxel/cta-block/button" 
           kind="primary" 
           loading=true 
-          ctaClass="boxel-cta-block__main-action-button"
+          ctaClass="boxel-cta-block__action-button"
         )
         CancelActionButton=(component 
           "boxel/cta-block/button" 
@@ -68,15 +68,15 @@
     }}
   {{else if (and (has-block "memorialized") this.isMemorialized)}}
     {{!-- 
-      if using MainActionButton and MainActionArea together, the grid layout will put them at the exact same spot,
+      if using ActionButton and MainActionArea together, the grid layout will put them at the exact same spot,
       causing a visual bug.
     --}}
     {{yield
       (hash 
-        MainActionButton=(component 
+        ActionButton=(component 
           "boxel/cta-block/button" 
           kind="secondary-light" 
-          ctaClass="boxel-cta-block__main-action-button"
+          ctaClass="boxel-cta-block__action-button"
         )
         MainActionArea=(component 
           "boxel/cta-block/main-action-area"

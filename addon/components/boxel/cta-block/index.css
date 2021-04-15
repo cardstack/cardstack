@@ -61,7 +61,7 @@
 }
 
 /* grid elements */
-.boxel-cta-block__main-action-button {
+.boxel-cta-block__action-button {
   grid-area: main-action;
 }
 

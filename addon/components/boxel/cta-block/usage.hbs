@@ -5,24 +5,24 @@
           @state={{this.state}}
         >
             <:default as |a|>
-              <a.MainActionButton {{on "click" (fn this.changeState "in-progress")}}>
+              <a.ActionButton {{on "click" (fn this.changeState "in-progress")}}>
                 Do this
-              </a.MainActionButton>
+              </a.ActionButton>
               <a.InfoArea>
                 Custom info area
               </a.InfoArea>
             </:default>
 
             <:disabled as |d|>
-              <d.MainActionButton {{on "click" (fn this.changeState "in-progress")}}>
+              <d.ActionButton {{on "click" (fn this.changeState "in-progress")}}>
                 Disabled
-              </d.MainActionButton>
+              </d.ActionButton>
             </:disabled>
 
             <:in-progress as |i|>
-              <i.MainActionButton>
+              <i.ActionButton>
                 Loading
-              </i.MainActionButton>
+              </i.ActionButton>
               <i.CancelActionButton {{on "click" (fn this.changeState "default")}}>
                 Cancel
               </i.CancelActionButton>
@@ -54,19 +54,19 @@
       />
       <Args.Yield
         @name="default"
-        @description="The block shown when @state is 'default'. Yields { MainActionButton, InfoArea }"
+        @description="The block shown when @state is 'default'. Yields { ActionButton, InfoArea }"
       />
       <Args.Yield
         @name="disabled"
-        @description="The block shown when @state is 'disabled'. Yields { MainActionButton }"
+        @description="The block shown when @state is 'disabled'. Yields { ActionButton }"
       />
       <Args.Yield
         @name="in-progress"
-        @description="The block shown when @state is 'in-progress'. Yields { MainActionButton, CancelActionButton, InfoArea }"
+        @description="The block shown when @state is 'in-progress'. Yields { ActionButton, CancelActionButton, InfoArea }"
       />
       <Args.Yield
         @name="memorialized"
-        @description="The block shown when @state is 'memorialized'. Yields { MainActionButton, MainActionArea, InfoArea }"
+        @description="The block shown when @state is 'memorialized'. Yields { ActionButton, MainActionArea, InfoArea }"
       />
     </:api>
 </Freestyle::Usage>
@@ -87,7 +87,7 @@
         </tbody>
       </table>
       CtaBlock provides components to use within it - these components have appropriate classes to place them in the correct spots in the layout, and have correct states.
-      The MainActionButton and CancelActionButton components use the Button component and should accept all arguments it does.
+      The ActionButton and CancelActionButton components use the Button component and should accept all arguments it does.
       The InfoArea and MainActionArea components are essentially divs, which you can put your custom contents in.
       <table class="usage-cta-block-explanation-table">
         <tbody>
@@ -104,7 +104,7 @@
           </tr>
           <tr>
             <td>
-              MainActionButton
+              ActionButton
             </td>
             <td>
               The button that's used to perform the main action for this CTA. It undergoes a few changes in styling in between states.
@@ -124,13 +124,13 @@
             </td>
             <td>
               Memorialized state status update area for the main action, that is built to accept a small descriptive statement - eg. "Unlocked".
-              It should be used when an action is completed, replacing the MainActionButton.
+              It should be used when an action is completed, replacing the ActionButton.
               <br>
               <br>
               It accepts a `@icon` argument. By default, it shows a checkmark as the icon.
               <br>
               <br>
-              <strong>Don't use this and MainActionButton together, they occupy the same grid area!</strong>
+              <strong>Don't use this and ActionButton together, they occupy the same grid area!</strong>
             </td>
             <td>
               <ul>
