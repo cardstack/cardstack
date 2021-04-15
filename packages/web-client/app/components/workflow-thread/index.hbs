@@ -10,6 +10,12 @@
       {{#let (or milestone.complete (lte i @workflow.completedMilestoneCount)) as |displayMilestone|}}
         {{#if displayMilestone}}
           {{#each milestone.visiblePostables as |postable j|}}
+            {{#if (is-postable-on-new-day postable)}}
+              <Boxel::DateDivider
+                @date={{postable.timestamp}}
+                data-test-date-divider
+              />
+            {{/if}}
             {{#if postable.message}}
               <Boxel::ThreadMessage
                 @datetime={{postable.timestamp}}
@@ -33,7 +39,11 @@
             {{/if}}
           {{/each}}
           {{#if milestone.isComplete}}
-            <Boxel::MilestoneBanner @title={{milestone.completedDetail}} data-test-milestone-completed data-test-milestone={{i}} />
+            <Boxel::MilestoneBanner
+              @title={{milestone.completedDetail}}
+              data-test-milestone-completed
+              data-test-milestone={{i}}
+            />
           {{/if}}
         {{/if}}
       {{/let}}
@@ -47,7 +57,10 @@
       >
         <div>
           <Boxel::ProgressCircle
-            @percentComplete={{percent-complete total=@workflow.milestones.length completed=@workflow.completedMilestoneCount}}
+            @percentComplete={{percent-complete
+              total=@workflow.milestones.length
+              completed=@workflow.completedMilestoneCount
+            }}
           />
         </div>
         <div class="workflow-thread__status">
