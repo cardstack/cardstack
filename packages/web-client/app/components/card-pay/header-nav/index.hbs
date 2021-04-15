@@ -1,8 +1,8 @@
-<nav class="card-pay-header-nav">
+<nav class="card-pay-header-nav" ...attributes>
   <ul class="card-pay-header-nav__list" role="tablist">
     {{#each @tabs as |tab i|}}
       <li>
-        <LinkTo role="tab" id={{tab.route}} @route={{tab.route}} class="card-pay-header-nav__tab" data-test-card-pay-header-tab={{i}}>
+        <LinkTo role="tab" id={{tab.id}} @route={{tab.route}} class="card-pay-header-nav__tab" data-test-card-pay-header-tab={{i}}>
           {{svg-jar tab.icon aria-hidden="true"}}
           {{tab.title}}
         </LinkTo>

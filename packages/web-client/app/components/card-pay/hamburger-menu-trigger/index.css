@@ -1,0 +1,9 @@
+.hamburger-menu-trigger {
+  --icon-color: var(--boxel-highlight);
+  display: flex;
+  padding: var(--boxel-sp-lg);
+}
+
+.hamburger-menu-trigger:hover {
+  cursor: pointer;
+}

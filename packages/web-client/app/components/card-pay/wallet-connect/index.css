@@ -1,0 +1,30 @@
+/* Connect wallet component */
+.card-pay-header__item-list {
+  margin: 0;
+  padding: var(--boxel-sp-lg);
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  gap: var(--boxel-sp);
+  text-align: right;
+}
+
+.card-pay-header__item {
+  display: grid;
+  grid-template-columns: 4rem max-content;
+  align-items: center;
+  gap: var(--boxel-sp-sm);
+}
+
+@media screen and (max-width: 950px) {
+  .card-pay-header__item-list {
+    grid-template-columns: 1fr;
+    gap: var(--boxel-sp-lg);
+    text-align: initial;
+  }
+
+  .card-pay-header__item {
+    grid-template-columns: 1fr;
+    gap: var(--boxel-sp-xs);
+  }
+}

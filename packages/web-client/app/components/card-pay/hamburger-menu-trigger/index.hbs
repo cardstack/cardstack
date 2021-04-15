@@ -1,0 +1,10 @@
+<label class="hamburger-menu-trigger" ...attributes>
+  {{#if @displayMenu}}
+    {{svg-jar "close" width="14px" height="14px" aria-label="Close hamburger menu"}}
+  {{else}}
+    {{svg-jar "hamburger-menu" width="20px" height="20px" aria-label="Open hamburger menu"}}
+  {{/if}}
+  <span class="boxel-sr-only">
+    <Input @type="checkbox" @checked={{@displayMenu}} {{on "input" @toggleMenu}} />
+  </span>
+</label>

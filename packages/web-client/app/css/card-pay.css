@@ -1,0 +1,90 @@
+.card-pay-header {
+  --boxel-org-header-background-color: var(--boxel-dark);
+  --boxel-org-header-color: var(--boxel-light);
+  --boxel-org-header-logo-size: 2.5rem; /* 40px */
+  --header-padding: var(--boxel-sp-lg);
+
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  justify-content: space-between;
+  gap: 0;
+  padding: 0;
+}
+
+.card-pay-header h1 {
+  margin: 0;
+  padding: var(--header-padding);
+  gap: 0 var(--boxel-sp-xs);
+  font: 900 1.125rem/1.333 var(--boxel-font-family);
+  letter-spacing: var(--boxel-lsp-xxl);
+  white-space: nowrap;
+}
+
+.card-pay-header > nav {
+  grid-column: 1 / -1;;
+}
+
+.card-pay .card-pay-header__hamburger-trigger,
+.card-pay-sidebar {
+  display: none;
+}
+
+.card-pay__main {
+  padding: var(--boxel-sp-lg);
+}
+
+
+@media screen and (max-width: 950px) {
+  .card-pay-header {
+    --boxel-org-header-logo-size: 2.125rem; /* 34px */
+    --header-padding: var(--boxel-sp);
+  }
+
+  .card-pay-header > ul,
+  .card-pay-header > nav {
+    display: none;
+  }
+
+  .card-pay .card-pay-header__hamburger-trigger {
+    display: flex;
+  }
+
+  .card-pay .boxel-dashboard__body-container {
+    --mobile-nav-width: 20rem;
+    position: relative;
+  }
+
+  .card-pay-sidebar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    width: var(--mobile-nav-width);
+    height: 100%;
+    background-color: var(--boxel-dark);
+    transform: translateX(-100%);
+    transition: transform var(--boxel-transition);
+  }
+
+  .card-pay-sidebar--slide-in {
+    transform: translateX(0);
+  }
+
+  .card-pay-sidebar > ul {
+    order: 1;
+  }
+
+  .card-pay__main {
+    width: max-content;
+    margin-left: 0;
+    transition: margin-left var(--boxel-transition);
+  }
+
+  .card-pay-sidebar--slide-in + .card-pay__main {
+    margin-left: var(--mobile-nav-width);
+    overflow: hidden;
+  }
+}

@@ -1,0 +1,18 @@
+<ul class="card-pay-header__item-list" ...attributes>
+  <li class="card-pay-header__item" data-test-card-pay-layer-1-connect>
+    <CardPay::WalletConnect::ConnectionButton
+      @chainName={{@layer1ChainName}}
+      @address={{@layer1Address}}
+      @isConnected={{@isLayer1Connected}}
+      @onConnect={{@layer1Connect}}
+    />
+  </li>
+  <li class="card-pay-header__item" data-test-card-pay-layer-2-connect>
+    <CardPay::WalletConnect::ConnectionButton
+      @chainName={{@layer2ChainName}}
+      @address={{@layer2Address}}
+      @isConnected={{@isLayer2Connected}}
+      @onConnect={{@layer2Connect}}
+    />
+  </li>
+</ul>
