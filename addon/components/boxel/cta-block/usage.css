@@ -6,19 +6,19 @@
   font-size: 1rem;
   border: 1px solid black;
   border-collapse: collapse;
-  margin: 1rem 0px;
+  margin: 1rem 0;
   max-width: 90ch;
 }
 
-.usage-cta-block-explanation-table tr:first-child td {
-  font-weight: bold;
+.usage-cta-block-explanation-table td {
+  border: 1px solid black;
+  padding: 0.25rem;
 }
 
 .usage-cta-block-explanation-table td:first-child {
   width: 25ch;
 }
 
-.usage-cta-block-explanation-table td {
-  border: 1px solid black;
-  padding: .25rem;
+.usage-cta-block-explanation-table tr:first-child td {
+  font-weight: bold;
 }

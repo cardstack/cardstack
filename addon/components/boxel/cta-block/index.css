@@ -4,19 +4,15 @@
   --icon-color: var(--cta-block-text-color);
 
   position: relative;
-
   display: grid;
   grid-template-columns: auto auto minmax(var(--boxel-sp-sm), 1fr) auto auto;
   grid-template-rows: auto;
   grid-template-areas: "main-action cancel-action _ info lock-icon";
   align-items: center;
-
   padding: var(--cta-block-padding-vertical) var(--cta-block-padding-horizontal);
-
   background-color: var(--cta-block-background-color);
   color: var(--cta-block-text-color);
   font: var(--boxel-font-xs);
-
   transition: background-color var(--boxel-transition), padding var(--boxel-transition);
 }
 
@@ -57,6 +53,7 @@
   align-items: center;
   justify-content: center;
 }
+
 .boxel-cta-block__step::before {
   content: attr(data-step);
   font: 700 var(--boxel-font-sm);
@@ -76,8 +73,10 @@
 .boxel-cta-block__info-area {
   grid-area: info;
 
-  /* some defaults so that people can simply enter text */
-  /* if they want to supply more complex content they should be able to overwrite it */
+  /*
+  some defaults so that people can simply enter text
+  if they want to supply more complex content they should be able to overwrite it
+  */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -95,16 +94,12 @@
 
 /* The lock icon and notice is not shown when the cta is disabled */
 .boxel-cta-block__private-notice {
-  --boxel-cta-block-lock-icon-size: .75rem;
+  --boxel-cta-block-lock-icon-size: 0.75rem;
 
   grid-area: info;
   display: flex;
   align-items: center;
   text-align: right;
-}
-.boxel-cta-block--disabled .boxel-cta-block__private-notice,
-.boxel-cta-block--disabled .boxel-cta-block__lock-icon {
-  display: none;
 }
 
 .boxel-cta-block__lock-icon {
@@ -114,8 +109,13 @@
   margin-left: var(--boxel-sp-xs);
 }
 
-/* 
-  Only visually show the "Actions only visible to you" message if someone hasn't added an info area 
+.boxel-cta-block--disabled .boxel-cta-block__private-notice,
+.boxel-cta-block--disabled .boxel-cta-block__lock-icon {
+  display: none;
+}
+
+/*
+  Only visually show the "Actions only visible to you" message if someone hasn't added an info area
   Since the lock seems to be a visual cue that actions are only visible to the user
   We keep the text around and visible to screenreaders (tested only on VoiceOver)
 */
