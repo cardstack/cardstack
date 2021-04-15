@@ -37,8 +37,8 @@ async function serializeCard(
       componentModule: card[format].moduleName,
     },
   });
-
-  ctx.body = cardSerializer.serialize(card.data);
+  let data = Object.assign({ id: card.url }, card.data);
+  ctx.body = cardSerializer.serialize(data);
 }
 
 export async function respondWithCard(ctx: RouterContext, builder: Builder) {
@@ -57,11 +57,12 @@ export async function respondWithCardForPath(
   builder: Builder
 ) {
   // TODO: This should be dynamically part of the server config
-  const schema = await import(
-    '@cardstack/compiled/http%3A%2F%2Fdemo.com%2Fcards%2Froutes%2Fschema.js'
-  );
+  const SchemaClass = (
+    await import('@cardstack/compiled/http-demo.com-cards-routes-schema.js')
+  ).default;
   let { pathname } = ctx.params;
 
+  let schema = new SchemaClass();
   let url = schema.routeTo(pathname);
 
   if (!url) {

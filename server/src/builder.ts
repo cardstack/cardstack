@@ -5,9 +5,9 @@ import {
   CompiledCard,
   assertValidRawCard,
 } from '@cardstack/core/src/interfaces';
-import { RealmConfig } from './interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
 import { encodeCardURL } from '@cardstack/core/src/utils';
+import { Environment, RealmConfig, NODE, BROWSER } from './interfaces';
 import {
   readFileSync,
   writeFileSync,
@@ -16,31 +16,42 @@ import {
 } from 'fs-extra';
 import { join } from 'path';
 import { NotFound } from './error';
+import { transformSync } from '@babel/core';
 
 class CardCache {
   constructor(private dir: string) {}
 
-  private getLocation(moduleURL: string): string {
-    return join(this.dir, filename);
+  private getLocation(env: Environment, moduleURL: string): string {
     let filename = encodeCardURL(moduleURL);
+    return join(this.dir, env, filename);
   }
 
   private moduleURL(cardURL: string, localFile: string): string {
     return new URL(localFile, cardURL.replace(/\/$/, '') + '/').href;
   }
 
-  setModule(cardURL: string, localFile: string, source: string) {
+  setModule(
+    env: Environment,
+    cardURL: string,
+    localFile: string,
+    source: string
+  ) {
     let url = this.moduleURL(cardURL, localFile);
-    writeFileSync(this.getLocation(url), source);
+    writeFileSync(this.getLocation(env, url), source);
     return url;
   }
 
   setCard(cardURL: string, source: CompiledCard) {
-    this.setModule(cardURL, 'compiled.json', JSON.stringify(source, null, 2));
+    this.setModule(
+      NODE,
+      cardURL,
+      'compiled.json',
+      JSON.stringify(source, null, 2)
+    );
   }
 
-  getCard(cardURL: string): CompiledCard | undefined {
-    let loc = this.getLocation(this.moduleURL(cardURL, 'compiled.json'));
+  getCard(cardURL: string, env: Environment = NODE): CompiledCard | undefined {
+    let loc = this.getLocation(env, this.moduleURL(cardURL, 'compiled.json'));
     if (existsSync(loc)) {
       return readJSONSync(loc);
     }
@@ -68,9 +79,23 @@ export default class Builder implements BuilderInterface {
     localModule: string,
     source: string
   ): Promise<string> {
-    let url = this.cache.setModule(cardURL, localModule, source);
-    return `@cardstack/compiled/${encodeCardURL(url)}`;
+    let url = this.cache.setModule(BROWSER, cardURL, localModule, source);
 
+    let nodeSource = this.transformToCommonJS(localModule, source);
+    this.cache.setModule(NODE, cardURL, localModule, nodeSource);
+
+    return `@cardstack/compiled/${encodeCardURL(url)}`;
+  }
+
+  transformToCommonJS(moduleURL: string, source: string): string {
+    let out = transformSync(source, {
+      configFile: false,
+      babelrc: false,
+      filenameRelative: moduleURL,
+      plugins: ['@babel/plugin-transform-modules-commonjs'],
+    });
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return out!.code!;
   }
 
   private locateRealmDir(url: string): string {

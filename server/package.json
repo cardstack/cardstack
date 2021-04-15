@@ -11,6 +11,9 @@
   "license": "MIT",
   "description": "Stock API server for the Cardstack tech stack.",
   "dependencies": {
+    "@babel/core": "^7.12.13",
+    "@babel/types": "^7.12.13",
+    "@babel/plugin-transform-modules-commonjs": "^7.13.8",
     "@cardstack/compiled": "*",
     "@cardstack/core": "*",
     "@koa/cors": "^3.1.0",

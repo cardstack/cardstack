@@ -9,7 +9,7 @@ import { sep } from 'path';
 
 export function cleanCache(dir: string) {
   console.debug('Cleaning cardCache dir: ' + dir);
-  for (let file of glob.sync('http*', { cwd: dir })) {
+  for (let file of glob.sync('**/http*', { cwd: dir })) {
     rmSync(join(dir, file));
   }
 }
