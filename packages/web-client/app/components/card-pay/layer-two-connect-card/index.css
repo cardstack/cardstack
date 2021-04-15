@@ -1,51 +1,54 @@
 
 .layer-two-connect-card__wrapper {
   display: grid;
-  height: 100%;
+  margin: 0;
+  padding: var(--boxel-sp-xl);
 }
 
-.layer-two-connect-card__section-one {
-  border-bottom: 1px solid var(--boxel-light-300);
-  padding-bottom: var(--boxel-sp-xl);
+.layer-two-connect-card__section {
+  padding-top: var(--boxel-sp-xl);
+  margin: 0 var(--boxel-sp-lg);
 }
 
-.layer-two-connect-card--with-explanations  .layer-two-connect-card__section-one {
-  padding-bottom: 0;
+.layer-two-connect-card__section::marker {
+  font: 700 1.125rem/calc(24/18) var(--boxel-font-family);
+}
+
+.layer-two-connect-card__section + .layer-two-connect-card__section {
+  border-top: 1px solid var(--boxel-light-300);
 }
 
 .layer-two-connect-card__header {
-  font: 600 var(--boxel-font);
   margin: 0;
-  padding: var(--boxel-sp-lg);
-}
-
-.layer-two-connect-card--with-explanations .layer-two-connect-card__header {
-  font: 600 var(--boxel-font-lg);
-  padding-bottom: var(--boxel-sp-xxs);
+  font: 700 1.125rem/calc(24/18) var(--boxel-font-family);
+  letter-spacing: 0;
 }
 
 .layer-two-connect-card__explanation {
-  color: var(--boxel-purple-600);
-  padding-bottom: var(--boxel-sp-xs);
-  padding-left: 0;
-  padding-right: 0;
-  margin-top: 0;
+  margin: 0;
+  color: var(--boxel-purple-500);
+  font: var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-sm);
 }
 
-.layer-two-connect-card__app-store-links {
-  align-items: center;
+.layer-two-connect-card__header + .layer-two-connect-card__explanation {
+  margin-top: var(--boxel-sp-xs);
+}
+
+.layer-two-connect-card__display {
   display: flex;
   flex-wrap: wrap;
-  margin-left: var(--boxel-sp-xxxl);
-  margin-right: var(--boxel-sp-xxxl);
-  padding: var(--boxel-sp);
+  align-items: center;
+  justify-content: center;
+}
+
+* + .layer-two-connect-card__display {
+  margin-top: var(--boxel-sp-xl);
 }
 
 .layer-two-connect-card__app-phone {
   width: 138px;
   height: 149px;
-  margin-left: 16px;
-  margin-right: 29px;
 }
 
 .layer-two-connect-card__mobile-coming-soon {
@@ -90,9 +93,12 @@
 }
 
 .layer-two-connect-card__loading-qr,
-  .layer-two-connect-card__qr-container {
+.layer-two-connect-card__qr-container {
   text-align: center;
-  padding: var(--boxel-sp-lg);
+}
+
+.layer-two-connect-card__qr-container > * {
+  width: 300px;
 }
 
 .layer-two-connect-card__loading-qr {
@@ -102,4 +108,10 @@
 
 .layer-two-connect-card__loading-qr > span {
   margin: auto;
+}
+
+.layer-two-connect-card__link {
+  margin-top: var(--boxel-sp-lg);
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-sm);
 }

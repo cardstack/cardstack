@@ -1,12 +1,6 @@
 .layer-two-connect-modal__card {
-  max-height: 80vh;
-  max-width: 80vw;
-  margin: 0 auto;
+  max-width: 36.5rem; /* ~584px */
+  height: max-content;
+  margin: auto;
   overflow: auto;
-}
-
-@media screen and (max-width: 950px) {
-  .layer-two-connect-modal__card {
-    max-height: 90vh;
-  }
 }

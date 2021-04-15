@@ -9,22 +9,23 @@
       <div data-test-layer2-account-id>{{account.address}}</div>
     {{/each}}
   {{else}}
-    <div class="layer-two-connect-card__wrapper">
-      <div class="layer-two-connect-card__section-one">
+    <h1 class="boxel-sr-only">How to connect your wallet</h1>
+    <ol class="layer-two-connect-card__wrapper">
+      <li class="layer-two-connect-card__section">
         <h2 class="layer-two-connect-card__header">
-          1. Install the Cardstack app on your mobile phone
+          Install the Cardstack app on your mobile phone
         </h2>
         {{#if @includeExplanations}}
           <p class="layer-two-connect-card__explanation">
             Please install the Cardstack app on your mobile phone and create/add an account.
           </p>
         {{/if}}
-        <div class="layer-two-connect-card__app-store-links">
+        <div class="layer-two-connect-card__display">
           <img srcset="{{this.cardstackMobileAppPhone}},
-                       {{this.cardstackMobileAppPhone2x}} 2x"
-               src={{this.cardstackMobileAppPhone}}
-               alt="Cardstack Mobile App on a smartphone"
-               class="layer-two-connect-card__app-phone">
+                      {{this.cardstackMobileAppPhone2x}} 2x"
+              src={{this.cardstackMobileAppPhone}}
+              alt="Cardstack Mobile App on a smartphone"
+              class="layer-two-connect-card__app-phone">
           {{#if this.appStoreUrl}}
             <a href={{this.appStoreUrl}} class="layer-two-connect-card__app-store-badge">
               <img src={{this.appStoreBadge}} width="120" height="40" alt="Download on the App Store" />
@@ -44,10 +45,10 @@
             </div>
           {{/if}}
         </div>
-      </div>
-      <div class="layer-two-connect-card__section-two">
+      </li>
+      <li class="layer-two-connect-card__section">
         <h2 class="layer-two-connect-card__header">
-          2. Scan this QR code with your Cardstack app
+          Scan this QR code with your Cardstack app
         </h2>
         {{#if @includeExplanations}}
           <p class="layer-two-connect-card__explanation">
@@ -55,7 +56,7 @@
           </p>
         {{/if}}
         {{#if this.layer2Network.walletConnectUri}}
-          <div data-test-wallet-connect-qr-code class="layer-two-connect-card__qr-container">
+          <div data-test-wallet-connect-qr-code class="layer-two-connect-card__display layer-two-connect-card__qr-container">
             <StyledQrCode
               @data={{this.layer2Network.walletConnectUri}}
               @image={{this.cardstackLogo}}
@@ -67,6 +68,7 @@
               @cornerSquareType="extra-rounded"
               @imageMargin={{5}}
             />
+            {{!-- <a class="layer-two-connect-card__link" href="#">Watch video instructions</a> --}}
           </div>
         {{else}}
           <div class="layer-two-connect-card__loading-qr" data-test-wallet-connect-loading-qr-code>
@@ -75,13 +77,13 @@
             </span>
           </div>
         {{/if}}
-      </div>
+      </li>
       <button class="layer-two-connect-card__alternate-wallet" type="button">
         <span>
           Use a different wallet with xDai Chain support
         </span>
         {{svg-jar "caret-thin-right" class="layer-two-connect-card__alternate-wallet-caret"}}
       </button>
-    </div>
+    </ol>
   {{/if}}
 </Boxel::CardContainer>
