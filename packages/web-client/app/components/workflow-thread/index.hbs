@@ -1,0 +1,79 @@
+<Boxel::Thread ...attributes>
+  <:header>
+    <Boxel::ThreadHeader @title={{@workflow.name}} />
+  </:header>
+  <:content>
+    {{#if (has-block 'before-content')}}
+      {{yield to='before-content'}}
+    {{/if}}
+    {{#each @workflow.milestones as |milestone i|}}
+      {{#let (or milestone.complete (lte i @workflow.completedMilestoneCount)) as |displayMilestone|}}
+        {{#if displayMilestone}}
+          {{#each milestone.visiblePostables as |postable j|}}
+            {{#if (is-postable-on-new-day postable)}}
+              <Boxel::DateDivider
+                @date={{postable.timestamp}}
+                data-test-date-divider
+              />
+            {{/if}}
+            {{#if postable.message}}
+              <Boxel::ThreadMessage
+                @datetime={{postable.timestamp}}
+                @imgURL={{postable.author.imgURL}}
+                @hideMeta={{postable-meta-identical postable (object-at milestone.visiblePostables (dec j))}}
+                data-test-postable={{j}} data-test-milestone={{i}}
+              >
+                <div class="prose">
+                  {{format-workflow-message postable.message}}
+                </div>
+              </Boxel::ThreadMessage>
+            {{else}}
+              <Boxel::ThreadMessage
+                @datetime={{postable.timestamp}}
+                @imgURL={{postable.author.imgURL}}
+                @hideMeta={{postable-meta-identical postable (object-at milestone.visiblePostables (dec j))}}
+                data-test-postable={{j}} data-test-milestone={{i}}
+              >
+                {{component postable.componentName onComplete=(optional postable.onComplete)}}
+              </Boxel::ThreadMessage>
+            {{/if}}
+          {{/each}}
+          {{#if milestone.isComplete}}
+            <Boxel::MilestoneBanner
+              @title={{milestone.completedDetail}}
+              data-test-milestone-completed
+              data-test-milestone={{i}}
+            />
+          {{/if}}
+        {{/if}}
+      {{/let}}
+    {{/each}}
+  </:content>
+  <:sidebar as |SidebarSection|>
+    <SidebarSection>
+      <Boxel::Sidebar::CardContainer
+        @header={{html-safe (concat "Workflow:<br>" @workflow.name)}}
+        @attachNext={{true}}
+      >
+        <div>
+          <Boxel::ProgressCircle
+            @percentComplete={{percent-complete
+              total=@workflow.milestones.length
+              completed=@workflow.completedMilestoneCount
+            }}
+          />
+        </div>
+        <div class="workflow-thread__status">
+          {{@workflow.progressStatus}}
+        </div>
+      </Boxel::Sidebar::CardContainer>
+
+      <Boxel::Sidebar::CardContainer @header="Milestones">
+        <Boxel::Milestones
+          @milestones={{@workflow.milestones}}
+          @completedCount={{@workflow.completedMilestoneCount}}
+        />
+      </Boxel::Sidebar::CardContainer>
+    </SidebarSection>
+  </:sidebar>
+</Boxel::Thread>

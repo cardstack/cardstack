@@ -27,6 +27,11 @@ export class Milestone {
     this.completedDetail = opts.completedDetail;
   }
 
+  // return visible postables that should be visible -- all completed posts up to
+  // and including the first incomplete post. Computation intentionally has some side effects:
+  //   * calculate whether a post should be visible once and only once
+  //   * set the timestamp on the post when we determine it should be visible
+  // Designed to be called from the template.
   get visiblePostables() {
     let postablesArr = [];
 
@@ -56,5 +61,11 @@ export class Milestone {
     }
 
     return postablesArr;
+  }
+
+  // return visible postables with zero side effects
+  peekAtVisiblePostables() {
+    let includedPostables = this.#includedPostables;
+    return this.postables.filter((p) => includedPostables.has(p));
   }
 }
