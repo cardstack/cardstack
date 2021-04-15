@@ -3,13 +3,18 @@ export class NotFound extends Error {
   status = 404;
 }
 
-export function setErrorResponse(ctx: any, err: any) {
-  let status = err.status ?? '500';
-  let title = err.message ?? 'An unexpected exception occured';
+export async function errorMiddleware(ctx: any, next: any) {
+  try {
+    await next();
+  } catch (err) {
+    let status = err.status ?? '500';
+    let title = err.message ?? 'An unexpected exception occured';
 
-  ctx.response.status = parseInt(status);
-  ctx.body = new JSONAPIError({
-    status,
-    title,
-  });
+    ctx.status = parseInt(status);
+    ctx.body = new JSONAPIError({
+      status,
+      title,
+    });
+    ctx.app.emit('error', err, ctx);
+  }
 }

@@ -1,3 +1,4 @@
+import { RealmConfig } from '@cardstack/core/src/interfaces';
 import Koa from 'koa';
 import Router from '@koa/router';
 import logger from 'koa-logger';
@@ -5,9 +6,9 @@ import cors from '@koa/cors';
 import sane from 'sane';
 
 import Builder from './builder';
-import { RealmConfig } from './interfaces';
-import { respondWithCardForPath, respondWithCard } from './routes/card';
+import { respondWithCardForPath, respondWithCard } from './routes/card-route';
 import { cleanCache, primeCache, setupWatchers } from './watcher';
+import { errorMiddleware } from './error';
 
 interface ServerOptions {
   realms: RealmConfig[];
@@ -29,6 +30,10 @@ export class Server {
     let builder = new Builder({ realms, cardCacheDir });
 
     // The card data layer
+    // app.use(errorMiddlewpre);
+    app.use(logger());
+    app.use(cors({ origin: '*' }));
+
     router.get(`/cards/:encodedCardURL`, async (ctx) => {
       respondWithCard(ctx, builder);
     });
@@ -37,10 +42,12 @@ export class Server {
       respondWithCardForPath(ctx, builder);
     });
 
-    app.use(logger());
-    app.use(cors({ origin: '*' }));
     app.use(router.routes());
     app.use(router.allowedMethods());
+
+    app.on('error', (err) => {
+      log.error('server error', err);
+    });
 
     return new this(app, builder, options);
   }

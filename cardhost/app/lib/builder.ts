@@ -1,3 +1,4 @@
+import { RealmConfig } from './../../../server/src/interfaces';
 import type {
   Builder as BuilderInterface,
   RawCard,
@@ -15,16 +16,22 @@ export default class Builder implements BuilderInterface {
   });
 
   private cache: Map<string, CompiledCard>;
-  private realm?: string;
+  private realms: RealmConfig[];
 
-  constructor(params: { realm?: string }) {
+  constructor(params: { realms: RealmConfig[] }) {
     this.cache = new Map();
-    this.realm = params.realm;
+    this.realms = params.realms;
   }
 
-  private async defineModule(moduleURL: string, source: string): Promise<void> {
-    source = dynamicCardTransform(moduleURL, source);
+  private async defineModule(
+    cardURL: string,
+    localModule: string,
+    source: string
+  ): Promise<string> {
+    let url = new URL(localModule, cardURL.replace(/\/$/, '') + '/').href;
+    source = dynamicCardTransform(url, source);
     eval(source);
+    return url;
   }
 
   async getRawCard(url: string): Promise<RawCard> {
@@ -62,7 +69,7 @@ export default class Builder implements BuilderInterface {
 
     return {
       model: compiledCard.data,
-      moduleName: compiledCard.templateModules[format].moduleName,
+      moduleName: compiledCard[format].moduleName,
     };
   }
 }

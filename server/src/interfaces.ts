@@ -1,8 +1,3 @@
-export interface RealmConfig {
-  url: string;
-  directory: string;
-}
-
 const ENVIRONMENTS_OBJ = {
   browser: '',
   node: '',

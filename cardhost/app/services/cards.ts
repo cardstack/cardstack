@@ -4,8 +4,10 @@ import Component from '@glimmer/component';
 import { hbs } from 'ember-cli-htmlbars';
 import { setComponentTemplate } from '@ember/component';
 
-import { encodeCardURL } from '@cardstack/core/src/utils';
 import { Format } from '@cardstack/core/src/interfaces';
+
+import config from 'cardhost/config/environment';
+const { cardServer } = config as any; // Environment types arent working
 
 export default class Cards extends Service {
   async load(
@@ -13,19 +15,14 @@ export default class Cards extends Service {
     format: Format
   ): Promise<{ model: any; component: unknown }> {
     let params = new URLSearchParams({ format }).toString();
-    let fullURL = [
-      'http://localhost:3000/',
-      'cards/',
-      encodeCardURL(url),
-      `?${params}`,
-    ];
+    let fullURL = [cardServer, 'cards/', encodeURIComponent(url), `?${params}`];
     return this.internalLoad(fullURL.join(''));
   }
 
   async loadForRoute(
     pathname: string
   ): Promise<{ model: any; component: unknown }> {
-    return this.internalLoad(`http://localhost:3000/cardFor${pathname}`);
+    return this.internalLoad(`${cardServer}cardFor${pathname}`);
   }
 
   private async internalLoad(

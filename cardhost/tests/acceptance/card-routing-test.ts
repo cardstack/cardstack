@@ -11,10 +11,12 @@ module('Acceptance | card routing', function (hooks) {
   setupCardMocking(hooks);
 
   hooks.beforeEach(function () {
+    // TODO
     this.server.create('space', {
       id: 'home',
       routingCard: 'https://mirage/cards/my-routes',
     });
+
     this.createCard({
       url: 'https://mirage/cards/my-routes',
       files: {
@@ -30,6 +32,12 @@ module('Acceptance | card routing', function (hooks) {
     });
     this.createCard({
       url: 'https://mirage/cards/person',
+      isolated: 'isolated.js',
+      data: {
+        attributes: {
+          name: 'Arthur',
+        },
+      },
       files: {
         'schema.js': `
           import { contains } from "@cardstack/types";
@@ -38,11 +46,6 @@ module('Acceptance | card routing', function (hooks) {
             @contains(string)
             name;
           }`,
-        'data.json': {
-          attributes: {
-            name: 'Arthur',
-          },
-        },
         'isolated.js': templateOnlyComponentTemplate(
           `<div data-test-person>Hi! I am <@model.name/></div>`
         ),

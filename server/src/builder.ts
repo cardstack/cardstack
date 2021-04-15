@@ -4,17 +4,19 @@ import {
   RawCard,
   CompiledCard,
   assertValidRawCard,
+  RealmConfig,
 } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
 import { encodeCardURL } from '@cardstack/core/src/utils';
-import { Environment, RealmConfig, NODE, BROWSER } from './interfaces';
+import { Environment, NODE, BROWSER } from './interfaces';
 import {
   readFileSync,
   writeFileSync,
   readJSONSync,
   existsSync,
+  mkdirpSync,
 } from 'fs-extra';
-import { join } from 'path';
+import { join, dirname } from 'path';
 import { NotFound } from './error';
 import { transformSync } from '@babel/core';
 
@@ -37,7 +39,9 @@ class CardCache {
     source: string
   ) {
     let url = this.moduleURL(cardURL, localFile);
-    writeFileSync(this.getLocation(env, url), source);
+    let fsLocation = this.getLocation(env, url);
+    mkdirpSync(dirname(fsLocation));
+    writeFileSync(fsLocation, source);
     return url;
   }
 
@@ -87,7 +91,7 @@ export default class Builder implements BuilderInterface {
     return `@cardstack/compiled/${encodeCardURL(url)}`;
   }
 
-  transformToCommonJS(moduleURL: string, source: string): string {
+  private transformToCommonJS(moduleURL: string, source: string): string {
     let out = transformSync(source, {
       configFile: false,
       babelrc: false,

@@ -86,3 +86,8 @@ export interface Builder {
   getRawCard(url: string): Promise<RawCard>;
   getCompiledCard(url: string): Promise<CompiledCard>;
 }
+
+export interface RealmConfig {
+  url: string;
+  directory: string;
+}

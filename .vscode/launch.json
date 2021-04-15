@@ -5,6 +5,7 @@
   "version": "0.2.0",
   "configurations": [
 
+
     {
       "type": "node",
       "request": "launch",
@@ -16,6 +17,13 @@
         "JOBS": "1"
       },
       "outputCapture": "std"
+    },
+    {
+      "command": "yarn test:ember",
+      "name": "Cardhost: yarn test:ember",
+      "request": "launch",
+      "type": "node-terminal",
+      "cwd": "${workspaceRoot}/cardhost",
     },
     {
       "type": "node",

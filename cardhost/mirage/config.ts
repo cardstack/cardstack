@@ -104,7 +104,7 @@ export default function (this: Server): void {
   this.post('/spaces');
   this.patch('/spaces');
 
-  this.get('/spaces/home/:pathname', async function (schema: any, request) {
+  this.get('/cardFor/:pathname', async function (schema: any, request) {
     let { routingCard } = schema.spaces.find('home');
     let cardServer = FakeCardServer.current();
     if (!routingCard) {
