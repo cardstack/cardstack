@@ -65,7 +65,7 @@
   grid-area: main-action;
 }
 
-.boxel-cta-block__cancel-action-button {
+.boxel-cta-block__cancel-button {
   grid-area: cancel-action;
   margin-left: var(--boxel-sp);
 }

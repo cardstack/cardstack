@@ -7,7 +7,7 @@ const CTA_BLOCK_SELECTOR = '[data-test-boxel-cta-block]';
 const MAIN_ACTION_BUTTON_SELECTOR =
   '[data-test-boxel-cta-block-button].boxel-cta-block__action-button';
 const CANCEL_ACTION_BUTTON_SELECTOR =
-  '[data-test-boxel-cta-block-button].boxel-cta-block__cancel-action-button';
+  '[data-test-boxel-cta-block-button].boxel-cta-block__cancel-button';
 const MAIN_ACTION_AREA_SELECTOR =
   '[data-test-boxel-cta-block-main-action-area]';
 const MAIN_ACTION_AREA_ICON_SELECTOR =
@@ -70,7 +70,7 @@ module('Integration | Component | CtaBlock', function (hooks) {
     assert.dom(DEFAULT_PRIVATE_NOTICE_SELECTOR).isNotVisible();
   });
 
-  test('it accepts and renders the in-progress named block with the ActionButton, CancelActionButton, and InfoArea components', async function (assert) {
+  test('it accepts and renders the in-progress named block with the ActionButton, CancelButton, and InfoArea components', async function (assert) {
     this.setProperties({
       state: 'in-progress',
       mainActionButtonText,
@@ -86,9 +86,9 @@ module('Integration | Component | CtaBlock', function (hooks) {
           {{this.mainActionButtonText}}
         </i.ActionButton>
 
-        <i.CancelActionButton>
+        <i.CancelButton>
           {{this.cancelActionButtonText}}
-        </i.CancelActionButton>
+        </i.CancelButton>
 
         <i.InfoArea>
           {{this.infoAreaText}}

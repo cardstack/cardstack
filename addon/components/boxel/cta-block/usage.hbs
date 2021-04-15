@@ -23,9 +23,9 @@
               <i.ActionButton>
                 Loading
               </i.ActionButton>
-              <i.CancelActionButton {{on "click" (fn this.changeState "default")}}>
+              <i.CancelButton {{on "click" (fn this.changeState "default")}}>
                 Cancel
-              </i.CancelActionButton>
+              </i.CancelButton>
             </:in-progress>
 
             <:memorialized as |m|>
@@ -62,7 +62,7 @@
       />
       <Args.Yield
         @name="in-progress"
-        @description="The block shown when @state is 'in-progress'. Yields { ActionButton, CancelActionButton, InfoArea }"
+        @description="The block shown when @state is 'in-progress'. Yields { ActionButton, CancelButton, InfoArea }"
       />
       <Args.Yield
         @name="memorialized"
@@ -87,7 +87,7 @@
         </tbody>
       </table>
       CtaBlock provides components to use within it - these components have appropriate classes to place them in the correct spots in the layout, and have correct states.
-      The ActionButton and CancelActionButton components use the Button component and should accept all arguments it does.
+      The ActionButton and CancelButton components use the Button component and should accept all arguments it does.
       The InfoArea and MainActionArea components are essentially divs, which you can put your custom contents in.
       <table class="usage-cta-block-explanation-table">
         <tbody>
@@ -140,7 +140,7 @@
           </tr>
           <tr>
             <td>
-              CancelActionButton
+              CancelButton
             </td>
             <td>
               Button to cancel the main action. It should only appear in the 'in-progress' state.
