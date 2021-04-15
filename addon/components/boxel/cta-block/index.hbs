@@ -6,10 +6,11 @@
     (if this.isMemorialized "boxel-cta-block--memorialized")
     (if @stepNumber "boxel-cta-block--has-step")
   }}
+  data-test-boxel-cta-block
 >
   {{!-- Not accounting for 0 as a step number --}}
   {{#if @stepNumber}}
-    <div class="boxel-cta-block__step" data-step={{@stepNumber}}>
+    <div class="boxel-cta-block__step" data-step={{@stepNumber}} data-test-boxel-cta-block-step={{@stepNumber}}>
       <span class="boxel-sr-only">Step {{@stepNumber}}</span> 
     </div>
   {{/if}}
@@ -90,6 +91,6 @@
     }}
   {{/if}}
 
-  <span class="boxel-cta-block__private-notice">Actions only visible to you</span>
+  <span class="boxel-cta-block__private-notice" data-test-boxel-cta-block-private-notice>Actions only visible to you</span>
   {{svg-jar "lock" class="boxel-cta-block__lock-icon" role="presentation"}}
 </div>
