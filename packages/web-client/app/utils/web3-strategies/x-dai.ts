@@ -9,7 +9,7 @@ import WalletInfo from '../wallet-info';
 import { defer } from 'rsvp';
 
 export default class XDaiWeb3Strategy implements Web3Strategy {
-  chainName = 'xDai';
+  chainName = 'xDai Chain';
   chainId = 100;
   provider = new WalletConnectProvider({
     bridge: BRIDGE,
