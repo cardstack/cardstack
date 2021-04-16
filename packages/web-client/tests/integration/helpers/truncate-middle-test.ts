@@ -9,7 +9,7 @@ module('Integration | Helper | truncate-middle', function (hooks) {
   test('typical input', async function (assert) {
     this.set('inputValue', '0xA0BACA1Ce00A95DED1674b3cC27bd1C77b6EDF9b');
     await render(hbs`{{truncate-middle this.inputValue 6 4}}`);
-    assert.equal(this.element.textContent?.trim(), '0xA0BA…DF9b');
+    assert.equal(this.element.textContent?.trim(), '0xA0BA...DF9b');
   });
 
   test('empty input', async function (assert) {

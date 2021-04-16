@@ -35,7 +35,7 @@ module('Acceptance | Connect Wallet', function (hooks) {
       .dom(
         '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
       )
-      .hasText('0x18261…6E44');
+      .hasText('0x18261...6E44');
     assert.dom('[data-test-wallet-connect-qr-code]').doesNotExist();
     assert.dom('[data-test-layer-two-connect-modal]').doesNotExist();
   });
