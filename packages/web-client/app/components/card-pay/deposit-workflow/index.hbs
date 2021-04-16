@@ -1,11 +1,10 @@
 <WorkflowThread class="deposit-workflow" @workflow={{this.workflow}}>
   <:before-content>
     <Boxel::ExpandableBanner
-      class="deposit-workflow__banner"
       @icon="deposit"
       @summary="Deposit Funds"
     >
-      <div class="prose prose-dark-mode">
+      <div class="deposit-workflow__banner">
         <p>
           As a Supplier, you deposit funds from your Ethereum mainnet wallet into the
           CARD Protocol's reserve pool and receive the corresponding amount of CPXD
@@ -22,14 +21,16 @@
           The CARD Protocol's reserve pool facilitates payments between customers
           and merchants on the Cardstack network.
         </p>
-        <p class="deposit-workflow__banner-small-text">
-          Fees: Suppliers earn transaction fees of 0.5% for all transactions across
-          the CARD Protocol. Those fees will be distributed to Suppliers based on
-          their proportional share of supplied tokens in the reserve pool, averaged
-          over the 30-day period in which the transactions occurred. {{!-- <a href="#">More details here.</a> --}}
-          {{!-- TODO: add link --}}
+        <p>
+          <small>
+            Fees: Suppliers earn transaction fees of 0.5% for all transactions across
+            the CARD Protocol. Those fees will be distributed to Suppliers based on
+            their proportional share of supplied tokens in the reserve pool, averaged
+            over the 30-day period in which the transactions occurred. {{!-- <a href="#">More details here.</a> --}}
+            {{!-- TODO: add link --}}
+          </small>
         </p>
       </div>
     </Boxel::ExpandableBanner>
   </:before-content>
-</WorkflowThread> 
+</WorkflowThread>

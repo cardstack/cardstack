@@ -7,3 +7,43 @@
   color: var(--boxel-light-600);
   font: var(--boxel-font-xs);
 }
+
+
+/* Expandable banner */
+.deposit-workflow__banner ul {
+  margin: 0;
+  padding-left: 0;
+  list-style-position: inside;
+}
+
+.deposit-workflow__banner ul li::marker {
+  content: '- ';
+}
+
+.deposit-workflow__banner p {
+  margin: 0;
+  font: var(--boxel-font-sm);
+}
+
+.deposit-workflow__banner small {
+  color: var(--boxel-light-600);
+  font: var(--boxel-font-xs);
+}
+
+.deposit-workflow__banner p + p {
+  margin-top: var(--boxel-sp-sm);
+}
+
+
+/* TODO: Fix in boxel */
+.boxel-expandable-banner__summary {
+  display: block;
+}
+.boxel-expandable-banner__summary-icon{
+  margin-top: 5px;
+}
+.boxel-expandable-banner__summary-icon,
+.boxel-expandable-banner__summary-text {
+  display: inline-block;
+  vertical-align: middle;
+}
