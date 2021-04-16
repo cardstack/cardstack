@@ -4,3 +4,33 @@
   letter-spacing: var(--boxel-lsp);
   text-align: center;
 }
+
+.workflow-thread__markdown {
+  font-size: 0.9375rem;
+  line-height: calc(23/15);
+  letter-spacing: var(--boxel-lsp-sm);
+  text-align: start;
+}
+
+.workflow-thread__markdown > * {
+  margin: 0;
+}
+
+.workflow-thread__markdown > * + * {
+  margin-top: var(--boxel-sp-lg);
+}
+
+.workflow-thread__markdown ul,
+.workflow-thread__markdown ol {
+  margin: 0;
+  padding-left: 0;
+  list-style-position: inside;
+}
+
+.workflow-thread__markdown ul li::marker {
+  content: '- ';
+}
+
+.workflow-thread__markdown ol li::marker {
+  font: inherit;
+}
