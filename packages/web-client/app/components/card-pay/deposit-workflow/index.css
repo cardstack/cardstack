@@ -2,14 +2,12 @@
   color: var(--boxel-dark);
 }
 
-.deposit-workflow__banner-small-text {
-  margin-bottom: 0;
-  color: var(--boxel-light-600);
-  font: var(--boxel-font-xs);
-}
-
 
 /* Expandable banner */
+.deposit-workflow__banner {
+  padding-right: var(--boxel-sp);
+}
+
 .deposit-workflow__banner ul {
   margin: 0;
   padding-left: 0;
@@ -22,28 +20,35 @@
 
 .deposit-workflow__banner p {
   margin: 0;
-  font: var(--boxel-font-sm);
 }
 
 .deposit-workflow__banner small {
+  display: block;
   color: var(--boxel-light-600);
-  font: var(--boxel-font-xs);
+  font-size: var(--boxel-font-size-xs);
+  line-height: calc(18/11);
+  letter-spacing: var(--boxel-lsp-lg);
+}
+
+.deposit-workflow__banner strong {
+  font-weight: 700;
+}
+
+.deposit-workflow__banner a {
+  color: currentColor;
+  font-weight: 600;
+  text-decoration: underline;
+  transition: color var(--boxel-transition);
+}
+
+.deposit-workflow__banner a:hover {
+  color: var(--boxel-light);
 }
 
 .deposit-workflow__banner p + p {
-  margin-top: var(--boxel-sp-sm);
+  margin-top: var(--boxel-sp);
 }
 
-
-/* TODO: Fix in boxel */
-.boxel-expandable-banner__summary {
-  display: block;
-}
-.boxel-expandable-banner__summary-icon{
-  margin-top: 5px;
-}
-.boxel-expandable-banner__summary-icon,
-.boxel-expandable-banner__summary-text {
-  display: inline-block;
-  vertical-align: middle;
+.deposit-workflow__banner p + p:last-of-type {
+  margin-top: var(--boxel-sp-lg);
 }
