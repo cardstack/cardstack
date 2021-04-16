@@ -9,18 +9,17 @@ aria-labelledby seems friendlier to safari than the for element, but unsure abou
   for={{@id}} 
   {{!-- id={{concat "checkbox-label-for-" @id}} --}}
 >
-    {{yield}}
+  <Input
+    @type="radio"
+    @id={{@id}} 
+    @value={{or @value @id}} 
+    @checked={{@checked}}
+    name={{@name}}
+    class="boxel-custom-radio__hidden-input" 
+    {{!-- aria-labelledby={{concat "checkbox-label-for-" @id}} --}}
+    {{on "change" (optional @onChange)}} 
+    {{on "focusin" (fn (mut this.focused) true)}}
+    {{on "focusout" (fn (mut this.focused) false)}}
+  />
+  {{yield}}
 </label>
-
-<Input
-  @type="radio"
-  @id={{@id}} 
-  @value={{or @value @id}} 
-  @checked={{@checked}}
-  name={{@name}}
-  class="boxel-custom-radio__hidden-input" 
-  {{!-- aria-labelledby={{concat "checkbox-label-for-" @id}} --}}
-  {{on "change" (optional @onChange)}} 
-  {{on "focusin" (fn (mut this.focused) true)}}
-  {{on "focusout" (fn (mut this.focused) false)}}
-/>

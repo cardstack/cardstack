@@ -12,4 +12,5 @@
   left: -9999px;
   max-width: 1px;
   max-height: 1px;
+  white-space: nowrap;
 }
