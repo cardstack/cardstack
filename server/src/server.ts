@@ -30,24 +30,20 @@ export class Server {
     let builder = new Builder({ realms, cardCacheDir });
 
     // The card data layer
-    // app.use(errorMiddlewpre);
+    app.use(errorMiddleware);
     app.use(logger());
     app.use(cors({ origin: '*' }));
 
     router.get(`/cards/:encodedCardURL`, async (ctx) => {
-      respondWithCard(ctx, builder);
+      await respondWithCard(ctx, builder);
     });
 
-    router.get('/cardFor/:pathname', (ctx) => {
-      respondWithCardForPath(ctx, builder);
+    router.get('/cardFor/:pathname', async (ctx) => {
+      await respondWithCardForPath(ctx, builder);
     });
 
     app.use(router.routes());
     app.use(router.allowedMethods());
-
-    app.on('error', (err) => {
-      log.error('server error', err);
-    });
 
     return new this(app, builder, options);
   }

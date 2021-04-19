@@ -15,6 +15,5 @@ export async function errorMiddleware(ctx: any, next: any) {
       status,
       title,
     });
-    ctx.app.emit('error', err, ctx);
   }
 }

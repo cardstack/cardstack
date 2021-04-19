@@ -5,6 +5,7 @@ import supertest from 'supertest';
 import QUnit from 'qunit';
 import { join } from 'path';
 import tmp from 'tmp';
+import { ensureDirSync, outputJSONSync } from 'fs-extra';
 
 // TODO: share this in core
 export function templateOnlyComponentTemplate(template: string): string {
@@ -22,7 +23,7 @@ export function templateOnlyComponentTemplate(template: string): string {
 QUnit.module('Card Data', function (hooks) {
   let realm: Project;
   let server: Koa;
-  let cardCacheDir: string;
+  let tempDir: string;
 
   function getCard(cardURL: string) {
     return supertest(server.callback()).get(
@@ -31,9 +32,7 @@ QUnit.module('Card Data', function (hooks) {
   }
 
   function resolveCard(modulePath: string): string {
-    return require.resolve(
-      modulePath.replace('@cardstack/compiled', cardCacheDir)
-    );
+    return require.resolve(modulePath, { paths: [tempDir] });
   }
 
   hooks.beforeEach(async function () {
@@ -72,7 +71,24 @@ QUnit.module('Card Data', function (hooks) {
 
     realm.writeSync();
 
-    cardCacheDir = tmp.dirSync().name;
+    // setting up a card cache directory that is also a resolvable node_modules
+    // package with the appropriate exports rules
+    tempDir = tmp.dirSync().name;
+    let cardCacheDir = join(tempDir, 'node_modules', '@cardstack', 'compiled');
+    ensureDirSync(cardCacheDir);
+    outputJSONSync(join(cardCacheDir, 'package.json'), {
+      name: '@cardstack/compiled',
+      exports: {
+        '.': {
+          browser: './browser',
+          default: './node',
+        },
+        './*': {
+          browser: './browser/*',
+          default: './node/*',
+        },
+      },
+    });
 
     server = (
       await Server.create({
@@ -91,13 +107,12 @@ QUnit.module('Card Data', function (hooks) {
   QUnit.test(
     "404s when you try to load a card outside of it's realm",
     async function (assert) {
-      let done = assert.async(1);
-      assert.expect(1);
-      await getCard('https://some-other-origin.com/thing').expect(404, done);
+      assert.expect(0);
+      await getCard('https://some-other-origin.com/thing').expect(404);
     }
   );
 
-  QUnit.skip("can load a simple isolated card's data", async function (assert) {
+  QUnit.test("can load a simple isolated card's data", async function (assert) {
     let response = await getCard('https://my-realm/post0').expect(200);
     assert.deepEqual(response.body.data?.attributes, {
       title: 'Hello World',
