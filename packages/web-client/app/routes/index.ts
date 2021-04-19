@@ -14,7 +14,6 @@ import CardCatalogImage from '@cardstack/web-client/images/illustrations/card-ca
 import CardMembershipImage from '@cardstack/web-client/images/illustrations/card-membership-illustration.svg';
 
 import '../css/cardstack-landing-page.css';
-import '../css/prose.css';
 
 const ORGS = [
   {
