@@ -1,5 +1,5 @@
 .card-pay-workflow-connect-layer-one {
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+  filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.15));
 }
 
 .card-pay-workflow-connect-layer-one__body {
@@ -15,4 +15,44 @@
 
 .card-pay-workflow-connect-layer-one__wallet-selection {
   margin-bottom: var(--boxel-sp-xl);
+}
+
+.card-pay-workflow-connect-layer-one__connection {
+  display: flex;
+  align-items: center;
+  padding: var(--boxel-sp);
+  font: 600 var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-xs);
+  margin-top: var(--boxel-sp-lg);
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.15));
+}
+
+.card-pay-workflow-connect-layer-one__connection-icons {
+  display: flex;
+  align-items: center;
+}
+
+.card-pay-workflow-connect-layer-one__connection-cardstack-logo {
+  width: 2.5rem;
+  height: 2.5rem;
+  object-fit: contain;
+}
+
+.card-pay-workflow-connect-layer-one__connection-wallet-logo {
+  width: 2.5rem;
+  height: 2.5rem;
+  box-shadow: 0 0 0 2px var(--boxel-purple-300);
+  border-radius: var(--boxel-border-radius);
+  padding: .25rem;
+  object-fit: contain;
+}
+
+.card-pay-workflow-connect-layer-one__connection-symbol {
+  width: 2rem;
+  height: 1rem;
+  object-fit: contain;
+}
+
+.card-pay-workflow-connet-layer-one__connection-text {
+  margin-left: var(--boxel-sp-lg);
 }
