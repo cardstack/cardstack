@@ -46,6 +46,9 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
       taskFor(this.connectWalletTask).perform();
     }
   }
+  @action cancelConnection() {
+    // TODO after connectors are added
+  }
   @action disconnect() {
     // TODO after connectors are added
   }
