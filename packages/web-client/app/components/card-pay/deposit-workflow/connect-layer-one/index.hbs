@@ -4,8 +4,8 @@
 <Boxel::Header
   @header="Wallet Connection - Ethereum Mainnet"
 />
-<section>
-  <header>Connect your Ethereum Mainnet wallet</header>
+<section class="card-pay-workflow-layer-one-connect__body">
+  <header class="card-pay-workflow-layer-one-connect__body-header">Connect your Ethereum mainnet wallet</header>
   {{#if this.hasAccount}}
     TODO: show wallet details and balances
   {{else}}
@@ -13,7 +13,7 @@
       @currentWalletId={{this.currentWalletId}}
       @changeWallet={{this.changeWallet}}
       @isConnecting={{this.isWaitingForConnection}}
-      class="card-pay-workflow-layer-one-connect"
+      class="card-pay-workflow-layer-one-connect__wallet-selection"
     />
   {{/if}}
 </section>
