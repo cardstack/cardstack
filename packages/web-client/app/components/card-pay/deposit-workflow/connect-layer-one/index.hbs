@@ -1,19 +1,20 @@
 <Boxel::CardContainer
+  class="card-pay-workflow-connect-layer-one"
   data-test-mainnnet-connection-action-container
 >
 <Boxel::Header
   @header="Wallet Connection - Ethereum Mainnet"
 />
-<section class="card-pay-workflow-layer-one-connect__body">
-  <header class="card-pay-workflow-layer-one-connect__body-header">Connect your Ethereum mainnet wallet</header>
-  {{#if this.hasAccount}}
+<section class="card-pay-workflow-connect-layer-one__body">
+  <header class="card-pay-workflow-connect-layer-one__body-header">Connect your Ethereum mainnet wallet</header>
+  {{#if (eq this.cardState 'memorialized')}}
     TODO: show wallet details and balances
   {{else}}
     <CardPay::LayerOneWalletSelection
       @currentWalletId={{this.currentWalletId}}
       @changeWallet={{this.changeWallet}}
       @isConnecting={{this.isWaitingForConnection}}
-      class="card-pay-workflow-layer-one-connect__wallet-selection"
+      class="card-pay-workflow-connect-layer-one__wallet-selection"
     />
   {{/if}}
 </section>
