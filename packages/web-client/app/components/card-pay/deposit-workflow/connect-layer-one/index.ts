@@ -7,14 +7,24 @@ import { inject as service } from '@ember/service';
 import { taskFor } from 'ember-concurrency-ts';
 import { reads } from 'macro-decorators';
 import { next } from '@ember/runloop';
+import wallets from '../../../../utils/wallet-providers';
+
+import cardstackLogo from '@cardstack/web-client/images/icons/cardstack-logo-navy-rounded.svg';
+import connectionSymbol from '@cardstack/web-client/images/icons/connection-symbol.svg';
 
 interface CardPayDepositWorkflowConnectLayer1ComponentArgs {
   onComplete: (() => void) | undefined;
 }
 class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepositWorkflowConnectLayer1ComponentArgs> {
+  cardstackLogo = cardstackLogo;
+  connectionSymbol = connectionSymbol;
+  wallets = wallets;
+
   @service declare layer1Network: Layer1Network;
   @reads('layer1Network.hasAccount') declare hasAccount: boolean;
   @tracked isWaitingForConnection = false;
+  @tracked currentWalletId = '';
+
   constructor(
     owner: unknown,
     args: CardPayDepositWorkflowConnectLayer1ComponentArgs
@@ -26,10 +36,35 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
       });
     }
   }
-  @action onClickActionContainerButton() {
+  get currentWalletLogo(): string {
+    const currentWallet = this.wallets.find(
+      (wallet) => wallet.id === this.currentWalletId
+    );
+    if (currentWallet) return currentWallet.logo;
+    else return '';
+  }
+  get cardState(): string {
+    if (this.hasAccount) {
+      return 'memorialized';
+    } else if (this.isWaitingForConnection) {
+      return 'in-progress';
+    } else {
+      return 'default';
+    }
+  }
+  @action changeWallet(e: Event): void {
+    this.currentWalletId = (e.target as HTMLInputElement).id;
+  }
+  @action connect() {
     if (!this.hasAccount) {
       taskFor(this.connectWalletTask).perform();
     }
+  }
+  @action cancelConnection() {
+    // TODO after connectors are added
+  }
+  @action disconnect() {
+    // TODO after connectors are added
   }
   @task *connectWalletTask() {
     this.isWaitingForConnection = true;

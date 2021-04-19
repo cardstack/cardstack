@@ -1,0 +1,77 @@
+.card-pay-layer-one-wallet-selection__details {
+  --min-column-width: 15rem;
+  --max-column-width: 1fr;
+  --ideal-column-width: 19.875rem;
+  --row-height: 9.375rem;
+  --gap: var(--boxel-sp-lg);
+
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--min-column-width), var(--max-column-width)));
+  gap: var(--gap);
+  justify-items: center;
+}
+
+.card-pay-layer-one-wallet-selection-body {
+  padding: 0 var(--horizontal-padding);
+}
+
+.card-pay-layer-one-wallet-selection-body-header {
+  padding: var(--boxel-sp-xl) 0;
+  max-height: 6rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.card-pay-layer-one-wallet-selection__item {
+  height: var(--row-height);
+  width: 100%;
+  max-width: var(--ideal-column-width);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--boxel-sp-sm);
+  border-radius: var(--boxel-border-radius);
+  box-shadow: 0 0 0 1px var(--boxel-light-400);
+  transition: box-shadow var(--boxel-transition);
+}
+
+.card-pay-layer-one-wallet-selection__item-image {
+  width: 2.5rem;
+  height: 2.5rem;
+  object-fit: contain;
+  margin-bottom: var(--boxel-sp-xs);
+}
+
+.card-pay-layer-one-wallet-selection__item-name {
+  font: 600 var(--boxel-font);
+}
+
+.card-pay-layer-one-wallet-selection__item-description {
+  font: var(--boxel-font-sm);
+  color: var(--boxel-purple-400);
+  text-align: center;
+}
+
+.card-pay-layer-one-wallet-selection__cta {
+  width: 100%;
+}
+
+/* variants start here */
+.card-pay-layer-one-wallet-selection__item:hover:not(.card-pay-layer-one-wallet-selection__item--checked) {
+  box-shadow: 0 0 0 2px var(--boxel-purple-300);
+}
+
+.card-pay-layer-one-wallet-selection__item--checked {
+  box-shadow: 0 0 0 2px var(--boxel-highlight);
+}
+
+.card-pay-layer-one-wallet-selection__item-disabled {
+  pointer-events: none;
+}
+
+.card-pay-layer-one-wallet-selection__item-disabled:not(.card-pay-layer-one-wallet-selection__item--checked) {
+  opacity: 0.5;
+  box-shadow: 0 0 0 1px transparent;
+}
