@@ -97,7 +97,7 @@ module('Acceptance | deposit', function (hooks) {
       .dom(
         '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
       )
-      .hasText('0x18261…6E44');
+      .hasText('0x18261...6E44');
     await waitFor(milestoneCompletedSel(1));
     assert
       .dom(milestoneCompletedSel(1))
@@ -217,7 +217,7 @@ module('Acceptance | deposit', function (hooks) {
       .dom(
         '[data-test-card-pay-layer-1-connect] [data-test-card-pay-connect-button]'
       )
-      .hasText('0xaCD5f…4Fb6');
+      .hasText('0xaCD5f...4Fb6');
     assert.dom('[data-test-layer-one-connect-modal]').doesNotExist();
 
     await click('[data-test-card-pay-header-tab][href="/card-pay/balances"]');
@@ -279,7 +279,7 @@ module('Acceptance | deposit', function (hooks) {
       .dom(
         '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
       )
-      .hasText('0x18261…6E44');
+      .hasText('0x18261...6E44');
     await waitFor(milestoneCompletedSel(1));
     assert
       .dom(milestoneCompletedSel(1))
@@ -314,7 +314,7 @@ module('Acceptance | deposit', function (hooks) {
       .dom(
         '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
       )
-      .hasText('0x18261…6E44');
+      .hasText('0x18261...6E44');
     assert.dom('[data-test-layer-two-connect-modal]').doesNotExist();
 
     await click('[data-test-card-pay-header-tab][href="/card-pay/balances"]');

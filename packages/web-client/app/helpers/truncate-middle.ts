@@ -6,7 +6,7 @@ export function truncateMiddle(
   if (input && input.length <= startLength + endLength) {
     return input;
   } else if (input) {
-    return `${input.substring(0, startLength)}…${input.substring(
+    return `${input.substring(0, startLength)}...${input.substring(
       input.length - endLength
     )}`;
   }

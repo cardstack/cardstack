@@ -5,16 +5,16 @@
     <h2 class="org-card__name">{{@org.name}}</h2>
     <span>{{@org.subtitle}}</span>
     {{#if @org.description}}
-      <span class="org-card__description">
+      <p class="org-card__description">
         {{@org.description}}
-      </span>
-    {{/if}}
-    {{#if (and @org.descriptionList @org.descriptionList.length)}}
-      <ul class="org-card__description-list">
-        {{#each @org.descriptionList as |descriptionListItem|}}
-        <li>{{descriptionListItem}}</li>
-        {{/each}}
-      </ul>
+        {{#if (and @org.descriptionList @org.descriptionList.length)}}
+          <ul class="org-card__description-list">
+            {{#each @org.descriptionList as |descriptionListItem|}}
+            <li>{{descriptionListItem}}</li>
+            {{/each}}
+          </ul>
+        {{/if}}
+      </p>
     {{/if}}
   <Boxel::Button class="org-card__cta" @as="link-to" @kind="primary" @disabled={{not @org.launched}} @route={{@route}} data-test-cardstack-org-link={{@org.id}}>{{@org.cta}}</Boxel::Button>
   </div>

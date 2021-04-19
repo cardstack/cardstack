@@ -1,6 +1,7 @@
 .card-pay-header {
   --boxel-org-header-background-color: var(--boxel-dark);
   --boxel-org-header-color: var(--boxel-light);
+  --boxel-org-header-logo-size: 2.5rem; /* 40px */
 
   display: flex;
   flex-wrap: wrap;
@@ -34,7 +35,7 @@
 
 .card-pay-header__item {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: 4rem max-content;
   align-items: center;
   gap: var(--boxel-sp);
 }

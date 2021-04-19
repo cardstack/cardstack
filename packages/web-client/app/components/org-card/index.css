@@ -18,7 +18,7 @@
   width: 4.375rem;
   height: 4.375rem;
   padding: 1rem;
-  background-color: var(--boxel-dark);
+  background-color: var(--boxel-navy);
   border-radius: 1rem;
 }
 
@@ -35,6 +35,7 @@
 }
 
 .org-card__description {
+  color: var(--boxel-purple-500);
   font: 600 var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
   margin-bottom: 0;
@@ -46,6 +47,11 @@
   font: var(--boxel-font-sm);
   margin-bottom: 0;
   margin-top: var(--boxel-sp-xxxs);
+  padding-left: 0;
+}
+
+.org-card__description-list li::marker {
+  color: var(--boxel-dark);
 }
 
 .org-card__content {
