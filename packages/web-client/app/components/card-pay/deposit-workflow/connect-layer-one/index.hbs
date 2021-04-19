@@ -20,7 +20,7 @@
 </section>
 <Boxel::CtaBlock @state={{this.cardState}}>
   <:default as |a|>
-    <a.ActionButton {{on "click" this.onClickActionContainerButton}}>
+    <a.ActionButton {{on "click" this.connect}}>
       Connect Wallet
     </a.ActionButton>
   </:default>
@@ -33,7 +33,7 @@
     </i.CancelButton>
   </:in-progress>
   <:memorialized as |m|>
-    <m.ActionButton {{on "click" this.onClickActionContainerButton}}>
+    <m.ActionButton {{on "click" this.disconnect}}>
       Disconnect Wallet
     </m.ActionButton>
   </:memorialized>

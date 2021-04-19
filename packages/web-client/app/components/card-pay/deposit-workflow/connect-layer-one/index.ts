@@ -41,10 +41,13 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
   @action changeWallet(e: Event): void {
     this.currentWalletId = (e.target as HTMLInputElement).id;
   }
-  @action onClickActionContainerButton() {
+  @action connect() {
     if (!this.hasAccount) {
       taskFor(this.connectWalletTask).perform();
     }
+  }
+  @action disconnect() {
+    // TODO after connectors are added
   }
   @task *connectWalletTask() {
     this.isWaitingForConnection = true;
