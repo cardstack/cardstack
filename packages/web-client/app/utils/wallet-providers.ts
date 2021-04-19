@@ -1,5 +1,3 @@
-import Component from '@glimmer/component';
-
 import metamaskLogo from '@cardstack/web-client/images/logos/metamask-logo.svg';
 import walletConnectLogo from '@cardstack/web-client/images/logos/wallet-connect-logo.svg';
 import torusLogo from '@cardstack/web-client/images/logos/torus-logo.svg';
@@ -7,7 +5,7 @@ import fortmaticLogo from '@cardstack/web-client/images/logos/fortmatic-logo.svg
 import authereumLogo from '@cardstack/web-client/images/logos/authereum-logo.svg';
 import bitskiLogo from '@cardstack/web-client/images/logos/bitski-logo.svg';
 
-const wallets = [
+const walletProviders = [
   {
     id: 'metamask',
     name: 'Metamask',
@@ -40,6 +38,4 @@ const wallets = [
   },
 ];
 
-export default class CardPayLayerOneWalletSelection extends Component {
-  wallets = wallets;
-}
+export default walletProviders;

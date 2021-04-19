@@ -11,6 +11,7 @@
     TODO: show wallet details and balances
   {{else}}
     <CardPay::LayerOneWalletSelection
+      @wallets={{this.wallets}}
       @currentWalletId={{this.currentWalletId}}
       @changeWallet={{this.changeWallet}}
       @isConnecting={{this.isWaitingForConnection}}

@@ -7,6 +7,7 @@ import { inject as service } from '@ember/service';
 import { taskFor } from 'ember-concurrency-ts';
 import { reads } from 'macro-decorators';
 import { next } from '@ember/runloop';
+import wallets from '../../../../utils/wallet-providers';
 
 interface CardPayDepositWorkflowConnectLayer1ComponentArgs {
   onComplete: (() => void) | undefined;
@@ -15,6 +16,8 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
   @service declare layer1Network: Layer1Network;
   @reads('layer1Network.hasAccount') declare hasAccount: boolean;
   @tracked isWaitingForConnection = false;
+
+  wallets = wallets;
   @tracked currentWalletId = '';
 
   get cardState(): string {
