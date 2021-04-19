@@ -6,19 +6,7 @@ import QUnit from 'qunit';
 import { join } from 'path';
 import tmp from 'tmp';
 import { ensureDirSync, outputJSONSync } from 'fs-extra';
-
-// TODO: share this in core
-export function templateOnlyComponentTemplate(template: string): string {
-  return `import { setComponentTemplate } from '@ember/component';
-  import { precompileTemplate } from '@ember/template-compilation';
-  import templateOnlyComponent from '@ember/component/template-only';
-  export default setComponentTemplate(
-    precompileTemplate('${template}', {
-      strictMode: true,
-    }),
-    templateOnlyComponent()
-  );`;
-}
+import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 
 QUnit.module('Card Data', function (hooks) {
   let realm: Project;

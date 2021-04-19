@@ -3,7 +3,7 @@ import { visit, currentURL } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import setupCardMocking from '../helpers/card-mocking';
 import { setupMirage } from 'ember-cli-mirage/test-support';
-import { templateOnlyComponentTemplate } from '../helpers/template-compiler';
+import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/template-compiler';
 
 module('Acceptance | card routing', function (hooks) {
   setupApplicationTest(hooks);

@@ -10,7 +10,7 @@ async function run() {
       directory: join(__dirname, '..', '..', 'base-cards'),
     },
     {
-      url: 'http://demo.com/cards/',
+      url: 'https://demo.com/cards/',
       directory: join(__dirname, '..', '..', 'demo-cards'),
     },
   ];

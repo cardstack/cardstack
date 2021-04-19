@@ -1,10 +1,8 @@
 import { module, test, skip } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
-import {
-  compileTemplate,
-  templateOnlyComponentTemplate,
-} from '../helpers/template-compiler';
+import { compileTemplate } from '../helpers/template-compiler';
+import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import setupCardMocking from '../helpers/card-mocking';
 import Builder from 'cardhost/lib/builder';

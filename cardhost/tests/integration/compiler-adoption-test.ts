@@ -4,7 +4,7 @@ import { setupMirage } from 'ember-cli-mirage/test-support';
 import setupCardMocking from '../helpers/card-mocking';
 import Builder from 'cardhost/lib/builder';
 import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
-import { templateOnlyComponentTemplate } from '../helpers/template-compiler';
+import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 
 module('Integration | compiler-adoption', function (hooks) {
   setupRenderingTest(hooks);

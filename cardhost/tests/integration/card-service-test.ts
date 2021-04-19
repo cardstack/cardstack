@@ -5,7 +5,7 @@ import { hbs } from 'ember-cli-htmlbars';
 import type Cards from 'cardhost/services/cards';
 import setupCardMocking from '../helpers/card-mocking';
 import { setupMirage } from 'ember-cli-mirage/test-support';
-import { templateOnlyComponentTemplate } from '../helpers/template-compiler';
+import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 
 module('Integration | card-service', function (hooks) {
   setupRenderingTest(hooks);
