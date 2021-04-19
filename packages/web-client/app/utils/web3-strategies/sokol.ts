@@ -3,12 +3,12 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 import Web3 from 'web3';
 import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
-import { Web3Strategy } from './types';
+import { Layer2Web3Strategy } from './types';
 import { IConnector } from '@walletconnect/types';
 import WalletInfo from '../wallet-info';
 import { defer } from 'rsvp';
 
-export default class SokolWeb3Strategy implements Web3Strategy {
+export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   chainName = 'Sokol Testnet';
   chainId = 77;
   provider = new WalletConnectProvider({
@@ -31,12 +31,8 @@ export default class SokolWeb3Strategy implements Web3Strategy {
     // super(...arguments);
     this.initialize();
   }
-  unlock(): Promise<void> {
-    throw new Error('Method not implemented.');
-  }
-  deposit(): Promise<void> {
-    throw new Error('Method not implemented.');
-  }
+
+  @tracked xdaiBalance: number | undefined;
 
   async initialize() {
     this.connector.on('display_uri', (err, payload) => {

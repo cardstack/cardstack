@@ -9,6 +9,8 @@ import {
   waitUntil,
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
+import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
+import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -58,8 +60,13 @@ module('Acceptance | deposit', function (hooks) {
       .containsText('Connect your Ethereum mainnet wallet');
 
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-    let layer1Service = this.owner.lookup('service:layer1-network');
+    let layer1Service = this.owner.lookup('service:layer1-network')
+      .strategy as Layer1TestWeb3Strategy;
     layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
+
+    // TODO: assert ETH balance showing on Layer 1 connect card
+    // TODO: assert DAI balance showing on Layer 1 connect card
+    // TODO: assert CARD balance showing on Layer 1 connect card
 
     await waitFor(milestoneCompletedSel(0));
     assert
@@ -82,7 +89,8 @@ module('Acceptance | deposit', function (hooks) {
       .dom(`${postableSel(1, 2)} [data-test-wallet-connect-loading-qr-code]`)
       .exists();
 
-    let layer2Service = this.owner.lookup('service:layer2-network');
+    let layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
     layer2Service.test__simulateWalletConnectUri();
     await waitFor('[data-test-wallet-connect-qr-code]');
     assert.dom('[data-test-wallet-connect-qr-code]').exists();
@@ -206,7 +214,8 @@ module('Acceptance | deposit', function (hooks) {
       '[data-test-card-pay-layer-1-connect] [data-test-card-pay-connect-button]'
     );
     assert.dom('[data-test-layer-one-connect-modal]').exists();
-    let layer1Service = this.owner.lookup('service:layer1-network');
+    let layer1Service = this.owner.lookup('service:layer1-network')
+      .strategy as Layer1TestWeb3Strategy;
 
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
@@ -264,7 +273,8 @@ module('Acceptance | deposit', function (hooks) {
       .dom(postableSel(1, 2))
       .containsText('Loading QR Code for Cardstack Mobile wallet connection');
 
-    let layer2Service = this.owner.lookup('service:layer2-network');
+    let layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
     layer2Service.test__simulateWalletConnectUri();
     await waitFor('[data-test-wallet-connect-qr-code]');
     assert.dom('[data-test-wallet-connect-qr-code]').exists();
@@ -298,7 +308,8 @@ module('Acceptance | deposit', function (hooks) {
       '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
     );
     assert.dom('[data-test-layer-two-connect-modal]').exists();
-    let layer2Service = this.owner.lookup('service:layer2-network');
+    let layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
 
     layer2Service.test__simulateWalletConnectUri();
     await waitFor('[data-test-wallet-connect-qr-code]');
@@ -328,7 +339,8 @@ module('Acceptance | deposit', function (hooks) {
     );
 
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-    let layer1Service = this.owner.lookup('service:layer1-network');
+    let layer1Service = this.owner.lookup('service:layer1-network')
+      .strategy as Layer1TestWeb3Strategy;
     layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
 
     await waitFor(milestoneCompletedSel(0));

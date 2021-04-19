@@ -1,7 +1,7 @@
 import Service from '@ember/service';
 import config from '../config/environment';
-import { Web3Strategy } from '../utils/web3-strategies/types';
-import TestWeb3Strategy from '../utils/web3-strategies/test';
+import { Layer1Web3Strategy } from '../utils/web3-strategies/types';
+import Layer1TestWeb3Strategy from '../utils/web3-strategies/test-layer1';
 import EthWeb3Strategy from '../utils/web3-strategies/ethereum';
 import KovanWeb3Strategy from '../utils/web3-strategies/kovan';
 import { reads } from 'macro-decorators';
@@ -9,7 +9,7 @@ import WalletInfo from '../utils/wallet-info';
 import { task } from 'ember-concurrency-decorators';
 
 export default class Layer1Network extends Service {
-  strategy!: Web3Strategy;
+  strategy!: Layer1Web3Strategy;
   @reads('strategy.isConnected', false) isConnected!: boolean;
   @reads('strategy.walletConnectUri') walletConnectUri: string | undefined;
   @reads('strategy.walletInfo', new WalletInfo([], -1)) walletInfo!: WalletInfo;
@@ -26,7 +26,7 @@ export default class Layer1Network extends Service {
         this.strategy = new EthWeb3Strategy();
         break;
       case 'test':
-        this.strategy = new TestWeb3Strategy();
+        this.strategy = new Layer1TestWeb3Strategy();
         break;
     }
   }
@@ -35,32 +35,24 @@ export default class Layer1Network extends Service {
     return this.walletInfo.accounts.length > 0;
   }
 
+  get defaultTokenBalance() {
+    return this.strategy.defaultTokenBalance;
+  }
+
+  daiTokenBalance() {
+    return this.strategy.daiBalance;
+  }
+
+  cardTokenBalance() {
+    return this.strategy.cardBalance;
+  }
+
   @task *unlock() {
     yield this.strategy.unlock();
   }
 
   @task *deposit() {
     yield this.strategy.deposit();
-  }
-
-  test__simulateWalletConnectUri() {
-    let strategy = this.strategy as TestWeb3Strategy;
-    strategy.test__simulateWalletConnectUri();
-  }
-
-  test__simulateAccountsChanged(accounts: string[]) {
-    let strategy = this.strategy as TestWeb3Strategy;
-    strategy.test__simulateAccountsChanged(accounts);
-  }
-
-  test__simulateUnlock() {
-    let strategy = this.strategy as TestWeb3Strategy;
-    strategy.test__simulateUnlock();
-  }
-
-  test__simulateDeposit() {
-    let strategy = this.strategy as TestWeb3Strategy;
-    strategy.test__simulateDeposit();
   }
 }
 

@@ -7,6 +7,7 @@ import {
   waitUntil,
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
+import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 
 module('Acceptance | Connect Wallet', function (hooks) {
   setupApplicationTest(hooks);
@@ -20,7 +21,9 @@ module('Acceptance | Connect Wallet', function (hooks) {
     await click(
       '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
     );
-    let layer2Service = this.owner.lookup('service:layer2-network');
+    let layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
+
     layer2Service.test__simulateWalletConnectUri();
     await waitFor('[data-test-wallet-connect-qr-code]');
     assert.dom('[data-test-wallet-connect-qr-code]').exists();

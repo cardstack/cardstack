@@ -1,15 +1,21 @@
 import { tracked } from '@glimmer/tracking';
 import WalletInfo from '../wallet-info';
-import { Web3Strategy } from './types';
+import { Layer1Web3Strategy } from './types';
 import { defer } from 'rsvp';
 import RSVP from 'rsvp';
 
-export default class TestWeb3Strategy implements Web3Strategy {
-  chainName = 'Test Chain';
-  chainId = '-1';
+export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
+  chainName = 'L1 Test Chain';
+  chainId = -1;
   @tracked walletConnectUri: string | undefined;
   @tracked isConnected = false;
   @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
+
+  // Balances are settable in this test implementation
+  @tracked defaultTokenBalance: number | undefined;
+  @tracked daiBalance: number | undefined;
+  @tracked cardBalance: number | undefined;
+
   waitForAccountDeferred = defer();
   #unlockDeferred: RSVP.Deferred<void> | undefined;
   #depositDeferred: RSVP.Deferred<void> | undefined;
