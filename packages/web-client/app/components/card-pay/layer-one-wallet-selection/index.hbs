@@ -18,6 +18,7 @@
       "card-pay-layer-one-wallet-selection__item"
       card-pay-layer-one-wallet-selection__item-disabled=@isConnecting
     }}
+    data-test-wallet-option={{item.data.id}}
   >
     {{!-- semantics are swallowed by label element so not using hx elements here --}}
     <img src={{item.data.logo}} alt="" role="presentation" class="card-pay-layer-one-wallet-selection__item-image">
