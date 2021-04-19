@@ -15,6 +15,8 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
   @service declare layer1Network: Layer1Network;
   @reads('layer1Network.hasAccount') declare hasAccount: boolean;
   @tracked isWaitingForConnection = false;
+  @tracked currentWalletId = '';
+
   constructor(
     owner: unknown,
     args: CardPayDepositWorkflowConnectLayer1ComponentArgs
@@ -25,6 +27,9 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
         this.args.onComplete?.();
       });
     }
+  }
+  @action changeWallet(e: Event): void {
+    this.currentWalletId = (e.target as HTMLInputElement).id;
   }
   @action onClickActionContainerButton() {
     if (!this.hasAccount) {
