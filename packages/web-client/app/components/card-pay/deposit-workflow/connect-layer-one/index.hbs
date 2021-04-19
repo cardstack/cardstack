@@ -1,11 +1,11 @@
-<Boxel::ActionContainer
-  @header="Wallet Connection - Ethereum Mainnet"
-  @prompt="Connect your Ethereum Mainnet wallet"
-  @incompleteActionLabel="Connect Wallet"
-  @completeActionLabel="Disconnect Mainnet Wallet"
-  @onClickButton={{this.onClickActionContainerButton}}
+<Boxel::CardContainer
   data-test-mainnnet-connection-action-container
 >
+<Boxel::Header
+  @header="Wallet Connection - Ethereum Mainnet"
+/>
+<section>
+  <header>Connect your Ethereum Mainnet wallet</header>
   {{#if this.hasAccount}}
     TODO: show wallet details and balances
   {{else}}
@@ -16,4 +16,25 @@
       class="card-pay-workflow-layer-one-connect"
     />
   {{/if}}
-</Boxel::ActionContainer>
+</section>
+<Boxel::CtaBlock @state={{this.cardState}}>
+  <:default as |a|>
+    <a.ActionButton {{on "click" this.onClickActionContainerButton}}>
+      Connect Wallet
+    </a.ActionButton>
+  </:default>
+  <:in-progress as |i|>
+    <i.ActionButton>
+      Connecting
+    </i.ActionButton>
+    <i.CancelButton>
+      Cancel
+    </i.CancelButton>
+  </:in-progress>
+  <:memorialized as |m|>
+    <m.ActionButton {{on "click" this.onClickActionContainerButton}}>
+      Disconnect Wallet
+    </m.ActionButton>
+  </:memorialized>
+</Boxel::CtaBlock>
+</Boxel::CardContainer>

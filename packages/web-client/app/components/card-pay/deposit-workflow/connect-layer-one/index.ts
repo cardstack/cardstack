@@ -17,6 +17,16 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
   @tracked isWaitingForConnection = false;
   @tracked currentWalletId = '';
 
+  get cardState(): string {
+    if (this.hasAccount) {
+      return 'memorialized';
+    } else if (this.isWaitingForConnection) {
+      return 'in-progress';
+    } else {
+      return 'default';
+    }
+  }
+
   constructor(
     owner: unknown,
     args: CardPayDepositWorkflowConnectLayer1ComponentArgs
