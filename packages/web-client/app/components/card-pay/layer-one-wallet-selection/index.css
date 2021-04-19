@@ -34,6 +34,7 @@
   padding: var(--boxel-sp-sm);
   border-radius: var(--boxel-border-radius);
   box-shadow: 0 0 0 1px var(--boxel-light-400);
+  transition: box-shadow var(--boxel-transition);
 }
 
 .card-pay-layer-one-wallet-selection__item-image {
