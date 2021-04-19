@@ -1,20 +1,23 @@
 import Builder from './builder';
-import { RealmConfig } from './interfaces';
 import { glob } from 'glob';
 import { rmSync } from 'fs';
 import { join } from 'path';
 import walkSync from 'walk-sync';
 import sane from 'sane';
 import { sep } from 'path';
+import { RealmConfig } from '@cardstack/core/src/interfaces';
 
-export function cleanCache(dir: string) {
+export function cleanCache(dir: string): void {
   console.debug('Cleaning cardCache dir: ' + dir);
   for (let file of glob.sync('**/http*', { cwd: dir })) {
     rmSync(join(dir, file));
   }
 }
 
-export async function primeCache(realms: RealmConfig[], builder: Builder) {
+export async function primeCache(
+  realms: RealmConfig[],
+  builder: Builder
+): Promise<void> {
   let promises = [];
 
   for (let realm of realms) {

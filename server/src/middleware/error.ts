@@ -15,5 +15,7 @@ export async function errorMiddleware(ctx: any, next: any) {
       status,
       title,
     });
+
+    console.error(err);
   }
 }

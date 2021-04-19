@@ -17,7 +17,7 @@ import {
   mkdirpSync,
 } from 'fs-extra';
 import { join, dirname } from 'path';
-import { NotFound } from './error';
+import { NotFound } from './middleware/error';
 import { transformSync } from '@babel/core';
 
 class CardCache {

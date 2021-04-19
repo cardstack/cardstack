@@ -1,17 +1,15 @@
 import type Koa from 'koa';
 import { Project } from 'scenario-tester';
-import { Server } from '../src/server';
 import supertest from 'supertest';
 import QUnit from 'qunit';
 import { join } from 'path';
-import tmp from 'tmp';
-import { ensureDirSync, outputJSONSync } from 'fs-extra';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
+import { setupCardCache } from './helpers/cache';
+import { Server } from '../src/server';
 
-QUnit.module('Card Data', function (hooks) {
+QUnit.module('respondWithCard', function (hooks) {
   let realm: Project;
   let server: Koa;
-  let tempDir: string;
 
   function getCard(cardURL: string) {
     return supertest(server.callback()).get(
@@ -19,9 +17,7 @@ QUnit.module('Card Data', function (hooks) {
     );
   }
 
-  function resolveCard(modulePath: string): string {
-    return require.resolve(modulePath, { paths: [tempDir] });
-  }
+  let { resolveCard, getCardCacheDir } = setupCardCache(hooks);
 
   hooks.beforeEach(async function () {
     realm = new Project('my-realm', {
@@ -61,26 +57,9 @@ QUnit.module('Card Data', function (hooks) {
 
     // setting up a card cache directory that is also a resolvable node_modules
     // package with the appropriate exports rules
-    tempDir = tmp.dirSync().name;
-    let cardCacheDir = join(tempDir, 'node_modules', '@cardstack', 'compiled');
-    ensureDirSync(cardCacheDir);
-    outputJSONSync(join(cardCacheDir, 'package.json'), {
-      name: '@cardstack/compiled',
-      exports: {
-        '.': {
-          browser: './browser',
-          default: './node',
-        },
-        './*': {
-          browser: './browser/*',
-          default: './node/*',
-        },
-      },
-    });
-
     server = (
       await Server.create({
-        cardCacheDir,
+        cardCacheDir: getCardCacheDir(),
         realms: [
           { url: 'https://my-realm', directory: realm.baseDir },
           {
