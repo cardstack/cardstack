@@ -1,10 +1,12 @@
+import { A } from '@ember/array';
 import { Milestone } from './workflow/milestone';
+import PostableCollection from './workflow/postable-collection';
 import { WorkflowPostable } from './workflow/workflow-postable';
 
 export abstract class Workflow {
   name!: string;
   milestones: Milestone[] = [];
-  epiloguePostables: WorkflowPostable[] = [];
+  epilogue: PostableCollection = new PostableCollection();
   owner: any;
 
   constructor(owner: any) {
@@ -13,11 +15,15 @@ export abstract class Workflow {
 
   attachWorkflow() {
     this.milestones.invoke('setWorkflow', this);
-    this.epiloguePostables.invoke('setWorkflow', this);
+    this.epilogue.setWorkflow(this);
   }
 
   get completedMilestoneCount() {
     return this.milestones.filterBy('isComplete').length;
+  }
+
+  get isComplete() {
+    return A(this.milestones).isEvery('isComplete');
   }
 
   get progressStatus() {
@@ -30,6 +36,9 @@ export abstract class Workflow {
     let result: WorkflowPostable[] = [];
     for (const milestone of this.milestones) {
       result = result.concat(milestone.peekAtVisiblePostables());
+    }
+    if (this.isComplete) {
+      result = result.concat(this.epilogue.peekAtVisiblePostables());
     }
     return result;
   }

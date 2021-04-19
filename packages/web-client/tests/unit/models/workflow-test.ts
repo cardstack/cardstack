@@ -38,7 +38,7 @@ module('Unit | Workflow model', function (hooks) {
   test('attachWorkflow sets workflow on epiloguePostables', function (assert) {
     let workflow = new ConcreteWorkflow({});
     workflow.milestones = [exampleMilestone];
-    workflow.epiloguePostables = [exampleMessage];
+    workflow.epilogue.postables = [exampleMessage];
     assert.ok(!exampleMessage.workflow);
     workflow.attachWorkflow();
     assert.strictEqual(workflow, exampleMessage.workflow);
