@@ -7,10 +7,11 @@ import { inject as service } from '@ember/service';
 import { taskFor } from 'ember-concurrency-ts';
 import { reads } from 'macro-decorators';
 import { next } from '@ember/runloop';
-import wallets from '../../../../utils/wallet-providers';
+import walletProviders from '../../../../utils/wallet-providers';
 
 import cardstackLogo from '@cardstack/web-client/images/icons/cardstack-logo-navy-rounded.svg';
 import connectionSymbol from '@cardstack/web-client/images/icons/connection-symbol.svg';
+import { WalletProvider } from '../../../../utils/wallet-providers';
 
 interface CardPayDepositWorkflowConnectLayer1ComponentArgs {
   onComplete: (() => void) | undefined;
@@ -18,12 +19,12 @@ interface CardPayDepositWorkflowConnectLayer1ComponentArgs {
 class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepositWorkflowConnectLayer1ComponentArgs> {
   cardstackLogo = cardstackLogo;
   connectionSymbol = connectionSymbol;
-  wallets = wallets;
+  walletProviders = walletProviders;
 
   @service declare layer1Network: Layer1Network;
   @reads('layer1Network.hasAccount') declare hasAccount: boolean;
   @tracked isWaitingForConnection = false;
-  @tracked currentWalletId = '';
+  @tracked currentWalletProviderId = '';
 
   constructor(
     owner: unknown,
@@ -36,11 +37,14 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
       });
     }
   }
-  get currentWalletLogo(): string {
-    const currentWallet = this.wallets.find(
-      (wallet) => wallet.id === this.currentWalletId
+  get currentWalletProvider(): WalletProvider | undefined {
+    return this.walletProviders.find(
+      (walletProvider) => walletProvider.id === this.currentWalletProviderId
     );
-    if (currentWallet) return currentWallet.logo;
+  }
+  get currentWalletLogo(): string {
+    let { currentWalletProvider } = this;
+    if (currentWalletProvider) return currentWalletProvider.logo;
     else return '';
   }
   get cardState(): string {
@@ -52,8 +56,8 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
       return 'default';
     }
   }
-  @action changeWallet(e: Event): void {
-    this.currentWalletId = (e.target as HTMLInputElement).id;
+  @action changeWalletProvider(e: Event): void {
+    this.currentWalletProviderId = (e.target as HTMLInputElement).id;
   }
   @action connect() {
     if (!this.hasAccount) {
@@ -68,7 +72,9 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
   }
   @task *connectWalletTask() {
     this.isWaitingForConnection = true;
-    yield this.layer1Network.waitForAccount;
+    if (this.currentWalletProvider) {
+      yield this.layer1Network.connect(this.currentWalletProvider);
+    }
     this.isWaitingForConnection = false;
     this.args.onComplete?.();
   }

@@ -5,7 +5,13 @@ import fortmaticLogo from '@cardstack/web-client/images/logos/fortmatic-logo.svg
 import authereumLogo from '@cardstack/web-client/images/logos/authereum-logo.svg';
 import bitskiLogo from '@cardstack/web-client/images/logos/bitski-logo.svg';
 
-const walletProviders = [
+export interface WalletProvider {
+  id: string;
+  name: string;
+  logo: string;
+}
+
+const walletProviders: WalletProvider[] = [
   {
     id: 'metamask',
     name: 'Metamask',
