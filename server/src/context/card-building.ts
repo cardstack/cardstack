@@ -1,7 +1,16 @@
-import { ENVIRONMENTS, ServerKoa } from '../interfaces';
+import { ServerKoa } from '../interfaces';
 import Builder from '../builder';
 import { ServerOptions } from '../interfaces';
 import isEqual from 'lodash/isEqual';
+
+const EXPORTS_PATHS = ['.', './*'];
+const EXPORTS_ENVIRONMENTS = ['browser', 'default'];
+
+function hasValidExports(pkg: any): boolean {
+  return EXPORTS_PATHS.every((key) => {
+    return pkg[key] && isEqual(Object.keys(pkg[key]), EXPORTS_ENVIRONMENTS);
+  });
+}
 
 function validatePackageJson(cardCacheDir: string): void {
   let pkg;
@@ -11,11 +20,7 @@ function validatePackageJson(cardCacheDir: string): void {
     throw new Error('package.json is required in cardCacheDir');
   }
 
-  let e = pkg.exports;
-  if (
-    (!e['.'] || !isEqual(Object.keys(e['.']), ENVIRONMENTS)) &&
-    (!e['./*'] || !isEqual(Object.keys(e['./*']), ENVIRONMENTS))
-  ) {
+  if (!hasValidExports(pkg.exports)) {
     throw new Error(
       'package.json of cardCacheDir does not have properly configured exports'
     );

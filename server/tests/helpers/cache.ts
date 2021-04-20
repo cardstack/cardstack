@@ -18,27 +18,39 @@ export const MINIMAL_PACKAGE = {
   },
 };
 
+export function createCardCacheDir() {
+  let tmpDir = tmp.dirSync().name;
+  let cardCacheDir = join(tmpDir, 'node_modules', '@cardstack', 'compiled');
+  ensureDirSync(cardCacheDir);
+
+  return { tmpDir, cardCacheDir };
+}
+
+export function createMinimalPackageJSON(cardCacheDir: string): void {
+  outputJSONSync(join(cardCacheDir, 'package.json'), MINIMAL_PACKAGE);
+}
+
 export function setupCardCache(
   hooks: NestedHooks
 ): {
   resolveCard: (modulePath: string) => string;
   getCardCacheDir: () => string;
 } {
-  let tmpDir: string, cardCacheDir: string;
+  let _tmpDir: string, _cardCacheDir: string;
 
   function resolveCard(modulePath: string): string {
-    return require.resolve(modulePath, { paths: [tmpDir] });
+    return require.resolve(modulePath, { paths: [_tmpDir] });
   }
 
   function getCardCacheDir(): string {
-    return cardCacheDir;
+    return _cardCacheDir;
   }
 
   hooks.beforeEach(function () {
-    tmpDir = tmp.dirSync().name;
-    cardCacheDir = join(tmpDir, 'node_modules', '@cardstack', 'compiled');
-    ensureDirSync(cardCacheDir);
-    outputJSONSync(join(cardCacheDir, 'package.json'), MINIMAL_PACKAGE);
+    let { tmpDir, cardCacheDir } = createCardCacheDir();
+    createMinimalPackageJSON(cardCacheDir);
+    _tmpDir = tmpDir;
+    _cardCacheDir = cardCacheDir;
   });
 
   return { resolveCard, getCardCacheDir };

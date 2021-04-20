@@ -2,10 +2,10 @@ import type Koa from 'koa';
 import { Project } from 'scenario-tester';
 import supertest from 'supertest';
 import QUnit from 'qunit';
-import { join } from 'path';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { setupCardCache } from './helpers/cache';
 import { Server } from '../src/server';
+import { BASE_CARD_REALM_CONFIG } from './helpers/fixtures';
 
 QUnit.module('respondWithCard', function (hooks) {
   let realm: Project;
@@ -62,10 +62,7 @@ QUnit.module('respondWithCard', function (hooks) {
         cardCacheDir: getCardCacheDir(),
         realms: [
           { url: 'https://my-realm', directory: realm.baseDir },
-          {
-            url: 'https://cardstack.com/base',
-            directory: join(__dirname, '..', '..', 'base-cards'),
-          },
+          BASE_CARD_REALM_CONFIG,
         ],
       })
     ).app;

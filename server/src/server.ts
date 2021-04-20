@@ -7,8 +7,8 @@ import sane from 'sane';
 import { cleanCache, primeCache, setupWatchers } from './watcher';
 import { errorMiddleware } from './middleware/error';
 import { ServerOptions } from './interfaces';
-import { setupCardBuilding } from './middleware/card-building';
-import { setupCardRouting } from './middleware/card-routing';
+import { setupCardBuilding } from './context/card-building';
+import { setupCardRouting } from './context/card-routing';
 import { respondWithCard } from './routes/card-route';
 
 export class Server {
@@ -25,7 +25,7 @@ export class Server {
     setupCardBuilding(app, { realms, cardCacheDir });
 
     if (routeCard) {
-      await setupCardRouting(app, koaRouter, { routeCard });
+      await setupCardRouting(app, koaRouter, { routeCard, cardCacheDir });
     }
 
     koaRouter.get(`/cards/:encodedCardURL`, respondWithCard);

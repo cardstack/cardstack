@@ -1,23 +1,13 @@
 import tmp from 'tmp';
 import { ensureDirSync, outputJSONSync } from 'fs-extra';
 import { join } from 'path';
-import type Koa from 'koa';
 import QUnit from 'qunit';
 import { Server } from '../src/server';
-// import { Project } from 'scenario-tester';
-// import { setupCardCache } from './helpers/cache';
-
-const realms = [
-  // { url: 'https://my-realm', directory: realm.baseDir },
-  {
-    url: 'https://cardstack.com/base',
-    directory: join(__dirname, '..', '..', 'base-cards'),
-  },
-];
+import { createCardCacheDir, createMinimalPackageJSON } from './helpers/cache';
+import { Project } from 'scenario-tester';
+import { BASE_CARD_REALM_CONFIG } from './helpers/fixtures';
 
 QUnit.module('Server boot', function () {
-  let server: Koa;
-
   QUnit.test(
     'Errors if cacheDir doesnt have a package.json in cardCarchDir',
     async function (assert) {
@@ -28,14 +18,14 @@ QUnit.module('Server boot', function () {
       assert.rejects(
         Server.create({
           cardCacheDir,
-          realms,
+          realms: [BASE_CARD_REALM_CONFIG],
         }),
         /package.json is required in cardCacheDir/
       );
     }
   );
 
-  QUnit.only(
+  QUnit.test(
     'Errors if cacheDirs package.json does not have proper exports',
     async function (assert) {
       let tmpDir = tmp.dirSync().name;
@@ -49,7 +39,7 @@ QUnit.module('Server boot', function () {
       assert.rejects(
         Server.create({
           cardCacheDir,
-          realms,
+          realms: [BASE_CARD_REALM_CONFIG],
         }),
         /package.json of cardCacheDir does not have properly configured exports/
       );
@@ -62,7 +52,7 @@ QUnit.module('Server boot', function () {
       assert.rejects(
         Server.create({
           cardCacheDir,
-          realms,
+          realms: [BASE_CARD_REALM_CONFIG],
         }),
         /package.json of cardCacheDir does not have properly configured exports/
       );
@@ -72,14 +62,44 @@ QUnit.module('Server boot', function () {
   QUnit.test(
     'Errors if configured routing card does not have routeTo methods',
     async function (assert) {
-      server = (
-        await Server.create({
-          cardCacheDir: '',
-          realms,
-        })
-      ).app;
+      let realm = new Project('my-realm', {
+        files: {
+          routes: {
+            'card.json': JSON.stringify({
+              schema: 'schema.js',
+            }),
+            'schema.js': `
+              export default class Routes {
+                goToThisCardPLS(path) {
+                  if (path === 'homepage') {
+                    return 'https://my-realm/welcome';
+                  }
+              
+                  if (path === 'about') {
+                    return 'https://my-realm/about';
+                  }
+                }
+              }
+            `,
+          },
+        },
+      });
+      realm.writeSync();
 
-      assert.ok(server);
+      let { cardCacheDir } = createCardCacheDir();
+      createMinimalPackageJSON(cardCacheDir);
+
+      assert.rejects(
+        Server.create({
+          cardCacheDir,
+          realms: [
+            { url: 'https://my-realm', directory: realm.baseDir },
+            BASE_CARD_REALM_CONFIG,
+          ],
+          routeCard: 'https://my-realm/routes',
+        }),
+        /Route Card's Schema does not have proper routing method defined/
+      );
     }
   );
 });
