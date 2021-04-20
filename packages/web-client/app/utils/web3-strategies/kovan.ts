@@ -1,11 +1,11 @@
 import { tracked } from '@glimmer/tracking';
 import { WalletProvider } from '../wallet-providers';
 import { Layer1Web3Strategy } from './types';
-import detectEthereumProvider from '../detect-provider';
+import detectEthereumProvider from '@metamask/detect-provider';
 import WalletInfo from '../wallet-info';
 import { defer } from 'rsvp';
 import Web3 from 'web3';
-// import { BigNumber } from '@ethersproject/bignumber';
+import { BigNumber } from '@ethersproject/bignumber';
 
 const DAI_TOKEN_ADDRESS = '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa';
 const ERC20_MIN_ABI = [
@@ -101,8 +101,7 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
       method: 'eth_getBalance',
       params: [this.walletInfo.firstAddress, 'latest'],
     });
-    // this.defaultTokenBalance = new BigNumber(balance);
-    this.defaultTokenBalance = defaultTokenBalance;
+    this.defaultTokenBalance = BigNumber.from(defaultTokenBalance);
 
     let web3 = new Web3();
     web3.setProvider(this.provider);
