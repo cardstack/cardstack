@@ -3,6 +3,8 @@ import WalletInfo from '../wallet-info';
 import { Layer1Web3Strategy } from './types';
 import { defer } from 'rsvp';
 import RSVP from 'rsvp';
+import { BigNumber } from '@ethersproject/bignumber';
+import { WalletProvider } from '../wallet-providers';
 
 export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   chainName = 'L1 Test Chain';
@@ -12,13 +14,18 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
 
   // Balances are settable in this test implementation
-  @tracked defaultTokenBalance: number | undefined;
-  @tracked daiBalance: number | undefined;
-  @tracked cardBalance: number | undefined;
+  @tracked defaultTokenBalance: BigNumber | undefined;
+  @tracked daiBalance: BigNumber | undefined;
+  @tracked cardBalance: BigNumber | undefined;
 
   waitForAccountDeferred = defer();
   #unlockDeferred: RSVP.Deferred<void> | undefined;
   #depositDeferred: RSVP.Deferred<void> | undefined;
+
+  // eslint-disable-next-line no-unused-vars
+  connect(_walletProvider: WalletProvider): Promise<void> {
+    return this.waitForAccount;
+  }
 
   unlock() {
     this.#unlockDeferred = RSVP.defer();
@@ -36,7 +43,7 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
 
   test__simulateAccountsChanged(accounts: string[]) {
     this.isConnected = true;
-    this.walletInfo = new WalletInfo(accounts, parseInt(this.chainId, 10));
+    this.walletInfo = new WalletInfo(accounts, this.chainId);
     this.waitForAccountDeferred.resolve();
   }
 
@@ -49,6 +56,6 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   }
 
   get waitForAccount() {
-    return this.waitForAccountDeferred.promise;
+    return this.waitForAccountDeferred.promise as Promise<void>;
   }
 }

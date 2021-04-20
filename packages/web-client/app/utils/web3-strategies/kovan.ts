@@ -5,10 +5,13 @@ import detectEthereumProvider from '@metamask/detect-provider';
 import WalletInfo from '../wallet-info';
 import { defer } from 'rsvp';
 import Web3 from 'web3';
+import { AbiItem } from 'web3-utils';
+import { Contract } from 'web3-eth-contract';
 import { BigNumber } from '@ethersproject/bignumber';
 
+const CARD_TOKEN_ADDRESS = '0xd6E34821F508e4247Db359CFceE0cb5e8050972a';
 const DAI_TOKEN_ADDRESS = '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa';
-const ERC20_MIN_ABI = [
+const ERC20_MIN_ABI: AbiItem[] = [
   // balanceOf
   {
     constant: true,
@@ -31,13 +34,25 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   chainId = 42;
   walletConnectUri: string | undefined;
   provider: any | undefined;
-  @tracked walletInfo = { accounts: [], chainId: -1 } as WalletInfo;
-  waitForAccountDeferred = defer();
+  web3 = new Web3();
+  cardTokenContract = new this.web3.eth.Contract(
+    ERC20_MIN_ABI,
+    CARD_TOKEN_ADDRESS
+  );
+  daiTokenContract = new this.web3.eth.Contract(
+    ERC20_MIN_ABI,
+    DAI_TOKEN_ADDRESS
+  );
+
+  @tracked walletInfo = new WalletInfo([], this.chainId);
 
   @tracked defaultTokenBalance: BigNumber | undefined;
-  @tracked daiBalance: number | undefined;
-  @tracked cardBalance: number | undefined;
-  waitForAccount: Promise<void>;
+  @tracked daiBalance: BigNumber | undefined;
+  @tracked cardBalance: BigNumber | undefined;
+  #waitForAccountDeferred = defer<void>();
+  get waitForAccount(): Promise<void> {
+    return this.#waitForAccountDeferred.promise;
+  }
 
   async connect(walletProvider: WalletProvider): Promise<void> {
     if (walletProvider.id === 'metamask') {
@@ -51,6 +66,7 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
         console.log('Please install MetaMask!');
       }
     }
+    this.web3.setProvider(this.provider);
     this.provider.on('accountsChanged', (accounts: string[]) => {
       this.updateWalletInfo(accounts, this.chainId);
     });
@@ -86,9 +102,9 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     this.walletInfo = new WalletInfo(accounts, chainId);
     if (accounts.length > 0) {
       this.refreshBalances();
-      this.waitForAccountDeferred.resolve();
+      this.#waitForAccountDeferred.resolve();
     } else {
-      this.waitForAccountDeferred = defer();
+      this.#waitForAccountDeferred = defer();
     }
   }
 
@@ -97,23 +113,28 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   }
 
   async refreshBalances() {
-    let defaultTokenBalance = await this.provider.request({
+    let balances = await Promise.all<String>([
+      this.getDefaultTokenBalance(),
+      this.getErc20Balance(this.daiTokenContract),
+      this.getErc20Balance(this.cardTokenContract),
+    ]);
+    let [defaultTokenBalance, daiBalance, cardBalance] = balances.map((b) =>
+      BigNumber.from(b)
+    );
+    this.defaultTokenBalance = BigNumber.from(defaultTokenBalance);
+    this.daiBalance = BigNumber.from(daiBalance);
+    this.cardBalance = BigNumber.from(cardBalance);
+  }
+  getDefaultTokenBalance() {
+    return this.provider.request({
       method: 'eth_getBalance',
       params: [this.walletInfo.firstAddress, 'latest'],
     });
-    this.defaultTokenBalance = BigNumber.from(defaultTokenBalance);
-
-    let web3 = new Web3();
-    web3.setProvider(this.provider);
-    let daiTokenContract = new web3.eth.Contract(
-      ERC20_MIN_ABI,
-      DAI_TOKEN_ADDRESS
-    );
-    let daiBalance = await daiTokenContract.methods
-      .balanceOf(this.walletInfo.firstAddress)
-      .call();
-    this.daiBalance = daiBalance;
   }
+  getErc20Balance(contract: Contract) {
+    return contract.methods.balanceOf(this.walletInfo.firstAddress).call();
+  }
+
   unlock(): Promise<void> {
     throw new Error('Method not implemented.');
   }

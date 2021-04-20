@@ -13,9 +13,9 @@
     </header>
     Network: {{this.layer1Network.chainName}} <br>
     Address: {{this.layer1Network.walletInfo.firstAddress}} <br>
-    ETH Balance: {{this.layer1Network.defaultTokenBalance}} <br>
-    DAI Balance: {{this.layer1Network.daiBalance}} <br>
-    CARD Balance: {{this.layer1Network.cardBalance}} <br>
+    ETH Balance: {{format-token-amount this.layer1Network.defaultTokenBalance}} <br>
+    DAI Balance: {{format-token-amount this.layer1Network.daiBalance}} <br>
+    CARD Balance: {{format-token-amount this.layer1Network.cardBalance}} <br>
     Status: {{if this.layer1Network.isConnected 'Connected' 'Disconnected'}} <br>
   {{else}}
     <header aria-label="Layer 1 Connection Header" class="card-pay-workflow-connect-layer-one__body-header">Connect your Ethereum mainnet wallet</header>

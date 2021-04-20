@@ -8,6 +8,7 @@ import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
 import { task } from 'ember-concurrency-decorators';
 import { WalletProvider } from '../utils/wallet-providers';
+import { BigNumber } from '@ethersproject/bignumber';
 
 export default class Layer1Network extends Service {
   strategy!: Layer1Web3Strategy;
@@ -17,10 +18,10 @@ export default class Layer1Network extends Service {
   @reads('strategy.waitForAccount') waitForAccount!: Promise<void>;
   @reads('strategy.chainName') chainName!: string;
   @reads('strategy.defaultTokenBalance') defaultTokenBalance:
-    | string
-    | undefined; // TODO: BigNumber
-  @reads('strategy.daiBalance') daiBalance: string | undefined; // TODO: BigNumber
-  @reads('strategy.cardBalance') cardBalance: string | undefined; // TODO: BigNumber
+    | BigNumber
+    | undefined;
+  @reads('strategy.daiBalance') daiBalance: BigNumber | undefined;
+  @reads('strategy.cardBalance') cardBalance: BigNumber | undefined;
 
   constructor(props: object | undefined) {
     super(props);
