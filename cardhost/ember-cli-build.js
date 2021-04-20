@@ -14,7 +14,7 @@ const { Webpack } = require('@embroider/webpack');
 const { compatBuild } = require('@embroider/compat');
 const withSideWatch = require('./lib/with-side-watch');
 const Funnel = require('broccoli-funnel');
-const { DefinePlugin, ProvidePlugin } = require('webpack');
+const { ProvidePlugin } = require('webpack');
 
 module.exports = function (defaults) {
   let app = new EmberApp(defaults, {
@@ -36,6 +36,10 @@ module.exports = function (defaults) {
     packagerOptions: {
       webpackConfig: {
         plugins: [
+          // new DefinePlugin({
+          //   'process.env': '({})',
+          //   'process.platform': '"browser"',
+          // }),
           new ProvidePlugin({
             Buffer: 'buffer',
             process: 'process',

@@ -1,3 +1,4 @@
+import { encodeCardURL } from '@cardstack/core/src/utils';
 import type {
   Response as ResponseType,
   Request as RequestType,
@@ -12,16 +13,9 @@ import { Format, RawCard } from '@cardstack/core/src/interfaces';
 import { getContext } from '@ember/test-helpers';
 import { Memoize } from 'typescript-memoize';
 
-const REALM = 'https://cardstack.com/mirage';
+// const REALM = 'https://cardstack.com/mirage';
 
-type CardParams =
-  | {
-      type: 'raw';
-    }
-  | {
-      format: Format;
-      type?: 'compiled';
-    };
+type CardParams = { type: 'raw' } | { format: Format; type?: 'compiled' };
 
 class FakeCardServer {
   static cardServers = new WeakMap<object, FakeCardServer>();
@@ -41,9 +35,17 @@ class FakeCardServer {
 
   @Memoize()
   get builder(): Builder {
-    return new Builder({
-      realm: REALM,
-    });
+    return new Builder();
+    // return new Builder({
+    //   realm: [
+    //     {
+    //       url: 'https://cardstack.com/base',
+    //     },
+    //     {
+    //       url: 'https://mirage',
+    //     },
+    //   ],
+    // });
   }
 
   async respondWithCard(url: string, format: Format) {
@@ -86,23 +88,19 @@ function cardParams(queryParams: RequestType['queryParams']): CardParams {
   return (queryParams as unknown) as CardParams;
 }
 
-async function returnCompiledCard(schema: any, request: RequestType) {
+async function returnCard(schema: any, request: RequestType) {
   let cardServer = FakeCardServer.current();
   let params = cardParams(request.queryParams);
-  let [url] = request.url.split('?');
+  let cardURL = request.params.encodedCardURL;
 
   if (params.type === 'raw') {
-    return cardServer.respondWithRawCard(schema, url);
+    return cardServer.respondWithRawCard(schema, cardURL);
   }
-  return cardServer.respondWithCard(url, params.format);
+  return cardServer.respondWithCard(cardURL, params.format);
 }
 
 export default function (this: Server): void {
-  this.get('http://mirage/cards/:id', returnCompiledCard);
-  this.get('https://cardstack.com/base/:id', returnCompiledCard);
-
-  this.post('/spaces');
-  this.patch('/spaces');
+  this.get(`/cards/:encodedCardURL`, returnCard);
 
   this.get('/cardFor/:pathname', async function (schema: any, request) {
     let { routingCard } = schema.spaces.find('home');

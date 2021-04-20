@@ -5,6 +5,7 @@ import { hbs } from 'ember-cli-htmlbars';
 import { setComponentTemplate } from '@ember/component';
 
 import { Format } from '@cardstack/core/src/interfaces';
+import { encodeCardURL } from '@cardstack/core/src/utils';
 
 import config from 'cardhost/config/environment';
 const { cardServer } = config as any; // Environment types arent working
@@ -15,7 +16,7 @@ export default class Cards extends Service {
     format: Format
   ): Promise<{ model: any; component: unknown }> {
     let params = new URLSearchParams({ format }).toString();
-    let fullURL = [cardServer, 'cards/', encodeURIComponent(url), `?${params}`];
+    let fullURL = [cardServer, 'cards/', encodeCardURL(url), `?${params}`];
     return this.internalLoad(fullURL.join(''));
   }
 

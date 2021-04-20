@@ -19,6 +19,7 @@ module('Acceptance | card routing', function (hooks) {
 
     this.createCard({
       url: 'https://mirage/cards/my-routes',
+      schema: 'schema.js',
       files: {
         'schema.js': `
           export default class MyRoutes {
@@ -30,6 +31,7 @@ module('Acceptance | card routing', function (hooks) {
           }`,
       },
     });
+
     this.createCard({
       url: 'https://mirage/cards/person',
       isolated: 'isolated.js',

@@ -17,30 +17,14 @@ module('Integration | card-service', function (hooks) {
     cards = this.owner.lookup('service:cards');
   });
 
-  test('compiled-cards dynamic import example', async function (assert) {
-    let target = 'hello';
-    this.set(
-      'hello',
-      (
-        await import(
-          /* webpackExclude: /schema\.js$/ */
-          `@cardstack/compiled/${target}`
-        )
-      ).default
-    );
-
-    await render(
-      hbs`{{#let (ensure-safe-component this.hello) as |Hello|}} <Hello /> {{/let}}`
-    );
-    assert.dom(this.element).containsText('Hello world');
-  });
-
   module('hello world', function (hooks) {
     let helloId = 'http://mirage/cards/hello';
     let greenId = 'http://mirage/cards/green';
     hooks.beforeEach(function () {
       this.createCard({
         url: greenId,
+        schema: 'schema.js',
+        embedded: 'embedded.js',
         files: {
           'schema.js': `export default class Green {}`,
           'embedded.js': templateOnlyComponentTemplate(
@@ -51,13 +35,15 @@ module('Integration | card-service', function (hooks) {
 
       this.createCard({
         url: helloId,
-        files: {
-          'data.json': {
-            attributes: {
-              greeting: 'Hello World',
-              greenGreeting: 'it works',
-            },
+        schema: 'schema.js',
+        isolated: 'isolated.js',
+        data: {
+          attributes: {
+            greeting: 'Hello World',
+            greenGreeting: 'it works',
           },
+        },
+        files: {
           'schema.js': `
           import { contains } from "@cardstack/types";
           import string from "https://cardstack.com/base/string";

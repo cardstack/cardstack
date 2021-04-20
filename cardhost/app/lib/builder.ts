@@ -1,11 +1,12 @@
-import { RealmConfig } from './../../../server/src/interfaces';
 import type {
   Builder as BuilderInterface,
   RawCard,
   CompiledCard,
   Format,
 } from '@cardstack/core/src/interfaces';
+// import { RealmConfig } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
+import { encodeCardURL } from '@cardstack/core/src/utils';
 
 import dynamicCardTransform from './dynamic-card-transform';
 
@@ -16,11 +17,11 @@ export default class Builder implements BuilderInterface {
   });
 
   private cache: Map<string, CompiledCard>;
-  private realms: RealmConfig[];
+  // private realms: [{ url: string }];
 
-  constructor(params: { realms: RealmConfig[] }) {
+  constructor(/*params: { realms: RealmConfig[] }*/) {
     this.cache = new Map();
-    this.realms = params.realms;
+    // this.realms = params.realms;
   }
 
   private async defineModule(
@@ -28,14 +29,16 @@ export default class Builder implements BuilderInterface {
     localModule: string,
     source: string
   ): Promise<string> {
-    let url = new URL(localModule, cardURL.replace(/\/$/, '') + '/').href;
+    let url = encodeCardURL(
+      new URL(localModule, cardURL.replace(/\/$/, '') + '/').href
+    );
     source = dynamicCardTransform(url, source);
     eval(source);
     return url;
   }
 
   async getRawCard(url: string): Promise<RawCard> {
-    let response = await fetch(`${url}?type=raw`);
+    let response = await fetch(`/cards/${encodeCardURL(url)}?type=raw`);
     if (!response || response.status === 404) {
       throw Error(`Card Builder: No raw card found for ${url}`);
     }
