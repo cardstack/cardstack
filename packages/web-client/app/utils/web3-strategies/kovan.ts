@@ -70,17 +70,15 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
       });
       this.updateWalletInfo(accounts, this.chainId);
     } else if (walletProvider.id === 'wallet-connect') {
-      this.provider = await this.setupWalletConnect();
-      if (!this.provider) {
-        return;
-      }
+      this.provider = this.setupWalletConnect();
       this.web3.setProvider(this.provider);
+      await this.provider.enable();
       let accounts = await this.web3.eth.getAccounts();
       this.updateWalletInfo(accounts, this.chainId);
     }
   }
 
-  async setupWalletConnect(): Promise<any> {
+  setupWalletConnect(): any {
     let provider = new WalletConnectProvider({
       bridge: WALLET_CONNECT_BRIDGE,
       chainId: 42,
@@ -102,8 +100,6 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     provider.on('disconnect', (code: number, reason: string) => {
       console.log('disconnect', code, reason);
     });
-
-    await provider.enable();
 
     return provider;
   }
