@@ -1,3 +1,4 @@
+import WalletConnectProvider from '@walletconnect/web3-provider';
 import { tracked } from '@glimmer/tracking';
 import { WalletProvider } from '../wallet-providers';
 import { Layer1Web3Strategy } from './types';
@@ -8,6 +9,9 @@ import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Contract } from 'web3-eth-contract';
 import { BigNumber } from '@ethersproject/bignumber';
+
+const WALLET_CONNECT_BRIDGE = 'https://safe-walletconnect.gnosis.io/';
+const INFURA_ID = '';
 
 const CARD_TOKEN_ADDRESS = '0xd6E34821F508e4247Db359CFceE0cb5e8050972a';
 const DAI_TOKEN_ADDRESS = '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa';
@@ -65,7 +69,43 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
         method: 'eth_requestAccounts',
       });
       this.updateWalletInfo(accounts, this.chainId);
+    } else if (walletProvider.id === 'wallet-connect') {
+      this.provider = await this.setupWalletConnect();
+      if (!this.provider) {
+        return;
+      }
+      this.web3.setProvider(this.provider);
+      let accounts = await this.web3.eth.getAccounts();
+      this.updateWalletInfo(accounts, this.chainId);
     }
+  }
+
+  async setupWalletConnect(): Promise<any> {
+    let provider = new WalletConnectProvider({
+      bridge: WALLET_CONNECT_BRIDGE,
+      chainId: 42,
+      infuraId: INFURA_ID,
+      qrcode: true,
+    });
+
+    // Subscribe to accounts change
+    provider.on('accountsChanged', (accounts: string[]) => {
+      if (accounts.length) this.updateWalletInfo(accounts, this.chainId);
+    });
+
+    // Subscribe to chainId change
+    provider.on('chainChanged', (chainId: number) => {
+      console.log('chainChanged', chainId);
+    });
+
+    // Subscribe to session disconnection
+    provider.on('disconnect', (code: number, reason: string) => {
+      console.log('disconnect', code, reason);
+    });
+
+    await provider.enable();
+
+    return provider;
   }
 
   async setupMetamask() {
