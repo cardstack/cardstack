@@ -206,15 +206,12 @@ export class Compiler {
     cardURL: string,
     localFile: string
   ): Promise<ComponentInfo> {
-    let inlineHBS;
-    let usedFields = [] as ComponentInfo['usedFields'];
-
     let options: CardTemplateOptions = {
       fields,
       cardURL,
       localFile,
-      inlineHBS,
-      usedFields,
+      inlineHBS: undefined,
+      usedFields: [] as ComponentInfo['usedFields'],
     };
     let out = transformSync(templateSource, {
       plugins: [[cardTemplatePlugin, options]],
@@ -222,8 +219,8 @@ export class Compiler {
 
     return {
       moduleName: await this.define(cardURL, localFile, out!.code!),
-      usedFields,
-      inlineHBS,
+      usedFields: options.usedFields,
+      inlineHBS: options.inlineHBS,
     };
   }
 }

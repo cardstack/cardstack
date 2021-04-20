@@ -14,6 +14,8 @@ async function evalModule(src: string): Promise<any> {
 
 const PERSON_CARD = {
   url: 'https://mirage/cards/person',
+  schema: 'schema.js',
+  embedded: 'embedded.js',
   files: {
     'schema.js': `
       import { contains } from "@cardstack/types";
@@ -32,7 +34,7 @@ const PERSON_CARD = {
   },
 };
 
-module('Integration | compiler-basics', function (hooks) {
+module('@core | compiler-basics', function (hooks) {
   let builder: Builder;
 
   setupRenderingTest(hooks);
@@ -40,7 +42,7 @@ module('Integration | compiler-basics', function (hooks) {
   setupCardMocking(hooks);
 
   hooks.beforeEach(async function () {
-    builder = new Builder({});
+    builder = new Builder();
   });
 
   skip('it has a working evalModule', async function (assert) {
@@ -62,6 +64,7 @@ module('Integration | compiler-basics', function (hooks) {
   test('Names and defines a module for the model', async function (assert) {
     let card = {
       url: 'http://mirage/cards/post',
+      schema: 'schema.js',
       files: {
         'schema.js': `export default class Post {}`,
       },
@@ -71,16 +74,18 @@ module('Integration | compiler-basics', function (hooks) {
     let compiled = await builder.getCompiledCard(card.url);
     assert.equal(
       compiled.modelModule,
-      `${card.url}/model`,
+      `${card.url}/schema.js`,
       'CompiledCard moduleName is set correctly'
     );
-    let source = window.require(`${card.url}/model`).default;
+    let source = window.require(compiled.modelModule).default;
     assert.equal(source.toString(), 'class Post {}', 'Source code is correct');
   });
 
   test('Generates inlineHBS for templates without', async function (assert) {
     let card = {
       url: 'http://mirage/cards/string',
+      schema: 'schema.js',
+      embedded: 'embedded.js',
       files: {
         'schema.js': `export default class String {}`,
         'embedded.js': templateOnlyComponentTemplate('{{@model}}'),
@@ -90,36 +95,33 @@ module('Integration | compiler-basics', function (hooks) {
 
     let compiled = await builder.getCompiledCard(card.url);
     assert.equal(
-      compiled.templateModules.embedded.inlineHBS,
+      compiled.embedded.inlineHBS,
       `{{@model}}`,
       'templateModules includes inlineHBS for simple cards'
     );
   });
 
-  test('it discovers the four kinds of fields', async function (assert) {
+  test('it discovers three kinds of fields', async function (assert) {
     await this.createCard(PERSON_CARD);
     let card = {
       url: 'http://mirage/cards/post',
+      schema: 'schema.js',
       files: {
         'schema.js': `
           import { contains, belongsTo, containsMany, hasMany } from "@cardstack/types";
           import string from "https://cardstack.com/base/string";
-          import comment from "https://cardstack.com/base/comment";
-          import tag from "https://cardstack.com/base/tag";
+          import date from "https://cardstack.com/base/date";
           import person from "https://mirage/cards/person";
 
           export default class Post {
             @contains(string)
             title;
 
-            @containsMany(tag)
-            tags;
-
             @belongsTo(person)
             author;
 
-            @hasMany(comment)
-            comments;
+            @hasMany(date)
+            date;
 
             foo = 'bar'
           }`,
@@ -128,17 +130,13 @@ module('Integration | compiler-basics', function (hooks) {
     this.createCard(card);
 
     let compiled = await builder.getCompiledCard(card.url);
-    assert.deepEqual(Object.keys(compiled.fields), [
-      'title',
-      'author',
-      'tags',
-      'comments',
-    ]);
+    assert.deepEqual(Object.keys(compiled.fields), ['title', 'author', 'date']);
   });
 
   test('it discovers a string literal field', async function (assert) {
     let card = {
       url: 'http://mirage/cards/post',
+      schema: 'schema.js',
       files: {
         'schema.js': `
         import { contains } from "@cardstack/types";
@@ -160,6 +158,7 @@ module('Integration | compiler-basics', function (hooks) {
   test('it discovers a field whose import comes before the field decorator', async function (assert) {
     let card = {
       url: 'http://mirage/cards/post',
+      schema: 'schema.js',
       files: {
         'schema.js': `
         import string from "https://cardstack.com/base/string";
@@ -181,6 +180,7 @@ module('Integration | compiler-basics', function (hooks) {
   test('it discovers the field type of contains', async function (assert) {
     let card = {
       url: 'http://mirage/cards/post',
+      schema: 'schema.js',
       files: {
         'schema.js': `
         import { contains } from "@cardstack/types";
@@ -202,15 +202,14 @@ module('Integration | compiler-basics', function (hooks) {
   });
 
   module('data', function () {
-    test('it accepts data.json and returns the values', async function (assert) {
+    test('it accepts data and returns the values', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
+        schema: 'schema.js',
+        data: {
+          title: 'Hello World',
+        },
         files: {
-          'data.json': {
-            attributes: {
-              title: 'Hello World',
-            },
-          },
           'schema.js': `
           import { contains } from "@cardstack/types";
           import string from "https://cardstack.com/base/string";
@@ -233,16 +232,18 @@ module('Integration | compiler-basics', function (hooks) {
     test('it inlines a simple field template', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
+        schema: 'schema.js',
+        isolated: 'isolated.js',
         files: {
           'schema.js': `
-        import { contains } from "@cardstack/types";
-        import string from "https://cardstack.com/base/string";
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
 
-        export default class Post {
-          @contains(string)
-          title;
-        }
-    `,
+            export default class Post {
+              @contains(string)
+              title;
+            }
+          `,
           'isolated.js': templateOnlyComponentTemplate(
             '<h1><@model.title /></h1>'
           ),
@@ -253,8 +254,8 @@ module('Integration | compiler-basics', function (hooks) {
 
       let compiled = await builder.getCompiledCard(card.url);
       assert.equal(
-        compiled.templateModules['isolated'].moduleName,
-        `${card.url}/isolated`,
+        compiled.isolated.moduleName,
+        `${card.url}/isolated.js`,
         'templateModule for "isolated" is full url'
       );
     });
@@ -264,9 +265,12 @@ module('Integration | compiler-basics', function (hooks) {
 
       let compiled = await builder.getCompiledCard(PERSON_CARD.url);
       assert.equal(
-        compiled.templateModules['embedded'].moduleName,
-        `${PERSON_CARD.url}/embedded`
+        compiled.embedded.moduleName,
+        `${PERSON_CARD.url}/embedded.js`
       );
+      // Could not find module `@ember/template-factory` imported from `https://mirage/cards/person/embedded.js`
+      // let source = window.require(compiled.embedded.moduleName).default;
+      // assert.equal(source, 'source');
     });
   });
 
@@ -274,13 +278,14 @@ module('Integration | compiler-basics', function (hooks) {
     test('field must be called', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
+        schema: 'schema.js',
         files: {
           'schema.js': `
-    import { contains } from "@cardstack/types";
-    function hi() {
-      return contains;
-    }
-    `,
+            import { contains } from "@cardstack/types";
+            function hi() {
+              return contains;
+            }
+          `,
         },
       };
       this.createCard(card);
@@ -298,15 +303,16 @@ module('Integration | compiler-basics', function (hooks) {
     test('field must be a decorator', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
+        schema: 'schema.js',
         files: {
           'schema.js': `
-    import { contains } from "@cardstack/types";
-    import string from "https://cardstack.com/base/string";
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
 
-    function hi() {
-      return contains(string);
-    }
-    `,
+            function hi() {
+              return contains(string);
+            }
+          `,
         },
       };
       assert.expect(1);
@@ -326,14 +332,15 @@ module('Integration | compiler-basics', function (hooks) {
     test('field must be on a class property', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
+        schema: 'schema.js',
         files: {
           'schema.js': `
-    import { contains } from "@cardstack/types";
-    import string from "https://cardstack.com/base/string";
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
 
-    @contains(string)
-    class X {}
-    `,
+            @contains(string)
+            class X {}
+          `,
         },
       };
       assert.expect(1);
@@ -354,18 +361,19 @@ module('Integration | compiler-basics', function (hooks) {
     test('field must have static name', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
+        schema: 'schema.js',
         files: {
           'schema.js': `
-    import { contains } from "@cardstack/types";
-    import string from "https://cardstack.com/base/string";
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
 
-    let myFieldName = 'title';
-    class X {
+            let myFieldName = 'title';
+            class X {
 
-      @contains(string)
-      [myFieldName];
-    }
-    `,
+              @contains(string)
+              [myFieldName];
+            }
+          `,
         },
       };
       assert.expect(1);
@@ -384,18 +392,19 @@ module('Integration | compiler-basics', function (hooks) {
     test('field cannot be weird type', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
+        schema: 'schema.js',
         files: {
           'schema.js': `
-    import { contains } from "@cardstack/types";
-    import string from "https://cardstack.com/base/string";
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
 
-    let myFieldName = 'title';
-    class X {
+            let myFieldName = 'title';
+            class X {
 
-      @contains(string)
-      123;
-    }
-    `,
+              @contains(string)
+              123;
+            }
+          `,
         },
       };
       assert.expect(1);
@@ -416,16 +425,17 @@ module('Integration | compiler-basics', function (hooks) {
     test('field with wrong number of arguments', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
+        schema: 'schema.js',
         files: {
           'schema.js': `
-    import { contains } from "@cardstack/types";
-    import string from "https://cardstack.com/base/string";
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
 
-    class X {
-      @contains(string, 1)
-      title;
-    }
-    `,
+            class X {
+              @contains(string, 1)
+              title;
+            }
+          `,
         },
       };
       assert.expect(1);
@@ -444,16 +454,17 @@ module('Integration | compiler-basics', function (hooks) {
     test('hasMany with wrong number of arguments', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
+        schema: 'schema.js',
         files: {
           'schema.js': `
-    import { hasMany } from "@cardstack/types";
-    import string from "https://cardstack.com/base/string";
+            import { hasMany } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
 
-    class X {
-      @hasMany(string, 1)
-      title;
-    }
-    `,
+            class X {
+              @hasMany(string, 1)
+              title;
+            }
+          `,
         },
       };
       assert.expect(1);
@@ -472,16 +483,17 @@ module('Integration | compiler-basics', function (hooks) {
     test('field with wrong argument syntax', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
+        schema: 'schema.js',
         files: {
           'schema.js': `
-    import { contains } from "@cardstack/types";
+            import { contains } from "@cardstack/types";
 
-    class X {
+            class X {
 
-      @contains("string")
-      title;
-    }
-    `,
+              @contains("string")
+              title;
+            }
+          `,
         },
       };
       assert.expect(1);
@@ -500,15 +512,16 @@ module('Integration | compiler-basics', function (hooks) {
     test('field with undefined type', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
+        schema: 'schema.js',
         files: {
           'schema.js': `
-    import { contains } from "@cardstack/types";
+            import { contains } from "@cardstack/types";
 
-    class X {
-      @contains(string)
-      title;
-    }
-    `,
+            class X {
+              @contains(string)
+              title;
+            }
+          `,
         },
       };
       assert.expect(1);
@@ -527,16 +540,16 @@ module('Integration | compiler-basics', function (hooks) {
     test('field with card type that was not imported', async function (assert) {
       let card = {
         url: 'http://mirage/cards/post',
+        schema: 'schema.js',
         files: {
           'schema.js': `
-    import { contains } from "@cardstack/types";
-    let string = 'string';
-    class X {
-      @contains(string)
-      title;
-    }
-
-    `,
+            import { contains } from "@cardstack/types";
+            let string = 'string';
+            class X {
+              @contains(string)
+              title;
+            }
+          `,
         },
       };
       assert.expect(1);
