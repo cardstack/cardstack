@@ -7,6 +7,8 @@ import KovanWeb3Strategy from '../utils/web3-strategies/kovan';
 import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
 import { task } from 'ember-concurrency-decorators';
+import { WalletProvider } from '../utils/wallet-providers';
+import { BigNumber } from '@ethersproject/bignumber';
 
 export default class Layer1Network extends Service {
   strategy!: Layer1Web3Strategy;
@@ -15,6 +17,11 @@ export default class Layer1Network extends Service {
   @reads('strategy.walletInfo', new WalletInfo([], -1)) walletInfo!: WalletInfo;
   @reads('strategy.waitForAccount') waitForAccount!: Promise<void>;
   @reads('strategy.chainName') chainName!: string;
+  @reads('strategy.defaultTokenBalance') defaultTokenBalance:
+    | BigNumber
+    | undefined;
+  @reads('strategy.daiBalance') daiBalance: BigNumber | undefined;
+  @reads('strategy.cardBalance') cardBalance: BigNumber | undefined;
 
   constructor(props: object | undefined) {
     super(props);
@@ -31,20 +38,13 @@ export default class Layer1Network extends Service {
     }
   }
 
+  connect(walletProvider: WalletProvider) {
+    this.strategy.connect(walletProvider);
+    return this.waitForAccount;
+  }
+
   get hasAccount() {
     return this.walletInfo.accounts.length > 0;
-  }
-
-  get defaultTokenBalance() {
-    return this.strategy.defaultTokenBalance;
-  }
-
-  daiTokenBalance() {
-    return this.strategy.daiBalance;
-  }
-
-  cardTokenBalance() {
-    return this.strategy.cardBalance;
   }
 
   @task *unlock() {

@@ -3,6 +3,7 @@ import WalletInfo from '../wallet-info';
 import { Layer2Web3Strategy } from './types';
 import { defer } from 'rsvp';
 import RSVP from 'rsvp';
+import { BigNumber } from '@ethersproject/bignumber';
 
 export default class TestWeb3Strategy implements Layer2Web3Strategy {
   chainName = 'L2 Test Chain';
@@ -14,7 +15,7 @@ export default class TestWeb3Strategy implements Layer2Web3Strategy {
   #unlockDeferred: RSVP.Deferred<void> | undefined;
   #depositDeferred: RSVP.Deferred<void> | undefined;
 
-  @tracked xdaiBalance: number | undefined;
+  @tracked xdaiBalance: BigNumber | undefined;
 
   unlock() {
     this.#unlockDeferred = RSVP.defer();

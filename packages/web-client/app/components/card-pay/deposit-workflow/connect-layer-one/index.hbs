@@ -6,14 +6,23 @@
   @header="Wallet Connection - Ethereum Mainnet"
 />
 <section class="card-pay-workflow-connect-layer-one__body">
-  <header class="card-pay-workflow-connect-layer-one__body-header">Connect your Ethereum mainnet wallet</header>
   {{#if (eq this.cardState 'memorialized')}}
-    TODO: show wallet details and balances
+    <header aria-label="Layer 1 Connected Header" class="card-pay-workflow-connect-layer-one__body-header">
+      {{this.currentWalletProvider.name}}
+      {{this.currentWalletProvider.logo}}
+    </header>
+    Network: {{this.layer1Network.chainName}} <br>
+    Address: {{this.layer1Network.walletInfo.firstAddress}} <br>
+    ETH Balance: {{format-token-amount this.layer1Network.defaultTokenBalance}} <br>
+    DAI Balance: {{format-token-amount this.layer1Network.daiBalance}} <br>
+    CARD Balance: {{format-token-amount this.layer1Network.cardBalance}} <br>
+    Status: {{if this.layer1Network.isConnected 'Connected' 'Disconnected'}} <br>
   {{else}}
-    <CardPay::LayerOneWalletSelection
-      @wallets={{this.wallets}}
-      @currentWalletId={{this.currentWalletId}}
-      @changeWallet={{this.changeWallet}}
+    <header aria-label="Layer 1 Connection Header" class="card-pay-workflow-connect-layer-one__body-header">Connect your Ethereum mainnet wallet</header>
+    <CardPay::LayerOneWalletProviderSelection
+      @walletProviders={{this.walletProviders}}
+      @currentWalletProviderId={{this.currentWalletProviderId}}
+      @changeWalletProvider={{this.changeWalletProvider}}
       @isConnecting={{this.isWaitingForConnection}}
       class="card-pay-workflow-connect-layer-one__wallet-provider-selection"
     />

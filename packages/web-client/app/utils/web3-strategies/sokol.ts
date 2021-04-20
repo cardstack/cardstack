@@ -7,6 +7,7 @@ import { Layer2Web3Strategy } from './types';
 import { IConnector } from '@walletconnect/types';
 import WalletInfo from '../wallet-info';
 import { defer } from 'rsvp';
+import { BigNumber } from '@ethersproject/bignumber';
 
 export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   chainName = 'Sokol Testnet';
@@ -23,7 +24,7 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   @reads('provider.connector') connector!: IConnector;
   @tracked isConnected = false;
   @tracked walletConnectUri: string | undefined;
-  @tracked walletInfo = { accounts: [], chainId: -1 } as WalletInfo;
+  @tracked walletInfo = new WalletInfo([], this.chainId) as WalletInfo;
   waitForAccountDeferred = defer();
   web3!: Web3;
 
@@ -32,7 +33,7 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
     this.initialize();
   }
 
-  @tracked xdaiBalance: number | undefined;
+  @tracked xdaiBalance: BigNumber | undefined;
 
   async initialize() {
     this.connector.on('display_uri', (err, payload) => {
@@ -84,7 +85,7 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   }
 
   clearWalletInfo() {
-    this.updateWalletInfo([], -1);
+    this.updateWalletInfo([], this.chainId);
   }
 
   get waitForAccount() {

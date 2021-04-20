@@ -1,3 +1,6 @@
+import { WalletProvider } from '../wallet-providers';
+import { BigNumber } from '@ethersproject/bignumber';
+
 export interface Web3Strategy {
   chainName: string;
   isConnected: boolean;
@@ -5,13 +8,15 @@ export interface Web3Strategy {
 }
 
 export interface Layer1Web3Strategy extends Web3Strategy {
-  defaultTokenBalance: number | undefined;
-  daiBalance: number | undefined;
-  cardBalance: number | undefined;
+  defaultTokenBalance: BigNumber | undefined;
+  daiBalance: BigNumber | undefined;
+  cardBalance: BigNumber | undefined;
+  connect(walletProvider: WalletProvider): Promise<void>; // eslint-disable-line no-unused-vars
+  waitForAccount: Promise<void>;
   unlock(): Promise<void>;
   deposit(): Promise<void>;
 }
 
 export interface Layer2Web3Strategy extends Web3Strategy {
-  xdaiBalance: number | undefined;
+  xdaiBalance: BigNumber | undefined;
 }
