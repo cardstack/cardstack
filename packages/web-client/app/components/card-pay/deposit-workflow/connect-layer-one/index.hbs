@@ -7,7 +7,7 @@
 />
 <section class="card-pay-workflow-connect-layer-one__body">
   {{#if (eq this.cardState 'memorialized')}}
-    <header class="card-pay-workflow-connect-layer-one__body-header">
+    <header aria-label="Layer 1 Connected Header" class="card-pay-workflow-connect-layer-one__body-header">
       {{this.currentWalletProvider.name}}
       {{this.currentWalletProvider.logo}}
     </header>
@@ -18,7 +18,7 @@
     CARD Balance: {{this.layer1Network.cardBalance}} <br>
     Status: {{if this.layer1Network.isConnected 'Connected' 'Disconnected'}} <br>
   {{else}}
-    <header class="card-pay-workflow-connect-layer-one__body-header">Connect your Ethereum mainnet wallet</header>
+    <header aria-label="Layer 1 Connection Header" class="card-pay-workflow-connect-layer-one__body-header">Connect your Ethereum mainnet wallet</header>
     <CardPay::LayerOneWalletProviderSelection
       @walletProviders={{this.walletProviders}}
       @currentWalletProviderId={{this.currentWalletProviderId}}
