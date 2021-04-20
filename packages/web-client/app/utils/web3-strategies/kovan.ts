@@ -56,42 +56,52 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
 
   async connect(walletProvider: WalletProvider): Promise<void> {
     if (walletProvider.id === 'metamask') {
-      this.provider = await detectEthereumProvider();
-      if (this.provider) {
-        if (this.provider !== window.ethereum) {
-          console.error('Do you have multiple wallets installed?');
-          return;
-        }
-      } else {
-        console.log('Please install MetaMask!');
+      this.provider = await this.setupMetamask();
+      if (!this.provider) {
+        return;
       }
+      this.web3.setProvider(this.provider);
+      let accounts = await this.provider.request({
+        method: 'eth_requestAccounts',
+      });
+      this.updateWalletInfo(accounts, this.chainId);
     }
-    this.web3.setProvider(this.provider);
-    this.provider.on('accountsChanged', (accounts: string[]) => {
+  }
+
+  async setupMetamask() {
+    let provider: any | undefined = await detectEthereumProvider();
+    if (!provider) {
+      // TODO: some UI prompt for getting people to setup metamask
+      console.log('Please install MetaMask!');
+      return;
+    }
+
+    if (provider !== window.ethereum) {
+      // TODO: some UI prompt to get people to disconnect their other wallets
+      console.error('Do you have multiple wallets installed?');
+      return;
+    }
+
+    provider.on('accountsChanged', (accounts: string[]) => {
       this.updateWalletInfo(accounts, this.chainId);
     });
 
     // Subscribe to chainId change
-    this.provider.on('chainChanged', (chainId: number) => {
+    provider.on('chainChanged', (chainId: number) => {
       console.log(chainId);
     });
 
     // Subscribe to provider connection
-    this.provider.on('connect', (info: { chainId: number }) => {
+    provider.on('connect', (info: { chainId: number }) => {
       console.log(info);
     });
 
     // Subscribe to provider disconnection
-    this.provider.on(
-      'disconnect',
-      (error: { code: number; message: string }) => {
-        console.log(error);
-      }
-    );
-    let accounts = await this.provider.request({
-      method: 'eth_requestAccounts',
+    provider.on('disconnect', (error: { code: number; message: string }) => {
+      console.log(error);
     });
-    this.updateWalletInfo(accounts, this.chainId);
+
+    return provider;
   }
 
   get isConnected(): boolean {
