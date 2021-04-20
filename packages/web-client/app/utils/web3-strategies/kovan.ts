@@ -171,11 +171,8 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     this.daiBalance = BigNumber.from(daiBalance);
     this.cardBalance = BigNumber.from(cardBalance);
   }
-  getDefaultTokenBalance() {
-    return this.provider.request({
-      method: 'eth_getBalance',
-      params: [this.walletInfo.firstAddress, 'latest'],
-    });
+  async getDefaultTokenBalance() {
+    return await this.web3.eth.getBalance(this.walletInfo.firstAddress!);
   }
   getErc20Balance(contract: Contract) {
     return contract.methods.balanceOf(this.walletInfo.firstAddress).call();
