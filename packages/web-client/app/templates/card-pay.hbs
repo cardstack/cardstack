@@ -9,8 +9,8 @@
       @layer2Connect={{set this 'isShowingLayer2ConnectModal' true}}
       @isLayer1Connected={{this.layer1Network.isConnected}}
       @isLayer2Connected={{this.layer2Network.isConnected}}
-      @layer1Address={{this.layer1Network.walletInfo.accounts.0.address}}
-      @layer2Address={{this.layer2Network.walletInfo.accounts.0.address}}
+      @layer1Address={{this.layer1Network.walletInfo.firstAddress}}
+      @layer2Address={{this.layer2Network.walletInfo.firstAddress}}
     />
     <CardPay::HeaderNav
       @tabs={{array

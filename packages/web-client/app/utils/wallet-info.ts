@@ -18,6 +18,10 @@ export default class WalletInfo {
   accounts: WalletAccount[];
   chainId: number;
 
+  get firstAddress(): string | undefined {
+    return this.accounts.length ? this.accounts[0].address : undefined;
+  }
+
   constructor(rawAccounts: string[] | any[], chainId: number) {
     if (rawAccounts.length > 0 && typeof rawAccounts[0] === 'string') {
       this.accounts = rawAccounts.map(
