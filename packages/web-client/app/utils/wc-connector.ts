@@ -11,16 +11,16 @@ import SessionStorage from '@walletconnect/core/dist/cjs/storage';
 export default class CustomStorageWalletConnect extends Connector {
   constructor(
     connectorOpts: IWalletConnectOptions,
-    layer: string | number,
+    chain: string | number,
     pushServerOpts?: IPushServerOptions
   ) {
-    if (!layer) {
+    if (!chain) {
       throw new Error(
-        'Layer is required to set custom session storage for parallel connections in WalletConnect'
+        'chain is required to set custom session storage for parallel connections in WalletConnect'
       );
     }
     const storage = new SessionStorage();
-    storage.storageId = `wallet-connect-chain-${layer}`;
+    storage.storageId = `wallet-connect-chain-${chain}`;
     super({
       cryptoLib,
       connectorOpts,
