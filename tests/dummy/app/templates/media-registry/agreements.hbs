@@ -17,7 +17,7 @@
         />
         <Boxel::FieldRenderer
           @mode="view"
-          @field={{hash title="Date & Time" value=(moment-format (now) "MM/DD/YYYY HH:mm")}}
+          @field={{hash title="Date & Time" value=(dayjs-format (now) "MM/DD/YYYY HH:mm")}}
           @class="agreements-edit-field"
         />
       {{/if}}

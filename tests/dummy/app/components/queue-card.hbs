@@ -3,7 +3,7 @@
   boxel--light-theme" "boxel--dark-theme" }}">
   <div class="queue-card__datetime-row">
     {{#let (if @currentMilestone.timestamp @currentMilestone.timestamp @card.datetime) as |datetime|}}
-    <time datetime={{datetime}} class="queue-card__datetime">{{moment-format datetime "MMM D, h:mm A"}}</time>
+    <time datetime={{datetime}} class="queue-card__datetime">{{dayjs-format datetime "MMM D, h:mm A"}}</time>
     {{#if (eq @card.status "unread")}}
     <div class="queue-card__notification">1</div>
     {{/if}}

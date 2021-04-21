@@ -24,15 +24,15 @@
             {{#if cell}}
               {{#if (eq column.type "date")}}
                 {{#if @isCompleted}}
-                  {{moment-from cell @now}}
+                  {{dayjs-from cell @now}}
                 {{else}}
-                  {{#let (moment-diff (moment-format @now "YYYY-MM-DD") cell precision="days") as |diff|}}
+                  {{#let (dayjs-diff (dayjs-format @now "YYYY-MM-DD") cell precision="days") as |diff|}}
                     {{#if (eq diff 0)}}
                       <span class="tasklist-table__cell-important">Today</span>
                     {{else if (eq diff 1)}}
                       <span class="tasklist-table__cell-important">Tomorrow</span>
                     {{else}}
-                      {{moment-format cell "ddd, MMM D"}}
+                      {{dayjs-format cell "ddd, MMM D"}}
                     {{/if}}
                   {{/let}}
                 {{/if}}

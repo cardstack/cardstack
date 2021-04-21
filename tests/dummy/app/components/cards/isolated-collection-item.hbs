@@ -9,7 +9,7 @@
               <div class="collection__list-field-label">{{field.name}}</div>
               <div>
                 {{#if (eq field.type "date")}}
-                  {{moment-format (get item field.valuePath) "MMM D, YYYY h:mm A"}}
+                  {{dayjs-format (get item field.valuePath) "MMM D, YYYY h:mm A"}}
                 {{else}}
                   {{get item field.valuePath}}
                 {{/if}}

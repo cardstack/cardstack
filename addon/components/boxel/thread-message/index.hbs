@@ -23,7 +23,7 @@
         </span>
       {{/if}}
       <time datetime={{or @datetime (now)}} class="boxel-thread-message__time">
-        {{moment-format (or @datetime (now)) "MMM D, h:mm A"}}
+        {{dayjs-format (or @datetime (now)) "MMM D, h:mm A"}}
       </time>
     </h3>
 

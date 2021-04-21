@@ -276,7 +276,7 @@
           {{else}}
             <div class="field-renderer__opacity-control basic-field">
               {{#if (eq @field.type "date")}}
-                {{moment-format @field.value "MMM DD, YYYY" "YYYY-MM-DD"}}
+                {{dayjs-format @field.value "MMM DD, YYYY" "YYYY-MM-DD"}}
               {{else if (eq @field.type "image")}}
                 {{!-- Make this more generic --}}
                 <img src={{or @field.value this.albumArtSvg}} alt="cover art" width="260" height="260" />

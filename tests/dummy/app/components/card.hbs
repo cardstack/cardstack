@@ -37,7 +37,7 @@
         {{#if @model.description}}
           <p class="boxel-card__description">
             {{#if @model.createdDate}}
-              Created {{moment-format @model.createdDate "MMM DD, YYYY" "YYYY-MM-DD"}}<br><br>
+              Created {{dayjs-format @model.createdDate "MMM DD, YYYY" "YYYY-MM-DD"}}<br><br>
             {{/if}}
 
             {{@model.description}}

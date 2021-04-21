@@ -88,7 +88,7 @@
               </div>
               <div>
                 <div class="discrepancy-card__title">{{model.baseCard.owner}}</div>
-                <div class="discrepancy-card__datetime">{{moment-format model.baseCard.datetime "MMM D, YYYY h:mm A"}}</div>
+                <div class="discrepancy-card__datetime">{{dayjs-format model.baseCard.datetime "MMM D, YYYY h:mm A"}}</div>
               </div>
             </div>
             {{#unless this.nestedView}}
@@ -112,7 +112,7 @@
               </div>
               <div>
                 <div class="discrepancy-card__title">{{model.compCard.owner}}</div>
-                <div class="discrepancy-card__datetime">{{moment-format model.compCard.datetime "MMM D, YYYY h:mm A"}}</div>
+                <div class="discrepancy-card__datetime">{{dayjs-format model.compCard.datetime "MMM D, YYYY h:mm A"}}</div>
               </div>
             </div>
             {{#unless this.nestedView}}

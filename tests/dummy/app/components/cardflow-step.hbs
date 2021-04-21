@@ -7,6 +7,6 @@
     {{/if}}
   </div>
   {{#if (and @model.completed @model.timestamp)}}
-    <div>{{moment-format @model.timestamp "MMM D, h:mm A"}}</div>
+    <div>{{dayjs-format @model.timestamp "MMM D, h:mm A"}}</div>
   {{/if}}
 </li>

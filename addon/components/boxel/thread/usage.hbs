@@ -6,7 +6,7 @@
       </:header>
 
       <:content>
-        <Boxel::DateDivider @date={{moment-format (now)}} />
+        <Boxel::DateDivider @date={{dayjs-format (now)}} />
         <Boxel::ThreadMessage
           @imgURL={{this.cardBotIcon}}
         >
@@ -25,7 +25,7 @@
       </:header>
 
       <:content>
-        <Boxel::DateDivider @date={{moment-format (now)}} />
+        <Boxel::DateDivider @date={{dayjs-format (now)}} />
         <Boxel::ThreadMessage
           @imgURL={{this.milestones.0.senderIcon}}
         >

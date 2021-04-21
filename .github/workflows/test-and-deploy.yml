@@ -150,11 +150,9 @@ jobs:
         ember-try-scenario: [
           # ember-default-with-jquery,
           ember-release,
+          ember-beta
         ]
         allow-failure: [false]
-        include:
-          - ember-try-scenario: ember-beta
-            allow-failure: true
         #   - ember-try-scenario: ember-canary
         #     allow-failure: true
 
