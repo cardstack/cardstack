@@ -14,8 +14,6 @@ import { Contract } from 'web3-eth-contract';
 import { BigNumber } from '@ethersproject/bignumber';
 
 const WALLET_CONNECT_BRIDGE = 'https://safe-walletconnect.gnosis.io/';
-const INFURA_ID = config.infuraId;
-
 const CARD_TOKEN_ADDRESS = '0xd6E34821F508e4247Db359CFceE0cb5e8050972a';
 const DAI_TOKEN_ADDRESS = '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa';
 const ERC20_MIN_ABI: AbiItem[] = [
@@ -84,7 +82,7 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   setupWalletConnect(): any {
     let provider = new WalletConnectProvider({
       chainId: 42,
-      infuraId: INFURA_ID,
+      infuraId: config.infuraId,
       // based on https://github.com/WalletConnect/walletconnect-monorepo/blob/7aa9a7213e15489fa939e2e020c7102c63efd9c4/packages/providers/web3-provider/src/index.ts#L47-L52
       connector: new CustomStorageWalletConnect(
         {
