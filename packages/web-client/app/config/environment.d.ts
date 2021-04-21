@@ -21,6 +21,7 @@ declare const config: {
   locationType: string;
   rootURL: string;
   chains: ChainsOptions;
+  infuraId: string;
   urls: UrlsOptions;
   APP: Record<string, unknown>;
 };

@@ -1,14 +1,14 @@
 import Service from '@ember/service';
 import config from '../config/environment';
-import { Web3Strategy } from '../utils/web3-strategies/types';
-import TestWeb3Strategy from '../utils/web3-strategies/test';
+import { Layer2Web3Strategy } from '../utils/web3-strategies/types';
+import Layer2TestWeb3Strategy from '../utils/web3-strategies/test-layer2';
 import XDaiWeb3Strategy from '../utils/web3-strategies/x-dai';
 import SokolWeb3Strategy from '../utils/web3-strategies/sokol';
 import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
 
 export default class Layer2Network extends Service {
-  strategy!: Web3Strategy;
+  strategy!: Layer2Web3Strategy;
   @reads('strategy.isConnected', false) isConnected!: boolean;
   @reads('strategy.walletConnectUri') walletConnectUri: string | undefined;
   @reads('strategy.walletInfo', []) walletInfo!: WalletInfo;
@@ -25,23 +25,13 @@ export default class Layer2Network extends Service {
         this.strategy = new SokolWeb3Strategy();
         break;
       case 'test':
-        this.strategy = new TestWeb3Strategy();
+        this.strategy = new Layer2TestWeb3Strategy();
         break;
     }
   }
 
   get hasAccount() {
     return this.walletInfo.accounts.length > 0;
-  }
-
-  test__simulateWalletConnectUri() {
-    let strategy = this.strategy as TestWeb3Strategy;
-    strategy.test__simulateWalletConnectUri();
-  }
-
-  test__simulateAccountsChanged(accounts: string[]) {
-    let strategy = this.strategy as TestWeb3Strategy;
-    strategy.test__simulateAccountsChanged(accounts);
   }
 }
 

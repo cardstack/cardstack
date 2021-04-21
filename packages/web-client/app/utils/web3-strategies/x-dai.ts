@@ -3,12 +3,13 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 import Web3 from 'web3';
 import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
-import { Web3Strategy } from './types';
+import { Layer2Web3Strategy } from './types';
 import { IConnector } from '@walletconnect/types';
 import WalletInfo from '../wallet-info';
 import { defer } from 'rsvp';
+import { BigNumber } from '@ethersproject/bignumber';
 
-export default class XDaiWeb3Strategy implements Web3Strategy {
+export default class XDaiWeb3Strategy implements Layer2Web3Strategy {
   chainName = 'xDai Chain';
   chainId = 100;
   provider = new WalletConnectProvider({
@@ -23,7 +24,7 @@ export default class XDaiWeb3Strategy implements Web3Strategy {
   @reads('provider.connector') connector!: IConnector;
   @tracked isConnected = false;
   @tracked walletConnectUri: string | undefined;
-  @tracked walletInfo = { accounts: [], chainId: -1 } as WalletInfo;
+  @tracked walletInfo = new WalletInfo([], this.chainId);
   waitForAccountDeferred = defer();
   web3!: Web3;
 
@@ -31,6 +32,9 @@ export default class XDaiWeb3Strategy implements Web3Strategy {
     // super(...arguments);
     this.initialize();
   }
+
+  @tracked xdaiBalance: BigNumber | undefined;
+
   unlock(): Promise<void> {
     throw new Error('Method not implemented.');
   }
