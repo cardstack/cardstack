@@ -1,3 +1,4 @@
+{{! template-lint-disable deprecated-inline-view-helper }}
 {{#if (eq @format "table")}}
   <Card @format={{@format}} @model={{hash type="collection"}}>
     <EmbeddedCollectionTable @model={{@collection}} @mode="view" @expandAction={{@expandAction}} />

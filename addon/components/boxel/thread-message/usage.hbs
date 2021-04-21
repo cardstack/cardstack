@@ -6,6 +6,7 @@
       @datetime={{this.datetime}}
       @notRound={{this.notRound}}
       @hideMeta={{this.hideMeta}}
+      @hideName={{this.hideName}}
     >
       Hi Haley, Here’s your manuscript with all the edits I would recommend. Please review and let me know if you have any questions. I also added a couple tasks for you about things you should think about, as you figure out the rest of your story.
     </Boxel::ThreadMessage>
@@ -20,6 +21,7 @@
       @description="The name displayed above the message"
       @value={{this.name}}
       @onInput={{fn (mut this.name)}}
+      @required={{true}}
     />
     <Args.String
       @name="imgURL"
@@ -48,6 +50,13 @@
       @defaultValue={{false}}
       @onInput={{fn (mut this.hideMeta)}}
     />
+    <Args.Bool
+      @name="hideName"
+      @value={{this.hideName}}
+      @description="Visually hides the user name"
+      @defaultValue={{false}}
+      @onInput={{fn (mut this.hideName)}}
+    />
   </:api>
 </Freestyle::Usage>
 
@@ -59,8 +68,10 @@
       {{#each this.messageArray as |message i|}}
         <Boxel::ThreadMessage
           role="listitem"
+          @name="Cardbot"
           @imgURL={{this.cardbotIcon}}
           @hideMeta={{gt i 0}}
+          @hideName={{true}}
         >
           {{message}}
         </Boxel::ThreadMessage>

@@ -1,7 +1,7 @@
 <CardPlatter @class="tasklist__platter">
   <div class="tasklist">
     <section class="tasklist__section">
-      <header class="tasklist__header">
+      <header class="tasklist__header" aria-label="My tasks">
         {{svg-jar "task" width="15px" height="15px"}}
         <div class="tasklist__label">
           {{@userTasks.length}} assigned to me
@@ -14,7 +14,7 @@
       />
     </section>
     <section class="tasklist__section">
-      <header class="tasklist__header">
+      <header class="tasklist__header" aria-label="Tasks assigned to others">
         {{svg-jar "task" width="15px" height="15px"}}
         <div class="tasklist__label tasklist__label--assigned">
           {{@assignedTasks.length}} assigned to others
@@ -27,7 +27,7 @@
       />
     </section>
     <section class="tasklist__section">
-      <header class="tasklist__header">
+      <header class="tasklist__header" aria-label="Completed tasks">
         {{svg-jar "task-checkmark" width="16px" height="16px"}}
         <div class="tasklist__label tasklist__label--completed">
           {{@completedTasks.length}} completed

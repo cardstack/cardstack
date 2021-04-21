@@ -40,7 +40,6 @@ const ORGS = [
 export default class extends Component {
   @tracked orgs = A(ORGS);
   @tracked currentOrg: ExampleOrg | undefined = ORGS[0];
-  @tracked ariaLabel = 'View catalog for ';
   @action onChooseOrg(orgId: string): void {
     this.currentOrg = ORGS.find((o) => o.id === orgId);
   }

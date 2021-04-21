@@ -1,12 +1,12 @@
 <div class="queue {{@class}}">
-  <header class="queue__header">
+  <header class="queue__header" aria-labelledby="queue">
     <div class="queue__org">
       <div class="queue__org-logo" style={{css-url "background-image" this.org.iconURL}} />
       <div class="queue__org-title">{{this.org.title}}</div>
     </div>
 
     <ul class="queue__nav">
-      <li class="queue__nav-item queue__nav-item--selected">Queue</li>
+      <li id="queue" class="queue__nav-item queue__nav-item--selected">Queue</li>
       <li class="queue__nav-item">Workflows</li>
       <li class="queue__nav-item">Tasks</li>
     </ul>
@@ -32,9 +32,8 @@
   </header>
 
   <section class="queue__section">
-    <header class="queue__section-header">
-      <span>Unread</span>
-      <span class="queue__section-count">{{this.unreadCards.length}}</span>
+    <header class="queue__section-header" aria-labelledby="unread">
+      <span id="unread" class="queue__section-count">{{this.unreadCards.length}}</span>
     </header>
     <div class="queue__section-content">
       {{#each this.unreadCards as |card|}}
@@ -51,8 +50,8 @@
   </section>
 
   <section class="queue__section">
-    <header class="queue__section-header">
-      <span>Needs Response</span>
+    <header class="queue__section-header" aria-labelledby="needs-response">
+      <span id="needs-response">Needs Response</span>
       <span class="queue__section-count">{{this.actionReqCards.length}}</span>
     </header>
     <div class="queue__section-content">
@@ -68,8 +67,8 @@
   </section>
 
   <section class="queue__section">
-    <header class="queue__section-header">
-      <span>Recent Activity</span>
+    <header class="queue__section-header" aria-labelledby="recent">
+      <span id="recent">Recent Activity</span>
       <span class="queue__section-count">{{this.recentCards.length}}</span>
     </header>
     <div class="queue__section-content">

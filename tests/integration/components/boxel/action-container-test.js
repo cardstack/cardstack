@@ -3,6 +3,7 @@ import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import click from '@ember/test-helpers/dom/click';
+import a11yAudit from 'ember-a11y-testing/test-support/audit';
 
 module('Integration | Component | ActionContainer', function (hooks) {
   setupRenderingTest(hooks);
@@ -26,6 +27,9 @@ module('Integration | Component | ActionContainer', function (hooks) {
     assert.dom('[data-test-action-container-test-content]').hasText('Card');
     assert.dom('[data-test-boxel-action-footer]').exists();
     assert.dom('[data-test-boxel-action-footer] button').hasText('Save');
+
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
   });
 
   test('it can render with a prompt', async function (assert) {
@@ -41,6 +45,9 @@ module('Integration | Component | ActionContainer', function (hooks) {
 
     assert.dom('[data-test-boxel-action-container]').exists();
     assert.dom('[data-test-boxel-action-prompt]').hasText('Please enter name');
+
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
   });
 
   test('it can render in memorialized mode', async function (assert) {
@@ -59,6 +66,9 @@ module('Integration | Component | ActionContainer', function (hooks) {
       .dom('[data-test-boxel-action-container]')
       .hasClass('boxel-action-container--is-complete');
     assert.dom('[data-test-boxel-action-footer] button').hasText('Edit');
+
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
   });
 
   test('it can accept function to switch from data-entry mode to memorialized mode', async function (assert) {

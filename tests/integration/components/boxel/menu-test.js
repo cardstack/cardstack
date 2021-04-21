@@ -2,6 +2,7 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render, click } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
+import a11yAudit from 'ember-a11y-testing/test-support/audit';
 
 const MENU_ITEM_SELECTOR = '[data-test-boxel-menu-item]';
 const MENU_ITEM_ICON_SELECTOR = '[data-test-boxel-menu-item-icon]';
@@ -10,6 +11,11 @@ const TEST_MENU_ITEM_TEXT_ATTRIBUTE = 'data-test-boxel-menu-item-text';
 
 module('Integration | Component | Menu', function (hooks) {
   setupRenderingTest(hooks);
+
+  hooks.afterEach(async function (assert) {
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
+  });
 
   test('It can render a list of menu items that trigger appropriate callbacks when clicked', async function (assert) {
     let lastClicked = null;
@@ -23,7 +29,7 @@ module('Integration | Component | Menu', function (hooks) {
     await render(hbs`
       <Boxel::Menu
         @closeMenu={{fn this.closeMenu}}
-        @items={{array 
+        @items={{array
           (menu-item 'One' (fn this.record 'One'))
           (menu-item 'Two' (fn this.record 'Two') dangerous=true)
           (menu-item 'Three' (fn this.record 'Three') icon='gear')
@@ -45,7 +51,7 @@ module('Integration | Component | Menu', function (hooks) {
     await render(hbs`
       <Boxel::Menu
         @closeMenu={{noop}}
-        @items={{array 
+        @items={{array
           (menu-item 'Top' (noop))
           (menu-item '---')
           (menu-item 'Three' (noop))
@@ -59,7 +65,7 @@ module('Integration | Component | Menu', function (hooks) {
     await render(hbs`
       <Boxel::Menu
         @closeMenu={{noop}}
-        @items={{array 
+        @items={{array
           (menu-item 'Dangerous' (noop) dangerous=true)
           (menu-item 'Icon' (noop) icon='gear')
           (menu-item 'Icon' (noop) icon='gear' dangerous=true)

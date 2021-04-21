@@ -3,15 +3,15 @@ import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 
 export default class ModalUsage extends Component {
-  @tracked open = false;
+  @tracked isOpen = false;
   @tracked overlayClass = '';
   @tracked offsetRight = '0px';
   @tracked offsetLeft = '0px';
-  @tracked offsetTop = '30px';
+  @tracked offsetTop = 'none';
   @tracked maxWidth = '60%';
 
   @action
   onClose(): void {
-    this.open = false;
+    this.isOpen = false;
   }
 }

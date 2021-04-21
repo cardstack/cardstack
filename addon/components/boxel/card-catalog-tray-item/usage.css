@@ -73,9 +73,15 @@
   overflow: scroll;
 }
 
+.boxel-card-catalog-tray-example__list-container:focus {
+  outline: var(--boxel-outline);
+}
+
 .boxel-card-catalog-tray-example__list {
   display: inline-flex;
   align-items: center;
+  list-style: none;
+  margin: 0;
   padding: 0 var(--boxel-sp);
   min-height: calc(5rem + 2px); /* 2px for the borders */
   min-width: 100%;

@@ -1,10 +1,12 @@
-<ul class={{cn "boxel-menu" @class}} ...attributes>
+{{! template-lint-disable no-invalid-role }}
+<ul role="menu" class={{cn "boxel-menu" @class}} ...attributes>
   {{#if @items}}
     {{#each (compact @items) as |menuItem|}}
       {{#if (eq menuItem.type "divider")}}
         <hr class="boxel-menu__separator" data-test-boxel-menu-separator />
       {{else}}
         <li
+          role="none"
           class={{cn
             "boxel-menu__item"
             boxel-menu__item--dangerous=menuItem.dangerous
@@ -13,6 +15,7 @@
           data-test-boxel-menu-item
         >
           <a
+            role="menuitem"
             href="#"
             data-test-boxel-menu-item-text={{menuItem.text}}
             {{on "click" (fn this.invokeMenuItemAction menuItem.action)}}

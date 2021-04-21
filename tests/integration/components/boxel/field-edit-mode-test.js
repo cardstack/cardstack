@@ -2,6 +2,7 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
+import a11yAudit from 'ember-a11y-testing/test-support/audit';
 
 module('Integration | Component | Field - Edit Mode', function (hooks) {
   setupRenderingTest(hooks);
@@ -25,7 +26,7 @@ module('Integration | Component | Field - Edit Mode', function (hooks) {
   test('it renders with id and labelClass', async function (assert) {
     await render(hbs`<Boxel::Field
       @fieldMode="edit"
-      @id="breed"
+      @fieldId="breed"
       @label="Breed"
       @labelClass="dog-breed"
     >
@@ -34,5 +35,8 @@ module('Integration | Component | Field - Edit Mode', function (hooks) {
     assert.dom('[data-test-boxel-edit-field-id="breed"]').hasText('Breed');
     assert.dom('[data-test-boxel-edit-field-label]').hasClass('dog-breed');
     assert.dom('[data-test-boxel-edit-field] input').hasValue('Beagle');
+
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
   });
 });

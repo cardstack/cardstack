@@ -1,10 +1,5 @@
 .boxel-card-container {
-  --boxel-card-container-min-height: 5rem;
-
   position: relative;
-  min-height: var(--boxel-card-container-min-height);
-  width: 100%;
-  height: 100%;
   background-color: var(--boxel-light);
   border-radius: var(--boxel-border-radius);
   overflow: hidden;

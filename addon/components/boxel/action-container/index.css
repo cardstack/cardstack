@@ -14,7 +14,7 @@
 
 /* Card Header */
 .boxel-action-container__header {
-  --boxel-header-text-color: var(--boxel-purple-300);
+  --boxel-header-text-color: var(--boxel-purple-400);
   --boxel-header-background-color: transparent;
 
   border-top-right-radius: inherit;

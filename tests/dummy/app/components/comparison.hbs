@@ -1,3 +1,4 @@
+{{! template-lint-disable deprecated-inline-view-helper }}
 <section class="discrepancy" {{did-insert (if this.nestedView this.getNestedFields this.adjustCount)}}>
   <div class="discrepancy__container">
     <header class="discrepancy__header">
@@ -10,14 +11,14 @@
     </header>
 
     <Boxel::Breadcrumbs @class="discrepancy__breadcrumbs">
-      <LinkTo @route={{@topLevelRoute}} @model={{if @model.topLevelCard @model.topLevelCard.id @model.id}} @class="boxel-breadcrumbs__item boxel-breadcrumbs__item--inverse">
+      <LinkTo @route={{@topLevelRoute}} @model={{if @model.topLevelCard @model.topLevelCard.id @model.id}} class="boxel-breadcrumbs__item boxel-breadcrumbs__item--inverse">
         <div class="boxel-breadcrumbs__item-label">Field</div>
         <div class="boxel-breadcrumbs__item-title">Musical Work</div>
       </LinkTo>
 
       {{#if @model.parentCard.cardType}}
         <span class="boxel-breadcrumbs__caret" />
-        <LinkTo @route={{@model.parentCard.route}} @model={{@model.parentCard}} @class="boxel-breadcrumbs__item boxel-breadcrumbs__item--inverse">
+        <LinkTo @route={{@model.parentCard.route}} @model={{@model.parentCard}} class="boxel-breadcrumbs__item boxel-breadcrumbs__item--inverse">
           <div class="boxel-breadcrumbs__item-label">Field</div>
           <div class="boxel-breadcrumbs__item-title">{{humanize @model.parentCard.cardType}}</div>
         </LinkTo>
@@ -42,7 +43,7 @@
       <div class="discrepancy__comparison-header {{if (eq this.mode "comparison") "discrepancy__comparison-header--comp-mode"}}">
         <div class="discrepancy__comparison-header-title-group">
           {{#if this.nestedView}}
-            <LinkTo @route={{@topLevelRoute}} @model={{@model.topLevelCard.id}} @class="discrepancy__nested-level-back-btn">
+            <LinkTo @route={{@topLevelRoute}} @model={{@model.topLevelCard.id}} class="discrepancy__nested-level-back-btn">
               Go back to {{@model.topLevelCard.type}}
             </LinkTo>
           {{else}}

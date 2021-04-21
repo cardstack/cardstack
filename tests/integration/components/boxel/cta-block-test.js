@@ -2,6 +2,7 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
+import a11yAudit from 'ember-a11y-testing/test-support/audit';
 
 const CTA_BLOCK_SELECTOR = '[data-test-boxel-cta-block]';
 const MAIN_ACTION_BUTTON_SELECTOR =
@@ -47,6 +48,9 @@ module('Integration | Component | CtaBlock', function (hooks) {
     `);
     assert.dom(MAIN_ACTION_BUTTON_SELECTOR).containsText(mainActionButtonText);
     assert.dom(INFO_AREA_SELECTOR).containsText(infoAreaText);
+
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
   });
 
   test('it accepts and renders the disabled named block with the ActionButton component', async function (assert) {
@@ -68,6 +72,9 @@ module('Integration | Component | CtaBlock', function (hooks) {
     assert.dom(MAIN_ACTION_BUTTON_SELECTOR).containsText(mainActionButtonText);
     assert.dom(MAIN_ACTION_BUTTON_SELECTOR).isDisabled();
     assert.dom(DEFAULT_PRIVATE_NOTICE_SELECTOR).isNotVisible();
+
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
   });
 
   test('it accepts and renders the in-progress named block with the ActionButton, CancelButton, and InfoArea components', async function (assert) {
@@ -101,6 +108,9 @@ module('Integration | Component | CtaBlock', function (hooks) {
       .dom(CANCEL_ACTION_BUTTON_SELECTOR)
       .containsText(cancelActionButtonText);
     assert.dom(INFO_AREA_SELECTOR).containsText(infoAreaText);
+
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
   });
 
   test('it accepts and renders the memorialized named block with the ActionButton, ActionStatusArea, and InfoArea components', async function (assert) {
@@ -131,6 +141,9 @@ module('Integration | Component | CtaBlock', function (hooks) {
     `);
     assert.dom(MAIN_ACTION_BUTTON_SELECTOR).containsText(mainActionButtonText);
     assert.dom(INFO_AREA_SELECTOR).containsText(infoAreaText);
+
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
 
     await render(hbs`
       <Boxel::CtaBlock
@@ -202,6 +215,9 @@ module('Integration | Component | CtaBlock', function (hooks) {
     assert.dom(`[${STEP_DATA_TEST_ATTRIBUTE}="1"]`).containsText('Step 1');
     this.set('stepNumber', 2);
     assert.dom(`[${STEP_DATA_TEST_ATTRIBUTE}="2"]`).containsText('Step 2');
+
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
   });
 
   test('In the memorialized state, the ActionStatusArea icon can be configured', async function (assert) {

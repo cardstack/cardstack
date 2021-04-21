@@ -2,6 +2,7 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render, click } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
+import a11yAudit from 'ember-a11y-testing/test-support/audit';
 
 const BUTTON_SELECTOR = '[data-test-boxel-button]';
 
@@ -11,6 +12,9 @@ module('Integration | Component | Button', function (hooks) {
   test('It renders with the correct text contents', async function (assert) {
     await render(hbs`<Boxel::Button>A button</Boxel::Button>`);
     assert.dom(BUTTON_SELECTOR).hasText('A button');
+
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
   });
 
   test('It renders with the correct html inside', async function (assert) {
@@ -35,6 +39,9 @@ module('Integration | Component | Button', function (hooks) {
   test('It can be disabled via html attribute', async function (assert) {
     await render(hbs`<Boxel::Button disabled>A button</Boxel::Button>`);
     assert.dom(BUTTON_SELECTOR).isDisabled();
+
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
   });
 
   test('It can be disabled via argument', async function (assert) {
@@ -42,6 +49,9 @@ module('Integration | Component | Button', function (hooks) {
       hbs`<Boxel::Button @disabled={{ true }}>A button</Boxel::Button>`
     );
     assert.dom(BUTTON_SELECTOR).isDisabled();
+
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
   });
 
   test('It can apply appropriate classes depending on the kind argument', async function (assert) {
@@ -71,6 +81,9 @@ module('Integration | Component | Button', function (hooks) {
     // check that there is a default value set
     this.set('kind', '');
     assert.dom(BUTTON_SELECTOR).hasClass(/--kind-secondary-light/);
+
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
   });
 
   test('It can apply appropriate classes depending on the size argument', async function (assert) {
@@ -112,12 +125,20 @@ module('Integration | Component | Button', function (hooks) {
     );
     assert.dom(`a${BUTTON_SELECTOR}`).hasAttribute('href', '#');
     assert.dom(`button${BUTTON_SELECTOR}`).doesNotExist();
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
+
     this.set('as', '');
     assert.dom(`a${BUTTON_SELECTOR}`).doesNotExist();
     assert.dom(`button${BUTTON_SELECTOR}`).doesNotHaveAttribute('href');
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
+
     this.set('as', 'link-to');
     assert.dom(`a${BUTTON_SELECTOR}`).exists();
     assert.dom(`button${BUTTON_SELECTOR}`).doesNotExist();
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
   });
 
   test('An anchor element button should be able to receive event listeners', async function (assert) {
@@ -127,7 +148,7 @@ module('Integration | Component | Button', function (hooks) {
       clicked = true;
     });
     await render(hbs`
-      <Boxel::Button @href={{ this.href }} {{ on "click" this.onClick }}>      
+      <Boxel::Button @href={{ this.href }} {{ on "click" this.onClick }}>
         An anchor
       </Boxel::Button>
     `);

@@ -2,6 +2,7 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render, click } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
+import a11yAudit from 'ember-a11y-testing/test-support/audit';
 
 const SELECTION_CONTROL_GROUP_DATA_ATTRIBUTE =
   'data-test-boxel-selection-control-group';
@@ -15,6 +16,11 @@ const SELECTION_CONTROL_GROUP_DROPDOWN_SELECTOR =
 module('Integration | Component | SelectionControlGroup', function (hooks) {
   setupRenderingTest(hooks);
 
+  hooks.afterEach(async function (assert) {
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
+  });
+
   test('It can render a state where all items are selected', async function (assert) {
     let toggled = false;
     this.setProperties({
@@ -25,10 +31,10 @@ module('Integration | Component | SelectionControlGroup', function (hooks) {
       isSelected: true,
     });
     await render(
-      hbs`<Boxel::SelectionControlGroup 
-            @selectedItemCount={{this.selectedItemCount}} 
-            @toggleSelectAll={{fn this.toggleSelectAll}} 
-            @isSelected={{this.isSelected}} 
+      hbs`<Boxel::SelectionControlGroup
+            @selectedItemCount={{this.selectedItemCount}}
+            @toggleSelectAll={{fn this.toggleSelectAll}}
+            @isSelected={{this.isSelected}}
             @menuComponent={{component 'boxel/menu' items=(array
                 (menu-item "Delete" (noop))
                 (menu-item "Duplicate" (noop))
@@ -54,10 +60,10 @@ module('Integration | Component | SelectionControlGroup', function (hooks) {
       isSelected: false,
     });
     await render(
-      hbs`<Boxel::SelectionControlGroup 
-            @selectedItemCount={{this.selectedItemCount}} 
-            @toggleSelectAll={{fn this.toggleSelectAll}} 
-            @isSelected={{this.isSelected}} 
+      hbs`<Boxel::SelectionControlGroup
+            @selectedItemCount={{this.selectedItemCount}}
+            @toggleSelectAll={{fn this.toggleSelectAll}}
+            @isSelected={{this.isSelected}}
             @menuComponent={{component 'boxel/menu' items=(array
                 (menu-item "Delete" (noop))
                 (menu-item "Duplicate" (noop))
@@ -83,10 +89,10 @@ module('Integration | Component | SelectionControlGroup', function (hooks) {
       isSelected: false,
     });
     await render(
-      hbs`<Boxel::SelectionControlGroup 
-            @selectedItemCount={{this.selectedItemCount}} 
-            @toggleSelectAll={{fn this.toggleSelectAll}} 
-            @isSelected={{this.isSelected}} 
+      hbs`<Boxel::SelectionControlGroup
+            @selectedItemCount={{this.selectedItemCount}}
+            @toggleSelectAll={{fn this.toggleSelectAll}}
+            @isSelected={{this.isSelected}}
             @menuComponent={{component 'boxel/menu' items=(array
                 (menu-item "Delete" (noop))
                 (menu-item "Duplicate" (noop))
@@ -112,10 +118,10 @@ module('Integration | Component | SelectionControlGroup', function (hooks) {
       isSelected: true,
     });
     await render(
-      hbs`<Boxel::SelectionControlGroup 
-            @selectedItemCount={{this.selectedItemCount}} 
-            @toggleSelectAll={{fn this.toggleSelectAll}} 
-            @isSelected={{this.isSelected}} 
+      hbs`<Boxel::SelectionControlGroup
+            @selectedItemCount={{this.selectedItemCount}}
+            @toggleSelectAll={{fn this.toggleSelectAll}}
+            @isSelected={{this.isSelected}}
           />`
     );
     assert.dom(`[${SELECTION_CONTROL_GROUP_DATA_ATTRIBUTE}=selected]`).exists();

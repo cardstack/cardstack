@@ -1,6 +1,6 @@
 <div class="boxel-sort-menu" style={{this.styleAttribute}} ...attributes>
   <header>Sort by</header>
-  <ul>
+  <ul role="menu">
     {{#each @sortableColumns as |column|}}
       <Boxel::SortMenu::Item
         @column={{column}}

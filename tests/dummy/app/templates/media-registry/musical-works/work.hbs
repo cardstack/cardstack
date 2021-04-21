@@ -1,7 +1,7 @@
 <DetailTemplate>
   <Boxel::Breadcrumbs>
     {{#if this.work.masterDetail}}
-      <LinkTo @route="media-registry.item" @model={{this.work.masterDetail.id}} @class="boxel-breadcrumbs__item">
+      <LinkTo @route="media-registry.item" @model={{this.work.masterDetail.id}} class="boxel-breadcrumbs__item">
         <div class="boxel-breadcrumbs__item-label">Master Detail</div>
         <div class="boxel-breadcrumbs__item-title">{{this.work.masterDetail.title}}</div>
       </LinkTo>

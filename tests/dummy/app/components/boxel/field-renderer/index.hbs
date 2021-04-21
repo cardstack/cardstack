@@ -1,3 +1,4 @@
+{{! template-lint-disable }}
 {{#if (eq @mode "edit")}}
   {{!-- Edit Mode --}}
   {{#if (or (eq @field.type "card") (eq @field.type "collection") @field.value.id (is-array @field.value))}}
@@ -84,7 +85,7 @@
           </PowerSelect>
         </div>
       {{else if (eq @field.type "textarea")}}
-        <Textarea @type={{@field.type}} @class="field-renderer__input field-renderer__textarea" @value={{@field.value}} />
+        <Textarea @type={{@field.type}} class="field-renderer__input field-renderer__textarea" @value={{@field.value}} />
       {{else}}
         <Boxel::Input
           type={{@field.type}}

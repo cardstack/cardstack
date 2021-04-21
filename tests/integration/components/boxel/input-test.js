@@ -2,6 +2,7 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render, fillIn } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
+import a11yAudit from 'ember-a11y-testing/test-support/audit';
 
 module('Integration | Component | Input', function (hooks) {
   setupRenderingTest(hooks);
@@ -15,7 +16,9 @@ module('Integration | Component | Input', function (hooks) {
 
   test('it renders with arguments', async function (assert) {
     await render(
-      hbs`<Boxel::Input @id="input-test" @value="Puppies" @disabled={{true}} @required={{true}} />`
+      hbs`
+      <label for="input-test" class="boxel-sr-only">Pets</label>
+      <Boxel::Input @id="input-test" @value="Puppies" @disabled={{true}} @required={{true}} />`
     );
     assert
       .dom('[data-test-boxel-input-id="input-test"]')
@@ -29,6 +32,8 @@ module('Integration | Component | Input', function (hooks) {
     assert
       .dom('[data-test-boxel-input-id="input-test"]')
       .isRequired('can be required');
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
   });
 
   test('it accepts input', async function (assert) {

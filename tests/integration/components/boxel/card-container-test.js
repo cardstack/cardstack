@@ -3,6 +3,7 @@ import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import click from '@ember/test-helpers/dom/click';
+import a11yAudit from 'ember-a11y-testing/test-support/audit';
 
 module('Integration | Component | CardContainer', function (hooks) {
   setupRenderingTest(hooks);
@@ -21,6 +22,9 @@ module('Integration | Component | CardContainer', function (hooks) {
     assert
       .dom('[data-test-boxel-card-container]')
       .doesNotHaveClass('boxel-card-container--selected');
+
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
   });
 
   test('it can render with boundaries', async function (assert) {
@@ -34,6 +38,9 @@ module('Integration | Component | CardContainer', function (hooks) {
     assert
       .dom('[data-test-boxel-card-container]')
       .hasClass('boxel-card-container--boundaries');
+
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
   });
 
   test('it can be selected', async function (assert) {
@@ -63,6 +70,9 @@ module('Integration | Component | CardContainer', function (hooks) {
     assert
       .dom('[data-test-boxel-card-container]')
       .hasClass('boxel-card-container--selected');
+
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
 
     await click('[data-test-boxel-header-label-button]');
     assert

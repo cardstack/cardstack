@@ -2,11 +2,17 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render, click } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
+import a11yAudit from 'ember-a11y-testing/test-support/audit';
 
 const SELECT_BUTTON_SELECTOR = '[data-test-boxel-select-button]';
 
 module('Integration | Component | SelectButton', function (hooks) {
   setupRenderingTest(hooks);
+
+  hooks.afterEach(async function (assert) {
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
+  });
 
   test('It renders', async function (assert) {
     await render(hbs`<Boxel::SelectButton/>`);

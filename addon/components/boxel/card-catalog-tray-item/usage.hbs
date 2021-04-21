@@ -35,8 +35,8 @@
 </Freestyle::Usage>
 
 <Freestyle::Usage @description="dragging example">
-    {{!-- 
-      note - drop shadow does not actually follow this in the example. 
+    {{!--
+      note - drop shadow does not actually follow this in the example.
       right now the browser has control over styles of the drag image
      --}}
   <:example>
@@ -87,7 +87,7 @@
           {{svg-jar "close" width="100%" height="100%" aria-hidden=true}}
         </button>
       </header>
-      <div class="boxel-card-catalog-tray-example__list-container">
+      <div class="boxel-card-catalog-tray-example__list-container" tabindex="0">
         <ul class="boxel-card-catalog-tray-example__list">
           {{#each this.filteredItems as |item|}}
           <li>

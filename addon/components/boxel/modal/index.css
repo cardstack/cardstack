@@ -19,11 +19,14 @@
   --boxel-modal-max-width: 1000px;
 
   position: fixed;
+  width: 100%;
   height: calc(100vh - var(--boxel-modal-offset-top));
   top: var(--boxel-modal-offset-top);
   left: var(--boxel-modal-offset-left);
   right: var(--boxel-modal-offset-right);
   margin: 0 auto;
+  padding: 0;
+  background: none;
   border: none;
   overflow: hidden;
   z-index: 15;

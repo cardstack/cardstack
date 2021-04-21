@@ -17,6 +17,8 @@
               <AnimatedContainer onInitialRender={{not milestone.complete}}>
                 {{#animated-each milestone.message initialInsertion=(not milestone.complete) use=this.transition as |content i|}}
                   <Boxel::ThreadMessage
+                    @name="Cardbot"
+                    @hideName={{true}}
                     @imgURL={{@workflowBot.imgURL}}
                     @datetime={{milestone.datetime}}
                     @hideMeta={{gt i 0}}

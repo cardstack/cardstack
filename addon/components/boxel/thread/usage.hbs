@@ -8,6 +8,8 @@
       <:content>
         <Boxel::DateDivider @date={{dayjs-format (now)}} />
         <Boxel::ThreadMessage
+          @name="Cardbot"
+          @hideName={{true}}
           @imgURL={{this.cardBotIcon}}
         >
           Hello, it's nice to see you!
@@ -27,6 +29,8 @@
       <:content>
         <Boxel::DateDivider @date={{dayjs-format (now)}} />
         <Boxel::ThreadMessage
+          @name="Cardbot"
+          @hideName={{true}}
           @imgURL={{this.milestones.0.senderIcon}}
         >
           {{this.milestones.0.message}}

@@ -2,6 +2,7 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render, click } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
+import a11yAudit from 'ember-a11y-testing/test-support/audit';
 
 const TEST_COLUMN_ATTRIBUTE = 'data-test-boxel-sort-menu-item-column';
 const TEST_DIRECTION_ATTRIBUTE = 'data-test-boxel-sort-menu-item-direction';
@@ -32,6 +33,9 @@ module('Integration | Component | SortMenu', function (hooks) {
       .exists()
       .includesText('Year')
       .hasText(DESCENDING_NUMERIC_REGEX);
+
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
   });
 
   test('It renders alphabetical items as an ascending-descending pair', async function (assert) {

@@ -4,10 +4,10 @@
       <label for={{@id}} class="boxel-searchbox__input-label">{{@label}}</label>
     {{/if}}
     {{!-- TODO: review accessibility of type=text vs type=search --}}
-    <Input 
-      type="text"
+    <Input
+      @type="text"
       class="boxel-searchbox__input"
-      @id={{@id}}
+      id={{@id}}
       @value={{@value}}
       {{on "input" (optional @onInput)}}
       {{on "change" (optional @onChange)}}

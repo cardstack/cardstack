@@ -4,14 +4,12 @@
     boxel-action-container--is-complete=@isComplete
   }}
   data-test-boxel-action-container
+  data-test-boxel-action-container-is-complete={{@isComplete}}
   ...attributes
 >
   <Boxel::Header
     class="boxel-action-container__header"
     @header={{@header}}
-    @hasContextMenu={{true}}
-    @expandable={{true}}
-    @expandAction={{@expandAction}}
     data-test-boxel-action-header
   />
 

@@ -15,13 +15,21 @@
   display: grid;
   grid-template-columns: 1fr auto;
   background-color: var(--boxel-light-300);
-  border-radius: var(--boxel-border-radius);
   overflow: hidden;
 }
 
 .boxel-thread__scroll-wrapper {
   padding-bottom: var(--boxel-sp-lg);
   overflow-y: auto;
+}
+
+.boxel-thread__scroll-wrapper:focus {
+  outline-color: var(--boxel-outline-color);
+  outline-offset: -1px;
+}
+
+.boxel-thread__scroll-wrapper:focus:not(:focus-visible) {
+  outline: none;
 }
 
 .boxel-thread__content {

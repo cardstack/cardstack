@@ -5,13 +5,16 @@
   --queue-card-secondary-color: var(--boxel-purple-300);
 
   position: relative;
+  display: block;
   width: 100%;
   padding: 0;
+  border: none;
   border-radius: var(--boxel-border-radius);
   background-color: var(--boxel-purple-500);
   color: var(--queue-card-primary-color);
   font: var(--boxel-font-xs);
   letter-spacing: var(--boxel-lsp-lg);
+  text-align: left;
   transition:
     color var(--boxel-transition),
     background-color var(--boxel-transition);

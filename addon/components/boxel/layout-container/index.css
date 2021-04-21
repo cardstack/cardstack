@@ -7,7 +7,7 @@
 }
 
 .boxel-layout-container__header {
-  --boxel-header-text-color: var(--boxel-purple-300);
+  --boxel-header-text-color: var(--boxel-purple-400);
 }
 
 .boxel-layout-container:hover .boxel-layout-container__header {

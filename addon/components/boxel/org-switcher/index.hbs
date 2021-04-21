@@ -4,8 +4,8 @@
       <Boxel::OrgSwitcher::Button
         @org={{org}}
         @isSelected={{eq @currentOrg org}}
-        aria-label={{if @ariaLabel (concat @ariaLabel " " org.title) (concat "Organization page for " org.title)}}
         {{on "click" (fn @onChooseOrg org.id)}}
+        aria-label={{concat (or org.title org.id) " organization page"}}
       />
     </li>
   {{/each}}

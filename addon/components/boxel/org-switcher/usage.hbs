@@ -4,7 +4,6 @@
       <Boxel::OrgSwitcher
         @orgs={{this.orgs}}
         @currentOrg={{this.currentOrg}}
-        @ariaLabel={{this.ariaLabel}}
         @onChooseOrg={{this.onChooseOrg}}
       />
     </Doc::DemoStage>
@@ -15,12 +14,6 @@
       @value={{this.currentOrg}}
       @description="The organization to show as selected."
       @jsonCollapseDepth={{0}}
-    />
-    <Args.String
-      @name="ariaLabel"
-      @value={{this.ariaLabel}}
-      @description="which card mode are we in"
-      @onInput={{fn (mut this.ariaLabel)}}
     />
     <Args.Action
       @name="onChooseOrg"

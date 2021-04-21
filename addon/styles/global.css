@@ -18,6 +18,10 @@ body {
   overscroll-behavior: none;
 }
 
+body.has-modal {
+  overflow: hidden;
+}
+
 a {
   display: inline-block;
   color: inherit;

@@ -11,4 +11,6 @@ module.exports = {
     'require-button-type': false,
     quotes: 'double',
   },
+
+  ignore: ['tests/dummy/app/templates/media-registry/**'],
 };

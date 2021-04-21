@@ -10,7 +10,6 @@
       @completeActionLabel={{this.completeActionLabel}}
       @isComplete={{this.isComplete}}
       @onClickButton={{fn (mut this.isComplete) (not this.isComplete)}}
-      @expandAction={{@expandAction}}
     >
       {{!-- Sample block yield --}}
         <div>Action Card here</div>
@@ -49,11 +48,6 @@
     <Args.Action
       @name="onClickButton"
       @description="Function for the CTA button action"
-      @required={{true}}
-    />
-    <Args.Action
-      @name="expandAction"
-      @description="action for expand button"
       @required={{true}}
     />
     <Args.Bool

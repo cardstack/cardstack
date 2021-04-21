@@ -1,6 +1,6 @@
 <section class="versions">
   <div class="versions-grid {{if this.isCompView "versions-grid--comp-view"}}">
-    <header class="versions__header">
+    <header class="versions__header" aria-label="Version history">
       <h1 class="versions__title">Master Recording - {{@model.title}}</h1>
       {{#if this.isCompView}}
         <div class="versions__view">
@@ -48,7 +48,7 @@
       <div class="versions__cards {{if this.isCompView "comp-view"}}" {{did-insert this.setPositions}}>
         {{#let this.compCardContent as |c|}}
           <div class="version-card version-card--comp-card">
-            <header class="version-card__header">
+            <header class="version-card__header" aria-label="Comparison card">
               <div class="version__title">{{dayjs-format c.published "MMM D, h:mm A"}}</div>
               <div class="version__description">{{c.description}}</div>
               <div class="version__label">{{if (eq c.id this.latest.id) "Current"}}</div>
@@ -58,7 +58,7 @@
         {{/let}}
         {{#let this.baseCardContent as |v|}}
           <div class="version-card version-card--base-card {{if (eq v.id this.latest.id) "current"}}">
-            <header class="version-card__header">
+            <header class="version-card__header" aria-label="Selected card">
               <div class="version__title">{{dayjs-format v.published "MMM D, h:mm A"}}</div>
               <div class="version__description">{{v.description}}</div>
               <div class="version__label">{{if (eq v.id this.latest.id) "Current"}}</div>
@@ -91,7 +91,7 @@
       <AnimatedContainer class="versions__cards" {{did-insert this.setPositions}}>
         {{#animated-each this.versions watch="position" key="version" use=this.transition as |v|}}
           <div class="version-card version-card--{{v.position}} {{if (eq v.id this.latest.id) "current"}} {{if (eq v.id (sub this.latest.id 1)) "current-1"}} {{if (eq v.id (sub this.latest.id 2)) "current-2"}}">
-            <header class="version-card__header">
+            <header class="version-card__header" aria-label="Version">
               <div class="version__title">{{dayjs-format v.published "MMM D, h:mm A"}}</div>
               <div class="version__description">{{v.description}}</div>
               <div class="version__label">{{if (eq v.id this.latest.id) "Current"}}</div>

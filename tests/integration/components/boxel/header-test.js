@@ -3,9 +3,15 @@ import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import click from '@ember/test-helpers/dom/click';
+import a11yAudit from 'ember-a11y-testing/test-support/audit';
 
 module('Integration | Component | Header', function (hooks) {
   setupRenderingTest(hooks);
+
+  hooks.afterEach(async function (assert) {
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found!');
+  });
 
   test('it renders', async function (assert) {
     await render(hbs`<Boxel::Header @header="Card Header" />`);

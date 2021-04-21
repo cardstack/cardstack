@@ -105,8 +105,6 @@
 .boxel-expandable-banner__summary-marker-icon {
   margin-left: var(--boxel-sp-xs);
   transform: rotate(180deg);
-
-  /* transition: transform var(--boxel-transition); */
 }
 
 .boxel-expandable-banner__details[open] .boxel-expandable-banner__summary-marker-icon {

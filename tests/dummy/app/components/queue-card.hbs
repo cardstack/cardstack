@@ -1,4 +1,4 @@
-<div role="button" {{on "click" @selectCard}}
+<button {{on "click" @selectCard}}
   class="queue-card {{if (and (eq @card.id @currentCard.id) (eq @card.orgId @currentCard.orgId)) "
   boxel--light-theme" "boxel--dark-theme" }}">
   <div class="queue-card__datetime-row">
@@ -12,9 +12,9 @@
 
   <section class="queue-card__content">
     {{#if @card.project}}
-    <h4 class="queue-card__label">{{@card.project}}</h4>
+    <span class="queue-card__label">{{@card.project}}</span>
     {{/if}}
-    <h3 class="queue-card__project-title">{{@card.title}}</h3>
+    <span class="queue-card__project-title">{{@card.title}}</span>
     {{#if (and @card.participants @card.participants.length)}}
       <Boxel::ParticipantsSummary @participants={{@card.participants}} class="queue-card__participants" />
     {{/if}}
@@ -41,4 +41,4 @@
     </div>
   </footer>
   {{/if}}
-</div>
+</button>

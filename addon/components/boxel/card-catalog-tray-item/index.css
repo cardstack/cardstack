@@ -22,6 +22,14 @@
   align-items: center;
 }
 
+.boxel-card-catalog-tray-item:focus {
+  outline: var(--boxel-outline);
+}
+
+.boxel-card-catalog-tray-item:focus:not(:focus-visible) {
+  outline-color: transparent;
+}
+
 .boxel-card-catalog-tray-item--dragged-item {
   --boxel-card-catalog-tray-item-border: 1px solid rgba(39, 35, 48, 0.15); /* var(--boxel-purple-900) with 15% opacity */
 

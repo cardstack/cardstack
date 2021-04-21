@@ -25,21 +25,5 @@
   --icon-color: var(--boxel-purple-400);
 
   background-color: var(--boxel-purple-100);
-  color: var(--boxel-purple-400);
-}
-
-.boxel-action-chin--light > button {
-  border-color: var(--boxel-purple-300);
-  transition: border-color var(--boxel-transition);
-}
-
-.boxel-action-chin--light > button:hover {
-  border-color: var(--boxel-dark);
-}
-
-.boxel-action-chin > button:disabled {
-  background-color: var(--boxel-purple-300);
-  border-color: var(--boxel-purple-300);
   color: var(--boxel-purple-500);
-  filter: none;
 }
