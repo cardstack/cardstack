@@ -26,6 +26,7 @@ module.exports = function (environment) {
       layer1: process.env.LAYER_1_CHAIN || 'keth', // set to "eth" for production
       layer2: process.env.LAYER_2_CHAIN || 'sokol', // set to "xdai" for production,
     },
+    infuraId: process.env.INFURA_ID,
     urls: {
       appStoreLink: undefined,
       googlePlayStoreLink: undefined,

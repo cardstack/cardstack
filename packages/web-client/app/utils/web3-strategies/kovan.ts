@@ -1,3 +1,4 @@
+import config from '../../config/environment';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { tracked } from '@glimmer/tracking';
 import { WalletProvider } from '../wallet-providers';
@@ -11,7 +12,7 @@ import { Contract } from 'web3-eth-contract';
 import { BigNumber } from '@ethersproject/bignumber';
 
 const WALLET_CONNECT_BRIDGE = 'https://safe-walletconnect.gnosis.io/';
-const INFURA_ID = '';
+const INFURA_ID = config.infuraId;
 
 const CARD_TOKEN_ADDRESS = '0xd6E34821F508e4247Db359CFceE0cb5e8050972a';
 const DAI_TOKEN_ADDRESS = '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa';
