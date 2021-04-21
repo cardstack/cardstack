@@ -26,7 +26,7 @@ export default function dynamicCardTransform(
 }
 
 function babelConfig(moduleURL: string): TransformOptions {
-  let ensureModuleApiPolyfill = false; // For now?Not sure we need this...
+  let ensureModuleApiPolyfill = true; // For now?Not sure we need this...
 
   let plugins = [
     [

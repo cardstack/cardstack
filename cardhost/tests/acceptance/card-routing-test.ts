@@ -36,9 +36,7 @@ module('Acceptance | card routing', function (hooks) {
       url: 'https://mirage/cards/person',
       isolated: 'isolated.js',
       data: {
-        attributes: {
-          name: 'Arthur',
-        },
+        name: 'Arthur',
       },
       files: {
         'schema.js': `

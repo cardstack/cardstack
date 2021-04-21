@@ -129,7 +129,14 @@ export class Compiler {
   ): Promise<string | undefined> {
     let schemaLocalFilePath = cardSource.schema;
     if (!schemaLocalFilePath) {
-      return undefined;
+      if (cardSource.files['schema.js']) {
+        console.warn(
+          `You did not specify what is your schema file, but a schema.js file exists. Using schema.js. url = ${cardSource.url}`
+        );
+        schemaLocalFilePath = 'schema.js';
+      } else {
+        return undefined;
+      }
     }
     let schemaSrc = this.getSource(cardSource, schemaLocalFilePath);
     let out = transformSync(schemaSrc, {

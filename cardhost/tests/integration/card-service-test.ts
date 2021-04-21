@@ -6,6 +6,7 @@ import type Cards from 'cardhost/services/cards';
 import setupCardMocking from '../helpers/card-mocking';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
+import { encodeCardURL } from '@cardstack/core/src/utils';
 
 module('Integration | card-service', function (hooks) {
   setupRenderingTest(hooks);
@@ -38,10 +39,8 @@ module('Integration | card-service', function (hooks) {
         schema: 'schema.js',
         isolated: 'isolated.js',
         data: {
-          attributes: {
-            greeting: 'Hello World',
-            greenGreeting: 'it works',
-          },
+          greeting: 'Hello World',
+          greenGreeting: 'it works',
         },
         files: {
           'schema.js': `
@@ -77,7 +76,7 @@ module('Integration | card-service', function (hooks) {
       assert.deepEqual(model, {
         greeting: 'Hello World',
         greenGreeting: 'it works',
-        id: helloId,
+        id: encodeCardURL(helloId),
       });
     });
   });

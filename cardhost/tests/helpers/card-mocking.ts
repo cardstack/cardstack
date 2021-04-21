@@ -31,7 +31,8 @@ function createCard(this: TestContext, card: RawCard): unknown {
 }
 
 function lookupCard(this: TestContext, id: string): Promise<CompiledCard> {
-  let response = this.server.schema.cards.find(id);
+  let { schema } = this.server as any;
+  let response = schema.cards.find(id);
   if (!response) {
     throw Error(`Could not find card '${id}'. Did you make it?`);
   }

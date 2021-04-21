@@ -4,7 +4,6 @@ import type {
   CompiledCard,
   Format,
 } from '@cardstack/core/src/interfaces';
-// import { RealmConfig } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
 import { encodeCardURL } from '@cardstack/core/src/utils';
 
@@ -17,11 +16,9 @@ export default class Builder implements BuilderInterface {
   });
 
   private cache: Map<string, CompiledCard>;
-  // private realms: [{ url: string }];
 
   constructor(/*params: { realms: RealmConfig[] }*/) {
     this.cache = new Map();
-    // this.realms = params.realms;
   }
 
   private async defineModule(
@@ -29,9 +26,7 @@ export default class Builder implements BuilderInterface {
     localModule: string,
     source: string
   ): Promise<string> {
-    let url = encodeCardURL(
-      new URL(localModule, cardURL.replace(/\/$/, '') + '/').href
-    );
+    let url = new URL(localModule, cardURL.replace(/\/$/, '') + '/').href;
     source = dynamicCardTransform(url, source);
     eval(source);
     return url;

@@ -16,30 +16,56 @@ module('Unit | Lib | dynamic-card-transform', function () {
       'dyanmic-component',
       COMPILED_TEMPLATE_COMPNENT
     );
-
+    // Ember <= 3.26
     assert.equal(
       result,
-      `define("dyanmic-component", ["exports", "@ember/template-factory", "@ember/component", "@ember/component/template-only"], function (_exports, _templateFactory, _component, _templateOnly) {
-  "use strict";
+      `define(\"dyanmic-component\", [\"exports\"], function (_exports) {
+  \"use strict\";
 
-  Object.defineProperty(_exports, "__esModule", {
+  Object.defineProperty(_exports, \"__esModule\", {
     value: true
   });
   _exports.default = void 0;
 
-  var _default = (0, _component.setComponentTemplate)((0, _templateFactory.createTemplateFactory)(
+  var _default = Ember._setComponentTemplate(Ember.HTMLBars.template(
   /*
     <h1>{{@model.title}}</h1>
   */
   {
-    "block": "[[[10,\\\"h1\\\"],[12],[1,[30,1,[\\\"title\\\"]]],[13]],[\\\"@model\\\"],false,[]]",
-    "moduleName": "(unknown template module)",
-    "scope": null,
-    "isStrictMode": true
-  }), (0, _templateOnly.default)());
+    \"block\": \"[[[10,\\\"h1\\\"],[12],[1,[30,1,[\\\"title\\\"]]],[13]],[\\\"@model\\\"],false,[]]\",
+    \"moduleName\": \"(unknown template module)\",
+    \"scope\": null,
+    \"isStrictMode\": true
+  }), Ember._templateOnlyComponent());
 
   _exports.default = _default;
 });`
     );
+
+    // Ember > 3.26
+    //     assert.equal(
+    //       result,
+    //       `define("dyanmic-component", ["exports", "@ember/template-factory", "@ember/component", "@ember/component/template-only"], function (_exports, _templateFactory, _component, _templateOnly) {
+    //   "use strict";
+
+    //   Object.defineProperty(_exports, "__esModule", {
+    //     value: true
+    //   });
+    //   _exports.default = void 0;
+
+    //   var _default = (0, _component.setComponentTemplate)((0, _templateFactory.createTemplateFactory)(
+    //   /*
+    //     <h1>{{@model.title}}</h1>
+    //   */
+    //   {
+    //     "block": "[[[10,\\\"h1\\\"],[12],[1,[30,1,[\\\"title\\\"]]],[13]],[\\\"@model\\\"],false,[]]",
+    //     "moduleName": "(unknown template module)",
+    //     "scope": null,
+    //     "isStrictMode": true
+    //   }), (0, _templateOnly.default)());
+
+    //   _exports.default = _default;
+    // });`
+    //     );
   });
 });
