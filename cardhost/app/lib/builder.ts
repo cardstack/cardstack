@@ -3,6 +3,7 @@ import type {
   RawCard,
   CompiledCard,
   Format,
+  Asset,
 } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
 import { encodeCardURL } from '@cardstack/core/src/utils';
@@ -70,4 +71,7 @@ export default class Builder implements BuilderInterface {
       moduleName: compiledCard[format].moduleName,
     };
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  copyAssetsSync(_assets: Asset[], _files: RawCard['files']): void {}
 }

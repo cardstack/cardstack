@@ -5,6 +5,7 @@ import {
   CompiledCard,
   assertValidRawCard,
   RealmConfig,
+  Asset,
 } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
 import { encodeCardURL } from '@cardstack/core/src/utils';
@@ -40,9 +41,18 @@ class CardCache {
   ) {
     let url = this.moduleURL(cardURL, localFile);
     let fsLocation = this.getLocation(env, url);
+    this.writeFile(fsLocation, source);
+    return url;
+  }
+
+  writeAsset(filename: string, source: string) {
+    let path = join(this.dir, 'assets', filename);
+    this.writeFile(path, source);
+  }
+
+  private writeFile(fsLocation: string, source: string): void {
     mkdirpSync(dirname(fsLocation));
     writeFileSync(fsLocation, source);
-    return url;
   }
 
   setCard(cardURL: string, source: CompiledCard) {
@@ -146,9 +156,16 @@ export default class Builder implements BuilderInterface {
     return compiledCard;
   }
 
+  copyAssetsSync(assets: Asset[], files: RawCard['files']): void {
+    for (const asset of assets) {
+      this.cache.writeAsset(asset.path, files[asset.path]);
+    }
+  }
+
   async buildCard(url: string): Promise<void> {
     let rawCard = await this.getRawCard(url);
     let compiledCard = await this.compiler.compile(rawCard);
+    this.copyAssetsSync(compiledCard.assets, rawCard.files);
     this.cache.setCard(url, compiledCard);
   }
 }

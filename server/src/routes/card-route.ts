@@ -54,6 +54,10 @@ export async function respondWithCardForPath(ctx: any) {
     params: { pathname },
   } = ctx;
 
+  if (!cardRouter) {
+    throw Error('Card routing not configured for this server');
+  }
+
   let url = cardRouter.routeTo(pathname);
 
   if (!url) {

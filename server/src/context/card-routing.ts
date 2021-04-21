@@ -1,6 +1,4 @@
 import { ServerKoa } from '../interfaces';
-import type Router from '@koa/router';
-import { respondWithCardForPath } from '../routes/card-route';
 
 const ROUTER_METHOD_NAME = 'routeTo';
 
@@ -15,7 +13,6 @@ function assertValidRouterInstance(router: any, routeCard: string): void {
 
 export async function setupCardRouting(
   app: ServerKoa,
-  koaRouter: Router,
   options: { routeCard: string; cardCacheDir: string }
 ) {
   let { routeCard, cardCacheDir } = options;
@@ -31,6 +28,4 @@ export async function setupCardRouting(
   assertValidRouterInstance(cardRouterInstance, routeCard);
 
   app.context.cardRouter = cardRouterInstance;
-
-  koaRouter.get('/cardFor/:pathname', respondWithCardForPath);
 }

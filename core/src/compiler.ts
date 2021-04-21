@@ -3,6 +3,7 @@ import { transformSync } from '@babel/core';
 import decoratorsPlugin from '@babel/plugin-proposal-decorators';
 // @ts-ignore
 import classPropertiesPlugin from '@babel/plugin-proposal-class-properties';
+import difference from 'lodash/difference';
 
 import cardSchemaPlugin, {
   FieldsMeta,
@@ -12,8 +13,21 @@ import cardSchemaPlugin, {
 import cardTemplatePlugin, {
   Options as CardTemplateOptions,
 } from './babel/card-template-plugin';
-import { CompiledCard, ComponentInfo, Format, RawCard } from './interfaces';
+import {
+  Asset,
+  AssetType,
+  CompiledCard,
+  ComponentInfo,
+  Format,
+  RawCard,
+} from './interfaces';
 import intersection from 'lodash/intersection';
+
+function getNonAssetFilePaths(sourceCard: RawCard): (string | undefined)[] {
+  return [sourceCard.schema, sourceCard.isolated, sourceCard.embedded].filter(
+    Boolean
+  );
+}
 
 export class Compiler {
   lookup: (cardURL: string) => Promise<CompiledCard>;
@@ -63,11 +77,14 @@ export class Compiler {
       fields = this.adoptFields(fields, parentCard);
     }
 
+    let assets = this.buildAssetsList(cardSource);
+
     let card: CompiledCard = {
       url: cardSource.url,
       modelModule: modelModuleName ?? parentCard.modelModule,
       fields,
       data: cardSource.data,
+      assets,
       isolated: await this.prepareComponent(
         cardSource,
         fields,
@@ -85,6 +102,22 @@ export class Compiler {
       card['adoptsFrom'] = parentCard;
     }
     return card;
+  }
+
+  private buildAssetsList(sourceCard: RawCard): Asset[] {
+    let assetPaths = difference(
+      Object.keys(sourceCard.files),
+      getNonAssetFilePaths(sourceCard)
+    ).filter(Boolean);
+
+    let assets = assetPaths.map((p: string) => {
+      return {
+        type: getAssetType(p),
+        path: p,
+      };
+    });
+
+    return assets;
   }
 
   private getCardParentPath(
@@ -133,10 +166,9 @@ export class Compiler {
         console.warn(
           `You did not specify what is your schema file, but a schema.js file exists. Using schema.js. url = ${cardSource.url}`
         );
-        schemaLocalFilePath = 'schema.js';
-      } else {
-        return undefined;
       }
+
+      return undefined;
     }
     let schemaSrc = this.getSource(cardSource, schemaLocalFilePath);
     let out = transformSync(schemaSrc, {
@@ -248,4 +280,13 @@ const compiledBaseCard: CompiledCard = {
     moduleName: 'todo',
     usedFields: [],
   },
+  assets: [],
 };
+
+function getAssetType(filename: string): AssetType {
+  if (filename.endsWith('.css')) {
+    return 'css';
+  }
+
+  return 'unknown';
+}

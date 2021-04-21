@@ -34,6 +34,7 @@ module('Acceptance | card routing', function (hooks) {
 
     this.createCard({
       url: 'https://mirage/cards/person',
+      schema: 'schema.js',
       isolated: 'isolated.js',
       data: {
         name: 'Arthur',
@@ -41,14 +42,16 @@ module('Acceptance | card routing', function (hooks) {
       files: {
         'schema.js': `
           import { contains } from "@cardstack/types";
+          import './isolated.css'
           import string from "https://cardstack.com/base/string";
           export default class Person {
             @contains(string)
             name;
           }`,
         'isolated.js': templateOnlyComponentTemplate(
-          `<div data-test-person>Hi! I am <@model.name/></div>`
+          `<div class="person-isolated" data-test-person>Hi! I am <@model.name/></div>`
         ),
+        'isolated.css': '.person-isolated { background: red }',
       },
     });
   });
@@ -56,6 +59,7 @@ module('Acceptance | card routing', function (hooks) {
   test('visiting /card-routing', async function (assert) {
     await visit('/welcome');
     assert.equal(currentURL(), '/welcome');
+    await this.pauseTest();
     assert.dom('[data-test-person]').containsText('Hi! I am Arthur');
   });
 });

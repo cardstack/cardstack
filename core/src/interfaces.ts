@@ -5,6 +5,12 @@ const componentFormats = {
 export type Format = keyof typeof componentFormats;
 export const formats = Object.keys(componentFormats) as Format[];
 
+export type AssetType = 'css' | 'unknown';
+export type Asset = {
+  type: AssetType;
+  path: string;
+};
+
 export type RawCard = {
   url: string;
 
@@ -69,6 +75,7 @@ export interface CompiledCard {
   modelModule: string;
   isolated: ComponentInfo;
   embedded: ComponentInfo;
+  assets: Asset[];
 }
 export interface Field {
   type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
@@ -85,6 +92,7 @@ export interface ComponentInfo {
 export interface Builder {
   getRawCard(url: string): Promise<RawCard>;
   getCompiledCard(url: string): Promise<CompiledCard>;
+  copyAssetsSync(assets: Asset[], files: RawCard['files']): void;
 }
 
 export interface RealmConfig {

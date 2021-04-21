@@ -9,7 +9,7 @@ import { errorMiddleware } from './middleware/error';
 import { ServerOptions } from './interfaces';
 import { setupCardBuilding } from './context/card-building';
 import { setupCardRouting } from './context/card-routing';
-import { respondWithCard } from './routes/card-route';
+import { respondWithCard, respondWithCardForPath } from './routes/card-route';
 
 export class Server {
   static async create(options: ServerOptions): Promise<Server> {
@@ -25,10 +25,11 @@ export class Server {
     setupCardBuilding(app, { realms, cardCacheDir });
 
     if (routeCard) {
-      await setupCardRouting(app, koaRouter, { routeCard, cardCacheDir });
+      await setupCardRouting(app, { routeCard, cardCacheDir });
     }
 
     koaRouter.get(`/cards/:encodedCardURL`, respondWithCard);
+    koaRouter.get('/cardFor/:pathname', respondWithCardForPath);
 
     app.use(koaRouter.routes());
     app.use(koaRouter.allowedMethods());

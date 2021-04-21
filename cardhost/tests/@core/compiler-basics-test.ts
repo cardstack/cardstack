@@ -6,6 +6,7 @@ import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/tem
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import setupCardMocking from '../helpers/card-mocking';
 import Builder from 'cardhost/lib/builder';
+import { RawCard, CompiledCard } from '@cardstack/core/src/interfaces';
 
 async function evalModule(src: string): Promise<any> {
   //   return import(`data:application/javascript;base64,${btoa(src)}`);
@@ -228,9 +229,12 @@ module('@core | compiler-basics', function (hooks) {
     });
   });
 
-  module('templates', function () {
-    test('it inlines a simple field template', async function (assert) {
-      let card = {
+  module('templates and styles', function (hooks) {
+    let card: RawCard;
+    let compiled: CompiledCard;
+
+    hooks.beforeEach(async function () {
+      card = {
         url: 'http://mirage/cards/post',
         schema: 'schema.js',
         isolated: 'isolated.js',
@@ -238,6 +242,7 @@ module('@core | compiler-basics', function (hooks) {
           'schema.js': `
             import { contains } from "@cardstack/types";
             import string from "https://cardstack.com/base/string";
+            import styles from '../assets/isolated.css';
 
             export default class Post {
               @contains(string)
@@ -245,18 +250,29 @@ module('@core | compiler-basics', function (hooks) {
             }
           `,
           'isolated.js': templateOnlyComponentTemplate(
-            '<h1><@model.title /></h1>'
+            '<div class="post-isolated><h1><@model.title /></h1></div>'
           ),
+          'isolated.css': '.post-isolated { background: red }',
         },
       };
 
       this.createCard(card);
+      compiled = await builder.getCompiledCard(card.url);
+    });
 
-      let compiled = await builder.getCompiledCard(card.url);
+    test('it inlines a simple field template', async function (assert) {
       assert.equal(
         compiled.isolated.moduleName,
         `${card.url}/isolated.js`,
         'templateModule for "isolated" is full url'
+      );
+    });
+
+    test('it builds a list of assets to be included', async function (assert) {
+      assert.deepEqual(
+        compiled.assets,
+        [{ type: 'css', path: 'isolated.css' }],
+        'Builds a list of assets'
       );
     });
 
@@ -268,9 +284,8 @@ module('@core | compiler-basics', function (hooks) {
         compiled.embedded.moduleName,
         `${PERSON_CARD.url}/embedded.js`
       );
-      // Could not find module `@ember/template-factory` imported from `https://mirage/cards/person/embedded.js`
-      // let source = window.require(compiled.embedded.moduleName).default;
-      // assert.equal(source, 'source');
+      let source = window.require(compiled.embedded.moduleName).default;
+      assert.equal(source.moduleName, '@glimmer/component/template-only');
     });
   });
 

@@ -9,7 +9,7 @@ import { RealmConfig } from '@cardstack/core/src/interfaces';
 
 export function cleanCache(dir: string): void {
   console.debug('Cleaning cardCache dir: ' + dir);
-  for (let file of glob.sync('**/http*', { cwd: dir })) {
+  for (let file of glob.sync('**/http*|assets/*', { cwd: dir })) {
     rmSync(join(dir, file));
   }
 }
