@@ -1,5 +1,7 @@
 import config from '../../config/environment';
+import CustomStorageWalletConnect from '../wc-connector';
 import WalletConnectProvider from '@walletconnect/web3-provider';
+import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
 import { tracked } from '@glimmer/tracking';
 import { WalletProvider } from '../wallet-providers';
 import { Layer1Web3Strategy } from './types';
@@ -79,10 +81,16 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
 
   setupWalletConnect(): any {
     let provider = new WalletConnectProvider({
-      bridge: WALLET_CONNECT_BRIDGE,
       chainId: 42,
       infuraId: config.infuraId,
-      qrcode: true,
+      // based on https://github.com/WalletConnect/walletconnect-monorepo/blob/7aa9a7213e15489fa939e2e020c7102c63efd9c4/packages/providers/web3-provider/src/index.ts#L47-L52
+      connector: new CustomStorageWalletConnect(
+        {
+          bridge: WALLET_CONNECT_BRIDGE,
+          qrcodeModal: WalletConnectQRCodeModal,
+        },
+        this.chainId
+      ),
     });
 
     // Subscribe to accounts change
