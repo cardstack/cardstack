@@ -13,7 +13,6 @@
     <div>xDai balance: <span data-test-xdai-balance>{{format-token-amount this.layer2Network.defaultTokenBalance}}</span></div>
     
     <Boxel::CtaBlock @state='memorialized'>
-      <:default></:default>
       <:memorialized as |m|>
         <m.ActionButton {{on "click" this.disconnect}}>
           Disconnect Wallet
