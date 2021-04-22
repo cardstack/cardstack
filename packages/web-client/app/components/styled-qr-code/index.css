@@ -3,5 +3,6 @@
 }
 
 .styled-qr-code > canvas {
-  border-radius: var(--boxel-border-radius);
+  border-radius: 2.5rem;
+  border: 1px solid var(--boxel-light-400);
 }
