@@ -1,4 +1,22 @@
+.layer-one-connect-modal__scroll-wrapper {
+  height: 100%;
+  margin: 0 var(--boxel-sp-sm);
+  padding: var(--boxel-sp-lg) var(--boxel-sp-sm);
+  overflow-y: auto;
+}
+
+.layer-one-connect-modal__card:focus {
+  outline-color: transparent;
+  outline-offset: -5px;
+  box-shadow: 0 0 0 2px var(--boxel-blue);
+}
+
+.layer-one-connect-modal__card:focus:not(:focus-visible) {
+  box-shadow: none;
+}
+
 .layer-one-connect-modal__card {
   height: auto;
 }
 
+/* TODO: Close button */

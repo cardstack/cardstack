@@ -1,12 +1,17 @@
 <Boxel::Modal
+  @isOpen={{@isOpen}}
   @onClose={{@onClose}}
-  style={{css-var boxel-modal-max-width="45rem"}}
+  style={{css-var boxel-modal-max-width="45rem" boxel-modal-offset-top="0px"}}
   class="layer-two-connect-modal"
   data-test-layer-two-connect-modal
 >
-  <CardPay::LayerTwoConnectCard
-    class="layer-two-connect-modal__card"
-    @suppressHeader={{true}}
-    @includeExplanations={{true}}
-  />
+  <div class="layer-two-connect-modal__scroll-wrapper">
+    <CardPay::LayerTwoConnectCard
+      class="layer-two-connect-modal__card"
+      @suppressHeader={{true}}
+      @includeExplanations={{true}}
+      tabindex="0"
+      {{did-insert this.focus}}
+    />
+  </div>
 </Boxel::Modal>

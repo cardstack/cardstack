@@ -1,8 +1,11 @@
 .styled-qr-code {
   display: inline-block;
+  padding: var(--boxel-sp-xxs);
+  border-radius: 2.5rem;
+  border: 1px solid var(--boxel-light-400);
+  overflow: hidden;
 }
 
 .styled-qr-code > canvas {
-  border-radius: 2.5rem;
-  border: 1px solid var(--boxel-light-400);
+  max-width: 100%;
 }

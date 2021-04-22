@@ -8,8 +8,9 @@
   </Boxel::Button>
 </section>
 
-{{#if this.isShowingDepositWorkflow}}
-  <Boxel::Modal @onClose={{set this "isShowingDepositWorkflow" false}}>
-    <CardPay::DepositWorkflow />
-  </Boxel::Modal>
-{{/if}}
+<Boxel::Modal
+  @isOpen={{this.isShowingDepositWorkflow}}
+  @onClose={{set this "isShowingDepositWorkflow" false}}
+>
+  <CardPay::DepositWorkflow />
+</Boxel::Modal>

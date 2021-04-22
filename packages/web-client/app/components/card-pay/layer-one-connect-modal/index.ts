@@ -3,6 +3,7 @@ import Layer1Network from '../../../services/layer1-network';
 import { inject as service } from '@ember/service';
 import { taskFor } from 'ember-concurrency-ts';
 import { task } from 'ember-concurrency-decorators';
+import { action } from '@ember/object';
 
 interface CardPayLayerOneConnectModalComponentArgs {
   onClose: () => void;
@@ -17,6 +18,9 @@ class CardPayLayerOneConnectModalComponent extends Component<CardPayLayerOneConn
   @task *closeOnConnectedTask() {
     yield this.layer1Network.waitForAccount;
     this.args.onClose();
+  }
+  @action focus(element: any) {
+    element.focus();
   }
 }
 

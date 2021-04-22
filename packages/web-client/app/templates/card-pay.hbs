@@ -28,14 +28,12 @@
   </:body>
 </Boxel::Dashboard>
 
-{{#if this.isShowingLayer1ConnectModal}}
-  <CardPay::LayerOneConnectModal
-    @onClose={{set this 'isShowingLayer1ConnectModal' false}}
-  />
-{{/if}}
+<CardPay::LayerOneConnectModal
+  @isOpen={{this.isShowingLayer1ConnectModal}}
+  @onClose={{set this 'isShowingLayer1ConnectModal' false}}
+/>
 
-{{#if this.isShowingLayer2ConnectModal}}
-  <CardPay::LayerTwoConnectModal
-    @onClose={{set this 'isShowingLayer2ConnectModal' false}}
-  />
-{{/if}}
+<CardPay::LayerTwoConnectModal
+  @isOpen={{this.isShowingLayer2ConnectModal}}
+  @onClose={{set this 'isShowingLayer2ConnectModal' false}}
+/>
