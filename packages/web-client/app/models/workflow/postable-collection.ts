@@ -49,6 +49,13 @@ export default class PostableCollection {
       }
 
       if (!post.isComplete) {
+        // clear out remaining posts from #includedPostables and #excludedPostables,
+        // in case we have a situation where we went backward
+        for (let post of this.postables.slice(i, -1)) {
+          this.#includedPostables.delete(post);
+          this.#excludedPostables.delete(post);
+          post.reset?.();
+        }
         break;
       }
     }

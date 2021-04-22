@@ -9,6 +9,7 @@ module('Unit | Workflow model', function (hooks) {
   setupTest(hooks);
 
   class ConcreteWorkflow extends Workflow {}
+
   let exampleMilestone: Milestone;
   let exampleMessage: WorkflowMessage;
   let examplePostable: WorkflowPostable;
@@ -61,6 +62,33 @@ module('Unit | Workflow model', function (hooks) {
     assert.equal(workflow.completedMilestoneCount, 1);
     milestone2Postable.isComplete = true;
     assert.equal(workflow.completedMilestoneCount, 2);
+  });
+
+  test('visibleMilestones returns milestones up to and including first incomplete milestone', function (assert) {
+    let workflow = new ConcreteWorkflow({});
+    let milestone2Postable = new WorkflowPostable({ name: 'cardbot' });
+    milestone2Postable.isComplete = false;
+
+    let secondMilestone = new Milestone({
+      title: 'Milestone 2',
+      postables: [milestone2Postable],
+      completedDetail: 'Second mile-stoned!',
+    });
+
+    workflow.milestones = [exampleMilestone, secondMilestone];
+    assert.deepEqual(workflow.visibleMilestones, [exampleMilestone]);
+    examplePostable.isComplete = true;
+    assert.deepEqual(workflow.visibleMilestones, [
+      exampleMilestone,
+      secondMilestone,
+    ]);
+    milestone2Postable.isComplete = true;
+    assert.deepEqual(workflow.visibleMilestones, [
+      exampleMilestone,
+      secondMilestone,
+    ]);
+    examplePostable.isComplete = false;
+    assert.deepEqual(workflow.visibleMilestones, [exampleMilestone]);
   });
 
   test('progressStatus returns the "completedDetail" of the last complete milestone', function (assert) {

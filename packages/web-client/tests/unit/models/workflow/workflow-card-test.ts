@@ -26,5 +26,8 @@ module('Unit | WorkflowCard model', function (hooks) {
     });
     subject.onComplete();
     assert.equal(subject.isComplete, true);
+
+    subject.onIncomplete();
+    assert.equal(subject.isComplete, false);
   });
 });

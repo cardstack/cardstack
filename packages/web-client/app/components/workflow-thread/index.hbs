@@ -6,26 +6,22 @@
     {{#if (has-block 'before-content')}}
       {{yield to='before-content'}}
     {{/if}}
-    {{#each @workflow.milestones as |milestone i|}}
-      {{#let (or milestone.complete (lte i @workflow.completedMilestoneCount)) as |displayMilestone|}}
-        {{#if displayMilestone}}
-          {{#each milestone.visiblePostables as |postable j|}}
-            <WorkflowThread::Postable
-              @postable={{postable}}
-              @postables={{milestone.visiblePostables}}
-              @index={{j}}
-              data-test-milestone={{i}}
-            />
-          {{/each}}
-          {{#if milestone.isComplete}}
-            <Boxel::MilestoneBanner
-              @title={{milestone.completedDetail}}
-              data-test-milestone-completed
-              data-test-milestone={{i}}
-            />
-          {{/if}}
-        {{/if}}
-      {{/let}}
+    {{#each @workflow.visibleMilestones as |milestone i|}}
+      {{#each milestone.visiblePostables as |postable j|}}
+        <WorkflowThread::Postable
+          @postable={{postable}}
+          @postables={{milestone.visiblePostables}}
+          @index={{j}}
+          data-test-milestone={{i}}
+        />
+      {{/each}}
+      {{#if milestone.isComplete}}
+        <Boxel::MilestoneBanner
+          @title={{milestone.completedDetail}}
+          data-test-milestone-completed
+          data-test-milestone={{i}}
+        />
+      {{/if}}
     {{/each}}
     {{#if @workflow.isComplete}}
       {{#each @workflow.epilogue.visiblePostables as |postable j|}}

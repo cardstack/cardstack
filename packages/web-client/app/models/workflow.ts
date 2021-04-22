@@ -22,6 +22,18 @@ export abstract class Workflow {
     return this.milestones.filterBy('isComplete').length;
   }
 
+  get visibleMilestones(): Milestone[] {
+    let milestonesArr: Milestone[] = [];
+    for (let i = 0; i < this.milestones.length; i++) {
+      let milestone = this.milestones[i];
+      milestonesArr.push(milestone);
+      if (!milestone.isComplete) {
+        break;
+      }
+    }
+    return milestonesArr;
+  }
+
   get isComplete() {
     return A(this.milestones).isEvery('isComplete');
   }

@@ -15,6 +15,7 @@ import { WalletProvider } from '../../../../utils/wallet-providers';
 
 interface CardPayDepositWorkflowConnectLayer1ComponentArgs {
   onComplete: (() => void) | undefined;
+  onIncomplete: (() => void) | undefined;
 }
 class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepositWorkflowConnectLayer1ComponentArgs> {
   cardstackLogo = cardstackLogo;
@@ -74,6 +75,7 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
   }
   @action disconnect() {
     this.layer1Network.disconnect();
+    this.args.onIncomplete?.();
   }
   @task *connectWalletTask() {
     this.isWaitingForConnection = true;

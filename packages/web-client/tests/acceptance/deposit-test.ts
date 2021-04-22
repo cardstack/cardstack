@@ -51,10 +51,7 @@ module('Acceptance | deposit', function (hooks) {
     post = postableSel(0, 3);
     await click(`${post} [data-test-wallet-option="metamask"]`);
     await click(
-      `${postableSel(
-        0,
-        3
-      )} [data-test-mainnnet-connection-action-container] [data-test-boxel-button]`
+      `${post} [data-test-mainnnet-connection-action-container] [data-test-boxel-button]`
     );
 
     assert.dom(post).containsText('Connect your Ethereum mainnet wallet');
@@ -377,5 +374,125 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(postableSel(2, 0))
       .containsText('choose the asset you would like to deposit');
+  });
+
+  test('Disconnecting Layer 1 after proceeding beyond it', async function (assert) {
+    let layer1Service = this.owner.lookup('service:layer1-network')
+      .strategy as Layer1TestWeb3Strategy;
+    let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+    layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
+    layer1Service.test__simulateBalances({
+      defaultToken: BigNumber.from('2141100000000000000'),
+      dai: BigNumber.from('250500000000000000000'),
+      card: BigNumber.from('10000000000000000000000'),
+    });
+    let layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
+    let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    layer2Service.test__simulateBalances({
+      defaultToken: BigNumber.from('142200000000000000'),
+    });
+
+    await visit('/card-pay/balances');
+    await click('[data-test-deposit-button]');
+
+    let post = postableSel(0, 0);
+    assert.dom(post).containsText('Hi there, we’re happy to see you');
+
+    assert
+      .dom(postableSel(0, 3))
+      .containsText(
+        'Looks like you’ve already connected your Ethereum mainnet wallet'
+      );
+
+    assert
+      .dom(milestoneCompletedSel(0))
+      .containsText('Mainnet Wallet connected');
+
+    assert
+      .dom(postableSel(1, 0))
+      .containsText(
+        'Looks like you’ve already connected your xDai chain wallet'
+      );
+
+    await waitFor(milestoneCompletedSel(1));
+    assert
+      .dom(milestoneCompletedSel(1))
+      .containsText('xDai Chain wallet connected');
+
+    assert
+      .dom(postableSel(2, 0))
+      .containsText('choose the asset you would like to deposit');
+    assert
+      .dom(`${postableSel(0, 4)} [data-test-boxel-cta-block-button]`)
+      .containsText('Disconnect Wallet');
+    await click(`${postableSel(0, 4)} [data-test-boxel-cta-block-button]`);
+    assert
+      .dom(postableSel(0, 4))
+      .containsText('Connect your Ethereum mainnet wallet');
+    assert.dom(milestoneCompletedSel(1)).doesNotExist();
+    assert.dom(milestoneCompletedSel(0)).doesNotExist();
+  });
+
+  test('Disconnecting Layer 2 after proceeding beyond it', async function (assert) {
+    let layer1Service = this.owner.lookup('service:layer1-network')
+      .strategy as Layer1TestWeb3Strategy;
+    let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+    layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
+    layer1Service.test__simulateBalances({
+      defaultToken: BigNumber.from('2141100000000000000'),
+      dai: BigNumber.from('250500000000000000000'),
+      card: BigNumber.from('10000000000000000000000'),
+    });
+    let layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
+    let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    layer2Service.test__simulateBalances({
+      defaultToken: BigNumber.from('142200000000000000'),
+    });
+
+    await visit('/card-pay/balances');
+    await click('[data-test-deposit-button]');
+
+    let post = postableSel(0, 0);
+    assert.dom(post).containsText('Hi there, we’re happy to see you');
+
+    assert
+      .dom(postableSel(0, 3))
+      .containsText(
+        'Looks like you’ve already connected your Ethereum mainnet wallet'
+      );
+
+    assert
+      .dom(milestoneCompletedSel(0))
+      .containsText('Mainnet Wallet connected');
+
+    assert
+      .dom(postableSel(1, 0))
+      .containsText(
+        'Looks like you’ve already connected your xDai chain wallet'
+      );
+
+    await waitFor(milestoneCompletedSel(1));
+    assert
+      .dom(milestoneCompletedSel(1))
+      .containsText('xDai Chain wallet connected');
+
+    assert
+      .dom(postableSel(2, 0))
+      .containsText('choose the asset you would like to deposit');
+    assert.dom('[data-test-layer-2-wallet-card]').containsText('0.1422');
+    assert
+      .dom('[data-test-layer-2-wallet-card] [data-test-boxel-cta-block-button]')
+      .containsText('Disconnect Wallet');
+    await click(
+      `[data-test-layer-2-wallet-card] [data-test-boxel-cta-block-button]`
+    );
+    assert
+      .dom('[data-test-layer-2-wallet-card]')
+      .containsText('Install the Cardstack app on your mobile phone');
+    assert.dom(milestoneCompletedSel(1)).doesNotExist();
   });
 });

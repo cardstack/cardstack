@@ -25,6 +25,10 @@
     data-test-postable={{@index}}
     ...attributes
   >
-    {{component @postable.componentName onComplete=(optional @postable.onComplete)}}
+    {{component
+      @postable.componentName
+      onComplete=(optional @postable.onComplete)
+      onIncomplete=(optional @postable.onIncomplete)
+    }}
   </Boxel::ThreadMessage>
 {{/if}}
