@@ -6,6 +6,7 @@ import XDaiWeb3Strategy from '../utils/web3-strategies/x-dai';
 import SokolWeb3Strategy from '../utils/web3-strategies/sokol';
 import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
+import { BigNumber } from '@ethersproject/bignumber';
 
 export default class Layer2Network extends Service {
   strategy!: Layer2Web3Strategy;
@@ -14,6 +15,9 @@ export default class Layer2Network extends Service {
   @reads('strategy.walletInfo', []) walletInfo!: WalletInfo;
   @reads('strategy.waitForAccount') waitForAccount!: Promise<void>;
   @reads('strategy.chainName') chainName!: string;
+  @reads('strategy.defaultTokenBalance') defaultTokenBalance:
+    | BigNumber
+    | undefined;
 
   constructor(props: object | undefined) {
     super(props);

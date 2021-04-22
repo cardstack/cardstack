@@ -12,10 +12,9 @@ export default class TestWeb3Strategy implements Layer2Web3Strategy {
   @tracked isConnected = false;
   @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
   waitForAccountDeferred = defer();
+  @tracked defaultTokenBalance: BigNumber | undefined;
   #unlockDeferred: RSVP.Deferred<void> | undefined;
   #depositDeferred: RSVP.Deferred<void> | undefined;
-
-  @tracked xdaiBalance: BigNumber | undefined;
 
   unlock() {
     this.#unlockDeferred = RSVP.defer();
@@ -35,6 +34,12 @@ export default class TestWeb3Strategy implements Layer2Web3Strategy {
     this.isConnected = true;
     this.walletInfo = new WalletInfo(accounts, parseInt(this.chainId, 10));
     this.waitForAccountDeferred.resolve();
+  }
+
+  test__simulateBalances(balances: { defaultToken: BigNumber | undefined }) {
+    if (balances.defaultToken) {
+      this.defaultTokenBalance = balances.defaultToken;
+    }
   }
 
   test__simulateUnlock() {

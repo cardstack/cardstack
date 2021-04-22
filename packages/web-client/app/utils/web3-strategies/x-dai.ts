@@ -33,7 +33,7 @@ export default class XDaiWeb3Strategy implements Layer2Web3Strategy {
     this.initialize();
   }
 
-  @tracked xdaiBalance: BigNumber | undefined;
+  @tracked defaultTokenBalance: BigNumber | undefined;
 
   unlock(): Promise<void> {
     throw new Error('Method not implemented.');

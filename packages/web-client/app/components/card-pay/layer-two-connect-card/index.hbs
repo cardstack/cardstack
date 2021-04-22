@@ -8,6 +8,8 @@
     {{#each this.layer2Network.walletInfo.accounts as |account|}}
       <div data-test-layer2-account-id>{{account.address}}</div>
     {{/each}}
+    <br>
+    xDai balance: <span data-test-xdai-balance>{{format-token-amount this.layer2Network.defaultTokenBalance}}</span>
   {{else}}
     <div class="layer-two-connect-card__wrapper">
       <div class="layer-two-connect-card__section-one">
