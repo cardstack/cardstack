@@ -13,7 +13,7 @@ import { BigNumber } from '@ethersproject/bignumber';
 export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   chainName = 'Sokol Testnet';
   chainId = 77;
-  provider: any | undefined;
+  provider: WalletConnectProvider | undefined;
 
   @reads('provider.connector') connector!: IConnector;
   @tracked isConnected = false;
@@ -110,5 +110,10 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
         'latest'
       );
     else return 0;
+  }
+
+  async disconnect(): Promise<void> {
+    await this.provider?.disconnect();
+    this.clearWalletInfo();
   }
 }

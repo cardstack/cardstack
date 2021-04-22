@@ -1,15 +1,25 @@
-<Boxel::CardContainer class={{if @includeExplanations 'layer-two-connect-card--with-explanations'}} ...attributes>
+<Boxel::CardContainer
+  class={{if @includeExplanations 'layer-two-connect-card--with-explanations'}}
+  data-test-layer-2-wallet-card
+  ...attributes
+>
   {{#unless @suppressHeader}}
-    <Boxel::Header @header="Wallet - xDai Chain"></Boxel::Header>
+    <Boxel::Header @header="Wallet Connection - xDai Chain"></Boxel::Header>
   {{/unless}}
 
   {{#if this.layer2Network.hasAccount}}
     Connected to wallet:
-    {{#each this.layer2Network.walletInfo.accounts as |account|}}
-      <div data-test-layer2-account-id>{{account.address}}</div>
-    {{/each}}
-    <br>
-    xDai balance: <span data-test-xdai-balance>{{format-token-amount this.layer2Network.defaultTokenBalance}}</span>
+    <div data-test-layer2-account-id>{{this.layer1Network.walletInfo.firstAddress}}</div>
+    <div>xDai balance: <span data-test-xdai-balance>{{format-token-amount this.layer2Network.defaultTokenBalance}}</span></div>
+    
+    <Boxel::CtaBlock @state='memorialized'>
+      <:default></:default>
+      <:memorialized as |m|>
+        <m.ActionButton {{on "click" this.disconnect}}>
+          Disconnect Wallet
+        </m.ActionButton>
+      </:memorialized>
+    </Boxel::CtaBlock>
   {{else}}
     <div class="layer-two-connect-card__wrapper">
       <div class="layer-two-connect-card__section-one">

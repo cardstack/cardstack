@@ -12,9 +12,11 @@ import { reads } from 'macro-decorators';
 import { task } from 'ember-concurrency-decorators';
 import { taskFor } from 'ember-concurrency-ts';
 import { next } from '@ember/runloop';
+import { action } from '@ember/object';
 
 interface CardPayLayerTwoConnectCardComponentArgs {
   onComplete: (() => void) | undefined;
+  onIncomplete: (() => void) | undefined;
 }
 
 class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConnectCardComponentArgs> {
@@ -45,6 +47,10 @@ class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConne
     yield this.layer2Network.waitForAccount;
     this.isWaitingForConnection = false;
     this.args.onComplete?.();
+  }
+  @action disconnect() {
+    this.layer2Network.disconnect();
+    this.args.onIncomplete?.();
   }
 }
 

@@ -35,9 +35,14 @@ export default class XDaiWeb3Strategy implements Layer2Web3Strategy {
 
   @tracked defaultTokenBalance: BigNumber | undefined;
 
+  disconnect(): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+
   unlock(): Promise<void> {
     throw new Error('Method not implemented.');
   }
+
   deposit(): Promise<void> {
     throw new Error('Method not implemented.');
   }

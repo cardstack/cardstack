@@ -37,6 +37,10 @@ export default class Layer2Network extends Service {
   get hasAccount() {
     return this.walletInfo.accounts.length > 0;
   }
+
+  disconnect() {
+    this.strategy.disconnect();
+  }
 }
 
 // DO NOT DELETE: this is how TypeScript knows how to look up your services.
