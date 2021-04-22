@@ -18,5 +18,5 @@ export interface Layer1Web3Strategy extends Web3Strategy {
 }
 
 export interface Layer2Web3Strategy extends Web3Strategy {
-  xdaiBalance: BigNumber | undefined;
+  defaultTokenBalance: BigNumber | undefined;
 }

@@ -19,7 +19,8 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   @tracked isConnected = false;
   @tracked walletConnectUri: string | undefined;
   @tracked walletInfo = new WalletInfo([], this.chainId) as WalletInfo;
-  waitForAccountDeferred = defer();
+  @tracked defaultTokenBalance: BigNumber | undefined;
+  #waitForAccountDeferred = defer();
   web3!: Web3;
 
   constructor() {
@@ -27,13 +28,11 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
     this.initialize();
   }
 
-  @tracked xdaiBalance: BigNumber | undefined;
-
   async initialize() {
     this.provider = new WalletConnectProvider({
       chainId: this.chainId,
       rpc: {
-        77: 'https://sokol.poa.network',
+        77: 'https://sokol.stack.cards',
       },
       connector: new CustomStorageWalletConnect(
         {
@@ -82,12 +81,13 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   }
 
   updateWalletInfo(accounts: string[], chainId: number) {
-    if (accounts.length) {
-      this.waitForAccountDeferred.resolve();
-    } else {
-      this.waitForAccountDeferred = defer();
-    }
     this.walletInfo = new WalletInfo(accounts, chainId);
+    if (accounts.length) {
+      this.refreshBalances();
+      this.#waitForAccountDeferred.resolve();
+    } else {
+      this.#waitForAccountDeferred = defer();
+    }
   }
 
   clearWalletInfo() {
@@ -95,6 +95,20 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   }
 
   get waitForAccount() {
-    return this.waitForAccountDeferred.promise;
+    return this.#waitForAccountDeferred.promise;
+  }
+
+  async refreshBalances() {
+    let raw = await this.getDefaultTokenBalance();
+    this.defaultTokenBalance = BigNumber.from(raw);
+  }
+
+  async getDefaultTokenBalance() {
+    if (this.walletInfo.firstAddress)
+      return await this.web3.eth.getBalance(
+        this.walletInfo.firstAddress,
+        'latest'
+      );
+    else return 0;
   }
 }

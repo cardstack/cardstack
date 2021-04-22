@@ -103,6 +103,13 @@ module('Acceptance | deposit', function (hooks) {
     // Simulate the user scanning the QR code and connecting their mobile wallet
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    layer2Service.test__simulateBalances({
+      defaultToken: BigNumber.from('0'),
+    });
+    await waitFor(`${postableSel(1, 2)} [data-test-xdai-balance]`);
+    assert
+      .dom(`${postableSel(1, 2)} [data-test-xdai-balance]`)
+      .containsText('0.0');
     await waitUntil(
       () => !document.querySelector('[data-test-wallet-connect-qr-code]')
     );
