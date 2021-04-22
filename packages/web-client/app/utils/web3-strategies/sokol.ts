@@ -13,18 +13,7 @@ import { BigNumber } from '@ethersproject/bignumber';
 export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   chainName = 'Sokol Testnet';
   chainId = 77;
-  provider = new WalletConnectProvider({
-    chainId: this.chainId,
-    rpc: {
-      77: 'https://sokol.stack.cards',
-    },
-    connector: new CustomStorageWalletConnect(
-      {
-        bridge: BRIDGE,
-      },
-      this.chainId
-    ),
-  });
+  provider: any | undefined;
 
   @reads('provider.connector') connector!: IConnector;
   @tracked isConnected = false;
@@ -40,6 +29,18 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   }
 
   async initialize() {
+    this.provider = new WalletConnectProvider({
+      chainId: this.chainId,
+      rpc: {
+        77: 'https://sokol.stack.cards',
+      },
+      connector: new CustomStorageWalletConnect(
+        {
+          bridge: BRIDGE,
+        },
+        this.chainId
+      ),
+    });
     this.connector.on('display_uri', (err, payload) => {
       if (err) {
         console.error('Error in display_uri callback', err);
