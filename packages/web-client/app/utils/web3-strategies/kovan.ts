@@ -38,6 +38,7 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   chainName = 'Kovan Testnet';
   chainId = 42;
   walletConnectUri: string | undefined;
+  currentProviderId: string | undefined;
   provider: any | undefined;
   web3 = new Web3();
   cardTokenContract = new this.web3.eth.Contract(
@@ -60,7 +61,8 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   }
 
   async connect(walletProvider: WalletProvider): Promise<void> {
-    if (walletProvider.id === 'metamask') {
+    this.currentProviderId = walletProvider.id;
+    if (this.currentProviderId === 'metamask') {
       this.provider = await this.setupMetamask();
       if (!this.provider) {
         return;
@@ -70,7 +72,7 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
         method: 'eth_requestAccounts',
       });
       this.updateWalletInfo(accounts, this.chainId);
-    } else if (walletProvider.id === 'wallet-connect') {
+    } else if (this.currentProviderId === 'wallet-connect') {
       this.provider = this.setupWalletConnect();
       this.web3.setProvider(this.provider);
       await this.provider.enable();
