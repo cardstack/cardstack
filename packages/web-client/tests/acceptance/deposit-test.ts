@@ -11,6 +11,7 @@ import {
 import { setupApplicationTest } from 'ember-qunit';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
+import { BigNumber } from '@ethersproject/bignumber';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -47,7 +48,8 @@ module('Acceptance | deposit', function (hooks) {
         'The funds you wish to deposit must be available in your Mainnet Wallet'
       );
 
-    await click(`${postableSel(0, 3)} [data-test-wallet-option="metamask"]`);
+    post = postableSel(0, 3);
+    await click(`${post} [data-test-wallet-option="metamask"]`);
     await click(
       `${postableSel(
         0,
@@ -55,18 +57,21 @@ module('Acceptance | deposit', function (hooks) {
       )} [data-test-mainnnet-connection-action-container] [data-test-boxel-button]`
     );
 
-    assert
-      .dom(postableSel(0, 3))
-      .containsText('Connect your Ethereum mainnet wallet');
+    assert.dom(post).containsText('Connect your Ethereum mainnet wallet');
 
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     let layer1Service = this.owner.lookup('service:layer1-network')
       .strategy as Layer1TestWeb3Strategy;
     layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
-
-    // TODO: assert ETH balance showing on Layer 1 connect card
-    // TODO: assert DAI balance showing on Layer 1 connect card
-    // TODO: assert CARD balance showing on Layer 1 connect card
+    layer1Service.test__simulateBalances({
+      defaultToken: BigNumber.from('2141100000000000000'),
+      dai: BigNumber.from('250500000000000000000'),
+      card: BigNumber.from('10000000000000000000000'),
+    });
+    await waitFor(`${post} [data-test-eth-balance]`);
+    assert.dom(`${post} [data-test-eth-balance]`).containsText('2.1411');
+    assert.dom(`${post} [data-test-dai-balance]`).containsText('250.5');
+    assert.dom(`${post} [data-test-card-balance]`).containsText('10000.0');
 
     await waitFor(milestoneCompletedSel(0));
     assert
@@ -116,9 +121,12 @@ module('Acceptance | deposit', function (hooks) {
       .containsText('choose the asset you would like to deposit');
 
     post = postableSel(2, 1);
-    // TODO: assert ETH balance showing
-    // TODO: assert DAI balance showing
+
     await click(`${post} [data-test-layer-1-source-trigger]`);
+    await waitFor(`${post} [data-test-eth-balance]`);
+    assert.dom(`${post} [data-test-eth-balance]`).containsText('2.1411');
+    assert.dom(`${post} [data-test-dai-balance]`).containsText('250.5');
+    assert.dom(`${post} [data-test-card-balance]`).containsText('10000.0');
     await click(`${post} [data-test-dai-option]`);
     await click(`${post} [data-test-layer-2-target-trigger]`);
     await click(`${post} [data-test-new-depot-option]`);

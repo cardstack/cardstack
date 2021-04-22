@@ -47,6 +47,22 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     this.waitForAccountDeferred.resolve();
   }
 
+  test__simulateBalances(balances: {
+    defaultToken: BigNumber | undefined;
+    dai: BigNumber | undefined;
+    card: BigNumber | undefined;
+  }) {
+    if (balances.defaultToken) {
+      this.defaultTokenBalance = balances.defaultToken;
+    }
+    if (balances.dai) {
+      this.daiBalance = balances.dai;
+    }
+    if (balances.card) {
+      this.cardBalance = balances.card;
+    }
+  }
+
   test__simulateUnlock() {
     this.#unlockDeferred?.resolve();
   }

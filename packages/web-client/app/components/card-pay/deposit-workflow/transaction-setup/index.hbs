@@ -5,10 +5,16 @@
   </button>
   {{#if this.isShowingLayer1SourceOptions}}
     <div data-test-ethereum-option>
-      Ethereum
+      Ethereum<br>
+      <span data-test-eth-balance>{{format-token-amount this.layer1Network.defaultTokenBalance}}</span>
     </div>
     <div data-test-dai-option>
-      DAI
+      DAI<br>
+      <span data-test-dai-balance>{{format-token-amount this.layer1Network.daiBalance}}</span>
+    </div>
+    <div data-test-card-option>
+      CARD<br>
+      <span data-test-card-balance>{{format-token-amount this.layer1Network.cardBalance}}</span>
     </div>
   {{/if}}
   <label>Receive balance in xDai Chain wallet</label>
