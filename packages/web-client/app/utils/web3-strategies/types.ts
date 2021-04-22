@@ -12,6 +12,7 @@ export interface Layer1Web3Strategy extends Web3Strategy {
   daiBalance: BigNumber | undefined;
   cardBalance: BigNumber | undefined;
   connect(walletProvider: WalletProvider): Promise<void>; // eslint-disable-line no-unused-vars
+  disconnect(): Promise<void>;
   waitForAccount: Promise<void>;
   unlock(): Promise<void>;
   deposit(): Promise<void>;

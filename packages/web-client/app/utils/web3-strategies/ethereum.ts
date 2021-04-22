@@ -22,6 +22,10 @@ export default class EthereumWeb3Strategy implements Layer1Web3Strategy {
     throw new Error(`Method not implemented. ${walletProvider}`);
   }
 
+  disconnect(): Promise<void> {
+    throw new Error(`Method not implemented.`);
+  }
+
   unlock(): Promise<void> {
     throw new Error('Method not implemented.');
   }

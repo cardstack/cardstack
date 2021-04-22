@@ -81,6 +81,26 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     }
   }
 
+  async disconnect(): Promise<void> {
+    if (this.currentProviderId === 'metamask') {
+      // There is a solution in https://github.com/MetaMask/metamask-extension/issues/8990
+      // that just makes the site think that the wallet isn't connected
+      // It actually still is, you can see this when you open the wallet
+      // The metamask team believes you should be disconnecting via the extension
+      // and has not exposed any way to do this from a dapp
+      this.updateWalletInfo([], this.chainId);
+      this.provider = undefined;
+      this.web3.setProvider(this.provider);
+      this.currentProviderId = '';
+    } else if (this.currentProviderId === 'wallet-connect') {
+      await this.provider.disconnect();
+      this.updateWalletInfo([], this.chainId);
+      this.provider = undefined;
+      this.web3.setProvider(this.provider);
+      this.currentProviderId = '';
+    }
+  }
+
   setupWalletConnect(): any {
     let provider = new WalletConnectProvider({
       chainId: 42,
