@@ -9,7 +9,7 @@
   {{#if (eq this.cardState 'memorialized')}}
     <header aria-label="Layer 1 Connected Header" class="card-pay-workflow-connect-layer-one__body-header">
       {{this.currentWalletProvider.name}}
-      {{this.currentWalletProvider.logo}}
+      <img class="card-pay-workflow-connect-layer-one__body-header-logo" src={{this.currentWalletProvider.logo}} alt="" role="presentation">
     </header>
     Network: {{this.layer1Network.chainName}} <br>
     Address: {{this.layer1Network.walletInfo.firstAddress}} <br>

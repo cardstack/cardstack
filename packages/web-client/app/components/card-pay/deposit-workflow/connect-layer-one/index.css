@@ -7,10 +7,17 @@
 }
 
 .card-pay-workflow-connect-layer-one__body-header {
+  display: flex;
+  align-items: center;
   padding: var(--boxel-sp-xl) 0;
-  max-height: 6rem;
   font-size: 1.125rem;
   font-weight: 600;
+}
+
+.card-pay-workflow-connect-layer-one__body-header-logo {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-left: auto;
 }
 
 .card-pay-workflow-connect-layer-one__wallet-provider-selection {
