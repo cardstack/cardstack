@@ -43,6 +43,10 @@ export default class Layer1Network extends Service {
     return this.waitForAccount;
   }
 
+  disconnect() {
+    this.strategy.disconnect();
+  }
+
   get hasAccount() {
     return this.walletInfo.accounts.length > 0;
   }
