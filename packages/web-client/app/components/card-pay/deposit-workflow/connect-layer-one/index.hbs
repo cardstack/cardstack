@@ -9,14 +9,61 @@
   {{#if (eq this.cardState 'memorialized')}}
     <header aria-label="Layer 1 Connected Header" class="card-pay-workflow-connect-layer-one__body-header">
       {{this.currentWalletProvider.name}}
-      {{this.currentWalletProvider.logo}}
+      <img class="card-pay-workflow-connect-layer-one__body-header-logo" src={{this.currentWalletProvider.logo}} alt="" role="presentation">
     </header>
-    Network: {{this.layer1Network.chainName}} <br>
-    Address: {{this.layer1Network.walletInfo.firstAddress}} <br>
-    ETH Balance: <span data-test-eth-balance>{{format-token-amount this.layer1Network.defaultTokenBalance}}</span><br>
-    DAI Balance: <span data-test-dai-balance>{{format-token-amount this.layer1Network.daiBalance}}</span> <br>
-    CARD Balance: <span data-test-card-balance>{{format-token-amount this.layer1Network.cardBalance}}</span> <br>
-    Status: {{if this.layer1Network.isConnected 'Connected' 'Disconnected'}} <br>
+    <Boxel::Field
+      @label="Network"
+      @fieldMode="view"
+      class="card-pay-workflow-connect-layer-one__field"
+      @labelClass="card-pay-workflow-connect-layer-one__field-label"
+    >
+      <span class="card-pay-workflow-connect-layer-one__field-contents">
+        {{this.layer1Network.chainName}}
+      </span>
+    </Boxel::Field>
+    <Boxel::Field
+      @label="Address"
+      @fieldMode="view"
+      class="card-pay-workflow-connect-layer-one__field"
+      @labelClass="card-pay-workflow-connect-layer-one__field-label"
+    >
+    <span class="card-pay-workflow-connect-layer-one__field-contents card-pay-workflow-connect-layer-one__field-contents-address">
+      {{this.layer1Network.walletInfo.firstAddress}}
+    </span>
+    </Boxel::Field>
+    <Boxel::Field
+      @label="Balance*"
+      @fieldMode="view"
+      class="card-pay-workflow-connect-layer-one__field"
+      @labelClass="card-pay-workflow-connect-layer-one__field-label"
+    >
+      <ul class="card-pay-workflow-connect-layer-one__field-contents card-pay-workflow-connect-layer-one__balance-list">
+        <li class="card-pay-workflow-connect-layer-one__field-balance-display" data-test-eth-balance>
+          {{svg-jar "ethereum-token" class="card-pay-workflow-connect-layer-one__small-icon" role="presentation"}} {{format-token-amount this.layer1Network.defaultTokenBalance}} ETH
+        </li>
+        <li class="card-pay-workflow-connect-layer-one__field-balance-display" data-test-dai-balance>
+          {{svg-jar "dai-token" class="card-pay-workflow-connect-layer-one__small-icon" role="presentation"}} {{format-token-amount this.layer1Network.daiBalance}} DAI
+        </li>
+        <li class="card-pay-workflow-connect-layer-one__field-balance-display" data-test-card-balance>
+          {{svg-jar "card-token" class="card-pay-workflow-connect-layer-one__small-icon" role="presentation"}} {{format-token-amount this.layer1Network.cardBalance}} CARD
+        </li>
+      </ul>
+    </Boxel::Field>
+    <Boxel::Field
+      @label="Status"
+      @fieldMode="view"
+      class="card-pay-workflow-connect-layer-one__field"
+      @labelClass="card-pay-workflow-connect-layer-one__field-label"
+    >
+      <div class="card-pay-workflow-connect-layer-one__field-contents card-pay-workflow-connect-layer-one__connection-status">
+        {{svg-jar "checkbox-primary-checked" class="card-pay-workflow-connect-layer-one__small-icon card-pay-workflow-connect-layer-one__done-icon" role="presentation"}} Connected
+      </div>
+    </Boxel::Field>
+
+    <div class="card-pay-workflow-connect-layer-one__disclaimer">
+      * This balance reflects some of the tokens that are accepted in the Card Pay network. 
+It may not reflect all the tokens in your wallet.
+    </div>
   {{else}}
     <header aria-label="Layer 1 Connection Header" class="card-pay-workflow-connect-layer-one__body-header">Connect your Ethereum mainnet wallet</header>
     <CardPay::LayerOneWalletProviderSelection
@@ -57,6 +104,6 @@
       <img src={{this.connectionSymbol}} alt="" role="presentation" class="card-pay-workflow-connect-layer-one__connection-symbol">
       <img src={{this.currentWalletLogo}} alt="" role="presentation" class="card-pay-workflow-connect-layer-one__connection-wallet-logo">
     </div>
-    <div class="card-pay-workflow-connet-layer-one__connection-text">Waiting for you to connect Card Pay with your mainnet wallet...</div>
+    <div class="card-pay-workflow-connect-layer-one__connection-text">Waiting for you to connect Card Pay with your mainnet wallet...</div>
   </Boxel::CardContainer>
 {{/if}}
