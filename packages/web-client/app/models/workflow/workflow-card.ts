@@ -23,6 +23,6 @@ export class WorkflowCard extends WorkflowPostable {
     this.isComplete = true;
   }
   @action onIncomplete() {
-    this.isComplete = false;
+    this.workflow?.resetTo(this);
   }
 }

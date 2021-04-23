@@ -49,13 +49,6 @@ export default class PostableCollection {
       }
 
       if (!post.isComplete) {
-        // clear out remaining posts from #includedPostables and #excludedPostables,
-        // in case we have a situation where we went backward
-        for (let post of this.postables.slice(i, -1)) {
-          this.#includedPostables.delete(post);
-          this.#excludedPostables.delete(post);
-          post.reset?.();
-        }
         break;
       }
     }
@@ -67,5 +60,18 @@ export default class PostableCollection {
   peekAtVisiblePostables() {
     let includedPostables = this.#includedPostables;
     return this.postables.filter((p) => includedPostables.has(p));
+  }
+
+  resetFrom(startingPostableIndex: number) {
+    for (let i = startingPostableIndex; i < this.postables.length; i++) {
+      const post = this.postables[i];
+      post.reset?.();
+      this.#includedPostables.delete(post);
+      this.#excludedPostables.delete(post);
+    }
+  }
+
+  indexOf(postable: WorkflowPostable) {
+    return this.postables.indexOf(postable);
   }
 }

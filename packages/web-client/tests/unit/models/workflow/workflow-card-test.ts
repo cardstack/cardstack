@@ -1,7 +1,11 @@
 import { module, test } from 'qunit';
 import { setupTest } from 'ember-qunit';
-import { Participant } from '../../../../app/models/workflow/workflow-postable';
+import {
+  Participant,
+  WorkflowPostable,
+} from '../../../../app/models/workflow/workflow-postable';
 import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-card';
+import { Workflow } from '@cardstack/web-client/models/workflow';
 
 module('Unit | WorkflowCard model', function (hooks) {
   setupTest(hooks);
@@ -26,7 +30,20 @@ module('Unit | WorkflowCard model', function (hooks) {
     });
     subject.onComplete();
     assert.equal(subject.isComplete, true);
+  });
 
+  test('when onIncomplete is called, workflow is called', function (assert) {
+    let subject = new WorkflowCard({
+      author: participant,
+      componentName: 'foo/bar',
+    });
+    class StubWorkflow extends Workflow {
+      resetTo(postable: WorkflowPostable) {
+        postable.isComplete = false; // simplified version of actual implementation
+      }
+    }
+    let wf = new StubWorkflow(this.owner);
+    subject.setWorkflow(wf);
     subject.onIncomplete();
     assert.equal(subject.isComplete, false);
   });
