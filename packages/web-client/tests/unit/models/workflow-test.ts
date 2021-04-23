@@ -120,11 +120,10 @@ module('Unit | Workflow model', function (hooks) {
   test('Workflow.resetTo resets each milestone and its epilogue correctly', function (assert) {
     const testWorkflow = new ConcreteWorkflow({});
     let indicesArray: string[] = [];
-    let epilogueReset = false;
 
     class DummyResetFromEpilogue extends PostableCollection {
-      resetFrom() {
-        epilogueReset = true;
+      resetFrom(index: number) {
+        indicesArray.push(`epilogue-${index}`);
       }
     }
 
@@ -148,6 +147,7 @@ module('Unit | Workflow model', function (hooks) {
 
     let targetPostable1 = createPostable();
     let targetPostable2 = createPostable();
+    let epiloguePostable = createPostable();
 
     let milestones = [
       new DummyResetFromMilestone(
@@ -176,22 +176,30 @@ module('Unit | Workflow model', function (hooks) {
       ),
     ];
     testWorkflow.milestones = milestones;
-    testWorkflow.epilogue = new DummyResetFromEpilogue();
+    testWorkflow.epilogue = new DummyResetFromEpilogue([
+      createPostable(),
+      epiloguePostable,
+    ]);
     testWorkflow.attachWorkflow();
     testWorkflow.resetTo(targetPostable1);
-    assert.equal(indicesArray.length, 3);
+    assert.equal(indicesArray.length, 4);
     assert.ok(indicesArray.includes('0-2'));
     assert.ok(indicesArray.includes('1-0'));
     assert.ok(indicesArray.includes('2-0'));
-    assert.ok(epilogueReset);
+    assert.ok(indicesArray.includes('epilogue-0'));
 
     indicesArray = [];
-    epilogueReset = false;
 
     testWorkflow.resetTo(targetPostable2);
-    assert.equal(indicesArray.length, 2);
+    assert.equal(indicesArray.length, 3);
     assert.ok(indicesArray.includes('1-1'));
     assert.ok(indicesArray.includes('2-0'));
-    assert.ok(epilogueReset);
+    assert.ok(indicesArray.includes('epilogue-0'));
+
+    indicesArray = [];
+
+    testWorkflow.resetTo(epiloguePostable);
+    assert.equal(indicesArray.length, 1);
+    assert.ok(indicesArray.includes('epilogue-1'));
   });
 });
