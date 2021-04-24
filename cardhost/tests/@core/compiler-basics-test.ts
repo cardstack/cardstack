@@ -242,7 +242,7 @@ module('@core | compiler-basics', function (hooks) {
           'schema.js': `
             import { contains } from "@cardstack/types";
             import string from "https://cardstack.com/base/string";
-            import styles from '../assets/isolated.css';
+            import styles from './isolated.css';
 
             export default class Post {
               @contains(string)

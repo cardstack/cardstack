@@ -59,7 +59,10 @@ module('Acceptance | card routing', function (hooks) {
   test('visiting /card-routing', async function (assert) {
     await visit('/welcome');
     assert.equal(currentURL(), '/welcome');
-    await this.pauseTest();
+    assert.equal(
+      document.head.querySelector('[data-assets-for-card]')?.innerHTML,
+      '/* card:https://mirage/cards/person asset:isolated.css */\n.person-isolated { background: red }\n\n'
+    );
     assert.dom('[data-test-person]').containsText('Hi! I am Arthur');
   });
 });

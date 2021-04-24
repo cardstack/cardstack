@@ -52,6 +52,7 @@ export default class Builder implements BuilderInterface {
 
     let rawCard = await this.getRawCard(url);
     compiledCard = await this.compiler.compile(rawCard);
+    this.copyAssets(url, compiledCard.assets, rawCard.files);
     this.cache.set(url, compiledCard);
     return compiledCard;
   }
@@ -73,5 +74,27 @@ export default class Builder implements BuilderInterface {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  copyAssetsSync(_assets: Asset[], _files: RawCard['files']): void {}
+  copyAssets(url: string, assets: Asset[], files: RawCard['files']): void {
+    let styles: string[] = [];
+    for (const asset of assets) {
+      if (asset.type === 'css') {
+        styles = styles.concat([
+          `/* card:${url} asset:${asset.path} */`,
+          files[asset.path],
+          '\n',
+        ]);
+      } else {
+        console.warn(
+          `A card declared an asset that the Builder is ignoring. ${url}:${asset.path}`
+        );
+      }
+    }
+
+    if (styles.length) {
+      const style = document.createElement('style');
+      style.innerHTML = styles.join('\n');
+      style.setAttribute('data-assets-for-card', url);
+      document.head.appendChild(style);
+    }
+  }
 }

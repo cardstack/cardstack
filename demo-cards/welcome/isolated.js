@@ -2,7 +2,7 @@ import { setComponentTemplate } from '@ember/component';
 import { precompileTemplate } from '@ember/template-compilation';
 import templateOnlyComponent from '@ember/component/template-only';
 // TODO: We should rewrite this...
-import '../assets/isolated.css';
+import './isolated.css';
 
 export default setComponentTemplate(
   precompileTemplate(

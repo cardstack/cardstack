@@ -1,4 +1,3 @@
-import { encodeCardURL } from '@cardstack/core/src/utils';
 import type {
   Response as ResponseType,
   Request as RequestType,
