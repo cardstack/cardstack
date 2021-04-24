@@ -92,7 +92,7 @@ export interface ComponentInfo {
 export interface Builder {
   getRawCard(url: string): Promise<RawCard>;
   getCompiledCard(url: string): Promise<CompiledCard>;
-  copyAssetsSync(assets: Asset[], files: RawCard['files']): void;
+  copyAssets(url: string, assets: Asset[], files: RawCard['files']): void;
 }
 
 export interface RealmConfig {

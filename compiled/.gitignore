@@ -1,5 +1,3 @@
-*compiled.json
-*isolated.js
-*embedded.js
-*schema.js
+node/*
+browser/*
 assets/*

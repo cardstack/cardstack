@@ -41,5 +41,9 @@ export function setupCardBuilding(
     directory: realm.directory.replace(/\/$/, '') + '/',
   }));
 
-  app.context.builder = new Builder({ realms, cardCacheDir });
+  app.context.builder = new Builder({
+    realms,
+    cardCacheDir,
+    pkgName: '@cardstack/compiled',
+  });
 }

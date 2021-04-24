@@ -1,6 +1,6 @@
+import { ENVIRONMENTS } from './interfaces';
 import Builder from './builder';
-import { glob } from 'glob';
-import { rmSync } from 'fs';
+import { removeSync } from 'fs-extra';
 import { join } from 'path';
 import walkSync from 'walk-sync';
 import sane from 'sane';
@@ -9,9 +9,10 @@ import { RealmConfig } from '@cardstack/core/src/interfaces';
 
 export function cleanCache(dir: string): void {
   console.debug('Cleaning cardCache dir: ' + dir);
-  for (let file of glob.sync('**/http*|assets/*', { cwd: dir })) {
-    rmSync(join(dir, file));
+  for (let subDir of ENVIRONMENTS) {
+    removeSync(join(dir, subDir));
   }
+  removeSync(join(dir, 'assets'));
 }
 
 export async function primeCache(
