@@ -2,8 +2,11 @@ import type {
   Builder as BuilderInterface,
   RawCard,
   CompiledCard,
+  Format,
+  Asset,
 } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
+import { encodeCardURL } from '@cardstack/core/src/utils';
 
 import dynamicCardTransform from './dynamic-card-transform';
 
@@ -14,20 +17,24 @@ export default class Builder implements BuilderInterface {
   });
 
   private cache: Map<string, CompiledCard>;
-  private realm?: string;
 
-  constructor(params: { realm?: string }) {
+  constructor(/*params: { realms: RealmConfig[] }*/) {
     this.cache = new Map();
-    this.realm = params.realm;
   }
 
-  private async defineModule(moduleURL: string, source: string): Promise<void> {
-    source = dynamicCardTransform(moduleURL, source);
+  private async defineModule(
+    cardURL: string,
+    localModule: string,
+    source: string
+  ): Promise<string> {
+    let url = new URL(localModule, cardURL.replace(/\/$/, '') + '/').href;
+    source = dynamicCardTransform(url, source);
     eval(source);
+    return url;
   }
 
   async getRawCard(url: string): Promise<RawCard> {
-    let response = await fetch(`${url}?type=raw`);
+    let response = await fetch(`/cards/${encodeCardURL(url)}?type=raw`);
     if (!response || response.status === 404) {
       throw Error(`Card Builder: No raw card found for ${url}`);
     }
@@ -55,13 +62,16 @@ export default class Builder implements BuilderInterface {
   // implementation and the data to give you a single thing you can render.
   async getBuiltCard(
     url: string,
-    format: 'isolated' | 'embedded'
+    format: Format
   ): Promise<{ model: any; moduleName: string }> {
     let compiledCard = await this.getCompiledCard(url);
 
     return {
       model: compiledCard.data,
-      moduleName: compiledCard.templateModules[format].moduleName,
+      moduleName: compiledCard[format].moduleName,
     };
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  copyAssetsSync(_assets: Asset[], _files: RawCard['files']): void {}
 }

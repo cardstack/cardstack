@@ -4,6 +4,19 @@
   "keywords": [
     "ember-addon"
   ],
+  "exports": {
+    ".": {
+      "browser": "./browser",
+      "default": "./node"
+    },
+    "./*": {
+      "browser": "./browser/*",
+      "default": "./node/*"
+    }
+  },
+  "engines": {
+    "node": ">= 15"
+  },
   "dependencies": {},
   "ember-addon": {
     "version": 2,

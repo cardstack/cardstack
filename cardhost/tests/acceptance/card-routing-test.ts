@@ -3,7 +3,7 @@ import { visit, currentURL } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import setupCardMocking from '../helpers/card-mocking';
 import { setupMirage } from 'ember-cli-mirage/test-support';
-import { templateOnlyComponentTemplate } from '../helpers/template-compiler';
+import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 
 module('Acceptance | card routing', function (hooks) {
   setupApplicationTest(hooks);
@@ -11,12 +11,15 @@ module('Acceptance | card routing', function (hooks) {
   setupCardMocking(hooks);
 
   hooks.beforeEach(function () {
+    // TODO
     this.server.create('space', {
       id: 'home',
       routingCard: 'https://mirage/cards/my-routes',
     });
+
     this.createCard({
       url: 'https://mirage/cards/my-routes',
+      schema: 'schema.js',
       files: {
         'schema.js': `
           export default class MyRoutes {
@@ -28,24 +31,27 @@ module('Acceptance | card routing', function (hooks) {
           }`,
       },
     });
+
     this.createCard({
       url: 'https://mirage/cards/person',
+      schema: 'schema.js',
+      isolated: 'isolated.js',
+      data: {
+        name: 'Arthur',
+      },
       files: {
         'schema.js': `
           import { contains } from "@cardstack/types";
-          import string from "https://cardstack.com/base/models/string";
+          import './isolated.css'
+          import string from "https://cardstack.com/base/string";
           export default class Person {
             @contains(string)
             name;
           }`,
-        'data.json': {
-          attributes: {
-            name: 'Arthur',
-          },
-        },
         'isolated.js': templateOnlyComponentTemplate(
-          `<div data-test-person>Hi! I am <@model.name/></div>`
+          `<div class="person-isolated" data-test-person>Hi! I am <@model.name/></div>`
         ),
+        'isolated.css': '.person-isolated { background: red }',
       },
     });
   });
@@ -53,6 +59,7 @@ module('Acceptance | card routing', function (hooks) {
   test('visiting /card-routing', async function (assert) {
     await visit('/welcome');
     assert.equal(currentURL(), '/welcome');
+    await this.pauseTest();
     assert.dom('[data-test-person]').containsText('Hi! I am Arthur');
   });
 });

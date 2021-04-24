@@ -9,9 +9,6 @@
     "directory": "core"
   },
   "main": "src/index.ts",
-  "exports": {
-    ".": "./src/index.ts"
-  },
   "license": "MIT",
   "description": "Core library for Cardstack, portable to both browser and server environments",
   "dependencies": {
@@ -62,7 +59,6 @@
     "test:node": "node --loader ts-node/esm ../node_modules/.bin/qunit 'tests/**/*-test.ts'",
     "test:browser": "webpack && testem ci"
   },
-  "type": "module",
   "volta": {
     "extends": "../package.json"
   }

@@ -1,0 +1,7 @@
+{
+  "adoptsFrom": "../post",
+  "data": {
+    "title": "Hello World",
+    "body": "First post."
+  }
+}

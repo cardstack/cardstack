@@ -3,6 +3,7 @@ import type { TransformOptions } from '@babel/core';
 import { ColocatedBabelPlugin } from '@cardstack/core/src/babel/utils';
 
 import { precompile } from '@glimmer/compiler';
+// import { precompile } from 'ember-source/dist/ember-template-compiler';
 // @ts-ignore
 import HTMLBarsInlinePrecompile from 'babel-plugin-htmlbars-inline-precompile';
 // @ts-ignore
@@ -25,7 +26,7 @@ export default function dynamicCardTransform(
 }
 
 function babelConfig(moduleURL: string): TransformOptions {
-  let ensureModuleApiPolyfill = false; // For now?Not sure we need this...
+  let ensureModuleApiPolyfill = true; // For now?Not sure we need this...
 
   let plugins = [
     [

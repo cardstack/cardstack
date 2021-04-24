@@ -4,12 +4,16 @@ import {
   ASTPluginEnvironment,
   preprocess as parse,
 } from '@glimmer/syntax';
-import { CompiledCard } from '../interfaces';
+// @ts-ignore
+// import ETC from 'ember-source/dist/ember-template-compiler';
+// const { preprocess: parse } = ETC._GlimmerSyntax
+import { CompiledCard, ComponentInfo } from '../interfaces';
 
 const PREFIX = '@model.';
 
 export interface Options {
   fields: CompiledCard['fields'];
+  usedFields: ComponentInfo['usedFields'];
   importAndChooseName: (
     desiredName: string,
     moduleSpecifier: string,
@@ -19,7 +23,7 @@ export interface Options {
 
 export default function cardTransform(options: Options): ASTPluginBuilder {
   return function transform(/* env: ASTPluginEnvironment */): ASTPlugin {
-    let { fields, importAndChooseName } = options;
+    let { fields, importAndChooseName, usedFields } = options;
     return {
       name: 'card-glimmer-plugin',
       visitor: {
@@ -31,7 +35,9 @@ export default function cardTransform(options: Options): ASTPluginBuilder {
               return;
             }
 
-            let { inlineHBS } = field.card.templateModules.embedded;
+            usedFields.push(fieldName);
+
+            let { inlineHBS } = field.card.embedded;
             if (inlineHBS) {
               let ast = parse(inlineHBS, {
                 plugins: {
@@ -42,7 +48,7 @@ export default function cardTransform(options: Options): ASTPluginBuilder {
             } else {
               let componentName = importAndChooseName(
                 capitalize(field.localName),
-                field.card.templateModules.embedded.moduleName,
+                field.card.embedded.moduleName,
                 'default'
               );
               let template = `<${componentName} @model={{${node.tag}}} />`;

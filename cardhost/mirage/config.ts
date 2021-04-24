@@ -1,21 +1,21 @@
-import { Response, Request } from 'miragejs';
+import { encodeCardURL } from '@cardstack/core/src/utils';
+import type {
+  Response as ResponseType,
+  Request as RequestType,
+} from 'miragejs';
 import type { Server } from 'miragejs/server';
 
+// @ts-ignore
+import { Response } from 'ember-cli-mirage';
+
 import Builder from 'cardhost/lib/builder';
-import { RawCard } from '@cardstack/core/src/interfaces';
+import { Format, RawCard } from '@cardstack/core/src/interfaces';
 import { getContext } from '@ember/test-helpers';
 import { Memoize } from 'typescript-memoize';
 
-const REALM = 'https://cardstack.com/mirage';
+// const REALM = 'https://cardstack.com/mirage';
 
-type CardParams =
-  | {
-      type: 'raw';
-    }
-  | {
-      format: 'isolated' | 'embedded';
-      type?: 'compiled';
-    };
+type CardParams = { type: 'raw' } | { format: Format; type?: 'compiled' };
 
 class FakeCardServer {
   static cardServers = new WeakMap<object, FakeCardServer>();
@@ -35,12 +35,20 @@ class FakeCardServer {
 
   @Memoize()
   get builder(): Builder {
-    return new Builder({
-      realm: REALM,
-    });
+    return new Builder();
+    // return new Builder({
+    //   realm: [
+    //     {
+    //       url: 'https://cardstack.com/base',
+    //     },
+    //     {
+    //       url: 'https://mirage',
+    //     },
+    //   ],
+    // });
   }
 
-  async respondWithCard(url: string, format: 'embedded' | 'isolated') {
+  async respondWithCard(url: string, format: Format) {
     let {
       model,
       moduleName,
@@ -57,7 +65,7 @@ class FakeCardServer {
     };
   }
 
-  respondWithRawCard(schema: any, url: string): RawCard | Response {
+  respondWithRawCard(schema: any, url: string): RawCard | ResponseType {
     let rawCard = schema.cards.find(url);
     if (!rawCard) {
       return new Response(404, {}, { error: `Not Found: No card for '${url}` });
@@ -66,7 +74,7 @@ class FakeCardServer {
   }
 }
 
-function cardParams(queryParams: Request['queryParams']): CardParams {
+function cardParams(queryParams: RequestType['queryParams']): CardParams {
   let { type, format } = queryParams;
   if (type && !['raw', 'compiled'].includes(type)) {
     throw new Error(`unsupported ?type=${type}`);
@@ -80,25 +88,21 @@ function cardParams(queryParams: Request['queryParams']): CardParams {
   return (queryParams as unknown) as CardParams;
 }
 
-async function returnCompiledCard(schema: any, request: Request) {
+async function returnCard(schema: any, request: RequestType) {
   let cardServer = FakeCardServer.current();
   let params = cardParams(request.queryParams);
-  let [url] = request.url.split('?');
+  let cardURL = request.params.encodedCardURL;
 
   if (params.type === 'raw') {
-    return cardServer.respondWithRawCard(schema, url);
+    return cardServer.respondWithRawCard(schema, cardURL);
   }
-  return cardServer.respondWithCard(url, params.format);
+  return cardServer.respondWithCard(cardURL, params.format);
 }
 
 export default function (this: Server): void {
-  this.get('http://mirage/cards/:id', returnCompiledCard);
-  this.get('http://cardstack.com/base/models/:id', returnCompiledCard);
+  this.get(`/cards/:encodedCardURL`, returnCard);
 
-  this.post('/spaces');
-  this.patch('/spaces');
-
-  this.get('/spaces/home/:pathname', async function (schema: any, request) {
+  this.get('/cardFor/:pathname', async function (schema: any, request) {
     let { routingCard } = schema.spaces.find('home');
     let cardServer = FakeCardServer.current();
     if (!routingCard) {

@@ -1,4 +1,6 @@
 import * as syntax from '@glimmer/syntax';
+// import ETC from 'ember-source/dist/ember-template-compiler';
+// const { preprocess, print } = ETC._GlimmerSyntax;
 import { NodePath } from '@babel/core';
 import {
   CallExpression,
@@ -12,14 +14,19 @@ import {
   objectExpression,
   identifier,
 } from '@babel/types';
-import { CompiledCard, TemplateModule } from '../interfaces';
+import { CompiledCard, ComponentInfo } from '../interfaces';
 import cardGlimmerPlugin from '../glimmer/card-template-plugin';
 
 import { getObjectKey, error } from './utils';
 
 export interface Options {
   fields: CompiledCard['fields'];
-  templateModule: TemplateModule;
+  cardURL: string;
+  localFile: string;
+
+  // these are for gathering output
+  usedFields: ComponentInfo['usedFields'];
+  inlineHBS: string | undefined;
 }
 
 interface State {
@@ -83,13 +90,13 @@ function callExpressionEnter(path: NodePath<CallExpression>, state: State) {
   let { template, neededScope } = transformTemplate(
     inputTemplate,
     path,
-    state.opts.fields,
+    state.opts,
     state.neededImports
   );
   path.node.arguments[0] = stringLiteral(template);
 
   if (shouldInlineHBS(options, neededScope)) {
-    state.opts.templateModule.inlineHBS = template;
+    state.opts.inlineHBS = template;
   }
 
   updateScope(options, neededScope);
@@ -146,7 +153,7 @@ function handleArguments(
 function transformTemplate(
   source: string,
   path: NodePath<CallExpression>,
-  fields: CompiledCard['fields'],
+  opts: Options,
   importNames: State['neededImports']
 ): { template: string; neededScope: Set<string> } {
   let neededScope = new Set<string>();
@@ -161,7 +168,10 @@ function transformTemplate(
     while (path.scope.getBinding(candidate) || importNames.has(candidate)) {
       candidate = `${desiredName}${counter++}`;
     }
-    importNames.set(candidate, { moduleSpecifier, exportedName: importedName });
+    importNames.set(candidate, {
+      moduleSpecifier,
+      exportedName: importedName,
+    });
     neededScope.add(candidate);
     return candidate;
   }
@@ -170,7 +180,13 @@ function transformTemplate(
     syntax.preprocess(source, {
       mode: 'codemod',
       plugins: {
-        ast: [cardGlimmerPlugin({ fields, importAndChooseName })],
+        ast: [
+          cardGlimmerPlugin({
+            fields: opts.fields,
+            usedFields: opts.usedFields,
+            importAndChooseName,
+          }),
+        ],
       },
     })
   );
@@ -192,7 +208,7 @@ function updateScope(
   let scope = getObjectKey(options, 'scope');
 
   if (scope?.isObjectExpression()) {
-    scope.node.properties.concat(scopeVars);
+    scope.node.properties = scope.node.properties.concat(scopeVars);
   } else {
     options.node.properties.push(
       objectProperty(identifier('scope'), objectExpression(scopeVars))

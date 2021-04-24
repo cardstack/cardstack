@@ -40,12 +40,12 @@ export type ParentMeta = {
   cardURL: string;
 };
 
-export function getMeta(
-  obj: Object
-): {
+export type PluginMeta = {
   fields: FieldsMeta;
   parent?: ParentMeta;
-} {
+};
+
+export function getMeta(obj: Object): PluginMeta {
   let meta = metas.get(obj);
   if (!meta) {
     // throw new Error(

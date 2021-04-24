@@ -8,6 +8,6 @@ export default class Delegate extends Route {
   model(params: {
     pathname: string;
   }): Promise<{ model: any; component: unknown }> {
-    return this.cards.loadForRoute(params.pathname);
+    return this.cards.loadForRoute('/' + params.pathname);
   }
 }

@@ -1,0 +1,26 @@
+import type Koa from 'koa';
+import type Builder from '../src/builder';
+import type { RealmConfig } from '@cardstack/core/src/interfaces';
+
+const ENVIRONMENTS_OBJ = {
+  browser: '',
+  node: '',
+};
+export type Environment = keyof typeof ENVIRONMENTS_OBJ;
+export const ENVIRONMENTS = Object.keys(ENVIRONMENTS_OBJ) as Environment[];
+export const BROWSER = ENVIRONMENTS[0];
+export const NODE = ENVIRONMENTS[1];
+
+export interface ServerOptions {
+  realms: RealmConfig[];
+  cardCacheDir: string;
+  routeCard?: string;
+}
+
+interface BuilderContext {
+  builder: Builder;
+}
+interface CardRouterContext {
+  cardRouter: any;
+}
+export type ServerKoa = Koa<{}, BuilderContext & CardRouterContext>;

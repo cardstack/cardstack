@@ -5,7 +5,8 @@ import { hbs } from 'ember-cli-htmlbars';
 import type Cards from 'cardhost/services/cards';
 import setupCardMocking from '../helpers/card-mocking';
 import { setupMirage } from 'ember-cli-mirage/test-support';
-import { templateOnlyComponentTemplate } from '../helpers/template-compiler';
+import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
+import { encodeCardURL } from '@cardstack/core/src/utils';
 
 module('Integration | card-service', function (hooks) {
   setupRenderingTest(hooks);
@@ -17,22 +18,14 @@ module('Integration | card-service', function (hooks) {
     cards = this.owner.lookup('service:cards');
   });
 
-  test('compiled-cards dynamic import example', async function (assert) {
-    let target = 'hello';
-    this.set('hello', (await import(`@cardstack/compiled/${target}`)).default);
-
-    await render(
-      hbs`{{#let (ensure-safe-component this.hello) as |Hello|}} <Hello /> {{/let}}`
-    );
-    assert.dom(this.element).containsText('Hello world');
-  });
-
   module('hello world', function (hooks) {
     let helloId = 'http://mirage/cards/hello';
     let greenId = 'http://mirage/cards/green';
     hooks.beforeEach(function () {
       this.createCard({
         url: greenId,
+        schema: 'schema.js',
+        embedded: 'embedded.js',
         files: {
           'schema.js': `export default class Green {}`,
           'embedded.js': templateOnlyComponentTemplate(
@@ -43,16 +36,16 @@ module('Integration | card-service', function (hooks) {
 
       this.createCard({
         url: helloId,
+        schema: 'schema.js',
+        isolated: 'isolated.js',
+        data: {
+          greeting: 'Hello World',
+          greenGreeting: 'it works',
+        },
         files: {
-          'data.json': {
-            attributes: {
-              greeting: 'Hello World',
-              greenGreeting: 'it works',
-            },
-          },
           'schema.js': `
           import { contains } from "@cardstack/types";
-          import string from "https://cardstack.com/base/models/string";
+          import string from "https://cardstack.com/base/string";
           import green from "${greenId}"
 
           export default class Hello {
@@ -83,7 +76,7 @@ module('Integration | card-service', function (hooks) {
       assert.deepEqual(model, {
         greeting: 'Hello World',
         greenGreeting: 'it works',
-        id: helloId,
+        id: encodeCardURL(helloId),
       });
     });
   });

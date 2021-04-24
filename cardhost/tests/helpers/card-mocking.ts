@@ -2,6 +2,7 @@ import { Server } from 'miragejs/server';
 import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
 import type { TestContext } from 'ember-test-helpers';
 import { RAW_BASE_CARDS } from '@cardstack/core/src/raw-base-cards';
+import { encodeCardURL } from '@cardstack/core/src/utils';
 declare module 'ember-test-helpers' {
   interface TestContext {
     server: Server;
@@ -18,6 +19,7 @@ export default function setupCardMocking(hooks: NestedHooks): void {
     this.createCard = createCard.bind(this);
     this.lookupCard = lookupCard.bind(this);
 
+    // TODO: Is this still neccessary?
     RAW_BASE_CARDS.forEach((card) => this.createCard(card));
   });
 
@@ -25,11 +27,12 @@ export default function setupCardMocking(hooks: NestedHooks): void {
 }
 
 function createCard(this: TestContext, card: RawCard): unknown {
-  return this.server.create('card', { id: card.url, raw: card });
+  return this.server.create('card', { id: encodeCardURL(card.url), raw: card });
 }
 
 function lookupCard(this: TestContext, id: string): Promise<CompiledCard> {
-  let response = this.server.schema.cards.find(id);
+  let { schema } = this.server as any;
+  let response = schema.cards.find(id);
   if (!response) {
     throw Error(`Could not find card '${id}'. Did you make it?`);
   }
