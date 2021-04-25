@@ -12,8 +12,17 @@ export class WorkflowCard extends WorkflowPostable {
   constructor(options: Partial<WorkflowCardOptions>) {
     super(options.author!, options.includeIf);
     this.componentName = options.componentName!;
+    this.reset = () => {
+      if (this.isComplete) {
+        this.isComplete = false;
+      }
+    };
   }
+
   @action onComplete() {
     this.isComplete = true;
+  }
+  @action onIncomplete() {
+    this.workflow?.resetTo(this);
   }
 }

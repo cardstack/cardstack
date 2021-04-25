@@ -38,6 +38,7 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   chainName = 'Kovan Testnet';
   chainId = 42;
   walletConnectUri: string | undefined;
+  currentProviderId: string | undefined;
   provider: any | undefined;
   web3 = new Web3();
   cardTokenContract = new this.web3.eth.Contract(
@@ -60,7 +61,8 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   }
 
   async connect(walletProvider: WalletProvider): Promise<void> {
-    if (walletProvider.id === 'metamask') {
+    this.currentProviderId = walletProvider.id;
+    if (this.currentProviderId === 'metamask') {
       this.provider = await this.setupMetamask();
       if (!this.provider) {
         return;
@@ -70,12 +72,32 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
         method: 'eth_requestAccounts',
       });
       this.updateWalletInfo(accounts, this.chainId);
-    } else if (walletProvider.id === 'wallet-connect') {
+    } else if (this.currentProviderId === 'wallet-connect') {
       this.provider = this.setupWalletConnect();
       this.web3.setProvider(this.provider);
       await this.provider.enable();
       let accounts = await this.web3.eth.getAccounts();
       this.updateWalletInfo(accounts, this.chainId);
+    }
+  }
+
+  async disconnect(): Promise<void> {
+    if (this.currentProviderId === 'metamask') {
+      // There is a solution in https://github.com/MetaMask/metamask-extension/issues/8990
+      // that just makes the site think that the wallet isn't connected
+      // It actually still is, you can see this when you open the wallet
+      // The metamask team believes you should be disconnecting via the extension
+      // and has not exposed any way to do this from a dapp
+      this.clearWalletInfo();
+      this.provider = undefined;
+      this.web3.setProvider(this.provider);
+      this.currentProviderId = '';
+    } else if (this.currentProviderId === 'wallet-connect') {
+      await this.provider.disconnect();
+      this.clearWalletInfo();
+      this.provider = undefined;
+      this.web3.setProvider(this.provider);
+      this.currentProviderId = '';
     }
   }
 

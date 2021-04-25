@@ -27,6 +27,11 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     return this.waitForAccount;
   }
 
+  disconnect(): Promise<void> {
+    this.test__simulateAccountsChanged([]);
+    return this.waitForAccount;
+  }
+
   unlock() {
     this.#unlockDeferred = RSVP.defer();
     return this.#unlockDeferred.promise;

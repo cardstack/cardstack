@@ -35,4 +35,12 @@ export class Milestone {
   peekAtVisiblePostables() {
     return this.#postableCollection.peekAtVisiblePostables();
   }
+
+  indexOf(postable: WorkflowPostable) {
+    return this.#postableCollection.indexOf(postable);
+  }
+
+  resetFrom(start: number) {
+    this.#postableCollection.resetFrom(start);
+  }
 }

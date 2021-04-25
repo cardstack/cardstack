@@ -26,6 +26,11 @@ export default class TestWeb3Strategy implements Layer2Web3Strategy {
     return this.#depositDeferred.promise;
   }
 
+  disconnect(): Promise<void> {
+    this.test__simulateAccountsChanged([]);
+    return this.waitForAccount as Promise<void>;
+  }
+
   test__simulateWalletConnectUri() {
     this.walletConnectUri = 'This is a test of Layer2 Wallet Connect';
   }

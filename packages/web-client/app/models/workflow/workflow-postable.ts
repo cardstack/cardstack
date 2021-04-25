@@ -20,4 +20,5 @@ export class WorkflowPostable {
     this.includeIf = includeIf;
   }
   includeIf: (() => boolean) | undefined;
+  reset: (() => void) | undefined;
 }

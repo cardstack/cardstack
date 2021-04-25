@@ -61,4 +61,17 @@ export default class PostableCollection {
     let includedPostables = this.#includedPostables;
     return this.postables.filter((p) => includedPostables.has(p));
   }
+
+  resetFrom(startingPostableIndex: number) {
+    for (let i = startingPostableIndex; i < this.postables.length; i++) {
+      const post = this.postables[i];
+      post.reset?.();
+      this.#includedPostables.delete(post);
+      this.#excludedPostables.delete(post);
+    }
+  }
+
+  indexOf(postable: WorkflowPostable) {
+    return this.postables.indexOf(postable);
+  }
 }

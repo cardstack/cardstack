@@ -5,6 +5,7 @@ export interface Web3Strategy {
   chainName: string;
   isConnected: boolean;
   walletConnectUri: string | undefined;
+  disconnect(): Promise<void>;
 }
 
 export interface Layer1Web3Strategy extends Web3Strategy {
