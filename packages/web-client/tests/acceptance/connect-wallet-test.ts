@@ -9,6 +9,7 @@ import {
 import { setupApplicationTest } from 'ember-qunit';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
+import a11yAudit from 'ember-a11y-testing/test-support/audit';
 
 module('Acceptance | Connect Wallet', function (hooks) {
   setupApplicationTest(hooks);
@@ -53,12 +54,17 @@ module('Acceptance | Connect Wallet', function (hooks) {
     await click(
       '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
     );
+    assert.dom('[data-test-layer-two-connect-modal-card]').isFocused();
+
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
 
     layer2Service.test__simulateWalletConnectUri();
     await waitFor('[data-test-wallet-connect-qr-code]');
     assert.dom('[data-test-wallet-connect-qr-code]').exists();
+
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found on layer 2 connect modal');
 
     // Simulate the user scanning the QR code and connecting their mobile wallet
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';

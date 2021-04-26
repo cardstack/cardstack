@@ -65,3 +65,7 @@
   margin-top: auto;
   align-self: flex-end;
 }
+
+.org-card__cta--disabled-link {
+  color: var(--boxel-purple-600);
+}

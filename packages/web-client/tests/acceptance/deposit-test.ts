@@ -12,6 +12,7 @@ import { setupApplicationTest } from 'ember-qunit';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { BigNumber } from '@ethersproject/bignumber';
+import a11yAudit from 'ember-a11y-testing/test-support/audit';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -55,6 +56,9 @@ module('Acceptance | deposit', function (hooks) {
     );
 
     assert.dom(post).containsText('Connect your Ethereum mainnet wallet');
+
+    await a11yAudit();
+    assert.ok(true, 'no a11y errors found - layer 1 connect card');
 
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     let layer1Service = this.owner.lookup('service:layer1-network')

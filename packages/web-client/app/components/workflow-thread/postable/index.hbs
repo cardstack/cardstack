@@ -9,6 +9,8 @@
   <Boxel::ThreadMessage
     @datetime={{@postable.timestamp}}
     @imgURL={{@postable.author.imgURL}}
+    @name={{@postable.author.name}}
+    @hideName={{true}}
     @hideMeta={{postable-meta-identical @postable (object-at @postables (dec @index))}}
     data-test-postable={{@index}}
     ...attributes
@@ -21,6 +23,8 @@
   <Boxel::ThreadMessage
     @datetime={{@postable.timestamp}}
     @imgURL={{@postable.author.imgURL}}
+    @name={{@postable.author.name}}
+    @hideName={{true}}
     @hideMeta={{postable-meta-identical @postable (object-at @postables (dec @index))}}
     data-test-postable={{@index}}
     ...attributes

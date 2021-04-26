@@ -22,7 +22,7 @@
     "test:ember": "ember test"
   },
   "devDependencies": {
-    "@cardstack/boxel": "^0.4.0",
+    "@cardstack/boxel": "^0.4.2",
     "@ember/optional-features": "^2.0.0",
     "@ember/test-helpers": "^2.2.5",
     "@embroider/compat": "^0.39.1",
@@ -63,6 +63,7 @@
     "broccoli-asset-rev": "^3.0.0",
     "broccoli-concat": "^4.2.4",
     "commonmark": "^0.29.3",
+    "ember-a11y-testing": "^4.0.3",
     "ember-auto-import": "^1.11.2",
     "ember-cli": "~3.25.3",
     "ember-cli-app-version": "^4.0.0",
@@ -75,6 +76,7 @@
     "ember-cli-deploy-display-revisions": "^2.1.2",
     "ember-cli-deploy-revision-data": "^1.0.0",
     "ember-cli-deploy-s3": "^3.0.0",
+    "ember-cli-deprecation-workflow": "^1.0.1",
     "ember-cli-dotenv": "^3.1.0",
     "ember-cli-htmlbars": "^5.3.2",
     "ember-cli-inject-live-reload": "^2.0.2",
@@ -96,7 +98,7 @@
     "ember-set-helper": "^2.0.0",
     "ember-source": "~3.25.1",
     "ember-svg-jar": "^2.3.3",
-    "ember-template-lint": "^2.18.1",
+    "ember-template-lint": "^3.2.0",
     "ember-welcome-page": "^4.0.0",
     "eslint": "^7.23.0",
     "eslint-config-prettier": "^8.1.0",

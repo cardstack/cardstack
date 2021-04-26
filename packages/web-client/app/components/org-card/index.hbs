@@ -16,6 +16,15 @@
         {{/if}}
       </p>
     {{/if}}
-  <Boxel::Button class="org-card__cta" @as="link-to" @kind="primary" @disabled={{not @org.launched}} @route={{@route}} data-test-cardstack-org-link={{@org.id}}>{{@org.cta}}</Boxel::Button>
+    <Boxel::Button
+      class={{cn "org-card__cta" (unless @org.launched "org-card__cta--disabled-link")}}
+      @as="link-to"
+      @kind="primary"
+      @disabled={{not @org.launched}}
+      @route={{@route}}
+      data-test-cardstack-org-link={{@org.id}}
+    >
+      {{@org.cta}}
+    </Boxel::Button>
   </div>
 </div>
