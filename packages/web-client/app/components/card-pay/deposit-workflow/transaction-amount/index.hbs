@@ -1,5 +1,7 @@
 <Boxel::CardContainer>
-
+  <div data-test-source-token={{@workflowSession.state.depositSourceToken}}>
+    Depositing from {{@workflowSession.state.depositSourceToken}}
+  </div>
   <Boxel::Input data-test-deposit-amount-input @value={{this.amount}} />
   <Boxel::Button {{on 'click' this.unlock}} data-test-unlock-button @disabled={{this.isUnlockButtonDisabled}}>
     Unlock

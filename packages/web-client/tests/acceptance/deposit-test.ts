@@ -141,6 +141,7 @@ module('Acceptance | deposit', function (hooks) {
       .containsText('How many tokens would you like to deposit?');
 
     post = postableSel(2, 3);
+    assert.dom(`${post} [data-test-source-token="dai"]`).exists();
     assert.dom(`${post} [data-test-unlock-button]`).isDisabled();
     assert.dom(`${post} [data-test-deposit-button]`).isDisabled();
     await fillIn('[data-test-deposit-amount-input]', '2500');

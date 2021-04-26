@@ -4,18 +4,18 @@
     Layer 1
   </button>
   {{#if this.isShowingLayer1SourceOptions}}
-    <div data-test-ethereum-option>
+    <button data-test-ethereum-option type="button" {{on 'click' (fn this.chooseSource 'default-token')}}>
       Ethereum<br>
       <span data-test-eth-balance>{{format-token-amount this.layer1Network.defaultTokenBalance}}</span>
-    </div>
-    <div data-test-dai-option>
+    </button>
+    <button data-test-dai-option type="button" {{on 'click' (fn this.chooseSource 'dai')}}>
       DAI<br>
       <span data-test-dai-balance>{{format-token-amount this.layer1Network.daiBalance}}</span>
-    </div>
-    <div data-test-card-option>
+    </button>
+    <button data-test-card-option type="button" {{on 'click' (fn this.chooseSource 'card')}}>
       CARD<br>
       <span data-test-card-balance>{{format-token-amount this.layer1Network.cardBalance}}</span>
-    </div>
+    </button>
   {{/if}}
   <label>Receive balance in xDai Chain wallet</label>
   <button data-test-layer-2-target-trigger type="button" {{on 'click' (set this 'isShowingLayer2TargetOptions' true)}}>

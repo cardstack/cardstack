@@ -3,7 +3,7 @@ import { setupTest } from 'ember-qunit';
 import {
   Participant,
   WorkflowPostable,
-} from '../../../../app/models/workflow/workflow-postable';
+} from '@cardstack/web-client/models/workflow/workflow-postable';
 import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-card';
 import { Workflow } from '@cardstack/web-client/models/workflow';
 
@@ -13,6 +13,17 @@ module('Unit | WorkflowCard model', function (hooks) {
   let participant: Participant;
   hooks.beforeEach(function () {
     participant = { name: 'cardbot' };
+  });
+
+  test('setWorkflow makes session available', function (assert) {
+    let subject = new WorkflowCard({
+      author: participant,
+      componentName: 'foo/bar',
+    });
+    class StubWorkflow extends Workflow {}
+    let wf = new StubWorkflow(this.owner);
+    subject.setWorkflow(wf);
+    assert.equal(subject.session, wf.session);
   });
 
   test('isComplete starts off as false', function (assert) {

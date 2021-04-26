@@ -7,7 +7,7 @@ export interface Participant {
 export class WorkflowPostable {
   author: Participant;
   timestamp: Date | null = null;
-  workflow: Workflow | undefined;
+  @tracked workflow: Workflow | undefined;
   setWorkflow(wf: Workflow) {
     this.workflow = wf;
   }
