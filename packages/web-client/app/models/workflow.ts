@@ -2,6 +2,7 @@ import { A } from '@ember/array';
 import { Milestone } from './workflow/milestone';
 import PostableCollection from './workflow/postable-collection';
 import { WorkflowPostable } from './workflow/workflow-postable';
+import WorkflowSession from './workflow/workflow-session';
 
 interface PostableIndices {
   isInMilestone: boolean;
@@ -14,6 +15,7 @@ export abstract class Workflow {
   name!: string;
   milestones: Milestone[] = [];
   epilogue: PostableCollection = new PostableCollection();
+  session: WorkflowSession = new WorkflowSession();
   owner: any;
 
   constructor(owner: any) {

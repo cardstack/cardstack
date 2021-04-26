@@ -1,5 +1,6 @@
 import { action } from '@ember/object';
 import { Participant, WorkflowPostable } from './workflow-postable';
+import WorkflowSession from './workflow-session';
 
 interface WorkflowCardOptions {
   author: Participant;
@@ -17,6 +18,9 @@ export class WorkflowCard extends WorkflowPostable {
         this.isComplete = false;
       }
     };
+  }
+  get session(): WorkflowSession | undefined {
+    return this.workflow?.session;
   }
 
   @action onComplete() {
