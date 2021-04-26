@@ -24,6 +24,7 @@ module('Integration | Component | workflow-thread', function (hooks) {
     `);
 
     assert.dom('[data-test-hello-world]').exists();
+    assert.dom('[data-test-workflow-thread]').isFocused();
   });
 
   test('it renders date divider before first post and when the date changes', async function (assert) {
@@ -68,6 +69,7 @@ module('Integration | Component | workflow-thread', function (hooks) {
       <WorkflowThread @workflow={{this.workflow}} />
     `);
     assert.dom('[data-test-date-divider]').exists({ count: 2 });
+    assert.dom('[data-test-workflow-thread]').isFocused();
   });
 
   test('it renders epilogue posts after the workflow is complete', async function (assert) {

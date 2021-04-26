@@ -54,6 +54,8 @@ module('Acceptance | Connect Wallet', function (hooks) {
     await click(
       '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
     );
+    assert.dom('[data-test-layer-two-connect-modal-card]').isFocused();
+
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
 
