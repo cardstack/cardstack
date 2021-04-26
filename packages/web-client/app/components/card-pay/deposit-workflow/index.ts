@@ -61,7 +61,7 @@ class DepositWorkflow extends Workflow {
         }),
         new WorkflowCard({
           author: cardbot,
-          componentName: 'card-pay/deposit-workflow/connect-layer-one',
+          componentName: 'card-pay/layer-one-connect-card',
         }),
       ],
       completedDetail: 'Mainnet Wallet connected',

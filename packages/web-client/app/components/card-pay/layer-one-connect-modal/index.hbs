@@ -4,7 +4,10 @@
   class="layer-one-connect-modal"
   data-test-layer-one-connect-modal
 >
-  <Boxel::CardContainer class="layer-one-connect-modal__card">
-    Connect...
-  </Boxel::CardContainer>
+  <CardPay::LayerOneConnectCard
+    class="layer-one-connect-modal__card"
+    @onComplete={{@onClose}}
+    @suppressHeader={{true}}
+    @suppressConnectingCard={{true}}
+  />
 </Boxel::Modal>
