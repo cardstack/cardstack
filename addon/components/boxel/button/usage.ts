@@ -3,7 +3,7 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 export default class extends Component {
-  sizeVariants = ['small', 'base', 'tall', 'touch'];
+  sizeVariants = ['extra-small', 'small', 'base', 'tall', 'touch'];
   kindVariants = {
     all: ['primary', 'secondary-light', 'secondary-dark'],
     light: ['primary', 'secondary-light'],

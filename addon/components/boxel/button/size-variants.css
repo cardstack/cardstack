@@ -15,6 +15,14 @@
  *
  */
 
+.boxel-button--size-extra-small {
+  --boxel-button-padding: var(--boxel-sp-xxxs) var(--boxel-sp);
+  --boxel-button-font: var(--boxel-font-xs);
+  --boxel-button-loading-icon-size: var(--boxel-font-size-xs);
+  --boxel-button-letter-spacing: var(--boxel-lsp-lg);
+  --boxel-button-min-height: 1.8125rem;
+}
+
 /* thinner base button */
 .boxel-button--size-small {
   --boxel-button-padding: var(--boxel-sp-xxxs) var(--boxel-sp);
