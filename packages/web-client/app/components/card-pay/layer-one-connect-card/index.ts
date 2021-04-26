@@ -2,16 +2,16 @@ import { action } from '@ember/object';
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { task } from 'ember-concurrency-decorators';
-import Layer1Network from '../../../../services/layer1-network';
+import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import { inject as service } from '@ember/service';
 import { taskFor } from 'ember-concurrency-ts';
 import { reads } from 'macro-decorators';
 import { next } from '@ember/runloop';
-import walletProviders from '../../../../utils/wallet-providers';
+import walletProviders from '@cardstack/web-client/utils/wallet-providers';
 
 import cardstackLogo from '@cardstack/web-client/images/icons/cardstack-logo-navy-rounded.svg';
 import connectionSymbol from '@cardstack/web-client/images/icons/connection-symbol.svg';
-import { WalletProvider } from '../../../../utils/wallet-providers';
+import { WalletProvider } from '@cardstack/web-client/utils/wallet-providers';
 
 interface CardPayDepositWorkflowConnectLayer1ComponentArgs {
   onComplete: (() => void) | undefined;

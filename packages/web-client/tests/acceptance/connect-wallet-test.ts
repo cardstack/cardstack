@@ -7,10 +7,42 @@ import {
   waitUntil,
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
+import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 
 module('Acceptance | Connect Wallet', function (hooks) {
   setupApplicationTest(hooks);
+
+  test('Connecting a layer 1 wallet via Metamask', async function (assert) {
+    await visit('/');
+    assert.equal(currentURL(), '/');
+    await click('[data-test-cardstack-org-link="card-pay"]');
+    assert.equal(currentURL(), '/card-pay');
+
+    await click(
+      '[data-test-card-pay-layer-1-connect] [data-test-card-pay-connect-button]'
+    );
+    let layer1Service = this.owner.lookup('service:layer1-network')
+      .strategy as Layer1TestWeb3Strategy;
+
+    await click('[data-test-wallet-option="metamask"]');
+    await click(
+      '[data-test-mainnnet-connection-action-container] [data-test-boxel-button]'
+    );
+
+    // Simulate the user connecting their Metamask wallet
+    let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+    layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
+    await waitUntil(
+      () => !document.querySelector('[data-test-layer-one-connect-modal]')
+    );
+    assert
+      .dom(
+        '[data-test-card-pay-layer-1-connect] [data-test-card-pay-connect-button]'
+      )
+      .hasText('0xaCD5f...4Fb6');
+    assert.dom('[data-test-layer-one-connect-modal]').doesNotExist();
+  });
 
   test('Connecting a layer 2 wallet via Cardstack Mobile', async function (assert) {
     await visit('/');
