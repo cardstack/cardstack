@@ -14,8 +14,8 @@ class CardPayDepositWorkflowTransactionSetupComponent extends Component<CardPayD
   @tracked isShowingLayer1SourceOptions = false;
   @tracked isShowingLayer2TargetOptions = false;
 
-  @action chooseSource(tokenId: string) {
-    this.args.workflowSession.update('depositSourceToken', tokenId);
+  @action chooseSource(tokenSymbol: string) {
+    this.args.workflowSession.update('depositSourceToken', tokenSymbol);
   }
 }
 

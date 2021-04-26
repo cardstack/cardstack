@@ -141,7 +141,7 @@ module('Acceptance | deposit', function (hooks) {
       .containsText('How many tokens would you like to deposit?');
 
     post = postableSel(2, 3);
-    assert.dom(`${post} [data-test-source-token="dai"]`).exists();
+    assert.dom(`${post} [data-test-source-token="DAI"]`).exists();
     assert.dom(`${post} [data-test-unlock-button]`).isDisabled();
     assert.dom(`${post} [data-test-deposit-button]`).isDisabled();
     await fillIn('[data-test-deposit-amount-input]', '2500');
@@ -154,12 +154,16 @@ module('Acceptance | deposit', function (hooks) {
     // // on the "Unlock" button until the Ethereum transaction is mined.
     // // When the mining is complete, the "Deposit" button becomes clickable.
 
-    // TODO assert spinner on Unlock button
+    assert
+      .dom(`${post} [data-test-unlock-button]`)
+      .hasClass('boxel-button--loading');
 
     layer1Service.test__simulateUnlock();
     await settled();
 
-    // TODO assert no spinner on Unlock button
+    assert
+      .dom(`${post} [data-test-unlock-button]`)
+      .doesNotHaveClass('boxel-button--loading');
 
     assert
       .dom(`${post} [data-test-unlock-button]`)
@@ -169,10 +173,16 @@ module('Acceptance | deposit', function (hooks) {
       .isEnabled('Deposit is enabled once unlocked');
     await click(`${post} [data-test-deposit-button]`);
 
-    // TODO assert spinner on Deposit button
+    assert
+      .dom(`${post} [data-test-deposit-button]`)
+      .hasClass('boxel-button--loading');
 
     layer1Service.test__simulateDeposit();
     await settled();
+
+    assert
+      .dom(`${post} [data-test-deposit-button]`)
+      .doesNotHaveClass('boxel-button--loading');
 
     assert
       .dom(milestoneCompletedSel(2))

@@ -1,8 +1,9 @@
 import { tracked } from '@glimmer/tracking';
-import { Layer1Web3Strategy } from './types';
+import { Layer1Web3Strategy, TransactionHash } from './types';
 import { BigNumber } from '@ethersproject/bignumber';
 import { WalletProvider } from '../wallet-providers';
 import { defer } from 'rsvp';
+import { TransactionReceipt } from 'web3-core';
 
 export default class EthereumWeb3Strategy implements Layer1Web3Strategy {
   chainName = 'Ethereum Mainnet';
@@ -26,10 +27,23 @@ export default class EthereumWeb3Strategy implements Layer1Web3Strategy {
     throw new Error(`Method not implemented.`);
   }
 
-  unlock(): Promise<void> {
+  approve(
+    _amountInWei: BigNumber, // eslint-disable-line no-unused-vars
+    _token: string // eslint-disable-line no-unused-vars
+  ): Promise<TransactionReceipt> {
     throw new Error('Method not implemented.');
   }
-  deposit(): Promise<void> {
+
+  relayTokens(
+    _amountInWei: BigNumber, // eslint-disable-line no-unused-vars
+    _token: string, // eslint-disable-line no-unused-vars
+    _destinationAddress: string // eslint-disable-line no-unused-vars
+  ): Promise<TransactionReceipt> {
+    throw new Error('Method not implemented.');
+  }
+
+  // eslint-disable-next-line no-unused-vars
+  txnViewerUrl(_txnHash: TransactionHash): string {
     throw new Error('Method not implemented.');
   }
 }
