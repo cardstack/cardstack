@@ -1,9 +1,4 @@
-import {
-  ASTPlugin,
-  ASTPluginBuilder,
-  ASTPluginEnvironment,
-  preprocess as parse,
-} from '@glimmer/syntax';
+import * as syntax from '@glimmer/syntax';
 // @ts-ignore
 // import ETC from 'ember-source/dist/ember-template-compiler';
 // const { preprocess: parse } = ETC._GlimmerSyntax
@@ -21,8 +16,22 @@ export interface Options {
   ) => string;
 }
 
-export default function cardTransform(options: Options): ASTPluginBuilder {
-  return function transform(/* env: ASTPluginEnvironment */): ASTPlugin {
+export default function glimmerCardTemplateTransform(
+  source: string,
+  options: Options
+) {
+  return syntax.print(
+    syntax.preprocess(source, {
+      mode: 'codemod',
+      plugins: {
+        ast: [cardTransformPlugin(options)],
+      },
+    })
+  );
+}
+
+export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
+  return function transform(/* env: ASTPluginEnvironment */): syntax.ASTPlugin {
     let { fields, importAndChooseName, usedFields } = options;
     return {
       name: 'card-glimmer-plugin',
@@ -39,7 +48,7 @@ export default function cardTransform(options: Options): ASTPluginBuilder {
 
             let { inlineHBS } = field.card.embedded;
             if (inlineHBS) {
-              let ast = parse(inlineHBS, {
+              let ast = syntax.preprocess(inlineHBS, {
                 plugins: {
                   ast: [rewriteLocals({ this: fieldName })],
                 },
@@ -52,7 +61,7 @@ export default function cardTransform(options: Options): ASTPluginBuilder {
                 'default'
               );
               let template = `<${componentName} @model={{${node.tag}}} />`;
-              return parse(template).body;
+              return syntax.preprocess(template).body;
             }
           }
           return undefined;
@@ -65,9 +74,11 @@ export default function cardTransform(options: Options): ASTPluginBuilder {
 /**
  *
  */
-function rewriteLocals(remapping: { this: string }): ASTPluginBuilder {
+function rewriteLocals(remapping: { this: string }): syntax.ASTPluginBuilder {
   let rewritten = new Set<unknown>();
-  return function transform(env: ASTPluginEnvironment): ASTPlugin {
+  return function transform(
+    env: syntax.ASTPluginEnvironment
+  ): syntax.ASTPlugin {
     return {
       name: 'card-glimmer-plugin-rewrite-locals',
       visitor: {

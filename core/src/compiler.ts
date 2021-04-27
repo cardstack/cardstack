@@ -267,7 +267,7 @@ export class Compiler {
 // it's easier to hand-compile and hard-code the base card rather than make the
 // card compiler always support the case of an undefined parentCard. This is the
 // only card with no parentCard
-const compiledBaseCard: CompiledCard = {
+export const compiledBaseCard: CompiledCard = {
   url: 'https://cardstack.com/base/base',
   fields: {},
   data: undefined,
