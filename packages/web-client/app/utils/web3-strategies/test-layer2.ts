@@ -2,10 +2,9 @@ import { tracked } from '@glimmer/tracking';
 import WalletInfo from '../wallet-info';
 import { Layer2Web3Strategy } from './types';
 import { defer } from 'rsvp';
-import RSVP from 'rsvp';
 import { BigNumber } from '@ethersproject/bignumber';
 
-export default class TestWeb3Strategy implements Layer2Web3Strategy {
+export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   chainName = 'L2 Test Chain';
   chainId = '-1';
   @tracked walletConnectUri: string | undefined;
@@ -13,18 +12,6 @@ export default class TestWeb3Strategy implements Layer2Web3Strategy {
   @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
   waitForAccountDeferred = defer();
   @tracked defaultTokenBalance: BigNumber | undefined;
-  #unlockDeferred: RSVP.Deferred<void> | undefined;
-  #depositDeferred: RSVP.Deferred<void> | undefined;
-
-  unlock() {
-    this.#unlockDeferred = RSVP.defer();
-    return this.#unlockDeferred.promise;
-  }
-
-  deposit() {
-    this.#depositDeferred = RSVP.defer();
-    return this.#depositDeferred.promise;
-  }
 
   disconnect(): Promise<void> {
     this.test__simulateAccountsChanged([]);
@@ -45,14 +32,6 @@ export default class TestWeb3Strategy implements Layer2Web3Strategy {
     if (balances.defaultToken) {
       this.defaultTokenBalance = balances.defaultToken;
     }
-  }
-
-  test__simulateUnlock() {
-    this.#unlockDeferred?.resolve();
-  }
-
-  test__simulateDeposit() {
-    this.#depositDeferred?.resolve();
   }
 
   get waitForAccount() {

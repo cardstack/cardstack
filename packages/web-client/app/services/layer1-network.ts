@@ -9,6 +9,7 @@ import WalletInfo from '../utils/wallet-info';
 import { task } from 'ember-concurrency-decorators';
 import { WalletProvider } from '../utils/wallet-providers';
 import { BigNumber } from '@ethersproject/bignumber';
+import { amountInWei } from '../utils/token';
 
 export default class Layer1Network extends Service {
   strategy!: Layer1Web3Strategy;
@@ -51,12 +52,29 @@ export default class Layer1Network extends Service {
     return this.walletInfo.accounts.length > 0;
   }
 
-  @task *unlock() {
-    yield this.strategy.unlock();
+  @task *approve(amount: number, tokenSymbol: string): any {
+    let txnReceipt = yield this.strategy.approve(
+      amountInWei(amount),
+      tokenSymbol
+    );
+    return txnReceipt;
   }
 
-  @task *deposit() {
-    yield this.strategy.deposit();
+  @task *relayTokens(
+    amount: number,
+    tokenSymbol: string,
+    destinationAddress: string
+  ): any {
+    let txnReceipt = yield this.strategy.relayTokens(
+      amountInWei(amount),
+      tokenSymbol,
+      destinationAddress
+    );
+    return txnReceipt;
+  }
+
+  txnViewerUrl(txnHash: string | undefined): string | undefined {
+    return txnHash ? this.strategy.txnViewerUrl(txnHash) : undefined;
   }
 }
 

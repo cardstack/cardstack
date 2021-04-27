@@ -4,51 +4,46 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
 import { tracked } from '@glimmer/tracking';
 import { WalletProvider } from '../wallet-providers';
-import { Layer1Web3Strategy } from './types';
+import { Layer1Web3Strategy, TransactionHash, Token } from './types';
 import detectEthereumProvider from '@metamask/detect-provider';
 import WalletInfo from '../wallet-info';
 import { defer } from 'rsvp';
 import Web3 from 'web3';
-import { AbiItem } from 'web3-utils';
+import BRIDGE_ABI from '../../utils/contracts/bridge-contract-abi';
 import { Contract } from 'web3-eth-contract';
 import { BigNumber } from '@ethersproject/bignumber';
+import { AbiItem } from 'web3-utils';
+import { TransactionReceipt } from 'web3-core';
 
 const WALLET_CONNECT_BRIDGE = 'https://safe-walletconnect.gnosis.io/';
-const CARD_TOKEN_ADDRESS = '0xd6E34821F508e4247Db359CFceE0cb5e8050972a';
-const DAI_TOKEN_ADDRESS = '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa';
-const ERC20_MIN_ABI: AbiItem[] = [
-  // balanceOf
-  {
-    constant: true,
-    inputs: [{ name: '_owner', type: 'address' }],
-    name: 'balanceOf',
-    outputs: [{ name: 'balance', type: 'uint256' }],
-    type: 'function',
-  },
-  // decimals
-  {
-    constant: true,
-    inputs: [],
-    name: 'decimals',
-    outputs: [{ name: '', type: 'uint8' }],
-    type: 'function',
-  },
-];
+const HOME_BRIDGE_ADDRESS = '0x63AaCB22753d0DF234C32Ff62F5860da233cB360';
+const FOREIGN_BRIDGE_ADDRESS = '0xAfbA2216Aae9Afe23FD09Cf5dfe420F6ecdDD04B';
+
+let cardToken = new Token(
+  'CARD',
+  'CARD',
+  '0xd6E34821F508e4247Db359CFceE0cb5e8050972a'
+);
+
+let daiToken = new Token(
+  'DAI',
+  'Dai Stablecoin',
+  '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'
+);
+
 export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   chainName = 'Kovan Testnet';
   chainId = 42;
+  bridgeableTokens = [daiToken, cardToken];
   walletConnectUri: string | undefined;
   currentProviderId: string | undefined;
   provider: any | undefined;
   web3 = new Web3();
   cardTokenContract = new this.web3.eth.Contract(
-    ERC20_MIN_ABI,
-    CARD_TOKEN_ADDRESS
+    cardToken.abi,
+    cardToken.address
   );
-  daiTokenContract = new this.web3.eth.Contract(
-    ERC20_MIN_ABI,
-    DAI_TOKEN_ADDRESS
-  );
+  daiTokenContract = new this.web3.eth.Contract(daiToken.abi, daiToken.address);
 
   @tracked walletInfo = new WalletInfo([], this.chainId);
 
@@ -212,10 +207,60 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     return contract.methods.balanceOf(this.walletInfo.firstAddress).call();
   }
 
-  unlock(): Promise<void> {
-    throw new Error('Method not implemented.');
+  approve(
+    amountInWei: BigNumber,
+    tokenSymbol: string
+  ): Promise<TransactionReceipt> {
+    let token = this.getTokenBySymbol(tokenSymbol);
+    return this.contractForToken(token)
+      .methods.approve(FOREIGN_BRIDGE_ADDRESS, amountInWei.toString())
+      .send({ from: this.walletInfo.firstAddress });
   }
-  deposit(): Promise<void> {
-    throw new Error('Method not implemented.');
+
+  relayTokens(
+    amountInWei: BigNumber,
+    tokenSymbol: string,
+    destinationAddress: string
+  ): Promise<TransactionReceipt> {
+    let token = this.getTokenBySymbol(tokenSymbol);
+    let bridgeTokenContract = new this.web3.eth.Contract(
+      BRIDGE_ABI as AbiItem[],
+      FOREIGN_BRIDGE_ADDRESS,
+      {
+        from: this.walletInfo.firstAddress,
+        gasPrice: this.web3.utils.toWei('20', 'gwei'),
+      }
+    );
+    let txnReceiptPromise = bridgeTokenContract.methods
+      .relayTokens(token.address, destinationAddress, amountInWei.toString())
+      .send({
+        from: this.walletInfo.firstAddress,
+        to: HOME_BRIDGE_ADDRESS,
+        gas: 300000, // this is the gas limit
+      });
+    return txnReceiptPromise;
+  }
+
+  getTokenBySymbol(symbol: string): Token {
+    let token = this.bridgeableTokens.findBy('symbol', symbol);
+    if (!token) {
+      throw new Error(`Expected to find bridgeable token for symbol ${symbol}`);
+    }
+    return token!;
+  }
+
+  contractForToken(token: Token): Contract {
+    switch (token) {
+      case daiToken:
+        return this.daiTokenContract;
+      case cardToken:
+        return this.cardTokenContract;
+      default:
+        throw new Error(`Expected to find contract for token ${token}`);
+    }
+  }
+
+  txnViewerUrl(txnHash: TransactionHash) {
+    return `https://kovan.etherscan.io/tx/${txnHash}`;
   }
 }

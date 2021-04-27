@@ -1,10 +1,11 @@
 import { tracked } from '@glimmer/tracking';
 import WalletInfo from '../wallet-info';
-import { Layer1Web3Strategy } from './types';
+import { Layer1Web3Strategy, TransactionHash } from './types';
 import { defer } from 'rsvp';
 import RSVP from 'rsvp';
 import { BigNumber } from '@ethersproject/bignumber';
 import { WalletProvider } from '../wallet-providers';
+import { TransactionReceipt } from 'web3-core';
 
 export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   chainName = 'L1 Test Chain';
@@ -19,8 +20,8 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   @tracked cardBalance: BigNumber | undefined;
 
   waitForAccountDeferred = defer();
-  #unlockDeferred: RSVP.Deferred<void> | undefined;
-  #depositDeferred: RSVP.Deferred<void> | undefined;
+  #unlockDeferred: RSVP.Deferred<TransactionReceipt> | undefined;
+  #depositDeferred: RSVP.Deferred<TransactionReceipt> | undefined;
 
   // eslint-disable-next-line no-unused-vars
   connect(_walletProvider: WalletProvider): Promise<void> {
@@ -32,14 +33,23 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     return this.waitForAccount;
   }
 
-  unlock() {
+  // eslint-disable-next-line no-unused-vars
+  approve(_amountInWei: BigNumber, _token: string) {
     this.#unlockDeferred = RSVP.defer();
     return this.#unlockDeferred.promise;
   }
 
-  deposit() {
+  relayTokens(
+    _amountInWei: BigNumber, // eslint-disable-line no-unused-vars
+    _token: string, // eslint-disable-line no-unused-vars
+    _destinationAddress: string // eslint-disable-line no-unused-vars
+  ) {
     this.#depositDeferred = RSVP.defer();
     return this.#depositDeferred.promise;
+  }
+
+  txnViewerUrl(txnHash: TransactionHash): string {
+    return `https://www.youtube.com/watch?v=xvFZjo5PgG0&txnHash=${txnHash}`;
   }
 
   test__simulateWalletConnectUri() {
@@ -69,11 +79,39 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   }
 
   test__simulateUnlock() {
-    this.#unlockDeferred?.resolve();
+    this.#unlockDeferred?.resolve({
+      status: true,
+      transactionHash: '0xABC',
+      transactionIndex: 1,
+      blockHash: '',
+      blockNumber: 1,
+      from: '',
+      to: '',
+      contractAddress: '',
+      cumulativeGasUsed: 1,
+      gasUsed: 1,
+      logs: [],
+      logsBloom: '',
+      events: {},
+    });
   }
 
   test__simulateDeposit() {
-    this.#depositDeferred?.resolve();
+    this.#depositDeferred?.resolve({
+      status: true,
+      transactionHash: '0xDEF',
+      transactionIndex: 1,
+      blockHash: '',
+      blockNumber: 1,
+      from: '',
+      to: '',
+      contractAddress: '',
+      cumulativeGasUsed: 1,
+      gasUsed: 1,
+      logs: [],
+      logsBloom: '',
+      events: {},
+    });
   }
 
   get waitForAccount() {

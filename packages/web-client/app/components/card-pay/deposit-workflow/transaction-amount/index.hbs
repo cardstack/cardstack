@@ -3,10 +3,34 @@
     Depositing from {{@workflowSession.state.depositSourceToken}}
   </div>
   <Boxel::Input data-test-deposit-amount-input @value={{this.amount}} />
-  <Boxel::Button {{on 'click' this.unlock}} data-test-unlock-button @disabled={{this.isUnlockButtonDisabled}}>
-    Unlock
-  </Boxel::Button>
-  <Boxel::Button {{on 'click' this.deposit}} data-test-deposit-button @disabled={{this.isDepositButtonDisabled}}>
-    Deposit
-  </Boxel::Button>
+  <div>
+    <Boxel::Button
+      {{on 'click' this.unlock}}
+      data-test-unlock-button
+      @disabled={{this.isUnlockButtonDisabled}}
+      @loading={{this.isUnlocking}}
+    >
+      {{if this.isUnlocking 'Unlocking...' 'Unlock'}}
+    </Boxel::Button>
+    {{#if this.unlockTxnViewerUrl}}
+      <Boxel::Button @as="anchor" @href={{this.unlockTxnViewerUrl}} target="_blank">
+        View on Etherscan
+      </Boxel::Button>
+    {{/if}}
+  </div>
+  <div>
+    <Boxel::Button
+      {{on 'click' this.deposit}}
+      data-test-deposit-button
+      @disabled={{this.isDepositButtonDisabled}}
+      @loading={{this.isDepositing}}
+    >
+      {{if this.isDepositing 'Depositing...' 'Deposit'}}
+    </Boxel::Button>
+    {{#if this.depositTxnViewerUrl}}
+      <Boxel::Button @as="anchor" @href={{this.depositTxnViewerUrl}} target="_blank">
+        View on Etherscan
+      </Boxel::Button>
+    {{/if}}
+  </div>
 </Boxel::CardContainer>
