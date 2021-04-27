@@ -1,4 +1,4 @@
-.boxel-milestones {
+.boxel-progress-steps {
   --bullet-fill-color: var(--boxel-light-600);
 
   list-style-type: none;
@@ -9,11 +9,11 @@
   letter-spacing: var(--boxel-lsp);
 }
 
-.boxel-milestones__item {
+.boxel-progress-steps__item {
   position: relative;
 }
 
-.boxel-milestones__item + .boxel-milestones__item::before {
+.boxel-progress-steps__item + .boxel-progress-steps__item::before {
   display: block;
   content: "";
   width: 1px;
@@ -24,7 +24,7 @@
   background-color: var(--boxel-light-600);
 }
 
-.boxel-milestones__item-grid {
+.boxel-progress-steps__item-grid {
   display: grid;
   grid-template-columns: 16px 1fr;
   grid-template-rows: 1.125rem;
@@ -32,7 +32,7 @@
   align-items: center;
 }
 
-.boxel-milestones__item-bullet {
+.boxel-progress-steps__item-bullet {
   width: 16px;
   height: 16px;
   background-color: var(--bullet-fill-color);
@@ -40,18 +40,18 @@
   text-align: center;
 }
 
-.boxel-milestones__item.current {
+.boxel-progress-steps__item--current {
   color: var(--boxel-dark);
   font-weight: 600;
 }
 
-.boxel-milestones__item.current .boxel-milestones__item-bullet {
+.boxel-progress-steps__item--current .boxel-progress-steps__item-bullet {
   --bullet-fill-color: var(--boxel-dark);
 
   border: 6px solid var(--boxel-highlight);
 }
 
-.boxel-milestones__item.completed .boxel-milestones__item-bullet {
+.boxel-progress-steps__item--completed .boxel-progress-steps__item-bullet {
   --icon-color: var(--boxel-dark);
   --bullet-fill-color: var(--boxel-highlight);
 }

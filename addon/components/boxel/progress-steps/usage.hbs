@@ -1,0 +1,53 @@
+<Freestyle::Usage
+  @name="ProgressSteps"
+  @description="The current step will appear in bold, while the completed steps get a checkmark."
+>
+  <:example>
+    <Boxel::ProgressSteps
+      @progressSteps={{this.progressSteps}}
+      @completedCount={{this.completedCount}}
+    />
+  </:example>
+  <:api as |Args|>
+    <Args.Array
+      @name="progressSteps"
+      @type="Object"
+      @items={{this.progressSteps}}
+      @description="Each object should have a `title` property with title of the progress step."
+      @onChange={{fn (mut this.progressSteps)}}
+    />
+    <Args.Number
+      @name="completedCount"
+      @value={{this.completedCount}}
+      @defaultValue={{0}}
+      @min={{0}}
+      @description="(integer) — Number of progress steps completed."
+      @onInput={{fn (mut this.completedCount)}}
+    />
+    <Args.Yield
+      @description="Render custom progress steps.Yields an object with keys { title, data, index, completed, current }."
+    />
+  </:api>
+</Freestyle::Usage>
+
+<Freestyle::Usage @description="Usage with block">
+  <:example>
+    <Boxel::ProgressSteps
+      @progressSteps={{this.progressSteps}}
+      @completedCount={{this.completedCount}}
+      as |progressStep|
+    >
+    <div class={{cn 
+      "progress-steps-usage-item" 
+      progress-steps-usage-item--current=progressStep.current 
+      progress-steps-usage-item--completed=progressStep.completed
+      }}
+    >
+      <span class="progress-steps-usage-item__title">{{if progressStep.completed progressStep.data.statusOnCompletion progressStep.title}}</span>
+      {{#if progressStep.completed}}
+        <span class="progress-steps-usage-item__number">Progress step number {{add progressStep.index 1}} done</span>
+      {{/if}}
+    </div>
+    </Boxel::ProgressSteps>
+  </:example>
+</Freestyle::Usage>

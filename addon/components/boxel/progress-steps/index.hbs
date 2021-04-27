@@ -1,0 +1,20 @@
+<ul class="boxel-progress-steps" ...attributes>
+  {{#each @progressSteps as |progressStep i|}}
+    {{#let (gt @completedCount i) (eq @completedCount i) as |isCompleted isCurrent|}}
+      <li class={{cn "boxel-progress-steps__item" boxel-progress-steps__item--completed=isCompleted boxel-progress-steps__item--current=isCurrent}}>
+        <span class="boxel-progress-steps__item-grid">
+          <span class="boxel-progress-steps__item-bullet">
+            {{#if isCompleted}}
+              {{svg-jar "check-mark" width="10px" height="10px"}}
+            {{/if}}
+          </span>
+          {{#if (has-block)}}
+            {{yield (hash title=progressStep.title data=progressStep index=i completed=isCompleted current=isCurrent)}}
+          {{else}}
+          <span>{{progressStep.title}}</span>
+          {{/if}}
+        </span>
+      </li>
+    {{/let}}
+  {{/each}}
+</ul>
