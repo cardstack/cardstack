@@ -3,6 +3,10 @@ import { ComponentInfo } from '../../src/interfaces';
 import transform from './../../src/glimmer/card-template-plugin';
 import { COMPILED_STRING_CARD, COMPILED_DATE_CARD } from '../helpers/fixtures';
 
+function importAndChooseName() {
+  return 'BestGuess';
+}
+
 QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
   let usedFields: ComponentInfo['usedFields'];
 
@@ -10,8 +14,8 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     usedFields = [];
   });
 
-  QUnit.module('base cards', function () {
-    QUnit.test('string-card', async function (assert) {
+  QUnit.module('Fields: contains', function () {
+    QUnit.test('Simple embeds', async function (assert) {
       let template = transform('<@model.title />', {
         fields: {
           title: {
@@ -21,9 +25,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
           },
         },
         usedFields,
-        importAndChooseName() {
-          return 'nothing';
-        },
+        importAndChooseName,
       });
 
       assert.equal(
@@ -34,7 +36,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       assert.deepEqual(usedFields, ['title']);
     });
 
-    QUnit.test('date card', async function (assert) {
+    QUnit.test('Embedding with imports', async function (assert) {
       let template = transform('<@model.createdAt />', {
         fields: {
           createdAt: {
@@ -44,13 +46,36 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
           },
         },
         usedFields,
-        importAndChooseName() {
-          return 'BestGuess';
-        },
+        importAndChooseName,
       });
 
       assert.equal(template, '<BestGuess @model={{@model.createdAt}} />');
       assert.deepEqual(usedFields, ['createdAt']);
+    });
+  });
+
+  QUnit.module('Fields: containsMany', function () {
+    QUnit.test('each-as loops for strings', async function (assert) {
+      let template = transform(
+        '{{#each @model.items as |Item|}}<Item />{{/each}}',
+        {
+          fields: {
+            items: {
+              type: 'containsMany',
+              card: COMPILED_STRING_CARD,
+              localName: 'items',
+            },
+          },
+          usedFields,
+          importAndChooseName,
+        }
+      );
+
+      assert.equal(
+        template,
+        '{{#each @model.items as |Item|}}{{Item}}{{/each}}'
+      );
+      assert.deepEqual(usedFields, ['items']);
     });
   });
 });

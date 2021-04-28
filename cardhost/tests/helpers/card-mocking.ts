@@ -19,7 +19,6 @@ export default function setupCardMocking(hooks: NestedHooks): void {
     this.createCard = createCard.bind(this);
     this.lookupCard = lookupCard.bind(this);
 
-    // TODO: Is this still neccessary?
     RAW_BASE_CARDS.forEach((card) => this.createCard(card));
   });
 
