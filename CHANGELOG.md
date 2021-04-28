@@ -1,3 +1,12 @@
+## v0.5.0 (2021-04-28)
+
+#### :rocket: Enhancement
+* [#355](https://github.com/cardstack/boxel/pull/355) Enhancement/progress steps ([@Aierie](https://github.com/Aierie))
+* [#353](https://github.com/cardstack/boxel/pull/353) add an extra-small variant for buttons ([@Aierie](https://github.com/Aierie))
+
+#### Committers: 1
+- [@Aierie](https://github.com/Aierie)
+
 ## v0.4.2 (2021-04-22)
 
 ## v0.4.1 (2021-04-21)
