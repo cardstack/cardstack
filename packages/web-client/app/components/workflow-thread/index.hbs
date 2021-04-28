@@ -54,8 +54,8 @@
       </Boxel::Sidebar::CardContainer>
 
       <Boxel::Sidebar::CardContainer @header="Milestones">
-        <Boxel::Milestones
-          @milestones={{@workflow.milestones}}
+        <Boxel::ProgressSteps
+          @progressSteps={{@workflow.milestones}}
           @completedCount={{@workflow.completedMilestoneCount}}
         />
       </Boxel::Sidebar::CardContainer>
