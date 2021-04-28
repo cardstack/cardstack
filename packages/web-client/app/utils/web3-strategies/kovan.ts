@@ -61,8 +61,23 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     const previousProviderId = window.localStorage.getItem(
       this.providerStorageKey
     );
-    if (previousProviderId === 'metamask') {
-      this.connect({ id: 'metamask' } as WalletProvider);
+    try {
+      if (previousProviderId === 'metamask') {
+        // ping because the disconnect event does not seem to be a reliable way to tell whether there's actually a connection
+        // if the user hasn't sent a request after they disconnected at the wallet side,
+        // the app might not know that it's disconnected and end up popping up metamask
+        let provider: any | undefined = await detectEthereumProvider();
+        let accounts = await provider.request({ method: 'eth_accounts' });
+        if (!accounts.length) {
+          window.localStorage.removeItem(this.providerStorageKey);
+          return;
+        }
+      }
+
+      await this.connect({ id: previousProviderId } as WalletProvider);
+    } catch (e) {
+      // clean up if anything goes wrong.
+      this.clearLocalConnectionState();
     }
   }
 
