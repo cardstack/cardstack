@@ -94,23 +94,23 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   }
 
   async disconnect(): Promise<void> {
-    if (this.currentProviderId === 'metamask') {
-      // There is a solution in https://github.com/MetaMask/metamask-extension/issues/8990
-      // that just makes the site think that the wallet isn't connected
-      // It actually still is, you can see this when you open the wallet
-      // The metamask team believes you should be disconnecting via the extension
-      // and has not exposed any way to do this from a dapp
-      this.clearWalletInfo();
-      this.provider = undefined;
-      this.web3.setProvider(this.provider);
-      this.currentProviderId = '';
-    } else if (this.currentProviderId === 'wallet-connect') {
+    // There is a solution in https://github.com/MetaMask/metamask-extension/issues/8990
+    // that just makes the site think that the wallet isn't connected
+    // It actually still is, you can see this when you open the wallet
+    // The metamask team believes you should be disconnecting via the extension
+    // and has not exposed any way to do this from a dapp
+    if (this.currentProviderId === 'wallet-connect') {
       await this.provider.disconnect();
-      this.clearWalletInfo();
-      this.provider = undefined;
-      this.web3.setProvider(this.provider);
-      this.currentProviderId = '';
     }
+
+    this.clearLocalConnectionState();
+  }
+
+  clearLocalConnectionState() {
+    this.clearWalletInfo();
+    this.provider = undefined;
+    this.web3.setProvider(this.provider);
+    this.currentProviderId = '';
     window.localStorage.removeItem(this.providerStorageKey);
   }
 
@@ -141,7 +141,7 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     // Subscribe to session disconnection
     provider.on('disconnect', (code: number, reason: string) => {
       console.log('disconnect', code, reason);
-      window.localStorage.removeItem(this.providerStorageKey);
+      this.clearLocalConnectionState();
     });
 
     return provider;
@@ -178,7 +178,7 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     // Subscribe to provider disconnection
     provider.on('disconnect', (error: { code: number; message: string }) => {
       console.log(error);
-      window.localStorage.removeItem(this.providerStorageKey);
+      this.clearLocalConnectionState();
     });
 
     return provider;
