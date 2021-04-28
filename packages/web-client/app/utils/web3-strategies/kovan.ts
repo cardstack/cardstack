@@ -236,7 +236,7 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
       .send({
         from: this.walletInfo.firstAddress,
         to: HOME_BRIDGE_ADDRESS,
-        gas: 300000, // this is the gas limit
+        gas: 600000, // this is the gas limit
       });
     return txnReceiptPromise;
   }
