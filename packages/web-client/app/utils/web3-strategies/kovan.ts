@@ -45,12 +45,25 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   );
   daiTokenContract = new this.web3.eth.Contract(daiToken.abi, daiToken.address);
 
+  providerStorageKey = 'cardstack-layer-1-provider';
   @tracked walletInfo = new WalletInfo([], this.chainId);
 
   @tracked defaultTokenBalance: BigNumber | undefined;
   @tracked daiBalance: BigNumber | undefined;
   @tracked cardBalance: BigNumber | undefined;
   #waitForAccountDeferred = defer<void>();
+
+  constructor() {
+    this.initialize();
+  }
+
+  async initialize() {
+    const previousProviderId = window.localStorage.getItem(
+      this.providerStorageKey
+    );
+    console.log('previous provider is', previousProviderId);
+  }
+
   get waitForAccount(): Promise<void> {
     return this.#waitForAccountDeferred.promise;
   }
@@ -67,12 +80,14 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
         method: 'eth_requestAccounts',
       });
       this.updateWalletInfo(accounts, this.chainId);
+      window.localStorage.setItem(this.providerStorageKey, 'metamask');
     } else if (this.currentProviderId === 'wallet-connect') {
       this.provider = this.setupWalletConnect();
       this.web3.setProvider(this.provider);
       await this.provider.enable();
       let accounts = await this.web3.eth.getAccounts();
       this.updateWalletInfo(accounts, this.chainId);
+      window.localStorage.setItem(this.providerStorageKey, 'wallet-connect');
     }
   }
 
@@ -94,6 +109,7 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
       this.web3.setProvider(this.provider);
       this.currentProviderId = '';
     }
+    window.localStorage.removeItem(this.providerStorageKey);
   }
 
   setupWalletConnect(): any {
@@ -123,6 +139,7 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     // Subscribe to session disconnection
     provider.on('disconnect', (code: number, reason: string) => {
       console.log('disconnect', code, reason);
+      window.localStorage.removeItem(this.providerStorageKey);
     });
 
     return provider;
@@ -159,6 +176,7 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     // Subscribe to provider disconnection
     provider.on('disconnect', (error: { code: number; message: string }) => {
       console.log(error);
+      window.localStorage.removeItem(this.providerStorageKey);
     });
 
     return provider;
