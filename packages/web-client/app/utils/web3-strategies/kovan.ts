@@ -45,7 +45,6 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   );
   daiTokenContract = new this.web3.eth.Contract(daiToken.abi, daiToken.address);
 
-  providerStorageKey = 'cardstack-layer-1-provider';
   @tracked walletInfo = new WalletInfo([], this.chainId);
 
   @tracked defaultTokenBalance: BigNumber | undefined;
@@ -55,6 +54,10 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
 
   constructor() {
     this.initialize();
+  }
+
+  get providerStorageKey(): string {
+    return `cardstack-chain-${this.chainId}-provider`;
   }
 
   async initialize() {
