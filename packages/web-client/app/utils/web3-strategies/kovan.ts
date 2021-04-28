@@ -61,7 +61,9 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     const previousProviderId = window.localStorage.getItem(
       this.providerStorageKey
     );
-    console.log('previous provider is', previousProviderId);
+    if (previousProviderId === 'metamask') {
+      this.connect({ id: 'metamask' } as WalletProvider);
+    }
   }
 
   get waitForAccount(): Promise<void> {
