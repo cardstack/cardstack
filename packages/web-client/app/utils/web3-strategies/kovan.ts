@@ -112,6 +112,7 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   }
 
   async disconnect(): Promise<void> {
+    // re: disconnecting from metamask
     // There is a solution in https://github.com/MetaMask/metamask-extension/issues/8990
     // that just makes the site think that the wallet isn't connected
     // It actually still is, you can see this when you open the wallet
