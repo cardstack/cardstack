@@ -1,9 +1,14 @@
 <Boxel::CardContainer>
-  ✓ Step 1: Deposit tokens into Reserve Pool on Ethereum Mainnet
-View on Etherscan
-
-◔ Step 2: Bridge tokens from Ethereum Mainnet to xDai Chain
-
-
-Step 3: Mint tokens on xDai: DAI CPXD
+  <Boxel::ProgressSteps
+    @progressSteps={{this.progressSteps}}
+    @completedCount={{this.completedCount}}
+    as |progressStep|
+  >
+    <span>{{progressStep.title}}</span>
+    {{#if (eq progressStep.index 0)}}
+      <Boxel::Button @as="anchor" @size="extra-small" @href={{this.depositTxnViewerUrl}} target="_blank">
+        View on Etherscan
+      </Boxel::Button>
+    {{/if}}
+  </Boxel::ProgressSteps>
 </Boxel::CardContainer>

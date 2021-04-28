@@ -64,6 +64,10 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
       .perform(this.amount, tokenSymbol, layer2Address)
       .then((transactionReceipt: TransactionReceipt) => {
         this.depositTxnReceipt = transactionReceipt;
+        this.args.workflowSession.update(
+          'depositTxnReceipt',
+          transactionReceipt
+        );
         this.args.onComplete();
       })
       .finally(() => {
