@@ -57,8 +57,8 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
       return 'default';
     }
   }
-  @action changeWalletProvider(e: Event): void {
-    this.currentWalletProviderId = (e.target as HTMLInputElement).id;
+  @action changeWalletProvider(id: string): void {
+    this.currentWalletProviderId = id;
   }
   @action connect() {
     if (!this.hasAccount) {
