@@ -18,6 +18,8 @@ import { action } from '@ember/object';
 interface CardPayLayerTwoConnectCardComponentArgs {
   onComplete: (() => void) | undefined;
   onIncomplete: (() => void) | undefined;
+  onConnect: (() => void) | undefined;
+  onDisconnect: (() => void) | undefined;
 }
 
 class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConnectCardComponentArgs> {
@@ -48,10 +50,12 @@ class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConne
     this.isWaitingForConnection = true;
     yield this.layer2Network.waitForAccount;
     this.isWaitingForConnection = false;
+    this.args.onConnect?.();
     this.args.onComplete?.();
   }
   @action disconnect() {
     this.layer2Network.disconnect();
+    this.args.onDisconnect?.();
     this.args.onIncomplete?.();
   }
   get cardState(): string {

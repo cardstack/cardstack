@@ -8,7 +8,8 @@
   <div class="layer-one-connect-modal__scroll-wrapper">
     <CardPay::LayerOneConnectCard
       class="layer-one-connect-modal__card"
-      @onComplete={{@onClose}}
+      @onConnect={{@onClose}}
+      @onDisconnect={{@onClose}}
       @suppressHeader={{true}}
       @suppressConnectingCard={{true}}
       tabindex="0"
