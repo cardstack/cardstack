@@ -1,0 +1,26 @@
+{
+  "name": "@cardstack/cardpay-cli",
+  "description": "CLI tool for basic actions in the Cardpay ecosystem",
+  "version": "0.18.17",
+  "author": "Dominic Sherman @DominicSherman",
+  "type": "module",
+  "repository": "cardstack/cardstack",
+  "scripts": {
+    "viewSafes": "node ./view-safes.js",
+    "bridge": "node ./bridge.js",
+    "createPrepaidCard": "node ./create-prepaid-card.js"
+  },
+  "dependencies": {
+    "@cardstack/cardpay-sdk": "0.18.17",
+    "@truffle/hdwallet-provider": "^1.2.6",
+    "@trufflesuite/web3-provider-engine": "^15.0.13-1",
+    "@types/bn.js": "^5.1.0",
+    "@types/lodash": "^4.14.168",
+    "@types/web3-provider-engine": "^14.0.0",
+    "bn.js": "^5.2.0",
+    "cli-ux": "^5.5.1",
+    "parity-hdwallet-provider": "^1.3.0-fork.2",
+    "web3": "^1.3.5",
+    "yargs": "^16.2.0"
+  }
+}
