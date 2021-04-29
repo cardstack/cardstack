@@ -933,10 +933,10 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
-"@cardstack/boxel@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@cardstack/boxel/-/boxel-0.5.0.tgz#93abba7faa7d6351af29f6a9cd8873a592d60f05"
-  integrity sha512-XG/LmzAlMUVnn8aiR/W/irRVgouPLtMqbEWEAAfh5u7o9If1+L7WUe6gHmP+iO5f6uW/hrSOor2XDH/CSi3Dag==
+"@cardstack/boxel@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@cardstack/boxel/-/boxel-0.6.0.tgz#3b9c373db2f6e8f7ae1aef53beb79afd3868e6ab"
+  integrity sha512-O002OhiyJ36M/BIzqFunTZ9aXdlzaIkyeMBf5YvxB9ACbrFwj/y8zOvDI+6gg49IPetXw3Nch9qUXRgOdmfRTA==
   dependencies:
     broccoli-concat "^4.2.4"
     broccoli-funnel "^3.0.3"
@@ -944,7 +944,7 @@
     broccoli-plugin "^4.0.3"
     broccoli-stew "^3.0.0"
     dayjs "^1.10.4"
-    ember-animated "^0.10.1"
+    ember-animated "^0.11.0"
     ember-auto-import "^1.10.1"
     ember-class-names-helper "^0.2.1"
     ember-cli-babel "~7.24.0"
@@ -955,7 +955,8 @@
     ember-composable-helpers "^4.4.1"
     ember-concurrency-decorators "^2.0.3"
     ember-css-url "^0.2.1"
-    ember-element-helper "^0.3.2"
+    ember-element-helper "^0.5.0"
+    ember-event-helpers "^0.1.1"
     ember-keyboard "^6.0.2"
     ember-link "^1.3.1"
     ember-load-initializers "^2.1.2"
@@ -1446,6 +1447,15 @@
   dependencies:
     "@embroider/macros" "0.36.0"
     ember-cli-babel "^7.22.1"
+
+"@embroider/util@^0.39.1":
+  version "0.39.1"
+  resolved "https://registry.yarnpkg.com/@embroider/util/-/util-0.39.1.tgz#7cec8ea13d8ce73539179d47d2564d8c09d055f6"
+  integrity sha512-3sQlpEjOXt03sId8ZYGWjm6SdQaR78Ppa6LwLon76kYsDM8J2hRXY1Zcpt1rKTSuOyXs/0Pc5+ri1MNfJKD3DA==
+  dependencies:
+    "@embroider/macros" "0.39.1"
+    broccoli-funnel ef4/broccoli-funnel#c70d060076e14793e8495571f304a976afc754ac
+    ember-cli-babel "^7.23.1"
 
 "@embroider/webpack@^0.39.1":
   version "0.39.1"
@@ -6027,7 +6037,7 @@ broccoli-funnel@^3.0.1, broccoli-funnel@^3.0.3:
     path-posix "^1.0.0"
     walk-sync "^2.0.2"
 
-broccoli-funnel@ef4/broccoli-funnel#c70d060076e14793e8495571f304a976afc754ac:
+broccoli-funnel@ef4/broccoli-funnel#c70d060076e14793e8495571f304a976afc754ac, "broccoli-funnel@github:ef4/broccoli-funnel#c70d060076e14793e8495571f304a976afc754ac":
   version "2.0.2-ef4.0"
   resolved "https://codeload.github.com/ef4/broccoli-funnel/tar.gz/c70d060076e14793e8495571f304a976afc754ac"
   dependencies:
@@ -8403,20 +8413,20 @@ ember-a11y-testing@^4.0.3:
     ember-compatibility-helpers "^1.0.2"
     silent-error "^1.1.1"
 
-ember-animated@^0.10.1:
-  version "0.10.1"
-  resolved "https://registry.yarnpkg.com/ember-animated/-/ember-animated-0.10.1.tgz#f347d7ef22511781b29c1f5201b65352c86c8ff8"
-  integrity sha512-Uo7k38kXhhO0H1uPXFVH3yS8LTwFEFQoKbE+pSypeEVCuu6qiW7e+3nxQFk4WImRBHNliOvkegPbqwL0VVkEJw==
+ember-animated@^0.11.0:
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/ember-animated/-/ember-animated-0.11.0.tgz#f4d841fb7b2361aebd4413c08710963d56ff73e9"
+  integrity sha512-jRwPtKUWiRDnTAkYHgsPggQrVkpDLG0sOzr0GuGmocWy24wkNPm5k2hI/YgVa4TztBflQ00Rxcs5gAIsu9bOFg==
   dependencies:
     assert-never "^1.2.0"
     ember-angle-bracket-invocation-polyfill "^1.3.0 || ^2.0.0"
-    ember-auto-import "^1.5.3"
-    ember-cli-babel "^7.13.0"
-    ember-cli-htmlbars "^4.2.0"
+    ember-auto-import "^1.6.0"
+    ember-cli-babel "^7.21.0"
+    ember-cli-htmlbars "^5.2.0"
     ember-cli-typescript "^3.1.1"
     ember-compatibility-helpers "^1.2.0"
     ember-decorators "^6.1.1"
-    ember-element-helper "^0.2.0"
+    ember-element-helper "^0.5.0"
     ember-maybe-import-regenerator "^0.1.5"
     ember-named-arguments-polyfill "^1.0.0"
 
@@ -8440,6 +8450,41 @@ ember-auto-import@^1.10.1, ember-auto-import@^1.11.2, ember-auto-import@^1.5.3:
   version "1.11.2"
   resolved "https://registry.yarnpkg.com/ember-auto-import/-/ember-auto-import-1.11.2.tgz#b6e9a0dddd88a10692830ffa4f5dfd8c137c8919"
   integrity sha512-Sm0x9qgAQEx+XSYeh5zeKj89Uo0c7XzULZxuziFPxbhtKy/G4pywhBuQ7EgDznTj8IZVxOdfe4ufcUxnJtbSgg==
+  dependencies:
+    "@babel/core" "^7.1.6"
+    "@babel/preset-env" "^7.10.2"
+    "@babel/traverse" "^7.1.6"
+    "@babel/types" "^7.1.6"
+    "@embroider/core" "^0.33.0"
+    babel-core "^6.26.3"
+    babel-loader "^8.0.6"
+    babel-plugin-syntax-dynamic-import "^6.18.0"
+    babylon "^6.18.0"
+    broccoli-debug "^0.6.4"
+    broccoli-node-api "^1.7.0"
+    broccoli-plugin "^4.0.0"
+    broccoli-source "^3.0.0"
+    debug "^3.1.0"
+    ember-cli-babel "^7.0.0"
+    enhanced-resolve "^4.0.0"
+    fs-extra "^6.0.1"
+    fs-tree-diff "^2.0.0"
+    handlebars "^4.3.1"
+    js-string-escape "^1.0.1"
+    lodash "^4.17.19"
+    mkdirp "^0.5.1"
+    resolve-package-path "^3.1.0"
+    rimraf "^2.6.2"
+    semver "^7.3.4"
+    symlink-or-copy "^1.2.0"
+    typescript-memoize "^1.0.0-alpha.3"
+    walk-sync "^0.3.3"
+    webpack "^4.43.0"
+
+ember-auto-import@^1.6.0:
+  version "1.11.3"
+  resolved "https://registry.yarnpkg.com/ember-auto-import/-/ember-auto-import-1.11.3.tgz#6e3384a7fbb163384a34546f2e902cd297b0e683"
+  integrity sha512-ekq/XCvsonESobFU30zjZ0I4XMy2E/2ZILCYWuQ1JdhcCSTYhnXDZcqRW8itUG7kbsPqAHT/XZ1LEZYm3seVwQ==
   dependencies:
     "@babel/core" "^7.1.6"
     "@babel/preset-env" "^7.10.2"
@@ -8773,7 +8818,7 @@ ember-cli-htmlbars@^3.0.0, ember-cli-htmlbars@^3.0.1, ember-cli-htmlbars@^3.1.0:
     json-stable-stringify "^1.0.1"
     strip-bom "^3.0.0"
 
-ember-cli-htmlbars@^4.2.0, ember-cli-htmlbars@^4.2.3, ember-cli-htmlbars@^4.3.1:
+ember-cli-htmlbars@^4.2.3, ember-cli-htmlbars@^4.3.1:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/ember-cli-htmlbars/-/ember-cli-htmlbars-4.5.0.tgz#d299e4f7eba6f30dc723ee086906cc550beb252e"
   integrity sha512-bYJpK1pqFu9AadDAGTw05g2LMNzY8xTCIqQm7dMJmKEoUpLRFbPf4SfHXrktzDh7Q5iggl6Skzf1M0bPlIxARw==
@@ -9261,13 +9306,6 @@ ember-destroyable-polyfill@^2.0.1, ember-destroyable-polyfill@^2.0.2, ember-dest
     ember-cli-version-checker "^5.1.1"
     ember-compatibility-helpers "^1.2.1"
 
-ember-element-helper@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/ember-element-helper/-/ember-element-helper-0.2.0.tgz#eacdf4d8507d6708812623206e24ad37bad487e7"
-  integrity sha512-/WV0PNLyxDvLX/YETb/8KICFTr719OYqFWXqV5XUkh9YhhBGDU/mr1OtlQaWOlsx+sHm42HD2UAICecqex8ziw==
-  dependencies:
-    ember-cli-babel "^6.16.0"
-
 ember-element-helper@^0.3.2:
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/ember-element-helper/-/ember-element-helper-0.3.2.tgz#a0e384c266c6fb0e39803708d6f5e83ce6dba659"
@@ -9276,6 +9314,22 @@ ember-element-helper@^0.3.2:
     ember-cli-babel "^7.17.2"
     ember-cli-htmlbars "^5.1.0"
     ember-compatibility-helpers "^1.2.1"
+
+ember-element-helper@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/ember-element-helper/-/ember-element-helper-0.5.0.tgz#0e8bd489f2f8b515a01f47394c1194601dfb140c"
+  integrity sha512-l1aaL6JBU56KkTOAcoXAtb6JYjZXgwXR/A33oCwbJ2EOWL0tpXJ23zX6rw0LDqHEQXi0nGLqoggGiVijTpsGFQ==
+  dependencies:
+    "@embroider/util" "^0.39.1"
+    ember-cli-babel "^7.17.2"
+    ember-cli-htmlbars "^5.1.0"
+
+ember-event-helpers@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/ember-event-helpers/-/ember-event-helpers-0.1.1.tgz#8df141306c927b9d1a7bc63d63095e92c0ba90a1"
+  integrity sha512-fWcbWd4W4nRv8bbato8JB6oGRpATkR+oGYxMIqnfgTgPWaCS0ww7CuUVNpwg1TulojKMCuTXi8Fem2b1NSF1ZQ==
+  dependencies:
+    ember-cli-babel "^7.19.0"
 
 ember-export-application-global@^2.0.1:
   version "2.0.1"
@@ -9443,7 +9497,7 @@ ember-page-title@^6.2.1:
   dependencies:
     ember-cli-babel "^7.22.1"
 
-ember-power-select-typeahead@alexspeller/ember-power-select-typeahead#6d279fb:
+"ember-power-select-typeahead@github:alexspeller/ember-power-select-typeahead#6d279fb":
   version "0.8.0"
   resolved "https://codeload.github.com/alexspeller/ember-power-select-typeahead/tar.gz/6d279fb9e6a640282a2dc887fe06f1d09a062148"
   dependencies:
