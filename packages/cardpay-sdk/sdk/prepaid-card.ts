@@ -1,3 +1,5 @@
+/*global fetch */
+
 import BN from 'bn.js';
 import Web3 from 'web3';
 import { ContractOptions } from 'web3-eth-contract';

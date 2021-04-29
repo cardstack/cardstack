@@ -1,3 +1,5 @@
+/*global fetch */
+
 import Web3 from 'web3';
 import PrepaidCardManagerABI from '../contracts/abi/prepaid-card-manager.js';
 import { getAddress } from '../contracts/addresses.js';
